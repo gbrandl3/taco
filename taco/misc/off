@@ -17,7 +17,13 @@ usage() {
 ###########################################
 kill_procs()
 {
-	PSARGS="-af"
+	case `uname -s` in
+		Darwin*)
+			PSARGS="-o pid,command";;
+		*)
+			PSARGS="-o pid,comm";;
+	esac
+	
 	proc_name=$1
 	number_of_procs=`ps $PSARGS | grep -v $0 | grep -v grep | grep $proc_name | wc -l`
 	pid_list=`ps $PSARGS | grep -v grep | grep -v $0 | grep $proc_name | awk '{print $1}'`
