@@ -1,4 +1,3 @@
-
 /*+*******************************************************************
 
  File:          haz_xdr.h
@@ -13,9 +12,9 @@
 
  Original:	July 1992
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2004-02-06 13:11:22 $
+ Date:		$Date: 2004-02-19 15:49:18 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
