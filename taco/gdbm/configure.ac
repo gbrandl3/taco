@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(gdbm, 1.8.3, [gdbm-bug@gnu.org])
+AC_INIT(gdbm, 1.8.3a, [gdbm-bug@gnu.org])
 AC_PREREQ(2.53)
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR(gdbmdefs.h)

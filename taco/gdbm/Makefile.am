@@ -51,7 +51,7 @@ DISTCLEANFILES		= autoconf.h conv2gdbm junk.gdbm junkdbm.dir junkdbm.pag junkndb
 
 nodist_include_HEADERS	= gdbm.h 
 
-EXTRA_DIST 		= gdbm.3 gdbm.texinfo \
+EXTRA_DIST 		= autogen.sh gdbm.3 gdbm.texinfo \
 			gdbm.info gdbm.proto gdbm.proto2 \
 			getopt.c getopt.h 
 
