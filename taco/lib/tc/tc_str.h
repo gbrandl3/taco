@@ -1,36 +1,34 @@
 /****************************************************************************
+ *
+ * File:   	tc_str.h
+ *
+ * Project:   	Type conversion library
+ *
+ * Description: The header filefor the C module including all the conversion
+ *              functions from dev_xdr kernel types to string and the other
+ *              way around (from string to the dev_xdr kernel types).
+ *
+ * Author(s):   Faranguiss Poncet
+ *              $Author: jkrueger1 $
+ * Original:   	November 1996
+ *
+ * Version:	$Revision: 1.2 $
+ *
+ * Date:	$Date: 2003-05-21 16:15:19 $
+ *
+ * Copyright (c) 1996 by European Synchrotron Radiation Facility,
+ *                       Grenoble, France
+ *
+ *                       All Rights Reserved
+ *
+ *****************************************************************************/
 
- File          :   tc_str.h
 
- Project       :   Type conversion library
-
- Description   :   The header filefor the C module including all the conversion
-                   functions from dev_xdr kernel types to string and the other
-                   way around (from string to the dev_xdr kernel types).
-
- Author        :   Faranguiss Poncet
-
- Original      :   November 1996
-
- $Revision: 1.1 $                               $Author: jkrueger1 $
- $Date: 2003-04-25 11:21:45 $                                     $State: Exp $
-
- Copyright (c) 1996 by European Synchrotron Radiation Facility,
-                       Grenoble, France
-
-                       All Rights Reserved
-
-****************************************************************************/
-
-
-#ifndef _tc_str_h
-#define _tc_str_h
+#ifndef tc_str_h
+#define tc_str_h
 
 #include <dev_xdr.h>
 #include <maxe_xdr.h>
-
-
-
 
 /*--------------   Conversion from types TO STRING   ---------------------*/
 
@@ -82,16 +80,9 @@ long tc_DevVarDoubleArray_to_str(DevVarDoubleArray *d_dbl_arr, char *out_str);
 
 long tc_DevVarFloatReadPointArray_to_str(DevVarFloatReadPointArray *d_flrp_arr, char *out_str);
 
-long tc_DevVarStateFloatReadPointArray_to_str(
-                 DevVarStateFloatReadPointArray *d_stflrp_arr,
-                 char *out_str);
+long tc_DevVarStateFloatReadPointArray_to_str( DevVarStateFloatReadPointArray *d_stflrp_arr, char *out_str);
 
-long tc_DevVarLongReadPointArray_to_str( DevVarLongReadPointArray *d_lnrp_arr,
-                                         char *out_str);
-
-
-
-
+long tc_DevVarLongReadPointArray_to_str( DevVarLongReadPointArray *d_lnrp_arr, char *out_str);
 
 
 /*--------------   Conversion FROM STRING to types   ---------------------*/
@@ -138,6 +129,6 @@ long tc_str_to_DevMotorLong(char *in_str, DevMotorLong *d_motorl);
 long tc_str_to_DevMotorFloat(char *in_str, DevMotorFloat *d_motorf);
 
 
-#endif /* _tc_str_h */
+#endif /* tc_str_h */
 
 
