@@ -13,9 +13,9 @@
 
  Original: 	January 1991
 
- Version:	$Revision: 1.10 $
+ Version:	$Revision: 1.11 $
 
- Date:		$Date: 2004-03-03 08:42:05 $
+ Date:		$Date: 2004-03-03 11:37:18 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -338,7 +338,7 @@ int main (int argc, char **argv)
 #else
       					"rsh %s -l dserver -n \"export %s/%s %s %s 1>&- 2>&- &\" ", 
 #endif
-      					dbhost, homepath, dbm_server, mysql_name, nethost);
+      					dbhost, homepath, dbm_server, dbm_name, nethost);
 			}
 		}
 		else
@@ -380,15 +380,10 @@ int main (int argc, char **argv)
 			cmd_argv[i++] = dbm_server; 
 			cmd_argv[i++] = "-t";
 			if (c_flags.mysql == True)
-			{
 				cmd_argv[i++] = "mysql";
-				cmd_argv[i++] = mysql_name; 
-			}
 			else
-			{
 				cmd_argv[i++] = "dbm";
-				cmd_argv[i++] = dbm_name; 
-			}
+			cmd_argv[i++] = dbm_name; 
 			cmd_argv[i++] = nethost; 
 			cmd_argv[i] = 0;
 
