@@ -93,14 +93,14 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-			cerr << "File analyzis failed with error " << error << endl;
+			cerr << "File analysis failed with error " << error << endl;
 	    		cerr << "Error at line " << err_line << " in file " << file_name << " (" << error << ")" << endl;
 			cerr << "Error message : " << dev_error_str(error) << endl;
 		}
 		exit(-1);
 	}
 #ifdef DEBUG
-	cout << "File analyzis is OK" << endl;
+	cout << "File analysis is OK" << endl;
 
 	cout << nb_dev << " device list defined" << endl;	
 	for (int i = 0; i < nb_dev; i++)
