@@ -10,11 +10,11 @@ autoversion=`$AUTOCONF --version | head -n 1`
 
 echo "Using $autoversion"
 case $autoversion in
-    *2.5[2-7])
+    *2.5[2-79])
 	;;
     *)
 	echo "This autoconf version is not supported by gdbm."
-	echo "gdbm only supports autoconf 2.13 and 2.5[2-7]."
+	echo "gdbm only supports autoconf 2.13 and 2.5[2-79]."
 	exit
 	;;
 esac
