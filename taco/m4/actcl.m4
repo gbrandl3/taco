@@ -32,7 +32,7 @@ dnl
 dnl check in a few common install locations
 dnl	
 	if test x"${TCLCONFIG}" = x ; then
-               for i in `ls /usr/lib/* /usr/local/lib/* 2>/dev/null | grep ':$'` ; do
+               for i in "/usr/lib:" `ls -a /usr/lib/* /usr/local/lib/* 2>/dev/null | grep ':$'` ; do
                         dir="`dirname $i`/`basename $i ':'`"
                         if test -f "$dir/tclConfig.sh" ; then
                                 TCLCONFIG=$dir
@@ -47,6 +47,9 @@ dnl
 		. $TCLCONFIG/tclConfig.sh
 		TCL_PREFIX=`eval "echo $TCL_PREFIX"`
 		TCL_H=`find $TCL_PREFIX/include -type f -name tcl.h | grep $TCL_VERSION`
+		if test -z "$TCL_H" ; then
+			TCL_H=`find $TCL_PREFIX/include -type f -name tcl.h`
+		fi
 		TCLINCLUDE="-I`dirname $TCL_H`"
 		TCLLIB=`eval "echo $TCL_LIB_SPEC"`
 	fi
