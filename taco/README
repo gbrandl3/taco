@@ -1,0 +1,21 @@
+TACO is an object oriented control system originally developed at the European Synchrotron Radiation Facility 
+to control accelerators and beamlines and data acquisition systems. 
+
+At the ESRF (www.esrf.fr) TACO is used to control three accelerators - linear accelerator , booster synchrotron 
+and storage ring, and over 30 beamlines. 
+TACO is being used for instrument control for the new  neutron source FRM-II (www.frm2.tum.de) in Garching-Munich. 
+TACO has been applied to telescope control at the 26m radio telescope at the Hartebeesthoek Radio Astronomy Observatory 
+(www.hartroa.ac.za). 
+
+TACO is very scalable and can be used for simple single device laboratory like setups with only a few devices 
+or for a big installation comprising thousands of devices. TACO is a cheap and simple solution for doing distributed 
+home automation. TACO is available free of charge without warranties. 
+
+TACO is object oriented because it treats ALL (physical and logical) control points in a control system as objects 
+in a distributed environment. All actions are implement in classes. New classes can be constructed out of existing 
+classes in a hierarchical manner thereby ensuring a high-level of software reuse. Classes can be written in C++, 
+in C (using a methodology called Objects in C), in Python or in LabView (using G). 
+
+TACO has been designed to be portable and runs on a large number of platforms (e.g. Linux, Solaris, BSD, Mac OS X, 
+HP-UX, Win32, OS9). 
+
