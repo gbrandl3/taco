@@ -334,68 +334,70 @@ int MySQLServer::db_find(std::string tab_name, std::string p_res_name, char **ou
 	std::cerr << mysql_error(mysql_conn) << std::endl;
 	return (DbErr_DatabaseAccess);
     }
-    MYSQL_RES	*result = mysql_store_result(mysql_conn);
-    MYSQL_ROW	row;
-    *k1 = mysql_num_rows(result);
-    for (i = 0; i < *k1 && ((row = mysql_fetch_row(result)) != NULL); i++)
-    {
-	if (i)
+	MYSQL_RES	*result = mysql_store_result(mysql_conn);
+	MYSQL_ROW	row;
+	*k1 = mysql_num_rows(result);
+	for (i = 0; i < *k1 && ((row = mysql_fetch_row(result)) != NULL); i++)
 	{
-	    adr_tmp1 += SEP_ELT;
-	    adr_tmp1 += row[1];
+		if (i)
+		{
+			adr_tmp1 += SEP_ELT;
+			adr_tmp1 += row[1];
+		}
+		else
+			adr_tmp1 = row[1];
 	}
-	else
-	    adr_tmp1 = row[1];
-    }
-    try
-    {
-    	switch (i)
-    	{
+	mysql_free_result(result);
+	try
+	{
+    		switch (i)
+    		{
 //
 // If it is a normal resource,so copy the resource value to the result buffer 
 //
-	    case 1 : *out = new char[adr_tmp1.length() + 1];
-		     strcpy(*out, adr_tmp1.c_str());
-		     break;
+			case 1 : 
+				*out = new char[adr_tmp1.length() + 1];
+				strcpy(*out, adr_tmp1.c_str());
+				break;
 //
 // Initialize resource value to N_DEF if the resource is not defined in the
 // database 
 //
-    	    case 0 : *out = new char[10];
-		     strcpy(*out,"N_DEF");
-		     break;
+			case 0 : 
+				*out = new char[10];
+				strcpy(*out,"N_DEF");
+				break;
 //
 // For an array of resource 
 //
-    	    default: *out = new char[adr_tmp1.length() + 10];
-		     (*out)[0] = INIT_ARRAY;
-		     sprintf(&((*out)[1]),"%d", i);
-		     k = strlen(*out);
-		     (*out)[k] = SEP_ELT;
-		     (*out)[k + 1] = 0;
-		     strcat(*out, adr_tmp1.c_str());
-		     break;
-    	}
-    	mysql_free_result(result);
-    }
-    catch(const std::bad_alloc &e)
-    {
-    	mysql_free_result(result);
-	std::cerr << "Error in malloc for out" << std::endl;
-	throw e;
-    }
+			default: 
+				*out = new char[adr_tmp1.length() + 10];
+				(*out)[0] = INIT_ARRAY;
+				sprintf(&((*out)[1]),"%d", i);
+				k = strlen(*out);
+				(*out)[k] = SEP_ELT;
+				(*out)[k + 1] = 0;
+				strcat(*out, adr_tmp1.c_str());
+				break;
+		}
+	}
+	catch(const std::bad_alloc &e)
+	{
+		std::cerr << "Error in malloc for out" << std::endl;
+		throw e;
+	}
 //
 // For resource of the SEC domain, change all occurences of the ^ character
 // to the | character 
 //
-    if (sec_res)
-    {
-	k = strlen(*out);   
-   	for (int i = 0;i < k;i++)
-	    if ((*out)[i] == SEC_SEP)
+	if (sec_res)
+	{
+		k = strlen(*out);   
+		for (int i = 0;i < k;i++)
+			if ((*out)[i] == SEC_SEP)
 		(*out)[i] = '|';
-    }
-    return(0);
+	}
+	return DS_OK;
 }
 
 
@@ -536,16 +538,14 @@ int MySQLServer::db_devlist(std::string dev_na, int *dev_num, db_res *back)
 ****************************************************************************/
 DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
 {
-    int 		res_num = rece->tab_putres_len,
-			res_numb = 1;
+    int 			res_num = rece->tab_putres_len,
+				res_numb = 1;
     std::string::size_type	pos,
-			last_pos;
-    std::string		res_name,
-			res_val;
-    register putres 	*tmp_ptr;
-    unsigned int 	ctr;
-    char 		indnr[9];
-
+				last_pos;
+    std::string			res_name,
+				res_val;
+    register putres 		*tmp_ptr;
+    char 			indnr[16];
 
 #ifdef DEBUG
     for (int i = 0; i < res_num; i++)
@@ -589,21 +589,21 @@ DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
 // it is not necessary to look for the element separator to extract the last
 // element value from the string. 
 //
-	    if ((pos = res_val.find(SEP_ELT)) == std::string::npos)
-	    {
-		std::cerr << "Missing '" << SEP_ELT <<"' in resource value." << std::endl;
-		errcode = DbErr_BadDevSyntax;
-		return (&errcode);
-	    }
-	    ctr = (unsigned int)atoi(res_val.substr(1, pos - 1).c_str());
-	    res_numb = 1;
+		if ((pos = res_val.find(SEP_ELT)) == std::string::npos)
+		{
+			std::cerr << "Missing '" << SEP_ELT <<"' in resource value." << std::endl;
+			errcode = DbErr_BadDevSyntax;
+			return (&errcode);
+		}
+		int ctr = int(atoi(res_val.substr(1, pos - 1).c_str()) - 1);
+		res_numb = 1;
 
 	    for (int l = 0; l < ctr; l++)
 	    {
 //
 // Initialize database information 
 //
-		sprintf(indnr,"%d", res_numb++);
+		snprintf(indnr, sizeof(indnr), "%d", res_numb++);
 //
 // Add one array element in the database 
 //
@@ -619,7 +619,7 @@ DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
 // For the last element value 
 
 	    content = res_val.substr(pos + 1);
-	    sprintf(indnr,"%d",res_numb++);
+	    snprintf(indnr, sizeof(indnr), "%d",res_numb++);
 	    if (db_insert(res_name, indnr, content) != 0)
 	    {
 		errcode = DbErr_DatabaseAccess;
@@ -628,7 +628,7 @@ DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
 	}
 	else
 	{
-	    sprintf(indnr,"%d",res_numb++);
+	    snprintf(indnr, sizeof(indnr), "%d",res_numb++);
 	    if (db_insert(res_name, indnr, res_val) != 0)
 	    { 
 		errcode = DbErr_DatabaseAccess;

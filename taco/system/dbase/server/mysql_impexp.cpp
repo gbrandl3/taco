@@ -297,6 +297,7 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
             }
 	    if (mysql_query(mysql_conn, query.c_str()) != 0)
 	    {
+#warning What happens if this point is reached ?
 		throw;
 	    }
 	    MYSQL_RES	*result = mysql_store_result(mysql_conn);
@@ -662,7 +663,6 @@ svc_inf *MySQLServer::db_svcchk_1_svc(nam *dsn_name)
 ****************************************************************************/
 int MySQLServer::db_store(db_devinfo &dev_stu)
 {
-    int errorcode = 0;
 //
 // Try to retrieve the right tuple in the NAMES table 
 //
@@ -690,24 +690,24 @@ int MySQLServer::db_store(db_devinfo &dev_stu)
     {
 #if !HAVE_SSTREAM
    	if (mysql_query(mysql_conn, query.str()) != 0)
-	    throw int(DbErr_DatabaseAccess);
+	    throw long(DbErr_DatabaseAccess);
         query.freeze(false);
 #else
    	if (mysql_query(mysql_conn, query.str().c_str()) != 0)
-	    throw int(DbErr_DatabaseAccess);
+	    throw long(DbErr_DatabaseAccess);
 #endif
    	if (mysql_affected_rows(mysql_conn) == 0)
-	    throw int(DbErr_DeviceNotDefined);
+	    throw long(DbErr_DeviceNotDefined);
     }
-    catch(const int err)
+    catch(const long err)
     {
-	errorcode = err;
+	throw err;
     }
 //
 // Leave function
 //
 //  query.freeze(false);
-    return(errcode);
+	return DS_OK;
 }
 
 /****************************************************************************
@@ -730,7 +730,6 @@ int MySQLServer::db_store(db_devinfo &dev_stu)
 ****************************************************************************/
 int MySQLServer::db_store(db_devinfo_2 &dev_stu)
 {
-    int errorcode = 0;
 //
 // Try to retrieve the right tuple in the NAMES table 
 //
@@ -759,24 +758,24 @@ int MySQLServer::db_store(db_devinfo_2 &dev_stu)
     {
 #if !HAVE_SSTREAM
    	if (mysql_query(mysql_conn, query.str()) != 0)
-	    throw int(DbErr_DatabaseAccess);
+	    throw long(DbErr_DatabaseAccess);
         query.freeze(false);
 #else
    	if (mysql_query(mysql_conn, query.str().c_str()) != 0)
-	    throw int(DbErr_DatabaseAccess);
+	    throw long(DbErr_DatabaseAccess);
 #endif
    	if (mysql_affected_rows(mysql_conn) == 0)
-	    throw int(DbErr_DeviceNotDefined);
+	    throw long(DbErr_DeviceNotDefined);
     }
-    catch(const int err)
+    catch(const long err)
     {
-	errorcode = err;
+	throw err;
     }
 //
 // Leave function
 //
 //    query.freeze(false);
-    return(errorcode);
+    return DS_OK;
 }
 
 /****************************************************************************
@@ -801,7 +800,6 @@ int MySQLServer::db_store(db_devinfo_2 &dev_stu)
 ****************************************************************************/
 int MySQLServer::db_store(db_devinfo_3 &dev_stu)
 {
-    int errorcode = 0;
 //
 // Try to retrieve the right tuple in the NAMES table 
 //
@@ -834,23 +832,23 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
     {
 #if !HAVE_SSTREAM
    	if (mysql_query(mysql_conn, query.str()) != 0)
-	    throw int(DbErr_DatabaseAccess);
+	    throw long(DbErr_DatabaseAccess);
         query.freeze(false);
 #else
    	if (mysql_query(mysql_conn, query.str().c_str()) != 0)
-	    throw int(DbErr_DatabaseAccess);
+	    throw long(DbErr_DatabaseAccess);
 #endif
    	if (mysql_affected_rows(mysql_conn) == 0)
-	    throw int(DbErr_DatabaseAccess);
+	    throw long(DbErr_DatabaseAccess);
     }
-    catch(const int err)
+    catch(const long err)
     {
 	std::cerr << "MySQLServer::db_store(): error = " << mysql_error(mysql_conn) << std::endl;
-	errorcode = err;
+	throw err;
     }
 //
 // Leave function
 //
-//    query.freeze(false);
-    return(errorcode);
+//    	query.freeze(false);
+	return DS_OK;
 }

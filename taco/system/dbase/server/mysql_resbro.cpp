@@ -320,16 +320,24 @@ db_res *MySQLServer::resresolist_1_svc(db_res *recev)
 //
     std::string query;
 
-    if (mysql_db == "tango")
-    {
-    	query = "SELECT DISTINCT NAME FROM property_device WHERE DOMAIN = '";
-    	query += (user_domain + "' AND FAMILY = '" + user_family + "' AND MEMBER = '");
-    }
-    else
-    {
-    	query = "SELECT DISTINCT NAME FROM RESOURCE WHERE DOMAIN = '";
-    	query += (user_domain + "' AND FAMILY = '" + user_family + "' AND MEMBER = '");
-    }
+	if (mysql_db == "tango")
+	{
+		query = "SELECT DISTINCT NAME FROM property_device WHERE DOMAIN = '";
+	}
+	else
+	{
+		query = "SELECT DISTINCT NAME FROM RESOURCE WHERE DOMAIN = '";
+	}
+    	query += (user_domain + "' AND FAMILY = '" + user_family);
+	if (user_member != "*")
+	{
+		query += ("' AND MEMBER = '" + user_member + "' ORDER BY NAME ASC");
+	}
+        else
+	{
+                query += ("' ORDER BY NAME ASC");
+	}
+
     query += (user_member + "' ORDER BY NAME ASC");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
@@ -453,9 +461,12 @@ db_res *MySQLServer::resresoval_1_svc(db_res *recev)
     MYSQL_ROW   row;
     if (mysql_num_rows(result) == 0)
     { 
-	mysql_free_result(result);
-	browse_back.db_err = DbErr_ResourceNotDefined;
-	return(&browse_back);
+		if (user_member != "*" && user_reso != "*")
+		{
+			mysql_free_result(result);
+			browse_back.db_err = DbErr_ResourceNotDefined;
+			return(&browse_back);
+		}
     }
     res_val = "";
     while((row = mysql_fetch_row(result)) != NULL)
@@ -473,6 +484,7 @@ db_res *MySQLServer::resresoval_1_svc(db_res *recev)
 	else
 	    res_val += ("," + std::string(row[3]));
     }
+    reso_list.push_back(res_val);
     mysql_free_result(result);                                                                            
 //
 // Sort the resource array

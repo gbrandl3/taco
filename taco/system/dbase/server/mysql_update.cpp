@@ -53,12 +53,16 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 	std::string::size_type pos =  lin.rfind(':');
 	if (pos == std::string::npos)
 	{
-
+		psdev_back.error_code = DbErr_BadResourceType;
+		psdev_back.psdev_err = i + 1;
+		return (&psdev_back);
 	}
 	tmp = lin.substr(0, pos);
 	if (count(tmp.begin(), tmp.end(), '/') != 2)
 	{
-
+        	psdev_back.error_code = DbErr_BadResourceType;
+        	psdev_back.psdev_err = i + 1;
+        	return (&psdev_back);
 	}
 	lin.erase(0, pos + 1);
 	pos = tmp.find('/');
@@ -82,8 +86,8 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 	std::string query;
 	if (mysql_db == "tango")
 	{
-	    query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM device WHERE ";
-	    query += (" SERVER LIKE '" + ds_class + "/" + ds_name + "'");
+            query = "SELECT NAME FROM device WHERE ";
+            query += (" SERVER LIKE '" + ds_class + "/" + ds_name + "'");
 	}
 	else
 	{
@@ -148,6 +152,39 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 	    std::cerr << " Return = " << psdev_back.error_code << std::endl;
 #endif
 	}
+//
+// Delete devices which the same name but registered for other servers
+//
+	if (mysql_db == "tango")
+	{
+		for (std::vector<std::string>::iterator it = dev_list.begin(); it != dev_list.end(); ++it)
+		{
+#ifdef DEBUG
+			std::cout << "Checking device : "<< *it << std::endl;
+#endif
+// if device was not exported by the same server
+			if ( ( find(db_dev_list.begin(), db_dev_list.end(), *it)) == db_dev_list.end() )
+                        {
+#ifdef DEBUG
+				std::cout << "Not found -> delete" << std::endl;
+#endif
+// clean it from the database if an entry exists
+				query = "DELETE FROM device WHERE NAME = '" + *it + "'";
+				if (mysql_query(mysql_conn, query.c_str()) != 0)
+                                {
+					std::cerr << mysql_error(mysql_conn) << std::endl;
+					psdev_back.error_code = DbErr_DatabaseAccess;
+					psdev_back.psdev_err = i + 1;
+					return (&psdev_back);
+				}
+#ifdef DEBUG
+				if (mysql_affected_rows(mysql_conn) == 1)
+					std::cout << "Deleted existing device : "<< *it << std::endl;
+#endif
+			}
+		}
+	}
+
         for (std::vector<std::string>::iterator it = dev_list.begin(); it != dev_list.end(); ++it)
 	    if ((psdev_back.error_code = db_insert_names(ds_class, ds_name, ind, *it)) != 0)
 	    {
@@ -243,8 +280,8 @@ long MySQLServer::db_delete_names(const std::string ds_class, const std::string 
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "DELETE FROM device WHERE CLASS = '" + ds_class + "' AND SERVER LIKE  '"
-	       + ds_name + "/%' AND CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + dev_name + "'";
+	query = "DELETE FROM device WHERE SERVER LIKE '" + ds_class + "/" + ds_name
+                         + "' AND NAME = '" + dev_name + "'";
     }
     else
     {
@@ -302,7 +339,9 @@ long MySQLServer::db_insert_names(const std::string ds_class, const std::string 
         query << "INSERT INTO device(NAME, CLASS, SERVER, DOMAIN, FAMILY, MEMBER, IOR, PID, VERSION, EXPORTED)"
 	      << " VALUES('" << domain << "/" << family << "/" << member << "','" 
 	      << ds_class << "', '" << ds_class << "/" << ds_name << "', '" << domain << "', '" << family
-	      << "', '" << member << "', 'rpc::0', 0, 0, 0)" << std::ends;
+	      << "', '" << member << "', 'nada', 0, 0, 0)" << std::ends;
+//	      << "', '" << member << "', 'rpc::0', 0, 0, 0)" << std::ends;
+
 #if DEBUG
         std::cout << query.str() << std::endl;
 #endif
@@ -578,44 +617,46 @@ long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
 	}
     }
 //
-// Insert a new tuple 
+// Insert a new tuple only if the value != %
 //
-    std::stringstream query;
-    if (mysql_db == "tango")
-    {
-        query << "INSERT INTO property_device(DEVICE,NAME,DOMAIN,FAMILY,MEMBER,COUNT,VALUE) VALUES('"
-	      << domain << "/" << family << "/" << member << "','" << name << "','"
-	      << domain << "','" << family << "','" << member << "','" 
-	      << numb << "',\"" << val << "\")" << std::ends;
-
-    }
-    else
-    {
-        query << "INSERT INTO RESOURCE(DOMAIN, FAMILY, MEMBER, NAME, INDEX_RES, RESVAL) VALUES('"
-	      << domain << "', '" << family << "', '" << member << "', '" << name << "', " << numb
-	      << ", '" << val << "')" << std::ends;
-    }
+	if (val != "%")
+	{
+    		std::stringstream query;
+    		if (mysql_db == "tango")
+    		{
+			query << "INSERT INTO property_device(DEVICE,NAME,DOMAIN,FAMILY,MEMBER,COUNT,VALUE) VALUES('"
+			<< domain << "/" << family << "/" << member << "','" << name << "','"
+			<< domain << "','" << family << "','" << member << "','" 
+			<< numb << "',\"" << val << "\")" << std::ends;
+		}
+		else
+    		{
+			query << "INSERT INTO RESOURCE(DOMAIN, FAMILY, MEMBER, NAME, INDEX_RES, RESVAL) VALUES('"
+				<< domain << "', '" << family << "', '" << member << "', '" << name << "', " << numb
+				<< ", '" << val << "')" << std::ends;
+		}
 #ifdef DEBUG
-    std::cout << "MySQLServer::upd_res(): query = " << query.str() << std::endl;
+		std::cout << "MySQLServer::upd_res(): query = " << query.str() << std::endl;
 #endif /* DEBUG */
 #if !HAVE_SSTREAM
-    if (mysql_query(mysql_conn, query.str()) != 0)
+		if (mysql_query(mysql_conn, query.str()) != 0)
 #else
-    if (mysql_query(mysql_conn, query.str().c_str()) != 0)
+		if (mysql_query(mysql_conn, query.str().c_str()) != 0)
 #endif
-    {
-	std::cerr << __LINE__ << mysql_error(mysql_conn) << std::endl;
-	std::cerr << query.str() << std::endl;
+		{
+			std::cerr << __LINE__ << mysql_error(mysql_conn) << std::endl;
+			std::cerr << query.str() << std::endl;
 #if !HAVE_SSTREAM
-	query.freeze(false);
+			query.freeze(false);
 #endif
-	*p_err = DbErr_DatabaseAccess;
-	return (-1);
-    }
+			*p_err = DbErr_DatabaseAccess;
+			return (-1);
+		}
 #if !HAVE_SSTREAM
-    query.freeze(false);
+		query.freeze(false);
 #endif
-    return(0);
+	}
+	return DS_OK;
 }
 
 
@@ -652,8 +693,17 @@ db_res *MySQLServer::secpass_1_svc()
 //
 // Build security file name
 //
-    std::string f_name((char *)getenv("DBM_DIR"));
-    f_name.append("/.sec_pass");	
+	std::string f_name;
+        if (getenv("SEC_DIR") != NULL)
+        {
+        	f_name = (char *)getenv("SEC_DIR");
+	}
+        else
+	{
+		f_name = (char *)getenv("HOME");
+	}
+
+	f_name.append("/.sec_pass");	
 //
 // Try to open the file
 //

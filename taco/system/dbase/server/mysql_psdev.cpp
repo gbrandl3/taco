@@ -102,44 +102,52 @@ db_psdev_error *MySQLServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
 ****************************************************************************/
 long MySQLServer::reg_ps(std::string h_name, long pid, std::string ps_name, long poll, long *p_error)
 {
-    std::string	ps_name_low(ps_name);
+	std::string	ps_name_low(ps_name);
 //
 // Make a copy of the pseudo device name in lowercase letter 
 //
-    transform(ps_name_low.begin(), ps_name_low.end(), ps_name_low.begin(), ::tolower);
-    if (count(ps_name_low.begin(), ps_name_low.end(), '/') != 2)
-    {
-	*p_error = DbErr_BadDevSyntax;
-	return (-1);
-    }
+	transform(ps_name_low.begin(), ps_name_low.end(), ps_name_low.begin(), ::tolower);
+	if (count(ps_name_low.begin(), ps_name_low.end(), '/') != 2)
+	{
+		*p_error = DbErr_BadDevSyntax;
+		return (-1);
+	}
 //
 // First, check that the name used for the pseudo device is not already used
 // for a real device 
 //
-    std::string query = "SELECT COUNT(*) FROM NAMES WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + ps_name_low + "'";
-    if (mysql_query(mysql_conn, query.c_str()) != 0)
-    {
-	std::cerr << mysql_error(mysql_conn) << std::endl; 
-	*p_error = DbErr_DatabaseAccess;
-	return(-1);
-    }
-    MYSQL_RES *result = mysql_store_result(mysql_conn);
-    MYSQL_ROW row;
-    if ((row = mysql_fetch_row(result)) != NULL)
-    {
-	if (atoi(row[0]))
-    	{
-	    *p_error = DbErr_NameAlreadyUsed;
-	    return(-1);
-    	}
-    }
-    else
-    {
+	std::string query; 
+	if (mysql_db == "tango")
+	{
+    		query = "SELECT COUNT(*) FROM device WHERE NAME = '" + ps_name_low + "' AND CLASS NOT LIKE 'PseudoDevice'";
+	}
+	else
+	{
+    		query = "SELECT COUNT(*) FROM NAMES WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + ps_name_low + "'";
+	}
+	if (mysql_query(mysql_conn, query.c_str()) != 0)
+	{
+		std::cerr << mysql_error(mysql_conn) << std::endl; 
+		*p_error = DbErr_DatabaseAccess;
+		return(-1);
+	}
+	MYSQL_RES *result = mysql_store_result(mysql_conn);
+	MYSQL_ROW row;
+	if ((row = mysql_fetch_row(result)) != NULL)
+	{
+		if (atoi(row[0]))
+    		{
+			*p_error = DbErr_NameAlreadyUsed;
+			return(-1);
+		}
+	}
+	else
+	{
+		mysql_free_result(result);
+		*p_error = DbErr_DatabaseAccess;
+		return (-1);
+	}
 	mysql_free_result(result);
-	*p_error = DbErr_DatabaseAccess;
-	return (-1);
-    }
-    mysql_free_result(result);
 //
 // Now, try to retrieve a tuple in the PS_NAMES table with the same pseudo
 // device name 
@@ -185,17 +193,26 @@ long MySQLServer::reg_ps(std::string h_name, long pid, std::string ps_name, long
 	    std::string		domain,
 				family,
 				member;
+//
+// Split the name into domain, family, and member
+//
+		pos = ps_name_low.find('/');
+		domain = ps_name_low.substr(0, pos);
+		pos = ps_name_low.find('/', (last_pos = pos + 1));
+		family = ps_name_low.substr(last_pos, (pos - last_pos));
+		pos = ps_name_low.find('/', (last_pos = pos + 1));
+		member = ps_name_low.substr(last_pos, (pos - last_pos));
 
 	    strquery.seekp(0);
 	    if (mysql_db == "tango")
 	    {
-    	       strquery << "INSERT INTO device (DOMAIN, FAMILY, MEMBER, HOST, PID, IOR, EXPORTED, SERVER, CLASS, VERSION) VALUES('"
-	  	   << domain << "', '" << family << "', '" << member << "', '" << h_name << "', " 
+		strquery << "INSERT INTO device (NAME, DOMAIN, FAMILY, MEMBER, HOST, PID, IOR, EXPORTED, SERVER, CLASS, VERSION) VALUES('"
+                   << ps_name_low << "', '" << domain << "', '" << family << "', '" << member << "', '" << h_name << "', "
 		   << pid << ", 'DC:" << poll << "',1,'DataCollector','PseudoDevice',1)" << std::ends;
 	    }
 	    else
 	    {
-    	       strquery << "INSERT INTO PS_NAMES (DOMAIN, FAMILY, MEMBER, HOST, PROCESS_ID, POLL) VALUES('"
+		strquery << "INSERT INTO PS_NAMES (DOMAIN, FAMILY, MEMBER, HOST, PROCESS_ID, POLL) VALUES('"
 	  	   << domain << "', '" << family << "', '" << member << "', '" << h_name << "', " 
 		   << pid << ", " << poll << ")" << std::ends;
 	    }
@@ -315,12 +332,7 @@ db_psdev_error *MySQLServer::db_psdev_unreg_1_svc(arr1 *rece)
 ****************************************************************************/
 long MySQLServer::unreg_ps(std::string ps_name, long *p_error)
 {
-    long i,
-	l;
     std::string	ps_name_low(ps_name);
-    datum 	key,
-		content;
-    char 	key_buf[MAX_KEY];
 //
 // Make a copy of the pseudo device name in lowercase letter 
 //
