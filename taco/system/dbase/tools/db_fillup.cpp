@@ -42,9 +42,9 @@ static int 	from_res(void);
 static int 	read_file(std::string);
 static void 	dev_name(void);
 static int 	TestLine(char *,char *,int);
-static void 	dev_line(char *,ifstream &, const std::string, int, char *);
+static void 	dev_line(char *, std::ifstream &, const std::string, int, char *);
 static int 	dev_name(const std::string, int);
-static int 	res_line(std::string, ifstream &, const std::string, int , char *);
+static int 	res_line(std::string,  std::ifstream &, const std::string, int , char *);
 static int 	rs_val(std::string ,int);
 static int 	ask_passwd(void);
 static void 	create_db(void);
@@ -246,7 +246,7 @@ static int from_res(void)
  */
 static int read_file(const std::string f_name)
 {
-	ifstream	fil(f_name.c_str());
+	std::ifstream	fil(f_name.c_str());
 	char 		line[256],
     			line1[256];
 
@@ -434,9 +434,9 @@ static int TestLine(char *line,char *line1,int k)
  * @param line          A pointer to a buffer where to store the next line in the
  *              	resource file which defined device name
  */
-static void dev_line(char *line1, ifstream &file, const std::string f_name, int siz_line, char *line)
+static void dev_line(char *line1, std::ifstream &file, const std::string f_name, int siz_line, char *line)
 {
-	std::string		temp,
+	std::string	temp,
 			base,
 			ptr;
 	char 		*tmp;
@@ -700,7 +700,7 @@ static int dev_name(const std::string line, int numb)
  * @param line          A pointer to a buffer where to store the next line in the
  *              	resource file which defined the resource array
  */
-static int res_line(string line1, ifstream &file, const std::string f_name, int siz_line, char *line)
+static int res_line(std::string line1, std::ifstream &file, const std::string f_name, int siz_line, char *line)
 {
 	unsigned int 	diff;
     	int 		l_base,
@@ -1091,7 +1091,7 @@ static int ask_passwd()
 	}
 
 /* Get the passwd stored in the file */
-	ifstream 	file_sec(f_name.c_str());
+	std::ifstream 	file_sec(f_name.c_str());
 	if (!file_sec)
 	{
         	std::cerr << "dbm_update : Can't get passwd information" << std::endl;
@@ -1159,7 +1159,7 @@ static void create_db(void)
 	while(env_string.length())
 	{
 		std::string::size_type	pos = env_string.find_first_of(",");
-		string t;
+		std::string t;
 		if (pos != std::string::npos)
 		{
 			t = env_string.substr(0, pos);
