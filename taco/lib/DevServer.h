@@ -9,13 +9,13 @@
 
  Author(s):	Andy Goetz
 		Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original:	March 1990
 
- Version:	$Revision: 1.6 $
+ Version:	$Revision: 1.7 $
 
- Date:		$Date: 2004-07-14 12:44:40 $
+ Date:		$Date: 2005-03-29 09:47:16 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -29,6 +29,7 @@
 
 #ifdef __cplusplus
 #include <DeviceBase.h>
+#include <Device.h>
 #endif /* __cplusplus */
 
 /*
@@ -36,7 +37,7 @@
  */
 #ifdef _IDENT
 static char DevServerh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServer.h,v 1.6 2004-07-14 12:44:40 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServer.h,v 1.7 2005-03-29 09:47:16 andy_gotz Exp $";
 #endif /* _IDENT */
 
 typedef long DevMethod;
