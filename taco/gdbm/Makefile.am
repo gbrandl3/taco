@@ -1,7 +1,7 @@
 # GDBM 1.8.3 builds shared libraries version 3.0
-SHLIB_VER = 3 0 0
+SHLIB_VER 		= 3 0 0
 
-lib_LTLIBRARIES = libgdbm.la 
+lib_LTLIBRARIES 	= libgdbm.la 
 check_PROGRAMS 		= testgdbm testdbm testndbm 
 
 if COMPAT
