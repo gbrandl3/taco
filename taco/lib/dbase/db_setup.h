@@ -1,9 +1,9 @@
 /*
  * Author:	$Author: jkrueger1 $
  * 
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:		$Date: 2004-03-09 17:02:49 $
+ * Date:		$Date: 2004-03-26 16:37:09 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -114,10 +114,10 @@
 #define DOMAIN_NAME_LENGTH	9
 #define FAMILY_NAME_LENGTH	20
 #define MEMBER_NAME_LENGTH	20
-#define DEV_NAME_LENGTH		24
 #if 0
-#define DEV_NAME_LENGTH		DOMAIN_NAME_LENGTH + FAMILY_NAME_LENGTH + MEMBER_NAME_LENGTH 
+#define DEV_NAME_LENGTH		24
 #endif
+#define DEV_NAME_LENGTH		DOMAIN_NAME_LENGTH + FAMILY_NAME_LENGTH + MEMBER_NAME_LENGTH 
 #define RES_NAME_LENGTH		32
 #ifdef NDBM
 #define RES_VAL_LENGTH		2048
