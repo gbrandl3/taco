@@ -54,7 +54,6 @@ AC_DEFUN([SWIG_PROG],[
 		test -n "$swig_tmp" && swig_tmp=yes || swig_tmp=no
 		AC_MSG_RESULT([$swig_tmp])
 	fi
-	AM_CONDITIONAL(BUILD_PYTHON, [test x"$swig_tmp" = x"yes"])
 	AC_SUBST([SWIG_RUNTIME_LIBS_DIR])
 ])
 
@@ -95,6 +94,7 @@ AC_DEFUN([SWIG_PYTHON],[
 	if test "$SWIG" ; then
 		AC_SUBST([SWIG_LIB], [`$SWIG -swiglib`])
 	fi
+	AM_CONDITIONAL(BUILD_PYTHON, [test x"$swig_tmp" = x"yes" -a x"$taco_python_binding" = x"yes"])
 	AC_SUBST([SWIG_PYTHON_CPPFLAGS],[$PYTHON_CPPFLAGS])
 	AC_SUBST([SWIG_PYTHON_LIBS],["-L$SWIG_RUNTIME_LIBS_DIR -lswigpy"])
 ])

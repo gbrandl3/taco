@@ -75,7 +75,7 @@ dnl
 	  		if test -r $python_libdir/libpython${ac_python_version}.a; then
 				PYTHON_LDFLAGS="-L$python_libdir -lpython${ac_python_version} $LIBDL $LIBSOCKET"
 				taco_python_bindings=yes
-				AC_MSG_RESULT([build Python binding])
+				AC_MSG_RESULT([Python (devel and runtime) found.])
 			else
 				AC_MSG_RESULT([libpython${ac_python_version}.a not found.])
  	 	    	fi
