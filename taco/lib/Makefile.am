@@ -28,14 +28,14 @@ INCLUDES		= @TACO_INCLUDES@
 
 ## AM_CPPFLAGS 		= -DEBUG
 
-libtacoc_la_SOURCES 	= gen_api.c dev_errors.c dev_states.c oic.c 
+libtacoc_la_SOURCES 	= gen_api.c dev_errors.c dev_states.c oic.c util_api.c asyn_api.c gettrans.c 
 libtacoc_la_LDFLAGS 	= -version-info @LIB_VERSION@
 libtacoc_la_LIBADD  	= xdr/libdsxdr.la
 
 EXTRA_DIST 		= 
 
-SRC_TACO_SPECIAL 	= util_api.c asyn_api.c dev_api.c sec_api.c event_api.c \
-			svc_api.c DevServerSig.c  gettrans.c event_relisten.c 
+SRC_TACO_SPECIAL 	= dev_api.c sec_api.c event_api.c \
+			svc_api.c DevServerSig.c  event_relisten.c 
 
 libtacoapi_la_SOURCES 	= $(SRC_TACO_SPECIAL) 
 libtacoapi_la_CFLAGS  	= -DCLIENTONLY 

@@ -11,15 +11,15 @@
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.10 $
+ Version:	$Revision: 1.11 $
 
- Date:		$Date: 2004-03-09 17:15:50 $
+ Date:		$Date: 2004-03-26 16:21:52 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
 
 ********************************************************************-*/
-#include <config.h>
+#include "config.h"
 /*
  * Include files and Static Routine definitions
  */
@@ -27,13 +27,11 @@
 /*
  * C++ version
  */
-#ifdef __cplusplus
-#ifdef _UCC
-#include <types.h>
+#ifdef HAVE_SYS_TYPES_H
+#	include <sys/types.h>
 #else
-#include <sys/types.h>
+#	include <types.h>
 #endif
-#endif /* __cplusplus */
 
 #include <API.h>
 #include <private/ApiP.h>
@@ -100,7 +98,7 @@ extern char *dev_error_stack;
 static long read_device_id 	PT_( (long device_id, long *ds_id,
 long *connection_id, long *error) );
 
-/**
+/**@ingroup dsAPI
  * RPC procedure corresponding to dev_import().
  *
  * Registers a device as imported and returns
@@ -131,7 +129,7 @@ _dev_import_out * _DLLFunc rpc_dev_import_4 (_dev_import_in *dev_import_in,
 	dev_import_out.var_argument.length   = 0;
 	dev_import_out.var_argument.sequence = NULL;
 
-	/*
+/*
  * first try to to find the device among the list of
  * devices already being served 
  *
@@ -206,7 +204,7 @@ _dev_import_out * _DLLFunc rpc_dev_import_4 (_dev_import_in *dev_import_in,
 }
 
 
-/**
+/**@ingroup dsAPI
  * RPC procedure corresponding to dev_free().
  *
  * Unregisters an imported device. 
@@ -265,7 +263,7 @@ _dev_free_out * _DLLFunc rpc_dev_free_4 (_dev_free_in *dev_free_in)
 	return (&dev_free_out);
 }
 
-/**
+/**@ingroup dsAPI
  * RPC procedure corresponding to dev_putget().
  *   
  * Executes commands on devices by calling the command handler. 
@@ -450,7 +448,7 @@ _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
 }
 
 
-/**
+/**@ingroup dsAPI
  * RPC procedure corresponding to dev_put().
  *
  * Executes commands on devices by calling the command handler. 
@@ -581,7 +579,7 @@ _client_data * _DLLFunc rpc_dev_put_4 (_server_data *server_data)
 }
 
 
-/**
+/**@ingroup dsAPI
  * RPC procedure corresponding to dev_putget_raw().
  *
  * Executes commands on devices by calling the command handler. 
@@ -791,7 +789,7 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
 
 
 
-/**
+/**@ingroup dsAPI
  * The first part of the aynchronous call.
  *
  * Will do the administration part of the call.
@@ -860,7 +858,7 @@ _client_data * _DLLFunc rpc_dev_put_asyn_4 (_server_data *server_data)
 	return (&client_data);
 }
 
-/**
+/**@ingroup dsAPI
  * The second part of the asynchronous call.
  *
  * The command will be executed without any return values. 
@@ -961,7 +959,7 @@ void _DLLFunc rpc_dev_put_asyn_cmd (_server_data *server_data)
 
 
 
-/**@ingroup dsAPIserver
+/**@ingroup dsAPI
  * This function makes devices visible for device server clients. All necessary connection information
  * for a @ref dev_import() call will be stored in a database table. Moreover the exported devices are 
  * added to the device server's global list of exported devices. The function is installed as a method

@@ -14,9 +14,9 @@
 
  Original:	November 1993
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-04-25 11:21:45 $
+ Date:		$Date: 2004-03-26 16:21:52 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -31,7 +31,7 @@
  */
 #ifdef _IDENT
 static char DevXdrKernelh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/DevXdrKernel.h,v 1.1 2003-04-25 11:21:45 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/DevXdrKernel.h,v 1.2 2004-03-26 16:21:52 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -40,7 +40,6 @@ static char DevXdrKernelh[] =
 /*
  * include XDR data types for the kernel.
  */
-
 #include <API_xdr.h>
 #include <dev_xdr.h>
 

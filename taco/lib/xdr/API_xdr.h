@@ -12,9 +12,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		 $Date: 2004-02-06 13:11:22 $
+ Date:		 $Date: 2004-03-26 16:21:52 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -29,7 +29,7 @@
  */
 #ifdef _IDENT
 static char API_xdrh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/API_xdr.h,v 1.2 2004-02-06 13:11:22 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/API_xdr.h,v 1.3 2004-03-26 16:21:52 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -263,6 +263,10 @@ bool_t _DLLFunc xdr__msg_out PT_((XDR *xdrs, _msg_out *objp));
 bool_t _DLLFunc xdr__dev_event_info PT_((XDR *xdrs, _dev_event_info *objp));
 bool_t _DLLFunc xdr__msg_manager_data PT_((XDR *xdrs, _msg_manager_data *objp));
 bool_t _DLLFunc xdr__dev_queryevent_out PT_((XDR *xdrs, _dev_queryevent_out *objp));
+/*
+bool_t _DLLFunc xdr__asynch_client_data PT_((XDR *xdrs, _asynch_client_data *objp));
+bool_t _DLLFunc xdr__asynch_client_raw_data PT_((XDR *xdrs, _asynch_client_raw_data *objp));
+*/
 #ifdef __cplusplus
 }
 #endif

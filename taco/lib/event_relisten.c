@@ -1,6 +1,7 @@
 #include <API.h>
 #include <Admin.h>
 #include <stdio.h>
+#include <private/ApiP.h>
 
 typedef struct event_relisten_info {
     long event_id; 

@@ -33,9 +33,9 @@
 
  Original   :	April 1999
 
- Version    :	$Revision: 1.7 $
+ Version    :	$Revision: 1.8 $
 
- Date       :	$Date: 2004-03-09 09:35:50 $
+ Date       :	$Date: 2004-03-26 16:21:52 $
 
  Copyleft (c) 1999 by European Synchrotron Radiation Facility,
                       Grenoble, France
@@ -107,7 +107,13 @@ extern "C" {
 static event_client *event_client_list=NULL;
 
 /* following line should be in API_xdr.h */
+#ifdef __cplusplus
+extern "C" {
+#endif
 bool_t _DLLFunc xdr__asynch_client_data PT_((XDR *xdrs, _asynch_client_data *objp));
+#ifdef __cplusplus
+}
+#endif
 
 /**
  * application interface to register a client as a listener

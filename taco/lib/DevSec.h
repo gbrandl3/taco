@@ -11,9 +11,9 @@
 
  Original:      September 1993
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
  
- Date:		$Date: 2003-05-02 09:12:48 $
+ Date:		$Date: 2004-03-26 16:21:52 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -101,68 +101,44 @@ typedef struct _SecOpenConn {
 	} SecOpenConn;
 
 
-
-long _DLLFunc dev_security
-			PT_( (char *dev_name, long requested_access,
+#ifdef __cplusplus
+extern "C" {
+#endif
+long _DLLFunc dev_security PT_( (char *dev_name, long requested_access,
 			long *ret_client_id, long *connection_id,
 			long *error) );
-long _DLLFunc create_sec_key
-			PT_( (devserver ds, long *error) );
-long _DLLFunc verify_sec_key
-			PT_( (devserver ds, long *client_id, long *error));
-void _DLLFunc free_sec_key
-			PT_( (devserver ds) );
-long _DLLFunc sec_tcp_connection
-			PT_( (long requested_access, CLIENT * *clnt,
+long _DLLFunc create_sec_key PT_( (devserver ds, long *error) );
+long _DLLFunc verify_sec_key PT_( (devserver ds, long *client_id, long *error));
+void _DLLFunc free_sec_key PT_( (devserver ds) );
+long _DLLFunc sec_tcp_connection PT_( (long requested_access, CLIENT * *clnt,
 			server_connections *svr_conn, long *error) );
-void _DLLFunc sec_free_tcp_connection
-			PT_( (devserver ds,server_connections *svr_conn));
+void _DLLFunc sec_free_tcp_connection PT_( (devserver ds,server_connections *svr_conn));
+long _DLLFunc free_connection_id_vers3 PT_( (long connection_id, long *error) );
+#ifdef __cplusplus
+}
+#endif
 
 #ifdef _DevServer_h
 /* DevServerDevices is declared in DevServer.h
  * so hopefully these functions are needed only for servers
  */
-#ifndef __cplusplus
-/*
- * OIC version
- */
-long _DLLFunc sec_svc_import
-			PT_( (DevServerDevices *device, long connection_id,
+#ifdef __cplusplus
+extern "C" {
+#endif
+long _DLLFunc sec_svc_import PT_( (DevServerDevices *device, long connection_id,
 			long client_id, long access_right,
 			struct svc_req *rqstp, long *error) );
-long _DLLFunc sec_svc_free
-			PT_( (DevServerDevices *device, long connection_id,
+long _DLLFunc sec_svc_free PT_( (DevServerDevices *device, long connection_id,
 			long client_id, long access_right,
 			long *error) );
-long _DLLFunc sec_svc_cmd
-			PT_( (DevServerDevices *device, long connection_id,
+long _DLLFunc sec_svc_cmd PT_( (DevServerDevices *device, long connection_id,
 			long client_id, long access_right,
 			long cmd, long *error) );
-void _DLLFunc free_var_str_array
-			PT_( (DevVarStringArray *str_array) );
-#else
-/*
- * C++ version
- */
-extern "C" long _DLLFunc sec_svc_import
-			PT_( (DevServerDevices *device, long connection_id,
-			long client_id, long access_right,
-			struct svc_req *rqstp, long *error) );
-extern "C" long _DLLFunc sec_svc_free
-			PT_( (DevServerDevices *device, long connection_id,
-			long client_id, long access_right,
-			long *error) );
-extern "C" long _DLLFunc sec_svc_cmd
-			PT_( (DevServerDevices *device, long connection_id,
-			long client_id, long access_right,
-			long cmd, long *error) );
-extern "C" void _DLLFunc free_var_str_array
-			PT_( (DevVarStringArray *str_array) );
-#endif /* __cplusplus */
+void _DLLFunc free_var_str_array PT_( (DevVarStringArray *str_array) );
+#ifdef __cplusplus
+}
+#endif
 #endif /* _DevServer_h */
-
-long _DLLFunc free_connection_id_vers3
-			PT_( (long connection_id, long *error) );
 
 
 #endif /* _DevSec_h */

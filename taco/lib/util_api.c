@@ -13,9 +13,9 @@
 
  Original   :	April 1993
 
- Version:	$Revision: 1.11 $
+ Version:	$Revision: 1.12 $
 
- Date:		$Date: 2004-03-09 17:02:49 $
+ Date:		$Date: 2004-03-26 16:21:52 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -1002,7 +1002,7 @@ int*  error;
 }
 #endif   /* _NT */
 
-/**ingroup internalAPI
+/**ingroup clientAPIintern
  * Get the index for the nethost from the device
  * name. The nethost is specified in the device name
  * as "//nethost/domain/family/member". 
@@ -1075,7 +1075,7 @@ long _DLLFunc get_i_nethost_by_device_name (char *device_name, long *error)
 	return(i_nethost);
 }
 
-/**@ingroup internalAPI
+/**@ingroup clientAPIintern
  * Get the index for the nethost from the nethost name. 
  *
  * @param nethost 	the nethost name
@@ -1116,7 +1116,7 @@ long _DLLFunc get_i_nethost_by_name (char *nethost, long *error)
 }
 
 
-/**@ingroup internalAPI
+/**@ingroup clientAPIintern
  * Get the nethost name associated with this index
  * 
  * @param i_nethost 	nethost index
@@ -1144,7 +1144,7 @@ char* _DLLFunc get_nethost_by_index (long i_nethost, long *error)
 }
 
 
-/**@ingroup internalAPI
+/**@ingroup clientAPIintern
  * Extract the domain/family/member part of name from the 
  * full device name "//nethost/domain/family/member?number" ,
  * return a pointer
@@ -1155,7 +1155,6 @@ char* _DLLFunc get_nethost_by_index (long i_nethost, long *error)
  *
  * @return	pointer to string containing only "domain/family/member"
  */
-	
 char* _DLLFunc extract_device_name (char *full_name, long *error)
 {
 	static char *device_name_alloc=NULL, *device_name;
@@ -1192,7 +1191,7 @@ extern struct _devserver *msg_ds;
 extern struct _devserver *db_ds;
 extern short *auth_flag;
 
-/**@ingroup internalAPI
+/**@ingroup clientAPIintern
  * alloc place for MIN_NETHOST to global array which contains list of nethosts
  * 
  * @param error Will contain an appropriate error code if the

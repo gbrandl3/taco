@@ -25,9 +25,9 @@
 
  Original   :	January 1997
 
- Version:	$Revision: 1.9 $
+ Version:	$Revision: 1.10 $
 
- Date:		$Date: 2004-03-09 17:02:48 $
+ Date:		$Date: 2004-03-26 16:21:52 $
 
  Copyright (c) 1997-2000 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -125,9 +125,14 @@ asynch_request client_asynch_request = {0, NULL};
 
 /* DIRTY FIX - the following 2 lines should be in API_xdr.h */
 
+#ifdef __cplusplus 
+extern "C" {
+#endif
 bool_t _DLLFunc xdr__asynch_client_data PT_((XDR *xdrs, _asynch_client_data *objp));
-
 bool_t _DLLFunc xdr__asynch_client_raw_data PT_((XDR *xdrs, _asynch_client_raw_data *objp));
+#ifdef __cplusplus 
+}
+#endif
 
 
 /*

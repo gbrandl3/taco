@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.10 $
+ Version    :	$Revision: 1.11 $
 
- Date	    :	$Date: 2004-03-09 17:02:49 $
+ Date	    :	$Date: 2004-03-26 16:21:52 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -77,7 +77,7 @@ static long 	dev_import_local PT_( (_dev_import_in  *dev_import_in, devserver  *
 static long 	dev_free_local PT_( (_dev_free_in  *dev_free_in, long* error) );
 static long 	dev_put_local PT_( (_server_data  *server_data, long* error) );
 static long 	dev_putget_local PT_( (_server_data  *server_data, _client_data  *client_data, long* error) );
-long 		dev_notimported_init PT_( (char *device_name, long access, long i_nethost, devserver *ds_ptr, long *error) );
+long _DLLFunc	dev_notimported_init PT_( (char *device_name, long access, long i_nethost, devserver *ds_ptr, long *error) );
 
 /*
  * local data used by each client is kept in external area
@@ -1438,8 +1438,8 @@ DON'T - 26/3/98
 	return (status);
 }
 
-/**@ingroup dsAPI
- * query already open connections to servers.  If a connection to a server is already
+/**@ingroup clientAPIintern
+ * Query already open connections to servers.  If a connection to a server is already
  * established, it will be reused. Otherwise a new connection to a server will be
  * created.
  *
@@ -1482,9 +1482,8 @@ long _DLLFunc dev_query_svr (char* host, long prog_number, long vers_number)
 	}
 
 /*
-  * search amongst list of existing connections for server matching
-  * this host and port
-  */
+ * search amongst list of existing connections for server matching this host and port
+ */
 	for (i = 0; i < NFILE; i++)
 	{
 		if (svr_conns[i].no_conns == 0)
@@ -1572,14 +1571,11 @@ long _DLLFunc dev_xdrfree (DevType type, DevArgument objptr, long *error)
 	return (DS_OK);
 }
 
-/**@ingroup dsAPI
- * Checks the RPC connection to a server.
- * If a tcp connection was detected as lost or 
- * a udp connection has shown three timeouts in
- * a row, the function tries to recreate the
- * RPC handle and to reimport the current device.
- * If one of the two steps fails, the connection to
- * the server is marked as a bad connection.
+/**@ingroup clientAPIintern 
+ * Checks the RPC connection to a server.  If a tcp connection was detected as lost or 
+ * a udp connection has shown three timeouts in a row, the function tries to recreate the
+ * RPC handle and to reimport the current device.  If one of the two steps fails, the 
+ * connection to the server is marked as a bad connection.
  * 
  * @param ds 	handle to device.
  * @param error Will contain an appropriate error code if the
@@ -1587,7 +1583,7 @@ long _DLLFunc dev_xdrfree (DevType type, DevArgument objptr, long *error)
  * 
  * Return(s)  :	DS_OK or DS_NOTOK
  */
-long  check_rpc_connection (devserver ds, long *error)
+long _DLLFunc check_rpc_connection (devserver ds, long *error)
 {
 	CLIENT				*clnt = NULL;
 	enum clnt_stat		clnt_stat;
@@ -1632,7 +1628,6 @@ long  check_rpc_connection (devserver ds, long *error)
  * have shown consequetive errors. If yes try to reopen
  * the connection.
  */
-
 	if ( svr_conns[ds->no_svr_conn].rpc_conn_status != BAD_SVC_CONN )
 	{
 		if ( svr_conns[ds->no_svr_conn].rpc_error_flag < BAD_SVC_CONN )
@@ -1675,8 +1670,7 @@ long  check_rpc_connection (devserver ds, long *error)
 			vers_number  = API_VERSION;
 
 /*
- * now free the devinfo structure allocated by
- * db_dev_import().
+ * now free the devinfo structure allocated by db_dev_import().
  */
 			free (devinfo);
 		}
@@ -1699,17 +1693,14 @@ long  check_rpc_connection (devserver ds, long *error)
 	}
 
 /*
- * Before a new handle can be created,
- * verify whether it is possible to connect
- * to the remote host.
+ * Before a new handle can be created, verify whether it is possible to connect to the remote host.
  */
 	if ( rpc_check_host ( host_name, error ) == DS_NOTOK )
 		return (DS_NOTOK);
 
 /*
  * Attention, Attention
- * Here comes a delay timing to let the VME reboot
- * in peace when the network is alread answering.
+ * Here comes a delay timing to let the VME reboot in peace when the network is alread answering.
  */
 	if ( svr_conns[ds->no_svr_conn].first_access_time == False )
 	{
@@ -1719,8 +1710,7 @@ long  check_rpc_connection (devserver ds, long *error)
 	}
 
 /*
- *  Store the current RPC timeout off the old connection. 
- *
+ * Store the current RPC timeout off the old connection. 
  * reopen a connection with the same protocol than before.
  */
 	if ( svr_conns[ds->no_svr_conn].rpc_protocol == D_UDP )
@@ -1728,18 +1718,13 @@ long  check_rpc_connection (devserver ds, long *error)
 		clnt = clnt_create ( host_name, prog_number, vers_number, "udp");
 
 /*
- * This part was added for compatibility reasons with
- * the old libray version 3.
- * If the server is not version 4, the version number
- * must be set to 1.
- * Even if the last library version was 3, because
- * 1 indicates the RPC service version.
+ * This part was added for compatibility reasons with the old libray version 3.
+ * If the server is not version 4, the version number must be set to 1.
+ * Even if the last library version was 3, because 1 indicates the RPC service version.
  *
- * To make the version check the null procedure of
- * the service is called. A version mismatch will
- * be returned, if the service runs version 3 software.
- * The RPC version number will be set to one in this
- * case.
+ * To make the version check the null procedure of the service is called. A version 
+ * mismatch will be returned, if the service runs version 3 software.
+ * The RPC version number will be set to one in this case.
  */
 		if (clnt != NULL)
 		{
@@ -1782,18 +1767,13 @@ long  check_rpc_connection (devserver ds, long *error)
 
 		clnt = clnttcp_create ( &serv_adr, prog_number, vers_number, &tcp_socket, 0, 0);
 /*
- * This part was added for compatibility reasons with
- * the old libray version 3.
- * If the server is not version 4, the version number
- * must be set to 1.
- * Even if the last library version was 3, because
- * 1 indicates the RPC service version.
+ * This part was added for compatibility reasons with the old libray version 3.
+ * If the server is not version 4, the version number must be set to 1.
+ * Even if the last library version was 3, because 1 indicates the RPC service version.
  *
- * To make the version check the null procedure of
- * the service is called. A version mismatch will
- * be returned, if the service runs version 3 software.
- * The RPC version number will be set to one in this
- * case.
+ * To make the version check the null procedure of the service is called. A version mismatch will
+ * be returned, if the service runs version 3 software. The RPC version number will be set to one 
+ * in this case.
  */
 		if (clnt != NULL)
 		{
@@ -1833,8 +1813,7 @@ long  check_rpc_connection (devserver ds, long *error)
 	if (clnt != NULL) 
 	{
 /*
- * new client handle created to server - destroy old (stale) client
- * handles
+ * new client handle created to server - destroy old (stale) client handles
  */
 		if (svr_conns[ds->no_svr_conn].udp_clnt != NULL)
 		{
@@ -1857,9 +1836,8 @@ long  check_rpc_connection (devserver ds, long *error)
                		svr_conns[ds->no_svr_conn].tcp_socket = tcp_socket;
 	  	}
 /*
- *  if an asynchronous handle exists then close it (tcp connection)
- *  it will be recreated at the next asynchronous request by the
- *  asynch_server_import() function
+ * if an asynchronous handle exists then close it (tcp connection) it will be recreated at the 
+ * next asynchronous request by the asynch_server_import() function
  */
 		if (svr_conns[ds->no_svr_conn].asynch_clnt != NULL)
 		{
@@ -1882,16 +1860,14 @@ long  check_rpc_connection (devserver ds, long *error)
 		    	svr_conns[ds->no_svr_conn].tcp_clnt = clnt;
 		strncpy (svr_conns[ds->no_svr_conn].server_host, host_name, sizeof(svr_conns[ds->no_svr_conn].server_host));
 /*
- * update program and version number because they could have changed
- * and increment the connection counter to force a reimport of the
- * device (in dev_rpc_connection())
+ * update program and version number because they could have changed and increment the connection 
+ * counter to force a reimport of the device (in dev_rpc_connection())
  */
 		svr_conns[ds->no_svr_conn].prog_number = prog_number;
 		svr_conns[ds->no_svr_conn].vers_number = vers_number;
 
 /*
- * only return DS_OK if NULL procedure answered with RPC_SUCCESS this means
- * it is OK to reimport the device
+ * only return DS_OK if NULL procedure answered with RPC_SUCCESS this means it is OK to reimport the device
  */
 		if (clnt_stat != RPC_SUCCESS)
 		{
@@ -1899,8 +1875,7 @@ long  check_rpc_connection (devserver ds, long *error)
 			return(DS_NOTOK);
 		}
 /*
- * mark this connection as god again and increment the counter of no. of
- * reconnects
+ * mark this connection as god again and increment the counter of no. of reconnects
  */
 		svr_conns[ds->no_svr_conn].rpc_conn_status = GOOD_SVC_CONN;
 		svr_conns[ds->no_svr_conn].rpc_error_flag = GOOD_SVC_CONN;
@@ -1912,24 +1887,22 @@ long  check_rpc_connection (devserver ds, long *error)
 		clnt_control (clnt, CLSET_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_timeout);
 
 /*
- * return without error, a call to dev_import() will be forced
- * in dev_rpc_connection() - andy 10feb99
+ * return without error, a call to dev_import() will be forced in dev_rpc_connection() 
+ * andy 10feb99
  */
 		return(DS_OK);
 /*
- *  try to import the device to see whether the server
- *  is realy ready and waiting and not only registered
- *  to the portmapper.
+ * try to import the device to see whether the server is realy ready and waiting and not 
+ * only registered to the portmapper.
  *
- * keep track of the no. of the connection and the no. of connections 
- * we will need this to test if this is a new connection to a server
- * or the old one - andy 29jan99
+ * keep track of the no. of the connection and the no. of connections we will need this to 
+ * test if this is a new connection to a server or the old one 
+ * andy 29jan99
  */
 		no_conns = svr_conns[ds->no_svr_conn].no_conns;
 		no_svr_conn = ds->no_svr_conn;
 /*
- * if this is a no database device then tag the program number on so that
- * the dev_import() can detect this
+ * if this is a no database device then tag the program number on so that the dev_import() can detect this
  */
 		if (( import_status = dev_import ( ds->device_name,  ds->dev_access, &new_ds, error ) == DS_OK ))
 		{
@@ -1955,14 +1928,12 @@ long  check_rpc_connection (devserver ds, long *error)
 				return(DS_NOTOK);
 			}
 /*
- * case (2) import worked using client handle created by check_rpc_connection()
- *          i.e this routine
+ * case (2) import worked using client handle created by check_rpc_connection() i.e this routine
  */
 			if (no_svr_conn == new_ds->no_svr_conn)
 			{
 /*
- * only substract old connection from the list.
- * if dev_import really worked using old  client handle
+ * only substract old connection from the list. if dev_import really worked using old  client handle
  */
 				svr_conns[ds->no_svr_conn].no_conns--;
 /*
@@ -2011,11 +1982,8 @@ long  check_rpc_connection (devserver ds, long *error)
 			}
 
 /*
- * Decrease the counter of single user accesses
- * if a single user access was freed. 
- * If it was the last
- * single user access for the connection 
- * reinstall the initial protocol.
+ * Decrease the counter of single user accesses if a single user access was freed. 
+ * If it was the last single user access for the connection reinstall the initial protocol.
  *
  * Free the security key for the connection.
  */
@@ -2047,8 +2015,7 @@ long  check_rpc_connection (devserver ds, long *error)
 			free (new_ds);
 			svr_conns[ds->no_svr_conn].first_access_time = False;
 /*	
- * relisten  previuosly  registered events,the server
- * has to know, we are there
+ * relisten  previuosly  registered events,the server has to know, we are there
  */
 			relisten_events(ds);
 			return (DS_OK);
@@ -2056,13 +2023,12 @@ long  check_rpc_connection (devserver ds, long *error)
 		else
 		{
 /*
- * if the dev_import failed, destroy the created
- * client handle and close the socket.
+ * if the dev_import failed, destroy the created client handle and close the socket.
  */
 /*			svr_conns[ds->no_svr_conn].clnt = ds->clnt;*/
 
 /*
- *  if tcp protocol is used, close the old socket first.
+ * if tcp protocol is used, close the old socket first.
  */
 			if (svr_conns[ds->no_svr_conn].rpc_protocol == D_TCP)
 			{
@@ -2087,11 +2053,9 @@ long  check_rpc_connection (devserver ds, long *error)
 	return (DS_NOTOK);
 }
 
-/**@ingroup dsAPI
- * The function will reimport the device, and
- * reinitialise the connection parameters, if
- * the RPC handle to the server was detected lost
- * and recreated.
+/**@ingroup clientAPIintern
+ * The function will reimport the device, and reinitialise the connection parameters, if
+ * the RPC handle to the server was detected lost and recreated.
  * 
  * @param ds 	handle to device.
  * @param error Will contain an appropriate error code if the
@@ -2099,7 +2063,7 @@ long  check_rpc_connection (devserver ds, long *error)
  * 
  * @return DS_OK or DS_NOTOK
  */ 
-long  reinstall_rpc_connection (devserver ds, long *error)
+long _DLLFunc reinstall_rpc_connection (devserver ds, long *error)
 {
 	devserver	new_ds;
 	long		h_error;
@@ -2143,8 +2107,7 @@ long  reinstall_rpc_connection (devserver ds, long *error)
         }
 
 /*
- * in the "stateless" case where the device was not imported 
- * previously, do not free the security keys
+ * in the "stateless" case where the device was not imported previously, do not free the security keys
  */
 	if (ds->clnt != NULL)
 	{
@@ -2152,10 +2115,8 @@ long  reinstall_rpc_connection (devserver ds, long *error)
         	svr_conns[ds->no_svr_conn].no_conns--;
 
 /*
- * Decrease the counter of single user accesses
- * if a single user access was freed. If it was the last
- * single user access for the connection reinstall the initial
- * protocol.
+ * Decrease the counter of single user accesses if a single user access was freed. If it was the last
+ * single user access for the connection reinstall the initial protocol.
  *
  * Free the security key for the connection.
  */
@@ -2168,9 +2129,8 @@ long  reinstall_rpc_connection (devserver ds, long *error)
 	else
 	{
 /*
- * in the stateless import case check if the client has requested the 
- * rpc protocol or timeout to be changed in which case modify the client 
- * handle accordingly.
+ * in the stateless import case check if the client has requested the rpc protocol or timeout to be changed 
+ * in which case modify the client handle accordingly.
  */
 		if (ds->rpc_protocol != 0)
 		{
@@ -2226,12 +2186,11 @@ long  reinstall_rpc_connection (devserver ds, long *error)
 }
 
 
-/**@ingroup dsAPI
- * Checks whether the remote host is responding
- * or not. Opens a TCP connection to the portmapper
- * and tests the write access on the socket.
+/**@ingroup clientAPIintern
+ * Checks whether the remote host is responding or not. Opens a TCP connection to the 
+ * portmapper and tests the write access on the socket.
  * 
- * VXWORKS version - simply ping() host to check if alive
+ * The VXWORKS version simply pings host to check if alive.
  *
  * @param host_name 	name of the remote host.
  * @param error  	Will contain an appropriate error code if the
@@ -2239,7 +2198,7 @@ long  reinstall_rpc_connection (devserver ds, long *error)
  * 
  * @return DS_OK or DS_NOTOK
  */
-long rpc_check_host (char *host_name, long *error)
+long _DLLFunc rpc_check_host (char *host_name, long *error)
 {
 #if !defined vxworks
 #if ( (! OSK) && (! _OSK))
@@ -2277,8 +2236,8 @@ long rpc_check_host (char *host_name, long *error)
  * Set up the peer address to which we will connect. 
  */
 	peeraddr_in.sin_family = AF_INET;
-/* Get the host information for the hostname that the
- * user passed in.
+/* 
+ * Get the host information for the hostname that the user passed in.
  */
 	hp = gethostbyname (host_name);
 	if (hp == NULL)
@@ -2289,18 +2248,17 @@ long rpc_check_host (char *host_name, long *error)
 	}
 
 	peeraddr_in.sin_addr.s_addr = ((struct in_addr *)(hp->h_addr))->s_addr;
-/* Find the information for the "example" server
- * in order to get the needed port number.
+/* 
+ * Find the information for the "example" server in order to get the needed port number.
  *
- * Do this only once to prevent Purify complaining that there
- * is a memory leak for HP-UX ! (andy 15sep98)
+ * Do this only once to prevent Purify complaining that there is a memory leak for HP-UX 
+ * andy 15sep98
  */
 	if (portmap_port == -1)
 	{
 /*
- * in order to reduce the network traffic to the NIS server generated
- * by "getservbyname()" suppresed this call and hardcoded the port no.
- * of the portmapper (which should be 111 for udp+tcp all over)
+ * in order to reduce the network traffic to the NIS server generated by "getservbyname()" suppressed 
+ * this call and hardcoded the port no. of the portmapper (which should be 111 for udp+tcp all over)
  *
  *#if ( (defined sun) || (defined linux) || (defined irix))
  *		sp = getservbyname ("sunrpc", "tcp");
@@ -2322,7 +2280,7 @@ long rpc_check_host (char *host_name, long *error)
 
 /* 
  * Create the socket. 
-*/
+ */
 	s = socket (AF_INET, SOCK_STREAM, 0);
 	if (s == DS_NOTOK)
 	{
@@ -2332,9 +2290,7 @@ long rpc_check_host (char *host_name, long *error)
 	}
 
 /*
- * Set the socket into noblocking mode
- *
- * defines noblocking mode 
+ * Set the socket into noblocking mode. 
  */
 	nb =1;
 
@@ -2357,8 +2313,7 @@ long rpc_check_host (char *host_name, long *error)
 #endif /* WIN32 || linux || solaris */
 
 /*
- *  select the socket and wait until the connection is 
- *  ready for write access. 
+ *  select the socket and wait until the connection is ready for write access. 
  */
 	FD_ZERO ((_LPfd_set)&writemask);
 	FD_SET  (s, (_LPfd_set)&writemask);
@@ -2366,7 +2321,8 @@ long rpc_check_host (char *host_name, long *error)
 
 /*
  * make a local copy of the timeout structure because Linux will update
- * this value on return with the time remaining to wait - andy 19nov98
+ * this value on return with the time remaining to wait  
+ * andy 19nov98
  */
 	my_timeout = check_host_timeout;
 #if defined (__hpux)
@@ -2432,7 +2388,7 @@ long rpc_check_host (char *host_name, long *error)
 #endif /* !vxworks */
 }
 
-/**@ingroup dsAPI
+/**@ingroup clientAPIintern
  * Import a local device, without using an RPC.
  *
  * @param dev_import_in 	
@@ -2490,7 +2446,7 @@ static long dev_import_local (_dev_import_in  *dev_import_in, devserver  *ds_ptr
 }
 
 
-/**@ingroup dsAPI
+/**@ingroup clientAPIintern
  * Free a local device, without using an RPC.
  * 
  * @param dev_free_in 	handle to access the device.
@@ -2517,7 +2473,7 @@ static long dev_free_local (_dev_free_in  *dev_free_in, long* error)
 
 
 
-/**@ingroup dsAPI
+/**@ingroup clientAPIintern
  * Execute a command on a local device, without using an RPC.
  * Will not return any output arguments.
  * 
@@ -2544,7 +2500,7 @@ static long dev_put_local (_server_data  *server_data, long* error)
 	return (client_data->status);
 }
 
-/**@ingroup dsAPI
+/**@ingroup clientAPIintern
  * Execute a command on a local device, without using an RPC.
  *
  * @param server_data 	Input data structure.
@@ -2571,37 +2527,29 @@ static long dev_putget_local (_server_data  *server_data,
 
 	*error = 0;
 
-	/*
-	 * Call the entry point for local putget calls.
-	 * The function rpc_dev_putget_4 can not be used,
-	 * to avoid pointer clashes in the static return structure!!!
-	 */
-
+/*
+ * Call the entry point for local putget calls.  The function rpc_dev_putget_4 can not be used,
+ * to avoid pointer clashes in the static return structure!!!
+ */
 	ret_data = rpc_dev_putget_local (server_data);
 
 	if ( ret_data->status == DS_OK )
 	{
-		/*
-	    * Encode the outgoing arguments into XDR format.
-	    * Decode the arguments afterwards, to get the same memory
-	    * allocation by XDR as the dev_putget() working with
-	    * RPCs.
-	    */
-
-		/*
-	    * Get the XDR data type.
-	    */
-		if (xdr_get_type (ret_data->argout_type, &type_info, error)
-		    == DS_NOTOK)
+/*
+ * Encode the outgoing arguments into XDR format.  Decode the arguments afterwards, to get the 
+ * same memory allocation by XDR as the dev_putget() working with RPCs.
+ */
+/*
+ * Get the XDR data type.
+ */
+		if (xdr_get_type (ret_data->argout_type, &type_info, error) == DS_NOTOK)
 		{
 			return (DS_NOTOK);
 		}
 
-		/*
-	    * Calculate the size of the buffer needed for the
-	    * outgoing arguments.
-	    */
-
+/*
+ * Calculate the size of the buffer needed for the outgoing arguments.
+ */
 		if (type_info.xdr_length != NULL)
 		{
 			buf_size = type_info.xdr_length(ret_data->argout);
@@ -2610,31 +2558,29 @@ static long dev_putget_local (_server_data  *server_data,
 				*error = DevErr_XDRLengthCalculationFailed;
 				return (DS_NOTOK);
 			}
-
 			buf_size = buf_size + 32;
 		}
 		else
 		{
-			/* If no length calculation is implemented, allocate
-	       * 8KB as for RPC/UDP.
-	       */
+/* 
+ * If no length calculation is implemented, allocate 8KB as for RPC/UDP.
+ */
 			buf_size = 8000;
 		}
 
-		/*
-	    * Allocate the data buffer.
-		 */
+/*
+ * Allocate the data buffer.
+ */
 		if ( (buf = (char *)malloc(buf_size)) == NULL)
 		{
 			*error  = DevErr_InsufficientMemory;
 			return (DS_NOTOK);
 		}
 
-		/*
-	    * Create XDR handles and serialize and deserialize
-	    * the arguments. This is done to have the same
-	    * memory allocation as dev_putget() using RPCs.
-	    */
+/*
+ * Create XDR handles and serialize and deserialize the arguments. This is done to have the 
+ * same memory allocation as dev_putget() using RPCs.
+ */
 #ifdef _UCC
 		xdrmem_create(&xdrs_en, (caddr_t)buf, (_Int)buf_size, XDR_ENCODE);
 		xdrmem_create(&xdrs_de, (caddr_t)buf, (_Int)buf_size, XDR_DECODE);
@@ -2676,20 +2622,15 @@ static long dev_putget_local (_server_data  *server_data,
 }
 
 
-
-
-/**@ingroup dsAPI
+/**@ingroup clientAPIintern
  * Verifies the RPC connection to a server.
  *
- * If the device is not fully imported then import it
- * by calling reinstall_rpc_connection(). This is the
+ * If the device is not fully imported then import it by calling reinstall_rpc_connection(). This is the
  * case for stateless import.
  * 
- * If the connection is marked as a bad connection,
- * it will be tried to reopen the connection to a server.
+ * If the connection is marked as a bad connection, it will be tried to reopen the connection to a server.
  * 
- * If the connection was already reopened the device has to
- * be reimported from the server.
+ * If the connection was already reopened the device has to be reimported from the server.
  * 
  * @param ds 	handle to device.
  * @param error Will contain an appropriate error code if the
@@ -2697,7 +2638,7 @@ static long dev_putget_local (_server_data  *server_data,
  * 
  * @return DS_OK or DS_NOTOK
  */ 
-long dev_rpc_connection (devserver ds, long *error)
+long _DLLFunc dev_rpc_connection (devserver ds, long *error)
 {
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_rpc_connection() : entering routine\n");
 
@@ -2709,12 +2650,10 @@ long dev_rpc_connection (devserver ds, long *error)
 #endif /* TANGO */
 
 /*
- * in order to make the device server api "stateless"
- * check to see whether the device has been imported at all i.e. if
- * the server has been identified yet, if not then try to import
- * the device via the reinstall_rpc_connection() function. If this
- * does not succeed then inform the client the device is not imported yet
- *
+ * in order to make the device server api "stateless" check to see whether the device has been imported at 
+ * all i.e. if the server has been identified yet, if not then try to import the device via the 
+ * reinstall_rpc_connection() function. If this does not succeed then inform the client the device is not 
+ * imported yet
  */
         if (ds->clnt == NULL)
         {
@@ -2726,30 +2665,25 @@ long dev_rpc_connection (devserver ds, long *error)
                 else
 /*
  * the import worked , dev_putget() can carry on !
- *
  */
                         return (DS_OK);
         }
 
 /*
- * to be sure to work with the correct client handle
- * initialise the pointer again.
+ * to be sure to work with the correct client handle initialise the pointer again.
  */
 	ds->clnt = svr_conns[ds->no_svr_conn].clnt;
 
 /*
- * first check if the connection to the server is marked
- * as a bad connection.
+ * first check if the connection to the server is marked as a bad connection.
  */
 	if ((svr_conns[ds->no_svr_conn].rpc_conn_status == BAD_SVC_CONN)
 		&& (check_rpc_connection (ds, error) == DS_NOTOK))
 		return (DS_NOTOK);
 
 /*
- * check whether the device was already reinstalled
- * in case of a connection update.
+ * check whether the device was already reinstalled in case of a connection update.
  */
-
 	dev_printdebug (DBG_API, "\ndev_putget() : connection statistics\n");
 	dev_printdebug (DBG_API, "connections on clnt : %d\n", svr_conns[ds->no_svr_conn].no_conns);
 	dev_printdebug (DBG_API, "rpc_conn_counter for clnt = %d\nrpc_conn_counter for ds  = %d\n",
@@ -2765,7 +2699,7 @@ long dev_rpc_connection (devserver ds, long *error)
 }
 
 
-/**@ingroup dsAPI
+/**@ingroup clientAPIintern
  *
  * @param ds            handle to device.
  * @param clnt_stat  	return status of the clnt_call().
@@ -2775,7 +2709,7 @@ long dev_rpc_connection (devserver ds, long *error)
  * 
  * @return DS_OK or DS_NOTOK
  */
-long dev_rpc_error (devserver ds, enum clnt_stat clnt_stat, long *error)
+long _DLLFunc dev_rpc_error (devserver ds, enum clnt_stat clnt_stat, long *error)
 {
 	char	*hstring;
 
@@ -2799,10 +2733,8 @@ long dev_rpc_error (devserver ds, enum clnt_stat clnt_stat, long *error)
 		else
 		{
 /*
- *  check whether a tcp connection was lost
- *
- * do not check only if protocol is TCP because this error can occur for asynch
- * calls as well
+ * check whether a tcp connection was lost. do not check only if protocol is TCP because this error 
+ * can occur for asynch calls as well
  *			if ( svr_conns[ds->no_svr_conn].rpc_protocol == D_TCP )
  */
 			{
@@ -2831,7 +2763,7 @@ long dev_rpc_error (devserver ds, enum clnt_stat clnt_stat, long *error)
 }
 
 
-/**@ingroup dsAPI
+/**@ingroup clientAPI
  * By calling this function with one of the two defined protocol parameters D_UDP and D_TCP (API.h), 
  * the transport protocol for an open RPC connection will be set to the chosen protocol. Before
  * switching the protocol, an RPC connection to a device server has to be opened by a @ref dev_import()
@@ -2902,8 +2834,7 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
 		nethost = &multi_nethost[i_nethost];
 
 /*
- * If the security system is configured,
- * verify the security key
+ * If the security system is configured, verify the security key
  */
 		if ( nethost->config_flags.security == True )
 		{
@@ -2911,8 +2842,7 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
 				return (DS_NOTOK);
 
 /*
- * The protocol can only be changed, if no single user
- * access was requested on the connection.
+ * The protocol can only be changed, if no single user access was requested on the connection.
  */
 			if (svr_conns[ds->no_svr_conn].open_si_connections > 0)
 			{
@@ -2923,19 +2853,15 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
 	}
 
 /*
- *  make sure the client handle stored in the svr_conn table
- *  is used because the copy of the client handle in the devserver
- *  structure could be stale - why is there a local copy anyway ?
- *
- *  - andy 18jan97
+ * make sure the client handle stored in the svr_conn table is used because the copy of the 
+ * client handle in the devserver structure could be stale - why is there a local copy anyway ?
+ * andy 18jan97
  */
 	ds->clnt = svr_conns[ds->no_svr_conn].clnt;
 
 /*
  *  Store the current RPC timeout off the old connection. 
- *
  */
-
 	clnt_control (ds->clnt, CLGET_RETRY_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_retry_timeout);
 	clnt_control (ds->clnt, CLGET_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_timeout);
 
@@ -2945,14 +2871,13 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
 			if ( svr_conns[ds->no_svr_conn].rpc_protocol == D_UDP )
 				break;
 /*
- * Before a new handle can be created,
- * verify whether it is possible to connect
- * to the remote host.
+ * Before a new handle can be created, verify whether it is possible to connect to the remote host.
  */
 			if (rpc_check_host(svr_conns[ds->no_svr_conn].server_host, error) == DS_NOTOK)
 				return (DS_NOTOK);
 /*
- * check if an UDP handle exists, if so reuse it - andy 30jan97
+ * check if an UDP handle exists, if so reuse it 
+ * andy 30jan97
  */
 			if (svr_conns[ds->no_svr_conn].udp_clnt != NULL)
 			{
@@ -2973,8 +2898,7 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
 			svr_conns[ds->no_svr_conn].rpc_protocol = D_UDP;
 
 /*
- * try to solve problem with Ultra-C/C++ 2.0.1 by not
- * destroying the TCP client handle, keep it for reuse
+ * try to solve problem with Ultra-C/C++ 2.0.1 by not destroying the TCP client handle, keep it for reuse
  */
 			svr_conns[ds->no_svr_conn].tcp_clnt = svr_conns[ds->no_svr_conn].clnt;
 
@@ -2995,8 +2919,7 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
 			ds->clnt = clnt;
 
 /*
- * If the security system is configured,
- * free the security key for the old connection
+ * If the security system is configured, free the security key for the old connection
  * and recreate it for the new connection.
  */
 			if (!ds->no_database && (nethost->config_flags.security == True))
@@ -3011,18 +2934,15 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
 			if ( svr_conns[ds->no_svr_conn].rpc_protocol == D_TCP )
 				break;
 /*
- * Before a new handle can be created,
- * verify whether it is possible to connect
- * to the remote host.
+ * Before a new handle can be created, verify whether it is possible to connect to the remote host.
  */
 			if (rpc_check_host(svr_conns[ds->no_svr_conn].server_host, error) == DS_NOTOK)
 				return (DS_NOTOK);
 
 /* 
- * if a TCP client handle exists already then reuse it
- * this modification has been introduced to try to solve the problems
- * with the OS9 Ultra-C/C++ compiler V2.0.1 which timeouts after
- * changing protocols - andy 30/1/97
+ * if a TCP client handle exists already then reuse it this modification has been introduced to try 
+ * to solve the problems with the OS9 Ultra-C/C++ compiler V2.0.1 which timeouts after changing protocols 
+ * andy 30/1/97
  */
 			if (svr_conns[ds->no_svr_conn].tcp_clnt != NULL)
 			{
@@ -3061,7 +2981,7 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
 /*
  * DO NOT destroy udp client handle , keep it for reuse
  *
- *		clnt_destroy (svr_conns[ds->no_svr_conn].clnt);
+ *			clnt_destroy (svr_conns[ds->no_svr_conn].clnt);
  */
 			svr_conns[ds->no_svr_conn].udp_clnt = svr_conns[ds->no_svr_conn].clnt;
 			svr_conns[ds->no_svr_conn].clnt = clnt;
@@ -3069,8 +2989,7 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
 			ds->clnt = clnt;
 
 /*
- * If the security system is configured,
- * free the security key for the old connection
+ * If the security system is configured, free the security key for the old connection
  * and recreate it for the new connection.
  */
 			if (!ds->no_database && (nethost->config_flags.security == True))
@@ -3096,7 +3015,7 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
 }
 
 
-/**@ingroup dsAPI
+/**@ingroup clientAPIintern
  * Allocate and initialise the devserver structure for a device which has not been successfully
  * imported so that it can be imported during a future call to dev_putget().
  *
@@ -3143,10 +3062,9 @@ long _DLLFunc dev_notimported_init (char *device_name, long access, long i_netho
 	return(DS_OK);
 }
 
-/**@ingroup dsAPI
- * Sets or reads the import timeout for an import()
- * of a server.  A request to set the timeout has to be asked
- * with CLSET_TIMEOUT. The timeout will be set without any retry.
+/**@ingroup clientAPI
+ * Sets or reads the import timeout for an import() of a server.  A request to set the timeout
+ * has to be asked with CLSET_TIMEOUT. The timeout will be set without any retry.
  * A request to read the timeout has to be asked with CLGET_TIMEOUT.
  * 
  * @param request 	indicates whether the timeout should be set or only read.

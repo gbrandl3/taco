@@ -12,9 +12,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:		$Date: 2004-03-09 17:15:49 $
+ * Date:		$Date: 2004-03-26 16:21:52 $
  *
  *
  * Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
@@ -58,6 +58,10 @@
  * @ingroup API
  */
 
+/**@defgroup clientAPIintern Internal funtions of the Device Server Client API
+ * @ingroup clientAPI
+ */
+
 /**
  * @defgroup syncAPI Synchronous Client API
  * @ingroup clientAPI
@@ -71,7 +75,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.7 2004-03-09 17:15:49 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.8 2004-03-26 16:21:52 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*
@@ -384,10 +388,8 @@ extern _DLLFunc long dev_pending PT_( (devserver) );
 extern _DLLFunc long debug_flag;	/* global that is used in gen_api.c */
 
 /*
- * For these functions, ANSI prtotyping is in
- * todays form not possible, because their
- * functionality base on type conversion for
- * input arguments.
+ * For these functions, ANSI portotyping is in todays form not possible, because their
+ * functionality base on type conversion for input arguments.
  */
 /* 
  * adding ANSI C support for function with variable argument lists
@@ -395,25 +397,25 @@ extern _DLLFunc long debug_flag;	/* global that is used in gen_api.c */
  * - andy , 13sep94
  */
 #if defined (__STDC__) || (__STDCPP__)
-#ifdef __cplusplus
-extern "C" {
-#endif
-#if (!defined _GNU_PP)
-extern _DLLFunc void  dev_printerror	PT_( (DevShort mode, char *var_args, ...) );
-extern _DLLFunc void  dev_printdebug	PT_( (long mode, char *var_args, ...) );
-extern _DLLFunc void  dev_printdiag	PT_( (DevShort mode, char *var_args, ...) );
-#else
-extern _DLLFunc void  dev_printerror	(DevShort mode,char *fmt, char *str);
-extern _DLLFunc void  dev_printdebug	();
-extern _DLLFunc void  dev_printdiag	();
-#endif
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+#	ifdef __cplusplus
+		extern "C" {
+#	endif
+#	if (!defined _GNU_PP)
+		extern _DLLFunc void  dev_printerror	PT_( (DevShort mode, char *var_args, ...) );
+		extern _DLLFunc void  dev_printdebug	PT_( (long mode, char *var_args, ...) );
+		extern _DLLFunc void  dev_printdiag	PT_( (DevShort mode, char *var_args, ...) );
+#	else
+		extern _DLLFunc void  dev_printerror	(DevShort mode,char *fmt, char *str);
+		extern _DLLFunc void  dev_printdebug	();
+		extern _DLLFunc void  dev_printdiag	();
+#	endif
+#	ifdef __cplusplus
+		}
+#	endif /* __cplusplus */
 #else /* STDC */
-extern _DLLFunc void  dev_printerror();
-extern _DLLFunc void  dev_printdebug();
-extern _DLLFunc void  dev_printdiag();
+	extern _DLLFunc void  dev_printerror();
+	extern _DLLFunc void  dev_printdebug();
+	extern _DLLFunc void  dev_printdiag();
 #endif /* __STDC__ */
 
 /* global variable containing dynamic error string */
@@ -428,4 +430,5 @@ void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_
 }
 #endif
 #endif /* _api_h */
+
 

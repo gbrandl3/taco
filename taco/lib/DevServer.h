@@ -13,9 +13,9 @@
 
  Original:	March 1990
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2003-05-02 09:12:48 $
+ Date:		$Date: 2004-03-26 16:21:52 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -36,7 +36,7 @@
  */
 #ifdef _IDENT
 static char DevServerh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServer.h,v 1.3 2003-05-02 09:12:48 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServer.h,v 1.4 2004-03-26 16:21:52 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -160,26 +160,24 @@ typedef struct _DevServerAccess {
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern DevMethodFunction ds__method_finder
-				PT_( (void *ptr_ds, DevMethod method) );
+DevMethodFunction ds__method_finder PT_( (void *ptr_ds, DevMethod method) );
 
-extern long ds__method_search  	PT_( (void *ptr_ds_class, DevMethod method,
-				DevMethodFunction *function_ptr) );
-extern long ds__create          PT_( (char *name, void *ptr_ds_class,
-				void *ptr_ds_ptr, long *error) );
-extern long ds__destroy         PT_( (void *ptr_ds, long *error) );
-extern long ds__svcrun          PT_( (long *error) );
-extern long startup  		PT_( (char* svr_name,long* error) );
+long ds__method_search PT_( (void *ptr_ds_class, DevMethod method, DevMethodFunction *function_ptr) );
+long ds__create PT_( (char *name, void *ptr_ds_class, void *ptr_ds_ptr, long *error) );
+long ds__destroy PT_( (void *ptr_ds, long *error) );
+long ds__svcrun PT_( (long *error) );
+long startup PT_( (char* svr_name,long* error) );
 
+
+long ds__signal PT_( (int sig, void (*action)(int), long *error) );
+int gettransient PT_( (const char *ds_name) );
+void main_signal_handler PT_( (int sig) );
+void unregister_server PT_( (void) );
 
 #ifdef __cplusplus
 	}
 #endif /* __cplusplus */
 
-extern long ds__signal          PT_( (int sig, void (*action)(int), long *error) );
-extern int gettransient         PT_( (const char *ds_name) );
-extern void main_signal_handler PT_( (int sig) );
-extern void unregister_server   PT_( (void) );
 
 /*
  * Convenience functions for the Device Server programs. These provide 
@@ -188,35 +186,25 @@ extern void unregister_server   PT_( (void) );
  */
 
 #ifdef __cplusplus
-extern "C" long dev_cmd PT_( (void *ptr_ds, long cmd, DevArgument argin,
+extern "C" {
+#endif
+
+long dev_cmd PT_( (void *ptr_ds, long cmd, DevArgument argin,
 			long argin_type, DevArgument argout, long argout_type,
 			long *error) );
-#else
-extern long dev_cmd 	PT_( (void *ptr_ds, long cmd, DevArgument argin,
-			long argin_type, DevArgument argout, long argout_type,
-			long *error) );
-#endif /* __cplusplus */
 
-#ifndef __cplusplus
-/*
- * OIC version
- */
-extern long dev_export  PT_( (char *dev_name, void *ptr_ds, long *error) );
-extern void dev_event_fire 
-				PT_( (DevServer ds, long event_type,
+#ifdef __cplusplus
+void dev_event_fire PT_( (DeviceBase *device, long event_type,
+				DevArgument argout, DevType argout_type,
+	 			long event_status, long event_error) );
+long dev_export (char *name, DeviceBase *ptr_dev, long *error);
+}
+#else
+void dev_event_fire PT_( (DevServer ds, long event_type,
 				DevArgument argout, DevType argout_type,
 				long event_status, long event_error) );
-#else
-/*
- * C++ version
- */
-extern "C" long dev_export  PT_( (char* dev_name, DeviceBase *ptr_dev, long *error) );
-
-extern "C" void dev_event_fire 
-				PT_( (DeviceBase *device, long event_type,
-				DevArgument argout, DevType argout_type,
-				long event_status, long event_error) );
-#endif /* __cplusplus */
+long dev_export  PT_( (char *dev_name, void *ptr_ds, long *error) );
+#endif
 
 /*
  * NT stuff for DevServerMain and its various Window elements

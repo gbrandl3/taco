@@ -12,9 +12,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.9 $
+ Version    :	$Revision: 1.10 $
 
- Date       : 	$Date: 2004-03-09 17:15:50 $
+ Date       : 	$Date: 2004-03-26 16:21:52 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -30,19 +30,19 @@
 #include <DevErrors.h>
 #include <DevSignal.h>
 #ifdef vxworks
-#include <taskLib.h>
+#	include <taskLib.h>
 #endif /* vxworks */
 
 /*
  * Include file for variable function arguments.
  */
 #ifdef sun
-#include <varargs.h>
-#include <signal.h>
+#	include <varargs.h>
+#	include <signal.h>
 #else
-#ifndef OSK
-#include <stdarg.h>
-#endif
+#	ifndef OSK
+#		include <stdarg.h>
+#	endif
 #endif
 
 static long 		setup_config (long *error);
@@ -422,7 +422,7 @@ void _DLLFunc dev_printerror_no (DevShort mode, char *comment, long dev_errno)
 }
 
 
-/**@ingroup dsAPI
+/**@ingroup dsAPIintern
  * This function returns the error string for a given error number. It first checks to see
  * if the error is negative. If so it returns a standard error message "negative errors are not supported".
  * Then it checks if the error is one of the kernel errors (e.g. NETHOST not defined, RPC timeout etc) and
@@ -538,7 +538,7 @@ void _DLLFunc dev_printdebug (long debug_bits, char *fmt, ...)
  * For OS9 version 2.4 and Solaris with g++
  */
 #else
-/**@ingroup dsAPI
+/**@ingroup messageAPI
  * Send debug string to a message service or to stdout, if a message service
  * is not imported.
  *
@@ -673,7 +673,7 @@ _DLLFunc void dev_printdiag (DevShort mode, char *fmt, ...)
  */
 #else
 
-/**@ingroup dsAPI
+/**@ingroup messageAPI
  * Send device server diagnostic_string to a message 
  * service or to stdout, if a message service
  * is not imported.
@@ -1081,8 +1081,7 @@ long _DLLFunc db_import (long *error)
 	return db_import_multi(nethost,error);
 }
 
-
-/**@ingroup dsAPI
+/**@ingroup databaseAPI
  * import the static database service for a multi-nethost
  *
  * @param nethost 	which nethost to import the static database for
@@ -1435,7 +1434,6 @@ static long setup_config (long *error)
 struct _devserver 	*msg_ds, 
 			*db_ds;
 
-
 /**@ingroup dsAPI
  * This function gets the necessary configuration information for a static database service and a message
  * service from  a network manager in a multi-nethost environment.
@@ -1449,7 +1447,6 @@ struct _devserver 	*msg_ds,
  *
  * @return DS_OK or DS_NOTOK
  */
-
 long setup_config_multi (char *nethost, long *error)
 {
 	_manager_data 		manager_data={0};
@@ -1729,7 +1726,7 @@ long setup_config_multi (char *nethost, long *error)
 	return (DS_OK);
 }
 
-/**@ingroup dsAPI
+/**@ingroup clientAPI
  * This function sets the host given by nethost as the current default nethost. In case of failure
  * the old nethost will be set.
  *
