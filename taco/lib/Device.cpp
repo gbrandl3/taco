@@ -12,9 +12,9 @@
 //
 // Original:	March 1995
 //
-// Version:	$Revision: 1.5 $
+// Version:	$Revision: 1.6 $
 //
-// Date:	$Date: 2004-11-24 20:45:31 $
+// Date:	$Date: 2005-03-29 09:44:06 $
 //
 //-**********************************************************************
 		
@@ -140,28 +140,9 @@ long Device::Command (long cmd, void* argin, long argin_type,
 
 	dev_printdebug(DBG_TRACE,"Device::Command() called, cmd = %d\n",cmd);
 
-// in the new scheme of things the command list is a map instead of
-// an array. if the map has not commands then assume the device class
-// has initialised the array and not the map. copy the array contents
-// to the map. this should only be done once because afterwards the
-// the map will be initialised - andy 24nov2004
-//
-	if (commands_map.size() == 0) 
-	{
-		dev_printdebug(DBG_TRACE,"Device::Command() initialise commands_map from commands_list array, n_commands = %d\n",this->n_commands);
-   		for (int i = 0; i < this->n_commands; i++)
-   		{
-			this->commands_map[this->commands_list[i].cmd] = 
-				DeviceCommandMapEntry(
-				this->commands_list[i].cmd, 
-				(DeviceBaseMemberFunction)this->commands_list[i].fn, 
-				this->commands_list[i].argin_type, 
-				this->commands_list[i].argout_type, 
-				this->commands_list[i].min_access, 
-				this->commands_list[i].cmd_name);
-		}
-	}
+// call to GetCommandNumber() will initialise the commands_map if empty
 
+	GetCommandNumber();
 //
 // add code to execute a command here
 //
@@ -492,3 +473,38 @@ long Device::EventQuery(_dev_event_info *event_info)
 	long error;
 	return this->Event_Query(event_info, &error);
 }
+
+/**
+ * Method to return number of commands. It will initialise the commands_map
+ * if it is empty.
+ *
+ * @return Number of commands
+ */
+unsigned int Device::GetCommandNumber()
+{
+//
+//
+// in the new scheme of things the command list is a map instead of
+// an array. if the map has not commands then assume the device class
+// has initialised the array and not the map. copy the array contents
+// to the map. this should only be done once because afterwards the
+// the map will be initialised - andy 24nov2004
+//
+	if (commands_map.size() == 0) 
+	{
+		dev_printdebug(DBG_TRACE,"Device::GetCommandNumber() initialise commands_map from commands_list array, n_commands = %d\n",this->n_commands);
+   		for (int i = 0; i < this->n_commands; i++)
+   		{
+			this->commands_map[this->commands_list[i].cmd] = 
+				DeviceCommandMapEntry(
+				this->commands_list[i].cmd, 
+				(DeviceBaseMemberFunction)this->commands_list[i].fn, 
+				this->commands_list[i].argin_type, 
+				this->commands_list[i].argout_type, 
+				this->commands_list[i].min_access, 
+				this->commands_list[i].cmd_name);
+		}
+	}
+	return commands_map.size();
+}
+
