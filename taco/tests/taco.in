@@ -10,6 +10,7 @@ sbindir=@sbindir@
 sysconfdir=@sysconfdir@
 top_builddir=@abs_top_builddir@
 testbindir=${top_builddir}/tests
+appdefaultdir=@appdefaultdir@
 LD_LIBRARY_PATH=@abs_top_builddir@/tests/test/@prefix@/lib:$LD_LIBRARY_PATH
 
 }
@@ -35,7 +36,7 @@ if test $# -gt 0 ; then
 			. $sysconfdir/tacoenv.sh
 			killall Manager
 			dc_destdir=$testbindir/test
-			make -C $topsrcdir DESTDIR=$dc_destdir uninstall >/dev/null 2>&1
+			make -C $top_builddir DESTDIR=$dc_destdir uninstall >/dev/null 2>&1
 			dir=`echo $prefix | cut -d'/' -f 1`
 			if [ -z "$dir" ] ; then
 				dir=`echo $prefix | cut -d'/' -f 2`
@@ -44,6 +45,11 @@ if test $# -gt 0 ; then
 			dir=`aclocal --print-ac-dir | cut -d'/' -f 1`
 			if [ -z "$dir" ] ; then
 				dir=`aclocal --print-ac-dir | cut -d'/' -f 2`
+			fi
+			rm -rf ${dc_destdir}/$dir
+			dir=`echo $appdefaultdir|cut -d'/' -f1` 
+			if [ -z "$dir" ] ; then
+				dir=`echo $appdefaultdir|cut -d'/' -f2` 
 			fi
 			rm -rf ${dc_destdir}/$dir
 			if { rmdir $testbindir/test; } ; then
