@@ -13,16 +13,16 @@ export RES_BASE_DIR
 DBM_DIR=$DSHOME/dbase/dbm
 export DBM_DIR
 if [[ ! -z $LD_LIBRARY_PATH ]]; then
-LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$DSHOME/lib/linux/x86
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$DSHOME/lib/@taco_install_path@
 else
-LD_LIBRARY_PATH=$DSHOME/lib/linux/x86
+LD_LIBRARY_PATH=$DSHOME/lib/@taco_install_path@
 fi
 export LD_LIBRARY_PATH
 
 if [[ ! -z $PYTHONPATH ]]; then
-PYTHONPATH=$PYTHONPATH:$DSHOME/lib/linux/x86:$DSHOME/python
+PYTHONPATH=$PYTHONPATH:$DSHOME/lib/@taco_install_path@:$DSHOME/python
 else
-PYTHONPATH=$DSHOME/lib/linux/x86:$DSHOME/python
+PYTHONPATH=$DSHOME/lib/@taco_install_path@:$DSHOME/python
 fi
 export PYTHONPATH
 
@@ -34,6 +34,6 @@ else
 	export NETHOST
 fi
 
-PATH=$PATH:$DSHOME/system/bin/linux/x86
-PATH=$PATH:$DSHOME/bin/linux/x86
+PATH=$PATH:$DSHOME/system/bin/@taco_install_path@
+PATH=$PATH:$DSHOME/bin/@taco_install_path@
 export PATH

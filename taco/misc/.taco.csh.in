@@ -11,15 +11,15 @@ setenv RES_BASE_DIR ${DSHOME}/dbase/res
 setenv DBM_DIR ${DSHOME}/dbase/dbm
 
 if (${?LD_LIBRARY_PATH}) then
-setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:${DSHOME}/lib/linux/x86
+setenv LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:${DSHOME}/lib/@taco_install_path@
 else
-setenv LD_LIBRARY_PATH ${DSHOME}/lib/linux/x86
+setenv LD_LIBRARY_PATH ${DSHOME}/lib/@taco_install_path@
 endif
 
 if (${?PYTHONPATH}) then
-setenv PYTHONPATH ${PYTHONPATH}:${DSHOME}/lib/linux/x86:$DSHOME/python
+setenv PYTHONPATH ${PYTHONPATH}:${DSHOME}/lib/@taco_install_path@:$DSHOME/python
 else
-setenv PYTHONPATH ${DSHOME}/lib/linux/x86:$DSHOME/python
+setenv PYTHONPATH ${DSHOME}/lib/@taco_install_path@$DSHOME/python
 endif
 if (${?NETHOST}) then
 	;
@@ -27,5 +27,5 @@ if (${?NETHOST}) then
 else
 setenv NETHOST localhost
 endif
-setenv PATH ${PATH}:${DSHOME}/system/bin/linux/x86
-setenv PATH ${PATH}:${DSHOME}/bin/linux/x86
+setenv PATH ${PATH}:${DSHOME}/system/bin/@taco_install_path@
+setenv PATH ${PATH}:${DSHOME}/bin/@taco_install_path@
