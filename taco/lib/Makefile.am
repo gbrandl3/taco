@@ -43,7 +43,7 @@ libtaco_la_SOURCES 	= $(SRC_TACO_SPECIAL)
 libtaco_la_LIBADD  	= libtacoc.la 
 libtaco_la_LDFLAGS 	= -version-info @LIB_VERSION@
 
-libtaco___la_SOURCES 	= $(SRC_TACO_SPECIAL) Device.C OICDevice.C 
+libtaco___la_SOURCES 	= $(SRC_TACO_SPECIAL) Device.cpp OICDevice.cpp 
 libtaco___la_CFLAGS  	= -x c++
 libtaco___la_LIBADD  	= libtacoc.la -lstdc++ 
 libtaco___la_LDFLAGS 	= -version-info @LIB_VERSION@
@@ -56,10 +56,10 @@ libtacomain_la_LDFLAGS 	= -version-info @LIB_VERSION@
 
 include_HEADERS		+= BlcDsNumbers.h CntrlDsNumbers.h DasDsNumbers.h MachDsNumbers.h SysNumbers.h 
 
-include_HEADERS		+= DeviceBase.h Device.H OICDevice.H 
+include_HEADERS		+= DeviceBase.h Device.h OICDevice.h 
 include_HEADERS		+= DevServer.h  DevServerP.h  DevSignal.h  NT_debug.h  Starter.h
 
-EXTRA_DIST		+= DeviceFRM.H OICDeviceFRM.H DeviceFRM.C OICDeviceFRM.C 
+EXTRA_DIST		+= DeviceFRM.h OICDeviceFRM.h DeviceFRM.cpp OICDeviceFRM.cpp 
 EXTRA_DIST		+= NT_debug.c  Doxyfile.in
 
 doc:	Doxyfile $(include_HEADERS) $(libtaco_la_SOURCES) $(libtaco___la_SOURCES) 
