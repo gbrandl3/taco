@@ -6,7 +6,7 @@ SERVERLIBS		=
 
 lib_LTLIBRARIES 	= libTACOndbm.la 
 
-dbm_newserver_SOURCES 	= main_svc.cpp dbm.cpp dbm_xdr.cpp NdbmClass.cpp
+dbm_newserver_SOURCES 	= main_svc.cpp dbm.cpp dbm_xdr.cpp NdbmClass.cpp db_serv.cpp
 
 libTACOndbm_la_SOURCES = dbm_serv.cpp \
 			dbm_devbro.cpp \

@@ -1,4 +1,7 @@
-TACO::DBServer::DBServer()
+#include <dbClass.h>
+#include <algorithm>
+
+DBServer::DBServer()
 {
 //
 // Find the dbm_database table names

@@ -107,7 +107,7 @@ public:
     static  int 		make_sec(int c) {return (c == '|') ? SEC_SEP : c;}
     static  int 		make_unsec(int c) {return (c == SEC_SEP) ? '|' : c;}
 public:
-   		DBServer() {};
+   		DBServer();
     virtual 	~DBServer() {};
 };
 
