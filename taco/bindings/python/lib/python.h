@@ -1,16 +1,19 @@
-
 /*********************************************************************
  *
  * File:	Python.h
  *
- * Project:	<PROJECT>
+ * Project:	Taco server in Python
  *
- * Description:	<CLASSDESC>
- *		
+ * Description:	
  *
- * Author(s):	<AUTHOR>
+ * Author(s):	
+ *		$Author: jkrueger1 $
  *
- * Original:	<DATE>
+ * Original:	
+ *
+ * Date:	$Date: 2004-05-14 15:02:07 $
+ *
+ * Version:	$Revision: 1.2 $
  *
  * Copyright(c) 1994 by European Synchrotron Radiation Facility, 
  *                     Grenoble, France
@@ -24,10 +27,9 @@
 #define DevErr_PythonException			999
 #define DevErr_PythonDataConversionError	998
 
+typedef struct _PythonClassRec 	*PythonClass;
+typedef struct _PythonRec 	*Python;
 
-typedef struct _PythonClassRec *PythonClass;
-typedef struct _PythonRec *Python;
-
-extern PythonClass pythonClass;
+extern PythonClass 		pythonClass;
 
 #endif /*_PYTHON_H*/
