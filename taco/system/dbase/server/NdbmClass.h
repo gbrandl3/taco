@@ -4,13 +4,14 @@
 #include <API.h>
 #include <db_xdr.h>
 
+#include <vector>
+#include <string>
+
+#ifdef USE_GDBM
 #include <gdbm.h>
 
 #define gdbm_error(dbf) 	(0)
 #define gdbm_clearerr(dbf)
-
-#include <vector>
-#include <string>
 
 /**@ingroup dbServerClasses
  */
@@ -206,29 +207,7 @@ private:
 	std::vector<NdbmNameList>	 sec_list;
 };
 
-/**@ingroup dbServerClasses
- */
-class NdbmDomain
-{
-public:
-	NdbmDomain();
-	NdbmDomain(const std::string &);
-	NdbmDomain(const std::string &,const long);
-	~NdbmDomain();
-	
-	friend bool operator== (const NdbmDomain &, const NdbmDomain &);
-	friend bool operator< (const NdbmDomain &, const NdbmDomain &);
-		
-	void 		inc_nb() {nb++;}
-	long 		get_nb() {return nb;}
-	const char 	*get_name() {return name.c_str();}	
-private:
-	std::string 	name;
-	long 		nb;
-};
 
-/**@ingroup dbServerClasses
- */
 class NdbmDomDev
 {
 public:
@@ -264,6 +243,42 @@ private:
 	long 		flag;
 };
 
+#endif
+
+/**@class NdbmDomain
+   @ingroup dbServerClasses
+ *
+ * This class is used to manage a simple name list. This is used for all
+ * the browsing facilities implemented in the TACO static database server.
+ *
+ */
+class NdbmDomain
+{
+public:
+    //! The default constructor of the class
+	NdbmDomain() : nb(0) {}
+    //! Another constructor from the domain name
+	NdbmDomain(const std::string &str) : name(str), nb(1) {}
+    //! The last constructor from the domain name and the elt number
+	NdbmDomain(const std::string &str,const long n): name(str), nb(n) {}
+    //! The class destructor
+	~NdbmDomain(){}
+	
+    //! == operator overloading. Used by the standard find algorithms
+	friend bool operator== (const NdbmDomain &a, const NdbmDomain &b) {return (a.name == b.name);}
+    //! < operator overloading. Used by the standard sort algorithms
+	friend bool operator< (const NdbmDomain &a, const NdbmDomain &b) {return (a.name < b.name);}
+		
+	void 		inc_nb() {nb++;}
+	long 		get_nb() {return nb;}
+	const char 	*get_name() {return name.c_str();}	
+private:
+	std::string 	name;
+	long 		nb;
+};
+
+/**@ingroup dbServerClasses
+ */
 
 #define	DbErr_CantGetContent	440
 #define	DbErr_IndTooLarge	441
@@ -324,7 +339,9 @@ long cmp_nocase(std::string &,std::string &);
 // Define some structures
 
 typedef struct _NdbmInfo {
+#if USE_GDBM
 	GDBM_FILE			tid[MAXDOMAIN];
+#endif
 	std::vector<std::string>	TblName;
 	long				TblNum;
 	long				ps_names_index;
@@ -339,6 +356,8 @@ typedef struct _NdbmInfo {
 #       include <strstream>
 #       define stringstream strstream
 #endif
+
+#ifdef USE_GDBM
 
 /**@ingroup dbServerClasses
  */
@@ -375,5 +394,7 @@ private:
 }; 
 
 datum createKey(std::string family, std::string member, std::string name, long number);
+
+#endif
 
 #endif

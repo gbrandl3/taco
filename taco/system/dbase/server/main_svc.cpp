@@ -14,10 +14,12 @@
 #endif
 
 #include <dbClass.h>
-#if defined(HAVE_MYSQL_MYSQL_H) || defined(HAVE_MYSQL_H)
+#ifdef USE_MYSQL
 #	include <MySqlServer.h>
 #endif
-#include <NdbmServer.h>
+#ifdef USE_GDBM
+#	include <NdbmServer.h>
+#endif
 //
 // RPC function not defined within rpc include files !!
 // M. Diehl, 15.11.99
@@ -81,7 +83,7 @@ void default_sig(int signo)
 void usage(const char *argv)
 {
 	std::string	types("");
-#if USE_GDBM
+#ifdef USE_GDBM
 	types += "dbm";
 #endif
 #ifdef USE_MYSQL
@@ -220,12 +222,16 @@ int main(int argc,char **argv)
 	std::string netmanhost(argv[argc - 1]);
 #endif
 
-#if defined(MYSQL_MYSQL) && !defined(USE_GDBM)
+#if defined(USE_MYSQL) && !defined(USE_GDBM)
 	if (!dbm)
 		dbm = new MySQLServer(mysql_user, mysql_password, argv[optind]);
 #else
+#	if defined(USE_GBM)
 	if (!dbm)
     		dbm = new NdbmServer("", "", "");
+#	else
+#		error Use either GDBM or mySQL as database
+#	endif
 #endif
 //
 // RPC business !!!!!!!!!!!!!!!!!!!! 

@@ -1092,50 +1092,6 @@ void NdbmDoubleNameList::add(std::string first,std::string second)
 	return;		
 }
 
-/**@class NdbmDomain 
-//
-// This class is used to manage a simple name list. This is used for all
-// the browsing facilities implemented in the TACO static database server.
-//
- */
-
-//! The class default constuctor
-NdbmDomain::NdbmDomain()
-{
-    nb = 0;
-}
-
-//! Another constructor from the domain name
-NdbmDomain::NdbmDomain(const std::string &str)
-{
-    name = str;
-    nb = 1;
-}
-
-//! The last constructor from the domain name and the elt number
-NdbmDomain::NdbmDomain(const std::string &str,const long n) 
-	: name(str),
-	  nb(n)
-{
-}
-
-//! The class destructor
-NdbmDomain::~NdbmDomain()
-{
-}
-
-//! == operator overloading. Used by the standard find algorithms
-bool operator== (const NdbmDomain &a, const NdbmDomain &b)
-{
-    return (a.name == b.name);
-}
-
-//! < operator overloading. Used by the standard sort algorithms
-bool operator< (const NdbmDomain &a, const NdbmDomain &b)
-{
-    return (a.name < b.name);
-}
-
 /**@class NdbmDomDev 
 //
 // This class is used to manage a list of family/mmeber associated to a domain. 

@@ -4,7 +4,7 @@ sbin_PROGRAMS		= dbm_server
 
 lib_LTLIBRARIES 	= 
 
-dbm_server_SOURCES 	= main_svc.cpp dbm.cpp dbm_xdr.cpp NdbmClass.cpp db_serv.cpp
+dbm_server_SOURCES 	= main_svc.cpp dbm.cpp dbm_xdr.cpp db_serv.cpp
 INCLUDES		= @TACO_INCLUDES@ 
 AM_CPPFLAGS		= 
 
@@ -22,7 +22,8 @@ libTACOndbm_la_SOURCES = dbm_serv.cpp \
 			dbm_psdev.cpp \
 			dbm_clo_op.cpp \
 			dbm_miscbro.cpp \
-			dbm_update.cpp 
+			dbm_update.cpp \
+			NdbmClass.cpp
 libTACOndbm_la_LIBADD	= @GDBM_LIBS@ 
 INCLUDES		+= @GDBM_CFLAGS@ 
 AM_CPPFLAGS		+= -DNDBM -DUSE_GDBM
