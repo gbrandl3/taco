@@ -20,8 +20,10 @@ kill_procs()
 	case `uname -s` in
 		Darwin*)
 			PSARGS="-o pid,command";;
+		SunOS*)
+			PSARGS="-aeo pid,comm";;
 		*)
-			PSARGS="-o pid,comm";;
+			PSARGS="-xo pid,comm";;
 	esac
 	
 	proc_name=$1
