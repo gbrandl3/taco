@@ -9,6 +9,7 @@
 # If the optional second argument is 'yes', an error is generated if SWIG is not present.
 AC_DEFUN([SWIG_PROG],[
 	AC_PATH_PROG([SWIG],[swig])
+
 	if test -z "$SWIG" ; then
 		swig_tmp="SWIG is not installed, you may have a look at http://www.swig.org"
 		if test "x$2" = "xyes" ; then
@@ -24,12 +25,18 @@ AC_DEFUN([SWIG_PROG],[
 		AC_MSG_RESULT([$swig_version])
 		if test -n "$swig_version" ; then
 			# Calculate the required version number
-			[swig_tmp=( `echo $1 | sed 's/[^0-9]\+/ /g'` )]
-			[swig_required_version=$(( 1000000 * ${swig_tmp[0]:-0} + 1000 * ${swig_tmp[1]:-0} + ${swig_tmp[2]:-0} ))]
+			[swig_tmp=`(echo $1 | sed 's/[^0-9]\+/ /g')`]
+			[swig_tmp0=`(echo $swig_tmp | cut -d' ' -f1)`]
+			[swig_tmp1=`(echo $swig_tmp | cut -d' ' -f2)`]
+			[swig_tmp2=`(echo $swig_tmp | cut -d' ' -f3)`]
+			[swig_required_version=$(( 1000000 * ${swig_tmp0:-0} + 1000 * ${swig_tmp1:-0} + ${swig_tmp2:-0} ))]
 
 			# Calculate the available version number
-			[swig_tmp=( `echo $swig_version | sed 's/[^0-9]\+/ /g'` )]
-			[swig_tmp=$(( 1000000 * ${swig_tmp[0]:-0} + 1000 * ${swig_tmp[1]:-0} + ${swig_tmp[2]:-0} ))]
+			[swig_tmp=`(echo $swig_version | sed 's/[^0-9]\+/ /g')`]
+			[swig_tmp0=`(echo $swig_tmp | cut -d' ' -f1)`]
+			[swig_tmp1=`(echo $swig_tmp | cut -d' ' -f2)`]
+			[swig_tmp2=`(echo $swig_tmp | cut -d' ' -f3)`]
+			[swig_tmp=$(( 1000000 * ${swig_tmp0:-0} + 1000 * ${swig_tmp1:-0} + ${swig_tmp2:-0} ))]
 
 			if test $swig_required_version -gt $swig_tmp ; then
 				AC_MSG_WARN([SWIG version $1 or above is required, you have $swig_version])
@@ -45,6 +52,7 @@ AC_DEFUN([SWIG_PROG],[
 		test -n "$swig_tmp" && swig_tmp=yes || swig_tmp=no
 		AC_MSG_RESULT([$swig_tmp])
 	fi
+	AM_CONDITIONAL(BUILD_PYTHON, [test x"$swig_tmp" = x"yes"])
 	AC_SUBST([SWIG_RUNTIME_LIBS_DIR])
 ])
 
@@ -85,4 +93,3 @@ AC_DEFUN([SWIG_PYTHON],[
 	AC_SUBST([SWIG_PYTHON_CPPFLAGS],[$PYTHON_CPPFLAGS])
 	AC_SUBST([SWIG_PYTHON_LIBS],["$SWIG_RUNTIME_LIBS_DIR -lswigpy"])
 ])
- 
