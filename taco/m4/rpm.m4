@@ -159,7 +159,7 @@ dnl
 dnl   # end of file
 dnl   ---------- >8 ----------
 dnl
-dnl @version $Id: rpm.m4,v 1.1 2004-04-28 16:41:57 jkrueger1 Exp $
+dnl @version $Id: rpm.m4,v 1.2 2004-05-19 15:38:06 jkrueger1 Exp $
 dnl @author Dale K. Hawkins <dhawkins@cdrgts.com>
 
 dnl AM_RPM_INIT
@@ -197,7 +197,7 @@ dnl echo rpm_prog is $rpm_prog
 			fi
 		fi
 
-		AC_PATH_PROG(RPM_PROG, rpm, no)
+		AC_PATH_PROGS(RPM_PROG, [rpmbuild rpm], no)
 		no_rpm=no
 		if test "$RPM_PROG" = "no" ; then
 			echo *** RPM Configuration Failed
