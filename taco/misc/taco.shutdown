@@ -1,4 +1,4 @@
-#
+#! /bin/sh
 # taco.shutdown - shutdown TACO manager + database
 #
 #./off Manager
