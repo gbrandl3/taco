@@ -12,10 +12,10 @@
  Original:      January 1994
 
 
- $Revision: 1.1 $
- $Date: 2003-04-25 11:21:29 $
+ $Revision: 1.2 $
+ $Date: 2004-11-25 15:56:52 $
 
- $Author: jkrueger1 $
+ $Author: andy_gotz $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -51,6 +51,10 @@
 /*------- Starter base number ----------------------------*/
 
 #define DevStarterBase	(SysTeamNumber + DS_LSHIFT(7, DS_IDENT_SHIFT))
+
+/*------- Tango base number for automatic numbering of Tango commands -*/
+
+#define DevTangoBase	(SysTeamNumber + DS_LSHIFT(8, DS_IDENT_SHIFT))
 
 /*------- Data collector warning codes ---------*/
 
