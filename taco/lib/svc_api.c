@@ -11,9 +11,9 @@
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.12 $
+ Version:	$Revision: 1.13 $
 
- Date:		$Date: 2004-03-26 16:32:09 $
+ Date:		$Date: 2004-09-17 07:56:18 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -1227,7 +1227,7 @@ long ds__destroy (void *ptr_ds, long *error)
  */
 _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 {
-	static _dev_query_out	dev_query_out = { 0, NULL, "", 0, 0, { 0, NULL}};
+	static _dev_query_out	dev_query_out = { 0, NULL, "", 0, 0, {0, NULL}};
 	long        		ds_id;
 	long        		connection_id;
 	static DevVarArgument 	vararg[1024];
@@ -1235,18 +1235,18 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 /*
  * OIC version
  */
-	DevServer		ds;
-	DevCommandList		ds_cl;
-	DevServerClass		ds_class;
-	_Int			i;
+	DevServer	ds;
+	DevCommandList	ds_cl;
+	DevServerClass	ds_class;
+	_Int		i;
 #else
 /*
  * C++ version
  */
 	DeviceBase	*device;
-	long 			error;
-	long 			ret;
-	int			i;
+	long 		error;
+	long 		ret;
+	u_long		i;
 #endif
 
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_cmd_query_4() : entering routine\n");
@@ -1256,7 +1256,14 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 
 	dev_query_out.var_argument.length   = 0;
 	dev_query_out.var_argument.sequence = NULL;
-
+/*
+ * Free last allocated memory for the command info sequence.
+ */
+	if (dev_query_out.sequence != NULL)
+	{
+		free (dev_query_out.sequence);
+		dev_query_out.sequence = NULL;
+	}
 /*
  * Split up the device identification.
  */
@@ -1285,16 +1292,7 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 #endif /* __cplusplus */
 
 /*
- * Free last allocated memory for the command info sequence.
- */
-
-	if (dev_query_out.sequence != NULL)
-	{
-		free (dev_query_out.sequence);
-	}
-
-/*
- * Get number of implmented commands and allocate memory
+ * Get number of implemented commands and allocate memory
  * for the command info sequence.
  */
 
@@ -1360,7 +1358,7 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 	if (ds_cl[0].cmd_name != NULL)
 	{
         	dev_query_out.var_argument.length = 0;
-		for (i=0; (u_long)i<dev_query_out.length; i++)
+		for (i=0; i < dev_query_out.length; i++)
 		{
         		vararg[i].argument_type      = D_STRING_TYPE;
         		vararg[i].argument           = (DevArgument)&ds_cl[i].cmd_name;
@@ -1372,8 +1370,10 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 	if ((device->commands_list.begin())->second.cmd_name != NULL)
 	{
 		dev_query_out.var_argument.length = 0;
-		for (i=0; (u_long)i<dev_query_out.length; i++)
+		for (u_long i = 0; i < dev_query_out.length; i++)
 		{
+			dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_cmd_query_4() : %d %d %s\n", i, dev_query_out.sequence[i].cmd,
+								device->commands_list[dev_query_out.sequence[i].cmd].cmd_name);
 			vararg[i].argument_type      = D_STRING_TYPE;
 			vararg[i].argument           = (DevArgument)&(device->commands_list[dev_query_out.sequence[i].cmd].cmd_name);
 		}
@@ -1381,6 +1381,7 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 	        dev_query_out.var_argument.sequence = vararg;
 	}
 #endif /* __cplusplus */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_cmd_query_4() : leaving routine\n");
 	return (&dev_query_out);
 }
 
@@ -1508,6 +1509,7 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
 	snprintf (dev_query_out.class_name, sizeof(dev_query_out.class_name), "%s", device->GetClassName());
 #endif /* __cplusplus */
 
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_event_query_4() : leaving routine\n");
 	return (&dev_query_out);
 }
 

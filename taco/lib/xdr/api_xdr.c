@@ -11,15 +11,15 @@
 
  Original:      January 1991
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-05-09 15:30:26 $
+ Date:		$Date: 2004-09-17 07:56:18 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
 
 *******************************************************************-*/
-
+#include <Admin.h>
 #include <DevXdrKernel.h>
 #include <macros.h>
 
@@ -33,12 +33,18 @@ bool_t xdr_DevVarArgument (XDR *xdrs, DevVarArgument *objp)
         DevDataListEntry        data_type;
         long                    error;
 
+	dev_printdebug(DBG_TRACE | DBG_API, "xdr_DevVarArgument() : entering routine.\n");
+	dev_printdebug(DBG_TRACE | DBG_API, "xdr_DevVarArgument() : call xdr_long(argument_type).\n");
         if (!xdr_long(xdrs, &objp->argument_type)) 
+	{
+		dev_printdebug(DBG_TRACE | DBG_API, "xdr_DevVarArgument() : leaving routine, xdr_long failed.\n");
                 return (FALSE);
+	}
 
 /*
  * Get the XDR data type from the loaded type list
  */
+	dev_printdebug(DBG_TRACE | DBG_API, "xdr_DevVarArgument() : call xdr_get_type().\n");
         if ( xdr_get_type(objp->argument_type, &data_type, &error) == DS_NOTOK)
 	{
 		char msg[512];
@@ -46,21 +52,33 @@ bool_t xdr_DevVarArgument (XDR *xdrs, DevVarArgument *objp)
 #ifdef _NT
 		PRINTF(msg);
 #else
-		fprintf (stderr, "%s\n", msg);
+		fprintf(stderr, msg);
 #endif
+		dev_printdebug(DBG_TRACE | DBG_API, "xdr_DevVarArgument() : leaving routine, xdr_get_type failed.\n");
 		return (FALSE);
         }
 
+	char	*p = (char *)objp->argument;
+	dev_printdebug(DBG_TRACE | DBG_API, "xdr_DevVarArgument() : objp->argument %p.\n", &objp->argument);
         if (!xdr_pointer(xdrs, (char **)&objp->argument, data_type.size, (xdrproc_t)data_type.xdr )) 
+	{
+		dev_printdebug(DBG_TRACE | DBG_API, "xdr_DevVarArgument() : leaving routine, xdr_pointer failed.\n");
                 return (FALSE);
+	}
+	dev_printdebug(DBG_TRACE | DBG_API, "xdr_DevVarArgument() : leaving routine.\n");
 	return (TRUE);
 }
 
 bool_t xdr_DevVarArgumentArray(XDR *xdrs, DevVarArgumentArray *objp)
 {
+	dev_printdebug(DBG_TRACE | DBG_API, "xdr_DevVarArgumentArray() : entering routine.\n");
         if (!xdr_array(xdrs, (caddr_t *)&objp->sequence, (u_int *)&objp->length, 
 		MAXU_INT, sizeof(DevVarArgument), (xdrproc_t)xdr_DevVarArgument)) 
+	{
+		dev_printdebug(DBG_TRACE | DBG_API, "xdr_DevVarArgumentArray() : leaving routine, xdr_array faild.");
                 return (FALSE);
+	}
+	dev_printdebug(DBG_TRACE | DBG_API, "xdr_DevVarArgumentArray() : leaving routine.\n");
         return (TRUE);
 }
 
@@ -323,17 +341,31 @@ bool_t xdr__dev_cmd_info(XDR *xdrs, _dev_cmd_info *objp)
 
 bool_t xdr__dev_query_out(XDR *xdrs, _dev_query_out *objp)
 {
+	dev_printdebug(DBG_TRACE | DBG_API, "xdr__dev_query_out() : entering routine.\n");
 	if (!xdr_array(xdrs, (caddr_t *)&objp->sequence, (u_int *)&objp->length, 
 			MAXU_INT, sizeof(_dev_cmd_info), (xdrproc_t)xdr__dev_cmd_info)) 
+	{
+		dev_printdebug(DBG_TRACE | DBG_API, "xdr__dev_query_out() : leaving routine, xdr_array failed.\n");
 		return (FALSE);
+	}
 	if (!xdr_opaque(xdrs, (caddr_t)objp->class_name, SHORT_NAME_SIZE)) 
+	{
+		dev_printdebug(DBG_TRACE | DBG_API, "xdr__dev_query_out() : leaving routine, xdr_opaque failed.\n");
 		return (FALSE);
+	}
 	if (!xdr_long(xdrs, &objp->error)) 
+	{
+		dev_printdebug(DBG_TRACE | DBG_API, "xdr__dev_query_out() : leaving routine, xdr_long(error) failed.\n");
 		return (FALSE);
+	}
 	if (!xdr_long(xdrs, &objp->status)) 
+	{
+		dev_printdebug(DBG_TRACE | DBG_API, "xdr__dev_query_out() : leaving routine, xdr_long(status) failed.\n");
 		return (FALSE);
+	}
 	if (!xdr_DevVarArgumentArray(xdrs, &objp->var_argument)) 
 		return (FALSE);
+	dev_printdebug(DBG_TRACE | DBG_API, "xdr__dev_query_out() : leaving routine.\n");
 	return (TRUE);
 }	
 

@@ -11,9 +11,9 @@
 
  Original   	: March 1991
 
- Version	: $Revision: 1.10 $
+ Version	: $Revision: 1.11 $
 
- Date		: $Date: 2004-05-27 07:26:14 $
+ Date		: $Date: 2004-09-17 07:56:18 $
 
  Copyright (c) 1990-2002 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -1670,7 +1670,6 @@ WorkerThreadMain(LPDWORD lpdwParam)
 
  Return(s)  :   none
 ***********************************************************************-*/
-
 static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp) 
 {
 	char	*help_ptr;
@@ -1702,213 +1701,196 @@ static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp)
 	char *(*local)();
 #endif
 
-	/*
-	 *  call the right server routine
-	 */
+/*
+ *  call the right server routine
+ */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "devserver_prog_4(): called with rqstp->rq_proc %d\n", rqstp->rq_proc);
+	switch (rqstp->rq_proc) 
+	{
+		case NULLPROC:
+			svc_sendreply(transp, (xdrproc_t)xdr_void, (caddr_t)NULL);
+			return;
 
-	/*printf("devserver_prog_4(): called with rqstp->rq_proc %d\n",rqstp->rq_proc);*/
-	switch (rqstp->rq_proc) {
-	case NULLPROC:
-#ifdef _UCC
-		svc_sendreply(transp, (xdrproc_t)xdr_void, (caddr_t)NULL);
-#else
-		svc_sendreply(transp, (xdrproc_t)xdr_void, NULL);
-#endif /* _UCC */
-		return;
-
-        case RPC_QUIT_SERVER:
-#ifdef _UCC
-		svc_sendreply(transp, (xdrproc_t)xdr_void, (caddr_t)NULL);
-#else
-		svc_sendreply(transp, (xdrproc_t)xdr_void, NULL);
-#endif /* _UCC */
-
+        	case RPC_QUIT_SERVER:
+			svc_sendreply(transp, (xdrproc_t)xdr_void, (caddr_t)NULL);
 #if defined (_NT)
-                raise(SIGABRT);
+                	raise(SIGABRT);
 #else  /* _NT */
 #if !defined (vxworks)
-                pid = getpid ();
+                	pid = getpid ();
 #else  /* !vxworks */
-                pid = taskIdSelf ();
+                	pid = taskIdSelf ();
 #endif /* !vxworks */
-                kill (pid,SIGQUIT);
+                	kill (pid,SIGQUIT);
 #endif /* _NT */
-		return;
+			return;
 
-	case RPC_CHECK:
-		help_ptr = &(config_flags.server_name[0]);
-		svc_sendreply (transp, (xdrproc_t)xdr_wrapstring, 
-			       (caddr_t) &help_ptr);
-		return;
+		case RPC_CHECK:
+			help_ptr = &(config_flags.server_name[0]);
+			svc_sendreply (transp, (xdrproc_t)xdr_wrapstring, (caddr_t) &help_ptr);
+			return;
 
-	case RPC_DEV_IMPORT:
-		xdr_argument = (xdrproc_t)xdr__dev_import_in;
-		xdr_result = (xdrproc_t)xdr__dev_import_out;
+		case RPC_DEV_IMPORT:
+			xdr_argument = (xdrproc_t)xdr__dev_import_in;
+			xdr_result = (xdrproc_t)xdr__dev_import_out;
 #ifdef __cplusplus
-		local = (DevRpcLocalFunc) rpc_dev_import_4;
+			local = (DevRpcLocalFunc) rpc_dev_import_4;
 #else
-		local = (char *(*)()) rpc_dev_import_4;
+			local = (char *(*)()) rpc_dev_import_4;
 #endif
-		break;
+			break;
 
-	case RPC_DEV_FREE:
-		xdr_argument = (xdrproc_t)xdr__dev_free_in;
-		xdr_result = (xdrproc_t)xdr__dev_free_out;
+		case RPC_DEV_FREE:
+			xdr_argument = (xdrproc_t)xdr__dev_free_in;
+			xdr_result = (xdrproc_t)xdr__dev_free_out;
 #ifdef __cplusplus
-		local = (DevRpcLocalFunc) rpc_dev_free_4;
+			local = (DevRpcLocalFunc) rpc_dev_free_4;
 #else
-		local = (char *(*)()) rpc_dev_free_4;
+			local = (char *(*)()) rpc_dev_free_4;
 #endif
-		break;
+			break;
 
-	case RPC_DEV_PUTGET:
-		xdr_argument = (xdrproc_t)xdr__server_data;
-		xdr_result = (xdrproc_t)xdr__client_data;
+		case RPC_DEV_PUTGET:
+			xdr_argument = (xdrproc_t)xdr__server_data;
+			xdr_result = (xdrproc_t)xdr__client_data;
 #ifdef __cplusplus
-		local = (DevRpcLocalFunc) rpc_dev_putget_4;
+			local = (DevRpcLocalFunc) rpc_dev_putget_4;
 #else
-		local = (char *(*)()) rpc_dev_putget_4;
+			local = (char *(*)()) rpc_dev_putget_4;
 #endif
-		break;
+			break;
 
-	case RPC_DEV_PUT:
-		xdr_argument = (xdrproc_t)xdr__server_data;
-		xdr_result = (xdrproc_t)xdr__client_data;
+		case RPC_DEV_PUT:
+			xdr_argument = (xdrproc_t)xdr__server_data;
+			xdr_result = (xdrproc_t)xdr__client_data;
 #ifdef __cplusplus
-		local = (DevRpcLocalFunc) rpc_dev_put_4;
+			local = (DevRpcLocalFunc) rpc_dev_put_4;
 #else
-		local = (char *(*)()) rpc_dev_put_4;
+			local = (char *(*)()) rpc_dev_put_4;
 #endif
-		break;
+			break;
 
-        case RPC_DEV_CMD_QUERY:
-		xdr_argument = (xdrproc_t)xdr__dev_query_in;
-		xdr_result = (xdrproc_t)xdr__dev_query_out;
+		case RPC_DEV_CMD_QUERY:
+			xdr_argument = (xdrproc_t)xdr__dev_query_in;
+			xdr_result = (xdrproc_t)xdr__dev_query_out;
 #ifdef __cplusplus
-		local = (DevRpcLocalFunc) rpc_dev_cmd_query_4;
+			local = (DevRpcLocalFunc) rpc_dev_cmd_query_4;
 #else
-		local = (char *(*)()) rpc_dev_cmd_query_4;
+			local = (char *(*)()) rpc_dev_cmd_query_4;
 #endif
-		break;
+			break;
 /* event query */
-	case RPC_DEV_EVENT_QUERY:
-        	xdr_argument = (xdrproc_t)xdr__dev_query_in;
-        	xdr_result = (xdrproc_t)xdr__dev_query_out;
+		case RPC_DEV_EVENT_QUERY:
+        		xdr_argument = (xdrproc_t)xdr__dev_query_in;
+        		xdr_result = (xdrproc_t)xdr__dev_queryevent_out;
 #ifdef __cplusplus
-        	local = (DevRpcLocalFunc) rpc_dev_event_query_4;
+        		local = (DevRpcLocalFunc) rpc_dev_event_query_4;
 #else
-        	local = (char *(*)()) rpc_dev_event_query_4;
+        		local = (char *(*)()) rpc_dev_event_query_4;
 #endif
-        	break;
+        		break;
 /* end event query */
-
 
 /*
  * RPC ADMIN service disabled temporarily, to be reimplemented later
  *
  * - andy 26nov96
  *
- *	case RPC_ADMIN_IMPORT:
- *		xdr_argument = xdr_long;
- *		xdr_result = xdr_long;
- *		local = (char *(*)()) rpc_admin_import_4;
- *		break;
+ *		case RPC_ADMIN_IMPORT:
+ *			xdr_argument = xdr_long;
+ *			xdr_result = xdr_long;
+ *			local = (char *(*)()) rpc_admin_import_4;
+ *			break;
  *
- *	case RPC_ADMIN:
- *		xdr_argument = (xdrproc_t)xdr__server_admin;
- *		xdr_result = xdr_long;
- *		local = (char *(*)()) rpc_admin_4;
- *		break;
+ *		case RPC_ADMIN:
+ *			xdr_argument = (xdrproc_t)xdr__server_admin;
+ *			xdr_result = xdr_long;
+ *			local = (char *(*)()) rpc_admin_4;
+ *			break;
  */
-
-	case RPC_DEV_PUTGET_RAW:
-		xdr_argument = (xdrproc_t)xdr__server_data;
-		xdr_result = (xdrproc_t)xdr__client_raw_data;
+		case RPC_DEV_PUTGET_RAW:
+			xdr_argument = (xdrproc_t)xdr__server_data;
+			xdr_result = (xdrproc_t)xdr__client_raw_data;
 #ifdef __cplusplus
-		local = (DevRpcLocalFunc) rpc_dev_putget_raw_4;
+			local = (DevRpcLocalFunc) rpc_dev_putget_raw_4;
 #else
-		local = (char *(*)()) rpc_dev_putget_raw_4;
+			local = (char *(*)()) rpc_dev_putget_raw_4;
 #endif
-		break;
+			break;
 
-	case RPC_DEV_PUT_ASYN:
-		/*
-		 * Read incoming arguments and send
-                 * the reply immediately without waiting
-		 * the execution of the function.
-		 */
-		xdr_argument = (xdrproc_t)xdr__server_data;
-		xdr_result = (xdrproc_t)xdr__client_data;
-	        /*
-	         * Function only for the adminstration and security part
-		 * of the asynchronous call.
-		 */
+		case RPC_DEV_PUT_ASYN:
+/*
+ * Read incoming arguments and send the reply immediately without waiting
+ * the execution of the function.
+ */
+			xdr_argument = (xdrproc_t)xdr__server_data;
+			xdr_result = (xdrproc_t)xdr__client_data;
+/*
+ * Function only for the adminstration and security part of the asynchronous call.
+ */
 #ifdef __cplusplus
-		local = (DevRpcLocalFunc) rpc_dev_put_asyn_4;
+			local = (DevRpcLocalFunc) rpc_dev_put_asyn_4;
 #else
-		local = (char *(*)()) rpc_dev_put_asyn_4;
+			local = (char *(*)()) rpc_dev_put_asyn_4;
 #endif
-	        break;
+	        	break;
 
-	case RPC_DEV_PING:
-		xdr_argument = (xdrproc_t)xdr__dev_import_in;
-		xdr_result = (xdrproc_t)xdr__dev_import_out;
+		case RPC_DEV_PING:
+			xdr_argument = (xdrproc_t)xdr__dev_import_in;
+			xdr_result = (xdrproc_t)xdr__dev_import_out;
 #ifdef __cplusplus
-		local = (DevRpcLocalFunc) rpc_dev_ping_4;
+			local = (DevRpcLocalFunc) rpc_dev_ping_4;
 #else
-		local = (char *(*)()) rpc_dev_ping_4;
+			local = (char *(*)()) rpc_dev_ping_4;
 #endif
-		break;
+			break;
 
-	default:
-		svcerr_noproc(transp);
-		return;
+		default:
+			svcerr_noproc(transp);
+			return;
 	}
-
 
 	memset(&argument, 0, sizeof(argument));
 
 	if (!svc_getargs(transp, xdr_argument, (caddr_t) &argument)) 
 	{
-		dev_printerror (SEND,"%s", "svcerr_decode : server couldn't decode incoming arguments");
+		dev_printerror (SEND, "svcerr_decode : server couldn't decode incoming arguments");
 		svcerr_decode(transp);
 		return;
 	}
 
-
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nDevServerMain() : call (*local) \n");
 	result = (*local)(&argument, rqstp);
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nDevServerMain() : call (*local)() %s\n", (result == NULL ? "failed" : "ok"));
+
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nDevServerMain() : call svc_sendreply()\n");
 	if (result != NULL && !svc_sendreply(transp, xdr_result, (caddr_t)result)) 
 	{
-		dev_printerror (SEND,"%s", "svcerr_systemerr : server couldn't send reply arguments");
+		dev_printerror (SEND, "svcerr_systemerr : server couldn't send reply arguments");
 		svcerr_systemerr(transp);
 	}
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nDevServerMain() : call svc_sendreply() ok\n");
 
-
-	/*
-	 * If an asynchronous call was requested, execute now the
-	 * command. After the answer was already send back to 
-	 * the client.
-	 */
-
+/*
+ * If an asynchronous call was requested, execute now the command. After the answer was already send back to 
+ * the client.
+ */
 	if ( rqstp->rq_proc == RPC_DEV_PUT_ASYN )
-	   {
-	   rpc_dev_put_asyn_cmd ((_server_data *)&argument);
-	   }
+	{
+		rpc_dev_put_asyn_cmd ((_server_data *)&argument);
+	}
 
-	/*
-	 * If dev_free() was called AND the server is on OS9 AND tcp
-	 * then give OS9 a hand in closing this end of the tcp socket
-	 * This fixes a bug in the OS9 (>3.x) implementation which led to
-	 * the server blocking for a few seconds when closing a tcp 
-	 * connection
-	 */
-
+/*
+ * If dev_free() was called AND the server is on OS9 AND tcp then give OS9 a hand in closing this end of 
+ * the tcp socket. This fixes a bug in the OS9 (>3.x) implementation which led to the server blocking for 
+ * a few seconds when closing a tcp connection.
+ */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nDevServerMain() : call svc_freeargs()\n");
 	if (!svc_freeargs(transp, xdr_argument, (caddr_t) &argument)) 
 	{
-		dev_printerror (SEND,"%s",
-		"svc_freeargs : server couldn't free arguments !!");
-		return;
+		dev_printerror (SEND, "svc_freeargs : server couldn't free arguments !!");
 	}
+	return;
 }
 
 
@@ -1926,7 +1908,6 @@ static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp)
 
  Return(s)  :   DS_OK or DS_NOTOK
 ***********************************************************************-*/
-
 static long svc_check (long *error)
 {
         CLIENT          *clnt;

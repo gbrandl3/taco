@@ -12,9 +12,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		 $Date: 2004-03-26 16:21:52 $
+ Date:		 $Date: 2004-09-17 07:56:18 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -29,7 +29,7 @@
  */
 #ifdef _IDENT
 static char API_xdrh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/API_xdr.h,v 1.3 2004-03-26 16:21:52 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/API_xdr.h,v 1.4 2004-09-17 07:56:18 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -39,6 +39,10 @@ static char API_xdrh[] =
  * Structures for variable argument passing for API calls.
  * Will avoid recompilation of the system when adding variables.
  */
+
+#ifdef __cplusplus
+extern "C" {
+#endif					   
 
 struct DevVarArgument {
 	long 		argument_type;
@@ -240,16 +244,13 @@ struct _msg_manager_data {
 };
 typedef struct _msg_manager_data _msg_manager_data;					   
 					   
-#ifdef __cplusplus
-extern "C" {
-#endif					   
 bool_t _DLLFunc xdr_DevVarArgument PT_((XDR *xdrs, DevVarArgument *objp));
 bool_t _DLLFunc xdr_DevVarArgumentArray PT_((XDR *xdrs, DevVarArgumentArray *objp));
 bool_t _DLLFunc xdr__register_data PT_((XDR *xdrs, _register_data *objp));
 bool_t _DLLFunc xdr__manager_data PT_((XDR *xdrs, _manager_data *objp));
 bool_t _DLLFunc xdr__server_data PT_((XDR *xdrs, _server_data *objp));
 bool_t _DLLFunc xdr__client_data PT_((XDR *xdrs, _client_data *objp));
-bool_t _DLLFunc xdr__client_raw_data PT_((XDR *xdrs,_client_raw_data *objp));
+bool_t _DLLFunc xdr__client_raw_data PT_((XDR *xdrs, _client_raw_data *objp));
 bool_t _DLLFunc xdr__dev_import_in PT_((XDR *xdrs, _dev_import_in *objp));
 bool_t _DLLFunc xdr__dev_import_out PT_((XDR *xdrs, _dev_import_out *objp));
 bool_t _DLLFunc xdr__dev_free_in PT_((XDR *xdrs, _dev_free_in *objp));

@@ -13,9 +13,9 @@
 
  Original   :	April 1993
 
- Version:	$Revision: 1.14 $
+ Version:	$Revision: 1.15 $
 
- Date:		$Date: 2004-09-17 07:45:17 $
+ Date:		$Date: 2004-09-17 07:56:18 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -442,31 +442,26 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 		return(status);
 	}
 #endif /* TANGO */
-	/*
-         * Verify the RPC connection.
-         */
+/*
+ * Verify the RPC connection.
+ */
 
 	if ( dev_rpc_connection (ds, error)  == DS_NOTOK )
 	{
 		return (DS_NOTOK);
 	}
 
-
-	/*
-         *  fill in data transfer structures dev_query_in
-         *  and dev_query_out.
-         */
-
+/*
+ *  fill in data transfer structures dev_query_in and dev_query_out.
+ */
 	dev_query_in.ds_id = ds->ds_id;
 
 	dev_query_in.var_argument.length   = 0;
 	dev_query_in.var_argument.sequence = NULL;
 
-
 /*
  *  Call the rpc entry point RPC_DEV_CMD_QUERY at the specified device server.
  */
-
 	memset ((char *)&dev_query_out, 0, sizeof (dev_query_out));
 
 /*
@@ -488,19 +483,16 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 		    (xdrproc_t)xdr__dev_query_out_3, (caddr_t) &dev_query_out, TIMEVAL(timeout));
 	}
 
-
 /*
  * Check for errors on the RPC connection.
  */
-
-	if ( dev_rpc_error (ds, clnt_stat, error) == DS_NOTOK )
+	if (dev_rpc_error(ds, clnt_stat, error) == DS_NOTOK)
 	{
 		return (DS_NOTOK);
 	}
 
 /*
- * Free the variable arguments in the dev_query_out
- * structure, coming from the server.
+ * Free the variable arguments in the dev_query_out structure, coming from the server.
  */
 	if (dev_query_out.var_argument.length > 0)
 	{
@@ -531,7 +523,6 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
  * command-name-list and name strings for the data types are searched in the resource CLASS table of the object class.
  * Undefined names will be initialised with NULL.
  */
-
 	for ( i=0; (u_long)i<varcmdarr->length; i++ )
 	{
 /*
@@ -541,7 +532,6 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 		varcmdarr->sequence[i].cmd      = dev_query_out.sequence[i].cmd;
 		varcmdarr->sequence[i].in_type  = dev_query_out.sequence[i].in_type;
 		varcmdarr->sequence[i].out_type = dev_query_out.sequence[i].out_type;
-
 /*
  * get command name string from the resource database check to see if device server returned command names 
  */
@@ -682,18 +672,14 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
 	server = server & DS_IDENT_MASK;
 	cmds_ident = (_Int)(cmd & cmd_number_mask);
 
-	/*
+/*
  * Create the resource path and the resource structure.
- *
- * first check to see whether the device belongs to another
- * nethost domain i.e. i_nethost != 0
+ * First check to see whether the device belongs to another nethost domain i.e. i_nethost != 0
  */
-
 	if (ds->i_nethost > 0)
 	{
 		snprintf(res_path, sizeof(res_path), "//%s/CMDS/%d/%d", 
-		   get_nethost_by_index(ds->i_nethost, error),
-		   team, server);
+		   get_nethost_by_index(ds->i_nethost, error), team, server);
 	}
 /*
  * use default nethost
@@ -711,17 +697,15 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
 	res_tab.resource_type = D_STRING_TYPE;
 	res_tab.resource_adr  = &ret_str;
 
-	/*
+/*
  * Read the command name string from the database.
  */
-
 	if (db_getresource (res_path, &res_tab, 1, error) == DS_NOTOK)
 	{
 		dev_printdebug (DBG_API | DBG_ERROR, "get_cmd_string() : db_getresource failed with error %d\n", *error);
 
 		return (DS_NOTOK);
 	}
-
 /*
  * If the variable ret_str is still NULL, no resource value was found
  * in the database, but the function was executed without error.
