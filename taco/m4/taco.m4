@@ -45,7 +45,7 @@ AC_DEFUN([TACO_BASE_PATH],
         		taco_libdirs="$taco_libdirs $i/lib"
 		done
 	       	AC_FIND_LIB([dsxdr], [xdr_length_DevChar], [$taco_libdirs], [eval taco_libdir="\"$i\""; LIB_TACO="-ldsxdr"], 
-			[AC_MSG_ERROR([In the following dirs: $taco_libdirs, there are no taco libraries installed.])]) 
+			[AC_MSG_ERROR([In the following dirs: $taco_libdirs, there are no taco libraries installed.])], [-ltacoapi -ldbapi]) 
         	ac_taco_libraries="$taco_libdir"
  
         	if test "$ac_taco_includes" = NO || test "$ac_taco_libraries" = NO; then
