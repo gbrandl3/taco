@@ -13,9 +13,9 @@
 
  Original: 	January 1991
 
- Version:	$Revision: 1.13 $
+ Version:	$Revision: 1.14 $
 
- Date:		$Date: 2004-03-11 16:11:21 $
+ Date:		$Date: 2004-03-18 14:10:18 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -70,13 +70,10 @@ int main (int argc, char **argv)
 	char 	*ora_home = NULL;
 	char 	*cmd_argv [5];
 	char	oracle_server_path [200];
-	char	ld_path [200];
 	char	db_path [200];
 	char	homepath [200];
 	char	homedir [200];
-	char	dbase_env [200];
 	char	db_start [256];
-	char	mode [256];
 	char    *time_string;
 	time_t	clock;
 	int	msg_pid = 0;
@@ -91,7 +88,7 @@ static	int	fd_devnull = -1;
 	pid = getpid ();
 
 #ifdef unix
-	if ( (nethost_env = (char *)getenv ("NETHOST")) == NULL )
+	if ( (nethost_env = (char *)getenv ("NETHOST")) == NULL ) /* Flawfinder: ignore */
 	{
 		printf ("Environment variable NETHOST not defined, using local host ...\n");
 		gethostname (nethost, sizeof(nethost) - 1);
