@@ -1,7 +1,13 @@
-if PYTHON_SERVER_BUILD
+if PYTHON_BINDING
 python=python
 else
 python=
 endif
 
-SUBDIRS = tcl $(python)
+if TCL_BINDING
+tcl=tcl
+else
+tcl=
+endif
+
+SUBDIRS = $(tcl) $(python)
