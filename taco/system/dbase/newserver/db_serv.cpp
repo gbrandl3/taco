@@ -26,13 +26,13 @@ DBServer::DBServer()
 //
 // Change database table names to lowercase letter names
 //
-    transform(dbtables.begin(), dbtables.end(), dbtables.begin(), tolower);
-    string::size_type 	pos(0),
-			start(0);
+    std::transform(dbtables.begin(), dbtables.end(), dbtables.begin(), ::tolower);
+    std::string::size_type 	pos(0),
+				start(0);
 
-    while ((pos = dbtables.find(',', pos)) != string::npos)
+    while ((pos = dbtables.find(',', pos)) != std::string::npos)
     {
-        string tmp_str(dbtables, start, pos - start);
+        std::string tmp_str(dbtables, start, pos - start);
         start = ++pos;
         if ((tmp_str == "names") || (tmp_str == "ps_names"))
              continue;

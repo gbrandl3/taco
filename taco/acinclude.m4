@@ -165,11 +165,29 @@ AC_DEFUN(AC_FIND_GDBM,
 	LIBS_ORIG="$LIBS"
 	CFLAGS_ORIG="$CFLAGS"
 	CFLAGS="$CFLAGS $TACO_GDBM_INC" 
+	gdbm_header=gdbm.h
 	AC_CHECK_HEADER(gdbm.h,
-		[], [AC_CHECK_HEADER(gdbm/gdbm.h, [], [MAKE_GDBM="yes"])])
-	if test "$MAKE_GDBM" != "yes" ; then
-		AC_CHECK_LIB(gdbm, gdbm_open)		 
-	fi
+		[gdbm_header="gdbm.h"], [AC_CHECK_HEADER(gdbm/gdbm.h, [gdbm_header="gdbm/gdbm.h"], [MAKE_GDBM="yes"])])
+	AC_MSG_CHECKING([Try compile gdbm.h with C++])
+	AC_LANG_PUSH(C++)
+	AC_COMPILE_IFELSE(
+		[AC_LANG_PROGRAM(
+[#include <${gdbm_header}> 
+
+class Test
+{
+public:
+	Test(GDBM_FILE, datum);
+};
+],
+[
+	GDBM_FILE	db;
+	datum		d;
+	Test a(db, d);
+// #error Broken
+]
+)], [AC_CHECK_LIB(gdbm, gdbm_open)], [MAKE_GDBM="yes"])
+	AC_LANG_POP(C++)
 	if test x${ac_cv_lib_gdbm_gdbm_open} != xyes ; then
 		TACO_GDBM_LIBS="\$(top_builddir)/gdbm/libgdbm.la"
 		TACO_GDBM_INC="-I\$(top_builddir)/gdbm"
