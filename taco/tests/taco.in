@@ -8,6 +8,7 @@ exec_prefix=@exec_prefix@
 bindir=@bindir@
 sbindir=@sbindir@
 sysconfdir=@sysconfdir@
+templatedir=@templatedir@
 top_builddir=@abs_top_builddir@
 testbindir=${top_builddir}/tests
 appdefaultdir=@appdefaultdir@
@@ -28,14 +29,14 @@ if test $# -gt 0 ; then
 			fi
 			exit 1;;
 		start)
-			. $sysconfdir/tacoenv.sh
+			. $templatedir/tacoenv.sh
 			mkdir -p ${LOGPATH}
 			set_env
 			export TACO_PATH=$sbindir
 			$sbindir/taco.startup >log 2>&1
 			exit 0;;
 		stop)
-			. $sysconfdir/tacoenv.sh
+			. $templatedir/tacoenv.sh
 			killall Manager
 			;;
 		uninstall)
@@ -61,29 +62,29 @@ if test $# -gt 0 ; then
 			fi
 			exit 1 ;;
 		unreg)
-			. $sysconfdir/tacoenv.sh
+			. $templatedir/tacoenv.sh
 			set_env
 			shift 1
 			$sbindir/unreg $@ ;;
 
 		dbm_server)
-			. $sysconfdir/tacoenv.sh
+			. $templatedir/tacoenv.sh
 			set_env
 			shift 1
 			$sbindir/dbm_server dbm `uname -n|cut -f1 -d'.'` ;;
 		ldd)
-			. $sysconfdir/tacoenv.sh
+			. $templatedir/tacoenv.sh
 			set_env
 			shift 1
 			ldd $bindir/$1 ;;
 		StartServer)
-			. $sysconfdir/tacoenv.sh
+			. $templatedir/tacoenv.sh
 			set_env
 			prog=$1
 			shift 1
 			$sbindir/$prog $@;;
 		*)
-			. $sysconfdir/tacoenv.sh
+			. $templatedir/tacoenv.sh
 			set_env
 			prog=$1
 			shift 1
@@ -92,4 +93,5 @@ if test $# -gt 0 ; then
 else
 	export LD_LIBRARY_PATH
 	export sysconfdir
+	export templatedir
 fi
