@@ -15,3 +15,6 @@ Makefile.in
 *.dvi
 *.log
 *.toc
+*.lineno
+*.core
+.gdbinit
