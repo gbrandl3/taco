@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0rc3, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.31 $)dnl
+AC_REVISION($Revision: 1.32 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -85,11 +85,11 @@ TACO_CHECK_RPC
 TACO_CHECK_RPC_AND_THREADS
 AC_CHECK_DECLS([get_myaddress], [], [], [
 #if HAVE_RPC_RPC_H
-#       include <rpc/clnt.h>
+#       include <rpc/rpc.h>
 #elif HAVE_RPC_H
-#       include <clnt.h>
+#       include <rpc.h>
 #else
-#       error "Can't find clnt.h"
+#       error "Can't find rpc.h"
 #endif
 ]) 
 AC_CHECK_FUNCS([get_myaddress])
