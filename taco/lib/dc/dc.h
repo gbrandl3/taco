@@ -3,9 +3,9 @@
  * Author:	Emanuel Taurel
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2005-02-22 15:59:57 $
+ * Date:	$Date: 2005-03-29 10:44:02 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                     Grenoble, France
@@ -77,7 +77,7 @@ typedef struct _dc_cmd_mretdat{
 	}dc_cmd_mretdat;
 
 typedef struct _datco {
-	char device_name[24];
+	char device_name[DEV_NAME_LENGTH];
 	char dc_host_name[HOST_NAME_LENGTH];
 	int indice;
 	long net_ind;
@@ -126,7 +126,7 @@ typedef struct _dc_dev_free {
 	}dc_dev_free;
 
 typedef struct _dom_info {
-	char dom_name[20];
+	char dom_name[DOMAIN_NAME_LENGTH];
 	int dom_nb_dev;
 	}dom_info;
 
