@@ -1,0 +1,70 @@
+INSTRUCTIONS FOR ACCESSING LABVIEW CONTROLS WITH TACOSILVIA:
+
+
+TacoSilvia means TACO Server Interfacing Labview Virtual Instrument Applications 
+It represents a GUI application built with Qt and allows communication with arbitrary 
+Labview Virtual Instruments(VIs) by means of getting and setting the control and indicator 
+values of the VI. It uses the TACO communication mechanism to interface Labview applications. 
+   
+The TACO/LV-wrappers are strongly tied to a corresponding particular Labview VI that itself 
+loads the VI to be controlled remotely and it is able to handle TACO client requests in 
+Labview context. In that context, this pair acts as the TACO Device Server whereas another 
+class is responsible for the client side: <b>LabviewClient</b>.  The LabviewClient class 
+encapsulates the communication with labview via TACO and does all the type conversion and 
+checking. 
+
+TacoSilvia just delegates the requests to that class in order to contact labview.
+Once a connection has been established (the device server has been imported) the 
+controls (and the indicators too) of the selected virtual instrument can be listed 
+and modified using the GUI functionality.   
+
+NOTE:
+If you don't have Qt installed on your system you may still use the LabviewClient class
+via command line. Start ./lv_menu and select the desired command from the list.
+ 
+
+
+1) Run Your Labview VI and start the Labview TACO Server 
+--------------------------------------------------------
+- Start Labview and open the Taco-Labview-Client application (LVTacoSelectViRemote.vi).
+
+1.1) Local VI Access: 
+- In the upper panel choose the directory where your VI is located via FileChooserDialog.
+- Press <Update>, select your VI from the pulldown-list and run it via <Run> button.
+
+1.2) Remote VI Access: 
+- Enter the machine name of the remote machine in the server list on the lower panel
+- Open the VI Server(Server.vi) on the corresponding machine. 
+- Insert the desired VI in the export list and run the application. 
+- After pressing <Update> the exported VIs should appear in the list now. 
+- Select the VI from the list and press <Run>. 
+Note: When you run the VI from within the Panel, the adequate TACO Server is exported automatically. 
+
+2) Import The Device And Access VI Controls
+---------------------------------------------
+- Start TacoSilvia
+- In the TacoSilvia GUI just click <Import Device>. 
+
+2.1) List the Controls: 
+
+- Retrieve a list of the available controls and indicators by pressing <GetControlList> 
+- Once listed, you can set and get the values of the controls and indicators in various ways.
+
+2.2) Get a value (control OR indicator):
+- Press the <GetControlValue> or the <GetIndicatorValue>button 
+- Select the corresponding Pull-Down Menu Item
+- Press the adequate Toolbar Icon.
+- Let the data automatically be retrieved by activating the <Update> facility.
+
+2.3) Set a value (only control):
+- Double-click on an entry in the control list and fill in the value field. 
+- Select the control in the list and press the <SetControlValue> button. 
+- Select the corresponding Pull-Down Menu Item.
+- Press the adequate Toolbar Icon.
+
+3) Synchronize Data 
+---------------------
+- If desired, the control values are regularly synchronized with labview. 
+- Just mark the checkbox and enter the interval at which synchronization should occur.
+- The control data is then retrieved automatically at regular intervals.
+

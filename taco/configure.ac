@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0-rc2, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.16 $)dnl
+AC_REVISION($Revision: 1.17 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -119,8 +119,7 @@ AC_SUBST(pythondir, ['${prefix}/python'])
 dnl aclocaldir=`aclocal --print-ac-dir`
 AC_SUBST([aclocaldir], ['${datadir}/m4'])
 
-
-AC_SUBST(TACO_INCLUDES, ["-I\$(top_srcdir)/lib/xdr -I\$(top_srcdir)/lib -I\$(top_srcdir)/lib/dc -I\$(top_srcdir)/lib/dbase -I\$(top_srcdir)/lib/tc -I\$(top_srcdir)/lib/ascii]") 
+AC_SUBST(TACO_INCLUDES, ["-I\$(top_srcdir)/lib/xdr -I\$(top_srcdir)/lib -I\$(top_srcdir)/lib/dc -I\$(top_srcdir)/lib/dbase -I\$(top_srcdir)/lib/tc -I\$(top_srcdir)/lib/ascii] -I\$(top_srcdir)/lib/private") 
 
 AC_FIND_GDBM
 if test "${MAKE_GDBM}" = "yes" ; then
@@ -204,6 +203,10 @@ AC_CONFIG_FILES(m4/Makefile)
 AC_CONFIG_FILES(bindings/python/Makefile bindings/python/lib/Makefile bindings/python/doc/Makefile bindings/python/demo.server/Makefile)
 
 AC_CONFIG_FILES(bindings/Makefile bindings/tcl/Makefile)
+
+AC_CONFIG_FILES(bindings/labview/Makefile
+					bindings/labview/client/Makefile
+					bindings/labview/server/Makefile)
 
 dnl Initialize the test suite
 AC_CONFIG_TESTDIR(tests)

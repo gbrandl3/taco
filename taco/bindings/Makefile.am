@@ -10,4 +10,4 @@ else
 tcl=
 endif
 
-SUBDIRS = $(tcl) $(python)
+SUBDIRS = $(tcl) $(python) labview
