@@ -35,31 +35,28 @@ extern "C" {
 }
 #endif
 
-using namespace std;
-
 /* Function definitions */
 
-static int from_file();
-static int from_res();
-static int read_file(string);
-static void dev_name();
-static int read_file(char *);
-static int TestLine(char *,char *,int);
-static void dev_line(char *,ifstream &, const string, int, char *);
-static int dev_name(const string, int);
-static int res_line(char *,ifstream &, const string, int , char *);
-static int rs_val(string ,int);
-static int ask_passwd();
-static void create_db();
-static void leave();
+static int 	from_file(void);
+static int 	from_res(void);
+static int 	read_file(std::string);
+static void 	dev_name(void);
+static int 	TestLine(char *,char *,int);
+static void 	dev_line(char *,ifstream &, const std::string, int, char *);
+static int 	dev_name(const std::string, int);
+static int 	res_line(std::string, ifstream &, const std::string, int , char *);
+static int 	rs_val(std::string ,int);
+static int 	ask_passwd(void);
+static void 	create_db(void);
+static void 	leave(void);
 
 /* Global variables definitions */
 
-vector<DBM *>	tid;
-int line_ptr;
-char sec_first = TRUE;
-vector<string> 	tblName;
-int TblNum = 0;
+std::vector<DBM *>		tid;
+int 				line_ptr;
+char 				sec_first = TRUE;
+std::vector<std::string> 	tblName;
+int 				TblNum = 0;
 
 
 /****************************************************************************
@@ -79,16 +76,15 @@ int TblNum = 0;
 *    Synopsis : db_fillup <0/1>                             		    *
 *                                                                           *
 ****************************************************************************/
-
 int main(int argc,char *argv[])
 {
 /* Arguments number test */
 	if(argc != 2) 
 	{
-		cerr << "db_fillup usage : db_fillup <data source>" << endl << endl;
-		cerr << "     data source parameter values" << endl;
-		cerr << "               0: from resource files" << endl;
-		cerr << "               1: from previously backuped database" << endl;
+		std::cerr << "db_fillup usage : db_fillup <data source>" << std::endl << std::endl;
+		std::cerr << "     data source parameter values" << std::endl;
+		std::cerr << "               0: from resource files" << std::endl;
+		std::cerr << "               1: from previously backuped database" << std::endl;
 		exit(-1);
 	}
 
@@ -97,59 +93,37 @@ int main(int argc,char *argv[])
    	{
 		case 0 : return from_res();
 		case 1 : return from_file();
-		default: cout << "Bad value (" << ds << ") for the data source parameter." << endl;
+		default: std::cout << "Bad value (" << ds << ") for the data source parameter." << std::endl;
 	}
 	return 1;
 }
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for from_file  function                                *
-*                        ---------                                          *
-*                                                                           *
-*    Function rule : To fill up the database from the contents of the       *
-*                    backup files.					    *
-*                                                                           *
-*    Argin : No argin							    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-****************************************************************************/
-
-static int from_file()
+/**
+ * To fill up the database from the contents of the backup files.
+ */
+static int from_file(void)
 {
-    int	iret = 0;
-
+	int	iret = 0;
 #ifdef DEBUG
-    cerr << "From backup file" << endl;
+	std::cerr << "From backup file" << std::endl;
 #endif /* DEBUG */
 
 /* Build the right command string for the db_build command */
-    if ((iret = system("cp $DBM_DIR/backup/* $DBM_DIR/.")) != 0)
-	return iret;
-    if ((iret = system("chmod 0664 $DBM_DIR/*.dir")) != 0)
-	return iret;
-    return system("chmod 0664 $DBM_DIR/*.pag"); 
+	if ((iret = system("cp $DBM_DIR/backup/* $DBM_DIR/.")) != 0)
+		return iret;
+	if ((iret = system("chmod 0664 $DBM_DIR/*.dir")) != 0)
+		return iret;
+	return system("chmod 0664 $DBM_DIR/*.pag"); 
 }
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for from_res  function                                 *
-*                        --------                                           *
-*                                                                           *
-*    Function rule : To fill up the database from the contents of the       *
-*                    resource files					    *
-*                                                                           *
-*    Argin : No argin							    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-****************************************************************************/
-static int from_res()
+/**
+ * To fill up the database from the contents of the resource files
+ */
+static int from_res(void)
 {
-	string	res_dir,
+	std::string	res_dir,
     		inter,
     		file_name,
     		temp,
@@ -166,7 +140,7 @@ static int from_res()
 
 	if ((ptr = getenv("RES_BASE_DIR")) == NULL)
 	{
-		cerr << "db_fillup : Can't find environment variable RES_BASE_DIR" << endl;
+		std::cerr << "db_fillup : Can't find environment variable RES_BASE_DIR" << std::endl;
 		return (-1);
 	}
 
@@ -183,7 +157,7 @@ static int from_res()
 
 	if ((ptr = (char *)getenv("DBM_DIR")) == NULL)
 	{
-		cerr << "db_fillup: Can't find environment variable DBM_DIR" << endl;
+		std::cerr << "db_fillup: Can't find environment variable DBM_DIR" << std::endl;
 		return (-1);
 	}
 	
@@ -198,14 +172,14 @@ static int from_res()
 
 /* Open database tables of the database */
 	int i = 0;
-	for (vector<string>::iterator it = tblName.begin(); it != tblName.end(); it++)
+	for (std::vector<std::string>::iterator it = tblName.begin(); it != tblName.end(); it++)
 	{
-		string dbm_file = dbm_dir + *it;
+		std::string dbm_file = dbm_dir + *it;
 		DBM	*t;
 		t = dbm_open(const_cast<char *>(dbm_file.c_str()), flags, 0666);
 		if (t == NULL)
 		{
-	   		 cerr << "db_fillup : Can't open " << tblName[i] << " table" << endl;
+	   		 std::cerr << "db_fillup : Can't open " << tblName[i] << " table" << std::endl;
 			leave();
 		}
 		tid.push_back(t);
@@ -216,7 +190,7 @@ static int from_res()
 	FILE	*file;
 	if ((file = popen("ls -R1p", "r")) == NULL)
 	{
-		cerr << "db_fillup : Can't get contents of directory" << endl;
+		std::cerr << "db_fillup : Can't get contents of directory" << std::endl;
 		leave();
 	}
 
@@ -229,7 +203,7 @@ static int from_res()
 		{
 			fgets(line,sizeof(line),file);
 	    		line[strlen(line) - 1] = '\0';		// remove newline
-	    		temp = string(line, strlen(line) - 1);	// remove colon
+	    		temp = std::string(line, strlen(line) - 1);	// remove colon
 //	    		res_dir = base_dir;
 
 #if defined(linux) || defined(sun)
@@ -248,47 +222,40 @@ static int from_res()
 				file_name = res_dir + "/" + line;
 				if (read_file(file_name))
 					leave();
-				cout << "Resources from file " << file_name << " inserted" << endl;
+				std::cout << "Resources from file " << file_name << " inserted" << std::endl;
 			}
 		}
 
 	}
 
 /* Close database */
-	for (vector<DBM *>::iterator it = tid.begin(); it < tid.end(); ++it)
+	for (std::vector<DBM *>::iterator it = tid.begin(); it < tid.end(); ++it)
 		dbm_close(*it);
 	tid.clear();
 	return fclose(file);
 }
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for read_file function                                 *
-*                        ---------                                          *
-*                                                                           *
-*    Function rule : To read a resource file                                *
-*                                                                           *
-*    Argin : - The name of the resource file                                *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
-static int read_file(const string f_name)
+/**
+ * To read a resource file
+ * 
+ * @param f_name The name of the resource file
+ *
+ * @return This function returns 0 if no errors occurs or the error code when
+ *    		there is a problem.
+ */
+static int read_file(const std::string f_name)
 {
 	ifstream	fil(f_name.c_str());
-	char 	line[256],
-    		line1[256];
+	char 		line[256],
+    			line1[256];
 
-	cerr << "File name : " << f_name << endl;
+	std::cout << "File name : " << f_name << std::endl;
 
 /* Open resource file */
 	if (!fil.is_open()) 
 	{
-		cerr << "db_fillup : Couldn't open resource file " << f_name << endl;
+		std::cerr << "db_fillup : Couldn't open resource file " << f_name << std::endl;
 		perror("db_fillup");
 		return(-1);
 	}
@@ -316,8 +283,8 @@ static int read_file(const string f_name)
 		switch(TestLine(line, line1, k)) 
 		{
 	    		case -1 : 	
-				cerr << "db_fillup : Error in resource file " << f_name << endl
-		      	   			<< "            at line " << line_ptr << endl;
+				std::cerr << "db_fillup : Error in resource file " << f_name << std::endl
+		      	   			<< "            at line " << line_ptr << std::endl;
 				leave();
 				break;
 	    		case 0 :  	
@@ -326,16 +293,16 @@ static int read_file(const string f_name)
 			case 1 : 	
 				if (rs_val(line1, 1)) 
 				{
-			     		cerr << "db_fillup : Error in resource file " << f_name << endl
-				  		<< "            at line " << line_ptr << endl;
+			     		std::cerr << "db_fillup : Error in resource file " << f_name << std::endl
+				  		<< "            at line " << line_ptr << std::endl;
 					leave();
 				}
 				break;
 	    		case 2 : 	
 				if (res_line(line1, fil, f_name, sizeof(line), line)) 
 				{
-			    		cerr << "db_fillup : Error in resource file " << f_name << endl
-				 		<< "            at line " << line_ptr << endl;
+			    		std::cerr << "db_fillup : Error in resource file " << f_name << std::endl
+				 		<< "            at line " << line_ptr << std::endl;
 					leave();
 				}
 				break;
@@ -345,36 +312,27 @@ static int read_file(const string f_name)
 	return 0;
 }
 
-
-/****************************************************************************
-*                                                                           *
-*		Code for TestLine  function                                 *
-*                        --------                                           *
-*                                                                           *
-*    Function rule : To change the line to lower case letters if it is      *
-*                    necessary and to return a value which indicate which   *
-*                    type of line it is (device definition, simple resource *
-*                    definition or resources array definition)              *
-*                                                                           *
-*    Argin : - A pointer to a buffer where is stored a line of the resource *
-*              file 						            *
-*	     - A pointer to a buffer where the modified line will be store  *
-*            - The length of the original line                              *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    Return value : -1 : Error  					    *
-*                    0 : It is a device definition line                     *
-*                    1 : It is a simple resource definition line            *
-*                    2 : It is definition for an array of resources         *
-*                                                                           *
-****************************************************************************/
-
+/**
+ * To change the line to lower case letters if it is 
+ * necessary and to return a value which indicate which
+ * type of line it is (device definition, simple resource
+ * definition or resources array definition)
+ * 
+ * @param line 	A pointer to a buffer where is stored a line of the resource file
+ * @param line1	A pointer to a buffer where the modified line will be store 
+ * @param k     The length of the original line
+ * 
+ * @return 
+ *	-	-1 : Error 
+ *	-        0 : It is a device definition line
+ * 	-	 1 : It is a simple resource definition line 
+ *      -        2 : It is definition for an array of resources 
+ */
 static int TestLine(char *line,char *line1,int k)
 {
 	char *tmp;
 	u_int diff;
-    int 	string = 0,
+	int 	i_string = 0,
 		iret = 1,
 		i,
 		l1 = 0;
@@ -382,228 +340,193 @@ static int TestLine(char *line,char *line1,int k)
 /* Return error in this line is not a definition line */
 
 	if ((tmp = strchr(line,(int)':')) == NULL) 
-    {	
-	cerr << "No delimiter in definition line ':' found" << endl;
+	{	
+		std::cerr << "No delimiter in definition line ':' found" << std::endl;
 		return(-1);
-    }
+	}
 
 /* Change all the letters before the : to lower case */
-
 	diff = (u_int)(tmp - line) + 1;
 	i = 0;
-    for (int j = 0; j < diff; j++)
+	for (int j = 0; j < diff; j++)
 	{
-	if (line[j] != ' ' && line[j] != '\t')
+		if (line[j] != ' ' && line[j] != '\t')
 			line1[i++] = tolower(line[j]);
 	}
 	line1[i] = 0;
 
 /* Is is a device defintion line ? In this case, all the line must be 
    translated to lower case letter */
-
-	if (strstr(line1,"device:") != NULL)
+	if (strstr(line1, "device:") != NULL)
 	{
-	for (int j = diff; j < k; j++)
+		for (int j = diff; j < k; j++)
 		{
-	    if (line[j] != ' ' && line[j] != '\t')
+			if (line[j] != ' ' && line[j] != '\t')
 				line1[i++] = tolower(line[j]);
 		}
 		iret = 0;
 	}
 
 /* Now it is a resource definition line */
-
 	else
 	{
-
 /* If the last character is \ , this is a resource array definition */
-
 		if (line[k - 1] == '\\')
 			iret = 2;
-
-	for (int j = diff; j < k; j++)
+		for (int j = diff; j < k; j++)
 		{
-
-/* If the " character is detected, set a flag. If the flag is already set,
-   reset it */
-
+/* If the " character is detected, set a flag. If the flag is already set, reset it */
 			if (line[j] == '"')
 			{
-		string = !string;
+				i_string = !i_string;
 				continue;
 			}
-
 /* When the string flag is set, copy character from the original line to the
    new one without any modifications */
-
-			if (string)
+			if (i_string)
 			{
 				line1[i++] = line[j];
 				l1 = 1;
 				continue;
 			}
-
 /* If the , character is detected not in a string definition, this is a
    resource array definition */
-
 			if (line[j] == ',')
 			{
 				line1[i++] = SEP_ELT;
 				iret = 2;
 				continue;
 			}
-
 /* Remove space and tab */
-	    if (line[j] != ' ' && line[j] != '\t')
+	    		if (line[j] != ' ' && line[j] != '\t')
 			{
 				line1[i++] = line[j];
 				l1 = 1;
 			}
 		}
 	}
-
 /* If an odd number of " character has been detected, it is an error */
-
-	if (string)
-    {
-	cerr << "incomplete string (missing \"?)" << endl;
+	if (i_string)
+    	{
+		std::cerr << "incomplete string (missing \"?)" << std::endl;
 		iret = -1;
-    }
+    	}
 /* Leave function */
-
 	line1[i] = 0;
 	if (strlen(line1) == diff && l1 == 0)
-    {
-	cerr << "incomplete line ??" << endl;
+    	{
+		std::cerr << "incomplete line ??" << std::endl;
 		iret = -1;
-    }
+    	}
 	return(iret);
-
 }
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for dev_line function                                  *
-*                        --------                                           *
-*                                                                           *
-*    Function rule : To extract from a resource file all the informations   *
-*                    concerning the device name.                            *
-*                                                                           *
-*    Argin : - A pointer to a buffer where is stored a line of the resource *
-*              file (The first line with the "device" word in it )          *
-*            - The pointer to the FILE structure of the resource file       *
-*            - Name of the resource file                                    *
-*            - The size of the buffer where to stored the next line in the  *
-*              resource file which defined device name                      *
-*            - A pointer to a buffer where to store the next line in the    *
-*              resource file which defined device name                      *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-****************************************************************************/
-static void dev_line(char *line1, ifstream &file, const string f_name, int siz_line, char *line)
+/**
+ * To extract from a resource file all the informations concerning the device name.
+ *
+ * @param line1 	A pointer to a buffer where is stored a line of the resource 
+ *              	file (The first line with the "device" word in it )
+ * @param file 		The pointer to the FILE structure of the resource file
+ * @param f_name 	Name of the resource file
+ * @param siz_line      The size of the buffer where to stored the next line in the 
+ *              	resource file which defined device name 
+ * @param line          A pointer to a buffer where to store the next line in the
+ *              	resource file which defined device name
+ */
+static void dev_line(char *line1, ifstream &file, const std::string f_name, int siz_line, char *line)
 {
-    string	temp,
-		base,
-		ptr;
-	char *tmp;
-    unsigned int diff;
-    int 	i,k,j,
-    		ind;
-    register char *ptr1;
-
+	std::string		temp,
+			base,
+			ptr;
+	char 		*tmp;
+	unsigned int 	diff;
+	int 		i,
+			k,
+			j,
+    			ind;
+    	register char 	*ptr1;
 
 /* Make a copy of the device server network name */
 	tmp = strchr(line1,(int)':');
 	diff = (u_int)(tmp - line1) + 1;
-    base = string(line1, diff);
+	base = std::string(line1, diff);
 
 /* Copy the first line in the result buffer */
-    ptr = line1;
+	ptr = line1;
 
 /* Following lines examination (discard space or tab at beginning of line) */
-    k = strlen(line1);
+	k = strlen(line1);
 	while(line1[k - 1] == '\\')
 	{
-	file.getline(line,siz_line);
+		file.getline(line,siz_line);
 		line_ptr++;
 		k = strlen(line);
 		j = 0;
-	for (int i = 0;i < k;i++)
+		for (int i = 0;i < k;i++)
 		{
-	    if (line[i] != ' ' && line[i] != '\t')
+			if (line[i] != ' ' && line[i] != '\t')
 				line1[j++] = tolower(line[i]);
 		}
 		line1[j] = '\0';
 		k = strlen(line1);
-	ptr += line1;
+		ptr += line1;
 	}
 
 /* Fill up db with first device name */
-
 	ind = 1;
-    ptr1 = strtok(const_cast<char *>(ptr.c_str()), "\\");
+	ptr1 = strtok(const_cast<char *>(ptr.c_str()), "\\");
 	if (dev_name(ptr1,ind))
 	{	
-	cerr << "db_fillup : Error in device definition in file " << f_name << endl
-	     << "            at line " << line_ptr << endl;
+		std::cerr << "db_fillup : Error in device definition in file " << f_name << std::endl
+			<< "            at line " << line_ptr << std::endl;
 		leave();
 	} 
 
 /* Fill up db with the other device names */
-    while((ptr1 = strtok(NULL,"\\")) != NULL)
+	while((ptr1 = strtok(NULL,"\\")) != NULL)
 	{
 		ind++;
-	temp = base  + ptr1;
+		temp = base  + ptr1;
 		if (dev_name(temp,ind))
 		{
-	    cerr << "db_fillup : Error in device definition in file " << f_name << endl
-		 << "            at line " << line_ptr << endl;
+	    		std::cerr << "db_fillup : Error in device definition in file " << f_name << std::endl
+		 		<< "            at line " << line_ptr << std::endl;
 			leave();
 		} 
 	}
 }
 
-
-/****************************************************************************
-*                                                                           *
-*		Code for dev_name function                                  *
-*                        --------                                           *
-*                                                                           *
-*    Function rule : To store all the devices names in the NAMES table      *
-*                                                                           *
-*    Argin : - The address of a buffer where is saved a device name         *
-*              definition                                                   *
-*              The buffer contains a string which follows this format :     * 
-*              Device server network name/device:     device name           *
-*	     - The number of the device in the device list		    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
-static int dev_name(const string line, int numb)
+/**
+ * To store all the devices names in the NAMES table
+ * 
+ * @param line The address of a buffer where is saved a device name definition 
+ *             The buffer contains a string which follows this format :
+ *             Device server network name/device:     device name 
+ * @param numb The number of the device in the device list
+ *
+ * @return 	This function returns 0 if no errors occurs or the error code when    
+ *    		there is a problem.
+ */
+static int dev_name(const std::string line, int numb)
 {
 	device dev;
-    datum 		ret, 
+	datum 		ret, 
 			key, 
 			keyn, 
 			key_sto, 
 			content;
-	unsigned int diff;
-    register char 	*temp; 
-    string::size_type	pos;
-    char 		seqnr[4],
+	unsigned int 	diff;
+	register char 	*temp; 
+	std::string::size_type	pos;
+	char 		seqnr[4],
 			prgnr[20],
 			keyr[MAX_KEY];
-    string		lin(line);
+	std::string		lin(line);
 
-    cerr << "dev_name = " << lin << endl;
+	std::cerr << "dev_name = " << lin << std::endl;
 /* Verify device name syntax */
-    if (count(lin.begin(), lin.end(), '/') != 4)
+	if (std::count(lin.begin(), lin.end(), '/') != 4)
 		return(ERR_DEVNAME);
 
 /* Initialize host name, device type and device class */
@@ -614,86 +537,81 @@ static int dev_name(const string line, int numb)
 	strcpy(dev.proc_name,"unknown");
 
 /* Get device server class */
-    if ((pos = lin.find_first_of("/")) > sizeof(dev.ds_class) - 1)
-    {
-	cerr << "Device server class to long (max. " << (sizeof(dev.ds_class) - 1) << " chars)" << endl; 
-	return (ERR_DEVNAME);
-    }
-    strncpy(dev.ds_class,lin.c_str(), pos);
-    dev.ds_class[pos] = '\0';
-    lin.erase(0, pos + 1);
+	if ((pos = lin.find_first_of("/")) > sizeof(dev.ds_class) - 1)
+	{
+		std::cerr << "Device server class to long (max. " << (sizeof(dev.ds_class) - 1) << " chars)" << std::endl; 
+		return (ERR_DEVNAME);
+	}
+	strncpy(dev.ds_class,lin.c_str(), pos);
+	dev.ds_class[pos] = '\0';
+	lin.erase(0, pos + 1);
 
 /* Get device server name */
-    if ((pos = lin.find_first_of("/")) > sizeof(dev.ds_name) - 1)
-    {
-	cerr << "Device server name to long (max. " << (sizeof(dev.ds_name) - 1) << " chars)" << endl;
-	return (ERR_DEVNAME);
-    }
-    strncpy(dev.ds_name, lin.c_str(), pos);
-    dev.ds_name[pos] = '\0';
-    lin.erase(0, pos + 1);
+	if ((pos = lin.find_first_of("/")) > sizeof(dev.ds_name) - 1)
+	{
+		std::cerr << "Device server name to long (max. " << (sizeof(dev.ds_name) - 1) << " chars)" << std::endl;
+		return (ERR_DEVNAME);
+	}
+	strncpy(dev.ds_name, lin.c_str(), pos);
+	dev.ds_name[pos] = '\0';
+	lin.erase(0, pos + 1);
 
 /* Get device name */
-    pos = lin.find_first_of(":");
-    lin.erase(0, pos + 1);
-    if (lin.length() > sizeof(dev.d_name) - 1)
-    {
-	cerr << "Device name to long (max. " << (sizeof(dev.d_name) - 1) << " chars)" << endl; 
+	pos = lin.find_first_of(":");
+	lin.erase(0, pos + 1);
+	if (lin.length() > sizeof(dev.d_name) - 1)
+	{
+		std::cerr << "Device name to long (max. " << (sizeof(dev.d_name) - 1) << " chars)" << std::endl; 
 		return(ERR_DEVNAME);
-    }
-    if (lin.empty())
-	return(ERR_DEVNAME);
-    strcpy(dev.d_name, lin.c_str());
+	}
+	if (lin.empty())
+		return(ERR_DEVNAME);
+	strcpy(dev.d_name, lin.c_str());
 
 /* Initialize the other columns */
-
 	dev.pn = 0;
 	dev.vn = 0;
 	dev.indi = numb;
 	dev.pid = 0;
 
 #ifdef DEBUG
-    cerr  << "Host name : " << dev.h_name << endl
-    	<< "Device server class : " << dev.ds_class << endl
-    	<< "Device server name : " << dev.ds_name << endl
-    	<< "Device name : " << dev.d_name << endl
-    	<< "Program number : " << dev.pn << endl
-    	<< "Version number : " << dev.vn << endl
-    	<< "Device type : " << dev.d_type << endl
-    	<< "Device class : " << dev.d_class << endl
-    	<< "Device number (in this device list) : " << dev.indi << endl
-    	<< "Device server PID : " << dev.pid << endl
-    	<< "Device server process name : " << dev.proc_name << endl;
+	std::cerr  << "Host name : " << dev.h_name << std::endl
+		<< "Device server class : " << dev.ds_class << std::endl
+		<< "Device server name : " << dev.ds_name << std::endl
+		<< "Device name : " << dev.d_name << std::endl
+		<< "Program number : " << dev.pn << std::endl
+		<< "Version number : " << dev.vn << std::endl
+		<< "Device type : " << dev.d_type << std::endl
+		<< "Device class : " << dev.d_class << std::endl
+		<< "Device number (in this device list) : " << dev.indi << std::endl
+		<< "Device server PID : " << dev.pid << std::endl
+		<< "Device server process name : " << dev.proc_name << std::endl;
 #endif
 
-/* Verify that no device with the same name is already registered in the
-   database */
-
+/* Verify that no device with the same name is already registered in the database */
 	key_sto.dptr = (char *)malloc(MAX_KEY); 
 
 /* Go through the table to detect any double instance */
-
-    vector<DBM *>::iterator 	t = tid.begin();
-    for (key = dbm_firstkey(*t); key.dptr != NULL;key = dbm_nextkey(*t))
+	std::vector<DBM *>::iterator 	t = tid.begin();
+	for (key = dbm_firstkey(*t); key.dptr != NULL;key = dbm_nextkey(*t))
 	{
 		strncpy(keyr,key.dptr,key.dsize);
 		keyr[key.dsize] = '\0';
 		strncpy(key_sto.dptr, key.dptr, key.dsize);
 		key_sto.dsize = key.dsize;
 	
-	ret = dbm_fetch(*t, key_sto);
-
+		ret = dbm_fetch(*t, key_sto);
 		if (ret.dptr == NULL)
 		{
-	    cerr << "db_fillup: Error in dbm_fetch for " << key.dptr << endl;
+	    		std::cerr << "db_fillup: Error in dbm_fetch for " << key.dptr << std::endl;
 			return(ERR_DEVNAME);
 		}
 		
-	char *tmp = ret.dptr;
+		char *tmp = ret.dptr;
 		temp = strchr(tmp,(int)'|');
 		if (temp == NULL)
 		{
-	    cerr << "db_fillup: No separator in db tuple" << endl;
+	    		std::cerr << "db_fillup: No separator in db tuple" << std::endl;
 			return(ERR_DEVNAME);
 		}
 		diff = (u_int)(temp++ - tmp);
@@ -701,17 +619,17 @@ static int dev_name(const string line, int numb)
 		keyr[diff] = '\0';
 		if (strcmp(keyr, dev.d_name) == 0 )
 		{
-	    cerr << "db_fillup : Can't insert a tuple in NAMES table" << endl
-		 << "Device " << dev.d_name << " already defined in the database" << endl;
+	    		std::cerr << "db_fillup : Can't insert a tuple in NAMES table" << std::endl
+				<< "Device " << dev.d_name << " already defined in the database" << std::endl;
 			return(ERR_DEVNAME);
 		}		
 	}
 
 
 /* Insert tuple in NAMES table */
-    if ((keyn.dptr = (char *)malloc(line.length())) == NULL)
+	if ((keyn.dptr = (char *)malloc(line.length())) == NULL)
 	{
-	cerr << "Error in memory allocation for the key." << endl;
+		std::cerr << "Error in memory allocation for the key." << std::endl;
 		leave();
 	}
 
@@ -726,7 +644,7 @@ static int dev_name(const string line, int numb)
 
 	if ((content.dptr = (char *)malloc(MAX_CONT)) == NULL)
 	{
-	cerr << "Error in memory allocation for the content." << endl;
+		std::cerr << "Error in memory allocation for the content." << std::endl;
 		leave();
 	}
 	
@@ -752,222 +670,209 @@ static int dev_name(const string line, int numb)
 
 	content.dsize = strlen(content.dptr);	
 
-    int flags = DBM_INSERT,
+	int flags = DBM_INSERT,
 	i;
-    if ((i = dbm_store(*t, keyn, content, flags)) != 0)
+	if ((i = dbm_store(*t, keyn, content, flags)) != 0)
 	{
-	cerr << "db_fillup : Can't insert a" 
-	     << ((i == 1) ?  " double " : "n erroneous")
-             << " instance in NAMES table: " <<  keyn.dptr << endl;
+		std::cerr << "db_fillup : Can't insert a" 
+	     		<< ((i == 1) ?  " double " : "n erroneous")
+             		<< " instance in NAMES table: " <<  keyn.dptr << std::endl;
 		free(keyn.dptr);
 		free(content.dptr);
 		return(ERR_DEVNAME);
 	}
-	
 	free(keyn.dptr);
 	free(content.dptr);
 	return(0);
 }
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for res_line function                                  *
-*                        --------                                           *
-*                                                                           *
-*    Function rule : To extract from a resource file all the informations   *
-*                    concerning a resource array			    *
-*                                                                           *
-*    Argin : - A pointer to a buffer where is stored a line of the resource *
-*              file (The first line of the resource array definition)       *
-*	     - The pointer to the FILE structure of the resource file       *
-*            - Name of the resource file                                    *
-*            - The size of the buffer where to stored the next line in the  *
-*              resource file which defined the resource array               *
-*            - A pointer to a buffer where to store the next line in the    *
-*              resource file which defined the resource array               *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-****************************************************************************/
-static int res_line(char *line1, ifstream &file,const string f_name,int siz_line,char *line)
+/**
+ * To extract from a resource file all the informations
+ * concerning a resource array
+ * 
+ * @param line1  	A pointer to a buffer where is stored a line of the resource 
+ *              	file (The first line of the resource array definition)
+ * @param file		The pointer to the FILE structure of the resource file
+ * @param f_name 	Name of the resource file
+ * @param siz_line 	The size of the buffer where to stored the next line in the
+ *              	resource file which defined the resource array
+ * @param line          A pointer to a buffer where to store the next line in the
+ *              	resource file which defined the resource array
+ */
+static int res_line(string line1, ifstream &file, const std::string f_name, int siz_line, char *line)
 {
-	unsigned int diff;
-    int 	l_base,ind,
-    		string = 0,
-    		k1 = 1;
-	register char *ptr,*ptr1,*ptr2,*ptr3;
-    char 	t_name[80],
-    		base[80],
-    		temp[80],
-    		*tmp,
-    		pat[2];
+	unsigned int 	diff;
+    	int 		l_base,
+			ind,
+    			i_string = 0,
+    			k1 = 1;
+	register char 	*ptr,
+			*ptr1,
+			*ptr2,
+			*ptr3;
+    	char 		t_name[80],
+    			base[80],
+    			temp[80],
+    			*tmp,
+    			pat[2];
 
 /* Make a copy of the resource array name */
 
-	tmp = strchr(line1,(int)':');
-	diff = (u_int)(tmp - line1) + 1;
-	strncpy(base,line1,diff);
-	base[diff] = 0;
-	l_base = diff;
+	std::string::size_type pos = line1.find(':') + 1;
+	if (pos > sizeof(base) - 1)
+	{
+		std::cerr << "Resource \"" << line1.substr(0, pos) << "\"name is too long : max" 
+			<< sizeof(base) << " chars" << std::endl;
+		return 1;
+	}
+	strncpy(base, line1.substr(0, pos).c_str(), pos);
+	base[pos] = 0;
+	l_base = pos;
 
 /* Copy the first line in the resulting buffer */
-    int k = strlen(line1);
-    if ((ptr = (char *)malloc(SIZE)) == NULL) 
-    {
-	cerr << "Not enough memory, exiting..." << endl;
+	int k = line1.length();
+	if (k > SIZE)
+	{
+		std::cerr << "Resource line \"" << line1 << "\" too long. Max " << SIZE << "chars." << std::endl;
+		return 1;
+	}
+	if ((ptr = (char *)malloc(SIZE)) == NULL) 
+	{
+		std::cerr << "Not enough memory, exiting..." << std::endl;
 		leave();
-		}
-	strcpy(ptr,line1);
-    if (line1[k - 1] == '\\') 
+	}
+	strcpy(ptr,line1.c_str());
+	if (line1[k - 1] == '\\') 
 		ptr[k - 1] = SEP_ELT;
 
 /* Following line examination */
-    while (line1[k - 1] == '\\') 
-    {
-	file.getline(line,siz_line);
+	while (line1[k - 1] == '\\') 
+	{
+		file.getline(line, siz_line);
 		line_ptr++;
 		line[strlen(line) - 1] = 0;
 
 /* Verify the new line is not a simple resource definition */
-	if ((ptr2 = strchr(line,(int)':')) != NULL) 
-	{
+		if ((ptr2 = strchr(line,(int)':')) != NULL) 
+		{
 			diff = (u_int)(ptr2 - line);
 			strncpy(t_name,line,diff);
 			t_name[diff] = 0;
 			k = 0;
 			NB_CHAR(k,t_name,'/');
-	    if (k == 3) 
-	    {
+	    		if (k == 3) 
+	    		{
 				line_ptr--;
 				return(ERR_RESVAL);
-				    }
-						}
-
+			}
+		}
 		k = strlen(line);
-	int j = 0;
-
+		int j = 0;
 /* Remove space and tab characters except if they are between two ".
    Replace the , character by 0x02 except if they are between two ". */
-	for (int i = 0; i < k; i++) 
-	{
-	    if (line[i] == '"') 
-	    {
-		string = !string;
+		for (int i = 0; i < k; i++) 
+		{
+			if (line[i] == '"') 
+	    		{
+				i_string = !i_string;
 				continue;
-					}
-	    if (string) 
-	    {
+			}
+	    		if (i_string) 
+	    		{
 				line1[j++] = line[i];
 				continue;
-				}
-	    if (line[i] == ',') 
-	    {
+			}
+	    		if (line[i] == ',') 
+	    		{
 				line1[j++] = SEP_ELT;
 				continue;
-					}
-	    if (line[i] != ' ' && line[i] != '\t')
+			}
+	    		if (line[i] != ' ' && line[i] != '\t')
 				line1[j++] = line[i];
-				}
+		}
 
 /* Error if odd number of " characters */
-
-		if (string)
-	{
-	    cerr << "unmatched \"" << endl;
+		if (i_string)
+		{
+			std::cerr << "unmatched \"" << std::endl;
 			return(ERR_RESVAL);
-	}
+		}
 		line1[j] = 0;
-		k = strlen(line1);
+		k = line1.length();
 
 /* Add this new line to the result buffer */
-
-		strcat(ptr,line1);
-	int l = strlen(ptr);
-	if (line1[k - 1] == '\\') 
-	    ptr[l - 1] = (ptr[l - 2] == SEP_ELT) ? '\0' : SEP_ELT;		
+		strcat(ptr,line1.c_str());
+		int l = strlen(ptr);
+		if (line1[k - 1] == '\\') 
+	    		ptr[l - 1] = (ptr[l - 2] == SEP_ELT) ? '\0' : SEP_ELT;		
 
 /* Test to verify that the array (in ascii characters) is not bigger than
    the allocated memory and realloc memory if needed. */
-    	if (l > ((k1 * SIZE) - LIM)) 
-    	{
-	    if ((ptr = (char *)realloc((void *)ptr,(size_t)(l + SIZE))) == 0) 
-	    {
-		cerr << "Not enought memory, exiting..." << endl;
+    		if (l > ((k1 * SIZE) - LIM)) 
+    		{
+			if ((ptr = (char *)realloc((void *)ptr,(size_t)(l + SIZE))) == 0) 
+	    		{
+				std::cerr << "Not enought memory, exiting..." << std::endl;
 				leave();
-				}
-			k1++;
 			}
+			k1++;
 		}
+	}
 
 /* Make two copies of the "ptr" string */
-
 	ptr2 = (char*)malloc(strlen(ptr) + 1);
 	strcpy(ptr2,ptr);
 	ptr3 = (char*)malloc(strlen(ptr) + 1);
 	strcpy(ptr3,ptr);
 
 /* Fill up db with the first array element */
-
 	ind = 1;
 	pat[0] = SEP_ELT;
 	pat[1] = 0;
 	ptr1 = strtok(ptr3,pat);
-    if (rs_val(ptr1, ind)) 
-    {
+	if (rs_val(ptr1, ind)) 
+	{
 		base[l_base - 1] = 0;
-	cerr << "db_fillup : Error in storing " << base << " array." << endl;
+		std::cerr << "db_fillup : Error in storing " << base << " array." << std::endl;
 		leave();
-			}
+	}
 
 /* Fill up the db with the other elements of the resource array */
-
 /* Reinitialize strtok internal pointer */
-
 	ptr1 = strtok(ptr,pat);
-    while ((ptr1 = strtok(NULL,pat)) != NULL) 
-    {
+	while ((ptr1 = strtok(NULL,pat)) != NULL) 
+	{
 		ind++;
 		strcpy(temp,base);
 		strcat(temp,ptr1);
-	if (rs_val(temp,ind)) 
-	{
+		if (rs_val(temp,ind)) 
+		{
 			base[l_base - 1] = 0;
-	    cerr << "db_fillup : Error in storing " << base << " array." << endl;
+			std::cerr << "db_fillup : Error in storing " << base << " array." << std::endl;
 			leave();
-				}
-						}
+		}
+	}
 
 /* Free memory */
-
 	free(ptr);
 	free(ptr2);
 	free(ptr3);
 
 /* Leave function */
-
 	return(0);
-
 }
 
-
-/****************************************************************************
-*                                                                           *
-*		Code for rs_val function                                    *
-*                        ------                                             *
-*                                                                           *
-*    Function rule : To store resource definition in the static database    *
-*                                                                           *
-*    Argin : - The address of a buffer where is saved a resource definition *
-*              The buffer contains a string which follows this format :     *
-*              Resource name (DOMAIN/FAMILY/MEMBER):   resource value       *
-*	     - The number of the resource if the resource type is array     *
-*	       (must be one if the resource type is not an array)           *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-****************************************************************************/
-static int rs_val(string lin, int ind)
+/**
+ * To store resource definition in the static database
+ *
+ * @param lin The  buffer where is saved a resource definition 
+ *              The buffer contains a string which follows this format :  
+ *              Resource name (DOMAIN/FAMILY/MEMBER):   resource value   
+ * @param ind The number of the resource if the resource type is array 
+ *	       (must be 1 if the resource type is not an array)      
+ */
+static int rs_val(std::string lin, int ind)
 {
 	char		indnr[12];
 	reso 		res;
@@ -979,64 +884,63 @@ static int rs_val(string lin, int ind)
 			content;
 	static int 	res_pas;
 
-	string::size_type	pos = lin.find(':'),
+	std::string::size_type	pos = lin.find(':'),
 				_pos;
 
 /* Verify that the resource syntax is correct */
-
-	if (pos == string::npos)
+	if (pos == std::string::npos)
 	{
-		cerr << "No delimiter ':' found" << endl;
+		std::cerr << "No delimiter ':' found in line " << lin << std::endl;
 		return(ERR_RESVAL);
 	}
-	string resval = lin.substr(pos + 1);
-	string r_name = lin.substr(0, pos);
+	std::string resval = lin.substr(pos + 1);
+	std::string r_name = lin.substr(0, pos);
 	if (r_name.length() > (DOMAIN_NAME_LENGTH + FAMILY_NAME_LENGTH + MEMBER_NAME_LENGTH + RES_NAME_LENGTH + 3 - 1))
 	{
-		cerr << "Resource path to long: (max " 
+		std::cerr << "Resource path to long: (max " 
 		     << (DOMAIN_NAME_LENGTH + FAMILY_NAME_LENGTH + MEMBER_NAME_LENGTH + RES_NAME_LENGTH + 3 - 1) 
-		     << " characters)" << endl; 
+		     << " characters)" << std::endl; 
 		return(ERR_RESVAL);
 	}
 
-	if (count(r_name.begin(), r_name.end(), '/') != 3)
+	if (std::count(r_name.begin(), r_name.end(), '/') != 3)
 	{
-		cerr << "Resource path does not match 'table/family/member/resource'" << endl;
+		std::cerr << "Resource path does not match 'table/family/member/resource'" << std::endl;
 		return(ERR_RESVAL);
 	}
 /* Get table name */
 	_pos = 1 + (pos = r_name.find('/'));
 	if (pos > DOMAIN_NAME_LENGTH -1)
 	{
-		cerr << "Resource name : table name to long (max. " << (DOMAIN_NAME_LENGTH -1) << " chars)" << endl;
+		std::cerr << "Resource name : table name to long (max. " << (DOMAIN_NAME_LENGTH -1) << " chars)" << std::endl;
 		return(ERR_RESVAL);
 	}
-	string d_name = r_name.substr(0, pos);
+	std::string d_name = r_name.substr(0, pos);
 
 /* Get family name */
 	pos = r_name.find('/', _pos);
 	if (pos - _pos > FAMILY_NAME_LENGTH)
 	{
-		cerr << "Resource name : family to long (max. " << (FAMILY_NAME_LENGTH - 1) << " chars)" << endl;
+		std::cerr << "Resource name : family to long (max. " << (FAMILY_NAME_LENGTH - 1) << " chars)" << std::endl;
 		return(ERR_RESVAL);
 	}
-	strcpy(res.fam, r_name.substr(_pos, (pos - _pos + 1)).c_str());
+	strcpy(res.fam, r_name.substr(_pos, (pos - _pos)).c_str());
 	_pos = pos + 1;
 
 /* Get member name */
 	pos = r_name.find('/', _pos);
 	if (pos - _pos > MEMBER_NAME_LENGTH)
 	{
-		cerr << "Resource name : member to long (max. " << (MEMBER_NAME_LENGTH - 1) << " chars)" << endl; 
+		std::cerr << "Resource name : member to long (max. " << (MEMBER_NAME_LENGTH - 1) << " chars)" << std::endl; 
 		return(ERR_RESVAL);
 	}
-	strcpy(res.member, r_name.substr(_pos, (pos - _pos + 1)).c_str());
+	strcpy(res.member, r_name.substr(_pos, (pos - _pos)).c_str());
 	_pos = pos + 1;
 
 /* Get resource name */
 	if (r_name.substr(_pos).length() > RES_NAME_LENGTH - 1)
 	{
-		cerr << "Resource name : name to long (max. " << (RES_NAME_LENGTH - 1) << " chars)" << endl;
+		std::cerr << "Resource name : name to long (max. " << (RES_NAME_LENGTH - 1) << " chars)" << std::endl;
 		return(ERR_RESVAL);
 	}
 	strcpy(res.r_name, r_name.substr(_pos).c_str());
@@ -1046,7 +950,7 @@ static int rs_val(string lin, int ind)
 /* Get resource value and leave function if it is initilised to %  */
 	if (resval.length() > sizeof(res.r_val) - 1)
 	{
-		cerr << "Resource : value to long (max. " << (sizeof(res.r_val) - 1) <<" chars)" << endl; 
+		std::cerr << "Resource : value to long (max. " << (sizeof(res.r_val) - 1) <<" chars)" << std::endl; 
 		return (ERR_RESVAL);
 	}
 	strcpy(res.r_val, resval.c_str());
@@ -1066,17 +970,17 @@ static int rs_val(string lin, int ind)
 	}
 
 #ifdef DEBUG
-    	cerr << "Table name : " << d_name << endl
-    	 	<< "Family name : " << res.fam << endl
-    	 	<< "Member name : " << res.member << endl
-    	 	<< "Resource name : " << res.r_name << endl
-    	 	<< "Resource value : " << res.r_val << endl
-    	 	<< "Number of the resource : " << res.indi << endl << endl;
+    	std::cerr << "Table name : " << d_name << std::endl
+    	 	<< "Family name : " << res.fam << std::endl
+    	 	<< "Member name : " << res.member << std::endl
+    	 	<< "Resource name : " << res.r_name << std::endl
+    	 	<< "Resource value : " << res.r_val << std::endl
+    	 	<< "Number of the resource : " << res.indi << std::endl << std::endl;
 #endif
 
 /* Select the right resource table in database */
 	int i = 0;
-	vector<string>::iterator it = tblName.begin();
+	std::vector<std::string>::iterator it = tblName.begin();
 	for (it = tblName.begin(); it != tblName.end(); it++)
 	{	
 		if (d_name == *it)
@@ -1089,7 +993,7 @@ static int rs_val(string lin, int ind)
 
 	if (it == tblName.end()) 
 	{
-		cerr << "Table name '" << d_name << "' not found." << endl;
+		std::cerr << "Table name '" << d_name << "' not found." << std::endl;
 		return(ERR_RESVAL);
 	}
 
@@ -1108,14 +1012,12 @@ static int rs_val(string lin, int ind)
 
                  if (res_pas == -1)
                         return(0);
-                                                    }
-	
+	}
 	if ((key.dptr = (char *)malloc(sizeof(res))) == NULL) 
 	{
-		cerr << "Error in memory allocation for the key." << endl;
+		std::cerr << "Error in memory allocation for the key." << std::endl;
 		leave();
 	}
-
 	strcpy(key.dptr, res.fam);
 	strcat(key.dptr, "|");
 	strcat(key.dptr, res.member);
@@ -1134,9 +1036,9 @@ static int rs_val(string lin, int ind)
 	int flags = DBM_INSERT;
 	if ((i = dbm_store(tab, key, content, flags)) != 0) 
 	{
-		cerr << "db_fillup : Can't insert a"
+		std::cerr << "db_fillup : Can't insert a"
 	     		<< ((i == 1) ? " double" : "n erroneous")
-	     		<< " resource: " << key.dptr << endl;
+	     		<< " resource: " << key.dptr << std::endl;
 		free(key.dptr);
 		return(ERR_RESVAL);
 	}
@@ -1146,30 +1048,20 @@ static int rs_val(string lin, int ind)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for ask_passwd function                                *
-*                        ----------                                         *
-*                                                                           *
-*    Function rule : To ask for the security passwd if one is defined. This *
-*		     function also checks if the passwd typed by the user   *
-*		     is the right one					    *
-*                                                                           *
-*    Argin : No argin							    *
-*                                                                           *
-*    Argout : No argout							    *
-*                                                                           *
-*    This function returns 0 if there is no passwd defined or if the passwd *
-*    supplied by the user is the right one. The function returns -1 if the  *
-*    passwd typed by the user is not correct				    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To ask for the security passwd if one is defined. This 
+ * function also checks if the passwd typed by the user is the right one
+ * 
+ * @return This function returns 0 if there is no passwd defined or if the passwd 
+ * supplied by the user is the right one. The function returns -1 if the  
+ * passwd typed by the user is not correct
+ */
 static int ask_passwd()
 {
 	char 	*user_pas,
     		file_pas[40],
     		*db_env;
-	string 	f_name;
+	std::string 	f_name;
 	struct stat stat_info;
 
 /* Get the database environment variable */
@@ -1177,7 +1069,7 @@ static int ask_passwd()
 	db_env = getenv("DBM_DIR");
 
 /* Build the security file name */
-	f_name = string(db_env) + "/.sec_pass";
+	f_name = std::string(db_env) + "/.sec_pass";
 
 /* Is there any password defined for the security table ? */
 	if (stat(f_name.c_str(),&stat_info) == -1)
@@ -1186,7 +1078,7 @@ static int ask_passwd()
                         return(0);
                 else
 		{
-			cerr << "dbm_update : Can't get passwd information" << endl;
+			std::cerr << "dbm_update : Can't get passwd information" << std::endl;
                         return(-1);
 		}
 	}
@@ -1194,7 +1086,7 @@ static int ask_passwd()
 /* There is one password, so ask it to the user */
 	if ((user_pas = (char *)getpass("Security passwd : ")) == NULL)
 	{
-		cerr << "dbm_update : Can't get user passwd" << endl;
+		std::cerr << "dbm_update : Can't get user passwd" << std::endl;
 		return(-1);
 	}
 
@@ -1202,7 +1094,7 @@ static int ask_passwd()
 	ifstream 	file_sec(f_name.c_str());
 	if (!file_sec)
 	{
-        	cerr << "dbm_update : Can't get passwd information" << endl;
+        	std::cerr << "dbm_update : Can't get passwd information" << std::endl;
                 return(-1);
 	}
 	file_sec.getline(file_pas,sizeof(file_pas));
@@ -1210,7 +1102,7 @@ static int ask_passwd()
 /* Compare the two passwd */
 	if (user_pas == file_pas)
 	{
-		cerr << "dbm_update : Sorry, bad passwd. The security resources will not be updated" << endl;
+		std::cerr << "dbm_update : Sorry, bad passwd. The security resources will not be updated" << std::endl;
 		file_sec.close();
 		return(-1);
 	}
@@ -1241,15 +1133,14 @@ bool nocase_compare(char c1, char c2)
 *    Argout : No argout                                                     *
 *                                                                           *
 ****************************************************************************/
-
-static void create_db()
+static void create_db(void)
 {
 	int 	diff,
 		ind,
      		names = False,
      		ps_names = False;
 	char 	*ptr;
-	string	dbm_file;
+	std::string	dbm_file;
 	mode_t 	mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
 
 /* Find the dbm_database table names */        
@@ -1259,7 +1150,7 @@ static void create_db()
 		fprintf(stderr,"db_fillup: Can't find environment variable DBTABLES\n");
 		exit(-1);
 	}
-	string			env_string(ptr);
+	std::string			env_string(ptr);
 
 	tblName.push_back("names");
 	tblName.push_back("ps_names");
@@ -1267,7 +1158,7 @@ static void create_db()
 /* Create database tables of the database definition */
 	while(env_string.length())
 	{
-		string::size_type	pos = env_string.find_first_of(",");
+		std::string::size_type	pos = env_string.find_first_of(",");
 		string t;
 		if (pos != std::string::npos)
 		{
@@ -1282,17 +1173,17 @@ static void create_db()
 		transform(t.begin(), t.end(), t.begin(), ::tolower);
 		if (t.length() > (DOMAIN_NAME_LENGTH -1))
 		{
-	    		cerr << "Table name '" << t << "' too long in DBTABLES (max. " << (DOMAIN_NAME_LENGTH - 1) << " chars)" << endl;
+	    		std::cerr << "Table name '" << t << "' too long in DBTABLES (max. " << (DOMAIN_NAME_LENGTH - 1) << " chars)" << std::endl;
 	    		return;
 		}
 /* Change the database table names to lowercase letter names and check if there 
    is a names and ps_names tables defined */
-		if (t == string("names"))
+		if (t == std::string("names"))
 		{
 			names = True;
 			continue;	
 		}
-		if (t == string("ps_names"))
+		if (t == std::string("ps_names"))
 		{
 			ps_names = True;
 			continue;	
@@ -1301,26 +1192,26 @@ static void create_db()
 		TblNum++;
 		if (TblNum > MAXDOMAIN)
 		{
-	    		cerr << "Too many domains (" << TblNum << ") were given in the environment variable list, max (" 
-				<< MAXDOMAIN << ")" << endl;
+	    		std::cerr << "Too many domains (" << TblNum << ") were given in the environment variable list, max (" 
+				<< MAXDOMAIN << ")" << std::endl;
 			exit(-1);
 		}
     	}
 		
 #ifdef DEBUG
-    	for (vector<string>::iterator it = tblName.begin(); it != tblName.end(); it++)
-		cerr << "Name = " << *it << endl;
+    	for (std::vector<std::string>::iterator it = tblName.begin(); it != tblName.end(); it++)
+		std::cerr << "Name = " << *it << std::endl;
     	for (int i = 0; i < tblName.size(); i++)
-		cerr << "Name = " << tblName[i] << endl;
+		std::cerr << "Name = " << tblName[i] << std::endl;
 #endif
 			
 /* Create the dbm_database files */        
 	if ((ptr = (char *)getenv("DBM_DIR")) == NULL)
 	{
-		cerr << "db_fillup: Can't find environment variable DBM_DIR" << endl;
+		std::cerr << "db_fillup: Can't find environment variable DBM_DIR" << std::endl;
 		exit(-1);
 	}
-    	string	res_dir(ptr);
+    	std::string	res_dir(ptr);
     	if (res_dir[res_dir.length() - 1]  != '/')
 		res_dir += "/";
 
@@ -1336,14 +1227,14 @@ static void create_db()
    the rest of the world. The dbm_open */
 
 	umask(0);
-    	for (vector<string>::iterator it = tblName.begin(); it != tblName.end(); it++)
+    	for (std::vector<std::string>::iterator it = tblName.begin(); it != tblName.end(); it++)
 	{
 		DBM	*t;
 		dbm_file = res_dir + *it;
 		t = dbm_open(const_cast<char *>(dbm_file.c_str()), flags, mode);
 		if (t == NULL)
 		{
-	    		cerr <<"db_fillup : Can't create " << *it << " table" << endl;
+	    		std::cerr <<"db_fillup : Can't create " << *it << " table" << std::endl;
 			leave();	
 		}
 		tid.push_back(t);
@@ -1351,32 +1242,22 @@ static void create_db()
 	
 
 /* And now close the db_files */
-	for (vector<DBM *>::iterator it = tid.begin(); it != tid.end(); it++)
+	for (std::vector<DBM *>::iterator it = tid.begin(); it != tid.end(); it++)
 		dbm_close(*it);
 	tid.clear();
 	return;
 }
 
 
-
-/****************************************************************************
-*                                                                           *
-*		Code for leave function                                     *
-*                        -----                                              *
-*                                                                           *
-*    Function rule : To close everything before to exit the process         *
-*                                                                           *
-*    Argin : No argin							    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-****************************************************************************/
-static void leave()
+/**
+ * close everything before to exit the process
+ */
+static void leave(void)
 {
 /* Close the database  */
-    for (vector<DBM *>::iterator it = tid.begin(); it != tid.end(); it++)
-	if (*it != NULL)
-	    dbm_close(*it);
+	for (std::vector<DBM *>::iterator it = tid.begin(); it != tid.end(); it++)
+		if (*it != NULL)
+			dbm_close(*it);
 /* Exit now */
 	exit(-1);
 }
