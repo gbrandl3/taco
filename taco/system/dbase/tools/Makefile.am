@@ -1,8 +1,5 @@
-bin_PROGRAMS		= db_fillup \
-		 	db_update \
-		 	db_read \
+bin_PROGRAMS		= db_update \
 		 	db_info \
-		 	db_initcache \
 		 	db_devinfo \
 	 		db_devdel \
 		 	db_servdel \
@@ -10,7 +7,13 @@ bin_PROGRAMS		= db_fillup \
 	 		db_servunreg \
 		 	db_devres \
 		 	db_resdel \
+		 	db_initcache \
 			db_devicetree
+
+if GDBMSUPPORT
+bin_PROGRAMS		+= db_fillup \
+		 	db_read 
+endif
 
 INCLUDES		= @TACO_INCLUDES@ @GDBM_CFLAGS@
 
