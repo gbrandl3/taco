@@ -13,9 +13,9 @@
 
  Original:	June 1992
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-03-14 12:22:07 $
+ Date:		$Date: 2003-03-14 16:53:27 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -25,13 +25,12 @@
 #ifndef _apiP_h
 #define _apiP_h
 
-
 /*
  *  standard header string to use "what" or "ident".
  */
 #ifdef _IDENT
 static char ApiPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/ApiP.h,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/ApiP.h,v 1.2 2003-03-14 16:53:27 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -39,18 +38,14 @@ static char ApiPh[] =
  * dsxdr library include files
  */
 #include <API_xdr.h>
-#ifndef __cplusplus
 #include <DevServer.h>
-#else
-#include <Device.H>
-#endif /* __cplusplus */
 
 /*
  * Define the number of array fields to allocate as a
  * data block.
  */
 
-#define BLOCK_SIZE      50
+#define BLOCK_SIZE      	50
 
 /*
  * Defines to handle the export of devices and the
@@ -62,8 +57,8 @@ static char ApiPh[] =
 
 #define MAX_DEVICES             2047
 #define MAX_CONNECTIONS         4095
-#define MAX_COUNT                255
-#define MAX_ASYNCH_CALLS	 300
+#define MAX_COUNT               255
+#define MAX_ASYNCH_CALLS	300
 
 /*
  * Masks to decode the device identification variable.
@@ -88,20 +83,20 @@ static char ApiPh[] =
 #define NFILE 100 /* maximum number of server connections per process */
 #endif
 
-#define RPC_ERROR	1
-#define GOOD_SVC_CONN	0
-#define BAD_SVC_CONN	3
+#define RPC_ERROR		1
+#define GOOD_SVC_CONN		0
+#define BAD_SVC_CONN		3
 
-#define DELAY_TIME	10
+#define DELAY_TIME		10
 
 /*
  * asynchronous + event symbols
  */
 
-#define D_ASYNCH_TYPE 0x10000000
-#define D_EVENT_TYPE  0x20000000
+#define D_ASYNCH_TYPE 		0x10000000
+#define D_EVENT_TYPE  		0x20000000
 
-#define EVENT_MAX_CLIENTS 100
+#define EVENT_MAX_CLIENTS 	100
 /* 
  * timeouts for rpc calls
  */
@@ -286,10 +281,10 @@ typedef struct {
  * definitions for message transfer to message server
  */
 
-#define NUMBER_OF_MSG_TYPES  3
-#define ERROR_TYPE  	0
-#define DEBUG_TYPE  	1
-#define DIAG_TYPE   	2
+#define NUMBER_OF_MSG_TYPES  	3
+#define ERROR_TYPE  		0
+#define DEBUG_TYPE  		1
+#define DIAG_TYPE   		2
 
 typedef struct {
                  short 	init_flg;

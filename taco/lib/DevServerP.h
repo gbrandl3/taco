@@ -13,9 +13,9 @@
 
  Original:	March 1990
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-03-14 12:22:07 $
+ Date:		$Date: 2003-03-14 16:53:27 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -30,7 +30,7 @@
  */
 #ifdef _IDENT
 static char DevServerPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServerP.h,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServerP.h,v 1.2 2003-03-14 16:53:27 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*
@@ -57,7 +57,7 @@ typedef struct _DevServerClassPart {
 
 typedef struct _DevServerPart {
                DevString       name;
-	       char            dev_type[24];
+	       char            dev_type[DEV_TYPE_LENGTH];
                DevServerClass  class_pointer;
                long            state;
                long            n_state;
