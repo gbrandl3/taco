@@ -72,10 +72,14 @@ AT_CLEANUP
 AT_SETUP([db_putresource function])
 AT_CHECK([AT_TACO_RUN_LOCAL([db_resput test/device/3/res1 TEST])
 AT_TACO_RUN_LOCAL([db_resget test/device/3/res1])
-AT_TACO_RUN_LOCAL([db_resput test/device/3/res1 TEST TEST2 TEST3])
+AT_TACO_RUN_LOCAL([db_resput test/device/3/res1 TEST TEST2 TEST3 ])
 AT_TACO_RUN_LOCAL([db_resget test/device/3/res1])], [], [[TEST
 TEST,TEST2,TEST3
 ]])
+AT_CLEANUP
+
+AT_SETUP([db_putresource long resource function])
+AT_CHECK([AT_TACO_RUN_LOCAL([db_resput test/device/3/res1 thisisalongresourcewhichisshouldbelongerthan23characterslong])], [])
 AT_CLEANUP
 
 AT_SETUP([db_delresource function])
