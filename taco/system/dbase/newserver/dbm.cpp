@@ -901,7 +901,7 @@ db_poller_svc *getpoller_1_svc(nam *dev)
 ****************************************************************************/
 db_psdev_error *upddev_1_svc(db_res *dev_list)
 {
-    return upddev_1_svc(dev_list);
+    return dbm->upddev_1_svc(dev_list);
 }
 
 /****************************************************************************
