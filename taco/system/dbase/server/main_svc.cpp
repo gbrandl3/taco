@@ -222,12 +222,13 @@ int main(int argc,char **argv)
 	std::string netmanhost(argv[argc - 1]);
 #endif
 
-#if defined(USE_MYSQL) && !defined(USE_GDBM)
 	if (!dbm)
+#if defined(USE_MYSQL) 
+#	if !defined(USE_GDBM)
 		dbm = new MySQLServer(mysql_user, mysql_password, argv[optind]);
-#else
+#	endif
+#else 
 #	if defined(USE_GBM)
-	if (!dbm)
     		dbm = new NdbmServer("", "", "");
 #	else
 #		error Use either GDBM or mySQL as database
@@ -337,32 +338,32 @@ int main(int argc,char **argv)
 #else
 	if (!svc_register(transp_udp,pgnum, DB_SETUPVERS, setup_prog, IPPROTO_UDP))
 	{
-		std::cerr << "unable to register (pgnum, DB_SETUPVERS, udp)" << std::endl;
+		std::cerr << "unable to register (" << pgnum << ", DB_SETUPVERS, udp)" << std::endl;
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,pgnum,DB_SETUPVERS, setup_prog,IPPROTO_TCP))
 	{
-		std::cerr << "unable to register (pgnum,DB_SETUPVERS,tcp)" << std::endl;
+		std::cerr << "unable to register (" << pgnum << ",DB_SETUPVERS,tcp)" << std::endl;
 		exit(1);
 	}
 	if (!svc_register(transp_udp,pgnum, DB_VERS_2, setup_prog, IPPROTO_UDP))
 	{
-		std::cerr << "unable to register (pgnum, DB_VERS_2, udp)" << std::endl;
+		std::cerr << "unable to register (" << pgnum << ", DB_VERS_2, udp)" << std::endl;
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,pgnum,DB_VERS_2,setup_prog,IPPROTO_TCP))
 	{
-		std::cerr << "unable to register (pgnum,DB_VERS_2,tcp)" << std::endl;
+		std::cerr << "unable to register (" << pgnum << ",DB_VERS_2,tcp)" << std::endl;
 		exit(1);
 	}
 	if (!svc_register(transp_udp,pgnum, DB_VERS_3, setup_prog, IPPROTO_UDP))
 	{
-		std::cerr << "unable to register (pgnum, DB_VERS_2, udp)" << std::endl;
+		std::cerr << "unable to register (" << pgnum << ", DB_VERS_2, udp)" << std::endl;
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,pgnum,DB_VERS_3,setup_prog,IPPROTO_TCP))
 	{
-		std::cerr << "unable to register (pgnum,DB_VERS_2,tcp)" << std::endl;
+		std::cerr << "unable to register (" << pgnum << ",DB_VERS_2,tcp)" << std::endl;
 		exit(1);
 	}
 #endif 

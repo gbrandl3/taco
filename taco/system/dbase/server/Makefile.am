@@ -4,7 +4,6 @@ sbin_PROGRAMS		= dbm_server
 
 lib_LTLIBRARIES 	= 
 
-dbm_server_SOURCES 	= main_svc.cpp dbm.cpp dbm_xdr.cpp db_serv.cpp
 INCLUDES		= @TACO_INCLUDES@ 
 AM_CPPFLAGS		= 
 
@@ -48,4 +47,5 @@ INCLUDES		+= @MYSQL_CFLAGS@
 AM_CPPFLAGS		+= -DUSE_MYSQL
 endif
 
+dbm_server_SOURCES 	= main_svc.cpp dbm.cpp dbm_xdr.cpp db_serv.cpp
 dbm_server_LDADD	= @TACO_SERVER_LIBS@ $(lib_LTLIBRARIES)
