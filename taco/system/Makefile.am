@@ -16,5 +16,5 @@ else
   dc_dir=
 endif
 
-SUBDIRS = . manager msg $(dc_dir) dbase starter $(xdev_dir) $(alarm_dir)
+SUBDIRS = . manager msg $(dc_dir) dbase starter $(xdev_dir) $(alarm_dir) $(dbdev_dir)
 
