@@ -19,7 +19,7 @@ test_asc_dyn_SOURCES 	= test_asc_dyn.c
 test_tc_SOURCES 	= test_tc.c
 test_tc_LDADD		= @TACO_CLIENT_LIBS@ 
 
-EXTRA_DIST 		+= testsuite.at $(TESTSUITE_AT) testsuite package.m4
+EXTRA_DIST 		+= testsuite.at $(TESTSUITE_AT) testsuite package.m4 local.at
 
 TESTSUITE 		= $(srcdir)/testsuite
 

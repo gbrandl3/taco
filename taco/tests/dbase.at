@@ -52,6 +52,7 @@ AT_CHECK([RES_BASE_DIR=`pwd` taco db_update test.res 2>/dev/null], [255])
 AT_CLEANUP
 
 AT_SETUP([db_read command])
+AT_XFAIL_IF([test x"$python" != x"yes"])
 AT_CHECK([taco db_read names | sort], [],
 [[NAMES: agpspp|1|1|: test/agps/1|not_exp|0|0|unknown|unknown|0|unknown|
 NAMES: inst_verify|1|1|: test/device/1|not_exp|0|0|unknown|unknown|0|unknown|

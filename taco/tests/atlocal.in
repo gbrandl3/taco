@@ -1,0 +1,2 @@
+@PYTHON_BINDING_TRUE@ python=yes
+@PYTHON_BINDING_FALSE@ python=no
