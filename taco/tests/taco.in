@@ -7,6 +7,7 @@ prefix=@abs_top_builddir@/tests/test/@prefix@
 exec_prefix=@exec_prefix@
 bindir=@bindir@
 sbindir=@sbindir@
+datadir=@datadir@
 sysconfdir=@sysconfdir@
 templatedir=@templatedir@
 top_builddir=@abs_top_builddir@
