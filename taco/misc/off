@@ -19,7 +19,7 @@ kill_procs()
 {
 	case `uname -s` in
 		Darwin*)
-			PSARGS="-o pid,command";;
+			PSARGS="-xo pid,command";;
 		SunOS*)
 			PSARGS="-aeo pid,comm";;
 		Linux*)
