@@ -67,7 +67,7 @@ dnl
 	if test "x$mysql_libraries" != "x" ; then
 		MYSQL_LIBS="-L$mysql_libraries -lmysqlclient"
 	elif test "x$mysql_prefix" != "x" ; then
-		MYSQL_LIBS="-L$mysql_prefix/lib -lmysqlclient"
+		MYSQL_LIBS="-L$mysql_prefix/lib/mysql -lmysqlclient"
 	elif test -n "$MYSQL_CONFIG" ; then
 		MYSQL_LIBS=`$MYSQL_CONFIG --libs`
 	elif test "x$prefix" != "xNONE" -a "x$prefix" != "x/usr"; then
@@ -77,7 +77,7 @@ dnl
 	if test "x$mysql_includes" != "x" ; then
 		MYSQL_CFLAGS="-I$mysql_includes"
 	elif test "x$mysql_prefix" != "x" ; then
-		MYSQL_CFLAGS="-I$mysql_prefix/include"
+		MYSQL_CFLAGS="-I$mysql_prefix/include/mysql"
 	elif test -n "$MYSQL_CONFIG" ; then
 		MYSQL_CFLAGS=`$MYSQL_CONFIG --cflags`
 	elif test "x$prefix" != "xNONE" -a "x$prefix" != "x/usr"; then
