@@ -12,9 +12,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.10 $
+ Version    :	$Revision: 1.11 $
 
- Date       : 	$Date: 2004-03-26 16:21:52 $
+ Date       : 	$Date: 2004-03-26 16:33:47 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -987,7 +987,7 @@ long _DLLFunc db_import (long *error)
  * check wether the system is already configured
  */
 	if ( !config_flags.configuration && (setup_config(error) != DS_OK) )
-			return (DS_NOTOK);
+		return (DS_NOTOK);
 
 /*
  * Create message server client handle with data from
@@ -1053,11 +1053,11 @@ long _DLLFunc db_import (long *error)
 			db_info.conf->vers_number = DB_VERS_2;
 		}
 	}
-	else if ((nethost_env = (char *)getenv ("NETHOST")) == NULL)
+	if ((nethost_env = (char *)getenv ("NETHOST")) == NULL)
 	{
-	   		db_info.conf->vers_number = DB_VERS_3;
-			*error = DevErr_NethostNotDefined;
-			return (DS_NOTOK);
+	   	db_info.conf->vers_number = DB_VERS_3;
+		*error = DevErr_NethostNotDefined;
+		return (DS_NOTOK);
 	}
 
 /* 

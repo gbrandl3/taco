@@ -33,15 +33,15 @@
 
  Original   :	April 1999
 
- Version    :	$Revision: 1.8 $
+ Version    :	$Revision: 1.9 $
 
- Date       :	$Date: 2004-03-26 16:21:52 $
+ Date       :	$Date: 2004-03-26 16:33:47 $
 
  Copyleft (c) 1999 by European Synchrotron Radiation Facility,
                       Grenoble, France
-
 ********************************************************************-*/
-#include <config.h>
+
+#include "config.h"
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevServer.h>
@@ -115,7 +115,29 @@ bool_t _DLLFunc xdr__asynch_client_data PT_((XDR *xdrs, _asynch_client_data *obj
 }
 #endif
 
-/**
+/**@defgroup eventAPIsvc Server side calls of the events
+ * @ingroup dsAPI
+ */
+/**@defgroup eventAPI Event API
+ * @ingroup clientAPI
+ * Because events use the same mechanisms as the asynchronous calls additional 
+ * code can be found in asynchronous API. 
+ * The semantics for events consists of a client registering interest in an 
+ * event (by calling dev_event_listen()). This is transmitted to the device server 
+ * where the client is registered. When a device server has an event it wants 
+ * to distribute to registered clients it has to dispatch it (by calling
+ * dev_event_fire()). If a client is not interested in an event anymore it 
+ * (or wants to exit) it must unregister (by calling dev_event_unlisten()).
+ * 
+ * Although it is possible to support different types of events in the first 
+ * implementation only user events are supported. User events are events which 
+ * are specific to a device server and are totally managed by the device class. 
+ * This means the device class generates the events which it then passes on to 
+ * the DSAPI to dispatch.  The period and timing of user events is totally under 
+ * control of the device class.
+ */
+
+/**@ingroup eventAPIintern
  * application interface to register a client as a listener
  * for events of a specified type from a device server.
  * The clients specifies a callback routine which will
@@ -358,7 +380,7 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 	return (DS_OK);
 }
 
-/**@ingroup dsAPI
+/**@ingroup eventAPIds
  * application interface for device servers to fire events.
  * It will dispatch the event to all clients who have
  * registered interest in the specified event type.
@@ -560,10 +582,9 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
 	return;
 }
 
-/**@ingroup dsAPI
- * application interface for a client to unlisten to
- * an event. Client will be unregistered in the server
- * and will not receive anymore events of this type.
+/**@ingroup eventAPIintern
+ * application interface for a client to unlisten to an event. Client will be 
+ * unregistered in the server and will not receive anymore events of this type.
  * 
  * @param ds       	handle to access the device.
  * @param event_type    event to listen for
@@ -742,11 +763,10 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 	return (DS_OK);
 }
 
-/**@ingroup dsAPI
- * internal housekeeping function used on the server
- * side to cleanup event clients which are not
- * responding anymore. They are removed from the
- * list and will not receive events.
+/**@ingroup eventAPI
+ * internal housekeeping function used on the server side to cleanup event clients 
+ * which are not responding anymore. They are removed from the list and will not 
+ * receive events.
  * 
  * @param error	Will contain an appropriate error code if the 
  *		corresponding call returns a non-zero value.
@@ -783,7 +803,7 @@ void _DLLFunc event_client_cleanup (long *error)
 	return;
 }
 
-/**@ingroup dsAPI
+/**@ingroup eventAPIsvc
  * rpc function used on the server side to register new clients. 
  * They are added to the global list of registered clients and 
  * will be sent events by the dev_event_fire() call.
@@ -903,7 +923,7 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
 	return(&dev_import_out);
 }
 
-/**@ingroup dsAPI
+/**@ingroup eventAPIsvc
  * rpc function used on the server side to unregister a clients. 
  * It is removed from the global list of registered clients and 
  * will be not be sent events anymore by the dev_event_fire() call.
@@ -978,7 +998,7 @@ static db_resource   res_tab [] = {
 
 static long get_event_string PT_( (devserver ds, long event, char *event_str, long *error) );
 
-/**@ingroup dsAPI
+/**@ingroup eventAPI
  * Returns a sequence of structures containing all
  * available events, their names, their input and
  * output data types, and type describtions for one
@@ -1217,7 +1237,7 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long
 }
 
 
-/**@ingroup dsAPI
+/**@ingroup eventAPIintern
  * Read the event name as a string from the resource database.
  *
  * The resource name is: EVENT/team_no/server_no/event_ident

@@ -11,9 +11,9 @@
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.11 $
+ Version:	$Revision: 1.12 $
 
- Date:		$Date: 2004-03-26 16:21:52 $
+ Date:		$Date: 2004-03-26 16:32:09 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -94,9 +94,7 @@ extern char *dev_error_stack;
 /*
  * Internal Functions
  */
-
-static long read_device_id 	PT_( (long device_id, long *ds_id,
-long *connection_id, long *error) );
+static long read_device_id PT_((long, long *, long *, long *));
 
 /**@ingroup dsAPI
  * RPC procedure corresponding to dev_import().
@@ -115,8 +113,8 @@ _dev_import_out * _DLLFunc rpc_dev_import_4 (_dev_import_in *dev_import_in,
 {
 	static _dev_import_out	dev_import_out;
 
-	long 		device_id;
-	register int 	i;
+	long 			device_id;
+	register int 		i;
 
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_import_4() : entering routine\n");
 
@@ -130,25 +128,20 @@ _dev_import_out * _DLLFunc rpc_dev_import_4 (_dev_import_in *dev_import_in,
 	dev_import_out.var_argument.sequence = NULL;
 
 /*
- * first try to to find the device among the list of
- * devices already being served 
- *
+ * first try to to find the device among the list of devices already being served 
  */
-
 	for (i=0; i<max_no_of_devices; i++)
 	{
 		if (devices[i].export_status == EXPORTED)
 		{
-			/*
-          * device will be known under its export name to the outside world
-          */
+/*
+ * device will be known under its export name to the outside world
+ */
 			if (strcmp (dev_import_in->device_name,devices[i].export_name) == 0)
 			{
-				/*
-	     * Do the security checks and initialization for the 
-	     * device import.
-	     */
-
+/*
+ * Do the security checks and initialization for the device import.
+ */
 				if ( config_flags.security == True )
 				{
 					if ( sec_svc_import (&devices[i], dev_import_in->connection_id, 
@@ -161,14 +154,11 @@ _dev_import_out * _DLLFunc rpc_dev_import_4 (_dev_import_in *dev_import_in,
 					}
 				}
 
-
-				/*
-	     * Combine device ID, connection ID and the export count as an
-	     * identifier for the client.
-	     */
+/*
+ * Combine device ID, connection ID and the export count as an identifier for the client.
+ */
 				device_id = (devices[i].export_counter << COUNT_SHIFT) +
-				    (dev_import_in->connection_id << CONNECTIONS_SHIFT) + 
-				    i;
+				    (dev_import_in->connection_id << CONNECTIONS_SHIFT) + i;
 
 				dev_import_out.ds_id = device_id;
 
@@ -185,7 +175,7 @@ _dev_import_out * _DLLFunc rpc_dev_import_4 (_dev_import_in *dev_import_in,
 			}
 		}
 	}
-	/*
+/*
  * device of this name is not being served 
  * 
  * in the new philosophy do not instantiate 
@@ -197,7 +187,6 @@ _dev_import_out * _DLLFunc rpc_dev_import_4 (_dev_import_in *dev_import_in,
  *
  * - andy 03jul90
  */
-
 	dev_import_out.error  = DevErr_DeviceOfThisNameNotServed;
 	dev_import_out.status = DS_NOTOK;
 	return (&dev_import_out);
@@ -229,10 +218,9 @@ _dev_free_out * _DLLFunc rpc_dev_free_4 (_dev_free_in *dev_free_in)
 	dev_free_out.var_argument.length   = 0;
 	dev_free_out.var_argument.sequence = NULL;
 
-	/*
-    * Split up the device identification.
-    */
-
+/*
+ * Split up the device identification.
+ */
 	if (read_device_id (dev_free_in->ds_id, &ds_id, &connection_id, 
 	    &dev_free_out.error) == DS_NOTOK)
 	{
@@ -240,10 +228,9 @@ _dev_free_out * _DLLFunc rpc_dev_free_4 (_dev_free_in *dev_free_in)
 		return (&dev_free_out);
 	}
 
-	/*
-    * Clean up the security structure for the client connection.
-    */
-
+/*
+ * Clean up the security structure for the client connection.
+ */
 	if ( config_flags.security == True )
 	{
 		if ( sec_svc_free (&devices[(_Int)ds_id], connection_id,
@@ -254,7 +241,6 @@ _dev_free_out * _DLLFunc rpc_dev_free_4 (_dev_free_in *dev_free_in)
 			return (&dev_free_out);
 		}
 	}
-
 
 	dev_printdebug ( DBG_DEV_SVR_CLASS, "rpc_dev_free_4() : ds_id = %d\n", ds_id);
 	dev_printdebug ( DBG_DEV_SVR_CLASS, "rpc_dev_free_4() : connection_id = %d\n", connection_id);
@@ -295,14 +281,12 @@ _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
 
 	DevDataListEntry        data_type;
 
-
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_putget_4() : entering routine\n");
 	dev_printdebug ( DBG_DEV_SVR_CLASS, "\nrpc_dev_putget_4() : with ds_id = %d\n", server_data->ds_id);
 
 /*
  * Free and preset the structure for outgoing arguments.
  */
-
 	free (client_data.argout);
 	memset ((char *)&client_data,0,sizeof(client_data));
 /*
@@ -311,12 +295,9 @@ _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
         if (dev_error_stack != NULL) free(dev_error_stack);
 	dev_error_stack = NULL;
 
-
-
 /*
  * Split up the device identification.
  */
-
 	if (read_device_id (server_data->ds_id, &ds_id, &connection_id, 
 	    &client_data.error) == DS_NOTOK)
 	{
@@ -337,35 +318,30 @@ _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
 	device = devices[(_Int)ds_id].device;
 #endif /* __cplusplus*/
 
-
-	/*
-    * Do the security checks for the command access.
-    */
-
+/*
+ * Do the security checks for the command access.
+ */
 	if ( config_flags.security == True )
 	{
 		if ( sec_svc_cmd (&devices[(_Int)ds_id], connection_id,
 		    server_data->client_id, server_data->access_right, 
-		    server_data->cmd, &client_data.error)
-		    == DS_NOTOK )
+		    server_data->cmd, &client_data.error) == DS_NOTOK )
 		{
 			client_data.status = DS_NOTOK;
 			return (&client_data);
 		}
 	}
 
-	/*
+/*
  *  allocate and initialise outgoing arguments 
  */
-
 	client_data.argout_type = server_data->argout_type;
 
 	if (client_data.argout_type != D_VOID_TYPE)
 	{
-		/*
-      * Get the XDR data type from the loaded type list
-      */
-
+/*
+ * Get the XDR data type from the loaded type list
+ */
 		if ( xdr_get_type( client_data.argout_type, &data_type, 
 		    &client_data.error) == DS_NOTOK)
 		{
@@ -393,7 +369,7 @@ _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
 	}
 
 
-	/*
+/*
  * in the simple case the command is passed directly on to the command_handler
  * method
  */
@@ -426,7 +402,6 @@ _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
  *  Because in case of error the status of the outgoing arguments
  *  is undefined, initialise argout to NULL before serialising.
  */
-
 	if (client_data.status == DS_NOTOK)
 	{
 		free (client_data.argout);
@@ -446,7 +421,6 @@ _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
 
 	return (&client_data);
 }
-
 
 /**@ingroup dsAPI
  * RPC procedure corresponding to dev_put().
@@ -484,7 +458,6 @@ _client_data * _DLLFunc rpc_dev_put_4 (_server_data *server_data)
 /*
  *  initialise outgoing arguments 
  */
-
 	memset ((char *)&client_data,0,sizeof(client_data));
 	client_data.argout_type = D_VOID_TYPE;
 	client_data.argout = NULL;
@@ -494,11 +467,9 @@ _client_data * _DLLFunc rpc_dev_put_4 (_server_data *server_data)
         if (dev_error_stack != NULL) free(dev_error_stack);
 	dev_error_stack = NULL;
 
-
-   /*
-    * Split up the device identification.
-    */
-
+/*
+ * Split up the device identification.
+ */
 	if (read_device_id (server_data->ds_id, &ds_id, &connection_id, 
 	    &client_data.error) == DS_NOTOK)
 	{
@@ -518,23 +489,21 @@ _client_data * _DLLFunc rpc_dev_put_4 (_server_data *server_data)
 	device = devices[(_Int)ds_id].device;
 #endif /* __cplusplus */
 
-	/*
-    * Do the security checks for the command access.
-    */
-
+/*
+ * Do the security checks for the command access.
+ */
 	if ( config_flags.security == True )
 	{
 		if ( sec_svc_cmd (&devices[(_Int)ds_id], connection_id,
 		    server_data->client_id, server_data->access_right, 
-		    server_data->cmd, &client_data.error)
-		    == DS_NOTOK )
+		    server_data->cmd, &client_data.error) == DS_NOTOK )
 		{
 			client_data.status = DS_NOTOK;
 			return (&client_data);
 		}
 	}
 
-	/*
+/*
  * in the simple case the command is passed directly on to the command_handler
  * method
  */
@@ -578,7 +547,6 @@ _client_data * _DLLFunc rpc_dev_put_4 (_server_data *server_data)
 	return (&client_data);
 }
 
-
 /**@ingroup dsAPI
  * RPC procedure corresponding to dev_putget_raw().
  *
@@ -619,23 +587,20 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
 
 	DevDataListEntry        	data_type;
 
-
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_putget_raw_4() : entering routine\n");
 	dev_printdebug ( DBG_DEV_SVR_CLASS, "rpc_dev_putget_raw_4() : with ds_id = %d\n", server_data->ds_id);
 
 /*
  *  allocate and initialise outgoing arguments 
  */
-
 	if (client_data.argout != NULL) 
 		free (client_data.argout);
 
 	memset ((char *)&client_data,0,sizeof(client_data));
 
-	/*
-    * Split up the device identification.
-    */
-
+/*
+ * Split up the device identification.
+ */
 	if (read_device_id (server_data->ds_id, &ds_id, &connection_id, 
 	    &client_data.error) == DS_NOTOK)
 	{
@@ -655,10 +620,9 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
 	device = devices[(_Int)ds_id].device;
 #endif
 
-	/*
-    * Do the security checks for the command access.
-    */
-
+/*
+ * Do the security checks for the command access.
+ */
 	if ( config_flags.security == True )
 	{
 		if ( sec_svc_cmd (&devices[(_Int)ds_id], connection_id, 
@@ -671,32 +635,27 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
 		}
 	}
 
-	/*  
-    * Set the datatypes used to serialise the outgoing arguments. 
-    */
-
+/*  
+ * Set the datatypes used to serialise the outgoing arguments. 
+ */
 	client_data.ser_argout_type   = server_data->argout_type;
 
-	/*
-   * Get the XDR data type from the loaded type list
-   */
-
+/*
+ * Get the XDR data type from the loaded type list
+ */
 	if ( xdr_get_type( client_data.ser_argout_type, &data_type, 
 	    &client_data.error) == DS_NOTOK)
 	{
 		dev_printdebug (DBG_ERROR | DBG_DEV_SVR_CLASS, "\nrpc_dev_putget_raw_4() : xdr_get_type(%d) returned error %d\n",
-		    client_data.ser_argout_type, client_data.error);
-
+		client_data.ser_argout_type, client_data.error);
 		client_data.status     = DS_NOTOK;
 		return (&client_data);
 	}
 
-	/*  
-    * Set the datatypes used to serialise the outgoing arguments. 
-    */
-
+/*  
+ * Set the datatypes used to serialise the outgoing arguments. 
+ */
 	client_data.deser_argout_type = D_OPAQUE_TYPE;
-
 
 	if (client_data.ser_argout_type != D_VOID_TYPE)
 	{
@@ -715,7 +674,7 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
 		client_data.argout = NULL;
 	}
 
-	/*
+/*
  * in the simple case the command is passed directly on to the command_handler
  * method
  */
@@ -743,14 +702,12 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
 	                                     client_data.ser_argout_type,
 	                                     &client_data.error);
 #endif /* __cplusplus */
-
-	/*
+/*
  *  Now calculate the number of bytes the outgoing arguments 
  *  represent in XDR-format. 
  *  With the help of the xdr_length the parametes can be read on
  *  the client side in an opaque format.
  */
-
 	if ( client_data.status == DS_OK )
 	{
 		client_data.xdr_length = 
@@ -764,12 +721,10 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
 		}
 	}
 
-
-	/*
+/*
  *  Because in case of error the status of the outgoing arguments
  *  is undefined, initialise argout to NULL before serialising.
  */
-
 	if (client_data.status == DS_NOTOK)
 	{
 		free (client_data.argout);
@@ -787,24 +742,18 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
 	return (&client_data);
 }
 
-
-
-/**@ingroup dsAPI
+/**@ingroup dsAPIintern
  * The first part of the aynchronous call.
  *
- * Will do the administration part of the call.
- * Only the execution of the command is excluded
- * and handled in the second part of the call
- * (rpc_dev_put_asyn_cmd) after the reponse
- * is send back to the client.
- *
- * Errors are returned from this function to the client. 
+ * Will do the administration part of the call. Only the execution of the command is excluded
+ * and handled in the second part of the call (rpc_dev_put_asyn_cmd) after the reponse
+ * is send back to the client. Errors are returned from this function to the client. 
  *
  * @param server_data 	information about device identification, the command, and
  *			the input arguments for the command.
  *
- * @return(s)  	the status of the function (DS_OK or DS_NOTOK) and
- *		an appropriate error number if the function fails.
+ * @return the status of the function (DS_OK or DS_NOTOK) and an appropriate error number 
+ *		if the function fails.
  */
 _client_data * _DLLFunc rpc_dev_put_asyn_4 (_server_data *server_data)
 {
@@ -820,17 +769,15 @@ _client_data * _DLLFunc rpc_dev_put_asyn_4 (_server_data *server_data)
 /*
  *  initialise outgoing arguments 
  */
-
 	memset ((char *)&client_data,0,sizeof(client_data));
 	client_data.argout_type = D_VOID_TYPE;
 	client_data.argout      = NULL;
 	client_data.status      = DS_OK;
 	client_data.error       = DS_OK;
 
-	/*
-    * Split up the device identification.
-    */
-
+/*
+ * Split up the device identification.
+ */
 	if (read_device_id (server_data->ds_id, &ds_id, &connection_id, 
 	    &client_data.error) == DS_NOTOK)
 	{
@@ -839,10 +786,9 @@ _client_data * _DLLFunc rpc_dev_put_asyn_4 (_server_data *server_data)
 		return (&client_data);
 	}
 
-	/*
-    * Do the security checks for the command access.
-    */
-
+/*
+ * Do the security checks for the command access.
+ */
 	if ( config_flags.security == True )
 	{
 		if ( sec_svc_cmd (&devices[(_Int)ds_id], connection_id,
@@ -860,9 +806,7 @@ _client_data * _DLLFunc rpc_dev_put_asyn_4 (_server_data *server_data)
 
 /**@ingroup dsAPI
  * The second part of the asynchronous call.
- *
  * The command will be executed without any return values. 
- *
  * Sends the RPC reply before executing this function.
  *
  * @param server_data 	information about device identification, the 
@@ -957,9 +901,7 @@ void _DLLFunc rpc_dev_put_asyn_cmd (_server_data *server_data)
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "rpc_dev_put_asyn_cmd() : leaving routine\n");
 }
 
-
-
-/**@ingroup dsAPI
+/**@ingroup dsAPIserver
  * This function makes devices visible for device server clients. All necessary connection information
  * for a @ref dev_import() call will be stored in a database table. Moreover the exported devices are 
  * added to the device server's global list of exported devices. The function is installed as a method
@@ -1011,8 +953,7 @@ long dev_export (char *name, DeviceBase *ptr_dev, long *error)
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\ndev_export() : entering routine\n");
 
 /*
- * If no space is yet allocated in the global device array,
- * allocate the first block of devices.
+ * If no space is yet allocated in the global device array, allocate the first block of devices.
  */
 	if ( max_no_of_devices == 0 )
 	{
@@ -1031,13 +972,10 @@ long dev_export (char *name, DeviceBase *ptr_dev, long *error)
 			devices[i].export_status = NOT_EXPORTED;
 	}
 /*
- * used to export a device of the specified name 
- * to the outside. ds points to the space allocated 
- * for the device. the next free entry will be
- * found in the global device[] array and it will
- * be reserved for the device. this array is accessed
- * by the dev_import function to determine what devices
- * are known to the server.
+ * used to export a device of the specified name to the outside. ds points to the space allocated 
+ * for the device. the next free entry will be found in the global device[] array and it will be 
+ * reserved for the device. this array is accessed by the dev_import function to determine what 
+ * devices are known to the server.
  */
 	for (i=0; i<max_no_of_devices; i++)
 	{
@@ -1048,8 +986,7 @@ long dev_export (char *name, DeviceBase *ptr_dev, long *error)
 		}
 	}
 /*
- * If all allocated devices are already used, allocate
- * a new block of devices.
+ * If all allocated devices are already used, allocate a new block of devices.
  */
 	if ( (max_no_of_devices + BLOCK_SIZE) > MAX_DEVICES )
 	{
@@ -1081,14 +1018,12 @@ free_found:
 	TOLOWER(name)
 
 /* 
- * do not export the device to the static database if
- * no_database is selected ...
+ * do not export the device to the static database if no_database is selected ...
  */
 	if (!config_flags.no_database)
 	{
 /*
- *  export device to the static database.
- *  device server configuration for this device
+ *  export device to the static database. device server configuration for this device
  *  will be stored in the static database
  */
 		devinfo.device_name = name;
@@ -1117,8 +1052,7 @@ free_found:
 #endif /* __cplusplus */
 
 /*
- *  check whether the pointer to the device type is
- *  already initialised
+ *  check whether the pointer to the device type is already initialised
  */
 #ifndef __cplusplus
 /*
@@ -1175,10 +1109,9 @@ free_found:
       		*error  = DevErr_NameStringToLong;
       		return (DS_NOTOK);
       	}
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "dev_export() : leaving routine\n");
+	dev_printdebug(DBG_TRACE | DBG_DEV_SVR_CLASS, "dev_export() : leaving routine\n");
 	return(DS_OK);
 }
-
 
 /**@ingroup oicAPI
  * This function searches for a destroy method (@b DevMethodDestroy) in the device server object class.
@@ -1627,8 +1560,6 @@ static long read_device_id (long device_id, long *ds_id, long *connection_id, lo
 	return (DS_OK);
 }
 
-
-
 /**@ingroup dsAPI
  * RPC procedure corresponding to dev_putget_local().
  *
@@ -1752,10 +1683,8 @@ _client_data * _DLLFunc rpc_dev_putget_local (_server_data *server_data)
 		client_data->argout = NULL;
 	}
 
-
 /*
- * in the simple case the command is passed directly on to the command_handler
- * method
+ * in the simple case the command is passed directly on to the command_handler method
  */
 
 #ifndef __cplusplus
@@ -1786,7 +1715,6 @@ _client_data * _DLLFunc rpc_dev_putget_local (_server_data *server_data)
  *  Because in case of error the status of the outgoing arguments
  *  is undefined, initialise argout to NULL before serialising.
  */
-
 	if (client_data->status == DS_NOTOK)
 	{
 		free (client_data->argout);

@@ -25,9 +25,9 @@
 
  Original   :	January 1997
 
- Version:	$Revision: 1.10 $
+ Version:	$Revision: 1.11 $
 
- Date:		$Date: 2004-03-26 16:21:52 $
+ Date:		$Date: 2004-03-26 16:33:47 $
 
  Copyright (c) 1997-2000 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -2477,7 +2477,7 @@ long _DLLFunc dev_asynch_timeout (devserver ds, long request,
  * @param error   	Will contain an appropriate error code if the
  *		        corresponding call returns a non-zero value.
  */
-void asynch_client_cleanup(long *error)
+void _DLLFunc asynch_client_cleanup(long *error)
 {
 	long 		i;
 	enum clnt_stat 	clnt_stat;
@@ -2515,7 +2515,7 @@ void asynch_client_cleanup(long *error)
  *
  * @param ds_tout       handle to device.
  */
-void asynch_timed_out(devserver ds_tout)
+void _DLLFunc asynch_timed_out(devserver ds_tout)
 {
 	long 		i, 
 			timediff, 
@@ -2658,7 +2658,7 @@ void asynch_timed_out(devserver ds_tout)
  *
  * @return DS_OK or DS_NOTOK
  */
-long asynch_client_ping(long i,long *error)
+long _DLLFunc asynch_client_ping(long i,long *error)
 {
 	enum clnt_stat 	clnt_stat;
 	long 		status;

@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.11 $
+ Version    :	$Revision: 1.12 $
 
- Date	    :	$Date: 2004-03-26 16:21:52 $
+ Date	    :	$Date: 2004-03-26 16:29:33 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -171,25 +171,24 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 	enum clnt_stat		clnt_stat;
 
 	Db_devinf_imp		devinfo;
-	char			*device_name;
-	char			device_class[SHORT_NAME_SIZE];
-	char			device_type[SHORT_NAME_SIZE];
-	char			host_name[SHORT_NAME_SIZE];
-	long			prog_number;
-	long			vers_number;
-	int			n_svr_conn;
-	int			len;
-	int			i;
-	char			name [256];
-	char			*hstring;
-	char			nethost[80];
-	long			i_nethost;
-
-	long			client_id     = 0;
-	long			connection_id = 0;
-	long			status;
-	int			no_database = False;
-	char			*prog_url;
+	char			*device_name,
+				device_class[SHORT_NAME_SIZE],
+				device_type[SHORT_NAME_SIZE],
+				host_name[SHORT_NAME_SIZE];
+	long			prog_number,
+				vers_number,
+				i_nethost,
+				client_id     = 0,
+				connection_id = 0,
+				status;
+	int			n_svr_conn,
+				len,
+				i,
+				no_database = False;
+	char			name [256],
+				*hstring,
+				nethost[80],
+				*prog_url;
 
 	*error = 0;
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_import() : entering routine\n");
@@ -270,7 +269,6 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
  *
  * check wether a database server is already imported
  */
-
 	if (!no_database)
 	{
 		if (i_nethost == 0)
@@ -295,22 +293,18 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 		dev_printdebug (DBG_API, "dev_import() : try to import %s\n",device_name);
 
 /*
- * if the security system is configured, check the user
- * access on the control system and the requested access 
- * right.
+ * if the security system is configured, check the user access on the control system 
+ * and the requested access right.
  */
 		if ((multi_nethost[i_nethost].config_flags.security == True )
 			&& dev_security(device_name,access,&client_id, &connection_id, error) == DS_NOTOK )
 				return (DS_NOTOK);
 
 /*
- *  get device server  host name, programm number
- *  and version number from the devices database table.
- *  Information will be asked from the current network 
- *  database server.
+ * get device server host name, programm number and version number from the devices 
+ * database table. Information will be asked from the current network database server.
  */
-
-		if ( db_dev_import (&device_name,&devinfo,1,error) < 0)
+		if ( db_dev_import(&device_name,&devinfo,1,error) < 0)
 		{
 /*
  * the following introduces "stateless-ness" to the device server api
@@ -330,19 +324,18 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
                 	else
                         	return (DS_NOTOK);
 		}
-		dev_printdebug (DBG_API, "dev_import() : Info from database:\n");
-		dev_printdebug (DBG_API, "class = %s   type = %s\n", devinfo[0].device_class, devinfo[0].device_type);
-		dev_printdebug (DBG_API, "host = %s  pn = %d  vn = %d\n",devinfo[0].host_name, devinfo[0].pn, devinfo[0].vn);
+		dev_printdebug(DBG_API, "dev_import() : Info from database:\n");
+		dev_printdebug(DBG_API, "class = %s   type = %s\n", devinfo[0].device_class, devinfo[0].device_type);
+		dev_printdebug(DBG_API, "host = %s  pn = %d  vn = %d\n",devinfo[0].host_name, devinfo[0].pn, devinfo[0].vn);
 
-		strncpy (device_class, devinfo[0].device_class, sizeof(device_class));
-		strncpy (device_type, devinfo[0].device_type, sizeof(device_type));
-		strncpy (host_name, devinfo[0].host_name, sizeof(host_name));
+		strncpy(device_class, devinfo[0].device_class, sizeof(device_class));
+		strncpy(device_type, devinfo[0].device_type, sizeof(device_type));
+		strncpy(host_name, devinfo[0].host_name, sizeof(host_name));
 		prog_number = devinfo[0].pn;
 		vers_number = API_VERSION;
 
 /*
- * now free the devinfo structure allocated by 
- * db_dev_import().
+ * now free the devinfo structure allocated by db_dev_import().
  */
 		free (devinfo);
 	}
@@ -369,9 +362,8 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 	dev_import_in.var_argument.sequence = NULL;
 
 /*
- * Find out whether the process is a device server and
- * the requested device is served locally
- * in the process. 
+ * Find out whether the process is a device server and the requested device is 
+ * served locally in the process. 
  */
 #if !defined __BORLANDC__
 	if (config_flags.startup == SERVER_STARTUP || config_flags.startup == True)
@@ -423,72 +415,50 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 	if ( svr_conns[n_svr_conn].no_conns == 0)
 	{
 /*
- * Before a new handle can be created,
- * verify whether it is possible to connect
+ * Before a new handle can be created, verify whether it is possible to connect
  * to the remote host.
  */
-		if ( rpc_check_host ( host_name, error ) == DS_NOTOK )
+		if (rpc_check_host(host_name, error) == DS_NOTOK)
 		{
         		dev_printdebug (DBG_API,"dev_import(): host %s not answering, do stateless import\n",host_name);
                        	return(dev_notimported_init(device_name,access,i_nethost,ds_ptr,error));
 		}
 
 /*
- * No old connection exists to this server.
- * Create new client handle the device server.
+ * No old connection exists to this server. Create new client handle the device server.
  */
 		dev_printdebug (DBG_API, "dev_import() : open a new client handle \n");
-		clnt = clnt_create (host_name,prog_number, vers_number,"udp");
+		clnt = clnt_create (host_name, prog_number, vers_number, "udp");
 		if (clnt == NULL)
 		{
 /*
- * in order to make no database stateless return DS_OK here. I don't 
- * know what side effects this can have on the other (with database)
- * device servers ... !
+ * in order to make no database stateless return DS_OK here. I don't know what side 
+ * effects this can have on the other (with database) device servers ... !
  */
                         dev_notimported_init(device_name,access,i_nethost,ds_ptr,error);
 			strncpy((*ds_ptr)->server_host,host_name, sizeof((*ds_ptr)->server_host));
 			(*ds_ptr)->prog_number      = prog_number;
 			(*ds_ptr)->vers_number      = vers_number;
 			return(DS_OK);
-/*
-			hstring = clnt_spcreateerror ("dev_import");
-			dev_printerror (SEND,hstring);
-			*error = DevErr_CannotCreateClientHandle;
-			return (DS_NOTOK);
-*/
 		}
 
 /* 
- * This part was added for compatibility reasons with
- * the old libray version 3.
- * If the server is not version 4, the version number
- * must be set to 1.
- * Even if the last library version was 3, because
- * 1 indicates the RPC service version.
+ * This part was added for compatibility reasons with the old libray version 3.
+ * If the server is not version 4, the version number must be set to 1.  Even if the 
+ * last library version was 3, because 1 indicates the RPC service version.
  *
- * To make the version check the null procedure of
- * the service is called. A version mismatch will
- * be returned, if the service runs version 3 software.
- * The RPC version number will be set to one in this
- * case.
+ * To make the version check the null procedure of the service is called. A version 
+ * mismatch will be returned, if the service runs version 3 software. The RPC version 
+ * number will be set to one in this case.
  *
- * USE A timeout of 2s to TRY TO CIRCUMVENT THE OS9 PROBLEM OF 
- * BLOCKING TCP CONNECTIONS 
- *
+ * USE A timeout of 2s to TRY TO CIRCUMVENT THE OS9 PROBLEM OF BLOCKING TCP CONNECTIONS 
  * ANDY 24OCT97
  *
- * changed to import_timeout which is a global which can be changed by
- * clients - andy 13mar2000
+ * changed to import_timeout which is a global which can be changed by clients 
+ * andy 13mar2000
  */
  		clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &import_retry_timeout);
  		clnt_control (clnt, CLSET_TIMEOUT, (char *) &import_timeout);
-/*
- * OLD timeout (1s)
- *
- *		clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &api_retry_timeout);
- *		clnt_control (clnt, CLSET_TIMEOUT, (char *) &api_timeout);
- */
 
 		clnt_stat = clnt_call (clnt, NULLPROC,
 				    (xdrproc_t)xdr_void,  NULL, (xdrproc_t)xdr_void, NULL, 
@@ -504,17 +474,12 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 				clnt_destroy (clnt);
 
 /*
- * Set version number to 1 and recreate the
- * client handle.
+ * Set version number to 1 and recreate the client handle.
  */
 				vers_number = DEVSERVER_VERS;
 				clnt = clnt_create (host_name,prog_number, vers_number,"udp");
 				if (clnt == NULL)
 				{
-/*
-					hstring = clnt_spcreateerror ("dev_import");
-					dev_printerror (SEND,hstring);
-*/
 					*error = DevErr_CannotCreateClientHandle;
 					return (DS_NOTOK);
 				}
@@ -523,19 +488,16 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 			else
 			{
 /*
- * treat all errors the same i.e. stateless import - andy 25/6/02
- *
+ * treat all errors the same i.e. stateless import 
+ * andy 25/6/02
  */
 				clnt_destroy (clnt);
 /*
- * add "stateless-ness" by ignoring RPC timeouts at import time
- * this code assumes that because there was no version mismatch
- * version 4 exists (i.e. version which supports security) and
- * that the null procedure timed out because the device server
- * was blocked.
+ * add "stateless-ness" by ignoring RPC timeouts at import time this code assumes that 
+ * because there was no version mismatch version 4 exists (i.e. version which supports 
+ * security) and that the null procedure timed out because the device server was blocked.
  *
- * initialise the devserver struct so that the device can be properly
- * imported next time round.
+ * initialise the devserver struct so that the device can be properly imported next time round.
  */
                        		dev_notimported_init(device_name,access,i_nethost,ds_ptr,error);
 
@@ -558,7 +520,6 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 /*
  * initialise the administration structure for the RPC connection
  */
-
 		svr_conns[n_svr_conn].clnt        = clnt;
 		svr_conns[n_svr_conn].vers_number = vers_number;
 		svr_conns[n_svr_conn].udp_clnt = clnt;
@@ -590,10 +551,10 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
  *  Store the current RPC timeout for the connection and
  *  change the timeout to a short api_timeout.
  */
- 	clnt_control (clnt, CLGET_RETRY_TIMEOUT, (char *) &svr_conns[n_svr_conn].rpc_retry_timeout);
- 	clnt_control (clnt, CLGET_TIMEOUT, (char *) &svr_conns[n_svr_conn].rpc_timeout);
- 	clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &import_retry_timeout);
- 	clnt_control (clnt, CLSET_TIMEOUT, (char *) &import_timeout);
+ 	clnt_control (clnt, CLGET_RETRY_TIMEOUT, (char *)&svr_conns[n_svr_conn].rpc_retry_timeout);
+ 	clnt_control (clnt, CLGET_TIMEOUT, (char *)&svr_conns[n_svr_conn].rpc_timeout);
+ 	clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *)&import_retry_timeout);
+ 	clnt_control (clnt, CLSET_TIMEOUT, (char *)&import_timeout);
 
 /*
  * import device from device server.
@@ -631,26 +592,8 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
  * imported next time round.
  */
                 dev_notimported_init(device_name,access,i_nethost,ds_ptr,error);
-/*
-		if (clnt_stat == RPC_TIMEDOUT)
-		{
- *
- * add "stateless-ness" by ignoring RPC timeouts at import time
- * initialise the devserver struct so that the device can be properly
- * imported next time round.
- * 
-                        dev_notimported_init(device_name,access,i_nethost,ds_ptr,error);
-			*error = DevErr_RPCTimedOut;
-		}
-		else
-		{
-			hstring = clnt_sperror (clnt, "dev_import");
-			dev_printerror (SEND, "%s", hstring);
-			*error = DevErr_RPCFailed;
-		}
- */
-		clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &svr_conns[n_svr_conn].rpc_retry_timeout);
-		clnt_control (clnt, CLSET_TIMEOUT, (char *) &svr_conns[n_svr_conn].rpc_timeout);
+		clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *)&svr_conns[n_svr_conn].rpc_retry_timeout);
+		clnt_control (clnt, CLSET_TIMEOUT, (char *)&svr_conns[n_svr_conn].rpc_timeout);
 
 /*
  *  if the first connection failed, close
@@ -666,20 +609,11 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
  */
                 *error = 0;
                 return (DS_OK);
-/*
-                if (*error == DevErr_RPCTimedOut )
-                {
-                        *error = 0;
-                        return (DS_OK);
-                }
-		return (DS_NOTOK);
- */
 	}
 
 /*
  *  reinstall current connnection timeout.
  */
-
 	clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &svr_conns[n_svr_conn].rpc_retry_timeout);
 	clnt_control (clnt, CLSET_TIMEOUT, (char *) &svr_conns[n_svr_conn].rpc_timeout);
 
@@ -798,8 +732,6 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 	*error = dev_import_out.error;
 	return (dev_import_out.status);
 }
-
-
 
 /**@ingroup syncAPI
  * This function executes a command synchronously on the device associatied with the passed client handle.
@@ -973,7 +905,6 @@ long _DLLFunc dev_putget (devserver ds, long cmd,DevArgument argin,
 	*error = client_data.error;
 	return (client_data.status);
 }
-
 
 /**@ingroup syncAPI
  * This function executes a command on the device associated with the passed client handle, without
@@ -2471,8 +2402,6 @@ static long dev_free_local (_dev_free_in  *dev_free_in, long* error)
 	return (dev_free_out->status);
 }
 
-
-
 /**@ingroup clientAPIintern
  * Execute a command on a local device, without using an RPC.
  * Will not return any output arguments.
@@ -2698,7 +2627,6 @@ long _DLLFunc dev_rpc_connection (devserver ds, long *error)
 	return (DS_OK);
 }
 
-
 /**@ingroup clientAPIintern
  *
  * @param ds            handle to device.
@@ -2761,7 +2689,6 @@ long _DLLFunc dev_rpc_error (devserver ds, enum clnt_stat clnt_stat, long *error
 	dev_printdebug (DBG_TRACE | DBG_API, "dev_rpc_error() : leaving routine\n");
 	return (DS_OK);
 }
-
 
 /**@ingroup clientAPI
  * By calling this function with one of the two defined protocol parameters D_UDP and D_TCP (API.h), 

@@ -13,9 +13,9 @@
 
  Original   :	April 1993
 
- Version:	$Revision: 1.12 $
+ Version:	$Revision: 1.13 $
 
- Date:		$Date: 2004-03-26 16:21:52 $
+ Date:		$Date: 2004-03-26 16:33:47 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -847,7 +847,7 @@ long _DLLFunc dev_inform (devserver *clnt_handles, long num_devices,
 	return (DS_OK);
 }
 
-/**@ingroup syncAPI
+/**@ingroup clientAPI
  * Sets or reads the timeout for an RPC connection. A request to set the timeout has to be asked with
  * CLSET_TIMEOUT as request parameter and the timeout specified by the timeval structure dev_timeout.
  * The timeout will be set without any retry. A request to read the timeout has to ask with CLGET_TIMEOUT,

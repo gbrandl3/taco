@@ -1,10 +1,9 @@
-
 /***************************************************************************
  *
  * $Source: /home/jkrueger1/sources/taco/backup/taco/lib/dataport/dataport_os9.c,v $
  *
  * $Author: jkrueger1 $
- * $Date: 2003-05-21 16:19:00 $
+ * $Date: 2004-03-26 16:34:55 $
  *
  ***************************************************************************/
 
@@ -23,18 +22,16 @@
 
 static long InitialiseSemaphore();
 static long DeinitialiseSemaphore();
-
 
-
 /**
  * create a Dataport
  * 
- * @param name name of Dataport
- * @param size size of Dataport body
+ * @param name the name of Dataport
+ * @param size the size of Dataport body
  *
  * @return  NULL on failure, pointer to Dataport otherwise.
  */
-extern Dataport *CreateDataport(name,size)   char   *name;
+extern Dataport *CreateDataport(name, size)   char   *name;
                                              long   size;
 {
 	Dataport	*thisdataport;
@@ -101,19 +98,15 @@ extern Dataport *CreateDataport(name,size)   char   *name;
  */
 	return(thisdataport);
 }
-
 
-
-/************************************************************************
- Function   :  extern long CloseDataport()
-
- Description:  close Dataport, releasing system resources
-
- Arg(s) In  :  thisdataport   Dataport to close
-	       name	      name of the dataport (used only in UNIX version)
-
- Return(s)  :  minus one on failure, zero otherwise.
-*************************************************************************/
+/**
+ * close Dataport, releasing system resources
+ * 
+ * @param thisdataport	Dataport to close
+ * @param name		name of the dataport (used only in UNIX version)
+ * 
+ * @return  minus one on failure, zero otherwise.
+ */
 extern long CloseDataport(thisdataport, name)   Dataport *thisdataport;
 						char     *name;
 {
@@ -146,19 +139,15 @@ extern long CloseDataport(thisdataport, name)   Dataport *thisdataport;
 	}while(ret != -1);
 	return(0);
 }
-
 
-
-/************************************************************************
- Function   :  extern Dataport *OpenDataport()
-
- Description:  link to a Dataport
-
- Arg(s) In  :  name      name of Dataport
-	       size	 not used
- Return(s)  :  NULL on failure, pointer to Dataport otherwise.
-
-*************************************************************************/
+/**
+ * link to a Dataport
+ *
+ * @param name name of Dataport
+ * @param size not used
+ * 
+ * @return NULL on failure, pointer to Dataport otherwise.
+ */
 extern Dataport *OpenDataport(name, size)   char   *name;
 				      long   size;
 {
@@ -169,18 +158,13 @@ extern Dataport *OpenDataport(name, size)   char   *name;
 		return(NULL);
 	return(thisdataport);
 }
-
 
-
-/************************************************************************
- Function   :  extern long AccessDataport()
-
- Description:  request exclusive access to a Dataport
-
- Arg(s) In  :  dp         Dataport
-
- Return(s)  :  -1 on failure, 0 otherwise.
-*************************************************************************/
+/**
+ * request exclusive access to a Dataport
+ * @param dp Dataport
+ *
+ * @return -1 on failure, 0 otherwise.
+ */
 extern long AccessDataport(dp)   Dataport   *dp;
 {
 	if(_ev_wait_t(dp->sem,0,32767,OS9_DEADLOCK_WAIT,0)==(-1))
@@ -189,16 +173,12 @@ extern long AccessDataport(dp)   Dataport   *dp;
 }
 
 
-
-/************************************************************************
- Function   :  extern long ReleaseDataport()
-
- Description:  relinquish exclusive access to Dataport
-
- Arg(s) In  :  dp      Dataport
-
- Return(s)  :  -1 on failure, 0 otherwise.
-*************************************************************************/
+/**
+ * relinquish exclusive access to Dataport
+ * @param dp      Dataport
+ * 
+ * @return  -1 on failure, 0 otherwise.
+ */
 extern long ReleaseDataport(dp)   Dataport   *dp;
 {
 	int	ret = 0;
@@ -206,20 +186,14 @@ extern long ReleaseDataport(dp)   Dataport   *dp;
 	ret=_ev_signal(dp->sem,0x8000);
 	return (errno!=0) ? (-1) : (0);
 }
-
 
-
-/************************************************************************
- Function   :  long InitialiseSemaphore()
-
- Description:  Create an event used as a semaphore
-
- Arg(s) In  :  name      name of Dataport
-
- Arg(s) Out :  sem       The semaphore ID
-
- Return(s)  :  NULL if successful, -1 otherwise.
-*************************************************************************/
+/**
+ * Create an event used as a semaphore
+ * @param name      name of Dataport
+ * @param sem       The ID of the created semaphore 
+ * 
+ * @return NULL if successful, -1 otherwise.
+ */
 static long InitialiseSemaphore(name,sem)   char         *name;
                                             Semaphore   *sem;
 {
@@ -231,19 +205,15 @@ static long InitialiseSemaphore(name,sem)   char         *name;
 	*sem = semid;
 	return(0);
 }
-
 
-
-/************************************************************************
- Function   :  long DeinitialiseSemaphore()
-
- Description:  Delete the event
-
- Arg(s) In  :  name      name of Dataport
-	       sem	 semaphore ID
-
- Return(s)  :  NULL on failure, pointer to Dataport otherwise.
-*************************************************************************/
+/**
+ * Delete the event
+ *
+ * @param name      name of Dataport
+ * @param sem	 semaphore ID
+ * 
+ * @return  NULL on failure, pointer to Dataport otherwise.
+ */
 static long DeinitialiseSemaphore(name,sem)   char         *name;
                                               Semaphore   *sem;
 {
