@@ -5,7 +5,7 @@ Release: @RPM_RELEASE@
 Copyright: GPL
 Group: Utilities/TACO
 Source: @PACKAGE@-@VERSION@.tar.gz 
-Prefix: /usr/local/dshome
+Prefix: @prefix@
 Vendor: FRMII, TU München, FRG
 Requires: gdbm
 Provides: taco
@@ -16,12 +16,12 @@ Provides: taco
 %setup -n @PACKAGE@-@VERSION@
 
 %build
-export DSHOME=/usr/local/dshome
+export DSHOME=@prefix@
 ./configure --enable-fast-install=yes --enable-greta --enable-xdevmenu --with-motif=/usr/X11R6/LessTif/Motif1.2 "--prefix=$DSHOME"
 make 
 
 %install
-export DSHOME=/usr/local/dshome
+export DSHOME=@prefix@
 make install-strip
 make "DESTDIR=$PWD/tmp-install-dir" install
 find tmp-install-dir -regex ".*$DSHOME/lib/.*" -a -not -type d | sed -e 's/^tmp-install-dir//' > @PACKAGE@.txt
@@ -41,7 +41,7 @@ mkdir -p "$DSHOME/dbase/dbm"
 mkdir -p "$DSHOME/dbase/res/TEST"
 
 # Adjust some paths
-if test "x$DSHOME" != x/usr/local/dshome ; then
+if test "x$DSHOME" != x@prefix@ ; then
 	cd "$DSHOME"
 	for i in etc/.taco.csh \
 		etc/.taco_env \
@@ -51,7 +51,7 @@ if test "x$DSHOME" != x/usr/local/dshome ; then
 		templates/taco/tacoenv.sh
 	do
 		mv $i tmp.sed
-		sed -e "s%/usr/local/dshome%$DSHOME%" tmp.sed > $i
+		sed -e "s%@prefix@%$DSHOME%" tmp.sed > $i
 	done
 	for i in lib/linux/x86/libTACOMySQL.la \
 		lib/linux/x86/libTACOndbm.la \
@@ -70,7 +70,7 @@ if test "x$DSHOME" != x/usr/local/dshome ; then
 		templates/taco/taco
 	do
 		mv $i tmp.sed
-		sed -e "s%/usr/local/dshome%$DSHOME%" tmp.sed > $i
+		sed -e "s%@prefix@%$DSHOME%" tmp.sed > $i
 		chmod 0755 $i
 	done
 	rm -f tmp.sed
@@ -125,58 +125,58 @@ fi
 
 %files -f @PACKAGE@.txt
 %defattr(-,root,root)
-/usr/local/dshome/doc/index.html
-/usr/local/dshome/templates/taco/taco
-/usr/local/dshome/templates/taco/tacoenv.sh
-%config(noreplace) /usr/local/dshome/etc/.taco_env
-%config(noreplace) /usr/local/dshome/etc/.taco.csh
-%config(noreplace) /usr/local/dshome/etc/taco.shutdown
-%config(noreplace) /usr/local/dshome/etc/taco.startup
-%config(noreplace) /usr/local/dshome/etc/taco.startup.sec
-%config /usr/local/dshome/dbase/res/SYS/README
-%config /usr/local/dshome/dbase/res/SEC/README
-%config(noreplace) /usr/local/dshome/dbase/res/SEC/sec_frm.res
-%config /usr/local/dshome/dbase/res/CMDS/README
-%config /usr/local/dshome/dbase/res/CMDS/dev_cmds.res
-%config /usr/local/dshome/dbase/res/NAMES/README
-%config /usr/local/dshome/dbase/res/PS_NAMES/README
-%config /usr/local/dshome/dbase/res/ERROR/README
-%config /usr/local/dshome/dbase/res/ERROR/dev_errors.res
-%config /usr/local/dshome/dbase/res/CLASS/README
-%config /usr/local/dshome/dbase/res/CLASS/Inst_verify.res
-%config /usr/local/dshome/dbase/res/EVENTS/README
+@prefix@/doc/index.html
+@prefix@/templates/taco/taco
+@prefix@/templates/taco/tacoenv.sh
+%config(noreplace) @prefix@/etc/.taco_env
+%config(noreplace) @prefix@/etc/.taco.csh
+%config(noreplace) @prefix@/etc/taco.shutdown
+%config(noreplace) @prefix@/etc/taco.startup
+%config(noreplace) @prefix@/etc/taco.startup.sec
+%config @prefix@/dbase/res/SYS/README
+%config @prefix@/dbase/res/SEC/README
+%config(noreplace) @prefix@/dbase/res/SEC/sec_frm.res
+%config @prefix@/dbase/res/CMDS/README
+%config @prefix@/dbase/res/CMDS/dev_cmds.res
+%config @prefix@/dbase/res/NAMES/README
+%config @prefix@/dbase/res/PS_NAMES/README
+%config @prefix@/dbase/res/ERROR/README
+%config @prefix@/dbase/res/ERROR/dev_errors.res
+%config @prefix@/dbase/res/CLASS/README
+%config @prefix@/dbase/res/CLASS/Inst_verify.res
+%config @prefix@/dbase/res/EVENTS/README
 %doc INSTALL doc/TACO.pdf doc/README
-/usr/local/dshome/bin/linux/x86/db_fillup
-/usr/local/dshome/bin/linux/x86/db_update
-/usr/local/dshome/bin/linux/x86/db_read
-/usr/local/dshome/bin/linux/x86/db_info
-/usr/local/dshome/bin/linux/x86/db_initcache
-/usr/local/dshome/bin/linux/x86/db_devinfo
-/usr/local/dshome/bin/linux/x86/db_devdel
-/usr/local/dshome/bin/linux/x86/db_servdel
-/usr/local/dshome/bin/linux/x86/db_servinfo
-/usr/local/dshome/bin/linux/x86/db_servunreg
-/usr/local/dshome/bin/linux/x86/db_devres
-/usr/local/dshome/bin/linux/x86/db_resdel
-/usr/local/dshome/system/bin/linux/x86/Manager
-/usr/local/dshome/system/bin/linux/x86/unreg
-/usr/local/dshome/system/bin/linux/x86/MessageServer
-/usr/local/dshome/system/bin/linux/x86/dcwr_alo
-/usr/local/dshome/system/bin/linux/x86/dcrd_alo
-/usr/local/dshome/system/bin/linux/x86/dbm_server
+@prefix@/bin/linux/x86/db_fillup
+@prefix@/bin/linux/x86/db_update
+@prefix@/bin/linux/x86/db_read
+@prefix@/bin/linux/x86/db_info
+@prefix@/bin/linux/x86/db_initcache
+@prefix@/bin/linux/x86/db_devinfo
+@prefix@/bin/linux/x86/db_devdel
+@prefix@/bin/linux/x86/db_servdel
+@prefix@/bin/linux/x86/db_servinfo
+@prefix@/bin/linux/x86/db_servunreg
+@prefix@/bin/linux/x86/db_devres
+@prefix@/bin/linux/x86/db_resdel
+@prefix@/system/bin/linux/x86/Manager
+@prefix@/system/bin/linux/x86/unreg
+@prefix@/system/bin/linux/x86/MessageServer
+@prefix@/system/bin/linux/x86/dcwr_alo
+@prefix@/system/bin/linux/x86/dcrd_alo
+@prefix@/system/bin/linux/x86/dbm_server
 
 %package x-apps
 Summary: TACO control system X11 applications.
 Group: Utilities/TACO/X11
-Prefix: /usr/X11R6/lib/X11
+Prefix: @prefix@
 Provides: taco-x-apps
 
 %description x-apps
 
 %files x-apps
 %defattr(-,root,root)
-/usr/local/dshome/bin/linux/x86/greta
-/usr/local/dshome/bin/linux/x86/xdevmenu
-/usr/X11/lib/X11/app-defaults/GReta
-/usr/X11/lib/X11/app-defaults/XDevmenu
+@prefix@/bin/linux/x86/greta
+@prefix@/bin/linux/x86/xdevmenu
+@appdefaultdir@/GReta
+@appdefaultdir@/XDevmenu
 
