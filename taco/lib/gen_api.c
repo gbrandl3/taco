@@ -8,13 +8,13 @@
 		servers and clients using the SUN-RPC.
 
  Author(s)  :	Jens Meyer
- 		$Author: andy_gotz $
+ 		$Author: jkrueger1 $
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.17 $
+ Version    :	$Revision: 1.18 $
 
- Date       : 	$Date: 2005-03-29 09:54:10 $
+ Date       : 	$Date: 2005-04-04 16:03:18 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -1971,7 +1971,7 @@ long dev_error_push (char *error_string)
 }
 
 /**@ingroup dsAPI
- * Clear the dynmaic error stack. This can be useful for servers
+ * Clear the dynamic error stack. This can be useful for servers
  * who want to remove error messages from the stack and return
  * their own error only.
  *
