@@ -1,6 +1,6 @@
-AC_INIT(TACO, 3.0rc2, [taco-devel@lists.sourceforge.net])
+AC_INIT(TACO, 3.0rc3, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.26 $)dnl
+AC_REVISION($Revision: 1.27 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -95,11 +95,7 @@ AC_SUBST(X_LDFLAGS, ['-L/usr/X11R6/lib'])
 
 AC_SUBST(appdefaultdir)
 
-sbindir='${exec_prefix}'/system/bin/${taco_install_path}
-AC_SUBST(sbindir)
-AC_SUBST(datadir, ['${prefix}/etc'])
 AC_SUBST(docdir, ['${prefix}/doc'])
-AC_SUBST(etcdir)
 AC_SUBST(templatedir, ['${prefix}/templates/taco'])
 AC_SUBST(resdatadir, ['${prefix}/dbase/res'])
 AC_SUBST(dbmdir, ['${prefix}/dbase/dbm'])
@@ -185,7 +181,7 @@ AC_CONFIG_FILES(Makefile
 )
 
 dnl AC_CONFIG_FILES(system/dbdev/Makefile
-dnl		system/dbdev/src/Makefile
+dnl 		system/dbdev/src/Makefile)
 dnl		system/dbdev/doc/Makefile)
 
 AC_CONFIG_FILES(classes/instverify/Makefile)
