@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.6 $
+ Version    :	$Revision: 1.7 $
 
- Date	    :	$Date: 2003-11-28 15:50:54 $
+ Date	    :	$Date: 2004-02-11 10:16:50 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -172,10 +172,7 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 	char			*prog_url;
 
 	*error = 0;
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_API,
-	    "\ndev_import() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_import() : entering routine\n");
 
 #ifdef TANGO
 	if (strncasecmp(dev_name,"tango:",6) == 0)
@@ -275,10 +272,7 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 			}
 		}
 
-#ifdef EBUG
-		dev_printdebug (DBG_API,
-	    	"dev_import() : try to import %s\n",device_name);
-#endif /* EBUG */
+		dev_printdebug (DBG_API, "dev_import() : try to import %s\n",device_name);
 
 /*
  * if the security system is configured, check the user
@@ -310,19 +304,15 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
  */
                 	if (*error == DbErr_DeviceNotExported)
                 	{
-#ifdef EBUG
         			dev_printdebug (DBG_API,"dev_import(): device %s not exported (yet)\n",device_name);
-#endif /* EBUG */
 	                        return(dev_notimported_init(device_name,access,i_nethost,ds_ptr,error));
                 	}
                 	else
                         	return (DS_NOTOK);
 		}
-#ifdef EBUG
 		dev_printdebug (DBG_API, "dev_import() : Info from database:\n");
 		dev_printdebug (DBG_API, "class = %s   type = %s\n", devinfo[0].device_class, devinfo[0].device_type);
 		dev_printdebug (DBG_API, "host = %s  pn = %d  vn = %d\n",devinfo[0].host_name, devinfo[0].pn, devinfo[0].vn);
-#endif /* EBUG */
 
 		strncpy (device_class, devinfo[0].device_class, sizeof(device_class));
 		strncpy (device_type, devinfo[0].device_type, sizeof(device_type));
@@ -419,9 +409,7 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
  */
 		if ( rpc_check_host ( host_name, error ) == DS_NOTOK )
 		{
-#ifdef EBUG
         		dev_printdebug (DBG_API,"dev_import(): host %s not answering, do stateless import\n",host_name);
-#endif /* EBUG */
                        	return(dev_notimported_init(device_name,access,i_nethost,ds_ptr,error));
 		}
 
@@ -429,9 +417,7 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
  * No old connection exists to this server.
  * Create new client handle the device server.
  */
-#ifdef EBUG
 		dev_printdebug (DBG_API, "dev_import() : open a new client handle \n");
-#endif /* EBUG */
 		clnt = clnt_create (host_name,prog_number, vers_number,"udp");
 		if (clnt == NULL)
 		{
@@ -564,9 +550,7 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 /* 
  * a connection already exists to this server, reuse it
  */
-#ifdef EBUG
 		dev_printdebug (DBG_API, "dev_import() : reuse already open client handle\n");
-#endif /* EBUG */
 		clnt        = svr_conns[n_svr_conn].clnt;
 		vers_number = svr_conns[n_svr_conn].vers_number;
 	}
@@ -579,9 +563,7 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 		&& (sec_tcp_connection (access, &clnt, &svr_conns[n_svr_conn], error) == DS_NOTOK))
 		return (DS_NOTOK);
 
-#ifdef EBUG
 	dev_printdebug (DBG_API, "dev_import() : import device %s from device server\n", device_name);
-#endif /* EBUG */
 
 /*
  *
@@ -763,7 +745,6 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 			if (!no_database && (multi_nethost[i_nethost].config_flags.security == True)
 				&& ( create_sec_key ((*ds_ptr), error) == DS_NOTOK ))
 						return (DS_NOTOK);
-#ifdef EBUG
 			dev_printdebug (DBG_API, "dev_import() : client handle info:\n"); 
 			dev_printdebug (DBG_API, "device_name = %s\n", device_name);
 			dev_printdebug (DBG_API, "device_class = %s\n", device_class);
@@ -775,7 +756,6 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 			dev_printdebug (DBG_API, "ds_id       = %d\n", (*ds_ptr)->ds_id);
 			dev_printdebug (DBG_API, "no_svr_conn = %d\n", (*ds_ptr)->no_svr_conn);
 			dev_printdebug (DBG_API, "rpc_conn_counter = %d\n", (*ds_ptr)->rpc_conn_counter);
-#endif /* EBUG */
 		}
 	}
 
@@ -832,9 +812,7 @@ long _DLLFunc dev_putget (devserver ds, long cmd,DevArgument argin,
 
 	*error = 0;
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_putget() : entering routine\n");
-#endif /* EBUG */
 	if (ds == NULL)
 	{
 		*error = DevErr_DeviceNotImportedYet;
@@ -913,11 +891,9 @@ long _DLLFunc dev_putget (devserver ds, long cmd,DevArgument argin,
 	memset ((char *)&client_data, 0, sizeof (client_data));
 	client_data.argout	= (char *) argout;
 
-#ifdef EBUG
 	dev_printdebug (DBG_API, "dev_putget() : server data -> \n");
 	dev_printdebug (DBG_API, "ds_id=%d  cmd=%d  intype=%d  outtype=%d\n",
 		    server_data.ds_id, server_data.cmd, server_data.argin_type, server_data.argout_type);
-#endif /* EBUG */
 
 /*
  * Check if the device is a local or a remote device.
@@ -1001,9 +977,7 @@ long _DLLFunc dev_put (devserver ds, long cmd,DevArgument argin,
 	nethost_info		*nethost;
 
 	*error = 0;
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_put() : entering routine\n");
-#endif /* EBUG */
 	if (ds == NULL)
 	{
 		*error = DevErr_DeviceNotImportedYet;
@@ -1074,11 +1048,9 @@ long _DLLFunc dev_put (devserver ds, long cmd,DevArgument argin,
 	memset ((char *)&client_data, 0, sizeof (client_data));
 	client_data.argout	= NULL;
 
-#ifdef EBUG
 	dev_printdebug (DBG_API, "dev_put() : server data -> \n");
 	dev_printdebug (DBG_API, "ds_id=%d  cmd=%d  intype=%d\n", 
 			server_data.ds_id, server_data.cmd, server_data.argin_type);
-#endif /* EBUG */
 
 /*
  * Check if the device is a local or a remote device.
@@ -1164,10 +1136,8 @@ long _DLLFunc dev_free (devserver ds, long *error)
 	status = DS_OK;
 	*error = 0;
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_free() : entering routine\n");
 	dev_printdebug (DBG_API, "dev_free() :  ds_id = %d\n",ds->ds_id);
-#endif /* EBUG */
 
 	if (ds == NULL)
 	{
@@ -1371,9 +1341,7 @@ long _DLLFunc dev_free (devserver ds, long *error)
                            	(xdrproc_t)xdr__dev_free_in, (caddr_t)&dev_free_in,
                            	(xdrproc_t)xdr_void, (caddr_t)NULL,
 			TIMEVAL(api_timeout));
-#ifdef EBUG
 			dev_printdebug ( DBG_ASYNCH, "dev_free(): RPC_ASYN_FREE returned clnt_stat=%d\n",clnt_stat);
-#endif /* EBUG */
 
 /*
  * close the 2 asynch tcp sockets (one for client requests and one for server
@@ -1396,11 +1364,9 @@ DON'T - 26/3/98
 #else
                 	close_socket (svr_conns[ds->no_svr_conn].asynch_callback_tcp_socket);
 #endif * WIN32 *
-#ifdef EBUG
 			dev_printdebug ( DBG_ASYNCH, "dev_free(): closed client socket out=%d (errno=%d)\n",
 				*svr_conns[ds->no_svr_conn].asynch_listen_tcp_socket,
 				*svr_conns[ds->no_svr_conn].asynch_callback_tcp_socket,errno);
-#endif * EBUG *
 */
 			clnt_destroy (svr_conns[ds->no_svr_conn].asynch_clnt);
 		}
@@ -1464,9 +1430,7 @@ long _DLLFunc dev_query_svr (char* host, long prog_number, long vers_number)
 	int 	   next_conn   = -1;
 	int 	   i;
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_query_svr() : entering routine\n");
-#endif /* EBUG */
 
 /*
  * first time initialise all the possible server connections
@@ -1564,18 +1528,14 @@ long _DLLFunc dev_xdrfree (DevType type, DevArgument objptr, long *error)
 	DevDataListEntry        data_type;
 
 	*error = 0;
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_xdrfree() : entering routine\n");
-#endif /* EBUG */
 
 /*
  * Get the XDR data type from the loaded type list
  */
 	if ( xdr_get_type (type, &data_type, error) == DS_NOTOK)
 	{
-#ifdef EBUG
 		dev_printdebug (DBG_ERROR | DBG_API, "\ndev_xdrfree() : xdr_get_type(%d) returned error %d\n", type, *error);
-#endif /* EBUG */
 		return (DS_NOTOK);
 	}
 
@@ -1630,9 +1590,7 @@ long  check_rpc_connection (devserver ds, long *error)
 
 	*error = 0;
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "\ncheck_rpc_connection() : entering routine\n");
-#endif /* EBUG */
 
 #ifdef TANGO
 	if (ds->rpc_protocol == D_IIOP)
@@ -2128,9 +2086,7 @@ long  reinstall_rpc_connection (devserver ds, long *error)
 
 	*error = 0;
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "\nreinstall_rpc_connection() : entering routine\n");
-#endif /* EBUG */
 
 #ifdef TANGO
 	if (ds->rpc_protocol == D_IIOP)
@@ -2469,10 +2425,7 @@ static long dev_import_local (_dev_import_in  *dev_import_in,
 	_dev_import_out		*dev_import_out;
 	long			ds_id;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_API,
-	    "\ndev_import_local() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_import_local() : entering routine\n");
 
 	*error = 0;
 
@@ -2507,9 +2460,7 @@ static long dev_import_local (_dev_import_in  *dev_import_in,
 		}
 	}
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "dev_import_local() : leaving routine\n");
-#endif /* EBUG */
 
 	*error = dev_import_out->error;
 	return (dev_import_out->status);
@@ -2530,16 +2481,12 @@ static long dev_free_local (_dev_free_in  *dev_free_in, long* error)
 {
 	_dev_free_out		*dev_free_out;
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_free_local() : entering routine\n");
-#endif /* EBUG */
 
 	*error = 0;
 	dev_free_out = rpc_dev_free_4 ( dev_free_in );
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "dev_free_local() : leaving routine\n");
-#endif /* EBUG */
 
 	*error = dev_free_out->error;
 	return (dev_free_out->status);
@@ -2562,17 +2509,13 @@ static long dev_put_local (_server_data  *server_data, long* error)
 {
 	_client_data	*client_data;
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_put_local() : entering routine\n");
-#endif /* EBUG */
 
 	*error = 0;
 
 	client_data = rpc_dev_put_4 (server_data);
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "dev_put_local() : leaving routine\n");
-#endif /* EBUG */
 
 	*error = client_data->error;
 	return (client_data->status);
@@ -2601,10 +2544,7 @@ static long dev_putget_local (_server_data  *server_data,
 	long		status;
 
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_API,
-	    "\ndev_putget_local() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_putget_local() : entering routine\n");
 
 	*error = 0;
 
@@ -2699,10 +2639,7 @@ static long dev_putget_local (_server_data  *server_data,
 		free (buf);
 	}
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_API,
-	    "dev_putget_local() : leaving routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_API, "dev_putget_local() : leaving routine\n");
 
 	*error = ret_data->error;
 	status =  ret_data->status;
@@ -2739,9 +2676,7 @@ static long dev_putget_local (_server_data  *server_data,
  */ 
 long dev_rpc_connection (devserver ds, long *error)
 {
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_rpc_connection() : entering routine\n");
-#endif /* EBUG */
 
 	*error = 0;
 
@@ -2792,20 +2727,16 @@ long dev_rpc_connection (devserver ds, long *error)
  * in case of a connection update.
  */
 
-#ifdef EBUG
 	dev_printdebug (DBG_API, "\ndev_putget() : connection statistics\n");
 	dev_printdebug (DBG_API, "connections on clnt : %d\n", svr_conns[ds->no_svr_conn].no_conns);
 	dev_printdebug (DBG_API, "rpc_conn_counter for clnt = %d\nrpc_conn_counter for ds  = %d\n",
 	    	svr_conns[ds->no_svr_conn].rpc_conn_counter, ds->rpc_conn_counter);
-#endif /* EBUG */
 
 	if (( svr_conns[ds->no_svr_conn].rpc_conn_counter != ds->rpc_conn_counter )
 		&& (reinstall_rpc_connection (ds, error) == DS_NOTOK))
 		return (DS_NOTOK);
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "dev_rpc_connection() : leaving routine\n");
-#endif /* EBUG */
 
 	return (DS_OK);
 }
@@ -2825,9 +2756,7 @@ long dev_rpc_error (devserver ds, enum clnt_stat clnt_stat, long *error)
 {
 	char	*hstring;
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_rpc_error() : entering routine\n");
-#endif /* EBUG */
 
 	*error = 0;
 
@@ -2874,9 +2803,7 @@ long dev_rpc_error (devserver ds, enum clnt_stat clnt_stat, long *error)
  */
 	svr_conns[ds->no_svr_conn].rpc_error_flag = GOOD_SVC_CONN;
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "dev_rpc_error() : leaving routine\n");
-#endif /* EBUG */
 	return (DS_OK);
 }
 
@@ -3157,10 +3084,7 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
  */
 long _DLLFunc dev_notimported_init (char *device_name, long access, long i_nethost, devserver *ds_ptr, long *error)
 {
-#ifdef EBUG
-        dev_printdebug (DBG_TRACE | DBG_API,
-            "\ndev_notimported_init() : entering routine\n");
-#endif /* EBUG */
+        dev_printdebug (DBG_TRACE | DBG_API, "\ndev_notimported_init() : entering routine\n");
 
         *error = 0;
 
