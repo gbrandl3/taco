@@ -6,7 +6,7 @@ DBTABLES_DOMAIN=TEST
 DBTABLES=$DBTABLES_STANDARD,$DBTABLES_DOMAIN
 export DBTABLES
 
-DSHOME=/usr/local/dshome2
+DSHOME=/home/hgilde/taco_installl
 export DSHOME
 RES_BASE_DIR=$DSHOME/dbase/res
 export RES_BASE_DIR

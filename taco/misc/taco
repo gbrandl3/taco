@@ -12,21 +12,26 @@
 . /etc/rc.status
 rc_reset
 
-taco_config_file="/etc/tacoenv.sh"
-if test -f "$taco_config_file" ; then
-	. "$taco_config_file" 
-else
-	echo "error: TACO configuration file '$taco_config_file' not installed"
-	rc_failed
-	rc_exit
-fi
-
 usage="Usage: $0 {start|stop|status|restart|new}"
-taco_manager="$DSHOME/system/bin/linux/x86/Manager"
+
+# Include TACO environment file
+taco_env_file="/etc/tacoenv.sh"
+if ! test -r "$taco_env_file" ; then
+	echo "error: TACO environment file '$taco_env_file' is missing"
+	exit 6
+fi
+. "$taco_env_file" 
+
+# Check for TACO manager executable
+taco_manager="$DSHOME/system/bin/linux/i686/Manager"
+if ! test -x $taco_manager ; then
+	echo "error: TACO manager '$taco_manager' is not installed"
+	exit 5
+fi
 
 case $1 in
 	start)
-		if test ! -f "$DBM_DIR/names.pag" ; then
+		if test ! \( -f "$DBM_DIR/names.pag" -o -f "$DBM_DIR/names" \) ; then
 			echo "Initialization of the database:"
 			if db_fillup 0 ; then
 				rc_status -v
@@ -37,35 +42,35 @@ case $1 in
 		fi
 		if test "x$TACO_SECURE_MODE" = xyes ; then
 			echo -n "Starting TACO services in secure mode"
-			/sbin/startproc -s -t 5 -q "$taco_manager" -security
+			startproc -s -q "$taco_manager" -security
 			rc_status -v
 		else
 			echo -n "Starting TACO services"
-			/sbin/startproc -s -q "$taco_manager"
+			startproc -s -q "$taco_manager"
 			rc_status -v
 		fi
 		;;
 	stop)
 		echo -n "Shutting down TACO services"
-		/sbin/killproc "$taco_manager"
+		killproc "$taco_manager"
 		rc_status -v
 		;;
 	restart)
 		$0 stop
-		$0 start $2
+		$0 start
 		rc_status
 		;;
 	status)
 		echo -n "Checking for TACO services"
-		/sbin/checkproc "$taco_manager"
+		checkproc "$taco_manager"
 		rc_status -v
 		;;
 	new)
 		echo -n "Do you really want to delete the complete TACO database (not the resource files)? (yes/no): "
 		read
 		if test "x$REPLY" = xyes ; then
-			rm "$DBM_DIR"/*
-			$0 restart $2
+			rm -i "$DBM_DIR"/*
+			$0 restart
 			rc_status
 		else
 			rc_failed

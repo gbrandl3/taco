@@ -6,7 +6,7 @@ setenv  DBTABLES_DOMAIN TEST
 setenv DBTABLES ${DBTABLES_STANDARD},${DBTABLES_DOMAIN}
 
 
-setenv DSHOME /usr/local/dshome2
+setenv DSHOME /home/hgilde/taco_installl
 setenv RES_BASE_DIR ${DSHOME}/dbase/res
 setenv DBM_DIR ${DSHOME}/dbase/dbm
 
