@@ -13,9 +13,9 @@
 
  Original   :   January 1991
 
- Version    :	$Revision: 1.6 $
+ Version    :	$Revision: 1.7 $
 
- Date       :	$Date: 2004-03-09 17:02:49 $
+ Date       :	$Date: 2004-05-07 15:08:56 $
  
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -3098,6 +3098,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 		for (i=0;i<(int)dev_num;i++)
 		{
 			k = strlen(devexp[i].host_name);
+			k = k >= HOST_NAME_LENGTH ? HOST_NAME_LENGTH - 1 : k;
 			if ((devexp3[i].host_name = (char *)malloc(k + 1)) == NULL)
 			{
 				*perr = DbErr_ClientMemoryAllocation;
@@ -3112,11 +3113,12 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				free(devexp3);
 				return(DS_NOTOK);
 			}
-			strcpy(devexp3[i].host_name,devexp[i].host_name);
 			for (j=0;j<k;j++) 
-				devexp3[i].host_name[j] = tolower(devexp3[i].host_name[j]);
+				devexp3[i].host_name[j] = tolower(devexp[i].host_name[j]);
+			devexp3[i].host_name[k] = '\0';
 
 			k = strlen(devexp[i].device_name);
+			k = k >= DEV_NAME_LENGTH ? DEV_NAME_LENGTH - 1 : k;
 			if ((devexp3[i].dev_name = (char *)malloc(k + 1)) == NULL)
 			{
 				*perr = DbErr_ClientMemoryAllocation;
@@ -3132,11 +3134,12 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				free(devexp3);
 				return(DS_NOTOK);
 			}
-			strcpy(devexp3[i].dev_name,devexp[i].device_name);
 			for (j=0;j<k;j++)
-				devexp3[i].dev_name[j] = tolower(devexp3[i].dev_name[j]);
+				devexp3[i].dev_name[j] = tolower(devexp[i].device_name[j]);
+			devexp3[i].dev_name[k] = '\0';
 
 			k = strlen(devexp[i].device_type);
+			k = k >= DEV_TYPE_LENGTH ? DEV_TYPE_LENGTH - 1 : k;
 			if ((devexp3[i].dev_type = (char *)malloc(k + 1)) == NULL)
 			{
 				*perr = DbErr_ClientMemoryAllocation;
@@ -3153,9 +3156,11 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				free(devexp3);
 				return(DS_NOTOK);
 			}
-			strcpy(devexp3[i].dev_type,devexp[i].device_type);
+			strncpy(devexp3[i].dev_type,devexp[i].device_type, k);
+			devexp3[i].dev_type[k] = '\0';
 
 			k = strlen(devexp[i].device_class);
+			k = k >= DEV_CLASS_LENGTH ? DEV_CLASS_LENGTH - 1 : k;
 			if ((devexp3[i].dev_class = (char *)malloc(k + 1)) == NULL)
 			{
 				*perr = DbErr_ClientMemoryAllocation;
@@ -3173,7 +3178,8 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				free(devexp3);
 				return(DS_NOTOK);
 			}
-			strcpy(devexp3[i].dev_class,devexp[i].device_class);
+			strncpy(devexp3[i].dev_class,devexp[i].device_class, k);
+			devexp3[i].dev_class[k] = '\0';
 
 			devexp3[i].p_num = devexp[i].pn;
 			devexp3[i].v_num = devexp[i].vn;
@@ -3195,6 +3201,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 /* Copy process name (specific for version 3) */
 
 			k = strlen(devexp[i].proc_name);
+			k = k >= PROC_NAME_LENGTH ? PROC_NAME_LENGTH - 1 : k;
 			if ((devexp3[i].proc_name = (char *)malloc(k + 1)) == NULL)
 			{
 				*perr = DbErr_ClientMemoryAllocation;
@@ -3213,9 +3220,9 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				free(devexp3);
 				return(DS_NOTOK);
 			}
-			strcpy(devexp3[i].proc_name,devexp[i].proc_name);
 			for (j=0;j<k;j++) 
-				devexp3[i].proc_name[j] = tolower(devexp3[i].proc_name[j]);
+				devexp3[i].proc_name[j] = tolower(devexp[i].proc_name[j]);
+			devexp3[i].proc_name[k] = '\0';
 		}
 
 	}
@@ -3520,7 +3527,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 		return(DS_NOTOK);
 	}
 
-/* Structure initialization (structure sended to server) */
+/* Structure initialization (structure sent to server) */
 
 	send.arr1_len = num_dev;
 
@@ -3535,8 +3542,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 	}
 	else
 	{
-		recev = db_devimp_1(&send,
-		   multi_nethost[i_nethost].db_info->clnt,&error);
+		recev = db_devimp_1(&send, multi_nethost[i_nethost].db_info->clnt,&error);
 	}
 #endif /* ALONE */
 
@@ -3566,8 +3572,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 				}
 				else
 				{
-					recev = db_devimp_1(&send,multi_nethost[i_nethost].db_info->clnt,
-				  			    &error);
+					recev = db_devimp_1(&send,multi_nethost[i_nethost].db_info->clnt, &error);
 				}
 #endif /* ALONE */
 				if(recev == NULL)
@@ -3637,10 +3642,10 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 	{
 		tmp_ptr = &((*tab)[i]);	
 		tmp_ptr1 = &(recev->imp_dev.tab_dbdev_val[i]);
-		strcpy(tmp_ptr->device_name,tmp_ptr1->dev_name);
-		strcpy(tmp_ptr->host_name,tmp_ptr1->host_name);
-		strcpy(tmp_ptr->device_type,tmp_ptr1->dev_type);
-		strcpy(tmp_ptr->device_class,tmp_ptr1->dev_class);
+		snprintf(tmp_ptr->device_name, sizeof(tmp_ptr->device_name), "%s", tmp_ptr1->dev_name);
+		snprintf(tmp_ptr->host_name, sizeof(tmp_ptr->host_name), "%s", tmp_ptr1->host_name);
+		snprintf(tmp_ptr->device_type, sizeof(tmp_ptr->device_type), "%s", tmp_ptr1->dev_type);
+		snprintf(tmp_ptr->device_class, sizeof(tmp_ptr->device_class), "%s", tmp_ptr1->dev_class);
 		tmp_ptr->pn = tmp_ptr1->p_num;
 		tmp_ptr->vn = tmp_ptr1->v_num;
 	}
