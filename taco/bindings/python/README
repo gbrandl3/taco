@@ -4,7 +4,7 @@
 Attention: 
 	The class names has changed from "dev" to "TacoDevice"!!!
 
-This version contains less memory leaks a lot of bugs repaired and
+This version contains less memory leaks, a lot of bugs repaired, and
 some cleaned up source code. The functionality is the same as the first
 release. The class names have been changed corresponding to the TACO
 server modules for Python.
@@ -12,33 +12,24 @@ server modules for Python.
 
                         TACO Server in Python
                         =======================
-                          J.Meyer 15/7/2000
+                          J.Meyer 22/02/2005
 
 
 This directory contains the modules necessary to implement TACO device
 servers written in Python. To run these modules the device server libraries
-(libdsapi, libdbapi, libdsxdr and libdsxdr_all) must be available as 
+(libdsapinomain, libdbapi, libdcapi and libdsxdr_all) must be available as 
 shared libraries.
-
-INSTALLATION
-
-The Makefile assumes that the environment variable DSHOME is positioned to
-the home directory of the TACO installation i.e. where include and lib
-can be found. To make the shared library module simply type linuxmake.
 
 EXAMPLE
 
 Examples of device server classes written in Python and how to startup 
-such a device dserver are available in the demo directory.
-
-DOCUMENTATION
-
-Not yet available!
+such a device dserver are available in the 'demo' directory.
 
 TESTING
 
 To test a device server written in Python, set LD_LIBRARY_PATH to point to the
-TACO shared libraries. Set NETHOST to your favourite TACO NETHOST.
+TACO shared libraries. Set NETHOST to your favourite TACO NETHOST. Set the PYTHONPATH
+to point also to the TACO python bindings. 
 Load the device definitions to your resource database as commented in
 demo/Server_startup.py and run the startup script to create a server of the
 class MyServer! 
