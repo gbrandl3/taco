@@ -11,6 +11,10 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AM_PROG_LIBTOOL
 
+AC_ARG_ENABLE(compat, AC_HELP_STRING([--disable-compat], [disable compatibility mode to ndbm and dbm @<:@default=enabled@:>@]),
+	[], [enable_compat=yes])
+AM_CONDITIONAL(COMPAT, test "$enable_compat" = "yes")
+
 AC_C_CONST
 AC_CHECK_HEADERS([stdlib.h string.h sys/file.h unistd.h fcntl.h sys/types.h memory.y])
 AC_CHECK_LIB(dbm, main)
