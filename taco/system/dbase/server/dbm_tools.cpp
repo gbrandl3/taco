@@ -58,14 +58,12 @@ db_devinfo_svc *NdbmServer::devinfo_1_svc(nam *dev)
 #ifdef DEBUG
 	std::cout << "In devinfo_1_svc function for device " << *dev << std::endl;
 #endif
-
 	std::string user_device(*dev);
 
 //
 // Initialize parameter sent back to client and allocate memory for string
 // (bloody XDR)
 //
-
 	sent_back.db_err = 0;
 
 	sent_back.device_class = NULL;
@@ -966,17 +964,17 @@ db_info_svc *NdbmServer::info_1_svc()
 //
 // If the server is not connected to the database, return error
 //
-
 	if (dbgen.connected == False)
 	{
 		info_back.db_err = DbErr_DatabaseNotConnected;
 		return(&info_back);
 	}
 
+	dom_list.clear();
+	res_list.clear();
 //
 // First, count devices
 //
-
 	try 
 	{
 		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
@@ -1005,7 +1003,6 @@ db_info_svc *NdbmServer::info_1_svc()
 //
 // Now, count pseudo_devices
 //
-
 		for (key = gdbm_firstkey(dbgen.tid[dbgen.ps_names_index]);
 		     key.dptr != NULL;
 		     key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key))
