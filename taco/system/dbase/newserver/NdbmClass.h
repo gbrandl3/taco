@@ -4,17 +4,10 @@
 #include <API.h>
 #include <db_xdr.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-#ifdef DBM_FETCH_VOID
-#include <ndbm.h>
-#else
-#include <ndbm_ansi.h>
-#endif
-#ifdef __cplusplus
-}
-#endif
+#include <gdbm.h>
+
+#define gdbm_error(dbf) 	(0)
+#define gdbm_clearerr(dbf)
 
 #include <vector>
 #include <string>
@@ -51,7 +44,7 @@ class NdbmNamesCont
 {
 public:
     NdbmNamesCont();
-    NdbmNamesCont(DBM *,datum);
+    NdbmNamesCont(GDBM_FILE, datum);
 
     ~NdbmNamesCont();
 
@@ -109,7 +102,7 @@ class NdbmPSNamesCont
 {
 public:
     NdbmPSNamesCont();
-    NdbmPSNamesCont(DBM *,datum);
+    NdbmPSNamesCont(GDBM_FILE, datum);
 
     ~NdbmPSNamesCont();
 
@@ -159,7 +152,7 @@ class NdbmResCont
 {
 public:
     NdbmResCont();
-    NdbmResCont(DBM *,datum);
+    NdbmResCont(GDBM_FILE, datum);
 
     ~NdbmResCont();
 
@@ -330,7 +323,7 @@ long cmp_nocase(string &,string &);
 // Define some structures
 
 typedef struct _NdbmInfo {
-	DBM		*tid[MAXDOMAIN];
+	GDBM_FILE	tid[MAXDOMAIN];
 	vector<string>	TblName;
 	long		TblNum;
 	long		ps_names_index;

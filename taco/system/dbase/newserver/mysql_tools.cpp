@@ -127,7 +127,6 @@ db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
 	    }
 	    else
 	    {		
-	    	dbm_clearerr(dbgen.tid[0]);
 	    	sent_back.db_err = DbErr_DatabaseAccess;
 	    	return(&sent_back);
 	    }
@@ -136,7 +135,6 @@ db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
     }
     else
     {			
-	dbm_clearerr(dbgen.tid[0]);
 	sent_back.db_err = DbErr_DatabaseAccess;
 	return(&sent_back);			
     }

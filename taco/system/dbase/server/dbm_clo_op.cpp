@@ -59,7 +59,7 @@ int *db_clodb_1_svc()
 /* Disconnect server from database files */
 
 	for (i = 0;i < dbgen.TblNum;i++)
-		dbm_close(dbgen.tid[i]);
+		gdbm_close(dbgen.tid[i]);
 	dbgen.connected = False;
 
 /* Leave server */
@@ -138,7 +138,7 @@ int *db_reopendb_1_svc()
 			return(&errcode);
 		}
 
-		dbgen.tid[i] = dbm_open((char *)dbm_file.c_str(), flags, 0666);
+		dbgen.tid[i] = gdbm_open((char *)dbm_file.c_str(), 0, flags, 0666, NULL);
 		if (dbgen.tid[i] == NULL)
 		{
 			cerr <<"dbm_server : Can't open " << dbgen.TblName[i] << " table"; 

@@ -309,7 +309,7 @@ int db_find(char *tab_name,char *p_res_name,char **out,char **adr_tmp1,int *k1)
 	char *temp, *tmp;
 	int k,sec_res;
 	int ctr = 0;
-	DBM *tab;
+	GDBM_FILE	tab;
 	datum key;
 	datum resu, resu_out;
 	int res_numb = 1;
@@ -412,7 +412,7 @@ int db_find(char *tab_name,char *p_res_name,char **out,char **adr_tmp1,int *k1)
 		key.dsize = strlen(key.dptr);
 
 
-		resu = dbm_fetch(tab, key);                                 
+		resu = gdbm_fetch(tab, key);                                 
 		if (resu.dptr != NULL)
 		{
 			strncpy(resu_out.dptr, resu.dptr, resu.dsize);
@@ -617,7 +617,7 @@ int db_devlist(char *dev_na,int *dev_num,db_res *back)
 		strcat(key.dptr,"|");
 		key.dsize = strlen(key.dptr);
 
-		resu = dbm_fetch(dbgen.tid[0], key);                                 
+		resu = gdbm_fetch(dbgen.tid[0], key);                                 
 
 		if (resu.dptr != NULL)
 		{
@@ -739,7 +739,7 @@ int *db_putres_1_svc(tab_putres *rece)
 	char ind_name[20];
 	char numb[20];
 	unsigned int ctr;
-	DBM *tab;
+	GDBM_FILE 	tab;
 	datum key;
 	datum content;
 	reso ret;
@@ -850,7 +850,7 @@ int *db_putres_1_svc(tab_putres *rece)
 /* Delete the old information (single or array) if the array already exists */
 
 
-		while(( dbm_delete(tab, key)) == 0)
+		while(( gdbm_delete(tab, key)) == 0)
 		{
 			res_numb++;
 			ret_res = 1;
@@ -908,9 +908,9 @@ int *db_putres_1_svc(tab_putres *rece)
 				content.dsize = strlen(content.dptr);
 				res_numb++;
 				tmp = temp;
-				flags = DBM_INSERT;
+				flags = GDBM_INSERT;
 
-				if (dbm_store(tab, key, content, flags))
+				if (gdbm_store(tab, key, content, flags))
 				{
 					sent_back = DbErr_DatabaseAccess;
 					free(key.dptr);
@@ -935,8 +935,8 @@ int *db_putres_1_svc(tab_putres *rece)
 			key.dsize = strlen(key.dptr);
 			res_numb++;
 
-			flags = DBM_INSERT;
-			if (dbm_store(tab, key, content, flags))
+			flags = GDBM_INSERT;
+			if (gdbm_store(tab, key, content, flags))
 			{
 				sent_back = DbErr_DatabaseAccess;
 				free(key.dptr);
@@ -966,9 +966,9 @@ int *db_putres_1_svc(tab_putres *rece)
 
 				strcpy(content.dptr, tmp_ptr->res_val);
 				content.dsize = strlen(content.dptr);
-				flags = DBM_REPLACE;
+				flags = GDBM_REPLACE;
 
-				if (dbm_store(tab, key, content, flags))
+				if (gdbm_store(tab, key, content, flags))
 				{ 
 					sent_back = DbErr_DatabaseAccess;
 					free(key.dptr);
@@ -995,9 +995,9 @@ int *db_putres_1_svc(tab_putres *rece)
 
 				strcpy(content.dptr, tmp_ptr->res_val);
 				content.dsize = strlen(content.dptr);
-				flags = DBM_INSERT;
+				flags = GDBM_INSERT;
 
-				if (dbm_store(tab, key, content, flags))
+				if (gdbm_store(tab, key, content, flags))
 				{ 
 					sent_back = DbErr_DatabaseAccess;
 					free(key.dptr);
@@ -1160,7 +1160,7 @@ int db_del(char *res_name,char **p_oldres)
 	int ctr = 0;
 	char *tmp_buf;
 	datum resu,key;
-	DBM *tab;
+	GDBM_FILE	tab;
 	int res_numb = 1;
 	int err;
 	int exit = 0;
@@ -1255,7 +1255,7 @@ int db_del(char *res_name,char **p_oldres)
         	strcat(key.dptr,"|");
         	key.dsize = strlen(key.dptr);
 	
-		resu = dbm_fetch(tab,key);
+		resu = gdbm_fetch(tab,key);
 		if (resu.dptr != NULL)
 		{
 			if (ctr)
@@ -1287,7 +1287,7 @@ int db_del(char *res_name,char **p_oldres)
 
 /* Remove the tuple from database */
 
-			dbm_delete(tab,key);
+			gdbm_delete(tab,key);
 			ctr++;
 			res_numb++;
 		}
@@ -1296,10 +1296,10 @@ int db_del(char *res_name,char **p_oldres)
 
 /* Is it an error or simply the data does not exist in the database */
 
-			err = dbm_error(tab);
+			err = gdbm_error(tab);
 			if (err != 0)
 			{
-				dbm_clearerr(tab);
+				gdbm_clearerr(tab);
 				error = True;
 			}
 			exit = 1;
@@ -1448,7 +1448,7 @@ int i;
 /* Close database */
 
 	for (i = 0;i < dbgen.TblNum;i++) 
-		dbm_close(dbgen.tid[i]);
+		gdbm_close(dbgen.tid[i]);
 
 /* Exit now */
 

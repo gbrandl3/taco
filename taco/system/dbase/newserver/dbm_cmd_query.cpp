@@ -27,7 +27,7 @@ cmd_que *NdbmServer::db_cmd_query_1_svc(nam *pcmd_name)
 {
     int 		i;
     bool		found;
-    DBM 		*tab;
+    GDBM_FILE 		tab;
     string 		fam,
     			memb,
     			r_name,
@@ -73,9 +73,9 @@ cmd_que *NdbmServer::db_cmd_query_1_svc(nam *pcmd_name)
 // to the command name 
 //
     datum 	key;
-    for (key = dbm_firstkey(tab); key.dptr != NULL; key = dbm_nextkey(tab))
+    for (key = gdbm_firstkey(tab); key.dptr != NULL; key = gdbm_nextkey(tab, key))
     {
-	datum	content = dbm_fetch(tab,key);
+	datum	content = gdbm_fetch(tab,key);
 	if (content.dptr == NULL)
 	{
 	    cmd_queue.db_err = DbErr_DatabaseAccess;

@@ -18,4 +18,4 @@ dbm_server_SOURCES =NdbmClass.cpp \
 		dbm_event_query.cpp
 
 INCLUDES= -DNDBM @TACO_GDBM_INC@ @TACO_INCLUDES@ 
-dbm_server_LDADD= @TACO_SERVER_LIBS@ @TACO_GDBM@
+dbm_server_LDADD= @TACO_SERVER_LIBS@ @TACO_GDBM_LDFLAGS@ @TACO_GDBM_LIBS@

@@ -96,7 +96,7 @@ void un_register_prog(int signo)
 /* Added code to close database */
 
 	for (int i=0;i<dbgen.TblNum;i++) 
-		dbm_close(dbgen.tid[i]);
+		gdbm_close(dbgen.tid[i]);
 
 	exit(1);
 }
@@ -130,17 +130,18 @@ void default_sig(int signo)
 
 int main(int argc,char **argv)
 {
-	SVCXPRT *transp_udp;
-	SVCXPRT *transp_tcp;
-	struct sockaddr_in so;
-	int flags;
-	char *ptr;
-	int i,j;
-	char hostna[32];
-	struct sigaction sighand;
+	SVCXPRT 		*transp_udp;
+	SVCXPRT 		*transp_tcp;
+	struct sockaddr_in 	so;
+	int 			flags = GDBM_WRCREAT; // O_RDWR; 
+	char 			*ptr;
+	int 			i,
+				j;
+	char 			hostna[32];
+	struct sigaction 	sighand;
 #ifdef sun
-	struct hostent *host;
-	unsigned long *ptmp_long;
+	struct hostent 		*host;
+	unsigned long 		*ptmp_long;
 #endif
  
 #ifndef ALONE
@@ -173,10 +174,7 @@ int main(int argc,char **argv)
 	sigaction(SIGVTALRM,&sighand,NULL);
 	sigaction(SIGPROF,&sighand,NULL);
 	
-	flags = O_RDWR;
-
 /* Find the dbm_database table names */        
-
 	if ((ptr = (char *)getenv("DBTABLES")) == NULL)
 	{
 		cerr << "dbm_server: Can't find environment variable DBTABLES" << endl;
@@ -184,21 +182,16 @@ int main(int argc,char **argv)
 	}
 	
 /* Change database table names to lowercase letter names */
-
 	for (i = 0;i < strlen(ptr);i++)
-	{
 		ptr[i] = tolower(ptr[i]);
-	}
 
 /* Automatically add a names and a ps_names tables */
-
 	dbgen.TblName[0] = "names";
 	dbgen.TblName[1] = "ps_names";
 	dbgen.ps_names_index = 1;
 	dbgen.TblNum = 2;
 		
 /* Extract each table name */
-
 	string dbtables(ptr);
 	string::size_type pos,start;
 
@@ -223,7 +216,6 @@ int main(int argc,char **argv)
 	dbgen.TblNum++;
 
 /* Find the dbm_database files */        
-
 	if ((ptr = (char *)getenv("DBM_DIR")) == NULL)
 	{
 		cerr << "dbm_server: Can't find environment variable DBM_DIR" << endl;
@@ -244,32 +236,30 @@ int main(int argc,char **argv)
 		dbm_file.append(dbgen.TblName[i]);
 
 		string uni_file(dbm_file);
-		uni_file.append(".dir");
-
+//		uni_file.append(".dir");
+/*
 		ifstream fi(uni_file.c_str());
 		if (!fi)
 		{
 			cerr << "dbm_server : Can't find file " << uni_file << endl;
 			exit(-1);	
 		}
-
-		dbgen.tid[i] = dbm_open((char *)dbm_file.c_str(), flags, 0666);
+*/
+		dbgen.tid[i] = gdbm_open((char *)dbm_file.c_str(), 0, flags, 0666, NULL);
 		if (dbgen.tid[i] == NULL)
 		{
 			cerr <<"dbm_server : Can't open " << dbgen.TblName[i] << " table" << endl; 
 			for (long j = 0;j < i;j++)
-				dbm_close(dbgen.tid[i]);
+				gdbm_close(dbgen.tid[i]);
 			exit(-1);	
 		}		
 	}
 
 /* Mark the server as connected to the database */
-
 	dbgen.connected = True;
 
 
 /* RPC business !!!!!!!!!!!!!!!!!!!! */
-
 #ifdef ALONE
 	transp_udp = svcudp_create(RPC_ANYSOCK);
 
@@ -280,12 +270,12 @@ int main(int argc,char **argv)
 #else
 /* Added code to manage transient program number and to get host name*/
 
-        /* M. Diehl, 15.11.99
-         * Use new gettransient() interface. Use some program description
-         * to create the hash value. This will prevent conflicts with
-         * message server. When both programms try to register numbers
-         * beginning at a common base leading to a race condition!
-         */
+/* M. Diehl, 15.11.99
+ * Use new gettransient() interface. Use some program description
+ * to create the hash value. This will prevent conflicts with
+ * message server. When both programms try to register numbers
+ * beginning at a common base leading to a race condition!
+ */
          
   	pgnum = gettransient("DatabaseServer");
   	

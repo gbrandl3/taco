@@ -23,17 +23,7 @@
 
 #include <fcntl.h>
 #include "config.h"
-#ifdef __cplusplus
-extern "C" {
-#endif
-#ifdef DBM_FETCH_VOID
-#include <ndbm.h>
-#else
-#include <ndbm_ansi.h>
-#endif
-#ifdef __cplusplus
-}
-#endif
+#include <gdbm.h>
 
 /* Function definitions */
 
@@ -52,7 +42,7 @@ static void 	leave(void);
 
 /* Global variables definitions */
 
-std::vector<DBM *>		tid;
+std::vector<GDBM_FILE>		tid;
 int 				line_ptr;
 char 				sec_first = TRUE;
 std::vector<std::string> 	tblName;
@@ -168,18 +158,18 @@ static int from_res(void)
 /* Create the database tables */
 	create_db();
 
-	flags = O_RDWR;
+	flags = GDBM_WRITER; // O_RDWR;
 
 /* Open database tables of the database */
 	int i = 0;
 	for (std::vector<std::string>::iterator it = tblName.begin(); it != tblName.end(); it++)
 	{
 		std::string dbm_file = dbm_dir + *it;
-		DBM	*t;
-		t = dbm_open(const_cast<char *>(dbm_file.c_str()), flags, 0666);
+		GDBM_FILE	t;
+		t = gdbm_open(const_cast<char *>(dbm_file.c_str()), 0, flags, 0666, NULL);
 		if (t == NULL)
 		{
-	   		 std::cerr << "db_fillup : Can't open " << tblName[i] << " table" << std::endl;
+	   		std::cerr << "db_fillup : Can't open " << tblName[i] << " table" << std::endl;
 			leave();
 		}
 		tid.push_back(t);
@@ -229,8 +219,8 @@ static int from_res(void)
 	}
 
 /* Close database */
-	for (std::vector<DBM *>::iterator it = tid.begin(); it < tid.end(); ++it)
-		dbm_close(*it);
+	for (std::vector<GDBM_FILE>::iterator it = tid.begin(); it < tid.end(); ++it)
+		gdbm_close(*it);
 	tid.clear();
 	return fclose(file);
 }
@@ -592,18 +582,18 @@ static int dev_name(const std::string line, int numb)
 	key_sto.dptr = (char *)malloc(MAX_KEY); 
 
 /* Go through the table to detect any double instance */
-	std::vector<DBM *>::iterator 	t = tid.begin();
-	for (key = dbm_firstkey(*t); key.dptr != NULL;key = dbm_nextkey(*t))
+	std::vector<GDBM_FILE>::iterator 	t = tid.begin();
+	for (key = gdbm_firstkey(*t); key.dptr != NULL;key = gdbm_nextkey(*t, key))
 	{
 		strncpy(keyr,key.dptr,key.dsize);
 		keyr[key.dsize] = '\0';
 		strncpy(key_sto.dptr, key.dptr, key.dsize);
 		key_sto.dsize = key.dsize;
 	
-		ret = dbm_fetch(*t, key_sto);
+		ret = gdbm_fetch(*t, key_sto);
 		if (ret.dptr == NULL)
 		{
-	    		std::cerr << "db_fillup: Error in dbm_fetch for " << key.dptr << std::endl;
+	    		std::cerr << "db_fillup: Error in gdbm_fetch for " << key.dptr << std::endl;
 			return(ERR_DEVNAME);
 		}
 		
@@ -670,9 +660,9 @@ static int dev_name(const std::string line, int numb)
 
 	content.dsize = strlen(content.dptr);	
 
-	int flags = DBM_INSERT,
+	int flags = GDBM_INSERT,
 	i;
-	if ((i = dbm_store(*t, keyn, content, flags)) != 0)
+	if ((i = gdbm_store(*t, keyn, content, flags)) != 0)
 	{
 		std::cerr << "db_fillup : Can't insert a" 
 	     		<< ((i == 1) ?  " double " : "n erroneous")
@@ -879,7 +869,7 @@ static int rs_val(std::string lin, int ind)
 	unsigned int 	diff;
 	register char 	*temp,
 			*tmp;
-	DBM 		*tab;
+	GDBM_FILE 	tab;
 	datum		key, 
 			content;
 	static int 	res_pas;
@@ -1033,8 +1023,8 @@ static int rs_val(std::string lin, int ind)
 	content.dsize = strlen(res.r_val);
 
 /* Insert tuple in tables */
-	int flags = DBM_INSERT;
-	if ((i = dbm_store(tab, key, content, flags)) != 0) 
+	int flags = GDBM_INSERT;
+	if ((i = gdbm_store(tab, key, content, flags)) != 0) 
 	{
 		std::cerr << "db_fillup : Can't insert a"
 	     		<< ((i == 1) ? " double" : "n erroneous")
@@ -1078,7 +1068,7 @@ static int ask_passwd()
                         return(0);
                 else
 		{
-			std::cerr << "dbm_update : Can't get passwd information" << std::endl;
+			std::cerr << "gdbm_update : Can't get passwd information" << std::endl;
                         return(-1);
 		}
 	}
@@ -1086,7 +1076,7 @@ static int ask_passwd()
 /* There is one password, so ask it to the user */
 	if ((user_pas = (char *)getpass("Security passwd : ")) == NULL)
 	{
-		std::cerr << "dbm_update : Can't get user passwd" << std::endl;
+		std::cerr << "gdbm_update : Can't get user passwd" << std::endl;
 		return(-1);
 	}
 
@@ -1094,7 +1084,7 @@ static int ask_passwd()
 	std::ifstream 	file_sec(f_name.c_str());
 	if (!file_sec)
 	{
-        	std::cerr << "dbm_update : Can't get passwd information" << std::endl;
+        	std::cerr << "gdbm_update : Can't get passwd information" << std::endl;
                 return(-1);
 	}
 	file_sec.getline(file_pas,sizeof(file_pas));
@@ -1102,7 +1092,7 @@ static int ask_passwd()
 /* Compare the two passwd */
 	if (user_pas == file_pas)
 	{
-		std::cerr << "dbm_update : Sorry, bad passwd. The security resources will not be updated" << std::endl;
+		std::cerr << "gdbm_update : Sorry, bad passwd. The security resources will not be updated" << std::endl;
 		file_sec.close();
 		return(-1);
 	}
@@ -1218,7 +1208,7 @@ static void create_db(void)
 /* Create database tables of the database definition */
 
 #if defined(linux)
-    	int flags = O_CREAT | O_RDWR;
+    	int flags = GDBM_WRCREAT; // O_CREAT | O_RDWR;
 #else
     	int flags = O_CREAT;
 #endif
@@ -1229,9 +1219,9 @@ static void create_db(void)
 	umask(0);
     	for (std::vector<std::string>::iterator it = tblName.begin(); it != tblName.end(); it++)
 	{
-		DBM	*t;
+		GDBM_FILE	t;
 		dbm_file = res_dir + *it;
-		t = dbm_open(const_cast<char *>(dbm_file.c_str()), flags, mode);
+		t = gdbm_open(const_cast<char *>(dbm_file.c_str()), 0, flags, mode, NULL);
 		if (t == NULL)
 		{
 	    		std::cerr <<"db_fillup : Can't create " << *it << " table" << std::endl;
@@ -1242,8 +1232,8 @@ static void create_db(void)
 	
 
 /* And now close the db_files */
-	for (std::vector<DBM *>::iterator it = tid.begin(); it != tid.end(); it++)
-		dbm_close(*it);
+	for (std::vector<GDBM_FILE>::iterator it = tid.begin(); it != tid.end(); it++)
+		gdbm_close(*it);
 	tid.clear();
 	return;
 }
@@ -1255,9 +1245,9 @@ static void create_db(void)
 static void leave(void)
 {
 /* Close the database  */
-	for (std::vector<DBM *>::iterator it = tid.begin(); it != tid.end(); it++)
+	for (std::vector<GDBM_FILE>::iterator it = tid.begin(); it != tid.end(); it++)
 		if (*it != NULL)
-			dbm_close(*it);
+			gdbm_close(*it);
 /* Exit now */
 	exit(-1);
 }

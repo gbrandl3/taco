@@ -119,14 +119,14 @@ db_res *NdbmServer::resfamilylist_1_svc(nam* domain)
 //
     try
     {
-	for (datum key = dbm_firstkey(dbgen.tid[i]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[i]))
+	for (datum key = gdbm_firstkey(dbgen.tid[i]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[i], key))
 	{
 	    NdbmResKey reskey(key);
 	    fam_list.add_if_new(reskey.get_res_fam_name());
 	}
-	if (dbm_error(dbgen.tid[i]) != 0)
+	if (gdbm_error(dbgen.tid[i]) != 0)
 	{			
-	    dbm_clearerr(dbgen.tid[i]);
+	    gdbm_clearerr(dbgen.tid[i]);
 	    browse_back.db_err = DbErr_DatabaseAccess;
 	    return(&browse_back);
 	}
@@ -219,7 +219,7 @@ db_res *NdbmServer::resmemberlist_1_svc(db_res *recev)
 //
     try
     {
-	for (datum key = dbm_firstkey(dbgen.tid[i]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[i]))
+	for (datum key = gdbm_firstkey(dbgen.tid[i]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[i], key))
 	{
 	    NdbmResKey reskey(key);
 			
@@ -227,9 +227,9 @@ db_res *NdbmServer::resmemberlist_1_svc(db_res *recev)
 		continue;
 	    memb_list.add_if_new(reskey.get_res_memb_name());
 	}
-	if (dbm_error(dbgen.tid[i]) != 0)
+	if (gdbm_error(dbgen.tid[i]) != 0)
 	{			
-	    dbm_clearerr(dbgen.tid[i]);
+	    gdbm_clearerr(dbgen.tid[i]);
 	    browse_back.db_err = DbErr_DatabaseAccess;
 	    return(&browse_back);
 	}
@@ -324,7 +324,7 @@ db_res *NdbmServer::resresolist_1_svc(db_res *recev)
 //
     try
     {
-	for (datum key = dbm_firstkey(dbgen.tid[i]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[i]))
+	for (datum key = gdbm_firstkey(dbgen.tid[i]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[i], key))
 	{
 	    NdbmResKey reskey(key);
 			
@@ -336,9 +336,9 @@ db_res *NdbmServer::resresolist_1_svc(db_res *recev)
 		continue;
 	    reso_list.add_if_new(reskey.get_res_name());
 	}
-	if (dbm_error(dbgen.tid[i]) != 0)
+	if (gdbm_error(dbgen.tid[i]) != 0)
 	{			
-	    dbm_clearerr(dbgen.tid[i]);
+	    gdbm_clearerr(dbgen.tid[i]);
 	    browse_back.db_err = DbErr_DatabaseAccess;
 	    return(&browse_back);
 	}
@@ -457,7 +457,7 @@ db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 //
     try
     {
-	for (datum key = dbm_firstkey(dbgen.tid[i]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[i]))
+	for (datum key = gdbm_firstkey(dbgen.tid[i]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[i], key))
 	{
 	    NdbmResKey 	reskey(key);
 
@@ -472,9 +472,9 @@ db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 		continue;
 	    memb_res_list.add(memb, resource);
 	}
-	if (dbm_error(dbgen.tid[i]) != 0)
+	if (gdbm_error(dbgen.tid[i]) != 0)
 	{			
-	    dbm_clearerr(dbgen.tid[i]);
+	    gdbm_clearerr(dbgen.tid[i]);
 	    browse_back.db_err = DbErr_DatabaseAccess;
 	    return(&browse_back);
 	}
@@ -530,9 +530,9 @@ db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 	    {
 		if (seq == 1)
 		{
-		    if (dbm_error(dbgen.tid[i]) != 0)
+		    if (gdbm_error(dbgen.tid[i]) != 0)
 		    {
-			dbm_clearerr(dbgen.tid[i]);			
+			gdbm_clearerr(dbgen.tid[i]);			
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);
 		    }
@@ -544,9 +544,9 @@ db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 		}
 		else
 		{
-		    if (dbm_error(dbgen.tid[i]) != 0)
+		    if (gdbm_error(dbgen.tid[i]) != 0)
 		    {
-			dbm_clearerr(dbgen.tid[i]);			
+			gdbm_clearerr(dbgen.tid[i]);			
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);
 		    }

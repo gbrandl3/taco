@@ -138,7 +138,7 @@ db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 // different than "not_exp" 
 //
     key_sto.dptr = new char[MAX_KEY];
-    key = dbm_firstkey(dbgen.tid[0]);
+    key = gdbm_firstkey(dbgen.tid[0]);
     if (key.dptr == NULL)
     {
 	delete [] key_sto.dptr;
@@ -155,7 +155,7 @@ db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 	strncpy(key_sto.dptr, key.dptr, key.dsize);
 	key_sto.dptr[key.dsize] = '\0';
 	key_sto.dsize = key.dsize;
-	content = dbm_fetch(dbgen.tid[0], key);
+	content = gdbm_fetch(dbgen.tid[0], key);
 
 	if (content.dptr != NULL)
 	{
@@ -247,7 +247,7 @@ db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 		} 
 	    } 
 	} 
-	key = dbm_nextkey(dbgen.tid[0]);
+	key = gdbm_nextkey(dbgen.tid[0], key);
     } 
     while (key.dptr != NULL);
 //

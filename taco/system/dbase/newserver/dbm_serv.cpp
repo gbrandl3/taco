@@ -272,7 +272,7 @@ int NdbmServer::db_find(const string tab_name, const string res_name, char **out
     int 		k,
 			ctr = 0;
     bool		sec_res = (tab_name == "sec");
-    DBM 		*tab;
+    GDBM_FILE 		tab;
     datum 		key,
 			resu;
     int 		res_numb = 1;
@@ -345,7 +345,7 @@ int NdbmServer::db_find(const string tab_name, const string res_name, char **out
 #endif
 	key.dsize = strlen(key.dptr);
 
-	resu = dbm_fetch(tab, key);
+	resu = gdbm_fetch(tab, key);
 	if (resu.dptr != NULL)
 	{
 	    string	resu_out(resu.dptr, resu.dsize);
@@ -479,7 +479,7 @@ int NdbmServer::db_devlist(const string dev_name, db_res * back)
 #endif
 	key.dsize = strlen(key.dptr);
 
-	resu = dbm_fetch(dbgen.tid[0], key);
+	resu = gdbm_fetch(dbgen.tid[0], key);
 	if (resu.dptr != NULL)
 	{
 //
@@ -574,7 +574,7 @@ DevLong *NdbmServer::db_putres_1_svc(tab_putres * rece)
     		member,
     		r_name;
     unsigned int ctr;
-    DBM 	*tab;
+    GDBM_FILE 	tab;
     datum 	key,
     		content;
     int 	res_numb = 1;
@@ -676,7 +676,7 @@ DevLong *NdbmServer::db_putres_1_svc(tab_putres * rece)
         	strcpy(key.dptr, s.str().c_str());
 #endif
 	        key.dsize = strlen(key.dptr);
-	        if (dbm_delete(tab, key))
+	        if (gdbm_delete(tab, key))
 		    break;  
 	        res_numb++;
 	        ret_res = 1;
@@ -721,7 +721,7 @@ DevLong *NdbmServer::db_putres_1_svc(tab_putres * rece)
 		    strcpy(content.dptr, tmp.substr(0, pos).c_str());
 		    content.dsize = strlen(content.dptr);
 		    res_numb++;
-		    if (dbm_store(tab, key, content, DBM_INSERT))
+		    if (gdbm_store(tab, key, content, GDBM_INSERT))
 		    	throw long(DbErr_DatabaseAccess);
 	    	}
 //
@@ -742,7 +742,7 @@ DevLong *NdbmServer::db_putres_1_svc(tab_putres * rece)
 #endif
 	    	key.dsize = strlen(key.dptr);
 	    	res_numb++;
-	    	if (dbm_store(tab, key, content, DBM_INSERT))
+	    	if (gdbm_store(tab, key, content, GDBM_INSERT))
 		    throw long(DbErr_DatabaseAccess);
 	    }
 	    else
@@ -766,7 +766,7 @@ DevLong *NdbmServer::db_putres_1_svc(tab_putres * rece)
 // If the resource is already defined in the database, just update the tuple or
 // insert a new tuple 
 //
-		if (dbm_store(tab, key, content, ret_res ? DBM_REPLACE : DBM_INSERT))
+		if (gdbm_store(tab, key, content, ret_res ? GDBM_REPLACE : GDBM_INSERT))
 		    throw long(DbErr_DatabaseAccess);
 	    }			
 	}			// end of for for every resource 
@@ -906,7 +906,7 @@ int NdbmServer::db_del(string res_name, char **p_oldres)
 			err;
     static string	tmp_buf;
     datum 		key;
-    DBM 		*tab;
+    GDBM_FILE 		tab;
 //
 // Get table name 
 //
@@ -988,7 +988,7 @@ int NdbmServer::db_del(string res_name, char **p_oldres)
 #endif
 	key.dsize = strlen(key.dptr);
 
-	datum resu = dbm_fetch(tab, key);
+	datum resu = gdbm_fetch(tab, key);
 	if (resu.dptr != NULL)
 	{
 	    if (ctr)
@@ -1008,7 +1008,7 @@ int NdbmServer::db_del(string res_name, char **p_oldres)
 //
 // Remove the tuple from database 
 //
-	    dbm_delete(tab, key);
+	    gdbm_delete(tab, key);
 	    ctr++;
 	    res_numb++;
 	}
@@ -1017,9 +1017,9 @@ int NdbmServer::db_del(string res_name, char **p_oldres)
 //
 // Is it an error or simply the data does not exist in the database 
 //
-	    if ((err = dbm_error(tab)) != 0)
+	    if ((err = gdbm_error(tab)) != 0)
 	    {
-		dbm_clearerr(tab);
+		gdbm_clearerr(tab);
 		return (DbErr_DatabaseAccess);
 	    }
 	    break;
@@ -1139,7 +1139,7 @@ void NdbmServer::leave(void)
 // Close database 
 //
     for (int i = 0; i < dbgen.TblNum; i++)
-	dbm_close(dbgen.tid[i]);
+	gdbm_close(dbgen.tid[i]);
 //
 // Exit now 
 //

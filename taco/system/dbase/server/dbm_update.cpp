@@ -197,7 +197,7 @@ static long upd_name(char *lin,char *ptr,int ind,long last,long *p_err)
 	register char *temp,*tmp, *tbeg;
 	int i,l;
 	int flags;
-	DBM *tup;
+	GDBM_FILE	tup;
 	static datum key, key_sto, key_sto2, key_2;
 	static datum resu, content, cont_sto;
 	static int ndev;
@@ -385,12 +385,12 @@ static long upd_name(char *lin,char *ptr,int ind,long last,long *p_err)
 		cout << "Insert tuple in NAMES table" << endl;
 #endif /* DEBUG */
 
-		flags = DBM_INSERT;
+		flags = GDBM_INSERT;
 
 		key_sto2 = key_sto;
 		cont_sto = content;
 
-		if ((i = dbm_store(dbgen.tid[0],key_sto2,cont_sto,flags)) != 0)
+		if ((i = gdbm_store(dbgen.tid[0],key_sto2,cont_sto,flags)) != 0)
 		{
 			free(content.dptr);
 			free(key_2.dptr);
@@ -488,11 +488,11 @@ static long del_name(device *devi,int *pndev,char *ptr,dena **buf,long *p_err)
 
 /* Try to get data out of database */
 
-		content = dbm_fetch(dbgen.tid[0],key);
+		content = gdbm_fetch(dbgen.tid[0],key);
 
 		if (content.dptr == NULL)
 		{
-			if (dbm_error(dbgen.tid[0]) == 0)
+			if (gdbm_error(dbgen.tid[0]) == 0)
 				exit_loop = True;
 			else
 			{
@@ -567,7 +567,7 @@ static long del_name(device *devi,int *pndev,char *ptr,dena **buf,long *p_err)
 
 /* Delete database entry */
 
-			dbm_delete(dbgen.tid[0],key);
+			gdbm_delete(dbgen.tid[0],key);
 			seq++;
 		}
 	}while (exit_loop == False);
@@ -621,7 +621,7 @@ static long del_name(device *devi,int *pndev,char *ptr,dena **buf,long *p_err)
 				key.dptr = ptr_dev[j].key_buf;
 				key.dsize = strlen(ptr_dev[j].key_buf);
 				
-				dbm_delete(dbgen.tid[0],key);
+				gdbm_delete(dbgen.tid[0],key);
 				if (update_dev_list(&(ptr_dev[j].dev_info),ptr_dev[j].seq + 1) == ERR_DEVNAME)
 				{
 					free(ptr_dev);
@@ -680,7 +680,7 @@ static long is_dev_in_db(db_dev_in_db *ptr,long nb_dev)
 	device dev;
 	long j;
 	
-	for (key = dbm_firstkey(dbgen.tid[0]); key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+	for (key = gdbm_firstkey(dbgen.tid[0]); key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
 	{
 
 /* Extract dserver name */
@@ -725,7 +725,7 @@ static long is_dev_in_db(db_dev_in_db *ptr,long nb_dev)
 
 /* Get db content */
 
-		content = dbm_fetch(dbgen.tid[0], key);
+		content = gdbm_fetch(dbgen.tid[0], key);
 		if (content.dptr != NULL)
 		{
 			tend = strchr(content.dptr,'|');
@@ -810,10 +810,10 @@ cout << "before loop in update-dev_list function" << endl;
 
 /* Tried to get data from the database */
 
-		content = dbm_fetch(dbgen.tid[0],key);
+		content = gdbm_fetch(dbgen.tid[0],key);
 		if (content.dptr == NULL)
 		{
-			if (dbm_error(dbgen.tid[0]) == 0)
+			if (gdbm_error(dbgen.tid[0]) == 0)
 				exit_loop = True;
 			else
 			{
@@ -830,7 +830,7 @@ cout << "before loop in update-dev_list function" << endl;
 
 /* Delete the entry and store a new one with a modifed sequence field */
 
-			if (dbm_delete(dbgen.tid[0],key) != 0)
+			if (gdbm_delete(dbgen.tid[0],key) != 0)
 			{
 	   			return(ERR_DEVNAME);
 			}
@@ -845,7 +845,7 @@ cout << "before loop in update-dev_list function" << endl;
 			content.dptr = cont_sto;
 			content.dsize = strlen(cont_sto);
 
-			if (dbm_store(dbgen.tid[0],key,content,DBM_INSERT) != 0)
+			if (gdbm_store(dbgen.tid[0],key,content,GDBM_INSERT) != 0)
 			{
 	   			return(ERR_DEVNAME);
 			}
@@ -1032,7 +1032,7 @@ static long upd_res(char *lin,long numb,char array,long *p_err)
 	register char *temp,*tmp;
 	int i,l,resu;
 	int flags;
-	static DBM *tab;
+	static GDBM_FILE	tab;
 	datum key;
 	datum content;
 	char ind_name[20];
@@ -1189,14 +1189,14 @@ static long upd_res(char *lin,long numb,char array,long *p_err)
 			strcat(key.dptr, "|");
 			key.dsize = strlen(key.dptr);
 
-			cont = dbm_fetch(tab,key);
+			cont = gdbm_fetch(tab,key);
 			if (cont.dptr == NULL)
 			{
-				if (dbm_error(tab) == 0)
+				if (gdbm_error(tab) == 0)
 					break;
 				else
 				{
-					dbm_clearerr(tab);
+					gdbm_clearerr(tab);
 					free(key.dptr);
 					free(content.dptr);
 					free(key_array.dptr);
@@ -1221,14 +1221,14 @@ static long upd_res(char *lin,long numb,char array,long *p_err)
 				strcat(key_array.dptr, "|2|");
 				key_array.dsize = strlen(key_array.dptr);
 
-				cont = dbm_fetch(tab,key_array);
+				cont = gdbm_fetch(tab,key_array);
 				if (cont.dptr == NULL)
 				{
-					if (dbm_error(tab) == 0)
+					if (gdbm_error(tab) == 0)
 						old_res_array = False;
 					else
 					{
-						dbm_clearerr(tab);
+						gdbm_clearerr(tab);
 						free(key.dptr);
 						free(content.dptr);
 						free(key_array.dptr);
@@ -1240,7 +1240,7 @@ static long upd_res(char *lin,long numb,char array,long *p_err)
 					old_res_array = True;
 			}
 
-			dbm_delete(tab,key);
+			gdbm_delete(tab,key);
 			res_numb++;
 		}
 
@@ -1268,9 +1268,9 @@ static long upd_res(char *lin,long numb,char array,long *p_err)
 
 	strcpy(content.dptr, res.r_val);
 	content.dsize = strlen(res.r_val);
-	flags = DBM_REPLACE;
+	flags = GDBM_REPLACE;
 
-	if ((i = dbm_store(tab,key,content,flags)) != 0)
+	if ((i = gdbm_store(tab,key,content,flags)) != 0)
 	{
 		if (i == 1)
 			*p_err = DbErr_DoubleTupleInRes;

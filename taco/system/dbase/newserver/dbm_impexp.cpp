@@ -286,7 +286,7 @@ db_resimp *NdbmServer::db_devimp_1_svc(arr1 *de_name)
 //
 // Try to retrieve the tuple in the NAMES table 
 //
-	key = dbm_firstkey(dbgen.tid[0]);
+	key = gdbm_firstkey(dbgen.tid[0]);
 	if (!key.dptr)
 	{
 	    delete [] back.imp_dev.tab_dbdev_val;
@@ -297,7 +297,7 @@ db_resimp *NdbmServer::db_devimp_1_svc(arr1 *de_name)
 
 	do
 	{
-	    content = dbm_fetch(dbgen.tid[0], key);
+	    content = gdbm_fetch(dbgen.tid[0], key);
 	    if (content.dptr)
 	    {
 		string 			temp = content.dptr;
@@ -480,7 +480,7 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
     do
     {
 	old_d_num = d_num;
-	for (key = dbm_firstkey(dbgen.tid[0]); key.dptr != NULL; key = dbm_nextkey(dbgen.tid[0]))
+	for (key = gdbm_firstkey(dbgen.tid[0]); key.dptr != NULL; key = gdbm_nextkey(dbgen.tid[0], key))
 	{
 //
 // Extract personal name and sequence field from key 
@@ -497,9 +497,9 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 //
 // Get db content 
 //
-	    content = dbm_fetch(dbgen.tid[0], key);
+	    content = gdbm_fetch(dbgen.tid[0], key);
 	    if (!content.dptr)
-		if (dbm_error(dbgen.tid[0]) != 0)
+		if (gdbm_error(dbgen.tid[0]) != 0)
 		{
 		    errcode = DbErr_DatabaseAccess;
 		    return(&errcode);
@@ -545,7 +545,7 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 	    key.dptr = const_cast<char *>(key_str.data());
 	    key.dsize = key_str.length();
 
-	    if (dbm_store(dbgen.tid[0], key, dev1, DBM_REPLACE))
+	    if (gdbm_store(dbgen.tid[0], key, dev1, GDBM_REPLACE))
 	    {
 		errcode = DbErr_DatabaseAccess;
 		return(&errcode);
@@ -581,7 +581,7 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 //
 // Try to retrieve the tuples 
 //
-	    content = dbm_fetch(dbgen.tid[0], key); 
+	    content = gdbm_fetch(dbgen.tid[0], key); 
 	    if (content.dptr)
 	    {
 		d_num++;
@@ -613,7 +613,7 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 		dev1.dptr = const_cast<char *>(dev_str.data());
 		dev1.dsize = dev_str.length();
 
-		if (dbm_store(dbgen.tid[0], key, dev1, DBM_REPLACE))
+		if (gdbm_store(dbgen.tid[0], key, dev1, GDBM_REPLACE))
 		{
 		    errcode = DbErr_DatabaseAccess;
 		    return(&errcode);
@@ -712,7 +712,7 @@ svc_inf *NdbmServer::db_svcchk_1_svc(nam *dsn_nam)
 //
 // Try to retrieve the tuples 
 //
-    content = dbm_fetch(dbgen.tid[0], key);                                
+    content = gdbm_fetch(dbgen.tid[0], key);                                
 
     if (!content.dptr)
     {
@@ -793,7 +793,7 @@ int NdbmServer::db_store(db_devinfo &dev_stu)
 	key_sto.dptr = new char[MAX_KEY];
 	cont_sto.dptr = new char[MAX_CONT];
 
-    	key = dbm_firstkey(dbgen.tid[0]);
+    	key = gdbm_firstkey(dbgen.tid[0]);
     	if (!key.dptr)
 	    throw int(DbErr_DatabaseAccess);
     	do
@@ -801,7 +801,7 @@ int NdbmServer::db_store(db_devinfo &dev_stu)
             strncpy(key_sto.dptr, key.dptr, key.dsize);
             key_sto.dptr[key.dsize] = '\0';
             key_sto.dsize = key.dsize;
-	    content = dbm_fetch(dbgen.tid[0], key);
+	    content = gdbm_fetch(dbgen.tid[0], key);
 	    if (content.dptr)
 	    {
 	    	string temp = content.dptr;
@@ -810,7 +810,7 @@ int NdbmServer::db_store(db_devinfo &dev_stu)
 		    if (temp.substr(0, pos) ==  dev_stu.dev_name)
 		    	break;
 	    } 
-	    key = dbm_nextkey(dbgen.tid[0]);
+	    key = gdbm_nextkey(dbgen.tid[0], key);
     	} while(key.dptr); 
 //
 // Different result cases 
@@ -835,7 +835,7 @@ int NdbmServer::db_store(db_devinfo &dev_stu)
         strcpy(cont_sto.dptr, s.str().c_str());
 #endif
 	cont_sto.dsize = strlen(cont_sto.dptr);
-	if (dbm_store(dbgen.tid[0], key_sto, cont_sto, DBM_REPLACE))
+	if (gdbm_store(dbgen.tid[0], key_sto, cont_sto, GDBM_REPLACE))
 	    throw int(DbErr_DatabaseAccess);
     } 
     catch(const int err)
@@ -885,7 +885,7 @@ int NdbmServer::db_store_2(db_devinfo_2 &dev_stu)
 	key_sto.dptr = new char[MAX_KEY];
 	cont_sto.dptr = new char[MAX_CONT];
 	
-	key = dbm_firstkey(dbgen.tid[0]);
+	key = gdbm_firstkey(dbgen.tid[0]);
 	if (!key.dptr)
 	    throw int(DbErr_DatabaseAccess);
 
@@ -894,7 +894,7 @@ int NdbmServer::db_store_2(db_devinfo_2 &dev_stu)
 	    strncpy(key_sto.dptr, key.dptr, key.dsize);
 	    key_sto.dptr[key.dsize] = '\0';
 	    key_sto.dsize = key.dsize;
-	    content = dbm_fetch(dbgen.tid[0], key);
+	    content = gdbm_fetch(dbgen.tid[0], key);
 
 	    if (content.dptr)
 	    {
@@ -904,7 +904,7 @@ int NdbmServer::db_store_2(db_devinfo_2 &dev_stu)
 		    if (temp.substr(0, pos) == dev_stu.dev_name)
 			break;
 	    } 
-	    key = dbm_nextkey(dbgen.tid[0]);
+	    key = gdbm_nextkey(dbgen.tid[0], key);
 	} while (key.dptr );
 //
 // Different result cases 
@@ -929,7 +929,7 @@ int NdbmServer::db_store_2(db_devinfo_2 &dev_stu)
         strcpy(cont_sto.dptr, s.str().c_str());
 #endif
 	cont_sto.dsize = strlen(cont_sto.dptr);
-	if (dbm_store(dbgen.tid[0], key_sto, cont_sto, DBM_REPLACE))
+	if (gdbm_store(dbgen.tid[0], key_sto, cont_sto, GDBM_REPLACE))
 	    throw int(DbErr_DatabaseAccess);
     } 
     catch(const int err)
@@ -980,7 +980,7 @@ int NdbmServer::db_store_3(db_devinfo_3 &dev_stu)
 	key_sto.dptr = new char[MAX_KEY];
 	cont_sto.dptr = new char[MAX_CONT];
 	
-	key = dbm_firstkey(dbgen.tid[0]);
+	key = gdbm_firstkey(dbgen.tid[0]);
 	if (!key.dptr)
 	    throw int(DbErr_DatabaseAccess);
 
@@ -989,7 +989,7 @@ int NdbmServer::db_store_3(db_devinfo_3 &dev_stu)
 	    strncpy(key_sto.dptr, key.dptr, key.dsize);
 	    key_sto.dptr[key.dsize] = '\0';
 	    key_sto.dsize = key.dsize;
-	    content = dbm_fetch(dbgen.tid[0], key);
+	    content = gdbm_fetch(dbgen.tid[0], key);
 	    if (content.dptr)
 	    {
 		string 		temp = content.dptr;
@@ -998,7 +998,7 @@ int NdbmServer::db_store_3(db_devinfo_3 &dev_stu)
 		    if (temp.substr(0, pos) == dev_stu.dev_name)
 			break;
 	    }
-	    key = dbm_nextkey(dbgen.tid[0]);
+	    key = gdbm_nextkey(dbgen.tid[0], key);
 	} while (key.dptr);
 //
 // Different result cases 
@@ -1022,7 +1022,7 @@ int NdbmServer::db_store_3(db_devinfo_3 &dev_stu)
         strcpy(cont_sto.dptr, s.str().c_str());
 #endif
 	cont_sto.dsize = strlen(cont_sto.dptr);
-	if (dbm_store(dbgen.tid[0], key_sto, cont_sto, DBM_REPLACE))
+	if (gdbm_store(dbgen.tid[0], key_sto, cont_sto, GDBM_REPLACE))
 	    throw int(DbErr_DatabaseAccess);
     }
     catch(const int err)

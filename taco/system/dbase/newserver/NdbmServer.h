@@ -10,33 +10,33 @@
 class NdbmServer : public DBServer
 {
 private:
-    vector<DBM>	tid;
+    std::vector<GDBM_FILE>	tid;
 //    long        ps_names_index;
 private:
-    int		db_find(const string, const string, char **) throw (int);
-    int		db_devlist(string, db_res *);
-    int		db_del(string);
-    int		db_insert(string, string, string);                                                        
-    int 	db_del(string, char **);
+    int		db_find(const std::string, const std::string, char **) throw (int);
+    int		db_devlist(std::string, db_res *);
+    int		db_del(std::string);
+    int		db_insert(std::string, std::string, std::string);                                                        
+    int 	db_del(std::string, char **);
     int 	db_reinsert(arr1 *, char **, int);
     int 	db_store_3(db_devinfo_3 &);
     int 	db_store_2(db_devinfo_2 &);
     int 	db_store(db_devinfo &);
-    char 	*fam_fil(device *, const string &, const string &, int) throw (int);
-    char 	*memb_fil(device *, const string &, int) throw (int);
-    bool 	stringOK(const string, const string);
-    void 	delete_res(const string);
-    bool 	cmp_nocase(const string, const string);
-    long 	reg_ps(const string &,long, const string &,long) throw (long);
-    long 	unreg_ps(const string &) throw (long);
-    long 	upd_name(string , string, int, long) throw (long);
-    long 	del_name(device &,int &, string, vector<dena> &) throw (long);
+    char 	*fam_fil(device *, const std::string &, const std::string &, int) throw (int);
+    char 	*memb_fil(device *, const std::string &, int) throw (int);
+    bool 	stringOK(const std::string, const std::string);
+    void 	delete_res(const std::string);
+    bool 	cmp_nocase(const std::string, const std::string);
+    long 	reg_ps(const std::string &,long, const std::string &,long) throw (long);
+    long 	unreg_ps(const std::string &) throw (long);
+    long 	upd_name(std::string , std::string, int, long) throw (long);
+    long 	del_name(device &,int &, std::string, std::vector<dena> &) throw (long);
     long 	is_dev_in_db(db_dev_in_db *,long) throw (long);
     long 	update_dev_list(device &,int) throw (long);
-    long 	upd_res(const string &, long, bool) throw (long);
+    long 	upd_res(const std::string &, long, bool) throw (long);
     void	leave(void);
 public:
-    				NdbmServer(const string user, const string passwd, const string db);
+    				NdbmServer(const std::string user, const std::string passwd, const std::string db);
     virtual			~NdbmServer();
     virtual db_res 		*db_getres_1_svc(arr1 *, struct svc_req *);
     virtual db_res 		*db_getdev_1_svc(nam *);

@@ -30,7 +30,7 @@ event_que *NdbmServer::db_event_query_1_svc(nam *pevent_name)
     datum 		key;
     char 		*tbeg,
 			*tend;
-    DBM 		*tab;
+    GDBM_FILE		tab;
     unsigned int 	diff;
     string		fam,
 			memb,
@@ -76,9 +76,9 @@ event_que *NdbmServer::db_event_query_1_svc(nam *pevent_name)
 // Try to retrieve a resource in the EVENTS table with a resource value equal
 // to the command name 
 //
-    for (key=dbm_firstkey(tab);key.dptr!=NULL;key=dbm_nextkey(tab))
+    for (key=gdbm_firstkey(tab);key.dptr!=NULL;key=gdbm_nextkey(tab, key))
     {
-	datum content = dbm_fetch(tab,key);
+	datum content = gdbm_fetch(tab,key);
 	if (content.dptr == NULL)
 	{
 	    event_queue.db_err = DbErr_DatabaseAccess;

@@ -265,11 +265,11 @@ NdbmNamesCont::~NdbmNamesCont()
 }
 
 // Class constructor to be used with the record key
-NdbmNamesCont::NdbmNamesCont(DBM *db, datum key)
+NdbmNamesCont::NdbmNamesCont(GDBM_FILE db, datum key)
 {
     datum content;
 
-    content = dbm_fetch(db,key);
+    content = gdbm_fetch(db,key);
     if (content.dptr != NULL)
 	str = string(content.dptr, content.dsize);
     else
@@ -680,11 +680,11 @@ NdbmPSNamesCont::~NdbmPSNamesCont()
 
 // Class constructor to be used with the record key
 
-NdbmPSNamesCont::NdbmPSNamesCont(DBM *db, datum key)
+NdbmPSNamesCont::NdbmPSNamesCont(GDBM_FILE db, datum key)
 {
     datum content;
 
-    content = dbm_fetch(db,key);
+    content = gdbm_fetch(db,key);
     if (content.dptr != NULL)
 	str = string(content.dptr, content.dsize);
     else
@@ -1048,11 +1048,11 @@ NdbmResCont::~NdbmResCont()
 
 // Class constructor to be used with the record key
 
-NdbmResCont::NdbmResCont(DBM *db, datum key)
+NdbmResCont::NdbmResCont(GDBM_FILE db, datum key)
 {
     datum content;
 
-    content = dbm_fetch(db,key);
+    content = gdbm_fetch(db,key);
     if (content.dptr != NULL)
 	str = string(content.dptr, content.dsize);
     else

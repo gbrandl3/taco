@@ -182,7 +182,7 @@ db_res *db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 
 	key_sto.dptr = (char *) malloc(MAX_KEY);
 
-	key = dbm_firstkey(dbgen.tid[0]);
+	key = gdbm_firstkey(dbgen.tid[0]);
 	if (key.dptr == NULL)
 	{
 		free(key_sto.dptr);
@@ -200,7 +200,7 @@ db_res *db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 		strncpy(key_sto.dptr, key.dptr, key.dsize);
 		key_sto.dptr[key.dsize] = '\0';
 		key_sto.dsize = key.dsize;
-		content = dbm_fetch(dbgen.tid[0], key);
+		content = gdbm_fetch(dbgen.tid[0], key);
 
 		if (content.dptr != NULL)
 		{
@@ -331,7 +331,7 @@ db_res *db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 
 		if (exit == 0)
 		{
-			key = dbm_nextkey(dbgen.tid[0]);
+			key = gdbm_nextkey(dbgen.tid[0], key);
 			if (key.dptr == NULL)
 				exit = 1;
 		}

@@ -16,18 +16,7 @@
 
 #include <fcntl.h>
 #include "config.h"
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-#ifdef DBM_FETCH_VOID
-#include <ndbm.h>
-#else
-#include <ndbm_ansi.h>
-#endif
-#ifdef __cplusplus
-}
-#endif
+#include <gdbm.h>
 
 #include <iostream>
 #include <string>
@@ -141,45 +130,44 @@ int main(int argc,char *argv[])
 		cerr << "db_read: Can't find environment variable DBM_DIR" << endl;
 		exit(-1);
 	}
-    string dbm_dir(ptr);
+	string dbm_dir(ptr);
 
-    if (dbm_dir[dbm_dir.length() - 1] != '/')
-	dbm_dir += '/';
+	if (dbm_dir[dbm_dir.length() - 1] != '/')
+		dbm_dir += '/';
 
 /* Read the database tables of the database */
-	
    	for (int i = 0; i < TblNum; i++)
 	{
 		if ((domain == string(tblname[i])) || (domain == "all")) 
 		{
-	    string dbm_file(dbm_dir);
-	    dbm_file +=  string(tblname[i]);
-	    res_num[i] = db_read(const_cast<char *>(dbm_file.c_str()), tblname[i]);
+			string dbm_file(dbm_dir);
+			dbm_file +=  string(tblname[i]);
+			res_num[i] = db_read(const_cast<char *>(dbm_file.c_str()), tblname[i]);
+			if (domain != "all") 
+				return 0;
+		}
 	}
-	return 0;
-}
-
+	return 1;
 }
 
 int db_read(char *dbm_file,char *TblName)
 {
-	int flags = O_RDONLY;
-	DBM *tab_tid;
-	datum 	key,
-        	key_out;
-	datum 	content,
-        	content_out;
-	int res_num = 0;
-	long err;
+	int 		flags = GDBM_READER | GDBM_NOLOCK;
+	GDBM_FILE	tab_tid;
+	datum 		key,
+        		key_out;
+	datum 		content,
+        		content_out;
+	int 		res_num = 0;
+	long 		err;
 #ifdef linux
-	static long connected = False;
+	static long 	connected = False;
 #endif /* linux */
 	
 	key_out.dptr = (char *)malloc(MAX_KEY);
 	content_out.dptr = (char *)malloc(MAX_CONT);
 
-
-#ifdef linux
+#if 0 //def linux
 //
 // Connect process to db if it is not already done 
 //
@@ -204,12 +192,12 @@ int db_read(char *dbm_file,char *TblName)
 //
 // Open database file 
 //
-	tab_tid = dbm_open(dbm_file, flags, (int)0666);
+	tab_tid = gdbm_open(dbm_file, 0, flags, (int)0666, NULL);
 
 	if (tab_tid == NULL)
 	{
 		cerr << "db_read: Can't open " << dbm_file << " table" << endl;
-#ifdef linux
+#if 0 //def linux
 //
 // Ask server to disconnect from DBM files 
 //
@@ -221,9 +209,9 @@ int db_read(char *dbm_file,char *TblName)
 //
 // Display table contents 
 //
-	for (key = dbm_firstkey(tab_tid); key.dptr != NULL;key = dbm_nextkey(tab_tid))
+	for (key = gdbm_firstkey(tab_tid); key.dptr != NULL;key = gdbm_nextkey(tab_tid, key))
 	{
-		content = dbm_fetch(tab_tid, key);
+		content = gdbm_fetch(tab_tid, key);
 		if (content.dptr != NULL)
 		{
 			res_num++;
@@ -231,23 +219,23 @@ int db_read(char *dbm_file,char *TblName)
 			content_out.dptr[content.dsize] = '\0';
 			strncpy(key_out.dptr, key.dptr, key.dsize);
 			key_out.dptr[key.dsize] = '\0';
-			printf("%s: %s:  %s\n", TblName, key_out.dptr, content_out.dptr);
+			cout << TblName << ": " << key_out.dptr << ": " << content_out.dptr << endl;
 		}
 	}
 //
 // Close database 
 //
-	dbm_close(tab_tid);
+	gdbm_close(tab_tid);
 
 	free(key_out.dptr);
 	free(content_out.dptr);
-#ifdef linux
+#if 0 //def linux
 //
 // Ask server to reconnect to DBM files 
 //
 	if (db_svc_reopen(&err) == -1)
 	{
-	cerr << "db_read: Server failed when tries to reconnect to DBM files" << endl;
+		cerr << "db_read: Server failed when tries to reconnect to DBM files" << endl;
 		exit(-1);
 	}	
 #endif /* linux */

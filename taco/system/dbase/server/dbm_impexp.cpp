@@ -337,7 +337,7 @@ db_resimp *db_devimp_1_svc(arr1 *de_name)
 
 /* Try to retrieve the tuple in the NAMES table */
 
-		key = dbm_firstkey(dbgen.tid[0]);
+		key = gdbm_firstkey(dbgen.tid[0]);
 		if (key.dptr == NULL)
 		{
 			free(back.imp_dev.tab_dbdev_val);
@@ -348,7 +348,7 @@ db_resimp *db_devimp_1_svc(arr1 *de_name)
 
 		do
 		{
-			content = dbm_fetch(dbgen.tid[0], key);
+			content = gdbm_fetch(dbgen.tid[0], key);
 
 			if (content.dptr != NULL)
 			{
@@ -416,7 +416,7 @@ db_resimp *db_devimp_1_svc(arr1 *de_name)
 
 			if (exit == 0)
 			{
-		 		key = dbm_nextkey(dbgen.tid[0]); 
+		 		key = gdbm_nextkey(dbgen.tid[0], key); 
 				if (key.dptr == NULL) 
 					exit = 1;
 		
@@ -590,7 +590,7 @@ int *db_svcunr_1_svc(nam *dsn_name)
 	d_num = 0;
 	mis = 0;
 	sto = *dsn_name;
-	flags = DBM_REPLACE;
+	flags = GDBM_REPLACE;
 	exit_loop = False;
 
 /* Return error code if the server is not connected to the database */
@@ -625,7 +625,7 @@ int *db_svcunr_1_svc(nam *dsn_name)
 	{
 
 		old_d_num = d_num;
-		for (key = dbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
 		{
 
 /* Extract personal name and sequence field from key */
@@ -645,10 +645,10 @@ int *db_svcunr_1_svc(nam *dsn_name)
 
 /* Get db content */
 
-			content = dbm_fetch(dbgen.tid[0],key);
+			content = gdbm_fetch(dbgen.tid[0],key);
 			if (content.dptr == NULL)
 			{
-				if (dbm_error(dbgen.tid[0]) != 0)
+				if (gdbm_error(dbgen.tid[0]) != 0)
 				{
 					mis = DbErr_DatabaseAccess;
 					return(&mis);
@@ -734,7 +734,7 @@ int *db_svcunr_1_svc(nam *dsn_name)
 			key.dptr = key_str;
 			key.dsize = strlen(key_str);
 
-			if (dbm_store(dbgen.tid[0], key, dev1, flags))
+			if (gdbm_store(dbgen.tid[0], key, dev1, flags))
 			{
 				mis = DbErr_DatabaseAccess;
 				return(&mis);
@@ -768,7 +768,7 @@ int *db_svcunr_1_svc(nam *dsn_name)
 
 /* Try to retrieve the tuples */
 
-			content = dbm_fetch(dbgen.tid[0], key); 
+			content = gdbm_fetch(dbgen.tid[0], key); 
 
 			if (content.dptr != NULL)
 			{
@@ -830,7 +830,7 @@ int *db_svcunr_1_svc(nam *dsn_name)
 				dev1.dptr = dev_str;
 				dev1.dsize = strlen(dev_str);
 
-				if (dbm_store(dbgen.tid[0], key, dev1, flags))
+				if (gdbm_store(dbgen.tid[0], key, dev1, flags))
 				{
 					mis = DbErr_DatabaseAccess;
 					return(&mis);
@@ -955,7 +955,7 @@ svc_inf *db_svcchk_1_svc(nam *dsn_nam)
 
 /* Try to retrieve the tuples */
 
-	content = dbm_fetch(dbgen.tid[0], key);                                
+	content = gdbm_fetch(dbgen.tid[0], key);                                
 
 	if (content.dptr == NULL)
 		send.db_err = DbErr_DeviceServerNotDefined;
@@ -1064,7 +1064,7 @@ int db_store(db_devinfo dev_stu)
 	key_sto.dptr = (char *)malloc(MAX_KEY);
 	cont_sto.dptr = (char *)malloc(MAX_CONT);
 	
-	key = dbm_firstkey(dbgen.tid[0]);
+	key = gdbm_firstkey(dbgen.tid[0]);
 	if (key.dptr == NULL)
 	{
 		free(key_sto.dptr);
@@ -1078,7 +1078,7 @@ int db_store(db_devinfo dev_stu)
 
 	do
 	{
-		content = dbm_fetch(dbgen.tid[0], key);
+		content = gdbm_fetch(dbgen.tid[0], key);
 
 		if (content.dptr != NULL)
 		{
@@ -1099,7 +1099,7 @@ int db_store(db_devinfo dev_stu)
 
 		if (exit == 0)
 		{
-			key = dbm_nextkey(dbgen.tid[0]);
+			key = gdbm_nextkey(dbgen.tid[0], key);
 			if (key.dptr == NULL) 
 				exit = 1;
 			else
@@ -1143,9 +1143,9 @@ int db_store(db_devinfo dev_stu)
 		strcat(cont_sto.dptr ,"|0|unknown");
 		cont_sto.dsize = strlen(cont_sto.dptr);
 
-		flags = DBM_REPLACE;
+		flags = GDBM_REPLACE;
 
-		if (dbm_store(dbgen.tid[0], key_sto, cont_sto, flags))
+		if (gdbm_store(dbgen.tid[0], key_sto, cont_sto, flags))
 		{
 			free(key_sto.dptr);
 			free(cont_sto.dptr);
@@ -1204,7 +1204,7 @@ int db_store_2(db_devinfo_2 dev_stu)
 	key_sto.dptr = (char *)malloc(MAX_KEY);
 	cont_sto.dptr = (char *)malloc(MAX_CONT);
 	
-	key = dbm_firstkey(dbgen.tid[0]);
+	key = gdbm_firstkey(dbgen.tid[0]);
 	if (key.dptr == NULL)
 	{
 		free(key_sto.dptr);
@@ -1218,7 +1218,7 @@ int db_store_2(db_devinfo_2 dev_stu)
 
 	do
 	{
-		content = dbm_fetch(dbgen.tid[0], key);
+		content = gdbm_fetch(dbgen.tid[0], key);
 
 		if (content.dptr != NULL)
 		{
@@ -1239,7 +1239,7 @@ int db_store_2(db_devinfo_2 dev_stu)
 
 		if (exit == 0)
 		{
-			key = dbm_nextkey(dbgen.tid[0]);
+			key = gdbm_nextkey(dbgen.tid[0], key);
 			if (key.dptr == NULL) 
 				exit = 1;
 			else
@@ -1288,9 +1288,9 @@ int db_store_2(db_devinfo_2 dev_stu)
 		strcat(cont_sto.dptr ,"|");
 		cont_sto.dsize = strlen(cont_sto.dptr);
 
-		flags = DBM_REPLACE;
+		flags = GDBM_REPLACE;
 
-		if (dbm_store(dbgen.tid[0], key_sto, cont_sto, flags))
+		if (gdbm_store(dbgen.tid[0], key_sto, cont_sto, flags))
 		{
 			free(key_sto.dptr);
 			free(cont_sto.dptr);
@@ -1350,7 +1350,7 @@ int db_store_3(db_devinfo_3 dev_stu)
 	key_sto.dptr = (char *)malloc(MAX_KEY);
 	cont_sto.dptr = (char *)malloc(MAX_CONT);
 	
-	key = dbm_firstkey(dbgen.tid[0]);
+	key = gdbm_firstkey(dbgen.tid[0]);
 	if (key.dptr == NULL)
 	{
 		free(key_sto.dptr);
@@ -1364,7 +1364,7 @@ int db_store_3(db_devinfo_3 dev_stu)
 
 	do
 	{
-		content = dbm_fetch(dbgen.tid[0], key);
+		content = gdbm_fetch(dbgen.tid[0], key);
 
 		if (content.dptr != NULL)
 		{
@@ -1383,7 +1383,7 @@ int db_store_3(db_devinfo_3 dev_stu)
 
 		if (exit == 0)
 		{
-			key = dbm_nextkey(dbgen.tid[0]);
+			key = gdbm_nextkey(dbgen.tid[0], key);
 			if (key.dptr == NULL) 
 				exit = 1;
 			else
@@ -1431,9 +1431,9 @@ int db_store_3(db_devinfo_3 dev_stu)
 		strcat(cont_sto.dptr ,"|");
 		cont_sto.dsize = strlen(cont_sto.dptr);
 
-		flags = DBM_REPLACE;
+		flags = GDBM_REPLACE;
 
-		if (dbm_store(dbgen.tid[0], key_sto, cont_sto, flags))
+		if (gdbm_store(dbgen.tid[0], key_sto, cont_sto, flags))
 		{
 			free(key_sto.dptr);
 			free(cont_sto.dptr);

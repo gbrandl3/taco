@@ -14,13 +14,13 @@ bin_PROGRAMS		= db_fillup \
 INCLUDES		= @TACO_INCLUDES@ @TACO_GDBM_INC@
 
 db_fillup_SOURCES	= db_fillup.cpp
-db_fillup_LDADD		= @TACO_GDBM@	
+db_fillup_LDADD		= @TACO_GDBM_LDFLAGS@ @TACO_GDBM_LIBS@	
 
 db_update_SOURCES 	= db_update.cpp 
 db_update_LDADD		= @TACO_CLIENT_LIBS@
 
 db_read_SOURCES		= db_read.cpp
-db_read_LDADD		= @TACO_CLIENT_LIBS@ @TACO_GDBM@
+db_read_LDADD		= @TACO_CLIENT_LIBS@ @TACO_GDBM_LDFLAGS@ @TACO_GDBM_LIBS@
 
 db_info_SOURCES		= db_info.cpp 
 db_info_LDADD		= @TACO_CLIENT_LIBS@

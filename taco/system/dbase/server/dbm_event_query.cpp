@@ -46,7 +46,7 @@ event_que *db_event_query_1_svc(nam *pevent_name)
 	datum key;
 	datum content;
 	char *tbeg,*tend;
-	DBM *tab;
+	GDBM_FILE	tab;
 	unsigned int diff;
 	int ds_num;
 	int team;
@@ -95,10 +95,10 @@ event_que *db_event_query_1_svc(nam *pevent_name)
 /* Try to retrieve a resource in the EVENTS table with a resource value equal
    to the command name */
 
-	for (key=dbm_firstkey(tab);key.dptr!=NULL;key=dbm_nextkey(tab))
+	for (key=gdbm_firstkey(tab);key.dptr!=NULL;key=gdbm_nextkey(tab, key))
 	{
 
-		content = dbm_fetch(tab,key);
+		content = gdbm_fetch(tab,key);
 		if (content.dptr == NULL)
 		{
 			back.db_err = DbErr_DatabaseAccess;

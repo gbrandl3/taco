@@ -45,7 +45,7 @@ db_res *NdbmServer::devserverlist_1_svc()
 //
     try 
     {
-	for (key = dbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+	for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
 	{
 	    NdbmNamesKey nameskey(key);
 			
@@ -54,9 +54,9 @@ db_res *NdbmServer::devserverlist_1_svc()
 	    server = nameskey.get_ds_name();
 	    serv_list.add_if_new(server);		
 	}
-	if (dbm_error(dbgen.tid[0]) != 0)
+	if (gdbm_error(dbgen.tid[0]) != 0)
 	{			
-	    dbm_clearerr(dbgen.tid[0]);
+	    gdbm_clearerr(dbgen.tid[0]);
 	    browse_back.db_err = DbErr_DatabaseAccess;
 	    return(&browse_back);			
 	}
@@ -137,7 +137,7 @@ db_res *NdbmServer::devpersnamelist_1_svc(nam *server)
 //
     try
     {
-	for (key = dbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+	for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
 	{
 	    NdbmNamesKey nameskey(key);
 
@@ -149,9 +149,9 @@ db_res *NdbmServer::devpersnamelist_1_svc(nam *server)
 	    pers = nameskey.get_ds_pers_name();
 	    pers_list.add_if_new(pers);
 	}
-	if (dbm_error(dbgen.tid[0]) != 0)
+	if (gdbm_error(dbgen.tid[0]) != 0)
 	{
-	    dbm_clearerr(dbgen.tid[0]);
+	    gdbm_clearerr(dbgen.tid[0]);
 	    browse_back.db_err = DbErr_DatabaseAccess;
 	    return(&browse_back);
 	}
@@ -231,7 +231,7 @@ db_res *NdbmServer::hostlist_1_svc()
 //
     try 
     {
-	for (key = dbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+	for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
 	{
 //
 // Skip record if the device indice is different than 1
@@ -249,9 +249,9 @@ db_res *NdbmServer::hostlist_1_svc()
 		continue;
 	    host_list.add_if_new(host);		
 	}
-	if (dbm_error(dbgen.tid[0]) != 0)
+	if (gdbm_error(dbgen.tid[0]) != 0)
 	{			
-	    dbm_clearerr(dbgen.tid[0]);
+	    gdbm_clearerr(dbgen.tid[0]);
 	    browse_back.db_err = DbErr_DatabaseAccess;
 	    return(&browse_back);			
 	}

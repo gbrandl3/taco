@@ -113,7 +113,7 @@ long NdbmServer::upd_name(string lin, string ptr,int ind, long last) throw (long
 			last_pos = 0;
     char 		prgnr[20],
     			seqnr[4];
-    DBM 		*tup;
+    GDBM_FILE 		tup;
     static datum 	key, 
 			key_sto, 
 			key_sto2, 
@@ -275,7 +275,7 @@ long NdbmServer::upd_name(string lin, string ptr,int ind, long last) throw (long
 	key_sto2 = key_sto;
 	cont_sto = content;
 
-	if ((i = dbm_store(dbgen.tid[0], key_sto2, cont_sto, DBM_INSERT)) != 0)
+	if ((i = gdbm_store(dbgen.tid[0], key_sto2, cont_sto, GDBM_INSERT)) != 0)
 	{
 	    delete [] content.dptr;
 	    delete [] key_2.dptr;
@@ -362,10 +362,10 @@ long NdbmServer::del_name(device &devi, int &pndev, string ptr, vector<dena> &bu
 //
 // Try to get data out of database
 //
-	content = dbm_fetch(dbgen.tid[0],key);
+	content = gdbm_fetch(dbgen.tid[0],key);
 	if (!content.dptr)
 	{
-	    if (dbm_error(dbgen.tid[0]) == 0)
+	    if (gdbm_error(dbgen.tid[0]) == 0)
 		break;
 	    else
 		throw long(DbErr_DatabaseAccess);
@@ -413,7 +413,7 @@ long NdbmServer::del_name(device &devi, int &pndev, string ptr, vector<dena> &bu
 //
 // Delete database entry
 //
-	    dbm_delete(dbgen.tid[0], key);
+	    gdbm_delete(dbgen.tid[0], key);
 	    seq++;
 	}
     }while (true);
@@ -453,7 +453,7 @@ long NdbmServer::del_name(device &devi, int &pndev, string ptr, vector<dena> &bu
 	    	{
 		    key.dptr = ptr_dev[j].key_buf;
 		    key.dsize = strlen(ptr_dev[j].key_buf);
-		    dbm_delete(dbgen.tid[0], key);
+		    gdbm_delete(dbgen.tid[0], key);
 		    update_dev_list(ptr_dev[j].dev_info, ptr_dev[j].seq + 1);
 	    	}
     }
@@ -497,7 +497,7 @@ long NdbmServer::is_dev_in_db(db_dev_in_db *ptr,long nb_dev) throw (long)
 {
     device 		dev;
 	
-    for (datum key = dbm_firstkey(dbgen.tid[0]); key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+    for (datum key = gdbm_firstkey(dbgen.tid[0]); key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
     {
 	string	temp(key.dptr, key.dsize);
 //
@@ -530,7 +530,7 @@ long NdbmServer::is_dev_in_db(db_dev_in_db *ptr,long nb_dev) throw (long)
 //
 // Get db content 
 //
-	datum content = dbm_fetch(dbgen.tid[0], key);
+	datum content = gdbm_fetch(dbgen.tid[0], key);
 	if (content.dptr != NULL)
 	{
 	    temp = string(content.dptr, content.dsize);
@@ -607,10 +607,10 @@ long NdbmServer::update_dev_list(device &p_ret, int seq) throw (long)
 //
 // Tried to get data from the database 
 //
-	datum content = dbm_fetch(dbgen.tid[0],key);
+	datum content = gdbm_fetch(dbgen.tid[0],key);
 	if (content.dptr == NULL)
 	{
-	    if (dbm_error(dbgen.tid[0]) == 0)
+	    if (gdbm_error(dbgen.tid[0]) == 0)
 		break;
 	    else
 	   	throw long(ERR_DEVNAME);
@@ -624,7 +624,7 @@ long NdbmServer::update_dev_list(device &p_ret, int seq) throw (long)
 //
 // Delete the entry and store a new one with a modifed sequence field 
 //
-	    if (dbm_delete(dbgen.tid[0], key) != 0)
+	    if (gdbm_delete(dbgen.tid[0], key) != 0)
 	   	throw long(ERR_DEVNAME);
 #if !HAVE_SSTREAM
             s.seekp(0, ios::beg);
@@ -644,7 +644,7 @@ long NdbmServer::update_dev_list(device &p_ret, int seq) throw (long)
 	    content.dptr = const_cast<char *>(cont_sto.data());
 	    content.dsize = cont_sto.size();
 
-	    if (dbm_store(dbgen.tid[0], key, content, DBM_INSERT) != 0)
+	    if (gdbm_store(dbgen.tid[0], key, content, GDBM_INSERT) != 0)
 	   	throw long(ERR_DEVNAME);
 	    seq++;
 	}
@@ -766,7 +766,7 @@ long NdbmServer::upd_res(const string &lin, const long numb, bool array) throw (
 			l,
 			indi,
 			resu;
-    static DBM 		*tab;
+    static GDBM_FILE 	tab;
     datum 		key,
      			content,
           		cont,
@@ -896,14 +896,14 @@ long NdbmServer::upd_res(const string &lin, const long numb, bool array) throw (
         	strcpy(key.dptr, s.str().c_str());
     		key.dsize = s.str().size();
 #endif
-	    	cont = dbm_fetch(tab,key);
+	    	cont = gdbm_fetch(tab,key);
 	    	if (!cont.dptr)
 	    	{
-		    if (dbm_error(tab) == 0)
+		    if (gdbm_error(tab) == 0)
 		    	break;
 		    else
 		    {
-		    	dbm_clearerr(tab);
+		    	gdbm_clearerr(tab);
 			delete [] key_array.dptr;
 		    	throw long(DbErr_DatabaseAccess);
 		    }
@@ -932,14 +932,14 @@ long NdbmServer::upd_res(const string &lin, const long numb, bool array) throw (
     		    key_array.dsize = s.str().size();
 #endif
 
-		    cont = dbm_fetch(tab, key_array);
+		    cont = gdbm_fetch(tab, key_array);
 		    if (!cont.dptr)
 		    {
-		    	if (dbm_error(tab) == 0)
+		    	if (gdbm_error(tab) == 0)
 			    old_res_array = false;
 		    	else
 		    	{
-			    dbm_clearerr(tab);
+			    gdbm_clearerr(tab);
 			    delete [] key_array.dptr;
 			    throw long(DbErr_DatabaseAccess);
 		    	}
@@ -947,7 +947,7 @@ long NdbmServer::upd_res(const string &lin, const long numb, bool array) throw (
 		    else
 		    	old_res_array = true;
 	    	}
-	    	dbm_delete(tab,key);
+	    	gdbm_delete(tab,key);
 	    	res_numb++;
 	    }
 	    delete [] key_array.dptr;
@@ -979,7 +979,7 @@ long NdbmServer::upd_res(const string &lin, const long numb, bool array) throw (
     	strcpy(content.dptr, r_val.c_str());
     	content.dsize = r_val.size();
 
-    	switch(dbm_store(tab, key, content, DBM_REPLACE))
+    	switch(gdbm_store(tab, key, content, GDBM_REPLACE))
     	{
 	    case 0 : break;
 	    case 1 : throw long (DbErr_DoubleTupleInRes);

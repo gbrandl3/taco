@@ -20,6 +20,7 @@ libTACOndbm_la_SOURCES = dbm_serv.cpp \
 			dbm_clo_op.cpp \
 			dbm_miscbro.cpp \
 			dbm_update.cpp 
+libTACOndbm_la_LIBADD	= @TACO_GDBM_LDFLAGS@ @TACO_GDBM_LIBS@ 
 
 if MYSQLSUPPORT
 lib_LTLIBRARIES		+= libTACOMySQL.la
@@ -39,4 +40,4 @@ libTACOMySQL_la_LIBADD	= -lmysqlclient
 endif
 
 INCLUDES		= -DNDBM @TACO_GDBM_INC@ @TACO_INCLUDES@ 
-dbm_newserver_LDADD	= @TACO_SERVER_LIBS@ @TACO_GDBM@ $(lib_LTLIBRARIES)
+dbm_newserver_LDADD	= @TACO_SERVER_LIBS@ @TACO_GDBM_LDFLAGS@ @TACO_GDBM_LIBS@ $(lib_LTLIBRARIES)

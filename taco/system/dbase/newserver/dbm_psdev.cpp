@@ -120,9 +120,9 @@ long NdbmServer::reg_ps(const string &h_name, long pid, const string &ps_name, l
 // First, check that the name used for the pseudo device is not already used
 // for a real device 
 //
-    for (key = dbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+    for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
     {
-	content = dbm_fetch(dbgen.tid[0],key);
+	content = gdbm_fetch(dbgen.tid[0],key);
 	if (!content.dptr)
 	    throw long(DbErr_DatabaseAccess);
 	string temp = content.dptr;
@@ -133,7 +133,7 @@ long NdbmServer::reg_ps(const string &h_name, long pid, const string &ps_name, l
 
     if (key.dptr == NULL)
     {
-	if (dbm_error(dbgen.tid[0]) != 0)
+	if (gdbm_error(dbgen.tid[0]) != 0)
 	    throw long(DbErr_DatabaseAccess);
     }
     else
@@ -145,13 +145,13 @@ long NdbmServer::reg_ps(const string &h_name, long pid, const string &ps_name, l
     key.dptr = const_cast<char *>(ps_name_low.data());
     key.dsize = ps_name_low.length();
 
-    content = dbm_fetch(dbgen.tid[dbgen.ps_names_index],key);
+    content = gdbm_fetch(dbgen.tid[dbgen.ps_names_index],key);
     if (content.dptr == NULL)
     {
 //
 // In case of error 
 //
-	if (dbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
+	if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
 	    throw long(DbErr_DatabaseAccess);
 //
 // Insert a new record in database 
@@ -172,7 +172,7 @@ long NdbmServer::reg_ps(const string &h_name, long pid, const string &ps_name, l
 	    content.dsize = s.str().length();
 #endif
 
-	    if (dbm_store(dbgen.tid[dbgen.ps_names_index],key,content,DBM_INSERT))
+	    if (gdbm_store(dbgen.tid[dbgen.ps_names_index],key,content,GDBM_INSERT))
 		throw long(DbErr_DatabaseAccess);
 	}
     }
@@ -194,7 +194,7 @@ long NdbmServer::reg_ps(const string &h_name, long pid, const string &ps_name, l
 	content.dptr = const_cast<char *>(s.str().data());
 	content.dsize = s.str().length();
 #endif
-	if (dbm_store(dbgen.tid[dbgen.ps_names_index],key,content,DBM_REPLACE))
+	if (gdbm_store(dbgen.tid[dbgen.ps_names_index],key,content,GDBM_REPLACE))
 	    throw long(DbErr_DatabaseAccess);
     }
 //
@@ -310,10 +310,10 @@ long NdbmServer::unreg_ps(const string &ps_name) throw (long)
     key.dptr = const_cast<char *>(ps_name_low.data());
     key.dsize = ps_name_low.length();
 
-    content = dbm_fetch(dbgen.tid[dbgen.ps_names_index], key);
+    content = gdbm_fetch(dbgen.tid[dbgen.ps_names_index], key);
     if (!content.dptr)
     {
-	if (dbm_error(dbgen.tid[dbgen.ps_names_index]))
+	if (gdbm_error(dbgen.tid[dbgen.ps_names_index]))
 	    throw long(DbErr_DatabaseAccess);
 	else
 	    throw long(DbErr_DeviceNotDefined);
@@ -321,7 +321,7 @@ long NdbmServer::unreg_ps(const string &ps_name) throw (long)
 //
 // Remove pseudo device 
 //
-    else if (dbm_delete(dbgen.tid[dbgen.ps_names_index], key) != 0)
+    else if (gdbm_delete(dbgen.tid[dbgen.ps_names_index], key) != 0)
 	throw long(DbErr_DatabaseAccess);
 //
 // leave function 

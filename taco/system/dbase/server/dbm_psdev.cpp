@@ -161,9 +161,9 @@ long reg_ps(char *h_name,long pid,char *ps_name,long poll,long *p_error)
 /* First, check that the name used for the pseudo device is not already used
    for a real device */
 
-	for (key = dbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+	for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
 	{
-		content = dbm_fetch(dbgen.tid[0],key);
+		content = gdbm_fetch(dbgen.tid[0],key);
 		if (content.dptr == NULL)
 		{
 			free(ps_name_low);
@@ -182,7 +182,7 @@ long reg_ps(char *h_name,long pid,char *ps_name,long poll,long *p_error)
 
 	if (key.dptr == NULL)
 	{
-		if (dbm_error(dbgen.tid[0]) != 0)
+		if (gdbm_error(dbgen.tid[0]) != 0)
 		{
 			free(ps_name_low);
 			*p_error = DbErr_DatabaseAccess;
@@ -204,13 +204,13 @@ long reg_ps(char *h_name,long pid,char *ps_name,long poll,long *p_error)
 	key.dptr = key_buf;
 	key.dsize = strlen(key_buf);
 
-	content = dbm_fetch(dbgen.tid[dbgen.ps_names_index],key);
+	content = gdbm_fetch(dbgen.tid[dbgen.ps_names_index],key);
 	if (content.dptr == NULL)
 	{
 
 /* In case of error */
 
-		if (dbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
+		if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
 		{
 			free(ps_name_low);
 			*p_error = DbErr_DatabaseAccess;
@@ -231,7 +231,7 @@ long reg_ps(char *h_name,long pid,char *ps_name,long poll,long *p_error)
 			content.dptr = cont_buf;
 			content.dsize = strlen(cont_buf);
 			
-			if (dbm_store(dbgen.tid[dbgen.ps_names_index],key,content,DBM_INSERT) != 0)
+			if (gdbm_store(dbgen.tid[dbgen.ps_names_index],key,content,GDBM_INSERT) != 0)
 			{
 				free(ps_name_low);
 				*p_error = DbErr_DatabaseAccess;
@@ -255,7 +255,7 @@ long reg_ps(char *h_name,long pid,char *ps_name,long poll,long *p_error)
 		content.dptr = cont_buf;
 		content.dsize = strlen(cont_buf);
 			
-		if (dbm_store(dbgen.tid[dbgen.ps_names_index],key,content,DBM_REPLACE) != 0)
+		if (gdbm_store(dbgen.tid[dbgen.ps_names_index],key,content,GDBM_REPLACE) != 0)
 		{
 			free(ps_name_low);
 			*p_error = DbErr_DatabaseAccess;
@@ -396,11 +396,11 @@ long unreg_ps(char *ps_name,long *p_error)
 	key.dptr = key_buf;
 	key.dsize = strlen(key_buf);
 
-	content = dbm_fetch(dbgen.tid[dbgen.ps_names_index],key);
+	content = gdbm_fetch(dbgen.tid[dbgen.ps_names_index],key);
 
 	if (content.dptr == NULL)
 	{
-		if (dbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
+		if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
 		{
 			free(ps_name_low);
 			*p_error = DbErr_DatabaseAccess;
@@ -418,7 +418,7 @@ long unreg_ps(char *ps_name,long *p_error)
 
 /* Remove pseudo device */
 
-		if (dbm_delete(dbgen.tid[dbgen.ps_names_index],key) != 0)
+		if (gdbm_delete(dbgen.tid[dbgen.ps_names_index],key) != 0)
 		{
 			free(ps_name_low);
 			*p_error = DbErr_DatabaseAccess;

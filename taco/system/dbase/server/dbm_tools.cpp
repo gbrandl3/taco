@@ -116,7 +116,7 @@ db_devinfo_svc *devinfo_1_svc(nam *dev)
 	long found = False;
 	try 
 	{
-		for (key = dbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
 		{
 			NdbmNamesCont cont(dbgen.tid[0],key);
 		
@@ -134,9 +134,9 @@ db_devinfo_svc *devinfo_1_svc(nam *dev)
 				break;
 			}		
 		}
-		if (dbm_error(dbgen.tid[0]) != 0)
+		if (gdbm_error(dbgen.tid[0]) != 0)
 		{			
-			dbm_clearerr(dbgen.tid[0]);
+			gdbm_clearerr(dbgen.tid[0]);
 			sent_back.db_err = DbErr_DatabaseAccess;
 			return(&sent_back);			
 		}
@@ -147,9 +147,9 @@ db_devinfo_svc *devinfo_1_svc(nam *dev)
 
 		if (found == False)
 		{
-			for (key = dbm_firstkey(dbgen.tid[dbgen.ps_names_index]); \
+			for (key = gdbm_firstkey(dbgen.tid[dbgen.ps_names_index]); \
 		     	     key.dptr != NULL; \
-		     	     key = dbm_nextkey(dbgen.tid[dbgen.ps_names_index]))
+		     	     key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key))
 			{
 				string ps_dev_name(key.dptr,key.dsize);
 				
@@ -165,9 +165,9 @@ db_devinfo_svc *devinfo_1_svc(nam *dev)
 				}
 		
 			}
-			if (dbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
+			if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
 			{
-				dbm_clearerr(dbgen.tid[dbgen.ps_names_index]);
+				gdbm_clearerr(dbgen.tid[dbgen.ps_names_index]);
 				sent_back.db_err = DbErr_DatabaseAccess;
 				return(&sent_back);		
 			}
@@ -317,7 +317,7 @@ db_res *devres_1_svc(db_res *recev)
 //
 
 			tmp_res_list.clear();
-			for (key = dbm_firstkey(dbgen.tid[j]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[j]))
+			for (key = gdbm_firstkey(dbgen.tid[j]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[j], key))
 			{
 				long ind;
 				long found;
@@ -346,9 +346,9 @@ db_res *devres_1_svc(db_res *recev)
 					tmp_res_list.push_back(t);
 				}
 			}
-			if (dbm_error(dbgen.tid[j]) != 0)
+			if (gdbm_error(dbgen.tid[j]) != 0)
 			{			
-				dbm_clearerr(dbgen.tid[j]);
+				gdbm_clearerr(dbgen.tid[j]);
 				res_back.db_err = DbErr_DatabaseAccess;
 				return(&res_back);			
 			}
@@ -394,9 +394,9 @@ db_res *devres_1_svc(db_res *recev)
 					}
 					else
 					{
-						if (dbm_error(dbgen.tid[j]) != 0)
+						if (gdbm_error(dbgen.tid[j]) != 0)
 						{
-							dbm_clearerr(dbgen.tid[j]);
+							gdbm_clearerr(dbgen.tid[j]);
 							res_back.db_err = DbErr_DatabaseAccess;
 							return(&res_back);
 						}
@@ -528,7 +528,7 @@ long *devdel_1_svc(nam *dev)
 	long found = False;
 	try 
 	{
-		for (key = dbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
 		{
 			NdbmNamesCont cont(dbgen.tid[0],key);
 		
@@ -553,7 +553,7 @@ long *devdel_1_svc(nam *dev)
 // Delete device from table
 //
 				
-				dbm_delete(dbgen.tid[0],key);
+				gdbm_delete(dbgen.tid[0],key);
 				found = True;
 				
 //
@@ -569,12 +569,12 @@ long *devdel_1_svc(nam *dev)
 						NdbmNamesKey new_key(ds_name,ds_pers_name,ind);
 						NdbmNamesCont dbco(dbgen.tid[0],new_key.get_key());
 					
-						dbm_delete(dbgen.tid[0],new_key.get_key());
+						gdbm_delete(dbgen.tid[0],new_key.get_key());
 					
 						new_key.upd_indi(ind - 1);
 						dbco.build_datum();
 						
-						if (dbm_store(dbgen.tid[0],new_key.get_key(),dbco.get_datum(),DBM_INSERT) != 0)
+						if (gdbm_store(dbgen.tid[0],new_key.get_key(),dbco.get_datum(),GDBM_INSERT) != 0)
 						{
 							sent_back = DbErr_DatabaseAccess;
 							return(&sent_back);
@@ -583,9 +583,9 @@ long *devdel_1_svc(nam *dev)
 				}
 				catch (NdbmError &err)
 				{
-					if (dbm_error(dbgen.tid[0]) != 0)
+					if (gdbm_error(dbgen.tid[0]) != 0)
 					{
-						dbm_clearerr(dbgen.tid[0]);
+						gdbm_clearerr(dbgen.tid[0]);
 						sent_back = DbErr_DatabaseAccess;
 						return(&sent_back);
 					}
@@ -593,9 +593,9 @@ long *devdel_1_svc(nam *dev)
 				break;
 			}		
 		}
-		if (dbm_error(dbgen.tid[0]) != 0)
+		if (gdbm_error(dbgen.tid[0]) != 0)
 		{			
-			dbm_clearerr(dbgen.tid[0]);
+			gdbm_clearerr(dbgen.tid[0]);
 			sent_back = DbErr_DatabaseAccess;
 			return(&sent_back);			
 		}
@@ -606,23 +606,23 @@ long *devdel_1_svc(nam *dev)
 
 		if (found == False)
 		{
-			for (key = dbm_firstkey(dbgen.tid[dbgen.ps_names_index]); \
+			for (key = gdbm_firstkey(dbgen.tid[dbgen.ps_names_index]); \
 		     	     key.dptr != NULL; \
-		     	     key = dbm_nextkey(dbgen.tid[dbgen.ps_names_index]))
+		     	     key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key))
 			{
 				string ps_dev_name(key.dptr,key.dsize);
 				
 				if (ps_dev_name == user_device)
 				{			
-					dbm_delete(dbgen.tid[dbgen.ps_names_index],key);
+					gdbm_delete(dbgen.tid[dbgen.ps_names_index],key);
 					found = True;
 					break;
 				}
 		
 			}
-			if (dbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
+			if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
 			{
-				dbm_clearerr(dbgen.tid[dbgen.ps_names_index]);
+				gdbm_clearerr(dbgen.tid[dbgen.ps_names_index]);
 				sent_back = DbErr_DatabaseAccess;
 				return(&sent_back);		
 			}
@@ -773,7 +773,7 @@ db_psdev_error *devdelres_1_svc(db_res *recev)
 // which is 1 for all new resource
 //
 
-			for (key = dbm_firstkey(dbgen.tid[j]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[j]))
+			for (key = gdbm_firstkey(dbgen.tid[j]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[j], key))
 			{
 				NdbmResKey reskey(key);
 
@@ -821,7 +821,7 @@ db_psdev_error *devdelres_1_svc(db_res *recev)
 						if (ind != 1)
 							k.upd_indi(ind); 
 	
-						res = dbm_delete(dbgen.tid[j],k.get_key());
+						res = gdbm_delete(dbgen.tid[j],k.get_key());
 						if (res == 0)
 							ind++;
 						else
@@ -841,7 +841,7 @@ db_psdev_error *devdelres_1_svc(db_res *recev)
 							}
 							else
 							{
-								dbm_clearerr(dbgen.tid[j]);
+								gdbm_clearerr(dbgen.tid[j]);
 								break;
 							}
 						}					
@@ -863,9 +863,9 @@ db_psdev_error *devdelres_1_svc(db_res *recev)
 					}
 					else
 					{
-						if (dbm_error(dbgen.tid[j]) != 0)
+						if (gdbm_error(dbgen.tid[j]) != 0)
 						{
-							dbm_clearerr(dbgen.tid[j]);
+							gdbm_clearerr(dbgen.tid[j]);
 							sent_back.error_code = DbErr_DatabaseAccess;
 							tmp_dev_name = dom_list[i].get_domain() + '/' + fam + '/' + memb;
 							for (l = 0;l < recev->res_val.arr1_len;l++)
@@ -986,7 +986,7 @@ db_info_svc *info_1_svc()
 
 	try 
 	{
-		for (key = dbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
 		{
 			dev_defined++;
 			NdbmNamesCont cont(dbgen.tid[0],key);
@@ -1014,9 +1014,9 @@ db_info_svc *info_1_svc()
 // Now, count pseudo_devices
 //
 
-		for (key = dbm_firstkey(dbgen.tid[dbgen.ps_names_index]);
+		for (key = gdbm_firstkey(dbgen.tid[dbgen.ps_names_index]);
 		     key.dptr != NULL;
-		     key = dbm_nextkey(dbgen.tid[dbgen.ps_names_index]))
+		     key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key))
 		{
 			psdev_defined++;
 		}
@@ -1031,9 +1031,9 @@ db_info_svc *info_1_svc()
 				continue;
 
 			tmp_res = 0;				
-			for (key = dbm_firstkey(dbgen.tid[i]);
+			for (key = gdbm_firstkey(dbgen.tid[i]);
 			     key.dptr != NULL;
-			     key = dbm_nextkey(dbgen.tid[i]))
+			     key = gdbm_nextkey(dbgen.tid[i], key))
 			{
 				tmp_res++;
 			}
@@ -1157,7 +1157,7 @@ long *unreg_1_svc(db_res *recev)
 
 	try 
 	{
-		for (key = dbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
 		{
 			NdbmNamesKey k(key);
 			
@@ -1207,15 +1207,15 @@ long *unreg_1_svc(db_res *recev)
 					co.unreg();
 					co.build_datum();
 		
-					dbm_store(dbgen.tid[0],k.get_key(),co.get_datum(),DBM_REPLACE);
+					gdbm_store(dbgen.tid[0],k.get_key(),co.get_datum(),GDBM_REPLACE);
 					indi++;
 				}
 			}
 			catch (NdbmError &err)
 			{
-				if (dbm_error(dbgen.tid[i]) != 0)
+				if (gdbm_error(dbgen.tid[i]) != 0)
 				{
-					dbm_clearerr(dbgen.tid[i]);
+					gdbm_clearerr(dbgen.tid[i]);
 					sent_back = DbErr_DatabaseAccess;
 					return(&sent_back);
 				}
@@ -1337,7 +1337,7 @@ svcinfo_svc *svcinfo_1_svc(db_res *recev)
 
 	try 
 	{
-		for (key = dbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
 		{
 			NdbmNamesKey k(key);
 			
@@ -1415,9 +1415,9 @@ svcinfo_svc *svcinfo_1_svc(db_res *recev)
 			}
 			catch (NdbmError &err)
 			{
-				if (dbm_error(dbgen.tid[0]) != 0)
+				if (gdbm_error(dbgen.tid[0]) != 0)
 				{
-					dbm_clearerr(dbgen.tid[0]);
+					gdbm_clearerr(dbgen.tid[0]);
 					delete [] dev_list;
 					svcinfo_back.db_err = DbErr_DatabaseAccess;
 					return(&svcinfo_back);
@@ -1565,7 +1565,7 @@ long *svcdelete_1_svc(db_res *recev)
 
 	try 
 	{
-		for (key = dbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
 		{
 			NdbmNamesKey k(key);
 			
@@ -1618,15 +1618,15 @@ long *svcdelete_1_svc(db_res *recev)
 					if (del_res == True)
 						delete_res(device);
 			
-					dbm_delete(dbgen.tid[0],k.get_key());
+					gdbm_delete(dbgen.tid[0],k.get_key());
 					indi++;
 				}
 			}
 			catch (NdbmError &err)
 			{
-				if (dbm_error(dbgen.tid[i]) != 0)
+				if (gdbm_error(dbgen.tid[i]) != 0)
 				{
-					dbm_clearerr(dbgen.tid[i]);
+					gdbm_clearerr(dbgen.tid[i]);
 					error_back = DbErr_DatabaseAccess;
 					return(&error_back);
 				}
@@ -1730,7 +1730,7 @@ void  delete_res(const string &dev_name)
 
 	try
 	{
-		for (key = dbm_firstkey(dbgen.tid[i]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[i]))
+		for (key = gdbm_firstkey(dbgen.tid[i]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[i], key))
 		{
 			NdbmResKey reskey(key);
 
@@ -1754,7 +1754,7 @@ void  delete_res(const string &dev_name)
 	}
 	catch (NdbmError &err)
 	{
-		dbm_clearerr(dbgen.tid[i]);		
+		gdbm_clearerr(dbgen.tid[i]);		
 		throw;
 	}
 	catch (bad_alloc)
@@ -1779,7 +1779,7 @@ void  delete_res(const string &dev_name)
 				if (ind != 1)
 					k.upd_indi(ind); 
 	
-				res = dbm_delete(dbgen.tid[i],k.get_key());
+				res = gdbm_delete(dbgen.tid[i],k.get_key());
 				if (res == 0)
 					ind++;
 				else
@@ -1790,7 +1790,7 @@ void  delete_res(const string &dev_name)
 					}
 					else
 					{
-						dbm_clearerr(dbgen.tid[i]);
+						gdbm_clearerr(dbgen.tid[i]);
 						break;
 					}
 				}					
@@ -1804,9 +1804,9 @@ void  delete_res(const string &dev_name)
 			}
 			else
 			{
-				if (dbm_error(dbgen.tid[i]) != 0)
+				if (gdbm_error(dbgen.tid[i]) != 0)
 				{
-					dbm_clearerr(dbgen.tid[i]);
+					gdbm_clearerr(dbgen.tid[i]);
 					throw NdbmError(DbErr_DatabaseAccess,"");
 				}
 			}
@@ -1910,7 +1910,7 @@ db_poller_svc *getpoller_1_svc(nam *dev)
 	found = False;
 	try
 	{
-		for (key = dbm_firstkey(dbgen.tid[i]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[i]))
+		for (key = gdbm_firstkey(dbgen.tid[i]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[i], key))
 		{
 			NdbmResKey reskey(key);
 
@@ -1970,7 +1970,7 @@ db_poller_svc *getpoller_1_svc(nam *dev)
 	found = False;
 	try 
 	{
-		for (key = dbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
 		{
 			NdbmNamesCont cont(dbgen.tid[0],key);
 		
@@ -1987,9 +1987,9 @@ db_poller_svc *getpoller_1_svc(nam *dev)
 				break;
 			}		
 		}
-		if (dbm_error(dbgen.tid[0]) != 0)
+		if (gdbm_error(dbgen.tid[0]) != 0)
 		{			
-			dbm_clearerr(dbgen.tid[0]);
+			gdbm_clearerr(dbgen.tid[0]);
 			poll_back.db_err = DbErr_DatabaseAccess;
 			return(&poll_back);			
 		}

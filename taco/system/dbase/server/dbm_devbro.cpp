@@ -78,7 +78,7 @@ db_res *devdomainlist_1_svc()
 
 	try 
 	{
-		for (key = dbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
 		{
 			NdbmNamesCont cont(dbgen.tid[0],key);
 		
@@ -86,9 +86,9 @@ db_res *devdomainlist_1_svc()
 
 			dom_list.add_if_new(domain);		
 		}
-		if (dbm_error(dbgen.tid[0]) != 0)
+		if (gdbm_error(dbgen.tid[0]) != 0)
 		{			
-			dbm_clearerr(dbgen.tid[0]);
+			gdbm_clearerr(dbgen.tid[0]);
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);			
 		}
@@ -97,9 +97,9 @@ db_res *devdomainlist_1_svc()
 // Add new domain from the PS_NAMES table
 //
 
-		for (key = dbm_firstkey(dbgen.tid[dbgen.ps_names_index]); \
+		for (key = gdbm_firstkey(dbgen.tid[dbgen.ps_names_index]); \
 		     key.dptr != NULL; \
-		     key = dbm_nextkey(dbgen.tid[dbgen.ps_names_index]))
+		     key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key))
 		{
 			NdbmPSNamesKey pskey(key);
 		
@@ -107,9 +107,9 @@ db_res *devdomainlist_1_svc()
 		
 			dom_list.add_if_new(domain);
 		}
-		if (dbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
+		if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
 		{
-			dbm_clearerr(dbgen.tid[dbgen.ps_names_index]);
+			gdbm_clearerr(dbgen.tid[dbgen.ps_names_index]);
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);		
 		}
@@ -206,7 +206,7 @@ db_res *devfamilylist_1_svc(nam* domain)
 
 	try
 	{
-		for (key = dbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
 		{
 			NdbmNamesCont cont(dbgen.tid[0],key);
 		
@@ -218,9 +218,9 @@ db_res *devfamilylist_1_svc(nam* domain)
 		
 			fam_list.add_if_new(family);
 		}
-		if (dbm_error(dbgen.tid[0]) != 0)
+		if (gdbm_error(dbgen.tid[0]) != 0)
 		{
-			dbm_clearerr(dbgen.tid[0]);
+			gdbm_clearerr(dbgen.tid[0]);
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);
 		}
@@ -229,9 +229,9 @@ db_res *devfamilylist_1_svc(nam* domain)
 // Add family name list for the wanted domain in from the PS_NAMES table
 //
 
-		for (key = dbm_firstkey(dbgen.tid[dbgen.ps_names_index]); \
+		for (key = gdbm_firstkey(dbgen.tid[dbgen.ps_names_index]); \
 		     key.dptr != NULL; \
-		     key = dbm_nextkey(dbgen.tid[dbgen.ps_names_index]))
+		     key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key))
 		{
 			NdbmPSNamesKey pskey(key);
 		
@@ -243,9 +243,9 @@ db_res *devfamilylist_1_svc(nam* domain)
 		
 			fam_list.add_if_new(family);
 		}
-		if (dbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
+		if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
 		{
-			dbm_clearerr(dbgen.tid[dbgen.ps_names_index]);
+			gdbm_clearerr(dbgen.tid[dbgen.ps_names_index]);
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);
 		}
@@ -349,7 +349,7 @@ db_res *devmemberlist_1_svc(db_res *recev)
 
 	try
 	{
-		for (key = dbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = dbm_nextkey(dbgen.tid[0]))
+		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
 		{
 			NdbmNamesCont cont(dbgen.tid[0],key);
 		
@@ -364,9 +364,9 @@ db_res *devmemberlist_1_svc(db_res *recev)
 		
 			memb_list.add_if_new(member);
 		}
-		if (dbm_error(dbgen.tid[0]) != 0)
+		if (gdbm_error(dbgen.tid[0]) != 0)
 		{
-			dbm_clearerr(dbgen.tid[0]);
+			gdbm_clearerr(dbgen.tid[0]);
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);
 		}
@@ -375,9 +375,9 @@ db_res *devmemberlist_1_svc(db_res *recev)
 // Add member name for the wanted domain and family from PS_NAMES table
 //
 
-		for (key = dbm_firstkey(dbgen.tid[dbgen.ps_names_index]); \
+		for (key = gdbm_firstkey(dbgen.tid[dbgen.ps_names_index]); \
 		     key.dptr != NULL; \
-		     key = dbm_nextkey(dbgen.tid[dbgen.ps_names_index]))
+		     key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key))
 		{
 			NdbmPSNamesKey pskey(key);
 		
@@ -392,9 +392,9 @@ db_res *devmemberlist_1_svc(db_res *recev)
 		
 			memb_list.add_if_new(member);
 		}
-		if (dbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
+		if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
 		{
-			dbm_clearerr(dbgen.tid[dbgen.ps_names_index]);
+			gdbm_clearerr(dbgen.tid[dbgen.ps_names_index]);
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);
 		}

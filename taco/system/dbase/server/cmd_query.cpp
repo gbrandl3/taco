@@ -46,7 +46,7 @@ cmd_que *db_cmd_query_1_svc(nam *pcmd_name)
 	datum key;
 	datum content;
 	char *tbeg,*tend;
-	DBM *tab;
+	GDBM_FILE	tab;
 	unsigned int diff;
 	int ds_num;
 	int team;
@@ -95,10 +95,10 @@ cmd_que *db_cmd_query_1_svc(nam *pcmd_name)
 /* Try to retrieve a resource in the CMDS table with a resource value equal
    to the command name */
 
-	for (key=dbm_firstkey(tab);key.dptr!=NULL;key=dbm_nextkey(tab))
+	for (key=gdbm_firstkey(tab);key.dptr!=NULL;key=gdbm_nextkey(tab, key))
 	{
 
-		content = dbm_fetch(tab,key);
+		content = gdbm_fetch(tab,key);
 		if (content.dptr == NULL)
 		{
 			back.db_err = DbErr_DatabaseAccess;
