@@ -93,17 +93,17 @@ AC_DEFUN([TACO_ASCII_API],
 [
 	AC_ARG_ENABLE(ascii, AC_HELP_STRING([--enable-ascii], [build the ASCII api @<:@default=yes@:>@]),
 		[case "${enable_ascii}" in
-			yes)	ascii=yes;;
-			no)	ascii=no;;
+			yes)	taco_ascii=yes;;
+			no)	taco_ascii=no;;
 			*)	AC_MSG_ERROR([bad value ${enable_ascii} for --enable-ascii]);;
-		esac], [ascii=yes])
+		esac], [taco_ascii=yes])
 	AC_CHECK_HEADERS([dlfcn.h], [], [
-		AC_CHECK_HEADERS([dl.h], [], [ascii=no])])
-	if test "x$ascii" = "xyes" ; then
+		AC_CHECK_HEADERS([dl.h], [], [taco_ascii=no])])
+	if test "x$taco_ascii" = "xyes" ; then
 		TACO_ASCII_LIBS="\$(top_builddir)/lib/ascii/libascapi.la \$(top_builddir)/lib/tc/libtcapi.la"
 	fi
 	AC_SUBST(TACO_ASCII_LIBS)
-	AM_CONDITIONAL(ASCII_BUILD, test "x$ascii" = "xyes")
+	AM_CONDITIONAL(ASCII_BUILD, test "x$taco_ascii" = "xyes")
 ])
 
 AC_DEFUN([TACO_XDEVMENU],
@@ -116,13 +116,13 @@ AC_DEFUN([TACO_XDEVMENU],
 			no)	xdevmenu=no;;
 			*)	AC_MSG_ERROR(bad value ${enableval} for --enable-xdevmenu);;
 		esac], [xdevmenu=yes])
-	if test "x$xdevmenu" = "xno" ; then
-		ascii=yes
+	if test "x$xdevmenu" = "xyes" ; then
+		taco_ascii=yes
 		X_AND_MOTIF
 		XDEVMENU=xdevmenu
 	fi
-	AM_CONDITIONAL(ASCII_BUILD, test "x$ascii" = "xyes")
-	if test "x$motif_found" != "xyes" -o "x$ascii" != "xyes" ; then
+	AM_CONDITIONAL(ASCII_BUILD, test "x$taco_ascii" = "xyes")
+	if test "x$motif_found" != "xyes" -o "x$taco_ascii" != "xyes" ; then
 		xdevmenu=no
 	fi
 	AM_CONDITIONAL(XDEVMENUBUILD, test "x$xdevmenu" = "xyes") 

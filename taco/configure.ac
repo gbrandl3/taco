@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0rc3, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.29 $)dnl
+AC_REVISION($Revision: 1.30 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -245,7 +245,7 @@ build:
 	gdbm:			${MAKE_GDBM}
 	dataport API:		${DATAPORT}
 	data collector API:	${taco_dc}
-	ASCII API:		${ascii}
+	ASCII API:		${taco_ascii}
 	database server with:
 		DBM support:	yes
 		mySQL support:	${taco_mysql}
