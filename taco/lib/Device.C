@@ -12,9 +12,9 @@
 //
 // Original:	March 1995
 //
-// Version:	$Revision: 1.6 $
+// Version:	$Revision: 1.7 $
 //
-// Date:	$Date: 2003-05-21 16:21:20 $
+// Date:	$Date: 2003-05-30 07:49:51 $
 //
 //-**********************************************************************
 		
@@ -76,7 +76,7 @@ Device::Device (DevString devname, long *error)
 // type
 //
 	this->class_name = (char *)"DeviceClass";
-	snprintf(this->dev_type, sizeof(this->dev_type) - 1, TYPE_DEFAULT);
+	strncpy(this->dev_type, TYPE_DEFAULT, sizeof(this->dev_type) - 1);
 //
 // initialise the device name
 //
@@ -189,7 +189,6 @@ Device::~Device ()
 /* M. Diehl  2.11.99
  * free the memory malloc'ed by Device::Device()
  */
-
 	if( name != NULL )
 	{
 		free(name);
@@ -290,6 +289,7 @@ long Device::Status(void *vargin, void *vargout, long *error)
  */
 long Device::On(void *vargin, void *vargout, long *error)
 {
+	*error = 0;
 	this->state = DEVON;
 	return DS_OK;
 }
@@ -299,6 +299,7 @@ long Device::On(void *vargin, void *vargout, long *error)
  */
 long Device::Off(void *vargin, void *vargout, long *error)
 {
+	*error = 0;
 	this->state = DEVOFF;
 	return DS_OK;
 }
@@ -308,6 +309,7 @@ long Device::Off(void *vargin, void *vargout, long *error)
  */
 long Device::Reset(void *vargin, void *vargout, long *error)
 {
+	*error = 0;
 	this->state = DEVOFF;
 	return DS_OK;
 }
