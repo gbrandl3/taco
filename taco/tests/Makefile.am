@@ -27,7 +27,7 @@ AUTOTEST 		= $(AUTOM4TE) --language=autotest
 
 check_PROGRAMS 		= db_connect db_resget db_resput \
 			db_resdomain db_resfamily db_resmember dev_ping \
-			db_getresoval \
+			db_getresoval db_devdomain db_devfamily db_devmember \
 			test_asc_dyn test_asc_stat test_tc test_starter \
 			test_cmd_query 
 
@@ -47,11 +47,20 @@ db_resput_LDADD 	= @TACO_CLIENT_LIBS@
 db_resdomain_SOURCES 	= db_resdomain.cpp 
 db_resdomain_LDADD 	= @TACO_CLIENT_LIBS@
 
+db_devdomain_SOURCES 	= db_devdomain.cpp 
+db_devdomain_LDADD 	= @TACO_CLIENT_LIBS@
+
 db_resfamily_SOURCES 	= db_resfamily.cpp 
 db_resfamily_LDADD 	= @TACO_CLIENT_LIBS@
 
+db_devfamily_SOURCES 	= db_devfamily.cpp 
+db_devfamily_LDADD 	= @TACO_CLIENT_LIBS@
+
 db_resmember_SOURCES 	= db_resmember.cpp 
 db_resmember_LDADD 	= @TACO_CLIENT_LIBS@
+
+db_devmember_SOURCES 	= db_devmember.cpp 
+db_devmember_LDADD 	= @TACO_CLIENT_LIBS@
 
 dev_ping_SOURCES 	= dev_ping.c
 dev_ping_LDADD 		= @TACO_CLIENT_LIBS@ 
