@@ -1153,7 +1153,7 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT DISTINCT class FROM device WHERE server = '" + user_ds_name + "/" + user_pers_name;
+        query = "SELECT DISTINCT class FROM device WHERE server = '" + user_ds_name + "/" + user_pers_name + "'";
     }
     else
     {

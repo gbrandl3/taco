@@ -29,8 +29,8 @@
 db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 {
     std::string 	domain,	
-    			family("*"),			
-    			member("*");
+    			family("%"),			
+    			member("%");
     std::string::size_type	pos,
 			last_pos;
     int 		dev_num = 0;
@@ -87,11 +87,20 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT CONCAT(domain, '/', family, '/', member) FROM device WHERE";
+        query = "SELECT CONCAT(domain, '/', family, '/', member) FROM device WHERE ";
     }
     else
     {
-        query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM NAMES WHERE";
+        query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM NAMES WHERE ";
+    }
+/*
+ * replace * with mysql wildcard %
+ */
+    int index;
+
+    while ((index = tmpf.find('*')) != std::string::npos)
+    {
+	    tmpf.replace(index, 1, 1, '%');
     }
 
     switch(count(tmpf.begin(), tmpf.end(), '/'))
@@ -103,33 +112,33 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 		 member = tmpf.substr(pos + 1);
 		 if (mysql_db == "tango")
                  {
-		     query += ("CONCAT(domain, '/', family, '/', member) = '" + tmpf + "'");
+		     query += (" CONCAT(domain, '/', family, '/', member) LIKE '" + tmpf + "'");
                  }
                  else
                  {
-		     query += ("CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + tmpf + "'");
+		     query += (" CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) LIKE '" + tmpf + "'");
                  }
 		 break;
 	case 1 : pos = tmpf.find('/');
 		 domain = tmpf.substr(0, pos);	
 		 family = tmpf.substr(pos + 1);
-                 if (mysql_db == "tango")
+		 if (mysql_db == "tango")
                  {
-		     query += ("CONCAT(domain, '/', family) = '" + tmpf + "'");
+		     query += (" CONCAT(domain, '/', family) LIKE '" + tmpf + "'");
                  }
                  else
                  {
-		     query += ("CONCAT(DOMAIN, '/', FAMILY) = '" + tmpf + "'");
+		     query += (" CONCAT(DOMAIN, '/', FAMILY) LIKE '" + tmpf + "'");
                  }
 		 break;
 	case 0 : domain = tmpf;		
                  if (mysql_db == "tango")
                  {
-		     query += ("domain = '" + tmpf + "'");
+		     query += (" domain LIKE '" + tmpf + "'");
                  }
                  else
                  {
-		     query += ("DOMAIN = '" + tmpf + "'");
+		     query += (" DOMAIN LIKE '" + tmpf + "'");
                  }
 		 break;
 	default: std::cerr << "To many '/' in device name." << std::endl;
@@ -137,7 +146,14 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 		 browse_back.res_val.arr1_len = 0;
 		 return (&browse_back);		 		 
     }
-    query += (" AND PROGRAM_NUMBER != 0");
+    if (mysql_db == "tango")
+    {
+        query += (" AND exported != 0 AND ior LIKE 'rpc:%'");
+    }
+    else
+    {
+        query += (" AND PROGRAM_NUMBER != 0");
+    }
 #ifdef DEBUG
     std::cout << "filter domain : " << domain << std::endl;
     std::cout << "filter family : " << family << std::endl;
@@ -155,8 +171,8 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 //
 // Store the key if it is needed later 
 //
-	MYSQL_RES *result = mysql_store_result(mysql_conn);
-	MYSQL_ROW row;
+	    MYSQL_RES *result = mysql_store_result(mysql_conn);
+	    MYSQL_ROW row;
 	dev_num = mysql_num_rows(result);
 	if (prot == IPPROTO_UDP && (dev_num > MAXDEV_UDP))
 	{
