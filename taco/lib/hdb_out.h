@@ -39,6 +39,8 @@
 
 #define HDB_SYNC_MODE		1
 #define HDB_ASYNC_MODE		2
+#define HDB_CORRELATED_MODE		3
+#define HDB_INTERPOLATED_MODE		4
 
 /* Error codes */
 
@@ -78,6 +80,8 @@
 #define HDB_SIG_IS_GROUP_MEMBER			HdbLibBase + 33
 #define HDB_SIG_ISNOT_GROUP_MEMBER		HdbLibBase + 34
 #define HDB_ONE_SIG_IS_GROUP_MEMBER		HdbLibBase + 35
+#define HDB_CANNOT_INTERPOLATE_STRING           HdbLibBase + 36
+#define HDB_ARRAY_NOT_SUPPORTED                 HdbLibBase + 37
 
 
 /**************************************************************************
@@ -375,6 +379,9 @@ typedef struct _HdbVarGMUse {
  *									  *
  **************************************************************************/
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 long hdb_get_alias_list PT_((char ***,long *,long *));
 long hdb_get_sig_list PT_((char ***,long *,long *));
 long hdb_get_sigid_byalias PT_((char *,long *,long *));
@@ -421,6 +428,12 @@ long hdb_get_grp_data PT_((long,long,HdbDateInt *,HdbGrpOut *,long *));
 long hdb_free_grp_data PT_((HdbGrpOut *,long *));
 long hdb_grp_date_convert PT_((HdbGrpOut *,long *));
 long hdb_get_grp_memb_data PT_((long,long,HdbDateInt *,long,HdbSigOut *,long *));
+long hdb_disconnect PT_((void));
+long hdb_change_connection PT_((char *));
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 
 
