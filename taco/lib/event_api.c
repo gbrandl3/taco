@@ -33,9 +33,9 @@
 
  Original   :	April 1999
 
- Version    :	$Revision: 1.3 $
+ Version    :	$Revision: 1.4 $
 
- Date       :	$Date: 2003-05-02 09:12:48 $
+ Date       :	$Date: 2003-05-16 13:53:11 $
 
  Copyleft (c) 1999 by European Synchrotron Radiation Facility,
                       Grenoble, France
@@ -115,35 +115,29 @@ static event_client *event_client_list=NULL;
 bool_t _DLLFunc xdr__asynch_client_data PT_((XDR *xdrs, _asynch_client_data *objp));
 
 
-/*+**********************************************************************
- Function   :	extern long dev_event_listen_x()
-
- Description:	application interface to register a client as a listener
-		for events of a specified type from a device server.
-		The clients specifies a callback routine which will
-		be called every time an event of this type occurs.
-		The client has to pass pointers to output arguments of
-		a type appropriate to the event type. The client remains
-		registered until such time as a dev_event_unlisten()
-		call is issued.
-
- Arg(s) In  :	devserver ds       - handle to access the device.
-	    :   long event         - event to listen for
-	    :	DevCallback callback - callback routine to be triggered
-				       on completion
-	    :	void *user_data	   - pointer to user data to be passed to
-	                             callback function
-
- Arg(s) Out :	DevArgument argout  - pointer for output arguments.
-            :   DevType argout_type - data type of output arguments.
-            :   long *event_id_ptr  - client event identifier
-            :	long *status        - pointer to status of command execution
-            :	long *error         - Will contain an appropriate error 
-				      code if the corresponding call 
-				      returns a non-zero value.
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**
+ * application interface to register a client as a listener
+ * for events of a specified type from a device server.
+ * The clients specifies a callback routine which will
+ * be called every time an event of this type occurs.
+ * The client has to pass pointers to output arguments of
+ * a type appropriate to the event type. The client remains
+ * registered until such time as a dev_event_unlisten()
+ * call is issued.
+ * 
+ * @param ds		handle to access the device.
+ * @param event		event to listen for
+ * @param callback	callback routine to be triggered on completion
+ * @param *user_data	pointer to user data to be passed to callback function
+ * @param argout	pointer for output arguments.
+ * @param argout_type	data type of output arguments.
+ * @param event_id_ptr	client event identifier
+ * @param status        pointer to status of command execution
+ * @param error         Will contain an appropriate error code if the 
+ *			corresponding call returns a non-zero value.
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 	DevArgument argout, DevType argout_type, 
 	DevCallbackFunction *callback, void *user_data,
@@ -379,20 +373,19 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 	return (DS_OK);
 }
 
-/*+**********************************************************************
- Function   :	extern void dev_event_fire()
-
- Description:	application interface for device servers to fire events.
-		It will dispatch the event to all clients who have
-		registered interest in the specified event type.
-		Clients are passed the arguments specified in argout.
-
- Arg(s) In  :	long event_type    - event type to fire
-            :	DevArgument argout  - pointer for output arguments.
-            :   DevType argout_type - data type of output arguments.
-
- Return(s)  :	nothing
-***********************************************************************-*/
+/**@ingroup dsAPI
+ * application interface for device servers to fire events.
+ * It will dispatch the event to all clients who have
+ * registered interest in the specified event type.
+ * Clients are passed the arguments specified in argout.
+ * 
+ * @param ds
+ * @param event    	event type to fire
+ * @param argout  	pointer for output arguments.
+ * @param argout_type	data type of output arguments.
+ * @param event_status 
+ * @param event_error
+ */ 
 #ifndef __cplusplus 
 /*
  * OIC version
@@ -426,8 +419,7 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
 	long			i;
 
 #ifdef EBUG
-        dev_printdebug (DBG_ASYNCH,
-            "\ndev_event_fire() : entering routine\n");
+        dev_printdebug (DBG_ASYNCH, "\ndev_event_fire() : entering routine\n");
 #endif /* EBUG */
 	LOCK(async_mutex);
 
@@ -437,31 +429,25 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
  * them by sending them the output arguments
  */
 	for (i=0; i<EVENT_MAX_CLIENTS; i++)
-	{
 		if (event_client_list != NULL)
 		{
 			if ((event == event_client_list[i].event) &&
 #ifndef __cplusplus
-			    (ds == event_client_list[i].ds) &&
+				(ds == event_client_list[i].ds) 
 #else
-			    (device == event_client_list[i].device) &&
+				(device == event_client_list[i].device) 
 #endif /* __cplusplus */
-		    	(event_client_list[i].flag == DS_PENDING))
+		    		&& (event_client_list[i].flag == DS_PENDING))
 			{
-	
-				sprintf(client.server_name,"%s",event_client_list[i].server_name);
-				sprintf(client.server_host,"%s",event_client_list[i].server_host);
+				strncpy(client.server_name,event_client_list[i].server_name, sizeof(client.server_name));
+				strncpy(client.server_host,event_client_list[i].server_host, sizeof(client.server_host));
 				client.prog_number =  event_client_list[i].prog_number;
 				client.vers_number =  event_client_list[i].vers_number;
 
 #ifdef EBUG
-        			dev_printdebug (DBG_ASYNCH,
-            			"\ndev_event_fire() : send event to client -> ");
-        			dev_printdebug (DBG_ASYNCH,
-            			"event_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
-	    			event_client_list[i].id,
-				client.server_name, client.server_host,
-				client.prog_number, client.vers_number);
+        			dev_printdebug (DBG_ASYNCH, "\ndev_event_fire() : send event to client -> ");
+        			dev_printdebug (DBG_ASYNCH, "event_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
+		    			event_client_list[i].id, client.server_name, client.server_host, client.prog_number, client.vers_number);
 #endif /* EBUG */
 
 /*
@@ -471,8 +457,7 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
         			UNLOCK(async_mutex);
 				if (asynch_client_check(&client, &error) != DS_OK)
 				{
-					dev_printerror (SEND,"%s",
-                			"dev_event_fire : server couldn't import client to fire event");
+					dev_printerror (SEND,"%s", "dev_event_fire : server couldn't import client to fire event");
                                 	return;
 				}
         			LOCK(async_mutex);
@@ -495,15 +480,15 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
 #endif /* !vxworks */
 
 #ifdef EBUG
-                        	dev_printdebug (DBG_ASYNCH,
-                        	"\ndev_event_fire() : send event to client (time={%d,%d})\n",
-			   	timenow.tv_sec,timenow.tv_usec);
+                        	dev_printdebug (DBG_ASYNCH, "\ndev_event_fire() : send event to client (time={%d,%d})\n",
+				   	timenow.tv_sec,timenow.tv_usec);
 #endif /* EBUG */
 
 				iarg = 0;
 				vararg[iarg].argument_type	= D_ULONG_TYPE;
 				vararg[iarg].argument = (DevArgument)&timenow.tv_sec;
 				iarg++;
+
 				vararg[iarg].argument_type	= D_ULONG_TYPE;
 				vararg[iarg].argument = (DevArgument)&timenow.tv_usec;
 				iarg++;
@@ -514,8 +499,9 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
 				asynch_client_data.argout = argout;
 				asynch_client_data.argout_type = argout_type;
 
-#ifdef NEVER /* no need for this management - simply point to argout ? */
-/*
+#ifdef NEVER 
+/* no need for this management - simply point to argout ? 
+ *
  * allocate space for client data and copy argout to this area
  */
         			if (asynch_client_data.argout_type != D_VOID_TYPE)
@@ -523,33 +509,26 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
 /*
  * Get the XDR data type from the loaded type list
  */
-
-                			if ( xdr_get_type( asynch_client_data.argout_type, &data_type,
-                    		     	&asynch_client_data.error) == DS_NOTOK)
+                			if ( xdr_get_type( asynch_client_data.argout_type, &data_type, &asynch_client_data.error) == DS_NOTOK)
                 			{
 #ifdef EBUG
-                        		dev_printdebug (DBG_ERROR | DBG_ASYNCH,
-                            		"\ndev_event_fire() : xdr_get_type(%d) returned error %d\n",
-                            		asynch_client_data.argout_type, asynch_client_data.error);
+	                        		dev_printdebug (DBG_ERROR | DBG_ASYNCH, "\ndev_event_fire() : xdr_get_type(%d) returned error %d\n",
+		                            		asynch_client_data.argout_type, asynch_client_data.error);
 #endif /* EBUG */
-
-                        		asynch_client_data.status = DS_NOTOK;
+                        			asynch_client_data.status = DS_NOTOK;
                 			}
 
-
-                			asynch_client_data.argout =
-                    		       (char *) malloc ((unsigned int)data_type.size);
+                			asynch_client_data.argout = (char *) malloc ((unsigned int)data_type.size);
                 			if ( asynch_client_data.argout == NULL )
                 			{
-                        		asynch_client_data.status = DS_NOTOK;
-                        		asynch_client_data.error  = DevErr_InsufficientMemory;
+                        			asynch_client_data.status = DS_NOTOK;
+                        			asynch_client_data.error  = DevErr_InsufficientMemory;
                 			}
-                			memcpy (asynch_client_data.argout, argout, (size_t)data_type.size);
+					else
+                				memcpy (asynch_client_data.argout, argout, (size_t)data_type.size);
         			}
         			else
-        			{
                 			asynch_client_data.argout = NULL;
-        			}
 #endif /* NEVER */
 				asynch_client_data.var_argument.length = iarg; 
 				asynch_client_data.var_argument.sequence = vararg;
@@ -559,12 +538,11 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
  * gets rid of the replies immediately.
  */
         			clnt_stat = clnt_call (client.asynch_clnt, RPC_PUTGET_ASYN_REPLY,
-                    	   	(xdrproc_t)xdr__asynch_client_data, (caddr_t) &asynch_client_data,
-			   	(xdrproc_t)xdr_void, (caddr_t) NULL, TIMEVAL(zero_timeout));
+	                    	   	(xdrproc_t)xdr__asynch_client_data, (caddr_t) &asynch_client_data,
+				   	(xdrproc_t)xdr_void, (caddr_t) NULL, TIMEVAL(zero_timeout));
 
 #ifdef EBUG
-                        	dev_printdebug (DBG_ASYNCH,
-                        	"\ndev_event_fire() : send event to client (clnt_stat %d)\n",clnt_stat);
+                        	dev_printdebug (DBG_ASYNCH, "\ndev_event_fire() : send event to client (clnt_stat %d)\n",clnt_stat);
 #endif /* EBUG */
 
 /*
@@ -600,35 +578,29 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
   				}			
 			}
 		}
-	}
 
 #ifdef EBUG
-	dev_printdebug (DBG_ASYNCH, 
-		"\ndev_event_fire() : returning\n");
+	dev_printdebug (DBG_ASYNCH, "\ndev_event_fire() : returning\n");
 #endif /* EBUG */
 	UNLOCK(async_mutex);
 
 	return;
 }
 
-/*+**********************************************************************
- Function   :	extern long dev_event_unlisten_x()
-
- Description:	application interface for a client to unlisten to
-		an event. Client will be unregistered in the server
-		and will not receive anymore events of this type.
-
- Arg(s) In  :	devserver ds       - handle to access the device.
-	    :   long event         - event to listen for
-
- Arg(s) Out :	long *event_id_ptr  - client event identifier
-            :	long *status        - pointer to status of command execution
-            :	long *error         - Will contain an appropriate error 
-				      code if the corresponding call 
-				      returns a non-zero value.
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**@ingroup dsAPI
+ * application interface for a client to unlisten to
+ * an event. Client will be unregistered in the server
+ * and will not receive anymore events of this type.
+ * 
+ * @param ds       	handle to access the device.
+ * @param event         event to listen for
+ * @param event_id_ptr  client event identifier
+ * @param status        pointer to status of command execution
+ * @param error         Will contain an appropriate error code if the 
+ *			corresponding call returns a non-zero value.
+ * 
+ * Return(s)  :	DS_OK or DS_NOTOK
+ */ 
 long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
                                   long event_id, long *error)
 {
@@ -669,12 +641,10 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 		nethost = &multi_nethost[i_nethost];
 	}
 
-
 /*
  * Identify a local device.
  * Device is local if local_flag == True.
  */
-
 	local_flag =(_Int)( ds->ds_id >> LOCALACCESS_SHIFT);
 	local_flag = local_flag & LOCALACCESS_MASK;
 
@@ -682,12 +652,11 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
  * Verify the RPC connection if the device is not local.
  * Events are not supported for local devices.
  */
-
 	if ( local_flag != True )
 	{
 		if ( dev_rpc_connection (ds, error)  == DS_NOTOK )
 		{
-		    UNLOCK(async_mutex);
+			UNLOCK(async_mutex);
 			return (DS_NOTOK);
 		}
 	}
@@ -701,41 +670,28 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
  * If the security system is configured, 
  * verify the security key
  */
-
-	if (!ds->no_database)
-	{
-		if ( nethost->config_flags.security == True )
+	if (!ds->no_database && (nethost->config_flags.security == True)
+		&& (verify_sec_key (ds, &client_id, error) == DS_NOTOK))
 		{
-			if ( verify_sec_key (ds, &client_id, error) == DS_NOTOK )
-			{
-		    UNLOCK(async_mutex);
-				return (DS_NOTOK);
-			}
+			UNLOCK(async_mutex);
+			return (DS_NOTOK);
 		}
-	}
 
 /*
  * events use the asynchronous service of the device server - 
  * make sure it is imported. 
  */
-
 	UNLOCK(async_mutex);
 	if (asynch_server_import(ds,error) != DS_OK)
-	{
 		return (DS_NOTOK);
-	}
 
 	LOCK(async_mutex);
 /*
  * store the pointers to the return arguments so that event can
  * be passed back asynchronously to the client
+ *
+ *  fill in data transfer structures server_data and client_data.
  */
-
-	/*
-	 *  fill in data transfer structures server_data
-	 *  and client_data.
-	 */
-
 	server_data.ds_id	= ds->ds_id;
 	server_data.client_id	= client_id;
 	server_data.access_right= ds->dev_access;
@@ -743,7 +699,6 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 	server_data.argin_type	= D_VOID_TYPE;
 	server_data.argout_type	= D_VOID_TYPE;
 	server_data.argin	= (char *) NULL;
-
 /*
  * additional arguments, in this case asynch_id and the return argument
  * pointers are passed to the device server via the variable argument 
@@ -752,20 +707,26 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 	server_data.var_argument.length = iarg = 0;
 	vararg[iarg].argument_type	= D_ULONG_TYPE;
 	vararg[iarg].argument		= (DevArgument)&event_id;
-	server_data.var_argument.length++; iarg++;
+	server_data.var_argument.length++; 
+	iarg++;
 
 	name = config_flags.server_name;
 	vararg[iarg].argument_type	= D_STRING_TYPE;
 	vararg[iarg].argument		= (DevArgument)&name;
-	server_data.var_argument.length++; iarg++;
+	server_data.var_argument.length++; 
+	iarg++;
+	
 	host = config_flags.server_host;
 	vararg[iarg].argument_type	= D_STRING_TYPE;
 	vararg[iarg].argument		= (DevArgument)&host;
-	server_data.var_argument.length++; iarg++;
+	server_data.var_argument.length++; 
+	iarg++;
  
 	vararg[iarg].argument_type	= D_ULONG_TYPE;
 	vararg[iarg].argument		= (DevArgument)&config_flags.prog_number;
-	server_data.var_argument.length++; iarg++;
+	server_data.var_argument.length++; 
+	iarg++;
+
 	vararg[iarg].argument_type	= D_ULONG_TYPE;
 	vararg[iarg].argument		= (DevArgument)&config_flags.vers_number;
 	server_data.var_argument.length++; iarg++;
@@ -775,13 +736,9 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 	server_data.var_argument.sequence = vararg;
 
 #ifdef EBUG
-        dev_printdebug (DBG_TRACE | DBG_ASYNCH,
-            "\ndev_event_unlisten_x() : client data -> ");
-        dev_printdebug (DBG_ASYNCH,
-            "event_type=%d asynch_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
-	    event_type,event_id,
-	    config_flags.server_name,config_flags.server_host,
-	    config_flags.prog_number,config_flags.vers_number);
+        dev_printdebug (DBG_TRACE | DBG_ASYNCH, "\ndev_event_unlisten_x() : client data -> ");
+        dev_printdebug (DBG_ASYNCH, "event_type=%d asynch_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
+	    event_type,event_id, config_flags.server_name,config_flags.server_host, config_flags.prog_number,config_flags.vers_number);
 #endif /* EBUG */
 
 /*
@@ -791,23 +748,19 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
  */
 
 	clnt_stat = clnt_call (ds->asynch_clnt, RPC_EVENT_UNLISTEN,
-		    (xdrproc_t)xdr__server_data, (caddr_t) &server_data,
-		    (xdrproc_t)xdr_void, (caddr_t) NULL, TIMEVAL(zero_timeout));
+			    (xdrproc_t)xdr__server_data, (caddr_t) &server_data,
+			    (xdrproc_t)xdr_void, (caddr_t) NULL, TIMEVAL(zero_timeout));
 #ifdef EBUG
-	 dev_printdebug (DBG_ASYNCH,
-                        "\ndev_event_unlisten_x() : clnt_stat %d\n",clnt_stat);
+	dev_printdebug (DBG_ASYNCH, "\ndev_event_unlisten_x() : clnt_stat %d\n",clnt_stat);
 #endif /* EBUG */
 
 /*
  * Check for errors on the RPC connection.
  */
-	if ( clnt_stat != RPC_TIMEDOUT)
+	if ((clnt_stat != RPC_TIMEDOUT) && (dev_rpc_error (ds, clnt_stat, error) == DS_NOTOK))
 	{
-		if ( dev_rpc_error (ds, clnt_stat, error) == DS_NOTOK )
-		{
-		    UNLOCK(async_mutex);
-			return (DS_NOTOK);
-		}
+		UNLOCK(async_mutex);
+		return (DS_NOTOK);
 	}
 /*
  * remove event from list of asynchronous calls
@@ -823,27 +776,21 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 	return (DS_OK);
 }
 
-/*+**********************************************************************
- Function   :	extern void event_client_cleanup()
-
- Description:	internal housekeeping function used on the server
-		side to cleanup event clients which are not
-		responding anymore. They are removed from the
-		list and will not receive events.
-
-
- Arg(s) Out :	long *error         - Will contain an appropriate error 
-				      code if the corresponding call 
-				      returns a non-zero value.
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**@ingroup dsAPI
+ * internal housekeeping function used on the server
+ * side to cleanup event clients which are not
+ * responding anymore. They are removed from the
+ * list and will not receive events.
+ * 
+ * @param error	Will contain an appropriate error code if the 
+ *		corresponding call returns a non-zero value.
+ */
 void _DLLFunc event_client_cleanup (long *error)
 {
-	long		i, i_client;
+	long	i, 
+		i_client;
 #ifdef EBUG
-	dev_printdebug (DBG_ASYNCH, 
-		"\nevent_client_cleanup() : entering\n");
+	dev_printdebug (DBG_ASYNCH, "\nevent_client_cleanup() : entering\n");
 #endif /* EBUG */
 	LOCK(async_mutex);
 
@@ -856,9 +803,7 @@ void _DLLFunc event_client_cleanup (long *error)
  * remove those which have been detected as dead
  */
 	if (event_client_list != NULL)
-	{
 		for (i=0; i<EVENT_MAX_CLIENTS; i++)
-		{
 			if (event_client_list[i].flag == DS_PENDING)
 			{
 				i_client = event_client_list[i].no_svc_conn;
@@ -866,13 +811,11 @@ void _DLLFunc event_client_cleanup (long *error)
 				{
 					event_client_list[i].flag = DS_FALSE;
 #ifdef EBUG
-        dev_printdebug (DBG_ASYNCH,
-                "\nevent_client_cleanup() : removed client %d from list of clients registered for events\n",i);
+        				dev_printdebug (DBG_ASYNCH,
+				                "\nevent_client_cleanup() : removed client %d from list of clients registered for events\n",i);
 #endif /* EBUG */  
 				}
 			}
-		}
-	}	
 #ifdef EBUG
 	dev_printdebug (DBG_ASYNCH, 
 		"\nevent_client_cleanup() : returning\n");
@@ -881,24 +824,24 @@ void _DLLFunc event_client_cleanup (long *error)
 	return;
 }
 
-/*+**********************************************************************
- Function   :	extern void rpc_event_listen_5()
-
- Description:	rpc function used on the server side to register new clients. 
-		They are added to the global list of registered clients and 
-		will be sent events by the dev_event_fire() call.
-
- Arg(s) In  :	_server_data server_data - client data
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**@ingroup dsAPI
+ * rpc function used on the server side to register new clients. 
+ * They are added to the global list of registered clients and 
+ * will be sent events by the dev_event_fire() call.
+ * 
+ * @param server_data client data
+ * 
+ * @return DS_OK or DS_NOTOK
+ */ 
 _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
 {
-	static struct _dev_import_out dev_import_out;
-	long		i, i_client;
-	struct _devserver client;
-	long		status, error;
-	static long	first=1;
+	static struct _dev_import_out 	dev_import_out;
+	long				i, 
+					i_client;
+	struct _devserver 		client;
+	long				status, 
+					error;
+	static long			first=1;
 
 /*
  * first time round initialise event_client_list[] 
@@ -907,17 +850,14 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
 
 	if (first || event_client_list == NULL)
 	{
-		event_client_list =
-		(event_client*)malloc(sizeof(event_client)*EVENT_MAX_CLIENTS);
+		event_client_list = (event_client*)malloc(sizeof(event_client)*EVENT_MAX_CLIENTS);
 		if(!event_client_list)
-		    {
+		{
 			UNLOCK(async_mutex);
 			return NULL;
-		    }
-		for (i=0; i<EVENT_MAX_CLIENTS; i++)
-		{
-			event_client_list[i].flag = DS_FALSE;
 		}
+		for (i=0; i<EVENT_MAX_CLIENTS; i++)
+			event_client_list[i].flag = DS_FALSE;
 		first = 0;
 	}
 /*
@@ -925,17 +865,15 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
  */
 	i_client = -1;
 	for (i=0; i<EVENT_MAX_CLIENTS; i++)
-	{
 		if (event_client_list[i].flag == DS_FALSE)
 		{
 			i_client = i;
 			break;
 		}
-	}
 	
 	if ((i < 0) || (i > EVENT_MAX_CLIENTS))
 	{
-		printf("rpc_event_listen_5(): no more free event client slots !\n");
+		fprintf(stderr, "rpc_event_listen_5(): no more free event client slots !\n");
 		UNLOCK(async_mutex);
 		return(&dev_import_out);
 	}
@@ -950,50 +888,45 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
 	event_client_list[i_client].device = devices[server_data->ds_id&DEVICES_MASK].device;
 #endif /* __cplusplus */
 	event_client_list[i_client].id = *(long*)server_data->var_argument.sequence[0].argument;
-	event_client_list[i_client].server_name =
-	(char*)malloc(strlen(*(char**)server_data->var_argument.sequence[1].argument)+1);
+	event_client_list[i_client].server_name = (char*)malloc(strlen(*(char**)server_data->var_argument.sequence[1].argument)+1);
 	if(!event_client_list[i_client].server_name)
-	    {
+	{
 		error=DevErr_InsufficientMemory;
 		UNLOCK(async_mutex);
 		return NULL;
-	    }
+	}
 	sprintf(event_client_list[i_client].server_name,"%s",*(char**)server_data->var_argument.sequence[1].argument);
 	event_client_list[i_client].server_host = (char*)malloc(strlen(*(char**)server_data->var_argument.sequence[2].argument)+1);
 	if(!event_client_list[i_client].server_host)
-	    {
+	{
+		free(event_client_list[i_client].server_name);
 		error=DevErr_InsufficientMemory;
 		UNLOCK(async_mutex);
 		return NULL;
-	    }
+	}
 
-	sprintf(event_client_list[i_client].server_host,"%s",*(char**)server_data->var_argument.sequence[2].argument);
+	strcpy(event_client_list[i_client].server_host,*(char**)server_data->var_argument.sequence[2].argument);
 	event_client_list[i_client].prog_number = *(long*)server_data->var_argument.sequence[3].argument;
 	event_client_list[i_client].vers_number = *(long*)server_data->var_argument.sequence[4].argument;
 	event_client_list[i_client].event = *(long*)server_data->var_argument.sequence[5].argument;
 	event_client_list[i_client].argout_type = server_data->argout_type;
 
 #ifdef EBUG
-        dev_printdebug (DBG_ASYNCH,
-             "\nrpc_event_listen_5() : event client data -> ");
-        dev_printdebug (DBG_ASYNCH,
-              "event=%d id=%d server_name=%s server_host=%s argout_type=%d\n",
+        dev_printdebug (DBG_ASYNCH, "\nrpc_event_listen_5() : event client data -> ");
+        dev_printdebug (DBG_ASYNCH, "event=%d id=%d server_name=%s server_host=%s argout_type=%d\n",
 	     event_client_list[i_client].event,event_client_list[i_client].id, 
-	     event_client_list[i_client].server_name,
-	     event_client_list[i_client].server_host, 
-	     event_client_list[i_client].argout_type);
+	     event_client_list[i_client].server_name, event_client_list[i_client].server_host, event_client_list[i_client].argout_type);
 #endif /* EBUG */
 
 /*
  * import asynchronous service of client which wants to receive events
  */
-	sprintf(client.server_name,"%s",event_client_list[i_client].server_name);
-	sprintf(client.server_host,"%s",event_client_list[i_client].server_host);
+	strncpy(client.server_name,event_client_list[i_client].server_name, sizeof(client.server_name));
+	strncpy(client.server_host,event_client_list[i_client].server_host, sizeof(client.server_host));
 	client.prog_number = event_client_list[i_client].prog_number;
 	client.vers_number = event_client_list[i_client].vers_number;
 
 	UNLOCK(async_mutex);
-
 	status = asynch_client_check(&client, &error);
 	LOCK(async_mutex);
 
@@ -1003,28 +936,25 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
 		svr_conns[client.no_svr_conn].no_conns++; /* BP: needed to avoid premature freeing of async service ? */
 		event_client_list[i_client].flag = DS_PENDING;
 	}
-	else
+	else 
 	{
 		free(event_client_list[i_client].server_name);
 		free(event_client_list[i_client].server_host);
 		event_client_list[i_client].flag = DS_FALSE;
 	}
 	UNLOCK(async_mutex);
-
 	return(&dev_import_out);
 }
 
-/*+**********************************************************************
- Function   :	extern void rpc_event_unlisten_5()
-
- Description:	rpc function used on the server side to unregister a clients. 
-		It is removed from the global list of registered clients and 
-		will be not be sent events anymore by the dev_event_fire() call.
-
- Arg(s) In  :	_server_data server_data - client data
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**@ingroup dsAPI
+ * rpc function used on the server side to unregister a clients. 
+ * It is removed from the global list of registered clients and 
+ * will be not be sent events anymore by the dev_event_fire() call.
+ *
+ * @param _server_data server_data client data
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 _dev_free_out* _DLLFunc rpc_event_unlisten_5 (_server_data *server_data)
 {
 	static struct _dev_free_out dev_free_out;
@@ -1042,10 +972,8 @@ _dev_free_out* _DLLFunc rpc_event_unlisten_5 (_server_data *server_data)
 	prog_number = *(long*)server_data->var_argument.sequence[3].argument;
 	event_type = *(long*)server_data->var_argument.sequence[5].argument;
 #ifdef EBUG
-        dev_printdebug (DBG_ASYNCH,
-             "\nrpc_event_unlisten_5() : event client data -> ");
-        dev_printdebug (DBG_ASYNCH,
-             "type=%d id=%d name=%s host=%s program=%d\n",
+        dev_printdebug (DBG_ASYNCH, "\nrpc_event_unlisten_5() : event client data -> ");
+        dev_printdebug (DBG_ASYNCH, "type=%d id=%d name=%s host=%s program=%d\n",
 	     event_type, event_id, server_name, server_host, prog_number);
 #endif /* EBUG */
 
@@ -1054,28 +982,21 @@ _dev_free_out* _DLLFunc rpc_event_unlisten_5 (_server_data *server_data)
  */
 	i_client = -1;
 	if (event_client_list != NULL)
-	{
 		for (i=0; i<EVENT_MAX_CLIENTS; i++)
-		{
 			if (event_client_list[i].flag != DS_FALSE)
-			{
-				if ((strcmp(server_name,event_client_list[i].server_name) == 0) &&
-			    	(strcmp(server_host,event_client_list[i].server_host) == 0) &&
-			    	(prog_number == event_client_list[i].prog_number))
+				if ((strcmp(server_name,event_client_list[i].server_name) == 0) 
+					&& (strcmp(server_host,event_client_list[i].server_host) == 0) 
+					&& (prog_number == event_client_list[i].prog_number))
 				{
-					i_client = i;
 #ifdef EBUG
-        				dev_printdebug (DBG_ASYNCH,
-             				"\nrpc_event_unlisten_5() : found client at i_client=%d\n",i_client);
+        				dev_printdebug (DBG_ASYNCH, "\nrpc_event_unlisten_5() : found client at i_client=%d\n",i_client);
 #endif /* EBUG */
+					i_client = i;
 					break;
 				}
-			}
-		}
-	}
 	if (i_client < 0)
 	{
-		printf("rpc_event_unlisten_5(): event client not found !\n");
+		fprintf(stderr, "rpc_event_unlisten_5(): event client not found !\n");
 		UNLOCK(async_mutex);
 		return(&dev_free_out);
 	}
@@ -1091,8 +1012,7 @@ _dev_free_out* _DLLFunc rpc_event_unlisten_5 (_server_data *server_data)
                 	clnt_destroy (svr_conns[no_svc_conn].asynch_clnt);
 			svr_conns[no_svc_conn].asynch_clnt = NULL;
 #ifdef EBUG
-        		dev_printdebug (DBG_ASYNCH,
-			"rpc_event_unlisten_5(): destroy asynch client handle\n");
+        		dev_printdebug (DBG_ASYNCH, "rpc_event_unlisten_5(): destroy asynch client handle\n");
 #endif /* EBUG */
 		}
 	}
@@ -1107,53 +1027,48 @@ static db_resource   res_tab [] = {
 
 static long get_event_string PT_( (devserver ds, long event, char *event_str, long *error) );
 
-/*+**********************************************************************
- Function   : 	extern long dev_event_query()
-
- Description:	Returns a sequence of structures containing all
-		available events, their names, their input and
-		output data types, and type describtions for one
-		device.
-            :	Events and data types are read from the event
-		list in the device server by calling 
-		RPC_DEV_EVENT_QUERY.
-            :	Event names are read from the event name list,
-		defined in the database (EVENT/team/server/event): 
-
-            :	Data type describtions have to be specified as 
-		CLASS resources as:
-            :		CLASS/class_name/event_name/OUT_TYPE:
-
- Arg(s) In  :	ds - client handle for the associated device.
-
- Arg(s) Out :	vareventarr - sequence of DevEventInfo structures.
-		error     - Will contain an appropriate error code if the
-			    corresponding call returns a non-zero value.
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**@ingroup dsAPI
+ * Returns a sequence of structures containing all
+ * available events, their names, their input and
+ * output data types, and type describtions for one
+ * device.
+ *
+ * Events and data types are read from the event
+ * list in the device server by calling 
+ * RPC_DEV_EVENT_QUERY.
+ *
+ * Event names are read from the event name list,
+ * defined in the database (EVENT/team/server/event): 
+ * 
+ * Data type describtions have to be specified as 
+ * CLASS resources as: CLASS/class_name/event_name/OUT_TYPE:
+ *
+ * @param ds 		client handle for the associated device.
+ * @param vareventarr 	sequence of DevEventInfo structures.
+ * @param error     	Will contain an appropriate error code if the
+ *			corresponding call returns a non-zero value.
+ *
+ * Return(s)  :	DS_OK or DS_NOTOK
+ */
 long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long *error)
 {
-	_dev_query_in	dev_query_in;
+	_dev_query_in		dev_query_in;
 	_dev_queryevent_out	dev_query_out;
-	enum clnt_stat  clnt_stat;
-	char		class_name[SHORT_NAME_SIZE];
-	char		event_name[SHORT_NAME_SIZE];
-	long		length;
-	long		ret_stat;
-	char		res_path [LONG_NAME_SIZE];
-	int		i;
-	u_int 		res_tab_size = sizeof(res_tab) / 
-	    sizeof(db_resource);
-	long		status;
-	static char	**event_names=NULL;
-	int		n_event_names;
+	enum clnt_stat  	clnt_stat;
+	char			class_name[SHORT_NAME_SIZE],
+				res_path [LONG_NAME_SIZE],
+				event_name[SHORT_NAME_SIZE];
+	long			length;
+	long			ret_stat;
+	int			i;
+	u_int 			res_tab_size = sizeof(res_tab) / sizeof(db_resource);
+	long			status;
+	static char		**event_names=NULL;
+	int			n_event_names;
 
 	*error = 0;
 #ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_API,
-	    "\ndev_event_query() : entering routine\n");
+	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_event_query() : entering routine\n");
 #endif /* EBUG */
 
 #ifdef TANGO
@@ -1165,98 +1080,87 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long
 		return(status);
 	}
 #endif /* TANGO */
-	/*
-         * Verify the RPC connection.
-         */
-
+/*
+ * Verify the RPC connection.
+ */
 	if ( dev_rpc_connection (ds, error)  == DS_NOTOK )
-	{
 		return (DS_NOTOK);
-	}
 
-
-	/*
-         *  fill in data transfer structures dev_query_in
-         *  and dev_query_out.
-         */
-
+/*
+ *  fill in data transfer structures dev_query_in
+ *  and dev_query_out.
+ */
 	dev_query_in.ds_id = ds->ds_id;
-
 	dev_query_in.var_argument.length   = 0;
 	dev_query_in.var_argument.sequence = NULL;
 
-
-	/*
+/*
  *  Call the rpc entry point RPC_DEV_EVENT_QUERY at the specified device server.
  */
-
 	memset ((char *)&dev_query_out, 0, sizeof (dev_query_out));
 
-	/*
-	 * Query a device with the current version number >1.
-   	 */
+/*
+ * Query a device with the current version number >1.
+ */
 	if ( ds->vers_number > DEVSERVER_VERS)
-	{
 		clnt_stat = clnt_call (ds->clnt, RPC_DEV_EVENT_QUERY,
 		    (xdrproc_t)xdr__dev_query_in,  (caddr_t) &dev_query_in,
 		    (xdrproc_t)xdr__dev_queryevent_out, (caddr_t) &dev_query_out, TIMEVAL(timeout));
-	}
 	else
-	{
-		/*
-	    * Query a device from an old version server.
-	     THIS is not supported for old servers
-	    */
+/*
+ * Query a device from an old version server. THIS is not supported for old servers
+ */
 		    return (DS_NOTOK);
-	}
 
-
-	/*
-         * Check for errors on the RPC connection.
-         */
-
+/*
+ * Check for errors on the RPC connection.
+ */
 	if ( dev_rpc_error (ds, clnt_stat, error) == DS_NOTOK )
-	{
 		return (DS_NOTOK);
-	}
 
-	/*
-         * Free the variable arguments in the dev_query_out
-         * structure, coming from the server.
-         */
-
+/*
+ * Free the variable arguments in the dev_query_out structure, coming from the server.
+ */
         if (dev_query_out.var_argument.length > 0)
         {
                 event_names = (char**)realloc(event_names,dev_query_out.var_argument.length*sizeof(char*));
+		if (event_names == NULL)
+		{
+			*error  = DevErr_InsufficientMemory;
+			return DS_NOTOK;
+		}
                 for (i=0; i<dev_query_out.var_argument.length; i++)
                 {
                         event_names[i] = (char*)malloc(strlen(*(char**)dev_query_out.var_argument.sequence[i].argument)+1);
-                        sprintf(event_names[i],"%s",*(char**)dev_query_out.var_argument.sequence[i].argument);
+			if (event_names[i] == NULL)
+			{
+				int j;
+				for (j = 0; j < i; ++i)
+					free(event_names[j]);
+				free(event_names);
+				*error  = DevErr_InsufficientMemory;
+				return DS_NOTOK;
+			}
+                        strcpy(event_names[i], *(char**)dev_query_out.var_argument.sequence[i].argument);
                 }
         }
 	n_event_names = dev_query_out.var_argument.length;
 
-	xdr_free ((xdrproc_t)xdr_DevVarArgumentArray,
-	    (char *)&(dev_query_out.var_argument));
-
-
-	/*
+	xdr_free ((xdrproc_t)xdr_DevVarArgumentArray, (char *)&(dev_query_out.var_argument));
+/*
  * Allocate memory for a sequence of DevEventInfo structures
  * returned with vareventarr.
  */
-
 	vareventarr->length   = dev_query_out.length;
-	vareventarr->sequence = (DevEventInfo *) malloc
-	    (vareventarr->length * sizeof (DevEventInfo));
+	vareventarr->sequence = (DevEventInfo *) malloc (vareventarr->length * sizeof (DevEventInfo));
 	if ( vareventarr->sequence == NULL )
 	{
 		*error  = DevErr_InsufficientMemory;
 		return (-1);
 	}
-	memset ((char *)vareventarr->sequence, 0,
-	    (vareventarr->length * sizeof (DevEventInfo)));
+	memset ((char *)vareventarr->sequence, 0, (vareventarr->length * sizeof (DevEventInfo)));
 
-	/*
+/*
  * Now get command and types name strings for the returned
  * command sequence. Command names are retrieved from the
  * global command-name-list and name strings for the data types
@@ -1264,15 +1168,13 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long
  * 
  * Undefined names will be initialised with NULL.
  */
-
 	for ( i=0; (u_long)i<vareventarr->length; i++ )
 	{
-		/*
-	    * initialise vareventarr->sequence[i] with command and
-	    * argument types, returned with dev_query_out from the
-	    * device servers command list.
-	    */
-
+/*
+ * initialise vareventarr->sequence[i] with command and
+ * argument types, returned with dev_query_out from the
+ * device servers command list.
+ */
 		vareventarr->sequence[i].event      = dev_query_out.sequence[i].event;
 		vareventarr->sequence[i].out_type = dev_query_out.sequence[i].out_type;
 
@@ -1281,160 +1183,118 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long
  */
                 if (i < n_event_names && n_event_names > 0)
                 {
-                        sprintf(vareventarr->sequence[i].event_name,"%s",event_names[i]);
+                        strncpy(vareventarr->sequence[i].event_name,event_names[i], sizeof(vareventarr->sequence[i].event_name));
                         free(event_names[i]);
                 }
                 else
                 {
-	   /*
-	    * get command name string from the resource database
-	    */
+/*
+ * get command name string from the resource database
+ */
 			if (!ds->no_database)
 			{
-
-				if ( (ret_stat = get_event_string (ds, vareventarr->sequence[i].event, 
-		    		vareventarr->sequence[i].event_name, 
-		    		error )) == DS_NOTOK )
-				{
-			/*
-	       * An error will be only returned if the database
-	       * access fails.
-	       */
+				if ((ret_stat = get_event_string (ds, vareventarr->sequence[i].event, vareventarr->sequence[i].event_name, error)) == DS_NOTOK)
+/*
+ * An error will be only returned if the database access fails.
+ */
 					return (DS_NOTOK);
-				}
 			}
 			else
-			{
-				sprintf(vareventarr->sequence[i].event_name,"event%s",i);
-			}
+				snprintf(vareventarr->sequence[i].event_name, sizeof(vareventarr->sequence[i].event_name), "event%s",i);
 		}
 
-
-		/*
-	    *  Check wether command name was found.
-	    *  If the name was not found, get_event_string() returns
-	    *  DS_WARNING.
-	    */
-
-		if (!ds->no_database)
+/*
+ *  Check wether command name was found.
+ *  If the name was not found, get_event_string() returns DS_WARNING.
+ */
+		if (!ds->no_database && (ret_stat != DS_WARNING))
 		{
-			if ( ret_stat != DS_WARNING )
-			{
-			/*
-	       * Limit the class_name and the command_name
-	       * strings to 19 characters. This is the limit
-	       * of the static database name fields.
-	       */
+/*
+ * Limit the class_name and the command_name
+ * strings to 19 characters. This is the limit
+ * of the static database name fields.
+ */
+			length = strlen (dev_query_out.class_name);
+			if ( length > MAX_RESOURCE_FIELD_LENGTH )
+				length = MAX_RESOURCE_FIELD_LENGTH;
+			strncpy (class_name, dev_query_out.class_name, MAX_RESOURCE_FIELD_LENGTH);
+			class_name[(_Int)length] = '\0';
 
-				length = strlen (dev_query_out.class_name);
-				if ( length > MAX_RESOURCE_FIELD_LENGTH )
-					length = MAX_RESOURCE_FIELD_LENGTH;
-				strncpy (class_name, dev_query_out.class_name, 
-			    	MAX_RESOURCE_FIELD_LENGTH);
-				class_name[(_Int)length] = '\0';
-
-				length = strlen (vareventarr->sequence[i].event_name);
-				if ( length > MAX_RESOURCE_FIELD_LENGTH )
-					length = MAX_RESOURCE_FIELD_LENGTH;
-				strncpy (event_name, vareventarr->sequence[i].event_name,
-			    	MAX_RESOURCE_FIELD_LENGTH);
-				event_name[(_Int)length] = '\0';
+			length = strlen (vareventarr->sequence[i].event_name);
+			if ( length > MAX_RESOURCE_FIELD_LENGTH )
+				length = MAX_RESOURCE_FIELD_LENGTH;
+			strncpy (event_name, vareventarr->sequence[i].event_name, MAX_RESOURCE_FIELD_LENGTH);
+			event_name[(_Int)length] = '\0';
 
 /*
- *  setup resource path to read information about
- *  data types from the CLASS resource table.
+ * setup resource path to read information about
+ * data types from the CLASS resource table.
  *
  * but first check to see whether the device belongs to another
  * nethost domain i.e. i_nethost != 0
  */
-
-				if (ds->i_nethost > -1)
-				{
-					sprintf(res_path, "//%s/CLASS/%s/%s",
-				   	get_nethost_by_index(ds->i_nethost, error),
-				   	class_name, event_name);
-				}
+			if (ds->i_nethost > -1)
+				snprintf(res_path, sizeof(res_path), "//%s/CLASS/%s/%s", get_nethost_by_index(ds->i_nethost, error), class_name, event_name);
 /*
  * use default nethost
  */
-				else
-				{
-					sprintf (res_path, "CLASS/%s/%s", 
-				   	class_name, event_name);
-				}
+			else
+				snprintf (res_path, sizeof(res_path), "CLASS/%s/%s", class_name, event_name);
 
-			/*
-	       *  read CLASS resources from database
-	       */
-
-				res_tab[0].resource_adr = &(vareventarr->sequence[i].out_name);
-
-				if (db_getresource (res_path, res_tab, res_tab_size, error) < 0)
-				{
-					return (-1);
-				}
-			}
+/*
+ *  read CLASS resources from database
+ */
+			res_tab[0].resource_adr = &(vareventarr->sequence[i].out_name);
+			if (db_getresource (res_path, res_tab, res_tab_size, error) < 0)
+				return (DS_NOTOK);
 		}
 /*
  * no database, set out_name to NULL
  */
 		else
-		{
 			vareventarr->sequence[i].out_name = NULL;
-		}
 	}
 
-	/*
-	 *  free dev_query_out 
-	 */
+/*
+ *  free dev_query_out 
+ */
+	xdr_free ((xdrproc_t)xdr__dev_queryevent_out, (char *)&dev_query_out);
 
-	xdr_free ((xdrproc_t)xdr__dev_queryevent_out,
-	    (char *)&dev_query_out);
-
-	/*
+/*
  * Return error code and status from device server.
  */
-
 	*error = dev_query_out.error;
 	return (dev_query_out.status);
 }
 
 
-/*+**********************************************************************
- Function   :	static long get_event_string()
-
- Description:   Read the event name as a string from the
-		resource database.
-		The resource name is:
-		EVENT/team_no/server_no/event_ident:
-		DS_WARNING is returned, if the function was
-		executed correctly, but no event name
-		string was found in the database.
-
- Arg(s) In  :   long event      - error number
-
- Arg(s) Out :   char *event_str - command name as a string.
-		long *error   - Will contain an appropriate error
-			        code if the corresponding call
-		    	        returns a non-zero value.
-
- Return(s)  :   DS_OK or DS_NOTOK or DS_WARNING
-***********************************************************************-*/
-
+/**@ingroup dsAPI
+ * Read the event name as a string from the resource database.
+ *
+ * The resource name is: EVENT/team_no/server_no/event_ident
+ *
+ * DS_WARNING is returned, if the function was executed correctly, but no event 
+ * name string was found in the database.
+ *
+ * @param event      	event number
+ * @param event_str 	event name as a string.
+ * @param error   	Will contain an appropriate error code if the 
+ *			corresponding call returns a non-zero value.
+ * @return DS_OK or DS_NOTOK or DS_WARNING
+ */
 static long get_event_string (devserver ds, long event, char *event_str, long *error)
 {
-	char		res_path[LONG_NAME_SIZE];
-	char		res_name[SHORT_NAME_SIZE];
-	char		*ret_str = NULL;
+	char		res_path[LONG_NAME_SIZE],
+			res_name[SHORT_NAME_SIZE],
+			*ret_str = NULL;
 	db_resource 	res_tab;
 	unsigned long 	event_number_mask = 0x3ffff;
-	unsigned short 	team;
-	unsigned short 	server;
-	unsigned short 	events_ident;
+	unsigned short 	team,
+			server,
+			events_ident;
 
 #ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_API,
-	    "\nget_event_string() : entering routine\n");
+	dev_printdebug (DBG_TRACE | DBG_API, "\nget_event_string() : entering routine\n");
 #endif /* EBUG */
 
 	*error = 0;
@@ -1449,48 +1309,38 @@ static long get_event_string (devserver ds, long event, char *event_str, long *e
 	server = server & DS_IDENT_MASK;
 	events_ident = (_Int)(event & event_number_mask);
 
-	/*
+/*
  * Create the resource path and the resource structure.
  *
  * first check to see whether the device belongs to another
  * nethost domain i.e. i_nethost != 0
  */
-
 	if (ds->i_nethost > 0)
-	{
-		sprintf(res_path, "//%s/EVENTS/%d/%d", 
-		   get_nethost_by_index(ds->i_nethost, error),
-		   team, server);
-	}
+		snprintf(res_path, sizeof(res_path), "//%s/EVENTS/%d/%d", get_nethost_by_index(ds->i_nethost, error), team, server);
 /*
  * use default nethost
  */
 	else
-	{
-		sprintf(res_path, "EVENTS/%d/%d", team, server);
-	}
+		snprintf(res_path, sizeof(res_path),"EVENTS/%d/%d", team, server);
 
-	sprintf (res_name, "%d", events_ident);
+	snprintf (res_name, sizeof(res_name), "%d", events_ident);
 #ifdef EBUG
-	dev_printdebug (DBG_API,
-	    "get_events_string() : res_path = %s\n", res_path);
-	dev_printdebug (DBG_API,
-	    "get_events_string() : res_name = %s\n", res_name);
+	dev_printdebug (DBG_API, "get_events_string() : res_path = %s\n", res_path);
+	dev_printdebug (DBG_API, "get_events_string() : res_name = %s\n", res_name);
 #endif /* EBUG */
 
 	res_tab.resource_name = res_name;
 	res_tab.resource_type = D_STRING_TYPE;
 	res_tab.resource_adr  = &ret_str;
 
-	/*
+/*
  * Read the command name string from the database.
  */
 
 	if (db_getresource (res_path, &res_tab, 1, error) == DS_NOTOK)
 	{
 #ifdef EBUG
-		dev_printdebug (DBG_API | DBG_ERROR,
-		    "get_event_string() : db_getresource failed with error %d\n", *error);
+		dev_printdebug (DBG_API | DBG_ERROR, "get_event_string() : db_getresource failed with error %d\n", *error);
 #endif /* EBUG */
 
 		return (DS_NOTOK);
@@ -1502,11 +1352,9 @@ static long get_event_string (devserver ds, long event, char *event_str, long *e
  * In this case return the value DS_WARNING.
  */
 	if ( ret_str == NULL )
-	{
 		return (DS_WARNING);
-	}
 
-	sprintf (event_str, "%s", ret_str);
+	snprintf (event_str, sizeof(event_str), "%s", ret_str);
 	free (ret_str);
 	return (DS_OK);
 }

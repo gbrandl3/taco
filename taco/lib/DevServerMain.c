@@ -11,9 +11,9 @@
 
  Original   	: March 1991
 
- Version	: $Revision: 1.3 $
+ Version	: $Revision: 1.4 $
 
- Date		: $Date: 2003-05-12 07:06:20 $
+ Date		: $Date: 2003-05-16 13:53:10 $
 
  Copyright (c) 1990-2002 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -281,61 +281,59 @@ application_main (int argc, char **argv)  /* Windows does not use main()! */
 
 #else /* _NT */
 int main (int argc, char **argv)
-/*+**********************************************************************
- Function   :   main()
-
- Description:   Main routine for all device servers.
-	    :   Checks wether a device server with the
-		same name is already running. 
-	    :	Opens a connection to the static database and
-		to a message service.
-            :   Registers the server on a transient program
-		number to the portmapper.
-
- Arg(s) In  :   char *argv[1] - personal name for the device server.
-
- Return(s)  :   exit(1) or exit(-1)
-***********************************************************************-*/
+/**@ingroup dsAPI
+ * Main routine for all device servers.
+ *
+ * Checks wether a device server with the same name is already running. 
+ *
+ * Opens a connection to the static database and to a message service.
+ *
+ * Registers the server on a transient program number to the portmapper.
+ * 
+ * @param argv options and the personal name for the device server.
+ * 
+ * @return 1 DS_NOTOK
+ */
 #endif /* _NT */
 {
-/*        SVCXPRT *transp; */
-/*        SVCXPRT *transp_tcp; */
-        char    host_name [19];
-        char    dsn_name [37];
-        char    *proc_name;
-        char    *display;
+/*	SVCXPRT 		*transp; 
+        			*transp_tcp; */
+	char    		host_name [19],
+				dsn_name [37],
+				*proc_name,
+				*display,
+				res_path [80],
+				res_name[80];
+	DevVarStringArray	default_access;
+	db_resource		res_tab;
 
-        char                    res_path [80];
-        char                    res_name[80];
-        DevVarStringArray       default_access;
-        db_resource             res_tab;
+	long			prog_number=0,
+				status,
+				error = 0;
+	int			pid = 0;
+	short			m_opt = False,
+				s_opt = True,
+				nodb_opt = False,
+				sig,
+				i,
+				j;
 
-        long    prog_number=0;
-        long    status;
-        long    error = 0;
-        int     pid = 0;
-        short   m_opt = False;
-        short   s_opt = True;
-        short   nodb_opt = False;
-        short   sig;
-        short   i,j;
-
-	/*
-	 *  read device server's class name and personal name
-	 *  check for lenght of names : server process name <= 23 char
-	 *                              personal name       <= 11 char
-	 */
+/*
+ *  read device server's class name and personal name
+ *  check for lenght of names : server process name <= 23 char
+ *                              personal name       <= 11 char
+ */
 #ifndef _NT
 	if (argc < 2)
 	{
-/*	   	printf ("usage :  %s personal_name {-m} {-s} {-nodb} {-pn program #} {-device dev1 ...}\n",argv[0]);*/
 		fprintf (stderr, "usage :  %s personal_name {-nodb} {-pn program #} {-device device1 ...}\n",argv[0]);
 		exit (1);
 	}
 #else
-	if(0 !=(proc_name = (char *)strrchr (argv[0],'\\'))) {
-		if(0 == strncmp(proc_name+strlen(proc_name)-4,".exe",4))
-    		proc_name[strlen(proc_name)-4]='\0';
+	if(0 !=(proc_name = (char *)strrchr (argv[0],'\\'))) 
+	{
+		if(strncmp(proc_name+strlen(proc_name)-4,".exe",4) == 0)
+    			proc_name[strlen(proc_name)-4]='\0';
 	}
 #endif  /* !_NT */
 
@@ -344,7 +342,7 @@ int main (int argc, char **argv)
  */
 	memset(&config_flags, 0, sizeof(config_flags));
 #if defined (unix)
-  	proc_name = (char *)strrchr (argv[0], '/');
+	proc_name = (char *)strrchr (argv[0], '/');
 #endif	/*unix*/
 #if ( OSK || _OSK )
 #ifdef __cplusplus
@@ -355,9 +353,9 @@ int main (int argc, char **argv)
 #endif /* OSK || _OSK */
 
 	if (proc_name == NULL)
-      		proc_name = argv[0];
+		proc_name = argv[0];
 	else  
-           	proc_name++;
+		proc_name++;
 
 	if ( strlen(proc_name) > 23 )
 	{
@@ -367,7 +365,7 @@ int main (int argc, char **argv)
 		return(FALSE);
 #else
 		fprintf (stderr, msg);
-		exit (-1);
+		exit (DS_NOTOK);
 #endif
 	}
 
@@ -379,7 +377,7 @@ int main (int argc, char **argv)
 		return(FALSE);
 #else
 		fprintf (stderr, msg); 
-		exit (-1);
+		exit (DS_NOTOK);
 #endif
 	}
 
@@ -449,12 +447,12 @@ int main (int argc, char **argv)
  */
 
 #if defined (_NT)
-        pid = _getpid ();
+	pid = _getpid ();
 #else
 #if !defined (vxworks)
-        pid = getpid ();
+	pid = getpid ();
 #else  /* !vxworks */
-        pid = taskIdSelf ();
+	pid = taskIdSelf ();
 #endif /* !vxworks */
 #endif
 /*
@@ -487,7 +485,6 @@ int main (int argc, char **argv)
  * world. However, one has to keep in mind, that a bunch of other stuff
  * will fail, if FQDN exceeds SHORT_NAME_SIZE=32 - which is not too hard!
  */
- 
 	if( gethostname(host_name, 19) != 0 )
 	{
 		char            hostname[200];     /* hopefully enough! */
@@ -495,60 +492,43 @@ int main (int argc, char **argv)
 #if !defined(vxworks)
 		struct hostent	*host_info;
 #else  /* !vxworks */
-		union 		{ int    int_addr;
-	  			  u_char char_addr[4];}  host_addr;
+		union 		{ 
+					int    int_addr;
+					u_char char_addr[4];
+				}  host_addr;
 #endif /* !vxworks */
-
 		
 		if( gethostname(hostname,sizeof(hostname)) != 0 )
 		{
-			printf("unable to retrieve hostname!\n");
-			exit(-1);
+			fprintf(stderr, "unable to retrieve hostname!\n");
+			exit(DS_NOTOK);
 		}
-/*#ifdef EBUG		
-		printf("long hostname found - FQDN = %s\n", hostname);
-#endif*/
 
 #if !defined(vxworks)
 		if ( (host_info = gethostbyname(hostname)) == NULL )
 		{
-			printf("unable to get IP for host %s\n",
-				hostname);
-			exit(-1);
+			fprintf(stderr, "unable to get IP for host %s\n", hostname);
+			exit(DS_NOTOK);
 		}
-
-		sprintf (ip_str,"%d.%d.%d.%d",
-		    (u_char) host_info->h_addr[0],
-		    (u_char) host_info->h_addr[1],
-		    (u_char) host_info->h_addr[2],
-		    (u_char) host_info->h_addr[3]);
+		snprintf(ip_str, sizeof(ip_str), "%d.%d.%d.%d", (u_char) host_info->h_addr[0],
+			    (u_char) host_info->h_addr[1], (u_char) host_info->h_addr[2], (u_char) host_info->h_addr[3]);
 #else  /* !vxworks */
 		host_addr.int_addr = hostGetByName(hostname);
-		sprintf (ip_str,"%d.%d.%d.%d",
-		    (u_char) host_addr.char_addr[0],
-		    (u_char) host_addr.char_addr[1],
-		    (u_char) host_addr.char_addr[2],
-		    (u_char) host_addr.char_addr[3]);
+		snprintf (ip_str, sizeof(ip_str), "%d.%d.%d.%d", (u_char) host_addr.char_addr[0],
+			    (u_char) host_addr.char_addr[1], (u_char) host_addr.char_addr[2], (u_char) host_addr.char_addr[3]);
 #endif /* !vxworks */
 
-/*#ifdef EBUG
-		printf("using IP-addr-quad %s\n", ip_str);
-#endif*/
-		strncpy(host_name,ip_str,19);
+		strncpy(host_name,ip_str, sizeof(host_name));
 	}
-/*#ifdef EBUG
-	printf( "using hostname: %s\n", host_name);
-#endif*/
 
 	TOLOWER(dsn_name);
 	TOLOWER(host_name);
-	sprintf (config_flags.server_name,"%s", dsn_name); 
-	sprintf (config_flags.server_host,"%s", host_name); 
+	strncpy(config_flags.server_name, dsn_name, sizeof(config_flags.server_name)); 
+	strncpy(config_flags.server_host, host_name, sizeof(config_flags.server_host)); 
 
-	/*
-	 * install signal handling for HPUX, SUN, OS9
-	 */
-
+/*
+ * install signal handling for HPUX, SUN, OS9
+ */
 	(void) signal(SIGINT,  main_signal_handler);
 	(void) signal(SIGTERM, main_signal_handler);
         (void) signal(SIGABRT, main_signal_handler);
@@ -567,13 +547,12 @@ int main (int argc, char **argv)
 #endif /* unix */
 
 #if defined (_NT)
-        (void) signal(SIGBREAK,main_signal_handler);
+	(void) signal(SIGBREAK,main_signal_handler);
 #endif /* _NT */
 
 #if ( OSK || _OSK )
 	(void) signal(SIGQUIT, main_signal_handler);
 #endif /* OSK || _OSK */
-
 
 	if (nodb_opt == False)
 	{
@@ -583,7 +562,7 @@ int main (int argc, char **argv)
 		if ( db_import (&error) < 0 )
 	   	{
 	   		dev_printerror_no (SEND,"db_import failed",error);
-	   		exit(-1);
+	   		exit(DS_NOTOK);
 	   	}		
 /*
  *  check wether an old server with the same name
@@ -592,65 +571,61 @@ int main (int argc, char **argv)
 		if ( svc_check(&error) < 0 )
 	   	{
 	   		dev_printerror_no (SEND,"svc_check()",error);
-	   		exit(-1);
+	   		exit(DS_NOTOK);
 	   	}		
 /*
  * If the security system is switched on, read the minimal
  * access right for version 3 clients from the 
  * security database.
  */
-       		if ( config_flags.security == True )
-	   	{
-	   		default_access.length   = 0;
-	   		default_access.sequence = NULL;
+		if ( config_flags.security == True )
+		{
+			default_access.length   = 0;
+			default_access.sequence = NULL;
 
-       	   		sprintf (res_name, "default");
-	   		res_tab.resource_name = res_name;
-	   		res_tab.resource_type = D_VAR_STRINGARR;
-	   		res_tab.resource_adr  = &default_access;
+			strncpy (res_name, "default", sizeof(res_name));
+			res_tab.resource_name = res_name;
+			res_tab.resource_type = D_VAR_STRINGARR;
+			res_tab.resource_adr  = &default_access;
 
-	   		sprintf (res_path, "SEC/MINIMAL/ACC_RIGHT");
+			strncpy(res_path, "SEC/MINIMAL/ACC_RIGHT", sizeof(res_path));
 
-	   		if (db_getresource (res_path, &res_tab, 1, &error) == DS_NOTOK)
-	      		{
-			      	dev_printerror_no (SEND,
-	      				"db_getresource() get default security access right\n",error);
-	      			exit (-1);
-	      		}
+			if (db_getresource (res_path, &res_tab, 1, &error) == DS_NOTOK)
+			{
+				dev_printerror_no (SEND, "db_getresource() get default security access right\n",error);
+				exit (DS_NOTOK);
+			}
 /*
  * Transform the string array into an access right value.
  */
-           		if ( default_access.length > 0 )
-	      		{
-              			for (i=0; i<SEC_LIST_LENGTH; i++)
-                 		{
-                 			if (strcmp (default_access.sequence[0], 
-			     			DevSec_List[i].access_name) == 0)
-                    			{
-			                    	minimal_access = DevSec_List[i].access_right;
-                    				break;
-                    			}
-                 		}
-              			if ( i == SEC_LIST_LENGTH )
-		                 	minimal_access = NO_ACCESS;
-	      		}	 
-	   		else 
-		              	minimal_access = NO_ACCESS;
+			if ( default_access.length > 0 )
+			{
+				for (i=0; i<SEC_LIST_LENGTH; i++)
+				{
+					if (strcmp (default_access.sequence[0], DevSec_List[i].access_name) == 0)
+					{
+						minimal_access = DevSec_List[i].access_right;
+						break;
+					}
+				}
+				if ( i == SEC_LIST_LENGTH )
+					minimal_access = NO_ACCESS;
+			}	 
+			else 
+				minimal_access = NO_ACCESS;
 
-	   		free_var_str_array (&default_access);
-	   	}
+			free_var_str_array (&default_access);
+		}
 	}		
 /*
  * let portmapper choose port numbers for services 
  */
-        udp_socket = RPC_ANYSOCK;
-        tcp_socket = RPC_ANYSOCK;
+	udp_socket = RPC_ANYSOCK;
+	tcp_socket = RPC_ANYSOCK;
 
 /*
  *  create server handle and register to portmap
- */
-
-/*
+ *
  *  register udp port
  */
 	transp = svcudp_create (udp_socket);
@@ -659,43 +634,40 @@ int main (int argc, char **argv)
 		char msg[]="Cannot create udp service, exiting...\n";
 #if defined(_NT)
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
-            	/*raise(SIGABRT);*/
 		return (FALSE);
 #else
-		printf (msg);
-            	kill (pid,SIGQUIT);
+		fprintf (stderr, msg);
+		kill (pid,SIGQUIT);
 #endif
 	}
 /*
  *  make 3 tries to get transient progam number
  */
 	synch_svc_udp_sock = -1;
-	for (i=0; i<3; i++)
+	for (i = 0; i < 3; i++)
 	{
 		if (prog_number == 0)
 			prog_number = gettransient(dsn_name);
 		if( prog_number == 0 )
 		{
 	  		dev_printerror_no(SEND,"gettransient: no free programm nnumber\n",error);
-	  		exit(-1);
+	  		exit(DS_NOTOK);
 		}
 /*
  * Write the device server identification to the global
  * configuration structure.
  */
 		config_flags.prog_number = prog_number;
-/*		config_flags.vers_number = DEVSERVER_VERS;*/
 		config_flags.vers_number = API_VERSION;
 
-		if (!svc_register(transp, prog_number, API_VERSION, 
-			  	devserver_prog_4, IPPROTO_UDP)) 
+		if (!svc_register(transp, prog_number, API_VERSION, devserver_prog_4, IPPROTO_UDP)) 
 		{
 			char msg[]="Unable to register server (UDP,4), retry...\n"; 
 #if defined(_NT)
 			MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
 			return(FALSE);
 #else
-			printf (msg); 
+			fprintf (stderr, msg); 
 #endif
 		}
 		else
@@ -715,7 +687,7 @@ int main (int argc, char **argv)
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
 		return(FALSE);
 #else
-		printf (msg); 
+		fprintf (stderr, msg); 
 		kill(pid, SIGQUIT);
 #endif
 	}
@@ -729,16 +701,14 @@ int main (int argc, char **argv)
 		char msg[]= "Cannot create tcp service, exiting...\n";
 #if defined(_NT)
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
-            	/*raise(SIGABRT);*/
 		return (FALSE);
 #else
-		printf (msg); 
+		fprintf (stderr, msg); 
 		kill (pid,SIGQUIT);
 #endif
 	}
 
-        if (!svc_register(transp_tcp, prog_number, API_VERSION,
-			  devserver_prog_4, IPPROTO_TCP))
+        if (!svc_register(transp_tcp, prog_number, API_VERSION, devserver_prog_4, IPPROTO_TCP))
 	{
 		char msg[]= "Unable to register server (TCP,4), exiting...\n";
 #if defined(_NT)
@@ -746,7 +716,7 @@ int main (int argc, char **argv)
 		raise(SIGABRT);
 		return (FALSE);
 #else
-		printf (msg); 
+		fprintf (stderr, msg); 
 		kill (pid,SIGQUIT);
 #endif
 	}
@@ -775,22 +745,17 @@ int main (int argc, char **argv)
 		dev_printerror_no (SEND,"failed to register asynchronus rpc",error);
 /* 
  * DO NOT abort server, continue (without asynchronous server) ...
- *
-#if defined (_NT)
-		raise(SIGABRT);
-#else
-		kill (pid,SIGQUIT);
-#endif
+ * 
+ * startup message service 
  */
-/* startup message service */
 		if (m_opt ==True)
 	    	{	
 			display=getenv("DISPLAY");
 			if(msg_import(dsn_name,host_name,prog_number,display,&error)!=DS_OK)
-		    	{
-			/* we dont care */
-				printf("can not import message service\n");
-		    	}	
+/* 
+ * we dont care 
+*/
+				fprintf(stderr, "can not import message service\n");
 	    	}
 	}
 
@@ -836,11 +801,9 @@ int main (int argc, char **argv)
  *  set server into wait status
  */
 	svc_run();
-	{
-		char msg[]= "svc_run returned\n";
-		printf (msg); 
-		kill (pid,SIGQUIT);
-	}
+		
+	fprintf (stderr, "svc_run returned\n"); 
+	kill (pid,SIGQUIT);
 #else   /* _NT */
 /*
  * show up the main dialog
@@ -1904,8 +1867,7 @@ static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp)
 
 	if (!svc_getargs(transp, xdr_argument, (caddr_t) &argument)) 
 	{
-		dev_printerror (SEND,"%s",
-		"svcerr_decode : server couldn't decode incoming arguments");
+		dev_printerror (SEND,"%s", "svcerr_decode : server couldn't decode incoming arguments");
 		svcerr_decode(transp);
 		return;
 	}
@@ -1914,8 +1876,7 @@ static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp)
 	result = (*local)(&argument, rqstp);
 	if (result != NULL && !svc_sendreply(transp, xdr_result, (caddr_t)result)) 
 	{
-		dev_printerror (SEND,"%s",
-		"svcerr_systemerr : server couldn't send repply arguments");
+		dev_printerror (SEND,"%s", "svcerr_systemerr : server couldn't send reply arguments");
 		svcerr_systemerr(transp);
 	}
 

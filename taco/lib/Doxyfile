@@ -51,10 +51,11 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = 
+INPUT                  = . dbase xdr dc
 FILE_PATTERNS          = *.c \
                          *.h \
                          *.cpp \
+			 *.C \
                          *.H
 RECURSIVE              = NO
 EXCLUDE                = 

@@ -13,9 +13,9 @@
 
  Original:	June 1991
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2003-05-12 07:08:19 $
+ Date:		$Date: 2003-05-16 13:53:10 $
 
  Copyright (c) 1990-1997 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -55,7 +55,7 @@ extern "C" configuration_flags config_flags;
 extern configuration_flags config_flags;
 #endif
 
-/**
+/**@ingroup dsAPI
  *
  * A general device server signal handling interface for
  * HPUX, SUN and OS9. Based on the UNIX way of treating
@@ -81,9 +81,9 @@ long ds__signal (int sig, void (*action)(int), long *error)
 {
 	*error = 0;
 
-	/*
-	 *  check limits for valid signals
-	 */
+/*
+ *  check limits for valid signals
+ */
 
 #if defined (unix)
 	if ( sig<1 || sig>=NUSIG)
@@ -92,70 +92,64 @@ long ds__signal (int sig, void (*action)(int), long *error)
 #else
 	if ( sig<0 || sig>=NUSIG)
 #endif /* unix */
-	   {
-	   *error = DevErr_SignalOutOfRange;
-	   return (DS_NOTOK);
-	   }
+	{
+		*error = DevErr_SignalOutOfRange;
+		return (DS_NOTOK);
+	}
 
-	/*
-	 *  store action in global table and acitvate
-	 *  the handler.
-	 */
-
+/*
+ *  store action in global table and acitvate
+ *  the handler.
+ */
 	sig_tab[sig] 	= action;
 
-	/*
-	 *  check that the main quit signals will not be deactivated
-	 */
-
+/*
+ *  check that the main quit signals will not be deactivated
+ */
 #ifdef __cplusplus
 	if ( action == (void (*)(int)) SIG_DFL || 
 	     action == (void (*)(int))SIG_IGN)
 #else
 	if ( action == SIG_DFL || action == SIG_IGN)
 #endif
-	   {
+	{
 #ifndef WIN32
-	   if ( sig!=SIGHUP && sig!=SIGINT && sig!=SIGQUIT && sig!=SIGTERM )
+		if ( sig!=SIGHUP && sig!=SIGINT && sig!=SIGQUIT && sig!=SIGTERM )
 #else
-	   if ( sig!=SIGINT && sig!=SIGTERM )
+		if ( sig!=SIGINT && sig!=SIGTERM )
 #endif /* WIN32 */
-	      {
+		{
 #ifdef __cplusplus
-	      if ( (void (*) (int)) signal (sig, action) == 
-					   (void (*)(int)) SIG_ERR )
+			if ( (void (*) (int)) signal (sig, action) == (void (*)(int)) SIG_ERR )
 #else
-	      if ( (void (*) (int)) signal (sig, action) == SIG_ERR )
+			if ( (void (*) (int)) signal (sig, action) == SIG_ERR )
 #endif
-		 {
-	         *error = DevErr_CannotSetSignalHandler;
-	         return (DS_NOTOK);
-		 }
-	      }
-	   }
+			{
+				*error = DevErr_CannotSetSignalHandler;
+				return (DS_NOTOK);
+			}
+	  	}
+	}
 	else
-	   {
-	   /*
-	    *  activate signal
-	    */
-
+	{
+/*
+ *  activate signal
+ */
 #ifdef __cplusplus
-	   if ( (void (*) (int)) signal (sig, main_signal_handler) == 
-						(void (*)(int)) SIG_ERR )
+		if ( (void (*) (int)) signal (sig, main_signal_handler) == (void (*)(int)) SIG_ERR )
 #else
-	   if ( (void (*) (int)) signal (sig, main_signal_handler) == SIG_ERR )
+		if ( (void (*) (int)) signal (sig, main_signal_handler) == SIG_ERR )
 #endif
-	      {
-	      *error = DevErr_CannotSetSignalHandler;
-	      return (DS_NOTOK);
-	      }
-	   }
-
+		{
+			*error = DevErr_CannotSetSignalHandler;
+			return (DS_NOTOK);
+		}
+	}
 	return (DS_OK);
 }
 
 
-/**
+/**@ingroup dsAPI
  *
  * A global device server signal handler which catches
  * in any case all main quit/kill signals for a proper
@@ -172,13 +166,11 @@ void main_signal_handler (int signo)
 #if defined (unix)
 	if ( signo < 1 || signo >= NUSIG)
 #elif defined(_NT)
-        if ( signo< SIGINT || signo>=NUSIG)
+	if ( signo< SIGINT || signo>=NUSIG)
 #else
 	if ( signo < 0 || signo >= NUSIG)
 #endif /* unix */
-	{
 		return;
-	}
 	
 /*
  *  call of internal device server signal handling function
@@ -191,9 +183,7 @@ void main_signal_handler (int signo)
 	if ( sig_tab[signo] != (void (*) ()) SIG_DFL && 
 	     sig_tab[signo] != (void (*) ()) SIG_IGN )
 #endif
-	{
 		sig_tab[signo] (signo);
-	}
 
 /*
  *  filter signals for quitting the server

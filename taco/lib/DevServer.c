@@ -7,14 +7,15 @@
  Description:	code for implementing the public methods for the 
 		device server class.
 
- Author(s);	Andy Goetz , Jens Meyer
+ Author(s);	Andy Goetz 
+		Jens Meyer
+ 		$Author: jkrueger1 $
 
  Original:	June 1990
 
- $Revision: 1.1 $
- $Date: 2003-04-25 11:21:26 $
+ Version:	$Revision: 1.2 $
 
- $Author: jkrueger1 $
+ Date:		$Date: 2003-05-16 13:53:10 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -50,9 +51,9 @@
  */
 
 #ifdef __cplusplus
-        extern "C" configuration_flags      config_flags;
+extern "C" configuration_flags      config_flags;
 #else
-        extern configuration_flags      config_flags;
+extern configuration_flags      config_flags;
 #endif
 
 /*
@@ -60,9 +61,9 @@
  */
 
 #ifdef __cplusplus
-        extern "C"  long     debug_flag; 
+extern "C"  long     debug_flag; 
 #else
-	extern long 	debug_flag;
+extern long 	debug_flag;
 #endif
 
 
@@ -73,8 +74,8 @@
  * Memory will be dynamically allocated during the
  * device_export().
  */
-	extern DevServerDevices	*devices;
-	extern long 		max_no_of_devices;
+extern DevServerDevices	*devices;
+extern long 		max_no_of_devices;
 
 /* 
  * private methods accessible only via the method_finder
@@ -113,118 +114,102 @@ DevServerClassRec devServerClassRec = {
 
 DevServerClass devServerClass = (DevServerClass)&devServerClassRec;
 
-/*+**********************************************************************
- Function   :   static long class_initialise()
-
- Description:   Device server class initialise.
-            :   Called by the method finder via :
-		DevMethodClassInitialise
-		
- Arg(s) In  :   none
-
- Arg(s) Out :  	long *error - Will contain an appropriate error
-			      code if the corresponding call
-			      returns a non-zero value.
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**@ingroup dsAPI
+ * Device server class initialise.
+ *
+ * Called by the method finder via : DevMethodClassInitialise
+ *		
+ * @param error Will contain an appropriate error
+ *		code if the corresponding call
+ *		returns a non-zero value.
+ *
+ * @return  DS_OK or DS_NOTOK
+ */
 static long class_initialise (long *error)
 {
-   *error = 0;
+	*error = 0;
 
 #ifdef EBUG
-   dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-		 "\nclass_initialise() [devServerClass] : entering routine\n");
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nclass_initialise() [devServerClass] : entering routine\n");
 #endif /* EBUG */
 
 /*
  * initialise all class related fields
  */
-
-   devServerClass->devserver_class.class_name = 
-			(char*)malloc(sizeof("DevServerClass")+1);
-   if ( devServerClass->devserver_class.class_name == NULL )
-      {
-      *error = DevErr_InsufficientMemory;
-      return(DS_NOTOK);
-      }
-   sprintf(devServerClass->devserver_class.class_name,"DevServerClass");
+	devServerClass->devserver_class.class_name = (char*)malloc(sizeof("DevServerClass")+1);
+	if ( devServerClass->devserver_class.class_name == NULL )
+	{
+		*error = DevErr_InsufficientMemory;
+		return(DS_NOTOK);
+	}
+	strcpy(devServerClass->devserver_class.class_name,"DevServerClass");
 
 /*
  * this is a root class
  */
-   devServerClass->devserver_class.superclass = 0;
-   devServerClass->devserver_class.class_inited = 1;
+	devServerClass->devserver_class.superclass = 0;
+	devServerClass->devserver_class.class_inited = 1;
 
 /*
  * the devServerClass has no commands of its own
  */
-   devServerClass->devserver_class.n_commands = 0;
-   devServerClass->devserver_class.commands_list = 0;
+	devServerClass->devserver_class.n_commands = 0;
+	devServerClass->devserver_class.commands_list = 0;
  
-   return (0);
+	return (0);
 }
 
 
-/*+**********************************************************************
- Function   :   static long command_handler()
-
- Description:	Device server's command handler   
-            :   Called by the method finder via :
-		DevMethodCommandHandler.	
-
- Arg(s) In  :   DevServer ds       - pointer to the object.
-            :   long ds_cmd        - command to be executed.
-            :   DevArgument argin  - pointer to input arguments.
-            :   DevType argin_type - data type of input arguments.
-
- Arg(s) Out :   DevArgument argout  - pointer for output arguments.
-            :   DevType argout_type - data type of output arguments.
-            :	long *error         - Will contain an appropriate error
-			              code if the corresponding call
-			      	      returns a non-zero value.
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * Device server's command handler   
+ *
+ * Called by the method finder via : DevMethodCommandHandler.	
+ *
+ * @param ds       	pointer to the object.
+ * @param ds_cmd        command to be executed.
+ * @param argin		pointer to input arguments.
+ * @param argin_type 	data type of input arguments.
+ *
+ * @param argout	pointer for output arguments.
+ * @param argout_type	data type of output arguments.
+ * @param error         Will contain an appropriate error code if the 
+ *			corresponding call returns a non-zero value.
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 static long command_handler (DevServer ds, long ds_cmd, 
 			     DevArgument argin,  long argin_type,
 			     DevArgument argout, long argout_type, long *error)
 {
-   long i, iret = 0;
-   DevServerClass ds_class;
-   DevMethodFunction cmd_function;
-   static char error_message[1024];
+	long 			i, 
+				iret = 0;
+	DevServerClass 		ds_class;
+	DevMethodFunction 	cmd_function;
+	static char	 	error_message[1024];
 
 #ifdef EBUG
-   dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-		   "\ncommand_handler() : entering routine\n");
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\ncommand_handler() : entering routine\n");
 #endif /* EBUG */
 
-   ds_class = ds->devserver.class_pointer;
+	ds_class = ds->devserver.class_pointer;
 
 /*
  * first check if the command is implemented in the device server
  */
-
-   for (i = 0; i < ds_class->devserver_class.n_commands; i++)
-   {
-      if (ds_cmd == (ds_class->devserver_class.commands_list[i].cmd))
-      {
-	 /*
-	  *  check types of incoming and outgoing arguments for
-	  *  the command function
-	  */
-
-	 if (argin_type != 
-		ds_class->devserver_class.commands_list[i].argin_type || 
-	     argout_type !=
-		ds_class->devserver_class.commands_list[i].argout_type)  
-	 {
-   		(*error) = DevErr_IncompatibleCmdArgumentTypes;
-            	return (-1);
-	 }
+	for (i = 0; i < ds_class->devserver_class.n_commands; i++)
+	{
+		if (ds_cmd == (ds_class->devserver_class.commands_list[i].cmd))
+		{
+/*
+ *  check types of incoming and outgoing arguments for
+ *  the command function
+ */
+	 		if (argin_type != ds_class->devserver_class.commands_list[i].argin_type 
+				|| argout_type != ds_class->devserver_class.commands_list[i].argout_type)  
+	 		{
+				(*error) = DevErr_IncompatibleCmdArgumentTypes;
+				return (-1);
+			}
 
 /*
  * found command , now check the device state if it is possible to
@@ -235,111 +220,86 @@ static long command_handler (DevServer ds, long ds_cmd,
  *
  * NOTE - this method is not using the david carron Finite State Automaton
  */
+         		if((iret = (ds__method_finder(ds,DevMethodStateHandler)) (ds, ds_cmd, error)) != DS_OK)
+            			return (DS_NOTOK);
 
-         if((iret = (ds__method_finder(ds,DevMethodStateHandler))
-                                      (ds, ds_cmd, error)) != 0)
-         {
-            return (-1);
-         }
-	
-	/*
-	 *  call command function
-	 */
-
-         cmd_function = (DevMethodFunction)(ds_class->devserver_class.commands_list[i].fn);
-         iret = (cmd_function)(ds, argin, argout, error);
-
-         return (iret);
-      }
-   }
+/*
+ *  call command function
+ */
+         		cmd_function = (DevMethodFunction)(ds_class->devserver_class.commands_list[i].fn);
+         		return (cmd_function)(ds, argin, argout, error);
+      		}
+	}
    
 /*
  * if program arrives here then command is not implemented
+ *
+ * since V8.32 of DSAPI the command_list entry has an extra field
+ * (cmd_name), if one of the classes in a device server have not
+ * been recompiled then this can cause the command entries to be
+ * incorrectly interpreted, therefore if a command is not found
+ * then print a warning message.
  */
-/*
-   since V8.32 of DSAPI the command_list entry has an extra field
-   (cmd_name), if one of the classes in a device server have not
-   been recompiled then this can cause the command entries to be
-   incorrectly interpreted, therefore if a command is not found
-   then print a warning message.
- */
-   printf("command_handler(): command %d not found, maybe you need to recompile the class %s\n",ds_cmd,ds_class->devserver_class.class_name);
-   sprintf(error_message,"command_handler(): command %d not found, maybe you need to recompile the class %s\n",ds_cmd,ds_class->devserver_class.class_name);
-   dev_error_push(error_message);
-
-   (*error) = DevErr_CommandNotImplemented;
-   return (-1);
+   	sprintf(error_message, sizeof(error_message), "command_handler(): command %d not found, maybe you need to recompile the class %s\n",
+		ds_cmd, ds_class->devserver_class.class_name);
+	fprintf(stderr, error_message);
+	dev_error_push(error_message);
+	(*error) = DevErr_CommandNotImplemented;
+	return (DS_NOTOK);
 }
 
 
-/*+**********************************************************************
- Function   :   static long error_handler()
-
- Description:	Device server's error handler   
-            :   Called by the method finder via :
-		DevMethodErrorHandler.	
-
-            :   NOT YET USED !!
-
- Arg(s) In  :   DevServer ds        - pointer to the object.
-
- Arg(s) Out :	long *error         - Will contain an appropriate error
-			              code if the corresponding call
-			      	      returns a non-zero value.
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
-
+/**@ingroup dsAPI
+ * Device server's error handler   
+ *
+ * Called by the method finder via : DevMethodErrorHandler.	
+ *
+ * NOT YET USED !!
+ *
+ * @param ds    pointer to the object.
+ * @param error Will contain an appropriate error code if the 
+ *		corresponding call returns a non-zero value.
+ *
+ * @return  DS_OK or DS_NOTOK
+ */
 static long error_handler (DevServer ds, long *error)
 {
-   int iret = DS_OK;
-
-   /*
-   printf("ds::error_handler()\n");
-   */
-
-   return (iret);
+	int iret = DS_OK;
+/*
+	printf("ds::error_handler()\n");
+ */
+	return (iret);
 }
 
-
-/*+**********************************************************************
- Function   :   static long destroy()
-
- Description:	Device server's device destroy   
-            :   Called by the method finder via :
-		DevMethodDestroy.	
-            :   Simply frees the object structure.
-
- Arg(s) In  :   DevServer ds   - pointer to the object.
-
- Arg(s) Out :	long *error    - Will contain an appropriate error
-			         code if the corresponding call
-			         returns a non-zero value.
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**@ingroup dsAPI
+ * Device server's device destroy   
+ *
+ * Called by the method finder via DevMethodDestroy.	
+ *
+ * Simply frees the object structure.
+ *
+ *
+ * @param ds	pointer to the object.
+ * @param error Will contain an appropriate error code if the 
+ *		corresponding call returns a non-zero value.
+ * 
+ * @return  DS_OK or DS_NOTOK
+ */
 static long destroy (DevServer ds, long *error)
 {
 #ifdef EBUG
-   dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-		   "\ndestroy() : entering routine\n");
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\ndestroy() : entering routine\n");
 #endif /* EBUG */
 
 /*
  * this very simple version of destroy simply does a
  * free on the space occupied by the object
  */
+	free (ds->devserver.name);
+	free (ds);
 
-   free (ds->devserver.name);
-   free (ds);
-
-   return (DS_OK);
+	return (DS_OK);
 }
-
-
-
 
 /***************************************************************************
  * Convenience functions for the Device Server programs. These provide     *
@@ -352,27 +312,22 @@ static long destroy (DevServer ds, long *error)
  *                                                                         *
  ***************************************************************************/
 
-/*+**********************************************************************
- Function   :   extern long dev_cmd()
-
- Description:	Convenience function for executing commands 
-		on a device. 
-	    :   Only calls the command handler internally.
-
- Arg(s) In  :   DevServer ds       - pointer to the object.
-            :   long cmd           - command to be executed.
-            :   DevArgument argin  - pointer to input arguments.
-            :   DevType argin_type - data type of input arguments.
-
- Arg(s) Out :   DevArgument argout  - pointer for output arguments.
-            :   DevType argout_type - data type of output arguments.
-            :	long *error         - Will contain an appropriate error
-			              code if the corresponding call
-			      	      returns a non-zero value.
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**@ingroup dsAPI
+ * Convenience function for executing commands on a device. 
+ *
+ * Only calls the command handler internally.
+ *
+ * @param ds		pointer to the object.
+ * @param cmd           command to be executed.
+ * @param argin  	pointer to input arguments.
+ * @param argin_type  	data type of input arguments.
+ * @param argout  	pointer for output arguments.
+ * @param argout_type  	data type of output arguments.
+ * @param error         Will contain an appropriate error code if the 
+ *			corresponding call returns a non-zero value.
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 long dev_cmd (void *ptr_ds, long cmd, DevArgument argin,  long argin_type,
 	      DevArgument argout, long argout_type, long *error)
 {
@@ -384,30 +339,21 @@ long dev_cmd (void *ptr_ds, long cmd, DevArgument argin,  long argin_type,
 }
 
 #if !defined(_NT)
-/*+**********************************************************************
- Function   :	extern long ds__svcrun()
-
- Description:	The function supports the checking of pending
-		device server commands (rpc requests) on
-		all open sockets.
-
-            :	If commands are available on filedesciptors (sockets),
-		the next pending command for every descriptor will
-		be executed and ds__svcrun will return aterwards.
-
-            :	If no commands are pending on any descriptor 
-		ds__svcrun should return after 10ms.
-
- Problem    : 	OS9 seems to have a fixed minimal timeout for
-	 	the select() about 1sec.
-
- Arg(s) In  :	none
-
- Arg(s) Out :   long *error - pointer to error code, in case routine fails.
-
- Return(s)  :	0 = DS_OK / -1 = DS_NOTOK
-***********************************************************************-*/
-
+/**@ingroup dsAPI
+ * The function supports the checking of pending  device server commands 
+ * (rpc requests) on all open sockets.
+ *
+ * If commands are available on filedesciptors (sockets), the next pending 
+ * command for every descriptor will be executed and ds__svcrun will return aterwards.
+ *
+ * If no commands are pending on any descriptor ds__svcrun should return after 10ms.
+ * 
+ * Problem : OS9 seems to have a fixed minimal timeout for the select() about 1sec.
+ *
+ * @param error	pointer to error code, in case routine fails.
+ * 
+ * @return DS_OK or DS_NOTOK
+ */
 long ds__svcrun (long *error)
 {
 	struct timeval	timeout;
@@ -420,24 +366,21 @@ long ds__svcrun (long *error)
 
 	*error = 0;
 
-	/*
-	 * Set the startup configuration flag.
-	 * Indicates, that the process acts as a server now.
-         */
-
+/*
+ * Set the startup configuration flag.
+ * Indicates, that the process acts as a server now.
+ */
 	config_flags.startup = True;
 
-	/*
-  	 *  set timeout to the shortest time os9 can measure (1 tick).
-	 */
-
+/*
+ *  set timeout to the shortest time os9 can measure (1 tick).
+ */
 	timeout.tv_sec  = 0;
 	timeout.tv_usec = 10000;
 
-	/*
- 	 *  set filedescriptor mask 
-	 */
-
+/*
+ *  set filedescriptor mask 
+ */
 #if !defined (vxworks)
 #ifdef linux
 	readfds = svc_fdset;
@@ -456,9 +399,9 @@ long ds__svcrun (long *error)
 	readfds = 0;
 #endif /* !vxworks */
 
-	/*
-	 *  check for pending commands on sockets
-	 */
+/*
+ *  check for pending commands on sockets
+ */
 
 #if defined (__hpux)
 #if defined (__STDCPP__) && !defined (_GNU_PP)
@@ -473,45 +416,39 @@ long ds__svcrun (long *error)
 	switch ( select (32, (struct fd_set *) &readfds, NULL, NULL, &timeout) )
 #endif /* linux */
 #endif /* hpux */
-	   {
-	   case -1:
-		/* 
-		 * A signal was delivered before any of the
-                 * selected for events occurred or before the
-                 * time limit expired.
-	         */
+	{
+		case -1:
+/* 
+ * A signal was delivered before any of the
+ * selected for events occurred or before the
+ * time limit expired.
+ */
+			if ( errno == EINTR )
+				break;
 
-		if ( errno == EINTR )
+/* 
+ * Return error message
+ */
+			dev_printerror (SEND, "ds__svcrun() : select() : errno = %d", (char*)errno);	
+			*error = DevErr_RPCFailed;
+			return (DS_NOTOK);
+	   	case  0:
+/*
+ * timeout, no commands pending.
+ */
 			break;
-
-		/* 
-		 * Return error message
-		 */
-
-		dev_printerror (SEND, 
-			"ds__svcrun() : select() : errno = %d", (char*)errno);	
-		*error = DevErr_RPCFailed;
-		return (-1);
-
-	   case  0:
-		/*
- 		 * timeout, no commands pending.
-		 */
-		break;
-
-	   default:
-		/*
- 		 *  execute the next available command on every socket.
-		 */
+		default:
+/*
+ *  execute the next available command on every socket.
+ */
 #ifdef linux
-		svc_getreqset (&readfds);
+			svc_getreqset (&readfds);
 #else
-		svc_getreq (readfds);
+			svc_getreq (readfds);
 #endif /* linux */
-		break;
-	   }
-	
-	return (0);
+			break;
+	}
+	return (DS_OK);
 }
 #endif  /* _NT */
 
