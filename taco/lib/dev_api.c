@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.13 $
+ Version    :	$Revision: 1.14 $
 
- Date	    :	$Date: 2004-03-29 16:34:18 $
+ Date	    :	$Date: 2004-04-16 12:57:09 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -888,7 +888,7 @@ long _DLLFunc dev_putget (devserver ds, long cmd,DevArgument argin,
 	if (client_data.var_argument.length == 1)
 	{
 		dev_error_string = (char*)malloc( strlen(*(char**)client_data.var_argument.sequence[0].argument)+1);
-	    	assert(dev_error_string==NULL);
+	    	assert(dev_error_string != NULL);
 		if(dev_error_string)
 			strcpy(dev_error_string,*(char**)client_data.var_argument.sequence[0].argument);
 	}
@@ -1047,7 +1047,7 @@ long _DLLFunc dev_put (devserver ds, long cmd,DevArgument argin,
         if (client_data.var_argument.length == 1)
         {
                 dev_error_string = (char*)malloc( strlen(*(char**)client_data.var_argument.sequence[0].argument)+1);
-	    	assert(dev_error_string==NULL);
+	    	assert(dev_error_string != NULL);
 		if (dev_error_string)
                 	strcpy(dev_error_string,*(char**)client_data.var_argument.sequence[0].argument);
         }

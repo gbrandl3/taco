@@ -25,9 +25,9 @@
 
  Original   :	January 1997
 
- Version:	$Revision: 1.12 $
+ Version:	$Revision: 1.13 $
 
- Date:		$Date: 2004-03-29 16:33:49 $
+ Date:		$Date: 2004-04-16 12:57:09 $
 
  Copyright (c) 1997-2000 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -1912,7 +1912,7 @@ _asynch_client_data* _DLLFunc rpc_asynch_reply_5(_asynch_client_data *asynch_cli
 		if (asynch_client_data->var_argument.length == 3)
 		{
 			dev_error_string = (char*)malloc(strlen(*(char**)asynch_client_data->var_argument.sequence[iarg].argument)+1);
-			assert(dev_error_string==NULL);
+			assert(dev_error_string != NULL);
 			if(dev_error_string)
 				strcpy(dev_error_string,*(char**)asynch_client_data->var_argument.sequence[iarg].argument);
 		}
