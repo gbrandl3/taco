@@ -1,5 +1,6 @@
 AC_DEFUN([TACO_PYTHON_BINDING],
 [
+	AC_REQUIRE([TACO_SERVER])
 	PYTHON_PROG(2.0, [yes])
 	PYTHON_DEVEL
 	if test "x$taco_python_binding" = "xyes" ; then
@@ -8,7 +9,10 @@ AC_DEFUN([TACO_PYTHON_BINDING],
 		AC_CHECK_HEADERS(Numeric/arrayobject.h, [taco_python_binding=yes], [taco_python_binding=no], [#include <Python.h>])
 		CFLAGS="$ac_save_CFLAGS"
 	fi	
-	AM_CONDITIONAL(PYTHON_BINDING, test $taco_python_binding = yes)
+	if test x"${taco_server_libs}" != x"yes" ; then
+		taco_python_binding=no
+	fi
+	AM_CONDITIONAL(PYTHON_BINDING, [test x"${taco_python_binding}" = x"yes"])
 ])
 
 AC_DEFUN([TACO_TCL_BINDING],
