@@ -1,7 +1,7 @@
-#!/bin/sh
+#! /bin/sh
 
 for libtoolize in glibtoolize libtoolize ; do
-        LIBTOOLIZE=`which $libtoolize 2>/dev/null`
+        LIBTOOLIZE=`which $libtoolize 2>/dev/null | grep -v '^no'`
         if test "$LIBTOOLIZE" ; then
                 break;
         fi
@@ -13,7 +13,7 @@ AUTOMAKE="automake -a -c --foreign"
 AUTOCONF="autoconf"
 
 touch AUTHORS ChangeLog NEWS README
-if { ! test -d config ; } ; then mkdir config ; else rm -rf config/* ;  fi
+if test ! -d config ; then mkdir config ; else rm -rf config/* ;  fi
 
 
 # Discover what version of autoconf we are using.
@@ -50,8 +50,8 @@ case $libtoolversion in
     *1.[45]*)
         ;;
     *)
-        echo "This libtool version is not supported by NeXus."
-        echo "NeXus only supports libtool 1.[45].*."
+        echo "This libtool version is not supported by taco."
+        echo "taco only supports libtool 1.[45].*."
         echo "You may download it from ftp://ftp.gnu.org/gnu/libtool"
         exit
         ;;
@@ -78,12 +78,6 @@ else
 fi
 
 # 
-if { ! test -d config ; } ; then 
-	mkdir config ; 
-else 
-	rm -rf config/* ;  
-fi
-
 # Prepare the use of libtool
 if ( $LIBTOOLIZE --version ) < /dev/null > /dev/null 2>&1 ; then
 	echo "Preparing the use of libtool ..."
