@@ -9,13 +9,13 @@
 		dummy database under OS9.
 
  Author(s):     Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original: 	January 1991
 
- Version:	$Revision: 1.7 $
+ Version:	$Revision: 1.8 $
 
- Date:		$Date: 2003-12-15 07:53:17 $
+ Date:		$Date: 2003-12-21 20:05:03 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -74,13 +74,7 @@ int main (int argc, char **argv)
 	pid = getpid ();
 
 #ifdef unix
-	if ( (nethost_env = (char *)getenv ("NETHOST")) == NULL )
-	{
-		printf ("Environment variable NETHOST not defined, using local host ...\n");
-		gethostname (nethost, sizeof(nethost) - 1);
-	}
-	else
-		snprintf(nethost, sizeof(nethost) - 1, "%s",nethost_env);
+	gethostname (nethost, sizeof(nethost) - 1);
 	printf ("Environment variable NETHOST = %s\n",nethost);
 #endif /* unix */
 
