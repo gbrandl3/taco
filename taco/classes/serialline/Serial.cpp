@@ -1713,8 +1713,7 @@ long Serial::SerSetParameter ( void *vargin, void *vargout, long *error)
 	// Do not convert upper-case characters to lower-case ones and
 	// vice-versa
 	//
-
-#if !defined(FREEBSD)
+#if !defined(FreeBSD)
  termin.c_iflag     	&= ~IUCLC;
  termout.c_oflag     	&= ~OLCUC;
 #endif
@@ -1741,7 +1740,7 @@ long Serial::SerSetParameter ( void *vargin, void *vargout, long *error)
 	//
 	// Do not expand tabs to 8 spaces
 	//
-#if !defined(FREEBSD)
+#if !defined(FreeBSD)
  termout.c_oflag	&= ~XTABS;
 #endif
 
@@ -1903,12 +1902,12 @@ long Serial::SerSetParameter ( void *vargin, void *vargout, long *error)
 	 default    : speed =  B9600; break;
 	}
 
-#if !defined (FREEBSD)
+#if !defined (FreeBSD)
 	termin.c_cflag  &= ~CBAUD;	// erase previous speed settings
 #endif
 	termin.c_cflag  |= speed;
 
-#if !defined (FREEBSD)
+#if !defined (FreeBSD)
 	termout.c_cflag &= ~CBAUD;	// erase previous speed settings
 #endif
 	termout.c_cflag |= speed;

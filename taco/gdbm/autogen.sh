@@ -1,10 +1,5 @@
 #!/bin/sh
-for i in /usr/share/aclocal /usr/local/share/aclocal ; do
-        if test -d $i ; then
-                aclocal_includes="$aclocal_includes -I $i"
-        fi
-done
-LIBTOOLIZE="libtoolize --force --copy --automake"
+LIBTOOLIZE="libtoolize --force --copy --ltdl --automake"
 ACLOCAL="aclocal $aclocal_includes"
 AUTOHEADER="autoheader"
 AUTOMAKE="automake -a -c --foreign"
@@ -15,11 +10,11 @@ autoversion=`$AUTOCONF --version | head -n 1`
 
 echo "Using $autoversion"
 case $autoversion in
-    *2.5[2-9])
+    *2.5[2-7])
 	;;
     *)
 	echo "This autoconf version is not supported by gdbm."
-	echo "gdbm only supports autoconf 2.13 and 2.5[2-9]."
+	echo "gdbm only supports autoconf 2.13 and 2.5[2-7]."
 	exit
 	;;
 esac

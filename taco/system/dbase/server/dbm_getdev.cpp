@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <db_xdr.h>
 #include <fcntl.h>
+#include "config.h"
 
 /* Some C++ include files */
 

@@ -1,9 +1,4 @@
 #!/bin/sh
-for i in /usr/share/aclocal /usr/local/share/aclocal ; do 
-	if test -d $i ; then
-		aclocal_includes="$aclocal_includes -I $i"
-	fi
-done
 LIBTOOLIZE="libtoolize --force --copy --automake"
 ACLOCAL="aclocal -I m4 $aclocal_includes"
 AUTOHEADER="autoheader"

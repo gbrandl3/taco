@@ -1,7 +1,7 @@
 #include <API.h>
 
 #include <DevErrors.h>
-#if defined (FREEBSD)
+#if defined (FreeBSD)
 #	include <stdlib.h>
 #else
 #	include <malloc.h>
@@ -18,7 +18,7 @@
 #include <NdbmServer.h>
 #include <string>
 
-#ifdef FREEBSD
+#ifdef FreeBSD
 #define xp_sock xp_fd
 #endif
 
