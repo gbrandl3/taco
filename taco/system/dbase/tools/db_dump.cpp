@@ -3,10 +3,7 @@
 #include <cstdlib>
 #include <sys/wait.h>
 
-#define _db_setup_h
 #include <API.h>
-#undef _db_setup_h
-#include "db_setup.h"
 
 /* For database only */
 
@@ -20,6 +17,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <map>
 
 using namespace std;
 
@@ -30,6 +28,8 @@ int db_read(char *,char *);
 /* Global variables definitions */
 
 int line_ptr;
+std::map<std::string, int> device_map;
+std::map<std::string,int>::iterator ipos;
 
 
 /****************************************************************************
@@ -144,6 +144,13 @@ int main(int argc,char *argv[])
 			res_num[i] = db_read(const_cast<char *>(dbm_file.c_str()), tblname[i]);
 			if (domain != "all") 
 				return 0;
+		}
+	}
+	for (ipos = device_map.begin(); ipos != device_map.end(); ipos++)
+	{
+		if (ipos->second > 1)
+		{
+			cout << "WARNING - the following device " << ipos->first << " has " << ipos->second << " entries in the NAMES table !\n";
 		}
 	}
 	return 1;
@@ -274,7 +281,19 @@ int db_read(char *dbm_file,char *TblName)
 				pos = device_tmp.find("/");
 				member = device_tmp.substr(0,pos);
 
+//
+// count how many times each device is in the "names" table
+//
 
+				ipos = device_map.find(device);
+				if (ipos == device_map.end())
+				{
+					device_map[device] = 1;
+				}
+				else
+				{
+					device_map[device] = device_map[device]+1;
+				}
 				cout << "INSERT INTO device SET "
 				     << "name='" << device << "',"
 				     << "domain='" << domain << "',"
