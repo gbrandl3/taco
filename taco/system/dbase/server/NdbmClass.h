@@ -12,6 +12,8 @@
 #include <vector>
 #include <string>
 
+/**@ingroup dbServerClasses
+ */
 class NdbmNamesKey
 {
 public:
@@ -38,6 +40,8 @@ private:
 	datum 		key;
 };
 
+/**@ingroup dbServerClasses
+ */
 class NdbmNamesCont
 {
 public:
@@ -72,8 +76,8 @@ private:
 	datum 		dat;
 };
 
-
-
+/**@ingroup dbServerClasses
+ */
 class NdbmPSNamesKey
 {
 public:
@@ -93,8 +97,8 @@ private:
 	std::string 	str;
 };
 
-
-
+/**@ingroup dbServerClasses
+ */
 class NdbmPSNamesCont
 {
 public:
@@ -115,6 +119,8 @@ private:
 	std::string str;
 };
 
+/**@ingroup dbServerClasses
+ */
 class NdbmResKey
 {
 public:
@@ -143,6 +149,8 @@ private:
 	datum 		key;
 };
 
+/**@ingroup dbServerClasses
+ */
 class NdbmResCont
 {
 public:
@@ -160,7 +168,8 @@ private:
 	std::string 	str;
 };
 
-
+/**@ingroup dbServerClasses
+ */
 class NdbmNameList
 {
 public:
@@ -178,7 +187,8 @@ private:
 	std::vector<std::string> name_list;
 };
 
-
+/**@ingroup dbServerClasses
+ */
 class NdbmDoubleNameList
 {
 public:
@@ -196,6 +206,8 @@ private:
 	std::vector<NdbmNameList>	 sec_list;
 };
 
+/**@ingroup dbServerClasses
+ */
 class NdbmDomain
 {
 public:
@@ -215,6 +227,8 @@ private:
 	long 		nb;
 };
 
+/**@ingroup dbServerClasses
+ */
 class NdbmDomDev
 {
 public:
@@ -233,6 +247,8 @@ private:
 	std::vector<std::string> fm;
 };
 
+/**@ingroup dbServerClasses
+ */
 class NdbmSvcDev
 {
 public:
@@ -265,6 +281,8 @@ private:
 #define	MessBuildKey	"The key pointer is NULL!!!"
 #define MessKeySyntax	"Bad syntax in database key record"
 
+/**@ingroup dbServerClasses
+ */
 class NdbmError
 {
 public:
@@ -278,16 +296,6 @@ private:
 	long 		errcode;
 	std::string 	errmess;
 };
-
-
-/*#ifdef sun
-class bad_alloc
-{
-public:
-	bad_alloc() {};
-	~bad_alloc() {};
-};
-#endif*/
 
 // Define some constant
 
@@ -332,6 +340,8 @@ typedef struct _NdbmInfo {
 #       define stringstream strstream
 #endif
 
+/**@ingroup dbServerClasses
+ */
 struct DATUM : public datum
 {
 	DATUM()	{dptr = NULL; dsize = 0;};

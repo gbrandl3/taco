@@ -12,47 +12,40 @@
 #include <iostream>
 #include <stdexcept>
 
-//****************************************************************************
+/**@class NdbmNamesKey
+// This class is used to manage NAMES table key part. It is constructed
+// from the NDBM key. Within the NAMES table, the key is :
+//	- Device server name
+//	- Device server personal name
+//	- Device sequence number in the device server device list
 //
-//		NdbmNamesKey class 
-//		------------
-//
-//	This class is used to manage NAMES table key part. It is constructed
-// 	from the NDBM key. Within the NAMES table, the key is :
-//		Device server name
-//		Device server personal name
-//		Device sequence number in the device server device list
-//
-// 	The record content is :
-//		Device name
-//		Host name
-//		Device server program number
-//		Device server version number
-//		Device type
-//		Device class
-//		Device server process PID
-//		Device server process name
-//
-//****************************************************************************
-//
+// The record content is :
+//	- Device name
+//	- Host name
+//	- Device server program number
+//	- Device server version number
+//	- Device type
+//	- Device class
+//	- Device server process PID
+//	- Device server process name
+ */
+
 //		Class constructor and destructor
-//		--------------------------------
-// The class default constuctor
+//! The class default constuctor
 NdbmNamesKey::NdbmNamesKey()
 {
 	key.dptr = NULL;
 	key.dsize = 0;
 }
 
-// The class destructor
-
+//! The class destructor
 NdbmNamesKey::~NdbmNamesKey()
 {
 	if (key.dsize != 0)
 		delete [] key.dptr;
 }
 
-// Class constructor to be used with the record key
+//! Class constructor to be used with the record key
 NdbmNamesKey::NdbmNamesKey(const datum &call_key)
 {
 	key.dptr = NULL;
@@ -64,7 +57,7 @@ NdbmNamesKey::NdbmNamesKey(const datum &call_key)
 	build_datum();	
 }
 
-// Class constructor to be used from individual element
+//! Class constructor to be used from individual element
 NdbmNamesKey::NdbmNamesKey(const std::string &server, const std::string &pers_name, const long indi)
 {
 //
@@ -94,7 +87,7 @@ NdbmNamesKey::NdbmNamesKey(const std::string &server, const std::string &pers_na
 //
 //		Class operator overloading
 //		--------------------------
-// [] operator overloading. It returns one key character
+//! [] operator overloading. It returns one key character
 char NdbmNamesKey::operator [](long i)
 {
 	try
@@ -110,7 +103,7 @@ char NdbmNamesKey::operator [](long i)
 //
 //		Class methods
 //		-------------
-// Method to build a datum data from the already stored content
+//! Method to build a datum data from the already stored content
 void NdbmNamesKey::build_datum()
 {
 	long l = strlen(str.c_str());
@@ -131,7 +124,7 @@ void NdbmNamesKey::build_datum()
 	}
 }
 
-// Method to return the device server name
+//! Method to return the device server name
 std::string NdbmNamesKey::get_ds_name(void)
 {
 	std::string::size_type pos = str.find(SEP);
@@ -140,7 +133,7 @@ std::string NdbmNamesKey::get_ds_name(void)
 	return str.substr(0, pos);	
 }
 
-// Method to return the DS personal name
+//! Method to return the DS personal name
 std::string  NdbmNamesKey::get_ds_pers_name(void)
 {
 	std::string::size_type 	pos = 0,
@@ -158,7 +151,7 @@ std::string  NdbmNamesKey::get_ds_pers_name(void)
 	return str.substr(start, pos - start);
 }
 
-// Method to return the device index in the DS device list
+//! Method to return the device index in the DS device list
 long NdbmNamesKey::get_dev_indi(void)
 {
 	std::string::size_type pos = str.find_last_of(SEP, str.size() - 2);
@@ -177,7 +170,7 @@ long NdbmNamesKey::get_dev_indi(void)
 	return indi;
 }
 
-// Method to increment the key index part
+//! Method to increment the key index part
 void NdbmNamesKey::upd_indi(long ind)
 {
 //
@@ -194,8 +187,7 @@ void NdbmNamesKey::upd_indi(long ind)
 	return;
 }
 
-// Method to return all the parameters from the record key necessary for
-// the devinfo call
+//! Method to return all the parameters from the record key necessary for the devinfo call
 void NdbmNamesKey::get_devinfo(db_devinfo_svc &data)
 {
 	std::string s = this->get_ds_name();
@@ -205,6 +197,7 @@ void NdbmNamesKey::get_devinfo(db_devinfo_svc &data)
 	return;
 }
 
+//! Method to return all the parameters from the record key necessary for the devinfo call
 void NdbmNamesKey::get_devinfo(db_poller_svc &data)
 {
 	std::string s = this->get_ds_name();
@@ -214,47 +207,40 @@ void NdbmNamesKey::get_devinfo(db_poller_svc &data)
 	return;
 }
 
-//****************************************************************************
+/**@class NdbmNamesCont
+// This class is used to manage NAMES table content part. It is constructed
+// from the NDBM key. Within the pseudo NAMES table, the key is :
+//	- Device server name
+//	- Device server personal name
+//	- Device sequence number in the device server device list
 //
-//		NdbmNamesCont class 
-//		-------------
-//
-//	This class is used to manage NAMES table content part. It is constructed
-// 	from the NDBM key. Within the pseudo NAMES table, the key is :
-//		Device server name
-//		Device server personal name
-//		Device sequence number in the device server device list
-//
-// 	The record content is :
-//		Device name
-//		Host name
-//		Device server program number
-//		Device server version number
-//		Device type
-//		Device class
-//		Device server process PID
-//		Device server process name
-//
-//****************************************************************************
+// The record content is :
+//	- Device name
+//	- Host name
+//	- Device server program number
+//	- Device server version number
+//	- Device type
+//	- Device class
+//	- Device server process PID
+//	- Device server process name
+ */
 
-//
 //		Class constructor and destructor
-//		--------------------------------
-// The class default constructor
+//! The class default constructor
 NdbmNamesCont::NdbmNamesCont()
 {
 	dat.dptr = NULL;
 	dat.dsize = 0;
 }
 
-// The class destructor
+//! The class destructor
 NdbmNamesCont::~NdbmNamesCont()
 {
 	if (dat.dsize != 0)
 		delete [] dat.dptr;
 }
 
-// Class constructor to be used with the record key
+//! Class constructor to be used with the record key
 NdbmNamesCont::NdbmNamesCont(GDBM_FILE db, datum key)
 {
 	dat = gdbm_fetch(db, key);
@@ -264,10 +250,7 @@ NdbmNamesCont::NdbmNamesCont(GDBM_FILE db, datum key)
 		throw NdbmError(DbErr_CantGetContent,MessGetContent);
 }
 
-//
-//		Class operator overloading
-//		--------------------------
-// [] operator overloading. It returns one content character
+//! [] operator overloading. It returns one content character
 char NdbmNamesCont::operator [] (long i)
 {
 	try
@@ -280,10 +263,7 @@ char NdbmNamesCont::operator [] (long i)
 	}
 }
 
-//
-//		Class methods
-//		-------------
-// Method to return the device name from the record content
+//! Method to return the device name from the record content
 std::string NdbmNamesCont::get_device_name(void) const
 {
 	std::string::size_type pos = str.find(SEP);
@@ -293,7 +273,7 @@ std::string NdbmNamesCont::get_device_name(void) const
 	return str.substr(0, pos);	
 }
 
-// Method to return the host name from the record content
+//! Method to return the host name from the record content
 std::string NdbmNamesCont::get_host_name(void) const
 {
 	std::string::size_type 	pos = 0,
@@ -310,7 +290,7 @@ std::string NdbmNamesCont::get_host_name(void) const
 	return str.substr(start, pos - start);
 }
 
-// Method to return the device server program number from the record content
+//! Method to return the device server program number from the record content
 unsigned long NdbmNamesCont::get_p_num(void) const
 {
 	std::string::size_type 	pos = 0,
@@ -334,8 +314,7 @@ unsigned long NdbmNamesCont::get_p_num(void) const
 	return pn;
 }
 
-// Method to return the device server version number from the record content
-
+//! Method to return the device server version number from the record content
 unsigned long NdbmNamesCont::get_v_num(void) const
 {
 	std::string::size_type 	pos = 0,
@@ -361,7 +340,7 @@ unsigned long NdbmNamesCont::get_v_num(void) const
 	return vn;
 }
 
-// Method to return the device type from the record content
+//! Method to return the device type from the record content
 std::string NdbmNamesCont::get_device_type(void) const
 {
 	std::string::size_type 	pos = 0,
@@ -378,7 +357,7 @@ std::string NdbmNamesCont::get_device_type(void) const
 	return str.substr(start, pos - start);
 }
 
-// Method to return the device class from the record content
+//! Method to return the device class from the record content
 std::string NdbmNamesCont::get_device_class() const
 {
 	std::string::size_type 	pos = 0,
@@ -395,7 +374,7 @@ std::string NdbmNamesCont::get_device_class() const
 	return  str.substr(start, pos - start);
 }
 
-// Method to return the device server process PID from the record content
+//! Method to return the device server process PID from the record content
 unsigned long NdbmNamesCont::get_pid() const
 {
 	std::string::size_type 	pos = 0,
@@ -419,7 +398,7 @@ unsigned long NdbmNamesCont::get_pid() const
 	return p;
 }
 
-// Method to return the device server process name from the record content
+//! Method to return the device server process name from the record content
 std::string NdbmNamesCont::get_process_name(void) const
 {
 	std::string::size_type pos = str.find_last_of(SEP, str.size() - 2);
@@ -430,7 +409,7 @@ std::string NdbmNamesCont::get_process_name(void) const
 	return str.substr(pos, (str.size() - 1) - pos);
 }
 
-// Method to return the device name domain part from the record content
+//! Method to return the device name domain part from the record content
 std::string NdbmNamesCont::get_dev_domain_name(void) const
 {
 	try
@@ -447,7 +426,7 @@ std::string NdbmNamesCont::get_dev_domain_name(void) const
 	}
 }
 
-// Method to return the device name family part from the record content
+//! Method to return the device name family part from the record content
 std::string NdbmNamesCont::get_dev_fam_name(void) const
 {
     try
@@ -472,7 +451,7 @@ std::string NdbmNamesCont::get_dev_fam_name(void) const
     }
 }
 
-// Method to return the device name member part from the record content
+//! Method to return the device name member part from the record content
 std::string NdbmNamesCont::get_dev_memb_name(void) const
 {
     try
@@ -490,8 +469,7 @@ std::string NdbmNamesCont::get_dev_memb_name(void) const
     }
 }
 
-// Method to return all the parameters from the record content necessary for
-// the devinfo call
+//! Method to return all the parameters from the record content necessary for the devinfo call
 void NdbmNamesCont::get_devinfo(db_devinfo_svc &data)
 {
     strcpy(data.host_name, this->get_host_name().c_str());
@@ -507,7 +485,7 @@ void NdbmNamesCont::get_devinfo(db_devinfo_svc &data)
 	data.device_exported = true;	
     return;
 }
-
+//! Method to  return all the parameters from the record content necessary for the devinfo call
 void NdbmNamesCont::get_devinfo(db_poller_svc &data)
 {
     strcpy(data.host_name,this->get_host_name().c_str());
@@ -516,7 +494,7 @@ void NdbmNamesCont::get_devinfo(db_poller_svc &data)
     return;
 }
 
-// Method to update the already stored content as a unregister device
+//! Method to update the already stored content as a unregister device
 void NdbmNamesCont::unreg()
 {
 	std::string::size_type 	start;
@@ -526,38 +504,28 @@ void NdbmNamesCont::unreg()
 	str.replace(start, str.size() - start, "not_exp|0|0|unknown|unknown|0|unknown|");	
 }
 
-//****************************************************************************
+/**@class NdbmPSNamesKey
+// This class is used to manage PSNAMES table key part. It is constructed
+// from the NDBM key. Within the pseudo PSNAMES table, the key is :
+//	- Pseudo device name
 //
-//		NdbmPSNamesKey class 
-//		--------------
-//
-//	This class is used to manage PSNAMES table key part. It is constructed
-// 	from the NDBM key. Within the pseudo PSNAMES table, the key is :
-//		Pseudo device name
-//
-// 	The record content is :
-//		Host name
-//		Process PID
-//		Refresh period
-//
-//****************************************************************************
+// The record content is :
+//	- Host name
+//	- Process PID
+//	- Refresh period
+ */
 
-//
-//		Class constructor and destructor
-//		--------------------------------
-// The class default constuctor
+//! The class default constuctor
 NdbmPSNamesKey::NdbmPSNamesKey()
 {
 }
 
-// The class destructor
-
+//! The class destructor
 NdbmPSNamesKey::~NdbmPSNamesKey()
 {
 }
 
-// Class constructor to be used with the record key
-
+//! Class constructor to be used with the record key
 NdbmPSNamesKey::NdbmPSNamesKey(datum key)
 {
     if (key.dptr != NULL)
@@ -582,10 +550,7 @@ char NdbmPSNamesKey::operator [] (long i)
     }
 }
 
-//
-//		Class methods
-//		-------------
-// Method to return the pseudo device name domain part from the record key
+//! Method to return the pseudo device name domain part from the record key
 std::string NdbmPSNamesKey::get_psdev_domain_name(void) const
 {
 	std::string::size_type pos = str.find(SEP_DEV);
@@ -595,7 +560,7 @@ std::string NdbmPSNamesKey::get_psdev_domain_name(void) const
 	return str.substr(0, pos + 1);
 }
 
-// Method to return the pseudo device name family part from the key content
+//! Method to return the pseudo device name family part from the key content
 std::string NdbmPSNamesKey::get_psdev_fam_name(void) const
 {
     std::string::size_type 	pos = 0,
@@ -612,7 +577,7 @@ std::string NdbmPSNamesKey::get_psdev_fam_name(void) const
     return str.substr(start, pos - start);
 }
 
-// Method to return the pseudo device name member part from the key content
+//! Method to return the pseudo device name member part from the key content
 std::string NdbmPSNamesKey::get_psdev_memb_name(void) const
 {
     std::string::size_type pos;
@@ -623,38 +588,29 @@ std::string NdbmPSNamesKey::get_psdev_memb_name(void) const
     return str.substr(pos,(str.size() - pos));
 }
 
-//****************************************************************************
+/**@class NdbmPSNamesCont
+// This class is used to manage PSNAMES table content part. It is 
+// constructed from the NDBM key. Within the pseudo PSNAMES table, 
+// the key is :
+//	- Pseudo device name
 //
-//		NdbmPSNamesCont class
-//		---------------
-//
-//	This class is used to manage PSNAMES table content part. It is 
-//	constructed from the NDBM key. Within the pseudo PSNAMES table, 
-//	the key is :
-//		Pseudo device name
-//
-// 	The record content is :
-//		Host name
-//		Process PID
-//		Refresh period
-//
-//****************************************************************************
-//
-//		Class constructor and destructor
-//		--------------------------------
-// The class default constuctor
+// The record content is :
+//	- Host name
+//	- Process PID
+//	- Refresh period
+ */
+
+//! The class default constuctor
 NdbmPSNamesCont::NdbmPSNamesCont()
 {
 }
 
-// The class destructor
-
+//! The class destructor
 NdbmPSNamesCont::~NdbmPSNamesCont()
 {
 }
 
-// Class constructor to be used with the record key
-
+//! Class constructor to be used with the record key
 NdbmPSNamesCont::NdbmPSNamesCont(GDBM_FILE db, datum key)
 {
 	datum content;
@@ -667,11 +623,7 @@ NdbmPSNamesCont::NdbmPSNamesCont(GDBM_FILE db, datum key)
 	free(content.dptr);
 }
 
-//
-//		Class operator overloading
-//		--------------------------
-
-// [] operator overloading. It returns one content character
+//! [] operator overloading. It returns one content character
 char NdbmPSNamesCont::operator [] (long i)
 {
 	try
@@ -684,10 +636,7 @@ char NdbmPSNamesCont::operator [] (long i)
 	}
 }
 
-//
-//		Class methods
-//		-------------
-// Method to return the host name from the record content
+//! Method to return the host name from the record content
 std::string NdbmPSNamesCont::get_host_name(void) const
 {
 	std::string::size_type pos;
@@ -722,7 +671,7 @@ unsigned long NdbmPSNamesCont::get_pid(void) const
 	return p;
 }
 
-// Method to return the refresh period from the record content
+//! Method to return the refresh period from the record content
 long NdbmPSNamesCont::get_refresh(void) const
 {
 	std::string::size_type pos;
@@ -740,9 +689,7 @@ long NdbmPSNamesCont::get_refresh(void) const
 	return p;
 }
 
-// Method to return all the parameters from the record content necessary for
-// the devinfo call
-
+//! Method to return all the parameters from the record content necessary for the devinfo call
 void NdbmPSNamesCont::get_devinfo(db_devinfo_svc &data)
 {
 	strcpy(data.host_name,this->get_host_name().c_str());	
@@ -755,27 +702,19 @@ void NdbmPSNamesCont::get_devinfo(db_devinfo_svc &data)
 	data.device_exported = False;
 }
 
+/**@class NdbmResKey
+// This class is used to manage a resource table key part. It is 
+// constructed from the NDBM key. Within a resource table, the key is :
+//	- Resource family  name
+//	- Resource member name
+//	- Resource name
+//	- Resource index
+//
+// The record content is :
+//	- Resource value
+ */
 
-//****************************************************************************
-//
-//	NdbmResKey class
-//
-//	This class is used to manage a resource table key part. It is 
-//      constructed from the NDBM key. Within a resource table, the key is :
-//		Resource family  name
-//		Resource member name
-//		Resource name
-//		Resource index
-//
-// 	The record content is :
-//		Resource value
-//
-//****************************************************************************
-//
-//		Class constructor and destructor
-//		--------------------------------
-// The class default constuctor
-//
+//! The class default constuctor
 NdbmResKey::NdbmResKey()
 	: inter_str(""),
 	  str("")
@@ -784,15 +723,14 @@ NdbmResKey::NdbmResKey()
 	key.dsize = 0;
 }
 
-// The class destructor
-//
+//! The class destructor
 NdbmResKey::~NdbmResKey()
 {
 	if (key.dsize != 0)
 		delete [] key.dptr;
 }
 
-// Class constructor to be used from individual element
+//! Class constructor to be used from individual element
 NdbmResKey::NdbmResKey(std::string &family,std::string &member,std::string &r_name,long indi=1)
 {
 	key.dptr = NULL;
@@ -820,10 +758,7 @@ NdbmResKey::NdbmResKey(std::string &family,std::string &member,std::string &r_na
 	}
 }
 
-
-// 
-// Class constructor to be used from a already build key as a string
-// 
+//! Class constructor to be used from a already build key as a string
 NdbmResKey::NdbmResKey(std::string &key_str)
 {
 	key.dptr = NULL;
@@ -844,7 +779,7 @@ NdbmResKey::NdbmResKey(std::string &key_str)
 	}
 }
 
-// Class constructor to be used with the record key
+//! Class constructor to be used with the record key
 NdbmResKey::NdbmResKey(datum user_key)
 {
 	key.dptr = NULL;
@@ -863,10 +798,7 @@ NdbmResKey::NdbmResKey(datum user_key)
 		throw NdbmError(DbErr_CantBuildKey,MessBuildKey);
 }
 
-//
-//		Class operator overloading
-//		--------------------------
-// [] operator overloading. It returns one key character
+//! [] operator overloading. It returns one key character
 char NdbmResKey::operator [] (long i)
 {
 	try
@@ -879,10 +811,7 @@ char NdbmResKey::operator [] (long i)
 	}
 }
 
-//
-// Class methods
-//
-// Method to build a datum data from the already stored content
+//! Method to build a datum data from the already stored content
 void NdbmResKey::build_datum()
 {
 	try
@@ -906,8 +835,7 @@ void NdbmResKey::build_datum()
 }
 
 
-// Method to increment the key index part
-
+//! Method to increment the key index part
 void NdbmResKey::upd_indi(long ind)
 {
 //
@@ -922,7 +850,7 @@ void NdbmResKey::upd_indi(long ind)
 	build_datum();
 }
 
-// Method to retrieve resource family name
+//! Method to retrieve resource family name
 std::string NdbmResKey::get_res_fam_name(void) const
 {
 	std::string::size_type pos;
@@ -931,7 +859,7 @@ std::string NdbmResKey::get_res_fam_name(void) const
 	return str.substr(0, pos);	
 }
 
-// Method to retrieve resource member name
+//! Method to retrieve resource member name
 std::string NdbmResKey::get_res_memb_name(void) const
 {
 	std::string::size_type 	pos = 0,
@@ -948,7 +876,7 @@ std::string NdbmResKey::get_res_memb_name(void) const
 	return str.substr(start, pos - start);
 }
 
-// Method to retrieve resource name
+//! Method to retrieve resource name
 std::string NdbmResKey::get_res_name(void) const
 {
 	std::string::size_type 	pos = 0,
@@ -966,7 +894,7 @@ std::string NdbmResKey::get_res_name(void) const
 	return str.substr(start, pos - start);
 }
 
-// Method to retrieve resource index (in case of resource from the array type)
+//! Method to retrieve resource index (in case of resource from the array type)
 long NdbmResKey::get_res_indi(void) const
 {
 	std::string::size_type pos;
@@ -984,39 +912,29 @@ long NdbmResKey::get_res_indi(void) const
 	return indi;
 }
 
+/**@class NdbmResCont 
+// This class is used to manage a resource table content part. It is 
+// constructed from the NDBM key. Within a resource table, the key is :
+//	- Resource family  name
+//	- Resource member name
+//	- Resource name
+//	- Resource index
+//
+// The record content is :
+//	- Resource value
+ */
 
-//****************************************************************************
-//
-//		NdbmResCont class
-//		-----------
-//
-//	This class is used to manage a resource table content part. It is 
-//      constructed from the NDBM key. Within a resource table, the key is :
-//		Resource family  name
-//		Resource member name
-//		Resource name
-//		Resource index
-//
-// 	The record content is :
-//		Resource value
-//
-//****************************************************************************
-//
-//		Class constructor and destructor
-//		--------------------------------
-// The class default constuctor
+//! The class default constuctor
 NdbmResCont::NdbmResCont()
 {
 }
 
-// The class destructor
-
+//! The class destructor
 NdbmResCont::~NdbmResCont()
 {
 }
 
-// Class constructor to be used with the record key
-
+//! Class constructor to be used with the record key
 NdbmResCont::NdbmResCont(GDBM_FILE db, datum key)
 {
 	datum content = gdbm_fetch(db, key);
@@ -1029,10 +947,7 @@ NdbmResCont::NdbmResCont(GDBM_FILE db, datum key)
 		throw NdbmError(DbErr_CantGetContent,MessGetContent);
 }
 
-//
-//		Class operator overloading
-//		--------------------------
-// [] operator overloading. It returns one content character
+//! [] operator overloading. It returns one content character
 char NdbmResCont::operator [] (long i)
 {
 	try
@@ -1045,44 +960,30 @@ char NdbmResCont::operator [] (long i)
 	}
 }
 
-//
-//		Class methods
-//		-------------
-// Method to return the resource value
+//! Method to return the resource value
 std::string NdbmResCont::get_res_value(void) const
 {
 	return str;
 }
 
-
-//****************************************************************************
-//		
-//		NdbmNameList class
-//		------------
-//
-//	This class is used to manage a simple name list. This is used for all
+/**@class NdbmNameList 
+// This class is used to manage a simple name list. This is used for all
 // the browsing facilities implemented in the TACO static database server.
-//
-//****************************************************************************
-//
-//		Class constructor and destructor
-//		--------------------------------
-// The class default constuctor
+ */
+
+//! The class default constuctor
 NdbmNameList::NdbmNameList()
 {
 	name_list.clear();
 }
 
-// The class destructor
+//! The class destructor
 NdbmNameList::~NdbmNameList()
 {
 	name_list.clear();
 }
 
-//
-//		Class operator overloading
-//		--------------------------
-// [] operator overloading. It returns one element of the list
+//! [] operator overloading. It returns one element of the list
 std::string &NdbmNameList::operator [] (long i)
 {
     try
@@ -1095,12 +996,7 @@ std::string &NdbmNameList::operator [] (long i)
     }
 }
 
-//
-//		Class methods
-//		-------------
-
-// This method add a name to the list if it is not already in the list
-
+//! This method add a name to the list if it is not already in the list
 void NdbmNameList::add_if_new(const std::string &na)
 {
     std::vector<std::string>::iterator p = find(name_list.begin(),name_list.end(),na);
@@ -1110,15 +1006,13 @@ void NdbmNameList::add_if_new(const std::string &na)
 }
 
 
-// This method sorts the list (alphabetically)
-
+//! This method sorts the list (alphabetically)
 void NdbmNameList::sort_name()
 {
     sort(name_list.begin(), name_list.end());
 }
 
-// This method copy the vector to a C array allocated in this method
-
+//! This method copy the vector to a C array allocated in this method
 long NdbmNameList::copy_to_C(char **&buf)
 {
     long length = name_list.size();
@@ -1142,47 +1036,41 @@ long NdbmNameList::copy_to_C(char **&buf)
 	return(-1);
     }
 }
-//****************************************************************************
-//		
-//		NdbmDoubleNameList class
-//		------------------
+/**@class NdbmDoubleNameList 
 //
-//	This class is used to manage a simple name list. This is used for all
+// This class is used to manage a simple name list. This is used for all
 // the browsing facilities implemented in the TACO static database server.
 //
-//****************************************************************************
-//
-//		Class constructor and destructor
-//		--------------------------------
-// The class default constuctor
+ */
+
+//! The class default constuctor
 NdbmDoubleNameList::NdbmDoubleNameList()
 {
 	first_list.clear();
 	sec_list.clear();
 }
 
-// The class destructor
+//! The class destructor
 NdbmDoubleNameList::~NdbmDoubleNameList()
 {
 	first_list.clear();
 	sec_list.clear();
 }
 
-//
-//		Class methods
-//		-------------
+//! method to return ???
 void NdbmDoubleNameList::get_record(const long first, const long second, std::string &f_str, std::string &s_str)
 {
     f_str = first_list[first];
     s_str = sec_list[first][second];
 }
 
+//! method to return ???
 long NdbmDoubleNameList::sec_name_length(long first)
 {
     return(sec_list[first].size());
 }
 
-// This method add a name to the list if it is not already in the list
+//! This method add a name to the list if it is not already in the list
 void NdbmDoubleNameList::add(std::string first,std::string second)
 {
 	long i;
@@ -1204,100 +1092,86 @@ void NdbmDoubleNameList::add(std::string first,std::string second)
 	return;		
 }
 
-//****************************************************************************
-//		
-//		NdbmDomain class
-//		----------
+/**@class NdbmDomain 
 //
-//	This class is used to manage a simple name list. This is used for all
+// This class is used to manage a simple name list. This is used for all
 // the browsing facilities implemented in the TACO static database server.
 //
-//****************************************************************************
-//
-//		Class constructor and destructor
-//		--------------------------------
-// The class default constuctor
+ */
+
+//! The class default constuctor
 NdbmDomain::NdbmDomain()
 {
     nb = 0;
 }
 
-// Another constructor from the domain name
+//! Another constructor from the domain name
 NdbmDomain::NdbmDomain(const std::string &str)
 {
     name = str;
     nb = 1;
 }
 
-// The last constructor from the domain name and the elt number
+//! The last constructor from the domain name and the elt number
 NdbmDomain::NdbmDomain(const std::string &str,const long n) 
 	: name(str),
 	  nb(n)
 {
 }
 
-// The class destructor
+//! The class destructor
 NdbmDomain::~NdbmDomain()
 {
 }
 
-//
-//		Class operator overloading
-//		--------------------------
-// == operator overloading. Used by the standard find algorithms
+//! == operator overloading. Used by the standard find algorithms
 bool operator== (const NdbmDomain &a, const NdbmDomain &b)
 {
     return (a.name == b.name);
 }
 
-
-// < operator overloading. Used by the standard sort algorithms
-
-
+//! < operator overloading. Used by the standard sort algorithms
 bool operator< (const NdbmDomain &a, const NdbmDomain &b)
 {
     return (a.name < b.name);
 }
 
-//****************************************************************************
-//		
-//		NdbmDomDev class
-//		----------
+/**@class NdbmDomDev 
 //
-//	This class is used to manage a list of family/mmeber associated to a
-//  domain. This is used by the server for the db_deviceres and db_deldeviceres
-//  calls.
+// This class is used to manage a list of family/mmeber associated to a domain. 
+// This is used by the server for the db_deviceres and db_deldeviceres calls.
 //
-//****************************************************************************
-//
-//		Class constructor and destructor
-//		--------------------------------
-// The class default constuctor
+ */
+
+//! The class default constuctor
 NdbmDomDev::NdbmDomDev()
 {
 }
 
-// The last constructor from the domain name and a family/member string
+//! The last constructor from the domain name and a family/member string
 NdbmDomDev::NdbmDomDev(const std::string &dom,const std::string &str) : domain(dom)
 {
     fm.push_back(str);
 }
 
-// The class destructor
+//! The class destructor
 NdbmDomDev::~NdbmDomDev()
 {
 }
 
+//! method to add a device name
 void NdbmDomDev::add_dev(const std::string &dev)
 {
     fm.push_back(dev);
 }
 
+//! method to return the domain
 std::string NdbmDomDev::get_domain()
 {
     return(domain);
 }
 
+//! method to return ???
 std::string NdbmDomDev::get_fm(long ind)
 {
     try
@@ -1310,16 +1184,14 @@ std::string NdbmDomDev::get_fm(long ind)
     }
 }
 
+//! method to check if the device (in str) is in the list
 long NdbmDomDev::find_in_list(const std::string &str)
 {
     std::vector<std::string>::iterator p = std::find(fm.begin(), fm.end(), str);
     return (p != fm.end());
 }
 
-//
-//		Class operator overloading
-//		--------------------------
-// == operator overloading. Used by the standard find algorithms
+//! == operator overloading. Used by the standard find algorithms
 bool operator== (const NdbmDomDev &a, const NdbmDomDev &b)
 {
     return (a.domain == b.domain);
@@ -1327,26 +1199,20 @@ bool operator== (const NdbmDomDev &a, const NdbmDomDev &b)
 
 
 
-//****************************************************************************
-//		
-//		NdbmSvcDev class
-//		----------
+/**@class NdbmSvcDev 
 //
-//	This class is used to manage a simple name list. This is used for all
+// This class is used to manage a simple name list. This is used for all
 // the browsing facilities implemented in the TACO static database server.
 //
-//****************************************************************************
+ */
 
-//
-//		Class constructor and destructor
-//		--------------------------------
-// The class default constuctor
+//! The class default constuctor
 NdbmSvcDev::NdbmSvcDev()
 	: flag(false)
 {
 }
 
-// Another constructor from a NAMES table content
+//! Another constructor from a NAMES table content
 NdbmSvcDev::NdbmSvcDev(const NdbmNamesCont &co)
 {
     unsigned long 	pn = co.get_p_num(),
@@ -1359,45 +1225,36 @@ NdbmSvcDev::NdbmSvcDev(const NdbmNamesCont &co)
 	flag = false;
 }
 
-// The class destructor
+//! The class destructor
 NdbmSvcDev::~NdbmSvcDev()
 {
 }
 
-//****************************************************************************
+/**@class NdbmError 
 //
-//		NdbmError class
-//		---------
+// This class is used for error management.
 //
-//	This class is used for error management.
-//
-//****************************************************************************
-//
-//		Class constructor and destructor
-//		--------------------------------
-// Contructor from the error code and error message (with default value)
+ */
 
+//! Contructor from the error code and error message (with default value)
 NdbmError::NdbmError(long err, std::string mess)
  	: errcode(err), errmess(mess)
 {
 }
 
-//
-//		Class methods
-//		-------------
-// Method to retrieve the error code
+//! Method to retrieve the error code
 long NdbmError::get_err_code()
 {
 	return errcode;
 }
 
-// Method to retrieve the error message
+//! Method to retrieve the error message
 char *NdbmError::get_err_message()
 {
     	return const_cast<char *>(errmess.c_str());
 }
 
-// Method to display the error message
+//! Method to display the error message
 void NdbmError::display_err_message()
 {
     	std::cout << errmess << std::endl;
