@@ -7,10 +7,30 @@ Group: Utilities/TACO
 Source: @PACKAGE@-@VERSION@.tar.gz 
 Prefix: @prefix@
 Vendor: FRMII, TU München, FRG
+Distribution:@DISTRIBUTION@
 Requires: gdbm
 Provides: taco
+Url: http://www.sourceforge.net/projects/taco
 
 %description
+TACO is an object oriented control system originally developed at the European Synchrotron Radiation Facility to control accelerators 
+and beamlines and data acquisition systems. 
+
+At the ESRF (www.esrf.fr) TACO is used to control three accelerators - linear accelerator , booster synchrotron and storage ring, and 
+over 30 beamlines. 
+TACO is being used for instrument control for the new  neutron source FRM-II (www.frm2.tum.de) in Garching-Munich. 
+TACO has been applied to telescope control at the 26m radio telescope at the Hartebeesthoek Radio Astronomy Observatory (www.hartroa.ac.za). 
+
+TACO is very scalable and can be used for simple single device laboratory like setups with only a few devices or for a big installation 
+comprising thousands of devices. TACO is a cheap and simple solution for doing distributed home automation. TACO is available free of 
+charge without warranties. 
+
+TACO is object oriented because it treats ALL (physical and logical) control points in a control system as objects in a distributed 
+environment. All actions are implement in classes. New classes can be constructed out of existing classes in a hierarchical manner 
+thereby ensuring a high-level of software reuse. Classes can be written in C++, in C (using a methodology called Objects in C), in 
+Python or in LabView (using G). 
+
+TACO has been designed to be portable and runs on a large number of platforms (e.g. Linux, Solaris, BSD, Mac OS X, HP-UX, Win32, OS9). 
 
 %prep
 %setup -n @PACKAGE@-@VERSION@
@@ -127,34 +147,31 @@ fi
 %defattr(-,root,root)
 @prefix@/templates/taco/taco
 @prefix@/templates/taco/tacoenv.sh
-%config(noreplace) @prefix@/system/bin/@taco_install_path@/taco.shutdown
-%config(noreplace) @prefix@/system/bin/@taco_install_path@/taco.startup
-%config(noreplace) @prefix@/system/bin/@taco_install_path@/taco.startup.sec
+%config(noreplace) @prefix@/sbin/taco.shutdown
+%config(noreplace) @prefix@/sbin/taco.startup
 %config(noreplace) @prefix@/dbase/res/SEC/sec_auth.res
 %config @prefix@/dbase/res/CMDS/dev_cmds.res
 %config @prefix@/dbase/res/ERROR/dev_errors.res
 %config @prefix@/dbase/res/ERROR/db_errors.res
-%config @prefix@/dbase/res/TEST/Inst_verify.res
-%config @prefix@/dbase/res/CLASS/Inst_verify_class.res
 # %doc INSTALL doc/TACO.pdf doc/README doc/index.html
-@prefix@/bin/@taco_install_path@/db_fillup
-@prefix@/bin/@taco_install_path@/db_update
-@prefix@/bin/@taco_install_path@/db_read
-@prefix@/bin/@taco_install_path@/db_info
-@prefix@/bin/@taco_install_path@/db_initcache
-@prefix@/bin/@taco_install_path@/db_devinfo
-@prefix@/bin/@taco_install_path@/db_devdel
-@prefix@/bin/@taco_install_path@/db_servdel
-@prefix@/bin/@taco_install_path@/db_servinfo
-@prefix@/bin/@taco_install_path@/db_servunreg
-@prefix@/bin/@taco_install_path@/db_devres
-@prefix@/bin/@taco_install_path@/db_resdel
-@prefix@/system/bin/@taco_install_path@/Manager
-@prefix@/system/bin/@taco_install_path@/unreg
-@prefix@/system/bin/@taco_install_path@/MessageServer
-@prefix@/system/bin/@taco_install_path@/dcwr_alo
-@prefix@/system/bin/@taco_install_path@/dcrd_alo
-@prefix@/system/bin/@taco_install_path@/dbm_server
+@prefix@/bin/db_fillup
+@prefix@/bin/db_update
+@prefix@/bin/db_read
+@prefix@/bin/db_info
+@prefix@/bin/db_initcache
+@prefix@/bin/db_devinfo
+@prefix@/bin/db_devdel
+@prefix@/bin/db_servdel
+@prefix@/bin/db_servinfo
+@prefix@/bin/db_servunreg
+@prefix@/bin/db_devres
+@prefix@/bin/db_resdel
+@prefix@/sbin/Manager
+@prefix@/sbin/unreg
+@prefix@/sbin/MessageServer
+@prefix@/sbin/dcwr_alo
+@prefix@/sbin/dcrd_alo
+@prefix@/sbin/dbm_server
 
 %package x-apps
 Summary: TACO control system X11 applications.
@@ -166,9 +183,9 @@ Provides: taco-x-apps
 
 %files x-apps
 %defattr(-,root,root)
-@prefix@/bin/@taco_install_path@/greta
-@prefix@/bin/@taco_install_path@/xdevmenu
-@prefix@/system/bin/@taco_install_path@/S_Alarm
+@prefix@/bin/greta
+@prefix@/bin/xdevmenu
+@prefix@/sbin/S_Alarm
 @appdefaultdir@/GReta
 @appdefaultdir@/XDevmenu
 
