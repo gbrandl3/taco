@@ -12,9 +12,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:		$Date: 2004-03-26 16:21:52 $
+ * Date:		$Date: 2004-10-26 11:27:44 $
  *
  *
  * Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
@@ -75,7 +75,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.8 2004-03-26 16:21:52 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.9 2004-10-26 11:27:44 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*
@@ -284,6 +284,18 @@ typedef void (*DevCallbackFunction(devserver, void*, DevCallbackData));
 #define SEND      	2
 
 /*
+ * data collector library include file
+ */
+#include <dc.h>
+
+#if !defined(_NT)
+ /*
+ * HDB library include file
+ */
+#include <hdb_out.h>
+#endif
+
+/*
  *  Function definitions for API-library
  */
 #ifdef __cplusplus
@@ -292,12 +304,24 @@ extern "C" {
 extern _DLLFunc long  dev_import
 				PT_( (char *dev_name, long access,
 				devserver *ds_ptr, long *error) );
+extern _DLLFunc long  taco_dev_import
+				PT_( (char *dev_name, long access,
+				devserver *ds_ptr, long *error) );
 extern _DLLFunc long  dev_putget
 				PT_( (devserver ds, long cmd,
 				DevArgument argin,  DevType argin_type,
 				DevArgument argout, DevType argout_type,
 				long *error) );
+extern _DLLFunc long  taco_dev_putget
+				PT_( (devserver ds, long cmd,
+				DevArgument argin,  DevType argin_type,
+				DevArgument argout, DevType argout_type,
+				long *error) );
 extern _DLLFunc long  dev_put
+				PT_( (devserver ds, long cmd,
+				DevArgument argin,  DevType argin_type,
+				long *error) );
+extern _DLLFunc long  taco_dev_put
 				PT_( (devserver ds, long cmd,
 				DevArgument argin,  DevType argin_type,
 				long *error) );
@@ -312,12 +336,17 @@ extern _DLLFunc long  dev_put_asyn
 				long *error) );
 extern _DLLFunc long  dev_free
 				PT_( (devserver ds, long *error) );
+extern _DLLFunc long  taco_dev_free
+				PT_( (devserver ds, long *error) );
 extern _DLLFunc long  dev_xdrfree
 				PT_( (DevType type, DevArgument objptr,
 				long *error) );
 extern _DLLFunc long  dev_cmd_query
 				PT_( (devserver ds, DevVarCmdArray *varcmdarr,
 				long *error) );
+extern _DLLFunc long  taco_dev_cmd_query
+                                PT_( (devserver ds, DevVarCmdArray *varcmdarr,
+                                long *error) );
 extern _DLLFunc long  dev_event_query
 				PT_( (devserver ds, DevVarEventArray *vareventarr,
 				long *error) );
@@ -335,8 +364,6 @@ extern _DLLFunc long  dev_ping
 extern _DLLFunc long  dev_import_timeout
 				PT_( (long request, struct timeval *timeout, 
 				long *error) );
-
-
 
 extern _DLLFunc long   db_import
 				PT_( (long *error) );
@@ -406,8 +433,8 @@ extern _DLLFunc long debug_flag;	/* global that is used in gen_api.c */
 		extern _DLLFunc void  dev_printdiag	PT_( (DevShort mode, char *var_args, ...) );
 #	else
 		extern _DLLFunc void  dev_printerror	(DevShort mode,char *fmt, char *str);
-		extern _DLLFunc void  dev_printdebug	();
-		extern _DLLFunc void  dev_printdiag	();
+		extern _DLLFunc void  dev_printdebug	( ... );
+		extern _DLLFunc void  dev_printdiag	( ... );
 #	endif
 #	ifdef __cplusplus
 		}
