@@ -13,9 +13,9 @@
 
  Original: 	January 1991
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2003-11-24 13:51:59 $
+ Date:		$Date: 2003-12-09 13:31:45 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -334,7 +334,8 @@ int main (int argc, char **argv)
  */
 	if (c_flags.request_log)
 	{
-		snprintf (logfile, sizeof(logfile) - 1, "%s/System.log", homepath);
+		char *logpath = getenv("LOGPATH");
+		snprintf (logfile, sizeof(logfile) - 1, "%s/System.log", logpath ? logpath : homepath);
 		if ( (system_log = fopen (logfile, "w")) == NULL )
 		{
 			fprintf (stderr,"cannot open System.log file, exiting...\n");
