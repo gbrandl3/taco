@@ -12,9 +12,9 @@
 
  Original:	March 1990
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-04-25 11:21:24 $
+ Date:		$Date: 2004-11-03 15:01:35 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -29,7 +29,7 @@
  */
 #ifdef _IDENT
 static char DevErrorsh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevErrors.h,v 1.2 2003-04-25 11:21:24 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevErrors.h,v 1.3 2004-11-03 15:01:35 andy_gotz Exp $";
 #endif /* _IDENT */
 
 /*
@@ -411,8 +411,10 @@ typedef struct { short err_type;
 #define DcErr_CantResolveLoadTypeSymbol		1066
 
 
-/* Numbers upto 1199 reserved for data acquisition */
-
+/* Errors for TACO/TANGO attribute handling */
+#define DevErr_AttributeNotFound					 1100
+#define DevErr_TangoAccessFailed					 1101
+#define DevErr_CannotConvertAttributeDataType 1102
 
 /* Errors 1200-1210 for attenuators */
 #define DevErr_FluorescentScreenPlaced          1200
