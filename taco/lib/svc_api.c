@@ -11,9 +11,9 @@
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.7 $
+ Version:	$Revision: 1.8 $
 
- Date:		$Date: 2004-01-14 11:09:13 $
+ Date:		$Date: 2004-02-11 11:50:46 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -120,16 +120,13 @@ _dev_import_out * _DLLFunc rpc_dev_import_4 (_dev_import_in *dev_import_in,
 	long 		device_id;
 	register int 	i;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-	    "\nrpc_dev_import_4() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_import_4() : entering routine\n");
 
 	device_id = 0;
 	dev_import_out.ds_id  = 0;
 	dev_import_out.status = DS_OK;
 	dev_import_out.error  = DS_OK;
-	sprintf (dev_import_out.server_name, "%s", config_flags.server_name);
+	snprintf (dev_import_out.server_name, sizeof(dev_import_out.server_name), "%s", config_flags.server_name);
 
 	dev_import_out.var_argument.length   = 0;
 	dev_import_out.var_argument.sequence = NULL;
@@ -177,20 +174,13 @@ _dev_import_out * _DLLFunc rpc_dev_import_4 (_dev_import_in *dev_import_in,
 
 				dev_import_out.ds_id = device_id;
 
-#ifdef EBUG
-				dev_printdebug ( DBG_DEV_SVR_CLASS,
-				    "rpc_dev_import() : device %s found in export list\n",
+				dev_printdebug ( DBG_DEV_SVR_CLASS, "rpc_dev_import() : device %s found in export list\n",
 				    dev_import_in->device_name);
-				dev_printdebug ( DBG_DEV_SVR_CLASS,
-				    "rpc_dev_import() : device_id = %d\n", device_id);
-				dev_printdebug ( DBG_DEV_SVR_CLASS,
-				    "rpc_dev_import() : ds_id = %d\n", i);
-				dev_printdebug ( DBG_DEV_SVR_CLASS,
-				    "rpc_dev_import() : export_counter = %d\n", 
+				dev_printdebug ( DBG_DEV_SVR_CLASS, "rpc_dev_import() : device_id = %d\n", device_id);
+				dev_printdebug ( DBG_DEV_SVR_CLASS, "rpc_dev_import() : ds_id = %d\n", i);
+				dev_printdebug ( DBG_DEV_SVR_CLASS, "rpc_dev_import() : export_counter = %d\n", 
 				    devices[i].export_counter);
-				dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-				    "rpc_dev_import_4() : leaving routine\n");
-#endif /* EBUG */
+				dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "rpc_dev_import_4() : leaving routine\n");
 
 				dev_import_out.status = DS_OK;
 				return (&dev_import_out);
@@ -232,13 +222,8 @@ _dev_free_out * _DLLFunc rpc_dev_free_4 (_dev_free_in *dev_free_in)
 	long			ds_id;
 	long			connection_id;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-	    "\nrpc_dev_free_4() : entering routine\n");
-	dev_printdebug ( DBG_DEV_SVR_CLASS,
-	    "\nrpc_dev_free_4() : with device_id = %d\n", 
-	    dev_free_in->ds_id);
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_free_4() : entering routine\n");
+	dev_printdebug ( DBG_DEV_SVR_CLASS, "\nrpc_dev_free_4() : with device_id = %d\n", dev_free_in->ds_id);
 
 	dev_free_out.status = DS_OK;
 	dev_free_out.error  = DS_OK;
@@ -273,14 +258,9 @@ _dev_free_out * _DLLFunc rpc_dev_free_4 (_dev_free_in *dev_free_in)
 	}
 
 
-#ifdef EBUG
-	dev_printdebug ( DBG_DEV_SVR_CLASS,
-	    "rpc_dev_free_4() : ds_id = %d\n", ds_id);
-	dev_printdebug ( DBG_DEV_SVR_CLASS, 
-	    "rpc_dev_free_4() : connection_id = %d\n", connection_id);
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-	    "rpc_dev_free_4() : leaving routine\n");
-#endif /* EBUG */
+	dev_printdebug ( DBG_DEV_SVR_CLASS, "rpc_dev_free_4() : ds_id = %d\n", ds_id);
+	dev_printdebug ( DBG_DEV_SVR_CLASS, "rpc_dev_free_4() : connection_id = %d\n", connection_id);
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "rpc_dev_free_4() : leaving routine\n");
 
 	return (&dev_free_out);
 }
@@ -318,13 +298,8 @@ _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
 	DevDataListEntry        data_type;
 
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-	    "\nrpc_dev_putget_4() : entering routine\n");
-	dev_printdebug ( DBG_DEV_SVR_CLASS,
-	    "\nrpc_dev_putget_4() : with ds_id = %d\n", 
-	    server_data->ds_id);
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_putget_4() : entering routine\n");
+	dev_printdebug ( DBG_DEV_SVR_CLASS, "\nrpc_dev_putget_4() : with ds_id = %d\n", server_data->ds_id);
 
 /*
  * Free and preset the structure for outgoing arguments.
@@ -396,11 +371,8 @@ _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
 		if ( xdr_get_type( client_data.argout_type, &data_type, 
 		    &client_data.error) == DS_NOTOK)
 		{
-#ifdef EBUG
-			dev_printdebug (DBG_ERROR | DBG_DEV_SVR_CLASS,
-			    "\nrpc_dev_putget_4() : xdr_get_type(%d) returned error %d\n",
+			dev_printdebug (DBG_ERROR | DBG_DEV_SVR_CLASS, "\nrpc_dev_putget_4() : xdr_get_type(%d) returned error %d\n",
 			    client_data.argout_type, client_data.error);
-#endif /* EBUG */
 
 			client_data.status = DS_NOTOK;
 			return (&client_data);
@@ -508,13 +480,8 @@ _client_data * _DLLFunc rpc_dev_put_4 (_server_data *server_data)
 	long			ds_id;
 	long 		connection_id;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-	    "\nrpc_dev_put_4() : entering routine\n");
-	dev_printdebug ( DBG_DEV_SVR_CLASS,
-	    "\nrpc_dev_put_4() : with ds_id = %d\n", 
-	    server_data->ds_id);
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_put_4() : entering routine\n");
+	dev_printdebug ( DBG_DEV_SVR_CLASS, "\nrpc_dev_put_4() : with ds_id = %d\n", server_data->ds_id);
 
 /*
  *  initialise outgoing arguments 
@@ -655,15 +622,10 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
 	DevDataListEntry        	data_type;
 
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-	    "\nrpc_dev_putget_raw_4() : entering routine\n");
-	dev_printdebug ( DBG_DEV_SVR_CLASS,
-	    "rpc_dev_putget_raw_4() : with ds_id = %d\n", 
-	    server_data->ds_id);
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_putget_raw_4() : entering routine\n");
+	dev_printdebug ( DBG_DEV_SVR_CLASS, "rpc_dev_putget_raw_4() : with ds_id = %d\n", server_data->ds_id);
 
-	/*
+/*
  *  allocate and initialise outgoing arguments 
  */
 
@@ -724,11 +686,8 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
 	if ( xdr_get_type( client_data.ser_argout_type, &data_type, 
 	    &client_data.error) == DS_NOTOK)
 	{
-#ifdef EBUG
-		dev_printdebug (DBG_ERROR | DBG_DEV_SVR_CLASS,
-		    "\nrpc_dev_putget_raw_4() : xdr_get_type(%d) returned error %d\n",
+		dev_printdebug (DBG_ERROR | DBG_DEV_SVR_CLASS, "\nrpc_dev_putget_raw_4() : xdr_get_type(%d) returned error %d\n",
 		    client_data.ser_argout_type, client_data.error);
-#endif /* EBUG */
 
 		client_data.status     = DS_NOTOK;
 		return (&client_data);
@@ -820,20 +779,12 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
 		client_data.xdr_length = 0;
 	}
 
-#ifdef EBUG
-	dev_printdebug (DBG_DEV_SVR_CLASS,
-	    "rpc_dev_putget_raw_4() : _client_raw_data\n");
-	dev_printdebug ( DBG_DEV_SVR_CLASS, "status            = %d\n", 
-	    client_data.status);
-	dev_printdebug ( DBG_DEV_SVR_CLASS, "error             = %d\n", 
-	    client_data.error);
-	dev_printdebug ( DBG_DEV_SVR_CLASS, "ser_argout_type   = %d\n", 
-	    client_data.ser_argout_type);
-	dev_printdebug ( DBG_DEV_SVR_CLASS, "deser_argout_type = %d\n", 
-	    client_data.deser_argout_type);
-	dev_printdebug ( DBG_DEV_SVR_CLASS, "xdr_length        = %d\n", 
-	    client_data.xdr_length);
-#endif /* EBUG */
+	dev_printdebug (DBG_DEV_SVR_CLASS, "rpc_dev_putget_raw_4() : _client_raw_data\n");
+	dev_printdebug ( DBG_DEV_SVR_CLASS, "status            = %d\n", client_data.status);
+	dev_printdebug ( DBG_DEV_SVR_CLASS, "error             = %d\n", client_data.error);
+	dev_printdebug ( DBG_DEV_SVR_CLASS, "ser_argout_type   = %d\n", client_data.ser_argout_type);
+	dev_printdebug ( DBG_DEV_SVR_CLASS, "deser_argout_type = %d\n", client_data.deser_argout_type);
+	dev_printdebug ( DBG_DEV_SVR_CLASS, "xdr_length        = %d\n", client_data.xdr_length);
 
 	return (&client_data);
 }
@@ -865,15 +816,10 @@ _client_data * _DLLFunc rpc_dev_put_asyn_4 (_server_data *server_data)
 
 	asyn_error = DS_OK;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-	    "\nrpc_dev_put_asyn_4() : entering routine\n");
-	dev_printdebug ( DBG_DEV_SVR_CLASS,
-	    "\nrpc_dev_put_asyn_4() : with ds_id = %d\n", 
-	    server_data->ds_id);
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_put_asyn_4() : entering routine\n");
+	dev_printdebug ( DBG_DEV_SVR_CLASS, "\nrpc_dev_put_asyn_4() : with ds_id = %d\n", server_data->ds_id);
 
-	/*
+/*
  *  initialise outgoing arguments 
  */
 
@@ -944,13 +890,8 @@ void _DLLFunc rpc_dev_put_asyn_cmd (_server_data *server_data)
 
 	error = DS_OK;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-	    "\nrpc_dev_put_asyn_cmd() : entering routine\n");
-	dev_printdebug ( DBG_DEV_SVR_CLASS,
-	    "\nrpc_dev_put_asyn_cmd() : with ds_id = %d\n", 
-	    server_data->ds_id);
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_put_asyn_cmd() : entering routine\n");
+	dev_printdebug ( DBG_DEV_SVR_CLASS, "\nrpc_dev_put_asyn_cmd() : with ds_id = %d\n", server_data->ds_id);
 
 	/*
     * If an error occurred in rpc_dev_put_asyn(), do not execute
@@ -1015,10 +956,7 @@ void _DLLFunc rpc_dev_put_asyn_cmd (_server_data *server_data)
 	                                     client_data.argout_type,
 	                                     &error);
 #endif /* __cplusplus */
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-	    "rpc_dev_put_asyn_cmd() : leaving routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "rpc_dev_put_asyn_cmd() : leaving routine\n");
 }
 
 
@@ -1072,9 +1010,7 @@ long dev_export (char *name, DeviceBase *ptr_dev, long *error)
 
 	*error = DS_OK;
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\ndev_export() : entering routine\n");
-#endif /* EBUG */
 
 /*
  * If no space is yet allocated in the global device array,
@@ -1191,7 +1127,7 @@ free_found:
  * OIC version
  */
       		if ( strncmp (ds->devserver.dev_type, TYPE_INIT, strlen(TYPE_INIT)) != 0 )
-         		sprintf (ds->devserver.dev_type, TYPE_DEFAULT );
+         		snprintf (ds->devserver.dev_type, sizeof(ds->devserver.dev_type), TYPE_DEFAULT );
       		devinfo.device_type  = ds->devserver.dev_type;
 #else
 /*
@@ -1200,14 +1136,10 @@ free_found:
 		devinfo.device_type  = const_cast<char *>(device->GetDevType());
 #endif /* __cplusplus */
 
-#ifdef EBUG
-		dev_printdebug (DBG_DEV_SVR_CLASS,
-			"dev_export() :  name = %s , class = %s , type = %s\n",
+		dev_printdebug (DBG_DEV_SVR_CLASS, "dev_export() :  name = %s , class = %s , type = %s\n",
 			devinfo.device_name, devinfo.device_class, devinfo.device_type);
-		dev_printdebug (DBG_DEV_SVR_CLASS,
-			"dev_export() :  host_name = %s , proc = %s , pn = %d , vn = %d\n",
+		dev_printdebug (DBG_DEV_SVR_CLASS, "dev_export() :  host_name = %s , proc = %s , pn = %d , vn = %d\n",
 			devinfo.host_name, devinfo.proc_name, devinfo.pn, devinfo.vn );
-#endif /* EBUG */
 		if ( db_dev_export (&devinfo,1,error) < DS_OK )
 			return (DS_NOTOK);
 	}
@@ -1239,15 +1171,13 @@ free_found:
  * The length of the device name can only be 80 characters!
  */
 	if ( strlen(name) < MAX_NAME_LENGTH )
-      		sprintf (devices[next_free].export_name, "%s", name);
+      		snprintf (devices[next_free].export_name, sizeof(devices[next_free].export_name), "%s", name);
 	else
       	{
       		*error  = DevErr_NameStringToLong;
       		return (DS_NOTOK);
       	}
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "dev_export() : leaving routine\n");
-#endif /* EBUG */
 	return(DS_OK);
 }
 
@@ -1281,15 +1211,12 @@ long ds__destroy (void *ptr_ds, long *error)
 
 	*error = DS_OK;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-	    "\nds__destroy() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nds__destroy() : entering routine\n");
 
-	/*
-    * If the object was exported, delete the entry in the
-    * list of exported devices before freeing the object.
-    */
+/*
+ * If the object was exported, delete the entry in the
+ * list of exported devices before freeing the object.
+ */
 
 	for (i=0; i<max_no_of_devices; i++)
 	{
@@ -1316,15 +1243,12 @@ long ds__destroy (void *ptr_ds, long *error)
 #endif
 				devices[i].export_counter++;
 
-#ifdef EBUG
-				dev_printdebug ( DBG_DEV_SVR_CLASS,
-				    "ds__destroy() : device %s deleted from export list\n",
+				dev_printdebug ( DBG_DEV_SVR_CLASS, "ds__destroy() : device %s deleted from export list\n",
 #ifndef __cplusplus
 				    ds->devserver.name);
 #else
 				    device->GetDevName());
 #endif /* __cplusplus */
-#endif /* EBUG */
 
 				break;
 			}
@@ -1390,9 +1314,7 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 	int			i;
 #endif
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_cmd_query_4() : entering routine\n");
-#endif /* EBUG */
 
 	dev_query_out.error  = DS_OK;
 	dev_query_out.status = DS_OK;
@@ -1474,7 +1396,7 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 		dev_query_out.sequence[i].in_type  = ds_cl[i].argin_type;
 		dev_query_out.sequence[i].out_type = ds_cl[i].argout_type;
 	}
-	sprintf (dev_query_out.class_name, "%s", ds_class->devserver_class.class_name);
+	snprintf (dev_query_out.class_name, sizeof(dev_query_out.class_name), "%s", ds_class->devserver_class.class_name);
 #else
 /*
  * C++ version
@@ -1487,7 +1409,7 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 		dev_query_out.status = DS_NOTOK;
 		return (&dev_query_out);
 	}
-	sprintf (dev_query_out.class_name, "%s", device->GetClassName());
+	snprintf (dev_query_out.class_name, sizeof(dev_query_out.class_name), "%s", device->GetClassName());
 #endif /* __cplusplus */
 
 /* 
@@ -1551,9 +1473,7 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
 	long 				ret;
 #endif
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_event_query_4() : entering routine\n");
-#endif /* EBUG */
 
 	dev_query_out.error  = 0;
 	dev_query_out.status = 0;
@@ -1633,7 +1553,7 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
 		dev_query_out.sequence[i].out_type = ds_ev[i].argout_type;
 	}
 
-	sprintf (dev_query_out.class_name, "%s", ds_class->devserver_class.class_name);
+	snprintf (dev_query_out.class_name, sizeof(dev_query_out.class_name), "%s", ds_class->devserver_class.class_name);
 #else
 /*
  * C++ version
@@ -1646,7 +1566,7 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
 		dev_query_out.status = -1;
 		return (&dev_query_out);
 	}
-	sprintf (dev_query_out.class_name, "%s", device->GetClassName());
+	snprintf (dev_query_out.class_name, sizeof(dev_query_out.class_name), "%s", device->GetClassName());
 #endif /* __cplusplus */
 
 	return (&dev_query_out);
@@ -1668,10 +1588,7 @@ static long read_device_id (long device_id, long *ds_id, long *connection_id, lo
 {
 	long 	export_counter;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-	    "\nread_device_id() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nread_device_id() : entering routine\n");
 
 	*error = DS_OK;
 
@@ -1697,13 +1614,9 @@ static long read_device_id (long device_id, long *ds_id, long *connection_id, lo
 		return (DS_NOTOK);
 	}
 
-#ifdef EBUG
-	dev_printdebug (DBG_DEV_SVR_CLASS,
-	    "read_device_id() : ds_id = %d   conn_id = %d\n",
+	dev_printdebug (DBG_DEV_SVR_CLASS, "read_device_id() : ds_id = %d   conn_id = %d\n",
 	    *ds_id, *connection_id);
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-	    "read_device_id() : leaving routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "read_device_id() : leaving routine\n");
 
 	return (DS_OK);
 }
@@ -1745,13 +1658,8 @@ _client_data * _DLLFunc rpc_dev_putget_local (_server_data *server_data)
 	DevDataListEntry        data_type;
 
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-	    "\nrpc_dev_putget_local() : entering routine\n");
-	dev_printdebug ( DBG_DEV_SVR_CLASS,
-	    "\nrpc_dev_putget_local() : with ds_id = %d\n", 
-	    server_data->ds_id);
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_putget_local() : entering routine\n");
+	dev_printdebug ( DBG_DEV_SVR_CLASS, "\nrpc_dev_putget_local() : with ds_id = %d\n", server_data->ds_id);
 
 /*
  * Free and preset the structure for outgoing arguments.
@@ -1815,11 +1723,8 @@ _client_data * _DLLFunc rpc_dev_putget_local (_server_data *server_data)
 		if ( xdr_get_type( client_data->argout_type, &data_type, 
 		    &client_data->error) == DS_NOTOK)
 		{
-#ifdef EBUG
-			dev_printdebug (DBG_ERROR | DBG_DEV_SVR_CLASS,
-			    "\nrpc_dev_putget_local() : xdr_get_type(%d) returned error %d\n",
+			dev_printdebug (DBG_ERROR | DBG_DEV_SVR_CLASS, "\nrpc_dev_putget_local() : xdr_get_type(%d) returned error %d\n",
 			    client_data->argout_type, client_data->error);
-#endif /* EBUG */
 
 			client_data->status = DS_NOTOK;
 			return (client_data);
@@ -1903,16 +1808,12 @@ _dev_import_out * _DLLFunc rpc_dev_ping_4 (_dev_import_in *dev_import_in,
 	register int 		i;
 	char			*in_name_stripped;
 
-
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-	    "\nrpc_dev_ping_4() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_ping_4() : entering routine\n");
 
 	dev_import_out.ds_id  = 0;
 	dev_import_out.status = DS_OK;
 	dev_import_out.error  = DS_OK;
-	sprintf (dev_import_out.server_name, "%s", config_flags.server_name);
+	snprintf (dev_import_out.server_name, sizeof(dev_import_out.server_name), "%s", config_flags.server_name);
 
 	dev_import_out.var_argument.length   = 0;
 	dev_import_out.var_argument.sequence = NULL;
@@ -1920,9 +1821,8 @@ _dev_import_out * _DLLFunc rpc_dev_ping_4 (_dev_import_in *dev_import_in,
 /* 
  * strip nethost name, if present 
  */
-	if(dev_import_in->device_name[0]=='/' && dev_import_in->device_name[1]=='/')
-	 /* Nethost part present */
-		in_name_stripped=strchr(dev_import_in->device_name,'/');
+	if(dev_import_in->device_name[0]=='/' && dev_import_in->device_name[1]=='/') /* Nethost part present */
+		in_name_stripped=strchr(dev_import_in->device_name, '/');
 	else
 		in_name_stripped=dev_import_in->device_name;
 /*
@@ -1930,28 +1830,20 @@ _dev_import_out * _DLLFunc rpc_dev_ping_4 (_dev_import_in *dev_import_in,
  * devices already being served 
  *
  */
-
 	for (i=0; i<max_no_of_devices; i++)
-	{
 		if (devices[i].export_status == EXPORTED)
-		{
- 	 /*
-          * device will be known under its export name to the outside world
-          */
-			if (strcmp (in_name_stripped,devices[i].export_name) == 0)
+/*
+ * device will be known under its export name to the outside world
+ */
+			if (strcmp (in_name_stripped, devices[i].export_name) == 0)
 			{
 				dev_import_out.status = DS_OK;
 				return (&dev_import_out);
 			}
-
-
-		}
-	}
 /*
  * device of this name is not being served 
  * 
  */
-
 	dev_import_out.error  = DevErr_DeviceOfThisNameNotServed;
 	dev_import_out.status = DS_NOTOK;
 	return (&dev_import_out);
