@@ -11,14 +11,14 @@
 
  Original   :   December 1993
 
- Version    :	$Revision: 1.3 $
+ Version    :	$Revision: 1.4 $
 
- Date       :	$Date: 2003-05-02 09:12:49 $
+ Date       :	$Date: 2003-11-28 15:50:54 $
 
  Copyright (c) 1993 by European Synchrotron Radiation Facility,
                        Grenoble, France
 ********************************************************************-*/
-#include <config.h>
+#include "config.h"
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevServer.h>
@@ -29,23 +29,21 @@
 #include <errno.h>
 
 #ifdef unix
-#if !defined vxworks
-#include <pwd.h>
-#include <grp.h>
-#endif /* !vxworks */
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#ifndef lynx
-#include <netinet/in.h>
-#endif /* !lynx */
-#if !defined vxworks
-#include <netdb.h>
-#endif /* !vxworks */
+#	if !defined vxworks
+#		include <pwd.h>
+#		include <grp.h>
+#		include <netdb.h>
+#	endif /* !vxworks */
+#	include <sys/socket.h>
+#	include <arpa/inet.h>
+#	ifndef lynx
+#		include <netinet/in.h>
+#	endif /* !lynx */
 #endif /* unix */
 
 #if ( OSK | _OSK )
-#include <inet/socket.h>
-#include <inet/netdb.h>
+#	include <inet/socket.h>
+#	include <inet/netdb.h>
 #endif /* OSK | _OSK */
 
 /*
@@ -1934,9 +1932,9 @@ long _DLLFunc sec_svc_import (DevServerDevices *device, long connection_id,
 			getpeername ((int)device->si_tcp_socket, 
 #if defined (_XOPEN_SOURCE_EXTENDED)
 			    (struct sockaddr *)&(device->si_peeraddr), &ulen);
-#elif defined (_UCC) || (solaris)
+#elif defined (_UCC) || defined(solaris)
 			    (struct sockaddr *)&(device->si_peeraddr), &len);
-#elif defined (linux)
+#elif defined (linux) || defined(FreeBSD)
 			    (struct sockaddr *)&(device->si_peeraddr), (socklen_t*)&len);
 #elif defined (WIN32)
 			    (struct sockaddr *)&(device->si_peeraddr), &len);
@@ -2003,7 +2001,7 @@ long _DLLFunc sec_svc_import (DevServerDevices *device, long connection_id,
 			    (struct sockaddr *)&(device->si_peeraddr), &ulen);
 #elif defined (_UCC) || (solaris)
 			    (struct sockaddr *)&(device->si_peeraddr), &len);
-#elif defined (linux)
+#elif defined (linux) || defined (FreeBSD)
 			    (struct sockaddr *)&(device->si_peeraddr), (socklen_t*)&len);
 #elif defined (WIN32)
 			    (struct sockaddr *)&(device->si_peeraddr), &len);
@@ -2556,9 +2554,9 @@ static long sec_verify_tcp_conn (DevServerDevices *device)
 			if ( getpeername ((int)device->si_tcp_socket,
 #if defined (_XOPEN_SOURCE_EXTENDED)
 			    (struct sockaddr *)&peeraddr, &ulen) == DS_NOTOK ||
-#elif defined (_UCC) || (solaris)
+#elif defined (_UCC) || defined (solaris)
 			    (struct sockaddr *)&peeraddr, &len) == DS_NOTOK ||
-#elif defined (linux)
+#elif defined (linux) || defined(FreeBSD)
 			    (struct sockaddr *)&peeraddr, (socklen_t*)&len) == DS_NOTOK ||
 #elif defined (WIN32)
 			    (struct sockaddr *)&peeraddr, &len) == DS_NOTOK ||

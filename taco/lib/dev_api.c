@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.5 $
+ Version    :	$Revision: 1.6 $
 
- Date	    :	$Date: 2003-05-16 13:53:10 $
+ Date	    :	$Date: 2003-11-28 15:50:54 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -31,55 +31,46 @@
 #include <API_xdr_vers3.h>
 
 #if (!defined WIN32)
-#if ( (defined OSK) || (defined _OSK))
-#include <inet/socket.h>
-#include <inet/netdb.h>
-#else /* OSK || _OSK */
-#if (defined sun) || (defined irix)
-#include <sys/filio.h>
-#endif /* sun */
-#include <sys/socket.h>
-#include <netinet/in.h>
-#if !defined vxworks
-#include <netdb.h>
-#else /* !vxworks */
-#include <hostLib.h>
-#include <pingLib.h>
-#endif  /* !vxworks */
-#ifdef lynx
-#include <ioctl.h>
-#endif /*lynx */
-#ifdef linux
-#include <sys/types.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <linux/posix_types.h>
-#endif /* linux */
-#endif /* OSK || _OSK */
+#	if ( (defined OSK) || (defined _OSK))
+#		include <inet/socket.h>
+#		include <inet/netdb.h>
+#	else /* OSK || _OSK */
+#		if (defined sun) || (defined irix) || defined(FreeBSD)
+#			include <sys/filio.h>
+#		endif /* sun */
+#		include <sys/socket.h>
+#		include <netinet/in.h>
+#		if !defined vxworks
+#			include <netdb.h>
+#		else /* !vxworks */
+#			include <hostLib.h>
+#			include <pingLib.h>
+#		endif  /* !vxworks */
+#		ifdef lynx
+#			include <ioctl.h>
+#		endif /*lynx */
+#		ifdef linux
+#			include <sys/types.h>
+#			include <sys/ioctl.h>
+#			include <sys/socket.h>
+#			include <linux/posix_types.h>
+#		endif /* linux */
+#	endif /* OSK || _OSK */
 #endif /* WIN32 */
 
 #include <errno.h>
-
 #include <assert.h>
 
 /*
  * Functions reused in modul util_api.c
  */
 
-long _DLLFunc dev_query_svr
-PT_( (char* host,long prog_number,long vers_number) );
-static long dev_import_local
-PT_( (_dev_import_in  *dev_import_in,
-devserver  *ds_ptr, long* error) );
-static long dev_free_local
-PT_( (_dev_free_in  *dev_free_in, long* error) );
-static long dev_put_local
-PT_( (_server_data  *server_data, long* error) );
-static long dev_putget_local
-PT_( (_server_data  *server_data,
-_client_data  *client_data, long* error) );
-long dev_notimported_init
-PT_( (char *device_name, long access, long i_nethost, devserver *ds_ptr, long *error) );
+long _DLLFunc 	dev_query_svr PT_( (char* host,long prog_number,long vers_number) );
+static long 	dev_import_local PT_( (_dev_import_in  *dev_import_in, devserver  *ds_ptr, long* error) );
+static long 	dev_free_local PT_( (_dev_free_in  *dev_free_in, long* error) );
+static long 	dev_put_local PT_( (_server_data  *server_data, long* error) );
+static long 	dev_putget_local PT_( (_server_data  *server_data, _client_data  *client_data, long* error) );
+long 		dev_notimported_init PT_( (char *device_name, long access, long i_nethost, devserver *ds_ptr, long *error) );
 
 /*
  * local data used by each client is kept in external area
@@ -97,8 +88,6 @@ PT_( (char *device_name, long access, long i_nethost, devserver *ds_ptr, long *e
  * variable _NFILE replaced by NFILE in API.h because it is not
  * defined in sun unix.
  */
-
-
 
 /****************************************
  *          Globals	                *
@@ -2369,7 +2358,7 @@ long rpc_check_host (char *host_name, long *error)
  */
 	nb =1;
 
-#if defined (sun) || defined (lynx) || defined (linux) || defined (irix)
+#if defined (sun) || defined (lynx) || defined (linux) || defined (irix) || defined(FreeBSD)
 	ioctl (s, FIONBIO, &nb);
 
 #elif defined (WIN32)
@@ -2381,7 +2370,7 @@ long rpc_check_host (char *host_name, long *error)
 /*
  * try to connect to the remote host.
  */
-#if defined (WIN32) || defined (linux) || defined (solaris) || defined (_XOPEN_SOURCE_EXTENDED)
+#if defined (WIN32) || defined (linux) || defined (solaris) || defined (_XOPEN_SOURCE_EXTENDED) || defined(FreeBSD)
 	connect (s,(struct sockaddr *)&peeraddr_in, sizeof(struct sockaddr_in));
 #else
 	connect (s, (void *) &peeraddr_in, sizeof(struct sockaddr_in));

@@ -25,16 +25,16 @@
 
  Original   :	January 1997
 
- Version:	$Revision: 1.4 $
+ Version:	$Revision: 1.5 $
 
- Date:		$Date: 2003-05-16 13:53:10 $
+ Date:		$Date: 2003-11-28 15:50:54 $
 
  Copyright (c) 1997-2000 by European Synchrotron Radiation Facility,
                             Grenoble, France
 
 ********************************************************************-*/
 
-#include <config.h>
+#include "config.h"
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevServer.h>
@@ -43,49 +43,47 @@
 #include <Admin.h>
 #include <DevErrors.h>
 #include <API_xdr_vers3.h>
-
+#include <errno.h>
 #include <assert.h>
-#if !defined (_NT)
-#if ( defined (OSK) || defined (_OSK))
 
-#include <inet/socket.h>
-#include <inet/netdb.h>
-#else
-#if defined (sun) || defined (irix)
-#include <sys/filio.h>
-#include <errno.h>
-#endif /* sun */
-#include <sys/socket.h>
-#if !defined (vxworks)
-#include <netdb.h>
-#else
-#include <rpcGbl.h>
-#endif /* !vxworks */
-#ifdef lynx
-#include <ioctl.h>
-#endif /*lynx */
-#ifdef linux
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
+#if !defined (_NT)
+#	if ( defined (OSK) || defined (_OSK))
+
+#	include <inet/socket.h>
+#	include <inet/netdb.h>
+#	else
+#		if defined (sun) || defined (irix)
+#			include <sys/filio.h>
+#		endif /* sun */
+#		include <sys/socket.h>
+#		if !defined (vxworks)
+#			include <netdb.h>
+#		else
+#			include <rpcGbl.h>
+#		endif /* !vxworks */
+#		ifdef lynx
+#			include <ioctl.h>
+#		endif /*lynx */
+#		if defined (linux) || defined (FreeBSD) 
+#			include <errno.h>
+#			include <sys/types.h>
+#			include <sys/ioctl.h>
+#			include <sys/socket.h>
 
 /* mutex locking for handling asyncronous request */
 /* here the mutex is instantiated. */
-#ifdef _REENTRANT
-#include <pthread.h>
-       pthread_mutex_t async_mutex=PTHREAD_MUTEX_INITIALIZER;
-#endif
+#			ifdef _REENTRANT
+#				include <pthread.h>
+				pthread_mutex_t async_mutex = PTHREAD_MUTEX_INITIALIZER;
+#			endif
 
-
-
-#endif /* linux */
-#endif /* OSK || _OSK */
+#		endif /* linux */
+#	endif /* OSK || _OSK */
 #endif /* _NT */
+
 #ifdef _UCC
-#include <errno.h>
-#include <rpc/rpc.h>
-#include <_os9_sockets.h>
+#	include <rpc/rpc.h>
+#	include <_os9_sockets.h>
 /* 
  * findstr() was forgotten in the OS9 include files
  * therefore define prototype here
@@ -99,17 +97,12 @@
 /*#include <os9time.h>*/
 #endif /* _UCC */
 
-
 #ifdef __cplusplus
-extern "C" configuration_flags config_flags;
+	extern "C" configuration_flags config_flags;
+	extern "C" nethost_info *multi_nethost;
 #else
-extern configuration_flags config_flags;
-#endif
-
-#ifdef __cplusplus
-extern "C" nethost_info *multi_nethost;
-#else
-extern nethost_info *multi_nethost;
+	extern configuration_flags config_flags;
+	extern nethost_info *multi_nethost;
 #endif
 
 extern server_connections svr_conns[];
