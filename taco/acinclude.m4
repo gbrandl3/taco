@@ -95,6 +95,7 @@ AC_DEFUN([TACO_ASCII_API],
 			no)	ascii=no;;
 			*)	AC_MSG_ERROR([bad value ${enable_ascii} for --enable-ascii]);;
 		esac], [ascii=yes])
+	AC_CHECK_HEADERS([dlfcn.h dl.h], [], [ascii=no])
 	if test "x$ascii" = "xyes" ; then
 		TACO_ASCII_LIBS="\$(top_builddir)/lib/ascii/libascapi.la \$(top_builddir)/lib/tc/libtcapi.la"
 	fi
@@ -180,7 +181,7 @@ AC_DEFUN([TACO_DEFINES],
 	case "$target" in
             i[[3456]]86-*-linux-* | i[[3456]]86-*-linux | i[[3456]]86-*-cygwin*)
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -Dx86=1 -DNDBM" ;;
-	    i386-*-freebsd* )
+	    powerpc-apple-darwin* | i386-*-freebsd* )
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -Dx86=1 -DNDBM" ;;
             m68k-*-linux-*) 
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -Dm68k=1 -DNDBM" ;;
@@ -345,6 +346,7 @@ AH_BOTTOM([
 
 AC_DEFUN([TACO_CHECK_RPC_AND_THREADS],
 [
+AC_CHECK_HEADERS([socket.h sys/socket.h rpc.h rpc/rpc.h])
 LIBS_SAVE="$LIBS"
 AC_SEARCH_LIBS(pthread_cancel, [pthread c_r])
 AC_RUN_IFELSE(
@@ -353,7 +355,20 @@ AC_RUN_IFELSE(
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include <rpc/rpc.h>
+#if HAVE_SOCKET_H
+#	include <socket.h>
+#elif HAVE_SYS_SOCKET_H
+#	include <sys/socket.h>
+#else
+#	error "Can't find socket.h"
+#endif
+#if HAVE_RPC_RPC_H
+#       include <rpc/rpc.h>
+#elif HAVE_RPC_H
+#       include <rpc.h>
+#else
+#	error "Can't find rpc.h"
+#endif
 #include <arpa/inet.h>
 
 #define PROGNUM 1234
