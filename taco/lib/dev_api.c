@@ -10,13 +10,13 @@
 
  Author(s)  :	Andy Goetz
 		Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.23 $
+ Version    :	$Revision: 1.24 $
 
- Date	    :	$Date: 2005-02-24 15:59:37 $
+ Date	    :	$Date: 2005-03-29 09:42:28 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -204,6 +204,11 @@ server_connections	 	svr_conns [NFILE];
  */
 long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *error)
 {
+    long    status;
+    char    *str_ptr;
+    short   count;
+    char    *attribute_name;
+
 	*error = 0;
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_import() : entering routine\n");
 
