@@ -1,4 +1,5 @@
-@PYTHON_BINDING_TRUE@ python=yes
-@PYTHON_BINDING_FALSE@ python=no
+#! /bin/sh -v
 unset RES_BASE_DIR
 unset DSHOME
+@PYTHON_BINDING_TRUE@ python=yes
+@PYTHON_BINDING_FALSE@ python=no
