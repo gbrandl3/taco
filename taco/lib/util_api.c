@@ -14,9 +14,9 @@
 
  Original   :	April 1993
 
- Version:	$Revision: 1.5 $
+ Version:	$Revision: 1.6 $
 
- Date:		$Date: 2003-05-09 06:33:49 $
+ Date:		$Date: 2003-12-08 14:23:32 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -531,7 +531,7 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 		for (i=0; i<dev_query_out.var_argument.length; i++)
 		{
 			cmd_names[i] = (char*)malloc(strlen(*(char**)dev_query_out.var_argument.sequence[i].argument)+1);
-			sprintf(cmd_names[i],"%s",*(char**)dev_query_out.var_argument.sequence[i].argument);
+			strcpy(cmd_names[i], *(char**)dev_query_out.var_argument.sequence[i].argument);
 		}
 	}
 	n_cmd_names = dev_query_out.var_argument.length;
@@ -586,7 +586,7 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
  */
 		if (i < n_cmd_names && n_cmd_names > 0)
 		{
-			sprintf(varcmdarr->sequence[i].cmd_name,"%s",cmd_names[i]);
+			strncpy(varcmdarr->sequence[i].cmd_name, cmd_names[i], sizeof(varcmdarr->sequence[i].cmd_name) - 1);
 			free(cmd_names[i]);
 		}
 		else
@@ -606,7 +606,7 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 			}
 			else
 			{
-				sprintf(varcmdarr->sequence[i].cmd_name,"command%d",i);
+				snprintf(varcmdarr->sequence[i].cmd_name, sizeof(varcmdarr->sequence[i].cmd_name) - 1, "command%d",i);
 			}
 		}
 		if (!ds->no_database)
@@ -649,26 +649,22 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
  * but first check to see whether the device belongs to another
  * nethost domain i.e. i_nethost != 0
  */
-
 			if (ds->i_nethost > 0)
 			{
-				sprintf(res_path, "//%s/CLASS/%s/%s",
-		   		get_nethost_by_index(ds->i_nethost, error),
-		   		class_name, cmd_name);
+				snprintf(res_path, sizeof(res_path) - 1, "//%s/CLASS/%s/%s",
+		   			get_nethost_by_index(ds->i_nethost, error), class_name, cmd_name);
 			}
 /*
  * use default nethost
  */
 			else
 			{
-				sprintf (res_path, "CLASS/%s/%s", 
-		   		class_name, cmd_name);
+				snprintf (res_path, sizeof(res_path) - 1, "CLASS/%s/%s", class_name, cmd_name);
 			}
 
-			/*
-	       *  read CLASS resources from database
-	       */
-
+/*
+ *  read CLASS resources from database
+ */
 			res_tab[0].resource_adr = &(varcmdarr->sequence[i].in_name);
 			res_tab[1].resource_adr = &(varcmdarr->sequence[i].out_name);
 
@@ -756,7 +752,7 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
 
 	if (ds->i_nethost > 0)
 	{
-		sprintf(res_path, "//%s/CMDS/%d/%d", 
+		snprintf(res_path, sizeof(res_path) - 1, "//%s/CMDS/%d/%d", 
 		   get_nethost_by_index(ds->i_nethost, error),
 		   team, server);
 	}
@@ -765,10 +761,10 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
  */
 	else
 	{
-		sprintf(res_path, "CMDS/%d/%d", team, server);
+		snprintf(res_path, sizeof(res_path) - 1, "CMDS/%d/%d", team, server);
 	}
 
-	sprintf (res_name, "%d", cmds_ident);
+	snprintf (res_name, sizeof(res_name) - 1, "%d", cmds_ident);
 #ifdef EBUG
 	dev_printdebug (DBG_API,
 	    "get_cmds_string() : res_path = %s\n", res_path);
@@ -804,7 +800,7 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
 		return (DS_WARNING);
 	}
 
-	sprintf (cmd_str, "%s", ret_str);
+	strncpy(cmd_str, ret_str, SHORT_NAME_SIZE);
 	free (ret_str);
 	return (DS_OK);
 }
@@ -872,11 +868,11 @@ long _DLLFunc dev_inform (devserver *clnt_handles, long num_devices,
 
 	for (i=0; i<num_devices; i++, clnt_ptr++, info_ptr++)
 	{
-		sprintf (info_ptr->device_name,  "%s", (*clnt_ptr)->device_name);
-		sprintf (info_ptr->device_class, "%s", (*clnt_ptr)->device_class);
-		sprintf (info_ptr->device_type,  "%s", (*clnt_ptr)->device_type);
-		sprintf (info_ptr->server_name,  "%s", (*clnt_ptr)->server_name);
-		sprintf (info_ptr->server_host,  "%s", (*clnt_ptr)->server_host);
+		strncpy (info_ptr->device_name, (*clnt_ptr)->device_name, sizeof(info_ptr->device_name) - 1);
+		strncpy (info_ptr->device_class, (*clnt_ptr)->device_class, sizeof(info_ptr->device_class) - 1);
+		strncpy (info_ptr->device_type, (*clnt_ptr)->device_type, sizeof(info_ptr->device_type) - 1);
+		strncpy (info_ptr->server_name, (*clnt_ptr)->server_name, sizeof(info_ptr->server_name) - 1);
+		strncpy (info_ptr->server_host, (*clnt_ptr)->server_host, sizeof(info_ptr->server_host) - 1);
 
 #ifdef EBUG
 		dev_printdebug (DBG_API,
@@ -1115,6 +1111,7 @@ long _DLLFunc get_i_nethost_by_device_name (char *device_name, long *error)
  */
 	else
 	{
+	//	i_nethost = (max_nethost > 0) ? 0 : -1;
 		i_nethost = 0;
 	}
 
@@ -1211,17 +1208,14 @@ char* _DLLFunc extract_device_name (char *full_name, long *error)
  * assume full_name == device_name to start off with
  */
 	device_name_alloc = (char*)realloc(device_name_alloc,strlen(full_name)+1);
-	sprintf(device_name_alloc,"%s",full_name);
+	strcpy(device_name_alloc, full_name);
 	device_name = device_name_alloc;
 /*
  * if nethost is specified in the device name "remove" it
  */
 	if (strncmp(device_name,"//",2) == 0)
 	{
-		for (device_name +=2; *device_name != '/'; device_name++)
-		{ 
-			/* do nothing */ 
-		};
+		for (device_name +=2; *device_name != '/'; device_name++);
 		device_name++;
 	}
 	if (strchr(device_name,'?') != NULL)

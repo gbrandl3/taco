@@ -11,9 +11,9 @@
 
  Original   	: March 1991
 
- Version	: $Revision: 1.5 $
+ Version	: $Revision: 1.6 $
 
- Date		: $Date: 2003-11-28 15:50:54 $
+ Date		: $Date: 2003-12-08 14:23:32 $
 
  Copyright (c) 1990-2002 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -63,6 +63,10 @@
 #endif /* !WIN32 */
 #endif /* !vxworks */
 #endif /* OSK | _OSK */
+
+#ifdef FREEBSD
+#define xp_sock xp_fd
+#endif
 
 /* end of added includes */
 

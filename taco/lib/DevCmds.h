@@ -13,9 +13,9 @@
 
  Original:	June 1991
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-04-25 11:21:24 $
+ Date:		$Date: 2003-12-08 14:23:32 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                       Grenoble, France
@@ -23,14 +23,14 @@
 ********************************************************************-*/
 
 #ifndef _DevCmds_h
-#define _DevCmds_h
+#define _DevCmds_h 
 
 /*
  *  standart header string to use "what" or "ident".
  */
 #ifdef _IDENT
 static char DevCmdsh[] = 
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevCmds.h,v 1.2 2003-04-25 11:21:24 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevCmds.h,v 1.3 2003-12-08 14:23:32 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
