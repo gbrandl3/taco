@@ -3,9 +3,9 @@
 
  Original:      
 
- Version:       $Revision: 1.2 $
+ Version:       $Revision: 1.3 $
 
- Date:          $Date: 2003-05-16 13:40:27 $
+ Date:          $Date: 2004-05-07 15:12:00 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -105,13 +105,13 @@ bool_t _WINAPI xdr_tab_dbdev_2(XDR *xdrs, tab_dbdev_2 *objp)
 
 bool_t _WINAPI xdr_db_devinfo_3(XDR *xdrs, db_devinfo_3 *objp)
 {
-	if (!xdr_string(xdrs, &objp->dev_name, 24))
+	if (!xdr_string(xdrs, &objp->dev_name, DEV_NAME_LENGTH))
 		return (FALSE);
-	if (!xdr_string(xdrs, &objp->host_name, 20))
+	if (!xdr_string(xdrs, &objp->host_name, HOST_NAME_LENGTH))
 		return (FALSE);
-	if (!xdr_string(xdrs, &objp->dev_type, 24))
+	if (!xdr_string(xdrs, &objp->dev_type, DEV_TYPE_LENGTH))
 		return (FALSE);
-	if (!xdr_string(xdrs, &objp->dev_class, 24))
+	if (!xdr_string(xdrs, &objp->dev_class, DEV_CLASS_LENGTH))
 		return (FALSE);
 	if (!xdr_u_int(xdrs, &objp->p_num))
 		return (FALSE);
@@ -119,7 +119,7 @@ bool_t _WINAPI xdr_db_devinfo_3(XDR *xdrs, db_devinfo_3 *objp)
 		return (FALSE);
 	if (!xdr_u_int(xdrs, &objp->pid))
 		return (FALSE);
-	if (!xdr_string(xdrs, &objp->proc_name, 40))
+	if (!xdr_string(xdrs, &objp->proc_name, PROC_NAME_LENGTH))
 		return (FALSE);
 	return (TRUE);
 }
@@ -153,7 +153,7 @@ bool_t _WINAPI xdr_db_resimp(XDR *xdrs, db_resimp *objp)
 
 bool_t _WINAPI xdr_svc_inf(XDR *xdrs, svc_inf *objp)
 {
-	if (!xdr_string(xdrs,&objp->ho_name,20))
+	if (!xdr_string(xdrs,&objp->ho_name, HOST_NAME_LENGTH))
 		return (FALSE);
 	if (!xdr_u_int(xdrs, &objp->p_num))
 		return (FALSE);
@@ -166,7 +166,7 @@ bool_t _WINAPI xdr_svc_inf(XDR *xdrs, svc_inf *objp)
 
 bool_t _WINAPI xdr_putres(XDR *xdrs, putres *objp)
 {
-	if (!xdr_string(xdrs,&objp->res_name,80))
+	if (!xdr_string(xdrs,&objp->res_name, RES_NAME_LENGTH))
 		return(FALSE);
 	if (!xdr_wrapstring(xdrs,&objp->res_val))
 		return(FALSE);
@@ -208,7 +208,7 @@ bool_t _WINAPI xdr_psdev_reg_x(XDR *xdrs,psdev_reg_x *objp)
 {
 	if (!xdr_u_int(xdrs, &objp->pid))
 		return (FALSE);
-	if (!xdr_string(xdrs,&objp->h_name,20))
+	if (!xdr_string(xdrs,&objp->h_name, HOST_NAME_LENGTH))
 		return(FALSE);
 	if (!xdr_array(xdrs, (caddr_t *)&objp->psdev_arr.psdev_arr_val,
 			(u_int *)&objp->psdev_arr.psdev_arr_len, MAXU_INT,
@@ -219,7 +219,7 @@ bool_t _WINAPI xdr_psdev_reg_x(XDR *xdrs,psdev_reg_x *objp)
 
 bool_t _WINAPI xdr_psdev_elt(XDR *xdrs,psdev_elt *objp)
 {
-	if (!xdr_string(xdrs, &objp->psdev_name,24))
+	if (!xdr_string(xdrs, &objp->psdev_name, DS_NAME_LENGTH))
 		return (FALSE);
 	if (!xdr_long(xdrs, &objp->poll))
 		return (FALSE);
