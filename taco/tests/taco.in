@@ -10,6 +10,7 @@ sbindir=@sbindir@
 sysconfdir=@sysconfdir@
 top_builddir=@abs_top_builddir@
 testbindir=${top_builddir}/tests
+LD_LIBRARY_PATH=@abs_top_builddir@/tests/test/@prefix@/lib:$LD_LIBRARY_PATH
 
 }
 
@@ -78,4 +79,7 @@ if test $# -gt 0 ; then
 			shift 1
 			$bindir/$prog $@;;
 	esac
+else
+	export LD_LIBRARY_PATH
+	export sysconfdir
 fi
