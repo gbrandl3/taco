@@ -11,10 +11,10 @@
 
  Original:      Aug 1993
 
- $Revision: 1.1 $
- $Date: 2003-04-25 11:21:24 $
+ $Revision: 1.2 $
+ $Date: 2004-11-03 14:56:22 $
 
- $Author: jkrueger1 $
+ $Author: andy_gotz $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -77,5 +77,7 @@
 #define DevXdsBase  (DasTeamNumber + DS_LSHIFT(26, DS_IDENT_SHIFT))
 /*** Barras Unix device server ***/
 #define DevBarrasBase  (DasTeamNumber + DS_LSHIFT(27, DS_IDENT_SHIFT))
+/*** C111 CompactPCI TDC card Linux device server ***/
+#define DevC111Base  (DasTeamNumber + DS_LSHIFT(28, DS_IDENT_SHIFT))
 
 #endif	/* _DasDsNumbers_h */
