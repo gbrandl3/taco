@@ -15,9 +15,9 @@
 //
 // Original:	November 1996
 //
-// $Revision: 1.3 $
+// $Revision: 1.4 $
 //
-// $Date: 2004-11-25 15:53:47 $
+// $Date: 2005-03-29 09:57:58 $
 //
 // $Author: andy_gotz $
 //
@@ -157,10 +157,22 @@ OICDevice::OICDevice (DevString devname, DevServerClass devclass, long *error)
 		_argout_type = (oicclass->devserver_class.commands_list[i].argout_type);
 		_min_access = (oicclass->devserver_class.commands_list[i].min_access);
 		_cmd_name = (char*)(oicclass->devserver_class.commands_list[i].cmd_name);
+        
+        this->commands_list[i].cmd = _cmd;
+        this->commands_list[i].fn = _fn;
+        this->commands_list[i].argin_type = _argin_type;
+        this->commands_list[i].argout_type = _argout_type;
+        this->commands_list[i].min_access = _min_access;
+        this->commands_list[i].cmd_name = _cmd_name;
+/*
+ * the following does not work because commands_list is not a map anymore ...
+ *
+ * andy 21dec2004
+
 	
 		this->commands_list[oicclass->devserver_class.commands_list[i].cmd] = 
 			Device::DeviceCommandListEntry(_cmd, _fn, _argin_type, _argout_type, _min_access, _cmd_name);
-/*
+ *
 		printf("OICDevice::OICDevice() command(%d) cmd=%d argin_type=%d argout_type=%d min_access=%d\n",
 			i,this->commands_list[i].cmd,this->commands_list[i].argin_type,
 			this->commands_list[i].argout_type,this->commands_list[i].min_access);
