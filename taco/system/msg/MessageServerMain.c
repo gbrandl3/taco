@@ -11,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.7 $
+ Version:	$Revision: 1.8 $
 
- Date:		$Date: 2004-09-13 09:20:59 $
+ Date:		$Date: 2004-10-23 15:16:39 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -294,7 +294,7 @@ void unreg_server (int signo)
 	fprintf(logFile, "\n%s unregistered.\n", getTimeString("MessageServer"));
 	fprintf(logFile, "\n%s exited.\n", getTimeString("MessageServer"));
 	fflush(logFile);
-	close(logFile);
+	fclose(logFile);
 	exit(1);
 }
 
