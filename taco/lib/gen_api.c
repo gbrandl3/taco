@@ -12,9 +12,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.11 $
+ Version    :	$Revision: 1.12 $
 
- Date       : 	$Date: 2004-03-26 16:33:47 $
+ Date       : 	$Date: 2004-04-02 12:46:14 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -959,7 +959,7 @@ static void msg_clear (_Int msg_type)
 	message_buffer[msg_type].messages = NULL;
 }
 
-/**@ingroup databaseAPI
+/**@ingroup dbaseAPI
  * This function imports the static database service.
  *
  * @param error Will contain an appropriate error
@@ -1081,7 +1081,7 @@ long _DLLFunc db_import (long *error)
 	return db_import_multi(nethost,error);
 }
 
-/**@ingroup databaseAPI
+/**@ingroup dbaseAPI
  * import the static database service for a multi-nethost
  *
  * @param nethost 	which nethost to import the static database for
