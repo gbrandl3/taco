@@ -18,7 +18,7 @@ AT_DATA([instverify], [[3
 0
 ]])
 echo "NETHOST = " $NETHOST >> instverify
-AT_CHECK([taco Inst_verify_menu test/device/1 < instverify], [1], [[
+AT_CHECK([taco Inst_verify_menu test/device/1 2>/dev/null < instverify], [1], [[
 test_menu for test/device/1 (Inst_verifyClass)
 ____________________________________
 1.State 	2.Status 
@@ -61,7 +61,7 @@ AT_DATA([agps],
 [[4
 0
 ]])
-AT_CHECK([taco ps_menu test/agps/1 < agps], [0], 
+AT_CHECK([taco ps_menu test/agps/1 2>/dev/null < agps], [0], 
 [[dev_import(test/agps/1) returned 0 (error=0)
 Select one of the following commands :
 
