@@ -4,7 +4,7 @@
 
  Version:	$Version$
 
- Date:		$Date: 2003-04-25 11:21:42 $
+ Date:		$Date: 2004-04-15 08:17:11 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -32,8 +32,8 @@ bool_t _WINAPI
 
 
 struct arr1 {
-	u_int arr1_len;
-	nam *arr1_val;
+	u_int arr1_len;	/**! The number of strings */
+	nam *arr1_val;	/**! A pointer to the array of strings */
 };
 typedef struct arr1 arr1;
 bool_t _WINAPI
@@ -46,12 +46,18 @@ bool_t _WINAPI
 /* For db_dev_export version 1 */
 
 struct db_devinfo {
-	char *dev_name;
-	char *host_name;
-	char *dev_type;
-	char *dev_class;
-	u_int p_num;
-	u_int v_num;
+/** The device name */
+	nam 	dev_name;
+/** The host name */
+	nam 	host_name;
+/** The device type */
+	nam 	dev_type;
+/** The device class */
+	nam 	dev_class;
+/** The program number */
+	u_int 	p_num;
+/** The version number */
+	u_int 	v_num;
 };
 typedef struct db_devinfo db_devinfo;
 bool_t _WINAPI
@@ -63,8 +69,10 @@ bool_t _WINAPI
 
 
 typedef struct {
-	u_int tab_dbdev_len;
-	db_devinfo *tab_dbdev_val;
+/** The number of structures db_devinfo */
+	u_int 		tab_dbdev_len;
+/** A pointer to the array of structure db_devinfo */
+	db_devinfo 	*tab_dbdev_val;
 } tab_dbdev;
 bool_t _WINAPI
 #if defined __STDC__ | defined __STDCPP__
@@ -76,13 +84,20 @@ bool_t _WINAPI
 /* For db_dev_export version 2 */
 
 struct db_devinfo_2 {
-	char *dev_name;
-	char *host_name;
-	char *dev_type;
-	char *dev_class;
-	u_int p_num;
-	u_int v_num;
-	u_int pid;
+/** The device name */
+	nam	dev_name;
+/** The host name */
+	nam	host_name;
+/** The device type */
+	nam	dev_type;
+/** The device class */
+	nam	dev_class;
+/** The program number */
+	u_int 	p_num;
+/** The version number */
+	u_int 	v_num;
+/** The process ID */
+	u_int 	pid;
 };
 typedef struct db_devinfo_2 db_devinfo_2;
 bool_t _WINAPI
@@ -94,8 +109,10 @@ bool_t _WINAPI
 
 
 typedef struct {
-	u_int tab_dbdev_len;
-	db_devinfo_2 *tab_dbdev_val;
+/** The number of structures db_devinfo_2 */
+	u_int 		tab_dbdev_len;
+/** A pointer to the array of structure db_devinfo_2 */
+	db_devinfo_2 	*tab_dbdev_val;
 } tab_dbdev_2;
 bool_t _WINAPI
 #if defined __STDC__ | defined __STDCPP__
@@ -107,14 +124,22 @@ bool_t _WINAPI
 /* For db_dev_export version 3 */
 
 struct db_devinfo_3 {
-	char *dev_name;
-	char *host_name;
-	char *dev_type;
-	char *dev_class;
-	u_int p_num;
-	u_int v_num;
-	u_int pid;
-	char *proc_name;
+/** The host name */
+	nam 	dev_name;
+/** The device type */
+	nam 	host_name;
+/** The device type */
+	nam 	dev_type;
+/** The device class */
+	nam 	dev_class;
+/** The program number */
+	u_int 	p_num;
+/** The version number */
+	u_int 	v_num;
+/** The process ID */
+	u_int 	pid;
+/** The process name */
+	nam 	proc_name;
 };
 typedef struct db_devinfo_3 db_devinfo_3;
 bool_t _WINAPI
@@ -126,8 +151,10 @@ bool_t _WINAPI
 
 
 typedef struct {
-	u_int tab_dbdev_len;
-	db_devinfo_3 *tab_dbdev_val;
+/** The number of structures db_devinfo_3 */
+	u_int 		tab_dbdev_len;
+/** A pointer to the array of structure db_devinfo_3 */
+	db_devinfo_3 	*tab_dbdev_val;
 } tab_dbdev_3;
 bool_t _WINAPI
 #if defined __STDC__ | defined __STDCPP__
@@ -140,8 +167,9 @@ bool_t _WINAPI
 
 
 struct db_res {
-	arr1 res_val;
-	int db_err;
+	arr1 res_val;	/**  A structure of the arr1 type (see above) with the 
+			resources values information transferred as strings */
+	int db_err;	/** The database error code 0 if no error */
 };
 typedef struct db_res db_res;
 bool_t _WINAPI
@@ -153,8 +181,11 @@ bool_t _WINAPI
 
 
 struct db_resimp {
-	tab_dbdev imp_dev;
-	int db_imperr;
+/** A structure of the tab_dbdev type with the informations needed 
+ (host_name, program number and version number) */
+	tab_dbdev 	imp_dev;
+/** The database error code (0 if no error occured) */
+	int 		db_imperr;
 };
 typedef struct db_resimp db_resimp;
 bool_t _WINAPI
@@ -166,10 +197,14 @@ bool_t _WINAPI
 
 
 struct svc_inf {
-	char *ho_name;
-	u_int p_num;
-	u_int v_num;
-	int db_err;
+/** the host name*/
+	nam	ho_name;
+/** the program number */
+	u_int 	p_num;
+/** the version number */
+	u_int 	v_num;
+/** database access error code (if 0 no error occured) */
+	int 	db_err;
 };
 typedef struct svc_inf svc_inf;
 bool_t _WINAPI
@@ -194,8 +229,11 @@ bool_t _WINAPI
 
 
 typedef struct {
-	u_int tab_putres_len;
-	putres *tab_putres_val;
+/** The number of resources to be updated or inserted */
+	u_int 	tab_putres_len;
+/** A pointer to an array of putres structure. Each putres structure 
+    contains the resource name and the resource value */
+	putres 	*tab_putres_val;
 }tab_putres;
 bool_t _WINAPI
 #if defined __STDC__ | defined __STDCPP__
@@ -205,7 +243,9 @@ bool_t _WINAPI
 #endif	/* __STDC__ */
 
 struct cmd_que{
+/** The database error code 0 if no error */
 	int db_err;
+/** The command code. 0 if the database query fails */
 	u_int xcmd_code;
 };
 typedef struct cmd_que cmd_que;
