@@ -3,17 +3,17 @@ AC_DEFUN([TACO_PROG_PYTHON],
 	AM_PATH_PYTHON([$1]) 
 	AC_MSG_CHECKING([Python ])
  
-	AC_CACHE_VAL(ac_cv_pythondir,
+	AC_CACHE_VAL(ac_cv_python,
 	[
   		if test -z "$PYTHONDIR"; then
-    			ac_cv_pythondir=/usr/local
+    			ac_cv_python=/usr/local
 		else
-			ac_cv_pythondir="$PYTHONDIR"
+			ac_cv_python="$PYTHONDIR"
 		fi
 	])
  
-	AC_ARG_WITH(pythondir, AC_HELP_STRING([--with-pythondir=pythondir], [use python installed in pythondir]),
-		[ac_python_dir=$withval], [ac_python_dir=$ac_cv_pythondir])
+	AC_ARG_WITH(python, AC_HELP_STRING([--with-python=pythondir], [use python installed in pythondir]),
+		[ac_python_dir=$withval], [ac_python_dir=$ac_cv_python])
  
 	AC_MSG_RESULT($ac_python_dir)
  
