@@ -1,0 +1,12 @@
+AT_SETUP([start server])
+pers_name=`uname -n`
+AT_DATA([starter.res], [[
+]])
+echo startserver/$pers_name/device:	SYS/START/$pers_name >>starter.res
+echo SYS/START/$pers_name/DEFAULT:	"Inst_verify/1", "AGPSpp/1" >>starter.res
+AT_CHECK([RES_BASE_DIR=`pwd` taco db_update starter.res; 
+nohup taco StartServer `uname -n` &  
+sleep 10
+killall StartServer
+])
+AT_CLEANUP

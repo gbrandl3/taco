@@ -41,6 +41,9 @@ m4_include([dbase.at])
 AT_BANNER([[Testing the devices.]])
 m4_include([devices.at])
 
+AT_BANNER([[Testing the starter server]])
+m4_include([starter.at])
+
 AT_BANNER([[Uninstalling TACO system.]])
 
 AT_SETUP([TACO deinstallation])
