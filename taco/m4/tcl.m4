@@ -50,13 +50,18 @@ dnl
 	else
 		AC_MSG_RESULT(found $TCLCONFIG/tclConfig.sh)
 		. $TCLCONFIG/tclConfig.sh
-		TCL_PREFIX=`eval "echo $TCL_PREFIX"`
-		TCL_H=`find $TCL_PREFIX/include -type f -name tcl.h | grep $TCL_VERSION`
-		if test -z "$TCL_H" ; then
-			TCL_H=`find $TCL_PREFIX/include -type f -name tcl.h`
+		if test -z "$TCL_INCLUDE_SPEC" ; then
+			TCL_PREFIX=`eval "echo $TCL_PREFIX"`
+			TCL_H=`find $TCL_PREFIX/include -type f -name tcl.h | grep $TCL_VERSION`
+			if test -z "$TCL_H" ; then
+				TCL_H=`find $TCL_PREFIX/include -type f -name tcl.h`
+			fi
+			TCLINCLUDE="-I`dirname $TCL_H`"
+		else
+			TCLINCLUDE=`eval "echo $TCL_INCLUDE_SPEC"`
 		fi
-		TCLINCLUDE="-I`dirname $TCL_H`"
-		TCLLIB=`eval "echo $TCL_LIB_SPEC"`
+		TCLINCLUDE="$TCL_CFLAGS_WARNING $TCL_EXTRA_CFLAGS $TCLINCLUDE"
+		TCLLIB=`eval "echo $TCL_LIB_SPEC $TCL_LIBS"`
 	fi
 
 	if test -z "$TCLINCLUDE"; then
@@ -94,17 +99,17 @@ dnl
 
 	AC_MSG_CHECKING(for Tcl library)
 	if test -z "$TCLLIB"; then
-	dirs="/usr/local/lib /usr/lib /opt/local/lib"
-	for i in $dirs ; do
-		if test -r $i/libtcl.a; then
-			AC_MSG_RESULT($i)
-			TCLLIB="-L$i -ltcl"
-			break
-		fi
-	done
-	if test -z "$TCLLIB"; then
-		AC_MSG_RESULT(not found)
-#		TCLLIB="-L/usr/local/lib"
+		dirs="/usr/local/lib /usr/lib /opt/local/lib"
+		for i in $dirs ; do
+			if test -r $i/libtcl.a; then
+				AC_MSG_RESULT($i)
+				TCLLIB="-L$i -ltcl"
+				break
+			fi
+		done
+		if test -z "$TCLLIB"; then
+			AC_MSG_RESULT(not found)
+#			TCLLIB="-L/usr/local/lib"
 	fi
 	else
 		AC_MSG_RESULT($TCLLIB)
