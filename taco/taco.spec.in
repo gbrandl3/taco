@@ -5,7 +5,7 @@ Release: @RPM_RELEASE@
 Copyright: GPL
 Group: Utilities/TACO
 Source: @PACKAGE@-@VERSION@.tar.gz 
-Prefix: @prefix@
+Prefix: %{_prefix}
 Vendor: FRMII, TU München, FRG
 Distribution:@DISTRIBUTION@
 Requires: gdbm
@@ -36,16 +36,16 @@ TACO has been designed to be portable and runs on a large number of platforms (e
 %setup -n @PACKAGE@-@VERSION@
 
 %build
-export DSHOME=@prefix@
-./configure --enable-fast-install=yes --enable-greta --enable-xdevmenu --with-motif=/usr/X11R6/LessTif/Motif1.2 "--prefix=$DSHOME"
+./configure --enable-fast-install=yes --enable-greta --enable-xdevmenu --with-motif=/usr/X11R6/LessTif/Motif1.2 --prefix=%_prefix
 make 
 
 %install
-export DSHOME=@prefix@
 make install-strip
 make "DESTDIR=$PWD/tmp-install-dir" install
-find tmp-install-dir -regex ".*$DSHOME/lib/.*" -a -not -type d | sed -e 's/^tmp-install-dir//' > @PACKAGE@.txt
-find tmp-install-dir -regex ".*$DSHOME/include/.*" -a -not -type d | sed -e 's/^tmp-install-dir//' >> @PACKAGE@.txt
+# %makeinstall
+find tmp-install-dir -regex ".*%{_libdir}/.*" -a -not -type d | sed -e 's/^tmp-install-dir//' > @PACKAGE@.txt
+find tmp-install-dir -regex ".*%{_includedir}/.*" -a -not -type d | sed -e 's/^tmp-install-dir//' >> @PACKAGE@.txt
+cp @PACKAGE@.txt /tmp
 
 %clean
 make uninstall
@@ -56,52 +56,40 @@ else
 fi
        
 %post
-export DSHOME="$RPM_INSTALL_PREFIX"
-mkdir -p "$DSHOME/dbase/dbm"
-mkdir -p "$DSHOME/dbase/res/TEST"
+prefix="$RPM_INSTALL_PREFIX"
+mkdir -p "%_datadir/taco/dbase/dbm"
+mkdir -p "%_datadir/taco/dbase/res/TEST"
 
 # Adjust some paths
-if test "x$DSHOME" != x@prefix@ ; then
-	cd "$DSHOME"
-	for i in etc/.taco.csh \
-		etc/.taco_env \
-		etc/taco.shutdown \
+if test "x$prefix" != x%prefix ; then
+	cd %prefix
+	for i in etc/taco.shutdown \
 		etc/taco.startup \
-		etc/taco.startup.sec \
-		templates/taco/tacoenv.sh
+		etc/tacoenv.sh \
+		etc/tacoenv.csh \
+		share/taco/templates/tacoenv.sh
 	do
 		mv $i tmp.sed
-		sed -e "s%@prefix@%$DSHOME%" tmp.sed > $i
+		sed -e "s|%prefix|$prefix|" tmp.sed > $i
 	done
-	for i in lib/@taco_install_path@/libTACOMySQL.la \
-		lib/@taco_install_path@/libTACOndbm.la \
-		lib/@taco_install_path@/libascapi.la \
-		lib/@taco_install_path@/libdataport.la \
-		lib/@taco_install_path@/libdbapi.la \
-		lib/@taco_install_path@/libdcapi.la \
-		lib/@taco_install_path@/libdcmem.la \
-		lib/@taco_install_path@/libdsapi.la \
-		lib/@taco_install_path@/libdsapig++.la \
-		lib/@taco_install_path@/libdsxdr.la \
-		lib/@taco_install_path@/libdsxdr_all.la \
-		lib/@taco_install_path@/libtacoapi.la \
-		lib/@taco_install_path@/libtacoapig++.la \
-		lib/@taco_install_path@/libtcapi.la \
-		templates/taco/taco
+	for i in lib/*.la \
+		share/taco/templates/taco
 	do
 		mv $i tmp.sed
-		sed -e "s%@prefix@%$DSHOME%" tmp.sed > $i
+		sed -e "s|%prefix|$prefix|" tmp.sed > $i
 		chmod 0755 $i
 	done
 	rm -f tmp.sed
+
+	SHL_EXT=`(. %_libdir/python%{py_ver}/site-packages/Server.la ; echo ${library_names} | cut -f3 -d' ' | cut -f2 -d'.')` ; 
+	rm -f %_libdir/python%{py_ver}/site-packages/Taco.${SHL_EXT} && ln -s Server.${SHL_EXT} %_libdir/python%{py_ver}/site-packages/Taco.${SHL_EXT}
 fi
 
 # Update the linker cache
-cd "$DSHOME/lib/@taco_install_path@
-/sbin/ldconfig -n
+/sbin/ldconfig -n %_libdir
 
 # Install runlevel control script
-test -f /etc/tacoenv.sh || install -m 0644 "$DSHOME/templates/taco/tacoenv.sh" /etc
+test -f %_sysconfdir/tacoenv.sh || install -m 0644 "%_datadir/taco/templates/tacoenv.sh" %_sysconfdir
 
 # Install TACO environment file
 if test -d /etc/init.d ; then
@@ -115,7 +103,7 @@ else
 	exit 1
 fi
 if ! test -f "$initdir/taco" ; then
-	taco_rc_file="$DSHOME/templates/taco/taco"
+	taco_rc_file="%_datadir/taco/templates/taco"
 	if test -f /etc/SuSE-release ; then
 		case `grep VERSION /etc/SuSE-release` in
 			'VERSION = 7.'*)
@@ -128,9 +116,12 @@ if ! test -f "$initdir/taco" ; then
 	install "$taco_rc_file" "$initdir"
 fi
 echo "The automatic installation is complete."
-echo "You should read the file '$DSHOME/doc/index.html' now."
+echo "You should read the file '%_datadir/doc/index.html' now."
 
 %preun
+SHL_EXT=`(. %_libdir/python%{py_ver}/site-packages/Server.la ; echo ${library_names} | cut -f3 -d' ' | cut -f2 -d'.')` ; 
+rm -f %_libdir/python%{py_ver}/site-packages/Taco.${SHL_EXT}
+
 # Delete TACO services startup at the final erase
 if test "x$1" = x0 ; then
 	if test -e /sbin/chkconfig ; then
@@ -145,49 +136,77 @@ fi
 
 %files -f @PACKAGE@.txt
 %defattr(-,root,root)
-@prefix@/templates/taco/taco
-%config(noreplace) @prefix@/sbin/taco.shutdown
-%config(noreplace) @prefix@/sbin/taco.startup
-%config(noreplace) @prefix@/dbase/res/SEC/sec_auth.res
-%config @prefix@/dbase/res/CMDS/dev_cmds.res
-%config @prefix@/dbase/res/ERROR/dev_errors.res
-%config @prefix@/dbase/res/ERROR/db_errors.res
-%config @prefix@/etc/tacoenv.sh
-%config @prefix@/etc/tacoenv.csh
+%_datadir/taco/templates/taco
+%config(noreplace) %_sbindir/taco.shutdown
+%config(noreplace) %_sbindir/taco.startup
+%config(noreplace) %_datadir/taco/dbase/res/SEC/sec_auth.res
+%config %_datadir/taco/dbase/res/CMDS/dev_cmds.res
+%config %_datadir/taco/dbase/res/ERROR/dev_errors.res
+%config %_datadir/taco/dbase/res/ERROR/db_errors.res
+%config %_datadir/taco/dbase/res/TEST/python.res
+%config %_sysconfdir/tacoenv.sh
+%config %_sysconfdir/tacoenv.csh
+%doc %_infodir/gdbm.info
 # %doc INSTALL doc/TACO.pdf doc/README doc/index.html
-@prefix@/bin/db_fillup
-@prefix@/bin/db_update
-@prefix@/bin/db_read
-@prefix@/bin/db_info
-@prefix@/bin/db_initcache
-@prefix@/bin/db_devinfo
-@prefix@/bin/db_devdel
-@prefix@/bin/db_servdel
-@prefix@/bin/db_servinfo
-@prefix@/bin/db_servunreg
-@prefix@/bin/db_devres
-@prefix@/bin/db_resdel
-@prefix@/sbin/Manager
-@prefix@/sbin/unreg
-@prefix@/sbin/MessageServer
-@prefix@/sbin/dcwr_alo
-@prefix@/sbin/dcrd_alo
-@prefix@/sbin/dbm_server
+%_bindir/dc_del
+%_bindir/dc_dels
+%_bindir/dc_devall
+%_bindir/dc_devinfo
+%_bindir/dc_hash
+%_bindir/dc_info
+%_bindir/dc_init
+%_bindir/dc_inits
+%_bindir/dc_mem
+%_bindir/dc_mfree
+%_bindir/dc_mfrees
+%_bindir/dc_patch
+%_bindir/conv2gdbm
+%_bindir/db_devicetree
+%_bindir/db_fillup
+%_bindir/db_fillup2
+%_bindir/db_update
+%_bindir/db_read
+%_bindir/db_info
+%_bindir/db_initcache
+%_bindir/db_devinfo
+%_bindir/db_devdel
+%_bindir/db_servdel
+%_bindir/db_servinfo
+%_bindir/db_servunreg
+%_bindir/db_devres
+%_bindir/db_resdel
+%_sbindir/Manager
+%_sbindir/unreg
+%_sbindir/MessageServer
+%_sbindir/dcwr_alo
+%_sbindir/dcrd_alo
+%_sbindir/dbm_server
+%_sbindir/StartServer
+%_sbindir/taco-config
+%_datadir/m4/extra.m4
+%_datadir/m4/findfile.m4
+%_datadir/m4/python.m4
+%_datadir/m4/qt.m4
+%_datadir/m4/rpm.m4
+%_datadir/m4/swig.m4
+%_datadir/m4/taco.m4
 
 %package x-apps
 Summary: TACO control system X11 applications.
 Group: Utilities/TACO/X11
-Prefix: @prefix@
+Prefix: /usr/local/dshome
 Provides: taco-x-apps
 
 %description x-apps
 
 %files x-apps
 %defattr(-,root,root)
-@prefix@/bin/greta
-@prefix@/bin/xdevmenu
-@prefix@/sbin/S_Alarm
+%_bindir/greta
+%_bindir/xdevmenu
+%_sbindir/S_Alarm
 @appdefaultdir@/GReta
 @appdefaultdir@/XDevmenu
 
 %changelog
+* Wed May 19 2004 Jens Krüger <jens.krueger@frm2.tum.de>
+- Change the variables from autotools to rpm
