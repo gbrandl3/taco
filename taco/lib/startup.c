@@ -18,9 +18,9 @@
  *
  * Original:	October 1996
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2003-05-02 09:12:49 $
+ * Date:	$Date: 2004-02-19 15:45:03 $
  *
  * Copyleft (c) 1990 by European Synchrotron Radiation Facility, 
  *                      Grenoble, France
@@ -75,9 +75,7 @@ long startup(char *svr_name, long *error)
  */ 
 	char	 	**dev_list;
    	unsigned int 	dev_no;
-#ifdef EBUG
    	debug_flag = (DEBUG_ON_OFF | DBG_TRACE | DBG_DEV_SVR_CLASS | DBG_API);
-#endif
 	if (db_getdevlist(svr_name,&dev_list,&dev_no,error))
 	{
 		fprintf(stderr, "startup(): db_getdevlist() failed, error %d\n",*error);

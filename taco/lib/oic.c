@@ -13,9 +13,9 @@
 
  Original:	July 1995
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-04-25 11:21:36 $
+ Date:		$Date: 2004-02-19 15:42:49 $
 
  Copyright (c) 1995-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -66,17 +66,13 @@ long ds__method_search (void *ptr_ds_class, DevMethod method,
 	ds_class = (DevServerClass) ptr_ds_class;
 
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-	    "\nds__method_search() : entering routine\n");
-#endif /* EBUG */
-
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nds__method_search() : entering routine\n");
 
 	for (i = 0; i < ds_class->devserver_class.n_methods; i++)
 	{
 		if (method == (ds_class->devserver_class.methods_list[i].method))
 		{
-			/*
+/*
  * found method 
  */
 			(*function_ptr) = ds_class->devserver_class.methods_list[i].fn;
@@ -84,7 +80,7 @@ long ds__method_search (void *ptr_ds_class, DevMethod method,
 		}
 	}
 
-	/*
+/*
  * method not found in the method list
  */
 	return (DS_NOTOK);
@@ -138,10 +134,7 @@ DevMethodFunction ds__method_finder (void *ptr_ds, DevMethod method)
  * - andy 05jul90
  */
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-	    "\nds__method_finder() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nds__method_finder() : entering routine\n");
 
 	ds_class = ds->devserver.class_pointer;
 	do 
@@ -215,10 +208,7 @@ long ds__create (char *name, void *ptr_ds_class,void *ptr_ds_ptr, long *error)
 	ds_ptr   = (DevServer *)    ptr_ds_ptr;
 
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-	    "\nds__create() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nds__create() : entering routine\n");
 
 	*error = 0;
 

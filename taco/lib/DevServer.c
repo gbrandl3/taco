@@ -13,9 +13,9 @@
 
  Original:	June 1990
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2003-11-26 16:03:54 $
+ Date:		$Date: 2004-02-19 15:38:05 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -129,9 +129,7 @@ static long class_initialise (long *error)
 {
 	*error = 0;
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nclass_initialise() [devServerClass] : entering routine\n");
-#endif /* EBUG */
 
 /*
  * initialise all class related fields
@@ -187,9 +185,7 @@ static long command_handler (DevServer ds, long ds_cmd,
 	DevMethodFunction 	cmd_function;
 	static char	 	error_message[1024];
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\ncommand_handler() : entering routine\n");
-#endif /* EBUG */
 
 	ds_class = ds->devserver.class_pointer;
 
@@ -287,9 +283,7 @@ static long error_handler (DevServer ds, long *error)
  */
 static long destroy (DevServer ds, long *error)
 {
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\ndestroy() : entering routine\n");
-#endif /* EBUG */
 
 /*
  * this very simple version of destroy simply does a

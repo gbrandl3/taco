@@ -11,9 +11,9 @@
 
  Original   	: March 1991
 
- Version	: $Revision: 1.7 $
+ Version	: $Revision: 1.8 $
 
- Date		: $Date: 2004-02-11 10:07:21 $
+ Date		: $Date: 2004-02-19 15:38:52 $
 
  Copyright (c) 1990-2002 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -1028,11 +1028,9 @@ InitInstance(HINSTANCE hInstance, int nCmdShow)
 		return (FALSE);                    /* huugh! Taco startup not ok */
 	}
 
-/*#ifdef _DEBUG*/
 	// Get/Set the debug level
 	SetDebugLevel(GetDebugLevel());
 	dprintf("Initial debug level is %d", giDebugLevel);
-/*#endif // _DEBUG*/
 
 	/* init the main window and it's backdrop */
 	SetCapture(hWnd);

@@ -1,4 +1,5 @@
 #include <API.h>
+#include <Admin.h>
 #include <stdio.h>
 
 typedef struct event_relisten_info {
@@ -32,9 +33,7 @@ long relisten_events(devserver ds)
 	long error;
     
 	Event_Relisten_Info* start = event_head;
-#ifdef EBUG
-	fprintf(stderr, "relisten_events called\n");
-#endif
+	dev_printdebug(DBG_TRACE | DBG_API, "relisten_events called\n");
 	while(start)
 	{
 		dev_event_listen_x(ds, start->event_type, start->argout,
@@ -52,9 +51,7 @@ long _DLLFunc dev_event_listen (devserver ds, long event_type,
 				long *event_id_ptr, long *error)
 {
 	long ret;
-#ifdef EBUG
-	fprintf(stderr, "dev_event_listen called\n");
-#endif
+	dev_printdebug(DBG_TRACE | DBG_API, "dev_event_listen called\n");
 	ret = dev_event_listen_x(ds, event_type,
 				 argout,  argout_type, 
 				 callback, user_data,
@@ -73,9 +70,7 @@ long _DLLFunc dev_event_unlisten (devserver ds, long event_type,
                                   long event_id, long *error)
 {
 	long ret;
-#ifdef EBUG
-	fprintf(stderr,"dev_event_unlisten called\n");
-#endif
+	dev_printdebug(DBG_TRACE | DBG_API, "dev_event_unlisten called\n");
 	ret = dev_event_unlisten_x(ds, event_type, event_id, error);
 	if(ret == DS_OK)
 		remove_relisten_info(event_id,event_type);
@@ -93,9 +88,7 @@ long add_relisten_info(long event_id,
 {
 	Event_Relisten_Info	*start = event_head,
 				*newevent;
-#ifdef EBUG
-	fprintf(stderr,"add_relisten_info called\n");
-#endif
+	dev_printerror(DBG_TRACE | DBG_API, "add_relisten_info called\n");
     
 	newevent = (Event_Relisten_Info*)malloc(sizeof(Event_Relisten_Info));
 	if(newevent)
@@ -134,9 +127,7 @@ long remove_relisten_info(long event_id, long event_type)
 	Event_Relisten_Info 	*start = event_head,
 				*old;
 
-#ifdef EBUG
-	fprintf(stderr,"remove_relisten_info called\n");
-#endif
+	dev_printerror(DBG_TRACE | DBG_API, "remove_relisten_info called\n");
 	while(start)
 	{
 		if(start->event_id == event_id && start->event_type == event_type)

@@ -25,9 +25,9 @@
 
  Original   :	January 1997
 
- Version:	$Revision: 1.5 $
+ Version:	$Revision: 1.6 $
 
- Date:		$Date: 2003-11-28 15:50:54 $
+ Date:		$Date: 2004-02-19 15:39:39 $
 
  Copyright (c) 1997-2000 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -184,9 +184,7 @@ long _DLLFunc dev_putget_asyn (devserver ds, long cmd,
 
 	*error = 0;
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_ASYNCH, "\ndev_putget_asyn() : entering routine\n");
-#endif /* EBUG */
 
 #ifdef TANGO
         if (ds->rpc_protocol == D_IIOP)
@@ -290,11 +288,9 @@ long _DLLFunc dev_putget_asyn (devserver ds, long cmd,
 	server_data.argout_type	= argout_type;
 	server_data.argin	= (char *) argin;
 
-#ifdef EBUG
 	dev_printdebug (DBG_ASYNCH, "dev_putget_asyn() : server data -> \n");
 	dev_printdebug (DBG_ASYNCH, "ds_id=%d  cmd=%d  intype=%d  outtype=%d\n",
 	    	server_data.ds_id, server_data.cmd, server_data.argin_type, server_data.argout_type);
-#endif /* EBUG */
 
 /*
  * additional arguments, in this case asynch_id and the return argument
@@ -327,12 +323,9 @@ long _DLLFunc dev_putget_asyn (devserver ds, long cmd,
 	server_data.var_argument.length++;
 	server_data.var_argument.sequence = vararg;
 
-#ifdef EBUG
         dev_printdebug (DBG_TRACE | DBG_ASYNCH, "\ndev_putget_asyn() : client data -> ");
         dev_printdebug (DBG_ASYNCH, "asynch_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
-	    asynch_id,config_flags.server_name,config_flags.server_host,
-	    config_flags.prog_number,config_flags.vers_number);
-#endif /* EBUG */
+	    asynch_id,config_flags.server_name,config_flags.server_host, config_flags.prog_number,config_flags.vers_number);
 
 /* 
  * the asynchronous call uses one-way RPC to dispatch the call which
@@ -367,9 +360,7 @@ long _DLLFunc dev_putget_asyn (devserver ds, long cmd,
 	clnt_stat = clnt_call (ds->asynch_clnt, RPC_DEV_PUTGET_ASYN,
 		    (xdrproc_t)xdr__server_data, (caddr_t) &server_data,
 		    (xdrproc_t)xdr_void, (caddr_t) NULL, TIMEVAL(zero_timeout));
-#ifdef EBUG
 	 dev_printdebug (DBG_ASYNCH, "\ndev_putget_asyn() : clnt_stat %d\n",clnt_stat);
-#endif /* EBUG */
 
 /*
  * Check for errors on the RPC connection.
@@ -444,9 +435,7 @@ long _DLLFunc dev_putget_raw_asyn (devserver ds, long cmd,
 
 	*error = 0;
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_ASYNCH, "\ndev_putget_asyn() : entering routine\n");
-#endif /* EBUG */
 
 #ifdef TANGO
         if (ds->rpc_protocol == D_IIOP)
@@ -540,11 +529,9 @@ long _DLLFunc dev_putget_raw_asyn (devserver ds, long cmd,
 	server_data.argout_type	= argout_type;
 	server_data.argin	= (char *) argin;
 
-#ifdef EBUG
 	dev_printdebug (DBG_ASYNCH, "dev_putget_asyn() : server data -> \n");
 	dev_printdebug (DBG_ASYNCH, "ds_id=%d  cmd=%d  intype=%d  outtype=%d\n",
 	    server_data.ds_id, server_data.cmd, server_data.argin_type, server_data.argout_type);
-#endif /* EBUG */
 
 /*
  * additional arguments, in this case asynch_id and the return argument
@@ -579,12 +566,10 @@ long _DLLFunc dev_putget_raw_asyn (devserver ds, long cmd,
 	server_data.var_argument.length++;
 	server_data.var_argument.sequence = vararg;
 
-#ifdef EBUG
         dev_printdebug (DBG_TRACE | DBG_ASYNCH, "\ndev_putget_asyn() : client data -> ");
         dev_printdebug (DBG_ASYNCH, "asynch_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
 	    asynch_id,config_flags.server_name,config_flags.server_host,
 	    config_flags.prog_number,config_flags.vers_number);
-#endif /* EBUG */
 
 /* 
  * the asynchronous call uses one-way RPC to dispatch the call which
@@ -632,9 +617,7 @@ long _DLLFunc dev_putget_raw_asyn (devserver ds, long cmd,
  *		    (xdrproc_t)xdr__server_data, (caddr_t) &server_data,
  *		    (xdrproc_t)NULL, (caddr_t) NULL, TIMEVAL(zero_timeout));
  */
-#ifdef EBUG
 	 dev_printdebug (DBG_ASYNCH, "\ndev_putget_asyn() : clnt_stat %d\n",clnt_stat);
-#endif /* EBUG */
 
 /*
  * Check for errors on the RPC connection.
@@ -704,9 +687,7 @@ static void _WINAPI devserver_prog_5 (struct svc_req *rqstp, SVCXPRT *transp)
 	char 			*(*local)();
 #endif
 
-#ifdef EBUG
         dev_printdebug (DBG_ASYNCH, "\ndevserver_prog_5() : rqstp->rq_proc=%d\n",rqstp->rq_proc);
-#endif /* EBUG */
 
 /*
  *  call the right server routine
@@ -828,9 +809,7 @@ static void _WINAPI devserver_prog_5 (struct svc_req *rqstp, SVCXPRT *transp)
  */
 		case RPC_FLUSH:
 			FD_SET(transp->xp_sock, &asynch_readfds);
-#ifdef EBUG
 			dev_printdebug (DBG_ASYNCH, "\ndevserver_prog_5() : returning\n");
-#endif /* EBUG */
 			return;
 
 		default:
@@ -839,15 +818,11 @@ static void _WINAPI devserver_prog_5 (struct svc_req *rqstp, SVCXPRT *transp)
 	}
 
 	memset(&argument, 0, sizeof(argument));
-#ifdef EBUG
 	dev_printdebug (DBG_ASYNCH, "\ndevserver_prog_5() : going to svc_getargs()\n");
-#endif /* EBUG */
 	if (!svc_getargs(transp, xdr_argument, (caddr_t) &argument)) 
 	{
 		dev_printerror (SEND,"%s", "svcerr_decode : server couldn't decode incoming arguments");
-#ifdef EBUG
 		dev_printdebug (DBG_ASYNCH, "\ndevserver_prog_5() : returning\n");
-#endif /* EBUG */
 		return;
 	}
 /*
@@ -878,9 +853,7 @@ static void _WINAPI devserver_prog_5 (struct svc_req *rqstp, SVCXPRT *transp)
  * andy - 27/4/98
  */
 				svc_sendreply(transp, (xdrproc_t)xdr_void, (caddr_t)NULL);
-#ifdef EBUG
        				dev_printdebug (DBG_ASYNCH, "\ndevserver_prog_5() : free does send reply back to client\n");
-#endif /* EBUG */
 			}
 		        if (!svc_freeargs(transp, xdr_argument, (caddr_t) &argument))
         		{
@@ -896,9 +869,7 @@ static void _WINAPI devserver_prog_5 (struct svc_req *rqstp, SVCXPRT *transp)
 		if ((rqstp->rq_proc == RPC_EVENT_LISTEN) ||
 		    (rqstp->rq_proc == RPC_EVENT_UNLISTEN))
 		{
-#ifdef EBUG
        			dev_printdebug (DBG_ASYNCH, "\ndevserver_prog_5() : event listen/unlisten do not send reply to client\n");
-#endif /* EBUG */
 			if (!svc_freeargs(transp, xdr_argument, (caddr_t) &argument))
         		{
                 		dev_printerror (SEND,"%s",
@@ -930,11 +901,9 @@ static void _WINAPI devserver_prog_5 (struct svc_req *rqstp, SVCXPRT *transp)
 			iarg++;
 			client.vers_number = *(long*)argument.server_data.var_argument.sequence[iarg].argument;
 
-#ifdef EBUG
         		dev_printdebug (DBG_ASYNCH, "\ndevserver_prog_5() : client data -> ");
         		dev_printdebug (DBG_ASYNCH, "asynch_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
 		    		asynch_id,client.server_name,client.server_host, client.prog_number, client.vers_number);
-#endif /* EBUG */
 
 /*
  * to send answer back to client asynchronously the client rpc service
@@ -995,11 +964,9 @@ static void _WINAPI devserver_prog_5 (struct svc_req *rqstp, SVCXPRT *transp)
 				asynch_client_data.var_argument.length = iarg; 
 				asynch_client_data.var_argument.sequence = vararg;
 		
-#ifdef EBUG
         			dev_printdebug (DBG_ASYNCH, "\ndevserver_prog_5() : asynchronous client data -> ");
         			dev_printdebug (DBG_ASYNCH, "asynch_id=%d status=%d error=%d argout_type=%d\n",
 	    				asynch_id, asynch_client_data.status, asynch_client_data.error, asynch_client_data.argout_type);
-#endif /* EBUG */
 
 /*
  * DO send reply using ONE-WAY rpc i.e. timeout=0 , this way the server
@@ -1025,11 +992,9 @@ static void _WINAPI devserver_prog_5 (struct svc_req *rqstp, SVCXPRT *transp)
 				asynch_client_raw_data.var_argument.length = iarg; 
 				asynch_client_raw_data.var_argument.sequence = vararg;
 		
-#ifdef EBUG
 				dev_printdebug (DBG_ASYNCH, "\ndevserver_prog_5() : asynchronous client raw data -> \n");
 				dev_printdebug (DBG_ASYNCH, "\nasynch_id=%d status=%d error=%d ser_argout_type=%d\n",
 					asynch_id, asynch_client_raw_data.status, asynch_client_raw_data.error, asynch_client_raw_data.ser_argout_type);
-#endif /* EBUG */
 
 /*
  * DO send reply using ONE-WAY rpc i.e. timeout=0 , this way the server
@@ -1040,9 +1005,7 @@ static void _WINAPI devserver_prog_5 (struct svc_req *rqstp, SVCXPRT *transp)
 					(xdrproc_t)xdr_void, (caddr_t) NULL, TIMEVAL(zero_timeout));
 			}
 
-#ifdef EBUG
-                        dev_printdebug (DBG_ASYNCH, "\ndevserver_prog_5() : send reply to client (clnt_stat %d)\n",clnt_stat);/
-#endif /* EBUG */
+                        dev_printdebug (DBG_ASYNCH, "\ndevserver_prog_5() : send reply to client (clnt_stat %d)\n",clnt_stat);
 
 /*
  * because we are using "one-way rpc" to send the reply to the client
@@ -1095,9 +1058,7 @@ static void _WINAPI devserver_prog_5 (struct svc_req *rqstp, SVCXPRT *transp)
         		xdr_free ((xdrproc_t)xdr_DevVarArgumentArray, (char *)&(argument.asynch_client_raw_data.var_argument));
 	}
 
-#ifdef EBUG
 	dev_printdebug (DBG_ASYNCH, "\ndevserver_prog_5() : returning\n");
-#endif /* EBUG */
 	return;
 }
 
@@ -1214,10 +1175,8 @@ long _DLLFunc asynch_rpc_register(long *error)
   		}
   
 		asynch_svc_tcp_sock = asynch_trans_tcp->xp_sock;
-#ifdef EBUG
         	dev_printdebug (DBG_ASYNCH, "\nasynch_rpc_register() : registered asynchronous server (%s) at prog no=%d\n",
 		config_flags.server_name,config_flags.prog_number);
-#endif /* EBUG */
 		config_flags.asynch_rpc = True;
 	}
 
@@ -1272,9 +1231,7 @@ long asynch_server_import(devserver ds, long *error)
 		if ((idot = strstr(svr_conns[ds->no_svr_conn].server_host,".")) != NULL)
 		{
 			svr_conns[ds->no_svr_conn].server_host[strlen(svr_conns[ds->no_svr_conn].server_host)-strlen(idot)-1] = '\0';
-#ifdef EBUG
                 	dev_printdebug (DBG_ASYNCH, "\nasynch_server_import() : new server host name %s\n", svr_conns[ds->no_svr_conn].server_host);
-#endif /* EBUG */
 		}
 #endif /* _UCC */
 
@@ -1395,22 +1352,18 @@ long asynch_server_import(devserver ds, long *error)
                 svr_conns[ds->no_svr_conn].asynch_callback_tcp_socket = tcp_socket;
 #endif /* _UCC */
 
-#ifdef EBUG
                 dev_printdebug (DBG_ASYNCH,
                 	"\nasynch_server_import() : imported asynchronous server (host=%s) at prog no=%d socket in=%d out=%d\n",
                 	svr_conns[ds->no_svr_conn].server_host,svr_conns[ds->no_svr_conn].prog_number,
 			svr_conns[ds->no_svr_conn].asynch_listen_tcp_socket,
 			svr_conns[ds->no_svr_conn].asynch_callback_tcp_socket);
-#endif /* EBUG */
 	}
 	else
 	{
 /* 
  * asynch handle exists, ping the server to see if it is still alive
  */
-#ifdef EBUG
 		dev_printdebug (DBG_TRACE | DBG_ASYNCH,"calling asynch_client_ping\n");
-#endif
 		if (asynch_client_ping(ds->no_svr_conn, error) == DS_NOTOK)
 		{
 			ds->asynch_clnt = NULL;
@@ -1463,9 +1416,7 @@ long asynch_client_import(devserver client, long *error)
 		return(DS_NOTOK);
 	}
 
-#ifdef EBUG
-        dev_printdebug (DBG_ASYNCH, "\nasynch_client_import() : next free svr_conn = %d\n", no_svr_conn);/
-#endif /* EBUG */
+        dev_printdebug (DBG_ASYNCH, "\nasynch_client_import() : next free svr_conn = %d\n", no_svr_conn);
 /*
  * before importing the asynchronous client first cleanup any stale 
  * asynchronous client connections lying around. this will ensure that
@@ -1489,9 +1440,7 @@ long asynch_client_import(devserver client, long *error)
 		if ((idot = strstr(client->server_host,".")) != NULL)
 		{
 			client->server_host[strlen(client->server_host)-strlen(idot)-1] = 0;
-#ifdef EBUG
                 	dev_printdebug (DBG_ASYNCH, "\nasynch_client_import() : new client host name %s\n", client->server_host);
-#endif /* EBUG */
 		}
 #endif /* _UCC */
 /*
@@ -1546,13 +1495,11 @@ long asynch_client_import(devserver client, long *error)
                 svr_conns[no_svr_conn].asynch_listen_tcp_socket = ds_rpc_svc_fd;
 #endif /* _UCC */
                 svr_conns[no_svr_conn].asynch_callback_tcp_socket = tcp_socket;
-#ifdef EBUG
                 dev_printdebug (DBG_ASYNCH,
 	                "\nasynch_client_import() : imported asynchronous client (server=%s,prog no=%d,no_svr_conn=%d) socket in=%d out=%d\n",
 	                client->server_name,client->prog_number,
 			no_svr_conn,svr_conns[no_svr_conn].asynch_listen_tcp_socket,
 			svr_conns[no_svr_conn].asynch_callback_tcp_socket);
-#endif /* EBUG */
 	}
 /*
  * increment the number of connections the client has open
@@ -1639,9 +1586,7 @@ long _DLLFunc dev_synch(struct timeval *timeout, long *error)
 	short 		timedout=0;
 	struct timeval 	my_timeout;
 
-#ifdef EBUG
         dev_printdebug (DBG_ASYNCH, "\ndev_synch() : %d replies still pending\n",client_asynch_request.pending);
-#endif /* EBUG */
 
 /*
  * only check if any asynchronous are pending
@@ -1762,9 +1707,7 @@ _dev_import_out* _DLLFunc rpc_asynch_import_5(_dev_import_in *dev_import_in)
 
 	LOCK(async_mutex);
 
-#ifdef EBUG
 	dev_printdebug (DBG_ASYNCH, "rpc_asynch_import() : entered\n");
-#endif /* EBUG */
 
 /*
  * unpack additional input arguments to identify the client 
@@ -1777,12 +1720,10 @@ _dev_import_out* _DLLFunc rpc_asynch_import_5(_dev_import_in *dev_import_in)
 	client.prog_number = *(long*)dev_import_in->var_argument.sequence[iarg].argument;
 	iarg++;
 	client.vers_number = *(long*)dev_import_in->var_argument.sequence[iarg].argument;
-#ifdef EBUG
 	dev_printdebug (DBG_ASYNCH, "\nrpc_asynch_import() : client data -> ");
         dev_printdebug (DBG_ASYNCH, "name=%s host=%s prog_no=%d vers_no=%d\n", client.server_name, client.server_host,
                         client.prog_number, client.vers_number);
 
-#endif /* EBUG */
 /*
  * import asynchronous service of client so that server can send replies to it
  */
@@ -1835,12 +1776,10 @@ _dev_free_out* _DLLFunc rpc_asynch_free_5(_dev_free_in *dev_free_in)
 	client.prog_number = *(long*)dev_free_in->var_argument.sequence[iarg].argument;
 	iarg++;
 	client.vers_number = *(long*)dev_free_in->var_argument.sequence[iarg].argument;
-#ifdef EBUG
 	dev_printdebug (DBG_ASYNCH, "\nrpc_asynch_free() : client data -> ");
 	dev_printdebug (DBG_ASYNCH, "name=%s host=%s prog_no=%d vers_no=%d\n",
                         client.server_name, client.server_host, client.prog_number, client.vers_number);
 
-#endif /* EBUG */
 /*
  * decrement the number of open server --> client connections so that the 
  * the server can eventually free and reuse the svr_conns[] entry for
@@ -1848,10 +1787,8 @@ _dev_free_out* _DLLFunc rpc_asynch_free_5(_dev_free_in *dev_free_in)
  */
 	no_svr_conn = dev_query_svr(client.server_host, client.prog_number, client.vers_number);
 	svr_conns[no_svr_conn].no_conns--;
-#ifdef EBUG
         dev_printdebug (DBG_ASYNCH, "\nrpc_asynch_free() : no of server (no_svr_conn=%d) connections open to client %d\n",
 			no_svr_conn,svr_conns[no_svr_conn].no_conns);
-#endif /* EBUG */
 /* 
  * destroy the client handle now, don't wait for the client to
  * exit. note on OS9 this can lead to a lot of stale tcp ports
@@ -1866,9 +1803,7 @@ _dev_free_out* _DLLFunc rpc_asynch_free_5(_dev_free_in *dev_free_in)
  * destroy the imported client callback handle
  */
 		clnt_destroy(svr_conns[no_svr_conn].asynch_clnt);
-#ifdef EBUG
         	dev_printdebug (DBG_ASYNCH, "\nrpc_asynch_free() : destroy asynchronous client handle (no_svr_conn=%d,errno=%d)\n", no_svr_conn, errno);
-#endif /* EBUG */
 #ifdef _UCC
 /*
  * OS9 has difficulty detecting TCP sockets closing which can lead to stale
@@ -1877,14 +1812,10 @@ _dev_free_out* _DLLFunc rpc_asynch_free_5(_dev_free_in *dev_free_in)
  */
 		shutdown(svr_conns[no_svr_conn].asynch_listen_tcp_socket,2);
                 status = close (svr_conns[no_svr_conn].asynch_listen_tcp_socket);
-#if EBUG
         	dev_printdebug (DBG_ASYNCH, "\nrpc_asynch_free() : close (status=%d) listen socket %d (errno=%d)\n",
 		       	status,svr_conns[no_svr_conn].asynch_listen_tcp_socket,errno);
-#endif /* EBUG */
 /*
-#ifdef EBUG 
         	dev_printdebug (DBG_ASYNCH, "\nrpc_asynch_free() : before calling FD_CLR() svc_fdset = 0x%04x, errno=%d\n", svc_fdset,errno);
-#endif * EBUG *
  *
  * now that we have closed the socket manually we have to tell the RPC
  * not to listen on this socket anymore by modifying the global svc_fdset mask
@@ -1892,9 +1823,7 @@ _dev_free_out* _DLLFunc rpc_asynch_free_5(_dev_free_in *dev_free_in)
  * an OS9 problem !
  *
 		FD_CLR(svr_conns[no_svr_conn].asynch_listen_tcp_socket,&svc_fdset);
-#if EBUG
         	dev_printdebug (DBG_ASYNCH, "\nrpc_asynch_free() : after calling FD_CLR() svc_fdset = 0x%04x, errno=%d\n", svc_fdset,errno);
-#endif * EBUG *
 */
 #endif /* _UCC */
 		svr_conns[no_svr_conn].asynch_clnt = NULL;
@@ -1940,18 +1869,14 @@ _asynch_client_data* _DLLFunc rpc_asynch_reply_5(_asynch_client_data *asynch_cli
 
 	if ((asynch_index = asynch_get_index(asynch_id)) < 0)
 	{
-#ifdef EBUG
 		dev_printdebug (DBG_ASYNCH, "\nrpc_asynch_reply_5(): problem - could not identify reply (id=%d)\n",asynch_id);
-#endif /* EBUG */
 		return(asynch_client_data);
 	}
 	LOCK(async_mutex);
 
 
-#ifdef EBUG
         dev_printdebug (DBG_ASYNCH, "\nrpc_asynch_reply() : received asynchronous reply id=%d index=%d status=%d error=%d\n",
 		asynch_id,asynch_index,asynch_client_data->status,asynch_client_data->error);
-#endif /* EBUG */
 	if (client_asynch_request.args[asynch_index].callback != NULL)
 	{
 		cb_data.asynch_id = client_asynch_request.args[asynch_index].asynch_id;
@@ -2044,11 +1969,9 @@ _asynch_client_raw_data* _DLLFunc rpc_raw_asynch_reply_5(_asynch_client_raw_data
 	}
 
 
-#ifdef EBUG
         dev_printdebug (DBG_ASYNCH,
         "\nrpc_raw_asynch_reply() : received asynchronous reply id=%d index=%d status=%d error=%d\n",
         asynch_id,asynch_index,asynch_client_raw_data->status,asynch_client_raw_data->error);
-#endif /* EBUG */
 	if (client_asynch_request.args[asynch_index].callback != NULL)
 	{
 		cb_data.asynch_id = client_asynch_request.args[asynch_index].asynch_id;
@@ -2124,10 +2047,8 @@ long _DLLFunc asynch_add_request(devserver ds, long asynch_type, long event_type
 
 	if (client_asynch_request.args == NULL)
 	{
-#ifdef EBUG
        		dev_printdebug (DBG_ASYNCH, "\nasynch_add_request() : sizeof(asynch_request_arg)*MAX_ASYNCH_CALLS %d \n",
 	       		sizeof(asynch_request_arg)*MAX_ASYNCH_CALLS);
-#endif /* EBUG */
 
 		client_asynch_request.args = (asynch_request_arg*)malloc(sizeof(asynch_request_arg)*MAX_ASYNCH_CALLS);
 		if(!client_asynch_request.args)
@@ -2167,11 +2088,9 @@ long _DLLFunc asynch_add_request(devserver ds, long asynch_type, long event_type
 			svr_conns[ds->no_svr_conn].pending++;
 			ds->pending++;
 			
-#ifdef EBUG
         		dev_printdebug (DBG_ASYNCH, "\nasynch_add_request() : added asynchronous request type=%08xd"
 				" event=%d id=%d index=%d argout_type= %d argout=0x%08x callback=0x%08x pending total=%d device=%d\n",
         			asynch_type,event_type,asynch_id,i,argout_type,argout,callback,client_asynch_request.pending, ds->pending);
-#endif /* EBUG */
 			break;
 		}
 	}
@@ -2267,17 +2186,13 @@ bool_t xdr__asynch_client_data(XDR *xdrs, _asynch_client_data *objp)
 		if (asynch_index >= 0)
 		{
 			objp->argout = client_asynch_request.args[asynch_index].argout;
-#ifdef EBUG
         		dev_printdebug (DBG_ASYNCH,
         		"\nxdr__asynch_client_data() : identified asynchronous request id=%d index=%d argout_type=%d argout=0x%08x\n",
        			objp->asynch_id,asynch_index,objp->argout_type,objp->argout);
-#endif /* EBUG */ 
 		}
 		else
 		{
-#ifdef EBUG
         		dev_printdebug (DBG_ASYNCH, "\nxdr__asynch_client_data() : unidentified asynchronous request id=%d\n", objp->asynch_id);
-#endif /* EBUG */ 
 			return(TRUE);
 		}
 	}
@@ -2354,19 +2269,15 @@ bool_t xdr__asynch_client_raw_data(XDR *xdrs, _asynch_client_raw_data *objp)
 		{
 			objp->argout = client_asynch_request.args[asynch_index].argout;
 
-#ifdef EBUG
         		dev_printdebug (DBG_ASYNCH,
         		"\nxdr__asynch_client_data() : identified asynchronous request id=%d index=%d deser_argout_type=%d argout=0x%08x\n",
        			objp->asynch_id,asynch_index,objp->deser_argout_type,objp->argout);
-#endif /* EBUG */ 
 		}
 		else
 		{
-#ifdef EBUG
         		dev_printdebug (DBG_ASYNCH,
         		"\nxdr__asynch_client_data() : unidentified asynchronous request id=%d\n",
        			objp->asynch_id);
-#endif /* EBUG */ 
 			return(TRUE);
 		}
 
@@ -2437,9 +2348,7 @@ long _DLLFunc dev_flush(devserver ds)
  */
 		if (!svr_conns[ds->no_svr_conn].flushed)
 		{
-#ifdef EBUG
 			dev_printdebug (DBG_ASYNCH, "\ndev_flush() : flush asynchronous request/reply buffer\n");
-#endif /* EBUG */
 /*
  * flush the client's buffer by making a call to the null procedure
  * of the server. because the null procedure expects an (void) answer 
@@ -2451,9 +2360,7 @@ long _DLLFunc dev_flush(devserver ds)
                    		(xdrproc_t)xdr_void, NULL, 
 	           		(xdrproc_t)xdr_void, NULL,
                    		TIMEVAL(timeout));
-#ifdef EBUG
 			 dev_printdebug (DBG_ASYNCH, "\ndev_flush() : clnt_stat %d\n",clnt_stat);
-#endif /* EBUG */
 /*
  * because this is a one-way RPC the normal status returned is RPC_TIMEDOUT
  * if any other error is received then pass it on to the dev_rpc_error()
@@ -2566,18 +2473,14 @@ void asynch_client_cleanup(long *error)
 	long 		status;
 	char 		message[]="is there anybody there ?";
 	static long 	n_stale_client = 0;
-#ifdef EBUG
 	dev_printdebug (DBG_ASYNCH, "asynch_client_cleanup() : entered\n");
-#endif /* EBUG */
 	for (i=0; i<NFILE; i++)
 	{
 		if ((svr_conns[i].no_conns > 0) && (svr_conns[i].asynch_clnt != NULL))
 		{
-#ifdef EBUG
 			dev_printdebug(DBG_ASYNCH,
 				"asynch_client_cleanup(): found asynchronous client %d on host %s program no. %d no_conn %d\n",
 			       	i, svr_conns[i].server_host, svr_conns[i].prog_number, svr_conns[i].no_conns);
-#endif /* EBUG */
 /*
  * try to ping asynchronous client to see if it is alive
  */
@@ -2588,9 +2491,7 @@ void asynch_client_cleanup(long *error)
 			}
 		}
 	}
-#ifdef EBUG
 	dev_printdebug (DBG_ASYNCH, "asynch_client_cleanup() : left\n");
-#endif /* EBUG */
 	return;
 }
 
@@ -2682,11 +2583,9 @@ void asynch_timed_out(devserver ds_tout)
 								client_asynch_request.pending--;
 								svr_conns[ds->no_svr_conn].pending--;
 								ds->pending--;
-#ifdef EBUG
 								dev_printdebug (DBG_ASYNCH,
 								"\nasynch_timed_out(): asynchronous request %d TIMED OUT\n", 
 								client_asynch_request.args[i].asynch_id);
-#endif /* EBUG */
 							}
 /*
  * if asynchronous callback to inform it that the request has timed out
@@ -2723,11 +2622,9 @@ void asynch_timed_out(devserver ds_tout)
 								client_asynch_request.pending--;
 								svr_conns[ds->no_svr_conn].pending--;
 								ds->pending--;
-#ifdef EBUG
 								dev_printdebug (DBG_ASYNCH,
 								"\nasynch_timed_out(): event request %d TIMED OUT\n", 
 								client_asynch_request.args[i].asynch_id);
-#endif /* EBUG */
 							   }
 							}
 						}
@@ -2756,9 +2653,7 @@ long asynch_client_ping(long i,long *error)
 	long 		status;
 	char 		message[]="is there anybody there ?";
 	static long 	n_stale_client = 0;
-#ifdef EBUG
 	dev_printdebug (DBG_ASYNCH, "asynch_client_ping() : entered\n");
-#endif /* EBUG */
 /*
  * first check if there is an asynchronous client handle
  */
@@ -2777,18 +2672,14 @@ long asynch_client_ping(long i,long *error)
                               (xdrproc_t)xdr_void, NULL,
                               (xdrproc_t)xdr_void, NULL,
                               TIMEVAL(zero_timeout));
-#ifdef EBUG
 	dev_printdebug (DBG_ASYNCH, "\nasynch_client_ping() : clnt_stat %d\n",clnt_stat);
-#endif /* EBUG */
 /*
  * if asynchronous client has died the rpc should return an RPC_CANTSEND error
  */
 	if (clnt_stat == RPC_CANTSEND)
 	{
-#ifdef EBUG
 		n_stale_client++;
              	dev_printdebug (DBG_ASYNCH, "\nasynch_client_ping() : detected %d th stale client handle - remove it !\n", n_stale_client);
-#endif /* EBUG */
        		clnt_destroy(svr_conns[i].asynch_clnt);
 #ifdef _UCC
 /*
@@ -2800,23 +2691,17 @@ long asynch_client_ping(long i,long *error)
 		if (svr_conns[i].asynch_listen_tcp_socket != ds_rpc_svc_fd)
 		{
               		status = send(svr_conns[i].asynch_listen_tcp_socket, message,sizeof(message),0);
-#if EBUG
        			dev_printdebug (DBG_ASYNCH,
                		"\nasynch_client_ping() : try to send to a dead client (status=%d) listen socket %d (errno=%d)\n",
 	       		status,svr_conns[i].asynch_listen_tcp_socket,errno);
-#endif /* EBUG */
 			if (status != -1)
 			{
 				shutdown(svr_conns[i].asynch_listen_tcp_socket,2);
                			close (svr_conns[i].asynch_listen_tcp_socket);
-#if EBUG
        				dev_printdebug (DBG_ASYNCH, "\nasynch_cleanup() : close (status=%d) listen socket %d (errno=%d)\n",
 		       			status,svr_conns[i].asynch_listen_tcp_socket,errno);
-#endif /* EBUG */
-#ifdef EBUG 
         			dev_printdebug (DBG_ASYNCH, "\asynch_client_ping() : before calling FD_CLR() svc_fdset = 0x%04x, errno=%d\n",
 		       			svc_fdset,errno);
-#endif /* EBUG */
 /*
  * now that we have closed the socket manually we have to tell the RPC
  * not to listen on this socket anymore by modifying the global svc_fdset mask
@@ -2824,10 +2709,8 @@ long asynch_client_ping(long i,long *error)
  * an OS9 problem !
  */
 				FD_CLR(svr_conns[i].asynch_listen_tcp_socket,&svc_fdset);
-#if EBUG
         			dev_printdebug (DBG_ASYNCH, "\nasynch_client_ping() : after calling FD_CLR() svc_fdset = 0x%04x, errno=%d\n",
 		       			svc_fdset,errno);
-#endif /* EBUG */
 			}
 		}
 #endif /* _UCC */

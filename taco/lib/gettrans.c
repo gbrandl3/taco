@@ -14,9 +14,9 @@
 
  Original:      09.01.1991
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-04-25 11:21:36 $
+ Date:		$Date: 2004-02-19 15:41:44 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -229,9 +229,7 @@ int gettransient( const char *ds_name )
  * if plist is NULL assume simply that no programs are registered
  * and return prognum as is - andy 2/11/2001
  */
-#ifdef EBUG
-	  printf("gettransient(): pmap_getmaps() failed , aborting !\n");
-#endif
+	  dev_printdebug(DBG_ERROR | DBG_STARTUP, "gettransient(): pmap_getmaps() failed , aborting !\n");
 
 	  return prognum;
 
