@@ -73,7 +73,7 @@ AC_DEFUN([TACO_GRETA],
 	if test "x$greta" = "xyes" ; then
 		dc=yes
 		X_AND_MOTIF
-		GRETA=greta_ndbm
+		GRETA=greta
 	fi
 	AM_CONDITIONAL(DC_BUILD, test "x$dc" = "xyes") 
 	if test "x$dc" = "xyes" ; then
