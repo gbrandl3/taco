@@ -1,5 +1,5 @@
 #!/bin/sh
-#
+# This is the FreeBSD specific init script
 
 # PROVIDE: taco_manager
 # REQUIRE: DAEMON rpcbind
