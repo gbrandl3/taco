@@ -68,7 +68,6 @@ manager()
 # now start the Manager 
     	echo "starting the Manager ..."
     	Manager $taco_manager_flags 
-	sleep 5
     	echo "Manager started"
 }
 

@@ -13,9 +13,9 @@
 
  Original: 	January 1991
 
- Version:	$Revision: 1.19 $
+ Version:	$Revision: 1.20 $
 
- Date:		$Date: 2005-03-15 13:51:34 $
+ Date:		$Date: 2005-03-15 14:54:26 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -440,9 +440,6 @@ static	int	fd_devnull = -1;
 				fprintf(system_log, "\t%s %s %s %s %s %s\n",homedir,cmd_argv[0],cmd_argv[1],cmd_argv[2],cmd_argv[3],cmd_argv[4]);
 				fflush(system_log);
 			}
-#ifdef unix
-			sleep(2);
-#endif
 			execvp (homedir, cmd_argv);
 			
 			fprintf (stderr,"\nexecvp failed, database_server not started\n");
@@ -486,9 +483,6 @@ static	int	fd_devnull = -1;
 			fprintf(system_log, "\t%s %s %s\n",homedir,cmd_argv[0],cmd_argv[1]);
 			fflush(system_log);
 		}
-#ifdef unix
-		sleep(2);
-#endif
 		execvp (homedir,cmd_argv);
 
 		fprintf (stderr,"\nexecvp failed, message server not started\n");
@@ -560,6 +554,7 @@ static	int	fd_devnull = -1;
 /*
  * Try to become a daemon
  */
+	sleep(2);
 	pid = become_daemon();
 #endif
 	svc_run();
