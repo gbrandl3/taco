@@ -7,13 +7,13 @@
  Description:	Server side of the API.  
 
  Author(s);	Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.14 $
+ Version:	$Revision: 1.15 $
 
- Date:		$Date: 2004-09-17 15:34:03 $
+ Date:		$Date: 2004-11-25 19:39:30 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -1355,14 +1355,14 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
         	dev_query_out.var_argument.sequence = vararg;
 	}
 #else
-	if ((device->commands_list.begin())->second.cmd_name != NULL)
+	if ((device->commands_map.begin())->second.cmd_name != NULL)
 	{
 		for (u_long i = 0; i < dev_query_out.length; i++)
 		{
 			dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_cmd_query_4() : %d %d %s\n", i, dev_query_out.sequence[i].cmd,
-								device->commands_list[dev_query_out.sequence[i].cmd].cmd_name);
+								device->commands_map[dev_query_out.sequence[i].cmd].cmd_name);
 			vararg[i].argument_type      = D_STRING_TYPE;
-			vararg[i].argument           = (DevArgument)&(device->commands_list[dev_query_out.sequence[i].cmd].cmd_name);
+			vararg[i].argument           = (DevArgument)&(device->commands_map[dev_query_out.sequence[i].cmd].cmd_name);
 		}
 	        dev_query_out.var_argument.length = dev_query_out.length;
 	        dev_query_out.var_argument.sequence = vararg;
