@@ -2,33 +2,14 @@
 #include <MySqlServer.h>
 
 
-/****************************************************************************
-*                                                                           *
-*		Server code for db_getresource function                     *
-*                               --------------                              *
-*                                                                           *
-*    Function rule : To retrieve from the database (builded from resources  *
-*		     files) a resource value                                *
-*                                                                           *
-*    Argin : A pointer to a structure of the "arr1" type                    *
-*            The definition of the arr1 type is :                           *
-*            struct {                                                       *
-*              u_int arr1_len;     The number of strings                    *
-*              char **arr1_val;    A pointer to the array of strings        *
-*                  }                                                        *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a structure of the "db_res" type.   *
-*    The definition of this structure is :                                  *
-*    struct {                                                               *
-*      arr1 rev_val;   A structure of the arr1 type (see above) with the    *
-*                     resources values information transferred as strings   *
-*      int db_err;    The database error code                               *
-*                     0 if no error                                         *
-*          }                                                                *
-*                                                                           *
-*****************************************************************************/
+/**
+ * retrieve from the database (built from resources files) a resource value
+ *
+ * @param rece A pointer to a structure of the arr1 type
+ * @param rqstp
+ *
+ * @return a pointer to a structure of the db_res type.
+ */
 db_res *MySQLServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 {
     int 		j,
@@ -164,30 +145,13 @@ db_res *MySQLServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 }
 
 
-/****************************************************************************
-*                                                                           *
-*		Server code for db_getdevlist function                      *
-*                               -------------                               *
-*                                                                           *
-*    Function rule : To retrieve all the names of the devices driven by a   *
-*                    device server.                                         *
-*                                                                           *
-*    Argin : The name of the device server                                  *
-*            The definition of the nam type is :                            *
-*            typedef char *nam;                                             *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a structure of the "db_res" type.   *
-*    The definition of this structure is :                                  *
-*    struct {                                                               *
-*      arr1 rev_val;   A structure of the arr1 type (see above) with the    *
-*                     devices names                                         *
-*      int db_err;    The database error code                               *
-*                     0 if no error                                         *
-*            }                                                              *
-*                                                                           *
-****************************************************************************/
+/**
+ * retrieve all the names of the devices driven by a device server. 
+ * 
+ * @param dev_name The name of the device server
+ *
+ * @returns a pointer to a structure of the db_res type.
+ */
 db_res *MySQLServer::db_getdev_1_svc(nam *dev_name)
 {
     int 	dev_num,
@@ -231,24 +195,16 @@ db_res *MySQLServer::db_getdev_1_svc(nam *dev_name)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for db_find function                                   *
-*                        -------                                            *
-*                                                                           *
-*    Function rule : To retrieve a resource value in the database           *
-*                                                                           *
-*    Argin : - The table name where the ressource can be retrieved          *
-*            - A part of the resource name (FAMILY/MEMBER/RES.)             *
-*            - The adress where to put the resource value (as a string)     *
-*	     - The buffer's address used to store temporary results         *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To retrieve a resource value in the database 
+ *
+ * @param tab_name The table name where the ressource can be retrieved
+ * @param p_res_name A part of the resource name (FAMILY/MEMBER/RES.)
+ * @param The adress where to put the resource value (as a string) 
+ * @param The buffer's address used to store temporary results
+ *
+ * @return 0 if no errors occurs or the error code when there is a problem. 
+ */
 int MySQLServer::db_find(std::string tab_name, std::string p_res_name, char **out, int *k1)
 {
     std::string		family,
@@ -401,25 +357,16 @@ int MySQLServer::db_find(std::string tab_name, std::string p_res_name, char **ou
 }
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for db_devlist function                                *
-*                        ----------                                         *
-*                                                                           *
-*    Function rule : To retrieve all the devices name for a particular      *
-*                    device server                                          *
-*                                                                           *
-*    Argin : - The  device server name                                      *
-*            - The adress  of the db_res structure to be initialized with    *
-*              the devices names                                            *
-*              (see the definition of the db_res structure above)           *
-*                                                                           *
-*    Argout : - The number of devices managed by the devices server         *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
+/**
+ * retrieve all the devices name for a particular device server
+ * 
+ * @param dev_na The  device server name 
+ * @param dev_num The number of devices managed by the devices server
+ * @param back The address of the db_res structure to be initialized with 
+ *              the devices names
+ *
+ * @return 0 if no errors occurs or the error code when there is a problem.
+ */
 int MySQLServer::db_devlist(std::string dev_na, int *dev_num, db_res *back)
 {
     register char 	**ptra;
@@ -509,33 +456,14 @@ int MySQLServer::db_devlist(std::string dev_na, int *dev_num, db_res *back)
     }
     return 0;
 }
-
 
-
-/****************************************************************************
-*                                                                           *
-*		Server code for db_putresource function                     *
-*                               --------------                              *
-*                                                                           *
-*    Function rule : To insert or update resources    		    	    *
-*                                                                           *
-*    Argin : A pointer to a structure of the tab_putres type		    *
-*            The definition of the tab_putres type is :                     *
-*	     struct {							    *
-*		u_int tab_putres_len;	The number of resources to be       *
-*					updated or inserted		    *
-*		putres tab_putres_val;	A pointer to an array of putres     *
-*					structure. Each putres structure    *
-*					contains the resource name and      *
-*                                       the resource value		    *
-*		    }							    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This funtion returns 0 if no error occurs. Otherwise an error code is  *
-*    returned								    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To insert or update resources
+ * 
+ * @param rece A pointer to a structure of the tab_putres type
+ * 
+ * @return 0 if no error occurs. Otherwise an error code is returned
+ */
 DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
 {
     int 			res_num = rece->tab_putres_len,
@@ -643,28 +571,14 @@ DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
 }
 
 
-/****************************************************************************
-*                                                                           *
-*		Server code for db_delresource function                     *
-*                               --------------                              *
-*                                                                           *
-*    Function rule : To delete resources from the database (builded from    *
-*		     resource files)					    *
-*                                                                           *
-*    Argin : A pointer to a structure of the "arr1" type                    *
-*            The definition of the arr1 type is :                           *
-*            struct {                                                       *
-*              u_int arr1_len;     The number of strings                    *
-*              char **arr1_val;    A pointer to the array of strings        *
-*                  }                                                        *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a int. This int is the error code   *
-*    It is set to 0 is everything is correct. Otherwise, it is initialised  *
-*    with the error code.						    *
-*                                                                           *
-*****************************************************************************/
+/**
+ * delete resources from the database (built from resource files)
+ * 
+ * @param rece A pointer to a structure of the arr1 type
+ *
+ * @return a pointer to a int. This int is the error code It is set to 0 is everything 
+ * is correct. Otherwise, it is initialised with the error code.
+ */
 DevLong *MySQLServer::db_delres_1_svc(arr1 *rece/*, struct svc_req *rqstp*/)
 {
     int 	j;
@@ -718,24 +632,15 @@ DevLong *MySQLServer::db_delres_1_svc(arr1 *rece/*, struct svc_req *rqstp*/)
     return(&errcode);
 }
 
-/****************************************************************************
-*                                                                           *
-*		Code for db_insert function                                 *
-*                        ---------                                          *
-*                                                                           *
-*    Function rule : To add a resource from the database         	    *
-*                                                                           *
-*    Argin : - The full resource name (DOMAIN/FAMILY/MEMBER/R_NAME)	    *
-*	     - The address where to store the string to memorize the deleted*
-*	       resource value						    *
-*  	     - The content of the resource				    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
+/**
+ * add a resource to the database
+ * 
+ * @param res_name The full resource name (DOMAIN/FAMILY/MEMBER/R_NAME)
+ * @param number The address where to store the string to memorize the deleted resource value
+ * @param content The content of the resource
+ *
+ * @return 0 if no errors occurs or the error code when there is a problem.
+ */
 int MySQLServer::db_insert(std::string res_name, std::string number, std::string content)
 {
     std::string		domain,
@@ -820,23 +725,13 @@ int MySQLServer::db_insert(std::string res_name, std::string number, std::string
 }
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for db_del function                                    *
-*                        ------                                             *
-*                                                                           *
-*    Function rule : To delete a resource from the database         	    *
-*                                                                           *
-*    Argin : - The full resource name (DOMAIN/FAMILY/MEMBER/R_NAME)	    *
-*	     - The address where to store the string to memorize the deleted*
-*	       resource value						    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
+/**
+ * delete a resource from the database
+ * 
+ * @param res_name The full resource name (DOMAIN/FAMILY/MEMBER/R_NAME)
+ *
+ * @return 0 if no errors occurs or the error code when there is a problem.
+ */
 int MySQLServer::db_del(std::string res_name)
 {
     std::string		t_name,

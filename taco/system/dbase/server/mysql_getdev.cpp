@@ -3,29 +3,15 @@
 #include <algorithm>
 
 
-/****************************************************************************
-*                                                                           *
-*		Server code for db_getdevexp function                       *
-*                               -------------                               *
-*                                                                           *
-*    Function rule : To retrieve the names of the exported devices          *
-*                    device server.                                         *
-*                                                                           *
-*    Argin : A string to filter special device names in the whole list of   *
-*	     the exported device					    *
-*            The definition of the nam type is :                            *
-*            typedef char *nam;                                             *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a structure of the "db_res" type.   *
-*    The definition of this structure is :                                  *
-*    struct {                                                               *
-*      arr1 rev_val;  A structure of the arr1 type with the device names    *
-*      int db_err;    The database error code (0 if no error)               *
-*            }                                                              *
-*                                                                           *
-****************************************************************************/
+/**
+ * retrieve the names of the exported devices of a device server. 
+ *
+ * @param fil_name A string to filter special device names in the whole list of 
+ *	     the exported device
+ * @param rqstp
+ *
+ * @return a pointer to a structure of the db_res type.
+ */
 db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 {
     std::string 	domain,	

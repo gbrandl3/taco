@@ -1,28 +1,13 @@
 #include <MySqlServer.h>
 
 
-/****************************************************************************
-*                                                                           *
-*		Server code for db_cmd_query function                       *
-*                               ------------                                *
-*                                                                           *
-*    Function rule : To retrieve (from database) the command code           *
-*		     associated to a command name (the string)		    *
-*                                                                           *
-*    Argin : A pointer to string which is the command name		    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a structure of the "cmd_que" type   *
-*    The definition of this structure is :                                  *
-*    struct {                                                               *
-*      int db_err;    The database error code                               *
-*                        0 if no error                                      *
-*      unsigned int xcmd_code;	The command code.			    *
-*				0 if the database query fails		    *
-*            }                                                              *
-*                                                                           *
-****************************************************************************/
+/**
+ * retrieve (from database) the command code associated to a command name (the string)
+ * 
+ * @param pcmd_name A pointer to string which is the command name
+ * 
+ * @return a pointer to a structure of the cmd_que type
+ */
 cmd_que *MySQLServer::db_cmd_query_1_svc(nam *pcmd_name)
 {
     int 		i;

@@ -32,6 +32,8 @@
 
 #include <NdbmClass.h>
 
+/**@ingroup dbServerClasses
+ */
 class DBServer
 {
 private:
@@ -105,7 +107,7 @@ public:
 	virtual long		*svcdelete_1_svc(db_res *) = 0;
 	virtual db_psdev_error	*upddev_1_svc(db_res *) = 0;
 	virtual db_psdev_error	*updres_1_svc (db_res *) = 0;
-	virtual db_res		*secpass_1_svc(void) = 0;
+		db_res		*secpass_1_svc(void);
 	virtual db_poller_svc	*getpoller_1_svc(nam *) = 0;
 
 public:

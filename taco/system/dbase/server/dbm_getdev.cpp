@@ -14,43 +14,18 @@
 #include <string>
 #include <NdbmClass.h>
 #include <NdbmServer.h>
-
 #include <errno.h>
 
-/* Global variables */
-
-// static char domain[DOMAIN_NAME_LENGTH];	// 20
-// static char family[FAMILY_NAME_LENGTH];	// 20
-// static char member[MEMBER_NAME_LENGTH];	// 20 
-// static char domain_tup[DOMAIN_NAME_LENGTH];	// 20
-// static char family_tup[FAMILY_NAME_LENGTH];	// 20
-// static char member_tup[MEMBER_NAME_LENGTH];	// 20
-
 
-
-/****************************************************************************
-*                                                                           *
-*		Server code for db_getdevexp function                       *
-*                               -------------                               *
-*                                                                           *
-*    Function rule : To retrieve the names of the exported devices          *
-*                    device server.                                         *
-*                                                                           *
-*    Argin : A string to filter special device names in the whole list of   *
-*	     the exported device					    *
-*            The definition of the nam type is :                            *
-*            typedef char *nam;                                             *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a structure of the "db_res" type.   *
-*    The definition of this structure is :                                  *
-*    struct {                                                               *
-*      arr1 rev_val;  A structure of the arr1 type with the device names    *
-*      int db_err;    The database error code (0 if no error)               *
-*            }                                                              *
-*                                                                           *
-****************************************************************************/
+/**
+ * To retrieve the names of the exported devices device server. 
+ * 
+ * @param fil_name A string to filter special device names in the whole list of 
+ *	     the exported device
+ * @param rqstp
+ *
+ * @return a pointer to a structure of the db_res type.
+ */
 db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 {
 	std::string     device_name(*fil_name);
@@ -259,24 +234,17 @@ db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 	return(&browse_back);
 }
 
-/****************************************************************************
-*                                                                           *
-*		Code for fam_fil function                                   *
-*                        -------                                            *
-*                                                                           *
-*    Function rule : To check if the family part of the filter is the same  *
-*		     than the family part of the device name retrieved from *
-*		     the database					    *
-*                                                                           *
-*    Argin : - A pointer to the structure with the contents of one          *
-*	       database tuple.						    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
+/**
+ * check if the family part of the filter is the same as the family part of the 
+ * device name retrieved from the database
+ * 
+ * @param dev1 
+ * @param family
+ * @param member 
+ * @param prot
+ *
+ * @return 
+ */
 char* NdbmServer::fam_fil(device *dev1, const std::string &family, const std::string &member, int prot) throw (int)
 {
 	std::string 	tmp(dev1->d_name);
@@ -318,25 +286,16 @@ char* NdbmServer::fam_fil(device *dev1, const std::string &family, const std::st
 	throw int(0);
 }
 
-/****************************************************************************
-*                                                                           *
-*		Code for memb_fil function                                  *
-*                        --------                                           *
-*                                                                           *
-*    Function rule : To check if the member part of the filter is the same  *
-*		     than the member part of the device name retrieved from *
-*		     the database. If yes, this device name must be         *
-*		     returned to the caller				    *
-*                                                                           *
-*    Argin : - A pointer to the structure with the contents of one          *
-*	       database tuple.						    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
+/**
+ * check if the member part of the filter is the same as the member part of the device 
+ * name retrieved from the database. If yes, this device name must be returned to the caller
+ * 
+ * @param dev2 
+ * @param member
+ * @param prot	
+ *
+ * @return 
+ */
 char *NdbmServer::memb_fil(device *dev2, const std::string &member, int prot) throw (int)
 {
 	std::string 		tmp(dev2->d_name);
@@ -389,24 +348,15 @@ char *NdbmServer::memb_fil(device *dev2, const std::string &member, int prot) th
 	return p;
 }
 
-/****************************************************************************
-*                                                                           *
-*		Code for stringOK function                                  *
-*                        --------                                           *
-*                                                                           *
-*    Function rule : To check if a string is the same than a wanted string  *
-*		     This function allow the caller to have ONE wildcard '*'*
-*		     in the wanted string.				    *
-*                                                                           *
-*    Argin : - A pointer to the wanted string				    *
-*   	     - A pointer to the string to be compared			    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if the string in the same than the wanted one  *
-*    Otherwise, this function returns 1					    *
-*                                                                           *
-****************************************************************************/
+/**
+ * check if a string is the same than a wanted string This function allow the 
+ * caller to have ONE wildcard '*' in the wanted string.
+ *
+ * @param wanted the wanted string
+ * @param retrieved the string to be compared
+ * 
+ * @return 0 if the string in the same than the wanted one Otherwise, this function returns 1
+ */
 bool NdbmServer::stringOK(const std::string wanted, const std::string retrieved)
 {
 //

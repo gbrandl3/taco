@@ -3,21 +3,13 @@
 #include <algorithm>
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the devinfo_1_svc function       	   	    *
-*                           -------------                       	    *
-*                                                                           *
-*    Method rule : To return device information 			    *
-*                                                                           *
-*    Argin : - dev : The device name					    *
-*                                                                           *
-*    Argout : - No argout						    *
-*                                                                           *
-*    This function returns a pointer to a structure with all device info    *
-*    and an error code which is set if needed				    *
-*                                                                           *
-****************************************************************************/
+/**
+ * retrieve the  device information from the database for a given device
+ *
+ * @param dev The device name
+ *
+ * @return a pointer to a structure with all device info and an error code which is set if needed
+ */
 db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
 {
     std::string user_device(*dev);
@@ -195,21 +187,13 @@ db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
 
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the devres_1_svc function 	    	    	    *
-*                           ------------                     	    	    *
-*                                                                           *
-*    Method rule : To retrieve all resources belonging to a device	    *
-*                                                                           *
-*    Argin : - name : The device name				    	    *
-*                                                                           *
-*    Argout : No argout							    *
-*                                                                    	    *
-*    This function returns the resource list and an error code which is set *
-*    if needed								    *
-*                                                                           *
-****************************************************************************/
+/**
+ * retrieve all resources belonging to a device
+ * 
+ * @param recev The device name
+ *
+ * @return the resource list and an error code which is set if needed
+ */
 db_res *MySQLServer::devres_1_svc(db_res *recev)
 {
     std::string 		fam,
@@ -344,20 +328,13 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the devdel_1_svc function       	   	    *
-*                           ------------                       	    	    *
-*                                                                           *
-*    Method rule : To delete a device from the database			    *
-*                                                                           *
-*    Argin : - dev : The device name					    *
-*                                                                           *
-*    Argout : No argout			    				    *
-*                                                                           *
-*    This function returns a pointer to an error code			    *
-*                                                                           *
-****************************************************************************/
+/**
+ * delete a device from the database
+ *
+ * @param dev The device name
+ *
+ * @return a pointer to an error code
+ */
 DevLong *MySQLServer::devdel_1_svc(nam *dev)
 {
     std::string 	user_device(*dev);
@@ -478,20 +455,13 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
 
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the devdelres_1_svc function       	   	    *
-*                           ---------------                       	    *
-*                                                                           *
-*    Method rule : To delete all the resources belonging to a device	    *
-*                                                                           *
-*    Argin : - dev : The device name					    *
-*                                                                           *
-*    Argout : No argout			    				    *
-*                                                                           *
-*    This function returns a pointer to an error code			    *
-*                                                                           *
-****************************************************************************/
+/**
+ * delete all the resources belonging to a device
+ * 
+ * @param recev The device name
+ * 
+ * @return a pointer to an error code
+ */
 db_psdev_error *MySQLServer::devdelres_1_svc(db_res *recev)
 {
 #ifdef DEBUG
@@ -565,21 +535,11 @@ public:
 };
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the info_1_svc function       	   	    	    *
-*                           ----------                       	    	    *
-*                                                                           *
-*    Method rule : To get global information on the database		    *
-*                                                                           *
-*    Argin : No argin							    *
-*                                                                           *
-*    Argout : No argout			    				    *
-*                                                                           *
-*    This function returns a pointer to a structure with all the database   *
-*    info								    *
-*                                                                           *
-****************************************************************************/
+/**
+ * get global information on the database
+ * 
+ * @return a pointer to a structure with all the database info
+ */
 db_info_svc *MySQLServer::info_1_svc()
 {
     long 			dev_defined = 0,
@@ -761,24 +721,14 @@ db_info_svc *MySQLServer::info_1_svc()
 
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the unreg_1_svc function     	    	    	    *
-*                           -----------                     	    	    *
-*                                                                           *
-*    Method rule : To unregister a server from the database (to mark all its*
-*		   devices as not exported)				    *
-*                                                                           *
-*    Argin : - recev : A pointer to a structure where the first element     *
-*		       is the device server name and the second element     *
-*		       is the device server personal name.		    *
-*                                                                           *
-*    Argout : - No argout						    *
-*                                                                    	    *
-*    This function returns a pointer to a long which will be set in case of *
-*    error								    *
-*                                                                           *
-****************************************************************************/
+/**
+ * unregister a server from the database (to mark all its devices as not exported)
+ * 
+ * @param recev : A pointer to a structure where the first element is the device server 
+ * 	name and the second element is the device server personal name.
+ *
+ * @return a pointer to a long which will be set in case of error
+ */
 long *MySQLServer::unreg_1_svc(db_res *recev)
 {
     std::string 		user_ds_name(recev->res_val.arr1_val[0]),
@@ -890,23 +840,14 @@ typedef struct
     std::string	name;
     int		flag;
 }SvcDev;
-/****************************************************************************
-*                                                                           *
-*	Server code for the svcinfo_1_svc function     	    	    	    *
-*                           -------------                     	    	    *
-*                                                                           *
-*    Method rule : To return device server info to client		    *
-*                                                                           *
-*    Argin : - recev : A pointer to a structure where the first element     *
-*		       is the device server name and the second element     *
-*		       is the device server personal name.		    *
-*                                                                           *
-*    argout : - no argout						    *
-*                                                                    	    *
-*    this function returns a pointer to a structure with all the device     *
-*    server information							    *
-*                                                                           *
-****************************************************************************/
+/**
+ * retrieve device server info from the database
+ *
+ * @param recev A pointer to a structure where the first element is the device server 
+ *		name and the second element is the device server personal name.
+ *
+ * @return a pointer to a structure with all the device server information
+ */
 svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 {
     long 		indi,
@@ -1150,24 +1091,14 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the svcdelete_1_svc function     	    	    *
-*                           ---------------                     	    *
-*                                                                           *
-*    Method rule : To return delete all the device belonging to a device    *
-*		   server and if necessary also their resources		    *
-*                                                                           *
-*    Argin : - recev : A pointer to a structure where the first element     *
-*		       is the device server name and the second element     *
-*		       is the device server personal name.		    *
-*                                                                           *
-*    Argout : - No argout						    *
-*                                                                    	    *
-*    This function returns a pointer to a structure with all the device     *
-*    server information							    *
-*                                                                           *
-****************************************************************************/
+/**
+ * delete all the device belonging to a device server and if necessary also their resources
+ * 
+ * @param recev A pointer to a structure where the first element is the device server name and 
+ * 	the second element is the device server personal name.
+ *
+ * @return a pointer to a structure with all the device server information
+ */
 long *MySQLServer::svcdelete_1_svc(db_res *recev)
 {
     std::string 		user_ds_name(recev->res_val.arr1_val[0]),
@@ -1315,20 +1246,13 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
 }
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the getpoller_1_svc function       	   	    *
-*                           ---------------                       	    *
-*                                                                           *
-*    Method rule : To retrieve poller info from a device name	    	    *
-*                                                                           *
-*    Argin : - dev : The device name					    *
-*                                                                           *
-*    Argout : No argout			    				    *
-*                                                                           *
-*    This function returns a pointer to an error code			    *
-*                                                                           *
-****************************************************************************/
+/**
+ * retrieve poller info from a device name
+ *
+ * @param dev The device name
+ *
+ * @return a pointer to an error code
+ */
 db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
 {
     std::string 	poller_name,

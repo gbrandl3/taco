@@ -3,20 +3,11 @@
 #include <MySqlServer.h>
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the resdomainlist_1_svc function     	    	    *
-*                           -------------------                     	    *
-*                                                                           *
-*    Method rule : To retrive resource domain list for all the resources    *
-*		   defined in the database				    *
-*                                                                           *
-*    Argin : No argin							    *
-*                                                                           *
-*    Argout : domain_list : The domain name list 			    *
-*                                                                           *                                                          *
-*                                                                           *
-****************************************************************************/
+/**
+ * retrieve resource domain list for all the resources defined in the database
+ *
+ * @return The domain name list
+ */
 db_res *MySQLServer::resdomainlist_1_svc()
 {
     std::vector<std::string> 	dom_list;
@@ -80,20 +71,13 @@ db_res *MySQLServer::resdomainlist_1_svc()
 }
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the resfamilylist_1_svc function     	   	    *
-*                           -------------------                     	    *
-*                                                                           *
-*    Method rule : To retrieve all the family defined (in resources name)   *
-*		   for a specific domain				    *
-*                                                                           *
-*    Argin : - domain : The domain name					    *
-*                                                                           *
-*    Argout : - family_list : The family name list 			    *
-*                                                                           * 
-*                                                                           *
-****************************************************************************/
+/**
+ * retrieve all the families defined (in resources name) for a specific domain
+ *
+ * @param domain The domain name
+ * 
+ * @return The family name list
+ */
 db_res *MySQLServer::resfamilylist_1_svc(nam* domain)
 {
     std::vector<std::string> 	fam_list;
@@ -175,26 +159,18 @@ db_res *MySQLServer::resfamilylist_1_svc(nam* domain)
 }
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the resmemberlist_1_svc function 	    	    *
-*                           -------------------                     	    *
-*                                                                           *
-*    Method rule : To retrieve all the family defined (in resources name)   *
-*		   for a specific couple domain,family			    *
-*                                                                           *
-*    Argin : - domain : The domain name					    *
-*	     - family : The family name					    *
-*                                                                           *
-*    Argout : - member_list : The member name list			    *
-*                                                                           *
-*                                                                           *
-****************************************************************************/
+/**
+ * retrieve all the members defined (in resources name) for a specific couple domain,family
+ *
+ * @param recev The domain name, the family name
+ * 
+ * @return The member name list
+ */
 db_res *MySQLServer::resmemberlist_1_svc(db_res *recev)
 {
     std::vector<std::string> 	memb_list;
     std::string 		user_domain(recev->res_val.arr1_val[0]),
-     			user_family(recev->res_val.arr1_val[1]);
+  	   			user_family(recev->res_val.arr1_val[1]);
 	
 #ifdef DEBUG
     std::cout << "In resmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << std::endl;
@@ -272,21 +248,13 @@ db_res *MySQLServer::resmemberlist_1_svc(db_res *recev)
 }
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the resresolist_1_svc function 	    	    	    *
-*                           -----------------                     	    *
-*                                                                           *
-*    Method rule : To retrieve a list of resources for a given device	    *
-*                                                                           *
-*    Argin : - domain : The device domain name				    *
-*	     - family : The device family name				    *
-*	     - member : The device member name				    *
-*                                                                           *
-*    Argout : - member_list : The member name list			    *
-*                                                                    	    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To retrieve a list of resources for a given device
+ *
+ * @param recev The device domain name, the device family name, the device member name
+ *
+ * @return The member name list
+ */
 db_res *MySQLServer::resresolist_1_svc(db_res *recev)
 {
     std::vector<std::string> 	reso_list;
@@ -381,22 +349,14 @@ db_res *MySQLServer::resresolist_1_svc(db_res *recev)
     return(&browse_back);	
 }
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the resresoval_1_svc function     	    	    *
-*                           ----------------                     	    *
-*                                                                           *
-*    Method rule : To retrieve a resource value (as strings)		    *
-*                                                                           *
-*    Argin : - domain : The device domain name				    *
-*	     - family : The device family name				    *
-*	     - member : The device member name				    *
-*	     - resource : The resource name				    *
-*                                                                           *
-*    Argout : - member_list : The member name list			    *
-*                                                                    	    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To retrieve a device resource value (as strings)
+ *
+ * @param recev The device domain name, the device family name, the device member name,
+ *	the resource name
+ * 
+ * return the resource value list
+ */
 db_res *MySQLServer::resresoval_1_svc(db_res *recev)
 {
     std::string 		res_val;

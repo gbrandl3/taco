@@ -1,28 +1,13 @@
 #include <MySqlServer.h>
 
 
-/****************************************************************************
-*                                                                           *
-*		Server code for db_event_query function                     *
-*                               ------------                                *
-*                                                                           *
-*    Function rule : To retrieve (from database) the command code           *
-*		     associated to a command name (the string)		    *
-*                                                                           *
-*    Argin : A pointer to string which is the command name		    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a structure of the "event_que" type *
-*    The definition of this structure is :                                  *
-*    struct {                                                               *
-*      int db_err;    The database error code                               *
-*                        0 if no error                                      *
-*      unsigned int xevent_code;	The command code.		    *
-*				0 if the database query fails		    *
-*            }                                                              *
-*                                                                           *
-****************************************************************************/
+/**
+ * To retrieve (from database) the event code associated to a event name (the string)
+ * 
+ * @param pevent_name A pointer to string which is the event name
+ * 
+ * @return a pointer to a structure of the event_que type 
+ */
 event_que *MySQLServer::db_event_query_1_svc(nam *pevent_name)
 {
     int 		i;

@@ -7,6 +7,8 @@
 
 #include "dbClass.h"
 
+/**@ingroup dbServerClasses
+ */
 class NdbmServer : public DBServer
 {
 private:
@@ -84,7 +86,6 @@ public:
 	virtual DevLong		*svcdelete_1_svc(db_res *);
 	virtual db_psdev_error	*upddev_1_svc(db_res *);
 	virtual db_psdev_error	*updres_1_svc (db_res *);
-	virtual db_res		*secpass_1_svc(void);
 	virtual db_poller_svc	*getpoller_1_svc(nam *);
 };
 

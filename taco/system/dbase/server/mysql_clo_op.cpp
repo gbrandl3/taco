@@ -3,22 +3,11 @@
 #include <algorithm>
 
 
-/****************************************************************************
-*                                                                           *
-*		Server code for dbm_close function                          *
-*                               --------                                    *
-*                                                                           *
-*    Function rule : To close the database to be able to reload a new       *
-*		     database.						    *
-*                                                                           *
-*    Argin :  No argin							    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to an integer. This integer is simply  *
-*    an error code (0 if no error).					    * 
-*                                                                           *
-****************************************************************************/
+/**
+ * close the database to be able to reload a new database.
+ *
+ * @return a pointer to an integer. This integer is simply an error code (0 if no error).
+ */
 DevLong *MySQLServer::db_clodb_1_svc(void)
 {
     errcode = 0;
@@ -45,24 +34,12 @@ DevLong *MySQLServer::db_clodb_1_svc(void)
     return(&errcode);
 }
 
-/****************************************************************************
-*                                                                           *
-*		Server code for dbm_reopendb function                       *
-*                               ------------                                *
-*                                                                           *
-*    Function rule : Reopen the database after it has been updated by a     *
-*		     dbm_update command in a single user mode or after      *
-*		     the rebuilding from a backup file.			    *
-*									    *
-*                                                                           *
-*    Argin :  No argin							    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to an integer. This integer is simply  *
-*    an error code (0 if no error).					    * 
-*                                                                           *
-****************************************************************************/
+/**
+ * Reopen the database after it has been updated by a dbm_update command in a 
+ * single user mode or after the rebuilding from a backup file.
+ * 
+ * @returns a pointer to an integer. This integer is simply an error code (0 if no error).
+ */
 DevLong *MySQLServer::db_reopendb_1_svc(void)
 {
 #ifdef DEBUG

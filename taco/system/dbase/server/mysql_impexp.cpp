@@ -1,29 +1,14 @@
 #include <MySqlServer.h>
 
 
-/****************************************************************************
-*                                                                           *
-*		Server code for db_dev_export version 1 function            *
-*                               -----------------------                     *
-*                                                                           *
-*    Function rule : To store in the database (builded from resources files)*
-*                    the host_name, the program number and the version      *
-*                    number of the device server for a specific device      *
-*                                                                           *
-*    Argin : A pointer to a structure of the "tab_dbdev" type               *
-*            The definition of the tab_dbdev type is :                      *
-*            struct {                                                       *
-*              u_int tab_dbdev_len;     The number of structures bm_devinfo *
-*              bm_devinfo *tab_dbdev_val;    A pointer to the array of      *
-*					     structures                     *
-*                  }                                                        *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns an integer which is an error code                *
-*         Zero means no error                                               * 
-*                                                                           *
-*****************************************************************************/
+/**
+ * To store in the database (built from resources files) the host_name, the program 
+ * number and the version number of the device server for a specific device
+ * 
+ * @param rece A pointer to a structure of the tab_dbdev type 
+ *
+ * @return an integer which is an error code. Zero means no error
+ */
 DevLong *MySQLServer::db_devexp_1_svc(tab_dbdev *rece)
 {
     u_int 	num_dev = rece->tab_dbdev_len;;
@@ -67,30 +52,14 @@ DevLong *MySQLServer::db_devexp_1_svc(tab_dbdev *rece)
     return(&errcode);
 }
 
-/****************************************************************************
-*                                                                           *
-*		Server code for db_dev_export version 2 function            *
-*                               -----------------------                     *
-*                                                                           *
-*    Function rule : To store in the database (builded from resources files)*
-*                    the host_name, the program number, the version         *
-*                    number and the process ID of the device server for a   *
-*                    specific device      				    *
-*                                                                           *
-*    Argin : A pointer to a structure of the "tab_dbdev" type               *
-*            The definition of the tab_dbdev type is :                      *
-*            struct {                                                       *
-*              u_int tab_dbdev_len;     The number of structures bm_devinfo *
-*              bm_devinfo *tab_dbdev_val;    A pointer to the array of      *
-*					     structures                     *
-*                  }                                                        *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns an integer which is an error code                *
-*    Zero means no error                                                    * 
-*                                                                           *
-*****************************************************************************/
+/**
+ * store in the database (built from resources files) the host_name, the program number, 
+ * the version number and the process ID of the device server for a specific device
+ * 
+ * @param rece A pointer to a structure of the tab_dbdev_2 type
+ * 
+ * @return an integer which is an error code. Zero means no error
+ */
 DevLong *MySQLServer::db_devexp_2_svc(tab_dbdev_2 *rece)
 {
     u_int 	num_dev = rece->tab_dbdev_len;;
@@ -138,30 +107,14 @@ DevLong *MySQLServer::db_devexp_2_svc(tab_dbdev_2 *rece)
     return(&errcode);
 }
 
-/****************************************************************************
-*                                                                           *
-*		Server code for db_dev_export version 3 function            *
-*                               -----------------------                     *
-*                                                                           *
-*    Function rule : To store in the database (builded from resources files)*
-*                    the host_name, the program number, the version         *
-*                    number and the process ID of the device server for a   *
-*                    specific device      				    *
-*                                                                           *
-*    Argin : A pointer to a structure of the "tab_dbdev" type               *
-*            The definition of the tab_dbdev type is :                      *
-*            struct {                                                       *
-*              u_int tab_dbdev_len;     The number of structures bm_devinfo *
-*              bm_devinfo *tab_dbdev_val;    A pointer to the array of      *
-*					     structures                     *
-*                  }                                                        *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns an integer which is an error code                *
-*    Zero means no error                                                    * 
-*                                                                           *
-*****************************************************************************/
+/**
+ * To store in the database (built from resources files) the host_name, the program number, 
+ * the version number and the process ID of the device server for a specific device 
+ * 
+ * @param rece A pointer to a structure of the tab_dbdev_3 type
+ *
+ * @return an integer which is an error code. Zero means no error
+ */
 DevLong *MySQLServer::db_devexp_3_svc(tab_dbdev_3 *rece)
 {
     u_int 	num_dev = rece->tab_dbdev_len;
@@ -207,34 +160,14 @@ DevLong *MySQLServer::db_devexp_3_svc(tab_dbdev_3 *rece)
     return(&errcode);
 }
 
-/****************************************************************************
-*                                                                           *
-*		Server code for db_dev_import function                      *
-*                               -------------                               *
-*                                                                           *
-*    Function rule : To retrieve (from database) the host_name, the program *
-*                    number and the version number for specific devices     *
-*                                                                           *
-*    Argin : A pointer to a structure of the "arr1" type                    *
-*            The definition of the arr1 type is :                           *
-*            struct {                                                       *
-*               u_int arr1_len;      The number of strings                  *
-*               char **arr1_val;     A pointer to the array of strings      *
-*                   }                                                       *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a structure of the "db_resimp" type *
-*    The definition of this structure is :                                  *
-*    struct {                                                               *
-*      tab_dbdev imp_dev;   A structure of the tab_dbdev type (see above)   *
-*                           with the informations needed (host_name,        *
-*                           program number and version number)              *
-*      int db_imperr;    The database error code                            *
-*                        0 if no error                                      *
-*            }                                                              *
-*                                                                           *
-****************************************************************************/
+/**
+ * To retrieve (from database) the host_name, the program number and the version 
+ * number for specific devices
+ *
+ * @param de_name A pointer to a structure of the arr1 type 
+ * 
+ * @return a pointer to a structure of the db_resimp type
+ */
 db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
 {
     int 	resu,
@@ -399,24 +332,13 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
     return(&back);
 }
 
-/****************************************************************************
-*                                                                           *
-*		Server code for db_svc_unreg function                       *
-*                               ------------                                *
-*                                                                           *
-*    Function rule : To unregister from database all the devices driven by  *
-*                    a device server                                        *
-*                                                                           *
-*    Argin : The network device server name                                 *
-*            The definition of the nam type is :                            *
-*            typedef char *nam;                                             *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns an int which is an error code                    *
-*       Zero means no error                                                 *
-*                                                                           *
-****************************************************************************/
+/**
+ * unregister from database all the devices driven by a device server 
+ * 
+ * @param dsn_name  The network device server name 
+ *
+ * @return an int which is an error code. Zero means no error 
+ */
 DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
 {
     int 		d_num = 0;
@@ -529,30 +451,13 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
     return(&errcode);
 }
 
-/****************************************************************************
-*                                                                           *
-*		Server code for db_svc_check function                       *
-*                               ------------                                *
-*                                                                           *
-*    Function rule : To retrieve (and send back to client) the program      *
-*                    number and version number for a device server          *
-*                                                                           *
-*    Argin : The network device server name                                 *
-*            The definition of the nam type is :                            *
-*            typedef char *nam;                                             *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a stucture of the "svc_inf" type    *
-*    The definition of this structure is :                                  *
-*    struct {                                                               *
-*	char *ho_name;  host name					    *	
-*   	u_int p_num;	the program number                                  *
-*       u_int v_num;    the version number                                  *
-*       int db_err;     an error code (0 if no error)                       *
-*           }                                                               *
-*                                                                           *
-****************************************************************************/
+/**
+ * retrieve (and send back to client) the program number and version number for a device server 
+ * 
+ * @param dsn_name The network device server name 
+ *
+ * @return a pointer to a stucture of the svc_inf type
+ */
 svc_inf *MySQLServer::db_svcchk_1_svc(nam *dsn_name)
 {
     static char 	host_name[HOST_NAME_LENGTH];
@@ -643,24 +548,15 @@ svc_inf *MySQLServer::db_svcchk_1_svc(nam *dsn_name)
     return(&svc_info);
 }
 
-/****************************************************************************
-*                                                                           *
-*		Code for db_store function                                  *
-*                        --------                                           *
-*                                                                           *
-*    Function rule : To store in the NAMES table of the database the        *
-*                    number and the version number of the device server     *
-*                    in charge of a device                                  *
-*                                                                           *
-*    Argin : - A db_devinf structure (with device name, host name, program  *
-*              number and version number)                                   *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
+/**
+ * store in the database the  number and the version number of the device server 
+ * in charge of a device
+ * 
+ * @param dev_stu A db_devinf structure (with device name, host name, program 
+ *              number and version number)
+ *
+ * @return 0 if no errors occurs or the error code when there is a problem. 
+ */
 int MySQLServer::db_store(db_devinfo &dev_stu)
 {
 //
@@ -710,24 +606,15 @@ int MySQLServer::db_store(db_devinfo &dev_stu)
 	return DS_OK;
 }
 
-/****************************************************************************
-*                                                                           *
-*		Code for db_store function                                *
-*                        ----------                                         *
-*                                                                           *
-*    Function rule : To store in the NAMES table of the database the        *
-*                    number and the version number of the device server     *
-*                    in charge of a device                                  *
-*                                                                           *
-*    Argin : - A db_devinf structure (with device name, host name, program  *
-*              number and version number)                                   *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To store in the database the number and the version number of the device server
+ * in charge of a device 
+ * 
+ * @param dev_stu A db_devinf_2 structure (with device name, host name, program 
+ *              number and version number)
+ *
+ * @return 0 if no errors occurs or the error code when there is a problem. 
+ */
 int MySQLServer::db_store(db_devinfo_2 &dev_stu)
 {
 //
@@ -778,26 +665,15 @@ int MySQLServer::db_store(db_devinfo_2 &dev_stu)
     return DS_OK;
 }
 
-/****************************************************************************
-*                                                                           *
-*		Code for db_store function                                *
-*                        ----------                                         *
-*                                                                           *
-*    Function rule : To store in the NAMES table of the database the        *
-*                    number and the version number of the device server     *
-*                    in charge of a device                                  *
-*		     This function is for the version 3 of the db_dev_export*
-*		     call						    *
-*                                                                           *
-*    Argin : - A db_devinf structure (with device name, host name, program  *
-*              number, version number and process name)                     *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
+/**
+ * store in the database the number and the version number of the device server 
+ * in charge of a device. This function is for the version 3 of the db_store call
+ * 
+ * @param dev_stu A db_devinf_3 structure (with device name, host name, program 
+ *              number, version number and process name)
+ *
+ * @return 0 if no errors occurs or the error code when there is a problem.
+ */
 int MySQLServer::db_store(db_devinfo_3 &dev_stu)
 {
 //

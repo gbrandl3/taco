@@ -3,20 +3,11 @@
 
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the devdomainlist_1_svc function       	   	    *
-*                           -------------------                       	    *
-*                                                                           *
-*    Method rule : To device domain list for all the device name defined    *
-*		   in the NAMES and PS_NAMES tables			    *
-*                                                                           *
-*    Argin : No argin							    *
-*                                                                           *
-*    Argout : domain_list : The domain name list 			    *
-*                                                                           *
-*                                                                           *
-****************************************************************************/
+/**
+ * list the domains for all the devices defined in the database 
+ *
+ * @return The domain name list
+ */
 db_res *MySQLServer::devdomainlist_1_svc(void)
 {
     std::vector<std::string>	dom_list;
@@ -108,20 +99,13 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
     return(&browse_back);
 }
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the devfamilylist_1_svc function    	    	    *
-*                           -------------------                    	    *
-*                                                                           *
-*    Method rule : To device family list for all the device defined in the  *
-*		   NAMES and PS_NAMES tables for a given domain		    *
-*                                                                           *
-*    Argin : - domain : The domain name					    *
-*                                                                           *
-*    Argout : - family_list : The family name list 			    *
-*                                                                           * 
-*                                                                           *
-****************************************************************************/
+/**
+ * list all families for all the devices defined in the database for a given domain
+ *
+ * @param domain The domain name
+ *
+ * @return The family name list
+ */
 db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
 {
     std::string		user_domain(*domain);
@@ -219,21 +203,13 @@ db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
     return(&browse_back);	
 }
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the devmemberlist_1_svc fucntion 	    	    *
-*                           -------------------                     	    *
-*                                                                           *
-*    Method rule : To device member list for all the device defined in the  *
-*		   NAMES and PS_NAMES tables for a given domain and family  *
-*                                                                           *
-*    Argin : - domain : The domain name					    *
-*	     - family : The family name					    *
-*                                                                           *
-*    Argout : - member_list : The member name list			    *
-*                                                                           *
-*                                                                           *
-****************************************************************************/
+/**
+ * list all members for all the devices defined in the database for a given domain and family 
+ * 
+ * @param recev The domain name, the family name
+ * 
+ * @return The member name list
+ */
 db_res *MySQLServer::devmemberlist_1_svc(db_res *recev)
 {
     std::vector<std::string> memb_list;

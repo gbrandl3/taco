@@ -2,20 +2,11 @@
 #include <MySqlServer.h>
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the devserverlist_1_svc function       	   	    *
-*                           -------------------                       	    *
-*                                                                           *
-*    Method rule : To retrieve device server list for all the devices       *
-*		   defined in the NAMES table			  	    *
-*                                                                           *
-*    Argin : No argin							    *
-*                                                                           *
-*    Argout : domain_list : The domain name list 			    *
-*                                                                           *
-*                                                                           *
-****************************************************************************/
+/**
+ * retrieve device server list for all the devices defined in the database
+ *
+ * @return The domain name list
+ */
 db_res *MySQLServer::devserverlist_1_svc()
 {
     std::string 		server;
@@ -100,20 +91,13 @@ db_res *MySQLServer::devserverlist_1_svc()
 }
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the devpersnamelist_1_svc function    	    	    *
-*                           ---------------------                    	    *
-*                                                                           *
-*    Method rule : To device family list for all the device defined in the  *
-*		   NAMES and PS_NAMES tables for a given domain		    *
-*                                                                           *
-*    Argin : - domain : The domain name					    *
-*                                                                           *
-*    Argout : - family_list : The family name list 			    *
-*                                                                           * 
-*                                                                           *
-****************************************************************************/
+/*
+ * list the families for all the devices defined in the database for a given domain
+ * 
+ * @param domain The domain name
+ * 
+ * @param The family name list
+ */
 db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
 {
     std::string 		user_server(*server);
@@ -200,21 +184,12 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
     return(&browse_back);	
 }
 
-
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the hostlist_1_svc function       	   	    *
-*                           --------------                       	    *
-*                                                                           *
-*    Method rule : To device host list where device server should run       *		   in the NAMES table			  		    *
-*                                                                           *
-*    Argin : No argin							    *
-*                                                                           *
-*    Argout : domain_list : The domain name list 			    *
-*                                                                           *
-*                                                                           *
-****************************************************************************/
+/**
+ * list all hosts where device servers should run 
+ *
+ * @return The host name list
+ */
 db_res *MySQLServer::hostlist_1_svc()
 {
 	std::vector<std::string>	host_list;

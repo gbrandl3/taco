@@ -3,21 +3,13 @@
 #include <MySqlServer.h>
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the upddev_1_svc function       	   	    *
-*                           ------------                       	    	    *
-*                                                                           *
-*    Method rule : To update device list(s)				    *
-*                                                                           *
-*    Argin : - dev : The device name					    *
-*                                                                           *
-*    Argout : - No argout						    *
-*                                                                           *
-*    This function returns a pointer to a structure with all device info    *
-*    and an error code which is set if needed				    *
-*                                                                           *
-****************************************************************************/
+/**
+ * update device lists for device servers
+ *
+ * @param dev_list The device name lists
+ *
+ * @return a pointer to a structure with all device info and an error code which is set if needed
+ */
 db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 {
     long 			list_nb = dev_list->res_val.arr1_len;
@@ -198,22 +190,16 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
     return(&psdev_back);
 }
 
-/****************************************************************************
-*                                                                           *
-*		Code for db_update_names function                           *
-*                        ---------------                                    *
-*                                                                           *
-*    Function rule : To update the index in the NAMES table in the database *
-*                                                                           *
-*    Argin : - ds_class : The device class name	contains the DS    	    *
-*	     - ds_name : The personal name				    *
-*	     - ind : The device indice list in the list (starting with 1)   *
-*	     - dev_name : the device name 				    *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
+/**
+ * update the index of devices in the database 
+ *
+ * @param ds_class The device class name contains the DS 
+ * @param ds_name The personal name
+ * @param ind The device index list in the list (starting with 1)
+ * @param dev_name the device name
+ *
+ * @returns 0 if no errors occurs or the error code when there is a problem.
+ */
 long MySQLServer::db_update_names(const std::string ds_class, const std::string ds_name, const int ind, const std::string dev_name)
 {
     if (count(dev_name.begin(), dev_name.end(), '/') != 2)
@@ -255,23 +241,16 @@ long MySQLServer::db_update_names(const std::string ds_class, const std::string 
     }
 }
 
-/****************************************************************************
-*                                                                           *
-*		Code for db_delete_names function                           *
-*                        ---------------                                    *
-*                                                                           *
-*    Function rule : To delete (in the database) a device for a      	    *
-*                    specific device server.                                *
-*                                                                           *
-*    Argin : - ds_class : The device class name	contains the DS    	    *
-*	     - ds_name : The personal name				    *
-*	     - ind : The device indice list in the list (starting with 1)   *
-*	     - dev_name : the device name 				    *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
+/**
+ * delete (in the database) a device for a specific device server. 
+ *
+ * @param ds_class The device class name contains the DS
+ * @param ds_name The personal name
+ * @param ind The device indice list in the list (starting with 1)
+ * @param dev_name the device name
+ *
+ * @return 0 if no errors occurs or the error code when there is a problem. 
+ */
 long MySQLServer::db_delete_names(const std::string ds_class, const std::string ds_name, const int ind, const std::string dev_name)
 {
     if (count(dev_name.begin(), dev_name.end(), '/') != 2)
@@ -299,22 +278,16 @@ long MySQLServer::db_delete_names(const std::string ds_class, const std::string 
 	return DbErr_DeviceNotDefined;
 }
 
-/****************************************************************************
-*                                                                           *
-*		Code for db_insert_names function                           *
-*                        ---------------                                    *
-*                                                                           *
-*    Function rule : To insert a new device in the NAMES table              *
-*                                                                           *
-*    Argin : - ds_class : The device class name	contains the DS    	    *
-*	     - ds_name : The personal name				    *
-*	     - ind : The device indice list in the list (starting with 1)   *
-*	     - dev_name : the device name 				    *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
+/**
+ * insert a new device in the database
+ *
+ * @param ds_class The device class name contains the DS
+ * @param ds_name The personal name
+ * @param ind The device indice list in the list (starting with 1)
+ * @param dev_name the device name
+ *
+ * @return 0 if no errors occurs or the error code when there is a problem. 
+ */
 long MySQLServer::db_insert_names(const std::string ds_class, const std::string ds_name, const int ind, const std::string dev_name)
 {
     std::stringstream query;
@@ -374,21 +347,13 @@ long MySQLServer::db_insert_names(const std::string ds_class, const std::string 
 }
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the updres_1_svc function       	   	    *
-*                           ------------                       	    	    *
-*                                                                           *
-*    Method rule : To update resource(s)				    *
-*                                                                           *
-*    Argin : - dev : The device name					    *
-*                                                                           *
-*    Argout : - No argout						    *
-*                                                                           *
-*    This function returns a pointer to a structure with all device info    *
-*    and an error code which is set if needed				    *
-*                                                                           *
-****************************************************************************/
+/**
+ * update resources in the database
+ *
+ * @param res_list the list of resources to update
+ *
+ * @return a pointer to a structure with all device info and an error code which is set if needed
+ */
 db_psdev_error *MySQLServer::updres_1_svc(db_res *res_list)
 {
     long 			list_nb = res_list->res_val.arr1_len,
@@ -478,27 +443,17 @@ db_psdev_error *MySQLServer::updres_1_svc(db_res *res_list)
 }
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for upd_res function                                   *
-*                        -------                                            *
-*                                                                           *
-*    Function rule : To update a resource in the appropriate table in       *
-*                    database                                               *
-*                                                                           *
-*    Argin : - A pointer to the modified resource definition (without space *
-*              and tab characters)                                          *
-*            - The number of the resource in the array (one if the resource *
-*              type is not an array)					    *
-*            - A flag to inform the function that this resource is a member *
-*              of an array                                                  *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
+/**
+ * update a resource in the appropriate table in database 
+ *
+ * @param lin the modified resource definition (without space and tab characters)
+ * @param numb The number of the resource in the array (one if the resource 
+ *              type is not an array)
+ * @param array A flag to inform the function that this resource is a member of an array 
+ * @param p_err pointer to the error code 
+ *
+ * @return 0 if no errors occurs or the error code when there is a problem.
+ */
 long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
 {
     unsigned int 	diff;
@@ -659,86 +614,3 @@ long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
 	return DS_OK;
 }
 
-
-
-/****************************************************************************
-*                                                                           *
-*	Server code for the secpass_1_svc function       	   	    *
-*                           -------------                       	    *
-*                                                                           *
-*    Method rule : To device domain list for all the device name defined    *
-*		   in the NAMES and PS_NAMES tables			    *
-*                                                                           *
-*    Argin : No argin							    *
-*                                                                           *
-*    Argout : domain_list : The domain name list 			    *
-*                                                                           *
-*                                                                           *
-****************************************************************************/
-db_res *MySQLServer::secpass_1_svc()
-{
-    char pass[80];
-	
-#ifdef DEBUG
-    std::cout << "In secpass_1_svc function" << std::endl;
-#endif
-
-//
-// Initialize structure sent back to client
-//
-    browse_back.db_err = 0;
-    browse_back.res_val.arr1_len = 0;
-    browse_back.res_val.arr1_val = NULL;
-    pass[0] = '\0';
-//
-// Build security file name
-//
-	std::string f_name;
-        if (getenv("SEC_DIR") != NULL)
-        {
-        	f_name = (char *)getenv("SEC_DIR");
-	}
-        else
-	{
-		f_name = (char *)getenv("HOME");
-	}
-
-	f_name.append("/.sec_pass");	
-//
-// Try to open the file
-//
-    std::ifstream f(f_name.c_str());
-    if (!f)
-    {
-	browse_back.db_err = DbErr_NoPassword;
-	return(&browse_back);
-    }
-//
-// Get password
-//
-    f.getline(pass, sizeof(pass) - 1);
-    if (strlen(pass) == 0)
-    {
-	browse_back.db_err = DbErr_NoPassword;
-	return(&browse_back);
-    }
-//
-// Init data sent back to client 
-//	
-    try
-    {
-	browse_back.res_val.arr1_val = new nam[1];
-	browse_back.res_val.arr1_val[0] = new char [strlen(pass) + 1];
-	strcpy(browse_back.res_val.arr1_val[0], pass);
-    }
-    catch (std::bad_alloc)
-    {
-	browse_back.db_err = DbErr_ServerMemoryAllocation;
-	return(&browse_back);
-    }
-    browse_back.res_val.arr1_len = 1;
-//
-// Return data
-//
-    return(&browse_back);
-}
