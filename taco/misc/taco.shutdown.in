@@ -1,0 +1,30 @@
+#!/bin/sh -v
+# taco.shutdown - shutdown TACO manager + database
+#
+
+environ()
+{
+# setup TACO environment variables
+	prefix=${DSHOME:-@prefix@}
+	exec_prefix=@exec_prefix@
+	if test -f @sysconfdir@/tacoenv.sh ; then
+		. @sysconfdir@/tacoenv.sh
+	else
+		. @templatedir@/tacoenv.sh
+	fi
+
+	echo "You are working on host $HOSTNAME machine -"
+	echo ""
+	echo "DSHOME 		= $DSHOME"
+	echo "DBM_DIR		= $DBM_DIR"
+	echo "RES_BASE_DIR	= $RES_BASE_DIR"
+	echo "DBTABLES	= $DBTABLES"
+	echo ""
+	echo "PATH = $PATH"
+}
+
+#
+#  Here is the heart of the script:
+#
+environ
+@sbindir@/off Manager
