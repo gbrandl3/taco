@@ -125,27 +125,18 @@ fi
 
 %files -f @PACKAGE@.txt
 %defattr(-,root,root)
-@prefix@/doc/index.html
 @prefix@/templates/taco/taco
 @prefix@/templates/taco/tacoenv.sh
-%config(noreplace) @prefix@/etc/.taco_env
-%config(noreplace) @prefix@/etc/.taco.csh
-%config(noreplace) @prefix@/etc/taco.shutdown
-%config(noreplace) @prefix@/etc/taco.startup
-%config(noreplace) @prefix@/etc/taco.startup.sec
-%config @prefix@/dbase/res/SYS/README
-%config @prefix@/dbase/res/SEC/README
-%config(noreplace) @prefix@/dbase/res/SEC/sec_frm.res
-%config @prefix@/dbase/res/CMDS/README
+%config(noreplace) @prefix@/system/bin/@taco_install_path@/taco.shutdown
+%config(noreplace) @prefix@/system/bin/@taco_install_path@/taco.startup
+%config(noreplace) @prefix@/system/bin/@taco_install_path@/taco.startup.sec
+%config(noreplace) @prefix@/dbase/res/SEC/sec_auth.res
 %config @prefix@/dbase/res/CMDS/dev_cmds.res
-%config @prefix@/dbase/res/NAMES/README
-%config @prefix@/dbase/res/PS_NAMES/README
-%config @prefix@/dbase/res/ERROR/README
 %config @prefix@/dbase/res/ERROR/dev_errors.res
-%config @prefix@/dbase/res/CLASS/README
-%config @prefix@/dbase/res/CLASS/Inst_verify.res
-%config @prefix@/dbase/res/EVENTS/README
-%doc INSTALL doc/TACO.pdf doc/README
+%config @prefix@/dbase/res/ERROR/db_errors.res
+%config @prefix@/dbase/res/TEST/Inst_verify.res
+%config @prefix@/dbase/res/CLASS/Inst_verify_class.res
+# %doc INSTALL doc/TACO.pdf doc/README doc/index.html
 @prefix@/bin/@taco_install_path@/db_fillup
 @prefix@/bin/@taco_install_path@/db_update
 @prefix@/bin/@taco_install_path@/db_read
@@ -177,7 +168,7 @@ Provides: taco-x-apps
 %defattr(-,root,root)
 @prefix@/bin/@taco_install_path@/greta
 @prefix@/bin/@taco_install_path@/xdevmenu
-@prefix@/bin/@taco_install_path@/S_Alarm
+@prefix@/system/bin/@taco_install_path@/S_Alarm
 @appdefaultdir@/GReta
 @appdefaultdir@/XDevmenu
 
