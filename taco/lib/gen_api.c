@@ -12,9 +12,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.6 $
+ Version    :	$Revision: 1.7 $
 
- Date       : 	$Date: 2004-03-05 17:02:14 $
+ Date       : 	$Date: 2004-03-09 09:35:50 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -238,11 +238,11 @@ char *DS_display, long *error)
 	NETHOST:/DSHOME/api/error/hostname_program-number
    @endverbatim
  * where 
- * @li NETHOST - the device server system host
- * @li DSHOME  - the device server system directory on NETHOST
- * @li hostname - the name of the host where the server is running.
- * @li prog_number - the program number of the registered service.
- * If no message service is imported, all error messages are sent to @stderr and printed on the terminal.
+ * 	- NETHOST the device server system host
+ * 	- DSHOME the device server system directory on NETHOST
+ * 	- li hostname the name of the host where the server is running.
+ * 	- prog_number the program number of the registered service.
+ * If no message service is imported, all error messages are sent to @c stderr and printed on the terminal.
  *
  * The mode parameter indicates, how to handle the error message buffer. Single messages can only be 256
  * characters long. To printout longer messages, short strings can be buffered and printed later as a text.
@@ -376,11 +376,12 @@ _DLLFunc void dev_printerror (DevShort mode,char *fmt, char *str)
 	NETHOST:/DSHOME/api/error/hostname_program-number
    @endverbatim
  * where 
- * @li NETHOST - the device server system host
- * @li DSHOME  - the device server system directory on NETHOST
- * @li hostname - the name of the host where the server is running.
- * @li prog_number - the program number of the registered service.
- * If no message service is imported, all error messages are sent to @stderr and printed on the terminal.
+ * 	- NETHOST the device server system host
+ * 	- DSHOME  the device server system directory on NETHOST
+ * 	- hostname the name of the host where the server is running.
+ * 	- prog_number the program number of the registered service.
+ *
+ * If no message service is imported, all error messages are sent to @c stderr and printed on the terminal.
  *
  * The mode parameter indicates, how to handle the error message buffer. Single messages can only be 256
  * characters long. To printout longer messages, short strings can be buffered and printed later as a text.
@@ -417,7 +418,7 @@ void _DLLFunc dev_printerror_no (DevShort mode, char *comment, long dev_errno)
  * if the error is negative. If so it returns a standard error message "negative errors are not supported".
  * Then it checks if the error is one of the kernel errors (e.g. NETHOST not defined, RPC timeout etc) and
  * returns a corresponding error message. Then it checks to see if a dynamic error message was returned by
- * the last @ref dev_put_get(), @ref dev_put(), or @ref dev_putget_asyn() call, if so it returns this error
+ * the last @ref dev_putget(), @ref dev_put(), or @ref dev_putget_asyn() call, if so it returns this error
  * message. If none of the above are trus it searches the TACO database for the (static) error string. If an
  * appropriate error string cannot be found in the database, this function returns a string, indicating the
  * failure. <b>This function allocates memory for the return error string everytime using malloc(3C), it is
@@ -467,7 +468,7 @@ _DLLFunc char * dev_error_str (long dev_errno)
  * @li DSHOME  - the device server system directory on NETHOST
  * @li hostname - the name of the host where the server is running.
  * @li prog_number - the program number of the registered service.
- * If no message service is imported, all error messages are sent to @stderr and printed on the terminal.
+ * If no message service is imported, all error messages are sent to @c stderr and printed on the terminal.
  *
  * Debug strings can be only 256 characters long.
  *
@@ -535,7 +536,7 @@ void _DLLFunc dev_printdebug (long debug_bits, char *fmt, ...)
  * A debug string will be send if one of the debug_bits
  * related to the string is set in the global debug_flag.
  *
- * Debug strings can br only 256 characters long.
+ * Debug strings can be only 256 characters long.
  *
  * @param debug_bits  	debug bits on which to send the information.
  * @param fmt        	format string in printf() style.
@@ -950,7 +951,7 @@ static void msg_clear (_Int msg_type)
 }
 
 /**@ingroup dsAPI
- * import the static database service
+ * imports the static database service
  *
  * @param error Will contain an appropriate error
  *		code if the corresponding call returns a non-zero value.
@@ -1204,16 +1205,13 @@ long _DLLFunc db_import_multi (char *nethost, long *error)
 	return (DS_OK);
 }
 
-/**@ingroup dsAPI
- * gets the necessary configuration information
- * for a static database service and a message
+/**@ingroup internalAPI
+ * This function gets the necessary configuration information for a static database service and a message
  * service from  a network manager.
  *
- * The host of the network manager must be 
- * specified by the environment variable NETHOST.    
+ * The host of the network manager must be specified by the environment variable NETHOST.    
  *
- * @param error Will contain an appropriate error code if the 
- *		corresponding call returns a non-zero value.
+ * @param error Will contain an appropriate error code if the corresponding call returns a non-zero value.
  * 
  * @return  DS_OK or DS_NOTOK
  */
@@ -1430,19 +1428,15 @@ struct _devserver 	*msg_ds,
 
 
 /**@ingroup dsAPI
- * gets the necessary configuration information
- * for a static database service and a message
- * service from  a network manager in a multi-nethost
- * environment.
+ * gets the necessary configuration information for a static database service and a message
+ * service from  a network manager in a multi-nethost environment.
  *
- * The host of the network manager is specified
- * by the nethost_name parameter.    
+ * The host of the network manager is specified by the nethost_name parameter.    
  *
- * @param nethost_name  name of nethost to configure
+ * @param nethost  name of nethost to configure
  *
- * @param error 	Will contain an appropriate error
- * 			code if the corresponding call
- *			returns a non-zero value.
+ * @param error Will contain an appropriate error code if the corresponding call
+ *		returns a non-zero value.
  *
  * @return DS_OK or DS_NOTOK
  */
@@ -1726,6 +1720,15 @@ long setup_config_multi (char *nethost, long *error)
 	return (DS_OK);
 }
 
+/**@ingroup dsAPI
+ * This function sets the host given by nethost as the current default nethost. In case of failure
+ * the old nethost will be set.
+ *
+ * @param nethost host name of the new nethost
+ * @param error points to the possible error code, only set if returns DS_NOTOK
+ *
+ * @return DS_OK or DS_NOTOK in case of failure
+ */
 long db_ChangeDefaultNethost(char* nethost,long *error)
 {
 	int i_nethost = get_i_nethost_by_name(nethost,error);
@@ -1763,26 +1766,33 @@ long db_ChangeDefaultNethost(char* nethost,long *error)
 }
 /* Function: */
 
+/**@ingroup internalAPI
+ * Formats the error string with a timestamp. The resulting string contains at
+ * first the time stamp and then the message divided by a blank. The returned
+ * string is malloced and has to be freed by the caller.
+ * 
+ * @param time_stamp time stamp string containing date and time
+ * @param message the error message.
+ * 
+ * @return error string in case of failure NULL
+ */
 static char* format_error_string(const char* time_stamp,const char* message )
 {
-	char * error_str;
-	error_str = (char*)malloc(strlen(time_stamp)+strlen(message)+2);
+	char * error_str = (char*)malloc(strlen(time_stamp)+strlen(message)+2);
 	if(error_str)
 		snprintf(error_str, strlen(time_stamp) + strlen(message) + 2, "%s %s", time_stamp, message );
 	return (error_str);
 }
 
 
-/**@ingroup dsAPI
- * Read the error string from the global error table
- * or from the resource database.
+/**@ingroup internalAPI
+ * Read the error string from the global error table or from the resource database.
  *
- * The rsource name is: ERROR/team_no/server_no/error_ident
+ * The resource name is: ERROR/team_no/server_no/error_ident
  * 
  * @param error   error number
  * 
  * @return error string.
- * 
  */ 
 static char *get_error_string (long error)
 {
@@ -1917,10 +1927,14 @@ static char *get_error_string (long error)
 }
 
 /**@ingroup dsAPI
- * Push a dynamically generated error string onto the error 
- * string stack so that it can be transferred back to the client 
- * at the end of execution.
- * 
+ * This function is a server side call for generatig dynamic error strings. If called
+ * by the server while executing a @ref dev_putget() it will make a copy of the error
+ * string and transmit it back to the client. The client can recover the error string 
+ * by calling @ref dev_error_string() immediatly after the return of the @ref dev_putget()
+ * call in question. Not if a new call to @ref dev_putget() is made the error string
+ * returned by the previous call(s) is lost. This function can be called multiple times
+ * to stack errors if necessary e.g. to return errors from multiple nested calls.
+ *
  * @param error_string error string
  * 
  * @return   DS_OK or DS_NOTOK 

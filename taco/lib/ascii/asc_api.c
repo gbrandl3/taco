@@ -12,9 +12,9 @@
  *
  * Original:   	November 1996
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:		$Date: 2004-03-03 08:39:36 $
+ * Date:		$Date: 2004-03-09 09:35:50 $
  *
  * Copyright (c) 1996 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -696,7 +696,6 @@ long dev_get_ascii(char *dev_name, char *cmd_name, char **out_arg, char **str_er
  * @param dev_name
  * @param cmd_name
  * @param in_arg
- * @param out_arg
  * @param str_err
  *
  * @return DS_OK or DS_NOTOK

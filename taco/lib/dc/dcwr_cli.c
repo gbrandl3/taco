@@ -4,9 +4,9 @@
  *
  * Original:      1992
  *
- * Version:       $Revision: 1.4 $
+ * Version:       $Revision: 1.5 $
  *
- * Date:          $Date: 2003-05-22 08:04:17 $
+ * Date:          $Date: 2004-03-09 09:35:51 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -69,11 +69,7 @@ static int test_server();
 static int re_test_server();
 static int rpc_reconnect();
 static int rpc_connect();
-#ifndef _NT
-static int comp();
-#else
-static int comp(const void*, const void*);
-#endif   /* _NT */
+static int comp(serv *a, serv *b);
 static int get_dc_host(char **p_serv_name,long *perr);
 
 
@@ -780,6 +776,12 @@ int dc_dataput(dc_dev_dat *dev_data,unsigned int num_dev,dc_error *perr)
  * Compare two values as requested by the qsort 
  * function. The definition of this qsort function is 
  * available as a UNIX man page.
+ * @param a
+ * @param b
+ *
+ * @return 0 in case of a == b 
+ *	   1 in case of a > b
+ *	   -1 in case of a < b
  */
 static int comp(serv *a, serv *b)
 {
@@ -796,7 +798,7 @@ static int comp(serv *a, serv *b)
 /**@ingroup dcAPIintern
  * Build an RPC connection to the less heavily loaded data collector server
  *
- * @param The address of the error variable
+ * @param perr The address of the error variable
  * 
  * @return This function returns DS_OK when no problem occurs. Otherwise the return
  *    value is DS_NOTOK and the error variable is set according to the error

@@ -74,5 +74,5 @@ include_HEADERS		+= DevServer.h  DevServerP.h  DevSignal.h  NT_debug.h  Starter.
 EXTRA_DIST		+= DeviceFRM.H OICDeviceFRM.H DeviceFRM.C OICDeviceFRM.C 
 EXTRA_DIST		+= NT_debug.c  Doxyfile.in
 
-doc:	Doxyfile
+doc:	Doxyfile $(include_HEADERS) $(libtacoapi_la_SOURCES) $(libtacoapig___la_SOURCES) $(libdsapi_la_SOURCES) $(libdsapig___la_SOURCES)
 	doxygen

@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.8 $
+ Version    :	$Revision: 1.9 $
 
- Date	    :	$Date: 2004-03-03 11:38:16 $
+ Date	    :	$Date: 2004-03-09 09:35:49 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -136,7 +136,24 @@ server_connections	 	svr_conns [NFILE];
 
 
 /**@ingroup dsAPI
- *application interface to import a device from the device server in charge of it.
+ * This function opens a connection to a device and returns a client handle for the connection.
+ * This function can distinguish between local and remote devices.
+ *
+ * If the control system is running with security on then the axxess parameter determines what 
+ * level of access permission the client wants on the device. The following levels are supported:
+ * 	-# READ_ACCESS for read-only access
+ * 	-# WRITE_ACCESS for read and write access (@b default)
+ *	-# SI_WRITE_ACCESS for single user write access 
+ *	-# SU_ACCESS for super-user access
+ *	-# SI_SU_ACCESS for single super-user access
+ *	-# ADMIN_ACCESS for administrator access
+ *
+ * The default access is WRITE_ACCESS and corresponds to access = 0. If the TACO control system
+ * is running with security the client has to have the necessary permission in the security database
+ * for the (UID,GID,HOST,NETWORK) quadrupole.
+ *
+ * For more information on security refer to "Access Control and Security for the ESRF Control System"
+ * by J. Meyer (DSN/102)
  *
  * @param dev_name 	name of the device
  * @param access   	not used yet
@@ -785,9 +802,13 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 
 
 /**@ingroup dsAPI
- * application interface to execute commands on a device
- * with the possibility to pass input data and to 
- * receive output data.
+ * This function executes a command synchronously on the device associatied with the passed client handle.
+ * The device might be remote or local. Input and output data types must correspond to the types specified
+ * for this command in te device server's command list. Othewise an error code will be returned. All arguments
+ * have to be passed as pointers.
+ *
+ * Memory for outgoing arguments will be automatically allocated by XDR, if pointers are initilised to @b 
+ * NULL. To free the memory allocated by XDR afterwards, the function @ref dev_xdrfree() must be used.
  * 
  * @param ds       	handle to access the device.
  * @param cmd           command to be executed.
@@ -955,8 +976,11 @@ long _DLLFunc dev_putget (devserver ds, long cmd,DevArgument argin,
 
 
 /**@ingroup dsAPI
- * application interface to execute commands on a device
- * with only the possibility to pass input data. 
+ * This function executes a command on the device associated with the passed client handle, without
+ * returning any output data. The device might be remote or local. Input data types must correspond
+ * to the types specified for this command in the device server's command list. Othewise an error 
+ * code will be returned. The output data type in the device server's list must be set to D_VOID_TYPE.
+ * All arguments have to be passed as pointers.
  * 
  * @param ds       	handle to access the device.
  * @param cmd           command to be executed.
@@ -1111,7 +1135,7 @@ long _DLLFunc dev_put (devserver ds, long cmd,DevArgument argin,
 }
 
 /**@ingroup dsAPI
- * application interface to destroy and free a handle to a device.
+ * This function closes the connection to a device associated with the passed client handle.
  *
  * @param ds	handle to device.
  * @param error Will contain an appropriate error code if the corresponding 
@@ -1422,8 +1446,6 @@ DON'T - 26/3/98
  * @param host       	host name of the device server
  * @param prog_number 	program number of the device server
  * @param vers_number	vers number of the device server
- * @param error		Will contain an appropriate error code if the corresponding call 
- *			returns a non-zero value.
  *
  * @return DS_OK or DS_NOTOK
  */
@@ -1508,19 +1530,18 @@ long _DLLFunc dev_query_svr (char* host, long prog_number, long vers_number)
 
 
 /**@ingroup dsAPI
- * In many cases, memory is allocated when deserialising
- * data in the rpc package. To free all allocated memory
- * according to the describing XDR-routine, xdr_free()
- * has to be used. 
+ * This function frees the memory for device server data allocated by XDR. An example for the user
+ * of this function is the freeing of a D_VAR_FLOATARR data type. Using this function you don't have
+ * to care about the length of the internal sequence of float values. Just pass a pointer to a 
+ * D_VAR_FLOATARR structure and the allocated memory for the sequence will be freed, according to the
+ * length specified in the structure.
  *
- * Dev_xdrfree offers you an interface to use xdr_free()
- * for the implented device server types.
+ * This function offers you an interface to use xdr_free() for the implented device server types.
  *
- * Using free() might cause problems, because internal
- * data of the rpc package will not be freed.
+ * Using free() might cause problems, because internal data of the rpc package will not be freed.
  *
  * @param type   device server data type to be freed.
- * @param objprt pointer to a structure of type.
+ * @param objptr pointer to a structure of type.
  * @param error  Will contain an appropriate error code if the
  *		 corresponding call returns a non-zero value.
  *
@@ -2414,7 +2435,7 @@ long rpc_check_host (char *host_name, long *error)
 /**@ingroup dsAPI
  * Import a local device, without using an RPC.
  *
- * @param dev_name 	name of the device
+ * @param dev_import_in 	
  * @param ds_ptr 	returns a handle to access the device
  * @param error        	Will contain an appropriate error 
  *			code if the corresponding call 
@@ -2422,8 +2443,7 @@ long rpc_check_host (char *host_name, long *error)
  *
  * @return DS_OK or DS_NOTOK
  */
-static long dev_import_local (_dev_import_in  *dev_import_in,
-			      devserver  *ds_ptr, long* error)
+static long dev_import_local (_dev_import_in  *dev_import_in, devserver  *ds_ptr, long* error)
 {
 	_dev_import_out		*dev_import_out;
 	long			ds_id;
@@ -2473,7 +2493,7 @@ static long dev_import_local (_dev_import_in  *dev_import_in,
 /**@ingroup dsAPI
  * Free a local device, without using an RPC.
  * 
- * @param ds 	handle to access the device.
+ * @param dev_free_in 	handle to access the device.
  * @param error Will contain an appropriate error 
  * 		code if the corresponding call 
  * 		returns a non-zero value.
@@ -2812,12 +2832,17 @@ long dev_rpc_error (devserver ds, enum clnt_stat clnt_stat, long *error)
 
 
 /**@ingroup dsAPI
+ * By calling this function with one of the two defined protocol parameters D_UDP and D_TCP (API.h), 
+ * the transport protocol for an open RPC connection will be set to the chosen protocol. Before
+ * switching the protocol, an RPC connection to a device server has to be opened by a @ref dev_import()
+ * call.
  *
- * By calling dev_rpc_protocol with the two defined
- * parameters D_UDP and D_TCP (API.h), the tansport
- * protocol for an open RPC connection will be set to
- * the choosen protocols.
- * 
+ * All devices implemented in the same server and imported by the client use the same RPC connection.
+ * Changing the protocol of a RPC connection with this function means changing the protocol for all 
+ * devices of the same server.
+ * @li D_UDP UDP protocol with maximal 8kByte data transfer.
+ * @li D_TCP TCP protocol. TCP point to point connection with no transfer limitations.
+ *
  * @param ds 		handle to device.
  * @param protocol 	Protocol for the rpc connection tcp or udp.
  * @param error  	Will contain an appropriate error code if the
@@ -3079,6 +3104,7 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
  *
  * @param device_name 	the device name
  * @param access 	access right requested by client
+ * @param i_nethost
  * @param ds_ptr 	pointer to initialise devserver struct
  * @param error  	Will contain an appropriate error code if the
  *                      corresponding call returns a non-zero value.

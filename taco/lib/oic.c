@@ -13,9 +13,9 @@
 
  Original:	July 1995
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2004-02-19 15:42:49 $
+ Date:		$Date: 2004-03-09 09:35:50 $
 
  Copyright (c) 1995-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -44,19 +44,17 @@
  ***************************************************************************/
  
  
-/*+**********************************************************************
- Function   :   extern long ds__method_search()
-
- Description:   device server method searcher for one class
-
- Arg(s) In  :   DevServerClass ds_class - class of the object.
-	    :   DevMethod method        - method to be searched for.
-
- Arg(s) Out :   DevMethodFunction *function_ptr - function pointer of method.
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**@ingroup oicAPI
+ * This function searches for a method in the class specified. It returns the pointer to the 
+ * method function if the requested method was found in the class. If no such method was 
+ * specified the status DS_NOTOK is returned.
+ *
+ * @param ptr_ds_class 	class of the device server object.
+ * @param method 	method to be searched for.
+ * @param function_ptr 	function pointer of method to be searched for.
+ *
+ * @return  DS_OK or DS_NOTOK
+ */
 long ds__method_search (void *ptr_ds_class, DevMethod method,
 			DevMethodFunction *function_ptr)
 {
@@ -87,19 +85,20 @@ long ds__method_search (void *ptr_ds_class, DevMethod method,
 }
 
 
-/*+**********************************************************************
- Function   :   extern DevMethodFunction ds__method_finder()
-
- Description:   device server's method finder
-
- Arg(s) In  :   DevServer ds     - pointer to object.
-	    :   DevMethod method - method to be searched for.
-
- Arg(s) Out :   none
-
- Return(s)  :   DevMethodFunction - function pointer of method.
-***********************************************************************-*/
-
+/**@ingroup oicAPI
+ * This function searches for a method in the class hierarchy of the object @b ds 
+ * and returns a pointer to the method function. If the method was not found in the object's 
+ * class, the search continues in all its superclasses up to the general device server class.
+ *
+ * If the the method is not implemented the method finder takes @b DRASTIC action and exits.
+ * This has been included in the specification to guarantee that on returning from the method
+ * finder the method can be directly executed.
+ *
+ * @param ptr_ds     	pointer to device server object.
+ * @param method 	method to be searched for.
+ * 
+ * @return  function pointer of method.
+ */
 DevMethodFunction ds__method_finder (void *ptr_ds, DevMethod method)
 {
 	DevServerClass 	ds_class;
@@ -109,7 +108,7 @@ DevMethodFunction ds__method_finder (void *ptr_ds, DevMethod method)
 	DevServer       ds;
 	ds = (DevServer) ptr_ds;
 
-	/*
+/*
  * this function will be take the place of a method dispatcher
  * in its absence. any object oriented programming style has
  * to have a method dispatcher/finder. this way classes are
@@ -180,22 +179,20 @@ DevMethodFunction ds__method_finder (void *ptr_ds, DevMethod method)
 	return NULL;
 }
 
-/*+**********************************************************************
- Function   :   extern long ds__create()
-
- Description:   creates a device server object.
-
- Arg(s) In  :   char *name              - name of the object to create.
-	    :   DevServerClass ds_class - pointer to the object class.
-
- Arg(s) Out :   DevServer *ds_ptr - pionter to the new object structure.
-	    :	long *error       - Will contain an appropriate error
-			  	    code if the corresponding call
-				    returns a non-zero value.
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**@ingroup oicAPI
+ * This function creates a new device server object of the class ds_class and will return
+ * a pointer on the object. Before creating the object (DevMethodCreate : obj_create(3X))
+ * the class and all its superclasses are checked to see if they have been initialised.
+ * If not, then the DevMethodClassInitialise (class_init(3x)) is called for each uninitialised
+ * class.
+ *
+ * @param name 		name of the object to create.
+ * @param ptr_ds_class  pointer to the object class.
+ * @param ptr_ds_ptr 	pointer to the new object structure.
+ * @param error 	Will contain an appropriate error code if the corresponding call returns a non-zero value.
+ * 
+ * @return  DS_OK or DS_NOTOK
+ */
 long ds__create (char *name, void *ptr_ds_class,void *ptr_ds_ptr, long *error)
 {
 	DevServerClass ds_class_tmp;

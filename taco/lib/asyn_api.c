@@ -25,9 +25,9 @@
 
  Original   :	January 1997
 
- Version:	$Revision: 1.7 $
+ Version:	$Revision: 1.8 $
 
- Date:		$Date: 2004-03-03 11:38:16 $
+ Date:		$Date: 2004-03-09 09:35:49 $
 
  Copyright (c) 1997-2000 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -140,15 +140,26 @@ long asynch_svc_tcp_sock;
 
 
 /**@ingroup dsAPI
- * application interface to execute commands on a device
- * asynchronously with the possibility to pass input data 
- * and to receive output data. the command request will
- * be dispatched to the server so that the client can continue.
- * the result will be sent back to the client once the 
- * command has finished executing. it is up to the client to
- * resynchronise so that it can recuperate the result 
- * (c.f. using the dev_synch(), dev_wait() etc. calls).
- * This version is with callback i.e. the client has to
+ * This function executes a command asynchronously on the device associated with the passed
+ * client handle. The device must be remote and compiled with V6. Input and output data types
+ * must correspond to the types specified for this command in the device server's command list.
+ * Otherwise an error code will be returned. All arguments have to be passed as pointers.
+ *
+ * Memory for outgoing arguments will be automatically allocated by XDR, if pointers are 
+ * initialised to @b NULL. To free the memory allocated by XDR afterwards, the function @b
+ * dev_xdrfree() must be used.
+ * 
+ * The client continues immediatly and does not wait for the server to execute the request.
+ * The callback function has to be specified otherwise an error will be returned. The callback 
+ * function is triggred by making a call to @ref dev_synch(). The client can pass data to the
+ * callback function via userdata. The callback function receives the device server handle, 
+ * user data, and a DevCallbackData structure as input. The function returns a (unique) id in
+ * asynch_id for each call.
+ * 
+ * The command request will be dispatched to the server so that the client can continue.
+ * the result will be sent back to the client once the command has finished executing. It is 
+ * up to the client to resynchronise so that it can recuperate the result (c.f. using the 
+ * dev_synch(), dev_wait() etc. calls).  This version is with callback i.e. the client has to
  * specify a callback.
  * 
  * @param ds       	handle to access the device.
@@ -160,7 +171,6 @@ long asynch_svc_tcp_sock;
  * @param argout	pointer for output arguments.
  * @param argout_type 	data type of output arguments.
  * @param asynch_id_ptr asynch call identifier
- * @param status        pointer to status of command execution
  * @param error         Will contain an appropriate error * code if the 
  *			corresponding call returns a non-zero value.
  * 
@@ -388,30 +398,27 @@ long _DLLFunc dev_putget_asyn (devserver ds, long cmd,
 }
 
 /**@ingroup dsAPI
- * application interface to execute commands on a device
- * asynchronously with the possibility to pass input data 
- * and to receive output data in raw format. raw format
- * means that the XDR data are not decoded by the client
- * instead they are returned as a string of bytes whichthe command request will
- * be dispatched to the server so that the client can continue.
- * the result will be sent back to the client once the 
- * command has finished executing. it is up to the client to
- * resynchronise so that it can recuperate the result 
- * (c.f. using the dev_synch(), dev_wait() etc. calls).
- * This version is with callback i.e. the client has to
- * specify a callback.
+ * Application interface to execute commands on a device asynchronously with the possibility 
+ * to pass input data and to receive output data in raw format. raw format means that the XDR 
+ * data are not decoded by the client instead they are returned as a string of bytes whichthe 
+ * command request will be dispatched to the server so that the client can continue.
+ *
+ * The result will be sent back to the client once the command has finished executing. it is up 
+ * to the client to resynchronise so that it can recuperate the result (c.f. using the dev_synch(), 
+ * dev_wait() etc. calls).
+ *
+ * This version is with callback i.e. the client has to specify a callback.
  * 
  * @param ds       	handle to access the device.
  * @param cmd           command to be executed.
  * @param argin  	pointer to input arguments.
  * @param argin_type 	data type of input arguments.
  * @param callback  	callback routine to be triggered on completion
- * @param user_dat	pointer to user data to be passed to callback function
+ * @param user_data	pointer to user data to be passed to callback function
  * 
  * @param argout  	pointer for raw output arguments.
  * @param argout_type   data type of output arguments.
  * @param asynch_id_ptr	asynch call identifier
- * @param status        pointer to status of command execution
  * @param error         Will contain an appropriate error code if the 
  *			corresponding call returns a non-zero value.
  *
@@ -1070,8 +1077,7 @@ static SVCXPRT 	*asynch_trans_tcp,
 		*asynch_transp_udp;
 
 /**@ingroup dsAPI
- * function to register the asynchronous rpc service
- * which will serve asynchronous requests and replies
+ * Function to register the asynchronous rpc service which will serve asynchronous requests and replies
  * for servers and clients respectively
  * 
  * @param error         Will contain an appropriate error code if the 
@@ -1189,8 +1195,7 @@ long _DLLFunc asynch_rpc_register(long *error)
 }
 
 /**@ingroup dsAPI
- * function to check whether the asynchronous server
- * has been imported, and if not to import it.
+ * Function to check whether the asynchronous server has been imported, and if not to import it.
  * 
  * @param ds       	handle to access the device.
  * @param error         Will contain an appropriate error code if the 
@@ -1386,7 +1391,7 @@ long asynch_server_import(devserver ds, long *error)
 /**@ingroup dsAPI
  * function to check whether the asynchronous client has been imported, if not then import it.
  *
- * @param ds       	handle to access the device.
+ * @param client       	handle to access the device.
  * @param error         Will contain an appropriate error code if the 
  *			corresponding call returns a non-zero value.
  *
@@ -1522,7 +1527,7 @@ long asynch_client_import(devserver client, long *error)
 /**@ingroup dsAPI
  * function to check whether the asynchronous client has been importedand return an error if it has not
  *
- * @param ds       	handle to access the device.
+ * @param client       	handle to access the device.
  * @param error         Will contain an appropriate error code if the 
  *			corresponding call returns a non-zero value.
  *
@@ -1574,7 +1579,7 @@ long asynch_client_check(devserver client, long *error)
  * will return after the timeout (regardless if there
  * are any calls still pending). 
  *
- * @param ds       	handle to access the device.
+ * @param timeout       The time before returning in case of no answer of any device	
  * @param error         Will contain an appropriate error code if the 
  *			corresponding call returns a non-zero value.
  *
@@ -1757,7 +1762,7 @@ _dev_import_out* _DLLFunc rpc_asynch_import_5(_dev_import_in *dev_import_in)
  * it will free the imported reply service of the client 
  * and send a (synchronous) reply to the client.
  *
- * @param dev_import_in 
+ * @param dev_free_in 
  *
  * @return 
  */
@@ -2016,8 +2021,8 @@ _asynch_client_raw_data* _DLLFunc rpc_raw_asynch_reply_5(_asynch_client_raw_data
  * @param ds       	handle to access the device.
  * @param asynch_type   
  * @param event_type    
- * @param argin		pointer to input arguments.
- * @param argin_type	data type of input arguments.
+ * @param argout	pointer to input arguments.
+ * @param argout_type	data type of input arguments.
  * @param callback	callback routine to be triggered  on completion
  * @param user_data	pointer to user data to be passed to callback function
  * @param id_ptr 	asynch call identifier
@@ -2379,10 +2384,9 @@ long _DLLFunc dev_flush(devserver ds)
 	return(DS_OK);
 }
 
-/**@ingroup dsAPI
- * function to return the number of asynchronous calls sent
- * by the client still pending an answer from the server.
- * 
+/**@ingroup asyncAPI
+ * This functions returns the number of asynchronous calls sent by the client still pending an answer 
+ * from the server ds. If ds == NULL the returns the total number of pending calls. 
  * 
  * @param ds       	handle to access the device.
  *
@@ -2412,11 +2416,9 @@ long _DLLFunc dev_pending(devserver ds)
 }
 
 /**@ingroup dsAPI
- * Sets or reads the timeout for an asynchronous dev_putget()
- * to a server.  A request to set the timeout has to be asked
- * with CLSET_TIMEOUT. The timeout will be set without any retry.
- * A request to read the timeout has to be asked with
- * CLGET_TIMEOUT.
+ * This function sets or reads the timeout for an asynchronous call to the device ds. 
+ * A request to set the timeout has to be asked with CLSET_TIMEOUT. The timeout will be 
+ * set without any retry.  A request to read the timeout has to be asked with CLGET_TIMEOUT.
  * 
  * @param ds           	handle to device.
  * @param request	indicates whether the timeout should be set or only read.

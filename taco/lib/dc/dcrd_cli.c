@@ -5,9 +5,9 @@
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2004-02-19 15:48:19 $
+ * Date:	$Date: 2004-03-09 09:35:50 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -565,6 +565,9 @@ static long init_imp(long i_nethost, long *perr)
  * To compare two values as requested by the qsort
  * function. The definition of this function is
  * available as a UNIX man page
+ * @param a
+ * @param b
+ * @return 
  */
 #ifndef _NT
 static int comp(serv *a, serv *b)
@@ -711,7 +714,7 @@ static int rpc_connect(char *serv_name,CLIENT **prpc,int ind,long i_net,long *pe
  * @param ind 		The indice in the array of dc host information	
  * @param serv_info 	A pointer to an array of structures. There is one structure for 
  *			each server and one element of the structure is the server request number	
- * @param int 		The indice in the previous array  
+ * @param min 		The indice in the previous array  
  * @param i_net 	Index in the dc multi nethost array		
  * @param clnt_ptr 	A pointer to the client handle which will be used later on  				
  * @param perr 		The address of the error variable
@@ -1072,7 +1075,7 @@ int dc_free(dc_dev_free *dc_devfree,unsigned int num_device,long *error)
  * @param dc_ptr 	Pointer to dc device handle
  * @param cmd_code 	The command code
  * @param argout_type 	The command result data type
- * @param argout_type   Pointer where the command result will be stored
+ * @param argout   	Pointer where the command result will be stored
  * @param error 	Pointer to error code
  *
  * @return   In case of trouble, the function returns DS_NOTOK and set the variable 
@@ -2767,20 +2770,18 @@ static char *dc_extract_device_name(char *full_name)
 
 
 /**@ingroup dcAPIintern
- * Set all the error code for devices registered in the
- * same nethost (in a dc_devgetv call)
+ * Set all the error code for devices registered in the same nethost (in a dc_devgetv call)
  *
- * @param i_net 	Index into the  multi nethost array
- * @param p_nb_dev	Pointer to the array of device number for this
- *			nethost (array because the da can be distributed)*
- * @param pp_ind 	Pointer to array of index in the caller structures 
+ * @param nb_dev	Pointer to the array of device number for this
+ *			nethost (array because the da can be distributed)
+ * @param p_ind 	Pointer to array of index in the caller structures 
  *			of the devices for this nethost
  * @param error 	The error code
  * @param dev_retdat 	The caller structures array
  *
  * @return the number of devices for which it sets the error code
  */
-static long set_err_nethv(long nb_dev,long *p_ind,long error,dc_dev_retdat *dev_retdat)
+static long set_err_nethv(long nb_dev, long *p_ind, long error, dc_dev_retdat *dev_retdat)
 {
 	long l;
 	long call_numb;
@@ -2801,10 +2802,9 @@ static long set_err_nethv(long nb_dev,long *p_ind,long error,dc_dev_retdat *dev_
  * Set all the error code for devices registered in the
  * same nethost (in a dc_devgetm call)
  *
- * @param i_net 	Index into the  multi nethost array
- * @param p_nb_dev 	Pointer to the array of device number for this
+ * @param nb_dev 	Pointer to the array of device number for this
  *			nethost (array because the da can be distributed)
- * @param pp_ind 	Pointer to array of index in the caller structures
+ * @param p_ind 	Pointer to array of index in the caller structures
  *			of the devices for this nethost
  * @param error 	The error code
  * @param dev_mretdat 	The caller structures array

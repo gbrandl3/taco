@@ -16,9 +16,9 @@
  *
  * Original:   	November 1996
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2003-05-22 08:13:18 $
+ * Date:	$Date: 2004-03-09 09:35:51 $
  *
  * Copyright (c) 1996 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -364,7 +364,7 @@ long tc_DevVarLongReadPointArray_to_str( DevVarLongReadPointArray *d_lnrp_arr, c
  * @endcode
  *
  * @param in_str The input string can by any string
- * @param The pointer passed in is returned unchanged.
+ * @param d_void The pointer passed in is returned unchanged.
  * 
  * @return DS_OK
  */

@@ -14,9 +14,9 @@
 
  Original   :   May 1998
 
- Version:       $Revision: 1.3 $
+ Version:       $Revision: 1.4 $
 
- Date:          $Date: 2004-03-05 15:07:00 $
+ Date:          $Date: 2004-03-09 09:35:50 $
 
  Copyright (c) 1998 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -112,7 +112,7 @@ static struct timeval timeout_update={60,0};
  * @param devdef 	Device definitions returned
  * @param nb_resdef 	Number of resource definition returned
  * @param resdef 	Resource definitions returned
- * @param line_err 	File line where error occurs
+ * @param error_line 	File line where error occurs
  * @param p_error 	Pointer for the error code in case of problems 
  * 
  * @return 	In case of trouble, the function returns DS_NOTOK and set the variable 
@@ -120,8 +120,8 @@ static struct timeval timeout_update={60,0};
  * 		argout with the file line where the error occurs. Otherwise, the 
  * 		function returns DS_OK 
  */
-long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***devdef, \
-		     long *nb_resdef,char ***resdef,long *error_line,long *p_error)
+long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***devdef, 
+		     long *nb_resdef, char ***resdef, long *error_line, long *p_error)
 {
 	FILE *file;
 	long domain_nb;
@@ -683,7 +683,7 @@ printf("End of TestLine \n");
  * @param line1		A pointer to a buffer where is stored a line of the resource
  *              	file (The first line with the "device" word in it )
  * @param in
- * @param p_line
+ * @param p_line_ptr
  * @param tmp_devdef
  * @param p_error
  *
@@ -787,6 +787,7 @@ static long name_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_devd
  *		     	space and tab characters)
  * @param d_num   	Number of resource domain known by the db server
  * @param d_list   	Name of resource domain known by the db server
+ * @param p_error	Pointer to the error code in case of failure
  *
  * @return    	This function returns DS_OK if no errors occurs or DS_NOTOK if the resource
  *    		definition is not valid.						
@@ -1689,6 +1690,7 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
  * its user for security resources password.
  *
  * @param pass 		Database security password
+ * @param p_error	Pointer to the error code in case of failure
  *
  * @return   		In case of trouble, the function returns DS_NOTOK and set the variable
  *    			pointed to by "p_error". Otherwise, the function returns DS_OK
@@ -1845,10 +1847,14 @@ long db_secpass(char **pass, long *p_error)
  * To update resource(s) into the database. This call is used by the db_update 
  * facility for the update of any resources						
  *									
+ * @param dev_nb	
+ * @param dev_name_list
+ * @param list_type
+ * @param devdef_nb
+ * @param devdef
  * @param resdef_nb 	Resource number				
  * @param resdef 	Resource list					
  *									
- * @param deferr_nb 	Which device definition is the error reason	
  * @param p_error 	Pointer for the error code in case of problems
  *
  * @return    	In case of trouble, the function returns DS_NOTOK and set the variable
@@ -1856,9 +1862,9 @@ long db_secpass(char **pass, long *p_error)
  *    		argout with the device definition  where the error occurs. Otherwise,
  *    		the function returns DS_OK             				
  */
-long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
-		      long devdef_nb,char **devdef,
-		      long resdef_nb,char **resdef,
+long db_delete_update(long dev_nb, char **dev_name_list, long list_type,
+		      long devdef_nb, char **devdef,
+		      long resdef_nb, char **resdef,
 		      db_delupd_error *p_error)
 {
 	db_delupd_error *recev;

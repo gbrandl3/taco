@@ -13,9 +13,9 @@
 
  Original:	June 1990
 
- Version:	$Revision: 1.4 $
+ Version:	$Revision: 1.5 $
 
- Date:		$Date: 2004-02-19 15:38:05 $
+ Date:		$Date: 2004-03-09 09:35:47 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -307,11 +307,16 @@ static long destroy (DevServer ds, long *error)
  ***************************************************************************/
 
 /**@ingroup dsAPI
- * Convenience function for executing commands on a device. 
+ * This function executes a command on a given object locally i a device server.
+ * Memory freeing must be done with free() and @b not with dev_xdrfree().
  *
- * Only calls the command handler internally.
+ * With the extended functionality of @b dev_putget and @b dev_put the function
+ * should be used only to access objects which are not exported.
  *
- * @param ds		pointer to the object.
+ * To access internal exported devices the unified interface must be used, to
+ * avoid access and security problems in the coming releases.
+ *
+ * @param ptr_ds	pointer to the object.
  * @param cmd           command to be executed.
  * @param argin  	pointer to input arguments.
  * @param argin_type  	data type of input arguments.
@@ -334,12 +339,9 @@ long dev_cmd (void *ptr_ds, long cmd, DevArgument argin,  long argin_type,
 
 #if !defined(_NT)
 /**@ingroup dsAPI
- * The function supports the checking of pending  device server commands 
- * (rpc requests) on all open sockets.
- *
- * If commands are available on filedesciptors (sockets), the next pending 
- * command for every descriptor will be executed and ds__svcrun will return aterwards.
- *
+ * The function supports the checking of pending  device server commands  (rpc requests) 
+ * on all open sockets.  If commands are available on filedesciptors (sockets), the next 
+ * pending request for every descriptor will be executed and ds__svcrun will return afterwards.
  * If no commands are pending on any descriptor ds__svcrun should return after 10ms.
  * 
  * Problem : OS9 seems to have a fixed minimal timeout for the select() about 1sec.

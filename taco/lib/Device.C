@@ -12,9 +12,9 @@
 //
 // Original:	March 1995
 //
-// Version:	$Revision: 1.8 $
+// Version:	$Revision: 1.9 $
 //
-// Date:	$Date: 2004-02-11 10:08:36 $
+// Date:	$Date: 2004-03-09 09:35:48 $
 //
 //-**********************************************************************
 		
@@ -56,7 +56,7 @@ long Device::ClassInitialise( long *error )
 /**
  * constructor to create an object of the base class Device
  *
- * @param name name (ascii identifier) of device to create
+ * @param devname name (ascii identifier) of device to create
  * @param error error code returned in the case of problems
  *
  */

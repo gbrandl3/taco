@@ -5,9 +5,9 @@
  *
  * Original:      1993
  *
- * Version:       $Revision: 1.4 $
+ * Version:       $Revision: 1.5 $
  *
- * Date:          $Date: 2003-11-27 18:03:30 $
+ * Date:          $Date: 2004-03-09 09:35:51 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -208,11 +208,11 @@ int dc_info(char *serv_name,servinf *dc_inf,long *error)
 
 
 /**@ingroup dcAPI
- * To ask to a data collector system the name of all its
- * registered devices
+ * To ask to a data collector system the name of all its registered devices
  *
  * @param serv_name 	The dc host name
- * @param devname_tab 	Pointer where the device list will be stored
+ * @param devnametab 	Pointer where the device list will be stored
+ * @param dev_n		Pointer where the number of devices in the list will be stored
  * @param error 	Pointer for error code
  *
  * @return    In case of trouble, the function returns DS_NOTOK and set the err variable

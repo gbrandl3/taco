@@ -11,9 +11,9 @@
 
  Original   	: March 1991
 
- Version	: $Revision: 1.8 $
+ Version	: $Revision: 1.9 $
 
- Date		: $Date: 2004-02-19 15:38:52 $
+ Date		: $Date: 2004-03-09 09:35:48 $
 
  Copyright (c) 1990-2002 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -294,6 +294,7 @@ int main (int argc, char **argv)
  *
  * Registers the server on a transient program number to the portmapper.
  * 
+ * @param argc the number of command line parameters including the name of the executeable itself
  * @param argv options and the personal name for the device server.
  * 
  * @return 1 DS_NOTOK

@@ -33,9 +33,9 @@
 
  Original   :	April 1999
 
- Version    :	$Revision: 1.6 $
+ Version    :	$Revision: 1.7 $
 
- Date       :	$Date: 2004-03-03 11:38:16 $
+ Date       :	$Date: 2004-03-09 09:35:50 $
 
  Copyleft (c) 1999 by European Synchrotron Radiation Facility,
                       Grenoble, France
@@ -120,13 +120,12 @@ bool_t _DLLFunc xdr__asynch_client_data PT_((XDR *xdrs, _asynch_client_data *obj
  * call is issued.
  * 
  * @param ds		handle to access the device.
- * @param event		event to listen for
+ * @param event_type	event to listen for
  * @param callback	callback routine to be triggered on completion
- * @param *user_data	pointer to user data to be passed to callback function
+ * @param user_data	pointer to user data to be passed to callback function
  * @param argout	pointer for output arguments.
  * @param argout_type	data type of output arguments.
  * @param event_id_ptr	client event identifier
- * @param status        pointer to status of command execution
  * @param error         Will contain an appropriate error code if the 
  *			corresponding call returns a non-zero value.
  *
@@ -561,13 +560,12 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
  * and will not receive anymore events of this type.
  * 
  * @param ds       	handle to access the device.
- * @param event         event to listen for
- * @param event_id_ptr  client event identifier
- * @param status        pointer to status of command execution
+ * @param event_type    event to listen for
+ * @param event_id  	client event identifier
  * @param error         Will contain an appropriate error code if the 
  *			corresponding call returns a non-zero value.
  * 
- * Return(s)  :	DS_OK or DS_NOTOK
+ * @return	DS_OK or DS_NOTOK
  */ 
 long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
                                   long event_id, long *error)
@@ -904,7 +902,7 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
  * It is removed from the global list of registered clients and 
  * will be not be sent events anymore by the dev_event_fire() call.
  *
- * @param _server_data server_data client data
+ * @param server_data client data
  *
  * @return DS_OK or DS_NOTOK
  */
@@ -1221,6 +1219,7 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long
  * DS_WARNING is returned, if the function was executed correctly, but no event 
  * name string was found in the database.
  *
+ * @param ds		client device handle
  * @param event      	event number
  * @param event_str 	event name as a string.
  * @param error   	Will contain an appropriate error code if the 

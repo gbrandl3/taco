@@ -11,9 +11,9 @@
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.8 $
+ Version:	$Revision: 1.9 $
 
- Date:		$Date: 2004-02-11 11:50:46 $
+ Date:		$Date: 2004-03-09 09:35:50 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -961,14 +961,14 @@ void _DLLFunc rpc_dev_put_asyn_cmd (_server_data *server_data)
 
 
 
-/**
- * Function for exporting a device onto the network	
- *
- * Replaces the DevMethodDevExport which was originally implemented in the 
- * DevServerClass
+/**@ingroup dsAPI
+ * This function makes devices visible for device server clients. All necessary connection information
+ * for a @ref dev_import() call will be stored in a database table. Moreover the exported devices are 
+ * added to the device server's global list of exported devices. The function is installed as a method
+ * in the DeviceServerClass and accessible by the name @b DevMethodDevExport.
  *
  * @param name  name of the device.
- * @param ds 	pointer to the object.
+ * @param ptr_ds pointer to the object.
  * @param error Will contain an appropriate error code if the corresponding 
  *		call returns a non-zero value.
  *
@@ -1182,16 +1182,20 @@ free_found:
 }
 
 
-/**
- * Searches and executes the destroy method for the object.
+/**@ingroup oicAPI
+ * This function searches for a destroy method (@b DevMethodDestroy) in the device server object class.
+ * If no destroy method is implemented in the objext class, its superclasses are searched. Arriving at 
+ * the end of the class tree, the destroy method of the general device server class will be executed.
+ * 
+ * The general destroy method will free the object correctly only, if no memory allocation was done for
+ * the object fields outside the @b DevServerPart structure of the object. The device name, as a field 
+ * of DevServerPart will be freed correctly by the general device server class destroy method.
  *
- * If no method is implemented in the object class or its superclasses, the simple 
- * destroy method of the general device server class will be executed.  
+ * Also exported objects can be destroyed. They will be deleted from the list of exported devices and 
+ * all clients accesses will be stopped.
  *
- * The object pointer will be freed and set to NULL !!
- *
- *@param ds  	pointer to the object structure.
- *@param error 	Will contain an appropriate error
+ * @param ptr_ds  	pointer to the object structure.
+ * @param error 	Will contain an appropriate error
  *		code if the corresponding call returns a non-zero value.
  *
  * @return DS_OK or DS_NOTOK
@@ -1271,7 +1275,7 @@ long ds__destroy (void *ptr_ds, long *error)
 	return (DS_OK);
 }
 
-/**
+/**@ingroup dsAPI
  * RPC procedure corresponding to dev_cmd_query().
  *
  * Retrieves all available information from the command list of the 
@@ -1287,7 +1291,7 @@ long ds__destroy (void *ptr_ds, long *error)
  *
  * @param dev_query_in 	input structure with the identification of the device.
  *
- * @returni	pointer to structure containig a sequence of _dev_cmd_info 
+ * @return	pointer to structure containig a sequence of _dev_cmd_info 
  *		structures, the name of the device class, an error and a status flag.
  */
 _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
@@ -1572,14 +1576,14 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
 	return (&dev_query_out);
 }
 
-/**
+/**@ingroup dsAPI
  * Split up the device identification into its information fields.
  *
  * @param device_id   	client handle to access the device.
  * @param ds_id 	access to exported device. Place in the array of exported devices.
  * @param connection_id access to device connections. Place in the connections (or 
  *			client access) array of an exported device.
- * @param		long *error - pointer to error code, in case routine fails.
+ * @param error 	pointer to error code, in case routine fails.
  *
  * @return DS_OK or DS_NOTOK
  *
@@ -1623,7 +1627,7 @@ static long read_device_id (long device_id, long *ds_id, long *connection_id, lo
 
 
 
-/**
+/**@ingroup dsAPI
  * RPC procedure corresponding to dev_putget_local().
  *
  * Executes commands on devices by calling the command handler. 
@@ -1790,7 +1794,7 @@ _client_data * _DLLFunc rpc_dev_putget_local (_server_data *server_data)
 	return (client_data);
 }
 
-/**
+/**@ingroup dsAPI
  * RPC procedure corresponding to dev_ping().
  *
  * Checks to see if the requested device is served by this server.

@@ -13,9 +13,9 @@
 
  Original   :	April 1993
 
- Version:	$Revision: 1.9 $
+ Version:	$Revision: 1.10 $
 
- Date:		$Date: 2004-03-05 17:02:14 $
+ Date:		$Date: 2004-03-09 09:35:50 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -255,23 +255,6 @@ long _DLLFunc dev_putget_raw (devserver ds, long cmd, DevArgument argin,
 
 
 /**@ingroup asyncAPI
- * This function executes a command asynchronously on the device associated with
- * the passed client handle. The device must be remote and compiled with V6. Input
- * and output data types must correspond to the types specified for this command
- * in the device server's command list. Otherwise an error code will be returned. 
- * All arguments have to be passed as pointer.
- *
- * Memory for outgoing arguments will be automatically allocated, if pointers are
- * initialised to @b NULL. The memory allocated by XDR afterwards, the function
- * @ref dev_xdrfree() must used.
- *
- * The client continues immediatly and does not wait for the server to execute the
- * request. The callback function has to be specified otherwise an error will be
- * returned. The callback function is triggered by making a call to @ref dev_synch().
- * The client can pass data to the callback function via @ref user_data. The callback
- * function receives the device server handle, user data and a @ref DevCallbackData
- * structure as input. The function returns a (unique) id in @ref asynch_id for each call.
- 
  * This function is similar to @ref dev_put(). The only difference is, that it sends
  * a request to execute a command to a device server and returns immediatly when the 
  * command was received. The only errors which can be returned by this function are
@@ -694,6 +677,7 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
  * The resource name is:
  * CMD/team_no/server_no/cmd_ident
  * 
+ * @param ds		the device handle
  * @param cmd       	error number
  * @param cmd_str  	command name as a string.
  * @param error   	Will contain an appropriate error
@@ -800,13 +784,13 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
  * @param clnt_handles 	pointer to a table of client handles.
  * @param num_devices   number of devices.
  * @param dev_info    	pointer to information structures returned.
- * @param 		Will contain an appropriate error code if the
+ * @param error		Will contain an appropriate error code if the
  * 		        corresponding call returns a non-zero value.
  * 
  * @return DS_OK or DS_NOTOK
  */
 long _DLLFunc dev_inform (devserver *clnt_handles, long num_devices,
-			  DevInfo * *dev_info, long *error)
+			  DevInfo **dev_info, long *error)
 {
 	devserver	*clnt_ptr;
 	DevInfo		*info_ptr;
@@ -1094,7 +1078,7 @@ long _DLLFunc get_i_nethost_by_device_name (char *device_name, long *error)
 /**@ingroup internalAPI
  * Get the index for the nethost from the nethost name. 
  *
- * @param device_name 	device name
+ * @param nethost 	the nethost name
  * @param error  	Will contain an appropriate error code if the
  *		        corresponding call returns a non-zero value.
  *

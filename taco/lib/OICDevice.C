@@ -15,9 +15,9 @@
 //
 // Original:	November 1996
 //
-// $Revision: 1.5 $
+// $Revision: 1.6 $
 //
-// $Date: 2004-02-11 10:09:33 $
+// $Date: 2004-03-09 09:35:48 $
 //
 // $Author: jkrueger1 $
 //
@@ -88,8 +88,9 @@ long OICDevice::GetResources( char *name, long *error )
 /**
  * constructor to create an object of the base class OICDevice
  *
- * @param name 	name (ascii identifier) of oicdevice to create
- * @param error error code returned in the case of problems
+ * @param devname 	name (ascii identifier) of oicdevice to create
+ * @param devclass
+ * @param error 	error code returned in the case of problems
  */
 OICDevice::OICDevice (DevString devname, DevServerClass devclass, long *error)
           : Device (devname, error)

@@ -13,9 +13,9 @@
 
  Original   :   September 1998
   
- Version    :	$Revision: 1.4 $
+ Version    :	$Revision: 1.5 $
 
- Date	    : 	$Date: 2004-03-05 15:07:00 $
+ Date	    : 	$Date: 2004-03-09 09:35:50 $
 
  Copyright (c) 1998 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -72,7 +72,7 @@ extern nethost_info 		*multi_nethost;
  * To do automatic reconnection with the database server if it has been killed or restarted.		
  *
  * @param p_data	A pointer to the data to pass to the server	
- * @param pp_resul	A double pointer to the place where the result should be stored							
+ * @param pp_result	A double pointer to the place where the result should be stored							
  * @param client	The client handle
  * @param call_type	The type of call
  * @param nethost_index
