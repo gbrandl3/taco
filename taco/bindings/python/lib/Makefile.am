@@ -1,17 +1,22 @@
-pkgpyexec_LTLIBRARIES	= Taco.la
+pkgpyexec_LTLIBRARIES	= Server.la 
 
-Taco_la_LDFLAGS 	= -module 
-
-## -avoid-version
+Server_la_LDFLAGS 	= -module 
 
 INCLUDES 		= @TACO_INCLUDES@ @PYTHON_CPPFLAGS@ @PYTHON_CPPFLAGS@/Numeric
 
-Taco_la_LIBADD 		= $(top_builddir)/lib/libdsapinomain.la $(top_builddir)/lib/dbase/libdbapi.la \
+Server_la_LIBADD 	= $(top_builddir)/lib/libdsapinomain.la $(top_builddir)/lib/dbase/libdbapi.la \
 		$(top_builddir)/lib/xdr/libdsxdr_all.la $(top_builddir)/lib/dc/libdcapi.la @PYTHON_LDFLAGS@
 
 AM_CPPFLAGS 		= -DMYDEB -DNUMPY 
 
 noinst_HEADERS		= taco.h python.h pythonP.h
 
-Taco_la_SOURCES		= taco.c taco_types.c server.c python.c
+Server_la_SOURCES	= taco.c taco_types.c server.c python.c
 
+install-exec-hook:	
+	SHL_EXT="`(. $(pkgpyexecdir)/Server.la ; echo $${library_names} | cut -f3 -d' ' | cut -f2 -d'.')`" ; \
+	$(RM) "$(pkgpyexecdir)/Taco.$${SHL_EXT}" && $(LN_S) "Server.$${SHL_EXT}" "$(pkgpyexecdir)/Taco.$${SHL_EXT}"
+
+uninstall-local:
+	SHL_EXT="`(. $(pkgpyexecdir)/Server.la ; echo $${library_names} | cut -f3 -d' ' | cut -f2 -d'.')`" ; \
+	$(RM) "$(pkgpyexecdir)/Taco.$${SHL_EXT}"
