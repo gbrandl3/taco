@@ -6,7 +6,7 @@ for libtoolize in glibtoolize libtoolize ; do
                 break;
         fi
 done
-LIBTOOLIZE="libtoolize --force --copy --automake"
+LIBTOOLIZE="$libtoolize --force --copy --automake"
 ACLOCAL="aclocal -I m4 $aclocal_includes"
 AUTOHEADER="autoheader"
 AUTOMAKE="automake -a -c --foreign"
