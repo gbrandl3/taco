@@ -35,7 +35,7 @@ AT_CHECK([taco install])
 AT_CLEANUP
 
 AT_SETUP([Starting TACO])
-AT_CHECK([unset RES_BASE_DIR; taco start])
+AT_CHECK([unset RES_BASE_DIR; taco start ; sleep 10])
 AT_CLEANUP
 
 AT_BANNER([[Testing the database server.]])
