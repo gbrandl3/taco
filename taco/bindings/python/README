@@ -17,7 +17,8 @@ server modules for Python.
 
 This directory contains the modules necessary to implement TACO device
 servers written in Python. To run these modules the device server libraries
-(libtaco and libdsxdr_all) must be available as shared libraries.
+(libdsapi, libdbapi, libdsxdr and libdsxdr_all) must be available as 
+shared libraries.
 
 INSTALLATION
 

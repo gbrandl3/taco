@@ -1,33 +1,13 @@
-static char RcsId[] = "$Header: /home/jkrueger1/sources/taco/backup/taco/bindings/python/server.c,v 1.1 2003-03-18 16:54:16 jkrueger1 Exp $";
+
 /*********************************************************************
  * File:        Server.c
  *
  * Description: TACO server in Python
  *
  * Author(s):   J. Meyer
+ *		$Author: jkrueger1 $
  *
  * Original:    June 2000
- *
- * $Log: not supported by cvs2svn $
- * Revision 2.7  2002/03/06  15:34:58  15:34:58  meyer (J.Meyer)
- * Corrected version numbering
- * 
- * Revision 2.6  2002/03/06  14:30:52  14:30:52  meyer (J.Meyer)
- * Version for server without database
- * 
- * Revision 2.5  2001/10/17  18:42:57  18:42:57  meyer (J.Meyer)
- * Corrected command ececution for LINUX
- * 
- * Revision 2.4  2001/07/18  16:13:58  16:13:58  meyer (J.Meyer)
- * Corrected dev_getresource().
- * 
- * Revision 2.2  2001/04/27  14:37:14  14:37:14  meyer (J.Meyer)
- * Corrected modules to work only with one shared library
- * 
- * Revision 2.1  2001/02/22  16:57:59  16:57:59  meyer (J.Meyer)
- * TACO server and client as one package!
- * 
-
  *
  * $Revision: 1.1 $
  *********************************************************************/

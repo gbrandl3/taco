@@ -1,4 +1,4 @@
-static char RcsId[] = "$Header: /home/jkrueger1/sources/taco/backup/taco/bindings/python/python.c,v 1.1 2003-03-18 16:54:15 jkrueger1 Exp $";
+
 /*********************************************************************
  *
  *File:		Python.c
@@ -11,52 +11,6 @@ static char RcsId[] = "$Header: /home/jkrueger1/sources/taco/backup/taco/binding
  *
  *Original:	June 2000
  *
- *$Log: not supported by cvs2svn $
- * Revision 2.7  2002/03/06  15:34:59  15:34:59  meyer (J.Meyer)
- * Corrected version numbering
- * 
- * Revision 2.6  2002/03/06  14:30:52  14:30:52  meyer (J.Meyer)
- * Version for server without database
- * 
- *Revision 2.5  2001/10/17 18:42:57  meyer
- *Corrected command ececution for LINUX
- *
- * Revision 2.4  2001/07/18  16:13:59  16:13:59  meyer (J.Meyer)
- * Corrected dev_getresource().
- * 
- * Revision 2.2  2001/04/27  14:37:15  14:37:15  meyer (J.Meyer)
- * Corrected modules to work only with one shared library
- * 
- * Revision 2.1  2001/02/22  16:58:00  16:58:00  meyer (J.Meyer)
- * TACO server and client as one package!
- * 
- * Revision 1.10  2000/11/14  13:07:45  13:07:45  meyer (J.Meyer)
- * Corrected referenze handling!
- * 
- * Revision 1.9  2000/07/20  17:10:03  17:10:03  meyer (J.Meyer)
- * Cleaned-up sources
- * 
- * Revision 1.8  2000/07/20  17:06:59  17:06:59  meyer (J.Meyer)
- * cleaned-up sources.
- * 
- * Revision 1.7  2000/06/23  15:50:07  15:50:07  meyer (J.Meyer)
- * Added methode to read command name string to Server.c
- * 
- * Revision 1.6  2000/06/22  13:09:55  13:09:55  meyer (Jens MEYER)
- * Can handle several Python classes
- * 
- * Revision 1.5  2000/06/22  08:50:41  08:50:41  meyer (Jens MEYER)
- * Correct memory treatment with arrays.
- * 
- * Revision 1.4  2000/06/16  18:26:22  18:26:22  meyer (Jens MEYER)
- * First running version
- * 
- * Revision 1.2  2000/06/15  14:31:52  14:31:52  meyer (Jens MEYER)
- * *** empty log message ***
- * 
- * Revision 1.1  2000/06/08  12:18:41  12:18:41  meyer (Jens MEYER)
- * Initial revision
- * 
  *Copyright(c) 1994 by European Synchrotron Radiation Facility, 
  *                     Grenoble, France
  *

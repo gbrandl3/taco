@@ -1,20 +1,15 @@
-static char RcsId[] = "$Header: /home/jkrueger1/sources/taco/backup/taco/bindings/python/taco_types.c,v 1.1 2003-03-18 16:54:17 jkrueger1 Exp $";
-/*
+
+/*********************************************************************
  * File:        taco_types.c
  *
  * Description: interface python - taco
  *
  * Author(s):   MCD
- * 		Jens Meyer
  *		$Author: jkrueger1 $
  *
  * Original:    March 99
  *
- * Version:	$Revision: 1.1 $
- *
- * Date:	$Date: 2003-03-18 16:54:17 $
- *
- */
+ *********************************************************************/
 
 #include "Python.h"
 
@@ -24,9 +19,9 @@ static char RcsId[] = "$Header: /home/jkrueger1/sources/taco/backup/taco/binding
 #include <Admin.h>
 #include <API.h>
 #include <DevServer.h>
-// #include <atte_xdr.h>
-// #include <grp_xdr.h>
-// #include <maxe_xdr.h>
+#include <atte_xdr.h>
+#include <grp_xdr.h>
+#include <maxe_xdr.h>
 
 #ifdef NUMPY
 #include <arrayobject.h>
@@ -866,13 +861,6 @@ void display_special(DevArgument ds_argin,long ds_in,char * ms)
 	          ((DevLongReadPoint *)(ds_argin))->set, 
 		  ((DevLongReadPoint *)(ds_argin))->read);
 	  break;
-      case D_STATE_FLOAT_READPOINT:
-          printf("-- esrf_io: %s: STATE FLOAT READ POINT: (%d %f,%f)\n",ms,
-	          ((DevStateFloatReadPoint *)(ds_argin))->state, 
-		  ((DevStateFloatReadPoint *)(ds_argin))->set,
-		  ((DevStateFloatReadPoint *)(ds_argin))->read);
-	  break;
-#if 0
       case D_MOTOR_LONG:
           printf("-- esrf_io: %s: MOTOR_LONG: (%d,%d)\n",ms,
 	          ((DevMotorLong *)(ds_argin))->axisnum, 
@@ -882,6 +870,12 @@ void display_special(DevArgument ds_argin,long ds_in,char * ms)
           printf("-- esrf_io: %s: MOTOR_FLOAT: (%d,%f)\n",ms,
 	          ((DevMotorFloat *)(ds_argin))->axisnum, 
 		  ((DevMotorFloat *)(ds_argin))->value);
+	  break;
+      case D_STATE_FLOAT_READPOINT:
+          printf("-- esrf_io: %s: STATE FLOAT READ POINT: (%d %f,%f)\n",ms,
+	          ((DevStateFloatReadPoint *)(ds_argin))->state, 
+		  ((DevStateFloatReadPoint *)(ds_argin))->set,
+		  ((DevStateFloatReadPoint *)(ds_argin))->read);
 	  break;
       case D_MULMOVE_TYPE:
           printf("-- esrf_io: %s: MULMOVE: \n",ms);
@@ -897,7 +891,7 @@ void display_special(DevArgument ds_argin,long ds_in,char * ms)
 	  for (i=0; i<8; i++)
 	     printf("%d ",((DevMulMove *)(ds_argin))->delay[i]);
 	  printf(")\n");	   
-#endif
+
 	  break; 	  	  	  
      default:
           printf("display_special: %s unknown type %d\n",ms,ds_in);
@@ -1038,43 +1032,7 @@ long get_argin_special(DevArgument ds_argin, long ds_in,
 	 }
 	 Py_XDECREF (item);
 	 break;
-
-      case D_STATE_FLOAT_READPOINT:		/*(short state, float set,float read)*/
-         if (len != 3)
-	 {
-	    sprintf(mymess,"get_argin_special : input should be (short,float,float)");
-	    return(-1);	 
-	 }
-	 /* state */
-	 item = PySequence_GetItem(mytuple,0);
-	 if (merr != 0)
-	 {
-	    sprintf(mymess,"get_argin_special : input (short,float,float): first item not short");
-	    return(-1);
-	 }
-	 Py_XDECREF (item);
 	 
-	 /* set */	 
-	 item = PySequence_GetItem(mytuple,1);
-         ((DevStateFloatReadPoint*)(ds_argin))->set= p2c_FLOAT(item,&merr);
-	 if (merr != 0)
-	 {
-	    sprintf(mymess,"get_argin_special : input (short,float,float): second item not float");
-	    return(-1);
-	 }
-	 Py_XDECREF (item);
-	 
-	 /* read */	 
-	 item = PySequence_GetItem(mytuple,2);
-         ((DevStateFloatReadPoint*)(ds_argin))->read= p2c_FLOAT(item,&merr);
-	 if (merr != 0)
-	 {
-	    sprintf(mymess,"get_argin_special : input (short,float,float): third item not float");
-	    return(-1);
-	 }
-	 Py_XDECREF (item);	 
-	 break;
-#if 0	 
       case D_MOTOR_LONG:		/*(long axisnum, long value)*/
          if (len != 2)
 	 {
@@ -1129,6 +1087,42 @@ long get_argin_special(DevArgument ds_argin, long ds_in,
 	 Py_XDECREF (item);
 	 break;
 	 
+      case D_STATE_FLOAT_READPOINT:		/*(short state, float set,float read)*/
+         if (len != 3)
+	 {
+	    sprintf(mymess,"get_argin_special : input should be (short,float,float)");
+	    return(-1);	 
+	 }
+	 /* state */
+	 item = PySequence_GetItem(mytuple,0);
+	 if (merr != 0)
+	 {
+	    sprintf(mymess,"get_argin_special : input (short,float,float): first item not short");
+	    return(-1);
+	 }
+	 Py_XDECREF (item);
+	 
+	 /* set */	 
+	 item = PySequence_GetItem(mytuple,1);
+         ((DevStateFloatReadPoint*)(ds_argin))->set= p2c_FLOAT(item,&merr);
+	 if (merr != 0)
+	 {
+	    sprintf(mymess,"get_argin_special : input (short,float,float): second item not float");
+	    return(-1);
+	 }
+	 Py_XDECREF (item);
+	 
+	 /* read */	 
+	 item = PySequence_GetItem(mytuple,2);
+         ((DevStateFloatReadPoint*)(ds_argin))->read= p2c_FLOAT(item,&merr);
+	 if (merr != 0)
+	 {
+	    sprintf(mymess,"get_argin_special : input (short,float,float): third item not float");
+	    return(-1);
+	 }
+	 Py_XDECREF (item);	 
+	 break;
+
       case D_MULMOVE_TYPE:		/*(long action[8],long delay[8],float position[8])*/
          if (len != 3)
 	 {
@@ -1171,7 +1165,8 @@ long get_argin_special(DevArgument ds_argin, long ds_in,
 	    Py_XDECREF (item);	    
 	 }
 	 break;
-#endif
+	 
+
       default:
          sprintf(mymess,"get_argin_special: unknown type %d\n",ds_in);
 	 return(-1);
@@ -1532,7 +1527,7 @@ long get_argout_special(DevArgument ds_argout, long ds_out,
          item = PyFloat_FromDouble((double) ((((DevDoubleReadPoint *)(ds_argout))->read)));
 	 PyList_SetItem(*mylist,i,item);                   
 	 break;
-#if 0	 
+	 
       case D_MOTOR_LONG:
 	 if ( (*mylist = PyList_New(len)) == NULL)
 	 {
@@ -1556,7 +1551,7 @@ long get_argout_special(DevArgument ds_argout, long ds_out,
          item = PyFloat_FromDouble((double) ((((DevMotorFloat *)(ds_argout))->value)));
 	 PyList_SetItem(*mylist,i,item);      
 	 break;
-#endif
+
       case D_STATE_FLOAT_READPOINT:
 	 if ( (*mylist = PyList_New(len)) == NULL)
 	 {
@@ -1632,12 +1627,10 @@ long check_type(long ds_ty, long *is_a_single,
       case D_FLOAT_READPOINT:
       case D_LONG_READPOINT:
       case D_DOUBLE_READPOINT:
-#if 0
       case D_MOTOR_LONG:
       case D_MOTOR_FLOAT:
-      case D_MULMOVE_TYPE:
-#endif
       case D_STATE_FLOAT_READPOINT:
+      case D_MULMOVE_TYPE:
          *is_a_special = 1;
 	 return(0);
 	 break;

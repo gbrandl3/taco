@@ -1,20 +1,16 @@
-static char RcsId[] = "$Header: /home/jkrueger1/sources/taco/backup/taco/bindings/python/taco.c,v 1.1 2003-03-18 16:54:17 jkrueger1 Exp $";
-/**
+
+/*********************************************************************
  * File:        taco.c
  *
  * Description: interface python - Taco
  *
  * Author(s):   MCD
- * 		J.Meyer
  *		$Author: jkrueger1 $
  *
  * Original:    December 99
  *
- * Version:	$Revision: 1.1 $
- *
- * Date:	$Date: 2003-03-18 16:54:17 $
- *
- */
+ * $Revision: 1.1 $
+ *********************************************************************/
 
 #include "Python.h"
 
@@ -25,9 +21,6 @@ static char RcsId[] = "$Header: /home/jkrueger1/sources/taco/backup/taco/binding
 #include <API.h>
 #include <DevServer.h>
 #include <dc.h>
-// #include <atte_xdr.h>
-// #include <grp_xdr.h>
-// #include <maxe_xdr.h>
 
 #ifdef NUMPY
 #include <arrayobject.h>
@@ -1548,6 +1541,7 @@ esrf_dc_info(PyObject *self,PyObject *args)
       }      
    }
 }
+
 
 /**************************************************************   
 

@@ -1,0 +1,375 @@
+	
+Python commands:
+   file TacoDevice.py
+   
+1- Use of the Dev class:
+------------------------
+	x=Device("MCD/maxe032_1/1")
+	print x
+	x.CommandList()
+	x.tcp()
+	x.udp()
+	print x.timeout()
+	x.timeout(2)
+	a = x.DevReadEncPos(2)   
+	aa=array([0,1,2,3,4,5,6,7],Float32)
+	x.DevReadMulVel(0,1,2,3,out=aa)
+	bb=DevReadMulVel(0,1,2,3,outtype='numeric')
+	
+	dev_putresource("MCD/maxe032_1/1","toto","5")
+	dev_getresource("MCD/maxe032_1_1/1","axe_ident0")
+	dev_delresource("MCD/maxe032_1/1","toto")
+		
+2- python internal functions used with module TacoDevice
+---------------------------------------------------------   
+
+dev_debug(flag):		STANDARD CALL
+---------------
+   sets python functions debug flag
+   
+  	input: 	- flag: debug flag
+ 		   0: no trace
+ 		   else: trace
+ 
+   	returns:
+ 		- 0: error
+   		- 1: OK   	
+
+dev_init(mdevname):
+-------------------
+   inits the class instance
+   used by x=Device("MCD/maxe032_1/1")
+   
+   	input: 	- mdevname: device name
+ 
+   	returns list:
+ 		- [] if error
+   		- [devname,cpt]
+      		devname: mdevname in lowercase
+      		cpt:  index in C device table
+
+dev_unref(mdevname):
+-------------------
+  decrement reference to that object in Tab_dev table
+  If reference becomes 0, calls the C dev_free routines:
+ 
+  	input: 	- mdevname: device name
+ 
+   	returns:
+      		- 0 : error
+      		- 1 : OK
+ 
+
+dev_query(mdevname):
+-------------------
+   asks for database device command list
+   
+    	input: 	- mdevname: device name in lower case
+ 
+    	returns dictionnary:
+ 		- {} if error
+   		-{cmd_name:[cmd,in_type,out_type], ...}
+ 	        cmd_name: command string
+      		cmd: command numeric value
+ 		in_type: input type
+ 		out_type: output type
+
+dev_tcpudp(mdevname,mode):
+-------------------------
+    Sets mode tcp/udp for the device
+    
+    	input:
+       		- mdevname: device name in lower case
+ 		- mode: "tcp" or "udp"
+ 
+    	returns value:
+ 		- 0 if error
+   		- 1 if OK
+
+dev_timeout(mdevname,*mtime):
+----------------------------
+    Asks for or set the device timeout
+    
+    	input:
+       		- mdevname: device name in lower case
+ 		- mtime: optional argument:
+ 			- if not existing: read timeout required
+ 			- if exists: time in  second for setting timeout
+ 
+    	returns value:
+ 		- 0 if error
+ 		- time in sec (read or set) if OK
+
+dev_getresource(mdevname,resname):		STANDARD CALL
+----------------------------------
+    Gets a device resource
+    
+    	input:
+       		- mdevname: device name 
+ 		- resname:  resource name
+ 
+    	returns value packed as a string:
+ 		- resource value if OK
+ 		- None if error
+
+dev_putresource(mdevname,resname,value):	STANDARD CALL
+---------------------------------------
+    Sets a device resource
+    
+    	input:
+       		- mdevname: device name 
+ 		- resname:  resource name
+ 		- value: the resource value packed as a string
+ 
+    	returns value:
+ 		- 1: if OK
+ 		- 0: if error
+   
+
+dev_delresource(mdevname,resname):		STANDARD CALL
+---------------------------------
+    removes a device resource
+    
+    	input:
+       		- mdevname: device name 
+ 		- resname:  resource name
+ 
+    	returns value:
+ 		- 1: OK
+ 		- 0: error
+ 
+dev_io(mdevname,mdevcommand,*parin,**kw):
+-----------------------------------------
+   sends a command to a device
+   
+    	input:
+       		- mdevname: device name in lower case
+ 		- parin: list of optional INPUT parameters
+ 		- kw: dictionnary of optional OUTPUT parameters
+ 
+    	returns value:
+ 		- 1 : if no device ARGOUT or OUTPUT param provided
+ 		- device ARGOUT : if device ARGOUT and no OUTPUT param
+ 
+3- C functions call from python
+-------------------------------
+
+esrf_getdevlist(filter):	STANDARD CALL
+-----------------------
+   call for the database list of devices corresponding to the filter
+   
+   	input:	- filter :
+	             device name, with * for filtering
+	
+	returns:
+		- list whit devices names (possibly empty)
+		
+	examples:
+	        esrf_getdevlist()
+		esrf_getdevlist("MCD/*/*")
+
+esrf_debug(flag):		STANDARD CALL
+----------------
+    sets debug flag for C trace
+    
+    	input:	- flag:
+		     0 : no trace
+		     else:  trace
+		     
+
+esrf_free(c_pointer):
+--------------------------
+   frees a device 
+   
+	arguments:
+		- device pointer 
+			
+        returns:
+		Null:	no error
+		NULL:	error			     
+		
+esrf_import(devname):
+---------------------
+    Imports a device 
+
+	arguments:
+		- device name (in)
+			
+        returns:
+		device server C pointer:	no error
+		NULL:				error	
+		
+
+esrf_query(c_pointer):
+----------------------
+    Asks for device command list 
+
+	arguments:
+		- C object pointer given 
+				  by dev_import
+			
+        returns: a dictionnary
+		{ 'cmd': [cmd,in_type,out_type], ... }
+		NULL:			error		
+		
+	
+esrf_getresource(device_name,recource name):
+-------------------------------------------
+    Asks for commands 
+
+	arguments:
+		- device name 
+		- resource name
+			
+        returns: 
+	        resource value (string pack): OK
+		NULL:		 error				
+		
+
+esrf_putresource(devname,resname,objet):
+-----------------------------------------
+    set a device resource value 
+
+	arguments:
+		- devname: device name 
+		- resname: resource name
+		- object: containing the value
+		    packed as a string
+			
+        returns: 
+	        Py_None: 	if OK
+		NULL: 		if error			
+		
+esrf_delresource(devname,resname):
+----------------------------------
+    deletes a device resource 
+
+	arguments:
+		- devname: device name 
+		- resname: resource name
+			
+        returns: 
+	        Py_None: 	if OK
+		NULL: 		if error
+		
+		
+esrf_tcpudp(C_pointer,mode):
+----------------------------
+    sets tcp/udp mode  
+
+	arguments:
+		- C object pointer given 
+			by dev_import
+		- "tcp" | "udp"
+			
+        returns: 
+		Py_None: 		OK
+		NULL:			error	
+		
+esrf_timeout(C_pointer[,timeout]):
+----------------------------------
+    Sets timeout for device 
+
+	arguments:
+		- C object pointer given 
+			by dev_import
+		- time for setting timeout 
+			(optional)
+			
+        returns: 
+		timeout (read or set) 	if ok
+		NULL:			error	
+		
+		
+esrf_getdevlist([filter]):
+------------------------
+Retrieve from database the list of devices
+User can provide a fliter
+
+	arguments:
+		- filter (optional)
+				  
+			
+        returns: 
+		[list of devices] 	if ok
+		NULL:			error	
+		
+
+esrf_io(C_pointer,command_sring,command,input_type,output_type,
+        input_param[,out=myarray][,outtype=python_type]):
+--------------------------------------------------------------------------
+   Asks for commands 
+
+	arguments:
+		- C_pointer: pointer on C device server
+			(returned by dev_import)
+		- command_string: command string
+		- command: command number
+		- input_type: integer input type
+		- output_type: interger output type
+		- input_param: 
+			- for "single": adress or value
+			- for "arrays" or "special":
+			    list of parameters
+		- out=myarray: keyword 'out' with the name
+		  of a numeric array
+		- outtype=python_type: keyword 'outtype' with
+		  the name of a python special type 
+		  for the moment: numeric only
+			
+        returns: 
+		Python objet according to type:  if ok
+		NULL:				 error
+		
+	examples:
+	        x.DevReadMulpos(0,3,1)
+		y.DevStatus()
+		par=(3,2,1)
+		x.DevReadMulPos(par)
+		aa=array([0,1,2,3,4,5,6,7],Float32)
+		x.DevReadMulVel(0,1,2,3,out=aa)			
+	        bb=DevReadMulVel(0,1,2,3,outtype='numeric')
+
+4- List of taco types handled by the C interface
+------------------------------------------------
+D_VOID_TYPE
+D_BOOLEAN_TYPE
+D_USHORT_TYPE
+D_SHORT_TYPE
+D_ULONG_TYPE
+D_LONG_TYPE
+D_FLOAT_TYPE
+D_DOUBLE_TYPE
+D_STRING_TYPE
+
+D_INT_FLOAT_TYPE
+D_FLOAT_READPOINT
+D_LONG_READPOINT
+D_DOUBLE_READPOINT
+D_MOTOR_LONG
+D_MOTOR_FLOAT
+D_STATE_FLOAT_READPOINT
+D_MULMOVE_TYPE
+
+D_VAR_CHARARR
+D_VAR_STRINGARR
+D_VAR_USHORTARR
+D_VAR_SHORTARR
+D_VAR_ULONGARR
+D_VAR_LONGARR
+D_VAR_FLOATARR
+D_VAR_DOUBLEARR
+D_VAR_FRPARR
+D_VAR_SFRPARR
+D_VAR_LRPARR
+D_OPAQUE_TYPE
+
+5- For Numeric types, correspondance C <-> numeric
+--------------------------------------------------
+D_VAR_CHARARR		Int8
+D_VAR_USHORTARR		Int16
+D_VAR_SHORTARR		Int16
+D_VAR_ULONGARR		Int32
+D_VAR_LONGARR		Int32
+D_VAR_FLOATARR		Float32
+D_VAR_DOUBLEARR		Float64
