@@ -1,6 +1,6 @@
 AC_INIT([TACO], [3.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.40 $)dnl
+AC_REVISION($Revision: 1.41 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -30,6 +30,20 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
+
+GCC_LIB_PATH="" 
+if test x"$CC" = x"gcc" ; then
+	AC_MSG_CHECKING([for the path to the gcc library])
+	for i in `gcc -print-libgcc-file-name | tr '/' ' '` ; do 
+		if test x"$i" = x"gcc-lib" ; then 
+			break ; 
+		else 
+			GCC_LIB_PATH="${GCC_LIB_PATH}/${i}" 
+		fi  
+	done  
+	AC_MSG_RESULT([$GCC_LIB_PATH])
+fi
+AC_SUBST([GCC_LIBRARY_PATH], [$GCC_LIB_PATH])
 
 # Checks for header files.
 AC_FUNC_ALLOCA
@@ -220,6 +234,7 @@ AC_CONFIG_FILES(Makefile
 		misc/tacoenv.sh
 		misc/tacoenv.csh
 		misc/taco.startup
+		misc/taco.shutdown
 		doc/Makefile
 		lib/Makefile
 		lib/Doxyfile
