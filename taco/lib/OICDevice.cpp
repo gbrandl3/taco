@@ -15,11 +15,11 @@
 //
 // Original:	November 1996
 //
-// $Revision: 1.2 $
+// $Revision: 1.3 $
 //
-// $Date: 2004-11-05 08:52:35 $
+// $Date: 2004-11-25 15:53:47 $
 //
-// $Author: jkrueger1 $
+// $Author: andy_gotz $
 //
 //-**********************************************************************
 		
@@ -133,25 +133,33 @@ OICDevice::OICDevice (DevString devname, DevServerClass devclass, long *error)
 	strcpy(this->name, devname);
 
 //
-// now initialise the OICDevice object fields by copying the necessary
+// initialise the OICDevice object fields by copying the necessary
 // values from the DevServer object and DevServerClass class.
 //
 	this->n_commands = oicclass->devserver_class.n_commands;
 //
-// now copy the list of commands and their input and output argument
+// copy the list of commands and their input and output argument
 // types to the DeviceCommandListEntry. This code makes the assumption
 // that one can cast and copy a DevCommandListEntry* to a Device::Device
 // CommandListEntry*
 //
 	for (int i = 0; i < this->n_commands; i++)
 	{
+		DevCommand _cmd;
+		DeviceMemberFunction _fn;
+		DevArgType _argin_type, _argout_type;
+		long _min_access;
+		char *_cmd_name;
+		
+        _cmd = oicclass->devserver_class.commands_list[i].cmd;
+		_fn = (DeviceMemberFunction)NULL;
+		_argin_type = (oicclass->devserver_class.commands_list[i].argin_type);
+		_argout_type = (oicclass->devserver_class.commands_list[i].argout_type);
+		_min_access = (oicclass->devserver_class.commands_list[i].min_access);
+		_cmd_name = (char*)(oicclass->devserver_class.commands_list[i].cmd_name);
+	
 		this->commands_list[oicclass->devserver_class.commands_list[i].cmd] = 
-                	DeviceCommandListEntry(oicclass->devserver_class.commands_list[i].cmd,
-					NULL,
-					oicclass->devserver_class.commands_list[i].argin_type,
-					oicclass->devserver_class.commands_list[i].argout_type,
-					oicclass->devserver_class.commands_list[i].min_access, 
-					oicclass->devserver_class.commands_list[i].cmd_name);
+			Device::DeviceCommandListEntry(_cmd, _fn, _argin_type, _argout_type, _min_access, _cmd_name);
 /*
 		printf("OICDevice::OICDevice() command(%d) cmd=%d argin_type=%d argout_type=%d min_access=%d\n",
 			i,this->commands_list[i].cmd,this->commands_list[i].argin_type,
