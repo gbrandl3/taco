@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0-beta, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.53)
-AC_REVISION($Revision: 1.2 $)dnl
+AC_REVISION($Revision: 1.3 $)dnl
 AC_COPYRIGHT([(C) 19??-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR(lib/dev_api.c)
@@ -81,11 +81,22 @@ TACO_SERVER_LIBS="\$(top_builddir)/lib/libdsapi.la \
 	       \$(top_builddir)/lib/xdr/libdsxdr.la"
 AC_SUBST(TACO_SERVER_LIBS)
 
+TACO_SERVER_CXX_LIBS="\$(top_builddir)/lib/libdsapig++.la \
+	       \$(top_builddir)/lib/dbase/libdbapi.la \
+	       \$(top_builddir)/lib/xdr/libdsxdr.la"
+AC_SUBST(TACO_SERVER_CXX_LIBS)
+
 TACO_CLIENT_LIBS="\$(top_builddir)/lib/libtacoapi.la \
 	       \$(top_builddir)/lib/dbase/libdbapi.la \
 	       \$(top_builddir)/lib/xdr/libdsxdr.la"
 AC_SUBST(TACO_CLIENT_LIBS)
 
+TACO_CLIENT_CXX_LIBS="\$(top_builddir)/lib/libtacoapig++.la \
+	       \$(top_builddir)/lib/dbase/libdbapi.la \
+	       \$(top_builddir)/lib/xdr/libdsxdr.la"
+AC_SUBST(TACO_CLIENT_CXX_LIBS)
+
+AC_SUBST(TACO_CLIENT_LIBS)
 TACO_DEFINES
 TACO_DATAPORT_SRC
 TACO_PYTHON_SERVER
@@ -128,8 +139,6 @@ AC_CONFIG_FILES(Makefile
 	  classes/Makefile
 	  system/dbase/greta/Makefile
 	  system/xdevmenu/Makefile
-	  tests/Makefile
-	  tests/taco
 	  taco.spec
 )
 
@@ -151,6 +160,12 @@ AC_CONFIG_FILES(m4/Makefile)
 AC_CONFIG_FILES(bindings/python/Makefile bindings/python/lib/Makefile bindings/python/doc/Makefile bindings/python/demo.server/Makefile)
 
 AC_CONFIG_FILES(bindings/Makefile bindings/tcl/Makefile)
+
+dnl Initialize the test suite
+AC_CONFIG_TESTDIR(tests)
+AC_CONFIG_FILES(tests/Makefile tests/atlocal)
+AC_CONFIG_FILES(tests/taco, [chmod +x tests/taco])
+AM_MISSING_PROG([AUTOM4TE], [autom4te])
 
 AC_OUTPUT
 
