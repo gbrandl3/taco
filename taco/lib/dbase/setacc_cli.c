@@ -9,13 +9,13 @@
             :   Interface to access static database
 
  Author(s)  :   Emmanuel Taurel
-		$Author: jkrueger1 $
+		$Author: andy_gotz $
 
  Original   :   January 1991
 
- Version    :	$Revision: 1.7 $
+ Version    :	$Revision: 1.8 $
 
- Date       :	$Date: 2004-05-07 15:08:56 $
+ Date       :	$Date: 2005-03-29 10:10:09 $
  
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -1953,6 +1953,10 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 						free(tmp_arr);
 						return(DS_NOTOK);
 					}
+/*
+ *  STRANGE - why check the string length against STRING_SIZE when you have
+ *            just checked it against MAX_RES ... ?! Skip this check - andy 25mar05
+ *
 					if (strlen(tmp_string->sequence[j]) > (size_t)STRING_SIZE) 
 					{
 						*perr = DbErr_StringTooLong;
@@ -1966,6 +1970,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 						free(tmp_arr);
 						return(DS_NOTOK);
 					}
+ */
 					k = strlen(tmp_arr);
 					tmp_arr[k++] = SEP_ELT;
 					tmp_arr[k] = 0;
