@@ -12,9 +12,9 @@
 //
 // Original:	March 1995
 //
-// Version:	$Revision: 1.4 $
+// Version:	$Revision: 1.5 $
 //
-// Date:	$Date: 2003-05-09 06:33:49 $
+// Date:	$Date: 2003-05-16 13:49:44 $
 //
 //-**********************************************************************
 		
@@ -139,12 +139,12 @@ long Device::Command (long cmd, void* argin, long argin_type,
 //
 // add code to execute a command here
 //
-	for (int i = 0; i < this->commands_list.size(); i++)
+	for (std::map<DevCommand, DeviceCommandListEntry>::iterator it = this->commands_list.begin(); it != this->commands_list.end(); ++it)
 	{
-		if (cmd == this->commands_list[i].cmd)
+		if (cmd == it->second.cmd)
 		{
-			if (argin_type != this->commands_list[i].arginType ||
-			    argout_type != this->commands_list[i].argoutType)
+			if (argin_type != it->second.arginType ||
+			    argout_type != it->second.argoutType)
 			{
 				*error = DevErr_IncompatibleCmdArgumentTypes;
 				return(DS_NOTOK);
@@ -160,7 +160,7 @@ long Device::Command (long cmd, void* argin, long argin_type,
 // now execute the command
 //
 
-			member_fn = this->commands_list[i].fn;
+			member_fn = it->second.fn;
 			return (this->*member_fn)(argin,argout,error);
 		}
 	}
@@ -345,7 +345,7 @@ long Device::Command_Query(_dev_cmd_info *cmd_info,long *error)
 {
 	*error = DS_OK;
 	long	i = 0;
-	for (std::map<DevCommand, DeviceCommandListEntry>::iterator it = commands_list.begin(); it != this->commands_list.end(); ++it, ++i)
+	for (std::map<DevCommand, DeviceCommandListEntry>::iterator it = this->commands_list.begin(); it != this->commands_list.end(); ++it, ++i)
 	{
 		cmd_info[i].cmd = it->second.cmd;
 		cmd_info[i].in_type = it->second.arginType;
