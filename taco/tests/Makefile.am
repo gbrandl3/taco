@@ -127,7 +127,7 @@ atconfig:	$(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
 clean-local:
-	$(SHELL) $(TESTSUITE) --clean
+	if test -f $(TESTSUITE) ; then $(SHELL) $(TESTSUITE) --clean ; fi	
 
 noinst_HEADERS		= test_server.h test_serverP.h
 
