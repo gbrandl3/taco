@@ -23,7 +23,6 @@
 // db_info_svc info_back;
 // vector<NdbmDomain> dom_list;
 // vector<NdbmDomain> res_list;
-// vector<string> res_list_dev;
 // svcinfo_svc svcinfo_back;
 // db_poller_svc poll_back;
 
@@ -288,7 +287,7 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 		else
 			(*p).add_dev(fam_memb);
 	}
-
+	res_list_dev.clear();
 	try
 	{
 		for (i = 0;i < dom_list.size();i++)
@@ -353,7 +352,6 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 //
 // Get resource value for each element in the tmp_res_list list 
 //
-
 			for (k = 0;k < tmp_res_list.size();k++)
 			{
 				try
@@ -364,7 +362,6 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 					fam = key.get_res_fam_name();
 					memb = key.get_res_memb_name();
 					r_name = key.get_res_name();
-					
 					resource = dom_list[i].get_domain() + "/" + fam + "/" + memb + "/" + r_name;			
 					while(1)
 					{
@@ -375,9 +372,9 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 			
 						tmp_res = rescont.get_res_value();
 						if (ind == 1)
-							resource = resource + ": " + tmp_res;
+							resource += ": " + tmp_res;
 						else
-							resource = resource + "," + tmp_res;
+							resource += "," + tmp_res;
 						ind++;
 					}
 				}
@@ -433,13 +430,11 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 //
 // Sort resource name list
 //
-
 	std::sort(res_list_dev.begin(),res_list_dev.end());
 		
 // 
 // Build the structure returned to caller
 //
-
 	long res_nb = res_list_dev.size();
 	try
 	{		
@@ -468,7 +463,6 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 //
 // Return data
 //
-
 	return(&browse_back);	
 }
 
@@ -1115,7 +1109,6 @@ db_info_svc *NdbmServer::info_1_svc()
 *    error								    *
 *                                                                           *
 ****************************************************************************/
-
 long *NdbmServer::unreg_1_svc(db_res *recev)
 {
 	static long 	sent_back;
@@ -1832,8 +1825,6 @@ void  NdbmServer::delete_res(const std::string &dev_name)
 *    This function returns a pointer to an error code			    *
 *                                                                           *
 ****************************************************************************/
-
-
 db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 {
 	datum 		key;
