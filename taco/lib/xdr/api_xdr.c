@@ -11,9 +11,9 @@
 
  Original:      January 1991
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2004-09-17 07:56:18 $
+ Date:		$Date: 2004-11-10 16:43:25 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -32,6 +32,7 @@ bool_t xdr_DevVarArgument (XDR *xdrs, DevVarArgument *objp)
 {
         DevDataListEntry        data_type;
         long                    error;
+	char			*p;
 
 	dev_printdebug(DBG_TRACE | DBG_API, "xdr_DevVarArgument() : entering routine.\n");
 	dev_printdebug(DBG_TRACE | DBG_API, "xdr_DevVarArgument() : call xdr_long(argument_type).\n");
@@ -58,7 +59,7 @@ bool_t xdr_DevVarArgument (XDR *xdrs, DevVarArgument *objp)
 		return (FALSE);
         }
 
-	char	*p = (char *)objp->argument;
+	p = (char *)objp->argument;
 	dev_printdebug(DBG_TRACE | DBG_API, "xdr_DevVarArgument() : objp->argument %p.\n", &objp->argument);
         if (!xdr_pointer(xdrs, (char **)&objp->argument, data_type.size, (xdrproc_t)data_type.xdr )) 
 	{
