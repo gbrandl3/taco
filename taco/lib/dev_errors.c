@@ -8,13 +8,13 @@
 
  Author(s):	Andy Goetz
 		Jens Meyer
-		$Author: jkrueger1 $
+		$Author: andy_gotz $
 
  Original:	9 March 1992
 
- Version:       $Revision: 1.2 $
+ Version:       $Revision: 1.3 $
 
- Date:          $Date: 2003-04-25 11:21:34 $
+ Date:          $Date: 2004-11-02 16:28:27 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -156,7 +156,10 @@ DevErrListEntry DevErr_List[] = {
 { DbErr_NameAlreadyUsed,"The pseudo device name is already used for a device"},
 { DbErr_CannotEncodeArguments,"XDR : Cannot encode arguments"},
 { DbErr_CannotDecodeResult,"XDR : Cannot decode results from db server"},
-	};
+
+{ DevErr_AttributeNotFound,"Attribute name is neither defined for TACO nor for TANGO"},
+{ DevErr_CannotConvertAttributeDataType,"Cannot cast attribute data type to the requested type"},
+};
 
 
 /*
