@@ -15,7 +15,9 @@ AC_DEFUN([TACO_PYTHON_BINDING],
 AC_DEFUN([TACO_TCL_BINDING],
 [
 	AC_REQUIRE([TACO_PROG_TCL])
-	if test -n "$TCLINCLUDE" -a -n "$TCLLIB" -a "$TCLPACKAGE" != "no" ; then
+	if { echo $target | grep darwin ; } then 
+		taco_tcl_bindings=no
+	elif test -n "$TCLINCLUDE" -a -n "$TCLLIB" -a "$TCLPACKAGE" != "no" ; then
 		taco_tcl_binding=yes
 	else
 		taco_tcl_binding=no
