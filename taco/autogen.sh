@@ -19,7 +19,7 @@ case $autoversion in
 	;;
     *)
 	echo "This autoconf version is not supported by taco."
-	echo "gdbm only supports autoconf 2.5[2-79]."
+	echo "taco only supports autoconf 2.5[2-79]."
 	exit
 	;;
 esac
