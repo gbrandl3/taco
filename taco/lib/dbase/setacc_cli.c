@@ -13,9 +13,9 @@
 
  Original   :   January 1991
 
- Version    :	$Revision: 1.3 $
+ Version    :	$Revision: 1.4 $
 
- Date       :	$Date: 2003-05-16 13:40:27 $
+ Date       :	$Date: 2004-02-19 15:47:03 $
  
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -1443,10 +1443,10 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 					}
 					free(tmp->res_name);
 					free(send.tab_putres_val);
-				return(DS_NOTOK);
+					return(DS_NOTOK);
 				}
 /* Convert resource value to string */
-				sprintf(tmp->res_val,"%hd",*(short *)res[i].resource_adr);
+				snprintf(tmp->res_val, 10, "%hd",*(short *)res[i].resource_adr);
 				break;
 
 			case D_USHORT_TYPE :
@@ -1461,10 +1461,10 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 					}
 					free(tmp->res_name);
 					free(send.tab_putres_val);
-				return(DS_NOTOK);
+					return(DS_NOTOK);
 				}
 /* Convert resource value to string */
-				sprintf(tmp->res_val,"%hu",*(unsigned short *)res[i].resource_adr);
+				snprintf(tmp->res_val, 10, "%hu",*(unsigned short *)res[i].resource_adr);
 				break;
 
 			case D_LONG_TYPE :
@@ -1479,10 +1479,10 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 					}
 					free(tmp->res_name);
 					free(send.tab_putres_val);
-				return(DS_NOTOK);
+					return(DS_NOTOK);
 				}
 /* Convert resource value to string */
-				sprintf(tmp->res_val,"%ld",*(long *)res[i].resource_adr);
+				snprintf(tmp->res_val, 16, "%ld",*(long *)res[i].resource_adr);
 				break;
 			case D_ULONG_TYPE :
 /* Allocate memory for the string */
@@ -1496,10 +1496,10 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 					}
 					free(tmp->res_name);
 					free(send.tab_putres_val);
-				return(DS_NOTOK);
+					return(DS_NOTOK);
 				}
 /* Convert resource value to string */
-				sprintf(tmp->res_val,"%ul",*(unsigned long *)res[i].resource_adr);
+				snprintf(tmp->res_val, 16, "%ul",*(unsigned long *)res[i].resource_adr);
 				break;
 			case D_FLOAT_TYPE :
 /* Allocate memory for the string */
@@ -1513,10 +1513,10 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 					}
 					free(tmp->res_name);
 					free(send.tab_putres_val);
-				return(DS_NOTOK);
+					return(DS_NOTOK);
 				}
 /* Convert resource value to string */
-				sprintf(tmp->res_val,"%.8e",*(float *)res[i].resource_adr);
+				snprintf(tmp->res_val, SIZE_A, "%.8e",*(float *)res[i].resource_adr);
 				break;
 			case D_DOUBLE_TYPE :
 /* Allocate memory for the string */
@@ -1530,10 +1530,10 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 					}
 					free(tmp->res_name);
 					free(send.tab_putres_val);
-				return(DS_NOTOK);
+					return(DS_NOTOK);
 				}
 /* Convert resource value to string */
-				sprintf(tmp->res_val,"%.8e",*(double *)res[i].resource_adr);
+				snprintf(tmp->res_val, SIZE_A, "%.8e",*(double *)res[i].resource_adr);
 				break;
 			case D_STRING_TYPE :
 /* Verify that the string is not too long */
@@ -1548,7 +1548,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 					}
 					free(tmp->res_name);
 					free(send.tab_putres_val);
-				return(DS_NOTOK);
+					return(DS_NOTOK);
 				}
 	
 /* Allocate memory for the string */
@@ -1562,7 +1562,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 					}
 					free(tmp->res_name);
 					free(send.tab_putres_val);
-				return(DS_NOTOK);
+					return(DS_NOTOK);
 				}
 /* Copy the string */
 				strcpy(tmp->res_val,*(char **)res[i].resource_adr);
@@ -1579,14 +1579,13 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 					}
 					free(tmp->res_name);
 					free(send.tab_putres_val);
-				return(DS_NOTOK);
+					return(DS_NOTOK);
 				}
 /* Convert the boolean value to string */
 				if (*(char *)res[i].resource_adr == TRUE)
 					strcpy(tmp->res_val,"On");
 				else
 					strcpy(tmp->res_val,"Off");
-
 				break;
 			case D_VAR_CHARARR :
 				tmp_char = (DevVarCharArray *)res[i].resource_adr;
@@ -1603,7 +1602,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 						}
 						free(tmp->res_name);
 						free(send.tab_putres_val);
-			return(DS_NOTOK);
+						return(DS_NOTOK);
 					}
 					tmp_arr[0] = 0;
 					k2 = 1;
@@ -1616,7 +1615,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 
 					k = strlen(tmp_arr);
 					tmp_arr[k++] = SEP_ELT;
-					sprintf(&tmp_arr[k],"%d",tmp_char->sequence[j]);
+					snprintf(&tmp_arr[k], LIM, "%d",tmp_char->sequence[j]);
 					if (k > ((k2 * SIZE) - LIM)) 
 					{
 						if ((tmp_arr = (char *)realloc((void *)tmp_arr,(k2 + 1) * SIZE)) == NULL) 
@@ -1630,7 +1629,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 							free(tmp->res_name);
 							free(send.tab_putres_val);
 							free(tmp_arr);
-					return(DS_NOTOK);
+							return(DS_NOTOK);
 						}
 						k2++;
 					}
@@ -1647,11 +1646,11 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 					free(tmp->res_name);
 					free(send.tab_putres_val);
 					free(tmp_arr);
-			return(DS_NOTOK);
+					return(DS_NOTOK);
 				}
 /* Copy the temporary string */
 				tmp->res_val[0] = INIT_ARRAY;
-				sprintf(&tmp->res_val[1],"%d",tmp_char->length);
+				snprintf(&tmp->res_val[1], 10, "%d",tmp_char->length);
 				strcat(tmp->res_val,tmp_arr);
 /* Clear the temporary buffer */
 				tmp_arr[0] = 0;
@@ -1671,7 +1670,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 						}
 						free(tmp->res_name);
 						free(send.tab_putres_val);
-			return(DS_NOTOK);
+						return(DS_NOTOK);
 					}
 					tmp_arr[0] = 0;
 					k2 = 1;
@@ -1681,203 +1680,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 				{
 					k = strlen(tmp_arr);
 					tmp_arr[k++] = SEP_ELT;
-					sprintf(&tmp_arr[k],"%d",tmp_short->sequence[j]);
-					if (k > ((k2 * SIZE) - LIM)) 
-					{
-						if ((tmp_arr = (char *)realloc((void *)tmp_arr,(k2 + 1) * SIZE)) == NULL) 
-						{
-							*perr = DbErr_ClientMemoryAllocation;
-							for (j=0;j<i;j++) 
-							{
-								free(send.tab_putres_val[j].res_name);
-								free(send.tab_putres_val[j].res_val);
-							}
-							free(tmp->res_name);
-							free(send.tab_putres_val);
-							free(tmp_arr);
-					return(DS_NOTOK);
-						}
-						k2++;
-					}
-				}
-/* Allocate memory for the full string (header and array) */
-				if ((tmp->res_val = (char *)malloc(strlen(tmp_arr) + 10)) == NULL) 
-				{
-					*perr = DbErr_ClientMemoryAllocation;
-					for (j=0;j<i;j++) 
-					{
-						free(send.tab_putres_val[j].res_name);
-						free(send.tab_putres_val[j].res_val);
-					}
-					free(tmp->res_name);
-					free(send.tab_putres_val);
-					free(tmp_arr);
-			return(DS_NOTOK);
-				}
-/* Copy the temporary string */
-				tmp->res_val[0] = INIT_ARRAY;
-				sprintf(&tmp->res_val[1],"%d",tmp_short->length);
-				strcat(tmp->res_val,tmp_arr);
-/* Clear the temporary buffer */
-				tmp_arr[0] = 0;
-				break;
-			case D_VAR_LONGARR :
-				tmp_long = (DevVarLongArray *)res[i].resource_adr;
-/* Allocate memory for the temporary string */
-				if (k2 == 0) 
-				{
-					if ((tmp_arr = (char *)malloc(SIZE)) == NULL) 
-					{
-						*perr = DbErr_ClientMemoryAllocation;
-						for (j=0;j<i;j++) 
-						{
-							free(send.tab_putres_val[j].res_name);
-							free(send.tab_putres_val[j].res_val);
-						}
-						free(tmp->res_name);
-						free(send.tab_putres_val);
-			return(DS_NOTOK);
-					}
-					tmp_arr[0] = 0;
-					k2 = 1;
-				}   
-/* Build the temporary string and realloc memory for the temporary string if it is needed. */
-				for (j=0;j<(int)tmp_long->length;j++) 
-				{
-					k = strlen(tmp_arr);
-					tmp_arr[k++] = SEP_ELT;
-					sprintf(&tmp_arr[k],"%d",tmp_long->sequence[j]);
-					if (k > ((k2 * SIZE) - LIM)) 
-					{
-						if ((tmp_arr = (char *)realloc((void *)tmp_arr,(k2 + 1) * SIZE)) == NULL) 
-						{
-							*perr = DbErr_ClientMemoryAllocation;
-							for (j=0;j<i;j++) 
-							{
-								free(send.tab_putres_val[j].res_name);
-								free(send.tab_putres_val[j].res_val);
-							}
-							free(tmp->res_name);
-							free(send.tab_putres_val);
-							free(tmp_arr);
-					return(DS_NOTOK);
-						}
-						k2++;
-					}
-				}
-/* Allocate memory for the full string (header and array) */
-				if ((tmp->res_val = (char *)malloc(strlen(tmp_arr) + 10)) == NULL) 
-				{
-					*perr = DbErr_ClientMemoryAllocation;
-					for (j=0;j<i;j++) 
-					{
-						free(send.tab_putres_val[j].res_name);
-						free(send.tab_putres_val[j].res_val);
-					}
-					free(tmp->res_name);
-					free(send.tab_putres_val);
-					free(tmp_arr);
-			return(DS_NOTOK);
-				}
-/* Copy the temporary string */
-				tmp->res_val[0] = INIT_ARRAY;
-				sprintf(&tmp->res_val[1],"%d",tmp_long->length);
-				strcat(tmp->res_val,tmp_arr);
-/* Clear the temporary buffer */
-				tmp_arr[0] = 0;
-				break;
-			case D_VAR_FLOATARR :
-				tmp_float = (DevVarFloatArray *)res[i].resource_adr;
-/* Allocate memory for the temporary string */
-				if (k2 == 0) 
-				{
-					if ((tmp_arr = (char *)malloc(SIZE)) == NULL) 
-					{
-						*perr = DbErr_ClientMemoryAllocation;
-						for (j=0;j<i;j++) 
-						{
-							free(send.tab_putres_val[j].res_name);
-							free(send.tab_putres_val[j].res_val);
-						}
-						free(tmp->res_name);
-						free(send.tab_putres_val);
-			return(DS_NOTOK);
-					}
-					tmp_arr[0] = 0;
-					k2 = 1;
-				}   
-/* Build a string with only the array elements */
-				for (j=0;j<(int)tmp_float->length;j++) 
-				{
-					k = strlen(tmp_arr);
-					tmp_arr[k++] = SEP_ELT;
-					sprintf(&tmp_arr[k],"%.8e",tmp_float->sequence[j]);
-
-					if (k > ((k2 * SIZE) - LIM)) 
-					{
-						if ((tmp_arr = (char *)realloc((void *)tmp_arr,(k2 + 1) * SIZE)) == NULL) 
-						{
-							*perr = DbErr_ClientMemoryAllocation;
-							for (j=0;j<i;j++) 
-							{
-								free(send.tab_putres_val[j].res_name);
-								free(send.tab_putres_val[j].res_val);
-							}
-							free(tmp->res_name);
-							free(send.tab_putres_val);
-							free(tmp_arr);
-					return(DS_NOTOK);
-						}
-						k2++;
-					}
-				}
-/* Allocate memory for the full string (header and array) */
-				if ((tmp->res_val = (char *)malloc(strlen(tmp_arr) + 10)) == NULL) 
-				{
-					*perr = DbErr_ClientMemoryAllocation;
-					for (j=0;j<i;j++) 
-					{
-						free(send.tab_putres_val[j].res_name);
-						free(send.tab_putres_val[j].res_val);
-					}
-					free(tmp->res_name);
-					free(send.tab_putres_val);
-					free(tmp_arr);
-			return(DS_NOTOK);
-				}
-/* Copy the temporary string */
-				tmp->res_val[0] = INIT_ARRAY;
-				sprintf(&tmp->res_val[1],"%d",tmp_float->length);
-				strcat(tmp->res_val,tmp_arr);
-/* Clear the temporary buffer */
-				tmp_arr[0] = 0;
-				break;
-			case D_VAR_DOUBLEARR :
-				tmp_double = (DevVarDoubleArray *)res[i].resource_adr;
-/* Allocate memory for the temporary string */
-				if (k2 == 0) 
-				{
-					if ((tmp_arr = (char *)malloc(SIZE)) == NULL) 
-					{
-						*perr = DbErr_ClientMemoryAllocation;
-						for (j=0;j<i;j++) 
-						{
-							free(send.tab_putres_val[j].res_name);
-							free(send.tab_putres_val[j].res_val);
-						}
-						free(tmp->res_name);
-						free(send.tab_putres_val);
-						return(DS_NOTOK);
-					}
-					tmp_arr[0] = 0;
-					k2 = 1;
-				}   
-/* Build a string with only the array elements */
-				for (j=0;j<(int)tmp_double->length;j++) 
-				{
-					k = strlen(tmp_arr);
-					tmp_arr[k++] = SEP_ELT;
-					sprintf(&tmp_arr[k],"%.8e",tmp_double->sequence[j]);
+					snprintf(&tmp_arr[k], LIM, "%d",tmp_short->sequence[j]);
 					if (k > ((k2 * SIZE) - LIM)) 
 					{
 						if ((tmp_arr = (char *)realloc((void *)tmp_arr,(k2 + 1) * SIZE)) == NULL) 
@@ -1912,7 +1715,203 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 				}
 /* Copy the temporary string */
 				tmp->res_val[0] = INIT_ARRAY;
-				sprintf(&tmp->res_val[1],"%d",tmp_double->length);
+				snprintf(&tmp->res_val[1], 10, "%d",tmp_short->length);
+				strcat(tmp->res_val,tmp_arr);
+/* Clear the temporary buffer */
+				tmp_arr[0] = 0;
+				break;
+			case D_VAR_LONGARR :
+				tmp_long = (DevVarLongArray *)res[i].resource_adr;
+/* Allocate memory for the temporary string */
+				if (k2 == 0) 
+				{
+					if ((tmp_arr = (char *)malloc(SIZE)) == NULL) 
+					{
+						*perr = DbErr_ClientMemoryAllocation;
+						for (j=0;j<i;j++) 
+						{
+							free(send.tab_putres_val[j].res_name);
+							free(send.tab_putres_val[j].res_val);
+						}
+						free(tmp->res_name);
+						free(send.tab_putres_val);
+						return(DS_NOTOK);
+					}
+					tmp_arr[0] = 0;
+					k2 = 1;
+				}   
+/* Build the temporary string and realloc memory for the temporary string if it is needed. */
+				for (j=0;j<(int)tmp_long->length;j++) 
+				{
+					k = strlen(tmp_arr);
+					tmp_arr[k++] = SEP_ELT;
+					snprintf(&tmp_arr[k], LIM, "%d",tmp_long->sequence[j]);
+					if (k > ((k2 * SIZE) - LIM)) 
+					{
+						if ((tmp_arr = (char *)realloc((void *)tmp_arr,(k2 + 1) * SIZE)) == NULL) 
+						{
+							*perr = DbErr_ClientMemoryAllocation;
+							for (j=0;j<i;j++) 
+							{
+								free(send.tab_putres_val[j].res_name);
+								free(send.tab_putres_val[j].res_val);
+							}
+							free(tmp->res_name);
+							free(send.tab_putres_val);
+							free(tmp_arr);
+							return(DS_NOTOK);
+						}
+						k2++;
+					}
+				}
+/* Allocate memory for the full string (header and array) */
+				if ((tmp->res_val = (char *)malloc(strlen(tmp_arr) + 10)) == NULL) 
+				{
+					*perr = DbErr_ClientMemoryAllocation;
+					for (j=0;j<i;j++) 
+					{
+						free(send.tab_putres_val[j].res_name);
+						free(send.tab_putres_val[j].res_val);
+					}
+					free(tmp->res_name);
+					free(send.tab_putres_val);
+					free(tmp_arr);
+					return(DS_NOTOK);
+				}
+/* Copy the temporary string */
+				tmp->res_val[0] = INIT_ARRAY;
+				snprintf(&tmp->res_val[1], 10, "%d",tmp_long->length);
+				strcat(tmp->res_val,tmp_arr);
+/* Clear the temporary buffer */
+				tmp_arr[0] = 0;
+				break;
+			case D_VAR_FLOATARR :
+				tmp_float = (DevVarFloatArray *)res[i].resource_adr;
+/* Allocate memory for the temporary string */
+				if (k2 == 0) 
+				{
+					if ((tmp_arr = (char *)malloc(SIZE)) == NULL) 
+					{
+						*perr = DbErr_ClientMemoryAllocation;
+						for (j=0;j<i;j++) 
+						{
+							free(send.tab_putres_val[j].res_name);
+							free(send.tab_putres_val[j].res_val);
+						}
+						free(tmp->res_name);
+						free(send.tab_putres_val);
+						return(DS_NOTOK);
+					}
+					tmp_arr[0] = 0;
+					k2 = 1;
+				}   
+/* Build a string with only the array elements */
+				for (j=0;j<(int)tmp_float->length;j++) 
+				{
+					k = strlen(tmp_arr);
+					tmp_arr[k++] = SEP_ELT;
+					snprintf(&tmp_arr[k], LIM, "%.8e",tmp_float->sequence[j]);
+
+					if (k > ((k2 * SIZE) - LIM)) 
+					{
+						if ((tmp_arr = (char *)realloc((void *)tmp_arr,(k2 + 1) * SIZE)) == NULL) 
+						{
+							*perr = DbErr_ClientMemoryAllocation;
+							for (j=0;j<i;j++) 
+							{
+								free(send.tab_putres_val[j].res_name);
+								free(send.tab_putres_val[j].res_val);
+							}
+							free(tmp->res_name);
+							free(send.tab_putres_val);
+							free(tmp_arr);
+							return(DS_NOTOK);
+						}
+						k2++;
+					}
+				}
+/* Allocate memory for the full string (header and array) */
+				if ((tmp->res_val = (char *)malloc(strlen(tmp_arr) + 10)) == NULL) 
+				{
+					*perr = DbErr_ClientMemoryAllocation;
+					for (j=0;j<i;j++) 
+					{
+						free(send.tab_putres_val[j].res_name);
+						free(send.tab_putres_val[j].res_val);
+					}
+					free(tmp->res_name);
+					free(send.tab_putres_val);
+					free(tmp_arr);
+					return(DS_NOTOK);
+				}
+/* Copy the temporary string */
+				tmp->res_val[0] = INIT_ARRAY;
+				snprintf(&tmp->res_val[1], 10, "%d",tmp_float->length);
+				strcat(tmp->res_val,tmp_arr);
+/* Clear the temporary buffer */
+				tmp_arr[0] = 0;
+				break;
+			case D_VAR_DOUBLEARR :
+				tmp_double = (DevVarDoubleArray *)res[i].resource_adr;
+/* Allocate memory for the temporary string */
+				if (k2 == 0) 
+				{
+					if ((tmp_arr = (char *)malloc(SIZE)) == NULL) 
+					{
+						*perr = DbErr_ClientMemoryAllocation;
+						for (j=0;j<i;j++) 
+						{
+							free(send.tab_putres_val[j].res_name);
+							free(send.tab_putres_val[j].res_val);
+						}
+						free(tmp->res_name);
+						free(send.tab_putres_val);
+						return(DS_NOTOK);
+					}
+					tmp_arr[0] = 0;
+					k2 = 1;
+				}   
+/* Build a string with only the array elements */
+				for (j=0;j<(int)tmp_double->length;j++) 
+				{
+					k = strlen(tmp_arr);
+					tmp_arr[k++] = SEP_ELT;
+					snprintf(&tmp_arr[k], LIM, "%.8e",tmp_double->sequence[j]);
+					if (k > ((k2 * SIZE) - LIM)) 
+					{
+						if ((tmp_arr = (char *)realloc((void *)tmp_arr,(k2 + 1) * SIZE)) == NULL) 
+						{
+							*perr = DbErr_ClientMemoryAllocation;
+							for (j=0;j<i;j++) 
+							{
+								free(send.tab_putres_val[j].res_name);
+								free(send.tab_putres_val[j].res_val);
+							}
+							free(tmp->res_name);
+							free(send.tab_putres_val);
+							free(tmp_arr);
+							return(DS_NOTOK);
+						}
+						k2++;
+					}
+				}
+/* Allocate memory for the full string (header and array) */
+				if ((tmp->res_val = (char *)malloc(strlen(tmp_arr) + 10)) == NULL) 
+				{
+					*perr = DbErr_ClientMemoryAllocation;
+					for (j=0;j<i;j++) 
+					{
+						free(send.tab_putres_val[j].res_name);
+						free(send.tab_putres_val[j].res_val);
+					}
+					free(tmp->res_name);
+					free(send.tab_putres_val);
+					free(tmp_arr);
+					return(DS_NOTOK);
+				}
+/* Copy the temporary string */
+				tmp->res_val[0] = INIT_ARRAY;
+				snprintf(&tmp->res_val[1], 10, "%d",tmp_double->length);
 				strcat(tmp->res_val,tmp_arr);
 /* Clear the temporary buffer */
 				tmp_arr[0] = 0;
@@ -1932,7 +1931,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 						}
 						free(tmp->res_name);
 						free(send.tab_putres_val);
-					return(DS_NOTOK);
+						return(DS_NOTOK);
 					}
 					tmp_arr[0] = 0;
 					k2 = 1;
@@ -2005,7 +2004,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 				}
 /* Copy the temporary string */
 				tmp->res_val[0] = INIT_ARRAY;
-				sprintf(&tmp->res_val[1],"%d",tmp_string->length);
+				snprintf(&tmp->res_val[1], 10, "%d",tmp_string->length);
 				strcat(tmp->res_val,tmp_arr);
 /* Clear the temporary buffer */
 				tmp_arr[0] = 0;

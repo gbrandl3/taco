@@ -5,9 +5,9 @@
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2003-05-21 16:17:12 $
+ * Date:	$Date: 2004-02-19 15:48:19 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -745,7 +745,7 @@ static int test_server(int ind,serv *serv_info,int min,CLIENT **clnt_ptr,long i_
 		diff = (u_int)(tmp_ptr - dev_name);
 		dev_name[diff + 1] = 0;
 	}
-	sprintf(&(dev_name[strlen(dev_name)]),"%d",serv_info[min].numb);
+	snprintf(&(dev_name[strlen(dev_name)]), sizeof(dev_name) - strlen(dev_name), "%d",serv_info[min].numb);
 
 /* 
  * Ask the static database for this server network parameters (host_name,
@@ -2303,7 +2303,7 @@ static int re_test_server(int ind,serv *serv_info,int min,int nb_server,long i_n
 #endif /* OSK */
 		diff = (u_int)(tmp_ptr - dev_name);
 		dev_name[diff + 1] = 0;
-		sprintf(&(dev_name[strlen(dev_name)]),"%d",serv_info[min].numb);
+		snprintf(&(dev_name[strlen(dev_name)]), sizeof(dev_name) - strlen(dev_name), "%d",serv_info[min].numb);
 
 /* Ask the static database for this server network parameters (host_name,
    program number and version number) */
