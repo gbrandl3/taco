@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.17 $
+ Version    :	$Revision: 1.18 $
 
- Date	    :	$Date: 2004-10-23 16:32:48 $
+ Date	    :	$Date: 2004-10-26 08:46:39 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -492,6 +492,7 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
  * andy 25/6/02
  */
 				clnt_destroy (clnt);
+				clnt = NULL;
 /*
  * add "stateless-ness" by ignoring RPC timeouts at import time this code assumes that 
  * because there was no version mismatch version 4 exists (i.e. version which supports 
@@ -522,8 +523,8 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
  */
 		svr_conns[n_svr_conn].clnt        = clnt;
 		svr_conns[n_svr_conn].vers_number = vers_number;
-		svr_conns[n_svr_conn].udp_clnt = clnt;
-		svr_conns[n_svr_conn].tcp_clnt = NULL;
+		svr_conns[n_svr_conn].tcp_clnt = clnt;
+		svr_conns[n_svr_conn].udp_clnt = NULL;
 		svr_conns[n_svr_conn].asynch_clnt = NULL;
 	}
 	else
@@ -643,8 +644,8 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 			{
 				svr_conns[n_svr_conn].clnt        = clnt;
 				svr_conns[n_svr_conn].vers_number = vers_number;
-				svr_conns[n_svr_conn].udp_clnt    = clnt;
-				svr_conns[n_svr_conn].tcp_clnt    = NULL;
+				svr_conns[n_svr_conn].tcp_clnt    = clnt;
+				svr_conns[n_svr_conn].udp_clnt    = NULL;
 				svr_conns[n_svr_conn].asynch_clnt = NULL;
 			}
 			else
@@ -1095,7 +1096,7 @@ long _DLLFunc dev_free (devserver ds, long *error)
 	*error = 0;
 
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_free() : entering routine\n");
-	dev_printdebug (DBG_API, "dev_free() :  ds_id = %d\n",ds->ds_id);
+	dev_printdebug (DBG_API, "dev_free() :  ds_id = %d\n", ds->ds_id);
 
 	if (ds == NULL)
 	{
@@ -1241,12 +1242,6 @@ long _DLLFunc dev_free (devserver ds, long *error)
 	if (--(svr_conns[ds->no_svr_conn].no_conns) == 0)
 	{
 /*
- * if udp protocol has been used then close the UDP client handle
- */
-		if (svr_conns[ds->no_svr_conn].udp_clnt != NULL)
-			clnt_destroy (svr_conns[ds->no_svr_conn].udp_clnt);
-			
-/*
  *  if tcp protocol is used, close the socket first.
  */
 		if (svr_conns[ds->no_svr_conn].tcp_clnt != NULL)
@@ -1258,6 +1253,11 @@ long _DLLFunc dev_free (devserver ds, long *error)
 #endif /* WIN32 */
 			clnt_destroy (svr_conns[ds->no_svr_conn].tcp_clnt);
 		}
+/*
+ * if udp protocol has been used then close the UDP client handle
+ */
+		if (svr_conns[ds->no_svr_conn].udp_clnt != NULL)
+			clnt_destroy (svr_conns[ds->no_svr_conn].udp_clnt);
 /*
  *  if an asynchronous handle exists then close it (tcp connection)
  */
@@ -1366,6 +1366,7 @@ DON'T - 26/3/98
 /*
  * return error code and status from device server
  */
+	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_free() : leaving routine\n");
 	return (status);
 }
 
@@ -2068,7 +2069,7 @@ long _DLLFunc reinstall_rpc_connection (devserver ds, long *error)
 			status = dev_rpc_protocol(new_ds, ds->rpc_protocol, error);
 			if (status != DS_OK)
 			{
-				fprintf(stderr, "reinstall_rpc_connection(): problems changing protocol to %d (error=%d)\n",
+				dev_printerror(SEND, "reinstall_rpc_connection(): problems changing protocol to %d (error=%d)\n",
 			  	         ds->rpc_protocol,*error);
 				dev_printerror_no(SEND,NULL,*error);
 			}
@@ -2076,11 +2077,10 @@ long _DLLFunc reinstall_rpc_connection (devserver ds, long *error)
 
 		if ((ds->rpc_timeout.tv_sec != 0) || (ds->rpc_timeout.tv_usec != 0))
 		{
-			status = dev_rpc_timeout(new_ds, CLSET_TIMEOUT,
-			                         &ds->rpc_timeout, error);
+			status = dev_rpc_timeout(new_ds, CLSET_TIMEOUT, &ds->rpc_timeout, error);
 			if (status != DS_OK)
 			{
-				fprintf(stderr, "reinstall_rpc_connection(): problems changing timeout to %d.d (error=%d)\n",
+				dev_printerror(SEND, "reinstall_rpc_connection(): problems changing timeout to %d.d (error=%d)\n",
 			  	         ds->rpc_timeout.tv_sec,ds->rpc_timeout.tv_usec,*error);
 				dev_printerror_no(SEND,NULL,*error);
 			}
@@ -2828,21 +2828,7 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
  * try to solve problem with Ultra-C/C++ 2.0.1 by not destroying the TCP client handle, keep it for reuse
  */
 			svr_conns[ds->no_svr_conn].tcp_clnt = svr_conns[ds->no_svr_conn].clnt;
-
-/*
- * DO NOT close the TCP connection - keep it for reuse, it will be closed
- * by dev_free() or check_rpc_connection()
- *
-#if !defined (WIN32)
- *              	close (svr_conns[ds->no_svr_conn].tcp_socket);
-#else
- *              	closesocket (svr_conns[ds->no_svr_conn].tcp_socket);
-#endif  * WIN32 * 
- *
- *			clnt_destroy (svr_conns[ds->no_svr_conn].clnt);
- */
-			svr_conns[ds->no_svr_conn].clnt = clnt;
-			svr_conns[ds->no_svr_conn].udp_clnt = clnt;
+			svr_conns[ds->no_svr_conn].clnt = svr_conns[ds->no_svr_conn].udp_clnt = clnt;
 			ds->clnt = clnt;
 
 /*
@@ -2905,14 +2891,8 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
 				}
 			}
 			svr_conns[ds->no_svr_conn].rpc_protocol = D_TCP;
-/*
- * DO NOT destroy udp client handle , keep it for reuse
- *
- *			clnt_destroy (svr_conns[ds->no_svr_conn].clnt);
- */
 			svr_conns[ds->no_svr_conn].udp_clnt = svr_conns[ds->no_svr_conn].clnt;
-			svr_conns[ds->no_svr_conn].clnt = clnt;
-			svr_conns[ds->no_svr_conn].tcp_clnt = clnt;
+			svr_conns[ds->no_svr_conn].clnt = svr_conns[ds->no_svr_conn].tcp_clnt = clnt;
 			ds->clnt = clnt;
 
 /*
