@@ -97,8 +97,9 @@ DevLong *NdbmServer::db_reopendb_1_svc()
 		std::ifstream fi(dbm_file.c_str());
 		if (!fi)
 		{
-			umask(0);
+			mode_t	old_mask = umask(0);
 			GDBM_FILE t = gdbm_open(const_cast<char *>(dbm_file.c_str()), 0, GDBM_WRCREAT, 0666, NULL);
+			umask(old_mask);
                 	if (t == NULL)
                 	{
 				std::cerr << "dbm_clo_op : Can't create file " << dbm_file << std::endl;
