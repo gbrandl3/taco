@@ -1,4 +1,3 @@
-
 /*********************************************************************
  * File:        taco_types.c
  *
@@ -8,14 +7,16 @@
  *		$Author: jkrueger1 $
  *
  * Original:    March 99
+ * 
+ * Date:	$Date: 2004-05-14 15:05:21 $
+ *
+ * Version:	$Revision: 1.2 $
  *
  *********************************************************************/
-
 #include "Python.h"
 
 #include <ctype.h>
 
-/* for taco */
 #include <Admin.h>
 #include <API.h>
 #include <DevServer.h>
@@ -24,40 +25,20 @@
 #include <maxe_xdr.h>
 
 #ifdef NUMPY
-#include <arrayobject.h>
-#endif /*NUMPY*/
+#	include <arrayobject.h>
+#endif 
 
-#define _taco_py
+#include "taco.h"
 
-long get_argin_single(DevArgument ds_argin, long ds_in, 
-                      PyObject *item, char* mymess);
-long get_argin_array(DevArgument ds_argin, long ds_in, 
-                      PyObject *mytuple, char* mymess);
-long get_argin_special(DevArgument ds_argin, long ds_in, 
-                      PyObject *mytuple, char* mymess);
-long get_argout_single(DevArgument ds_argout, long ds_out, 
-                      PyObject **item, char* mymess);
-long get_argout_array(DevArgument ds_argout, long ds_out, 
-                      PyObject **mylist, char* mymess);
-long get_argout_special(DevArgument ds_argout, long ds_out, 
-                      PyObject **mylist, char* mymess);
-long check_type(long ds_ty, long *is_a_single, 
-                long *is_an_array, long *is_a_special);
-void display_single(DevArgument ds_argin,long ds_in,char * ms);
-void display_array(DevArgument ds_argin,long ds_in, char* ms);
-void display_special(DevArgument ds_argin,long ds_in,char * ms);
-long get_dmulmove_longfloatarr(DevArgument ds_arg,long ds_type,
-      PyObject * mytuple, long len, char* mymess);
-char p2c_BOOLEAN(PyObject *item,long *err);     
-unsigned short p2c_USHORT(PyObject *item,long *err);     
-short p2c_SHORT(PyObject *item,long *err);     
-unsigned long p2c_ULONG(PyObject *item,long *err);     
-long p2c_LONG(PyObject *item,long *err);     
-float p2c_FLOAT(PyObject *item,long *err);     
-double p2c_DOUBLE(PyObject *item,long *err);     
-DevString p2c_STRING(PyObject *item,long *err);     
-long Ctype2numeric(long ds_out);
-long lenoftype(long ds_out);     
+long get_dmulmove_longfloatarr(DevArgument ds_arg,long ds_type, PyObject * mytuple, long len, char* mymess);
+char p2c_BOOLEAN(PyObject *, long *);     
+unsigned short p2c_USHORT(PyObject *, long *);     
+short p2c_SHORT(PyObject *, long *);     
+unsigned long p2c_ULONG(PyObject *, long *);     
+long p2c_LONG(PyObject *, long *);     
+float p2c_FLOAT(PyObject *, long *);     
+double p2c_DOUBLE(PyObject *, long *);     
+DevString p2c_STRING(PyObject *, long *);     
 
 
 /********************************************************************
