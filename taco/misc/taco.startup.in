@@ -32,12 +32,19 @@ dbase()
   	# database files present (names)
 
 	if test "${TACO_DATABASE:-dbm}" = "dbm" ; then
-	  	if [ ! -r $DBM_DIR/names ]  
-	  	then
+		new=`ls -l $DBM_DIR/* 2>/dev/null | awk '{print $5;}' | sort | uniq | wc -l`
+		if [ $new -eq 1 ] ;  then
 	      		echo "calling db_fillup to fill database"
-	      		db_fillup 0
+	      		db_fillup2
 	      		echo "dbm database fillup done"
 	  	fi
+	elif test "x${TACO_DATABASE}" = "xmysql" ; then
+		new=`echo 'select count(*) from property_device;' | mysql -u $MYSQL_USER -D tango | grep -v count`
+		if [ $new -eq 0 ] ; then
+			echo "calling db_fillup to fill database"
+			db_fillup2
+			echo "mysql database fillup done"
+		fi
 	fi
 }
 
@@ -69,5 +76,5 @@ manager()
 #  Here is the heart of the script:
 #
 environ
-dbase
 manager
+dbase
