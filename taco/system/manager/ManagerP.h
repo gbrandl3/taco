@@ -7,13 +7,13 @@
  Description:   Private include file for the network manager
 
  Author(s):     Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original:      January 1991
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-05-09 15:26:25 $
+ Date:		$Date: 2003-12-14 23:25:53 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -42,6 +42,12 @@ static char     *dbm_server 	    = "dbm_server";
 static char   	*dbm_name           = "dbm";
 	
 /*
+ * Definitions for MYSQL database
+ */
+static char     *mysql_server 	    = "dbm_server";
+static char   	*mysql_name         = "tango";
+	
+/*
  * Definition for ORACLE database
  */
 static char 	*ora_server	    = "db_server";
@@ -55,8 +61,9 @@ typedef struct 	{
 		short	startup;
 		short	security;
 		short	request_log;
-		short	rtdb;
 		short	oracle;
+		short	mysql;
+		short	dbm;
 		} config_flags;
 
 typedef struct 	{

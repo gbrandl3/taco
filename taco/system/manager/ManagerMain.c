@@ -9,13 +9,13 @@
 		dummy database under OS9.
 
  Author(s):     Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original: 	January 1991
 
- Version:	$Revision: 1.5 $
+ Version:	$Revision: 1.6 $
 
- Date:		$Date: 2003-12-09 13:37:07 $
+ Date:		$Date: 2003-12-14 23:25:53 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -34,7 +34,7 @@ static void 	network_manager_1();
 static void 	network_manager_4();
 static void 	startup_msg();
 
-config_flags	c_flags = {False,False,False,False,False,False,False};
+config_flags	c_flags = {False,False,False,False,False,False,False,True};
 char 		*dshome  = NULL;
 char		*display = NULL;
 char	 	nethost [SHORT_NAME_SIZE];
@@ -54,7 +54,6 @@ int main (int argc, char **argv)
 	char	*ora_sid = NULL;
 	char 	*ora_home = NULL;
 	char 	*cmd_argv [5];
-	char	rtdb_server_path [200];
 	char	oracle_server_path [200];
 	char	ld_path [200];
 	char	db_path [200];
@@ -69,6 +68,7 @@ int main (int argc, char **argv)
 	int	db_pid = 0;
 	int	i;
 	int     res;
+	char 	*dbase_used="NDBM";
 
 
 	pid = getpid ();
@@ -83,7 +83,7 @@ int main (int argc, char **argv)
 	{
 		snprintf(nethost, sizeof(nethost) - 1, "%s",nethost_env);
 
-/*		printf ("Environment variable NETHOST = %s\n",nethost);*/
+		printf ("Environment variable NETHOST = %s\n",nethost);
 	}
 #endif /* unix */
 
@@ -95,14 +95,27 @@ int main (int argc, char **argv)
 	{
 		for (i=1; i<argc; i++)
 		{
-			if (strcmp (argv[i],"-rtdb") == 0)
-		 		c_flags.rtdb        = True;
+			if (strcmp (argv[i],"-oracle") == 0)
+			{
+	         		c_flags.oracle	     = True;
+	         		c_flags.dbm   	     = False;
+				dbase_used = "ORACLE";
+			}
+			if (strcmp (argv[i],"-mysql") == 0)
+			{
+	         		c_flags.mysql	     = True;
+	         		c_flags.dbm  	     = False;
+				dbase_used = "MYSQL";
+			}
 			if (strcmp (argv[i],"-log") == 0)
 		 		c_flags.request_log = True;
 			if (strcmp (argv[i],"-security") == 0)
 		 		c_flags.security    = True;
-			if (strcmp (argv[i],"-oracle") == 0)
-	         		c_flags.oracle	     = True;
+			if (strncmp (argv[i],"-h",2) == 0)
+			{
+		 		printf("usage: Manager [ -dbm | -mysql | -oracle ] [-log] [-security] [-help] (note: default database is dbm)\n");
+				exit(0);
+			}
 		}
 	}
 
@@ -179,84 +192,66 @@ int main (int argc, char **argv)
 /*
  * Check the environment if DBM database is used !!
  */
-	if (c_flags.rtdb == False )
+
+	if (c_flags.oracle == False )
 	{
-		if (c_flags.oracle == False )
-	   	{
-			if ( ((char *)getenv ("DBTABLES")) == NULL ||
-				((char *)getenv ("DBM_DIR")) == NULL ||
-				((char *)getenv ("RES_BASE_DIR")) == NULL )
-			{
-	      			fprintf (stderr, 
-	    				"\nEnvironment variables for DBM database not defined, exiting...\n");
-	      			fprintf (stderr, "Use %s/dbm_env to set the environment variables!\n", homepath);
-	      			exit (-1);
-	      		}
-		}
-	   	else
-/*
- * Check the environment if ORACLE is used 
- */
+		if ( (dbtables = (char *)getenv ("DBTABLES")) == NULL )
 		{
-			if ( (dbtables = (char *)getenv ("DBTABLES")) == NULL )
+	      		fprintf (stderr, 
+	    			"\nEnvironment variables for %s database not defined, exiting...\n",dbase_used);
+			fprintf (stderr, "DBTABLES must be defined!\n");
+			exit (-1);
+		}
+		if ( (dbtables = (char *)getenv ("RES_BASE_DIR")) == NULL )
+		{
+	      		fprintf (stderr, 
+	    			"\nEnvironment variables for %s database not defined, exiting...\n",dbase_used);
+			fprintf (stderr, "RES_BASE_DIR must be defined!\n");
+			exit (-1);
+		}
+		if (c_flags.mysql == False)
+		{
+			if ( (dbtables = (char *)getenv ("DBM_DIR")) == NULL )
 			{
 	      			fprintf (stderr, 
-	    				"\nEnvironment variables for ORACLE database not defined, exiting...\n");
-				fprintf (stderr, "DBTABLES must be defined!\n");
+	    				"\nEnvironment variables for NDBM database not defined, exiting...\n");
+				fprintf (stderr, "DBM_DIR must be defined!\n");
 				exit (-1);
 			}
-			if ( (dbhome = (char *)getenv ("DBHOME")) == NULL )
-			{
-				fprintf (stderr, "Environment variable DBHOME not defined, exiting...\n");
-				exit (-1);
-			}
-			if ( (ora_sid = (char *)getenv("ORACLE_SID")) == NULL)
-			{
-				fprintf (stderr, "Environment variable ORACLE_SID not defined, exiting...\n");
-				exit(-1);
-			}
-			if  ( (ora_home = (char *)getenv("ORACLE_HOME")) == NULL)
-			{
-				fprintf (stderr, "Environment variable ORACLE_HOME not defined, exiting...\n");
-				exit(-1);
-			}
-/* 
- * Set the pathes and check them. 
- */
-			snprintf (oracle_server_path, sizeof(oracle_server_path) - 1, "%s/bin/solaris", dbhome);
-			if ( (fptr = fopen (oracle_server_path,"r")) == NULL )
-			{
-				fprintf (stderr, "DBHOME leads to a strange directory, exiting...\n");
-				exit (-1);
-			}
-			else
-				fclose (fptr);
 		}
 	}
 	else
 /*
- * Check the environment if RTDB database is used !!
+ * Check the environment if ORACLE is used 
  */
 	{
+		if ( (dbtables = (char *)getenv ("DBTABLES")) == NULL )
+		{
+	      		fprintf (stderr, 
+	    			"\nEnvironment variables for ORACLE database not defined, exiting...\n");
+			fprintf (stderr, "DBTABLES must be defined!\n");
+			exit (-1);
+		}
 		if ( (dbhome = (char *)getenv ("DBHOME")) == NULL )
 		{
 			fprintf (stderr, "Environment variable DBHOME not defined, exiting...\n");
 			exit (-1);
 		}
+		if ( (ora_sid = (char *)getenv("ORACLE_SID")) == NULL)
+		{
+			fprintf (stderr, "Environment variable ORACLE_SID not defined, exiting...\n");
+			exit(-1);
+		}
+		if  ( (ora_home = (char *)getenv("ORACLE_HOME")) == NULL)
+		{
+			fprintf (stderr, "Environment variable ORACLE_HOME not defined, exiting...\n");
+			exit(-1);
+		}
 /* 
  * Set the pathes and check them. 
  */
-		snprintf (rtdb_server_path, sizeof(rtdb_server_path) - 1, "%s/bin", dbhome);
-		if ( (fptr = fopen (rtdb_server_path,"r")) == NULL )
-		{
-			fprintf (stderr, "DBHOME leads to a strange directory, exiting...\n");
-			exit (-1);
-		}
-		else
-			fclose (fptr);
-		
-		snprintf (db_path, sizeof(db_path) - 1, "%s/setup", dbhome);
-		if ( (fptr = fopen (rtdb_server_path,"r")) == NULL )
+		snprintf (oracle_server_path, sizeof(oracle_server_path) - 1, "%s/bin/solaris", dbhome);
+		if ( (fptr = fopen (oracle_server_path,"r")) == NULL )
 		{
 			fprintf (stderr, "DBHOME leads to a strange directory, exiting...\n");
 			exit (-1);
@@ -346,61 +341,52 @@ int main (int argc, char **argv)
 /*
  *  startup database server on a remote host
  */
-		if ( c_flags.rtdb == False )
-		{
-			if ( c_flags.oracle == False )
-	      		{
+		if ( c_flags.oracle == False )
+	      	{
+			if (c_flags.mysql == False)
+			{
 /* 
  * DBM startup sequence 
  */
-	      			snprintf (db_start, sizeof(db_start) - 1, 
+      				snprintf (db_start, sizeof(db_start) - 1, 
 #ifdef __hpux
-	      				"remsh %s -l dserver -n \"export %s/%s %s %s 1>&- 2>&- &\" ", 
+      					"remsh %s -l dserver -n \"export %s/%s %s %s 1>&- 2>&- &\" ", 
 #endif
 #ifdef sun
-	      				"rsh %s -l dserver -n \"export %s/%s %s %s 1>&- 2>&- &\" ", 
+      					"rsh %s -l dserver -n \"export %s/%s %s %s 1>&- 2>&- &\" ", 
 #endif
-	      				dbhost, homepath, dbm_server, dbm_name, nethost);
+      					dbhost, homepath, dbm_server, dbm_name, nethost);
 			}
 			else
-	      		{
+			{
 /* 
- * ORACLE startup sequence 
+ * MYSQL startup sequence 
  */
-	      			snprintf (db_start, sizeof(db_start) - 1,
+      				snprintf (db_start, sizeof(db_start) - 1, 
 #ifdef __hpux
-	      				"remsh %s -l dserver -n \"export DBTABLES=%s;"
-					"export ORACLE_SID=%s;export ORACLE_HOME=%s;%s/%s %s %s 1>&- 2>&- &\" ", 
+      					"remsh %s -l dserver -n \"export %s/%s %s %s 1>&- 2>&- &\" ", 
 #endif
 #ifdef sun
-	      				"rsh %s -l dserver -n \"export DBTABLES=%s;"
-					"export ORACLE_SID=%s;export ORACLE_HOME=%s;%s/%s %s %s 1>&- 2>&- &\" ", 
+      					"rsh %s -l dserver -n \"export %s/%s %s %s 1>&- 2>&- &\" ", 
 #endif
-					dbhost, dbtables, ora_sid, ora_home, oracle_server_path, ora_server, nethost, ora_name);
+      					dbhost, homepath, mysql_server, mysql_name, nethost);
 			}
 		}
 		else
-		{
+      		{
 /* 
- * RTDB startup sequence 
+ * ORACLE startup sequence 
  */
-	      		snprintf (db_start, sizeof(db_start) - 1, 
+      			snprintf (db_start, sizeof(db_start) - 1,
 #ifdef __hpux
-	      			"remsh %s -l dbase -n \"export %s=%s:%s/%s;%s/%s %s %s 1>&- 2>&- &\" ", 
+      				"remsh %s -l dserver -n \"export DBTABLES=%s;"
+				"export ORACLE_SID=%s;export ORACLE_HOME=%s;%s/%s %s %s 1>&- 2>&- &\" ", 
 #endif
 #ifdef sun
-	      			"rsh %s -l dbase -n \"export %s=%s:%s/%s;%s/%s %s %s 1>&- 2>&- &\" ", 
+      				"rsh %s -l dserver -n \"export DBTABLES=%s;"
+				"export ORACLE_SID=%s;export ORACLE_HOME=%s;%s/%s %s %s 1>&- 2>&- &\" ", 
 #endif
-				dbhost, db_name, db_name, db_path, db_name, rtdb_server_path, db_server, db_name, nethost);
-		}
-
-		res = system(db_start);
-		if ( res != 0 )
-		{
-			fprintf (stderr,"database server startup failed, exiting...\n");
-			if (c_flags.request_log)
-				fprintf (system_log, "database server startup failed, exiting...\n");
-			kill (pid,SIGQUIT);
+				dbhost, dbtables, ora_sid, ora_home, oracle_server_path, ora_server, nethost, ora_name);
 		}
 	}
 	else
@@ -415,30 +401,23 @@ int main (int argc, char **argv)
 
 		if (!db_pid)
 		{
-			if ( c_flags.rtdb == True )
+/* 
+ * Set path to MYSQL server 
+ */
+			if (c_flags.mysql == True)
 			{
-/* 
- * Set environment 
- */
-				snprintf (dbase_env, sizeof(dbase_env) - 1, "%s=%s:%s/%s", 
-						db_name, db_name, db_path, db_name );
-				if ( putenv (dbase_env) != 0 )
-				{
-					fprintf (stderr, "Cannot set environment variable %s, exiting...\n", db_name);
-					if (c_flags.request_log)
-						fprintf (system_log, "Cannot set environment variable %s, exiting...\n", db_name);
-					kill (pid,SIGQUIT);
-				}
-/* 
- * Set path to executable 
- */
-				snprintf (homedir, sizeof(homedir) - 1, "%s/%s", rtdb_server_path, db_server);
+				if (dshome != NULL)
+					snprintf (homedir, sizeof(homedir) -1, "%s/%s", homepath, mysql_server);
+				else
+					snprintf (homedir, sizeof(homedir) - 1, "%s", mysql_server);
 /* 
  * Set arguments for execv 
  */
 				i = 0;
-				cmd_argv[i++] = db_server; 
-				cmd_argv[i++] = db_name; 
+				cmd_argv[i++] = mysql_server; 
+				cmd_argv[i++] = "-t";
+				cmd_argv[i++] = "mysql";
+				cmd_argv[i++] = mysql_name; 
 				cmd_argv[i++] = nethost; 
 				cmd_argv[i] = 0;
 			}
@@ -456,14 +435,18 @@ int main (int argc, char **argv)
  */
 				i = 0;
 				cmd_argv[i++] = dbm_server; 
+				cmd_argv[i++] = "-t";
+				cmd_argv[i++] = "dbm";
 				cmd_argv[i++] = dbm_name; 
 				cmd_argv[i++] = nethost; 
 				cmd_argv[i] = 0;
 			}
 
 			svc_destroy(transp); 
+			printf("Manager execvp arguments for database : \n");
+			printf("%s %s %s %s %s %s\n",homedir,cmd_argv[0],cmd_argv[1],cmd_argv[2],cmd_argv[3],cmd_argv[4]);
 			execvp (homedir, cmd_argv);
-		
+			
 			fprintf (stderr,"execvp failed, database_server not started\n");
 			if (c_flags.request_log)
 				fprintf (system_log, "execv failed, database_server not started\n");
@@ -471,7 +454,7 @@ int main (int argc, char **argv)
 		}
 	}
 
-/*
+	/*
  *  startup message server
  */
         if (( msg_pid = fork () ) < 0 )
@@ -495,6 +478,8 @@ int main (int argc, char **argv)
 		cmd_argv[i] = 0;
 
 		svc_destroy(transp); 
+		printf("Manager execvp arguments for message server :\n");
+		printf("%s %s %s\n",homedir,cmd_argv[0],cmd_argv[1]);
 
 		execvp (homedir,cmd_argv);
 
