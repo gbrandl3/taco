@@ -7,7 +7,7 @@ libtcltacoapi_la_SOURCES = convert.c \
 			tcltaco_ver.c tcltacoapi_init.c \
 			dc_io_debug.c dc_io_get.c 
 
-libtcltacoapi_la_LIBADD = $(top_builddir)/lib/libtacoapi.la
+libtcltacoapi_la_LIBADD = $(top_builddir)/lib/libtaco.la
 
 libtcltacoapi_la_LDFLAGS = -rdynamic
 

@@ -4,8 +4,7 @@ Server_la_LDFLAGS 	= -module
 
 INCLUDES 		= @TACO_INCLUDES@ @PYTHON_CPPFLAGS@ @PYTHON_CPPFLAGS@
 
-Server_la_LIBADD 	= $(top_builddir)/lib/libdsapinomain.la $(top_builddir)/lib/dbase/libdbapi.la \
-		$(top_builddir)/lib/xdr/libdsxdr_all.la $(top_builddir)/lib/dc/libdcapi.la @PYTHON_LDFLAGS@
+Server_la_LIBADD 	= $(top_builddir)/lib/libtaco.la $(top_builddir)/lib/xdr/libdsxdr_all.la $(top_builddir)/lib/dc/libdcapi.la @PYTHON_LDFLAGS@
 
 AM_CPPFLAGS 		= -DMYDEB -DNUMPY 
 
