@@ -1,6 +1,6 @@
 AC_DEFUN([TACO_PYTHON_BINDING],
 [
-	TACO_PROG_PYTHON(2.1, [yes])
+	TACO_PROG_PYTHON(2.0, [yes])
 	if test "$ac_python_dir" != "no" ; then
 		ac_save_CFLAGS="$CFLAGS"
 		CFLAGS="$CFLAGS $PYTHON_INCLUDES"
