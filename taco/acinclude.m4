@@ -31,7 +31,6 @@ AC_DEFUN(TACO_MYSQL_SUPPORT,
 			AC_CHECK_FILE($i/mysql/mysql.h, [
 				mysql=yes
 				MYSQL_LDFLAGS="-L`dirname $i`/lib/mysql/"
-				echo $MYSQL_LDFLAGS
 				AC_SUBST(MYSQL_LDFLAGS)
 				CPPFLAGS="$CPPFLAGS -I$i"
 				break],[mysql=no])
