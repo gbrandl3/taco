@@ -1,6 +1,6 @@
 AC_DEFUN([TACO_PYTHON_BINDING],
 [
-	AC_REQUIRE([TACO_SERVER])
+	AC_REQUIRE([TACO_SERVER_T])
 	PYTHON_PROG(2.0, [yes])
 	PYTHON_DEVEL
 	if test "x$taco_python_binding" = "xyes" ; then
@@ -115,7 +115,7 @@ MYSQL       mysql,
 	fi
 ])
 
-AC_DEFUN([TACO_SERVER],
+AC_DEFUN([TACO_SERVER_T],
 [
 	AC_ARG_ENABLE(server, AC_HELP_STRING([--enable-server], [build the libraries for the TACO servers @<:@default=yes@:>@]),
 		[case "${enable_server}" in
@@ -128,7 +128,7 @@ AC_DEFUN([TACO_SERVER],
 
 AC_DEFUN([TACO_DATABASE_SERVER],
 [
-	AC_REQUIRE([TACO_SERVER])
+	AC_REQUIRE([TACO_SERVER_T])
 	AC_ARG_ENABLE(dbserver, AC_HELP_STRING([--enable-dbserver], [build the TACO database server @<:@default=yes@:>@]),
 		[case "${enable_dbserver}" in
 			yes)	taco_dbserver=yes;;
@@ -151,7 +151,7 @@ AC_DEFUN([TACO_DATABASE_SERVER],
 
 AC_DEFUN([TACO_MANAGER],
 [
-	AC_REQUIRE([TACO_SERVER])
+	AC_REQUIRE([TACO_SERVER_T])
 	AC_ARG_ENABLE(manager, AC_HELP_STRING([--enable-manager], [build the TACO manager @<:@default=yes@:>@]),
 		[case "${enable_manager}" in
 			yes)	taco_manager=yes;;
@@ -166,7 +166,7 @@ AC_DEFUN([TACO_MANAGER],
 
 AC_DEFUN([TACO_MESSAGE_SERVER],
 [
-	AC_REQUIRE([TACO_SERVER])
+	AC_REQUIRE([TACO_SERVER_T])
 	AC_ARG_ENABLE(message, AC_HELP_STRING([--enable-message], [build the TACO message server @<:@default=yes@:>@]),
 		[case "${enable_message}" in
 			yes)	taco_message=yes;;

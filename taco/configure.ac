@@ -1,6 +1,6 @@
 AC_INIT([TACO], [3.0.6], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.51 $)dnl
+AC_REVISION($Revision: 1.52 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -231,13 +231,13 @@ AC_SUBST(TACO_CLIENT_LIBS, ["\$(top_builddir)/lib/libtacoapi.la \$(top_builddir)
 AC_SUBST(TACO_CLIENT_CXX_LIBS, ["\$(top_builddir)/lib/libtacoapig++.la \$(top_builddir)/lib/dbase/libdbapi.la \$(top_builddir)/lib/xdr/libdsxdr.la"])
 
 TACO_DEFINES
+TACO_SERVER_T
 TACO_DATAPORT_SRC
 TACO_PYTHON_BINDING
 TACO_TCL_BINDING
 TACO_GRETA
 TACO_XDEVMENU
 TACO_ALARM
-TACO_SERVER
 TACO_MANAGER
 TACO_DATABASE_SERVER
 if test "x${taco_build_gdbm}" = "xyes" ; then
