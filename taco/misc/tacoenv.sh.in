@@ -13,24 +13,23 @@ DBTABLES_CUSTOM=${DBTABLES_CUSTOM:-TEST}
 #TACO_SECURE_MODE=yes
 
 # It is unlikely that the rest of the file needs a modification
-export DSHOME="${DSHOME:-@prefix@}"
-export DBTABLES="NAMES,PS_NAMES,CLASS,SYS,ERROR,CMDS,SEC,EVENTS,${DBTABLES_CUSTOM}"
-export RES_BASE_DIR="${RES_BASE_DIR:-${DSHOME}/dbase/res}"
-export DBM_DIR="${DSHOME}/dbase/dbm"
-export LOGPATH="${DSHOME}/log"
-export NETHOST="${NETHOST:-`hostname|cut -f1 -d'.'`}"
+export DSHOME=${DSHOME:-@prefix@}
+export DBTABLES=NAMES,PS_NAMES,CLASS,SYS,ERROR,CMDS,SEC,EVENTS,${DBTABLES_CUSTOM}
+export RES_BASE_DIR=${RES_BASE_DIR:-${DSHOME}/dbase/res}
+export DBM_DIR=${DSHOME}/dbase/dbm
+export LOGPATH=${DSHOME}/log
+export NETHOST=${NETHOST:-`hostname|cut -f1 -d'.'`}
 if [ "$DSHOME" = "$prefix" ] ; then
-	export LD_LIBRARY_PATH="@libdir@${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}"
-	export TACO_PATH=@sbindir@"
-	export PATH="${TACO_PATH}:@bindir@${PATH:+:}${PATH}"
+	export LD_LIBRARY_PATH=@libdir@${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
+	export TACO_PATH=@sbindir@
+	export PATH=${TACO_PATH}:@bindir@${PATH:+:}${PATH}
 else
-	export LD_LIBRARY_PATH="${DSHOME}/lib/@taco_install_path@${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}"
-	export TACO_PATH=${DSHOME}/system/bin/@taco_install_path@"
-	export PATH="${TACO_PATH}:${DSHOME}/bin/@taco_install_path@${PATH:+:}${PATH}"
+	export LD_LIBRARY_PATH=${DSHOME}/lib/@taco_install_path@${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
+	export TACO_PATH=${DSHOME}/system/bin/@taco_install_path@
+	export PATH=${TACO_PATH}:${DSHOME}/bin/@taco_install_path@${PATH:+:}${PATH}
 fi
 
-
-export PYTHONPATH="${DSHOME}/python/@taco_install_path@${PYTHONPATH:+:}${PYTHONPATH}"
+export PYTHONPATH=${DSHOME}/python/@taco_install_path@${PYTHONPATH:+:}${PYTHONPATH}
 unset DBTABLES_CUSTOM
 
 export MYSQL_USER=root
