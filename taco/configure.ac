@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0rc3, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.37 $)dnl
+AC_REVISION($Revision: 1.38 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -121,7 +121,7 @@ AC_SUBST(SEC_resdir, ['${resdatadir}/SEC'])
 AC_SUBST(TEST_resdir, ['${resdatadir}/TEST'])
 
 dnl aclocaldir=`aclocal --print-ac-dir`
-AC_SUBST([aclocaldir], ['${datadir}/m4'])
+AC_SUBST([aclocaldir], ['${datadir}/aclocal'])
 
 AC_SUBST(TACO_INCLUDES, ["-I\$(top_srcdir)/lib/xdr -I\$(top_srcdir)/lib -I\$(top_srcdir)/lib/dc -I\$(top_srcdir)/lib/dbase -I\$(top_srcdir)/lib/tc -I\$(top_srcdir)/lib/ascii] -I\$(top_srcdir)/lib/private") 
 
