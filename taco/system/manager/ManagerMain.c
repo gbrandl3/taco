@@ -9,13 +9,13 @@
 		dummy database under OS9.
 
  Author(s):     Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original: 	January 1991
 
- Version:	$Revision: 1.20 $
+ Version:	$Revision: 1.21 $
 
- Date:		$Date: 2005-03-15 14:54:26 $
+ Date:		$Date: 2005-03-29 10:05:42 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -294,7 +294,7 @@ static	int	fd_devnull = -1;
 
 /* 
  * because the normal kill command under OS9 can not
- * be caugth it makes live easier to unregister the manager
+ * be caught it makes live easier to unregister the manager
  * from the portmapper every time before startup.
  * Safety will be neglected because now it is possible
  * to start several managers on the same host.
