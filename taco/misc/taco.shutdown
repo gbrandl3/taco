@@ -1,7 +1,0 @@
-#! /bin/sh
-# taco.shutdown - shutdown TACO manager + database
-#
-#./off Manager
-killall Manager 
-killall dbm_server
-killall MessageServer
