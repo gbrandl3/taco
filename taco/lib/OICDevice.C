@@ -15,9 +15,9 @@
 //
 // Original:	November 1996
 //
-// $Revision: 1.3 $
+// $Revision: 1.4 $
 //
-// $Date: 2003-05-07 14:47:37 $
+// $Date: 2003-05-21 16:21:19 $
 //
 // $Author: jkrueger1 $
 //
@@ -91,7 +91,7 @@ long OICDevice::GetResources( char *name, long *error )
  * @param name 	name (ascii identifier) of oicdevice to create
  * @param error error code returned in the case of problems
  */
-OICDevice::OICDevice (char *devname, DevServerClass devclass, long *error)
+OICDevice::OICDevice (DevString devname, DevServerClass devclass, long *error)
           : Device (devname, error)
 {
 //	static  DeviceCommandListEntry dev_cmd_list[] = {
