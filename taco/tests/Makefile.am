@@ -4,7 +4,7 @@ EXTRA_DIST 		= taco.in
 
 CLEANFILES 		= log taco
 
-DISTCLEANFILES 		= System.log atconfig *.lineno
+DISTCLEANFILES 		= System.log atconfig *.lineno package.m4 testsuite
 
 INCLUDES		= @TACO_INCLUDES@ @GDBM_CFLAGS@
 
@@ -19,9 +19,9 @@ test_asc_dyn_SOURCES 	= test_asc_dyn.c
 test_tc_SOURCES 	= test_tc.c
 test_tc_LDADD		= @TACO_CLIENT_LIBS@ 
 
-EXTRA_DIST 		+= testsuite.at $(TESTSUITE_AT) testsuite package.m4 local.at
+EXTRA_DIST 		+= testsuite.at $(TESTSUITE_AT) testsuite local.at
 
-TESTSUITE 		= $(srcdir)/testsuite
+TESTSUITE 		= testsuite
 
 TESTSUITE_AT		= dbase.at devices.at starter.at
 
@@ -106,7 +106,7 @@ db_getresoval_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 db_getdevexp_SOURCES	= db_getdevexp.cpp
 db_getdevexp_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
-$(srcdir)/package.m4:	$(top_srcdir)/configure.ac
+package.m4:	$(top_srcdir)/configure.ac
 	{\
 		echo '# Signature of the current package.'; \
 		echo 'm4_define([AT_PACKAGE_NAME], 	[@PACKAGE_NAME@])'; \
@@ -114,13 +114,13 @@ $(srcdir)/package.m4:	$(top_srcdir)/configure.ac
 		echo 'm4_define([AT_PACKAGE_VERSION],	[@PACKAGE_VERSION@])'; \
 		echo 'm4_define([AT_PACKAGE_STRING],	[@PACKAGE_STRING@])'; \
 		echo 'm4_define([AT_PACKAGE_BUGREPORT],	[@PACKAGE_BUGREPORT@])'; \
-	} > $(srcdir)/package.m4
+	} > package.m4
 
 check-local:	atconfig atlocal $(TESTSUITE) taco
 	$(SHELL) $(TESTSUITE)
 
-$(TESTSUITE):	$(srcdir)/testsuite.at $(TESTSUITE_AT) $(srcdir)/package.m4
-	$(AUTOTEST) -I $(srcdir) $@.at -o $@.tmp
+$(TESTSUITE):	$(srcdir)/testsuite.at $(TESTSUITE_AT) package.m4
+	$(AUTOTEST) -I $(srcdir) $(srcdir)/testsuite.at -o $@.tmp
 	sed  -e's/5>&1//g' $@.tmp > $@
 	chmod +x $@
 	rm -f $@.tmp	
