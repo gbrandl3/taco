@@ -1,6 +1,6 @@
 #!/bin/sh
 LIBTOOLIZE="libtoolize --force --copy --automake"
-ACLOCAL="aclocal -I m4"
+ACLOCAL="aclocal -I m4 -I /usr/local/share/aclocal -I /usr/share/aclocal"
 AUTOHEADER="autoheader"
 AUTOMAKE="automake -a -c --foreign"
 AUTOCONF="autoconf"
