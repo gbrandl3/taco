@@ -2,9 +2,6 @@
 #include <algorithm>
 #include <MySqlServer.h>
 
-/* Variables defined in setacc_svc.c */
-// extern db_res 	browse_back;
-
 
 /****************************************************************************
 *                                                                           *
@@ -26,7 +23,7 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
     long 			list_nb = dev_list->res_val.arr1_len;
 		
 #ifdef DEBUG
-    cout << "In upddev_1_svc function for " << list_nb << " device list(s)" << endl;
+    std::cout << "In upddev_1_svc function for " << list_nb << " device list(s)" << std::endl;
 #endif
 //
 // Initialize parameter sent back to client */
@@ -41,20 +38,20 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 //		
 // Allocate memory for strtok pointers */
 //
-	string lin = dev_list->res_val.arr1_val[i];
+	std::string lin = dev_list->res_val.arr1_val[i];
 
 #ifdef DEBUG
-	cout << "Device list = " << lin << endl;
+	std::cout << "Device list = " << lin << std::endl;
 #endif 
 //
 // Find the last device in the list. If there is no , character in the line,
 // this means that there is only one device in the list 
 //
-	string	ds_class,
+	std::string	ds_class,
 		ds_name,
 		tmp;
-	string::size_type pos =  lin.rfind(':');
-	if (pos == string::npos)
+	std::string::size_type pos =  lin.rfind(':');
+	if (pos == std::string::npos)
 	{
 
 	}
@@ -70,19 +67,19 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 	pos = tmp.find('/');
 	ds_name = tmp.substr(0,pos);
 
-	vector<string>	dev_list;
+	std::vector<std::string>	dev_list;
 	dev_list.clear();
-	while((pos = lin.find(',')) != string::npos)
+	while((pos = lin.find(',')) != std::string::npos)
 	{
 #ifdef DEBUG
-	    cout << "Line = " << lin << endl;
+	    std::cout << "Line = " << lin << std::endl;
 #endif
 	    dev_list.push_back(lin.substr(0, pos));
 	    lin.erase(0, pos + 1);
 	}
 	dev_list.push_back(lin);
 
-	string query;
+	std::string query;
 	if (mysql_db == "tango")
 	{
 	    query = "SELECT CONCAT(domain, '/', family, '/', member) FROM device WHERE ";
@@ -94,11 +91,11 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 	    query += ( ds_class + "' AND DEVICE_SERVER_NAME = '" + ds_name + "' ORDER BY INDEX_NUMBER ASC");
 	}
 #ifdef DEBUG
-        cout << "MySQLServer::upddev_1_svc(): query = " << query << endl;
+        std::cout << "MySQLServer::upddev_1_svc(): query = " << query << std::endl;
 #endif /* DEBUG */
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
-	    cerr << mysql_error(mysql_conn) << endl;
+	    std::cerr << mysql_error(mysql_conn) << std::endl;
 	    psdev_back.error_code = DbErr_DatabaseAccess;
 	    psdev_back.psdev_err = i + 1;
 	    return (&psdev_back);
@@ -106,21 +103,21 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 	MYSQL_RES *result = mysql_store_result(mysql_conn);
 	MYSQL_ROW row;
 
-	vector<string>	db_dev_list;
+	std::vector<std::string>	db_dev_list;
 	db_dev_list.clear();
 	while ((row = mysql_fetch_row(result)) != NULL)
 	    db_dev_list.push_back(row[0]);	
 	int 	ind = 1;
 #ifdef DEBUG
-	cout << "Some devices deleted " << endl;
+	std::cout << "Some devices deleted " << std::endl;
 #endif
-        for (vector<string>::iterator it = db_dev_list.begin(); it != db_dev_list.end(); ++it)
+        for (std::vector<std::string>::iterator it = db_dev_list.begin(); it != db_dev_list.end(); ++it)
 	{
-	    cerr << " Device = " << *it; 
-	    vector<string>::iterator	it2;  
+	    std::cerr << " Device = " << *it; 
+	    std::vector<std::string>::iterator	it2;  
 	    if ((it2 = find(dev_list.begin(), dev_list.end(), *it)) != dev_list.end())
 	    {
-		cerr << " found." << endl;	
+		std::cerr << " found." << std::endl;	
 	        switch(psdev_back.error_code = db_update_names(ds_class, ds_name, ind, *it))
 	    	{
 		    case DbErr_BadResourceType: 	
@@ -134,7 +131,7 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 	    }
 	    else
 	    {
-		cerr << " not found." << endl;
+		std::cerr << " not found." << std::endl;
 		switch(psdev_back.error_code = db_delete_names(ds_class, ds_name, ind, *it))
 		{
 		    case DbErr_BadResourceType: 	
@@ -143,9 +140,9 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 						return (&psdev_back);
 		}
 	    }
-	    cerr << " Return = " << psdev_back.error_code << endl;
+	    std::cerr << " Return = " << psdev_back.error_code << std::endl;
 	}
-        for (vector<string>::iterator it = dev_list.begin(); it != dev_list.end(); ++it)
+        for (std::vector<std::string>::iterator it = dev_list.begin(); it != dev_list.end(); ++it)
 	    if ((psdev_back.error_code = db_insert_names(ds_class, ds_name, ind, *it)) != 0)
 	    {
 	    	psdev_back.psdev_err = i + 1;
@@ -174,11 +171,11 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 *    there is a problem.                                                    *
 *                                                                           *
 ****************************************************************************/
-long MySQLServer::db_update_names(const string ds_class, const string ds_name, const int ind, const string dev_name)
+long MySQLServer::db_update_names(const std::string ds_class, const std::string ds_name, const int ind, const std::string dev_name)
 {
     if (count(dev_name.begin(), dev_name.end(), '/') != 2)
 	return DbErr_BadResourceType;
-    stringstream query;
+    std::stringstream query;
 
     if (mysql_db == "tango")
     {
@@ -191,7 +188,7 @@ long MySQLServer::db_update_names(const string ds_class, const string ds_name, c
     {
         query << "UPDATE NAMES SET INDEX_NUMBER = " << ind 
 	      << " WHERE DEVICE_SERVER_CLASS = '" << ds_class << "' AND DEVICE_SERVER_NAME = '" << ds_name
-	      << "' AND CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_name <<"'" << ends;
+	      << "' AND CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_name <<"'" << std::ends;
 
 #if !HAVE_SSTREAM    
         if (mysql_query(mysql_conn, query.str()) != 0)
@@ -199,7 +196,7 @@ long MySQLServer::db_update_names(const string ds_class, const string ds_name, c
         if (mysql_query(mysql_conn, query.str().c_str()) != 0)
 #endif
         {
-	    cerr << __LINE__ << mysql_error(mysql_conn) << endl;
+	    std::cerr << __LINE__ << mysql_error(mysql_conn) << std::endl;
 #if !HAVE_SSTREAM
 	    query.freeze(false);
 #endif
@@ -232,12 +229,12 @@ long MySQLServer::db_update_names(const string ds_class, const string ds_name, c
 *    there is a problem.                                                    *
 *                                                                           *
 ****************************************************************************/
-long MySQLServer::db_delete_names(const string ds_class, const string ds_name, const int ind, const string dev_name)
+long MySQLServer::db_delete_names(const std::string ds_class, const std::string ds_name, const int ind, const std::string dev_name)
 {
     if (count(dev_name.begin(), dev_name.end(), '/') != 2)
 	return DbErr_BadResourceType;
 
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
         query = "DELETE FROM device WHERE class = '" + ds_class + "' AND server LIKE  '"
@@ -250,7 +247,7 @@ long MySQLServer::db_delete_names(const string ds_class, const string ds_name, c
     }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << __LINE__ << mysql_error(mysql_conn) << endl;
+	std::cerr << __LINE__ << mysql_error(mysql_conn) << std::endl;
 	return DbErr_DatabaseAccess;
     }
     if (mysql_affected_rows(mysql_conn) == 1)
@@ -275,16 +272,16 @@ long MySQLServer::db_delete_names(const string ds_class, const string ds_name, c
 *    there is a problem.                                                    *
 *                                                                           *
 ****************************************************************************/
-long MySQLServer::db_insert_names(const string ds_class, const string ds_name, const int ind, const string dev_name)
+long MySQLServer::db_insert_names(const std::string ds_class, const std::string ds_name, const int ind, const std::string dev_name)
 {
-    stringstream query;
+    std::stringstream query;
 
     if (count(dev_name.begin(), dev_name.end(), '/') != 2)
 	return DbErr_BadResourceType;
-    string	domain,
+    std::string	domain,
 		family,
 		member;
-    string::size_type	pos,
+    std::string::size_type	pos,
 			last_pos = 0;
 
     pos = dev_name.find('/');
@@ -299,14 +296,14 @@ long MySQLServer::db_insert_names(const string ds_class, const string ds_name, c
         query << "INSERT INTO device(name, class, server, domain, family, member)"
 	      << " VALUES('" << domain << "/" << family << "/" << member << "','" 
 	      << ds_class << "', '" << ds_class << "/" << ds_name << "', '" << domain << "', '" << family
-	      << "', '" << member << "')" << ends;
-        cout << query.str() << endl;
+	      << "', '" << member << "')" << std::ends;
+        std::cout << query.str() << std::endl;
     }
     else
     {
         query << "INSERT INTO NAMES(DEVICE_SERVER_CLASS, DEVICE_SERVER_NAME, INDEX_NUMBER, DOMAIN, FAMILY, MEMBER)"
 	      << " VALUES('" << ds_class << "', '" << ds_name << "', " << ind << ", '" << domain << "', '" << family
-	      << "', '" << member << "')" << ends;
+	      << "', '" << member << "')" << std::ends;
     }
 #if !HAVE_SSTREAM
     if (mysql_query(mysql_conn, query.str()) != 0)
@@ -314,7 +311,7 @@ long MySQLServer::db_insert_names(const string ds_class, const string ds_name, c
     if (mysql_query(mysql_conn, query.str().c_str()) != 0)
 #endif
     {
-	cerr << __LINE__ << mysql_error(mysql_conn) << endl;
+	std::cerr << __LINE__ << mysql_error(mysql_conn) << std::endl;
 #if !HAVE_SSTREAM
 	query.freeze(false);
 #endif
@@ -357,7 +354,7 @@ db_psdev_error *MySQLServer::updres_1_svc(db_res *res_list)
 				pat[2] = {SEP_ELT, '\0'};
 
 #ifdef DEBUG
-    cout << "In updres_1_svc function for " << list_nb << " resource(s)" << endl;
+    std::cout << "In updres_1_svc function for " << list_nb << " resource(s)" << std::endl;
 #endif
 //
 // Initialize parameter sent back to client */
@@ -372,15 +369,15 @@ db_psdev_error *MySQLServer::updres_1_svc(db_res *res_list)
 //
 // Allocate memory for strtok pointers */
 //
-	string lin(res_list->res_val.arr1_val[i]);
+	std::string lin(res_list->res_val.arr1_val[i]);
 
 #ifdef DEBUG
-	cout << "Resource list = " << lin << endl;
+	std::cout << "Resource list = " << lin << std::endl;
 #endif
 //
 // Only one update if the resource is a simple one */
 //
-	if (lin.find(SEP_ELT) == string::npos)
+	if (lin.find(SEP_ELT) == std::string::npos)
 	{
 	    if (upd_res(lin,1,False,&psdev_back.error_code) == -1)
 	    {
@@ -394,7 +391,7 @@ db_psdev_error *MySQLServer::updres_1_svc(db_res *res_list)
 	    {
 	    	ptr_cp = new char[lin.length() + 1];
 	    }
-	    catch(bad_alloc)
+	    catch(std::bad_alloc)
 	    {
 		psdev_back.psdev_err = i + 1;
 		psdev_back.error_code = DbErr_ClientMemoryAllocation;
@@ -455,18 +452,18 @@ db_psdev_error *MySQLServer::updres_1_svc(db_res *res_list)
 *    there is a problem.                                                    *
 *                                                                           *
 ****************************************************************************/
-long MySQLServer::upd_res(string lin, long numb, char array, long *p_err)
+long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
 {
     unsigned int 	diff;
-    static string	domain,
+    static std::string	domain,
 			family,
 			member,
 			name;
-    string		val;
+    std::string		val;
 
     if (numb == 1)
     {
-    	string::size_type	pos,
+    	std::string::size_type	pos,
 				last_pos;
 //
 // Get table name 
@@ -502,7 +499,7 @@ long MySQLServer::upd_res(string lin, long numb, char array, long *p_err)
 	}
 //
 // Get resource value (resource values are stored in the database as 
-// case dependent strings 
+// case dependent std::strings 
 //
 	val = lin.substr(pos + 1);
     }
@@ -523,12 +520,12 @@ long MySQLServer::upd_res(string lin, long numb, char array, long *p_err)
 //
     numb;
 #ifdef DEBUG
-    cout << "Table name : " << domain << endl;
-    cout << "Family name : " << family << endl;
-    cout << "Number name : " << member << endl;
-    cout << "Resource name : " << name << endl;
-    cout << "Resource value : " << val << endl;
-    cout << "Sequence number : " << numb << endl << endl;
+    std::cout << "Table name : " << domain << std::endl;
+    std::cout << "Family name : " << family << std::endl;
+    std::cout << "Number name : " << member << std::endl;
+    std::cout << "Resource name : " << name << std::endl;
+    std::cout << "Resource value : " << val << std::endl;
+    std::cout << "Sequence number : " << numb << std::endl << std::endl;
 #endif 
 //
 // Select the right resource table in database */
@@ -553,7 +550,7 @@ long MySQLServer::upd_res(string lin, long numb, char array, long *p_err)
 //
     if (val == "%" || !array)
     {
-	string query;
+	std::string query;
         if (mysql_db == "tango")
         {
             query = "DELETE FROM property_device WHERE device = '" + domain + "/" + family + "/" + member + "'";
@@ -561,13 +558,13 @@ long MySQLServer::upd_res(string lin, long numb, char array, long *p_err)
         }
         else
         {
-	    string query = "DELETE FROM RESOURCE WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER, '/', NAME) = '";
+	    std::string query = "DELETE FROM RESOURCE WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER, '/', NAME) = '";
 	    query += (domain + '/' + family + '/' + member + '/' + name + "'");
         }                                                                
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
-	    cerr << __LINE__ << mysql_error(mysql_conn) << endl;
-	    cerr << query.c_str() << endl;
+	    std::cerr << __LINE__ << mysql_error(mysql_conn) << std::endl;
+	    std::cerr << query.c_str() << std::endl;
 	    *p_err = DbErr_DatabaseAccess;
 	    return(-1);
 	}
@@ -575,23 +572,23 @@ long MySQLServer::upd_res(string lin, long numb, char array, long *p_err)
 //
 // Insert a new tuple 
 //
-    stringstream query;
+    std::stringstream query;
     if (mysql_db == "tango")
     {
         query << "INSERT INTO property_device(device,name,domain,family,member,count,value) VALUES('"
 	      << domain << "/" << family << "/" << member << "','" << name << "','"
 	      << domain << "','" << family << "','" << member << "','" 
-	      << numb << "','" << val << "')" << ends;
+	      << numb << "','" << val << "')" << std::ends;
 
     }
     else
     {
         query << "INSERT INTO RESOURCE(DOMAIN, FAMILY, MEMBER, NAME, INDEX_RES, RESVAL) VALUES('"
 	      << domain << "', '" << family << "', '" << member << "', '" << name << "', " << numb
-	      << ", '" << val << "')" << ends;
+	      << ", '" << val << "')" << std::ends;
     }
 #ifdef DEBUG
-    cout << "MySQLServer::upd_res(): query = " << query.str() << endl;
+    std::cout << "MySQLServer::upd_res(): query = " << query.str() << std::endl;
 #endif /* DEBUG */
 #if !HAVE_SSTREAM
     if (mysql_query(mysql_conn, query.str()) != 0)
@@ -599,8 +596,8 @@ long MySQLServer::upd_res(string lin, long numb, char array, long *p_err)
     if (mysql_query(mysql_conn, query.str().c_str()) != 0)
 #endif
     {
-	cerr << __LINE__ << mysql_error(mysql_conn) << endl;
-	cerr << query.str() << endl;
+	std::cerr << __LINE__ << mysql_error(mysql_conn) << std::endl;
+	std::cerr << query.str() << std::endl;
 #if !HAVE_SSTREAM
 	query.freeze(false);
 #endif
@@ -634,7 +631,7 @@ db_res *MySQLServer::secpass_1_svc()
     char pass[80];
 	
 #ifdef DEBUG
-    cout << "In secpass_1_svc function" << endl;
+    std::cout << "In secpass_1_svc function" << std::endl;
 #endif
 
 //
@@ -647,12 +644,12 @@ db_res *MySQLServer::secpass_1_svc()
 //
 // Build security file name
 //
-    string f_name((char *)getenv("DBM_DIR"));
+    std::string f_name((char *)getenv("DBM_DIR"));
     f_name.append("/.sec_pass");	
 //
 // Try to open the file
 //
-    ifstream f(f_name.c_str());
+    std::ifstream f(f_name.c_str());
     if (!f)
     {
 	browse_back.db_err = DbErr_NoPassword;
@@ -676,7 +673,7 @@ db_res *MySQLServer::secpass_1_svc()
 	browse_back.res_val.arr1_val[0] = new char [strlen(pass) + 1];
 	strcpy(browse_back.res_val.arr1_val[0], pass);
     }
-    catch (bad_alloc)
+    catch (std::bad_alloc)
     {
 	browse_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&browse_back);

@@ -26,10 +26,10 @@
 cmd_que *MySQLServer::db_cmd_query_1_svc(nam *pcmd_name)
 {
     int 		i;
-    string 		req_cmd(*pcmd_name);
+    std::string 	req_cmd(*pcmd_name);
 
 #ifdef DEBUG
-    cout << "Command name : " << req_cmd << endl;
+    std::cout << "Command name : " << req_cmd << std::endl;
 #endif
 //
 // Initialize error code sended cmd_queue to client 
@@ -40,7 +40,7 @@ cmd_que *MySQLServer::db_cmd_query_1_svc(nam *pcmd_name)
 //
     if (!dbgen.connected)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	cmd_queue.db_err = DbErr_DatabaseNotConnected;
 	cmd_queue.xcmd_code = 0;
 	return(&cmd_queue);
@@ -61,7 +61,7 @@ cmd_que *MySQLServer::db_cmd_query_1_svc(nam *pcmd_name)
 // Try to retrieve a resource in the CMDS table with a resource value equal
 // to the command name 
 //
-    string query;
+    std::string query;
 
     if (mysql_db == "tango")
     {
@@ -75,7 +75,7 @@ cmd_que *MySQLServer::db_cmd_query_1_svc(nam *pcmd_name)
     }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	cmd_queue.db_err = DbErr_DatabaseAccess;
 	cmd_queue.xcmd_code = 0;
 	return (&cmd_queue);

@@ -31,12 +31,12 @@ DevLong *MySQLServer::db_devexp_1_svc(tab_dbdev *rece)
 #ifdef DEBUG
     for (int i=0;i<num_dev;i++)
     {
-	cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << endl;
-	cout << "Host name : " << rece->tab_dbdev_val[i].host_name << endl;
-	cout << "Program number : " << rece->tab_dbdev_val[i].p_num << endl;
-	cout << "Version number : " << rece->tab_dbdev_val[i].v_num << endl;
-	cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << endl;
-	cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << endl;
+	std::cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl;
+	std::cout << "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl;
+	std::cout << "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl;
+	std::cout << "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl;
+	std::cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl;
+	std::cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl;
     }
 #endif
 //
@@ -48,7 +48,7 @@ DevLong *MySQLServer::db_devexp_1_svc(tab_dbdev *rece)
 //
     if (!dbgen.connected)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -98,13 +98,13 @@ DevLong *MySQLServer::db_devexp_2_svc(tab_dbdev_2 *rece)
 #ifdef DEBUG
     for (int i = 0; i < num_dev; i++)
     {
-	cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << endl;
-	cout << "Host name : " << rece->tab_dbdev_val[i].host_name << endl;
-	cout << "Program number : " << rece->tab_dbdev_val[i].p_num << endl;
-	cout << "Version number : " << rece->tab_dbdev_val[i].v_num << endl;
-	cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << endl;
-	cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << endl;
-	cout << "Device server PID : " << rece->tab_dbdev_val[i].pid << endl;
+	std::cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl;
+	std::cout << "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl;
+	std::cout << "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl;
+	std::cout << "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl;
+	std::cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl;
+	std::cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl;
+	std::cout << "Device server PID : " << rece->tab_dbdev_val[i].pid << std::endl;
     }
 #endif
 //
@@ -116,7 +116,7 @@ DevLong *MySQLServer::db_devexp_2_svc(tab_dbdev_2 *rece)
 //
     if (!dbgen.connected)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -169,14 +169,14 @@ DevLong *MySQLServer::db_devexp_3_svc(tab_dbdev_3 *rece)
 #ifdef DEBUG
     for (int i = 0; i < num_dev; i++)
     {
-	cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << endl;
-	cout << "Host name : " << rece->tab_dbdev_val[i].host_name << endl;
-	cout << "Program number : " << rece->tab_dbdev_val[i].p_num << endl;
-	cout << "Version number : " << rece->tab_dbdev_val[i].v_num << endl;
-	cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << endl;
-	cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << endl;
-	cout << "Device server PID : " << rece->tab_dbdev_val[i].pid << endl;
-	cout << "Device server process name : " << rece->tab_dbdev_val[i].proc_name << endl;
+	std::cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl;
+	std::cout << "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl;
+	std::cout << "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl;
+	std::cout << "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl;
+	std::cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl;
+	std::cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl;
+	std::cout << "Device server PID : " << rece->tab_dbdev_val[i].pid << std::endl;
+	std::cout << "Device server process name : " << rece->tab_dbdev_val[i].proc_name << std::endl;
     }
 #endif
 //
@@ -188,7 +188,7 @@ DevLong *MySQLServer::db_devexp_3_svc(tab_dbdev_3 *rece)
 //
     if (dbgen.connected == False)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -241,7 +241,7 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
 		num_dev = de_name->arr1_len;
     device 	ret;
     db_devinfo 	*stu_addr;
-    string 	ret_host_name,
+    std::string ret_host_name,
 		ret_dev_name,
 		ret_dev_type,
 		ret_dev_class;
@@ -250,7 +250,7 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
 	
 #ifdef DEBUG
     for (int i = 0; i < num_dev; i++)
-	cout << "Device name (in import function) : " << de_name->arr1_val[i] << endl;
+	std::cout << "Device name (in import function) : " << de_name->arr1_val[i] << std::endl;
 #endif
 //
 // Initialize error code sended back to client */
@@ -261,7 +261,7 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
 //
     if (!dbgen.connected)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	back.db_imperr = DbErr_DatabaseNotConnected;
 	back.imp_dev.tab_dbdev_len = 0;
 	back.imp_dev.tab_dbdev_val = NULL;
@@ -282,8 +282,8 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
 //
 // Try to retrieve the tuple in the NAMES table 
 //
-	    string dev_name(de_name->arr1_val[i]);
-	    string query;
+	    std::string dev_name(de_name->arr1_val[i]);
+	    std::string query;
             if (mysql_db == "tango")
 	    {
 	        query = "SELECT host, ior, version, class";
@@ -311,8 +311,8 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
 	    	    ret_host_name = row[0];
                     if (mysql_db == "tango")
                     {
-		    	string ior(row[1]);
-			string pgm_no;
+		    	std::string ior(row[1]);
+			std::string pgm_no;
 			pgm_no = ior.substr(ior.rfind(':')+1);
                         ret_pn = atoi(pgm_no.c_str());
                         ret_dev_type = "DevType_Default";
@@ -378,7 +378,7 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
     	} 
         back.imp_dev.tab_dbdev_len = num_dev;
     }
-    catch(bad_alloc)
+    catch(std::bad_alloc)
     {
 	delete [] stu_addr->host_name;
 	delete [] stu_addr->dev_name;
@@ -419,13 +419,13 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
 DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
 {
     int 		d_num = 0;
-    string		ds_class,
+    std::string		ds_class,
 			ds_name,
 			device(*dsn_name);
-    string::size_type	pos;
+    std::string::size_type	pos;
 
 #ifdef DEBUG
-    cout << "Device server name (unregister function) : " << device << endl;
+    std::cout << "Device server name (unregister function) : " << device << std::endl;
 #endif
 //
 // Miscallaneous initialization 
@@ -436,14 +436,14 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
 //
     if (!dbgen.connected)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
 //
 // Get device server class */
 //
-    if ((pos = device.find('/')) == string::npos)
+    if ((pos = device.find('/')) == std::string::npos)
     {
 	errcode = DbErr_BadDevSyntax;
 	return (&errcode);
@@ -455,15 +455,15 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
     ds_name = device.substr(pos + 1);
 
 #ifdef DEBUG
-    cout << "Device server class (unreg) : " << ds_class << endl;
-    cout << "Device server name (unreg) : " << ds_name << endl;
+    std::cout << "Device server class (unreg) : " << ds_class << std::endl;
+    std::cout << "Device server name (unreg) : " << ds_name << std::endl;
 #endif
 //
 // Try to retrieve devices in database assuming that the input device server
 // name is the device server PROCESS name. As there is no key build on
 // the device server process name, do a full traversal of the database 
 //
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
         query = "UPDATE device SET exported = 0 WHERE";
@@ -477,7 +477,7 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
         query += (" PROCESS_NAME = '" + ds_name + "' AND PROCESS_ID != 0");
     }
 #ifdef DEBUG
-    cout << "MySQLServer::db_svcunr_1_svc(): query = " << query << endl;
+    std::cout << "MySQLServer::db_svcunr_1_svc(): query = " << query << std::endl;
 #endif /* DEBUG */
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
@@ -505,7 +505,7 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
 	    query += (" DEVICE_SERVER_NAME = '" + ds_name + "'");
         }
 #ifdef DEBUG
-        cout << "MySQLServer::db_svcunr_1_svc(): query = " << query << endl;
+        std::cout << "MySQLServer::db_svcunr_1_svc(): query = " << query << std::endl;
 #endif /* DEBUG */
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
@@ -555,13 +555,13 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
 svc_inf *MySQLServer::db_svcchk_1_svc(nam *dsn_name)
 {
     static char 	host_name[HOST_NAME_LENGTH];
-    string		ds_class,
+    std::string		ds_class,
 			ds_name,
 			device(*dsn_name);
-    string::size_type	pos;
+    std::string::size_type	pos;
 
 #ifdef DEBUG
-    cout << "Device server name (check function) : " << device << endl;
+    std::cout << "Device server name (check function) : " << device << std::endl;
 #endif 
 //
 // Miscalaneous initialization */
@@ -576,14 +576,14 @@ svc_inf *MySQLServer::db_svcchk_1_svc(nam *dsn_name)
 //
     if (!dbgen.connected)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	svc_info.db_err = DbErr_DatabaseNotConnected;
 	return(&svc_info);
     }
 //
 // Get device server class */
 //
-    if ((pos = device.find('/')) == string::npos)
+    if ((pos = device.find('/')) == std::string::npos)
     {
     	svc_info.db_err = DbErr_BadDevSyntax; 
 	return (&svc_info);
@@ -595,13 +595,13 @@ svc_inf *MySQLServer::db_svcchk_1_svc(nam *dsn_name)
     ds_name = device.substr(pos + 1);
 
 #ifdef DEBUG
-    cout << "Device server class (check) : " << ds_class << endl;
-    cout << "Device server name (check) : " << ds_name << endl;
+    std::cout << "Device server class (check) : " << ds_class << std::endl;
+    std::cout << "Device server name (check) : " << ds_name << std::endl;
 #endif
 //
 // Initialization needed to retrieve the right tuples in the NAMES table 
 //
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
         query = "SELECT host, ior, version FROM device WHERE";
@@ -666,7 +666,7 @@ int MySQLServer::db_store(db_devinfo &dev_stu)
 //
 // Try to retrieve the right tuple in the NAMES table 
 //
-    stringstream query;
+    std::stringstream query;
     if (mysql_db == "tango")
     {
         query << "UPDATE device SET host = '" << dev_stu.host_name <<  "',"
@@ -674,7 +674,7 @@ int MySQLServer::db_store(db_devinfo &dev_stu)
           << " version = '" << dev_stu.v_num << "',"
           << " class = '" << dev_stu.dev_class << "',"
           << " pid = 0 , server = 'unknown'"
-          << " WHERE CONCAT(domain, '/', family, '/', member) = '" << dev_stu.dev_name << "'" << ends; 	
+          << " WHERE CONCAT(domain, '/', family, '/', member) = '" << dev_stu.dev_name << "'" << std::ends; 	
     }
     else
     {
@@ -684,7 +684,7 @@ int MySQLServer::db_store(db_devinfo &dev_stu)
           << " DEVICE_TYPE = '" << dev_stu.dev_type << "',"
           << " DEVICE_CLASS = '" << dev_stu.dev_class << "',"
           << " PROCESS_ID = 0, PROCESS_NAME = 'unknown'"
-          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << ends; 	
+          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << std::ends; 	
     }
     try
     {
@@ -734,7 +734,7 @@ int MySQLServer::db_store(db_devinfo_2 &dev_stu)
 //
 // Try to retrieve the right tuple in the NAMES table 
 //
-    stringstream query;
+    std::stringstream query;
     if (mysql_db == "tango")
     {
         query << "UPDATE device SET host = '" << dev_stu.host_name <<  "',"
@@ -742,7 +742,7 @@ int MySQLServer::db_store(db_devinfo_2 &dev_stu)
           << " version = '" << dev_stu.v_num << "',"
           << " class = '" << dev_stu.dev_class << "',"
           << " pid = " << dev_stu.pid << ", server = 'unknown'"
-          << " WHERE CONCAT(domain, '/', family, '/', member) = '" << dev_stu.dev_name << "'" << ends; 	
+          << " WHERE CONCAT(domain, '/', family, '/', member) = '" << dev_stu.dev_name << "'" << std::ends; 	
     }
     else
     {
@@ -752,7 +752,7 @@ int MySQLServer::db_store(db_devinfo_2 &dev_stu)
           << " DEVICE_TYPE = '" << dev_stu.dev_type << "',"
           << " DEVICE_CLASS = '" << dev_stu.dev_class << "',"
           << " PROCESS_ID = " << dev_stu.pid << ", PROCESS_NAME = 'unknown'" 
-          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << ends; 	
+          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << std::ends; 	
     }
 
     try
@@ -805,7 +805,7 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
 //
 // Try to retrieve the right tuple in the NAMES table 
 //
-    stringstream query;
+    std::stringstream query;
     if (mysql_db == "tango")
     {
         query << "UPDATE device SET host = '" << dev_stu.host_name <<  "',"
@@ -815,7 +815,7 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
 //        << " pid = " << dev_stu.pid << ", server = '" << dev_stu.proc_name << "'"
           << " pid = " << dev_stu.pid << ","
 	  << " exported = 1" 
-          << " WHERE CONCAT(domain, '/', family, '/', member) = '" << dev_stu.dev_name << "'" << ends; 	
+          << " WHERE CONCAT(domain, '/', family, '/', member) = '" << dev_stu.dev_name << "'" << std::ends; 	
     }
     else
     {
@@ -825,10 +825,10 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
           << " DEVICE_TYPE = '" << dev_stu.dev_type << "',"
           << " DEVICE_CLASS = '" << dev_stu.dev_class << "',"
           << " PROCESS_ID = " << dev_stu.pid << ", PROCESS_NAME = '" << dev_stu.proc_name << "'"
-          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << ends; 	
+          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << std::ends; 	
     }
 #ifdef DEBUG
-    cout << "MySQLServer::db_store(): query = " << query.str() << endl;
+    std::cout << "MySQLServer::db_store(): query = " << query.str() << std::endl;
 #endif /* DEBUG */
     try
     {
@@ -845,7 +845,7 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
     }
     catch(const int err)
     {
-	cerr << "MySQLServer::db_store(): error = " << mysql_error(mysql_conn) << endl;
+	std::cerr << "MySQLServer::db_store(): error = " << mysql_error(mysql_conn) << std::endl;
 	errorcode = err;
     }
 //

@@ -32,7 +32,7 @@ typedef char * (* DbRpcLocalFunc)(...);
 //
 // Local function 
 //
-static void register_db(const string, const string, const u_long, const u_long);
+static void register_db(const std::string, const std::string, const u_long, const u_long);
 static void db_setupprog_1(struct svc_req *, SVCXPRT *);
 
 extern	DBServer	*dbm;
@@ -67,23 +67,23 @@ void default_sig(int signo)
     time_tm = localtime(&tps);
     tps_str = asctime(time_tm);
     tps_str[24] = '\0';
-    cout << tps_str << " : signal " << signo << " received !!!" << endl;
+    std::cout << tps_str << " : signal " << signo << " received !!!" << std::endl;
 }
 
 void usage(const char *argv)
 {
-    string	types("dbm");
+    std::string	types("dbm");
 #if HAVE_MYSQL_MYSQL_H
     types += "|mysql";
 #endif
-    cerr << "usage: " << argv << " [-h] [-t (" << types << ")] database_name network_manager_host_name" << endl;
-    cerr << "       -h             - prints this message" << endl;
-    cerr << "       -t (dbm|mysql) - gives the type of underlying database connect to" << endl;
-    cerr << "                        'dbm' stands for the dbm, ndbm, and gdbm" << endl;
-    cerr << "                        'mysql' stands for the MySQL database" << endl;
-    cerr << "                        database_name for MySQL database should be tango" << endl;
-    cerr << "       -u user        - user for MySQL database" << endl;
-    cerr << "       -p password    - password for MySQL database" << endl;
+    std::cerr << "usage: " << argv << " [-h] [-t (" << types << ")] database_name network_manager_host_name" << std::endl;
+    std::cerr << "       -h             - prints this message" << std::endl;
+    std::cerr << "       -t (dbm|mysql) - gives the type of underlying database connect to" << std::endl;
+    std::cerr << "                        'dbm' stands for the dbm, ndbm, and gdbm" << std::endl;
+    std::cerr << "                        'mysql' stands for the MySQL database" << std::endl;
+    std::cerr << "                        database_name for MySQL database should be tango" << std::endl;
+    std::cerr << "       -u user        - user for MySQL database" << std::endl;
+    std::cerr << "       -p password    - password for MySQL database" << std::endl;
     exit(1);
 }
 
@@ -152,10 +152,10 @@ int main(int argc,char **argv)
     while ((c = getopt(argc, argv, "t:h:u:p")) != EOF)
     	switch(c)
 	{
-	    case 't' :	if (string(optarg) == "dbm")
+	    case 't' :	if (std::string(optarg) == "dbm")
 			    dbm = new NdbmServer("", "", "");
 #ifdef HAVE_MYSQL_MYSQL_H
-			else if (string(optarg) == "mysql")
+			else if (std::string(optarg) == "mysql")
 			{
 			    if (getenv("MYSQL_USER") != NULL)
 			    {
@@ -165,8 +165,8 @@ int main(int argc,char **argv)
 			    {
 				mysql_password = getenv("MYSQL_PASSWORD");
 			    }
-			    cout << "going to connect to mysql database with user = " << mysql_user;
-			    cout << ", password = " << mysql_password << endl;
+			    std::cout << "going to connect to mysql database with user = " << mysql_user;
+			    std::cout << ", password = " << mysql_password << std::endl;
     			    dbm = new MySQLServer(mysql_user, mysql_password, argv[optind]);
 			}
 #endif
@@ -179,7 +179,7 @@ int main(int argc,char **argv)
 
     if (optind != (argc - 2))
 	usage(*argv); 			
-    string netmanhost(argv[argc - 1]);
+    std::string netmanhost(argv[argc - 1]);
 #endif
     if (!dbm)
     	dbm = new NdbmServer("", "", "");
@@ -190,7 +190,7 @@ int main(int argc,char **argv)
     transp_udp = svcudp_create(RPC_ANYSOCK);
     transp_tcp = svctcp_create(RPC_ANYSOCK,0,0);
     gethostname(hostna, sizeof(hostna));
-    cout << "Server host name : " << hostna << endl;
+    std::cout << "Server host name : " << hostna << endl;
 #else
 //
 // Added code to manage transient program number and to get host name
@@ -203,12 +203,12 @@ int main(int argc,char **argv)
 //
     if ((pgnum = gettransient("DatabaseServer")) == 0)
     {
-	cerr << "dbm_server : Can't get transcient program number" << endl;
+	std::cerr << "dbm_server : Can't get transcient program number" << std::endl;
 	exit(-1);
     }
-    cout << "Program number : " << pgnum << endl;
+    std::cout << "Program number : " << pgnum << std::endl;
     gethostname(hostna, sizeof(hostna));
-    cout << "Server host name : " << hostna << endl;
+    std::cout << "Server host name : " << hostna << std::endl;
 //
 // Send these informations to network manager. Even if the server is now 
 // supporting version one and two, register it in the Manager with version 1
@@ -228,12 +228,12 @@ int main(int argc,char **argv)
 
     if (transp_udp == NULL)
     {
-	cerr << "cannot create udp service." << endl;
+	std::cerr << "cannot create udp service." << std::endl;
 	exit(1);
     }
     if (transp_tcp == NULL)
     {
-	cerr << "cannot create tcp service." << endl;
+	std::cerr << "cannot create tcp service." << std::endl;
 	exit(1);
     }
 //
@@ -245,64 +245,64 @@ int main(int argc,char **argv)
 #ifdef ALONE
     if (!svc_register(transp_udp,DB_SETUPPROG,DB_SETUPVERS,setup_prog,IPPROTO_UDP))
     {
-	cerr << "unable to register (DB_SETUPPROG,DB_SETUPVERS,udp)" << endl;
+	std::cerr << "unable to register (DB_SETUPPROG,DB_SETUPVERS,udp)" << std::endl;
 	exit(1);
     }
     if (!svc_register(transp_tcp,DB_SETUPPROG,DB_SETUPVERS,setup_prog,IPPROTO_TCP))
     {
-	cerr << "unable to register (DB_SETUPPROG,DB_SETUPVERS,tcp)" << endl;
+	std::cerr << "unable to register (DB_SETUPPROG,DB_SETUPVERS,tcp)" << std::endl;
 	exit(1);
     }
     if (!svc_register(transp_udp,DB_SETUPPROG,DB_VERS_2,setup_prog,IPPROTO_UDP))
     {
-	cerr << "unable to register (DB_SETUPPROG,DB_VERS_2,udp)" << endl;
+	std::cerr << "unable to register (DB_SETUPPROG,DB_VERS_2,udp)" << std::endl;
 	exit(1);
     }
     if (!svc_register(transp_tcp,DB_SETUPPROG,DB_VERS_2,setup_prog,IPPROTO_TCP))
     {
-	cerr << "unable to register (DB_SETUPPROG,DB_VERS_2,tcp)" << endl;
+	std::cerr << "unable to register (DB_SETUPPROG,DB_VERS_2,tcp)" << std::endl;
 	exit(1);
     }
     if (!svc_register(transp_udp,DB_SETUPPROG,DB_VERS_3,setup_prog,IPPROTO_UDP))
     {
-	cerr << "unable to register (DB_SETUPPROG,DB_VERS_2,udp)" << endl;
+	std::cerr << "unable to register (DB_SETUPPROG,DB_VERS_2,udp)" << std::endl;
 	exit(1);
     }
     if (!svc_register(transp_tcp,DB_SETUPPROG,DB_VERS_3, setup_prog,IPPROTO_TCP))
     {
-	cerr << "unable to register (DB_SETUPPROG,DB_VERS_2,tcp)" << endl;
+	std::cerr << "unable to register (DB_SETUPPROG,DB_VERS_2,tcp)" << std::endl;
 	exit(1);
     }
 
 #else
     if (!svc_register(transp_udp,pgnum, DB_SETUPVERS, setup_prog, IPPROTO_UDP))
     {
- 	cerr << "unable to register (pgnum, DB_SETUPVERS, udp)" << endl;
+ 	std::cerr << "unable to register (pgnum, DB_SETUPVERS, udp)" << std::endl;
  	exit(1);
     }
     if (!svc_register(transp_tcp,pgnum,DB_SETUPVERS, setup_prog,IPPROTO_TCP))
     {
- 	cerr << "unable to register (pgnum,DB_SETUPVERS,tcp)" << endl;
+ 	std::cerr << "unable to register (pgnum,DB_SETUPVERS,tcp)" << std::endl;
  	exit(1);
     }
     if (!svc_register(transp_udp,pgnum, DB_VERS_2, setup_prog, IPPROTO_UDP))
     {
-	cerr << "unable to register (pgnum, DB_VERS_2, udp)" << endl;
+	std::cerr << "unable to register (pgnum, DB_VERS_2, udp)" << std::endl;
 	exit(1);
     }
     if (!svc_register(transp_tcp,pgnum,DB_VERS_2,setup_prog,IPPROTO_TCP))
     {
-	cerr << "unable to register (pgnum,DB_VERS_2,tcp)" << endl;
+	std::cerr << "unable to register (pgnum,DB_VERS_2,tcp)" << std::endl;
 	exit(1);
     }
     if (!svc_register(transp_udp,pgnum, DB_VERS_3, setup_prog, IPPROTO_UDP))
     {
-	cerr << "unable to register (pgnum, DB_VERS_2, udp)" << endl;
+	std::cerr << "unable to register (pgnum, DB_VERS_2, udp)" << std::endl;
 	exit(1);
     }
     if (!svc_register(transp_tcp,pgnum,DB_VERS_3,setup_prog,IPPROTO_TCP))
     {
-	cerr << "unable to register (pgnum,DB_VERS_2,tcp)" << endl;
+	std::cerr << "unable to register (pgnum,DB_VERS_2,tcp)" << std::endl;
 	exit(1);
     }
 #endif 
@@ -313,7 +313,7 @@ int main(int argc,char **argv)
 #ifdef sun
     if ((host = gethostbyname(hostna)) == NULL)
     {
-	cerr << "Unable to get my IP address" << endl;
+	std::cerr << "Unable to get my IP address" << std::endl;
 	exit(1);
     }
     ptmp_long = (unsigned long *)host->h_addr_list[0];
@@ -326,7 +326,7 @@ int main(int argc,char **argv)
     if ((udp_port = pmap_getport(&so,pgnum,DB_SETUPVERS,IPPROTO_UDP)) == 0)
 #endif 
     {
-	cerr << "unable to retrieve udp port number" << endl;
+	std::cerr << "unable to retrieve udp port number" << std::endl;
 	exit(1);
     }
 
@@ -336,11 +336,11 @@ int main(int argc,char **argv)
     if ((tcp_port = pmap_getport(&so,pgnum,DB_SETUPVERS,IPPROTO_TCP)) == 0)
 #endif 
     {
-	cerr << "unable to retrieve tcp port number" << endl;
+	std::cerr << "unable to retrieve tcp port number" << std::endl;
 	exit(1);
     }
     svc_run();
-    cerr << "svc_run returned" << endl;
+    std::cerr << "svc_run returned" << std::endl;
     exit(1);
 }
 
@@ -660,7 +660,7 @@ static void db_setupprog_1(struct svc_req *rqstp, SVCXPRT *transp)
 	svcerr_systemerr(transp);
     if (!svc_freeargs(transp, xdr_argument, (caddr_t)&argument))
     {
-	cerr << "unable to free arguments" << endl;
+	std::cerr << "unable to free arguments" << std::endl;
 	exit(1);
     }
 //
@@ -772,7 +772,7 @@ static void db_setupprog_1(struct svc_req *rqstp, SVCXPRT *transp)
 *                                                                           *
 ****************************************************************************/
 #ifndef ALONE
-static void register_db(const string netman_host,const string host, const u_long prog, const u_long vers)
+static void register_db(const std::string netman_host,const std::string host, const u_long prog, const u_long vers)
 {
     _register_data register_data;
     CLIENT *netman_clnt;
@@ -784,7 +784,7 @@ static void register_db(const string netman_host,const string host, const u_long
     netman_clnt = clnt_create(netman_host.c_str(), NMSERVER_PROG, NMSERVER_VERS, "udp");
     if (netman_clnt == NULL)
     {
-	cerr << "Unable to create connection to network manager." << endl;
+	std::cerr << "Unable to create connection to network manager." << std::endl;
 	exit(1);
     }
 
@@ -802,7 +802,7 @@ static void register_db(const string netman_host,const string host, const u_long
 
     if (clnt_stat != RPC_SUCCESS)
     {
-	cerr << "register_db failed !!!" << endl;
+	std::cerr << "register_db failed !!!" << std::endl;
 	exit(1);
     }
 //

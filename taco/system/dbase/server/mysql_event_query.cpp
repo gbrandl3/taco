@@ -1,4 +1,5 @@
 #include <MySqlServer.h>
+
 
 /****************************************************************************
 *                                                                           *
@@ -25,13 +26,13 @@
 event_que *MySQLServer::db_event_query_1_svc(nam *pevent_name)
 {
     int 		i;
-    string		fam,
+    std::string		fam,
 			memb,
 			r_name,
 			event_str(*pevent_name);
 
 #ifdef DEBUG
-    cout << "Command name : " << event_str << endl;
+    std::cout << "Command name : " << event_str << std::endl;
 #endif
 //
 // Initialize error code sended event_queue to client 
@@ -42,7 +43,7 @@ event_que *MySQLServer::db_event_query_1_svc(nam *pevent_name)
 //
     if (!dbgen.connected)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	event_queue.db_err = DbErr_DatabaseNotConnected;
 	event_queue.xevent_code = 0;
 	return(&event_queue);
@@ -63,7 +64,7 @@ event_que *MySQLServer::db_event_query_1_svc(nam *pevent_name)
 // Try to retrieve a resource in the EVENTS table with a resource value equal
 // to the command name 
 //
-    string query;
+    std::string query;
 
     if (mysql_db == "tango")
     {

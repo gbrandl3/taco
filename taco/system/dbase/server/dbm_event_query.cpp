@@ -1,9 +1,21 @@
-#include <NdbmServer.h>
+#include <API.h>
 
+#include <fcntl.h>
+#include <db_xdr.h>
+
+/* Some C++ include files */
+
+#include <string>
+#include <NdbmClass.h>
+#include <NdbmServer.h>
+#include <iostream>
+
+/* Variables defined elsewhere */
 
+
 /****************************************************************************
 *                                                                           *
-*		Server code for db_event_query function                     *
+*		Server code for db_event_query function                       *
 *                               ------------                                *
 *                                                                           *
 *    Function rule : To retrieve (from database) the command code           *
@@ -13,140 +25,159 @@
 *                                                                           *
 *    Argout : No argout                                                     *
 *                                                                           *
-*    This function returns a pointer to a structure of the "event_que" type *
+*    This function returns a pointer to a structure of the "event_que" type   *
 *    The definition of this structure is :                                  *
 *    struct {                                                               *
 *      int db_err;    The database error code                               *
 *                        0 if no error                                      *
-*      unsigned int xevent_code;	The command code.		    *
+*      unsigned int xevent_code;	The command code.			    *
 *				0 if the database query fails		    *
 *            }                                                              *
 *                                                                           *
 ****************************************************************************/
 event_que *NdbmServer::db_event_query_1_svc(nam *pevent_name)
 {
-    int 		i,
-			found;
-    datum 		key;
-    char 		*tbeg,
-			*tend;
-    GDBM_FILE		tab;
-    unsigned int 	diff;
-    string		fam,
-			memb,
-			r_name,
-			event_str;
+	static event_que back;
+	int i,found;
+	datum key;
+	datum content;
+	char *tbeg,*tend;
+	GDBM_FILE	tab;
+	unsigned int diff;
+	int ds_num;
+	int team;
+	int event_num;
+	char fam[40];
+	char memb[40];
+	char r_name[40];
+	char event_str[50];
 
 #ifdef DEBUG
-    cout << "Command name : " << *pevent_name << endl;
+	std::cout << "Command name : " << *pevent_name << std::endl;
 #endif
-//
-// Initialize error code sended event_queue to client 
-//
-    event_queue.db_err = 0;
-    found = False;
-//
-// Return error code if the server is not connected to the database files 
-//
-    if (!dbgen.connected)
-    {
-	event_queue.db_err = DbErr_DatabaseNotConnected;
-	event_queue.xevent_code = 0;
-	return(&event_queue);
-    }
-//
-// Retrieve the right "table" in the table array 
-//
-    for (i = 0;i < dbgen.TblNum;i++)
-    {
-	if (dbgen.TblName[i] == "events")
-	{
-	    tab = dbgen.tid[i];
-	    break;
-	}
-    }
 
-    if (i == dbgen.TblNum)
-    {
-	event_queue.db_err = DbErr_DomainDefinition;
-	event_queue.xevent_code = 0;
-	return(&event_queue);
-    }
-//
-// Try to retrieve a resource in the EVENTS table with a resource value equal
-// to the command name 
-//
-    for (key=gdbm_firstkey(tab);key.dptr!=NULL;key=gdbm_nextkey(tab, key))
-    {
-	datum content = gdbm_fetch(tab,key);
-	if (content.dptr == NULL)
-	{
-	    event_queue.db_err = DbErr_DatabaseAccess;
-	    event_queue.xevent_code = 0;
-	    return(&event_queue);
-	}
-	event_str = string(content.dptr,content.dsize);
-	if (event_str == *pevent_name)
-	{
-	    found = true;
-	    break;
-	}
-    }
+/* Initialize error code sended back to client */
 
-    if (!found)
-    {
-//
-// Get family from key 
-//
-	string tmp = key.dptr;
-	string::size_type	pos = tmp.find('|');
-	if (pos == string::npos)
+	back.db_err = 0;
+	found = False;
+
+/* Return error code if the server is not connected to the database files */
+
+	if (dbgen.connected == False)
 	{
-	    event_queue.db_err = DbErr_DatabaseAccess;
-	    event_queue.xevent_code = 0;
-	    return(&event_queue);
+		back.db_err = DbErr_DatabaseNotConnected;
+		back.xevent_code = 0;
+		return(&back);
 	}
-	fam = tmp.substr(0, pos);
-	tmp.erase(0, pos + 1);
-//
-// Get member from key 
-//
-	if ((pos = tmp.find('|')) == string::npos)
+
+/* Retrieve the right "table" in the table array */
+
+	for (i = 0;i < dbgen.TblNum;i++)
 	{
-	    event_queue.db_err = DbErr_DatabaseAccess;
-	    event_queue.xevent_code = 0;
-	    return(&event_queue);
+		if (dbgen.TblName[i] == "events")
+		{
+			tab = dbgen.tid[i];
+			break;
+		}
 	}
-	memb = tmp.substr(0, pos);
-	tmp.erase(0, pos + 1);
-//
-// Get resource name from key 
-//
-	if ((pos = tmp.find('|')) == string::npos)
+
+	if (i == dbgen.TblNum)
 	{
-	    event_queue.db_err = DbErr_DatabaseAccess;
-	    event_queue.xevent_code = 0;
-	    return(&event_queue);
+		back.db_err = DbErr_DomainDefinition;
+		back.xevent_code = 0;
+		return(&back);
 	}
-	r_name = tmp.substr(0, pos);
-//
-// Build the command code 
-//
-	int 	team = atoi(fam.c_str()),
-		ds_num = atoi(memb.c_str()),
-		event_num = atoi(r_name.c_str());
-	event_queue.xevent_code = (team << DS_TEAM_SHIFT) + (ds_num << DS_IDENT_SHIFT) + event_num;
-    }
-//
-// If no command string founded 
-//
-    else
-    {
-	event_queue.xevent_code = 0;
-	event_queue.db_err = DbErr_ResourceNotDefined;
-    }
-//
-// Leave server 
-//
-    return(&event_queue);
+
+/* Try to retrieve a resource in the EVENTS table with a resource value equal
+   to the command name */
+
+	for (key=gdbm_firstkey(tab);key.dptr!=NULL;key=gdbm_nextkey(tab, key))
+	{
+
+		content = gdbm_fetch(tab,key);
+		if (content.dptr == NULL)
+		{
+			back.db_err = DbErr_DatabaseAccess;
+			back.xevent_code = 0;
+			return(&back);
+		}
+
+		strncpy(event_str,content.dptr,content.dsize);
+		event_str[content.dsize] = 0;
+
+		if (strcmp(event_str,*pevent_name) == 0)
+		{
+			found = True;
+			break;
+		}
+	}
+
+	if (found == True)
+	{
+
+/* Get family from key */
+
+		tbeg = key.dptr;
+		tend = (char *)strchr(tbeg,'|');
+		if (tend == NULL)
+		{
+			back.db_err = DbErr_DatabaseAccess;
+			back.xevent_code = 0;
+			return(&back);
+		}
+		diff = (unsigned int)(tend++ - tbeg);
+		strncpy(fam,tbeg,diff);
+		fam[diff] = 0;
+
+/* Get member from key */
+
+		tbeg = tend;
+
+		tend = (char *)strchr(tbeg,'|');
+		if (tend == NULL)
+		{
+			back.db_err = DbErr_DatabaseAccess;
+			back.xevent_code = 0;
+			return(&back);
+		}
+		diff = (unsigned int)(tend++ - tbeg);
+		strncpy(memb,tbeg,diff);
+		memb[diff] = 0;
+
+/* Get resource name from key */
+
+		tbeg = tend;
+
+		tend = (char *)strchr(tbeg,'|');
+		if (tend == NULL)
+		{
+			back.db_err = DbErr_DatabaseAccess;
+			back.xevent_code = 0;
+			return(&back);
+		}
+		diff = (unsigned int)(tend++ - tbeg);
+		strncpy(r_name,tbeg,diff);
+		r_name[diff] = 0;
+
+/* Build the command code */
+
+		team = atoi(fam);
+		ds_num = atoi(memb);
+		event_num = atoi(r_name);
+		back.xevent_code = (team << DS_TEAM_SHIFT) + (ds_num << DS_IDENT_SHIFT) + event_num;
+
+	}
+
+/* If no command string founded */
+
+	else
+	{
+		back.xevent_code = 0;
+		back.db_err = DbErr_ResourceNotDefined;
+	}
+
+
+/* Leave server */
+
+	return(&back);
 }

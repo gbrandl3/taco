@@ -1,6 +1,7 @@
 #include <DevErrors.h>
 #include <MySqlServer.h>
 #include <algorithm>
+
 
 /****************************************************************************
 *                                                                           *
@@ -22,14 +23,14 @@ DevLong *MySQLServer::db_clodb_1_svc(void)
 {
     errcode = 0;
 #ifdef DEBUG
-    cout << "db_clodb()" << endl;
+    std::cout << "db_clodb()" << std::endl;
 #endif 
 //
 // Return error code if the server is not connected to the database files 
 //
     if (!dbgen.connected)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -65,7 +66,7 @@ DevLong *MySQLServer::db_clodb_1_svc(void)
 DevLong *MySQLServer::db_reopendb_1_svc(void)
 {
 #ifdef DEBUG
-    cout << "db_reopendb" << endl;
+    std::cout << "db_reopendb" << std::endl;
 #endif
     errcode = 0;
 //
@@ -73,7 +74,7 @@ DevLong *MySQLServer::db_reopendb_1_svc(void)
 //
     if ((mysql_conn = mysql_real_connect(&mysql, "localhost", mysql_user.c_str(), mysql_passwd.c_str(), mysql_db.c_str(), 0, NULL, 0)) == NULL)
     {
-        cerr << mysql_error(&mysql) << endl;
+        std::cerr << mysql_error(&mysql) << std::endl;
 	errcode = DbErr_DatabaseAccess;
         return (&errcode);
     }

@@ -38,28 +38,28 @@
 class MySQLServer : public DBServer
 {
 private:
-    string	mysql_user,
+    std::string	mysql_user,
 		mysql_passwd,
 		mysql_db;
     MYSQL	mysql,
 		*mysql_conn;
 
 private:
-    int		db_find(string, string, char **, int *);
-    int		db_devlist(string, int *, db_res *);
-    int		db_del(string);
-    int		db_insert(string, string, string);                                                        
+    int		db_find(std::string, std::string, char **, int *);
+    int		db_devlist(std::string, int *, db_res *);
+    int		db_del(std::string);
+    int		db_insert(std::string, std::string, std::string);                                                        
     int 	db_store(db_devinfo_3 &);
     int 	db_store(db_devinfo_2 &);
     int 	db_store(db_devinfo &);
-    long	reg_ps(string, long, string, long, long *);
-    long	unreg_ps(string, long *);
-    long	db_update_names(const string, const string, const int, const string); 
-    long	db_insert_names(const string, const string, const int, const string); 
-    long	db_delete_names(const string, const string, const int, const string); 
-    long	upd_res(string, long, char, long *);
+    long	reg_ps(std::string, long, std::string, long, long *);
+    long	unreg_ps(std::string, long *);
+    long	db_update_names(const std::string, const std::string, const int, const std::string); 
+    long	db_insert_names(const std::string, const std::string, const int, const std::string); 
+    long	db_delete_names(const std::string, const std::string, const int, const std::string); 
+    long	upd_res(std::string, long, char, long *);
 public:
-    				MySQLServer(string, string, string);
+    				MySQLServer(std::string, std::string, std::string);
     virtual			~MySQLServer();
     virtual db_res 		*db_getres_1_svc(arr1 *, struct svc_req *);
     virtual db_res 		*db_getdev_1_svc(nam *);
@@ -102,19 +102,8 @@ public:
     virtual db_res		*secpass_1_svc(void);
     virtual db_poller_svc	*getpoller_1_svc(nam *);
 };
-/*
-class GDBMServer : public DBMServer
-{
-private:
-    vector<DBM>	tid;
-    long        ps_names_index;
-public:
-		GDBMServer();
-    virtual	~GDBMServer();
-};
-*/
 
-inline MySQLServer::MySQLServer(const string user, const string password, const string db)
+inline MySQLServer::MySQLServer(const std::string user, const std::string password, const std::string db)
 	: DBServer(),
 	  mysql_user(user),
 	  mysql_passwd(password),
@@ -124,16 +113,16 @@ inline MySQLServer::MySQLServer(const string user, const string password, const 
 //
 // Open database tables according to the definition 
 //
-    mysql_init(&mysql);
-    if (*this->db_reopendb_1_svc() != 0)
-	return;
-    dbgen.connected = true;
+	mysql_init(&mysql);
+	if (*this->db_reopendb_1_svc() != 0)
+		return;
+	dbgen.connected = true;
 }
 
 inline MySQLServer::~MySQLServer()
 {
-    mysql_close(mysql_conn);
-    dbgen.connected = false;
+	mysql_close(mysql_conn);
+	dbgen.connected = false;
 }
 
 #endif

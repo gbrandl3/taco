@@ -37,14 +37,14 @@ db_psdev_error *MySQLServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
     psdev_back.error_code = psdev_back.psdev_err = 0;
 
 #ifdef DEBUG
-    cout << "Begin db_psdev_register" << endl;
-    cout << "Host name : " << rece->h_name << endl;
-    cout << "PID = " << rece->pid << endl;
+    std::cout << "Begin db_psdev_register" << std::endl;
+    std::cout << "Host name : " << rece->h_name << std::endl;
+    std::cout << "PID = " << rece->pid << std::endl;
     for (long i = 0; i < num_psdev; i++)
     {
 	tmp = &(rece->psdev_arr.psdev_arr_val[i]);
-	cout << "Pseudo device name : " << tmp->psdev_name << endl;
-	cout << "Refresh period : " << tmp->poll << endl;
+	std::cout << "Pseudo device name : " << tmp->psdev_name << std::endl;
+	std::cout << "Refresh period : " << tmp->poll << std::endl;
     }
 #endif
 //
@@ -52,7 +52,7 @@ db_psdev_error *MySQLServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
 //
     if (dbgen.connected == False)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	psdev_back.error_code = DbErr_DatabaseNotConnected;
 	return(&psdev_back);
     }
@@ -74,7 +74,7 @@ db_psdev_error *MySQLServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
 // Leave server 
 //
 #ifdef DEBUG
-    cout << "End db_psdev_register" << endl;
+    std::cout << "End db_psdev_register" << std::endl;
 #endif 
     return(&psdev_back);
 }
@@ -100,9 +100,9 @@ db_psdev_error *MySQLServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
 *    is -1 and the error code is set to the appropiate error.		    *
 *                                                                           *
 ****************************************************************************/
-long MySQLServer::reg_ps(string h_name, long pid, string ps_name, long poll, long *p_error)
+long MySQLServer::reg_ps(std::string h_name, long pid, std::string ps_name, long poll, long *p_error)
 {
-    string	ps_name_low(ps_name);
+    std::string	ps_name_low(ps_name);
 //
 // Make a copy of the pseudo device name in lowercase letter 
 //
@@ -116,10 +116,10 @@ long MySQLServer::reg_ps(string h_name, long pid, string ps_name, long poll, lon
 // First, check that the name used for the pseudo device is not already used
 // for a real device 
 //
-    string query = "SELECT COUNT(*) FROM NAMES WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + ps_name_low + "'";
+    std::string query = "SELECT COUNT(*) FROM NAMES WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + ps_name_low + "'";
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl; 
+	std::cerr << mysql_error(mysql_conn) << std::endl; 
 	*p_error = DbErr_DatabaseAccess;
 	return(-1);
     }
@@ -147,18 +147,18 @@ long MySQLServer::reg_ps(string h_name, long pid, string ps_name, long poll, lon
 //
 // Update database information 
 //
-    stringstream strquery;
+    std::stringstream strquery;
     try
     {
 	if (mysql_db == "tango")
         {
     	    strquery << "UPDATE device SET host = '" << h_name << "', pid = " << pid << " ior = 'DC:" << poll << "'"
-	      << " WHERE device = '" << ps_name_low << "'" << ends;
+	      << " WHERE device = '" << ps_name_low << "'" << std::ends;
 	}
 	else
 	{
     	    strquery << "UPDATE PS_NAMES SET HOST = '" << h_name << "', PROCESS_ID = " << pid << " POLL = " << poll
-	      << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << ps_name_low << "'" << ends;
+	      << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << ps_name_low << "'" << std::ends;
 	}
 #if !HAVE_SSTREAM
     	if (mysql_query(mysql_conn, strquery.str()) != 0)
@@ -169,7 +169,7 @@ long MySQLServer::reg_ps(string h_name, long pid, string ps_name, long poll, lon
 //
 // In case of error 
 //
-	    cerr << mysql_error(mysql_conn) << endl;
+	    std::cerr << mysql_error(mysql_conn) << std::endl;
 	    throw long(DbErr_DatabaseAccess);
         }
 #if !HAVE_SSTREAM
@@ -180,9 +180,9 @@ long MySQLServer::reg_ps(string h_name, long pid, string ps_name, long poll, lon
 //
 // Insert a new record in database 
 //
-	    string::size_type	pos,
+	    std::string::size_type	pos,
 				last_pos;
-	    string		domain,
+	    std::string		domain,
 				family,
 				member;
 
@@ -191,13 +191,13 @@ long MySQLServer::reg_ps(string h_name, long pid, string ps_name, long poll, lon
 	    {
     	       strquery << "INSERT INTO device (domain, family, member, host, pid, ior, exported, server, class, version) VALUES('"
 	  	   << domain << "', '" << family << "', '" << member << "', '" << h_name << "', " 
-		   << pid << ", 'DC:" << poll << "',1,'DataCollector','PseudoDevice',1)" << ends;
+		   << pid << ", 'DC:" << poll << "',1,'DataCollector','PseudoDevice',1)" << std::ends;
 	    }
 	    else
 	    {
     	       strquery << "INSERT INTO PS_NAMES (DOMAIN, FAMILY, MEMBER, HOST, PROCESS_ID, POLL) VALUES('"
 	  	   << domain << "', '" << family << "', '" << member << "', '" << h_name << "', " 
-		   << pid << ", " << poll << ")" << ends;
+		   << pid << ", " << poll << ")" << std::ends;
 	    }
 #if !HAVE_SSTREAM
 	    if (mysql_query(mysql_conn, strquery.str()) != 0)
@@ -261,16 +261,16 @@ db_psdev_error *MySQLServer::db_psdev_unreg_1_svc(arr1 *rece)
     psdev_back.error_code = psdev_back.psdev_err = 0;
 
 #ifdef DEBUG
-    cout << "Begin db_psdev_unregister" << endl;
+    std::cout << "Begin db_psdev_unregister" << std::endl;
     for (long i = 0;i < num_psdev;i++)
-	cout << "Pseudo device name : " << rece->arr1_val[i] << endl;
+	std::cout << "Pseudo device name : " << rece->arr1_val[i] << std::endl;
 #endif
 //
 // Return error code if the server is not connected 
 //
     if (dbgen.connected == False)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	psdev_back.error_code = DbErr_DatabaseNotConnected;
 	return(&psdev_back);
     }
@@ -291,7 +291,7 @@ db_psdev_error *MySQLServer::db_psdev_unreg_1_svc(arr1 *rece)
 // Leave server */
 //
 #ifdef DEBUG
-    cout << "End db_psdev_unregister" << endl;
+    std::cout << "End db_psdev_unregister" << std::endl;
 #endif 
     return(&psdev_back);
 }
@@ -313,11 +313,11 @@ db_psdev_error *MySQLServer::db_psdev_unreg_1_svc(arr1 *rece)
 *    is -1 and the error code is set to the appropiate error.		    *
 *                                                                           *
 ****************************************************************************/
-long MySQLServer::unreg_ps(string ps_name, long *p_error)
+long MySQLServer::unreg_ps(std::string ps_name, long *p_error)
 {
     long i,
 	l;
-    string	ps_name_low(ps_name);
+    std::string	ps_name_low(ps_name);
     datum 	key,
 		content;
     char 	key_buf[MAX_KEY];
@@ -333,7 +333,7 @@ long MySQLServer::unreg_ps(string ps_name, long *p_error)
 //
 // Retrieve a tuple in the PS_NAMES table with the same pseudo device name 
 //
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
         query = "DELETE FROM device WHERE name = '" + ps_name_low + "'";
@@ -344,7 +344,7 @@ long MySQLServer::unreg_ps(string ps_name, long *p_error)
     }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	*p_error = DbErr_DatabaseAccess;
 	return (-1);
     }

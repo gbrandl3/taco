@@ -1,6 +1,19 @@
+#include <API.h>
+
+#include <string.h>
+
+#include <fcntl.h>
+#include <db_xdr.h>
+
+/* Some C++ include files */
+
+#include <string>
+#include <NdbmClass.h>
+#include <iostream>
 #include <NdbmServer.h>
 
 
+
 /****************************************************************************
 *                                                                           *
 *		Server code for db_cmd_query function                       *
@@ -23,127 +36,151 @@
 *            }                                                              *
 *                                                                           *
 ****************************************************************************/
+
+
 cmd_que *NdbmServer::db_cmd_query_1_svc(nam *pcmd_name)
 {
-    int 		i;
-    bool		found;
-    GDBM_FILE 		tab;
-    string 		fam,
-    			memb,
-    			r_name,
-     			cmd_str,
-			req_cmd(*pcmd_name);
+	static cmd_que back;
+	int i,found;
+	datum key;
+	datum content;
+	char *tbeg,*tend;
+	GDBM_FILE tab;
+	unsigned int diff;
+	int ds_num;
+	int team;
+	int cmd_num;
+	char fam[40];
+	char memb[40];
+	char r_name[40];
+	char cmd_str[50];
 
 #ifdef DEBUG
-    cout << "Command name : " << *pcmd_name << endl;
+	std::cout << "Command name : " << *pcmd_name << std::endl;
 #endif
-//
-// Initialize error code sended cmd_queue to client 
-//
-    cmd_queue.db_err = 0;
-    found = False;
-//
-// Return error code if the server is not connected to the database files 
-//
-    if (!dbgen.connected)
-    {
-	cmd_queue.db_err = DbErr_DatabaseNotConnected;
-	cmd_queue.xcmd_code = 0;
-	return(&cmd_queue);
-    }
-//
-// Retrieve the right "table" in the table array 
-//
-    for (i = 0;i < dbgen.TblNum;i++)
-    {
-	if (dbgen.TblName[i] == "cmds")
-	{
-	    tab = dbgen.tid[i];
-	    break;
-	}
-    }
-    if (i == dbgen.TblNum)
-    {
-	cmd_queue.db_err = DbErr_DomainDefinition;
-	cmd_queue.xcmd_code = 0;
-	return(&cmd_queue);
-    }
-//
-// Try to retrieve a resource in the CMDS table with a resource value equal
-// to the command name 
-//
-    datum 	key;
-    for (key = gdbm_firstkey(tab); key.dptr != NULL; key = gdbm_nextkey(tab, key))
-    {
-	datum	content = gdbm_fetch(tab,key);
-	if (content.dptr == NULL)
-	{
-	    cmd_queue.db_err = DbErr_DatabaseAccess;
-	    cmd_queue.xcmd_code = 0;
-	    return(&cmd_queue);
-	}
-	cmd_str = string(content.dptr, content.dsize);
-	if (cmd_str == req_cmd)
-	{
-	    found = true;
-	    break;
-	}
-    }
 
-    if (found)
-    {
-//
-// Get family from key 
-//
-	string tmp = key.dptr;
-	string::size_type pos = tmp.find('|');
-	if (pos == string::npos)
+/* Initialize error code sended back to client */
+
+	back.db_err = 0;
+	found = False;
+
+/* Return error code if the server is not connected to the database files */
+
+	if (dbgen.connected == False)
 	{
-	    cmd_queue.db_err = DbErr_DatabaseAccess;
-	    cmd_queue.xcmd_code = 0;
-	    return(&cmd_queue);
+		back.db_err = DbErr_DatabaseNotConnected;
+		back.xcmd_code = 0;
+		return(&back);
 	}
-	fam = tmp.substr(0, pos);
-	tmp.erase(0, pos + 1);
-//
-// Get member from key 
-//
-	if ((pos = tmp.find('|')) == string::npos)
+
+/* Retrieve the right "table" in the table array */
+
+	for (i = 0;i < dbgen.TblNum;i++)
 	{
-	    cmd_queue.db_err = DbErr_DatabaseAccess;
-	    cmd_queue.xcmd_code = 0;
-	    return(&cmd_queue);
+		if (dbgen.TblName[i] == "cmds")
+		{
+			tab = dbgen.tid[i];
+			break;
+		}
 	}
-	memb = tmp.substr(0, pos);
-	tmp.erase(0, pos + 1);
-//
-// Get resource name from key 
-//
-	if ((pos = tmp.find('|')) == string::npos)
+
+	if (i == dbgen.TblNum)
 	{
-	    cmd_queue.db_err = DbErr_DatabaseAccess;
-	    cmd_queue.xcmd_code = 0;
-	    return(&cmd_queue);
+		back.db_err = DbErr_DomainDefinition;
+		back.xcmd_code = 0;
+		return(&back);
 	}
-	r_name = tmp.substr(0, pos);
-//
-// Build the command code 
-//
-        int 		ds_num = atoi(memb.c_str()),
-     			team = atoi(fam.c_str()),
-     			cmd_num = atoi(r_name.c_str());
-	cmd_queue.xcmd_code = (team << DS_TEAM_SHIFT) + (ds_num << DS_IDENT_SHIFT) + cmd_num;
-    }
-//
-// If no command string founded 
-//
-    else
-    {
-	cmd_queue.xcmd_code = 0;
-	cmd_queue.db_err = DbErr_ResourceNotDefined;
-    }
-//
-// Leave server 
-//
-    return(&cmd_queue);
+
+/* Try to retrieve a resource in the CMDS table with a resource value equal
+   to the command name */
+
+	for (key=gdbm_firstkey(tab);key.dptr!=NULL;key=gdbm_nextkey(tab, key))
+	{
+
+		content = gdbm_fetch(tab,key);
+		if (content.dptr == NULL)
+		{
+			back.db_err = DbErr_DatabaseAccess;
+			back.xcmd_code = 0;
+			return(&back);
+		}
+
+		strncpy(cmd_str,content.dptr,content.dsize);
+		cmd_str[content.dsize] = 0;
+
+		if (strcmp(cmd_str,*pcmd_name) == 0)
+		{
+			found = True;
+			break;
+		}
+	}
+
+	if (found == True)
+	{
+
+/* Get family from key */
+
+		tbeg = key.dptr;
+		tend = (char *)strchr(tbeg,'|');
+		if (tend == NULL)
+		{
+			back.db_err = DbErr_DatabaseAccess;
+			back.xcmd_code = 0;
+			return(&back);
+		}
+		diff = (unsigned int)(tend++ - tbeg);
+		strncpy(fam,tbeg,diff);
+		fam[diff] = 0;
+
+/* Get member from key */
+
+		tbeg = tend;
+
+		tend = (char *)strchr(tbeg,'|');
+		if (tend == NULL)
+		{
+			back.db_err = DbErr_DatabaseAccess;
+			back.xcmd_code = 0;
+			return(&back);
+		}
+		diff = (unsigned int)(tend++ - tbeg);
+		strncpy(memb,tbeg,diff);
+		memb[diff] = 0;
+
+/* Get resource name from key */
+
+		tbeg = tend;
+
+		tend = (char *)strchr(tbeg,'|');
+		if (tend == NULL)
+		{
+			back.db_err = DbErr_DatabaseAccess;
+			back.xcmd_code = 0;
+			return(&back);
+		}
+		diff = (unsigned int)(tend++ - tbeg);
+		strncpy(r_name,tbeg,diff);
+		r_name[diff] = 0;
+
+/* Build the command code */
+
+		team = atoi(fam);
+		ds_num = atoi(memb);
+		cmd_num = atoi(r_name);
+		back.xcmd_code = (team << DS_TEAM_SHIFT) + (ds_num << DS_IDENT_SHIFT) + cmd_num;
+
+	}
+
+/* If no command string founded */
+
+	else
+	{
+		back.xcmd_code = 0;
+		back.db_err = DbErr_ResourceNotDefined;
+	}
+
+
+/* Leave server */
+
+	return(&back);
 }

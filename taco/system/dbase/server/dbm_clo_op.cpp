@@ -1,7 +1,21 @@
+#include <API.h>
+
 #include <DevErrors.h>
+
+#include <db_xdr.h>
+
+#include <fcntl.h>
+
+/* Some C++ include files */
+
+#include <string>
+#include <NdbmClass.h>
 #include <NdbmServer.h>
+#include <iostream>
+#include <fstream>
 
 
+
 /****************************************************************************
 *                                                                           *
 *		Server code for dbm_close function                          *
@@ -18,32 +32,41 @@
 *    an error code (0 if no error).					    * 
 *                                                                           *
 ****************************************************************************/
+
 DevLong *NdbmServer::db_clodb_1_svc()
 {
-    errcode = 0;
+	static DevLong errcode;
+	int flags;
+	int i;
+
+	errcode = 0;
+
 #ifdef DEBUG
-    cout << "db_clodb()" << endl;
-#endif 
-//
-// Return error code if the server is not connected to the database files 
-//
-    if (!dbgen.connected)
-    {
-	errcode = DbErr_DatabaseNotConnected;
+	std::cout << "db_clodb()" << std::endl;
+#endif /* DEBUG */
+
+/* Return error code if the server is not connected to the database files */
+
+	if (dbgen.connected == False)
+	{
+		errcode = DbErr_DatabaseNotConnected;
+		return(&errcode);
+	}
+
+/* Disconnect server from database files */
+
+	for (i = 0;i < dbgen.TblNum;i++)
+		gdbm_close(dbgen.tid[i]);
+	dbgen.connected = False;
+
+/* Leave server */
+
 	return(&errcode);
-    }
-//
-// Disconnect server from database files 
-//
-    for (int i = 0; i < dbgen.TblNum; i++) 
-	gdbm_close(dbgen.tid[i]);
-    dbgen.connected = False;
-//
-// Leave server 
-//
-    return(&errcode);
+
 }
+
 
+
 /****************************************************************************
 *                                                                           *
 *		Server code for dbm_reopendb function                       *
@@ -62,60 +85,71 @@ DevLong *NdbmServer::db_clodb_1_svc()
 *    an error code (0 if no error).					    * 
 *                                                                           *
 ****************************************************************************/
+
 DevLong *NdbmServer::db_reopendb_1_svc()
 {
-    char 	*ptr;
+	static DevLong errcode;
+	int flags;
+	char *ptr;
+	int i;
 
 #ifdef DEBUG
-    cout << "db_reopendb" << endl;
-#endif
-    errcode = 0;
-//
-// Find the dbm_database files 
-//
-    if ((ptr = (char *)getenv("DBM_DIR")) == NULL)
-    {
-	cerr << "dbm_server: Can't find environment variable DBM_DIR" << endl;
-	errcode = DbErr_DatabaseAccess;
-	return(&errcode);
-    }
+	std::cout << "db_reopendb" << std::endl;
+#endif /* DEBUG */
 
-    string dir_name(ptr);
-    if (dir_name[dir_name.size() - 1] != '/')
+	errcode = 0;
+
+	flags = O_RDWR;
+
+/* Find the dbm_database files */        
+
+	if ((ptr = (char *)getenv("DBM_DIR")) == NULL)
+	{
+		std::cerr << "dbm_server: Can't find environment variable DBM_DIR" << std::endl;
+		errcode = DbErr_DatabaseAccess;
+		return(&errcode);
+	}
+
+	std::string dir_name(ptr);
+
+	if (dir_name[dir_name.size() - 1] != '/')
 		dir_name.append(1,'/');
-//
-// Open database tables according to the definitions  
-//
-    int flags = O_RDWR;
-    for (int i = 0;i < dbgen.TblNum;i++)
-    {
-	string dbm_file(dir_name);
-	dbm_file.append(dbgen.TblName[i]);
-	string uni_file(dbm_file);
-#warning "TEST old and new GDBM version"
-//	uni_file.append(".dir");
-	ifstream fi(uni_file.c_str());
-	if (!fi)
-	{
-	    cerr << "dbm_clo_op : Can't find file " << uni_file << endl;
-	    errcode = DbErr_DatabaseAccess;
-	    return(&errcode);
-	}
 
-	dbgen.tid[i] = gdbm_open((char *)dbm_file.c_str(), 0, flags, 0666, NULL);
-	if (dbgen.tid[i] == NULL)
+/* Open database tables according to the definitions  */
+
+	for (i = 0;i < dbgen.TblNum;i++)
 	{
-	    cerr <<"dbm_server : Can't open " << dbgen.TblName[i] << " table"; 
-	    errcode = DbErr_DatabaseAccess;
-	    return(&errcode);
-	}
-    } 
-//
-// Mark the server as connected to the database 
-//
-    dbgen.connected = true;
-//
-// Leave server 
-//
-    return(&errcode);
+
+		std::string dbm_file(dir_name);
+		
+		dbm_file.append(dbgen.TblName[i]);
+		
+		std::string uni_file(dbm_file);
+#warning		uni_file.append(".dir");
+
+		std::ifstream fi(uni_file.c_str());
+		if (!fi)
+		{
+			std::cerr << "dbm_clo_op : Can't find file " << uni_file << std::endl;
+			errcode = DbErr_DatabaseAccess;
+			return(&errcode);
+		}
+
+		dbgen.tid[i] = gdbm_open((char *)dbm_file.c_str(), 0, flags, 0666, NULL);
+		if (dbgen.tid[i] == NULL)
+		{
+			std::cerr <<"dbm_server : Can't open " << dbgen.TblName[i] << " table" << std::endl; 
+			errcode = DbErr_DatabaseAccess;
+			return(&errcode);
+		}
+	} 
+	
+/* Mark the server as connected to the database */
+
+	dbgen.connected = True;
+
+/* Leave server */
+
+	return(&errcode);
+
 }

@@ -20,9 +20,9 @@
 ****************************************************************************/
 db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
 {
-    string user_device(*dev);
+    std::string user_device(*dev);
 #ifdef DEBUG
-    cout << "In devinfo_1_svc function for device " << user_device << endl;
+    std::cout << "In devinfo_1_svc function for device " << user_device << std::endl;
 #endif
 //
 // Initialize parameter sent back to client and allocate memory for string
@@ -52,9 +52,9 @@ db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
 	sent_back.host_name = new char[HOST_NAME_LENGTH];	
 	sent_back.host_name[0] = '\0';
     }
-    catch (bad_alloc)
+    catch (std::bad_alloc)
     {
-	cerr << "Memory allocation error in devinfo" << endl;
+	std::cerr << "Memory allocation error in devinfo" << std::endl;
 	sent_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&sent_back);
     }
@@ -63,7 +63,7 @@ db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
 //
     if (dbgen.connected == False)
     {
-	cerr << "I'm not connected to database" << endl;
+	std::cerr << "I'm not connected to database" << std::endl;
 	sent_back.db_err = DbErr_DatabaseNotConnected;
 	return(&sent_back);
     }
@@ -72,7 +72,7 @@ db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
 //
     long found = False;
 
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
         query = "SELECT SUBSTRING_INDEX(server,'/',1), SUBSTRING_INDEX(server,'/',-1), host, ior,";
@@ -100,8 +100,8 @@ db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
 	    {
 		if (row[3] != NULL)
 		{
-                    string ior(row[3]);
-                    string pgm_no;
+                    std::string ior(row[3]);
+                    std::string pgm_no;
 		    pgm_no = ior.substr(ior.rfind(':')+1);
                     sent_back.program_num = atoi(pgm_no.c_str());         
 		}
@@ -198,19 +198,19 @@ db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
 ****************************************************************************/
 db_res *MySQLServer::devres_1_svc(db_res *recev)
 {
-    string 		fam,
+    std::string 		fam,
     			memb,
 			resource,
 			tmp_res,
 			r_name;
-    string::size_type 	pos;
+    std::string::size_type 	pos;
 	
     res_list_dev.clear();
 
 #ifdef DEBUG
-    cout << "In devres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << endl;
+    std::cout << "In devres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << std::endl;
     for (long i = 0; i < recev->res_val.arr1_len; i++)
-	cout << " Device = " << recev->res_val.arr1_val[i] << endl;
+	std::cout << " Device = " << recev->res_val.arr1_val[i] << std::endl;
 #endif
 //
 // Initialize structure sent back to client
@@ -223,16 +223,16 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 //
     if (dbgen.connected == False)
     {
-	cerr << "I'm not connected to database" << endl;
+	std::cerr << "I'm not connected to database" << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
 
     for (long i = 0; i < recev->res_val.arr1_len; i++)
     {
-	string in_dev(recev->res_val.arr1_val[i]);
+	std::string in_dev(recev->res_val.arr1_val[i]);
 #ifdef DEBUG
-	cout << " Device = " << in_dev << endl;
+	std::cout << " Device = " << in_dev << std::endl;
 #endif
 	if (count(in_dev.begin(), in_dev.end(), SEP_DEV) != 2)
 	{
@@ -245,7 +245,7 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 // which is 1 for all new resource
 //
 
-	string query;
+	std::string query;
 
 	if (mysql_db == "tango")
 	{
@@ -267,17 +267,17 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 	    MYSQL_RES *result = mysql_store_result(mysql_conn);
 	    MYSQL_ROW row;
 
-	    string resource("");
+	    std::string resource("");
 	    while ((row = mysql_fetch_row(result)) != NULL)
 	    {
 		if (atoi(row[4]) == 1)
 		{
 		    if (!resource.empty())
 		   	res_list_dev.push_back(resource);
-		    resource = string(row[0]) + "/" + row[1] + "/" + row[2] + "/" + row[3] + ": " + row[5];
+		    resource = std::string(row[0]) + "/" + row[1] + "/" + row[2] + "/" + row[3] + ": " + row[5];
 		}
 		else
-		    resource += ("," + string(row[5]));
+		    resource += ("," + std::string(row[5]));
 	    }
 	    if (!resource.empty())
 		res_list_dev.push_back(resource);
@@ -285,7 +285,7 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 	}
 	else
 	{
-	    cerr << mysql_error(mysql_conn) << endl;
+	    std::cerr << mysql_error(mysql_conn) << std::endl;
 	    browse_back.db_err = DbErr_DatabaseAccess;
 	    return (&browse_back);
 	}
@@ -309,7 +309,7 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 	}
 	browse_back.res_val.arr1_len = res_list_dev.size();
     }
-    catch (bad_alloc)
+    catch (std::bad_alloc)
     {
 	if (browse_back.res_val.arr1_val != NULL)
 	{
@@ -317,7 +317,7 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 		delete [] browse_back.res_val.arr1_val;
 	    delete [] browse_back.res_val.arr1_val;
 			
-	    cerr << "Memory allocation error in devres_svc" << endl;
+	    std::cerr << "Memory allocation error in devres_svc" << std::endl;
 	    browse_back.db_err = DbErr_ServerMemoryAllocation;
 	    return(&browse_back);
 	}
@@ -346,9 +346,9 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 ****************************************************************************/
 DevLong *MySQLServer::devdel_1_svc(nam *dev)
 {
-    string 	user_device(*dev);
+    std::string 	user_device(*dev);
 #ifdef DEBUG
-    cout << "In devdel_1_svc function for device " << user_device << endl;
+    std::cout << "In devdel_1_svc function for device " << user_device << std::endl;
 #endif
 
 //
@@ -361,7 +361,7 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
 
     if (dbgen.connected == False)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -373,7 +373,7 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
 //
 // Search for device name in the NAMES table
 //
-    string query, where;
+    std::string query, where;
     if (mysql_db == "tango")
     {
         query = "SELECT class, server FROM device ",
@@ -387,7 +387,7 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
     
     if (mysql_query(mysql_conn, (query + where).c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	errcode = DbErr_DatabaseAccess;
 	return (&errcode);
     }
@@ -396,7 +396,7 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
 
     if(row != NULL)
     {
-    	string	ds_name(row[0]),
+    	std::string	ds_name(row[0]),
 		ds_pers_name(row[1]),
     		ind(row[2]);
 		
@@ -411,7 +411,7 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
 	}
     	if (mysql_query(mysql_conn, (query + where).c_str()) != 0)
     	{
-	    cerr << mysql_error(mysql_conn) << endl;
+	    std::cerr << mysql_error(mysql_conn) << std::endl;
 	    errcode = DbErr_DatabaseAccess;
 	    return (&errcode);
     	}
@@ -425,7 +425,7 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
     	    query += ("DEVICE_SERVER_NAME = '" + ds_pers_name + "' AND INDEX_RES > " + ind);
     	    if (mysql_query(mysql_conn, query.c_str()) != 0)
     	    {
-	        cerr << mysql_error(mysql_conn) << endl;
+	        std::cerr << mysql_error(mysql_conn) << std::endl;
 	        errcode = DbErr_DatabaseAccess;
 	        return (&errcode);
 	    }
@@ -442,7 +442,7 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
 	    query = "DELETE FROM PS_NAMES ";
     	    if (mysql_query(mysql_conn, (query + where).c_str()) != 0)
     	    {
-	        cerr << mysql_error(mysql_conn) << endl;
+	        std::cerr << mysql_error(mysql_conn) << std::endl;
 	        errcode = DbErr_DatabaseAccess;
 	        return (&errcode);
             }
@@ -481,7 +481,7 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
 db_psdev_error *MySQLServer::devdelres_1_svc(db_res *recev)
 {
 #ifdef DEBUG
-    cout << "In devdelres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << endl;
+    std::cout << "In devdelres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << std::endl;
 #endif
 
 //
@@ -494,7 +494,7 @@ db_psdev_error *MySQLServer::devdelres_1_svc(db_res *recev)
 //
     if (dbgen.connected == False)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	psdev_back.error_code = DbErr_DatabaseNotConnected;
 	return(&psdev_back);
     }
@@ -504,7 +504,7 @@ db_psdev_error *MySQLServer::devdelres_1_svc(db_res *recev)
 //
     for (long i = 0;i < recev->res_val.arr1_len;i++)
     {
-	string in_dev(recev->res_val.arr1_val[i]);
+	std::string in_dev(recev->res_val.arr1_val[i]);
 		
 	if (count(in_dev.begin(), in_dev.end(), SEP_DEV) != 2)
 	{
@@ -512,7 +512,7 @@ db_psdev_error *MySQLServer::devdelres_1_svc(db_res *recev)
 	    psdev_back.psdev_err = i;
 	    return(&psdev_back);
 	}
-	string query;
+	std::string query;
 	if (mysql_db == "tango")
 	{
 	    query = "DELETE FROM property_device WHERE device = '" + in_dev + "'";
@@ -523,7 +523,7 @@ db_psdev_error *MySQLServer::devdelres_1_svc(db_res *recev)
 	}
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
-	    cerr << mysql_error(mysql_conn) << endl;
+	    std::cerr << mysql_error(mysql_conn) << std::endl;
 	    psdev_back.error_code = DbErr_DatabaseAccess;
 	    psdev_back.psdev_err = i;
 	    return (&psdev_back);
@@ -544,7 +544,7 @@ db_psdev_error *MySQLServer::devdelres_1_svc(db_res *recev)
 class NameCount	
 {
 public:
-    string	name;
+    std::string	name;
     long	count;
     friend bool operator== (const NameCount &a, const NameCount &b){return (a.name == b.name);};
     friend bool operator< (const NameCount &a, const NameCount &b) {return (a.name < b.name);};
@@ -573,11 +573,11 @@ db_info_svc *MySQLServer::info_1_svc()
 				psdev_defined = 0,
 				res_num = 0,
     				length;
-    static vector<NameCount>	dom_list,
+    static std::vector<NameCount>	dom_list,
 				res_list;
 
 #ifdef DEBUG
-    cout << "In info_1_svc function" << endl;
+    std::cout << "In info_1_svc function" << std::endl;
 #endif 
 
     dom_list.clear();
@@ -597,14 +597,14 @@ db_info_svc *MySQLServer::info_1_svc()
 //
     if (dbgen.connected == False)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	info_back.db_err = DbErr_DatabaseNotConnected;
 	return(&info_back);
     }
 //
 // First, count exported devices in the domains
 //
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
         query = "SELECT domain, COUNT(*) FROM device WHERE exported != 0 GROUP BY domain";
@@ -615,7 +615,7 @@ db_info_svc *MySQLServer::info_1_svc()
     }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	info_back.db_err = DbErr_DatabaseAccess;
 	return (&info_back);
     }
@@ -644,7 +644,7 @@ db_info_svc *MySQLServer::info_1_svc()
     }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	info_back.db_err = DbErr_DatabaseAccess;
 	return (&info_back);
     }
@@ -655,7 +655,7 @@ db_info_svc *MySQLServer::info_1_svc()
 	nc.name = row[0];
 	nc.count = atoi(row[1]);
 	dev_defined += nc.count;
-	vector<NameCount>::iterator p;
+	std::vector<NameCount>::iterator p;
 	for (p = dom_list.begin(); p != dom_list.end(); ++p)
 	    if ((*p).name == nc.name)
 		break;
@@ -677,7 +677,7 @@ db_info_svc *MySQLServer::info_1_svc()
     }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     { 
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	info_back.db_err = DbErr_DatabaseAccess;
 	return (&info_back);
     }
@@ -698,7 +698,7 @@ db_info_svc *MySQLServer::info_1_svc()
     }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	info_back.db_err = DbErr_DatabaseAccess;
 	return (&info_back);
     }
@@ -767,11 +767,11 @@ db_info_svc *MySQLServer::info_1_svc()
 ****************************************************************************/
 long *MySQLServer::unreg_1_svc(db_res *recev)
 {
-    string 		user_ds_name(recev->res_val.arr1_val[0]),
+    std::string 		user_ds_name(recev->res_val.arr1_val[0]),
     			user_pers_name(recev->res_val.arr1_val[1]);
 		
 #ifdef DEBUG
-    cout << "In unreg_1_svc function for " << user_ds_name << "/" << user_pers_name << endl;
+    std::cout << "In unreg_1_svc function for " << user_ds_name << "/" << user_pers_name << std::endl;
 #endif
 	
 //
@@ -783,14 +783,14 @@ long *MySQLServer::unreg_1_svc(db_res *recev)
 //
     if (dbgen.connected == False)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
 //
 // First, suppose that the ds_name is a PROCESS name
 //
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
         query = "SELECT DISTINCT class FROM device";
@@ -803,19 +803,19 @@ long *MySQLServer::unreg_1_svc(db_res *recev)
     }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
    	errcode = DbErr_DatabaseAccess;
 	return (&errcode);
     }
     MYSQL_RES *result = mysql_store_result(mysql_conn);
     MYSQL_ROW row;
-    string	class_list("");
+    std::string	class_list("");
     while ((row = mysql_fetch_row(result)) != NULL)
     {
 	if (class_list.empty())
-	    class_list += ("'" + string(row[0]) + "'");
+	    class_list += ("'" + std::string(row[0]) + "'");
 	else
-	    class_list += (",'" + string(row[0]) + "'");
+	    class_list += (",'" + std::string(row[0]) + "'");
     }
     mysql_free_result(result);
 //
@@ -840,7 +840,7 @@ long *MySQLServer::unreg_1_svc(db_res *recev)
 
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	errcode = DbErr_DatabaseAccess;
 	return (&errcode);
     }
@@ -859,7 +859,7 @@ long *MySQLServer::unreg_1_svc(db_res *recev)
 
 typedef struct
 {
-    string	name;
+    std::string	name;
     int		flag;
 }SvcDev;
 /****************************************************************************
@@ -886,13 +886,13 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 			j,
 			dev_length,
 			name_length;
-    vector<SvcDev> 	dev_list;
+    std::vector<SvcDev> 	dev_list;
 	
-    string 		user_ds_name(recev->res_val.arr1_val[0]),
+    std::string 		user_ds_name(recev->res_val.arr1_val[0]),
     			user_pers_name(recev->res_val.arr1_val[1]);
 		
 #ifdef DEBUG
-    cout << "in svcinfo_1_svc function for " << user_ds_name << "/" << user_pers_name << endl;
+    std::cout << "in svcinfo_1_svc function for " << user_ds_name << "/" << user_pers_name << std::endl;
 #endif
 	
 //
@@ -913,9 +913,9 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 	svcinfo_back.host_name = new char [HOST_NAME_LENGTH];
 	svcinfo_back.host_name[0] = '\0';
     }
-    catch (bad_alloc)
+    catch (std::bad_alloc)
     {
-	cerr << "memory allocation error in svc_info" << endl;
+	std::cerr << "memory allocation error in svc_info" << std::endl;
 	svcinfo_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&svcinfo_back);
     }
@@ -924,14 +924,14 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 //
     if (dbgen.connected == false)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	svcinfo_back.db_err = DbErr_DatabaseNotConnected;
 	return(&svcinfo_back);
     }
 //
 // First, suppose that the ds_name is a PROCESS name
 //
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
         query = "SELECT DISTINCT class FROM device";
@@ -945,21 +945,21 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	svcinfo_back.db_err = DbErr_DatabaseAccess;
 	return (&svcinfo_back);
     }
     MYSQL_RES *result = mysql_store_result(mysql_conn);
     MYSQL_ROW row;
     
-    string 	class_list("");
+    std::string 	class_list("");
     int		nb_class = 0;
     while ((row = mysql_fetch_row(result)) != NULL)
     {
 	if (class_list.empty())
-	    class_list = "'" + string(row[0]) + "'";
+	    class_list = "'" + std::string(row[0]) + "'";
 	else
-	    class_list += (", '" + string(row[0]) + "'");
+	    class_list += (", '" + std::string(row[0]) + "'");
 	++nb_class;
     }
     mysql_free_result(result);
@@ -989,7 +989,7 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
     }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	svcinfo_back.db_err = DbErr_DatabaseAccess;
 	return (&svcinfo_back);
     }
@@ -1011,7 +1011,7 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 //
 // Initialize structure sent-back to client
 //
-	string	ds_class("");
+	std::string	ds_class("");
 	svcinfo_back.embedded_len = nb_class;
 	svcinfo_back.embedded_val = new svcinfo_server[nb_class];
 	for (long i = 0;i < nb_class;i++)
@@ -1033,8 +1033,8 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
         {
 	    if (row[3] != NULL)
 	    {
-                string ior(row[3]);
-                string pgm_no;
+                std::string ior(row[3]);
+                std::string pgm_no;
                 pgm_no = ior.substr(ior.rfind(':')+1);
                 svcinfo_back.program_num = atoi(pgm_no.c_str());
             }
@@ -1127,11 +1127,11 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 ****************************************************************************/
 long *MySQLServer::svcdelete_1_svc(db_res *recev)
 {
-    string 		user_ds_name(recev->res_val.arr1_val[0]),
+    std::string 		user_ds_name(recev->res_val.arr1_val[0]),
 			user_pers_name(recev->res_val.arr1_val[1]);
 		
 #ifdef DEBUG
-    cout << "In svcdelete_1_svc function for " << user_ds_name << "/" << user_pers_name << endl;
+    std::cout << "In svcdelete_1_svc function for " << user_ds_name << "/" << user_pers_name << std::endl;
 #endif
 	
 //
@@ -1143,14 +1143,14 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
 //
     if (dbgen.connected == False)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
 //
 // First, suppose that the ds_name is a PROCESS name
 //
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
         query = "SELECT DISTINCT class FROM device WHERE server = '" + user_ds_name + "/" + user_pers_name;
@@ -1162,20 +1162,20 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
     }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	errcode = DbErr_DatabaseAccess;
 	return (&errcode);
     }
     MYSQL_RES *result = mysql_store_result(mysql_conn);
     MYSQL_ROW row;
-    string class_list("");
+    std::string class_list("");
 
     while((row = mysql_fetch_row(result)) != NULL)
     {
 	if (class_list.empty())
-	    class_list = "'" + string(row[0]) + "'";
+	    class_list = "'" + std::string(row[0]) + "'";
 	else
-	    class_list += (", '" + string(row[0]) + "'");
+	    class_list += (", '" + std::string(row[0]) + "'");
     }
     mysql_free_result(result);
 //
@@ -1193,18 +1193,18 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
     }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	errcode = DbErr_DatabaseAccess;
 	return (&errcode);
     }
-    string	dev_list("");
+    std::string	dev_list("");
     result = mysql_store_result(mysql_conn);
     while((row = mysql_fetch_row(result)) != NULL)
     {
 	if (dev_list.empty())
-	    dev_list = "'" + string(row[0]) + "'";
+	    dev_list = "'" + std::string(row[0]) + "'";
 	else
-	    dev_list += ", '" + string(row[0]) + "'";
+	    dev_list += ", '" + std::string(row[0]) + "'";
     }
     mysql_free_result(result);
     if (dev_list.empty())
@@ -1227,7 +1227,7 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
 	}
         if (mysql_query(mysql_conn, query.c_str()) != 0)
         {
-	    cerr << mysql_error(mysql_conn) << endl;
+	    std::cerr << mysql_error(mysql_conn) << std::endl;
 	    errcode = DbErr_DatabaseAccess;
 	    return (&errcode);
         }
@@ -1245,7 +1245,7 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
     }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	errcode = DbErr_DatabaseAccess;
 	return (&errcode);
     }
@@ -1272,10 +1272,10 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
 ****************************************************************************/
 db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
 {
-    string 	poller_name,
+    std::string 	poller_name,
     		user_device(*dev);
 #ifdef DEBUG
-    cout << "In getpoller_1_svc function for device " << user_device << endl;
+    std::cout << "In getpoller_1_svc function for device " << user_device << std::endl;
 #endif
 
 
@@ -1303,9 +1303,9 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
 	poll_back.host_name = new char[HOST_NAME_LENGTH];	
 	poll_back.host_name[0] = '\0';
     }
-    catch (bad_alloc)
+    catch (std::bad_alloc)
     {
-	cerr << "Memory allocation error in devinfo" << endl;
+	std::cerr << "Memory allocation error in devinfo" << std::endl;
 	poll_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&poll_back);
     }
@@ -1314,7 +1314,7 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
 //
     if (dbgen.connected == False)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	poll_back.db_err = DbErr_DatabaseNotConnected;
 	return(&poll_back);
     }
@@ -1333,21 +1333,21 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
 //
 // Search for a resource "ud_poll_list" with its value set to caller device name
 //
-    string query;
+    std::string query;
 
     if (mysql_db == "tango")
     {
         query = "SELECT device FROM property_device WHERE domain = 'sys' AND";
-        query += ("name = '" + string(POLL_RES) + "' AND UPPER(value) = UPPER('" + user_device + "')");
+        query += ("name = '" + std::string(POLL_RES) + "' AND UPPER(value) = UPPER('" + user_device + "')");
     }
     else
     {
         query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM RESOURCE WHERE DOMAIN = 'sys' AND";
-        query += ("NAME = '" + string(POLL_RES) + "' AND UPPER(RESVAL) = UPPER('" + user_device + "')");
+        query += ("NAME = '" + std::string(POLL_RES) + "' AND UPPER(RESVAL) = UPPER('" + user_device + "')");
     }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	poll_back.db_err = DbErr_DatabaseAccess;
 	return (&poll_back);
     }
@@ -1378,7 +1378,7 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
     query += (" WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + poller_name + "'");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	poll_back.db_err = DbErr_DatabaseAccess;
 	return (&poll_back);
     }

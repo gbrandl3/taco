@@ -40,63 +40,55 @@
 // The class default constuctor
 NdbmNamesKey::NdbmNamesKey()
 {
-    key.dptr = NULL;
-    key.dsize = 0;
+	key.dptr = NULL;
+	key.dsize = 0;
 }
 
 // The class destructor
 
 NdbmNamesKey::~NdbmNamesKey()
 {
-    if (key.dsize != 0)
-	delete [] key.dptr;
+	if (key.dsize != 0)
+		delete [] key.dptr;
 }
 
 // Class constructor to be used with the record key
 NdbmNamesKey::NdbmNamesKey(const datum &call_key)
 {
-    if (call_key.dptr != NULL)
-	str = string(call_key.dptr, call_key.dsize);
-    else
-	throw NdbmError(DbErr_CantBuildKey, MessBuildKey);
-		
-    key.dsize = 0;
-    key.dptr = NULL;
+	key.dptr = 0;
+	key.dsize = 0;
+	if (call_key.dptr != NULL)
+		str = std::string(call_key.dptr, call_key.dsize);
+	else
+		throw NdbmError(DbErr_CantBuildKey, MessBuildKey);
+	build_datum();	
 }
 
 // Class constructor to be used from individual element
-NdbmNamesKey::NdbmNamesKey(const string &server, const string &pers_name, const long indi)
+NdbmNamesKey::NdbmNamesKey(const std::string &server, const std::string &pers_name, const long indi)
 {
 //
 // Allocate memory to store key
 //
-    try
-    {
-	key.dptr = new char[MAX_KEY];
-//
-// Build intermediate key
-//
-    	inter_str = server + '|' + pers_name + '|';
+	key.dptr = 0;
+	key.dsize = 0;
+	try
+	{
 //
 // Build key
 //
+		std::stringstream to;
+		to << server << '|' << pers_name << '|' << indi << '|' << std::ends;
+		str = to.str();
 #if !HAVE_SSTREAM
-    	stringstream to(key.dptr, MAX_KEY);
-#else
-    	stringstream to(string(key.dptr, MAX_KEY));
+		to.freeze(false);
 #endif
-    	to << inter_str << indi << '|' << ends;
-#if !HAVE_SSTREAM
-    	key.dsize = strlen(to.str());
-	to.freeze(false);
-#else
-    	key.dsize = strlen(to.str().c_str());
-#endif
-    }
-    catch (bad_alloc)
-    {
-	throw;
-    }
+		build_datum();
+	}
+	catch (std::bad_alloc)
+	{
+		throw;
+	}
 }
 
 //
@@ -105,14 +97,14 @@ NdbmNamesKey::NdbmNamesKey(const string &server, const string &pers_name, const 
 // [] operator overloading. It returns one key character
 char NdbmNamesKey::operator [](long i)
 {
-    try
-    {
-	return(str.at(i));
-    }
-    catch(const out_of_range &)
-    {
-	throw NdbmError(DbErr_IndTooLarge, MessTooLarge);
-    }
+	try
+	{
+		return(str.at(i));
+	}
+	catch(const std::out_of_range &)
+	{
+		throw NdbmError(DbErr_IndTooLarge, MessTooLarge);
+	}
 }
 
 //
@@ -121,65 +113,65 @@ char NdbmNamesKey::operator [](long i)
 // Method to build a datum data from the already stored content
 void NdbmNamesKey::build_datum()
 {
-    long l = str.size();
-    if (str.size())
-    {
-	try
+	long l = strlen(str.c_str());
+	if (l)
 	{
-	    key.dptr = new char[l + 1];
-	    strcpy(key.dptr,str.c_str());
-	    key.dsize = l;
-	}
-	catch (bad_alloc)
-	{
+		try
+		{
+			if (key.dsize)
+				delete [] key.dptr;
+			key.dptr = new char[l + 1];
+			strcpy(key.dptr,str.c_str());
+			key.dsize = l;
+		}
+		catch (std::bad_alloc)
+		{
 			throw;
+		}
 	}
-    }
 }
 
 // Method to return the device server name
-string NdbmNamesKey::get_ds_name(void)
+std::string NdbmNamesKey::get_ds_name(void)
 {
-    string::size_type pos;
-
-    if ((pos = str.find(SEP)) == string::npos)
-	throw NdbmError(DbErr_BadKeySyntax, MessKeySyntax);
-    return str.substr(0, pos);	
+	std::string::size_type pos = str.find(SEP);
+	if (pos == std::string::npos)
+		throw NdbmError(DbErr_BadKeySyntax, MessKeySyntax);
+	return str.substr(0, pos);	
 }
 
 // Method to return the DS personal name
-string  NdbmNamesKey::get_ds_pers_name(void)
+std::string  NdbmNamesKey::get_ds_pers_name(void)
 {
-    string::size_type pos,start;
+	std::string::size_type pos,start;
 	
-    pos = 0;
-    for (long i = 0; i < NB_SEP_DS_PERS; ++i)
-    {
-	if ((pos = str.find(SEP, pos)) == string::npos)
-	    throw NdbmError(DbErr_BadKeySyntax, MessKeySyntax);
-	if (i != (NB_SEP_DS_PERS - 1))
-	    pos++;
-	if (i == (NB_SEP_DS_PERS - 2))
-	    start = pos;
-    }
-    return str.substr(start, pos - start);
+	pos = 0;
+	for (long i = 0; i < NB_SEP_DS_PERS; ++i)
+	{
+		if ((pos = str.find(SEP, pos)) == std::string::npos)
+			throw NdbmError(DbErr_BadKeySyntax, MessKeySyntax);
+		if (i != (NB_SEP_DS_PERS - 1))
+			pos++;
+		if (i == (NB_SEP_DS_PERS - 2))
+			start = pos;
+	}
+	return str.substr(start, pos - start);
 }
 
 // Method to return the device index in the DS device list
-
 long NdbmNamesKey::get_dev_indi(void)
 {
-    string::size_type pos;
+	std::string::size_type pos = str.find_last_of(SEP, str.size() - 2);
 	
-    if ((pos = str.find_last_of(SEP, str.size() - 2)) == string::npos)
-	throw NdbmError(DbErr_BadKeySyntax, MessKeySyntax);
-    pos++;
+	if (pos == std::string::npos)
+		throw NdbmError(DbErr_BadKeySyntax, MessKeySyntax);
+	pos++;
 
-    stringstream st;
-    long	indi;
-    st << str.substr(pos, (str.size() - 1) - pos);
-    st >> indi;
-    return indi;
+	std::stringstream st;
+	long	indi;
+	st << str.substr(pos, (str.size() - 1) - pos);
+	st >> indi;
+	return indi;
 }
 
 // Method to increment the key index part
@@ -188,40 +180,35 @@ void NdbmNamesKey::upd_indi(long ind)
 //
 // Build the new key
 //
-#if !HAVE_SSTREAM
-    stringstream to(key.dptr, MAX_KEY);
-#else
-    stringstream to(string(key.dptr, MAX_KEY));
-#endif
-    to << inter_str << ind << '|' << ends;
+	std::stringstream to;
 
+	to << get_ds_name() << '|' << get_ds_pers_name() << '|' << ind << '|' << std::ends;
+	str = to.str();
 #if !HAVE_SSTREAM
-    key.dsize = strlen(to.str()) - 1;
-    to.freeze(false);
-#else
-    key.dsize = strlen(to.str().c_str());
+	to.freeze(false);
 #endif
-    return;
+	build_datum();
+	return;
 }
 
 // Method to return all the parameters from the record key necessary for
 // the devinfo call
 void NdbmNamesKey::get_devinfo(db_devinfo_svc &data)
 {
-    string s = this->get_ds_name();
-    strcpy(data.server_name, s.c_str());
-    s = this->get_ds_pers_name();
-    strcpy(data.personal_name,s.c_str());	
-    return;
+	std::string s = this->get_ds_name();
+	strcpy(data.server_name, s.c_str());
+	s = this->get_ds_pers_name();
+	strcpy(data.personal_name,s.c_str());	
+	return;
 }
 
 void NdbmNamesKey::get_devinfo(db_poller_svc &data)
 {
-    string s = this->get_ds_name();
-    strcpy(data.server_name,s.c_str());
-    s = this->get_ds_pers_name();
-    strcpy(data.personal_name,s.c_str());	
-    return;
+	std::string s = this->get_ds_name();
+	strcpy(data.server_name,s.c_str());
+	s = this->get_ds_pers_name();
+	strcpy(data.personal_name,s.c_str());	
+	return;
 }
 
 //****************************************************************************
@@ -253,30 +240,30 @@ void NdbmNamesKey::get_devinfo(db_poller_svc &data)
 // The class default constructor
 NdbmNamesCont::NdbmNamesCont()
 {
-    dat.dptr = NULL;
-    dat.dsize = 0;
+	dat.dptr = NULL;
+	dat.dsize = 0;
 }
 
 // The class destructor
 NdbmNamesCont::~NdbmNamesCont()
 {
-    if (dat.dsize != 0)
-	delete [] dat.dptr;
+	if (dat.dsize != 0)
+		delete [] dat.dptr;
 }
 
 // Class constructor to be used with the record key
 NdbmNamesCont::NdbmNamesCont(GDBM_FILE db, datum key)
 {
-    datum content;
+	datum content;
 
-    content = gdbm_fetch(db,key);
-    if (content.dptr != NULL)
-	str = string(content.dptr, content.dsize);
-    else
-	throw NdbmError(DbErr_CantGetContent,MessGetContent);
+	content = gdbm_fetch(db, key);
+	if (content.dptr != NULL)
+		str = std::string(content.dptr, content.dsize);
+	else
+		throw NdbmError(DbErr_CantGetContent,MessGetContent);
 		
-    dat.dsize = 0;
-    dat.dptr = NULL;
+	dat.dsize = 0;
+	dat.dptr = NULL;
 }
 
 //
@@ -285,14 +272,14 @@ NdbmNamesCont::NdbmNamesCont(GDBM_FILE db, datum key)
 // [] operator overloading. It returns one content character
 char NdbmNamesCont::operator [] (long i)
 {
-   try
-   {
-	return(str.at(i));
-   }
-   catch (const out_of_range &)
-   {
-	throw NdbmError(DbErr_IndTooLarge,MessTooLarge);
-   }
+	try
+	{
+		return(str.at(i));
+	}
+	catch (const std::out_of_range &)
+	{
+		throw NdbmError(DbErr_IndTooLarge,MessTooLarge);
+	}
 }
 
 //
@@ -301,188 +288,188 @@ char NdbmNamesCont::operator [] (long i)
 // Method to build a datum data from the already stored content
 void NdbmNamesCont::build_datum()
 {
-    try
-    {
-        long l = str.size();
-        if (l != 0)
+	try
 	{
-	    dat.dptr = new char[l + 1];
-	    strcpy(dat.dptr,str.c_str());
-	    dat.dsize = l;
+		long l = str.size();
+		if (l != 0)
+		{
+			dat.dptr = new char[l + 1];
+			strcpy(dat.dptr,str.c_str());
+			dat.dsize = l;
+		}
 	}
-    }
-    catch (bad_alloc)
-    {
-	throw;
-    }
+	catch (std::bad_alloc)
+	{
+		throw;
+	}
 }
 
 // Method to return the device name from the record content
-string NdbmNamesCont::get_device_name(void) const
+std::string NdbmNamesCont::get_device_name(void) const
 {
-    string::size_type pos;
+	std::string::size_type pos = str.find(SEP);
 
-    if ((pos = str.find(SEP)) == string::npos)
-	throw NdbmError(DbErr_BadContSyntax, MessContSyntax);
-	
-    return str.substr(0, pos);	
+	if (pos == std::string::npos)
+		throw NdbmError(DbErr_BadContSyntax, MessContSyntax);
+	return str.substr(0, pos);	
 }
 
 // Method to return the host name from the record content
-string NdbmNamesCont::get_host_name(void) const
+std::string NdbmNamesCont::get_host_name(void) const
 {
-    string::size_type 	pos = 0,
-			start;
-    for (long i = 0;i < NB_SEP_HOST;i++)
-    {
-	if ((pos = str.find(SEP,pos)) == string::npos)
-	    throw NdbmError(DbErr_BadContSyntax, MessContSyntax);
-	if (i != (NB_SEP_HOST - 1))
-	    pos++;
-	if (i == (NB_SEP_HOST - 2))
-	    start = pos;
-    }
-    return str.substr(start, pos - start);
+	std::string::size_type 	pos = 0,
+				start;
+	for (long i = 0;i < NB_SEP_HOST;i++)
+	{
+		if ((pos = str.find(SEP,pos)) == std::string::npos)
+			throw NdbmError(DbErr_BadContSyntax, MessContSyntax);
+		if (i != (NB_SEP_HOST - 1))
+			pos++;
+		if (i == (NB_SEP_HOST - 2))
+			start = pos;
+	}
+	return str.substr(start, pos - start);
 }
 
 // Method to return the device server program number from the record content
 unsigned long NdbmNamesCont::get_p_num(void) const
 {
-    string::size_type 	pos = 0,
-			start;
-    for (long i = 0;i < NB_SEP_PN;i++)
-    {
-	if ((pos = str.find(SEP,pos)) == string::npos)
-	    throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
-	if (i != (NB_SEP_PN - 1))
-	    pos++;
-	if (i == (NB_SEP_PN - 2))
-	    start = pos;
-    }
-    stringstream 		st;
-    st << str.substr(start, pos - start);
-    unsigned long 	pn;
-    st >> pn;
-    return pn;
+	std::string::size_type 	pos = 0,
+				start;
+	for (long i = 0;i < NB_SEP_PN;i++)
+	{
+		if ((pos = str.find(SEP,pos)) == std::string::npos)
+	    		throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
+		if (i != (NB_SEP_PN - 1))
+	    		pos++;
+		if (i == (NB_SEP_PN - 2))
+	    		start = pos;
+	}
+	std::stringstream 		st;
+	st << str.substr(start, pos - start);
+	unsigned long 	pn;
+	st >> pn;
+	return pn;
 }
 
 // Method to return the device server version number from the record content
 
 unsigned long NdbmNamesCont::get_v_num(void) const
 {
-    string::size_type 	pos = 0,
-			start;
+	std::string::size_type 	pos = 0,
+				start;
 	
-    for (long i = 0;i < NB_SEP_VN;i++)
-    {
-	if ((pos = str.find(SEP,pos)) == string::npos)
-	    throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
-	if (i != (NB_SEP_VN - 1))
-	    pos++;
-	if (i == (NB_SEP_VN - 2))
-	    start = pos;
-    }
+	for (long i = 0;i < NB_SEP_VN;i++)
+	{
+		if ((pos = str.find(SEP,pos)) == std::string::npos)
+			throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
+		if (i != (NB_SEP_VN - 1))
+			pos++;
+		if (i == (NB_SEP_VN - 2))
+			start = pos;
+	}
 	
-    stringstream 	st;
-    st << str.substr(start, pos - start);
-    long 	vn;
-    st >> vn;
-    return vn;
+	std::stringstream 	st;
+	st << str.substr(start, pos - start);
+	long 	vn;
+	st >> vn;
+	return vn;
 }
 
 // Method to return the device type from the record content
-string NdbmNamesCont::get_device_type(void) const
+std::string NdbmNamesCont::get_device_type(void) const
 {
-    string::size_type 	pos = 0,
-			start;
-    for (long i = 0;i < NB_SEP_TYPE;i++)
-    {
-	if ((pos = str.find(SEP,pos)) == string::npos)
-	    throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
-	if (i != (NB_SEP_TYPE - 1))
-	    pos++;
-	if (i == (NB_SEP_TYPE - 2))
-	    start = pos;
-    }
-    return str.substr(start, pos - start);
+	std::string::size_type 	pos = 0,
+				start;
+	for (long i = 0;i < NB_SEP_TYPE;i++)
+	{
+		if ((pos = str.find(SEP,pos)) == std::string::npos)
+	    		throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
+		if (i != (NB_SEP_TYPE - 1))
+	    		pos++;
+		if (i == (NB_SEP_TYPE - 2))
+	    		start = pos;
+	}
+	return str.substr(start, pos - start);
 }
 
 // Method to return the device class from the record content
-string NdbmNamesCont::get_device_class() const
+std::string NdbmNamesCont::get_device_class() const
 {
-    string::size_type 	pos = 0,
-			start;
-    for (long i = 0;i < NB_SEP_CLASS;i++)
-    {
-	if ((pos = str.find(SEP,pos)) == string::npos)
-	    throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
-	if (i != (NB_SEP_CLASS - 1))
-	    pos++;
-	if (i == (NB_SEP_CLASS - 2))
-	    start = pos;
-    }
-    return  str.substr(start, pos - start);
+	std::string::size_type 	pos = 0,
+				start;
+	for (long i = 0;i < NB_SEP_CLASS;i++)
+	{
+		if ((pos = str.find(SEP,pos)) == std::string::npos)
+			throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
+		if (i != (NB_SEP_CLASS - 1))
+			pos++;
+		if (i == (NB_SEP_CLASS - 2))
+	    		start = pos;
+	}
+	return  str.substr(start, pos - start);
 }
 
 // Method to return the device server process PID from the record content
 unsigned long NdbmNamesCont::get_pid() const
 {
-    string::size_type 	pos = 0,
+	std::string::size_type 	pos = 0,
 			start;
-    for (long i = 0;i < NB_SEP_PID;i++)
-    {
-	if ((pos = str.find(SEP,pos)) == string::npos)
-	    throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
-	if (i != (NB_SEP_PID - 1))
-	    pos++;
-	if (i == (NB_SEP_PID - 2))
-	    start = pos;
-    }
-    stringstream 	st;
-    unsigned long	p;
-    st << str.substr(start, pos - start);
-    st >> p;
+	for (long i = 0;i < NB_SEP_PID;i++)
+	{
+		if ((pos = str.find(SEP,pos)) == std::string::npos)
+			throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
+		if (i != (NB_SEP_PID - 1))
+			pos++;
+		if (i == (NB_SEP_PID - 2))
+			start = pos;
+	}
+	std::stringstream 	st;
+	unsigned long	p;
+	st << str.substr(start, pos - start);
+	st >> p;
+	return p;
 }
 
 // Method to return the device server process name from the record content
-string NdbmNamesCont::get_process_name(void) const
+std::string NdbmNamesCont::get_process_name(void) const
 {
-    string::size_type pos;
+	std::string::size_type pos = str.find_last_of(SEP, str.size() - 2);
 	
-    if ((pos = str.find_last_of(SEP,str.size() - 2)) == string::npos)
-	throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
-    pos++;
-    return str.substr(pos,( str.size() - 1) - pos);
+	if (pos == std::string::npos)
+		throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
+	pos++;
+	return str.substr(pos, (str.size() - 1) - pos);
 }
 
 // Method to return the device name domain part from the record content
-string NdbmNamesCont::get_dev_domain_name(void) const
+std::string NdbmNamesCont::get_dev_domain_name(void) const
 {
-   try
-   {
-	string s = this->get_device_name();
-        string::size_type pos;
-	if ((pos = s.find(SEP_DEV)) == string::npos)
-	    throw NdbmError(DbErr_BadDevSyntax,MessDevSyntax);
-	return s.substr(0, pos);	
-   }
-   catch (NdbmError &err)
-   {
-	throw;
-   }
+	try
+	{
+		std::string s = this->get_device_name();
+        	std::string::size_type pos = s.find(SEP_DEV);
+		if (pos == std::string::npos)
+			throw NdbmError(DbErr_BadDevSyntax,MessDevSyntax);
+		return s.substr(0, pos);	
+	}
+	catch (NdbmError &err)
+	{
+		throw;
+	}
 }
 
 // Method to return the device name family part from the record content
-string NdbmNamesCont::get_dev_fam_name(void) const
+std::string NdbmNamesCont::get_dev_fam_name(void) const
 {
     try
     {
-	string s = this->get_device_name();
-	string::size_type 	pos = 0,
+	std::string s = this->get_device_name();
+	std::string::size_type 	pos = 0,
 				start;
 	for (long i = 0;i < NB_SEP_DEV_FAM;i++)
 	{
-	    if ((pos = s.find(SEP_DEV,pos)) == string::npos)
+	    if ((pos = s.find(SEP_DEV,pos)) == std::string::npos)
 		throw NdbmError(DbErr_BadDevSyntax,MessDevSyntax);
 	    if (i != (NB_SEP_DEV_FAM - 1))
 		pos++;
@@ -498,13 +485,13 @@ string NdbmNamesCont::get_dev_fam_name(void) const
 }
 
 // Method to return the device name member part from the record content
-string NdbmNamesCont::get_dev_memb_name(void) const
+std::string NdbmNamesCont::get_dev_memb_name(void) const
 {
     try
     {
-	string s = this->get_device_name();
-	string::size_type pos;
-	if ((pos = s.find_last_of(SEP_DEV,s.size())) == string::npos)
+	std::string s = this->get_device_name();
+	std::string::size_type pos;
+	if ((pos = s.find_last_of(SEP_DEV,s.size())) == std::string::npos)
 		throw NdbmError(DbErr_BadDevSyntax,MessDevSyntax);
 	pos++;
 	return s.substr(pos, (s.size() - pos));
@@ -544,8 +531,8 @@ void NdbmNamesCont::get_devinfo(db_poller_svc &data)
 // Method to update the already stored content as a unregister device
 void NdbmNamesCont::unreg()
 {
-    string::size_type 	start;
-    if ((start = str.find(SEP)) == string::npos)
+    std::string::size_type 	start;
+    if ((start = str.find(SEP)) == std::string::npos)
 	throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
     start++;
     str.replace(start, str.size() - start, "not_exp|0|0|unknown|unknown|0|unknown|");	
@@ -586,7 +573,7 @@ NdbmPSNamesKey::~NdbmPSNamesKey()
 NdbmPSNamesKey::NdbmPSNamesKey(datum key)
 {
     if (key.dptr != NULL)
-	str = string(key.dptr, key.dsize);
+	str = std::string(key.dptr, key.dsize);
     else
 	throw NdbmError(DbErr_CantBuildKey,MessBuildKey);
 }
@@ -601,7 +588,7 @@ char NdbmPSNamesKey::operator [] (long i)
     {
 	return(str.at(i));
     }
-    catch(const out_of_range &)
+    catch(const std::out_of_range &)
     {
 	throw NdbmError(DbErr_IndTooLarge, MessTooLarge);
     }
@@ -611,23 +598,23 @@ char NdbmPSNamesKey::operator [] (long i)
 //		Class methods
 //		-------------
 // Method to return the pseudo device name domain part from the record key
-string NdbmPSNamesKey::get_psdev_domain_name(void) const
+std::string NdbmPSNamesKey::get_psdev_domain_name(void) const
 {
-    string::size_type pos;
+	std::string::size_type pos = str.find(SEP_DEV);
 	
-    if ((pos = str.find(SEP_DEV)) == string::npos)
+	if (pos == std::string::npos)
 		throw NdbmError(DbErr_BadDevSyntax,MessDevSyntax);
-    return str.substr(0, pos + 1);
+	return str.substr(0, pos + 1);
 }
 
 // Method to return the pseudo device name family part from the key content
-string NdbmPSNamesKey::get_psdev_fam_name(void) const
+std::string NdbmPSNamesKey::get_psdev_fam_name(void) const
 {
-    string::size_type 	pos = 0,
+    std::string::size_type 	pos = 0,
 			start;
     for (long i = 0;i < NB_SEP_DEV_FAM; i++)
     {
-	if ((pos = str.find(SEP_DEV,pos)) == string::npos)
+	if ((pos = str.find(SEP_DEV,pos)) == std::string::npos)
 	    throw NdbmError(DbErr_BadDevSyntax,MessDevSyntax);
 	if (i != (NB_SEP_DEV_FAM - 1))
 	    pos++;
@@ -638,11 +625,11 @@ string NdbmPSNamesKey::get_psdev_fam_name(void) const
 }
 
 // Method to return the pseudo device name member part from the key content
-string NdbmPSNamesKey::get_psdev_memb_name(void) const
+std::string NdbmPSNamesKey::get_psdev_memb_name(void) const
 {
-    string::size_type pos;
+    std::string::size_type pos;
 	
-    if ((pos = str.find_last_of(SEP_DEV,str.size())) == string::npos)
+    if ((pos = str.find_last_of(SEP_DEV,str.size())) == std::string::npos)
 	throw NdbmError(DbErr_BadDevSyntax,MessDevSyntax);
     pos++;
     return str.substr(pos,(str.size() - pos));
@@ -686,7 +673,7 @@ NdbmPSNamesCont::NdbmPSNamesCont(GDBM_FILE db, datum key)
 
     content = gdbm_fetch(db,key);
     if (content.dptr != NULL)
-	str = string(content.dptr, content.dsize);
+	str = std::string(content.dptr, content.dsize);
     else
 	throw NdbmError(DbErr_CantGetContent,MessGetContent);
 }
@@ -702,7 +689,7 @@ char NdbmPSNamesCont::operator [] (long i)
     {
 	return(str.at(i));
     }
-    catch(const out_of_range &)
+    catch(const std::out_of_range &)
     {
 	throw NdbmError(DbErr_IndTooLarge, MessTooLarge);
     }
@@ -712,11 +699,11 @@ char NdbmPSNamesCont::operator [] (long i)
 //		Class methods
 //		-------------
 // Method to return the host name from the record content
-string NdbmPSNamesCont::get_host_name(void) const
+std::string NdbmPSNamesCont::get_host_name(void) const
 {
-    string::size_type pos;
+    std::string::size_type pos;
 
-    if ((pos = str.find(SEP)) == string::npos)
+    if ((pos = str.find(SEP)) == std::string::npos)
 	throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
     return str.substr(0, pos);	
 }
@@ -724,11 +711,11 @@ string NdbmPSNamesCont::get_host_name(void) const
 // Method to return the process PID from the record content
 unsigned long NdbmPSNamesCont::get_pid(void) const
 {
-    string::size_type 	pos = 0,
+    std::string::size_type 	pos = 0,
 			start;
     for (long i = 0;i < NB_SEP_PS_PID;i++)
     {
-	if ((pos = str.find(SEP,pos)) == string::npos)
+	if ((pos = str.find(SEP,pos)) == std::string::npos)
 	    throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
 	if (i != (NB_SEP_PS_PID - 1))
 	    pos++;
@@ -736,7 +723,7 @@ unsigned long NdbmPSNamesCont::get_pid(void) const
 	    start = pos;
     }
     
-    stringstream st;
+    std::stringstream st;
     st << str.substr(start, pos - start);
     unsigned long 	p;
     st >> p;
@@ -746,12 +733,12 @@ unsigned long NdbmPSNamesCont::get_pid(void) const
 // Method to return the refresh period from the record content
 long NdbmPSNamesCont::get_refresh(void) const
 {
-    string::size_type pos;
+    std::string::size_type pos;
 	
-    if ((pos = str.find_last_of(SEP,str.size() - 2)) == string::npos)
+    if ((pos = str.find_last_of(SEP,str.size() - 2)) == std::string::npos)
 	throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
     pos++;
-    stringstream st;
+    std::stringstream st;
     st << str.substr(pos, (str.size() - 1) - pos);
     long	p;
     st >> p;
@@ -810,7 +797,7 @@ NdbmResKey::~NdbmResKey()
 }
 
 // Class constructor to be used from individual element
-NdbmResKey::NdbmResKey(string &family,string &member,string &r_name,long indi=1)
+NdbmResKey::NdbmResKey(std::string &family,std::string &member,std::string &r_name,long indi=1)
 {
     try
     {
@@ -826,11 +813,11 @@ NdbmResKey::NdbmResKey(string &family,string &member,string &r_name,long indi=1)
 // Build key
 //
 #if !HAVE_SSTREAM
-	stringstream to(key.dptr, MAX_KEY);
+	std::stringstream to(key.dptr, MAX_KEY);
 #else
-	stringstream to(string(key.dptr, MAX_KEY));
+	std::stringstream to(std::string(key.dptr, MAX_KEY));
 #endif
-	to << inter_str << indi << '|' << ends;
+	to << inter_str << indi << '|' << std::ends;
 #if !HAVE_SSTREAM
 	key.dsize = strlen(to.str());
 	to.freeze(false);
@@ -838,7 +825,7 @@ NdbmResKey::NdbmResKey(string &family,string &member,string &r_name,long indi=1)
 	key.dsize = strlen(to.str().c_str());
 #endif
     }
-    catch (bad_alloc)
+    catch (std::bad_alloc)
     {
 	throw;
     }
@@ -847,7 +834,7 @@ NdbmResKey::NdbmResKey(string &family,string &member,string &r_name,long indi=1)
 
 // Class constructor to be used from a already build key as a string
 
-NdbmResKey::NdbmResKey(string &key_str)
+NdbmResKey::NdbmResKey(std::string &key_str)
 {
 
     try
@@ -859,17 +846,17 @@ NdbmResKey::NdbmResKey(string &key_str)
 //
 // Build intermediate key
 //
-	string::size_type pos = key_str.find_last_of('|',key_str.size() - 2);
+	std::string::size_type pos = key_str.find_last_of('|',key_str.size() - 2);
 	inter_str =key_str.substr(0, pos + 1); 
 //
 // Build key
 //
 #if !HAVE_SSTREAM
-	stringstream to(key.dptr, MAX_KEY);
+	std::stringstream to(key.dptr, MAX_KEY);
 #else
-	stringstream to(string(key.dptr, MAX_KEY));
+	std::stringstream to(std::string(key.dptr, MAX_KEY));
 #endif
-	to << key_str << ends;
+	to << key_str << std::ends;
 #if !HAVE_SSTREAM
 	key.dsize = strlen(to.str());
 	to.freeze(false);
@@ -878,7 +865,7 @@ NdbmResKey::NdbmResKey(string &key_str)
 #endif
 	str = key_str;	
     }
-    catch (bad_alloc)
+    catch (std::bad_alloc)
     {
 	throw;
     }
@@ -888,7 +875,7 @@ NdbmResKey::NdbmResKey(string &key_str)
 NdbmResKey::NdbmResKey(datum user_key)
 {
     if (user_key.dptr != NULL)
-	str = string(user_key.dptr, user_key.dsize);
+	str = std::string(user_key.dptr, user_key.dsize);
     else
 	throw NdbmError(DbErr_CantBuildKey,MessBuildKey);
 			
@@ -906,7 +893,7 @@ char NdbmResKey::operator [] (long i)
     {
 	return(str.at(i));
     }
-    catch(const out_of_range &)
+    catch(const std::out_of_range &)
     {
 	throw NdbmError(DbErr_IndTooLarge, MessTooLarge);
     }
@@ -928,7 +915,7 @@ void NdbmResKey::build_datum()
 	    key.dsize = l;
 	}
     }
-    catch (bad_alloc)
+    catch (std::bad_alloc)
     {
 	throw;
     }
@@ -943,11 +930,11 @@ void NdbmResKey::upd_indi(long ind)
 // Build the new key
 //
 #if !HAVE_SSTREAM
-    stringstream to(key.dptr, MAX_KEY);
+    std::stringstream to(key.dptr, MAX_KEY);
 #else
-    stringstream to(string(key.dptr, MAX_KEY));
+    std::stringstream to(std::string(key.dptr, MAX_KEY));
 #endif
-    to << inter_str << ind << '|' << ends;
+    to << inter_str << ind << '|' << std::ends;
 #if !HAVE_SSTREAM
     key.dsize = strlen(to.str());
     to.freeze(false);
@@ -957,22 +944,22 @@ void NdbmResKey::upd_indi(long ind)
 }
 
 // Method to retrieve resource family name
-string NdbmResKey::get_res_fam_name(void) const
+std::string NdbmResKey::get_res_fam_name(void) const
 {
-    string::size_type pos;
-    if ((pos = str.find(SEP)) == string::npos)
+    std::string::size_type pos;
+    if ((pos = str.find(SEP)) == std::string::npos)
 	throw NdbmError(DbErr_BadKeySyntax,MessKeySyntax);
     return str.substr(0, pos);	
 }
 
 // Method to retrieve resource member name
-string NdbmResKey::get_res_memb_name(void) const
+std::string NdbmResKey::get_res_memb_name(void) const
 {
-    string::size_type 	pos = 0,
+    std::string::size_type 	pos = 0,
 			start;
     for (long i = 0;i < NB_SEP_RES_MEMB;i++)
     {
-	if ((pos = str.find(SEP,pos)) == string::npos)
+	if ((pos = str.find(SEP,pos)) == std::string::npos)
 	     throw NdbmError(DbErr_BadKeySyntax,MessKeySyntax);
 	if (i != (NB_SEP_RES_MEMB - 1))
 	     pos++;
@@ -983,14 +970,14 @@ string NdbmResKey::get_res_memb_name(void) const
 }
 
 // Method to retrieve resource name
-string NdbmResKey::get_res_name(void) const
+std::string NdbmResKey::get_res_name(void) const
 {
-    string::size_type 	pos = 0,
+    std::string::size_type 	pos = 0,
 			start;
 	
     for (long i = 0; i < NB_SEP_RES_NAME; i++)
     {
-	if ((pos = str.find(SEP,pos)) == string::npos)
+	if ((pos = str.find(SEP,pos)) == std::string::npos)
 	    throw NdbmError(DbErr_BadKeySyntax,MessKeySyntax);
 	if (i != (NB_SEP_RES_NAME - 1))
 	    pos++;
@@ -1003,12 +990,12 @@ string NdbmResKey::get_res_name(void) const
 // Method to retrieve resource index (in case of resource from the array type)
 long NdbmResKey::get_res_indi(void) const
 {
-    string::size_type pos;
+    std::string::size_type pos;
 	
-    if ((pos = str.find_last_of(SEP,str.size() - 2)) == string::npos)
+    if ((pos = str.find_last_of(SEP,str.size() - 2)) == std::string::npos)
 	throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
     pos++;
-    stringstream st;
+    std::stringstream st;
     st << str.substr(pos, (str.size() - 1) - pos);
     unsigned long	indi;
     st >> indi;
@@ -1054,7 +1041,7 @@ NdbmResCont::NdbmResCont(GDBM_FILE db, datum key)
 
     content = gdbm_fetch(db,key);
     if (content.dptr != NULL)
-	str = string(content.dptr, content.dsize);
+	str = std::string(content.dptr, content.dsize);
     else
 	throw NdbmError(DbErr_CantGetContent,MessGetContent);
 }
@@ -1069,7 +1056,7 @@ char NdbmResCont::operator [] (long i)
     {
 	return(str.at(i));
     }
-    catch(const out_of_range &)
+    catch(const std::out_of_range &)
     {
 	throw NdbmError(DbErr_IndTooLarge,MessTooLarge);
     }
@@ -1079,7 +1066,7 @@ char NdbmResCont::operator [] (long i)
 //		Class methods
 //		-------------
 // Method to return the resource value
-string NdbmResCont::get_res_value(void) const
+std::string NdbmResCont::get_res_value(void) const
 {
     return str;
 }
@@ -1111,7 +1098,7 @@ NdbmNameList::~NdbmNameList()
 //		Class operator overloading
 //		--------------------------
 // [] operator overloading. It returns one element of the list
-string &NdbmNameList::operator [] (long i)
+std::string &NdbmNameList::operator [] (long i)
 {
     try
     {
@@ -1129,9 +1116,9 @@ string &NdbmNameList::operator [] (long i)
 
 // This method add a name to the list if it is not already in the list
 
-void NdbmNameList::add_if_new(const string &na)
+void NdbmNameList::add_if_new(const std::string &na)
 {
-    vector<string>::iterator p = find(name_list.begin(),name_list.end(),na);
+    std::vector<std::string>::iterator p = find(name_list.begin(),name_list.end(),na);
     if (p == name_list.end())
 	name_list.push_back(na);
     return;
@@ -1157,12 +1144,12 @@ long NdbmNameList::copy_to_C(char **&buf)
 	for (long i = 0;i < length;i++)
 	{
 	    buf[i] = new char [name_list[i].size() + 1];
-	    name_list[i].copy(buf[i], string::npos);
+	    name_list[i].copy(buf[i], std::string::npos);
 	    (buf[i])[name_list[i].size()] = '\0';
 	}
     	return(0);	
     }
-    catch (bad_alloc)
+    catch (std::bad_alloc)
     {
 	for (long j = 0; j < length; j++)
 	    delete [] buf[j];		
@@ -1195,7 +1182,7 @@ NdbmDoubleNameList::~NdbmDoubleNameList()
 //
 //		Class methods
 //		-------------
-void NdbmDoubleNameList::get_record(const long first, const long second, string &f_str, string &s_str)
+void NdbmDoubleNameList::get_record(const long first, const long second, std::string &f_str, std::string &s_str)
 {
     f_str = first_list[first];
     s_str = sec_list[first][second];
@@ -1207,7 +1194,7 @@ long NdbmDoubleNameList::sec_name_length(long first)
 }
 
 // This method add a name to the list if it is not already in the list
-void NdbmDoubleNameList::add(string &first,string &second)
+void NdbmDoubleNameList::add(std::string &first,std::string &second)
 {
     long i;
     long si = first_list.size();
@@ -1247,14 +1234,14 @@ NdbmDomain::NdbmDomain()
 }
 
 // Another constructor from the domain name
-NdbmDomain::NdbmDomain(const string &str)
+NdbmDomain::NdbmDomain(const std::string &str)
 {
     name = str;
     nb = 1;
 }
 
 // The last constructor from the domain name and the elt number
-NdbmDomain::NdbmDomain(const string &str,const long n) 
+NdbmDomain::NdbmDomain(const std::string &str,const long n) 
 	: name(str),
 	  nb(n)
 {
@@ -1302,7 +1289,7 @@ NdbmDomDev::NdbmDomDev()
 }
 
 // The last constructor from the domain name and a family/member string
-NdbmDomDev::NdbmDomDev(const string &dom,const string &str) : domain(dom)
+NdbmDomDev::NdbmDomDev(const std::string &dom,const std::string &str) : domain(dom)
 {
     fm.push_back(str);
 }
@@ -1312,17 +1299,17 @@ NdbmDomDev::~NdbmDomDev()
 {
 }
 
-void NdbmDomDev::add_dev(const string &dev)
+void NdbmDomDev::add_dev(const std::string &dev)
 {
     fm.push_back(dev);
 }
 
-string NdbmDomDev::get_domain()
+std::string NdbmDomDev::get_domain()
 {
     return(domain);
 }
 
-string NdbmDomDev::get_fm(long ind)
+std::string NdbmDomDev::get_fm(long ind)
 {
     try
     {
@@ -1330,13 +1317,13 @@ string NdbmDomDev::get_fm(long ind)
     }
     catch (...)
     {
-	return string("");
+	return std::string("");
     }
 }
 
-long NdbmDomDev::find_in_list(const string &str)
+long NdbmDomDev::find_in_list(const std::string &str)
 {
-    vector<string>::iterator p = find(fm.begin(), fm.end(), str);
+    std::vector<std::string>::iterator p = std::find(fm.begin(), fm.end(), str);
     return (p != fm.end());
 }
 
@@ -1401,10 +1388,9 @@ NdbmSvcDev::~NdbmSvcDev()
 //		--------------------------------
 // Contructor from the error code and error message (with default value)
 
-NdbmError::NdbmError(long err, char *mess = "No error message defined")
- :errcode(err)
+NdbmError::NdbmError(long err, std::string mess)
+ 	: errcode(err), errmess(mess)
 {
-    strcpy(errmess,mess);
 }
 
 //
@@ -1413,17 +1399,17 @@ NdbmError::NdbmError(long err, char *mess = "No error message defined")
 // Method to retrieve the error code
 long NdbmError::get_err_code()
 {
-    return(errcode);
+	return errcode;
 }
 
 // Method to retrieve the error message
 char *NdbmError::get_err_message()
 {
-    return(errmess);
+    	return const_cast<char *>(errmess.c_str());
 }
 
 // Method to display the error message
 void NdbmError::display_err_message()
 {
-    cout << errmess << endl;
+    	std::cout << errmess << std::endl;
 }

@@ -1,12 +1,30 @@
+#include <API.h>
+
 #include <DevErrors.h>
+
+#include <db_xdr.h>
+#include <fcntl.h>
+
+/* Some C++ include files */
+
+#include <iostream>
+#include <NdbmClass.h>
 #include <NdbmServer.h>
-#ifdef HAVE_SSTREAM
-#	include <sstream>
-#else
-#	include <strstream>
-#	define	stringstream	strstream
-#endif
+
+/* Some local function definition */
+
+// int db_store_3(db_devinfo_3);
+// int db_store_2(db_devinfo_2);
+// int db_store(db_devinfo);
+
+/* Variables defined elsewhere */
+
+/* Global variables */
+
+// db_resimp back;
+
 
+
 /****************************************************************************
 *                                                                           *
 *		Server code for db_dev_export version 1 function            *
@@ -32,42 +50,47 @@
 *****************************************************************************/
 DevLong *NdbmServer::db_devexp_1_svc(tab_dbdev *rece)
 {
-    int 	db_err;
-    u_int 	num_dev = rece->tab_dbdev_len;;
+	int i,db_err;
+	u_int num_dev;
+	static DevLong errcode;
 
+	num_dev = rece->tab_dbdev_len;
 #ifdef DEBUG
-    for (int i=0;i<num_dev;i++)
-    {
-	cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << endl;
-	cout << "Host name : " << rece->tab_dbdev_val[i].host_name << endl;
-	cout << "Program number : " << rece->tab_dbdev_val[i].p_num << endl;
-	cout << "Version number : " << rece->tab_dbdev_val[i].v_num << endl;
-	cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << endl;
-	cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << endl;
-    }
-#endif
-//
-// Initialize error code sended back to client 
-//
-    errcode = 0;
-//
-// Return error code if the server is not connected to the database
-//
-    if (!dbgen.connected)
-    {
-	errcode = DbErr_DatabaseNotConnected;
-	return(&errcode);
-    }
-//
-// Store values in database
-//
-    for (int i = 0; i < num_dev; i++)
-	if ((db_err = db_store(rece->tab_dbdev_val[i])) != 0)
+	for (i=0;i<num_dev;i++)
 	{
-	    errcode = db_err;
-	    break;
+		std::cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl;
+		std::cout << "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl;
+		std::cout << "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl;
+		std::cout << "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl;
+		std::cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl;
+		std::cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl;
 	}
-    return(&errcode);
+#endif
+
+/* Initialize error code sended back to client */
+
+	errcode = 0;
+
+/* Return error code if the server is not connected to the database */
+
+	if (dbgen.connected == False)
+	{
+		errcode = DbErr_DatabaseNotConnected;
+		return(&errcode);
+	}
+
+/* Store values in database */
+
+	for (i=0;i<num_dev;i++)
+	{
+		if ((db_err = db_store(rece->tab_dbdev_val[i])) != 0)
+		{
+			errcode = db_err;
+			return(&errcode);
+		}
+	}
+
+	return(&errcode);
 }
 
 
@@ -96,48 +119,56 @@ DevLong *NdbmServer::db_devexp_1_svc(tab_dbdev *rece)
 *    Zero means no error                                                    * 
 *                                                                           *
 *****************************************************************************/
-DevLong  *NdbmServer::db_devexp_2_svc(tab_dbdev_2 *rece)
+
+
+DevLong *NdbmServer::db_devexp_2_svc(tab_dbdev_2 *rece)
 {
-    int 	db_err;
-    u_int 	num_dev = rece->tab_dbdev_len;
+	int i,db_err;
+	u_int num_dev;
+	static DevLong errcode;
+
+	num_dev = rece->tab_dbdev_len;
 #ifdef DEBUG
-    for (int i = 0; i < num_dev; i++)
-    {
-	cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << endl;
-	cout << "Host name : " << rece->tab_dbdev_val[i].host_name << endl;
-	cout << "Program number : " << rece->tab_dbdev_val[i].p_num << endl;
-	cout << "Version number : " << rece->tab_dbdev_val[i].v_num << endl;
-	cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << endl;
-	cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << endl;
-	cout << "Device server PID : " << rece->tab_dbdev_val[i].pid << endl;
-    }
-#endif
-//
-// Initialize error code sended back to client */
-//
-    errcode = 0;
-//
-// Return error code if the server is not connected to the database */
-//
-    if (dbgen.connected == False)
-    {
-	errcode = DbErr_DatabaseNotConnected;
-	return(&errcode);
-    }
-//
-// Store values in database */
-//
-    for (int i = 0; i < num_dev; i++)
-    {
-	if ((db_err = db_store_2(rece->tab_dbdev_val[i])) != 0)
+	for (i=0;i<num_dev;i++)
 	{
-	    errcode = db_err;
-	    break;
+		std::cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl;
+		std::cout << "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl;
+		std::cout << "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl;
+		std::cout << "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl;
+		std::cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl;
+		std::cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl;
+		std::cout << "Device server PID : " << rece->tab_dbdev_val[i].pid << std::endl;
 	}
-    }
-    return(&errcode);
+#endif
+
+/* Initialize error code sended back to client */
+
+	errcode = 0;
+
+/* Return error code if the server is not connected to the database */
+
+	if (dbgen.connected == False)
+	{
+		errcode = DbErr_DatabaseNotConnected;
+		return(&errcode);
+	}
+
+/* Store values in database */
+
+	for (i=0;i<num_dev;i++)
+	{
+		if ((db_err = db_store_2(rece->tab_dbdev_val[i])) != 0)
+		{
+			errcode = db_err;
+			return(&errcode);
+		}
+	}
+
+	return(&errcode);
 }
+
 
+
 /****************************************************************************
 *                                                                           *
 *		Server code for db_dev_export version 3 function            *
@@ -162,49 +193,57 @@ DevLong  *NdbmServer::db_devexp_2_svc(tab_dbdev_2 *rece)
 *    Zero means no error                                                    * 
 *                                                                           *
 *****************************************************************************/
+
+
 DevLong *NdbmServer::db_devexp_3_svc(tab_dbdev_3 *rece)
 {
-    int 	db_err;
-    u_int 	num_dev = rece->tab_dbdev_len;
-#ifdef DEBUG
-    for (int i = 0; i < num_dev; i++)
-    {
-	cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << endl;
-	cout << "Host name : " << rece->tab_dbdev_val[i].host_name << endl;
-	cout << "Program number : " << rece->tab_dbdev_val[i].p_num << endl;
-	cout << "Version number : " << rece->tab_dbdev_val[i].v_num << endl;
-	cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << endl;
-	cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << endl;
-	cout << "Device server PID : " << rece->tab_dbdev_val[i].pid << endl;
-	cout << "Device server process name : " << rece->tab_dbdev_val[i].proc_name << endl;
-    }
-#endif
-//
-// Initialize error code sended back to client */
-//
-    errcode = 0;
-//
-// Return error code if the server is not connected to the database */
+	int i,db_err;
+	u_int num_dev;
+	static DevLong errcode;
 
-    if (!dbgen.connected)
-    {
-	errcode = DbErr_DatabaseNotConnected;
-	return(&errcode);
-    }
-//
-// Store values in database */
-//
-    for (int i = 0; i < num_dev; i++)
-    {
-	if ((db_err = db_store_3(rece->tab_dbdev_val[i])) != 0)
+	num_dev = rece->tab_dbdev_len;
+#ifdef DEBUG
+	for (i=0;i<num_dev;i++)
 	{
-	    errcode = db_err;
-	    break;
+		std::cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl;
+		std::cout << "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl;
+		std::cout << "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl;
+		std::cout << "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl;
+		std::cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl;
+		std::cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl;
+		std::cout << "Device server PID : " << rece->tab_dbdev_val[i].pid << std::endl;
+		std::cout << "Device server process name : " << rece->tab_dbdev_val[i].proc_name << std::endl;
 	}
-    }
-    return(&errcode);
+#endif
+
+/* Initialize error code sended back to client */
+
+	errcode = 0;
+
+/* Return error code if the server is not connected to the database */
+
+	if (dbgen.connected == False)
+	{
+		errcode = DbErr_DatabaseNotConnected;
+		return(&errcode);
+	}
+
+/* Store values in database */
+
+	for (i=0;i<num_dev;i++)
+	{
+		if ((db_err = db_store_3(rece->tab_dbdev_val[i])) != 0)
+		{
+			errcode = db_err;
+			return(&errcode);
+		}
+	}
+
+	return(&errcode);
 }
+
 
+
 /****************************************************************************
 *                                                                           *
 *		Server code for db_dev_import function                      *
@@ -233,182 +272,269 @@ DevLong *NdbmServer::db_devexp_3_svc(tab_dbdev_3 *rece)
 *            }                                                              *
 *                                                                           *
 ****************************************************************************/
+
+
 db_resimp *NdbmServer::db_devimp_1_svc(arr1 *de_name)
 {
-    int 			num_dev = de_name->arr1_len;
-    datum 			key,
-				content;
-//    device 			ret;
-    register db_devinfo 	*stu_addr,
-				*stu_addr1;	
-    string 			ret_dev_name,
-				ret_host_name,
-				ret_dev_type,
-				ret_dev_class;
-    int 			ret_pn,
-				ret_vn;
+	int i,j,resu,num_dev,flags;
+	datum key;
+	datum content;
+	device ret;
+	register db_devinfo *stu_addr,*stu_addr1;	
+	char *tbeg, *tend;
+	int diff;
+	int exit = 0;
+	char ret_host_name[20];
+	char ret_dev_name[24];
+	int ret_pn;
+	int ret_vn;
+	char ret_dev_type[24];
+	char ret_dev_class[24];
+	char prgnr[12];
+	
+
+	num_dev = de_name->arr1_len;
+ 
 #ifdef DEBUG
-    for (int i = 0; i < num_dev; i++)
-	cout << "Device name (in import function) : " << de_name->arr1_val[i] << endl;
+	for (i=0;i<num_dev;i++)
+		std::cout << "Device name (in import function) : " << de_name->arr1_val[i] << std::endl;
 #endif
-//
-// Initialize error code sended back to client 
-//
+
+/* Initialize error code sended back to client */
+
 	back.db_imperr = 0;
-//
-// Return error code if the server is not connected to the database 
-//
-    if (!dbgen.connected)
-    {
-	back.db_imperr = DbErr_DatabaseNotConnected;
-	back.imp_dev.tab_dbdev_len = 0;
-	back.imp_dev.tab_dbdev_val = NULL;
-	return(&back);
-    }
-//
-// Allocate memory for the array of db_devinfo structures
-//
-    try
-    {
-	back.imp_dev.tab_dbdev_val = new db_devinfo[num_dev];
-    }
-    catch(const bad_alloc &)
-    {
-	back.db_imperr = DbErr_ServerMemoryAllocation;
-	back.imp_dev.tab_dbdev_len = 0;
-	return(&back);
-    }
-//
-// A loop on every device to import
-//
-    for (int i = 0; i < num_dev; i++)
-    {
-//
-// Try to retrieve the tuple in the NAMES table 
-//
-	key = gdbm_firstkey(dbgen.tid[0]);
-	if (!key.dptr)
+
+/* Return error code if the server is not connected to the database */
+
+	if (dbgen.connected == False)
 	{
-	    delete [] back.imp_dev.tab_dbdev_val;
-	    back.db_imperr = DbErr_DatabaseAccess;
-	    back.imp_dev.tab_dbdev_len = 0;
-	    return(&back);
+		back.db_imperr = DbErr_DatabaseNotConnected;
+		back.imp_dev.tab_dbdev_len = 0;
+		back.imp_dev.tab_dbdev_val = NULL;
+		return(&back);
 	}
 
-	do
+/* Allocate memory for the array of db_devinfo structures */
+
+	if ((back.imp_dev.tab_dbdev_val = (db_devinfo *)calloc(num_dev,sizeof(db_devinfo))) == NULL )
 	{
-	    content = gdbm_fetch(dbgen.tid[0], key);
-	    if (content.dptr)
-	    {
-		string 			temp = content.dptr;
-		string::size_type	pos = temp.find('|');
-		if (pos != string::npos)
+		back.db_imperr = DbErr_ServerMemoryAllocation;
+		back.imp_dev.tab_dbdev_len = 0;
+		return(&back);
+	}
+
+/* A loop on every device to import */
+
+	for (i=0;i<num_dev;i++)
+	{
+
+/* Initialise exit flag */
+
+		exit = 0;
+
+/* Try to retrieve the tuple in the NAMES table */
+
+		key = gdbm_firstkey(dbgen.tid[0]);
+		if (key.dptr == NULL)
 		{
-		    ret_dev_name = temp.substr(0, pos);
-		    if (ret_dev_name == de_name->arr1_val[i])
-		    {
-//
-// Unpack the content 
-//
-			temp.erase(0, pos + 1);
-			pos = temp.find('|');
-			ret_host_name = temp.substr(0, pos);
-			temp.erase(0, pos + 1);
+			free(back.imp_dev.tab_dbdev_val);
+			back.db_imperr = DbErr_DatabaseAccess;
+			back.imp_dev.tab_dbdev_len = 0;
+			return(&back);
+		}
 
-			pos = temp.find('|');
-			ret_pn = atoi(temp.substr(0, pos).c_str());
-			temp.erase(0, pos + 1);
+		do
+		{
+			content = gdbm_fetch(dbgen.tid[0], key);
 
-			pos = temp.find('|');
-			ret_vn = atoi(temp.substr(0, pos).c_str());
-			temp.erase(0, pos + 1);
+			if (content.dptr != NULL)
+			{
+		
+				tbeg = content.dptr;
+				if ((tend = strchr(tbeg, '|')) != NULL)
+				{
+					diff = (u_int)(tend++ - tbeg);
+					strncpy(ret_dev_name, tbeg, diff);
+					ret_dev_name[diff] = '\0';
+		
+					if (strcmp(ret_dev_name, de_name->arr1_val[i]) == 0)
+					{
+						exit = 1;
+/* Unpack the content */
+						tbeg = content.dptr;
+						tend = strchr(tbeg, '|');
+						diff = (u_int)(tend++ - tbeg);
+						strncpy(ret_dev_name, tbeg, diff);
+						ret_dev_name[diff] = '\0';
+		
+						tbeg = tend;
 
-			pos = temp.find('|');
-			ret_dev_type = temp.substr(0, pos);
-			temp.erase(0, pos + 1);
+						tend = strchr(tbeg, '|');
+						diff = (u_int)(tend++ - tbeg);
+						strncpy(ret_host_name, tbeg, diff);
+						ret_host_name[diff] = '\0';
 
-			pos = temp.find('|');
-			if (pos == string::npos) 
-			    ret_dev_class = temp;
+						tbeg = tend;
+
+						tend = strchr(tbeg, '|');
+						diff = (u_int)(tend++ - tbeg);
+						strncpy(prgnr, tbeg, diff);
+						prgnr[diff] = '\0';
+						ret_pn = atoi(prgnr);
+		
+						tbeg = tend;
+
+						tend = strchr(tbeg, '|');
+						diff = (u_int)(tend++ - tbeg);
+						strncpy(prgnr, tbeg, diff);
+						prgnr[diff] = '\0';
+						ret_vn = atoi(prgnr);
+
+						tbeg = tend;
+
+						tend = strchr(tbeg, '|');
+						diff = (u_int)(tend++ - tbeg);
+						strncpy(ret_dev_type, tbeg, diff);
+						ret_dev_type[diff] = '\0';
+
+						tbeg = tend;
+
+						tend = strchr(tbeg, '|');
+						if (tend == NULL) 
+							diff = strlen(tbeg);
+						else
+							diff = (u_int)(tend++ - tbeg);
+						strncpy(ret_dev_class, tbeg, diff);
+						ret_dev_class[diff] = '\0';
+
+					} /* end of found */
+				} /* end of not NULL content */
+			} /* end of not NULL separator */
+
+			if (exit == 0)
+			{
+		 		key = gdbm_nextkey(dbgen.tid[0], key); 
+				if (key.dptr == NULL) 
+					exit = 1;
+		
+			} /*end of exit if */
+		} /* end of do */
+		while (!exit);
+
+/* In case of error */
+
+		if ((content.dptr == NULL) || (key.dptr == NULL) || (ret_pn == 0))
+		{
+			for (j=0;j<i;j++)
+			{
+				stu_addr = &(back.imp_dev.tab_dbdev_val[j]);
+				free(stu_addr->dev_name);
+				free(stu_addr->host_name);
+				free(stu_addr->dev_type);
+				free(stu_addr->dev_class);
+			}
+			back.imp_dev.tab_dbdev_len = 0;
+			if (key.dptr == NULL)
+				back.db_imperr = DbErr_DeviceNotDefined;
+			else if (content.dptr == NULL)
+				back.db_imperr = DbErr_DatabaseAccess;
 			else
-			    ret_dev_class = temp.substr(0, pos);
-			break;
-		    } 
-		} 
-	    } 
-	}while (key.dptr);
-//
-// In case of error 
-//
-	if (!content.dptr || !key.dptr || !ret_pn)
-	{
-	    for (int j = 0; j < i; j++)
-	    {
-		stu_addr = &(back.imp_dev.tab_dbdev_val[j]);
-		delete [] stu_addr->dev_name;
-		delete [] stu_addr->host_name;
-		delete [] stu_addr->dev_type;
-		delete [] stu_addr->dev_class;
-	    }
-	    back.imp_dev.tab_dbdev_len = 0;
-	    if (!key.dptr)
-		back.db_imperr = DbErr_DeviceNotDefined;
-	    else if (!content.dptr)
-		back.db_imperr = DbErr_DatabaseAccess;
-	    else
-		back.db_imperr = DbErr_DeviceNotExported;
-	    return(&back);
-	}
-	stu_addr1 = &(back.imp_dev.tab_dbdev_val[i]);
-	try
-	{
-//
-// Allocate memory for the host_name string 
-//
-	    stu_addr1->host_name = new char[ret_host_name.length() + 1];
-//
-// Allocate memory for the device name string 
-//
-	    stu_addr1->dev_name = new char[strlen(de_name->arr1_val[i]) + 1];
-//
-// Allocate memory for the device type string 
-//
-	    stu_addr1->dev_type = new char[ret_dev_type.length() + 1];
-//
-// Allocate memory for the device class string 
-//
-	    stu_addr1->dev_class = new char[ret_dev_class.length() + 1];
-	}
-	catch(const bad_alloc &)
-	{
-	    for (int j = 0; j <= i; j++)
-	    {
-		stu_addr = &(back.imp_dev.tab_dbdev_val[j]);
-		delete [] stu_addr->dev_name;
-		delete [] stu_addr->host_name;
-		delete [] stu_addr->dev_class;
-		delete [] stu_addr->dev_type;
-	    }
-	    back.imp_dev.tab_dbdev_len = 0;
-	    back.db_imperr = DbErr_ServerMemoryAllocation;
-	    return(&back);
-	}
-//
-// Initialize structure sended back to client 
-//
-	strcpy(stu_addr1->host_name, ret_host_name.c_str());
-	strcpy(stu_addr1->dev_name, de_name->arr1_val[i]);
-	stu_addr1->p_num = ret_pn;
-	stu_addr1->v_num = ret_vn;
-	strcpy(stu_addr1->dev_class, ret_dev_class.c_str());
-	strcpy(stu_addr1->dev_type, ret_dev_type.c_str());
+				back.db_imperr = DbErr_DeviceNotExported;
+			return(&back);
+		}
 
-    } // end of for for devices 
+/* Allocate memory for the host_name string */
 
-    back.imp_dev.tab_dbdev_len = num_dev;
-    return(&back);
+		stu_addr1 = &(back.imp_dev.tab_dbdev_val[i]);
+		if ((stu_addr1->host_name = (char *)malloc(strlen(ret_host_name) + 1)) == NULL)
+		{
+			for (j=0;j<i;j++)
+			{
+				stu_addr = &(back.imp_dev.tab_dbdev_val[j]);
+				free(stu_addr->dev_name);
+				free(stu_addr->host_name);
+				free(stu_addr->dev_class);
+				free(stu_addr->dev_type);
+			}
+			back.imp_dev.tab_dbdev_len = 0;
+			back.db_imperr = DbErr_ServerMemoryAllocation;
+			return(&back);
+		}
+
+/* Allocate memory for the device name string */
+
+		if ((stu_addr1->dev_name = (char *)malloc(strlen(de_name->arr1_val[i]) + 1)) == NULL)
+		{
+			free(stu_addr1->host_name);
+			for (j=0;j<i;j++)
+			{
+				stu_addr = &(back.imp_dev.tab_dbdev_val[j]);
+				free(stu_addr->dev_name);
+				free(stu_addr->host_name);
+				free(stu_addr->dev_type);
+				free(stu_addr->dev_class);
+			}
+			back.imp_dev.tab_dbdev_len = 0;
+			back.db_imperr = DbErr_ServerMemoryAllocation;
+			return(&back);
+		}
+
+/* Allocate memory for the device type string */
+
+		if ((stu_addr1->dev_type = (char *)malloc(strlen(ret_dev_type) + 1)) == NULL)
+		{
+			free(stu_addr1->host_name);
+			free(stu_addr1->dev_name);
+			for (j=0;j<i;j++)
+			{
+				stu_addr = &(back.imp_dev.tab_dbdev_val[j]);
+				free(stu_addr->dev_name);
+				free(stu_addr->host_name);
+				free(stu_addr->dev_type);
+				free(stu_addr->dev_class);
+			}
+			back.imp_dev.tab_dbdev_len = 0;
+			back.db_imperr = DbErr_ServerMemoryAllocation;
+			return(&back);
+		}
+
+/* Allocate memory for the device class string */
+
+		if ((stu_addr1->dev_class = (char *)malloc(strlen(ret_dev_class) + 1)) == NULL)
+		{
+			free(stu_addr1->host_name);
+			free(stu_addr1->dev_name);
+			free(stu_addr1->dev_type);
+			for (j=0;j<i;j++)
+			{
+				stu_addr = &(back.imp_dev.tab_dbdev_val[j]);
+				free(stu_addr->dev_name);
+				free(stu_addr->host_name);
+				free(stu_addr->dev_type);
+				free(stu_addr->dev_class);
+			}
+			back.imp_dev.tab_dbdev_len = 0;
+			back.db_imperr = DbErr_ServerMemoryAllocation;
+			return(&back);
+		}
+
+/* Initialize structure sended back to client */
+
+		strcpy(stu_addr1->host_name,ret_host_name);
+		strcpy(stu_addr1->dev_name,de_name->arr1_val[i]);
+		stu_addr1->p_num = ret_pn;
+		stu_addr1->v_num = ret_vn;
+		strcpy(stu_addr1->dev_class,ret_dev_class);
+		strcpy(stu_addr1->dev_type,ret_dev_type);
+
+	} /* end of for for devices */
+
+	back.imp_dev.tab_dbdev_len = num_dev;
+	return(&back);
 }
+
 
+
 /****************************************************************************
 *                                                                           *
 *		Server code for db_svc_unreg function                       *
@@ -427,218 +553,308 @@ db_resimp *NdbmServer::db_devimp_1_svc(arr1 *de_name)
 *       Zero means no error                                                 *
 *                                                                           *
 ****************************************************************************/
+
+
 DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 {
-//    device 	dev;
-    datum 	key,
-		content, 
-		dev1;
-    string 	dev_str,
-		proc_str,
-		pers_str,
-		dev_class,
-		key_str;
-    int 	d_num = 0,
-   		dev_numb = 1,
-		old_d_num;
+	static DevLong mis;
+	register char *tmp,*sto,*temp;
+	register int i;
+	device dev;
+	unsigned int diff;
+	datum key;
+	datum content, dev1;
+	char dev_str[MAX_CONT];
+	char key_str[MAX_KEY];
+	int resu,d_num;
+	int dev_numb = 1;
+	char seqnr[4];
+	int exit = 0;
+	int flags;
+	char proc_str[40];
+	char pers_str[40];
+	char p_num[20];
+	char dev_class[40];
+	int exit_loop;
+	int old_d_num;
 
 #ifdef DEBUG
-	cout << "Device server name (unregister function) : " << *dsn_name << endl;
+	std::cout << "Device server name (unregister function) : " << *dsn_name << std::endl;
 #endif
-//
-// Miscallaneous initialization
-//
-    errcode = 0;
-    string	sto(*dsn_name);
-//
-// Return error code if the server is not connected to the database 
-//
-    if (!dbgen.connected)
-    {
-	errcode = DbErr_DatabaseNotConnected;
-	return(&errcode);
-    }
-//
-// Get device server class */
-//
-    string::size_type	pos = sto.find('/');
-    string	ds_class = sto.substr(0, pos);
-//
-// Get device server name */
-//
-    string	ds_name  = sto.substr(pos + 1);
 
-#ifdef DEBUG
-    cout << "Device server class (unreg) : " << ds_class << endl;
-    cout << "Device server name (unreg) : " << ds_name << endl;
-#endif
-//
-// Try to retrieve devices in database assuming that the input device server
-// name is the device server PROCESS name. As there is no key build on
-// the device server process name, do a full traversal of the database 
-//
-    do
-    {
-	old_d_num = d_num;
-	for (key = gdbm_firstkey(dbgen.tid[0]); key.dptr != NULL; key = gdbm_nextkey(dbgen.tid[0], key))
+/* Miscallaneous initialization */
+	
+	d_num = 0;
+	mis = 0;
+	sto = *dsn_name;
+	flags = GDBM_REPLACE;
+	exit_loop = False;
+
+/* Return error code if the server is not connected to the database */
+
+	if (dbgen.connected == False)
 	{
-//
-// Extract personal name and sequence field from key 
-//
-	    string	temp = key.dptr;
-	    pos = temp.find('|');
-	    temp.erase(0, pos + 1);
-	    pos = temp.find('|');
-	    pers_str = temp.substr(0, pos);
-	    if (ds_name != pers_str)
-		continue;
-
-	    string key_str(key.dptr, key.dsize);
-//
-// Get db content 
-//
-	    content = gdbm_fetch(dbgen.tid[0], key);
-	    if (!content.dptr)
-		if (gdbm_error(dbgen.tid[0]) != 0)
-		{
-		    errcode = DbErr_DatabaseAccess;
-		    return(&errcode);
-		}
-	    temp = content.dptr;
-	    pos = temp.find('|');
-	    pos = temp.find('|', pos + 1);
-	    dev_str = temp.substr(0, pos);
-//
-// Extract program number 
-//
-	    temp.erase(0, pos + 1);
-	    pos = temp.find('|');
-	    if (temp.substr(0, pos) == "0")
-		continue;
-//
-// Extract device class 
-//
-	    for (int i = 0; i < 2; i++)
-	    	pos = temp.find('|', pos + 1);
-	    temp.erase(0, pos + 1);
-	    pos = temp.find('|');
-	    dev_class = temp.substr(0, pos);
-//
-// Extract process name 
-//
-	    for (int i = 0; i < 2; i++)
-	    	pos = temp.find('|', pos + 1);
-	    temp.erase(0, pos + 1);
-	    pos = temp.find('|');
-	    proc_str = temp.substr(0, pos);
-	    if (ds_class != proc_str)
-		continue;
-//
-// A device to be unregistered has been found, build the new database content 
-//
-	    dev_str += ("|0|0|unknown|" + dev_class + "|0|" + proc_str + "|");
-//
-// Update database 
-//
-	    dev1.dptr = const_cast<char *>(dev_str.data());
-	    dev1.dsize = dev_str.length();
-	    key.dptr = const_cast<char *>(key_str.data());
-	    key.dsize = key_str.length();
-
-	    if (gdbm_store(dbgen.tid[0], key, dev1, GDBM_REPLACE))
-	    {
-		errcode = DbErr_DatabaseAccess;
-		return(&errcode);
-	    }
-	    d_num++;
-	    break;
+		mis = DbErr_DatabaseNotConnected;
+		return(&mis);
 	}
-	if (old_d_num == d_num)
-	    break;
-    }
-    while (true);
-//
-// Initialization needed to retrieve the right tuples in the NAMES table
-// and to update the tuples (program and version number) assuming the input
-// name is a device server name
-//
-    if (d_num == 0)
-    {
+
+/* Get device server class */
+
+	tmp = strchr(sto,'/');
+	diff = (u_int)(tmp++ - sto);
+	strncpy(dev.ds_class,sto,diff);
+	dev.ds_class[diff] = '\0';
+
+/* Get device server name */
+
+	strcpy(dev.ds_name,tmp);
+
+#ifdef DEBUG
+	std::cout << "Device server class (unreg) : " << dev.ds_class << std::endl;
+	std::cout << "Device server name (unreg) : " << dev.ds_name << std::endl;
+#endif
+
+/* Try to retrieve devices in database assuming that the input device server
+   name is the device server PROCESS name. As there is no key build on
+   the device server process name, do a full traversal of the database */
+
 	do
 	{
-	    stringstream	s;
-#if !HAVE_SSTREAM
-            s.seekp(0, ios::beg);
-#endif
-	    s << ds_class << "|" << ds_name << "|" << dev_numb << "|" << ends;
-#if !HAVE_SSTREAM
-            strcpy(key.dptr, s.str());
-            s.freeze(false);
-#else
-            strcpy(key.dptr, s.str().c_str());
-#endif
-	    key.dsize = strlen(key.dptr);
-//
-// Try to retrieve the tuples 
-//
-	    content = gdbm_fetch(dbgen.tid[0], key); 
-	    if (content.dptr)
-	    {
-		d_num++;
-//
-// Extract device class 
-//
-		string	temp = content.dptr;
-	        pos = temp.find('|');
-	        pos = temp.find('|', pos + 1);
-		dev_str = temp.substr(0, pos);
-	     	for (int i = 0; i < 3; i++)
-	    	    pos = temp.find('|', pos + 1);
-	    	temp.erase(0, pos + 1);
-	        pos = temp.find('|');
-		dev_class = temp.substr(0, pos);
-//
-// Build the new database content 
-//
-		temp.erase(0, pos + 1);
-	     	for (int i = 0; i < 2; i++)
-	    	    pos = temp.find('|', pos + 1);
-	    	temp.erase(0, pos + 1);
-	        pos = temp.find('|');
-		proc_str = temp.substr(0, pos);
-	        dev_str += ("|0|0|unknown|" + dev_class + "|0|" + proc_str + "|");
-//
-// Update database 
-//
-		dev1.dptr = const_cast<char *>(dev_str.data());
-		dev1.dsize = dev_str.length();
 
-		if (gdbm_store(dbgen.tid[0], key, dev1, GDBM_REPLACE))
+		old_d_num = d_num;
+		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
 		{
-		    errcode = DbErr_DatabaseAccess;
-		    return(&errcode);
+
+/* Extract personal name and sequence field from key */
+
+			tmp = strchr(key.dptr,'|');
+			tmp++;
+			temp = strchr(tmp,'|');
+			diff = (unsigned int)(temp++ - tmp);
+			strncpy(pers_str,tmp,diff);
+			pers_str[diff] = '\0';
+
+			if (strcmp(dev.ds_name,pers_str) != 0)
+				continue;
+
+			strncpy(key_str,key.dptr,key.dsize);
+			key_str[key.dsize] = '\0';
+
+/* Get db content */
+
+			content = gdbm_fetch(dbgen.tid[0],key);
+			if (content.dptr == NULL)
+			{
+				if (gdbm_error(dbgen.tid[0]) != 0)
+				{
+					mis = DbErr_DatabaseAccess;
+					return(&mis);
+				}
+			}
+
+/* Extract program number */
+
+			tmp = content.dptr;
+			for (i = 0;i < 2;i++)
+			{
+				temp = strchr(tmp,'|');
+				temp++;	
+				tmp = temp;
+			}
+			temp = strchr(tmp,'|');
+			diff = (unsigned int)(temp - tmp);
+			strncpy(p_num,tmp,diff);
+			p_num[diff] = '\0';
+
+			if (strcmp(p_num,"0") == 0)
+				continue;
+
+/* Extract device class */
+
+			tmp = content.dptr;
+			for (i = 0;i < 5;i++)
+			{
+				temp = strchr(tmp,'|');
+				temp++;	
+				tmp = temp;
+			}
+			temp = strchr(tmp,'|');
+			diff = (unsigned int)(temp - tmp);
+			strncpy(dev_class,tmp,diff);
+			dev_class[diff] = '\0';
+
+/* Extract process name */
+
+			tmp = content.dptr;
+			for (i = 0;i < 7;i++)
+			{
+				temp = strchr(tmp,'|');
+				temp++;	
+				tmp = temp;
+			}
+			temp = strchr(tmp,'|');
+			diff = (unsigned int)(temp - tmp);
+			strncpy(proc_str,tmp,diff);
+			proc_str[diff] = '\0';
+
+			if (strcmp(dev.ds_class,proc_str) != 0)
+				continue;
+
+/* A device to be unregistered has been found, build the new database content */
+
+			sto = content.dptr;
+			tmp = strchr(sto,'|');
+			tmp++;
+			temp = strchr(tmp,'|');
+			diff = (u_int)(temp - sto);
+			strncpy(dev_str, sto, diff);
+			dev_str[diff] = '\0';
+
+			strcat(dev_str,"|");
+			strcat(dev_str,"0");
+			strcat(dev_str,"|");
+			strcat(dev_str,"0");
+			strcat(dev_str,"|");
+			strcat(dev_str,"unknown");
+			strcat(dev_str,"|");
+			strcat(dev_str,dev_class);
+			strcat(dev_str,"|");
+			strcat(dev_str,"0");
+			strcat(dev_str,"|");
+			strcat(dev_str,proc_str);
+			strcat(dev_str,"|");
+
+/* Update database */
+
+			dev1.dptr = dev_str;
+			dev1.dsize = strlen(dev_str);
+			key.dptr = key_str;
+			key.dsize = strlen(key_str);
+
+			if (gdbm_store(dbgen.tid[0], key, dev1, flags))
+			{
+				mis = DbErr_DatabaseAccess;
+				return(&mis);
+			}
+			d_num++;
+			break;
 		}
-		dev_numb++;
-	    }
-	    else
-		break;
-	} 
-	while (true);
-    }
-//
-// In case of trouble 
-//
-    if ((content.dptr == NULL) && (d_num == 0))
-    {
-	errcode = DbErr_DeviceServerNotDefined;
-	return(&errcode);
-    }
-//
-// No error 
-//
-    return(&errcode);
+
+		if (old_d_num == d_num)
+			exit_loop = True;
+	}
+	while (exit_loop == False);
+
+/* Initialization needed to retrieve the right tuples in the NAMES table
+   and to update the tuples (program and version number) assuming the input
+   name is a device server name*/
+
+	if (d_num == 0)
+	{
+		do
+		{
+			strcpy(key_str, dev.ds_class);
+			strcat(key_str, "|");
+			strcat(key_str, dev.ds_name);
+			strcat(key_str, "|");
+			sprintf(seqnr, "%d", dev_numb);
+			strcat(key_str, seqnr);
+			strcat(key_str, "|");
+			key.dptr = key_str;
+			key.dsize = strlen(key_str);
+
+/* Try to retrieve the tuples */
+
+			content = gdbm_fetch(dbgen.tid[0], key); 
+
+			if (content.dptr != NULL)
+			{
+				d_num++;
+
+/* Extract device class */
+
+				tmp = content.dptr;
+				for (i = 0;i < 5;i++)
+				{
+					temp = strchr(tmp,'|');
+					temp++;	
+					tmp = temp;
+				}
+				temp = strchr(tmp,'|');
+				diff = (unsigned int)(temp - tmp);
+				strncpy(dev_class,tmp,diff);
+				dev_class[diff] = '\0';
+
+/* Build the new database content */
+
+				sto = content.dptr;
+				tmp = strchr(sto,'|');
+				tmp++;
+				temp = strchr(tmp,'|');
+				diff = (u_int)(temp - sto);
+				strncpy(dev_str, sto, diff);
+				dev_str[diff] = '\0';
+
+				strcat(dev_str,"|");
+				strcat(dev_str,"0");
+				strcat(dev_str,"|");
+				strcat(dev_str,"0");
+				strcat(dev_str,"|");
+				strcat(dev_str,"unknown");
+				strcat(dev_str,"|");
+				strcat(dev_str,dev_class);
+				strcat(dev_str,"|");
+				strcat(dev_str,"0");
+				strcat(dev_str,"|");
+
+				tmp = content.dptr;
+				for (i = 0;i < 7;i++)
+				{
+					temp = strchr(tmp,'|');
+					temp++;	
+					tmp = temp;
+				}
+				temp = strchr(tmp,'|');
+				diff = (unsigned int)(temp - tmp);
+				strncpy(proc_str,tmp,diff);
+				proc_str[diff] = '\0';
+			
+				strcat(dev_str,proc_str);
+				strcat(dev_str,"|");
+
+/* Update database */
+
+				dev1.dptr = dev_str;
+				dev1.dsize = strlen(dev_str);
+
+				if (gdbm_store(dbgen.tid[0], key, dev1, flags))
+				{
+					mis = DbErr_DatabaseAccess;
+					return(&mis);
+				}
+				dev_numb++;
+			}
+			else
+				exit = 1;
+		} 
+		while (!exit);
+	}
+
+/* In case of trouble */
+	
+	if ((content.dptr == NULL) && (d_num == 0))
+	{
+		mis = DbErr_DeviceServerNotDefined;
+		return(&mis);
+	}
+
+/* No error */
+	return(&mis);
+
 }
+
 
+
 /****************************************************************************
 *                                                                           *
 *		Server code for db_svc_check function                       *
@@ -663,102 +879,145 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 *           }                                                               *
 *                                                                           *
 ****************************************************************************/
+
 svc_inf *NdbmServer::db_svcchk_1_svc(nam *dsn_nam)
 {
-    datum 	key,
-    		content;
-    string	ret_host_name,
-    		ret_dev_name,
-    		ret_dev_type,
-    		ret_dev_class;
-    string	sto(*dsn_nam);
+	static svc_inf send;
+	static char host_name[20];
+	register char *tmp, *sto;
+	device dev,dev1;
+	datum key;
+	datum content;
+	char key_str[MAX_KEY];
+	unsigned int diff;
+	int dev_numb = 1;
+	char seqnr[4];
+	char *tbeg, *tend;
+	char ret_host_name[20];
+	char ret_dev_name[24];
+	int ret_pn;
+	int ret_vn;
+	char ret_dev_type[24];
+	char ret_dev_class[24];
+	char prgnr[12];
+
 #ifdef DEBUG
-    cout << "Device server name (check function) : " << sto << endl;
+	std::cout << "Device server name (check function) : " << *dsn_nam << std::endl;
 #endif /* DEBUG */
-//
-// Miscalaneous initialization 
-//
-    svc_info.p_num = 1;
-    svc_info.v_num = 1;
-    svc_info.db_err = 0;
-//
-// Return error code if the server is not connected to the database 
-//
-    if (!dbgen.connected)
-    {
-	svc_info.db_err = DbErr_DatabaseNotConnected;
-	return(&svc_info);
-    }
-//
-// Get device server class
-//
-    string::size_type	pos = sto.find('/');
-    string	ds_class = sto.substr(0, pos);
-//
-// Get device server name 
-//
-    string	ds_name = sto.substr(pos + 1);
+
+/* Miscalaneous initialization */
+
+	sto = *dsn_nam;
+	host_name[0] = '\0';
+	send.ho_name = host_name;
+	send.p_num = 1;
+	send.v_num = 1;
+	send.db_err = 0;
+
+/* Return error code if the server is not connected to the database */
+
+	if (dbgen.connected == False)
+	{
+		send.db_err = DbErr_DatabaseNotConnected;
+		return(&send);
+	}
+
+/* Get device server class */
+
+	tmp = strchr(sto,'/');
+	diff = (u_int)(tmp++ - sto);
+	strncpy(dev.ds_class,sto,diff);
+	dev.ds_class[diff] = '\0';
+
+/* Get device server name */
+
+	strcpy(dev.ds_name,tmp);
 
 #ifdef DEBUG
-    cout << "Device server class (check) : " << ds_class << endl;
-    cout << "Device server name (check) : " << ds_name << endl;
+	std::cout << "Device server class (check) : " << dev.ds_class << std::endl;
+	std::cout << "Device server name (check) : " << dev.ds_name << std::endl;
 #endif
-//
-// Initialization needed to retrieve the right tuples in the NAMES table 
-//
-    string s = ds_class + "|" + ds_name + "|1|"; 
-    key.dptr = const_cast<char *>(s.data());
-    key.dsize = s.length();
-//
-// Try to retrieve the tuples 
-//
-    content = gdbm_fetch(dbgen.tid[0], key);                                
 
-    if (!content.dptr)
-    {
-	string	temp = content.dptr;
-	pos = temp.find('|');
-	ret_dev_name = temp.substr(0, pos);
-	temp.erase(0, pos + 1);		
+/* Initialization needed to retrieve the right tuples in the NAMES table */
 
-	pos = temp.find('|');
-	ret_host_name = temp.substr(0, pos);
-	temp.erase(0, pos + 1);		
+	strcpy(key_str, dev.ds_class);
+	strcat(key_str, "|");
+	strcat(key_str, dev.ds_name);
+	strcat(key_str, "|");
+	sprintf(seqnr,"%d", dev_numb);
+	strcat(key_str, seqnr);
+	strcat(key_str, "|");
+	key.dptr = key_str;
+	key.dsize = strlen(key_str);
 
-	pos = temp.find('|');
-	svc_info.p_num = atoi(temp.substr(0, pos).c_str());
-	temp.erase(0, pos + 1);		
+/* Try to retrieve the tuples */
 
-	pos = temp.find('|');
-	svc_info.v_num = atoi(temp.substr(0, pos).c_str());
-	temp.erase(0, pos + 1);		
+	content = gdbm_fetch(dbgen.tid[0], key);                                
 
-	pos = temp.find('|');
-	ret_dev_type = temp.substr(0, pos);
-	temp.erase(0, pos + 1);		
-
-	if ((pos = temp.find('|')) == string::npos)
-	    ret_dev_class = temp;
+	if (content.dptr == NULL)
+		send.db_err = DbErr_DeviceServerNotDefined;
 	else
-	    ret_dev_class = temp.substr(0, pos);
-        try
 	{
-    	    svc_info.ho_name = new char[ret_host_name.length() + 1];
-	    strcpy(svc_info.ho_name, ret_host_name.c_str());
+		tbeg = content.dptr;
+		tend = strchr(tbeg, '|');
+		diff = (u_int)(tend++ - tbeg);
+		strncpy(ret_dev_name, tbeg, diff);
+		ret_dev_name[diff] = '\0';
+		
+		tbeg = tend;
+
+		tend = strchr(tbeg, '|');
+		diff = (u_int)(tend++ - tbeg);
+		strncpy(ret_host_name, tbeg, diff);
+		ret_host_name[diff] = '\0';
+
+		tbeg = tend;
+
+		tend = strchr(tbeg, '|');
+		diff = (u_int)(tend++ - tbeg);
+		strncpy(prgnr, tbeg, diff);
+		prgnr[diff] = '\0';
+		ret_pn = atoi(prgnr);
+		
+		tbeg = tend;
+
+		tend = strchr(tbeg, '|');
+		diff = (u_int)(tend++ - tbeg);
+		strncpy(prgnr, tbeg, diff);
+		prgnr[diff] = '\0';
+		ret_vn = atoi(prgnr);
+
+		tbeg = tend;
+
+		tend = strchr(tbeg, '|');
+		diff = (u_int)(tend++ - tbeg);
+		strncpy(ret_dev_type, tbeg, diff);
+		ret_dev_type[diff] = '\0';
+
+		tbeg = tend;
+
+		tend = strchr(tbeg, '|');
+		if (tend == NULL)
+			diff = strlen(tbeg);
+		else
+			diff = (u_int)(tend++ - tbeg);
+		strncpy(ret_dev_class, tbeg, diff);
+		ret_dev_class[diff] = '\0';
+		strcpy(host_name, ret_host_name);
+
+		send.p_num = ret_pn;
+		send.v_num = ret_vn;
+		send.ho_name = host_name;
 	}
-	catch(const bad_alloc &)
-	{
-	    svc_info.db_err = DbErr_ServerMemoryAllocation;
-	}
-    }
-    else
-	svc_info.db_err = DbErr_DeviceServerNotDefined;
-//
-// Leave function 
-//
-    return(&svc_info);
+
+/* Leave function */
+
+	return(&send);
+
 }
+
 
+
 /****************************************************************************
 *                                                                           *
 *		Code for db_store function                                  *
@@ -777,80 +1036,128 @@ svc_inf *NdbmServer::db_svcchk_1_svc(nam *dsn_nam)
 *    there is a problem.                                                    *
 *                                                                           *
 ****************************************************************************/
+
+
 int NdbmServer::db_store(db_devinfo &dev_stu)
 {
-    datum 	key, 
-		key_sto,
-		content, 
-		cont_sto;
-    int		errcode = 0;
+	datum key, key_sto;
+	datum content, cont_sto;
+	register db_devinfo *staddr;
+	int exit = 0;
+	char prgnr[12];
+	char *tbeg, *tend;
+	int diff;
+	int flags;
+	char ret_host_name[20];
+	char ret_dev_name[24];
 
-    try
-    {
-//
-// Try to retrieve the right tuple in the NAMES table
-//
-	key_sto.dptr = new char[MAX_KEY];
-	cont_sto.dptr = new char[MAX_CONT];
+/* Miscellaneous initialisation */
 
-    	key = gdbm_firstkey(dbgen.tid[0]);
-    	if (!key.dptr)
-	    throw int(DbErr_DatabaseAccess);
-    	do
-    	{
-            strncpy(key_sto.dptr, key.dptr, key.dsize);
-            key_sto.dptr[key.dsize] = '\0';
-            key_sto.dsize = key.dsize;
-	    content = gdbm_fetch(dbgen.tid[0], key);
-	    if (content.dptr)
-	    {
-	    	string temp = content.dptr;
-	    	string::size_type	pos = temp.find('|');
-	    	if (pos != string::npos)
-		    if (temp.substr(0, pos) ==  dev_stu.dev_name)
-		    	break;
-	    } 
-	    key = gdbm_nextkey(dbgen.tid[0], key);
-    	} while(key.dptr); 
-//
-// Different result cases 
-//
-    	if (!key.dptr || !key_sto.dptr)
-	    throw int(DbErr_DeviceNotDefined);
-//
-// Test to see if host name in database is the same.
-// Finally, update the tuple in database
-//
-	stringstream	s;
-#if !HAVE_SSTREAM
-        s.seekp(0, ios::beg);
-#endif
-	s << dev_stu.dev_name << "|" << dev_stu.host_name << "|" << dev_stu.p_num << "|"
-	  <<  dev_stu.v_num << "|" << dev_stu.dev_type << "|" << dev_stu.dev_class 
-	  << "|0|unknown" << ends;
-#if !HAVE_SSTREAM
-        strcpy(cont_sto.dptr, s.str());
-        s.freeze(false);
-#else
-        strcpy(cont_sto.dptr, s.str().c_str());
-#endif
-	cont_sto.dsize = strlen(cont_sto.dptr);
-	if (gdbm_store(dbgen.tid[0], key_sto, cont_sto, GDBM_REPLACE))
-	    throw int(DbErr_DatabaseAccess);
-    } 
-    catch(const int err)
-    {
-        errcode = err;
-    }
-    catch(const bad_alloc &)
-    {
-	errcode = int(DbErr_ServerMemoryAllocation);
-    }
-    delete [] cont_sto.dptr;
-    delete [] key_sto.dptr;
-    return(errcode);
+	staddr = &dev_stu;
+	exit = 0;
+
+/* Try to retrieve the right tuple in the NAMES table */
+
+	key_sto.dptr = (char *)malloc(MAX_KEY);
+	cont_sto.dptr = (char *)malloc(MAX_CONT);
+	
+	key = gdbm_firstkey(dbgen.tid[0]);
+	if (key.dptr == NULL)
+	{
+		free(key_sto.dptr);
+		free(cont_sto.dptr);
+		return(DbErr_DatabaseAccess);
+	}
+
+	strncpy(key_sto.dptr, key.dptr, key.dsize);
+	key_sto.dptr[key.dsize] = '\0';
+	key_sto.dsize = key.dsize;
+
+	do
+	{
+		content = gdbm_fetch(dbgen.tid[0], key);
+
+		if (content.dptr != NULL)
+		{
+			tbeg = content.dptr;
+			if ((tend = strchr(tbeg, '|')) != NULL)
+			{
+				diff = (u_int)(tend++ - tbeg);
+				strncpy(ret_dev_name, tbeg, diff);
+				ret_dev_name[diff] = '\0';
+		
+				if (strcmp(ret_dev_name, staddr->dev_name) == 0)
+				{
+					exit = 1;
+				}
+			} /* not NULL separator */
+		
+		} /* not NULL content*/
+
+		if (exit == 0)
+		{
+			key = gdbm_nextkey(dbgen.tid[0], key);
+			if (key.dptr == NULL) 
+				exit = 1;
+			else
+			{
+				strncpy(key_sto.dptr, key.dptr, key.dsize);
+				key_sto.dptr[key.dsize] = '\0';
+				key_sto.dsize = key.dsize;
+			} /* end of else */
+			
+		} /* end of exit if */
+	} /* end of do */
+	while (!exit);
+
+/* Different result cases */
+
+	if (key.dptr == NULL || key_sto.dptr == NULL)
+	{
+		free(key_sto.dptr);
+		free(cont_sto.dptr);
+		return(DbErr_DeviceNotDefined);
+	}
+
+/* Test to see if host name in database is the same.
+   Finally, update the tuple in database */
+
+	else
+	{
+		strcpy(cont_sto.dptr, staddr->dev_name);
+		strcat(cont_sto.dptr, "|");
+		strcat(cont_sto.dptr, staddr->host_name);
+		strcat(cont_sto.dptr, "|");
+		sprintf(prgnr, "%d", staddr->p_num);
+		strcat(cont_sto.dptr, prgnr);
+		strcat(cont_sto.dptr ,"|");
+		sprintf(prgnr, "%d", staddr->v_num);
+		strcat(cont_sto.dptr, prgnr);
+		strcat(cont_sto.dptr ,"|");
+		strcat(cont_sto.dptr ,staddr->dev_type);
+		strcat(cont_sto.dptr ,"|");
+		strcat(cont_sto.dptr, staddr->dev_class);
+		strcat(cont_sto.dptr ,"|0|unknown");
+		cont_sto.dsize = strlen(cont_sto.dptr);
+
+		flags = GDBM_REPLACE;
+
+		if (gdbm_store(dbgen.tid[0], key_sto, cont_sto, flags))
+		{
+			free(key_sto.dptr);
+			free(cont_sto.dptr);
+			return(DbErr_DatabaseAccess);
+		}
+	} /* end of else */
+
+	free(cont_sto.dptr);
+	free(key_sto.dptr);
+	return(0);
+
 }
+
 
+
 /****************************************************************************
 *                                                                           *
 *		Code for db_store_2 function                                *
@@ -869,82 +1176,133 @@ int NdbmServer::db_store(db_devinfo &dev_stu)
 *    there is a problem.                                                    *
 *                                                                           *
 ****************************************************************************/
+
+
 int NdbmServer::db_store_2(db_devinfo_2 &dev_stu)
 {
-    datum 		key, 
-			key_sto,
-			content, 
-			cont_sto;
-    int			errcode = 0;
+	datum key, key_sto;
+	datum content, cont_sto;
+	register db_devinfo_2 *staddr;
+	int exit = 0;
+	char prgnr[12];
+	char *tbeg, *tend;
+	int diff;
+	int flags;
+	char ret_host_name[20];
+	char ret_dev_name[24];
 
-//
-// Try to retrieve the right tuple in the NAMES table */
-//
-    try
-    {
-	key_sto.dptr = new char[MAX_KEY];
-	cont_sto.dptr = new char[MAX_CONT];
+/* Miscellaneous initialisation */
+
+	staddr = &dev_stu;
+	exit = 0;
+
+/* Try to retrieve the right tuple in the NAMES table */
+
+	key_sto.dptr = (char *)malloc(MAX_KEY);
+	cont_sto.dptr = (char *)malloc(MAX_CONT);
 	
 	key = gdbm_firstkey(dbgen.tid[0]);
-	if (!key.dptr)
-	    throw int(DbErr_DatabaseAccess);
+	if (key.dptr == NULL)
+	{
+		free(key_sto.dptr);
+		free(cont_sto.dptr);
+		return(DbErr_DatabaseAccess);
+	}
+
+	strncpy(key_sto.dptr, key.dptr, key.dsize);
+	key_sto.dptr[key.dsize] = '\0';
+	key_sto.dsize = key.dsize;
 
 	do
 	{
-	    strncpy(key_sto.dptr, key.dptr, key.dsize);
-	    key_sto.dptr[key.dsize] = '\0';
-	    key_sto.dsize = key.dsize;
-	    content = gdbm_fetch(dbgen.tid[0], key);
+		content = gdbm_fetch(dbgen.tid[0], key);
 
-	    if (content.dptr)
-	    {
-		string 		temp = content.dptr;
-		string::size_type	pos = temp.find('|');
-		if (pos != string::npos)
-		    if (temp.substr(0, pos) == dev_stu.dev_name)
-			break;
-	    } 
-	    key = gdbm_nextkey(dbgen.tid[0], key);
-	} while (key.dptr );
-//
-// Different result cases 
-//
-	if (!key.dptr || !key_sto.dptr)
-	    throw int(DbErr_DeviceNotDefined);
-//
-// Test to see if host name in database is the same.
-// Finally, update the tuple in database 
-//
-	stringstream	s;
-#if !HAVE_SSTREAM
-        s.seekp(0, ios::beg);
-#endif
-	s << dev_stu.dev_name << "|" << dev_stu.host_name << "|" << dev_stu.p_num <<  "|"
-	  << dev_stu.v_num << "|" << dev_stu.dev_type << "|" << dev_stu.dev_class << "|" 
-	  << dev_stu.pid << "|unknown|" << ends;
-#if !HAVE_SSTREAM
-        strcpy(cont_sto.dptr, s.str());
-        s.freeze(false);
-#else
-        strcpy(cont_sto.dptr, s.str().c_str());
-#endif
-	cont_sto.dsize = strlen(cont_sto.dptr);
-	if (gdbm_store(dbgen.tid[0], key_sto, cont_sto, GDBM_REPLACE))
-	    throw int(DbErr_DatabaseAccess);
-    } 
-    catch(const int err)
-    {
-        errcode = err;
-    }
-    catch(const bad_alloc &)
-    {
-	errcode = int(DbErr_ServerMemoryAllocation);
-    }
-    delete [] cont_sto.dptr;
-    delete [] key_sto.dptr;
-    return(errcode);
+		if (content.dptr != NULL)
+		{
+			tbeg = content.dptr;
+			if ((tend = strchr(tbeg, '|')) != NULL)
+			{
+				diff = (u_int)(tend++ - tbeg);
+				strncpy(ret_dev_name, tbeg, diff);
+				ret_dev_name[diff] = '\0';
+		
+				if (strcmp(ret_dev_name, staddr->dev_name) == 0)
+				{
+					exit = 1;
+				}
+			} /* not NULL separator */
+		
+		} /* not NULL content*/
+
+		if (exit == 0)
+		{
+			key = gdbm_nextkey(dbgen.tid[0], key);
+			if (key.dptr == NULL) 
+				exit = 1;
+			else
+			{
+				strncpy(key_sto.dptr, key.dptr, key.dsize);
+				key_sto.dptr[key.dsize] = '\0';
+				key_sto.dsize = key.dsize;
+			} /* end of else */
+			
+		} /* end of exit if */
+	} /* end of do */
+	while (!exit);
+
+/* Different result cases */
+
+	if (key.dptr == NULL || key_sto.dptr == NULL)
+	{
+		free(key_sto.dptr);
+		free(cont_sto.dptr);
+		return(DbErr_DeviceNotDefined);
+	}
+
+/* Test to see if host name in database is the same.
+   Finally, update the tuple in database */
+
+	else
+	{
+		strcpy(cont_sto.dptr, staddr->dev_name);
+		strcat(cont_sto.dptr, "|");
+		strcat(cont_sto.dptr, staddr->host_name);
+		strcat(cont_sto.dptr, "|");
+		sprintf(prgnr, "%d", staddr->p_num);
+		strcat(cont_sto.dptr, prgnr);
+		strcat(cont_sto.dptr ,"|");
+		sprintf(prgnr, "%d", staddr->v_num);
+		strcat(cont_sto.dptr, prgnr);
+		strcat(cont_sto.dptr ,"|");
+		strcat(cont_sto.dptr ,staddr->dev_type);
+		strcat(cont_sto.dptr ,"|");
+		strcat(cont_sto.dptr, staddr->dev_class);
+		strcat(cont_sto.dptr ,"|");
+		sprintf(prgnr, "%d", staddr->pid);
+		strcat(cont_sto.dptr, prgnr);
+		strcat(cont_sto.dptr ,"|");
+		strcat(cont_sto.dptr,"unknown");
+		strcat(cont_sto.dptr ,"|");
+		cont_sto.dsize = strlen(cont_sto.dptr);
+
+		flags = GDBM_REPLACE;
+
+		if (gdbm_store(dbgen.tid[0], key_sto, cont_sto, flags))
+		{
+			free(key_sto.dptr);
+			free(cont_sto.dptr);
+			return(DbErr_DatabaseAccess);
+		}
+	} /* end of else */
+
+	free(cont_sto.dptr);
+	free(key_sto.dptr);
+	return(0);
+
 }
+
 
+
 /****************************************************************************
 *                                                                           *
 *		Code for db_store_3 function                                *
@@ -965,76 +1323,123 @@ int NdbmServer::db_store_2(db_devinfo_2 &dev_stu)
 *    there is a problem.                                                    *
 *                                                                           *
 ****************************************************************************/
+
 int NdbmServer::db_store_3(db_devinfo_3 &dev_stu)
 {
-    datum 	key, 
-		key_sto,
-		content, 
-		cont_sto;
+	datum key, key_sto;
+	datum content, cont_sto;
+	register db_devinfo_3 *staddr;
+	int exit = 0;
+	char prgnr[12];
+	char *tbeg, *tend;
+	int diff;
+	int flags;
+	char ret_host_name[20];
+	char ret_dev_name[24];
 
-    try
-    {
-//
-// Try to retrieve the right tuple in the NAMES table 
-//
-	key_sto.dptr = new char[MAX_KEY];
-	cont_sto.dptr = new char[MAX_CONT];
+/* Miscellaneous initialisation */
+
+	staddr = &dev_stu;
+	exit = 0;
+
+/* Try to retrieve the right tuple in the NAMES table */
+
+	key_sto.dptr = (char *)malloc(MAX_KEY);
+	cont_sto.dptr = (char *)malloc(MAX_CONT);
 	
 	key = gdbm_firstkey(dbgen.tid[0]);
-	if (!key.dptr)
-	    throw int(DbErr_DatabaseAccess);
+	if (key.dptr == NULL)
+	{
+		free(key_sto.dptr);
+		free(cont_sto.dptr);
+		return(DbErr_DatabaseAccess);
+	}
+
+	strncpy(key_sto.dptr, key.dptr, key.dsize);
+	key_sto.dptr[key.dsize] = '\0';
+	key_sto.dsize = key.dsize;
 
 	do
 	{
-	    strncpy(key_sto.dptr, key.dptr, key.dsize);
-	    key_sto.dptr[key.dsize] = '\0';
-	    key_sto.dsize = key.dsize;
-	    content = gdbm_fetch(dbgen.tid[0], key);
-	    if (content.dptr)
-	    {
-		string 		temp = content.dptr;
-		string::size_type	pos = temp.find('|');
-		if (pos != string::npos)
-		    if (temp.substr(0, pos) == dev_stu.dev_name)
-			break;
-	    }
-	    key = gdbm_nextkey(dbgen.tid[0], key);
-	} while (key.dptr);
-//
-// Different result cases 
-//
-	if (!key.dptr || !key_sto.dptr)
-	    throw int(DbErr_DeviceNotDefined);
-//
-// Finally, update the tuple in database 
-//
-	stringstream	s;
-#if !HAVE_SSTREAM
-        s.seekp(0, ios::beg);
-#endif
-	s << dev_stu.dev_name << "|" << dev_stu.host_name << "|" << dev_stu.p_num <<  "|"
-	  << dev_stu.v_num << "|" << dev_stu.dev_type << "|" << dev_stu.dev_class << "|" 
-	  << dev_stu.pid << "|" << dev_stu.proc_name << "|" << ends;
-#if !HAVE_SSTREAM
-        strcpy(cont_sto.dptr, s.str());
-        s.freeze(false);
-#else
-        strcpy(cont_sto.dptr, s.str().c_str());
-#endif
-	cont_sto.dsize = strlen(cont_sto.dptr);
-	if (gdbm_store(dbgen.tid[0], key_sto, cont_sto, GDBM_REPLACE))
-	    throw int(DbErr_DatabaseAccess);
-    }
-    catch(const int err)
-    {
-        errcode = err;
-    }
-    catch(const bad_alloc &)
-    {
-	errcode = int(DbErr_ServerMemoryAllocation);
-    }
+		content = gdbm_fetch(dbgen.tid[0], key);
 
-    delete [] (cont_sto.dptr);
-    delete [] (key_sto.dptr);
-    return(errcode);
+		if (content.dptr != NULL)
+		{
+			tbeg = content.dptr;
+			if ((tend = strchr(tbeg, '|')) != NULL)
+			{
+				diff = (u_int)(tend++ - tbeg);
+				strncpy(ret_dev_name, tbeg, diff);
+				ret_dev_name[diff] = '\0';
+		
+				if (strcmp(ret_dev_name, staddr->dev_name) == 0)
+					exit = 1;
+			}
+		
+		}
+
+		if (exit == 0)
+		{
+			key = gdbm_nextkey(dbgen.tid[0], key);
+			if (key.dptr == NULL) 
+				exit = 1;
+			else
+			{
+				strncpy(key_sto.dptr, key.dptr, key.dsize);
+				key_sto.dptr[key.dsize] = '\0';
+				key_sto.dsize = key.dsize;
+			} 
+			
+		}
+	}
+	while (!exit);
+
+/* Different result cases */
+
+	if ((key.dptr == NULL) || (key_sto.dptr == NULL))
+	{
+		free(key_sto.dptr);
+		free(cont_sto.dptr);
+		return(DbErr_DeviceNotDefined);
+	}
+
+/* Finally, update the tuple in database */
+
+	else
+	{
+		strcpy(cont_sto.dptr, staddr->dev_name);
+		strcat(cont_sto.dptr, "|");
+		strcat(cont_sto.dptr, staddr->host_name);
+		strcat(cont_sto.dptr, "|");
+		sprintf(prgnr, "%d", staddr->p_num);
+		strcat(cont_sto.dptr, prgnr);
+		strcat(cont_sto.dptr ,"|");
+		sprintf(prgnr, "%d", staddr->v_num);
+		strcat(cont_sto.dptr, prgnr);
+		strcat(cont_sto.dptr ,"|");
+		strcat(cont_sto.dptr ,staddr->dev_type);
+		strcat(cont_sto.dptr ,"|");
+		strcat(cont_sto.dptr, staddr->dev_class);
+		strcat(cont_sto.dptr ,"|");
+		sprintf(prgnr, "%d", staddr->pid);
+		strcat(cont_sto.dptr, prgnr);
+		strcat(cont_sto.dptr ,"|");
+		strcat(cont_sto.dptr, staddr->proc_name);
+		strcat(cont_sto.dptr ,"|");
+		cont_sto.dsize = strlen(cont_sto.dptr);
+
+		flags = GDBM_REPLACE;
+
+		if (gdbm_store(dbgen.tid[0], key_sto, cont_sto, flags))
+		{
+			free(key_sto.dptr);
+			free(cont_sto.dptr);
+			return(DbErr_DatabaseAccess);
+		}
+	}
+
+	free(cont_sto.dptr);
+	free(key_sto.dptr);
+	return(0);
+
 }

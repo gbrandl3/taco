@@ -19,10 +19,10 @@
 ****************************************************************************/
 db_res *MySQLServer::devdomainlist_1_svc(void)
 {
-    vector<string>	dom_list;
+    std::vector<std::string>	dom_list;
 	
 #ifdef DEBUG
-    cout << "In devdomainlist_1_svc function" << endl;
+    std::cout << "In devdomainlist_1_svc function" << std::endl;
 #endif
 
 //
@@ -36,14 +36,14 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
 //
     if (!dbgen.connected)
     {
-	cerr << "I'm not connected to the database" << endl;
+	std::cerr << "I'm not connected to the database" << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
 //
 // Get the domain name list from the NAMES table
 //
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
         query = "SELECT DISTINCT domain FROM device ORDER BY domain ASC";
@@ -53,11 +53,11 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
         query = "SELECT DISTINCT DOMAIN FROM NAMES ORDER BY DOMAIN ASC";
     }
 #ifdef DEBUG
-    cout << "MySQLServer::devdomainlist_1_svc(): query " << query << endl;
+    std::cout << "MySQLServer::devdomainlist_1_svc(): query " << query << std::endl;
 #endif /* DEBUG */
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return (&browse_back);
     }
@@ -73,7 +73,7 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
         query = "SELECT DISTINCT DOMAIN FROM PS_NAMES ORDER BY DOMAIN ASC";
         if (mysql_query(mysql_conn, query.c_str()) != 0)
         {
-	    cerr << mysql_error(mysql_conn) << endl;
+	    std::cerr << mysql_error(mysql_conn) << std::endl;
 	    browse_back.db_err = DbErr_DatabaseAccess;
 	    return (&browse_back);
         }
@@ -93,14 +93,14 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
     {
 	int	k = dom_list[i].length();
         browse_back.res_val.arr1_val[i] = new char [k + 1];
-        dom_list[i].copy(browse_back.res_val.arr1_val[i],string::npos);
+        dom_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
         (browse_back.res_val.arr1_val[i])[k] = '\0';
     }
 #ifdef DEBUG
-    cout << "Found the following domains" << endl;
-    for (vector<string>::iterator it = dom_list.begin(); it != dom_list.end(); ++it)
-	cout << *it << endl;
-    cout << endl;
+    std::cout << "Found the following domains" << std::endl;
+    for (std::vector<std::string>::iterator it = dom_list.begin(); it != dom_list.end(); ++it)
+	std::cout << *it << std::endl;
+    std::cout << std::endl;
 #endif
 //
 // Return data
@@ -124,11 +124,11 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
 ****************************************************************************/
 db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
 {
-    string		user_domain(*domain);
-    vector<string>	fam_list;
+    std::string		user_domain(*domain);
+    std::vector<std::string>	fam_list;
 	
 #ifdef DEBUG
-    cout << "In devfamilylist_1_svc function for domain " << *domain << endl;
+    std::cout << "In devfamilylist_1_svc function for domain " << *domain << std::endl;
 #endif
 	
 //
@@ -142,14 +142,14 @@ db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
 //
     if (!dbgen.connected)
     {
-	cerr << "I'm not connected to the database" << endl;
+	std::cerr << "I'm not connected to the database" << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
 //
 // Get the family name list for the wanted domain in the NAMES table
 //
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
         query = "SELECT DISTINCT family FROM device WHERE domain = '" + user_domain + "' ORDER BY family ASC";
@@ -159,11 +159,11 @@ db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
         query = "SELECT DISTINCT FAMILY FROM NAMES WHERE DOMAIN = '" + user_domain + "' ORDER BY FAMILY ASC";
     }
 #ifdef DEBUG
-    cout << "MySQLServer::devfamilylist_1_svc(): query " << query << endl;
+    std::cout << "MySQLServer::devfamilylist_1_svc(): query " << query << std::endl;
 #endif /* DEBUG */
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return (&browse_back);
     }
@@ -181,7 +181,7 @@ db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
         query = "SELECT DISTINCT FAMILY FROM PS_NAMES WHERE DOMAIN = '" + user_domain + "' ORDER BY FAMILY ASC";
         if (mysql_query(mysql_conn, query.c_str()) != 0)
         {
-	    cerr << mysql_error(mysql_conn) << endl;
+	    std::cerr << mysql_error(mysql_conn) << std::endl;
 	    browse_back.db_err = DbErr_DatabaseAccess;
 	    return (&browse_back);
         }
@@ -204,14 +204,14 @@ db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
     {
 	int	k = fam_list[i].length();
         browse_back.res_val.arr1_val[i] = new char [k + 1];
-        fam_list[i].copy(browse_back.res_val.arr1_val[i],string::npos);
+        fam_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
         (browse_back.res_val.arr1_val[i])[k] = '\0';
     }
 #ifdef DEBUG
-    cout << "Found the following families in the domain " << user_domain << endl;
-    for (vector<string>::iterator it = fam_list.begin(); it != fam_list.end(); ++it)
-	cout << *it << endl;
-    cout << endl;
+    std::cout << "Found the following families in the domain " << user_domain << std::endl;
+    for (std::vector<std::string>::iterator it = fam_list.begin(); it != fam_list.end(); ++it)
+	std::cout << *it << std::endl;
+    std::cout << std::endl;
 #endif
 //
 // Return data
@@ -236,15 +236,15 @@ db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
 ****************************************************************************/
 db_res *MySQLServer::devmemberlist_1_svc(db_res *recev)
 {
-    vector<string> memb_list;
+    std::vector<std::string> memb_list;
 //
 // Build strings from input names
 //
-    string user_domain(recev->res_val.arr1_val[0]);
-    string user_family(recev->res_val.arr1_val[1]);
+    std::string user_domain(recev->res_val.arr1_val[0]);
+    std::string user_family(recev->res_val.arr1_val[1]);
 	
 #ifdef DEBUG
-    cout << "In devmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << endl;
+    std::cout << "In devmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << std::endl;
 #endif
 	
 //
@@ -258,14 +258,14 @@ db_res *MySQLServer::devmemberlist_1_svc(db_res *recev)
 //
     if (!dbgen.connected)
     {
-	cerr << "I'm not connected to the database" << endl;
+	std::cerr << "I'm not connected to the database" << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
 //
 // Get the member name list for the wanted domain and family from NAMES table
 //
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
         query = "SELECT DISTINCT member FROM device WHERE domain = '" + user_domain;
@@ -277,11 +277,11 @@ db_res *MySQLServer::devmemberlist_1_svc(db_res *recev)
         query += "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC";
     }
 #ifdef DEBUG
-    cout << "MySQLServer::devfamilylist_1_svc(): query " << query << endl;
+    std::cout << "MySQLServer::devfamilylist_1_svc(): query " << query << std::endl;
 #endif /* DEBUG */
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return (&browse_back);
     }
@@ -301,7 +301,7 @@ db_res *MySQLServer::devmemberlist_1_svc(db_res *recev)
         query += "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC";
         if (mysql_query(mysql_conn, query.c_str()) != 0)
         {
-	    cerr << mysql_error(mysql_conn) << endl;
+	    std::cerr << mysql_error(mysql_conn) << std::endl;
 	    browse_back.db_err = DbErr_DatabaseAccess;
 	    return (&browse_back);
         }
@@ -321,7 +321,7 @@ db_res *MySQLServer::devmemberlist_1_svc(db_res *recev)
     {
 	int	k = memb_list[i].length();
         browse_back.res_val.arr1_val[i] = new char [k + 1];
-        memb_list[i].copy(browse_back.res_val.arr1_val[i],string::npos);
+        memb_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
         (browse_back.res_val.arr1_val[i])[k] = '\0';
     }
 //

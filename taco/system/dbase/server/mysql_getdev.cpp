@@ -28,10 +28,10 @@
 ****************************************************************************/
 db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 {
-    string 		domain,	
+    std::string 	domain,	
     			family("*"),			
     			member("*");
-    string::size_type	pos,
+    std::string::size_type	pos,
 			last_pos;
     int 		dev_num = 0;
     char 		**ptra;
@@ -47,7 +47,7 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 //
     if (dbgen.connected == False)
     {
-	cerr << "I'm not connected to database" << endl;
+	std::cerr << "I'm not connected to database" << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	browse_back.res_val.arr1_len = 0;
 	return(&browse_back);
@@ -83,8 +83,8 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 // initialized and if there is no / in the filter string, just the domain
 // is initialized. 
 //
-    string tmpf(*fil_name);
-    string query;
+    std::string tmpf(*fil_name);
+    std::string query;
     if (mysql_db == "tango")
     {
         query = "SELECT CONCAT(domain, '/', family, '/', member) FROM device WHERE";
@@ -132,16 +132,16 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 		     query += ("DOMAIN = '" + tmpf + "'");
                  }
 		 break;
-	default: cerr << "To many '/' in device name." << endl;
+	default: std::cerr << "To many '/' in device name." << std::endl;
 		 browse_back.db_err = 1;
 		 browse_back.res_val.arr1_len = 0;
 		 return (&browse_back);		 		 
     }
     query += (" AND PROGRAM_NUMBER != 0");
 #ifdef DEBUG
-    cout << "filter domain : " << domain << endl;
-    cout << "filter family : " << family << endl;
-    cout << "filter member : " << member << endl;
+    std::cout << "filter domain : " << domain << std::endl;
+    std::cout << "filter family : " << family << std::endl;
+    std::cout << "filter member : " << member << std::endl;
 #endif 
 //
 // Try to retrieve all tuples in the database NAMES table with the PN column
@@ -177,7 +177,7 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 	    	strcpy(ptra[i], row[0]);
 	    }
 	}
-	catch(bad_alloc)
+	catch(std::bad_alloc)
     	{
 	    mysql_free_result(result);
 	    for (int j = 0; j < i; j++)

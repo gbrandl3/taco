@@ -35,7 +35,7 @@ db_res *MySQLServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
     			k = 0;
     u_int 		num_res,
 			err_db;
-    string		tab_name,
+    std::string		tab_name,
     			rest;
     struct sockaddr_in 	so;
 #if defined __GLIBC__  &&  __GLIBC__ >= 2
@@ -103,11 +103,11 @@ db_res *MySQLServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 //
     	for(i = 0; i < num_res; i++)
     	{
-	    string ptrc = rece->arr1_val[i];
+	    std::string ptrc = rece->arr1_val[i];
 //
 // Find the table name (DOMAIN) 
 //
-	    string::size_type pos = ptrc.find('/');
+	    std::string::size_type pos = ptrc.find('/');
 	    tab_name = ptrc.substr(0, pos);
 	    rest = ptrc.substr(pos + 1);
 //
@@ -144,7 +144,7 @@ db_res *MySQLServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 //
     	browse_back.res_val.arr1_len = num_res;
     }
-    catch(bad_alloc)
+    catch(std::bad_alloc)
     {
 	for (int j = 0; j <= i; j++)
 	    delete [] browse_back.res_val.arr1_val[j];
@@ -244,13 +244,13 @@ db_res *MySQLServer::db_getdev_1_svc(nam *dev_name)
 *    there is a problem.                                                    *
 *                                                                           *
 ****************************************************************************/
-int MySQLServer::db_find(string tab_name, string p_res_name, char **out, int *k1)
+int MySQLServer::db_find(std::string tab_name, std::string p_res_name, char **out, int *k1)
 {
-    string		family,
+    std::string		family,
 			member,
 			r_name,
     			adr_tmp1;
-    string::size_type	pos,
+    std::string::size_type	pos,
 			last_pos;
     int 		k,
 			sec_res,
@@ -277,7 +277,7 @@ int MySQLServer::db_find(string tab_name, string p_res_name, char **out, int *k1
 // Get resource name
 //
     r_name = p_res_name.substr(pos + 1);
-    if ((pos = r_name.find('/')) != string::npos)
+    if ((pos = r_name.find('/')) != std::string::npos)
 	r_name.erase(pos,1);
 //
 // For security domain, change all occurances of | by ^ (| is the field
@@ -308,7 +308,7 @@ int MySQLServer::db_find(string tab_name, string p_res_name, char **out, int *k1
 // Try to retrieve the resource in table and loop in the case of an
 // array of resources 
 //
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
         query = "SELECT count, value FROM property_device ";
@@ -322,7 +322,7 @@ int MySQLServer::db_find(string tab_name, string p_res_name, char **out, int *k1
         query += "' ORDER BY INDEX_RES ASC";
     }
 #ifdef DEBUG
-    cout << "MySQLServer::db_find(): query = " << query << endl;
+    std::cout << "MySQLServer::db_find(): query = " << query << std::endl;
 #endif /* DEBUG */
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
@@ -372,7 +372,7 @@ int MySQLServer::db_find(string tab_name, string p_res_name, char **out, int *k1
 		     break;
     	}
     }
-    catch(const bad_alloc &e)
+    catch(const std::bad_alloc &e)
     {
 	std::cerr << "Error in malloc for out" << std::endl;
 	throw e;
@@ -411,13 +411,13 @@ int MySQLServer::db_find(string tab_name, string p_res_name, char **out, int *k1
 *    there is a problem.                                                    *
 *                                                                           *
 ****************************************************************************/
-int MySQLServer::db_devlist(string dev_na, int *dev_num, db_res *back)
+int MySQLServer::db_devlist(std::string dev_na, int *dev_num, db_res *back)
 {
     register char 	**ptra;
     int 		dev_numb = 1;
-    string::size_type	pos;
+    std::string::size_type	pos;
     unsigned int 	diff;
-    string		ds_class,
+    std::string		ds_class,
 			ds_name;
 
 //
@@ -438,7 +438,7 @@ int MySQLServer::db_devlist(string dev_na, int *dev_num, db_res *back)
 // Try to retrieve the right tuple in NAMES table 
 //
 //  
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
     	query = "SELECT name FROM device WHERE server = '" + ds_class + "/" + ds_name + "'";
@@ -488,7 +488,7 @@ int MySQLServer::db_devlist(string dev_na, int *dev_num, db_res *back)
     	back->res_val.arr1_len = *dev_num = d_num;
         mysql_free_result(result); 
     }
-    catch(bad_alloc)
+    catch(std::bad_alloc)
     {
     	mysql_free_result(result); 
         for (int j = 0; j < i; j++)
@@ -531,9 +531,9 @@ DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
 {
     int 		res_num = rece->tab_putres_len,
 			res_numb = 1;
-    string::size_type	pos,
+    std::string::size_type	pos,
 			last_pos;
-    string		res_name,
+    std::string		res_name,
 			res_val;
     register putres 	*tmp_ptr;
     unsigned int 	ctr;
@@ -561,7 +561,7 @@ DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
 //
     for (int ires = 0; ires < res_num; ires++)
     {
-	string 	content;
+	std::string 	content;
 	tmp_ptr = &(rece->tab_putres_val[ires]);
 	res_numb = 1;
 	res_name = tmp_ptr->res_name;
@@ -582,7 +582,7 @@ DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
 // it is not necessary to look for the element separator to extract the last
 // element value from the string. 
 //
-	    if ((pos = res_val.find(SEP_ELT)) == string::npos)
+	    if ((pos = res_val.find(SEP_ELT)) == std::string::npos)
 	    {
 		std::cerr << "Missing '" << SEP_ELT <<"' in resource value." << std::endl;
 		errcode = DbErr_BadDevSyntax;
@@ -729,19 +729,19 @@ DevLong *MySQLServer::db_delres_1_svc(arr1 *rece/*, struct svc_req *rqstp*/)
 *    there is a problem.                                                    *
 *                                                                           *
 ****************************************************************************/
-int MySQLServer::db_insert(string res_name, string number, string content)
+int MySQLServer::db_insert(std::string res_name, std::string number, std::string content)
 {
-    string		domain,
+    std::string		domain,
     			family,
     			member,
     			r_name;
-    string::size_type 	pos, 
+    std::string::size_type 	pos, 
 			last_pos;
     int 		i;
 //
 // Get table name 
 //
-    if ((pos = res_name.find('/')) == string::npos)
+    if ((pos = res_name.find('/')) == std::string::npos)
     {
 	std::cerr << "db_del : Error in resource name " << res_name << std::endl;
 	return(DbErr_BadResourceType);
@@ -750,7 +750,7 @@ int MySQLServer::db_insert(string res_name, string number, string content)
 //
 // Get family name 
 //
-    if ((pos = res_name.find('/', (last_pos = pos + 1))) == string::npos)
+    if ((pos = res_name.find('/', (last_pos = pos + 1))) == std::string::npos)
     {
 	std::cerr << "db_insert : Error in resource name " << res_name << std::endl;
 	return(DbErr_BadResourceType);
@@ -759,7 +759,7 @@ int MySQLServer::db_insert(string res_name, string number, string content)
 //
 // Get member name 
 //
-    if ((pos = res_name.find('/', (last_pos = pos + 1))) == string::npos)
+    if ((pos = res_name.find('/', (last_pos = pos + 1))) == std::string::npos)
     {
 	std::cerr << "db_insert : Error in resource name " <<res_name << std::endl;
 	return(DbErr_BadResourceType);
@@ -784,7 +784,7 @@ int MySQLServer::db_insert(string res_name, string number, string content)
     if (i == dbgen.TblNum)
 	return(DbErr_DomainDefinition);
 //
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
         query = "INSERT INTO property_device(device,name,domain,family,member,count,value) VALUES('" + domain + "/" + family + "/" + member + "','" + r_name + "','"; 
@@ -797,7 +797,7 @@ int MySQLServer::db_insert(string res_name, string number, string content)
         query += (r_name + "','" + number + "','" + content + "')");
     }
 #ifdef DEBUG
-    cout << "MySQLServer::db_insert(): query = " << query;
+    std::cout << "MySQLServer::db_insert(): query = " << query;
 #endif /* DEBUG */
     if (mysql_query(mysql_conn, query.c_str()))
     {
@@ -830,19 +830,19 @@ int MySQLServer::db_insert(string res_name, string number, string content)
 *    there is a problem.                                                    *
 *                                                                           *
 ****************************************************************************/
-int MySQLServer::db_del(string res_name)
+int MySQLServer::db_del(std::string res_name)
 {
-    string		t_name,
+    std::string		t_name,
     			family,
     			member,
     			r_name;
-    string::size_type 	pos, 
+    std::string::size_type 	pos, 
 			last_pos;
     int			i;
 //
 // Get table name 
 //
-    if ((pos = res_name.find('/')) == string::npos)
+    if ((pos = res_name.find('/')) == std::string::npos)
     {
 	std::cerr << "db_del : Error in resource name " << res_name << std::endl;
 	return(DbErr_BadResourceType);
@@ -851,7 +851,7 @@ int MySQLServer::db_del(string res_name)
 //
 // Get family name 
 //
-    if ((pos = res_name.find('/', 1 + (last_pos = pos))) == string::npos)
+    if ((pos = res_name.find('/', 1 + (last_pos = pos))) == std::string::npos)
     {
 	std::cerr << "db_del : Error in resource name " << res_name << std::endl;
 	return(DbErr_BadResourceType);
@@ -860,7 +860,7 @@ int MySQLServer::db_del(string res_name)
 //
 // Get member name 
 //
-    if ((pos = res_name.find('/', 1 + (last_pos = pos))) == string::npos)
+    if ((pos = res_name.find('/', 1 + (last_pos = pos))) == std::string::npos)
     {
 	std::cerr << "db_del : Error in resource name " <<res_name << std::endl;
 	return(DbErr_BadResourceType);
@@ -889,7 +889,7 @@ int MySQLServer::db_del(string res_name)
 // Try to retrieve the right tuple in table and loop for the case of an
 // array of resource 
 //
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
         query = "DELETE FROM property_device WHERE device = '" + t_name + "/" + family + "/" + member + "'";
@@ -902,7 +902,7 @@ int MySQLServer::db_del(string res_name)
     }
 
 #ifdef DEBUG
-    cout << "db_del : query = " << query << endl;
+    std::cout << "db_del : query = " << query << std::endl;
 #endif /* DEBUG */
 
     if (mysql_query(mysql_conn, query.c_str()))

@@ -18,12 +18,12 @@
 ****************************************************************************/
 db_res *MySQLServer::devserverlist_1_svc()
 {
-    string 		server;
-    vector<string> 	serv_list;
+    std::string 		server;
+    std::vector<std::string> 	serv_list;
     int			i;
 	
 #ifdef DEBUG
-    cout << "In devserverlist_1_svc function" << endl;
+    std::cout << "In devserverlist_1_svc function" << std::endl;
 #endif
 
 //
@@ -37,7 +37,7 @@ db_res *MySQLServer::devserverlist_1_svc()
 //
     if (dbgen.connected == False)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -47,10 +47,10 @@ db_res *MySQLServer::devserverlist_1_svc()
 //
 // Sort device server name list
 //
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT DISTINCT SUBSTRING_INDEX(server,'/',1) FROM device ORDER BY server ASC";
+        query = "SELECT DISTINCT SUBstd::string_INDEX(server,'/',1) FROM device ORDER BY server ASC";
     }
     else
     {
@@ -58,7 +58,7 @@ db_res *MySQLServer::devserverlist_1_svc()
     }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return(&browse_back);			
     }
@@ -68,7 +68,7 @@ db_res *MySQLServer::devserverlist_1_svc()
     {
 	serv_list.push_back(row[0]);		
 #ifdef DEBUG
-	cout << "devserverlist_1_svc(): server found " << row[0] << endl;
+	std::cout << "devserverlist_1_svc(): server found " << row[0] << std::endl;
 #endif /* DEBUG */
     }
     mysql_free_result(result);
@@ -82,13 +82,13 @@ db_res *MySQLServer::devserverlist_1_svc()
     {
         int     k = serv_list[i].length();
         browse_back.res_val.arr1_val[i] = new char [k + 1];
-        serv_list[i].copy(browse_back.res_val.arr1_val[i],string::npos);
+        serv_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
         (browse_back.res_val.arr1_val[i])[k] = '\0';
     }                                                                                                                                        
 #if 0
     if (serv_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
     {
-	cerr << "Memory allocation error in devserverlist" << endl;
+	std::cerr << "Memory allocation error in devserverlist" << std::endl;
 	browse_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&browse_back);
     }
@@ -116,12 +116,12 @@ db_res *MySQLServer::devserverlist_1_svc()
 ****************************************************************************/
 db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
 {
-    string 		user_server(*server);
-    vector<string>	pers_list;
+    std::string 		user_server(*server);
+    std::vector<std::string>	pers_list;
     int			i;
 
 #ifdef DEBUG
-    cout << "In devpersnamelist_1_svc function for server " << user_server << endl;
+    std::cout << "In devpersnamelist_1_svc function for server " << user_server << std::endl;
 #endif
 
 //
@@ -135,7 +135,7 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
 //
     if (dbgen.connected == False)
     {
-	cerr << "I'm not connected to database." << endl;
+	std::cerr << "I'm not connected to database." << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -145,11 +145,11 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
 //
 // Sort device server personal name list
 //
-    string query;
+    std::string query;
 
     if (mysql_db == "tango")
     {
-        query = "SELECT DISTINCT SUBSTRING_INDEX(server,'/',-1) FROM device WHERE server like '";
+        query = "SELECT DISTINCT SUBstd::string_INDEX(server,'/',-1) FROM device WHERE server like '";
         query += (user_server + "/%' ORDER BY server ASC");
     }
     else
@@ -159,7 +159,7 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
     }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return(&browse_back);			
     }
@@ -169,7 +169,7 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
     {
 	pers_list.push_back(row[0]);
 #ifdef DEBUG
-	cout << "devserverlist_1_svc(): server found " << row[0] << endl;
+	std::cout << "devserverlist_1_svc(): server found " << row[0] << std::endl;
 #endif /* DEBUG */
     }
     mysql_free_result(result);
@@ -183,13 +183,13 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
     {
         int     k = pers_list[i].length();
         browse_back.res_val.arr1_val[i] = new char [k + 1];
-        pers_list[i].copy(browse_back.res_val.arr1_val[i],string::npos);
+        pers_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
         (browse_back.res_val.arr1_val[i])[k] = '\0';
     }                                                                                                                                        
 #if 0
     if (pers_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
     {
-		cerr << "Memory allocation error in devpersnamelist" << endl;
+		std::cerr << "Memory allocation error in devpersnamelist" << std::endl;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
     }
@@ -217,10 +217,10 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
 ****************************************************************************/
 db_res *MySQLServer::hostlist_1_svc()
 {
-    vector<string>	host_list;
+    std::vector<std::string>	host_list;
 	
 #ifdef DEBUG
-    cout << "In hostlist_1_svc function" << endl;
+    std::cout << "In hostlist_1_svc function" << std::endl;
 #endif
 
 //
@@ -245,7 +245,7 @@ db_res *MySQLServer::hostlist_1_svc()
 // Get the host name list from the NAMES table for all exported devices (for DS with DB library release 4)
 // and sort device server host list
 //
-    string query;
+    std::string query;
     if (mysql_db == "tango")
     {
         query = "SELECT DISTINCT host FROM device WHERE exported != 0 ORDER host ASC";
@@ -256,7 +256,7 @@ db_res *MySQLServer::hostlist_1_svc()
     }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	cerr << mysql_error(mysql_conn) << endl;
+	std::cerr << mysql_error(mysql_conn) << std::endl;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return(&browse_back);			
     }
@@ -275,13 +275,13 @@ db_res *MySQLServer::hostlist_1_svc()
     {
         int     k = host_list[i].length();
         browse_back.res_val.arr1_val[i] = new char [k + 1];
-        host_list[i].copy(browse_back.res_val.arr1_val[i],string::npos);
+        host_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
         (browse_back.res_val.arr1_val[i])[k] = '\0';
     }                                                                                                                                        
 #if 0
     if (host_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
     {
-		cerr << "Memory allocation error in hostlist" << endl;
+		std::cerr << "Memory allocation error in hostlist" << std::endl;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
     }
