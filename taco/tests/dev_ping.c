@@ -20,7 +20,14 @@
 #include <API.h>
 #include <DevServer.h>
 #include <time.h>
-#include <signal.h>
+
+#if HAVE_SYS_SIGNAL_H
+#	include <sys/signal.h>
+#elif HAVE_SIGNAL_H
+#	include <signal.h>
+#else
+#error could not find signal.h
+#endif
 
 /*
  * global variables
