@@ -12,20 +12,21 @@
 *    Code for db_resput command                                  
 *                        ---------                                          
 *                                                                           
-*    Command rule : To get a resource from the static database.          
+*    Command rule : To put a resource into the static database.          
 *                                                                           
-*    Synopsis : db_resput resource_name resource_val
+*    Synopsis : db_resput resource_name resource_value [resource_value [resource_value] ... ]
 *                                                                           
 ****************************************************************************/
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
+	DevVarStringArray       server_list = {0, NULL};
 	long error;
 //
 // Argument test and device name structure
 //
-	if (argc != 3)
+	if (argc < 3)
 	{
-		std::cerr << "usage : " << *argv << " resource_name resource_val" << std::endl;
+		std::cerr << "usage : " << *argv << " resource_name resource_value [resource_value [resource_value] ... ]" << std::endl;
 		exit(-1);
 	}
 
@@ -34,11 +35,12 @@ int main(int argc, char **argv)
 //
 // Test resource name syntax
 //
-	int	max_slashes = (full_res_name.substr(0, 2) == "//") ? 6 : 3;
+	int  max_slashes = (full_res_name.substr(0, 2) == "//") ? 6 : 3;
 	if (std::count(full_res_name.begin(), full_res_name.end(), '/') != max_slashes)
 	{
-		std::cerr << "db_resput : Bad resource name" << std::endl;
+		std::cerr << "db_resdel : Bad resource name" << std::endl;
 		exit(-1);
+
 	}
 //
 // Extract device name from full resource name
@@ -58,7 +60,7 @@ int main(int argc, char **argv)
 	std::string domain(full_res_name, 0, pos);
 	if (domain == "sec")
 	{
-		std::cerr << "db_resput : SEC is not a authorized domain name" << std::endl;
+		std::cerr << "db_resdel : SEC is not a authorized domain name" << std::endl;
 		exit(-1);
 	}
 //
@@ -73,10 +75,15 @@ int main(int argc, char **argv)
 // Ask database server to delete resource
 // Display error message if the call fails
 //
-	unsigned int res_nb = 1;
-	char *tmp = argv[2]; 
-	db_resource resTable [] = {{ res_name.c_str(), D_STRING_TYPE, &tmp},};
-	if (db_putresource(const_cast<char *>(dev_name.c_str()), resTable, 1, &error) == -1)
+	db_resource             server = {res_name.c_str(), D_VAR_STRINGARR, &server_list};
+	server_list.length = argc - 2;
+	server_list.sequence = new char *[server_list.length];
+	for (int i = 0; i < server_list.length; ++i)
+	{
+		server_list.sequence[i] = new char[strlen(argv[2 + i]) + 1];
+		strcpy(server_list.sequence[i], argv[2 + i]);
+	}
+	if (db_putresource(const_cast<char *>(dev_name.c_str()), &server, 1, &error) != DS_OK)
 	{
 		std::cerr << "The call to database server failed with error " << error << std::endl;
 		std::cerr << "Error message : " << dev_error_str(error) << std::endl;

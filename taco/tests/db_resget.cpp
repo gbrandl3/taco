@@ -75,8 +75,8 @@ int main(int argc, char *argv[])
 // Display error message if the call fails
 //
 	unsigned int res_nb = 1;
-	char *tmp = NULL; 
-	db_resource resTable [] = {{ res_name.c_str(), D_STRING_TYPE, &tmp},};
+	DevVarStringArray tmp = {0, NULL};
+	db_resource resTable [] = {{ res_name.c_str(), D_VAR_STRINGARR, &tmp},};
 	if (db_getresource(const_cast<char *>(dev_name.c_str()), resTable, 1, &error) == -1)
 	{
 		if (error == DbErr_ResourceNotDefined)
@@ -91,6 +91,9 @@ int main(int argc, char *argv[])
 			exit(-1);
 		}
 	}
-	std::cout << tmp << std::endl;
+	int i = 0;
+	for (i = 0; i < tmp.length - 1; ++i)
+		std::cout << tmp.sequence[i] << ",";
+	std::cout << tmp.sequence[i] << std::endl;
 	return 0;
 }

@@ -71,7 +71,12 @@ AT_CLEANUP
 
 AT_SETUP([db_putresource function])
 AT_CHECK([AT_TACO_RUN_LOCAL
-db_resput test/device/2/res1 TEST], [])
+db_resput test/device/2/res1 TEST
+db_resget test/device/2/res1
+db_resput test/device/2/res1 TEST TEST2 TEST3
+db_resget test/device/2/res1], [], [[TEST
+TEST,TEST2,TEST3
+]])
 AT_CLEANUP
 
 AT_SETUP([db_delresource function])
@@ -140,3 +145,4 @@ db_devmember test device
 ], [], [[1
 ]])
 AT_CLEANUP
+
