@@ -1,6 +1,6 @@
 #! /bin/sh
 i=0 
-export NETHOST=taco6 
+export NETHOST=${NETHOST:-`hostname`} 
 while test $i -lt 1000 ; do 
 	echo $i  
 	./db_resfamily class  
