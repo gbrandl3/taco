@@ -1,4 +1,4 @@
-##  check-agps 
+SUBDIRS		= 
 
 EXTRA_DIST 	= taco.in 
 
@@ -27,7 +27,8 @@ AUTOTEST 	= $(AUTOM4TE) --language=autotest
 
 check_PROGRAMS 	= db_connect db_resget db_resput \
 		db_resdomain db_resfamily db_resmember dev_ping \
-		test_asc_dyn test_asc_stat test_tc test_start
+		test_asc_dyn test_asc_stat test_tc test_starter \
+		test_cmd_query
 
 check_SCRIPT	= taco
 
@@ -54,8 +55,11 @@ db_resmember_LDADD 	= @TACO_CLIENT_LIBS@
 dev_ping_SOURCES 	= dev_ping.c
 dev_ping_LDADD 		= @TACO_CLIENT_LIBS@ -ldl
 
-test_start_SOURCES	= test_start.cpp
-test_start_LDADD	= @TACO_CLIENT_LIBS@
+test_starter_SOURCES	= test_start.cpp
+test_starter_LDADD	= @TACO_CLIENT_LIBS@
+
+test_cmd_query_SOURCES	= test_cmd_query.cpp
+test_cmd_query_LDADD	= @TACO_CLIENT_LIBS@
 
 $(srcdir)/package.m4:	$(top_srcdir)/configure.ac
 	{\
