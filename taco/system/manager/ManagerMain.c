@@ -13,9 +13,9 @@
 
  Original: 	January 1991
 
- Version:	$Revision: 1.4 $
+ Version:	$Revision: 1.5 $
 
- Date:		$Date: 2003-12-09 13:31:45 $
+ Date:		$Date: 2003-12-09 13:37:07 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -138,14 +138,8 @@ int main (int argc, char **argv)
 	dshome = "/h0";
 #endif /* _OSK */
 
-	if (dshome != NULL)
-	{
-		snprintf (homepath, sizeof(homepath) - 1, "%s", dshome);
-	}
-	else
-	{
-		snprintf(homepath, sizeof(homepath) - 1, "./");
-	}
+	strncpy(homepath, dshome ? dshome : "./", sizeof(homepath) - 1);
+
 #ifdef NEVER
 #ifdef linuxx86
 	snprintf (homepath, sizeof(homepath) - 1, "%s/system/bin/linux/x86", dshome);
@@ -185,7 +179,6 @@ int main (int argc, char **argv)
 /*
  * Check the environment if DBM database is used !!
  */
-
 	if (c_flags.rtdb == False )
 	{
 		if (c_flags.oracle == False )
