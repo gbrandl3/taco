@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0rc3, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.28 $)dnl
+AC_REVISION($Revision: 1.29 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -93,6 +93,7 @@ AC_CHECK_DECLS([get_myaddress], [], [], [
 #endif
 ]) 
 AC_CHECK_FUNCS([get_myaddress])
+AC_CHECK_DECLS([gethostname])
 
 AC_SUBST(QT_INCLUDES, ['-I/usr/lib/qt3/include'])
 AC_SUBST(UIC, ['/usr/lib/qt3/bin/uic'])
@@ -144,6 +145,9 @@ TACO_MYSQL_SUPPORT
 TACO_GRETA
 TACO_XDEVMENU
 TACO_ALARM
+
+dnl the startup routine should not be built in the dsapi library on Mac OS X systems
+AM_CONDITIONAL(BUILTIN_STARTUP, ! echo $target|grep darwin)
 
 AC_SUBST([RPM_RELEASE], 0)
 AM_RPM_INIT
