@@ -90,7 +90,7 @@ NdbmNamesKey::NdbmNamesKey(const string &server, const string &pers_name, const 
     	key.dsize = strlen(to.str());
 	to.freeze(false);
 #else
-    	key.dsize = to.str().size();
+    	key.dsize = strlen(to.str().c_str());
 #endif
     }
     catch (bad_alloc)
@@ -199,7 +199,7 @@ void NdbmNamesKey::upd_indi(long ind)
     key.dsize = strlen(to.str()) - 1;
     to.freeze(false);
 #else
-    key.dsize = to.str().size() - 1;
+    key.dsize = strlen(to.str().c_str());
 #endif
     return;
 }
@@ -832,10 +832,10 @@ NdbmResKey::NdbmResKey(string &family,string &member,string &r_name,long indi=1)
 #endif
 	to << inter_str << indi << '|' << ends;
 #if !HAVE_SSTREAM
-	key.dsize = strlen(to.str()) - 1;
+	key.dsize = strlen(to.str());
 	to.freeze(false);
 #else
-	key.dsize = to.str().size() - 1;
+	key.dsize = strlen(to.str().c_str());
 #endif
     }
     catch (bad_alloc)
@@ -874,7 +874,7 @@ NdbmResKey::NdbmResKey(string &key_str)
 	key.dsize = strlen(to.str());
 	to.freeze(false);
 #else
-	key.dsize = to.str().size();
+	key.dsize = strlen(to.str().c_str());
 #endif
 	str = key_str;	
     }
@@ -952,7 +952,7 @@ void NdbmResKey::upd_indi(long ind)
     key.dsize = strlen(to.str());
     to.freeze(false);
 #else
-    key.dsize = to.str().size();
+    key.dsize = strlen(to.str().c_str());
 #endif
 }
 

@@ -1,5 +1,20 @@
 #include "config.h"
+#include <API.h>
+
 #include <DevErrors.h>
+#if defined (FreeBSD)
+#	include <stdlib.h>
+#else
+#	include <malloc.h>
+#endif
+
+#include <sys/socket.h>
+#include <db_xdr.h>
+#include <fcntl.h>
+
+/* Some C++ include files */
+
+#include <iostream>
 #include <NdbmClass.h>
 #include <NdbmServer.h>
 #include <algorithm>
@@ -86,18 +101,18 @@ db_res *NdbmServer::db_getres_1_svc(arr1 * rece, struct svc_req *rqstp)
     else
 	prot = IPPROTO_TCP;
 #else
-    so_size = sizeof(so);
-    if (getsockname(rqstp->rq_xprt->xp_sock, (struct sockaddr *)&so, &so_size) == -1)
-    {
-	browse_back.db_err = DbErr_TooManyInfoForUDP;
-	browse_back.res_val.arr1_len = 0;
-	return (&browse_back);
-    }
+	so_size = sizeof(so);
+	if (getsockname(rqstp->rq_xprt->xp_sock,(struct sockaddr *)&so, (socklen_t *)&so_size) == -1)
+	{
+		browse_back.db_err = DbErr_TooManyInfoForUDP;
+		browse_back.res_val.arr1_len = 0;
+		return(&browse_back);
+	}
 
-    if (so.sin_port == getUDPPort())
-	prot = IPPROTO_UDP;
-    else
-	prot = IPPROTO_TCP;
+    	if (so.sin_port == getUDPPort())
+		prot = IPPROTO_UDP;
+	else
+		prot = IPPROTO_TCP;
 #endif /*solaris */
 
 #ifdef DEBUG

@@ -19,67 +19,67 @@
 ****************************************************************************/
 db_psdev_error *NdbmServer::upddev_1_svc(db_res *dev_list)
 {
-    long list_nb = dev_list->res_val.arr1_len;
+	long list_nb = dev_list->res_val.arr1_len;
 		
 #ifdef DEBUG
-    cout << "In upddev_1_svc function for " << list_nb << " device list(s)" << endl;
+	cout << "In upddev_1_svc function for " << list_nb << " device list(s)" << endl;
 #endif
 //
-// Initialize parameter sent back to client */
+// Initialize parameter sent back to client 
 //
-    psdev_back.error_code = 0;
-    psdev_back.psdev_err = 0;
+	psdev_back.error_code = 0;
+	psdev_back.psdev_err = 0;
 //
 // A loop on each device list */
 //
-    for (long i = 0; i < list_nb; i++)
-    {
+	for (long i = 0; i < list_nb; i++)
+	{
 //		
 // Allocate memory for strtok pointers
 //
-	string	lin(dev_list->res_val.arr1_val[i]);
+		string	lin(dev_list->res_val.arr1_val[i]);
 #ifdef DEBUG
-	cout << "Device list = " << lin << endl;
+		cout << "Device list = " << lin << endl;
 #endif 
 //
 // Find the last device in the list. If there is no , character in the line,
 // this means that there is only one device in the list 
 //
-	string::size_type	pos = lin.rfind(",");
-	int			last(False);
-	if (pos == string::npos)
-	{
-	    pos = lin.find(":");
-	    last = True;
-	}
-	string	last_dev = lin.substr(pos + 1);
+		string::size_type	pos = lin.rfind(",");
+		int			last(False);
+		if (pos == string::npos)
+		{
+			pos = lin.find(":");
+			last = True;
+		}
+		string	last_dev = lin.substr(pos + 1);
 //
 // Extract each device from the list and update table each time 
 //
-	int	ind(1);
-	do
-	{
-	    pos = lin.find(",");
-	    string	dev = (pos == string::npos) ? lin : lin.substr(0, pos);
-	    try
-	    {
-	    	upd_name(dev, lin, ind, last);
-	    }
-	    catch(const long err)
-	    {
-	    	psdev_back.psdev_err = i + 1;
-		psdev_back.error_code = err;
-	    	return(&psdev_back);
-	    }
-	    lin.erase(0, pos + 1);
-	    last = (dev == last_dev);
-	    ind++;	
-	}while(pos != string::npos);
-    }
+		int	ind(1);
+		do
+		{
+			pos = lin.find(",");
+			string	dev = (pos == string::npos) ? lin : lin.substr(0, pos);
+			try
+			{
+	    			upd_name(dev, lin, ind, last);
+	    		}
+			catch(const long err)
+			{
+				psdev_back.psdev_err = i + 1;
+				psdev_back.error_code = err;
+				return(&psdev_back);
+	    		}
+	    		lin.erase(0, pos + 1);
+	    		last = (dev == last_dev);
+	    		ind++;	
+		}while(pos != string::npos);
+    	}
 //
 // return data
 //
-    return(&psdev_back);
+	return(&psdev_back);
 }
 
 
@@ -156,13 +156,13 @@ long NdbmServer::upd_name(string lin, string ptr,int ind, long last) throw (long
 //
 	pos = lin.find('/');
 	strcpy(dev.ds_class, lin.substr(last_pos, pos - last_pos).c_str());
-	last_pos = pos;
+	last_pos = pos + 1;
 	strcpy(key_sto.dptr, dev.ds_class);
 	strcat(key_sto.dptr, "|");
 //
 // Get device server name 
 //
-	pos = lin.find('/', last_pos + 1);
+	pos = lin.find('/', last_pos);
 	strcpy(dev.ds_name, lin.substr(last_pos, pos - last_pos).c_str());
 	last_pos = pos;
 	strcat(key_sto.dptr,dev.ds_name);
@@ -183,6 +183,14 @@ long NdbmServer::upd_name(string lin, string ptr,int ind, long last) throw (long
 	strcpy(content.dptr, dev.d_name);
 	strcat(content.dptr, "|");
     }
+#define DEBUG
+#ifdef DEBUG
+	cout << "Device server class : " << dev.ds_class << endl;
+	cout << "Device server name : " << dev.ds_name << endl;
+	cout << "Device name : " << dev.d_name << endl;
+	cout << "Device number (in device list) : " << ind << endl;
+#endif /* DEBUG */
+#undef DEBUG
 //
 // Allocate memory for the dena structures array 
 //
@@ -206,19 +214,13 @@ long NdbmServer::upd_name(string lin, string ptr,int ind, long last) throw (long
 	    delete [] (key_sto.dptr);
 	    return(-1);
 	}
-#ifdef DEBUG
-	cout << "Device server class : " << dev.ds_class << endl;
-	cout << "Device server name : " << dev.ds_name << endl;
-	cout << "Device name : " << dev.d_name << endl;
-	cout << "Device number (in device list) : " << ind << endl;
-	cout << "Returned from the del_name function" << endl;
-#endif /* DEBUG */
     }
+    cout << "Returned from the 'del_name' function " << dev.d_name << endl;
 
 //
 // Check, if the only device server is to be removed  
 //
-    if (dev.d_name != string("%"))
+    if (string(dev.d_name) != string("%"))
     {
 //
 // Initialize the new tuple with the right pn and vn values 
@@ -226,6 +228,7 @@ long NdbmServer::upd_name(string lin, string ptr,int ind, long last) throw (long
     	int 		i;
 	stringstream	s;
 	for (i = 0;i < ndev && strcmp(dev.d_name,tab_dena[i].devina);i++);
+	cerr << "HALLO Hier bin ich " << i << " " << ndev << endl;
 	if (i == ndev)
 	{
 //
@@ -251,13 +254,14 @@ long NdbmServer::upd_name(string lin, string ptr,int ind, long last) throw (long
 #endif
 	    s << tab_dena[i].oh_name << "|" << tab_dena[i].opn << "|" << tab_dena[i].ovn << "|" << tab_dena[i].od_class << "|"
 	      << tab_dena[i].od_type << "|" << tab_dena[i].opid << "|" << tab_dena[i].od_proc << "|";
+	cout << " update_name " << s.str() << endl;
 #if !HAVE_SSTREAM
             content.dptr = s.str();
 	    content.dsize = strlen(s.str());
             s.freeze(false);
 #else
 	    content.dptr = const_cast<char *>(s.str().data());
-	    content.dsize = s.str().size();
+	    content.dsize = strlen(s.str().c_str());
 #endif
 	}
 	dev.indi = ind;
@@ -351,14 +355,17 @@ long NdbmServer::del_name(device &devi, int &pndev, string ptr, vector<dena> &bu
         s.seekp(0, ios::beg);
 #endif
 	s << devi.ds_class << "|" << devi.ds_name << "|" << seq << "|" << ends;
+	cerr << s.str() << endl;
 #if !HAVE_SSTREAM
         key.dptr = s.str();
 	key.dsize = strlen(s.str());
+	cerr << s.str() << endl;
         s.freeze(false);
 #else
 	key.dptr = const_cast<char *>(s.str().data());
-	key.dsize = s.str().size();
+	key.dsize = strlen(s.str().c_str());
 #endif
+	cerr << key.dptr << endl << key.dsize << endl;
 //
 // Try to get data out of database
 //
@@ -601,7 +608,7 @@ long NdbmServer::update_dev_list(device &p_ret, int seq) throw (long)
         s.freeze(false);
 #else
 	key.dptr = const_cast<char *>(s.str().data());
-	key.dsize = s.str().size();
+	key.dsize = strlen(s.str().c_str());
         strcpy(key.dptr, s.str().c_str());
 #endif
 //
@@ -639,7 +646,7 @@ long NdbmServer::update_dev_list(device &p_ret, int seq) throw (long)
             s.freeze(false);
 #else
 	    key.dptr = const_cast<char *>(s.str().data());
-	    key.dsize = s.str().size();
+	    key.dsize = strlen(s.str().c_str());
 #endif
 	    content.dptr = const_cast<char *>(cont_sto.data());
 	    content.dsize = cont_sto.size();
@@ -869,7 +876,7 @@ long NdbmServer::upd_res(const string &lin, const long numb, bool array) throw (
         s.freeze(false);
 #else
         strcpy(key.dptr, s.str().c_str());
-    	key.dsize = s.str().size();
+    	key.dsize = strlen(s.str().c_str());
 #endif
 //
 // If the resource value is %, remove all the resources.
@@ -894,7 +901,7 @@ long NdbmServer::upd_res(const string &lin, const long numb, bool array) throw (
         	s.freeze(false);
 #else
         	strcpy(key.dptr, s.str().c_str());
-    		key.dsize = s.str().size();
+    		key.dsize = strlen(s.str().c_str());
 #endif
 	    	cont = gdbm_fetch(tab,key);
 	    	if (!cont.dptr)
@@ -929,7 +936,7 @@ long NdbmServer::upd_res(const string &lin, const long numb, bool array) throw (
         	    s.freeze(false);
 #else
         	    strcpy(key_array.dptr, s.str().c_str());
-    		    key_array.dsize = s.str().size();
+    		    key_array.dsize = strlen(s.str().c_str());
 #endif
 
 		    cont = gdbm_fetch(tab, key_array);
@@ -973,11 +980,11 @@ long NdbmServer::upd_res(const string &lin, const long numb, bool array) throw (
         s.freeze(false);
 #else
         strcpy(key.dptr, s.str().c_str());
-    	key.dsize = s.str().size();
+    	key.dsize = strlen(s.str().c_str());
 #endif
 
     	strcpy(content.dptr, r_val.c_str());
-    	content.dsize = r_val.size();
+    	content.dsize = r_val.length();
 
     	switch(gdbm_store(tab, key, content, GDBM_REPLACE))
     	{

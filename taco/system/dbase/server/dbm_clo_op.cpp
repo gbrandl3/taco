@@ -92,7 +92,8 @@ DevLong *NdbmServer::db_reopendb_1_svc()
 	string dbm_file(dir_name);
 	dbm_file.append(dbgen.TblName[i]);
 	string uni_file(dbm_file);
-	uni_file.append(".dir");
+#warning "TEST old and new GDBM version"
+//	uni_file.append(".dir");
 	ifstream fi(uni_file.c_str());
 	if (!fi)
 	{
