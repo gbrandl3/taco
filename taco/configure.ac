@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0rc3, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.32 $)dnl
+AC_REVISION($Revision: 1.33 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -160,7 +160,6 @@ AC_CONFIG_FILES(Makefile
 		misc/tacoenv.sh
 		misc/tacoenv.csh
 		misc/taco.startup
-		misc/taco.startup.sec
 		doc/Makefile
 		lib/Makefile
 		lib/Doxyfile
