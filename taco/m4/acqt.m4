@@ -1,30 +1,11 @@
 dnl
 dnl Module:
-dnl		$Id: acqt.m4,v 1.2 2004-01-13 16:46:12 jkrueger1 Exp $
+dnl		$Id: acqt.m4,v 1.3 2004-02-17 12:27:19 jkrueger1 Exp $
 dnl Description:
 dnl		autotool macros to get the Qt installation pathes
 dnl		adapted form the KDE2 acinclude.m4
 dnl Author:
 dnl		$Author: jkrueger1 $
-dnl History:
-dnl		$Log: not supported by cvs2svn $
-dnl		Revision 1.1  2003/04/25 13:30:25  jkrueger1
-dnl		Merge of ESRF and FRM-II contributions completed. Tests in progress.
-dnl		
-dnl		Revision 1.4  2002/04/19 11:38:58  jkrueger
-dnl		*** empty log message ***
-dnl		
-dnl		Revision 1.3  2002/03/19 12:23:52  jkrueger
-dnl		Improve the detection of different Qt library versions.
-dnl		Change the macros AC_USE_QT and AC_PRINT_QT_PROGRAM.
-dnl		Jens.
-dnl		
-dnl		Revision 1.2  2001/04/09 12:47:37  pedersen
-dnl		changed order oc AC_PROG_LIBTOOL and AM_INIT (otherwise newer libtool fails to dtect GNU C as GNU C )
-dnl		
-dnl		Revision 1.1  2001/02/05 12:39:54  jkrueger
-dnl		generate a new project containing the m4 macros for TACO and TACO clients.
-dnl		Jens.
 dnl		
 
 
@@ -137,48 +118,60 @@ AC_DEFUN([AC_USE_QT],
     [
 	if test -z "$1"; then
   	    qtver=2
-  	    qtsubver=1
+  	    qtsubver=3
 	else
   	    qtsubver=`echo "$1" | sed -e 's#[0-9]\+\.\([0-9]\+\).*#\1#'`
 # following is the check if subversion isn´t found in passed argument
   	    if test "$qtsubver" = "$1"; then
-    		qtsubver=1
+    		qtsubver=0
   	    fi
   	    qtver=`echo "$1" | sed -e 's#^\([0-9]\+\)\..*#\1#'`
   	    if test "$qtver" = "1"; then
     		qtsubver=42
-  	    else
-# this is the version number fallback to 2.1, unless major version is 1 or 2
-   		if test "$qtver" != "2"; then
-    		    qtver=2
-    		    qtsubver=1
-   		fi
-  	    fi
+  	    elif test "$qtver" = "2"; then
+    		    qtsubver=3
+  	    elif test "$qtver" != "3"; then
+		qtver=2
+		qtsubver=3	
+	    fi
 	fi
  
 	if test -z "$2"; then
   	    if test $qtver = 2; then
     		case $qtsubver in
-      		    1)	qt_minversion=">= 2.1.1";;
-      		    2)	qt_minversion=">= 2.2.1";;
-      		    3)	qt_minversion=">= 2.3.1";;
-      		    *)	qt_minversion=">= 2.0.2";;
+      		    1)	qt_minversion=">= 2.1.0";;
+      		    2)	qt_minversion=">= 2.2.0";;
+      		    3)	qt_minversion=">= 2.3.0";;
+      		    *)	qt_minversion=">= 2.0.0";;
     		esac	
+	    elif test $qtver = 3; then
+		case $qtsubver in
+		   1)	qt_minversion=">=3.1.0";;
+		   2)	qt_minversion=">=3.2.0";;
+		   *)	qt_minversion=">=3.0.0";;
+		esac
   	    else
    	 	qt_minversion=">= 1.42 and < 2.0"
   	    fi
 	else
-   	    qt_minversion=$2
+	    qtsubver=$2
+   	    qt_minversion=">=${qtver}.${qtsubver}.0"
         fi
  
 	if test -z "$3"; then
    	    if test $qtver = 2; then
     		case $qtsubver in
-      		   1) 	qt_verstring="QT_VERSION >= 211";;
-      		   2) 	qt_verstring="QT_VERSION >= 221";;
-      		   3) 	qt_verstring="QT_VERSION >= 231";;
+      		   1) 	qt_verstring="QT_VERSION >= 210";;
+      		   2) 	qt_verstring="QT_VERSION >= 220";;
+      		   3) 	qt_verstring="QT_VERSION >= 230";;
       		   *) 	qt_verstring="QT_VERSION >= 200";;
     		esac
+	    elif test $qtver = 3; then
+		case $qtsubver in
+		   1) qt_verstring="QT_VERSION >= 310";;
+		   2) qt_verstring="QT_VERSION >= 320";;
+		   3) qt_verstring="QT_VERSION >= 300";;
+		esac
    	    else
     		qt_verstring="QT_VERSION >= 142 && QT_VERSION < 200"
   	    fi
@@ -186,7 +179,9 @@ AC_DEFUN([AC_USE_QT],
    	    qt_verstring=$3
 	fi
  
-	if test $qtver = 2; then
+	if test $qtver = 3 ; then
+	    qt_dirs="$QTDIR /usr/lib/qt3 /usr/lib/qt"
+	elif test $qtver = 2; then
    	    qt_dirs="$QTDIR /usr/lib/qt2 /usr/lib/qt"
 	else
    	    qt_dirs="$QTDIR /usr/lib/qt"
@@ -532,7 +527,7 @@ AC_DEFUN([AC_CHECK_QT_DIRECT],
 )
 
 dnl 
-dnl AC_PATH_QT(current, revision)
+dnl AC_PATH_QT(current, revision, [abort=yes])
 dnl tests and gets the installation of the required version of Qt
 dnl exports following variables:
 dnl	qt_libraries	= library path to the Qt libraries
@@ -567,23 +562,20 @@ dnl  	    AC_REQUIRE([AC_FIND_JPEG])
 	ac_qt_bindir=NO
 	qt_libraries=""
 	qt_includes=""
-	AC_ARG_WITH(qt-dir,
-    	    [  --with-qt-dir=DIR       where the root of Qt is installed ],
+	AC_ARG_WITH(qt-dir,AC_HELP_STRING([--with-qt-dir=DIR],[where the root of Qt is installed]),
     	    [   ac_qt_includes="$withval"/include
        	    	ac_qt_libraries="$withval"/lib
        	    	ac_qt_bindir="$withval"/bin
     	    ]
 	)
  
-	AC_ARG_WITH(qt-includes,
-    	    [  --with-qt-includes=DIR  where the Qt includes are. ],
+	AC_ARG_WITH(qt-includes, AC_HELP_STRING([--with-qt-includes=DIR], [where the Qt includes are.]),
     	    [ac_qt_includes="$withval"]
 	)
  
 	qt_libs_given=no
  
-	AC_ARG_WITH(qt-libraries,
-    	    [  --with-qt-libraries=DIR where the Qt library is installed.],
+	AC_ARG_WITH(qt-libraries, AC_HELP_STRING([--with-qt-libraries=DIR], [where the Qt library is installed.]),
     	    [   ac_qt_libraries="$withval"
        		qt_libs_given=yes
     	    ]
@@ -622,13 +614,16 @@ dnl  	    AC_REQUIRE([AC_FIND_JPEG])
 # if the Qt was given, the chance is too big that libqt.* doesn't exist
   		    qt_libdir=NONE
   		    for dir in $qt_libdirs; do
-    			try="ls -1 $dir/libqt.*"
-    			if test -n "`$try 2> /dev/null`"; then 
-			    qt_libdir=$dir; 
-			    break; 
-			else 
-			    echo "tried $dir" >&AC_FD_CC ; 
-			fi
+			for lib in qt qt-mt ; do
+    				try="ls -1 ${dir}/lib${lib}.*"
+	    			if test -n "`$try 2>/dev/null`"; then 
+				    qt_libdir=$dir; 
+				    int_qt="-l${lib}"
+				    break 2; 
+				else
+				    echo "tried $dir" >&AC_FD_CC ; 
+				fi
+			done
   		    done
 		fi
  
@@ -643,22 +638,29 @@ dnl  	    AC_REQUIRE([AC_FIND_JPEG])
  
 		CXXFLAGS="$CXXFLAGS -I$qt_incdir $all_includes"
 		LDFLAGS="$LDFLAGS -L$qt_libdir $all_libraries $USER_LDFLAGS"
-		LIBS="$LIBS $LIBQT"
 
-		AC_PRINT_QT_PROGRAM
-
-		if AC_TRY_EVAL(ac_link) && test -s conftest; then
-  		    rm -f conftest*
-		else
-  		    echo "configure: failed program was:" >&AC_FD_CC
-  		    cat conftest.$ac_ext >&AC_FD_CC
-  		    ac_qt_libraries="NO"
-		fi
-		rm -f conftest*
+		for LIBQT in "-lqt" "-lqt-mt" ; do
+			LIBS="$ac_libs_safe $LIBQT"
+			AC_PRINT_QT_PROGRAM
+			if AC_TRY_EVAL(ac_link) && test -s conftest; then
+				rm -f conftest*
+				break
+			else
+  		    		echo "configure: failed program was:" >&AC_FD_CC
+  		    		cat conftest.$ac_ext >&AC_FD_CC
+				if test "$LIBQT" = "-lqt-mt" ; then
+  		    			ac_qt_libraries="NO"
+				fi
+			fi
+			rm -f conftest*
+		done
 		CXXFLAGS="$ac_cxxflags_safe"
 		LDFLAGS="$ac_ldflags_safe"
 		LIBS="$ac_libs_safe"
- 
+
+		if test "$LIBQT" = "-lqt-mt" ; then
+			CXXFLAGS="$CXXFLAGS -DQT_THREAD_SUPPORT"
+		fi 
 		AC_LANG_RESTORE
 		if test "$ac_qt_includes" = NO || test "$ac_qt_libraries" = NO; then
   		    ac_cv_have_qt="have_qt=no"
@@ -672,11 +674,16 @@ dnl  	    AC_REQUIRE([AC_FIND_JPEG])
   		    else
     			ac_qt_notfound="(libraries)";
   		    fi
-  		    AC_MSG_ERROR(
-		[Qt ($qt_minversion) $ac_qt_notfound not found. Please check your installation!
-For more details about this problem, look at the end of config.log.])
+		    qt_msg="Qt ($qt_minversion) $ac_qt_notfound not found. Please check your installation!
+For more details about this problem, look at the end of config.log."
+		    if test "$3" != "no" ; then
+  		    	AC_MSG_FAILURE([$qt_msg])
+		    else
+  		    	AC_MSG_WARN([$qt_msg])
+		    fi
 		else
-  		    have_qt="yes"
+			have_qt="yes"
+			int_qt=$LIBQT
 		fi
 	    ]
 	)
