@@ -4,6 +4,6 @@ else
   greta_dir=
 endif
 
-SUBDIRS= server newserver tools res $(greta_dir) 
+SUBDIRS= server tools res $(greta_dir) 
 
 dbm_DATA = 
