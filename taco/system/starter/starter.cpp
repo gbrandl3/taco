@@ -1,6 +1,5 @@
 /*****************************************************************************
- *
- * File:        $Id: starter.cpp,v 1.3 2003-05-16 14:04:08 jkrueger1 Exp $
+ * File:        $Id: starter.cpp,v 1.4 2003-12-08 15:17:42 jkrueger1 Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
@@ -11,9 +10,9 @@
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2003-05-16 14:04:08 $
+ * Date:	$Date: 2003-12-08 15:17:42 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -60,7 +59,7 @@ StarterDevice::StarterDevice(std::string name, long &error)
         commands_list[DevRestore] = DeviceCommandListEntry(DevRestore, static_cast<DeviceMemberFunction>( &StarterDevice::tacoDevRestart),
 					D_VAR_STRINGARR,
                                         D_VOID_TYPE,
-                                        ADMIN_ACCESS, "DevRestore");
+                                        ADMIN_ACCESS, "DevRestart");
 
 	return;
 }
@@ -170,7 +169,7 @@ void StarterDevice::deviceRun(const std::string proc, const std::string pers, co
 //
 		if (std::find(names_of_server.begin(), names_of_server.end(), newServer) == names_of_server.end())
 			names_of_server.push_back(newServer);
-		else if (this->getpid(proc, name) != 0)
+		else if (this->getpid(proc, pers) != 0)
 			return;
 //
 // Store the new list in the database 
@@ -213,8 +212,8 @@ void StarterDevice::deviceRun(const std::string proc, const std::string pers, co
 void StarterDevice::deviceStop(const std::string proc, const std::string pers)
 {
 	pid_t pid = this->getpid(proc, pers);
-	
-	if (pid != 0)
+
+	if (pid == 0)
 		return;
 	if (pid == ::getpid())
 		throw long(DevErr_DeviceIllegalParameter);
@@ -248,6 +247,7 @@ pid_t StarterDevice::getpid(const std::string proc, const std::string pers)
 {	
 	db_svcinfo_call	server_info;
 	long		error;
+
 	if (db_servinfo(const_cast<char *>(proc.c_str()), const_cast<char *>(pers.c_str()), &server_info, &error) == DS_OK)
 		return server_info.pid;
 	throw error;

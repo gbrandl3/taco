@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * File:        $Id: starter.h,v 1.3 2003-05-23 13:05:51 jkrueger1 Exp $
+ * File:        $Id: starter.h,v 1.4 2003-12-08 15:17:42 jkrueger1 Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
@@ -11,9 +11,9 @@
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2003-05-23 13:05:51 $
+ * Date:	$Date: 2003-12-08 15:17:42 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -34,7 +34,6 @@
 
 #ifndef __STARTER_DEVICE_H__
 #define __STARTER_DEVICE_H__
-
 
 #include <API.h>
 #include <Device.H>
