@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * File:        $Id: starter.h,v 1.2 2003-05-16 14:04:08 jkrueger1 Exp $
+ * File:        $Id: starter.h,v 1.3 2003-05-23 13:05:51 jkrueger1 Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
@@ -11,9 +11,9 @@
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2003-05-16 14:04:08 $
+ * Date:	$Date: 2003-05-23 13:05:51 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -45,7 +45,7 @@ class StarterDevice : public Device
 {
 	friend long StarterSetup(char *pszServerName, long *plError);
 public:
-	StarterDevice(string name, long &error);
+	StarterDevice(std::string name, long &error);
 	~StarterDevice();
 protected:
 //	long GetResources(char *name, long *error){}

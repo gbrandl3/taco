@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * File:        $Id: startup.cpp,v 1.1 2003-05-05 16:04:05 jkrueger1 Exp $
+ * File:        $Id: startup.cpp,v 1.2 2003-05-23 13:05:51 jkrueger1 Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
@@ -11,9 +11,9 @@
  *
  * Original:	January 2003
  *
- * Version:	$Revision: 1.1 $
+ * Version:	$Revision: 1.2 $
  *
- * Revision:	$Date: 2003-05-05 16:04:05 $
+ * Revision:	$Date: 2003-05-23 13:05:51 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -41,6 +41,7 @@
 #include <errno.h>
 #include "starter.h"
 
+#include <iostream>
 #include <string>
 #include <algorithm>
 
@@ -94,7 +95,7 @@ static void SignalHandler (int signal)
 			}
 			break;
 		default:
-			cerr << "Got unexpected signal: " << signal << endl;
+			std::cerr << "Got unexpected signal: " << signal << std::endl;
 			break;
 	}
 	return;
@@ -131,7 +132,7 @@ long startup(char *pszServerName, long *plError)
 		|| sigaction (SIGALRM, &sighand, NULL) != 0
 		|| sigaction (SIGCHLD, &sighand, NULL) != 0)
 	{
-		cerr <<" could not install signal handler" <<endl;
+		std::cerr <<" could not install signal handler" << std::endl;
 		return DS_NOTOK;
 	}
 	return ServerSetup(pszServerName, plError);
