@@ -528,3 +528,19 @@ AC_MSG_NOTICE([Running]),
 AC_MSG_FAILURE([Not Running]))
 LIBS="$LIBS_SAVE"
 ])
+
+
+AC_DEFUN([LINUX_DISTRIBUTION],
+[
+        AC_REQUIRE([AC_CANONICAL_SYSTEM])
+        case "$target" in
+                i[[3456]]86-*-linux-* | i[[3456]]86-*-linux)
+			if test -f /etc/lsb-release ; then
+				DISTRIBUTION=`(. /etc/lsb-release; echo $DISTRIB_DESCRIPTION)`
+			else
+				DISTRIBUTION=`cat /etc/*-release | head -1`
+			fi
+			;;
+	esac
+	AC_SUBST([DISTRIBUTION])
+])

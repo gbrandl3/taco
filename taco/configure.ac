@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0rc3, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.33 $)dnl
+AC_REVISION($Revision: 1.34 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -150,6 +150,7 @@ AM_CONDITIONAL(BUILTIN_STARTUP, ! echo $target|grep darwin)
 
 AC_SUBST([RPM_RELEASE], 0)
 AM_RPM_INIT
+LINUX_DISTRIBUTION
 AM_CONDITIONAL(MAKE_RPMS, test x$make_rpms = xtrue)
 
 AC_CONFIG_FILES(Makefile 
