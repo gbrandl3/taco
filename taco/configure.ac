@@ -1,6 +1,6 @@
 AC_INIT([TACO], [3.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.41 $)dnl
+AC_REVISION($Revision: 1.42 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -200,11 +200,6 @@ AC_SUBST([aclocaldir], ['${datadir}/aclocal'])
 
 AC_SUBST(TACO_INCLUDES, ["-I\$(top_srcdir)/lib/xdr -I\$(top_srcdir)/lib -I\$(top_srcdir)/lib/dc -I\$(top_srcdir)/lib/dbase -I\$(top_srcdir)/lib/tc -I\$(top_srcdir)/lib/ascii] -I\$(top_srcdir)/lib/private") 
 
-TACO_DBM_SERVER
-if test "x${taco_build_gdbm}" = "xyes" ; then
-     AC_CONFIG_SUBDIRS(gdbm)
-fi
-
 AC_SUBST(TACO_SERVER_LIBS, ["\$(top_builddir)/lib/libdsapi.la \$(top_builddir)/lib/dbase/libdbapi.la \$(top_builddir)/lib/xdr/libdsxdr.la"])
 AC_SUBST(TACO_SERVER_CXX_LIBS, ["\$(top_builddir)/lib/libdsapig++.la \$(top_builddir)/lib/dbase/libdbapi.la \$(top_builddir)/lib/xdr/libdsxdr.la"])
 AC_SUBST(TACO_CLIENT_LIBS, ["\$(top_builddir)/lib/libtacoapi.la \$(top_builddir)/lib/dbase/libdbapi.la \$(top_builddir)/lib/xdr/libdsxdr.la"])
@@ -217,6 +212,13 @@ TACO_TCL_BINDING
 TACO_GRETA
 TACO_XDEVMENU
 TACO_ALARM
+TACO_SERVER
+TACO_MANAGER
+TACO_DATABASE_SERVER
+if test "x${taco_build_gdbm}" = "xyes" ; then
+     AC_CONFIG_SUBDIRS(gdbm)
+fi
+TACO_MESSAGE_SERVER
 
 dnl the startup routine should not be built in the dsapi library on Mac OS X systems
 AM_CONDITIONAL(BUILTIN_STARTUP, ! echo $target|grep darwin)
@@ -304,6 +306,13 @@ AM_MISSING_PROG([AUTOM4TE], [autom4te])
 
 AC_OUTPUT
 
+if test x"${taco_dbserver}" = x"yes" ; then
+	taco_dbserver_support="
+	 	with:
+		DBM support:	${taco_gdbm}
+		mySQL support:	${taco_mysql}"
+fi
+
 AC_MSG_RESULT([
 
 Configuration (taco):
@@ -316,15 +325,18 @@ Configuration (taco):
 	
 build:
 	gdbm:			${taco_build_gdbm}
-	dataport API:		${DATAPORT}
-	data collector API:	${taco_dc}
-	ASCII API:		${taco_ascii}
-	database server with:
-		DBM support:	${taco_gdbm}
-		mySQL support:	${taco_mysql}
+	manager:		${taco_manager}
+	database server:	${taco_dbserver} ${taco_dbserver_support}
+	message server:		${taco_message}
+
 	greta:			${greta}
 	xdevmenu:		${xdevmenu}
 	S_Alarm:		${alarm}
+
+	server API:		${taco_server_libs}
+	dataport API:		${DATAPORT}
+	data collector API:	${taco_dc}
+	ASCII API:		${taco_ascii}
 	bindings:
 		python :	${taco_python_binding}
 		TCL:		${taco_tcl_binding}

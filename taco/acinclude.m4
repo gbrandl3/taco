@@ -111,6 +111,70 @@ MYSQL       mysql,
 	fi
 ])
 
+AC_DEFUN([TACO_SERVER],
+[
+	AC_ARG_ENABLE(server, AC_HELP_STRING([--enable-server], [build the libraries for the TACO servers @<:@default=yes@:>@]),
+		[case "${enable_server}" in
+			yes)	taco_server_libs=yes;;
+			no)	taco_server_libs=no;;
+			*)	AC_MSG_ERROR([bad value ${enable_server} for --enable-server]);;
+		esac], [taco_server_libs=yes])
+	AM_CONDITIONAL(BUILD_SERVER, [test x"${taco_server_libs}" = x"yes"])
+])
+
+AC_DEFUN([TACO_DATABASE_SERVER],
+[
+	AC_REQUIRE([TACO_SERVER])
+	AC_ARG_ENABLE(dbserver, AC_HELP_STRING([--enable-dbserver], [build the TACO database server @<:@default=yes@:>@]),
+		[case "${enable_dbserver}" in
+			yes)	taco_dbserver=yes;;
+			no)	taco_dbserver=no;;
+			*)	AC_MSG_ERROR([bad value ${enable_dbserver} for --enable-dbserver]);;
+		esac], [taco_dbserver=yes])
+	if test x"${taco_server_libs}" != x"yes" ; then
+		taco_dbserver=no
+	fi
+	if test x"${taco_dbserver}" = x"yes" ; then
+		TACO_DBM_SERVER
+	else
+		AM_CONDITIONAL(MYSQLSUPPORT, [false])
+		AM_CONDITIONAL(GDBMSUPPORT, [false])
+		AM_CONDITIONAL(BUILD_GDBM, [false])
+		taco_build_gdbm=no
+	fi
+	AM_CONDITIONAL(BUILD_DATABASESERVER, [test x"${taco_dbserver}" = x"yes"])
+])
+
+AC_DEFUN([TACO_MANAGER],
+[
+	AC_REQUIRE([TACO_SERVER])
+	AC_ARG_ENABLE(manager, AC_HELP_STRING([--enable-manager], [build the TACO manager @<:@default=yes@:>@]),
+		[case "${enable_manager}" in
+			yes)	taco_manager=yes;;
+			no)	taco_manager=no;;
+			*)	AC_MSG_ERROR([bad value ${enable_manager} for --enable-manager]);;
+		esac], [taco_manager=yes])
+	if test x"${taco_server_libs}" != x"yes" ; then
+		taco_manager=no
+	fi
+	AM_CONDITIONAL(BUILD_MANAGER, [test x"${taco_manager}" = x"yes"])
+])
+
+AC_DEFUN([TACO_MESSAGE_SERVER],
+[
+	AC_REQUIRE([TACO_SERVER])
+	AC_ARG_ENABLE(message, AC_HELP_STRING([--enable-message], [build the TACO message server @<:@default=yes@:>@]),
+		[case "${enable_message}" in
+			yes)	taco_message=yes;;
+			no)	taco_message=no;;
+			*)	AC_MSG_ERROR([bad value ${enable_message} for --enable-message]);;
+		esac], [taco_message=yes])
+	if test x"${taco_server_libs}" != x"yes" ; then
+		taco_message=no
+	fi
+	AM_CONDITIONAL(BUILD_MESSAGESERVER, [test x"${taco_message}" = x"yes"])
+])
+
 AC_DEFUN([TACO_DC_API],
 [
 	AC_ARG_ENABLE(dc, AC_HELP_STRING([--enable-dc], [build the data collector API @<:@default=yes@:>@]),
