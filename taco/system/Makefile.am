@@ -4,5 +4,5 @@ else
  xdev_dir=
 endif
 
-SUBDIRS = . manager msg dc dbase $(xdev_dir) 
+SUBDIRS = . manager msg dc dbase starter $(xdev_dir) 
 

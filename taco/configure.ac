@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0-beta, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.53)
-AC_REVISION($Revision: 1.3 $)dnl
+AC_REVISION($Revision: 1.4 $)dnl
 AC_COPYRIGHT([(C) 19??-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR(lib/dev_api.c)
@@ -139,6 +139,7 @@ AC_CONFIG_FILES(Makefile
 	  classes/Makefile
 	  system/dbase/greta/Makefile
 	  system/xdevmenu/Makefile
+	  system/starter/Makefile
 	  taco.spec
 )
 
