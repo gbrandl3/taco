@@ -2,7 +2,7 @@ default: all
 
 dist:
 	@echo "This file is to make it easier for you to create all you need"
-	aclocal 
+	aclocal -I m4
 	autoheader
 # use --include-deps, if you want to release the stuff. Don't use it for
 # yourself
@@ -20,8 +20,8 @@ all:
 	touch AUTHORS ChangeLog NEWS README
 	if { ! test -d config ; } ; then mkdir config ; else rm -rf config/* ;  fi
 	libtoolize --force --copy --automake
-	mv ltmain.sh config/
-	aclocal  
+	if { test -r ltmain.sh ; } ; then mv ltmain.sh config/ ; fi 
+	aclocal -I m4 
 	autoheader
 	automake --add-missing --copy --include-deps 
 	autoconf

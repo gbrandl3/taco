@@ -1,0 +1,6 @@
+The TACO manual has been removed from the source code release (to keep
+the source code tarball small). To get a copy of the TACO manual go 
+to the TACO web site (http://www.esrf.fr/taco) or download it directly
+from the ESRF websit :
+
+	ftp://ftp.esrf.fr/pub/cs/taco/TACO.pdf

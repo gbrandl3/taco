@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# agps.startup : starts the TACO AGPS C++ device server and menu
+#
+
+# setup TACO environment variables
+
+. .taco_env
+NETHOST=`uname -n` ; export NETHOST
+
+echo "Starting AGPS device server ..."
+../dserver/classes++/powersupply/ag/src/AGPSpp 1&
+sleep 1
+echo "Starting AGPS menu ..."
+echo 4 > .agps
+echo 0 >>.agps
+../dserver/classes++/powersupply/ag/src/ps_menu test/agps/1 <.agps&
+sleep 1

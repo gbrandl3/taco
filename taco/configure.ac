@@ -1,25 +1,16 @@
-AC_INIT(taco, 3.0.0, [goetz@esrf.fr])
+AC_INIT(TACO, 3.0-beta, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.53)
-AC_REVISION($Revision: 1.1 $)dnl
-AC_COPYRIGHT([(C) 1990-2003 ESRF])
-
-AC_PREFIX_DEFAULT(${DSHOME:-/usr/local/dshome})
+AC_REVISION($Revision: 1.2 $)dnl
+AC_COPYRIGHT([(C) 19??-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
-AC_CONFIG_SRCDIR(lib/gen_api.c)
+AC_CONFIG_SRCDIR(lib/dev_api.c)
 
-dnl AC_DISABLE_STATIC
-AC_DISABLE_FAST_INSTALL
+TACO_INIT([no])
 
-dnl AM_MAINTAINER_MODE
+LIB_VERSION="10.0.0"
+AC_SUBST(LIB_VERSION)
 
-AC_TACO_DEFINES
-AM_INIT_AUTOMAKE([1.6])
-AC_PROG_LIBTOOL
-AC_PROG_LN_S
-AC_PROG_MAKE_SET
-AC_PROG_CXX
-AC_PROG_INSTALL
-AC_CONFIG_HEADERS(config.h)
+AM_INIT_AUTOMAKE([1.7])
 
 AC_CHECK_SIZEOF(char)
 AC_CHECK_SIZEOF(short)
@@ -29,80 +20,10 @@ AC_CHECK_SIZEOF(unsigned long)
 AC_CHECK_SIZEOF(float)
 AC_CHECK_SIZEOF(double)
 
-AC_CHECK_HEADERS(ctype.h, [], [])
-AC_CHECK_HEADERS(errno.h, [], [])
-
-AC_CHECK_HEADERS(netdb.h, [], [])
-AC_CHECK_HEADERS(inet/netdb.h, [], [])
-AC_CHECK_HEADERS(inet/socket.h, [], [])
-
-AC_CHECK_HEADERS(linux/posix_types.h)
-AC_CHECK_HEADERS(linux/types.h)
-
-AC_CHECK_HEADERS(malloc.h, [], [])
-AC_CHECK_HEADERS(netinet/in.h, [], [])
-AC_CHECK_HEADERS(pwd.h, [], [])
-AC_CHECK_HEADERS(rpc/rpc.h, [], [])
-
-AC_CHECK_HEADERS(pingLib.h [], [])
-AC_CHECK_HEADERS(grp.h [], [])
-AC_CHECK_HEADERS(hostLib.h [], [])
-AC_CHECK_HEADERS(_os9_sockets.h [], [])
-AC_CHECK_HEADERS(arpa/inet.h [], [])
-AC_CHECK_HEADERS(rpcGbl.h [], [])
-AC_CHECK_HEADERS(taskLib.h [], [])
-AC_CHECK_HEADERS(sys/filio.h, [], [])
-
-AC_CHECK_HEADERS(stdarg.h, [], [])
-AC_CHECK_HEADERS(stddef.h, [], [])
-AC_CHECK_HEADERS(stdlib.h, [], [])
-
-AC_CHECK_HEADERS(ioctl.h, [], [])
-AC_CHECK_HEADERS(sys/ioctl.h, [], [])
-
-AC_CHECK_HEADERS(signal.h, [], [])
-AC_CHECK_HEADERS(sys/signal.h, [], [])
-
-AC_CHECK_HEADERS(sys/socket.h, [], [])
-
-AC_CHECK_HEADERS(time.h, [], [])
-AC_CHECK_HEADERS(varargs.h, [], [])
-
-dnl Windows specific
-AC_CHECK_HEADERS(process.h, [], [])
-AC_CHECK_HEADERS(winsock.h, [], [])
-
-dnl AC_LANG_PUSH(C++)
-dnl AC_CHECK_HEADERS(sstream, [], [])
-dnl AC_CHECK_HEADERS(strstream, [], [])
-dnl AC_LANG_POP(C++)
-
-dnl AC_ARG_ENABLE(greta, AC_HELP_STRING([--enable-greta], [build the graphical dbase tool default=no]),
-dnl 	[case "${enableval}" in
-dnl 		yes)	greta=true;;
-dnl 		no)	greta=false;;
-dnl 		*)	AC_MSG_ERROR(bad value ${enableval} for --enable-greta);;
-dnl 	esac], [greta=false])
-dnl AM_CONDITIONAL(GRETABUILD, test "x$greta" = "xtrue") 
-dnl if test "x$greta" = "xtrue" ; then
-dnl 	X_AND_MOTIF
-dnl 	GRETA=greta_ndbm
-dnl fi
-dnl AC_SUBST(GRETA)
-
-dnl AC_ARG_ENABLE(xdevmenu, AC_HELP_STRING([--enable-xdevmenu], [build the graphical dbase tool default=no]),
-dnl 	[case "${enableval}" in
-dnl 		yes)	xdevmenu=true;;
-dnl 		no)	xdevmenu=false;;
-dnl 		*)	AC_MSG_ERROR(bad value ${enableval} for --enable-xdevmenu);;
-dnl 	esac], [xdevmenu=false])
-dnl AM_CONDITIONAL(XDEVMENUBUILD, test x$xdevmenu = xtrue) 
-dnl if test "x$xdevmenu" = "xtrue" ; then
-dnl 	X_AND_MOTIF
-dnl 	XDEVMENU=xdevmenu
-dnl fi
-AC_SUBST(XDEVMENU)
-
+AC_LANG_PUSH(C++)
+AC_CHECK_HEADERS(sstream, [], [])
+AC_CHECK_HEADERS(strstream, [], [])
+AC_LANG_POP(C++)
 
 AC_SUBST(appdefaultdir)
 
@@ -122,6 +43,9 @@ PS_NAMES_resdir='${resdatadir}/PS_NAMES'
 EVENTS_resdir='${resdatadir}/EVENTS'
 SYS_resdir='${resdatadir}/SYS'
 SEC_resdir='${resdatadir}/SEC'
+TEST_resdir='${resdatadir}/TEST'
+aclocaldir=`aclocal --print-ac-dir`
+AC_SUBST(aclocaldir)
 AC_SUBST(sbindir)
 AC_SUBST(datadir)
 AC_SUBST(docdir)
@@ -138,52 +62,117 @@ AC_SUBST(NAMES_resdir)
 AC_SUBST(PS_NAMES_resdir)
 AC_SUBST(SYS_resdir)
 AC_SUBST(SEC_resdir)
+AC_SUBST(TEST_resdir)
 
-dnl TACO_INCLUDES="-I\$(top_srcdir)/dserver/classes/main/include \
-dnl -I\$(top_srcdir)/dserver/classes++/device/include \
-dnl -I\$(top_srcdir)/dserver/classes++/device/oic/include \
-dnl -I\$(top_srcdir)/dserver/system/api/admin/include \
-dnl -I\$(top_srcdir)/dserver/system/api/apilib/include \
-dnl -I\$(top_srcdir)/dserver/system/api/cmds_err/include \
-dnl -I\$(top_srcdir)/dserver/system/dataport/include \
-dnl -I\$(top_srcdir)/dserver/system/dc/include \
-dnl -I\$(top_srcdir)/dserver/system/manager/include \
-dnl -I\$(top_srcdir)/dserver/system/msg/include \
-dnl -I\$(top_srcdir)/dserver/system/xdr/include \
-dnl -I\$(top_srcdir)/dserver/system/dbapi/include \
-dnl -I\$(top_srcdir)/dbase/server/include"
+TACO_INCLUDES="-I\$(top_srcdir)/lib/xdr -I\$(top_srcdir)/lib -I\$(top_srcdir)/lib/dc -I\$(top_srcdir)/lib/dbase\
+		-I\$(top_srcdir)/lib/tc -I\$(top_srcdir)/lib/ascii" 
 
-dnl AC_SUBST(TACO_INCLUDES) 
-dnl AC_CHECK_HEADERS([ndbm.h gdbm/ndbm.h])
-dnl AC_FIND_GDBM
-dnl AC_FUNC_DBM_FETCH
+AC_SUBST(TACO_INCLUDES) 
+AC_CHECK_HEADERS([ndbm.h gdbm/ndbm.h])
+AC_FIND_GDBM
+AC_FUNC_DBM_FETCH
 
-dnl if test -n "${MAKE_GDBM}" ; then
-dnl      AC_CONFIG_SUBDIRS(gdbm-1.7.3)
-dnl fi
+if test -n "${MAKE_GDBM}" ; then
+     AC_CONFIG_SUBDIRS(gdbm-1.7.3)
+fi
 
-dnl TACO_LIBSBUILD="\$(top_builddir)/dserver/system/api/apilib/src/libdsapi.la \
-dnl 	       \$(top_builddir)/dserver/system/dbapi/src/libdbapi.la \
-dnl 	       \$(top_builddir)/dserver/system/xdr/src/libdsxdr.la"
-dnl AC_SUBST(TACO_LIBSBUILD)
-dnl TACO_LIBS2BUILD="\$(top_builddir)/dserver/system/api/apilib/src/libtacoapi.la \
-dnl 	       \$(top_builddir)/dserver/system/dbapi/src/libdbapi.la \
-dnl 	       \$(top_builddir)/dserver/system/xdr/src/libdsxdr.la"
-dnl AC_SUBST(TACO_LIBSBUILD)
-dnl AC_TACO_DEFINES
-dnl AC_DATAPORT_SRC
+TACO_SERVER_LIBS="\$(top_builddir)/lib/libdsapi.la \
+	       \$(top_builddir)/lib/dbase/libdbapi.la \
+	       \$(top_builddir)/lib/xdr/libdsxdr.la"
+AC_SUBST(TACO_SERVER_LIBS)
 
-dnl TACO_LIBDCBUILD="\$(top_builddir)/dserver/system/dc/src/libdcapi.la"
-dnl AC_SUBST(TACO_LIBDCBUILD)
-dnl TACO_LIBXDEVBUILD="\$(top_builddir)/dserver/system/xdevmenu/ascapi/src/libascapi.la \
-dnl \$(top_builddir)/dserver/system/xdevmenu/tcapi/src/libtcapi.la"
-dnl AC_SUBST(TACO_LIBXDEVBUILD)
+TACO_CLIENT_LIBS="\$(top_builddir)/lib/libtacoapi.la \
+	       \$(top_builddir)/lib/dbase/libdbapi.la \
+	       \$(top_builddir)/lib/xdr/libdsxdr.la"
+AC_SUBST(TACO_CLIENT_LIBS)
 
+TACO_DEFINES
+TACO_DATAPORT_SRC
+TACO_PYTHON_SERVER
+TACO_MYSQL_SUPPORT
+TACO_GRETA
+TACO_XDEVMENU
 
-dnl RPM_RELEASE=3
-dnl AC_SUBST(RPM_RELEASE)
-dnl AM_RPM_INIT
-dnl AM_CONDITIONAL(MAKE_RPMS, test x$make_rpms = xtrue)
+AC_SUBST([RPM_RELEASE], 0)
+AM_RPM_INIT
+AM_CONDITIONAL(MAKE_RPMS, test x$make_rpms = xtrue)
 
-AC_CONFIG_FILES(Makefile lib/Makefile)
+AC_CONFIG_FILES(Makefile 
+	  misc/Makefile
+	  misc/taco-config
+	  misc/tacoenv.sh
+	  misc/taco.startup
+	  misc/taco.startup.sec
+	  doc/Makefile
+	  lib/Makefile
+	  lib/private/Makefile
+	  lib/dbase/Makefile
+	  lib/dataport/Makefile
+	  lib/xdr/Makefile
+	  lib/dc/Makefile
+	  lib/ascii/Makefile
+	  lib/ascii/doc/Makefile
+	  lib/tc/Makefile
+	  system/dbase/Makefile
+	  system/dbase/server/Makefile
+	  system/dbase/tools/Makefile
+	  system/dbase/res/Makefile
+          system/Makefile 
+          system/manager/Makefile 
+          system/msg/Makefile 
+          system/dc/Makefile 
+          system/dc/doc/Makefile 
+          system/dc/server/Makefile 
+          system/dc/library/Makefile 
+	  system/dc/tools/Makefile
+	  classes/Makefile
+	  system/dbase/greta/Makefile
+	  system/xdevmenu/Makefile
+	  tests/Makefile
+	  tests/taco
+	  taco.spec
+)
+
+AC_CONFIG_FILES(classes/instverify/Makefile)
+AC_CONFIG_FILES(classes/powersupply/Makefile)
+AC_CONFIG_FILES(classes/serialline/Makefile)
+
+AC_CONFIG_FILES(classes/signal/Makefile 
+		classes/signal/doc/Makefile
+		classes/signal/multiple/Makefile 
+		classes/signal/multiple/doc/Makefile
+		classes/signal/single/Makefile
+		classes/signal/single/doc/Makefile)
+
+AC_CONFIG_FILES(system/dbase/newserver/Makefile)
+
+AC_CONFIG_FILES(m4/Makefile)
+
+AC_CONFIG_FILES(bindings/python/Makefile bindings/python/lib/Makefile bindings/python/doc/Makefile bindings/python/demo.server/Makefile)
+
+AC_CONFIG_FILES(bindings/Makefile bindings/tcl/Makefile)
+
 AC_OUTPUT
+
+echo "
+
+Configuration (taco):
+
+	Source code location:	${srcdir}
+	Version:		${VERSION}
+	Compiler:		${CC},${CXX}
+	
+build:
+	dataport API:		${DATAPORT}
+	data collector API:	${dc}
+	ASCII API:		${ascii}
+	database server with:
+		DBM support:	yes
+		mySQL support:	${mysql}
+	greta:			${greta}
+	xdevmenu:		${xdevmenu}
+	python server:		${python_array}
+
+Please check whether the configuration I detected matches what you
+would like to have. 
+"

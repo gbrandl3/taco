@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# instverify.startup : starts the TACO Inst_verify device server and menu
+#
+
+# setup TACO environment variables
+
+. .taco_env
+NETHOST=`uname -n` ; export NETHOST
+
+echo "Starting Inst_verify device server ..."
+../dserver/classes/instverify/src/Inst_verify 1&
+sleep 1
+echo "Starting Inst_verify menu ..."
+echo 3 > .instverify
+echo 0 >>.instverify
+../dserver/classes/instverify/src/Inst_verify_menu test/device/1 <.instverify&
+sleep 1

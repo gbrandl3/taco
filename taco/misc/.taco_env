@@ -1,0 +1,39 @@
+#!/bin/sh
+
+DBTABLES_STANDARD=NAMES,PS_NAMES,CLASS,SYS,ERROR,CMDS,SEC,EVENTS
+# add your DOAMIN tables here
+DBTABLES_DOMAIN=TEST
+DBTABLES=$DBTABLES_STANDARD,$DBTABLES_DOMAIN
+export DBTABLES
+
+DSHOME=/usr/local/dshome2
+export DSHOME
+RES_BASE_DIR=$DSHOME/dbase/res
+export RES_BASE_DIR
+DBM_DIR=$DSHOME/dbase/dbm
+export DBM_DIR
+if [[ ! -z $LD_LIBRARY_PATH ]]; then
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$DSHOME/lib/linux/x86
+else
+LD_LIBRARY_PATH=$DSHOME/lib/linux/x86
+fi
+export LD_LIBRARY_PATH
+
+if [[ ! -z $PYTHONPATH ]]; then
+PYTHONPATH=$PYTHONPATH:$DSHOME/lib/linux/x86:$DSHOME/python
+else
+PYTHONPATH=$DSHOME/lib/linux/x86:$DSHOME/python
+fi
+export PYTHONPATH
+
+if [[ ! -z $NETHOST ]]; then
+	true
+	echo "Nethost=" $NETHOST
+else
+	NETHOST=localhost
+	export NETHOST
+fi
+
+PATH=$PATH:$DSHOME/system/bin/linux/x86
+PATH=$PATH:$DSHOME/bin/linux/x86
+export PATH

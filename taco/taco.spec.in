@@ -1,0 +1,192 @@
+Summary: TACO control system FRM-II.
+Name: @PACKAGE@
+Version: @VERSION@
+Release: @RPM_RELEASE@
+Copyright: GPL
+Group: Utilities/TACO
+Source: @PACKAGE@-@VERSION@.tar.gz 
+Prefix: /usr/local/dshome2
+Vendor: FRMII, TU München, FRG
+Requires: gdbm
+Provides: tacoFRM
+
+%description
+
+%prep
+%setup -n @PACKAGE@-@VERSION@
+
+%build
+export DSHOME=/usr/local/dshome2
+./configure --enable-fast-install=yes --enable-greta --enable-xdevmenu --with-motif=/usr/X11R6/LessTif/Motif1.2 "--prefix=$DSHOME"
+make 
+
+%install
+export DSHOME=/usr/local/dshome2
+make install-strip
+make "DESTDIR=$PWD/tmp-install-dir" install
+find tmp-install-dir -regex ".*$DSHOME/lib/.*" -a -not -type d | sed -e 's/^tmp-install-dir//' > @PACKAGE@.lib.txt
+find tmp-install-dir -regex ".*$DSHOME/include/.*" -a -not -type d | sed -e 's/^tmp-install-dir//' > @PACKAGE@.include.txt
+
+%clean
+make uninstall
+if test "$PWD" = "${PWD%/*}/@PACKAGE@-@VERSION@" ; then
+	rm -rf "$PWD"
+else
+	echo "error: unexpected build directory: $PWD" ; exit 1
+fi
+       
+%post
+export DSHOME="$RPM_INSTALL_PREFIX"
+mkdir -p "$DSHOME/dbase/dbm"
+mkdir -p "$DSHOME/dbase/res/TEST"
+
+# Adjust some paths
+if test "x$DSHOME" != x/usr/local/dshome2 ; then
+	cd "$DSHOME"
+	for i in etc/.taco.csh \
+		etc/.taco_env \
+		etc/taco.shutdown \
+		etc/taco.startup \
+		etc/taco.startup.sec \
+		templates/taco/tacoenv.sh
+	do
+		mv $i tmp.sed
+		sed -e "s%/usr/local/dshome2%$DSHOME%" tmp.sed > $i
+	done
+	for i in lib/linux/x86/libTACOMySQL.la \
+		lib/linux/x86/libTACOndbm.la \
+		lib/linux/x86/libascapi.la \
+		lib/linux/x86/libdataport.la \
+		lib/linux/x86/libdbapi.la \
+		lib/linux/x86/libdcapi.la \
+		lib/linux/x86/libdcmem.la \
+		lib/linux/x86/libdsapi.la \
+		lib/linux/x86/libdsapig++.la \
+		lib/linux/x86/libdsxdr.la \
+		lib/linux/x86/libdsxdr_all.la \
+		lib/linux/x86/libtacoapi.la \
+		lib/linux/x86/libtacoapig++.la \
+		lib/linux/x86/libtcapi.la \
+		templates/taco/taco
+	do
+		mv $i tmp.sed
+		sed -e "s%/usr/local/dshome2%$DSHOME%" tmp.sed > $i
+		chmod 0755 $i
+	done
+	rm -f tmp.sed
+fi
+
+# Update the linker cache
+cd "$DSHOME/lib/linux/x86"
+/sbin/ldconfig -n
+
+# Install runlevel control script
+test -f /etc/tacoenv.sh || install -m 0644 "$DSHOME/templates/taco/tacoenv.sh" /etc
+
+# Install TACO environment file
+if test -d /etc/init.d ; then
+	initdir=/etc/init.d
+elif test -d /sbin/init.d ; then
+	initdir=/sbin/init.d
+elif test -d /etc/rc.d ; then
+	initdir=/etc/rc.d
+else
+	echo "error: cannot find init directory"
+	exit 1
+fi
+if ! test -f "$initdir/taco" ; then
+	taco_rc_file="$DSHOME/templates/taco/taco"
+	if test -f /etc/SuSE-release ; then
+		case `grep VERSION /etc/SuSE-release` in
+			'VERSION = 7.'*)
+				sed -e 's/\$portmap/portmap/' "$taco_rc_file" > "$taco_rc_file.sed"
+				mv "$taco_rc_file.sed" "$taco_rc_file"
+				chmod 0755 "$taco_rc_file"
+				;;
+		esac
+	fi
+	install "$taco_rc_file" "$initdir"
+fi
+echo "The automatic installation is complete."
+echo "You should read the file '$DSHOME/doc/index.html' now."
+
+%preun
+# Delete TACO services startup at the final erase
+if test "x$1" = x0 ; then
+	if test -e /sbin/chkconfig ; then
+		/sbin/chkconfig --del taco
+	elif test -e /sbin/insserv ; then
+		/sbin/insserv -r taco
+	else
+		echo "error: cannot find program to remove runlevel control script"
+		exit 1
+	fi
+fi
+
+%files -f @PACKAGE@.lib.txt
+%defattr(-,root,root)
+/usr/local/dshome2/doc/index.html
+/usr/local/dshome2/templates/taco/taco
+/usr/local/dshome2/templates/taco/tacoenv.sh
+%config(noreplace) /usr/local/dshome2/etc/.taco_env
+%config(noreplace) /usr/local/dshome2/etc/.taco.csh
+%config(noreplace) /usr/local/dshome2/etc/taco.shutdown
+%config(noreplace) /usr/local/dshome2/etc/taco.startup
+%config(noreplace) /usr/local/dshome2/etc/taco.startup.sec
+%config /usr/local/dshome2/dbase/res/SYS/README
+%config /usr/local/dshome2/dbase/res/SEC/README
+%config(noreplace) /usr/local/dshome2/dbase/res/SEC/sec_frm.res
+%config /usr/local/dshome2/dbase/res/CMDS/README
+%config /usr/local/dshome2/dbase/res/CMDS/dev_cmds.res
+%config /usr/local/dshome2/dbase/res/NAMES/README
+%config /usr/local/dshome2/dbase/res/PS_NAMES/README
+%config /usr/local/dshome2/dbase/res/ERROR/README
+%config /usr/local/dshome2/dbase/res/ERROR/dev_errors.res
+%config /usr/local/dshome2/dbase/res/CLASS/README
+%config /usr/local/dshome2/dbase/res/CLASS/Inst_verify.res
+%config /usr/local/dshome2/dbase/res/EVENTS/README
+%doc INSTALL doc/TACO.pdf doc/README
+/usr/local/dshome2/bin/linux/x86/db_fillup
+/usr/local/dshome2/bin/linux/x86/db_update
+/usr/local/dshome2/bin/linux/x86/db_read
+/usr/local/dshome2/bin/linux/x86/db_info
+/usr/local/dshome2/bin/linux/x86/db_initcache
+/usr/local/dshome2/bin/linux/x86/db_devinfo
+/usr/local/dshome2/bin/linux/x86/db_devdel
+/usr/local/dshome2/bin/linux/x86/db_servdel
+/usr/local/dshome2/bin/linux/x86/db_servinfo
+/usr/local/dshome2/bin/linux/x86/db_servunreg
+/usr/local/dshome2/bin/linux/x86/db_devres
+/usr/local/dshome2/bin/linux/x86/db_resdel
+/usr/local/dshome2/system/bin/linux/x86/Manager
+/usr/local/dshome2/system/bin/linux/x86/unreg
+/usr/local/dshome2/system/bin/linux/x86/MessageServer
+/usr/local/dshome2/system/bin/linux/x86/dcwr_alo
+/usr/local/dshome2/system/bin/linux/x86/dcrd_alo
+/usr/local/dshome2/system/bin/linux/x86/dbm_server
+
+%package x-apps
+Summary: TACO control system FRM-II X11 applications.
+Group: Utilities/TACO/X11
+Prefix: /usr/X11R6/lib/X11
+Provides: tacoFRM-x-apps
+
+%description x-apps
+
+%files x-apps
+%defattr(-,root,root)
+/usr/local/dshome2/bin/linux/x86/greta_ndbm
+/usr/local/dshome2/bin/linux/x86/xdevmenu
+/usr/X11/lib/X11/app-defaults/GReta
+/usr/X11/lib/X11/app-defaults/XDevmenu
+
+%package devel
+Summary: TACO control system FRM II development extensions.
+Group: Utilities/TACO/Development
+Prefix: /usr/local/dshome2
+Provides: tacoFRM-devel
+
+%description devel
+
+%files devel -f @PACKAGE@.include.txt
+%defattr(-,root,root)
