@@ -12,9 +12,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.3 $
+ Version    :	$Revision: 1.4 $
 
- Date       : 	$Date: 2003-05-02 09:12:48 $
+ Date       : 	$Date: 2003-05-16 13:47:46 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -24,6 +24,7 @@
 #include <API.h>
 #include <private/ApiP.h>
 #include <API_xdr_vers3.h>
+#include <stdlib.h>
 
 #include <Admin.h>
 #include <DevErrors.h>
@@ -141,8 +142,7 @@ long debug_flag = 0x0;
 }
 #endif
 
-/**
- *
+/**@ingroup dsAPI
  * imports a message service.
  * DS_xxx parameters are used to name the
  * approriate error file and to display
@@ -210,15 +210,15 @@ char *DS_display, long *error)
  	 * pass the information to the msgserver_info structure
  	 */
 
-	sprintf (msg_info.conf->device_name,"MessageServer");
+	strncpy (msg_info.conf->device_name, "MessageServer", sizeof(msg_info.conf->device_name));
 	msg_info.conf->clnt = clnt;
 	msg_info.conf->ds_id = 0;
 	msg_info.conf->no_svr_conn = 1;
 
-	sprintf (msg_info.DS_name,    "%s", DS_name);
-	sprintf (msg_info.DS_host,    "%s", DS_host);
+	snprintf (msg_info.DS_name, sizeof(msg_info.DS_name), "%s", DS_name);
+	snprintf (msg_info.DS_host, sizeof(msg_info.DS_host), "%s", DS_host);
 	msg_info.DS_prog_number         =   DS_prog_number;
-	sprintf (msg_info.DS_display, "%s", DS_display);
+	snprintf (msg_info.DS_display, sizeof(msg_info.DS_display), "%s", DS_display);
 
 	config_flags.message_server = True;
 
@@ -232,7 +232,7 @@ char *DS_display, long *error)
  * lists. It will still use the old tricky function!!
  */
 #if (!defined OSK) && (!defined _GNU_PP)
-/**
+/**@ingroup dsAPI
  * Send device server error_string to a message 
  * service or to stdout, if a message service
  * is not imported.
@@ -268,7 +268,7 @@ _DLLFunc void dev_printerror (DevShort mode, char *fmt, ...)
 	va_start(args, fmt);
 #endif /* sun */
 
-	vsprintf (buffer,fmt,args);
+	vsnprintf (buffer, sizeof(buffer), fmt,args);
 	strcat (buffer,"\n");
 
 	va_end(args);
@@ -289,11 +289,11 @@ _DLLFunc void dev_printerror (DevShort mode, char *fmt, ...)
 		{
 #ifdef _NT
 			char msg [1024];
-			sprintf ( msg, "\n\n%s\n", 
+			snprintf ( msg, sizeof(msg), "\n\n%s\n", 
 			    message_buffer[ERROR_TYPE].messages);
 			PRINTF(msg); //conout(msg);
 #else
-			printf ( "\n\n%s\n", 
+			fprintf (stderr, "\n\n%s\n", 
 			    message_buffer[ERROR_TYPE].messages);
 #endif
 			msg_clear ( ERROR_TYPE );
@@ -305,7 +305,7 @@ _DLLFunc void dev_printerror (DevShort mode, char *fmt, ...)
  * For OS9 version 2.4 and Solaris with g++
  */
 #else
-/**
+/**@ingroup dsAPI
  * Send device server error_string to a message 
  * service or to stdout, if a message service
  * is not imported.
@@ -333,22 +333,24 @@ _DLLFunc void dev_printerror (DevShort mode,char *fmt, char *str)
 
 	if (str != NULL)
 	{
-		sprintf (buffer,fmt,str);
+		snprintf (buffer, sizeof(buffer), fmt,str);
 	}
 	else
 	{
-		sprintf (buffer,fmt);
+		snprintf (buffer, sizeof(buffer), fmt);
 	}
-	strcat (buffer,"\n");
+	if (strlen(buffer) < sizeof(buffer) - 2)
+		strcat (buffer,"\n");
+	else
+		strcat (&buffer[sizeof(buffer) - 2], "\n")
 
 	msg_write ( ERROR_TYPE, buffer );
 
 	if ( mode != WRITE )
 	{
-		/*
-            * send messages to message server if imported
-            */
-
+/*
+ * send messages to message server if imported
+ */
 		if ( config_flags.message_server )
 		{
 			msg_send ( ERROR_TYPE );
@@ -357,11 +359,11 @@ _DLLFunc void dev_printerror (DevShort mode,char *fmt, char *str)
 		{
 #ifdef _NT
 			char msg[1024];
-			sprintf ( msg, "\n\n%s\n", 
+			snprintf ( msg, sizeof(msg), "\n\n%s\n", 
 			    message_buffer[ERROR_TYPE].messages);
 			PRINTF(msg); //conout(msrg);
 #else
-			printf ( "\n\n%s\n", 
+			fprintf (stderr, "\n\n%s\n", 
 			    message_buffer[ERROR_TYPE].messages);
 #endif
 			msg_clear ( ERROR_TYPE );
@@ -370,69 +372,41 @@ _DLLFunc void dev_printerror (DevShort mode,char *fmt, char *str)
 }
 #endif /* OSK */
 
-/*+**********************************************************************
- Function   :	extern void *dev_printerror_no()
-
- Description:   retrieves the related error string for an error number
-		from the list in DevErrors.h or the rsource database
-		and sends the error string with the choosen mode 
-		to dev_printerror().
-
- Arg(s) In  :	short mode     - mode for message buffer : WRITE or SEND
-	    :	char *comment  - comment to be printed before 
-				 error string.
-	    :   long dev_errno - device server system error number.
-
- Arg(s) Out :   none
-
- Return(s)  :   none
-***********************************************************************-*/
-
+/**@ingroup dsAPI
+ * retrieves the related error string for an error number
+ * from the list in DevErrors.h or the rsource database
+ * and sends the error string with the choosen mode 
+ * to dev_printerror().
+ * 
+ * @param mode     	mode for message buffer : WRITE or SEND
+ * @param comment  	comment to be printed before error string.
+ * @param dev_errno 	device server system error number.
+ */ 
 void _DLLFunc dev_printerror_no (DevShort mode, char *comment, long dev_errno)
 {
-	char *error_string=NULL;
-
-	/*
-         * get error string from the resource database
-         */
-
-	error_string = get_error_string ( dev_errno);
-
+	char *error_string = get_error_string ( dev_errno);
+/*
+ * get error string from the resource database
+ */
 	if (comment != NULL)
-	{
-		dev_printerror (mode,"%s",comment);
-	}
-
-	dev_printerror (mode,"%s",error_string);
-	if (error_string != NULL) free(error_string);
+		dev_printerror (mode, "%s", comment);
+	dev_printerror (mode, "%s", error_string);
+	if (error_string != NULL) 
+		free(error_string);
 }
 
 
-/*+**********************************************************************
- Function   :	extern char *dev_error_str()
-
- Description:   retrieves the related error string for an error number
-		from the list in DevErrors.h.
-
- Arg(s) In  :   long dev_errno - device server system error number.
-
- Arg(s) Out :   none
-
- Return(s)  :   error string, related to dev_errno.
-***********************************************************************-*/
-
+/**@ingroup dsAPI
+ * Description:   retrieves the related error string for an error number
+ * from the list in DevErrors.h.
+ * 
+ * @param dev_errno device server system error number.
+ * 
+ * @return error string, related to dev_errno.
+ */ 
 _DLLFunc char * dev_error_str (long dev_errno)
 {
-	char		*error_string = NULL;
-
-	/*
-	 * get error string from the resource database
-	 */
-
-	error_string = get_error_string (dev_errno);
-
-	return(error_string);
-
+	return get_error_string (dev_errno);
 }
 
 /*
@@ -440,26 +414,19 @@ _DLLFunc char * dev_error_str (long dev_errno)
  * lists. It will still use the old tricky function!!
  */
 #if (!defined OSK) && (!defined _GNU_PP)
-/*+**********************************************************************
- Function   :   extern void dev_printdebug()
-
- Description:   Send debug string to a message service
-		or to stdout, if a message service
-		is not imported.
-            :   A debug string will be send if one of the debug_bits
-		related to the string is set in the global debug_flag.
-            :   Debug strings can br only 256 characters long.
-
- Arg(s) In  :	long debug_bits  - debug bits on which to send the
-				   information.
-	    :   char *fmt        - format string in printf() style.
-            :   double a0,...,a9 - reserving memory for variables to print.
-
- Arg(s) Out :   none
-
- Return(s)  :   none
-***********************************************************************-*/
-
+/**@ingroup dsAPI
+ * Send debug string to a message service or to stdout, if a message service
+ * is not imported.
+ *
+ * A debug string will be send if one of the debug_bits
+ * related to the string is set in the global debug_flag.
+ *
+ * Debug strings can br only 256 characters long.
+ *
+ * @param debug_bits  	debug bits on which to send the information.
+ * @param fmt        	format string in printf() style.
+ * @param ... 		reserving memory for variables to print.
+ */ 
 void _DLLFunc dev_printdebug (long debug_bits, char *fmt, ...)
 {
 	char		debug_string[256];
@@ -485,13 +452,10 @@ void _DLLFunc dev_printdebug (long debug_bits, char *fmt, ...)
 
 		if ( (debug_flag & debug_bits) != 0 )
 		{
-			vsprintf (debug_string,fmt,args);
-			/*printf("dev_printdebug(): strlen(fmt) %d strlen(debug_string) %d\n",strlen(fmt),strlen(debug_string));*/
-
-	      		/*
-	       		 *  is the message server imported ?
-	       		 */
-
+			vsnprintf (debug_string, sizeof(debug_string), fmt,args);
+/*
+ *  is the message server imported ?
+ */
 			if ( config_flags.message_server )
 			{
 				msg_write ( DEBUG_TYPE, debug_string );
@@ -517,54 +481,41 @@ void _DLLFunc dev_printdebug (long debug_bits, char *fmt, ...)
  * For OS9 version 2.4 and Solaris with g++
  */
 #else
-/*+**********************************************************************
- Function   :   extern void dev_printdebug()
-
- Description:   Send debug string to a message service
-		or to stdout, if a message service
-		is not imported.
-            :   A debug string will be send if one of the debug_bits
-		related to the string is set in the global debug_flag.
-            :   Debug strings can br only 256 characters long.
-
- Arg(s) In  :	long debug_bits  - debug bits on which to send the
-				   information.
-	    :   char *fmt        - format string in printf() style.
-            :   double a0,...,a9 - reserving memory for variables to print.
-
- Arg(s) Out :   none
-
- Return(s)  :   none
-***********************************************************************-*/
+/**@ingroup dsAPI
+ * Send debug string to a message service or to stdout, if a message service
+ * is not imported.
+ *
+ * A debug string will be send if one of the debug_bits
+ * related to the string is set in the global debug_flag.
+ *
+ * Debug strings can br only 256 characters long.
+ *
+ * @param debug_bits  	debug bits on which to send the information.
+ * @param fmt        	format string in printf() style.
+ * @param str		reserving memory for variables to print.
+ */
 void dev_printdebug (long debug_bits,char *fmt, char *str)
 {
 	char 	debug_string[256];
 
-	/*
-	 *  is debuging switched on ?
-	 */
+/*
+ *  is debuging switched on ?
+ */
 
 	if ( debug_flag & DEBUG_ON_OFF )
 	{
-		/*
-	    *  are the right debug bits set ?
-	    */
-
+/*
+ *  are the right debug bits set ?
+ */
 		if ( (debug_flag & debug_bits) != NULL )
 		{
 			if (str != NULL)
-			{
-				sprintf (debug_string,fmt,str);
-			}
+				snprintf (debug_string, sizeof(debug_string), fmt,str);
 			else
-			{
-				sprintf (debug_string,fmt);
-			}
-
-			/*
-	       *  is the message server imported ?
-	       */
-
+				snprintf (debug_string, sizeof(debug_string), fmt);
+/*
+ *  is the message server imported ?
+ */
 			if ( config_flags.message_server )
 			{
 				msg_write ( DEBUG_TYPE, debug_string );
@@ -581,39 +532,29 @@ void dev_printdebug (long debug_bits,char *fmt, char *str)
 			}
 		}
 	}
-
 }
 #endif /* OSK */
-
-
 
 /*
  * Attention: OS9 version 2.4 can not handle variable argument
  * lists. It will still use the old tricky function!!
  */
 #if (!defined OSK) && (!defined _GNU_PP)
-
-/*+**********************************************************************
- Function   :   extern void dev_printdiag()
-
- Description:   Send device server diagnostic_string to a message 
-		service or to stdout, if a message service
-		is not imported.
-            :   Diagnostic strings can be only 256 characters long.
-		Longer texts can be send by storing short
-		strings in the message buffer with the WRITE
-		mode and send the whole buffer by using
-		the SEND mode with the last string.
-
- Arg(s) In  :	short mode       - mode for message buffer : WRITE or SEND
-	    :   char *fmt        - format string in printf() style.
-            :   double a0,...,a9 - reserving memory for variables to print.
-
- Arg(s) Out :   none
-
- Return(s)  :   none
-***********************************************************************-*/
-
+/**@ingroup dsAPI
+ * Send device server diagnostic_string to a message 
+ * service or to stdout, if a message service
+ * is not imported.
+ *
+ * Diagnostic strings can be only 256 characters long.
+ * Longer texts can be send by storing short
+ * strings in the message buffer with the WRITE
+ * mode and send the whole buffer by using
+ * the SEND mode with the last string.
+ *
+ * @param mode mode for message buffer : WRITE or SEND
+ * @param fmt  format string in printf() style.
+ * @param ...  reserving memory for variables to print.
+ */
 _DLLFunc void dev_printdiag (DevShort mode, char *fmt, ...)
 {
 	char  		buffer [256];
@@ -624,7 +565,7 @@ _DLLFunc void dev_printdiag (DevShort mode, char *fmt, ...)
 		msg_clear ( DIAG_TYPE );
 		return;
 	}
-	/*
+/*
  * get variable argument list pointer in order to pass it to vsprintf()
  */
 #if (defined sun) || (defined irix)
@@ -633,24 +574,21 @@ _DLLFunc void dev_printdiag (DevShort mode, char *fmt, ...)
 	va_start(args, fmt);
 #endif /* sun */
 
-	/*
+/*
  * vsprintf() gives a core dump at present (17sep94) replace it with
  * a simple sprintf() and ignore the variable arguments for the moment
  *
- 	sprintf (buffer,fmt);
+ 	snprintf (buffer, sizeof(buffer), fmt);
  */
-	vsprintf (buffer,fmt,args);
-
+	vsnprintf (buffer, sizeof(buffer), fmt,args);
 	va_end(args);
-
 	msg_write ( DIAG_TYPE, buffer );
 
 	if ( mode != WRITE )
 	{
-		/*
-            * send messages to message server if imported
-            */
-
+/*
+ * send messages to message server if imported
+ */
 		if ( config_flags.message_server )
 		{
 			msg_send ( DIAG_TYPE );
@@ -659,7 +597,7 @@ _DLLFunc void dev_printdiag (DevShort mode, char *fmt, ...)
 		{
 #ifdef _NT
 			char msg[1024];
-			sprintf (msg,"%s", message_buffer[DIAG_TYPE].messages);
+			snprintf (msg, sizeof(msg), "%s", message_buffer[DIAG_TYPE].messages);
 			PRINTF(msg); //conout(msg);
 #else
 			printf ("%s", message_buffer[DIAG_TYPE].messages);
@@ -680,29 +618,24 @@ _DLLFunc void dev_printdiag (DevShort mode, char *fmt, ...)
  */
 #else
 
-/**/
-/*+**********************************************************************
- Function   :   extern void dev_printdiag()
-
- Description:   Send device server diagnostic_string to a message 
-		service or to stdout, if a message service
-		is not imported.
-            :   Diagnostic strings can be only 256 characters long.
-		Longer texts can be send by storing short
-		strings in the message buffer with the WRITE
-		mode and send the whole buffer by using
-		the SEND mode with the last string.
-
- Arg(s) In  :	short mode       - mode for message buffer : WRITE or SEND
-	    :   char *fmt        - format string in printf() style.
-
- Arg(s) Out :   none
-
- Return(s)  :   none
-***********************************************************************-*/
+/**@ingroup dsAPI
+ * Send device server diagnostic_string to a message 
+ * service or to stdout, if a message service
+ * is not imported.
+ *
+ * Diagnostic strings can be only 256 characters long.
+ * Longer texts can be send by storing short
+ * strings in the message buffer with the WRITE
+ * mode and send the whole buffer by using
+ * the SEND mode with the last string.
+ *
+ * @param mode mode for message buffer : WRITE or SEND
+ * @param fmt  format string in printf() style.
+ * @param str  reserving memory for variables to print.
+ */
 void dev_printdiag (DevShort mode,char *fmt,char *str)
 {
-	char  		buffer [256];
+	char	buffer [256];
 
 	if ( mode == CLEAR )
 	{
@@ -711,22 +644,17 @@ void dev_printdiag (DevShort mode,char *fmt,char *str)
 	}
 
 	if (str != NULL)
-	{
-		sprintf (buffer,fmt,str);
-	}
+		snprintf (buffer, sizeof(buffer), fmt,str);
 	else
-	{
-		sprintf (buffer,fmt);
-	}
+		snprintf (buffer, sizeof(buffer), fmt);
 
 	msg_write ( DIAG_TYPE, buffer );
 
 	if ( mode != WRITE )
 	{
-		/*
-            * send messages to message server if imported
-            */
-
+/*
+ * send messages to message server if imported
+ */
 		if ( config_flags.message_server )
 		{
 			msg_send ( DIAG_TYPE );
@@ -735,7 +663,7 @@ void dev_printdiag (DevShort mode,char *fmt,char *str)
 		{
 #ifdef _NT
 			char msg[1024];
-			sprintf (masg,"%s", message_buffer[DIAG_TYPE].messages);
+			snprintf (msg, sizeof(msg), "%s", message_buffer[DIAG_TYPE].messages);
 			PRINTF(msg); //conout(msg);
 #else
 			printf ("%s", message_buffer[DIAG_TYPE].messages);
@@ -747,19 +675,12 @@ void dev_printdiag (DevShort mode,char *fmt,char *str)
 #endif /* OSK */
 
 
-/*+**********************************************************************
- Function   :	static void msg_write()
-
- Description:   writing messages into the message buffer  
-
- Arg(s) In  :   int msg_type     - type of message : error or debug
-	    :	char *msg_string - message string
-
- Arg(s) Out :   none
-
- Return(s)  :   none
-***********************************************************************-*/
-
+/**@ingroup dsAPI
+ * writing messages into the message buffer  
+ *
+ * @param msg_type   type of message: error or debug
+ * @param msg_string message string
+ */
 static void msg_write (_Int msg_type, char *msg_string)
 {
 	char 	*help;
@@ -768,10 +689,9 @@ static void msg_write (_Int msg_type, char *msg_string)
 	int		pid = 0;
 	static short init_flg = 0;
 
-	/*
-   * initialise all message buffer
-   */
-
+/*
+ * initialise all message buffer
+ */
 	if ( init_flg == 0 )
 	{
 		for ( i=0; i<NUMBER_OF_MSG_TYPES; i++ )
@@ -783,10 +703,9 @@ static void msg_write (_Int msg_type, char *msg_string)
 		init_flg = 1;
 	}
 
-	/*
-    * allocate space for the first message
-    */
-
+/*
+ * allocate space for the first message
+ */
 	if ( message_buffer[msg_type].init_flg == 0 )
 	{
 		len = strlen(msg_string) + 1;
@@ -815,63 +734,53 @@ static void msg_write (_Int msg_type, char *msg_string)
 	}
 
 	else
-		/*
-       * reallocate space for further messages
-       */
+/*
+ * reallocate space for further messages
+ */
+	{
+		len = message_buffer[msg_type].nbytes + strlen (msg_string);
+		help = message_buffer[msg_type].messages;
 
+		if ((help=(char *)realloc(message_buffer[msg_type].messages,len)) == NULL)
 		{
-			len = message_buffer[msg_type].nbytes + strlen (msg_string);
-			help = message_buffer[msg_type].messages;
-
-			if ((help=(char *)realloc(message_buffer[msg_type].messages,len)) == NULL)
-			{
 #ifdef _NT
-				{
+			{
 				char msg[1024];
 				PRINTF("msg_write() : Insufficient memory for reallocation !");
-				sprintf(msg,"message_buffer contents :\n%s",
+				snprintf(msg, sizeof(msg), "message_buffer contents :\n%s",
 				    message_buffer[msg_type].messages );
 				PRINTF(msg);
-				}
+			}
 #else
-				printf("msg_write() : Insufficient memory for reallocation !");
-				printf ("message_buffer contents :\n%s",
-				    message_buffer[msg_type].messages );
+			printf("msg_write() : Insufficient memory for reallocation !");
+			printf ("message_buffer contents :\n%s",
+			    message_buffer[msg_type].messages );
 #endif
 #if !defined (_NT)
 #if !defined (vxworks)
-				pid = getpid ();
+			pid = getpid ();
 #else  /* !vxworks */
-				pid = taskIdSelf ();
+			pid = taskIdSelf ();
 #endif /* !vxworks */
-				kill (pid,SIGQUIT);
+			kill (pid,SIGQUIT);
 #else
-				raise(SIGTERM);
+			raise(SIGTERM);
 #endif /* _NT */
-			}
-
-			message_buffer[msg_type].nbytes = len;
-			message_buffer[msg_type].messages = help;
-			strcat ( message_buffer[msg_type].messages , msg_string);
 		}
 
+		message_buffer[msg_type].nbytes = len;
+		message_buffer[msg_type].messages = help;
+		strcat ( message_buffer[msg_type].messages , msg_string);
+	}
 }
 
 
-/*+**********************************************************************
- Function   :	static void msg_send()
-
- Description:   sends the contents of the message buffer
-		to the message server or stdout, if no
-		message service is imported.
-
- Arg(s) In  :   int msg_type     - type of message : error or debug
-
- Arg(s) Out :   none
-
- Return(s)  :   none
-***********************************************************************-*/
-
+/**@ingroup dsAPI
+ * sends the contents of the message buffer to the message server or stdout, if no
+ * message service is imported.
+ *
+ * @param msg_type     type of message: error or debug
+ */ 
 static void msg_send (_Int msg_type)
 {
 	_msg_data 		msg_data;
@@ -882,10 +791,9 @@ static void msg_send (_Int msg_type)
 
 	if ( message_buffer[msg_type].init_flg == 1 )
 	{
-		/*
-       * initialise message structur
-       */
-
+/*
+ * initialise message structur
+ */
 		msg_data.devserver_name  = msg_info.DS_name;
 		msg_data.host_name       = msg_info.DS_host;
 		msg_data.prog_number     = msg_info.DS_prog_number;
@@ -893,10 +801,9 @@ static void msg_send (_Int msg_type)
 		msg_data.type_of_message = msg_type;
 		msg_data.message_buffer  = message_buffer[msg_type].messages;
 
-		/*
-       * send message structur to message server
-       */
-
+/*
+ * send message structur to message server
+ */
 		clnt_stat = clnt_call (msg_info.conf->clnt,RPC_MSG_SEND,
 		    (xdrproc_t)xdr__msg_data, (caddr_t) &msg_data,
 		    (xdrproc_t)xdr__msg_out, (caddr_t) &msg_out, TIMEVAL(timeout));
@@ -904,21 +811,20 @@ static void msg_send (_Int msg_type)
 		{
 #ifdef _NT
 			{
-			char msg[1024];
-			PRINTF(clnt_sperror (msg_info.conf->clnt,"msg_send()"));
-			sprintf(msg, "message_buffer contents :\n%s",
-			    message_buffer[msg_type].messages );
-			PRINTF(msg);
+				char msg[1024];
+				PRINTF(clnt_sperror (msg_info.conf->clnt,"msg_send()"));
+				snprintf(msg, sizeof(msg), "message_buffer contents :\n%s",
+				    message_buffer[msg_type].messages );
+				PRINTF(msg);
 			}
 #else
 			clnt_perror (msg_info.conf->clnt,"msg_send()");
 			printf ("message_buffer contents :\n%s",
 			    message_buffer[msg_type].messages );
 #endif
-
-			/*
-	  *  exit server if message server connection fails
-	  */
+/*
+ *  exit server if message server connection fails
+ */
 
 #if !defined (_NT)
 #if !defined (vxworks)
@@ -939,23 +845,22 @@ static void msg_send (_Int msg_type)
 			{
 #ifdef _NT
 				{
-				char msg[1024];
-				sprintf (msg,"Message Server : error number %d",msg_out.error);
-				PRINTF(msg);
-				sprintf (msg,"message_buffer contents :\n%s",
-				    message_buffer[msg_type].messages );
-				PRINTF(msg);
+					char msg[1024];
+					snprintf (msg, sizeof(msg), "Message Server : error number %d",msg_out.error);
+					PRINTF(msg);
+					snprintf (msg, sizeof(msg), "message_buffer contents :\n%s",
+					    message_buffer[msg_type].messages );
+					PRINTF(msg);
 				}
 #else
 				printf ("Message Server : error number %d",msg_out.error);
 				printf ("message_buffer contents :\n%s",
 				    message_buffer[msg_type].messages );
 #endif
-
-				/*
-	     *  exit server if message server fails to
-	     *  process an error message
-	     */
+/*
+ *  exit server if message server fails to
+ *  process an error message
+ */
 
 #if !defined (_NT)
 #if !defined (vxworks)
@@ -969,33 +874,22 @@ static void msg_send (_Int msg_type)
 #endif /* _NT */
 				return;
 			}
-
 			dev_printerror_no (WRITE,"Message Server : ",msg_out.error);
 			dev_printerror (SEND,"%s","msg_send : Message transfer failed");
 			return;
 		}
-
-		/*
-       * free message buffer
-       */
-
+/*
+ * free message buffer
+ */
 		msg_clear ( msg_type );
 	}
 }
 
-
-/*+**********************************************************************
- Function   :	static void msg_clear()
-
- Description:   frees the contents of the message buffer
-
- Arg(s) In  :   int msg_type     - type of message : error or debug
-
- Arg(s) Out :   none
-
- Return(s)  :   none
-***********************************************************************-*/
-
+/**@ingroup dsAPI
+ * frees the contents of the message buffer
+ * 
+ * @param msg_type type of message: error or debug
+ */
 static void msg_clear (_Int msg_type)
 {
 	if (message_buffer[msg_type].messages != NULL) 
@@ -1005,21 +899,14 @@ static void msg_clear (_Int msg_type)
 	message_buffer[msg_type].messages = NULL;
 }
 
-
-/*+**********************************************************************
- Function   :	extern long db_import()
-
- Description:   import the static database service
-
- Arg(s) In  :   none
-
- Arg(s) Out :   long *error - Will contain an appropriate error
-			      code if the corresponding call
-		    	      returns a non-zero value.
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**@ingroup dsAPI
+ * import the static database service
+ *
+ * @param error Will contain an appropriate error
+ *		code if the corresponding call returns a non-zero value.
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 long _DLLFunc db_import (long *error)
 {
 	CLIENT		*clnt;
@@ -1030,34 +917,25 @@ long _DLLFunc db_import (long *error)
 
 	*error = DS_OK;
 
-	/*
-	 * check wether a database server is already imported
-	 */
-
+/*
+ * check wether a database server is already imported
+ */
 	if (config_flags.database_server)
 		return (DS_OK);
 
-	/*
-	 * check wether the system is already configured
-	 */
-
-	if ( !config_flags.configuration )
-	{
-		if ( (setup_config (error)) < 0 )
+/*
+ * check wether the system is already configured
+ */
+	if ( !config_flags.configuration && (setup_config(error) != DS_OK) )
 			return (DS_NOTOK);
-	}
 
-
-	/*
-	 * Create message server client handle with data from
-	 * global dbserver_info structure.
-	 */
-
-	/* Create a client handle for version 3! */
-	clnt = clnt_create ( db_info.conf->server_host,
-	    		     db_info.conf->prog_number,
-	    		     DB_VERS_3,
-	    		     "udp");
+/*
+ * Create message server client handle with data from
+ * global dbserver_info structure.
+ *
+ * Create a client handle for version 3! 
+ */
+	clnt = clnt_create ( db_info.conf->server_host, db_info.conf->prog_number, DB_VERS_3, "udp");
 	if (clnt == NULL)
 	{
 		hstring = clnt_spcreateerror ("db_import");
@@ -1069,79 +947,69 @@ long _DLLFunc db_import (long *error)
 	clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &dbase_retry_timeout);
 	clnt_control (clnt, CLSET_TIMEOUT, (char *) &dbase_timeout);
 
-	/*
-	 * Check the database server version. 
-	 * If it is not a new version 3 server, create a handle to
-	 * version 2!!!
-	 */ 
-
+/*
+ * Check the database server version. 
+ * If it is not a new version 3 server, create a handle to version 2!!!
+ */ 
         clnt_stat = clnt_call (clnt, NULLPROC, (xdrproc_t)xdr_void, NULL, 
 			       (xdrproc_t)xdr_void, NULL, TIMEVAL(timeout));
         if (clnt_stat != RPC_SUCCESS)
-           {
-           if ( clnt_stat != RPC_PROGVERSMISMATCH )
-              {
-              clnt_perror (clnt,"db_import()");
-              clnt_destroy (clnt);
-              *error = DevErr_DbImportFailed;
-              return (DS_NOTOK);
-              }
+        {
+        	if ( clnt_stat != RPC_PROGVERSMISMATCH )
+		{
+			clnt_perror (clnt,"db_import()");
+			clnt_destroy (clnt);
+			*error = DevErr_DbImportFailed;
+			return (DS_NOTOK);
+		}
 
-           /*
-            * If it was an old version 2 of the database server,
-            * a version mismatch occured because the client handle
-            * was created for version 3.
-            * Destroy the handle and use version 2.
-            */
-	   else
-	      {
-              /*
-               * Destroy version 3 handle.
-               */
-              clnt_destroy (clnt);
+/*
+ * If it was an old version 2 of the database server,
+ * a version mismatch occured because the client handle
+ * was created for version 3.
+ * Destroy the handle and use version 2.
+ */
+		else
+		{
+/*
+ * Destroy version 3 handle.
+ */
+			clnt_destroy (clnt);
 
-              /*
-               * Set version number to 2 and recreate the
-               * client handle.
- 	 *  read environmental variable NETHOST
+/*
+ * Set version number to 2 and recreate the
+ * client handle.
+ *  read environmental variable NETHOST
+ */
+			clnt = clnt_create ( db_info.conf->server_host, db_info.conf->prog_number, DB_VERS_2, "udp");
+			if (clnt == NULL)
+			{
+				hstring = clnt_spcreateerror ("db_import()");
+				dev_printerror (SEND,"%s",hstring);
+				*error = DevErr_DbImportFailed;
+				return (DS_NOTOK);
+			}
 
-               */
-
-	      clnt = clnt_create ( db_info.conf->server_host,
-	    		           db_info.conf->prog_number,
-	    		           DB_VERS_2,
-	    		           "udp");
-	      if (clnt == NULL)
-	         {
-		 hstring = clnt_spcreateerror ("db_import()");
-		 dev_printerror (SEND,"%s",hstring);
-		 *error = DevErr_DbImportFailed;
-		 return (DS_NOTOK);
-	         }
-
-	      db_info.conf->vers_number = DB_VERS_2;
-	      }
-	   }
-	else
-	if ( (nethost_env = (char *)getenv ("NETHOST")) == NULL )
+			db_info.conf->vers_number = DB_VERS_2;
+		}
+	}
+	else if ((nethost_env = (char *)getenv ("NETHOST")) == NULL)
 	{
-	   	db_info.conf->vers_number = DB_VERS_3;
-		*error = DevErr_NethostNotDefined;
-		return (DS_NOTOK);
+	   		db_info.conf->vers_number = DB_VERS_3;
+			*error = DevErr_NethostNotDefined;
+			return (DS_NOTOK);
 	}
 
-
-	/* 
- 	 * pass the information to the database server_info structure
- 	 */
-
-	sprintf (db_info.conf->device_name,"DatabaseServer");
+/* 
+ * pass the information to the database server_info structure
+ */
+	strncpy (db_info.conf->device_name, "DatabaseServer", sizeof(db_info.conf->device_name));
 	db_info.conf->clnt = clnt;
 	db_info.conf->ds_id = 0;
 	db_info.conf->no_svr_conn = 1;
 
 	config_flags.database_server = True;
-	sprintf(nethost, "%s",nethost_env);
+	strncpy(nethost, nethost_env, sizeof(nethost));
 
 /*
  * for multi-nethost support copy the default configuration
@@ -1154,20 +1022,15 @@ long _DLLFunc db_import (long *error)
 }
 
 
-/*+**********************************************************************
- Function   :	extern long db_import_multi()
-
- Description:   import the static database service for a multi-nethost
-
- Arg(s) In  :   nethost - which nethost to import the static database
-		          for
-
- Arg(s) Out :   long *error - Will contain an appropriate error
-			      code if the corresponding call
-		    	      returns a non-zero value.
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**@ingroup dsAPI
+ * import the static database service for a multi-nethost
+ *
+ * @param nethost 	which nethost to import the static database for
+ * @param error 	Will contain an appropriate error code if the 
+ *			corresponding call returns a non-zero value.
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 long _DLLFunc db_import_multi (char *nethost, long *error)
 {
 	CLIENT		*clnt;
@@ -1178,40 +1041,38 @@ long _DLLFunc db_import_multi (char *nethost, long *error)
 
 	*error = DS_OK;
 
-	/*
-	 * identify the nethost in the array of multi-nethosts
-	 */
+/*
+ * identify the nethost in the array of multi-nethosts
+ */
 	if ((i_nethost = get_i_nethost_by_name(nethost,error)) < 0)
 	{
-        /*
-         * if not try to configure the new nethost
-         */
+/*
+ * if not try to configure the new nethost
+ */
                 if ( (setup_config_multi (nethost,error)) < 0 )
                         return (DS_NOTOK);
 		i_nethost = get_i_nethost_by_name(nethost,error);
 	}
-	/* 
-	 * which nethost to import the database from
-	 */
+/* 
+ * which nethost to import the database from
+ */
 	nethost_i = &(multi_nethost[i_nethost]);
 
-	/*
-	 * check wether a database server is already imported
-	 */
-
+/*
+ * check wether a database server is already imported
+ */
 	if (nethost_i->config_flags.database_server)
 		return (DS_OK);
 
-	/*
-	 * Create message server client handle with data from
-	 * global dbserver_info structure.
-	 */
+/*
+ * Create message server client handle with data from
+ * global dbserver_info structure.
+ */
 
-	/* Create a client handle for version 3! */
-	clnt = clnt_create ( nethost_i->db_info->server_host,
-	    		     nethost_i->db_info->prog_number,
-	    		     DB_VERS_3,
-	    		     "udp");
+/* 
+ * Create a client handle for version 3! 
+ */
+	clnt = clnt_create ( nethost_i->db_info->server_host, nethost_i->db_info->prog_number, DB_VERS_3, "udp");
 	if (clnt == NULL)
 	{
 		hstring = clnt_spcreateerror ("db_import");
@@ -1223,74 +1084,59 @@ long _DLLFunc db_import_multi (char *nethost, long *error)
 	clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &dbase_retry_timeout);
 	clnt_control (clnt, CLSET_TIMEOUT, (char *) &dbase_timeout);
 
-	/*
-	 * Check the database server version. 
-	 * If it is not a new version 3 server, create a handle to
-	 * version 2!!!
-	 */ 
-
-        clnt_stat = clnt_call (clnt, NULLPROC, (xdrproc_t)xdr_void, NULL, 
+/*
+ * Check the database server version. 
+ * If it is not a new version 3 server, create a handle to version 2!!!
+ */ 
+	clnt_stat = clnt_call (clnt, NULLPROC, (xdrproc_t)xdr_void, NULL, 
 			       (xdrproc_t)xdr_void, NULL, TIMEVAL(timeout));
-        if (clnt_stat != RPC_SUCCESS)
-           {
-           if ( clnt_stat != RPC_PROGVERSMISMATCH )
-              {
-              clnt_perror (clnt,"db_import()");
-              clnt_destroy (clnt);
-              *error = DevErr_DbImportFailed;
-              return (DS_NOTOK);
-              }
+	if (clnt_stat != RPC_SUCCESS)
+	{
+		if ( clnt_stat != RPC_PROGVERSMISMATCH )
+		{
+		clnt_perror (clnt,"db_import()");
+		clnt_destroy (clnt);
+		*error = DevErr_DbImportFailed;
+		return (DS_NOTOK);
+		}
 
-           /*
-            * If it was an old version 2 of the database server,
-            * a version mismatch occured because the client handle
-            * was created for version 3.
-            * Destroy the handle and use version 2.
-            */
-	   else
-	      {
-              /*
-               * Destroy version 3 handle.
-               */
-              clnt_destroy (clnt);
-
-              /*
-               * Set version number to 2 and recreate the
-               * client handle.
-               */
-
-	      clnt = clnt_create ( nethost_i->db_info->server_host,
-	    		           nethost_i->db_info->prog_number,
-	    		           DB_VERS_2,
-	    		           "udp");
-	      if (clnt == NULL)
-	         {
-		 hstring = clnt_spcreateerror ("db_import()");
-		 dev_printerror (SEND,"%s",hstring);
-		 *error = DevErr_DbImportFailed;
-		 return (DS_NOTOK);
-	         }
-
-	      nethost_i->db_info->vers_number = DB_VERS_2;
-	      }
-	   }
+/*
+ * If it was an old version 2 of the database server,
+ * a version mismatch occured because the client handle
+ * was created for version 3.
+ * Destroy the handle and use version 2.
+ */
+		else
+		{
+/*
+ * Destroy version 3 handle.
+ */
+			clnt_destroy (clnt);
+/*
+ * Set version number to 2 and recreate the client handle.
+ */
+			clnt = clnt_create ( nethost_i->db_info->server_host, nethost_i->db_info->prog_number, DB_VERS_2, "udp");
+			if (clnt == NULL)
+			{
+				hstring = clnt_spcreateerror ("db_import()");
+				dev_printerror (SEND,"%s",hstring);
+				*error = DevErr_DbImportFailed;
+				return (DS_NOTOK);
+			}
+			nethost_i->db_info->vers_number = DB_VERS_2;
+		}
+	}
 	else
-	   {
-	   nethost_i->db_info->vers_number = DB_VERS_3;
-	   }
+		nethost_i->db_info->vers_number = DB_VERS_3;
 
-
-	/* 
- 	 * pass the information to the database server_info structure
- 	 */
-
-	sprintf (nethost_i->db_info->device_name,"DatabaseServer");
+/* 
+ * pass the information to the database server_info structure
+ */
+	strncpy(nethost_i->db_info->device_name,"DatabaseServer", sizeof(nethost_i->db_info->device_name));
 	nethost_i->db_info->clnt = clnt;
 	nethost_i->db_info->ds_id = 0;
 	nethost_i->db_info->no_svr_conn = 1;
-
 	nethost_i->config_flags.database_server = True;
-
 	if (i_nethost == 0)
 	{
 /*
@@ -1300,39 +1146,31 @@ long _DLLFunc db_import_multi (char *nethost, long *error)
 		if (!config_flags.database_server)
 		{
 			if (db_import(error) != DS_OK)
-			{
 				return(DS_NOTOK);
-			}
 			config_flags = nethost_i->config_flags;
 			db_info.conf = multi_nethost[0].db_info ;
 		}
 	}
-
 	return (DS_OK);
 }
 
-
-/*+**********************************************************************
- Function   :	static long setup_config()
-
- Description:   gets the necessary configuration information
-		for a static database service and a message
-		service from  a network manager.
-            :   The host of the network manager must be 
-	        specified by the environment variable NETHOST.    
-
- Arg(s) In  :   none
-
- Arg(s) Out :   long *error - Will contain an appropriate error
-			      code if the corresponding call
-		    	      returns a non-zero value.
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**@ingroup dsAPI
+ * gets the necessary configuration information
+ * for a static database service and a message
+ * service from  a network manager.
+ *
+ * The host of the network manager must be 
+ * specified by the environment variable NETHOST.    
+ *
+ * @param error Will contain an appropriate error code if the 
+ *		corresponding call returns a non-zero value.
+ * 
+ * @return  DS_OK or DS_NOTOK
+ */
 static long setup_config (long *error)
 {
-	char				nethost[SHORT_NAME_SIZE], *nethost_env;
+	char				nethost[SHORT_NAME_SIZE], 
+					*nethost_env;
 	CLIENT				*clnt;
 	enum clnt_stat			clnt_stat;
 	int				pid;
@@ -1357,22 +1195,20 @@ static long setup_config (long *error)
 	*error = DS_OK;
 	memset ((char *)&manager_data,0,sizeof(manager_data));
 
-	/*
- 	 *  read environmental variable NETHOST
-  	 */
-
+/*
+ *  read environmental variable NETHOST
+ */
 	if ( (nethost_env = (char *)getenv ("NETHOST")) == NULL )
 	{
 		*error = DevErr_NethostNotDefined;
 		return (DS_NOTOK);
 	}
-	sprintf(nethost, "%s",nethost_env);
+	strncpy(nethost, nethost_env, sizeof(nethost));
 
-	/*
-	 *  create registration information that is send to
-	 *  the network manager and stored in the System.log file.
-	 */
-
+/*
+ *  create registration information that is send to
+ *  the network manager and stored in the System.log file.
+ */
 	gethostname (host_name,32);
 
 #if !defined (_NT)
@@ -1388,29 +1224,22 @@ static long setup_config (long *error)
 	register_data.prog_number = pid;
 	register_data.vers_number = 0;
 
-	/*
-	 * Create network manager client handle 
-	 */
-
-	clnt = clnt_create ( nethost,
-	    NMSERVER_PROG,
-	    NMSERVER_VERS,
-	    "udp");
+/*
+ * Create network manager client handle 
+ */
+	clnt = clnt_create ( nethost, NMSERVER_PROG, NMSERVER_VERS, "udp");
 	if (clnt == NULL)
 	{
 		clnt_pcreateerror ("setup_config");
 		*error = DevErr_NoNetworkManagerAvailable;
 		return (DS_NOTOK);
 	}
-
 	clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &api_retry_timeout);
 	clnt_control (clnt, CLSET_TIMEOUT, (char *) &api_timeout);
 
-	/*
-       	 *   get configuration information from
-       	 *   a network manager
-       	 */
-
+/*
+ *   get configuration information from a network manager
+ */
 	clnt_stat = clnt_call (clnt, RPC_GET_CONFIG,
 	    (xdrproc_t)xdr__register_data, (caddr_t) &register_data,
 	    (xdrproc_t)xdr__manager_data, (caddr_t) &manager_data, TIMEVAL(timeout));
@@ -1424,50 +1253,45 @@ static long setup_config (long *error)
 			return (DS_NOTOK);
 		}
 
-	   /*
-	    * If it was an old version 1 of the manager process,
-	    * a version mismatch occured because the client handle
-	    * was created for version 4.
-	    * Destroy the handle and use version 1.
-	    */
+/*
+ * If it was an old version 1 of the manager process,
+ * a version mismatch occured because the client handle
+ * was created for version 4.
+ * Destroy the handle and use version 1.
+ */
 		else
 		{
-	/*
-         * Destroy version 4 handle.
-               */
-	clnt_destroy (clnt);
+/*
+ * Destroy version 4 handle.
+ */
+			clnt_destroy (clnt);
 
-	/*
-               * Set version number to 1 and recreate the
-               * client handle.
-               */
+/*
+ * Set version number to 1 and recreate the client handle.
+ */
+			clnt = clnt_create (nethost,NMSERVER_PROG,NMSERVER_VERS_1,"udp");
+			if (clnt == NULL)
+			{
+				clnt_pcreateerror ("setup_config");
+				*error = DevErr_NoNetworkManagerAvailable;
+				return (DS_NOTOK);
+			}
 
-	clnt = clnt_create (nethost,NMSERVER_PROG,NMSERVER_VERS_1,"udp");
-	if (clnt == NULL)
-	{
-		clnt_pcreateerror ("setup_config");
-		*error = DevErr_NoNetworkManagerAvailable;
-		return (DS_NOTOK);
+/*
+ *   get configuration information from a network manager running version 1.
+ */
+			clnt_stat = clnt_call (clnt, RPC_GET_CONFIG,
+						(xdrproc_t)xdr__register_data, (caddr_t) &register_data,
+						(xdrproc_t)xdr__manager_data_3, (caddr_t) &manager_data, TIMEVAL(timeout));
+			if (clnt_stat != RPC_SUCCESS)
+			{
+				clnt_perror (clnt,"setup_config ()");
+				clnt_destroy (clnt);
+				*error = DevErr_NetworkManagerNotResponding;
+				return (DS_NOTOK);
+			}
+		}
 	}
-
-	/*
-       	       *   get configuration information from a network manager
-	       *   running version 1.
-       	       */
-
-	clnt_stat = clnt_call (clnt, RPC_GET_CONFIG,
-	    (xdrproc_t)xdr__register_data, (caddr_t) &register_data,
-	    (xdrproc_t)xdr__manager_data_3, (caddr_t) &manager_data, TIMEVAL(timeout));
-	if (clnt_stat != RPC_SUCCESS)
-	{
-		clnt_perror (clnt,"setup_config ()");
-		clnt_destroy (clnt);
-		*error = DevErr_NetworkManagerNotResponding;
-		return (DS_NOTOK);
-	}
-}
-	}
-
 
 	if (manager_data.status < 0)
 	{
@@ -1482,11 +1306,10 @@ static long setup_config (long *error)
 		return (DS_NOTOK);
 	}
 
-
-	/*
- 	 * Initialise the XDR data type list with all data types
-	 * specified in the Kernel of the system.
-	 */
+/*
+  * Initialise the XDR data type list with all data types
+ * specified in the Kernel of the system.
+ */
 
 	if ( xdr_load_kernel (error) == DS_NOTOK )
 	{
@@ -1499,13 +1322,11 @@ static long setup_config (long *error)
 		return (DS_NOTOK);
 	}
 
-	/*
-	 *  put message server and database server configuration
-	 *  into the global structures msgserver_info and
-	 *  dbserver_info.
-	 */
-
 /*
+ *  put message server and database server configuration
+ *  into the global structures msgserver_info and
+ *  dbserver_info.
+ *
  * do not allocate space for _devserver structure because this routine
  * could be called multiple times e.g. when database server has to be
  * reimported, simply point to a static _devserver structure which
@@ -1514,25 +1335,21 @@ static long setup_config (long *error)
 	msg_info.conf=(devserver)&msg_ds;
 	db_info.conf =(devserver)&db_ds;
 
-	sprintf (msg_info.conf->server_host, "%s", 
+	snprintf (msg_info.conf->server_host, sizeof(msg_info.conf->server_host), "%s", 
 	    manager_data.msg_info.host_name);
 	msg_info.conf->prog_number =  manager_data.msg_info.prog_number;
 	msg_info.conf->vers_number =  manager_data.msg_info.vers_number;
 
-	sprintf (db_info.conf->server_host, "%s", 
+	snprintf (db_info.conf->server_host, sizeof(db_info.conf->server_host), "%s", 
 	    manager_data.db_info.host_name);
 	db_info.conf->prog_number =  manager_data.db_info.prog_number;
 	db_info.conf->vers_number =  manager_data.db_info.vers_number;
 
-	/*
-	 * Enable the security system if the Manager indicates 
-	 * the use of the security system.
-	 */
-
-	if (manager_data.security == True)
-	{
-		config_flags.security =  True;
-	}
+/*
+ * Enable the security system if the Manager indicates 
+ * the use of the security system.
+ */
+	config_flags.security =  manager_data.security; 
 
 /*
  * free memory allocated by xdr in manager_data (assume we have connected
@@ -1561,28 +1378,27 @@ static long setup_config (long *error)
 }
 
 
-/*struct _devserver msg_ds[MIN_NETHOST], db_ds[MIN_NETHOST];*/
-struct _devserver *msg_ds, *db_ds;
+struct _devserver 	*msg_ds, 
+			*db_ds;
 
 
-/*+**********************************************************************
- Function   :	static long setup_config_multi()
-
- Description:   gets the necessary configuration information
-		for a static database service and a message
-		service from  a network manager in a multi-nethost
-		environment.
-            :   The host of the network manager is specified
-	        by the nethost_name parameter.    
-
- Arg(s) In  :   nethost_name - name of nethost to configure
-
- Arg(s) Out :   long *error - Will contain an appropriate error
-			      code if the corresponding call
-		    	      returns a non-zero value.
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**@ingroup dsAPI
+ * gets the necessary configuration information
+ * for a static database service and a message
+ * service from  a network manager in a multi-nethost
+ * environment.
+ *
+ * The host of the network manager is specified
+ * by the nethost_name parameter.    
+ *
+ * @param nethost_name  name of nethost to configure
+ *
+ * @param error 	Will contain an appropriate error
+ * 			code if the corresponding call
+ *			returns a non-zero value.
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 
 long setup_config_multi (char *nethost, long *error)
 {
@@ -1615,28 +1431,25 @@ long setup_config_multi (char *nethost, long *error)
 		    "\nsetup_config_multi() : entering routine\n");
 #endif /* EBUG */
 
-	/*
- 	 *  read environmental variable NETHOST
-  	 */
-
+/*
+ *  read environmental variable NETHOST
+ */
 	if ( nethost == NULL )
 	{
-	    if ( (nethost_env = (char *)getenv ("NETHOST")) == NULL )
+		if ( (nethost_env = (char *)getenv ("NETHOST")) == NULL )
 		{
-		*error = DevErr_NethostNotDefined;
-		return (DS_NOTOK);
+			*error = DevErr_NethostNotDefined;
+			return (DS_NOTOK);
 		}
-	    nethost=nethost_buffer;
-	    sprintf(nethost, "%s",nethost_env);
-
+		nethost=nethost_buffer;
+		snprintf(nethost, sizeof(nethost), "%s",nethost_env);
 	}
 
-	/*
-	 * look for the nethost in the array of multi_nethosts[] and
-	 * return its index; if the nethost is not found then return the
-	 * index of the next free slot in the array
-	 */
-
+/*
+ * look for the nethost in the array of multi_nethosts[] and
+ * return its index; if the nethost is not found then return the
+ * index of the next free slot in the array
+ */
 	if ((i_nethost = get_i_nethost_by_name(nethost,error)) < 0)
 	{
 /*
@@ -1667,7 +1480,7 @@ long setup_config_multi (char *nethost, long *error)
 		}
 		i_nethost = i;
 #ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_API,
+		dev_printdebug (DBG_TRACE | DBG_API,
 		    "\nsetup_config_multi() : add nethost %d\n",i_nethost);
 #endif /* EBUG */
 /*
@@ -1682,11 +1495,10 @@ long setup_config_multi (char *nethost, long *error)
 			nethost_alloc(error);
 		}
  	}
-	/*
-	 *  create registration information to be sent to
-	 *  the network manager and stored in the System.log file.
-	 */
-
+/*
+ *  create registration information to be sent to
+ *  the network manager and stored in the System.log file.
+ */
 	gethostname (host_name,32);
 
 #if !defined (_NT)
@@ -1702,28 +1514,22 @@ long setup_config_multi (char *nethost, long *error)
 	register_data.prog_number = pid;
 	register_data.vers_number = 0;
 
-	/*
-	 * Create network manager client handle 
-	 */
-
-	clnt = clnt_create ( nethost,
-	    NMSERVER_PROG,
-	    NMSERVER_VERS,
-	    "udp");
+/*
+ * Create network manager client handle 
+ */
+	clnt = clnt_create ( nethost, NMSERVER_PROG, NMSERVER_VERS, "udp");
 	if (clnt == NULL)
 	{
 		clnt_pcreateerror ("setup_config");
 		*error = DevErr_NoNetworkManagerAvailable;
 		return (DS_NOTOK);
 	}
-
 	clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &api_retry_timeout);
 	clnt_control (clnt, CLSET_TIMEOUT, (char *) &api_timeout);
 
-	/*
-       	 *   get configuration information from
-       	 *   a network manager
-       	 */
+/*
+ * get configuration information from a network manager
+ */
 
 	clnt_stat = clnt_call (clnt, RPC_GET_CONFIG,
 	    (xdrproc_t)xdr__register_data, (caddr_t) &register_data,
@@ -1737,49 +1543,42 @@ long setup_config_multi (char *nethost, long *error)
 			*error = DevErr_NetworkManagerNotResponding;
 			return (DS_NOTOK);
 		}
-
-	   /*
-	    * If it was an old version 1 of the manager process,
-	    * a version mismatch occured because the client handle
-	    * was created for version 4.
-	    * Destroy the handle and use version 1.
-	    */
+/*
+ * If it was an old version 1 of the manager process,
+ * a version mismatch occured because the client handle
+ * was created for version 4.
+ * Destroy the handle and use version 1.
+ */
 		else
 		{
-	/*
-         * Destroy version 4 handle.
-               */
-	clnt_destroy (clnt);
-
-	/*
-               * Set version number to 1 and recreate the
-               * client handle.
-               */
-
-	clnt = clnt_create (nethost,NMSERVER_PROG,NMSERVER_VERS_1,"udp");
-	if (clnt == NULL)
-	{
-		clnt_pcreateerror ("setup_config");
-		*error = DevErr_NoNetworkManagerAvailable;
-		return (DS_NOTOK);
-	}
-
-	/*
-       	       *   get configuration information from a network manager
-	       *   running version 1.
-       	       */
-
-	clnt_stat = clnt_call (clnt, RPC_GET_CONFIG,
-	    (xdrproc_t)xdr__register_data, (caddr_t) &register_data,
-	    (xdrproc_t)xdr__manager_data_3, (caddr_t) &manager_data, TIMEVAL(timeout));
-	if (clnt_stat != RPC_SUCCESS)
-	{
-		clnt_perror (clnt,"setup_config ()");
-		clnt_destroy (clnt);
-		*error = DevErr_NetworkManagerNotResponding;
-		return (DS_NOTOK);
-	}
-}
+/*
+ * Destroy version 4 handle.
+ */
+			clnt_destroy (clnt);
+/*
+ * Set version number to 1 and recreate the client handle.
+ */
+			clnt = clnt_create (nethost,NMSERVER_PROG,NMSERVER_VERS_1,"udp");
+			if (clnt == NULL)
+			{
+				clnt_pcreateerror ("setup_config");
+				*error = DevErr_NoNetworkManagerAvailable;
+				return (DS_NOTOK);
+			}
+/*
+ * get configuration information from a network manager running version 1.
+ */
+			clnt_stat = clnt_call (clnt, RPC_GET_CONFIG,
+				(xdrproc_t)xdr__register_data, (caddr_t) &register_data,
+				(xdrproc_t)xdr__manager_data_3, (caddr_t) &manager_data, TIMEVAL(timeout));
+			if (clnt_stat != RPC_SUCCESS)
+			{
+				clnt_perror (clnt,"setup_config ()");
+				clnt_destroy (clnt);
+				*error = DevErr_NetworkManagerNotResponding;
+				return (DS_NOTOK);
+			}
+		}
 	}
 
 
@@ -1795,14 +1594,11 @@ long setup_config_multi (char *nethost, long *error)
 		return (DS_NOTOK);
 	}
 
-
-	/*
-	 *  put message server and database server configuration
-	 *  into the global structures msgserver_info and
-	 *  dbserver_info.
-	 */
-
 /*
+ * put message server and database server configuration
+ * into the global structures msgserver_info and
+ * dbserver_info.
+ *
  * do not allocate space for _devserver structure because this routine
  * could be called multiple times e.g. when database server has to be
  * reimported, simply point to a static _devserver structure which
@@ -1811,33 +1607,25 @@ long setup_config_multi (char *nethost, long *error)
 	multi_nethost[i_nethost].msg_info = (devserver)&msg_ds[i_nethost];
 	multi_nethost[i_nethost].db_info = (devserver)&db_ds[i_nethost];
 
-	sprintf (multi_nethost[i_nethost].msg_info->server_host, "%s", 
+	snprintf (multi_nethost[i_nethost].msg_info->server_host, sizeof(multi_nethost[i_nethost].msg_info->server_host), "%s", 
 	    manager_data.msg_info.host_name);
 	multi_nethost[i_nethost].msg_info->prog_number =  
                                  manager_data.msg_info.prog_number;
 	multi_nethost[i_nethost].msg_info->vers_number =  
                                  manager_data.msg_info.vers_number;
 
-	sprintf (multi_nethost[i_nethost].db_info->server_host, "%s", 
+	snprintf (multi_nethost[i_nethost].db_info->server_host, sizeof(multi_nethost[i_nethost].db_info->server_host), "%s", 
 	    manager_data.db_info.host_name);
 	multi_nethost[i_nethost].db_info->prog_number =  
                                  manager_data.db_info.prog_number;
 	multi_nethost[i_nethost].db_info->vers_number =  
                                  manager_data.db_info.vers_number;
 
-	/*
-	 * Enable the security system if the Manager indicates 
-	 * the use of the security system.
-	 */
-
-	if (manager_data.security == True)
-	{
-		multi_nethost[i_nethost].config_flags.security =  True;
-	}
-	else
-	{
-		multi_nethost[i_nethost].config_flags.security =  False;
-	}
+/*
+ * Enable the security system if the Manager indicates 
+ * the use of the security system.
+ */
+	multi_nethost[i_nethost].config_flags.security = manager_data.security;
 
 /*
  * free memory allocated by xdr in manager_data (assume we have connected
@@ -1846,12 +1634,8 @@ long setup_config_multi (char *nethost, long *error)
 	xdr_free((xdrproc_t)xdr__manager_data, (char *)&manager_data);
 	clnt_destroy (clnt);
 	strcpy(multi_nethost[i_nethost].nethost,nethost);
-/*
-	printf( "setup_config_multi(): configured nethost[%d] %s\n",
-	        i_nethost,multi_nethost[i_nethost].nethost);
- */
-	multi_nethost[i_nethost].config_flags.configuration = True;
 
+	multi_nethost[i_nethost].config_flags.configuration = True;
 	if (i_nethost == 0)
 	{
 /*
@@ -1861,6 +1645,13 @@ long setup_config_multi (char *nethost, long *error)
  */
 		if (!config_flags.configuration)
 		{
+/*
+ * The string pointed to by string becomes part of the environment, so altering the string 
+ * changes the environment.
+ */
+			static char	*nethost_tmp = NULL;
+			if (!nethost_tmp)
+				nethost_tmp = malloc(64);
 /* 
  * Ultra-C++ does not find the symbole putenv() (maybe the prototype
  * is wrong). Supress its use for Ultra-C++. This means Ultra-C++
@@ -1871,8 +1662,9 @@ long setup_config_multi (char *nethost, long *error)
  * specified in the Kernel of the system. 
  */
 #ifndef _UCC
-			sprintf(nethost_env,"NETHOST=%s",nethost);
-			putenv(nethost_env);
+			snprintf(nethost_tmp, 64, "NETHOST=%s", nethost);
+			putenv(nethost_tmp);
+			nethost_env = (char *)getenv ("NETHOST");
 #endif /*!_UCC*/
 //			if (setup_config(error) != DS_OK)
 		    	if ( xdr_load_kernel (error) == DS_NOTOK )
@@ -1895,68 +1687,62 @@ long setup_config_multi (char *nethost, long *error)
 
 long db_ChangeDefaultNethost(char* nethost,long *error)
 {
-    int i_nethost;
-
-/* lookup in nethost array */
-	if ((i_nethost = get_i_nethost_by_name(nethost,error)) < 0)
+	int i_nethost = get_i_nethost_by_name(nethost,error);
+/* 
+ * lookup in nethost array 
+ */
+	if (i_nethost < 0);
 	{
-	    /* lookup failed, try to import the host */
-	    if(db_import_multi(nethost,error)!=DS_OK)
-		{
-		    
-		    return (DS_NOTOK);
-		}
-	    /* retry the lookup, it should now succeed */
-	    if((i_nethost = get_i_nethost_by_name(nethost,error)) < 0)
-		{
-		    /* this shuold never happen */
-		    return (DS_NOTOK);
-		}
-	    /* set the defautl nethost vars from multi-nethost array */
-	    /* HINT: some day, there should be a global index, and all
-	       functions could use multi_nethost[glob_index]  */
+/* 
+ * lookup failed, try to import the host 
+ */
+		if(db_import_multi(nethost,error) != DS_OK)
+			return (DS_NOTOK);
 
-	    config_flags = multi_nethost[i_nethost].config_flags;
-	    db_info.conf = multi_nethost[i_nethost].db_info;
-	    msg_info.conf = multi_nethost[i_nethost].msg_info;
-	    
-	    return (DS_OK);
+/* 
+ * retry the lookup, it should now succeed 
+ */
+		if((i_nethost = get_i_nethost_by_name(nethost,error)) < 0)
+/* 
+ * this should never happen 
+ */
+			return (DS_NOTOK);
+/* 
+ * set the default nethost vars from multi-nethost array 
+ *
+ * HINT: some day, there should be a global index, and all
+ * functions could use multi_nethost[glob_index]  
+ */
+		config_flags = multi_nethost[i_nethost].config_flags;
+		db_info.conf = multi_nethost[i_nethost].db_info;
+		msg_info.conf = multi_nethost[i_nethost].msg_info;
+		return (DS_OK);
 	}
+	return DS_NOTOK;
 }
 /* Function: */
 
 static char* format_error_string(const char* time_stamp,const char* message )
 {
-    char * error_str;
-    error_str = (char*)malloc(strlen(time_stamp)+strlen(message)+2);
-    if(error_str)
-	{
-	    sprintf ( error_str, "%s %s", time_stamp,
-		      message );
-	}
-         
-    return (error_str);
+	char * error_str;
+	error_str = (char*)malloc(strlen(time_stamp)+strlen(message)+2);
+	if(error_str)
+		snprintf(error_str, strlen(time_stamp) + strlen(message) + 2, "%s %s", time_stamp, message );
+	return (error_str);
 }
 
 
-/*+**********************************************************************
- Function   :	static long get_error_string()
-
- Description:   Read the error string from the global error table
-		or from the resource database.
-		The rsource name is:
-		ERROR/team_no/server_no/error_ident:
-                DS_WARNING is returned, if the function was
-                executed correctly, but no error
-                string was found in the database.
-
- Arg(s) In  :   long error    - error number
-
- Arg(s) Out :   char *error_str - error string.
-
- Return(s)  :   DS_OK or DS_NOTOK or DS_WARNING
-***********************************************************************-*/
-
+/**@ingroup dsAPI
+ * Read the error string from the global error table
+ * or from the resource database.
+ *
+ * The rsource name is: ERROR/team_no/server_no/error_ident
+ * 
+ * @param error   error number
+ * 
+ * @return error string.
+ * 
+ */ 
 static char *get_error_string (long error)
 {
 	char				res_path[LONG_NAME_SIZE];
@@ -2040,8 +1826,8 @@ static char *get_error_string (long error)
  * Create the resource path and the resource structure.
  */
 
-	sprintf (res_path, "ERROR/%d/%d", team, server);
-	sprintf (res_name, "%d", error_ident);
+	snprintf (res_path, sizeof(res_path), "ERROR/%d/%d", team, server);
+	snprintf (res_name, sizeof(res_name), "%d", error_ident);
 #ifdef EBUG
 	dev_printdebug (DBG_API,
 	    "get_error_string() : res_path = %s\n", res_path);
@@ -2100,19 +1886,15 @@ static char *get_error_string (long error)
 	return (error_str);
 }
 
-/*+**********************************************************************
- Function   :	long dev_error_push()
-
- Description:   Push a dynamically generated error string onto the error 
-		string stack so that it can be transferred back to the client 
-		at the end of execution.
-
- Arg(s) In  :   char *error_string    - error string
-
- Arg(s) Out :   none
-
- Return(s)  :   DS_OK or DS_NOTOK or DS_WARNING
-***********************************************************************-*/
+/**@ingroup dsAPI
+ * Push a dynamically generated error string onto the error 
+ * string stack so that it can be transferred back to the client 
+ * at the end of execution.
+ * 
+ * @param error_string error string
+ * 
+ * @return   DS_OK or DS_NOTOK 
+ */
 long dev_error_push (char *error_string)
 {
 	if (dev_error_stack == NULL)
@@ -2132,33 +1914,22 @@ long dev_error_push (char *error_string)
 		dev_error_stack=tmp;
 	}
 	strcat(dev_error_stack, error_string);
-/*
-	sprintf(dev_error_stack+strlen(dev_error_stack),"%s",error_string);
-	dev_error_stack[strlen(dev_error_stack)] = 0;
-*/
 	return(DS_OK);
 }
 
-/*+**********************************************************************
- Function   :	long dev_error_clear()
-
- Description:   Clear the dynmaic error stack. This can be useful for servers
- 		who want to remove error messages from the stack and return
-		their own error only.
-
- Arg(s) In  :   none
-
- Arg(s) Out :   none
-
- Return(s)  :   DS_OK or DS_NOTOK or DS_WARNING
-***********************************************************************-*/
+/**@ingroup dsAPI
+ * Clear the dynmaic error stack. This can be useful for servers
+ * who want to remove error messages from the stack and return
+ * their own error only.
+ *
+ * @return DS_OK 
+ */
 long dev_error_clear ()
 {
 	if (dev_error_stack != NULL)
 	{
 		free(dev_error_stack);
 		dev_error_stack = NULL;
-
 	}
 	return(DS_OK);
 }
@@ -2167,13 +1938,18 @@ long dev_error_clear ()
 #define MAX_ERR_STR 80
 long dev_error_push_level(const char * message,int level)
 {
-    char tmp_store[MAX_ERR_STR];
-    int cnt;
-    if(level<=0)level=1;
-    if(level>MAXLEVEL) level=MAXLEVEL; /* max 10 level, to avoid too long lines */
-    for(cnt=0;cnt<level;cnt++)
-	    tmp_store[cnt]=' ';
-    tmp_store[0]='\n';
-    strncpy(tmp_store+level,message,MAX_ERR_STR-level);
-    return dev_error_push(tmp_store);
+	char tmp_store[MAX_ERR_STR];
+	int cnt;
+	if(level < 1)
+		level=1;
+/* 
+ * max 10 level, to avoid too long lines 
+ */
+	if(level > MAXLEVEL) 
+		level=MAXLEVEL; 
+	for(cnt = 0; cnt < level; cnt++)
+		tmp_store[cnt]=' ';
+	tmp_store[0]='\n';
+	strncpy(tmp_store+level,message,MAX_ERR_STR-level);
+	return dev_error_push(tmp_store);
 }
