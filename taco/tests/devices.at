@@ -93,6 +93,15 @@ Select one of the following commands :
 cmd ?]]) 
 AT_CLEANUP
 
+AT_SETUP([get exported devices])
+AT_CHECK([
+AT_TACO_RUN_LOCAL
+db_getdevexp
+], [], [[test/agps/1
+test/device/1
+]]) 
+AT_CLEANUP
+
 AT_SETUP([import a device from server])
 AT_CHECK([
 AT_TACO_RUN_LOCAL

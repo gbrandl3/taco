@@ -25,7 +25,7 @@ TESTSUITE_AT		= dbase.at devices.at starter.at
 
 AUTOTEST 		= $(AUTOM4TE) --language=autotest
 
-check_PROGRAMS 		= db_connect db_resget db_resput \
+check_PROGRAMS 		= db_connect db_resget db_resput db_getdevexp \
 			db_resdomain db_resfamily db_resmember dev_ping \
 			db_getresoval db_devdomain db_devfamily db_devmember test_dev_import \
 			test_asc_dyn test_asc_stat test_tc test_starter \
@@ -79,6 +79,9 @@ test_con_params_LDADD	= @TACO_CLIENT_LIBS@
 
 db_getresoval_SOURCES	= db_getresoval.cpp
 db_getresoval_LDADD	= @TACO_CLIENT_LIBS@
+
+db_getdevexp_SOURCES	= db_getdevexp.cpp
+db_getdevexp_LDADD	= @TACO_CLIENT_LIBS@
 
 $(srcdir)/package.m4:	$(top_srcdir)/configure.ac
 	{\
