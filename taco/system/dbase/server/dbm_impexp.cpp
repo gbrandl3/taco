@@ -384,7 +384,7 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 			d_num = 0;
 	int 		dev_numb = 1;
 	char 		seqnr[4];
-	int 		exit = 0;
+	bool 		exit = false;
 	int 		flags = GDBM_REPLACE;
 	std::string	proc_str,
 			pers_str,
@@ -469,7 +469,7 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 // 
 				std::string 	dev_str,
 						key_str;
-				dev_str = cont.get_host_name() + "|0|0|unknown|" + dev_class + "|0|" + proc_str + "|";
+				dev_str = cont.get_device_name() + "|" + cont.get_host_name() + "|0|0|unknown|" + dev_class + "|0|" + proc_str + "|";
 //
 // Update database 
 //
@@ -505,49 +505,58 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 	{
 		do
 		{
-			datum	key;
+			datum	key3;
+			key3.dptr = new char[MAX_KEY];
 			std::stringstream        s;
 #if !HAVE_SSTREAM
 			s.seekp(0, ios::beg);
 #endif
-			s << dev.ds_class << "|" << dev.ds_name << "|" << dev_numb << "|" 
-				<< seqnr << "|" << std::ends;
+			s << dev.ds_class << "|" << dev.ds_name << "|" << dev_numb << "|" << std::ends;
+			std::cerr << s.str() << std::endl;
 #if !HAVE_SSTREAM
-			strcpy(key.dptr, s.str());
+			strcpy(key3.dptr, s.str());
 			s.freeze(false);
 #else
-			strcpy(key.dptr, s.str().c_str());
+			strcpy(key3.dptr, s.str().c_str());
 #endif
-			key.dsize = strlen(key.dptr);
+			key3.dsize = strlen(key3.dptr);
 //
 // Try to retrieve the tuples 
 //
-			NdbmNamesCont cont(dbgen.tid[0], key); 
-			d_num++;
+			try
+			{
+				NdbmNamesCont cont(dbgen.tid[0], key3); 
+				d_num++;
 //
 // Extract device class 
 //
-			dev_class = cont.get_device_class();
+				dev_class = cont.get_device_class();
 //
 // Build the new database content
 //
-			datum	content = cont.get_datum();
-			std::string 	dev_str;
+				datum	content = cont.get_datum();
+				std::string 	dev_str;
 			
-			dev_str = cont.get_host_name() + "|0|0|unknown|" + dev_class + "|0|" + cont.get_process_name() + "|";
+				dev_str = cont.get_host_name() + "|0|0|unknown|" + dev_class + "|0|" + cont.get_process_name() + "|";
 //
 // Update database 
 //
-			datum	dev1;
-			dev1.dptr = const_cast<char *>(dev_str.c_str());
-			dev1.dsize = strlen(dev1.dptr);
+				datum	dev1;
+				dev1.dptr = const_cast<char *>(dev_str.c_str());
+				dev1.dsize = strlen(dev1.dptr);
 
-			if (gdbm_store(dbgen.tid[0], key, dev1, flags))
-			{
-				mis = DbErr_DatabaseAccess;
-				return(&mis);
+				if (gdbm_store(dbgen.tid[0], key3, dev1, flags))
+				{
+					mis = DbErr_DatabaseAccess;
+					return(&mis);
+				}
+				dev_numb++;
+				delete [] key3.dptr;
 			}
-			dev_numb++;
+			catch ( ... )
+			{
+				exit = true;
+			}
 		} while (!exit);
 	}
 //
@@ -610,7 +619,7 @@ svc_inf *NdbmServer::db_svcchk_1_svc(nam *dsn_nam)
 // Initialization needed to retrieve the right tuples in the NAMES table
 //
 	std::string	s = ds_class + "|" + ds_name + "|1|";
-	key.dptr = const_cast<char *>(s.data());
+	key.dptr = const_cast<char *>(s.c_str());
 	key.dsize = strlen(key.dptr);
 //
 // Try to retrieve the tuples

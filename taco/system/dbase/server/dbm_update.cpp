@@ -218,7 +218,7 @@ long NdbmServer::upd_name(std::string serv, std::string dev_name, int ind) throw
 			content.dptr = s.str();
         		s.freeze(false);
 #else
-			content.dptr = const_cast<char *>(s.str().data());
+			content.dptr = const_cast<char *>(s.str().c_str());
 #endif
 			content.dsize = strlen(content.dptr);
 		}
@@ -302,7 +302,7 @@ long NdbmServer::del_name(device &devi, int &pndev, std::string ptr, std::vector
         	key.dptr = s.str();
         	s.freeze(false);
 #else
-		key.dptr = const_cast<char *>(s.str().data());
+		key.dptr = const_cast<char *>(s.str().c_str());
 #endif
 		key.dsize = strlen(key.dptr);
 #ifdef DEBUG
@@ -498,8 +498,7 @@ long NdbmServer::update_dev_list(device &p_ret, long seq) throw (long)
         	key.dptr = s.str();
         	s.freeze(false);
 #else
-		key.dptr = const_cast<char *>(s.str().data());
-        	strcpy(key.dptr, s.str().c_str());
+		key.dptr = const_cast<char *>(s.str().c_str());
 #endif
 		key.dsize = strlen(key.dptr);
 //
@@ -524,7 +523,7 @@ long NdbmServer::update_dev_list(device &p_ret, long seq) throw (long)
 			key.dptr = s.str();
 			s.freeze(false);
 #else
-			key.dptr = const_cast<char *>(s.str().data());
+			key.dptr = const_cast<char *>(s.str().c_str());
 #endif
 			key.dsize = strlen(key.dptr);
 
