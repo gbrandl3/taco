@@ -8,13 +8,13 @@
 		servers and clients using the SUN-RPC.
 
  Author(s)  :	Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.16 $
+ Version    :	$Revision: 1.17 $
 
- Date       : 	$Date: 2005-02-24 15:59:37 $
+ Date       : 	$Date: 2005-03-29 09:54:10 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -50,7 +50,6 @@
 #error could not find signal.h
 #endif
 
-static long 		setup_config (long *error);
 extern _DLLFunc long 	setup_config_multi(char *nethost, long *error);
 static void 		msg_write(_Int msg_type, char *msg_string);
 static void 		msg_send (_Int msg_type);
@@ -1228,7 +1227,7 @@ long _DLLFunc db_import_multi (char *nethost, long *error)
  * 
  * @return  DS_OK or DS_NOTOK
  */
-static long setup_config (long *error)
+long setup_config (long *error)
 {
 	char				nethost[HOST_NAME_LENGTH], 
 					*nethost_env;
@@ -1697,7 +1696,7 @@ long setup_config_multi (char *nethost, long *error)
  */
 			static char	*nethost_tmp = NULL;
 			if (!nethost_tmp)
-				nethost_tmp = malloc(64);
+				nethost_tmp = (char*)malloc(64);
 /* 
  * Ultra-C++ does not find the symbole putenv() (maybe the prototype
  * is wrong). Supress its use for Ultra-C++. This means Ultra-C++
