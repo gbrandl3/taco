@@ -77,8 +77,8 @@ dnl
 	fi
 
 	AC_MSG_CHECKING(for Tcl header files)
+	save_CPPFLAGS="$CPPFLAGS"
 	if test -z "$TCLINCLUDE"; then
-		AC_TRY_CPP([#include <tcl.h>], , TCLINCLUDE="")
 		if test -z "$TCLINCLUDE"; then
 			dirs="/usr/local/include /usr/include /opt/local/include"
 			for i in $dirs ; do
@@ -89,12 +89,16 @@ dnl
 				fi
 			done
 		fi
-		if test -z "$TCLINCLUDE"; then
-#			TCLINCLUDE="-I/usr/local/include"
-    			AC_MSG_RESULT(not found)
-		fi
-	else
+	fi
+	if test -n "$TCLINCLUDE"; then
+		CPPFLAGS="$CPPFLAGS -I$TCLINCLUDE"
+		AC_CHECK_HEADERS([tcl.h], , TCLINCLUDE="")
+	fi
+	if test -n "$TCLINCLUDE"; then
         	AC_MSG_RESULT($TCLINCLUDE)
+	else
+		CPPFLAGS="$save_CPPFLAGS"
+    		AC_MSG_RESULT(not found)
 	fi
 
 	AC_MSG_CHECKING(for Tcl library)
@@ -109,7 +113,6 @@ dnl
 		done
 		if test -z "$TCLLIB"; then
 			AC_MSG_RESULT(not found)
-#			TCLLIB="-L/usr/local/lib"
 	fi
 	else
 		AC_MSG_RESULT($TCLLIB)
