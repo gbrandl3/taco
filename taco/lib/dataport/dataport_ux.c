@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <errno.h>
+#include <macros.h>
 
 /**@ingroup dataportAPI
  * Build a unique key from the dataport name
