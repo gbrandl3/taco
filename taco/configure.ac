@@ -1,6 +1,6 @@
 AC_INIT([TACO], [3.0.6], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.52 $)dnl
+AC_REVISION($Revision: 1.53 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -68,6 +68,7 @@ AC_HEADER_STAT
 AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h]) 
 AC_CHECK_HEADERS([pthread.h fcntl.h malloc.h memory.h netdb.h stddef.h stdlib.h string.h strings.h sys/file.h sys/ioctl.h termios.h unistd.h sys/filio.h paths.h siggen.h])
 AC_CHECK_HEADERS([varargs.h stdarg.h])
+AC_CHECK_HEADERS([rpc/pmap_prot.h rpc/pmap_prot.h])
 
 AC_LANG_PUSH(C++)
 AC_CHECK_HEADERS([sstream strstream])
