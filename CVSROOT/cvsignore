@@ -11,3 +11,7 @@ Makefile.in
 *.backup
 *.pyc
 *.bck
+*.aux
+*.dvi
+*.log
+*.toc
