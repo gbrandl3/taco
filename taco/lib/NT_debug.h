@@ -2,13 +2,13 @@
 // Debug and printf support
 //
 /*
-  $Header: /home/jkrueger1/sources/taco/backup/taco/lib/NT_debug.h,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $
+  $Header: /home/jkrueger1/sources/taco/backup/taco/lib/NT_debug.h,v 1.2 2004-11-25 15:47:34 andy_gotz Exp $
 
- Author:	$Author: jkrueger1 $
+ Author:	$Author: andy_gotz $
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-03-14 12:22:07 $
+ Date:		$Date: 2004-11-25 15:47:34 $
 
 */
 
@@ -27,15 +27,15 @@ extern HINSTANCE ghAppInstance;  // the application's module handle
 
 extern void cdecl DbgOut(LPSTR lpFormat, ...);
 extern void LastErrorBox();
+extern DWORD   gdEval;
+extern int giDebugLevel;     // 0 is default 
+
+extern void SetDebugLevel(int i);
+extern int GetDebugLevel();
+extern void __AssertMsg(LPSTR exp ,LPSTR file, int line);
 
 #ifdef _DEBUG
 
-    extern DWORD   gdEval;
-    extern int giDebugLevel;     // 0 is default 
-
-    extern void SetDebugLevel(int i);
-    extern int GetDebugLevel();
-    extern void __AssertMsg(LPSTR exp ,LPSTR file, int line);
 
     #define A_SSERT(exp) \
         ((exp) ? (void)0 : __AssertMsg((LPSTR)(#exp), (LPSTR)__FILE__, __LINE__))
