@@ -13,9 +13,9 @@
 
  Original: 	January 1991
 
- Version:	$Revision: 1.11 $
+ Version:	$Revision: 1.12 $
 
- Date:		$Date: 2004-03-03 11:37:18 $
+ Date:		$Date: 2004-03-05 11:03:56 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -105,6 +105,7 @@ int main (int argc, char **argv)
 	         		c_flags.mysql	     = True;
 	         		c_flags.dbm  	     = False;
 				dbase_used = "MYSQL";
+				dbm_name = "tango";
 			}
 			if (strcmp (argv[i],"-log") == 0)
 		 		c_flags.request_log = True;
