@@ -129,7 +129,7 @@ int main(int argc, char **argv)
 	int sig_mask;
 	struct sigvec sighand;
 #endif
-#ifdef linux
+#if defined( linux) || defined (FreeBSD)
 	struct sigaction sigact;
 #endif /* linux */
 
@@ -182,7 +182,7 @@ int main(int argc, char **argv)
 	sigvec(SIGXCPU,&sighand,NULL);
 	sigvec(SIGXFSZ,&sighand,NULL);
 #else
-#ifndef linux
+#if !defined (linux) && !defined(FreeBSD)
 	(void) sigignore(SIGHUP);
 	(void) sigset(SIGINT, un_register_prog);
 	(void) sigset(SIGQUIT, un_register_prog);
@@ -193,7 +193,7 @@ int main(int argc, char **argv)
 	(void) sigset(SIGUSR2, default_sig);
 	(void) sigset(SIGVTALRM, default_sig);
 	(void) sigset(SIGPROF, default_sig);
-#ifndef _solaris
+#if !defined( _solaris) 
 	(void) sigset(SIGLOST, default_sig);
 #endif /* _solaris */
 #else

@@ -1,6 +1,6 @@
 SUBDIRS		=
 
-EXTRA_DIST	= doc bitmaps doc/ug 
+EXTRA_DIST	= doc bitmaps 
 
 SRC 		= xdev_bxutil.c xdev_creation.c xdev_gui.c xdevmenu.uil\
   		xdev_cb.c xdev_dev.c xdev_gui.h\
@@ -16,7 +16,7 @@ AM_CFLAGS	= -DXK_MISCELLANY -D_BSD_SOURCE @X_CFLAGS@
 
 INCLUDES	= @MOTIF_INCLUDES@ @TACO_INCLUDES@ 
 
-LDADD		= @TACO_CLIENT_LIBS@ @MOTIF_LIBS@ @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ @LIB_X11@ -lXt -ldl @TACO_ASCII_LIBS@ 
+LDADD		= @TACO_CLIENT_LIBS@ @MOTIF_LIBS@ @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ @LIB_X11@ -lXt @TACO_ASCII_LIBS@ # -ldl
 
 xdevmenu_SOURCES= $(SRC)
 

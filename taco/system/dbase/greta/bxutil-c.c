@@ -45,9 +45,9 @@
 /*
  * Include stdlib.h and malloc.h if code is C++, ANSI, or Extended ANSI.
  */
-#if defined(__cplusplus) || defined(__STDC__) || defined(__EXTENSIONS__)
+#if defined(__cplusplus) || defined(__STDC__) || defined(__EXTENSIONS__) 
 #include <stdlib.h>
-#ifndef VMS
+#if !defined( VMS ) && !defined(FreeBSD)
 #include <malloc.h>
 #endif
 #endif

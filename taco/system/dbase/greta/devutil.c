@@ -12,8 +12,8 @@
  Original      :  June 1998
 
 
- $Revision: 1.1 $
- $Date: 2003-04-25 12:54:06 $
+ $Revision: 1.2 $
+ $Date: 2003-11-28 13:18:25 $
 
 ****************************************************************************/
 
@@ -35,7 +35,7 @@
 #include <DevCmds.h>
 #include <DserverTeams.h>
 #include <dc.h>
-#ifndef linux
+#if !defined( linux) && !defined(FreeBSD)
 #include <siggen.h>
 #endif
 
@@ -443,7 +443,7 @@ static void printtype(int type,char *str)
 
 long gethdb_info(char *dev_name,char *buff)
 {
-#ifndef linux
+#if !defined( linux) && !defined(FreeBSD)
 	long sig_nb;
 	long error;
 	char **sig_list;
@@ -552,7 +552,7 @@ long gethdb_info(char *dev_name,char *buff)
 *									*
 *************************************************************************/
 
-#ifndef linux
+#if !defined( linux) && !defined(FreeBSD)
 
 static long objinfo_sig(long sigid,char *buff)
 {
