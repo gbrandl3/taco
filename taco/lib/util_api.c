@@ -13,9 +13,9 @@
 
  Original   :	April 1993
 
- Version:	$Revision: 1.13 $
+ Version:	$Revision: 1.14 $
 
- Date:		$Date: 2004-03-26 16:33:47 $
+ Date:		$Date: 2004-09-17 07:45:17 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -512,41 +512,30 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 		}
 	}
 	n_cmd_names = dev_query_out.var_argument.length;
-			
-	xdr_free ((xdrproc_t)xdr_DevVarArgumentArray,
-	    (char *)&(dev_query_out.var_argument));
+	xdr_free ((xdrproc_t)xdr_DevVarArgumentArray, (char *)&(dev_query_out.var_argument));
 
-
-	/*
- * Allocate memory for a sequence of DevCmdInfo structures
- * returned with varcmdarr.
+/*
+ * Allocate memory for a sequence of DevCmdInfo structures returned with varcmdarr.
  */
-
 	varcmdarr->length   = dev_query_out.length;
-	varcmdarr->sequence = (DevCmdInfo *) malloc
-	    (varcmdarr->length * sizeof (DevCmdInfo));
+	varcmdarr->sequence = (DevCmdInfo *) malloc(varcmdarr->length * sizeof (DevCmdInfo));
 	if ( varcmdarr->sequence == NULL )
 	{
 		*error  = DevErr_InsufficientMemory;
 		return (DS_NOTOK);
 	}
-	memset ((char *)varcmdarr->sequence, 0,
-	    (varcmdarr->length * sizeof (DevCmdInfo)));
+	memset ((char *)varcmdarr->sequence, 0, (varcmdarr->length * sizeof (DevCmdInfo)));
 
-	/*
- * Now get command and types name strings for the returned
- * command sequence. Command names are retrieved from the
- * global command-name-list and name strings for the data types
- * are searched in the resource CLASS table of the object class.
- * 
+/*
+ * Now get command and types name strings for the returned command sequence. Command names are retrieved from the global 
+ * command-name-list and name strings for the data types are searched in the resource CLASS table of the object class.
  * Undefined names will be initialised with NULL.
  */
 
 	for ( i=0; (u_long)i<varcmdarr->length; i++ )
 	{
 /*
- * initialise varcmdarr->sequence[i] with command and
- * argument types, returned with dev_query_out from the
+ * initialise varcmdarr->sequence[i] with command and argument types, returned with dev_query_out from the
  * device servers command list.
  */
 		varcmdarr->sequence[i].cmd      = dev_query_out.sequence[i].cmd;
@@ -554,14 +543,9 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 		varcmdarr->sequence[i].out_type = dev_query_out.sequence[i].out_type;
 
 /*
- * get command name string from the resource database
+ * get command name string from the resource database check to see if device server returned command names 
  */
-
-
-/* 
- * check to see if device server returned command names 
- */
-		if (i < n_cmd_names && n_cmd_names > 0)
+		if (n_cmd_names > 0 && i < n_cmd_names && strlen(cmd_names[i]))
 		{
 			strncpy(varcmdarr->sequence[i].cmd_name, cmd_names[i], sizeof(varcmdarr->sequence[i].cmd_name) - 1);
 			free(cmd_names[i]);
@@ -570,61 +554,48 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 		{
 			if (!ds->no_database)
 			{
-				if ( (ret_stat = get_cmd_string (ds, varcmdarr->sequence[i].cmd, 
-		    		varcmdarr->sequence[i].cmd_name, 
-		    		error )) == DS_NOTOK )
+				if ((ret_stat = get_cmd_string(ds, varcmdarr->sequence[i].cmd, varcmdarr->sequence[i].cmd_name, error)) == DS_NOTOK)
 				{
 /*
- * An error will be only returned if the database
- * access fails.
+ * An error will be only returned if the database access fails.
  */
 					return (DS_NOTOK);
 				}
 			}
-			else
+			if (ds->no_database || ret_stat == DS_WARNING)
 			{
-				snprintf(varcmdarr->sequence[i].cmd_name, sizeof(varcmdarr->sequence[i].cmd_name), "command%d",i);
+				snprintf(varcmdarr->sequence[i].cmd_name, sizeof(varcmdarr->sequence[i].cmd_name), "command_%li/%li/%li", 
+							((varcmdarr->sequence[i].cmd >> DS_TEAM_SHIFT) & DS_TEAM_MASK),
+                                                        ((varcmdarr->sequence[i].cmd >> DS_IDENT_SHIFT) & DS_IDENT_MASK),
+                                                        (varcmdarr->sequence[i].cmd & 0xFFF));
 			}
 		}
 		if (!ds->no_database)
 		{
-
-
 /*
- *  Check wether command name was found.
- *  If the name was not found, get_cmd_string() returns
- *  DS_WARNING.
+ *  Check wether command name was found.  If the name was not found, get_cmd_string() returns DS_WARNING.
  */
-
-			if ( ret_stat != DS_WARNING )
+			if (ret_stat != DS_WARNING)
 			{
 /*
- * Limit the class_name and the command_name
- * strings to 19 characters. This is the limit
- * of the static database name fields.
+ * Limit the class_name and the command_name strings to 19 characters. This is the limit of the static database name fields.
  */
-
 				length = strlen (dev_query_out.class_name);
 				if ( length > MAX_RESOURCE_FIELD_LENGTH )
 					length = MAX_RESOURCE_FIELD_LENGTH;
-				strncpy (class_name, dev_query_out.class_name, 
-			    	MAX_RESOURCE_FIELD_LENGTH);
+				strncpy (class_name, dev_query_out.class_name, MAX_RESOURCE_FIELD_LENGTH);
 				class_name[(_Int)length] = '\0';
 
 				length = strlen (varcmdarr->sequence[i].cmd_name);
 				if ( length > MAX_RESOURCE_FIELD_LENGTH )
 					length = MAX_RESOURCE_FIELD_LENGTH;
-				strncpy (cmd_name, varcmdarr->sequence[i].cmd_name,
-			    	MAX_RESOURCE_FIELD_LENGTH);
+				strncpy (cmd_name, varcmdarr->sequence[i].cmd_name, MAX_RESOURCE_FIELD_LENGTH);
 				cmd_name[(_Int)length] = '\0';
 			}
 
 /*
- *  setup resource path to read information about
- *  data types from the CLASS resource table.
- *
- * but first check to see whether the device belongs to another
- * nethost domain i.e. i_nethost != 0
+ * Setup resource path to read information about data types from the CLASS resource table,
+ * but first check to see whether the device belongs to another nethost domain i.e. i_nethost != 0
  */
 			if (ds->i_nethost > 0)
 				snprintf(res_path, sizeof(res_path), "//%s/CLASS/%s/%s",
@@ -633,7 +604,7 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
  * use default nethost
  */
 			else
-				snprintf (res_path, sizeof(res_path), "CLASS/%s/%s", class_name, cmd_name);
+				snprintf(res_path, sizeof(res_path), "CLASS/%s/%s", class_name, cmd_name);
 
 /*
  *  read CLASS resources from database
@@ -656,17 +627,14 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 		}
 	}
 
-	/*
-	 *  free dev_query_out 
-	 */
+/*
+ *  free dev_query_out 
+ */
+	xdr_free ((xdrproc_t)xdr__dev_query_out, (char *)&dev_query_out);
 
-	xdr_free ((xdrproc_t)xdr__dev_query_out,
-	    (char *)&dev_query_out);
-
-	/*
+/*
  * Return error code and status from device server.
  */
-
 	*error = dev_query_out.error;
 	return (dev_query_out.status);
 }
