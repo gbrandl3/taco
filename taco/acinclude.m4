@@ -27,7 +27,11 @@ AC_DEFUN(TACO_MYSQL_SUPPORT,
 			*)	mysql=no;;
 		esac], [mysql=yes])
 	if test "x$mysql" = "xyes" ; then
-		AC_CHECK_HEADERS([mysql/mysql.h], [], [mysql=no])
+		for i in /usr/include /usr/local/include ; do
+			AC_CHECK_FILE($i/mysql/mysql.h, [mysql=yes;CPPFLAGS="$CPPFLAGS -I$i";break],[mysql=no])
+		done
+		echo $CPPFLAGS
+		AC_CHECK_HEADERS([mysql/mysql.h], [mysql=yes], [mysql=no])
 	fi
 	AM_CONDITIONAL(MYSQLSUPPORT, test "x$mysql" = "xyes")
 ])
