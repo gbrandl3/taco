@@ -1,6 +1,6 @@
-AC_INIT([TACO], [3.0], [taco-devel@lists.sourceforge.net])
+AC_INIT([TACO], [3.0.1], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.43 $)dnl
+AC_REVISION($Revision: 1.44 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -30,6 +30,20 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
+AC_PROG_AWK
+AC_CHECK_PROGS(HOSTNAME, hostname)
+if test "$HOSTNAME" ; then
+	hostname=`hostname -s`;
+fi
+if test "$hostname" ; then
+	HOSTNAME='hostname -s'
+else 
+	hostname=`hostname`
+	if test -z "$hostname" ; then
+		HOSTNAME='uname -n | cut cut -f1 -d'.''
+	fi
+fi
+AC_SUBST([HOSTNAME])
 
 GCC_LIB_PATH="" 
 if test x"$CC" = x"gcc" ; then
