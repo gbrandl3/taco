@@ -3,10 +3,7 @@
 #include <cstdlib>
 #include <sys/wait.h>
 
-#define _db_setup_h
 #include <API.h>
-#undef _db_setup_h
-#include "db_setup.h"
 
 /* For database only */
 
