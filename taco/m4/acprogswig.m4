@@ -4,7 +4,7 @@ dnl	searches for SWIG in the PATH and adds the necessary options
 dnl	returns both in SWIG
 dnl
 
-AC_DEFUN(AC_PROG_SWIG_PYTHON,
+AC_DEFUN([AC_PROG_SWIG_PYTHON],
     [
 dnl Check if the SWIG program is available
         AC_CHECK_PROG(ac_swig_prog, swig, swig)

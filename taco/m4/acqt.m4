@@ -1,6 +1,6 @@
 dnl
 dnl Module:
-dnl		$Id: acqt.m4,v 1.1 2003-04-25 13:30:25 jkrueger1 Exp $
+dnl		$Id: acqt.m4,v 1.2 2004-01-13 16:46:12 jkrueger1 Exp $
 dnl Description:
 dnl		autotool macros to get the Qt installation pathes
 dnl		adapted form the KDE2 acinclude.m4
@@ -8,6 +8,9 @@ dnl Author:
 dnl		$Author: jkrueger1 $
 dnl History:
 dnl		$Log: not supported by cvs2svn $
+dnl		Revision 1.1  2003/04/25 13:30:25  jkrueger1
+dnl		Merge of ESRF and FRM-II contributions completed. Tests in progress.
+dnl		
 dnl		Revision 1.4  2002/04/19 11:38:58  jkrueger
 dnl		*** empty log message ***
 dnl		
@@ -31,7 +34,7 @@ dnl
 dnl AC_MOC_ERROR_MESSAGE
 dnl puts a message to user about the missing moc
 dnl
-AC_DEFUN(QT_MOC_ERROR_MESSAGE,
+AC_DEFUN([QT_MOC_ERROR_MESSAGE],
     [
 	AC_MSG_ERROR([No Qt meta object compiler (moc) found!
 Please check whether you installed Qt correctly.
@@ -48,7 +51,7 @@ dnl
 dnl AC_UIC_ERROR_MESSAGE
 dnl puts a message to user about the missing uic
 dnl
-AC_DEFUN(QT_UIC_ERROR_MESSAGE,
+AC_DEFUN([QT_UIC_ERROR_MESSAGE],
     [
 	AC_MSG_WARN([No Qt ui compiler (uic) found!
 Please check whether you installed Qt correctly.
@@ -67,7 +70,7 @@ dnl gets the pathes to moc and uic, and returns it in the
 dnl variables MOC resp. UIC
 dnl if failed, the variables contains only a echo statement
 dnl
-AC_DEFUN(AC_PATH_QT_MOC_UIC,
+AC_DEFUN([AC_PATH_QT_MOC_UIC],
     [
 	qt_bindirs=""
 	for dir in $qt_dirs; do
@@ -102,7 +105,7 @@ dnl AC_CHECK_BOOL
 dnl checks supporting bool type by c++ compiler and makes an item in 
 dnl config.h 
 dnl 
-AC_DEFUN(AC_CHECK_BOOL,
+AC_DEFUN([AC_CHECK_BOOL],
     [
         AC_MSG_CHECKING([for bool])
         AC_CACHE_VAL(ac_cv_have_bool,
@@ -130,7 +133,7 @@ dnl	qtsubver	= revision of Qt
 dnl	qt_minversion	= string with the minimum required version of Qt
 dnl	qt_verstring	= string with the version of Qt
 dnl
-AC_DEFUN(AC_USE_QT,
+AC_DEFUN([AC_USE_QT],
     [
 	if test -z "$1"; then
   	    qtver=2
@@ -195,7 +198,7 @@ dnl
 dnl QT_MISC_TESTS
 dnl performs some miscellaneous test to Qt
 dnl
-AC_DEFUN(QT_MISC_TESTS,
+AC_DEFUN([QT_MISC_TESTS],
     [
    	AC_LANG_C
 dnl Checks for libraries.
@@ -245,7 +248,7 @@ dnl
 dnl AC_X_PATH
 dnl performs some tests to get the Installation of the X system
 dnl 
-AC_DEFUN(AC_X_PATH,
+AC_DEFUN([AC_X_PATH],
      [
 	AC_REQUIRE([AC_PROG_CPP])dnl
 	AC_REQUIRE([QT_MISC_TESTS])dnl
@@ -412,7 +415,7 @@ dnl AC_PRINT_QT_PROGRAM
 dnl creates a little Qt program dependend on the Qt version to test the Qt 
 dnl installation
 dnl
-AC_DEFUN(AC_PRINT_QT_PROGRAM,
+AC_DEFUN([AC_PRINT_QT_PROGRAM],
     [
 	AC_REQUIRE([AC_USE_QT])
 	cat > conftest.$ac_ext <<EOF
@@ -473,7 +476,7 @@ dnl
 dnl AC_CHECK_QT_DIRECT
 dnl tests the generating a Qt program without setting some ld flags
 dnl
-AC_DEFUN(AC_CHECK_QT_DIRECT,
+AC_DEFUN([AC_CHECK_QT_DIRECT],
     [
 	AC_REQUIRE([AC_USE_QT])
 	AC_MSG_CHECKING([if Qt compiles without flags])
@@ -538,7 +541,7 @@ dnl	QT_INCLUDES	= include directives according to Qt
 dnl	QT_LDFLAGS	= ld flags according to Qt
 dnl	LIB_QT		= name of the Qt lib
 dnl
-AC_DEFUN(AC_PATH_QT,
+AC_DEFUN([AC_PATH_QT],
     [
 	AC_REQUIRE([AC_X_PATH])dnl
 	AC_USE_QT([$1], [$2])dnl

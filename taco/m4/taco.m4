@@ -1,7 +1,7 @@
 dnl
 dnl TACO_BASE_PATH
 dnl 
-AC_DEFUN(TACO_BASE_PATH,
+AC_DEFUN([TACO_BASE_PATH],
     [
 dnl    	AC_MSG_CHECKING([for TACO base])
     	AC_REQUIRE([TACO_CHECK_TACO_SYSTEM]) 
@@ -120,29 +120,29 @@ dnl
 dnl	produces $taco_config, $taco_install_path (this is the machine specific extention 
 dnl			for exec and lib)
 dnl
-AC_DEFUN(TACO_CHECK_TACO_SYSTEM, 
+AC_DEFUN([TACO_CHECK_TACO_SYSTEM], 
     [
     	AC_REQUIRE([AC_CANONICAL_SYSTEM])
     	taco_install_path=""
     	case "$target" in
             i[[3456]]86-*-linux|i[[3456]]86-*-linux-*|i[[3456]]-*-cygwin*)
-                        taco_config="unix=1 __unix=1 linux=1 x86=1"
-			taco_install_path="linux/x86" ;;
+                        taco_config="unix=1 __unix=1 linux=1 x86=1";;
             m68k-*-linux-*) 
-			taco_config="unix=1 __unix=1 linux=1 68k=1"
-			taco_install_path="linux/86k" ;;
+			taco_config="unix=1 __unix=1 linux=1 68k=1";;
+dnl			taco_install_path="linux/86k" ;;
             *-*-solar*-* | *-*-sun*-*)
-                        taco_config="unix=1 __unix=1 _solaris=1 __solaris__=1"
-			taco_install_path="solaris" ;;
+                        taco_config="unix=1 __unix=1 _solaris=1 __solaris__=1";;
+dnl			taco_install_path="solaris" ;;
             *-*-hp*-*)
-			taco_config="unix=1 __unix=1 __hpux=1 __hpux10=1 __hp9000s700=1 __hpux9000s700=1"
-			taco_install_path="hpux" ;;
+			taco_config="unix=1 __unix=1 __hpux=1 __hpux10=1 __hp9000s700=1 __hpux9000s700=1";;
+dnl			taco_install_path="hpux" ;;
             *-*-OS?-*)      
-			taco_config="_UCC=1"
-			taco_install_path="os9" ;;
+			taco_config="_UCC=1";;
+dnl			taco_install_path="os9" ;;
             *)              
 			taco_config="unknown $target" ;;
     	esac
+	taco_install_path="$target_os/$target_cpu"
     	AC_SUBST(taco_config)
     	AC_SUBST(taco_install_path)
 	libdir="${libdir}/${taco_install_path}"
@@ -154,7 +154,7 @@ dnl
 dnl	TACO_CHECK_EXTRA_LIBS
 dnl
 dnl
-AC_DEFUN(TACO_CHECK_EXTRA_LIBS,
+AC_DEFUN([TACO_CHECK_EXTRA_LIBS],
     [
     	AC_MSG_CHECKING(for extra includes)
     	AC_ARG_WITH(extra-includes, [  --with-extra-includes=DIR
@@ -206,7 +206,7 @@ AC_DEFUN(TACO_CHECK_EXTRA_LIBS,
 dnl
 dnl	TACO_CHECK_TACO
 dnl
-AC_DEFUN(TACO_CHECK_TACO,
+AC_DEFUN([TACO_CHECK_TACO],
     [
     	TACO_CHECK_TACO_SYSTEM
         AC_MSG_CHECKING([for TACO])
@@ -231,7 +231,7 @@ dnl TACO_INIT([check])
 dnl the parameter check indicates the check of a TACO installation
 dnl blank or "check" indicate the check all other no check
 dnl
-AC_DEFUN(TACO_INIT,
+AC_DEFUN([TACO_INIT],
     [
 	AC_REQUIRE([AC_CANONICAL_SYSTEM])
 	AM_INIT_AUTOMAKE([1.7])
@@ -260,7 +260,7 @@ dnl
     ]
 )
 
-AC_DEFUN(TACO_SERVER,
+AC_DEFUN([TACO_SERVER],
 [       AC_REQUIRE([TACO_CHECK_TACO])
 	AC_FIND_HEADER([API.h],[$TACO_INCLUDES])
         AC_LANG_SAVE
@@ -272,7 +272,7 @@ AC_DEFUN(TACO_SERVER,
 	AC_CACHE_SAVE
 ])
 
-AC_DEFUN(TACO_CLIENT,
+AC_DEFUN([TACO_CLIENT],
 [       AC_REQUIRE([TACO_CHECK_TACO])      
         AC_FIND_HEADER([API.h],[$TACO_INCLUDES])
         AC_LANG_SAVE

@@ -1,7 +1,7 @@
 dnl
 dnl AC_CHECK_LIB_FUN[lib-name,includes,body,found-action,not-found-action]
 dnl
-AC_DEFUN(AC_CHECK_LIB_FUN,
+AC_DEFUN([AC_CHECK_LIB_FUN],
 	[AC_MSG_CHECKING(checking for lib$1)
 	LIBS_ORG_LIBFUN="$LIBS"	
 	LIBS="$LIBS -l$1 "
@@ -29,7 +29,7 @@ dnl find header in list dirs
 dnl add dir to include file search path, if not already there
 dnl AC_FIND_HEADER( HEADER, PATH )
 dnl
-AC_DEFUN(AC_FIND_HEADER,
+AC_DEFUN([AC_FIND_HEADER],
 [ found=no
  ac_shead=`echo "$1" | sed 'y%./+-%__p_%'`
  AC_CACHE_VAL([ac_cv_header_path_$ac_shead],[
@@ -67,7 +67,7 @@ dnl if src-dir is given, it is preferred
 dnl make sure the ordering is correct for linking!
 dnl AC_FIND_LIB( lib-name,PATH,includes,body,[ , [src_dir]])
 dnl
-AC_DEFUN(AC_FIND_LIB,
+AC_DEFUN([AC_FIND_LIB],
 [ found=no 
 ac_slib=`echo "$1" | sed 'y%./+-%__p_%'`
 AC_CACHE_VAL([ac_cv_lib_path_$ac_slib],
