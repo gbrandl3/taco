@@ -17,13 +17,13 @@
 name=taco_manager
 rcvar=`set_rcvar`
 
-command=/taco/system/bin/freebsd5.2.1/i386/Manager
-required_files=/taco/etc/taco_freebsd.sh
+command=@sbindir@/Manager
+required_files=@sysconfdir@/tacoenv.sh
 start_precmd="taco_precmd"
 
 taco_precmd()
 {
-	. /taco/etc/taco_freebsd.sh
+	. @sysconfdir@/tacoenv.sh
 }
 
 # set defaults

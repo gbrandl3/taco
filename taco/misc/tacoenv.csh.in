@@ -44,22 +44,20 @@ if ( $DSHOME == $prefix ) then
 	else
 		setenv LD_LIBRARY_PATH @libdir@
 	endif
-	if (${?PATH}) then
-		setenv PATH @bindir@:@sbindir@:${PATH}
-	else
-		setenv PATH @bindir@:@sbindir@
-	endif
+        setenv TACO_PATH @bindir@:@sbindir@
 else
 	if (${?LD_LIBRARY_PATH}) then
 		setenv LD_LIBRARY_PATH ${DSHOME}/lib/@taco_install_path@:${LD_LIBRARY_PATH}
 	else
 		setenv LD_LIBRARY_PATH ${DSHOME}/lib/@taco_install_path@
 	endif
-	if (${?PATH}) then
-		setenv PATH ${DSHOME}/bin/@taco_install_path@:${DSHOME}/system/bin/@taco_install_path@:${PATH}
-	else
-		setenv PATH ${DSHOME}/bin/@taco_install_path@:${DSHOME}/system/bin/@taco_install_path@
-	endif
+	setenv TACO_PATH ${DSHOME}/bin/@taco_install_path@:${DSHOME}/system/bin/@taco_install_path@
+endif
+
+if (${?PATH}) then
+	setenv PATH ${TACO_PATH}:${PATH}
+else
+	setenv PATH ${TACO_PATH}
 endif
 
 if (${?PYTHONPATH}) then
