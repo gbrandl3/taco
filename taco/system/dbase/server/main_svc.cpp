@@ -165,8 +165,10 @@ int main(int argc,char **argv)
 			    {
 				mysql_password = getenv("MYSQL_PASSWORD");
 			    }
+#ifdef DEBUG
 			    std::cout << "going to connect to mysql database with user = " << mysql_user;
 			    std::cout << ", password = " << mysql_password << std::endl;
+#endif
     			    dbm = new MySQLServer(mysql_user, mysql_password, argv[optind]);
 			}
 #endif
@@ -206,9 +208,14 @@ int main(int argc,char **argv)
 	std::cerr << "dbm_server : Can't get transcient program number" << std::endl;
 	exit(-1);
     }
+    dbm->setPgNum(pgnum);
+#ifdef DEBUG
     std::cout << "Program number : " << pgnum << std::endl;
+#endif
     gethostname(hostna, sizeof(hostna));
+#ifdef DEBUG
     std::cout << "Server host name : " << hostna << std::endl;
+#endif
 //
 // Send these informations to network manager. Even if the server is now 
 // supporting version one and two, register it in the Manager with version 1
