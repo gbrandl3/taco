@@ -33,9 +33,9 @@
 
  Original   :	April 1999
 
- Version    :	$Revision: 1.5 $
+ Version    :	$Revision: 1.6 $
 
- Date       :	$Date: 2004-02-11 10:22:30 $
+ Date       :	$Date: 2004-03-03 11:38:16 $
 
  Copyleft (c) 1999 by European Synchrotron Radiation Facility,
                       Grenoble, France
@@ -52,58 +52,54 @@
 #include <API_xdr_vers3.h>
 
 #if !defined _NT
-#if ( (defined OSK) || (defined _OSK))
-#include <inet/socket.h>
-#include <inet/netdb.h>
-#else
-#if (defined sun) || (defined irix)
-#include <sys/filio.h>
-#include <errno.h>
-#endif /* sun */
-#include <sys/socket.h>
-#if !defined vxworks
-#include <netdb.h>
-#else
-#include <rpcGbl.h>
-#endif /* !vxworks */
-#ifdef lynx
-#include <ioctl.h>
-#endif /*lynx */
-#ifdef linux
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#endif /* linux */
-#endif /* OSK || _OSK */
+#	include <errno.h>
+#	if ( (defined OSK) || (defined _OSK))
+#		include <inet/socket.h>
+#		include <inet/netdb.h>
+#	else
+#		if HAVE_SYS_FILIO_H
+#			include <sys/filio.h>
+#		endif 
+#		if HAVE_SYS_SOCKET_H
+#			include <sys/socket.h>
+#		else
+#			include <socket.h>
+#		endif
+#		if HAVE_NETDB_H
+#			include <netdb.h>
+#		else
+#			include <rpcGbl.h>
+#		endif /* !vxworks */
+#		if HAVE_SYS_IOCTL_H
+#			include <sys/ioctl.h>
+#		else
+#			include <ioctl.h>
+#		endif 
+#		if HAVE_SYS_TYPES_H
+#			include <sys/types.h>
+#		endif
+#	endif /* OSK || _OSK */
 #endif /* _NT */
 #ifdef _UCC
-#include <errno.h>
 #include <rpc/rpc.h>
 #include <_os9_sockets.h>
 #endif /* _UCC */
 
 #ifdef __cplusplus
-extern "C" configuration_flags config_flags;
-#else
-extern configuration_flags config_flags;
+extern "C" {
 #endif
-
-#ifdef __cplusplus
-extern "C" nethost_info *multi_nethost;
-#else
-extern nethost_info *multi_nethost;
-#endif
-
-extern server_connections svr_conns[];
-
-extern DevServerDevices *devices;
+	extern configuration_flags 	config_flags;
+	extern nethost_info 		*multi_nethost;
+	extern server_connections 	svr_conns[];
+	extern DevServerDevices 	*devices;
 /*
  * global dynamic array of pending asynchronous requests used to store 
  * info needed to receive events (shared with asynchronous calls)
  */
-
-extern asynch_request client_asynch_request;
+	extern asynch_request client_asynch_request;
+#ifdef __cplusplus
+};
+#endif
 
 /*
  * use malloc() to allocate space (to avoid problems with OS-9 and 64k limit)
@@ -111,9 +107,7 @@ extern asynch_request client_asynch_request;
 static event_client *event_client_list=NULL;
 
 /* following line should be in API_xdr.h */
-
 bool_t _DLLFunc xdr__asynch_client_data PT_((XDR *xdrs, _asynch_client_data *objp));
-
 
 /**
  * application interface to register a client as a listener

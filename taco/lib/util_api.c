@@ -14,9 +14,9 @@
 
  Original   :	April 1993
 
- Version:	$Revision: 1.7 $
+ Version:	$Revision: 1.8 $
 
- Date:		$Date: 2004-02-11 15:13:03 $
+ Date:		$Date: 2004-03-03 11:38:16 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -32,74 +32,64 @@
 #include <DevErrors.h>
 
 #if !defined _NT
-#if  ( OSK | _OSK )
-#include <inet/socket.h>
-#include <inet/netdb.h>
-#else
-#ifdef sun
-#include <sys/filio.h>
-#endif /* sun */
-#include <sys/socket.h>
-#if !defined vxworks
-#include <netdb.h>
-#endif /* !vxworks */
-#endif /* OSK | _OSK */
+#	if  ( OSK | _OSK )
+#		include <inet/socket.h>
+#		include <inet/netdb.h>
+#	else
+#		if HAVE_SYS_FILIO_H
+#			include <sys/filio.h>
+#		endif 
+#		if HAVE_SYS_SOCKET_H
+#			include <sys/socket.h>
+#		else
+#			include <socket.h>
+#		endif
+#		if HAVE_NETDB_H
+#			include <netdb.h>
+#		endif 
+#	endif /* OSK | _OSK */
 #endif  /* _NT */
 
-/* pointer to global error message */
-extern char *dev_error_string;
 
 static long get_cmd_string PT_( (devserver ds, long cmd, char *cmd_str, long *error) );
-
 
 /****************************************
  *          Globals	                *
  ****************************************/
-
 /*
  *  Types for global state flags for the current
  *  server or client status and for Database Server
  *  information are defined in API.h
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /*
  *  Configuration flags
  */
-
-#ifdef __cplusplus
-extern "C" configuration_flags      config_flags;
-#else
-extern configuration_flags      config_flags;
-#endif
-
+	extern configuration_flags      config_flags;
+/* 
+ * pointer to global error message 
+ */
+	extern char 			*dev_error_string;
 /*
  * Global structure for multiple control systems, setup by
  * setup_config_multi() but used by all multi-nethost functions
  */
-
-#ifdef __cplusplus
-extern "C" nethost_info *multi_nethost;
-#else
-extern nethost_info *multi_nethost;
-#endif
-
-#ifdef __cplusplus
-extern "C" long  max_nethost;
-#else
-extern long  max_nethost;
-#endif
-
+	extern nethost_info 		*multi_nethost;
+	extern long  			max_nethost;
 /*  
  *  Structure for the adnministration of open RPC connections.
  */
-
-extern server_connections	svr_conns [];
-
+	extern server_connections	svr_conns [];
+#ifdef __cplusplus
+};
+#endif
 
 /*
  *  Table of command CLASS resources, read for dev_cmd_query()
  */
-
 static db_resource   res_tab [] = {
 	{(char *)"In_Type",  D_STRING_TYPE, NULL},
 	{(char *)"Out_Type", D_STRING_TYPE, NULL},

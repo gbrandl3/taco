@@ -14,57 +14,62 @@
 
  Original:      09.01.1991
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2004-02-19 15:41:44 $
+ Date:		$Date: 2004-03-03 11:38:16 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility,
                             Grenoble, France
 
 ********************************************************************-*/
 
+#include "config.h"
 #include <API.h>
 #include <private/ApiP.h>
 
 #include <Admin.h>
 
 #ifdef unix
-#include <rpc/pmap_clnt.h>
-#include <rpc/pmap_prot.h>
-#include <sys/socket.h>
+#	include <rpc/pmap_clnt.h>
+#	include <rpc/pmap_prot.h>
+#	if HAVE_SYS_SOCKET_H
+#		include <sys/socket.h>
+#	else
+#		include <socket.h>
+#	endif
 #elif defined _NT
-#include <rpc/pmap_pro.h>
-#include <rpc/pmap_cln.h>
+#	include <rpc/pmap_pro.h>
+#	include <rpc/pmap_cln.h>
 #endif
 
 #if ( OSK | _OSK )
-#ifdef __cplusplus
+#	ifdef __cplusplus
 extern "C" {
-#endif
-extern struct pmaplist *pmap_getmaps(struct sockaddr_in *address); 
-extern unsigned int tsleep(unsigned int);
-#ifdef __cplusplus
+#	endif
+	extern struct pmaplist *pmap_getmaps(struct sockaddr_in *address); 
+	extern unsigned int tsleep(unsigned int);
+#	ifdef __cplusplus
 }
-#endif
-#include <rpc/pmap_clnt.h>
-#include <rpc/pmap_prot.h>
-#include <inet/socket.h>
+#	endif
+#	include <rpc/pmap_clnt.h>
+#	include <rpc/pmap_prot.h>
+#	include <inet/socket.h>
 #endif /* OSK | _OSK */
 
 #ifdef vxworks
-#include <taskLib.h>
+#	include <taskLib.h>
 #endif /* vxworks */
 
 #ifdef _XOPEN_SOURCE_EXTENDED
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#	include <netinet/in.h>
+#	include <arpa/inet.h>
 #endif /* XOPEN_SOURCE_EXTENDED */
 
 #if defined (__hpux) || (WIN32)
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern void get_myaddress (struct sockaddr_in *);
+	extern void get_myaddress (struct sockaddr_in *);
 #ifdef __cplusplus
 }
 #endif

@@ -25,9 +25,9 @@
 
  Original   :	January 1997
 
- Version:	$Revision: 1.6 $
+ Version:	$Revision: 1.7 $
 
- Date:		$Date: 2004-02-19 15:39:39 $
+ Date:		$Date: 2004-03-03 11:38:16 $
 
  Copyright (c) 1997-2000 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -49,13 +49,17 @@
 #if !defined (_NT)
 #	if ( defined (OSK) || defined (_OSK))
 
-#	include <inet/socket.h>
-#	include <inet/netdb.h>
+#		include <inet/socket.h>
+#		include <inet/netdb.h>
 #	else
 #		if defined (sun) || defined (irix)
 #			include <sys/filio.h>
 #		endif /* sun */
-#		include <sys/socket.h>
+#		if HAVE_SYS_SOCKET_H
+#			include <sys/socket.h>
+#		else
+#			include <socket.h>
+#		endif
 #		if !defined (vxworks)
 #			include <netdb.h>
 #		else
@@ -64,19 +68,19 @@
 #		ifdef lynx
 #			include <ioctl.h>
 #		endif /*lynx */
-#		if defined (linux) || defined (FreeBSD) 
-#			include <errno.h>
+#		if HAVE_SYS_TYPES_H
 #			include <sys/types.h>
+#		endif
+#		if HAVE_SYS_IOCTL_H
 #			include <sys/ioctl.h>
-#			include <sys/socket.h>
-
+#		endif
+#		if defined (linux) || defined (FreeBSD) 
 /* mutex locking for handling asyncronous request */
 /* here the mutex is instantiated. */
 #			ifdef _REENTRANT
 #				include <pthread.h>
 				pthread_mutex_t async_mutex = PTHREAD_MUTEX_INITIALIZER;
 #			endif
-
 #		endif /* linux */
 #	endif /* OSK || _OSK */
 #endif /* _NT */
@@ -98,18 +102,24 @@
 #endif /* _UCC */
 
 #ifdef __cplusplus
-	extern "C" configuration_flags config_flags;
-	extern "C" nethost_info *multi_nethost;
-#else
+extern "C" {
+#endif
 	extern configuration_flags config_flags;
 	extern nethost_info *multi_nethost;
-#endif
-
-extern server_connections svr_conns[];
 /*
  * global dynamic array of pending asynchronous requests used to store 
  * info needed to receive asynchronous replies
  */
+	extern server_connections svr_conns[];
+	extern int ds_rpc_svc_fd; /* global variable - client rpc file descriptor */
+/* 
+ * dynamic error variables
+ */
+	extern char *dev_error_stack;
+	extern char *dev_error_string;
+#ifdef __cplusplus
+};
+#endif
 
 asynch_request client_asynch_request = {0, NULL};
 
@@ -119,7 +129,6 @@ bool_t _DLLFunc xdr__asynch_client_data PT_((XDR *xdrs, _asynch_client_data *obj
 
 bool_t _DLLFunc xdr__asynch_client_raw_data PT_((XDR *xdrs, _asynch_client_raw_data *objp));
 
-extern int ds_rpc_svc_fd; /* global variable - client rpc file descriptor */
 
 /*
  * global variables indicating the sockets used by the synchronous and
@@ -129,11 +138,6 @@ long synch_svc_udp_sock;
 long synch_svc_tcp_sock;
 long asynch_svc_tcp_sock;
 
-/* 
- * dynamic error variables
- */
-extern char *dev_error_stack;
-extern char *dev_error_string;
 
 /**@ingroup dsAPI
  * application interface to execute commands on a device

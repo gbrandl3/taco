@@ -11,9 +11,9 @@
 
  Original   :   December 1993
 
- Version    :	$Revision: 1.5 $
+ Version    :	$Revision: 1.6 $
 
- Date       :	$Date: 2004-02-11 11:42:59 $
+ Date       :	$Date: 2004-03-03 11:38:16 $
 
  Copyright (c) 1993 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -29,16 +29,25 @@
 #include <errno.h>
 
 #ifdef unix
+#	if HAVE_NETDB_H
+#		include <netdb.h>
+#	endif
 #	if !defined vxworks
 #		include <pwd.h>
 #		include <grp.h>
-#		include <netdb.h>
 #	endif /* !vxworks */
-#	include <sys/socket.h>
-#	include <arpa/inet.h>
-#	ifndef lynx
+#	if !HAVE_SOCKLEN_T
+#		define	_BSD_SOCKLEN_T_	/* Darwin 6.8 Problem? */
+#	endif
+#	if HAVE_SYS_SOCKET_H
+#		include <sys/socket.h>
+#	endif
+#	if HAVE_ARPA_INET_H
+#		include <arpa/inet.h>
+#	endif
+#	if HAVE_NETINET_Hx
 #		include <netinet/in.h>
-#	endif /* !lynx */
+#	endif 
 #endif /* unix */
 
 #if ( OSK | _OSK )
@@ -87,25 +96,23 @@ PT_( (DevServerDevices *device) );
 /*
  * A global variable to hold the unique client identification 
  */
-
 static long	client_id = 0;
 
 /*
  * A global variable to hold the security keys to check 
  * the client handles.
  */
-
-static SecOpenConn 	conn_list = {
-	0, NULL};
+static SecOpenConn 	conn_list = { 0, NULL};
 
 /* 
  * global variable defined in gen_api.c which keeps track of multi-nethosts
  */
-
 #ifdef __cplusplus
-extern "C" nethost_info *multi_nethost;
-#else
-extern nethost_info *multi_nethost;
+extern "C" {
+#endif
+	extern nethost_info *multi_nethost;
+#ifdef __cplusplus
+};
 #endif
 
 /*

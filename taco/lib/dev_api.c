@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.7 $
+ Version    :	$Revision: 1.8 $
 
- Date	    :	$Date: 2004-02-11 10:16:50 $
+ Date	    :	$Date: 2004-03-03 11:38:16 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -38,7 +38,11 @@
 #		if (defined sun) || (defined irix) || defined(FreeBSD)
 #			include <sys/filio.h>
 #		endif /* sun */
-#		include <sys/socket.h>
+#		if HAVE_SYS_SOCKET_H
+#			include <sys/socket.h>
+#		else
+#			include <socket.h>
+#		endif
 #		include <netinet/in.h>
 #		if !defined vxworks
 #			include <netdb.h>
@@ -49,10 +53,13 @@
 #		ifdef lynx
 #			include <ioctl.h>
 #		endif /*lynx */
-#		ifdef linux
+#		if HAVE_SYS_TYPES_H
 #			include <sys/types.h>
+#		endif
+#		if HAVE_SYS_IOCTL_H
 #			include <sys/ioctl.h>
-#			include <sys/socket.h>
+#		endif
+#		ifdef linux
 #			include <linux/posix_types.h>
 #		endif /* linux */
 #	endif /* OSK || _OSK */
@@ -104,9 +111,16 @@ long 		dev_notimported_init PT_( (char *device_name, long access, long i_nethost
  */
 
 #ifdef __cplusplus
-extern "C" configuration_flags      config_flags;
-#else
-extern configuration_flags      config_flags;
+extern "C" {
+#endif
+	extern configuration_flags      config_flags;
+	extern nethost_info 		*multi_nethost;
+/*
+ * dynamic error string
+ */
+	extern char 			*dev_error_string;
+#ifdef __cplusplus
+};
 #endif
 
 /*
@@ -114,23 +128,12 @@ extern configuration_flags      config_flags;
  * setup_config_multi() but used by all multi-nethost functions
  */
 
-#ifdef __cplusplus
-extern "C" nethost_info *multi_nethost;
-#else
-extern nethost_info *multi_nethost;
-#endif
-
 /*  
  *  Structure for the administration of open RPC connections.
  */
 
 server_connections	 	svr_conns [NFILE];
 
-/*
- * dynamic error string
- */
-
-extern char *dev_error_string;
 
 /**@ingroup dsAPI
  *application interface to import a device from the device server in charge of it.
