@@ -62,7 +62,7 @@ libdsapi_la_CPPFLAGS  	= -UCLIENTONLY
 libdsapi_la_LDFLAGS 	= -version-info $(subst .,:,@LIB_VERSION@)
 libdsapi_la_LIBADD  	= ./libdsapic.la ./libtacoapi.la 
 
-libdsapig___la_SOURCES 	= Device.C OICDevice.C DevServerMain.c startup.c  
+libdsapig___la_SOURCES 	= Device.C OICDevice.C DevServerMain.c startup.c 
 libdsapig___la_CFLAGS  	= -UCLIENTONLY  
 libdsapig___la_LDFLAGS 	= -version-info $(subst .,:,@LIB_VERSION@)
 libdsapig___la_LIBADD  	= ./libdsapic.la ./libtacoapig++.la 
@@ -72,6 +72,7 @@ include_HEADERS		+= DeviceBase.h Device.H OICDevice.H
 include_HEADERS		+= DevServer.h  DevServerP.h  DevSignal.h  NT_debug.h  Starter.h
 
 EXTRA_DIST		+= DeviceFRM.H OICDeviceFRM.H DeviceFRM.C OICDeviceFRM.C 
-EXTRA_DIST		+= NT_debug.c 
+EXTRA_DIST		+= NT_debug.c  Doxyfile.in
 
-
+doc:	Doxyfile
+	doxygen
