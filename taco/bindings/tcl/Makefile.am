@@ -11,6 +11,6 @@ libtcltacoapi_la_LIBADD = $(top_builddir)/lib/libtacoapi.la
 
 libtcltacoapi_la_LDFLAGS = -rdynamic
 
-AM_CPPFLAGS = @TACO_INCLUDES@ @TCLINCLUDE@
+AM_CPPFLAGS = @TACO_INCLUDES@ @TCL_CPPFLAGS@
 
 noinst_HEADERS = db_io.h dc_io.h debug.h dev_io.h
