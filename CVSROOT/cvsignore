@@ -4,3 +4,4 @@ Makefile.in
 *.moc
 .deps
 .libs
+*.lo
