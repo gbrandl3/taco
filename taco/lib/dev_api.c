@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.15 $
+ Version    :	$Revision: 1.16 $
 
- Date	    :	$Date: 2004-06-02 16:36:14 $
+ Date	    :	$Date: 2004-10-21 12:40:24 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -477,7 +477,7 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
  * Set version number to 1 and recreate the client handle.
  */
 				vers_number = DEVSERVER_VERS;
-				clnt = clnt_create (host_name,prog_number, vers_number,"udp");
+				clnt = clnt_create (host_name,prog_number, vers_number,"tcp");
 				if (clnt == NULL)
 				{
 					*error = DevErr_CannotCreateClientHandle;
