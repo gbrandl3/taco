@@ -20,7 +20,7 @@ AC_CHECK_HEADERS([stdlib.h string.h sys/file.h unistd.h fcntl.h sys/types.h memo
 AC_CHECK_LIB(dbm, main)
 AC_CHECK_LIB(ndbm, main)
 case "$host_os" in
-	linux-*)	AC_CHECK_FUNCS([rename ftruncate bcopy fsync]);;
+	linux*)	AC_CHECK_FUNCS([rename ftruncate bcopy fsync]) ;;
 	*)	AC_CHECK_FUNCS([rename ftruncate flock bcopy fsync]);;
 esac
 AC_REPLACE_FUNCS(getopt)
