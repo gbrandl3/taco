@@ -9,9 +9,13 @@ bin_PROGRAMS		= db_fillup \
 		 	db_servinfo \
 	 		db_servunreg \
 		 	db_devres \
-		 	db_resdel
+		 	db_resdel \
+			db_devicetree
 
 INCLUDES		= @TACO_INCLUDES@ @TACO_GDBM_INC@
+
+db_devicetree_SOURCES  = db_devicetree.cpp
+db_devicetree_LDADD    = @TACO_CLIENT_LIBS@
 
 db_fillup_SOURCES	= db_fillup.cpp
 db_fillup_LDADD		= @TACO_GDBM_LDFLAGS@ @TACO_GDBM_LIBS@	
