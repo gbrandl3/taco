@@ -16,5 +16,29 @@ else
   dc_dir=
 endif
 
-SUBDIRS = . manager msg $(dc_dir) dbase starter $(xdev_dir) $(alarm_dir) $(dbdev_dir)
+if BUILD_SERVER
+starter=starter
+else
+starter=
+endif
+
+if BUILD_MANAGER
+manager=manager
+else
+manager=
+endif
+
+if BUILD_MESSAGESERVER
+messageserver=msg
+else
+messageserver=
+endif
+
+if BUILD_DATABASESERVER
+databaseserver=dbase
+else
+databaseserver=
+endif
+
+SUBDIRS = . $(manager) $(messageserver) $(dc_dir) $(databaseserver) $(starter) $(xdev_dir) $(alarm_dir) $(dbdev_dir)
 
