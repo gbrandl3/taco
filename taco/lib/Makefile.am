@@ -20,9 +20,10 @@ SUBDIRS 		= dbase xdr $(dc_dir) $(ascii_dir) $(datap_dir) private .
 
 include_HEADERS 	= API.h DevSec.h hdb.h hdb_out.h Admin.h DevCmds.h DevErrors.h DevStates.h DserverTeams.h macros.h
 
-lib_LTLIBRARIES 	= libtacoapi.la libdsapi.la libtacoapig++.la libdsapig++.la libdsapinomain.la 
+lib_LTLIBRARIES 	= libtacoapi.la libtacoapig++.la 
 
-noinst_LTLIBRARIES 	= libtacoc.la libdsapic.la
+
+noinst_LTLIBRARIES 	= libtacoc.la 
 
 INCLUDES		= @TACO_INCLUDES@
 
@@ -46,6 +47,10 @@ libtacoapig___la_SOURCES = $(SRC_TACO_SPECIAL)
 libtacoapig___la_CFLAGS  = -DCLIENTONLY -x c++
 libtacoapig___la_LIBADD  = libtacoc.la
 libtacoapig___la_LDFLAGS = -version-info @LIB_VERSION@
+
+if BUILD_SERVER
+lib_LTLIBRARIES		+= libdsapi.la libdsapig++.la libdsapinomain.la 
+noinst_LTLIBRARIES 	+= libdsapic.la 
 
 libdsapic_la_SOURCES	= ds_prog_vers3.c oic.c \
 			DevServer.c DevServerSig.c\
@@ -75,6 +80,9 @@ endif
 libdsapig___la_CFLAGS  	= -UCLIENTONLY  
 libdsapig___la_LDFLAGS 	= -version-info @LIB_VERSION@
 libdsapig___la_LIBADD  	= libdsapic.la libtacoapig++.la 
+
+endif
+
 include_HEADERS		+= BlcDsNumbers.h CntrlDsNumbers.h DasDsNumbers.h MachDsNumbers.h SysNumbers.h 
 
 include_HEADERS		+= DeviceBase.h Device.H OICDevice.H 
