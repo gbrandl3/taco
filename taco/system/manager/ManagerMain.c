@@ -13,9 +13,9 @@
 
  Original: 	January 1991
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-05-09 15:26:25 $
+ Date:		$Date: 2003-11-24 13:51:59 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -332,11 +332,14 @@ int main (int argc, char **argv)
  *  delete old System.log and open a new
  *  System.log file for writing system information
  */
-	snprintf (logfile, sizeof(logfile) - 1, "%s/System.log", homepath);
-	if ( (system_log = fopen (logfile, "w")) == NULL )
+	if (c_flags.request_log)
 	{
-		fprintf (stderr,"cannot open System.log file, exiting...\n");
-		kill (pid,SIGQUIT);
+		snprintf (logfile, sizeof(logfile) - 1, "%s/System.log", homepath);
+		if ( (system_log = fopen (logfile, "w")) == NULL )
+		{
+			fprintf (stderr,"cannot open System.log file, exiting...\n");
+			kill (pid,SIGQUIT);
+		}
 	}
 /*
  *  Start the database server on a remote host, if the
@@ -400,9 +403,10 @@ int main (int argc, char **argv)
 		res = system(db_start);
 		if ( res != 0 )
 		{
-		fprintf (stderr,"database server startup failed, exiting...\n");
-		fprintf (system_log, "database server startup failed, exiting...\n");
-		kill (pid,SIGQUIT);
+			fprintf (stderr,"database server startup failed, exiting...\n");
+			if (c_flags.request_log)
+				fprintf (system_log, "database server startup failed, exiting...\n");
+			kill (pid,SIGQUIT);
 		}
 	}
 	else
@@ -410,7 +414,8 @@ int main (int argc, char **argv)
         	if (( db_pid = fork () ) < 0 )
 		{
 			fprintf (stderr,"database server startup failed, exiting...\n");
-			fprintf (system_log, "database server startup failed, exiting...\n");
+			if (c_flags.request_log)
+				fprintf (system_log, "database server startup failed, exiting...\n");
 			kill (pid,SIGQUIT);
 		}
 
@@ -426,7 +431,8 @@ int main (int argc, char **argv)
 				if ( putenv (dbase_env) != 0 )
 				{
 					fprintf (stderr, "Cannot set environment variable %s, exiting...\n", db_name);
-					fprintf (system_log, "Cannot set environment variable %s, exiting...\n", db_name);
+					if (c_flags.request_log)
+						fprintf (system_log, "Cannot set environment variable %s, exiting...\n", db_name);
 					kill (pid,SIGQUIT);
 				}
 /* 
@@ -465,7 +471,8 @@ int main (int argc, char **argv)
 			execvp (homedir, cmd_argv);
 		
 			fprintf (stderr,"execvp failed, database_server not started\n");
-			fprintf (system_log, "execv failed, database_server not started\n");
+			if (c_flags.request_log)
+				fprintf (system_log, "execv failed, database_server not started\n");
 			kill (pid,SIGQUIT);
 		}
 	}
@@ -476,7 +483,8 @@ int main (int argc, char **argv)
         if (( msg_pid = fork () ) < 0 )
 	{
 		fprintf (stderr,"message server startup failed, exiting...\n");
-		fprintf (system_log, "message server startup failed, exiting...\n");
+		if (c_flags.request_log)
+			fprintf (system_log, "message server startup failed, exiting...\n");
 		kill (pid,SIGQUIT);
 	}
 
@@ -497,7 +505,8 @@ int main (int argc, char **argv)
 		execvp (homedir,cmd_argv);
 
 		fprintf (stderr,"execvp failed, message server not started\n");
-		fprintf (system_log,"execv failed, message server not started\n");
+		if (c_flags.request_log)
+			fprintf (system_log,"execv failed, message server not started\n");
 		kill (pid,SIGQUIT);
 	}
 #endif /* unix */
@@ -520,7 +529,8 @@ int main (int argc, char **argv)
 			      cmd_argv, environ,0,0,3)) <= 0)
 		{
 			fprintf (stderr,"os9exec failed, os9_dbsu-server not started\n");
-			fprintf (system_log, "os9exec failed, os9_dbsu-server not started\n");
+			if (c_flags.request_log)
+				fprintf (system_log, "os9exec failed, os9_dbsu-server not started\n");
 			kill (pid,SIGQUIT);
 		}
  	}
@@ -544,9 +554,12 @@ int main (int argc, char **argv)
  */
 	time (&clock);
 	time_string = ctime (&clock);
-      	fprintf (system_log,"Network Manager started subprocesses at : %s", time_string);
-      	fprintf (system_log,"NETHOST = %s   PID = %d\n\n",nethost,pid);
-	fclose (system_log);
+	if (c_flags.request_log)
+	{
+      		fprintf (system_log,"Network Manager started subprocesses at : %s", time_string);
+      		fprintf (system_log,"NETHOST = %s   PID = %d\n\n",nethost,pid);
+		fclose (system_log);
+	}
 	
 /*
  *  point of no return
@@ -724,15 +737,18 @@ static void startup_msg (void)
 /*
  *  Open the System.log file for writing system information
  */
-		if ( (system_log = fopen (logfile, "a")) != NULL )
-	   	{
-			time (&clock);
-			time_string = ctime (&clock);
-      			fprintf (system_log, "Network Manager startup finished at : %s\n", time_string);
-			fclose (system_log);
-	   	}
-		else
-           		fprintf (stderr,"cannot open System.log file.\n");
+			if (c_flags.request_log)
+			{
+				if ((system_log = fopen (logfile, "a")) != NULL )
+	   			{
+					time (&clock);
+					time_string = ctime (&clock);
+      					fprintf (system_log, "Network Manager startup finished at : %s\n", time_string);
+					fclose (system_log);
+	   			}
+				else
+           				fprintf (stderr,"cannot open System.log file.\n");
+			}
 #endif /* unix */
 #ifdef _OSK
 			printf ("Database Dummy Server OK !\nNetwork Manager OK !\n");

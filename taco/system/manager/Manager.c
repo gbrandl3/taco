@@ -11,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-05-09 15:26:24 $
+ Date:		$Date: 2003-11-24 13:51:59 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -69,19 +69,22 @@ _msg_manager_data *rpc_msg_register_1 (_register_data *register_data)
 /*
  *  write information to System.log file
  */
-       	if ( (system_log = fopen (logfile, "a")) != NULL )
+	if (c_flags.request_log)
 	{
-		time (&clock);
-		time_string = ctime (&clock);
-		fprintf (system_log, "Message Server registered at : %s",time_string);
-		fprintf (system_log, "msg_host = %s  prog_nu = %d  vers_nu = %d\n\n",
+       		if ( (system_log = fopen (logfile, "a")) != NULL )
+		{
+			time (&clock);
+			time_string = ctime (&clock);
+			fprintf (system_log, "Message Server registered at : %s",time_string);
+			fprintf (system_log, "msg_host = %s  prog_nu = %d  vers_nu = %d\n\n",
 					    msg_conf.host_name,
 					    msg_conf.prog_number,
 					    msg_conf.vers_number);
-		fclose (system_log);
+			fclose (system_log);
+		}
+	   	else
+			fprintf (stderr,"cannot open System.log file.\n");
 	}
-   	else
-		fprintf (stderr,"cannot open System.log file.\n");
 /*
  *  set manager return values
  */
