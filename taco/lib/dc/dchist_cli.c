@@ -1,12 +1,11 @@
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/dc/dchist_cli.c,v 1.1 2003-04-25 11:21:43 jkrueger1 Exp $";
-
  /*
 
- Author:	$Author: jkrueger1 $
+ Author:	E. Taurel
+		$Author: jkrueger1 $
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-04-25 11:21:43 $
+ Date:		$Date: 2003-05-16 13:38:52 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                       Grenoble, France
@@ -52,72 +51,56 @@ extern dc_nethost_info *dc_multi_nethost;
 
 
 
-/****************************************************************************
-*                                                                           *
-*		dc_devget_history function code                             *
-*               -----------------                                           *
-*                                                                           *
-*    Function rule : To retrieve from the data collector the history of a   *
-*                    command result for a device.            		    *
-*                                                                           *
-*    Argins : - dc_ptr : Device handle					    *
-*	      - cmd_code : The command code				    *
-*	      - argout_type : Command result type			    *
-*	      - nb_rec : Number of record to be retrieved		    *
-*                                                                           *
-*    Argout : - hist_buff : Pointer to buffer where command result history  *
-*			    must be stored				    *
-*	      - error : Pointer to error code				    *
-*                                                                           *
-*    In case of trouble, the function returns -1. If there is a problem for *
-*    only some command result in the history, the function returns the      *
-*    number of command which failed.Otherwise, the function returns 0       *
-*                                                                           *
-*****************************************************************************/
-
-
-#ifdef __STDC__
+/**@ingroup dcAPI
+ * To retrieve from the data collector the history of a command result for a device. 
+ *
+ * @param dc_ptr 	Device handle					
+ * @param cmd_code 	The command code				
+ * @param argout_type 	Command result type			
+ * @param nb_rec 	Number of record to be retrieved		
+ * @param hist_buff 	Pointer to buffer where command result history must be stored	
+ * @param error 	Pointer to error code				
+ *
+ * @return In case of trouble, the function returns DS_NOTOK. If there is a problem for
+ *    only some command result in the history, the function returns the
+ *    number of command which failed.Otherwise, the function returns DS_OK
+ */
 int dc_devget_history(datco *dc_ptr,long cmd_code,dc_hist *hist_buff,DevType argout_type,long nb_rec,long *error)
-#else
-int dc_devget_history(dc_ptr,cmd_code,hist_buff,argout_type,nb_rec,error)
-datco *dc_ptr;
-long cmd_code;
-dc_hist *hist_buff;
-DevType argout_type;
-long nb_rec;
-long *error;
-#endif /* __STDC__ */
 {
-	int i,l,ind;
-	int max;
-	xdevgeth send;
-	xres_hist_clnt *recev;
-	xresh_clnt *tmp_ptr;
-	int tmp_err;
-	long err;
-	long error1;
-	int ret = 0;
-	long i_net;
+	int 		i,
+			l,
+			ind,
+			max;
+	xdevgeth 	send;
+	xres_hist_clnt 	*recev;
+	xresh_clnt 	*tmp_ptr;
+	int 		tmp_err;
+	long 		err,
+			error1;
+//	int 		ret = 0;
+	long 		i_net;
 	dc_nethost_info *tmp_net;
 
-/* Try to verify function parameters */
-
+/* 
+ * Try to verify function parameters 
+ */
 	if (dc_ptr == NULL || error == NULL || nb_rec == 0 || nb_rec > HIST)
 	{
 		*error = DcErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
-/* Miscellaneous initialisation */
-
+/* 
+ * Miscellaneous initialisation 
+ */
 	i_net = dc_ptr->net_ind;
 	tmp_net = &dc_multi_nethost[i_net];
-
 	ind = dc_ptr->indice;
 	max = tmp_net->host_dc.length;
 
-/* Is it necessary to reconnect to dc server? */
-
+/* 
+ * Is it necessary to reconnect to dc server? 
+ */
 	for (i = 0;i < max;i++)
 	{
 		if ((tmp_net->dchost_arr[i].nb_call == tmp_net->max_call_rd) ||
@@ -126,33 +109,35 @@ long *error;
 			if (rpc_reconnect_rd(i,i_net,&error1))
 			{
 				*error = error1;
-				return(-1);
+				return(DS_NOTOK);
 			}
 			tmp_net->dchost_arr[i].nb_call = 0;
 		}
 	}
 
-/* Allocate memory for the device name and initialise the structure sent to
-   server. */
+/* 
+ * Allocate memory for the device name and initialise the structure sent to server. 
+ */
 
 	l = strlen(dc_ptr->device_name);
 	if ((send.xdev_name = (char *)malloc(l + 1)) == NULL)
 	{
 		*error = DcErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(send.xdev_name,dc_ptr->device_name);
 	send.xcmd = cmd_code;
 	send.xargout_type = argout_type;
 	send.xnb_rec = nb_rec;
 
-/* Allocate memory for the array of "xresh_clnt" structure used by XDR
-   routine to deserialise data */
-
+/* 
+ * Allocate memory for the array of "xresh_clnt" structure used by XDR
+ * routine to deserialise data 
+ */
 	if ((tmp_ptr = (xresh_clnt *)calloc(nb_rec,sizeof(xresh_clnt))) == NULL)
 	{
 		*error = DcErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_OK);
 	}
 	for (i = 0;i < nb_rec;i++)
 	{
@@ -162,17 +147,20 @@ long *error;
 		tmp_ptr[i].xargout = (DevArgument)(hist_buff[i].argout);
 	}
 
-/* Call server */
-
+/* 
+ * Call server 
+ */
 	recev = dc_devgeth_clnt_1(&send,tmp_net->dchost_arr[ind].rpc_handle,tmp_ptr,&err);
 	tmp_net->dchost_arr[ind].nb_call++;
 
-/* Return memory allocated to send data to server */
-
+/* 
+ * Return memory allocated to send data to server 
+ */
 	free(send.xdev_name);
 
-/* Any problem with server ? */
-
+/* 
+ * Any problem with server ? 
+ */
 	if (recev == NULL)
 	{
 		free(tmp_ptr);
@@ -181,35 +169,34 @@ long *error;
 		else
 			tmp_net->dchost_arr[ind].cantcont_error = 0;
 		*error = err;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	else
 		tmp_net->dchost_arr[ind].cantcont_error = 0;
 
-/* Big problem with server ? */
-
+/* 
+ * Big problem with server ? 
+ */
 	tmp_err = recev->xgen_err;
 	if (tmp_err != 0)
 	{
 		free(tmp_ptr);
 		*error = tmp_err;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
-/* Copy results into caller structures */
-
+/* 
+ * Copy results into caller structures 
+ */
 	for (i = 0;i < nb_rec;i++)
 	{
 		tmp_err = recev->xresb_clnt.xresh_clnt_val[i].xerr;
 		hist_buff[i].cmd_error = tmp_err;
 		if (tmp_err != 0)
 		{
-			ret++;
 			hist_buff[i].time = (recev->xresb_clnt.xresh_clnt_val[i].xtime / 10) + TIME_OFF;
 			if (((tmp_err >> DS_CAT_SHIFT) & DS_CAT_MASK) == WarningError)
-			{
 				hist_buff[i].argout = (DevArgument)recev->xresb_clnt.xresh_clnt_val[i].xargout;
-			}
 		}
 		else
 		{
@@ -218,13 +205,14 @@ long *error;
 		}
 	}
 
-/* Free the memory allocated for the XDR routines used for deserialization */
-
+/* 
+ * Free the memory allocated for the XDR routines used for deserialization 
+ */
 	free(tmp_ptr);
 
-/* Leave function */
-
+/* 
+ * Leave function 
+ */
 	*error = 0;
-	return(ret);
-
+	return(DS_OK);
 }

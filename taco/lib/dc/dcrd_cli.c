@@ -1,18 +1,18 @@
 
 /*
- 
  Author(s):	Emmanuel Taurel
 		$Author: jkrueger1 $
 
  Original:	1992
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-04-25 11:21:43 $
+ Date:		$Date: 2003-05-16 13:38:52 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
- *  */
+ *  
+ */
 
 #include <API.h>
 #include <dc.h>
@@ -20,7 +20,6 @@
 
 #include <private/ApiP.h>
 #include <DevErrors.h>
-// #include <DserverTeams.h>
 
 #include <dc_xdr.h>
 
