@@ -1,4 +1,5 @@
 #include <greta.h>
+#include "config.h"
 
 /* Some local function */
 
@@ -80,7 +81,8 @@ char *arg_version()
 
 	version_lb=(char *)malloc(20*sizeof(char));
 //	sscanf(RcsId,"%*[^,],v %s %*[^$]$",no_version);
-	sprintf(version_lb,"   Version %s",no_version);
+//	sprintf(version_lb,"   Version %s",no_version);
+	sprintf(version_lb,"   Version %s", PACKAGE_VERSION);
 	return version_lb;
 }
 
@@ -112,7 +114,7 @@ long devresfile_create(char *file, char *res_text)
   char     message_txt[301];
 
 
-  strcpy(revision_text , "$Revision: 1.1 $");
+  strcpy(revision_text , "$Revision: 1.2 $");
   rev_nb_pointer = strstr(revision_text, ":");
   rev_nb_pointer++;
   nb_chars = strcspn(rev_nb_pointer, "$");
@@ -181,7 +183,7 @@ file_create(char *file, char *res_text)
   char     message_txt[301];
 
 
-  strcpy(revision_text , "$Revision: 1.1 $");
+  strcpy(revision_text , "$Revision: 1.2 $");
   rev_nb_pointer = strstr(revision_text, ":");
   rev_nb_pointer++;
   nb_chars = strcspn(rev_nb_pointer, "$");
