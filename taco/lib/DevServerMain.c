@@ -11,9 +11,9 @@
 
  Original   	: March 1991
 
- Version	: $Revision: 1.11 $
+ Version	: $Revision: 1.12 $
 
- Date		: $Date: 2004-09-17 07:56:18 $
+ Date		: $Date: 2004-10-26 11:30:58 $
 
  Copyright (c) 1990-2002 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -77,8 +77,7 @@
  */
 
 void _WINAPI devserver_prog_1	PT_( (struct svc_req *rqstp,SVCXPRT *transp) );
-long minimal_access      = WRITE_ACCESS;
-
+extern long minimal_access;
 
 static void _WINAPI devserver_prog_4	PT_( (struct svc_req *rqstp,SVCXPRT *transp) );
 static long svc_check 		PT_( (long *error) );
@@ -126,7 +125,7 @@ static SVCXPRT *transp_tcp;
 void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_device, char** device_list)
 {
         char    		host_name [HOST_NAME_LENGTH],
-        			dsn_name [37],
+        			dsn_name [DS_NAME_LENGTH + DSPERS_NAME_LENGTH + 1],
         			*proc_name,
         			*display,
         			res_path [80],
@@ -156,27 +155,27 @@ void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_
 	}		
 /*
  *  read device server's class name and personal name
- *  check for lenght of names : server process name <= 23 char
- *                              personal name       <= 11 char
+ *  check for lenght of names : server process name <= DS_NAME_LENGTH char
+ *                              personal name       <= DSPERS_NAME_LENGTH char
  */
         proc_name = server_name;
 
-        if ( strlen(proc_name) > 23 )
+        if ( strlen(proc_name) >= DS_NAME_LENGTH)
         {
-        	fprintf ( stderr, "Filename too long : server_name <= 23 char\n");
+        	fprintf ( stderr, "Filename too long : server_name <= %d char\n", DS_NAME_LENGTH);
            	exit (-1);
         }
 
-        if ( strlen(pers_name) > 11 )
+        if ( strlen(pers_name) >= DSPERS_NAME_LENGTH)
         {
-		fprintf ( stderr, "Personal DS_name too long : personal_dsname <= 11 char\n");
+		fprintf ( stderr, "Personal DS_name too long : personal_dsname <= %d char\n", DSPERS_NAME_LENGTH);
 		exit (-1);
         }
 
-	memset  (dsn_name,0,sizeof(dsn_name));
-	strncpy (dsn_name , proc_name, 23);
+	memset  (dsn_name, 0, sizeof(dsn_name));
+	strncpy (dsn_name , proc_name, DS_NAME_LENGTH - 1);
 	strncat (dsn_name , "/", 1);
-	strncat (dsn_name , pers_name, 11);
+	strncat (dsn_name , pers_name, DSPERS_NAME_LENGTH - 1);
 /*
  * option nodb means run device server without database
  */
@@ -305,7 +304,7 @@ int main (int argc, char **argv)
 /*	SVCXPRT 		*transp; 
         			*transp_tcp; */
 	char    		host_name [HOST_NAME_LENGTH],
-				dsn_name [37],
+				dsn_name [DS_NAME_LENGTH + DSPERS_NAME_LENGTH + 1],
 				*proc_name,
 				*display,
 				res_path [80],
@@ -326,8 +325,8 @@ int main (int argc, char **argv)
 
 /*
  *  read device server's class name and personal name
- *  check for lenght of names : server process name <= 23 char
- *                              personal name       <= 11 char
+ *  check for lenght of names : server process name <= DS_NAME_LENGTH char
+ *                              personal name       <= DSPERS_NAME_LENGTH char
  */
 #ifndef _NT
 	if (argc < 2)
@@ -363,9 +362,10 @@ int main (int argc, char **argv)
 	else  
 		proc_name++;
 
-	if ( strlen(proc_name) > 23 )
+	if ( strlen(proc_name) >= DS_NAME_LENGTH )
 	{
-		char msg[]="Filename to long : server_name <= 23 char\n";
+		char msg[80];
+		snprintf(msg, sizeof(msg), "Filename to long : server_name <= %d char\n", DS_NAME_LENGTH - 1);
 #ifdef _NT
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
 		return(FALSE);
@@ -375,9 +375,10 @@ int main (int argc, char **argv)
 #endif
 	}
 
-	if ( strlen(argv[1]) > 11 )
+	if ( strlen(argv[1]) >= DSPERS_NAME_LENGTH )
 	{
-		char msg[]= "Personal DS_name to long : personal_dsname <= 11 char\n";
+		char msg[80];
+		snprintf(msg, sizeof(msg), "Personal DS name to long : personal_dsname <= %d char\n", DSPERS_NAME_LENGTH - 1);
 #ifdef _NT
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
 		return(FALSE);
@@ -398,6 +399,10 @@ int main (int argc, char **argv)
 				m_opt = True;
 			if (strcmp (argv[i],"-s") == 0)
 				s_opt = True;
+
+			if (strcmp (argv[i], "-n") == 0)
+			{
+			}
 /*
  * option -nodb means run device server without database
  */
@@ -442,9 +447,9 @@ int main (int argc, char **argv)
 		}
 	}
 	memset  (dsn_name, 0, sizeof(dsn_name));
-	strncat (dsn_name , proc_name, 23);
+	strncat (dsn_name , proc_name, DS_NAME_LENGTH - 1);
 	strncat (dsn_name , "/", 1);
-	strncat (dsn_name , argv[1], 11);
+	strncat (dsn_name , argv[1], DSPERS_NAME_LENGTH - 1);
 
 #endif /* vxworks || NOMAIN */
 /*
