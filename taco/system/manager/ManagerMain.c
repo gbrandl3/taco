@@ -13,9 +13,9 @@
 
  Original: 	January 1991
 
- Version:	$Revision: 1.9 $
+ Version:	$Revision: 1.10 $
 
- Date:		$Date: 2004-02-19 16:00:51 $
+ Date:		$Date: 2004-03-03 08:42:05 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -29,6 +29,9 @@
 #include <ManagerP.h>
 #include <signal.h>
 #include <sys/wait.h>
+#ifdef unix
+#include <unistd.h>
+#endif
 
 static void 	network_manager_1();
 static void 	network_manager_4();
@@ -80,14 +83,13 @@ int main (int argc, char **argv)
 		gethostname (nethost, sizeof(nethost) - 1);
 	}
 	else
-		snprintf(nethost, sizeof(nethost), "%s",nethost_env);
+		snprintf(nethost, sizeof(nethost), "%s", nethost_env);
 	printf ("Environment variable NETHOST = %s\n",nethost);
 #endif /* unix */
 
-	/*
-	 *  read options for the manager startup.
-	 */
-
+/*
+ *  read options for the manager startup.
+ */
 	if (argc > 1)
 	{
 		for (i=1; i<argc; i++)
@@ -117,22 +119,20 @@ int main (int argc, char **argv)
 	}
 
 
-	/*
-	 *  get environment variables 
-	 */
-
+/*
+ *  get environment variables 
+ */
 #ifdef unix
 	if ( (dshome = (char *)getenv ("TACO_PATH")) == NULL )
 	{
 		printf ("Environment variable TACO_PATH not defined, assume database and message server are in path...\n");
+		dshome = getcwd(homepath, sizeof(homepath));
 	}
 
-/*
 	if ( (display = (char *)getenv ("DISPLAY")) == NULL )
 	{
 		display = "localhost:0.0";
 	}
- */
 
         if ( (dbhost = (char *)getenv ("DBHOST")) == NULL )
         {
@@ -141,36 +141,13 @@ int main (int argc, char **argv)
 #endif /* unix */
 
 #ifdef _OSK
-	/*
-      	 *  fixed path for a automatic os9 startup with 
-	 *  dummy database.
-	 */
+/*
+ *  fixed path for a automatic os9 startup with 
+ *  dummy database.
+ */
 	dshome = "/h0";
 #endif /* _OSK */
-
-	strncpy(homepath, dshome ? dshome : "./", sizeof(homepath) - 1);
-
-#ifdef NEVER
-#ifdef linuxx86
-	snprintf (homepath, sizeof(homepath), "%s/system/bin/linux/x86", dshome);
-#endif /* linuxx86 */
-#ifdef linux68k
-	snprintf (homepath, sizeof(homepath), "%s/system/bin/linux/68k", dshome);
-#endif /* linux68k */
-
-
-#ifdef sun
-#ifdef solaris
-	snprintf (homepath, sizeof(homepath), "%s/system/bin/solaris", dshome);
-#else
-	snprintf (homepath, sizeof(homepath), "%s/system/bin/sun4", dshome);
-#endif /* solaris */
-#endif /* sun */
-
-#ifdef hpux10
-	snprintf (homepath, sizeof(homepath), "%s/system/bin/hpux10.2", dshome);
-#endif /* hpux10 */
-#endif /* NEVER */
+	strncpy(homepath, dshome, sizeof(homepath) - 1);
 
 #ifdef unix
 	if ( (fptr = fopen (homepath,"r")) == NULL )
@@ -194,15 +171,13 @@ int main (int argc, char **argv)
 	{
 		if ( (dbtables = (char *)getenv ("DBTABLES")) == NULL )
 		{
-	      		fprintf (stderr, 
-	    			"\nEnvironment variables for %s database not defined, exiting...\n",dbase_used);
+	      		fprintf (stderr, "\nEnvironment variables for %s database not defined, exiting...\n", dbase_used);
 			fprintf (stderr, "DBTABLES must be defined!\n");
 			exit (-1);
 		}
 		if ( (dbtables = (char *)getenv ("RES_BASE_DIR")) == NULL )
 		{
-	      		fprintf (stderr, 
-	    			"\nEnvironment variables for %s database not defined, exiting...\n",dbase_used);
+	      		fprintf (stderr, "\nEnvironment variables for %s database not defined, exiting...\n",dbase_used);
 			fprintf (stderr, "RES_BASE_DIR must be defined!\n");
 			exit (-1);
 		}
@@ -210,8 +185,7 @@ int main (int argc, char **argv)
 		{
 			if ( (dbtables = (char *)getenv ("DBM_DIR")) == NULL )
 			{
-	      			fprintf (stderr, 
-	    				"\nEnvironment variables for NDBM database not defined, exiting...\n");
+	      			fprintf (stderr, "\nEnvironment variables for NDBM database not defined, exiting...\n");
 				fprintf (stderr, "DBM_DIR must be defined!\n");
 				exit (-1);
 			}
@@ -224,8 +198,7 @@ int main (int argc, char **argv)
 	{
 		if ( (dbtables = (char *)getenv ("DBTABLES")) == NULL )
 		{
-	      		fprintf (stderr, 
-	    			"\nEnvironment variables for ORACLE database not defined, exiting...\n");
+	      		fprintf (stderr, "\nEnvironment variables for ORACLE database not defined, exiting...\n");
 			fprintf (stderr, "DBTABLES must be defined!\n");
 			exit (-1);
 		}
@@ -276,10 +249,9 @@ int main (int argc, char **argv)
 
 #ifdef _OSK
 	intercept (unreg_server);
-#endif /* _OSK */
 
-#ifdef _OSK
-/* because the normal kill command under OS9 can not
+/* 
+ * because the normal kill command under OS9 can not
  * be caugth it makes live easier to unregister the manager
  * from the portmapper every time before startup.
  * Safety will be neglected because now it is possible
@@ -299,16 +271,14 @@ int main (int argc, char **argv)
 	        exit (-1);
 	}
 
-	if (!svc_register(transp, NMSERVER_PROG, NMSERVER_VERS_1, 
-			  network_manager_1, IPPROTO_UDP)) 	
+	if (!svc_register(transp, NMSERVER_PROG, NMSERVER_VERS_1, network_manager_1, IPPROTO_UDP)) 	
 	{
 		fprintf(stderr, "\nUnable to register network manager.\n");
 		fprintf(stderr, "Program number 100 already in use?\n");
 	        exit (-1);
 	}
 
-	if (!svc_register(transp, NMSERVER_PROG, NMSERVER_VERS, 
-			  network_manager_4, IPPROTO_UDP)) 	
+	if (!svc_register(transp, NMSERVER_PROG, NMSERVER_VERS, network_manager_4, IPPROTO_UDP)) 	
 	{
 		fprintf(stderr, "\nunable to register network manager\n");
 		fprintf(stderr, "Program number 100 already in use?\n");
@@ -352,8 +322,7 @@ int main (int argc, char **argv)
       				snprintf (db_start, sizeof(db_start), 
 #ifdef __hpux
       					"remsh %s -l dserver -n \"export %s/%s %s %s 1>&- 2>&- &\" ", 
-#endif
-#ifdef sun
+#else
       					"rsh %s -l dserver -n \"export %s/%s %s %s 1>&- 2>&- &\" ", 
 #endif
       					dbhost, homepath, dbm_server, dbm_name, nethost);
@@ -366,11 +335,10 @@ int main (int argc, char **argv)
       				snprintf (db_start, sizeof(db_start), 
 #ifdef __hpux
       					"remsh %s -l dserver -n \"export %s/%s %s %s 1>&- 2>&- &\" ", 
-#endif
-#ifdef sun
+#else
       					"rsh %s -l dserver -n \"export %s/%s %s %s 1>&- 2>&- &\" ", 
 #endif
-      					dbhost, homepath, mysql_server, mysql_name, nethost);
+      					dbhost, homepath, dbm_server, mysql_name, nethost);
 			}
 		}
 		else
@@ -382,8 +350,7 @@ int main (int argc, char **argv)
 #ifdef __hpux
       				"remsh %s -l dserver -n \"export DBTABLES=%s;"
 				"export ORACLE_SID=%s;export ORACLE_HOME=%s;%s/%s %s %s 1>&- 2>&- &\" ", 
-#endif
-#ifdef sun
+#else
       				"rsh %s -l dserver -n \"export DBTABLES=%s;"
 				"export ORACLE_SID=%s;export ORACLE_HOME=%s;%s/%s %s %s 1>&- 2>&- &\" ", 
 #endif
@@ -392,7 +359,7 @@ int main (int argc, char **argv)
 	}
 	else
 	{
-        	if (( db_pid = fork () ) < 0 )
+        	if ((db_pid = fork ()) < 0)
 		{
 			fprintf (stderr,"\ndatabase server startup failed, exiting...\n");
 			if (c_flags.request_log)
@@ -403,45 +370,27 @@ int main (int argc, char **argv)
 		if (!db_pid)
 		{
 /* 
- * Set path to MYSQL server 
+ * Set path to DBM server 
  */
-			if (c_flags.mysql == True)
-			{
-				if (dshome != NULL)
-					snprintf (homedir, sizeof(homedir), "%s/%s", homepath, mysql_server);
-				else
-					snprintf (homedir, sizeof(homedir), "%s", mysql_server);
+			snprintf (homedir, sizeof(homedir), "%s/%s", homepath, dbm_server);
 /* 
  * Set arguments for execv 
  */
-				i = 0;
-				cmd_argv[i++] = mysql_server; 
-				cmd_argv[i++] = "-t";
+			i = 0;
+			cmd_argv[i++] = dbm_server; 
+			cmd_argv[i++] = "-t";
+			if (c_flags.mysql == True)
+			{
 				cmd_argv[i++] = "mysql";
 				cmd_argv[i++] = mysql_name; 
-				cmd_argv[i++] = nethost; 
-				cmd_argv[i] = 0;
 			}
 			else
 			{
-/* 
- * Set path to DBM server 
- */
-				if (dshome != NULL)
-					snprintf (homedir, sizeof(homedir), "%s/%s", homepath, dbm_server);
-				else
-					snprintf (homedir, sizeof(homedir), "%s", dbm_server);
-/* 
- * Set arguments for execv 
- */
-				i = 0;
-				cmd_argv[i++] = dbm_server; 
-				cmd_argv[i++] = "-t";
 				cmd_argv[i++] = "dbm";
 				cmd_argv[i++] = dbm_name; 
-				cmd_argv[i++] = nethost; 
-				cmd_argv[i] = 0;
 			}
+			cmd_argv[i++] = nethost; 
+			cmd_argv[i] = 0;
 
 			svc_destroy(transp); 
 			printf("Manager execvp arguments for database : \n");
@@ -455,7 +404,7 @@ int main (int argc, char **argv)
 		}
 	}
 
-	/*
+/*
  *  startup message server
  */
         if (( msg_pid = fork () ) < 0 )
@@ -468,10 +417,7 @@ int main (int argc, char **argv)
 
 	if (!msg_pid)
 	{
-		if (dshome != NULL)
-			snprintf (homedir, sizeof(homedir), "%s/MessageServer", homepath);
-		else
-			snprintf (homedir, sizeof(homedir), "MessageServer", homepath);
+		snprintf (homedir, sizeof(homedir), "%s/MessageServer", homepath);
 
 		i = 0;
 		cmd_argv[i++] = "MessageServer"; 

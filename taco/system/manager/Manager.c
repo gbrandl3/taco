@@ -11,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.4 $
+ Version:	$Revision: 1.5 $
 
- Date:		$Date: 2004-02-19 16:00:50 $
+ Date:		$Date: 2004-03-03 08:42:05 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -28,11 +28,7 @@
 #include <ManagerP.h>
 #include <signal.h>
 
-/********************************
- *           GLOBALS            *
- ********************************/
-
-void 		quit_server ();
+void 			quit_server ();
 
 extern config_flags 	c_flags;
 extern char		*dshome;
@@ -40,29 +36,26 @@ extern char		*display;
 extern char		nethost [SHORT_NAME_SIZE];
 extern char		logfile [256];
 
-server_conf		db_conf  = {0,0,0};
-server_conf		msg_conf = {0,0,0};
+static server_conf	db_conf  = {0,0,0};
+static server_conf	msg_conf = {0,0,0};
 
-dbserver_info   	db_info;
+static dbserver_info   	db_info;
 
 
-/***************************************
- *                                     *
- *  register message server to manager *
- *                                     *
- ***************************************/
-
+/**
+  *  register message server to manager 
+  */
 _msg_manager_data *rpc_msg_register_1 (_register_data *register_data)
 {
 	static _msg_manager_data	msg_manager_data;
-	FILE   *system_log = NULL;
-	char   *time_string;
-	time_t   clock;
+	FILE   				*system_log = NULL;
+	char   				*time_string;
+	time_t   			clock;
 
 /*
  *  get message server info
  */
-	snprintf (msg_conf.host_name, sizeof(msg_conf.host_name), "%s",register_data->host_name);
+	snprintf (msg_conf.host_name, sizeof(msg_conf.host_name), "%s", register_data->host_name);
 	msg_conf.prog_number = register_data->prog_number;
 	msg_conf.vers_number = register_data->vers_number;
 
@@ -77,9 +70,7 @@ _msg_manager_data *rpc_msg_register_1 (_register_data *register_data)
 			time_string = ctime (&clock);
 			fprintf (system_log, "Message Server registered at : %s",time_string);
 			fprintf (system_log, "msg_host = %s  prog_nu = %d  vers_nu = %d\n\n",
-					    msg_conf.host_name,
-					    msg_conf.prog_number,
-					    msg_conf.vers_number);
+					    msg_conf.host_name, msg_conf.prog_number, msg_conf.vers_number);
 			fclose (system_log);
 		}
 	   	else
@@ -89,7 +80,7 @@ _msg_manager_data *rpc_msg_register_1 (_register_data *register_data)
  *  set manager return values
  */
 	msg_manager_data.dshome  = dshome;
-	msg_manager_data.display = "nada";
+	msg_manager_data.display = display;
 
 /*
  *  set configuration status
@@ -98,12 +89,9 @@ _msg_manager_data *rpc_msg_register_1 (_register_data *register_data)
 	return (&msg_manager_data);
 }
 
-/**********************************************
- *                                            *
- * register static database server to manager *
- *                                            *
- **********************************************/
-
+/**
+ * register static database server to manager 
+ */
 int *rpc_db_register_1 (_register_data *register_data)
 {
 	FILE   		*system_log = NULL;
@@ -129,9 +117,7 @@ int *rpc_db_register_1 (_register_data *register_data)
 			time_string = ctime (&clock);
 			fprintf (system_log, "Database Server registered at : %s",time_string);
 			fprintf (system_log, "db_host = %s  prog_nu = %d  vers_nu = %d\n\n",
-					    db_conf.host_name,
-					    db_conf.prog_number,
-					    db_conf.vers_number);
+					    db_conf.host_name, db_conf.prog_number, db_conf.vers_number);
 			fclose (system_log);
 		}
    		else
@@ -144,12 +130,10 @@ int *rpc_db_register_1 (_register_data *register_data)
 	return (&status);
 }
 
-/***************************************************
- *                                                 *
- *  send static database server and message server *
- *  configuration back to the requesting process.  *
- *                                                 *
- ***************************************************/
+/**
+  *  Send static database server and message server 
+  *  configuration back to the requesting process. 
+  */
 _manager_data *rpc_get_config_4 (_register_data	*register_data)
 {
 	static _manager_data	manager_data;
@@ -198,10 +182,10 @@ _manager_data *rpc_get_config_4 (_register_data	*register_data)
 }
 
 
-/****************************************************************
- *     Quit Network Manager and its related applications        *
- *     like Message Server and Database Server                  *
- ****************************************************************/
+/**
+  * Quit Network Manager and its related applications 
+  * like Message Server and Database Server 
+  */
 void unreg_server (int signo)
 {
 	FILE    *system_log = NULL;
@@ -217,7 +201,6 @@ void unreg_server (int signo)
  *  write system shutdown message to System.log file
  */
 	if ( c_flags.request_log == True )
-	{
 		if ( (system_log = fopen (logfile, "a")) != NULL )
 		{
 			time (&clock);
@@ -225,20 +208,15 @@ void unreg_server (int signo)
 			fprintf (system_log, "\nSystem shutdown at : %s",time_string);
 			fclose (system_log);
 		}
-	}
 
 /*
  *  quit database and message servers
  */
 	if (c_flags.db_server)
-		quit_server ( db_conf.host_name,
-			      db_conf.prog_number,
-			      db_conf.vers_number );
+		quit_server ( db_conf.host_name, db_conf.prog_number, db_conf.vers_number );
 #ifdef unix
 	if (c_flags.msg_server)
-		quit_server ( msg_conf.host_name,
-			      msg_conf.prog_number,
-			      msg_conf.vers_number );
+		quit_server ( msg_conf.host_name, msg_conf.prog_number, msg_conf.vers_number );
 #endif /* unix */
 /*
  *  unregister manager from portmapper
@@ -248,9 +226,9 @@ void unreg_server (int signo)
 	exit (-1);
 }
 
-/****************************************************************
- *     Quit remote server by RPC call                           *
- ****************************************************************/
+/**
+  * Quit remote server by RPC call 
+  */
 void quit_server (char*host_name, long prog_number, long vers_number)
 {
 	CLIENT	*clnt = clnt_create (host_name, prog_number, vers_number, "udp");

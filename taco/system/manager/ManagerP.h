@@ -7,13 +7,13 @@
  Description:   Private include file for the network manager
 
  Author(s):     Jens Meyer
- 		$Author: andy_gotz $
+ 		$Author: jkrueger1 $
 
  Original:      January 1991
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2003-12-14 23:25:53 $
+ Date:		$Date: 2004-03-03 08:42:05 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -36,16 +36,10 @@ static char	*db_server         = "dbsu_server";
 static char   	*db_name           = "Set_bdd";
 
 /*
- * Definitions for DBM database
+ * Definitions for DBM and MYSQL databases
  */
 static char     *dbm_server 	    = "dbm_server";
-static char   	*dbm_name           = "dbm";
-	
-/*
- * Definitions for MYSQL database
- */
-static char     *mysql_server 	    = "dbm_server";
-static char   	*mysql_name         = "tango";
+static char   	*dbm_name           = "taco";
 	
 /*
  * Definition for ORACLE database
