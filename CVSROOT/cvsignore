@@ -9,3 +9,5 @@ Makefile.in
 *.tar.gz
 *.tar.bz2
 *.backup
+*.pyc
+*.bck
