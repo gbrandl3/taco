@@ -1,9 +1,9 @@
 AC_INIT(TACO, 3.0-beta, [taco-devel@lists.sourceforge.net])
-AC_PREREQ(2.53)
-AC_REVISION($Revision: 1.9 $)dnl
+AC_PREREQ(2.57)
+AC_REVISION($Revision: 1.10 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
-AC_CONFIG_SRCDIR(lib/dev_api.c)
+AC_CONFIG_SRCDIR([config.h.in])
 
 TACO_INIT([no])
 
@@ -22,148 +22,84 @@ AC_CHECK_SIZEOF(unsigned long)
 AC_CHECK_SIZEOF(float)
 AC_CHECK_SIZEOF(double)
 
-LIBS_SAVE="$LIBS"
-AC_SEARCH_LIBS(pthread_cancel, [pthread c_r])
-AC_RUN_IFELSE(
-	AC_LANG_PROGRAM([
-#include <pthread.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <rpc/rpc.h>
-#include <arpa/inet.h>
+# Checks for programs.
+AC_PROG_CXX
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_AWK
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
 
-#define PROGNUM 1234
-#define VERSNUM 1
-#define PROCNUM 1
-#define PROCQUIT 2
+# Checks for libraries.
+# FIXME: Replace `main' with a function in `-lBusClient':
+AC_CHECK_LIB([BusClient], [main])
+# FIXME: Replace `main' with a function in `-lICE':
+AC_CHECK_LIB([ICE], [main])
+# FIXME: Replace `main' with a function in `-lProfiBusClient':
+AC_CHECK_LIB([ProfiBusClient], [main])
+# FIXME: Replace `main' with a function in `-lSM':
+AC_CHECK_LIB([SM], [main])
+# FIXME: Replace `main' with a function in `-lTacoError':
+AC_CHECK_LIB([TacoError], [main])
+# FIXME: Replace `main' with a function in `-lX11':
+AC_CHECK_LIB([X11], [main])
+# FIXME: Replace `main' with a function in `-lXext':
+AC_CHECK_LIB([Xext], [main])
+# FIXME: Replace `main' with a function in `-lXm':
+AC_CHECK_LIB([Xm], [main])
+# FIXME: Replace `main' with a function in `-lXt':
+AC_CHECK_LIB([Xt], [main])
+# FIXME: Replace `main' with a function in `-lmysqlclient':
+AC_CHECK_LIB([mysqlclient], [main])
+# FIXME: Replace `main' with a function in `-lpciprofi':
+AC_CHECK_LIB([pciprofi], [main])
+# FIXME: Replace `main' with a function in `-lqt':
+AC_CHECK_LIB([qt], [main])
 
-static int exitcode;
-
-struct rpc_arg
-{
-  CLIENT *client;
-  u_long proc;
-};
-
-static void
-dispatch(struct svc_req *request, SVCXPRT *xprt)
-{
-  svc_sendreply(xprt, (xdrproc_t)xdr_void, 0);
-  if (request->rq_proc == PROCQUIT)
-    exit (0);
-}
-
-static void
-test_one_call (struct rpc_arg *a)
-{
-  struct timeval tout = [{ 60, 0 }];
-  enum clnt_stat result;
-
-  printf ("test_one_call: ");
-  result = clnt_call (a->client, a->proc,
-		      (xdrproc_t) xdr_void, 0,
-		      (xdrproc_t) xdr_void, 0, tout);
-  if (result == RPC_SUCCESS)
-    puts ("success");
-  else
-    {
-      clnt_perrno (result);
-      putchar ('\n');
-      exitcode = 1;
-    }
-}
-
-static void *
-thread_wrapper (void *arg)
-{
-  struct rpc_arg a;
-
-  a.client = (CLIENT *)arg;
-  a.proc = PROCNUM;
-  test_one_call (&a);
-  a.client = (CLIENT *)arg;
-  a.proc = PROCQUIT;
-  test_one_call (&a);
-  return 0;
-}
-
-const char hw[[[]]] = "Hello World!\n";],
-[
-  pthread_t tid;
-  pid_t pid;
-  int err;
-  SVCXPRT *svx;
-  CLIENT *clnt;
-  struct sockaddr_in sin;
-  struct timeval wait = [{ 5, 0 }];
-  int sock = RPC_ANYSOCK;
-  struct rpc_arg a;
-
-  printf(hw);
-  svx = svcudp_create (RPC_ANYSOCK);
-  svc_register (svx, PROGNUM, VERSNUM, dispatch, 0);
-
-  pid = fork ();
-  if (pid == -1)
-    {
-      perror ("fork");
-      return 1;
-    }
-  if (pid == 0)
-    svc_run ();
-
-  inet_aton ("127.0.0.1", &sin.sin_addr);
-  sin.sin_port = htons (svx->xp_port);
-  sin.sin_family = AF_INET;
-
-  clnt = clntudp_create (&sin, PROGNUM, VERSNUM, wait, &sock);
-
-  a.client = clnt;
-  a.proc = PROCNUM;
-
-  /* Test in this thread */
-  test_one_call (&a);
-
-  /* Test in a child thread */
-  err = pthread_create (&tid, 0, thread_wrapper, (void *) clnt);
-  if (err)
-    fprintf (stderr, "pthread_create: %s\n", strerror (err));
-  err = pthread_join (tid, 0);
-  if (err)
-    fprintf (stderr, "pthread_join: %s\n", strerror (err));
-
-  return exitcode;
-])
-,
-AC_MSG_NOTICE([Running]),
-AC_MSG_FAILURE([Not Running]))
-LIBS="$LIBS_SAVE"
+# Checks for header files.
+AC_FUNC_ALLOCA
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h malloc.h memory.h netdb.h netinet/in.h stddef.h stdlib.h string.h strings.h sys/file.h sys/ioctl.h sys/socket.h termios.h unistd.h])
 
 AC_LANG_PUSH(C++)
 AC_CHECK_HEADERS(sstream, [], [])
 AC_CHECK_HEADERS(strstream, [], [])
 AC_LANG_POP(C++)
 
-AC_CHECK_HEADERS([rpc.h rpc/rpc.h])
-AC_CHECK_MEMBERS([SVCXPRT.xp_fd, SVCXPRT.xp_sock], [], [], [
-#if HAVE_RPC_RPC_H
-#	include <rpc/rpc.h>
-#elif HAVE_RPC_H
-#	include <rpc.h>
-#else
-#error rpc.h not found
-#endif
-]) 
-AH_BOTTOM([
-#ifndef HAVE_SVCXPRT_XP_SOCK
-#ifdef HAVE_SVCXPRT_XP_FD
-#       define xp_sock xp_fd
-#else
-#       error "Can't find xp_sock"
-#endif
-#endif])
+# Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_STDBOOL
+AC_C_CONST
+AC_C_INLINE
+AC_TYPE_MODE_T
+AC_TYPE_OFF_T
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+AC_HEADER_TIME
+AC_STRUCT_TM
+AC_C_VOLATILE
+AC_CHECK_TYPE(socklen_t)
 
+
+# Checks for library functions.
+AC_FUNC_FORK
+AC_PROG_GCC_TRADITIONAL
+AC_FUNC_MALLOC
+AC_FUNC_MEMCMP
+AC_FUNC_REALLOC
+AC_FUNC_SELECT_ARGTYPES
+AC_TYPE_SIGNAL
+AC_FUNC_STAT
+AC_FUNC_STRTOD
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS([alarm dup2 gethostbyname gethostname getpass gettimeofday isascii mblen memset putenv select socket strcasecmp strchr strcspn strdup strerror strncasecmp strrchr strspn strstr strtoul])
+
+AC_SEARCH_LIBS(dlopen, [dl])
+
+TACO_CHECK_RPC
+TACO_CHECK_RPC_AND_THREADS
 
 AC_SUBST(QT_INCLUDES, ['-I/usr/lib/qt2/include'])
 AC_SUBST(UIC, ['/usr/lib/qt2/bin/uic'])
@@ -199,38 +135,18 @@ AC_SUBST(SYS_resdir, ['${resdatadir}/SYS'])
 AC_SUBST(SEC_resdir, ['${resdatadir}/SEC'])
 AC_SUBST(TEST_resdir, ['${resdatadir}/TEST'])
 
-TACO_INCLUDES="-I\$(top_srcdir)/lib/xdr -I\$(top_srcdir)/lib -I\$(top_srcdir)/lib/dc -I\$(top_srcdir)/lib/dbase\
-		-I\$(top_srcdir)/lib/tc -I\$(top_srcdir)/lib/ascii" 
+AC_SUBST(TACO_INCLUDES, ["-I\$(top_srcdir)/lib/xdr -I\$(top_srcdir)/lib -I\$(top_srcdir)/lib/dc -I\$(top_srcdir)/lib/dbase -I\$(top_srcdir)/lib/tc -I\$(top_srcdir)/lib/ascii]") 
 
-AC_SEARCH_LIBS(dlopen, [dl])
-
-AC_SUBST(TACO_INCLUDES) 
 AC_FIND_GDBM
 if test "${MAKE_GDBM}" = "yes" ; then
      AC_CONFIG_SUBDIRS(gdbm)
 fi
 
-TACO_SERVER_LIBS="\$(top_builddir)/lib/libdsapi.la \
-	       \$(top_builddir)/lib/dbase/libdbapi.la \
-	       \$(top_builddir)/lib/xdr/libdsxdr.la"
-AC_SUBST(TACO_SERVER_LIBS)
+AC_SUBST(TACO_SERVER_LIBS, ["\$(top_builddir)/lib/libdsapi.la \$(top_builddir)/lib/dbase/libdbapi.la \$(top_builddir)/lib/xdr/libdsxdr.la"])
+AC_SUBST(TACO_SERVER_CXX_LIBS, ["\$(top_builddir)/lib/libdsapig++.la \$(top_builddir)/lib/dbase/libdbapi.la \$(top_builddir)/lib/xdr/libdsxdr.la"])
+AC_SUBST(TACO_CLIENT_LIBS, ["\$(top_builddir)/lib/libtacoapi.la \$(top_builddir)/lib/dbase/libdbapi.la \$(top_builddir)/lib/xdr/libdsxdr.la"])
+AC_SUBST(TACO_CLIENT_CXX_LIBS, ["\$(top_builddir)/lib/libtacoapig++.la \$(top_builddir)/lib/dbase/libdbapi.la \$(top_builddir)/lib/xdr/libdsxdr.la"])
 
-TACO_SERVER_CXX_LIBS="\$(top_builddir)/lib/libdsapig++.la \
-	       \$(top_builddir)/lib/dbase/libdbapi.la \
-	       \$(top_builddir)/lib/xdr/libdsxdr.la"
-AC_SUBST(TACO_SERVER_CXX_LIBS)
-
-TACO_CLIENT_LIBS="\$(top_builddir)/lib/libtacoapi.la \
-	       \$(top_builddir)/lib/dbase/libdbapi.la \
-	       \$(top_builddir)/lib/xdr/libdsxdr.la"
-AC_SUBST(TACO_CLIENT_LIBS)
-
-TACO_CLIENT_CXX_LIBS="\$(top_builddir)/lib/libtacoapig++.la \
-	       \$(top_builddir)/lib/dbase/libdbapi.la \
-	       \$(top_builddir)/lib/xdr/libdsxdr.la"
-AC_SUBST(TACO_CLIENT_CXX_LIBS)
-
-AC_SUBST(TACO_CLIENT_LIBS)
 TACO_DEFINES
 TACO_DATAPORT_SRC
 TACO_PYTHON_BINDING
