@@ -9,13 +9,13 @@
 		dummy database under OS9.
 
  Author(s):     Jens Meyer
- 		$Author: andy_gotz $
+ 		$Author: jkrueger1 $
 
  Original: 	January 1991
 
- Version:	$Revision: 1.6 $
+ Version:	$Revision: 1.7 $
 
- Date:		$Date: 2003-12-14 23:25:53 $
+ Date:		$Date: 2003-12-15 07:53:17 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -80,11 +80,8 @@ int main (int argc, char **argv)
 		gethostname (nethost, sizeof(nethost) - 1);
 	}
 	else
-	{
 		snprintf(nethost, sizeof(nethost) - 1, "%s",nethost_env);
-
-		printf ("Environment variable NETHOST = %s\n",nethost);
-	}
+	printf ("Environment variable NETHOST = %s\n",nethost);
 #endif /* unix */
 
 	/*
@@ -182,7 +179,7 @@ int main (int argc, char **argv)
 	if ( (fptr = fopen (homepath,"d")) == NULL )
 #endif /* _OSK */
 	{
-		printf ("TACO_PATH leads to a strange directory, exiting...\n");
+		fprintf (stderr, "\nTACO_PATH leads to a strange directory, exiting...\n");
 		exit (-1);
 	}
 	else
@@ -234,17 +231,20 @@ int main (int argc, char **argv)
 		}
 		if ( (dbhome = (char *)getenv ("DBHOME")) == NULL )
 		{
-			fprintf (stderr, "Environment variable DBHOME not defined, exiting...\n");
+			fprintf (stderr, "\nEnvironment variable DBHOME not defined, exiting...\n");
+			fprintf (stderr, "DBHOME must be defined!\n");
 			exit (-1);
 		}
 		if ( (ora_sid = (char *)getenv("ORACLE_SID")) == NULL)
 		{
-			fprintf (stderr, "Environment variable ORACLE_SID not defined, exiting...\n");
+			fprintf (stderr, "\nEnvironment variable ORACLE_SID not defined, exiting...\n");
+			fprintf (stderr, "ORACLE_SID must be defined!\n");
 			exit(-1);
 		}
 		if  ( (ora_home = (char *)getenv("ORACLE_HOME")) == NULL)
 		{
-			fprintf (stderr, "Environment variable ORACLE_HOME not defined, exiting...\n");
+			fprintf (stderr, "\nEnvironment variable ORACLE_HOME not defined, exiting...\n");
+			fprintf (stderr, "ORACLE_HOME must be defined!\n");
 			exit(-1);
 		}
 /* 
@@ -253,7 +253,7 @@ int main (int argc, char **argv)
 		snprintf (oracle_server_path, sizeof(oracle_server_path) - 1, "%s/bin/solaris", dbhome);
 		if ( (fptr = fopen (oracle_server_path,"r")) == NULL )
 		{
-			fprintf (stderr, "DBHOME leads to a strange directory, exiting...\n");
+			fprintf (stderr, "\nDBHOME leads to a strange directory, exiting...\n");
 			exit (-1);
 		}
 		else
@@ -295,14 +295,14 @@ int main (int argc, char **argv)
 	transp = svcudp_create(RPC_ANYSOCK);
 	if (transp == NULL) 
 	{
-		fprintf(stderr, "cannot create udp service for manager.\n");
+		fprintf(stderr, "\ncannot create udp service for manager.\n");
 	        exit (-1);
 	}
 
 	if (!svc_register(transp, NMSERVER_PROG, NMSERVER_VERS_1, 
 			  network_manager_1, IPPROTO_UDP)) 	
 	{
-		fprintf(stderr, "Unable to register network manager.\n");
+		fprintf(stderr, "\nUnable to register network manager.\n");
 		fprintf(stderr, "Program number 100 already in use?\n");
 	        exit (-1);
 	}
@@ -310,7 +310,7 @@ int main (int argc, char **argv)
 	if (!svc_register(transp, NMSERVER_PROG, NMSERVER_VERS, 
 			  network_manager_4, IPPROTO_UDP)) 	
 	{
-		fprintf(stderr, "unable to register network manager\n");
+		fprintf(stderr, "\nunable to register network manager\n");
 		fprintf(stderr, "Program number 100 already in use?\n");
 		pmap_unset (NMSERVER_PROG, NMSERVER_VERS_1);
 	        exit (-1);
@@ -326,7 +326,8 @@ int main (int argc, char **argv)
 		snprintf (logfile, sizeof(logfile) - 1, "%s/System.log", logpath ? logpath : homepath);
 		if ( (system_log = fopen (logfile, "w")) == NULL )
 		{
-			fprintf (stderr,"cannot open System.log file, exiting...\n");
+			fprintf (stderr,"\ncannot open System.log file (%s), exiting...\n", logfile);
+			fprintf(stderr, "LOGPATH or DSHOME path may be wrong\n");
 			kill (pid,SIGQUIT);
 		}
 	}
@@ -393,9 +394,9 @@ int main (int argc, char **argv)
 	{
         	if (( db_pid = fork () ) < 0 )
 		{
-			fprintf (stderr,"database server startup failed, exiting...\n");
+			fprintf (stderr,"\ndatabase server startup failed, exiting...\n");
 			if (c_flags.request_log)
-				fprintf (system_log, "database server startup failed, exiting...\n");
+				fprintf (system_log, "\ndatabase server startup failed, exiting...\n");
 			kill (pid,SIGQUIT);
 		}
 
@@ -447,9 +448,9 @@ int main (int argc, char **argv)
 			printf("%s %s %s %s %s %s\n",homedir,cmd_argv[0],cmd_argv[1],cmd_argv[2],cmd_argv[3],cmd_argv[4]);
 			execvp (homedir, cmd_argv);
 			
-			fprintf (stderr,"execvp failed, database_server not started\n");
+			fprintf (stderr,"\nexecvp failed, database_server not started\n");
 			if (c_flags.request_log)
-				fprintf (system_log, "execv failed, database_server not started\n");
+				fprintf (system_log, "\nexecv failed, database_server not started\n");
 			kill (pid,SIGQUIT);
 		}
 	}
@@ -459,9 +460,9 @@ int main (int argc, char **argv)
  */
         if (( msg_pid = fork () ) < 0 )
 	{
-		fprintf (stderr,"message server startup failed, exiting...\n");
+		fprintf (stderr,"\nmessage server startup failed, exiting...\n");
 		if (c_flags.request_log)
-			fprintf (system_log, "message server startup failed, exiting...\n");
+			fprintf (system_log, "\nmessage server startup failed, exiting...\n");
 		kill (pid,SIGQUIT);
 	}
 
@@ -483,9 +484,9 @@ int main (int argc, char **argv)
 
 		execvp (homedir,cmd_argv);
 
-		fprintf (stderr,"execvp failed, message server not started\n");
+		fprintf (stderr,"\nexecvp failed, message server not started\n");
 		if (c_flags.request_log)
-			fprintf (system_log,"execv failed, message server not started\n");
+			fprintf (system_log,"\nexecv failed, message server not started\n");
 		kill (pid,SIGQUIT);
 	}
 #endif /* unix */
@@ -507,9 +508,9 @@ int main (int argc, char **argv)
 		if ((db_pid = os9exec(os9forkc, cmd_argv[0], 
 			      cmd_argv, environ,0,0,3)) <= 0)
 		{
-			fprintf (stderr,"os9exec failed, os9_dbsu-server not started\n");
+			fprintf (stderr,"\nos9exec failed, os9_dbsu-server not started\n");
 			if (c_flags.request_log)
-				fprintf (system_log, "os9exec failed, os9_dbsu-server not started\n");
+				fprintf (system_log, "\nos9exec failed, os9_dbsu-server not started\n");
 			kill (pid,SIGQUIT);
 		}
  	}
@@ -535,7 +536,7 @@ int main (int argc, char **argv)
 	time_string = ctime (&clock);
 	if (c_flags.request_log)
 	{
-      		fprintf (system_log,"Network Manager started subprocesses at : %s", time_string);
+      		fprintf (system_log,"\nNetwork Manager started subprocesses at : %s", time_string);
       		fprintf (system_log,"NETHOST = %s   PID = %d\n\n",nethost,pid);
 		fclose (system_log);
 	}
@@ -544,7 +545,7 @@ int main (int argc, char **argv)
  *  point of no return
  */
 	svc_run();
-	fprintf(stderr, "svc_run returned\n");
+	fprintf(stderr, "\nsvc_run returned: Manager stopped\n");
 	kill (pid,SIGQUIT);
 }
 
@@ -613,7 +614,7 @@ static void network_manager_4(struct svc_req *rqstp, SVCXPRT *transp)
 
 	if (!svc_freeargs(transp, (xdrproc_t)xdr_argument, (char *) &argument)) 
 	{
-		fprintf(stderr, "unable to free arguments\n");
+		fprintf(stderr, "\nunable to free server arguments\n");
 		exit (-1);
 	}
 	startup_msg ();
@@ -687,7 +688,7 @@ static void network_manager_1(struct svc_req *rqstp, SVCXPRT *transp)
 
 	if (!svc_freeargs(transp, (xdrproc_t)xdr_argument, (char *) &argument)) 
 	{
-		fprintf(stderr, "unable to free arguments\n");
+		fprintf(stderr, "\nunable to free server arguments\n");
 		exit (-1);
 	}
 
@@ -722,11 +723,11 @@ static void startup_msg (void)
 	   			{
 					time (&clock);
 					time_string = ctime (&clock);
-      					fprintf (system_log, "Network Manager startup finished at : %s\n", time_string);
+      					fprintf (system_log, "\nNetwork Manager startup finished at : %s\n", time_string);
 					fclose (system_log);
 	   			}
 				else
-           				fprintf (stderr,"cannot open System.log file.\n");
+           				fprintf (stderr, "\ncannot open System.log file (%s).\n", logfile);
 			}
 #endif /* unix */
 #ifdef _OSK
