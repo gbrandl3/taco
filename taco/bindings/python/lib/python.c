@@ -11,9 +11,9 @@
  *
  * Original:	June 2000
  *
- * Date:	$Date: 2004-05-14 15:05:21 $
+ * Date:	$Date: 2005-02-22 13:07:44 $
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
  * Copyright(c) 1994 by European Synchrotron Radiation Facility, 
  *                     Grenoble, France
@@ -115,25 +115,22 @@ static long class_initialise(long *error)
  *
  * @return DS_OK
  */
-static long object_create(char *name,DevServer *ds_ptr, long *error)
+static long object_create(char *name, DevServer *ds_ptr, long *error)
 {
 	Python ds = (Python)malloc(sizeof(PythonRec));
-
 /*
  * initialise device with default object
  */
 	*(PythonRec*)ds = *(PythonRec*)python;
-
 /*
  * finally initialise the non-default values
  */
 	ds->devserver.name = (char*)malloc(strlen(name)+1);
 	sprintf(ds->devserver.name,"%s",name);
-   
-	printf (" %s device_name = %s\n", __FUNCTION__, ds->devserver.name);
+
+	dev_printdebug (DBG_TRACE | DBG_STARTUP, " %s device_name = %s\n", __FUNCTION__, ds->devserver.name);
 
 	*ds_ptr = (DevServer)ds;
-
 	return(DS_OK);
 }
 
@@ -376,7 +373,7 @@ static long dev_exec_cmd (Python ds, DevVoid *argin, DevVoid *argout, long *erro
 				if (is_single)
 				{
 /*
- * function is called argout, becauase it was created for the client part! 
+ * function is called argout, because it was created for the client part! 
  */
 					if (get_argout_single(argin, argin_type, &py_argin, error_msg) == DS_NOTOK)
 					{
@@ -392,7 +389,7 @@ static long dev_exec_cmd (Python ds, DevVoid *argin, DevVoid *argout, long *erro
 					if (is_array)
 					{
 /*
- * function is called argout, becauase it was created for the client part! 
+ * function is called argout, because it was created for the client part! 
  */
 						if (get_argout_array(argin, argin_type, &py_argin, error_msg)==DS_NOTOK)
 						{
