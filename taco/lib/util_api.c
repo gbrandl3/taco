@@ -13,9 +13,9 @@
 
  Original   :	April 1993
 
- Version:	$Revision: 1.16 $
+ Version:	$Revision: 1.17 $
 
- Date:		$Date: 2004-09-17 10:09:17 $
+ Date:		$Date: 2004-10-26 11:35:36 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -383,35 +383,25 @@ long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
 	return (client_data.status);
 }
 
-
 /**@ingroup syncAPI
- * This function returns a sequence of @ref DevCmdInfo structures containing all available
- * commands, their names, their input and output data types, and type descriptions for one
- * device. Commands and data types are read from the command list in the device server. 
- * Command names are read from the CMDS table of the resource database. Data type descriptions
- * for input and output arguments for a command function have to be specified in the resource
- * database in the CLASS table as:
+ * Returns a sequence of structures containig all available commands, their names, their input,
+ * and output data types, and type describtions for one device.
+ * @li Commands and data types are read from the command list in the device server by calling 
+ * RPC_DEV_CMD_QUERY.
+ * @li Command names are read from the command name list, defined in DevCmds.h.
+ * @li Data type describtions have to be specified as CLASS resources as:
  * @verbatim
 	CLASS/class_name/cmd_name/IN_TYPE:	"Current in mA"
 	CLASS/class_name/cmd_name/OUT_TYPE:	"Power in MW"
  * @endverbatim
- * @verbatim class_name @endverbatim is the name of the device class. It will be retrieved from
- * the device server.
  *
- * @verbatim cmd_name @endverbatim is the name of the command. It will be retrieved from the 
- * CMDS table in the resource database.
- *
- * Commands and data types are read from the command list in the device server by calling 
- * @b RPC_DEV_CMD_QUERY.
- *
- * @param ds 		client handle for the associated device.
- * @param varcmdarr 	sequence of DevCmdInfo structures.
- * @param error     	Will contain an appropriate error code if the
- *			corresponding call returns a non-zero value.
+ * @param ds client handle for the associated device.
+ * @param varcmdarr sequence of DevCmdInfo structures, that will returned.
+ * @param error Will contain an appropriate error code if the corresponding call returns a DS_NOTOK
  *
  * @return DS_OK or DS_NOTOK
  */
-long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error)
+long _DLLFunc taco_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error)
 {
 	_dev_query_in	dev_query_in;
 	_dev_query_out	dev_query_out;
@@ -427,35 +417,20 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 	static char	**cmd_names=NULL;
 	int		n_cmd_names;
 
-	*error = DS_OK;
-	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_cmd_query() : entering routine\n");
+	*error = 0;
+	
+	dev_printdebug (DBG_TRACE | DBG_API, "\ntaco_dev_cmd_query() : entering routine\n");
 
-	if (ds == NULL)
-	{
-		*error = DevErr_DeviceNotImportedYet;
-		return(DS_NOTOK);
-	}
-#ifdef TANGO
-	if (ds->rpc_protocol == D_IIOP)
-	{
-		status = tango_dev_cmd_query(ds, varcmdarr, error);
-		return(status);
-	}
-#endif /* TANGO */
 /*
  * Verify the RPC connection.
  */
-
 	if ( dev_rpc_connection (ds, error)  == DS_NOTOK )
-	{
 		return (DS_NOTOK);
-	}
 
 /*
  *  fill in data transfer structures dev_query_in and dev_query_out.
  */
 	dev_query_in.ds_id = ds->ds_id;
-
 	dev_query_in.var_argument.length   = 0;
 	dev_query_in.var_argument.sequence = NULL;
 
@@ -486,10 +461,8 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 /*
  * Check for errors on the RPC connection.
  */
-	if (dev_rpc_error(ds, clnt_stat, error) == DS_NOTOK)
-	{
+	if ( dev_rpc_error (ds, clnt_stat, error) == DS_NOTOK )
 		return (DS_NOTOK);
-	}
 
 /*
  * Free the variable arguments in the dev_query_out structure, coming from the server.
@@ -497,11 +470,21 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 	if (dev_query_out.var_argument.length > 0)
 	{
 		cmd_names = (char**)realloc(cmd_names,dev_query_out.var_argument.length*sizeof(char*));
-		for (i=0; i<dev_query_out.var_argument.length; i++)
-		{
-			cmd_names[i] = (char*)malloc(strlen(*(char**)dev_query_out.var_argument.sequence[i].argument)+1);
-			strcpy(cmd_names[i], *(char**)dev_query_out.var_argument.sequence[i].argument);
-		}
+		if (cmd_names)
+			for (i=0; i<dev_query_out.var_argument.length; i++)
+			{
+				cmd_names[i] = (char*)malloc(strlen(*(char**)dev_query_out.var_argument.sequence[i].argument)+1);
+				if (!cmd_names[i])
+				{
+					int j;
+					*error = DevErr_InsufficientMemory;
+					for (j = 0; j < i; i++)
+						free(cmd_names[i]);
+					free(cmd_names);
+					return DS_NOTOK;
+				}
+				strcpy(cmd_names[i], *(char**)dev_query_out.var_argument.sequence[i].argument);
+			}
 	}
 	n_cmd_names = dev_query_out.var_argument.length;
 	xdr_free ((xdrproc_t)xdr_DevVarArgumentArray, (char *)&(dev_query_out.var_argument));
@@ -510,56 +493,72 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
  * Allocate memory for a sequence of DevCmdInfo structures returned with varcmdarr.
  */
 	varcmdarr->length   = dev_query_out.length;
-	varcmdarr->sequence = (DevCmdInfo *) malloc(varcmdarr->length * sizeof (DevCmdInfo));
+	varcmdarr->sequence = (DevCmdInfo *)malloc(varcmdarr->length * sizeof (DevCmdInfo));
 	if ( varcmdarr->sequence == NULL )
 	{
 		*error  = DevErr_InsufficientMemory;
 		return (DS_NOTOK);
 	}
-	memset ((char *)varcmdarr->sequence, 0, (varcmdarr->length * sizeof (DevCmdInfo)));
+	memset((char *)varcmdarr->sequence, 0, (varcmdarr->length * sizeof (DevCmdInfo)));
 
 /*
- * Now get command and types name strings for the returned command sequence. Command names are retrieved from the global 
- * command-name-list and name strings for the data types are searched in the resource CLASS table of the object class.
+ * Now get command and types name strings for the returned
+ * command sequence. Command names are retrieved from the
+ * global command-name-list and name strings for the data types
+ * are searched in the resource CLASS table of the object class.
+ * 
  * Undefined names will be initialised with NULL.
  */
 	for ( i=0; (u_long)i<varcmdarr->length; i++ )
 	{
 /*
- * initialise varcmdarr->sequence[i] with command and argument types, returned with dev_query_out from the
- * device servers command list.
+ * initialise varcmdarr->sequence[i] with command and argument types, returned with 
+ * dev_query_out from the device servers command list.
  */
 		varcmdarr->sequence[i].cmd      = dev_query_out.sequence[i].cmd;
 		varcmdarr->sequence[i].in_type  = dev_query_out.sequence[i].in_type;
 		varcmdarr->sequence[i].out_type = dev_query_out.sequence[i].out_type;
+
 /*
- * get command name string from the resource database check to see if device server returned command names 
+ * get command name string from the resource database
+ * check to see if device server returned command names 
  */
-		if (n_cmd_names > 0 && i < n_cmd_names && strlen(cmd_names[i]))
+		if (i < n_cmd_names && n_cmd_names > 0)
 		{
-			strncpy(varcmdarr->sequence[i].cmd_name, cmd_names[i], sizeof(varcmdarr->sequence[i].cmd_name) - 1);
+			snprintf(varcmdarr->sequence[i].cmd_name, sizeof(varcmdarr->sequence[i].cmd_name), "%s", cmd_names[i]);
 			free(cmd_names[i]);
 		}
 		else
 		{
-			if ((ret_stat = get_cmd_string(ds, varcmdarr->sequence[i].cmd, varcmdarr->sequence[i].cmd_name, 
-						sizeof(varcmdarr->sequence[i].cmd_name), error)) == DS_NOTOK)
+			if (!ds->no_database)
 			{
+				if ((ret_stat = get_cmd_string(ds, varcmdarr->sequence[i].cmd, varcmdarr->sequence[i].cmd_name, 
+					sizeof(varcmdarr->sequence[i].cmd_name), error)) == DS_NOTOK )
+				{
 /*
- * An error will be only returned if the database access fails.
+ * An error will be only returned if the database
+ * access fails.
  */
 					return (DS_NOTOK);
+				}
+			}
+			else
+			{
+				sprintf(varcmdarr->sequence[i].cmd_name,"command%d",i);
 			}
 		}
 		if (!ds->no_database)
 		{
 /*
- *  Check wether command name was found.  If the name was not found, get_cmd_string() returns DS_WARNING.
+ *  Check wether command name was found. If the name was not found, get_cmd_string() returns
+ *  DS_WARNING.
  */
-			if (ret_stat != DS_WARNING)
+			if ( ret_stat != DS_WARNING )
 			{
 /*
- * Limit the class_name and the command_name strings to 19 characters. This is the limit of the static database name fields.
+ * Limit the class_name and the command_name
+ * strings to 19 characters. This is the limit
+ * of the static database name fields.
  */
 				length = strlen (dev_query_out.class_name);
 				if ( length > MAX_RESOURCE_FIELD_LENGTH )
@@ -575,17 +574,19 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 			}
 
 /*
- * Setup resource path to read information about data types from the CLASS resource table,
+ * Setup resource path to read information about data types from the CLASS resource table.
  * but first check to see whether the device belongs to another nethost domain i.e. i_nethost != 0
  */
 			if (ds->i_nethost > 0)
-				snprintf(res_path, sizeof(res_path), "//%s/CLASS/%s/%s",
-		   			get_nethost_by_index(ds->i_nethost, error), class_name, cmd_name);
+			{
+				snprintf(res_path, sizeof(res_path), "//%s/CLASS/%s/%s", get_nethost_by_index(ds->i_nethost, error),
+		   			class_name, cmd_name);
+			}
 /*
  * use default nethost
  */
 			else
-				snprintf(res_path, sizeof(res_path), "CLASS/%s/%s", class_name, cmd_name);
+				snprintf (res_path, sizeof(res_path), "CLASS/%s/%s", class_name, cmd_name);
 
 /*
  *  read CLASS resources from database
@@ -594,9 +595,7 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 			res_tab[1].resource_adr = &(varcmdarr->sequence[i].out_name);
 
 			if (db_getresource (res_path, res_tab, res_tab_size, error) < 0)
-			{
-				return (DS_NOTOK);
-			}
+				return DS_NOTOK;
 		}
 /*
  * no database, set in_name and out_name to NULL
@@ -618,6 +617,55 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
  */
 	*error = dev_query_out.error;
 	return (dev_query_out.status);
+}
+
+/**@ingroup syncAPI
+ * This function returns a sequence of @ref DevCmdInfo structures containing all available
+ * commands, their names, their input and output data types, and type descriptions for one
+ * device. Commands and data types are read from the command list in the device server. 
+ * Command names are read from the CMDS table of the resource database. Data type descriptions
+ * for input and output arguments for a command function have to be specified in the resource
+ * database in the CLASS table as:
+ * @verbatim
+	CLASS/class_name/cmd_name/IN_TYPE:	"Current in mA"
+	CLASS/class_name/cmd_name/OUT_TYPE:	"Power in MW"
+ * @endverbatim
+ * @verbatim class_name @endverbatim is the name of the device class. It will be retrieved from
+ * the device server.
+ *
+ * @verbatim cmd_name @endverbatim is the name of the command. It will be retrieved from the 
+ * CMDS table in the resource database.
+ *
+ * Commands and data types are read from the command list in the device server by calling 
+ * @b RPC_DEV_CMD_QUERY.
+ *
+ * @param ds 		client handle for the associated device.
+ * @param varcmdarr 	sequence of DevCmdInfo structures.
+ * @param error     	Will contain an appropriate error code if the
+ *			corresponding call returns a non-zero value.
+ *
+ * @return DS_OK or DS_NOTOK
+ */
+long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error)
+{
+	*error = DS_OK;
+	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_cmd_query() : entering routine\n");
+
+	if (ds == NULL)
+	{
+		*error = DevErr_DeviceNotImportedYet;
+		return(DS_NOTOK);
+	}
+#ifdef TANGO
+	if (ds->rpc_protocol == D_IIOP)
+	{
+                if ( strcmp (ds->device_type, "attribute") == 0 )
+                        return attribute_cmd_query(ds, varcmdarr, error);
+		else
+			return tango_dev_cmd_query(ds, varcmdarr, error);
+	}
+#endif /* TANGO */
+	return taco_dev_cmd_query(ds, varcmdarr, error);
 }
 
 
@@ -1101,15 +1149,20 @@ char* _DLLFunc get_nethost_by_index (long i_nethost, long *error)
  */
 char* _DLLFunc extract_device_name (char *full_name, long *error)
 {
-	static char *device_name_alloc=NULL, *device_name;
-	char *prog_url;
+	static char 	*device_name_alloc = NULL, 
+			*device_name;
+	char 		*prog_url;
 	
 /*
  * assume full_name == device_name to start off with
  */
-	device_name_alloc = (char*)realloc(device_name_alloc,strlen(full_name)+1);
+	device_name = device_name_alloc = (char*)realloc(device_name_alloc,strlen(full_name)+1);
+	if (!device_name_alloc)
+	{
+		*error = DevErr_InsufficientMemory;
+		return NULL;
+	}
 	strcpy(device_name_alloc, full_name);
-	device_name = device_name_alloc;
 /*
  * if nethost is specified in the device name "remove" it
  */
@@ -1123,7 +1176,6 @@ char* _DLLFunc extract_device_name (char *full_name, long *error)
 		prog_url = strchr(device_name, '?');
 		*prog_url = 0;
 	}
-
 	return(device_name);
 }
 

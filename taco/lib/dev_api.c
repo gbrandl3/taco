@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.18 $
+ Version    :	$Revision: 1.19 $
 
- Date	    :	$Date: 2004-10-26 08:46:39 $
+ Date	    :	$Date: 2004-10-26 11:35:36 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -62,11 +62,28 @@
 #		ifdef linux
 #			include <linux/posix_types.h>
 #		endif /* linux */
+#		ifdef solaris
+#			define PMAPPORT 111
+#			define PMAPPROG 100000
+#			define PMAPVERS 2
+#		endif 
+#		if HAVE_RPC_PMAP_CLNT_H
+#			include <rpc/pmap_clnt.h>
+#		endif
+#		if HAVE_RPC_PMAP_PROT_H
+#			include <rpc/pmap_prot.h>
+#		endif
 #	endif /* OSK || _OSK */
+#elif defined _NT
+#	include <rpc/pmap_pro.h>
+#	include <rpc/pmap_cln.h>
 #endif /* WIN32 */
 
 #include <errno.h>
 #include <assert.h>
+
+
+
 
 /*
  * Functions reused in modul util_api.c
@@ -165,6 +182,60 @@ server_connections	 	svr_conns [NFILE];
  */
 long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *error)
 {
+	*error = 0;
+	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_import() : entering routine\n");
+
+#ifdef TANGO
+/*
+ * Check for a four field attribute name /domain/family/member/attribute
+ * to open access for attribute reading and writing
+ */
+	attribute_name = extract_device_name(dev_name, error);
+	count = 0;
+	str_ptr = attribute_name;
+	while ( (str_ptr = strchr (str_ptr, '/')) != NULL )
+	{
+		count ++;
+		str_ptr++;
+	}
+
+	if ( count == 3 )
+	{
+/*
+ * check wether the system is already configured
+ */
+		if ( !config_flags.configuration )
+			if ( (setup_config (error)) < 0 )
+				return (DS_NOTOK);
+                return attribute_import (attribute_name, access, ds_ptr, error);
+	}
+
+/*
+ * Check for a TANGO device and import it for command execution.
+ */
+	if (strncasecmp(dev_name,"tango:",6) == 0)
+	{
+		status = tango_dev_import(dev_name+6,access, ds_ptr, error);
+		printf("dev_import(): tango_dev_import(%s) returned %d\n",dev_name,status);
+		return(status);
+	}
+#endif /* TANGO */
+        return taco_dev_import (dev_name, access, ds_ptr, error);
+}
+
+/**@ingroup syncAPI
+ * application interface to import a device from the device server in charge of it.
+ * 
+ * @param dev_name name of the device
+ * @param access not used yet
+ * @param ds_ptr returns a handle to access the device
+ * @param error Will contain an appropriate error code if the corresponding call
+ *  returns a non-zero value.
+ * 
+ * @return  DS_OK or DS_NOTOK
+ */
+long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, long *error)
+{
 	static _dev_import_out	dev_import_out;
 	_dev_import_in		dev_import_in;
 	CLIENT			*clnt = NULL;
@@ -190,25 +261,14 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 				nethost[80],
 				*prog_url;
 
-	*error = 0;
-	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_import() : entering routine\n");
-
-#ifdef TANGO
-	if (strncasecmp(dev_name,"tango:",6) == 0)
-	{
-		status = tango_dev_import(dev_name+6,access, ds_ptr, error);
-		printf("dev_import(): tango_dev_import(%s) returned %d\n",dev_name,status);
-		return(status);
-	}
-#endif /* TANGO */
 /*
  *  first convert the device name to lower case letters
  */
-	strncpy (name, dev_name, sizeof(name));
+	snprintf(name, sizeof(name), "%s", dev_name);
 
 	len = strlen (name);
 	device_name = name;
-	for (i=0; i<len; i++, device_name++)
+	for (i = 0; i < len; i++, device_name++)
 		*device_name = tolower (*device_name);
 	device_name = name;
 /*
@@ -226,8 +286,8 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
  * make a copy of the nethost name without the "//" and
  * removing the device name which follows
  */
-		strncpy(nethost,device_name+2, sizeof(nethost));
-		for (i=0; i<(int)strlen(nethost); i++)
+		snprintf(nethost, sizeof(nethost), "%s", device_name + 2);
+		for (i = 0; i < (int)strlen(nethost); i++)
 			if (nethost[i] == '/')
 			{
 				nethost[i] = 0;
@@ -344,9 +404,9 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
  */
 	else
 	{
-		strncpy(device_class,"unknown", sizeof(device_class));
-		strncpy(device_type,"unknown", sizeof(device_type));
-		strncpy(host_name,nethost, sizeof(host_name));
+		strncpy(device_class, "unknown", sizeof(device_class));
+		strncpy(device_type, "unknown", sizeof(device_type));
+		snprintf(host_name, sizeof(host_name), "%s", nethost);
 		vers_number = API_VERSION;
 	}
 
@@ -421,7 +481,7 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 		if (rpc_check_host(host_name, error) == DS_NOTOK)
 		{
         		dev_printdebug (DBG_API,"dev_import(): host %s not answering, do stateless import\n",host_name);
-                       	return(dev_notimported_init(device_name,access,i_nethost,ds_ptr,error));
+                       	return dev_notimported_init(device_name,access,i_nethost,ds_ptr,error);
 		}
 
 /*
@@ -484,7 +544,6 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 					return (DS_NOTOK);
 				}
 			}
-
 			else
 			{
 /*
@@ -758,15 +817,6 @@ long _DLLFunc dev_putget (devserver ds, long cmd,DevArgument argin,
 			  DevType argin_type,DevArgument argout,
 			  DevType argout_type, long *error)
 {
-	_server_data		server_data;
-	_client_data		client_data;
-	enum clnt_stat		clnt_stat;
-	_Int			local_flag;
-	long			client_id = 0;
-	long			i_nethost;
-	nethost_info		*nethost;
-	long			status;
-
 	*error = 0;
 
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_putget() : entering routine\n");
@@ -784,12 +834,54 @@ long _DLLFunc dev_putget (devserver ds, long cmd,DevArgument argin,
 		dev_error_string = NULL;
 	}
 #ifdef TANGO
-	if (ds->rpc_protocol == D_IIOP)
+        if (ds->rpc_protocol == D_IIOP)
+        {
+                if ( strcmp (ds->device_type, "attribute") == 0 )
+                        return attribute_putget(ds, cmd, argin, argin_type, argout, argout_type, error);
+
+                return tango_dev_putget(ds, cmd, argin, argin_type, argout, argout_type, error);
+        }
+#endif 
+        return taco_dev_putget(ds, cmd, argin, argin_type, argout, argout_type, error);
+}
+
+/**@ingroup syncAPI
+ * application interface to execute commands on a device with the possibility to pass 
+ * input data and to receive output data.
+ * 
+ * @param ds handle to access the device.
+ * @param cmd    command to be executed.
+ * @param argin  pointer to input arguments.
+ * @param argin_type data type of input arguments.
+ * @param argout  pointer for output arguments.
+ * @param argout_type data type of output arguments.
+ * @param error Will contain an appropriate error code if the corresponding call
+ *	returns a non-zero value.
+ * 
+ * @return   DS_OK or DS_NOTOK
+ */
+long _DLLFunc taco_dev_putget (devserver ds, long cmd,DevArgument argin,
+			  DevType argin_type,DevArgument argout,
+			  DevType argout_type, long *error)
+{
+	_server_data		server_data;
+	_client_data		client_data;
+	enum clnt_stat		clnt_stat;
+	_Int			local_flag;
+	long			client_id = 0;
+	long			i_nethost;
+	nethost_info		*nethost;
+	long			status;
+
+/*
+ * make sure dynamic error string points to nothing
+ */
+	if (dev_error_string != NULL)
 	{
-		status = tango_dev_putget(ds, cmd, argin, argin_type, argout, argout_type, error);
-		return(status);
+		free(dev_error_string);
+		dev_error_string = NULL;
 	}
-#endif /* TANGO */
+
 /*
  *  check data types
  */
@@ -926,15 +1018,6 @@ long _DLLFunc dev_putget (devserver ds, long cmd,DevArgument argin,
 long _DLLFunc dev_put (devserver ds, long cmd,DevArgument argin,
 		       DevType argin_type, long *error )
 {
-	_server_data		server_data;
-	_client_data		client_data;
-	enum clnt_stat		clnt_stat;
-	long			status;
-	_Int			local_flag;
-	long			client_id = 0;
-	long			i_nethost;
-	nethost_info		*nethost;
-
 	*error = 0;
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_put() : entering routine\n");
 	if (ds == NULL)
@@ -954,10 +1037,50 @@ long _DLLFunc dev_put (devserver ds, long cmd,DevArgument argin,
 #ifdef TANGO
 	if (ds->rpc_protocol == D_IIOP)
 	{
-		status = tango_dev_putget(ds, cmd, argin, argin_type, NULL, D_VOID_TYPE, error);
-		return(status);
+		if ( strcmp (ds->device_type, "attribute") == 0 )
+			return attribute_put(ds, cmd, argin, argin_type, error);
+
+		return tango_dev_putget(ds, cmd, argin, argin_type, NULL, D_VOID_TYPE, error);
 	}
-#endif /* TANGO */
+#endif 
+	return taco_dev_put (ds, cmd, argin, argin_type, error);
+}
+
+
+/**@ingroup syncAPI
+ * application interface to execute commands on a device with only the possibility 
+ * to pass input data.
+ * @param ds handle to access the device.
+ * @param cmd command to be executed.
+ * @param argin pointer to input arguments.
+ * @param argin_type data type of input arguments.
+ *
+ * @param error Will contain an appropriate error code if the corresponding call
+ *	returns a non-zero value.
+ *
+ * @return DS_OK or DS_NOTOK
+ */
+long _DLLFunc taco_dev_put (devserver ds, long cmd,DevArgument argin,
+		       DevType argin_type, long *error )
+{
+	_server_data		server_data;
+	_client_data		client_data;
+	enum clnt_stat		clnt_stat;
+	long			status;
+	_Int			local_flag;
+	long			client_id = 0;
+	long			i_nethost;
+	nethost_info		*nethost;
+
+/*
+ * make sure dynamic error string points to nothing
+ */
+	if (dev_error_string != NULL)
+	{
+		free(dev_error_string);
+		dev_error_string = NULL;
+	}
+
 /*
  * save the device's nethost in an intermediate variable
  * to make it more accessible
@@ -1077,22 +1200,6 @@ long _DLLFunc dev_put (devserver ds, long cmd,DevArgument argin,
  */
 long _DLLFunc dev_free (devserver ds, long *error)
 {
-	static _dev_free_out	dev_free_out;
-	_dev_free_in		dev_free_in;
-	enum clnt_stat		clnt_stat;
-	char			*hstring;
-	long			status;
-	_Int			local_flag;
-	long			client_id = 0;
-	long			i_nethost;
-	nethost_info		*nethost;
-/*	struct timeval		zero_timeout = {0,0};*/
-	long			iarg;
-	DevVarArgument		vararg[10];
-	char 			*name;
-	char 			*host;
-
-	status = DS_OK;
 	*error = 0;
 
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_free() : entering routine\n");
@@ -1106,10 +1213,38 @@ long _DLLFunc dev_free (devserver ds, long *error)
 #ifdef TANGO
 	if (ds->rpc_protocol == D_IIOP)
 	{
-		tango_dev_free(ds, error);
-		return(DS_OK);
+		if ( strcmp (ds->device_type, "attribute") == 0 )
+			return attribute_free(ds, error);
+		return tango_dev_free(ds, error);
 	}
-#endif /* TANGO */
+#endif
+        return taco_dev_free (ds, error);
+}
+
+/**@ingroup syncAPI
+ * application interface to destroy and free a handle to a device.
+ * 
+ * @param ds handle to device.
+ * @param error Will contain an appropriate error code if the corresponding call
+ *	returns a non-zero value.
+ * 
+ * return DS_OK or DS_NOTOK
+ */
+long _DLLFunc taco_dev_free(devserver ds, long *error)
+{
+	static _dev_free_out	dev_free_out;
+	_dev_free_in		dev_free_in;
+	enum clnt_stat		clnt_stat;
+	_Int			local_flag;
+	long			status = DS_OK,
+				client_id = 0,
+				i_nethost,
+				iarg;
+	nethost_info		*nethost;
+	DevVarArgument		vararg[10];
+	char			*hstring,
+				*name,
+				*host;
 /*
  * in a "stateless" import if the device was never imported
  * then simply free the _devserver structure and return
@@ -1577,12 +1712,9 @@ long _DLLFunc check_rpc_connection (devserver ds, long *error)
  */
 	if ( svr_conns[ds->no_svr_conn].first_access_time != False )
 	{
-		time (&access_time);
-		if ( (access_time - svr_conns[ds->no_svr_conn].first_access_time) < DELAY_TIME )
-		{
-			*error = DevErr_BadServerConnection;
-			return (DS_NOTOK);
-		}
+		time ( &(svr_conns[ds->no_svr_conn].first_access_time) );
+		*error = DevErr_BadServerConnection;
+		return (DS_NOTOK);
 	}
 
 /* 
@@ -1636,9 +1768,12 @@ long _DLLFunc check_rpc_connection (devserver ds, long *error)
  */
 	if ( svr_conns[ds->no_svr_conn].first_access_time == False )
 	{
-		time ( &(svr_conns[ds->no_svr_conn].first_access_time) );
-		*error = DevErr_BadServerConnection;
-		return (DS_NOTOK);
+		time (&access_time);
+		if ( (access_time - svr_conns[ds->no_svr_conn].first_access_time) < DELAY_TIME )
+		{
+			*error = DevErr_BadServerConnection;
+			return (DS_NOTOK);
+		}
 	}
 
 /*
