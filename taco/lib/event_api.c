@@ -33,9 +33,9 @@
 
  Original   :	April 1999
 
- Version    :	$Revision: 1.4 $
+ Version    :	$Revision: 1.5 $
 
- Date       :	$Date: 2003-05-16 13:53:11 $
+ Date       :	$Date: 2004-02-11 10:22:30 $
 
  Copyleft (c) 1999 by European Synchrotron Radiation Facility,
                       Grenoble, France
@@ -158,10 +158,7 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 
 	*error = 0;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_ASYNCH,
-	    "\ndev_event_listen_x() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_ASYNCH, "\ndev_event_listen_x() : entering routine\n");
 
 #ifdef TANGO
         if (ds->rpc_protocol == D_IIOP)
@@ -283,14 +280,10 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 	server_data.argout_type	= argout_type;
 	server_data.argin	= (char *) NULL;
 
-#ifdef EBUG
-	dev_printdebug (DBG_ASYNCH,
-	    "dev_event_listen_x() : server data -> \n");
-	dev_printdebug (DBG_ASYNCH,
-	    "ds_id=%d  cmd=%d  outtype=%d\n",
+	dev_printdebug (DBG_ASYNCH, "dev_event_listen_x() : server data -> \n");
+	dev_printdebug (DBG_ASYNCH, "ds_id=%d  cmd=%d  outtype=%d\n",
 	    server_data.ds_id, server_data.cmd,
 	    server_data.argout_type);
-#endif /* EBUG */
 
 /*
  * additional arguments, in this case asynch_id and the return argument
@@ -322,15 +315,11 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 	server_data.var_argument.length++;
 	server_data.var_argument.sequence = vararg;
 
-#ifdef EBUG
-        dev_printdebug (DBG_TRACE | DBG_ASYNCH,
-            "\ndev_event_listen_x() : client data -> ");
-        dev_printdebug (DBG_ASYNCH,
-            "event_type=%d asynch_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
+        dev_printdebug (DBG_TRACE | DBG_ASYNCH, "\ndev_event_listen_x() : client data -> ");
+        dev_printdebug (DBG_ASYNCH, "event_type=%d asynch_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
 	    event_type,event_id,
 	    config_flags.server_name,config_flags.server_host,
 	    config_flags.prog_number,config_flags.vers_number);
-#endif /* EBUG */
 
 /*
  *  call RPC_DEV_PUTGET_ASYN using the client handle which has
@@ -341,10 +330,7 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 	clnt_stat = clnt_call (ds->asynch_clnt, RPC_EVENT_LISTEN,
 		    (xdrproc_t)xdr__server_data, (caddr_t) &server_data,
 		    (xdrproc_t)xdr_void, (caddr_t) NULL, TIMEVAL(zero_timeout));
-#ifdef EBUG
-	 dev_printdebug (DBG_ASYNCH,
-                        "\ndev_event_listen_x() : clnt_stat %d\n",clnt_stat);
-#endif /* EBUG */
+	dev_printdebug (DBG_ASYNCH, "\ndev_event_listen_x() : clnt_stat %d\n",clnt_stat);
 
 /*
  * Check for errors on the RPC connection.
@@ -418,9 +404,7 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
 	_asynch_client_data 	asynch_client_data;
 	long			i;
 
-#ifdef EBUG
         dev_printdebug (DBG_ASYNCH, "\ndev_event_fire() : entering routine\n");
-#endif /* EBUG */
 	LOCK(async_mutex);
 
 
@@ -444,11 +428,9 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
 				client.prog_number =  event_client_list[i].prog_number;
 				client.vers_number =  event_client_list[i].vers_number;
 
-#ifdef EBUG
         			dev_printdebug (DBG_ASYNCH, "\ndev_event_fire() : send event to client -> ");
         			dev_printdebug (DBG_ASYNCH, "event_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
 		    			event_client_list[i].id, client.server_name, client.server_host, client.prog_number, client.vers_number);
-#endif /* EBUG */
 
 /*
  * to send an event to the client asynchronously the client rpc service
@@ -479,10 +461,8 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
 
 #endif /* !vxworks */
 
-#ifdef EBUG
                         	dev_printdebug (DBG_ASYNCH, "\ndev_event_fire() : send event to client (time={%d,%d})\n",
 				   	timenow.tv_sec,timenow.tv_usec);
-#endif /* EBUG */
 
 				iarg = 0;
 				vararg[iarg].argument_type	= D_ULONG_TYPE;
@@ -511,10 +491,8 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
  */
                 			if ( xdr_get_type( asynch_client_data.argout_type, &data_type, &asynch_client_data.error) == DS_NOTOK)
                 			{
-#ifdef EBUG
 	                        		dev_printdebug (DBG_ERROR | DBG_ASYNCH, "\ndev_event_fire() : xdr_get_type(%d) returned error %d\n",
 		                            		asynch_client_data.argout_type, asynch_client_data.error);
-#endif /* EBUG */
                         			asynch_client_data.status = DS_NOTOK;
                 			}
 
@@ -541,9 +519,7 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
 	                    	   	(xdrproc_t)xdr__asynch_client_data, (caddr_t) &asynch_client_data,
 				   	(xdrproc_t)xdr_void, (caddr_t) NULL, TIMEVAL(zero_timeout));
 
-#ifdef EBUG
                         	dev_printdebug (DBG_ASYNCH, "\ndev_event_fire() : send event to client (clnt_stat %d)\n",clnt_stat);
-#endif /* EBUG */
 
 /*
  * because we are using "one-way rpc" to send the reply to the client
@@ -579,9 +555,7 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
 			}
 		}
 
-#ifdef EBUG
 	dev_printdebug (DBG_ASYNCH, "\ndev_event_fire() : returning\n");
-#endif /* EBUG */
 	UNLOCK(async_mutex);
 
 	return;
@@ -617,10 +591,8 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 
 	*error = 0;
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_ASYNCH,
 	    "\ndev_event_unlisten_x() : entering routine\n");
-#endif /* EBUG */
 
 #ifdef TANGO
         if (ds->rpc_protocol == D_IIOP)
@@ -735,11 +707,9 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 	server_data.var_argument.length++;
 	server_data.var_argument.sequence = vararg;
 
-#ifdef EBUG
         dev_printdebug (DBG_TRACE | DBG_ASYNCH, "\ndev_event_unlisten_x() : client data -> ");
         dev_printdebug (DBG_ASYNCH, "event_type=%d asynch_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
 	    event_type,event_id, config_flags.server_name,config_flags.server_host, config_flags.prog_number,config_flags.vers_number);
-#endif /* EBUG */
 
 /*
  *  call RPC_EVENT_LISTEN using the client handle which has
@@ -750,9 +720,7 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 	clnt_stat = clnt_call (ds->asynch_clnt, RPC_EVENT_UNLISTEN,
 			    (xdrproc_t)xdr__server_data, (caddr_t) &server_data,
 			    (xdrproc_t)xdr_void, (caddr_t) NULL, TIMEVAL(zero_timeout));
-#ifdef EBUG
 	dev_printdebug (DBG_ASYNCH, "\ndev_event_unlisten_x() : clnt_stat %d\n",clnt_stat);
-#endif /* EBUG */
 
 /*
  * Check for errors on the RPC connection.
@@ -789,9 +757,7 @@ void _DLLFunc event_client_cleanup (long *error)
 {
 	long	i, 
 		i_client;
-#ifdef EBUG
 	dev_printdebug (DBG_ASYNCH, "\nevent_client_cleanup() : entering\n");
-#endif /* EBUG */
 	LOCK(async_mutex);
 
 /*
@@ -810,16 +776,11 @@ void _DLLFunc event_client_cleanup (long *error)
 				if (svr_conns[i_client].asynch_clnt == NULL)
 				{
 					event_client_list[i].flag = DS_FALSE;
-#ifdef EBUG
         				dev_printdebug (DBG_ASYNCH,
 				                "\nevent_client_cleanup() : removed client %d from list of clients registered for events\n",i);
-#endif /* EBUG */  
 				}
 			}
-#ifdef EBUG
-	dev_printdebug (DBG_ASYNCH, 
-		"\nevent_client_cleanup() : returning\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_ASYNCH, "\nevent_client_cleanup() : returning\n");
 	UNLOCK(async_mutex);
 	return;
 }
@@ -895,7 +856,7 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
 		UNLOCK(async_mutex);
 		return NULL;
 	}
-	sprintf(event_client_list[i_client].server_name,"%s",*(char**)server_data->var_argument.sequence[1].argument);
+	strcpy(event_client_list[i_client].server_name, *(char**)server_data->var_argument.sequence[1].argument);
 	event_client_list[i_client].server_host = (char*)malloc(strlen(*(char**)server_data->var_argument.sequence[2].argument)+1);
 	if(!event_client_list[i_client].server_host)
 	{
@@ -911,12 +872,10 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
 	event_client_list[i_client].event = *(long*)server_data->var_argument.sequence[5].argument;
 	event_client_list[i_client].argout_type = server_data->argout_type;
 
-#ifdef EBUG
         dev_printdebug (DBG_ASYNCH, "\nrpc_event_listen_5() : event client data -> ");
         dev_printdebug (DBG_ASYNCH, "event=%d id=%d server_name=%s server_host=%s argout_type=%d\n",
 	     event_client_list[i_client].event,event_client_list[i_client].id, 
 	     event_client_list[i_client].server_name, event_client_list[i_client].server_host, event_client_list[i_client].argout_type);
-#endif /* EBUG */
 
 /*
  * import asynchronous service of client which wants to receive events
@@ -971,11 +930,9 @@ _dev_free_out* _DLLFunc rpc_event_unlisten_5 (_server_data *server_data)
 	server_host = *(char**)server_data->var_argument.sequence[2].argument;
 	prog_number = *(long*)server_data->var_argument.sequence[3].argument;
 	event_type = *(long*)server_data->var_argument.sequence[5].argument;
-#ifdef EBUG
         dev_printdebug (DBG_ASYNCH, "\nrpc_event_unlisten_5() : event client data -> ");
         dev_printdebug (DBG_ASYNCH, "type=%d id=%d name=%s host=%s program=%d\n",
 	     event_type, event_id, server_name, server_host, prog_number);
-#endif /* EBUG */
 
 /*
  * find event client
@@ -988,9 +945,7 @@ _dev_free_out* _DLLFunc rpc_event_unlisten_5 (_server_data *server_data)
 					&& (strcmp(server_host,event_client_list[i].server_host) == 0) 
 					&& (prog_number == event_client_list[i].prog_number))
 				{
-#ifdef EBUG
         				dev_printdebug (DBG_ASYNCH, "\nrpc_event_unlisten_5() : found client at i_client=%d\n",i_client);
-#endif /* EBUG */
 					i_client = i;
 					break;
 				}
@@ -1011,9 +966,7 @@ _dev_free_out* _DLLFunc rpc_event_unlisten_5 (_server_data *server_data)
 		{
                 	clnt_destroy (svr_conns[no_svc_conn].asynch_clnt);
 			svr_conns[no_svc_conn].asynch_clnt = NULL;
-#ifdef EBUG
         		dev_printdebug (DBG_ASYNCH, "rpc_event_unlisten_5(): destroy asynch client handle\n");
-#endif /* EBUG */
 		}
 	}
 	UNLOCK(async_mutex);
@@ -1067,9 +1020,7 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long
 	int			n_event_names;
 
 	*error = 0;
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_event_query() : entering routine\n");
-#endif /* EBUG */
 
 #ifdef TANGO
 	if (ds->rpc_protocol == D_IIOP)
@@ -1293,9 +1244,7 @@ static long get_event_string (devserver ds, long event, char *event_str, long *e
 			server,
 			events_ident;
 
-#ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API, "\nget_event_string() : entering routine\n");
-#endif /* EBUG */
 
 	*error = 0;
 
@@ -1324,10 +1273,8 @@ static long get_event_string (devserver ds, long event, char *event_str, long *e
 		snprintf(res_path, sizeof(res_path),"EVENTS/%d/%d", team, server);
 
 	snprintf (res_name, sizeof(res_name), "%d", events_ident);
-#ifdef EBUG
 	dev_printdebug (DBG_API, "get_events_string() : res_path = %s\n", res_path);
 	dev_printdebug (DBG_API, "get_events_string() : res_name = %s\n", res_name);
-#endif /* EBUG */
 
 	res_tab.resource_name = res_name;
 	res_tab.resource_type = D_STRING_TYPE;
@@ -1339,9 +1286,7 @@ static long get_event_string (devserver ds, long event, char *event_str, long *e
 
 	if (db_getresource (res_path, &res_tab, 1, error) == DS_NOTOK)
 	{
-#ifdef EBUG
 		dev_printdebug (DBG_API | DBG_ERROR, "get_event_string() : db_getresource failed with error %d\n", *error);
-#endif /* EBUG */
 
 		return (DS_NOTOK);
 	}
