@@ -9,13 +9,13 @@
 		handle remote devices.
 
  Author(s)  :	Jens Meyer
- 		$Author: andy_gotz $
+ 		$Author: jkrueger1 $
 
  Original   :	April 1993
 
- Version:	$Revision: 1.18 $
+ Version:	$Revision: 1.19 $
 
- Date:		$Date: 2004-11-25 19:37:56 $
+ Date:		$Date: 2005-02-22 13:43:21 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -320,12 +320,10 @@ long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
 			return (DS_NOTOK);
 		}
 	}
-
-	/*
-	 *  fill in data to rpc transfer structures server_data
-	 *  and client_data.
-	 */
-
+/*
+ *  fill in data to rpc transfer structures server_data
+ *  and client_data.
+ */
 	server_data.ds_id	= ds->ds_id;
 	server_data.client_id	= client_id;
 	server_data.access_right= ds->dev_access;
@@ -337,17 +335,12 @@ long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
 	server_data.var_argument.length   = 0;
 	server_data.var_argument.sequence = NULL;
 
-	dev_printdebug (DBG_API, "dev_put_asyn() : server data -> \n");
-	dev_printdebug (DBG_API, "ds_id=%d  cmd=%d  intype=%d\n",
-	    server_data.ds_id, server_data.cmd, server_data.argin_type);
-
-	/*
-	 *  call RPC_DEV_PUT_ASYN at the correct device server
-	 */
-
-	/*
-	 * Call a device with the current version number >1.
-   	 */
+	dev_printdebug(DBG_API, "dev_put_asyn() : server data -> \n");
+	dev_printdebug(DBG_API, "ds_id=%d  cmd=%d  intype=%d\n", server_data.ds_id, server_data.cmd, server_data.argin_type);
+/*
+ * call RPC_DEV_PUT_ASYN at the correct device server
+ * Call a device with the current version number >1.
+ */
 	if ( ds->vers_number > DEVSERVER_VERS)
 	{
 		clnt_stat = clnt_call (ds->clnt, RPC_DEV_PUT_ASYN,
@@ -356,18 +349,16 @@ long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
 	}
 	else
 	{
-		/*
-	    * Call a device from an old version server.
-	    */
+/*
+ * Call a device from an old version server.
+ */
 		clnt_stat = clnt_call (ds->clnt, RPC_DEV_PUT_ASYN,
 		    (xdrproc_t)xdr__server_data_3, (caddr_t) &server_data,
 		    (xdrproc_t)xdr__client_data_3, (caddr_t) &client_data, TIMEVAL(timeout));
 	}
-
-	/*
-         * Check for errors on the RPC connection.
-         */
-
+/*
+ * Check for errors on the RPC connection.
+ */
 	if ( dev_rpc_error (ds, clnt_stat, error) == DS_NOTOK )
 	{
 		return (DS_NOTOK);
@@ -597,7 +588,9 @@ long _DLLFunc taco_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long 
 			res_tab[1].resource_adr = &(varcmdarr->sequence[i].out_name);
 
 			if (db_getresource (res_path, res_tab, res_tab_size, error) < 0)
-				return DS_NOTOK;
+			{
+//				return (DS_NOTOK);
+			}
 		}
 /*
  * no database, set in_name and out_name to NULL
@@ -608,12 +601,10 @@ long _DLLFunc taco_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long 
 			varcmdarr->sequence[i].out_name = NULL;
 		}
 	}
-
 /*
  *  free dev_query_out 
  */
 	xdr_free ((xdrproc_t)xdr__dev_query_out, (char *)&dev_query_out);
-
 /*
  * Return error code and status from device server.
  */
@@ -745,7 +736,8 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, size_t len, l
 		if (db_getresource (res_path, &res_tab, 1, error) == DS_NOTOK)
 		{
 			dev_printdebug (DBG_API | DBG_ERROR, "get_cmd_string() : db_getresource failed with error %d\n", *error);
-			return (DS_NOTOK);
+//			return (DS_NOTOK);
+			ret_str = NULL;
 		}
 	}
 /*

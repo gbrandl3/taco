@@ -14,9 +14,9 @@
 
  Original:      09.01.1991
 
- Version:	$Revision: 1.4 $
+ Version:	$Revision: 1.5 $
 
- Date:		$Date: 2004-03-03 11:38:16 $
+ Date:		$Date: 2005-02-22 13:45:12 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -141,23 +141,30 @@ Complete reimplementation of the transient RPC prognum allocation scheme :
   options (read: timing due to additional security checks!).
 =========================================================================-*/
 
-
-int gettransient( const char *ds_name )
+int gettransient(const char *ds_name)
 {
 #ifdef _NT
-	LPpmaplist        plist, p;
+	LPpmaplist      plist, 
+			p;
 #else
-        struct pmaplist   *plist, *p;
+        struct pmaplist *plist, 
+			*p;
 #endif
-	u_long	base=0x50000000, key=131, maxoffset=0x10000000;
-	u_long  offset, prognum, i, found;
+	u_long		base = 0x50000000, 
+			key = 131, 
+			maxoffset = 0x10000000;
+	u_long  	offset, 
+			prognum, 
+			i, 
+			found;
 	struct sockaddr_in addr;
 #if defined (_UCC) || (WIN32)
 	long backoff;
 #else
 	struct timespec backoff;
 #endif
-	long pid, first=1;
+	long 		pid, 
+			first = 1;
 
 	if (first)
 	{
@@ -179,15 +186,15 @@ int gettransient( const char *ds_name )
  * the portmapper at exactly the same time cf. above
  */
 #ifdef _UCC
-	backoff = 256.*(float)rand()/(float)RAND_MAX;
+	backoff = 256. * (float)rand() / (float)RAND_MAX;
 	tsleep(0x80000000|backoff);
 #else
 #ifdef WIN32
-	backoff = (long)(1000.*(float)rand()/(float)RAND_MAX);
+	backoff = (long)(1000. * (float)rand() / (float)RAND_MAX);
 	Sleep(backoff);
 #else
 	backoff.tv_sec = 0;
-	backoff.tv_nsec = 1000000000.*(float)rand()/(float)RAND_MAX;
+	backoff.tv_nsec = 1000000000. * (float)rand() / (float)RAND_MAX;
 	nanosleep(&backoff, NULL);
 #endif /* WIN32 */
 #endif /* _UCC */
@@ -201,7 +208,7 @@ int gettransient( const char *ds_name )
  * to the so-called "coalesced hashing" function also used by E.Taurel
  * in the data collector. It has been simplified here to the following
  *
- * hashing code = sum ( ds_name[i] * 131^i ) modulo 0x10000000
+ * hashing code = sum ( ds_name[i] * 131 ^ i ) modulo 0x10000000
  *
  * The modulo is necessary because transient program numbers must lie 
  * between 40000000 and 5fffffff and to avoid confusion with old servers
@@ -209,13 +216,9 @@ int gettransient( const char *ds_name )
  *
  * andy 12jun97
  */
-
-
 	offset = 0;
-	for (i=0; i<strlen(ds_name); i++)
-	{
-		offset = (offset*key + (u_long)ds_name[i])%maxoffset;
-	}
+	for (i = 0; i < strlen(ds_name); i++)
+		offset = (offset * key + (u_long)ds_name[i]) % maxoffset;
 
 	prognum = base + offset;
 
@@ -225,7 +228,6 @@ int gettransient( const char *ds_name )
  * number is already bound until an unbound program number is found or
  * until all program numbers have been checked.
  */
-
         get_myaddress(&addr);
 	plist = pmap_getmaps(&addr);
 	if(NULL == plist)
@@ -234,37 +236,33 @@ int gettransient( const char *ds_name )
  * if plist is NULL assume simply that no programs are registered
  * and return prognum as is - andy 2/11/2001
  */
-	  dev_printdebug(DBG_ERROR | DBG_STARTUP, "gettransient(): pmap_getmaps() failed , aborting !\n");
-
-	  return prognum;
+		dev_printdebug(DBG_ERROR | DBG_STARTUP, "gettransient(): pmap_getmaps() failed , aborting !\n");
+		return prognum;
 
 	}
   	found = 0;
         do
         {
-          if( prognum >= (base+maxoffset-1) )
-	    prognum = base;
+		if (prognum >= (base + maxoffset - 1))
+			prognum = base;
 
-	  for(p = plist; p != NULL; p = p->pml_next )
-	  {
-            if( prognum == p->pml_map.pm_prog )
-              break;
-          }
-          if( p == NULL )
-	  {
-	    found = 1;
-            break;
-	  }
-	  prognum++;
- 	} while( prognum != (base+offset));
+		for (p = plist; p != NULL; p = p->pml_next)
+            		if( prognum == p->pml_map.pm_prog )
+				break;
+		if (p == NULL)
+		{
+			found = 1;
+			break;
+		}
+		prognum++;
+ 	} while(prognum != (base + offset));
 
 	if (found == 0)
 	{
-	  printf("gettransient(): failed to find free prognum = %d\n", prognum);
-	  return 0;
+		printf("gettransient(): failed to find free prognum = %d\n", prognum);
+		return 0;
 	}
  	
-        /*xdr_free((xdrproc_t)xdr_pmap,(char *)plist);*/
-
+/*	xdr_free((xdrproc_t)xdr_pmap,(char *)plist); */
         return prognum;
 }
