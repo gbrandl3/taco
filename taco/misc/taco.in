@@ -1,5 +1,5 @@
 #! /bin/sh
-
+# This script is SuSE specific
 ### BEGIN INIT INFO
 # Provides: taco
 # Required-Start: $network $portmap
