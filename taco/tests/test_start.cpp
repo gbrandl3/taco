@@ -6,6 +6,22 @@
 
 extern long debug_flag;
 
+DevVarStringArray read_cmdparameters(void)
+{
+	DevVarStringArray	cmd;
+
+	std::string	process_name,
+			pers_name;
+
+	std::cin >> process_name;
+	std::cin >> pers_name;
+	cmd.length = 2;
+	cmd.sequence = new DevString[2];
+	cmd.sequence[0] = const_cast<DevString>(process_name.c_str());
+	cmd.sequence[1] = const_cast<DevString>(pers_name.c_str());
+	return cmd;
+}
+
 int main(int argc,char **argv)
 {
 	devserver 		ps;
@@ -25,16 +41,16 @@ int main(int argc,char **argv)
 	switch (argc)	
 	{
 		case 1:
-			std::cout << "enter device name [\"tl1/ps-d/d\"]?";
+			std::cout << "enter device name [\"sys/start/d\"]?";
 			std::cin >> cmd_string;
 			if (cmd_string.empty())
-				cmd_string = "tl1/ps-d/d";
+				cmd_string = "sys/start/d";
 			break;
 		case 2:
 			cmd_string = argv[1];
 			break;
 		default:
-			std::cerr << "usage: ps_menu [device name]" << std::endl;
+			std::cerr << "usage: test_start [device name]" << std::endl;
 			exit(1);
 	}
 
@@ -42,8 +58,8 @@ int main(int argc,char **argv)
 
 	if (status != 0) 
 	{
-		std::cout << "dev_import(" << cmd_string << ") returned " << status << " (error=" << error << std::endl;
-		std::cerr << dev_error_str(error) << std::endl;
+		std::cout << "dev_import(" << cmd_string << ") returned " << status << " (error=" << error << ")" << std::endl
+			<< dev_error_str(error) << std::endl;
 		exit(1);
 	}
 
@@ -51,8 +67,8 @@ int main(int argc,char **argv)
 	{
 		std::cout << "Select one of the following commands:" << std::endl << std::endl;
 		std::cout << "0. Quit" << std::endl
-			<< "1. On          2. Off          3. State" << std::endl
-			<< "4. Status      5. Reset" << std::endl
+			<< "1. On          2. Off          3. Reset" << std::endl
+			<< "4. State       5. Status" << std::endl
 			<< "6. Run         7. Stop         8. Restart" << std::endl;
 
 		std::cout << "cmd ?";
@@ -74,7 +90,7 @@ int main(int argc,char **argv)
 				if (status != DS_OK) 
 					dev_printerror_no(SEND, NULL, error); 
 				break;
-			case 3 : 
+			case 4 : 
 				status = dev_putget(ps, DevState, NULL, D_VOID_TYPE, &devstatus, D_SHORT_TYPE, &error);
 				std::cout << std::endl << "DevState dev_putget() returned " << status << std::endl;
 				if (status != DS_OK) 
@@ -82,7 +98,7 @@ int main(int argc,char **argv)
 				else	
 					std::cout << "status read " << devstatus << ", " << DEVSTATES[devstatus] << std::endl;
 				break;
-			case 4 : 
+			case 5 : 
 				ch_ptr=NULL; 
 				status = dev_putget(ps, DevStatus, NULL, D_VOID_TYPE, &ch_ptr, D_STRING_TYPE, &error);
 				std::cout << std::endl << "DevStatus dev_putget() returned " << status << std::endl;
@@ -91,29 +107,35 @@ int main(int argc,char **argv)
 				else  
 					std::cout << ch_ptr << std::endl;
 				break;
-			case 5 : 
+			case 3 : 
 				status = dev_put(ps, DevReset, NULL, D_VOID_TYPE, &error);
 				std::cout << std::endl << "DevReset dev_put() returned " << status << std::endl;
 				if (status != DS_OK) 
 					dev_printerror_no(SEND, NULL, error); 
 				break;
 			case 6 : 
+				cmdline = read_cmdparameters();
 				status = dev_put(ps, DevRun, &cmdline, D_VAR_STRINGARR, &error);
 				std::cout << "DevRun dev_put() returned " << status << std::endl;
 				if (status < 0) 
 					dev_printerror_no(SEND,NULL,error); 
+				delete [] cmdline.sequence;
 				break;
 			case 7 : 
-				status = dev_put(ps, DevStop, &pid, D_LONG_TYPE, &error);
+				cmdline = read_cmdparameters();
+				status = dev_put(ps, DevStop, &cmdline, D_VAR_STRINGARR, &error);
 				std::cout << std::endl << "DevStop devput() returned " << status << std::endl;
 				if (status != DS_OK) 
-					dev_printerror_no(SEND,NULL,error); 
+					dev_printerror_no(SEND, NULL, error); 
+				delete [] cmdline.sequence;
 				break;
 			case 8 : 
+				cmdline = read_cmdparameters();
 				status = dev_put(ps, DevRestore, &cmdline, D_VAR_STRINGARR, &error);
-				std::cout << std::endl << "DevRestor dev_put() returned " << status << std::endl;
+				std::cout << std::endl << "DevRestart dev_put() returned " << status << std::endl;
 				if (status != DS_OK)
 					dev_printerror_no(SEND,NULL,error); 
+				delete [] cmdline.sequence;
 				break;
 			default : 
 				break;

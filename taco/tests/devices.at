@@ -13,6 +13,16 @@ dev_ping -c 3 test/device/1 | grep status | cut -d' ' -f 4 | uniq], [],
 ]])
 AT_CLEANUP
 
+AT_SETUP([check the dev_cmd_query command to the test/device/1 device])
+AT_CHECK([AT_TACO_RUN_LOCAL
+test_cmd_query test/device/1], [],
+[[        12             DevReadValue         0         8
+        11              DevSetValue         4         0
+         4                 DevState         0         2
+         8                DevStatus         0         6]]
+)
+AT_CLEANUP
+
 AT_SETUP([client to the device])
 AT_DATA([instverify], [[3
 0

@@ -6,7 +6,7 @@ CLEANFILES 		= log taco
 
 DISTCLEANFILES 		= System.log atconfig
 
-INCLUDES		= @TACO_INCLUDES@ @TACO_GDBM_INC@ 
+INCLUDES		= @TACO_INCLUDES@ @TACO_GDBM_INC@ -g -O0
 
 test_asc_stat_SOURCES 	= test_asc_stat.c
 test_asc_stat_LDADD 	= @TACO_CLIENT_LIBS@ @TACO_ASCII_LIBS@ 
@@ -59,6 +59,7 @@ test_starter_SOURCES	= test_start.cpp
 test_starter_LDADD	= @TACO_CLIENT_LIBS@
 
 test_cmd_query_SOURCES	= test_cmd_query.cpp
+test_cmd_query_LDFLAGS	= -g 
 test_cmd_query_LDADD	= @TACO_CLIENT_LIBS@
 
 $(srcdir)/package.m4:	$(top_srcdir)/configure.ac

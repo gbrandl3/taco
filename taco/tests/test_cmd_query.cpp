@@ -41,19 +41,23 @@ int main(int argc,char **argv)
 	}
 
 	status = dev_import(const_cast<char *>(cmd_string.c_str()), readwrite, &ps, &error);
-
 	if (status != 0) 
 	{
-		std::cout << "dev_import(" << cmd_string << ") returned " << status << " (error=" << error << std::endl;
-		std::cerr << dev_error_str(error) << std::endl;
+		std::cout << "dev_import(" << cmd_string << ") returned " << status << " (error=" << error << ")" << std::endl
+			<< dev_error_str(error) << std::endl;
 		exit(1);
 	}
-
 	DevVarCmdArray	varcmdarr = {0, NULL}; 
-	if (dev_cmd_query(ps, &varcmdarr, &error) == DS_OK)
+	if ((status = dev_cmd_query(ps, &varcmdarr, &error)) == DS_OK)
 		for (int i = 0; i < varcmdarr.length; ++i)
 			std::cout << std::setw(10) << varcmdarr.sequence[i].cmd 
-				<< std::setw(25) << varcmdarr.sequence[i].cmd_name << std::endl; 
+				<< std::setw(25) << varcmdarr.sequence[i].cmd_name  
+				<< std::setw(10) << varcmdarr.sequence[i].in_type  
+				<< std::setw(10) << varcmdarr.sequence[i].out_type  
+				<< std::endl; 
+	else
+		std::cout << "dev_cmd_query(" << cmd_string << ") returned " << status << " (error=" << error << ")" << std::endl
+			<< dev_error_str(error) << std::endl;
 	return 0;
 }
 
