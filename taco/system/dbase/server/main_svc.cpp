@@ -14,7 +14,7 @@
 #endif
 
 #include <dbClass.h>
-#ifdef HAVE_MYSQL_MYSQL_H
+#if defined(HAVE_MYSQL_MYSQL_H) || defined(HAVE_MYSQL_H)
 #	include <MySqlServer.h>
 #endif
 #include <NdbmServer.h>

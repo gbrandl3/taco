@@ -51,6 +51,7 @@ AC_DEFUN([TACO_MYSQL_SUPPORT],
 dnl
 dnl Get the cflags and libraries
 dnl
+	AC_PATH_TOOL(MYSQL_CONFIG, mysql_config)
 	AC_ARG_ENABLE(mysql, AC_HELP_STRING(--enable-mysql, [build the database server with mysql support @<:@default=yes@:>@]),
 		[case "${enable_mysql}" in
 			yes)	taco_mysql=yes;;
@@ -65,18 +66,21 @@ dnl
 		[mysql_includes="$withval"], [mysql_includes=""])
 
 	if test "x$mysql_libraries" != "x" ; then
-		MYSQL_LIBS="-L$mysql_libraries"
+		MYSQL_LIBS="-L$mysql_libraries -lmysqlclient"
 	elif test "x$mysql_prefix" != "x" ; then
-		MYSQL_LIBS="-L$mysql_prefix/lib"
+		MYSQL_LIBS="-L$mysql_prefix/lib -lmysqlclient"
+	elif test -n "$MYSQL_CONFIG" ; then
+		MYSQL_LIBS=`$MYSQL_CONFIG --libs`
 	elif test "x$prefix" != "xNONE" -a "x$prefix" != "x/usr"; then
-		MYSQL_LIBS="-L$prefix/lib"
+		MYSQL_LIBS="-L$prefix/lib -lmysqlclient"
 	fi
-	MYSQL_LIBS="$MYSQL_LIBS -lmysqlclient"
 
 	if test "x$mysql_includes" != "x" ; then
 		MYSQL_CFLAGS="-I$mysql_includes"
 	elif test "x$mysql_prefix" != "x" ; then
 		MYSQL_CFLAGS="-I$mysql_prefix/include"
+	elif test -n "$MYSQL_CONFIG" ; then
+		MYSQL_CFLAGS=`$MYSQL_CONFIG --cflags`
 	elif test "x$prefix" != "xNONE" -a "x$prefix" != "x/usr"; then
 		MYSQL_CFLAGS="-I$prefix/include"
 	fi
@@ -86,16 +90,23 @@ dnl
 		save_CPPFLAGS="$CPPFLAGS"
 		CPPFLAGS="$CPPFLAGS $MYSQL_CFLAGS" 
 		LIBS="$LIBS $MYSQL_LIBS"
-		AC_CHECK_HEADERS([mysql/mysql.h], [], [taco_mysql=no])
-		AC_LINK_IFELSE(
-			[AC_LANG_PROGRAM(
-[#include <mysql/mysql.h> 
+		taco_mysql=no
+		AC_CHECK_HEADERS([mysql/mysql.h mysql.h], [taco_mysql=yes])
+		if test "x$taco_mysql" = "xyes" ; then
+			AC_LINK_IFELSE(
+				[AC_LANG_PROGRAM(
+[#ifdef HAVE_MYSQL_MYSQL_H
+#	include <mysql.h>
+#else
+#	include <mysql.h> 
+#endif
 ],
 [
 MYSQL       mysql,
             *mysql_conn = mysql_real_connect(&mysql, "localhost", "myuser", "mypasswd", "mydb", 0, 0, 0); 
 
 ])], [], [taco_mysql=no])
+		fi
 		LIBS="$save_LIBS"
 		CPPFLAGS="$save_CPPPLAGS"
 	fi

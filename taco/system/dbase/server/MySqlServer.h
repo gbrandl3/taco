@@ -4,6 +4,7 @@
 #ifdef sun
 #define PORTMAP
 #endif
+#include "config.h"
 
 #include <API.h>
 #include <cstdlib>
@@ -18,7 +19,11 @@
 #include <netdb.h>
 #include <rpc/pmap_clnt.h>
 
-#include <mysql/mysql.h>
+#ifdef HAVE_MYSQL_MYSQL_H
+#	include <mysql/mysql.h>
+#else
+#	include <mysql.h>
+#endif
 
 // C++ include
 #include <iostream>
