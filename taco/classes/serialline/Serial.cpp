@@ -30,6 +30,9 @@
 //#include <linux/types.h>
 #include <stddef.h>
 
+#if HAVE_SYS_FILIO_H
+#include <sys/filio.h>
+#endif
 #include <termios.h>
 #include <fcntl.h>
 
