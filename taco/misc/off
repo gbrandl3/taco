@@ -22,6 +22,8 @@ kill_procs()
 			PSARGS="-o pid,command";;
 		SunOS*)
 			PSARGS="-aeo pid,comm";;
+		Linux*)
+			PSARGS="xo pid,comm";;
 		*)
 			PSARGS="-xo pid,comm";;
 	esac
