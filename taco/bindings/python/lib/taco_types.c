@@ -8,9 +8,9 @@
  *
  * Original:    March 99
  * 
- * Date:	$Date: 2004-07-09 12:59:33 $
+ * Date:	$Date: 2005-02-22 13:16:29 $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
  *********************************************************************/
 #include "config.h"
@@ -343,8 +343,7 @@ retrieve from python object, the "single" value
                 -1: error
       
 *********************************************************************/
-long get_argin_single(DevArgument ds_argin, long ds_in, 
-                      PyObject *item, char* mymess)
+long get_argin_single(DevArgument ds_argin, long ds_in, PyObject *item, char* mymess)
 {
    int len;
    long merr;
@@ -428,13 +427,13 @@ long get_argin_single(DevArgument ds_argin, long ds_in,
 	 *(DevString *)(ds_argin) = p2c_STRING(item,&merr);
 	 if (merr != 0)
          {
-	    strcpy(mymess,"argin cannot be cast as C string\n");
+	    strcpy(mymess, "argin cannot be cast as C string\n");
 	    return(-1);
 	 }
          break;
 	 
       default:
-         sprintf(mymess,"get_argin_single: unknown type %d\n",ds_in);
+         sprintf(mymess, "get_argin_single: unknown type %d\n",ds_in);
 	 return(-1);
    }
 
