@@ -17,8 +17,9 @@
 #ifndef _Serial_H
 #define _Serial_H
 		
-//#include <linux/types.h>
 #include <BlcDsNumbers.h>
+
+#include <Device.H>
 
 #define MAX_DEVICES 16
 

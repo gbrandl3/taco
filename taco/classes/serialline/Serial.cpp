@@ -304,63 +304,25 @@ Serial::Serial (char *name, long *error)
  short 			short_array[20];
  DevVarShortArray	dargin_varsharr;
 
-
-
  //
  // Commands list available
  //
- static Device::DeviceCommandListEntry commands_list[] =
- {
-  {
-   DevSerWriteString,
-   (DeviceMemberFunction)(&Serial::SerWriteString),
-   D_STRING_TYPE,
-   D_LONG_TYPE
-  },
-  {
-   DevSerWriteChar,
-   (DeviceMemberFunction)(&Serial::SerWriteChar),
-   D_VAR_CHARARR,
-   D_LONG_TYPE
-  },
-  {
-   DevSerReadString,
-   (DeviceMemberFunction)(&Serial::SerReadString),
-   D_LONG_TYPE,
-   D_STRING_TYPE
-  },
-  {
-   DevSerReadChar,
-   (DeviceMemberFunction)(&Serial::SerReadChar),
-   D_LONG_TYPE,
-   D_VAR_CHARARR
-  },
-  {
-   DevSerSetParameter,
-   (DeviceMemberFunction)(&Serial::SerSetParameter),
-   D_VAR_SHORTARR,
-   D_VOID_TYPE
-  },
-  {
-   DevReset,
-   (DeviceMemberFunction)(&Serial::Reset),
-   D_VOID_TYPE,
-   D_VOID_TYPE
-  },
-  {
-   DevState,
-   (DeviceMemberFunction)(&Serial::State),
-   D_VOID_TYPE,
-   D_SHORT_TYPE
-  },
-  {
-   DevStatus,
-   (DeviceMemberFunction)(&Serial::Status),
-   D_VOID_TYPE,
-   D_STRING_TYPE
-  },
- };
- static long n_commands = sizeof(commands_list)/sizeof(DeviceCommandListEntry);
+ this->commands_list[DevSerWriteString] = DeviceCommandListEntry(
+   DevSerWriteString, (DeviceMemberFunction)(&Serial::SerWriteString), D_STRING_TYPE, D_LONG_TYPE, 0, "DevSerWriteString");
+ this->commands_list[DevSerWriteChar] = DeviceCommandListEntry(
+   DevSerWriteChar, (DeviceMemberFunction)(&Serial::SerWriteChar), D_VAR_CHARARR, D_LONG_TYPE, 0, "DevSerWriteChar");
+ this->commands_list[DevSerReadString] = DeviceCommandListEntry(
+   DevSerReadString, (DeviceMemberFunction)(&Serial::SerReadString), D_LONG_TYPE, D_STRING_TYPE, 0, "DevSerReadString");
+ this->commands_list[DevSerReadChar] = DeviceCommandListEntry(
+   DevSerReadChar, (DeviceMemberFunction)(&Serial::SerReadChar), D_LONG_TYPE, D_VAR_CHARARR, 0, "DevSerReadChar");
+ this->commands_list[DevSerSetParameter] = DeviceCommandListEntry(
+   DevSerSetParameter, (DeviceMemberFunction)(&Serial::SerSetParameter), D_VAR_SHORTARR, D_VOID_TYPE, 0, "DevSerSetParameter");
+ this->commands_list[DevReset] = DeviceCommandListEntry(
+   DevReset, (DeviceMemberFunction)(&Serial::Reset), D_VOID_TYPE, D_VOID_TYPE, 0, "DevReset");
+ this->commands_list[DevState] = DeviceCommandListEntry(
+   DevState, (DeviceMemberFunction)(&Serial::State), D_VOID_TYPE, D_SHORT_TYPE, 0, "DevState");
+ this->commands_list[DevStatus] = DeviceCommandListEntry(
+   DevStatus, (DeviceMemberFunction)(&Serial::Status), D_VOID_TYPE, D_STRING_TYPE, 0, "DevStatus");
 
 
 
@@ -415,8 +377,7 @@ Serial::Serial (char *name, long *error)
  // Initialise the commands list to point to the commands list 
  // implemented for the Serial class
  //
- this->n_commands = n_commands;
- this->commands_list = commands_list;
+ this->n_commands = this->commands_list.size();
 
 
 
