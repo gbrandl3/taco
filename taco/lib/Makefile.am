@@ -79,7 +79,7 @@ libdsapig___la_SOURCES 	+= startup.c
 endif
 libdsapig___la_CFLAGS  	= -UCLIENTONLY  
 libdsapig___la_LDFLAGS 	= -version-info @LIB_VERSION@
-libdsapig___la_LIBADD  	= libdsapic.la libtacoapig++.la -lstdc++
+libdsapig___la_LIBADD  	= libdsapic.la libtacoapig++.la 
 
 endif
 

@@ -41,70 +41,70 @@ check_SCRIPT		= taco
 TESTS_ENVIRONMENT 	= 
 
 db_connect_SOURCES 	= db_connect.cpp
-db_connect_LDADD 	= @TACO_CLIENT_LIBS@ @GDBM_LIBS@
+db_connect_LDADD 	= @TACO_CLIENT_LIBS@ @GDBM_LIBS@ -lstdc++
 
 db_resget_SOURCES 	= db_resget.cpp 
-db_resget_LDADD 	= @TACO_CLIENT_LIBS@
+db_resget_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 db_resput_SOURCES 	= db_resput.cpp 
-db_resput_LDADD 	= @TACO_CLIENT_LIBS@
+db_resput_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 db_resdomain_SOURCES 	= db_resdomain.cpp 
-db_resdomain_LDADD 	= @TACO_CLIENT_LIBS@
+db_resdomain_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 db_devdomain_SOURCES 	= db_devdomain.cpp 
-db_devdomain_LDADD 	= @TACO_CLIENT_LIBS@
+db_devdomain_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 dev_export_SOURCES 	= db_devexp.cpp 
-dev_export_LDADD 	= @TACO_CLIENT_LIBS@
+dev_export_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 db_resfamily_SOURCES 	= db_resfamily.cpp 
-db_resfamily_LDADD 	= @TACO_CLIENT_LIBS@
+db_resfamily_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 db_devlist_SOURCES 	= db_devlist.cpp 
-db_devlist_LDADD 	= @TACO_CLIENT_LIBS@
+db_devlist_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 db_serverlist_SOURCES 	= db_serverlist.cpp 
-db_serverlist_LDADD 	= @TACO_CLIENT_LIBS@
+db_serverlist_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 db_hostlist_SOURCES 	= db_hostlist.cpp 
-db_hostlist_LDADD 	= @TACO_CLIENT_LIBS@
+db_hostlist_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 db_dsonhost_SOURCES 	= db_dsonhost.cpp 
-db_dsonhost_LDADD 	= @TACO_CLIENT_LIBS@
+db_dsonhost_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 db_devperslist_SOURCES 	= db_devperslist.cpp 
-db_devperslist_LDADD 	= @TACO_CLIENT_LIBS@
+db_devperslist_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 db_devfamily_SOURCES 	= db_devfamily.cpp 
-db_devfamily_LDADD 	= @TACO_CLIENT_LIBS@
+db_devfamily_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 dev_import_SOURCES 	= test_dev_import.cpp 
-dev_import_LDADD 	= @TACO_CLIENT_LIBS@
+dev_import_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 db_resmember_SOURCES 	= db_resmember.cpp 
-db_resmember_LDADD 	= @TACO_CLIENT_LIBS@
+db_resmember_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 db_devmember_SOURCES 	= db_devmember.cpp 
-db_devmember_LDADD 	= @TACO_CLIENT_LIBS@
+db_devmember_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 dev_ping_SOURCES 	= dev_ping.c
 dev_ping_LDADD 		= @TACO_CLIENT_LIBS@ 
 
 test_starter_SOURCES	= test_start.cpp
-test_starter_LDADD	= @TACO_CLIENT_LIBS@
+test_starter_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 dev_cmdquery_SOURCES	= test_cmd_query.cpp
-dev_cmdquery_LDADD	= @TACO_CLIENT_LIBS@
+dev_cmdquery_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 dev_conparams_SOURCES	= test_con_params.cpp
-dev_conparams_LDADD	= @TACO_CLIENT_LIBS@
+dev_conparams_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 db_getresoval_SOURCES	= db_getresoval.cpp
-db_getresoval_LDADD	= @TACO_CLIENT_LIBS@
+db_getresoval_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 db_getdevexp_SOURCES	= db_getdevexp.cpp
-db_getdevexp_LDADD	= @TACO_CLIENT_LIBS@
+db_getdevexp_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 $(srcdir)/package.m4:	$(top_srcdir)/configure.ac
 	{\
@@ -134,12 +134,12 @@ clean-local:
 noinst_HEADERS		= test_server.h test_serverP.h
 
 test_server_SOURCES 	= test_server.cpp
-test_server_LDADD 	= @TACO_SERVER_CXX_LIBS@ 
+test_server_LDADD 	= @TACO_SERVER_CXX_LIBS@ -lstdc++
 
 test_client_SOURCES 	= test_client.cpp
-test_client_LDADD 	= @TACO_CLIENT_CXX_LIBS@ 
+test_client_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 
 test_status_SOURCES 	= test_status.cpp
-test_status_LDADD 	= @TACO_CLIENT_CXX_LIBS@ 
+test_status_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
