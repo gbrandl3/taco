@@ -13,9 +13,9 @@
 
  Original: 	January 1991
 
- Version:	$Revision: 1.16 $
+ Version:	$Revision: 1.17 $
 
- Date:		$Date: 2004-07-08 17:02:33 $
+ Date:		$Date: 2004-09-13 09:20:59 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -68,9 +68,9 @@ char *getTimeString(const char *name)
 {
         time_t          tps = time((time_t *)NULL);
         struct tm       *time_tm = localtime(&tps);
+	static char	message[80];
         char            *tps_str = asctime(time_tm);
         tps_str[24] = '\0';
-	static char	message[80];
 	
 	snprintf(message, sizeof(message), "%s : %s : ", name, tps_str);
 	return message;
