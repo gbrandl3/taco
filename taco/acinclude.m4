@@ -21,7 +21,7 @@ AC_DEFUN(TACO_TCL_BINDING,
 
 AC_DEFUN(TACO_MYSQL_SUPPORT,
 [
-	AC_ARG_ENABLE(mysqldbm, AC_HELP_STRING(--enable-mysqldbm, [build the database server with mysql support default=yes]),
+	AC_ARG_ENABLE(mysqldbm, AC_HELP_STRING(--enable-mysqldbm, [build the database server with mysql support @<:@default=yes@:>@]),
 		[case "${enable_mysqldbm}" in
 			yes)	mysql=yes;;
 			*)	mysql=no;;
@@ -34,7 +34,7 @@ AC_DEFUN(TACO_MYSQL_SUPPORT,
 
 AC_DEFUN(TACO_DC_API,
 [
-	AC_ARG_ENABLE(dc, AC_HELP_STRING([--enable-dc], [build the data collector API default=yes]),
+	AC_ARG_ENABLE(dc, AC_HELP_STRING([--enable-dc], [build the data collector API @<:@default=yes@:>@]),
 		[case "${enable_dc}" in
 			yes)	dc=yes;;
 			no)	dc=no;;
@@ -50,7 +50,7 @@ AC_DEFUN(TACO_DC_API,
 AC_DEFUN(TACO_GRETA,
 [
 	AC_REQUIRE([TACO_DC_API])
-	AC_ARG_ENABLE(greta, AC_HELP_STRING([--enable-greta], [build the graphical dbase tool default=yes]),
+	AC_ARG_ENABLE(greta, AC_HELP_STRING([--enable-greta], [build the graphical dbase tool @<:@default=yes@:>@]),
 		[case "${enable_greta}" in
 			yes)	greta=yes;;
 			no)	greta=no;;
@@ -72,7 +72,7 @@ AC_DEFUN(TACO_GRETA,
 
 AC_DEFUN(TACO_ASCII_API,
 [
-	AC_ARG_ENABLE(ascii, AC_HELP_STRING([--enable-ascii], [build the ASCII api default=yes]),
+	AC_ARG_ENABLE(ascii, AC_HELP_STRING([--enable-ascii], [build the ASCII api @<:@default=yes@:>@]),
 		[case "${enable_ascii}" in
 			yes)	ascii=yes;;
 			no)	ascii=no;;
@@ -88,7 +88,7 @@ AC_DEFUN(TACO_ASCII_API,
 AC_DEFUN(TACO_XDEVMENU,
 [
 	AC_REQUIRE([TACO_ASCII_API])
-	AC_ARG_ENABLE(xdevmenu, AC_HELP_STRING([--enable-xdevmenu], [build the graphical ds tool default=yes]),
+	AC_ARG_ENABLE(xdevmenu, AC_HELP_STRING([--enable-xdevmenu], [build the graphical ds tool @<:@default=yes@:>@]),
 		[case "${enable_xdevmenu}" in
 			yes)	xdevmenu=yes;;
 			no)	xdevmenu=no;;
@@ -107,7 +107,7 @@ AC_DEFUN(TACO_XDEVMENU,
 AC_DEFUN(X_AND_MOTIF,
 [
 	AC_REQUIRE([AC_PATH_XTRA])
-	AC_ARG_WITH(motif, AC_HELP_STRING([--with-motif], [Motif default=yes]),[
+	AC_ARG_WITH(motif, AC_HELP_STRING([--with-motif@<:@=ARG@:>@], [Motif @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the Motif installation, e.g. '/usr/local/myMotif']),
 		case  "$with_motif" in
 			yes) 	MOTIF_LIBS="-lXm" ;;
 			no)  	AC_MSG_WARN([You need Motif/Lesstif for greta/xdevmenu]);;
@@ -165,9 +165,9 @@ dnl		this required for RedHat
 		  TACO_GDBM_INC="-I/usr/include/gdbm"
 		  MAKE_GDBM=""		  	
 	else
-		  TACO_GDBM="-L\$(top_srcdir)/gdbm-1.7.3 -lgdbm"
-		  TACO_GDBM_INC="-I\$(top_srcdir)/gdbm-1.7.3"
-		  MAKE_GDBM="gdbm-1.7.3"
+		  TACO_GDBM="-L\$(top_srcdir)/gdbm -lgdbm"
+		  TACO_GDBM_INC="-I\$(top_srcdir)/gdbm"
+		  MAKE_GDBM="gdbm"
 	fi
 	AC_SUBST(TACO_GDBM)
 	AC_SUBST(TACO_GDBM_INC)
@@ -179,7 +179,7 @@ dnl		this required for RedHat
 AC_DEFUN(TACO_DATAPORT_SRC,
 [
  	AC_REQUIRE([AC_CANONICAL_SYSTEM])
-	AC_ARG_ENABLE(dataport, AC_HELP_STRING([--enable-dataport], [enables the dataport support default=yes]),
+	AC_ARG_ENABLE(dataport, AC_HELP_STRING([--enable-dataport], [enables the dataport support @<:@default=yes@:>@]),
 		[
 		case "$enable_dataport" in 
 			yes)	DATAPORT="yes";;
