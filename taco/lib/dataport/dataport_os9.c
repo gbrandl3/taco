@@ -4,7 +4,7 @@
  * $Source: /home/jkrueger1/sources/taco/backup/taco/lib/dataport/dataport_os9.c,v $
  *
  * $Author: jkrueger1 $
- * $Date: 2003-04-25 11:21:42 $
+ * $Date: 2003-05-21 16:19:00 $
  *
  ***************************************************************************/
 
@@ -24,77 +24,82 @@
 static long InitialiseSemaphore();
 static long DeinitialiseSemaphore();
 
-extern int errno;
-
 
 
-/************************************************************************
- Function   :  extern Dataport *CreateDataport()
-
- Description:  create a Dataport
-
- Arg(s) In  :  name      name of Dataport
-               size      size of Dataport body
-
- Return(s)  :  NULL on failure, pointer to Dataport otherwise.
-*************************************************************************/
+/**
+ * create a Dataport
+ * 
+ * @param name name of Dataport
+ * @param size size of Dataport body
+ *
+ * @return  NULL on failure, pointer to Dataport otherwise.
+ */
 extern Dataport *CreateDataport(name,size)   char   *name;
                                              long   size;
 {
-   Dataport   *thisdataport;
-   unsigned   fullsize;
-   short      attr,
-              perm;
+	Dataport	*thisdataport;
+	unsigned	fullsize;
+	short		attr,
+			perm;
+	long		ret;
 
-   long      ret;
+/* 
+ * verify inputs 
+ */
+	if(strlen(name)>10)
+	{
+		fprintf(stderr, "can't crate dataport, name too long (max 10 char)\n");
+		return(NULL);
+	}
+	if(size<=0)
+		return(NULL);
 
-   /* verify inputs */
-   if(strlen(name)>10)
-   {
-      printf("can't crate dataport, name too long (max 10 char)\n");
-      return(NULL);
-   }
-   if(size<=0)
-      return(NULL);
+/* 
+ * open a data module for the port 
+ */
+	fullsize=size+sizeof(Dataport);
+	attr=mkattrevs(MA_REENT,1);
+	perm=   MP_OWNER_READ|MP_OWNER_WRITE| MP_GROUP_READ|MP_GROUP_WRITE| MP_WORLD_READ|MP_WORLD_WRITE;
 
-   /* open a data module for the port */
-   fullsize=size+sizeof(Dataport);
-   attr=mkattrevs(MA_REENT,1);
-   perm=   MP_OWNER_READ|MP_OWNER_WRITE|
-         MP_GROUP_READ|MP_GROUP_WRITE|
-         MP_WORLD_READ|MP_WORLD_WRITE;
+	_mkdata_module(name,fullsize,attr,perm);
+	thisdataport=(Dataport *)modlink(name,MT_ANY);
 
-   _mkdata_module(name,fullsize,attr,perm);
-   thisdataport=(Dataport *)modlink(name,MT_ANY);
-
-   if(thisdataport==(Dataport *)(-1))
-   {
+	if(thisdataport==(Dataport *)(-1))
+	{
 #ifdef EBUG
-      fprintf(stderr,"modlink(%s) failed\n",name,fullsize);
+		fprintf(stderr,"modlink(%s) failed\n",name,fullsize);
 #endif
-      return(NULL);
-   }
+		return(NULL);
+	}
 
-   /* initialise values in dataport */
+/* 
+ * initialise values in dataport 
+ *
+ * initialise pid entry
+ */
+	thisdataport->pid=getpid();
 
-   /* initialise pid entry */
-   thisdataport->pid=getpid();
-
-   /* initialise semaphore entry */
-   if(InitialiseSemaphore(name,&(thisdataport->sem))!=0)
-   {
+/* 
+ * initialise semaphore entry 
+ */
+	if(InitialiseSemaphore(name,&(thisdataport->sem))!=0)
+	{
 #ifdef EBUG
-      fprintf(stderr,"InitialisedSemaphore() failed\n");
+		fprintf(stderr,"InitialisedSemaphore() failed\n");
 #endif
-      /* unlink datamodule */
-      munlink(thisdataport);
-      return(NULL);
-   }
+/* 
+ * unlink datamodule 
+ */
+		munlink(thisdataport);
+		return(NULL);
+	}
 
-   strcpy(thisdataport->semname,name);
+	strcpy(thisdataport->semname,name);
 
-   /* return pointer to initialised dataport */
-   return(thisdataport);
+/* 
+ * return pointer to initialised dataport 
+ */
+	return(thisdataport);
 }
 
 
@@ -112,26 +117,34 @@ extern Dataport *CreateDataport(name,size)   char   *name;
 extern long CloseDataport(thisdataport, name)   Dataport *thisdataport;
 						char     *name;
 {
-   long   i;
-   long ret;
+	long   	i,
+		ret;
 
-   /* check process id */
-   /* if(getpid()!=thisdataport->pid)
-      return(-1);*/
+/* 
+ * check process id 
+ */
+/* 
+	if(getpid()!=thisdataport->pid)
+		return(-1);
+*/
 
-   /* delete the semaphore */
-   if(DeinitialiseSemaphore(thisdataport->semname,&(thisdataport->sem))==(-1))
-   {
-      fprintf(stderr,"DeinitialiseSemaphore() failed\n");
-      return(-1);
-   }
+/* 
+ * delete the semaphore 
+ */
+	if(DeinitialiseSemaphore(thisdataport->semname,&(thisdataport->sem))==(-1))
+	{
+		fprintf(stderr,"DeinitialiseSemaphore() failed\n");
+		return(-1);
+	}
 
-   /* unlink the data module until it goes away */
-     do {
-	ret = munload(name,0);
+/* 
+ * unlink the data module until it goes away 
+ */
+	do 
+	{
+		ret = munload(name,0);
 	}while(ret != -1);
-
-   return(0);
+	return(0);
 }
 
 
@@ -149,14 +162,12 @@ extern long CloseDataport(thisdataport, name)   Dataport *thisdataport;
 extern Dataport *OpenDataport(name, size)   char   *name;
 				      long   size;
 {
-   Dataport *thisdataport;
+	Dataport *thisdataport;
 
-   thisdataport=(Dataport *)modlink(name,MT_ANY);
-   if(thisdataport==(Dataport *)(-1))
-   {
-      return(NULL);
-   }
-   return(thisdataport);
+	thisdataport=(Dataport *)modlink(name,MT_ANY);
+	if(thisdataport==(Dataport *)(-1))
+		return(NULL);
+	return(thisdataport);
 }
 
 
@@ -172,9 +183,9 @@ extern Dataport *OpenDataport(name, size)   char   *name;
 *************************************************************************/
 extern long AccessDataport(dp)   Dataport   *dp;
 {
-   if(_ev_wait_t(dp->sem,0,32767,OS9_DEADLOCK_WAIT,0)==(-1))
-      return(-1);
-   return(0);
+	if(_ev_wait_t(dp->sem,0,32767,OS9_DEADLOCK_WAIT,0)==(-1))
+		return(-1);
+	return(0);
 }
 
 
@@ -190,14 +201,10 @@ extern long AccessDataport(dp)   Dataport   *dp;
 *************************************************************************/
 extern long ReleaseDataport(dp)   Dataport   *dp;
 {
-   int ret;
-   ret=0;
-   errno=0;
-   ret=_ev_signal(dp->sem,0x8000);
+	int	ret = 0;
 
-   if(errno!=0)
-      return(-1);
-   return(0);
+	ret=_ev_signal(dp->sem,0x8000);
+	return (errno!=0) ? (-1) : (0);
 }
 
 
@@ -216,13 +223,13 @@ extern long ReleaseDataport(dp)   Dataport   *dp;
 static long InitialiseSemaphore(name,sem)   char         *name;
                                             Semaphore   *sem;
 {
-   int semid;
+	int semid;
 
-   semid=_ev_creat(0,-1,1,name);
-   if (semid == -1)
-      return(-1);
-   *sem = semid;
-   return(0);
+	semid=_ev_creat(0,-1,1,name);
+	if (semid == -1)
+		return(-1);
+	*sem = semid;
+	return(0);
 }
 
 
@@ -240,11 +247,10 @@ static long InitialiseSemaphore(name,sem)   char         *name;
 static long DeinitialiseSemaphore(name,sem)   char         *name;
                                               Semaphore   *sem;
 {
-   do
-   {
-      _ev_unlink(*sem);
-   } while(_ev_delete(name)!=(-1));
-
-   return(0);
+	do
+	{
+		_ev_unlink(*sem);
+	} while(_ev_delete(name)!=(-1));
+	return(0);
 }
 

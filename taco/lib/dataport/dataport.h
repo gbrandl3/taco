@@ -1,14 +1,25 @@
-#ifndef DATAPORT_H
-#define DATAPORT_H
-
 /***************************************************************************
  *
- * $Source: /home/jkrueger1/sources/taco/backup/taco/lib/dataport/dataport.h,v $
+ * Author:	$Author: jkrueger1 $
  *
- * $Author: jkrueger1 $
- * $Date: 2003-04-25 11:21:42 $
+ * Version:	$Revision: 1.2 $
+ *
+ * Date:	$Date: 2003-05-21 16:19:00 $
  *
  ***************************************************************************/
+
+/**
+ * @defgroup dataportAPI Data port API
+ * @ingroup API
+ * These functions allow the access to the data port
+ *
+ * The dataport library allows uses to create and share data structures
+ * on Unix and OS9 via shared memory. Synchronisation is achieved
+ * with semaphores.
+ */
+
+#ifndef DATAPORT_H
+#define DATAPORT_H
 
 #if (OSK || _OSK)
 /* OS-9 version */
