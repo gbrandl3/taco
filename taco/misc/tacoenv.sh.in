@@ -40,7 +40,7 @@ RES_BASE_DIR=${RES_BASE_DIR:-@resdatadir@}
 DBM_DIR=@dbmdir@
 LOGPATH=@datadir@/taco/log
 NETHOST=${NETHOST:-`@HOSTNAME@`}
-if [ "$DSHOME" = "$prefix" ] ; then
+if test "$DSHOME" = "$prefix" ; then
 	LD_LIBRARY_PATH=@libdir@${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
 	TACO_PATH=@sbindir@
 	PATH=${TACO_PATH}:@bindir@${PATH:+:}${PATH}
@@ -48,6 +48,18 @@ else
 	LD_LIBRARY_PATH=${DSHOME}/lib/${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
 	TACO_PATH=${DSHOME}/sbin/
 	PATH=${TACO_PATH}:${DSHOME}/bin/${PATH:+:}${PATH}
+fi
+
+if test x"$TACO_LOGGING" = x"yes" -a ! -d $LOGPATH ; then
+	mkdir -p $LOGPATH
+fi
+
+if test ! -d $DSHOME/system/error ; then
+	mkdir -p $DSHOME/system/error
+fi
+
+if test ! -d $DSHOME/system/pipe ; then
+	mkdir -p $DSHOME/system/pipe
 fi
 
 LD_LIBRARY_PATH=@GCC_LIBRARY_PATH@:${LD_LIBRARY_PATH}
