@@ -73,6 +73,7 @@ else
 	endif
 endif
 
+setenv LD_LIBRARY_PATH @GCC_LIBRARY_PATH@:${LD_LIBRARY_PATH}
 
 if (${?PYTHONPATH}) then
 	setenv PYTHONPATH @pkgpythondir@:@pkgpyexecdir@:${PYTHONPATH}

@@ -38,6 +38,7 @@ else
 	PATH=${TACO_PATH}:${DSHOME}/bin/${PATH:+:}${PATH}
 fi
 
+LD_LIBRARY_PATH=@GCC_LIBRARY_PATH@:${LD_LIBRARY_PATH}
 PYTHONPATH=@pkgpythondir@:@pkgpyexecdir@${PYTHONPATH:+:}${PYTHONPATH}
 unset DBTABLES_CUSTOM
 
