@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * File:        $Id: startup.cpp,v 1.2 2003-05-23 13:05:51 jkrueger1 Exp $
+ * File:        $Id: startup.cpp,v 1.3 2003-08-13 16:34:22 jkrueger1 Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
@@ -11,9 +11,9 @@
  *
  * Original:	January 2003
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Revision:	$Date: 2003-05-23 13:05:51 $
+ * Revision:	$Date: 2003-08-13 16:34:22 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -140,7 +140,7 @@ long startup(char *pszServerName, long *plError)
 
 
 #ifndef HOST_NAME_MAX
-#define HOST_NAME_MAX   _SC_HOST_NAME_MAX
+#define HOST_NAME_MAX   255
 #endif
 
 /**
