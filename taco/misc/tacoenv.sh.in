@@ -24,12 +24,12 @@ if [ "$DSHOME" = "$prefix" ] ; then
 	export TACO_PATH=@sbindir@
 	export PATH=${TACO_PATH}:@bindir@${PATH:+:}${PATH}
 else
-	export LD_LIBRARY_PATH=${DSHOME}/lib/@taco_install_path@${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
-	export TACO_PATH=${DSHOME}/system/bin/@taco_install_path@
-	export PATH=${TACO_PATH}:${DSHOME}/bin/@taco_install_path@${PATH:+:}${PATH}
+	export LD_LIBRARY_PATH=${DSHOME}/lib/${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
+	export TACO_PATH=${DSHOME}/sbin/
+	export PATH=${TACO_PATH}:${DSHOME}/bin/${PATH:+:}${PATH}
 fi
 
-export PYTHONPATH=${DSHOME}/python/@taco_install_path@${PYTHONPATH:+:}${PYTHONPATH}
+export PYTHONPATH=${DSHOME}/python/${PYTHONPATH:+:}${PYTHONPATH}
 unset DBTABLES_CUSTOM
 
 export MYSQL_USER=root

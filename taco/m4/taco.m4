@@ -11,11 +11,11 @@ dnl    	AC_MSG_CHECKING([for TACO base])
             taco_includes=${prefix}/include
             ac_taco_includes=$prefix/include
             if test "${exec_prefix}" != NONE; then
-            	taco_libraries=${exec_prefix}/lib/${taco_install_path}
-            	ac_taco_libraries=$exec_prefix/lib/${taco_install_path}
+            	taco_libraries=${exec_prefix}/lib
+            	ac_taco_libraries=$exec_prefix/lib
             else
-            	taco_libraries=${prefix}/lib/${taco_install_path}
-            	ac_taco_libraries=$prefix/lib/${taco_install_path}
+            	taco_libraries=${prefix}/lib
+            	ac_taco_libraries=$prefix/lib
             fi
     	else
 	    ac_taco_path=""
@@ -42,7 +42,7 @@ So, check this please and use another prefix!])
         	fi
  
         	taco_libdirs="$ac_taco_libraries"
-		test -n "$DSHOME" && taco_libdirs="$taco_libdirs $DSHOME/lib/${taco_install_path} "
+		test -n "$DSHOME" && taco_libdirs="$taco_libdirs $DSHOME/lib/"
         	taco_libdirs="$taco_libdirs /usr/lib/taco/lib \
                 /usr/local/taco/lib /usr/taco/lib /usr/lib/taco /usr/lib /opt/taco/lib "
         	AC_FIND_FILE(libdsapi.so, $taco_libdirs, taco_libdir)
@@ -81,7 +81,7 @@ So, check this please and use another prefix!])
             	AC_MSG_RESULT([will be installed in $ac_taco_prefix and $ac_taco_exec_prefix])
             fi
  
-            taco_libraries="${ac_taco_exec_prefix}/lib/${taco_install_path}"
+            taco_libraries="${ac_taco_exec_prefix}/lib/"
             taco_includes="${ac_taco_prefix}/include" 
    	else
             ac_cv_have_taco="have_taco=yes \
@@ -117,36 +117,26 @@ dnl	TACO_CHECK_TACO_SYSTEM
 dnl
 dnl    	uses $target, $target_alias, $target_cpu, $target_vendor, $target_os
 dnl
-dnl	produces $taco_config, $taco_install_path (this is the machine specific extention 
-dnl			for exec and lib)
+dnl	produces $taco_config 
 dnl
 AC_DEFUN([TACO_CHECK_TACO_SYSTEM], 
     [
     	AC_REQUIRE([AC_CANONICAL_SYSTEM])
-    	taco_install_path=""
     	case "$target" in
             i[[3456]]86-*-linux|i[[3456]]86-*-linux-*|i[[3456]]-*-cygwin*)
                         taco_config="unix=1 __unix=1 linux=1 x86=1";;
             m68k-*-linux-*) 
 			taco_config="unix=1 __unix=1 linux=1 68k=1";;
-dnl			taco_install_path="linux/68k" ;;
             *-*-solar*-* | *-*-sun*-*)
                         taco_config="unix=1 __unix=1 _solaris=1 __solaris__=1";;
-dnl			taco_install_path="solaris" ;;
             *-*-hp*-*)
 			taco_config="unix=1 __unix=1 __hpux=1 __hpux10=1 __hp9000s700=1 __hpux9000s700=1";;
-dnl			taco_install_path="hpux" ;;
             *-*-OS?-*)      
 			taco_config="_UCC=1";;
-dnl			taco_install_path="os9" ;;
             *)              
 			taco_config="unknown $target" ;;
     	esac
-	taco_install_path="$target_os/$target_cpu"
     	AC_SUBST(taco_config)
-    	AC_SUBST(taco_install_path)
-	libdir="${libdir}/${taco_install_path}"
-	bindir="${bindir}/${taco_install_path}"
     ]
 )
 

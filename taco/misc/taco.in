@@ -23,7 +23,7 @@ fi
 . "$taco_env_file" 
 
 # Check for TACO manager executable
-taco_manager="$DSHOME/system/bin/@taco_install_path@/Manager"
+taco_manager="${TACO_PATH}/Manager"
 if ! test -x $taco_manager ; then
 	echo "error: TACO manager '$taco_manager' is not installed"
 	exit 5

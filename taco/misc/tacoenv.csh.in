@@ -4,7 +4,7 @@ setenv prefix @prefix@
 setenv exec_prefix @exec_prefix@
 setenv libdir @libdir@
 setenv bindir @bindir@
-setenv sbindi =@sbindir@
+setenv sbindir @sbindir@
 
 # Add your domain tables here (comma seperated)
 if (${?DBTABLES_CUSTOM}) then
@@ -52,23 +52,23 @@ if ( $DSHOME == $prefix ) then
 	endif
 else
 	if (${?LD_LIBRARY_PATH}) then
-		setenv LD_LIBRARY_PATH ${DSHOME}/lib/@taco_install_path@:${LD_LIBRARY_PATH}
+		setenv LD_LIBRARY_PATH ${DSHOME}/lib/:${LD_LIBRARY_PATH}
 	else
-		setenv LD_LIBRARY_PATH ${DSHOME}/lib/@taco_install_path@
+		setenv LD_LIBRARY_PATH ${DSHOME}/lib/
 	endif
-	setenv TACO_PATH ${DSHOME}/system/bin/@taco_install_path@
+	setenv TACO_PATH ${DSHOME}/sbin/
 	if (${?PATH}) then
-		setenv PATH ${TACO_PATH}:${DSHOME}/bin/@taco_install_path@:${PATH}
+		setenv PATH ${TACO_PATH}:${DSHOME}/bin/:${PATH}
 	else
-		setenv PATH ${TACO_PATH}:${DSHOME}/bin/@taco_install_path@
+		setenv PATH ${TACO_PATH}:${DSHOME}/bin/
 	endif
 endif
 
 
 if (${?PYTHONPATH}) then
-	setenv PYTHONPATH ${DSHOME}/python/@taco_install_path@:${PYTHONPATH}
+	setenv PYTHONPATH ${DSHOME}/python/:${PYTHONPATH}
 else
-	setenv PYTHONPATH ${DSHOME}/python/@taco_install_path@
+	setenv PYTHONPATH ${DSHOME}/python/
 endif
 
 unsetenv DBTABLES_CUSTOM
