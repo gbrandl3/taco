@@ -24,3 +24,7 @@
 #DEFAULT (echo ""; id; echo %s; date; cat) >> $CVSROOT/CVSROOT/commitlog
 # or
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
+
+CVSROOT $CVSROOT/CVSROOT/cvs-email -m jens.krueger@frm2.tu-muenchen.de -s -f /dev/null
+DEFAULT $CVSROOT/CVSROOT/cvs-email -m taco-devel@lists.sourceforge.net -s -f /dev/null
+
