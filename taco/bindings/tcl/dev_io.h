@@ -11,9 +11,9 @@
  * Description: This file is necessary to compile dev_io.c
  *           	It contains all the necessary datas
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2003-05-07 13:19:25 $
+ * Date:	$Date: 2004-07-14 09:35:46 $
 */
 
 #ifndef DEV_IO_H
@@ -71,19 +71,19 @@ typedef struct IMPORTED_DEVICE  {
 #define OUTPUT 1
 
 /* Necessary for the dev_putget command */
-void *InputArg,*OutputArg;
+extern 	void 	*InputArg,
+		*OutputArg;
 
 /* Necessary for variable array */
-void *SequencePointer;
+extern 	void 	*SequencePointer;
 
 /* length of TclAux variable */
 #define TCLAUX_LENGTH 80 
                             
 /* Necessary for the type string */
-char *StringType;
-char *StringTypeOut;  /* GP140197 */
-DevString *StringArray;
-
+extern	DevString	StringType;
+extern	DevString	StringTypeOut;  /* GP140197 */
+extern 	DevString 	*StringArray;
 
        /* To encapsulate the variables */
 IMPORTED_DEVICE* GetImportedDevice (IMPORTED_DEVICE *Device);

@@ -31,9 +31,9 @@
  *
  *		In this version only two modes of debug are possible (0=no debug mode 1=debug mode)
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2003-05-07 13:42:42 $
+ * Date:	$Date: 2004-07-14 09:35:46 $
  */
 
 /* Codecenter comments to supress some warnings at load-time */
@@ -48,6 +48,8 @@
 
 /* Global variables */
 /* ---------------- */
+
+int	TCL_TEST;
 
 static int DEBUG_MODE=DEBUG_LEVEL_0;         /* Flag for debug mode      */
                                              /* default = 0 : no debug   */

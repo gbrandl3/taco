@@ -12,13 +12,21 @@
  *  	  	All the functions present in this file are used for the conversion
  *  	  	of the input and output arguments passed to dev_putget.
  *
- * Version:	$Revision: 1.1 $
+ * Version:	$Revision: 1.2 $
  *
- * Date:	$Date: 2003-03-18 16:28:23 $
+ * Date:	$Date: 2004-07-14 09:35:46 $
 */
 
 #include <dev_io.h>
 #include <debug.h>
+
+void		*InputArg,
+		*OutputArg,
+		*SequencePointer;
+
+DevString	StringType,
+		StringTypeOut,
+		*StringArray;
 
 /* #define CONV_TRACE */
 
