@@ -13,10 +13,10 @@
  Original:      July 1993
 
 
- $Revision: 1.1 $
- $Date: 2003-04-25 11:21:24 $
+ $Revision: 1.2 $
+ $Date: 2004-11-03 14:51:39 $
 
- $Author: jkrueger1 $
+ $Author: andy_gotz $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -195,4 +195,12 @@
 #define DevSCBase (CntrlTeamNumber + DS_LSHIFT(83, DS_IDENT_SHIFT))
 /* Radiation Survey Class base */
 #define DevRadSurveyBase (CntrlTeamNumber + DS_LSHIFT(84, DS_IDENT_SHIFT))
+/* Tsx57 Protocol Class base */
+#define DevTsx57Base (CntrlTeamNumber + DS_LSHIFT(85, DS_IDENT_SHIFT))
+/* Micos Motor Controller Class base */
+#define DevMicosBase (CntrlTeamNumber + DS_LSHIFT(86, DS_IDENT_SHIFT))
+/* Modbus protocol Class base */
+#define DevModb_protBase (CntrlTeamNumber + DS_LSHIFT(87, DS_IDENT_SHIFT))
+/* Oxford 700 cryo controller Class base */
+#define DevOxford700Base (CntrlTeamNumber + DS_LSHIFT(88, DS_IDENT_SHIFT))
 #endif	/* _CntrlDsNumbers_h */
