@@ -12,9 +12,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.4 $
+ Version    :	$Revision: 1.5 $
 
- Date       : 	$Date: 2003-05-16 13:47:46 $
+ Date       : 	$Date: 2004-02-11 10:27:32 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -259,8 +259,8 @@ _DLLFunc void dev_printerror (DevShort mode, char *fmt, ...)
 		return;
 	}
 
-	/*
- * get variable argument list pointer in order to pass it to vsprintf()
+/*
+ * get variable argument list pointer in order to pass it to vsnprintf()
  */
 #if (defined sun) || (defined irix)
 	va_start(args);
@@ -268,7 +268,7 @@ _DLLFunc void dev_printerror (DevShort mode, char *fmt, ...)
 	va_start(args, fmt);
 #endif /* sun */
 
-	vsnprintf (buffer, sizeof(buffer), fmt,args);
+	vsnprintf (buffer, sizeof(buffer), fmt, args);
 	strcat (buffer,"\n");
 
 	va_end(args);
@@ -282,9 +282,7 @@ _DLLFunc void dev_printerror (DevShort mode, char *fmt, ...)
             */
 
 		if ( config_flags.message_server )
-		{
 			msg_send ( ERROR_TYPE );
-		}
 		else
 		{
 #ifdef _NT
@@ -332,13 +330,9 @@ _DLLFunc void dev_printerror (DevShort mode,char *fmt, char *str)
 	}
 
 	if (str != NULL)
-	{
-		snprintf (buffer, sizeof(buffer), fmt,str);
-	}
+		snprintf (buffer, sizeof(buffer), fmt, str);
 	else
-	{
 		snprintf (buffer, sizeof(buffer), fmt);
-	}
 	if (strlen(buffer) < sizeof(buffer) - 2)
 		strcat (buffer,"\n");
 	else
@@ -352,9 +346,7 @@ _DLLFunc void dev_printerror (DevShort mode,char *fmt, char *str)
  * send messages to message server if imported
  */
 		if ( config_flags.message_server )
-		{
 			msg_send ( ERROR_TYPE );
-		}
 		else
 		{
 #ifdef _NT
@@ -432,7 +424,7 @@ void _DLLFunc dev_printdebug (long debug_bits, char *fmt, ...)
 	char		debug_string[256];
 	va_list	args;
 /*
- * get variable argument list pointer in order to pass it to vsprintf()
+ * get variable argument list pointer in order to pass it to vsnprintf()
  */
 #if (defined sun) || (defined irix)
 	va_start(args);
@@ -440,16 +432,15 @@ void _DLLFunc dev_printdebug (long debug_bits, char *fmt, ...)
 	va_start(args, fmt);
 #endif /* sun */
 
-	/*
-	 *  is debuging switched on ?
-	 */
+/*
+ *  is debuging switched on ?
+ */
 
 	if ( debug_flag & DEBUG_ON_OFF )
 	{
-     	   /*
-	    *  are the right debug bits set ?
-	    */
-
+/*
+ *  are the right debug bits set ?
+ */
 		if ( (debug_flag & debug_bits) != 0 )
 		{
 			vsnprintf (debug_string, sizeof(debug_string), fmt,args);
@@ -566,7 +557,7 @@ _DLLFunc void dev_printdiag (DevShort mode, char *fmt, ...)
 		return;
 	}
 /*
- * get variable argument list pointer in order to pass it to vsprintf()
+ * get variable argument list pointer in order to pass it to vsnprintf()
  */
 #if (defined sun) || (defined irix)
 	va_start(args);
@@ -575,12 +566,12 @@ _DLLFunc void dev_printdiag (DevShort mode, char *fmt, ...)
 #endif /* sun */
 
 /*
- * vsprintf() gives a core dump at present (17sep94) replace it with
- * a simple sprintf() and ignore the variable arguments for the moment
+ * vsnprintf() gives a core dump at present (17sep94) replace it with
+ * a simple snprintf() and ignore the variable arguments for the moment
  *
  	snprintf (buffer, sizeof(buffer), fmt);
  */
-	vsnprintf (buffer, sizeof(buffer), fmt,args);
+	vsnprintf (buffer, sizeof(buffer), fmt, args);
 	va_end(args);
 	msg_write ( DIAG_TYPE, buffer );
 
@@ -590,9 +581,7 @@ _DLLFunc void dev_printdiag (DevShort mode, char *fmt, ...)
  * send messages to message server if imported
  */
 		if ( config_flags.message_server )
-		{
 			msg_send ( DIAG_TYPE );
-		}
 		else
 		{
 #ifdef _NT
@@ -656,9 +645,7 @@ void dev_printdiag (DevShort mode,char *fmt,char *str)
  * send messages to message server if imported
  */
 		if ( config_flags.message_server )
-		{
 			msg_send ( DIAG_TYPE );
-		}
 		else
 		{
 #ifdef _NT
@@ -683,12 +670,17 @@ void dev_printdiag (DevShort mode,char *fmt,char *str)
  */
 static void msg_write (_Int msg_type, char *msg_string)
 {
-	char 	*help;
-	int  	len;
-	int   	i;
+	char 		*help,
+			*time_string;
+	int  		len;
+	int   		i;
 	int		pid = 0;
-	static short init_flg = 0;
+	static short 	init_flg = 0;
+	time_t		clock;
 
+	time (&clock);
+	time_string = ctime (&clock);
+	time_string[strlen(time_string) - 1] = ':';
 /*
  * initialise all message buffer
  */
@@ -708,7 +700,7 @@ static void msg_write (_Int msg_type, char *msg_string)
  */
 	if ( message_buffer[msg_type].init_flg == 0 )
 	{
-		len = strlen(msg_string) + 1;
+		len = strlen(time_string) + strlen(msg_string) + 1;
 		if ( (message_buffer[msg_type].messages = (char *)malloc (len)) == NULL )
 		{
 #ifdef _NT
@@ -729,7 +721,8 @@ static void msg_write (_Int msg_type, char *msg_string)
 		}
 
 		message_buffer[msg_type].nbytes = len;
-		strcpy ( message_buffer[msg_type].messages , msg_string);
+		strcpy(message_buffer[msg_type].messages, time_string);
+		strcat(message_buffer[msg_type].messages , msg_string);
 		message_buffer[msg_type].init_flg = 1;
 	}
 
@@ -738,7 +731,7 @@ static void msg_write (_Int msg_type, char *msg_string)
  * reallocate space for further messages
  */
 	{
-		len = message_buffer[msg_type].nbytes + strlen (msg_string);
+		len = message_buffer[msg_type].nbytes + strlen (msg_string) + strlen(time_string);
 		help = message_buffer[msg_type].messages;
 
 		if ((help=(char *)realloc(message_buffer[msg_type].messages,len)) == NULL)
@@ -770,6 +763,7 @@ static void msg_write (_Int msg_type, char *msg_string)
 
 		message_buffer[msg_type].nbytes = len;
 		message_buffer[msg_type].messages = help;
+		strcat ( message_buffer[msg_type].messages , time_string);
 		strcat ( message_buffer[msg_type].messages , msg_string);
 	}
 }
@@ -1179,10 +1173,7 @@ static long setup_config (long *error)
 	static char			host_name[SHORT_NAME_SIZE];
 	static struct _devserver	msg_ds, db_ds;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_API,
-	    "\nsetup_config() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_API, "\nsetup_config() : entering routine\n");
 
 #ifdef WIN32
 	if (!win32_rpc_inited)
@@ -1368,7 +1359,7 @@ static long setup_config (long *error)
 	if (max_nethost <= 0) 
 		nethost_alloc(error);
 	strncpy(nethost,nethost_env,SHORT_NAME_SIZE);
-//	sprintf(nethost, "%s",nethost_env);
+//	snprintf(nethost, sizeof(nethost), "%s",nethost_env);
 
 	strcpy(multi_nethost[0].nethost,nethost);
 	multi_nethost[0].config_flags = config_flags;
@@ -1426,10 +1417,7 @@ long setup_config_multi (char *nethost, long *error)
 	*error = DS_OK;
 	memset ((char *)&manager_data,0,sizeof(manager_data));
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_API,
-		    "\nsetup_config_multi() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_API, "\nsetup_config_multi() : entering routine\n");
 
 /*
  *  read environmental variable NETHOST
@@ -1479,10 +1467,7 @@ long setup_config_multi (char *nethost, long *error)
 			}
 		}
 		i_nethost = i;
-#ifdef EBUG
-		dev_printdebug (DBG_TRACE | DBG_API,
-		    "\nsetup_config_multi() : add nethost %d\n",i_nethost);
-#endif /* EBUG */
+		dev_printdebug (DBG_TRACE | DBG_API, "\nsetup_config_multi() : add nethost %d\n",i_nethost);
 /*
  * if this is the first time a nethost is being defined or the nethost
  * then table is full therefore allocate space for another MIN_NETHOST 
@@ -1763,10 +1748,7 @@ static char *get_error_string (long error)
 	static char	*db_error_mess=(char*)"Failed to get error message from database\n";
 
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_API,
-	    "\nget_error_string() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_API, "\nget_error_string() : entering routine\n");
 
 	db_error = DS_OK;
 
@@ -1828,12 +1810,8 @@ static char *get_error_string (long error)
 
 	snprintf (res_path, sizeof(res_path), "ERROR/%d/%d", team, server);
 	snprintf (res_name, sizeof(res_name), "%d", error_ident);
-#ifdef EBUG
-	dev_printdebug (DBG_API,
-	    "get_error_string() : res_path = %s\n", res_path);
-	dev_printdebug (DBG_API,
-	    "get_error_string() : res_name = %s\n", res_name);
-#endif /* EBUG */
+	dev_printdebug (DBG_API, "get_error_string() : res_path = %s\n", res_path);
+	dev_printdebug (DBG_API, "get_error_string() : res_name = %s\n", res_name);
 
 	res_tab.resource_name = res_name;
 	res_tab.resource_type = D_STRING_TYPE;
@@ -1845,11 +1823,7 @@ static char *get_error_string (long error)
 
 	if (db_getresource (res_path, &res_tab, 1, &db_error) == DS_NOTOK)
 	{
-#ifdef EBUG
-		dev_printdebug (DBG_API | DBG_ERROR,
-		    "get_error_string() : db_getresource failed with error %d\n",
-		    db_error);
-#endif /* EBUG */
+		dev_printdebug (DBG_API | DBG_ERROR, "get_error_string() : db_getresource failed with error %d\n", db_error);
 
 /*
  * If the database call returned an error, search the global
