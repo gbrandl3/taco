@@ -21,13 +21,14 @@ export LOGPATH="${DSHOME}/log"
 export NETHOST="${NETHOST:-`hostname|cut -f1 -d'.'`}"
 if [ "$DSHOME" = "$prefix" ] ; then
 	export LD_LIBRARY_PATH="@libdir@${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}"
-	export TACO_PATH="@bindir@:@sbindir@"
+	export TACO_PATH=@sbindir@"
+	export PATH="${TACO_PATH}:@bindir@${PATH:+:}${PATH}"
 else
 	export LD_LIBRARY_PATH="${DSHOME}/lib/@taco_install_path@${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}"
-	export TACO_PATH="${DSHOME}/bin/@taco_install_path@:${DSHOME}/system/bin/@taco_install_path@"
+	export TACO_PATH=${DSHOME}/system/bin/@taco_install_path@"
+	export PATH="${TACO_PATH}:${DSHOME}/bin/@taco_install_path@${PATH:+:}${PATH}"
 fi
 
-export PATH="${TACO_PATH}${PATH:+:}${PATH}"
 
 export PYTHONPATH="${DSHOME}/python/@taco_install_path@${PYTHONPATH:+:}${PYTHONPATH}"
 unset DBTABLES_CUSTOM
