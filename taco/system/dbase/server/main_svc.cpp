@@ -4,13 +4,20 @@
 
 #include "config.h"
 
+#ifdef DARWIN
+#include <rpc/types.h>
+#include <netinet/in.h>
+#include <rpc/xdr.h>
+#include <rpc/auth.h>
+#include <rpc/clnt.h>
+#include "svc.h"
+#endif
+
 #include <dbClass.h>
-#ifdef HAVE_MYSQL_MYSQL_H
+#	ifdef HAVE_MYSQL_MYSQL_H
 #include <MySqlServer.h>
 #endif
 #include <NdbmServer.h>
-
-#include <rpc/clnt.h>            /* for get_myaddress() */
 //
 // RPC function not defined within rpc include files !!
 // M. Diehl, 15.11.99
@@ -251,12 +258,13 @@ int main(int argc,char **argv)
 // Register the server in TCP and UDP for version 1,2 and 3
 //
 #ifdef DARWIN
-	typedef void (* MyRpcFuncPtr)();
+        typedef void (* MyRpcFuncPtr)();
 #else
 	typedef void (* MyRpcFuncPtr)(struct svc_req *, SVCXPRT *);
 #endif
 	MyRpcFuncPtr setup_prog;
-	setup_prog = db_setupprog_1; 
+        setup_prog = (MyRpcFuncPtr)db_setupprog_1;
+
 #ifdef ALONE
 	if (!svc_register(transp_udp,DB_SETUPPROG,DB_SETUPVERS,setup_prog,IPPROTO_UDP))
 	{

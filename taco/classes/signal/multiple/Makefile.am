@@ -10,3 +10,7 @@ LDADD= @TACO_SERVER_LIBS@ ../single/libdssig.la
 bin_PROGRAMS = MDSSignal 
 
 MDSSignal_SOURCES = MDSSignal.c  MDSSignal_config.c
+
+if !BUILTIN_STARTUP
+MDSSignal_SOURCES += $(top_srcdir)/lib/startup.c
+endif

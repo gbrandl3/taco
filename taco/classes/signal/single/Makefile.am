@@ -12,5 +12,9 @@ DSSignal_LDADD = libdssig.la @TACO_SERVER_LIBS@
 
 libdssig_la_SOURCES = DSSignal.c
 
+if !BUILTIN_STARTUP
+DSSignal_SOURCES += $(top_srcdir)/lib/startup.c
+endif
+
 libdssig_la_LIBADD = @TACO_SERVER_LIBS@
 

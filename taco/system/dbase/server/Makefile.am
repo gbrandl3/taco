@@ -1,4 +1,4 @@
-noinst_HEADERS		= NdbmClass.h NdbmServer.h MySqlServer.h dbClass.h
+noinst_HEADERS		= NdbmClass.h NdbmServer.h MySqlServer.h dbClass.h svc.h
 
 sbin_PROGRAMS		= dbm_server
 

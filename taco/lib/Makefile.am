@@ -53,16 +53,25 @@ libdsapic_la_SOURCES	= ds_prog_vers3.c oic.c \
 
 
 libdsapinomain_la_CPPFLAGS	= -DNOMAIN
-libdsapinomain_la_SOURCES 	= DevServerMain.c startup.c
+libdsapinomain_la_SOURCES 	= DevServerMain.c 
+if BUILTIN_STARTUP
+libdsapinomain_la_SOURCES 	+= startup.c
+endif
 libdsapinomain_la_LDFLAGS 	= -version-info @LIB_VERSION@
 libdsapinomain_la_LIBADD  	= libdsapic.la libtacoapi.la 
 
-libdsapi_la_SOURCES 	= DevServerMain.c startup.c  
+libdsapi_la_SOURCES 	= DevServerMain.c 
+if BUILTIN_STARTUP
+libdsapi_la_SOURCES 	+= startup.c  
+endif
 libdsapi_la_CPPFLAGS  	= -UCLIENTONLY 
 libdsapi_la_LDFLAGS 	= -version-info @LIB_VERSION@
 libdsapi_la_LIBADD  	= libdsapic.la libtacoapi.la 
 
-libdsapig___la_SOURCES 	= Device.C OICDevice.C DevServerMain.c startup.c 
+libdsapig___la_SOURCES 	= Device.C OICDevice.C DevServerMain.c 
+if BUILTIN_STARTUP
+libdsapig___la_SOURCES 	+= startup.c 
+endif
 libdsapig___la_CFLAGS  	= -UCLIENTONLY  
 libdsapig___la_LDFLAGS 	= -version-info @LIB_VERSION@
 libdsapig___la_LIBADD  	= libdsapic.la libtacoapig++.la 
