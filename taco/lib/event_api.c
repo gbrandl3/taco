@@ -33,9 +33,9 @@
 
  Original   :	April 1999
 
- Version    :	$Revision: 1.2 $
+ Version    :	$Revision: 1.3 $
 
- Date       :	$Date: 2003-04-25 11:21:35 $
+ Date       :	$Date: 2003-05-02 09:12:48 $
 
  Copyleft (c) 1999 by European Synchrotron Radiation Facility,
                       Grenoble, France
@@ -404,11 +404,7 @@ void _DLLFunc dev_event_fire (DevServer ds, long event,
 /*
  * C++ version
  */
-void _DLLFunc dev_event_fire (Device *device, long event,
-#if 0
 void _DLLFunc dev_event_fire (DeviceBase *device, long event,
-#endif
-
 	DevArgument argout, DevType argout_type, 
 	long event_status, long event_error)
 #endif /* __cplusplus */
@@ -1114,7 +1110,7 @@ static long get_event_string PT_( (devserver ds, long event, char *event_str, lo
 /*+**********************************************************************
  Function   : 	extern long dev_event_query()
 
- Description:	Returns a sequence of structures containig all
+ Description:	Returns a sequence of structures containing all
 		available events, their names, their input and
 		output data types, and type describtions for one
 		device.
@@ -1165,10 +1161,7 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long
 	{
 		*error = DevErr_CommandNotImplemented;
 		status = DS_NOTOK;
-#if 0
 		status = tango_dev_event_query(ds, vareventarr, error);
-#endif
-
 		return(status);
 	}
 #endif /* TANGO */

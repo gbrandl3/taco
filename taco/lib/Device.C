@@ -11,9 +11,9 @@
 //
 // Original:	March 1995
 //
-// $Revision: 1.1 $
+// $Revision: 1.2 $
 //
-// $Date: 2003-04-25 11:21:27 $
+// $Date: 2003-05-02 09:12:48 $
 //
 // $Author: jkrueger1 $
 //
@@ -27,101 +27,56 @@
 #include <DevServer.h>
 #include <DevErrors.h>
 #include <DevStates.h>
-#if 0
-#undef DEBUG_CON
-#ifdef DEBUG_CON
-#include <iostream>
-#endif
-#endif
 
-
-
-#if 0
-// generic base class
-DeviceBase::DeviceBase()
-{
-#ifdef DEBUG_CON
-  cerr<<" DevBase constructor" << endl;
-#endif
-};
-DeviceBase::~DeviceBase()
-{
-#ifdef DEBUG_CON
-  cerr<<" DevBase destructor" << endl;
-#endif
-};
-#endif
 //
 // private global variables of the Device class which have only static scope
 //
 
 short Device::class_inited = 0;
 
-//+=====================================================================
-//
-// Function:	Device::ClassInitialise() 
-//
-// Description:	function to initialise the Device class
-//
-// Input:	none
-//
-// Output:	long *error - error code returned in the case of problems
-//
-//-=====================================================================
-
+/**
+ * function to initialise the Device class
+ *
+ * @param error error code returned in the case of problems
+ *
+ * @return DS_OK 
+ */
 long Device::ClassInitialise( long *error )
 {
-   dev_printdebug(DBG_TRACE,"Device::ClassInitialise() called\n");
-
-   *error = DS_OK;
+	dev_printdebug(DBG_TRACE,"Device::ClassInitialise() called\n");
+	*error = DS_OK;
 
 // The following line is just to force the compiler to insert the RcsId array 
 // in the executable code.
-
 //   int l = strlen(RcsId);
 
-   Device::class_inited = 1;
-
-   return(DS_OK);
+	Device::class_inited = 1;
+	return(DS_OK);
 }
 
-
-//+=====================================================================
-//
-// Function:	Device::Device() 
-//
-// Description:	constructor to create an object of the base class Device
-//
-// Input:	char *name - name (ascii identifier) of device to create
-//
-// Output:	long *error - error code returned in the case of problems
-//
-//-=====================================================================
-
+/**
+ * constructor to create an object of the base class Device
+ *
+ * @param name name (ascii identifier) of device to create
+ * @param error error code returned in the case of problems
+ *
+ */
 Device::Device (char *devname, long *error)
 {
-   static  DeviceCommandListEntry dev_cmd_list[] = {
-                {DevState, &Device::State, D_VOID_TYPE, D_SHORT_TYPE},
-                {DevStatus, &Device::Status, D_VOID_TYPE, D_STRING_TYPE},
-                                              };
-   static long no_commands = sizeof(dev_cmd_list)/
-			     sizeof(DeviceCommandListEntry);
+	dev_printdebug(DBG_TRACE,"Device::Device() called, devname = %s\n",devname);
 
-   dev_printdebug(DBG_TRACE,"Device::Device() called, devname = %s\n",devname);
-
-   *error = DS_OK;
+	*error = DS_OK;
 
 //
 // check if ClassInitialise() has been called
 //
-
-   if (Device::class_inited != 1)
-   {
-      if (Device::ClassInitialise(error) != DS_OK)
-      {
-         return;
-      }
-   }
+	if (Device::class_inited != 1)
+	{
+		if (Device::ClassInitialise(error) != DS_OK)
+		{
+			return;
+		}
+	}
 
 //
 // initialise class_name (this should be done here because class_name
@@ -129,108 +84,94 @@ Device::Device (char *devname, long *error)
 // server with several embedded classes. Also initialises, device
 // type
 //
-
-   this->class_name = (char *)"DeviceClass";
-   sprintf(this->dev_type,TYPE_DEFAULT);
+	
+	this->class_name = (char *)"DeviceClass";
+	snprintf(this->dev_type, sizeof(this->dev_type) - 1, TYPE_DEFAULT);
 
 //
 // initialise the device name
 //
-
-   this->n_events = 0;
-   this->events_list =NULL;
-   this->name = (char*)malloc(strlen(devname)+1);
-   sprintf(this->name,"%s",devname);
+	this->n_events = this->events_list.size();
+	this->name = (char*)malloc(strlen(devname) + 1);
+	if (this->name == NULL)
+	{
+		*error = DS_NOTOK;
+		return;
+	}
+	strcpy(this->name, devname);
 
 //
 // initialise the commands list
 //
-
-   this->n_commands = no_commands;
-   this->commands_list = dev_cmd_list;
-
-   this->state = DEVON;
+	this->commands_list[DevState] = DeviceCommandListEntry(long(DevState), (DeviceMemberFunction)&Device::State, D_VOID_TYPE, D_SHORT_TYPE, 0L, "State");
+	this->commands_list[DevStatus] = DeviceCommandListEntry(long(DevStatus), (DeviceMemberFunction)&Device::Status, D_VOID_TYPE, D_STRING_TYPE, 0L, "Status");
+	this->n_commands = this->commands_list.size();
+	this->state = DEVON;
 }
 
-//+=====================================================================
-//
-// Function:	Device::GetResources() 
-//
-// Description:	empty function
-//
-// Input:	none
-//
-// Output:	long *error - error code returned in the case of problems
-//
-//-=====================================================================
-
+/**
+ * empty function
+ *
+ * @param name 
+ * @param error error code returned in the case of problems
+ *
+ * @return DS_OK
+ */
 long Device::GetResources(char *name, long *error )
 {
-   dev_printdebug(DBG_TRACE,"Device::GetResources() called\n");
-
-   *error = DS_OK;
-
-   return(DS_OK);
+	dev_printdebug(DBG_TRACE,"Device::GetResources() called\n");
+	*error = DS_OK;
+	return(DS_OK);
 }
 
 
-//+=====================================================================
-//
-// Function:	Device::Command() 
-//
-// Description:	function to execute a command ona device
-//
-// Input:	long cmd - command to execute
-//		DevArgument argin - pointer to input argument
-//		long argin_type   - type of input argument
-//
-// Output:	DevArgument argout - pointer to output argument
-//		long argout_type   - type of output argument
-//		long *error - pointer to error returned in case of problems
-//
-//-=====================================================================
-
+/**
+ * function to execute a command ona device
+ *
+ * @param cmd 		command to execute
+ * @param argin 	pointer to input argument
+ * @param argin_type	type of input argument
+ * @param argout	pointer to output argument
+ * @param argout_type   type of output argument
+ * @param error 	pointer to error returned in case of problems
+ *
+ * @return DS_NOTOK in case of error otherwise DS_OK
+ */
 long Device::Command (long cmd, void* argin, long argin_type,
                       void* argout, long argout_type, long *error)
 {
-   int i;
-   long iret;
-   DeviceMemberFunction member_fn;
+	DeviceMemberFunction member_fn;
 
-   dev_printdebug(DBG_TRACE,"Device::Command() called, cmd = %d\n",cmd);
+	dev_printdebug(DBG_TRACE,"Device::Command() called, cmd = %d\n",cmd);
 
 //
 // add code to execute a command here
 //
-   for (i = 0; i < this->n_commands; i++)
-   {
-      if (cmd == this->commands_list[i].cmd)
-      {
-         if (argin_type != this->commands_list[i].argin_type ||
-             argout_type != this->commands_list[i].argout_type)
-         {
-            *error = DevErr_IncompatibleCmdArgumentTypes;
-            return(DS_NOTOK);
-         }
+	for (int i = 0; i < this->n_commands; i++)
+	{
+		if (cmd == this->commands_list[i].cmd)
+		{
+			if (argin_type != this->commands_list[i].arginType ||
+			    argout_type != this->commands_list[i].argoutType)
+			{
+				*error = DevErr_IncompatibleCmdArgumentTypes;
+				return(DS_NOTOK);
+			}
 //
 // check state machine
 //
-         if (this->StateMachine(cmd,error) != DS_OK)
-         {
-            return(DS_NOTOK);
-         }
+			if (this->StateMachine(cmd,error) != DS_OK)
+			{
+				return(DS_NOTOK);
+			}
 //
 // now execute the command
 //
 
-         member_fn = this->commands_list[i].fn;
-
-         iret = (this->*member_fn)(argin,argout,error);
-
-	 return(iret);
-      }
-
-   }
+			member_fn = this->commands_list[i].fn;
+			return (this->*member_fn)(argin,argout,error);
+		}
+	}
 
 //
 // since V8.32 of DSAPI the command_list entry has an extra field 
@@ -239,312 +180,252 @@ long Device::Command (long cmd, void* argin, long argin_type,
 // incorrectly interpreted, therefore if a command is not found 
 // then print a warning message.
 //
-   printf("Device::Command(): command %d not found, maybe you need to recompile the class %s\n",cmd,this->class_name);
-
-   *error = DevErr_CommandNotImplemented;
-
-   return(DS_NOTOK);
+	fprintf(stderr, "Device::Command(): command %d not found, maybe you need to recompile the class %s\n", cmd, this->class_name);
+	*error = DevErr_CommandNotImplemented;
+	return(DS_NOTOK);
 }
 
-//+=====================================================================
-//
-// Function:	Device::~Device() 
-//
-// Description:	destructor to destroy an object of the base class Device
-//
-// Input:	none
-//
-// Output:	long *error - error code returned in the case of problems
-//
-//-=====================================================================
-
+/**
+ * destructor to destroy an object of the base class Device
+ */
 Device::~Device ()
 {
-   dev_printdebug(DBG_TRACE,"Device::~Device() called\n");
-
+	dev_printdebug(DBG_TRACE,"Device::~Device() called\n");
 //
 // add code to destroy a device here
 //
+/* M. Diehl  2.11.99
+ * free the memory malloc'ed by Device::Device()
+ */
 
-  /* M. Diehl  2.11.99
-   * free the memory malloc'ed by Device::Device()
-   */
-
-  if( name != NULL )
-  {
-    free(name);
-    name = NULL;
-  }
+	if( name != NULL )
+	{
+		free(name);
+		name = NULL;
+	}
 }
 
-//
-// virtual functions which should be defined in each new sub-classes
-//
 
-//+=====================================================================
-//
-// Function:	Device::StateMachine() 
-//
-// Description:	function to implement the state machine fo the Device class
-//
-// Input:	long cmd - command which is to be executed
-//
-// Output:	long *error - error code returned in the case of problems
-//
-//-=====================================================================
-
+/**
+ * Implements the state machine fo the Device class.
+ * It should be redefined in each new sub-classes.
+ *
+ * @param cmd 	command which is to be executed
+ * @param error error code returned in the case of problems
+ *
+ * @return DS_OK
+ */
 long Device::StateMachine(long cmd, long *error)
 {
-   dev_printdebug(DBG_TRACE,"Device::StateMachine() called\n");
-
-   *error = DS_OK;
+	dev_printdebug(DBG_TRACE,"Device::StateMachine() called\n");
+	
+	*error = DS_OK;
 //
 // default state machine is to allow all commands
 //
-   switch (cmd) 
-   {
-      default : break;
-   }
+	switch (cmd) 
+	{
+		default : break;
+	}
 
-   return(DS_OK);
+	return(DS_OK);
 }
 
 
-//
-// the following virtual commands must exist in all new sub-classes
-//
 
-//+=====================================================================
-//
-// Function:	Device::State() 
-//
-// Description:	function to implement the command to return the present 
-//		state of a device as a short variable
-//
-// Input:	none
-//
-// Output:	short *state - pointer to state returned
-//		long *error - error code returned in the case of problems
-//
-//-=====================================================================
-
+/**
+ * Implements the command to return the present state of a device as a short variable.
+ * It should be redefined in each new sub-classes.
+ *
+ * @param vargin 	not used should be a NULL pointer
+ * @param vargout	a pointer to the short variable which should store the state
+ * @param error  	error code returned in the case of problems
+ *
+ * @return DS_OK
+ */
 long Device::State(void *vargin, void *vargout, long *error)
 {
-   static short *pstate;
-   *error = DS_OK;
+	static short *pstate;
+	*error = DS_OK;
 
-   dev_printdebug(DBG_TRACE,"Device::State() called\n");
-
-   pstate = (short*)vargout;
+	dev_printdebug(DBG_TRACE,"Device::State() called\n");
+	pstate = (short*)vargout;
 //
 // code to implement the DevState command here
 //
-   *pstate = (short)this->state;
-
-   return(DS_OK);
+	*pstate = (short)this->state;
+	return(DS_OK);
 }
 
-//+=====================================================================
-//
-// Function:	Device::Status() 
-//
-// Description:	function to implement the command to return the present 
-//		state and additional info on a device as an ascii string
-//
-// Input:	none
-//
-// Output:	char *status - pointer to string returned
-//		long *error - error code returned in the case of problems
-//
-//-=====================================================================
-
+/**
+ * Implements the command to return the present 
+ * state and additional info on a device as an ascii string.
+ * It should be redefined in each new sub-classes.
+ *
+ * @param vargin 	not used should be a NULL pointer
+ * @param vargout	a pointer to the string variable which should store the status
+ * @param error  	error code returned in the case of problems
+ *
+ * @return DS_OK
+ */
 long Device::Status(void *vargin, void *vargout, long *error)
 {
-   static char lstatus[20], **status;
+	static char 	lstatus[20], 
+			**status;
 
-   dev_printdebug(DBG_TRACE,"Device::Status() called\n");
+	dev_printdebug(DBG_TRACE,"Device::Status() called\n");
 
-   *error = DS_OK;
-   status = (char **)vargout;
+	*error = DS_OK;
+	status = (char **)vargout;
 //
 // code to implement the DevStatus command here
 //
-   sprintf(lstatus,"%s",DEVSTATES[this->state]);
-
-   *status = lstatus;
-
-   return(DS_OK);
+	sprintf(lstatus,"%s",DEVSTATES[this->state]);
+	*status = lstatus;
+	return(DS_OK);
 }
 
-//+=====================================================================
-//
-// Function:	Device::Get_command_number() 
-//
-// Description:	Method to return the number of commands implemented
-//              in the device class 
-//
-// Input:	none
-//
-// Output:	unsigned int *cmd_nb - pointer to command number
-//
-//-=====================================================================
-
+/**
+ * Method to return the number of commands implemented in the device class 
+ *
+ * @param cmd_nb pointer to command number
+ */
 void Device::Get_command_number(unsigned int *cmd_nb)
 {
 	*cmd_nb = this->n_commands;
 }
 
 
-//+=====================================================================
-//
-// Function:	Device::Command_Query() 
-//
-// Description:	Method to return command code, input argument and output
-//		argument for every command defined in the class
-//
-// Input:	none
-//
-// Output:	_dev_cmd_info *cmd_info - pointer to an array of structures.
-//              There must be one structure for each command.
-//		long *error - error code returned in the case of problems
-//
-//-=====================================================================
-
+/**
+ * Method to return command code, input argument and output
+ *		argument for every command defined in the class
+ *
+ * @param cmd_info 	pointer to an array of structures.
+ *              	There must be one structure for each command.
+ * @param error 	error code returned in the case of problems
+ *
+ * @return DS_OK
+ */
 long Device::Command_Query(_dev_cmd_info *cmd_info,long *error)
 {
-	*error = 0;
+	*error = DS_OK;
 
 	for (long i = 0;i < this->n_commands;i++)
 	{
 		cmd_info[i].cmd = this->commands_list[i].cmd;
-		cmd_info[i].in_type = this->commands_list[i].argin_type;
-		cmd_info[i].out_type = this->commands_list[i].argout_type;
+		cmd_info[i].in_type = this->commands_list[i].arginType;
+		cmd_info[i].out_type = this->commands_list[i].argoutType;
 	}
 
 	return(DS_OK);
 }
-#if 0
-// FRM compatibility version
+
+/**
+ * FRM compatibility version of Command_Query
+ *
+ * @param cmd_info 	pointer to an array of structures.
+ *              	There must be one structure for each command.
+ * 
+ * @return DS_OK
+ *
+ * @see Command_Query
+ */
 long Device::CommandQuery(_dev_cmd_info *cmd_info)
 {
-	for (long i = 0;i < this->n_commands;i++)
-	{
-		cmd_info[i].cmd = this->commands_list[i].cmd;
-		cmd_info[i].in_type = this->commands_list[i].argin_type;
-		cmd_info[i].out_type = this->commands_list[i].argout_type;
-	}
-
-	return(DS_OK);
+	long error;
+	return this->Command_Query(cmd_info, &error);
 }
-#endif
 
-//+=====================================================================
-//
-// Function:	Device::Get_min_access_right() 
-//
-// Description:	Method to return minimun access right for a command
-//
-// Input:	long cmd - The command code
-//
-// Output:	long *min_access - Pointer where the min access right must
-//				   be stored
-//		long *error - error code returned in the case of problems
-//
-//-=====================================================================
-
+/**
+ * Method to return minimun access right for a command
+ *
+ * @param cmd		The command code
+ * @param min_access 	Pointer where the min access right must be stored
+ * @param error 	error code returned in the case of unknown command 
+ *
+ * @return DS_OK if command found otherwise DS_NOTOK
+ */
 long Device::Get_min_access_right(long cmd,long *min_access,long *error)
 {
-	*error = 0;
+	*error = DS_OK;
 
 	for (long i = 0;i < this->n_commands;i++)
-	{
 		if (cmd == this->commands_list[i].cmd)
 		{
-			*min_access = this->commands_list[i].min_access;
+			*min_access = this->commands_list[i].minAccess;
 			return(DS_OK);
 		}
-	}
-
 	*error = DevErr_CommandNotImplemented;
 	return(DS_NOTOK);
 }
-#if 0
-// FRM compatibiliy version ( still unused)
+
+/**
+ * FRM compatibiliy version of Get_min_access_right (still unused)
+ *
+ * @param cmd		The command code
+ *
+ * @return the access right of the command if command found
+ * 
+ * @see Get_min_access_right
+ *
+ * @throw long error code of the Get_min_access_right function if command not found
+ */
+
 long Device::GetMinAccessRight(const long cmd)
 {
-
-	for (long i = 0;i < this->n_commands;i++)
-	{
-		if (cmd == this->commands_list[i].cmd)
-		{
-			return  this->commands_list[i].min_access;
-		}
-	}
-
-	throw( DevErr_CommandNotImplemented);
+	long 	error,
+		min_access;
+	if (this->Get_min_access_right(cmd, &min_access, &error) == DS_OK)
+		return min_access;
+	throw error;
 	return(DS_NOTOK);
 }
-#endif
 
-//+=====================================================================
-//
-// Function:	Device::Get_event_number() 
-//
-// Description:	Method to return the number of events implemented
-//              in the device class 
-//
-// Input:	none
-//
-// Output:	unsigned int *cmd_nb - pointer to event number
-//
-//-=====================================================================
-
+/**
+ * Method to return the number of events implemented in the device class 
+ *
+ * @param cmd_nb pointer to event number
+ */
 void Device::Get_event_number(unsigned int *cmd_nb)
 {
 	*cmd_nb = this->n_events;
 }
 
 
-//+=====================================================================
-//
-// Function:	Device::Event_Query() 
-//
-// Description:	Method to return event code, input argument and output
-//		argument for every event defined in the class
-//
-// Input:	none
-//
-// Output:	_dev_cmd_info *cmd_info - pointer to an array of structures.
-//              There must be one structure for each event.
-//		long *error - error code returned in the case of problems
-//
-//-=====================================================================
-
-long Device::Event_Query(_dev_event_info *cmd_info,long *error)
+/**
+ * Method to return event code, input argument and output
+ * argument for every event defined in the class
+ *
+ * @param event_info 	pointer to an array of structures.
+ *               	There must be one structure for each event.
+ * @param error 	error code returned in the case of problems
+ *
+ * @return DS_OK
+ */
+long Device::Event_Query(_dev_event_info *event_info,long *error)
 {
-	*error = 0;
+	*error = DS_OK;
 
 	for (long i = 0;i < this->n_events;i++)
 	{
-		cmd_info[i].event = this->events_list[i].event;
-		cmd_info[i].out_type = this->events_list[i].argout_type;
+		event_info[i].event = this->events_list[i].event;
+		event_info[i].out_type = this->events_list[i].argType;
 	}
-
 	return(DS_OK);
-
 }
-#if 0
-// FRM compatibility version
-long Device::EventQuery(_dev_event_info *cmd_info)
+
+/**
+ * FRM compatibiliy version of Event_Query (still unused).
+ *
+ * @param event_info 	pointer to an array of structures.
+ *               	There must be one structure for each event.
+ *
+ * @return DS_OK
+ *
+ * @see Event_Query
+ */
+long Device::EventQuery(_dev_event_info *event_info)
 {
-
-	for (long i = 0;i < this->n_events;i++)
-	{
-		cmd_info[i].event = this->events_list[i].event;
-		cmd_info[i].out_type = this->events_list[i].argout_type;
-	}
-
-	return(DS_OK);
-
+	long error;
+	return this->Event_Query(event_info, &error);
 }
-#endif

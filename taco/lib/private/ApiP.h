@@ -12,9 +12,9 @@
 
  Original:	June 1992
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-04-25 11:21:44 $
+ Date:		$Date: 2003-05-02 09:12:50 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -30,7 +30,7 @@
  */
 #ifdef _IDENT
 static char ApiPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.1 2003-04-25 11:21:44 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.2 2003-05-02 09:12:50 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -41,7 +41,7 @@ static char ApiPh[] =
 #ifndef __cplusplus
 #include <DevServer.h>
 #else
-#include <Device.H>
+#include <DeviceBase.h>
 #endif /* __cplusplus */
 
 /*
@@ -271,11 +271,7 @@ typedef struct {
 #ifndef __cplusplus
 		DevServer ds;
 #else
-		Device *device;
-#if 0
 		DeviceBase *device;
-#endif
-
 #endif /* __cplusplus */
 		long id;
 		char *server_name;
@@ -440,8 +436,6 @@ long asynch_client_ping
 void event_client_cleanup 
 	PT_( (long *error) );
 
-/*used for relistening events on client reconnect */
-long relisten_events(devserver ds);
 
 
 /* TANGO entry points */
@@ -468,6 +462,9 @@ long dev_error_push_level PT_( (const char * message,int level) );
 #ifdef __cplusplus
 }
 #endif
+
+/*used for relistening events on client reconnect */
+long relisten_events(devserver ds);
 
 /*
  *  rpc service definitions used for to identify the rpc's

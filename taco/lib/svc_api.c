@@ -11,9 +11,9 @@
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2003-04-25 11:21:38 $
+ Date:		$Date: 2003-05-02 09:12:49 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -310,13 +310,10 @@ _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
 /*
  * C++ version
  */
-	Device			*device;
-#if 0
-	DeviceBase			*device;
-#endif
+	DeviceBase		*device;
 #endif /* __cplusplus */
 	long			ds_id;
-	long 		connection_id;
+	long 			connection_id;
 
 	DevDataListEntry        data_type;
 
@@ -506,10 +503,7 @@ _client_data * _DLLFunc rpc_dev_put_4 (_server_data *server_data)
 /*
  * C++ version
  */
-	Device			*device;
-#if 0
-	DeviceBase			*device;
-#endif
+	DeviceBase		*device;
 #endif /* __cplusplus */
 	long			ds_id;
 	long 		connection_id;
@@ -653,10 +647,7 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
 /*
  * C++ version
  */
-	Device				*device;
-#if 0
-	DeviceBase				*device;
-#endif
+	DeviceBase			*device;
 #endif /* __cplusplus */
 	long				ds_id;
 	long 			connection_id;
@@ -945,14 +936,10 @@ void _DLLFunc rpc_dev_put_asyn_cmd (_server_data *server_data)
 /*
  * C++ version
  */
-	Device			*device;
-#if 0
-	DeviceBase			*device;
-#endif
-
+	DeviceBase		*device;
 #endif /* __cplusplus */
 	long			ds_id;
-	long 		connection_id;
+	long 			connection_id;
 	long			error;
 
 	error = DS_OK;
@@ -1058,11 +1045,7 @@ long dev_export (char *name, void *ptr_ds, long *error)
 /*
  * C++ version
  */
-long dev_export (char *name, Device *ptr_dev, long *error)
-#if 0
 long dev_export (char *name, DeviceBase *ptr_dev, long *error)
-#endif
-
 #endif
 {
    db_devinf		devinfo;
@@ -1083,10 +1066,7 @@ long dev_export (char *name, DeviceBase *ptr_dev, long *error)
 /*
  * C++ version
  */
-	Device		*device;
-#if 0
-	DeviceBase		*device;
-#endif
+	DeviceBase	*device;
 
 	device =        ptr_dev;
 #endif
@@ -1229,10 +1209,7 @@ free_found:;
 /*
  * C++ version
  */
-      devinfo.device_class = device->class_name;
-#if 0
    devinfo.device_class = const_cast<char *>(device->GetClassName());
-#endif
 
 #endif /* __cplusplus */
 
@@ -1254,10 +1231,7 @@ free_found:;
 /*
  * C++ version
  */
-      devinfo.device_type  = device->dev_type;
-#if 0
    devinfo.device_type  = const_cast<char *>(device->GetDevType());
-#endif
 #endif /* __cplusplus */
 
 
@@ -1352,16 +1326,7 @@ long ds__destroy (void *ptr_ds, long *error)
 
 	ds       = (DevServer) ptr_ds;
 #else
-	Device 		*device;
-#if 0
-	DeviceBase 		*device;
-#endif
-
-
-	device   = (Device*) ptr_ds;
-#if 0
-	device   = (DeviceBase*) ptr_ds;
-#endif
+	DeviceBase 		*device = (DeviceBase*) ptr_ds;
 
 #endif /* __cplusplus */
 
@@ -1387,12 +1352,7 @@ long ds__destroy (void *ptr_ds, long *error)
 #ifndef __cplusplus
 			if (strcmp (ds->devserver.name, devices[i].export_name) == 0)
 #else
-			if (strcmp (device->name, devices[i].export_name)
-#if 0
-			if (strcmp (device->GetDevName(), devices[i].export_name)
-#endif
-
- == 0)
+			if (strcmp (device->GetDevName(), devices[i].export_name) == 0)
 #endif /* __cplusplus */
 			{
 				/*
@@ -1413,10 +1373,7 @@ long ds__destroy (void *ptr_ds, long *error)
 #ifndef __cplusplus
 				    ds->devserver.name);
 #else
-				    device->name);
-#if 0
 				    device->GetDevName());
-#endif
 #endif /* __cplusplus */
 #endif /* EBUG */
 
@@ -1462,50 +1419,46 @@ long ds__destroy (void *ptr_ds, long *error)
  */
 _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 {
-static _dev_query_out	dev_query_out = { 0, NULL, "", 0, 0, { 0, NULL}};
-long        ds_id;
-long        connection_id;
-static DevVarArgument vararg[1024];
+	static _dev_query_out	dev_query_out = { 0, NULL, "", 0, 0, { 0, NULL}};
+	long        		ds_id;
+	long        		connection_id;
+	static DevVarArgument 	vararg[1024];
 #ifndef __cplusplus
 /*
  * OIC version
  */
-DevServer		ds;
-DevCommandList		ds_cl;
-DevServerClass		ds_class;
-_Int			i;
+	DevServer		ds;
+	DevCommandList		ds_cl;
+	DevServerClass		ds_class;
+	_Int			i;
 #else
 /*
  * C++ version
  */
-Device			*device;
-#if 0
-	DeviceBase		*device;
-#endif
-
-long 			error;
-long 			ret;
-int			i;
+	DeviceBase	*device;
+	long 			error;
+	long 			ret;
+	int			i;
 #endif
 
 #ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_cmd_query_4() : entering routine\n");
 #endif /* EBUG */
 
-dev_query_out.error  = DS_OK;
-dev_query_out.status = DS_OK;
+	dev_query_out.error  = DS_OK;
+	dev_query_out.status = DS_OK;
 
-dev_query_out.var_argument.length   = 0;
-dev_query_out.var_argument.sequence = NULL;
+	dev_query_out.var_argument.length   = 0;
+	dev_query_out.var_argument.sequence = NULL;
 
 /*
-    	 * Split up the device identification.
-    	 */
+ * Split up the device identification.
+ */
 	if (read_device_id (dev_query_in->ds_id, &ds_id, &connection_id, &dev_query_out.error) == DS_NOTOK)
-{
-	dev_query_out.status = DS_NOTOK;
-	return (&dev_query_out);
-}
+	{
+		dev_query_out.status = DS_NOTOK;
+		return (&dev_query_out);
+	}
 
 /*
  * Open access to device and class structures.
@@ -1515,24 +1468,24 @@ dev_query_out.var_argument.sequence = NULL;
 /*
  * OIC version
  */
-ds       = devices[(_Int)ds_id].ds;
-ds_class = ds->devserver.class_pointer;
-ds_cl    = ds_class->devserver_class.commands_list;
+	ds       = devices[(_Int)ds_id].ds;
+	ds_class = ds->devserver.class_pointer;
+	ds_cl    = ds_class->devserver_class.commands_list;
 #else
 /*
  * C++ version
  */
-device   = devices[(_Int)ds_id].device;
+	device   = devices[(_Int)ds_id].device;
 #endif /* __cplusplus */
 
 /*
  * Free last allocated memory for the command info sequence.
  */
 
-if (dev_query_out.sequence != NULL)
-{
-	free (dev_query_out.sequence);
-}
+	if (dev_query_out.sequence != NULL)
+	{
+		free (dev_query_out.sequence);
+	}
 
 /*
  * Get number of implmented commands and allocate memory
@@ -1543,25 +1496,20 @@ if (dev_query_out.sequence != NULL)
 /*
  * OIC version
  */
-dev_query_out.length = ds_class->devserver_class.n_commands;
+	dev_query_out.length = ds_class->devserver_class.n_commands;
 #else
 /*
  * C++ version
  */
-device->Get_command_number(&dev_query_out.length);
-#if 0
 	dev_query_out.length = device->GetCommandNumber();
 #endif
-
-#endif
 	dev_query_out.sequence = (_dev_cmd_info *) malloc (dev_query_out.length * sizeof (_dev_cmd_info));
-if ( dev_query_out.sequence == NULL )
-{
-	dev_query_out.error  = DevErr_InsufficientMemory;
-	dev_query_out.status = DS_NOTOK;
-	return (&dev_query_out);
-}
-
+	if ( dev_query_out.sequence == NULL )
+	{
+		dev_query_out.error  = DevErr_InsufficientMemory;
+		dev_query_out.status = DS_NOTOK;
+		return (&dev_query_out);
+	}
 /*
  * Get information about command code, data types and class for
  * every implented command.
@@ -1571,34 +1519,26 @@ if ( dev_query_out.sequence == NULL )
 /*
  * OIC version
  */
-for ( i=0; (u_long)i<dev_query_out.length; i++ )
-{
-	dev_query_out.sequence[i].cmd      = ds_cl[i].cmd;
-	dev_query_out.sequence[i].in_type  = ds_cl[i].argin_type;
-	dev_query_out.sequence[i].out_type = ds_cl[i].argout_type;
-}
-
-sprintf (dev_query_out.class_name, "%s", ds_class->devserver_class.class_name);
+	for ( i=0; (u_long)i<dev_query_out.length; i++ )
+	{
+		dev_query_out.sequence[i].cmd      = ds_cl[i].cmd;
+		dev_query_out.sequence[i].in_type  = ds_cl[i].argin_type;
+		dev_query_out.sequence[i].out_type = ds_cl[i].argout_type;
+	}
+	sprintf (dev_query_out.class_name, "%s", ds_class->devserver_class.class_name);
 #else
 /*
  * C++ version
  */
-ret = device->Command_Query(dev_query_out.sequence,&error);
-#if 0
 	ret = device->CommandQuery(dev_query_out.sequence);
-#endif
-if (ret != DS_OK)
-{
-	free(dev_query_out.sequence);
-	dev_query_out.error  = error;
-	dev_query_out.status = DS_NOTOK;
-	return (&dev_query_out);
-}
-
-sprintf (dev_query_out.class_name, "%s", device->class_name);
-#if 0
+	if (ret != DS_OK)
+	{
+		free(dev_query_out.sequence);
+		dev_query_out.error  = error;
+		dev_query_out.status = DS_NOTOK;
+		return (&dev_query_out);
+	}
 	sprintf (dev_query_out.class_name, "%s", device->GetClassName());
-#endif
 #endif /* __cplusplus */
 
 /* 
@@ -1611,32 +1551,31 @@ sprintf (dev_query_out.class_name, "%s", device->class_name);
  */
 
 #ifndef __cplusplus
-if (ds_cl[0].cmd_name != NULL)
-{
-        dev_query_out.var_argument.length = 0;
-	for (i=0; (u_long)i<dev_query_out.length; i++)
+	if (ds_cl[0].cmd_name != NULL)
 	{
-        	vararg[i].argument_type      = D_STRING_TYPE;
-        	vararg[i].argument           = (DevArgument)&ds_cl[i].cmd_name;
+        	dev_query_out.var_argument.length = 0;
+		for (i=0; (u_long)i<dev_query_out.length; i++)
+		{
+        		vararg[i].argument_type      = D_STRING_TYPE;
+        		vararg[i].argument           = (DevArgument)&ds_cl[i].cmd_name;
+		}
+        	dev_query_out.var_argument.length = dev_query_out.length;
+        	dev_query_out.var_argument.sequence = vararg;
 	}
-        dev_query_out.var_argument.length = dev_query_out.length;
-        dev_query_out.var_argument.sequence = vararg;
-}
 #else
-if (device->commands_list[0].cmd_name != NULL)
-{
-	dev_query_out.var_argument.length = 0;
-	for (i=0; (u_long)i<dev_query_out.length; i++)
+	if ((device->commands_list.begin())->second.cmd_name != NULL)
 	{
-		vararg[i].argument_type      = D_STRING_TYPE;
-		vararg[i].argument           = (DevArgument)&(device->commands_list[i].cmd_name);
+		dev_query_out.var_argument.length = 0;
+		for (i=0; (u_long)i<dev_query_out.length; i++)
+		{
+			vararg[i].argument_type      = D_STRING_TYPE;
+			vararg[i].argument           = (DevArgument)&(device->commands_list[i].cmd_name);
+		}
+	        dev_query_out.var_argument.length = dev_query_out.length;
+	        dev_query_out.var_argument.sequence = vararg;
 	}
-        dev_query_out.var_argument.length = dev_query_out.length;
-        dev_query_out.var_argument.sequence = vararg;
-}
 #endif /* __cplusplus */
-
-return (&dev_query_out);
+	return (&dev_query_out);
 }
 
 /* event query */
@@ -1658,10 +1597,7 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
 /*
  * C++ version
  */
-#if 0
 	DeviceBase			*device;
-#endif
-	Device				*device;
 	long 				error;
 	long 				ret;
 #endif
@@ -1724,10 +1660,7 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
 /*
  * C++ version
  */
-#if 0
 	dev_query_out.length = device->GetEventNumber();
-#endif
-	device->Get_event_number(&dev_query_out.length); 
 #endif
 	dev_query_out.sequence = (_dev_event_info *) malloc(dev_query_out.length * sizeof (_dev_event_info));
 	if ( dev_query_out.sequence == NULL )
@@ -1755,6 +1688,20 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
 #else
 /*
  * C++ version
+ */
+	ret = device->EventQuery(dev_query_out.sequence);
+	if (ret != DS_OK)
+	{
+		free(dev_query_out.sequence);
+		dev_query_out.error  = error;
+		dev_query_out.status = -1;
+		return (&dev_query_out);
+	}
+	sprintf (dev_query_out.class_name, "%s", device->GetClassName());
+#endif /* __cplusplus */
+
+	return (&dev_query_out);
+}
 
 /**
  * Split up the device identification into its information fields.
@@ -1766,48 +1713,8 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
  * @param		long *error - pointer to error code, in case routine fails.
  *
  * @return DS_OK or DS_NOTOK
-
+ *
  */
-#if 0
-	ret = device->EventQuery(dev_query_out.sequence);
-#endif
-	ret = device->Event_Query(dev_query_out.sequence, &error); 
-	if (ret != DS_OK)
-	{
-		free(dev_query_out.sequence);
-		dev_query_out.error  = error;
-		dev_query_out.status = -1;
-		return (&dev_query_out);
-	}
-#if 0
-	sprintf (dev_query_out.class_name, "%s", device->class_name);
-#endif
-#endif /* __cplusplus */
-
-	return (&dev_query_out);
-}
-
-
-/*+**********************************************************************
- Function   :	static long read_device_id ()
-
- Description:	Split up the device identification into its 
-		information fields.
-		ds_id -> Place in the array of exported devices.
-		connection_id -> Place in the connections (or
-		client access) array of an exported device.
-		export_count-> A counter to avoid access from
-		ancient clients of destroyed devices. 
-
- Arg(s) In  :	device_id   - client handle to access the device.
-
- Arg(s) Out :   long *ds_id         - access to exported device.
-		long *connection_id - access to device connections.
-		long *error - pointer to error code, in case routine fails.
-
- Return(s)  :	DS_OK / DS_NOTOK
-***********************************************************************-*/
-
 static long read_device_id (long device_id, long *ds_id, long *connection_id, long *error)
 {
 	long 	export_counter;
@@ -1881,11 +1788,7 @@ _client_data * _DLLFunc rpc_dev_putget_local (_server_data *server_data)
 /*
  * C++ version
  */
-	Device			*device;
-#if 0
-	DeviceBase			*device;
-#endif
-
+	DeviceBase		*device;
 #endif
 	long			ds_id;
 	long 		connection_id;
@@ -2048,10 +1951,8 @@ _dev_import_out * _DLLFunc rpc_dev_ping_4 (_dev_import_in *dev_import_in,
 					   struct svc_req *rqstp)
 {
 	static _dev_import_out	dev_import_out;
-	register int 	i;
-#if 0
-	char* in_name_stripped;
-#endif
+	register int 		i;
+	char			*in_name_stripped;
 
 
 #ifdef EBUG
@@ -2067,17 +1968,14 @@ _dev_import_out * _DLLFunc rpc_dev_ping_4 (_dev_import_in *dev_import_in,
 	dev_import_out.var_argument.length   = 0;
 	dev_import_out.var_argument.sequence = NULL;
 
-#if 0
-	/* strip nethost name, if present */
+/* 
+ * strip nethost name, if present 
+ */
 	if(dev_import_in->device_name[0]=='/' && dev_import_in->device_name[1]=='/')
-	{ /* Nethost part present */
+	 /* Nethost part present */
 		in_name_stripped=strchr(dev_import_in->device_name,'/');
-	}
 	else
-	{
 		in_name_stripped=dev_import_in->device_name;
-	}
-#endif
 /*
  * first try to to find the device among the list of
  * devices already being served 
@@ -2091,10 +1989,7 @@ _dev_import_out * _DLLFunc rpc_dev_ping_4 (_dev_import_in *dev_import_in,
  	 /*
           * device will be known under its export name to the outside world
           */
-			if (strcmp (dev_import_in->device_name,devices[i].export_name) == 0)
-#if 0
 			if (strcmp (in_name_stripped,devices[i].export_name) == 0)
-#endif
 			{
 				dev_import_out.status = DS_OK;
 				return (&dev_import_out);

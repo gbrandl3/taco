@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.2 $
+ Version    :	$Revision: 1.3 $
 
- Date	    :	$Date: 2003-04-25 11:21:33 $
+ Date	    :	$Date: 2003-05-02 09:12:48 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -59,19 +59,8 @@
 #endif /* WIN32 */
 
 #include <errno.h>
-#if 0
+
 #include <assert.h>
-
-/*
- * communication sockets for syncrous rpc
- * moved from DevServerMain.c
- */
-long synch_svc_udp_sock;
-long synch_svc_tcp_sock;
-#endif
-
-
-
 
 /*
  * Functions reused in modul util_api.c
@@ -206,10 +195,6 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 
 #ifdef TANGO
 	if (strncasecmp(dev_name,"tango:",6) == 0)
-#if 0
-	if (strncmp(dev_name,"tango:",6) == 0)
-#endif
-
 	{
 		status = tango_dev_import(dev_name+6,access, ds_ptr, error);
 		printf("dev_import(): tango_dev_import(%s) returned %d\n",dev_name,status);
@@ -527,15 +512,10 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 			(*ds_ptr)->vers_number      = vers_number;
 			return(DS_OK);
 
-			/* *error = DevErr_CannotCreateClientHandle;
-			return (-1);*/
-#if 0
 			/*hstring = clnt_spcreateerror ("dev_import");
 			dev_printerror (SEND,hstring);*/
-			*error = DevErr_CannotCreateClientHandle;
-			return (-1);
-#endif
-
+			/* *error = DevErr_CannotCreateClientHandle;
+			return (-1);*/
 		}
 
 		/* 
@@ -623,42 +603,6 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 
 				*error = 0;
 				return (DS_OK);
-#if 0
- 				if (clnt_stat == RPC_TIMEDOUT)
- 				{
- 
-		    /*
- 		     * Destroy version 4 handle.
-		     */ 
-					clnt_destroy (clnt);
- *
- * add "stateless-ness" by ignoring RPC timeouts at import time
- * this code assumes that because there was no version mismatch
- * version 4 exists (i.e. version which supports security) and
- * that the null procedure timed out because the device server
- * was blocked.
- *
- * initialise the devserver struct so that the device can be properly
- * imported next time round.
- * 
-                        		dev_notimported_init(device_name,access,i_nethost,ds_ptr,error);
-
-					*error = 0;
-					return (DS_OK);
-				}
-				else
-				{
-		    /*
- 		     * Destroy version 4 handle.
-		     */
-					clnt_destroy (clnt);
-
-					*hstring = clnt_sperror (clnt, "dev_import");
-					dev_printerror (SEND, "%s", hstring);* 
-					*error = DevErr_RPCFailed;
-					return (DS_NOTOK);
-				}
-#endif
 			}
 		}
 
@@ -866,13 +810,10 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
  */
 			memset ((char *)*ds_ptr, 0, sizeof (struct _devserver));
 
-			if ( svr_conns[n_svr_conn].no_conns != 0)
-#if 0
-			/*
-	       * initialise the administration structure for the RPC connection
-	       * if this is the first device connected.
-	       */
-
+/*
+ * initialise the administration structure for the RPC connection
+ * if this is the first device connected.
+ */
 			if ( svr_conns[n_svr_conn].no_conns == 0)
 			{
 				svr_conns[n_svr_conn].clnt        = clnt;
@@ -882,15 +823,12 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 				svr_conns[n_svr_conn].asynch_clnt = NULL;
 			}
 			else
-#endif
-
 			{
-				/*
-		  * If the connection is marked as bad connection
-		  * and the import has worked, mark it now as a
-		  * good and working connection.
-		 **/
-
+/*
+ * If the connection is marked as bad connection
+ * and the import has worked, mark it now as a
+ * good and working connection.
+ */
 				if (svr_conns[n_svr_conn].rpc_conn_status == BAD_SVC_CONN)
 				{
 					svr_conns[n_svr_conn].rpc_conn_status = GOOD_SVC_CONN;
@@ -1202,15 +1140,12 @@ long _DLLFunc dev_putget (devserver ds, long cmd,DevArgument argin,
 	 */
 	if (client_data.var_argument.length == 1)
 	{
-#if 0
-	    assert(dev_error_string==NULL);
-#endif
-
 		dev_error_string = (char*)malloc( strlen(*(char**)client_data.var_argument.sequence[0].argument)+1);
+	    	assert(dev_error_string==NULL);
 		if(dev_error_string)
-		    {
-		sprintf(dev_error_string,*(char**)client_data.var_argument.sequence[0].argument);
-	}
+		{
+			sprintf(dev_error_string,*(char**)client_data.var_argument.sequence[0].argument);
+		}
 	}
 	/*
 	 * Free the variable arguments in the client_data
@@ -1409,10 +1344,8 @@ long _DLLFunc dev_put (devserver ds, long cmd,DevArgument argin,
          */
         if (client_data.var_argument.length == 1)
         {
-#if 0
-	    assert(dev_error_string==NULL);
-#endif
                 dev_error_string = (char*)malloc( strlen(*(char**)client_data.var_argument.sequence[0].argument)+1);
+	    	assert(dev_error_string==NULL);
                 sprintf(dev_error_string,*(char**)client_data.var_argument.sequence[0].argument);
         }
 

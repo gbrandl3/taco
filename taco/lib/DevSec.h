@@ -11,9 +11,9 @@
 
  Original:      September 1993
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
  
- Date:		$Date: 2003-04-25 11:21:25 $
+ Date:		$Date: 2003-05-02 09:12:48 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -58,13 +58,6 @@ static DevSecListEntry DevSec_List[] = {
 	{"ADMIN_ACCESS", 	ADMIN_ACCESS},
 };
 #define SEC_LIST_LENGTH     (sizeof(DevSec_List)/sizeof(DevSecListEntry))
-#if 0
-/* made access right translation table global 
- * B. Pedersen 20/11/2000 */
-extern DevSecListEntry DevSec_List[];
-extern size_t SEC_LIST_LENGTH;
-#endif
-
 
 /*
  * Defines for OS9 user name and group name

@@ -25,9 +25,9 @@
 
  Original   :	January 1997
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-04-25 11:21:29 $
+ Date:		$Date: 2003-05-02 09:12:48 $
 
  Copyright (c) 1997-2000 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -44,9 +44,7 @@
 #include <DevErrors.h>
 #include <API_xdr_vers3.h>
 
-#if 0
 #include <assert.h>
-#endif
 #if !defined (_NT)
 #if ( defined (OSK) || defined (_OSK))
 
@@ -2142,15 +2140,12 @@ _asynch_client_data* _DLLFunc rpc_asynch_reply_5(_asynch_client_data *asynch_cli
  */
 		if (asynch_client_data->var_argument.length == 3)
 		{
-#if 0
-		    assert(dev_error_string==NULL);
-#endif
-
 			dev_error_string = (char*)malloc(strlen(*(char**)asynch_client_data->var_argument.sequence[iarg].argument)+1);
-		    if(dev_error_string)
+			assert(dev_error_string==NULL);
+			if(dev_error_string)
 			{
-			sprintf(dev_error_string,*(char**)asynch_client_data->var_argument.sequence[iarg].argument);
-		}
+				sprintf(dev_error_string,*(char**)asynch_client_data->var_argument.sequence[iarg].argument);
+			}
 		}
 
 		(*client_asynch_request.args[asynch_index].callback) 

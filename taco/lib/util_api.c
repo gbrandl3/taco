@@ -14,9 +14,9 @@
 
  Original   :	April 1993
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2003-04-25 11:21:39 $
+ Date:		$Date: 2003-05-02 09:12:49 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -27,10 +27,6 @@
 #include <private/ApiP.h>
 #include <DevServer.h>
 #include <API_xdr_vers3.h>
-
-#if 0
-#include <DserverTeams.h>
-#endif
 
 #include <Admin.h>
 #include <DevErrors.h>
@@ -1376,7 +1372,7 @@ long _DLLFunc dev_ping (devserver ds, long *error)
 {
 	_dev_import_in	dev_import_in;
 	_dev_import_out	dev_import_out;
-	char * in_name_stripped;
+	char 		*in_name_stripped;
 	enum clnt_stat  clnt_stat;
 
 	*error = DS_OK;
@@ -1402,47 +1398,34 @@ long _DLLFunc dev_ping (devserver ds, long *error)
          */
 
 	if ( dev_rpc_connection (ds, error)  == DS_NOTOK )
-	{
 		return (DS_NOTOK);
-	}
 
 
-	/*
-         *  fill in data transfer structures dev_import_in
-         *  and dev_import_out.
-         */
-        /* strip nethost name, if present */
-
-	dev_import_in.device_name = ds->device_name;
-#if 0
-	if(ds->device_name[0]=='/' && ds->device_name[1]=='/')
-        { /* Net host part present */
-            in_name_stripped=strchr(&(ds->device_name[2]),'/');
-        }
+/*
+ *  fill in data transfer structures dev_import_in
+ *  and dev_import_out.
+ *
+ * strip nethost name, if present 
+ */
+	if(ds->device_name[0]=='/' && ds->device_name[1]=='/') /* Net host part present */
+            	in_name_stripped = strchr(&(ds->device_name[2]), '/');
         else
-       {
-          in_name_stripped=ds->device_name;
-       }
+        	in_name_stripped = ds->device_name;
 			
-	dev_import_in.device_name =in_name_stripped;
-#endif
+	dev_import_in.device_name = in_name_stripped;
 	dev_import_in.access_right = 0;
 	dev_import_in.client_id = 0;
 	dev_import_in.connection_id = 0;
 
 	dev_import_in.var_argument.length   = 0;
 	dev_import_in.var_argument.sequence = NULL;
-
-
 /*
  *  Call the rpc entry point RPC_DEV_PING at the specified device server.
  */
-
 	memset ((char *)&dev_import_out, 0, sizeof (dev_import_out));
-
-	/*
-	 * Query a device with the current version number >1.
-   	 */
+/*
+ * Query a device with the current version number >1.
+ */
 	if ( ds->vers_number > DEVSERVER_VERS)
 	{
 		clnt_stat = clnt_call (ds->clnt, RPC_DEV_PING,
@@ -1464,9 +1447,7 @@ long _DLLFunc dev_ping (devserver ds, long *error)
          */
 
 	if ( dev_rpc_error (ds, clnt_stat, error) == DS_NOTOK )
-	{
 		return (DS_NOTOK);
-	}
 	/*
 	 *  free dev_import_out 
 	 */
@@ -1482,11 +1463,9 @@ long _DLLFunc dev_ping (devserver ds, long *error)
 	xdr_free ((xdrproc_t)xdr_DevVarArgumentArray,
 	    (char *)&(dev_import_out.var_argument));
 
-
 /*
  * Return error code and status from device server.
  */
-
 	*error = dev_import_out.error;
 	return (dev_import_out.status);
 }

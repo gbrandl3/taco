@@ -12,14 +12,13 @@
 //		
 //
 // Author(s):	Andy Goetz
+// 		$Author: jkrueger1 $
 //
 // Original:	June 1995
 //
-// $Revision: 1.1 $
+// Version:	$Revision: 1.2 $
 //
-// $Date: 2003-04-25 11:21:38 $
-//
-// $Author: jkrueger1 $
+// Date:	$Date: 2003-05-02 09:12:49 $
 //
 //+**********************************************************************
 		
@@ -30,10 +29,10 @@
 #include <DevServer.h>
 #include <DevServerP.h>
 #include <OICDevice.H>
-#include <PowerSupply.h>
-#include <PowerSupplyP.h>
-#include <AGPowerSupply.h>
-#include <AGPowerSupplyP.h>
+// #include <PowerSupply.h>
+// #include <PowerSupplyP.h>
+// #include <AGPowerSupply.h>
+// #include <AGPowerSupplyP.h>
 
 #define MAX_DEVICES 1000
 

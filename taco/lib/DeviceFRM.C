@@ -1,8 +1,7 @@
 /*
  *******************************************************************************
  * Module:
- *	 	$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DeviceFRM.C,v 1.1 2003-04-25 11:21:27 jkrueger1 Exp $
- *		$Id: DeviceFRM.C,v 1.1 2003-04-25 11:21:27 jkrueger1 Exp $
+ *		$Id: DeviceFRM.C,v 1.2 2003-05-02 09:12:48 jkrueger1 Exp $
  * Description:
  *
  * Author:

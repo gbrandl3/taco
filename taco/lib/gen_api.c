@@ -12,9 +12,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.2 $
+ Version    :	$Revision: 1.3 $
 
- Date       : 	$Date: 2003-04-25 11:21:36 $
+ Date       : 	$Date: 2003-05-02 09:12:48 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -24,11 +24,6 @@
 #include <API.h>
 #include <private/ApiP.h>
 #include <API_xdr_vers3.h>
-
-#if 0
-#include <DserverTeams.h>
-#endif
-
 
 #include <Admin.h>
 #include <DevErrors.h>
@@ -136,63 +131,6 @@ long max_nethost = 0;
 static long win32_rpc_inited;
 #endif /* WIN32 */
 
-#if 0
-/*
- * globals for variuos time-outs
- * B. Pedersen 20/11/2000
- */
-struct timeval zero_timeout = { 0 , 0 };        /* { sec , usec } */
-
-/*  timeout for a client server connection  */
- struct timeval timeout = { 3 , 0 };        /* { sec , usec } */
-#ifndef lynx
- struct timeval retry_timeout = { 3 , 0 };  /* { sec , usec } */
-#else /* lynx */
- struct timeval retry_timeout = { 1 , 0 };  /* { sec , usec } */
-#endif
-
-/*  timeout for a server server connection  */
- struct timeval inner_timeout = { 2, 0 };        /* { sec , usec } */
-#ifndef lynx
- struct timeval inner_retry_timeout = { 2 , 0 };  /* { sec , usec } */
-#else /* lynx */
- struct timeval inner_retry_timeout = { 1 , 0 };  /* { sec , usec } */
-#endif /* lynx */
-
-/*  internal timeout for api library functions  */
- struct timeval api_timeout = { 1 , 0 };        /* { sec , usec } */
-#ifndef lynx
- struct timeval api_retry_timeout = { 1 , 0 };  /* { sec , usec } */
-#else /* lynx */
- struct timeval api_retry_timeout = { 0 , 500000 };  /* { sec , usec } */
-#endif /* lynx */
-
-/*  timeout for a message server connection  */
- struct timeval msg_timeout = { 1 , 0 };        /* { sec , usec } */
-#ifndef lynx
- struct timeval msg_retry_timeout = { 1 , 0 };  /* { sec , usec } */
-#else /* lynx */
- struct timeval msg_retry_timeout = { 0 , 500000 };  /* { sec , usec } */
-#endif /* lynx */
-
-/*  timeout for database server connection  */
- struct timeval dbase_timeout = { 4, 0 };        /* { sec , usec } */
- struct timeval dbase_retry_timeout = { 4 , 0 };  /* { sec , usec } */
-
-/* timeout for asynchronous calls i.e. maximum time to wait for reply after 
- * sending request, after this time declare the request as failed due to TIMEOUT
- */
- struct timeval asynch_timeout = { 25 , 0 };        /* { sec , usec } */
-
-/*  default timeout for import */
- struct timeval import_timeout = { 2 , 0 };        /* { sec , usec } */
- struct timeval import_retry_timeout = { 2 , 0 };  /* { sec , usec } */
-
-/*  timeout for the select in rpc_check_host   */
- struct timeval check_host_timeout = { 0 , 200000 }; /* { sec , usec } */
-#endif
-
-
 /*
  *  Debug globals
  */
@@ -241,10 +179,7 @@ char *DS_display, long *error)
 
 	if ( !config_flags.configuration )
 	{
-		if ( (setup_config (error)) < 0 )
-#if 0
 		if ( (setup_config_multi(NULL,error)) < 0 )
-#endif
 			return (DS_NOTOK);
 
 	}
@@ -1090,9 +1025,8 @@ long _DLLFunc db_import (long *error)
 	CLIENT		*clnt;
         enum clnt_stat  clnt_stat;
 	char		*hstring;
-#if 0
-	char		nethost[SHORT_NAME_SIZE], *nethost_env;
-#endif
+	char		nethost[SHORT_NAME_SIZE], 
+			*nethost_env;
 
 	*error = DS_OK;
 
@@ -1189,18 +1123,12 @@ long _DLLFunc db_import (long *error)
 	      }
 	   }
 	else
-#if 0
 	if ( (nethost_env = (char *)getenv ("NETHOST")) == NULL )
-#endif
-
-	   {
-	   db_info.conf->vers_number = DB_VERS_3;
-#if 0
+	{
+	   	db_info.conf->vers_number = DB_VERS_3;
 		*error = DevErr_NethostNotDefined;
 		return (DS_NOTOK);
-#endif
-
-	   }
+	}
 
 
 	/* 
@@ -1213,10 +1141,7 @@ long _DLLFunc db_import (long *error)
 	db_info.conf->no_svr_conn = 1;
 
 	config_flags.database_server = True;
-#if 0
 	sprintf(nethost, "%s",nethost_env);
-#endif
-
 
 /*
  * for multi-nethost support copy the default configuration
@@ -1225,12 +1150,7 @@ long _DLLFunc db_import (long *error)
  */
 	multi_nethost[0].config_flags = config_flags;
 	multi_nethost[0].db_info = db_info.conf;
-
-	return (DS_OK);
-#if 0
 	return db_import_multi(nethost,error);
-#endif
-
 }
 
 
@@ -1383,11 +1303,8 @@ long _DLLFunc db_import_multi (char *nethost, long *error)
 			{
 				return(DS_NOTOK);
 			}
-#if 0
 			config_flags = nethost_i->config_flags;
 			db_info.conf = multi_nethost[0].db_info ;
-#endif
-
 		}
 	}
 
@@ -1631,22 +1548,16 @@ static long setup_config (long *error)
  *
  * first allocate space for a minimum no. of nethosts
  */
-	if (max_nethost <= 0) nethost_alloc(error);
-#if 0
+	if (max_nethost <= 0) 
+		nethost_alloc(error);
 	strncpy(nethost,nethost_env,SHORT_NAME_SIZE);
 //	sprintf(nethost, "%s",nethost_env);
-#endif
 
 	strcpy(multi_nethost[0].nethost,nethost);
 	multi_nethost[0].config_flags = config_flags;
 	multi_nethost[0].db_info = db_info.conf;
 	multi_nethost[0].msg_info = msg_info.conf;
-#if 0
 	return setup_config_multi(nethost,error);
-#endif
-
-
-	return (DS_OK);
 }
 
 
@@ -1956,42 +1867,29 @@ long setup_config_multi (char *nethost, long *error)
  * programs have to specify $NETHOST
  *
  * - andy 27nov96
-#if 0
-		     * Initialise the XDR data type list with all data types
-		     * specified in the Kernel of the system. 
-#endif
-
+ * Initialise the XDR data type list with all data types
+ * specified in the Kernel of the system. 
  */
 #ifndef _UCC
 			sprintf(nethost_env,"NETHOST=%s",nethost);
 			putenv(nethost_env);
 #endif /*!_UCC*/
-			if (setup_config(error) != DS_OK)
-#if 0
-		    if ( xdr_load_kernel (error) == DS_NOTOK )
-#endif
-
+//			if (setup_config(error) != DS_OK)
+		    	if ( xdr_load_kernel (error) == DS_NOTOK )
 			{
-#if 0
 /*
  * free memory allocated by xdr in manager_data (assume we have connected
  * to version 4 of the Manager
  */
 				xdr_free((xdrproc_t)xdr__manager_data, (char *)&manager_data);
 				clnt_destroy (clnt);
-#endif
-
 				return(DS_NOTOK);
 			}
-#if 0
-		    config_flags = multi_nethost[0].config_flags;
-		    db_info.conf = multi_nethost[0].db_info;
-		    msg_info.conf = multi_nethost[0].msg_info;
-#endif
-
+		    	config_flags = multi_nethost[0].config_flags;
+		    	db_info.conf = multi_nethost[0].db_info;
+		    	msg_info.conf = multi_nethost[0].msg_info;
 		}
 	}
-
 	return (DS_OK);
 }
 
@@ -2219,35 +2117,25 @@ long dev_error_push (char *error_string)
 {
 	if (dev_error_stack == NULL)
 	{
-		dev_error_stack =
-		(char*)malloc(strlen(error_string)+1);
+		dev_error_stack = (char*)malloc(strlen(error_string)+1);
 		if(!dev_error_stack)
-		    {
 			return DS_NOTOK;
-		    }
 		dev_error_stack[0] = 0;
 	}
 	else
 	{
-	    char* tmp;
+		char* tmp;
 		tmp = (char*)realloc(dev_error_stack,
-		strlen(dev_error_stack)+strlen(error_string)+1);
+			strlen(dev_error_stack)+strlen(error_string)+1);
 		if(!tmp)
-		    {
 			return DS_NOTOK;
-		    }
 		dev_error_stack=tmp;
 	}
-#if 0	
-	strcat(dev_error_stack,error_string);
-	/*
-#endif
-
+	strcat(dev_error_stack, error_string);
+/*
 	sprintf(dev_error_stack+strlen(dev_error_stack),"%s",error_string);
 	dev_error_stack[strlen(dev_error_stack)] = 0;
-#if 0
-	*/
-#endif
+*/
 	return(DS_OK);
 }
 
@@ -2275,7 +2163,6 @@ long dev_error_clear ()
 	return(DS_OK);
 }
 
-#if 0
 #define MAXLEVEL 10
 #define MAX_ERR_STR 80
 long dev_error_push_level(const char * message,int level)
@@ -2290,4 +2177,3 @@ long dev_error_push_level(const char * message,int level)
     strncpy(tmp_store+level,message,MAX_ERR_STR-level);
     return dev_error_push(tmp_store);
 }
-#endif

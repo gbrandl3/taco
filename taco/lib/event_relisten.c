@@ -15,16 +15,6 @@ typedef struct event_relisten_info {
 
 Event_Relisten_Info	*event_head;
 
-long add_relisten_info(long event_id, 
-		       long event_type,
-		       DevArgument argout,
-		       DevType argout_type,
-		       DevCallbackFunction *callback,
-		       void *user_data,
-		       long *event_id_ptr);
-
-long relisten_events(devserver ds);
-
 long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 				  DevArgument argout, DevType argout_type, 
 				  DevCallbackFunction *callback, void
@@ -34,9 +24,8 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
                                   long event_id, long *error);
 
-long remove_relisten_info(long event_id, long event_type);
-
-
+static long add_relisten_info(long, long, DevArgument, DevType, DevCallbackFunction *, void *, long *);
+static long remove_relisten_info(long, long);
 
 long relisten_events(devserver ds)
 {

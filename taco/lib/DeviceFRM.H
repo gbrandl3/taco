@@ -1,38 +1,11 @@
 /*
  *******************************************************************************
  * Module:
- *		$Id: DeviceFRM.H,v 1.1 2003-04-25 11:21:28 jkrueger1 Exp $
+ *		$Id: DeviceFRM.H,v 1.2 2003-05-02 09:12:48 jkrueger1 Exp $
  * Description:
  *
  * Author:
  *		$Author: jkrueger1 $
- * History:
- *		$Log: not supported by cvs2svn $
- *		Revision 8.3  2002/09/13 07:40:12  jkrueger
- *		add unreg program to the distribution.
- *		prepare something for the gcc 3.2 compiler (not complete yet.)
- *		Jens.
- *		
- *		Revision 8.2  2001/04/10 15:32:24  pedersen
- *		some changes to automake-part
- *		
- *		Revision 8.1  2001/04/10 13:25:34  pedersen
- *		added missing files
- *		
- *		Revision 1.1.2.1  2001/04/10 13:18:22  pedersen
- *		addes missing files
- *		
- *		Revision 8.37  2001/01/19 16:18:26  pedersen
- *		 redo of esrf changes
- *		
- *		Revision 8.34  2000/11/27 13:47:29  jkrueger
- *		improve: taco mapping - remove virtual from taco... methods
- *		modify: it is now possible to export different devices from one server -
- *		             remove protected static members
- *		
- *		Revision 8.33  2000/09/12 11:03:15  jkrueger
- *		Changing the Device class to more C++ like programming.
- *		
  *******************************************************************************
  */
 
@@ -43,7 +16,7 @@
 #include <string>
 #include <API.h>
 #include <DevCmds.h>
-#include "Device.H"
+#include "DeviceBase.h"
 
 class FRMDevice:public DeviceBase
 {
@@ -55,6 +28,7 @@ private:
 
 public:
     typedef long	DevEvent;
+/*
     typedef long	(FRMDevice::*DeviceMemberFunction)(void *, void *); 
     typedef struct	_DeviceCommandListEntry
   			{
@@ -91,7 +65,7 @@ public:
 			    };
 			}DeviceEventListEntry;
     typedef std::map<DevEvent, DeviceEventListEntry>	DeviceEventList;
-
+*/
 protected:
     std::string			className;
     long			nEvents,

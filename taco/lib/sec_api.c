@@ -11,9 +11,9 @@
 
  Original   :   December 1993
 
- Version    :	$Revision: 1.2 $
+ Version    :	$Revision: 1.3 $
 
- Date       :	$Date: 2003-04-25 11:21:36 $
+ Date       :	$Date: 2003-05-02 09:12:49 $
 
  Copyright (c) 1993 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -116,28 +116,8 @@ extern nethost_info *multi_nethost;
  * in different control system and therefore has to be initialised
  * once per control system i.e. nethost.
  */
-/*short		auth_flag[MIN_NETHOST] = */
-/*                       {False,False,False,False,False,*/
-/*                        False,False,False,False,False};*/
 short		*auth_flag;
 
-#if 0
-/* 
- * Access rights string translation table now global object 
- * 20/11/2000 B. Pedersen
- */
-DevSecListEntry DevSec_List[] = {
-	{"NO_ACCESS", 		NO_ACCESS},
-	{"READ_ACCESS", 	READ_ACCESS},
-	{"WRITE_ACCESS", 	WRITE_ACCESS},
-	{"SI_WRITE_ACCESS", 	SI_WRITE_ACCESS},
-	{"SU_ACCESS", 		SU_ACCESS},
-	{"SI_SU_ACCESS", 	SI_SU_ACCESS},
-	{"ADMIN_ACCESS", 	ADMIN_ACCESS},
-};
-
-size_t SEC_LIST_LENGTH=(sizeof(DevSec_List)/ sizeof(DevSecListEntry));
-#endif
 /*+*********************************************************************
  Function   :   static long dev_security()
 
@@ -2147,7 +2127,7 @@ long _DLLFunc sec_svc_cmd (DevServerDevices *device, long connection_id,
 	DevServerClass 	ds_class;
 	register	long i;
 #endif /* __cplusplus */
-	long		min_access_right;
+	long		min_access_right = -1234L;
 
 #ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_SEC,
@@ -2163,22 +2143,15 @@ long _DLLFunc sec_svc_cmd (DevServerDevices *device, long connection_id,
 	*error = 0;
 
 #ifdef __cplusplus
-	ret = device->device->Get_min_access_right(cmd,&min_access_right,error);
-	if (ret == DS_OK)
-#if 0
-       try
-#endif
+	try
 	{
-#if 0
-	       min_access_right = device->device->GetMinAccessRight(cmd);
-	   }
-       catch (const long &lError)
-	   {
+		min_access_right = device->device->GetMinAccessRight(cmd);
+	}
+	catch (const long &lError)
+	{
 	       *error = lError;
 	       return DS_NOTOK;
-	   }
-#endif
-
+	}
 #else
 	ds_class = device->ds->devserver.class_pointer;
 
@@ -2188,133 +2161,112 @@ long _DLLFunc sec_svc_cmd (DevServerDevices *device, long connection_id,
 	 */
 
 	for (i = 0; i < ds_class->devserver_class.n_commands; i++)
-	{
 		if (cmd == (ds_class->devserver_class.commands_list[(_Int)i].cmd))
 		{
-		min_access_right = ds_class->devserver_class.commands_list[(_Int)i].min_access;
+			min_access_right = ds_class->devserver_class.commands_list[(_Int)i].min_access;
+			break;
+		}
+	if (min_access_right == -1234L)
+	{
+		*error = DevErr_CommandNotImplemented;
+		return (DS_NOTOK);
+	}
 #endif /* __cplusplus */
-
-			/*
-	       * switch on the requested access and verify the different
-	       * access modes.
-	       */
-
-			switch (access_right)
+/*
+ * switch on the requested access and verify the different
+ * access modes.
+ */
+	switch (access_right)
+	{
+		case ADMIN_ACCESS:
+/*
+ * Is the client the administrator?
+ */
+			if ( device->admin_user_flag  != True ||
+			    device->si_client_id     != client_id ||
+			    device->si_connection_id != connection_id ||
+			    device->si_access_right  != access_right )
 			{
-			case ADMIN_ACCESS:
-				/*
-		       * Is the client the administrator?
-		       */
-				if ( device->admin_user_flag  != True ||
-				    device->si_client_id     != client_id ||
-				    device->si_connection_id != connection_id ||
-				    device->si_access_right  != access_right )
-				{
 					*error = DevErr_AdminAccessWasCanceled;
 					return (DS_NOTOK);
-				}
+			}
+			break;
 
-				break;
+		case SI_WRITE_ACCESS:
+		case SI_SU_ACCESS:
+/*
+ * Return error, if the device is in administration mode.
+ */
+			if (device->admin_user_flag == True)
+			{
+				*error = DevErr_DeviceIsLockedInAdminMode;
+				return (DS_NOTOK);
+			}
 
-			case SI_WRITE_ACCESS:
-			case SI_SU_ACCESS:
-				/*
-		       * Return error, if the device is in administration mode.
-		       */
-				if (device->admin_user_flag == True)
+/*
+ * Is the client the single user?
+ */
+			if ( device->single_user_flag != True ||
+			    device->si_client_id     != client_id ||
+			    device->si_connection_id != connection_id ||
+			    device->si_access_right  != access_right )
+			{
+				*error = DevErr_SIAccessWasCanceled;
+				return (DS_NOTOK);
+			}
+			break;
+
+		default:
+/*
+ * Return error, if the device is in administration mode.
+ */
+			if (device->admin_user_flag == True)
+			{
+/*
+ * Validate the registered administrator connection
+ * before rejecting access.
+ */
+				if ( sec_verify_tcp_conn (device) == DS_OK)
 				{
 					*error = DevErr_DeviceIsLockedInAdminMode;
 					return (DS_NOTOK);
 				}
-
-				/*
-		       * Is the client the single user?
-		       */
-
-				if ( device->single_user_flag != True ||
-				    device->si_client_id     != client_id ||
-				    device->si_connection_id != connection_id ||
-				    device->si_access_right  != access_right )
+			}
+/*
+ * Return error, if the device is in single user mode,
+ * but the client is not the single user and requests
+ * a higher access right than READ_ACCESS.
+ */
+			if (device->single_user_flag == True && min_access_right > READ_ACCESS )
+			{
+/*
+ * Validate the registered single user connection
+ * before rejecting access.
+ */
+				if ( sec_verify_tcp_conn (device) == DS_OK)
 				{
-					*error = DevErr_SIAccessWasCanceled;
+					*error = DevErr_DeviceIsLockedInSiMode;
 					return (DS_NOTOK);
 				}
-
-				break;
-
-			default:
-				/*
-		       * Return error, if the device is in administration mode.
-		       */
-				if (device->admin_user_flag == True)
-				{
-					/*
-		          * Validate the registered administrator connection
-		          * before rejecting access.
-		          */
-
-					if ( sec_verify_tcp_conn (device) == DS_OK)
-					{
-						*error = DevErr_DeviceIsLockedInAdminMode;
-						return (DS_NOTOK);
-					}
-				}
-
-				/*
-		        * Return error, if the device is in single user mode,
-		        * but the client is not the single user and requests
-		        * a higher access right than READ_ACCESS.
-		        */
-
-				if (device->single_user_flag == True &&
-				    min_access_right > READ_ACCESS )
-				{
-					/*
-		           * Validate the registered single user connection
-		           * before rejecting access.
-		           */
-
-					if ( sec_verify_tcp_conn (device) == DS_OK)
-					{
-						*error = DevErr_DeviceIsLockedInSiMode;
-						return (DS_NOTOK);
-					}
-				}
-
-				break;
 			}
+			break;
+	}
 
-			/*
-	       * Now compare the minimum access right of the command
-	       * the maximum access right of the client.
-	       */
-
-			if ( access_right < min_access_right )
-			{
-				*error = DevErr_CmdAccessDenied;
-				return (DS_NOTOK);
-			}
+/*
+ * Now compare the minimum access right of the command
+ * the maximum access right of the client.
+ */
+	if ( access_right < min_access_right )
+	{
+			*error = DevErr_CmdAccessDenied;
+			return (DS_NOTOK);
+	}
 
 #ifdef EBUG
-			dev_printdebug (DBG_TRACE | DBG_SEC,
-			    "sec_svc_cmd() : leaving routine \n");
+	dev_printdebug (DBG_TRACE | DBG_SEC,
+		    "sec_svc_cmd() : leaving routine \n");
 #endif /* EBUG */
-
-			return (DS_OK);
-#ifdef __cplusplus
-	}
-	else
-	{
-#else
-		}
-	}
-#endif /* __cplusplus */
-
-	*error = DevErr_CommandNotImplemented;
-	return (DS_NOTOK);
-#ifdef __cplusplus
-	}
-#endif /* __cplusplus */
+	return (DS_OK);
 }
 
 

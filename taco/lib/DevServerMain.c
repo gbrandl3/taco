@@ -1,19 +1,19 @@
 /*+*******************************************************************
 
- File       :  	DevServerMain.c
+ File       	: DevServerMain.c
 
- Project    : 	Device Servers with sun-rpc
+ Project    	: Device Servers with sun-rpc
 
- Description:   Main programm for all device servers
+ Description	: Main programm for all device servers
 
- Author(s)  :	Jens Meyer
+ Author(s)  	: Jens Meyer
+ 		  $Author: jkrueger1 $
 
- Original   :	March 1991
+ Original   	: March 1991
 
+ Version	: $Revision: 1.2 $
 
- $Revision: 1.1 $
- $Date: 2003-04-25 11:21:26 $
- $Author: jkrueger1 $
+ Date		: $Date: 2003-05-02 09:12:48 $
 
  Copyright (c) 1990-2002 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -141,38 +141,34 @@ void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_
         short   sig;
         short   i;
 
-        /*
- *  import database server  
- *  BP: moved this to the front, as the new db_import_multi usage sets up
+/*
+ * import database server  
+ * BP: moved this to the front, as the new db_import_multi usage sets up
  * config_flags, so that server_name gets overwritten.
  */
-#if 0
-    if ( db_import (&error) < 0 )
+	if ( db_import (&error) < 0 )
 	{
 	    dev_printerror_no (SEND,"db_import failed",error);
 	    exit(-1);
 	}		
-#endif
-    /*
-
-         *  read device server's class name and personal name
-         *  check for lenght of names : server process name <= 23 char
-         *                              personal name       <= 11 char
-         */
-
+/*
+ *  read device server's class name and personal name
+ *  check for lenght of names : server process name <= 23 char
+ *                              personal name       <= 11 char
+ */
         proc_name = server_name;
 
         if ( strlen(proc_name) > 23 )
-           {
-           printf ( "Filename too long : server_name <= 23 char\n");
-           exit (-1);
-           }
+        {
+        	printf ( "Filename too long : server_name <= 23 char\n");
+           	exit (-1);
+        }
 
         if ( strlen(pers_name) > 11 )
-           {
-           printf ( "Personal DS_name too long : personal_dsname <= 11 char\n");
-           exit (-1);
-           }
+        {
+		printf ( "Personal DS_name too long : personal_dsname <= 11 char\n");
+		exit (-1);
+        }
 
 	memset  (dsn_name,0,sizeof(dsn_name));
 	strncat (dsn_name , proc_name, 23);
@@ -183,9 +179,9 @@ void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_
  */
 	if (nodb > 0)
 	{
-                 nodb_opt = True;
-                 config_flags.no_database = True;
-                 xdr_load_kernel(&error);
+		nodb_opt = True;
+		config_flags.no_database = True;
+		xdr_load_kernel(&error);
 	}
 /*
  * option pn specifies program number (to be used in conjunction with nodb)
@@ -224,7 +220,7 @@ void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_
 
 #include "resource.h"
 
-#define TITLE_STR "TACO-Device Server: "
+#define TITLE_STR 	"TACO-Device Server: "
 #define	MB_ERR		(MB_OK | MB_ICONEXCLAMATION)
 #define	MB_INFO		(MB_OK | MB_ICONINFORMATION)
 /* Makes it easier to determine appropriate code paths: */
@@ -286,10 +282,7 @@ static BOOL /* RPC and TACO initislization (Device Server's main) */
 application_main (int argc, char **argv)  /* Windows does not use main()! */
 
 #else /* _NT */
-#ifdef __cplusplus
 int main (int argc, char **argv)
-#else  /* c++ */
-int main (argc,argv)
 /*+**********************************************************************
  Function   :   main()
 
@@ -305,11 +298,6 @@ int main (argc,argv)
 
  Return(s)  :   exit(1) or exit(-1)
 ***********************************************************************-*/
-	int     argc;		/* */
-	char    **argv;		/* */
-#endif  /* c++ */
-
-
 #endif /* _NT */
 {
 /*        SVCXPRT *transp; */
@@ -358,101 +346,98 @@ int main (argc,argv)
  */
 	memset(&config_flags, 0, sizeof(config_flags));
 #if defined (unix)
-  	proc_name = (char *)strrchr (argv[0],'/');
+  	proc_name = (char *)strrchr (argv[0], '/');
 #endif	/*unix*/
 #if ( OSK || _OSK )
 #ifdef __cplusplus
-	proc_name = (char *)strrchr (argv[0],'/');
+	proc_name = (char *)strrchr (argv[0], '/');
 #else
-	proc_name = (char *)rindex (argv[0],'/');
+	proc_name = (char *)rindex (argv[0], '/');
 #endif
 #endif /* OSK || _OSK */
 
 	if (proc_name == NULL)
-	   {
-      	   proc_name = argv[0];
-	   } else  {
-           proc_name++;
-  		  }
+      		proc_name = argv[0];
+	else  
+           	proc_name++;
 
 	if ( strlen(proc_name) > 23 )
-	   {
+	{
 		char msg[]="Filename to long : server_name <= 23 char\n";
 #ifdef _NT
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
 		return(FALSE);
 #else
-	   printf (msg);
-	   exit (-1);
+		printf (msg);
+		exit (-1);
 #endif
-	   }
+	}
 
 	if ( strlen(argv[1]) > 11 )
-	   {
+	{
 		char msg[]= "Personal DS_name to long : personal_dsname <= 11 char\n";
 #ifdef _NT
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
 		return(FALSE);
 #else
-	   printf (msg); 
-	   exit (-1);
+		printf (msg); 
+		exit (-1);
 #endif
-	   }
+	}
 
-	/*
-	 *  read options for device server start
-	 */
-
+/*
+ *  read options for device server start
+ */
 	if (argc > 2)
 	{
-	   for (i=2; i<(argc); i++)
-	   {
-	      if (strcmp (argv[i],"-m") == 0)
-		 m_opt = True;
-	      if (strcmp (argv[i],"-s") == 0)
-		 s_opt = True;
+		for (i=2; i<(argc); i++)
+		{
+			if (strcmp (argv[i],"-m") == 0)
+				m_opt = True;
+			if (strcmp (argv[i],"-s") == 0)
+				s_opt = True;
 /*
  * option -nodb means run device server without database
  */
-	      if (strcmp (argv[i],"-nodb") == 0)
-	      {
-		 nodb_opt = True;
-		 config_flags.no_database = True;
-		 xdr_load_kernel(&error);
-	      }
+			if (strcmp (argv[i],"-nodb") == 0)
+			{
+				nodb_opt = True;
+				config_flags.no_database = True;
+				xdr_load_kernel(&error);
+			}
 /*
  * option -pn specifies program number (to be used in conjunction with -nodb)
  */
-	      if (strcmp (argv[i],"-pn") == 0)
-	      {
-		 sscanf(argv[i+1],"%d",&prog_number);
+			if (strcmp (argv[i],"-pn") == 0)
+			{
+				sscanf(argv[i+1],"%d",&prog_number);
 /*
  * unregister this program number from the portmapper - this is potentially
  * dangerous because it can unregister another running server. we assume
  * the -pn option is used by those who know what they are doing ...
  */
-		 if (prog_number != 0)
-		 {
-        	    pmap_unset (prog_number, API_VERSION);
-        	    pmap_unset (prog_number, ASYNCH_API_VERSION);
-		 }
-		 i++;
-              }
+				if (prog_number != 0)
+				{
+					pmap_unset (prog_number, API_VERSION);
+					pmap_unset (prog_number, ASYNCH_API_VERSION);
+				}
+				i++;
+			}
 /*
  * option -device means remaining command line arguments are device names
  */
-	      if (strcmp (argv[i],"-device") == 0)
-	      {
-		 config_flags.device_no = argc-i-1;
-		 config_flags.device_list = (char**)malloc(config_flags.device_no*sizeof(char));
-		 for (j=i+1; j<argc; j++)
-		 {
-		 	config_flags.device_list[j-i-1] = (char*)malloc(strlen(argv[j])+1);
-		 	sprintf(config_flags.device_list[j-i-1],"%s",argv[j]);
-		 }
-		 i = j;
-              }
-	   }
+			if (strcmp (argv[i],"-device") == 0)
+			{
+				config_flags.device_no = argc-i-1;
+				config_flags.device_list = (char**)malloc(config_flags.device_no*sizeof(char));
+				for (j=i+1; j<argc; j++)
+				{
+					config_flags.device_list[j-i-1] = (char*)malloc(strlen(argv[j])+1);
+					sprintf(config_flags.device_list[j-i-1],"%s",argv[j]);
+				}
+				i = j;
+			}
+		}
 	}
 	memset  (dsn_name,0,sizeof(dsn_name));
 	strncat (dsn_name , proc_name, 23);
@@ -460,10 +445,10 @@ int main (argc,argv)
 	strncat (dsn_name , argv[1], 11);
 
 #endif /* vxworks || NOMAIN */
-	/*
-	 *  get process ID, host_name 
-	 *  and create device server network name
-	 */
+/*
+ *  get process ID, host_name 
+ *  and create device server network name
+ */
 
 #if defined (_NT)
         pid = _getpid ();
@@ -557,8 +542,8 @@ int main (argc,argv)
 	printf( "using hostname: %s\n", host_name);
 #endif*/
 
-   TOLOWER(dsn_name);
-   TOLOWER(host_name);
+	TOLOWER(dsn_name);
+	TOLOWER(host_name);
 	sprintf (config_flags.server_name,"%s", dsn_name); 
 	sprintf (config_flags.server_host,"%s", host_name); 
 
@@ -597,133 +582,112 @@ int main (argc,argv)
 /*
  *  if database required then import database server  
  */
-
 		if ( db_import (&error) < 0 )
 	   	{
-	   	dev_printerror_no (SEND,"db_import failed",error);
-	   	exit(-1);
+	   		dev_printerror_no (SEND,"db_import failed",error);
+	   		exit(-1);
 	   	}		
-
-
 /*
  *  check wether an old server with the same name
  *  is mapped to portmap or still running
  */
-
 		if ( svc_check(&error) < 0 )
 	   	{
-	   	dev_printerror_no (SEND,"svc_check()",error);
-	   	exit(-1);
+	   		dev_printerror_no (SEND,"svc_check()",error);
+	   		exit(-1);
 	   	}		
-
-
 /*
  * If the security system is switched on, read the minimal
  * access right for version 3 clients from the 
  * security database.
  */
-
        		if ( config_flags.security == True )
 	   	{
-	   	default_access.length   = 0;
-	   	default_access.sequence = NULL;
+	   		default_access.length   = 0;
+	   		default_access.sequence = NULL;
 
-       	   	sprintf (res_name, "default");
-	   	res_tab.resource_name = res_name;
-	   	res_tab.resource_type = D_VAR_STRINGARR;
-	   	res_tab.resource_adr  = &default_access;
+       	   		sprintf (res_name, "default");
+	   		res_tab.resource_name = res_name;
+	   		res_tab.resource_type = D_VAR_STRINGARR;
+	   		res_tab.resource_adr  = &default_access;
 
-	   	sprintf (res_path, "SEC/MINIMAL/ACC_RIGHT");
+	   		sprintf (res_path, "SEC/MINIMAL/ACC_RIGHT");
 
-	   	if (db_getresource (res_path, &res_tab, 1, &error) == DS_NOTOK)
-	      	{
-	      	dev_printerror_no (SEND,
-	      	"db_getresource() get default security access right\n",error);
-	      	exit (-1);
-	      	}
-
+	   		if (db_getresource (res_path, &res_tab, 1, &error) == DS_NOTOK)
+	      		{
+			      	dev_printerror_no (SEND,
+	      				"db_getresource() get default security access right\n",error);
+	      			exit (-1);
+	      		}
 /*
  * Transform the string array into an access right value.
  */
+           		if ( default_access.length > 0 )
+	      		{
+              			for (i=0; i<SEC_LIST_LENGTH; i++)
+                 		{
+                 			if (strcmp (default_access.sequence[0], 
+			     			DevSec_List[i].access_name) == 0)
+                    			{
+			                    	minimal_access = DevSec_List[i].access_right;
+                    				break;
+                    			}
+                 		}
+              			if ( i == SEC_LIST_LENGTH )
+		                 	minimal_access = NO_ACCESS;
+	      		}	 
+	   		else 
+		              	minimal_access = NO_ACCESS;
 
-           	if ( default_access.length > 0 )
-	      	{
-              	for (i=0; i<SEC_LIST_LENGTH; i++)
-                 	{
-                 	if (strcmp (default_access.sequence[0], 
-			     	DevSec_List[i].access_name) == 0)
-                    	{
-                    	minimal_access = DevSec_List[i].access_right;
-                    	break;
-                    	}
-                 	}
-              		if ( i == SEC_LIST_LENGTH )
-                 	{
-                 	minimal_access = NO_ACCESS;
-                 	}
-	      	}	 
-	   	else 
-	      	{
-              	minimal_access = NO_ACCESS;
-	      	}
-
-	   	free_var_str_array (&default_access);
+	   		free_var_str_array (&default_access);
 	   	}
 	}		
-
 /*
  * let portmapper choose port numbers for services 
  */
         udp_socket = RPC_ANYSOCK;
         tcp_socket = RPC_ANYSOCK;
 
-    	/*
-	 *  create server handle and register to portmap
-	 */
+/*
+ *  create server handle and register to portmap
+ */
 
-	/*
-	 *  register udp port
-	 */
+/*
+ *  register udp port
+ */
 	transp = svcudp_create (udp_socket);
 	if (transp == NULL) 
-		{
+	{
 		char msg[]="Cannot create udp service, exiting...\n";
 #if defined(_NT)
-			MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
-            /*raise(SIGABRT);*/
-			return (FALSE);
+		MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
+            	/*raise(SIGABRT);*/
+		return (FALSE);
 #else
-			printf (msg);
-            kill (pid,SIGQUIT);
+		printf (msg);
+            	kill (pid,SIGQUIT);
 #endif
-		}
-	/*
-	 *  make 3 tries to get transient progam number
-	 */
-	 
+	}
+/*
+ *  make 3 tries to get transient progam number
+ */
 	synch_svc_udp_sock = -1;
-
 	for (i=0; i<3; i++)
 	{
 		if (prog_number == 0)
-		{
 			prog_number = gettransient(dsn_name);
-		}
 		if( prog_number == 0 )
 		{
 	  		dev_printerror_no(SEND,"gettransient: no free programm nnumber\n",error);
 	  		exit(-1);
 		}
-
-	/*
-	 * Write the device server identification to the global
-	 * configuration structure.
-	 */
-
+/*
+ * Write the device server identification to the global
+ * configuration structure.
+ */
 		config_flags.prog_number = prog_number;
 		/*config_flags.vers_number = DEVSERVER_VERS;*/
 		config_flags.vers_number = API_VERSION;
-
 
 		if (!svc_register(transp, prog_number, API_VERSION, 
 			  	devserver_prog_4, IPPROTO_UDP)) 
@@ -763,31 +727,31 @@ int main (argc,argv)
  */
 	transp_tcp = svctcp_create(tcp_socket,0,0);
 	if (transp_tcp == NULL) 
-		{
+	{
 		char msg[]= "Cannot create tcp service, exiting...\n";
 #if defined(_NT)
-			MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
-            /*raise(SIGABRT);*/
-			return (FALSE);
+		MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
+            	/*raise(SIGABRT);*/
+		return (FALSE);
 #else
-			printf (msg); 
-			kill (pid,SIGQUIT);
+		printf (msg); 
+		kill (pid,SIGQUIT);
 #endif
-		}
+	}
 
         if (!svc_register(transp_tcp, prog_number, API_VERSION,
 			  devserver_prog_4, IPPROTO_TCP))
-		{
-	    char msg[]= "Unable to register server (TCP,4), exiting...\n";
+	{
+		char msg[]= "Unable to register server (TCP,4), exiting...\n";
 #if defined(_NT)
-			MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
-			raise(SIGABRT);
-			return (FALSE);
+		MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
+		raise(SIGABRT);
+		return (FALSE);
 #else
-			printf (msg); 
-			kill (pid,SIGQUIT);
+		printf (msg); 
+		kill (pid,SIGQUIT);
 #endif
-		}
+	}
 
 /*
  * keep the socket, we need it later
@@ -820,64 +784,59 @@ int main (argc,argv)
 		kill (pid,SIGQUIT);
 #endif
  */
-	/* startup message serveice */
-	if(m_opt ==True)
-	    {	
-		display=getenv("DISPLAY");
-		if(msg_import(dsn_name,host_name,prog_number,display,&error)!=DS_OK)
-		    {
+/* startup message service */
+		if (m_opt ==True)
+	    	{	
+			display=getenv("DISPLAY");
+			if(msg_import(dsn_name,host_name,prog_number,display,&error)!=DS_OK)
+		    	{
 			/* we dont care */
-			printf("can not import message service\n");
-		    }	
-	    }
+				printf("can not import message service\n");
+		    	}	
+	    	}
 	}
 
 /*
  *  startup device server
  */
-
 	if (s_opt == True)
-	   {
-           /*
-            * Set the startup configuration flag to SERVER_STARTUP
-            * during the startup phase.
-            */
-
-           config_flags.startup = SERVER_STARTUP;
-
-	   status = startup(config_flags.server_name,&error);
-	   if ( status < 0 )
-	      {
-	      dev_printerror_no (SEND,"startup failed",error);
+	{
+/*
+ * Set the startup configuration flag to SERVER_STARTUP
+ * during the startup phase.
+ */
+		config_flags.startup = SERVER_STARTUP;
+		status = startup(config_flags.server_name,&error);
+		if ( status != DS_OK )
+		{
+			dev_printerror_no (SEND,"startup failed",error);
 #if defined(_NT)
-              raise(SIGABRT);
+			raise(SIGABRT);
 #else
-              kill (pid,SIGQUIT);
+			kill (pid,SIGQUIT);
 #endif
-	      }		
+		}		
 
 /*
  *  if ds__svcrun() is used, the server can return from
  *  the startup function with status=1 to avoid svc_run()
  *  and to do a proper exit.
  */
-	   if ( status == 1 )
-	      {
+		if ( status == 1 )
+		{
 #if defined(_NT)
-                raise(SIGABRT);
+			raise(SIGABRT);
 #else
-                kill (pid,SIGQUIT);
+			kill (pid,SIGQUIT);
 #endif
-	      }
-
-	   config_flags.startup = True;
-	   }
+		}
+		config_flags.startup = True;
+	}
 
 #ifndef _NT
 /*
  *  set server into wait status
  */
-
 	svc_run();
 	{
 		char msg[]= "svc_run returned\n";
@@ -889,7 +848,6 @@ int main (argc,argv)
  * show up the main dialog
  */
 	return TRUE;
-
 #endif
 }
 
@@ -1364,13 +1322,9 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		   /*
 			* RPC and potmapper stuff.
 			*/
-			svc_unregister(config_flags.prog_number, API_VERSION);
 			svc_unregister(config_flags.prog_number, DEVSERVER_VERS);
-#if 0
-    svc_unregister(prog_number, DEVSERVER_VERS);
-    svc_unregister(prog_number, API_VERSION);
-    svc_unregister(prog_number, ASYNCH_API_VERSION);
-#endif
+			svc_unregister(config_flags.prog_number, API_VERSION);
+			svc_unregister(config_flags.prog_number, ASYNCH_API_VERSION);
 
 			svc_destroy(transp);
 			svc_destroy(transp_tcp);
@@ -1872,19 +1826,17 @@ static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp)
 		local = (char *(*)()) rpc_dev_cmd_query_4;
 #endif
 		break;
-#if 0
 /* event query */
-    case RPC_DEV_EVENT_QUERY:
-        xdr_argument = (xdrproc_t)xdr__dev_query_in;
-        xdr_result = (xdrproc_t)xdr__dev_query_out;
+	case RPC_DEV_EVENT_QUERY:
+        	xdr_argument = (xdrproc_t)xdr__dev_query_in;
+        	xdr_result = (xdrproc_t)xdr__dev_query_out;
 #ifdef __cplusplus
-        local = (DevRpcLocalFunc) rpc_dev_event_query_4;
+        	local = (DevRpcLocalFunc) rpc_dev_event_query_4;
 #else
-        local = (char *(*)()) rpc_dev_event_query_4;
+        	local = (char *(*)()) rpc_dev_event_query_4;
 #endif
-        break;
+        	break;
 /* end event query */
-#endif
 
 
 /*
