@@ -1,5 +1,5 @@
 #!/bin/sh
-LIBTOOLIZE="libtoolize --force --copy --ltdl --automake"
+LIBTOOLIZE="libtoolize --force --copy --automake"
 ACLOCAL="aclocal $aclocal_includes"
 AUTOHEADER="autoheader"
 AUTOMAKE="automake -a -c --foreign"
