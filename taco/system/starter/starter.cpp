@@ -1,19 +1,19 @@
 /*****************************************************************************
  *
- * File:        $Id: starter.cpp,v 1.1 2003-05-05 16:04:05 jkrueger1 Exp $
+ * File:        $Id: starter.cpp,v 1.2 2003-05-07 14:53:11 jkrueger1 Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
  * Description: Source code for implementing a starter server
  *
- * Author(s):   Jens Krüeger
+ * Author(s):   Jens Krüger
  * 		$Author: jkrueger1 $
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.1 $
+ * Version:	$Revision: 1.2 $
  *
- * Date:	$Date: 2003-05-05 16:04:05 $
+ * Date:	$Date: 2003-05-07 14:53:11 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -138,11 +138,12 @@ void StarterDevice::deviceRun(string proc, string pers, string options, string p
 		std::cerr << "Start Child" << endl;
 #endif
 		int 	fd = open("/dev/null", O_APPEND);
-		dup2(fd, fileno(stderr));
 		dup2(fd, fileno(stdout));
 		execlp(proc.c_str(), proc.c_str(), pers.c_str(), options.c_str(), NULL);
+		close(fd);
 		perror("Execute failed");
-		throw long(DevErr_CantFindExecutable);
+		exit(0);
+//		throw long(DevErr_CantFindExecutable);
 	}
 	else if (pid < 0)
 		throw long(DevErr_NoProcessWithPid);
