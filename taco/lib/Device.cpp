@@ -8,13 +8,13 @@
 //		the device server base class in C++ (Device).
 //
 // Author(s):	Andy Goetz
-// 		$Author: jkrueger1 $
+// 		$Author: andy_gotz $
 //
 // Original:	March 1995
 //
-// Version:	$Revision: 1.4 $
+// Version:	$Revision: 1.5 $
 //
-// Date:	$Date: 2004-11-05 08:52:35 $
+// Date:	$Date: 2004-11-24 20:45:31 $
 //
 //-**********************************************************************
 		
@@ -89,15 +89,19 @@ Device::Device (DevString devname, long *error)
 	}
 	strcpy(this->name, devname);
 //
+// the following commands will not be added by default, it is up to the device subclass to add these
+// if needed - andy 24nov2004
+//
+//
 // initialise the commands list
 //
-	this->commands_list[DevState] = DeviceCommandListEntry(long(DevState), (DeviceMemberFunction)&Device::State, D_VOID_TYPE, D_SHORT_TYPE, 0L, "State");
-	this->commands_list[DevStatus] = DeviceCommandListEntry(long(DevStatus), (DeviceMemberFunction)&Device::Status, D_VOID_TYPE, D_STRING_TYPE, 0L, "Status");
-	this->commands_list[DevOn] = DeviceCommandListEntry(long(DevOn), (DeviceMemberFunction)&Device::On, D_VOID_TYPE, D_VOID_TYPE, 0L, "On");
-	this->commands_list[DevOff] = DeviceCommandListEntry(long(DevOff), (DeviceMemberFunction)&Device::Off, D_VOID_TYPE, D_VOID_TYPE, 0L, "Off");
-	this->commands_list[DevReset] = DeviceCommandListEntry(long(DevReset), (DeviceMemberFunction)&Device::Reset, D_VOID_TYPE, D_VOID_TYPE, 0L, "Reset");
-	this->commands_list[DevClose] = DeviceCommandListEntry(long(DevClose), (DeviceMemberFunction)&Device::Close, D_VOID_TYPE, D_VOID_TYPE, ADMIN_ACCESS, "Close");
-	this->n_commands = this->commands_list.size();
+//	this->commands_map[DevState] = DeviceCommandMapEntry(long(DevState), (DeviceBaseMemberFunction)&Device::State, D_VOID_TYPE, D_SHORT_TYPE, 0L, "State");
+//	this->commands_map[DevStatus] = DeviceCommandMapEntry(long(DevStatus), (DeviceBaseMemberFunction)&Device::Status, D_VOID_TYPE, D_STRING_TYPE, 0L, "Status");
+//	this->commands_map[DevOn] = DeviceCommandMapEntry(long(DevOn), (DeviceBaseMemberFunction)&Device::On, D_VOID_TYPE, D_VOID_TYPE, 0L, "On");
+//	this->commands_map[DevOff] = DeviceCommandMapEntry(long(DevOff), (DeviceBaseMemberFunction)&Device::Off, D_VOID_TYPE, D_VOID_TYPE, 0L, "Off");
+//	this->commands_map[DevReset] = DeviceCommandMapEntry(long(DevReset), (DeviceBaseMemberFunction)&Device::Reset, D_VOID_TYPE, D_VOID_TYPE, 0L, "Reset");
+//	this->commands_map[DevClose] = DeviceCommandMapEntry(long(DevClose), (DeviceBaseMemberFunction)&Device::Close, D_VOID_TYPE, D_VOID_TYPE, ADMIN_ACCESS, "Close");
+	this->n_commands = this->commands_map.size();
 	this->state = DEVON;
 }
 
@@ -132,14 +136,36 @@ long Device::GetResources(char *name, long *error )
 long Device::Command (long cmd, void* argin, long argin_type,
                       void* argout, long argout_type, long *error)
 {
-	DeviceMemberFunction member_fn;
+	DeviceBaseMemberFunction member_fn;
 
 	dev_printdebug(DBG_TRACE,"Device::Command() called, cmd = %d\n",cmd);
+
+// in the new scheme of things the command list is a map instead of
+// an array. if the map has not commands then assume the device class
+// has initialised the array and not the map. copy the array contents
+// to the map. this should only be done once because afterwards the
+// the map will be initialised - andy 24nov2004
+//
+	if (commands_map.size() == 0) 
+	{
+		dev_printdebug(DBG_TRACE,"Device::Command() initialise commands_map from commands_list array, n_commands = %d\n",this->n_commands);
+   		for (int i = 0; i < this->n_commands; i++)
+   		{
+			this->commands_map[this->commands_list[i].cmd] = 
+				DeviceCommandMapEntry(
+				this->commands_list[i].cmd, 
+				(DeviceBaseMemberFunction)this->commands_list[i].fn, 
+				this->commands_list[i].argin_type, 
+				this->commands_list[i].argout_type, 
+				this->commands_list[i].min_access, 
+				this->commands_list[i].cmd_name);
+		}
+	}
 
 //
 // add code to execute a command here
 //
-	for (std::map<DevCommand, DeviceCommandListEntry>::iterator it = this->commands_list.begin(); it != this->commands_list.end(); ++it)
+	for (std::map<DevCommand, DeviceCommandMapEntry>::iterator it = this->commands_map.begin(); it != this->commands_map.end(); ++it)
 	{
 		if (cmd == it->second.cmd)
 		{
@@ -347,7 +373,7 @@ long Device::Command_Query(_dev_cmd_info *cmd_info,long *error)
 {
 	*error = DS_OK;
 	long	i = 0;
-	for (std::map<DevCommand, DeviceCommandListEntry>::iterator it = this->commands_list.begin(); it != this->commands_list.end(); ++it, ++i)
+	for (std::map<DevCommand, DeviceCommandMapEntry>::iterator it = this->commands_map.begin(); it != this->commands_map.end(); ++it, ++i)
 	{
 		cmd_info[i].cmd = it->second.cmd;
 		cmd_info[i].in_type = it->second.arginType;
@@ -385,10 +411,10 @@ long Device::Get_min_access_right(long cmd,long *min_access,long *error)
 {
 	*error = DS_OK;
 
-	for (long i = 0;i < this->commands_list.size(); i++)
-		if (cmd == this->commands_list[i].cmd)
+	for (long i = 0;i < this->commands_map.size(); i++)
+		if (cmd == this->commands_map[i].cmd)
 		{
-			*min_access = this->commands_list[i].minAccess;
+			*min_access = this->commands_map[i].minAccess;
 			return(DS_OK);
 		}
 	*error = DevErr_CommandNotImplemented;

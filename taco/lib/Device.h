@@ -12,9 +12,9 @@
 //
 // Original:	February 1995
 //
-// $Revision: 1.1 $
+// $Revision: 1.2 $
 //
-// $Date: 2004-11-04 14:02:40 $
+// $Date: 2004-11-24 20:45:56 $
 //
 // $Author: andy_gotz $
 //
@@ -45,6 +45,24 @@ private :
 // public members
 //
 public:
+
+typedef long (Device::* DeviceMemberFunction)(void*, void*, long* );
+typedef struct _DeviceCommandListEntry {
+                                     DevCommand         cmd;
+                                     DeviceMemberFunction  fn;
+                                     DevArgType         argin_type;
+                                     DevArgType         argout_type;
+                                     long               min_access;
+                                     char               *cmd_name;
+				_DeviceCommandListEntry() : cmd(0), fn(NULL), argin_type(0), argout_type(0), min_access(0), cmd_name(NULL) {};
+				_DeviceCommandListEntry(DevCommand _cmd, DeviceMemberFunction f, DevArgType in, DevArgType out, 
+							long acc, char *_cmd_name = NULL) 
+					: cmd(_cmd), fn(f), argin_type(in), argout_type(out), min_access(acc), cmd_name(_cmd_name)	{};
+                                    }
+               DeviceCommandListEntry;
+
+typedef struct _DeviceCommandListEntry *DeviceCommandList;
+
 	virtual long State(void *vargin, void *vargout , long *error);
 	virtual long Status(void *vargin, void *vargout, long *error);
 	virtual long On(void *vargin, void *vargout, long *error);
@@ -59,6 +77,8 @@ public:
 	char dev_type[DEV_TYPE_LENGTH];
 
 	char* name;
+
+
 
 	Device (DevString name, long *error);
 	virtual ~Device ();
@@ -100,6 +120,7 @@ protected:
 	long state; 		// device state
 	long n_state; 		// convenience variable for storing next device state
 	long n_commands;	// number of commands
+   	DeviceCommandList commands_list; // array of commands (for backwards compatibility @ ESRF)
   
 private: 
 	Device(){};

@@ -9,13 +9,13 @@
 //		(DeviceClass).
 //
 // Author(s):	Björn Pedersen
-// 		$Author: jkrueger1 $
+// 		$Author: andy_gotz $
 //
 // Original:	 
 //
-// $Revision: 1.2 $
+// $Revision: 1.3 $
 //
-// $Date: 2004-09-17 07:53:16 $
+// $Date: 2004-11-24 20:46:09 $
 //
 //+**********************************************************************
 
@@ -82,7 +82,7 @@ public:
 	virtual const char 	*GetClassName() = 0;
 	virtual const char 	*GetDevType() = 0;
 	virtual const char 	*GetDevName() = 0;
-	virtual unsigned int 	GetCommandNumber() {return commands_list.size();}
+	virtual unsigned int 	GetCommandNumber() {return commands_map.size();}
 	virtual long 		CommandQuery(_dev_cmd_info *sequence) = 0;
 	virtual unsigned 	GetEventNumber(void) {return events_list.size();}
 	virtual long		EventQuery(_dev_event_info *) = 0;
@@ -91,37 +91,35 @@ public:
 // protected members - accessible only be derived classes
 // 
 	typedef long	DevEvent;
-	typedef long 	(DeviceBase::*DeviceMemberFunction)(void*, void*, long*);
+	typedef long 	(DeviceBase::*DeviceBaseMemberFunction)(void*, void*, long*);
 
-	typedef struct  _DeviceCommandListEntry
+	typedef struct  _DeviceCommandMapEntry
 			{
 				DevCommand         	cmd;
-				DeviceMemberFunction	fn;
+				DeviceBaseMemberFunction	fn;
 				DevArgType		arginType;
 				DevArgType		argoutType;
 				long			minAccess;
 				char			*cmd_name;
-				_DeviceCommandListEntry() : cmd(0), fn(NULL), arginType(0), argoutType(0), minAccess(0), cmd_name(NULL) {}
-				_DeviceCommandListEntry(DevCommand _cmd, DeviceMemberFunction f, DevArgType in, DevArgType out, 
+				_DeviceCommandMapEntry() : cmd(0), fn(NULL), arginType(0), argoutType(0), minAccess(0), cmd_name(NULL) {};
+				_DeviceCommandMapEntry(DevCommand _cmd, DeviceBaseMemberFunction f, DevArgType in, DevArgType out, 
 							long acc, char *_cmd_name = NULL) 
-					: cmd(_cmd), fn(f), arginType(in), argoutType(out), minAccess(acc), cmd_name(_cmd_name)
-
-				{}
-			}DeviceCommandListEntry;
-	typedef std::map<DevCommand, DeviceCommandListEntry>        	DeviceCommandList;
+					: cmd(_cmd), fn(f), arginType(in), argoutType(out), minAccess(acc), cmd_name(_cmd_name)	{};
+			}DeviceCommandMapEntry;
+	typedef std::map<DevCommand, DeviceCommandMapEntry>        	DeviceCommandMap;
 
 	typedef struct  _DeviceEventListEntry
                         {
 				DevEvent	event;
 				DevArgType	argType;
 				char		*event_name;
-				_DeviceEventListEntry() : event(0), argType(0), event_name(NULL) {}
+				_DeviceEventListEntry() : event(0), argType(0), event_name(NULL) {};
 				_DeviceEventListEntry(DevEvent _event, DevArgType type, char *_event_name) 
-					: event(_event), argType(type), event_name(_event_name) {}
+					: event(_event), argType(type), event_name(_event_name) {};
 			}DeviceEventListEntry;
 	typedef std::map<DevEvent, DeviceEventListEntry>    DeviceEventList;
 
-	DeviceCommandList commands_list;
+	DeviceCommandMap commands_map;
 	DeviceEventList events_list;
 
 protected:
