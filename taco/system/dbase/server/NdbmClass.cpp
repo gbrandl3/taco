@@ -143,9 +143,9 @@ std::string NdbmNamesKey::get_ds_name(void)
 // Method to return the DS personal name
 std::string  NdbmNamesKey::get_ds_pers_name(void)
 {
-	std::string::size_type pos,start;
+	std::string::size_type 	pos = 0,
+				start;
 	
-	pos = 0;
 	for (long i = 0; i < NB_SEP_DS_PERS; ++i)
 	{
 		if ((pos = str.find(SEP, pos)) == std::string::npos)
@@ -889,36 +889,36 @@ NdbmResKey::NdbmResKey(datum user_key)
 // [] operator overloading. It returns one key character
 char NdbmResKey::operator [] (long i)
 {
-    try
-    {
-	return(str.at(i));
-    }
-    catch(const std::out_of_range &)
-    {
-	throw NdbmError(DbErr_IndTooLarge, MessTooLarge);
-    }
+	try
+	{
+		return(str.at(i));
+	}
+	catch(const std::out_of_range &)
+	{
+		throw NdbmError(DbErr_IndTooLarge, MessTooLarge);
+	}
 }
 
 //
-//		Class methods
+// Class methods
 //
 // Method to build a datum data from the already stored content
 void NdbmResKey::build_datum()
 {
-    try
-    {
-	long l = str.size();
-	if (l != 0)
+	try
 	{
-	    key.dptr = new char[l + 1];
-	    strcpy(key.dptr, str.c_str());
-	    key.dsize = l;
+		long l = str.length();
+		if (l != 0)
+		{
+			key.dptr = new char[l + 1];
+			strcpy(key.dptr, str.c_str());
+			key.dsize = l;
+		}
 	}
-    }
-    catch (std::bad_alloc)
-    {
-	throw;
-    }
+	catch (std::bad_alloc)
+	{
+		throw;
+	}
 }
 
 
@@ -929,18 +929,12 @@ void NdbmResKey::upd_indi(long ind)
 //
 // Build the new key
 //
+	std::stringstream to;
+	to << inter_str << ind << '|' << std::ends;
 #if !HAVE_SSTREAM
-    std::stringstream to(key.dptr, MAX_KEY);
-#else
-    std::stringstream to(std::string(key.dptr, MAX_KEY));
+	to.freeze(false);
 #endif
-    to << inter_str << ind << '|' << std::ends;
-#if !HAVE_SSTREAM
-    key.dsize = strlen(to.str());
-    to.freeze(false);
-#else
-    key.dsize = strlen(to.str().c_str());
-#endif
+	build_datum();
 }
 
 // Method to retrieve resource family name
