@@ -1,34 +1,33 @@
 /*+*******************************************************************
+ * 
+ * File:          macros.h
+ *  
+ *  Project:       Device Servers with sun-rpc
+ * 
+ * Description:   Public macro definitions.
+ * 		Macros for function declarations and prototypes.
+ *
+ * Author(s):     Jens Meyer
+ * 		$Author: jkrueger1 $
+ *
+ * Original:      July 1994
+ *
+ * Version:	$Revision: 1.3 $
+ *
+ * Date:		$Date: 2003-05-22 08:09:18 $
+ *
+ * Copyright (c) 1990 by European Synchrotron Radiation Facility,
+ *                       Grenoble, France
+ *
+ ********************************************************************-*/
 
- File:          macros.h
-
- Project:       Device Servers with sun-rpc
-
- Description:   Public macro definitions.
-		Macros for function declarations and prototypes.
-
- Author(s):     Jens Meyer
- 		$Author: jkrueger1 $
-
- Original:      July 1994
-
- Version:	$Revision: 1.1 $
-
- Date:		$Date: 2003-04-25 11:21:47 $
-
- Copyright (c) 1990 by European Synchrotron Radiation Facility,
-                       Grenoble, France
-
-*******************************************************************-*/
-
-#ifndef _macros_h
-#define _macros_h
+#ifndef taco_macros_h
+#define taco_macros_h
 
 /*
  * convert NULL-terminated string to lower characters
  */
-#define TOLOWER(a) {char* i; i=a; while ( '\0'!=*i ) \
-      { *i=tolower(*i);i++; }}
+#define TOLOWER(a) {char* i; i=a; while ( '\0'!=*i ) { *i=tolower(*i);i++; }}
 
 #if !defined(FORTRAN)
 
@@ -163,24 +162,24 @@ typedef unsigned int	size_t;
 #endif /* !(linux) */
 #define	_Int		long
 #define _WINAPI
-#define TIMEVAL(a)  a
-#define MAXU_INT    ~0
+#define TIMEVAL(a)  	a
+#define MAXU_INT    	~0
 #define _DLLFunc        
 #define HWALK(p)
-#define PRINTF(a)      printf(a)
+#define PRINTF(a)	printf(a)
 
 #else /* (_NT) */
 #define _LPfd_set	struct fd_set *
 #define	_Int		short
-#define _WINAPI     WINAPI	   /* needed for MSVC++ */
-#define TIMEVAL(a)    (struct timeval*)&a	  /* needed for NetManage's RPC clnt_call() */
-#define MAXU_INT    0xFFFFFFFF
+#define _WINAPI     	WINAPI	   /* needed for MSVC++ */
+#define TIMEVAL(a)    	(struct timeval*)&a	  /* needed for NetManage's RPC clnt_call() */
+#define MAXU_INT    	0xFFFFFFFF
 
 /* Macros for NT DLL symbol definition */
 #define DllExport       __declspec( dllexport )
 #define DllImport       __declspec( dllimport )
 #ifdef _DLL           /* export definitions for NT Dlls */
-#define _DLLFunc   DllExport
+#define _DLLFunc   	DllExport
 #else 
 #define _DLLFunc
 #endif /* (_DLL) */
@@ -188,10 +187,10 @@ typedef unsigned int	size_t;
 /*
  * Heap Walk utility: very useful for debugging !!
  */
-extern _DLLFunc size_t msize PT_( (void* pointer, int* error) );
+extern _DLLFunc size_t 	msize PT_( (void* pointer, int* error) );
 #if defined (_HWALK)
-static int msz_error;
-static size_t msz_size;
+static int 		msz_error;
+static size_t 		msz_size;
 
 #define HWALK(p) msz_size= msize(p,&msz_error); \
    if(msz_size ==0)    \
