@@ -8,13 +8,13 @@
 		programmers interface.
 
  Author(s):	Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original:	June 1992
 
- Version:	$Revision: 1.5 $
+ Version:	$Revision: 1.6 $
 
- Date:		$Date: 2005-02-22 15:59:57 $
+ Date:		$Date: 2005-03-29 09:40:54 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -30,7 +30,7 @@
  */
 #ifdef _IDENT
 static char ApiPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.5 2005-02-22 15:59:57 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.6 2005-03-29 09:40:54 andy_gotz Exp $";
 #endif /* _IDENT */
 
 
@@ -357,6 +357,7 @@ long  dev_query_svr PT_( (char* host,long prog_number,long vers_number) );
  * Calls to setup the connection to the manager, database and message server
  */
 long setup_config_multi PT_( (char *nethost, long *error) );
+long setup_config PT_( (long *error) );
 long db_import_multi PT_( (char *nethost, long *error) );
 long db_ChangeDefaultNethost PT_( (char* nethost, long *error));
 
@@ -385,6 +386,14 @@ void asynch_client_cleanup PT_( (long *error) );
 void asynch_timed_out PT_( (devserver ds) );
 long asynch_client_ping PT_( (long i, long *error) );
 void event_client_cleanup PT_( (long *error) );
+
+/* Attribute access entry points */
+
+long attribute_import (char *attribute_name, long access, devserver *ds_ptr, long *error);
+long attribute_free (devserver ds, long *error); 
+long attribute_putget (devserver ds, long cmd, DevArgument argin, DevType argin_type,DevArgument argout, DevType argout_type, long *error);
+long attribute_put (devserver ds, long cmd, DevArgument argin, DevType argin_type, long *error);
+long attribute_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error);
 
 /* TANGO entry points */
 
@@ -494,6 +503,19 @@ extern "C" configuration_flags  config_flags;
 extern "C" nethost_info 	*multi_nethost;
 extern "C" dbserver_info        db_info;
 #endif
+
+#ifdef TANGO_API
+typedef struct _tango_device {
+   public :
+          long flag;
+          //vector<string> cmd_name;
+          char **cmd_name;
+          long n_cmds;
+          long *cmd_value;
+          long *argin_type;
+          long *argout_type;
+          Tango::DeviceProxy *device_proxy;} _tango_device;
+#endif /* TANGO_API */
 
 /* mutex locking for handling asyncronous request */
 #ifdef _REENTRANT
