@@ -81,7 +81,8 @@ int main(int argc,char **argv)
 	}
 	for (int i = 0; i < events.length; ++i)
 		std::cout << std::setw(14) << (unsigned)events.sequence[i].event
-			<< std::setw(25) << events.sequence[i].event_name << std::endl;
+			<< std::setw(12) << (unsigned)events.sequence[i].out_type
+			<< std::setw(25) << "\"" << events.sequence[i].event_name << "\"" << std::endl;
 
 	dev_free(ps,&error);
 	return 0;
