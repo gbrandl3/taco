@@ -95,6 +95,7 @@ AT_CLEANUP
 
 AT_SETUP([check existing resource families])
 AT_CHECK(AT_TACO_RUN_LOCAL([db_resfamily test]), [], [[device
+python
 ]])
 AT_CLEANUP
 
