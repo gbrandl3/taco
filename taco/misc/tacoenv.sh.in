@@ -5,6 +5,9 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 bindir=@bindir@
 sbindir=@sbindir@
+datadir=@datadir@
+pythondir=@pythondir@
+pyexecdir=@pyexecdir@
 
 # Add your domain tables here (comma separated)
 DBTABLES_CUSTOM=${DBTABLES_CUSTOM:-TEST}
@@ -19,10 +22,10 @@ TACO_LOGGING=yes
 TACO_DATABASE=dbm
 
 # It is unlikely that the rest of the file needs a modification
-export DSHOME=${DSHOME:-@prefix@}
+export DSHOME=${DSHOME:-${prefix}}
 export DBTABLES=NAMES,PS_NAMES,CLASS,SYS,ERROR,CMDS,SEC,EVENTS,${DBTABLES_CUSTOM}
-export RES_BASE_DIR=${RES_BASE_DIR:-${DSHOME}/dbase/res}
-export DBM_DIR=${DSHOME}/dbase/dbm
+export RES_BASE_DIR=${RES_BASE_DIR:-@resdatadir@}
+export DBM_DIR=@dbmdir@
 export LOGPATH=${DSHOME}/log
 export NETHOST=${NETHOST:-`hostname|cut -f1 -d'.'`}
 if [ "$DSHOME" = "$prefix" ] ; then
@@ -35,7 +38,7 @@ else
 	export PATH=${TACO_PATH}:${DSHOME}/bin/${PATH:+:}${PATH}
 fi
 
-export PYTHONPATH=${DSHOME}/python/${PYTHONPATH:+:}${PYTHONPATH}
+export PYTHONPATH=@pkgpythondir@:@pkgpyexecdir@${PYTHONPATH:+:}${PYTHONPATH}
 unset DBTABLES_CUSTOM
 
 export MYSQL_USER=root

@@ -1,4 +1,4 @@
-pyexec_LTLIBRARIES	= Taco.la
+pkgpyexec_LTLIBRARIES	= Taco.la
 
 Taco_la_LDFLAGS 	= -module 
 

@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0rc3, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.35 $)dnl
+AC_REVISION($Revision: 1.36 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -106,11 +106,10 @@ AC_SUBST(X_LDFLAGS, ['-L/usr/X11R6/lib'])
 
 AC_SUBST(appdefaultdir)
 
-AC_SUBST(docdir, ['${prefix}/doc'])
-AC_SUBST(templatedir, ['${datadir}/examples/taco'])
-AC_SUBST(resdatadir, ['${prefix}/dbase/res'])
-AC_SUBST(dbmdir, ['${prefix}/dbase/dbm'])
-AC_SUBST(initdir)
+AC_SUBST(docdir, ['${datadir}/taco/doc'])
+AC_SUBST(templatedir, ['${datadir}/taco/templates'])
+AC_SUBST(resdatadir, ['${datadir}/taco/dbase/res'])
+AC_SUBST(dbmdir, ['${datadir}/taco/dbase/dbm'])
 AC_SUBST(CMDS_resdir, ['${resdatadir}/CMDS'])
 AC_SUBST(ERROR_resdir, ['${resdatadir}/ERROR'])
 AC_SUBST(CLASS_resdir, ['${resdatadir}/CLASS'])
@@ -120,7 +119,6 @@ AC_SUBST(PS_NAMES_resdir, ['${resdatadir}/PS_NAMES'])
 AC_SUBST(SYS_resdir, ['${resdatadir}/SYS'])
 AC_SUBST(SEC_resdir, ['${resdatadir}/SEC'])
 AC_SUBST(TEST_resdir, ['${resdatadir}/TEST'])
-AC_SUBST(pythondir, ['${prefix}/python'])
 
 dnl aclocaldir=`aclocal --print-ac-dir`
 AC_SUBST([aclocaldir], ['${datadir}/m4'])

@@ -5,6 +5,9 @@ setenv exec_prefix @exec_prefix@
 setenv libdir @libdir@
 setenv bindir @bindir@
 setenv sbindir @sbindir@
+setenv datadir @datadir@
+setenv pythondir @pythondir@
+setenv pyexecdir @pyexecdir@
 
 # Add your domain tables here (comma seperated)
 if (${?DBTABLES_CUSTOM}) then
@@ -26,17 +29,17 @@ setenv TACO_DATABASE dbm
 if (${?DSHOME}) then
 ;
 else
-setenv DSHOME @prefix@
+setenv DSHOME ${prefix}
 endif
 
 setenv DBTABLES NAMES,PS_NAMES,CLASS,SYS,ERROR,CMDS,SEC,EVENTS,${DBTABLES_CUSTOM}
 if (${?RES_BASE_DIR}) then
 ;
 else
-setenv RES_BASE_DIR ${DSHOME}/dbase/res
+setenv RES_BASE_DIR @resdatadir@
 endif
 
-setenv DBM_DIR ${DSHOME}/dbase/dbm
+setenv DBM_DIR @dbmdir@
 setenv LOGPATH ${DSHOME}/log
 if (${?NETHOST}) then
 ;
@@ -72,9 +75,9 @@ endif
 
 
 if (${?PYTHONPATH}) then
-	setenv PYTHONPATH ${DSHOME}/python/:${PYTHONPATH}
+	setenv PYTHONPATH @pkgpythondir@:@pkgpyexecdir@:${PYTHONPATH}
 else
-	setenv PYTHONPATH ${DSHOME}/python/
+	setenv PYTHONPATH @pkgpythondir@:@pkgpyexecdir@
 endif
 
 unsetenv DBTABLES_CUSTOM
