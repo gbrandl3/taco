@@ -91,9 +91,15 @@ DevLong *NdbmServer::db_reopendb_1_svc()
 		std::ifstream fi(dbm_file.c_str());
 		if (!fi)
 		{
-			std::cerr << "dbm_clo_op : Can't find file " << dbm_file << std::endl;
-			errcode = DbErr_DatabaseAccess;
-			return(&errcode);
+			umask(0);
+			GDBM_FILE t = gdbm_open(const_cast<char *>(dbm_file.c_str()), 0, GDBM_WRCREAT, 0666, NULL);
+                	if (t == NULL)
+                	{
+				std::cerr << "dbm_clo_op : Can't create file " << dbm_file << std::endl;
+				errcode = DbErr_DatabaseAccess;
+				return(&errcode);
+                	}
+			gdbm_close(t);
 		}
 
 		dbgen.tid[i] = gdbm_open(const_cast<char *>(dbm_file.c_str()), 0, flags, 0666, NULL);
