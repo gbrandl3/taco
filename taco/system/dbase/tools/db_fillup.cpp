@@ -196,8 +196,11 @@ static int from_res(void)
 	    		temp = std::string(line, strlen(line) - 1);	// remove colon
 //	    		res_dir = base_dir;
 
+#warning this seems to be not ok
 #if defined(linux) || defined(sun) || defined(FreeBSD)
 	    		res_dir = "/" + temp;
+#else
+		    	res_dir = temp;
 #endif /* linux, sun */
 		    	res_dir = temp;
 		}
