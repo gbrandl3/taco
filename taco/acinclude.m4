@@ -136,17 +136,7 @@ AC_DEFUN([TACO_GRETA],
 			no)	greta=no;;
 			*)	AC_MSG_ERROR(bad value ${enableval} for --enable-greta);;
 		esac], [greta=yes])
-	if test "x$greta" = "xyes" ; then
-		dc=yes
-		X_AND_MOTIF
-		GRETA=greta
-	fi
-	AM_CONDITIONAL(DC_BUILD, test "x$dc" = "xyes") 
-	if test "x$dc" = "xyes" ; then
-		TACO_DC_LIBS="\$(top_builddir)/lib/dc/libdcapi.la"
-	fi
-	AC_SUBST(TACO_DC_LIBS)
-	if test "x$motif_found" != "xyes" -o "x$dc" != "xyes" ; then 
+	if test "x$motif_found" != "xyes" -o "x$taco_dc" != "xyes" ; then 
 		greta=no
 	fi
 	AM_CONDITIONAL(GRETABUILD, test "x$greta" = "xyes") 
