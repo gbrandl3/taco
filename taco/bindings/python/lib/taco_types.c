@@ -8,13 +8,14 @@
  *
  * Original:    March 99
  * 
- * Date:	$Date: 2004-05-14 15:05:21 $
+ * Date:	$Date: 2004-07-09 12:59:33 $
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
  *********************************************************************/
-#include "Python.h"
+#include "config.h"
 
+#include <Python.h>
 #include <ctype.h>
 
 #include <Admin.h>
@@ -25,7 +26,11 @@
 #include <maxe_xdr.h>
 
 #ifdef NUMPY
-#	include <arrayobject.h>
+#	if HAVE_NUMERIC_ARRAYOBJECT_H
+#		include <Numeric/arrayobject.h>
+#	elif HAVE_NUMARRAY_ARRAYOBJECT_H
+#		include <numarray/arrayobject.h>
+#	endif
 #endif 
 
 #include "taco.h"
