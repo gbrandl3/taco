@@ -311,22 +311,22 @@ Serial::Serial (char *name, long *error)
  //
  // Commands list available
  //
- this->commands_list[DevSerWriteString] = DeviceCommandListEntry(
-   DevSerWriteString, (DeviceMemberFunction)(&Serial::SerWriteString), D_STRING_TYPE, D_LONG_TYPE, 0, "DevSerWriteString");
- this->commands_list[DevSerWriteChar] = DeviceCommandListEntry(
-   DevSerWriteChar, (DeviceMemberFunction)(&Serial::SerWriteChar), D_VAR_CHARARR, D_LONG_TYPE, 0, "DevSerWriteChar");
- this->commands_list[DevSerReadString] = DeviceCommandListEntry(
-   DevSerReadString, (DeviceMemberFunction)(&Serial::SerReadString), D_LONG_TYPE, D_STRING_TYPE, 0, "DevSerReadString");
- this->commands_list[DevSerReadChar] = DeviceCommandListEntry(
-   DevSerReadChar, (DeviceMemberFunction)(&Serial::SerReadChar), D_LONG_TYPE, D_VAR_CHARARR, 0, "DevSerReadChar");
- this->commands_list[DevSerSetParameter] = DeviceCommandListEntry(
-   DevSerSetParameter, (DeviceMemberFunction)(&Serial::SerSetParameter), D_VAR_SHORTARR, D_VOID_TYPE, 0, "DevSerSetParameter");
- this->commands_list[DevReset] = DeviceCommandListEntry(
-   DevReset, (DeviceMemberFunction)(&Serial::Reset), D_VOID_TYPE, D_VOID_TYPE, 0, "DevReset");
- this->commands_list[DevState] = DeviceCommandListEntry(
-   DevState, (DeviceMemberFunction)(&Serial::State), D_VOID_TYPE, D_SHORT_TYPE, 0, "DevState");
- this->commands_list[DevStatus] = DeviceCommandListEntry(
-   DevStatus, (DeviceMemberFunction)(&Serial::Status), D_VOID_TYPE, D_STRING_TYPE, 0, "DevStatus");
+ this->commands_map[DevSerWriteString] = DeviceCommandMapEntry(
+   DevSerWriteString, (DeviceBaseMemberFunction)(&Serial::SerWriteString), D_STRING_TYPE, D_LONG_TYPE, 0, "DevSerWriteString");
+ this->commands_map[DevSerWriteChar] = DeviceCommandMapEntry(
+   DevSerWriteChar, (DeviceBaseMemberFunction)(&Serial::SerWriteChar), D_VAR_CHARARR, D_LONG_TYPE, 0, "DevSerWriteChar");
+ this->commands_map[DevSerReadString] = DeviceCommandMapEntry(
+   DevSerReadString, (DeviceBaseMemberFunction)(&Serial::SerReadString), D_LONG_TYPE, D_STRING_TYPE, 0, "DevSerReadString");
+ this->commands_map[DevSerReadChar] = DeviceCommandMapEntry(
+   DevSerReadChar, (DeviceBaseMemberFunction)(&Serial::SerReadChar), D_LONG_TYPE, D_VAR_CHARARR, 0, "DevSerReadChar");
+ this->commands_map[DevSerSetParameter] = DeviceCommandMapEntry(
+   DevSerSetParameter, (DeviceBaseMemberFunction)(&Serial::SerSetParameter), D_VAR_SHORTARR, D_VOID_TYPE, 0, "DevSerSetParameter");
+ this->commands_map[DevReset] = DeviceCommandMapEntry(
+   DevReset, (DeviceBaseMemberFunction)(&Serial::Reset), D_VOID_TYPE, D_VOID_TYPE, 0, "DevReset");
+ this->commands_map[DevState] = DeviceCommandMapEntry(
+   DevState, (DeviceBaseMemberFunction)(&Serial::State), D_VOID_TYPE, D_SHORT_TYPE, 0, "DevState");
+ this->commands_map[DevStatus] = DeviceCommandMapEntry(
+   DevStatus, (DeviceBaseMemberFunction)(&Serial::Status), D_VOID_TYPE, D_STRING_TYPE, 0, "DevStatus");
 
 
 
@@ -381,7 +381,7 @@ Serial::Serial (char *name, long *error)
  // Initialise the commands list to point to the commands list 
  // implemented for the Serial class
  //
- this->n_commands = this->commands_list.size();
+ this->n_commands = this->commands_map.size();
 
 
 

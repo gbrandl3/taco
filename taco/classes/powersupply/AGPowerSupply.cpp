@@ -212,29 +212,29 @@ AGPowerSupply::AGPowerSupply (char *name, long *error)
 // initialise the commands list to point to the commands list 
 // implemented for the AG PowerSupply class
 //
-        this->commands_list[DevStatus] = DeviceCommandListEntry(DevStatus, (DeviceMemberFunction)(&AGPowerSupply::Status), 
+        this->commands_map[DevStatus] = DeviceCommandMapEntry(DevStatus, (DeviceBaseMemberFunction)(&AGPowerSupply::Status), 
 							D_VOID_TYPE, D_STRING_TYPE, 0, "DevStatus");
-        this->commands_list[DevOn] = DeviceCommandListEntry(DevOn, (DeviceMemberFunction)(&AGPowerSupply::On), 
+        this->commands_map[DevOn] = DeviceCommandMapEntry(DevOn, (DeviceBaseMemberFunction)(&AGPowerSupply::On), 
 							D_VOID_TYPE, D_VOID_TYPE, 0, "DevOn");
-        this->commands_list[DevOff] = DeviceCommandListEntry(DevOff, (DeviceMemberFunction)&AGPowerSupply::Off, 
+        this->commands_map[DevOff] = DeviceCommandMapEntry(DevOff, (DeviceBaseMemberFunction)&AGPowerSupply::Off, 
 							D_VOID_TYPE, D_VOID_TYPE, 0, "DevOff");
-        this->commands_list[DevSetValue] = DeviceCommandListEntry(DevSetValue, (DeviceMemberFunction)&AGPowerSupply::SetValue, 
+        this->commands_map[DevSetValue] = DeviceCommandMapEntry(DevSetValue, (DeviceBaseMemberFunction)&AGPowerSupply::SetValue, 
 							D_FLOAT_TYPE, D_VOID_TYPE, 0, "DevSetValue");
-        this->commands_list[DevReadValue] = DeviceCommandListEntry(DevReadValue, (DeviceMemberFunction)&AGPowerSupply::ReadValue, 
+        this->commands_map[DevReadValue] = DeviceCommandMapEntry(DevReadValue, (DeviceBaseMemberFunction)&AGPowerSupply::ReadValue, 
 							D_VOID_TYPE, D_FLOAT_READPOINT, 0, "DevReadValue");
-        this->commands_list[DevReset] = DeviceCommandListEntry(DevReset, (DeviceMemberFunction)&AGPowerSupply::Reset, 
+        this->commands_map[DevReset] = DeviceCommandMapEntry(DevReset, (DeviceBaseMemberFunction)&AGPowerSupply::Reset, 
 							D_VOID_TYPE, D_VOID_TYPE, 0, "DevReset");
-        this->commands_list[DevError] = DeviceCommandListEntry(DevError, (DeviceMemberFunction)&AGPowerSupply::Error, 
+        this->commands_map[DevError] = DeviceCommandMapEntry(DevError, (DeviceBaseMemberFunction)&AGPowerSupply::Error, 
 							D_VOID_TYPE, D_VOID_TYPE, 0, "DevError");
-        this->commands_list[DevLocal] = DeviceCommandListEntry(DevLocal, (DeviceMemberFunction)&AGPowerSupply::Local, 
+        this->commands_map[DevLocal] = DeviceCommandMapEntry(DevLocal, (DeviceBaseMemberFunction)&AGPowerSupply::Local, 
 							D_VOID_TYPE, D_VOID_TYPE, 0, "DevLocal");
-        this->commands_list[DevRemote] = DeviceCommandListEntry(DevRemote, (DeviceMemberFunction)&AGPowerSupply::Remote, 
+        this->commands_map[DevRemote] = DeviceCommandMapEntry(DevRemote, (DeviceBaseMemberFunction)&AGPowerSupply::Remote, 
 							D_VOID_TYPE, D_VOID_TYPE, 0, "DevRemote");
-        this->commands_list[DevUpdate] = DeviceCommandListEntry(DevUpdate, (DeviceMemberFunction)&AGPowerSupply::Update, 
+        this->commands_map[DevUpdate] = DeviceCommandMapEntry(DevUpdate, (DeviceBaseMemberFunction)&AGPowerSupply::Update, 
 							D_VOID_TYPE, D_STATE_FLOAT_READPOINT, 0, "DevUpdate");
-        this->commands_list[DevHello] = DeviceCommandListEntry(DevHello, (DeviceMemberFunction)&AGPowerSupply::Hello, 
+        this->commands_map[DevHello] = DeviceCommandMapEntry(DevHello, (DeviceBaseMemberFunction)&AGPowerSupply::Hello, 
 							D_STRING_TYPE, D_SHORT_TYPE, 0, "DevHello");
-	this->n_commands = this->commands_list.size(); 
+		this->n_commands = this->commands_map.size(); 
 //
 // initialise new AGPowerSupply with template, (this could 
 // also be done by overloading the operator=)
