@@ -311,9 +311,9 @@ int MySQLServer::db_find(std::string tab_name, std::string p_res_name, char **ou
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT count, value FROM property_device ";
-        query += ("WHERE device = '" + tab_name + "/" + family + "/" + member + "' AND name = '" + r_name);
-        query += "' ORDER BY count ASC";
+        query = "SELECT COUNT, VALUE FROM PROPERTY_DEVICE ";
+        query += ("WHERE DEVICE = '" + tab_name + "/" + family + "/" + member + "' AND NAME = '" + r_name);
+        query += "' ORDER BY COUNT ASC";
     }
     else
     {
@@ -441,7 +441,7 @@ int MySQLServer::db_devlist(std::string dev_na, int *dev_num, db_res *back)
     std::string query;
     if (mysql_db == "tango")
     {
-    	query = "SELECT name FROM device WHERE server = '" + ds_class + "/" + ds_name + "'";
+    	query = "SELECT NAME FROM DEVICE WHERE SERVER = '" + ds_class + "/" + ds_name + "'";
     }
     else
     {
@@ -787,7 +787,7 @@ int MySQLServer::db_insert(std::string res_name, std::string number, std::string
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "INSERT INTO property_device(device,name,domain,family,member,count,value) VALUES('" + domain + "/" + family + "/" + member + "','" + r_name + "','"; 
+        query = "INSERT INTO PROPERTY_DEVICE(DEVICE,NAME,DOMAIN,FAMILY,MEMBER,COUNT,VALUE) VALUES('" + domain + "/" + family + "/" + member + "','" + r_name + "','"; 
 	query += (domain + "','" + family +"','" + member + "','");
         query += (number + "','" + content + "')");
     }
@@ -892,8 +892,8 @@ int MySQLServer::db_del(std::string res_name)
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "DELETE FROM property_device WHERE device = '" + t_name + "/" + family + "/" + member + "'";
-	query += " AND name = '" + r_name + "'";
+        query = "DELETE FROM PROPERTY_DEVICE WHERE DEVICE = '" + t_name + "/" + family + "/" + member + "'";
+	query += " AND NAME = '" + r_name + "'";
     }
     else
     {

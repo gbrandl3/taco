@@ -50,7 +50,7 @@ db_res *MySQLServer::devserverlist_1_svc()
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT DISTINCT SUBSTRING_INDEX(server,'/',1) FROM device ORDER BY server ASC";
+        query = "SELECT DISTINCT SUBSTRING_INDEX(SERVER,'/',1) FROM DEVICE ORDER BY SERVER ASC";
     }
     else
     {
@@ -149,8 +149,8 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
 
     if (mysql_db == "tango")
     {
-        query = "SELECT DISTINCT SUBSTRING_INDEX(server,'/',-1) FROM device WHERE server like '";
-        query += (user_server + "/%' ORDER BY server ASC");
+        query = "SELECT DISTINCT SUBSTRING_INDEX(SERVER,'/',-1) FROM DEVICE WHERE SERVER like '";
+        query += (user_server + "/%' ORDER BY SERVER ASC");
     }
     else
     {
@@ -248,7 +248,7 @@ db_res *MySQLServer::hostlist_1_svc()
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT DISTINCT host FROM device WHERE exported != 0 ORDER host ASC";
+        query = "SELECT DISTINCT HOST FROM DEVICE WHERE EXPORTED != 0 ORDER HOST ASC";
     }
     else
     {

@@ -152,8 +152,8 @@ long MySQLServer::reg_ps(std::string h_name, long pid, std::string ps_name, long
     {
 	if (mysql_db == "tango")
         {
-    	    strquery << "UPDATE device SET host = '" << h_name << "', pid = " << pid << " ior = 'DC:" << poll << "'"
-	      << " WHERE device = '" << ps_name_low << "'" << std::ends;
+    	    strquery << "UPDATE DEVICE SET HOST = '" << h_name << "', PID = " << pid << " IOR = 'DC:" << poll << "'"
+	      << " WHERE DEVICE = '" << ps_name_low << "'" << std::ends;
 	}
 	else
 	{
@@ -189,7 +189,7 @@ long MySQLServer::reg_ps(std::string h_name, long pid, std::string ps_name, long
 	    strquery.seekp(0);
 	    if (mysql_db == "tango")
 	    {
-    	       strquery << "INSERT INTO device (domain, family, member, host, pid, ior, exported, server, class, version) VALUES('"
+    	       strquery << "INSERT INTO DEVICE (DOMAIN, FAMILY, MEMBER, HOST, PID, IOR, EXPORTED, SERVER, CLASS, VERSION) VALUES('"
 	  	   << domain << "', '" << family << "', '" << member << "', '" << h_name << "', " 
 		   << pid << ", 'DC:" << poll << "',1,'DataCollector','PseudoDevice',1)" << std::ends;
 	    }
@@ -336,7 +336,7 @@ long MySQLServer::unreg_ps(std::string ps_name, long *p_error)
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "DELETE FROM device WHERE name = '" + ps_name_low + "'";
+        query = "DELETE FROM DEVICE WHERE NAME = '" + ps_name_low + "'";
     }
     else
     {

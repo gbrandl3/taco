@@ -46,7 +46,7 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT DISTINCT domain FROM device ORDER BY domain ASC";
+        query = "SELECT DISTINCT DOMAIN FROM DEVICE ORDER BY DOMAIN ASC";
     }
     else
     {
@@ -152,7 +152,7 @@ db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT DISTINCT family FROM device WHERE domain = '" + user_domain + "' ORDER BY family ASC";
+        query = "SELECT DISTINCT FAMILY FROM DEVICE WHERE DOMAIN = '" + user_domain + "' ORDER BY FAMILY ASC";
     }
     else
     {
@@ -268,8 +268,8 @@ db_res *MySQLServer::devmemberlist_1_svc(db_res *recev)
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT DISTINCT member FROM device WHERE domain = '" + user_domain;
-        query += "' AND family = '" + user_family + "' ORDER BY member ASC";
+        query = "SELECT DISTINCT MEMBER FROM DEVICE WHERE DOMAIN = '" + user_domain;
+        query += "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC";
     }
     else
     {

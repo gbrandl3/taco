@@ -87,7 +87,7 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT CONCAT(domain, '/', family, '/', member) FROM device WHERE ";
+        query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM DEVICE WHERE ";
     }
     else
     {
@@ -112,7 +112,7 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 		 member = tmpf.substr(pos + 1);
 		 if (mysql_db == "tango")
                  {
-		     query += (" CONCAT(domain, '/', family, '/', member) LIKE '" + tmpf + "'");
+		     query += (" CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) LIKE '" + tmpf + "'");
                  }
                  else
                  {
@@ -124,7 +124,7 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 		 family = tmpf.substr(pos + 1);
 		 if (mysql_db == "tango")
                  {
-		     query += (" CONCAT(domain, '/', family) LIKE '" + tmpf + "'");
+		     query += (" CONCAT(DOMAIN, '/', FAMILY) LIKE '" + tmpf + "'");
                  }
                  else
                  {
@@ -134,7 +134,7 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 	case 0 : domain = tmpf;		
                  if (mysql_db == "tango")
                  {
-		     query += (" domain LIKE '" + tmpf + "'");
+		     query += (" DOMAIN LIKE '" + tmpf + "'");
                  }
                  else
                  {
@@ -148,7 +148,7 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
     }
     if (mysql_db == "tango")
     {
-        query += (" AND exported != 0 AND ior LIKE 'rpc:%'");
+        query += (" AND EXPORTED != 0 AND IOR LIKE 'rpc:%'");
     }
     else
     {

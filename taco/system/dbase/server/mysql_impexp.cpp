@@ -286,9 +286,9 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
 	    std::string query;
             if (mysql_db == "tango")
 	    {
-	        query = "SELECT host, ior, version, class";
-	        query += (" FROM device WHERE CONCAT(domain, '/', family, '/', member) = '" + dev_name + "'" );
-	        query += (" AND ior LIKE 'rpc:%'");
+	        query = "SELECT HOST, IOR, VERSION, CLASS";
+	        query += (" FROM DEVICE WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + dev_name + "'" );
+	        query += (" AND IOR LIKE 'rpc:%'");
             }
             else
             {
@@ -466,8 +466,8 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "UPDATE device SET exported = 0 WHERE";
-        query += (" server = '" + ds_class + "/" + ds_name +"' AND pid != 0");
+        query = "UPDATE DEVICE SET EXPORTED = 0 WHERE";
+        query += (" SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
     }
     else
     {
@@ -494,8 +494,8 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
     {
         if (mysql_db == "tango")
         {
-            query = "UPDATE device SET exported = 0 WHERE";
-            query += (" server = '" + ds_class + "/" + ds_name +"' AND pid != 0");
+            query = "UPDATE DEVICE SET EXPORTED = 0 WHERE";
+            query += (" SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
         }
         else
         {
@@ -604,8 +604,8 @@ svc_inf *MySQLServer::db_svcchk_1_svc(nam *dsn_name)
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT host, ior, version FROM device WHERE";
-        query += (" server = '" + ds_class + "/" + ds_name + "'");
+        query = "SELECT HOST, IOR, VERSION FROM DEVICE WHERE";
+        query += (" SERVER = '" + ds_class + "/" + ds_name + "'");
     }
     else
     {
@@ -669,12 +669,12 @@ int MySQLServer::db_store(db_devinfo &dev_stu)
     std::stringstream query;
     if (mysql_db == "tango")
     {
-        query << "UPDATE device SET host = '" << dev_stu.host_name <<  "',"
-          << " ior = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
-          << " version = '" << dev_stu.v_num << "',"
-          << " class = '" << dev_stu.dev_class << "',"
-          << " pid = 0 , server = 'unknown'"
-          << " WHERE CONCAT(domain, '/', family, '/', member) = '" << dev_stu.dev_name << "'" << std::ends; 	
+        query << "UPDATE DEVICE SET HOST = '" << dev_stu.host_name <<  "',"
+          << " IOR = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
+          << " VERSION = '" << dev_stu.v_num << "',"
+          << " CLASS = '" << dev_stu.dev_class << "',"
+          << " PID = 0 , SERVER = 'unknown'"
+          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << std::ends; 	
     }
     else
     {
@@ -737,12 +737,12 @@ int MySQLServer::db_store(db_devinfo_2 &dev_stu)
     std::stringstream query;
     if (mysql_db == "tango")
     {
-        query << "UPDATE device SET host = '" << dev_stu.host_name <<  "',"
-          << " ior = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
-          << " version = '" << dev_stu.v_num << "',"
-          << " class = '" << dev_stu.dev_class << "',"
-          << " pid = " << dev_stu.pid << ", server = 'unknown'"
-          << " WHERE CONCAT(domain, '/', family, '/', member) = '" << dev_stu.dev_name << "'" << std::ends; 	
+        query << "UPDATE DEVICE SET HOST = '" << dev_stu.host_name <<  "',"
+          << " IOR = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
+          << " VERSION = '" << dev_stu.v_num << "',"
+          << " CLASS = '" << dev_stu.dev_class << "',"
+          << " PID = " << dev_stu.pid << ", SERVER = 'unknown'"
+          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', member) = '" << dev_stu.dev_name << "'" << std::ends; 	
     }
     else
     {
@@ -808,14 +808,14 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
     std::stringstream query;
     if (mysql_db == "tango")
     {
-        query << "UPDATE device SET host = '" << dev_stu.host_name <<  "',"
-          << " ior = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
-          << " version = '" << dev_stu.v_num << "',"
-          << " class = '" << dev_stu.dev_class << "',"
-//        << " pid = " << dev_stu.pid << ", server = '" << dev_stu.proc_name << "'"
-          << " pid = " << dev_stu.pid << ","
-	  << " exported = 1" 
-          << " WHERE CONCAT(domain, '/', family, '/', member) = '" << dev_stu.dev_name << "'" << std::ends; 	
+        query << "UPDATE DEVICE SET HOST = '" << dev_stu.host_name <<  "',"
+          << " IOR = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
+          << " VERSION = '" << dev_stu.v_num << "',"
+          << " CLASS = '" << dev_stu.dev_class << "',"
+//        << " PID = " << dev_stu.pid << ", SERVER = '" << dev_stu.proc_name << "'"
+          << " PID = " << dev_stu.pid << ","
+	  << " EXPORTED = 1" 
+          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << std::ends; 	
     }
     else
     {

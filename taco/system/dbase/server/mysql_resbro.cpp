@@ -124,8 +124,8 @@ db_res *MySQLServer::resfamilylist_1_svc(nam* domain)
     std::string query;
     if (mysql_db == "tango")
     {
-    	query = "SELECT DISTINCT family FROM property_device WHERE domain = '";
-    	query += (user_domain + "' ORDER BY family ASC");
+    	query = "SELECT DISTINCT FAMILY FROM PROPERTY_DEVICE WHERE DOMAIN = '";
+    	query += (user_domain + "' ORDER BY FAMILY ASC");
     }
     else
     {
@@ -221,8 +221,8 @@ db_res *MySQLServer::resmemberlist_1_svc(db_res *recev)
     std::string query;
     if (mysql_db == "tango")
     {
-    	query = "SELECT DISTINCT member FROM property_device WHERE domain = '";
-    	query += (user_domain + "' AND family = '" + user_family + "' ORDER BY member ASC");
+    	query = "SELECT DISTINCT MEMBER FROM PROPERTY_DEVICE WHERE DOMAIN = '";
+    	query += (user_domain + "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC");
     }
     else
     {
@@ -322,8 +322,8 @@ db_res *MySQLServer::resresolist_1_svc(db_res *recev)
 
     if (mysql_db == "tango")
     {
-    	query = "SELECT DISTINCT name FROM property_device WHERE domain = '";
-    	query += (user_domain + "' AND family = '" + user_family + "' AND member = '");
+    	query = "SELECT DISTINCT NAME FROM PROPERTY_DEVICE WHERE DOMAIN = '";
+    	query += (user_domain + "' AND FAMILY = '" + user_family + "' AND MEMBER = '");
     }
     else
     {
@@ -425,13 +425,13 @@ db_res *MySQLServer::resresoval_1_svc(db_res *recev)
 
     if (mysql_db == "tango")
     {
-    	query = "SELECT member, name, count, value FROM property_device WHERE ";
-    	query += (" domain = '" + user_domain + "' AND family = '" + user_family + "'");
+    	query = "SELECT MEMBER, NAME, COUNT, VALUE FROM PROPERTY_DEVICE WHERE ";
+    	query += (" DOMAIN = '" + user_domain + "' AND FAMILY = '" + user_family + "'");
         if (user_member != "*")
-    	    query += (" AND member = '" + user_member + "'");
+    	    query += (" AND MEMBER = '" + user_member + "'");
         if (user_reso != "*")
-	    query += (" AND name = '" + user_reso + "'");
-        query += (" ORDER BY member ASC, name ASC, count ASC");
+	    query += (" AND NAME = '" + user_reso + "'");
+        query += (" ORDER BY MEMBER ASC, NAME aSC, COUNT ASC");
     }
     else
     {

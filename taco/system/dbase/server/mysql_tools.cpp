@@ -75,10 +75,10 @@ db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT SUBSTRING_INDEX(server,'/',1), SUBSTRING_INDEX(server,'/',-1), host, ior,";
-        query += ("version, class, pid, SUBSTRING_INDEX(server,'/',1), exported FROM device");
-        query += (" WHERE CONCAT(domain, '/', family, '/', member) = '" + user_device + "'"); 
-        query += (" AND ior LIKE 'rpc:%'"); 
+        query = "SELECT SUBSTRING_INDEX(SERVER,'/',1), SUBSTRING_INDEX(SERVER,'/',-1), HOST, IOR,";
+        query += ("VERSION, CLASS, PID, SUBSTRING_INDEX(SERVER,'/',1), EXPORTED FROM DEVICE");
+        query += (" WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + user_device + "'"); 
+        query += (" AND IOR LIKE 'rpc:%'"); 
     }
     else
     {
@@ -249,9 +249,9 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 
 	if (mysql_db == "tango")
 	{
-	    query = "SELECT domain, family, member, name, count, value FROM property_device WHERE ";
-	    query += (" device = '" + in_dev);
-	    query += ( + "' ORDER BY domain ASC, family ASC, member ASC, name ASC, count ASC");
+	    query = "SELECT DOMAIN, FAMILY, MEMBER, NAME, COUNT, VALUE FROM PROPERTY_DEVICE WHERE ";
+	    query += (" DEVICE = '" + in_dev);
+	    query += ( + "' ORDER BY DOMAIN ASC, FAMILY ASC, MEMBER ASC, NAME ASC, COUNT ASC");
 	}
 	else
 	{
@@ -376,8 +376,8 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
     std::string query, where;
     if (mysql_db == "tango")
     {
-        query = "SELECT class, server FROM device ",
-        where = "WHERE CONCAT(domain, '/', family, '/', member) = '" + user_device + "'";   
+        query = "SELECT CLASS, SERVER FROM DEVICE ",
+        where = "WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + user_device + "'";   
     }
     else
     {
@@ -403,7 +403,7 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
     	mysql_free_result(result);
 	if (mysql_db == "tango")
 	{
-    	    query = "DELETE FROM device "; 
+    	    query = "DELETE FROM DEVICE "; 
 	}
 	else
 	{
@@ -515,7 +515,7 @@ db_psdev_error *MySQLServer::devdelres_1_svc(db_res *recev)
 	std::string query;
 	if (mysql_db == "tango")
 	{
-	    query = "DELETE FROM property_device WHERE device = '" + in_dev + "'";
+	    query = "DELETE FROM PROPERTY_DEVICE WHERE DEVICE = '" + in_dev + "'";
 	}
 	else
 	{
@@ -607,7 +607,7 @@ db_info_svc *MySQLServer::info_1_svc()
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT domain, COUNT(*) FROM device WHERE exported != 0 GROUP BY domain";
+        query = "SELECT DOMAIN, COUNT(*) FROM DEVICE WHERE EXPORTED != 0 GROUP BY DOMAIN";
     }
     else
     {
@@ -636,7 +636,7 @@ db_info_svc *MySQLServer::info_1_svc()
 //
     if (mysql_db == "tango")
     {
-        query = "SELECT domain, COUNT(*) FROM device WHERE exported = 0 GROUP BY domain";
+        query = "SELECT DOMAIN, COUNT(*) FROM DEVICE WHERE EXPORTED = 0 GROUP BY domain";
     }
     else
     {
@@ -669,7 +669,7 @@ db_info_svc *MySQLServer::info_1_svc()
 //
     if (mysql_db == "tango")
     {
-        query = "SELECT COUNT(*) FROM device where ior like 'DC:%'";
+        query = "SELECT COUNT(*) FROM DEVICE WHERE IOR LIKE 'DC:%'";
     }
     else
     {
@@ -690,7 +690,7 @@ db_info_svc *MySQLServer::info_1_svc()
 //
     if (mysql_db == "tango")
     {
-        query = "SELECT domain, COUNT(*) FROM property_device GROUP BY domain";
+        query = "SELECT DOMAIN, COUNT(*) FROM PROPERTY_DEVICE GROUP BY domain";
     }
     else
     {
@@ -793,8 +793,8 @@ long *MySQLServer::unreg_1_svc(db_res *recev)
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT DISTINCT class FROM device";
-        query += (" WHERE server = '" + user_ds_name + "/" + user_pers_name + "'");
+        query = "SELECT DISTINCT CLASS FROM DEVICE";
+        query += (" WHERE SERVER = '" + user_ds_name + "/" + user_pers_name + "'");
     }
     else
     {
@@ -828,7 +828,7 @@ long *MySQLServer::unreg_1_svc(db_res *recev)
 //
     if (mysql_db == "tango")
     {
-        query = "UPDATE device SET exported = 0 WHERE class IN (";
+        query = "UPDATE DEVICE SET EXPORTED = 0 WHERE CLASS IN (";
         query += (class_list + ")");
     }
     else
@@ -934,7 +934,7 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT DISTINCT class FROM device";
+        query = "SELECT DISTINCT CLASS FROM DEVICE";
         query += (" WHERE server = '" + user_ds_name + "/" + user_pers_name + "'");
     }
     else
@@ -976,10 +976,10 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 //
     if (mysql_db == "tango")
     {
-        query = "SELECT SUBSTRING_INDEX(server,'/',1), CONCAT(domain, '/', family, '/', member), host, ior, exported, ";
-        query += ("pid, server FROM device WHERE ");
-        query += ("class IN (" + class_list + ") AND server LIKE '%/" + user_pers_name + "'");
-        query += (" AND ior LIKE 'rpc:%'");
+        query = "SELECT SUBSTRING_INDEX(server,'/',1), CONCAT(domain, '/', family, '/', member), HOST, IOR, EXPORTED, ";
+        query += ("PID, SERVER FROM DEVICE WHERE ");
+        query += ("CLASS IN (" + class_list + ") AND SERVER LIKE '%/" + user_pers_name + "'");
+        query += (" AND IOR LIKE 'rpc:%'");
     }
     else
     {
@@ -1153,7 +1153,7 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT DISTINCT class FROM device WHERE server = '" + user_ds_name + "/" + user_pers_name + "'";
+        query = "SELECT DISTINCT CLASS FROM DEVICE WHERE SERVER = '" + user_ds_name + "/" + user_pers_name + "'";
     }
     else
     {
@@ -1185,7 +1185,7 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
 	class_list = "'" + user_ds_name + "'";
     if (mysql_db == "tango")
     {
-        query = "SELECT CONCAT(domain, '/', family, '/', member) FROM device WHERE class IN (" + class_list + ")";
+        query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM DEVICE WHERE CLASS IN (" + class_list + ")";
     }
     else
     {
@@ -1219,7 +1219,7 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
     {
 	if (mysql_db == "tango")
 	{
-	    query = "DELETE FROM property_device WHERE device IN (" + dev_list + ")";
+	    query = "DELETE FROM PROPERTY_DEVICE WHERE DEVICE IN (" + dev_list + ")";
 	}
 	else
 	{
@@ -1237,7 +1237,7 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
 //
     if (mysql_db == "tango")
     {
-        query = "DELETE FROM device WHERE CONCAT(domain, '/', family, '/', member) IN (" + dev_list + ")"; 
+        query = "DELETE FROM DEVICE WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) IN (" + dev_list + ")"; 
     }
     else
     {
@@ -1337,7 +1337,7 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
 
     if (mysql_db == "tango")
     {
-        query = "SELECT device FROM property_device WHERE domain = 'sys' AND";
+        query = "SELECT DEVICE FROM PROPERTY_DEVICE WHERE DOMAIN = 'sys' AND";
         query += ("name = '" + std::string(POLL_RES) + "' AND UPPER(value) = UPPER('" + user_device + "')");
     }
     else
