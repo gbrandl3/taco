@@ -13,9 +13,9 @@
 
  Original   :   September 1998
   
- Version    :	$Revision: 1.2 $
+ Version    :	$Revision: 1.3 $
 
- Date	    : 	$Date: 2003-05-16 13:40:27 $
+ Date	    : 	$Date: 2003-12-09 13:38:28 $
 
  Copyright (c) 1998 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -30,10 +30,6 @@
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevErrors.h>
-#if 0
-#include <nm_rpc.h>
-#endif
-
 
 #if defined(_NT)
 #include <rpc.h>
@@ -63,10 +59,9 @@
 extern CLIENT *cl;
 #endif
 
-extern dbserver_info db_info;
-extern configuration_flags config_flags;
-extern nethost_info *multi_nethost;
-
+extern dbserver_info 		db_info;
+extern configuration_flags 	config_flags;
+extern nethost_info 		*multi_nethost;
 
 
 /**@ingroup dbaseAPI
@@ -84,74 +79,66 @@ extern nethost_info *multi_nethost;
  * @return   This function returns DS_OK and clears the error code if the reconnection
  *    was successful. Otherwise, the function returns DS_NOTOK and set the error code.								
  */
-int to_reconnection(void *p_data,void **pp_result,CLIENT **client,
-		    int call_type,long nethost_index,
-		    long connect_type,long *error)
+int to_reconnection(void *p_data, void **pp_result, CLIENT **client,
+		    int call_type, long nethost_index,
+		    long connect_type, long *error)
 {
 	union {
-		db_res *getres_ptr;
-		int *putres_ptr;
-		int *delres_ptr;
-		db_res *getdev_ptr;
-		int *devexp_ptr;
-		db_resimp *devimp_ptr;
-		int *svcunr_ptr;
-		svc_inf *svcchk_ptr;
-		db_res *getdevexp_ptr;
-		int *clodb_ptr;
-		int *reopendb_ptr;
-		cmd_que *cmdquery_ptr;
-		db_psdev_error *psdevreg_ptr;
-		db_psdev_error *psdevunreg_ptr;
-		db_res *browse_ptr;
-		db_devinfo_svc *devinfo_ptr;
-		long *lg_ptr;
-		db_info_svc *info_ptr;
-		svcinfo_svc *svcinfo_ptr;
-		db_poller_svc *poll_ptr;
+		db_res 		*getres_ptr;
+		int 		*putres_ptr;
+		int 		*delres_ptr;
+		db_res 		*getdev_ptr;
+		int 		*devexp_ptr;
+		db_resimp 	*devimp_ptr;
+		int 		*svcunr_ptr;
+		svc_inf 	*svcchk_ptr;
+		db_res 		*getdevexp_ptr;
+		int 		*clodb_ptr;
+		int 		*reopendb_ptr;
+		cmd_que 	*cmdquery_ptr;
+		db_psdev_error 	*psdevreg_ptr;
+		db_psdev_error 	*psdevunreg_ptr;
+		db_res 		*browse_ptr;
+		db_devinfo_svc 	*devinfo_ptr;
+		long 		*lg_ptr;
+		db_info_svc 	*info_ptr;
+		svcinfo_svc 	*svcinfo_ptr;
+		db_poller_svc 	*poll_ptr;
 		db_delupd_error *delupd_ptr;
 		db_svcarray_net *dshost_ptr;
 	}recev_ptr;
-	void *recev_gen;
-	long res;
-	CLIENT *new_client,*old_client;
-	struct timeval old_tout;
-	CLIENT *cl_tcp;
-	struct sockaddr_in serv_adr;
-	int tcp_so;
+
+	void 	*recev_gen;
+	CLIENT 	*new_client,
+		*old_client,
+		*cl_tcp;
+	struct timeval 		old_tout;
+	struct sockaddr_in 	serv_adr;
+	int 			tcp_so;
 #ifndef vxworks
-	static struct hostent *ht;
+	static struct hostent 	*ht;
 #else
-	static int host_addr;
+	static int 		host_addr;
 #endif
 #ifdef ALONE
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
 /* Memorize old timeout */
-
    	clnt_control(*client,CLGET_TIMEOUT,(char *)&old_tout);
 
-/* First change the retry to 1 second to verify that the server does not answer
-   anymore */
-
+/* First change the retry to 1 second to verify that the server does not answer anymore */
 	clnt_control(*client,CLSET_RETRY_TIMEOUT,(char *)&api_retry_timeout);
 	clnt_control(*client,CLSET_TIMEOUT,(char *)&timeout);
 
 /* Try to do the NULLPROC call */
-
-	res = db_null_proc_1(*client,error);
-	
-	if (res == 0)
+	if (db_null_proc_1(*client,error) == 0)
 	{
-
 /* (Re)set time-out value */
-
 		clnt_control(*client,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		clnt_control(*client,CLSET_TIMEOUT,(char *)&old_tout);
 		 
 /* Redo the call */
-
 		switch (call_type)
 		{
 		case DB_GETRES : 
@@ -367,7 +354,6 @@ int to_reconnection(void *p_data,void **pp_result,CLIENT **client,
 		}
 			
 /* Pass data to caller and leave function */
-
 		*pp_result = recev_gen;
 		if (recev_gen != NULL)
 		{
@@ -719,7 +705,6 @@ int to_reconnection(void *p_data,void **pp_result,CLIENT **client,
 		}
 
 /* Pass data to caller and leave function */
-
 		*pp_result = recev_gen;
 		if (recev_gen != NULL)
 		{
