@@ -4,9 +4,9 @@
  *
  * Original:      1992
  *
- * Version:       $Revision: 1.3 $
+ * Version:       $Revision: 1.4 $
  *
- * Date:          $Date: 2003-05-21 16:17:12 $
+ * Date:          $Date: 2003-05-22 08:04:17 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -1273,7 +1273,7 @@ static int re_test_server(serv *serv_info,int min,int nb_server,long *perr)
 /* 
  * Build the device name associated with this server 
  */
-		snprint(serv1, sizeof(serv1), "%s%u", tmp_name, serv_info[min].numb);
+		snprintf(serv1, sizeof(serv1), "%s%u", tmp_name, serv_info[min].numb);
 	
 /* 
  * Ask the static database for this server network parameters (host_name, program number and version number) 
