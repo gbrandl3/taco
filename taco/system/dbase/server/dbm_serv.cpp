@@ -110,14 +110,12 @@ db_res *NdbmServer::db_getres_1_svc(arr1 *rece,struct svc_req *rqstp)
 #endif /*solaris */
 
 	num_res = rece->arr1_len;
-
 #ifdef DEBUG
-	for(i=0;i<num_res;i++)
+	for(i=0; i<num_res;i++)
 	{
 		std::cout << "Resource name : " << rece->arr1_val[i] << std::endl;
 	}
 #endif
-
 /* Initialize send_back structure error code */
 
 	browse_back.db_err = 0;
@@ -285,19 +283,23 @@ db_res *NdbmServer::db_getdev_1_svc(nam *dev_name)
 
 int NdbmServer::db_find(char *tab_name,char *p_res_name,char **out,char **adr_tmp1,int *k1)
 {
-	reso res, ret;
-	unsigned int diff;
-	char *temp, *tmp;
-	int k,sec_res;
-	int ctr = 0;
+	reso 		res, 
+			ret;
+	unsigned int 	diff;
+	char 		*temp, 
+			*tmp;
+	int	 	k,
+			sec_res;
+	int 		ctr = 0;
 	GDBM_FILE	tab;
-	datum key;
-	datum resu, resu_out;
-	int res_numb = 1;
-	char ind_name[20];
-	int exit = 0;
-	char indnr[4];
-	int i;
+	datum 		key,
+			resu, 
+			resu_out;
+	int 		res_numb = 1;
+	char 		ind_name[20];
+	int 		exit = 0;
+	char		indnr[4];
+	int 		i;
 
 #ifdef DEBUG
 	std::cout << "Table name : " << tab_name << std::endl;
@@ -311,26 +313,21 @@ int NdbmServer::db_find(char *tab_name,char *p_res_name,char **out,char **adr_tm
 		sec_res = False;
 
 /* Get family name */
-
 	tmp = (char *) strchr(p_res_name,'/');
 	diff = (u_int)(tmp++ - p_res_name);
 	strncpy(res.fam,p_res_name,diff);
 	res.fam[diff] = '\0';
 
 /* Get member name */
-
 	temp = (char *) strchr(tmp,'/');
 	diff = (u_int)(temp++ - tmp);
 	strncpy(res.member,tmp,diff);
 	res.member[diff] = '\0';
 
 /* Get resource name */
-
 	strcpy(res.r_name,temp);
 	
-/* For security domain, change all occurances of | by ^ (| is the field
-   separaor in NDBM !) */
-   
+/* For security domain, change all occurances of | by ^ (| is the field separator in NDBM !) */
 	if (sec_res == True)
 	{
 		k = strlen(res.r_name);
@@ -340,7 +337,6 @@ int NdbmServer::db_find(char *tab_name,char *p_res_name,char **out,char **adr_tm
 				res.r_name[i] = SEC_SEP;
 		}
 	}
-
 #ifdef DEBUG
 	std::cout << "Family name : " << res.fam << std::endl;
 	std::cout << "Member name : " << res.member << std::endl;
@@ -348,7 +344,6 @@ int NdbmServer::db_find(char *tab_name,char *p_res_name,char **out,char **adr_tm
 #endif
 
 /* Select the right resource table in the right database */
-
 	for (i = 0;i < dbgen.TblNum;i++)
 	{
 		if (strcmp(tab_name,dbgen.TblName[i].c_str()) == 0)
@@ -362,12 +357,10 @@ int NdbmServer::db_find(char *tab_name,char *p_res_name,char **out,char **adr_tm
 		return(DbErr_DomainDefinition);
 
 
-/* Try to retrieve the right tuple in table and loop in the case of an
-   array of resources */
-
+/* Try to retrieve the right tuple in table and loop in the case of an array of resources */
 	if ((resu_out.dptr = (char *)malloc(MAX_CONT)) == NULL)
 	{
-		printf("Error in malloc for resu\n");
+		printf("Error in malloc for resu_out\n");
 		return(DbErr_ServerMemoryAllocation);
 	}
 	if ((key.dptr = (char *)malloc(MAX_KEY)) == NULL)
@@ -380,7 +373,6 @@ int NdbmServer::db_find(char *tab_name,char *p_res_name,char **out,char **adr_tm
 
 	do
 	{
-
 		strcpy(key.dptr, res.fam);
 		strcat(key.dptr,"|");
 		strcat(key.dptr, res.member);
@@ -392,18 +384,15 @@ int NdbmServer::db_find(char *tab_name,char *p_res_name,char **out,char **adr_tm
 		strcat(key.dptr, "|");
 		key.dsize = strlen(key.dptr);
 
-
 		resu = gdbm_fetch(tab, key);                                 
 		if (resu.dptr != NULL)
 		{
 			strncpy(resu_out.dptr, resu.dptr, resu.dsize);
 			resu_out.dptr[resu.dsize] = '\0';
+			resu_out.dsize = resu.dsize;
 			if (ctr)
 			{
-
-/* Copy the new array element in the result buffer. If the temporary buffer
-   is full, realloc memory for it. */
-
+/* Copy the new array element in the result buffer. If the temporary buffer is full, realloc memory for it. */
 				k = strlen(*adr_tmp1);
 				if (k > ((*k1 * SIZE) - LIM))
 				{
@@ -423,20 +412,15 @@ int NdbmServer::db_find(char *tab_name,char *p_res_name,char **out,char **adr_tm
 				strcpy(*adr_tmp1,resu_out.dptr);
 			ctr++;
 			res_numb++;
-
-
 		} 
 		else
 		{
 			exit = 1;
 		}
-	}
-	while (!exit);
+	} while (!exit);
 
 
 /* If it is a normal resource,so copy the resource value to the result buffer */
-
-
 	if (ctr == 1)
 	{
 		if ((*out = (char *)malloc(strlen(*adr_tmp1) + 1)) == NULL)
@@ -450,7 +434,6 @@ int NdbmServer::db_find(char *tab_name,char *p_res_name,char **out,char **adr_tm
 	}
 
 /* For an array of resource */
-
 	if (ctr > 1)
 	{
 		k = strlen(*adr_tmp1);
@@ -470,7 +453,6 @@ int NdbmServer::db_find(char *tab_name,char *p_res_name,char **out,char **adr_tm
 	}
 	
 /* Return if database error */
-
 /*
 	if (resu == NULL && ctr != 0)
 	{
@@ -480,9 +462,7 @@ int NdbmServer::db_find(char *tab_name,char *p_res_name,char **out,char **adr_tm
 	}
 */
 
-/* Initialize resource value to N_DEF if the resource is not defined in the
-   database */
-
+/* Initialize resource value to N_DEF if the resource is not defined in the database */
 	if (resu.dptr == NULL && ctr == 0)
 	{
 		if ( (*out = (char *)malloc(10)) == NULL)
@@ -494,9 +474,7 @@ int NdbmServer::db_find(char *tab_name,char *p_res_name,char **out,char **adr_tm
 		strcpy(*out,"N_DEF");
 	}
 	
-/* For resource of the SEC domain, change all occurences of the ^ character
-   to the | character */
-
+/* For resource of the SEC domain, change all occurences of the ^ character to the | character */
 	if (sec_res == True)
 	{
 		k = strlen(*out);   
@@ -508,7 +486,6 @@ int NdbmServer::db_find(char *tab_name,char *p_res_name,char **out,char **adr_tm
 	}
 		
 /* Reset the temporary buffer */
-
 	(*adr_tmp1)[0] = 0;
 
 	free(key.dptr);

@@ -22,7 +22,6 @@
 
 /* Some local functions declaration */
 
-// int stringOK(char *,char *);
 // int memb_fil(device *);
 // int fam_fil(device *);
 
@@ -73,8 +72,6 @@ static char member_tup[MEMBER_NAME_LENGTH];	// 20
 *            }                                                              *
 *                                                                           *
 ****************************************************************************/
-
-
 db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 {
 	int i,err,ret;
@@ -307,14 +304,10 @@ db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 				std::cout << "Domain part from DB: " << domain_tup << std::endl;
 #endif /* DEBUG */
 
-/* Call the stringOK function to verify that the retrieved devices 
-   device name is OK */
-
+/* Call the stringOK function to verify that the retrieved devices device name is OK */
 				ret = stringOK(domain,domain_tup);
 
-/* If the domain part of the filter is *, directly call the fam_fil
-   function */
-
+/* If the domain part of the filter is *, directly call the fam_fil function */
 				if (ret == 0)
 				{
 					if ((err = fam_fil(&dev)) != 0)
@@ -427,8 +420,6 @@ int NdbmServer::fam_fil(device *dev1)
 		return(0);
 
 /* Call the stringOK to verify that the family name is OK */
-
-
 	ret = stringOK(family,family_tup);
 
 /* Is this family part the same than in the filter, call the memb_fil
@@ -489,9 +480,7 @@ int NdbmServer::memb_fil(device *dev2)
 	std::cout << "member part from DB : " << member_tup << std::endl;
 #endif /* DEBUG */
 
-/* Call the stringOK function to verify that the member part of the
-   retrieved device is OK */
-
+/* Call the stringOK function to verify that the member part of the retrieved device is OK */
 	ret = stringOK(member,member_tup);
 
 /* Is this member part the same than in the filter ? If yes, the device name
@@ -544,7 +533,7 @@ int NdbmServer::memb_fil(device *dev2)
 *    Otherwise, this function returns 1					    *
 *                                                                           *
 ****************************************************************************/
-int NdbmServer::stringOK(char *wanted,char *retrieved)
+int NdbmServer::stringOK(char *wanted, char *retrieved)
 {
 	register char *tmp;
 	unsigned int before,after;
