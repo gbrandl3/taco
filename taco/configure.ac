@@ -1,6 +1,6 @@
 AC_INIT([TACO], [3.1.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.55 $)dnl
+AC_REVISION($Revision: 1.56 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -70,6 +70,15 @@ AC_CHECK_HEADERS([pthread.h fcntl.h malloc.h memory.h netdb.h stddef.h stdlib.h 
 AC_CHECK_HEADERS([varargs.h stdarg.h])
 AC_CHECK_HEADERS([rpc/pmap_prot.h rpc/pmap_prot.h])
 AC_CHECK_HEADERS([signal.h sys/signal.h])
+AC_TYPE_SIGNAL
+AC_CHECK_TYPES([sighandler_t, __sighandler_t], [], [],
+[
+#if HAVE_SYS_SIGNAL_H
+#	include <sys/signal.h>
+#elif HAVE_SIGNAL_H
+#	include <signal.h>
+#endif
+])
 
 AC_LANG_PUSH(C++)
 AC_CHECK_HEADERS([sstream strstream])
