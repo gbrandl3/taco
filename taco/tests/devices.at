@@ -114,3 +114,22 @@ AT_SETUP([Stop the Inst_verify and AGPSpp device servers])
 AT_CHECK([AT_TACO_RUN_LOCAL([off Inst_verify >>log 2>&1])
 AT_TACO_RUN_LOCAL([off AGPSpp >>log 2>&1])])
 AT_CLEANUP
+
+AT_SETUP([Test the command and event lists of a device])
+AT_CHECK([AT_TACO_RUN_LOCAL([test_server 1 &])
+sleep 5
+AT_TACO_RUN_LOCAL([test_connect test/a/1])
+AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [Set protocol to TCP
+Query commands
+    4228120577       0       9                        "SendByteArray"
+             1       0       0                        "On"
+             2       0       0                        "Off"
+             3       0       0                        "Reset"
+             4       0       2                        "State"
+             8       0       6                        "Status"
+            10       0       0                        "Close"
+Query events
+])
+AT_CLEANUP
+
+

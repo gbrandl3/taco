@@ -1,4 +1,5 @@
 #include <API.h>
+#include <Admin.h>
 #include <DevServer.h>
 #include "test_serverP.h"
 #include "test_server.h"
@@ -11,6 +12,8 @@ TestDevice::TestDevice(const std::string name, long &error)
 {
 	commands_list[SendByteArray] = DeviceCommandListEntry(SendByteArray, static_cast<DeviceMemberFunction>(&TestDevice::tacoSendByteArray),
 				D_VOID_TYPE, D_VAR_CHARARR, 0, "SendByteArray");
+
+	events_list[HeartBeat] = DeviceEventListEntry(HeartBeat, D_LONG_TYPE, "HeartBeat");
 	this->class_name = "TestDevice";
 }
 
@@ -45,9 +48,9 @@ extern "C" long startup(char *serverName, long *error)
  */
 	char            **dev_list;
 	unsigned int    dev_no;
-#ifdef EBUG
-        debug_flag = (DEBUG_ON_OFF | DBG_TRACE | DBG_DEV_SVR_CLASS | DBG_API);
-#endif
+
+//        debug_flag = (DEBUG_ON_OFF | DBG_TRACE | DBG_DEV_SVR_CLASS | DBG_API);
+
 	if (db_getdevlist(serverName, &dev_list, &dev_no, error) != DS_OK)
 	{
 		std::cerr << "startup(): db_getdevlist() failed, error = "<< *error << std::endl; 
