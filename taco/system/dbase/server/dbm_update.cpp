@@ -276,8 +276,7 @@ long NdbmServer::del_name(device &devi, int &pndev, std::string ptr, std::vector
 	int 	j,
 		l,
 		tp;
-	datum 	key,
-		content;
+	datum 	key;
 	int 	seq = 1;
 	long 	nb_dev;
 //
@@ -285,6 +284,7 @@ long NdbmServer::del_name(device &devi, int &pndev, std::string ptr, std::vector
 // device server/personal name 
 // 
 	int 	i = 0;
+	key.dptr = new char[MAX_KEY];
 	do
 	{
 //
@@ -299,10 +299,10 @@ long NdbmServer::del_name(device &devi, int &pndev, std::string ptr, std::vector
 		std::cerr << s.str() << std::endl;
 #endif
 #if !HAVE_SSTREAM
-        	key.dptr = s.str();
+        	strcpy(key.dptr, s.str());
         	s.freeze(false);
 #else
-		key.dptr = const_cast<char *>(s.str().c_str());
+		strcpy(key.dptr, const_cast<char *>(s.str().c_str()));
 #endif
 		key.dsize = strlen(key.dptr);
 #ifdef DEBUG
@@ -313,7 +313,7 @@ long NdbmServer::del_name(device &devi, int &pndev, std::string ptr, std::vector
 //
 		try
 		{
-			NdbmNamesCont	cont(dbgen.tid[0],key);
+			NdbmNamesCont	cont(dbgen.tid[0], key);
 //
 // Copy all the database information in a "dena" structure 
 //
@@ -332,7 +332,8 @@ long NdbmServer::del_name(device &devi, int &pndev, std::string ptr, std::vector
 //
 // Delete database entry
 //
-			gdbm_delete(dbgen.tid[0], key);
+			if (gdbm_delete(dbgen.tid[0], key))
+				throw long(0);
 			seq++;
 		}
 		catch ( ... )
@@ -340,9 +341,13 @@ long NdbmServer::del_name(device &devi, int &pndev, std::string ptr, std::vector
 			if (gdbm_error(dbgen.tid[0]) == 0)
 				break;
 			else
+			{
+				delete [] key.dptr;
 				throw long(DbErr_DatabaseAccess);
+			}
 		}
 	}while (true);
+	delete [] key.dptr;
 //
 // Compute how many devices are defined in the list
 //
@@ -482,6 +487,7 @@ long NdbmServer::update_dev_list(device &p_ret, long seq) throw (long)
 #ifdef DEBUG
 	std::cout << "before loop in update-dev_list function" << std::endl;
 #endif
+	key.dptr = new char [MAX_KEY];
 	do
 	{
 //
@@ -495,10 +501,10 @@ long NdbmServer::update_dev_list(device &p_ret, long seq) throw (long)
 #endif
 		s << seq << "|" <<  std::ends;
 #if !HAVE_SSTREAM
-        	key.dptr = s.str();
+        	strcpy(key.dptr, s.str());
         	s.freeze(false);
 #else
-		key.dptr = const_cast<char *>(s.str().c_str());
+		strcpy(key.dptr, const_cast<char *>(s.str().c_str()));
 #endif
 		key.dsize = strlen(key.dptr);
 //
@@ -520,10 +526,10 @@ long NdbmServer::update_dev_list(device &p_ret, long seq) throw (long)
 #endif
 			s << (seq - 1) << "|" << std::ends;;
 #if !HAVE_SSTREAM
-			key.dptr = s.str();
+			strcpy(key.dptr, s.str());
 			s.freeze(false);
 #else
-			key.dptr = const_cast<char *>(s.str().c_str());
+			strcpy(key.dptr, const_cast<char *>(s.str().c_str()));
 #endif
 			key.dsize = strlen(key.dptr);
 
@@ -536,9 +542,13 @@ long NdbmServer::update_dev_list(device &p_ret, long seq) throw (long)
 			if (gdbm_error(dbgen.tid[0]) == 0)
 				break;
 			else
+			{
+				delete key.dptr;
 				throw long(ERR_DEV_NOT_FD);
+			}
 		}
 	}while(true);
+	delete [] key.dptr;
 #ifdef DEBUG
 	std::cout << "after loop in update-dev_list function" << std::endl;	
 #endif

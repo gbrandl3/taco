@@ -666,6 +666,7 @@ DevLong *NdbmServer::db_putres_1_svc(tab_putres * rece)
 					res_numb++;
 					if (gdbm_store(tab, key, content, GDBM_INSERT))
 						throw long(DbErr_DatabaseAccess);
+					tmp.erase(0, pos + 1);
 				}
 //
 // For the last element value 

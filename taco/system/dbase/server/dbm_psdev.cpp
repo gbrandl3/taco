@@ -78,7 +78,7 @@ db_psdev_error *NdbmServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
 
 
 /**
- * To register a pseuo device in the PS_NAMES database table
+ * To register a pseudo device in the PS_NAMES database table
  *
  * @param h_name The host name
  * @param pid The process PID
