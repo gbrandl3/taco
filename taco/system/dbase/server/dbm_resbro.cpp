@@ -17,7 +17,7 @@
 *	Server code for the resdomainlist_1_svc function     	    	    *
 *                           -------------------                     	    *
 *                                                                           *
-*    Method rule : To retrive resource domain list for all the resources    *
+*    Method rule : To retrieve resource domain list for all the resources    *
 *		   defined in the database				    *
 *                                                                           *
 *    Argin : No argin							    *
@@ -499,7 +499,6 @@ db_res *NdbmServer::resresolist_1_svc(db_res *recev)
 *                                                                    	    *
 *                                                                           *
 ****************************************************************************/
-
 db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 {
 	std::string 	res_val;
@@ -714,13 +713,11 @@ db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 //
 // Sort the resource array
 //
-
 	reso_val.sort_name();		
 	
 //
 // Build the structure returned to caller
 //
-		
 	browse_back.res_val.arr1_len = reso_val.size();
 	if (reso_val.copy_to_C(browse_back.res_val.arr1_val) != 0)
 	{
@@ -732,6 +729,5 @@ db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 //
 // Return data
 //
-
 	return(&browse_back);
 }
