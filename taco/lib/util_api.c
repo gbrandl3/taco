@@ -14,9 +14,9 @@
 
  Original   :	April 1993
 
- Version:	$Revision: 1.6 $
+ Version:	$Revision: 1.7 $
 
- Date:		$Date: 2003-12-08 14:23:32 $
+ Date:		$Date: 2004-02-11 15:13:03 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -133,10 +133,7 @@ long _DLLFunc dev_putget_raw (devserver ds, long cmd, DevArgument argin,
 	long 			status;
 
 	*error = DS_OK;
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_API,
-	    "\ndev_putget_raw() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_putget_raw() : entering routine\n");
 
 	if (ds == NULL)
 	{
@@ -208,15 +205,9 @@ long _DLLFunc dev_putget_raw (devserver ds, long cmd, DevArgument argin,
 	memset ((char *)&client_data, 0, sizeof (client_data));
 	client_data.argout	= (char *) argout;
 
-#ifdef EBUG
-	dev_printdebug (DBG_API,
-	    "dev_putget() : server data -> \n");
-	dev_printdebug (DBG_API,
-	    "ds_id=%d  cmd=%d  intype=%d  outtype=%d\n",
-	    server_data.ds_id, server_data.cmd,
-	    server_data.argin_type,
-	    server_data.argout_type);
-#endif /* EBUG */
+	dev_printdebug (DBG_API, "dev_putget() : server data -> \n");
+	dev_printdebug (DBG_API, "ds_id=%d  cmd=%d  intype=%d  outtype=%d\n",
+	    server_data.ds_id, server_data.cmd, server_data.argin_type, server_data.argout_type);
 
 	/*
 	 *  call RPC_DEV_PUTGET_RAW at the correct device server
@@ -298,10 +289,7 @@ long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
 
 	*error = DS_OK;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_API,
-	    "\ndev_put_asyn() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_put_asyn() : entering routine\n");
 
 	if (ds == NULL)
 	{
@@ -354,14 +342,9 @@ long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
 	server_data.var_argument.length   = 0;
 	server_data.var_argument.sequence = NULL;
 
-#ifdef EBUG
-	dev_printdebug (DBG_API,
-	    "dev_put_asyn() : server data -> \n");
-	dev_printdebug (DBG_API,
-	    "ds_id=%d  cmd=%d  intype=%d\n",
-	    server_data.ds_id, server_data.cmd,
-	    server_data.argin_type);
-#endif /* EBUG */
+	dev_printdebug (DBG_API, "dev_put_asyn() : server data -> \n");
+	dev_printdebug (DBG_API, "ds_id=%d  cmd=%d  intype=%d\n",
+	    server_data.ds_id, server_data.cmd, server_data.argin_type);
 
 	/*
 	 *  call RPC_DEV_PUT_ASYN at the correct device server
@@ -448,10 +431,7 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 	int		n_cmd_names;
 
 	*error = DS_OK;
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_API,
-	    "\ndev_cmd_query() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_cmd_query() : entering routine\n");
 
 	if (ds == NULL)
 	{
@@ -606,7 +586,7 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 			}
 			else
 			{
-				snprintf(varcmdarr->sequence[i].cmd_name, sizeof(varcmdarr->sequence[i].cmd_name) - 1, "command%d",i);
+				snprintf(varcmdarr->sequence[i].cmd_name, sizeof(varcmdarr->sequence[i].cmd_name), "command%d",i);
 			}
 		}
 		if (!ds->no_database)
@@ -650,17 +630,13 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
  * nethost domain i.e. i_nethost != 0
  */
 			if (ds->i_nethost > 0)
-			{
-				snprintf(res_path, sizeof(res_path) - 1, "//%s/CLASS/%s/%s",
+				snprintf(res_path, sizeof(res_path), "//%s/CLASS/%s/%s",
 		   			get_nethost_by_index(ds->i_nethost, error), class_name, cmd_name);
-			}
 /*
  * use default nethost
  */
 			else
-			{
-				snprintf (res_path, sizeof(res_path) - 1, "CLASS/%s/%s", class_name, cmd_name);
-			}
+				snprintf (res_path, sizeof(res_path), "CLASS/%s/%s", class_name, cmd_name);
 
 /*
  *  read CLASS resources from database
@@ -726,10 +702,7 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
 	unsigned short 	server;
 	unsigned short 	cmds_ident;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_API,
-	    "\nget_cmd_string() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_API, "\nget_cmd_string() : entering routine\n");
 
 	*error = DS_OK;
 
@@ -752,7 +725,7 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
 
 	if (ds->i_nethost > 0)
 	{
-		snprintf(res_path, sizeof(res_path) - 1, "//%s/CMDS/%d/%d", 
+		snprintf(res_path, sizeof(res_path), "//%s/CMDS/%d/%d", 
 		   get_nethost_by_index(ds->i_nethost, error),
 		   team, server);
 	}
@@ -761,16 +734,12 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
  */
 	else
 	{
-		snprintf(res_path, sizeof(res_path) - 1, "CMDS/%d/%d", team, server);
+		snprintf(res_path, sizeof(res_path), "CMDS/%d/%d", team, server);
 	}
 
-	snprintf (res_name, sizeof(res_name) - 1, "%d", cmds_ident);
-#ifdef EBUG
-	dev_printdebug (DBG_API,
-	    "get_cmds_string() : res_path = %s\n", res_path);
-	dev_printdebug (DBG_API,
-	    "get_cmds_string() : res_name = %s\n", res_name);
-#endif /* EBUG */
+	snprintf (res_name, sizeof(res_name), "%d", cmds_ident);
+	dev_printdebug (DBG_API, "get_cmds_string() : res_path = %s\n", res_path);
+	dev_printdebug (DBG_API, "get_cmds_string() : res_name = %s\n", res_name);
 
 	res_tab.resource_name = res_name;
 	res_tab.resource_type = D_STRING_TYPE;
@@ -782,10 +751,7 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
 
 	if (db_getresource (res_path, &res_tab, 1, error) == DS_NOTOK)
 	{
-#ifdef EBUG
-		dev_printdebug (DBG_API | DBG_ERROR,
-		    "get_cmd_string() : db_getresource failed with error %d\n", *error);
-#endif /* EBUG */
+		dev_printdebug (DBG_API | DBG_ERROR, "get_cmd_string() : db_getresource failed with error %d\n", *error);
 
 		return (DS_NOTOK);
 	}
@@ -834,10 +800,7 @@ long _DLLFunc dev_inform (devserver *clnt_handles, long num_devices,
 
 	*error = DS_OK;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_API,
-	    "\ndev_inform() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_inform() : entering routine\n");
 
 	if (clnt_handles == NULL)
 	{
@@ -874,20 +837,12 @@ long _DLLFunc dev_inform (devserver *clnt_handles, long num_devices,
 		strncpy (info_ptr->server_name, (*clnt_ptr)->server_name, sizeof(info_ptr->server_name) - 1);
 		strncpy (info_ptr->server_host, (*clnt_ptr)->server_host, sizeof(info_ptr->server_host) - 1);
 
-#ifdef EBUG
-		dev_printdebug (DBG_API,
-		    "dev_inform() : information data\n");
-		dev_printdebug (DBG_API,
-		    "name  = %s\n",info_ptr->device_name);
-		dev_printdebug (DBG_API,
-		    "class  = %s\n",info_ptr->device_class);
-		dev_printdebug (DBG_API,
-		    "type  = %s\n",info_ptr->device_type);
-		dev_printdebug (DBG_API,
-		    "svc_name = %s\n",info_ptr->server_name);
-		dev_printdebug (DBG_API,
-		    "svc_host = %s\n",info_ptr->server_host);
-#endif /* EBUG */
+		dev_printdebug (DBG_API, "dev_inform() : information data\n");
+		dev_printdebug (DBG_API, "name  = %s\n",info_ptr->device_name);
+		dev_printdebug (DBG_API, "class  = %s\n",info_ptr->device_class);
+		dev_printdebug (DBG_API, "type  = %s\n",info_ptr->device_type);
+		dev_printdebug (DBG_API, "svc_name = %s\n",info_ptr->server_name);
+		dev_printdebug (DBG_API, "svc_host = %s\n",info_ptr->server_host);
 	}
 
 	return (DS_OK);
@@ -1341,11 +1296,7 @@ long _DLLFunc nethost_alloc (long *error)
 		auth_flag[i] = False;
 	}
 	max_nethost = new_max_nethost;
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_API,
-			"nethost_alloc(): (re)allocate space for nethost, new max = %d\n",
-			 max_nethost);
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_API, "nethost_alloc(): (re)allocate space for nethost, new max = %d\n", max_nethost);
 
 	return(DS_OK);
 }
@@ -1368,10 +1319,7 @@ long _DLLFunc dev_ping (devserver ds, long *error)
 	enum clnt_stat  clnt_stat;
 
 	*error = DS_OK;
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_API,
-	    "\ndev_ping() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_ping() : entering routine\n");
 
 	if (ds == NULL)
 	{
