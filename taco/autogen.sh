@@ -1,20 +1,31 @@
 #!/bin/sh
+
+for libtoolize in glibtoolize libtoolize ; do
+        LIBTOOLIZE=`which $libtoolize 2>/dev/null`
+        if test "$LIBTOOLIZE" ; then
+                break;
+        fi
+done
 LIBTOOLIZE="libtoolize --force --copy --automake"
 ACLOCAL="aclocal -I m4 $aclocal_includes"
 AUTOHEADER="autoheader"
 AUTOMAKE="automake -a -c --foreign"
 AUTOCONF="autoconf"
 
-
 touch AUTHORS ChangeLog NEWS README
 if { ! test -d config ; } ; then mkdir config ; else rm -rf config/* ;  fi
 
 
 # Discover what version of autoconf we are using.
-autoversion=`$AUTOCONF --version | head -n 1`
+autoconfversion=`$AUTOCONF --version | head -n 1`
+automakeversion=`$AUTOMAKE --version | head -n 1`
+libtoolversion=`$LIBTOOLIZE --version | head -n 1`
 
-echo "Using $autoversion"
-case $autoversion in
+echo "Using $autoconfversion"
+echo "Using $automakeversion"
+echo "Using $libtoolversion"
+
+case $autoconfversion in
     *2.5[2-79])
 	;;
     *)
@@ -22,6 +33,28 @@ case $autoversion in
 	echo "taco only supports autoconf 2.5[2-79]."
 	exit
 	;;
+esac
+
+case $automakeversion in
+    *1.[5-8]*)
+        ;;
+    *)
+        echo "This automake version is not supported by taco."
+        echo "taco only supports automake 1.[5-8].*."
+        echo "You may download it from ftp://ftp.gnu.org/gnu/automake"
+        exit
+        ;;
+esac
+
+case $libtoolversion in
+    *1.[45]*)
+        ;;
+    *)
+        echo "This libtool version is not supported by NeXus."
+        echo "NeXus only supports libtool 1.[45].*."
+        echo "You may download it from ftp://ftp.gnu.org/gnu/libtool"
+        exit
+        ;;
 esac
 
 echo -n "Locating GNU m4... "
