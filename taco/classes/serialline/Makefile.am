@@ -13,7 +13,6 @@ rescmds_DATA 		= SerialCmnds.res
 errordir 		= ${prefix}/dbase/res/ERROR
 error_DATA 		= SerialErrors.res
 
-templatedir 		= ${prefix}/templates
 template_DATA 		= Serial.res
 
 EXTRA_DIST 		= Serial.res SerialCmnds.res SerialErrors.res
