@@ -71,7 +71,7 @@ include_HEADERS		+= BlcDsNumbers.h CntrlDsNumbers.h DasDsNumbers.h MachDsNumbers
 include_HEADERS		+= DeviceBase.h Device.H OICDevice.H 
 include_HEADERS		+= DevServer.h  DevServerP.h  DevSignal.h  NT_debug.h  Starter.h
 
-EXTRA_DIST		+= DeviceFRM.H OICDeviceFRM.H DeviceFRM.C OICDeviceFRM.C startup.cpp 
+EXTRA_DIST		+= DeviceFRM.H OICDeviceFRM.H DeviceFRM.C OICDeviceFRM.C 
 EXTRA_DIST		+= NT_debug.c 
 
 
