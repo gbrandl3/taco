@@ -11,8 +11,7 @@ sysconfdir=@sysconfdir@
 top_builddir=@abs_top_builddir@
 testbindir=${top_builddir}/tests
 appdefaultdir=@appdefaultdir@
-LD_LIBRARY_PATH=@abs_top_builddir@/tests/test/@prefix@/lib:$LD_LIBRARY_PATH
-
+LD_LIBRARY_PATH=@libdir@${LD_LIBRARY_PATH:+:}
 }
 
 set_env
@@ -25,17 +24,21 @@ if test $# -gt 0 ; then
 			if { mkdir test; } ; then
 				dc_destdir=$testbindir/test
 				make -C $top_builddir DESTDIR=$dc_destdir install >/dev/null 2>&1
-				. $sysconfdir/tacoenv.sh
-				mkdir -p ${LOGPATH}
-				set_env
-				export TACO_PATH=$sbindir
-				$sbindir/taco.startup >log 2>&1
-				exit 0
+				exit $?
 			fi
 			exit 1;;
-		uninstall)
+		start)
+			. $sysconfdir/tacoenv.sh
+			mkdir -p ${LOGPATH}
+			set_env
+			export TACO_PATH=$sbindir
+			$sbindir/taco.startup >log 2>&1
+			exit 0;;
+		stop)
 			. $sysconfdir/tacoenv.sh
 			killall Manager
+			;;
+		uninstall)
 			dc_destdir=$testbindir/test
 			make -C $top_builddir DESTDIR=$dc_destdir uninstall >/dev/null 2>&1
 			dir=`echo $prefix | cut -d'/' -f 1`
