@@ -1,20 +1,34 @@
 AC_DEFUN([TACO_PYTHON_BINDING],
 [
-	TACO_PROG_PYTHON(2.1, [yes])
-	ac_save_CFLAGS="$CFLAGS"
-	CFLAGS="$CFLAGS $PYTHON_INCLUDES"
-	AC_CHECK_HEADERS(Numeric/arrayobject.h, [taco_python_binding=yes], [taco_python_binding=no], [#include <Python.h>])
-	CFLAGS="$ac_save_CFLAGS"
+	AC_ARG_ENABLE(python-binding, AC_HELP_STRING(--enable-python-binding, [build the python binding library@<:@default=yes@:>@]),
+		[case "${enable_python_binding}" in
+			yes)	taco_python_binding=yes;;
+			*)	taco_python_binding=no;;
+		esac], [taco_python_binding=yes])
+	if test "x$taco_python_binding" = "xyes" ; then
+		TACO_PROG_PYTHON(2.1, [yes])
+		ac_save_CFLAGS="$CFLAGS"
+		CFLAGS="$CFLAGS $PYTHON_INCLUDES"
+		AC_CHECK_HEADERS(Numeric/arrayobject.h, [], [taco_python_binding=no], [#include <Python.h>])
+		CFLAGS="$ac_save_CFLAGS"
+	fi
 	AM_CONDITIONAL(PYTHON_BINDING, test $taco_python_binding = yes)
 ])
 
 AC_DEFUN([TACO_TCL_BINDING],
 [
-	TACO_PROG_TCL
-	if test -n "$TCLINCLUDE" -a -n "$TCLLIB" ; then
-		taco_tcl_binding=yes
-	else
-		taco_tcl_binding=no
+	AC_ARG_ENABLE(tcl-binding, AC_HELP_STRING(--enable-tcl-binding, [build the python binding library@<:@default=yes@:>@]),
+		[case "${enable_tcl_binding}" in
+			yes)	taco_tcl_binding=yes;;
+			*)	taco_tcl_binding=no;;
+		esac], [taco_tcl_binding=yes])
+	if test "x$taco_tcl_binding" = "xyes" ; then
+		AC_REQUIRE([TACO_PROG_TCL])
+		if test -n "$TCLINCLUDE" -a -n "$TCLLIB" ; then
+			taco_tcl_binding=yes
+		else
+			taco_tcl_binding=no
+		fi
 	fi
 	AM_CONDITIONAL(TCL_BINDING, test $taco_tcl_binding = yes)
 ])
@@ -23,33 +37,34 @@ AC_DEFUN([TACO_MYSQL_SUPPORT],
 [
 	AC_ARG_ENABLE(mysqldbm, AC_HELP_STRING(--enable-mysqldbm, [build the database server with mysql support @<:@default=yes@:>@]),
 		[case "${enable_mysqldbm}" in
-			yes)	mysql=yes;;
-			*)	mysql=no;;
-		esac], [mysql=yes])
-	if test "x$mysql" = "xyes" ; then
+			yes)	taco_mysql=yes;;
+			no)	taco_mysql=no;;
+			*)	AC_MSG_ERROR([bad value ${enable_mysqldbm} for --enable-mysqldbm]);;
+		esac], [taco_mysql=yes])
+	if test "x$taco_mysql" = "xyes" ; then
 		for i in /usr/include /usr/local/include ; do
 			AC_CHECK_FILE($i/mysql/mysql.h, [
-				mysql=yes
+				taco_mysql=yes
 				MYSQL_LDFLAGS="-L`dirname $i`/lib/mysql/"
 				AC_SUBST(MYSQL_LDFLAGS)
 				CPPFLAGS="$CPPFLAGS -I$i"
-				break],[mysql=no])
+				break],[taco_mysql=no])
 		done
-		AC_CHECK_HEADERS([mysql/mysql.h], [mysql=yes], [mysql=no])
+		AC_CHECK_HEADERS([mysql/mysql.h], [taco_mysql=yes], [taco_mysql=no])
 	fi
-	AM_CONDITIONAL(MYSQLSUPPORT, test "x$mysql" = "xyes")
+	AM_CONDITIONAL(MYSQLSUPPORT, test "x$taco_mysql" = "xyes")
 ])
 
 AC_DEFUN([TACO_DC_API],
 [
 	AC_ARG_ENABLE(dc, AC_HELP_STRING([--enable-dc], [build the data collector API @<:@default=yes@:>@]),
 		[case "${enable_dc}" in
-			yes)	dc=yes;;
-			no)	dc=no;;
+			yes)	taco_dc=yes;;
+			no)	taco_dc=no;;
 			*)	AC_MSG_ERROR([bad value ${enable_dc} for --enable-dc]);;
-		esac], [dc=yes])
-	AM_CONDITIONAL(DC_BUILD, test "x$dc" = "xyes") 
-	if test "x$dc" = "xyes" ; then
+		esac], [taco_dc=yes])
+	AM_CONDITIONAL(DC_BUILD, test "x$taco_dc" = "xyes") 
+	if test "x$taco_dc" = "xyes" ; then
 		TACO_DC_LIBS="\$(top_builddir)/lib/dc/libdcapi.la"
 	fi
 	AC_SUBST(TACO_DC_LIBS)
@@ -120,6 +135,26 @@ AC_DEFUN([TACO_XDEVMENU],
 	AC_SUBST(XDEVMENU)
 ])
 
+AC_DEFUN([TACO_ALARM],
+[
+	AC_REQUIRE([X_AND_MOTIF])
+	AC_ARG_ENABLE(alarm, AC_HELP_STRING([--enable-alarm], [build the graphical alarm tool @<:@default=yes@:>@]),
+		[case "${enable_alarm}" in
+			yes)	alarm=yes;;
+			no)	alarm=no;;
+			*)	AC_MSG_ERROR(bad value ${enableval} for --enable-alarm);;
+		esac], [alarm=yes])
+	if test "x$alarm" = "xno" ; then
+		X_AND_MOTIF
+		ALARM=alarm
+	fi
+	if test "x$motif_found" != "xyes" ; then
+		alarm=no
+	fi
+	AM_CONDITIONAL(ALARMBUILD, test "x$alarm" = "xyes") 
+	AC_SUBST(ALARM)
+])
+
 AC_DEFUN([X_AND_MOTIF],
 [
 	AC_REQUIRE([AC_PATH_XTRA])
@@ -137,11 +172,13 @@ AC_DEFUN([X_AND_MOTIF],
 		],[MOTIF_LIBS="-lXm"; MOTIF_INCLUDES="$X_CFLAGS"])
 	CPPFLAGS_SAVE="$CPPFLAGS"
 	CPPFLAGS="$CPPFLAGS $MOTIF_INCLUDES"
+	LIBS_SAVE="$LIBS"
 	AC_CHECK_HEADERS([Xm/Xm.h Xm/XmAll.h], [
 		AC_CHECK_LIB(Xm, XmStringCreateLocalized, [], [motif_found=no], [$X_LDFLAGS -lXt -lX11])
 		break;
 	], [motif_found=no])
 	CPPFLAGS="$CPPFLAGS_SAVE"
+	LIBS="$LIBS_SAVE"
 
 	AC_SUBST(MOTIF_LIBS)
 	AC_SUBST(MOTIF_INCLUDES)
