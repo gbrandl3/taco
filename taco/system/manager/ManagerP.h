@@ -11,9 +11,9 @@
 
  Original:      January 1991
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-04-25 12:54:27 $
+ Date:		$Date: 2003-05-09 15:26:25 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -29,24 +29,24 @@ extern void	unreg_server ();
 /*
  *  definitions for the static database server
  */
-	/*
-	 * Definitions for RTDB database
-	 */
-	static char	*db_server         = "dbsu_server";
-	static char   	*db_name           = "Set_bdd";
+/*
+ * Definitions for RTDB database
+ */
+static char	*db_server         = "dbsu_server";
+static char   	*db_name           = "Set_bdd";
 
-	/*
-	 * Definitions for DBM database
-	 */
-	static char     *dbm_server 	    = "dbm_server";
-	static char   	*dbm_name           = "dbm";
+/*
+ * Definitions for DBM database
+ */
+static char     *dbm_server 	    = "dbm_server";
+static char   	*dbm_name           = "dbm";
 	
-	/*
-	 * Definition for ORACLE database
-	 */
-	static char 	*ora_server	    = "db_server";
-	static char 	*ora_name	    = "res";
-	static char	*ora_tns	    = "/usr/local/oracle";
+/*
+ * Definition for ORACLE database
+ */
+static char 	*ora_server	    = "db_server";
+static char 	*ora_name	    = "res";
+static char	*ora_tns	    = "/usr/local/oracle";
 
 
 typedef struct 	{

@@ -12,8 +12,8 @@
 
  Original:	January 1991
 
- $Revision: 1.1 $
- $Date: 2003-04-25 12:54:27 $
+ $Revision: 1.2 $
+ $Date: 2003-05-09 15:26:45 $
 
  $Author: jkrueger1 $
 
@@ -27,9 +27,9 @@
 #ifndef _Message_h
 #define _Message_h
 
-extern void msg_alarm_handler();
-extern void msg_initialise();
-extern void msg_fault_handler();
+extern void msg_alarm_handler(short, char *, char *, char *, char *);
+extern void msg_initialise(char *);
+extern void msg_fault_handler(DevString);
 
 typedef struct _MessageServerPart {
                                   char      name [256];

@@ -8,14 +8,13 @@
  Description:   Main Programm for a Message-Server
 
  Author(s):    	Jens Meyer
+ 		$Author: jkrueger1 $
 
  Original:	January 1991
 
+ Version:	$Revision: 1.2 $
 
- $Revision: 1.1 $
- $Date: 2003-04-25 12:54:27 $
-
- $Author: jkrueger1 $
+ Date:		$Date: 2003-05-09 15:26:46 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -47,24 +46,19 @@ main (int argc, char **argv)
 
 	if (argc < 2)
 	{
-		printf ("usage: %s nethost\n",argv[0]);
+		fprintf (stderr, "usage: %s nethost\n",argv[0]);
 		exit (1);
 	}
 
-	sprintf (msg.name, "%s",argv[0]);
+	snprintf (msg.name, sizeof(msg.name), "%s",argv[0]);
 	nethost = argv[1]; 
-
-        /*
-	 *  get process ID
-	 */
-
+/*
+ *  get process ID
+ */
   	pid = getpid ();
-
-
-	/*
-	 * install signal handling
-	 */
-
+/*
+ * install signal handling
+ */
 	(void) signal(SIGHUP,  unreg_server);
 	(void) signal(SIGINT,  unreg_server);
 	(void) signal(SIGQUIT, unreg_server);
@@ -78,41 +72,34 @@ main (int argc, char **argv)
         (void) signal (SIGCLD,exit_child);
 #endif /* sun */
 
+/*
+ *  get transient progamm number and host name
+ */
 
-        /*
-	 *  get transient progamm number and host name
-	 */
-
-        /* M. Diehl, 15.11.99
-         * Use new gettransient() interface. Use some program description
-         * to create the hash value. This will prevent conflicts with
-         * database server. When both programms try to register numbers
-         * beginning at a common base leading to a race condition!
-         */
-         
+/* M. Diehl, 15.11.99
+ * Use new gettransient() interface. Use some program description
+ * to create the hash value. This will prevent conflicts with
+ * database server. When both programms try to register numbers
+ * beginning at a common base leading to a race condition!
+ */
   	msg.prog_number = gettransient("MessageServer");
-  	
   	gethostname (msg.host_name, 32);
 
-
-	/*
-	 *  register message-server to netwok manager
-	 */
-
+/*
+ *  register message-server to netwok manager
+ */
 	register_msg (nethost,&dshome);
-
 	
-        /*
-	 *  create server handle
-	 */
+/*
+ *  create server handle
+ */
 
-        /* M. Diehl, 15.11.99
-         * Since gettransient() does not bind sockets and pmap_set
-         * prognums anymore, the patches required for Solaris and
-         * Linux/glibc 2.x (and probably for every other well-behaving
-         * system) have been removed.
-         */
-
+/* M. Diehl, 15.11.99
+ * Since gettransient() does not bind sockets and pmap_set
+ * prognums anymore, the patches required for Solaris and
+ * Linux/glibc 2.x (and probably for every other well-behaving
+ * system) have been removed.
+ */
 	transp = svcudp_create(RPC_ANYSOCK);
 	if (transp == NULL) 
 	{
@@ -127,18 +114,14 @@ main (int argc, char **argv)
 		kill (pid,SIGQUIT);
 	}
 
-
-        /*
-	 *  startup message server
-	 */
-
+/*
+ *  startup message server
+ */
         msg_initialise (dshome);
 
-
-	/*
-	 *  set server into wait status
-	 */
-
+/*
+ *  set server into wait status
+ */
 	svc_run();
 	fprintf(stderr, "svc_run returned\n");
 	kill (pid,SIGQUIT);
@@ -196,10 +179,9 @@ static void msgserver_prog_1 (struct svc_req *rqstp, SVCXPRT *transp)
 			return;
 	}
 
-
 	memset(&argument, 0, sizeof(argument));
 
-	if (!svc_getargs(transp, xdr_argument, &argument)) 
+	if (!svc_getargs(transp, (xdrproc_t)xdr_argument, (char *)&argument)) 
 	{
 		msg_fault_handler 
 		("svcerr_decode : server couldn't decode incoming arguments");
@@ -219,7 +201,7 @@ static void msgserver_prog_1 (struct svc_req *rqstp, SVCXPRT *transp)
 		svcerr_systemerr(transp);
 	}
 
-	if (!svc_freeargs(transp, xdr_argument, &argument)) 
+	if (!svc_freeargs(transp, (xdrproc_t)xdr_argument, (char *)&argument)) 
 	{
 		msg_fault_handler 
 		("svc_freeargs : server couldn't free arguments !!");
@@ -239,27 +221,25 @@ void register_msg (char *nethost, char **dshome)
   	pid = getpid ();
        	memset (&msg_manager_data, 0, sizeof (msg_manager_data));
 
-
-        /*
-	 * Create network manager client handle to nethost 
-	 */
+/*
+ * Create network manager client handle to nethost 
+ */
 
 	clnt = clnt_create ( nethost,NMSERVER_PROG,NMSERVER_VERS,"udp");
   	if (clnt == NULL)
-     	   {
-	   clnt_pcreateerror ("register_msg");
-	   kill (pid,SIGQUIT);
-	   }
+     	{
+		clnt_pcreateerror ("register_msg");
+		kill (pid,SIGQUIT);
+	}
 
-    	clnt_control (clnt, CLSET_RETRY_TIMEOUT, &retry_timeout);
-    	clnt_control (clnt, CLSET_TIMEOUT, &timeout);
+    	clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *)&retry_timeout);
+    	clnt_control (clnt, CLSET_TIMEOUT, (char *)&timeout);
 
 
-        /*
-	 *  send server configuration to network manager
-	 *  and get back DSHOME and DISPLAY.
-	 */
-
+/*
+ *  send server configuration to network manager
+ *  and get back DSHOME and DISPLAY.
+ */
 	register_data.host_name   = msg.host_name;
 	register_data.prog_number = msg.prog_number;
 	register_data.vers_number = MSGSERVER_VERS;
@@ -270,18 +250,17 @@ void register_msg (char *nethost, char **dshome)
 			       xdr__msg_manager_data,&msg_manager_data,timeout);
 #else
 	clnt_stat = clnt_call (clnt, RPC_MSG_REGISTER,
-			       (xdrproc_t)xdr__register_data,&register_data,
-			       (xdrproc_t)xdr__msg_manager_data,&msg_manager_data,timeout);
+			       (xdrproc_t)xdr__register_data, (char *)&register_data,
+			       (xdrproc_t)xdr__msg_manager_data, (char *)&msg_manager_data,timeout);
 #endif /* !linux */
 	if (clnt_stat != RPC_SUCCESS)
-   	   {
-	   clnt_perror (clnt,"register_msg");
-	   kill (pid,SIGQUIT);
-	   }
+	{
+		clnt_perror (clnt,"register_msg");
+		kill (pid,SIGQUIT);
+	}
 
 	*dshome = msg_manager_data.dshome;
-	sprintf (msg.display, "%s", msg_manager_data.display);
-
+	snprintf (msg.display, sizeof(msg.display), "%s", msg_manager_data.display);
 	clnt_destroy (clnt);
 }
 
@@ -296,7 +275,6 @@ void unreg_server (int signo)
 void exit_child (int signo)
 {
 	int 	status;
-
 	wait (&status);
 }
 #endif /* sun */

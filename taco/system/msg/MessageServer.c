@@ -8,14 +8,13 @@
  Description:	Source code for implementing a Message-Server 
 
  Author(s):	Jens Meyer
+ 		$Author: jkrueger1 $
 
  Original:	January 1991
 
+ Version:	$Revision: 1.2 $
 
- $Revision: 1.1 $
- $Date: 2003-04-25 12:54:27 $
-
- $Author: jkrueger1 $
+ Date:		$Date: 2003-05-09 15:26:46 $
 
  Copyright (c) 1990 by	European Synchrotron Radiation Facility, 
 			Grenoble, France
@@ -46,39 +45,37 @@ extern MessageServerPart msg;
  * Message-Server initialise           *
  ***************************************/
 
-void msg_initialise (dshome)
-	char 	*dshome;
-
+void msg_initialise (char *dshome)
 {
-	/*
- 	 * initialise the MessageServerPart
- 	 */
+/*
+ * initialise the MessageServerPart
+ */
 
 #ifdef OSK
-        sprintf (msg.ER_file_dir, "%s/api/error/", dshome );
-        sprintf (msg.pipe_dir, "%s/api/pipe/", dshome );
-        sprintf (msg.aw_path, "%s/api/bin/S_Alarm", dshome );
+        snprintf (msg.ER_file_dir, sizeof(msg.ER_file_dir), "%s/api/error/", dshome );
+        snprintf (msg.pipe_dir, sizeof(msg.pipe_dir), "%s/api/pipe/", dshome );
+        snprintf (msg.aw_path, sizeof(msg.aw_path), "%s/api/bin/S_Alarm", dshome );
 #endif /* OSK */
 
 #ifdef unix
-        sprintf (msg.ER_file_dir, "%s/system/error/", dshome );
-        sprintf (msg.pipe_dir, "%s/system/pipe/", dshome );
+        snprintf (msg.ER_file_dir, sizeof(msg.ER_file_dir), "%s/system/error/", dshome );
+        snprintf (msg.pipe_dir, sizeof(msg.pipe_dir), "%s/system/pipe/", dshome );
 #endif /* unix */
 
 #ifdef __hp9000s300
-        sprintf (msg.aw_path, "%s/system/bin/s300/S_Alarm", dshome );
+        snprintf (msg.aw_path, sizeof(msg.aw_path), "%s/system/bin/s300/S_Alarm", dshome );
 #endif /* __hp9000s300 */
 
 #ifdef __hp9000s700
-        sprintf (msg.aw_path, "%s/system/bin/s700/S_Alarm", dshome );
+        snprintf (msg.aw_path, sizeof(msg.aw_path), "%s/system/bin/s700/S_Alarm", dshome );
 #else
 #  ifdef __hp9000s800
-        sprintf (msg.aw_path, "%s/system/bin/s800/S_Alarm", dshome );
+        snprintf (msg.aw_path, sizeof(msg.aw_path), "%s/system/bin/s800/S_Alarm", dshome );
 #  endif /* __hp9000s800 */
 #endif /* __hp9000s700 */
 
 #ifdef sun
-        sprintf (msg.aw_path, "%s/system/bin/sun4/S_Alarm", dshome );
+        snprintf (msg.aw_path, sizeof(msg.aw_path), "%s/system/bin/sun4/S_Alarm", dshome );
 #endif /* sun */
 
 }
@@ -89,18 +86,11 @@ void msg_initialise (dshome)
 /*******************************************
  * Message-Server alarm handler method     *
  *******************************************/
-
-void msg_alarm_handler  (alarm_type,
-				server_name,
-				host_name,
-				file_name,
-				display)
-	short 	alarm_type;
-	char 	*server_name;
-	char 	*host_name;
-	char 	*file_name;
-	char 	*display;
-
+void msg_alarm_handler(short alarm_type,
+			char *server_name,
+			char *host_name,
+			char *file_name,
+			char *display)
 {
 	char *cmd_argv [10];
 	char buffer [3];
@@ -113,88 +103,75 @@ void msg_alarm_handler  (alarm_type,
 	 */
 
 	if (( pid = fork () ) < 0 )
-	   {
-  	   fprintf (stderr,"\nCannot start alarm window because fork failed!!");
+	{
+  		fprintf (stderr, "\nCannot start alarm window because fork failed!!");
+		fprintf (stderr, "\n\nError in %s on host %s !!",server_name,host_name);
 
-           fprintf (stderr,
-	   "\n\nError in %s on host %s !!",server_name,host_name);
-
-           switch (alarm_type)
-              {
-              case 2 :
-                 fprintf (stderr,"\ncannot open error file :  %s\n",file_name);
-                 break;
-
-              case 1 :
-              case 0 :
-                 fprintf (stderr,"\nerror file :  %s\n",file_name);
-                 break;
-
-	      case -1 :
-		 fprintf (stderr,"\nMessage Server exiting !!\n");
-		 exit (-1);
-              }
-           return;
-	   }
+		switch (alarm_type)
+		{
+			case 2 :
+				fprintf (stderr,"\ncannot open error file :  %s\n",file_name);
+				break;
+			case 1 :
+			case 0 :
+				fprintf (stderr,"\nerror file :  %s\n",file_name);
+				break;
+			case -1 :
+				fprintf (stderr,"\nMessage Server exiting !!\n");
+				exit (-1);
+		}
+		return;
+	}
 
 	if (!pid)
-	   {
-	   sprintf (buffer, "%d", alarm_type);
-	   i=0;
-	   cmd_argv[i] = "S_Alarm"; i++;
-	   cmd_argv[i] = buffer; i++;
-	   cmd_argv[i] = server_name; i++;
-	   cmd_argv[i] = host_name; i++;
-	   cmd_argv[i] = file_name; i++;
-	   cmd_argv[i] = "-display"; i++;
-	   cmd_argv[i] = display; i++;
-	   cmd_argv[i] = 0; 
+	{
+		snprintf (buffer, sizeof(buffer), "%d", alarm_type);
+		i=0;
+		cmd_argv[i++] = "S_Alarm"; 
+		cmd_argv[i++] = buffer; 
+		cmd_argv[i++] = server_name; 
+		cmd_argv[i++] = host_name; 
+		cmd_argv[i++] = file_name; 
+		cmd_argv[i++] = "-display"; 
+		cmd_argv[i++] = display; 
+		cmd_argv[i] = 0; 
 
-	   execv (msg.aw_path,cmd_argv);
+		execv (msg.aw_path,cmd_argv);
 
-           fprintf (stderr,"\nMessage Server can not start Alarm Window !!\n");
-	   exit (-1);
-	   }
+		fprintf (stderr,"\nMessage Server can not start Alarm Window !!\n");
+		exit (-1);
+	}
 }
 
 
 /*******************************************
  * Message-Server fault handler method     *
  *******************************************/
-
-void msg_fault_handler (error_msg)
-DevString error_msg;
-
+void msg_fault_handler (DevString error_msg)
 {
         FILE *filepointer;
         char file_name [256];
         char *time_string;
         long clock;
         
-
-        sprintf (file_name,"%s%s.ERR",msg.ER_file_dir, msg.name);
+        snprintf (file_name, sizeof(file_name), "%s%s.ERR",msg.ER_file_dir, msg.name);
 
         time (&clock);
         time_string = ctime (&clock);
 
         if ( (filepointer = fopen (file_name,"a")) == NULL)
-           {
-           msg_alarm_handler (2,msg.name,msg.host_name,file_name,msg.display);
-           return;
-           }
+        {
+        	msg_alarm_handler (2,msg.name,msg.host_name,file_name,msg.display);
+		return;
+        }
 
         fprintf (filepointer,"\n     %s",time_string);
         fprintf (filepointer,"%s",error_msg);
 
         fclose (filepointer);
-
         msg_alarm_handler (1,msg.name,msg.host_name,file_name,msg.display);
         return;
 }
-
-
-
-
 
 /*******************************************
  *					   *
@@ -211,9 +188,7 @@ DevString error_msg;
  *
  */
 
-_msg_out *rpc_msg_send_1 (msg_data)
-	_msg_data 	*msg_data;
-
+_msg_out *rpc_msg_send_1 (_msg_data *msg_data)
 {
 	static _msg_out	msg_out;
         FILE 		*filepointer;
@@ -233,108 +208,96 @@ _msg_out *rpc_msg_send_1 (msg_data)
 	msg_out.status = 0;
 	msg_out.error = 0;
 
-         nbytes = strlen (msg_data->message_buffer);
-         char_ptr = msg_data->message_buffer;
+	nbytes = strlen (msg_data->message_buffer);
+	char_ptr = msg_data->message_buffer;
 
-	 /*
-	  *  control os9 messages for CR characters
-	  */
+/*
+ *  control os9 messages for CR characters
+ */
+	for ( j=0; j<nbytes; j++ , char_ptr++)
+        	if ( *char_ptr == 0x0D )
+			*char_ptr = 0x0A;
 
-         for ( j=0; j<nbytes; j++ , char_ptr++)
-            {
-            if ( *char_ptr == 0x0D )
-               *char_ptr = 0x0A;
-            }
-
-	/*
-	 *  send message to special output
-	 */
-
-        switch ( msg_data->type_of_message )
-           {
-
-           /*
-            * write error messages to a named error file !
-            */
-
-           case ERROR_TYPE:
-              sprintf (file_name,"%s%s_%d.ERR",msg.ER_file_dir,
+/*
+ *  send message to special output
+ */
+	switch ( msg_data->type_of_message )
+	{
+/*
+ * write error messages to a named error file !
+ */
+		case ERROR_TYPE:
+			snprintf (file_name, sizeof(file_name), "%s%s_%d.ERR",msg.ER_file_dir,
                                             msg_data->host_name,
 					    msg_data->prog_number);
 
-              time (&clock);
-              time_string = ctime (&clock);
+			time (&clock);
+			time_string = ctime (&clock);
 
-              if ( (filepointer = fopen (file_name,"a")) == NULL)
-                 {
-                 sprintf (error_msg, 
-                 "rpc_msg_send : \ncannot open error file > %s\n",file_name);
-                 msg_fault_handler (error_msg);
+			if ( (filepointer = fopen (file_name,"a")) == NULL)
+			{
+				snprintf (error_msg, sizeof(error_msg), 
+					"rpc_msg_send : \ncannot open error file > %s\n",file_name);
+				msg_fault_handler (error_msg);
+		
+				msg_out.error = DevErr_CannotOpenErrorFile;
+				msg_out.status = -1;
+				return (&msg_out);
+			}
+		
+			fprintf (filepointer,"\n     %s",time_string);
+			fprintf (filepointer,"%s",msg_data->message_buffer);
 
-		 msg_out.error = DevErr_CannotOpenErrorFile;
-		 msg_out.status = -1;
-	         return (&msg_out);
-                 }
+			snprintf (acm, sizeof(acm), "chmod 666 %s 2>/dev/null", file_name);
+			system (acm);
 
-              fprintf (filepointer,"\n     %s",time_string);
-              fprintf (filepointer,"%s",msg_data->message_buffer);
+			fclose (filepointer);
 
-	      sprintf (acm, "chmod 666 %s 2>/dev/null", file_name);
-	      system (acm);
+/*
+ * open alarm window
+ */
+			msg_alarm_handler (0,msg_data->devserver_name,
+			msg_data->host_name,file_name,
+			msg_data->display);
 
-              fclose (filepointer);
+			return (&msg_out);
+			break;
 
-	      /*
-	       * open alarm window
-	       */
-
-              msg_alarm_handler (0,msg_data->devserver_name,
-				 msg_data->host_name,file_name,
-				 msg_data->display);
-
-	      return (&msg_out);
-              break;
-
-
-
-           /*
-            * get pipe name for debug or diagnostic messages !
-            */
-
-            case DEBUG_TYPE:
-               sprintf (pipe_name,"%s%s_%d.DBG",  msg.pipe_dir,
+/*
+ * get pipe name for debug or diagnostic messages !
+ */
+            	case DEBUG_TYPE:
+			snprintf (pipe_name, sizeof(pipe_name), "%s%s_%d.DBG",  msg.pipe_dir,
                                                msg_data->host_name,
 					       msg_data->prog_number);
-               break;
+			break;
 
-            case DIAG_TYPE:
-               sprintf (pipe_name,"%s%s_%d.DIA",  msg.pipe_dir,
+		case DIAG_TYPE:
+			snprintf (pipe_name, sizeof(pipe_name), "%s%s_%d.DIA",  msg.pipe_dir,
                                                msg_data->host_name,
 					       msg_data->prog_number);
-               break;
-            }
+			break;
+	}
 
-         /*
-          * write debug or diagnostic messages to named pipe !
-          */
+/*
+ * write debug or diagnostic messages to named pipe !
+ */
+	fildes = open (pipe_name,O_WRONLY);
+	if (fildes == -1)
+	{
+		msg_out.error = DevErr_CannotOpenPipe;
+		msg_out.status = -1;
+		return (&msg_out);
+	}
 
-         fildes = open (pipe_name,O_WRONLY);
-         if (fildes == -1)
-            {
-	    msg_out.error = DevErr_CannotOpenPipe;
-	    msg_out.status = -1;
-	    return (&msg_out);
-            }
-
-         iret = write(fildes,msg_data->message_buffer,nbytes);
-         if ( iret == -1 || iret == 0)
-            {
-	    msg_out.error = DevErr_CannotWriteToPipe;
-	    msg_out.status = -1;
-	    return (&msg_out);
-            }
-
-         close (fildes);
-	 return (&msg_out);
+	iret = write(fildes,msg_data->message_buffer,nbytes);
+       	if ( iret == -1 || iret == 0)
+       	{
+		msg_out.error = DevErr_CannotWriteToPipe;
+		msg_out.status = -1;
+		return (&msg_out);
+       	}
+	close (fildes);
+	return (&msg_out);
 }
 

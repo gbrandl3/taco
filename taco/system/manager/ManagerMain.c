@@ -13,16 +13,15 @@
 
  Original: 	January 1991
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-04-25 12:54:27 $
+ Date:		$Date: 2003-05-09 15:26:25 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
 
 			All Rights Reserved
 **********************************************************************/
-
 
 #include <API.h>
 #include <private/ApiP.h>
@@ -31,20 +30,18 @@
 #include <signal.h>
 #include <sys/wait.h>
 
+static void 	network_manager_1();
+static void 	network_manager_4();
+static void 	startup_msg();
 
-	static void 	network_manager_1();
-	static void 	network_manager_4();
-	static void 	startup_msg();
+config_flags	c_flags = {False,False,False,False,False,False,False};
+char 		*dshome  = NULL;
+char		*display = NULL;
+char	 	nethost [SHORT_NAME_SIZE];
+char		logfile [256];
+FILE		*system_log = NULL;
 
-	config_flags	c_flags = {False,False,False,False,False,False,False};
-	char 		*dshome  = NULL;
-	char		*display = NULL;
-	char	 	nethost [SHORT_NAME_SIZE];
-	char		logfile [256];
-	FILE		*system_log = NULL;
-
-	int		pid = 0;
-
+int		pid = 0;
 
 int main (int argc, char **argv)
 {
@@ -78,38 +75,36 @@ int main (int argc, char **argv)
 
 #ifdef unix
 	if ( (nethost_env = (char *)getenv ("NETHOST")) == NULL )
-	   {
-	   printf ("Environment variable NETHOST not defined, using local host ...\n");
-	   gethostname (nethost, sizeof(nethost) - 1);
-
-	   }
+	{
+		printf ("Environment variable NETHOST not defined, using local host ...\n");
+		gethostname (nethost, sizeof(nethost) - 1);
+	}
 	else
-	   {
-	   snprintf(nethost, sizeof(nethost) - 1, "%s",nethost_env);
+	{
+		snprintf(nethost, sizeof(nethost) - 1, "%s",nethost_env);
 
-/*	   printf ("Environment variable NETHOST = %s\n",nethost);*/
-	   }
+/*		printf ("Environment variable NETHOST = %s\n",nethost);*/
+	}
 #endif /* unix */
-
 
 	/*
 	 *  read options for the manager startup.
 	 */
 
 	if (argc > 1)
-	   {
-	   for (i=1; i<argc; i++)
-	      {
-	      if (strcmp (argv[i],"-rtdb") == 0)
-		 c_flags.rtdb        = True;
-	      if (strcmp (argv[i],"-log") == 0)
-		 c_flags.request_log = True;
-	      if (strcmp (argv[i],"-security") == 0)
-		 c_flags.security    = True;
-	      if (strcmp (argv[i],"-oracle") == 0)
-	         c_flags.oracle	     = True;
-	      }
-	   }
+	{
+		for (i=1; i<argc; i++)
+		{
+			if (strcmp (argv[i],"-rtdb") == 0)
+		 		c_flags.rtdb        = True;
+			if (strcmp (argv[i],"-log") == 0)
+		 		c_flags.request_log = True;
+			if (strcmp (argv[i],"-security") == 0)
+		 		c_flags.security    = True;
+			if (strcmp (argv[i],"-oracle") == 0)
+	         		c_flags.oracle	     = True;
+		}
+	}
 
 
 	/*
@@ -118,21 +113,21 @@ int main (int argc, char **argv)
 
 #ifdef unix
 	if ( (dshome = (char *)getenv ("TACO_PATH")) == NULL )
-	   {
-	   printf ("Environment variable TACO_PATH not defined, assume database and message server are in path...\n");
-	   }
+	{
+		printf ("Environment variable TACO_PATH not defined, assume database and message server are in path...\n");
+	}
 
 /*
 	if ( (display = (char *)getenv ("DISPLAY")) == NULL )
-	   {
-	   display = "localhost:0.0";
-	   }
+	{
+		display = "localhost:0.0";
+	}
  */
 
         if ( (dbhost = (char *)getenv ("DBHOST")) == NULL )
-           {
-	   dbhost = "localhost";
-           }
+        {
+		dbhost = "localhost";
+        }
 #endif /* unix */
 
 #ifdef _OSK
@@ -179,119 +174,109 @@ int main (int argc, char **argv)
 #ifdef _OSK
 	if ( (fptr = fopen (homepath,"d")) == NULL )
 #endif /* _OSK */
-	   {
-	   printf ("TACO_PATH leads to a strange directory, exiting...\n");
-	   exit (-1);
-	   }
+	{
+		printf ("TACO_PATH leads to a strange directory, exiting...\n");
+		exit (-1);
+	}
 	else
-	   {
-	   fclose (fptr);
-	   }
-
+		fclose (fptr);
 
 #ifdef unix
-        /*
-         * Check the environment if DBM database is used !!
-         */
+/*
+ * Check the environment if DBM database is used !!
+ */
 
 	if (c_flags.rtdb == False )
-	   {
-	   if (c_flags.oracle == False )
+	{
+		if (c_flags.oracle == False )
 	   	{
-           	if ( ((char *)getenv ("DBTABLES")) == NULL ||
-                     ((char *)getenv ("DBM_DIR")) == NULL ||
-                     ((char *)getenv ("RES_BASE_DIR")) == NULL )
-	      		{
-	      		printf ("\n");
-	      		printf (
-	    		"Environment variables for DBM database not defined, exiting...\n");
-	      		printf ("Use %s/dbm_env to set the environment variables!\n", homepath);
-	      		exit (-1);
+			if ( ((char *)getenv ("DBTABLES")) == NULL ||
+				((char *)getenv ("DBM_DIR")) == NULL ||
+				((char *)getenv ("RES_BASE_DIR")) == NULL )
+			{
+	      			fprintf (stderr, 
+	    				"\nEnvironment variables for DBM database not defined, exiting...\n");
+	      			fprintf (stderr, "Use %s/dbm_env to set the environment variables!\n", homepath);
+	      			exit (-1);
 	      		}
 		}
-	   else
-	  /*
-	   * Check the environment if ORACLE is used 
-	   */
-		{
-		if ( (dbtables = (char *)getenv ("DBTABLES")) == NULL )
-			{
-	      		printf ("\n");
-	      		printf (
-	    		"Environment variables for ORACLE database not defined, exiting...\n");
-	      		printf ("DBTABLES must be defined!\n");
-	      		exit (-1);
-			}
-	   	if ( (dbhome = (char *)getenv ("DBHOME")) == NULL )
-	      		{
-	      		printf ("Environment variable DBHOME not defined, exiting...\n");
-	      		exit (-1);
-	      		}
-		if ( (ora_sid = (char *)getenv("ORACLE_SID")) == NULL)
-			{
-			printf ("Environment variable ORACLE_SID not defined, exiting...\n");
-			exit(-1);
-			}
-		if  ( (ora_home = (char *)getenv("ORACLE_HOME")) == NULL)
-			{
-			printf ("Environment variable ORACLE_HOME not defined, exiting...\n");
-			exit(-1);
-			}
-	   /* Set the pathes and check them. */
-	   	snprintf (oracle_server_path, sizeof(oracle_server_path) - 1, "%s/bin/solaris", dbhome);
-	   	if ( (fptr = fopen (oracle_server_path,"r")) == NULL )
-	      		{
-	      		printf ("DBHOME leads to a strange directory, exiting...\n");
-	      		exit (-1);
-	      		}
 	   	else
-	      		{
-	      		fclose (fptr);
-	      		}
+/*
+ * Check the environment if ORACLE is used 
+ */
+		{
+			if ( (dbtables = (char *)getenv ("DBTABLES")) == NULL )
+			{
+	      			fprintf (stderr, 
+	    				"\nEnvironment variables for ORACLE database not defined, exiting...\n");
+				fprintf (stderr, "DBTABLES must be defined!\n");
+				exit (-1);
+			}
+			if ( (dbhome = (char *)getenv ("DBHOME")) == NULL )
+			{
+				fprintf (stderr, "Environment variable DBHOME not defined, exiting...\n");
+				exit (-1);
+			}
+			if ( (ora_sid = (char *)getenv("ORACLE_SID")) == NULL)
+			{
+				fprintf (stderr, "Environment variable ORACLE_SID not defined, exiting...\n");
+				exit(-1);
+			}
+			if  ( (ora_home = (char *)getenv("ORACLE_HOME")) == NULL)
+			{
+				fprintf (stderr, "Environment variable ORACLE_HOME not defined, exiting...\n");
+				exit(-1);
+			}
+/* 
+ * Set the pathes and check them. 
+ */
+			snprintf (oracle_server_path, sizeof(oracle_server_path) - 1, "%s/bin/solaris", dbhome);
+			if ( (fptr = fopen (oracle_server_path,"r")) == NULL )
+			{
+				fprintf (stderr, "DBHOME leads to a strange directory, exiting...\n");
+				exit (-1);
+			}
+			else
+				fclose (fptr);
 		}
-	   }
+	}
 	else
-           /*
-            * Check the environment if RTDB database is used !!
-            */
-
-	   {
-	   if ( (dbhome = (char *)getenv ("DBHOME")) == NULL )
-	      {
-	      printf ("Environment variable DBHOME not defined, exiting...\n");
-	      exit (-1);
-	      }
-
-	   /* Set the pathes and check them. */
-	   snprintf (rtdb_server_path, sizeof(rtdb_server_path) - 1, "%s/bin", dbhome);
-	   if ( (fptr = fopen (rtdb_server_path,"r")) == NULL )
-	      {
-	      printf ("DBHOME leads to a strange directory, exiting...\n");
-	      exit (-1);
-	      }
-	   else
-	      {
-	      fclose (fptr);
-	      }
-
-	   snprintf (db_path, sizeof(db_path) - 1, "%s/setup", dbhome);
-	   if ( (fptr = fopen (rtdb_server_path,"r")) == NULL )
-	      {
-	      printf ("DBHOME leads to a strange directory, exiting...\n");
-	      exit (-1);
-	      }
-	   else
-	      {
-	      fclose (fptr);
-	      }
-	   }
+/*
+ * Check the environment if RTDB database is used !!
+ */
+	{
+		if ( (dbhome = (char *)getenv ("DBHOME")) == NULL )
+		{
+			fprintf (stderr, "Environment variable DBHOME not defined, exiting...\n");
+			exit (-1);
+		}
+/* 
+ * Set the pathes and check them. 
+ */
+		snprintf (rtdb_server_path, sizeof(rtdb_server_path) - 1, "%s/bin", dbhome);
+		if ( (fptr = fopen (rtdb_server_path,"r")) == NULL )
+		{
+			fprintf (stderr, "DBHOME leads to a strange directory, exiting...\n");
+			exit (-1);
+		}
+		else
+			fclose (fptr);
+		
+		snprintf (db_path, sizeof(db_path) - 1, "%s/setup", dbhome);
+		if ( (fptr = fopen (rtdb_server_path,"r")) == NULL )
+		{
+			fprintf (stderr, "DBHOME leads to a strange directory, exiting...\n");
+			exit (-1);
+		}
+		else
+			fclose (fptr);
+	}
 #endif /* unix */
 
 
-	/*
-	 *  setup signal handling
-	 */
-
+/*
+ *  setup signal handling
+ */
 #ifdef unix
 	(void) signal(SIGQUIT, unreg_server);
 	(void) signal(SIGTERM, unreg_server);
@@ -306,457 +291,413 @@ int main (int argc, char **argv)
 #endif /* _OSK */
 
 #ifdef _OSK
-	/*   because the normal kill command under OS9 can not
-	 *    be caugth it makes live easier to unregister the manager
-	 *   from the portmapper every time before startup.
-	 *   Safty will be neglected because now it is possible
-	 *   to start several managers on the same host.
-	 */
-
+/* because the normal kill command under OS9 can not
+ * be caugth it makes live easier to unregister the manager
+ * from the portmapper every time before startup.
+ * Safety will be neglected because now it is possible
+ * to start several managers on the same host.
+ */
 	pmap_unset (NMSERVER_PROG, NMSERVER_VERS);
 	pmap_unset (NMSERVER_PROG, NMSERVER_VERS_1);
 #endif /* _OSK */
 
-
-	/*
-	 *   create server transport with udp protocol
-	 */
-
+/*
+ *   create server transport with udp protocol
+ */
 	transp = svcudp_create(RPC_ANYSOCK);
 	if (transp == NULL) 
-		{
+	{
 		fprintf(stderr, "cannot create udp service for manager.\n");
 	        exit (-1);
-		}
+	}
 
 	if (!svc_register(transp, NMSERVER_PROG, NMSERVER_VERS_1, 
 			  network_manager_1, IPPROTO_UDP)) 	
-		{
+	{
 		fprintf(stderr, "Unable to register network manager.\n");
 		fprintf(stderr, "Program number 100 already in use?\n");
 	        exit (-1);
-		}
+	}
 
 	if (!svc_register(transp, NMSERVER_PROG, NMSERVER_VERS, 
 			  network_manager_4, IPPROTO_UDP)) 	
-		{
+	{
 		fprintf(stderr, "unable to register network manager\n");
 		fprintf(stderr, "Program number 100 already in use?\n");
 		pmap_unset (NMSERVER_PROG, NMSERVER_VERS_1);
 	        exit (-1);
-		}
+	}
 
-
-	/*
-	 *  delete old System.log and open a new
-	 *  System.log file for writing system information
-	 */
-	
+/*
+ *  delete old System.log and open a new
+ *  System.log file for writing system information
+ */
 	snprintf (logfile, sizeof(logfile) - 1, "%s/System.log", homepath);
 	if ( (system_log = fopen (logfile, "w")) == NULL )
-	   {
-           fprintf (stderr,"cannot open System.log file, exiting...\n");
-	   kill (pid,SIGQUIT);
-	   }
-
-	   /*
-	    *  Start the database server on a remote host, if the
-	    *  DBHOST environment variable is set and 
-	    *  specifies not the local host.
-	    */
-
-	if ( strcmp (dbhost, nethost)     != 0 && 
-	     strcmp (dbhost, "localhost") != 0 )
-	   {
+	{
+		fprintf (stderr,"cannot open System.log file, exiting...\n");
+		kill (pid,SIGQUIT);
+	}
+/*
+ *  Start the database server on a remote host, if the
+ *  DBHOST environment variable is set and 
+ *  specifies not the local host.
+ */
+	if (strcmp (dbhost, nethost) && strcmp (dbhost, "localhost"))
+	{
 #ifdef unix
-	   /*
-	    *  startup database server on a remote host
-	    */
-
-	   if ( c_flags.rtdb == False )
-	      {
-	      if ( c_flags.oracle == False )
+/*
+ *  startup database server on a remote host
+ */
+		if ( c_flags.rtdb == False )
+		{
+			if ( c_flags.oracle == False )
 	      		{
-	      /* DBM startup sequence */
+/* 
+ * DBM startup sequence 
+ */
+	      			snprintf (db_start, sizeof(db_start) - 1, 
 #ifdef __hpux
-	      		snprintf (db_start, sizeof(db_start) - 1, 
-	      		"remsh %s -l dserver -n \"export %s/%s %s %s 1>&- 2>&- &\" ", dbhost, homepath, dbm_server, dbm_name, nethost);
+	      				"remsh %s -l dserver -n \"export %s/%s %s %s 1>&- 2>&- &\" ", 
 #endif
-
 #ifdef sun
-	      		snprintf (db_start, sizeof(db_start) - 1, 
-	      		"rsh %s -l dserver -n \"export %s/%s %s %s 1>&- 2>&- &\" ", dbhost, homepath, dbm_server, dbm_name, nethost);
+	      				"rsh %s -l dserver -n \"export %s/%s %s %s 1>&- 2>&- &\" ", 
 #endif
-	      		}
-	      else
-	      /* ORACLE startup sequence */
-	      		{
-#ifdef __hpux
-	      		snprintf (db_start, sizeof(db_start) - 1,
-	      		"remsh %s -l dserver -n \"export DBTABLES=%s;export ORACLE_SID=%s;export ORACLE_HOME=%s;%s/%s %s %s 1>&- 2>&- &\" ", dbhost, dbtables, ora_sid, ora_home, oracle_server_path, ora_server, nethost, ora_name);
-#endif
-
-#ifdef sun
-	      		snprintf (db_start, sizeof(db_start) - 1,
-	      		"rsh %s -l dserver -n \"export DBTABLES=%s;export ORACLE_SID=%s;export ORACLE_HOME=%s;%s/%s %s %s 1>&- 2>&- &\" ", dbhost, dbtables, ora_sid, ora_home, oracle_server_path, ora_server, nethost, ora_name);
-#endif
+	      				dbhost, homepath, dbm_server, dbm_name, nethost);
 			}
-	      }
-	    else
-	      {
-	    /* RTDB startup sequence */
+			else
+	      		{
+/* 
+ * ORACLE startup sequence 
+ */
+	      			snprintf (db_start, sizeof(db_start) - 1,
 #ifdef __hpux
-	      snprintf (db_start, sizeof(db_start) - 1, 
-	      "remsh %s -l dbase -n \"export %s=%s:%s/%s;%s/%s %s %s 1>&- 2>&- &\" ", dbhost, db_name, db_name, db_path, db_name, rtdb_server_path, db_server, db_name, nethost);
+	      				"remsh %s -l dserver -n \"export DBTABLES=%s;"
+					"export ORACLE_SID=%s;export ORACLE_HOME=%s;%s/%s %s %s 1>&- 2>&- &\" ", 
 #endif
-
 #ifdef sun
-	      snprintf (db_start, sizeof(db_start) - 1,
-	      "rsh %s -l dbase -n \"export %s=%s:%s/%s;%s/%s %s %s 1>&- 2>&- &\" ", dbhost, db_name, db_name, db_path, db_name, rtdb_server_path, db_server, db_name, nethost);
+	      				"rsh %s -l dserver -n \"export DBTABLES=%s;"
+					"export ORACLE_SID=%s;export ORACLE_HOME=%s;%s/%s %s %s 1>&- 2>&- &\" ", 
 #endif
-	      }
+					dbhost, dbtables, ora_sid, ora_home, oracle_server_path, ora_server, nethost, ora_name);
+			}
+		}
+		else
+		{
+/* 
+ * RTDB startup sequence 
+ */
+	      		snprintf (db_start, sizeof(db_start) - 1, 
+#ifdef __hpux
+	      			"remsh %s -l dbase -n \"export %s=%s:%s/%s;%s/%s %s %s 1>&- 2>&- &\" ", 
+#endif
+#ifdef sun
+	      			"rsh %s -l dbase -n \"export %s=%s:%s/%s;%s/%s %s %s 1>&- 2>&- &\" ", 
+#endif
+				dbhost, db_name, db_name, db_path, db_name, rtdb_server_path, db_server, db_name, nethost);
+		}
 
-
-	   res = system(db_start);
-	   if ( res != 0 )
-	      {
-              fprintf (stderr,"database server startup failed, exiting...\n");
-              fprintf (system_log,
-		       "database server startup failed, exiting...\n");
-	      kill (pid,SIGQUIT);
-	      }
-	   }
-
+		res = system(db_start);
+		if ( res != 0 )
+		{
+		fprintf (stderr,"database server startup failed, exiting...\n");
+		fprintf (system_log, "database server startup failed, exiting...\n");
+		kill (pid,SIGQUIT);
+		}
+	}
 	else
-	   {
-           if (( db_pid = fork () ) < 0 )
-              {
-              fprintf (stderr,"database server startup failed, exiting...\n");
-              fprintf (system_log,
-		       "database server startup failed, exiting...\n");
-              kill (pid,SIGQUIT);
-              }
+	{
+        	if (( db_pid = fork () ) < 0 )
+		{
+			fprintf (stderr,"database server startup failed, exiting...\n");
+			fprintf (system_log, "database server startup failed, exiting...\n");
+			kill (pid,SIGQUIT);
+		}
 
-           if (!db_pid)
-              {
-	      if ( c_flags.rtdb == True )
-	         {
-	 	 /* Set environment */
-                 snprintf (dbase_env, sizeof(dbase_env) - 1, "%s=%s:%s/%s", db_name, db_name, 
-		       db_path, db_name );
-                 if ( putenv (dbase_env) != NULL )
-                    {
-                    fprintf (stderr,
-                         "Cannot set environment variable %s, exiting...\n", 
-		         db_name);
-                    fprintf (system_log,
-		      "Cannot set environment variable %s, exiting...\n",
-		         db_name);
-                    kill (pid,SIGQUIT);
-                    }
+		if (!db_pid)
+		{
+			if ( c_flags.rtdb == True )
+			{
+/* 
+ * Set environment 
+ */
+				snprintf (dbase_env, sizeof(dbase_env) - 1, "%s=%s:%s/%s", 
+						db_name, db_name, db_path, db_name );
+				if ( putenv (dbase_env) != 0 )
+				{
+					fprintf (stderr, "Cannot set environment variable %s, exiting...\n", db_name);
+					fprintf (system_log, "Cannot set environment variable %s, exiting...\n", db_name);
+					kill (pid,SIGQUIT);
+				}
+/* 
+ * Set path to executable 
+ */
+				snprintf (homedir, sizeof(homedir) - 1, "%s/%s", rtdb_server_path, db_server);
+/* 
+ * Set arguments for execv 
+ */
+				i = 0;
+				cmd_argv[i++] = db_server; 
+				cmd_argv[i++] = db_name; 
+				cmd_argv[i++] = nethost; 
+				cmd_argv[i] = 0;
+			}
+			else
+			{
+/* 
+ * Set path to DBM server 
+ */
+				if (dshome != NULL)
+					snprintf (homedir, sizeof(homedir) -1, "%s/%s", homepath, dbm_server);
+				else
+					snprintf (homedir, sizeof(homedir) - 1, "%s", dbm_server);
+/* 
+ * Set arguments for execv 
+ */
+				i = 0;
+				cmd_argv[i++] = dbm_server; 
+				cmd_argv[i++] = dbm_name; 
+				cmd_argv[i++] = nethost; 
+				cmd_argv[i] = 0;
+			}
 
-	         /* Set path to executable */
-                 snprintf (homedir, sizeof(homedir) - 1, "%s/%s", rtdb_server_path, db_server);
+			svc_destroy(transp); 
+			execvp (homedir, cmd_argv);
+		
+			fprintf (stderr,"execvp failed, database_server not started\n");
+			fprintf (system_log, "execv failed, database_server not started\n");
+			kill (pid,SIGQUIT);
+		}
+	}
 
-		 /* Set arguments for execv */
-                 i = 0;
-                 cmd_argv[i] = db_server; i++;
-                 cmd_argv[i] = db_name; i++;
-                 cmd_argv[i] = nethost; i++;
-                 cmd_argv[i] = 0;
-		 }
-	      else
-		 {
-		 /* Set path to DBM server */
-		 if (dshome != NULL)
-		 {
-                 	snprintf (homedir, sizeof(homedir) -1, "%s/%s", homepath, dbm_server);
-		 }
-		 else
-		 {
-                 	snprintf (homedir, sizeof(homedir) - 1, "%s", dbm_server);
-		 }
-
-
-		 /* Set arguments for execv */
-                 i = 0;
-                 cmd_argv[i] = dbm_server; i++;
-                 cmd_argv[i] = dbm_name; i++;
-                 cmd_argv[i] = nethost; i++;
-                 cmd_argv[i] = 0;
-		 }
-
-	      svc_destroy(transp); 
-	      
-              execvp (homedir, cmd_argv);
-
-              fprintf (stderr,"execvp failed, database_server not started\n");
-              fprintf (system_log,
-		       "execv failed, database_server not started\n");
-              kill (pid,SIGQUIT);
-              }
-	   }
-
-
-	/*
-	 *  startup message server
-	 */
-
+/*
+ *  startup message server
+ */
         if (( msg_pid = fork () ) < 0 )
-	   {
-           fprintf (stderr,"message server startup failed, exiting...\n");
-           fprintf (system_log,
-	     "message server startup failed, exiting...\n");
-	   kill (pid,SIGQUIT);
-	   }
+	{
+		fprintf (stderr,"message server startup failed, exiting...\n");
+		fprintf (system_log, "message server startup failed, exiting...\n");
+		kill (pid,SIGQUIT);
+	}
 
 	if (!msg_pid)
-	   {
-	   if (dshome != NULL)
-	   {
-	     snprintf (homedir, sizeof(homedir) - 1, "%s/MessageServer", homepath);
-	   }
-	   else
-	   {
-	     snprintf (homedir, sizeof(homedir) - 1, "MessageServer", homepath);
-	   }
+	{
+		if (dshome != NULL)
+			snprintf (homedir, sizeof(homedir) - 1, "%s/MessageServer", homepath);
+		else
+			snprintf (homedir, sizeof(homedir) - 1, "MessageServer", homepath);
 
-	   i = 0;
-	   cmd_argv[i] = "MessageServer"; i++;
-	   cmd_argv[i] = nethost; i++;
-	   cmd_argv[i] = 0;
+		i = 0;
+		cmd_argv[i++] = "MessageServer"; 
+		cmd_argv[i++] = nethost; 
+		cmd_argv[i] = 0;
 
-	   svc_destroy(transp); 
+		svc_destroy(transp); 
 
-	   execvp (homedir,cmd_argv);
+		execvp (homedir,cmd_argv);
 
-      	   fprintf (stderr,"execvp failed, message server not started\n");
-      	   fprintf (system_log,"execv failed, message server not started\n");
- 	   kill (pid,SIGQUIT);
-	   }
+		fprintf (stderr,"execvp failed, message server not started\n");
+		fprintf (system_log,"execv failed, message server not started\n");
+		kill (pid,SIGQUIT);
+	}
 #endif /* unix */
 
 #ifdef _OSK
-	   /*
-	    *  Startup of the dummy database server
-	    */
-
+/*
+ *  Startup of the dummy database server
+ */
 	{
-	int  	os9forkc();
-	extern char	**environ;
-	int		db_pid = 0;
+		int  	os9forkc();
+		extern char	**environ;
+		int		db_pid = 0;
 
-	snprintf (homedir, sizeof(homedir) - 1, "%s/CMDS/os9_dbsu_server", dshome);
-	i = 0;
-	cmd_argv[i] = homedir; i++;
-	cmd_argv[i] = 0;
+		snprintf (homedir, sizeof(homedir) - 1, "%s/CMDS/os9_dbsu_server", dshome);
+		i = 0;
+		cmd_argv[i++] = homedir; 
+		cmd_argv[i] = 0;
 
-	if ((db_pid = os9exec(os9forkc, cmd_argv[0], 
+		if ((db_pid = os9exec(os9forkc, cmd_argv[0], 
 			      cmd_argv, environ,0,0,3)) <= 0)
-    	   {
-    	   fprintf (stderr,"os9exec failed, os9_dbsu-server not started\n");
-    	   fprintf (system_log,
-   	   "os9exec failed, os9_dbsu-server not started\n");
-  	   kill (pid,SIGQUIT);
-    	   }
+		{
+			fprintf (stderr,"os9exec failed, os9_dbsu-server not started\n");
+			fprintf (system_log, "os9exec failed, os9_dbsu-server not started\n");
+			kill (pid,SIGQUIT);
+		}
  	}
+/*
+ *  Simulation of a normal message server startup
+ */
+	{
+		_register_data		register_data;
+		_msg_manager_data		*ret_data;
+
+		register_data.host_name   = "NULL";
+		register_data.prog_number = 0;
+		register_data.vers_number = 0;
+
+		ret_data = rpc_msg_register_1 (&register_data);
+	}
 #endif /* _OSK */
 
-#ifdef _OSK
-	   /*
-	    *  Simulation of a normal message server startup
-	    */
-
-	   {
-	   _register_data		register_data;
-	   _msg_manager_data		*ret_data;
-
-	   register_data.host_name   = "NULL";
-	   register_data.prog_number = 0;
-	   register_data.vers_number = 0;
-
-	   ret_data = rpc_msg_register_1 (&register_data);
-	   }
-#endif /* _OSK */
-
-
-	/*
-	 * print network manager starttime to System.log
-	 */
-
+/*
+ * print network manager starttime to System.log
+ */
 	time (&clock);
 	time_string = ctime (&clock);
-      	fprintf (system_log,"Network Manager started subprocesses at : %s",
-	         time_string);
+      	fprintf (system_log,"Network Manager started subprocesses at : %s", time_string);
       	fprintf (system_log,"NETHOST = %s   PID = %d\n\n",nethost,pid);
 	fclose (system_log);
 	
-
-	/*
-	 *  point of no return
-	 */
-	
+/*
+ *  point of no return
+ */
 	svc_run();
 	fprintf(stderr, "svc_run returned\n");
 	kill (pid,SIGQUIT);
 }
 
-static void network_manager_4(rqstp, transp)
-	struct svc_req *rqstp;
-	SVCXPRT *transp;
+static void network_manager_4(struct svc_req *rqstp, SVCXPRT *transp)
 {
-	union 	{
+	union 	
+	{
 		_register_data  	rpc_msg_register_4_arg;
 		_register_data  	rpc_db_register_4_arg;
 		_register_data  	rpc_get_config_4_arg;
-		} argument;
+	} argument;
 
 	char *result;
 	bool_t (*xdr_argument)(), (*xdr_result)();
 	char *(*local)();
 
 	switch (rqstp->rq_proc) 
-	   {
-	   case NULLPROC:
-		svc_sendreply (transp, xdr_void, NULL);
-		return;
-
-	   case RPC_MSG_REGISTER:
-		 xdr_argument = xdr__register_data;
-		 xdr_result = xdr__msg_manager_data;
-		 local = (char *(*)()) rpc_msg_register_1;
-		 break;
-
-	   case RPC_DB_REGISTER:
-		 xdr_argument = xdr__register_data;
-		 xdr_result = xdr_int;
-		 local = (char *(*)()) rpc_db_register_1;
-		 break;
-
-	   case RPC_GET_CONFIG:
-		   /*
- 		    * Execute only if the startup is finished!
-	            */
-		   if ( c_flags.startup == True )
-		      {
-		      xdr_argument = xdr__register_data;
-		      xdr_result = xdr__manager_data;
-		      local = (char *(*)()) rpc_get_config_4;
-		      break;
-		      }
-	           else
-	              {
-		      svcerr_noproc(transp);
-		      return;
-		      }
-
-	   default:
-		 svcerr_noproc(transp);
-		 return;
-	   }
-
+	{
+		case NULLPROC:
+			svc_sendreply (transp, (xdrproc_t)xdr_void, NULL);
+			return;
+		case RPC_MSG_REGISTER:
+			xdr_argument = xdr__register_data;
+			xdr_result = xdr__msg_manager_data;
+			local = (char *(*)()) rpc_msg_register_1;
+			break;
+		case RPC_DB_REGISTER:
+			xdr_argument = xdr__register_data;
+			xdr_result = xdr_int;
+			local = (char *(*)()) rpc_db_register_1;
+			break;
+		case RPC_GET_CONFIG:
+/*
+ * Execute only if the startup is finished!
+ */
+			if ( c_flags.startup == True )
+			{
+				xdr_argument = xdr__register_data;
+				xdr_result = xdr__manager_data;
+				local = (char *(*)()) rpc_get_config_4;
+				break;
+			}
+			else
+			{
+				svcerr_noproc(transp);
+				return;
+			}
+		default:
+			svcerr_noproc(transp);
+			return;
+	}
 
 	memset(&argument, 0, sizeof(argument));
 
-	if (!svc_getargs(transp, xdr_argument, (char *) &argument)) 
-		{
+	if (!svc_getargs(transp, (xdrproc_t)xdr_argument, (char *) &argument)) 
+	{
 		svcerr_decode(transp);
 		return;
-		}
+	}
 
 	result = (*local)(&argument, rqstp);
-	if (result != NULL && !svc_sendreply (transp, xdr_result, result)) 
-		{
+	if (result != NULL && !svc_sendreply (transp, (xdrproc_t)xdr_result, result)) 
+	{
 		svcerr_systemerr(transp);
-		}
+	}
 
-	if (!svc_freeargs(transp, xdr_argument, (char *) &argument)) 
-		{
+	if (!svc_freeargs(transp, (xdrproc_t)xdr_argument, (char *) &argument)) 
+	{
 		fprintf(stderr, "unable to free arguments\n");
 		exit (-1);
-		}
-
+	}
 	startup_msg ();
 }
 
-
-
-
-
-static void network_manager_1(rqstp, transp)
-	struct svc_req *rqstp;
-	SVCXPRT *transp;
+static void network_manager_1(struct svc_req *rqstp, SVCXPRT *transp)
 {
-	union 	{
+	union 	
+	{
 		_register_data  	rpc_msg_register_1_arg;
 		_register_data  	rpc_db_register_1_arg;
 		_register_data  	rpc_get_config_1_arg;
-		} argument;
+	} argument;
 
 	char *result;
 	bool_t (*xdr_argument)(), (*xdr_result)();
 	char *(*local)();
 
 	switch (rqstp->rq_proc) 
-	   {
-	   case NULLPROC:
-		svc_sendreply (transp, xdr_void, NULL);
-		return;
+	{
+		case NULLPROC:
+			svc_sendreply (transp, (xdrproc_t)xdr_void, NULL);
+			return;
+		case RPC_MSG_REGISTER:
+			xdr_argument = xdr__register_data;
+			xdr_result = xdr__msg_manager_data;
+			local = (char *(*)()) rpc_msg_register_1;
+			break;
+		
+		case RPC_DB_REGISTER:
+			xdr_argument = xdr__register_data;
+			xdr_result = xdr_int;
+			local = (char *(*)()) rpc_db_register_1;
+			break;
 
-	   case RPC_MSG_REGISTER:
-		 xdr_argument = xdr__register_data;
-		 xdr_result = xdr__msg_manager_data;
-		 local = (char *(*)()) rpc_msg_register_1;
-		 break;
+		case RPC_GET_CONFIG:
+/*
+ * Execute only if the startup is finished!
+ */
+			if ( c_flags.startup == True )
+			{
+				xdr_argument = xdr__register_data;
+				xdr_result = xdr__manager_data_3;
+				local = (char *(*)()) rpc_get_config_4;
+				break;
+			}
+			else
+			{
+				svcerr_noproc(transp);
+				return;
+			}
 
-	   case RPC_DB_REGISTER:
-		 xdr_argument = xdr__register_data;
-		 xdr_result = xdr_int;
-		 local = (char *(*)()) rpc_db_register_1;
-		 break;
-
-	   case RPC_GET_CONFIG:
-		   /*
- 		    * Execute only if the startup is finished!
-	            */
-		   if ( c_flags.startup == True )
-		      {
-		      xdr_argument = xdr__register_data;
-		      xdr_result = xdr__manager_data_3;
-		      local = (char *(*)()) rpc_get_config_4;
-		      break;
-		      }
-	           else
-	              {
-		      svcerr_noproc(transp);
-		      return;
-		      }
-
-	   default:
-		 svcerr_noproc(transp);
-		 return;
-	   }
-
+		default:
+			svcerr_noproc(transp);
+			return;
+		}
 
 	memset(&argument, 0, sizeof(argument));
 
-	if (!svc_getargs(transp, xdr_argument, (char *) &argument)) 
-		{
+	if (!svc_getargs(transp, (xdrproc_t)xdr_argument, (char *) &argument)) 
+	{
 		svcerr_decode(transp);
 		return;
-		}
+	}
 
 	result = (*local)(&argument, rqstp);
-	if (result != NULL && !svc_sendreply (transp, xdr_result, result)) 
-		{
+	if (result != NULL && !svc_sendreply (transp, (xdrproc_t)xdr_result, result)) 
+	{
 		svcerr_systemerr(transp);
-		}
+	}
 
-	if (!svc_freeargs(transp, xdr_argument, (char *) &argument)) 
-		{
+	if (!svc_freeargs(transp, (xdrproc_t)xdr_argument, (char *) &argument)) 
+	{
 		fprintf(stderr, "unable to free arguments\n");
 		exit (-1);
-		}
+	}
 
 	startup_msg ();
 }
@@ -767,8 +708,7 @@ static void network_manager_1(rqstp, transp)
  *     Network Manager startup message                          *
  ****************************************************************/
 
-static void startup_msg ()
-
+static void startup_msg (void)
 {
 	FILE	*system_log = NULL;
 	char    *time_string;
@@ -776,36 +716,29 @@ static void startup_msg ()
 
 
 	if ( c_flags.startup == False )
-	   {
-	   if ( c_flags.msg_server == True && c_flags.db_server == True) 
+	{
+		if ( c_flags.msg_server == True && c_flags.db_server == True) 
 		{
-		c_flags.startup = True;
+			c_flags.startup = True;
 #ifdef unix
-	        /*
-	         *  Open the System.log file for writing system information
-	         */
-	
+/*
+ *  Open the System.log file for writing system information
+ */
 		if ( (system_log = fopen (logfile, "a")) != NULL )
-	   	   {
-		   time (&clock);
-		   time_string = ctime (&clock);
-      		   fprintf (system_log,
-			    "Network Manager startup finished at : %s\n",
-	         	    time_string);
-		   fclose (system_log);
-	   	   }
+	   	{
+			time (&clock);
+			time_string = ctime (&clock);
+      			fprintf (system_log, "Network Manager startup finished at : %s\n", time_string);
+			fclose (system_log);
+	   	}
 		else
-	  	   {
-           	   fprintf (stderr,"cannot open System.log file.\n");
-		   }
-		
+           		fprintf (stderr,"cannot open System.log file.\n");
 #endif /* unix */
 #ifdef _OSK
-		printf (
-		      "Database Dummy Server OK !\nNetwork Manager OK !\n");
+			printf ("Database Dummy Server OK !\nNetwork Manager OK !\n");
 #endif /* _OSK */
 		}
-	   }
+	}
 }
 
 
