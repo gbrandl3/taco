@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.16 $
+ Version    :	$Revision: 1.17 $
 
- Date	    :	$Date: 2004-10-21 12:40:24 $
+ Date	    :	$Date: 2004-10-23 16:32:48 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -428,7 +428,7 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
  * No old connection exists to this server. Create new client handle the device server.
  */
 		dev_printdebug (DBG_API, "dev_import() : open a new client handle \n");
-		clnt = clnt_create (host_name, prog_number, vers_number, "udp");
+		clnt = clnt_create (host_name, prog_number, vers_number, "tcp");
 		if (clnt == NULL)
 		{
 /*
@@ -679,7 +679,7 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 			(*ds_ptr)->rpc_conn_counter = svr_conns[n_svr_conn].rpc_conn_counter;
 			(*ds_ptr)->dev_access       = access;
 			(*ds_ptr)->i_nethost        = i_nethost;
-			(*ds_ptr)->rpc_protocol     = D_UDP;
+			(*ds_ptr)->rpc_protocol     = D_TCP;
 			(*ds_ptr)->asynch_clnt      = NULL;
 			(*ds_ptr)->asynch_timeout   = asynch_timeout;
 			(*ds_ptr)->pending          = 0;
@@ -1404,10 +1404,10 @@ long _DLLFunc dev_query_svr (char* host, long prog_number, long vers_number)
 		svr_conns[next_conn].rpc_conn_status    = GOOD_SVC_CONN;
 		svr_conns[next_conn].rpc_error_flag     = GOOD_SVC_CONN;
 		svr_conns[next_conn].rpc_conn_counter   = 0;
-		svr_conns[next_conn].rpc_protocol       = D_UDP;
+		svr_conns[next_conn].rpc_protocol       = D_TCP;
 		svr_conns[next_conn].first_access_time  = False;
 		svr_conns[next_conn].open_si_connections    = 0;
-		svr_conns[next_conn].rpc_protocol_before_si = D_UDP;
+		svr_conns[next_conn].rpc_protocol_before_si = D_TCP;
 
 		return(next_conn);
 	}
@@ -1452,7 +1452,7 @@ long _DLLFunc dev_query_svr (char* host, long prog_number, long vers_number)
 	svr_conns[next_conn].rpc_conn_status    = GOOD_SVC_CONN;
 	svr_conns[next_conn].rpc_error_flag     = GOOD_SVC_CONN;
 	svr_conns[next_conn].rpc_conn_counter   = 0;
-	svr_conns[next_conn].rpc_protocol       = D_UDP;
+	svr_conns[next_conn].rpc_protocol       = D_TCP;
 	svr_conns[next_conn].first_access_time  = False;
 
 	return(next_conn);
