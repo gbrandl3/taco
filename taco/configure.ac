@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0rc3, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.30 $)dnl
+AC_REVISION($Revision: 1.31 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -127,8 +127,8 @@ AC_SUBST([aclocaldir], ['${datadir}/m4'])
 
 AC_SUBST(TACO_INCLUDES, ["-I\$(top_srcdir)/lib/xdr -I\$(top_srcdir)/lib -I\$(top_srcdir)/lib/dc -I\$(top_srcdir)/lib/dbase -I\$(top_srcdir)/lib/tc -I\$(top_srcdir)/lib/ascii] -I\$(top_srcdir)/lib/private") 
 
-AC_FIND_GDBM
-if test "${MAKE_GDBM}" = "yes" ; then
+TACO_DBM_SERVER
+if test "x${taco_build_gdbm}" = "xyes" ; then
      AC_CONFIG_SUBDIRS(gdbm)
 fi
 
@@ -141,7 +141,6 @@ TACO_DEFINES
 TACO_DATAPORT_SRC
 TACO_PYTHON_BINDING
 TACO_TCL_BINDING
-TACO_MYSQL_SUPPORT
 TACO_GRETA
 TACO_XDEVMENU
 TACO_ALARM
@@ -242,12 +241,12 @@ Configuration (taco):
 	Motif:			${motif_found}
 	
 build:
-	gdbm:			${MAKE_GDBM}
+	gdbm:			${taco_build_gdbm}
 	dataport API:		${DATAPORT}
 	data collector API:	${taco_dc}
 	ASCII API:		${taco_ascii}
 	database server with:
-		DBM support:	yes
+		DBM support:	${taco_gdbm}
 		mySQL support:	${taco_mysql}
 	greta:			${greta}
 	xdevmenu:		${xdevmenu}

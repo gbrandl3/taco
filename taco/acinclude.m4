@@ -25,26 +25,80 @@ AC_DEFUN([TACO_TCL_BINDING],
 	AM_CONDITIONAL(TCL_BINDING, test $taco_tcl_binding = yes)
 ])
 
+AC_DEFUN([TACO_DBM_SERVER],
+[
+	TACO_MYSQL_SUPPORT
+	TACO_GDBM_SUPPORT
+	AM_CONDITIONAL(MYSQLSUPPORT, test "x$taco_mysql" = "xyes")
+dnl disable gdbm support of the dbm server if mysql support of database server is disabled
+	if test "x$taco_mysql" != "xyes" ; then 	
+		taco_gdbm=yes
+	fi
+dnl disable the build of gdbm if gdbm support of database server is disabled
+	if test "x$taco_gdbm" = "xno" -a "x$taco_build_gdbm" = "xyes" ; then
+		taco_build_gdbm=no
+	fi 
+	AM_CONDITIONAL(GDBMSUPPORT, test "x$taco_gdbm" = "xyes")
+	AM_CONDITIONAL(BUILD_GDBM, test "x$taco_build_gdbm" = "xyes")
+	AC_SUBST(GDBM_CFLAGS)
+	AC_SUBST(GDBM_LIBS)
+	AC_SUBST(MYSQL_CFLAGS)
+	AC_SUBST(MYSQL_LIBS)
+])
+
 AC_DEFUN([TACO_MYSQL_SUPPORT],
 [
-	AC_ARG_ENABLE(mysqldbm, AC_HELP_STRING(--enable-mysqldbm, [build the database server with mysql support @<:@default=yes@:>@]),
-		[case "${enable_mysqldbm}" in
+dnl
+dnl Get the cflags and libraries
+dnl
+	AC_ARG_ENABLE(mysql, AC_HELP_STRING(--enable-mysql, [build the database server with mysql support @<:@default=yes@:>@]),
+		[case "${enable_mysql}" in
 			yes)	taco_mysql=yes;;
 			no)	taco_mysql=no;;
-			*)	AC_MSG_ERROR([bad value ${enable_mysqldbm} for --enable-mysqldbm]);;
+			*)	AC_MSG_ERROR([bad value ${enable_mysql} for --enable-mysql]);;
 		esac], [taco_mysql=yes])
-	if test "x$taco_mysql" = "xyes" ; then
-		for i in /usr/include /usr/local/include ; do
-			AC_CHECK_FILE($i/mysql/mysql.h, [
-				taco_mysql=yes
-				MYSQL_LDFLAGS="-L`dirname $i`/lib/mysql/"
-				AC_SUBST(MYSQL_LDFLAGS)
-				CPPFLAGS="$CPPFLAGS -I$i"
-				break],[taco_mysql=no])
-		done
-		AC_CHECK_HEADERS([mysql/mysql.h], [taco_mysql=yes], [taco_mysql=no])
+	AC_ARG_WITH(mysql, AS_HELP_STRING([--with-mysql=PFX], [Prefix where mysql is installed, e.g. '/usr/local/mysql']),
+		[mysql_prefix="$withval"], [mysql_prefix=""])
+	AC_ARG_WITH(mysql-libraries, AS_HELP_STRING([--with-mysql-libraries=DIR], [Directory where mysql library is installed (optional)]), 
+		[mysql_libraries="$withval"], [mysql_libraries=""])
+	AC_ARG_WITH(mysql-includes, AS_HELP_STRING([--with-mysql-includes=DIR], [Directory where mysql header files are installed (optional)]), 
+		[mysql_includes="$withval"], [mysql_includes=""])
+
+	if test "x$mysql_libraries" != "x" ; then
+		MYSQL_LIBS="-L$mysql_libraries"
+	elif test "x$mysql_prefix" != "x" ; then
+		MYSQL_LIBS="-L$mysql_prefix/lib"
+	elif test "x$prefix" != "xNONE" -a "x$prefix" != "x/usr"; then
+		MYSQL_LIBS="-L$prefix/lib"
 	fi
-	AM_CONDITIONAL(MYSQLSUPPORT, test "x$taco_mysql" = "xyes")
+	MYSQL_LIBS="$MYSQL_LIBS -lmysqlclient"
+
+	if test "x$mysql_includes" != "x" ; then
+		MYSQL_CFLAGS="-I$mysql_includes"
+	elif test "x$mysql_prefix" != "x" ; then
+		MYSQL_CFLAGS="-I$mysql_prefix/include"
+	elif test "x$prefix" != "xNONE" -a "x$prefix" != "x/usr"; then
+		MYSQL_CFLAGS="-I$prefix/include"
+	fi
+
+	if test "x$taco_mysql" = "xyes" ; then
+		save_LIBS="$LIBS"
+		save_CPPFLAGS="$CPPFLAGS"
+		CPPFLAGS="$CPPFLAGS $MYSQL_CFLAGS" 
+		LIBS="$LIBS $MYSQL_LIBS"
+		AC_CHECK_HEADERS([mysql/mysql.h], [], [taco_mysql=no])
+		AC_LINK_IFELSE(
+			[AC_LANG_PROGRAM(
+[#include <mysql/mysql.h> 
+],
+[
+MYSQL       mysql,
+            *mysql_conn = mysql_real_connect(&mysql, "localhost", "myuser", "mypasswd", "mydb", 0, 0, 0); 
+
+])], [], [taco_mysql=no])
+		LIBS="$save_LIBS"
+		CPPFLAGS="$save_CPPPLAGS"
+	fi
 ])
 
 AC_DEFUN([TACO_DC_API],
@@ -215,26 +269,50 @@ AC_DEFUN([TACO_DEFINES],
        CXXFLAGS="$CXXFLAGS $taco_CFLAGS" 
 ])
 
-AC_DEFUN([AC_FIND_GDBM],
+AC_DEFUN([TACO_GDBM_SUPPORT],
 [
-	MAKE_GDBM=no
-	AC_ARG_WITH(gdbm, AC_HELP_STRING([--with-gdbm=ARG], [ ARG is the path to the gdbm installation, e.g. '/usr/local/gdbm']),
-		[
-		TACO_GDBM_INC=-I${withval}/include
-		TACO_GDBM_LDFLAGS=-L${withval}/lib,
-		])
-	LIBS_ORIG="$LIBS"
-	CPPFLAGS_ORIG="$CPPFLAGS"
-	CPPFLAGS="$CPPFLAGS $TACO_GDBM_INC" 
-	LIBS="$LIBS $TACO_GDBM_LIBS"
-	gdbm_header=gdbm.h
-	for i in /usr/include /usr/local/include /usr/include/gdbm /usr/local/include/gdbm ; do
-		AC_CHECK_FILE($i/gdbm.h, [MAKE_GDBM=no;CPPFLAGS="$CPPFLAGS -I$i";break],[MAKE_GDBM=yes])
-		if test "$MAKE_GDBM" = "no" ; then
-			break
-		fi
-	done
-	AC_CHECK_HEADER(gdbm.h, [gdbm_header="gdbm.h"], [MAKE_GDBM="yes"])
+dnl
+dnl Get the cflags and libraries
+dnl
+	taco_build_gdbm=no
+	AC_ARG_ENABLE(gdbm, AC_HELP_STRING(--enable-gdbm, [build the database server with gdbm support @<:@default=yes@:>@]),
+		[case "${enable_gdbm}" in
+			yes)	taco_gdbm=yes;;
+			no)	taco_gdbm=no;;
+			*)	AC_MSG_ERROR([bad value ${enable_gdbm} for --enable-gdbm]);;
+		esac], [taco_gdbm=yes])
+	AC_ARG_WITH(gdbm, AS_HELP_STRING([--with-gdbm=PFX], [Prefix where gdbm is installed, e.g. '/usr/local/gdbm']),
+		[gdbm_prefix="$withval"], [gdbm_prefix=""])
+	AC_ARG_WITH(gdbm-libraries, AS_HELP_STRING([--with-gdbm-libraries=DIR], [Directory where gdbm library is installed (optional)]), 
+		[gdbm_libraries="$withval"], [gdbm_libraries=""])
+	AC_ARG_WITH(gdbm-includes, AS_HELP_STRING([--with-gdbm-includes=DIR], [Directory where gdbm header files are installed (optional)]), 
+		[gdbm_includes="$withval"], [gdbm_includes=""])
+
+	if test "x$gdbm_libraries" != "x" ; then
+		GDBM_LIBS="-L$gdbm_libraries"
+	elif test "x$gdbm_prefix" != "x" ; then
+		GDBM_LIBS="-L$gdbm_prefix/lib"
+	elif test "x$prefix" != "xNONE" -a "x$prefix" != "x/usr"; then
+		GDBM_LIBS="-L$prefix/lib"
+	fi
+	TACO_GDBM_LDFLAGS="$GDBM_LIBS"
+
+	GDBM_LIBS="$GDBM_LIBS -lgdbm"
+
+	if test "x$gdbm_includes" != "x" ; then
+		GDBM_CFLAGS="-I$gdbm_includes"
+	elif test "x$gdbm_prefix" != "x" ; then
+		GDBM_CFLAGS="-I$gdbm_prefix/include"
+	elif test "x$prefix" != "xNONE" -a "x$prefix" != "x/usr"; then
+		GDBM_CFLAGS="-I$prefix/include"
+	fi
+	TACO_GDBM_INC="$GDBM_CFLAGS"
+
+	save_LIBS="$LIBS"
+	save_CPPFLAGS="$CPPFLAGS"
+	CPPFLAGS="$CPPFLAGS $GDBM_CFLAGS" 
+	LIBS="$LIBS $GDBM_LIBS"
+	AC_CHECK_HEADER(gdbm.h, [gdbm_header="gdbm.h"], [taco_build_gdbm="yes"])
 	AC_MSG_CHECKING([Compiles gdbm.h with C++])
 	AC_LANG_PUSH(C++)
 	AC_COMPILE_IFELSE(
@@ -253,26 +331,20 @@ public:
 	Test a(db, d);
 // #error Broken
 ]
-)], [AC_CHECK_LIB(gdbm, gdbm_open)], [], [MAKE_GDBM="yes"])
-	if test "$MAKE_GDBM" = "yes" ;then
+)], [AC_CHECK_LIB(gdbm, gdbm_open)], [], [taco_build_gdbm="yes"])
+	if test "$taco_build_gdbm" = "yes" ;then
 		AC_MSG_RESULT([no])
 	else
 		AC_MSG_RESULT([yes])
 	fi
 	AC_LANG_POP(C++)
 	if test x${ac_cv_lib_gdbm_gdbm_open} != xyes ; then
-		TACO_GDBM_LIBS="\$(top_builddir)/gdbm/libgdbm.la"
-		TACO_GDBM_INC="-I\$(top_builddir)/gdbm"
-		MAKE_GDBM="yes"
-	else
-		AC_SUBST(TACO_GDBM_LIBS, ["-lgdbm"])
+		GDBM_LIBS="\$(top_builddir)/gdbm/libgdbm.la"
+		GDBM_CFLAGS="-I\$(top_builddir)/gdbm"
+		taco_build_gdbm="yes"
 	fi
-	AM_CONDITIONAL(BUILD_GDBM, test x${MAKE_GDBM} = xyes)
-	AC_SUBST(TACO_GDBM_INC)
-	AC_SUBST(TACO_GDBM_LDFLAGS)
-	AC_SUBST(MAKE_GDBM)	
-	LIBS="$LIBS_ORIG"
-	CPPFLAGS="$CPPPLAGS_ORIG"
+	LIBS="$save_LIBS"
+	CPPFLAGS="$save_CPPPLAGS"
 ]
 )
 

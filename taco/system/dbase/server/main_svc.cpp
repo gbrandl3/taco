@@ -14,8 +14,8 @@
 #endif
 
 #include <dbClass.h>
-#	ifdef HAVE_MYSQL_MYSQL_H
-#include <MySqlServer.h>
+#ifdef HAVE_MYSQL_MYSQL_H
+#	include <MySqlServer.h>
 #endif
 #include <NdbmServer.h>
 //
@@ -80,18 +80,31 @@ void default_sig(int signo)
 
 void usage(const char *argv)
 {
-	std::string	types("dbm");
-#if HAVE_MYSQL_MYSQL_H
-	types += "|mysql";
+	std::string	types("");
+#if USE_GDBM
+	types += "dbm";
 #endif
-	std::cerr << "usage: " << argv << " [-h] [-t (" << types << ")] database_name network_manager_host_name" << std::endl;
+#ifdef USE_MYSQL
+	if (!types.empty())
+		types += '|';
+	types += "mysql";
+#endif
+	std::cerr << "usage: " << argv << " [-h] [-t " << types << "] "
+#ifdef USE_MYSQL
+		<< "[-u user] [-p password] " 
+#endif
+		<< "database_name network_manager_host_name" << std::endl;
 	std::cerr << "       -h             - prints this message" << std::endl;
-	std::cerr << "       -t (dbm|mysql) - gives the type of underlying database connect to" << std::endl;
+	std::cerr << "       -t " << types << " - gives the type of underlying database connect to" << std::endl;
+#ifdef USE_GDBM
 	std::cerr << "                        'dbm' stands for the dbm, ndbm, and gdbm" << std::endl;
+#endif
+#ifdef USE_MYSQL
 	std::cerr << "                        'mysql' stands for the MySQL database" << std::endl;
 	std::cerr << "                        database_name for MySQL database should be tango" << std::endl;
 	std::cerr << "       -u user        - user for MySQL database" << std::endl;
 	std::cerr << "       -p password    - password for MySQL database" << std::endl;
+#endif
 	exit(1);
 }
 
@@ -158,35 +171,47 @@ int main(int argc,char **argv)
 #ifdef DEBUG
 	for (int i = 0; i< argc; i++) printf("argv[%d] %s ",i,argv[i]); printf("\n");
 #endif
+#ifdef USE_MYSQL
+	if (getenv("MYSQL_USER") != NULL)
+		mysql_user = getenv("MYSQL_USER");
+	if (getenv("MYSQL_PASSWORD") != NULL)
+		mysql_password = getenv("MYSQL_PASSWORD");
+#endif
 
 	while ((c = getopt(argc, argv, "t:h:u:p")) != EOF)
 		switch(c)
 		{
 			case 't' :	
+#ifdef USE_GDBM
 				if (std::string(optarg) == "dbm")
 					dbm = new NdbmServer("", "", "");
-#ifdef HAVE_MYSQL_MYSQL_H
-				else if (std::string(optarg) == "mysql")
+				else
+#endif
+#ifdef USE_MYSQL
+				if (std::string(optarg) == "mysql")
 				{
-					if (getenv("MYSQL_USER") != NULL)
-					{
-						mysql_user = getenv("MYSQL_USER");
-					}
-					if (getenv("MYSQL_PASSWORD") != NULL)
-					{
-						mysql_password = getenv("MYSQL_PASSWORD");
-					}
 #ifdef DEBUG
 					std::cout << "going to connect to mysql database with user = " << mysql_user;
 					std::cout << ", password = " << mysql_password << std::endl;
 #endif
 					dbm = new MySQLServer(mysql_user, mysql_password, argv[optind]);
 				}
-#endif
 				else
+#endif
 					usage(*argv);
 				break;
-			case 'h' :	usage(*argv);
+#ifdef USE_MYSQL
+			case 'u' :
+				mysql_user = optarg;
+				break;
+			case 'p' :
+				mysql_password = optarg;
+				break;
+#endif
+			case '?' :
+			case 'h' :	
+			default  :
+				usage(*argv);
 				break;
 		}
 
@@ -194,8 +219,14 @@ int main(int argc,char **argv)
 		usage(*argv); 			
 	std::string netmanhost(argv[argc - 1]);
 #endif
+
+#if defined(MYSQL_MYSQL) && !defined(USE_GDBM)
+	if (!dbm)
+		dbm = new MySQLServer(mysql_user, mysql_password, argv[optind]);
+#else
 	if (!dbm)
     		dbm = new NdbmServer("", "", "");
+#endif
 //
 // RPC business !!!!!!!!!!!!!!!!!!!! 
 //
