@@ -11,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.8 $
+ Version:	$Revision: 1.9 $
 
- Date:		$Date: 2004-07-08 17:02:33 $
+ Date:		$Date: 2005-02-24 15:56:05 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -27,7 +27,13 @@
 #include <private/ApiP.h>
 #include <DevErrors.h>
 #include <ManagerP.h>
-#include <signal.h>
+#if HAVE_SIGNAL_H
+#       include <signal.h>
+#elif HAVE_SYS_SIGNAL_H
+#       include <sys/signal.h>
+#else
+#error Could not find signal.h
+#endif
 
 void 			quit_server ();
 

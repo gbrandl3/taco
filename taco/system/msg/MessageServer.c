@@ -11,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.6 $
+ Version:	$Revision: 1.7 $
 
- Date:		$Date: 2004-07-08 17:02:33 $
+ Date:		$Date: 2005-02-24 15:55:38 $
 
  Copyright (c) 1990 by	European Synchrotron Radiation Facility, 
 			Grenoble, France
@@ -34,7 +34,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <signal.h>
+#if HAVE_SIGNAL_H
+#       include <signal.h>
+#elif HAVE_SYS_SIGNAL_H
+#       include <sys/signal.h>
+#else
+#error Could not find signal.h
+#endif
 #if TIME_WITH_SYS_TIME
 # 	include <sys/time.h>
 #	include <time.h>

@@ -14,15 +14,15 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.22 $
+ Version    :	$Revision: 1.23 $
 
- Date	    :	$Date: 2005-02-23 07:20:20 $
+ Date	    :	$Date: 2005-02-24 15:59:37 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
 
 ********************************************************************-*/
-#include <config.h>
+#include "config.h"
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevServer.h>
@@ -30,10 +30,10 @@
 #include <DevErrors.h>
 #include <API_xdr_vers3.h>
 
-#if HAVE_SYS_SIGNAL_H
-#	include <sys/signal.h>
-#elif HAVE_SIGNAL_H
+#if HAVE_SIGNAL_H
 #	include <signal.h>
+#elif HAVE_SYS_SIGNAL_H
+#	include <sys/signal.h>
 #else
 #error could not find signal.h
 #endif

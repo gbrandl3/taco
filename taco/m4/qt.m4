@@ -4,9 +4,9 @@ dnl		adapted form the KDE2 acinclude.m4
 dnl
 dnl Author: 	$Author: jkrueger1 $
 dnl
-dnl Version:	$Revision: 1.3 $
+dnl Version:	$Revision: 1.4 $
 dnl
-dnl Date:	$Date: 2004-08-10 11:57:27 $
+dnl Date:	$Date: 2005-02-24 16:01:31 $
 dnl
 
 dnl
@@ -652,6 +652,9 @@ dnl  	    AC_REQUIRE([AC_FIND_JPEG])
 
 		for LIBQT in "-lqt" "-lqt-mt" ; do
 			LIBS="$ac_libs_safe $LIBQT"
+			if test "$LIBQT" = "-lqt-mt" ; then
+				LIBS="$LIBS -pthread"
+			fi
 			AC_PRINT_QT_PROGRAM
 			if AC_TRY_EVAL(ac_link) && test -s conftest; then
 				rm -f conftest*

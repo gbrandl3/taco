@@ -13,9 +13,9 @@
 
  Original:	June 1991
 
- Version:	$Revision: 1.6 $
+ Version:	$Revision: 1.7 $
 
- Date:		$Date: 2005-02-22 13:50:25 $
+ Date:		$Date: 2005-02-24 15:59:36 $
 
  Copyright (c) 1990-1997 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -23,10 +23,10 @@
 *******************************************************************-*/
 
 #include "config.h"
-#if HAVE_SYS_SIGNAL_H
-#	include <sys/signal.h>
-#elif HAVE_SIGNAL_H
+#if HAVE_SIGNAL_H
 #	include <signal.h>
+#elif HAVE_SYS_SIGNAL_H
+#	include <sys/signal.h>
 #else
 #error could not find signal.h
 #endif

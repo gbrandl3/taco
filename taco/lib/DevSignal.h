@@ -14,9 +14,9 @@
 
  Original:	June, 1991
 
- Version:	$Revision: 1.5 $
+ Version:	$Revision: 1.6 $
 
- Date:		$Date: 2005-02-22 13:48:39 $
+ Date:		$Date: 2005-02-24 15:59:36 $
 
  Copyleft (c) 1990 by European Synchrotron Radiation Facility, 
                       Grenoble, France
@@ -31,13 +31,13 @@
  */
 #ifdef _IDENT
 static char DevSignalh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevSignal.h,v 1.5 2005-02-22 13:48:39 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevSignal.h,v 1.6 2005-02-24 15:59:36 jkrueger1 Exp $";
 #endif /* _IDENT */
 
-#if HAVE_SYS_SIGNAL_H
-#	include <sys/signal.h>
-#elif HAVE_SIGNAL_H
+#if HAVE_SIGNAL_H
 #	include <signal.h>
+#elif HAVE_SYS_SIGNAL_H
+#	include <sys/signal.h>
 #else
 #error could not find signal.h
 #endif

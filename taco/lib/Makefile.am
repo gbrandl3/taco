@@ -32,7 +32,7 @@ libtacoc_la_SOURCES 	= gen_api.c dev_errors.c dev_states.c oic.c util_api.c asyn
 			ds_prog_vers3.c DevServer.c 
 
 libtacoc_la_LDFLAGS 	= -version-info @LIB_VERSION@
-libtacoc_la_LIBADD  	= dbase/libdbapi.la xdr/libdsxdr.la -lc
+libtacoc_la_LIBADD  	= xdr/libdsxdr.la dbase/libdbapi.la -lc
 
 EXTRA_DIST 		= 
 

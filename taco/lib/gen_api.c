@@ -12,9 +12,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.15 $
+ Version    :	$Revision: 1.16 $
 
- Date       : 	$Date: 2005-02-22 15:59:56 $
+ Date       : 	$Date: 2005-02-24 15:59:37 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -42,10 +42,10 @@
 #	include <varargs.h>
 #endif
 
-#if HAVE_SYS_SIGNAL_H
-#	include <sys/signal.h>
-#elif HAVE_SIGNAL_H
+#if HAVE_SIGNAL_H
 #	include <signal.h>
+#elif HAVE_SYS_SIGNAL_H
+#	include <sys/signal.h>
 #else
 #error could not find signal.h
 #endif

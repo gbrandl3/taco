@@ -1,18 +1,18 @@
 /*****************************************************************************
- * File:        $Id: starter.cpp,v 1.5 2004-12-02 14:45:13 andy_gotz Exp $
+ * File:        $Id: starter.cpp,v 1.6 2005-02-24 15:54:58 jkrueger1 Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
  * Description: Source code for implementing a starter server
  *
  * Author(s):   Jens Krüger
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2004-12-02 14:45:13 $
+ * Date:	$Date: 2005-02-24 15:54:58 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -31,6 +31,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *****************************************************************************/
 
+#include "config.h"
 #include "starter.h"
 #include <Starter.h>
 #include <iostream>
@@ -38,8 +39,14 @@
 #include <algorithm>
 #include <DevSec.h>
 #include <unistd.h>
-#include <signal.h>
-#include <errno.h>
+#if HAVE_SIGNAL_H
+#       include <signal.h>
+#elif HAVE_SYS_SIGNAL_H
+#       include <sys/signal.h>
+#else
+#error Could not find signal.h
+#endif
+#include <cerrno>
 #include <cstdio>
 #include <fcntl.h>
 #include <sys/types.h>

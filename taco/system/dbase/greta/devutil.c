@@ -1,32 +1,39 @@
 /****************************************************************************
 
- File          :  devutil.c
+ File           : devutil.c
 
- Project       :  GRETA application
+ Project        : GRETA application
 
- Description   :  The module which contains all the utilities used to display
+ Description    : The module which contains all the utilities used to display
  		  device server information (device list, device resources..)
 
- Author        :  E. Taurel
+ Author         : E. Taurel
+		  $Author: jkrueger1 $
 
- Original      :  June 1998
+ Original       : June 1998
 
+ Version	: $Revision: 1.4 $
 
- $Revision: 1.3 $
- $Date: 2004-06-02 16:36:16 $
+ Date		: $Date: 2005-02-24 15:57:59 $
 
 ****************************************************************************/
 
 /*
  * Standard includes for builtins.
  */
- 
+#include "config.h" 
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <signal.h>
+#if HAVE_SIGNAL_H
+#	include <signal.h>
+#elif HAVE_SYS_SIGNAL_H
+#	include <sys/signal.h>
+#else
+#error Could not find signal.h
+#endif
 #include <time.h>
 #include <math.h>
 

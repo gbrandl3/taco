@@ -1,3 +1,11 @@
+2005-02-24 17:00 jkrueger1:
+	* Fix problems with reconnecting the client to restarted device
+	server.
+	* Improve the detection of the 'signal' function
+	* Use 'device_server' as the main entrance function for all
+	servers, written in C, C++ or Python
+	* Improve the Python framework for writting TACO servers
+	* Add documentation in the Python TACO server framework
 2004-09-22 10:00 jkrueger1:
 	* Add a new test for querying of commands and events list of the
 	devices

@@ -7,7 +7,13 @@
 #include <API.h>
 #include <private/ApiP.h>
 #include "db_xdr.h"
-#include <signal.h>
+#if HAVE_SIGNAL_H
+#	include <signal.h>
+#elif HAVE_SYS_SIGNAL_H
+#	include <sys/signal.h>
+#else
+#error Could not find signal.h
+#endif
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/socket.h>

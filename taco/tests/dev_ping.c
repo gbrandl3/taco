@@ -22,10 +22,10 @@
 #include <DevServer.h>
 #include <time.h>
 
-#if HAVE_SYS_SIGNAL_H
-#	include <sys/signal.h>
-#elif HAVE_SIGNAL_H
+#if HAVE_SIGNAL_H
 #	include <signal.h>
+#elif HAVE_SYS_SIGNAL_H
+#	include <sys/signal.h>
 #else
 #error could not find signal.h
 #endif

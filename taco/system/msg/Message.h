@@ -9,13 +9,13 @@
                 the Message-Server.
 
  Author(s):	Jens Meyer
+ 		$Author: jkrueger1 $
 
  Original:	January 1991
 
- $Revision: 1.4 $
- $Date: 2005-02-22 15:59:57 $
+ Version:	$Revision: 1.5 $
 
- $Author: jkrueger1 $
+ Date:		$Date: 2005-02-24 15:55:38 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
