@@ -1,18 +1,22 @@
-
 /*********************************************************************
  *
- *File:		MDSSignal.c
+ * File:	MDSSignal.c
  *
- *Project:	Multi Signal Device Server
+ * Project:	Multi Signal Device Server
  *
- *Description:	Device Server Class which is a top Layer of DSSignal
+ * Description:	Device Server Class which is a top Layer of DSSignal
  		Class to handle multiple signals.
  *
- *Author(s):	Ingrid Fladmark
+ * Author(s):	Ingrid Fladmark
+ * 		$Author: jkrueger1 $
  *
- *Original:	24th of january 1997
+ * Original:	24th of january 1997
  *
- *Copyright(c) 1997 by European Synchrotron Radiation Facility, 
+ * Version:	$Revision: 1.2 $
+ *
+ * Date:	$Date: 2005-03-30 06:28:13 $
+ *
+ * Copyright(c) 1997 by European Synchrotron Radiation Facility, 
  *                     Grenoble, France
  *
  *********************************************************************/

@@ -1,4 +1,3 @@
-
 /*********************************************************************
  *
  * File:	DSSignalP.h
@@ -8,8 +7,13 @@
  * Description:	A class to specify signal properties.
  *
  * Author(s):	J.Meyer
+ *		$Author: jkrueger1 $
  *
  * Original:	June 1996	
+ *
+ * Version:	$Revision: 1.2 $
+ *
+ * Date:	$Date: 2005-03-30 06:28:13 $
  *
  * Copyright (c) 1996 by European Synchrotron Radiation Facility, 
  *                     Grenoble, France

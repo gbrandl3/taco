@@ -1,17 +1,21 @@
-
 /*********************************************************************
  *
- *File:		DSSignal.c
+ * File:	DSSignal.c
  *
- *Project:	SRRF3 control system
+ * Project:	SRRF3 control system
  *
- *Description:	A class to specify signal properties and signal treatment.
+ * Description:	A class to specify signal properties and signal treatment.
  *
- *Author(s):	J.Meyer
+ * Author(s):	J.Meyer
+ * 		$Author: jkrueger1 $
  *
- *Original:	June 1996
+ * Original:	June 1996
  *
- *Copyright(c) 1996 by European Synchrotron Radiation Facility, 
+ * Version:	$Revision: 1.2 $
+ *
+ * Date:	$Date: 2005-03-30 06:28:13 $
+ *
+ * Copyright(c) 1996 by European Synchrotron Radiation Facility, 
  *                     Grenoble, France
  *
  *********************************************************************/

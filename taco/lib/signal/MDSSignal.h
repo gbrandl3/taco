@@ -1,4 +1,3 @@
-
 /*********************************************************************
  *
  * File:	MDSSignal.h
@@ -10,8 +9,13 @@
  *		
  *
  * Author(s):	Ingrid Fladmark
+ *		$Author: jkrueger1 $
+ *
+ * Version:	$Revision: 1.2 $
  *
  * Original:	24th of january 1997
+ *
+ * Date:	$Date: 2005-03-30 06:28:13 $
  *
  * Copyright(c) 1994 by European Synchrotron Radiation Facility, 
  *                     Grenoble, France

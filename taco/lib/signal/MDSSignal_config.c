@@ -1,18 +1,22 @@
-
 /*********************************************************************
  *
- *File:         MDSSignal_config.c
+ * File:        MDSSignal_config.c
  *
- *Project:      Multi Signal Class
+ * Project:     Multi Signal Class
  *
- *Description:  Device Server Class which is a top Layer of DSSignal
-                Class to handle multiple signals. Module to extract the
-		signal configuration of a device directly from the
-		resource database.
+ * Description: Device Server Class which is a top Layer of DSSignal
+ *              Class to handle multiple signals. Module to extract the
+ *		signal configuration of a device directly from the
+ *		resource database.
  *
- *Author(s):    Jens Meyer
+ * Author(s):   Jens Meyer
+ *		$Author: jkrueger1 $
  *
- *Original:     4.12.1997
+ * Version:	$Revision: 1.2 $
+ *
+ * Original:    4.12.1997
+ *
+ * Date:	$Date: 2005-03-30 06:28:13 $
  *
  *********************************************************************/
 
