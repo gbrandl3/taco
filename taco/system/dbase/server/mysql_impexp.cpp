@@ -287,7 +287,7 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
             if (mysql_db == "tango")
 	    {
 	        query = "SELECT HOST, IOR, VERSION, CLASS";
-	        query += (" FROM DEVICE WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + dev_name + "'" );
+	        query += (" FROM device WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + dev_name + "'" );
 	        query += (" AND IOR LIKE 'rpc:%'");
             }
             else
@@ -466,7 +466,7 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "UPDATE DEVICE SET EXPORTED = 0 WHERE";
+        query = "UPDATE device SET EXPORTED = 0 WHERE";
         query += (" SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
     }
     else
@@ -494,7 +494,7 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
     {
         if (mysql_db == "tango")
         {
-            query = "UPDATE DEVICE SET EXPORTED = 0 WHERE";
+            query = "UPDATE device SET EXPORTED = 0 WHERE";
             query += (" SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
         }
         else
@@ -604,7 +604,7 @@ svc_inf *MySQLServer::db_svcchk_1_svc(nam *dsn_name)
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT HOST, IOR, VERSION FROM DEVICE WHERE";
+        query = "SELECT HOST, IOR, VERSION FROM device WHERE";
         query += (" SERVER = '" + ds_class + "/" + ds_name + "'");
     }
     else
@@ -669,7 +669,7 @@ int MySQLServer::db_store(db_devinfo &dev_stu)
     std::stringstream query;
     if (mysql_db == "tango")
     {
-        query << "UPDATE DEVICE SET HOST = '" << dev_stu.host_name <<  "',"
+        query << "UPDATE device SET HOST = '" << dev_stu.host_name <<  "',"
           << " IOR = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
           << " VERSION = '" << dev_stu.v_num << "',"
           << " CLASS = '" << dev_stu.dev_class << "',"
@@ -737,7 +737,7 @@ int MySQLServer::db_store(db_devinfo_2 &dev_stu)
     std::stringstream query;
     if (mysql_db == "tango")
     {
-        query << "UPDATE DEVICE SET HOST = '" << dev_stu.host_name <<  "',"
+        query << "UPDATE device SET HOST = '" << dev_stu.host_name <<  "',"
           << " IOR = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
           << " VERSION = '" << dev_stu.v_num << "',"
           << " CLASS = '" << dev_stu.dev_class << "',"
@@ -808,7 +808,7 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
     std::stringstream query;
     if (mysql_db == "tango")
     {
-        query << "UPDATE DEVICE SET HOST = '" << dev_stu.host_name <<  "',"
+        query << "UPDATE device SET HOST = '" << dev_stu.host_name <<  "',"
           << " IOR = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
           << " VERSION = '" << dev_stu.v_num << "',"
           << " CLASS = '" << dev_stu.dev_class << "',"

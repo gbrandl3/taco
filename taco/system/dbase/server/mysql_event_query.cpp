@@ -68,7 +68,7 @@ event_que *MySQLServer::db_event_query_1_svc(nam *pevent_name)
 
     if (mysql_db == "tango")
     {
-    	query = "SELECT FAMILY, MEMBER, NAME FROM PROPERTY_DEVICE WHERE ";
+    	query = "SELECT FAMILY, MEMBER, NAME FROM property_device WHERE ";
     	query += ("DOMAIN = 'events' AND VALUE = '" + event_str + "'");
     }
     else

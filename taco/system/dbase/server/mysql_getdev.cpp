@@ -87,7 +87,7 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM DEVICE WHERE ";
+        query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM device WHERE ";
     }
     else
     {

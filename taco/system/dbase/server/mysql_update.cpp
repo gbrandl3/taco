@@ -82,7 +82,7 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 	std::string query;
 	if (mysql_db == "tango")
 	{
-	    query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM DEVICE WHERE ";
+	    query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM device WHERE ";
 	    query += (" SERVER LIKE '" + ds_class + "/" + ds_name + "'");
 	}
 	else
@@ -237,7 +237,7 @@ long MySQLServer::db_delete_names(const std::string ds_class, const std::string 
     std::string query;
     if (mysql_db == "tango")
     {
-        query = "DELETE FROM DEVICE WHERE CLASS = '" + ds_class + "' AND SERVER LIKE  '"
+        query = "DELETE FROM device WHERE CLASS = '" + ds_class + "' AND SERVER LIKE  '"
 	       + ds_name + "/%' AND CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + dev_name + "'";
     }
     else
@@ -293,7 +293,7 @@ long MySQLServer::db_insert_names(const std::string ds_class, const std::string 
 
     if (mysql_db == "tango")
     {
-        query << "INSERT INTO DEVICE(NAME, CLASS, SERVER, DOMAIN, FAMILY, MEMBER, IOR, PID, VERSION, EXPORTED)"
+        query << "INSERT INTO device(NAME, CLASS, SERVER, DOMAIN, FAMILY, MEMBER, IOR, PID, VERSION, EXPORTED)"
 	      << " VALUES('" << domain << "/" << family << "/" << member << "','" 
 	      << ds_class << "', '" << ds_class << "/" << ds_name << "', '" << domain << "', '" << family
 	      << "', '" << member << "', 'rpc::0', 0, 0, 0)" << std::ends;
@@ -553,7 +553,7 @@ long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
 	std::string query;
         if (mysql_db == "tango")
         {
-            query = "DELETE FROM PROPERTY_DEVICE WHERE DEVICE = '" + domain + "/" + family + "/" + member + "'";
+            query = "DELETE FROM property_device WHERE DEVICE = '" + domain + "/" + family + "/" + member + "'";
             query += " AND NAME = '" + name + "'";
         }
         else
@@ -575,7 +575,7 @@ long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
     std::stringstream query;
     if (mysql_db == "tango")
     {
-        query << "INSERT INTO PROPERTY_DEVICE(DEVICE,NAME,DOMAIN,FAMILY,MEMBER,COUNT,VALUE) VALUES('"
+        query << "INSERT INTO property_device(DEVICE,NAME,DOMAIN,FAMILY,MEMBER,COUNT,VALUE) VALUES('"
 	      << domain << "/" << family << "/" << member << "','" << name << "','"
 	      << domain << "','" << family << "','" << member << "','" 
 	      << numb << "','" << val << "')" << std::ends;

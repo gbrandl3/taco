@@ -65,7 +65,7 @@ cmd_que *MySQLServer::db_cmd_query_1_svc(nam *pcmd_name)
 
     if (mysql_db == "tango")
     {
-    	query = "SELECT FAMILY, MEMBER, NAME FROM PROPERTY_DEVICE WHERE ";
+    	query = "SELECT FAMILY, MEMBER, NAME FROM property_device WHERE ";
 	query += ("DOMAIN = 'cmds' AND VALUE = '" + req_cmd + "'");
     }
     else

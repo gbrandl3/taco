@@ -124,7 +124,7 @@ db_res *MySQLServer::resfamilylist_1_svc(nam* domain)
     std::string query;
     if (mysql_db == "tango")
     {
-    	query = "SELECT DISTINCT FAMILY FROM PROPERTY_DEVICE WHERE DOMAIN = '";
+    	query = "SELECT DISTINCT FAMILY FROM property_device WHERE DOMAIN = '";
     	query += (user_domain + "' ORDER BY FAMILY ASC");
     }
     else
@@ -221,7 +221,7 @@ db_res *MySQLServer::resmemberlist_1_svc(db_res *recev)
     std::string query;
     if (mysql_db == "tango")
     {
-    	query = "SELECT DISTINCT MEMBER FROM PROPERTY_DEVICE WHERE DOMAIN = '";
+    	query = "SELECT DISTINCT MEMBER FROM property_device WHERE DOMAIN = '";
     	query += (user_domain + "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC");
     }
     else
@@ -322,7 +322,7 @@ db_res *MySQLServer::resresolist_1_svc(db_res *recev)
 
     if (mysql_db == "tango")
     {
-    	query = "SELECT DISTINCT NAME FROM PROPERTY_DEVICE WHERE DOMAIN = '";
+    	query = "SELECT DISTINCT NAME FROM property_device WHERE DOMAIN = '";
     	query += (user_domain + "' AND FAMILY = '" + user_family + "' AND MEMBER = '");
     }
     else
@@ -425,7 +425,7 @@ db_res *MySQLServer::resresoval_1_svc(db_res *recev)
 
     if (mysql_db == "tango")
     {
-    	query = "SELECT MEMBER, NAME, COUNT, VALUE FROM PROPERTY_DEVICE WHERE ";
+    	query = "SELECT MEMBER, NAME, COUNT, VALUE FROM property_device WHERE ";
     	query += (" DOMAIN = '" + user_domain + "' AND FAMILY = '" + user_family + "'");
         if (user_member != "*")
     	    query += (" AND MEMBER = '" + user_member + "'");
