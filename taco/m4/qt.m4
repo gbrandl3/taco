@@ -1,6 +1,6 @@
 dnl
 dnl Module:
-dnl		$Id: acqt.m4,v 1.3 2004-02-17 12:27:19 jkrueger1 Exp $
+dnl		$Id: qt.m4,v 1.1 2004-04-28 16:41:57 jkrueger1 Exp $
 dnl Description:
 dnl		autotool macros to get the Qt installation pathes
 dnl		adapted form the KDE2 acinclude.m4

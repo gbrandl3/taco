@@ -4,10 +4,10 @@ Taco_la_LDFLAGS 	= -module
 
 ## -avoid-version
 
-INCLUDES 		= @TACO_INCLUDES@ @PYTHON_INCLUDES@ @PYTHON_INCLUDES@/Numeric
+INCLUDES 		= @TACO_INCLUDES@ @PYTHON_CPPFLAGS@ @PYTHON_CPPFLAGS@/Numeric
 
 Taco_la_LIBADD 		= $(top_builddir)/lib/libdsapinomain.la $(top_builddir)/lib/dbase/libdbapi.la \
-		$(top_builddir)/lib/xdr/libdsxdr_all.la $(top_builddir)/lib/dc/libdcapi.la @LIB_PYTHON@
+		$(top_builddir)/lib/xdr/libdsxdr_all.la $(top_builddir)/lib/dc/libdcapi.la @PYTHON_LDFLAGS@
 
 AM_CPPFLAGS 		= -DMYDEB -DNUMPY 
 

@@ -1,9 +1,10 @@
 AC_DEFUN([TACO_PYTHON_BINDING],
 [
-	TACO_PROG_PYTHON(2.0, [yes])
+	PYTHON_PROG(2.0, [yes])
+	PYTHON_DEVEL
 	if test "$ac_python_dir" != "no" ; then
 		ac_save_CFLAGS="$CFLAGS"
-		CFLAGS="$CFLAGS $PYTHON_INCLUDES"
+		CFLAGS="$CFLAGS $PYTHON_CPPFLAGS"
 		AC_CHECK_HEADERS(Numeric/arrayobject.h, [taco_python_binding=yes], [taco_python_binding=no], [#include <Python.h>])
 		CFLAGS="$ac_save_CFLAGS"
 	else
@@ -14,7 +15,7 @@ AC_DEFUN([TACO_PYTHON_BINDING],
 
 AC_DEFUN([TACO_TCL_BINDING],
 [
-	AC_REQUIRE([TACO_PROG_TCL])
+	AC_REQUIRE([TCL_DEVEL])
 	if { echo $target | grep darwin ; } then 
 		taco_tcl_bindings=no
 	elif test -n "$TCLINCLUDE" -a -n "$TCLLIB" -a "$TCLPACKAGE" != "no" ; then

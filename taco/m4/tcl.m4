@@ -2,16 +2,21 @@ dnl
 dnl 	Try to locate the Tcl package
 dnl 
 
-AC_DEFUN([TACO_PROG_TCL],
+AC_DEFUN([TCL_PROG],
 [
 	TCLINCLUDE=
 	TCLLIB=
 	TCLPACKAGE=
 
-	AC_ARG_WITH(tclconfig, AC_HELP_STRING([--with-tclconfig=path], [Set location of tclConfig.sh]),
-        	[with_tclconfig="$withval"])
 	AC_ARG_WITH(tcl, AC_HELP_STRING([--with-tcl=path], [Set location of Tcl package]),
 		[TCLPACKAGE="$withval"], [TCLPACKAGE=])
+])
+
+AC_DEFUN([TCL_DEVEL],
+[
+	AC_REQUIRE([TCL_PROG])
+	AC_ARG_WITH(tclconfig, AC_HELP_STRING([--with-tclconfig=path], [Set location of tclConfig.sh]),
+        	[with_tclconfig="$withval"])
 	AC_ARG_WITH(tclincl, AC_HELP_STRING([--with-tclincl=path], [Set location of Tcl include directory]),
 		[TCLINCLUDE="-I$withval"], [TCLINCLUDE=])
 	AC_ARG_WITH(tcllib, AC_HELP_STRING([--with-tcllib=path], [Set location of Tcl library directory]),
@@ -111,7 +116,7 @@ dnl
 		*)TCLDYNAMICLINKING="";;
 	esac
 
-	AC_SUBST(TCLINCLUDE)
-	AC_SUBST(TCLLIB)
+	AC_SUBST(TCL_CPPFLAGS)
+	AC_SUBST(TCL_LDFLAGS)
 	AC_SUBST(TCLDYNAMICLINKING)
 ])
