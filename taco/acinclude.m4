@@ -193,7 +193,7 @@ AC_DEFUN([TACO_DEFINES],
 	    i386-*-freebsd* )
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -Dx86=1 -DNDBM" ;;
             m68k-*-linux-*) 
-                        taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -D68k=1 -DNDBM" ;;
+                        taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -Dm68k=1 -DNDBM" ;;
             *-*-solar*-* | *-*-sun*-*)
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -D_solaris=1 -D__solaris__=1 -DNDBM" ;;
             *-*-hp*-*)
@@ -258,7 +258,7 @@ public:
 // #error Broken
 ]
 )], [AC_CHECK_LIB(gdbm, gdbm_open)], [], [MAKE_GDBM="yes"])
-	if test "MAKE_GDBM" = "yes" ;then
+	if test "$MAKE_GDBM" = "yes" ;then
 		AC_MSG_RESULT([no])
 	else
 		AC_MSG_RESULT([yes])
