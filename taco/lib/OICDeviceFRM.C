@@ -16,9 +16,9 @@
 //
 // Original:	November 1996
 //
-// $Revision: 1.1 $
+// $Revision: 1.2 $
 //
-// $Date: 2003-04-25 11:21:28 $
+// $Date: 2004-02-11 10:10:13 $
 //
 // $Author: jkrueger1 $
 //
@@ -326,7 +326,7 @@ long OICDeviceFRM::tacoStatus(void *vargin, void *vargout, long *error)
 //
 // code to implement the DevStatus command here
 //
-   sprintf(lstatus,"%s",DEVSTATES[this->ds->devserver.state]);
+   snprintf(lstatus, sizeof(lstatus), "%s",DEVSTATES[this->ds->devserver.state]);
 
    *status = lstatus;
 

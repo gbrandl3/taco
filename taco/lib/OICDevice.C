@@ -15,9 +15,9 @@
 //
 // Original:	November 1996
 //
-// $Revision: 1.4 $
+// $Revision: 1.5 $
 //
-// $Date: 2003-05-21 16:21:19 $
+// $Date: 2004-02-11 10:09:33 $
 //
 // $Author: jkrueger1 $
 //
@@ -122,14 +122,14 @@ OICDevice::OICDevice (DevString devname, DevServerClass devclass, long *error)
 // class and therefore does not exist as a class per se
 //
 	this->class_name = oicclass->devserver_class.class_name;
-	snprintf(this->dev_type, sizeof(this->dev_type) -1, TYPE_DEFAULT);
+	snprintf(this->dev_type, sizeof(this->dev_type), TYPE_DEFAULT);
 	this->class_inited = oicclass->devserver_class.class_inited;
 
 //
 // initialise the oicdevice name
 //
 	this->name = (char*)malloc(strlen(devname)+1);
-	sprintf(this->name,"%s",devname);
+	strcpy(this->name, devname);
 
 //
 // now initialise the OICDevice object fields by copying the necessary
@@ -298,7 +298,7 @@ long OICDevice::Status(void *vargin, void *vargout, long *error)
 //
 // code to implement the DevStatus command here
 //
-	sprintf(lstatus,"%s",DEVSTATES[this->ds->devserver.state]);
+	snprintf(lstatus, sizeof(status), "%s",DEVSTATES[this->ds->devserver.state]);
 	*status = lstatus;
 	return(DS_OK);
 }

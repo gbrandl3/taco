@@ -12,9 +12,9 @@
 //
 // Original:	March 1995
 //
-// Version:	$Revision: 1.7 $
+// Version:	$Revision: 1.8 $
 //
-// Date:	$Date: 2003-05-30 07:49:51 $
+// Date:	$Date: 2004-02-11 10:08:36 $
 //
 //-**********************************************************************
 		
@@ -279,7 +279,7 @@ long Device::Status(void *vargin, void *vargout, long *error)
 //
 // code to implement the DevStatus command here
 //
-	sprintf(lstatus,"%s",DEVSTATES[this->state]);
+	snprintf(lstatus, sizeof(status), "%s",DEVSTATES[this->state]);
 	*status = lstatus;
 	return(DS_OK);
 }

@@ -11,9 +11,9 @@
 
  Original   	: March 1991
 
- Version	: $Revision: 1.6 $
+ Version	: $Revision: 1.7 $
 
- Date		: $Date: 2003-12-08 14:23:32 $
+ Date		: $Date: 2004-02-11 10:07:21 $
 
  Copyright (c) 1990-2002 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -872,8 +872,7 @@ int APIENTRY WinMain(
 
 	if(gArgc < 2) {
 		char msg[1024];
-/*		sprintf (msg,"usage :  %s personal_name [-m] [-s]\n",gszAppName);*/
-		sprintf (msg,"usage :  %s personal_name [-nodb] [-pn number] [-device device1 ...]\n",gszAppName);
+		snprintf (msg, sizeof(msg), "usage :  %s personal_name [-nodb] [-pn number] [-device device1 ...]\n",gszAppName);
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
 		return(FALSE);
 	}
