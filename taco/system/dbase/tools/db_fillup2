@@ -11,9 +11,9 @@
 # Author(s):	Jens Krueger
 #		$Author: jkrueger1 $
 #
-# Date:		$Date: 2004-04-29 11:02:31 $
+# Date:		$Date: 2004-07-09 08:32:33 $
 #
-# Version:	$Revision: 1.1 $
+# Version:	$Revision: 1.2 $
 #
 # Copyright (c) 2004, FRM-II, TU Munich, Germany
 #
@@ -23,12 +23,13 @@ if test -z "$RES_BASE_DIR" ; then
 fi
 for i in `ls -R1p $RES_BASE_DIR | grep -v '/$' | grep -v '^$'`; do
 	if echo $i | grep ':$' >/dev/null ; then
-		dir=`basename ${i%:}`
+		dir=`echo ${i} | sed -e 's/:$//'`
+		dir=`basename ${dir}`
 		continue
 	fi
-	if ! db_update $dir/$i ; then
-		echo ERROR during update the $RES_BASE_DIR/$dir/$i resource file.
-	else
+	if { db_update $dir/$i ; } ; then
 		echo Resources sucessfully imported from : $RES_BASE_DIR/$dir/$i 
+	else
+		echo ERROR during update the $RES_BASE_DIR/$dir/$i resource file.
 	fi
 done
