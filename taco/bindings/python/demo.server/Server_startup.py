@@ -10,8 +10,8 @@ def start():
 	#
 	# Create two device objects
 	#
-	x=MyServer.MyServer ('mp/python/test1')
-	y=MyServer.MyServer ('mp/python/test2')
+	x=MyServer.MyServer ('test/python/test1')
+	y=MyServer.MyServer ('test/python/test2')
 
 	#
 	# Put the two objects to be exported 
@@ -25,11 +25,11 @@ def start():
 	#
 	# With a device server definition in the resource 
 	# database as:
-	# Python/test/device:	id/python/test1 \
-	#			id/python/test2
+	# Python/test/device:	test/python/test1 \
+	#			test/python/test2
 	#	
 	# 
-	TacoServer.server_startup (dev, process_name='Python', server_name='test')
+	TacoServer.server_startup(dev, process_name='Python', server_name='test')
 
 if __name__ == "__main__":
 	start()
