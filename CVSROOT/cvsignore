@@ -8,3 +8,4 @@ Makefile.in
 *.la
 *.tar.gz
 *.tar.bz2
+*.backup
