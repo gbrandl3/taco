@@ -12,10 +12,10 @@
  Original:      July 1993
 
 
- $Revision: 1.1 $
- $Date: 2003-04-25 11:21:24 $
+ $Revision: 1.2 $
+ $Date: 2004-11-03 14:46:57 $
 
- $Author: jkrueger1 $
+ $Author: andy_gotz $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -109,5 +109,23 @@
 #define DevHookBase   (BlcTeamNumber + DS_LSHIFT(40, DS_IDENT_SHIFT))
 /*------- FIDL device server -------*/
 #define DevFidlBase   (BlcTeamNumber + DS_LSHIFT(41, DS_IDENT_SHIFT))
+/*------- Simulator device server -------*/
+#define DevSimulatorBase   (BlcTeamNumber + DS_LSHIFT(42, DS_IDENT_SHIFT))
+/*------- Plot device server -------*/
+#define DevPlotBase   (BlcTeamNumber + DS_LSHIFT(43, DS_IDENT_SHIFT))
+/*------- Fitem device server -------*/
+#define DevFitemBase   (BlcTeamNumber + DS_LSHIFT(44, DS_IDENT_SHIFT))
+/*------- Relay device server -------*/
+#define DevRelayBase   (BlcTeamNumber + DS_LSHIFT(45, DS_IDENT_SHIFT))
+/*------- Mpa3 device server -------*/
+#define DevMpa3Base   (BlcTeamNumber + DS_LSHIFT(46, DS_IDENT_SHIFT))
+/*------- Wago device server -------*/
+#define DevWcBase   (BlcTeamNumber + DS_LSHIFT(47, DS_IDENT_SHIFT))
+/*------- Flex Correlator device server -------*/
+#define DevFlexBase   (BlcTeamNumber + DS_LSHIFT(48, DS_IDENT_SHIFT))
+/*------- Image input output device server -------*/
+#define DevImageIO   (BlcTeamNumber + DS_LSHIFT(49, DS_IDENT_SHIFT))
+/*------- Generic Python server -------*/
+#define DevPythonBase   (BlcTeamNumber + DS_LSHIFT(50, DS_IDENT_SHIFT))
 
 #endif	/* _BlcDsNumbers_h */
