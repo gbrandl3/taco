@@ -125,7 +125,7 @@ AC_DEFUN(TACO_CHECK_TACO_SYSTEM,
     	AC_REQUIRE([AC_CANONICAL_SYSTEM])
     	taco_install_path=""
     	case "$target" in
-            i[[3456]]86-suse-linux|i[[3456]]86-*-linux-*)
+            i[[3456]]86-*-linux|i[[3456]]86-*-linux-*|i[[3456]]-*-cygwin*)
                         taco_config="unix=1 __unix=1 linux=1 x86=1"
 			taco_install_path="linux/x86" ;;
             m68k-*-linux-*) 
