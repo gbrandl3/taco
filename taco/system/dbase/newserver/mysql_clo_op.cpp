@@ -71,15 +71,9 @@ DevLong *MySQLServer::db_reopendb_1_svc(void)
 //
 // Open database tables according to the definition
 //
-    if ((mysql_conn = mysql_connect(&mysql, "localhost", mysql_user.c_str(), mysql_passwd.c_str())) == NULL)
+    if ((mysql_conn = mysql_real_connect(&mysql, "localhost", mysql_user.c_str(), mysql_passwd.c_str(), mysql_db.c_str(), 0, NULL, 0)) == NULL)
     {
         cerr << mysql_error(&mysql) << endl;
-	errcode = DbErr_DatabaseAccess;
-        return (&errcode);
-    }
-    if (mysql_select_db(mysql_conn, mysql_db.c_str()) != 0)
-    {
-        cerr << mysql_error(mysql_conn) << endl;
 	errcode = DbErr_DatabaseAccess;
         return (&errcode);
     }
