@@ -5,7 +5,7 @@ EXTRA_DIST 		= README Taco.pth h2py
 nodist_pyexec_PYTHON	= DEVCMDS.py DEVERRORS.py DEVSTATES.py DEV_XDR.py 
 pyexec_PYTHON		= ResDatabase.py TacoDevice.py TacoServer.py
 
-CLEANFILES 		= DEVCMDS.py DEVERRORS.py DEVSTATES.py DEV_XDR.py
+CLEANFILES 		= DEVCMDS.py DEVERRORS.py DEVSTATES.py DEV_XDR.py *.pyc *.pyo
 
 DEVCMDS.py:	$(top_srcdir)/lib/DevCmds.h
 	$(srcdir)/h2py $?
