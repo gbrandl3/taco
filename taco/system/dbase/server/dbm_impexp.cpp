@@ -818,8 +818,13 @@ int NdbmServer::db_store_3(db_devinfo_3 &dev_stu)
         		key.dptr != NULL;
 			key2 = key, key = gdbm_nextkey(dbgen.tid[0], key2), free(key2.dptr))
 		{
+			NdbmNamesKey  k(key);
 			NdbmNamesCont cont(dbgen.tid[0], key);	
-			if (cont.get_device_name() == dev_stu.dev_name)
+/*
+ * WARNING !!!
+ * This does not solve the problem of double device names in different servers
+ */
+			if (cont.get_device_name() == dev_stu.dev_name && k.get_ds_name() == dev_stu.proc_name)
 				break;
 		}
 		if (key.dptr == NULL)
