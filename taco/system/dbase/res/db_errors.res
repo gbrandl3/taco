@@ -1,5 +1,5 @@
 #
-#"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/system/dbase/res/db_errors.res,v 1.1 2003-04-25 12:54:17 jkrueger1 Exp $";
+#"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/system/dbase/res/db_errors.res,v 1.2 2004-03-10 14:14:29 jkrueger1 Exp $";
 #
 #/*+*******************************************************************
 #
@@ -27,7 +27,7 @@ ERROR/0/0/405:	DbErr_MemoryFree
 ERROR/0/0/406:	"Client can't alloc Memory."
 ERROR/0/0/407:	"Database server can't allocate memory."
 ERROR/0/0/408:	"This domain is not defined in database."
-ERROR/0/0/408:	"This resource is not defined."
+ERROR/0/0/409:	"This resource is not defined."
 ERROR/0/0/410:	"This device server is not defined."
 ERROR/0/0/411:	"Too many devices for server defined."
 ERROR/0/0/412:	"This device is not defined."
