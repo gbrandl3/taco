@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0-rc2, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.20 $)dnl
+AC_REVISION($Revision: 1.21 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -209,9 +209,9 @@ AC_CONFIG_FILES(bindings/python/Makefile
 
 AC_CONFIG_FILES(bindings/Makefile bindings/tcl/Makefile)
 
-AC_CONFIG_FILES(bindings/labview/Makefile
-		bindings/labview/client/Makefile
-		bindings/labview/server/Makefile)
+dnl AC_CONFIG_FILES(bindings/labview/Makefile
+dnl 		bindings/labview/client/Makefile
+dnl 		bindings/labview/server/Makefile)
 
 dnl Initialize the test suite
 AC_CONFIG_TESTDIR(tests)
