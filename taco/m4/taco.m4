@@ -257,7 +257,6 @@ dnl
 	TACO_CHECK_TACO([$1])
 
 	AM_MAINTAINER_MODE
-dnl	ACLOCAL="$ACLOCAL -I ${DSHOME:-/usr/local/dshome2}/m4"
     ]
 )
 
