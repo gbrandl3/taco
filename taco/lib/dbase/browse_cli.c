@@ -14,9 +14,9 @@
 
  Original   :   December 1997
 
- Version    :	$Revision: 1.1 $
+ Version    :	$Revision: 1.2 $
 
- Date	    :	$Date: 2003-04-25 11:21:42 $
+ Date	    :	$Date: 2003-05-16 13:40:27 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -82,7 +82,7 @@ static struct timeval timeout_browse={60,0};
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To retrieve the list of devices  domain  name
  * 
  * @param p_domain_nb 	Pointer for domain number
@@ -264,7 +264,7 @@ long db_getdevdomainlist(long *p_domain_nb,char ***ppp_list,long *p_error)
 
 
 
-/**
+/**@ingroup dbaseAPI
  * 
  * To retrieve the list of devices family name when the domain name is known
  * 
@@ -469,7 +469,7 @@ long db_getdevfamilylist(char *domain,long *p_family_nb,char ***ppp_list,long *p
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To retrieve the list of devices member name when the domain and family names are known
  *
  * @param domain 	The domain name
@@ -700,7 +700,7 @@ long db_getdevmemberlist(char *domain,char *family,long *p_member_nb,
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To retrieve the list of resources  domain  name
  * 
  * @param p_domain_nb : Pointer for domain number
@@ -880,7 +880,7 @@ long db_getresdomainlist(long *p_domain_nb,char ***ppp_list,long *p_error)
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To retrieve the list of resources family name when the domain name is known
  *
  * @param domain 	The domain name
@@ -1083,7 +1083,7 @@ long db_getresfamilylist(char *domain,long *p_family_nb,char ***ppp_list,long *p
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To retrieve the list of resources member name when the domain and family names are known
  *
  * @param domain 	The domain name
@@ -1320,7 +1320,7 @@ long db_getresmemberlist(char *domain,char *family,long *p_member_nb, \
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To retrieve the list of resources name when the domain, family and member names are known
  *
  * @param domain  	The domain name
@@ -1576,7 +1576,7 @@ long db_getresresolist(char *domain,char *family,char *member, \
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To retrieve resource value when domain,family,member
  * and resource name are provided. Member and/or resource
  * names can be the wildcard "*". Resources are returned
@@ -1876,7 +1876,7 @@ long db_getresresoval(char *domain,char *family,char *member,char *resource, \
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To retrieve the list of devices server
  * 
  * @param p_server_nb  	Pointer for server number returned
@@ -2055,7 +2055,7 @@ long db_getdsserverlist(long *p_server_nb,char ***ppp_list,long *p_error)
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To retrieve the list of devices server personal name when the device server name is known
  * 
  * @param server 	The device server name
@@ -2258,7 +2258,7 @@ long db_getdspersnamelist(char *server,long *p_pers_nb,char ***ppp_list,long *p_
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To retrieve the list of host where device server should run
  *
  * @param p_host_nb  	Pointer for host number returned
@@ -2437,7 +2437,7 @@ long db_gethostlist(long *p_host_nb,char ***ppp_list,long *p_error)
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To a list of device server which should run on a host
  *
  * @param host  	The host name

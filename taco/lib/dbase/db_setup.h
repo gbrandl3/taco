@@ -1,15 +1,22 @@
- /*
- Author:	$Author: jkrueger1 $
+/*
+ * Author:	$Author: jkrueger1 $
+ * 
+ * Version:	$Revision: 1.2 $
+ *
+ * Date:		$Date: 2003-05-16 13:40:27 $
+ *
+ * Copyright (c) 1990 by European Synchrotron Radiation Facility,
+ *                       Grenoble, France
+ *  
+ */
 
- Version:	$Revision: 1.1 $
+/**@defgroup API
+ */
 
- Date:		$Date: 2003-04-25 11:21:42 $
-
- Copyright (c) 1990 by European Synchrotron Radiation Facility,
-                       Grenoble, France
-  
-  */
-
+/**@defgroup dbaseAPI	Database API
+ * @ingroup API
+ * Functions to access to the TACO database.
+ */
 #ifndef _db_setup_h
 #define _db_setup_h
 

@@ -13,9 +13,9 @@
 
  Original   :   September 1998
   
- Version    :	$Revision: 1.1 $
+ Version    :	$Revision: 1.2 $
 
- Date	    : 	$Date: 2003-04-25 11:21:42 $
+ Date	    : 	$Date: 2003-05-16 13:40:27 $
 
  Copyright (c) 1998 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -69,28 +69,21 @@ extern nethost_info *multi_nethost;
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for to_reconnection function                           *
-*                        ---------------                                    *
-*                                                                           *
-*    Function rule : To do automatic reconnection with the database server  *
-*		     if it has been killed or restarted.		    *
-*                                                                           *
-*    Argin : - A pointer to the data to pass to the server	   	    *	
-*	     - A double pointer to the place where the result should be     *
-*	       stored							    *
-*	     - The client handle					    *
-*	     - The type of call						    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 and clears the error code if the reconnection  *
-*    was successful. Otherwise, the function returns -1 and set the error   *
-*    code.								    *
-*                                                                           *
-****************************************************************************/
-
+/**@ingroup dbaseAPI
+ * To do automatic reconnection with the database server
+ * if it has been killed or restarted.		
+ *
+ * @param p_data	A pointer to the data to pass to the server	
+ * @param pp_resul	A double pointer to the place where the result should be stored							
+ * @param client	The client handle
+ * @param call_type	The type of call
+ * @param nethost_index
+ * @param connect_type
+ * @param error		The error code in case of failure
+ *
+ * @return   This function returns DS_OK and clears the error code if the reconnection
+ *    was successful. Otherwise, the function returns DS_NOTOK and set the error code.								
+ */
 int to_reconnection(void *p_data,void **pp_result,CLIENT **client,
 		    int call_type,long nethost_index,
 		    long connect_type,long *error)

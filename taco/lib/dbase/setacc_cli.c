@@ -13,9 +13,9 @@
 
  Original   :   January 1991
 
- Version    :	$Revision: 1.2 $
+ Version    :	$Revision: 1.3 $
 
- Date       :	$Date: 2003-05-09 06:33:50 $
+ Date       :	$Date: 2003-05-16 13:40:27 $
  
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -110,7 +110,7 @@ static int host_addr;
 extern nethost_info *multi_nethost;
 
 
-/**
+/**@ingroup dbaseAPI
  * To retrieve a resource value. The resource value is stored as a atring in a 
  * database on a remote computer
  *
@@ -123,41 +123,46 @@ extern nethost_info *multi_nethost;
  * @return  	 In case of trouble, the function returns DS_NOTOK and set the err varaible
  *    		pointed to by "perr". Otherwise, the function returns DS_OK
  */
-int _DLLFunc db_getresource(char *dev_name, Db_resource res, 
-			    u_int res_num,long *perr)
+int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long *perr)
 {
-	db_res *recev;
-	arr1 send;
-	int i,j,k,l,ctr;
-	int tcp_used = 0;
-	short tmp_short;
-	char numb[SIZE_A];
-	char *char_ptr;
-	short *short_ptr;
-	long *long_ptr;
-	float *float_ptr;
-	double *double_ptr;
-	char **str_ptr;
-	char *ptrc;
-	char *ptra;
-	u_int diff;
-	register char *temp,*tmp;
-	CLIENT *tcp_cl;
-	int tcp_so;
-	long error;
-	long i_nethost;
-	char nethost[40];
-long try_reconnect = False;
+	db_res		*recev;
+	arr1 		send;
+	int 		i,
+			j,
+			k,
+			l,
+			ctr,
+			tcp_used = 0;
+	short 		tmp_short,
+			*short_ptr;
+	char 		numb[SIZE_A],
+			*char_ptr;
+	long 		*long_ptr;
+	float 		*float_ptr;
+	double 		*double_ptr;
+	char 		**str_ptr,
+			*ptrc,
+			*ptra;
+	u_int 		diff;
+	register char 	*temp,
+			*tmp;
+	CLIENT 		*tcp_cl;
+	int 		tcp_so;
+	long 		error;
+	long 		i_nethost;
+	char 		nethost[40];
+	long 		try_reconnect = False;
 #ifndef _OSK
-	struct timeval tout;
+	struct timeval 	tout;
 #endif
 #ifdef ALONE
-	char *serv_name = ALONE_SERVER_HOST;
+	char 		*serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-/* Try to verify the function parameters (non NULL pointer and two \
-   characters in device name) */
-
+/* 
+ * Try to verify the function parameters (non NULL pointer and two 
+ *  characters in device name) 
+ */
 	if (config_flags.no_database)
 	{
 		*perr = DbErr_NoDatabase;
@@ -179,42 +184,30 @@ long try_reconnect = False;
 		}
 	}
 
-/* Check if device name follows naming conventions. If the nethost is specified,
-   checks syntax. If it is not specified, only count the / number */
-
+/* 
+ * Check if device name follows naming conventions. If the nethost is specified,
+ * checks syntax. If it is not specified, only count the / number 
+ */
+	l = 0;
+	NB_CHAR(l, dev_name, '/');
 	if (dev_name[0] == '/')
 	{
-		l = 0;
-		NB_CHAR(l,dev_name,'/');
-		if (l != 5)
+		if ((l != 5) || (dev_name[1] != '/'))
 		{
 			*perr = DbErr_BadParameters;
 			return(DS_NOTOK);
 		}
-		else
-		{
-			if (dev_name[1] != '/')
-			{
-				*perr = DbErr_BadParameters;
-				return(DS_NOTOK);
-			}
-		}
 	}
-	else
+	else if (l != 2)
 	{
-		l = 0;
-		NB_CHAR(l,dev_name,'/');
-		if (l != 2)
-		{
-			*perr = DbErr_BadParameters;
-			return(DS_NOTOK);
-		}
+		*perr = DbErr_BadParameters;
+		return(DS_NOTOK);
 	}
-
 
 #ifdef ALONE
-/* Create RPC connection if it's the first call */
-
+/* 
+ * Create RPC connection if it's the first call 
+ */
 	if (!first)
 	{
 		cl = clnt_create(serv_name,DB_SETUPPROG,DB_VERS_3,"udp");
@@ -232,79 +225,72 @@ long try_reconnect = False;
 /*
  * find out which nethost has been requested for this device
  */
-	if ((i_nethost = get_i_nethost_by_device_name(dev_name,perr)) < DS_OK)
+	if ((i_nethost = get_i_nethost_by_device_name(dev_name,perr)) < 0)
 	{
-
-/* The nethost is not imported, extract nethost name and import it */
-
-		strcpy(nethost,dev_name + 2);
-		for (i = 0;i < (int)strlen(nethost);i++)
-		{
+/* 
+ * The nethost is not imported, extract nethost name and import it 
+ */
+		strncpy(nethost, dev_name + 2, sizeof(nethost));
+		for (i = 0; i < (int)strlen(nethost); i++)
 			if (nethost[i] == '/')
 			{
 				nethost[i] = 0;
 				break;
 			}
-		}
-
-/* The specified nethost is not in the list of imorted nethosts, therefore 
-   call setup_config_multi() to add it */
-
+/* 
+ * The specified nethost is not in the list of imorted nethosts, therefore 
+ * call setup_config_multi() to add it 
+ */
 		if (setup_config_multi(nethost,perr) != DS_OK)
 			return(DS_NOTOK);
-
-/* Find where the nethost is in the multi-nethost array */
-
+/* 
+ * Find where the nethost is in the multi-nethost array 
+ */
 		i_nethost = get_i_nethost_by_name(nethost,perr);
 	}
-
-/* If the RPC connection to the database server is not built, build one.
-   The "config_flags" variable is defined as global by the device server
-   API library. If the db_import failed, clear the configuration flag
-   in order to recall the manager for database server RPC parameter at the
-   next db_import (for reconnection) */
-
+/* 
+ * If the RPC connection to the database server is not built, build one.
+ * The "config_flags" variable is defined as global by the device server
+ * API library. If the db_import failed, clear the configuration flag
+ * in order to recall the manager for database server RPC parameter at the
+ * next db_import (for reconnection) 
+ */
 	if (i_nethost == 0)
 	{
-		if (config_flags.database_server != True)
+		if ((config_flags.database_server != True) && db_import(&error))
 		{
-			if (db_import(&error))
-			{
-				config_flags.configuration = False;
-				*perr = DbErr_CannotCreateClientHandle;
-				return(DS_NOTOK);
-			}
+			config_flags.configuration = False;
+			*perr = DbErr_CannotCreateClientHandle;
+			return(DS_NOTOK);
 		}
 	}
 	else
 	{
-		if (multi_nethost[i_nethost].config_flags.database_server != True)
+		if ((multi_nethost[i_nethost].config_flags.database_server != True)
+			&& db_import_multi(multi_nethost[i_nethost].nethost,&error))
 		{
-			if (db_import_multi(multi_nethost[i_nethost].nethost,&error))
-			{
-				multi_nethost[i_nethost].config_flags.configuration = False;
-				*perr = DbErr_CannotCreateClientHandle;
-				return(DS_NOTOK);
-			}
+			multi_nethost[i_nethost].config_flags.configuration = False;
+			*perr = DbErr_CannotCreateClientHandle;
+			return(DS_NOTOK);
 		}
 	}
 	dev_name = extract_device_name(dev_name,perr);
 
 #endif /* ALONE */
-
-/* Allocate memory for the array of pointeur to char */
-
+/* 
+ * Allocate memory for the array of pointeur to char 
+ */
 	if((send.arr1_val = (nam *)calloc(res_num,sizeof(nam))) == NULL)
 	{
 		*perr = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-
-/* Build the full resource name (in lowercase letters) and initialize the array
-  of pointer to resource name */
-
+/* 
+ * Build the full resource name (in lowercase letters) and initialize the array
+ * of pointer to resource name 
+ */
 	k = strlen(dev_name);
-	for (i=0;i<(int)res_num;i++)
+	for ( i = 0; i < (int)res_num; i++)
 	{
 		l = strlen(res[i].resource_name);
 		if ((send.arr1_val[i] = (nam)malloc(k + l + 2)) == NULL)
@@ -322,16 +308,18 @@ long try_reconnect = False;
 		strcat(send.arr1_val[i],res[i].resource_name);
 
 		l = strlen(send.arr1_val[i]);
-		for (j=0;j<l;j++)
+		for (j = 0; j < l; j++)
 			send.arr1_val[i][j] = tolower(send.arr1_val[i][j]);
 	}
 
-/* Initialize the structure sended to server */
-
+/* 
+ * Initialize the structure sended to server 
+ */
 	send.arr1_len = res_num;
 
-/* Call server */
-
+/* 
+ * Call server 
+ */
 #ifdef ALONE
 	recev = db_getres_1(&send,cl,&error);
 #else
@@ -341,8 +329,9 @@ long try_reconnect = False;
 		recev = db_getres_1(&send,multi_nethost[i_nethost].db_info->clnt,&error);
 #endif /* ALONE */
 
-/* Any problem with server ? */
-
+/* 
+ * Any problem with server ? 
+ */
 	if(recev == NULL)
 	{
 		if (error == DevErr_RPCTimedOut || error == DbErr_RPCreception)
@@ -351,43 +340,35 @@ long try_reconnect = False;
 			to_reconnection((void *)&send,(void **)&recev,&cl,(int)DB_GETRES,0,DB_UDP,&error);
 #else
 			if (i_nethost == 0)
-			{
-				to_reconnection((void *)&send,(void **)&recev,
-				   		 &db_info.conf->clnt,
-						 (int)DB_GETRES,i_nethost,
-				   		 DB_UDP,&error);
-			}
+				to_reconnection((void *)&send,(void **)&recev, &db_info.conf->clnt,
+						 (int)DB_GETRES,i_nethost, DB_UDP,&error);
 			else
-			{
-				to_reconnection((void *)&send,(void **)&recev,
-			 	       &multi_nethost[i_nethost].db_info->clnt,
-				       (int)DB_GETRES,i_nethost,DB_UDP,&error);
-			}
+				to_reconnection((void *)&send,(void **)&recev, &multi_nethost[i_nethost].db_info->clnt,
+						(int)DB_GETRES,i_nethost,DB_UDP,&error);
 #endif /* ALONE */
 		}
 		if (error != DS_OK)
 		{
-			for (j=0;j<(int)res_num;j++)
+			for (j = 0; j < (int)res_num; j++)
 				free(send.arr1_val[j]);
 			free(send.arr1_val);
 			*perr = error;
 			return(DS_NOTOK);
 		}
 	}
-
-/* Any problems during database access ? */
-
+/* 
+ * Any problems during database access ? 
+ */
 	if(recev->db_err != DS_OK)
 	{
 		if (recev->db_err == DbErr_DatabaseNotConnected)
 		{
-
-/* If the server is not connected to the database (because a database update
-   is just going on), sleep a while (20 mS) and redo the call */
-
+/* 
+ * If the server is not connected to the database (because a database update
+ * is just going on), sleep a while (20 mS) and redo the call 
+ */
 			for (i = 0;i < RETRY;i++)
 			{
-
 #ifdef _OSK
 				tsleep(SLEEP_TIME);
 #else
@@ -399,19 +380,13 @@ long try_reconnect = False;
 				recev = db_getres_1(&send,cl,&error);
 #else
 				if (i_nethost == 0)
-				{
 					recev = db_getres_1(&send,db_info.conf->clnt,&error);
-				}
 				else
-				{
-					recev = db_getres_1(&send,
-					  multi_nethost[i_nethost].db_info->clnt,
-					  &error);
-				}
+					recev = db_getres_1(&send, multi_nethost[i_nethost].db_info->clnt, &error);
 #endif /* ALONE */
 				if(recev == NULL)
 				{
-					for (j=0;j<(int)res_num;j++)
+					for (j = 0; j < (int)res_num; j++)
 						free(send.arr1_val[j]);
 					free(send.arr1_val);
 					*perr = error;
@@ -423,22 +398,21 @@ long try_reconnect = False;
 		}
 		if (recev->db_err != DbErr_TooManyInfoForUDP)
 		{
-			for (j=0;j<(int)res_num;j++)
+			for (j = 0; j < (int)res_num; j++)
 				free(send.arr1_val[j]);
 			free(send.arr1_val);
 			*perr = recev->db_err;
 			return(DS_NOTOK);
 		}
-
-/* If the server answers that there is too many info to send for the UDP
-   protocol, create a TCP connection to the server and redo the call.
-   To be able to correctly close the TCP connection, we must know the 
-   socket number to close (the RPC function does not do this). So, instead
-   of the clnt_create function, we used the clnttcp_create function. */
-
+/* 
+ * If the server answers that there is too many info to send for the UDP
+ * protocol, create a TCP connection to the server and redo the call.
+ * To be able to correctly close the TCP connection, we must know the 
+ * socket number to close (the RPC function does not do this). So, instead
+ * of the clnt_create function, we used the clnttcp_create function. 
+ */
 		else
 		{
-
 			if (!first_tcp_call)
 			{
 #ifdef ALONE
@@ -467,19 +441,17 @@ long try_reconnect = False;
 				if (host_addr == 0)
 #endif /* !vxworks */
 				{
-					for (j=0;j<(int)res_num;j++)
+					for (j = 0; j < (int)res_num; j++)
 						free(send.arr1_val[j]);
 					free(send.arr1_val);
 					*perr = DbErr_CannotCreateClientHandle;
 					return(DS_NOTOK);
 				}
-
 				serv_adr.sin_family = AF_INET;
 #ifndef vxworks
 				memcpy((void *)(&serv_adr.sin_addr),ht->h_addr,(size_t)ht->h_length);
 #else  /* !vxworks */
-				memcpy((void *)(&serv_adr.sin_addr),(char*)&host_addr, 4
-);
+				memcpy((void *)(&serv_adr.sin_addr),(char*)&host_addr, 4);
 #endif /* !vxworks */
 				first_tcp_call = 1;
 			}
@@ -487,25 +459,16 @@ long try_reconnect = False;
 			serv_adr.sin_port = 0;
 			tcp_so = RPC_ANYSOCK;
 #ifdef ALONE
-			tcp_cl = clnttcp_create(&serv_adr,DB_SETUPPROG,
-						DB_VERS_3, &tcp_so,0,0);
+			tcp_cl = clnttcp_create(&serv_adr,DB_SETUPPROG, DB_VERS_3, &tcp_so,0,0);
 #else
 			if (i_nethost == 0)
-			{
-				tcp_cl = clnttcp_create(&serv_adr,
-					        db_info.conf->prog_number,
-					        DB_VERS_3,&tcp_so,0,0);
-			}
+				tcp_cl = clnttcp_create(&serv_adr, db_info.conf->prog_number, DB_VERS_3,&tcp_so,0,0);
 			else
-			{
-				tcp_cl = clnttcp_create(&serv_adr,
-					        multi_nethost[i_nethost].db_info->prog_number,
-					        DB_VERS_3,&tcp_so,0,0);
-			}
+				tcp_cl = clnttcp_create(&serv_adr, multi_nethost[i_nethost].db_info->prog_number, DB_VERS_3,&tcp_so,0,0);
 #endif /* ALONE */
 			if (tcp_cl == NULL)
 			{
-				for (j=0;j<(int)res_num;j++)
+				for (j = 0; j < (int)res_num; j++)
 					free(send.arr1_val[j]);
 				free(send.arr1_val);
 				*perr = DbErr_CannotCreateClientHandle;
@@ -514,9 +477,9 @@ long try_reconnect = False;
 
 			tcp_used = 1;
 			recev = db_getres_1(&send,tcp_cl,&error);
-
-/* Any problem with server ? */
-
+/* 
+ * Any problem with server ? 
+ */
 			if(recev == NULL)
 			{
 #ifndef _NT
@@ -525,7 +488,7 @@ long try_reconnect = False;
 				closesocket(tcp_so);
 #endif
 				clnt_destroy(tcp_cl);
-				for (j=0;j<(int)res_num;j++)
+				for (j = 0; j < (int)res_num; j++)
 					free(send.arr1_val[j]);
 				free(send.arr1_val);
 				*perr = error;
@@ -534,13 +497,12 @@ long try_reconnect = False;
 
 			if (recev->db_err == DbErr_DatabaseNotConnected)
 			{
-
-/* If the server is not connected to the database (because a database update
-   is just going on), sleep a while (20 mS) and redo the call */
-
+/* 
+ * If the server is not connected to the database (because a database update
+ * is just going on), sleep a while (20 mS) and redo the call 
+ */
 				for (i = 0;i < RETRY;i++)
 				{
-
 #ifdef _OSK
 					tsleep(SLEEP_TIME);
 #else
@@ -566,9 +528,9 @@ long try_reconnect = False;
 					if (recev->db_err == DS_OK || recev->db_err != DbErr_DatabaseNotConnected)
 						break;
 				}
-
-/* Any problems during database access ? */
-
+/* 
+ * Any problems during database access ? 
+ */
 				if(recev->db_err != DS_OK)
 				{
 #ifndef _NT
@@ -577,7 +539,7 @@ long try_reconnect = False;
 					closesocket(tcp_so);
 #endif
 					clnt_destroy(tcp_cl);
-					for (j=0;j<(int)res_num;j++)
+					for (j = 0; j < (int)res_num; j++)
 						free(send.arr1_val[j]);
 					free(send.arr1_val);
 					*perr = recev->db_err;
@@ -587,139 +549,125 @@ long try_reconnect = False;
 			}
 		}
 	}
-
-/* Return memory */
-
+/* 
+ * Return memory 
+ */
 	for (j=0;j<(int)res_num;j++)
 		free(send.arr1_val[j]);
 	free(send.arr1_val);
 
-/* Resources type conversion */
-
+/* 
+ * Resources type conversion 
+ */
 	for (i=0;i<(int)res_num;i++) 
 	{
 		ptrc = recev->res_val.arr1_val[i];
 		if (strcmp(ptrc,"N_DEF") == 0)
-		{
 			continue;
-		}
 		switch(res[i].resource_type)
 		{
-
-		case D_SHORT_TYPE :
-			if (ptrc[0] == '0' && ptrc[1] == 'x')
-			{
-				if (sscanf(&(ptrc[2]),"%hx",(short *)res[i].resource_adr) == -1)
+			case D_SHORT_TYPE :
+				if (ptrc[0] == '0' && ptrc[1] == 'x')
 				{
-					*perr = DbErr_BadResourceType;
+					if (sscanf(&(ptrc[2]),"%hx",(short *)res[i].resource_adr) == -1)
+					{
+						*perr = DbErr_BadResourceType;
+						return(DS_NOTOK);
+					}
+				}
+				else
+					*(short *)res[i].resource_adr = (short)atoi(ptrc);
+				break;
+
+			case D_USHORT_TYPE :
+				if (ptrc[0] == '0' && ptrc[1] == 'x')
+				{
+					if (sscanf(&(ptrc[2]),"%hx",(short *)res[i].resource_adr) == -1)
+					{
+						*perr = DbErr_BadResourceType;
+						return(DS_NOTOK);
+					}
+				}
+				else
+					*(unsigned short *)res[i].resource_adr = (unsigned short)atoi(ptrc);
+				break;
+
+			case D_LONG_TYPE :
+				if (ptrc[0] == '0' && ptrc[1] == 'x')
+				{
+					if (sscanf(&(ptrc[2]),"%x",(long *)res[i].resource_adr) == -1)
+					{
+						*perr = DbErr_BadResourceType;
+						return(DS_NOTOK);
+					}
+				}
+				else
+					*(long *)res[i].resource_adr = atol(ptrc);
+				break;
+
+			case D_ULONG_TYPE :
+				if (ptrc[0] == '0' && ptrc[1] == 'x')
+				{
+					if (sscanf(&(ptrc[2]),"%x",(long *)res[i].resource_adr) == -1)
+					{
+						*perr = DbErr_BadResourceType;
+						return(DS_NOTOK);
+					}
+				}
+				else
+					*(unsigned long *)res[i].resource_adr = atol(ptrc);
+				break;
+
+			case D_DOUBLE_TYPE :
+				*(double *)res[i].resource_adr = atof(ptrc);
+				break;
+
+			case D_FLOAT_TYPE :
+				*(float *)res[i].resource_adr = (float)atof(ptrc);
+				break;
+
+			case D_STRING_TYPE :
+				if((ptra = (char *)malloc(strlen(ptrc) + 1)) == NULL)
+				{
+					*perr = DbErr_ClientMemoryAllocation;
 					return(DS_NOTOK);
 				}
-			}
-			else
-			{
-				*(short *)res[i].resource_adr = (short)atoi(ptrc);
-			}
-			break;
 
-		case D_USHORT_TYPE :
-			if (ptrc[0] == '0' && ptrc[1] == 'x')
-			{
-				if (sscanf(&(ptrc[2]),"%hx",(short *)res[i].resource_adr) == -1)
+				strcpy(ptra,ptrc);
+				*(char **)res[i].resource_adr = ptra;
+				break;
+
+			case D_BOOLEAN_TYPE :
+				l = strlen(ptrc);
+				for (j = 0; j < l; j++)
+					ptrc[j] = tolower(ptrc[j]);
+
+				if (!strcmp("off",ptrc) || !strcmp("false",ptrc) || !strcmp("0",ptrc))
+					*(char *)res[i].resource_adr = FALSE;
+				else if (!strcmp("on",ptrc) || !strcmp("true",ptrc) || !strcmp("1",ptrc))
+					*(char *)res[i].resource_adr = TRUE;
+				else
 				{
-					*perr = DbErr_BadResourceType;
+					*perr = DbErr_BooleanResource;
 					return(DS_NOTOK);
-				}
-			}
-			else
-			{
-				*(unsigned short *)res[i].resource_adr = (unsigned short)atoi(ptrc);
-			}
-			break;
+				}	
+				break;
 
-		case D_LONG_TYPE :
-			if (ptrc[0] == '0' && ptrc[1] == 'x')
-			{
-				if (sscanf(&(ptrc[2]),"%x",(long *)res[i].resource_adr) == -1)
+			case D_VAR_CHARARR :
+/* 
+ * If the array has only one element, treat it has a single resource 
+ */
+				if (ptrc[0] != INIT_ARRAY)
 				{
-					*perr = DbErr_BadResourceType;
-					return(DS_NOTOK);
-				}
-			}
-			else
-			{
-				*(long *)res[i].resource_adr = atol(ptrc);
-			}
-			break;
-
-		case D_ULONG_TYPE :
-			if (ptrc[0] == '0' && ptrc[1] == 'x')
-			{
-				if (sscanf(&(ptrc[2]),"%x",(long *)res[i].resource_adr) == -1)
-				{
-					*perr = DbErr_BadResourceType;
-					return(DS_NOTOK);
-				}
-			}
-			else
-			{
-				*(unsigned long *)res[i].resource_adr = atol(ptrc);
-			}
-			break;
-
-		case D_DOUBLE_TYPE :
-			*(double *)res[i].resource_adr = atof(ptrc);
-			break;
-
-		case D_FLOAT_TYPE :
-			*(float *)res[i].resource_adr = (float)atof(ptrc);
-			break;
-
-		case D_STRING_TYPE :
-			if((ptra = (char *)malloc(strlen(ptrc) + 1)) == NULL)
-			{
-				*perr = DbErr_ClientMemoryAllocation;
-				return(DS_NOTOK);
-			}
-
-			strcpy(ptra,ptrc);
-			*(char **)res[i].resource_adr = ptra;
-			break;
-
-		case D_BOOLEAN_TYPE :
-			l = strlen(ptrc);
-			for (j=0;j<l;j++)
-				ptrc[j] = tolower(ptrc[j]);
-
-			if (!strcmp("off",ptrc) || !strcmp("false",ptrc) || !strcmp("0",ptrc))
-				*(char *)res[i].resource_adr = FALSE;
-
-			else if (!strcmp("on",ptrc) || !strcmp("true",ptrc) || !strcmp("1",ptrc))
-				*(char *)res[i].resource_adr = TRUE;
-
-			else
-			{
-				*perr = DbErr_BooleanResource;
-				return(DS_NOTOK);
-			}
-			break;
-
-		case D_VAR_CHARARR :
-
-/* If the array has only one element, treat it has a single resource */
-
-			if (ptrc[0] != INIT_ARRAY)
-			{
 #ifndef OSK
-				if ((char_ptr = (char *)malloc((size_t)sizeof(char))) == NULL)
-				{
+					if ((char_ptr = (char *)malloc((size_t)sizeof(char))) == NULL)
 #else
 					if ((char_ptr = (char *)malloc(sizeof(char))) == NULL)
-					{
 #endif /* OSK */
+					{
 						*perr = DbErr_ClientMemoryAllocation;
 						return(DS_NOTOK);
 					}
-
 					if (ptrc[0] == '0' && ptrc[1] == 'x')
 					{
 						if (sscanf(&(ptrc[2]),"%hx",&tmp_short) == -1)
@@ -730,19 +678,15 @@ long try_reconnect = False;
 						*char_ptr = (char)tmp_short;
 					}
 					else
-					{
 						*char_ptr = (char)atoi(ptrc);
-					}
-
 					((DevVarCharArray *)res[i].resource_adr)->sequence = char_ptr;
 					((DevVarCharArray *)res[i].resource_adr)->length = 1;
 				}
-
 				else
 				{
-
-/* Retrieve the array element number */
-
+/* 
+ * Retrieve the array element number 
+ */
 #ifndef OSK
 					tmp = (char *)strchr(ptrc,SEP_ELT);
 #else
@@ -755,17 +699,16 @@ long try_reconnect = False;
 
 #ifndef OSK
 					if ((char_ptr = (char *)calloc((size_t)(ctr + 1),(size_t)sizeof(char))) == NULL)
-					{
 #else
 					if ((char_ptr = (char *)calloc((ctr + 1),sizeof(char))) == NULL)
-					{
 #endif /* OSK */
+					{
 						*perr = DbErr_ClientMemoryAllocation;
 						return(DS_NOTOK);
 					}
-
-/* Convert each array element */
-
+/* 
+ * Convert each array element 
+ */
 					for (l=0;l<ctr;l++)
 					{
 #ifndef OSK
@@ -804,184 +747,201 @@ long try_reconnect = False;
 					((DevVarCharArray *)res[i].resource_adr)->sequence = char_ptr;
 					((DevVarCharArray *)res[i].resource_adr)->length = ctr + 1;
 				}
-			break;
+				break;
 
 			case D_VAR_SHORTARR :
-
-/* If the array has only one element, treat it as a single resource */
-
-				if (ptrc[0] != INIT_ARRAY) {
+/* 
+ * If the array has only one element, treat it as a single resource 
+ */
+				if (ptrc[0] != INIT_ARRAY) 
+				{
 #ifndef OSK
-				if ((short_ptr = (short *)malloc((size_t)sizeof(short))) == NULL) {
+					if ((short_ptr = (short *)malloc((size_t)sizeof(short))) == NULL) 
 #else
-				if ((short_ptr = (short *)malloc(sizeof(short))) == NULL) {
+					if ((short_ptr = (short *)malloc(sizeof(short))) == NULL) 
 #endif /* OSK */
-					*perr = DbErr_ClientMemoryAllocation;
-					return(DS_NOTOK);
-									}
-
-				if (ptrc[0] == '0' && ptrc[1] == 'x') {
-					if (sscanf(&(ptrc[2]),"%hx",short_ptr) == -1) {
-						*perr = DbErr_BadResourceType;
+					{
+						*perr = DbErr_ClientMemoryAllocation;
 						return(DS_NOTOK);
-							  }
-									}
-				else {
-					*short_ptr = (short)atoi(ptrc);
 					}
-
-				((DevVarShortArray *)res[i].resource_adr)->sequence = short_ptr;
-				((DevVarShortArray *)res[i].resource_adr)->length = 1;
-							}
-
-				else {
-
-/* Retrieve the array element number */
-
-#ifndef OSK
-				tmp = (char *)strchr(ptrc,SEP_ELT);
-#else
-				tmp = index(ptrc,SEP_ELT);
-#endif /* OSK */
-				diff = (u_int)(tmp++ - ptrc) - 1;
-				strncpy(numb,&ptrc[1],diff);
-				numb[diff] = 0;
-				ctr = (u_int)atoi(numb) - 1;
-
-#ifndef OSK
-				if ((short_ptr = (short *)calloc((size_t)(ctr + 1),(size_t)sizeof(short))) == NULL) {
-#else
-				if ((short_ptr = (short *)calloc((ctr + 1),sizeof(short))) == NULL) {
-#endif /* OSK */
-					*perr = DbErr_ClientMemoryAllocation;
-					return(DS_NOTOK);
-									}
-
-/* Convert each array element */
-
-				for (l=0;l<ctr;l++) {
-#ifndef OSK
-					temp = (char *)strchr(tmp,SEP_ELT);
-#else
-					temp = index(tmp,SEP_ELT);
-#endif /* OSK */
-					diff = (u_int)(temp++ - tmp);
-					strncpy(numb,tmp,diff);
-					numb[diff] = 0;
-					if (numb[0] == '0' && numb[1] == 'x') {
-						if (sscanf(&(numb[2]),"%hx",&(short_ptr[l])) == -1) {
+					if (ptrc[0] == '0' && ptrc[1] == 'x') 
+					{
+						if (sscanf(&(ptrc[2]),"%hx",short_ptr) == -1) 
+						{
 							*perr = DbErr_BadResourceType;
 							return(DS_NOTOK);
-						  }
-								    }
-					else
-						short_ptr[l] = (short)atoi(numb);
-					tmp = temp;
-							}
-				if (tmp[0] == '0' && tmp[1] == 'x') {
-					if (sscanf(&(tmp[2]),"%hx",&(short_ptr[l])) == -1) {
-						*perr = DbErr_BadResourceType;
-						return(DS_NOTOK);
-							  }
 						}
-				else 
-					short_ptr[l] = (short)atoi(tmp);
+					}
+					else 
+						*short_ptr = (short)atoi(ptrc);
 
-				((DevVarShortArray *)res[i].resource_adr)->sequence = short_ptr;
-				((DevVarShortArray *)res[i].resource_adr)->length = ctr + 1;
+					((DevVarShortArray *)res[i].resource_adr)->sequence = short_ptr;
+					((DevVarShortArray *)res[i].resource_adr)->length = 1;
+				}
+				else 
+				{
+/* 
+ * Retrieve the array element number 
+ */
+#ifndef OSK
+					tmp = (char *)strchr(ptrc,SEP_ELT);
+#else
+					tmp = index(ptrc,SEP_ELT);
+#endif /* OSK */
+					diff = (u_int)(tmp++ - ptrc) - 1;
+					strncpy(numb,&ptrc[1],diff);
+					numb[diff] = 0;
+					ctr = (u_int)atoi(numb) - 1;
+
+#ifndef OSK
+					if ((short_ptr = (short *)calloc((size_t)(ctr + 1),(size_t)sizeof(short))) == NULL) 
+#else
+					if ((short_ptr = (short *)calloc((ctr + 1),sizeof(short))) == NULL) 
+#endif /* OSK */
+					{
+						*perr = DbErr_ClientMemoryAllocation;
+						return(DS_NOTOK);
+					}
+/* 
+ * Convert each array element 
+ */
+					for (l = 0; l < ctr; l++) 
+					{
+#ifndef OSK
+						temp = (char *)strchr(tmp,SEP_ELT);
+#else
+						temp = index(tmp,SEP_ELT);
+#endif /* OSK */
+						diff = (u_int)(temp++ - tmp);
+						strncpy(numb,tmp,diff);
+						numb[diff] = 0;
+						if (numb[0] == '0' && numb[1] == 'x') 
+						{
+							if (sscanf(&(numb[2]),"%hx",&(short_ptr[l])) == -1) 
+							{
+								*perr = DbErr_BadResourceType;
+								return(DS_NOTOK);
+						  	}
+						}
+						else
+							short_ptr[l] = (short)atoi(numb);
+						tmp = temp;
+					}
+					if (tmp[0] == '0' && tmp[1] == 'x') 
+					{
+						if (sscanf(&(tmp[2]),"%hx",&(short_ptr[l])) == -1) 
+						{
+							*perr = DbErr_BadResourceType;
+							return(DS_NOTOK);
+						}
+					}
+					else 
+						short_ptr[l] = (short)atoi(tmp);
+
+					((DevVarShortArray *)res[i].resource_adr)->sequence = short_ptr;
+					((DevVarShortArray *)res[i].resource_adr)->length = ctr + 1;
 				}
 				break;
 
 			case D_VAR_LONGARR :
-
-/* If the array has only one element, treat it as a single resource */
-
-				if (ptrc[0] != INIT_ARRAY) {
+/* 
+ * If the array has only one element, treat it as a single resource 
+ */
+				if (ptrc[0] != INIT_ARRAY) 
+				{
 #ifndef OSK
-				if ((long_ptr = (long *)malloc((size_t)sizeof(long))) == NULL) {
+					if ((long_ptr = (long *)malloc((size_t)sizeof(long))) == NULL) 
 #else
-				if ((long_ptr = (long *)malloc(sizeof(long))) == NULL) {
+					if ((long_ptr = (long *)malloc(sizeof(long))) == NULL) 
 #endif /* OSK */
-					*perr = DbErr_ClientMemoryAllocation;
-					return(DS_NOTOK);
-									}
-
-				if (ptrc[0] == '0' && ptrc[1] == 'x') {
-					if (sscanf(&(ptrc[2]),"%x",long_ptr) == -1) {
-					*perr = DbErr_BadResourceType;
-					return(DS_NOTOK);
-						  }
-								}
-			    	else {
-					*long_ptr = atol(ptrc);
+					{
+						*perr = DbErr_ClientMemoryAllocation;
+						return(DS_NOTOK);
 					}
 
-				((DevVarLongArray *)res[i].resource_adr)->sequence = long_ptr;
-				((DevVarLongArray *)res[i].resource_adr)->length = 1;
-							}
-
-				else {
-
-/* Retrieve the array element number */
-
-#ifndef OSK
-				tmp = (char *)strchr(ptrc,SEP_ELT);
-#else
-				tmp = index(ptrc,SEP_ELT);
-#endif /* OSK */
-				diff = (u_int)(tmp++ - ptrc) - 1;
-				strncpy(numb,&ptrc[1],diff);
-				numb[diff] = 0;
-				ctr = (u_int)atoi(numb) - 1;
-
-#ifndef OSK
-				if ((long_ptr = (long *)calloc((size_t)(ctr + 1),(size_t)sizeof(long))) == NULL) {
-#else
-				if ((long_ptr = (long *)calloc((ctr + 1),sizeof(long))) == NULL) {
-#endif /* OSK */
-					*perr = DbErr_ClientMemoryAllocation;
-					return(DS_NOTOK);
-									}
-
-/* Convert each array element */
-
-				for (l=0;l<ctr;l++) {
-#ifndef OSK
-					temp = (char *)strchr(tmp,SEP_ELT);
-#else
-					temp = index(tmp,SEP_ELT);
-#endif /* OSK */
-					diff = (u_int)(temp++ - tmp);
-					strncpy(numb,tmp,diff);
-					numb[diff] = 0;
-					if (numb[0] == '0' && numb[1] == 'x') {
-						if (sscanf(&(numb[2]),"%lx",&(long_ptr[l])) == -1) {
-						*perr = DbErr_BadResourceType;
-						return(DS_NOTOK);
-							  }
-							}
-					else
-						long_ptr[l] = atol(numb);
-					tmp = temp;
-							}
-				if (tmp[0] == '0' && tmp[1] == 'x') {
-					if (sscanf(&(tmp[2]),"%lx",&(long_ptr[l])) == -1) {
-						*perr = DbErr_BadResourceType;
-						return(DS_NOTOK);
-							  }
+					if (ptrc[0] == '0' && ptrc[1] == 'x') 
+					{
+						if (sscanf(&(ptrc[2]),"%x",long_ptr) == -1) 
+						{
+							*perr = DbErr_BadResourceType;
+							return(DS_NOTOK);
 						}
-				else 
-					long_ptr[l] = atol(tmp);
-
-				((DevVarLongArray *)res[i].resource_adr)->sequence = long_ptr;
-				((DevVarLongArray *)res[i].resource_adr)->length = ctr + 1;
 					}
+			    		else 
+						*long_ptr = atol(ptrc);
+
+					((DevVarLongArray *)res[i].resource_adr)->sequence = long_ptr;
+					((DevVarLongArray *)res[i].resource_adr)->length = 1;
+				}
+				else 
+				{
+/* 
+ * Retrieve the array element number 
+ */
+#ifndef OSK
+					tmp = (char *)strchr(ptrc,SEP_ELT);
+#else
+					tmp = index(ptrc,SEP_ELT);
+#endif /* OSK */
+					diff = (u_int)(tmp++ - ptrc) - 1;
+					strncpy(numb,&ptrc[1],diff);
+					numb[diff] = 0;
+					ctr = (u_int)atoi(numb) - 1;
+
+#ifndef OSK
+					if ((long_ptr = (long *)calloc((size_t)(ctr + 1),(size_t)sizeof(long))) == NULL) 
+#else
+					if ((long_ptr = (long *)calloc((ctr + 1),sizeof(long))) == NULL) 
+#endif /* OSK */
+					{
+						*perr = DbErr_ClientMemoryAllocation;
+						return(DS_NOTOK);
+					}
+/* 
+ * Convert each array element 
+ */
+					for (l = 0; l < ctr; l++) 
+					{
+#ifndef OSK
+						temp = (char *)strchr(tmp,SEP_ELT);
+#else
+						temp = index(tmp,SEP_ELT);
+#endif /* OSK */
+						diff = (u_int)(temp++ - tmp);
+						strncpy(numb,tmp,diff);
+						numb[diff] = 0;
+						if (numb[0] == '0' && numb[1] == 'x') 
+						{
+							if (sscanf(&(numb[2]),"%lx",&(long_ptr[l])) == -1) 
+							{
+								*perr = DbErr_BadResourceType;
+								return(DS_NOTOK);
+							}
+						}
+						else
+							long_ptr[l] = atol(numb);
+						tmp = temp;
+					}
+					if (tmp[0] == '0' && tmp[1] == 'x') 
+					{
+						if (sscanf(&(tmp[2]),"%lx",&(long_ptr[l])) == -1) 
+						{
+							*perr = DbErr_BadResourceType;
+							return(DS_NOTOK);
+						}
+					}
+					else 
+						long_ptr[l] = atol(tmp);
+
+					((DevVarLongArray *)res[i].resource_adr)->sequence = long_ptr;
+					((DevVarLongArray *)res[i].resource_adr)->length = ctr + 1;
+				}
 				break;
 
 			case D_VAR_DOUBLEARR :
-
-/* If the array has only one element, treat it as a single resource */
-
+/* 
+ * If the array has only one element, treat it as a single resource 
+ */
 				if (ptrc[0] != INIT_ARRAY) 
 				{
 #ifndef OSK
@@ -1046,7 +1006,9 @@ long try_reconnect = False;
 				break;
 
 			case D_VAR_FLOATARR :
-/* If the array has only one element, treat it as a single resource */
+/* 
+ * If the array has only one element, treat it as a single resource 
+ */
 				if (ptrc[0] != INIT_ARRAY) 
 				{
 #ifndef OSK
@@ -1136,7 +1098,9 @@ long try_reconnect = False;
 				}
 				else 
 				{
-/* Retrieve the array element number */
+/* 
+ * Retrieve the array element number 
+ */
 #ifndef OSK
 					tmp = (char *)strchr(ptrc,SEP_ELT);
 #else
@@ -1147,8 +1111,9 @@ long try_reconnect = False;
 					numb[diff] = 0;
 					ctr = (u_int)atoi(numb) - 1;
 
-/* Allocate memory for the array of pointer to strings */
-
+/* 
+ * Allocate memory for the array of pointer to strings 
+ */
 #ifndef OSK
 					if ((str_ptr = (char **)calloc((size_t)(ctr + 1),(size_t)sizeof(char *))) == NULL) 
 #else
@@ -1159,9 +1124,10 @@ long try_reconnect = False;
 						return(DS_NOTOK);
 					}
 
-/* Convert each array element */
-
-					for (l=0;l<ctr;l++) 
+/* 
+ * Convert each array element 
+ */
+					for (l = 0; l < ctr; l++) 
 					{
 #ifndef OSK
 						temp = (char *)strchr(tmp,SEP_ELT);
@@ -1171,8 +1137,8 @@ long try_reconnect = False;
 						diff = (u_int)(temp++ - tmp);
 						if ((str_ptr[l] = (char *)malloc(diff + 1)) == NULL) 
 						{
-							for(k=0;k<l;k++)
-							free(str_ptr[k]);
+							for(k = 0; k < l; k++)
+								free(str_ptr[k]);
 							free(str_ptr);
 							*perr = DbErr_ClientMemoryAllocation;
 							return(DS_NOTOK);
@@ -1197,10 +1163,10 @@ long try_reconnect = False;
 				break;
 		}
 	}
-
-/* Return memory allocated by XDR routines. If the TCP connection has been
-   used, close the associated socket and destroy the RPC connection. */
-
+/* 
+ * Return memory allocated by XDR routines. If the TCP connection has been
+ * used, close the associated socket and destroy the RPC connection. 
+ */
 	if (tcp_used == 1)
 	{
 		if (!clnt_freeres(tcp_cl,(xdrproc_t)xdr_db_res,(char *)recev))
@@ -1243,8 +1209,9 @@ long try_reconnect = False;
 #endif /* ALONE */
 	}
 
-/* No error */
-
+/* 
+ * No error 
+ */
 	*perr = DS_OK;
 	return(DS_OK);
 
@@ -1252,27 +1219,19 @@ long try_reconnect = False;
  
 
 
-/****************************************************************************
-*                                                                           *
-*		db_putresource function code                                *
-*               --------------                                              *
-*                                                                           *
-*    Function rule : To update or insert a resource value. The resource     *
-*                    value is stored as a string in a database on a remote  *
-*                    computer                                               *
-*                                                                           *
-*    Argins : - A pointer to a string which defines the device name         *
-*             - A pointer to an array of db_resource structure defining the *
-*               resources to be updated or inserted                         *
-*             - The number of resource to be retrieved                      *
-*                                                                           *
-*    Argout : - The error code if any                                       *
-*                                                                           *
-*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns DS_OK                *
-*                                                                           *
-*****************************************************************************/
-
+/**@ingroup dbaseAPI
+ * To update or insert a resource value. The resource 
+ * value is stored as a string in a database on a remote computer
+ * 
+ * @param dev_name 	a string which defines the device name
+ * @param res      	A pointer to an array of db_resource structure defining the 
+ *                 	resources to be updated or inserted
+ * @param res_num  	The number of resource to be retrieved 
+ * @param perr		The error code if any
+ *
+ * @return In case of trouble, the function returns DS_NOTOK and set the err variable
+ *    	 pointed to by "perr". Otherwise, the function returns DS_OK 
+ */
 int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long *perr)
 {
 	int i,j,k,k1,l;
@@ -2262,27 +2221,20 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_delresource function code                                *
-*               --------------                                              *
-*                                                                           *
-*    Function rule : To delete resources. The resource value is    	    *
-*                    stored as a atring in a database on a remote           *
-*                    computer                                               *
-*                                                                           *
-*    Argins : - A pointer to a string which defines the device name         *
-*             - A pointer to an array of string defining the 		    *
-*               resource to be deleted                                      *
-*             - The number of resource to be deleted                        *
-*                                                                           *
-*    Argout : - The error code if any                                       *
-*                                                                           *
-*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns DS_OK                *
-*                                                                           *
-*****************************************************************************/
-
+/*
+ * To delete resources. The resource value is stored as a atring in a 
+ * database on a remote computer
+ *
+ * @param dev_name	a string which defines the device name
+ * @param res_name      an array of string defining the resource to be deleted
+ * @param res_num       The number of resource to be deleted
+ * @param perr 		The error code if any
+ *
+ * @return  In case of trouble, the function returns DS_NOTOK and set the err variable
+ *    		pointed to by "perr". Otherwise, the function returns DS_OK
+ *
+ * @see db_delreslist
+ */
 int _DLLFunc db_delresource(char *dev_name,char **res_name,u_int res_num,long *perr)
 {
 	int i,j,k,l;
@@ -2499,30 +2451,24 @@ int _DLLFunc db_delresource(char *dev_name,char **res_name,u_int res_num,long *p
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_delreslist function code                                 *
-*               -------------                                               *
-*                                                                           *
-*    Function rule : To delete resources. The resource value is    	    *
-*                    stored as a atring in a database on a remote           *
-*                    computer                                               *
-*                                                                           *
-*    Argins : - A pointer to an array of string defining the 		    *
-*               resource to be deleted                                      *
-*             - The number of resource to be deleted                        *
-*                                                                           *
-*    Argout : - The error code if any                                       *
-*                                                                           *
-*    It is not the same call than the previous one because the resource name*
-*    are given here with the following syntax :				    *
-*		domain/family/member/r_name				    *
-*									    *
-*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns DS_OK                *
-*                                                                           *
-*****************************************************************************/
-
+/**@ingroup dbaseAPI
+ * To delete resources. The resource value is  stored as a atring in a 
+ * database on a remote computer
+ *
+ * It is not the same call than the db_delresource because the resource name
+ * are given here with the following syntax :
+ *				
+ *		domain/family/member/r_name				
+ *
+ * @param res_list 	an array of string defining the resource to be deleted
+ * @param res_num  	The number of resource to be deleted
+ * @param perr		The error code if any
+ *
+ * @return   In case of trouble, the function returns DS_NOTOK and set the err variable
+ *    		pointed to by "perr". Otherwise, the function returns DS_OK
+ *
+ * @see db_delresource
+ */
 long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
 {
 	int i,j,k,l;
@@ -2704,27 +2650,20 @@ long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_getdevlist function code                                 *
-*               -------------                                               *
-*                                                                           *
-*    Function rule : To retrieve the deices names of the devices driven by  *
-*                    a device server. These informations can be found in a  *
-*                    database in a remote computer                          *
-*                                                                           *
-*    Argins : - The name of the device server                               *
-*             - The address of the pointer to the string's array            *
-*                                                                           *
-*    Argout : - The number of deices for this device server                 *
-*             - The error code in case of problems                          *
-*                                                                           *
-*    In case of trouble, the function returns DS_NOTOK and set the err varaible   *
-*    pointed to by "perr". Otherwise, the function returns DS_OK                *
-*                                                                           *
-*****************************************************************************/
-
-
+/**@ingroup dbaseAPI
+ * To retrieve the deices names of the devices driven by
+ * a device server. These informations can be found in a
+ * database in a remote computer
+ *
+ * @param name		The name of the device server
+ * @param tab		the string's array, where the found devices are stored in
+ * @param num_dev	The number of deices for this device server
+ * @param perr		The error code in case of problems
+ *
+ * @return In case of trouble, the function returns DS_NOTOK and set the err varaible
+ * 	pointed to by "perr". Otherwise, the function returns DS_OK
+ *
+ */
 int _DLLFunc db_getdevlist(char *name,char ***tab, u_int *num_dev,long *perr)
 {
 	char *name1;
@@ -2915,36 +2854,30 @@ int _DLLFunc db_getdevlist(char *name,char ***tab, u_int *num_dev,long *perr)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_dev_export function code                                 *
-*               -------------                                               *
-*                                                                           *
-*    Function rule : To export a device. This means that after this function*
-*                    has been executed by a device server,                  *
-*                    a client is able to ask for host name,  		    *
-*                    program number and version number of the device server *
-*                    in charge of a device.These three informations are     *
-*                    stored in a database                                   *
-*		     This function is now supported in version 1,2 and 3    *
-*		     The version 2 also send the process ID to the database *
-*		     server						    *
-*		     The version 3 also send the device server process name *
-*		     to the database. This is useful for multi-classes      *
-*		     device server.					    *
-*                                                                           *
-*    Argins : - A pointer to an array of db_devinf structures defining the  *
-*               devices to be exported                                      *
-*             - The number of resource to be exported                       *
-*                                                                           *
-*    Argout : - The error code if any                                       *
-*                                                                           *
-*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns DS_OK                *
-*                                                                           *
-*****************************************************************************/
-
-
+/**@ingroup dbaseAPI
+ * To export a device. This means that after this function
+ * has been executed by a device server,
+ * a client is able to ask for host name,  		
+ * program number and version number of the device server
+ * in charge of a device.These three informations are
+ * stored in a database
+ *
+ * This function is now supported in version 1,2 and 3
+ *
+ * The version 2 also send the process ID to the database server
+ * The version 3 also send the device server process name
+ * to the database. This is useful for multi-classes device server.
+ *
+ * @param devexp	an array of db_devinf structures defining the
+ *               	devices to be exported
+ * @param dev_num	The number of resource to be exported
+ * @param perr		The error code if any
+ *
+ * @return   In case of trouble, the function returns DS_NOTOK and set the err variable
+ *    pointed to by "perr". Otherwise, the function returns DS_OK
+ *
+ * @see db_dev_import
+ */
 int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 {
 	int i,j,k,l;
@@ -3436,29 +3369,23 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
  
 
 
-/****************************************************************************
-*                                                                           *
-*		db_dev_import function code                                 *
-*               -------------                                               *
-*                                                                           *
-*    Function rule : To import a device. This means to ask for the host name*
-*                    the program number and the version number of the device*
-*                    server which drives a device.                          *
-*                                                                           *
-*    Argins : - The address of an array of pointers to strings. Each string *
-*               contains the name of a device to be imported.               *
-*             - The number of devices to be imported                        *
-*                                                                           *
-*    Argout : - The adress of an array of db_devinf_imp structures. Each    *
-*               structure defines a device                                  *
-*             - The error code in case of problems                          *
-*                                                                           *
-*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns DS_OK                *
-*                                                                           *
-*****************************************************************************/
-
-
+/*
+ * To import a device. This means to ask for the host name
+ * the program number and the version number of the device
+ * server which drives a device.
+ *
+ * @param name	 	an array of pointers to strings. Each string
+ *               	contains the name of a device to be imported.
+ * @param num_dev	The number of devices to be imported
+ * @param tab		an array of db_devinf_imp structures. Each
+ *               	structure defines a device
+ * @param perr		The error code in case of problems
+ *
+ * @return   In case of trouble, the function returns DS_NOTOK and set the err variable
+ *    	pointed to by "perr". Otherwise, the function returns DS_OK
+ *
+ * @see db_dev_export
+ */
 int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *perr)
 {
 	int i,j,k,l;
@@ -3735,25 +3662,17 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_svc_unreg function code                                  *
-*               ------------                                                *
-*                                                                           *
-*    Function rule : To unregister devices from database (to deinitialize   *
-*                    the host name, program number and version number for   *
-*                    all the devices driven by a device server)             *
-*                                                                           *
-*    Argins : - A pointer to a string which contains the device server      *
-*               network name.                                               *
-*                                                                           *
-*    Argout : - The error caode in case of trouble                          *
-*                                                                           *
-*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns DS_OK                *
-*                                                                           *
-*****************************************************************************/
-
+/**@ingroup dbaseAPI
+ * To unregister devices from database (to deinitialize
+ * the host name, program number and version number for
+ * all the devices driven by a device server)
+ *
+ * @param ds_netnam 	a string which contains the device server network name.
+ * @param perr 		The error caode in case of trouble
+ *
+ * @return   In case of trouble, the function returns DS_NOTOK and set the err variable
+ *    pointed to by "perr". Otherwise, the function returns DS_OK
+ */
 int _DLLFunc db_svc_unreg(char *ds_netnam,long *perr)
 {
 	int i,j,k;
@@ -3901,29 +3820,23 @@ int _DLLFunc db_svc_unreg(char *ds_netnam,long *perr)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_svc_check function code                                  *
-*               ------------                                                *
-*                                                                           *
-*    Function rule : To send back to the user the program numberand the     *
-*                    version number of a device server (to allow him to     *
-*                    test if the device server has not been killed by an    *
-*                    OS-9 kill)                                             *
-*                                                                           *
-*    Argins : - A pointer to a string which contains the device server      *
-*               network name.                                               *
-*                                                                           *
-*    Argout : - The program number                                          *
-*             - The version number                                          *
-*             - The host_name                                               *
-*             - The error code in case of trouble                           *
-*                                                                           *
-*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns DS_OK                *
-*                                                                           *
-*****************************************************************************/
-
+/**@ingroup dbaseAPI
+ * To send back to the user the program numberand the
+ * version number of a device server (to allow him to
+ * test if the device server has not been killed by an
+ * OS-9 kill)
+ *
+ * @param ds_netname	a string which contains the device server
+ *               	network name.
+ * @param pp_num	The program number
+ * @param pv_num	The version number
+ * @param pho_name	The host_name
+ * @param perr		The error code in case of trouble
+ *
+ * @return   In case of trouble, the function returns DS_NOTOK and set the err variable
+ *    	pointed to by "perr". Otherwise, the function returns DS_OK
+ *
+ */
 int _DLLFunc db_svc_check(char *ds_netname,char **pho_name, u_int *pp_num, u_int *pv_num,long *perr)
 {
 	int i,j,k;
@@ -4094,26 +4007,18 @@ int _DLLFunc db_svc_check(char *ds_netname,char **pho_name, u_int *pp_num, u_int
 
 
 #ifndef _OSK
-/****************************************************************************
-*                                                                           *
-*		db_getdevexp function code                                  *
-*               ------------                                                *
-*                                                                           *
-*    Function rule : To retrieve the exported device names. These           * 
-*		     information can be found in a databse on a remote      *
-*		     computer						    *
-*                                                                           *
-*    Argins : - A filter to select the exported device names.		    *
-*             - The address of the pointer to the string's array            *
-*                                                                           *
-*    Argout : - The number of exported devices                              *
-*             - The error code in case of problems                          *
-*                                                                           *
-*    In case of trouble, the function returns DS_NOTOK and set the err varaible   *
-*    pointed to by "perr". Otherwise, the function returns DS_OK                *
-*                                                                           *
-*****************************************************************************/
-
+/**@ingroup dbaseAPI
+ * To retrieve the exported device names. These
+ * information can be found in a databse on a remote computer
+ *
+ * @param filter	A filter to select the exported device names.
+ * @param tab		the string's array containing the found exported devices
+ * @param num_dev	The number of exported devices
+ * @param perr		The error code in case of problems
+ *
+ * @return   In case of trouble, the function returns DS_NOTOK and set the err varaible
+ *    pointed to by "perr". Otherwise, the function returns DS_OK
+ */
 int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 {
 	char *filter1;
@@ -4551,32 +4456,24 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for kern_sort function                                 *
-*                        ---------                                          *
-*                                                                           *
-*    Function rule : To sort an array of strings. The sort is done with the *
-*		     strcmp function. The algorithm come from the famous    *
-*	 	     Kernighan and Ritchie book (chapter 5)		    *
-*                                                                           *
-*    Argin : - The address of the array of strings pointers		    *
-*	     - The number of elements in this array			    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-****************************************************************************/
+/**@ingroup dbaseAPI
+ * To sort an array of strings. The sort is done with the
+ * strcmp function. The algorithm come from the famous
+ * Kernighan and Ritchie book (chapter 5)
+ *
+ * @param tab 	the array of strings pointers
+ * @param n	The number of elements in this array
+ */
 void kern_sort(char **tab,int n)
 {
-	int gap,i,j;
-	char *temp;
+	int 	gap,
+		i,
+		j;
+	char 	*temp;
 
 	for (gap = n/2;gap > 0;gap /= 2)
-	{
 		for (i = gap;i < n;i++)
-		{
 			for (j = i - gap;j >=0; j -= gap)
-			{
 				if (strcmp(tab[j],tab[j + gap]) <= 0) 
 					break;
 				else
@@ -4585,29 +4482,17 @@ void kern_sort(char **tab,int n)
 					tab[j] = tab[j + gap];
 					tab[j + gap] = temp;
 				}
-			}
-		}
-	}
 }
-
-
 			
-/****************************************************************************
-*                                                                           *
-*		Code for test_star function                                 *
-*                        ---------                                          *
-*                                                                           *
-*    Function rule : To test the number of wild card ('*') in every filter  *
-*		     fields. The maximun number of '*' for each field is 1  *
-*                                                                           *
-*    Argin : - A pointer to the filter string				    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns DS_OK if the * is correctly used. Otherwise, the     *
-*    function returns DS_NOTOK						    *
-*                                                                           *
-****************************************************************************/
+/**@ingroup dbaseAPI
+ * To test the number of wild card ('*') in every filter
+ * fields. The maximun number of '*' for each field is 1
+ *
+ * @param filter the filter string				
+ *
+ * @return   This function returns DS_OK if the * is correctly used. Otherwise, the
+ *    function returns DS_NOTOK						
+ */
 int test_star(char *filter)
 {
 	int i,j;
@@ -4617,12 +4502,14 @@ int test_star(char *filter)
 	char filter_family[SIZE_A];
 	char filter_member[SIZE_A];
 
-/* Extract from filter string each part of the filter (domain, family and 
-   member). If two / characters can be retrieved in the filter string, this
-   means that the domain, family and member part of the filter are initialized.
-   If only one / can be retrieved, only the domain and family part are
-   initialized and if there is no / in the filter string, just the domain
-   is initialized. */
+/* 
+ * Extract from filter string each part of the filter (domain, family and 
+ * member). If two / characters can be retrieved in the filter string, this
+ * means that the domain, family and member part of the filter are initialized.
+ * If only one / can be retrieved, only the domain and family part are
+ * initialized and if there is no / in the filter string, just the domain
+ * is initialized. 
+ */
 
 	i = 0;
 	tmp = filter;
@@ -4630,97 +4517,84 @@ int test_star(char *filter)
 
 	switch(i)
 	{
-	case 2 : 
-		tmp = strchr(filter,'/');
-		diff = (u_int)(tmp++ - filter);
-		strncpy(filter_domain,filter,diff);
-		filter_domain[diff] = 0;
+		case 2 : 
+			tmp = strchr(filter,'/');
+			diff = (u_int)(tmp++ - filter);
+			strncpy(filter_domain,filter,diff);
+			filter_domain[diff] = 0;
 
-		temp = strchr(tmp,'/');
-		diff = (u_int)(temp++ - tmp);
-		strncpy(filter_family,tmp,diff);
-		filter_family[diff] = 0;
+			temp = strchr(tmp,'/');
+			diff = (u_int)(temp++ - tmp);
+			strncpy(filter_family,tmp,diff);
+			filter_family[diff] = 0;
 
-		strcpy(filter_member,temp);
+			strcpy(filter_member,temp);
 
-/* For each fields, count the number of wild card used */
+/* 
+ * For each fields, count the number of wild card used 
+ */
+			j = 0;
+			NB_CHAR(j,filter_domain,'*');
+			if (j > 1)
+				return(DS_NOTOK);
 
-		j = 0;
-		NB_CHAR(j,filter_domain,'*');
-		if (j > 1)
-			return(DS_NOTOK);
+			j = 0;
+			NB_CHAR(j,filter_family,'*');
+			if (j > 1)
+				return(DS_NOTOK);
 
-		j = 0;
-		NB_CHAR(j,filter_family,'*');
-		if (j > 1)
-			return(DS_NOTOK);
+			j = 0;
+			 NB_CHAR(j,filter_member,'*');
+			if (j > 1)
+				return(DS_NOTOK);
+			break;
+		case 1 : 
+			tmp = strchr(filter,'/');
+			diff = (u_int)(tmp++ - filter);
+			strncpy(filter_domain,filter,diff);
+			filter_domain[diff] = 0;
 
-		j = 0;
-		 NB_CHAR(j,filter_member,'*');
-		if (j > 1)
-			return(DS_NOTOK);
+			strcpy(filter_family,tmp);
+/* 
+ * For each fields, count the number of wild card used 
+ */
+			j = 0;
+			NB_CHAR(j,filter_domain,'*')
+			if (j > 1)
+				return(DS_NOTOK);
 
-		break;
-
-	case 1 : 
-		tmp = strchr(filter,'/');
-		diff = (u_int)(tmp++ - filter);
-		strncpy(filter_domain,filter,diff);
-		filter_domain[diff] = 0;
-
-		strcpy(filter_family,tmp);
-
-/* For each fields, count the number of wild card used */
-
-		j = 0;
-		NB_CHAR(j,filter_domain,'*')
-		if (j > 1)
-			return(DS_NOTOK);
-
-		j = 0;
-		NB_CHAR(j,filter_family,'*');
-		if (j > 1)
-			return(DS_NOTOK);
-
-		break;
-
-	case 0 : 
-		strcpy(filter_domain,filter);
-
-/* For each fields, count the number of wild card used */
-
-		j = 0;
-		NB_CHAR(j,filter_domain,'*')
-		if (j > 1)
-			return(DS_NOTOK);
-
-		break;
+			j = 0;
+			NB_CHAR(j,filter_family,'*');
+			if (j > 1)
+				return(DS_NOTOK);
+			break;
+		case 0 : 
+			strcpy(filter_domain,filter);
+/* 
+ * For each fields, count the number of wild card used 
+ */
+			j = 0;
+			NB_CHAR(j,filter_domain,'*')
+			if (j > 1)
+				return(DS_NOTOK);
+			break;
 	}
-
 	return(DS_OK);
-
 }
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for db_freedevexp function                             *
-*                        -------------                                      *
-*                                                                           *
-*    Function rule : To free all the memory needed by the db_getdevexp      *
-*                    function (essentially allocated by XDR routines)       *
-*                                                                           *
-*    Argin : - The pointer to the array of exported device name strings.    *
-*	       This pointer must have been initialized by a db_getdevexp    *
-*	       function.						    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns DS_OK if no errors occurs or DS_NOTOK if a problem occurs  *
-*                                                                           *
-****************************************************************************/
-
+/*
+ * To free all the memory needed by the db_getdevexp
+ * function (essentially allocated by XDR routines)
+ *
+ * @param ptr The pointer to the array of exported device name strings.
+ *   This pointer must have been initialized by a db_getdevexp function.
+ *
+ * @return DS_OK if no errors occurs or DS_NOTOK if a problem occurs
+ * 
+ * @see db_getdevexp
+ */
 int _DLLFunc db_freedevexp(char **ptr)
 {
 	register int i;
@@ -4798,24 +4672,16 @@ int _DLLFunc db_freedevexp(char **ptr)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_cmd_query function code                                  *
-*               ------------                                                *
-*                                                                           *
-*    Function rule : To retrieve, from the database, the code associated to *
-*		     a coomand string					    *
-*                                                                           *
-*    Argins : - The command name					    *
-*                                                                           *
-*    Argout : - The command code					    *
-* 	      - The error caode in case of trouble                          *
-*                                                                           *
-*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns DS_OK                *
-*                                                                           *
-*****************************************************************************/
-
+/**@ingroup dbaseAPI
+ * To retrieve, from the database, the code associated to a command string
+ *
+ * @param cmd_name	The command name
+ * @param cmd_code	The command code
+ * @param perr		The error code in case of trouble
+ *
+ * @return   In case of trouble, the function returns DS_NOTOK and set the err variable
+ *    	pointed to by "perr". Otherwise, the function returns DS_OK
+ */
 int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code,long *perr)
 {
 	int i;
@@ -4942,23 +4808,16 @@ int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code,long *perr)
 }
 
 
-/****************************************************************************
-*                                                                           *
-*		db_event_query function code                                *
-*               ------------                                                *
-*                                                                           *
-*    Function rule : To retrieve, from the database, the code associated to *
-*		     a coomand string					    *
-*                                                                           *
-*    Argins : - The command name					    *
-*                                                                           *
-*    Argout : - The command code					    *
-* 	      - The error caode in case of trouble                          *
-*                                                                           *
-*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns DS_OK                *
-*                                                                           *
-*****************************************************************************/
+/**@ingroup dbaseAPI
+ * To retrieve, from the database, the code associated to a event string	
+ * 
+ * @param event_name	The event name					
+ * @param event_code	The event code					
+ * @param perr		The error caode in case of trouble
+ *
+ * @return   In case of trouble, the function returns DS_NOTOK and set the err variable
+ *    pointed to by "perr". Otherwise, the function returns DS_OK
+ */
 
 int _DLLFunc db_event_query(char *event_name, u_int *event_code,long *perr)
 {
@@ -5088,27 +4947,22 @@ int _DLLFunc db_event_query(char *event_name, u_int *event_code,long *perr)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_psdev_register function code                             *
-*               -----------------                                           *
-*                                                                           *
-*    Function rule : To register pseudo devices in the static database      *
-*                                                                           *
-*    Argins : - The array of pseudo devices information structures          *
-*               In each structure, teh caller initialize the pseudo device  *
-*		name and the update period in the dc			    *
-*	      - The pseudo devices number				    *
-*                                                                           *
-*    Argout : No argout							    *
-*                                                                           *
-*    In case of major trouble, the function returns DS_NOTOK and set the          *
-*    error_code  variable of the error structure. In case of error for a    *
-*    pseudo device in the list, the function returns 1.			    *
-*    Otherwise, the function returns DS_OK                			    *
-*                                                                           *
-*****************************************************************************/
-
+/**@ingroup dbaseAPI
+ * To register pseudo devices in the static database
+ *
+ * @param psdev		The array of pseudo devices information structures
+ *               	In each structure, the caller initialize the pseudo device
+ *			name and the update period in the dc
+ * @param num_psdev 	The pseudo devices number
+ * @param p_err		The error code in case of failure
+ *
+ * @return   In case of major trouble, the function returns DS_NOTOK and set the
+ * 	error_code  variable of the error structure. In case of error for a
+ *	pseudo device in the list, the function returns 1.
+ *	Otherwise, the function returns DS_OK
+ *
+ * @see db_psdev_unregister
+ */
 int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_err)
 {
 	register long i;
@@ -5298,25 +5152,20 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_psdev_unregister function code                           *
-*               -------------------                                         *
-*                                                                           *
-*    Function rule : To unregister pseudo devices from the static database  *
-*                                                                           *
-*    Argins : - The pseudo devices name list				    *
-*	      - The pseudo devices number				    *
-*                                                                           *
-*    Argout : No argout							    *
-*                                                                           *
-*    In case of major trouble, the function returns DS_NOTOK and set the          *
-*    error_code  variable of the error structure. In case of error for a    *
-*    pseudo device in the list, the function returns 1.			    *
-*    Otherwise, the function returns DS_OK                			    *
-*                                                                           *
-*****************************************************************************/
-
+/**@ingroup dbaseAPI
+ * To unregister pseudo devices from the static database
+ *
+ * @param psdev_list	The pseudo devices name list
+ * @param num_psdev	The pseudo devices number
+ * @param p_err		The error code in case of failure
+ *
+ * @return   In case of major trouble, the function returns DS_NOTOK and set the
+ * 	error_code  variable of the error structure. In case of error for a
+ * 	pseudo device in the list, the function returns 1.			
+ * 	Otherwise, the function returns DS_OK                			
+ *
+ * @see db_psdev_register
+ */
 int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_err)
 {
 	register long i,j,l;
@@ -5495,21 +5344,16 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for db_svc_close function                              *
-*                        ------------                                       *
-*                                                                           *
-*    Function rule : To close the open connection of the database server    *
-*		     to the database					    *
-*                                                                           *
-*    Argin : No argin							    *
-*                                                                           *
-*    Argout : The error code						    *
-*                                                                           *
-*    This function returns DS_OK if no errors occurs or DS_NOTOK if a problem occurs  *
-*                                                                           *
-****************************************************************************/
+/**@ingroup dbaseAPI
+ * To close the open connection of the database server to the database
+ *
+ * @param perr	The error code
+ * 
+ * @return This function returns DS_OK if no errors occurs or DS_NOTOK if a problem occurs
+ * 
+ * @see db_import
+ * @see db_svc_reopen
+ */
 int _DLLFunc db_svc_close(long *perr)
 {
 	int *pdb_err;
@@ -5589,21 +5433,16 @@ int _DLLFunc db_svc_close(long *perr)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for db_svc_reopen function                             *
-*                        -------------                                      *
-*                                                                           *
-*    Function rule : To reopen the database and the database tables in the  *
-*		     database server.					    *
-*                                                                           *
-*    Argin : No argin							    *
-*                                                                           *
-*    Argout : The error code						    *
-*                                                                           *
-*    This function returns DS_OK if no errors occurs or DS_NOTOK if a problem occurs  *
-*                                                                           *
-****************************************************************************/
+/**@ingroup dbaseAPI
+ * To reopen the database and the database tables in the database server.
+ * 
+ * @param perr	The error code
+ * 
+ * @return This function returns DS_OK if no errors occurs or DS_NOTOK if a problem occurs
+ *
+ * @see db_import
+ * @see db_svc_close
+ */
 int _DLLFunc db_svc_reopen(long *perr)
 {
 	int *pdb_err;

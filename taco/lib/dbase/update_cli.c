@@ -14,9 +14,9 @@
 
  Original   :   May 1998
 
- Version:       $Revision: 1.1 $
+ Version:       $Revision: 1.2 $
 
- Date:          $Date: 2003-04-25 11:21:43 $
+ Date:          $Date: 2003-05-16 13:40:27 $
 
  Copyright (c) 1998 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -91,7 +91,7 @@ static struct timeval timeout_update={60,0};
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To check a resource file and to build simple device and
  * resource definition from it. A simple device definition
  * is a string like :
@@ -674,7 +674,7 @@ printf("End of TestLine \n");
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To extract from a resource file all the informations concerning the device name
  *
  * @param line1		A pointer to a buffer where is stored a line of the resource
@@ -777,7 +777,7 @@ static long name_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_devd
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To check that a simple resource definition line is correct						
  *
  * @param lin  		A pointer to the modified resource definition (without
@@ -876,7 +876,7 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To extract from a resource file all the informations concerning a resource array			
  *
  * @param line1 	A pointer to a buffer where is stored a line of the resource
@@ -1042,7 +1042,7 @@ static long res_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_resde
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To check that a simple device definition line is correct						
  *
  * @param lin 		A pointer to the modified resource definition (without
@@ -1124,7 +1124,7 @@ static long check_dev(char *lin,long *p_err_dev,long *p_error)
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To retrieve line number in input buffer with a faulty device definition					
  *
  * @param buffer 	The input buffer				
@@ -1165,7 +1165,7 @@ static void get_error_line(const char *buffer,long err_dev,long *p_line)
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To update device list(s) into the database. This call is used by the 
  * db_update facility for the update of any device server device list				
  *									
@@ -1361,7 +1361,7 @@ long db_upddev(long devdef_nb,char **devdef,long *deferr_nb,long *p_error)
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To update resource(s) into the database. This call is used by the db_update 
  * facility for the update of any resources						
  *									
@@ -1677,7 +1677,7 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To retrieve the list of devices  domain  name	
  *
  * @param p_domain_nb 	Pointer for domain number			
@@ -1836,7 +1836,7 @@ long db_secpass(char **pass,long *p_error)
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To update resource(s) into the database. This call is used by the db_update 
  * facility for the update of any resources						
  *									

@@ -14,9 +14,9 @@
 
  Original   :   April 1997
 
- Version:       $Revision: 1.1 $
+ Version:       $Revision: 1.2 $
 
- Date:          $Date: 2003-04-25 11:21:42 $
+ Date:          $Date: 2003-05-16 13:40:27 $
 
  Copyright (c) 1997 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -86,7 +86,7 @@ static struct timeval timeout_browse={60,0};
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To get device information from the database	
  *									
  * @param dev_name	Device name
@@ -266,7 +266,7 @@ long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info,long *p_error)
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To retrieve the list of resources for a given device
  *
  * @param dev_name 	The device name				
@@ -524,7 +524,7 @@ long db_deviceres(long dev_nb,char **dev_name_list,long *p_res_nb,char ***ppp_li
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To delete a device (or a pseudo device) from the database						
  *									
  * @param dev_name 	Device name
@@ -685,7 +685,7 @@ long db_devicedelete(const char *dev_name,long *p_error)
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To delete all resources belonging to a device list	
  *									
  * @param dev_nb  	The device name number				
@@ -880,7 +880,7 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 }
 
 
-/**
+/**@ingroup dbaseAPI
  * To retrieve global database information		
  *
  * @param p_info 	Pointer to the structure where all the info will be
@@ -1068,7 +1068,7 @@ long db_stat(db_stat_call *p_info,long *p_error)
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To unregister a server from the database. This will update all the server 
  * devices has been not exported
  *
@@ -1264,7 +1264,7 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To device server information to the caller. These info are the device list, 
  * the server process name and its pid plus the host name
  *
@@ -1519,7 +1519,7 @@ long db_servinfo(const char *ds_name,const char *pers_name, \
 }
 
 
-/**
+/**@ingroup dbaseAPI
  * To delete all the devices belonging to a device server in the static database				
  *
  * @param ds_name  	The device server name			
@@ -1712,7 +1712,7 @@ long db_servdelete(const char *ds_name,const char *pers_name, \
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To get poller information from a device name	
  *									
  * @param dev_name  	Device name
@@ -1890,7 +1890,7 @@ long db_getpoller(const char *dev_name,db_poller *poll,long *p_error)
 
 
 
-/**
+/**@ingroup dbaseAPI
  * To initialize a resource cache for the specified domain
  *									
  * @param domain 	Domain name
