@@ -45,6 +45,13 @@ CREATE TABLE device (
   comment text
 ) TYPE=MyISAM;
 
+--
+-- Dumping data for table 'device'
+--
+
+
+INSERT INTO device VALUES ('sys/database/2',NULL,'sys','database','2',1,'nada','wow','DataBaseds/2',1,'DataBase','2','2003-07-11 09:43:17',NULL,NULL);
+INSERT INTO device VALUES ('dserver/DataBaseds/2',NULL,'dserver','DataBaseds','2',1,'nada','wow','DataBaseds/2',1,'DServer','2','2003-07-11 09:43:17',NULL,NULL);
 
 --
 -- Table structure for table 'property'
@@ -130,7 +137,6 @@ CREATE TABLE property_class (
 --
 
 
-
 --
 -- Table structure for table 'property_device'
 --
@@ -169,5 +175,26 @@ CREATE TABLE server (
 -- Dumping data for table 'server'
 --
 
+CREATE TABLE attribute_alias (
+  alias varchar(255) DEFAULT '' NOT NULL,
+  name varchar(255) DEFAULT '' NOT NULL,
+  device varchar(255) DEFAULT '' NOT NULL,
+  attribute varchar(255) DEFAULT '' NOT NULL,
+  updated timestamp(14),
+  accessed timestamp(14),
+  comment text,
+  KEY index_attribute_alias (alias(64),name(64))
+);
 
+CREATE TABLE event (
+  name varchar(255),
+  exported int(11),
+  ior text,
+  host varchar(255),
+  server varchar(255),
+  pid int(11),
+  version varchar(8),
+  started datetime,
+  stopped datetime
+);
 

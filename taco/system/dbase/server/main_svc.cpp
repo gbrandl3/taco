@@ -147,6 +147,8 @@ int main(int argc,char **argv)
     extern int	optint;
     extern char	*optarg;
 
+//  for (int i = 0; i< argc; i++) printf("argv[%d] %s ",i,argv[i]); printf("\n");
+
     while ((c = getopt(argc, argv, "t:h:u:p")) != EOF)
     	switch(c)
 	{
