@@ -13,9 +13,9 @@
 
  Original: 	January 1991
 
- Version:	$Revision: 1.18 $
+ Version:	$Revision: 1.19 $
 
- Date:		$Date: 2005-02-24 15:56:06 $
+ Date:		$Date: 2005-03-15 13:51:34 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -162,10 +162,6 @@ static	int	fd_devnull = -1;
 
 
 #ifdef unix
-/*
- * Try to become a daemon
- */
-	pid = become_daemon();
 /*
  *  get environment variables 
  */
@@ -560,6 +556,12 @@ static	int	fd_devnull = -1;
 /*
  *  point of no return
  */
+#if unix
+/*
+ * Try to become a daemon
+ */
+	pid = become_daemon();
+#endif
 	svc_run();
 	fprintf(system_log, "\n%s svc_run returned: Manager stopped\n", getTimeString("Manager"));
 	fflush(system_log);
