@@ -1,4 +1,4 @@
-AC_DEFUN(TACO_PYTHON_BINDING,
+AC_DEFUN([TACO_PYTHON_BINDING],
 [
 	TACO_PROG_PYTHON(2.1, [yes])
 	ac_save_CFLAGS="$CFLAGS"
@@ -8,7 +8,7 @@ AC_DEFUN(TACO_PYTHON_BINDING,
 	AM_CONDITIONAL(PYTHON_BINDING, test $taco_python_binding = yes)
 ])
 
-AC_DEFUN(TACO_TCL_BINDING,
+AC_DEFUN([TACO_TCL_BINDING],
 [
 	TACO_PROG_TCL
 	if test -n "$TCLINCLUDE" -a -n "$TCLLIB" ; then
@@ -19,7 +19,7 @@ AC_DEFUN(TACO_TCL_BINDING,
 	AM_CONDITIONAL(TCL_BINDING, test $taco_tcl_binding = yes)
 ])
 
-AC_DEFUN(TACO_MYSQL_SUPPORT,
+AC_DEFUN([TACO_MYSQL_SUPPORT],
 [
 	AC_ARG_ENABLE(mysqldbm, AC_HELP_STRING(--enable-mysqldbm, [build the database server with mysql support @<:@default=yes@:>@]),
 		[case "${enable_mysqldbm}" in
@@ -40,7 +40,7 @@ AC_DEFUN(TACO_MYSQL_SUPPORT,
 	AM_CONDITIONAL(MYSQLSUPPORT, test "x$mysql" = "xyes")
 ])
 
-AC_DEFUN(TACO_DC_API,
+AC_DEFUN([TACO_DC_API],
 [
 	AC_ARG_ENABLE(dc, AC_HELP_STRING([--enable-dc], [build the data collector API @<:@default=yes@:>@]),
 		[case "${enable_dc}" in
@@ -55,7 +55,7 @@ AC_DEFUN(TACO_DC_API,
 	AC_SUBST(TACO_DC_LIBS)
 ])
 
-AC_DEFUN(TACO_GRETA,
+AC_DEFUN([TACO_GRETA],
 [
 	AC_REQUIRE([TACO_DC_API])
 	AC_REQUIRE([X_AND_MOTIF])
@@ -75,11 +75,14 @@ AC_DEFUN(TACO_GRETA,
 		TACO_DC_LIBS="\$(top_builddir)/lib/dc/libdcapi.la"
 	fi
 	AC_SUBST(TACO_DC_LIBS)
+	if test "x$motif_found" != "xyes" -o "x$dc" != "xyes" ; then 
+		greta=no
+	fi
 	AM_CONDITIONAL(GRETABUILD, test "x$greta" = "xyes") 
 	AC_SUBST(GRETA)
 ])
 
-AC_DEFUN(TACO_ASCII_API,
+AC_DEFUN([TACO_ASCII_API],
 [
 	AC_ARG_ENABLE(ascii, AC_HELP_STRING([--enable-ascii], [build the ASCII api @<:@default=yes@:>@]),
 		[case "${enable_ascii}" in
@@ -94,7 +97,7 @@ AC_DEFUN(TACO_ASCII_API,
 	AM_CONDITIONAL(ASCII_BUILD, test "x$ascii" = "xyes")
 ])
 
-AC_DEFUN(TACO_XDEVMENU,
+AC_DEFUN([TACO_XDEVMENU],
 [
 	AC_REQUIRE([TACO_ASCII_API])
 	AC_REQUIRE([X_AND_MOTIF])
@@ -110,28 +113,41 @@ AC_DEFUN(TACO_XDEVMENU,
 		XDEVMENU=xdevmenu
 	fi
 	AM_CONDITIONAL(ASCII_BUILD, test "x$ascii" = "xyes")
+	if test "x$motif_found" != "xyes" -o "x$ascii" != "xyes" ; then
+		xdevmenu=no
+	fi
 	AM_CONDITIONAL(XDEVMENUBUILD, test "x$xdevmenu" = "xyes") 
 	AC_SUBST(XDEVMENU)
 ])
 
-AC_DEFUN(X_AND_MOTIF,
+AC_DEFUN([X_AND_MOTIF],
 [
 	AC_REQUIRE([AC_PATH_XTRA])
 	appdefaultdir="`echo $X_LDFLAGS | cut -c3- `/X11/app-defaults"
+	motif_found=yes;
 	AC_ARG_WITH(motif, AC_HELP_STRING([--with-motif@<:@=ARG@:>@], [Motif @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the Motif installation, e.g. '/usr/local/myMotif']), [
 		case  "$with_motif" in
-			yes) 	MOTIF_LIBS="-lXm" ;;
-			no)  	AC_MSG_WARN([You need Motif/Lesstif for greta/xdevmenu]);;
+			yes) 	MOTIF_LIBS="-lXm" 
+				MOTIF_INCLUDES="$X_CFLAGS" ;;
+			no)  	AC_MSG_WARN([Disable build of greta/xdevmenu])
+				motif_found=no;;
 			*) 	MOTIF_LIBS="-L$withval/lib -lXm"
 				MOTIF_INCLUDES="-I$withval/include" ;;
 		esac      
-		],[MOTIF_LIBS="-lXm"])
-	
+		],[MOTIF_LIBS="-lXm"; MOTIF_INCLUDES="$X_CFLAGS"])
+	CPPFLAGS_SAVE="$CPPFLAGS"
+	CPPFLAGS="$CPPFLAGS $MOTIF_INCLUDES"
+	AC_CHECK_HEADERS([Xm/Xm.h Xm/XmAll.h], [
+		AC_CHECK_LIB(Xm, XmStringCreateLocalized, [], [motif_found=no], [$X_LDFLAGS -lXt -lX11])
+		break;
+	], [motif_found=no])
+	CPPFLAGS="$CPPFLAGS_SAVE"
+
 	AC_SUBST(MOTIF_LIBS)
 	AC_SUBST(MOTIF_INCLUDES)
 ])
 
-AC_DEFUN(TACO_DEFINES,
+AC_DEFUN([TACO_DEFINES],
 [
  	AC_REQUIRE([AC_CANONICAL_SYSTEM])
 	case "$target" in
@@ -166,7 +182,7 @@ AC_DEFUN(TACO_DEFINES,
        CXXFLAGS="$CXXFLAGS $taco_CFLAGS" 
 ])
 
-AC_DEFUN(AC_FIND_GDBM,
+AC_DEFUN([AC_FIND_GDBM],
 [
 	MAKE_GDBM=no
 	AC_ARG_WITH(gdbm, AC_HELP_STRING([--with-gdbm=ARG], [ ARG is the path to the gdbm installation, e.g. '/usr/local/gdbm']),
@@ -227,7 +243,7 @@ public:
 ]
 )
 
-AC_DEFUN(TACO_DATAPORT_SRC,
+AC_DEFUN([TACO_DATAPORT_SRC],
 [
  	AC_REQUIRE([AC_CANONICAL_SYSTEM])
 	AC_ARG_ENABLE(dataport, AC_HELP_STRING([--enable-dataport], [enables the dataport support @<:@default=yes@:>@]),
