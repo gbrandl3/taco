@@ -42,7 +42,7 @@ AC_DEFUN(TACO_PROG_PYTHON,
 			if test -z "$python_libraries"; then
 				python_libraries=-lpython${version}
 			fi
-			LIBPYTHON="$LIBPYTHON $LIBDL $LIBSOCKET"
+			LIB_PYTHON="$LIB_PYTHON $LIBDL $LIBSOCKET"
 		else
 			if test -z "$2" ; then
 				AC_MSG_ERROR(libpython${version}.a not found.)

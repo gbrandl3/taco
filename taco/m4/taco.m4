@@ -248,7 +248,7 @@ dnl
 dnl	essential for automatic make in development
 dnl
 
-	AM_CONFIG_HEADER(config.h)
+	AM_CONFIG_HEADER([config.h])
 
 	AC_PROG_CXX
 	AC_PROG_INSTALL
