@@ -13,9 +13,9 @@
 
  Original:	March 1990
 
- Version:	$Revision: 1.5 $
+ Version:	$Revision: 1.6 $
 
- Date:		$Date: 2004-07-14 12:43:23 $
+ Date:		$Date: 2004-07-14 12:44:40 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -36,7 +36,7 @@
  */
 #ifdef _IDENT
 static char DevServerh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServer.h,v 1.5 2004-07-14 12:43:23 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServer.h,v 1.6 2004-07-14 12:44:40 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 typedef long DevMethod;
@@ -128,16 +128,16 @@ typedef struct _DevServerAccess {
  */
 	DeviceBase		*device;
 #endif
-	char  			export_name[LONG_NAME_SIZE];
-	long 			export_status;
-	long 			export_counter;
-	long    		single_user_flag;
-	long    		admin_user_flag;
-	long			si_client_id;
-	long			si_access_right;
-	long			si_connection_id;
-	long			si_tcp_socket;
-	struct sockaddr_in 	si_peeraddr;
+		char  			export_name[LONG_NAME_SIZE];
+		long 			export_status;
+		long 			export_counter;
+		long    		single_user_flag;
+		long    		admin_user_flag;
+		long			si_client_id;
+		long			si_access_right;
+		long			si_connection_id;
+		long			si_tcp_socket;
+		struct sockaddr_in 	si_peeraddr;
 	} DevServerDevices;
 
 /*
