@@ -1,26 +1,26 @@
 /*+*******************************************************************
-
- File:		API.h
-
- Project:	Device Servers with sun-rpc
-
- Description:	Public include for applications using
-		the applications programmers interface.
-
- Author(s):	Jens Meyer
- 		$Author: jkrueger1 $
-
- Original:	January 1991
-
- Version:	$Revision: 1.3 $
-
- Date:		$Date: 2003-05-16 13:44:00 $
-
-
- Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
-                            Grenoble, France
-
-********************************************************************-*/
+ * 
+ * File:		API.h
+ *
+ * Project:	Device Servers with sun-rpc
+ *
+ * Description:	Public include for applications using
+ *		the applications programmers interface.
+ *
+ * Author(s):	Jens Meyer
+ * 		$Author: jkrueger1 $
+ *
+ * Original:	January 1991
+ *
+ * Version:	$Revision: 1.4 $
+ *
+ * Date:		$Date: 2003-05-21 16:21:56 $
+ *
+ *
+ * Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
+ *                            Grenoble, France
+ *
+ *********************************************************************-*/
 
 #ifndef _api_h
 #define _api_h
@@ -29,14 +29,23 @@
  * @defgroup dsAPI Device Server API
  * @ingroup API
  * Functions to access to a device server.
+ *
+ * Implement the device server (aka TACO) and the pplication programmer's interface (aka DSAPI).
+ *
+ * - version of DSAPI e.g. dev_import(), dev_putget(), dev_put()
+ * - the list of DS error messages
+ * - the list of device states (in ascii)
+ * - general purpose DSAPI routines for printing error, debug and diagnostic messages
+ * - implementing DSAPI security
+ * - some more DSAPI related routines e.g. dev_put_asyn()
  */
 
 /*
- *  standart header string to use "what" or "ident".
+ *  standard header string to use "what" or "ident".
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.3 2003-05-16 13:44:00 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.4 2003-05-21 16:21:56 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*

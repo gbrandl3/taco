@@ -1,16 +1,16 @@
 /*
  * Author:	$Author: jkrueger1 $
  * 
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:		$Date: 2003-05-16 13:40:27 $
+ * Date:		$Date: 2003-05-21 16:21:57 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
  *  
  */
 
-/**@defgroup API
+/**@defgroup API TACO API
  */
 
 /**@defgroup dbaseAPI	Database API
