@@ -36,7 +36,7 @@ case $1 in
 		if test "x$TACO_LOGGING" = xyes ; then 
 			log="-log"
 		fi
-		if test "x$TACO_SECURE_MODE" = xyes ; then
+		if test "x$TACO_SECURITY" = xyes ; then
 			sec_text="in secure mode"
 			security="-security"
 		fi
