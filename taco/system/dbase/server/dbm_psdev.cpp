@@ -11,36 +11,19 @@
 #include <NdbmClass.h>
 #include <NdbmServer.h>
 
-/* Some local functions definition */
-
-// long reg_ps(char *,long,char *,long,long *);
-// long unreg_ps(char *,long *);
-
 
-
-/****************************************************************************
-*                                                                           *
-*		Server code for db_psdev_register function                  *
-*                               -----------------            	            *
-*                                                                           *
-*    Function rule : To store in the database (builded from resources files)*
-*                    the host_name, the program number and the version      *
-*                    number of the device server for a specific device      *
-*                                                                           *
-*    Argin : A pointer to a structure of the "tab_dbdev" type               *
-*            The definition of the tab_dbdev type is :                      *
-*            struct {                                                       *
-*              u_int tab_dbdev_len;     The number of structures db_devinfo *
-*              db_devinfo *tab_dbdev_val;    A pointer to the array of      *
-*					     structures                     *
-*                  }                                                        *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns an integer which is an error code                *
-*         Zero means no error                                               * 
-*                                                                           *
-*****************************************************************************/
+/**
+ * To store in the database (builded from resources files) the host_name, the 
+ * program number and the version number of the device server for a specific device
+ * 
+ * @param rece A pointer to a structure of the tab_dbdev type 
+ *            struct { 
+ *              u_int tab_dbdev_len;     The number of structures db_devinfo 
+ *              db_devinfo *tab_dbdev_val;    A pointer to the array of structures 
+ *                  }
+ *
+ * @return This function returns an integer which is an error code Zero means no error.
+ */
 db_psdev_error *NdbmServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
 {
 	static db_psdev_error err;
@@ -98,28 +81,19 @@ db_psdev_error *NdbmServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
 }
 
 
-
-/****************************************************************************
-*                                                                           *
-*		Code for reg_ps function                		    *
-*                        ------                         		    *
-*                                                                           *
-*    Function rule : To register a pseuo device in the PS_NAMES database    *
-*		     table						    *
-*									    *
-*    Argin(s) : - h_name : The host name				    *
-*		- pid : The process PID					    *
-*		- ps_name : The pseudo device name			    *
-*		- poll : The polling period				    *
-*									    *
-*    Argout(s) : - p_error : Pointer for an error code			    *
-*									    *
-*    This function returns 0 is everything OK. Otherwise, the returned value*
-*    is -1 and the error code is set to the appropiate error.		    *
-*                                                                           *
-****************************************************************************/
-
-
+/**
+ * To register a pseuo device in the PS_NAMES database table
+ *
+ * @param h_name The host name
+ * @param pid The process PID
+ * @param ps_name The pseudo device name
+ * @param poll The polling period
+ *
+ * @param p_error Pointer for an error code
+ *
+ * @return This function returns 0 is everything OK. Otherwise, the returned value
+ *    is -1 and the error code is set to the appropiate error.
+ */
 long NdbmServer::reg_ps(char *h_name,long pid,char *ps_name,long poll,long *p_error)
 {
 	datum key,content;
@@ -258,37 +232,25 @@ long NdbmServer::reg_ps(char *h_name,long pid,char *ps_name,long poll,long *p_er
 }
 
 
-
-/****************************************************************************
-*                                                                           *
-*		Server code for db_psdev_unregister function                *
-*                               -------------------                         *
-*                                                                           *
-*    Function rule : To retrieve (from database) the host_name, the program *
-*                    number and the version number for specific devices     *
-*                                                                           *
-*    Argin : A pointer to a structure of the "arr1" type                    *
-*            The definition of the arr1 type is :                           *
-*            struct {                                                       *
-*               u_int arr1_len;      The number of strings                  *
-*               char **arr1_val;     A pointer to the array of strings      *
-*                   }                                                       *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a structure of the "db_resimp" type *
-*    The definition of this structure is :                                  *
-*    struct {                                                               *
-*      tab_dbdev imp_dev;   A structure of the tab_dbdev type (see above)   *
-*                           with the informations needed (host_name,        *
-*                           program number and version number)              *
-*      int db_imperr;    The database error code                            *
-*                        0 if no error                                      *
-*            }                                                              *
-*                                                                           *
-****************************************************************************/
-
-
+/**
+ * To retrieve (from database) the host_name, the program number and the version 
+ * number for specific devices
+ * 
+ * @param rece A pointer to a structure of the arr1 type
+ *            struct {
+ *               u_int arr1_len;      The number of strings
+ *               char **arr1_val;     A pointer to the array of strings
+ *                   }
+ *
+ * @return This function returns a pointer to a structure of the db_resimp type 
+ *    struct {
+ *      tab_dbdev imp_dev;   A structure of the tab_dbdev type (see above)
+ *                           with the informations needed (host_name,
+ *                           program number and version number)
+ *      int db_imperr;    The database error code
+ *                        0 if no error
+ *            }
+ */
 db_psdev_error *NdbmServer::db_psdev_unreg_1_svc(arr1 *rece)
 {
 	static db_psdev_error err;
@@ -338,24 +300,16 @@ db_psdev_error *NdbmServer::db_psdev_unreg_1_svc(arr1 *rece)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for unreg_ps function                		    *
-*                        --------                         		    *
-*                                                                           *
-*    Function rule : To unregister pseuo device from the database PS_NAMES  *
-*		     table						    *
-*									    *
-*    Argin(s) : - ps_name : The pseudo device name			    *
-*									    *
-*    Argout(s) : - p_error : Pointer for an error code			    *
-*									    *
-*    This function returns 0 is everything OK. Otherwise, the returned value*
-*    is -1 and the error code is set to the appropiate error.		    *
-*                                                                           *
-****************************************************************************/
-
-
+/**
+ * To unregister pseuo device from the database PS_NAMES table
+ *
+ * @param ps_name The pseudo device name
+ *
+ * @param p_error Pointer for an error code
+ *
+ * @return This function returns 0 is everything OK. Otherwise, the returned value
+ *    is -1 and the error code is set to the appropiate error.
+ */
 long NdbmServer::unreg_ps(char *ps_name,long *p_error)
 {
 	register long i;

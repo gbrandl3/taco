@@ -3,7 +3,6 @@
 #include <db_xdr.h>
 
 // C++ include
-
 #include <new>
 #include <iostream>
 #include <NdbmClass.h>
@@ -12,44 +11,17 @@
 #include <vector>
 #include <algorithm>
 
-/* Some local functions declaration */
-
-// void delete_res (const string &);
-
-/* Some global variables */
-
-// db_res res_back;
-// db_devinfo_svc sent_back;
-// db_info_svc info_back;
-// vector<NdbmDomain> dom_list;
-// vector<NdbmDomain> res_list;
-// svcinfo_svc svcinfo_back;
-// db_poller_svc poll_back;
-
-/* Variables defined in setacc_svc.c */
-
-// extern NdbmInfo dbgen;
-// extern int errno;
-
 #include <errno.h>
 
 
-
-/****************************************************************************
-*                                                                           *
-*	Server code for the devinfo_1_svc function       	   	    *
-*                           -------------                       	    *
-*                                                                           *
-*    Method rule : To return device information 			    *
-*                                                                           *
-*    Argin : - dev : The device name					    *
-*                                                                           *
-*    Argout : - No argout						    *
-*                                                                           *
-*    This function returns a pointer to a structure with all device info    *
-*    and an error code which is set if needed				    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To return device information
+ * 
+ * @param dev The device name
+ * 
+ * @return This function returns a pointer to a structure with all device info 
+ *    and an error code which is set if needed
+ */
 db_devinfo_svc *NdbmServer::devinfo_1_svc(nam *dev)
 {
 	datum 		key;
@@ -197,25 +169,15 @@ db_devinfo_svc *NdbmServer::devinfo_1_svc(nam *dev)
 
 }
 
-
 
-
-/****************************************************************************
-*                                                                           *
-*	Server code for the devres_1_svc function 	    	    	    *
-*                           ------------                     	    	    *
-*                                                                           *
-*    Method rule : To retrieve all resources belonging to a device	    *
-*                                                                           *
-*    Argin : - name : The device name				    	    *
-*                                                                           *
-*    Argout : No argout							    *
-*                                                                    	    *
-*    This function returns the resource list and an error code which is set *
-*    if needed								    *
-*                                                                           *
-****************************************************************************/
-
+/**
+ * To retrieve all resources belonging to a device
+ *
+ * @param name The device name
+ * 
+ * @return This function returns the resource list and an error code which is set 
+ *    if needed
+ */
 db_res *NdbmServer::devres_1_svc(db_res *recev)
 {
 	std::vector<NdbmDomDev> 	dom_list;
@@ -461,21 +423,13 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 }
 
 
-
-/****************************************************************************
-*                                                                           *
-*	Server code for the devdel_1_svc function       	   	    *
-*                           ------------                       	    	    *
-*                                                                           *
-*    Method rule : To delete a device from the database			    *
-*                                                                           *
-*    Argin : - dev : The device name					    *
-*                                                                           *
-*    Argout : No argout			    				    *
-*                                                                           *
-*    This function returns a pointer to an error code			    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To delete a device from the database
+ * 
+ * @param dev The device name
+ * 
+ * @return This function returns a pointer to an error code
+ */
 long *NdbmServer::devdel_1_svc(nam *dev)
 {
 	datum 		key;
@@ -638,21 +592,13 @@ long *NdbmServer::devdel_1_svc(nam *dev)
 }
 
 
-
-/****************************************************************************
-*                                                                           *
-*	Server code for the devdelres_1_svc function       	   	    *
-*                           ---------------                       	    *
-*                                                                           *
-*    Method rule : To delete all the resources belonging to a device	    *
-*                                                                           *
-*    Argin : - dev : The device name					    *
-*                                                                           *
-*    Argout : No argout			    				    *
-*                                                                           *
-*    This function returns a pointer to an error code			    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To delete all the resources belonging to a device
+ * 
+ * @param dev The device name
+ *
+ * @return This function returns a pointer to an error code
+ */
 db_psdev_error *NdbmServer::devdelres_1_svc(db_res *recev)
 {
 	datum 		key;
@@ -902,24 +848,12 @@ db_psdev_error *NdbmServer::devdelres_1_svc(db_res *recev)
 
 }
 
-
 
-
-/****************************************************************************
-*                                                                           *
-*	Server code for the info_1_svc function       	   	    	    *
-*                           ----------                       	    	    *
-*                                                                           *
-*    Method rule : To get global information on the database		    *
-*                                                                           *
-*    Argin : No argin							    *
-*                                                                           *
-*    Argout : No argout			    				    *
-*                                                                           *
-*    This function returns a pointer to a structure with all the database   *
-*    info								    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To get global information on the database
+ * 
+ * @return This function returns a pointer to a structure with all the database info
+ */
 db_info_svc *NdbmServer::info_1_svc()
 {
 	long 		dev_defined,
@@ -1080,26 +1014,14 @@ db_info_svc *NdbmServer::info_1_svc()
 }
 
 
-
-
-/****************************************************************************
-*                                                                           *
-*	Server code for the unreg_1_svc function     	    	    	    *
-*                           -----------                     	    	    *
-*                                                                           *
-*    Method rule : To unregister a server from the database (to mark all its*
-*		   devices as not exported)				    *
-*                                                                           *
-*    Argin : - recev : A pointer to a structure where the first element     *
-*		       is the device server name and the second element     *
-*		       is the device server personal name.		    *
-*                                                                           *
-*    Argout : - No argout						    *
-*                                                                    	    *
-*    This function returns a pointer to a long which will be set in case of *
-*    error								    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To unregister a server from the database (to mark all its devices as not exported)
+ *
+ * @param recev A pointer to a structure where the first element is the device server 
+ *		name and the second element is the device server personal name.
+ *
+ * @return This function returns a pointer to a long which will be set in case of error
+ */
 long *NdbmServer::unreg_1_svc(db_res *recev)
 {
 	static long 	sent_back;
@@ -1232,24 +1154,15 @@ long *NdbmServer::unreg_1_svc(db_res *recev)
 }
 
 
-
-/****************************************************************************
-*                                                                           *
-*	Server code for the svcinfo_1_svc function     	    	    	    *
-*                           -------------                     	    	    *
-*                                                                           *
-*    Method rule : To return device server info to client		    *
-*                                                                           *
-*    Argin : - recev : A pointer to a structure where the first element     *
-*		       is the device server name and the second element     *
-*		       is the device server personal name.		    *
-*                                                                           *
-*    Argout : - No argout						    *
-*                                                                    	    *
-*    This function returns a pointer to a structure with all the device     *
-*    server information							    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To return device server info to client
+ *
+ * @param recev A pointer to a structure where the first element is the device 
+ *		server name and the second element is the device server personal name.
+ * 
+ * @return This function returns a pointer to a structure with all the device
+ *    	server information
+ */
 svcinfo_svc *NdbmServer::svcinfo_1_svc(db_res *recev)
 {
 	datum 		key;
@@ -1484,26 +1397,16 @@ svcinfo_svc *NdbmServer::svcinfo_1_svc(db_res *recev)
 }
 
 
-
-/****************************************************************************
-*                                                                           *
-*	Server code for the svcdelete_1_svc function     	    	    *
-*                           ---------------                     	    *
-*                                                                           *
-*    Method rule : To return delete all the device belonging to a device    *
-*		   server and if necessary also their resources		    *
-*                                                                           *
-*    Argin : - recev : A pointer to a structure where the first element     *
-*		       is the device server name and the second element     *
-*		       is the device server personal name.		    *
-*                                                                           *
-*    Argout : - No argout						    *
-*                                                                    	    *
-*    This function returns a pointer to a structure with all the device     *
-*    server information							    *
-*                                                                           *
-****************************************************************************/
-
+/**
+ * To return delete all the device belonging to a device server and if necessary 
+ * also their resources
+ * 
+ * @param recev A pointer to a structure where the first element is the device server 
+ * 		name and the second element is the device server personal name.
+ * 
+ * @return This function returns a pointer to a structure with all the device 
+ *    	server information
+ */
 long *NdbmServer::svcdelete_1_svc(db_res *recev)
 {
 	static long 	error_back;
@@ -1645,21 +1548,13 @@ long *NdbmServer::svcdelete_1_svc(db_res *recev)
 
 
 
-/****************************************************************************
-*                                                                           *
-*	Code for the delete_res function     	    	    		    *
-*                    ----------                     	    		    *
-*                                                                           *
-*    Function rule : To delete all the resourcces belonging to a device.    *
-*                                                                           *
-*    Argin : - dev_name : The device name				    *
-*                                                                           *
-*    Argout : - No argout						    *
-*                                                                    	    *
-*    This function does not return anything				    *
-*                                                                           *
-****************************************************************************/
-
+/**
+ * To delete all the resources belonging to a device.
+ *
+ * @param dev_name The device name
+ * 
+ * @return This function does not return anything
+ */
 void  NdbmServer::delete_res(const std::string &dev_name)
 {
 	datum 		key;
@@ -1752,7 +1647,6 @@ void  NdbmServer::delete_res(const std::string &dev_name)
 //
 // Delete all resources in the list from db
 //
-
 	for (j = 0;j < res_list.size();j++)
 	{
 		try
@@ -1801,21 +1695,13 @@ void  NdbmServer::delete_res(const std::string &dev_name)
 }
 
 
-
-/****************************************************************************
-*                                                                           *
-*	Server code for the getpoller_1_svc function       	   	    *
-*                           ---------------                       	    *
-*                                                                           *
-*    Method rule : To retrieve poller info from a device name	    	    *
-*                                                                           *
-*    Argin : - dev : The device name					    *
-*                                                                           *
-*    Argout : No argout			    				    *
-*                                                                           *
-*    This function returns a pointer to an error code			    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To retrieve poller info from a device name
+ * 
+ * @param dev The device name
+ * 
+ * @return This function returns a pointer to an error code
+ */
 db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 {
 	datum 		key;
@@ -1837,7 +1723,6 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 //
 // Initialize parameter sent back to client
 //
-
 	poll_back.db_err = 0;
 	poll_back.pid = 0;
 	poll_back.server_name = NULL;
@@ -1869,7 +1754,6 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 //
 // If the server is not connected to the database, return error
 //
-
 	if (dbgen.connected == False)
 	{
 		poll_back.db_err = DbErr_DatabaseNotConnected;
@@ -1879,7 +1763,6 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 //
 // Find the db table for the sys domain
 //
-
 	for (i = 0;i < dbgen.TblNum;i++)
 	{
 		if (dbgen.TblName[i] == "sys")
@@ -1894,7 +1777,6 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 //
 // Search for a resource "ud_poll_list" with its value set to caller device name
 //
-
 	found = False;
 	try
 	{
@@ -1916,7 +1798,6 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 //				
 // A poller has been found, build its device name
 //
-
 			else
 			{
 				found = True;
@@ -1944,7 +1825,6 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 //
 // Return error if no poller has been found
 //
-
 	if (found == False)
 	{
 		poll_back.db_err = DbErr_NoPollerFound;
@@ -1954,7 +1834,6 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 //
 // get poller device info from the NAMES table
 //
-
 	found = False;
 	try 
 	{
@@ -1998,7 +1877,6 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 //
 // Return error if the device is not found
 //
-
 	if (found == False)
 	{
 		poll_back.db_err = DbErr_DeviceNotDefined;
@@ -2008,29 +1886,19 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 //
 // Return data
 //
-
 	return(&poll_back);
-
 }
 
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the cmp_nocase function       	   	    	    *
-*                           ----------                       	    	    *
-*                                                                           *
-*    Function rule : To compare two string independently of uppercase or    *
-*		     lowercase characters				    *
-*                                                                           *
-*    Argin : - s1 : The first string					    *
-*	     - s2 : the second string					    *
-*                                                                           *
-*    Argout : No argout			    				    *
-*                                                                           *
-*    This function returns 0 if the two strings are identicall		    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To compare two string independently of uppercase or lowercase characters
+ * 
+ * @param s1 The first string
+ * @param s2 the second string
+ * 
+ * @return This function returns 0 if the two strings are identical
+ */
 long NdbmServer::cmp_nocase(const std::string &s1, const std::string &s2)
 {
 	std::string::const_iterator p1 = s1.begin();
@@ -2046,4 +1914,4 @@ long NdbmServer::cmp_nocase(const std::string &s1, const std::string &s2)
 	
 	return (s2.size() - s1.size());
 }
-			
+
