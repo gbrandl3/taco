@@ -5,7 +5,7 @@ AC_DEFUN(TACO_PYTHON_BINDING,
 	CFLAGS="$CFLAGS $PYTHON_INCLUDES"
 	AC_CHECK_HEADERS(Numeric/arrayobject.h, [taco_python_binding=yes], [taco_python_binding=no], [#include <Python.h>])
 	CFLAGS="$ac_save_CFLAGS"
-	AM_CONDITIONAL(PYTHON_BINDING, test $taoc_python_binding = yes)
+	AM_CONDITIONAL(PYTHON_BINDING, test $taco_python_binding = yes)
 ])
 
 AC_DEFUN(TACO_TCL_BINDING,
@@ -127,6 +127,8 @@ AC_DEFUN(TACO_DEFINES,
 	case "$target" in
             i[[3456]]86-*-linux-* | i[[3456]]86-*-linux | i[[3456]]86-*-cygwin*)
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -Dx86=1 -DNDBM" ;;
+	    i386-unknown-freebsd* )
+                        taco_CFLAGS="-Dunix=1 -D__unix=1 -DFREEBSD -Dx86=1 -DNDBM" ;;
             m68k-*-linux-*) 
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -D68k=1 -DNDBM" ;;
             *-*-solar*-* | *-*-sun*-*)
@@ -163,8 +165,9 @@ AC_DEFUN(AC_FIND_GDBM,
 		TACO_GDBM_LDFLAGS=-L${withval}/lib,
 		])
 	LIBS_ORIG="$LIBS"
-	CFLAGS_ORIG="$CFLAGS"
-	CFLAGS="$CFLAGS $TACO_GDBM_INC" 
+	CXXFLAGS_ORIG="$CXXFLAGS"
+	CXXFLAGS="$CFLAGS $TACO_GDBM_INC" 
+	LIBS="$LIBS $TACO_GDBM_LIBS"
 	gdbm_header=gdbm.h
 	AC_CHECK_HEADER(gdbm.h,
 		[gdbm_header="gdbm.h"], [AC_CHECK_HEADER(gdbm/gdbm.h, [gdbm_header="gdbm/gdbm.h"], [MAKE_GDBM="yes"])])
@@ -186,7 +189,7 @@ public:
 	Test a(db, d);
 // #error Broken
 ]
-)], [AC_CHECK_LIB(gdbm, gdbm_open)], [MAKE_GDBM="yes"])
+)], [AC_CHECK_LIB(gdbm, gdbm_open)], [], [MAKE_GDBM="yes"])
 	AC_LANG_POP(C++)
 	if test x${ac_cv_lib_gdbm_gdbm_open} != xyes ; then
 		TACO_GDBM_LIBS="\$(top_builddir)/gdbm/libgdbm.la"
@@ -199,7 +202,8 @@ public:
 	AC_SUBST(TACO_GDBM_INC)
 	AC_SUBST(TACO_GDBM_LDFLAGS)
 	AC_SUBST(MAKE_GDBM)	
-dnl	LIBS="$LIBS_ORIG"
+	LIBS="$LIBS_ORIG"
+	CXXFLAGS="$CXXFLAGS_ORIG"
 ]
 )
 
