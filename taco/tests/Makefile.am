@@ -6,7 +6,9 @@ CLEANFILES 		= log taco
 
 DISTCLEANFILES 		= System.log atconfig *.lineno
 
-INCLUDES		= @TACO_INCLUDES@ @GDBM_CFLAGS@ -g -O0
+INCLUDES		= @TACO_INCLUDES@ @GDBM_CFLAGS@
+
+AM_CFLAGS		= -g -O0
 
 test_asc_stat_SOURCES 	= test_asc_stat.c
 test_asc_stat_LDADD 	= @TACO_CLIENT_LIBS@ @TACO_ASCII_LIBS@ 
@@ -32,7 +34,7 @@ check_PROGRAMS 		= db_connect db_resget db_resput db_getdevexp \
 			db_serverlist db_hostlist db_dsonhost \
 			test_asc_dyn test_asc_stat test_tc test_starter \
 			dev_cmdquery dev_conparams \
-			test_server test_client
+			test_server test_client test_status
 
 check_SCRIPT		= taco
 
@@ -137,4 +139,7 @@ test_server_LDADD 	= @TACO_SERVER_CXX_LIBS@
 test_client_SOURCES 	= test_client.cpp
 test_client_LDADD 	= @TACO_CLIENT_CXX_LIBS@ 
 
+
+test_status_SOURCES 	= test_status.cpp
+test_status_LDADD 	= @TACO_CLIENT_CXX_LIBS@ 
 
