@@ -1,7 +1,7 @@
 #!/bin/sh
 
 LIBTOOLIZE="libtoolize --force --copy --automake"
-ACLOCAL="aclocal"
+ACLOCAL="aclocal -I /usr/local/share/aclocal -I /usr/share/aclocal"
 AUTOHEADER="autoheader"
 AUTOMAKE="automake -a -c --foreign"
 AUTOCONF="autoconf"
@@ -11,11 +11,11 @@ autoversion=`$AUTOCONF --version | head -n 1`
 
 echo "Using $autoversion"
 case $autoversion in
-    *2.5[23467])
+    *2.5[2-9])
 	;;
     *)
 	echo "This autoconf version is not supported by gdbm."
-	echo "gdbm only supports autoconf 2.13 and 2.5[23467]."
+	echo "gdbm only supports autoconf 2.13 and 2.5[2-9]."
 	exit
 	;;
 esac
