@@ -28,7 +28,7 @@ AUTOTEST 		= $(AUTOM4TE) --language=autotest
 check_PROGRAMS 		= db_connect db_resget db_resput db_getdevexp \
 			db_resdomain db_resfamily db_resmember dev_ping \
 			db_getresoval db_devdomain db_devfamily db_devmember \
-			db_devlist db_devperslist test_dev_export test_dev_import \
+			db_devlist db_devperslist dev_export dev_import \
 			db_serverlist db_hostlist db_dsonhost \
 			test_asc_dyn test_asc_stat test_tc test_starter \
 			dev_cmdquery dev_conparams
@@ -52,8 +52,8 @@ db_resdomain_LDADD 	= @TACO_CLIENT_LIBS@
 db_devdomain_SOURCES 	= db_devdomain.cpp 
 db_devdomain_LDADD 	= @TACO_CLIENT_LIBS@
 
-test_dev_export_SOURCES = db_devexp.cpp 
-test_dev_export_LDADD 	= @TACO_CLIENT_LIBS@
+dev_export_SOURCES 	= db_devexp.cpp 
+dev_export_LDADD 	= @TACO_CLIENT_LIBS@
 
 db_resfamily_SOURCES 	= db_resfamily.cpp 
 db_resfamily_LDADD 	= @TACO_CLIENT_LIBS@
@@ -76,8 +76,8 @@ db_devperslist_LDADD 	= @TACO_CLIENT_LIBS@
 db_devfamily_SOURCES 	= db_devfamily.cpp 
 db_devfamily_LDADD 	= @TACO_CLIENT_LIBS@
 
-test_dev_import_SOURCES = test_dev_import.cpp 
-test_dev_import_LDADD 	= @TACO_CLIENT_LIBS@
+dev_import_SOURCES 	= test_dev_import.cpp 
+dev_import_LDADD 	= @TACO_CLIENT_LIBS@
 
 db_resmember_SOURCES 	= db_resmember.cpp 
 db_resmember_LDADD 	= @TACO_CLIENT_LIBS@
