@@ -19,14 +19,14 @@
  */
 int main(int argc, char *argv[])
 {
-    long 	error;
+	long 	error;
 //
 // Connect to database server
 //
-    if (db_import(&error) == -1)
-    {
-	cerr << "db_devinfo : Impossible to connect to database server" << endl;
-	exit(-1);
-    }
-    return 0;
+	if (db_import(&error) == -1)
+	{
+		std::cerr << "db_devinfo : Impossible to connect to database server" << std::endl;
+		exit(-1);
+	}
+	return 0;
 }

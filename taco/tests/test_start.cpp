@@ -8,7 +8,6 @@ extern long debug_flag;
 
 int main(int argc,char **argv)
 {
-
 	devserver 		ps;
 	long 			readwrite = ADMIN_ACCESS, 
 				pid,
@@ -20,13 +19,9 @@ int main(int argc,char **argv)
 	DevVarStringArray	cmdline = {0, NULL};
 	std::string		cmd_string;
 
-	/*debug_flag = (DEBUG_ON_OFF | DBG_TRACE | DBG_API | DBG_SEC);*/
-	
-	cerr << DevRun << endl
-		<< DevStop << endl
-		<< DevRestore << endl << endl
-		<< DevStatus << endl;
-
+#ifdef EBUG
+	debug_flag = (DEBUG_ON_OFF | DBG_TRACE | DBG_API | DBG_SEC);
+#endif	
 	switch (argc)	
 	{
 		case 1:

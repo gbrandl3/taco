@@ -26,6 +26,7 @@ if test $# -gt 0 ; then
 				make -C $top_builddir DESTDIR=$dc_destdir install >/dev/null 2>&1
 				. $sysconfdir/tacoenv.sh
 				set_env
+				export TACO_PATH=$sbindir
 				$sbindir/taco.startup >log 2>&1
 				exit 0
 			fi
