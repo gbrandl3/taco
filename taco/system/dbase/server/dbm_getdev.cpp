@@ -11,6 +11,7 @@
 /* Some C++ include files */
 
 #include <iostream>
+#include <algorithm>
 #include <string>
 #include <NdbmClass.h>
 #include <NdbmServer.h>
