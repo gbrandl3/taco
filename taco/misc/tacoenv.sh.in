@@ -9,6 +9,7 @@ datadir=@datadir@
 pythondir=@pythondir@
 pyexecdir=@pyexecdir@
 
+### USER SETUP START
 # Add your domain tables here (comma separated)
 DBTABLES_CUSTOM=${DBTABLES_CUSTOM:-TEST}
 
@@ -21,13 +22,24 @@ TACO_LOGGING=yes
 # set the database type "dbm" or "mysql"
 TACO_DATABASE=dbm
 
+# set the mySQL user for the taco database
+MYSQL_USER=root
+
+# set the password for the mySQL user for the taco database
+MYSQL_PASSWORD=
+
 # It is unlikely that the rest of the file needs a modification
 DSHOME=${DSHOME:-${prefix}}
+
+### USER SETUP END
+
 DBTABLES=NAMES,PS_NAMES,CLASS,SYS,ERROR,CMDS,SEC,EVENTS,${DBTABLES_CUSTOM}
+unset DBTABLES_CUSTOM
+
 RES_BASE_DIR=${RES_BASE_DIR:-@resdatadir@}
 DBM_DIR=@dbmdir@
-LOGPATH=${DSHOME}/log
-NETHOST=${NETHOST:-`hostname|cut -f1 -d'.'`}
+LOGPATH=@datadir@/taco/log
+NETHOST=${NETHOST:-`@HOSTNAME@`}
 if [ "$DSHOME" = "$prefix" ] ; then
 	LD_LIBRARY_PATH=@libdir@${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
 	TACO_PATH=@sbindir@
@@ -40,10 +52,6 @@ fi
 
 LD_LIBRARY_PATH=@GCC_LIBRARY_PATH@:${LD_LIBRARY_PATH}
 PYTHONPATH=@pythondir@:@pyexecdir@${PYTHONPATH:+:}${PYTHONPATH}
-unset DBTABLES_CUSTOM
-
-MYSQL_USER=root
-MYSQL_PASSWORD=
 
 export DSHOME DBTABLES RES_BASE_DIR DBM_DIR LOGPATH NETHOST LD_LIBRARY_PATH TACO_PATH PATH PYTHONPATH MYSQL_USER MYSQL_PASSWORD
 

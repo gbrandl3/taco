@@ -9,6 +9,8 @@ setenv datadir @datadir@
 setenv pythondir @pythondir@
 setenv pyexecdir @pyexecdir@
 
+### USER SETUP START
+
 # Add your domain tables here (comma seperated)
 if (${?DBTABLES_CUSTOM}) then
 ;
@@ -25,6 +27,12 @@ setenv TACO_LOGGING yes
 # set the database type "dbm" or "mysql"
 setenv TACO_DATABASE dbm
 
+# set the mySQL user for the taco database
+set env MYSQL_USER root
+
+# set the password for the mySQL user for the taco database
+setenv MYSQL_PASSWORD
+
 # It is unlikely that the rest of the file needs a modification
 if (${?DSHOME}) then
 ;
@@ -32,7 +40,10 @@ else
 setenv DSHOME ${prefix}
 endif
 
+### USER SETUP END
+
 setenv DBTABLES NAMES,PS_NAMES,CLASS,SYS,ERROR,CMDS,SEC,EVENTS,${DBTABLES_CUSTOM}
+unsetenv DBTABLES_CUSTOM
 if (${?RES_BASE_DIR}) then
 ;
 else
@@ -40,11 +51,11 @@ setenv RES_BASE_DIR @resdatadir@
 endif
 
 setenv DBM_DIR @dbmdir@
-setenv LOGPATH ${DSHOME}/log
+setenv LOGPATH @datadir@/taco/log
 if (${?NETHOST}) then
 ;
 else
-setenv NETHOST `hostname|cut -f1 -d'.'`
+setenv NETHOST `@HOSTNAME@`
 endif
 
 if ( $DSHOME == $prefix ) then
@@ -80,9 +91,4 @@ if (${?PYTHONPATH}) then
 else
 	setenv PYTHONPATH @pkgpythondir@:@pkgpyexecdir@
 endif
-
-unsetenv DBTABLES_CUSTOM
-
-setenv MYSQL_USER root
-setenv MYSQL_PASSWORD
 
