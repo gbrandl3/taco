@@ -12,9 +12,9 @@
 //
 // Original:	February 1995
 //
-// $Revision: 1.2 $
+// $Revision: 1.3 $
 //
-// $Date: 2004-11-24 20:45:56 $
+// $Date: 2005-03-29 09:45:48 $
 //
 // $Author: andy_gotz $
 //
@@ -54,10 +54,12 @@ typedef struct _DeviceCommandListEntry {
                                      DevArgType         argout_type;
                                      long               min_access;
                                      char               *cmd_name;
+/*
 				_DeviceCommandListEntry() : cmd(0), fn(NULL), argin_type(0), argout_type(0), min_access(0), cmd_name(NULL) {};
 				_DeviceCommandListEntry(DevCommand _cmd, DeviceMemberFunction f, DevArgType in, DevArgType out, 
 							long acc, char *_cmd_name = NULL) 
 					: cmd(_cmd), fn(f), argin_type(in), argout_type(out), min_access(acc), cmd_name(_cmd_name)	{};
+ */					
                                     }
                DeviceCommandListEntry;
 
@@ -102,7 +104,7 @@ typedef struct _DeviceCommandListEntry *DeviceCommandList;
 	virtual const char 	*GetClassName() {return this->class_name;};
 	virtual const char 	*GetDevType(){return this->dev_type;};
 	virtual const char 	*GetDevName(){return this->name;};
-//	virtual unsigned int 	GetCommandNumber(){return this->n_commands;};
+	virtual unsigned int 	GetCommandNumber();
 	virtual long 		CommandQuery(_dev_cmd_info *sequence);
 //	virtual unsigned 	GetEventNumber(void){return this->n_events;};
 	virtual long		EventQuery(_dev_event_info *);
