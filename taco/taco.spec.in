@@ -146,13 +146,14 @@ fi
 %files -f @PACKAGE@.txt
 %defattr(-,root,root)
 @prefix@/templates/taco/taco
-@prefix@/templates/taco/tacoenv.sh
 %config(noreplace) @prefix@/sbin/taco.shutdown
 %config(noreplace) @prefix@/sbin/taco.startup
 %config(noreplace) @prefix@/dbase/res/SEC/sec_auth.res
 %config @prefix@/dbase/res/CMDS/dev_cmds.res
 %config @prefix@/dbase/res/ERROR/dev_errors.res
 %config @prefix@/dbase/res/ERROR/db_errors.res
+%config @prefix@/etc/tacoenv.sh
+%config @prefix@/etc/tacoenv.csh
 # %doc INSTALL doc/TACO.pdf doc/README doc/index.html
 @prefix@/bin/db_fillup
 @prefix@/bin/db_update
@@ -189,3 +190,4 @@ Provides: taco-x-apps
 @appdefaultdir@/GReta
 @appdefaultdir@/XDevmenu
 
+%changelog
