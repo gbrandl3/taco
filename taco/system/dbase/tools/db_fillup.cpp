@@ -196,7 +196,7 @@ static int from_res(void)
 	    		temp = std::string(line, strlen(line) - 1);	// remove colon
 //	    		res_dir = base_dir;
 
-#if defined(linux) || defined(sun)
+#if defined(linux) || defined(sun) || defined(FreeBSD)
 	    		res_dir = "/" + temp;
 #endif /* linux, sun */
 		    	res_dir = temp;
@@ -1207,7 +1207,7 @@ static void create_db(void)
 
 /* Create database tables of the database definition */
 
-#if defined(linux)
+#if defined(linux) || defined(FreeBSD)
     	int flags = GDBM_WRCREAT; // O_CREAT | O_RDWR;
 #else
     	int flags = O_CREAT;
