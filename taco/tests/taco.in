@@ -1,0 +1,10 @@
+#!/bin/sh
+
+DSHOME=`pwd`/test@prefix@
+srcdir=`grep '^srcdir' Makefile | cut -d' ' -f 3`
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+sbindir=@sbindir@
+sysconfdir=@sysconfdir@
+

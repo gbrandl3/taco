@@ -1,0 +1,6 @@
+#!/bin/sh
+
+. ./taco
+. ./test/$sysconfdir/tacoenv.sh
+test/$bindir/db_info >>log
+exit $?

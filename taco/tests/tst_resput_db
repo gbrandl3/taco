@@ -1,0 +1,8 @@
+#! /bin/sh
+. ./taco
+. ./test/$sysconfdir/tacoenv.sh
+
+if { ! ./db_connect ; } ; then exit 77 ; fi
+if { ! ./db_resput test/device/2/res1 "TEST" >log 2>&1 ; } ; then exit 1 ; fi
+if [ "`./db_resget test/device/2/res1 2>log`" != "TEST" ] ; then exit 1 ; fi
+exit 0

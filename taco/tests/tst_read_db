@@ -1,0 +1,11 @@
+#! /bin/sh
+. ./taco
+. ./test/$sysconfdir/tacoenv.sh
+
+if { ! ./db_connect ; } ; then exit 77 ; fi
+if { ! test/$bindir/db_read names >log 2>&1 ; } ; then
+	exit 1
+elif { ! test/$bindir/db_read all >log 2>&1 ; } ; then
+	exit 1
+fi
+exit 0

@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# instverify.startup : starts the TACO Inst_verify device server and menu
+#
+
+# setup TACO environment variables
+
+. ./taco
+. ./test/$sysconfdir/tacoenv.sh
+
+echo "Starting Inst_verify device server ..."	>>log 
+test/$bindir/Inst_verify 1 >>log 2>&1 &
+sleep 2 
+echo "Starting Inst_verify menu ..." >> log
+echo 3 > .instverify
+echo 0 >>.instverify
+test/$bindir/Inst_verify_menu test/device/1 >>log 2>&1 <.instverify 
+sleep 1
+rm .instverify
+## killall Inst_verify

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+. ./taco
+
+if [ -d test ] ; then
+	rm -rf test
+fi
+if { mkdir test; } ; then
+	dc_destdir=`pwd`/test
+	make -C .. DESTDIR=$dc_destdir install >log 2>&1
+	. ./test/$sysconfdir/tacoenv.sh
+	./test/$sbindir/taco.startup >>log 2>&1
+	exit 0
+fi
+
+exit 1

@@ -1,0 +1,9 @@
+#! /bin/sh
+. ./taco
+. ./test/$sysconfdir/tacoenv.sh
+
+export RES_BASE_DIR=`grep '^srcdir' Makefile | cut -d' ' -f 3`
+
+if { ! ./db_connect ; } ; then exit 77; fi
+if { ! test/$bindir/db_update test.res >log 2>&1 ; } ; then exit 1 ; fi
+exit 0
