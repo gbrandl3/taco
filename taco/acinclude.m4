@@ -59,6 +59,7 @@ AC_DEFUN(TACO_DC_API,
 AC_DEFUN(TACO_GRETA,
 [
 	AC_REQUIRE([TACO_DC_API])
+	AC_REQUIRE([X_AND_MOTIF])
 	AC_ARG_ENABLE(greta, AC_HELP_STRING([--enable-greta], [build the graphical dbase tool @<:@default=yes@:>@]),
 		[case "${enable_greta}" in
 			yes)	greta=yes;;
@@ -97,6 +98,7 @@ AC_DEFUN(TACO_ASCII_API,
 AC_DEFUN(TACO_XDEVMENU,
 [
 	AC_REQUIRE([TACO_ASCII_API])
+	AC_REQUIRE([X_AND_MOTIF])
 	AC_ARG_ENABLE(xdevmenu, AC_HELP_STRING([--enable-xdevmenu], [build the graphical ds tool @<:@default=yes@:>@]),
 		[case "${enable_xdevmenu}" in
 			yes)	xdevmenu=yes;;
@@ -116,6 +118,7 @@ AC_DEFUN(TACO_XDEVMENU,
 AC_DEFUN(X_AND_MOTIF,
 [
 	AC_REQUIRE([AC_PATH_XTRA])
+	appdefaultdir="`echo $X_LDFLAGS | cut -c3- `/X11/app-defaults"
 	AC_ARG_WITH(motif, AC_HELP_STRING([--with-motif@<:@=ARG@:>@], [Motif @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the Motif installation, e.g. '/usr/local/myMotif']), [
 		case  "$with_motif" in
 			yes) 	MOTIF_LIBS="-lXm" ;;
@@ -124,8 +127,7 @@ AC_DEFUN(X_AND_MOTIF,
 				MOTIF_INCLUDES="-I$withval/include" ;;
 		esac      
 		],[MOTIF_LIBS="-lXm"])
-
-	appdefaultdir="/usr/X11/lib/X11/app-defaults"
+	
 	AC_SUBST(MOTIF_LIBS)
 	AC_SUBST(MOTIF_INCLUDES)
 ])
