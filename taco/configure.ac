@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0-beta, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.11 $)dnl
+AC_REVISION($Revision: 1.12 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -80,7 +80,17 @@ AC_TYPE_SIZE_T
 AC_HEADER_TIME
 AC_STRUCT_TM
 AC_C_VOLATILE
-AC_CHECK_TYPE(socklen_t)
+AC_CHECK_TYPES(socklen_t, [],[],
+[#if HAVE_SYS_SOCKET_H
+#	include	<sys/socket.h>
+#elif HAVE_SOCKET_H
+#	include <socket.h>
+#elif HAVE_NETDB_H
+#	include <netdb.h>
+#elif HAVE_ARPA_INET_H
+#	include <arpa/inet.h>
+#endif])
+AC_CHECK_TYPES(time_t)
 
 
 # Checks for library functions.
@@ -209,12 +219,6 @@ AC_CONFIG_FILES(classes/signal/Makefile
 		classes/signal/multiple/doc/Makefile
 		classes/signal/single/Makefile
 		classes/signal/single/doc/Makefile)
-
-dnl AC_CONFIG_FILES(classes/profibusdp/Makefile
-dnl 		classes/profibusdp/lib/Makefile
-dnl 		classes/profibusdp/driver/Makefile)
-
-dnl AC_CONFIG_FILES(system/dbase/newserver/Makefile)
 
 AC_CONFIG_FILES(m4/Makefile)
 
