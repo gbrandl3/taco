@@ -52,5 +52,37 @@ AT_CHECK([taco db_devinfo test/device/x], [255],
 AT_CLEANUP
 
 AT_SETUP([])
-AT_CHECK([killall Inst_verify])
+AT_CHECK([nohup taco AGPSpp 1 >/dev/null &
+sleep 1])
+AT_CLEANUP
+
+AT_SETUP([])
+AT_DATA([agps],
+[[4
+0
+]])
+AT_CHECK([taco ps_menu test/agps/1 < agps], [0], 
+[[dev_import(test/agps/1) returned 0 (error=0)
+Select one of the following commands :
+
+0. Quit
+1. On          2. Off          3. State
+4. Status      5. Set          6. Read
+7. Update      8. Local        9. Error
+10.Resett
+cmd ?
+DevStatus dev_putget() returned 0
+  On
+Select one of the following commands :
+
+0. Quit
+1. On          2. Off          3. State
+4. Status      5. Set          6. Read
+7. Update      8. Local        9. Error
+10.Resett
+cmd ?]]) 
+AT_CLEANUP
+
+AT_SETUP([])
+AT_CHECK([killall Inst_verify AGPSpp])
 AT_CLEANUP

@@ -49,6 +49,11 @@ if test $# -gt 0 ; then
 				exit 0
 			fi
 			exit 1 ;;
+		ldd)
+			. $sysconfdir/tacoenv.sh
+			set_env
+			shift 1
+			ldd $bindir/$1 ;;
 		*)
 			. $sysconfdir/tacoenv.sh
 			set_env

@@ -1,6 +1,5 @@
 AT_SETUP([connection to the database])
-AT_CHECK([. taco
-. $sysconfdir/tacoenv.sh
+AT_CHECK([AT_TACO_RUN_LOCAL
 db_connect])
 AT_CLEANUP
 
@@ -53,15 +52,13 @@ names: test|test|1|:  test/device/1|not_exp|0|0|unknown|unknown|0|unknown|
 AT_CLEANUP
 
 AT_SETUP([db_getresource function])
-AT_CHECK([. taco 
-. $sysconfdir/tacoenv.sh
+AT_CHECK([AT_TACO_RUN_LOCAL
 db_resget test/device/1/res1], [], [[resource 1
 ]])
 AT_CLEANUP
 
 AT_SETUP([db_putresource function])
-AT_CHECK([. taco 
-. $sysconfdir/tacoenv.sh
+AT_CHECK([AT_TACO_RUN_LOCAL
 db_resput test/device/2/res1 TEST], [])
 AT_CLEANUP
 
@@ -71,8 +68,7 @@ AT_CLEANUP
 
 AT_SETUP([existing domains])
 AT_CHECK([
-. taco
-. $sysconfdir/tacoenv.sh
+AT_TACO_RUN_LOCAL
 db_resdomain 
 ], [], [[class
 cmds
@@ -86,8 +82,7 @@ AT_CLEANUP
 
 AT_SETUP([existing family test])
 AT_CHECK([
-. taco
-. $sysconfdir/tacoenv.sh
+AT_TACO_RUN_LOCAL 
 db_resfamily test
 ], [], [[device
 ]])
@@ -95,8 +90,7 @@ AT_CLEANUP
 
 AT_SETUP([existing member test])
 AT_CHECK([
-. taco
-. $sysconfdir/tacoenv.sh
+AT_TACO_RUN_LOCAL 
 db_resmember test device
 ], [], [[1
 ]])
