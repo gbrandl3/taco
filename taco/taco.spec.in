@@ -53,20 +53,20 @@ if test "x$DSHOME" != x@prefix@ ; then
 		mv $i tmp.sed
 		sed -e "s%@prefix@%$DSHOME%" tmp.sed > $i
 	done
-	for i in lib/linux/x86/libTACOMySQL.la \
-		lib/linux/x86/libTACOndbm.la \
-		lib/linux/x86/libascapi.la \
-		lib/linux/x86/libdataport.la \
-		lib/linux/x86/libdbapi.la \
-		lib/linux/x86/libdcapi.la \
-		lib/linux/x86/libdcmem.la \
-		lib/linux/x86/libdsapi.la \
-		lib/linux/x86/libdsapig++.la \
-		lib/linux/x86/libdsxdr.la \
-		lib/linux/x86/libdsxdr_all.la \
-		lib/linux/x86/libtacoapi.la \
-		lib/linux/x86/libtacoapig++.la \
-		lib/linux/x86/libtcapi.la \
+	for i in lib/@taco_install_path@/libTACOMySQL.la \
+		lib/@taco_install_path@/libTACOndbm.la \
+		lib/@taco_install_path@/libascapi.la \
+		lib/@taco_install_path@/libdataport.la \
+		lib/@taco_install_path@/libdbapi.la \
+		lib/@taco_install_path@/libdcapi.la \
+		lib/@taco_install_path@/libdcmem.la \
+		lib/@taco_install_path@/libdsapi.la \
+		lib/@taco_install_path@/libdsapig++.la \
+		lib/@taco_install_path@/libdsxdr.la \
+		lib/@taco_install_path@/libdsxdr_all.la \
+		lib/@taco_install_path@/libtacoapi.la \
+		lib/@taco_install_path@/libtacoapig++.la \
+		lib/@taco_install_path@/libtcapi.la \
 		templates/taco/taco
 	do
 		mv $i tmp.sed
@@ -77,7 +77,7 @@ if test "x$DSHOME" != x@prefix@ ; then
 fi
 
 # Update the linker cache
-cd "$DSHOME/lib/linux/x86"
+cd "$DSHOME/lib/@taco_install_path@
 /sbin/ldconfig -n
 
 # Install runlevel control script
@@ -146,24 +146,24 @@ fi
 %config @prefix@/dbase/res/CLASS/Inst_verify.res
 %config @prefix@/dbase/res/EVENTS/README
 %doc INSTALL doc/TACO.pdf doc/README
-@prefix@/bin/linux/x86/db_fillup
-@prefix@/bin/linux/x86/db_update
-@prefix@/bin/linux/x86/db_read
-@prefix@/bin/linux/x86/db_info
-@prefix@/bin/linux/x86/db_initcache
-@prefix@/bin/linux/x86/db_devinfo
-@prefix@/bin/linux/x86/db_devdel
-@prefix@/bin/linux/x86/db_servdel
-@prefix@/bin/linux/x86/db_servinfo
-@prefix@/bin/linux/x86/db_servunreg
-@prefix@/bin/linux/x86/db_devres
-@prefix@/bin/linux/x86/db_resdel
-@prefix@/system/bin/linux/x86/Manager
-@prefix@/system/bin/linux/x86/unreg
-@prefix@/system/bin/linux/x86/MessageServer
-@prefix@/system/bin/linux/x86/dcwr_alo
-@prefix@/system/bin/linux/x86/dcrd_alo
-@prefix@/system/bin/linux/x86/dbm_server
+@prefix@/bin/@taco_install_path@/db_fillup
+@prefix@/bin/@taco_install_path@/db_update
+@prefix@/bin/@taco_install_path@/db_read
+@prefix@/bin/@taco_install_path@/db_info
+@prefix@/bin/@taco_install_path@/db_initcache
+@prefix@/bin/@taco_install_path@/db_devinfo
+@prefix@/bin/@taco_install_path@/db_devdel
+@prefix@/bin/@taco_install_path@/db_servdel
+@prefix@/bin/@taco_install_path@/db_servinfo
+@prefix@/bin/@taco_install_path@/db_servunreg
+@prefix@/bin/@taco_install_path@/db_devres
+@prefix@/bin/@taco_install_path@/db_resdel
+@prefix@/system/bin/@taco_install_path@/Manager
+@prefix@/system/bin/@taco_install_path@/unreg
+@prefix@/system/bin/@taco_install_path@/MessageServer
+@prefix@/system/bin/@taco_install_path@/dcwr_alo
+@prefix@/system/bin/@taco_install_path@/dcrd_alo
+@prefix@/system/bin/@taco_install_path@/dbm_server
 
 %package x-apps
 Summary: TACO control system X11 applications.
@@ -175,8 +175,9 @@ Provides: taco-x-apps
 
 %files x-apps
 %defattr(-,root,root)
-@prefix@/bin/linux/x86/greta
-@prefix@/bin/linux/x86/xdevmenu
+@prefix@/bin/@taco_install_path@/greta
+@prefix@/bin/@taco_install_path@/xdevmenu
+@prefix@/bin/@taco_install_path@/S_Alarm
 @appdefaultdir@/GReta
 @appdefaultdir@/XDevmenu
 

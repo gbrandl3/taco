@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0-rc2, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.19 $)dnl
+AC_REVISION($Revision: 1.20 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -145,44 +145,44 @@ AM_RPM_INIT
 AM_CONDITIONAL(MAKE_RPMS, test x$make_rpms = xtrue)
 
 AC_CONFIG_FILES(Makefile 
-	  misc/Makefile
-	  misc/taco-config
-	  misc/taco
-	  misc/tacoenv.sh
-	  misc/taco.startup
-	  misc/taco.startup.sec
-	  misc/.taco.csh
-	  misc/.taco_env
-	  doc/Makefile
-	  lib/Makefile
-	  lib/Doxyfile
-	  lib/private/Makefile
-	  lib/dbase/Makefile
-	  lib/dataport/Makefile
-	  lib/xdr/Makefile
-	  lib/dc/Makefile
-	  lib/ascii/Makefile
-	  lib/ascii/doc/Makefile
-	  lib/tc/Makefile
-	  system/dbase/Makefile
-	  system/dbase/server/Makefile
-	  system/dbase/tools/Makefile
-	  system/dbase/res/Makefile
-          system/Makefile 
-          system/manager/Makefile 
-          system/msg/Makefile 
-          system/dc/Makefile 
-          system/dc/doc/Makefile 
-          system/dc/server/Makefile 
-          system/dc/library/Makefile 
-	  system/dc/tools/Makefile
-	  classes/Makefile
-	  system/dbase/greta/Makefile
-	  system/xdevmenu/Makefile
-	  system/xdevmenu/doc/Makefile
-	  system/starter/Makefile
-	  system/alarm/Makefile
-	  taco.spec
+		misc/Makefile
+		misc/taco-config
+		misc/taco
+		misc/tacoenv.sh
+		misc/taco.startup
+		misc/taco.startup.sec
+		misc/.taco.csh
+		misc/.taco_env
+		doc/Makefile
+		lib/Makefile
+		lib/Doxyfile
+		lib/private/Makefile
+		lib/dbase/Makefile
+		lib/dataport/Makefile
+		lib/xdr/Makefile
+		lib/dc/Makefile
+		lib/ascii/Makefile
+		lib/ascii/doc/Makefile
+		lib/tc/Makefile
+		system/dbase/Makefile
+		system/dbase/server/Makefile
+		system/dbase/tools/Makefile
+		system/dbase/res/Makefile
+		system/Makefile 
+		system/manager/Makefile 
+		system/msg/Makefile 
+		system/dc/Makefile 
+		system/dc/doc/Makefile 
+		system/dc/server/Makefile 
+		system/dc/library/Makefile 
+		system/dc/tools/Makefile
+		classes/Makefile
+		system/dbase/greta/Makefile
+		system/xdevmenu/Makefile
+		system/xdevmenu/doc/Makefile
+		system/starter/Makefile
+		system/alarm/Makefile
+		taco.spec
 )
 
 dnl AC_CONFIG_FILES(system/dbdev/Makefile
@@ -202,13 +202,16 @@ AC_CONFIG_FILES(classes/signal/Makefile
 
 AC_CONFIG_FILES(m4/Makefile)
 
-AC_CONFIG_FILES(bindings/python/Makefile bindings/python/lib/Makefile bindings/python/doc/Makefile bindings/python/demo.server/Makefile)
+AC_CONFIG_FILES(bindings/python/Makefile 
+		bindings/python/lib/Makefile 
+		bindings/python/doc/Makefile 
+		bindings/python/demo.server/Makefile)
 
 AC_CONFIG_FILES(bindings/Makefile bindings/tcl/Makefile)
 
 AC_CONFIG_FILES(bindings/labview/Makefile
-					bindings/labview/client/Makefile
-					bindings/labview/server/Makefile)
+		bindings/labview/client/Makefile
+		bindings/labview/server/Makefile)
 
 dnl Initialize the test suite
 AC_CONFIG_TESTDIR(tests)
