@@ -14,9 +14,9 @@
 
  Original   :	April 1993
 
- Version:	$Revision: 1.4 $
+ Version:	$Revision: 1.5 $
 
- Date:		$Date: 2003-05-02 09:12:49 $
+ Date:		$Date: 2003-05-09 06:33:49 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -486,15 +486,15 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 	dev_query_in.var_argument.sequence = NULL;
 
 
-	/*
+/*
  *  Call the rpc entry point RPC_DEV_CMD_QUERY at the specified device server.
  */
 
 	memset ((char *)&dev_query_out, 0, sizeof (dev_query_out));
 
-	/*
-	 * Query a device with the current version number >1.
-   	 */
+/*
+ * Query a device with the current version number >1.
+ */
 	if ( ds->vers_number > DEVSERVER_VERS)
 	{
 		clnt_stat = clnt_call (ds->clnt, RPC_DEV_CMD_QUERY,
@@ -503,29 +503,28 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 	}
 	else
 	{
-		/*
-	    * Query a device from an old version server.
-	    */
+/*
+ * Query a device from an old version server.
+ */
 		clnt_stat = clnt_call (ds->clnt, RPC_DEV_CMD_QUERY,
 		    (xdrproc_t)xdr__dev_query_in_3,  (caddr_t) &dev_query_in,
 		    (xdrproc_t)xdr__dev_query_out_3, (caddr_t) &dev_query_out, TIMEVAL(timeout));
 	}
 
 
-	/*
-         * Check for errors on the RPC connection.
-         */
+/*
+ * Check for errors on the RPC connection.
+ */
 
 	if ( dev_rpc_error (ds, clnt_stat, error) == DS_NOTOK )
 	{
 		return (DS_NOTOK);
 	}
 
-	/*
-         * Free the variable arguments in the dev_query_out
-         * structure, coming from the server.
-         */
-
+/*
+ * Free the variable arguments in the dev_query_out
+ * structure, coming from the server.
+ */
 	if (dev_query_out.var_argument.length > 0)
 	{
 		cmd_names = (char**)realloc(cmd_names,dev_query_out.var_argument.length*sizeof(char*));
@@ -573,7 +572,6 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
  * argument types, returned with dev_query_out from the
  * device servers command list.
  */
-
 		varcmdarr->sequence[i].cmd      = dev_query_out.sequence[i].cmd;
 		varcmdarr->sequence[i].in_type  = dev_query_out.sequence[i].in_type;
 		varcmdarr->sequence[i].out_type = dev_query_out.sequence[i].out_type;

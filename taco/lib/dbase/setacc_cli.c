@@ -13,9 +13,9 @@
 
  Original   :   January 1991
 
- Version    :	$Revision: 1.1 $
+ Version    :	$Revision: 1.2 $
 
- Date       :	$Date: 2003-04-25 11:21:42 $
+ Date       :	$Date: 2003-05-09 06:33:50 $
  
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -982,212 +982,221 @@ long try_reconnect = False;
 
 /* If the array has only one element, treat it as a single resource */
 
-				if (ptrc[0] != INIT_ARRAY) {
+				if (ptrc[0] != INIT_ARRAY) 
+				{
 #ifndef OSK
-				if ((double_ptr = (double *)malloc((size_t)sizeof(double))) == NULL) {
+					if ((double_ptr = (double *)malloc((size_t)sizeof(double))) == NULL) 
 #else
-				if ((double_ptr = (double *)malloc(sizeof(double))) == NULL) {
+					if ((double_ptr = (double *)malloc(sizeof(double))) == NULL) 
 #endif /* OSK */
-					*perr = DbErr_ClientMemoryAllocation;
-					return(DS_NOTOK);
-									}
+					{
+						*perr = DbErr_ClientMemoryAllocation;
+						return(DS_NOTOK);
+					}
 
-				*double_ptr = atof(ptrc);
+					*double_ptr = atof(ptrc);
 
-				((DevVarDoubleArray *)res[i].resource_adr)->sequence = double_ptr;
-				((DevVarDoubleArray *)res[i].resource_adr)->length = 1;
-							}
-
-				else {
+					((DevVarDoubleArray *)res[i].resource_adr)->sequence = double_ptr;
+					((DevVarDoubleArray *)res[i].resource_adr)->length = 1;
+				}
+				else 
+				{
 
 /* Retrieve the array element number */
 
 #ifndef OSK
-				tmp = (char *)strchr(ptrc,SEP_ELT);
+					tmp = (char *)strchr(ptrc,SEP_ELT);
 #else
-				tmp = index(ptrc,SEP_ELT);
+					tmp = index(ptrc,SEP_ELT);
 #endif /* OSK */
-				diff = (u_int)(tmp++ - ptrc) - 1;
-				strncpy(numb,&ptrc[1],diff);
-				numb[diff] = 0;
-				ctr = (u_int)atoi(numb) - 1;
+					diff = (u_int)(tmp++ - ptrc) - 1;
+					strncpy(numb,&ptrc[1],diff);
+					numb[diff] = 0;
+					ctr = (u_int)atoi(numb) - 1;
 
 #ifndef OSK
-				if ((double_ptr = (double *)calloc((size_t)(ctr + 1),(size_t)sizeof(double))) == NULL) {
+					if ((double_ptr = (double *)calloc((size_t)(ctr + 1),(size_t)sizeof(double))) == NULL) 
 #else
-				if ((double_ptr = (double *)calloc((ctr + 1),sizeof(double))) == NULL) {
+					if ((double_ptr = (double *)calloc((ctr + 1),sizeof(double))) == NULL) 
 #endif /* OSK */
-					*perr = DbErr_ClientMemoryAllocation;
-					return(DS_NOTOK);
-									}
+					{
+						*perr = DbErr_ClientMemoryAllocation;
+						return(DS_NOTOK);
+					}
 
 /* Convert each array element */
-
-				for (l=0;l<ctr;l++) {
+					for (l=0;l<ctr;l++) 
+					{
 #ifndef OSK
-					temp = (char *)strchr(tmp,SEP_ELT);
+						temp = (char *)strchr(tmp,SEP_ELT);
 #else
-					temp = index(tmp,SEP_ELT);
+						temp = index(tmp,SEP_ELT);
 #endif /* OSK */
-					diff = (u_int)(temp++ - tmp);
-					strncpy(numb,tmp,diff);
-					numb[diff] = 0;
-					double_ptr[l] = atof(numb);
-					tmp = temp;
-							}
-				double_ptr[l] = atof(tmp);
-
-				((DevVarDoubleArray *)res[i].resource_adr)->sequence = double_ptr;
-				((DevVarDoubleArray *)res[i].resource_adr)->length = ctr + 1;
+						diff = (u_int)(temp++ - tmp);
+						strncpy(numb,tmp,diff);
+						numb[diff] = 0;
+						double_ptr[l] = atof(numb);
+						tmp = temp;
 					}
+					double_ptr[l] = atof(tmp);
+
+					((DevVarDoubleArray *)res[i].resource_adr)->sequence = double_ptr;
+					((DevVarDoubleArray *)res[i].resource_adr)->length = ctr + 1;
+				}
 				break;
 
 			case D_VAR_FLOATARR :
-
 /* If the array has only one element, treat it as a single resource */
-
-				if (ptrc[0] != INIT_ARRAY) {
+				if (ptrc[0] != INIT_ARRAY) 
+				{
 #ifndef OSK
-				if ((float_ptr = (float *)malloc((size_t)sizeof(float))) == NULL) {
+					if ((float_ptr = (float *)malloc((size_t)sizeof(float))) == NULL) 
 #else
-				if ((float_ptr = (float *)malloc(sizeof(float))) == NULL) {
+					if ((float_ptr = (float *)malloc(sizeof(float))) == NULL) 
 #endif /* OSK */
-					*perr = DbErr_ClientMemoryAllocation;
-					return(DS_NOTOK);
-									}
+					{
+						*perr = DbErr_ClientMemoryAllocation;
+						return(DS_NOTOK);
+					}
 
-				*float_ptr = (float)atof(ptrc);
+					*float_ptr = (float)atof(ptrc);
 
-				((DevVarFloatArray *)res[i].resource_adr)->sequence = float_ptr;
-				((DevVarFloatArray *)res[i].resource_adr)->length = 1;
-							}
-
-				else {
+					((DevVarFloatArray *)res[i].resource_adr)->sequence = float_ptr;
+					((DevVarFloatArray *)res[i].resource_adr)->length = 1;
+				}
+				else 
+				{
 
 /* Retrieve the array element number */
 
 #ifndef OSK
-				tmp = (char *)strchr(ptrc,SEP_ELT);
+					tmp = (char *)strchr(ptrc,SEP_ELT);
 #else
-				tmp = index(ptrc,SEP_ELT);
+					tmp = index(ptrc,SEP_ELT);
 #endif /* OSK */
-				diff = (u_int)(tmp++ - ptrc) - 1;
-				strncpy(numb,&ptrc[1],diff);
-				numb[diff] = 0;
-				ctr = (u_int)atoi(numb) - 1;
+					diff = (u_int)(tmp++ - ptrc) - 1;
+					strncpy(numb,&ptrc[1],diff);
+					numb[diff] = 0;
+					ctr = (u_int)atoi(numb) - 1;
 
 #ifndef OSK
-				if ((float_ptr = (float *)calloc((size_t)(ctr + 1),(size_t)sizeof(float))) == NULL) {
+					if ((float_ptr = (float *)calloc((size_t)(ctr + 1),(size_t)sizeof(float))) == NULL) 
 #else
-				if ((float_ptr = (float *)calloc((ctr + 1),sizeof(float))) == NULL) {
+					if ((float_ptr = (float *)calloc((ctr + 1),sizeof(float))) == NULL) 
 #endif /* OSK */
-					*perr = DbErr_ClientMemoryAllocation;
-					return(DS_NOTOK);
-									}
+					{
+						*perr = DbErr_ClientMemoryAllocation;
+						return(DS_NOTOK);
+					}
 
 /* Convert each array element */
 
-				for (l=0;l<ctr;l++) {
+					for (l=0;l<ctr;l++) 
+					{
 #ifndef OSK
-					temp = (char *)strchr(tmp,SEP_ELT);
+						temp = (char *)strchr(tmp,SEP_ELT);
 #else
-					temp = index(tmp,SEP_ELT);
+						temp = index(tmp,SEP_ELT);
 #endif /* OSK */
-					diff = (u_int)(temp++ - tmp);
-					strncpy(numb,tmp,diff);
-					numb[diff] = 0;
-					float_ptr[l] = (float)atof(numb);
-					tmp = temp;
-							}
-				float_ptr[l] = (float)atof(tmp);
-
-				((DevVarFloatArray *)res[i].resource_adr)->sequence = float_ptr;
-				((DevVarFloatArray *)res[i].resource_adr)->length = ctr + 1;
+						diff = (u_int)(temp++ - tmp);
+						strncpy(numb,tmp,diff);
+						numb[diff] = 0;
+						float_ptr[l] = (float)atof(numb);
+						tmp = temp;
 					}
+					float_ptr[l] = (float)atof(tmp);
+
+					((DevVarFloatArray *)res[i].resource_adr)->sequence = float_ptr;
+					((DevVarFloatArray *)res[i].resource_adr)->length = ctr + 1;
+				}
 				break;
-
 			case D_VAR_STRINGARR :
-				if (ptrc[0] != INIT_ARRAY) {
+				if (ptrc[0] != INIT_ARRAY) 
+				{
 #ifndef OSK
-				if ((str_ptr = (char **)malloc((size_t)sizeof(char *))) == NULL) {
+					if ((str_ptr = (char **)malloc((size_t)sizeof(char *))) == NULL) 
 #else
-				if ((str_ptr = (char **)malloc(sizeof(char *))) == NULL) {
+					if ((str_ptr = (char **)malloc(sizeof(char *))) == NULL) 
 #endif /* OSK */
-					*perr = DbErr_ClientMemoryAllocation;
-					return(DS_NOTOK);
-									}
-
-				if((str_ptr[0] = (char *)malloc(strlen(ptrc) + 1)) == NULL)  {
-					*perr = DbErr_ClientMemoryAllocation;
-					return(DS_NOTOK);
+					{
+						*perr = DbErr_ClientMemoryAllocation;
+						return(DS_NOTOK);
 					}
 
-				strcpy(str_ptr[0],ptrc);
+					if((str_ptr[0] = (char *)malloc(strlen(ptrc) + 1)) == NULL)  
+					{
+						*perr = DbErr_ClientMemoryAllocation;
+						return(DS_NOTOK);
+					}
 
-				((DevVarStringArray *)res[i].resource_adr)->sequence = str_ptr;
-				((DevVarStringArray *)res[i].resource_adr)->length = 1;
-							}
+					strcpy(str_ptr[0],ptrc);
 
-				else {
-
+					((DevVarStringArray *)res[i].resource_adr)->sequence = str_ptr;
+					((DevVarStringArray *)res[i].resource_adr)->length = 1;
+				}
+				else 
+				{
 /* Retrieve the array element number */
-
 #ifndef OSK
-				tmp = (char *)strchr(ptrc,SEP_ELT);
+					tmp = (char *)strchr(ptrc,SEP_ELT);
 #else
-				tmp = index(ptrc,SEP_ELT);
+					tmp = index(ptrc,SEP_ELT);
 #endif /* OSK */
-				diff = (u_int)(tmp++ - ptrc) - 1;
-				strncpy(numb,&ptrc[1],diff);
-				numb[diff] = 0;
-				ctr = (u_int)atoi(numb) - 1;
+					diff = (u_int)(tmp++ - ptrc) - 1;
+					strncpy(numb,&ptrc[1],diff);
+					numb[diff] = 0;
+					ctr = (u_int)atoi(numb) - 1;
 
 /* Allocate memory for the array of pointer to strings */
 
 #ifndef OSK
-				if ((str_ptr = (char **)calloc((size_t)(ctr + 1),(size_t)sizeof(char *))) == NULL) {
+					if ((str_ptr = (char **)calloc((size_t)(ctr + 1),(size_t)sizeof(char *))) == NULL) 
 #else
-				if ((str_ptr = (char **)calloc((ctr + 1),sizeof(char *))) == NULL) {
+					if ((str_ptr = (char **)calloc((ctr + 1),sizeof(char *))) == NULL) 
 #endif /* OSK */
-					*perr = DbErr_ClientMemoryAllocation;
-					return(DS_NOTOK);
-									}
+					{
+						*perr = DbErr_ClientMemoryAllocation;
+						return(DS_NOTOK);
+					}
 
 /* Convert each array element */
 
-				for (l=0;l<ctr;l++) {
+					for (l=0;l<ctr;l++) 
+					{
 #ifndef OSK
-					temp = (char *)strchr(tmp,SEP_ELT);
+						temp = (char *)strchr(tmp,SEP_ELT);
 #else
-					temp = index(tmp,SEP_ELT);
+						temp = index(tmp,SEP_ELT);
 #endif /* OSK */
-					diff = (u_int)(temp++ - tmp);
-					if ((str_ptr[l] = (char *)malloc(diff + 1)) == NULL) {
+						diff = (u_int)(temp++ - tmp);
+						if ((str_ptr[l] = (char *)malloc(diff + 1)) == NULL) 
+						{
+							for(k=0;k<l;k++)
+							free(str_ptr[k]);
+							free(str_ptr);
+							*perr = DbErr_ClientMemoryAllocation;
+							return(DS_NOTOK);
+						}
+						strncpy(str_ptr[l],tmp,diff);
+						str_ptr[l][diff] = 0;
+						tmp = temp;
+					}
+					if ((str_ptr[l] = (char *)malloc(strlen(tmp) + 1)) == NULL) 
+					{
 						for(k=0;k<l;k++)
 							free(str_ptr[k]);
 						free(str_ptr);
 						*perr = DbErr_ClientMemoryAllocation;
 						return(DS_NOTOK);
-								}
-					strncpy(str_ptr[l],tmp,diff);
-					str_ptr[l][diff] = 0;
-					tmp = temp;
-							}
-				if ((str_ptr[l] = (char *)malloc(strlen(tmp) + 1)) == NULL) {
-					for(k=0;k<l;k++)
-						free(str_ptr[k]);
-					free(str_ptr);
-					*perr = DbErr_ClientMemoryAllocation;
-					return(DS_NOTOK);
-									}
-				strcpy(str_ptr[l],tmp);
+					}
+					strcpy(str_ptr[l],tmp);
 
-				((DevVarStringArray *)res[i].resource_adr)->sequence = str_ptr;
-				((DevVarStringArray *)res[i].resource_adr)->length = ctr + 1;
-					}
-				break;
-					}
+					((DevVarStringArray *)res[i].resource_adr)->sequence = str_ptr;
+					((DevVarStringArray *)res[i].resource_adr)->length = ctr + 1;
 				}
+				break;
+		}
+	}
 
 /* Return memory allocated by XDR routines. If the TCP connection has been
    used, close the associated socket and destroy the RPC connection. */

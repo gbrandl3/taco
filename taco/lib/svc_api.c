@@ -11,9 +11,9 @@
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.4 $
+ Version:	$Revision: 1.5 $
 
- Date:		$Date: 2003-05-02 09:12:49 $
+ Date:		$Date: 2003-05-09 06:33:49 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -1569,7 +1569,7 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 		for (i=0; (u_long)i<dev_query_out.length; i++)
 		{
 			vararg[i].argument_type      = D_STRING_TYPE;
-			vararg[i].argument           = (DevArgument)&(device->commands_list[i].cmd_name);
+			vararg[i].argument           = (DevArgument)&(device->commands_list[dev_query_out.sequence[i].cmd].cmd_name);
 		}
 	        dev_query_out.var_argument.length = dev_query_out.length;
 	        dev_query_out.var_argument.sequence = vararg;

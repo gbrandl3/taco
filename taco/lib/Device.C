@@ -12,9 +12,9 @@
 //
 // Original:	March 1995
 //
-// Version:	$Revision: 1.3 $
+// Version:	$Revision: 1.4 $
 //
-// Date:	$Date: 2003-05-06 15:43:05 $
+// Date:	$Date: 2003-05-09 06:33:49 $
 //
 //-**********************************************************************
 		
@@ -344,14 +344,13 @@ void Device::Get_command_number(unsigned int *cmd_nb)
 long Device::Command_Query(_dev_cmd_info *cmd_info,long *error)
 {
 	*error = DS_OK;
-
-	for (long i = 0;i < this->commands_list.size(); i++)
+	long	i = 0;
+	for (std::map<DevCommand, DeviceCommandListEntry>::iterator it = commands_list.begin(); it != this->commands_list.end(); ++it, ++i)
 	{
-		cmd_info[i].cmd = this->commands_list[i].cmd;
-		cmd_info[i].in_type = this->commands_list[i].arginType;
-		cmd_info[i].out_type = this->commands_list[i].argoutType;
+		cmd_info[i].cmd = it->second.cmd;
+		cmd_info[i].in_type = it->second.arginType;
+		cmd_info[i].out_type = it->second.argoutType;
 	}
-
 	return(DS_OK);
 }
 
