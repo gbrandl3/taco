@@ -115,6 +115,7 @@ AT_CHECK(AT_TACO_RUN_LOCAL([db_devdomain]), [], [[test
 AT_CLEANUP
 
 AT_SETUP([check existing device families])
+AT_XFAIL_IF([test x"$python" != x"yes"])
 AT_CHECK(AT_TACO_RUN_LOCAL([db_devfamily test]), [], [[agps
 device
 python
