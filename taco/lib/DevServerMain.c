@@ -11,9 +11,9 @@
 
  Original   	: March 1991
 
- Version	: $Revision: 1.12 $
+ Version	: $Revision: 1.13 $
 
- Date		: $Date: 2004-10-26 11:30:58 $
+ Date		: $Date: 2005-02-22 14:14:47 $
 
  Copyright (c) 1990-2002 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -117,32 +117,9 @@ extern long debug_flag;
 
 static SVCXPRT *transp;
 static SVCXPRT *transp_tcp;
-/*
- * VXWORKS and NOMAIN routine to create a device server - device_server()
- */
 
-#if defined (vxworks) || (NOMAIN)
-void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_device, char** device_list)
-{
-        char    		host_name [HOST_NAME_LENGTH],
-        			dsn_name [DS_NAME_LENGTH + DSPERS_NAME_LENGTH + 1],
-        			*proc_name,
-        			*display,
-        			res_path [80],
-        			res_name[80];
-        DevVarStringArray       default_access;
-        db_resource             res_tab;
-
-        long    		prog_number=0,
-        			status,
-        			error = 0;
-        int     		pid = 0;
-        short   		m_opt = False,
-        			s_opt = True,
-        			nodb_opt = False,
-        			sig,
-        			i;
-
+#if !defined(vxworks) && !defined(NOMAIN)
+#if 0
 /*
  * import database server  
  * BP: moved this to the front, as the new db_import_multi usage sets up
@@ -153,70 +130,7 @@ void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_
 		dev_printerror_no (SEND,"db_import failed",error);
 		exit(-1);
 	}		
-/*
- *  read device server's class name and personal name
- *  check for lenght of names : server process name <= DS_NAME_LENGTH char
- *                              personal name       <= DSPERS_NAME_LENGTH char
- */
-        proc_name = server_name;
-
-        if ( strlen(proc_name) >= DS_NAME_LENGTH)
-        {
-        	fprintf ( stderr, "Filename too long : server_name <= %d char\n", DS_NAME_LENGTH);
-           	exit (-1);
-        }
-
-        if ( strlen(pers_name) >= DSPERS_NAME_LENGTH)
-        {
-		fprintf ( stderr, "Personal DS_name too long : personal_dsname <= %d char\n", DSPERS_NAME_LENGTH);
-		exit (-1);
-        }
-
-	memset  (dsn_name, 0, sizeof(dsn_name));
-	strncpy (dsn_name , proc_name, DS_NAME_LENGTH - 1);
-	strncat (dsn_name , "/", 1);
-	strncat (dsn_name , pers_name, DSPERS_NAME_LENGTH - 1);
-/*
- * option nodb means run device server without database
- */
-	if (nodb > 0)
-	{
-		nodb_opt = True;
-		config_flags.no_database = True;
-		xdr_load_kernel(&error);
-	}
-/*
- * option pn specifies program number (to be used in conjunction with nodb)
- */
-	prog_number = pn;
-/*
- * unregister this program number from the portmapper - this is potentially
- * dangerous because it can unregister another running server. we assume
- * the -pn option is used by those who know what they are doing ...
- */
-	if (prog_number != 0)
-	{
-		pmap_unset (prog_number, API_VERSION);
-		pmap_unset (prog_number, ASYNCH_API_VERSION);
-	}
-/*
- * option -device means remaining command line arguments are device names
- */
-	config_flags.device_no = n_device;
-	config_flags.device_list = device_list;
-
-#ifdef vxworks
-/*
- * call rpcTaskInit() to initialise task-specific data structures 
- * required by RPC (cf. VxWorks Reference manual pg. 1-203). 
- * Failure to do so will result in the task crashing the first
- * time a call to is made to an RPC function
- */
-	rpcTaskInit();
-#endif /* vxworks */
-
-#else /* vxworks || NOMAIN */
-
+#endif
 /**/
 #ifdef _NT  /* _NT */
 
@@ -280,11 +194,10 @@ WorkerThreadMain(LPDWORD lpdwParam);
 static LRESULT CALLBACK /* Handler for WM_COMMAND events */
 WM_COMMAND_handler( HWND hWnd, WPARAM wParam, LPARAM lParam);
 
-static BOOL /* RPC and TACO initislization (Device Server's main) */
+static BOOL /* RPC and TACO initialization (Device Server's main) */
 application_main (int argc, char **argv)  /* Windows does not use main()! */
 
 #else /* _NT */
-int main (int argc, char **argv)
 /**@ingroup dsAPI
  * Main routine for all device servers.
  *
@@ -299,16 +212,16 @@ int main (int argc, char **argv)
  * 
  * @return 1 DS_NOTOK
  */
+int main (int argc, char **argv)
 #endif /* _NT */
 {
-/*	SVCXPRT 		*transp; 
-        			*transp_tcp; */
 	char    		host_name [HOST_NAME_LENGTH],
 				dsn_name [DS_NAME_LENGTH + DSPERS_NAME_LENGTH + 1],
 				*proc_name,
 				*display,
 				res_path [80],
-				res_name[80];
+				res_name[80],
+				**device_list;
 	DevVarStringArray	default_access;
 	db_resource		res_tab;
 
@@ -319,6 +232,7 @@ int main (int argc, char **argv)
 	short			m_opt = False,
 				s_opt = True,
 				nodb_opt = False,
+				device_no,
 				sig,
 				i,
 				j;
@@ -348,45 +262,18 @@ int main (int argc, char **argv)
 	memset(&config_flags, 0, sizeof(config_flags));
 #if defined (unix)
 	proc_name = (char *)strrchr (argv[0], '/');
-#endif	/*unix*/
-#if ( OSK || _OSK )
-#ifdef __cplusplus
+#elif ( OSK || _OSK )
+#	ifdef __cplusplus
 	proc_name = (char *)strrchr (argv[0], '/');
-#else
+#	else
 	proc_name = (char *)rindex (argv[0], '/');
-#endif
+#	endif
 #endif /* OSK || _OSK */
 
 	if (proc_name == NULL)
 		proc_name = argv[0];
 	else  
 		proc_name++;
-
-	if ( strlen(proc_name) >= DS_NAME_LENGTH )
-	{
-		char msg[80];
-		snprintf(msg, sizeof(msg), "Filename to long : server_name <= %d char\n", DS_NAME_LENGTH - 1);
-#ifdef _NT
-		MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
-		return(FALSE);
-#else
-		fprintf (stderr, msg);
-		exit (DS_NOTOK);
-#endif
-	}
-
-	if ( strlen(argv[1]) >= DSPERS_NAME_LENGTH )
-	{
-		char msg[80];
-		snprintf(msg, sizeof(msg), "Personal DS name to long : personal_dsname <= %d char\n", DSPERS_NAME_LENGTH - 1);
-#ifdef _NT
-		MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
-		return(FALSE);
-#else
-		fprintf (stderr, msg); 
-		exit (DS_NOTOK);
-#endif
-	}
 
 /*
  *  read options for device server start
@@ -407,27 +294,13 @@ int main (int argc, char **argv)
  * option -nodb means run device server without database
  */
 			if (strcmp (argv[i],"-nodb") == 0)
-			{
 				nodb_opt = True;
-				config_flags.no_database = True;
-				xdr_load_kernel(&error);
-			}
 /*
  * option -pn specifies program number (to be used in conjunction with -nodb)
  */
 			if (strcmp (argv[i],"-pn") == 0)
 			{
 				sscanf(argv[i+1],"%d",&prog_number);
-/*
- * unregister this program number from the portmapper - this is potentially
- * dangerous because it can unregister another running server. we assume
- * the -pn option is used by those who know what they are doing ...
- */
-				if (prog_number != 0)
-				{
-					pmap_unset (prog_number, API_VERSION);
-					pmap_unset (prog_number, ASYNCH_API_VERSION);
-				}
 				i++;
 			}
 /*
@@ -435,23 +308,111 @@ int main (int argc, char **argv)
  */
 			if (strcmp (argv[i],"-device") == 0)
 			{
-				config_flags.device_no = argc-i-1;
-				config_flags.device_list = (char**)malloc(config_flags.device_no*sizeof(char));
+				device_no = argc-i-1;
+				device_list = (char**)malloc(device_no*sizeof(char));
 				for (j=i+1; j<argc; j++)
 				{
-					config_flags.device_list[j-i-1] = (char*)malloc(strlen(argv[j])+1);
-					strcpy(config_flags.device_list[j-i-1], argv[j]);
+					device_list[j-i-1] = (char*)malloc(strlen(argv[j])+1);
+					strcpy(device_list[j-i-1], argv[j]);
 				}
 				i = j;
 			}
 		}
 	}
-	memset  (dsn_name, 0, sizeof(dsn_name));
-	strncat (dsn_name , proc_name, DS_NAME_LENGTH - 1);
-	strncat (dsn_name , "/", 1);
-	strncat (dsn_name , argv[1], DSPERS_NAME_LENGTH - 1);
-
+	device_server(proc_name, argv[1], nodb_opt, prog_number, device_no, device_list);
+}
 #endif /* vxworks || NOMAIN */
+
+/*
+ * VXWORKS and NOMAIN routine to create a device server - device_server()
+ */
+void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_device, char** device_list)
+{
+	char    		host_name [HOST_NAME_LENGTH],
+				dsn_name [37],
+		//		*proc_name,
+				*display,
+				res_path [80],
+				res_name[80];
+	DevVarStringArray	default_access;
+	db_resource		res_tab;
+
+	long			prog_number=0,
+				status,
+				error = 0;
+	int			pid = 0;
+	short			m_opt = False,
+				s_opt = True,
+				nodb_opt = False,
+				sig,
+				i,
+				j;
+
+	if ( strlen(server_name) > 23 )
+	{
+		char msg[]="Filename to long : server_name <= 23 char\n";
+#ifdef _NT
+		MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
+		return(FALSE);
+#else
+		fprintf (stderr, msg);
+		exit (DS_NOTOK);
+#endif
+	}
+
+	if ( strlen(pers_name) > 11 )
+	{
+		char msg[]= "Personal DS_name to long : personal_dsname <= 11 char\n";
+#ifdef _NT
+		MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
+		return(FALSE);
+#else
+		fprintf (stderr, msg); 
+		exit (DS_NOTOK);
+#endif
+	}
+/*
+ * unregister this program number from the portmapper - this is potentially
+ * dangerous because it can unregister another running server. we assume
+ * the -pn option is used by those who know what they are doing ...
+ */
+	if (prog_number != 0)
+	{
+		pmap_unset (prog_number, API_VERSION);
+		pmap_unset (prog_number, ASYNCH_API_VERSION);
+	}
+
+	memset  (dsn_name,0,sizeof(dsn_name));
+	strncpy (dsn_name , server_name, DSPERS_NAME_LENGTH - 1);
+	strncat (dsn_name , "/", 1);
+	strncat (dsn_name , pers_name, 11);
+/*
+ * make sure all config flags are set to zero before starting
+ */
+	memset(&config_flags, 0, sizeof(config_flags));
+/*
+ * option nodb means run device server without database
+ */
+	if (nodb > 0)
+	{
+		config_flags.no_database = True;
+		xdr_load_kernel(&error);
+	}
+/*
+ * option -device means remaining command line arguments are device names
+ */
+	config_flags.device_no = n_device;
+	config_flags.device_list = device_list;
+
+#ifdef vxworks
+/*
+ * call rpcTaskInit() to initialise task-specific data structures 
+ * required by RPC (cf. VxWorks Reference manual pg. 1-203). 
+ * Failure to do so will result in the task crashing the first
+ * time a call to is made to an RPC function
+ */
+	rpcTaskInit();
+#endif /* vxworks */
 /*
  *  get process ID, host_name 
  *  and create device server network name
@@ -459,13 +420,11 @@ int main (int argc, char **argv)
 
 #if defined (_NT)
 	pid = _getpid ();
-#else
-#if !defined (vxworks)
+#elif !defined (vxworks)
 	pid = getpid ();
 #else  /* !vxworks */
 	pid = taskIdSelf ();
 #endif /* !vxworks */
-#endif
 /*
  * M. Diehl, 22.7.1999
  * We have to take care here, since hostname might be set to the FQDN thus
