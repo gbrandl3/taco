@@ -13,9 +13,9 @@
 
  Original:	March 1990
 
- Version:	$Revision: 1.4 $
+ Version:	$Revision: 1.5 $
 
- Date:		$Date: 2004-03-26 16:21:52 $
+ Date:		$Date: 2004-07-14 12:43:23 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -36,12 +36,10 @@
  */
 #ifdef _IDENT
 static char DevServerh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServer.h,v 1.4 2004-03-26 16:21:52 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServer.h,v 1.5 2004-07-14 12:43:23 jkrueger1 Exp $";
 #endif /* _IDENT */
 
-
 typedef long DevMethod;
-
 
 #define Fontaine_ps 	1
 #define WDK_ps 		2
@@ -52,11 +50,9 @@ typedef long DevMethod;
 #define Vacuum_gauges	7
 #define Dan8000_ps	8
 
-
 /*
  * standard methods, available in every class
  */
-
 #define DevMethodCreate			1
 #define DevMethodDestroy		2
 #define DevMethodClassInitialise	3
@@ -65,7 +61,6 @@ typedef long DevMethod;
 /*
  * DevServerClass methods
  */
-
 #define DevMethodCommandHandler		10
 #define DevMethodErrorHandler		11
 #define DevMethodInitialise		12
@@ -74,7 +69,6 @@ typedef long DevMethod;
 /*
  * Device dependent Methods
  */
-
 #define DevMethodLineOpen		101
 #define DevMethodLineClose		102
 #define DevMethodWrite			103
@@ -92,7 +86,6 @@ typedef long DevMethod;
 /*
  * miscellaneous methods
  */
-
 #define DevMethodHelloWorld		100
 
 #ifndef __cplusplus
@@ -102,9 +95,9 @@ typedef long 	int(*DevMethodFunction)(...);
 #endif /* __cplusplus */
 
 typedef struct _DevMethodListEntry {
-	DevMethod method;
-	DevMethodFunction fn;
-	}	DevMethodListEntry;
+		DevMethod method;
+		DevMethodFunction fn;
+	}DevMethodListEntry;
 
 typedef struct _DevMethodListEntry *DevMethodList;
 
@@ -211,9 +204,9 @@ long dev_export  PT_( (char *dev_name, void *ptr_ds, long *error) );
  */
 
 #ifdef _NT
-extern HINSTANCE ghAppInstance; /*  // the application's module handle */
-extern HWND ghWndMain;          /*  // the main window handle */
-extern char* gszAppName;        /*  // the application's name */
+extern HINSTANCE 	ghAppInstance; /*  the application's module handle */
+extern HWND 		ghWndMain;     /*  the main window handle */
+extern char* 		gszAppName;    /*  the application's name */
 
 /*
 #include "NT_debug.h"    // is done for all files in macros.h
@@ -236,9 +229,9 @@ extern void (*OnShutDown)();
 
 /* an array of strings to be displayed on the main window backdrop */
 typedef struct {
-	int lines;
-	char **text;
-} MainWndTextDisplay;
+		int lines;
+		char **text;
+	} MainWndTextDisplay;
 extern MainWndTextDisplay gMWndTxtDisplay;
 
 #endif  /* _NT */
