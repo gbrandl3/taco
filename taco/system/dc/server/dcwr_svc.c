@@ -25,65 +25,63 @@
 
 /* Function definition */
 
-static void dc_prog_1();
-void leave();
-void register_dc();
-void one_more_request(void);
+static void dc_prog_1(struct svc_req *, SVCXPRT *);
+static void leave(int);
+static void register_dc(char *, char *, u_long, u_long);
+static void one_more_request(void);
+static int db_register(char *, unsigned int, unsigned int, char *, char *);
+static int shm_size(char *);
 
 /* Some static variables */
-
 static SVCXPRT *transp_sta;
 
 /* Some external variables */
-
 extern dc_devallx_back ret_devall;
 
 /* Added definition */
+u_long		pgnum;
+char		d_name[DEV_NAME_LENGTH],
+		ds_name[DEV_NAME_LENGTH],
+		psd_name[DEV_NAME_LENGTH],
+		*addr_alloc,
+		*addr_ptr,
+		*addr_data;
+upd_reqnb 	req;
+hash_info 	mem;
+int 		ctr,
+		req_call,
+		time_out = False,
+		shmid_alloc,
+		shmid_ptr,
+		shmid_data,
+ 		ptr_size,
+		dat_size,
+		alloc_size,
+ 		semid,
+		semid1;
 
-u_long pgnum;
-char d_name[40];
-char ds_name[40];
-char psd_name[40];
-int ctr;
-upd_reqnb req;
-int req_call;
-hash_info mem;
-int time_out = False;
-
-int shmid_alloc,shmid_ptr,shmid_data;
-char *addr_alloc,*addr_ptr,*addr_data;
-int semid,semid1;
-
-db_resource res_serv_put;
-
-db_resource res_serv_get[] = {
-	{"start_req",D_LONG_TYPE},
-	{"start_nb",D_LONG_TYPE},
-	{"update",D_LONG_TYPE},
+db_resource 	res_serv_put,
+	 	res_serv_get[] = {
+			{"start_req", D_LONG_TYPE},
+			{"start_nb", D_LONG_TYPE},
+			{"update", D_LONG_TYPE},
+		},
+		res1[] = {
+			{"dev_number", D_LONG_TYPE},
+			{"cellar_number", D_LONG_TYPE},
+			{"data_size", D_LONG_TYPE},
 		};
-int res_serv_get_size = sizeof(res_serv_get)/sizeof(db_resource);
-
-db_resource res1[] = {
-	{"dev_number",D_LONG_TYPE},
-	{"cellar_number",D_LONG_TYPE},
-	{"data_size",D_LONG_TYPE},
-		};
-int res1_size = sizeof(res1) / sizeof(db_resource);
-int ptr_size,dat_size,alloc_size;
-
+int 		res_serv_get_size = sizeof(res_serv_get)/sizeof(db_resource),
+ 		res1_size = sizeof(res1) / sizeof(db_resource);
 
 /* Three differents signal routines */
-
 void default_sig(int signo)
 {
-        time_t tps;
-        char *tps_str;
-        struct tm *time_tm;
+        time_t 		tps = time((time_t *)0);
+        struct tm 	*time_tm = localtime(&tps);
+        char 		*tps_str = asctime(time_tm);
 
-        tps = time((time_t *)0);
-        time_tm = localtime(&tps);
-        tps_str = asctime(time_tm);
-        tps_str[24] = 0;
+#warning tps_str[24] = 0;
         fprintf(stderr,"%s : signal %d received !!!\n",tps_str,signo);
 #ifndef _solaris
         fprintf(stderr,"Server requested from %x\n",transp_sta->xp_raddr.sin_addr.s_addr);
@@ -94,25 +92,18 @@ void default_sig(int signo)
 void un_register_prog(int signo)
 {
 	long error;
-
 	pmap_unset(pgnum, DC_VERS);
-
 /* Added code to unregister the server from static db */
-
-	db_svc_unreg(ds_name,&error);
-
+	db_svc_unreg(ds_name, &error);
 	exit(1);
 }
-
 
 void time_out_prog(int signo)
 {
 	time_out = True;
 }
 
-
 
-
 /**
  *
  * DATA COLLECTOR WRITE SERVER MAIN FUNCTION
@@ -120,41 +111,44 @@ void time_out_prog(int signo)
  */
 int main(int argc, char **argv)
 {
-	SVCXPRT *transp_tcp;
-	SVCXPRT *transp_udp;
-	struct sockaddr_in so;
-	char hostna[32];
-	char full_name[80];
+	SVCXPRT 		*transp_tcp,
+				*transp_udp;
+	struct sockaddr_in 	so;
+	char 			hostna[HOST_NAME_LENGTH],
+				full_name[256];
 #ifdef OBSOLETE_SUN
-	int sig_mask;
-	struct sigvec sighand;
+	int 			sig_mask;
+	struct sigvec 		sighand;
 #endif
 #if defined( linux) || defined (FreeBSD)
-	struct sigaction sigact;
+	struct sigaction 	sigact;
 #endif /* linux */
 
 /* Added variables to manage transient program number */
-
-	int sock_tcp;
-	int sock_udp;
-	char *netmanhost;
-	struct rlimit lim;
+	int 			sock_tcp,
+				sock_udp;
+	char 			*netmanhost,
+				*serv_num;
+	struct rlimit 		lim;
 
 #ifndef ALONE
-	if (argc != 3) {
+	if (argc != 3) 
+	{
 		fprintf(stderr,"%s usage: %s <network manager host name> <server number>\n",argv[0],argv[0]);
 		exit(1);
-		}
+	}
 	netmanhost = argv[1];
+	serv_num = argv[2];
 #else
-	if (argc != 2) {
+	if (argc != 2) 
+	{
 		fprintf(stderr,"%s usage: %s <server number>\n",argv[0],argv[0]);
 		exit(1);
-			}
+	}
+	serv_num = argv[1];
 #endif /* ALONE */
 
 /* Install signal handlers */
-
 #ifdef OBSOLETE_SUN
 	sig_mask = sigmask(SIGHUP);
 	sigsetmask(sig_mask);
@@ -255,12 +249,10 @@ int main(int argc, char **argv)
 
 #ifdef DEBUG
 	printf("Server host name : %s\n",hostna);
-	printf("Program number : %x in hexa or %d in decimal\n",pgnum,pgnum);
+	printf("Program number : %x in hexa or %d in decimal\n", pgnum, pgnum);
 #endif /* DEBUG */
 
-
 	transp_tcp = svctcp_create(sock_tcp,0,0);
-
 	if (transp_tcp == NULL)
 	{
 		fprintf(stderr, "cannot create TCP service.\n");
@@ -268,48 +260,39 @@ int main(int argc, char **argv)
 	}
 
 /* Register the server with the TCP protocol */
-
-	if (!svc_register(transp_tcp,pgnum,DC_VERS,dc_prog_1,IPPROTO_TCP))
+	if (!svc_register(transp_tcp, pgnum, DC_VERS, dc_prog_1, IPPROTO_TCP))
 	{
 		fprintf(stderr,"unable to register (pgnum,DC_VERS,tcp). \n");
 		leave(NO_UNREG);
 	}
 
 /* Register the server with the UDP protocol */
-
 	transp_udp = svcudp_create(sock_udp);
 	if (transp_udp == NULL)
 	{
 		fprintf(stderr, "cannot create UDP service.\n");
 		leave(NO_UNREG);
 	}
-	if (!svc_register(transp_udp,pgnum,DC_VERS,dc_prog_1,IPPROTO_UDP))
+	if (!svc_register(transp_udp, pgnum, DC_VERS, dc_prog_1, IPPROTO_UDP))
 	{
 		fprintf(stderr,"unable to register (pgnum,DC_VERS,udp). \n");
 		leave(NO_UNREG);
 	}
 
 /* Register myself in the static database */
-
-#ifdef ALONE
-	if (db_register(argv[1],pgnum,DC_VERS,hostna,argv[0]))
-#else
-	if (db_register(argv[2],pgnum,DC_VERS,hostna,argv[0]))
-#endif /* ALONE */
+	if (db_register(serv_num, pgnum, DC_VERS, hostna, argv[0]))
 		leave(NO_UNREG);
 
 /* Retrieve shared memory segments size */
-
 	if (shm_size(hostna))
 		leave(UNREG);
 
-/* Attach the alloc area (it's a shared memory segment) to this process
-   data area */
-
-	if ((shmid_alloc = shmget((key_t)KEY_ALLOC,(size_t)alloc_size,0666)) == -1)
+/* Attach the alloc area (it's a shared memory segment) to this process data area */
+	if ((shmid_alloc = shmget((key_t)KEY_ALLOC,(size_t)alloc_size, 0666)) == -1)
 	{
 		fprintf(stderr,"dc_server_wr : Can't get the allocation table\n");
 		fprintf(stderr,"dc_server_wr : Error code : %d\n",errno);
+		fprintf(stderr,"dc_server_wr : Error code : %s\n", strerror(errno));
 		leave(UNREG);
 	}
 
@@ -320,10 +303,8 @@ int main(int argc, char **argv)
 		leave(UNREG);
 	}
 
-/* Attach the data buffer (it's a shared memory segment) to this process
-   data area */
-
-	if ((shmid_data = shmget((key_t)KEY_DATBUF,(size_t)dat_size,0666)) == -1)
+/* Attach the data buffer (it's a shared memory segment) to this process data area */
+	if ((shmid_data = shmget((key_t)KEY_DATBUF,(size_t)dat_size, 0666)) == -1)
 	{
 		fprintf(stderr,"dc_server_wr : Can't get the data buffer\n");
 		fprintf(stderr,"dc_server_wr : Error code : %d\n",errno);
@@ -337,10 +318,8 @@ int main(int argc, char **argv)
 		leave(UNREG);
 	}
 
-/* Attach the pointers buffer (it's a shared memory segment) to this process
-   data area */
-
-	if ((shmid_ptr = shmget((key_t)KEY_PTR,(size_t)ptr_size,0666)) == -1)
+/* Attach the pointers buffer (it's a shared memory segment) to this process data area */
+	if ((shmid_ptr = shmget((key_t)KEY_PTR,(size_t)ptr_size, 0666)) == -1)
 	{
 		fprintf(stderr,"dc_server_wr : Can't get the pointers buffer\n");
 		fprintf(stderr,"dc_server_wr : Error code : %d\n",errno);
@@ -355,8 +334,7 @@ int main(int argc, char **argv)
 	}
 
 /* Get the semaphore id used to protect the alloc area */
-
-	if ((semid = semget(SEM_KEY,1,0666)) == -1)
+	if ((semid = semget(SEM_KEY,1, 0666)) == -1)
 	{
 		fprintf(stderr,"dc_server_wr : Can't get the alloc semaphore\n");
 		perror("dc_server_wr ");
@@ -364,8 +342,7 @@ int main(int argc, char **argv)
 	}
 
 /* Get the semaphore set id used to protect the pointers area */
-
-	if ((semid1 = semget(SEMPTR_KEY,2,0666)) == -1)
+	if ((semid1 = semget(SEMPTR_KEY,2, 0666)) == -1)
 	{
 		fprintf(stderr,"dc_server_wr : Can't get the ptrs semaphore\n");
 		perror("dc_server_wr ");
@@ -373,15 +350,12 @@ int main(int argc, char **argv)
 	}
 			
 /* End of the hash_info structure initialisation */
-
 	mem.sem_id = semid1;
 	mem.parray = (dc_dev_param *)addr_ptr;
 
 #ifndef ALONE
 /* Send program number,host name and server version to network manager */
-	
  	register_dc(netmanhost,hostna,pgnum,DC_VERS);
-
 #endif /* ALONE */
 
 	svc_run();
@@ -398,13 +372,15 @@ static void dc_prog_1(struct svc_req *rqstp, SVCXPRT *transp)
 		int fill;
 		name dc_devinfo_1_arg;
 	} argument;
-	char *result;
-	bool_t (*xdr_argument)(), (*xdr_result)();
-	char *(*local)();
+	char 		*result;
+	bool_t 		(*xdr_argument)(), 
+			(*xdr_result)();
+	char 		*(*local)();
 /* Added variables */
-	int pid,i;
-	int max;
-	char *tmp_ch;
+	int 		pid,
+			i;
+	int 		max;
+	char 		*tmp_ch;
 
 	transp_sta = transp;
 
@@ -477,24 +453,21 @@ static void dc_prog_1(struct svc_req *rqstp, SVCXPRT *transp)
 	one_more_request();
 
 /* Added code to free memory allocated in the server functions */
-
 	switch(rqstp->rq_proc)
 	{
-	case DC_DEVALL :
-		if (ret_devall.err_code == 0)
-		{
-			max = ret_devall.dev_name.name_arr_len;
-			for (i = 0;i < max;i++)
-				free(ret_devall.dev_name.name_arr_val[i]);
-			free(ret_devall.dev_name.name_arr_val);
-		}
-		break;
+		case DC_DEVALL :
+			if (ret_devall.err_code == 0)
+			{
+				max = ret_devall.dev_name.name_arr_len;
+				for (i = 0;i < max;i++)
+					free(ret_devall.dev_name.name_arr_val[i]);
+				free(ret_devall.dev_name.name_arr_val);
+			}
+			break;
 	}
-		
 }
 
 
-
 #ifndef ALONE
 /**
  * To send server information (host_name,program number
@@ -509,15 +482,14 @@ static void dc_prog_1(struct svc_req *rqstp, SVCXPRT *transp)
  * @param vers		The server version number
  *                                                                           *
  */
-void register_dc(char *netman_host, char *host, u_long prog, u_long vers)
+static void register_dc(char *netman_host, char *host, u_long prog, u_long vers)
 {
-	_register_data register_data;
-	CLIENT *netman_clnt;
-	enum clnt_stat clnt_stat;
-	static int res;
+	_register_data 	register_data;
+	CLIENT 		*netman_clnt;
+	enum clnt_stat 	clnt_stat;
+	static int 	res;
 
 /* Create an RPC connection to network manager */
-
 	netman_clnt = clnt_create(netman_host,NMSERVER_PROG,NMSERVER_VERS,"udp");
 	if (netman_clnt == NULL)
 	{
@@ -529,7 +501,6 @@ void register_dc(char *netman_host, char *host, u_long prog, u_long vers)
 	clnt_control(netman_clnt,CLSET_TIMEOUT,(char *)&timeout);
 
 /* Send informations to network manager */
-
 	register_data.host_name = host;
 	register_data.prog_number = prog;
 	register_data.vers_number = vers;
@@ -544,14 +515,11 @@ void register_dc(char *netman_host, char *host, u_long prog, u_long vers)
 	}
 		
 /* Exit function */
-
 	clnt_destroy(netman_clnt);
-
 }
 #endif /* ALONE */
 
 
-
 /**
  * To export the pseudo device associated with this
  * server, to request for server resources and to set the 
@@ -566,25 +534,24 @@ void register_dc(char *netman_host, char *host, u_long prog, u_long vers)
  * @return This function returns DS_NOTOK if an error occurs. Otherwise, it returns DS_OK
  *
  */
-int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_serv, char *host_name, char *c_proc_name)
+static int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_serv, char *host_name, char *c_proc_name)
 {
-	struct hostent *host;
-	long error;
-	db_devinf devinfo;
-	unsigned char tmp = 0;
-	unsigned int diff;
-	char *tmp1;
-	char dev_type[40];
-	char dev_class[40];
-	char h_name[40];
-	char proc_name[40];
-	char *ptr;
-	char dev_def[256];
-	char **dev_def_array;
-	long dev_def_err;
+	struct hostent 	*host;
+	long 		error,
+			dev_def_err;
+	db_devinf 	devinfo;
+	unsigned char 	tmp = 0;
+	unsigned int 	diff;
+	char 		*tmp1,
+			dev_type[DEV_TYPE_LENGTH],
+			dev_class[DEV_CLASS_LENGTH],
+			h_name[HOST_NAME_LENGTH],
+			proc_name[PROC_NAME_LENGTH],
+			*ptr,
+			dev_def[256],
+			**dev_def_array;
 	
 /* Get host information */
-
 	if ((host = gethostbyname(host_name)) == NULL)
 	{
 		fprintf(stderr,"dc_server_wr : Can't get host info, exiting...\n");
@@ -593,9 +560,8 @@ int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_serv, char
 	tmp = (unsigned char)host->h_addr[3];
 
 /* Build the pseudo device server name */
-
-	strcpy(ds_name,"dc_server_wr/");
-	strcpy(h_name,host->h_name);
+	strcpy(ds_name, "dc_server_wr/");
+	strcpy(h_name, host->h_name);
 	if ((tmp1 = strchr(h_name,'.')) != NULL)
 	{
 		diff = (u_int)(tmp1 - h_name);
@@ -619,15 +585,15 @@ int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_serv, char
 	printf("Pseudo device name : %s\n",d_name);
 #endif /* DEBUG */
 
-/* Copy the host name in the devinfo structure before the db_import call
+/* 
+   Copy the host name in the devinfo structure before the db_import call
    because the db_import use the clnt_create call wich use also the
    gethostbyname function and the returned structure is static!!
-   Read the UNIX documentation, there is a little warning at this subject */
-
+   Read the UNIX documentation, there is a little warning at this subject 
+*/
 	strcpy(h_name,host->h_name);
 
 /* Import the static database server */
-
 	if (db_import(&error) == -1)
 	{
 		fprintf(stderr,"dc_server_wr : Can't import the static database server, exiting...\n");
@@ -636,7 +602,6 @@ int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_serv, char
 	}
 
 /* Build real process name */
-
 	ptr = strrchr(c_proc_name,'/');
 	if (ptr != NULL)
 	{
@@ -647,9 +612,8 @@ int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_serv, char
 		strcpy(proc_name,c_proc_name);
 
 /* Export me to the outside world */
-
-	strcpy(dev_type,"DevType_Default");
-	strcpy(dev_class,"DcWriteServerClass");
+	strcpy(dev_type, "DevType_Default");
+	strcpy(dev_class, "DcWriteServerClass");
 	devinfo.device_type = dev_type;
 	devinfo.device_class = dev_class;
 	devinfo.device_name = d_name;
@@ -668,9 +632,7 @@ int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_serv, char
 		}
 		else
 		{
-		
 /* Build the device definition string */
-
 			strcpy(dev_def,ds_name);
 			strcat(dev_def,"/device:");
 			strcat(dev_def,d_name);
@@ -684,9 +646,7 @@ int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_serv, char
 				fprintf(stderr," and I can't defined it. Error = %d\n",error);
 				return(-1);
 			}
-
 /* Export me to the outside world */
-			
 			if (db_dev_export(&devinfo,1,&error) == -1)
 			{
 				fprintf(stderr,"dc_server_wr : Can't export me to outside world, exiting...\n");
@@ -695,10 +655,8 @@ int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_serv, char
 			}
 		}
 	}
-
 /* Retrieve server resources. Assign some default value sto these resources in
    case they are not defined in database */
-
 	req.start_req = 8;
 	req.start_nb = 8;
 	req.update = 256;
@@ -715,7 +673,6 @@ int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_serv, char
 	}
 
 /* Init. request mask according to resources */
-
 	if (req.start_req < 2 || req.start_req > 128)
 	{
 		fprintf(stderr,"dc_server_wr : start_req resource out of bound, exiting...\n");
@@ -730,63 +687,64 @@ int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_serv, char
 	req.start = 0;
 	switch(req.start_req)
 	{
-		case 2 : req.start_shift = 1;
-			 break;
-
-		case 4 : req.start_shift = 2;
-			 break;
-
-		case 8 : req.start_shift = 3;
-			 break;
-
-		case 16 : req.start_shift = 4;
-			 break;
-
-		case 32 : req.start_shift = 5;
-			 break;
-
-		case 64 : req.start_shift = 6;
-			 break;
-
-		case 128 : req.start_shift = 7;
-			 break;
+		case 2 : 
+			req.start_shift = 1;
+			break;
+		case 4 : 
+			req.start_shift = 2;
+			break;
+		case 8 : 
+			req.start_shift = 3;
+			break;
+		case 16 : 
+			req.start_shift = 4;
+			break;
+		case 32 : 
+			req.start_shift = 5;
+			break;
+		case 64 : 
+			req.start_shift = 6;
+			break;
+		case 128 : 
+			req.start_shift = 7;
+			break;
 	}
 
 	switch(req.update)
 	{
-		case 2 : req.shift = 1;
-			 break;
-
-		case 4 : req.shift = 2;
-			 break;
-
-		case 8 : req.shift = 3;
-			 break;
-
-		case 16 : req.shift = 4;
-			 break;
-
-		case 32 : req.shift = 5;
-			 break;
-
-		case 64 : req.shift = 6;
-			 break;
-
-		case 128 : req.shift = 7;
-			 break;
-
-		case 256 : req.shift = 8;
-			   break;
-
-		case 512 : req.shift = 9;
-			   break;
-
-		case 1024 : req.shift = 10;
-			    break;
+		case 2 : 
+			req.shift = 1;
+			break;
+		case 4 : 
+			req.shift = 2;
+			break;
+		case 8 : 
+			req.shift = 3;
+			break;
+		case 16 : 
+			req.shift = 4;
+			break;
+		case 32 : 
+			req.shift = 5;
+			break;
+		case 64 : 
+			req.shift = 6;
+			break;
+		case 128 : 
+			req.shift = 7;
+			break;
+		case 256 : 
+			req.shift = 8;
+			break;
+		case 512 : 
+			req.shift = 9;
+			break;
+		case 1024 : 
+			req.shift = 10;
+			break;
 	}
 
 /* Update the "server request" resource to 0 */
-
 	strcpy(psd_name,"sys/dc_wr_");
 	sprintf(&(psd_name[strlen(psd_name)]),"%u",tmp);
 	strcat(psd_name,"/request");
@@ -808,9 +766,7 @@ int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_serv, char
 	}
 
 /* Leave function */
-
 	return(0);
-
 }
 
 
@@ -825,20 +781,19 @@ int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_serv, char
  * @return This function returns DS_NOTOK if an error occurs. Otherwise, it returns DS_OK.
  *	
  */
-int shm_size(char *host_name)
+static int shm_size(char *host_name)
 {
-	static long dev_num;
-	static long dat_size1;
-	static long cell_num;
-	unsigned int diff;
-	int nb_tot;
-	char dev_name[40];
-	char hostna[32];
-	char *tmp;
-	long error;
+	static long 	dev_num,
+			dat_size1,
+			cell_num;
+	unsigned int 	diff;
+	int 		nb_tot;
+	char 		dev_name[DEV_NAME_LENGTH],
+			hostna[HOST_NAME_LENGTH],
+			*tmp;
+	long 		error;
 
 /* Build the device name which is a function of the host name */
-
 	strcpy(hostna,host_name);
 	if ((tmp = strchr(hostna,'.')) != NULL)
 	{
@@ -849,7 +804,6 @@ int shm_size(char *host_name)
 	strcat(dev_name,hostna);
 
 /* Retrieve data collector memories size */
-
 	dev_num = dat_size1 = cell_num = 0;
 	res1[0].resource_adr = &dev_num;
 	res1[1].resource_adr = &cell_num;
@@ -867,14 +821,12 @@ int shm_size(char *host_name)
 	}
 
 /* Compute real memories size */
-
 	nb_tot = cell_num + dev_num;
 	ptr_size = (int)((nb_tot * sizeof(dc_dev_param)) + (nb_tot * sizeof(int_level)));
 	dat_size = dat_size1;
 	alloc_size = (int)(dat_size1 / 256);
 
 /* Initialise the hashing algorithm parameters in the mem structure */
-
 	mem.hash_table_size = dev_num;
 	mem.cellar_size = cell_num;
 
@@ -891,12 +843,14 @@ int shm_size(char *host_name)
  */
 void one_more_request(void)
 {
-	long error;
-	int ctr1;
-	int ctr_mul,ctr_mul_st,delta;
-	time_t tps;
-	char *tps_str;
-	struct tm *time_tm;
+	long 		error;
+	int 		ctr1;
+	int 		ctr_mul,
+			ctr_mul_st,
+			delta;
+	time_t 		tps;
+	char 		*tps_str;
+	struct tm 	*time_tm;
 
 /* If we are in the startup phase, update resource only "req.start_nb" time
    and every "req.start_mask" request */
@@ -911,7 +865,7 @@ void one_more_request(void)
 			ctr_mul_st = ctr1 >> req.start_shift;
 			ctr = ctr_mul_st << req.start_shift;
 #ifdef DEBUG
-	printf("Update request resource. ctr = %d\n",ctr);
+			printf("Update request resource. ctr = %d\n",ctr);
 #endif /* DEBUG */
 			if (db_putresource(psd_name,&res_serv_put,1,&error))
 			{
@@ -924,10 +878,7 @@ void one_more_request(void)
 			req.start = ctr_mul_st;
 		}
 	}
-
-/* After the starting phase, update request resources every "req.update"
-   request */
-
+/* After the starting phase, update request resources every "req.update" request */
 	else
 	{
 		ctr_mul = (ctr >> req.shift);
@@ -936,7 +887,7 @@ void one_more_request(void)
 		{
 			ctr = (ctr1 >> req.shift) << req.shift;
 #ifdef DEBUG
-	printf("Update request resource. ctr = %d\n",ctr);
+			printf("Update request resource. ctr = %d\n",ctr);
 #endif /* DEBUG */
 			if (db_putresource(psd_name,&res_serv_put,1,&error))
 			{
@@ -959,23 +910,15 @@ void one_more_request(void)
  * @param flag A flag to unregister (or not to unregister) the server from  the static database
  * 
  */
-void leave(int flag)
+static void leave(int flag)
 {
 	long error;
-
 /* Unregister server from portmapper */
-
 	pmap_unset(pgnum, DC_VERS);
-
 /* Unregister server from database (if necessary) */
-
 	if (flag == UNREG)
-	{
-		if (db_svc_unreg(ds_name,&error))
+		if (db_svc_unreg(ds_name, &error))
 			fprintf(stderr,"dc_server_wr : Error during server unregister...\n");
-	}
-	
 /* Exit server */
-
 	exit(-1);
 }
