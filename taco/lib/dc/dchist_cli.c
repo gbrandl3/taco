@@ -1,16 +1,14 @@
- /*
-
- Author:	E. Taurel
-		$Author: jkrueger1 $
-
- Version:	$Revision: 1.2 $
-
- Date:		$Date: 2003-05-16 13:38:52 $
-
- Copyright (c) 1990 by European Synchrotron Radiation Facility,
-                      Grenoble, France
-
- *  */
+/*
+ * Author:	E. Taurel
+ *		$Author: jkrueger1 $
+ *
+ * Version:	$Revision: 1.3 $
+ *
+ * Date:	$Date: 2003-05-21 16:17:12 $
+ *
+ * Copyright (c) 1990 by European Synchrotron Radiation Facility,
+ *                      Grenoble, France
+ */
 
 #include <API.h>
 #include <dc.h>
@@ -62,8 +60,8 @@ extern dc_nethost_info *dc_multi_nethost;
  * @param error 	Pointer to error code				
  *
  * @return In case of trouble, the function returns DS_NOTOK. If there is a problem for
- *    only some command result in the history, the function returns the
- *    number of command which failed.Otherwise, the function returns DS_OK
+ *    only some command result in the history, the function returns the number of command 
+ * which failed.Otherwise, the function returns DS_OK
  */
 int dc_devget_history(datco *dc_ptr,long cmd_code,dc_hist *hist_buff,DevType argout_type,long nb_rec,long *error)
 {

@@ -1,17 +1,14 @@
-
 /*
- 
- Author:	E. Taurel
-		$Author: jkrueger1 $
-
- Version:	$Revision: 1.2 $
-
- Date:		$Date: 2003-05-16 13:38:52 $
-
- Copyright (c) 1990 by European Synchrotron Radiation Facility,
-                      Grenoble, France
-
- *  
+ * 
+ * Author:	E. Taurel
+ *		$Author: jkrueger1 $
+ *
+ * Version:	$Revision: 1.3 $
+ *
+ * Date:	$Date: 2003-05-21 16:17:12 $
+ *
+ * Copyright (c) 1990 by European Synchrotron Radiation Facility,
+ *                      Grenoble, France
  */
 
 
@@ -35,7 +32,7 @@
 extern DevDataListEntry DevData_List[];
 
 /**@ingroup dcAPI
- * To store data belonging to super device into the data collector. 
+ * Store data belonging to super device into the data collector. 
  *
  * Super devices are non physical devices. The device name is used because of the 
  * analogy with real devices.

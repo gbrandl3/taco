@@ -1,18 +1,16 @@
 /*
-
- Author(s):     Emmanuel Taurel
-                $Author: jkrueger1 $
-
- Original:      1993
-
- Version:       $Revision: 1.2 $
-
- Date:          $Date: 2003-05-16 13:38:52 $
-
- Copyright (c) 1990 by European Synchrotron Radiation Facility,
-                       Grenoble, France
-
  *
+ * Author(s):     Emmanuel Taurel
+ *                $Author: jkrueger1 $
+ *
+ * Original:      1993
+ *
+ * Version:       $Revision: 1.3 $
+ *
+ * Date:          $Date: 2003-05-21 16:17:12 $
+ *
+ * Copyright (c) 1990 by European Synchrotron Radiation Facility,
+ *                       Grenoble, France
  */
 
 #include <API.h>
@@ -64,18 +62,18 @@ extern configuration_flags config_flags;
  */
 int dc_info(char *serv_name,servinf *dc_inf,long *error)
 {
-	long err;
-	int send;
-	dc_infox_back *recev;
-	struct hostent *host;
-	unsigned char tmp = 0;
-	char dev_name[40];
-	char *tmp_ptr;
-	db_devinf_imp *serv_net;
-	CLIENT *cl_info;
-	int i;
-	unsigned int diff;
-	char *tmp1;
+	long 		err;
+	int 		send;
+	dc_infox_back 	*recev;
+	struct hostent 	*host;
+	unsigned char	tmp = 0;
+	char 		dev_name[40],
+			*tmp_ptr;
+	db_devinf_imp 	*serv_net;
+	CLIENT 		*cl_info;
+	int 		i;
+	unsigned int 	diff;
+	char 		*tmp1;
 
 /* 
  * Try to verify function parameters 
@@ -136,17 +134,13 @@ int dc_info(char *serv_name,servinf *dc_inf,long *error)
  */
 #ifdef OSK
         if ((tmp1 = index(serv_net[0].host_name,'.')) != NULL)
-        {
-                diff = (u_int)(tmp1 - serv_net[0].host_name);
-                serv_net[0].host_name[diff] = 0;
-        }
 #else
         if ((tmp1 = strchr(serv_net[0].host_name,'.')) != NULL)
+#endif /* OSK */
         {
                 diff = (u_int)(tmp1 - serv_net[0].host_name);
                 serv_net[0].host_name[diff] = 0;
         }
-#endif /* OSK */
 
 /* 
  * Build the RPC connection to the dc server 
@@ -296,17 +290,13 @@ int dc_devall(char *serv_name,char ***devnametab,int *dev_n,long *error)
  */
 #ifdef OSK
         if ((tmp1 = index(serv_net[0].host_name,'.')) != NULL)
-        {
-                diff = (u_int)(tmp1 - serv_net[0].host_name);
-                serv_net[0].host_name[diff] = 0;
-        }
 #else
         if ((tmp1 = strchr(serv_net[0].host_name,'.')) != NULL)
+#endif /* OSK */
         {
                 diff = (u_int)(tmp1 - serv_net[0].host_name);
                 serv_net[0].host_name[diff] = 0;
         }
-#endif /* OSK */
 
 /* 
  * Build the RPC connection to the dc server 
@@ -611,20 +601,17 @@ int dc_devinfo(char *serv_name,char *dev_name,dc_devinf *dc_dev_info,long *error
 
 #ifdef OSK
         if ((tmp2 = index(serv_net[0].host_name,'.')) != NULL)
-        {
-                diff = (u_int)(tmp2 - serv_net[0].host_name);
-                serv_net[0].host_name[diff] = 0;
-        }
 #else
         if ((tmp2 = strchr(serv_net[0].host_name,'.')) != NULL)
+#endif /* OSK */
         {
                 diff = (u_int)(tmp2 - serv_net[0].host_name);
                 serv_net[0].host_name[diff] = 0;
         }
-#endif /* OSK */
 
-/* Build the RPC connection to the dc server */
-
+/* 
+ * Build the RPC connection to the dc server 
+ */
 	cl_info = clnt_create(serv_net[0].host_name,serv_net[0].pn,serv_net[0].vn,"tcp");
 	if (cl_info == NULL)
 	{

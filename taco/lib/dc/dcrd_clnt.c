@@ -5,9 +5,9 @@
 
  Original:      1993
 
- Version:       $Revision: 1.1 $
+ Version:       $Revision: 1.2 $
 
- Date:          $Date: 2003-04-25 11:21:43 $
+ Date:          $Date: 2003-05-21 16:17:12 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -32,21 +32,16 @@
 static struct timeval TIMEOUT = { 3, 0 };
 
 
-xres_clnt *
-dc_devget_clnt_1(argp, clnt, argout, argout_type,perr)
-	xdevget *argp;
-	CLIENT *clnt;
-	DevArgument argout;
-	DevType argout_type;
-	long *perr;
+xres_clnt *dc_devget_clnt_1(xdevget *argp, CLIENT *clnt, DevArgument argout, DevType argout_type, long *perr)
 {
-	static xres_clnt res;
-	enum clnt_stat clnt_stat;
+	static xres_clnt 	res;
+	enum clnt_stat 		clnt_stat;
 
-/* Clear only place for the error code coming from server, and initialize 
-   the remaining parameters of the "res" structure with the parameters
-   coming from the caller */
-
+/* 
+ * Clear only place for the error code coming from server, and initialize 
+ * the remaining parameters of the "res" structure with the parameters
+ * coming from the caller 
+ */
 	memset((char *)&res, 0, sizeof(res));
 	res.xargout_type = argout_type;
 	res.xargout = argout;
@@ -69,20 +64,12 @@ dc_devget_clnt_1(argp, clnt, argout, argout_type,perr)
 	return (&res);
 }
 
-
-
-xresv_clnt *
-dc_devgetv_clnt_1(argp, clnt, st_ptr,perr)
-	xdevgetv *argp;
-	CLIENT *clnt;
-	xres_clnt *st_ptr;
-	long *perr;
+xresv_clnt *dc_devgetv_clnt_1(xdevgetv *argp, CLIENT *clnt, xres_clnt *st_ptr, long *perr)
 {
-	static xresv_clnt res;
-	enum clnt_stat clnt_stat;
+	static xresv_clnt 	res;
+	enum clnt_stat 		clnt_stat;
 
 	memset((char *)&res, 0, sizeof(res));
-
 	res.xresa_clnt.xresv_clnt_val = st_ptr;
 
 	clnt_stat = clnt_call(clnt, DC_DEVGETV,(xdrproc_t)xdr_xdevgetv, (caddr_t)argp,(xdrproc_t)xdr_xresv_clnt, (caddr_t)&res, TIMEOUT);
@@ -102,20 +89,12 @@ dc_devgetv_clnt_1(argp, clnt, st_ptr,perr)
 	return (&res);
 }
 
-
-
-xresm_clnt *
-dc_devgetm_clnt_1(argp, clnt, st_ptr,perr)
-	mpar *argp;
-	CLIENT *clnt;
-	mint *st_ptr;
-	long *perr;
+xresm_clnt *dc_devgetm_clnt_1(mpar *argp, CLIENT *clnt, mint *st_ptr, long *perr)
 {
-	static xresm_clnt res;
-	enum clnt_stat clnt_stat;
+	static xresm_clnt 	res;
+	enum clnt_stat 	clnt_stat;
 
 	memset((char *)&res, 0, sizeof(res));
-
 	res.x_clnt.x_clnt_val = st_ptr;
 
 	clnt_stat = clnt_call(clnt, DC_DEVGETM,(xdrproc_t)xdr_mpar, (caddr_t)argp,(xdrproc_t)xdr_xresm_clnt, (caddr_t)&res, TIMEOUT);
@@ -135,16 +114,10 @@ dc_devgetm_clnt_1(argp, clnt, st_ptr,perr)
 	return (&res);
 }
 
-
-
-outpar *
-dc_devdef_1(argp, clnt,perr)
-	imppar *argp;
-	CLIENT *clnt;
-	long *perr;
+outpar *dc_devdef_1(imppar *argp, CLIENT *clnt, long *perr)
 {
-	static outpar res;
-	enum clnt_stat clnt_stat;
+	static outpar 	res;
+	enum clnt_stat 	clnt_stat;
 
 	memset((char *)&res, 0, sizeof(res));
 
@@ -165,16 +138,10 @@ dc_devdef_1(argp, clnt,perr)
 	return (&res);
 }
 
-
-xres_hist_clnt *
-dc_devgeth_clnt_1(argp, clnt, st_ptr,perr)
-	xdevgeth *argp;
-	CLIENT *clnt;
-	xresh_clnt *st_ptr;
-	long *perr;
+xres_hist_clnt *dc_devgeth_clnt_1(xdevgeth *argp, CLIENT *clnt, xresh_clnt *st_ptr, long *perr)
 {
-	static xres_hist_clnt res;
-	enum clnt_stat clnt_stat;
+	static xres_hist_clnt	res;
+	enum clnt_stat		clnt_stat;
 
 	memset((char *)&res, 0, sizeof(res));
 
@@ -197,12 +164,7 @@ dc_devgeth_clnt_1(argp, clnt, st_ptr,perr)
 	return (&res);
 }
 
-
-
-int dc_rpc_check_clnt_1(clnt,res,perr)
-	CLIENT *clnt;
-	long *perr;
-	char **res;
+int dc_rpc_check_clnt_1(CLIENT *clnt, char **res, long *perr)
 {
 	enum clnt_stat clnt_stat;
 

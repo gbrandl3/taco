@@ -1,18 +1,18 @@
 /*
-
- Author(s):     Emmanuel Taurel
-		$Author: jkrueger1 $
-
- Original:      1992
-
- Version:       $Revision: 1.1 $
-
- Date:          $Date: 2003-04-25 11:21:43 $
-
- Copyright (c) 1990 by European Synchrotron Radiation Facility,
-                       Grenoble, France
-
- *  */
+ * 
+ * Author(s):     Emmanuel Taurel
+ *		$Author: jkrueger1 $
+ *
+ * Original:      1992
+ *
+ * Version:       $Revision: 1.2 $
+ *
+ * Date:          $Date: 2003-05-21 16:17:12 $
+ *
+ * Copyright (c) 1990 by European Synchrotron Radiation Facility,
+ *                       Grenoble, France
+ *
+ */
 
 #include <API.h>
 #include <private/ApiP.h>
@@ -21,24 +21,21 @@
 #include <dc_xdr.h>
 
 #ifndef NULL
-#define NULL  0
+#define NULL  (0)
 #endif  /* NULL */
 
 static struct timeval TIMEOUT = { 3, 0 };
 
-dc_xdr_error *
-dc_open_1(argp,clnt,perr)
-	dc_open_in *argp;
-	CLIENT *clnt;
-	long *perr;
+dc_xdr_error *dc_open_1(dc_open_in *argp,CLIENT *clnt,long *perr)
 {
-	static dc_xdr_error res;
-	enum clnt_stat clnt_stat;
+	static dc_xdr_error 	res;
+	enum clnt_stat 		clnt_stat;
 
 	memset((char *)&res, 0, sizeof(res));
 
 	clnt_stat = clnt_call(clnt, DC_OPEN,(xdrproc_t)xdr_dc_open_in, (caddr_t)argp,(xdrproc_t)xdr_dc_xdr_error, (caddr_t)&res, TIMEOUT);
-	if (clnt_stat != RPC_SUCCESS) {
+	if (clnt_stat != RPC_SUCCESS) 
+	{
 		dev_printdebug(DBG_ERROR,"dc_open clnt_call returned : %s\n",clnt_sperrno(clnt_stat));
 		if (clnt_stat == RPC_TIMEDOUT)
 			*perr = DcErr_RPCTimedOut;
@@ -47,26 +44,20 @@ dc_open_1(argp,clnt,perr)
 		else
 			*perr = DcErr_RPCreception;
 		return (NULL);
-				    }
+	}
 	return (&res);
 }
 
-
-
-
-dc_xdr_error *
-dc_close_1(argp,clnt,perr)
-	name_arr *argp;
-	CLIENT *clnt;
-	long *perr;
+dc_xdr_error *dc_close_1(name_arr *argp,CLIENT *clnt,long *perr)
 {
-	static dc_xdr_error res;
-	enum clnt_stat clnt_stat;
+	static dc_xdr_error 	res;
+	enum clnt_stat 		clnt_stat;
 
 	memset((char *)&res, 0, sizeof(res));
 
 	clnt_stat = clnt_call(clnt, DC_CLOSE,(xdrproc_t)xdr_name_arr, (caddr_t)argp,(xdrproc_t)xdr_dc_xdr_error, (caddr_t)&res, TIMEOUT);
-	if (clnt_stat != RPC_SUCCESS) {
+	if (clnt_stat != RPC_SUCCESS) 
+	{
 		dev_printdebug(DBG_ERROR,"dc_close clnt_call returned : %s\n",clnt_sperrno(clnt_stat));
 		if (clnt_stat == RPC_TIMEDOUT)
 			*perr = DcErr_RPCTimedOut;
@@ -75,25 +66,20 @@ dc_close_1(argp,clnt,perr)
 		else
 			*perr = DcErr_RPCreception;
 		return (NULL);
-					}
+	}
 	return (&res);
 }
 
-
-
-dc_xdr_error *
-dc_dataput_1(argp,clnt,perr)
-	dev_datarr *argp;
-	CLIENT *clnt;
-	long *perr;
+dc_xdr_error *dc_dataput_1(dev_datarr *argp,CLIENT *clnt,long *perr)
 {
-	static dc_xdr_error res;
-	enum clnt_stat clnt_stat;
+	static dc_xdr_error 	res;
+	enum clnt_stat 		clnt_stat;
 
 	memset((char *)&res, 0, sizeof(res));
 
 	clnt_stat = clnt_call(clnt, DC_DATAPUT,(xdrproc_t)xdr_dev_datarr, (caddr_t)argp,(xdrproc_t)xdr_dc_xdr_error, (caddr_t)&res, TIMEOUT);
-	if (clnt_stat != RPC_SUCCESS) {
+	if (clnt_stat != RPC_SUCCESS) 
+	{
 		dev_printdebug(DBG_ERROR,"dc_dataput clnt_call returned : %s\n",clnt_sperrno(clnt_stat));
 		if (clnt_stat == RPC_TIMEDOUT)
 			*perr = DcErr_RPCTimedOut;
@@ -102,26 +88,20 @@ dc_dataput_1(argp,clnt,perr)
 		else
 			*perr = DcErr_RPCreception;
 		return (NULL);
-					}
+	}
 	return (&res);
 }
 
-
-
-
-dc_infox_back *
-dc_info_1(argp,clnt,perr)
-	void *argp;
-	CLIENT *clnt;
-	long *perr;
+dc_infox_back *dc_info_1(void *argp,CLIENT *clnt,long *perr)
 {
-	static dc_infox_back res;
-	enum clnt_stat clnt_stat;
+	static dc_infox_back 	res;
+	enum clnt_stat 		clnt_stat;
 
 	memset((char *)&res, 0, sizeof(res));
 
 	clnt_stat = clnt_call(clnt, DC_INFO,(xdrproc_t)xdr_void, argp,(xdrproc_t)xdr_dc_infox_back, (caddr_t)&res, TIMEOUT);
-	if (clnt_stat != RPC_SUCCESS) {
+	if (clnt_stat != RPC_SUCCESS) 
+	{
 		dev_printdebug(DBG_ERROR,"dc_info clnt_call returned : %s\n",clnt_sperrno(clnt_stat));
 		if (clnt_stat == RPC_TIMEDOUT)
 			*perr = DcErr_RPCTimedOut;
@@ -130,25 +110,20 @@ dc_info_1(argp,clnt,perr)
 		else
 			*perr = DcErr_RPCreception;
 		return (NULL);
-					}
+	}
 	return (&res);
 }
 
-
-
-dc_devallx_back *
-dc_devall_1(argp,clnt,perr)
-	void *argp;
-	CLIENT *clnt;
-	long *perr;
+dc_devallx_back *dc_devall_1(void *argp,CLIENT *clnt,long *perr)
 {
-	static dc_devallx_back res;
-	enum clnt_stat clnt_stat;
+	static dc_devallx_back 	res;
+	enum clnt_stat 		clnt_stat;
 
 	memset((char *)&res, 0, sizeof(res));
 
 	clnt_stat = clnt_call(clnt, DC_DEVALL,(xdrproc_t)xdr_void, argp,(xdrproc_t)xdr_dc_devallx_back, (caddr_t)&res, TIMEOUT);
-	if (clnt_stat != RPC_SUCCESS) {
+	if (clnt_stat != RPC_SUCCESS) 
+	{
 		dev_printdebug(DBG_ERROR,"dc_devall clnt_call returned : %s\n",clnt_sperrno(clnt_stat));
 		if (clnt_stat == RPC_TIMEDOUT)
 			*perr = DcErr_RPCTimedOut;
@@ -157,26 +132,20 @@ dc_devall_1(argp,clnt,perr)
 		else
 			*perr = DcErr_RPCreception;
 		return (NULL);
-					}
+	}
 	return (&res);
 }
 
-
-
-
-dc_devinfx_back *
-dc_devinfo_1(argp,clnt,perr)
-	name *argp;
-	CLIENT *clnt;
-	long *perr;
+dc_devinfx_back *dc_devinfo_1(name *argp,CLIENT *clnt,long *perr)
 {
-	static dc_devinfx_back res;
-	enum clnt_stat clnt_stat;
+	static dc_devinfx_back 	res;
+	enum clnt_stat 		clnt_stat;
 
 	memset((char *)&res, 0, sizeof(res));
 
 	clnt_stat = clnt_call(clnt, DC_DEVINFO,(xdrproc_t)xdr_name, (caddr_t)argp,(xdrproc_t)xdr_dc_devinfx_back, (caddr_t)&res, TIMEOUT);
-	if (clnt_stat != RPC_SUCCESS) {
+	if (clnt_stat != RPC_SUCCESS) 
+	{
 		dev_printdebug(DBG_ERROR,"dc_devinfo clnt_call returned : %s\n",clnt_sperrno(clnt_stat));
 		if (clnt_stat == RPC_TIMEDOUT)
 			*perr = DcErr_RPCTimedOut;
@@ -185,21 +154,19 @@ dc_devinfo_1(argp,clnt,perr)
 		else
 			*perr = DcErr_RPCreception;
 		return (NULL);
-					}
+	}
 	return (&res);
 }
 
 
 
-int dc_rpcwr_check_clnt_1(clnt,res,perr)
-	CLIENT *clnt;
-	long *perr;
-	char **res;
+int dc_rpcwr_check_clnt_1(CLIENT *clnt,char **res,long *perr)
 {
 	enum clnt_stat clnt_stat;
 
 	clnt_stat = clnt_call(clnt, RPC_CHECK,(xdrproc_t)xdr_void, NULL,(xdrproc_t)xdr_wrapstring,(caddr_t)res, TIMEOUT);
-	if (clnt_stat != RPC_SUCCESS) {
+	if (clnt_stat != RPC_SUCCESS) 
+	{
 		dev_printdebug(DBG_ERROR,"rpc_check clnt_call returned : %s\n",clnt_sperrno(clnt_stat));
 		if (clnt_stat == RPC_TIMEDOUT)
 			*perr = DcErr_RPCTimedOut;
@@ -208,6 +175,6 @@ int dc_rpcwr_check_clnt_1(clnt,res,perr)
 		else
 			*perr = DcErr_RPCreception;
 		return (-1);
-				      }
+	}
 	return (0);
 }

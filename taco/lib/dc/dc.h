@@ -3,9 +3,9 @@
  * Author:	Emanuel Taurel
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2003-05-16 13:38:52 $
+ * Date:	$Date: 2003-05-21 16:17:12 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                     Grenoble, France
@@ -18,6 +18,11 @@
  @defgroup dcAPI Data Collector API
  @ingroup API
  This functions allow the access to the data collector server.
+ */
+/**
+ @defgroup dcAPIintern Data Collector internal functions
+ @ingroup dcAPI
+ This functions are only for internal use
  */
 
 #include <SysNumbers.h>
