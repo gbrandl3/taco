@@ -1,4 +1,3 @@
-
 /*+*******************************************************************
 
  File:          pin_xdr.h
@@ -9,14 +8,13 @@
                 state of the Pinhole device.
 
  Author(s):  	Gilbert Pepellin
+ 		$Author: jkrueger1 $
 
  Original:	June 1993
 
+ Version:	$Revision: 1.2 $
 
- $Revision: 1.1 $
- $Date: 2003-04-25 11:21:47 $
-
- $Author: jkrueger1 $
+ Date:		$Date: 2004-02-06 13:11:22 $
 
  Copyright (c) 1992 by European Synchrotron Radiation Facility,
 		       Grenoble, France

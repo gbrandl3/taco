@@ -3,13 +3,18 @@
 
  File:          m4_xdr.h
 
- Project:       Data types for m4 (four mirrors device)
+ Project:       
 
- Description:  
+ Description:  	Data types for m4 (four mirrors device)
 
  Author(s):  	C. Dominguez
+		$Author: jkrueger1 $
 
  Original:	May 93
+
+ Version:	$Revision: 1.2 $
+
+ Date:		$Date: 2004-02-06 13:11:22 $
 
 Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		      Grenoble, France

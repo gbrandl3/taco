@@ -8,10 +8,15 @@
  Description:   xdr_routines for SLIT types.
 
  Author(s):     Timo Mett\"al\"a
+		$Author: jkrueger1 $
 
  Original:      September 1992
 
-Copyright (c) 1992 by European Synchrotron Radiation Facility,
+ Version:	$Revision: 1.2 $
+
+ Date:		$Date: 2004-02-06 13:11:22 $
+
+ Copyright (c) 1992 by European Synchrotron Radiation Facility,
                       Grenoble, France
 
 *******************************************************************-*/

@@ -1,17 +1,26 @@
 /*+*******************************************************************
 
  File:          icv101_xdr.c
+
  Project:       Device Servers with sun-rpc
+
  Description:   xdr_routines for icv101 types
+
  Author(s):     Timo Mettala
+		$Author: jkrueger1 $
+
  Original:      March  1993
 
-Copyright (c) 1993 by European Synchrotron Radiation Facility,
+ Version:	$Revision: 1.2 $
+
+ Date:		$Date: 2004-02-06 13:11:22 $
+
+ Copyright (c) 1993 by European Synchrotron Radiation Facility,
                       Grenoble, France
 *******************************************************************-*/
 
 static char RcsId[] =
-"$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/icv101_xdr.c,v 1.1 2003-04-25 11:21:47 jkrueger1 Exp $";
+"$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/icv101_xdr.c,v 1.2 2004-02-06 13:11:22 jkrueger1 Exp $";
 
 #include "dev_xdr.h"
 #include "icv101_xdr.h"

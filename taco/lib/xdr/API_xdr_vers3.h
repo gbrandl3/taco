@@ -14,9 +14,9 @@
 
  Original:	November 1994
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-04-25 11:21:45 $
+ Date:		$Date: 2004-02-06 13:11:22 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -31,7 +31,7 @@
  */
 #ifdef _IDENT
 static char API_xdrh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/API_xdr_vers3.h,v 1.1 2003-04-25 11:21:45 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/API_xdr_vers3.h,v 1.2 2004-02-06 13:11:22 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -142,32 +142,22 @@ typedef struct _manager_data_3 _manager_data_3;
 extern "C" {
 #endif					 					 
 bool_t _DLLFunc xdr__server_data_3 PT_((XDR *xdrs,_server_data_3 *objp));
-bool_t _DLLFunc xdr__client_data_3 PT_((XDR *xdrs, 
-					_client_data_3 *objp));
-bool_t _DLLFunc xdr__client_raw_data_3 PT_((XDR *xdrs,
-					    _client_raw_data_3 *objp));
-bool_t _DLLFunc xdr__dev_import_in_3 PT_((XDR *xdrs, 
-					  _dev_import_in_3 *objp));
-bool_t _DLLFunc xdr__dev_import_out_3 PT_((XDR *xdrs, 
-					   _dev_import_out_3 *objp));
-bool_t _DLLFunc xdr__dev_free_in_3 PT_((XDR *xdrs,
-					_dev_free_in_3 *objp));
-bool_t _DLLFunc xdr__dev_free_out_3 PT_((XDR *xdrs,
-					 _dev_free_out_3 *objp));
-bool_t _DLLFunc xdr__dev_query_in_3 PT_((XDR *xdrs, 
-					 _dev_query_in_3 *objp));
-bool_t _DLLFunc xdr__dev_query_out_3 PT_((XDR *xdrs, 
-					  _dev_query_out_3 *objp));
+bool_t _DLLFunc xdr__client_data_3 PT_((XDR *xdrs, _client_data_3 *objp));
+bool_t _DLLFunc xdr__client_raw_data_3 PT_((XDR *xdrs, _client_raw_data_3 *objp));
+bool_t _DLLFunc xdr__dev_import_in_3 PT_((XDR *xdrs, _dev_import_in_3 *objp));
+bool_t _DLLFunc xdr__dev_import_out_3 PT_((XDR *xdrs, _dev_import_out_3 *objp));
+bool_t _DLLFunc xdr__dev_free_in_3 PT_((XDR *xdrs, _dev_free_in_3 *objp));
+bool_t _DLLFunc xdr__dev_free_out_3 PT_((XDR *xdrs, _dev_free_out_3 *objp));
+bool_t _DLLFunc xdr__dev_query_in_3 PT_((XDR *xdrs, _dev_query_in_3 *objp));
+bool_t _DLLFunc xdr__dev_query_out_3 PT_((XDR *xdrs, _dev_query_out_3 *objp));
 #ifdef __cplusplus
 #ifdef _UCC
 bool_t _DLLFunc xdr__manager_data_3 (...); 
 #else
-bool_t _DLLFunc xdr__manager_data_3 PT_((XDR *xdrs, 
-					 _manager_data_3 *objp));
+bool_t _DLLFunc xdr__manager_data_3 PT_((XDR *xdrs, _manager_data_3 *objp));
 #endif /* _UCC */
 #else
-bool_t _DLLFunc xdr__manager_data_3 PT_((XDR *xdrs, 
-					 _manager_data_3 *objp));
+bool_t _DLLFunc xdr__manager_data_3 PT_((XDR *xdrs, _manager_data_3 *objp));
 #endif /* __cplusplus */
 
 #ifdef __cplusplus

@@ -12,9 +12,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		 $Date: 2003-04-25 11:21:45 $
+ Date:		 $Date: 2004-02-06 13:11:22 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -29,7 +29,7 @@
  */
 #ifdef _IDENT
 static char API_xdrh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/API_xdr.h,v 1.1 2003-04-25 11:21:45 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/API_xdr.h,v 1.2 2004-02-06 13:11:22 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -69,7 +69,6 @@ struct _server_data {
 };
 typedef struct _server_data _server_data;
 
-
 struct _client_data {
   	long status;
 	long error;
@@ -91,9 +90,6 @@ struct _client_raw_data {
 	DevVarArgumentArray var_argument;
 };
 typedef struct _client_raw_data _client_raw_data;
-
-
-
 
 /*
  *  internal structures for device services
@@ -247,10 +243,8 @@ typedef struct _msg_manager_data _msg_manager_data;
 #ifdef __cplusplus
 extern "C" {
 #endif					   
-bool_t _DLLFunc xdr_DevVarArgument 
-		PT_((XDR *xdrs, DevVarArgument *objp));
-bool_t  _DLLFunc xdr_DevVarArgumentArray
-                 PT_((XDR *xdrs, DevVarArgumentArray *objp));
+bool_t _DLLFunc xdr_DevVarArgument PT_((XDR *xdrs, DevVarArgument *objp));
+bool_t _DLLFunc xdr_DevVarArgumentArray PT_((XDR *xdrs, DevVarArgumentArray *objp));
 bool_t _DLLFunc xdr__register_data PT_((XDR *xdrs, _register_data *objp));
 bool_t _DLLFunc xdr__manager_data PT_((XDR *xdrs, _manager_data *objp));
 bool_t _DLLFunc xdr__server_data PT_((XDR *xdrs, _server_data *objp));
@@ -267,8 +261,7 @@ bool_t _DLLFunc xdr__dev_query_out PT_((XDR *xdrs, _dev_query_out *objp));
 bool_t _DLLFunc xdr__msg_data PT_((XDR *xdrs, _msg_data *objp));
 bool_t _DLLFunc xdr__msg_out PT_((XDR *xdrs, _msg_out *objp));
 bool_t _DLLFunc xdr__dev_event_info PT_((XDR *xdrs, _dev_event_info *objp));
-bool_t _DLLFunc xdr__msg_manager_data PT_((XDR *xdrs,
-					   _msg_manager_data *objp));
+bool_t _DLLFunc xdr__msg_manager_data PT_((XDR *xdrs, _msg_manager_data *objp));
 bool_t _DLLFunc xdr__dev_queryevent_out PT_((XDR *xdrs, _dev_queryevent_out *objp));
 #ifdef __cplusplus
 }

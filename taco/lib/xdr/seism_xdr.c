@@ -8,14 +8,13 @@
 		the Seismic Survey System data types.
 
  Author(s):  	Jean Michel Chaize
+ 		$Author: jkrueger1 $
 
  Original:	August 1992
 
+ Version:	$Revision: 1.2 $
 
- $Revision: 1.1 $
- $Date: 2003-04-25 11:21:47 $
-
- $Author: jkrueger1 $
+ Date:		$Date: 2004-02-06 13:11:22 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France

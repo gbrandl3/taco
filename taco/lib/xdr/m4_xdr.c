@@ -1,17 +1,21 @@
-
 /********************************************************************
 
  File:          m4_xdr.c
 
- Project:       4 mirrors device
+ Project:       
 
- Description:   xdr_routines for m4 types.
+ Description:   xdr_routines for m4 types.4 mirrors device
 
  Author(s):     Christine Dominguez
+		$Author: jkrueger1 $
 
  Original:      May 1993
 
-Copyright (c) 1990 by European Synchrotron Radiation Facility,
+ Version:	$Revision: 1.2 $
+
+ Date:		$Date: 2004-02-06 13:11:22 $
+
+ Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		      Grenoble, France
 
 *******************************************************************-*/

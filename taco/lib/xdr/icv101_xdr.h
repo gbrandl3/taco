@@ -1,14 +1,19 @@
 /*+*******************************************************************
  File:          icv101_xdr.h
+
  Project:       Device Servers with sun-rpc
+
  Description:   Include file for XDR definitions
 		of the icv101 data types.
+
  Author(s):  	Timo Mettala
+ 		$Author: jkrueger1 $
+
  Original:	March 1993
 
- $Revision $
- $Date: 2003-04-25 11:21:47 $
- $Author: jkrueger1 $
+ Version:	$Revision: 1.2 $
+
+ Date:		$Date: 2004-02-06 13:11:22 $
 
  Copyright (c) 1993 by European Synchrotron Radiation Facility,
 		       Grenoble, France
