@@ -5,7 +5,7 @@
 
 # setup TACO environment variables
 
-. .taco_env
+. tacoenv.sh
 NETHOST=`uname -n` ; export NETHOST
 
 echo "Starting AGPS device server ..."

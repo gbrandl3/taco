@@ -1,0 +1,75 @@
+#!/bin/csh
+
+setenv prefix @prefix@
+setenv exec_prefix @exec_prefix@
+setenv libdir @libdir@
+setenv bindir @bindir@
+setenv sbindi =@sbindir@
+
+# Add your domain tables here (comma seperated)
+if (${?DBTABLES_CUSTOM}) then
+;
+else
+setenv DBTABLES_CUSTOM TEST
+endif
+
+# Uncomment the next line if you want to start the TACO services in secure mode
+# setenv TACO_SECURE_MODE yes
+
+# It is unlikely that the rest of the file needs a modification
+if (${?DSHOME}) then
+;
+else
+setenv DSHOME @prefix@
+endif
+
+setenv DBTABLES NAMES,PS_NAMES,CLASS,SYS,ERROR,CMDS,SEC,EVENTS,${DBTABLES_CUSTOM}
+if (${?RES_BASE_DIR}) then
+;
+else
+setenv RES_BASE_DIR ${DSHOME}/dbase/res
+endif
+
+setenv DBM_DIR ${DSHOME}/dbase/dbm
+setenv LOGPATH ${DSHOME}/log
+if (${?NETHOST}) then
+;
+else
+setenv NETHOST `hostname|cut -f1 -d'.'`
+endif
+
+if ( $DSHOME == $prefix ) then
+	if (${?LD_LIBRARY_PATH}) then
+		setenv LD_LIBRARY_PATH @libdir@:${LD_LIBRARY_PATH}
+	else
+		setenv LD_LIBRARY_PATH @libdir@
+	endif
+	if (${?PATH}) then
+		setenv PATH @bindir@:@sbindir@:${PATH}
+	else
+		setenv PATH @bindir@:@sbindir@
+	endif
+else
+	if (${?LD_LIBRARY_PATH}) then
+		setenv LD_LIBRARY_PATH ${DSHOME}/lib/@taco_install_path@:${LD_LIBRARY_PATH}
+	else
+		setenv LD_LIBRARY_PATH ${DSHOME}/lib/@taco_install_path@
+	endif
+	if (${?PATH}) then
+		setenv PATH ${DSHOME}/bin/@taco_install_path@:${DSHOME}/system/bin/@taco_install_path@:${PATH}
+	else
+		setenv PATH ${DSHOME}/bin/@taco_install_path@:${DSHOME}/system/bin/@taco_install_path@
+	endif
+endif
+
+if (${?PYTHONPATH}) then
+	setenv PYTHONPATH ${DSHOME}/python/@taco_install_path@:${PYTHONPATH}
+else
+	setenv PYTHONPATH ${DSHOME}/python/@taco_install_path@
+endif
+
+unset DBTABLES_CUSTOM
+
+setenv MYSQL_USER root
+setenv MYSQL_PASSWORD
+
