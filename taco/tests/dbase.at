@@ -78,7 +78,7 @@ AT_SETUP([db_delresource function])
 AT_CHECK([taco db_resdel test/device/2/res1], [])
 AT_CLEANUP
 
-AT_SETUP([existing domains])
+AT_SETUP([check existing resource domains])
 AT_CHECK([
 AT_TACO_RUN_LOCAL
 db_resdomain 
@@ -92,7 +92,7 @@ test
 ]])
 AT_CLEANUP
 
-AT_SETUP([existing family test])
+AT_SETUP([check existing resource families])
 AT_CHECK([
 AT_TACO_RUN_LOCAL 
 db_resfamily test
@@ -100,10 +100,43 @@ db_resfamily test
 ]])
 AT_CLEANUP
 
-AT_SETUP([existing member test])
+AT_SETUP([check existing resource members])
 AT_CHECK([
 AT_TACO_RUN_LOCAL 
 db_resmember test device
+], [], [[1
+]])
+AT_CLEANUP
+
+AT_SETUP([check resource value])
+AT_CHECK([
+AT_TACO_RUN_LOCAL
+db_getresoval class/inst_verify/default/config
+], [], [[class/inst_verify/default/config: 10
+]])
+AT_CLEANUP 
+
+AT_SETUP([check existing device domains])
+AT_CHECK([
+AT_TACO_RUN_LOCAL
+db_devdomain 
+], [], [[test
+]])
+AT_CLEANUP
+
+AT_SETUP([check existing device families])
+AT_CHECK([
+AT_TACO_RUN_LOCAL
+db_devfamily test
+], [], [[agps
+device
+]])
+AT_CLEANUP
+
+AT_SETUP([check existing device members])
+AT_CHECK([
+AT_TACO_RUN_LOCAL
+db_devmember test device
 ], [], [[1
 ]])
 AT_CLEANUP

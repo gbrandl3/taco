@@ -93,6 +93,25 @@ Select one of the following commands :
 cmd ?]]) 
 AT_CLEANUP
 
+AT_SETUP([import a device from server])
+AT_CHECK([
+AT_TACO_RUN_LOCAL
+test_dev_import test/device/1
+], [], [[test/device/1
+Inst_verifyClass
+DevType_Default
+]])
+AT_CLEANUP
+
+AT_SETUP([check the RPC connection parameters])
+AT_CHECK([
+AT_TACO_RUN_LOCAL
+test_con_params test/device/1
+], [], [[3
+1.5
+]])
+AT_CLEANUP
+
 AT_SETUP([Stop the Inst_verify and AGPSpp device servers])
 AT_CHECK([killall Inst_verify AGPSpp])
 AT_CLEANUP

@@ -29,7 +29,7 @@ check_PROGRAMS 		= db_connect db_resget db_resput \
 			db_resdomain db_resfamily db_resmember dev_ping \
 			db_getresoval db_devdomain db_devfamily db_devmember test_dev_import \
 			test_asc_dyn test_asc_stat test_tc test_starter \
-			test_cmd_query 
+			test_cmd_query test_con_params
 
 check_SCRIPT		= taco
 
@@ -73,6 +73,9 @@ test_starter_LDADD	= @TACO_CLIENT_LIBS@
 
 test_cmd_query_SOURCES	= test_cmd_query.cpp
 test_cmd_query_LDADD	= @TACO_CLIENT_LIBS@
+
+test_con_params_SOURCES	= test_con_params.cpp
+test_con_params_LDADD	= @TACO_CLIENT_LIBS@
 
 db_getresoval_SOURCES	= db_getresoval.cpp
 db_getresoval_LDADD	= @TACO_CLIENT_LIBS@

@@ -49,17 +49,49 @@ int main(int argc, char *argv[])
 	devserver	ds;
 	if (dev_import(const_cast<char *>(full_name.c_str()), WRITE_ACCESS, &ds, &error) == -1)
 	{
-		std::cerr << "The call to system failed with error " << error << std::endl;
-		std::cerr << "Error message : " << dev_error_str(error) << std::endl;
+		std::cerr << "The call to system failed with error " << error << std::endl
+			<< "Error message : " << dev_error_str(error) << std::endl;
 		exit(-1);
 	}
-	std::cout << ds->device_name << std::endl;
-	std::cout << ds->device_class << std::endl;
-	std::cout << ds->device_type << std::endl;
+	if (dev_rpc_protocol(ds, D_UDP, &error) == -1)
+	{
+		std::cerr << "The call to system failed with error " << error << std::endl
+			<< "Error message : " << dev_error_str(error) << std::endl;
+		exit(-1);
+	}
+	if (dev_rpc_protocol(ds, D_TCP, &error) == -1)
+	{
+		std::cerr << "The call to system failed with error " << error << std::endl
+			<< "Error message : " << dev_error_str(error) << std::endl;
+		exit(-1);
+	}
+	struct timeval	tm;
+	if (dev_rpc_timeout(ds, CLGET_TIMEOUT, &tm, &error) == -1)
+	{
+		std::cerr << "The call to system failed with error " << error << std::endl
+			<< "Error message : " << dev_error_str(error) << std::endl;
+		exit(-1);
+	}
+	std::cout << tm.tv_sec + tm.tv_usec / 1000000.0 << std::endl;
+	tm.tv_sec = 1;
+	tm.tv_usec = 500000;
+	if (dev_rpc_timeout(ds, CLSET_TIMEOUT, &tm, &error) == -1)
+	{
+		std::cerr << "The call to system failed with error " << error << std::endl
+			<< "Error message : " << dev_error_str(error) << std::endl;
+		exit(-1);
+	}
+	if (dev_rpc_timeout(ds, CLGET_TIMEOUT, &tm, &error) == -1)
+	{
+		std::cerr << "The call to system failed with error " << error << std::endl
+			<< "Error message : " << dev_error_str(error) << std::endl;
+		exit(-1);
+	}
+	std::cout << tm.tv_sec + tm.tv_usec / 1000000.0 << std::endl;
 	if (dev_free(ds, &error) == -1)
 	{
-		std::cerr << "The call to system failed with error " << error << std::endl;
-		std::cerr << "Error message : " << dev_error_str(error) << std::endl;
+		std::cerr << "The call to system failed with error " << error << std::endl
+			<< "Error message : " << dev_error_str(error) << std::endl;
 		exit(-1);
 	}
 	return 0;
