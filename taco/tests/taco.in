@@ -15,6 +15,7 @@ appdefaultdir=@appdefaultdir@
 LD_LIBRARY_PATH=@libdir@${LD_LIBRARY_PATH:+:}
 }
 
+unset NETHOST
 set_env
 if test $# -gt 0 ; then
 	case $1 in 
