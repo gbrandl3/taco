@@ -9,13 +9,13 @@
 		dummy database under OS9.
 
  Author(s):     Jens Meyer
- 		$Author: andy_gotz $
+ 		$Author: jkrueger1 $
 
  Original: 	January 1991
 
- Version:	$Revision: 1.8 $
+ Version:	$Revision: 1.9 $
 
- Date:		$Date: 2003-12-21 20:05:03 $
+ Date:		$Date: 2004-02-19 16:00:51 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -74,7 +74,13 @@ int main (int argc, char **argv)
 	pid = getpid ();
 
 #ifdef unix
-	gethostname (nethost, sizeof(nethost) - 1);
+	if ( (nethost_env = (char *)getenv ("NETHOST")) == NULL )
+	{
+		printf ("Environment variable NETHOST not defined, using local host ...\n");
+		gethostname (nethost, sizeof(nethost) - 1);
+	}
+	else
+		snprintf(nethost, sizeof(nethost), "%s",nethost_env);
 	printf ("Environment variable NETHOST = %s\n",nethost);
 #endif /* unix */
 
@@ -146,23 +152,23 @@ int main (int argc, char **argv)
 
 #ifdef NEVER
 #ifdef linuxx86
-	snprintf (homepath, sizeof(homepath) - 1, "%s/system/bin/linux/x86", dshome);
+	snprintf (homepath, sizeof(homepath), "%s/system/bin/linux/x86", dshome);
 #endif /* linuxx86 */
 #ifdef linux68k
-	snprintf (homepath, sizeof(homepath) - 1, "%s/system/bin/linux/68k", dshome);
+	snprintf (homepath, sizeof(homepath), "%s/system/bin/linux/68k", dshome);
 #endif /* linux68k */
 
 
 #ifdef sun
 #ifdef solaris
-	snprintf (homepath, sizeof(homepath) - 1, "%s/system/bin/solaris", dshome);
+	snprintf (homepath, sizeof(homepath), "%s/system/bin/solaris", dshome);
 #else
-	snprintf (homepath, sizeof(homepath) - 1, "%s/system/bin/sun4", dshome);
+	snprintf (homepath, sizeof(homepath), "%s/system/bin/sun4", dshome);
 #endif /* solaris */
 #endif /* sun */
 
 #ifdef hpux10
-	snprintf (homepath, sizeof(homepath) - 1, "%s/system/bin/hpux10.2", dshome);
+	snprintf (homepath, sizeof(homepath), "%s/system/bin/hpux10.2", dshome);
 #endif /* hpux10 */
 #endif /* NEVER */
 
@@ -244,7 +250,7 @@ int main (int argc, char **argv)
 /* 
  * Set the pathes and check them. 
  */
-		snprintf (oracle_server_path, sizeof(oracle_server_path) - 1, "%s/bin/solaris", dbhome);
+		snprintf (oracle_server_path, sizeof(oracle_server_path), "%s/bin/solaris", dbhome);
 		if ( (fptr = fopen (oracle_server_path,"r")) == NULL )
 		{
 			fprintf (stderr, "\nDBHOME leads to a strange directory, exiting...\n");
@@ -317,7 +323,7 @@ int main (int argc, char **argv)
 	if (c_flags.request_log)
 	{
 		char *logpath = getenv("LOGPATH");
-		snprintf (logfile, sizeof(logfile) - 1, "%s/System.log", logpath ? logpath : homepath);
+		snprintf (logfile, sizeof(logfile), "%s/System.log", logpath ? logpath : homepath);
 		if ( (system_log = fopen (logfile, "w")) == NULL )
 		{
 			fprintf (stderr,"\ncannot open System.log file (%s), exiting...\n", logfile);
@@ -343,7 +349,7 @@ int main (int argc, char **argv)
 /* 
  * DBM startup sequence 
  */
-      				snprintf (db_start, sizeof(db_start) - 1, 
+      				snprintf (db_start, sizeof(db_start), 
 #ifdef __hpux
       					"remsh %s -l dserver -n \"export %s/%s %s %s 1>&- 2>&- &\" ", 
 #endif
@@ -357,7 +363,7 @@ int main (int argc, char **argv)
 /* 
  * MYSQL startup sequence 
  */
-      				snprintf (db_start, sizeof(db_start) - 1, 
+      				snprintf (db_start, sizeof(db_start), 
 #ifdef __hpux
       					"remsh %s -l dserver -n \"export %s/%s %s %s 1>&- 2>&- &\" ", 
 #endif
@@ -372,7 +378,7 @@ int main (int argc, char **argv)
 /* 
  * ORACLE startup sequence 
  */
-      			snprintf (db_start, sizeof(db_start) - 1,
+      			snprintf (db_start, sizeof(db_start),
 #ifdef __hpux
       				"remsh %s -l dserver -n \"export DBTABLES=%s;"
 				"export ORACLE_SID=%s;export ORACLE_HOME=%s;%s/%s %s %s 1>&- 2>&- &\" ", 
@@ -402,9 +408,9 @@ int main (int argc, char **argv)
 			if (c_flags.mysql == True)
 			{
 				if (dshome != NULL)
-					snprintf (homedir, sizeof(homedir) -1, "%s/%s", homepath, mysql_server);
+					snprintf (homedir, sizeof(homedir), "%s/%s", homepath, mysql_server);
 				else
-					snprintf (homedir, sizeof(homedir) - 1, "%s", mysql_server);
+					snprintf (homedir, sizeof(homedir), "%s", mysql_server);
 /* 
  * Set arguments for execv 
  */
@@ -422,9 +428,9 @@ int main (int argc, char **argv)
  * Set path to DBM server 
  */
 				if (dshome != NULL)
-					snprintf (homedir, sizeof(homedir) -1, "%s/%s", homepath, dbm_server);
+					snprintf (homedir, sizeof(homedir), "%s/%s", homepath, dbm_server);
 				else
-					snprintf (homedir, sizeof(homedir) - 1, "%s", dbm_server);
+					snprintf (homedir, sizeof(homedir), "%s", dbm_server);
 /* 
  * Set arguments for execv 
  */
@@ -463,9 +469,9 @@ int main (int argc, char **argv)
 	if (!msg_pid)
 	{
 		if (dshome != NULL)
-			snprintf (homedir, sizeof(homedir) - 1, "%s/MessageServer", homepath);
+			snprintf (homedir, sizeof(homedir), "%s/MessageServer", homepath);
 		else
-			snprintf (homedir, sizeof(homedir) - 1, "MessageServer", homepath);
+			snprintf (homedir, sizeof(homedir), "MessageServer", homepath);
 
 		i = 0;
 		cmd_argv[i++] = "MessageServer"; 
@@ -494,7 +500,7 @@ int main (int argc, char **argv)
 		extern char	**environ;
 		int		db_pid = 0;
 
-		snprintf (homedir, sizeof(homedir) - 1, "%s/CMDS/os9_dbsu_server", dshome);
+		snprintf (homedir, sizeof(homedir), "%s/CMDS/os9_dbsu_server", dshome);
 		i = 0;
 		cmd_argv[i++] = homedir; 
 		cmd_argv[i] = 0;

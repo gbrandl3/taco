@@ -170,7 +170,7 @@ int main(int argc, char **argv)
 		}
 
 /* Build the string which is the remsh command */
-		snprintf(cmd, sizeof(cmd) - 1, 
+		snprintf(cmd, sizeof(cmd), 
 			"%s %s -l %s \" echo \\\"NETHOST=%s;export NETHOST;%s/%s/dc_inits \\\" | sh \" | tee /usr/tmp/dcinitsta", 
 			rsh, host_dc.sequence[i], dc_login, net, dc_path, s_dc_path);
 #ifdef DEBUG
@@ -234,7 +234,7 @@ int dc_res_management(long *error_ptr)
 	ho = (unsigned char)(host->h_addr_list[0][3]);
 	net = (unsigned char)(host->h_addr_list[0][2]);
 	
-	snprintf(res_name, sizeof(res_name) - 1, "%u_default", net);
+	snprintf(res_name, sizeof(res_name), "%u_default", net);
 	net_res.resource_name = res_name;
 	net_res.resource_type = D_STRING_TYPE;
 	net_res.resource_adr = &net_def;
@@ -427,7 +427,7 @@ int dc_res_request(long *error_ptr)
 	ho = (unsigned char)(host->h_addr_list[0][3]);
 	net = (unsigned char)(host->h_addr_list[0][2]);
 
-	snprintf(dev_name, sizeof(dev_name) - 1, "sys/dc_wr_%u/request", ho);
+	snprintf(dev_name, sizeof(dev_name), "sys/dc_wr_%u/request", ho);
 				
 	net_res[0].resource_name = "1";
 	net_res[0].resource_type = D_LONG_TYPE;
@@ -504,7 +504,7 @@ int dc_res_request(long *error_ptr)
 /* Now, do the same for rd servers */
 	nb_put_class_res = 0;
 	req1 = req2 = req3 = req4 = 1234;	
-	snprintf(dev_name, sizeof(dev_name) -1 , "sys/dc_rd_%u/request", ho);
+	snprintf(dev_name, sizeof(dev_name), "sys/dc_rd_%u/request", ho);
 				
 	net_res[0].resource_name = "1";
 	net_res[0].resource_type = D_LONG_TYPE;

@@ -118,7 +118,7 @@ int main(int argc, char **argv)
 		}
 
 /* Build the string which is the remsh command */
-		snprintf(cmd, sizeof(cmd) - 1, 
+		snprintf(cmd, sizeof(cmd), 
 			"%s %s -l %s \"echo \\\"NETHOST=%s;export NETHOST; %s/%s/dc_mfrees \\\" | sh \"", 
 			rsh,host_dc.sequence[i], dc_login, net, dc_path, s_dc_path);
 

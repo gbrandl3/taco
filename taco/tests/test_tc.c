@@ -12,9 +12,9 @@
  *
  * Original:	November 1996
  *
- * Version: 	$Revision: 1.2 $
+ * Version: 	$Revision: 1.3 $
  *
- * Date: 	$Date: 2003-06-06 09:35:57 $
+ * Date: 	$Date: 2004-02-19 15:56:15 $
  *
  * Copyright (c) 1996 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -47,7 +47,7 @@ int call_type_to_str (const char *type_name, const void *data_to_convert, char *
 	char  func_name[101];
 	long  (*p_conv_func)();
 
-	snprintf(func_name, sizeof(func_name) - 1, "tc_%s_to_str", type_name);
+	snprintf(func_name, sizeof(func_name), "tc_%s_to_str", type_name);
 	printf("call_type_to_str : entered.\n");
 
 #ifdef __hpux
@@ -76,7 +76,7 @@ int call_str_to_type (const char *type_name, const char *str_in, void  *res_func
 	char  func_name[101];
 	long  (*p_conv_func)();
 
-	snprintf(func_name, sizeof(func_name) - 1, "tc_str_to_%s", type_name);
+	snprintf(func_name, sizeof(func_name), "tc_str_to_%s", type_name);
 	printf("call_str_to_type : entered.\n");
 
 #ifdef __hpux

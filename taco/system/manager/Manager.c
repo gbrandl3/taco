@@ -11,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2003-11-24 13:51:59 $
+ Date:		$Date: 2004-02-19 16:00:50 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -62,7 +62,7 @@ _msg_manager_data *rpc_msg_register_1 (_register_data *register_data)
 /*
  *  get message server info
  */
-	snprintf (msg_conf.host_name, sizeof(msg_conf.host_name) - 1, "%s",register_data->host_name);
+	snprintf (msg_conf.host_name, sizeof(msg_conf.host_name), "%s",register_data->host_name);
 	msg_conf.prog_number = register_data->prog_number;
 	msg_conf.vers_number = register_data->vers_number;
 
@@ -114,7 +114,7 @@ int *rpc_db_register_1 (_register_data *register_data)
 /*
  *  get database server info
  */
-	snprintf (db_conf.host_name, sizeof(db_conf.host_name) - 1, "%s",register_data->host_name);
+	snprintf (db_conf.host_name, sizeof(db_conf.host_name), "%s",register_data->host_name);
 	db_conf.prog_number = register_data->prog_number;
 	db_conf.vers_number = register_data->vers_number;
 
