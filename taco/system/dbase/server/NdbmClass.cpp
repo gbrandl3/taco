@@ -288,19 +288,19 @@ char NdbmNamesCont::operator [] (long i)
 // Method to build a datum data from the already stored content
 void NdbmNamesCont::build_datum()
 {
-	try
+	long l = str.size();
+	if (l)
 	{
-		long l = str.size();
-		if (l != 0)
+		try
 		{
 			dat.dptr = new char[l + 1];
 			strcpy(dat.dptr,str.c_str());
 			dat.dsize = l;
 		}
-	}
-	catch (std::bad_alloc)
-	{
-		throw;
+		catch (std::bad_alloc)
+		{
+			throw;
+		}
 	}
 }
 
@@ -763,8 +763,7 @@ void NdbmPSNamesCont::get_devinfo(db_devinfo_svc &data)
 
 //****************************************************************************
 //
-//		NdbmResKey class
-//		----------
+//	NdbmResKey class
 //
 //	This class is used to manage a resource table key part. It is 
 //      constructed from the NDBM key. Within a resource table, the key is :
@@ -781,106 +780,90 @@ void NdbmPSNamesCont::get_devinfo(db_devinfo_svc &data)
 //		Class constructor and destructor
 //		--------------------------------
 // The class default constuctor
-
+//
 NdbmResKey::NdbmResKey()
+	: inter_str(""),
+	  str("")
 {
-    key.dptr = NULL;
-    key.dsize = 0;
+	key.dptr = NULL;
+	key.dsize = 0;
 }
 
 // The class destructor
-
+//
 NdbmResKey::~NdbmResKey()
 {
-    if (key.dsize != 0)
-	delete [] key.dptr;
+	if (key.dsize != 0)
+		delete [] key.dptr;
 }
 
 // Class constructor to be used from individual element
 NdbmResKey::NdbmResKey(std::string &family,std::string &member,std::string &r_name,long indi=1)
 {
-    try
-    {
-//
-// Allocate memory to store key
-//
-	key.dptr = new char[MAX_KEY];
+	try
+	{
 //
 // Build intermediate key
 //
-	inter_str = family + '|' + member + '|' + r_name + '|';
+		inter_str = family + '|' + member + '|' + r_name + '|';
 //
 // Build key
 //
 #if !HAVE_SSTREAM
-	std::stringstream to(key.dptr, MAX_KEY);
+		std::stringstream to;
 #else
-	std::stringstream to(std::string(key.dptr, MAX_KEY));
+		std::stringstream to;
 #endif
-	to << inter_str << indi << '|' << std::ends;
+		to << inter_str << indi << '|' << std::ends;
+		str = to.str();
 #if !HAVE_SSTREAM
-	key.dsize = strlen(to.str());
-	to.freeze(false);
-#else
-	key.dsize = strlen(to.str().c_str());
+		to.freeze(false);
 #endif
-    }
-    catch (std::bad_alloc)
-    {
-	throw;
-    }
+		build_datum();
+	}
+	catch (std::bad_alloc)
+	{
+		throw;
+	}
 }
 
 
+// 
 // Class constructor to be used from a already build key as a string
-
+// 
 NdbmResKey::NdbmResKey(std::string &key_str)
 {
-
-    try
-    {
-//
-// Allocate memory to store key
-//
-	key.dptr = new char[MAX_KEY];
+	try
+	{
+		str = key_str;	
 //
 // Build intermediate key
 //
-	std::string::size_type pos = key_str.find_last_of('|',key_str.size() - 2);
-	inter_str =key_str.substr(0, pos + 1); 
-//
-// Build key
-//
-#if !HAVE_SSTREAM
-	std::stringstream to(key.dptr, MAX_KEY);
-#else
-	std::stringstream to(std::string(key.dptr, MAX_KEY));
-#endif
-	to << key_str << std::ends;
-#if !HAVE_SSTREAM
-	key.dsize = strlen(to.str());
-	to.freeze(false);
-#else
-	key.dsize = strlen(to.str().c_str());
-#endif
-	str = key_str;	
-    }
-    catch (std::bad_alloc)
-    {
-	throw;
-    }
+		std::string::size_type pos = key_str.find_last_of('|',key_str.size() - 2);
+		inter_str = key_str.substr(0, pos + 1); 
+		build_datum();
+	}
+	catch (std::bad_alloc)
+	{
+		throw;
+	}
 }
 
-	// Class constructor to be used with the record key
+// Class constructor to be used with the record key
 NdbmResKey::NdbmResKey(datum user_key)
 {
-    if (user_key.dptr != NULL)
-	str = std::string(user_key.dptr, user_key.dsize);
-    else
-	throw NdbmError(DbErr_CantBuildKey,MessBuildKey);
-			
-    key.dsize = 0;
-    key.dptr = NULL;
+	if (user_key.dptr != NULL)
+	{
+		str = std::string(user_key.dptr, user_key.dsize);
+//
+// Build intermediate key
+//
+		std::string::size_type pos = str.find_last_of('|',str.size() - 2);
+		inter_str = str.substr(0, pos + 1); 
+	}
+	else
+		throw NdbmError(DbErr_CantBuildKey,MessBuildKey);
+	build_datum();
 }
 
 //
@@ -907,7 +890,9 @@ void NdbmResKey::build_datum()
 {
 	try
 	{
-		long l = str.length();
+		if (str.length() >= MAX_KEY)
+			str.erase(MAX_KEY - 1);
+		long l = strlen(str.c_str());
 		if (l != 0)
 		{
 			key.dptr = new char[l + 1];
@@ -931,6 +916,7 @@ void NdbmResKey::upd_indi(long ind)
 //
 	std::stringstream to;
 	to << inter_str << ind << '|' << std::ends;
+	str = to.str();
 #if !HAVE_SSTREAM
 	to.freeze(false);
 #endif
@@ -940,60 +926,63 @@ void NdbmResKey::upd_indi(long ind)
 // Method to retrieve resource family name
 std::string NdbmResKey::get_res_fam_name(void) const
 {
-    std::string::size_type pos;
-    if ((pos = str.find(SEP)) == std::string::npos)
-	throw NdbmError(DbErr_BadKeySyntax,MessKeySyntax);
-    return str.substr(0, pos);	
+	std::string::size_type pos;
+	if ((pos = str.find(SEP)) == std::string::npos)
+		throw NdbmError(DbErr_BadKeySyntax, MessKeySyntax);
+	return str.substr(0, pos);	
 }
 
 // Method to retrieve resource member name
 std::string NdbmResKey::get_res_memb_name(void) const
 {
-    std::string::size_type 	pos = 0,
-			start;
-    for (long i = 0;i < NB_SEP_RES_MEMB;i++)
-    {
-	if ((pos = str.find(SEP,pos)) == std::string::npos)
-	     throw NdbmError(DbErr_BadKeySyntax,MessKeySyntax);
-	if (i != (NB_SEP_RES_MEMB - 1))
-	     pos++;
-	if (i == (NB_SEP_RES_MEMB - 2))
-	     start = pos;
-    }
-    return str.substr(start, pos - start);
+	std::string::size_type 	pos = 0,
+				start;
+	for (long i = 0;i < NB_SEP_RES_MEMB;i++)
+	{
+		if ((pos = str.find(SEP,pos)) == std::string::npos)
+			throw NdbmError(DbErr_BadKeySyntax,MessKeySyntax);
+		if (i != (NB_SEP_RES_MEMB - 1))
+			pos++;
+		if (i == (NB_SEP_RES_MEMB - 2))
+			start = pos;
+	}
+	return str.substr(start, pos - start);
 }
 
 // Method to retrieve resource name
 std::string NdbmResKey::get_res_name(void) const
 {
-    std::string::size_type 	pos = 0,
-			start;
+	std::string::size_type 	pos = 0,
+				start;
 	
-    for (long i = 0; i < NB_SEP_RES_NAME; i++)
-    {
-	if ((pos = str.find(SEP,pos)) == std::string::npos)
-	    throw NdbmError(DbErr_BadKeySyntax,MessKeySyntax);
-	if (i != (NB_SEP_RES_NAME - 1))
-	    pos++;
-	if (i == (NB_SEP_RES_NAME - 2))
-	    start = pos;
-    }
-    return str.substr(start, pos - start);
+	for (long i = 0; i < NB_SEP_RES_NAME; i++)
+	{
+		if ((pos = str.find(SEP,pos)) == std::string::npos)
+			throw NdbmError(DbErr_BadKeySyntax,MessKeySyntax);
+		if (i != (NB_SEP_RES_NAME - 1))
+			pos++;
+		if (i == (NB_SEP_RES_NAME - 2))
+			start = pos;
+	}
+	return str.substr(start, pos - start);
 }
 
 // Method to retrieve resource index (in case of resource from the array type)
 long NdbmResKey::get_res_indi(void) const
 {
-    std::string::size_type pos;
+	std::string::size_type pos;
 	
-    if ((pos = str.find_last_of(SEP,str.size() - 2)) == std::string::npos)
-	throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
-    pos++;
-    std::stringstream st;
-    st << str.substr(pos, (str.size() - 1) - pos);
-    unsigned long	indi;
-    st >> indi;
-    return indi;
+	if ((pos = str.find_last_of(SEP,str.size() - 2)) == std::string::npos)
+		throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
+	pos++;
+	std::stringstream st;
+	st << str.substr(pos, (str.size() - 1) - pos);
+	unsigned long	indi;
+	st >> indi;
+#if !HAVE_SSTREAM
+	st.freeze(false);
+#endif
+	return indi;
 }
 
 
