@@ -194,6 +194,27 @@ AC_DEFUN([TACO_DC_API],
 	AC_SUBST(TACO_DC_LIBS)
 ])
 
+AC_DEFUN([TACO_TANGO],
+[
+	AC_REQUIRE([WITH_CORBA])
+	AC_REQUIRE([WITH_TANGO])
+	AC_ARG_ENABLE(tango, AC_HELP_STRING([--enable-tango], [build the TANGO access @<:@default=no@:>@]),
+		[case "${enable_tango}" in
+			yes)    taco_tango=yes;;
+			no)     taco_tango=no;;
+			*)      AC_MSG_ERROR([bad value ${enable_tango} for --enable-tango]);;
+		esac], [taco_tango=yes])
+	AM_CONDITIONAL(TANGO_BUILD, test "x$taco_tango" = "xyes")
+	if test "x$taco_tango" = "xyes" ; then
+		WITH_CORBA
+		WITH_TANGO
+		TACO_TANGO_LIBS="\$(top_builddir)/lib/tango/libtacotango++.la"
+
+	fi
+	AC_SUBST(TACO_TANGO_LIBS)
+])
+
+
 AC_DEFUN([TACO_GRETA],
 [
 	AC_REQUIRE([TACO_DC_API])
@@ -602,4 +623,60 @@ AC_DEFUN([LINUX_DISTRIBUTION],
 			;;
 	esac
 	AC_SUBST([DISTRIBUTION])
+])
+
+AC_DEFUN([WITH_CORBA],
+[
+#	AC_REQUIRE([AC_PATH_XTRA])
+	corba_found=yes;
+	AC_ARG_WITH(corba, AC_HELP_STRING([--with-corba@<:@=ARG@:>@], [CORBA @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the omniORB CORBA installation, e.g. '/usr/local/omniORB']), [
+		case  "$with_corba" in
+			yes) 	CORBA_LIBS="-lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread" 
+				CORBA_INCLUDES="-I$withval/include" ;;
+			no)  	AC_MSG_WARN([Disable build of TANGO])
+				corba_found=no;;
+			*) 	CORBA_LIBS="-L$withval/lib -lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"
+				CORBA_INCLUDES="-I$withval/include" ;;
+		esac      
+		],[CORBA_LIBS="-lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"; CORBA_INCLUDES="-I$withval/include"])
+	CPPFLAGS_SAVE="$CPPFLAGS"
+	CPPFLAGS="$CPPFLAGS $CORBA_INCLUDES"
+	LIBS_SAVE="$LIBS"
+#	AC_CHECK_HEADERS([omniORB4/CORBA.h], [
+#	AC_CHECK_LIB(omniORB4, init_server, [], [corba_found=no], [$CORBA_LDFLAGS -lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread])
+#		break;
+#	], [corba_found=no])
+	CPPFLAGS="$CPPFLAGS_SAVE"
+	LIBS="$LIBS_SAVE"
+
+	AC_SUBST(CORBA_LIBS)
+	AC_SUBST(CORBA_INCLUDES)
+])
+
+AC_DEFUN([WITH_TANGO],
+[
+#	AC_REQUIRE([AC_PATH_XTRA])
+	tango_found=yes;
+	AC_ARG_WITH(tango, AC_HELP_STRING([--with-tango@<:@=ARG@:>@], [TANGO @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the TANGO installation, e.g. '/usr/local/tango']), [
+		case  "$with_tango" in
+			yes) 	TANGO_LIBS="-ltango" 
+				TANGO_INCLUDES="-I$withval/include" ;;
+			no)  	AC_MSG_WARN([Disable build of TANGO])
+				tango_found=no;;
+			*) 	TANGO_LIBS="-L$withval/lib -ltango"
+				TANGO_INCLUDES="-I$withval/include" ;;
+		esac      
+		],[TANGO_LIBS="-ltango"; TANGO_INCLUDES="-I$withval/include"])
+	CPPFLAGS_SAVE="$CPPFLAGS"
+	CPPFLAGS="$CPPFLAGS $TANGO_INCLUDES"
+	LIBS_SAVE="$LIBS"
+#	AC_CHECK_HEADERS([tango.h], [
+#	AC_CHECK_LIB(omniORB4, init_server, [], [tango_found=no], [$TANGO_LDFLAGS -ltango])
+#		break;
+#	], [tango_found=no])
+	CPPFLAGS="$CPPFLAGS_SAVE"
+	LIBS="$LIBS_SAVE"
+
+	AC_SUBST(TANGO_LIBS)
+	AC_SUBST(TANGO_INCLUDES)
 ])

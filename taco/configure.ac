@@ -1,6 +1,6 @@
 AC_INIT([TACO], [3.1.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.57 $)dnl
+AC_REVISION($Revision: 1.58 $)dnl
 AC_COPYRIGHT([(C) 1990-2005 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -260,6 +260,7 @@ AC_SUBST(TACO_CLIENT_CXX_LIBS, ["\$(top_builddir)/lib/libtaco++.la"])
 TACO_DEFINES
 TACO_SERVER_T
 TACO_DATAPORT_SRC
+TACO_TANGO
 TACO_PYTHON_BINDING
 TACO_TCL_BINDING
 TACO_GRETA
@@ -301,6 +302,7 @@ AC_CONFIG_FILES(Makefile
 		lib/ascii/Makefile
 		lib/ascii/doc/Makefile
 		lib/tc/Makefile
+		lib/tango/Makefile
 		system/dbase/Makefile
 		system/dbase/server/Makefile
 		system/dbase/tools/Makefile
@@ -329,13 +331,6 @@ dnl		system/dbdev/doc/Makefile)
 AC_CONFIG_FILES(classes/instverify/Makefile)
 AC_CONFIG_FILES(classes/powersupply/Makefile)
 AC_CONFIG_FILES(classes/serialline/Makefile)
-
-AC_CONFIG_FILES(classes/signal/Makefile 
-		classes/signal/doc/Makefile
-		classes/signal/multiple/Makefile 
-		classes/signal/multiple/doc/Makefile
-		classes/signal/single/Makefile
-		classes/signal/single/doc/Makefile)
 
 AC_CONFIG_FILES(m4/Makefile)
 
@@ -375,6 +370,8 @@ Configuration (taco):
 	Compiler:		${CC},${CXX}
 
 	Motif:			${motif_found}
+	CORBA:			${corba_found}
+	TANGO:			${tango_found}
 	
 build:
 	gdbm:			${taco_build_gdbm}
@@ -393,6 +390,8 @@ build:
 	bindings:
 		python :	${taco_python_binding}
 		TCL:		${taco_tcl_binding}
+
+	TANGO support:		${taco_tango}
 
 Please check whether the configuration I detected matches what you
 would like to have. 
