@@ -20,16 +20,13 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <algorithm>
 
-using namespace std;
-
 /* Function definitions */
-
-int db_read(char *,char *);
+int db_read(std::string , std::string);
 
 /* Global variables definitions */
-
 int line_ptr;
 
 
@@ -47,197 +44,123 @@ int line_ptr;
 *    Synopsis : db_read [domain/all]                                        *
 *                                                                           *
 ****************************************************************************/
-
-int main(int argc,char *argv[])
+int main(int argc,char **argv)
 {
-	char 	*ptr,
-		*tbeg,
-       		*tend;
-	int 	diff;
-	int 	flags;
-	FILE 	*fop;
-    	int 	i,
-        	j,
-        	l;
-	int 	res_num[MAXDOMAIN];
-	char 	TblName[MAXDOMAIN][12];
-	char 	tblname[MAXDOMAIN][14];
-	int 	TblNum = 0;
-	int 	names = False;
-	int 	ps_names = False;
-
-/* Argument test and domain name modification */
-
+	char				*ptr;
+	std::vector<int> 		res_num;
+	std::vector<std::string> 	TblName;
+	bool 				names(False),
+					ps_names(False);
+//
+// Argument test and domain name modification 
+//
 	if (argc != 2)
 	{
-		cerr <<  argv[0] << " usage: " << argv[0] << " <domain name|all>" << endl;
+		std::cerr <<  argv[0] << " usage: " << argv[0] << " <domain name|all>" << std::endl;
 		exit(-1);
 	}
 
-	string	domain(argv[1]);
-	transform(domain.begin(), domain.end(), domain.begin(), ::tolower);
-
-/* Find the dbm_database table names */        
-
+	std::string	domain(argv[1]);
+	std::transform(domain.begin(), domain.end(), domain.begin(), ::tolower);
+//
+// Find the dbm_database table names and
+// change the database table names to lowercase letter names and check if there 
+// is a names and ps_names tables defined 
+//
 	if ((ptr = (char *)getenv("DBTABLES")) == NULL)
 	{
-		cerr << "db_read: Can't find environment variable DBTABLES" << endl;
+		std::cerr << "db_read: Can't find environment variable DBTABLES" << std::endl;
 		exit(-1);
 	}
 
-	tbeg = ptr;
-	while ((tend = (char *)strchr(tbeg,',')) != NULL)
+	std::string		dbtables(ptr);
+	std::string::size_type	pos;
+	while ((pos = dbtables.find(',')) != std::string::npos)
 	{
-		diff = (unsigned int)(tend++ - tbeg);
-		strncpy(TblName[TblNum], tbeg, diff);
-		TblName[TblNum][diff] = '\0';
-		TblNum++;
-		tbeg = tend;
+		std::string	tblname = dbtables.substr(0, pos);
+		std::transform(tblname.begin(), tblname.end(), tblname.begin(), ::tolower);
+		TblName.push_back(tblname);
+		dbtables.erase(0, pos + 1);
 	}
-	strcpy (TblName[TblNum++], tbeg);
-	
-/* Change the database table names to lowercase letter names and check if there 
-   is a names and ps_names tables defined */
-
-	for (i = 0;i < TblNum;i++)
+	std::transform(dbtables.begin(), dbtables.end(), dbtables.begin(), ::tolower);
+	TblName.push_back(dbtables);
+	for (std::vector<std::string>::iterator it = TblName.begin(); it != TblName.end(); ++it)
 	{
-		for (j = 0;j < (int)strlen(TblName[i]);j++)
-			tblname[i][j] = tolower(TblName[i][j]);
-		tblname[i][j] = '\0';
-		if (strcmp(tblname[i],"names") == 0)
-			names = True;
-		if (strcmp(tblname[i],"ps_names") == 0)
-			ps_names = True;
+		if (*it == "names")
+			names = true;
+		if (*it == "ps_names")
+			ps_names = true;
 	}
-
-/* If no names or ps_names tables are defined, add them to the list */
-
-	if (names == False)
-	{
-		strcpy(tblname[TblNum],"names");
-		TblNum++;
-	}
-	if (ps_names == False)
-	{
-		strcpy(tblname[TblNum],"ps_names");
-		TblNum++;
-	}	
-	
-/* Take the environment variable DBM_DIR */
-
+//
+// If no names or ps_names tables are defined, add them to the list 
+//
+	if (!names)
+		TblName.push_back(std::string("names"));
+	if (!ps_names)
+		TblName.push_back(std::string("ps_names"));
+//
+// Take the environment variable DBM_DIR 
+//
 	if ((ptr = getenv("DBM_DIR")) == NULL)
 	{
-		cerr << "db_read: Can't find environment variable DBM_DIR" << endl;
+		std::cerr << "db_read: Can't find environment variable DBM_DIR" << std::endl;
 		exit(-1);
 	}
-	string dbm_dir(ptr);
+	std::string dbm_dir(ptr);
 
 	if (dbm_dir[dbm_dir.length() - 1] != '/')
 		dbm_dir += '/';
-
-/* Read the database tables of the database */
-   	for (int i = 0; i < TblNum; i++)
-	{
-		if ((domain == string(tblname[i])) || (domain == "all")) 
+//
+// Read the database tables of the database 
+//
+	for (std::vector<std::string>::iterator it = TblName.begin(); it != TblName.end(); ++it)
+		if ((domain == *it) || (domain == "all")) 
 		{
-			string dbm_file(dbm_dir);
-			dbm_file +=  string(tblname[i]);
-			res_num[i] = db_read(const_cast<char *>(dbm_file.c_str()), tblname[i]);
+			std::string dbm_file = dbm_dir + *it;
+			res_num.push_back(db_read(dbm_file, *it));
 			if (domain != "all") 
-				return 0;
+				break;
 		}
-	}
-	return 1;
+	return 0;
 }
 
-int db_read(char *dbm_file,char *TblName)
+int db_read(std::string dbm_file, std::string tblname)
 {
 	int 		flags = GDBM_READER | GDBM_NOLOCK;
 	GDBM_FILE	tab_tid;
-	datum 		key,
-        		key_out;
-	datum 		content,
-        		content_out;
+	datum 		content;
 	int 		res_num = 0;
-	long 		err;
-#ifdef linux
-	static long 	connected = False;
-#endif /* linux */
+	std::string	TblName(tblname);
 	
-	key_out.dptr = (char *)malloc(MAX_KEY);
-	content_out.dptr = (char *)malloc(MAX_CONT);
-
-#if 0 //def linux
-//
-// Connect process to db if it is not already done 
-//
-	if (connected == False)
-	{
-		if (db_import(&err) != 0)
-		{
-	    		cerr << "db_read: can't connect to database server" << endl;
-			exit(-1);
-		}
-		connected = True;
-	}
-//
-// Ask server to disconnect from DBM files 
-//
-	if (db_svc_close(&err) == -1)
-	{
-		cerr << "db_read: Server failed when tries to disconnect to DBM files" << endl;
-		exit(-1);
-	}	
-#endif /* linux */
+	std::transform(tblname.begin(), tblname.end(), TblName.begin(), ::toupper);
 //
 // Open database file 
 //
-	tab_tid = gdbm_open(dbm_file, 0, flags, (int)0666, NULL);
-
-	if (tab_tid == NULL)
+	if ((tab_tid = gdbm_open(const_cast<char *>(dbm_file.c_str()), 0, flags, (int)0666, NULL)) == NULL)
 	{
-		cerr << "db_read: Can't open " << dbm_file << " table" << endl;
-#if 0 //def linux
-//
-// Ask server to disconnect from DBM files 
-//
-		if (db_svc_reopen(&err) == -1)
-	   		cerr << "db_read: Server failed when tries to reconnect to DBM files" << endl;
-#endif /* linux */		
+		std::cerr << "db_read: Can't open " << dbm_file << " table" << std::endl;
 		exit(-1);
 	}	
 //
 // Display table contents 
 //
-	for (key = gdbm_firstkey(tab_tid); key.dptr != NULL;key = gdbm_nextkey(tab_tid, key))
+	datum	key2;
+	for (datum key = gdbm_firstkey(tab_tid); 
+		key.dptr != NULL;
+		key2 = key, key = gdbm_nextkey(tab_tid, key2), free(key2.dptr))
 	{
 		content = gdbm_fetch(tab_tid, key);
 		if (content.dptr != NULL)
 		{
+			std::string	content_out(content.dptr, content.dsize),
+					key_out(key.dptr, key.dsize);
 			res_num++;
-			strncpy(content_out.dptr, content.dptr, content.dsize);
-			content_out.dptr[content.dsize] = '\0';
-			strncpy(key_out.dptr, key.dptr, key.dsize);
-			key_out.dptr[key.dsize] = '\0';
-			cout << TblName << ": " << key_out.dptr << ": " << content_out.dptr << endl;
+			std::cout << TblName << ": " << key_out << ": " << content_out << std::endl;
 		}
 	}
 //
 // Close database 
 //
 	gdbm_close(tab_tid);
-
-	free(key_out.dptr);
-	free(content_out.dptr);
-#if 0 //def linux
-//
-// Ask server to reconnect to DBM files 
-//
-	if (db_svc_reopen(&err) == -1)
-	{
-		cerr << "db_read: Server failed when tries to reconnect to DBM files" << endl;
-		exit(-1);
-	}	
-#endif /* linux */
 	return(res_num);
 }
