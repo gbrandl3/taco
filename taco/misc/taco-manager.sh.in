@@ -22,22 +22,22 @@ exec_prefix=@exec_prefix@
 command=@sbindir@/Manager
 required_files=@sysconfdir@/tacoenv.sh
 start_precmd="taco_precmd"
-start_post_cmd="taco_postcmd"
+start_postcmd="taco_postcmd"
 
 taco_precmd()
 {
 	. @sysconfdir@/tacoenv.sh
-	taco_manager_flags=
+	command_args=
 	if test "x$TACO_LOGGING" = "xyes" ; then
-		taco_manager_flags="-log"
+		command_args="-log"
 		if ! test -d $LOGPATH ; then
 			mkdir -p $LOGPATH
 		fi
         fi
 	if test "x$TACO_SECURITY" = "xyes" ; then
-		taco_manager_flags="$taco_manager_flags -security"
+		command_args="$command_args -security"
 	fi
-	taco_manager_flags="$taco_manager_flags -${TACO_DATABASE:-dbm}"
+	command_args="$command_args -${TACO_DATABASE:-dbm}"
 }
 
 taco_postcmd()
@@ -48,7 +48,6 @@ taco_postcmd()
 # set defaults
 
 taco_manager_enable=${taco_manager_enable:-"NO"}
-# taco_manager_flags=${taco_manager_flags:-"-dbm"}
 
 load_rc_config $name
 run_rc_command "$1"
