@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.12 $
+ Version    :	$Revision: 1.13 $
 
- Date	    :	$Date: 2004-03-26 16:29:33 $
+ Date	    :	$Date: 2004-03-29 16:34:18 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -35,7 +35,7 @@
 #		include <inet/socket.h>
 #		include <inet/netdb.h>
 #	else /* OSK || _OSK */
-#		if (defined sun) || (defined irix) || defined(FreeBSD)
+#		if HAVE_SYS_FILIO_H
 #			include <sys/filio.h>
 #		endif /* sun */
 #		if HAVE_SYS_SOCKET_H

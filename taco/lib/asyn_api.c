@@ -25,9 +25,9 @@
 
  Original   :	January 1997
 
- Version:	$Revision: 1.11 $
+ Version:	$Revision: 1.12 $
 
- Date:		$Date: 2004-03-26 16:33:47 $
+ Date:		$Date: 2004-03-29 16:33:49 $
 
  Copyright (c) 1997-2000 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -52,9 +52,9 @@
 #		include <inet/socket.h>
 #		include <inet/netdb.h>
 #	else
-#		if defined (sun) || defined (irix)
+#		if HAVE_SYS_FILIO_H
 #			include <sys/filio.h>
-#		endif /* sun */
+#		endif 
 #		if HAVE_SYS_SOCKET_H
 #			include <sys/socket.h>
 #		else
@@ -64,15 +64,14 @@
 #			include <netdb.h>
 #		else
 #			include <rpcGbl.h>
-#		endif /* !vxworks */
-#		ifdef lynx
-#			include <ioctl.h>
-#		endif /*lynx */
+#		endif 
 #		if HAVE_SYS_TYPES_H
 #			include <sys/types.h>
 #		endif
 #		if HAVE_SYS_IOCTL_H
 #			include <sys/ioctl.h>
+#		else
+#			include <ioctl.h>
 #		endif
 #		if defined (linux) || defined (FreeBSD) 
 /* mutex locking for handling asyncronous request */

@@ -3,10 +3,10 @@
 #include <API.h>
 
 #include <DevErrors.h>
-#if defined (FreeBSD)
-#	include <stdlib.h>
-#else
+#if HAVE_MALLOC_H
 #	include <malloc.h>
+#else
+#	include <stdlib.h>
 #endif
 
 #include <sys/socket.h>
