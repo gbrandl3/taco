@@ -42,13 +42,12 @@ case $1 in
 		fi
 		dbase="-${TACO_DATABASE:-dbm}"
 		echo -n "Starting TACO services $sec_text"
-		startproc -s -q "$taco_manager" $dbase $log $security
+		startproc -t 5 -s -q "$taco_manager" $dbase $log $security
 		rc_status -v
 		if [ ${TACO_DATABASE:-dbm} = dbm ] ; then
 			new=`ls -l ${DBM_DIR}/* 2>/dev/null | awk '{print $5;}' | sort | uniq | wc -l`
 			if [ $new -le 1 ] ;  then
 				echo "Initialization of the database:"
-				sleep 5
 				if db_fillup2 ; then
 					rc_status -v
 				else

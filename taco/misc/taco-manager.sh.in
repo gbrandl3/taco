@@ -22,7 +22,6 @@ exec_prefix=@exec_prefix@
 command=@sbindir@/Manager
 required_files=@sysconfdir@/tacoenv.sh
 start_precmd="taco_precmd"
-start_postcmd="taco_postcmd"
 
 taco_precmd()
 {
@@ -38,11 +37,6 @@ taco_precmd()
 		command_args="$command_args -security"
 	fi
 	command_args="$command_args -${TACO_DATABASE:-dbm}"
-}
-
-taco_postcmd()
-{
-	sleep 2
 }
 
 # set defaults

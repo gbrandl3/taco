@@ -45,7 +45,6 @@ case $1 in
 			new=`ls -l ${DBM_DIR}/* 2>/dev/null | awk '{print $5;}' | sort | uniq | wc -l`
 			if [ $new -le 1 ] ;  then
 				echo -n "Initialization of the database:"
-				sleep 5
 				if db_fillup2 ; then
 					echo "."
 				else
