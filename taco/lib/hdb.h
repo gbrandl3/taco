@@ -74,6 +74,13 @@
 #define HDB_SIMP_GRPS		4
 #define HDB_UNDEF		5
 
+/* For long term archiving */
+
+#define	HDB_ONE_YEAR		365
+#define HDB_ON_LINE_MIN		60
+#define HDB_DELETE		0
+#define HDB_ARCHIVE		1
+
 /* Some maximun limit */
 
 #define HDB_MAX_SIG_ARRAY	250
@@ -83,7 +90,7 @@
 
 #define	HDB_MAX_MODE1_SAMPLE	100
 #define HDB_MIN_UDT		10
-#define HDB_MAX_UDT		86400
+#define HDB_MAX_UDT		7200
 #define HDB_MIN_N		1
 #define HDB_MAX_N		100
 #define HDB_MAX_TAPES		100
@@ -120,12 +127,14 @@
 
 #define HDB_ORACLE_NO_DATA		100
 #define HDB_ORACLE_NO_TABLE		-942
+#define HDB_ORACLE_NOT_CONNECTED	-1012
+#define HDB_ORACLE_DISCONNECTED		-3114
 
 /* Filler related define */
 
 #define	MACHINE_FILLER			"sys/fill-mcs/1"
 #define BL_FILLER			"sys/fill-bl/1"
-#define DB_SERVER			"hydra"
+#define DB_SERVER			"vega"
 
 
 /**************************************************************************
@@ -234,6 +243,14 @@ typedef struct _HdbSmtSignalMode {
 	HdbComment	sig_comment;
 	}HdbSmtSignalMode;
 
+/* For xAPT table */
+
+typedef struct _HdbObjApt {
+	long		obj_id;
+	long		on_line_period;
+	long		archive_mode;
+	}HdbObjApt;
+	
 /* For GT table */
 
 typedef struct _HdbGtGroup {
