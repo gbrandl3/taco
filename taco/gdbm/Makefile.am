@@ -46,6 +46,9 @@ noinst_HEADERS 		= gdbmdefs.h extern.h systems.h gdbmconst.h proto.h gdbmerrno.h
 BUILT_SOURCES		= gdbm.h
 CLEANFILES		= gdbm.h
 
+DISTCLEANFILES		= autoconf.h conv2gdbm junk.gdbm junkdbm.dir junkdbm.pag junkndbm.dir junkndbm.pag \
+			testdbm testgdbm testndbm
+
 nodist_include_HEADERS	= gdbm.h 
 
 EXTRA_DIST 		= gdbm.3 gdbm.texinfo \
