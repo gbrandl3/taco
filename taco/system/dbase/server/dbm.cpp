@@ -839,8 +839,10 @@ DevLong *unreg_1_svc(db_res *recev)
 ****************************************************************************/
 svcinfo_svc *svcinfo_1_svc(db_res *recev)
 {
+#ifdef DEBUG
 	std::cerr << __FUNCTION__ << std::endl;
-    return dbm->svcinfo_1_svc(recev);
+#endif
+	return dbm->svcinfo_1_svc(recev);
 }
 
 /****************************************************************************

@@ -113,11 +113,15 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 #endif
         for (std::vector<std::string>::iterator it = db_dev_list.begin(); it != db_dev_list.end(); ++it)
 	{
+#ifdef DEBUG
 	    std::cerr << " Device = " << *it; 
+#endif
 	    std::vector<std::string>::iterator	it2;  
 	    if ((it2 = find(dev_list.begin(), dev_list.end(), *it)) != dev_list.end())
 	    {
+#ifdef DEBUG
 		std::cerr << " found." << std::endl;	
+#endif
 	        switch(psdev_back.error_code = db_update_names(ds_class, ds_name, ind, *it))
 	    	{
 		    case DbErr_BadResourceType: 	
@@ -140,7 +144,9 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 						return (&psdev_back);
 		}
 	    }
+#ifdef DEBUG
 	    std::cerr << " Return = " << psdev_back.error_code << std::endl;
+#endif
 	}
         for (std::vector<std::string>::iterator it = dev_list.begin(); it != dev_list.end(); ++it)
 	    if ((psdev_back.error_code = db_insert_names(ds_class, ds_name, ind, *it)) != 0)
@@ -297,7 +303,9 @@ long MySQLServer::db_insert_names(const std::string ds_class, const std::string 
 	      << " VALUES('" << domain << "/" << family << "/" << member << "','" 
 	      << ds_class << "', '" << ds_class << "/" << ds_name << "', '" << domain << "', '" << family
 	      << "', '" << member << "', 'rpc::0', 0, 0, 0)" << std::ends;
+#if DEBUG
         std::cout << query.str() << std::endl;
+#endif
     }
     else
     {
