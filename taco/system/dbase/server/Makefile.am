@@ -1,12 +1,12 @@
 noinst_HEADERS		= NdbmClass.h NdbmServer.h MySqlServer.h dbClass.h
 
-sbin_PROGRAMS		= dbm_newserver
+sbin_PROGRAMS		= dbm_server
 
 SERVERLIBS		= 
 
 lib_LTLIBRARIES 	= libTACOndbm.la 
 
-dbm_newserver_SOURCES 	= main_svc.cpp dbm.cpp dbm_xdr.cpp NdbmClass.cpp db_serv.cpp
+dbm_server_SOURCES 	= main_svc.cpp dbm.cpp dbm_xdr.cpp NdbmClass.cpp db_serv.cpp
 
 libTACOndbm_la_SOURCES = dbm_serv.cpp \
 			dbm_devbro.cpp \
@@ -36,8 +36,8 @@ libTACOMySQL_la_SOURCES = mysql_serv.cpp \
 			mysql_clo_op.cpp \
 			mysql_miscbro.cpp \
 			mysql_update.cpp 
-libTACOMySQL_la_LIBADD	= -lmysqlclient
+libTACOMySQL_la_LIBADD	= @MYSQL_LDFLAGS@ -lmysqlclient
 endif
 
 INCLUDES		= -DNDBM @TACO_GDBM_INC@ @TACO_INCLUDES@ 
-dbm_newserver_LDADD	= @TACO_SERVER_LIBS@ @TACO_GDBM_LDFLAGS@ @TACO_GDBM_LIBS@ $(lib_LTLIBRARIES)
+dbm_server_LDADD	= @TACO_SERVER_LIBS@ @TACO_GDBM_LDFLAGS@ @TACO_GDBM_LIBS@ $(lib_LTLIBRARIES)
