@@ -1,6 +1,6 @@
-SUBDIRS		=
+SUBDIRS		= doc
 
-EXTRA_DIST	= doc bitmaps 
+EXTRA_DIST	= bitmaps 
 
 SRC 		= xdev_bxutil.c xdev_creation.c xdev_gui.c xdevmenu.uil\
   		xdev_cb.c xdev_dev.c xdev_gui.h\
