@@ -14,9 +14,11 @@ top_builddir=@abs_top_builddir@
 testbindir=${top_builddir}/tests
 appdefaultdir=@appdefaultdir@
 LD_LIBRARY_PATH=@GCC_LIBRARY_PATH@:@libdir@${LD_LIBRARY_PATH:+:}
+export DSHOME
 }
 
 unset NETHOST
+# unset RES_BASE_DIR
 set_env
 if test $# -gt 0 ; then
 	case $1 in 
@@ -27,11 +29,14 @@ if test $# -gt 0 ; then
 			if { mkdir test; } ; then
 				dc_destdir=$testbindir/test
 				(cd $top_builddir && make DESTDIR=$dc_destdir install >/dev/null 2>&1)
+				for i in $sysconfdir $templatedir ; do
+					(cd $i && mv tacoenv.sh t && sed -e 's%^prefix=.*$%prefix=@abs_top_builddir@/tests/test/@prefix@%' t > tacoenv.sh)
+				done
 				exit $?
 			fi
 			exit 1;;
 		start)
-			. $templatedir/tacoenv.sh
+			. $templatedir/tacoenv.sh 
 			mkdir -p ${LOGPATH}
 			set_env
 			TACO_PATH=$sbindir
@@ -39,7 +44,7 @@ if test $# -gt 0 ; then
 			$sbindir/taco.startup >log 2>&1
 			exit 0;;
 		stop)
-			. $templatedir/tacoenv.sh
+			# . $templatedir/tacoenv.sh 
 			$sbindir/taco.shutdown 
 			;;
 		uninstall)
@@ -65,32 +70,32 @@ if test $# -gt 0 ; then
 			fi
 			exit 1 ;;
 		unreg)
-			. $templatedir/tacoenv.sh
+			. $templatedir/tacoenv.sh 
 			set_env
 			shift 1
 			$sbindir/unreg $@ ;;
 
 		dbm_server)
-			. $templatedir/tacoenv.sh
+			. $templatedir/tacoenv.sh 
 			set_env
 			shift 1
 			$sbindir/dbm_server dbm `uname -n|cut -f1 -d'.'` ;;
 		ldd)
-			. $templatedir/tacoenv.sh
+			. $templatedir/tacoenv.sh 
 			set_env
 			shift 1
 			ldd $bindir/$1 ;;
 		StartServer)
-			. $templatedir/tacoenv.sh
+			. $templatedir/tacoenv.sh 
 			set_env
 			prog=$1
 			shift 1
 			$sbindir/$prog $@;;
 		*)
-			. $templatedir/tacoenv.sh
-			set_env
 			prog=$1
 			shift 1
+			. $templatedir/tacoenv.sh 
+			set_env
 			$bindir/$prog $@;;
 	esac
 else

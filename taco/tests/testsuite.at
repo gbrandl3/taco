@@ -22,7 +22,7 @@
 m4_version_prereq([2.57])
 
 m4_define([AT_TACO_RUN_LOCAL],
-[. taco && . $templatedir/tacoenv.sh
+[. taco && . $templatedir/tacoenv.sh && $@
 ])
 
 AT_INIT
@@ -50,7 +50,7 @@ m4_include([starter.at])
 AT_BANNER([[Uninstalling TACO system.]])
 
 AT_SETUP([Stopping TACO])
-AT_CHECK([taco stop])
+AT_CHECK([taco stop >>log 2>&1])
 AT_CLEANUP
 
 AT_SETUP([TACO deinstallation])
