@@ -5,7 +5,7 @@ for i in /usr/share/aclocal /usr/local/share/aclocal ; do
         fi
 done
 LIBTOOLIZE="libtoolize --force --copy --automake"
-ACLOCAL="aclocal -I m4 $aclocal_includes"
+ACLOCAL="aclocal $aclocal_includes"
 AUTOHEADER="autoheader"
 AUTOMAKE="automake -a -c --foreign"
 AUTOCONF="autoconf"
