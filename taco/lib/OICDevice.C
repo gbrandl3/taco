@@ -15,9 +15,9 @@
 //
 // Original:	November 1996
 //
-// $Revision: 1.2 $
+// $Revision: 1.3 $
 //
-// $Date: 2003-05-02 09:12:48 $
+// $Date: 2003-05-07 14:47:37 $
 //
 // $Author: jkrueger1 $
 //
@@ -122,7 +122,7 @@ OICDevice::OICDevice (char *devname, DevServerClass devclass, long *error)
 // class and therefore does not exist as a class per se
 //
 	this->class_name = oicclass->devserver_class.class_name;
-	sprintf(this->dev_type,TYPE_DEFAULT);
+	snprintf(this->dev_type, sizeof(this->dev_type) -1, TYPE_DEFAULT);
 	this->class_inited = oicclass->devserver_class.class_inited;
 
 //
