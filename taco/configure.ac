@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0rc3, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.27 $)dnl
+AC_REVISION($Revision: 1.28 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -77,12 +77,22 @@ AC_TYPE_SIGNAL
 AC_FUNC_STAT
 AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([alarm dup2 gethostbyname gethostname getpass gettimeofday isascii mblen memset putenv select socket strcasecmp strchr strcspn strdup strerror strncasecmp strrchr strspn strstr strtoul])
+AC_CHECK_FUNCS([alarm dup2 gethostbyname gethostname getpass gettimeofday isascii mblen memset putenv select socket strcasecmp strchr strcspn strdup strerror strncasecmp strrchr strspn strstr strtoul get_myaddress])
 
 AC_SEARCH_LIBS(dlopen, [dl])
 
 TACO_CHECK_RPC
 TACO_CHECK_RPC_AND_THREADS
+AC_CHECK_DECLS([get_myaddress], [], [], [
+#if HAVE_RPC_RPC_H
+#       include <rpc/clnt.h>
+#elif HAVE_RPC_H
+#       include <clnt.h>
+#else
+#       error "Can't find clnt.h"
+#endif
+]) 
+AC_CHECK_FUNCS([get_myaddress])
 
 AC_SUBST(QT_INCLUDES, ['-I/usr/lib/qt3/include'])
 AC_SUBST(UIC, ['/usr/lib/qt3/bin/uic'])
