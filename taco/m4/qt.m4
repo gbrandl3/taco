@@ -4,9 +4,9 @@ dnl		adapted form the KDE2 acinclude.m4
 dnl
 dnl Author: 	$Author: jkrueger1 $
 dnl
-dnl Version:	$Revision: 1.2 $
+dnl Version:	$Revision: 1.3 $
 dnl
-dnl Date:	$Date: 2004-08-02 12:54:25 $
+dnl Date:	$Date: 2004-08-10 11:57:27 $
 dnl
 
 dnl
@@ -299,18 +299,19 @@ dnl Things work just fine if you use just AC_PATH_X_DIRECT.
 		fi
  
 		case $target in
-			*-darwin*)	;;
+			*-darwin*)	
+				;;
 			*)
 				if test "$qt_x_includes" = NO; then
-  		    			AC_MSG_ERROR([Can't find X includes. Please check your installation and add the correct paths!])
-				fi
- 
-				if test "$qt_x_libraries" = NO; then
-					AC_MSG_ERROR([Can't find X libraries. Please check your installation and add the correct paths!])
-				fi
+  		    			AC_MSG_WARN([Can't find X includes. Please check your installation and add the correct paths!])
+				elif test "$qt_x_libraries" = NO; then
+					AC_MSG_WARN([Can't find X libraries. Please check your installation and add the correct paths!])
+				else
 # Record where we found X for the cache.
-		qt_cv_have_x="have_x=yes \
-         		qt_x_includes=$qt_x_includes qt_x_libraries=$qt_x_libraries" ;;
+					qt_cv_have_x="have_x=yes \
+         					qt_x_includes=$qt_x_includes qt_x_libraries=$qt_x_libraries" 
+				fi
+				;;
 		esac
 	   ]
 	)dnl
@@ -390,11 +391,10 @@ dnl better than nothing
 	) 
 	AC_MSG_RESULT($qt_cv_have_libXext)
 	if test "$qt_cv_have_libXext" = "no"; then
-  	    AC_MSG_ERROR(
+  	    AC_MSG_WARN(
 		[
-We need a working libXext to proceed. Since configure
-can't find it itself, we stop here assuming that make wouldn't find
-them either.
+We need a working libXext to proceed. Since configure can't find it 
+itself, we stop here assuming that make wouldn't find them either.
 	        ]
 	    )
 	fi
@@ -605,7 +605,12 @@ dnl  	    AC_REQUIRE([AC_FIND_JPEG])
 		fi
  
 		AC_FIND_HEADER([$qt_header], $qt_incdirs, [eval qt_incdir="\"$i\""], 
-			[AC_MSG_ERROR([QT header file no found in $qt_incdirs])])
+			[
+			if test x"$3" != x"no" ; then
+				AC_MSG_ERROR([QT header file no found in $qt_incdirs])
+			else
+				AC_MSG_WARN([QT header file no found in $qt_incdirs])
+			fi])
 		ac_qt_includes="$qt_incdir"
 
 		qt_libdirs=""
@@ -728,9 +733,11 @@ For more details about this problem, look at the end of config.log."
  
 	AC_SUBST(QT_INCLUDES)
 	AC_SUBST(QT_LDFLAGS)
-	AC_PATH_QT_MOC_UIC
+	if test x"$have_qt" = x"yes" ; then
+		AC_PATH_QT_MOC_UIC
  
-	LIB_QT="$int_qt "'$(LIBPNG) $(LIBJPEG) -lXext $(LIB_X11) $(LIBSM)'
+		LIB_QT="$int_qt "'$(LIBPNG) $(LIBJPEG) -lXext $(LIB_X11) $(LIBSM)'
+	fi
 	AC_SUBST(LIB_QT)
     ]
 )
