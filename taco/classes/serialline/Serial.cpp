@@ -1713,8 +1713,11 @@ long Serial::SerSetParameter ( void *vargin, void *vargout, long *error)
 	// Do not convert upper-case characters to lower-case ones and
 	// vice-versa
 	//
+
+#if !defined(FREEBSD)
  termin.c_iflag     	&= ~IUCLC;
  termout.c_oflag     	&= ~OLCUC;
+#endif
 
 	//
 	// Do not convert \n -> \r or \r -> \n and do not ignore \r
@@ -1738,7 +1741,9 @@ long Serial::SerSetParameter ( void *vargin, void *vargout, long *error)
 	//
 	// Do not expand tabs to 8 spaces
 	//
+#if !defined(FREEBSD)
  termout.c_oflag	&= ~XTABS;
+#endif
 
 	//
 	// Delete character forced to zero
@@ -1898,10 +1903,14 @@ long Serial::SerSetParameter ( void *vargin, void *vargout, long *error)
 	 default    : speed =  B9600; break;
 	}
 
+#if !defined (FREEBSD)
 	termin.c_cflag  &= ~CBAUD;	// erase previous speed settings
+#endif
 	termin.c_cflag  |= speed;
 
+#if !defined (FREEBSD)
 	termout.c_cflag &= ~CBAUD;	// erase previous speed settings
+#endif
 	termout.c_cflag |= speed;
 
 	if(Serial::debug)

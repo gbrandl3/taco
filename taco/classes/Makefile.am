@@ -1,1 +1,1 @@
-SUBDIRS=instverify powersupply serialline signal
+SUBDIRS=instverify powersupply serialline signal 
