@@ -12,8 +12,8 @@
 
  Original:	January 1991
 
- $Revision: 1.2 $
- $Date: 2003-05-09 15:26:45 $
+ $Revision: 1.3 $
+ $Date: 2004-07-08 17:02:33 $
 
  $Author: jkrueger1 $
 
@@ -31,15 +31,17 @@ extern void msg_alarm_handler(short, char *, char *, char *, char *);
 extern void msg_initialise(char *);
 extern void msg_fault_handler(DevString);
 
-typedef struct _MessageServerPart {
-                                  char      name [256];
-                                  char      host_name [32];
-				  long	    prog_number;
-                                  char      display [32];
-                                  char	    ER_file_dir [256];
-                                  char      pipe_dir [256];
-                                  char      aw_path [256];
-                                  } MessageServerPart;
+typedef struct _MessageServerPart 
+{
+	char	name [256];
+	char	host_name [32];
+	long	prog_number;
+	char	display [32];
+	char	ER_file_dir [256];
+	char	pipe_dir [256];
+	char	aw_path [256];
+	char	logfile[256];
+} MessageServerPart;
 
 #endif /* _Message_h */
 

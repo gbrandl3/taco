@@ -11,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.7 $
+ Version:	$Revision: 1.8 $
 
- Date:		$Date: 2004-06-02 16:36:17 $
+ Date:		$Date: 2004-07-08 17:02:33 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -42,6 +42,7 @@ static server_conf	msg_conf = {0,0,0};
 
 static dbserver_info   	db_info;
 
+char *getTimeString(const char *);
 
 /**
   *  register message server to manager 
@@ -67,10 +68,8 @@ _msg_manager_data *rpc_msg_register_1 (_register_data *register_data)
 	{
        		if ( (system_log = fopen (logfile, "a")) != NULL )
 		{
-			time (&clock);
-			time_string = ctime (&clock);
-			fprintf (system_log, "Message Server registered at : %s",time_string);
-			fprintf (system_log, "msg_host = %s  prog_nu = %d  vers_nu = %d\n\n",
+			fprintf (system_log, "%s Message Server registered ", getTimeString("Manager"));
+			fprintf (system_log, "(msg_host = %s  prog_nu = %d  vers_nu = %d)\n\n",
 					    msg_conf.host_name, msg_conf.prog_number, msg_conf.vers_number);
 			fclose (system_log);
 		}
@@ -114,10 +113,8 @@ int *rpc_db_register_1 (_register_data *register_data)
 	{
 		if ( (system_log = fopen (logfile, "a")) != NULL )
 		{
-			time (&clock);
-			time_string = ctime (&clock);
-			fprintf (system_log, "Database Server registered at : %s",time_string);
-			fprintf (system_log, "db_host = %s  prog_nu = %d  vers_nu = %d\n\n",
+			fprintf (system_log, "%s Database Server registered ", getTimeString("Manager"));
+			fprintf (system_log, "(db_host = %s  prog_nu = %d  vers_nu = %d)\n\n",
 					    db_conf.host_name, db_conf.prog_number, db_conf.vers_number);
 			fclose (system_log);
 		}
@@ -155,10 +152,8 @@ _manager_data *rpc_get_config_4 (_register_data	*register_data)
 	{
        		if ( (system_log = fopen (logfile, "a")) != NULL )
 		{
-			time (&clock);
-			time_string = ctime (&clock);
-			fprintf (system_log, "Configuration request at : %s",time_string);
-			fprintf (system_log, "Requesting process is running on %s with pid = %d\n",
+			fprintf (system_log, "%s Configuration request ", getTimeString("Manager"));
+			fprintf (system_log, "(Requesting process is running on %s with pid = %d)\n",
 					register_data->host_name, register_data->prog_number);
 			fclose (system_log);
 		}
@@ -204,9 +199,8 @@ void unreg_server (int signo)
 	if ( c_flags.request_log == True )
 		if ( (system_log = fopen (logfile, "a")) != NULL )
 		{
-			time (&clock);
-			time_string = ctime (&clock);
-			fprintf (system_log, "\nSystem shutdown at : %s",time_string);
+			fprintf (system_log, "\n%s Received signal %d\n", getTimeString("Manager"), signo);
+			fprintf (system_log, "\n%s System shutdown.\n", getTimeString("Manager"));
 			fclose (system_log);
 		}
 

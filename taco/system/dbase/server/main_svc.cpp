@@ -20,6 +20,9 @@
 #ifdef USE_GDBM
 #	include <NdbmServer.h>
 #endif
+
+#include <fstream>
+
 //
 // RPC function not defined within rpc include files !!
 // M. Diehl, 15.11.99
@@ -45,8 +48,25 @@ static void register_db(const std::string, const std::string, const u_long, cons
 static void db_setupprog_1(struct svc_req *, SVCXPRT *);
 
 extern	DBServer	*dbm;
+
+bool	enable_logging = true;
+std::ofstream	logStream;
+
+std::string getTimeString(std::string name)
+{
+	time_t 		tps = time((time_t *)NULL);
+	struct tm 	*time_tm = localtime(&tps);
+	char 		*tps_str = asctime(time_tm);
+	tps_str[24] = '\0';
+	std::string	text = name + " : " + std::string(tps_str) + " : ";
+	return text;
+}
+
 static void un_register_prog(int signo)
 {
+	logStream << getTimeString("dbm_server") << "signal " << signo << " received." << std::endl;
+	logStream << getTimeString("dbm_server") << "unregister database server." << std::endl;
+	logStream.flush();
 #ifdef ALONE
 	pmap_unset(DB_SETUPPROG, DB_SETUPVERS);
 	pmap_unset(DB_SETUPPROG, DB_VERS_2);
@@ -59,7 +79,12 @@ static void un_register_prog(int signo)
 //
 // Added code to close database 
 //
+	logStream << getTimeString("dbm_server") << "close connection to database." << std::endl;
+	logStream.flush();
 	delete dbm;
+	logStream << getTimeString("dbm_server") << "exit server." << std::endl;
+	logStream.flush();
+	logStream.close();
 	exit(1);
 }
 //
@@ -67,17 +92,8 @@ static void un_register_prog(int signo)
 //
 void default_sig(int signo)
 {
-	time_t 	tps;
-	char 	*tps_str;
-	struct tm 	*time_tm;
-	
-	tps = time((time_t *)0);
-	time_tm = localtime(&tps);
-	tps_str = asctime(time_tm);
-	tps_str[24] = '\0';
-#ifdef DEBUG
-	std::cout << tps_str << " : signal " << signo << " received !!!" << std::endl;
-#endif
+	logStream << getTimeString("dbm_server") << "signal " << signo << " received! (ignored)." << std::endl;
+	logStream.flush();
 }
 
 void usage(const char *argv)
@@ -106,6 +122,7 @@ void usage(const char *argv)
 	std::cerr << "                        database_name for MySQL database should be tango" << std::endl;
 	std::cerr << "       -u user        - user for MySQL database" << std::endl;
 	std::cerr << "       -p password    - password for MySQL database" << std::endl;
+	std::cerr << "       -l             - disable logging" << std::endl;
 #endif
 	exit(1);
 }
@@ -210,6 +227,8 @@ int main(int argc,char **argv)
 				mysql_password = optarg;
 				break;
 #endif
+			case 'l' :
+				enable_logging = false;
 			case '?' :
 			case 'h' :	
 			default  :
@@ -219,7 +238,18 @@ int main(int argc,char **argv)
 
 	if (optind != (argc - 2))
 		usage(*argv); 			
-	std::string netmanhost(argv[argc - 1]);
+	std::string 	netmanhost(argv[argc - 1]),
+			logfile;
+
+	char *logpath = getenv("LOGPATH");
+	if (logpath == NULL)
+		logpath = getenv("DSHOME");
+	if (logpath)
+        	logfile = std::string(logpath) + "/DatabaseServer.log";
+	else
+		logfile = std::string("DatabaseServer.log");
+
+	logStream.open(logfile.c_str(), std::ios::out | std::ios::trunc);
 #endif
 
 	if (!dbm)
@@ -250,23 +280,24 @@ int main(int argc,char **argv)
 //
 	if ((pgnum = gettransient("DatabaseServer")) == 0)
 	{
-		std::cerr << "dbm_server : Can't get transcient program number" << std::endl;
+		logStream << getTimeString("dbm_server") << "Can't get transcient program number" << std::endl;
+		logStream.flush();
 		exit(-1);
 	}
 	dbm->setPgNum(pgnum);
-#ifdef DEBUG
-	std::cout << "Program number : " << pgnum << std::endl;
-#endif
+
+	logStream << getTimeString("dbm_server") << "Program number : " << pgnum << std::endl;
+
 	gethostname(hostna, sizeof(hostna));
-#ifdef DEBUG
-	std::cout << "Server host name : " << hostna << std::endl;
-#endif
+	logStream << getTimeString("dbm_server") << "Server host name : " << hostna << std::endl;
+
 //
 // Send these informations to network manager. Even if the server is now 
 // supporting version one and two, register it in the Manager with version 1
 // for compatibility with old release of device server. */
 //
-	register_db((char *)netmanhost.c_str(),hostna,pgnum,DB_SETUPVERS);
+	register_db((char *)netmanhost.c_str(), hostna, pgnum, DB_SETUPVERS);
+	logStream << getTimeString("dbm_server") << "registered on host : " << hostna << std::endl;
 //
 // M. Diehl, 15.11.99
 // Since gettransient() does not bind sockets and pmap_set
@@ -280,12 +311,14 @@ int main(int argc,char **argv)
 
 	if (transp_udp == NULL)
 	{
-		std::cerr << "cannot create udp service." << std::endl;
+		logStream << getTimeString("dbm_server") << "cannot create udp service." << std::endl;
+		logStream.flush();
 		exit(1);
 	}
 	if (transp_tcp == NULL)
 	{
-		std::cerr << "cannot create tcp service." << std::endl;
+		logStream << getTimeString("dbm_server") << "cannot create tcp service." << std::endl;
+		logStream.flush();
 		exit(1);
 	}
 //
@@ -302,64 +335,76 @@ int main(int argc,char **argv)
 #ifdef ALONE
 	if (!svc_register(transp_udp,DB_SETUPPROG,DB_SETUPVERS,setup_prog,IPPROTO_UDP))
 	{
-		std::cerr << "unable to register (DB_SETUPPROG,DB_SETUPVERS,udp)" << std::endl;
+		logStream << getTimeString("dbm_server") << "unable to register (DB_SETUPPROG,DB_SETUPVERS,udp)" << std::endl;
+		logStream.flush();
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,DB_SETUPPROG,DB_SETUPVERS,setup_prog,IPPROTO_TCP))
 	{
-		std::cerr << "unable to register (DB_SETUPPROG,DB_SETUPVERS,tcp)" << std::endl;
+		logStream << getTimeString("dbm_server") << "unable to register (DB_SETUPPROG,DB_SETUPVERS,tcp)" << std::endl;
+		logStream.flush();
 		exit(1);
 	}
 	if (!svc_register(transp_udp,DB_SETUPPROG,DB_VERS_2,setup_prog,IPPROTO_UDP))
 	{
-		std::cerr << "unable to register (DB_SETUPPROG,DB_VERS_2,udp)" << std::endl;
+		logStream << getTimeString("dbm_server") << "unable to register (DB_SETUPPROG,DB_VERS_2,udp)" << std::endl;
+		logStream.flush();
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,DB_SETUPPROG,DB_VERS_2,setup_prog,IPPROTO_TCP))
 	{
-		std::cerr << "unable to register (DB_SETUPPROG,DB_VERS_2,tcp)" << std::endl;
+		logStream << getTimeString("dbm_server") << "unable to register (DB_SETUPPROG,DB_VERS_2,tcp)" << std::endl;
+		logStream.flush();
 		exit(1);
 	}
 	if (!svc_register(transp_udp,DB_SETUPPROG,DB_VERS_3,setup_prog,IPPROTO_UDP))
 	{
-		std::cerr << "unable to register (DB_SETUPPROG,DB_VERS_2,udp)" << std::endl;
+		logStream << getTimeString("dbm_server") << "unable to register (DB_SETUPPROG,DB_VERS_2,udp)" << std::endl;
+		logStream.flush();
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,DB_SETUPPROG,DB_VERS_3, setup_prog,IPPROTO_TCP))
 	{
-		std::cerr << "unable to register (DB_SETUPPROG,DB_VERS_2,tcp)" << std::endl;
+		logStream << getTimeString("dbm_server") << "unable to register (DB_SETUPPROG,DB_VERS_2,tcp)" << std::endl;
+		logStream.flush();
 		exit(1);
 	}
 
 #else
 	if (!svc_register(transp_udp,pgnum, DB_SETUPVERS, setup_prog, IPPROTO_UDP))
 	{
-		std::cerr << "unable to register (" << pgnum << ", DB_SETUPVERS, udp)" << std::endl;
+		logStream << getTimeString("dbm_server") << "unable to register (" << pgnum << ", DB_SETUPVERS, udp)" << std::endl;
+		logStream.flush();
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,pgnum,DB_SETUPVERS, setup_prog,IPPROTO_TCP))
 	{
-		std::cerr << "unable to register (" << pgnum << ",DB_SETUPVERS,tcp)" << std::endl;
+		logStream << getTimeString("dbm_server") << "unable to register (" << pgnum << ",DB_SETUPVERS,tcp)" << std::endl;
+		logStream.flush();
 		exit(1);
 	}
 	if (!svc_register(transp_udp,pgnum, DB_VERS_2, setup_prog, IPPROTO_UDP))
 	{
-		std::cerr << "unable to register (" << pgnum << ", DB_VERS_2, udp)" << std::endl;
+		logStream << getTimeString("dbm_server") << "unable to register (" << pgnum << ", DB_VERS_2, udp)" << std::endl;
+		logStream.flush();
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,pgnum,DB_VERS_2,setup_prog,IPPROTO_TCP))
 	{
-		std::cerr << "unable to register (" << pgnum << ",DB_VERS_2,tcp)" << std::endl;
+		logStream << getTimeString("dbm_server") << "unable to register (" << pgnum << ",DB_VERS_2,tcp)" << std::endl;
+		logStream.flush();
 		exit(1);
 	}
 	if (!svc_register(transp_udp,pgnum, DB_VERS_3, setup_prog, IPPROTO_UDP))
 	{
-		std::cerr << "unable to register (" << pgnum << ", DB_VERS_2, udp)" << std::endl;
+		logStream << getTimeString("dbm_server") << "unable to register (" << pgnum << ", DB_VERS_2, udp)" << std::endl;
+		logStream.flush();
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,pgnum,DB_VERS_3,setup_prog,IPPROTO_TCP))
 	{
-		std::cerr << "unable to register (" << pgnum << ",DB_VERS_2,tcp)" << std::endl;
+		logStream << getTimeString("dbm_server") << "unable to register (" << pgnum << ",DB_VERS_2,tcp)" << std::endl;
+		logStream.flush();
 		exit(1);
 	}
 #endif 
@@ -370,7 +415,8 @@ int main(int argc,char **argv)
 #ifdef sun
 	if ((host = gethostbyname(hostna)) == NULL)
 	{
-		std::cerr << "Unable to get my IP address" << std::endl;
+		logStream << getTimeString("dbm_server") << "Unable to get my IP address" << std::endl;
+		logStream.flush();
 		exit(1);
 	}
 	ptmp_long = (unsigned long *)host->h_addr_list[0];
@@ -383,7 +429,8 @@ int main(int argc,char **argv)
 	if ((udp_port = pmap_getport(&so,pgnum,DB_SETUPVERS,IPPROTO_UDP)) == 0)
 #endif 
 	{
-		std::cerr << "unable to retrieve udp port number" << std::endl;
+		logStream << getTimeString("dbm_server") << "unable to retrieve udp port number" << std::endl;
+		logStream.flush();
 		exit(1);
 	}
 
@@ -393,11 +440,15 @@ int main(int argc,char **argv)
 	if ((tcp_port = pmap_getport(&so,pgnum,DB_SETUPVERS,IPPROTO_TCP)) == 0)
 #endif 
 	{
-		std::cerr << "unable to retrieve tcp port number" << std::endl;
+		logStream << getTimeString("dbm_server") << "unable to retrieve tcp port number" << std::endl;
+		logStream.flush();
 		exit(1);
 	}
+	logStream << getTimeString("dbm_server") << "ready to run" << std::endl;
 	svc_run();
-	std::cerr << "svc_run returned" << std::endl;
+	logStream << getTimeString("dbm_server") << "svc_run returned" << std::endl;
+	logStream.flush();
+	logStream.close();
 	exit(1);
 }
 
@@ -671,7 +722,7 @@ static void db_setupprog_1(struct svc_req *rqstp, SVCXPRT *transp)
 		svcerr_systemerr(transp);
 	if (!svc_freeargs(transp, xdr_argument, (caddr_t)&argument))
 	{
-		std::cerr << "unable to free arguments" << std::endl;
+		logStream << getTimeString("dbm_server") << "unable to free arguments" << std::endl;
 		exit(1);
 	}
 //
@@ -806,7 +857,7 @@ static void register_db(const std::string netman_host,const std::string host, co
 	netman_clnt = clnt_create(const_cast<char *>(netman_host.c_str()), NMSERVER_PROG, NMSERVER_VERS, "udp");
 	if (netman_clnt == NULL)
 	{
-		std::cerr << "Unable to create connection to network manager." << std::endl;
+		logStream << getTimeString("dbm_server") << "Unable to create connection to network manager." << std::endl;
 		exit(1);
 	}
 
@@ -824,7 +875,7 @@ static void register_db(const std::string netman_host,const std::string host, co
 
 	if (clnt_stat != RPC_SUCCESS)
 	{
-		std::cerr << "register_db failed !!!" << std::endl;
+		logStream << getTimeString("dbm_server") << "register_db failed !!!" << std::endl;
 		exit(1);
 	}
 //

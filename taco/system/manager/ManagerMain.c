@@ -13,9 +13,9 @@
 
  Original: 	January 1991
 
- Version:	$Revision: 1.15 $
+ Version:	$Revision: 1.16 $
 
- Date:		$Date: 2004-04-27 15:11:49 $
+ Date:		$Date: 2004-07-08 17:02:33 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -30,11 +30,18 @@
 #include <ManagerP.h>
 #include <signal.h>
 #include <sys/wait.h>
+#include <errno.h>
+#include <string.h>
+
+
 #ifdef unix
 #	ifdef HAVE_PATHS_H
 #		include <paths.h>
 #	else
 #		define _PATH_DEVNULL	"/dev/null"
+#	endif
+#	if HAVE_SYS_TYPES_H
+#	include <sys/types.h>
 #	endif
 #	include <fcntl.h>
 #	include <unistd.h>
@@ -57,6 +64,17 @@ int		pid = 0;
 pid_t	become_daemon(void);
 #endif
 
+char *getTimeString(const char *name)
+{
+        time_t          tps = time((time_t *)NULL);
+        struct tm       *time_tm = localtime(&tps);
+        char            *tps_str = asctime(time_tm);
+        tps_str[24] = '\0';
+	static char	message[80];
+	
+	snprintf(message, sizeof(message), "%s : %s : ", name, tps_str);
+	return message;
+}
 
 int main (int argc, char **argv)
 {
@@ -309,23 +327,20 @@ static	int	fd_devnull = -1;
 	}
 
 /*
- *  delete old System.log and open a new
- *  System.log file for writing system information
+ *  delete old Manager.log and open a new
+ *  Manager.log file for writing system information
  */
 	if (c_flags.request_log)
 	{
 		char *logpath = getenv("LOGPATH");
-		snprintf (logfile, sizeof(logfile), "%s/System.log", logpath ? logpath : homepath);
+		snprintf (logfile, sizeof(logfile), "%s/Manager.log", logpath ? logpath : homepath);
 		if ( (system_log = fopen (logfile, "w")) == NULL )
 		{
-			fprintf (stderr,"\ncannot open System.log file (%s), exiting...\n", logfile);
+			fprintf (stderr,"\ncannot open Manager.log file (%s), exiting...\n", logfile);
 			fprintf(stderr, "LOGPATH or DSHOME path may be wrong\n");
 			kill (pid,SIGQUIT);
 		}
 	}
-#ifdef unix
-	sleep(2);
-#endif
 	
 /*
  *  Start the database server on a remote host, if the
@@ -389,7 +404,10 @@ static	int	fd_devnull = -1;
 		{
 			fprintf (stderr,"\ndatabase server startup failed, exiting...\n");
 			if (c_flags.request_log)
-				fprintf (system_log, "\ndatabase server startup failed, exiting...\n");
+			{
+				fprintf (system_log, "\n%sdatabase server startup failed, exiting...\n", getTimeString("Manager"));
+				fflush(system_log);
+			}
 			kill (pid,SIGQUIT);
 		}
 
@@ -414,20 +432,28 @@ static	int	fd_devnull = -1;
 			cmd_argv[i] = 0;
 
 			svc_destroy(transp); 
-			printf("Manager execvp arguments for database : \n");
-			printf("%s %s %s %s %s %s\n",homedir,cmd_argv[0],cmd_argv[1],cmd_argv[2],cmd_argv[3],cmd_argv[4]);
+			if (c_flags.request_log)
+			{
+				fprintf(system_log, "%s Manager execvp arguments for database : \n", getTimeString("Manager"));
+				fprintf(system_log, "\t%s %s %s %s %s %s\n",homedir,cmd_argv[0],cmd_argv[1],cmd_argv[2],cmd_argv[3],cmd_argv[4]);
+				fflush(system_log);
+			}
+#ifdef unix
+			sleep(2);
+#endif
 			execvp (homedir, cmd_argv);
 			
 			fprintf (stderr,"\nexecvp failed, database_server not started\n");
 			if (c_flags.request_log)
-				fprintf (system_log, "\nexecv failed, database_server not started\n");
+			{
+				fprintf(system_log, "\n%s execv failed, database_server not started\n", getTimeString("Manager"));
+				fprintf(system_log, "\t\tError = %d (%s)\n", errno, strerror(errno));
+				fflush(system_log);
+			}
 			kill (pid,SIGQUIT);
 		}
 	}
 	
-#ifdef unix
-	sleep(2);
-#endif
 /*
  *  startup message server
  */
@@ -435,7 +461,10 @@ static	int	fd_devnull = -1;
 	{
 		fprintf (stderr,"\nmessage server startup failed, exiting...\n");
 		if (c_flags.request_log)
-			fprintf (system_log, "\nmessage server startup failed, exiting...\n");
+		{
+			fprintf (system_log, "\n%s message server startup failed, exiting...\n", getTimeString("Manager"));
+			fflush(system_log);
+		}
 		kill (pid,SIGQUIT);
 	}
 
@@ -449,14 +478,24 @@ static	int	fd_devnull = -1;
 		cmd_argv[i] = 0;
 
 		svc_destroy(transp); 
-		printf("Manager execvp arguments for message server :\n");
-		printf("%s %s %s\n",homedir,cmd_argv[0],cmd_argv[1]);
-
+		if (c_flags.request_log)
+		{
+			fprintf(system_log, "\n%s Manager execvp arguments for message server :\n", getTimeString("Manager"));
+			fprintf(system_log, "\t%s %s %s\n",homedir,cmd_argv[0],cmd_argv[1]);
+			fflush(system_log);
+		}
+#ifdef unix
+		sleep(2);
+#endif
 		execvp (homedir,cmd_argv);
 
 		fprintf (stderr,"\nexecvp failed, message server not started\n");
 		if (c_flags.request_log)
-			fprintf (system_log,"\nexecv failed, message server not started\n");
+		{
+			fprintf(system_log,"\n%s execv failed, message server not started\n", getTimeString("Manager"));
+			fprintf(system_log, "\t\tError = %d (%s)\n", errno, strerror(errno));
+			fflush(system_log);
+		}
 		kill (pid,SIGQUIT);
 	}
 #endif /* unix */
@@ -480,7 +519,10 @@ static	int	fd_devnull = -1;
 		{
 			fprintf (stderr,"\nos9exec failed, os9_dbsu-server not started\n");
 			if (c_flags.request_log)
+			{
 				fprintf (system_log, "\nos9exec failed, os9_dbsu-server not started\n");
+				fflush(system_log);
+			}
 			kill (pid,SIGQUIT);
 		}
  	}
@@ -500,13 +542,11 @@ static	int	fd_devnull = -1;
 #endif /* _OSK */
 
 /*
- * print network manager starttime to System.log
+ * print network manager starttime to Manager.log
  */
-	time (&clock);
-	time_string = ctime (&clock);
 	if (c_flags.request_log)
 	{
-      		fprintf (system_log,"\nNetwork Manager started subprocesses at : %s", time_string);
+      		fprintf (system_log,"\n%s Network Manager started subprocesses ", getTimeString("Manager"));
       		fprintf (system_log,"NETHOST = %s   PID = %d\n\n",nethost,pid);
 		fclose (system_log);
 	}
@@ -515,7 +555,8 @@ static	int	fd_devnull = -1;
  *  point of no return
  */
 	svc_run();
-	fprintf(stderr, "\nsvc_run returned: Manager stopped\n");
+	fprintf(system_log, "\n%s svc_run returned: Manager stopped\n", getTimeString("Manager"));
+	fflush(system_log);
 	kill (pid,SIGQUIT);
 }
 
@@ -674,9 +715,6 @@ static void network_manager_1(struct svc_req *rqstp, SVCXPRT *transp)
 static void startup_msg (void)
 {
 	FILE	*system_log = NULL;
-	char    *time_string;
-	time_t	clock;
-
 
 	if ( c_flags.startup == False )
 	{
@@ -685,19 +723,17 @@ static void startup_msg (void)
 			c_flags.startup = True;
 #ifdef unix
 /*
- *  Open the System.log file for writing system information
+ *  Open the Manager.log file for writing system information
  */
 			if (c_flags.request_log)
 			{
 				if ((system_log = fopen (logfile, "a")) != NULL )
 	   			{
-					time (&clock);
-					time_string = ctime (&clock);
-      					fprintf (system_log, "\nNetwork Manager startup finished at : %s\n", time_string);
+      					fprintf (system_log, "\n%s startup finished.\n", getTimeString("Manager"));
 					fclose (system_log);
 	   			}
 				else
-           				fprintf (stderr, "\ncannot open System.log file (%s).\n", logfile);
+           				fprintf (stderr, "\ncannot open Manager.log file (%s).\n", logfile);
 			}
 #endif /* unix */
 #ifdef _OSK
@@ -736,8 +772,20 @@ pid_t	become_daemon(void)
 	else if (pid == 0)
 	{
 /* 
- * Child process 
+ * Child process and try to detach the terminal
  */
+#if HAVE_SETSID
+		setsid();
+#elif defined (TIOCNOTTY)
+		{
+			int i = open("/dev/tty", O_RDWR, 0);
+			if (i != -1)
+			{
+				ioctl(i, (int)TIOCNOTTY, (char *)NULL);
+				close(i);
+			}
+		}
+#endif
 		dup2(fd_devnull, 0);
 		dup2(fd_devnull, 1);
 		dup2(fd_devnull, 2);

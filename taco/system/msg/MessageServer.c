@@ -11,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.5 $
+ Version:	$Revision: 1.6 $
 
- Date:		$Date: 2004-02-19 16:01:58 $
+ Date:		$Date: 2004-07-08 17:02:33 $
 
  Copyright (c) 1990 by	European Synchrotron Radiation Facility, 
 			Grenoble, France
@@ -34,6 +34,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <signal.h>
 #if TIME_WITH_SYS_TIME
 # 	include <sys/time.h>
 #	include <time.h>
@@ -45,9 +46,9 @@
 #	endif
 #endif
 
-extern MessageServerPart msg;
-
-
+extern MessageServerPart 	msg;
+extern FILE		 	*logFile;
+char *getTimeString(const char *name);
 
 /***************************************
  * Message-Server initialise           *
@@ -71,12 +72,7 @@ void msg_initialise (char *dshome)
 #endif /* unix */
 
 #ifdef linux
-#	ifdef x86
-        snprintf (msg.aw_path, sizeof(msg.aw_path), "%s/system/bin/linux/x86/S_Alarm", dshome );
-#	endif
-#	if defined(m68k)
-        snprintf (msg.aw_path, sizeof(msg.aw_path), "%s/system/bin/linux/68k/S_Alarm", dshome );
-#	endif
+        snprintf (msg.aw_path, sizeof(msg.aw_path), "%s/sbin/S_Alarm", dshome );
 #endif
 
 #ifdef __hp9000s300
@@ -98,8 +94,6 @@ void msg_initialise (char *dshome)
 }
 
 
-
-
 /*******************************************
  * Message-Server alarm handler method     *
  *******************************************/
@@ -119,21 +113,21 @@ void msg_alarm_handler(short alarm_type,
  */
 	if (( pid = fork () ) < 0 )
 	{
-  		fprintf (stderr, "\nCannot start alarm window because fork failed!!");
-		fprintf (stderr, "\n\nError in %s on host %s !!",server_name,host_name);
+  		fprintf (logFile, "\n%s Cannot start alarm window because fork failed!", getTimeString("MessageServer"));
+		fprintf (logFile, "\n\nError in %s on host %s !\n",server_name,host_name);
 
 		switch (alarm_type)
 		{
 			case 2 :
-				fprintf (stderr,"\ncannot open error file :  %s\n",file_name);
+				fprintf (logFile,"%s cannot open error file :  %s\n",file_name, getTimeString("MessageServer"));
 				break;
 			case 1 :
 			case 0 :
-				fprintf (stderr,"\nerror file :  %s\n",file_name);
+				fprintf (logFile,"%s error file :  %s\n", getTimeString("MessageServer"), file_name);
 				break;
 			case -1 :
-				fprintf (stderr,"\nMessage Server exiting !!\n");
-				exit (-1);
+				fprintf (logFile,"%s exiting!\n", getTimeString("MessageServer"));
+				kill(getpid(), SIGQUIT);
 		}
 		return;
 	}
@@ -151,7 +145,8 @@ void msg_alarm_handler(short alarm_type,
 		cmd_argv[i++] = display; 
 		cmd_argv[i] = 0; 
 		execv (msg.aw_path, cmd_argv);
-		fprintf (stderr,"\nMessage Server can not start Alarm Window !!\n");
+		fprintf (logFile,"\n%s can not start Alarm Window !\n", getTimeString("MessageServer"));
+		fflush(logFile);
 		exit (-1);
 	}
 }
@@ -195,9 +190,7 @@ void msg_fault_handler (DevString error_msg)
  *       error messages      -> output file : hostname_prognumber.ERR
  *       debug messages      -> named pipe  : hostname_prognumber.DBG
  *       diagnostic messages -> named pipe  : hostname_prognumber.DIA
- *
  */
-
 _msg_out *rpc_msg_send_1 (_msg_data *msg_data)
 {
 	static _msg_out	msg_out;
