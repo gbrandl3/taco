@@ -10,6 +10,7 @@ bin_PROGRAMS		= db_update \
 		 	db_initcache \
 			db_devicetree
 
+bin_SCRIPTS		= db_fillup2
 if GDBMSUPPORT
 bin_PROGRAMS		+= db_fillup \
 		 	db_read 
