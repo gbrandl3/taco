@@ -12,9 +12,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.8 $
+ Version    :	$Revision: 1.9 $
 
- Date       : 	$Date: 2004-03-09 17:02:49 $
+ Date       : 	$Date: 2004-03-09 17:15:50 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -144,7 +144,7 @@ long debug_flag = 0x0;
 
 /**
  * @defgroup messageAPI Message API
- * @ingroup API
+ * @ingroup dsAPI
  * Functions to send some messages to the user or administrator.
  */
 /**

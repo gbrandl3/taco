@@ -13,9 +13,9 @@
 
  Original:	June 1990
 
- Version:	$Revision: 1.5 $
+ Version:	$Revision: 1.6 $
 
- Date:		$Date: 2004-03-09 09:35:47 $
+ Date:		$Date: 2004-03-09 17:15:49 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -306,7 +306,7 @@ static long destroy (DevServer ds, long *error)
  *                                                                         *
  ***************************************************************************/
 
-/**@ingroup dsAPI
+/**@ingroup dsAPIserver
  * This function executes a command on a given object locally i a device server.
  * Memory freeing must be done with free() and @b not with dev_xdrfree().
  *

@@ -12,9 +12,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:		$Date: 2004-03-09 17:02:48 $
+ * Date:		$Date: 2004-03-09 17:15:49 $
  *
  *
  * Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
@@ -40,6 +40,14 @@
  * @li some more DSAPI related routines e.g. dev_put_asyn()
  */
 
+/**@defgroup dsAPIserver Devicer server calls
+ * @ingroup dsAPI
+ */
+
+/**@defgroup oicAPI OIC device server calls
+ * @ingroup dsAPI
+ */
+
 /**
  * @defgroup dsAPIintern Internal functions to the Device Server API
  * @ingroup dsAPI
@@ -63,7 +71,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.6 2004-03-09 17:02:48 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.7 2004-03-09 17:15:49 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*

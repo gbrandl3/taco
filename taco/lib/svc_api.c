@@ -11,9 +11,9 @@
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.9 $
+ Version:	$Revision: 1.10 $
 
- Date:		$Date: 2004-03-09 09:35:50 $
+ Date:		$Date: 2004-03-09 17:15:50 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -961,7 +961,7 @@ void _DLLFunc rpc_dev_put_asyn_cmd (_server_data *server_data)
 
 
 
-/**@ingroup dsAPI
+/**@ingroup dsAPIserver
  * This function makes devices visible for device server clients. All necessary connection information
  * for a @ref dev_import() call will be stored in a database table. Moreover the exported devices are 
  * added to the device server's global list of exported devices. The function is installed as a method
@@ -1454,7 +1454,11 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 }
 
 /* event query */
-
+/**@ingroup dsAPI
+ *
+ * @param dev_query_in
+ * @return
+ */
 _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_in)
 {
 	static _dev_queryevent_out	dev_query_out = { 0, NULL, "", 0, 0, { 0, NULL}};
@@ -1576,7 +1580,7 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
 	return (&dev_query_out);
 }
 
-/**@ingroup dsAPI
+/**@ingroup dsAPIintern
  * Split up the device identification into its information fields.
  *
  * @param device_id   	client handle to access the device.
