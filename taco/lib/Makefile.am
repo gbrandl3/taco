@@ -22,7 +22,7 @@ else
  tango_dir=
 endif
 
-SUBDIRS 		= dbase xdr $(dc_dir) $(ascii_dir) $(datap_dir) \
+SUBDIRS 		= dbase xdr signal $(dc_dir) $(ascii_dir) $(datap_dir) \
 			  $(tango_dir) private .
 
 include_HEADERS 	= API.h DevSec.h hdb.h hdb_out.h Admin.h DevCmds.h DevErrors.h DevStates.h DserverTeams.h macros.h
@@ -36,11 +36,10 @@ INCLUDES		= @TACO_INCLUDES@ -I./signal
 ## AM_CPPFLAGS 		= -DEBUG
 
 libtacoc_la_SOURCES 	= gen_api.c dev_cmds.c dev_errors.c dev_states.c oic.c \
-			util_api.c asyn_api.c gettrans.c ds_prog_vers3.c DevServer.c \
-			signal/DSSignal.c signal/MDSSignal.c signal/MDSSignal_config.c
+			util_api.c asyn_api.c gettrans.c ds_prog_vers3.c DevServer.c 
 
 libtacoc_la_LDFLAGS 	= -version-info @LIB_VERSION@
-libtacoc_la_LIBADD  	= xdr/libdsxdr.la dbase/libdbapi.la -lc
+libtacoc_la_LIBADD  	= xdr/libdsxdr.la dbase/libdbapi.la signal/libsignal.la -lc
 
 EXTRA_DIST 		= 
 

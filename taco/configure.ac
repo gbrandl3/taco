@@ -1,6 +1,6 @@
 AC_INIT([TACO], [3.1.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.58 $)dnl
+AC_REVISION($Revision: 1.59 $)dnl
 AC_COPYRIGHT([(C) 1990-2005 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -303,6 +303,7 @@ AC_CONFIG_FILES(Makefile
 		lib/ascii/doc/Makefile
 		lib/tc/Makefile
 		lib/tango/Makefile
+		lib/signal/Makefile
 		system/dbase/Makefile
 		system/dbase/server/Makefile
 		system/dbase/tools/Makefile
