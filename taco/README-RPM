@@ -1,0 +1,15 @@
+Build of RPM's
+--------------
+
+The builing of the RPM's is a little bit tricky. If you use a SuSE 8.2 distribution
+you have to create a file '~/.rpmmacros' which contains the follwing contents.
+
+%_prefix 	/usr/local/dshome
+%_infodir       %{_prefix}/info
+%_sysconfdir	%{_prefix}/etc
+
+These definitions define some pathes used during the building and installation of the
+RPM's. These macros point per default to other directories so the RPM could not build
+successfully.
+
+Jens Krueger <jens.krueger@frm2.tum.de>
