@@ -13,9 +13,9 @@
 
  Original:	June 1990
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-05-16 13:53:10 $
+ Date:		$Date: 2003-11-26 16:03:54 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -240,7 +240,7 @@ static long command_handler (DevServer ds, long ds_cmd,
  * incorrectly interpreted, therefore if a command is not found
  * then print a warning message.
  */
-   	sprintf(error_message, sizeof(error_message), "command_handler(): command %d not found, maybe you need to recompile the class %s\n",
+   	snprintf(error_message, sizeof(error_message), "command_handler(): command %d not found, maybe you need to recompile the class %s\n",
 		ds_cmd, ds_class->devserver_class.class_name);
 	fprintf(stderr, error_message);
 	dev_error_push(error_message);
