@@ -43,6 +43,7 @@ private:
 		mysql_db;
     MYSQL	mysql,
 		*mysql_conn;
+
 private:
     int		db_find(string, string, char **, int *);
     int		db_devlist(string, int *, db_res *);

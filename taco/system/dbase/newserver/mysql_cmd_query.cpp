@@ -61,8 +61,18 @@ cmd_que *MySQLServer::db_cmd_query_1_svc(nam *pcmd_name)
 // Try to retrieve a resource in the CMDS table with a resource value equal
 // to the command name 
 //
-    string query = "SELECT FAMILY, MEMBER, NAME FROM RESOURCE WHERE ";
-    query += ("DOMAIN = 'cmds' AND RESVAL = '" + req_cmd + "'");
+    string query;
+
+    if (mysql_db == "tango")
+    {
+    	query = "SELECT family, member, name FROM property_device WHERE ";
+	query += ("domain = 'cmds' AND value = '" + req_cmd + "'");
+    }
+    else
+    {
+    	query = "SELECT FAMILY, MEMBER, NAME FROM RESOURCE WHERE ";
+    	query += ("DOMAIN = 'cmds' AND RESVAL = '" + req_cmd + "'");
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;

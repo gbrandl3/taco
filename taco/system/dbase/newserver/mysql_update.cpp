@@ -82,8 +82,20 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 	}
 	dev_list.push_back(lin);
 
-	string query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER), INDEX_NUMBER  FROM NAMES WHERE DEVICE_SERVER_CLASS = '";
-	query += ( ds_class + "' AND DEVICE_SERVER_NAME = '" + ds_name + "' ORDER BY INDEX_NUMBER ASC");
+	string query;
+	if (mysql_db == "tango")
+	{
+	    query = "SELECT CONCAT(domain, '/', family, '/', member) FROM device WHERE ";
+	    query += (" server LIKE '" + ds_class + "/" + ds_name + "'");
+	}
+	else
+	{
+	    query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER), INDEX_NUMBER  FROM NAMES WHERE DEVICE_SERVER_CLASS = '";
+	    query += ( ds_class + "' AND DEVICE_SERVER_NAME = '" + ds_name + "' ORDER BY INDEX_NUMBER ASC");
+	}
+#ifdef DEBUG
+        cout << "MySQLServer::upddev_1_svc(): query = " << query << endl;
+#endif /* DEBUG */
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
 	    cerr << mysql_error(mysql_conn) << endl;
@@ -168,29 +180,39 @@ long MySQLServer::db_update_names(const string ds_class, const string ds_name, c
 	return DbErr_BadResourceType;
     stringstream query;
 
-    query << "UPDATE NAMES SET INDEX_NUMBER = " << ind 
-	  << " WHERE DEVICE_SERVER_CLASS = '" << ds_class << "' AND DEVICE_SERVER_NAME = '" << ds_name
-	  << "' AND CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_name <<"'" << ends;
+    if (mysql_db == "tango")
+    {
+
+// the TANGO database does not have an index number in the device table therefore do nothing
+
+	return 0;
+    }
+    else
+    {
+        query << "UPDATE NAMES SET INDEX_NUMBER = " << ind 
+	      << " WHERE DEVICE_SERVER_CLASS = '" << ds_class << "' AND DEVICE_SERVER_NAME = '" << ds_name
+	      << "' AND CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_name <<"'" << ends;
 
 #if !HAVE_SSTREAM    
-    if (mysql_query(mysql_conn, query.str()) != 0)
+        if (mysql_query(mysql_conn, query.str()) != 0)
 #else
-    if (mysql_query(mysql_conn, query.str().c_str()) != 0)
+        if (mysql_query(mysql_conn, query.str().c_str()) != 0)
 #endif
-    {
-	cerr << __LINE__ << mysql_error(mysql_conn) << endl;
+        {
+	    cerr << __LINE__ << mysql_error(mysql_conn) << endl;
 #if !HAVE_SSTREAM
-	query.freeze(false);
+	    query.freeze(false);
 #endif
-	return DbErr_DatabaseAccess;
-    }
+	    return DbErr_DatabaseAccess;
+        }
 #if !HAVE_SSTREAM    
-    query.freeze(false);
+        query.freeze(false);
 #endif
-    if (mysql_affected_rows(mysql_conn) == 1)
-	return 0;
-    else
-	return DbErr_DeviceNotDefined;
+        if (mysql_affected_rows(mysql_conn) == 1)
+	    return 0;
+        else
+	    return DbErr_DeviceNotDefined;
+    }
 }
 
 /****************************************************************************
@@ -215,8 +237,17 @@ long MySQLServer::db_delete_names(const string ds_class, const string ds_name, c
     if (count(dev_name.begin(), dev_name.end(), '/') != 2)
 	return DbErr_BadResourceType;
 
-    string query = "DELETE FROM NAMES WHERE DEVICE_SERVER_CLASS = '" + ds_class + "' AND DEVICE_SERVER_NAME = '"
-	  + ds_name + "' AND CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + dev_name + "'";
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "DELETE FROM device WHERE class = '" + ds_class + "' AND server LIKE  '"
+	       + ds_name + "/%' AND CONCAT(domain, '/', family, '/', member) = '" + dev_name + "'";
+    }
+    else
+    {
+        query = "DELETE FROM NAMES WHERE DEVICE_SERVER_CLASS = '" + ds_class + "' AND DEVICE_SERVER_NAME = '"
+	       + ds_name + "' AND CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + dev_name + "'";
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << __LINE__ << mysql_error(mysql_conn) << endl;
@@ -263,9 +294,20 @@ long MySQLServer::db_insert_names(const string ds_class, const string ds_name, c
     pos = dev_name.find('/', (last_pos = pos + 1));
     member = dev_name.substr(last_pos, (pos - last_pos));
 
-    query << "INSERT INTO NAMES(DEVICE_SERVER_CLASS, DEVICE_SERVER_NAME, INDEX_NUMBER, DOMAIN, FAMILY, MEMBER)"
-	  << " VALUES('" << ds_class << "', '" << ds_name << "', " << ind << ", '" << domain << "', '" << family
-	  << "', '" << member << "')" << ends;
+    if (mysql_db == "tango")
+    {
+        query << "INSERT INTO device(name, class, server, domain, family, member)"
+	      << " VALUES('" << domain << "/" << family << "/" << member << "','" 
+	      << ds_class << "', '" << ds_class << "/" << ds_name << "', '" << domain << "', '" << family
+	      << "', '" << member << "')" << ends;
+        cout << query.str() << endl;
+    }
+    else
+    {
+        query << "INSERT INTO NAMES(DEVICE_SERVER_CLASS, DEVICE_SERVER_NAME, INDEX_NUMBER, DOMAIN, FAMILY, MEMBER)"
+	      << " VALUES('" << ds_class << "', '" << ds_name << "', " << ind << ", '" << domain << "', '" << family
+	      << "', '" << member << "')" << ends;
+    }
 #if !HAVE_SSTREAM
     if (mysql_query(mysql_conn, query.str()) != 0)
 #else
@@ -511,8 +553,17 @@ long MySQLServer::upd_res(string lin, long numb, char array, long *p_err)
 //
     if (val == "%" || !array)
     {
-	string query = "DELETE FROM RESOURCE WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER, '/', NAME) = '";
-	query += (domain + '/' + family + '/' + member + '/' + name + "'");
+	string query;
+        if (mysql_db == "tango")
+        {
+            query = "DELETE FROM property_device WHERE device = '" + domain + "/" + family + "/" + member + "'";
+            query += " AND name = '" + name + "'";
+        }
+        else
+        {
+	    string query = "DELETE FROM RESOURCE WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER, '/', NAME) = '";
+	    query += (domain + '/' + family + '/' + member + '/' + name + "'");
+        }                                                                
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
 	    cerr << __LINE__ << mysql_error(mysql_conn) << endl;
@@ -525,9 +576,23 @@ long MySQLServer::upd_res(string lin, long numb, char array, long *p_err)
 // Insert a new tuple 
 //
     stringstream query;
-    query << "INSERT INTO RESOURCE(DOMAIN, FAMILY, MEMBER, NAME, INDEX_RES, RESVAL) VALUES('"
-	  << domain << "', '" << family << "', '" << member << "', '" << name << "', " << numb
-	  << ", '" << val << "')" << ends;
+    if (mysql_db == "tango")
+    {
+        query << "INSERT INTO property_device(device,name,domain,family,member,count,value) VALUES('"
+	      << domain << "/" << family << "/" << member << "','" << name << "','"
+	      << domain << "','" << family << "','" << member << "','" 
+	      << numb << "','" << val << "')" << ends;
+
+    }
+    else
+    {
+        query << "INSERT INTO RESOURCE(DOMAIN, FAMILY, MEMBER, NAME, INDEX_RES, RESVAL) VALUES('"
+	      << domain << "', '" << family << "', '" << member << "', '" << name << "', " << numb
+	      << ", '" << val << "')" << ends;
+    }
+#ifdef DEBUG
+    cout << "MySQLServer::upd_res(): query = " << query.str() << endl;
+#endif /* DEBUG */
 #if !HAVE_SSTREAM
     if (mysql_query(mysql_conn, query.str()) != 0)
 #else

@@ -121,8 +121,17 @@ db_res *MySQLServer::resfamilylist_1_svc(nam* domain)
 //
 // Get all resources family name defined in this table
 //
-    string query = "SELECT DISTINCT FAMILY FROM RESOURCE WHERE DOMAIN = '";
-    query += (user_domain + "' ORDER BY FAMILY ASC");
+    string query;
+    if (mysql_db == "tango")
+    {
+    	query = "SELECT DISTINCT family FROM property_device WHERE domain = '";
+    	query += (user_domain + "' ORDER BY family ASC");
+    }
+    else
+    {
+    	query = "SELECT DISTINCT FAMILY FROM RESOURCE WHERE DOMAIN = '";
+    	query += (user_domain + "' ORDER BY FAMILY ASC");
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;
@@ -209,8 +218,17 @@ db_res *MySQLServer::resmemberlist_1_svc(db_res *recev)
 //
 // Get all resources family name defined in this table
 //
-    string query = "SELECT DISTINCT MEMBER FROM RESOURCE WHERE DOMAIN = '";
-    query += (user_domain + "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC");
+    string query;
+    if (mysql_db == "tango")
+    {
+    	query = "SELECT DISTINCT member FROM property_device WHERE domain = '";
+    	query += (user_domain + "' AND family = '" + user_family + "' ORDER BY member ASC");
+    }
+    else
+    {
+    	query = "SELECT DISTINCT MEMBER FROM RESOURCE WHERE DOMAIN = '";
+    	query += (user_domain + "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC");
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;
@@ -300,8 +318,18 @@ db_res *MySQLServer::resresolist_1_svc(db_res *recev)
 // The test to know if the resource is a new one is done by the index value
 // which is 1 for all new resource
 //
-    string query = "SELECT DISTINCT NAME FROM RESOURCE WHERE DOMAIN = '";
-    query += (user_domain + "' AND FAMILY = '" + user_family + "' AND MEMBER = '");
+    string query;
+
+    if (mysql_db == "tango")
+    {
+    	query = "SELECT DISTINCT name FROM property_device WHERE domain = '";
+    	query += (user_domain + "' AND family = '" + user_family + "' AND member = '");
+    }
+    else
+    {
+    	query = "SELECT DISTINCT NAME FROM RESOURCE WHERE DOMAIN = '";
+    	query += (user_domain + "' AND FAMILY = '" + user_family + "' AND MEMBER = '");
+    }
     query += (user_member + "' ORDER BY NAME ASC");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
@@ -393,13 +421,28 @@ db_res *MySQLServer::resresoval_1_svc(db_res *recev)
 //
 // Get a list of all members and resource name
 //
-    string query = "SELECT MEMBER, NAME, INDEX_RES, RESVAL FROM RESOURCE WHERE ";
-    query += (" DOMAIN = '" + user_domain + "' AND FAMILY = '" + user_family + "'");
-    if (user_member != "*")
-    	query += (" AND MEMBER = '" + user_member + "'");
-    if (user_reso != "*")
-	query += (" AND NAME = '" + user_reso + "'");
-    query += (" ORDER BY MEMBER ASC, NAME ASC, INDEX_RES ASC");
+    string query;
+
+    if (mysql_db == "tango")
+    {
+    	query = "SELECT member, name, count, value FROM property_device WHERE ";
+    	query += (" domain = '" + user_domain + "' AND family = '" + user_family + "'");
+        if (user_member != "*")
+    	    query += (" AND member = '" + user_member + "'");
+        if (user_reso != "*")
+	    query += (" AND name = '" + user_reso + "'");
+        query += (" ORDER BY member ASC, name ASC, count ASC");
+    }
+    else
+    {
+    	query = "SELECT MEMBER, NAME, INDEX_RES, RESVAL FROM RESOURCE WHERE ";
+    	query += (" DOMAIN = '" + user_domain + "' AND FAMILY = '" + user_family + "'");
+        if (user_member != "*")
+    	    query += (" AND MEMBER = '" + user_member + "'");
+        if (user_reso != "*")
+	    query += (" AND NAME = '" + user_reso + "'");
+        query += (" ORDER BY MEMBER ASC, NAME ASC, INDEX_RES ASC");
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;

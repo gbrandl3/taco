@@ -84,7 +84,15 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 // is initialized. 
 //
     string tmpf(*fil_name);
-    string	query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM NAMES WHERE";
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "SELECT CONCAT(domain, '/', family, '/', member) FROM device WHERE";
+    }
+    else
+    {
+        query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM NAMES WHERE";
+    }
 
     switch(count(tmpf.begin(), tmpf.end(), '/'))
     {
@@ -93,15 +101,36 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 		 pos = tmpf.find('/', 1 + (last_pos = pos));
 		 family = tmpf.substr(last_pos + 1, (pos - last_pos));
 		 member = tmpf.substr(pos + 1);
-		 query += ("CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + tmpf + "'");
+		 if (mysql_db == "tango")
+                 {
+		     query += ("CONCAT(domain, '/', family, '/', member) = '" + tmpf + "'");
+                 }
+                 else
+                 {
+		     query += ("CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + tmpf + "'");
+                 }
 		 break;
 	case 1 : pos = tmpf.find('/');
 		 domain = tmpf.substr(0, pos);	
 		 family = tmpf.substr(pos + 1);
-		 query += ("CONCAT(DOMAIN, '/', FAMILY) = '" + tmpf + "'");
+                 if (mysql_db == "tango")
+                 {
+		     query += ("CONCAT(domain, '/', family) = '" + tmpf + "'");
+                 }
+                 else
+                 {
+		     query += ("CONCAT(DOMAIN, '/', FAMILY) = '" + tmpf + "'");
+                 }
 		 break;
 	case 0 : domain = tmpf;		
-		 query += ("DOMAIN = '" + tmpf + "'");
+                 if (mysql_db == "tango")
+                 {
+		     query += ("domain = '" + tmpf + "'");
+                 }
+                 else
+                 {
+		     query += ("DOMAIN = '" + tmpf + "'");
+                 }
 		 break;
 	default: cerr << "To many '/' in device name." << endl;
 		 browse_back.db_err = 1;

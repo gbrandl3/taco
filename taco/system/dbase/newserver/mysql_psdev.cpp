@@ -150,8 +150,16 @@ long MySQLServer::reg_ps(string h_name, long pid, string ps_name, long poll, lon
     stringstream strquery;
     try
     {
-    	strquery << "UPDATE PS_NAMES SET HOST = '" << h_name << "', PROCESS_ID = " << pid << " POLL = " << poll
-	  << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << ps_name_low << "'" << ends;
+	if (mysql_db == "tango")
+        {
+    	    strquery << "UPDATE device SET host = '" << h_name << "', pid = " << pid << " ior = 'DC:" << poll << "'"
+	      << " WHERE device = '" << ps_name_low << "'" << ends;
+	}
+	else
+	{
+    	    strquery << "UPDATE PS_NAMES SET HOST = '" << h_name << "', PROCESS_ID = " << pid << " POLL = " << poll
+	      << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << ps_name_low << "'" << ends;
+	}
 #if !HAVE_SSTREAM
     	if (mysql_query(mysql_conn, strquery.str()) != 0)
 #else
@@ -179,9 +187,18 @@ long MySQLServer::reg_ps(string h_name, long pid, string ps_name, long poll, lon
 				member;
 
 	    strquery.seekp(0);
-    	    strquery << "INSERT INTO PS_NAMES (DOMAIN, FAMILY, MEMBER, HOST, PROCESS_ID, POLL) VALUES('"
-	  	<< domain << "', '" << family << "', '" << member << "', '" << h_name << "', " 
-		<< pid << ", " << poll << ")" << ends;
+	    if (mysql_db == "tango")
+	    {
+    	       strquery << "INSERT INTO device (domain, family, member, host, pid, ior, exported, server, class, version) VALUES('"
+	  	   << domain << "', '" << family << "', '" << member << "', '" << h_name << "', " 
+		   << pid << ", 'DC:" << poll << "',1,'DataCollector','PseudoDevice',1)" << ends;
+	    }
+	    else
+	    {
+    	       strquery << "INSERT INTO PS_NAMES (DOMAIN, FAMILY, MEMBER, HOST, PROCESS_ID, POLL) VALUES('"
+	  	   << domain << "', '" << family << "', '" << member << "', '" << h_name << "', " 
+		   << pid << ", " << poll << ")" << ends;
+	    }
 #if !HAVE_SSTREAM
 	    if (mysql_query(mysql_conn, strquery.str()) != 0)
 	    	throw long(DbErr_DatabaseAccess);
@@ -316,7 +333,15 @@ long MySQLServer::unreg_ps(string ps_name, long *p_error)
 //
 // Retrieve a tuple in the PS_NAMES table with the same pseudo device name 
 //
-    string query = "DELETE FROM PS_NAMES WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + ps_name_low + "'";
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "DELETE FROM device WHERE name = '" + ps_name_low + "'";
+    }
+    else
+    {
+        query = "DELETE FROM PS_NAMES WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + ps_name_low + "'";
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;

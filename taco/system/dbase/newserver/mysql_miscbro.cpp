@@ -20,6 +20,7 @@ db_res *MySQLServer::devserverlist_1_svc()
 {
     string 		server;
     vector<string> 	serv_list;
+    int			i;
 	
 #ifdef DEBUG
     cout << "In devserverlist_1_svc function" << endl;
@@ -46,7 +47,15 @@ db_res *MySQLServer::devserverlist_1_svc()
 //
 // Sort device server name list
 //
-    string query = "SELECT DISTINCT DEVICE_SERVER_CLASS FROM NAMES ORDER BY DEVICE_SERVER_CLASS ASC";
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "SELECT DISTINCT SUBSTRING_INDEX(server,'/',1) FROM device ORDER BY server ASC";
+    }
+    else
+    {
+        query = "SELECT DISTINCT DEVICE_SERVER_CLASS FROM NAMES ORDER BY DEVICE_SERVER_CLASS ASC";
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;
@@ -56,7 +65,12 @@ db_res *MySQLServer::devserverlist_1_svc()
     MYSQL_RES *result = mysql_store_result(mysql_conn);
     MYSQL_ROW row;
     while ((row = mysql_fetch_row(result)) != NULL)
+    {
 	serv_list.push_back(row[0]);		
+#ifdef DEBUG
+	cout << "devserverlist_1_svc(): server found " << row[0] << endl;
+#endif /* DEBUG */
+    }
     mysql_free_result(result);
 //
 // Build the structure returned to caller
@@ -104,7 +118,8 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
 {
     string 		user_server(*server);
     vector<string>	pers_list;
-	
+    int			i;
+
 #ifdef DEBUG
     cout << "In devpersnamelist_1_svc function for server " << user_server << endl;
 #endif
@@ -130,8 +145,18 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
 //
 // Sort device server personal name list
 //
-    string query = "SELECT DISTINCT DEVICE_SERVER_NAME FROM NAMES WHERE DEVICE_SERVER_CLASS = '";
-    query += (user_server + "' ORDER BY DEVICE_SERVER_NAME ASC");
+    string query;
+
+    if (mysql_db == "tango")
+    {
+        query = "SELECT DISTINCT SUBSTRING_INDEX(server,'/',-1) FROM device WHERE server like '";
+        query += (user_server + "/%' ORDER BY server ASC");
+    }
+    else
+    {
+        query = "SELECT DISTINCT DEVICE_SERVER_NAME FROM NAMES WHERE DEVICE_SERVER_CLASS = '";
+        query += (user_server + "' ORDER BY DEVICE_SERVER_NAME ASC");
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;
@@ -141,7 +166,12 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
     MYSQL_RES *result = mysql_store_result(mysql_conn);
     MYSQL_ROW row;
     while ((row = mysql_fetch_row(result)) != NULL)
+    {
 	pers_list.push_back(row[0]);
+#ifdef DEBUG
+	cout << "devserverlist_1_svc(): server found " << row[0] << endl;
+#endif /* DEBUG */
+    }
     mysql_free_result(result);
 //
 // Build the sequence returned to caller
@@ -215,7 +245,15 @@ db_res *MySQLServer::hostlist_1_svc()
 // Get the host name list from the NAMES table for all exported devices (for DS with DB library release 4)
 // and sort device server host list
 //
-    string query = "SELECT DISTINCT HOSTNAME FROM NAMES WHERE HOSTNAME != 'not_exp' ORDER HOSTNAME ASC";
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "SELECT DISTINCT host FROM device WHERE exported != 0 ORDER host ASC";
+    }
+    else
+    {
+        query = "SELECT DISTINCT HOSTNAME FROM NAMES WHERE HOSTNAME != 'not_exp' ORDER HOSTNAME ASC";
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;

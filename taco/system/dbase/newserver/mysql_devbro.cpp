@@ -43,7 +43,18 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
 //
 // Get the domain name list from the NAMES table
 //
-    string query = "SELECT DISTINCT DOMAIN FROM NAMES ORDER BY DOMAIN ASC";
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "SELECT DISTINCT domain FROM device ORDER BY domain ASC";
+    }
+    else
+    {
+        query = "SELECT DISTINCT DOMAIN FROM NAMES ORDER BY DOMAIN ASC";
+    }
+#ifdef DEBUG
+    cout << "MySQLServer::devdomainlist_1_svc(): query " << query << endl;
+#endif /* DEBUG */
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;
@@ -57,17 +68,20 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
     	dom_list.push_back(row[0]);
     mysql_free_result(result);
 
-    query = "SELECT DISTINCT DOMAIN FROM PS_NAMES ORDER BY DOMAIN ASC";
-    if (mysql_query(mysql_conn, query.c_str()) != 0)
+    if (mysql_db != "tango")
     {
-	cerr << mysql_error(mysql_conn) << endl;
-	browse_back.db_err = DbErr_DatabaseAccess;
-	return (&browse_back);
+        query = "SELECT DISTINCT DOMAIN FROM PS_NAMES ORDER BY DOMAIN ASC";
+        if (mysql_query(mysql_conn, query.c_str()) != 0)
+        {
+	    cerr << mysql_error(mysql_conn) << endl;
+	    browse_back.db_err = DbErr_DatabaseAccess;
+	    return (&browse_back);
+        }
+        result = mysql_store_result(mysql_conn);
+        while((row = mysql_fetch_row(result)) != NULL)
+    	    dom_list.push_back(row[0]);
+        mysql_free_result(result);
     }
-    result = mysql_store_result(mysql_conn);
-    while((row = mysql_fetch_row(result)) != NULL)
-    	dom_list.push_back(row[0]);
-    mysql_free_result(result);
 
 //
 // Build the structure returned to caller
@@ -135,7 +149,18 @@ db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
 //
 // Get the family name list for the wanted domain in the NAMES table
 //
-    string query = "SELECT DISTINCT FAMILY FROM NAMES WHERE DOMAIN = '" + user_domain + "' ORDER BY FAMILY ASC";
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "SELECT DISTINCT family FROM device WHERE domain = '" + user_domain + "' ORDER BY family ASC";
+    }
+    else
+    {
+        query = "SELECT DISTINCT FAMILY FROM NAMES WHERE DOMAIN = '" + user_domain + "' ORDER BY FAMILY ASC";
+    }
+#ifdef DEBUG
+    cout << "MySQLServer::devfamilylist_1_svc(): query " << query << endl;
+#endif /* DEBUG */
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;
@@ -151,17 +176,20 @@ db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
 //
 // Add family name list for the wanted domain in from the PS_NAMES table
 //
-    query = "SELECT DISTINCT FAMILY FROM PS_NAMES WHERE DOMAIN = '" + user_domain + "' ORDER BY FAMILY ASC";
-    if (mysql_query(mysql_conn, query.c_str()) != 0)
+    if (mysql_db != "tango")
     {
-	cerr << mysql_error(mysql_conn) << endl;
-	browse_back.db_err = DbErr_DatabaseAccess;
-	return (&browse_back);
+        query = "SELECT DISTINCT FAMILY FROM PS_NAMES WHERE DOMAIN = '" + user_domain + "' ORDER BY FAMILY ASC";
+        if (mysql_query(mysql_conn, query.c_str()) != 0)
+        {
+	    cerr << mysql_error(mysql_conn) << endl;
+	    browse_back.db_err = DbErr_DatabaseAccess;
+	    return (&browse_back);
+        }
+        result = mysql_store_result(mysql_conn);
+        while((row = mysql_fetch_row(result)) != NULL)
+    	    fam_list.push_back(row[0]);
+        mysql_free_result(result);
     }
-    result = mysql_store_result(mysql_conn);
-    while((row = mysql_fetch_row(result)) != NULL)
-    	fam_list.push_back(row[0]);
-    mysql_free_result(result);
 //
 // Sort family name list
 //
@@ -237,8 +265,20 @@ db_res *MySQLServer::devmemberlist_1_svc(db_res *recev)
 //
 // Get the member name list for the wanted domain and family from NAMES table
 //
-    string query = "SELECT DISTINCT MEMBER FROM NAMES WHERE DOMAIN = '" + user_domain;
-    query += "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC";
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "SELECT DISTINCT member FROM device WHERE domain = '" + user_domain;
+        query += "' AND family = '" + user_family + "' ORDER BY member ASC";
+    }
+    else
+    {
+        query = "SELECT DISTINCT MEMBER FROM NAMES WHERE DOMAIN = '" + user_domain;
+        query += "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC";
+    }
+#ifdef DEBUG
+    cout << "MySQLServer::devfamilylist_1_svc(): query " << query << endl;
+#endif /* DEBUG */
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;
@@ -255,19 +295,22 @@ db_res *MySQLServer::devmemberlist_1_svc(db_res *recev)
 // Add member name for the wanted domain and family from PS_NAMES table
 // Sort member name list
 //
-    query = "SELECT DISTINCT MEMBER FROM PS_NAMES WHERE DOMAIN = '" + user_domain;
-    query += "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC";
-    if (mysql_query(mysql_conn, query.c_str()) != 0)
+    if (mysql_db != "tango")
     {
-	cerr << mysql_error(mysql_conn) << endl;
-	browse_back.db_err = DbErr_DatabaseAccess;
-	return (&browse_back);
-    }
-    result = mysql_store_result(mysql_conn);
+        query = "SELECT DISTINCT MEMBER FROM PS_NAMES WHERE DOMAIN = '" + user_domain;
+        query += "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC";
+        if (mysql_query(mysql_conn, query.c_str()) != 0)
+        {
+	    cerr << mysql_error(mysql_conn) << endl;
+	    browse_back.db_err = DbErr_DatabaseAccess;
+	    return (&browse_back);
+        }
+        result = mysql_store_result(mysql_conn);
   
-    while((row = mysql_fetch_row(result)) != NULL)
-    	memb_list.push_back(row[0]);
-    mysql_free_result(result);
+        while((row = mysql_fetch_row(result)) != NULL)
+    	    memb_list.push_back(row[0]);
+        mysql_free_result(result);
+    }
 //
 // Build the structure returned to caller
 //

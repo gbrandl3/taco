@@ -283,8 +283,17 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
 // Try to retrieve the tuple in the NAMES table 
 //
 	    string dev_name(de_name->arr1_val[i]);
-	    string query = "SELECT HOSTNAME, PROGRAM_NUMBER, VERSION_NUMBER, DEVICE_TYPE, DEVICE_CLASS";
-	    query += (" FROM NAMES WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + dev_name + "'");
+	    string query;
+            if (mysql_db == "tango")
+	    {
+	        query = "SELECT host, ior, version, class";
+	        query += (" FROM device WHERE CONCAT(domain, '/', family, '/', member) = '" + dev_name + "'");
+            }
+            else
+            {
+	        query = "SELECT HOSTNAME, PROGRAM_NUMBER, VERSION_NUMBER, DEVICE_TYPE, DEVICE_CLASS";
+	        query += (" FROM NAMES WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + dev_name + "'");
+            }
 	    if (mysql_query(mysql_conn, query.c_str()) != 0)
 	    {
 		throw;
@@ -299,10 +308,22 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
 // Unpack the content 
 //
 	    	    ret_host_name = row[0];
-	    	    ret_pn = atoi(row[1]);
+                    if (mysql_db == "tango")
+                    {
+		    	string ior(row[1]);
+			string pgm_no;
+			pgm_no = ior.substr(ior.rfind(':')+1);
+                        ret_pn = atoi(pgm_no.c_str());
+                        ret_dev_type = "DevType_Default";
+                        ret_dev_class = row[3];
+                    }
+                    else
+                    {
+	    	        ret_pn = atoi(row[1]);
+	    	        ret_dev_type = row[3];
+	    	        ret_dev_class = row[4];
+                    }
 	    	    ret_vn = atoi(row[2]);
-	    	    ret_dev_type = row[3];
-	    	    ret_dev_class = row[4];
 	    	}
 //
 // In case of error 
@@ -441,11 +462,22 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
 // name is the device server PROCESS name. As there is no key build on
 // the device server process name, do a full traversal of the database 
 //
-    string query = "UPDATE NAMES SET PROGRAM_NUMBER = 0, VERSION_NUMBER = 0,";
-    query += (" DEVICE_TYPE = 'unknown', PROCESS_ID = 0 WHERE");
-    query += (" DEVICE_SERVER_CLASS = '" + ds_class + "' AND");
-    query += (" PROCESS_NAME = '" + ds_name + "' AND PROCESS_ID != 0");
-
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "UPDATE device SET exported = 0 WHERE";
+        query += (" server = '" + ds_class + "/" + ds_name +"' AND pid != 0");
+    }
+    else
+    {
+        query = "UPDATE NAMES SET PROGRAM_NUMBER = 0, VERSION_NUMBER = 0,";
+        query += (" DEVICE_TYPE = 'unknown', PROCESS_ID = 0 WHERE");
+        query += (" DEVICE_SERVER_CLASS = '" + ds_class + "' AND");
+        query += (" PROCESS_NAME = '" + ds_name + "' AND PROCESS_ID != 0");
+    }
+#ifdef DEBUG
+    cout << "MySQLServer::db_svcunr_1_svc(): query = " << query << endl;
+#endif /* DEBUG */
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	errcode = DbErr_DatabaseAccess;
@@ -459,10 +491,21 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
 //
     if ((d_num = mysql_affected_rows(mysql_conn)) == 0)
     {
-     	query = "UPDATE NAMES SET PROGRAM_NUMBER = 0, VERSION_NUMBER = 0,";
-    	query += (" DEVICE_TYPE = 'unknown', PROCESS_ID = 0 WHERE");
-	query += (" DEVICE_SERVER_CLASS = '" + ds_class + "' AND");
-	query += (" DEVICE_SERVER_NAME = '" + ds_name + "'");
+        if (mysql_db == "tango")
+        {
+            query = "UPDATE device SET exported = 0 WHERE";
+            query += (" server = '" + ds_class + "/" + ds_name +"' AND pid != 0");
+        }
+        else
+        {
+     	    query = "UPDATE NAMES SET PROGRAM_NUMBER = 0, VERSION_NUMBER = 0,";
+    	    query += (" DEVICE_TYPE = 'unknown', PROCESS_ID = 0 WHERE");
+	    query += (" DEVICE_SERVER_CLASS = '" + ds_class + "' AND");
+	    query += (" DEVICE_SERVER_NAME = '" + ds_name + "'");
+        }
+#ifdef DEBUG
+        cout << "MySQLServer::db_svcunr_1_svc(): query = " << query << endl;
+#endif /* DEBUG */
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
 	    errcode = DbErr_DatabaseAccess;
@@ -557,10 +600,19 @@ svc_inf *MySQLServer::db_svcchk_1_svc(nam *dsn_name)
 //
 // Initialization needed to retrieve the right tuples in the NAMES table 
 //
-    string query = "SELECT HOSTNAME, PROGRAM_NUMBER, VERSION_NUMBER FROM NAMES WHERE";
-    query += (" DEVICE_SERVER_CLASS = '" + ds_class + "' AND");
-    query += (" DEVICE_SERVER_NAME = '" + ds_name + "' AND");
-    query += (" INDEX_NUMBER = 1");
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "SELECT host, ior, version FROM device WHERE";
+        query += (" server = '" + ds_class + "/" + ds_name + "'");
+    }
+    else
+    {
+        query = "SELECT HOSTNAME, PROGRAM_NUMBER, VERSION_NUMBER FROM NAMES WHERE";
+        query += (" DEVICE_SERVER_CLASS = '" + ds_class + "' AND");
+        query += (" DEVICE_SERVER_NAME = '" + ds_name + "' AND");
+        query += (" INDEX_NUMBER = 1");
+    }
 //
 // Try to retrieve the tuples 
 //
@@ -571,14 +623,14 @@ svc_inf *MySQLServer::db_svcchk_1_svc(nam *dsn_name)
     }
     MYSQL_RES 	*result = mysql_store_result(mysql_conn);
 
-    if (mysql_num_rows(result) == 1)
+    if (mysql_num_rows(result) >= 1)
     {
     	MYSQL_ROW	row = mysql_fetch_row(result);
 	    
-	strcpy(host_name, row[0]);
+	if (row[0] != NULL) strcpy(host_name, row[0]);
 	svc_info.ho_name = host_name;
-    	svc_info.p_num = atoi(row[1]);
-    	svc_info.v_num = atoi(row[2]);
+    	if (row[1] != NULL) svc_info.p_num = atoi(row[1]);
+    	if (row[2] != NULL) svc_info.v_num = atoi(row[2]);
     }
     else
 	svc_info.db_err = DbErr_DeviceServerNotDefined;
@@ -614,13 +666,25 @@ int MySQLServer::db_store(db_devinfo &dev_stu)
 // Try to retrieve the right tuple in the NAMES table 
 //
     stringstream query;
-    query << "UPDATE NAMES SET HOSTNAME = '" << dev_stu.host_name <<  "',"
-      << " PROGRAM_NUMBER = " << dev_stu.p_num << ","
-      << " VERSION_NUMBER = " << dev_stu.v_num << ","
-      << " DEVICE_TYPE = '" << dev_stu.dev_type << "',"
-      << " DEVICE_CLASS = '" << dev_stu.dev_class << "',"
-      << " PROCESS_ID = 0, PROCESS_NAME = 'unknown'"
-      << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << ends; 	
+    if (mysql_db == "tango")
+    {
+        query << "UPDATE device SET host = '" << dev_stu.host_name <<  "',"
+          << " ior = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
+          << " version = '" << dev_stu.v_num << "',"
+          << " class = '" << dev_stu.dev_class << "',"
+          << " pid = 0 , server = 'unknown'"
+          << " WHERE CONCAT(domain, '/', family, '/', member) = '" << dev_stu.dev_name << "'" << ends; 	
+    }
+    else
+    {
+        query << "UPDATE NAMES SET HOSTNAME = '" << dev_stu.host_name <<  "',"
+          << " PROGRAM_NUMBER = " << dev_stu.p_num << ","
+          << " VERSION_NUMBER = " << dev_stu.v_num << ","
+          << " DEVICE_TYPE = '" << dev_stu.dev_type << "',"
+          << " DEVICE_CLASS = '" << dev_stu.dev_class << "',"
+          << " PROCESS_ID = 0, PROCESS_NAME = 'unknown'"
+          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << ends; 	
+    }
     try
     {
 #if !HAVE_SSTREAM
@@ -670,13 +734,25 @@ int MySQLServer::db_store(db_devinfo_2 &dev_stu)
 // Try to retrieve the right tuple in the NAMES table 
 //
     stringstream query;
-    query << "UPDATE NAMES SET HOSTNAME = '" << dev_stu.host_name <<  "',"
-      << " PROGRAM_NUMBER = " << dev_stu.p_num << ","
-      << " VERSION_NUMBER = " << dev_stu.v_num << ","
-      << " DEVICE_TYPE = '" << dev_stu.dev_type << "',"
-      << " DEVICE_CLASS = '" << dev_stu.dev_class << "',"
-      << " PROCESS_ID = " << dev_stu.pid << ", PROCESS_NAME = 'unknown'"
-      << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << ends; 	
+    if (mysql_db == "tango")
+    {
+        query << "UPDATE device SET host = '" << dev_stu.host_name <<  "',"
+          << " ior = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
+          << " version = '" << dev_stu.v_num << "',"
+          << " class = '" << dev_stu.dev_class << "',"
+          << " pid = " << dev_stu.pid << ", server = 'unknown'"
+          << " WHERE CONCAT(domain, '/', family, '/', member) = '" << dev_stu.dev_name << "'" << ends; 	
+    }
+    else
+    {
+        query << "UPDATE NAMES SET HOSTNAME = '" << dev_stu.host_name <<  "',"
+          << " PROGRAM_NUMBER = " << dev_stu.p_num << ","
+          << " VERSION_NUMBER = " << dev_stu.v_num << ","
+          << " DEVICE_TYPE = '" << dev_stu.dev_type << "',"
+          << " DEVICE_CLASS = '" << dev_stu.dev_class << "',"
+          << " PROCESS_ID = " << dev_stu.pid << ", PROCESS_NAME = 'unknown'" 
+          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << ends; 	
+    }
 
     try
     {
@@ -729,14 +805,30 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
 // Try to retrieve the right tuple in the NAMES table 
 //
     stringstream query;
-    query << "UPDATE NAMES SET HOSTNAME = '" << dev_stu.host_name <<  "',"
-      << " PROGRAM_NUMBER = " << dev_stu.p_num << ","
-      << " VERSION_NUMBER = " << dev_stu.v_num << ","
-      << " DEVICE_TYPE = '" << dev_stu.dev_type << "',"
-      << " DEVICE_CLASS = '" << dev_stu.dev_class << "',"
-      << " PROCESS_ID = " << dev_stu.pid << ", PROCESS_NAME = '" << dev_stu.proc_name << "'"
-      << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << ends; 	
-
+    if (mysql_db == "tango")
+    {
+        query << "UPDATE device SET host = '" << dev_stu.host_name <<  "',"
+          << " ior = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
+          << " version = '" << dev_stu.v_num << "',"
+          << " class = '" << dev_stu.dev_class << "',"
+//        << " pid = " << dev_stu.pid << ", server = '" << dev_stu.proc_name << "'"
+          << " pid = " << dev_stu.pid << ","
+	  << " exported = 1" 
+          << " WHERE CONCAT(domain, '/', family, '/', member) = '" << dev_stu.dev_name << "'" << ends; 	
+    }
+    else
+    {
+        query << "UPDATE NAMES SET HOSTNAME = '" << dev_stu.host_name <<  "',"
+          << " PROGRAM_NUMBER = " << dev_stu.p_num << ","
+          << " VERSION_NUMBER = " << dev_stu.v_num << ","
+          << " DEVICE_TYPE = '" << dev_stu.dev_type << "',"
+          << " DEVICE_CLASS = '" << dev_stu.dev_class << "',"
+          << " PROCESS_ID = " << dev_stu.pid << ", PROCESS_NAME = '" << dev_stu.proc_name << "'"
+          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << ends; 	
+    }
+#ifdef DEBUG
+    cout << "MySQLServer::db_store(): query = " << query.str() << endl;
+#endif /* DEBUG */
     try
     {
 #if !HAVE_SSTREAM
@@ -748,10 +840,11 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
 	    throw int(DbErr_DatabaseAccess);
 #endif
    	if (mysql_affected_rows(mysql_conn) == 0)
-	    throw int(DbErr_DeviceNotDefined);
+	    throw int(DbErr_DatabaseAccess);
     }
     catch(const int err)
     {
+	cerr << "MySQLServer::db_store(): error = " << mysql_error(mysql_conn) << endl;
 	errorcode = err;
     }
 //

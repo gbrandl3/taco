@@ -291,7 +291,7 @@ int MySQLServer::db_find(string tab_name, string p_res_name, char **out, int *k1
 		r_name[i] = SEC_SEP;
     }
 
-#ifdef DEBUG
+#ifdef NEVER
     cout << "Family name : " << family << endl;
     cout << "Member name : " << member << endl;
     cout << "Resource name : " << r_name << endl;
@@ -308,10 +308,22 @@ int MySQLServer::db_find(string tab_name, string p_res_name, char **out, int *k1
 // Try to retrieve the resource in table and loop in the case of an
 // array of resources 
 //
-    string query = "SELECT INDEX_RES, RESVAL FROM RESOURCE WHERE DOMAIN = '" + tab_name ;
-    query += ("' AND FAMILY = '" + family + "' AND MEMBER = '" + member + "' AND NAME = '" + r_name);
-    query += "' ORDER BY INDEX_RES ASC";
-
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "SELECT count, value FROM property_device ";
+        query += ("WHERE device = '" + tab_name + "/" + family + "/" + member + "' AND name = '" + r_name);
+        query += "' ORDER BY count ASC";
+    }
+    else
+    {
+        query = "SELECT INDEX_RES, RESVAL FROM RESOURCE WHERE DOMAIN = '" + tab_name ;
+        query += ("' AND FAMILY = '" + family + "' AND MEMBER = '" + member + "' AND NAME = '" + r_name);
+        query += "' ORDER BY INDEX_RES ASC";
+    }
+#ifdef DEBUG
+    cout << "MySQLServer::db_find(): query = " << query << endl;
+#endif /* DEBUG */
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;
@@ -426,7 +438,18 @@ int MySQLServer::db_devlist(string dev_na, int *dev_num, db_res *back)
 // Try to retrieve the right tuple in NAMES table 
 //
 //  
-    string query = "SELECT DEVICENAME FROM NAMES WHERE DEVICE_SERVER_CLASS = " + ds_class + " AND DEVICE_SERVER_NAME = " + ds_name;
+    string query;
+    if (mysql_db == "tango")
+    {
+    	query = "SELECT name FROM device WHERE server = '" + ds_class + "/" + ds_name + "'";
+    }
+    else
+    {
+    	query = "SELECT DEVICENAME FROM NAMES WHERE DEVICE_SERVER_CLASS = '" + ds_class + "' AND DEVICE_SERVER_NAME = '" + ds_name + "'";
+    }
+#ifdef DEBUG
+    cout << "MySQLServer::db_devlist(): query " << query << endl;
+#endif /* DEBUG */
     
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
@@ -747,7 +770,7 @@ int MySQLServer::db_insert(string res_name, string number, string content)
 //
     r_name = res_name.substr(pos + 1);
 
-#ifdef DEBUG
+#ifdef NEVER
     cout << "Family name : " << family << endl;
     cout << "Number name : " << member << endl;
     cout << "Resource name : " << r_name << endl;
@@ -761,8 +784,20 @@ int MySQLServer::db_insert(string res_name, string number, string content)
     if (i == dbgen.TblNum)
 	return(DbErr_DomainDefinition);
 //
-    string query = "INSERT INTO RESOURCE VALUES('" + domain + "','" + family + "','" + member + "','"; 
-    query += (r_name + "','" + number + "','" + content + "')");
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "INSERT INTO property_device(device,name,count,value) VALUES('" + domain + "/" + family + "/" + member + "','";
+        query += (r_name + "','" + number + "','" + content + "')");
+    }
+    else
+    {
+        query = "INSERT INTO RESOURCE VALUES('" + domain + "','" + family + "','" + member + "','"; 
+        query += (r_name + "','" + number + "','" + content + "')");
+    }
+#ifdef DEBUG
+    cout << "MySQLServer::db_insert(): query = " << query;
+#endif /* DEBUG */
     if (mysql_query(mysql_conn, query.c_str()))
     {
 	cerr << mysql_error(mysql_conn) << endl;
@@ -835,7 +870,7 @@ int MySQLServer::db_del(string res_name)
 //
     r_name = res_name.substr(last_pos + 1);
 
-#ifdef DEBUG
+#ifdef NEVER
     cout << "Family name : " << family << endl;
     cout << "Number name : " << member << endl;
     cout << "Resource name : " << r_name << endl;
@@ -852,8 +887,17 @@ int MySQLServer::db_del(string res_name)
 // Try to retrieve the right tuple in table and loop for the case of an
 // array of resource 
 //
-    string query = "DELETE FROM RESOURCE WHERE DOMAIN = " + t_name + " AND FAMILY = ";
-    query += (family + " AND MEMBER = " + member + " NAME = " + r_name);
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "DELETE FROM property_device WHERE device = '" + t_name + "/" + family + "/" + member + "'";
+	query += " AND name = '" + r_name + "'";
+    }
+    else
+    {
+        query = "DELETE FROM RESOURCE WHERE DOMAIN = " + t_name + " AND FAMILY = ";
+        query += (family + " AND MEMBER = " + member + " NAME = " + r_name);
+    }
 
     if (mysql_query(mysql_conn, query.c_str()))
     {

@@ -72,9 +72,19 @@ db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
 //
     long found = False;
 
-    string query = "SELECT DEVICE_SERVER_CLASS, DEVICE_SERVER_NAME, HOSTNAME, PROGRAM_NUMBER,";
-    query += ("VERSION_NUMBER, DEVICE_CLASS, PROCESS_ID, PROCESS_NAME FROM NAMES");
-    query += (" WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + user_device + "'"); 
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "SELECT SUBSTRING_INDEX(server,'/',1), SUBSTRING_INDEX(server,'/',-1), host, ior,";
+        query += ("version, class, pid, SUBSTRING_INDEX(server,'/',1), exported FROM device");
+        query += (" WHERE CONCAT(domain, '/', family, '/', member) = '" + user_device + "'"); 
+    }
+    else
+    {
+        query = "SELECT DEVICE_SERVER_CLASS, DEVICE_SERVER_NAME, HOSTNAME, PROGRAM_NUMBER,";
+        query += ("VERSION_NUMBER, DEVICE_CLASS, PROCESS_ID, PROCESS_NAME FROM NAMES");
+        query += (" WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + user_device + "'"); 
+    }
     if (mysql_query(mysql_conn, query.c_str()) == 0)
     {
 	MYSQL_RES *result = mysql_store_result(mysql_conn);
@@ -82,15 +92,35 @@ db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
 	if((row = mysql_fetch_row(result)) != NULL)
 	{
 	    sent_back.device_type = DB_Device;				
-	    strcpy(sent_back.server_name, row[0]);
-	    strcpy(sent_back.personal_name, row[1]);
-	    strcpy(sent_back.host_name, row[2]);
-	    sent_back.program_num = atoi(row[3]);
-	    sent_back.server_version = atoi(row[4]);
-	    strcpy(sent_back.device_class, row[5]);
-	    sent_back.pid = atoi(row[6]);
-	    strcpy(sent_back.process_name, row[7]);
-	    sent_back.device_exported = (sent_back.program_num != 0 || sent_back.server_version != 0); 
+	    if (row[0] != NULL) strcpy(sent_back.server_name, row[0]);
+	    if (row[1] != NULL) strcpy(sent_back.personal_name, row[1]);
+	    if (row[2] != NULL) strcpy(sent_back.host_name, row[2]);
+	    if (mysql_db == "tango")
+	    {
+		if (row[3] != NULL)
+		{
+                    string ior(row[3]);
+                    string pgm_no;
+		    pgm_no = ior.substr(ior.rfind(':')+1);
+                    sent_back.program_num = atoi(pgm_no.c_str());         
+		}
+	    }
+	    else
+	    {
+	        sent_back.program_num = atoi(row[3]);
+	    }
+	    if (row[4] != NULL) sent_back.server_version = atoi(row[4]);
+	    if (row[5] != NULL) strcpy(sent_back.device_class, row[5]);
+	    if (row[6] != NULL) sent_back.pid = atoi(row[6]);
+	    if (row[7] != NULL) strcpy(sent_back.process_name, row[7]);
+	    if (mysql_db == "tango")
+	    {
+	        if (row[8] != NULL) sent_back.device_exported = atoi(row[8]);
+	    }
+	    else
+	    {
+	        sent_back.device_exported = (sent_back.program_num != 0 || sent_back.server_version != 0); 
+	    }
 	}
 	else
 	{
@@ -98,36 +128,39 @@ db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
 // If device not found in the NAMES table, search for it in the PS_NAMES table
 //
 	    mysql_free_result(result);
-	    query = "SELECT HOST, PROCESS_ID FROM PS_NAMES";
-    	    query += (" WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + user_device + "'"); 
-    	    if (mysql_query(mysql_conn, query.c_str()) == 0)
-    	    {
-		result = mysql_store_result(mysql_conn);
-		if((row = mysql_fetch_row(result)) != NULL)
-		{
-    		    sent_back.device_type = DB_Pseudo_Device;
-	    	    *sent_back.server_name = '\0';
-	    	    *sent_back.personal_name = '\0';
-	    	    *sent_back.host_name = '\0';
-	    	    sent_back.program_num = 0;
-	    	    sent_back.server_version = 0;
-	    	    *sent_back.device_class = '\0';
-	    	    sent_back.pid = atoi(row[1]);
-	    	    *sent_back.process_name = '\0';
-	    	    sent_back.device_exported = False;
-		}
+	    if (mysql_db != "tango")
+	    {
+	        query = "SELECT HOST, PROCESS_ID FROM PS_NAMES";
+    	        query += (" WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + user_device + "'"); 
+    	        if (mysql_query(mysql_conn, query.c_str()) == 0)
+    	        {
+		    result = mysql_store_result(mysql_conn);
+		    if((row = mysql_fetch_row(result)) != NULL)
+		    {
+    		        sent_back.device_type = DB_Pseudo_Device;
+	    	        *sent_back.server_name = '\0';
+	    	        *sent_back.personal_name = '\0';
+	    	        *sent_back.host_name = '\0';
+	    	        sent_back.program_num = 0;
+	    	        sent_back.server_version = 0;
+	    	        *sent_back.device_class = '\0';
+	    	        sent_back.pid = atoi(row[1]);
+	    	        *sent_back.process_name = '\0';
+	    	        sent_back.device_exported = False;
+		    }
 //
 // Return error if the device is not found
 //
-   		else 
-    		{
-		    sent_back.db_err = DbErr_DeviceNotDefined;
-		    return(&sent_back);
-    		}
+   		    else 
+    		    {
+		        sent_back.db_err = DbErr_DeviceNotDefined;
+		        return(&sent_back);
+    		    }
+                }
 	    }
 	    else
 	    {		
-	    	sent_back.db_err = DbErr_DatabaseAccess;
+	    	sent_back.db_err = DbErr_DeviceNotDefined;
 	    	return(&sent_back);
 	    }
 	}
@@ -171,6 +204,8 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 			r_name;
     string::size_type 	pos;
 	
+    res_list_dev.clear();
+
 #ifdef DEBUG
     cout << "In devres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << endl;
     for (long i = 0; i < recev->res_val.arr1_len; i++)
@@ -209,9 +244,20 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 // which is 1 for all new resource
 //
 
-	string query = "SELECT DOMAIN, FAMILY, MEMBER, NAME, INDEX_RES, RESVAL FROM RESOURCE WHERE ";
-	query += (" CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + in_dev);
-	query += ( + "' ORDER BY DOMAIN ASC, FAMILY ASC, MEMBER ASC, NAME ASC, INDEX_RES ASC");
+	string query;
+
+	if (mysql_db == "tango")
+	{
+	    query = "SELECT domain, family, member, name, count, value FROM property_device WHERE ";
+	    query += (" device = '" + in_dev);
+	    query += ( + "' ORDER BY domain ASC, family ASC, member ASC, name ASC, count ASC");
+	}
+	else
+	{
+	    query = "SELECT DOMAIN, FAMILY, MEMBER, NAME, INDEX_RES, RESVAL FROM RESOURCE WHERE ";
+	    query += (" CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + in_dev);
+	    query += ( + "' ORDER BY DOMAIN ASC, FAMILY ASC, MEMBER ASC, NAME ASC, INDEX_RES ASC");
+	}
 //
 // Get resource value for each element in the tmp_res_list list 
 //
@@ -326,8 +372,17 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
 //
 // Search for device name in the NAMES table
 //
-    string query = "SELECT DEVICE_SERVER_CLASS, DEVICE_SERVER_NAME, INDEX_RES FROM NAMES ",
-    	   where = "WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + user_device + "'";   
+    string query, where;
+    if (mysql_db == "tango")
+    {
+        query = "SELECT class, server FROM device ",
+        where = "WHERE CONCAT(domain, '/', family, '/', member) = '" + user_device + "'";   
+    }
+    else
+    {
+        query = "SELECT DEVICE_SERVER_CLASS, DEVICE_SERVER_NAME, INDEX_RES FROM NAMES ",
+        where = "WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + user_device + "'";   
+    }
     
     if (mysql_query(mysql_conn, (query + where).c_str()) != 0)
     {
@@ -345,7 +400,14 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
     		ind(row[2]);
 		
     	mysql_free_result(result);
-    	query = "DELETE FROM NAMES "; 
+	if (mysql_db == "tango")
+	{
+    	    query = "DELETE FROM device "; 
+	}
+	else
+	{
+    	    query = "DELETE FROM NAMES "; 
+	}
     	if (mysql_query(mysql_conn, (query + where).c_str()) != 0)
     	{
 	    cerr << mysql_error(mysql_conn) << endl;
@@ -356,14 +418,17 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
 // Update device server device list (decrement all device index in device list
 // for all devices above the deleted one)
 //
-    	query = "UPDATE NAMES SET INDEX_RES = INDEX_RES - 1 WHERE DEVICE_SERVER_CLASS = '" + ds_name + "' AND ";
-    	query += ("DEVICE_SERVER_NAME = '" + ds_pers_name + "' AND INDEX_RES > " + ind);
-    	if (mysql_query(mysql_conn, query.c_str()) != 0)
-    	{
-	    cerr << mysql_error(mysql_conn) << endl;
-	    errcode = DbErr_DatabaseAccess;
-	    return (&errcode);
-	}
+	if (mysql_db != "tango")
+	{
+    	    query = "UPDATE NAMES SET INDEX_RES = INDEX_RES - 1 WHERE DEVICE_SERVER_CLASS = '" + ds_name + "' AND ";
+    	    query += ("DEVICE_SERVER_NAME = '" + ds_pers_name + "' AND INDEX_RES > " + ind);
+    	    if (mysql_query(mysql_conn, query.c_str()) != 0)
+    	    {
+	        cerr << mysql_error(mysql_conn) << endl;
+	        errcode = DbErr_DatabaseAccess;
+	        return (&errcode);
+	    }
+        }
     }
 //
 // If device not found in the NAMES table, search for it in the PS_NAMES table
@@ -371,21 +436,24 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
     else
     {
     	mysql_free_result(result);
-	query = "DELETE FROM PS_NAMES ";
-    	if (mysql_query(mysql_conn, (query + where).c_str()) != 0)
-    	{
-	    cerr << mysql_error(mysql_conn) << endl;
-	    errcode = DbErr_DatabaseAccess;
-	    return (&errcode);
-        }
+	if (mysql_db != "tango")
+	{
+	    query = "DELETE FROM PS_NAMES ";
+    	    if (mysql_query(mysql_conn, (query + where).c_str()) != 0)
+    	    {
+	        cerr << mysql_error(mysql_conn) << endl;
+	        errcode = DbErr_DatabaseAccess;
+	        return (&errcode);
+            }
 //
 // Return error if the device is not found
 //
-	if (mysql_affected_rows(mysql_conn) == 0)
-	{
-	    errcode = DbErr_DeviceNotDefined;
-	    return(&errcode);
-	}
+	    if (mysql_affected_rows(mysql_conn) == 0)
+	    {
+	        errcode = DbErr_DeviceNotDefined;
+	        return(&errcode);
+	    }
+        }
     }
 //
 // Return data
@@ -443,7 +511,15 @@ db_psdev_error *MySQLServer::devdelres_1_svc(db_res *recev)
 	    psdev_back.psdev_err = i;
 	    return(&psdev_back);
 	}
-	string query = "DELETE FROM RESOURCE WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + in_dev + "'";
+	string query;
+	if (mysql_db == "tango")
+	{
+	    query = "DELETE FROM property_device WHERE device = '" + in_dev + "'";
+	}
+	else
+	{
+	    query = "DELETE FROM RESOURCE WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + in_dev + "'";
+	}
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
 	    cerr << mysql_error(mysql_conn) << endl;
@@ -527,7 +603,15 @@ db_info_svc *MySQLServer::info_1_svc()
 //
 // First, count exported devices in the domains
 //
-    string query = "SELECT DOMAIN, COUNT(*) FROM NAMES WHERE PROGRAM_NUMBER != 0 GROUP BY DOMAIN";
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "SELECT domain, COUNT(*) FROM device WHERE exported != 0 GROUP BY domain";
+    }
+    else
+    {
+        query = "SELECT DOMAIN, COUNT(*) FROM NAMES WHERE PROGRAM_NUMBER != 0 GROUP BY DOMAIN";
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;
@@ -549,7 +633,14 @@ db_info_svc *MySQLServer::info_1_svc()
 //
 // And now,  count not exported devices in the domains
 //
-    query = "SELECT DOMAIN, COUNT(*) FROM NAMES WHERE PROGRAM_NUMBER = 0 GROUP BY DOMAIN";
+    if (mysql_db == "tango")
+    {
+        query = "SELECT domain, COUNT(*) FROM device WHERE exported = 0 GROUP BY domain";
+    }
+    else
+    {
+        query = "SELECT DOMAIN, COUNT(*) FROM NAMES WHERE PROGRAM_NUMBER = 0 GROUP BY DOMAIN";
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;
@@ -575,7 +666,14 @@ db_info_svc *MySQLServer::info_1_svc()
 //
 // Now, count pseudo_devices
 //
-    query = "SELECT COUNT(*) FROM PS_NAMES";
+    if (mysql_db == "tango")
+    {
+        query = "SELECT COUNT(*) FROM device where ior like 'DC:%'";
+    }
+    else
+    {
+        query = "SELECT COUNT(*) FROM PS_NAMES";
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     { 
 	cerr << mysql_error(mysql_conn) << endl;
@@ -589,7 +687,14 @@ db_info_svc *MySQLServer::info_1_svc()
 //
 // Then, count resources in each domain
 //
-    query = "SELECT DOMAIN, COUNT(*) FROM RESOURCE GROUP BY DOMAIN";
+    if (mysql_db == "tango")
+    {
+        query = "SELECT domain, COUNT(*) FROM property_device GROUP BY domain";
+    }
+    else
+    {
+        query = "SELECT DOMAIN, COUNT(*) FROM RESOURCE GROUP BY DOMAIN";
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;
@@ -684,8 +789,17 @@ long *MySQLServer::unreg_1_svc(db_res *recev)
 //
 // First, suppose that the ds_name is a PROCESS name
 //
-    string query = "SELECT DISTINCT DEVICE_SERVER_CLASS FROM NAMES";
-    query += (" WHERE PROCESS_NAME = '" + user_ds_name + "' AND DEVICE_SERVER_NAME = '" + user_pers_name + "'");
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "SELECT DISTINCT class FROM device";
+        query += (" WHERE server = '" + user_ds_name + "/" + user_pers_name + "'");
+    }
+    else
+    {
+        query = "SELECT DISTINCT DEVICE_SERVER_CLASS FROM NAMES";
+        query += (" WHERE PROCESS_NAME = '" + user_ds_name + "' AND DEVICE_SERVER_NAME = '" + user_pers_name + "'");
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;
@@ -711,9 +825,17 @@ long *MySQLServer::unreg_1_svc(db_res *recev)
 //
 // Unregister every devices for each ds name in the list
 //
-    query = "UPDATE NAMES SET HOSTNAME = 'not_exp', PROGRAM_NUMBER = 0, VERSION_NUMBER = 0, DEVICE_TYPE = 'unknown'";
-    query += (", DEVICE_CLASS = 'unknown', PROCESS_ID = 0, PROCESS_NAME = 'unknown' WHERE DEVICE_SERVER_CLASS IN (");
-    query += (class_list + ")");
+    if (mysql_db == "tango")
+    {
+        query = "UPDATE device SET exported = 0 WHERE class IN (";
+        query += (class_list + ")");
+    }
+    else
+    {
+        query = "UPDATE NAMES SET HOSTNAME = 'not_exp', PROGRAM_NUMBER = 0, VERSION_NUMBER = 0, DEVICE_TYPE = 'unknown'";
+        query += (", DEVICE_CLASS = 'unknown', PROCESS_ID = 0, PROCESS_NAME = 'unknown' WHERE DEVICE_SERVER_CLASS IN (");
+        query += (class_list + ")");
+    }
 
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
@@ -768,7 +890,7 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
     string 		user_ds_name(recev->res_val.arr1_val[0]),
     			user_pers_name(recev->res_val.arr1_val[1]);
 		
-#ifdef debug
+#ifdef DEBUG
     cout << "in svcinfo_1_svc function for " << user_ds_name << "/" << user_pers_name << endl;
 #endif
 	
@@ -808,8 +930,17 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 //
 // First, suppose that the ds_name is a PROCESS name
 //
-    string query = "SELECT DISTINCT DEVICE_SERVER_CLASS FROM NAMES";
-    query += (" WHERE DEVICE_SERVER_NAME = '" + user_pers_name + "' AND PROCESS_NAME = '" + user_ds_name + "'");
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "SELECT DISTINCT class FROM device";
+        query += (" WHERE server = '" + user_ds_name + "/" + user_pers_name + "'");
+    }
+    else
+    {
+        query = "SELECT DISTINCT DEVICE_SERVER_CLASS FROM NAMES";
+        query += (" WHERE DEVICE_SERVER_NAME = '" + user_pers_name + "' AND PROCESS_NAME = '" + user_ds_name + "'");
+    }
 
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
@@ -842,9 +973,18 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 //
 // Get all device for each class in the list
 //
-    query = "SELECT DEVICE_SERVER_CLASS, CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER), HOSTNAME, PROGRAM_NUMBER, VERSION_NUMBER, ";
-    query += ("PROCESS_ID, PROCESS_NAME FROM NAMES WHERE ");
-    query += ("DEVICE_SERVER_CLASS IN (" + class_list + ") AND DEVICE_SERVER_NAME = '" + user_pers_name + "'");
+    if (mysql_db == "tango")
+    {
+        query = "SELECT SUBSTRING_INDEX(server,'/',1), CONCAT(domain, '/', family, '/', member), host, ior, exported, ";
+        query += ("pid, server FROM device WHERE ");
+        query += ("class IN (" + class_list + ") AND server LIKE '%/" + user_pers_name + "'");
+    }
+    else
+    {
+        query = "SELECT DEVICE_SERVER_CLASS, CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER), HOSTNAME, PROGRAM_NUMBER, VERSION_NUMBER, ";
+        query += ("PROCESS_ID, PROCESS_NAME FROM NAMES WHERE ");
+        query += ("DEVICE_SERVER_CLASS IN (" + class_list + ") AND DEVICE_SERVER_NAME = '" + user_pers_name + "'");
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;
@@ -877,10 +1017,30 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 	    svcinfo_back.embedded_val[i].server_name = NULL;
 	    svcinfo_back.embedded_val[i].dev_val = NULL;
 	}
-   	strcpy(svcinfo_back.host_name, row[2]);
-	strcpy(svcinfo_back.process_name, row[6]);
-  	svcinfo_back.pid = atoi(row[5]);
-   	svcinfo_back.program_num = atoi(row[3]);
+   	if (row[2] != NULL) strcpy(svcinfo_back.host_name, row[2]);
+	if (mysql_db == "tango")
+	{
+	    if (row[0] != NULL) strcpy(svcinfo_back.process_name, row[0]);
+	}
+	else
+	{
+	    if (row[6] != NULL) strcpy(svcinfo_back.process_name, row[6]);
+	}
+  	if (row[5] != NULL) svcinfo_back.pid = atoi(row[5]);
+        if (mysql_db == "tango")
+        {
+	    if (row[3] != NULL)
+	    {
+                string ior(row[3]);
+                string pgm_no;
+                pgm_no = ior.substr(ior.rfind(':')+1);
+                svcinfo_back.program_num = atoi(pgm_no.c_str());
+            }
+        }
+        else
+        {
+   	    svcinfo_back.program_num = atoi(row[3]);
+        }
 	long i = 0;
         dev_list.clear();
 	do
@@ -910,7 +1070,14 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 	    }
 	    SvcDev	dev;
 	    dev.name = row[1];
-	    dev.flag = (atoi(row[3]) && atoi(row[4]));
+	    if (mysql_db == "tango")
+	    {
+	        if (row[4] != NULL) dev.flag = atoi(row[4]);
+	    }
+	    else
+	    {
+	        dev.flag = (atoi(row[3]) && atoi(row[4]));
+	    }
 	    dev_list.push_back(dev);	    
     	}while ((row = mysql_fetch_row(result)) != NULL);
 	dev_length = dev_list.size();
@@ -981,8 +1148,16 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
 //
 // First, suppose that the ds_name is a PROCESS name
 //
-    string query = "SELECT DISTINCT DEVICE_SERVER_CLASS FROM NAMES WHERE DEVICE_SERVER_NAME = '" + user_pers_name + "'";
-    query += (" AND PROCESS_NAME = '" + user_ds_name + "'");
+    string query;
+    if (mysql_db == "tango")
+    {
+        query = "SELECT DISTINCT class FROM device WHERE server = '" + user_ds_name + "/" + user_pers_name;
+    }
+    else
+    {
+        query = "SELECT DISTINCT DEVICE_SERVER_CLASS FROM NAMES WHERE DEVICE_SERVER_NAME = '" + user_pers_name + "'";
+        query += (" AND PROCESS_NAME = '" + user_ds_name + "'");
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;
@@ -1006,7 +1181,14 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
 //
     if (class_list.empty())
 	class_list = "'" + user_ds_name + "'";
-    query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM NAMES WHERE DEVICE_SERVER_CLASS IN (" + class_list + ")";
+    if (mysql_db == "tango")
+    {
+        query = "SELECT CONCAT(domain, '/', family, '/', member) FROM device WHERE class IN (" + class_list + ")";
+    }
+    else
+    {
+        query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM NAMES WHERE DEVICE_SERVER_CLASS IN (" + class_list + ")";
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;
@@ -1031,17 +1213,34 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
 //
 // Delete every resource for all devices in the ds name list
 //
-    query = "DELETE FROM RESOURCE WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) IN (" + dev_list + ")";
-    if (mysql_query(mysql_conn, query.c_str()) != 0)
+    if (mysql_db != "tango")
     {
-	cerr << mysql_error(mysql_conn) << endl;
-	errcode = DbErr_DatabaseAccess;
-	return (&errcode);
+	if (mysql_db == "tango")
+	{
+	    query = "DELETE FROM property_device WHERE device IN (" + dev_list + ")";
+	}
+	else
+	{
+            query = "DELETE FROM RESOURCE WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) IN (" + dev_list + ")";
+	}
+        if (mysql_query(mysql_conn, query.c_str()) != 0)
+        {
+	    cerr << mysql_error(mysql_conn) << endl;
+	    errcode = DbErr_DatabaseAccess;
+	    return (&errcode);
+        }
     }
 //
 // Delete every devices for each ds name in the list
 //
-    query = "DELETE FROM NAMES WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) IN (" + dev_list + ")"; 
+    if (mysql_db == "tango")
+    {
+        query = "DELETE FROM device WHERE CONCAT(domain, '/', family, '/', member) IN (" + dev_list + ")"; 
+    }
+    else
+    {
+        query = "DELETE FROM NAMES WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) IN (" + dev_list + ")"; 
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;
@@ -1132,8 +1331,18 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
 //
 // Search for a resource "ud_poll_list" with its value set to caller device name
 //
-    string query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM RESOURCE WHERE DOMAIN = 'sys' AND";
-    query += ("NAME = '" + string(POLL_RES) + "' AND UPPER(RESVAL) = UPPER('" + user_device + "')");
+    string query;
+
+    if (mysql_db == "tango")
+    {
+        query = "SELECT device FROM property_device WHERE domain = 'sys' AND";
+        query += ("name = '" + string(POLL_RES) + "' AND UPPER(value) = UPPER('" + user_device + "')");
+    }
+    else
+    {
+        query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM RESOURCE WHERE DOMAIN = 'sys' AND";
+        query += ("NAME = '" + string(POLL_RES) + "' AND UPPER(RESVAL) = UPPER('" + user_device + "')");
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	cerr << mysql_error(mysql_conn) << endl;

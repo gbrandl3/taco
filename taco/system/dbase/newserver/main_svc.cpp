@@ -146,7 +146,8 @@ int main(int argc,char **argv)
 			    dbm = new NdbmServer("", "", "");
 #ifdef HAVE_MYSQL_MYSQL_H
 			else if (string(optarg) == "mysql")
-    			    dbm = new MySQLServer("jkrueger", "jkrueger", "TACO");
+    			    //dbm = new MySQLServer("jkrueger", "jkrueger", "TACO");
+    			    dbm = new MySQLServer("root", "", argv[optind]);
 #endif
 			else
 			    usage(*argv);

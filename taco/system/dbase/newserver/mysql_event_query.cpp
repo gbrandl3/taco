@@ -63,8 +63,18 @@ event_que *MySQLServer::db_event_query_1_svc(nam *pevent_name)
 // Try to retrieve a resource in the EVENTS table with a resource value equal
 // to the command name 
 //
-    string query = "SELECT FAMILY, MEMBER, NAME FROM RESOURCE WHERE ";
-    query += ("DOMAIN = 'events' AND RESVAL = '" + event_str + "'");
+    string query;
+
+    if (mysql_db == "tango")
+    {
+    	query = "SELECT family, member, name FROM property_device WHERE ";
+    	query += ("domain = 'events' AND value = '" + event_str + "'");
+    }
+    else
+    {
+    	query = "SELECT FAMILY, MEMBER, NAME FROM RESOURCE WHERE ";
+    	query += ("DOMAIN = 'events' AND RESVAL = '" + event_str + "'");
+    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	event_queue.db_err = DbErr_DatabaseAccess;

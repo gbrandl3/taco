@@ -457,8 +457,8 @@ int NdbmServer::db_devlist(const string dev_name, db_res * back)
     string		ds_name = dev_na.substr(pos + 1);
 
 #ifdef DEBUG
-    cout << "Device server class (getdevlist) : " << dev.ds_class << endl;
-    cout << "Device server name (getdevlist) : " << dev.ds_name << endl;
+    cout << "Device server class (getdevlist) : " << ds_class << endl;
+    cout << "Device server name (getdevlist) : " << ds_name << endl;
 #endif /* DEBUG */
 //
 // Try to retrieve the right tuple in NAMES table */
