@@ -13,9 +13,9 @@
 
  Original: 	January 1991
 
- Version:	$Revision: 1.14 $
+ Version:	$Revision: 1.15 $
 
- Date:		$Date: 2004-03-18 14:10:18 $
+ Date:		$Date: 2004-04-27 15:11:49 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -323,6 +323,10 @@ static	int	fd_devnull = -1;
 			kill (pid,SIGQUIT);
 		}
 	}
+#ifdef unix
+	sleep(2);
+#endif
+	
 /*
  *  Start the database server on a remote host, if the
  *  DBHOST environment variable is set and 
@@ -420,7 +424,10 @@ static	int	fd_devnull = -1;
 			kill (pid,SIGQUIT);
 		}
 	}
-
+	
+#ifdef unix
+	sleep(2);
+#endif
 /*
  *  startup message server
  */
