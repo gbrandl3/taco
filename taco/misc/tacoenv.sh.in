@@ -54,12 +54,12 @@ if test x"$TACO_LOGGING" = x"yes" -a ! -d $LOGPATH ; then
 	mkdir -p $LOGPATH
 fi
 
-if test ! -d $DSHOME/system/error ; then
-	mkdir -p $DSHOME/system/error
+if test ! -d $sbindir/system/error ; then
+	mkdir -p $sbindir/system/error
 fi
 
-if test ! -d $DSHOME/system/pipe ; then
-	mkdir -p $DSHOME/system/pipe
+if test ! -d $sbindir/system/pipe ; then
+	mkdir -p $sbindir/system/pipe
 fi
 
 LD_LIBRARY_PATH=@GCC_LIBRARY_PATH@:${LD_LIBRARY_PATH}
