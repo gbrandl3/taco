@@ -8,7 +8,7 @@ AC_DEFUN([PYTHON_PROG],
 	AC_ARG_WITH(python, AC_HELP_STRING([--with-python=pythondir], [use python installed in pythondir]),
 		[ac_python_dir=$withval], [ac_python_dir=$ac_cv_python])
  
-	AC_MSG_RESULT($ac_python_dir)
+dnl	AC_MSG_RESULT($ac_python_dir)
  
   	AC_CACHE_VAL(ac_cv_python_version, [ac_cv_python_version="$PYTHON_VERSION"])
 ])
@@ -30,7 +30,7 @@ AC_DEFUN([PYTHON_DEVEL],[
                 [python_includes="$withval"], [python_includes=""])
 
 	if test "x$ac_python_dir" != "xno"  ; then
-		AC_MSG_CHECKING([Python${ac_python_version} devel])
+		AC_MSG_NOTICE([checking for Python${ac_python_version} devel])
 dnl
 dnl Get the cflags and libraries
 dnl
@@ -75,13 +75,13 @@ dnl
 	  		if test -r $python_libdir/libpython${ac_python_version}.a; then
 				PYTHON_LDFLAGS="-L$python_libdir -lpython${ac_python_version} $LIBDL $LIBSOCKET"
 				taco_python_bindings=yes
+				AC_MSG_RESULT([build Python binding])
 			else
-				result="libpython${ac_python_version}.a not found."
+				AC_MSG_RESULT([libpython${ac_python_version}.a not found.])
  	 	    	fi
 		else
-	    	    	result="Python.h not found."
+	    	    	AC_MSG_RESULT([Python.h not found.])
 	  	fi
-		AC_MSG_RESULT($result)
  
 		AC_SUBST(PYTHON_CPPFLAGS)
 		AC_SUBST(PYTHON_LDFLAGS)
