@@ -15,7 +15,9 @@ rc_reset
 usage="Usage: $0 {start|stop|status|restart|new}"
 
 # Include TACO environment file
-taco_env_file="/etc/tacoenv.sh"
+prefix=${DSHOME:-@prefix@}
+exec_prefix=@exec_prefix@
+taco_env_file="@sysconfdir@/tacoenv.sh"
 if ! test -r "$taco_env_file" ; then
 	echo "error: TACO environment file '$taco_env_file' is missing"
 	exit 6
@@ -31,13 +33,15 @@ fi
 
 case $1 in
 	start)
-		if test ! \( -f "$DBM_DIR/names.pag" -o -f "$DBM_DIR/names" \) ; then
-			echo "Initialization of the database:"
-			if db_fillup 0 ; then
-				rc_status -v
-			else
-				rc_status -v
-				rc_exit
+		if test ${TACO_DATABASE:-dbm} = dbm ; then
+			if test ! \( -f "$DBM_DIR/names.pag" -o -f "$DBM_DIR/names" \) ; then
+				echo "Initialization of the database:"
+				if db_fillup 0 ; then
+					rc_status -v
+				else
+					rc_status -v
+					rc_exit
+				fi
 			fi
 		fi
 		if test "x$TACO_LOGGING" = xyes ; then 
@@ -47,8 +51,9 @@ case $1 in
 			sec_text="in secure mode"
 			security="-security"
 		fi
+		dbase="-${TACO_DATABASE:-dbm}"
 		echo -n "Starting TACO services $sec_text"
-		startproc -s -q "$taco_manager" $log $security
+		startproc -s -q "$taco_manager" $dbase $log $security
 		rc_status -v
 		;;
 	stop)
@@ -67,14 +72,16 @@ case $1 in
 		rc_status -v
 		;;
 	new)
-		echo -n "Do you really want to delete the complete TACO database (not the resource files)? (yes/no): "
-		read
-		if test "x$REPLY" = xyes ; then
-			rm -i "$DBM_DIR"/*
-			$0 restart
-			rc_status
-		else
-			rc_failed
+		if ${TACO_DATABASE:-dbm} = dbm ; then
+			echo -n "Do you really want to delete the complete TACO database (not the resource files)? (yes/no): "
+			read
+			if test "x$REPLY" = xyes ; then
+				rm -f "$DBM_DIR"/*
+				$0 restart
+				rc_status
+			else
+				rc_failed
+			fi
 		fi
 		;;
 	*)

@@ -29,14 +29,16 @@ environ()
 dbase()
 {
   	# fill the database if there are no
-  	# database files present (names.pag)
+  	# database files present (names)
 
-  	if [ ! -r $DBM_DIR/names ]  
-  	then
-      		echo "calling db_fillup to fill database"
-      		db_fillup 0
-      		echo "dbm database fillup done"
-  	fi
+	if test "${TACO_DATABASE:-dbm}" = "dbm" ; then
+	  	if [ ! -r $DBM_DIR/names ]  
+	  	then
+	      		echo "calling db_fillup to fill database"
+	      		db_fillup 0
+	      		echo "dbm database fillup done"
+	  	fi
+	fi
 }
 
 manager()
@@ -59,7 +61,7 @@ manager()
 # now start the Manager 
     	echo "starting the Manager ..."
     	Manager $taco_manager_flags 
-	sleep 1
+	sleep 5
     	echo "Manager started"
 }
 
