@@ -21,13 +21,13 @@
 		calls and D_EVENT_TYPE for asynchronous events.
 
  Author(s)  :	Andy Goetz
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original   :	January 1997
 
- Version:	$Revision: 1.14 $
+ Version:	$Revision: 1.15 $
 
- Date:		$Date: 2004-06-02 16:36:13 $
+ Date:		$Date: 2004-11-25 19:40:39 $
 
  Copyright (c) 1997-2000 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -1286,12 +1286,12 @@ long asynch_server_import(devserver ds, long *error)
 			return(DS_NOTOK);
 		}
 /*
- * set timeout to asynchronous import timeout. this value can be changed
- * by the client using the dev_import_timeout() so that when the 
- * client imports the server it does not wait too long.
+ * DO NOT set timeout to the import timeout. Otherwise the client will
+ * timeout this amount of time. The asynchronous import is a one-way call. 
+ * The timeout must be set to zero for it to work correctly.
  */
-		clnt_control(asynch_clnt_tcp, CLSET_RETRY_TIMEOUT, (char*)&import_retry_timeout);
-		clnt_control(asynch_clnt_tcp, CLSET_TIMEOUT, (char*)&import_timeout);
+		clnt_control(asynch_clnt_tcp, CLSET_RETRY_TIMEOUT, (char*)&zero_timeout);
+		clnt_control(asynch_clnt_tcp, CLSET_TIMEOUT, (char*)&zero_timeout);
 /*
  * prepare arguments for dev_import
  */
