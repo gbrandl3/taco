@@ -1,39 +1,260 @@
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango_api.cpp,v 1.4 2004-11-25 19:05:31 andy_gotz Exp $";
 /*+*******************************************************************
- *
- * File       :	tango_api.c
- *
- * Project    :	Interfacing TACO (based on SUN/RPC) to TANGO (based on CORBA)
- *
- * Description:	TACO to TANGO Application Programmer's Interface
- *
- *		Source code to implement the taco interface to tango via
- *		the Device Server C API (DSAPI) using the TANGO C++ interface. 
- *		This means it will be possible to use the TACO dev_putget() 
- *		call from TACO programs which have been linked with C++
- *		to talk to TANGO device servers.
- *	
- * Author(s)  :	Andy Goetz
- *		$Author: jkrueger1 $
- *
- * Original   :	December 1999
- *
- * Version    :	$Revision: 1.3 $
- *
- * Date	      : $Date: 2004-03-09 17:02:49 $
- *
- * Copyleft (c) 1999 by European Synchrotron Radiation Facility,
- *                      Grenoble, France
- *
- *********************************************************************-*/
+
+ File       :	tango_api.c
+
+ Project    :	Interfacing TACO (based on SUN/RPC) to TANGO (based on CORBA)
+
+ Description:	TACO to TANGO Application Programmer's Interface
+
+		Source code to implement the taco interface to tango via
+		the Device Server C API (DSAPI) using the TANGO C++ interface. 
+		This means it will be possible to use the TACO dev_putget() 
+		call from TACO programs which have been linked with C++
+		to talk to TANGO device servers.
+	
+ Author(s)  :	Andy Goetz
+
+ Original   :	December 1999
+
+ $Revision: 1.4 $
+ $Date: 2004-11-25 19:05:31 $
+
+ $Author: andy_gotz $
+
+ $Log: not supported by cvs2svn $
+ Revision 8.82  2004/10/26 11:05:29  goetz
+ patched rpc_check_host for suse72
+
+ Revision 8.81  2004/09/13 10:43:57  pons
+ Minor fix in tango_api.cpp:get_cmd_value()
+
+ Revision 8.80  2004/09/10 17:05:27  pons
+ Added taco/tango command mapping
+
+// Revision 8.79  2004/08/04  08:51:04  08:51:04  pons (Jean-Luc Pons)
+// Added support D_VAR_CHARARR in tango_api
+// 
+// Revision 8.78  2004/03/24  06:29:04  06:29:04  kimdon (David Kimdon)
+// make it possible for C++ device servers to use only libdsapi++
+// 
+// Revision 8.77  2004/01/20  14:22:56  14:22:56  pons (Jean-Luc Pons)
+// fixed a bug in rpc_check_host()
+// 
+ Revision 8.76  2004/01/13 14:29:32  meyer
+ Bug correction in dev_put_asyn() and TACO initialisation even for TANGO usage!
+
+ Revision 8.75  2003/11/26 09:35:01  verdier
+ just a little mistake....
+
+ Revision 8.74  2003/11/26 09:19:56  verdier
+ Array attribute added in query cmd
+
+ Revision 8.73  2003/11/26 09:02:42  goetz
+ changed rpc_check_host() algorithm for Solaris; intermediate checkin for Verdier
+
+ Revision 8.72  2003/10/23 11:48:02  goetz
+ added support for spectrum attributes
+
+ Revision 8.70  2003/08/06 18:16:14  goetz
+ include errno.h in API.h
+
+ Revision 8.69  2003/06/30 11:21:34  goetz
+ tango command numbers for taco are auto-generated if they are not defined in the kernel nor database
+
+ Revision 8.68  2003/06/27 11:58:16  meyer
+ Bug corrections for attributes
+
+// Revision 8.67  2003/06/26  17:25:09  17:25:09  meyer (Jens Meyer)
+// Changed source for TANGO attribute reading to the device!
+// 
+// Revision 8.66  2003/06/12  08:45:40  08:45:40  meyer (Jens Meyer)
+// Case insensitve attribute access in attr_access.cpp
+// 
+// Revision 8.65  2003/05/14  13:34:21  13:34:21  goetz (Andy Goetz)
+// fixed bug with DevState and DevStatus commands for tango devices
+// 
+ Revision 8.64  2003/04/25 15:11:41  meyer
+ Corrected bugs in attr_access.cpp and MDSSignal_config.c
+
+ Revision 8.63  2003/04/23 14:52:01  goetz
+ set cmd_value to zero if not defined for TANGO devices
+
+ Revision 8.62  2003/04/23 14:40:42  goetz
+ fixed bug in mapping State and Status to DevState and DevStatus in tango_api.cpp
+
+ Revision 8.61  2003/04/22 19:30:55  goetz
+ ported toGNU 3.2 on Solaris
+
+ Revision 8.60  2003/02/24 08:28:29  meyer
+ Added DevStatus to attribute access
+
+ Revision 8.59  2003/02/11 08:45:52  goetz
+ fixed memory leak in tango_get_cmd_value()
+
+ Revision 8.58  2003/02/06 13:33:34  goetz
+ added header to cern_select
+
+// Revision 8.57  2003/02/05  20:08:22  20:08:22  goetz (Andy Goetz)
+// improved tango device management - made it dynamic, struct based, non vectorial
+// 
+ Revision 8.56  2003/02/05 13:36:46  goetz
+ modified to run multiple copies of the same device server on Windows; debug messages changed to dprintf() on Windows
+
+ Revision 8.55  2003/01/31 08:49:19  meyer
+ Added delete of DeviceProxy in tango_dev_import()
+
+ Revision 8.54  2002/11/26 17:35:30  meyer
+ First release of attribute interface
+
+ Revision 8.53  2002/11/21 06:39:24  goetz
+ removed include OB/Policies.h from tango_api.cpp
+
+ Revision 8.52  2002/11/15 14:42:54  goetz
+ added initialisation of tango_device[] to tango_db_import()
+
+ Revision 8.51  2002/11/13 22:02:50  goetz
+ modified tango_api for Solaris native CC
+
+ Revision 8.50  2002/10/30 17:47:46  meyer
+ First version with tanco/tango attribute interface
+
+// Revision 8.49  2002/10/14  10:29:52  10:29:52  goetz (Andy Goetz)
+// intermediate checkin so Jens can work; tango_api.cpp not finished
+// 
+ Revision 8.48  2002/09/04 12:55:52  goetz
+ changed char* to string for tango api in tango_api.cpp
+
+ Revision 8.47  2002/06/27 11:56:58  goetz
+ fixed bug in stateless import with database
+
+ Revision 8.46  2002/06/25 07:26:28  goetz
+ extended stateless import to host down and all rpc errors
+
+ Revision 8.45  2002/06/18 07:44:01  goetz
+ NFILE reduced to 100 for OS9
+
+ Revision 8.44  2002/06/11 17:32:31  goetz
+ fixed double declaration of i in tango_api.cpp
+
+ Revision 8.43  2002/06/10 12:09:37  goetz
+ added Tango::INIT state to tango_api.cpp
+
+ Revision 8.42  2002/05/30 15:11:42  goetz
+ ported to C++ on Windows
+
+ Revision 8.41  2002/04/14 13:06:59  goetz
+ ported -nodb option to Windows
+
+// Revision 8.40  2002/03/18  10:10:45  10:10:45  goetz (Andy Goetz)
+// removed ^M from files which were confusing Ultra C++ compiler
+// 
+// Revision 8.39  2002/03/18  05:48:50  05:48:50  goetz (Andy Goetz)
+// added tango_dev_free() and dev_error_clear(); error message in command_handler
+// 
+ Revision 8.38  2002/03/13 07:29:24  goetz
+ fixed bug initializing struct _devserver to zero; rpc_protocol=D_UDP
+
+ Revision 8.37  2002/03/11 14:20:18  goetz
+ initalise prog_number and config_flags to zero at startup
+
+ Revision 8.36  2002/03/07 15:58:44  goetz
+ fixed leak in extract_device_name
+
+ Revision 8.35  2002/03/06 22:08:42  goetz
+ made stateless import and reimport work for no database devices
+
+ Revision 8.34  2002/03/06 21:00:07  goetz
+ added -nodb option to device_server(); suppressed -m -s; improved dev_cmd_query
+
+ Revision 8.33  2002/03/05 11:52:47  goetz
+ added command name to C++ commands_list, asynchronous and events support -nodb
+
+ Revision 8.32  2002/03/03 22:44:53  goetz
+ added TACO-lite option i.e. no database
+
+ Revision 8.31  2002/02/28 12:13:05  goetz
+ setup_config() and setup_config_multi() now call rpc_nt_init() for Windows
+
+ Revision 8.30  2001/11/12 09:59:58  goetz
+ updated C port for Windows 95/98/NT using Visual C++ 6
+
+ Revision 8.29  2001/07/26 05:05:07  goetz
+ fixed error in CORBA::is_nil() test
+
+ Revision 8.28  2001/07/25 13:13:14  goetz
+ tango cmd_query in_name and out_name left NULL; desc replaces reason for errors
+
+ Revision 8.26  2001/04/10 14:24:33  goetz
+ set timeout on tango devices to 3 seconds
+
+ Revision 8.25  2001/03/20 11:56:37  goetz
+ DevCmdNameList searched before database for commands in tango_api.cpp
+
+ Revision 8.24  2001/03/10 16:38:18  goetz
+ ported tango_api to TANGO 2
+
+ Revision 8.23  2001/02/28 12:26:46  goetz
+ converted TANGO states to TACO states
+
+ Revision 8.22  2001/01/16 10:09:44  goetz
+ applied J.Quick's patch for security; removed stderr from DevServerMain.c
+
+// Revision 8.21  2001/01/15  11:36:36  11:36:36  goetz (Andy Goetz)
+// added check for ds == NULL in all dev_ api routines; changed ds__signal prototype
+// 
+ Revision 8.20  2001/01/08 12:08:26  goetz
+ added patch by B.Pedersen to support querying events
+
+ Revision 8.19  2000/12/11 12:06:38  goetz
+ fixed bugs with TANGO interface returning unsigned values and states
+
+ Revision 8.18  2000/11/12 13:24:01  goetz
+ added dynamic error handling; improved TANGO error treatment
+
+ Revision 8.17  1900/09/26 13:36:27  goetz
+ tango_dev_putget() and tango_dev_putget_raw() implement immediate reconnection
+
+// Revision 8.16  2000/09/25  14:50:12  14:50:12  goetz (Andy Goetz)
+// tango_api implements TANGO_HOST, stateless import and reimport
+// 
+// Revision 8.15  20/0./7.  1.:6.:9.  1.:6.:9.  goetz (Andy Goetz)
+// changed from tango database to host mysql, added support for float and double arrays
+// 
+// Revision 8.14  20/0./6.  2.:4.:0.  2.:4.:0.  goetz (Andy Goetz)
+// fixed bug in dev_event_listen() which caused server to crash
+// 
+// Revision 8.13  2000/06/02 21:56:42  goetz
+// _DEVICE_H now _TANGO_DEVICE_H in Device.H; (char*)taco_tango
+//
+// Revision 8.12  2000/06/02 15:58:01  goetz
+// dev_event_fire() now device specific; ported to SuSE V6.4
+//
+// Revision 8.11  2000/05/31 07:47:47  goetz
+// tango_api has local copies of argc and argv, ported to HP-UX
+//
+// Revision 8.10  2000/05/30  10:16:33  10:16:33  goetz (Andrew GOETZ)
+// tango_api.cpp now has same version as other DSAPI files (V8.10)
+// 
+// Revision 8.0  99/12/28  14:18:21  14:18:21  goetz (Andrew GOETZ)
+// added TANGO support for TACO dev_xxx() calls via -DTANGO for C++
+// 
+
+
+
+ Copyleft (c) 1999 by European Synchrotron Radiation Facility,
+                      Grenoble, France
+
+********************************************************************-*/
 
 #include <tango.h>
-#include <OB/CORBA.h> 
-
+//#include <OB/OBPolicies.h> 
+#define TANGO_API
 #include <API.h>
-#include <private/ApiP.h>
-#include <cstdio>
-#include <cassert>
-#include <iostream>
+#include <ApiP.h>
+#include <stdio.h>
+#include <assert.h>
+#include <iostream.h>
 #include <vector>
 #include <string>
 #ifdef linux
@@ -54,21 +275,26 @@ static long tango_dev_error_string(Tango::DevFailed tango_exception);
  * TANGO/CORBA globals with file scope
  */
 
-static CORBA::ORB 			*orb;
-static Tango::Database 			*tango_dbase;
-static long 				tango_dbase_init = 0;
+static CORBA::ORB *orb;
+static Tango::Database *tango_dbase;
+static long tango_dbase_init=0;
+/*
 typedef struct _tango_device {
 	long flag; 
-	std::vector<std::string> 	cmd_name;
-	std::vector<long> 		cmd_value;
-	std::vector<long> 		argin_type;
-	std::vector<long> 		argout_type;
-	Tango::Device_var 		object;
-	} _tango_device;
-static std::vector<_tango_device> 	tango_device;
-static long 				n_tango_device=0;
-static int 				tango_port = 10000;
-static char 				*tango_host_c_str = NULL;
+	vector<string> cmd_name;
+	vector<long> cmd_value;
+	vector<long> argin_type;
+	vector<long> argout_type;
+	Tango::Device_var object;} _tango_device;
+static vector<_tango_device> tango_device;
+ */
+#define MAX_TANGO_DEVICE 1000
+static _tango_device *tango_device=NULL;
+static int max_tango_device=0;
+static int tango_device_init=0;
+static long n_tango_device=0;
+static int tango_port=10000;
+static char *tango_host_c_str=NULL;
 
 /*
  * symbols used by TACO/TANGO interface
@@ -84,61 +310,33 @@ extern char *dev_error_string;
 #undef DevState
 #undef RUNNING
 
-/**
- * @defgroup tangoAPI TANGO API for TACO
- * @ingroup clientAPI
- */
+/*+**********************************************************************
+ Function   :   extern long tango_db_import()
 
-/**
- * @defgroup tangoAPIintern internal API for the TANGO API
- * @ingroup tangoAPI
- */
+ Description:   import TANGO database
 
-/**@ingroup tangoAPI
- * 
- * import TANGO database
- *
- * @param db_name name of the database
- * @param db_host database host
- * @param db_port database port
- * @param error	  contains the error code if function returns DS_NOTOK
- *
- * @return DS_OK or DS_NOTOK
- */
-long tango_db_import(char *db_name, char *db_host, long db_port, long *error)
+ Arg(s) In  :   char *db_name - name of the database
+            :   char *db_host - database host
+            :   long db_port  - database port
+
+ Arg(s) Out :   none
+
+ Return(s)  :   DS_OK or DS_NOTOK
+***********************************************************************-*/
+
+long tango_db_import(long *error)
 {
-	if (db_name == NULL) 
-	{
-		*error = DevErr_DbImportFailed;
-		return(DS_NOTOK);
-	}
+
 
 // Connect to TANGO database
-	try 
-	{
-//
-// create a CORBA orb manually. This is needed for the string_to_object 
-// call to connect to devices. This can be removed when the TANGO Device
-// api is used and all this CORBA stuff is hidden.
-//
-                int 		_argc;
-                char		**_argv;
-		std::string 	db_host_str(db_host);
- 
-// Pass dummy arguments to init() because we don't have access to
-// argc and argv
-                _argc = 1;
-                _argv = (char**)malloc(sizeof(char*));
-                _argv[0] = (char*)"taco_tango";
- 
-                orb = CORBA::ORB_init(_argc, _argv);                            
-	
-		tango_dbase = new Tango::Database(db_host_str, db_port, orb);
+
+	try {
+		tango_dbase = new Tango::Database();
 	}
-	catch (CORBA::Exception  &corba_exception) 
-	{
-		if (debug_flag & DBG_TANGO) 
-			Tango::Util::print_exception(corba_exception); 
+	catch (CORBA::Exception  &corba_exception) {
+#ifdef DEBUG
+		if (debug_flag & DBG_TANGO) Tango::Util::print_exception(corba_exception); 
+#endif
 		*error = DevErr_DbImportFailed;
 		return(DS_NOTOK);
 	}
@@ -151,53 +349,54 @@ long tango_db_import(char *db_name, char *db_host, long db_port, long *error)
 
 	tango_dbase_init = 1;
 
+	int i;
+
+	if (!tango_device_init)
+	{
+		if (tango_device == NULL)
+		{
+			tango_device = (_tango_device*)malloc(sizeof(_tango_device)*MAX_TANGO_DEVICE);
+		}
+		for (i=0; i< MAX_TANGO_DEVICE; i++)
+		{
+			tango_device[i].flag = TANGO_DEV_FREE;
+		}
+		max_tango_device = MAX_TANGO_DEVICE;
+		tango_device_init =1;
+	}
+
 	return(DS_OK);
 }
 
-/**@ingroup tangoAPI
- * import TANGO device
- *
- * @param dev_name name of device
- * @param access
- * @param ds_ptr
- * @param error	  contains the error code if function returns DS_NOTOK
- *
- * @return  DS_OK or DS_NOTOK
- */
+/*+**********************************************************************
+ Function   :   extern long tango_dev_import()
+
+ Description:   import TANGO device
+
+ Arg(s) In  :   char *dev_name - name of device
+
+ Arg(s) Out :   none
+
+ Return(s)  :   DS_OK or DS_NOTOK
+***********************************************************************-*/
+
 long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, long *error)
 {
-	_tango_device 	tango_device_tmp;
-	long 		tango_device_free;
+	_tango_device tango_device_tmp;
+	long tango_device_free;
+	long i;
 
 	if (!tango_dbase_init) 
 	{
 		try
 		{
-			char *tango_host_env_c_str = getenv("TANGO_HOST");
-			if (tango_host_env_c_str == NULL)
-			{
-				std::cout <<"TANGO_HOST environment variable not set, set it and retry (e.g. TANGO_HOST=tango:10000)" << std::endl;
-				return(DS_NOTOK);
-			}
-			std::string 		tango_host_env(tango_host_env_c_str);
-						tango_host;
-			std::string::size_type 	separator;
-			
-			separator = tango_host_env.find(":");
-			if (separator != std::string::npos)
-			{
-				tango_port = ::atoi((tango_host_env.substr(separator+1)).c_str());
-			}
-			tango_host = tango_host_env.substr(0,separator);
-			
-			tango_host_c_str = (char*)malloc(strlen(tango_host.c_str())+1);
-			strcpy(tango_host_c_str, tango_host.c_str());
-			tango_db_import("database", tango_host_c_str, tango_port,error);
+			tango_db_import(error);
         	}
 		catch (CORBA::Exception  &corba_exception)
 		{
-                	if (debug_flag & DBG_TANGO) 
-				Tango::Util::print_exception(corba_exception);
+#ifdef DEBUG
+                	if (debug_flag & DBG_TANGO) Tango::Util::print_exception(corba_exception);
+#endif
 			*error = DevErr_DbImportFailed;
                 	return(DS_NOTOK);
         	}
@@ -213,38 +412,9 @@ long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, long *erro
 
 	try 
 	{
-		Tango::DbDevImportInfo 	dev_info;
-		std::string 		dev_name_str(dev_name);
+		string dev_name_str(dev_name);
 
-		dev_info = tango_dbase->import_device(dev_name_str);
-
-//
-// device defined but not exported - case for stateless import
-//
-                if (dev_info.exported == 0)
-                {
-			if (dev_notimported_init(dev_name,access,0,ds_ptr,error) == DS_NOTOK)
-				return(DS_NOTOK);
-			(*ds_ptr)->ds_id = -1;
-			(*ds_ptr)->dev_access = access;
-			(*ds_ptr)->rpc_protocol = D_IIOP;
-                        return(DS_OK);
-                }
-                CORBA::Object_var obj = orb->string_to_object(dev_info.ior.c_str());
-                CORBA::PolicyList policy;
-                CORBA::Any any;
-                CORBA::Object_var policy_obj;
-		CORBA::ULong timeout=3000;
- 
-                policy.length(1);
- 
-                any <<= timeout;
- 
-// set timeout to 3 seconds
- 
-                policy[0] = orb->create_policy(OB::TIMEOUT_POLICY_ID,any);
-                policy_obj = obj->_set_policy_overrides(policy,CORBA::ADD_OVERRIDE);
-                tango_device_tmp.object = Tango::Device::_narrow(policy_obj);
+                tango_device_tmp.device_proxy = new Tango::DeviceProxy(dev_name_str);
                 tango_device_tmp.flag = TANGO_DEV_IMPORTED;
         }
 //
@@ -252,69 +422,104 @@ long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, long *erro
 //
         catch (CORBA::Exception  &corba_exception)
 	{
-                if (debug_flag & DBG_TANGO) 
-			Tango::Util::print_exception(corba_exception);
+#ifdef DEBUG
+                if (debug_flag & DBG_TANGO) Tango::Util::print_exception(corba_exception);
+#endif
 		*error = DevErr_DeviceOfThisNameNotServed;
                 return(DS_NOTOK);
-        }
-//
-// device defined but could not be narrowed - case for stateless import
-//
-        if (CORBA::is_nil(tango_device_tmp.object))
-        {
-		if (dev_notimported_init(dev_name,access,0,ds_ptr,error) == DS_NOTOK)
-			return(DS_NOTOK);
-                (*ds_ptr)->ds_id = -1;
-                (*ds_ptr)->rpc_protocol = D_IIOP;
-                return(DS_OK);
         }
 //
 // initialise command list for device
 //
 	try
 	{
-		Tango::DevCmdInfoList_var 	cmd_query = tango_device_tmp.object->command_list_query();
-		Tango::DevInfo_var 		dev_info = tango_device_tmp.object->info();
+		Tango::CommandInfoList *cmd_query = tango_device_tmp.device_proxy->command_list_query();
+		Tango::DeviceInfo dev_info = tango_device_tmp.device_proxy->info();
 
-		tango_device_tmp.cmd_name = std::vector<std::string>(cmd_query->length());
-		tango_device_tmp.cmd_value = std::vector<long>(cmd_query->length());
-		tango_device_tmp.argin_type = std::vector<long>(cmd_query->length());
-		tango_device_tmp.argout_type = std::vector<long>(cmd_query->length());
-		for (long i = 0;i < cmd_query->length();i++)
+		//tango_device_tmp.cmd_name = vector<string>(cmd_query->size());
+		tango_device_tmp.cmd_name = (char**)malloc(cmd_query->size()*sizeof(char*));
+		tango_device_tmp.n_cmds = cmd_query->size();
+		tango_device_tmp.cmd_value = (long*)malloc(cmd_query->size()*sizeof(long));
+		tango_device_tmp.argin_type = (long*)malloc(cmd_query->size()*sizeof(long));
+		tango_device_tmp.argout_type = (long*)malloc(cmd_query->size()*sizeof(long));
+/*
+ * the Solaris CC compiler does not support vector<long> as a member of a class array
+ * replace it with an array - andy 4nov02
+ *
+		tango_device_tmp.cmd_value = vector<long>(cmd_query->size());
+		tango_device_tmp.argin_type = vector<long>(cmd_query->size());
+		tango_device_tmp.argout_type = vector<long>(cmd_query->size());
+ */
+		for (i = 0;i < cmd_query->size();i++)
 		{
-			long error;
-			tango_device_tmp.cmd_name[i] = std::string((*cmd_query)[i].cmd_name);
-			get_cmd_value((char*)dev_info->dev_class,
-			              (char*)tango_device_tmp.cmd_name[i].c_str(),
-			              &tango_device_tmp.cmd_value[i],
+			long error, tango_cmd_value;
+			//tango_device_tmp.cmd_name[i] = string((*cmd_query)[i].cmd_name);
+//
+// map TANGO's "State" and "Status" commands into "DevState" and "DevStatus"
+// to make them compatible with TACO (on request of Laurent Farvacque)
+//
+// andy 08apr03
+//
+			if ((*cmd_query)[i].cmd_name == "State" || (*cmd_query)[i].cmd_name == "Status")
+			{
+				if ((*cmd_query)[i].cmd_name == "State")
+				{
+					tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevState")+1);
+					sprintf(tango_device_tmp.cmd_name[i],"DevState");
+				}
+				else
+				{
+					tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevStatus")+1);
+					sprintf(tango_device_tmp.cmd_name[i],"DevStatus");
+				}
+				
+			}
+			else
+			{
+				tango_device_tmp.cmd_name[i] = (char*)malloc(strlen((*cmd_query)[i].cmd_name.c_str())+1);
+				sprintf(tango_device_tmp.cmd_name[i],"%s",(*cmd_query)[i].cmd_name.c_str());
+			}
+			get_cmd_value((char*)dev_info.dev_class.c_str(),
+			              tango_device_tmp.cmd_name[i],
+			              &tango_cmd_value,
 			              &error);
+			tango_device_tmp.cmd_value[i] = tango_cmd_value;
 			tango_device_tmp.argin_type[i] = (*cmd_query)[i].in_type;
 			tango_device_tmp.argout_type[i] = (*cmd_query)[i].out_type;
 		}
+		delete cmd_query;
         	if ((*ds_ptr = (devserver)malloc(sizeof(struct _devserver))) == NULL)
         	{
                 	*error = DevErr_InsufficientMemory;
                 	return(DS_NOTOK);
         	}
 		tango_device_free = -1;
-		for (long i = 0; i < tango_device.size(); i++)
+		/*for (i = 0; i < tango_device.size(); i++)*/
+		for (i = 0; i < max_tango_device; i++)
+		{
 			if (tango_device[i].flag == TANGO_DEV_FREE)
+			{
 				tango_device_free = i;
+				break;
+			}
+		}
 		if (tango_device_free < 0)
 		{
-			tango_device.push_back(tango_device_tmp);
-			n_tango_device = tango_device.size() - 1;
+			tango_device = (_tango_device*)realloc(tango_device,sizeof(_tango_device)*(max_tango_device+MAX_TANGO_DEVICE));
+			for (i=max_tango_device;i<max_tango_device+MAX_TANGO_DEVICE;i++)
+			{
+				tango_device[i].flag = TANGO_DEV_FREE;
+			}
+			tango_device_free = max_tango_device;
+			max_tango_device = max_tango_device+MAX_TANGO_DEVICE;
 		}
-		else
-		{
-			tango_device[tango_device_free] = tango_device_tmp;
-			n_tango_device = tango_device_free;
-		}
-        	strncpy((*ds_ptr)->device_name, dev_name, sizeof((*ds_ptr)->device_name));
-        	strncpy((*ds_ptr)->device_class, dev_info->dev_class, sizeof((*ds_ptr)->device_class));
-        	strncpy((*ds_ptr)->device_type, "TANGO_Device", sizeof((*ds_ptr)->device_type));
-        	strncpy((*ds_ptr)->server_name, "Unknown", sizeof((*ds_ptr)->server_name));
-        	strncpy((*ds_ptr)->server_host, "Unknown", sizeof((*ds_ptr)->server_host));
+		tango_device[tango_device_free] = tango_device_tmp;
+		n_tango_device = tango_device_free;
+        	sprintf((*ds_ptr)->device_name,"%s",dev_name);
+        	sprintf((*ds_ptr)->device_class,"%s",(char*)dev_info.dev_class.c_str());
+        	sprintf((*ds_ptr)->device_type,"TANGO_Device");
+        	sprintf((*ds_ptr)->server_name,"Unknown");
+        	sprintf((*ds_ptr)->server_host,"Unknown");
         	(*ds_ptr)->clnt             = NULL;
         	(*ds_ptr)->ds_id            = n_tango_device;
         	(*ds_ptr)->no_svr_conn      = 0;
@@ -324,67 +529,84 @@ long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, long *erro
         	(*ds_ptr)->rpc_protocol     = D_IIOP;
         	(*ds_ptr)->rpc_timeout.tv_sec  = 0;
         	(*ds_ptr)->rpc_timeout.tv_usec = 0;
+
 	}
         catch (CORBA::Exception  &corba_exception)
         {
-                if (debug_flag & DBG_TANGO) 
-			Tango::Util::print_exception(e);
+#ifdef DEBUG
+                if (debug_flag & DBG_TANGO) Tango::Util::print_exception(e);
+#endif
 //
 // device command query failed - case for stateless import
 // 
-                if (dev_notimported_init(dev_name,access,0,ds_ptr,error) == DS_NOTOK)
-			return(DS_NOTOK);
+                if (dev_notimported_init(dev_name,access,0,ds_ptr,error) == DS_NOTOK)                                return(DS_NOTOK);
                 (*ds_ptr)->ds_id = -1;
                 (*ds_ptr)->rpc_protocol = D_IIOP; 
                 return(DS_OK);
         }
 	n_tango_device++;
 
-	return(DS_OK);
+	return(0);
 }
 
-/**@ingroup tangoAPI
- * free a TANGO device
- * 
- * @param ds  device server structure
- * @param error	  contains the error code if function returns DS_NOTOK
- *
- * @return DS_OK 
- */
+/*+**********************************************************************
+ Function   :   extern long tango_dev_free()
+
+ Description:   free a TANGO device
+
+ Arg(s) In  :   devserver ds  - device server structure
+
+ Arg(s) Out :   none
+
+ Return(s)  :   DS_OK or DS_NOTOK
+***********************************************************************-*/
+
 long tango_dev_free(devserver ds, long *error)
 {
-//	_tango_device tango_device_tmp;
-
-//	delete tango_device[ds->ds_id].cmd_name;
-//	delete tango_device[ds->ds_id].cmd_value;
-//	delete tango_device[ds->ds_id].argin_type;
-//	delete tango_device[ds->ds_id].argout_type;
-	tango_device[ds->ds_id].flag = TANGO_DEV_FREE;
+	if (ds->ds_id != -1)
+	{
+		for (int i=0; i<tango_device[ds->ds_id].n_cmds; i++)
+		{
+			free(tango_device[ds->ds_id].cmd_name[i]);
+		}
+		free(tango_device[ds->ds_id].cmd_name);
+		free(tango_device[ds->ds_id].cmd_value);
+		free(tango_device[ds->ds_id].argin_type);
+		free(tango_device[ds->ds_id].argout_type);
+		tango_device[ds->ds_id].flag = TANGO_DEV_FREE;
+		delete (tango_device[ds->ds_id].device_proxy);
+	}
 	free(ds);
 
-	return(DS_OK);
+	return(0);
 }
 
-/**@ingroup tangoAPI
- * reimport TANGO device
- *
- * @param ds  device server structure
- * @param error	  contains the error code if function returns DS_NOTOK
- *
- * @return DS_OK or DS_NOTOK
- */
+/*+**********************************************************************
+ Function   :   extern long tango_dev_reimport()
+
+ Description:   reimport TANGO device
+
+ Arg(s) In  :   char *dev_name - name of device
+
+ Arg(s) Out :   none
+
+ Return(s)  :   DS_OK or DS_NOTOK
+***********************************************************************-*/
+
 long tango_dev_reimport(devserver ds, long *error)
 {
+
 	if (!tango_dbase_init) 
 	{
 		try
 		{
-			tango_db_import("database",tango_host_c_str, tango_port,error);
+			tango_db_import(error);
         	}
 		catch (CORBA::Exception  &corba_exception)
 		{
-                	if (debug_flag & DBG_TANGO) 
-				Tango::Util::print_exception(corba_exception);
+#ifdef DEBUG
+                	if (debug_flag & DBG_TANGO) Tango::Util::print_exception(corba_exception);
+#endif
 			*error = DevErr_DbImportFailed;
                 	return(DS_NOTOK);
         	}
@@ -394,85 +616,80 @@ long tango_dev_reimport(devserver ds, long *error)
 
 	try 
 	{
-		Tango::DbDevImportInfo 	dev_info;
-		std::string 		device_name_str(ds->device_name);
+		string device_name_str(ds->device_name);
 
-                dev_info = tango_dbase->import_device(device_name_str);
-
-                if (dev_info.exported == 0)
-                {
-			*error = DevErr_BadServerConnection;
-                        return(DS_NOTOK);
-                }
-                CORBA::Object_var obj = orb->string_to_object(dev_info.ior.c_str());
-
-        	CORBA::PolicyList policy;
-        	CORBA::Any any;
-        	CORBA::Object_var policy_obj;
- 		CORBA::ULong timeout=3000;
- 
-        	policy.length(1);
-	 
-        	any <<= timeout;
- 
-// set timeout to 3 seconds
-
-        	policy[0] = orb->create_policy(OB::TIMEOUT_POLICY_ID,any);
-        	policy_obj = obj->_set_policy_overrides(policy,CORBA::ADD_OVERRIDE);
-                tango_device[ds->ds_id].object = Tango::Device::_narrow(policy_obj);
+                tango_device[ds->ds_id].device_proxy = new Tango::DeviceProxy(device_name_str);
                 tango_device[ds->ds_id].flag = TANGO_DEV_IMPORTED;
         }
         catch (CORBA::Exception  &corba_exception)
 	{
-                if (debug_flag & DBG_TANGO) 
-			Tango::Util::print_exception(corba_exception);
+#ifdef DEBUG
+                if (debug_flag & DBG_TANGO) Tango::Util::print_exception(corba_exception);
+#endif
 		*error = DevErr_BadServerConnection;
                 return(DS_NOTOK);
         }
 
-        if (CORBA::is_nil(tango_device[ds->ds_id].object))
+/*
+        if (CORBA::is_nil(tango_device[ds->ds_id].device_proxy))
         {
 		*error = DevErr_BadServerConnection;
                 return(DS_NOTOK);
         }
+ */
 
-	return(DS_OK);
+	return(0);
 }
 
-/**@ingroup tangoAPI
- * execute a command on a TANGO device
- * 
- * @param ds  		device server structure
- * @param error	  	contains the error code if function returns DS_NOTOK
- * @param cmd 		command to execute
- * @param argin 	pointer to argin
- * @param argin_type	argin type
- * @param argout	pointer to argout
- * @param argout_type	argout type
- *
- * @return DS_OK or DS_NOTOK
- */
+/*+**********************************************************************
+ Function   :   extern long tango_dev_putget()
+
+ Description:   execute a command on a TANGO device
+
+ Arg(s) In  :   long id - device id
+		long cmd - command to execute
+		void *argin - pointer to argin
+		long argin_type - argin type
+		void *argout - pointer to argout
+		long argout_type - argout type
+
+ Arg(s) Out :   long *error - error code, in case of failure
+
+ Return(s)  :   DS_OK or DS_NOTOK
+***********************************************************************-*/
+
 long tango_dev_putget(devserver ds, long cmd, void *argin, long argin_type,
                       void *argout, long argout_type, long *error)
 {
-	long	i_cmd = -1, 
-		dev_id;
-	char 	*cmd_name = NULL;
 
-	if (tango_dev_check(ds, error) != DS_OK) 
-		return(DS_NOTOK);
+	long i_cmd = -1, dev_id;
+	const char *cmd_name = NULL;
+
+	if (tango_dev_check(ds,error) != DS_OK) return(DS_NOTOK);
 
 	dev_id = ds->ds_id;
 //
 // check if command has already been executed, if not then
 // read command string using its value from TACO database
 //
-	for (long i=0; i<tango_device[dev_id].cmd_value.size(); i++)
+	//for (long i=0; i<tango_device[dev_id].cmd_value.size(); i++)
+	for (long i=0; i<tango_device[dev_id].n_cmds; i++)
+	{
 		if (tango_device[dev_id].cmd_value[i] == cmd)
 		{
 			i_cmd = i;
+			cmd_name = tango_device[dev_id].cmd_name[i_cmd];
+			if (strcmp(cmd_name,"DevState") == 0)
+			{
+				cmd_name = "State";
+			}
+			if (strcmp(cmd_name,"DevStatus") == 0)
+			{
+				cmd_name = "Status";
+			}
 			break;
 		}
+	}
 	if (i_cmd == -1)
 	{
 		*error = DevErr_CommandNotImplemented;
@@ -485,18 +702,25 @@ long tango_dev_putget(devserver ds, long cmd, void *argin, long argin_type,
 		{
 
 // insert input argument into Any type
-			CORBA::Any send = tango_argin_to_any(argin_type, tango_device[dev_id].argin_type[i_cmd], argin, error);
+
+			CORBA::Any send = tango_argin_to_any(argin_type, tango_device[dev_id].argin_type[i_cmd],
+			                                    argin, error);
 
 // execute command using command_inout() method
-                	CORBA::Any_var received = tango_device[dev_id].object->command_inout(tango_device[dev_id].cmd_name[i_cmd].c_str(),send);
+
+//                	CORBA::Any_var received = tango_device[dev_id].device_proxy->command_inout(tango_device[dev_id].cmd_name[i_cmd],send);
+                	CORBA::Any_var received = tango_device[dev_id].device_proxy->command_inout(cmd_name,send);
 
 // extract output argument from Any
-			tango_any_to_argout(argout_type, tango_device[dev_id].argout_type[i_cmd], received, argout, error);
+
+			tango_any_to_argout(argout_type, tango_device[dev_id].argout_type[i_cmd],
+		                    	received, argout, error);
         	}
         	catch (Tango::DevFailed  &tango_exception)
 		{
-                	if (debug_flag & DBG_TANGO) 
-				Tango::Util::print_exception(tango_exception);
+#ifdef DEBUG
+                	if (debug_flag & DBG_TANGO) Tango::Util::print_exception(tango_exception);
+#endif
 //
 // recover TANGO error string and save it in global error string so that
 // it can be printed out with dev_error_str()
@@ -510,8 +734,9 @@ long tango_dev_putget(devserver ds, long cmd, void *argin, long argin_type,
 //
                 catch (CORBA::Exception  &e)
                 {
-                        if (debug_flag & DBG_TANGO) 
-				Tango::Util::print_exception(e);
+#ifdef DEBUG
+                        if (debug_flag & DBG_TANGO) Tango::Util::print_exception(e);
+#endif
                         tango_device[dev_id].flag = TANGO_BAD_CONNECTION;
 			if (tango_dev_check(ds,error) != DS_OK)
 			{
@@ -520,23 +745,30 @@ long tango_dev_putget(devserver ds, long cmd, void *argin, long argin_type,
 			}
 //
 // if import works then execute the command again i.e. immediate reconnection
-//
+
 			try 
 			{
-//		
-// insert input argument into Any type
-				CORBA::Any send = tango_argin_to_any(argin_type, tango_device[dev_id].argin_type[i_cmd], argin, error);
+		
+		// insert input argument into Any type
+		
+				CORBA::Any send = tango_argin_to_any(argin_type, tango_device[dev_id].argin_type[i_cmd],
+			                                    	argin, error);
 		
 // execute command using command_inout() method
-		               	CORBA::Any_var received = tango_device[dev_id].object->command_inout(tango_device[dev_id].cmd_name[i_cmd].c_str(),send);
+		
+//		               	CORBA::Any_var received = tango_device[dev_id].device_proxy->command_inout(tango_device[dev_id].cmd_name[i_cmd],send);
+		               	CORBA::Any_var received = tango_device[dev_id].device_proxy->command_inout(cmd_name,send);
 		
 // extract output argument from Any
-				tango_any_to_argout(argout_type, tango_device[dev_id].argout_type[i_cmd], received, argout, error);
+		
+				tango_any_to_argout(argout_type, tango_device[dev_id].argout_type[i_cmd],
+			                    	received, argout, error);
 		        }
 		        catch (Tango::DevFailed  &tango_exception)
 		        {
-		        	if (debug_flag & DBG_TANGO) 
-					Tango::Util::print_exception(tango_exception);
+#ifdef DEBUG
+		        	if (debug_flag & DBG_TANGO) Tango::Util::print_exception(tango_exception);
+#endif
 //
 // recover TANGO error string and save it in global error string so that
 // it can be printed out with dev_error_str()
@@ -547,8 +779,9 @@ long tango_dev_putget(devserver ds, long cmd, void *argin, long argin_type,
 	                }
 	                catch (CORBA::Exception  &corba_exception)
 	                {
-	                        if (debug_flag & DBG_TANGO) 
-					Tango::Util::print_exception(corba_exception);
+#ifdef DEBUG
+	                        if (debug_flag & DBG_TANGO) Tango::Util::print_exception(corba_exception);
+#endif
 	                        tango_device[dev_id].flag = TANGO_BAD_CONNECTION;
 	                        *error = DevErr_BadServerConnection;
 	                        return(DS_NOTOK);
@@ -556,43 +789,60 @@ long tango_dev_putget(devserver ds, long cmd, void *argin, long argin_type,
 		}
 	}
 
-	return(DS_OK);
+	return(0);
 }
 
-/**@ingroup tangoAPI
- * execute a command on a TANGO device and return the data in DEV_OPAQUE_TYP
- * 
- * @param ds  		device server structure
- * @param error	  	contains the error code if function returns DS_NOTOK
- * @param cmd 		command to execute
- * @param argin 	pointer to argin
- * @param argin_type	argin type
- * @param argout	pointer to argout
- * @param argout_type	argout type
- *
- * @return DS_OK or NOTOK
- */ 
+/*+**********************************************************************
+ Function   :   extern long tango_dev_putget_raw()
+
+ Description:   execute a command on a TANGO device and return the data in 
+		DEV_OPAQUE_TYPE
+
+ Arg(s) In  :   long id - device id
+		long cmd - command to execute
+		void *argin - pointer to argin
+		long argin_type - argin type
+		void *argout - pointer to argout
+		long argout_type - argout type
+
+ Arg(s) Out :   long *error - error code, in case of failure
+
+ Return(s)  :   DS_OK or DS_NOTOK
+***********************************************************************-*/
+
 long tango_dev_putget_raw(devserver ds, long cmd, void *argin, long argin_type,
                       void *argout, long argout_type, long *error)
 {
-	long	i_cmd = -1, 
-		dev_id;
-	char 	*cmd_name = NULL;
 
-	if (tango_dev_check(ds,error) != DS_OK) 
-		return(DS_NOTOK);
+	long i_cmd = -1, dev_id;
+	const char *cmd_name = NULL;
+
+	if (tango_dev_check(ds,error) != DS_OK) return(DS_NOTOK);
 
 	dev_id = ds->ds_id;
 //
 // check if command has already been executed, if not then
 // read command string using its value from TACO database
 //
-	for (long i=0; i<tango_device[dev_id].cmd_value.size(); i++)
+	//for (long i=0; i<tango_device[dev_id].cmd_value.size(); i++)
+	for (long i=0; i<tango_device[dev_id].n_cmds; i++)
+	{
 		if (tango_device[dev_id].cmd_value[i] == cmd)
 		{
 			i_cmd = i;
+			cmd_name = tango_device[dev_id].cmd_name[i_cmd];
+			if (strcmp(cmd_name,"DevState") == 0)
+			{
+				cmd_name = "State";
+			}
+			if (strcmp(cmd_name,"DevStatus") == 0)
+			{
+				cmd_name = "Status";
+			}
+			break;
 			break;
 		}
+	}
 	if (i_cmd == -1)
 	{
 		*error = DevErr_CommandNotImplemented;
@@ -605,18 +855,25 @@ long tango_dev_putget_raw(devserver ds, long cmd, void *argin, long argin_type,
 		{
 
 // insert input argument into Any type
-			CORBA::Any send = tango_argin_to_any(argin_type, tango_device[dev_id].argin_type[i_cmd], argin, error);
+
+			CORBA::Any send = tango_argin_to_any(argin_type, tango_device[dev_id].argin_type[i_cmd],
+		                                    	argin, error);
 
 // execute command using command_inout() method
-                	CORBA::Any_var received = tango_device[dev_id].object->command_inout(tango_device[dev_id].cmd_name[i_cmd].c_str(),send);
+
+//                	CORBA::Any_var received = tango_device[dev_id].device_proxy->command_inout(tango_device[dev_id].cmd_name[i_cmd],send);
+                	CORBA::Any_var received = tango_device[dev_id].device_proxy->command_inout(cmd_name,send);
 
 // extract output argument from Any
-			tango_any_to_argout_raw(argout_type, tango_device[dev_id].argout_type[i_cmd], received, argout, error);
+
+			tango_any_to_argout_raw(argout_type, tango_device[dev_id].argout_type[i_cmd],
+		                    	received, argout, error);
         	}
                 catch (Tango::DevFailed  &tango_exception)
                 {
-                        if (debug_flag & DBG_TANGO) 
-				Tango::Util::print_exception(tango_exception);
+#ifdef DEBUG
+                        if (debug_flag & DBG_TANGO) Tango::Util::print_exception(tango_exception);
+#endif
 // TODO - improve TANGO to TACO error handling here
                         *error = DevErr_CommandFailed;
                         return(DS_NOTOK);
@@ -626,8 +883,9 @@ long tango_dev_putget_raw(devserver ds, long cmd, void *argin, long argin_type,
 //
                 catch (CORBA::Exception  &corba_exception)
                 {
-                        if (debug_flag & DBG_TANGO) 
-				Tango::Util::print_exception(corba_exception);
+#ifdef DEBUG
+                        if (debug_flag & DBG_TANGO) Tango::Util::print_exception(corba_exception);
+#endif
                         tango_device[dev_id].flag = TANGO_BAD_CONNECTION;
 			if (tango_dev_check(ds,error) != DS_OK)
 			{
@@ -640,68 +898,86 @@ long tango_dev_putget_raw(devserver ds, long cmd, void *argin, long argin_type,
 			try 
 			{
 		
-// insert input argument into Any type
-				CORBA::Any send = tango_argin_to_any(argin_type, tango_device[dev_id].argin_type[i_cmd], argin, error);
+		// insert input argument into Any type
+		
+				CORBA::Any send = tango_argin_to_any(argin_type, tango_device[dev_id].argin_type[i_cmd],
+			                                    	argin, error);
 		
 // execute command using command_inout() method
-		               	CORBA::Any_var received = tango_device[dev_id].object->command_inout(tango_device[dev_id].cmd_name[i_cmd].c_str(),send);
+		
+//		               	CORBA::Any_var received = tango_device[dev_id].device_proxy->command_inout(tango_device[dev_id].cmd_name[i_cmd],send);
+		               	CORBA::Any_var received = tango_device[dev_id].device_proxy->command_inout(cmd_name,send);
 		
 // extract output argument from Any
-				tango_any_to_argout_raw(argout_type, tango_device[dev_id].argout_type[i_cmd], received, argout, error);
+		
+				tango_any_to_argout_raw(argout_type, tango_device[dev_id].argout_type[i_cmd],
+			                    	received, argout, error);
 		        }
 		        catch (Tango::DevFailed  &tango_exception)
 		        {
-		        	if (debug_flag & DBG_TANGO) 
-					Tango::Util::print_exception(tango_exception);
+#ifdef DEBUG
+		        	if (debug_flag & DBG_TANGO) Tango::Util::print_exception(tango_exception);
+#endif
 // TODO - improve TANGO to TACO error handling here
 	                        *error = DevErr_CommandFailed;
 	                        return(DS_NOTOK);
 	                }
 	                catch (CORBA::Exception  &corba_exception)
 	                {
-	                        if (debug_flag & DBG_TANGO) 
-					Tango::Util::print_exception(corba_exception);
+#ifdef DEBUG
+	                        if (debug_flag & DBG_TANGO) Tango::Util::print_exception(corba_exception);
+#endif
 	                        tango_device[dev_id].flag = TANGO_BAD_CONNECTION;
 	                        *error = DevErr_BadServerConnection;
 	                        return(DS_NOTOK);
 	                }
 		}
 	}
+
 	return(DS_OK);
 }
 
-/**@ingroup tangoAPI
- * Returns a sequence of structures containing all available commands, names, input 
- * and output data types for a TANGO device. 
- * 
- * Command names and data types are read from the command list in the device server 
- * by calling device->cmd_query.
- *
- * Command values are read from the TACO database
- *
- * Data type descriptions have to be specified as CLASS resources as:
- * 	- CLASS/class_name/cmd_name/IN_TYPE:
- * 	- CLASS/class_name/cmd_name/OUT_TYPE:
- * 
- * @param ds  		device server structure
- * @param error	  	Will contain an appropriate error code if the function returns DS_NOTOK
- * @param varcmdarr 	sequence of DevCmdInfo structures.
- *		
- * @return DS_OK or NOTOK
- */ 
+
+/*+**********************************************************************
+Function   : 	extern long tango_dev_cmd_query()
+
+ Description:	Returns a sequence of structures containing all
+		available commands, names, input and output data types
+		for a TANGO device. 
+            :	Command names and data types are read from the command
+		list in the device server by calling device->cmd_query.
+            :	Command values are read from the TACO database
+            :	Data type descriptions have to be specified as 
+		CLASS resources as:
+            :		CLASS/class_name/cmd_name/IN_TYPE:
+            :		CLASS/class_name/cmd_name/OUT_TYPE:
+
+ Arg(s) In  :	dev_id - device id in tango_device
+
+ Arg(s) Out :	varcmdarr - sequence of DevCmdInfo structures.
+		error     - Will contain an appropriate error code if the
+			    corresponding call returns a non-zero value.
+
+ Return(s)  :	DS_OK or DS_NOTOK
+***********************************************************************-*/
+
 long tango_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error)
 {
-	if (tango_dev_check(ds,error) != DS_OK) 
-		return(DS_NOTOK);
+	long dev_id;
 
-	long dev_id = ds->ds_id;
+	if (tango_dev_check(ds,error) != DS_OK) return(DS_NOTOK);
+
+	dev_id = ds->ds_id;
+
 	*error = 0;
 
 /*
  * Allocate memory for a sequence of DevCmdInfo structures
  * returned with varcmdarr.
  */
-	varcmdarr->length   = tango_device[dev_id].cmd_value.size();
+
+	//varcmdarr->length   = tango_device[dev_id].cmd_value.size();
+	varcmdarr->length   = tango_device[dev_id].n_cmds;
 	varcmdarr->sequence = (DevCmdInfo*)malloc(varcmdarr->length * sizeof (DevCmdInfo));
 	if ( varcmdarr->sequence == NULL )
 	{
@@ -713,7 +989,7 @@ long tango_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error)
 	for (long i = 0; i < varcmdarr->length; i++)
 	{
 		varcmdarr->sequence[i].cmd      = tango_device[dev_id].cmd_value[i];
-		strncat(varcmdarr->sequence[i].cmd_name,tango_device[dev_id].cmd_name[i].c_str(),32);
+		strncat(varcmdarr->sequence[i].cmd_name,tango_device[dev_id].cmd_name[i],32);
 		varcmdarr->sequence[i].in_type  = tango_to_taco_type(tango_device[dev_id].argin_type[i]);
 // leave in_name == NULL
 //		varcmdarr->sequence[i].in_name = (char*)" "; 
@@ -725,14 +1001,20 @@ long tango_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error)
 	return (DS_OK);
 }
 
-/**@ingroup tangoAPI
- * Ping a TANGO device
- * 
- * @param ds  		device server structure
- * @param error	  	Will contain an appropriate error code if the function returns DS_NOTOK
- * 
- * @return DS_OK or DS_NOTOK
- */
+/*+**********************************************************************
+Function   : 	extern long tango_dev_ping()
+
+ Description:	Ping a TANGO device
+
+ Arg(s) In  :	devserver ds - device 
+
+ Arg(s) Out :	varcmdarr - sequence of DevCmdInfo structures.
+		error     - Will contain an appropriate error code if the
+			    corresponding call returns a non-zero value.
+
+ Return(s)  :	DS_OK or DS_NOTOK
+***********************************************************************-*/
+
 long tango_dev_ping (devserver ds, long *error)
 {
 	long dev_id;
@@ -745,12 +1027,13 @@ long tango_dev_ping (devserver ds, long *error)
 
         try
         {
-                tango_device[dev_id].object->ping();
+                tango_device[dev_id].device_proxy->ping();
         }
         catch (CORBA::Exception  &corba_exception)
 	{
-		if (debug_flag & DBG_TANGO) 
-			Tango::Util::print_exception(corba_exception);
+#ifdef DEBUG
+		if (debug_flag & DBG_TANGO) Tango::Util::print_exception(corba_exception);
+#endif
 // TODO - improve TANGO to TACO error handling here
                 *error = DevErr_CommandFailed;
                 return(DS_NOTOK);
@@ -759,16 +1042,19 @@ long tango_dev_ping (devserver ds, long *error)
 	return (DS_OK);
 }
 
-/**@ingroup tangoAPIintern
- * convert a TACO argin type to a TANGO type and return it in an Any
- *
- * @param argin_type 	TACO argin type to convert
- * @param argin		pointer to argin
- * @param tango_type	TANGO argin type to convert
- * @param error	  	Will contain an appropriate error code if the function returns DS_NOTOK
- * 
- * @return argin converted to CORBA::Any 
- */         
+/*+**********************************************************************
+ Function   :   extern long tango_argin_to_any()
+
+ Description:   convert a TACO argin type to a TANGO type and return it in an Any
+
+ Arg(s) In  :   long argin_type - argin type to convert
+                void *argin - pointer to argin
+
+ Arg(s) Out :   long *error - error code, in case of failure
+
+ Return(s)  :   CORBA::Any - argin converted to Any
+***********************************************************************-*/         
+
 static CORBA::Any tango_argin_to_any(long argin_type, long tango_type, void *argin, long *error)
 {
 	CORBA::Any send;
@@ -776,12 +1062,14 @@ static CORBA::Any tango_argin_to_any(long argin_type, long tango_type, void *arg
 	if (argin == NULL && argin_type != D_VOID_TYPE)
 	{
 		Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
-				(const char *)"argin is NULL ", (const char *)"tango_argin_to_any()");
+				(const char *)"argin is NULL ",
+		                (const char *)"tango_argin_to_any()");
 	}
 
 	switch(argin_type) 
 	{
 		case D_VOID_TYPE : 
+		{
 			if (tango_type != Tango::DEV_VOID)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
@@ -789,220 +1077,270 @@ static CORBA::Any tango_argin_to_any(long argin_type, long tango_type, void *arg
 		                		(const char *)"tango_argin_to_any()");
 			}
 			break;
+		}
+
 		case D_SHORT_TYPE :
+		{
 			if (tango_type != Tango::DEV_SHORT)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"TANGO argin type not Tango::DEV_SHORT ", 
 		                		(const char *)"tango_argin_to_any()");
 			}
-			{
-				short *argin_short = (short*)argin;
-				send <<= *argin_short;
-			}
+			short *argin_short;
+			argin_short = (short*)argin;
+			send <<= *argin_short;
 			break;
+		}
+			
 
 		case D_USHORT_TYPE :
+		{
 			if (tango_type != Tango::DEV_USHORT)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"TANGO argin type not Tango::DEV_USHORT ", 
 		                		(const char *)"tango_argin_to_any()");
 			}
-			{
-				unsigned short *argin_short = (unsigned short*)argin;
-				send <<= *argin_short;
-			}
+			unsigned short *argin_short;
+			argin_short = (unsigned short*)argin;
+			send <<= *argin_short;
 			break;
+		}
 			
 		case D_LONG_TYPE :
+		{
 			if (tango_type != Tango::DEV_LONG)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"TANGO argin type not Tango::DEV_LONG ", 
 		                		(const char *)"tango_argin_to_any()");
 			}
-			{
-				long *argin_long = (long*)argin;
-				send <<= *argin_long;
-			}
+			long *argin_long;
+			argin_long = (long*)argin;
+			send <<= *argin_long;
 			break;
+		}
 			
 		case D_ULONG_TYPE :
+		{
 			if (tango_type != Tango::DEV_ULONG)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"TANGO argin type not Tango::DEV_ULONG ", 
 		                		(const char *)"tango_argin_to_any()");
 			}
-			{
-				unsigned long *argin_ulong = (unsigned long*)argin;
-				send <<= *argin_ulong;
-			}
+			unsigned long *argin_ulong;
+			argin_ulong = (unsigned long*)argin;
+			send <<= *argin_ulong;
 			break;
+		}
 			
 		case D_FLOAT_TYPE :
+		{
 			if (tango_type != Tango::DEV_FLOAT)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"TANGO argin type not Tango::DEV_FLOAT ", 
 		                		(const char *)"tango_argin_to_any()");
 			}
-			{
-				float *argin_float = (float*)argin;
-				send <<= *argin_float;
-			}
+			float *argin_float;
+			argin_float = (float*)argin;
+			send <<= *argin_float;
 			break;
+		}
 			
 		case D_DOUBLE_TYPE :
+		{
 			if (tango_type != Tango::DEV_DOUBLE)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"TANGO argin type not Tango::DEV_DOUBLE ", 
 		                		(const char *)"tango_argin_to_any()");
 			}
-			{
-				double *argin_double = (double*)argin;
-				send <<= *argin_double;
-			}
+			double *argin_double;
+			argin_double = (double*)argin;
+			send <<= *argin_double;
 			break;
+		}
 			
 		case D_STRING_TYPE :
+		{
+			char **argin_str;
+
 			if (tango_type != Tango::DEV_STRING)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"tango argin type is not Tango::DEV_STRING", 
 		                		(const char *)"tango_argin_to_any()");
 			}
-			{
-				char **argin_str = (char**)argin;
-				send <<= CORBA::string_dup(*argin_str);
-			}
+			argin_str = (char**)argin;
+			send <<= CORBA::string_dup(*argin_str);
 			break;
+		}
 
 		case D_VAR_STRINGARR :
+		{
 			if (tango_type != Tango::DEVVAR_STRINGARRAY)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"TANGO argin type not Tango::DEVVAR_STRINGARRAY ", 
 		                		(const char *)"tango_argin_to_any()");
 			}
+			DevVarStringArray *argin_vsa;
+			argin_vsa = (DevVarStringArray*)argin;
+			Tango::DevVarStringArray *tango_vsa = new Tango::DevVarStringArray;
+			tango_vsa->length(argin_vsa->length);
+			for (long i=0; i<argin_vsa->length; i++)
 			{
-				DevVarStringArray *argin_vsa = (DevVarStringArray*)argin;
-				Tango::DevVarStringArray *tango_vsa = new Tango::DevVarStringArray;
-				tango_vsa->length(argin_vsa->length);
-				for (long i=0; i<argin_vsa->length; i++)
-					(*tango_vsa)[i] = CORBA::string_dup(argin_vsa->sequence[i]);
-				send <<= tango_vsa;
+				(*tango_vsa)[i] = CORBA::string_dup(argin_vsa->sequence[i]);
 			}
+			send <<= tango_vsa;
 			break;
+		}
 			
+		case D_VAR_CHARARR :
+		{
+			if (tango_type != Tango::DEVVAR_CHARARRAY)
+			{
+				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
+						(const char*)"TANGO argin type not Tango::DEVVAR_CHARARRAY ", 
+		                		(const char *)"tango_argin_to_any()");
+			}
+			DevVarCharArray *argin_vsha;
+			argin_vsha = (DevVarCharArray*)argin;
+			Tango::DevVarCharArray *tango_vsha = new Tango::DevVarCharArray;
+			tango_vsha->length(argin_vsha->length);
+			for (long i=0; i<argin_vsha->length; i++)
+			{
+				(*tango_vsha)[i] = argin_vsha->sequence[i];
+			}
+			send <<= tango_vsha;
+			break;
+		}
+		
 		case D_VAR_SHORTARR :
+		{
 			if (tango_type != Tango::DEVVAR_SHORTARRAY)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"TANGO argin type not Tango::DEVVAR_SHORTARRAY ", 
 		                		(const char *)"tango_argin_to_any()");
 			}
+			DevVarShortArray *argin_vsha;
+			argin_vsha = (DevVarShortArray*)argin;
+			Tango::DevVarShortArray *tango_vsha = new Tango::DevVarShortArray;
+			tango_vsha->length(argin_vsha->length);
+			for (long i=0; i<argin_vsha->length; i++)
 			{
-				DevVarShortArray *argin_vsha = (DevVarShortArray*)argin;
-				Tango::DevVarShortArray *tango_vsha = new Tango::DevVarShortArray;
-				tango_vsha->length(argin_vsha->length);
-				for (long i=0; i<argin_vsha->length; i++)
-					(*tango_vsha)[i] = argin_vsha->sequence[i];
-				send <<= tango_vsha;
+				(*tango_vsha)[i] = argin_vsha->sequence[i];
 			}
+			send <<= tango_vsha;
 			break;
+		}
 			
 		case D_VAR_USHORTARR :
+		{
 			if (tango_type != Tango::DEVVAR_USHORTARRAY)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"TANGO argin type not Tango::DEVVAR_USHORTARRAY ", 
 		                		(const char *)"tango_argin_to_any()");
 			}
+			DevVarUShortArray *argin_vusha;
+			argin_vusha = (DevVarUShortArray*)argin;
+			Tango::DevVarUShortArray *tango_vusha = new Tango::DevVarUShortArray;
+			tango_vusha->length(argin_vusha->length);
+			for (long i=0; i<argin_vusha->length; i++)
 			{
-				DevVarUShortArray *argin_vusha = (DevVarUShortArray*)argin;
-				Tango::DevVarUShortArray *tango_vusha = new Tango::DevVarUShortArray;
-				tango_vusha->length(argin_vusha->length);
-				for (long i=0; i<argin_vusha->length; i++)
-					(*tango_vusha)[i] = argin_vusha->sequence[i];
-				send <<= tango_vusha;
+				(*tango_vusha)[i] = argin_vusha->sequence[i];
 			}
+			send <<= tango_vusha;
 			break;
+		}
 			
 		case D_VAR_LONGARR :
+		{
 			if (tango_type != Tango::DEVVAR_LONGARRAY)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"TANGO argin type not Tango::DEVVAR_LONGARRAY ", 
 		                		(const char *)"tango_argin_to_any()");
 			}
+			DevVarLongArray *argin_vla;
+			argin_vla = (DevVarLongArray*)argin;
+			Tango::DevVarLongArray *tango_vla = new Tango::DevVarLongArray;
+			tango_vla->length(argin_vla->length);
+			for (long i=0; i<argin_vla->length; i++)
 			{
-				DevVarLongArray *argin_vla = (DevVarLongArray*)argin;
-				Tango::DevVarLongArray *tango_vla = new Tango::DevVarLongArray;
-				tango_vla->length(argin_vla->length);
-				for (long i=0; i<argin_vla->length; i++)
-					(*tango_vla)[i] = argin_vla->sequence[i];
-				send <<= tango_vla;
+				(*tango_vla)[i] = argin_vla->sequence[i];
 			}
+			send <<= tango_vla;
 			break;
+		}
 			
 		case D_VAR_ULONGARR :
+		{
 			if (tango_type != Tango::DEVVAR_ULONGARRAY)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"TANGO argin type not Tango::DEVVAR_ULONGARRAY ", 
 		                		(const char *)"tango_argin_to_any()");
 			}
+			DevVarULongArray *argin_vula;
+			argin_vula = (DevVarULongArray*)argin;
+			Tango::DevVarULongArray *tango_vula = new Tango::DevVarULongArray;
+			tango_vula->length(argin_vula->length);
+			for (long i=0; i<argin_vula->length; i++)
 			{
-				DevVarULongArray *argin_vula = (DevVarULongArray*)argin;
-				Tango::DevVarULongArray *tango_vula = new Tango::DevVarULongArray;
-				tango_vula->length(argin_vula->length);
-				for (long i=0; i<argin_vula->length; i++)
-					(*tango_vula)[i] = argin_vula->sequence[i];
-				send <<= tango_vula;
+				(*tango_vula)[i] = argin_vula->sequence[i];
 			}
+			send <<= tango_vula;
 			break;
+		}
 			
 		case D_VAR_FLOATARR :
+		{
 			if (tango_type != Tango::DEVVAR_FLOATARRAY)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"TANGO argin type not Tango::DEVVAR_FLOATARRAY ", 
 		                		(const char *)"tango_argin_to_any()");
 			}
+			DevVarFloatArray *argin_vfa;
+			argin_vfa = (DevVarFloatArray*)argin;
+			Tango::DevVarFloatArray *tango_vfa = new Tango::DevVarFloatArray;
+			tango_vfa->length(argin_vfa->length);
+			for (long i=0; i<argin_vfa->length; i++)
 			{
-				DevVarFloatArray *argin_vfa = (DevVarFloatArray*)argin;
-				Tango::DevVarFloatArray *tango_vfa = new Tango::DevVarFloatArray;
-				tango_vfa->length(argin_vfa->length);
-				for (long i=0; i<argin_vfa->length; i++)
-					(*tango_vfa)[i] = argin_vfa->sequence[i];
-				send <<= tango_vfa;
+				(*tango_vfa)[i] = argin_vfa->sequence[i];
 			}
+			send <<= tango_vfa;
 			break;
 		}
 			
 		case D_VAR_DOUBLEARR :
+		{
 			if (tango_type != Tango::DEVVAR_DOUBLEARRAY)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"TANGO argin type not Tango::DEVVAR_DOUBLEARRAY ", 
 		                		(const char *)"tango_argin_to_any()");
 			}
+			DevVarDoubleArray *argin_vda;
+			argin_vda = (DevVarDoubleArray*)argin;
+			Tango::DevVarDoubleArray *tango_vda = new Tango::DevVarDoubleArray;
+			tango_vda->length(argin_vda->length);
+			for (long i=0; i<argin_vda->length; i++)
 			{
-				DevVarDoubleArray *argin_vda = (DevVarDoubleArray*)argin;
-				Tango::DevVarDoubleArray *tango_vda = new Tango::DevVarDoubleArray;
-				tango_vda->length(argin_vda->length);
-				for (long i=0; i<argin_vda->length; i++)
-					(*tango_vda)[i] = argin_vda->sequence[i];
-				send <<= tango_vda;
+				(*tango_vda)[i] = argin_vda->sequence[i];
 			}
+			send <<= tango_vda;
 			break;
 		}
 			
 		default:
-			Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
+				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"TACO type no supported", 
 		                		(const char *)"tango_argin_to_any()");
 	}
@@ -1010,17 +1348,20 @@ static CORBA::Any tango_argin_to_any(long argin_type, long tango_type, void *arg
 	return(send);
 }
 
-/**@ingroup tangoAPIintern
- * extract a TANGO type from an Any and convert it to a TACO argout
- *
- * @param argout_type 	TACO argout type to convert
- * @param argout	pointer to argout
- * @param tango_type	TANGO argout type to convert
- * @param received 	Any returned by device server
- * @param error	  	Will contain an appropriate error code if the function returns DS_NOTOK
- * 
- * @return argin converted to CORBA::Any 
- */         
+/*+**********************************************************************
+ Function   :   extern long tango_any_to_argout()
+
+ Description:   extract a TANGO type from an Any and convert it to a TACO argout
+
+ Arg(s) In  :   long argout_type - argout type to convert
+		CORBA::Any received - Any returned by device server
+                void *argout - pointer to argout
+
+ Arg(s) Out :   long *error - error code, in case of failure
+
+ Return(s)  :   void
+***********************************************************************-*/         
+
 static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any received, void *argout, long *error)
 {
 	if (argout == NULL && argout_type != D_VOID_TYPE)
@@ -1033,6 +1374,7 @@ static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any re
 	switch(argout_type) 
 	{
 		case D_VOID_TYPE : 
+		{
 			if (tango_type != Tango::DEV_VOID)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
@@ -1040,8 +1382,14 @@ static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any re
 				                (const char *)"tango_any_to_argout()");
 			}
 			break;
+		}
 
 		case D_SHORT_TYPE :
+		{
+			short tango_short;
+			short *argout_short;
+			Tango::DevState tango_state;
+
 			if ((tango_type != Tango::DEV_SHORT) &&
 			    (tango_type != Tango::DEV_STATE))
 			{
@@ -1049,230 +1397,262 @@ static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any re
 						(const char*)"tango argout type is not Tango::DEV_SHORT", 
 				                (const char *)"tango_any_to_argout()");
 			}
+			argout_short = (short*)argout;
+			if (tango_type == Tango::DEV_SHORT)
 			{
-				short tango_short;
-				short *argout_short = (short*)argout;;
-				Tango::DevState tango_state;
-
-				if (tango_type == Tango::DEV_SHORT)
-				{
-					received >>= tango_short;
-					*argout_short = tango_short;
-				}
-				if (tango_type == Tango::DEV_STATE)
-				{
-					received >>= tango_state;
+				received >>= tango_short;
+				*argout_short = tango_short;
+			}
+			if (tango_type == Tango::DEV_STATE)
+			{
+				received >>= tango_state;
 //
 // convert TANGO:Devstate type to equivalent TACO state
 //
-					switch (tango_state) 
-					{
-						case (Tango::ON) : 
-							*argout_short = DEVON; 
-					        	break;
-						case (Tango::OFF) : 
-							*argout_short = DEVOFF; 
-					        	break;
-						case (Tango::CLOSE) : 
-							*argout_short = DEVCLOSE; 
-					        	break;
-						case (Tango::OPEN) : 
-							*argout_short = DEVOPEN; 
-					        	break;
-						case (Tango::INSERT) : 
-							*argout_short = DEVINSERTED; 
-					        	break;
-						case (Tango::EXTRACT) : 
-							*argout_short = DEVEXTRACTED; 
-					        	break;
-						case (Tango::MOVING) : 
-							*argout_short = DEVMOVING; 
-					        	break;
-						case (Tango::STANDBY) : 
-							*argout_short = DEVSTANDBY; 
-					        	break;
-						case (Tango::FAULT) : 
-							*argout_short = DEVFAULT; 
-					        	break;
-						case (Tango::INIT) : 
-							*argout_short = DEVINIT; 
-					        	break;
-						case (Tango::RUNNING) : 
-							*argout_short = DEVRUN; 
-					        	break;
-						case (Tango::ALARM) : 
-							*argout_short = DEVALARM; 
-					        	break;
-						case (Tango::DISABLE) : 
-							*argout_short = DEVDISABLED; 
-					        	break;
-						default : 
-							*argout_short = DEVUNKNOWN; 
-					        	break;
-					}
-				}
+				switch (tango_state) 
+				{
+					case (Tango::ON) : *argout_short = DEVON; 
+					            break;
+					case (Tango::OFF) : *argout_short = DEVOFF; 
+					             break;
+					case (Tango::CLOSE) : *argout_short = DEVCLOSE; 
+					             break;
+					case (Tango::OPEN) : *argout_short = DEVOPEN; 
+					             break;
+					case (Tango::INSERT) : *argout_short = DEVINSERTED; 
+					             break;
+					case (Tango::EXTRACT) : *argout_short = DEVEXTRACTED; 
+					             break;
+					case (Tango::MOVING) : *argout_short = DEVMOVING; 
+					             break;
+					case (Tango::STANDBY) : *argout_short = DEVSTANDBY; 
+					             break;
+					case (Tango::FAULT) : *argout_short = DEVFAULT; 
+					             break;
+					case (Tango::INIT) : *argout_short = DEVINIT; 
+					             break;
+					case (Tango::RUNNING) : *argout_short = DEVRUN; 
+					             break;
+					case (Tango::ALARM) : *argout_short = DEVALARM; 
+					             break;
+					case (Tango::DISABLE) : *argout_short = DEVDISABLED; 
+					             break;
+					default : *argout_short = DEVUNKNOWN; 
+					             break;
+				};
 			}
-			break
+			break;
+		}
 
 		case D_USHORT_TYPE :
+		{
+			unsigned short tango_ushort;
+			unsigned short *argout_ushort;
+
 			if (tango_type != Tango::DEV_USHORT)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"tango argout type is not Tango::DEV_USHORT", 
 				                (const char *)"tango_any_to_argout()");
 			}
-			{
-				unsigned short tango_ushort;
-				received >>= tango_ushort;
-				unsigned short *argout_ushort = (unsigned short*)argout;
-				*argout_ushort = tango_ushort;
-			}
+			received >>= tango_ushort;
+			argout_ushort = (unsigned short*)argout;
+			*argout_ushort = tango_ushort;
 			break;
+		}
 
 		case D_LONG_TYPE :
+		{
+			long tango_long;
+			long *argout_long;
+
 			if (tango_type != Tango::DEV_LONG)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"tango argout type is not Tango::DEV_LONG", 
 				                (const char *)"tango_any_to_argout()");
 			}
-			{
-				long tango_long;
-				long *argout_long = (long*)argout;
-
-				received >>= tango_long;
-				*argout_long = tango_long;
-			}
+			received >>= tango_long;
+			argout_long = (long*)argout;
+			*argout_long = tango_long;
 			break;
+		}
 
 		case D_ULONG_TYPE :
+		{
+			unsigned long tango_ulong;
+			unsigned long *argout_ulong;
+
 			if (tango_type != Tango::DEV_ULONG)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"tango argout type is not Tango::DEV_ULONG", 
 				                (const char *)"tango_any_to_argout()");
 			}
-			{
-				unsigned long tango_ulong;
-				unsigned long *argout_ulong = (unsigned long*)argout;
-
-				received >>= tango_ulong;
-				*argout_ulong = tango_ulong;
-			}
+			received >>= tango_ulong;
+			argout_ulong = (unsigned long*)argout;
+			*argout_ulong = tango_ulong;
 			break;
+		}
 
 		case D_FLOAT_TYPE :
+		{
+			float tango_float;
+			float *argout_float;
+
 			if (tango_type != Tango::DEV_FLOAT)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"tango argout type is not Tango::DEV_FLOAT", 
 				                (const char *)"tango_any_to_argout()");
 			}
-			{
-				float tango_float;
-				float *argout_float = (float*)argout;;
-				received >>= tango_float;
-				*argout_float = tango_float;
-			}
+			received >>= tango_float;
+			argout_float = (float*)argout;
+			*argout_float = tango_float;
 			break;
+		}
 
 		case D_DOUBLE_TYPE :
+		{
+			double tango_double;
+			double *argout_double;
+
 			if (tango_type != Tango::DEV_DOUBLE)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"tango argout type is not Tango::DEV_DOUBLE", 
 				                (const char *)"tango_any_to_argout()");
 			}
-			{
-				double tango_double;
-				double *argout_double = (double*)argout;;
-
-				received >>= tango_double;
-				*argout_double = tango_double;
-			}
+			received >>= tango_double;
+			argout_double = (double*)argout;
+			*argout_double = tango_double;
 			break;
+		}
 
 		case D_STRING_TYPE :
+		{
+			const char *tango_str;
+			char **argout_str;
+
 			if (tango_type != Tango::DEV_STRING)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"tango argout type is not Tango::DEV_STRING", 
 				                (const char *)"tango_any_to_argout()");
 			}
-			{
-				const char *tango_str;
-				char **argout_str = (char**)argout;;
-
-				received >>= tango_str;
-				*argout_str = (char*)malloc(strlen(tango_str)+1);
-				strcpy(*argout_str,tango_str);
-			}
+			received >>= tango_str;
+			argout_str = (char**)argout;
+			*argout_str = (char*)malloc(strlen(tango_str)+1);
+			strcpy(*argout_str,tango_str);
 			break;
+		}
 
 		case D_VAR_STRINGARR :
+		{
+			DevVarStringArray *argout_vsa;
+			const Tango::DevVarStringArray *tango_vsa;
+
 			if (tango_type != Tango::DEVVAR_STRINGARRAY)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"tango argout type is not Tango::DEVVAR_STRINGARRAY", 
 		                		(const char *)"tango_argin_to_any()");
 			}
+			received >>= tango_vsa;
+			argout_vsa = (DevVarStringArray*)argout;
+			if (argout_vsa->sequence == NULL)
 			{
-				DevVarStringArray *argout_vsa = (DevVarStringArray*)argout;;
-				const Tango::DevVarStringArray *tango_vsa;
-
-				received >>= tango_vsa;
-				if (argout_vsa->sequence == NULL)
-					argout_vsa->sequence = (char**)malloc(tango_vsa->length()*sizeof(char*));
-				argout_vsa->length = tango_vsa->length();
-				for (long i=0; i< tango_vsa->length(); i++)
-				{
-					argout_vsa->sequence[i] = (char*)malloc(strlen((*tango_vsa)[i])+1);
-					strcpy(argout_vsa->sequence[i],(*tango_vsa)[i]);
-				}
+				argout_vsa->sequence = (char**)malloc(tango_vsa->length()*sizeof(char*));
+			}
+			argout_vsa->length = tango_vsa->length();
+			for (long i=0; i< tango_vsa->length(); i++)
+			{
+				argout_vsa->sequence[i] = (char*)malloc(strlen((*tango_vsa)[i])+1);
+				strcpy(argout_vsa->sequence[i],(*tango_vsa)[i]);
 			}
 			break;
+		}
+
+		case D_VAR_CHARARR :
+		{
+			DevVarCharArray *argout_vsha;
+			const Tango::DevVarCharArray *tango_vsha;
+
+			if (tango_type != Tango::DEVVAR_CHARARRAY)
+			{
+				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
+						(const char*)"tango argout type is not Tango::DEVVAR_CHARARRAY", 
+				                (const char *)"tango_any_to_argout()");
+			}
+			received >>= tango_vsha;
+			argout_vsha = (DevVarCharArray*)argout;
+			if (argout_vsha->sequence == NULL)
+			{
+				argout_vsha->sequence = (char*)malloc(tango_vsha->length()*sizeof(char));
+			}
+			argout_vsha->length = tango_vsha->length();
+			for (long i=0; i< tango_vsha->length(); i++)
+			{
+				argout_vsha->sequence[i] = (*tango_vsha)[i];
+			}
+			break;
+		}
 
 		case D_VAR_SHORTARR :
+		{
+			DevVarShortArray *argout_vsha;
+			const Tango::DevVarShortArray *tango_vsha;
+
 			if (tango_type != Tango::DEVVAR_SHORTARRAY)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"tango argout type is not Tango::DEVVAR_SHORTARRAY", 
 				                (const char *)"tango_any_to_argout()");
 			}
+			received >>= tango_vsha;
+			argout_vsha = (DevVarShortArray*)argout;
+			if (argout_vsha->sequence == NULL)
 			{
-				DevVarShortArray *argout_vsha = (DevVarShortArray*)argout;;
-				const Tango::DevVarShortArray *tango_vsha;
-
-				received >>= tango_vsha;
-				if (argout_vsha->sequence == NULL)
-					argout_vsha->sequence = (short*)malloc(tango_vsha->length()*sizeof(short));
-				argout_vsha->length = tango_vsha->length();
-				for (long i=0; i< tango_vsha->length(); i++)
-					argout_vsha->sequence[i] = (*tango_vsha)[i];
+				argout_vsha->sequence = (short*)malloc(tango_vsha->length()*sizeof(short));
+			}
+			argout_vsha->length = tango_vsha->length();
+			for (long i=0; i< tango_vsha->length(); i++)
+			{
+				argout_vsha->sequence[i] = (*tango_vsha)[i];
 			}
 			break;
+		}
 
 		case D_VAR_USHORTARR :
+		{
+			DevVarUShortArray *argout_vusha;
+			const Tango::DevVarUShortArray *tango_vusha;
+
 			if (tango_type != Tango::DEVVAR_USHORTARRAY)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"tango argout type is not Tango::DEVVAR_USHORTARRAY", 
 				                (const char *)"tango_any_to_argout()");
 			}
+			received >>= tango_vusha;
+			argout_vusha = (DevVarUShortArray*)argout;
+			if (argout_vusha->sequence == NULL)
 			{
-				DevVarUShortArray *argout_vusha = (DevVarUShortArray*)argout;
-				const Tango::DevVarUShortArray *tango_vusha;
-
-				received >>= tango_vusha;
-				if (argout_vusha->sequence == NULL)
-					argout_vusha->sequence = (unsigned short*)malloc(tango_vusha->length()*sizeof(unsigned short));
-				argout_vusha->length = tango_vusha->length();
-				for (long i=0; i< tango_vusha->length(); i++)
-					argout_vusha->sequence[i] = (*tango_vusha)[i];
+				argout_vusha->sequence = (unsigned short*)malloc(tango_vusha->length()*sizeof(unsigned short));
+			}
+			argout_vusha->length = tango_vusha->length();
+			for (long i=0; i< tango_vusha->length(); i++)
+			{
+				argout_vusha->sequence[i] = (*tango_vusha)[i];
 			}
 			break;
+		}
 
 		case D_VAR_LONGARR :
+		{
+			DevVarLongArray *argout_vla;
+			const Tango::DevVarLongArray *tango_vla;
+
 			if ((tango_type != Tango::DEVVAR_LONGARRAY) &&
 			    (tango_type != Tango::DEVVAR_ULONGARRAY))
 			{
@@ -1280,96 +1660,119 @@ static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any re
 						(const char*)"tango argout type is not Tango::DEVVAR_LONGARRAY", 
 				                (const char *)"tango_any_to_argout()");
 			}
+			received >>= tango_vla;
+			argout_vla = (DevVarLongArray*)argout;
+			if (argout_vla->sequence == NULL)
 			{
-				DevVarLongArray *argout_vla = (DevVarLongArray*)argout;;
-				const Tango::DevVarLongArray *tango_vla;
-
-				received >>= tango_vla;
-				if (argout_vla->sequence == NULL)
-					argout_vla->sequence = (long*)malloc(tango_vla->length()*sizeof(long));
-				argout_vla->length = tango_vla->length();
-				for (long i=0; i< tango_vla->length(); i++)
-					argout_vla->sequence[i] = (*tango_vla)[i];
+				argout_vla->sequence = (long*)malloc(tango_vla->length()*sizeof(long));
+			}
+			argout_vla->length = tango_vla->length();
+			for (long i=0; i< tango_vla->length(); i++)
+			{
+				argout_vla->sequence[i] = (*tango_vla)[i];
 			}
 			break;
+		}
 
 		case D_VAR_ULONGARR :
+		{
+			DevVarULongArray *argout_vula;
+			const Tango::DevVarULongArray *tango_vula;
+
 			if (tango_type != Tango::DEVVAR_ULONGARRAY)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"tango argout type is not Tango::DEVVAR_ULONGARRAY", 
 				                (const char *)"tango_any_to_argout()");
 			}
+			received >>= tango_vula;
+			argout_vula = (DevVarULongArray*)argout;
+			if (argout_vula->sequence == NULL)
 			{
-				DevVarULongArray *argout_vula = (DevVarULongArray*)argout;;
-				const Tango::DevVarULongArray *tango_vula;
-
-				received >>= tango_vula;
-				if (argout_vula->sequence == NULL)
-					argout_vula->sequence = (unsigned long*)malloc(tango_vula->length()*sizeof(unsigned long));
-				argout_vula->length = tango_vula->length();
-				for (long i=0; i< tango_vula->length(); i++)
-					argout_vula->sequence[i] = (*tango_vula)[i];
+				argout_vula->sequence = (unsigned long*)malloc(tango_vula->length()*sizeof(unsigned long));
+			}
+			argout_vula->length = tango_vula->length();
+			for (long i=0; i< tango_vula->length(); i++)
+			{
+				argout_vula->sequence[i] = (*tango_vula)[i];
 			}
 			break;
+		}
 
 		case D_VAR_FLOATARR :
+		{
+			DevVarFloatArray *argout_vfa;
+			const Tango::DevVarFloatArray *tango_vfa;
+
 			if (tango_type != Tango::DEVVAR_FLOATARRAY)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"tango argout type is not Tango::DEVVAR_FLOATARRAY", 
 				                (const char *)"tango_any_to_argout()");
 			}
+			received >>= tango_vfa;
+			argout_vfa = (DevVarFloatArray*)argout;
+			if (argout_vfa->sequence == NULL)
 			{
-				DevVarFloatArray *argout_vfa = (DevVarFloatArray*)argout;;
-				const Tango::DevVarFloatArray *tango_vfa;
-
-				received >>= tango_vfa;
-				if (argout_vfa->sequence == NULL)
-					argout_vfa->sequence = (float*)malloc(tango_vfa->length()*sizeof(float));
-				argout_vfa->length = tango_vfa->length();
-				for (long i=0; i< tango_vfa->length(); i++)
-					argout_vfa->sequence[i] = (*tango_vfa)[i];
+				argout_vfa->sequence = (float*)malloc(tango_vfa->length()*sizeof(float));
+			}
+			argout_vfa->length = tango_vfa->length();
+			for (long i=0; i< tango_vfa->length(); i++)
+			{
+				argout_vfa->sequence[i] = (*tango_vfa)[i];
 			}
 			break;
+		}
 
 		case D_VAR_DOUBLEARR :
+		{
+			DevVarDoubleArray *argout_vda;
+			const Tango::DevVarDoubleArray *tango_vda;
+
 			if (tango_type != Tango::DEVVAR_DOUBLEARRAY)
 			{
 				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 						(const char*)"tango argout type is not Tango::DEVVAR_DOUBLEARRAY", 
 				                (const char *)"tango_any_to_argout()");
 			}
+			received >>= tango_vda;
+			argout_vda = (DevVarDoubleArray*)argout;
+			if (argout_vda->sequence == NULL)
 			{
-				DevVarDoubleArray *argout_vda = (DevVarDoubleArray*)argout;;
-				const Tango::DevVarDoubleArray *tango_vda;
-
-				received >>= tango_vda;
-				if (argout_vda->sequence == NULL)
-					argout_vda->sequence = (double*)malloc(tango_vda->length()*sizeof(double));
-				argout_vda->length = tango_vda->length();
-				for (long i=0; i< tango_vda->length(); i++)
-					argout_vda->sequence[i] = (*tango_vda)[i];
+				argout_vda->sequence = (double*)malloc(tango_vda->length()*sizeof(double));
+			}
+			argout_vda->length = tango_vda->length();
+			for (long i=0; i< tango_vda->length(); i++)
+			{
+				argout_vda->sequence[i] = (*tango_vda)[i];
 			}
 			break;
+		}
 
 		default:
 			Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
 					(const char*)"taco argout type not supported", 
 			                (const char *)"tango_any_to_argout()");
 	}
+
 	return;
 }
 	
-/**@ingroup tangoAPIintern
- * extract a TANGO type from an Any and convert it to a TACO argout of DEV_OPAQUE_TYPE
- *
- * @param argout_type 	TACO argout type to convert
- * @param argout	pointer to argout
- * @param tango_type	TANGO argout type to convert
- * @param received 	Any returned by device server
- * @param error	  	Will contain an appropriate error code if the function returns DS_NOTOK
- */         
+/*+**********************************************************************
+ Function   :   extern long tango_any_to_argout_raw()
+
+ Description:   extract a TANGO type from an Any and convert it to a TACO argout
+		of DEV_OPAQUE_TYPE
+
+ Arg(s) In  :   long argout_type - argout type to convert
+		CORBA::Any received - Any returned by device server
+                void *argout - pointer to argout
+
+ Arg(s) Out :   long *error - error code, in case of failure
+
+ Return(s)  :   void
+***********************************************************************-*/         
+
 static void tango_any_to_argout_raw(long argout_type, long tango_type, CORBA::Any received, void *argout, long *error)
 {
 	dc_datacmd dc_datacmd;
@@ -1631,6 +2034,33 @@ static void tango_any_to_argout_raw(long argout_type, long tango_type, CORBA::An
 			break;
 		}
 
+		case D_VAR_CHARARR :
+		{
+			DevVarCharArray taco_vsha;
+			const Tango::DevVarCharArray *tango_vsha;
+
+			if (tango_type != Tango::DEVVAR_CHARARRAY)
+			{
+				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
+						(const char*)"tango argout type is not Tango::DEVVAR_CHARARRAY", 
+				                (const char *)"tango_any_to_argout_raw()");
+			}
+			received >>= tango_vsha;
+			taco_vsha.sequence = (char*)malloc(tango_vsha->length()*sizeof(char));
+			taco_vsha.length = tango_vsha->length();
+			for (long i=0; i< tango_vsha->length(); i++)
+			{
+				taco_vsha.sequence[i] = (*tango_vsha)[i];
+			}
+                        dc_datacmd.argout_type = argout_type;
+                        dc_datacmd.argout = &taco_vsha;
+                        status = dc_dataconvert(&dc_datacmd, 1, &dc_error);
+                        taco_opaque->length = dc_datacmd.length;
+                        taco_opaque->sequence = dc_datacmd.sequence;              
+			free(taco_vsha.sequence);
+			break;
+		}
+		
 		case D_VAR_SHORTARR :
 		{
 			DevVarShortArray taco_vsha;
@@ -1802,13 +2232,18 @@ static void tango_any_to_argout_raw(long argout_type, long tango_type, CORBA::An
 	return;
 }
 	
-/**@ingroup tangoAPIintern
- * convert a TANGO type code to a TACO type code
- * 
- * @param tango_type - TANGo type code
- *
- * @return  TACO type code
- */
+/*+**********************************************************************
+ Function   :   static long tango_to_taco_type()
+
+ Description:   convert a TANGO type code to a TACO type code
+
+ Arg(s) In  :   long tango_type - TANGo type code
+
+ Arg(s) Out :   none
+
+ Return(s)  :   TACO type code
+***********************************************************************-*/
+
 static long tango_to_taco_type(long tango_type)
 {
 	long taco_type;
@@ -1875,32 +2310,40 @@ static long tango_to_taco_type(long tango_type)
 extern DevCmdNameListEntry DevCmdNameList[];
 extern int max_cmds;
 
-/**@ingroup tangoAPIintern
- * Read the command value corresponding to the command string from the TACO resource 
- * database. This is the reverse of the function get_cmd_string() in util_api.c. 
- * The resource name must follow the convention :
- * 
- * CLASS/class_name/CMD/cmd_string: value
- *
- * Example:
- * @verbatim
- * class/database/cmd/dbinfo: 10000
- * @endverbatim
- *
- * FIRST : try to get the command from the global table of commands DevCmdNameList[]. If it is 
- * not there then try the database. This new algorithm means that TANGO servers which use 
- * "standard" TACO commands will not need to define anything in the database.
- *
- * @param class_name 	class name
- * @param cmd_name   	command name
- * @param cmd_value  	command value
- * @param error	  	Will contain an appropriate error code if the function returns DS_NOTOK
- *
- * @return  DS_OK or DS_NOTOK or DS_WARNING is returned, if the function was executed correctly, 
- *		but no command name value was found in the database.
- */
+/*+**********************************************************************
+ Function   :	static long get_cmd_value()
+
+ Description:   Read the command value corresponding to the command string
+		from the TACO resource database. This is the reverse of
+		the function get_cmd_string() in util_api.c. 
+		The resource name must follow the convention :
+		CLASS/class_name/CMD/cmd_string: value
+		e.g. class/database/cmd/dbinfo: 10000
+
+		FIRST : try to get the command from the global table
+		of commands DevCmdNameList[]. If it is not there then
+		try the database. This new algorithm means that TANGO
+		servers which use "standard" TACO commands will not need
+		to define anything in the database.
+
+		DS_WARNING is returned, if the function was
+		executed correctly, but no command name
+		value was found in the database.
+
+ Arg(s) In  :   char *class_name - class name
+		char *cmd_name   - command name
+
+ Arg(s) Out :   long *cmd_value  - command value
+		long *error   - Will contain an appropriate error
+			        code if the corresponding call
+		    	        returns a non-zero value.
+
+ Return(s)  :   DS_OK or DS_NOTOK or DS_WARNING
+***********************************************************************-*/
+
 static long get_cmd_value (char *class_name, char *cmd_name, long *cmd_value, long *error)
 {
+	static unsigned int tango_auto_cmd = DevTangoBase;
 	char		res_path[LONG_NAME_SIZE];
 	char		res_name[SHORT_NAME_SIZE];
 	char		*ret_str = NULL;
@@ -1908,13 +2351,16 @@ static long get_cmd_value (char *class_name, char *cmd_name, long *cmd_value, lo
 	int		i;
 
 	*error = 0;
+	*cmd_value = 0;
 
 	for (i=0; i<max_cmds; i++)
+	{
 		if (strcmp(DevCmdNameList[i].name, cmd_name) == 0)
 		{
 			*cmd_value = DevCmdNameList[i].value;
 			return(DS_OK);
 		}
+	}
 /*
  * Create the resource path and the resource structure.
  *
@@ -1925,8 +2371,9 @@ static long get_cmd_value (char *class_name, char *cmd_name, long *cmd_value, lo
 /*
  * use default nethost
  */
-	snprintf(res_path, sizeof(res_path), "CLASS/%s/CMD", class_name);
-	strncpy(res_name, cmd_name, sizeof(res_name));
+	sprintf(res_path, "CLASS/%s/CMD", class_name);
+
+	sprintf (res_name, "%s", cmd_name);
 
 	res_tab.resource_name = res_name;
 	res_tab.resource_type = D_STRING_TYPE;
@@ -1935,8 +2382,11 @@ static long get_cmd_value (char *class_name, char *cmd_name, long *cmd_value, lo
 /*
  * Read the command name string from the database.
  */
-	if (db_getresource (res_path, &res_tab, 1, error) == DS_NOTOK)
-		return (DS_NOTOK);
+
+	/* Ignore error here to be able to use use taco->tango
+	   interface without having a full taco system */
+	db_getresource (res_path, &res_tab, 1, error);
+	*error=0;
 
 /*
  * If the variable ret_str is still NULL, no resource value was found
@@ -1944,81 +2394,116 @@ static long get_cmd_value (char *class_name, char *cmd_name, long *cmd_value, lo
  * In this case return the value DS_WARNING.
  */
 	if ( ret_str == NULL )
-		return (DS_WARNING);
+	{
+/*
+ * if there is no command number defined for this command in the
+ * the database then return an automatically generated command
+ * number which is simply TangoBase incremented by on each time.
+ *
+ * NOTE : this could cause problems because the same command
+ *        from the same device server will be assigned different
+ *        command numbers depending on when it is called and
+ *        by which client. However this problem is considered
+ *        minor compared to the advantages for generic clients
+ *        i.e. no need to define command numbers in the database
+ *        for tango anymore 
+ *
+ * andy 30jun03
+ */
+		*cmd_value = tango_auto_cmd;
+		tango_auto_cmd++;
+		return (DS_OK);
+	}
 
-	sscanf(ret_str, "%d", cmd_value);
+	sscanf(ret_str,"%d",cmd_value);
+	free(ret_str);
 
 	return (DS_OK);
 }
 
-/**@ingroup tangoAPIintern
- * Check TANGO device connection. If not imported then import it. If bad connection 
- * has been signalled then reimport. Returns DS_OK if device has been (re)imported correctly.
- * 
- * @param ds  		device server structure
- * @param error	  	Will contain an appropriate error code if the function returns DS_NOTOK
- *
- * @return  DS_OK or DS_NOTOK
- */
+/*+**********************************************************************
+ Function   :   static long tango_dev_check()
+ 
+ Description:   Check TANGO device connection. If not imported then
+		import it. If bad connection has been signalled then reimport.	
+		Returns DS_OK if device has been (re)imported correctly.
+ 
+ Arg(s) In  :   devserver ds - client handle
+ 
+ Arg(s) Out :   devserver ds - updated if device (re)imported correctly
+ 
+ Return(s)  :   DS_OK or DS_NOTOK
+***********************************************************************-*/
+
 static long tango_dev_check(devserver ds, long *error)
 {
-	long dev_id = ds->ds_id;
+	long dev_id;
+
+	dev_id = ds->ds_id;
 //
 // is device imported yet ?
 //
-	if (dev_id == -1)
-	{
-		devserver ds_ptr;
-		if ( tango_dev_import(ds->device_name, ds->dev_access, &ds_ptr, error) != DS_OK) 
-			return(DS_NOTOK);
+        if (dev_id == -1)
+        {
+                devserver ds_ptr;
+                if ( tango_dev_import(ds->device_name, ds->dev_access, &ds_ptr, error)
+                     != DS_OK) return(DS_NOTOK);
 //
 // was device really imported ?
 //
-		if (ds_ptr->ds_id == -1)                                           
-		{
-			free(ds_ptr);
-			*error = DevErr_DeviceNotImportedYet;
-			return(DS_NOTOK);
-		}
+                if (ds_ptr->ds_id == -1)                                           
+                {
+                        free(ds_ptr);
+                        *error = DevErr_DeviceNotImportedYet;
+                        return(DS_NOTOK);
+                }
 //
 // device really imported - update device info in client's copy of devserver structure
 //
-		strncpy(ds->device_name, ds_ptr->device_name, sizeof(ds->device_name));
-		strncpy(ds->device_class, ds_ptr->device_class, sizeof(ds->device_class));
-		strncpy(ds->device_type, ds_ptr->device_type, sizeof(ds->device_type));
-		strncpy(ds->server_name, ds_ptr->server_name, sizeof(ds->server_name));
-		strncpy(ds->server_host, ds_ptr->server_host, sizeof(ds->server_host));
-		ds->clnt                = ds_ptr->clnt;
-		ds->ds_id               = ds_ptr->ds_id;
-		ds->no_svr_conn         = ds_ptr->no_svr_conn;
-		ds->rpc_conn_counter    = ds_ptr->rpc_conn_counter;
-		ds->dev_access          = ds_ptr->dev_access;
-		ds->i_nethost           = ds_ptr->i_nethost;
-		ds->rpc_protocol        = ds_ptr->rpc_protocol;
-		ds->rpc_timeout         = ds_ptr->rpc_timeout;
-		free(ds_ptr);
-	}
-	else
-	{
+                sprintf(ds->device_name,"%s",ds_ptr->device_name);
+                sprintf(ds->device_class,"%s",ds_ptr->device_class);
+                sprintf(ds->device_type,"%s",ds_ptr->device_type);
+                sprintf(ds->server_name,"%s",ds_ptr->server_name);
+                sprintf(ds->server_host,"%s",ds_ptr->server_host);
+                ds->clnt                = ds_ptr->clnt;
+                ds->ds_id               = ds_ptr->ds_id;
+                ds->no_svr_conn         = ds_ptr->no_svr_conn;
+                ds->rpc_conn_counter    = ds_ptr->rpc_conn_counter;
+                ds->dev_access          = ds_ptr->dev_access;
+                ds->i_nethost           = ds_ptr->i_nethost;
+                ds->rpc_protocol        = ds_ptr->rpc_protocol;
+                ds->rpc_timeout         = ds_ptr->rpc_timeout;
+                free(ds_ptr);
+        }
+        else
+        {
 //
 // does device need to be reimported ?
 //
-		if ((tango_device[dev_id].flag == TANGO_BAD_CONNECTION) && (tango_dev_reimport(ds, error) != DS_OK))
-		{
-			*error = DevErr_BadServerConnection;               
-			return(DS_NOTOK);                                  
-		}                                                                  
-	}                                                                          
+                if (tango_device[dev_id].flag == TANGO_BAD_CONNECTION)
+                {
+                        if (tango_dev_reimport(ds, error) != DS_OK)
+                        {
+                                *error = DevErr_BadServerConnection;               
+                                return(DS_NOTOK);                                  
+                        }                                                          
+                }                                                                  
+        }                                                                          
+
 	return(DS_OK);
 }
+/*+**********************************************************************
+ Function   :   static long tango_dev_error_string()
+ 
+ Description:   Recover TANGO error string stack from DevFailed exception.
+ 
+ Arg(s) In  :   Tango::DevFailed e - DevFailed exception
+ 
+ Arg(s) Out :   char *dev_error_string - global pointer to error string
+ 
+ Return(s)  :   DS_OK or DS_NOTOK
+***********************************************************************-*/
 
-/**@ingroup tangoAPIintern
- * Recover TANGO error string stack from DevFailed exception.
- * 
- * @param tango_exception DevFailed exception
- * 
- * @return  DS_OK 
- */
 static long tango_dev_error_string(Tango::DevFailed tango_exception)
 {
 	for (int i=0; i<tango_exception.errors.length(); i++)
@@ -2026,12 +2511,12 @@ static long tango_dev_error_string(Tango::DevFailed tango_exception)
 		if (i == 0)
 		{
 			dev_error_string = (char*)malloc(strlen(tango_exception.errors[i].desc.in())+1);
-			strcpy(dev_error_string, tango_exception.errors[i].desc.in());
+			sprintf(dev_error_string,"%s",tango_exception.errors[i].desc.in());
 		}
 		else
 		{
 			dev_error_string = (char*)realloc(dev_error_string,strlen(dev_error_string)+strlen(tango_exception.errors[i].desc.in())+1);
-			strcat(dev_error_string, tango_exception.errors[i].desc.in());
+			sprintf(dev_error_string+strlen(dev_error_string),"%s",tango_exception.errors[i].desc.in());
 		}
 	}
 	return(DS_OK);
