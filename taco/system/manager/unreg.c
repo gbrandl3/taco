@@ -7,13 +7,15 @@ int main (int argc, char **argv)
 
 	for (i=1; i<argc; i++)
 	{
-		sscanf (argv[i],"%d",&nu);
-		printf ("%d\n", nu);
-		pmap_unset(nu, 1L);
-		pmap_unset(nu, 2L);
-		pmap_unset(nu, 3L);
-		pmap_unset(nu, 4L);
-		pmap_unset(nu, 5L);
+		sscanf (argv[i],"%d", &nu); /* Flawfinder: ignore */
+		if (nu > 0)
+		{
+			pmap_unset(nu, 1L);
+			pmap_unset(nu, 2L);
+			pmap_unset(nu, 3L);
+			pmap_unset(nu, 4L);
+			pmap_unset(nu, 5L);
+		}
 	}
 	return 0;
 }
