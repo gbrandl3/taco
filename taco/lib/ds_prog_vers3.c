@@ -13,9 +13,9 @@
 
  Original   :	November 1994
 
- Version    :	$Revision: 1.3 $
+ Version    :	$Revision: 1.4 $
 
- Date	    :	$Date: 2004-06-02 16:36:14 $
+ Date	    :	$Date: 2004-10-26 11:32:14 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -51,8 +51,7 @@ extern configuration_flags      config_flags;
  * Defined in DevServerMain.c and initialised with the
  * minimal access right given in the security database.
  */
-
-extern long minimal_access;
+long minimal_access = WRITE_ACCESS;
 
 void _WINAPI devserver_prog_1	PT_( (struct svc_req *rqstp,SVCXPRT *transp) );
 
