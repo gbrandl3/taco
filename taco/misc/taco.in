@@ -44,9 +44,9 @@ case $1 in
 		echo -n "Starting TACO services $sec_text"
 		startproc -s -q "$taco_manager" $dbase $log $security
 		rc_status -v
-		if test ${TACO_DATABASE:-dbm} = dbm ; then
+		if [ ${TACO_DATABASE:-dbm} = dbm ] ; then
 			new=`ls -l ${DBM_DIR}/* 2>/dev/null | awk '{print $5;}' | sort | uniq | wc -l`
-			if [ $new -eq 1 ] ;  then
+			if [ $new -le 1 ] ;  then
 				echo "Initialization of the database:"
 				sleep 5
 				if db_fillup2 ; then
@@ -74,7 +74,7 @@ case $1 in
 		rc_status -v
 		;;
 	new)
-		if ${TACO_DATABASE:-dbm} = dbm ; then
+		if [ ${TACO_DATABASE:-dbm} = dbm ] ; then
 			echo -n "Do you really want to delete the complete TACO database (not the resource files)? (yes/no): "
 			read
 			if test "x$REPLY" = xyes ; then
