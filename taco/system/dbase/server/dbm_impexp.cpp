@@ -512,7 +512,6 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 			s.seekp(0, ios::beg);
 #endif
 			s << dev.ds_class << "|" << dev.ds_name << "|" << dev_numb << "|" << std::ends;
-			std::cerr << s.str() << std::endl;
 #if !HAVE_SSTREAM
 			strcpy(key3.dptr, s.str());
 			s.freeze(false);
@@ -537,7 +536,7 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 				datum	content = cont.get_datum();
 				std::string 	dev_str;
 			
-				dev_str = cont.get_host_name() + "|0|0|unknown|" + dev_class + "|0|" + cont.get_process_name() + "|";
+				dev_str = cont.get_device_name() + "|" + cont.get_host_name() + "|0|0|unknown|" + dev_class + "|0|" + cont.get_process_name() + "|";
 //
 // Update database 
 //
@@ -845,6 +844,8 @@ int NdbmServer::db_store_3(db_devinfo_3 &dev_stu)
 		cont_sto.dsize = strlen(cont_sto.dptr);
 		if (gdbm_store(dbgen.tid[0], key, cont_sto, GDBM_REPLACE))
 			throw int(DbErr_DatabaseAccess);
+		delete [] cont_sto.dptr;
+		free(key.dptr);
 	}
 	catch(NdbmError & err)
 	{
@@ -853,12 +854,15 @@ int NdbmServer::db_store_3(db_devinfo_3 &dev_stu)
 	catch(const int err)
 	{
         	errcode = err;
+		if (err == DbErr_DatabaseAccess)
+		{
+			delete [] cont_sto.dptr;
+			free(key.dptr);
+		}
 	}
 	catch (const std::bad_alloc)
 	{
 		errcode	= int(DbErr_ServerMemoryAllocation);
 	}
-	delete [] cont_sto.dptr;
-	free(key.dptr);
 	return errcode;
 }
