@@ -47,7 +47,7 @@ manager()
 
 # now start the Manager 
     	echo "starting the Manager ..."
-    	nohup Manager -log &
+    	Manager -log 
 	sleep 1
     	echo "Manager started"
 }
