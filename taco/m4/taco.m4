@@ -129,7 +129,7 @@ AC_DEFUN([TACO_CHECK_TACO_SYSTEM],
                         taco_config="unix=1 __unix=1 linux=1 x86=1";;
             m68k-*-linux-*) 
 			taco_config="unix=1 __unix=1 linux=1 68k=1";;
-dnl			taco_install_path="linux/86k" ;;
+dnl			taco_install_path="linux/68k" ;;
             *-*-solar*-* | *-*-sun*-*)
                         taco_config="unix=1 __unix=1 _solaris=1 __solaris__=1";;
 dnl			taco_install_path="solaris" ;;
