@@ -18,7 +18,7 @@ usage="Usage: $0 {start|stop|status|restart|new}"
 prefix=${DSHOME:-@prefix@}
 exec_prefix=@exec_prefix@
 taco_env_file="@sysconfdir@/tacoenv.sh"
-if ! test -r "$taco_env_file" ; then
+if test ! -r "$taco_env_file" ; then
 	echo "error: TACO environment file '$taco_env_file' is missing"
 	exit 6
 fi
@@ -26,7 +26,7 @@ fi
 
 # Check for TACO manager executable
 taco_manager="${TACO_PATH}/Manager"
-if ! test -x $taco_manager ; then
+if test ! -x $taco_manager ; then
 	echo "error: TACO manager '$taco_manager' is not installed"
 	exit 5
 fi

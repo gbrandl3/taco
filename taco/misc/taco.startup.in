@@ -56,7 +56,7 @@ manager()
 
 	if test "x$TACO_LOGGING" = "xyes" ; then
 		taco_manager_flags="-log"
-		if ! test -d $LOGPATH ; then
+		if test ! -d $LOGPATH ; then
 			mkdir -p $LOGPATH
 		fi
 	fi
