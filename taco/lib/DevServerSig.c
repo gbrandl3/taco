@@ -1,6 +1,3 @@
-static char RcsId[]           = 
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServerSig.c,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
-
 /*+*******************************************************************
 
  File:          DevServerSignal.c
@@ -16,9 +13,9 @@ static char RcsId[]           =
 
  Original:	June 1991
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-03-14 12:22:07 $
+ Date:		$Date: 2003-04-25 11:21:27 $
 
  Copyright (c) 1990-1997 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -27,7 +24,7 @@ static char RcsId[]           =
 
 #include <signal.h>
 #include <API.h>
-#include <ApiP.h>
+#include <private/ApiP.h>
 #include <DevServer.h>
 #include <DevErrors.h>
 #include <DevSignal.h>
@@ -169,7 +166,6 @@ long ds__signal (int sig, void (*action)(int), long *error)
  */
 void main_signal_handler (int signo)
 {
-	/*printf("main_signal_handler(): called with signo=%d ...\n",signo);*/
 
 	/*
 	 *  check limits for valid signals
@@ -241,6 +237,7 @@ void main_signal_handler (int signo)
 void unregister_server (void)
 {
 	long error = 0;
+  LOCK(async_mutex);
 
 /*
  * if this is a bona fida device server and it is using the database
@@ -285,4 +282,12 @@ void unregister_server (void)
  *
  *	exit(1);
  */
+
+  /* the server has been unregistred, so set flag to false! 
+     otherwise, there may be more than one attempt to unregister the server
+     in multithreaded apps.
+  */
+  config_flags.device_server = False;    
+  UNLOCK(async_mutex);
+
 }

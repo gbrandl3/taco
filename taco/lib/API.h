@@ -12,9 +12,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.1 $
- 
- Date:		$Date: 2003-03-14 12:22:07 $
+ Version:	$Revision: 1.2 $
+
+ Date:		$Date: 2003-04-25 11:21:22 $
 
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
@@ -30,7 +30,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.2 2003-04-25 11:21:22 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*
@@ -50,6 +50,7 @@ static char APIh[] =
  * when it comes to the RPC part e.g. caddr_t
 #ifdef linux
 #include <linux/types.h>
+#include <assert.h>
 #endif
  */
 

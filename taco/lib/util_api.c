@@ -1,6 +1,3 @@
-static char RcsId[] = 
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/util_api.c,v 1.2 2003-03-18 16:16:33 jkrueger1 Exp $";
-
 /*+*******************************************************************
 
  File       :	util_api.c
@@ -17,9 +14,9 @@ static char RcsId[] =
 
  Original   :	April 1993
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-03-18 16:16:33 $
+ Date:		$Date: 2003-04-25 11:21:39 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -27,9 +24,13 @@ static char RcsId[] =
 ********************************************************************-*/
 #include <config.h>
 #include <API.h>
-#include <ApiP.h>
+#include <private/ApiP.h>
 #include <DevServer.h>
 #include <API_xdr_vers3.h>
+
+#if 0
+#include <DserverTeams.h>
+#endif
 
 #include <Admin.h>
 #include <DevErrors.h>
@@ -409,7 +410,7 @@ long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
 	*error = client_data.error;
 	return (client_data.status);
 }
-
+
 
 /**
  * Returns a sequence of structures containig all
@@ -706,7 +707,7 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 	*error = dev_query_out.error;
 	return (dev_query_out.status);
 }
-
+
 
 /**
  * Read the command name as a string from the resource database.
@@ -813,7 +814,7 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
 	free (ret_str);
 	return (DS_OK);
 }
-
+
 
 /**
  * Returns to the user a structure of device
@@ -834,7 +835,7 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
  * @return DS_OK or DS_NOTOK
  */
 long _DLLFunc dev_inform (devserver *clnt_handles, long num_devices,
-			  DevInfo **dev_info, long *error)
+			  DevInfo * *dev_info, long *error)
 {
 	devserver	*clnt_ptr;
 	DevInfo		*info_ptr;
@@ -1005,7 +1006,7 @@ long _DLLFunc dev_rpc_timeout (devserver ds, long request,
 
 	return (DS_OK);
 }
-
+
 
 #if defined(_NT)
 /**
@@ -1053,7 +1054,7 @@ int*  error;
    return(ret_val);
 }
 #endif   /* _NT */
-
+
 /**
  * Get the index for the nethost from the device
  * name. The nethost is specified in the device name
@@ -1085,6 +1086,12 @@ long _DLLFunc get_i_nethost_by_device_name (char *device_name, long *error)
  * removing the device name which follows
  */
 		nethost = (char*)malloc(strlen(device_name)+1);
+		if (nethost == NULL)
+		{
+			*error  = DevErr_InsufficientMemory;
+			return (DS_NOTOK);
+		}
+
 		strcpy(nethost,device_name+2);
 		for (i=0; i<(int)strlen(nethost); i++)
 		{
@@ -1119,7 +1126,7 @@ long _DLLFunc get_i_nethost_by_device_name (char *device_name, long *error)
 
 	return(i_nethost);
 }
-
+
 /**
  * Get the index for the nethost from the nethost name. 
  *
@@ -1138,6 +1145,9 @@ long _DLLFunc get_i_nethost_by_name (char *nethost, long *error)
  * loop through the array of imported nethosts looking for the 
  * specified nethost
  */
+/* no hethost specified */
+	if(nethost==NULL)
+	    return -1;
 
 	for (i=0; i<max_nethost; i++)
 	{
@@ -1184,7 +1194,7 @@ char* _DLLFunc get_nethost_by_index (long i_nethost, long *error)
 
 	return(nethost);
 }
-
+
 
 /**
  * Extract the domain/family/member part of name from the 
@@ -1228,7 +1238,7 @@ char* _DLLFunc extract_device_name (char *full_name, long *error)
 
 	return(device_name);
 }
-
+
 /*
  * global arrays required for multi-nethost support, memory is
  * allocated for them by nethost_alloc()
@@ -1257,9 +1267,27 @@ long _DLLFunc nethost_alloc (long *error)
  */
 	if (first)
 	{
-		multi_nethost = (nethost_info*)malloc((sizeof(nethost_info)));
+		multi_nethost =
+		(nethost_info*)malloc((sizeof(nethost_info)));
+		if (multi_nethost == NULL)
+		    {
+			*error  = DevErr_InsufficientMemory;
+			return (DS_NOTOK);
+		    }
+
 		msg_ds = (struct _devserver*)malloc((sizeof(struct _devserver)));
+		if (msg_ds == NULL)
+		{
+			*error  = DevErr_InsufficientMemory;
+			return (DS_NOTOK);
+		}
+
 		db_ds = (struct _devserver*)malloc((sizeof(struct _devserver)));
+		if (db_ds == NULL)
+		{
+			*error  = DevErr_InsufficientMemory;
+			return (DS_NOTOK);
+		}
 		auth_flag = (short*)malloc((sizeof(short)));
 		first = 0;
 		new_max_nethost = 1;
@@ -1270,10 +1298,36 @@ long _DLLFunc nethost_alloc (long *error)
  */
 	else
 	{
-		multi_nethost = (nethost_info*)realloc(multi_nethost,(sizeof(nethost_info))*(max_nethost+MIN_NETHOST));
-		msg_ds = (struct _devserver*)realloc(msg_ds,(sizeof(struct _devserver))*(max_nethost+MIN_NETHOST));
-		db_ds = (struct _devserver*)realloc(db_ds,(sizeof(struct _devserver))*(max_nethost+MIN_NETHOST));
-		auth_flag = (short*)realloc(auth_flag,(sizeof(short))*(max_nethost+MIN_NETHOST));
+	    void* tmp;
+		tmp = realloc(multi_nethost,(sizeof(nethost_info))*(max_nethost+MIN_NETHOST));
+		
+		if (tmp == NULL)
+		{
+			*error  = DevErr_InsufficientMemory;
+			return (DS_NOTOK);
+		}
+		multi_nethost=(nethost_info*)tmp;
+		tmp=realloc(msg_ds,(sizeof(struct _devserver))*(max_nethost+MIN_NETHOST));
+		if (tmp == NULL)
+		{
+			*error  = DevErr_InsufficientMemory;
+			return (DS_NOTOK);
+		}
+		msg_ds = (struct _devserver*)tmp;
+		tmp=realloc(db_ds,(sizeof(struct _devserver))*(max_nethost+MIN_NETHOST));
+		if (tmp == NULL)
+		{
+			*error  = DevErr_InsufficientMemory;
+			return (DS_NOTOK);
+		}
+		db_ds = (struct _devserver*)tmp;
+		tmp=realloc(auth_flag,(sizeof(short))*(max_nethost+MIN_NETHOST));
+		if (tmp == NULL)
+		{
+			*error  = DevErr_InsufficientMemory;
+			return (DS_NOTOK);
+		}
+		auth_flag = (short*)tmp;
 		new_max_nethost = max_nethost + MIN_NETHOST;
 	}
 /* 
@@ -1307,7 +1361,7 @@ long _DLLFunc nethost_alloc (long *error)
 
 	return(DS_OK);
 }
-
+
 
 /**
  * Pings the device server to find out if this device is being served. 
@@ -1322,6 +1376,7 @@ long _DLLFunc dev_ping (devserver ds, long *error)
 {
 	_dev_import_in	dev_import_in;
 	_dev_import_out	dev_import_out;
+	char * in_name_stripped;
 	enum clnt_stat  clnt_stat;
 
 	*error = DS_OK;
@@ -1356,8 +1411,21 @@ long _DLLFunc dev_ping (devserver ds, long *error)
          *  fill in data transfer structures dev_import_in
          *  and dev_import_out.
          */
+        /* strip nethost name, if present */
 
 	dev_import_in.device_name = ds->device_name;
+#if 0
+	if(ds->device_name[0]=='/' && ds->device_name[1]=='/')
+        { /* Net host part present */
+            in_name_stripped=strchr(&(ds->device_name[2]),'/');
+        }
+        else
+       {
+          in_name_stripped=ds->device_name;
+       }
+			
+	dev_import_in.device_name =in_name_stripped;
+#endif
 	dev_import_in.access_right = 0;
 	dev_import_in.client_id = 0;
 	dev_import_in.connection_id = 0;

@@ -1,0 +1,4537 @@
+%!PS-Adobe-3.0
+%%BoundingBox: (atend)
+%%Pages: (atend)
+%%PageOrder: (atend)
+%%DocumentFonts: (atend)
+%%Creator: Frame 5.0
+%%DocumentData: Clean7Bit
+%%EndComments
+%%BeginProlog
+%
+% Frame ps_prolog 5.0, for use with Frame 5.0 products
+% This ps_prolog file is Copyright (c) 1986-1995 Frame Technology
+% Corporation.  All rights reserved.  This ps_prolog file may be
+% freely copied and distributed in conjunction with documents created
+% using FrameMaker, FrameMaker/SGML and FrameViewer as long as this 
+% copyright notice is preserved.
+%
+% FrameMaker users specify the proper paper size for each print job in the
+% "Print" dialog's "Printer Paper Size" "Width" and "Height~ fields.  If the
+% printer that the PS file is sent to does not support the requested paper
+% size, or if there is no paper tray of the proper size currently installed, 
+% then the job will not be printed.  The following flag, if set to true, will
+% cause the job to print on the default paper in such cases.
+/FMAllowPaperSizeMismatch            false def
+%
+% Frame products normally print colors as their true color on a color printer
+% or as shades of gray, based on luminance, on a black-and white printer. The
+% following flag, if set to true, forces all non-white colors to print as pure
+% black. This has no effect on bitmap images.
+/FMPrintAllColorsAsBlack             false def
+%
+% Frame products can either set their own line screens or use a printer's 
+% default settings. Three flags below control this separately for no 
+% separations, spot separations and process separations. If a flag
+% is true, then the default printer settings will not be changed. If it is
+% false, Frame products will use their own settings from a table based on
+% the printer's resolution.
+/FMUseDefaultNoSeparationScreen      true  def
+/FMUseDefaultSpotSeparationScreen    true  def
+/FMUseDefaultProcessSeparationScreen false def
+%
+% For any given PostScript printer resolution, Frame products have two sets of 
+% screen angles and frequencies for printing process separations, which are 
+% recomended by Adobe. The following variable chooses the higher frequencies
+% when set to true or the lower frequencies when set to false. This is only
+% effective if the appropriate FMUseDefault...SeparationScreen flag is false.
+/FMUseHighFrequencyScreens true def
+%
+% The following is a set of predefined optimal frequencies and angles for various
+% common dpi settings. This is taken from "Advances in Color Separation Using
+% PostScript Software Technology," from Adobe Systems (3/13/89 P.N. LPS 0043)
+% and corrolated with information which is in various PPD (4.0) files.
+%
+% The "dpiranges" figure is the minimum dots per inch device resolution which
+% can support this setting. The "low" and "high" values are controlled by the
+% setting of the FMUseHighFrequencyScreens flag above. The "TDot" flags control
+% the use of the "Yellow Triple Dot" feature whereby the frequency id divided by
+% three, but the dot function is "trippled" giving a block of 3x3 dots per cell.
+%
+% PatFreq is a compromise pattern frequency for ps Level 2 printers which is close
+% to the ideal WYSIWYG pattern frequency of 9 repetitions/inch but does not beat
+% (too badly) against the screen frequencies of any separations for that DPI.
+/dpiranges   [  2540    2400    1693     1270    1200     635      600      0      ] def
+/CMLowFreqs  [ 100.402  94.8683 89.2289 100.402  94.8683  66.9349  63.2456 47.4342 ] def
+/YLowFreqs   [  95.25   90.0    84.65    95.25   90.0     70.5556  66.6667 50.0    ] def
+/KLowFreqs   [  89.8026 84.8528 79.8088  89.8026 84.8528  74.8355  70.7107 53.033  ] def
+/CLowAngles  [  71.5651 71.5651 71.5651 71.5651  71.5651  71.5651  71.5651 71.5651 ] def
+/MLowAngles  [  18.4349 18.4349 18.4349 18.4349  18.4349  18.4349  18.4349 18.4349 ] def
+/YLowTDot    [  true    true    false    true    true     false    false   false   ] def
+/CMHighFreqs [ 133.87  126.491 133.843  108.503 102.523  100.402   94.8683 63.2456 ] def
+/YHighFreqs  [ 127.0   120.0   126.975  115.455 109.091   95.25    90.0    60.0    ] def
+/KHighFreqs  [ 119.737 113.137 119.713  128.289 121.218   89.8026  84.8528 63.6395 ] def
+/CHighAngles [  71.5651 71.5651 71.5651  70.0169 70.0169  71.5651  71.5651 71.5651 ] def
+/MHighAngles [  18.4349 18.4349 18.4349  19.9831 19.9831  18.4349  18.4349 18.4349 ] def
+/YHighTDot   [  false   false   true     false   false    true     true    false   ] def
+/PatFreq     [	10.5833 10.0     9.4055  10.5833 10.0	  10.5833  10.0	   9.375   ] def
+%
+% PostScript Level 2 printers contain an "Accurate Screens" feature which can
+% improve process separation rendering at the expense of compute time. This 
+% flag is ignored by PostScript Level 1 printers.
+/FMUseAcccurateScreens true def
+%
+% The following PostScript procedure defines the spot function that Frame
+% products will use for process separations. You may un-comment-out one of
+% the alternative functions below, or use your own.
+%
+% Dot function
+/FMSpotFunction {abs exch abs 2 copy add 1 gt 
+		{1 sub dup mul exch 1 sub dup mul add 1 sub }
+		{dup mul exch dup mul add 1 exch sub }ifelse } def
+%
+% Line function
+% /FMSpotFunction { pop } def
+%
+% Elipse function
+% /FMSpotFunction { dup 5 mul 8 div mul exch dup mul exch add 
+%		sqrt 1 exch sub } def
+%
+%
+/FMversion (5.0) def 
+/fMLevel1 /languagelevel where {pop languagelevel} {1} ifelse 2 lt def
+/FMPColor
+	fMLevel1 {
+		false
+		/colorimage where {pop pop true} if
+	} {
+		true
+	} ifelse
+def
+/FrameDict 400 dict def 
+systemdict /errordict known not {/errordict 10 dict def
+		errordict /rangecheck {stop} put} if
+% The readline in PS 23.0 doesn't recognize cr's as nl's on AppleTalk
+FrameDict /tmprangecheck errordict /rangecheck get put 
+errordict /rangecheck {FrameDict /bug true put} put 
+FrameDict /bug false put 
+mark 
+% Some PS machines read past the CR, so keep the following 3 lines together!
+currentfile 5 string readline
+00
+0000000000
+cleartomark 
+errordict /rangecheck FrameDict /tmprangecheck get put 
+FrameDict /bug get { 
+	/readline {
+		/gstring exch def
+		/gfile exch def
+		/gindex 0 def
+		{
+			gfile read pop 
+			dup 10 eq {exit} if 
+			dup 13 eq {exit} if 
+			gstring exch gindex exch put 
+			/gindex gindex 1 add def 
+		} loop
+		pop 
+		gstring 0 gindex getinterval true 
+		} bind def
+	} if
+/FMshowpage /showpage load def
+/FMquit /quit load def
+/FMFAILURE { 
+	dup = flush 
+	FMshowpage 
+	/Helvetica findfont 12 scalefont setfont
+	72 200 moveto show
+	72 220 moveto show
+	FMshowpage 
+	FMquit 
+	} def 
+/FMVERSION {
+	FMversion ne {
+		(Frame product version does not match ps_prolog!  Check installation;)
+		(also check ~/fminit and ./fminit for old versions) FMFAILURE
+		} if
+	} def 
+/FMBADEPSF { 
+	(Adobe's PostScript Language Reference Manual, 2nd Edition, section H.2.4)
+	(says your EPS file is not valid, as it calls X              )
+	dup dup (X) search pop exch pop exch pop length 
+	5 -1 roll 
+	putinterval 
+	FMFAILURE
+	} def
+/fmConcatProcs
+	{
+	/proc2 exch cvlit def/proc1 exch cvlit def/newproc proc1 length proc2 length add array def
+	newproc 0 proc1 putinterval newproc proc1 length proc2 putinterval newproc cvx
+}def
+FrameDict begin [
+	/ALDsave
+	/FMdicttop
+	/FMoptop
+	/FMpointsize
+	/FMsaveobject
+	/b
+	/bitmapsave
+	/blut
+	/bpside
+	/bs
+	/bstring
+	/bwidth
+	/c
+	/cf
+	/cs
+	/cynu
+	/depth
+	/edown
+	/fh
+	/fillvals
+	/fw
+	/fx
+	/fy
+	/g
+	/gfile
+	/gindex
+	/grnt
+	/gryt
+	/gstring
+	/height
+	/hh
+	/i
+	/im
+	/indx
+	/is
+	/k
+	/kk
+	/landscape
+	/lb
+	/len
+	/llx
+	/lly
+	/m
+	/magu
+	/manualfeed
+	/n
+	/offbits
+	/onbits
+	/organgle
+	/orgbangle
+	/orgbfreq
+	/orgbproc
+	/orgbxfer
+	/orgfreq
+	/orggangle
+	/orggfreq
+	/orggproc
+	/orggxfer
+	/orgmatrix
+	/orgproc
+	/orgrangle
+	/orgrfreq
+	/orgrproc
+	/orgrxfer
+	/orgxfer
+	/pagesave
+	/paperheight
+	/papersizedict
+	/paperwidth
+	/pos
+	/pwid
+	/r
+	/rad
+	/redt
+	/sl
+	/str
+	/tran
+	/u
+	/urx
+	/ury
+	/val
+	/width
+	/width
+	/ws
+	/ww
+	/x
+	/x1
+	/x2
+	/xindex
+	/xpoint
+	/xscale
+	/xx
+	/y
+	/y1
+	/y2
+	/yelu
+	/yindex
+	/ypoint
+	/yscale
+	/yy
+] { 0 def } forall
+/FmBD {bind def} bind def
+systemdict /pdfmark known {
+	/fMAcrobat true def
+	
+	/FmPD /pdfmark load def
+	
+	
+	/FmPT /show load def
+	
+	
+	currentdistillerparams /CoreDistVersion get 2000 ge {
+	
+		
+		/FmPD2 /pdfmark load def
+		
+		
+		
+		
+		
+		/FmPA { mark exch /Dest exch 5 3 roll 
+				/View [ /XYZ null 6 -2 roll FmDC exch pop null] /DEST FmPD 
+		}FmBD
+	} {
+		
+		/FmPD2 /cleartomark load def
+		/FmPA {pop pop pop}FmBD
+	} ifelse
+} {
+	
+	/fMAcrobat false def
+	/FmPD /cleartomark load def
+	/FmPD2 /cleartomark load def
+	/FmPT /pop load def
+	/FmPA {pop pop pop}FmBD
+} ifelse
+/FmDC {
+	transform fMDefaultMatrix itransform cvi exch cvi exch
+}FmBD
+/FmBx {
+	dup 3 index lt {3 1 roll exch} if 
+	1 index 4 index lt {4 -1 roll 3 1 roll exch 4 1 roll} if
+}FmBD
+/FMnone 0 def
+/FMcyan 1 def
+/FMmagenta 2 def
+/FMyellow 3 def
+/FMblack 4 def
+/FMcustom 5 def
+/fMNegative false def 
+/FrameSepIs FMnone def 
+/FrameSepBlack 0 def
+/FrameSepYellow 0 def
+/FrameSepMagenta 0 def
+/FrameSepCyan 0 def
+/FrameSepRed 1 def
+/FrameSepGreen 1 def
+/FrameSepBlue 1 def
+/FrameCurGray 1 def
+/FrameCurPat null def
+/FrameCurColors [ 0 0 0 1 0 0 0 ] def 
+/FrameColorEpsilon .001 def	
+/eqepsilon {		
+	sub dup 0 lt {neg} if
+	FrameColorEpsilon le
+} bind def
+/FrameCmpColorsCMYK { 
+	2 copy 0 get exch 0 get eqepsilon {
+		2 copy 1 get exch 1 get eqepsilon {
+			2 copy 2 get exch 2 get eqepsilon {
+				3 get exch 3 get eqepsilon
+			} {pop pop false} ifelse
+		}{pop pop false} ifelse
+	} {pop pop false} ifelse
+} bind def
+/FrameCmpColorsRGB { 
+	2 copy 4 get exch 0 get eqepsilon {
+		2 copy 5 get exch 1 get eqepsilon {
+			6 get exch 2 get eqepsilon
+		}{pop pop false} ifelse
+	} {pop pop false} ifelse
+} bind def
+/RGBtoCMYK { 
+	1 exch sub 
+	3 1 roll 
+	1 exch sub 
+	3 1 roll 
+	1 exch sub 
+	3 1 roll 
+	3 copy 
+	2 copy 
+	le { pop } { exch pop } ifelse 
+	2 copy 
+	le { pop } { exch pop } ifelse 
+	dup dup dup 
+	6 1 roll 
+	4 1 roll 
+	7 1 roll 
+	sub 
+	6 1 roll 
+	sub 
+	5 1 roll 
+	sub 
+	4 1 roll 
+} bind def
+/CMYKtoRGB { 
+	dup dup 4 -1 roll add 						  
+	5 1 roll 3 -1 roll add 						  
+	4 1 roll add 								  
+	1 exch sub dup 0 lt {pop 0} if 3 1 roll 	  
+	1 exch sub dup 0 lt {pop 0} if exch 	      
+	1 exch sub dup 0 lt {pop 0} if exch	  		  
+} bind def
+/FrameSepInit {
+	1.0 RealSetgray
+} bind def
+/FrameSetSepColor { 
+	/FrameSepBlue exch def
+	/FrameSepGreen exch def
+	/FrameSepRed exch def
+	/FrameSepBlack exch def
+	/FrameSepYellow exch def
+	/FrameSepMagenta exch def
+	/FrameSepCyan exch def
+	/FrameSepIs FMcustom def
+	setCurrentScreen	
+} bind def
+/FrameSetCyan {
+	/FrameSepBlue 1.0 def
+	/FrameSepGreen 1.0 def
+	/FrameSepRed 0.0 def
+	/FrameSepBlack 0.0 def
+	/FrameSepYellow 0.0 def
+	/FrameSepMagenta 0.0 def
+	/FrameSepCyan 1.0 def
+	/FrameSepIs FMcyan def
+	setCurrentScreen	
+} bind def
+ 
+/FrameSetMagenta {
+	/FrameSepBlue 1.0 def
+	/FrameSepGreen 0.0 def
+	/FrameSepRed 1.0 def
+	/FrameSepBlack 0.0 def
+	/FrameSepYellow 0.0 def
+	/FrameSepMagenta 1.0 def
+	/FrameSepCyan 0.0 def
+	/FrameSepIs FMmagenta def
+	setCurrentScreen
+} bind def
+ 
+/FrameSetYellow {
+	/FrameSepBlue 0.0 def
+	/FrameSepGreen 1.0 def
+	/FrameSepRed 1.0 def
+	/FrameSepBlack 0.0 def
+	/FrameSepYellow 1.0 def
+	/FrameSepMagenta 0.0 def
+	/FrameSepCyan 0.0 def
+	/FrameSepIs FMyellow def
+	setCurrentScreen
+} bind def
+ 
+/FrameSetBlack {
+	/FrameSepBlue 0.0 def
+	/FrameSepGreen 0.0 def
+	/FrameSepRed 0.0 def
+	/FrameSepBlack 1.0 def
+	/FrameSepYellow 0.0 def
+	/FrameSepMagenta 0.0 def
+	/FrameSepCyan 0.0 def
+	/FrameSepIs FMblack def
+	setCurrentScreen
+} bind def
+ 
+/FrameNoSep { 
+	/FrameSepIs FMnone def
+	setCurrentScreen
+} bind def
+/FrameSetSepColors { 
+	FrameDict begin
+	[ exch 1 add 1 roll ]
+	/FrameSepColors  
+	exch def end
+	} bind def
+/FrameColorInSepListCMYK { 
+	FrameSepColors {  
+       		exch dup 3 -1 roll 
+       		FrameCmpColorsCMYK 
+       		{ pop true exit } if
+    	} forall 
+	dup true ne {pop false} if
+	} bind def
+/FrameColorInSepListRGB { 
+	FrameSepColors {  
+       		exch dup 3 -1 roll 
+       		FrameCmpColorsRGB 
+       		{ pop true exit } if
+    	} forall 
+	dup true ne {pop false} if
+	} bind def
+/RealSetgray /setgray load def
+/RealSetrgbcolor /setrgbcolor load def
+/RealSethsbcolor /sethsbcolor load def
+end 
+/setgray { 
+	FrameDict begin
+	FrameSepIs FMnone eq
+		{ RealSetgray } 
+		{ 
+		FrameSepIs FMblack eq 
+			{ RealSetgray } 
+			{ FrameSepIs FMcustom eq 
+			  FrameSepRed 0 eq and
+			  FrameSepGreen 0 eq and
+			  FrameSepBlue 0 eq and {
+			  	RealSetgray
+			  } {
+				1 RealSetgray pop 
+			  } ifelse
+			} ifelse
+		} ifelse
+	end
+} bind def
+/setrgbcolor { 
+	FrameDict begin
+	FrameSepIs FMnone eq
+	{  RealSetrgbcolor }
+	{
+		3 copy [ 4 1 roll ] 
+		FrameColorInSepListRGB
+		{
+				FrameSepBlue eq exch 
+			 	FrameSepGreen eq and exch 
+			 	FrameSepRed eq and
+			 	{ 0 } { 1 } ifelse
+		}
+		{
+			FMPColor {
+				RealSetrgbcolor
+				currentcmykcolor
+			} {
+				RGBtoCMYK
+			} ifelse
+			FrameSepIs FMblack eq
+			{1.0 exch sub 4 1 roll pop pop pop} {
+			FrameSepIs FMyellow eq
+			{pop 1.0 exch sub 3 1 roll pop pop} {
+			FrameSepIs FMmagenta eq
+			{pop pop 1.0 exch sub exch pop } {
+			FrameSepIs FMcyan eq
+			{pop pop pop 1.0 exch sub } 
+			{pop pop pop pop 1} ifelse } ifelse } ifelse } ifelse 
+		} ifelse
+		RealSetgray
+	} 
+	ifelse
+	end
+} bind def
+/sethsbcolor {
+	FrameDict begin
+	FrameSepIs FMnone eq 
+	{ RealSethsbcolor } 
+	{
+		RealSethsbcolor 
+		currentrgbcolor  
+		setrgbcolor 
+	} 
+	ifelse
+	end
+} bind def
+FrameDict begin
+/setcmykcolor where {
+	pop /RealSetcmykcolor /setcmykcolor load def
+} {
+	/RealSetcmykcolor {
+		4 1 roll
+		3 { 3 index add 0 max 1 min 1 exch sub 3 1 roll} repeat 
+		RealSetrgbcolor pop
+	} bind def
+} ifelse
+userdict /setcmykcolor { 
+		FrameDict begin
+		FrameSepIs FMnone eq
+		{ RealSetcmykcolor } 
+		{
+			4 copy [ 5 1 roll ]
+			FrameColorInSepListCMYK
+			{
+				FrameSepBlack eq exch 
+				FrameSepYellow eq and exch 
+				FrameSepMagenta eq and exch 
+				FrameSepCyan eq and 
+				{ 0 } { 1 } ifelse
+			}
+			{
+				FrameSepIs FMblack eq
+				{1.0 exch sub 4 1 roll pop pop pop} {
+				FrameSepIs FMyellow eq
+				{pop 1.0 exch sub 3 1 roll pop pop} {
+				FrameSepIs FMmagenta eq
+				{pop pop 1.0 exch sub exch pop } {
+				FrameSepIs FMcyan eq
+				{pop pop pop 1.0 exch sub } 
+				{pop pop pop pop 1} ifelse } ifelse } ifelse } ifelse 
+			} ifelse
+			RealSetgray
+		}
+		ifelse
+		end
+	} bind put
+fMLevel1 { 
+	
+	
+	
+	/patScreenDict 7 dict dup begin
+		<0f1e3c78f0e1c387> [ 45  { pop } {exch pop} 		.5   2 sqrt] FmBD
+		<0f87c3e1f0783c1e> [ 135 { pop } {exch pop}			.5   2 sqrt] FmBD
+		<cccccccccccccccc> [ 0   { pop } dup				.5   2	   ] FmBD
+		<ffff0000ffff0000> [ 90  { pop } dup				.5   2	   ] FmBD
+		<8142241818244281> [ 45  { 2 copy lt {exch} if pop}	dup .75  2 sqrt] FmBD
+		<03060c183060c081> [ 45  { pop } {exch pop}			.875 2 sqrt] FmBD
+		<8040201008040201> [ 135 { pop } {exch pop}			.875 2 sqrt] FmBD
+	end def
+} { 
+	
+	/patProcDict 5 dict dup begin
+		<0f1e3c78f0e1c387> { 3 setlinewidth -1 -1 moveto 9 9 lineto stroke 
+											4 -4 moveto 12 4 lineto stroke
+											-4 4 moveto 4 12 lineto stroke} bind def
+		<0f87c3e1f0783c1e> { 3 setlinewidth -1 9 moveto 9 -1 lineto stroke 
+											-4 4 moveto 4 -4 lineto stroke
+											4 12 moveto 12 4 lineto stroke} bind def
+		<8142241818244281> { 1 setlinewidth -1 9 moveto 9 -1 lineto stroke
+											-1 -1 moveto 9 9 lineto stroke } bind def
+		<03060c183060c081> { 1 setlinewidth -1 -1 moveto 9 9 lineto stroke 
+											4 -4 moveto 12 4 lineto stroke
+											-4 4 moveto 4 12 lineto stroke} bind def
+		<8040201008040201> { 1 setlinewidth -1 9 moveto 9 -1 lineto stroke 
+											-4 4 moveto 4 -4 lineto stroke
+											4 12 moveto 12 4 lineto stroke} bind def
+	end def
+	/patDict 15 dict dup begin
+		/PatternType 1 def		
+		/PaintType 2 def		
+		/TilingType 3 def		
+		/BBox [ 0 0 8 8 ] def 	
+		/XStep 8 def			
+		/YStep 8 def			
+		/PaintProc {
+			begin
+			patProcDict bstring known {
+				patProcDict bstring get exec
+			} {
+				8 8 true [1 0 0 -1 0 8] bstring imagemask
+			} ifelse
+			end
+		} bind def
+	end def
+} ifelse
+/combineColor {
+    FrameSepIs FMnone eq
+	{
+		graymode fMLevel1 or not {
+			
+			[/Pattern [/DeviceCMYK]] setcolorspace
+			FrameCurColors 0 4 getinterval aload pop FrameCurPat setcolor
+		} {
+			FrameCurColors 3 get 1.0 ge {
+				FrameCurGray RealSetgray
+			} {
+				fMAcrobat not FMPColor graymode and and {
+					0 1 3 { 
+						FrameCurColors exch get
+						1 FrameCurGray sub mul
+					} for
+					RealSetcmykcolor
+				} {
+					4 1 6 {
+						FrameCurColors exch get
+						graymode {
+							1 exch sub 1 FrameCurGray sub mul 1 exch sub
+						} {
+							1.0 lt {FrameCurGray} {1} ifelse
+						} ifelse
+					} for
+					RealSetrgbcolor
+				} ifelse
+			} ifelse
+		} ifelse
+	} { 
+		FrameCurColors 0 4 getinterval aload
+		FrameColorInSepListCMYK {
+			FrameSepBlack eq exch 
+			FrameSepYellow eq and exch 
+			FrameSepMagenta eq and exch 
+			FrameSepCyan eq and
+			FrameSepIs FMcustom eq and
+			{ FrameCurGray } { 1 } ifelse
+		} {
+			FrameSepIs FMblack eq
+			{FrameCurGray 1.0 exch sub mul 1.0 exch sub 4 1 roll pop pop pop} {
+			FrameSepIs FMyellow eq
+			{pop FrameCurGray 1.0 exch sub mul 1.0 exch sub 3 1 roll pop pop} {
+			FrameSepIs FMmagenta eq
+			{pop pop FrameCurGray 1.0 exch sub mul 1.0 exch sub exch pop } {
+			FrameSepIs FMcyan eq
+			{pop pop pop FrameCurGray 1.0 exch sub mul 1.0 exch sub } 
+			{pop pop pop pop 1} ifelse } ifelse } ifelse } ifelse 
+		} ifelse
+		graymode fMLevel1 or not {
+			
+			[/Pattern [/DeviceGray]] setcolorspace
+			FrameCurPat setcolor
+		} { 
+			graymode not fMLevel1 and {
+				
+				dup 1 lt {pop FrameCurGray} if
+			} if
+			RealSetgray
+		} ifelse
+	} ifelse
+} bind def
+/savematrix {
+	orgmatrix currentmatrix pop
+	} bind def
+/restorematrix {
+	orgmatrix setmatrix
+	} bind def
+/fMDefaultMatrix matrix defaultmatrix def
+/fMatrix2 matrix def
+/dpi    72 0 fMDefaultMatrix dtransform
+    dup mul exch   dup mul add   sqrt def
+	
+/freq dpi dup 72 div round dup 0 eq {pop 1} if 8 mul div def
+/sangle 1 0 fMDefaultMatrix dtransform exch atan def
+	sangle fMatrix2 rotate 
+	fMDefaultMatrix fMatrix2 concatmatrix 
+	dup 0 get /sflipx exch def
+	    3 get /sflipy exch def
+/screenIndex {
+	0 1 dpiranges length 1 sub { dup dpiranges exch get 1 sub dpi le {exit} {pop} ifelse } for
+} bind def
+/getCyanScreen {
+	FMUseHighFrequencyScreens { CHighAngles CMHighFreqs} {CLowAngles CMLowFreqs} ifelse
+		screenIndex dup 3 1 roll get 3 1 roll get /FMSpotFunction load
+} bind def
+/getMagentaScreen {
+	FMUseHighFrequencyScreens { MHighAngles CMHighFreqs } {MLowAngles CMLowFreqs} ifelse
+		screenIndex dup 3 1 roll get 3 1 roll get /FMSpotFunction load
+} bind def
+/getYellowScreen {
+	FMUseHighFrequencyScreens { YHighTDot YHighFreqs} { YLowTDot YLowFreqs } ifelse
+		screenIndex dup 3 1 roll get 3 1 roll get { 3 div
+			{2 { 1 add 2 div 3 mul dup floor sub 2 mul 1 sub exch} repeat
+			FMSpotFunction } } {/FMSpotFunction load } ifelse
+			0.0 exch
+} bind def
+/getBlackScreen  {
+	FMUseHighFrequencyScreens { KHighFreqs } { KLowFreqs } ifelse
+		screenIndex get 45.0 /FMSpotFunction load 
+} bind def
+/getSpotScreen {
+	getBlackScreen
+} bind def
+/getCompositeScreen {
+	getBlackScreen
+} bind def
+/FMSetScreen 
+	fMLevel1 { /setscreen load 
+	}{ {
+		8 dict begin
+		/HalftoneType 1 def
+		/SpotFunction exch def
+		/Angle exch def
+		/Frequency exch def
+		/AccurateScreens FMUseAcccurateScreens def
+		currentdict end sethalftone
+	} bind } ifelse
+def
+/setDefaultScreen {
+	FMPColor {
+		orgrxfer cvx orggxfer cvx orgbxfer cvx orgxfer cvx setcolortransfer
+	}
+	{
+		orgxfer cvx settransfer
+	} ifelse
+	orgfreq organgle orgproc cvx setscreen
+} bind def
+/setCurrentScreen {
+	FrameSepIs FMnone eq {
+		FMUseDefaultNoSeparationScreen {
+			setDefaultScreen
+		} {
+			getCompositeScreen FMSetScreen
+		} ifelse
+	} {
+		FrameSepIs FMcustom eq {
+			FMUseDefaultSpotSeparationScreen {
+				setDefaultScreen
+			} {
+				getSpotScreen FMSetScreen
+			} ifelse
+		} {
+			FMUseDefaultProcessSeparationScreen {
+				setDefaultScreen
+			} {
+				FrameSepIs FMcyan eq {
+					getCyanScreen FMSetScreen
+				} {
+					FrameSepIs FMmagenta eq {
+						getMagentaScreen FMSetScreen
+					} {
+						FrameSepIs FMyellow eq {
+							getYellowScreen FMSetScreen
+						} {
+							getBlackScreen FMSetScreen
+						} ifelse
+					} ifelse
+				} ifelse
+			} ifelse
+		} ifelse
+	} ifelse 
+} bind def
+end
+	
+/FMDOCUMENT { 
+	array /FMfonts exch def 
+	/#copies exch def
+	FrameDict begin
+	0 ne /manualfeed exch def
+	/paperheight exch def
+	/paperwidth exch def
+	0 ne /fMNegative exch def 
+	0 ne /edown exch def 
+	/yscale exch def
+	/xscale exch def
+	fMLevel1 {
+		manualfeed {setmanualfeed} if
+		/FMdicttop countdictstack 1 add def 
+		/FMoptop count def 
+		setpapername 
+		manualfeed {true} {papersize} ifelse 
+		{manualpapersize} {false} ifelse 
+		{desperatepapersize} {false} ifelse 
+		{papersizefailure} if
+		count -1 FMoptop {pop pop} for
+		countdictstack -1 FMdicttop {pop end} for 
+		}
+		{2 dict
+		 dup /PageSize [paperwidth paperheight] put
+		 manualfeed {dup /ManualFeed manualfeed put} if
+		 {setpagedevice} stopped {papersizefailure} if
+		}
+	ifelse 
+	
+	FMPColor {
+		currentcolorscreen
+			cvlit /orgproc exch def
+				  /organgle exch def 
+				  /orgfreq exch def
+			cvlit /orgbproc exch def
+				  /orgbangle exch def 
+				  /orgbfreq exch def
+			cvlit /orggproc exch def
+				  /orggangle exch def 
+				  /orggfreq exch def
+			cvlit /orgrproc exch def
+				  /orgrangle exch def 
+				  /orgrfreq exch def
+			currentcolortransfer 
+			fMNegative {
+				1 1 4 { 
+					pop { 1 exch sub } fmConcatProcs 4 1 roll
+				} for
+				4 copy
+				setcolortransfer
+			} if
+			cvlit /orgxfer exch def
+			cvlit /orgbxfer exch def
+			cvlit /orggxfer exch def
+			cvlit /orgrxfer exch def
+	} {
+		currentscreen 
+			cvlit /orgproc exch def
+				  /organgle exch def 
+				  /orgfreq exch def
+				  
+		currenttransfer 
+		fMNegative {
+			{ 1 exch sub } fmConcatProcs
+			dup settransfer
+		} if 
+		cvlit /orgxfer exch def
+	} ifelse
+	end 
+} def 
+/FMBEGINPAGE { 
+	FrameDict begin 
+	/pagesave save def
+	3.86 setmiterlimit
+	/landscape exch 0 ne def
+	landscape { 
+		90 rotate 0 exch dup /pwid exch def neg translate pop 
+	}{
+		pop /pwid exch def
+	} ifelse
+	edown { [-1 0 0 1 pwid 0] concat } if
+	0 0 moveto paperwidth 0 lineto paperwidth paperheight lineto 
+	0 paperheight lineto 0 0 lineto 1 setgray fill
+	xscale yscale scale
+	/orgmatrix matrix def
+	gsave 
+} def 
+/FMENDPAGE {
+	grestore 
+	pagesave restore
+	end 
+	showpage
+	} def 
+/FMFONTDEFINE { 
+	FrameDict begin
+	findfont 
+	ReEncode 
+	1 index exch 
+	definefont 
+	FMfonts 3 1 roll 
+	put
+	end 
+	} def 
+/FMFILLS {
+	FrameDict begin dup
+	array /fillvals exch def
+	dict /patCache exch def
+	end 
+	} def 
+/FMFILL {
+	FrameDict begin
+	 fillvals 3 1 roll put
+	end 
+	} def 
+/FMNORMALIZEGRAPHICS { 
+	newpath
+	1 setlinewidth
+	0 setlinecap
+	0 0 0 sethsbcolor
+	0 setgray 
+	} bind def
+/FMBEGINEPSF { 
+	end 
+	/FMEPSF save def 
+	/showpage {} def 
+% See Adobe's "PostScript Language Reference Manual, 2nd Edition", page 714.
+% "...the following operators MUST NOT be used in an EPS file:" (emphasis ours)
+	/banddevice {(banddevice) FMBADEPSF} def
+	/clear {(clear) FMBADEPSF} def
+	/cleardictstack {(cleardictstack) FMBADEPSF} def 
+	/copypage {(copypage) FMBADEPSF} def
+	/erasepage {(erasepage) FMBADEPSF} def
+	/exitserver {(exitserver) FMBADEPSF} def
+	/framedevice {(framedevice) FMBADEPSF} def
+	/grestoreall {(grestoreall) FMBADEPSF} def
+	/initclip {(initclip) FMBADEPSF} def
+	/initgraphics {(initgraphics) FMBADEPSF} def
+	/quit {(quit) FMBADEPSF} def
+	/renderbands {(renderbands) FMBADEPSF} def
+	/setglobal {(setglobal) FMBADEPSF} def
+	/setpagedevice {(setpagedevice) FMBADEPSF} def
+	/setshared {(setshared) FMBADEPSF} def
+	/startjob {(startjob) FMBADEPSF} def
+	/lettertray {(lettertray) FMBADEPSF} def
+	/letter {(letter) FMBADEPSF} def
+	/lettersmall {(lettersmall) FMBADEPSF} def
+	/11x17tray {(11x17tray) FMBADEPSF} def
+	/11x17 {(11x17) FMBADEPSF} def
+	/ledgertray {(ledgertray) FMBADEPSF} def
+	/ledger {(ledger) FMBADEPSF} def
+	/legaltray {(legaltray) FMBADEPSF} def
+	/legal {(legal) FMBADEPSF} def
+	/statementtray {(statementtray) FMBADEPSF} def
+	/statement {(statement) FMBADEPSF} def
+	/executivetray {(executivetray) FMBADEPSF} def
+	/executive {(executive) FMBADEPSF} def
+	/a3tray {(a3tray) FMBADEPSF} def
+	/a3 {(a3) FMBADEPSF} def
+	/a4tray {(a4tray) FMBADEPSF} def
+	/a4 {(a4) FMBADEPSF} def
+	/a4small {(a4small) FMBADEPSF} def
+	/b4tray {(b4tray) FMBADEPSF} def
+	/b4 {(b4) FMBADEPSF} def
+	/b5tray {(b5tray) FMBADEPSF} def
+	/b5 {(b5) FMBADEPSF} def
+	FMNORMALIZEGRAPHICS 
+	[/fy /fx /fh /fw /ury /urx /lly /llx] {exch def} forall 
+	fx fw 2 div add fy fh 2 div add  translate
+	rotate
+	fw 2 div neg fh 2 div neg translate
+	fw urx llx sub div fh ury lly sub div scale 
+	llx neg lly neg translate 
+	/FMdicttop countdictstack 1 add def 
+	/FMoptop count def 
+	} bind def
+/FMENDEPSF {
+	count -1 FMoptop {pop pop} for 
+	countdictstack -1 FMdicttop {pop end} for 
+	FMEPSF restore
+	FrameDict begin 
+	} bind def
+FrameDict begin 
+/setmanualfeed {
+%%BeginFeature *ManualFeed True
+	 statusdict /manualfeed true put
+%%EndFeature
+	} bind def
+/max {2 copy lt {exch} if pop} bind def
+/min {2 copy gt {exch} if pop} bind def
+/inch {72 mul} def
+/pagedimen { 
+	paperheight sub abs 16 lt exch 
+	paperwidth sub abs 16 lt and
+	{/papername exch def} {pop} ifelse
+	} bind def
+/setpapername { 
+	/papersizedict 14 dict def 
+	papersizedict begin
+	/papername /unknown def 
+		/Letter 8.5 inch 11.0 inch pagedimen
+		/LetterSmall 7.68 inch 10.16 inch pagedimen
+		/Tabloid 11.0 inch 17.0 inch pagedimen
+		/Ledger 17.0 inch 11.0 inch pagedimen
+		/Legal 8.5 inch 14.0 inch pagedimen
+		/Statement 5.5 inch 8.5 inch pagedimen
+		/Executive 7.5 inch 10.0 inch pagedimen
+		/A3 11.69 inch 16.5 inch pagedimen
+		/A4 8.26 inch 11.69 inch pagedimen
+		/A4Small 7.47 inch 10.85 inch pagedimen
+		/B4 10.125 inch 14.33 inch pagedimen
+		/B5 7.16 inch 10.125 inch pagedimen
+	end
+	} bind def
+/papersize {
+	papersizedict begin
+		/Letter {lettertray letter} def
+		/LetterSmall {lettertray lettersmall} def
+		/Tabloid {11x17tray 11x17} def
+		/Ledger {ledgertray ledger} def
+		/Legal {legaltray legal} def
+		/Statement {statementtray statement} def
+		/Executive {executivetray executive} def
+		/A3 {a3tray a3} def
+		/A4 {a4tray a4} def
+		/A4Small {a4tray a4small} def
+		/B4 {b4tray b4} def
+		/B5 {b5tray b5} def
+		/unknown {unknown} def
+	papersizedict dup papername known {papername} {/unknown} ifelse get
+	end
+	statusdict begin stopped end 
+	} bind def
+/manualpapersize {
+	papersizedict begin
+		/Letter {letter} def
+		/LetterSmall {lettersmall} def
+		/Tabloid {11x17} def
+		/Ledger {ledger} def
+		/Legal {legal} def
+		/Statement {statement} def
+		/Executive {executive} def
+		/A3 {a3} def
+		/A4 {a4} def
+		/A4Small {a4small} def
+		/B4 {b4} def
+		/B5 {b5} def
+		/unknown {unknown} def
+	papersizedict dup papername known {papername} {/unknown} ifelse get
+	end
+	stopped 
+	} bind def
+/desperatepapersize {
+	statusdict /setpageparams known
+		{
+		paperwidth paperheight 0 1 
+		statusdict begin
+		{setpageparams} stopped 
+		end
+		} {true} ifelse 
+	} bind def
+/papersizefailure {
+	FMAllowPaperSizeMismatch not
+		{
+(The requested paper size is not available in any currently-installed tray)
+(Edit the PS file to "FMAllowPaperSizeMismatch true" to use default tray)
+		 FMFAILURE } if
+	} def
+/DiacriticEncoding [
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/.notdef /.notdef /.notdef /.notdef /space /exclam /quotedbl
+/numbersign /dollar /percent /ampersand /quotesingle /parenleft
+/parenright /asterisk /plus /comma /hyphen /period /slash /zero /one
+/two /three /four /five /six /seven /eight /nine /colon /semicolon
+/less /equal /greater /question /at /A /B /C /D /E /F /G /H /I /J /K
+/L /M /N /O /P /Q /R /S /T /U /V /W /X /Y /Z /bracketleft /backslash
+/bracketright /asciicircum /underscore /grave /a /b /c /d /e /f /g /h
+/i /j /k /l /m /n /o /p /q /r /s /t /u /v /w /x /y /z /braceleft /bar
+/braceright /asciitilde /.notdef /Adieresis /Aring /Ccedilla /Eacute
+/Ntilde /Odieresis /Udieresis /aacute /agrave /acircumflex /adieresis
+/atilde /aring /ccedilla /eacute /egrave /ecircumflex /edieresis
+/iacute /igrave /icircumflex /idieresis /ntilde /oacute /ograve
+/ocircumflex /odieresis /otilde /uacute /ugrave /ucircumflex
+/udieresis /dagger /.notdef /cent /sterling /section /bullet
+/paragraph /germandbls /registered /copyright /trademark /acute
+/dieresis /.notdef /AE /Oslash /.notdef /.notdef /.notdef /.notdef
+/yen /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef
+/ordfeminine /ordmasculine /.notdef /ae /oslash /questiondown
+/exclamdown /logicalnot /.notdef /florin /.notdef /.notdef
+/guillemotleft /guillemotright /ellipsis /.notdef /Agrave /Atilde
+/Otilde /OE /oe /endash /emdash /quotedblleft /quotedblright
+/quoteleft /quoteright /.notdef /.notdef /ydieresis /Ydieresis
+/fraction /currency /guilsinglleft /guilsinglright /fi /fl /daggerdbl
+/periodcentered /quotesinglbase /quotedblbase /perthousand
+/Acircumflex /Ecircumflex /Aacute /Edieresis /Egrave /Iacute
+/Icircumflex /Idieresis /Igrave /Oacute /Ocircumflex /.notdef /Ograve
+/Uacute /Ucircumflex /Ugrave /dotlessi /circumflex /tilde /macron
+/breve /dotaccent /ring /cedilla /hungarumlaut /ogonek /caron
+] def
+/ReEncode { 
+	dup 
+	length 
+	dict begin 
+	{
+	1 index /FID ne 
+		{def} 
+		{pop pop} ifelse 
+	} forall 
+	0 eq {/Encoding DiacriticEncoding def} if 
+	currentdict 
+	end 
+	} bind def
+FMPColor 
+	
+	{
+	/BEGINBITMAPCOLOR { 
+		BITMAPCOLOR} def
+	/BEGINBITMAPCOLORc { 
+		BITMAPCOLORc} def
+	/BEGINBITMAPTRUECOLOR { 
+		BITMAPTRUECOLOR } def
+	/BEGINBITMAPTRUECOLORc { 
+		BITMAPTRUECOLORc } def
+	/BEGINBITMAPCMYK { 
+		BITMAPCMYK } def
+	/BEGINBITMAPCMYKc { 
+		BITMAPCMYKc } def
+	}
+	
+	{
+	/BEGINBITMAPCOLOR { 
+		BITMAPGRAY} def
+	/BEGINBITMAPCOLORc { 
+		BITMAPGRAYc} def
+	/BEGINBITMAPTRUECOLOR { 
+		BITMAPTRUEGRAY } def
+	/BEGINBITMAPTRUECOLORc { 
+		BITMAPTRUEGRAYc } def
+	/BEGINBITMAPCMYK { 
+		BITMAPCMYKGRAY } def
+	/BEGINBITMAPCMYKc { 
+		BITMAPCMYKGRAYc } def
+	}
+ifelse
+/K { 
+	FMPrintAllColorsAsBlack {
+		dup 1 eq 2 index 1 eq and 3 index 1 eq and not
+			{7 {pop} repeat 0 0 0 1 0 0 0} if
+	} if 
+	FrameCurColors astore 
+	pop combineColor
+} bind def
+/graymode true def
+fMLevel1 {
+	/fmGetFlip {
+		fMatrix2 exch get mul 0 lt { -1 } { 1 } ifelse
+	} FmBD
+} if
+/setPatternMode {
+	fMLevel1 {
+		2 index patScreenDict exch known {
+			pop pop
+			patScreenDict exch get aload pop 
+			freq 								
+			mul									
+			5 2 roll							
+			fMatrix2 currentmatrix 1 get 0 ne {
+				3 -1 roll 90 add 3 1 roll 		
+				sflipx 1 fmGetFlip sflipy 2 fmGetFlip neg mul
+			} {  								
+				sflipx 0 fmGetFlip sflipy 3 fmGetFlip mul 
+			} ifelse
+			0 lt {exch pop} {pop} ifelse 		
+			fMNegative { 
+				{neg} fmConcatProcs 			
+			} if
+			bind
+			
+			
+			
+			systemdict /setscreen get exec		
+			/FrameCurGray exch def
+		} {
+			/bwidth  exch def
+			/bpside  exch def
+			/bstring exch def
+			/onbits 0 def  /offbits 0 def
+			freq sangle landscape {90 add} if 
+				{/ypoint exch def
+				 /xpoint exch def
+				 /xindex xpoint 1 add 2 div bpside mul cvi def
+				 /yindex ypoint 1 add 2 div bpside mul cvi def
+				 bstring yindex bwidth mul xindex 8 idiv add get
+				 1 7 xindex 8 mod sub bitshift and 0 ne fMNegative {not} if
+				 {/onbits  onbits  1 add def 1}
+				 {/offbits offbits 1 add def 0}
+				 ifelse
+				}
+				setscreen
+			offbits offbits onbits add div fMNegative {1.0 exch sub} if
+			/FrameCurGray exch def
+		} ifelse
+	} { 
+		pop pop
+		dup patCache exch known {
+			patCache exch get
+		} { 
+			dup
+			patDict /bstring 3 -1 roll put
+			patDict 
+			9 PatFreq screenIndex get div dup matrix scale
+			makepattern
+			dup 
+			patCache 4 -1 roll 3 -1 roll put
+		} ifelse
+		/FrameCurGray 0 def
+		/FrameCurPat exch def
+	} ifelse
+	/graymode false def
+	combineColor
+} bind def
+/setGrayScaleMode {
+	graymode not {
+		/graymode true def
+		fMLevel1 {
+			setCurrentScreen
+		} if
+	} if
+	/FrameCurGray exch def
+	combineColor
+} bind def
+/normalize {
+	transform round exch round exch itransform
+	} bind def
+/dnormalize {
+	dtransform round exch round exch idtransform
+	} bind def
+/lnormalize { 
+	0 dtransform exch cvi 2 idiv 2 mul 1 add exch idtransform pop
+	} bind def
+/H { 
+	lnormalize setlinewidth
+	} bind def
+/Z {
+	setlinecap
+	} bind def
+	
+/PFill {
+	graymode fMLevel1 or not {
+		gsave 1 setgray eofill grestore
+	} if
+} bind def
+/PStroke {
+	graymode fMLevel1 or not {
+		gsave 1 setgray stroke grestore
+	} if
+	stroke
+} bind def
+/X { 
+	fillvals exch get
+	dup type /stringtype eq
+	{8 1 setPatternMode} 
+	{setGrayScaleMode}
+	ifelse
+	} bind def
+/V { 
+	PFill gsave eofill grestore
+	} bind def
+/Vclip {
+	clip
+	} bind def
+/Vstrk {
+	currentlinewidth exch setlinewidth PStroke setlinewidth
+	} bind def
+/N { 
+	PStroke
+	} bind def
+/Nclip {
+	strokepath clip newpath
+	} bind def
+/Nstrk {
+	currentlinewidth exch setlinewidth PStroke setlinewidth
+	} bind def
+/M {newpath moveto} bind def
+/E {lineto} bind def
+/D {curveto} bind def
+/O {closepath} bind def
+/L { 
+ 	/n exch def
+	newpath
+	normalize
+	moveto 
+	2 1 n {pop normalize lineto} for
+	} bind def
+/Y { 
+	L 
+	closepath
+	} bind def
+/R { 
+	/y2 exch def
+	/x2 exch def
+	/y1 exch def
+	/x1 exch def
+	x1 y1
+	x2 y1
+	x2 y2
+	x1 y2
+	4 Y 
+	} bind def
+/rarc 
+	{rad 
+	 arcto
+	} bind def
+/RR { 
+	/rad exch def
+	normalize
+	/y2 exch def
+	/x2 exch def
+	normalize
+	/y1 exch def
+	/x1 exch def
+	mark
+	newpath
+	{
+	x1 y1 rad add moveto
+	x1 y2 x2 y2 rarc
+	x2 y2 x2 y1 rarc
+	x2 y1 x1 y1 rarc
+	x1 y1 x1 y2 rarc
+	closepath
+	} stopped {x1 y1 x2 y2 R} if 
+	cleartomark
+	} bind def
+/RRR { 
+	/rad exch def
+	normalize /y4 exch def /x4 exch def
+	normalize /y3 exch def /x3 exch def
+	normalize /y2 exch def /x2 exch def
+	normalize /y1 exch def /x1 exch def
+	newpath
+	normalize moveto 
+	mark
+	{
+	x2 y2 x3 y3 rarc
+	x3 y3 x4 y4 rarc
+	x4 y4 x1 y1 rarc
+	x1 y1 x2 y2 rarc
+	closepath
+	} stopped
+	 {x1 y1 x2 y2 x3 y3 x4 y4 newpath moveto lineto lineto lineto closepath} if
+	cleartomark
+	} bind def
+/C { 
+	grestore
+	gsave
+	R 
+	clip
+	setCurrentScreen
+} bind def
+/CP { 
+	grestore
+	gsave
+	Y 
+	clip
+	setCurrentScreen
+} bind def
+/F { 
+	FMfonts exch get
+	FMpointsize scalefont
+	setfont
+	} bind def
+/Q { 
+	/FMpointsize exch def
+	F 
+	} bind def
+/T { 
+	moveto show
+	} bind def
+/RF { 
+	rotate
+	0 ne {-1 1 scale} if
+	} bind def
+/TF { 
+	gsave
+	moveto 
+	RF
+	show
+	grestore
+	} bind def
+/P { 
+	moveto
+	0 32 3 2 roll widthshow
+	} bind def
+/PF { 
+	gsave
+	moveto 
+	RF
+	0 32 3 2 roll widthshow
+	grestore
+	} bind def
+/S { 
+	moveto
+	0 exch ashow
+	} bind def
+/SF { 
+	gsave
+	moveto
+	RF
+	0 exch ashow
+	grestore
+	} bind def
+/B { 
+	moveto
+	0 32 4 2 roll 0 exch awidthshow
+	} bind def
+/BF { 
+	gsave
+	moveto
+	RF
+	0 32 4 2 roll 0 exch awidthshow
+	grestore
+	} bind def
+/G { 
+	gsave
+	newpath
+	normalize translate 0.0 0.0 moveto 
+	dnormalize scale 
+	0.0 0.0 1.0 5 3 roll arc 
+	closepath 
+	PFill fill
+	grestore
+	} bind def
+/Gstrk {
+	savematrix
+    newpath
+    2 index 2 div add exch 3 index 2 div sub exch 
+    normalize 2 index 2 div sub exch 3 index 2 div add exch 
+    translate
+    scale 
+    0.0 0.0 1.0 5 3 roll arc 
+    restorematrix
+    currentlinewidth exch setlinewidth PStroke setlinewidth
+    } bind def
+/Gclip { 
+	newpath
+	savematrix
+	normalize translate 0.0 0.0 moveto 
+	dnormalize scale 
+	0.0 0.0 1.0 5 3 roll arc 
+	closepath 
+	clip newpath
+	restorematrix
+	} bind def
+/GG { 
+	gsave
+	newpath
+	normalize translate 0.0 0.0 moveto 
+	rotate 
+	dnormalize scale 
+	0.0 0.0 1.0 5 3 roll arc 
+	closepath
+	PFill
+	fill
+	grestore
+	} bind def
+/GGclip { 
+	savematrix
+	newpath
+    normalize translate 0.0 0.0 moveto 
+    rotate 
+    dnormalize scale 
+    0.0 0.0 1.0 5 3 roll arc 
+    closepath
+	clip newpath
+	restorematrix
+	} bind def
+/GGstrk { 
+	savematrix
+    newpath
+    normalize translate 0.0 0.0 moveto 
+    rotate 
+    dnormalize scale 
+    0.0 0.0 1.0 5 3 roll arc 
+    closepath 
+	restorematrix
+    currentlinewidth exch setlinewidth PStroke setlinewidth
+	} bind def
+/A { 
+	gsave
+	savematrix
+	newpath
+	2 index 2 div add exch 3 index 2 div sub exch 
+	normalize 2 index 2 div sub exch 3 index 2 div add exch 
+	translate 
+	scale 
+	0.0 0.0 1.0 5 3 roll arc 
+	restorematrix
+	PStroke
+	grestore
+	} bind def
+/Aclip {
+	newpath
+	savematrix
+	normalize translate 0.0 0.0 moveto 
+	dnormalize scale 
+	0.0 0.0 1.0 5 3 roll arc 
+	closepath 
+	strokepath clip newpath
+	restorematrix
+} bind def
+/Astrk {
+	Gstrk
+} bind def
+/AA { 
+	gsave
+	savematrix
+	newpath
+	
+	3 index 2 div add exch 4 index 2 div sub exch 
+	
+	normalize 3 index 2 div sub exch 4 index 2 div add exch
+	translate 
+	rotate 
+	scale 
+	0.0 0.0 1.0 5 3 roll arc 
+	restorematrix
+	PStroke
+	grestore
+	} bind def
+/AAclip {
+	savematrix
+	newpath
+    normalize translate 0.0 0.0 moveto 
+    rotate 
+    dnormalize scale 
+    0.0 0.0 1.0 5 3 roll arc 
+    closepath
+	strokepath clip newpath
+	restorematrix
+} bind def
+/AAstrk {
+	GGstrk
+} bind def
+/BEGINPRINTCODE { 
+	/FMdicttop countdictstack 1 add def 
+	/FMoptop count 7 sub def 
+	/FMsaveobject save def
+	userdict begin 
+	/showpage {} def 
+	FMNORMALIZEGRAPHICS 
+	3 index neg 3 index neg translate
+	} bind def
+/ENDPRINTCODE {
+	count -1 FMoptop {pop pop} for 
+	countdictstack -1 FMdicttop {pop end} for 
+	FMsaveobject restore 
+	} bind def
+/gn { 
+	0 
+	{	46 mul 
+		cf read pop 
+		32 sub 
+		dup 46 lt {exit} if 
+		46 sub add 
+		} loop
+	add 
+	} bind def
+/cfs { 
+	/str sl string def 
+	0 1 sl 1 sub {str exch val put} for 
+	str def 
+	} bind def
+/ic [ 
+	0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0223
+	0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0223
+	0
+	{0 hx} {1 hx} {2 hx} {3 hx} {4 hx} {5 hx} {6 hx} {7 hx} {8 hx} {9 hx}
+	{10 hx} {11 hx} {12 hx} {13 hx} {14 hx} {15 hx} {16 hx} {17 hx} {18 hx}
+	{19 hx} {gn hx} {0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12}
+	{13} {14} {15} {16} {17} {18} {19} {gn} {0 wh} {1 wh} {2 wh} {3 wh}
+	{4 wh} {5 wh} {6 wh} {7 wh} {8 wh} {9 wh} {10 wh} {11 wh} {12 wh}
+	{13 wh} {14 wh} {gn wh} {0 bl} {1 bl} {2 bl} {3 bl} {4 bl} {5 bl} {6 bl}
+	{7 bl} {8 bl} {9 bl} {10 bl} {11 bl} {12 bl} {13 bl} {14 bl} {gn bl}
+	{0 fl} {1 fl} {2 fl} {3 fl} {4 fl} {5 fl} {6 fl} {7 fl} {8 fl} {9 fl}
+	{10 fl} {11 fl} {12 fl} {13 fl} {14 fl} {gn fl}
+	] def
+/ms { 
+	/sl exch def 
+	/val 255 def 
+	/ws cfs 
+	/im cfs 
+	/val 0 def 
+	/bs cfs 
+	/cs cfs 
+	} bind def
+400 ms 
+/ip { 
+	is 
+	0 
+	cf cs readline pop 
+	{	ic exch get exec 
+		add 
+		} forall 
+	pop 
+	
+	} bind def
+/rip { 
+	   
+	  
+	  bis ris copy pop 
+      is
+      0
+      cf cs readline pop 
+      {       ic exch get exec 
+              add 
+              } forall 
+	  pop pop 
+	  ris gis copy pop 
+	  dup is exch 
+	  
+      cf cs readline pop 
+      {       ic exch get exec 
+              add 
+              } forall 
+	  pop pop
+	  gis bis copy pop 
+	  dup add is exch 
+	  
+      cf cs readline pop 
+      {       ic exch get exec 
+              add 
+              } forall 
+      pop 
+      
+      } bind def
+/rip4 { 
+	   
+	  
+	  kis cis copy pop 
+      is
+      0
+      cf cs readline pop 
+      {       ic exch get exec 
+              add 
+              } forall 
+	  pop pop 
+	  cis mis copy pop 
+	  dup is exch 
+	  
+      cf cs readline pop 
+      {       ic exch get exec 
+              add 
+              } forall 
+	  pop pop
+	  mis yis copy pop 
+	  dup dup add is exch 
+	  
+      cf cs readline pop 
+      {       ic exch get exec 
+              add 
+              } forall 
+	  pop pop
+	  yis kis copy pop 
+	  3 mul is exch 
+	  
+      cf cs readline pop 
+      {       ic exch get exec 
+              add 
+              } forall 
+      pop 
+      
+      } bind def
+/wh { 
+	/len exch def 
+	/pos exch def 
+	ws 0 len getinterval im pos len getinterval copy pop
+	pos len 
+	} bind def
+/bl { 
+	/len exch def 
+	/pos exch def 
+	bs 0 len getinterval im pos len getinterval copy pop
+	pos len 
+	} bind def
+/s1 1 string def
+/fl { 
+	/len exch def 
+	/pos exch def 
+	/val cf s1 readhexstring pop 0 get def
+	pos 1 pos len add 1 sub {im exch val put} for
+	pos len 
+	} bind def
+/hx { 
+	3 copy getinterval 
+	cf exch readhexstring pop pop 
+	} bind def
+/wbytes { 
+      dup dup
+      8 gt { pop 8 idiv mul }
+      { 8 eq {pop} {1 eq {7 add 8 idiv} {3 add 4 idiv} ifelse} ifelse } ifelse
+	} bind def
+/BEGINBITMAPBWc { 
+	1 {} COMMONBITMAPc
+	} bind def
+/BEGINBITMAPGRAYc { 
+	8 {} COMMONBITMAPc
+	} bind def
+/BEGINBITMAP2BITc { 
+	2 {} COMMONBITMAPc
+	} bind def
+/COMMONBITMAPc { 
+		 
+	/cvtProc exch def
+	/depth exch def
+	gsave
+	
+	3 index 2 div add exch	
+	4 index 2 div add exch	
+	translate		
+	rotate			
+	1 index 2 div neg	
+	1 index 2 div neg	
+	translate		
+	scale			
+	/height exch def /width exch def
+	/lb width depth wbytes def 
+	sl lb lt {lb ms} if 
+	/bitmapsave save def 
+	cvtProc                
+	/is im 0 lb getinterval def 
+	ws 0 lb getinterval is copy pop 
+	/cf currentfile def 
+	width height depth [width 0 0 height neg 0 height] 
+	{ip} image 
+	bitmapsave restore 
+	grestore
+	} bind def
+/BEGINBITMAPBW { 
+	1 {} COMMONBITMAP
+	} bind def
+/BEGINBITMAPGRAY { 
+	8 {} COMMONBITMAP
+	} bind def
+/BEGINBITMAP2BIT { 
+	2 {} COMMONBITMAP
+	} bind def
+/COMMONBITMAP { 
+	/cvtProc exch def
+	/depth exch def
+	gsave
+	
+	3 index 2 div add exch	
+	4 index 2 div add exch	
+	translate		
+	rotate			
+	1 index 2 div neg	
+	1 index 2 div neg	
+	translate		
+	scale			
+	/height exch def /width exch def
+	/bitmapsave save def 
+	cvtProc              
+	/is width depth wbytes string def
+	/cf currentfile def 
+	width height depth [width 0 0 height neg 0 height] 
+	{cf is readhexstring pop} image
+	bitmapsave restore 
+	grestore
+	} bind def
+/ngrayt 256 array def
+/nredt 256 array def
+/nbluet 256 array def
+/ngreent 256 array def
+fMLevel1 {
+/colorsetup {
+	currentcolortransfer
+	/gryt exch def
+	/blut exch def
+	/grnt exch def
+	/redt exch def
+	0 1 255 {
+		/indx exch def
+		/cynu 1 red indx get 255 div sub def
+		/magu 1 green indx get 255 div sub def
+		/yelu 1 blue indx get 255 div sub def
+		/kk cynu magu min yelu min def
+		/u kk currentundercolorremoval exec def
+%		/u 0 def
+		nredt indx 1 0 cynu u sub max sub redt exec put
+		ngreent indx 1 0 magu u sub max sub grnt exec put
+		nbluet indx 1 0 yelu u sub max sub blut exec put
+		ngrayt indx 1 kk currentblackgeneration exec sub gryt exec put
+	} for
+	{255 mul cvi nredt exch get}
+	{255 mul cvi ngreent exch get}
+	{255 mul cvi nbluet exch get}
+	{255 mul cvi ngrayt exch get}
+	setcolortransfer
+	{pop 0} setundercolorremoval
+	{} setblackgeneration
+	} bind def
+}
+{
+/colorSetup2 {
+	[ /Indexed /DeviceRGB 255 
+		{dup red exch get 255 div 
+		 exch dup green exch get 255 div 
+		 exch blue exch get 255 div}
+	] setcolorspace
+} bind def
+} ifelse
+/fakecolorsetup {
+	/tran 256 string def
+	0 1 255 {/indx exch def 
+		tran indx
+		red indx get 77 mul
+		green indx get 151 mul
+		blue indx get 28 mul
+		add add 256 idiv put} for
+	currenttransfer
+	{255 mul cvi tran exch get 255.0 div}
+	exch fmConcatProcs settransfer
+} bind def
+/BITMAPCOLOR { 
+	/depth 8 def
+	gsave
+	
+	3 index 2 div add exch	
+	4 index 2 div add exch	
+	translate		
+	rotate			
+	1 index 2 div neg	
+	1 index 2 div neg	
+	translate		
+	scale			
+	/height exch def /width exch def
+	/bitmapsave save def
+	fMLevel1 {	
+		colorsetup
+		/is width depth wbytes string def
+		/cf currentfile def 
+		width height depth [width 0 0 height neg 0 height] 
+		{cf is readhexstring pop} {is} {is} true 3 colorimage 
+	} {
+		colorSetup2
+		/is width depth wbytes string def
+		/cf currentfile def 
+		7 dict dup begin
+			/ImageType 1 def
+			/Width width def
+			/Height height def
+			/ImageMatrix [width 0 0 height neg 0 height] def
+			/DataSource {cf is readhexstring pop} bind def
+			/BitsPerComponent depth def
+			/Decode [0 255] def
+		end image	
+	} ifelse
+	bitmapsave restore 
+	grestore
+	} bind def
+/BITMAPCOLORc { 
+	/depth 8 def
+	gsave
+	
+	3 index 2 div add exch	
+	4 index 2 div add exch	
+	translate		
+	rotate			
+	1 index 2 div neg	
+	1 index 2 div neg	
+	translate		
+	scale			
+	/height exch def /width exch def
+	/lb width depth wbytes def 
+	sl lb lt {lb ms} if 
+	/bitmapsave save def 
+	fMLevel1 {	
+		colorsetup
+		/is im 0 lb getinterval def 
+		ws 0 lb getinterval is copy pop 
+		/cf currentfile def 
+		width height depth [width 0 0 height neg 0 height] 
+		{ip} {is} {is} true 3 colorimage
+	} {
+		colorSetup2
+		/is im 0 lb getinterval def 
+		ws 0 lb getinterval is copy pop 
+		/cf currentfile def 
+		7 dict dup begin
+			/ImageType 1 def
+			/Width width def
+			/Height height def
+			/ImageMatrix [width 0 0 height neg 0 height] def
+			/DataSource {ip} bind def
+			/BitsPerComponent depth def
+			/Decode [0 255] def
+		end image	
+	} ifelse
+	bitmapsave restore 
+	grestore
+	} bind def
+/BITMAPTRUECOLORc { 
+	/depth 24 def
+        gsave
+ 	
+	3 index 2 div add exch	
+	4 index 2 div add exch	
+	translate		
+	rotate			
+	1 index 2 div neg	
+	1 index 2 div neg	
+	translate		
+	scale			
+	/height exch def /width exch def
+	/lb width depth wbytes def 
+	sl lb lt {lb ms} if 
+	/bitmapsave save def 
+        
+	/is im 0 lb getinterval def	
+	/ris im 0 width getinterval def	
+	/gis im width width getinterval def	
+	/bis im width 2 mul width getinterval def 
+        
+	ws 0 lb getinterval is copy pop 
+	/cf currentfile def 
+	width height 8 [width 0 0 height neg 0 height] 
+	{width rip pop ris} {gis} {bis} true 3 colorimage
+	bitmapsave restore 
+	grestore
+	} bind def
+/BITMAPCMYKc { 
+	/depth 32 def
+        gsave
+ 	
+	3 index 2 div add exch	
+	4 index 2 div add exch	
+	translate		
+	rotate			
+	1 index 2 div neg	
+	1 index 2 div neg	
+	translate		
+	scale			
+	/height exch def /width exch def
+	/lb width depth wbytes def 
+	sl lb lt {lb ms} if 
+	/bitmapsave save def 
+        
+	/is im 0 lb getinterval def	
+	/cis im 0 width getinterval def	
+	/mis im width width getinterval def	
+	/yis im width 2 mul width getinterval def 
+	/kis im width 3 mul width getinterval def 
+        
+	ws 0 lb getinterval is copy pop 
+	/cf currentfile def 
+	width height 8 [width 0 0 height neg 0 height] 
+	{width rip4 pop cis} {mis} {yis} {kis} true 4 colorimage
+	bitmapsave restore 
+	grestore
+	} bind def
+/BITMAPTRUECOLOR { 
+        gsave
+		
+		3 index 2 div add exch	
+		4 index 2 div add exch	
+		translate		
+		rotate			
+		1 index 2 div neg	
+		1 index 2 div neg	
+		translate		
+		scale			
+		/height exch def /width exch def
+        /bitmapsave save def 
+        /is width string def
+        /gis width string def
+        /bis width string def
+        /cf currentfile def 
+        width height 8 [width 0 0 height neg 0 height] 
+        { cf is readhexstring pop } 
+        { cf gis readhexstring pop } 
+        { cf bis readhexstring pop } 
+        true 3 colorimage 
+        bitmapsave restore 
+        grestore
+        } bind def
+/BITMAPCMYK { 
+        gsave
+		
+		3 index 2 div add exch	
+		4 index 2 div add exch	
+		translate		
+		rotate			
+		1 index 2 div neg	
+		1 index 2 div neg	
+		translate		
+		scale			
+		/height exch def /width exch def
+        /bitmapsave save def 
+        /is width string def
+        /mis width string def
+        /yis width string def
+        /kis width string def
+        /cf currentfile def 
+        width height 8 [width 0 0 height neg 0 height] 
+        { cf is readhexstring pop } 
+        { cf mis readhexstring pop } 
+        { cf yis readhexstring pop } 
+        { cf kis readhexstring pop } 
+        true 4 colorimage 
+        bitmapsave restore 
+        grestore
+        } bind def
+/BITMAPTRUEGRAYc { 
+	/depth 24 def
+        gsave
+	
+	3 index 2 div add exch	
+	4 index 2 div add exch	
+	translate		
+	rotate			
+	1 index 2 div neg	
+	1 index 2 div neg	
+	translate		
+	scale			
+	/height exch def /width exch def
+	/lb width depth wbytes def 
+	sl lb lt {lb ms} if 
+        /bitmapsave save def 
+        
+	/is im 0 lb getinterval def	
+	/ris im 0 width getinterval def	
+	/gis im width width getinterval def	
+	/bis im width 2 mul width getinterval def 
+        ws 0 lb getinterval is copy pop 
+        /cf currentfile def 
+        width height 8 [width 0 0 height neg 0 height] 
+        {width rip pop ris gis bis width gray} image
+        bitmapsave restore 
+        grestore
+        } bind def
+/BITMAPCMYKGRAYc { 
+	/depth 32 def
+        gsave
+	
+	3 index 2 div add exch	
+	4 index 2 div add exch	
+	translate		
+	rotate			
+	1 index 2 div neg	
+	1 index 2 div neg	
+	translate		
+	scale			
+	/height exch def /width exch def
+	/lb width depth wbytes def 
+	sl lb lt {lb ms} if 
+        /bitmapsave save def 
+        
+	/is im 0 lb getinterval def	
+	/cis im 0 width getinterval def	
+	/mis im width width getinterval def	
+	/yis im width 2 mul width getinterval def 
+	/kis im width 3 mul width getinterval def 
+        ws 0 lb getinterval is copy pop 
+        /cf currentfile def 
+        width height 8 [width 0 0 height neg 0 height] 
+        {width rip pop cis mis yis kis width cgray} image
+        bitmapsave restore 
+        grestore
+        } bind def
+/cgray { 
+        /ww exch def
+        /k exch def
+        /y exch def
+        /m exch def
+        /c exch def
+        0 1 ww 1 sub { /i exch def c i get m i get y i get k i get CMYKtoRGB
+				.144 mul 3 1 roll .587 mul 3 1 roll .299 mul add add
+				c i 3 -1 roll floor cvi put } for
+        c
+ 		} bind def
+/gray { 
+        /ww exch def
+        /b exch def
+        /g exch def
+        /r exch def
+        0 1 ww 1 sub { /i exch def r i get .299 mul g i get .587 mul
+			b i get .114 mul add add r i 3 -1 roll floor cvi put } for
+        r
+        } bind def
+/BITMAPTRUEGRAY { 
+        gsave
+		
+		3 index 2 div add exch	
+		4 index 2 div add exch	
+		translate		
+		rotate			
+		1 index 2 div neg	
+		1 index 2 div neg	
+		translate		
+		scale			
+		/height exch def /width exch def
+        /bitmapsave save def 
+        /is width string def
+        /gis width string def
+        /bis width string def
+        /cf currentfile def 
+        width height 8 [width 0 0 height neg 0 height] 
+        { cf is readhexstring pop 
+          cf gis readhexstring pop 
+          cf bis readhexstring pop width gray}  image
+        bitmapsave restore 
+        grestore
+        } bind def
+/BITMAPCMYKGRAY { 
+        gsave
+		
+		3 index 2 div add exch	
+		4 index 2 div add exch	
+		translate		
+		rotate			
+		1 index 2 div neg	
+		1 index 2 div neg	
+		translate		
+		scale			
+		/height exch def /width exch def
+        /bitmapsave save def 
+        /is width string def
+        /yis width string def
+        /mis width string def
+        /kis width string def
+        /cf currentfile def 
+        width height 8 [width 0 0 height neg 0 height] 
+        { cf is readhexstring pop 
+          cf mis readhexstring pop 
+          cf yis readhexstring pop 
+          cf kis readhexstring pop width cgray}  image
+        bitmapsave restore 
+        grestore
+        } bind def
+/BITMAPGRAY { 
+	8 {fakecolorsetup} COMMONBITMAP
+	} bind def
+/BITMAPGRAYc { 
+	8 {fakecolorsetup} COMMONBITMAPc
+	} bind def
+/ENDBITMAP {
+	} bind def
+end 
+	/ALDmatrix matrix def ALDmatrix currentmatrix pop
+/StartALD {
+	/ALDsave save def
+	 savematrix
+	 ALDmatrix setmatrix
+	} bind def
+/InALD {
+	 restorematrix
+	} bind def
+/DoneALD {
+	 ALDsave restore
+	} bind def
+/I { setdash } bind def
+/J { [] 0 setdash } bind def
+%%EndProlog
+%%BeginSetup
+(5.0) FMVERSION
+1 1 0 0 595.28 841.89 0 1 17 FMDOCUMENT
+0 0 /Helvetica-Bold FMFONTDEFINE
+1 0 /Times-Bold FMFONTDEFINE
+2 0 /Times-Roman FMFONTDEFINE
+3 0 /Times-BoldItalic FMFONTDEFINE
+4 0 /Times-Italic FMFONTDEFINE
+5 0 /Courier-Bold FMFONTDEFINE
+6 0 /Helvetica-Oblique FMFONTDEFINE
+32 FMFILLS
+0 0 FMFILL
+1 0.1 FMFILL
+2 0.3 FMFILL
+3 0.5 FMFILL
+4 0.7 FMFILL
+5 0.9 FMFILL
+6 0.97 FMFILL
+7 1 FMFILL
+8 <0f1e3c78f0e1c387> FMFILL
+9 <0f87c3e1f0783c1e> FMFILL
+10 <cccccccccccccccc> FMFILL
+11 <ffff0000ffff0000> FMFILL
+12 <8142241818244281> FMFILL
+13 <03060c183060c081> FMFILL
+14 <8040201008040201> FMFILL
+16 1 FMFILL
+17 0.9 FMFILL
+18 0.7 FMFILL
+19 0.5 FMFILL
+20 0.3 FMFILL
+21 0.1 FMFILL
+22 0.03 FMFILL
+23 0 FMFILL
+24 <f0e1c3870f1e3c78> FMFILL
+25 <f0783c1e0f87c3e1> FMFILL
+26 <3333333333333333> FMFILL
+27 <0000ffff0000ffff> FMFILL
+28 <7ebddbe7e7dbbd7e> FMFILL
+29 <fcf9f3e7cf9f3f7e> FMFILL
+30 <7fbfdfeff7fbfdfe> FMFILL
+%%EndSetup
+%%Page: "1" 1
+%%BeginPaperSize: A4
+%%EndPaperSize
+595.28 841.89 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+0 0 0 1 0 0 0 K
+J
+70.87 711.5 538.58 711.5 2 L
+0.5 H
+0 Z
+0 X
+0 0 0 1 0 0 0 K
+N
+0 0 0 1 0 0 0 K
+0 9 Q
+(13 Jan) 70.87 694.16 T
+(uar) 98.79 694.16 T
+(y 1997) 112.89 694.16 T
+70.87 462.05 538.58 462.05 2 L
+2 Z
+N
+70.87 76.54 541.42 76.54 2 L
+1 H
+N
+1 24 Q
+(E) 70.87 772.46 T
+2 14 Q
+(UR) 86.87 772.46 T
+(OPEAN) 105.76 772.46 T
+1 24 Q
+(S) 156.92 772.46 T
+2 14 Q
+(YNCHR) 170.27 772.46 T
+(O) 218.71 772.46 T
+(TR) 228.25 772.46 T
+(ON) 245.59 772.46 T
+1 24 Q
+(R) 270.3 772.46 T
+2 14 Q
+(ADIA) 287.63 772.46 T
+(TION) 321.06 772.46 T
+1 24 Q
+(F) 358.99 772.46 T
+2 14 Q
+(A) 372.62 772.46 T
+(CILITY) 382.17 772.46 T
+2 10 Q
+(INST) 70.87 755.79 T
+(ALLA) 92.16 755.79 T
+(TION EUR) 117.71 755.79 T
+(OPEENNE DE RA) 163.69 755.79 T
+(Y) 240.41 755.79 T
+(ONNEMENT SYNCHR) 247.33 755.79 T
+(O) 346.09 755.79 T
+(TR) 352.91 755.79 T
+(ON) 365.29 755.79 T
+(COMPUTING SER) 70.87 722.79 T
+(VICES) 150.35 722.79 T
+0 0 0 1 0 0 0 K
+447.87 717.17 537.16 806.46 C
+0 X
+0 0 0 1 0 0 0 K
+%%BeginBinary:  28691    
+904 904 72 72 0 456.52 725.81
+/red <
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4FFFFFFFFFFFFFF
+FFFFFFFFCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+CCCCCCCCCCCCCCCC999999999999999999999999999999999999999999999999
+99999999999999999999999957666666665F6666666666666666666666666666
+6666666666666666666666666666666633333333333333333333333333333333
+3333333333333333143333333333333333333333000000000000000000000000
+000000000000000000000000150000000000B115F8FFFF990000334D72EE8B00
+FFB38B00D20000E65AADFFE7F7B9DD5B91FF9FC7A28C8A99D9F64ACC1515FF00
+> store
+/green <
+FFFFFFFFFFFFCCCCCCCCCCCC9999999999996666666666663E33333333330000
+00000000FFFFFFFFFFFFCCCCCCCCCCCC99999999999966666666666633333333
+3333000000000000FFFFFFFFFFFFCCCCCCCCCCCC999999999999666666666666
+333333333333000000000000FEFFFFFFFFFBCCCCCCCCCCCC9999999999996666
+66666666333333333333000000000000FFFFFFFFFFFFCCCCCCCCCCCC99999999
+9999666666666666293333333333000000000000FFFFFFFFFFFFCCCCCCCCCCCC
+99999999999966666666666635333333333329356900FF0000DDFF4D778277FF
+FCB35B00B4FF00581FAD00BABBB97E5B00009FC7B58C8299D92241CC0505FF00
+> store
+/blue <
+FFCC99663300FFCC99663300FFCC99663300FFCC99663300FFCC99663300FFCC
+99663300FFCC99663300FFCC99663300FFCC99663300FFCC99663300FFCC9966
+3300FFCC99663300FFCC99663300FFCC99663300FFCC99663300FFCC99663300
+FFCC99663300FFCC99663300FFCC99663317FFCC99663300FFCC99663300FFCC
+99663300FFCC99663300FFCC99663300FFCC99663300FFCC99663300FFCC9966
+3300FFCC99663300F8CC99663300FFCC99663300FFCC99663300FFCC99663300
+FFCC99663300FFCC99663300FFCC99663300F8FEA69933FFDD00FF4D85EE6500
+17B37AFF8CFF4FD890ADFF813EB97E5B00009FC5CD8CB399D91717CC1767FF00
+> store
+ BEGINBITMAPCOLORc
+z
+a>FE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Jt
+W:D3J#?#
+W8D3D3D3D3J#C#
+W6D3D3D3D3J#G#
+W4D3D3D3D3J"J"
+W3D35D3J"J"
+W2D37D3J"J"
+W1D39D3
+J"J"
+W0D3;D3J"J"
+W/D3=D3
+
+J"J"
+W.D3?D3
+
+
+
+
+
+
+J"J"
+W.FE?FEJt
+Z$D3J#?#
+Z"D3D3D3D3J"J"J#C#
+W/FE=FEP D3D3D3D3J"J"J#G#
+W0FE;FEOMD3D3D3D3JtJ"J"
+U%D3R=D35D3J#?#J"J"J"J"
+U#D3D3D3D3P!FE9FEOLD37D3J#C#J"J"J"J"
+U!D3D3D3D3P FE7FEOLD39D3J#G#J"J"
+TMD3D3D3D3OMFE5FEJ"J"J#G#J"J"
+TLD35D3OMFEFEFEFEOMD3;D3J"J"J#C#J"J"
+TKD37D3P FEFEFEFEP D3=D3J"J"J#?#
+TJD39D3P!FEFEFEFEJt
+W:FEJ"J"J"J"
+TID3;D3R.D3?D3J"J"
+THD3=D3
+
+J"J"
+TGD3?D3
+
+
+J"J"
+YFFE?FE
+
+J"J"
+YGFE=FEJ"J"J"J"
+TGFE?FER.FE;FE
+J"J"
+YIFE9FEJ"J"J"J"
+THFE=FER1FE7FEJ"J"J"J"
+TIFE;FER3FE5FEJ#G#
+YLFEFEFEFEJ"J"J#C#
+TJFE9FER7FEFEFEFEJ"J"J#?#
+TKFE7FER:FEFEFEFEJ"J"Jt
+TLFE5FER=FEJ#G#
+TMFEFEFEFEJ#C#
+U!FEFEFEFEJ#?#
+U#FEFEFEFEJt
+U%FE
+
+
+Js
+W:D3J$>$
+W7D3D3D3D3D3D3J$D$
+W4D3D3D3D3D3D3J"J"
+W3D34D3J"J"
+W2D36D3J#J#
+W0D3D38D3D3J"J"
+W/D3<D3
+J"J"
+W.D3>D3J"J"
+W-D3@D3J"J"
+W,D3BD3
+JtJ"J"Jt
+RHD3R(D3DD3R1D3J#?#J#?#
+RFD3D3D3D3W-D3D3D3D3J#C#J#C#
+RDD3D3D3D3W)D3D3D3D3J#G#J#G#
+RBD3D3D3D3W%D3D3D3D3J"J"JsJ"J"JsJ"J"
+RAD35D3P,D3O:D3FD3O:D3P5D35D3J"J"J$>$J$>$J"J"
+R@D37D3P(D3D3D3D3D3D3QHD3D3D3D3D3D3P1D37D3J"J"J$D$J$D$J"J"
+R?D39D3P$D3D3D3D3D3D3QBD3D3D3D3D3D3P-D39D3J"J"J"J"
+U/D34D3Q@D34D3J"J"J"J"J"J"J"J"
+R>D3;D3P!D36D3Q>D36D3P*D3;D3J"J"J#J#J#J#J"J"
+R=D3=D3OLD3D38D3D3Q:D3D38D3D3P'D3=D3J"J"J"J"
+U+D3<D3Q8D3<D3
+J"J"J"J"J"J"J"J"J"J"
+R<D3?D3OID3>D3O.FEFFEO.D3>D3P$D3?D3J"J"J"J"
+U)D3@D3Q4D3@D3J"J"J"J"
+U(D3BD3Q2D3BD3
+J"J"J"J"J"J"
+U'D3DD3O,FEDFEO,D3DD3
+J"J"
+W,FEBFEJ"J"
+W-FE@FEJ"J"J"J"J"J"J"J"J"J"
+R<FE?FEOED3FD3O.FE>FEO.D3FD3P FE?FE
+J"J"
+W/FE<FEJ"J"J#J#J"J"
+R=FE=FER"FEFE8FEFER+FE=FEJ"J"J"J"J"J"
+R>FE;FER%FE6FER.FE;FEJ"J"
+W3FE4FEJ"J"J$D$J"J"
+R?FE9FER(FEFEFEFEFEFER1FE9FEJ"J"J$>$J"J"
+R@FE7FER,FEFEFEFEFEFER5FE7FEJ"J"J"J"JsJ"J"J"J"
+RAFE5FEOJFEFFEO:FEO:FEFFEP%FE5FEJ#G#J#G#
+RBFEFEFEFEW%FEFEFEFEJ#C#J#C#
+RDFEFEFEFEW)FEFEFEFEJ#?#J#?#
+RFFEFEFEFEW-FEFEFEFEJtJ"J"J"J"Jt
+RHFEP$FEDFEQ0FEDFEP-FE
+J"J"J"J"
+U(FEBFEQ2FEBFEJ"J"J"J"
+U)FE@FEQ4FE@FEJ"J"J"J"
+U*FE>FEQ6FE>FE
+J"J"J"J"
+U+FE<FEQ8FE<FEJ#J#J#J#
+U,FEFE8FEFEQ:FEFE8FEFEJ"J"J"J"
+U.FE6FEQ>FE6FEJ"J"J"J"
+U/FE4FEQ@FE4FEJ$D$J$D$
+U0FEFEFEFEFEFEQBFEFEFEFEFEFEJ$>$J$>$
+U3FEFEFEFEFEFEQHFEFEFEFEFEFEJsJsJsJs
+S:D3OBFER FEOBD3J$>$J$>$
+S7D3D3D3D3D3D3U@D3D3D3D3D3D3J$D$J$D$
+S4D3D3D3D3D3D3U:D3D3D3D3D3D3J"J"J"J"
+S3D34D3U8D34D3J"J"J"J"
+S2D36D3U6D36D3J#J#J#J#
+S0D3D38D3D3U2D3D38D3D3J"J"J"J"
+S/D3<D3U0D3<D3
+J"J"J"J"
+S.D3>D3U.D3>D3J"J"J"J"
+S-D3@D3U,D3@D3J"J"J"J"
+S,D3BD3U*D3BD3
+J"J"J"J"
+S+D3DD3U(D3DD3
+
+
+J"J"J"J"
+S*D3FD3U&D3FD3
+
+Ju
+W9D3J$@$
+W6D3D3D3D3D3D3J$F$
+W3D3D3D3D3D3D3J#J#
+W1D3D36D3D3J"J"
+W0D3:D3J"J"J"J"J"J"
+S*FEFFEQ+D3<D3Q+FEFFEJ#J#
+W-D3D3>D3D3J"J"
+W,D3BD3J"J"
+W+D3DD3JtJ"J"J"J"Jt
+PLD3P$FEDFEU(FEDFEP%D3J#?#J"J"J#?#
+PJD3D3D3D3T!D3FD3T"D3D3D3D3J#C#J"J"J"J"J"J"J#C#
+PHD3D3D3D3P!FEBFEQ'D3HD3Q'FEBFEP"D3D3D3D3J#G#J"J"J"J"J"J"J#G#
+PFD3D3D3D3P FE@FEQ'D3JD3Q'FE@FEP!D3D3D3D3J"J"J"J"J"J"J"J"
+PED35D3P FE>FEU.FE>FEP!D35D3J"J"J"J"J"J"
+PDD37D3SFD3LD3SGD37D3J"J"J"J"JuJ"J"J"J"
+PCD39D3OMFE<FEP D3S&FE<FEP D39D3J#J#J$@$JuJ#J#
+S0FEFE8FEFEOLD3D3D3D3D3D3PHD3P FEFE8FEFEJ"J"J"J"J$F$J"J"J$@$J"J"J"J"
+PBD3;D3P!FE6FEOKD3D3D3D3D3D3ED3O D3ID3D3D3D3D3D3OMFE6FEP"D3;D3J"J"J"J"J#J#J$F$J"J"J"J"
+PAD3=D3P!FE4FEOJD3D36D3D3P=D3D3D3D3D3D3OKFE4FEP"D3=D3J$D$J"J"J#J#J$D$
+S4FEFEFEFEFEFEOJD3:D3P:D3D36D3D3OJFEFEFEFEFEFEJ$>$J"J"J"J"J"J"J$>$
+S7FEFEFEFEFEFEOLD3<D3@D3O"D3BD3:D3OLFEFEFEFEFEFEJ"J"JsJ#J#J"J"JsJ"J"
+P@D3?D3P'FEOMD3D3>D3D3P5D3<D3P FEP(D3?D3J"J"J#J#
+U@D3BD3P2D3D3>D3D3J"J"J"J"
+U?D3DD3P0D3BD3J"J"
+XFD3DD3J"J"
+U>D3FD3J"J"J"J"
+U=D3HD3P,D3FD3J"J"J"J"
+U<D3JD3P*D3HD3J"J"
+XCD3JD3J"J"J"J"J"J"
+P@FE?FER(D3LD3U/FE?FEJ"J"J"J"
+W%FEO"FE9D3LD3
+J"J"J"J"J"J"
+PAFE=FER(D3O D3U/FE=FEJ"J"J"J"J"J"J"J"
+PBFE;FESCFEO FE9D3O D3R)FE;FE
+J"J"J"J"J"J"
+PCFE9FER)D3O"D3U0FE9FEJ"J"J"J"J"J"J"J"
+PDFE7FESFFELFE9D3O"D3R*FE7FEJ"J"J"J"
+PEFE5FEZAFE5FEJ#G#J"J"J#G#
+PFFEFEFEFESIFEJFESJFEFEFEFEJ#C#J"J"J#C#
+PHFEFEFEFESLFEHFESMFEFEFEFEJ#?#J"J"J#?#
+PJFEFEFEFET!FEFFET"FEFEFEFEJtJt
+PLFE[!FEJ"J"
+W+FEDFEJ"J"
+W,FEBFEJ#J#
+W-FEFE>FEFEJ"J"J"J"
+U9FEO"FE@FE<FEJ"J"J"J"
+W0FE:FEBFEO"FEJuJ#J#
+T3D3PBFEFE6FEFEJ$@$J"J"J$F$Ju
+T0D3D3D3D3D3D3HFEO FEEFEFEFEFEFEFEPDD3J$F$J$@$J"J"J$@$
+T-D3D3D3D3D3D3PAFEFEFEFEFEFEIFEO FEGD3D3D3D3D3D3J#J#JuJ$F$
+T+D3D36D3D3PBFEPDD3D3D3D3D3D3J"J"J"J"J#J#
+T*D3:D3CFELFEQJD3D36D3D3J"J"J"J"J"J"
+T)D3<D3QIFELFEBD3:D3JsJ#J#J"J"J"J"Js
+R D3OMD3D3>D3D3AFEJFEQID3<D3P)D3J$>$J"J"J"J"J"J"J#J#J$>$
+QKD3D3D3D3D3D3OID3BD3AFEHFEP*FEJFE@D3D3>D3D3P$D3D3D3D3D3D3J$D$J"J"J"J"J"J"J"J"J$D$
+QHD3D3D3D3D3D3OED3DD3AFEFFEP,FEHFE@D3BD3P D3D3D3D3D3D3J"J"J"J"J"J"J"J"
+QGD34D3T6FEFFE@D3DD3OLD34D3J"J"J"J"J"J"J"J"
+QFD36D3OBD3FD3AFEDFET=D36D3J#J#J"J"J"J"J"J"J"J"J#J#
+QDD3D38D3D3O?D3HD3AFEBFEP0FEDFE@D3FD3OHD3D38D3D3J"J"J"J"J#J#J"J"J"J"J"J"
+QCD3<D3O=D3JD3AFEFE>FEFEP2FEBFE@D3HD3OFD3<D3J"J"J#J#J"J"
+UCFE<FEP5FEFE>FEFE@D3JD3J"J"J"J"J"J"J"J"J"J"
+QBD3>D3O;D3LD3CFE:FEP8FE<FEQ6D3>D3J"J"J#J#J"J"J"J"J"J"
+QAD3@D3Q0FEFE6FEFEP:FE:FEBD3LD3OBD3@D3J"J"J$F$J#J#J"J"
+Q@D3BD3Q1FEFEFEFEFEFEP=FEFE6FEFEQ6D3BD3J"J"J$@$J$F$
+T D3O D3HFEFEFEFEFEFEPBFEFEFEFEFEFEJ"J"JuJ$@$J"J"J"J"
+Q?D3DD3Q6FEPHFEFEFEFEFEFEGD3O D3O?D3DD3Ju
+Y&FEJ"J"
+SMD3O"D3J"J"
+Z+D3O"D3J"J"J"J"
+Q>D3FD3X4D3FD3
+
+
+
+
+
+
+J"J"J"J"J"J"
+Q>FEFFEO5FEO"FEUIFEFFEJ"J"
+Z+FEO"FE
+J"J"
+T FEO FEJ"J"JwJ"J"J"J"
+Q?FEDFES!D3P6FEO FEO?FEDFEJ&B&
+W3D3D3D3D3D3D3D3D3D3D3J"J"J"J"J$J$J"J"
+Q@FEBFEO9FELFEP/D3D3D36D3D3D3S"FEBFEJ"J"J#J#J"J"J"J"
+QAFE@FERGD3D3<D3D3P-FELFEOBFE@FEJ"J"J"J"J#J#J"J"
+QBFE>FEO<FEJFEP,D3D3@D3D3S FE>FEJ"J"J#J#J"J"
+T#FEHFEP+D3D3DD3D3P*FEJFEJ"J"J"J"J#J#J"J"J"J"
+QCFE<FEO?FEFFEP*D3D3HD3D3P)FEHFEOFFE<FEJ#J#J"J"J"J"J#J#
+QDFEFE8FEFERCD3LD3P)FEFFEOHFEFE8FEFEJ"J"J"J"J"J"J"J"
+QFFE6FEOCFEDFEP)D3O D3RLFE6FEJ"J"J"J"J#J#J"J"J"J"
+QGFE4FEOEFEBFEP(D3D3O"D3D3P'FEDFEOLFE4FEJ$D$J#J#J"J"J"J"J$D$
+QHFEFEFEFEFEFEOGFEFE>FEFEP(D3O&D3P'FEBFEP FEFEFEFEFEFEJ$>$J"J"J"J"J#J#J$>$
+QKFEFEFEFEFEFEOLFE<FEP)D3O(D3P'FEFE>FEFEP$FEFEFEFEFEFEJsJ"J"J"J"J"J"Js
+R FEP"FE:FEP)D3O*D3P(FE<FEP)FEJ#J#J"J"J"J"
+T+FEFE6FEFEP)D3O,D3P(FE:FEJ$F$J"J"J#J#
+T-FEFEFEFEFEFEP*D3O.D3P(FEFE6FEFEJuJ$@$J$F$Ju
+S)D3KFEFEFEFEFEFESGFEFEFEFEFEFEHD3J$@$JuJ"J"J$@$J$@$
+S&D3D3D3D3D3D3KFEP/D3O0D3P,FEFEFEFEFEFEHD3D3D3D3D3D3J$F$J"J"JuJ$F$
+S#D3D3D3D3D3D3Q2D3O2D3P.FEHD3D3D3D3D3D3J#J#J"J"J#J#
+S!D3D36D3D3Q/D3O4D3Q/D3D36D3D3J"J"J"J"
+S D3:D3V$D3:D3J"J"J"J"J"J"
+RMD3<D3Q,D3O6D3Q,D3<D3J#J#J#J#
+RKD3D3>D3D3ULD3D3>D3D3J"J"J"J"J"J"
+RJD3BD3Q(D3O8D3Q(D3BD3J"J"J"J"
+RID3DD3UHD3DD3J"J"
+VGD3O:D3J"J"J"J"
+RHD3FD3UFD3FD3J"J"J"J"J"J"
+RGD3HD3Q#D3O<D3Q#D3HD3J"J"J"J"
+RFD3JD3UBD3JD3
+J"J"J"J"J"J"
+RED3LD3Q D3O>D3Q D3LD3
+
+JtJ"J"JwJwJ"J"Jt
+O9D3Q"D3O D3ODD3Q:D3ODD3O D3Q"D3J#?#J&B&J&B&J#?#
+O7D3D3D3D3SAD3D3D3D3D3D3D3D3D3D3Q0D3D3D3D3D3D3D3D3D3D3SAD3D3D3D3J#C#J$J$J"J"J$J$J#C#
+O5D3D3D3D3S<D3D3D36D3D3D3BD3O@D3BD3D3D36D3D3D3S<D3D3D3D3J#G#J"J"J#J#J#J#J"J"J#G#
+O3D3D3D3D3PID3O"D3O9D3D3<D3D3Q&D3D3<D3D3O9D3O"D3PID3D3D3D3J"J"J#J#J#J#J"J"
+O2D35D3S5D3D3@D3D3Q"D3D3@D3D3S5D35D3J"J"J#J#J#J#J"J"
+O1D37D3S2D3D3DD3D3PLD3D3DD3D3S2D37D3J"J"J#J#J#J#J"J"
+O0D39D3S/D3D3HD3D3PHD3D3HD3D3S/D39D3J"J"J"J"
+U+D3LD3PFD3LD3J"J"J"J"J"J"J"J"
+O/D3;D3S,D3O D3PDD3O D3S,D3;D3J"J"J#J#J#J#J"J"
+O.D3=D3S)D3D3O"D3D3P@D3D3O"D3D3S)D3=D3J"J"J"J"
+U'D3O&D3P>D3O&D3J"J"J"J"
+U&D3O(D3P<D3O(D3J"J"J"J"J"J"J"J"
+O-D3?D3S%D3O*D3P:D3O*D3S%D3?D3J"J"J"J"J"J"J"J"
+RCFEO"FEO+D3O,D3P8D3O,D3O+FEO"FEJ"J"G"J"G"J"
+U#D3O.D3FEO@FED3O.D3
+J"J"J"J"J"J"J"J"
+RDFEO FEO*D3O0D3P4D3O0D3O*FEO FEJ"J"J"J"
+U!D3O2D3P2D3O2D3J"J"J"J"
+U D3O4D3P0D3O4D3J"J"J"J"J"J"
+REFELFEQ FEO>FEQ FELFEJ"J"JsJ"J"J"J"JsJ"J"
+O-FE?FEDD3R!D3O6D3P.D3O6D3R!D3DFE?FEJ$>$J"J"J"J"J$>$
+PAD3D3D3D3D3D3OEFEJFEUBFEJFEOED3D3D3D3D3D3J$D$J"J"J"J"D"J"D"J"J"J"J$D$
+P>D3D3D3D3D3D3OCFEHFEO)D3O8D3FEO<FED3O8D3O)FEHFEOCD3D3D3D3D3D3J"J"J"J"J"J"J"J"J"J"J"J"
+O.FE=FE>D34D3OCFEFFEUFFEFFEOCD34D3>FE=FEJ"J"J"J"J"J"D"J"D"J"J"J"J"J"
+O/FE;FE>D36D3QED3O:D3FEO:FED3O:D3QED36D3>FE;FEJ#J#J"J"J"J"J#J#
+P:D3D38D3D3OAFEDFEUHFEDFEOAD3D38D3D3J"J"J"J"J"J"J"J"D"J"D"J"J"J"J"J"J"J"
+O0FE9FE<D3<D3OAFEBFEO*D3O<D3FEO8FED3O<D3O*FEBFEOAD3<D3<FE9FEJ"J"J#J#J#J#J"J"
+O1FE7FEQ!FEFE>FEFEULFEFE>FEFEQ!FE7FEJ"J"J"J"J"J"J"J"J"J"J"J"J"J"
+O2FE5FE=D3>D3OCFE<FEQ,FEO6FEQ,FE<FEOCD3>D3=FE5FEJ#G#J"J"J"J"J"J"J"J"J"J"J"J"J#G#
+O3FEFEFEFE=D3@D3OCFE:FEO-D3O>D3P&D3O>D3O-FE:FEOCD3@D3=FEFEFEFEJ#C#J"J"J#J#J"J"J#J#J"J"J#C#
+O5FEFEFEFE>D3BD3OCFEFE6FEFEQ/FEO4FEQ/FEFE6FEFEOCD3BD3>FEFEFEFEJ#?#J$F$J"J"J$F$J#?#
+O7FEFEFEFEQ-FEFEFEFEFEFEQ2FEO2FEQ2FEFEFEFEFEFEQ-FEFEFEFEJtJ"J"J$@$J"J"J$@$J"J"Jt
+O9FEAD3DD3OGFEFEFEFEFEFEQ6FEO0FEQ6FEFEFEFEFEFEOGD3DD3AFEJuJu
+S)FEV6FEJ"J"G"J"G"J"
+THD3O@D3FEO.FED3O@D3J"J"
+W FEO,FEJ"J"J"J"J"J"
+P4D3FD3SAFEO*FESAD3FD3J"J"
+W"FEO(FEJ"J"
+W#FEO&FEJ#J#
+W$FEFEO"FEFEJ"J"
+W&FEO FEJ"J"
+W'FELFEJ#J#
+W(FEFEHFEFEJ#J#
+W*FEFEDFEFEJ"J"J#J#J"J"
+P4FEFFESLFEFE@FEFESLFEFFEJ#J#
+W.FEFE<FEFEJ"J"J$J$J"J"
+THFEO@FEBFEFEFE6FEFEFEBFEO@FEJuJ&B&Ju
+R7D3R@FEFEFEFEFEFEFEFEFEFERHD3J"J"J$@$JwJ$@$J"J"
+P5FEDFEO'D3D3D3D3D3D3RBFERJD3D3D3D3D3D3MFEDFEJ$F$J$F$
+R1D3D3D3D3D3D3WDD3D3D3D3D3D3J"J"J#J#J#J#J"J"
+P6FEBFEO#D3D36D3D3W@D3D36D3D3IFEBFEJ"J"J"J"J"J"J"J"J"J"J"J"
+P7FE@FEO#D3:D3OMFEO>FEP&FEO>FEP'D3:D3IFE@FEJ"J"J"J"J"J"J"J"
+P8FE>FEO#D3<D3W<D3<D3IFE>FEJ#J#J#J#
+R+D3D3>D3D3W8D3D3>D3D3J"J"J"J"J"J"J"J"J"J"J"J"
+P9FE<FEO!D3BD3OJFEO<FEP(FEO<FEP$D3BD3GFE<FEJ#J#J"J"J"J"J#J#
+P:FEFE8FEFEO!D3DD3W4D3DD3GFEFE8FEFEJ"J"J"J"J"J"J"J"
+P<FE6FEQEFEO:FEP*FEO:FEQEFE6FEJ"J"J"J"J"J"J"J"
+P=FE4FEO#D3FD3W2D3FD3IFE4FEJ$D$J"J"J"J"J"J"J"J"J$D$
+P>FEFEFEFEFEFEO#D3HD3OIFEO8FEP,FEO8FEP#D3HD3IFEFEFEFEFEFEJ$>$J"J"J"J"J$>$
+PAFEFEFEFEFEFEO%D3JD3W.D3JD3KFEFEFEFEFEFEJsJ"J"J"J"Js
+PDFER!FEO6FEP.FEO6FER!FEJ"J"J"J"
+R%D3LD3W,D3LD3J"J"J"J"
+U FEO4FEP0FEO4FEJ"J"J"J"
+U!FEO2FEP2FEO2FEJ"J"J"J"J"J"J"J"
+R$D3O D3OJFEO0FEP4FEO0FEP$D3O D3
+J"J"J"J"
+U#FEO.FEP6FEO.FEJ"J"J"J"J"J"J"J"
+R#D3O"D3OKFEO,FEP8FEO,FEP%D3O"D3J"J"J"J"
+U%FEO*FEP:FEO*FEJ"J"J"J"
+U&FEO(FEP<FEO(FEJ"J"J"J"
+U'FEO&FEP>FEO&FEJ#J#J#J#
+U(FEFEO"FEFEP@FEFEO"FEFEJwJ"J"J"J"Jw
+T"D3JFEO FEPDFEO FEJD3J&B&J"J"J"J"J&B&
+SKD3D3D3D3D3D3D3D3D3D3FFELFEPFFELFEFD3D3D3D3D3D3D3D3D3D3J$J$J#J#J#J#J$J$
+SHD3D3D36D3D3D3DFEFEHFEFEPHFEFEHFEFEDD3D3D36D3D3D3J#J#J#J#J#J#J#J#
+SFD3D3<D3D3DFEFEDFEFEPLFEFEDFEFEDD3D3<D3D3J#J#J#J#J#J#J#J#
+SDD3D3@D3D3DFEFE@FEFEQ"FEFE@FEFEDD3D3@D3D3J"J"J#J#J#J#J#J#J#J#J"J"
+R#FEO"FE;D3D3DD3D3DFEFE<FEFEQ&FEFE<FEFEDD3D3DD3D3CFEO"FEJ#J#J$J$J$J$J#J#
+S@D3D3HD3D3DFEFEFE6FEFEFEQ*FEFEFE6FEFEFEDD3D3HD3D3J"J"J&B&J&B&J"J"
+S?D3LD3FFEFEFEFEFEFEFEFEFEFEQ0FEFEFEFEFEFEFEFEFEFEFD3LD3J"J"J"J"JwJwJ"J"J"J"
+R$FEO FE8D3O D3JFEQ:FEJD3O D3@FEO FEJ#J#J#J#
+S<D3D3O"D3D3SFD3D3O"D3D3J"J"J"J"
+S;D3O&D3SDD3O&D3J"J"J"J"J"J"J"J"
+R%FELFE5D3O(D3SBD3O(D3=FELFEJ"J"J"J"
+S9D3O*D3S@D3O*D3J"J"J"J"J"J"J"J"
+R&FEJFE4D3O,D3S>D3O,D3<FEJFEJ"J"J"J"J"J"J"J"
+R'FEHFE4D3O.D3S<D3O.D3<FEHFEJ"J"J"J"
+R(FEFFEW2FEFFEJ"J"J"J"
+S6D3O0D3S:D3O0D3J"J"J"J"J"J"J"J"
+R)FEDFE4D3O2D3S8D3O2D3<FEDFEJ"J"J"J"J"J"J"J"
+R*FEBFE4D3O4D3S6D3O4D3<FEBFEJ#J#J#J#
+R+FEFE>FEFEW8FEFE>FEFEJ"J"J"J"J"J"J"J"
+R-FE<FE6D3O6D3S4D3O6D3>FE<FEJ"J"J"J"
+R.FE:FEW>FE:FEJ#J#J"J"J"J"J#J#
+R/FEFE6FEFE7D3O8D3S2D3O8D3?FEFE6FEFEJ$F$J$F$
+R1FEFEFEFEFEFEWDFEFEFEFEFEFEJ$@$J"J"J"J"J$@$
+R4FEFEFEFEFEFE;D3O:D3S0D3O:D3CFEFEFEFEFEFEJuJu
+R7FEX"FEJ"J"J"J"
+S0D3O<D3S.D3O<D3
+
+J"J"J"J"
+S/D3O>D3S,D3O>D3
+
+
+
+J"J"J"J"
+S.D3O@D3S*D3O@D3
+
+
+
+
+JtJt
+GD3_*D3J#?#J#?#
+ED3D3D3D3_&D3D3D3D3J#C#J#C#
+CD3D3D3D3_"D3D3D3D3J#G#J#G#
+AD3D3D3D3^LD3D3D3D3J"J"JsJsJ"J"
+@D35D3O#D3\4D3O#D35D3J"J"J$>$J$>$J"J"
+?D37D3MD3D3D3D3D3D3\.D3D3D3D3D3D3MD37D3J"J"J$D$J"J"J"J"J$D$J"J"
+>D39D3ID3D3D3D3D3D3PBFEO@FES*FEO@FEPBD3D3D3D3D3D3ID39D3J"J"JuJuJ"J"
+P%D34D3O2D3Y$D3O*D34D3J"J"J"J"J$@$J$@$J"J"J"J"
+=D3;D3FD36D3O.D3D3D3D3D3D3XLD3D3D3D3D3D3O&D36D3FD3;D3J"J"J#J#J$F$J$F$J#J#J"J"
+<D3=D3CD3D38D3D3O)D3D3D3D3D3D3XFD3D3D3D3D3D3O!D3D38D3D3CD3=D3J"J"J#J#J#J#J"J"
+P!D3<D3O&D3D36D3D3XBD3D36D3D3LD3<D3J"J"J"J"J"J"J"J"
+QDD3:D3KFEO>FES,FEO>FEO%D3:D3J"J"J"J"J"J"J"J"J"J"J"J"
+;D3?D3@D3>D3O#D3<D3X>D3<D3ID3>D3@D3?D3J"J"J#J#J#J#J"J"
+OMD3@D3O D3D3>D3D3X:D3D3>D3D3FD3@D3J"J"J"J"J"J"J"J"J"J"J"J"
+OLD3BD3LD3BD3HFEO<FES.FEO<FEO"D3BD3DD3BD3J"J"J"J"
+Q?D3DD3X6D3DD3J"J"J"J"J"J"J"J"
+OKD3DD3P<FEO:FES0FEO:FEP<D3DD3J"J"J"J"
+Q>D3FD3X4D3FD3J"J"J"J"J"J"J"J"
+Q=D3HD3GFEO8FES2FEO8FEO!D3HD3J"J"J"J"
+Q<D3JD3X0D3JD3J"J"J"J"J"J"J"J"J"J"J"J"
+;FE?FE<D3FD3P=FEO6FES4FEO6FEP=D3FD3<FE?FEJ"J"J"J"
+Q;D3LD3X.D3LD3J"J"J"J"
+S4FEO4FES6FEO4FEJ"J"J"J"J"J"J"J"
+<FE=FER(FEO2FES8FEO2FER(FE=FEJ"J"J"J"J"J"J"J"J"J"J"J"
+=FE;FEP.D3O D3HFEO0FES:FEO0FEO"D3O D3P&FE;FE
+J"J"J"J"J"J"J"J"
+>FE9FER,FEO.FES<FEO.FER,FE9FEJ"J"J"J"J"J"J"J"J"J"J"J"
+?FE7FEP/D3O"D3IFEO,FES>FEO,FEO#D3O"D3P'FE7FEJ"J"J"J"J"J"J"J"J"J"J"J"
+@FE5FEAFEFFEPCFEO*FES@FEO*FEPCFEFFEAFE5FEJ#G#J"J"J"J"J#G#
+AFEFEFEFER2FEO(FESBFEO(FER2FEFEFEFEJ#C#J"J"J"J"J#C#
+CFEFEFEFER5FEO&FESDFEO&FER5FEFEFEFEJ#?#J#J#J#J#J#?#
+EFEFEFEFER8FEFEO"FEFESFFEFEO"FEFER8FEFEFEFEJtJ"J"J"J"J"J"J"J"Jt
+GFEIFEDFEPIFEO FESJFEO FEPIFEDFEIFEJ"J"J"J"
+S?FELFESLFELFEJ"J"J#J#J#J#J"J"
+OLFEBFEPLFEFEHFEFET FEFEHFEFEPLFEBFEJ"J"J#J#J#J#J"J"
+OMFE@FEQ!FEFEDFEFET$FEFEDFEFEQ!FE@FEJ"J"J#J#J#J#J"J"
+P FE>FEQ$FEFE@FEFET(FEFE@FEFEQ$FE>FEJ"J"J#J#J#J#J"J"
+Q9FEO"FEO)FEFE<FEFET,FEFE<FEFEO1FEO"FEJ"J"J$J$J$J$J"J"
+P!FE<FEQ)FEFEFE6FEFEFET0FEFEFE6FEFEFEQ)FE<FEJ#J#J&B&J&B&J#J#
+P"FEFE8FEFEQ-FEFEFEFEFEFEFEFEFEFET6FEFEFEFEFEFEFEFEFEFEQ-FEFE8FEFEJ"J"J"J"JwJwJ"J"J"J"
+P$FE6FELFEO FEO4FET@FEO<FEO FEDFE6FEJ"J"J"J"
+P%FE4FE\&FE4FEJ$D$J$D$
+P&FEFEFEFEFEFE\(FEFEFEFEFEFEJ$>$J"J"J"J"J$>$
+P)FEFEFEFEFEFEO$FELFEX.FELFEJFEFEFEFEFEFEJsJs
+P,FE\4FEJ"J"J"J"
+Q<FEJFEX0FEJFEJ"J"J"J"
+Q=FEHFEX2FEHFEJ"J"J"J"
+Q>FEFFEX4FEFFEJwJw
+SHD3U"D3J"J"J&B&J&B&J"J"
+Q?FEDFEO,D3D3D3D3D3D3D3D3D3D3TFD3D3D3D3D3D3D3D3D3D3O4FEDFEJ"J"J$J$J$J$J"J"
+Q@FEBFEO*D3D3D36D3D3D3T@D3D3D36D3D3D3O2FEBFEJ#J#J#J#J#J#J#J#
+QAFEFE>FEFEO)D3D3<D3D3T<D3D3<D3D3O1FEFE>FEFEJ"J"J#J#J#J#J"J"
+QCFE<FEO)D3D3@D3D3T8D3D3@D3D3O1FE<FEJ"J"J#J#J#J#J"J"
+QDFE:FEO(D3D3DD3D3T4D3D3DD3D3O0FE:FEJ#J#J#J#J#J#J#J#
+QEFEFE6FEFEO'D3D3HD3D3T0D3D3HD3D3O/FEFE6FEFEJ$F$J"J"J"J"J$F$
+QGFEFEFEFEFEFEO(D3LD3T.D3LD3O0FEFEFEFEFEFEJ$@$J"J"J"J"J$@$
+QJFEFEFEFEFEFEO*D3O D3T,D3O D3O2FEFEFEFEFEFEJuJ#J#J#J#Ju
+QMFEO+D3D3O"D3D3T(D3D3O"D3D3O3FEJ"J"J"J"
+S3D3O&D3T&D3O&D3J"J"J"J"
+S2D3O(D3T$D3O(D3J"J"J"J"
+S1D3O*D3T"D3O*D3J"J"J"J"
+S0D3O,D3T D3O,D3J"J"J"J"
+S/D3O.D3SLD3O.D3
+J"J"J"J"
+S.D3O0D3SJD3O0D3J"J"J"J"
+S-D3O2D3SHD3O2D3J"J"J"J"
+S,D3O4D3SFD3O4D3
+J"J"J"J"
+S+D3O6D3SDD3O6D3
+J"J"J"J"
+S*D3O8D3SBD3O8D3JuJu
+QMD3Y$D3J$@$J"J"J"J"J$@$
+QJD3D3D3D3D3D3KD3O:D3S@D3O:D3O%D3D3D3D3D3D3J$F$J$F$
+QGD3D3D3D3D3D3XFD3D3D3D3D3D3J#J#J"J"J"J"J#J#
+QED3D36D3D3ED3O<D3S>D3O<D3MD3D36D3D3J"J"J"J"
+QDD3:D3X@D3:D3J"J"J"J"
+QCD3<D3X>D3<D3J#J#J"J"J"J"J#J#
+QAD3D3>D3D3@D3O>D3S<D3O>D3HD3D3>D3D3J"J"J"J"
+Q@D3BD3X8D3BD3J"J"J"J"
+Q?D3DD3X6D3DD3
+J"J"J"J"
+Q>D3FD3X4D3FD3J"J"J"J"J"J"J"J"
+Q=D3HD3;D3O@D3S:D3O@D3CD3HD3J"J"J"J"
+Q<D3JD3X0D3JD3
+J"J"J"J"
+Q;D3LD3X.D3LD3
+
+J"J"J"J"
+Q:D3O D3X,D3O D3
+
+J"J"J"J"
+Q9D3O"D3X*D3O"D3JsJs
+P,D3\4D3J$>$J$>$
+P)D3D3D3D3D3D3\.D3D3D3D3D3D3J$D$J"J"J"J"J$D$
+P&D3D3D3D3D3D3P:FEO@FES:FEO@FEP:D3D3D3D3D3D3J"J"J"J"
+P%D34D3\&D34D3J"J"J"J"
+P$D36D3\$D36D3J#J#J#J#
+P"D3D38D3D3\ D3D38D3D3J"J"J"J"
+P!D3<D3[LD3<D3J"J"J"J"
+S'FEO>FES<FEO>FEJ"J"J"J"
+P D3>D3[JD3>D3J"J"J"J"J"J"J"J"
+OMD3@D3FFEO"FEX*FEO"FE>D3@D3J"J"J"J"J"J"J"J"
+OLD3BD3P4FEO<FES>FEO<FEP4D3BD3
+JtJ"J"J"J"J"J"J"J"J"J"J"J"Jt
+GD3ID3DD3EFEO FE;FEO:FES@FEO:FECFEO FE=D3DD3ID3J#?#J#?#
+ED3D3D3D3_&D3D3D3D3J#C#J"J"J"J"J#C#
+CD3D3D3D3R$FEO8FESBFEO8FER$D3D3D3D3J#G#J"J"J"J"J#G#
+AD3D3D3D3P3FELFEX.FELFEP+D3D3D3D3J"J"J"J"J"J"J"J"J"J"J"J"
+@D35D3AD3FD3P5FEO6FESDFEO6FEP5D3FD3AD35D3J"J"J"J"J"J"J"J"
+?D37D3P2FEJFEX0FEJFEP*D37D3J"J"J"J"J"J"J"J"J"J"J"J"
+>D39D3P2FEHFEAFEO4FESFFEO4FEIFEHFEP*D39D3J"J"J"J"J"J"J"J"
+Q>FEFFECFEO2FESHFEO2FEKFEFFEJ"J"J"J"J"J"J"J"
+=D3;D3R"FEO0FESJFEO0FER"D3;D3J"J"J"J"J"J"J"J"
+<D3=D3P2FEDFEX6FEDFEP*D3=D3J"J"J"J"J"J"J"J"
+Q@FEBFEGFEO.FESLFEO.FEO!FEBFEJ#J#J"J"J"J"J#J#
+QAFEFE>FEFEIFEO,FET FEO,FEO#FEFE>FEFEJ"J"J"J"J"J"J"J"J"J"J"J"J"J"J"J"
+;D3?D3<FEFFEMFE<FELFEO*FET"FEO*FEO&FE<FEEFEFFE<D3?D3J"J"J"J"J"J"J"J"
+QDFE:FEO FEO(FET$FEO(FEO(FE:FEJ#J#J"J"J"J"J#J#
+QEFEFE6FEFEO"FEO&FET&FEO&FEO*FEFE6FEFEJ$F$J#J#J#J#J$F$
+QGFEFEFEFEFEFEO%FEFEO"FEFET(FEFEO"FEFEO-FEFEFEFEFEFEJ"J"J$@$J"J"J"J"J$@$J"J"
+OKFEDFEO'FEFEFEFEFEFEO*FEO FET,FEO FEO2FEFEFEFEFEFEMFEDFEJuJ"J"J"J"Ju
+QMFEO.FELFET.FELFEO6FEJ"J"J#J#J#J#J"J"
+OLFEBFEPDFEFEHFEFET0FEFEHFEFEPDFEBFEJ"J"J#J#J#J#J"J"
+OMFE@FEPGFEFEDFEFET4FEFEDFEFEPGFE@FEJ"J"J"J"J#J#J#J#J"J"J"J"
+;FE?FE@FE>FEPJFEFE@FEFET8FEFE@FEFEPJFE>FE@FE?FEJ#J#J#J#
+S>FEFE<FEFET<FEFE<FEFEJ"J"J$J$J$J$J"J"
+P!FE<FEQ!FEFEFE6FEFEFET@FEFEFE6FEFEFEQ!FE<FEJ"J"J#J#J&B&J&B&J#J#J"J"
+<FE=FECFEFE8FEFEQ%FEFEFEFEFEFEFEFEFEFETFFEFEFEFEFEFEFEFEFEFEQ%FEFE8FEFECFE=FEJ"J"J"J"JwJwJ"J"J"J"
+=FE;FEFFE6FEQ,FEU"FEQ,FE6FEFFE;FEJ"J"J"J"
+P%FE4FE\&FE4FEJ"J"J$D$J$D$J"J"
+>FE9FEIFEFEFEFEFEFE\(FEFEFEFEFEFEIFE9FEJ"J"J$>$J$>$J"J"
+?FE7FEMFEFEFEFEFEFE\.FEFEFEFEFEFEMFE7FEJ"J"JsJsJ"J"
+@FE5FEO#FE\4FEO#FE5FEJ#G#J#G#
+AFEFEFEFE^LFEFEFEFEJ#C#J#C#
+CFEFEFEFE_"FEFEFEFEJ#?#J#?#
+EFEFEFEFE_&FEFEFEFEJtJwJwJt
+GFES@D3S.D3S@FEJ&B&J&B&
+T=D3D3D3D3D3D3D3D3D3D3S$D3D3D3D3D3D3D3D3D3D3J$J$J$J$
+T:D3D3D36D3D3D3RLD3D3D36D3D3D3J#J#J#J#
+T8D3D3<D3D3RHD3D3<D3D3J#J#J#J#
+T6D3D3@D3D3RDD3D3@D3D3J#J#J#J#
+T4D3D3DD3D3R@D3D3DD3D3J#J#J#J#
+T2D3D3HD3D3R<D3D3HD3D3J"J"J"J"
+T1D3LD3R:D3LD3J"J"J"J"
+T0D3O D3R8D3O D3J#J#J#J#
+T.D3D3O"D3D3R4D3D3O"D3D3J"J"J"J"
+T-D3O&D3R2D3O&D3J"J"J"J"
+T,D3O(D3R0D3O(D3J"J"J"J"
+T+D3O*D3R.D3O*D3J"J"J"J"
+T*D3O,D3R,D3O,D3J"J"J"J"
+T)D3O.D3R*D3O.D3JuJu
+R7D3X"D3J$@$J"J"J"J"J$@$
+R4D3D3D3D3D3D3O2D3O0D3R(D3O0D3O:D3D3D3D3D3D3J$F$J"J"J"J"J$F$
+R1D3D3D3D3D3D3O.D3O2D3R&D3O2D3O6D3D3D3D3D3D3J#J#J"J"J"J"J#J#
+R/D3D36D3D3O+D3O4D3R$D3O4D3O3D3D36D3D3J"J"J"J"
+R.D3:D3W>D3:D3J"J"J"J"J"J"J"J"
+R-D3<D3O(D3O6D3R"D3O6D3O0D3<D3J#J#J#J#
+R+D3D3>D3D3W8D3D3>D3D3J"J"J"J"J"J"J"J"
+R*D3BD3O$D3O8D3R D3O8D3O,D3BD3J"J"J"J"
+R)D3DD3W4D3DD3J"J"J"J"
+T#D3O:D3QLD3O:D3J"J"J"J"
+R(D3FD3W2D3FD3J"J"J"J"J"J"J"J"
+R'D3HD3MD3O<D3QJD3O<D3O'D3HD3J"J"J"J"
+R&D3JD3W.D3JD3
+J"J"J"J"J"J"J"J"
+R%D3LD3JD3O>D3QHD3O>D3O$D3LD3
+
+J"J"J"J"
+R$D3O D3W*D3O D3
+J"J"J"J"
+T D3O@D3QFD3O@D3J"J"J"J"
+R#D3O"D3W(D3O"D3
+
+
+
+
+
+
+
+
+J"J"J"J"
+R#FEO"FEW(FEO"FEJ"J"J"J"
+T FEO@FEQFFEO@FE
+J"J"J"J"
+R$FEO FEW*FEO FE
+
+J"J"J"J"J"J"J"J"
+R%FELFEJFEO>FEQHFEO>FEO$FELFEJsJs
+PDD3[2D3J$>$J"J"J"J"J$>$
+PAD3D3D3D3D3D3O%FEJFEW.FEJFEKD3D3D3D3D3D3J$D$J"J"J"J"J"J"J"J"J$D$
+P>D3D3D3D3D3D3O#FEHFEMFEO<FEQJFEO<FEO'FEHFEID3D3D3D3D3D3J"J"J"J"J"J"J"J"
+P=D34D3O#FEFFEW2FEFFEID34D3J"J"J"J"JwJwJ"J"J"J"
+P<D36D3PKFEO:FEED3OFD3EFEO:FEPKD36D3J#J#J"J"J&B&J&B&J"J"J#J#
+P:D3D38D3D3O!FEDFEQ0D3D3D3D3D3D3D3D3D3D3O<D3D3D3D3D3D3D3D3D3D3Q8FEDFEGD3D38D3D3J"J"J"J"J"J"J$J$J$J$J"J"J"J"J"J"
+P9D3<D3O!FEBFEO$FEO8FE>D3D3D36D3D3D3O6D3D3D36D3D3D3>FEO8FEO,FEBFEGD3<D3J#J#J#J#J#J#J#J#
+R+FEFE>FEFEQ-D3D3<D3D3O2D3D3<D3D3Q5FEFE>FEFEJ"J"J"J"J"J"J#J#J#J#J"J"J"J"J"J"
+P8D3>D3O#FE<FEO(FEO6FE;D3D3@D3D3O.D3D3@D3D3;FEO6FEO0FE<FEID3>D3J"J"J"J"J#J#J#J#J"J"J"J"
+P7D3@D3O#FE:FEQ,D3D3DD3D3O*D3D3DD3D3Q4FE:FEID3@D3J"J"J#J#J"J"J#J#J#J#J"J"J#J#J"J"
+P6D3BD3O#FEFE6FEFEO+FEO4FE8D3D3HD3D3O&D3D3HD3D38FEO4FEO3FEFE6FEFEID3BD3J$F$J"J"J"J"J"J"J"J"J$F$
+R1FEFEFEFEFEFEO.FEO2FE8D3LD3O$D3LD38FEO2FEO6FEFEFEFEFEFEJ"J"J$@$J"J"J"J"J"J"J"J"J$@$J"J"
+P5D3DD3O'FEFEFEFEFEFEO2FEO0FE8D3O D3O"D3O D38FEO0FEO:FEFEFEFEFEFEMD3DD3JuJ#J#J#J#Ju
+R7FEQ/D3D3O"D3D3LD3D3O"D3D3Q7FEJ"J"J"J"J"J"J"J"
+T)FEO.FE6D3O&D3JD3O&D36FEO.FEJ"J"J"J"J"J"J"J"
+T*FEO,FE6D3O(D3HD3O(D36FEO,FEJ"J"J"J"J"J"J"J"J"J"J"J"
+P4D3FD3PKFEO*FE6D3O*D3FD3O*D36FEO*FEPKD3FD3J"J"J"J"J"J"J"J"
+T,FEO(FE6D3O,D3DD3O,D36FEO(FEJ"J"J"J"J"J"J"J"
+T-FEO&FE6D3O.D3BD3O.D36FEO&FEJ#J#J#J#
+T.FEFEO"FEFER4FEFEO"FEFEJ"J"J"J"J"J"J"J"
+T0FEO FE8D3O0D3@D3O0D38FEO FEJ"J"J"J"J"J"J"J"
+T1FELFE8D3O2D3>D3O2D38FELFEJ#J#J"J"J"J"J#J#
+T2FEFEHFEFE8D3O4D3<D3O4D38FEFEHFEFEJ#J#J#J#
+T4FEFEDFEFER@FEFEDFEFEJ"J"J#J#J"J"J"J"J#J#J"J"
+P4FEFFEQ(FEFE@FEFE;D3O6D3:D3O6D3;FEFE@FEFEQ(FEFFEJ#J#J#J#
+T8FEFE<FEFERHFEFE<FEFEJ$J$J"J"J"J"J$J$
+T:FEFEFE6FEFEFE>D3O8D38D3O8D3>FEFEFE6FEFEFEJuJ&B&J&B&Ju
+S)D3O*FEFEFEFEFEFEFEFEFEFES$FEFEFEFEFEFEFEFEFEFEO*D3JtJ"J"J$@$JwJ"J"J"J"JwJ$@$J"J"Jt
+O9D3AFEDFEOGD3D3D3D3D3D3O,FEED3O:D36D3O:D3EFEO,D3D3D3D3D3D3OGFEDFEAD3J#?#J$F$J$F$J#?#
+O7D3D3D3D3Q-D3D3D3D3D3D3V*D3D3D3D3D3D3Q-D3D3D3D3J#C#J"J"J#J#J"J"J"J"J#J#J"J"J#C#
+O5D3D3D3D3>FEBFEOCD3D36D3D3P)D3O<D34D3O<D3P)D3D36D3D3OCFEBFE>D3D3D3D3J#G#J"J"J"J"J"J"J"J"J#G#
+O3D3D3D3D3=FE@FEOCD3:D3V$D3:D3OCFE@FE=D3D3D3D3J"J"J"J"J"J"J"J"J"J"J"J"
+O2D35D3=FE>FEOCD3<D3V"D3<D3OCFE>FE=D35D3J"J"J#J#J"J"H"J"J#J#J"J"
+O1D37D3Q!D3D3>D3D3P$D3O>D3D3O>D3P$D3D3>D3D3Q!D37D3J"J"J"J"J"J"J"J"J"J"J"J"
+O0D39D3<FE<FEOAD3BD3UJD3BD3OAFE<FE<D39D3J#J#J"J"J"J"J#J#
+P:FEFE8FEFEOAD3DD3UHD3DD3OAFEFE8FEFEJ"J"J"J"J"J"J"J"
+O/D3;D3>FE6FE["FE6FE>D3;D3J"J"J"J"J"J"J"J"J"J"J"J"
+O.D3=D3>FE4FEOCD3FD3UFD3FD3OCFE4FE>D3=D3J$D$J"J"J"J"F"J"J"J"J$D$
+P>FEFEFEFEFEFEOCD3HD3OMD3O@D3D3O@D3OMD3HD3OCFEFEFEFEFEFEJ$>$J"J"J"J"J$>$
+PAFEFEFEFEFEFEOED3JD3UBD3JD3OEFEFEFEFEFEFEJ"J"JsJsJ"J"
+O-D3?D3DFE[2FEDD3?D3J"J"J"J"
+RED3LD3U@D3LD3
+
+J"J"J"J"
+RDD3O D3U>D3O D3
+
+J"J"J"J"
+RCD3O"D3U<D3O"D3J"J"J"J"
+O-FE?FE].FE?FE
+J"J"F"J"
+UBFEO@FEFEO@FEJ"J"J"J"
+O.FE=FE]0FE=FEJ"J"J"J"
+O/FE;FE]2FE;FE
+J"J"J"J"
+O0FE9FE]4FE9FEJ"J"J"J"H"J"J"J"
+O1FE7FESGFEO>FEFEO>FESGFE7FEJ"J"J"J"
+O2FE5FE]8FE5FEJ#G#J"J"J"J"J#G#
+O3FEFEFEFEPIFEO"FEU<FEO"FEPIFEFEFEFEJ#C#J"J"J"J"J#C#
+O5FEFEFEFESLFEO<FE4FEO<FESLFEFEFEFEJ#?#J#?#
+O7FEFEFEFE]BFEFEFEFEJtJ"J"J"J"J"J"J"J"Jt
+O9FEQ"FEO FEOMFEO:FE6FEO:FEOMFEO FEQ"FE
+J"J"J"J"
+UFFEO8FE8FEO8FEJ"J"J"J"
+REFELFEU@FELFEJ"J"J"J"
+UGFEO6FE:FEO6FEJ"J"J"J"
+RFFEJFEUBFEJFEJ"J"J"J"J"J"J"J"
+RGFEHFEP%FEO4FE<FEO4FEP%FEHFEJ"J"J"J"J"J"J"J"
+RHFEFFEP'FEO2FE>FEO2FEP'FEFFEJ"J"J"J"
+UJFEO0FE@FEO0FEJ"J"J"J"
+RIFEDFEUHFEDFEJ"J"J"J"J"J"J"J"
+RJFEBFEP+FEO.FEBFEO.FEP+FEBFEJ#J#J"J"J"J"J#J#
+RKFEFE>FEFEP-FEO,FEDFEO,FEP-FEFE>FEFEJ"J"J"J"J"J"J"J"
+RMFE<FEP0FEO*FEFFEO*FEP0FE<FEJ"J"J"J"J"J"J"J"
+S FE:FEP2FEO(FEHFEO(FEP2FE:FEJ#J#J"J"J"J"J#J#
+S!FEFE6FEFEP4FEO&FEJFEO&FEP4FEFE6FEFEJ$F$JuJ#J#J#J#JuJ$F$
+S#FEFEFEFEFEFEHD3O3FEFEO"FEFELFEFEO"FEFEO3D3HFEFEFEFEFEFEJ$@$J$@$J"J"J"J"J$@$J$@$
+S&FEFEFEFEFEFEHD3D3D3D3D3D3O2FEO FEO"FEO FEO2D3D3D3D3D3D3HFEFEFEFEFEFEJuJ$F$J"J"J"J"J$F$Ju
+S)FEHD3D3D3D3D3D3O0FELFEO$FELFEO0D3D3D3D3D3D3HFEJ#J#J#J#J#J#J#J#
+T+D3D36D3D3O/FEFEHFEFEO&FEFEHFEFEO/D3D36D3D3J"J"J#J#J#J#J"J"
+T*D3:D3O0FEFEDFEFEO*FEFEDFEFEO0D3:D3JsJ"J"J#J#J#J#J"J"Js
+R D3P!D3<D3O1FEFE@FEFEO.FEFE@FEFEO1D3<D3P)D3J$>$J#J#J#J#J#J#J#J#J$>$
+QKD3D3D3D3D3D3OJD3D3>D3D3O1FEFE<FEFEO2FEFE<FEFEO1D3D3>D3D3P$D3D3D3D3D3D3J$D$J"J"J$J$J$J$J"J"J$D$
+QHD3D3D3D3D3D3OFD3BD3O2FEFEFE6FEFEFEO6FEFEFE6FEFEFEO2D3BD3P D3D3D3D3D3D3J"J"J"J"J&B&J&B&J"J"J"J"
+QGD34D3ODD3DD3O4FEFEFEFEFEFEFEFEFEFEO<FEFEFEFEFEFEFEFEFEFEO4D3DD3OLD34D3J"J"JwJwJ"J"
+QFD36D3R&FEOFFER.D36D3J#J#J"J"J"J"J#J#
+QDD3D38D3D3O@D3FD3S2D3FD3OHD3D38D3D3J"J"J"J"J"J"J"J"
+QCD3<D3O>D3HD3S0D3HD3OFD3<D3J"J"J"J"
+T"D3JD3S.D3JD3J"J"J"J"
+QBD3>D3X<D3>D3J"J"J"J"J"J"J"J"
+QAD3@D3O:D3LD3S,D3LD3OBD3@D3J"J"J"J"
+Q@D3BD3X8D3BD3
+J"J"J"J"J"J"J"J"
+Q?D3DD3O7D3O D3S*D3O D3O?D3DD3
+
+J"J"J"J"
+SMD3O"D3S(D3O"D3J"J"J"J"
+Q>D3FD3X4D3FD3
+
+
+
+
+
+
+J"J"J"J"
+Q>FEFFEX4FEFFEJ"J"J"J"
+SMFEO"FES(FEO"FE
+JuJu
+UMD3PJD3J"J"J"J"J$@$J$@$J"J"J"J"
+Q?FEDFEO7FEO FEHD3D3D3D3D3D3PDD3D3D3D3D3D3HFEO FEO?FEDFEJ$F$J$F$
+UGD3D3D3D3D3D3P>D3D3D3D3D3D3J"J"J#J#J#J#J"J"
+Q@FEBFEQ/D3D36D3D3P:D3D36D3D3Q7FEBFEJ"J"J"J"J"J"J"J"J"J"J"J"
+QAFE@FEO:FELFECD3:D3P8D3:D3CFELFEOBFE@FEJ"J"J"J"J"J"J"J"
+QBFE>FEQ/D3<D3P6D3<D3Q7FE>FEJ"J"J#J#J#J#J"J"
+T"FEJFEAD3D3>D3D3P2D3D3>D3D3AFEJFEJ"J"J"J"J"J"J"J"J"J"J"J"
+QCFE<FEO>FEHFEAD3BD3P0D3BD3AFEHFEOFFE<FEJ#J#J"J"J"J"JuJ"J"J"J"J#J#
+QDFEFE8FEFEO@FEFFEAD3DD3O"D3O"D3DD3AFEFFEOHFEFE8FEFEJ"J"J$@$J"J"
+QFFE6FES&D3D3D3D3D3D3S.FE6FEJ"J"J"J"J"J"J$F$J"J"J"J"J"J"
+QGFE4FEODFEDFEAD3FD3ID3D3D3D3D3D3ID3FD3AFEDFEOLFE4FEJ$D$J"J"J"J"J#J#J"J"J"J"J$D$
+QHFEFEFEFEFEFEOFFEBFEAD3HD3FD3D36D3D3FD3HD3AFEBFEP FEFEFEFEFEFEJ$>$J#J#J"J"J"J"J"J"J#J#J$>$
+QKFEFEFEFEFEFEOJFEFE>FEFEAD3JD3DD3:D3DD3JD3AFEFE>FEFEP$FEFEFEFEFEFEJsJ"J"J"J"J"J"Js
+R FEP!FE<FEP6D3<D3P6FE<FEP)FEJ"J"J"J"J#J#J"J"J"J"
+T*FE:FECD3LD3@D3D3>D3D3@D3LD3CFE:FEJ#J#J"J"J#J#
+T+FEFE6FEFEP5D3BD3P5FEFE6FEFEJ$F$J"J"J$F$
+T-FEFEFEFEFEFEP6D3DD3P6FEFEFEFEFEFEJ$@$J"J"J"J"J$@$
+T0FEFEFEFEFEFEHD3O D3P$D3O D3HFEFEFEFEFEFEJuJ"J"Ju
+T3FEP;D3FD3P;FEJ"J"
+W)D3HD3J"J"J"J"J"J"
+U9D3O"D39D3JD39D3O"D3
+J"J"
+W'D3LD3
+
+JtJ"J"Jt
+PKD3T D3O D3SMD3J#?#J#?#
+PID3D3D3D3ZKD3D3D3D3J#C#J#C#
+PGD3D3D3D3ZGD3D3D3D3J#G#J"J"J#G#
+PED3D3D3D3SGD3O"D3SFD3D3D3D3J"J"J"J"
+PDD35D3ZAD35D3J"J"J"J"J"J"J"J"
+PCD37D3R+FEO"FEP"FEO"FER*D37D3J"J"J"J"
+PBD39D3Z=D39D3
+J"J"J"J"J"J"J"J"
+PAD3;D3R*FEO FEP$FEO FER)D3;D3J"J"J"J"
+P@D3=D3Z9D3=D3
+J"J"J"J"
+U;FELFEP&FELFEJ"J"J"J"
+P?D3?D3Z7D3?D3J"J"J"J"J"J"
+U<FEJFE9FEO"FE9FEJFEJ"J"J"J"
+U=FEHFEP*FEHFEJ"J"J"J"
+U>FEFFEP,FEFFEJ"J"
+W&FEO FEJ"J"J"J"
+U?FEDFEP.FEDFEJ"J"J"J"
+U@FEBFEP0FEBFEJ#J#J"J"J#J#
+UAFEFE>FEFE@FELFE@FEFE>FEFEJ"J"JsJ"J"J"J"JsJ"J"
+P?FE?FEP(D3P!FE<FEP6FE<FEP!D3P'FE?FEJ$>$J"J"J"J"J"J"J$>$
+S7D3D3D3D3D3D3OMFE:FEDFEJFEDFE:FEOMD3D3D3D3D3D3J$D$J#J#J"J"J#J#J$D$
+S4D3D3D3D3D3D3OKFEFE6FEFEFFEHFEFFEFE6FEFEOKD3D3D3D3D3D3J"J"J"J"J$F$J"J"J$F$J"J"J"J"
+P@FE=FEP"D34D3OLFEFEFEFEFEFEIFEFFEIFEFEFEFEFEFEOLD34D3P!FE=FEJ"J"J"J"J$@$J$@$J"J"J"J"
+PAFE;FEP"D36D3P FEFEFEFEFEFEPDFEFEFEFEFEFEP D36D3P!FE;FEJ#J#JuJ"J"JuJ#J#
+S0D3D38D3D3P!FEO"FEDFEO"FEP!D3D38D3D3J"J"J"J"J"J"J"J"J"J"
+PBFE9FEP D3<D3Q-FEBFEQ-D3<D3OMFE9FEJ"J"J#J#J"J"
+PCFE7FESMFEFE>FEFESLFE7FEJ"J"J"J"J"J"J"J"J"J"
+PDFE5FEP!D3>D3Q/FE<FEQ/D3>D3P FE5FEJ#G#J"J"J"J"J"J"J#G#
+PEFEFEFEFEP!D3@D3Q/FE:FEQ/D3@D3P FEFEFEFEJ#C#J"J"J#J#J"J"J#C#
+PGFEFEFEFEP"D3BD3Q/FEFE6FEFEQ/D3BD3P!FEFEFEFEJ#?#J$F$J#?#
+PIFEFEFEFET+FEFEFEFEFEFET*FEFEFEFEJtJ"J"J$@$J"J"Jt
+PKFEP%D3DD3Q3FEFEFEFEFEFEQ3D3DD3P$FEJu
+W9FE
+
+J"J"J"J"
+S*D3FD3U&D3FD3
+
+
+
+
+
+
+J"J"J"J"
+S*FEFFEU&FEFFE
+
+
+J"J"J"J"
+S+FEDFEU(FEDFE
+J"J"J"J"
+S,FEBFEU*FEBFEJ"J"J"J"
+S-FE@FEU,FE@FEJ"J"J"J"
+S.FE>FEU.FE>FE
+J"J"J"J"
+S/FE<FEU0FE<FEJ#J#J#J#
+S0FEFE8FEFEU2FEFE8FEFEJ"J"J"J"
+S2FE6FEU6FE6FEJ"J"J"J"
+S3FE4FEU8FE4FEJ$D$J$D$
+S4FEFEFEFEFEFEU:FEFEFEFEFEFEJ$>$J$>$
+S7FEFEFEFEFEFEU@FEFEFEFEFEFEJsJsJsJs
+S:FEOBD3R D3OBFEJ$>$J$>$
+U3D3D3D3D3D3D3QHD3D3D3D3D3D3J$D$J$D$
+U0D3D3D3D3D3D3QBD3D3D3D3D3D3J"J"J"J"
+U/D34D3Q@D34D3J"J"J"J"
+U.D36D3Q>D36D3J#J#J#J#
+U,D3D38D3D3Q:D3D38D3D3J"J"J"J"
+U+D3<D3Q8D3<D3
+J"J"JsJ"J"
+U*D3>D3O>D3O>D3>D3J"J"J$>$J"J"
+U)D3@D3O:D3D3D3D3D3D3O:D3@D3J"J"J$D$J"J"
+U(D3BD3O6D3D3D3D3D3D3O6D3BD3J"J"
+W3D34D3JtJ"J"J"J"J"J"Jt
+RGD3P%D3DD3O3D36D3O3D3DD3P-D3J#?#J#J#J#?#
+RED3D3D3D3R,D3D38D3D3R4D3D3D3D3J#C#J"J"J#C#
+RCD3D3D3D3R)D3<D3R1D3D3D3D3J#G#J#G#
+RAD3D3D3D3W&D3D3D3D3J"J"J"J"J"J"J"J"J"J"
+R@D35D3OKD3FD3O.D3>D3O.D3FD3P%D35D3J"J"J"J"J"J"
+R?D37D3R#D3@D3R+D37D3J"J"J"J"J"J"
+R>D39D3R!D3BD3R)D39D3
+J"J"J"J"J"J"
+R=D3;D3QMD3DD3R'D3;D3J"J"J"J"
+R<D3=D3VJD3=D3
+
+J"J"J"J"J"J"J"J"J"J"
+R;D3?D3OFFEFFEO*D3FD3O*FEFFEP D3?D3
+
+
+J"J"J"J"
+U'FEDFEQ0FEDFE
+J"J"J"J"
+U(FEBFEQ2FEBFEJ"J"J"J"
+U)FE@FEQ4FE@FEJ"J"J"J"J"J"J"J"J"J"
+R;FE?FEOJFE>FEO.FEFFEO.FE>FEP$FE?FE
+J"J"J"J"
+U+FE<FEQ8FE<FEJ"J"J#J#J#J#J"J"
+R<FE=FEOMFEFE8FEFEQ:FEFE8FEFEP'FE=FEJ"J"J"J"J"J"J"J"J"J"
+R=FE;FEP"FE6FEO3FEDFEO3FE6FEP*FE;FEJ"J"J"J"
+U/FE4FEQ@FE4FEJ"J"J$D$J"J"J$D$J"J"
+R>FE9FEP%FEFEFEFEFEFEO6FEBFEO6FEFEFEFEFEFEP-FE9FEJ"J"J$>$J"J"J$>$J"J"
+R?FE7FEP)FEFEFEFEFEFEO:FE@FEO:FEFEFEFEFEFEP1FE7FEJ"J"JsJ"J"JsJ"J"
+R@FE5FEP-FEO>FE>FEO>FEP5FE5FEJ#G#J#G#
+RAFEFEFEFEW&FEFEFEFEJ#C#J"J"J#C#
+RCFEFEFEFER)FE<FER1FEFEFEFEJ#?#J#J#J#?#
+REFEFEFEFER,FEFE8FEFER4FEFEFEFEJtJ"J"Jt
+RGFER0FE6FER8FEJ"J"
+W3FE4FEJ$D$
+W4FEFEFEFEFEFEJ$>$
+W7FEFEFEFEFEFEJs
+W:FE
+
+
+
+
+
+
+
+
+
+
+JtJt
+U%D3R?D3J#?#J#?#
+U#D3D3D3D3R;D3D3D3D3J#C#J#C#
+U!D3D3D3D3R7D3D3D3D3J#G#J#G#
+TMD3D3D3D3R3D3D3D3D3J"J"J"J"
+TLD35D3R1D35D3J"J"J"J"
+TKD37D3R/D37D3J"J"J"J"
+TJD39D3R-D39D3
+J"J"J"J"
+TID3;D3R+D3;D3J"J"J"J"
+THD3=D3R)D3=D3
+
+J"J"J"J"
+TGD3?D3R'D3?D3
+
+
+Jt
+W9D3J#?#
+W7D3D3D3D3J#C#
+W5D3D3D3D3J#G#
+W3D3D3D3D3J"J"J"J"J"J"
+TGFE?FEOFD35D3OFFE?FEJ"J"
+W1D37D3J"J"
+W0D39D3J"J"J"J"
+THFE=FER)FE=FEJ"J"J"J"J"J"
+TIFE;FEOED3;D3OEFE;FEJ"J"
+W.D3=D3J"J"J"J"
+TJFE9FER-FE9FEJ"J"J"J"
+TKFE7FER/FE7FEJ"J"J"J"J"J"
+TLFE5FEOFD3?D3OFFE5FEJ#G#J#G#
+TMFEFEFEFER3FEFEFEFEJ#C#J#C#
+U!FEFEFEFER7FEFEFEFEJ#?#J#?#
+U#FEFEFEFER;FEFEFEFEJtJt
+U%FER?FE
+
+
+J"J"
+W-FE?FE
+
+J"J"
+W.FE=FEJ"J"
+W/FE;FE
+J"J"
+W0FE9FEJ"J"
+W1FE7FEJ"J"
+W2FE5FEJ#G#
+W3FEFEFEFEJ#C#
+W5FEFEFEFEJ#?#
+W7FEFEFEFEJt
+W9FE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ENDBITMAP
+%%EndBinary
+0 0 595.28 841.89 C
+0 0 0 1 0 0 0 K
+2 24 Q
+0 X
+0 0 0 1 0 0 0 K
+-0.17 (An  ASCII  interf) 198.43 681.32 S
+-0.17 (ace to) 363.35 681.32 S
+198.43 631.98 538.58 643.32 C
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+198.43 634.32 450.42 634.32 2 L
+0.25 H
+0 Z
+0 X
+0 0 0 1 0 0 0 K
+N
+0 0 595.28 841.89 C
+2 24 Q
+0 X
+0 0 0 1 0 0 0 K
+-0.17 (de) 198.43 651.32 S
+-0.17 (vice serv) 220.15 651.32 S
+-0.17 (er API) 304.27 651.32 S
+3 12 Q
+(by) 198.43 607.98 T
+(F) 198.43 591.98 T
+(aranguiss P) 205.29 591.98 T
+(oncet) 263.64 591.98 T
+4 F
+(DSN120) 198.43 575.98 T
+3 10 Q
+(The AscApi shared  library \050libascapi.sl\051 is dev) 70.87 444.04 T
+(elopped to pro) 262.39 444.04 T
+(vide an Ascii) 320.57 444.04 T
+(based  interface to the device serv) 70.87 431.04 T
+(er API. This Ascii interface will be used) 208.47 431.04 T
+(to interf) 70.87 418.04 T
+(ece the HP  VEETEST softw) 103.83 418.04 T
+(are with the ESRF control system.) 222.35 418.04 T
+0 0 0 1 0 0 0 K
+FMENDPAGE
+%%EndPage: "1" 1
+%%Page: "2" 2
+595.28 841.89 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+1 1 0 0 0 0 1 K
+56.69 802.21 524.41 802.21 2 L
+1 H
+0 Z
+0 X
+1 1 0 0 0 0 1 K
+N
+0 0 0 1 0 0 0 K
+1 1 0 0 0 0 1 K
+56.69 768.19 524.41 768.19 2 L
+0.5 H
+N
+0 0 0 1 0 0 0 K
+56.69 76.54 524.41 76.54 2 L
+1 H
+2 Z
+0 0 0 1 0 0 0 K
+N
+0 10 Q
+(2) 56.69 61.36 T
+0 9 Q
+(An ASCII interface to de) 192.76 61.36 T
+(vice ser) 295.14 61.36 T
+(ver API) 328.76 61.36 T
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+203.75 690.21 192.76 690.21 2 L
+V
+0.9 H
+0 Z
+N
+0 18 Q
+(T) 192.76 692.01 T
+223.32 690.21 202.31 690.21 2 L
+V
+N
+(ab) 202.31 692.01 T
+349.14 690.21 223.14 690.21 2 L
+V
+N
+(le of Contents:) 223.14 692.01 T
+1 14 Q
+(1) 174.42 662.68 T
+(Data type used f) 192.76 662.68 T
+(or input and output ar) 289.23 662.68 T
+(guments) 423.67 662.68 T
+(3) 488.23 662.68 T
+(2) 174.42 640.68 T
+(Con) 192.76 640.68 T
+(v) 217.09 640.68 T
+(ersion of types to and fr) 223.95 640.68 T
+(om string) 365.63 640.68 T
+(3) 436.79 640.68 T
+(3) 174.42 618.68 T
+(The functions of the library) 192.76 618.68 T
+(5) 371.65 618.68 T
+2 12 Q
+(3.1) 192.76 604.01 T
+(Examples for \322de) 215.43 604.01 T
+(v_get_ascii\323 function) 299.11 604.01 T
+(6) 414.09 604.01 T
+(3.2) 192.76 590.01 T
+(Examples for \322de) 215.43 590.01 T
+(v_put_ascii\323 function) 299.11 590.01 T
+(6) 414.77 590.01 T
+(3.3) 192.76 576.01 T
+(Examples for \322de) 215.43 576.01 T
+(v_putget_ascii\323 function) 299.11 576.01 T
+(8) 429.43 576.01 T
+1 14 Q
+(4) 174.42 554.68 T
+(Library locations) 192.76 554.68 T
+(8) 310.59 554.68 T
+0 0 0 1 0 0 0 K
+FMENDPAGE
+%%EndPage: "2" 2
+%%Page: "3" 3
+595.28 841.89 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+1 1 0 0 0 0 1 K
+70.87 802.21 538.58 802.21 2 L
+1 H
+0 Z
+0 X
+1 1 0 0 0 0 1 K
+N
+0 0 0 1 0 0 0 K
+0 9 Q
+0 0 0 1 0 0 0 K
+(Data type used f) 206.93 790.54 T
+(or input and output ar) 276.27 790.54 T
+(guments) 369.63 790.54 T
+1 1 0 0 0 0 1 K
+70.87 768.19 538.58 768.19 2 L
+0.25 H
+1 1 0 0 0 0 1 K
+N
+0 0 0 1 0 0 0 K
+70.87 76.54 538.58 76.54 2 L
+1 H
+2 Z
+0 0 0 1 0 0 0 K
+N
+(An ASCII interface to de) 206.93 58.53 T
+(vice ser) 309.31 58.53 T
+(ver API) 342.93 58.53 T
+0 10 Q
+-2.78 (3) 533.02 58.53 P
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+70.87 683.17 538.58 686.01 C
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+205.87 685.16 556.87 685.16 2 L
+0.25 H
+2 Z
+0 X
+0 0 0 1 0 0 0 K
+N
+70.87 685.16 196.87 685.16 2 L
+0 Z
+N
+0 0 595.28 841.89 C
+0 12 Q
+0 X
+0 0 0 1 0 0 0 K
+(1) 188.92 690.01 T
+(Data type used f) 206.93 690.01 T
+(or input and output ar) 299.38 690.01 T
+(guments) 423.86 690.01 T
+2 10 Q
+(The type used to send or to get data to or from AscApi library is \322string\323. The) 206.93 666.51 T
+(strings are used as de\336ned in C programming language.) 206.93 654.51 T
+(Therefore all the necessary information to e) 206.93 630.51 T
+(x) 381.73 630.51 T
+(ecute a command on a de) 386.58 630.51 T
+(vice serv) 487.69 630.51 T
+(er) 523.36 630.51 T
+(should be sent in string format. This means that the de) 206.93 618.51 T
+(vice name, command name,) 423.61 618.51 T
+(input ar) 206.93 606.51 T
+(gument for that command \050if needed\051 and output ar) 237.58 606.51 T
+(gument are all strings.) 442.36 606.51 T
+70.87 563.34 538.58 566.17 C
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+205.87 565.33 556.87 565.33 2 L
+0.25 H
+2 Z
+0 X
+0 0 0 1 0 0 0 K
+N
+70.87 565.33 196.87 565.33 2 L
+0 Z
+N
+0 0 595.28 841.89 C
+0 12 Q
+0 X
+0 0 0 1 0 0 0 K
+(2) 188.92 570.17 T
+(Con) 206.93 570.17 T
+(ver) 229.78 570.17 T
+(sion of types to and fr) 247.61 570.17 T
+(om string) 372.72 570.17 T
+2 10 Q
+(There are a lot of data types de\336ned and used by the components of the ESRF con-) 206.93 546.67 T
+(trol system to perform an action on a de) 206.93 534.67 T
+(vice or to get the information from a) 366.1 534.67 T
+(de) 206.93 522.67 T
+(vice. So to be able to send and to recei) 216.12 522.67 T
+(v) 369.73 522.67 T
+(e the information in a unique data type) 374.58 522.67 T
+-0.1 (and format the type con) 206.93 510.67 P
+-0.1 (v) 301.13 510.67 P
+-0.1 (ersions are performed in tw) 305.98 510.67 P
+-0.1 (o directions : from control sys-) 415.46 510.67 P
+(tem data types to string , from string to the control system data types.) 206.93 498.67 T
+-0.12 (It has been decided that all these con) 206.93 474.67 P
+-0.12 (v) 352.56 474.67 P
+-0.12 (ersion functions are de) 357.41 474.67 P
+-0.12 (v) 447.59 474.67 P
+-0.12 (elopped in a separate) 452.44 474.67 P
+-0.2 (shared library so it can easily be e) 206.93 462.67 P
+-0.2 (xtended to ne) 341.2 462.67 P
+-0.2 (w types, and also adaptable to other) 394.43 462.67 P
+(softw) 206.93 450.67 T
+(are \050applications\051 needs.) 229.05 450.67 T
+(In a \336rst step, only the k) 206.93 426.67 T
+(ernel  data types  ha) 303.77 426.67 T
+(v) 383.27 426.67 T
+(e con) 388.12 426.67 T
+(v) 409.1 426.67 T
+(ersion functions to and from) 413.95 426.67 T
+(string. The other con) 206.93 414.67 T
+(v) 289.85 414.67 T
+(ersion functions \050for other data types\051 can easily be added in) 294.7 414.67 T
+(the type con) 206.93 402.67 T
+(v) 255.41 402.67 T
+(ersion shared library \322libtcapi.sl\323.) 260.26 402.67 T
+(F) 206.93 378.67 T
+(or the moment the follo) 212.34 378.67 T
+(wing types are con) 306.53 378.67 T
+(v) 381.39 378.67 T
+(erted in the so-called) 386.24 378.67 T
+1 F
+(\322type con) 472.33 378.67 T
+(v) 512.76 378.67 T
+(er-) 517.66 378.67 T
+(sion \050libtcapi.sl\051\323) 206.93 366.67 T
+2 F
+( library :) 279.72 366.67 T
+5 11 Q
+(\245) 206.93 348.01 T
+2 10 Q
+(D_V) 218.27 348.01 T
+(OID_TYPE) 237.31 348.01 T
+5 11 Q
+(\245) 206.93 332.01 T
+2 10 Q
+(D_USHOR) 218.27 332.01 T
+(T_TYPE) 263.78 332.01 T
+5 11 Q
+(\245) 206.93 316.01 T
+2 10 Q
+(D_SHOR) 218.27 316.01 T
+(T_TYPE) 256.56 316.01 T
+5 11 Q
+(\245) 206.93 300.01 T
+2 10 Q
+(D_ULONG_TYPE) 218.27 300.01 T
+5 11 Q
+(\245) 206.93 284.01 T
+2 10 Q
+(D_LONG_TYPE) 218.27 284.01 T
+5 11 Q
+(\245) 206.93 268.01 T
+2 10 Q
+(D_FLO) 218.27 268.01 T
+(A) 249.03 268.01 T
+(T_TYPE) 255.14 268.01 T
+5 11 Q
+(\245) 206.93 252.01 T
+2 10 Q
+(D_DOUBLE_TYPE) 218.27 252.01 T
+5 11 Q
+(\245) 206.93 236.01 T
+2 10 Q
+(D_STRING_TYPE) 218.27 236.01 T
+5 11 Q
+(\245) 206.93 220.01 T
+2 10 Q
+(D_INT_FLO) 218.27 220.01 T
+(A) 270.69 220.01 T
+(T_TYPE) 276.8 220.01 T
+5 11 Q
+(\245) 206.93 204.01 T
+2 10 Q
+(D_FLO) 218.27 204.01 T
+(A) 249.03 204.01 T
+(T_READPOINT) 255.14 204.01 T
+5 11 Q
+(\245) 206.93 188.01 T
+2 10 Q
+(D_ST) 218.27 188.01 T
+(A) 241.23 188.01 T
+(TE_FLO) 247.34 188.01 T
+(A) 283.1 188.01 T
+(T_READPOINT) 289.21 188.01 T
+5 11 Q
+(\245) 206.93 172.01 T
+2 10 Q
+(D_LONG_READPOINT) 218.27 172.01 T
+5 11 Q
+(\245) 206.93 156.01 T
+2 10 Q
+(D_DOUBLE_READPOINT) 218.27 156.01 T
+5 11 Q
+(\245) 206.93 140.01 T
+2 10 Q
+(D_V) 218.27 140.01 T
+(AR_CHARARR) 236.36 140.01 T
+5 11 Q
+(\245) 206.93 124.01 T
+2 10 Q
+(D_V) 218.27 124.01 T
+(AR_STRINGARR) 236.36 124.01 T
+5 11 Q
+(\245) 206.93 108.01 T
+2 10 Q
+(D_V) 218.27 108.01 T
+(AR_USHOR) 236.36 108.01 T
+(T) 288.54 108.01 T
+(ARR) 293.72 108.01 T
+5 11 Q
+(\245) 206.93 92.01 T
+2 10 Q
+(D_V) 218.27 92.01 T
+(AR_SHOR) 236.36 92.01 T
+(T) 281.32 92.01 T
+(ARR) 286.5 92.01 T
+0 0 0 1 0 0 0 K
+FMENDPAGE
+%%EndPage: "3" 3
+%%Page: "4" 4
+595.28 841.89 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+1 1 0 0 0 0 1 K
+56.69 802.21 524.41 802.21 2 L
+1 H
+0 Z
+0 X
+1 1 0 0 0 0 1 K
+N
+0 0 0 1 0 0 0 K
+0 9 Q
+0 0 0 1 0 0 0 K
+(Con) 192.76 787.7 T
+(ver) 209.89 787.7 T
+(sion of types to and fr) 223.27 787.7 T
+(om string) 317.1 787.7 T
+1 1 0 0 0 0 1 K
+56.69 768.19 524.41 768.19 2 L
+0.5 H
+1 1 0 0 0 0 1 K
+N
+0 0 0 1 0 0 0 K
+56.69 76.54 524.41 76.54 2 L
+1 H
+2 Z
+0 0 0 1 0 0 0 K
+N
+0 10 Q
+(4) 56.69 61.36 T
+0 9 Q
+(An ASCII interface to de) 192.76 61.36 T
+(vice ser) 295.14 61.36 T
+(ver API) 328.76 61.36 T
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+5 11 Q
+(\245) 192.76 729.68 T
+2 10 Q
+(D_V) 204.09 729.68 T
+(AR_ULONGARR) 222.18 729.68 T
+5 11 Q
+(\245) 192.76 713.68 T
+2 10 Q
+(D_V) 204.09 713.68 T
+(AR_LONGARR) 222.18 713.68 T
+5 11 Q
+(\245) 192.76 697.68 T
+2 10 Q
+(D_V) 204.09 697.68 T
+(AR_FLO) 222.18 697.68 T
+(A) 259.61 697.68 T
+(T) 265.72 697.68 T
+(ARR) 270.9 697.68 T
+5 11 Q
+(\245) 192.76 681.68 T
+2 10 Q
+(D_V) 204.09 681.68 T
+(AR_DOUBLEARR) 222.18 681.68 T
+0 0 0 1 0 0 0 K
+FMENDPAGE
+%%EndPage: "4" 4
+%%Page: "5" 5
+595.28 841.89 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+1 1 0 0 0 0 1 K
+70.87 802.21 538.58 802.21 2 L
+1 H
+0 Z
+0 X
+1 1 0 0 0 0 1 K
+N
+0 0 0 1 0 0 0 K
+0 9 Q
+0 0 0 1 0 0 0 K
+(The functions of the librar) 206.93 790.54 T
+(y) 318.03 790.54 T
+1 1 0 0 0 0 1 K
+70.87 768.19 538.58 768.19 2 L
+0.25 H
+1 1 0 0 0 0 1 K
+N
+0 0 0 1 0 0 0 K
+70.87 76.54 538.58 76.54 2 L
+1 H
+2 Z
+0 0 0 1 0 0 0 K
+N
+(An ASCII interface to de) 206.93 58.53 T
+(vice ser) 309.31 58.53 T
+(ver API) 342.93 58.53 T
+0 10 Q
+-2.78 (5) 533.02 58.53 P
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+70.87 722.17 538.58 725.01 C
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+205.87 724.16 556.87 724.16 2 L
+0.25 H
+2 Z
+0 X
+0 0 0 1 0 0 0 K
+N
+70.87 724.16 196.87 724.16 2 L
+0 Z
+N
+0 0 595.28 841.89 C
+0 12 Q
+0 X
+0 0 0 1 0 0 0 K
+(3) 188.92 729.01 T
+(The functions of the librar) 206.93 729.01 T
+(y) 355.07 729.01 T
+2 10 Q
+(There will be three main functions in the library :) 206.93 705.51 T
+0 12 Q
+(de) 70.87 686.17 T
+(v_g) 84.69 686.17 T
+(et_acsii) 105.49 686.17 T
+1 10 Q
+(long  de) 206.93 661.51 T
+(v_get_ascii\050char *de) 240.12 661.51 T
+(v_name, char *cmd_name, char **out_ar) 326.9 661.51 T
+(g, char) 504 661.51 T
+(**str_err\051) 206.93 649.51 T
+2 F
+(    This function is used for all the de) 206.93 631.51 T
+(vice serv) 353.61 631.51 T
+(er commands which do not require) 389.28 631.51 T
+(an) 206.93 619.51 T
+(y input ar) 216.22 619.51 T
+(gument. The \336rst tw) 254.37 619.51 T
+(o parameters are the input parameters which gi) 335.38 619.51 T
+(v) 522.58 619.51 T
+(e) 527.43 619.51 T
+(the indication on the de) 206.93 607.51 T
+(vice name and the command name to be e) 300.56 607.51 T
+(x) 468.15 607.51 T
+(ecuted on that) 473 607.51 T
+(de) 206.93 595.51 T
+(vice. The last tw) 216.12 595.51 T
+(o parameters are the output parameters which contain respec-) 282.12 595.51 T
+(ti) 206.93 583.51 T
+(v) 212.24 583.51 T
+(ely the result returned by the de) 217.09 583.51 T
+(vice serv) 343.48 583.51 T
+(er command and an error string if an) 379.15 583.51 T
+(y) 525.35 583.51 T
+-0.16 (error occured. The output parameters :) 206.93 571.51 P
+1 F
+-0.16 (out_ar) 362.32 571.51 P
+-0.16 (g) 390.55 571.51 P
+2 F
+-0.16 ( and) 395.55 571.51 P
+1 F
+-0.16 (str_err) 414.68 571.51 P
+2 F
+-0.16 ( should be allocated by) 444.66 571.51 P
+(the caller of the function. The) 206.93 559.51 T
+1 F
+(de) 328.29 559.51 T
+(v_get_ascii) 338.14 559.51 T
+2 F
+(function does not do ANY allocation) 387.3 559.51 T
+(for these strings and supposes that enough memory space has been allocated for) 206.93 547.51 T
+(them.) 206.93 535.51 T
+0 12 Q
+(de) 70.87 516.17 T
+(v_put_ascii) 84.69 516.17 T
+1 10 Q
+(long de) 206.93 491.51 T
+(v_put_ascii\050char *de) 237.62 491.51 T
+(v_name, char *cmd_name, char *in_ar) 326.08 491.51 T
+(g, char) 492.63 491.51 T
+(**str_err\051) 206.93 479.51 T
+2 F
+-0.25 (    This function is used for all the de) 206.93 461.51 P
+-0.25 (vice serv) 350.9 461.51 P
+-0.25 (er commands which do not return an) 386.32 461.51 P
+-0.25 (y) 531.33 461.51 P
+(output ar) 206.93 449.51 T
+(gument. The \336rst tw) 242.58 449.51 T
+(o parameters are the input parameters which gi) 323.59 449.51 T
+(v) 510.79 449.51 T
+(e the) 515.64 449.51 T
+(indication on the de) 206.93 437.51 T
+(vice name and the command name to be e) 285.84 437.51 T
+(x) 453.43 437.51 T
+(ecuted on that) 458.28 437.51 T
+(de) 206.93 425.51 T
+(vice. The third parameter is the input data required by the de) 216.12 425.51 T
+(vice serv) 458.04 425.51 T
+(er com-) 493.71 425.51 T
+(mand.The last parameter is the output parameter which contain the error occured) 206.93 413.51 T
+-0.32 (during the e) 206.93 401.51 P
+-0.32 (x) 253.9 401.51 P
+-0.32 (ecution of the de) 258.75 401.51 P
+-0.32 (vice serv) 324.45 401.51 P
+-0.32 (er command. The output parameter :) 359.8 401.51 P
+1 F
+-0.32 (str_err) 506.43 401.51 P
+2 F
+(should be allocated by the caller of the function. The) 206.93 389.51 T
+1 F
+(de) 420.5 389.51 T
+(v_put_ascii) 430.35 389.51 T
+2 F
+(function does) 481.19 389.51 T
+(not do ANY allocation for this string and supposes that enough memory space has) 206.93 377.51 T
+(been allocated for it.) 206.93 365.51 T
+(As e) 206.93 341.51 T
+(xplained before, the \322in_ar) 224.83 341.51 T
+(g\323 parameter is the input ar) 331.84 341.51 T
+(gument required by the) 440.8 341.51 T
+(de) 206.93 329.51 T
+(vice serv) 216.12 329.51 T
+(er command in string format. This string must repect a strict format so) 251.79 329.51 T
+(that) 206.93 317.51 T
+1 F
+(de) 224.43 317.51 T
+(v_put_ascii) 234.28 317.51 T
+2 F
+( can con) 285.12 317.51 T
+(v) 318.04 317.51 T
+(ert it to the data type e) 322.89 317.51 T
+(xpected by the de) 412.17 317.51 T
+(vice com-) 482.18 317.51 T
+(mand. T) 206.93 305.51 T
+(o kno) 239.46 305.51 T
+(w which format should be used, refer to the follo) 261.71 305.51 T
+(wing section where) 456.98 305.51 T
+(an e) 206.93 293.51 T
+(xample is gi) 223.16 293.51 T
+(v) 271.8 293.51 T
+(en for each data type.) 276.65 293.51 T
+0 12 Q
+(de) 70.87 274.17 T
+(v_putg) 84.69 274.17 T
+(et_ascii) 124.15 274.17 T
+1 10 Q
+-0.14 (long  de) 206.93 249.51 P
+-0.14 (v_putget_ascii\050char *de) 239.84 249.51 P
+-0.14 (v_name, char *cmd_name, char *in_ar) 340.93 249.51 P
+-0.14 (g, char) 506.92 249.51 P
+(**out_ar) 206.93 237.51 T
+(g, char **str_err\051) 245.16 237.51 T
+2 F
+(    This function is used for all the de) 206.93 219.51 T
+(vice serv) 353.61 219.51 T
+(er commands which do require an) 389.28 219.51 T
+(input ar) 206.93 207.51 T
+(gument as well as an output ar) 237.58 207.51 T
+(gument. The \336rst tw) 359.05 207.51 T
+(o parameters are the) 440.06 207.51 T
+(input parameters which gi) 206.93 195.51 T
+(v) 310.83 195.51 T
+(e the indication on the de) 315.68 195.51 T
+(vice name and the command) 416.25 195.51 T
+(name to be e) 206.93 183.51 T
+(x) 257.6 183.51 T
+(ecuted on that de) 262.45 183.51 T
+(vice. The third parameter is the input data required) 330.24 183.51 T
+(by the de) 206.93 171.51 T
+(vice serv) 243.34 171.51 T
+(er command.The last tw) 279.01 171.51 T
+(o parameters are the output parameters) 375.56 171.51 T
+(which contain respecti) 206.93 159.51 T
+(v) 296.66 159.51 T
+(ely the result of the de) 301.51 159.51 T
+(vice serv) 390.41 159.51 T
+(er command and an error) 426.08 159.51 T
+(string if an) 206.93 147.51 T
+(y) 250.11 147.51 T
+(. The output parameters :) 254.46 147.51 T
+1 F
+(out_ar) 357.22 147.51 T
+(g) 385.45 147.51 T
+2 F
+( and) 390.45 147.51 T
+1 F
+(str_err) 409.89 147.51 T
+2 F
+( should be allocated by) 439.87 147.51 T
+(the caller of the function. The) 206.93 135.51 T
+1 F
+(de) 328.29 135.51 T
+(v_putget_ascii) 338.14 135.51 T
+2 F
+(function does not do ANY alloca-) 401.75 135.51 T
+(tion for these strings and supposes that enough memory space has been allocated) 206.93 123.51 T
+(for them.) 206.93 111.51 T
+0 0 0 1 0 0 0 K
+FMENDPAGE
+%%EndPage: "5" 5
+%%Page: "6" 6
+595.28 841.89 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+1 1 0 0 0 0 1 K
+56.69 802.21 524.41 802.21 2 L
+1 H
+0 Z
+0 X
+1 1 0 0 0 0 1 K
+N
+0 0 0 1 0 0 0 K
+0 9 Q
+0 0 0 1 0 0 0 K
+(The functions of the librar) 192.76 787.7 T
+(y) 303.86 787.7 T
+6 F
+(Examples f) 192.76 776.7 T
+(or \322de) 237 776.7 T
+(v_get_ascii\323 function) 260.24 776.7 T
+1 1 0 0 0 0 1 K
+56.69 768.19 524.41 768.19 2 L
+0.5 H
+1 1 0 0 0 0 1 K
+N
+0 0 0 1 0 0 0 K
+56.69 76.54 524.41 76.54 2 L
+1 H
+2 Z
+0 0 0 1 0 0 0 K
+N
+0 10 Q
+(6) 56.69 61.36 T
+0 9 Q
+(An ASCII interface to de) 192.76 61.36 T
+(vice ser) 295.14 61.36 T
+(ver API) 328.76 61.36 T
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+0 10 Q
+(3.1) 167.52 700.34 T
+(Examples f) 192.76 700.34 T
+(or \322de) 245.36 700.34 T
+(v_g) 274.66 700.34 T
+(et_ascii\323 function) 291.99 700.34 T
+2 F
+(Since this function is called when no input ar) 192.76 684.34 T
+(gument is required for the de) 373.12 684.34 T
+(vice) 488.68 684.34 T
+(serv) 192.76 672.34 T
+(er command, it is v) 209.27 672.34 T
+(ery simple to use. There is no particular format to be fol-) 286.06 672.34 T
+(lo) 192.76 660.34 T
+(wed. The de) 200.29 660.34 T
+(v_name parameter should contain a string which is the name of a) 249.19 660.34 T
+(de) 192.76 648.34 T
+(vice e) 201.95 648.34 T
+(xported in the static data base. The cmd_name parameter should contain a) 225.4 648.34 T
+(string which is the name of a command de\336ned for this de) 192.76 636.34 T
+(vice and which does not) 424.98 636.34 T
+(require an) 192.76 624.34 T
+(y input ar) 232.87 624.34 T
+(gument.) 271.02 624.34 T
+5 11 Q
+(\245) 192.76 605.68 T
+2 10 Q
+(de) 204.09 605.68 T
+(v_get_ascii\050\322tl1/ps-d/d\323, \322De) 213.28 605.68 T
+(vState\323,  &my_out_string, &my_error_string\051) 330.23 605.68 T
+(this call will return the follo) 204.09 593.34 T
+(wing v) 315.78 593.34 T
+(alues :) 343.03 593.34 T
+(my_out_string = \322De) 204.09 578.34 T
+(vShort.\134n2\134n\323) 288.92 578.34 T
+(my_error_string = \322de) 204.09 563.34 T
+(v_get_ascii succeeded.\134n\323) 293.35 563.34 T
+5 11 Q
+(\245) 192.76 547.68 T
+2 10 Q
+(de) 204.09 547.68 T
+(v_get_ascii\050\322tl1/ps-d/d\323, \322De) 213.28 547.68 T
+(vStatus\323,  &my_out_string, &my_error_string\051) 330.23 547.68 T
+(this call will return the follo) 204.09 535.34 T
+(wing v) 315.78 535.34 T
+(alues :) 343.03 535.34 T
+(my_out_string = \322De) 204.09 520.34 T
+(vString.\134nOn\134n\323) 288.92 520.34 T
+(my_error_string = \322de) 204.09 505.34 T
+(v_get_ascii succeeded.\134n\323) 293.35 505.34 T
+0 F
+(3.2) 167.52 475.34 T
+(Examples f) 192.76 475.34 T
+(or \322de) 245.36 475.34 T
+(v_put_ascii\323 function) 274.66 475.34 T
+2 F
+(This function is used for all de) 192.76 459.34 T
+(vice serv) 314.72 459.34 T
+(er commands which require an input ar) 350.39 459.34 T
+(gu-) 506.84 459.34 T
+(ment and do not return an) 192.76 447.34 T
+(y output ar) 295.65 447.34 T
+(gument. The input ar) 338.8 447.34 T
+(gument \050in_ar) 422.5 447.34 T
+(g\051 passed) 478.7 447.34 T
+(through this function is a string. But according to the type of the input ar) 192.76 435.34 T
+(gument) 482.84 435.34 T
+(e) 192.76 423.34 T
+(xpected by the de) 197.05 423.34 T
+(vice serv) 267.06 423.34 T
+(er command this string must follo) 302.73 423.34 T
+(w a precise format.) 437.76 423.34 T
+(Here are the string formats for each of the control system data types :) 192.76 399.34 T
+5 11 Q
+(\245) 192.76 380.68 T
+1 10 Q
+(De) 204.09 380.68 T
+(vUShort,De) 215.6 380.68 T
+(vShort,De) 265.72 380.68 T
+(vULong and De) 308.62 380.68 T
+(vLong :) 375.7 380.68 T
+2 F
+(the string must contain a) 411.26 380.68 T
+(numeric data \050composed of numeric characters only\051 e) 204.09 368.34 T
+(v) 421.83 368.34 T
+(entually preceded and) 426.68 368.34 T
+(follo) 204.09 356.34 T
+(wed by authorized white characters \050space, tabs, return\051.) 222.73 356.34 T
+(e) 204.09 341.34 T
+(xample :) 208.38 341.34 T
+(   \322  345  \322   or  \322  -99  \322) 204.09 326.34 T
+(    de) 204.09 311.34 T
+(v_put_ascii\050\322tt/pp/1\323, \322De) 223.28 311.34 T
+(vSet\323, \322  +345  \322, &my_error_string\051) 328.57 311.34 T
+5 11 Q
+(\245) 192.76 295.67 T
+1 10 Q
+(De) 204.09 295.67 T
+(vFloat and De) 215.6 295.67 T
+(vDouble :) 275.45 295.67 T
+2 F
+( the string must contain a \337oating point data \050com-) 316.84 295.67 T
+-0.25 (posed of numeric characters  and dot \322.) 204.09 283.34 P
+-0.25 (\323 only\051 e) 358.27 283.34 P
+-0.25 (v) 392.51 283.34 P
+-0.25 (entually preceded and follo) 397.36 283.34 P
+-0.25 (wed) 505.5 283.34 P
+(by authorized white characters \050space, tabs, return\051.) 204.09 271.34 T
+(e) 204.09 256.34 T
+(xample :) 208.38 256.34 T
+(   \3223.00678\323  or  \322  -98.7746  \322) 204.09 241.34 T
+(   de) 204.09 226.34 T
+(v_put_ascii\050\322tt/pp/1\323, \322De) 220.78 226.34 T
+(vSet\323, \322  12.39876  \322, &my_error_string\051) 326.07 226.34 T
+5 11 Q
+(\245) 192.76 210.67 T
+1 10 Q
+(De) 204.09 210.67 T
+(vString :) 215.6 210.67 T
+2 F
+( the string must contain the De) 253.1 210.67 T
+(vString data to be passed to the) 375.62 210.67 T
+(de) 204.09 198.34 T
+(vice serv) 213.28 198.34 T
+(er command inside tw) 248.95 198.34 T
+(o \050starting and ending\051 double quotes.) 337.45 198.34 T
+(e) 204.09 183.34 T
+(xample :) 208.38 183.34 T
+(   \322\134\323This is the De) 204.09 168.34 T
+(vString to be passed to the command.\134\323\323) 278.83 168.34 T
+-0.07 (note that the \336rst character and the last character of the string should be the dou-) 204.09 153.34 P
+(ble quotes.) 204.09 141.34 T
+(    de) 204.09 126.34 T
+(v_put_ascii\050\322tt/pp/1\323, \322De) 223.28 126.34 T
+(vSet\323, \322\134\323Coucou\134\323\323, &my_error_string\051) 328.57 126.34 T
+5 11 Q
+(\245) 192.76 110.68 T
+1 10 Q
+(De) 204.09 110.68 T
+(vIntFloat :) 215.6 110.68 T
+2 F
+( the string contains tw) 261.43 110.68 T
+(o items. The \336rst one is a De) 349.66 110.68 T
+(vLong data so) 464.4 110.68 T
+(it should respect the format de\336ned abo) 204.09 98.34 T
+(v) 362.25 98.34 T
+(e and the second item is a De) 367.1 98.34 T
+(vFloat) 483.77 98.34 T
+0 0 0 1 0 0 0 K
+FMENDPAGE
+%%EndPage: "6" 6
+%%Page: "7" 7
+595.28 841.89 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+1 1 0 0 0 0 1 K
+70.87 802.21 538.58 802.21 2 L
+1 H
+0 Z
+0 X
+1 1 0 0 0 0 1 K
+N
+0 0 0 1 0 0 0 K
+0 9 Q
+0 0 0 1 0 0 0 K
+(The functions of the librar) 206.93 790.54 T
+(y) 318.03 790.54 T
+6 F
+(Examples f) 206.93 779.54 T
+(or \322de) 251.17 779.54 T
+(v_put_ascii\323 function) 274.41 779.54 T
+1 1 0 0 0 0 1 K
+70.87 768.19 538.58 768.19 2 L
+0.25 H
+1 1 0 0 0 0 1 K
+N
+0 0 0 1 0 0 0 K
+70.87 76.54 538.58 76.54 2 L
+1 H
+2 Z
+0 0 0 1 0 0 0 K
+N
+0 F
+(An ASCII interface to de) 206.93 58.53 T
+(vice ser) 309.31 58.53 T
+(ver API) 342.93 58.53 T
+0 10 Q
+-2.78 (7) 533.02 58.53 P
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+2 F
+(data respecting the corresponding format de\336ned abo) 218.27 730.34 T
+(v) 430.85 730.34 T
+(e. These tw) 435.7 730.34 T
+(o items are) 481.42 730.34 T
+(separated by at least one authorized white characters \050space, tabs, return\051. Each) 218.27 718.34 T
+-0.32 (of them can e) 218.27 706.34 P
+-0.32 (v) 271.22 706.34 P
+-0.32 (entually be preceded and / or  follo) 276.07 706.34 P
+-0.32 (wed by one or more authorized) 413.29 706.34 P
+(white characters \050space, tabs, return\051.) 218.27 694.34 T
+(e) 218.27 679.34 T
+(xample :) 222.56 679.34 T
+(    \3226454   765.0987\323     or      \322    64747    464.8747    \322) 218.27 664.34 T
+-0.1 (    de) 218.27 649.34 P
+-0.1 (v_put_ascii\050\322tt/pp/1\323, \322De) 237.07 649.34 P
+-0.1 (vSet\323, \322  64747    464.8747 \322, &my_error_string\051) 342.26 649.34 P
+5 11 Q
+(\245) 206.93 633.68 T
+1 10 Q
+(De) 218.27 633.68 T
+(vFloatReadP) 229.78 633.68 T
+(oint, De) 285.13 633.68 T
+(vDoubleReadP) 318.31 633.68 T
+(oint and De) 382 633.68 T
+(vLongReadP) 431.3 633.68 T
+(oint :) 486.66 633.68 T
+2 F
+( The) 509.16 633.68 T
+(string is composed of tw) 218.27 621.34 T
+(o items. Both of them are either \337oat data \050respecting) 316.5 621.34 T
+(the format described abo) 218.27 609.34 T
+(v) 317.26 609.34 T
+(e) 322.11 609.34 T
+1 F
+(De) 329.05 609.34 T
+(vFloat, De) 340.56 609.34 T
+(vDouble) 384.29 609.34 T
+2 F
+(\051 or long decimal data) 419.85 609.34 T
+(\050respecting the format described abo) 218.27 597.34 T
+(v) 364.19 597.34 T
+(e) 369.04 597.34 T
+1 F
+(De) 375.98 597.34 T
+(vUShort,De) 387.49 597.34 T
+(vShort,De) 437.61 597.34 T
+(vULong and) 480.51 597.34 T
+(De) 218.27 585.34 T
+(vLong) 229.78 585.34 T
+2 F
+(\051. These tw) 257.01 585.34 T
+(o items are separated by at least one authorized white char-) 301.62 585.34 T
+(acters \050space, tabs, return\051.  Each of them can e) 218.27 573.34 T
+(v) 406.84 573.34 T
+(entually be preceded and / or) 411.69 573.34 T
+(follo) 218.27 561.34 T
+(wed by one or more authorized white characters \050space, tabs, return\051.) 236.91 561.34 T
+(e) 218.27 546.34 T
+(xample :) 222.56 546.34 T
+(      \3226454   765\323    or     \322    987   64    \322   or  \322765.09  464.87  \322) 218.27 531.34 T
+( de) 218.27 516.34 T
+(v_put_ascii\050\322tt/pp/1\323, \322De) 229.96 516.34 T
+(vSet\323, \322    987   64  \322, &my_error_string\051) 335.25 516.34 T
+( de) 218.27 501.34 T
+(v_put_ascii\050\322tt/pp/1\323, \322De) 229.96 501.34 T
+(vSet\323, \322  765.09  464.87 \322, &my_error_string\051) 335.25 501.34 T
+5 11 Q
+(\245) 206.93 485.68 T
+1 10 Q
+-0.33 (De) 218.27 485.68 P
+-0.33 (vStateFloatReadP) 229.78 485.68 P
+-0.33 (oint :) 306.79 485.68 P
+2 F
+-0.33 ( The string is composed of three items. The \336rst one) 331.13 485.68 P
+(is a De) 218.27 473.34 T
+(vShort data respecting the corresponding format described abo) 245.79 473.34 T
+(v) 496.42 473.34 T
+(e. The) 501.27 473.34 T
+(ne) 218.27 461.34 T
+(xt tw) 227.56 461.34 T
+(o items are the De) 247.74 461.34 T
+(vFloat data respecting the corresponding format) 320.25 461.34 T
+(described abo) 218.27 449.34 T
+(v) 273.38 449.34 T
+(e. These three items are separated by at least one authorized) 278.23 449.34 T
+-0.02 (white characters \050space, tabs, return\051.  Each of them can e) 218.27 437.34 P
+-0.02 (v) 448.55 437.34 P
+-0.02 (entually be preceded) 453.4 437.34 P
+(and / or  follo) 218.27 425.34 T
+(wed by one or more authorized white characters \050space, tabs,) 272.46 425.34 T
+(return\051.) 218.27 413.34 T
+(e) 218.27 398.34 T
+(xample :) 222.56 398.34 T
+(      \322454   765.09  464.87\323   or     \322    454   765.09  464.87    \322) 218.27 383.34 T
+(   de) 218.27 368.34 T
+(v_put_ascii\050\322tt/pp/1\323, \322De) 234.96 368.34 T
+(vSet\323, \322   454   765.09  464.87 \322,) 340.25 368.34 T
+(&my_error_string\051) 218.27 356.34 T
+5 11 Q
+(\245) 206.93 340.68 T
+1 10 Q
+(De) 218.27 340.68 T
+(vV) 229.78 340.68 T
+(arCharArray :) 241.08 340.68 T
+2 F
+( The string for this data type can be an) 304.67 340.68 T
+(y string.) 458.1 340.68 T
+(e) 218.27 325.34 T
+(xample :) 222.56 325.34 T
+(      \322Here is an e) 218.27 310.34 T
+(xample for a De) 285.04 310.34 T
+(vV) 349.49 310.34 T
+(arCharArray data.) 360.6 310.34 T
+(\323) 432.09 310.34 T
+(Note that the \336rst character and the last character are not double quotes in this) 218.27 295.34 T
+(case.) 218.27 283.34 T
+(de) 218.27 268.34 T
+(v_put_ascii\050\322tt/pp/1\323, \322De) 227.46 268.34 T
+(vSet\323, \322 This is a CharArray\322, &my_error_string\051) 332.75 268.34 T
+5 11 Q
+(\245) 206.93 252.67 T
+1 10 Q
+(De) 218.27 252.67 T
+(vV) 229.78 252.67 T
+(arStringArray :) 241.08 252.67 T
+2 F
+(The string contains N items. N is the number of) 311.62 252.67 T
+(De) 218.27 240.34 T
+(vString data to be put into the array) 229.68 240.34 T
+(. Each De) 370.96 240.34 T
+(vString item should start with a) 409.86 240.34 T
+(double quotes and end with the double quotes also. T) 218.27 228.34 T
+(w) 430.23 228.34 T
+(o consecuti) 437.35 228.34 T
+(v) 482.37 228.34 T
+(e De) 487.22 228.34 T
+(vString) 505.57 228.34 T
+-0.01 (items can be separated by zero or more characters which can be ANY character) 218.27 216.34 P
+(including white characters, commas, and all other characters.) 218.27 204.34 T
+(e) 218.27 189.34 T
+(xample :) 222.56 189.34 T
+(   \322 \134\323\336rst De) 218.27 174.34 T
+(vString!\134\323  ,  \134\323Second De) 269.4 174.34 T
+(vString data.\134\323\134\323Last De) 372.47 174.34 T
+(vString.\134\323 \322) 469.15 174.34 T
+(Note that the number of De) 218.27 159.34 T
+(vString read from the input string is the number of) 327.72 159.34 T
+(double quotes di) 218.27 147.34 T
+(vided by 2. The most important characteristic of this string for-) 284.13 147.34 T
+(mat is that each De) 218.27 135.34 T
+(vString item should be between tw) 294.67 135.34 T
+(o double quotes.) 433.73 135.34 T
+(de) 218.27 120.34 T
+(v_put_ascii\050\322tt/pp/1\323, \322De) 227.46 120.34 T
+(vSet\323, \322\134\323\336rst De) 332.75 120.34 T
+(vString!\134\323  ,  \134\323Second De) 401.1 120.34 T
+(vString) 504.17 120.34 T
+(data.\134\323\134\323Last De) 218.27 108.34 T
+(vString.\134\323\322, &my_error_string\051) 283 108.34 T
+0 0 0 1 0 0 0 K
+FMENDPAGE
+%%EndPage: "7" 7
+%%Page: "8" 8
+595.28 841.89 0 FMBEGINPAGE
+[0 0 0 1 0 0 0]
+[ 0 1 1 0 1 0 0]
+[ 1 0 1 0 0 1 0]
+[ 1 1 0 0 0 0 1]
+[ 1 0 0 0 0 1 1]
+[ 0 1 0 0 1 0 1]
+[ 0 0 1 0 1 1 0]
+ 7 FrameSetSepColors
+FrameNoSep
+1 1 0 0 0 0 1 K
+56.69 802.21 524.41 802.21 2 L
+1 H
+0 Z
+0 X
+1 1 0 0 0 0 1 K
+N
+0 0 0 1 0 0 0 K
+0 9 Q
+0 0 0 1 0 0 0 K
+(Librar) 192.76 787.7 T
+(y locations) 218.35 787.7 T
+6 F
+(Examples f) 192.76 776.7 T
+(or \322de) 237 776.7 T
+(v_putget_ascii\323 function) 260.24 776.7 T
+1 1 0 0 0 0 1 K
+56.69 768.19 524.41 768.19 2 L
+0.5 H
+1 1 0 0 0 0 1 K
+N
+0 0 0 1 0 0 0 K
+56.69 76.54 524.41 76.54 2 L
+1 H
+2 Z
+0 0 0 1 0 0 0 K
+N
+0 10 Q
+(8) 56.69 61.36 T
+0 9 Q
+(An ASCII interface to de) 192.76 61.36 T
+(vice ser) 295.14 61.36 T
+(ver API) 328.76 61.36 T
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+5 11 Q
+(\245) 192.76 729.68 T
+1 10 Q
+(De) 204.09 729.68 T
+(vV) 215.6 729.68 T
+(arUShortArray) 226.9 729.68 T
+(, De) 293 729.68 T
+(vV) 309.51 729.68 T
+(arShortArray) 320.81 729.68 T
+(, De) 379.69 729.68 T
+(vV) 396.2 729.68 T
+(arULongArray) 407.5 729.68 T
+(, De) 471.94 729.68 T
+(vV) 488.45 729.68 T
+(ar-) 499.75 729.68 T
+-0.1 (LongArray) 204.09 717.34 P
+-0.1 (, De) 251.87 717.34 P
+-0.1 (vV) 268.28 717.34 P
+-0.1 (arFloatArray) 279.58 717.34 P
+-0.1 (, De) 336.79 717.34 P
+-0.1 (vV) 353.2 717.34 P
+-0.1 (arDoubleArray :) 364.5 717.34 P
+2 F
+-0.1 (The string contains a) 438.72 717.34 P
+-0.23 (sequence of either decimal numeric items or \337oat data items. Each item respects) 204.09 705.34 P
+(the corresponding format described abo) 204.09 693.34 T
+(v) 362.79 693.34 T
+(e. Each item MUST be follo) 367.64 693.34 T
+(wed by a) 480.71 693.34 T
+(comma \050,\051) 204.09 681.34 T
+1 F
+(e) 247.69 681.34 T
+(v) 251.98 681.34 T
+(en the last item.) 256.88 681.34 T
+2 F
+( The characters authorized for this string are : all) 324.09 681.34 T
+(numeric characters, \324-\325, space, tabs, return, dot \324.) 204.09 669.34 T
+(\325, and comma \050,\051. The number) 397.49 669.34 T
+(of items read from the string is determined by the number of commas in that) 204.09 657.34 T
+(string.) 204.09 645.34 T
+(e) 204.09 630.34 T
+(xample :) 208.38 630.34 T
+(   \322  45,465  ,   665,  645,78, \322   or   \322 3.4, 8.9  ,   576.098, \322) 204.09 615.34 T
+(de) 204.09 585.34 T
+(v_put_ascii\050\322tt/pp/1\323, \322De) 213.28 585.34 T
+(vSet\323, \32245,465  ,   665,  645,78,\322,) 318.57 585.34 T
+(&my_error_string\051) 204.09 573.34 T
+(de) 204.09 558.34 T
+(v_put_ascii\050\322tt/pp/1\323, \322De) 213.28 558.34 T
+(vSet\323, \3223.4, 8.9  ,   576.098, \322, &my_error_string\051) 318.57 558.34 T
+0 F
+(3.3) 167.52 513.34 T
+(Examples f) 192.76 513.34 T
+(or \322de) 245.36 513.34 T
+(v_putg) 274.66 513.34 T
+(et_ascii\323 function) 307.54 513.34 T
+2 F
+-0.39 (This function is used for all de) 192.76 497.34 P
+-0.39 (vice serv) 312.36 497.34 P
+-0.39 (er commands which need an input ar) 347.64 497.34 P
+-0.39 (gument) 492.3 497.34 P
+(and which also return an output ar) 192.76 485.34 T
+(gument. The input ar) 329.22 485.34 T
+(gument is passed through) 412.92 485.34 T
+-0.11 (this function under the form of a string. But according to the type of the input ar) 192.76 473.34 P
+-0.11 (gu-) 511.08 473.34 P
+(ment e) 192.76 461.34 T
+(xpected by the de) 219.55 461.34 T
+(vice serv) 289.56 461.34 T
+(er command this string must follo) 325.23 461.34 T
+(w a precise for-) 460.26 461.34 T
+(mat. These formats are already de\336ned in the pre) 192.76 449.34 T
+(vious section \050) 388.29 449.34 T
+1 F
+(3.2) 446.62 449.34 T
+2 F
+(\051.) 459.12 449.34 T
+-0.28 (T) 192.76 425.34 P
+-0.28 (o kno) 198.07 425.34 P
+-0.28 (w ho) 220.04 425.34 P
+-0.28 (w to de\336ne the \336rst tw) 239.24 425.34 P
+-0.28 (o parameters \050de) 327.48 425.34 P
+-0.28 (v_name and cmd_name\051 refer to) 393.32 425.34 P
+(the e) 192.76 413.34 T
+(xamples in the sections) 211.77 413.34 T
+1 F
+(3.1) 307.32 413.34 T
+2 F
+(or) 322.32 413.34 T
+1 F
+(3.2) 333.15 413.34 T
+2 F
+(.) 345.65 413.34 T
+(T) 192.76 389.34 T
+(o kno) 198.07 389.34 T
+(w ho) 220.32 389.34 T
+(w to de\336ne the third parameter \050) 239.79 389.34 T
+1 F
+(in_ar) 368.65 389.34 T
+(g) 391.33 389.34 T
+2 F
+(\051 refer to the e) 396.33 389.34 T
+(xamples in the) 452.82 389.34 T
+(section) 192.76 377.34 T
+1 F
+(3.2) 223.59 377.34 T
+2 F
+(.) 236.09 377.34 T
+56.69 334.17 524.41 337.01 C
+0 0 0 1 0 0 0 K
+0 0 0 1 0 0 0 K
+191.69 336.16 542.69 336.16 2 L
+0.25 H
+2 Z
+0 X
+0 0 0 1 0 0 0 K
+N
+56.69 336.16 182.69 336.16 2 L
+0 Z
+N
+0 0 595.28 841.89 C
+0 12 Q
+0 X
+0 0 0 1 0 0 0 K
+(4) 174.74 341.01 T
+(Librar) 192.76 341.01 T
+(y locations) 226.88 341.01 T
+2 10 Q
+-0.39 (The tw) 192.76 317.51 P
+-0.39 (o libraries are called respecti) 220.31 317.51 P
+-0.39 (v) 333.45 317.51 P
+-0.39 (ely \322libtcapi.sl\323 for the type con) 338.3 317.51 P
+-0.39 (v) 464.24 317.51 P
+-0.39 (ersion library) 469.1 317.51 P
+-0.21 (and \322libascapi.sl\323 for the acii interf) 192.76 305.51 P
+-0.21 (ace to de) 332.12 305.51 P
+-0.21 (vice serv) 366.98 305.51 P
+-0.21 (er api. Note that \322libascapi.sl\323) 402.44 305.51 P
+(dynamically loads  \322libtcapi.sl\323 and references it.) 192.76 293.51 T
+(The root of the de) 192.76 269.51 T
+(v) 264.16 269.51 T
+(eloppement directory for the type con) 269.01 269.51 T
+(v) 419.41 269.51 T
+(ersion library is : \322) 424.26 269.51 T
+2 9 Q
+(/users/d/dserv) 209.76 251.17 T
+(er/system/type_con) 259.62 251.17 T
+(v) 329.26 251.17 T
+2 10 Q
+(The root of the de) 192.76 227.51 T
+(v) 264.16 227.51 T
+(eloppement directory for the ascii de) 269.01 227.51 T
+(v) 415.67 227.51 T
+(api  library is : \322) 420.42 227.51 T
+2 9 Q
+(/users/d/dserv) 209.76 209.17 T
+(er/system/ascii_de) 259.62 209.17 T
+(v) 325.89 209.17 T
+2 10 Q
+(The header \336les for these libraries are installed in :) 192.76 185.51 T
+2 9 Q
+(/users/d/dserv) 205.26 161.51 T
+(er/de) 255.12 161.51 T
+(v/include) 272.88 161.51 T
+2 10 Q
+(  and) 306.38 161.51 T
+2 9 Q
+(/users/d/dserv) 330.82 161.51 T
+(er/include) 380.68 161.51 T
+2 10 Q
+(The libraries themselv) 192.76 137.51 T
+(es are installed in :) 282.04 137.51 T
+2 9 Q
+(/users/d/dserv) 205.26 113.51 T
+(er/de) 255.12 113.51 T
+(v/lib/shared/s700) 272.88 113.51 T
+2 10 Q
+(  and) 334.88 113.51 T
+2 9 Q
+(/users/d/dserv) 359.32 113.51 T
+(er/lib/shared/s700) 409.18 113.51 T
+0 0 0 1 0 0 0 K
+FMENDPAGE
+%%EndPage: "8" 8
+%%Trailer
+%%BoundingBox: 0 0 595.28 841.89
+%%PageOrder: Ascend
+%%Pages: 8
+%%DocumentFonts: Helvetica-Bold
+%%+ Times-Bold
+%%+ Times-Roman
+%%+ Times-BoldItalic
+%%+ Times-Italic
+%%+ Courier-Bold
+%%+ Helvetica-Oblique
+%%EOF

@@ -1,0 +1,349 @@
+
+/*+*******************************************************************
+
+ File:          bpm_xdr.c
+
+ Project:       Device Servers with sun-rpc
+
+ Description:   xdr_routines for beam position monitor types.
+
+ Author(s):	Jens Meyer
+
+ Original:	January 1991
+
+$Revision: 1.1 $
+$Date: 2003-04-25 11:21:45 $
+
+$Author: jkrueger1 $
+
+ Copyright (c) 1990 by European Synchrotron Radiation Facility,
+		       Grenoble, France
+
+*******************************************************************-*/
+
+
+#include <dev_xdr.h>
+#include <bpm_xdr.h>
+
+
+
+/*
+ *  xdr for beam position monitor types
+ */
+
+bool_t
+xdr_DevBpmElec(xdrs, objp)
+	XDR *xdrs;
+	DevBpmElec objp;
+{
+	if (!xdr_vector(xdrs, (char *)objp, 4, sizeof(float), (xdrproc_t)xdr_float)) {
+		return (FALSE);
+	}
+	return (TRUE);
+}
+
+long
+xdr_length_DevBpmElec (objp)
+        DevBpmElec objp;
+{
+        long    length = 0;
+
+        length = length + (4 * xdr_length_DevFloat (&objp[0]));
+
+        return (length);
+}
+
+
+
+bool_t
+xdr_DevBpmMeasHead(xdrs, objp)
+	XDR *xdrs;
+	DevBpmMeasHead *objp;
+{
+	if (!xdr_u_short(xdrs, &objp->mn)) {
+		return (FALSE);
+	}
+	if (!xdr_u_short(xdrs, &objp->gms)) {
+		return (FALSE);
+	}
+	if (!xdr_array(xdrs, (caddr_t *)&objp->momint.sequence, (u_int *)&objp->momint.length, MAXU_INT, sizeof(DevBpmElec), (xdrproc_t)xdr_DevBpmElec)) {
+		return (FALSE);
+	}
+	return (TRUE);
+}
+
+long
+xdr_length_DevBpmMeasHead (objp)
+        DevBpmMeasHead *objp;
+{
+        long    length = 0;
+
+        length = length + xdr_length_DevShort ((short *)&objp->mn);
+        length = length + xdr_length_DevShort ((short *)&objp->gms);
+
+        /*
+         *  four bytes for the number of array elements
+         */
+        length = length + xdr_length_DevLong ((long *)&objp->momint.length);
+        /*
+         *  now calculate the length of the array
+         */
+        length = length + (objp->momint.length *
+                 xdr_length_DevBpmElec( objp->momint.sequence[0]) );
+
+        return (length);
+}
+
+
+
+bool_t
+xdr_DevBpmPos(xdrs, objp)
+	XDR *xdrs;
+	DevBpmPos *objp;
+{
+	if (!xdr_u_short(xdrs, &objp->mms)) {
+		return (FALSE);
+	}
+	if (!xdr_float(xdrs, &objp->xcoord)) {
+		return (FALSE);
+	}
+	if (!xdr_float(xdrs, &objp->zcoord)) {
+		return (FALSE);
+	}
+	return (TRUE);
+}
+
+long
+xdr_length_DevBpmPos (objp)
+        DevBpmPos *objp;
+{
+        long    length = 0;
+
+        length = length + xdr_length_DevShort ((short *)&objp->mms);
+        length = length + xdr_length_DevFloat (&objp->xcoord);
+        length = length + xdr_length_DevFloat (&objp->zcoord);
+
+        return (length);
+}
+
+
+
+bool_t
+xdr_DevBpmPosMeasure(xdrs, objp)
+	XDR *xdrs;
+	DevBpmPosMeasure *objp;
+{
+	if (!xdr_DevBpmMeasHead(xdrs, &objp->meashead)) {
+		return (FALSE);
+	}
+	if (!xdr_array(xdrs, (caddr_t *)&objp->posdata.sequence, (u_int *)&objp->posdata.length, MAXU_INT, sizeof(DevBpmPos), (xdrproc_t)xdr_DevBpmPos)) {
+		return (FALSE);
+	}
+	return (TRUE);
+}
+
+long
+xdr_length_DevBpmPosMeasure (objp)
+        DevBpmPosMeasure *objp;
+{
+        long    length = 0;
+
+        length = length + xdr_length_DevBpmMeasHead (&objp->meashead);
+
+        /*
+         *  four bytes for the number of array elements
+         */
+        length = length + xdr_length_DevLong ((long *)&objp->posdata.length);
+        /*
+         *  now calculate the length of the array
+         */
+        length = length + (objp->posdata.length *
+                 xdr_length_DevBpmPos(&objp->posdata.sequence[0]) );
+
+        return (length);
+}
+
+
+
+bool_t
+xdr_DevBpmElecMeasure(xdrs, objp)
+	XDR *xdrs;
+	DevBpmElecMeasure *objp;
+{
+	if (!xdr_DevBpmMeasHead(xdrs, &objp->meashead)) {
+		return (FALSE);
+	}
+	if (!xdr_array(xdrs, (caddr_t *)&objp->elecdata.sequence, (u_int *)&objp->elecdata.length, MAXU_INT, sizeof(DevBpmElec), (xdrproc_t)xdr_DevBpmElec)) {
+		return (FALSE);
+	}
+	return (TRUE);
+}
+
+long
+xdr_length_DevBpmElecMeasure (objp)
+        DevBpmElecMeasure *objp;
+{
+        long    length = 0;
+
+        length = length + xdr_length_DevBpmMeasHead (&objp->meashead);
+
+        /*
+         *  four bytes for the number of array elements
+         */
+        length = length + xdr_length_DevLong ((long *)&objp->elecdata.length);
+        /*
+         *  now calculate the length of the array
+         */
+        length = length + (objp->elecdata.length *
+                 xdr_length_DevBpmElec( objp->elecdata.sequence[0]) );
+
+        return (length);
+}
+
+
+
+bool_t
+xdr_DevBpmMeasParm(xdrs, objp)
+	XDR *xdrs;
+	DevBpmMeasParm *objp;
+{
+	if (!xdr_long(xdrs, &objp->expbeamint)) {
+		return (FALSE);
+	}
+	if (!xdr_long(xdrs, &objp->timewind)) {
+		return (FALSE);
+	}
+	if (!xdr_vector(xdrs, (char *)objp->delaytim, 6, 
+			sizeof(long), (xdrproc_t)xdr_long)) {
+		return (FALSE);
+	}
+	return (TRUE);
+}
+
+long
+xdr_length_DevBpmMeasParm (objp)
+        DevBpmMeasParm *objp;
+{
+        long    length = 0;
+
+        length = length + xdr_length_DevLong (&objp->expbeamint);
+        length = length + xdr_length_DevLong (&objp->timewind);
+        length = length + (6 * xdr_length_DevLong (&objp->delaytim[0]));
+
+        return (length);
+}
+
+
+
+
+bool_t
+xdr_DevBpmInjectHead(xdrs, objp)
+	XDR *xdrs;
+	DevBpmInjectHead *objp;
+{
+	if (!xdr_u_short(xdrs, &objp->min)) {
+		return (FALSE);
+	}
+	if (!xdr_u_long(xdrs, &objp->gis)) {
+		return (FALSE);
+	}
+	if (!xdr_DevBpmMeasParm(xdrs, &objp->bpm_measpar)) {
+		return (FALSE);
+	}
+	return (TRUE);
+}
+
+long
+xdr_length_DevBpmInjectHead (objp)
+        DevBpmInjectHead *objp;
+{
+        long    length = 0;
+
+        length = length + xdr_length_DevShort ((short*)&objp->min);
+        length = length + xdr_length_DevLong ((long *)&objp->gis);
+        length = length + xdr_length_DevBpmMeasParm (&objp->bpm_measpar);
+
+        return (length);
+}
+
+
+
+bool_t
+xdr_DevBpmPosField(xdrs, objp)
+	XDR *xdrs;
+	DevBpmPosField *objp;
+{
+	if (!xdr_DevBpmInjectHead(xdrs, &objp->injhead)) {
+		return (FALSE);
+	}
+	if (!xdr_array(xdrs, (caddr_t *)&objp->posmeas.sequence, 
+			     (u_int *)&objp->posmeas.length, 
+			     MAXU_INT, sizeof(DevBpmPosMeasure), 
+			     (xdrproc_t)xdr_DevBpmPosMeasure)) {
+		return (FALSE);
+	}
+	return (TRUE);
+}
+
+long
+xdr_length_DevBpmPosField (objp)
+        DevBpmPosField *objp;
+{
+        long    length = 0;
+
+        length = length + xdr_length_DevBpmInjectHead (&objp->injhead);
+
+        /*
+         *  four bytes for the number of array elements
+         */
+        length = length + xdr_length_DevLong ((long *)&objp->posmeas.length);
+        /*
+         *  now calculate the length of the array
+         */
+        length = length + (objp->posmeas.length *
+                 xdr_length_DevBpmPosMeasure(&objp->posmeas.sequence[0]) );
+
+        return (length);
+}
+
+
+
+
+bool_t
+xdr_DevBpmElecField(xdrs, objp)
+	XDR *xdrs;
+	DevBpmElecField *objp;
+{
+	if (!xdr_DevBpmInjectHead(xdrs, &objp->injhead)) {
+		return (FALSE);
+	}
+	if (!xdr_array(xdrs, (caddr_t *)&objp->elecmeas.sequence, 
+			     (u_int *)&objp->elecmeas.length, 
+			     MAXU_INT, sizeof(DevBpmElecMeasure), 
+			     (xdrproc_t)xdr_DevBpmElecMeasure)) {
+		return (FALSE);
+	}
+	return (TRUE);
+}
+
+long
+xdr_length_DevBpmElecField (objp)
+        DevBpmElecField *objp;
+{
+        long    length = 0;
+
+        length = length + xdr_length_DevBpmInjectHead (&objp->injhead);
+
+        /*
+         *  four bytes for the number of array elements
+         */
+	length = length + xdr_length_DevLong ((long *)&objp->elecmeas.length);
+        /*
+         *  now calculate the length of the array
+         */
+        length = length + (objp->elecmeas.length *
+                 xdr_length_DevBpmElecMeasure(&objp->elecmeas.sequence[0]) );
+
+        return (length);
+}
+

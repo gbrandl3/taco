@@ -1,5 +1,3 @@
-static char RcsId[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/sec_api.c,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
 /*+*******************************************************************
 
  File       :   sec_api.c
@@ -13,21 +11,22 @@ static char RcsId[] =
 
  Original   :   December 1993
 
- Version    :	$Revision: 1.1 $
+ Version    :	$Revision: 1.2 $
 
- Date       :	$Date: 2003-03-14 12:22:07 $
+ Date       :	$Date: 2003-04-25 11:21:36 $
 
  Copyright (c) 1993 by European Synchrotron Radiation Facility,
                        Grenoble, France
 ********************************************************************-*/
 #include <config.h>
 #include <API.h>
-#include <ApiP.h>
+#include <private/ApiP.h>
 #include <DevServer.h>
 #include <DevServerP.h>
 #include <DevErrors.h>
 #include <Admin.h>
 
+#include <errno.h>
 
 #ifdef unix
 #if !defined vxworks
@@ -122,6 +121,23 @@ extern nethost_info *multi_nethost;
 /*                        False,False,False,False,False};*/
 short		*auth_flag;
 
+#if 0
+/* 
+ * Access rights string translation table now global object 
+ * 20/11/2000 B. Pedersen
+ */
+DevSecListEntry DevSec_List[] = {
+	{"NO_ACCESS", 		NO_ACCESS},
+	{"READ_ACCESS", 	READ_ACCESS},
+	{"WRITE_ACCESS", 	WRITE_ACCESS},
+	{"SI_WRITE_ACCESS", 	SI_WRITE_ACCESS},
+	{"SU_ACCESS", 		SU_ACCESS},
+	{"SI_SU_ACCESS", 	SI_SU_ACCESS},
+	{"ADMIN_ACCESS", 	ADMIN_ACCESS},
+};
+
+size_t SEC_LIST_LENGTH=(sizeof(DevSec_List)/ sizeof(DevSecListEntry));
+#endif
 /*+*********************************************************************
  Function   :   static long dev_security()
 
@@ -219,7 +235,13 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
 /*
  * make local copy of user name returned by getpwuid to avoid it being overwritten
  */
-		user_name = (char*)malloc(strlen(passwd_info->pw_name)+1);
+		user_name =
+		(char*)malloc(strlen(passwd_info->pw_name)+1);
+		if(!user_name)
+		    {
+			*error=DevErr_InsufficientMemory;
+			return DS_NOTOK;
+		    }
 		strcpy(user_name, passwd_info->pw_name);
 
 		user_auth.user_name = user_name;
@@ -2143,7 +2165,20 @@ long _DLLFunc sec_svc_cmd (DevServerDevices *device, long connection_id,
 #ifdef __cplusplus
 	ret = device->device->Get_min_access_right(cmd,&min_access_right,error);
 	if (ret == DS_OK)
+#if 0
+       try
+#endif
 	{
+#if 0
+	       min_access_right = device->device->GetMinAccessRight(cmd);
+	   }
+       catch (const long &lError)
+	   {
+	       *error = lError;
+	       return DS_NOTOK;
+	   }
+#endif
+
 #else
 	ds_class = device->ds->devserver.class_pointer;
 
@@ -2156,8 +2191,7 @@ long _DLLFunc sec_svc_cmd (DevServerDevices *device, long connection_id,
 	{
 		if (cmd == (ds_class->devserver_class.commands_list[(_Int)i].cmd))
 		{
-			min_access_right = 
-			    ds_class->devserver_class.commands_list[(_Int)i].min_access;
+		min_access_right = ds_class->devserver_class.commands_list[(_Int)i].min_access;
 #endif /* __cplusplus */
 
 			/*
@@ -2541,7 +2575,6 @@ void _DLLFunc sec_free_tcp_connection (devserver ds, server_connections *svr_con
 
 static long sec_verify_tcp_conn (DevServerDevices *device)
 {
-	extern int		errno;
 	struct sockaddr_in	peeraddr;
 #ifdef _XOPEN_SOURCE_EXTENDED
 	unsigned int		ulen = sizeof(peeraddr);

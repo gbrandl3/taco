@@ -1,4 +1,3 @@
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/asyn_api.c,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
 /*+*******************************************************************
 
  File       :	asyn_api.c
@@ -26,9 +25,9 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib
 
  Original   :	January 1997
 
- Version:	$Revision: 1.1 $
- 
- Date:		$Date: 2003-03-14 12:22:07 $
+ Version:	$Revision: 1.2 $
+
+ Date:		$Date: 2003-04-25 11:21:29 $
 
  Copyright (c) 1997-2000 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -37,7 +36,7 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib
 
 #include <config.h>
 #include <API.h>
-#include <ApiP.h>
+#include <private/ApiP.h>
 #include <DevServer.h>
 #include <DevServerP.h>
 #include <DevSignal.h>
@@ -45,17 +44,21 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib
 #include <DevErrors.h>
 #include <API_xdr_vers3.h>
 
-#if !defined _NT
-#if ( (defined OSK) || (defined _OSK))
+#if 0
+#include <assert.h>
+#endif
+#if !defined (_NT)
+#if ( defined (OSK) || defined (_OSK))
+
 #include <inet/socket.h>
 #include <inet/netdb.h>
 #else
-#if (defined sun) || (defined irix)
+#if defined (sun) || defined (irix)
 #include <sys/filio.h>
 #include <errno.h>
 #endif /* sun */
 #include <sys/socket.h>
-#if !defined vxworks
+#if !defined (vxworks)
 #include <netdb.h>
 #else
 #include <rpcGbl.h>
@@ -68,6 +71,16 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
+
+/* mutex locking for handling asyncronous request */
+/* here the mutex is instantiated. */
+#ifdef _REENTRANT
+#include <pthread.h>
+       pthread_mutex_t async_mutex=PTHREAD_MUTEX_INITIALIZER;
+#endif
+
+
+
 #endif /* linux */
 #endif /* OSK || _OSK */
 #endif /* _NT */
@@ -1255,6 +1268,7 @@ long _DLLFunc asynch_rpc_register(long *error)
  * first check if the asynchronous service has not already 
  * been registered. if so then do not register it.
  */
+	LOCK(async_mutex);
 	if (config_flags.asynch_rpc != True)
 	{
 /*
@@ -1290,7 +1304,11 @@ long _DLLFunc asynch_rpc_register(long *error)
  */
 
                         if( config_flags.prog_number == 0 )
-                          return DS_NOTOK;    /* no error defined in DB */
+			    {
+				UNLOCK(async_mutex);
+				return DS_NOTOK;    /* no error defined in
+					       * DB */
+			    }
 
 /* M. Diehl, 15.11.99
  * Set version depending on whether we are a real device server or not!
@@ -1327,6 +1345,7 @@ long _DLLFunc asynch_rpc_register(long *error)
 		if (asynch_trans_tcp == NULL)
 		{
 			printf("asynch_rpc_register(): cannot create asynchronous tcp service\n");
+			UNLOCK(async_mutex);
 			return(DS_NOTOK);
 		}
 
@@ -1335,6 +1354,7 @@ long _DLLFunc asynch_rpc_register(long *error)
   				ASYNCH_API_VERSION, devserver_prog_5, IPPROTO_TCP))
   		{
   			printf("asynch_rpc_register(): cannot register asynchronous tcp service\n");
+			UNLOCK(async_mutex);
   			return(DS_NOTOK);
   		}
   
@@ -1347,6 +1367,7 @@ long _DLLFunc asynch_rpc_register(long *error)
 		config_flags.asynch_rpc = True;
 	}
 
+	UNLOCK(async_mutex);
 	return(DS_OK);
 }
 
@@ -1366,13 +1387,15 @@ long asynch_server_import(devserver ds, long *error)
 	char *name, *host, *hstring;
 	long iarg, clnt_stat;
         struct sockaddr_in serv_adr;
-#if !defined vxworks
+#if !defined (vxworks)
 	struct hostent	*ht;
 #else  /* !vxworks */
 	int		host_addr;
 #endif /* !vxworks */
         int tcp_socket=0;
 	char *idot;
+
+	LOCK(async_mutex);
 
 /*
  * check to see whether the asynchronous client handle has
@@ -1405,11 +1428,11 @@ long asynch_server_import(devserver ds, long *error)
  * when calling clnt_destroy() !) - andy 2/7/97
  */
 
-#if !defined vxworks
+#if !defined (vxworks)
                	ht = gethostbyname((char*)svr_conns[ds->no_svr_conn].server_host);
 		if (ht == NULL)
 		{
-			printf("asynch_server_import(): could not resolve server host name %d\n",
+			printf("asynch_server_import(): could not resolve server host name %s\n",
 			svr_conns[ds->no_svr_conn].server_host);
 			*error = DevErr_AsynchronousServerNotImported;
 			return(DS_NOTOK);
@@ -1432,6 +1455,7 @@ long asynch_server_import(devserver ds, long *error)
 		{
 			printf("asynch_server_import(): could not import asynchronous server\n");
 			*error = DevErr_AsynchronousServerNotImported;
+			UNLOCK(async_mutex);
 			return(DS_NOTOK);
 		}
 /*
@@ -1500,6 +1524,7 @@ long asynch_server_import(devserver ds, long *error)
                         closesocket (tcp_socket);
 #endif /* _NT */
 			clnt_destroy(asynch_clnt_tcp);
+			UNLOCK(async_mutex);
 			return(DS_NOTOK);
 		}
 /*
@@ -1530,9 +1555,11 @@ long asynch_server_import(devserver ds, long *error)
 /* 
  * asynch handle exists, ping the server to see if it is still alive
  */
+	  dev_printdebug (DBG_TRACE | DBG_ASYNCH,"calling asynch_client_ping\n");
 		if (asynch_client_ping(ds->no_svr_conn, error) == DS_NOTOK)
 		{
 			ds->asynch_clnt = NULL;
+			UNLOCK(async_mutex);
 			return(DS_NOTOK);
 		}
 	}
@@ -1541,6 +1568,7 @@ long asynch_server_import(devserver ds, long *error)
  */
 	ds->asynch_clnt = svr_conns[ds->no_svr_conn].asynch_clnt;
 
+	UNLOCK(async_mutex);
 	return(DS_OK);
 }
 
@@ -1559,12 +1587,14 @@ long asynch_client_import(devserver client, long *error)
 	char *idot;
 	CLIENT *asynch_clnt;
         static struct sockaddr_in serv_adr;
-#if !defined vxworks
+#if !defined (vxworks)
 	struct hostent		*ht;
 #else  /* !vxworks */
 	int			host_addr;
 #endif /* !vxworks */
 	int tcp_socket;
+
+	LOCK(async_mutex);
 
 /*
  * check to see whether the asynchronous client has been
@@ -1576,6 +1606,7 @@ long asynch_client_import(devserver client, long *error)
 		printf("asynch_client_import(): dev_query_svr failed, could not import client\n");
 		*error = DevErr_ExceededMaximumNoOfServers;
 
+		UNLOCK(async_mutex);
 		return(DS_NOTOK);
 	}
 
@@ -1626,13 +1657,14 @@ long asynch_client_import(devserver client, long *error)
  * when calling clnt_destroy() !) - andy 2/7/97
  */
 		tcp_socket = RPC_ANYSOCK;
-#if !defined vxworks
+#if !defined (vxworks)
                 ht = gethostbyname(client->server_host);
 		if (ht == NULL)
 		{
-			printf("asynch_client_import(): could not resolve client host name %d\n",
+			printf("asynch_client_import(): could not resolve client host name %s!\n",
 			client->server_host);
 			*error = DevErr_AsynchronousServerNotImported;
+			UNLOCK(async_mutex);
 			return(DS_NOTOK);
 		}
                 memcpy ( (char *)&serv_adr.sin_addr, ht->h_addr,
@@ -1689,6 +1721,7 @@ long asynch_client_import(devserver client, long *error)
  * update copy of client handle in devserver structure
  */
 	client->asynch_clnt = svr_conns[client->no_svr_conn].asynch_clnt;
+	UNLOCK(async_mutex);
 
 
 	return(DS_OK);
@@ -1710,11 +1743,14 @@ long asynch_client_check(devserver client, long *error)
  * check to see whether the asynchronous client has been
  * imported as a server 
  */
+	LOCK(async_mutex);
+			
 	if ((no_svr_conn = dev_query_svr(client->server_host, client->prog_number,
 	                                 client->vers_number)) < 0)
 	{
 		printf("asynch_client_check(): dev_query_svr failed, could not import client (DevErr_ExceededMaximumNoOfServers)\n");
 		*error = DevErr_ExceededMaximumNoOfServers;
+		UNLOCK(async_mutex);
 
 		return(DS_NOTOK);
 	}
@@ -1728,9 +1764,11 @@ long asynch_client_check(devserver client, long *error)
 	if (client->asynch_clnt == NULL)
 	{
 		printf("asynch_client_check(): asynch client not imported, try to import it !\n");
+		UNLOCK(async_mutex);
 		return (asynch_client_import(client,error));
 	}
 
+	UNLOCK(async_mutex);
 	return(DS_OK);
 }
 
@@ -1767,6 +1805,8 @@ long _DLLFunc dev_synch(struct timeval *timeout, long *error)
 /*
  * only check if any asynchronous are pending
  */
+	LOCK(async_mutex);
+
 	if (client_asynch_request.pending > 0)
 	{
 		FD_ZERO(&readfds);
@@ -1817,8 +1857,10 @@ long _DLLFunc dev_synch(struct timeval *timeout, long *error)
 #else
                         	case -1 : if ((errno == EINTR) || (errno == EOS_SIGNAL))
 #endif
+				  	  perror("dev_synch(): select() returns with error ");
 					  continue;
 				  	  perror("dev_synch(): select() returns with error ");
+					  UNLOCK(async_mutex);
 				          return(DS_NOTOK);
 
 /*
@@ -1833,7 +1875,9 @@ long _DLLFunc dev_synch(struct timeval *timeout, long *error)
  * RPC_PUTGET_ASYN_REPLY service because this is a client/server synchronising
  * with replies coming from device servers
  */
-				default : svc_getreqset(&readfds);
+				default : 	UNLOCK(async_mutex);
+                			svc_getreqset(&readfds);
+							LOCK(async_mutex);
 			}
 
 		}
@@ -1846,6 +1890,7 @@ long _DLLFunc dev_synch(struct timeval *timeout, long *error)
  * if any calls still pending then check if any have timedout
  */
 	asynch_timed_out(NULL);
+	UNLOCK(async_mutex);
 
 	return(DS_OK);
 }
@@ -1871,6 +1916,8 @@ _dev_import_out* _DLLFunc rpc_asynch_import_5(_dev_import_in *dev_import_in)
 	static struct _dev_import_out dev_import_out;
 	struct _devserver client;
 	long iarg, error, status;
+
+	LOCK(async_mutex);
 
 #ifdef EBUG
 	dev_printdebug (DBG_ASYNCH, "rpc_asynch_import() : entered\n");
@@ -1899,8 +1946,10 @@ _dev_import_out* _DLLFunc rpc_asynch_import_5(_dev_import_in *dev_import_in)
 /*
  * import asynchronous service of client so that server can send replies to it
  */
-
+	UNLOCK(async_mutex);
 	status = asynch_client_import(&client, &error);
+	LOCK(async_mutex);
+
 /*
  * initialise output arguments 
  */
@@ -1910,6 +1959,8 @@ _dev_import_out* _DLLFunc rpc_asynch_import_5(_dev_import_in *dev_import_in)
         sprintf (dev_import_out.server_name, "%s", config_flags.server_name);
         dev_import_out.var_argument.length   = 0;
         dev_import_out.var_argument.sequence = NULL;
+
+	UNLOCK(async_mutex);
 
 	return(&dev_import_out);
 }
@@ -1934,6 +1985,8 @@ _dev_free_out* _DLLFunc rpc_asynch_free_5(_dev_free_in *dev_free_in)
 /*
  * unpack additional input arguments to identify the client 
  */
+	LOCK(async_mutex);
+
 	iarg = 0;
 	sprintf(client.server_name,"%s",*(char**)dev_free_in->var_argument.sequence[iarg].argument);
 	iarg++;
@@ -1943,12 +1996,12 @@ _dev_free_out* _DLLFunc rpc_asynch_free_5(_dev_free_in *dev_free_in)
 	iarg++;
 	client.vers_number = *(long*)dev_free_in->var_argument.sequence[iarg].argument;
 #ifdef EBUG
-	/*dev_printdebug (DBG_ASYNCH,
+	dev_printdebug (DBG_ASYNCH,
                         "\nrpc_asynch_free() : client data -> ");
                         dev_printdebug (DBG_ASYNCH,
                         "name=%s host=%s prog_no=%d vers_no=%d\n",
                         client.server_name, client.server_host,
-                        client.prog_number, client.vers_number);*/
+                        client.prog_number, client.vers_number);
 
 #endif /* EBUG */
 /*
@@ -1959,10 +2012,10 @@ _dev_free_out* _DLLFunc rpc_asynch_free_5(_dev_free_in *dev_free_in)
 	no_svr_conn = dev_query_svr(client.server_host, client.prog_number,
 	                                 client.vers_number);
 	svr_conns[no_svr_conn].no_conns--;
-#if EBUG
-        /*dev_printdebug (DBG_ASYNCH,
+#ifdef EBUG
+        dev_printdebug (DBG_ASYNCH,
                         "\nrpc_asynch_free() : no of server (no_svr_conn=%d) connections open to client %d\n",
-			no_svr_conn,svr_conns[no_svr_conn].no_conns);*/
+			no_svr_conn,svr_conns[no_svr_conn].no_conns);
 #endif /* EBUG */
 /* 
  * destroy the client handle now, don't wait for the client to
@@ -1978,7 +2031,7 @@ _dev_free_out* _DLLFunc rpc_asynch_free_5(_dev_free_in *dev_free_in)
  * destroy the imported client callback handle
  */
 		clnt_destroy(svr_conns[no_svr_conn].asynch_clnt);
-#if EBUG
+#ifdef EBUG
         	dev_printdebug (DBG_ASYNCH,
                        "\nrpc_asynch_free() : destroy asynchronous client handle (no_svr_conn=%d,errno=%d)\n",
 		       no_svr_conn, errno);
@@ -2027,6 +2080,7 @@ _dev_free_out* _DLLFunc rpc_asynch_free_5(_dev_free_in *dev_free_in)
         dev_free_out.var_argument.length   = 0;
         dev_free_out.var_argument.sequence = NULL;
 
+	UNLOCK(async_mutex);
 	return(&dev_free_out);
 }
 
@@ -2063,6 +2117,7 @@ _asynch_client_data* _DLLFunc rpc_asynch_reply_5(_asynch_client_data *asynch_cli
 #endif /* EBUG */
 		return(asynch_client_data);
 	}
+	LOCK(async_mutex);
 
 
 #ifdef EBUG
@@ -2087,8 +2142,15 @@ _asynch_client_data* _DLLFunc rpc_asynch_reply_5(_asynch_client_data *asynch_cli
  */
 		if (asynch_client_data->var_argument.length == 3)
 		{
+#if 0
+		    assert(dev_error_string==NULL);
+#endif
+
 			dev_error_string = (char*)malloc(strlen(*(char**)asynch_client_data->var_argument.sequence[iarg].argument)+1);
+		    if(dev_error_string)
+			{
 			sprintf(dev_error_string,*(char**)asynch_client_data->var_argument.sequence[iarg].argument);
+		}
 		}
 
 		(*client_asynch_request.args[asynch_index].callback) 
@@ -2125,6 +2187,7 @@ _asynch_client_data* _DLLFunc rpc_asynch_reply_5(_asynch_client_data *asynch_cli
 		client_asynch_request.args[asynch_index].timesent.tv_usec = 0;
 #endif /* !vxworks */
 	}
+	UNLOCK(async_mutex);
 
 	return(asynch_client_data);
 }
@@ -2147,6 +2210,7 @@ _asynch_client_raw_data* _DLLFunc rpc_raw_asynch_reply_5(_asynch_client_raw_data
 	DevCallbackData cb_data;
 
 
+	LOCK(async_mutex);
 	asynch_id = asynch_client_raw_data->asynch_id;
 /*
  * find out which request the reply belongs to
@@ -2155,6 +2219,7 @@ _asynch_client_raw_data* _DLLFunc rpc_raw_asynch_reply_5(_asynch_client_raw_data
 	if ((asynch_index = asynch_get_index(asynch_id)) < 0)
 	{
 		printf("rpc_raw_asynch_id(): problem - could not identify reply (id=%d)\n",asynch_id);
+		UNLOCK(async_mutex);
 		return(asynch_client_raw_data);
 	}
 
@@ -2193,6 +2258,7 @@ _asynch_client_raw_data* _DLLFunc rpc_raw_asynch_reply_5(_asynch_client_raw_data
 	svr_conns[client_asynch_request.args[asynch_index].ds->no_svr_conn].pending--;
 	client_asynch_request.args[asynch_index].ds->pending--;
 
+	UNLOCK(async_mutex);
 	return(asynch_client_raw_data);
 }
 
@@ -2217,6 +2283,7 @@ long _DLLFunc asynch_add_request(devserver ds, long asynch_type, long event_type
 	time_t tea_time;
 #endif /* vxworks */
 	long i;
+	LOCK(async_mutex);
 
 
 /*
@@ -2236,6 +2303,12 @@ long _DLLFunc asynch_add_request(devserver ds, long asynch_type, long event_type
 #endif /* EBUG */
 
 		client_asynch_request.args = (asynch_request_arg*)malloc(sizeof(asynch_request_arg)*MAX_ASYNCH_CALLS);
+		if(!client_asynch_request.args)
+		    {
+			*error=DevErr_InsufficientMemory;
+			UNLOCK(async_mutex);
+			return DS_NOTOK;
+		    }
 		memset((char*)client_asynch_request.args,0,sizeof(asynch_request_arg)*MAX_ASYNCH_CALLS);
 		client_asynch_request.pending = 0;
 		for (i=0; i<MAX_ASYNCH_CALLS; i++)
@@ -2291,11 +2364,13 @@ long _DLLFunc asynch_add_request(devserver ds, long asynch_type, long event_type
  */
 	
 		*error = DevErr_ExceededMaxNoOfPendingCalls;
+		UNLOCK(async_mutex);
 
 		return (DS_NOTOK);
 	}
 
 	*asynch_index = i;
+	UNLOCK(async_mutex);
 
 	return(DS_OK);
 }
@@ -2347,15 +2422,19 @@ bool_t xdr__asynch_client_data(XDR *xdrs, _asynch_client_data *objp)
 	long			asynch_index;
 
 	if (!xdr_long(xdrs, &objp->asynch_id)) {
+	  dev_printdebug (DBG_TRACE | DBG_ASYNCH,"cannot encode async_id: %ld\n",(long)objp->asynch_id);
 		return (FALSE);
 	}
 	if (!xdr_long(xdrs, &objp->status)) {
+	  dev_printdebug (DBG_TRACE | DBG_ASYNCH,"cannot encode status: %ld\n",(long)objp->status);
 		return (FALSE);
 	}
 	if (!xdr_long(xdrs, &objp->error)) {
+	  dev_printdebug (DBG_TRACE | DBG_ASYNCH,"cannot encode error: %ld\n",(long)objp->error);
 		return (FALSE);
 	}
 	if (!xdr_long(xdrs, &objp->argout_type)) {
+	  dev_printdebug (DBG_TRACE | DBG_ASYNCH,"cannot encode argout_type: %ld\n",(long)objp->argout_type);
 		return (FALSE);
 	}
 
@@ -2405,10 +2484,12 @@ bool_t xdr__asynch_client_data(XDR *xdrs, _asynch_client_data *objp)
 	if (!xdr_pointer(xdrs, (char **)&objp->argout,
 			 data_type.size,
 			 (xdrproc_t)data_type.xdr )) {
+	  dev_printdebug (DBG_TRACE | DBG_ASYNCH,"error decoding argout\n");
 	  	return (FALSE);
 	}
 
         if (!xdr_DevVarArgumentArray(xdrs, &objp->var_argument)) {
+	  dev_printdebug (DBG_TRACE | DBG_ASYNCH,"error decoding vararg\n");
                 return (FALSE);
         }
   	return (TRUE);
@@ -2543,6 +2624,7 @@ long _DLLFunc dev_flush(devserver ds)
 	enum clnt_stat clnt_stat;
 	struct timeval timeout = {1, 0};
 	long error;
+	LOCK(async_mutex);
 
 /*
  * check if the asynchronous client handle exists 
@@ -2587,6 +2669,7 @@ long _DLLFunc dev_flush(devserver ds)
 			svr_conns[ds->no_svr_conn].flushed = True;
 		}
 	}
+	UNLOCK(async_mutex);
 	return(DS_OK);
 }
 
@@ -2607,16 +2690,20 @@ long _DLLFunc dev_pending(devserver ds)
                 return(DS_NOTOK);
         }
 #endif /* TANGO */
+	LOCK(async_mutex);
+
 /*
  * first check if any calls have timed out
  */
 	asynch_timed_out(ds);
 	if (ds == NULL)
 	{
+	    UNLOCK(async_mutex);
 		return(client_asynch_request.pending);
 	}
 	else
 	{
+	    UNLOCK(async_mutex);
 		return(ds->pending);
 	}
 }

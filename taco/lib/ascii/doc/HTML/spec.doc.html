@@ -1,0 +1,353 @@
+<TITLE>An  ASCII  interface to device server API </TITLE>
+<H1>An  ASCII  interface to device server API </H1>
+<P><ADDRESS><B><I>byFaranguiss Poncet</B></I><I>DSN120</ADDRESS>
+<H2>Table of Contents</H2>
+
+<UL>
+<A HREF="spec.doc.html#HDR0">  1  Data type used for input and output arguments </A>
+
+<BR>
+<A HREF="spec.doc.html#HDR1">  2  Conversion of types to and from string</A>
+
+<BR>
+<A HREF="spec.doc.html#HDR2">  3  The functions of the library</A>
+
+<UL>
+<A HREF="spec.doc.html#HDR3">  3.1  </B>Examples for "dev_get_ascii" function</A>
+
+<BR>
+<A HREF="spec.doc.html#HDR4">  3.2  Examples for "dev_put_ascii" function</A>
+
+<BR>
+<A HREF="spec.doc.html#HDR5">  3.3  Examples for "dev_putget_ascii" function</A>
+</UL>
+
+<A HREF="spec.doc.html#HDR6">  4  Library locations</A>
+</UL>
+
+<HR>
+<!-- This file was created with the fm2html filter.
+The filter is copyright Norwegian Telecom Research and
+was programmed by Jon Stephenson von Tetzchner. -->
+
+
+
+<HR>
+
+<P><EM><B></I><I>The AscApi shared  library (libascapi.sl) is developped to provide an Ascii based  interface to the device server API. This Ascii interface will be used to interfece the HP  VEETEST software with the ESRF control system.</EM>
+
+<P></B></I><B>Table of Contents:
+<H2><A HREF="openObjectId">1</A>Data type used for input and output arguments3</H2>
+<H2></B><B><A HREF="openObjectId">2</A>Conversion of types to and from string3</H2>
+<H2><A HREF="openObjectId">3</A>The functions of the library5</H2>
+<H3><A HREF="openObjectId">3.1</A>Examples for "dev_get_ascii" function6</H3>
+<H3><A HREF="openObjectId">3.2</A>Examples for "dev_put_ascii" function6</H3>
+<H3><A HREF="openObjectId">3.3</A>Examples for "dev_putget_ascii" function8</H3>
+<H2><A HREF="openObjectId">4</A>Library locations8</H2>
+<H2><A NAME="HDR0">  1  Data type used for input and output arguments </A></H2>
+
+<HR>
+<P></B>The type used to send or to get data to or from AscApi library is "string". The strings are used as defined in C programming language. 
+<P>Therefore all the necessary information to execute a command on a device server should be sent in string format. This means that the device name, command name, input argument for that command (if needed) and output argument are all strings.
+<H2><A NAME="HDR1">  2  Conversion of types to and from string</A></H2>
+
+<HR>
+<P>There are a lot of data types defined and used by the components of the ESRF control system to perform an action on a device or to get the information from a device. So to be able to send and to receive the information in a unique data type and format the type conversions are performed in two directions : from control system data types to string , from string to the control system data types.
+<P>It has been decided that all these conversion functions are developped in a separate shared library so it can easily be extended to new types, and also adaptable to other software (applications) needs.
+<P>In a first step, only the kernel  data types  have conversion functions to and from string. The other conversion functions (for other data types) can easily be added in the type conversion shared library "libtcapi.sl".
+<P>For the moment the following types are converted in the so-called <B>"type conversion (libtcapi.sl)"</B> library :
+
+<UL>
+<P><LI>D_VOID_TYPE
+<BR>
+<P><LI>D_USHORT_TYPE
+<BR>
+<P><LI>D_SHORT_TYPE
+<BR>
+<P><LI>D_ULONG_TYPE
+<BR>
+
+<P><LI>D_LONG_TYPE
+<BR>
+<P><LI>D_FLOAT_TYPE
+<BR>
+<P><LI>D_DOUBLE_TYPE
+<BR>
+<P><LI>D_STRING_TYPE
+<BR>
+<P><LI>D_INT_FLOAT_TYPE
+<BR>
+<P><LI>D_FLOAT_READPOINT
+<BR>
+<P><LI>D_STATE_FLOAT_READPOINT
+<BR>
+<P><LI>D_LONG_READPOINT
+<BR>
+<P><LI>D_DOUBLE_READPOINT
+<BR>
+<P><LI>D_VAR_CHARARR
+<BR>
+<P><LI>D_VAR_STRINGARR
+<BR>
+<P><LI>D_VAR_USHORTARR
+<BR>
+<P><LI>D_VAR_SHORTARR
+<BR>
+<P><LI>D_VAR_ULONGARR
+<BR>
+<P><LI>D_VAR_LONGARR
+<BR>
+<P><LI>D_VAR_FLOATARR
+<BR>
+<P><LI>D_VAR_DOUBLEARR
+<BR>
+</UL>
+
+
+<H2><A NAME="HDR2">  3  The functions of the library</A></H2>
+
+<HR>
+<P>There will be three main functions in the library : 
+<P><B></B><B>dev_get_acsii
+<P></B><B>long  dev_get_ascii(char *dev_name, char *cmd_name, char **out_arg, char **str_err)
+<P></B>    This function is used for all the device server commands which do not require any input argument. The first two parameters are the input parameters which give the indication on the device name and the command name to be executed on that device. The last two parameters are the output parameters which contain respectively the result returned by the device server command and an error string if any error occured. The output parameters : <B>out_arg</B> and <B>str_err</B> should be allocated by the caller of the function. The <B>dev_get_ascii </B>function does not do ANY allocation for these strings and supposes that enough memory space has been allocated for them.<B>
+<P></B><B>dev_put_ascii
+<P></B><B>long dev_put_ascii(char *dev_name, char *cmd_name, char *in_arg, char **str_err)
+<P></B>    This function is used for all the device server commands which do not return any output argument. The first two parameters are the input parameters which give the indication on the device name and the command name to be executed on that device. The third parameter is the input data required by the device server command.The last parameter is the output parameter which contain the error occured during the execution of the device server command. The output parameter : <B>str_err</B> should be allocated by the caller of the function. The <B>dev_put_ascii </B>function does not do ANY allocation for this string and supposes that enough memory space has been allocated for it.
+<P>As explained before, the "in_arg" parameter is the input argument required by the device server command in string format. This string must repect a strict format so that <B>dev_put_ascii </B> can convert it to the data type expected by the device command. To know which format should be used, refer to the following section where an example is given for each data type.
+<P><B></B><B>dev_putget_ascii
+<P></B><B>long  dev_putget_ascii(char *dev_name, char *cmd_name, char *in_arg, char **out_arg, char **str_err)
+<P></B>    This function is used for all the device server commands which do require an input argument as well as an output argument. The first two parameters are the input parameters which give the indication on the device name and the command name to be executed on that device. The third parameter is the input data required by the device server command.The last two parameters are the output parameters which contain respectively the result of the device server command and an error string if any. The output parameters : <B>out_arg</B> and <B>str_err</B> should be allocated by the caller of the function. The <B>dev_putget_ascii </B>function does not do ANY allocation for these strings and supposes that enough memory space has been allocated for them.<B>
+
+<H3><A NAME="HDR3">  3.1  </B>Examples for "dev_get_ascii" function</A></H3>
+<P>Since this function is called when no input argument is required for the device server command, it is very simple to use. There is no particular format to be followed. The dev_name parameter should contain a string which is the name of a device exported in the static data base. The cmd_name parameter should contain a string which is the name of a command defined for this device and which does not require any input argument. 
+
+<UL>
+<P><LI>dev_get_ascii("tl1/ps-d/d", "DevState",  &amp;my_out_string, &amp;my_error_string) this call will return the following values :
+<BR>
+</UL>
+
+
+
+<DL>
+<DD>my_out_string = "DevShort.\n2\n"
+<BR>
+<DD>my_error_string = "dev_get_ascii succeeded.\n"
+<BR>
+</DL>
+
+
+
+<UL>
+<P><LI>dev_get_ascii("tl1/ps-d/d", "DevStatus",  &amp;my_out_string, &amp;my_error_string) this call will return the following values :
+<BR>
+</UL>
+
+
+
+<DL>
+<DD>my_out_string = "DevString.\nOn\n"
+<BR>
+<DD>my_error_string = "dev_get_ascii succeeded.\n"
+<BR></DL>
+
+
+<H3><A NAME="HDR4">  3.2  Examples for "dev_put_ascii" function</A></H3>
+<P>This function is used for all device server commands which require an input argument and do not return any output argument. The input argument (in_arg) passed through this function is a string. But according to the type of the input argument expected by the device server command this string must follow a precise format.
+<P>Here are the string formats for each of the control system data types :
+
+<UL>
+<P><LI><B>DevUShort,DevShort,DevULong and DevLong : </B>the string must contain a numeric data (composed of numeric characters only) eventually preceded and followed by authorized white characters (space, tabs, return).
+<BR>
+</UL>
+
+
+
+<DL>
+<DD>example :
+<BR>
+<DD>   "  345  "   or  "  -99  "
+<BR>
+<DD>    dev_put_ascii("tt/pp/1", "DevSet", "  +345  ", &amp;my_error_string)
+<BR>
+</DL>
+
+
+
+<UL>
+<P><LI><B>DevFloat and DevDouble :</B> the string must contain a floating point data (composed of numeric characters  and dot "." only) eventually preceded and followed by authorized white characters (space, tabs, return).
+<BR>
+</UL>
+
+
+
+<DL>
+<DD>example :
+<BR>
+<DD>   "3.00678"  or  "  -98.7746  "
+<BR>
+<DD>   dev_put_ascii("tt/pp/1", "DevSet", "  12.39876  ", &amp;my_error_string)
+<BR>
+</DL>
+
+
+
+<UL>
+<P><LI><B>DevString :</B> the string must contain the DevString data to be passed to the device server command inside two (starting and ending) double quotes.
+<BR>
+</UL>
+
+
+
+<DL>
+<DD>example :
+<BR>
+<DD>   "\"This is the DevString to be passed to the command.\""
+<BR>
+<DD>note that the first character and the last character of the string should be the double quotes.
+<BR>
+<DD>    dev_put_ascii("tt/pp/1", "DevSet", "\"Coucou\"", &amp;my_error_string)
+<BR>
+
+</DL>
+
+
+
+<UL>
+<P><LI><B>DevIntFloat :</B> the string contains two items. The first one is a DevLong data so it should respect the format defined above and the second item is a DevFloat data respecting the corresponding format defined above. These two items are separated by at least one authorized white characters (space, tabs, return). Each of them can eventually be preceded and / or  followed by one or more authorized white characters (space, tabs, return).
+<BR>
+</UL>
+
+
+
+<DL>
+<DD>example :
+<BR>
+<DD>    "6454   765.0987"     or      "    64747    464.8747    "
+<BR>
+<DD>    dev_put_ascii("tt/pp/1", "DevSet", "  64747    464.8747 ", &amp;my_error_string)
+<BR>
+</DL>
+
+
+
+<UL>
+<P><LI><B>DevFloatReadPoint, DevDoubleReadPoint and DevLongReadPoint :</B> The string is composed of two items. Both of them are either float data (respecting the format described above <B>DevFloat, DevDouble</B>) or long decimal data (respecting the format described above <B>DevUShort,DevShort,DevULong and DevLong</B>). These two items are separated by at least one authorized white characters (space, tabs, return).  Each of them can eventually be preceded and / or  followed by one or more authorized white characters (space, tabs, return).
+<BR>
+</UL>
+
+
+
+<DL>
+<DD>example :
+<BR>
+<DD>      "6454   765"    or     "    987   64    "   or  "765.09  464.87  "
+<BR>
+<DD> dev_put_ascii("tt/pp/1", "DevSet", "    987   64  ", &amp;my_error_string)
+<BR>
+<DD> dev_put_ascii("tt/pp/1", "DevSet", "  765.09  464.87 ", &amp;my_error_string)
+<BR>
+</DL>
+
+
+
+<UL>
+<P><LI><B>DevStateFloatReadPoint : </B> The string is composed of three items. The first one is a DevShort data respecting the corresponding format described above. The next two items are the DevFloat data respecting the corresponding format described above. These three items are separated by at least one authorized white characters (space, tabs, return).  Each of them can eventually be preceded and / or  followed by one or more authorized white characters (space, tabs, return).
+<BR>
+</UL>
+
+
+
+<DL>
+<DD>example :
+<BR>
+<DD>      "454   765.09  464.87"   or     "    454   765.09  464.87    "
+<BR>
+<DD>   dev_put_ascii("tt/pp/1", "DevSet", "   454   765.09  464.87 ",     &amp;my_error_string)
+<BR>
+</DL>
+
+
+
+<UL>
+<P><LI><B>DevVarCharArray :</B> The string for this data type can be any string.
+<BR>
+</UL>
+
+
+
+<DL>
+<DD>example :
+<BR>
+<DD>      "Here is an example for a DevVarCharArray data."
+<BR>
+<DD>Note that the first character and the last character are not double quotes in this case.
+<BR>
+<DD>dev_put_ascii("tt/pp/1", "DevSet", " This is a CharArray", &amp;my_error_string)
+<BR>
+</DL>
+
+
+
+<UL>
+<P><LI><B>DevVarStringArray : </B>The string contains N items. N is the number of DevString data to be put into the array. Each DevString item should start with a double quotes and end with the double quotes also. Two consecutive DevString items can be separated by zero or more characters which can be ANY character including white characters, commas, and all other characters.
+<BR>
+</UL>
+
+
+
+<DL>
+<DD>example :
+<BR>
+<DD>   " \"first DevString!\"  ,  \"Second DevString data.\"\"Last DevString.\" "
+<BR>
+<DD>Note that the number of DevString read from the input string is the number of double quotes divided by 2. The most important characteristic of this string format is that each DevString item should be between two double quotes.
+<BR>
+<DD>dev_put_ascii("tt/pp/1", "DevSet", "\"first DevString!\"  ,  \"Second DevString data.\"\"Last DevString.\"", &amp;my_error_string)
+<BR>
+
+</DL>
+
+
+
+<UL>
+<P><LI><B>DevVarUShortArray, DevVarShortArray, DevVarULongArray, DevVarLongArray, DevVarFloatArray, DevVarDoubleArray : </B>The string contains a sequence of either decimal numeric items or float data items. Each item respects the corresponding format described above. Each item MUST be followed by a comma (,) <B>even the last item.</B> The characters authorized for this string are : all numeric characters, `-', space, tabs, return, dot `.', and comma (,). The number of items read from the string is determined by the number of commas in that string.
+<BR>
+</UL>
+
+
+
+<DL>
+<DD>example :
+<BR>
+<DD>   "  45,465  ,   665,  645,78, "   or   " 3.4, 8.9  ,   576.098, "
+<BR>
+<DD>dev_put_ascii("tt/pp/1", "DevSet", "45,465  ,   665,  645,78,", &amp;my_error_string)
+<BR>
+<DD>dev_put_ascii("tt/pp/1", "DevSet", "3.4, 8.9  ,   576.098, ", &amp;my_error_string)
+<BR></DL>
+
+
+<H3><A NAME="HDR5">  3.3  Examples for "dev_putget_ascii" function</A></H3>
+<P>This function is used for all device server commands which need an input argument and which also return an output argument. The input argument is passed through this function under the form of a string. But according to the type of the input argument expected by the device server command this string must follow a precise format. These formats are already defined in the previous section (<B>3.2</B>).
+<P>To know how to define the first two parameters (dev_name and cmd_name) refer to the examples in the sections <B>3.1 </B>or <B>3.2</B>.
+<P>To know how to define the third parameter (<B>in_arg</B>) refer to the examples in the section <B>3.2</B>.
+<H2><A NAME="HDR6">  4  Library locations</A></H2>
+
+<HR>
+<P>The two libraries are called respectively "libtcapi.sl" for the type conversion library and "libascapi.sl" for the acii interface to device server api. Note that "libascapi.sl" dynamically loads  "libtcapi.sl" and references it.
+<P>The root of the developpement directory for the type conversion library is : "
+<UL><DL>
+<DT>/users/d/dserver/system/type_conv
+</DL></UL>
+<P>The root of the developpement directory for the ascii devapi  library is : "
+<UL><DL>
+<DT>/users/d/dserver/system/ascii_dev
+</DL></UL>
+<P>The header files for these libraries are installed in :
+<P>     /users/d/dserver/dev/include  and  /users/d/dserver/include
+<P>The libraries themselves are installed in :
+<P>     /users/d/dserver/dev/lib/shared/s700  and  /users/d/dserver/lib/shared/s700
+
+<A NAME="ENDFILE"><PRE> </PRE></A>
+

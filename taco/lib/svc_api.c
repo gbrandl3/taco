@@ -1,5 +1,3 @@
-static char RcsId[]      =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/svc_api.c,v 1.2 2003-03-18 16:16:27 jkrueger1 Exp $";
 /*+*******************************************************************
 
  File:		svc_api.c
@@ -13,11 +11,11 @@ static char RcsId[]      =
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-03-18 16:16:27 $
+ Date:		$Date: 2003-04-25 11:21:38 $
 
- Copyright (c) 19901997 by European Synchrotron Radiation Facility, 
+ Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
 
 ********************************************************************-*/
@@ -38,7 +36,7 @@ static char RcsId[]      =
 #endif /* __cplusplus */
 
 #include <API.h>
-#include <ApiP.h>
+#include <private/ApiP.h>
 #include <DevCmds.h>
 
 #include <DevServer.h>
@@ -62,13 +60,9 @@ static char RcsId[]      =
  */
 
 #ifdef __cplusplus
-extern "C" {
-#endif
-
+extern "C" configuration_flags      config_flags;
+#else
 extern configuration_flags      config_flags;
-
-#ifdef __cplusplus
-};
 #endif
 
 /*
@@ -317,6 +311,9 @@ _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
  * C++ version
  */
 	Device			*device;
+#if 0
+	DeviceBase			*device;
+#endif
 #endif /* __cplusplus */
 	long			ds_id;
 	long 		connection_id;
@@ -510,6 +507,9 @@ _client_data * _DLLFunc rpc_dev_put_4 (_server_data *server_data)
  * C++ version
  */
 	Device			*device;
+#if 0
+	DeviceBase			*device;
+#endif
 #endif /* __cplusplus */
 	long			ds_id;
 	long 		connection_id;
@@ -654,6 +654,9 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
  * C++ version
  */
 	Device				*device;
+#if 0
+	DeviceBase				*device;
+#endif
 #endif /* __cplusplus */
 	long				ds_id;
 	long 			connection_id;
@@ -673,7 +676,9 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
  *  allocate and initialise outgoing arguments 
  */
 
-	if (client_data.argout != NULL) free (client_data.argout);
+	if (client_data.argout != NULL) 
+		free (client_data.argout);
+
 	memset ((char *)&client_data,0,sizeof(client_data));
 
 	/*
@@ -941,6 +946,10 @@ void _DLLFunc rpc_dev_put_asyn_cmd (_server_data *server_data)
  * C++ version
  */
 	Device			*device;
+#if 0
+	DeviceBase			*device;
+#endif
+
 #endif /* __cplusplus */
 	long			ds_id;
 	long 		connection_id;
@@ -1050,6 +1059,10 @@ long dev_export (char *name, void *ptr_ds, long *error)
  * C++ version
  */
 long dev_export (char *name, Device *ptr_dev, long *error)
+#if 0
+long dev_export (char *name, DeviceBase *ptr_dev, long *error)
+#endif
+
 #endif
 {
    db_devinf		devinfo;
@@ -1071,6 +1084,10 @@ long dev_export (char *name, Device *ptr_dev, long *error)
  * C++ version
  */
 	Device		*device;
+#if 0
+	DeviceBase		*device;
+#endif
+
 	device =        ptr_dev;
 #endif
 
@@ -1213,6 +1230,10 @@ free_found:;
  * C++ version
  */
       devinfo.device_class = device->class_name;
+#if 0
+   devinfo.device_class = const_cast<char *>(device->GetClassName());
+#endif
+
 #endif /* __cplusplus */
 
    /*
@@ -1234,6 +1255,9 @@ free_found:;
  * C++ version
  */
       devinfo.device_type  = device->dev_type;
+#if 0
+   devinfo.device_type  = const_cast<char *>(device->GetDevType());
+#endif
 #endif /* __cplusplus */
 
 
@@ -1329,8 +1353,16 @@ long ds__destroy (void *ptr_ds, long *error)
 	ds       = (DevServer) ptr_ds;
 #else
 	Device 		*device;
+#if 0
+	DeviceBase 		*device;
+#endif
+
 
 	device   = (Device*) ptr_ds;
+#if 0
+	device   = (DeviceBase*) ptr_ds;
+#endif
+
 #endif /* __cplusplus */
 
 	*error = DS_OK;
@@ -1356,6 +1388,10 @@ long ds__destroy (void *ptr_ds, long *error)
 			if (strcmp (ds->devserver.name, devices[i].export_name) == 0)
 #else
 			if (strcmp (device->name, devices[i].export_name)
+#if 0
+			if (strcmp (device->GetDevName(), devices[i].export_name)
+#endif
+
  == 0)
 #endif /* __cplusplus */
 			{
@@ -1378,6 +1414,9 @@ long ds__destroy (void *ptr_ds, long *error)
 				    ds->devserver.name);
 #else
 				    device->name);
+#if 0
+				    device->GetDevName());
+#endif
 #endif /* __cplusplus */
 #endif /* EBUG */
 
@@ -1440,14 +1479,17 @@ _Int			i;
  * C++ version
  */
 Device			*device;
+#if 0
+	DeviceBase		*device;
+#endif
+
 long 			error;
 long 			ret;
 int			i;
 #endif
 
 #ifdef EBUG
-dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-"\nrpc_dev_cmd_query_4() : entering routine\n");
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_cmd_query_4() : entering routine\n");
 #endif /* EBUG */
 
 dev_query_out.error  = DS_OK;
@@ -1459,9 +1501,7 @@ dev_query_out.var_argument.sequence = NULL;
 /*
     	 * Split up the device identification.
     	 */
-
-if (read_device_id (dev_query_in->ds_id, &ds_id, &connection_id,
-&dev_query_out.error) == DS_NOTOK)
+	if (read_device_id (dev_query_in->ds_id, &ds_id, &connection_id, &dev_query_out.error) == DS_NOTOK)
 {
 	dev_query_out.status = DS_NOTOK;
 	return (&dev_query_out);
@@ -1509,9 +1549,12 @@ dev_query_out.length = ds_class->devserver_class.n_commands;
  * C++ version
  */
 device->Get_command_number(&dev_query_out.length);
+#if 0
+	dev_query_out.length = device->GetCommandNumber();
 #endif
-dev_query_out.sequence = (_dev_cmd_info *) malloc 
-(dev_query_out.length * sizeof (_dev_cmd_info));
+
+#endif
+	dev_query_out.sequence = (_dev_cmd_info *) malloc (dev_query_out.length * sizeof (_dev_cmd_info));
 if ( dev_query_out.sequence == NULL )
 {
 	dev_query_out.error  = DevErr_InsufficientMemory;
@@ -1541,6 +1584,9 @@ sprintf (dev_query_out.class_name, "%s", ds_class->devserver_class.class_name);
  * C++ version
  */
 ret = device->Command_Query(dev_query_out.sequence,&error);
+#if 0
+	ret = device->CommandQuery(dev_query_out.sequence);
+#endif
 if (ret != DS_OK)
 {
 	free(dev_query_out.sequence);
@@ -1550,6 +1596,9 @@ if (ret != DS_OK)
 }
 
 sprintf (dev_query_out.class_name, "%s", device->class_name);
+#if 0
+	sprintf (dev_query_out.class_name, "%s", device->GetClassName());
+#endif
 #endif /* __cplusplus */
 
 /* 
@@ -1590,6 +1639,122 @@ if (device->commands_list[0].cmd_name != NULL)
 return (&dev_query_out);
 }
 
+/* event query */
+
+_dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_in)
+{
+	static _dev_queryevent_out	dev_query_out = { 0, NULL, "", 0, 0, { 0, NULL}};
+	long        			ds_id;
+	long        			connection_id;
+#ifndef __cplusplus
+ /*
+  * OIC version
+  */
+	DevServer			ds;
+	DevEventList			ds_ev;
+	DevServerClass			ds_class;
+	_Int				i;
+#else
+/*
+ * C++ version
+ */
+#if 0
+	DeviceBase			*device;
+#endif
+	Device				*device;
+	long 				error;
+	long 				ret;
+#endif
+
+#ifdef EBUG
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_event_query_4() : entering routine\n");
+#endif /* EBUG */
+
+	dev_query_out.error  = 0;
+	dev_query_out.status = 0;
+	dev_query_out.length = 0;
+	dev_query_out.var_argument.sequence = NULL;
+
+/*
+ * Split up the device identification.
+ */
+	if (read_device_id (dev_query_in->ds_id, &ds_id, &connection_id, &dev_query_out.error) == DS_NOTOK)
+	{
+		dev_query_out.status = DS_NOTOK;
+		return (&dev_query_out);
+	}
+
+/*
+ * Open access to device and class structures.
+ */
+
+#ifndef __cplusplus
+/*
+ * OIC version
+ */
+	ds       = devices[(_Int)ds_id].ds;
+	ds_class = ds->devserver.class_pointer;
+	ds_ev    = ds_class->devserver_class.events_list;
+#else
+/*
+ * C++ version
+ */
+	device   = devices[(_Int)ds_id].device;
+#endif /* __cplusplus */
+
+/*
+ * Free last allocated memory for the command info sequence.
+ */
+
+	if (dev_query_out.sequence != NULL)
+	{
+		free (dev_query_out.sequence);
+	}
+/*
+ * Get number of implmented commands and allocate memory
+ * for the command info sequence.
+ */
+
+#ifndef __cplusplus
+/*
+ * OIC version
+ */
+	dev_query_out.length = ds_class->devserver_class.n_events;
+#else
+/*
+ * C++ version
+ */
+#if 0
+	dev_query_out.length = device->GetEventNumber();
+#endif
+	device->Get_event_number(&dev_query_out.length); 
+#endif
+	dev_query_out.sequence = (_dev_event_info *) malloc(dev_query_out.length * sizeof (_dev_event_info));
+	if ( dev_query_out.sequence == NULL )
+	{
+		dev_query_out.error  = DevErr_InsufficientMemory;
+		dev_query_out.status = -1;
+		return (&dev_query_out);
+	}
+
+/*
+ * Get information about event code, data types and class for
+ * every implented command.
+ */
+#ifndef __cplusplus
+/*
+ * OIC version
+ */
+	for ( i=0; (u_long)i<dev_query_out.length; i++ )
+	{
+		dev_query_out.sequence[i].event    = NULL;
+		dev_query_out.sequence[i].out_type = ds_ev[i].argout_type;
+	}
+
+	sprintf (dev_query_out.class_name, "%s", ds_class->devserver_class.class_name);
+#else
+/*
+ * C++ version
 
 /**
  * Split up the device identification into its information fields.
@@ -1601,7 +1766,48 @@ return (&dev_query_out);
  * @param		long *error - pointer to error code, in case routine fails.
  *
  * @return DS_OK or DS_NOTOK
+
  */
+#if 0
+	ret = device->EventQuery(dev_query_out.sequence);
+#endif
+	ret = device->Event_Query(dev_query_out.sequence, &error); 
+	if (ret != DS_OK)
+	{
+		free(dev_query_out.sequence);
+		dev_query_out.error  = error;
+		dev_query_out.status = -1;
+		return (&dev_query_out);
+	}
+#if 0
+	sprintf (dev_query_out.class_name, "%s", device->class_name);
+#endif
+#endif /* __cplusplus */
+
+	return (&dev_query_out);
+}
+
+
+/*+**********************************************************************
+ Function   :	static long read_device_id ()
+
+ Description:	Split up the device identification into its 
+		information fields.
+		ds_id -> Place in the array of exported devices.
+		connection_id -> Place in the connections (or
+		client access) array of an exported device.
+		export_count-> A counter to avoid access from
+		ancient clients of destroyed devices. 
+
+ Arg(s) In  :	device_id   - client handle to access the device.
+
+ Arg(s) Out :   long *ds_id         - access to exported device.
+		long *connection_id - access to device connections.
+		long *error - pointer to error code, in case routine fails.
+
+ Return(s)  :	DS_OK / DS_NOTOK
+***********************************************************************-*/
+
 static long read_device_id (long device_id, long *ds_id, long *connection_id, long *error)
 {
 	long 	export_counter;
@@ -1676,6 +1882,10 @@ _client_data * _DLLFunc rpc_dev_putget_local (_server_data *server_data)
  * C++ version
  */
 	Device			*device;
+#if 0
+	DeviceBase			*device;
+#endif
+
 #endif
 	long			ds_id;
 	long 		connection_id;
@@ -1839,6 +2049,10 @@ _dev_import_out * _DLLFunc rpc_dev_ping_4 (_dev_import_in *dev_import_in,
 {
 	static _dev_import_out	dev_import_out;
 	register int 	i;
+#if 0
+	char* in_name_stripped;
+#endif
+
 
 #ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
@@ -1853,6 +2067,17 @@ _dev_import_out * _DLLFunc rpc_dev_ping_4 (_dev_import_in *dev_import_in,
 	dev_import_out.var_argument.length   = 0;
 	dev_import_out.var_argument.sequence = NULL;
 
+#if 0
+	/* strip nethost name, if present */
+	if(dev_import_in->device_name[0]=='/' && dev_import_in->device_name[1]=='/')
+	{ /* Nethost part present */
+		in_name_stripped=strchr(dev_import_in->device_name,'/');
+	}
+	else
+	{
+		in_name_stripped=dev_import_in->device_name;
+	}
+#endif
 /*
  * first try to to find the device among the list of
  * devices already being served 
@@ -1867,6 +2092,9 @@ _dev_import_out * _DLLFunc rpc_dev_ping_4 (_dev_import_in *dev_import_in,
           * device will be known under its export name to the outside world
           */
 			if (strcmp (dev_import_in->device_name,devices[i].export_name) == 0)
+#if 0
+			if (strcmp (in_name_stripped,devices[i].export_name) == 0)
+#endif
 			{
 				dev_import_out.status = DS_OK;
 				return (&dev_import_out);

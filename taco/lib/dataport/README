@@ -1,0 +1,29 @@
+
+README for the dataport source directory
+----------------------------------------
+
+This directory contains the source code for the dataport library.
+The dataport library allows uses to create and share data structures
+on Unix and OS9 via chareed memory. Synchronisation is achieved
+with semaphores.
+
+The files in this directory are :
+
+	Makefile - a GNU make conditional make file for making the
+                   dataport library on multiple platforms.
+
+	sema.c - source code for small set of routines which handle
+                 the semaphore (under Unix). Basically an interface
+		 to semop().
+
+	shared.h - source code for routines which get and release a
+		   a shared memory segment (under Unix).
+
+	dataport_ux.c - source code to implement Dataport library
+		        under Unix.
+
+	dataport_os.c - source code to implement the Dataport library
+	                under OS9.
+
+
+	

@@ -1,4 +1,3 @@
-
 /*+*******************************************************************
 
  File:		DevServerP.h
@@ -13,9 +12,9 @@
 
  Original:	March 1990
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-03-14 16:53:27 $
+ Date:		$Date: 2003-04-25 11:21:26 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -30,7 +29,7 @@
  */
 #ifdef _IDENT
 static char DevServerPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServerP.h,v 1.2 2003-03-14 16:53:27 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServerP.h,v 1.3 2003-04-25 11:21:26 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*

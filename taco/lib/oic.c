@@ -1,5 +1,3 @@
-static char RcsId[]      =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/oic.c,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
 /*+*******************************************************************
 
  File:		oic.c
@@ -15,9 +13,9 @@ static char RcsId[]      =
 
  Original:	July 1995
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-03-14 12:22:07 $
+ Date:		$Date: 2003-04-25 11:21:36 $
 
  Copyright (c) 1995-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -28,7 +26,7 @@ static char RcsId[]      =
  */
 
 #include <API.h>
-#include <ApiP.h>
+#include <private/ApiP.h>
 #include <DevServer.h>
 #include <DevServerP.h>
 #include <DevSignal.h>

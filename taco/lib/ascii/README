@@ -1,0 +1,64 @@
+### Last updated 21 January 1997
+
+In this directory you find all the stuff related to the "ASCII based dev api"
+library : "libascapi.la". This library has been designed as a shared library
+which can dynamically be loaded (using dynamic loader functions) in any C
+program. It has been loaded and used inside veetest application to access
+the TACO control system. It will also be used in "xdevmenu" application to
+access devices.
+
+
+The aim of this library is to give an ASCII based interface to the device
+server API. It means one can execute a command on a device server simply by
+specifying the device name and the command name with two strings. He (she)
+is returned the output result and the eventual errors in the form of string
+as well. If the device server command requires an input argument, it is also
+specified through a string.
+
+This library has simply one C module in which the 3 functions of the interface
+will be defined (asc_dev_get, asc_dev_put, asc_dev_putget).
+
+
+Organization of this directory :
+           
+     --> doc : contains 2 frameMaker files (spec.doc, specTOC.doc) these are
+               the source files of the documentation. A FrameMaker generated
+               postscript file is available (spec.ps) also.
+
+
+     --> . : contains all C code files + Makefile + RCS directory
+
+In directory, one can find an archived version of the library with the
+corresponding target in the Makefile. The reason is that a shared library
+cannot be debugged (see "Programming with HPUX" doc) and the only way of
+debugging is to debug the archived version and then rebuild it in shared mode.
+So the archived version has only be used in the debugging phase. It will not
+be distributed nor supported.
+
+The Solaris version has been tested a bit thanks to the test application, but
+needs deeper tests.
+
+
+
+     Faranguiss Poncet   2028
+
+		README for ASCII API library of TACO 
+		------------------------------------
+
+The TACO Ascii based API library is used to give the clients a string (C type)
+based interface to the device server commands.
+
+The name of the device, the command to be executed on that device, the input
+and output parameters all are specified in strings.
+
+This library uses the TACO type conversion library to do the necessary type
+conversion to (output data) and from (input data) strings.
+
+Files needed to build the TACO conversion library are :
+
+	asc_api.c - Contains three functions for executing a device server
+                    command : dev_get_ascii, dev_put_ascii and dev_putget_ascii.
+
+To be able to test and to debug the library a test application is developped.
+It can be found under ../test_lib directory.
+

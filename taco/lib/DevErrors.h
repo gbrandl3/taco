@@ -1,4 +1,3 @@
-
 /*+*******************************************************************
 
  File:		DevErrors.h
@@ -13,9 +12,9 @@
 
  Original:	March 1990
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-03-14 12:22:07 $
+ Date:		$Date: 2003-04-25 11:21:24 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -30,7 +29,7 @@
  */
 #ifdef _IDENT
 static char DevErrorsh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevErrors.h,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevErrors.h,v 1.2 2003-04-25 11:21:24 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*

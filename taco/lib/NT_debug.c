@@ -1,14 +1,13 @@
-static char RcsId[] ="$Header: /home/jkrueger1/sources/taco/backup/taco/lib/NT_debug.c,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
 /*
- debug.c
+    debug.c
 
- Functions to support a popup console/debug window
+    Functions to support a popup console/debug window
 
  Author:	$Author: jkrueger1 $
   
  Version:	$Version$
 
- Date:		$Date: 2003-03-14 12:22:07 $
+ Date:		$Date: 2003-04-25 11:21:28 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                       Grenoble, France

@@ -1,0 +1,54 @@
+### Last updated 21 January 1997
+
+In this directory you find all the stuff related to the "Type conversion"
+library : "libtcapi.sl". This library has been designed as a shared library
+which can dynamically be loaded (using dynamic loader functions) in any C
+program. It has been loaded and used inside the Ascii Dev shared library.
+
+The purpose of this library is the type conversion. For the moment the only
+conversion which is available is : from TACO kernel data types to C strings
+(char *) and from C strings (char *) to TACO kernel data types. Each conversion
+function in this library follows a strict NAMING CONVENTION. This has been done
+to be able to find and to load dynamically the conversion function which is
+needed.
+
+
+This library has simply one C module in which half of the functions to convert
+TACO Kernel data types to strings (char *) and the other half to convert strings
+(following a defined format) to TACO kernel data types. Example :
+tc_DevShort_to_str  and   tc_str_to_DevShort.
+
+
+In directory, one can find an archived version of the library with the
+corresponding target in the Makefile. The reason is that a shared library
+cannot be debugged (see "Programming with HPUX" doc) and the only way of
+debugging is to debug the archived version and then rebuild it in shared mode.
+So the archived version has only be used in the debugging phase. It will not
+be distributed nor supported.
+
+The Solaris version has been tested a bit thanks to the test application, but
+needs deeper tests.
+
+
+
+     Faranguiss Poncet   2028
+
+		README for Type Conversion library of TACO 
+		-------------------------------------------
+
+The TACO type conversion library is accessed from clients, applications and
+any program which need to convert the "TACO Kernel types" to and from a basic
+C type.
+
+For the moment only the conversion to and from string (C type) is available.
+
+Files needed to build the TACO conversion library are :
+
+	tc_str.c - Contains all the functions to convert a TACO Kernel type to
+                   a C string and the other way (convert a C string to a TACO
+                   Kernel type).
+
+To be able to test and to debug the library a test application is developped.
+It can be found under ../test_lib directory.
+
+                   

@@ -1,0 +1,27 @@
+
+This README file describes the directory : lib
+
+This directory contains the source files necessary to implement the device 
+server (aka TACO) application programmer's interface (aka DSAPI). 
+It is also used as intermediate storage for object files which are created 
+during compilation of the DSAPI library files (i.e. not all object files
+will have a corresponding source file in this directory).
+
+Description of files and directories found in this directory :
+
+	dev_api.c - source code for the functions which implement the C
+		version of DSAPI e.g. dev_import(), dev_putget(), dev_put()
+
+	dev_errors.c - link to the source code file containing the list of
+		DS error messages
+
+	dev_states.c - link to the source code file containing the list of
+		device states (in ascii)
+
+	gen_api.c - source code for general purpose DSAPI routines for
+		printing error, debug and diagnostic messages
+
+	sec_api.c - source code for implementing DSAPI security
+
+	util_api.c - some more DSAPI related routines e.g. dev_put_asyn()
+

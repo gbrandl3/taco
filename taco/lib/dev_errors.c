@@ -1,6 +1,3 @@
-static char RcsId[]      =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/dev_errors.c,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
-
 /*+*******************************************************************
 
  File:		dev_errors.c
@@ -15,9 +12,9 @@ static char RcsId[]      =
 
  Original:	9 March 1992
 
- Version:       $Revision: 1.1 $
+ Version:       $Revision: 1.2 $
 
- Date:          $Date: 2003-03-14 12:22:07 $
+ Date:          $Date: 2003-04-25 11:21:34 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France

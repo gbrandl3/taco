@@ -1,4 +1,3 @@
-
 /*+*******************************************************************
 
  File:		DevServer.h
@@ -14,9 +13,9 @@
 
  Original:	March 1990
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-03-14 12:22:07 $
+ Date:		$Date: 2003-04-25 11:21:26 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -25,6 +24,10 @@
 
 #ifndef _DevServer_h
 #define _DevServer_h
+
+#if 0
+#define Device	DeviceBase
+#endif
 
 #include <API.h>
 
@@ -37,7 +40,7 @@
  */
 #ifdef _IDENT
 static char DevServerh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServer.h,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServer.h,v 1.2 2003-04-25 11:21:26 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -212,6 +215,7 @@ extern void dev_event_fire
  * C++ version
  */
 extern "C" long dev_export  PT_( (char* dev_name, Device *ptr_dev, long *error) );
+
 extern "C" void dev_event_fire 
 				PT_( (Device *device, long event_type,
 				DevArgument argout, DevType argout_type,

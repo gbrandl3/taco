@@ -1,4 +1,3 @@
-
 /*+*******************************************************************
 
  File:		DevSignal.h
@@ -15,9 +14,9 @@
 
  Original:	June, 1991
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-03-14 12:22:07 $
+ Date:		$Date: 2003-04-25 11:21:27 $
 
  Copyleft (c) 1990 by European Synchrotron Radiation Facility, 
                       Grenoble, France
@@ -32,7 +31,7 @@
  */
 #ifdef _IDENT
 static char DevSignalh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevSignal.h,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevSignal.h,v 1.2 2003-04-25 11:21:27 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 

@@ -1,6 +1,3 @@
-static char RcsId[]    = 
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/gettrans.c,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
-
 /*+*******************************************************************
 
  File:          gettrans.c
@@ -17,9 +14,9 @@ static char RcsId[]    =
 
  Original:      09.01.1991
 
- Version:	$Revision: 1.1 $
- 
- Date:		$Date: 2003-03-14 12:22:07 $
+ Version:	$Revision: 1.2 $
+
+ Date:		$Date: 2003-04-25 11:21:36 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -27,7 +24,7 @@ static char RcsId[]    =
 ********************************************************************-*/
 
 #include <API.h>
-#include <ApiP.h>
+#include <private/ApiP.h>
 
 #include <Admin.h>
 
@@ -232,8 +229,12 @@ int gettransient( const char *ds_name )
  * if plist is NULL assume simply that no programs are registered
  * and return prognum as is - andy 2/11/2001
  */
-	  /*printf("gettransient(): pmap_getmaps() failed , aborting !\n");*/
+#ifdef EBUG
+	  printf("gettransient(): pmap_getmaps() failed , aborting !\n");
+#endif
+
 	  return prognum;
+
 	}
   	found = 0;
         do

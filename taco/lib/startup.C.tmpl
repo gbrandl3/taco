@@ -1,0 +1,88 @@
+
+//+**********************************************************************
+// File:	
+//		$Id: startup.C.tmpl,v 1.1 2003-04-25 11:21:38 jkrueger1 Exp $
+// Project:	
+//		Device Servers in C++
+// Description:	
+//		
+// Author(s):	
+//		$Author: jkrueger1 $
+// Version:
+//		$Revision: 1.1 $
+// Date:
+//		$Date: 2003-04-25 11:21:38 $
+// 		 
+//+**********************************************************************
+		
+#include <iostream>
+#include <API.h>
+#include <Device.H>
+
+static unsigned int MAX_DEVICES = 1;
+
+long startup(const char *svr_name, long *error)
+{
+    char 	**dev_list;
+    unsigned int n_devices, 
+		i;
+    Device 	*device[MAX_DEVICES];
+    devserver 	ds;
+    short 	state;
+    long 	status;
+
+    cerr << "startup++() to generate dserver++ (server name = " 
+		<< svr_name << ")" << endl;
+//
+// get the list of device name to be served from the static database
+//
+    if (db_getdevlist(svr_name, &dev_list, &n_devices, error))
+    {
+        cerr << "startup(): db_getdevlist() failed, error " << *error << endl;
+        return(-1);
+    }
+    cerr << "Following devices found in static database: " << endl << endl;
+    for (i=0; i< n_devices; i++)
+        cerr << "\t" << dev_list[i] << endl;
+//
+//  now loop round creating and exporting the devices
+//
+    for (i=0; i < n_devices; i++)
+    {
+      	long lError;
+      	device[i] = new Device(dev_list[i], lError);
+      	*error = lError;
+//
+// test calling Device::State via Device::Command method
+//
+      	device[i]->Command(DevState, NULL, D_VOID_TYPE, (void*)&state, D_SHORT_TYPE, error);
+
+//
+// export the device onto the network
+//
+      	status = dev_export(const_cast<char *>(device[i]->GetDevName()), 
+		(Device*)device[i], (long*)error);
+
+      	cerr << "startup++() dev_export() returned " << status << " (error = " 
+		<< *error << ")" << endl;
+
+      	if (dev_import(dev_list[i],0,&ds[i],error) != DS_OK)
+      	{
+            cerr << "startup(): dev_import(" << dev_list[i] << ") failed , error " 
+                 << dev_error_str(*error) << endl;
+      	}
+      	else
+      	{
+            cerr << "startup(): dev_import(" << dev_list[i] << ") worked !" << endl;
+	    dev_putget(ds, DevState, NULL, D_VOID_TYPE, &state, D_SHORT_TYPE, error);
+	    cerr << "startup(): dev_putget(" <<  dev_list[i] << ",DevState) = " 
+		<< state << " , error = " << *error << endl;
+      	}
+    }
+    if (db_freedevexp(dev_list, error) != DS_OK)
+    {
+	cerr << "startup(): dev_freedevexp() failed!" << dev_error_str(*error) << endl;
+	return -1;
+    }
+    return(DS_OK);
+}

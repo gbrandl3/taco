@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <TITLE>TACO interface to VeeTest</TITLE>
+   <META NAME="GENERATOR" CONTENT="Mozilla/3.0Gold (X11; I; HP-UX A.09.05 9000/755) [Netscape]">
+   <META NAME="Author" CONTENT="Faranguiss PONCET">
+</HEAD>
+<BODY TEXT="#000000" BGCOLOR="#FFFFFF" LINK="#0000FF" VLINK="#191970" ALINK="#FF0000">
+
+<P><IMG SRC="Esrf.gif" ALT="ESRF Logo" HEIGHT=53 WIDTH=51 ALIGN=RIGHT>
+</P>
+
+<H1><FONT COLOR="#0000FF"><FONT SIZE=+4>E</FONT></FONT><FONT SIZE=+1>UROPEAN</FONT>
+<FONT COLOR="#0000FF"><FONT SIZE=+4>S</FONT></FONT><FONT SIZE=+1>YNCHROTRON</FONT>
+<FONT COLOR="#0000FF"><FONT SIZE=+4>R</FONT></FONT><FONT SIZE=+1>ADIATION</FONT>
+<FONT COLOR="#0000FF"><FONT SIZE=+4>F</FONT></FONT><FONT SIZE=+1>ACILITY</FONT></H1>
+
+<H5>INSTALLATION EUROPEENNE DE RAYONNEMENT SYNCHROTRON</H5>
+
+<H2 ALIGN=CENTER><FONT SIZE=+4>How to access device servers</FONT></H2>
+
+<H2 ALIGN=CENTER><FONT SIZE=+4>from VeeTest</FONT></H2>
+
+<H1><B>Use predefined library functions in VeeTest</B></H1>
+
+<P>
+<HR SIZE=4 WIDTH="100%"></P>
+
+<UL>
+<LI><FONT SIZE=+2>Make sure that NETHOST variable is correctly set.</FONT></LI>
+
+<LI><FONT SIZE=+2>Start VeeTest.</FONT></LI>
+
+<LI><FONT SIZE=+2>Go to &quot;File&quot; pulldown menu and select &quot;Merge
+Library ...&quot;.</FONT></LI>
+
+<LI><FONT SIZE=+2>You will be prompted with a window to select the name
+of the library to load.</FONT></LI>
+
+<LI><FONT SIZE=+2>In that window scroll down to find &quot;taco_lib.vee&quot;.
+Select it and then click on &quot;ok&quot; button.</FONT></LI>
+
+<LI><FONT SIZE=+2>Go to &quot;Device&quot; then to &quot;Function&quot;
+pulldown menu and select &quot;Call&quot;.</FONT></LI>
+
+<LI><FONT SIZE=+2>Click inside your working area to create a &quot;call
+function&quot; object.</FONT></LI>
+
+<LI><FONT SIZE=+2>Go to the pulldown menu associated with this object (button
+in the window decoration of this object).</FONT></LI>
+
+<LI><FONT SIZE=+2>Select &quot;Select Function&quot; in this pulldown menu.</FONT></LI>
+
+<LI><FONT SIZE=+2>You will be prompted with a window to select among three
+functions &quot;dev_get_ascii&quot; , &quot;dev_put_ascii&quot; or &quot;dev_putget_ascii&quot;.</FONT></LI>
+
+<LI><FONT SIZE=+2>Select one of these three functions.</FONT></LI>
+
+<UL>
+<LI><I><FONT SIZE=+2>use &quot;dev_get_ascii&quot; for all device server
+commands which do not require any input argument (in_type = D_VOID_TYPE).</FONT></I></LI>
+
+<LI><I><FONT SIZE=+2>use &quot;dev_put_ascii&quot; for all device server
+commands which require an input argument but do not return any output argument
+(out_type = D_VOID_TYPE).</FONT></I></LI>
+
+<LI><I><FONT SIZE=+2>use &quot;dev_putget_ascii&quot; for all device server
+commands which require an input argument as well as returning an output
+argument.</FONT></I></LI>
+</UL>
+
+<LI><FONT SIZE=+2>You should now attach the inputs and outputs of this
+call object with VeeTest objects keeping in mind that all of the inputs
+are strings. So use &quot;constant text&quot; objects for the inputs and
+&quot;alphanumerical display&quot; objects for the outputs.</FONT></LI>
+
+<LI><FONT SIZE=+2>Before running your program you should fill in &quot;dev_name&quot;,
+&quot;cmd_name&quot; and eventually &quot;in_arg&quot;. It is very important
+to fill in the input argument correctly. The format to respect for the
+input argument is given in the next section.</FONT></LI>
+</UL>
+
+<H1><B><FONT SIZE=+2>Input argument format for device server commands</FONT></B></H1>
+
+<P>
+<HR SIZE=4 WIDTH="100%"></P>
+
+<P><FONT SIZE=+1>When you use one of the functions &quot;<B>dev_put_ascii</B>&quot;
+or &quot;d<B>ev_putget_ascii</B>&quot; you need to provide the input argument
+to execute the device server command. This input argument can have any
+of the following data types : Boolean, Short, Unsigned Short, Long, Unsigned
+Long, Array of shorts, Array of Longs, String, Char, Array of Strings,
+Array of Chars , .... etc. There are many data types these functions accept.
+All of them are listed in a document (<B><A HREF="spec.doc.html">AsciiDev
+API Library</A></B>) explaining how to use these functions.</FONT></P>
+
+<P><FONT SIZE=+1>As a general idea you should separate the numerical items
+of an Array with a comma and never use a Carriage Return inside the text
+repesenting an input argument. The precise format to be used for each data
+type is defined in <B><A HREF="spec.doc.html">AsciiDev API Library</A></B>
+document.</FONT></P>
+
+<ADDRESS><FONT SIZE=+1>Author:</FONT> <B><FONT SIZE=+1><A HREF="f_poncet.html">Faranguiss
+Poncet</A></FONT></B></ADDRESS>
+
+</BODY>
+</HTML>

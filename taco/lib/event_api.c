@@ -1,4 +1,3 @@
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/event_api.c,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
 /*+*******************************************************************
 
  File       :	event_api.c
@@ -34,9 +33,9 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib
 
  Original   :	April 1999
 
- Version    :	$Revision: 1.1 $
+ Version    :	$Revision: 1.2 $
 
- Date       :	$Date: 2003-03-14 12:22:07 $
+ Date       :	$Date: 2003-04-25 11:21:35 $
 
  Copyleft (c) 1999 by European Synchrotron Radiation Facility,
                       Grenoble, France
@@ -44,7 +43,7 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib
 ********************************************************************-*/
 #include <config.h>
 #include <API.h>
-#include <ApiP.h>
+#include <private/ApiP.h>
 #include <DevServer.h>
 #include <DevServerP.h>
 #include <DevSignal.h>
@@ -115,8 +114,9 @@ static event_client *event_client_list=NULL;
 
 bool_t _DLLFunc xdr__asynch_client_data PT_((XDR *xdrs, _asynch_client_data *objp));
 
+
 /*+**********************************************************************
- Function   :	extern long dev_event_listen()
+ Function   :	extern long dev_event_listen_x()
 
  Description:	application interface to register a client as a listener
 		for events of a specified type from a device server.
@@ -144,7 +144,7 @@ bool_t _DLLFunc xdr__asynch_client_data PT_((XDR *xdrs, _asynch_client_data *obj
 
  Return(s)  :	DS_OK or DS_NOTOK
 ***********************************************************************-*/
-long _DLLFunc dev_event_listen (devserver ds, long event_type,
+long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 	DevArgument argout, DevType argout_type, 
 	DevCallbackFunction *callback, void *user_data,
 	long *event_id_ptr, long *error)
@@ -166,7 +166,7 @@ long _DLLFunc dev_event_listen (devserver ds, long event_type,
 
 #ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_ASYNCH,
-	    "\ndev_event_listen() : entering routine\n");
+	    "\ndev_event_listen_x() : entering routine\n");
 #endif /* EBUG */
 
 #ifdef TANGO
@@ -291,7 +291,7 @@ long _DLLFunc dev_event_listen (devserver ds, long event_type,
 
 #ifdef EBUG
 	dev_printdebug (DBG_ASYNCH,
-	    "dev_event_listen() : server data -> \n");
+	    "dev_event_listen_x() : server data -> \n");
 	dev_printdebug (DBG_ASYNCH,
 	    "ds_id=%d  cmd=%d  outtype=%d\n",
 	    server_data.ds_id, server_data.cmd,
@@ -330,7 +330,7 @@ long _DLLFunc dev_event_listen (devserver ds, long event_type,
 
 #ifdef EBUG
         dev_printdebug (DBG_TRACE | DBG_ASYNCH,
-            "\ndev_event_listen() : client data -> ");
+            "\ndev_event_listen_x() : client data -> ");
         dev_printdebug (DBG_ASYNCH,
             "event_type=%d asynch_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
 	    event_type,event_id,
@@ -349,7 +349,7 @@ long _DLLFunc dev_event_listen (devserver ds, long event_type,
 		    (xdrproc_t)xdr_void, (caddr_t) NULL, TIMEVAL(zero_timeout));
 #ifdef EBUG
 	 dev_printdebug (DBG_ASYNCH,
-                        "\ndev_event_listen() : clnt_stat %d\n",clnt_stat);
+                        "\ndev_event_listen_x() : clnt_stat %d\n",clnt_stat);
 #endif /* EBUG */
 
 /*
@@ -405,6 +405,10 @@ void _DLLFunc dev_event_fire (DevServer ds, long event,
  * C++ version
  */
 void _DLLFunc dev_event_fire (Device *device, long event,
+#if 0
+void _DLLFunc dev_event_fire (DeviceBase *device, long event,
+#endif
+
 	DevArgument argout, DevType argout_type, 
 	long event_status, long event_error)
 #endif /* __cplusplus */
@@ -429,6 +433,8 @@ void _DLLFunc dev_event_fire (Device *device, long event,
         dev_printdebug (DBG_ASYNCH,
             "\ndev_event_fire() : entering routine\n");
 #endif /* EBUG */
+	LOCK(async_mutex);
+
 
 /*
  * for all registered clients if event type corresponds then notify
@@ -466,12 +472,15 @@ void _DLLFunc dev_event_fire (Device *device, long event,
  * to send an event to the client asynchronously the client rpc service
  * must be imported. make sure it is imported.
  */
+        			UNLOCK(async_mutex);
 				if (asynch_client_check(&client, &error) != DS_OK)
 				{
 					dev_printerror (SEND,"%s",
                 			"dev_event_fire : server couldn't import client to fire event");
                                 	return;
 				}
+        			LOCK(async_mutex);
+
 /*
  * tag asynchronous information onto client_data so that client
  * can identify the reply
@@ -588,7 +597,10 @@ void _DLLFunc dev_event_fire (Device *device, long event,
 				{
   					dev_printerror (SEND,
                           		"dev_event_fire() : server couldn't send event to client (clnt_stat=%d) calling cleanup !", (char*)clnt_stat); 
+					UNLOCK(async_mutex);
 					event_client_cleanup(&error);
+					LOCK(async_mutex);
+									
   				}			
 			}
 		}
@@ -598,12 +610,13 @@ void _DLLFunc dev_event_fire (Device *device, long event,
 	dev_printdebug (DBG_ASYNCH, 
 		"\ndev_event_fire() : returning\n");
 #endif /* EBUG */
+	UNLOCK(async_mutex);
 
 	return;
 }
 
 /*+**********************************************************************
- Function   :	extern long dev_event_unlisten()
+ Function   :	extern long dev_event_unlisten_x()
 
  Description:	application interface for a client to unlisten to
 		an event. Client will be unregistered in the server
@@ -620,7 +633,7 @@ void _DLLFunc dev_event_fire (Device *device, long event,
 
  Return(s)  :	DS_OK or DS_NOTOK
 ***********************************************************************-*/
-long _DLLFunc dev_event_unlisten (devserver ds, long event_type,
+long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
                                   long event_id, long *error)
 {
 	_server_data		server_data;
@@ -638,7 +651,7 @@ long _DLLFunc dev_event_unlisten (devserver ds, long event_type,
 
 #ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_ASYNCH,
-	    "\ndev_event_unlisten() : entering routine\n");
+	    "\ndev_event_unlisten_x() : entering routine\n");
 #endif /* EBUG */
 
 #ifdef TANGO
@@ -648,6 +661,8 @@ long _DLLFunc dev_event_unlisten (devserver ds, long event_type,
                 return(DS_NOTOK);
         }
 #endif /* TANGO */
+	LOCK(async_mutex);
+
 /*
  * save the device's nethost in an intermediate variable
  * to make it more accessible
@@ -676,12 +691,14 @@ long _DLLFunc dev_event_unlisten (devserver ds, long event_type,
 	{
 		if ( dev_rpc_connection (ds, error)  == DS_NOTOK )
 		{
+		    UNLOCK(async_mutex);
 			return (DS_NOTOK);
 		}
 	}
 	else
 	{
 		*error = DevErr_AsynchronousCallsNotSupported;
+		UNLOCK(async_mutex);
 		return(DS_NOTOK);
 	}
 /*
@@ -695,6 +712,7 @@ long _DLLFunc dev_event_unlisten (devserver ds, long event_type,
 		{
 			if ( verify_sec_key (ds, &client_id, error) == DS_NOTOK )
 			{
+		    UNLOCK(async_mutex);
 				return (DS_NOTOK);
 			}
 		}
@@ -705,11 +723,13 @@ long _DLLFunc dev_event_unlisten (devserver ds, long event_type,
  * make sure it is imported. 
  */
 
+	UNLOCK(async_mutex);
 	if (asynch_server_import(ds,error) != DS_OK)
 	{
 		return (DS_NOTOK);
 	}
 
+	LOCK(async_mutex);
 /*
  * store the pointers to the return arguments so that event can
  * be passed back asynchronously to the client
@@ -760,7 +780,7 @@ long _DLLFunc dev_event_unlisten (devserver ds, long event_type,
 
 #ifdef EBUG
         dev_printdebug (DBG_TRACE | DBG_ASYNCH,
-            "\ndev_event_unlisten() : client data -> ");
+            "\ndev_event_unlisten_x() : client data -> ");
         dev_printdebug (DBG_ASYNCH,
             "event_type=%d asynch_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
 	    event_type,event_id,
@@ -779,7 +799,7 @@ long _DLLFunc dev_event_unlisten (devserver ds, long event_type,
 		    (xdrproc_t)xdr_void, (caddr_t) NULL, TIMEVAL(zero_timeout));
 #ifdef EBUG
 	 dev_printdebug (DBG_ASYNCH,
-                        "\ndev_event_unlisten() : clnt_stat %d\n",clnt_stat);
+                        "\ndev_event_unlisten_x() : clnt_stat %d\n",clnt_stat);
 #endif /* EBUG */
 
 /*
@@ -789,6 +809,7 @@ long _DLLFunc dev_event_unlisten (devserver ds, long event_type,
 	{
 		if ( dev_rpc_error (ds, clnt_stat, error) == DS_NOTOK )
 		{
+		    UNLOCK(async_mutex);
 			return (DS_NOTOK);
 		}
 	}
@@ -802,6 +823,7 @@ long _DLLFunc dev_event_unlisten (devserver ds, long event_type,
 		ds->pending--;
 	}
 
+	UNLOCK(async_mutex);
 	return (DS_OK);
 }
 
@@ -827,6 +849,8 @@ void _DLLFunc event_client_cleanup (long *error)
 	dev_printdebug (DBG_ASYNCH, 
 		"\nevent_client_cleanup() : entering\n");
 #endif /* EBUG */
+	LOCK(async_mutex);
+
 /*
  * first call asynch_client_cleanup() to detect any dead clients
  */
@@ -857,6 +881,8 @@ void _DLLFunc event_client_cleanup (long *error)
 	dev_printdebug (DBG_ASYNCH, 
 		"\nevent_client_cleanup() : returning\n");
 #endif /* EBUG */
+	UNLOCK(async_mutex);
+	return;
 }
 
 /*+**********************************************************************
@@ -881,9 +907,17 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
 /*
  * first time round initialise event_client_list[] 
  */
+	LOCK(async_mutex);
+
 	if (first || event_client_list == NULL)
 	{
-		event_client_list = (event_client*)malloc(sizeof(event_client)*EVENT_MAX_CLIENTS);
+		event_client_list =
+		(event_client*)malloc(sizeof(event_client)*EVENT_MAX_CLIENTS);
+		if(!event_client_list)
+		    {
+			UNLOCK(async_mutex);
+			return NULL;
+		    }
 		for (i=0; i<EVENT_MAX_CLIENTS; i++)
 		{
 			event_client_list[i].flag = DS_FALSE;
@@ -906,6 +940,7 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
 	if ((i < 0) || (i > EVENT_MAX_CLIENTS))
 	{
 		printf("rpc_event_listen_5(): no more free event client slots !\n");
+		UNLOCK(async_mutex);
 		return(&dev_import_out);
 	}
 
@@ -919,9 +954,23 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
 	event_client_list[i_client].device = devices[server_data->ds_id&DEVICES_MASK].device;
 #endif /* __cplusplus */
 	event_client_list[i_client].id = *(long*)server_data->var_argument.sequence[0].argument;
-	event_client_list[i_client].server_name = (char*)malloc(strlen(*(char**)server_data->var_argument.sequence[1].argument)+1);
+	event_client_list[i_client].server_name =
+	(char*)malloc(strlen(*(char**)server_data->var_argument.sequence[1].argument)+1);
+	if(!event_client_list[i_client].server_name)
+	    {
+		error=DevErr_InsufficientMemory;
+		UNLOCK(async_mutex);
+		return NULL;
+	    }
 	sprintf(event_client_list[i_client].server_name,"%s",*(char**)server_data->var_argument.sequence[1].argument);
 	event_client_list[i_client].server_host = (char*)malloc(strlen(*(char**)server_data->var_argument.sequence[2].argument)+1);
+	if(!event_client_list[i_client].server_host)
+	    {
+		error=DevErr_InsufficientMemory;
+		UNLOCK(async_mutex);
+		return NULL;
+	    }
+
 	sprintf(event_client_list[i_client].server_host,"%s",*(char**)server_data->var_argument.sequence[2].argument);
 	event_client_list[i_client].prog_number = *(long*)server_data->var_argument.sequence[3].argument;
 	event_client_list[i_client].vers_number = *(long*)server_data->var_argument.sequence[4].argument;
@@ -932,7 +981,7 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
         dev_printdebug (DBG_ASYNCH,
              "\nrpc_event_listen_5() : event client data -> ");
         dev_printdebug (DBG_ASYNCH,
-              "event=%d id=%d server_name=%d server_host=%d argout_type=%d\n",
+              "event=%d id=%d server_name=%s server_host=%s argout_type=%d\n",
 	     event_client_list[i_client].event,event_client_list[i_client].id, 
 	     event_client_list[i_client].server_name,
 	     event_client_list[i_client].server_host, 
@@ -947,11 +996,15 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
 	client.prog_number = event_client_list[i_client].prog_number;
 	client.vers_number = event_client_list[i_client].vers_number;
 
+	UNLOCK(async_mutex);
+
 	status = asynch_client_check(&client, &error);
+	LOCK(async_mutex);
 
 	if (status == DS_OK)
 	{
 		event_client_list[i_client].no_svc_conn = client.no_svr_conn;
+		svr_conns[client.no_svr_conn].no_conns++; /* BP: needed to avoid premature freeing of async service ? */
 		event_client_list[i_client].flag = DS_PENDING;
 	}
 	else
@@ -960,6 +1013,7 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
 		free(event_client_list[i_client].server_host);
 		event_client_list[i_client].flag = DS_FALSE;
 	}
+	UNLOCK(async_mutex);
 
 	return(&dev_import_out);
 }
@@ -985,6 +1039,7 @@ _dev_free_out* _DLLFunc rpc_event_unlisten_5 (_server_data *server_data)
 /*
  * get event client fields so that client can be unregistered
  */
+	LOCK(async_mutex);
 	event_id = *(long*)server_data->var_argument.sequence[0].argument;
 	server_name = *(char**)server_data->var_argument.sequence[1].argument;
 	server_host = *(char**)server_data->var_argument.sequence[2].argument;
@@ -1025,6 +1080,7 @@ _dev_free_out* _DLLFunc rpc_event_unlisten_5 (_server_data *server_data)
 	if (i_client < 0)
 	{
 		printf("rpc_event_unlisten_5(): event client not found !\n");
+		UNLOCK(async_mutex);
 		return(&dev_free_out);
 	}
 	else
@@ -1044,6 +1100,7 @@ _dev_free_out* _DLLFunc rpc_event_unlisten_5 (_server_data *server_data)
 #endif /* EBUG */
 		}
 	}
+	UNLOCK(async_mutex);
 
 	return(&dev_free_out);
 }
@@ -1061,11 +1118,12 @@ static long get_event_string PT_( (devserver ds, long event, char *event_str, lo
 		available events, their names, their input and
 		output data types, and type describtions for one
 		device.
-            :	Events and data types are read from the command
+            :	Events and data types are read from the event
 		list in the device server by calling 
 		RPC_DEV_EVENT_QUERY.
-            :	Event names are read from the command name list,
-		defined in the database (EVENT/team/server/event)
+            :	Event names are read from the event name list,
+		defined in the database (EVENT/team/server/event): 
+
             :	Data type describtions have to be specified as 
 		CLASS resources as:
             :		CLASS/class_name/event_name/OUT_TYPE:
@@ -1107,6 +1165,10 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long
 	{
 		*error = DevErr_CommandNotImplemented;
 		status = DS_NOTOK;
+#if 0
+		status = tango_dev_event_query(ds, vareventarr, error);
+#endif
+
 		return(status);
 	}
 #endif /* TANGO */

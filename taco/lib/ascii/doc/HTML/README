@@ -1,0 +1,104 @@
+
+		README for TACO interface to HP VeeTest
+		---------------------------------------
+			Faranguiss Poncet, 22/1/97
+			--------------------------
+
+INTRODUCTION
+------------
+
+This README describes files which are needed to interface TACO into the HP
+VeeTest tool, how to install them and how to use them inside VeeTest. This
+interface is available only for HPUX and SOLARIS platforms.
+
+HP VeeTest is a tool distributed by HP company on several platfroms : HP,
+Solaris, Windows, ...etc.).
+
+Before going further with this installation, you need to get the TACO binary
+release for the platform you are working on (hpux : bin_hpux_Vn.m.tar.gz
+or solaris : bin_solaris_Vn.m.tar.gz).
+
+If this is already done, make sure that the following files are installed :
+
+           - include/asc_api.h  , include/tc_api.h , include/tc_str.h
+
+             |-- hpux platform :    lib/shared/s700/libascapi.sl ,
+             |                       lib/shared/s700/libtcapi.sl
+           --|
+             |
+             |-- solaris platform : lib/shared/solaris/libascapi.so ,
+                                    lib/shared/solaris/libtcapi.so
+
+If one of these files are missing, please take the TACO binary release from ftp
+site again. Once everything is OK concerning TACO binary release files go ahead
+with the installation of the TACO interface to HP VeeTest.
+
+Files included in this release are :
+
+	README - this file
+	veetest_empty.h - an empty header file needed by HP VeeTest
+	taco_lib.vee - a HP VeeTest file interfacing TACO
+        taco_vee.ps - a Postscript file document for this interface
+
+INSTALL
+-------
+
+(0) If you have a working version of "HP VeeTest <--> TACO" interface, save
+    copies of the three files mentioned above into a save place.
+
+(1) go to the directory where you have installed this interface files e.g.
+    TACO_VEE_HOME = /home/dserver/veetest.
+
+    cd $TACO_VEE_HOME
+    
+(2) unzip and untar the distribution
+
+    gunzip taco_vee_Vn.m.tar.gz
+    tar -xvf taco_vee_Vn.m.tar
+    
+    where Vn.m is the major and minor version number of the release of the 
+    VeeTest interface you have ftp'ed.
+
+(3) If it is not already done do the following on the machine you will execute
+    VeeTest.
+
+        - make symbolic links from "/usr/local/lib" to
+            for hpux :  libdsapi.sl, libdbapi.sl, libdsxdr.sl, libascapi.sl
+                        and libtcapi.sl  of the TACO binary release
+            for solaris :  libdsapi.so, libdbapi.so, libdsxdr.so, libascapi.so
+                           and libtcapi.so  of the TACO binary release
+
+        - make a symbolic link from "/usr/local/include" to
+               asc_api.h   of the TACO binary release
+
+        - make a symbolic link from "/usr/local/include" to
+               veetest_empty.h  of this distribution
+
+        - make a symbolic link from
+                 "somewhere appropriate e.g. : /usr/lib/veetest/lib"
+                 to the file taco_lib.vee
+
+(4) Once all these links are made you can follow the instructions in the VeeTest
+    documentation to call a VeeTest user function. These instructions are
+    briefly reminded here.
+
+        - excute veetest
+        - go to "File" pulldown menu and select "Merge Library ..."
+        - find taco_lib.vee (in the directory where you have made the link)
+          and click on OK
+        - go to "Device" pulldown menu and select "Function --> Call"
+        - go to the pulldown menu attached to the window associated with
+          this "Call Function" object and select "Select Function".
+        - select one of the following functions :
+                 dev_get_ascii , dev_put_ascii , dev_putget_ascii
+        - You can now attach the input and outputs of the call function object
+          you have just created to the appropriate VeeTest objects and then
+          execute the veetest program. All the data types (input and output)
+          of the three functions above are strings.
+          DON'T forget to set the NETHOST variable before executing veetest.
+               
+
+
+For more information on VeeTest and how to use it, please refer to the VeeTest
+official documentation
+

@@ -1,0 +1,25 @@
+
+Once all these links are made you can follow the instructions in the VeeTest
+documentation to call a VeeTest user function. These instructions are
+briefly reminded here.
+
+        - excute veetest
+        - go to "File" pulldown menu and select "Merge Library ..."
+        - find taco_lib.vee (in the directory where you have made the link)
+          and click on OK
+        - go to "Device" pulldown menu and select "Function --> Call"
+        - go to the pulldown menu attached to the window associated with
+          this "Call Function" object and select "Select Function".
+        - select one of the following functions :
+                 dev_get_ascii , dev_put_ascii , dev_putget_ascii
+        - You can now attach the input and outputs of the call function object
+          you have just created to the appropriate VeeTest objects and then
+          execute the veetest program. All the data types (input and output)
+          of the three functions above are strings.
+          DON'T forget to set the NETHOST variable before executing veetest.
+               
+
+
+For more information on VeeTest and how to use it, please refer to the VeeTest
+official documentation
+

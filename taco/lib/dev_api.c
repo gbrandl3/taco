@@ -1,4 +1,3 @@
- char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/dev_api.c,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
 /*+*******************************************************************
 
  File       :	dev_api.c
@@ -15,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.1 $
+ Version    :	$Revision: 1.2 $
 
- Date	    :	$Date: 2003-03-14 12:22:07 $
+ Date	    :	$Date: 2003-04-25 11:21:33 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -25,7 +24,7 @@
 ********************************************************************-*/
 #include <config.h>
 #include <API.h>
-#include <ApiP.h>
+#include <private/ApiP.h>
 #include <DevServer.h>
 #include <Admin.h>
 #include <DevErrors.h>
@@ -60,6 +59,18 @@
 #endif /* WIN32 */
 
 #include <errno.h>
+#if 0
+#include <assert.h>
+
+/*
+ * communication sockets for syncrous rpc
+ * moved from DevServerMain.c
+ */
+long synch_svc_udp_sock;
+long synch_svc_tcp_sock;
+#endif
+
+
 
 
 /*
@@ -159,9 +170,7 @@ extern char *dev_error_string;
 
  Return(s)  :	DS_OK or DS_NOTOK
 ***********************************************************************-*/
-
-long _DLLFunc dev_import (char *dev_name, long access,
-			  devserver *ds_ptr, long *error)
+long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *error)
 {
 	static _dev_import_out	dev_import_out;
 	_dev_import_in		dev_import_in;
@@ -197,6 +206,10 @@ long _DLLFunc dev_import (char *dev_name, long access,
 
 #ifdef TANGO
 	if (strncasecmp(dev_name,"tango:",6) == 0)
+#if 0
+	if (strncmp(dev_name,"tango:",6) == 0)
+#endif
+
 	{
 		status = tango_dev_import(dev_name+6,access, ds_ptr, error);
 		printf("dev_import(): tango_dev_import(%s) returned %d\n",dev_name,status);
@@ -346,8 +359,7 @@ long _DLLFunc dev_import (char *dev_name, long access,
 #ifdef EBUG
         			dev_printdebug (DBG_API,"dev_import(): device %s not exported (yet)\n",device_name);
 #endif /* EBUG */
-                        	status = dev_notimported_init(device_name,access,i_nethost,ds_ptr,error);
-                        	return(status);
+                        return(dev_notimported_init(device_name,access,i_nethost,ds_ptr,error));
                 	}
                 	else
                 	{
@@ -486,8 +498,8 @@ long _DLLFunc dev_import (char *dev_name, long access,
 #ifdef EBUG
         		dev_printdebug (DBG_API,"dev_import(): host %s not answering, do stateless import\n",host_name);
 #endif /* EBUG */
-                       	status = dev_notimported_init(device_name,access,i_nethost,ds_ptr,error);
-                       	return(status);
+                       	return(dev_notimported_init(device_name,access,i_nethost,ds_ptr,error));
+
 		}
 
 		/*
@@ -517,6 +529,13 @@ long _DLLFunc dev_import (char *dev_name, long access,
 
 			/* *error = DevErr_CannotCreateClientHandle;
 			return (-1);*/
+#if 0
+			/*hstring = clnt_spcreateerror ("dev_import");
+			dev_printerror (SEND,hstring);*/
+			*error = DevErr_CannotCreateClientHandle;
+			return (-1);
+#endif
+
 		}
 
 		/* 
@@ -604,13 +623,13 @@ long _DLLFunc dev_import (char *dev_name, long access,
 
 				*error = 0;
 				return (DS_OK);
-/*
+#if 0
  				if (clnt_stat == RPC_TIMEDOUT)
  				{
  
-		     *
+		    /*
  		     * Destroy version 4 handle.
-		     * 
+		     */ 
 					clnt_destroy (clnt);
  *
  * add "stateless-ness" by ignoring RPC timeouts at import time
@@ -629,17 +648,17 @@ long _DLLFunc dev_import (char *dev_name, long access,
 				}
 				else
 				{
-		     *
+		    /*
  		     * Destroy version 4 handle.
-		     * 
+		     */
 					clnt_destroy (clnt);
 
-					 *hstring = clnt_sperror (clnt, "dev_import");
+					*hstring = clnt_sperror (clnt, "dev_import");
 					dev_printerror (SEND, "%s", hstring);* 
 					*error = DevErr_RPCFailed;
 					return (DS_NOTOK);
 				}
- */
+#endif
 			}
 		}
 
@@ -848,6 +867,23 @@ long _DLLFunc dev_import (char *dev_name, long access,
 			memset ((char *)*ds_ptr, 0, sizeof (struct _devserver));
 
 			if ( svr_conns[n_svr_conn].no_conns != 0)
+#if 0
+			/*
+	       * initialise the administration structure for the RPC connection
+	       * if this is the first device connected.
+	       */
+
+			if ( svr_conns[n_svr_conn].no_conns == 0)
+			{
+				svr_conns[n_svr_conn].clnt        = clnt;
+				svr_conns[n_svr_conn].vers_number = vers_number;
+				svr_conns[n_svr_conn].udp_clnt    = clnt;
+				svr_conns[n_svr_conn].tcp_clnt    = NULL;
+				svr_conns[n_svr_conn].asynch_clnt = NULL;
+			}
+			else
+#endif
+
 			{
 				/*
 		  * If the connection is marked as bad connection
@@ -1166,8 +1202,15 @@ long _DLLFunc dev_putget (devserver ds, long cmd,DevArgument argin,
 	 */
 	if (client_data.var_argument.length == 1)
 	{
+#if 0
+	    assert(dev_error_string==NULL);
+#endif
+
 		dev_error_string = (char*)malloc( strlen(*(char**)client_data.var_argument.sequence[0].argument)+1);
+		if(dev_error_string)
+		    {
 		sprintf(dev_error_string,*(char**)client_data.var_argument.sequence[0].argument);
+	}
 	}
 	/*
 	 * Free the variable arguments in the client_data
@@ -1366,6 +1409,9 @@ long _DLLFunc dev_put (devserver ds, long cmd,DevArgument argin,
          */
         if (client_data.var_argument.length == 1)
         {
+#if 0
+	    assert(dev_error_string==NULL);
+#endif
                 dev_error_string = (char*)malloc( strlen(*(char**)client_data.var_argument.sequence[0].argument)+1);
                 sprintf(dev_error_string,*(char**)client_data.var_argument.sequence[0].argument);
         }
@@ -1447,6 +1493,7 @@ long _DLLFunc dev_free (devserver ds, long *error)
  */
 	if (ds->clnt == NULL)
 	{
+		free (ds);
 		return(DS_OK);
 	}
 
@@ -1731,6 +1778,21 @@ long _DLLFunc dev_free (devserver ds, long *error)
 		    (char *) &svr_conns[ds->no_svr_conn].rpc_retry_timeout);
 		clnt_control (ds->clnt, CLSET_TIMEOUT, 
 		    (char *) &svr_conns[ds->no_svr_conn].rpc_timeout);
+	}
+
+	/*
+	 * Decrease the counter of single user accesses
+	 * if a single user access was freed. If it was the last
+	 * single user access for the connection reinstall the initial
+	 * protocol.
+	 *
+	 * Free the security key for the connection.
+	 */
+
+	if ( nethost->config_flags.security == True )
+	{
+		sec_free_tcp_connection (ds, &svr_conns[ds->no_svr_conn]);
+		free_sec_key (ds);
 	}
 
 	/*
@@ -2070,42 +2132,42 @@ long  check_rpc_connection (devserver ds, long *error)
 		vers_number = ds->vers_number;
 	}
 
-	   /*
-	    * Before a new handle can be created,
-	    * verify whether it is possible to connect
-	    * to the remote host.
-	    */
+	/*
+	 * Before a new handle can be created,
+	 * verify whether it is possible to connect
+	 * to the remote host.
+	 */
 
-		if ( rpc_check_host ( host_name, error ) == DS_NOTOK )
-		{
-			return (DS_NOTOK);
-		}
+	if ( rpc_check_host ( host_name, error ) == DS_NOTOK )
+	{
+		return (DS_NOTOK);
+	}
 
-	   /*
-            * Attention, Attention
-            * Here comes a delay timing to let the VME reboot
-				* in peace when the network is alread answering.
-            */
+	 /*
+          * Attention, Attention
+          * Here comes a delay timing to let the VME reboot
+	  * in peace when the network is alread answering.
+          */
 
-		if ( svr_conns[ds->no_svr_conn].first_access_time == False )
-		{
-			time ( &(svr_conns[ds->no_svr_conn].first_access_time) );
-			*error = DevErr_BadServerConnection;
-			return (DS_NOTOK);
-		}
+	if ( svr_conns[ds->no_svr_conn].first_access_time == False )
+	{
+		time ( &(svr_conns[ds->no_svr_conn].first_access_time) );
+		*error = DevErr_BadServerConnection;
+		return (DS_NOTOK);
+	}
 
 
-	    /*
- 	     *  Store the current RPC timeout off the old connection. 
- 	     */
+	/*
+ 	 *  Store the current RPC timeout off the old connection. 
+ 	 */
 
-	   /*
-	    * reopen a connection with the same protocol than before.
-	    */
+	/*
+	 * reopen a connection with the same protocol than before.
+	 */
 
-		if ( svr_conns[ds->no_svr_conn].rpc_protocol == D_UDP )
-		{
-			clnt = clnt_create ( host_name, prog_number, vers_number, "udp");
+	if ( svr_conns[ds->no_svr_conn].rpc_protocol == D_UDP )
+	{
+		clnt = clnt_create ( host_name, prog_number, vers_number, "udp");
 
 	      /*
                * This part was added for compatibility reasons with
@@ -2122,50 +2184,48 @@ long  check_rpc_connection (devserver ds, long *error)
                * case.
                */
 
-			if (clnt != NULL)
-			{
-				clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &api_retry_timeout);
-				clnt_control (clnt, CLSET_TIMEOUT, (char *) &api_timeout);
+		if (clnt != NULL)
+		{
+			clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &api_retry_timeout);
+			clnt_control (clnt, CLSET_TIMEOUT, (char *) &api_timeout);
 
-				clnt_stat = clnt_call (clnt, NULLPROC,
+			clnt_stat = clnt_call (clnt, NULLPROC,
 				    (xdrproc_t)xdr_void,  NULL,
 				    (xdrproc_t)xdr_void,  NULL, TIMEVAL(timeout));
-				if (clnt_stat != RPC_SUCCESS)
+			if (clnt_stat != RPC_SUCCESS)
+			{
+				if ( clnt_stat == RPC_PROGVERSMISMATCH )
 				{
-					if ( clnt_stat == RPC_PROGVERSMISMATCH )
-					{
 			/*
                         * Destroy version 4 handle.
                         */
-						clnt_destroy (clnt);
+					clnt_destroy (clnt);
 
 			/*
                         * Set version number to 1 and recreate the
                         * client handle.
                         */
-						vers_number = DEVSERVER_VERS;
-						clnt = clnt_create (host_name,prog_number,
+					vers_number = DEVSERVER_VERS;
+					clnt = clnt_create (host_name,prog_number,
 						    vers_number,"udp");
-					}
 				}
 			}
 		}
-		else
-		{
+	}
+	else
+	{
 #if !defined vxworks
-			ht = gethostbyname(host_name);
-			memcpy ( (char *)&serv_adr.sin_addr, ht->h_addr,
-			    (size_t) ht->h_length );
+		ht = gethostbyname(host_name);
+		memcpy ( (char *)&serv_adr.sin_addr, ht->h_addr, (size_t) ht->h_length );
 #else  /* !vxworks */
-			host_addr = hostGetByName(host_name);
-			memcpy ( (char*)&serv_adr.sin_addr, (char*)&host_addr, 4);
+		host_addr = hostGetByName(host_name);
+		memcpy ( (char*)&serv_adr.sin_addr, (char*)&host_addr, 4);
 #endif /* !vxworks */
-			serv_adr.sin_family = AF_INET;
-			serv_adr.sin_port = 0;
-			tcp_socket = RPC_ANYSOCK;
+		serv_adr.sin_family = AF_INET;
+		serv_adr.sin_port = 0;
+		tcp_socket = RPC_ANYSOCK;
 
-			clnt = clnttcp_create ( &serv_adr, prog_number, vers_number,
-			    &tcp_socket, 0, 0);
+		clnt = clnttcp_create ( &serv_adr, prog_number, vers_number, &tcp_socket, 0, 0);
 	      /*
                * This part was added for compatibility reasons with
                * the old libray version 3.
@@ -2181,156 +2241,154 @@ long  check_rpc_connection (devserver ds, long *error)
                * case.
                */
 
-			if (clnt != NULL)
-			{
-				clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &api_retry_timeout);
-				clnt_control (clnt, CLSET_TIMEOUT, (char *) &api_timeout);
+		if (clnt != NULL)
+		{
+			clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &api_retry_timeout);
+			clnt_control (clnt, CLSET_TIMEOUT, (char *) &api_timeout);
 
-				clnt_stat = clnt_call (clnt, NULLPROC,
-				   (xdrproc_t)xdr_void,  NULL,
+			clnt_stat = clnt_call (clnt, NULLPROC, (xdrproc_t)xdr_void,  NULL,
 				   (xdrproc_t)xdr_void,  NULL, TIMEVAL(timeout));
-				if (clnt_stat != RPC_SUCCESS)
+			if (clnt_stat != RPC_SUCCESS)
+			{
+				if ( clnt_stat == RPC_PROGVERSMISMATCH )
 				{
-					if ( clnt_stat == RPC_PROGVERSMISMATCH )
-					{
 			/*
                         * Destroy version 4 handle.
                         */
-						clnt_destroy (clnt);
+					clnt_destroy (clnt);
 
 			/*
                         * Set version number to 1 and recreate the
                         * client handle.
                         */
 #if !defined (WIN32)
-                                                close (tcp_socket);
+                                        close (tcp_socket);
 #else
-                                                closesocket (tcp_socket);
+                                        closesocket (tcp_socket);
 #endif /* WIN32 */
-						tcp_socket = RPC_ANYSOCK;
+					tcp_socket = RPC_ANYSOCK;
 
-						vers_number = DEVSERVER_VERS;
-						clnt = clnttcp_create ( &serv_adr, prog_number, 
+					vers_number = DEVSERVER_VERS;
+					clnt = clnttcp_create ( &serv_adr, prog_number, 
 						    vers_number, &tcp_socket, 0, 0);
-					}
 				}
 			}
 		}
+	}
 
 
-		if (clnt != NULL) 
-		{
+	if (clnt != NULL) 
+	{
 /*
  * new client handle created to server - destroy old (stale) client
  * handles
  */
-			if (svr_conns[ds->no_svr_conn].udp_clnt != NULL)
-			{
-				clnt_destroy(svr_conns[ds->no_svr_conn].udp_clnt);
-				svr_conns[ds->no_svr_conn].udp_clnt = NULL;
-			}
-			if (svr_conns[ds->no_svr_conn].tcp_clnt != NULL)
-			{
+		if (svr_conns[ds->no_svr_conn].udp_clnt != NULL)
+		{
+			clnt_destroy(svr_conns[ds->no_svr_conn].udp_clnt);
+			svr_conns[ds->no_svr_conn].udp_clnt = NULL;
+		}
+		if (svr_conns[ds->no_svr_conn].tcp_clnt != NULL)
+		{
 			/*
          		*  if tcp protocol was used, 
          		*  close the old socket first.
          		*/
 #if !defined (WIN32)
-               			close (svr_conns[ds->no_svr_conn].tcp_socket);
+               		close (svr_conns[ds->no_svr_conn].tcp_socket);
 #else
-              			closesocket (svr_conns[ds->no_svr_conn].tcp_socket);
+              		closesocket (svr_conns[ds->no_svr_conn].tcp_socket);
 #endif /* WIN32 */
 
-	 			clnt_destroy(svr_conns[ds->no_svr_conn].tcp_clnt);
-				svr_conns[ds->no_svr_conn].tcp_clnt = NULL;
-               			svr_conns[ds->no_svr_conn].tcp_socket = tcp_socket;
-	  		}
+	 		clnt_destroy(svr_conns[ds->no_svr_conn].tcp_clnt);
+			svr_conns[ds->no_svr_conn].tcp_clnt = NULL;
+               		svr_conns[ds->no_svr_conn].tcp_socket = tcp_socket;
+	  	}
 /*
  *  if an asynchronous handle exists then close it (tcp connection)
  *  it will be recreated at the next asynchronous request by the
  *  asynch_server_import() function
  */
-			if (svr_conns[ds->no_svr_conn].asynch_clnt != NULL)
-			{
+		if (svr_conns[ds->no_svr_conn].asynch_clnt != NULL)
+		{
 /*
 #if !defined (WIN32)
-               			close (svr_conns[ds->no_svr_conn].asynch_listen_tcp_socket);
-               			close (svr_conns[ds->no_svr_conn].asynch_callback_tcp_socket);
+               		close (svr_conns[ds->no_svr_conn].asynch_listen_tcp_socket);
+               		close (svr_conns[ds->no_svr_conn].asynch_callback_tcp_socket);
 #else
-              			closesocket (svr_conns[ds->no_svr_conn].asynch_listen_tcp_socket);
-              			closesocket (svr_conns[ds->no_svr_conn].asynch_callback_tcp_socket);
+              		closesocket (svr_conns[ds->no_svr_conn].asynch_listen_tcp_socket);
+              		closesocket (svr_conns[ds->no_svr_conn].asynch_callback_tcp_socket);
 #endif * WIN32 *
  */
-				clnt_destroy (svr_conns[ds->no_svr_conn].asynch_clnt);
-				svr_conns[ds->no_svr_conn].asynch_clnt = NULL;
-			}
-			svr_conns[ds->no_svr_conn].clnt = clnt;
-			if (svr_conns[ds->no_svr_conn].rpc_protocol == D_UDP)
-			{
-			  	svr_conns[ds->no_svr_conn].udp_clnt = clnt;
-			}
-			else
-			{
-			    	svr_conns[ds->no_svr_conn].tcp_clnt = clnt;
-		  	}
-			sprintf (svr_conns[ds->no_svr_conn].server_host, "%s", host_name);
+			clnt_destroy (svr_conns[ds->no_svr_conn].asynch_clnt);
+			svr_conns[ds->no_svr_conn].asynch_clnt = NULL;
+		}
+		svr_conns[ds->no_svr_conn].clnt = clnt;
+		if (svr_conns[ds->no_svr_conn].rpc_protocol == D_UDP)
+		{
+		  	svr_conns[ds->no_svr_conn].udp_clnt = clnt;
+		}
+		else
+		{
+		    	svr_conns[ds->no_svr_conn].tcp_clnt = clnt;
+		}
+		sprintf (svr_conns[ds->no_svr_conn].server_host, "%s", host_name);
 /*
  * update program and version number because they could have changed
  * and increment the connection counter to force a reimport of the
  * device (in dev_rpc_connection())
  */
-			svr_conns[ds->no_svr_conn].prog_number = prog_number;
-			svr_conns[ds->no_svr_conn].vers_number = vers_number;
+		svr_conns[ds->no_svr_conn].prog_number = prog_number;
+		svr_conns[ds->no_svr_conn].vers_number = vers_number;
 
 /*
  * only return DS_OK if NULL procedure answered with RPC_SUCCESS this means
  * it is OK to reimport the device
  */
-			if (clnt_stat != RPC_SUCCESS)
-			{
-				*error = DevErr_BadServerConnection;
-				return(DS_NOTOK);
-			}
+		if (clnt_stat != RPC_SUCCESS)
+		{
+			*error = DevErr_BadServerConnection;
+			return(DS_NOTOK);
+		}
 /*
  * mark this connection as god again and increment the counter of no. of
  * reconnects
  */
-			svr_conns[ds->no_svr_conn].rpc_conn_status = GOOD_SVC_CONN;
-			svr_conns[ds->no_svr_conn].rpc_error_flag = GOOD_SVC_CONN;
-			svr_conns[ds->no_svr_conn].rpc_conn_counter++;
-			/*
-	       *  Initialise the current RPC timeout to the new connection. 
-	       */
-			clnt_control (clnt, CLSET_RETRY_TIMEOUT,
+		svr_conns[ds->no_svr_conn].rpc_conn_status = GOOD_SVC_CONN;
+		svr_conns[ds->no_svr_conn].rpc_error_flag = GOOD_SVC_CONN;
+		svr_conns[ds->no_svr_conn].rpc_conn_counter++;
+		/*
+	         *  Initialise the current RPC timeout to the new connection. 
+	         */
+		clnt_control (clnt, CLSET_RETRY_TIMEOUT,
 			    (char *) &svr_conns[ds->no_svr_conn].rpc_retry_timeout);
-			clnt_control (clnt, CLSET_TIMEOUT,
+		clnt_control (clnt, CLSET_TIMEOUT,
 			    (char *) &svr_conns[ds->no_svr_conn].rpc_timeout);
 
 /*
  * return without error, a call to dev_import() will be forced
  * in dev_rpc_connection() - andy 10feb99
  */
-			return(DS_OK);
-			/*
-	       *  try to import the device to see whether the server
-	       *  is realy ready and waiting and not only registered
-	       *  to the portmapper.
-	       */
+		return(DS_OK);
+		/*
+	         *  try to import the device to see whether the server
+	         *  is realy ready and waiting and not only registered
+	         *  to the portmapper.
+	         */
 
 /*
  * keep track of the no. of the connection and the no. of connections 
  * we will need this to test if this is a new connection to a server
  * or the old one - andy 29jan99
  */
-			no_conns = svr_conns[ds->no_svr_conn].no_conns;
-			no_svr_conn = ds->no_svr_conn;
+		no_conns = svr_conns[ds->no_svr_conn].no_conns;
+		no_svr_conn = ds->no_svr_conn;
 /*
  * if this is a no database device then tag the program number on so that
  * the dev_import() can detect this
  */
-			if (( import_status = dev_import ( ds->device_name,  ds->dev_access, 
-			    &new_ds, error ) == DS_OK ))
-			{
+		if (( import_status = dev_import ( ds->device_name,  ds->dev_access, &new_ds, error ) == DS_OK ))
+		{
 
 /*
  * dev_import returns DS_OK in three cases, these are :
@@ -2359,26 +2417,23 @@ long  check_rpc_connection (devserver ds, long *error)
  */
 			if (no_svr_conn == new_ds->no_svr_conn)
 			{
-
-			
 /*
  * only substract old connection from the list.
  * if dev_import really worked using old  client handle
  */
-
 				svr_conns[ds->no_svr_conn].no_conns--;
 /*
  * make a copy of the client handle for future use e.g. when changing protocol
  */
 			 	if (svr_conns[ds->no_svr_conn].rpc_protocol == D_UDP)
 			 	{
-			    	svr_conns[ds->no_svr_conn].udp_clnt = clnt;
-			     	svr_conns[ds->no_svr_conn].tcp_clnt = NULL;
+			    		svr_conns[ds->no_svr_conn].udp_clnt = clnt;
+			     		svr_conns[ds->no_svr_conn].tcp_clnt = NULL;
 			 	}
 			 	else
 			 	{
-			    	svr_conns[ds->no_svr_conn].udp_clnt = NULL;
-			     	svr_conns[ds->no_svr_conn].tcp_clnt = clnt;
+			    		svr_conns[ds->no_svr_conn].udp_clnt = NULL;
+			     		svr_conns[ds->no_svr_conn].tcp_clnt = clnt;
 		  		}
 
 			}
@@ -2408,8 +2463,7 @@ long  check_rpc_connection (devserver ds, long *error)
  */
 				if ((ds->rpc_timeout.tv_sec != 0) || (ds->rpc_timeout.tv_usec != 0))
 				{
-					dev_rpc_timeout(new_ds, CLSET_TIMEOUT,
-			                         &(ds->rpc_timeout), error);
+					dev_rpc_timeout(new_ds, CLSET_TIMEOUT, &(ds->rpc_timeout), error);
 				}
 			}
 
@@ -2427,8 +2481,8 @@ long  check_rpc_connection (devserver ds, long *error)
 			{
 		    		if ( nethost->config_flags.security == True )
 		    		{
-		       		sec_free_tcp_connection (ds, &svr_conns[ds->no_svr_conn]);
-		       		free_sec_key (ds);
+		       			sec_free_tcp_connection (ds, &svr_conns[ds->no_svr_conn]);
+		       			free_sec_key (ds);
 		    		}
 			}
 
@@ -2455,11 +2509,15 @@ long  check_rpc_connection (devserver ds, long *error)
 
 			free (new_ds);
 			svr_conns[ds->no_svr_conn].first_access_time = False;
-
+		 /*	
+		  * relisten  previuosly  registered events,the server
+		  * has to know, we are there
+		  */
+			relisten_events(ds);
 			return (DS_OK);
-			}
-			else
-			{
+		}
+		else
+		{
 		/*
 		 * if the dev_import failed, destroy the created
 		 * client handle and close the socket.
@@ -2473,23 +2531,22 @@ long  check_rpc_connection (devserver ds, long *error)
 			if (svr_conns[ds->no_svr_conn].rpc_protocol == D_TCP)
 			{
 #if !defined (WIN32)
-                                       close (tcp_socket);
+                               close (tcp_socket);
 #else
-                                       closesocket (tcp_socket);
+                               closesocket (tcp_socket);
 #endif /* WIN32 */
 			}
 
 			clnt_destroy (clnt);
-			}
 		}
-
-		else
-		{
-			/*hstring = clnt_spcreateerror ("check_rpc_connection");
-			dev_printerror (SEND,hstring);*/
-		}
-		*error = DevErr_BadServerConnection;
-		return (DS_NOTOK);
+	}
+	else
+	{
+		/*hstring = clnt_spcreateerror ("check_rpc_connection");
+		dev_printerror (SEND,hstring);*/
+	}
+	*error = DevErr_BadServerConnection;
+	return (DS_NOTOK);
 }
 
 /*+**********************************************************************
@@ -2636,6 +2693,9 @@ long  reinstall_rpc_connection (devserver ds, long *error)
 	ds->no_svr_conn      = new_ds->no_svr_conn;
 	ds->rpc_conn_counter = new_ds->rpc_conn_counter;
 	ds->dev_access       = new_ds->dev_access;
+
+	/* relisten to events*/
+	relisten_events(ds);
 
 	/*
 	 *  Free new new device handle created by dev_import().
