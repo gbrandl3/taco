@@ -11,9 +11,9 @@
 
  Original   :   December 1993
 
- Version    :	$Revision: 1.4 $
+ Version    :	$Revision: 1.5 $
 
- Date       :	$Date: 2003-11-28 15:50:54 $
+ Date       :	$Date: 2004-02-11 11:42:59 $
 
  Copyright (c) 1993 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -158,12 +158,9 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
 	register long		i;
 	long			i_nethost;
 
-#ifdef EBUG
 	u_char			*ip_ptr;
 
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\ndev_security() : entering routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\ndev_security() : entering routine \n");
 
 	*error = 0;
 
@@ -248,13 +245,8 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
 		user_auth.user_name = VW_USER_NAME;
 #endif /* vxworks */
 
-#ifdef EBUG
-		dev_printdebug (DBG_SEC,
-		    "dev_security() : user_name = %s\n", 
-		    user_auth.user_name);
-		dev_printdebug (DBG_SEC,
-		    "dev_security() : uid       = %d\n", user_auth.uid);
-#endif /* EBUG */
+		dev_printdebug (DBG_SEC, "dev_security() : user_name = %s\n", user_auth.user_name);
+		dev_printdebug (DBG_SEC, "dev_security() : uid       = %d\n", user_auth.uid);
 
 /*
  * get the group name and the group id of a user
@@ -286,13 +278,8 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
 		user_auth.gid        = VW_GROUP_ID;
 #endif	/* vxworks */
 
-#ifdef EBUG
-		dev_printdebug (DBG_SEC,
-		    "dev_security() : group_name = %s\n", 
-		    user_auth.group_name);
-		dev_printdebug (DBG_SEC,
-		    "dev_security() : gid        = %d\n", user_auth.gid);
-#endif /* EBUG */
+		dev_printdebug (DBG_SEC, "dev_security() : group_name = %s\n", user_auth.group_name);
+		dev_printdebug (DBG_SEC, "dev_security() : gid        = %d\n", user_auth.gid);
 
 		/*
 	    * get the IP address of the users host
@@ -306,29 +293,23 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
 			return (DS_NOTOK);
 		}
 
-		sprintf (ip_str,"%d.%d.%d.%d",(u_char) host_info->h_addr[0],
+		snprintf (ip_str, sizeof(ip_str), "%d.%d.%d.%d",(u_char) host_info->h_addr[0],
 		    (u_char) host_info->h_addr[1],
 		    (u_char) host_info->h_addr[2],
 		    (u_char) host_info->h_addr[3]);
 #else  /* !vxworks */
 		host_addr.int_addr = hostGetByName(user_auth.host_name);
-		sprintf (ip_str,"%d.%d.%d.%d",(u_char) host_addr.char_addr[0],
+		snprintf (ip_str, sizeof(ip_str), "%d.%d.%d.%d",(u_char) host_addr.char_addr[0],
 		    (u_char) host_addr.char_addr[1],
 		    (u_char) host_addr.char_addr[2],
 		    (u_char) host_addr.char_addr[3]);
 #endif /* !vxworks */
 		user_auth.ip = inet_network (ip_str);
 
-#ifdef EBUG
 		ip_ptr = (u_char *) &user_auth.ip;
-		dev_printdebug (DBG_SEC,
-		    "dev_security() : host_name = %s\n", 
-		    user_auth.host_name);
-		dev_printdebug (DBG_SEC,
-		    "dev_security() : ip_str    = %s\n", 
-		    ip_str);
-		dev_printdebug (DBG_SEC,
-		    "dev_security() : ip        = %d.%d.%d.%d\n", 
+		dev_printdebug (DBG_SEC, "dev_security() : host_name = %s\n", user_auth.host_name);
+		dev_printdebug (DBG_SEC, "dev_security() : ip_str    = %s\n", ip_str);
+		dev_printdebug (DBG_SEC, "dev_security() : ip        = %d.%d.%d.%d\n", 
 #ifndef linux
 		    ip_ptr[0], ip_ptr[1], ip_ptr[2], ip_ptr[3]);
 #else
@@ -337,7 +318,6 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
  */
 		    ip_ptr[3], ip_ptr[2], ip_ptr[1], ip_ptr[0]);
 #endif /* !linux */
-#endif /* EBUG */
 
 /*
  * Create the unique client identification.
@@ -379,10 +359,7 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
 		return (DS_NOTOK);
 	}
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	                "\ndev_security() : leaving routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\ndev_security() : leaving routine \n");
 
 	return (DS_OK);
 }
@@ -431,12 +408,9 @@ static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
 	long			ret;
 	short			i;
 	long			i_nethost;
-#ifdef EBUG
 	u_char			*ip_ptr;
 
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\nsec_check() : entering routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\nsec_check() : entering routine \n");
 
 	*error = 0;
 /*
@@ -455,7 +429,7 @@ static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
 	 * and store the in the structure sec_default_access.
 	 */
 
-	sprintf (res_name, "default");
+	snprintf (res_name, sizeof(res_name), "default");
 	res_tab.resource_name = res_name;
 	res_tab.resource_type = D_VAR_STRINGARR;
 	res_tab.resource_adr  = &default_access;
@@ -466,11 +440,11 @@ static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
  */
 	if (i_nethost > 0)
 	{
-		sprintf (res_path, "//%s/SEC/MINIMAL/ACC_RIGHT",multi_nethost[i_nethost].nethost);
+		snprintf (res_path, sizeof(res_path), "//%s/SEC/MINIMAL/ACC_RIGHT",multi_nethost[i_nethost].nethost);
 	}
 	else
 	{
-		sprintf (res_path, "SEC/MINIMAL/ACC_RIGHT");
+		snprintf (res_path, sizeof(res_path), "SEC/MINIMAL/ACC_RIGHT");
 	}
 
 	if (db_getresource (res_path, &res_tab, res_tab_size, error)==DS_NOTOK)
@@ -535,15 +509,11 @@ static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
 		alloc_ip_list = 0;   /* do not try to free() it later */
 	}
 
-#ifdef EBUG
-	dev_printdebug (DBG_SEC,
-	    "sec_check() : def_access = %d\n", 
-	    sec_default_access.access_right);
+	dev_printdebug (DBG_SEC, "sec_check() : def_access = %d\n", sec_default_access.access_right);
 	for (i=0; i<sec_default_access.ip_list_length; i++)
 	{
 		ip_ptr = (u_char *)&sec_default_access.ip_addr_list[i];
-		dev_printdebug (DBG_SEC,
-		    "sec_check() : def_ip = %d.%d.%d.%d\n",
+		dev_printdebug (DBG_SEC, "sec_check() : def_ip = %d.%d.%d.%d\n",
 #ifndef linux
 		    ip_ptr[0], ip_ptr[1], ip_ptr[2], ip_ptr[3]);
 #else
@@ -553,7 +523,6 @@ static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
 		    ip_ptr[3], ip_ptr[2], ip_ptr[1], ip_ptr[0]);
 #endif /* !linux */
 	}
-#endif /* EBUG */
 	/*
 	 * free the allocated string array
 	 */
@@ -594,15 +563,14 @@ static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
  */
 	if (i_nethost > 0)
 	{
-		sprintf (res_path, "//%s/SEC/USER/ACC_RIGHT",multi_nethost[i_nethost].nethost);
+		snprintf (res_path, sizeof(res_path), "//%s/SEC/USER/ACC_RIGHT",multi_nethost[i_nethost].nethost);
 	}
 	else
 	{
-		sprintf (res_path, "SEC/USER/ACC_RIGHT");
+		snprintf (res_path, sizeof(res_path), "SEC/USER/ACC_RIGHT");
 	}
 
-	ret = check_access_hierarchy (dev_name, access_right, 
-	    user_auth.user_name, res_path, error);
+	ret = check_access_hierarchy (dev_name, access_right, user_auth.user_name, res_path, error);
 	if (ret != DS_WARNING)
 	{
 		return (ret);
@@ -616,11 +584,11 @@ static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
 
 	if (i_nethost > 0)
 	{
-		sprintf (res_path, "//%s/SEC/GROUP/ACC_RIGHT",multi_nethost[i_nethost].nethost);
+		snprintf (res_path, sizeof(res_path), "//%s/SEC/GROUP/ACC_RIGHT",multi_nethost[i_nethost].nethost);
 	}
 	else
 	{
-		sprintf (res_path, "SEC/GROUP/ACC_RIGHT");
+		snprintf (res_path, sizeof(res_path), "SEC/GROUP/ACC_RIGHT");
 	}
 
 	ret = check_access_hierarchy (dev_name, access_right, 
@@ -639,12 +607,8 @@ static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
 		return (DS_NOTOK);
 	}
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "sec_check() : default access OK\n");
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "sec_check() : leaving routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "sec_check() : default access OK\n");
+	dev_printdebug (DBG_TRACE | DBG_SEC, "sec_check() : leaving routine \n");
 
 	return (DS_OK);
 }
@@ -684,18 +648,10 @@ static long check_access_hierarchy (char *dev_name, long access_right,
 	DevVarStringArray	member_access;
 	long			ret;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\ncheck_access_hierarchy() : entering routine \n");
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "check_access_hierarchy() : name         = %s\n", name);
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "check_access_hierarchy() : access_right = %d\n", 
-	    access_right);
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "check_access_hierarchy() : dev_name     = %s\n", 
-	    dev_name);
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\ncheck_access_hierarchy() : entering routine \n");
+	dev_printdebug (DBG_TRACE | DBG_SEC, "check_access_hierarchy() : name         = %s\n", name);
+	dev_printdebug (DBG_TRACE | DBG_SEC, "check_access_hierarchy() : access_right = %d\n", access_right);
+	dev_printdebug (DBG_TRACE | DBG_SEC, "check_access_hierarchy() : dev_name     = %s\n", dev_name);
 
 	*error = 0;
 	domain_access.length   = 0;
@@ -759,10 +715,7 @@ static long check_access_hierarchy (char *dev_name, long access_right,
 		free_var_str_array (&domain_access);
 		return (ret);
 		}
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "check_access_hierarchy() : no access right for device\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "check_access_hierarchy() : no access right for device\n");
 
 	/*
 	 * Check the rights specified for the device family.
@@ -778,10 +731,7 @@ static long check_access_hierarchy (char *dev_name, long access_right,
 		free_var_str_array (&domain_access);
 		return (ret);
 		}
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "check_access_hierarchy() : no access right for family\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "check_access_hierarchy() : no access right for family\n");
 
 	/*
 	 * Check the rights specified for the domain of the device.
@@ -797,10 +747,7 @@ static long check_access_hierarchy (char *dev_name, long access_right,
 		free_var_str_array (&domain_access);
 		return (ret);
 		}
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "check_access_hierarchy() : no access right for domain\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "check_access_hierarchy() : no access right for domain\n");
 
 	/* 
 	 * Free variable string arrays, allcoated by db_getresource().
@@ -810,10 +757,7 @@ static long check_access_hierarchy (char *dev_name, long access_right,
 	free_var_str_array (&family_access);
 	free_var_str_array (&domain_access);
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "check_access_hierarchy() : leaving routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "check_access_hierarchy() : leaving routine\n");
 
 	return (DS_WARNING);
 }
@@ -857,10 +801,7 @@ static long sec_user_ident (SecUserAuth user_auth,
 
 	short			i, k, j;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\nsec_user_ident() : entering routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\nsec_user_ident() : entering routine \n");
 
 	*error = 0;
 	ident.length   = 0;
@@ -882,11 +823,11 @@ static long sec_user_ident (SecUserAuth user_auth,
  */
 	if (i_nethost > 0)
 	{
-		sprintf (res_path, "//%s/SEC/USER/IDENT",multi_nethost[i_nethost].nethost);
+		snprintf (res_path, sizeof(res_path), "//%s/SEC/USER/IDENT",multi_nethost[i_nethost].nethost);
 	}
 	else
 	{
-		sprintf (res_path, "SEC/USER/IDENT");
+		snprintf (res_path, sizeof(res_path), "SEC/USER/IDENT");
 	}
 
 	if (db_getresource (res_path, &res_tab, 1, error) == DS_NOTOK)
@@ -906,10 +847,7 @@ static long sec_user_ident (SecUserAuth user_auth,
 		/*
 	    * check the uid
 	    */
-#ifdef EBUG
-		dev_printdebug (DBG_SEC,
-		    "sec_user_ident() : uid = %d res_uid = %d\n", user_auth.uid, uid);
-#endif /* EBUG */
+		dev_printdebug (DBG_SEC, "sec_user_ident() : uid = %d res_uid = %d\n", user_auth.uid, uid);
 
 		if ( uid != user_auth.uid )
 		{
@@ -959,51 +897,39 @@ static long sec_user_ident (SecUserAuth user_auth,
 
 				if ( j != 0 )
 				{
-#ifdef EBUG
-					dev_printdebug (DBG_SEC,
-					    "sec_user_ident() : User network access OK!\n");
-#endif /* EBUG */
-					/*
-	 		 		 * Free the allocated variable string 
-					   array.
-	 		 		 */
+					dev_printdebug (DBG_SEC, "sec_user_ident() : User network access OK!\n");
+/*
+ * Free the allocated variable string array.
+ */
 					free_var_str_array (&ident);
 					return (DS_OK);
 				}
 			}
 
-			/*
-	 		 * Free the allocated variable string array
-	 		 */
+/*
+ * Free the allocated variable string array
+ */
 			free_var_str_array (&ident);
-
 			*error = DevErr_NetworkAccessDenied;
 			return (DS_NOTOK);
 		}
 
 	}
 
-#ifdef EBUG
-	dev_printdebug (DBG_SEC,
-	    "sec_user_ident() : No user network access specified!\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_SEC, "sec_user_ident() : No user network access specified!\n");
 
-	/*
-	 * Free the allocated variable string array
-	 */
+/*
+ * Free the allocated variable string array
+ */
 
 	free_var_str_array (&ident);
 
-
-	/*
-	 * Not sufficient user rights specified.
-	 * Check the group ID and the network access for the group.
-	 */
-
-	/*
-	 * Read the group identification from the resource database.
-	 */
-
+/*
+ * Not sufficient user rights specified.
+ * Check the group ID and the network access for the group.
+ *
+ * Read the group identification from the resource database.
+ */
 	res_tab.resource_name = user_auth.group_name;
 	res_tab.resource_type = D_VAR_STRINGARR;
 	res_tab.resource_adr  = &ident;
@@ -1016,11 +942,11 @@ static long sec_user_ident (SecUserAuth user_auth,
  */
 	if (i_nethost > 0)
 	{
-		sprintf (res_path, "//%s/SEC/GROUP/IDENT",multi_nethost[i_nethost].nethost);
+		snprintf (res_path, sizeof(res_path), "//%s/SEC/GROUP/IDENT",multi_nethost[i_nethost].nethost);
 	}
 	else
 	{
-		sprintf (res_path, "SEC/GROUP/IDENT");
+		snprintf (res_path, sizeof(res_path), "SEC/GROUP/IDENT");
 	}
 
 	if (db_getresource (res_path, &res_tab, 1, error) == DS_NOTOK)
@@ -1037,13 +963,10 @@ static long sec_user_ident (SecUserAuth user_auth,
 	{
 		gid = atol (ident.sequence[0]);
 
-		/*
-	    * check the gid
-	    */
-#ifdef EBUG
-		dev_printdebug (DBG_SEC,
-		    "sec_user_ident() : gid = %d res_gid = %d\n", user_auth.gid, gid);
-#endif /* EBUG */
+/*
+ * check the gid
+ */
+		dev_printdebug (DBG_SEC, "sec_user_ident() : gid = %d res_gid = %d\n", user_auth.gid, gid);
 
 		if ( gid != user_auth.gid )
 		{
@@ -1089,14 +1012,10 @@ static long sec_user_ident (SecUserAuth user_auth,
 
 				if ( j != 0 )
 				{
-#ifdef EBUG
-					dev_printdebug (DBG_SEC,
-					    "sec_user_ident() : Group network access OK!\n");
-#endif /* EBUG */
-					/*
-	 		 		 * Free the allocated variable string 
-					   array.
-	 		 		 */
+					dev_printdebug (DBG_SEC, "sec_user_ident() : Group network access OK!\n");
+/*
+ * Free the allocated variable string array.
+ */
 					free_var_str_array (&ident);
 					return (DS_OK);
 				}
@@ -1113,10 +1032,7 @@ static long sec_user_ident (SecUserAuth user_auth,
 
 	}
 
-#ifdef EBUG
-	dev_printdebug (DBG_SEC,
-	    "sec_user_ident() : No group network access specified!\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_SEC, "sec_user_ident() : No group network access specified!\n");
 
 	/*
 	 * Free the allocated variable string array
@@ -1164,10 +1080,7 @@ static long sec_user_ident (SecUserAuth user_auth,
 
 		if ( j != 0 )
 		{
-#ifdef EBUG
-			dev_printdebug (DBG_SEC,
-			    "sec_user_ident() : Default network access OK!\n");
-#endif /* EBUG */
+			dev_printdebug (DBG_SEC, "sec_user_ident() : Default network access OK!\n");
 			return (DS_OK);
 		}
 	}
@@ -1207,10 +1120,7 @@ static long search_dev_name (char *dev_name, char str_array[3][LONG_NAME_SIZE],
 
 	*error = 0;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\nsearch_dev_name() : entering routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\nsearch_dev_name() : entering routine \n");
 
 /*
  * check if nethost ahs been specified e.g. "//nethost.domain/family/member"
@@ -1226,7 +1136,7 @@ static long search_dev_name (char *dev_name, char str_array[3][LONG_NAME_SIZE],
 		dev_name++;
 	}
 
-	sprintf (name, "%s", dev_name);
+	snprintf (name, sizeof(name), "%s", dev_name);
 	ptr1 = name;
 	ptr2 = name;
 
@@ -1257,19 +1167,11 @@ static long search_dev_name (char *dev_name, char str_array[3][LONG_NAME_SIZE],
 		return (DS_NOTOK);
 	}
 
-	sprintf (str_array[k], "%s", name);
+	snprintf (str_array[k], sizeof(str_array[k]), "%s", name);
 
-#ifdef EBUG
-	dev_printdebug (DBG_SEC,
-	    "search_dev_name() : resource names \n");
-	dev_printdebug (DBG_SEC, "DO= %s  FA= %s  ME=%s\n",
-	    str_array[0], str_array[1], str_array[2]);
-#endif /* EBUG */
-
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "search_dev_name() : leaving routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_SEC, "search_dev_name() : resource names \n");
+	dev_printdebug (DBG_SEC, "DO= %s  FA= %s  ME=%s\n", str_array[0], str_array[1], str_array[2]);
+	dev_printdebug (DBG_TRACE | DBG_SEC, "search_dev_name() : leaving routine \n");
 
 	return (DS_OK);
 }
@@ -1309,10 +1211,7 @@ static long check_access_right (char *name, long requested_access,
 	register long   i;
 	register long   k;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\ncheck_access_right() : entering routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\ncheck_access_right() : entering routine \n");
 
 	*error = 0;
 
@@ -1351,14 +1250,8 @@ static long check_access_right (char *name, long requested_access,
 				    DevSec_List[k].access_name) == 0)
 				{
 					max_access_right = DevSec_List[k].access_right;
-#ifdef EBUG
-					dev_printdebug (DBG_SEC,
-					    "check_access_right() : max_access_right = %d\n", 
-					    max_access_right);
-					dev_printdebug (DBG_SEC,
-					    "check_access_right() : requested_access = %d\n", 
-					    requested_access);
-#endif /* EBUG */
+					dev_printdebug (DBG_SEC, "check_access_right() : max_access_right = %d\n", max_access_right);
+					dev_printdebug (DBG_SEC, "check_access_right() : requested_access = %d\n", requested_access);
 					break;
 				}
 			}
@@ -1389,10 +1282,7 @@ static long check_access_right (char *name, long requested_access,
 		}
 	}
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "check_access_right() : leaving routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "check_access_right() : leaving routine \n");
 
 	/*
 	 * return a warning to indicate that the search has to go on.
@@ -1451,10 +1341,7 @@ static long create_client_id (SecUserAuth user_auth, long *ret_client_id,
 	time_t 	time_stamp;
 	long 	pid;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\ncreate_client_id() : entering routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\ncreate_client_id() : entering routine \n");
 
 	*error = 0;
 
@@ -1491,12 +1378,8 @@ static long create_client_id (SecUserAuth user_auth, long *ret_client_id,
 
 	*ret_client_id = client_id;
 
-#ifdef EBUG
-	dev_printdebug (DBG_SEC,
-	    "create_client_id() : client_id = %d\n", client_id);
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "create_client_id() : leaving routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_SEC, "create_client_id() : client_id = %d\n", client_id);
+	dev_printdebug (DBG_TRACE | DBG_SEC, "create_client_id() : leaving routine \n");
 
 	return (DS_OK);
 }
@@ -1522,10 +1405,7 @@ static long get_connection_id (long *connection_id, long *error)
 	long   	*new_connections;
 	short    i;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\nget_connection_id() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\nget_connection_id() : entering routine\n");
 
 	*error = 0;
 
@@ -1605,17 +1485,11 @@ static long get_connection_id (long *connection_id, long *error)
 
 long _DLLFunc free_connection_id_vers3 (long connection_id, long *error)
 {
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "free_connection_id_vers3() : entering routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "free_connection_id_vers3() : entering routine\n");
 
 	conn_list.sec_keys[(_Int)connection_id] = FREE_CONNECTION;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\nfree_connection_id_vers3() : leaving routine\n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\nfree_connection_id_vers3() : leaving routine\n");
 
 	return (*error=DS_OK);
 }
@@ -1644,10 +1518,7 @@ long _DLLFunc create_sec_key (devserver ds, long *error)
 
 	*error = 0;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\ncreate_sec_key() : entering routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\ncreate_sec_key() : entering routine \n");
 
 	/*
 	 * Ignore any security key treatment in case of
@@ -1678,17 +1549,10 @@ long _DLLFunc create_sec_key (devserver ds, long *error)
 		    ds->dev_access +
 		    ds->prog_number;
 
-#ifdef EBUG
-		dev_printdebug (DBG_SEC,
-		    "create_sec_key() : sec_key   = %d\n", 
-			 conn_list.sec_keys[(_Int)connection_id]);
-#endif /* EBUG */
+		dev_printdebug (DBG_SEC, "create_sec_key() : sec_key   = %d\n", conn_list.sec_keys[(_Int)connection_id]);
 	}
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "create_sec_key() : leaving routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "create_sec_key() : leaving routine \n");
 
 	return (DS_OK);
 }
@@ -1720,10 +1584,7 @@ long _DLLFunc verify_sec_key (devserver ds, long *ret_client_id, long *error)
 
 	*error = 0;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\nverify_sec_key() : entering routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\nverify_sec_key() : entering routine \n");
 
 	/*
 	 * Ignore any security key treatment in case of
@@ -1746,13 +1607,9 @@ long _DLLFunc verify_sec_key (devserver ds, long *ret_client_id, long *error)
 		connection_id = ds->ds_id >> CONNECTIONS_SHIFT;
 		connection_id = connection_id & CONNECTIONS_MASK;
 
-#ifdef EBUG
-		dev_printdebug (DBG_SEC,
-		    "verify_sec_key() : new sec_key = %d\n", sec_key);
-		dev_printdebug (DBG_SEC,
-		    "verify_sec_key() : sec_key = %d  conn_id = %d\n", 
+		dev_printdebug (DBG_SEC, "verify_sec_key() : new sec_key = %d\n", sec_key);
+		dev_printdebug (DBG_SEC, "verify_sec_key() : sec_key = %d  conn_id = %d\n", 
 			 conn_list.sec_keys[(_Int)connection_id], connection_id);
-#endif /* EBUG */
 
 		if ( sec_key != conn_list.sec_keys[(_Int)connection_id] )
 		{
@@ -1767,10 +1624,7 @@ long _DLLFunc verify_sec_key (devserver ds, long *ret_client_id, long *error)
 
 	*ret_client_id = client_id;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "verify_sec_key() : leaving routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "verify_sec_key() : leaving routine \n");
 
 	return (DS_OK);
 }
@@ -1794,10 +1648,7 @@ void _DLLFunc free_sec_key (devserver ds)
 {
 	long	connection_id;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\nfree_sec_key() : entering routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\nfree_sec_key() : entering routine \n");
 
 	/*
 	 * Ignore any security key treatment in case of
@@ -1809,19 +1660,13 @@ void _DLLFunc free_sec_key (devserver ds)
 		connection_id = ds->ds_id >> CONNECTIONS_SHIFT;
 		connection_id = connection_id & CONNECTIONS_MASK;
 
-#ifdef EBUG
-		dev_printdebug (DBG_SEC,
-		    "free_sec_key() : sec_key = %d  conn_id = %d\n", 
+		dev_printdebug (DBG_SEC, "free_sec_key() : sec_key = %d  conn_id = %d\n", 
 		    conn_list.sec_keys[(_Int)connection_id], connection_id);
-#endif /* EBUG */
 
 		conn_list.sec_keys[(_Int)connection_id] = FREE_CONNECTION;
 	}
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "free_sec_key() : leaving routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "free_sec_key() : leaving routine \n");
 }
 
 
@@ -1861,17 +1706,10 @@ long _DLLFunc sec_svc_import (DevServerDevices *device, long connection_id,
 	int          len  = sizeof(device->si_peeraddr);
 #endif /* _XOPEN_SOURCE_EXTENDED */
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\nsec_svc_import() : entering routine \n");
-	dev_printdebug (DBG_SEC,
-	    "sec_svc_import() : client_id     = %d\n", client_id);
-	dev_printdebug (DBG_SEC,
-	    "sec_svc_import() : connection_id = %d\n", 
-	    connection_id);
-	dev_printdebug (DBG_SEC,
-	    "sec_svc_import() : access_right  = %d\n",access_right);
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\nsec_svc_import() : entering routine \n");
+	dev_printdebug (DBG_SEC, "sec_svc_import() : client_id     = %d\n", client_id);
+	dev_printdebug (DBG_SEC, "sec_svc_import() : connection_id = %d\n", connection_id);
+	dev_printdebug (DBG_SEC, "sec_svc_import() : access_right  = %d\n",access_right);
 
 	*error = 0;
 
@@ -2020,10 +1858,7 @@ long _DLLFunc sec_svc_import (DevServerDevices *device, long connection_id,
 		break;
 	}
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "sec_svc_import() : leaving routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "sec_svc_import() : leaving routine \n");
 
 	return (DS_OK);
 }
@@ -2050,16 +1885,10 @@ long _DLLFunc sec_svc_import (DevServerDevices *device, long connection_id,
 long _DLLFunc sec_svc_free (DevServerDevices *device, long connection_id,
 			    long client_id, long access_right, long *error)
 {
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\nsec_svc_free() : entering routine \n");
-	dev_printdebug (DBG_SEC,
-	    "sec_svc_free() : client_id     = %d\n", client_id);
-	dev_printdebug (DBG_SEC,
-	    "sec_svc_free() : connection_id = %d\n", connection_id);
-	dev_printdebug (DBG_SEC,
-	    "sec_svc_free() : access_right  = %d\n", access_right);
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\nsec_svc_free() : entering routine \n");
+	dev_printdebug (DBG_SEC, "sec_svc_free() : client_id     = %d\n", client_id);
+	dev_printdebug (DBG_SEC, "sec_svc_free() : connection_id = %d\n", connection_id);
+	dev_printdebug (DBG_SEC, "sec_svc_free() : access_right  = %d\n", access_right);
 
 	*error = 0;
 
@@ -2086,10 +1915,7 @@ long _DLLFunc sec_svc_free (DevServerDevices *device, long connection_id,
 		}
 	}
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "sec_svc_free() : leaving routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "sec_svc_free() : leaving routine \n");
 
 	return (DS_OK);
 }
@@ -2127,16 +1953,10 @@ long _DLLFunc sec_svc_cmd (DevServerDevices *device, long connection_id,
 #endif /* __cplusplus */
 	long		min_access_right = -1234L;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\nsec_svc_cmd() : entering routine \n");
-	dev_printdebug (DBG_SEC,
-	    "sec_svc_cmd() : client_id     = %d\n", client_id);
-	dev_printdebug (DBG_SEC,
-	    "sec_svc_cmd() : connection_id = %d\n", connection_id);
-	dev_printdebug (DBG_SEC,
-	    "sec_svc_cmd() : access_right  = %d\n", access_right);
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\nsec_svc_cmd() : entering routine \n");
+	dev_printdebug (DBG_SEC, "sec_svc_cmd() : client_id     = %d\n", client_id);
+	dev_printdebug (DBG_SEC, "sec_svc_cmd() : connection_id = %d\n", connection_id);
+	dev_printdebug (DBG_SEC, "sec_svc_cmd() : access_right  = %d\n", access_right);
 
 	*error = 0;
 
@@ -2260,10 +2080,7 @@ long _DLLFunc sec_svc_cmd (DevServerDevices *device, long connection_id,
 			return (DS_NOTOK);
 	}
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-		    "sec_svc_cmd() : leaving routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "sec_svc_cmd() : leaving routine \n");
 	return (DS_OK);
 }
 
@@ -2302,10 +2119,7 @@ long _DLLFunc sec_tcp_connection (long requested_access, CLIENT * *clnt,
 
 	*error = 0;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\nsec_tcp_connection() : entering routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\nsec_tcp_connection() : entering routine \n");
 
 	/*
 	 * Execute the protocol change only if for a single user
@@ -2432,10 +2246,7 @@ long _DLLFunc sec_tcp_connection (long requested_access, CLIENT * *clnt,
 	svr_conn->open_si_connections++;
 	svr_conn->rpc_protocol = D_TCP;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "sec_tcp_connection() : leaving routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "sec_tcp_connection() : leaving routine \n");
 
 	return (DS_OK);
 }
@@ -2463,10 +2274,7 @@ void _DLLFunc sec_free_tcp_connection (devserver ds, server_connections *svr_con
 {
 	long 	error = 0;
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\nsec_free_tcp_connection() : entering routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\nsec_free_tcp_connection() : entering routine \n");
 
 	/*
 	 * Decrease the number of single user accesses on a connection 
@@ -2496,10 +2304,7 @@ void _DLLFunc sec_free_tcp_connection (devserver ds, server_connections *svr_con
 		}
 	}
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "sec_tcp_connection() : leaving routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "sec_tcp_connection() : leaving routine \n");
 
 	return;
 }
@@ -2533,10 +2338,7 @@ static long sec_verify_tcp_conn (DevServerDevices *device)
 #endif /* XOPEN_SOURCE_EXTENDED */
 
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "\nsec_verify_tcp_conn() : entering routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "\nsec_verify_tcp_conn() : entering routine \n");
 
 	/*
 	 * Is the device in single user mode and
@@ -2573,19 +2375,12 @@ static long sec_verify_tcp_conn (DevServerDevices *device)
 		  * Cancel the single user mode.
 		  */
 
-#ifdef EBUG
-				dev_printdebug (DBG_SEC,
-				    "sec_verify_tcp_conn() : Canceled single user mode!\n");
-				dev_printdebug (DBG_SEC,
-				    "sec_verify_tcp_conn() : host = %X  ref_host = %X\n",
-				    peeraddr.sin_addr.s_addr, 
-				    device->si_peeraddr.sin_addr.s_addr);
-				dev_printdebug (DBG_SEC,
-				    "sec_verify_tcp_conn() : port = %d  ref_port = %d\n",
+				dev_printdebug (DBG_SEC, "sec_verify_tcp_conn() : Canceled single user mode!\n");
+				dev_printdebug (DBG_SEC, "sec_verify_tcp_conn() : host = %X  ref_host = %X\n",
+				    peeraddr.sin_addr.s_addr, device->si_peeraddr.sin_addr.s_addr);
+				dev_printdebug (DBG_SEC, "sec_verify_tcp_conn() : port = %d  ref_port = %d\n",
 				    peeraddr.sin_port, device->si_peeraddr.sin_port);
-				dev_printdebug (DBG_SEC,
-				    "sec_verify_tcp_conn() : errno = %d\n", errno);
-#endif /* EBUG */
+				dev_printdebug (DBG_SEC, "sec_verify_tcp_conn() : errno = %d\n", errno);
 
 				device->admin_user_flag  = False;
 				device->single_user_flag = False;
@@ -2595,10 +2390,7 @@ static long sec_verify_tcp_conn (DevServerDevices *device)
 		}
 	}
 
-#ifdef EBUG
-	dev_printdebug (DBG_TRACE | DBG_SEC,
-	    "sec_verify_tcp_conn() : leaving routine \n");
-#endif /* EBUG */
+	dev_printdebug (DBG_TRACE | DBG_SEC, "sec_verify_tcp_conn() : leaving routine \n");
 
 	return (DS_OK);
 }
