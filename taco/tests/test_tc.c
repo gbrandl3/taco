@@ -12,9 +12,9 @@
  *
  * Original:	November 1996
  *
- * Version: 	$Revision: 1.3 $
+ * Version: 	$Revision: 1.4 $
  *
- * Date: 	$Date: 2004-02-19 15:56:15 $
+ * Date: 	$Date: 2004-11-03 17:44:50 $
  *
  * Copyright (c) 1996 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -275,8 +275,8 @@ int main (int argc, char **argv)
 		else if (strcmp("DevString", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets((char *) string_data);  /** for return **/
-			if (gets((char *) string_data) == NULL)
+			fgets((char *) string_data, 500, stdin);  /** for return **/
+			if (fgets((char *) string_data, 500, stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
@@ -352,8 +352,8 @@ int main (int argc, char **argv)
 		else if (strcmp("DevVarCharArray", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
@@ -376,24 +376,24 @@ int main (int argc, char **argv)
 			for (i=0; i<3; i++)
 				str_arr_data.sequence[i] = (char *) malloc(101);
 
-			gets(str_local);  /** for return **/
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
 
 			printf("Type in the first string : ");
-			if (gets( (char *) str_arr_data.sequence[0]) == NULL)
+			if (fgets((char *) str_arr_data.sequence[0], 100, stdin) == NULL)
 			{
 				printf("test_tc : first gets failed.\n");
 				continue;
 			};
 
 			printf("Type in the second string : ");
-			if (gets( (char *) str_arr_data.sequence[1]) == NULL)
+			if (fgets( (char *) str_arr_data.sequence[1], 100, stdin) == NULL)
 			{
 				printf("test_tc : second gets failed.\n");
 				continue;
 			};
 
 			printf("Type in the third string : ");
-			if (gets( (char *) str_arr_data.sequence[2]) == NULL)
+			if (fgets( (char *) str_arr_data.sequence[2], 100, stdin) == NULL)
 			{
 				printf("test_tc : third gets failed.\n");
 				continue;
@@ -522,8 +522,8 @@ int main (int argc, char **argv)
 		if (strcmp("DevString", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
@@ -539,8 +539,8 @@ int main (int argc, char **argv)
 		else if (strcmp("DevIntFloat", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
@@ -557,8 +557,8 @@ int main (int argc, char **argv)
 		else if (strcmp("DevFloatReadPoint", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
@@ -575,8 +575,8 @@ int main (int argc, char **argv)
 		else if (strcmp("DevStateFloatReadPoint", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
@@ -593,8 +593,8 @@ int main (int argc, char **argv)
 		else if (strcmp("DevLongReadPoint", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
@@ -612,8 +612,8 @@ int main (int argc, char **argv)
 		if (strcmp("DevDoubleReadPoint", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
@@ -630,8 +630,8 @@ int main (int argc, char **argv)
 		else if (strcmp("DevVarCharArray", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
@@ -651,8 +651,8 @@ int main (int argc, char **argv)
 		else if (strcmp("DevVarStringArray", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
@@ -682,8 +682,8 @@ int main (int argc, char **argv)
 		else if (strcmp("DevVarUShortArray", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 			continue;
@@ -710,8 +710,8 @@ int main (int argc, char **argv)
 		else if (strcmp("DevVarShortArray", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
@@ -739,8 +739,8 @@ int main (int argc, char **argv)
 		else if (strcmp("DevVarULongArray", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
@@ -767,8 +767,8 @@ int main (int argc, char **argv)
 		else if (strcmp("DevVarLongArray", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
@@ -795,8 +795,8 @@ int main (int argc, char **argv)
 		if (strcmp("DevVarFloatArray", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
@@ -823,8 +823,8 @@ int main (int argc, char **argv)
 		else if (strcmp("DevVarDoubleArray", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
@@ -851,8 +851,8 @@ int main (int argc, char **argv)
 		if (strcmp("DevMulMove", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
@@ -872,8 +872,8 @@ int main (int argc, char **argv)
 		if (strcmp("DevMotorLong", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
@@ -892,8 +892,8 @@ int main (int argc, char **argv)
 		else if (strcmp("DevMotorFloat", type_name) == 0)
 		{
 			printf("Type in the value : ");
-			gets(str_local);  /** for return **/
-			if (gets(str_local) == NULL)
+			fgets(str_local, sizeof(str_local), stdin);  /** for return **/
+			if (fgets(str_local, sizeof(str_local), stdin) == NULL)
 			{
 				printf("test_tc : gets failed.\n");
 				continue;
