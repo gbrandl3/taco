@@ -95,7 +95,8 @@ AC_DEFUN([TACO_ASCII_API],
 			no)	ascii=no;;
 			*)	AC_MSG_ERROR([bad value ${enable_ascii} for --enable-ascii]);;
 		esac], [ascii=yes])
-	AC_CHECK_HEADERS([dlfcn.h dl.h], [], [ascii=no])
+	AC_CHECK_HEADERS([dlfcn.h], [], [
+		AC_CHECK_HEADERS([dl.h], [], [ascii=no])])
 	if test "x$ascii" = "xyes" ; then
 		TACO_ASCII_LIBS="\$(top_builddir)/lib/ascii/libascapi.la \$(top_builddir)/lib/tc/libtcapi.la"
 	fi
@@ -181,10 +182,12 @@ AC_DEFUN([TACO_DEFINES],
 	case "$target" in
             i[[3456]]86-*-linux-* | i[[3456]]86-*-linux | i[[3456]]86-*-cygwin*)
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -Dx86=1 -DNDBM" ;;
-	    powerpc-apple-darwin* | i386-*-freebsd* )
+	    i386-*-freebsd* )
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -Dx86=1 -DNDBM" ;;
             m68k-*-linux-*) 
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -Dm68k=1 -DNDBM" ;;
+	    powerpc-apple-darwin*)
+                        taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -DNDBM" ;;
             *-*-solar*-* | *-*-sun*-*)
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -D_solaris=1 -D__solaris__=1 -DNDBM" ;;
             *-*-hp*-*)
