@@ -1,6 +1,6 @@
 AC_INIT([TACO], [3.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.42 $)dnl
+AC_REVISION($Revision: 1.43 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -148,6 +148,7 @@ AC_FUNC_STAT
 AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([alarm dup2 gethostbyname gethostname getpass gettimeofday isascii mblen memset putenv select socket strcasecmp strchr strcspn strdup strerror strncasecmp strrchr strspn strstr strtoul get_myaddress])
+AC_CHECK_FUNCS([setsid])
 
 AC_SEARCH_LIBS(dlopen, [dl])
 AC_SEARCH_LIBS(svc_run, [c nsl])
@@ -155,6 +156,16 @@ AC_SEARCH_LIBS(socket, [c socket], [], [], [-lnsl])
 AC_SEARCH_LIBS(connect, [c socket], [], [], [-lnsl])
 AC_SEARCH_LIBS(nanosleep, [c rt c_r])
 AC_SEARCH_LIBS(inet_pton, [c socket nsl])
+
+sbin_dir=`eval "echo $sbindir"`
+if test x"$prefix" = x"NONE" -a x"$sbin_dir" = x"NONE/sbin"; then
+	sbin_dir=`echo $sbin_dir| sed -e s%NONE/%%`
+	sbin_dir="${ac_default_prefix}/${sbin_dir}"
+else
+	sbin_dir="$sbindir"
+fi
+AC_SUBST(sbin_dir)
+AC_CONFIG_COMMANDS([pathes.h], [echo '#define sbindir "'${sbin_dir}'"' > pathes.h], [sbin_dir=$sbin_dir]) 
 
 TACO_CHECK_RPC
 TACO_CHECK_RPC_AND_THREADS
