@@ -7,13 +7,13 @@
  Description:   Public include file for the device server security
 
  Author(s):     Jens Meyer
-		$Author: jkrueger1 $
+		$Author: andy_gotz $
 
  Original:      September 1993
 
- Version:	$Revision: 1.4 $
+ Version:	$Revision: 1.5 $
  
- Date:		$Date: 2004-03-26 16:21:52 $
+ Date:		$Date: 2004-11-03 15:06:03 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -139,6 +139,9 @@ void _DLLFunc free_var_str_array PT_( (DevVarStringArray *str_array) );
 }
 #endif
 #endif /* _DevServer_h */
+
+long _DLLFunc free_connection_id_vers3
+			PT_( (long connection_id, long *error) );
 
 
 #endif /* _DevSec_h */
