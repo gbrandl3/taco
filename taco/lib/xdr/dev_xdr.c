@@ -11,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-05-09 15:30:26 $
+ Date:		$Date: 2003-05-12 11:47:49 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -196,9 +196,15 @@ long xdr_length_DevDoubleReadPoint(DevDoubleReadPoint *objp)
 /* D_VAR_CHARARR */
 bool_t xdr_DevVarCharArray(XDR *xdrs, DevVarCharArray *objp)
 {
+	if (!xdr_u_int(xdrs, &objp->length))
+		return (FALSE);
+        if (!xdr_bytes(xdrs, (char **)&objp->sequence, (u_int *)&objp->length, MAXU_INT)) 
+		return (FALSE);
+/*
 	if (!xdr_array(xdrs, (caddr_t *)&objp->sequence, (u_int *)&objp->length, 
 			MAXU_INT, sizeof(DevBoolean), (xdrproc_t)xdr_char)) 
 		return (FALSE);
+*/
 	return (TRUE);
 }
 
@@ -477,20 +483,10 @@ bool_t xdr_DevOpaque(XDR *xdrs, DevOpaque *objp)
 
 long xdr_length_DevOpaque (DevOpaque *objp)
 {
-/*
- *  four bytes for the number of bytes
- */
-	long length = xdr_length_DevLong ((long *)&objp->length);
-
-/* 
- * now calculate the length of the byte array 
- */
-	length += objp->length;
 /* 
  * only packets of four bytes can be send by XDR
  * Calculate the next multiple of four. 
  */
-	length = adjust_size(length);
-	return (length);
+	return adjust_size(objp->length);
 }
 
