@@ -223,16 +223,12 @@ int main(int argc,char **argv)
 #endif
 
 	if (!dbm)
-#if defined(USE_MYSQL) 
-#	if !defined(USE_GDBM)
-		dbm = new MySQLServer(mysql_user, mysql_password, argv[optind]);
-#	endif
-#else 
-#	if defined(USE_GBM)
+#if defined(USE_GDBM) 
     		dbm = new NdbmServer("", "", "");
-#	else
-#		error Use either GDBM or mySQL as database
-#	endif
+#elif defined (USE_MYSQL)
+		dbm = new MySQLServer(mysql_user, mysql_password, argv[optind]);
+#else
+#	error select either GDBM or mySQL as database type
 #endif
 //
 // RPC business !!!!!!!!!!!!!!!!!!!! 
