@@ -2,6 +2,7 @@
 #include <API.h>
 #include <DevServer.h>
 #include <iostream>
+#include <iomanip>
 #include <string>
 
 extern long debug_flag;
@@ -19,7 +20,7 @@ int main(int argc,char **argv)
 	DevVarStringArray	cmdline = {0, NULL};
 	std::string		cmd_string;
 
-	debug_flag = (DEBUG_ON_OFF | DBG_TRACE | DBG_API | DBG_SEC);
+//	debug_flag = (DEBUG_ON_OFF | DBG_TRACE | DBG_API | DBG_SEC);
 	switch (argc)	
 	{
 		case 1:
@@ -45,33 +46,42 @@ int main(int argc,char **argv)
 		exit(1);
 	}
 
-	status = dev_rpc_protocol(&ps, D_TCP, &error);
+	std::cout << "Set protocol to TCP" << std::endl;
+	status = dev_rpc_protocol(ps, D_TCP, &error);
 	if (status != DS_OK)
 	{
 		std::cout << "dev_rpc_protocol(D_TCP) returned " << status << " (error=" << error << ")" << std::endl
 			<< dev_error_str(error) << std::endl;
 		exit(1);
 	}
-	DevVarCmdArray	cmds = {0, NULL};
-	status = dev_cmd_query(&ps, &cmds, &error);
-	if (status != DS_OK)
-	{
-		std::cout << "dev_cmd_query() returned " << status << " (error=" << error << ")" << std::endl
-			<< dev_error_str(error) << std::endl;
-		exit(1);
-	}
-	for (int i = 0; i < varcmdarr.length; ++i)
-		std::cout << std::setw(14) << (unsigned)varcmdarr.sequence[i].cmd
-			<< std::setw(25) << varcmdarr.sequence[i].cmd_name << std::endl;
 
-	DevVarEventArray	events;
-	status = dev_event_query(&ps, &events, &error);
+	std::cout << "Query commands" << std::endl;
+	DevVarCmdArray	cmds = {0, NULL};
+	status = dev_cmd_query(ps, &cmds, &error);
 	if (status != DS_OK)
 	{
 		std::cout << "dev_cmd_query() returned " << status << " (error=" << error << ")" << std::endl
 			<< dev_error_str(error) << std::endl;
 		exit(1);
 	}
+	for (int i = 0; i < cmds.length; ++i)
+		std::cout << std::setw(14) << (unsigned)cmds.sequence[i].cmd
+			<< std::setw(8) << (unsigned)cmds.sequence[i].in_type
+			<< std::setw(8) << (unsigned)cmds.sequence[i].out_type
+			<< std::setw(25) << "\"" << cmds.sequence[i].cmd_name << "\"" << std::endl;
+
+	std::cout << "Query events" << std::endl;
+	DevVarEventArray	events;
+	status = dev_event_query(ps, &events, &error);
+	if (status != DS_OK)
+	{
+		std::cout << "dev_cmd_query() returned " << status << " (error=" << error << ")" << std::endl
+			<< dev_error_str(error) << std::endl;
+		exit(1);
+	}
+	for (int i = 0; i < events.length; ++i)
+		std::cout << std::setw(14) << (unsigned)events.sequence[i].event
+			<< std::setw(25) << events.sequence[i].event_name << std::endl;
 
 	dev_free(ps,&error);
 	return 0;
