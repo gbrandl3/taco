@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * File:        $Id: startup.cpp,v 1.3 2003-08-13 16:34:22 jkrueger1 Exp $
+ * File:        $Id: startup.cpp,v 1.4 2003-11-26 09:15:57 jkrueger1 Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
@@ -11,9 +11,9 @@
  *
  * Original:	January 2003
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Revision:	$Date: 2003-08-13 16:34:22 $
+ * Revision:	$Date: 2003-11-26 09:15:57 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -162,7 +162,11 @@ long ServerSetup(char *pszServerName, long *plError)
         if (gethostname(hostname, HOST_NAME_MAX))
 		return DS_NOTOK;
 	std::string		devName("sys/start/");
-	devName += std::string(hostname);
+	std::string::size_type	pos = std::string(hostname).find('.');
+	if (pos != std::string::npos)
+		devName += std::string(hostname).substr(0, pos);
+	else
+		devName += std::string(hostname);
 
 	long    	lError;
 	StarterDevice	*dev = new StarterDevice(devName, lError);
