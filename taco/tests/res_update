@@ -1,0 +1,14 @@
+#! /bin/sh
+i=0 
+export NETHOST=${NETHOST:-`hostname`} 
+export RES_BASE_DIR=`pwd`
+pers_name=`uname -n|cut -f1 -d'.'`
+echo startserver/$pers_name/device:     SYS/START/$pers_name >test.res
+echo SYS/START/$pers_name/DEFAULT:      "Inst_verify/1", "AGPSpp/1" >>test.res
+while test $i -lt 1000 ; do 
+	echo $i  
+	../system/dbase/tools/db_update test.res  
+	i=`expr $i + 1`  
+	usleep 100000
+done
+rm test.res
