@@ -10,22 +10,15 @@
 #include <NdbmClass.h>
 #include <NdbmServer.h>
 
-/* Some global variables */
-// db_res browse_back;
-// extern NdbmInfo dbgen;
-// extern int errno;
-
 #include <errno.h>
 
 
 
-/****************************************************************************
-*	Server code for the devdomainlist_1_svc function       	   	    *
-*    Method rule : To device domain list for all the device name defined    *
-*		   in the NAMES and PS_NAMES tables			    *
-*    Argin : No argin							    *
-*    Argout : domain_list : The domain name list 			    *
-****************************************************************************/
+/**
+ * To list the domains for all the device name defined in the NAMES and PS_NAMES tables
+ * 
+ * @return The domain name list
+ */
 db_res *NdbmServer::devdomainlist_1_svc(void)
 {
 #ifdef DEBUG
@@ -62,9 +55,9 @@ db_res *NdbmServer::devdomainlist_1_svc(void)
 			NdbmNamesCont cont(dbgen.tid[0],key);
 			dom_list.add_if_new(cont.get_dev_domain_name());
 		}
-		free(key.dptr);
 		if (gdbm_error(dbgen.tid[0]) != 0)
 		{			
+			free(key.dptr);
 			gdbm_clearerr(dbgen.tid[0]);
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);			
@@ -79,9 +72,9 @@ db_res *NdbmServer::devdomainlist_1_svc(void)
 			NdbmPSNamesKey pskey(key);
 			dom_list.add_if_new(pskey.get_psdev_domain_name());
 		}
-		free(key.dptr);
 		if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
 		{
+			free(key.dptr);
 			gdbm_clearerr(dbgen.tid[dbgen.ps_names_index]);
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);		
@@ -124,36 +117,25 @@ db_res *NdbmServer::devdomainlist_1_svc(void)
 
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the devfamilylist_1_svc function    	    	    *
-*                           -------------------                    	    *
-*                                                                           *
-*    Method rule : To device family list for all the device defined in the  *
-*		   NAMES and PS_NAMES tables for a given domain		    *
-*                                                                           *
-*    Argin : - domain : The domain name					    *
-*                                                                           *
-*    Argout : - family_list : The family name list 			    *
-*                                                                           * 
-*                                                                           *
-****************************************************************************/
+/**
+ * To list families for all the device defined in the NAMES and PS_NAMES tables 
+ * for a given domain
+ * 
+ * @param domain The domain name
+ *
+ * @return The family name list
+ */
 db_res *NdbmServer::devfamilylist_1_svc(nam* domain)
 {
-	std::string 	dom,
-			family;
-	NdbmNameList 	fam_list;
 	
-#ifdef DEBUG
-	std::cout << "In devfamilylist_1_svc function for domain " << *domain << std::endl;
-#endif
-
 	std::string 	user_domain(*domain);
+#ifdef DEBUG
+	std::cout << "In devfamilylist_1_svc function for domain " << user_domain << std::endl;
+#endif
 	
 //
 // Initialize structure sent back to client
 //
-
 	browse_back.db_err = 0;
 	browse_back.res_val.arr1_len = 0;
 	browse_back.res_val.arr1_val = NULL;
@@ -170,25 +152,24 @@ db_res *NdbmServer::devfamilylist_1_svc(nam* domain)
 //
 // Get the family name list for the wanted domain in the NAMES table
 //
+	NdbmNameList 	fam_list;
 	try
 	{
-		datum 		key, key2;
+		datum 		key, 
+				key2;
 		for (key = gdbm_firstkey(dbgen.tid[0]); 
 			key.dptr != NULL; 
 			key2 = key, key = gdbm_nextkey(dbgen.tid[0], key2), free(key2.dptr))
 		{
 			NdbmNamesCont cont(dbgen.tid[0],key);
 		
-			dom = cont.get_dev_domain_name();
-			if (dom != user_domain)
+			if (cont.get_dev_domain_name() != user_domain)
 				continue;
-			
-			family = cont.get_dev_fam_name();
-			fam_list.add_if_new(family);
+			fam_list.add_if_new(cont.get_dev_fam_name());
 		}
-		free(key.dptr);
 		if (gdbm_error(dbgen.tid[0]) != 0)
 		{
+			free(key.dptr);
 			gdbm_clearerr(dbgen.tid[0]);
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);
@@ -204,16 +185,13 @@ db_res *NdbmServer::devfamilylist_1_svc(nam* domain)
 		{
 			NdbmPSNamesKey pskey(key);
 		
-			dom = pskey.get_psdev_domain_name();
-			if (dom != user_domain)
+			if (pskey.get_psdev_domain_name() != user_domain)
 				continue;
-			
-			family = pskey.get_psdev_fam_name();
-			fam_list.add_if_new(family);
+			fam_list.add_if_new(pskey.get_psdev_fam_name());
 		}
-		free(key.dptr);
 		if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
 		{
+			free(key.dptr);
 			gdbm_clearerr(dbgen.tid[dbgen.ps_names_index]);
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);
@@ -235,13 +213,11 @@ db_res *NdbmServer::devfamilylist_1_svc(nam* domain)
 //
 // Sort family name list
 //
-	
 	fam_list.sort_name();
 	
 //
 // Build the sequence returned to caller
 //
-	
 	browse_back.res_val.arr1_len = fam_list.size();
 	if (fam_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
 	{
@@ -253,35 +229,20 @@ db_res *NdbmServer::devfamilylist_1_svc(nam* domain)
 //
 // Return data
 //
-
 	return(&browse_back);	
 }
 
 
-
-/****************************************************************************
-*                                                                           *
-*	Server code for the devmemberlist_1_svc fucntion 	    	    *
-*                           -------------------                     	    *
-*                                                                           *
-*    Method rule : To device member list for all the device defined in the  *
-*		   NAMES and PS_NAMES tables for a given domain and family  *
-*                                                                           *
-*    Argin : - domain : The domain name					    *
-*	     - family : The family name					    *
-*                                                                           *
-*    Argout : - member_list : The member name list			    *
-*                                                                           *
-*                                                                           *
-****************************************************************************/
-
+/**
+ * To list members for all the device defined in the NAMES and PS_NAMES tables 
+ * for a given domain and family
+ *
+ * @param recev The domain name, the family name
+ *
+ * @return The member name list
+ */
 db_res *NdbmServer::devmemberlist_1_svc(db_res *recev)
 {
-	std::string 	dom,
-			fam,
-			member;
-	NdbmNameList 	memb_list;
-	
 //
 // Build strings from input names
 //
@@ -295,7 +256,6 @@ db_res *NdbmServer::devmemberlist_1_svc(db_res *recev)
 //
 // Initialize structure sent back to client
 //
-
 	browse_back.db_err = 0;
 	browse_back.res_val.arr1_len = 0;
 	browse_back.res_val.arr1_val = NULL;
@@ -303,7 +263,6 @@ db_res *NdbmServer::devmemberlist_1_svc(db_res *recev)
 //
 // If the server is not connected to the database, return error
 //
-
 	if (dbgen.connected == False)
 	{
 		browse_back.db_err = DbErr_DatabaseNotConnected;
@@ -313,57 +272,48 @@ db_res *NdbmServer::devmemberlist_1_svc(db_res *recev)
 //
 // Get the member name list for the wanted domain and family from NAMES table
 //
-
+	NdbmNameList 	memb_list;
 	try
 	{
-		datum 		key, key2;
+		datum 		key, 
+				key2;
 		for (key = gdbm_firstkey(dbgen.tid[0]);
 			key.dptr != NULL;
 			key2 = key, key = gdbm_nextkey(dbgen.tid[0], key), free(key2.dptr))
 		{
 			NdbmNamesCont cont(dbgen.tid[0],key);
 		
-			dom = cont.get_dev_domain_name();
-			if (dom != user_domain)
+			if (cont.get_dev_domain_name() != user_domain)
 				continue;
-			fam = cont.get_dev_fam_name();
-			if (fam != user_family)
+			if (cont.get_dev_fam_name() != user_family)
 				continue;
-			
-			member = cont.get_dev_memb_name();
-			memb_list.add_if_new(member);
+			memb_list.add_if_new(cont.get_dev_memb_name());
 		}
-		free(key.dptr);
 		if (gdbm_error(dbgen.tid[0]) != 0)
 		{
+			free(key.dptr);
 			gdbm_clearerr(dbgen.tid[0]);
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);
 		}
-	
 //
 // Add member name for the wanted domain and family from PS_NAMES table
 //
-
 		for (key = gdbm_firstkey(dbgen.tid[dbgen.ps_names_index]); \
 		     key.dptr != NULL; \
 		     key2 = key, key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key), free(key2.dptr))
 		{
 			NdbmPSNamesKey pskey(key);
 		
-			dom = pskey.get_psdev_domain_name();
-			if (dom != user_domain)
+			if (pskey.get_psdev_domain_name() != user_domain)
 				continue;
-			fam = pskey.get_psdev_fam_name();
-			if (fam != user_family)
+			if (pskey.get_psdev_fam_name() != user_family)
 				continue;
-			
-			member = pskey.get_psdev_memb_name();
-			memb_list.add_if_new(member);
+			memb_list.add_if_new(pskey.get_psdev_memb_name());
 		}
-		free(key.dptr);
 		if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
 		{
+			free(key.dptr);
 			gdbm_clearerr(dbgen.tid[dbgen.ps_names_index]);
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);
@@ -382,17 +332,14 @@ db_res *NdbmServer::devmemberlist_1_svc(db_res *recev)
 		return(&browse_back);
 	}
 
-
 //
 // Sort member name list
 //
-	
 	memb_list.sort_name();
 	
 //
 // Build the structure returned to caller
 //
-		
 	browse_back.res_val.arr1_len = memb_list.size();
 	if (memb_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
 	{
@@ -404,6 +351,5 @@ db_res *NdbmServer::devmemberlist_1_svc(db_res *recev)
 //
 // Return data
 //
-
 	return(&browse_back);	
 }

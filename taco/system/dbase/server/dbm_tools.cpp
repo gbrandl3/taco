@@ -83,7 +83,10 @@ db_devinfo_svc *NdbmServer::devinfo_1_svc(nam *dev)
 	long found = False;
 	try 
 	{
-		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
+		datum	key2;
+		for (key = gdbm_firstkey(dbgen.tid[0]);
+			key.dptr != NULL;
+			key2 = key, key = gdbm_nextkey(dbgen.tid[0], key), free(key2.dptr))
 		{
 			NdbmNamesCont cont(dbgen.tid[0],key);
 		
@@ -98,6 +101,7 @@ db_devinfo_svc *NdbmServer::devinfo_1_svc(nam *dev)
 
 				sent_back.device_type = DB_Device;				
 				found = True;
+				free(key.dptr);
 				break;
 			}		
 		}
@@ -114,9 +118,10 @@ db_devinfo_svc *NdbmServer::devinfo_1_svc(nam *dev)
 
 		if (found == False)
 		{
-			for (key = gdbm_firstkey(dbgen.tid[dbgen.ps_names_index]); \
-		     	     key.dptr != NULL; \
-		     	     key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key))
+			datum	key2;
+			for (key = gdbm_firstkey(dbgen.tid[dbgen.ps_names_index]); 
+		     	     key.dptr != NULL; 
+		     	     key2 = key, key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key), free(key2.dptr))
 			{
 				std::string ps_dev_name(key.dptr,key.dsize);
 				
@@ -128,6 +133,7 @@ db_devinfo_svc *NdbmServer::devinfo_1_svc(nam *dev)
 					
 					sent_back.device_type = DB_Pseudo_Device;
 					found = True;
+					free(key.dptr);
 					break;
 				}
 		
@@ -142,15 +148,14 @@ db_devinfo_svc *NdbmServer::devinfo_1_svc(nam *dev)
 	}
 	catch (NdbmError &err)
 	{		
+		free(key.dptr);
 		std::cerr << err.get_err_message() << std::endl;	
 		sent_back.db_err = err.get_err_code();
-		return(&sent_back);
 	}
 	catch (std::bad_alloc)
 	{		
 		std::cerr << "Memory allocation error in devinfo" << std::endl;
 		sent_back.db_err = DbErr_ServerMemoryAllocation;
-		return(&sent_back);
 	}
 	
 //
@@ -159,7 +164,6 @@ db_devinfo_svc *NdbmServer::devinfo_1_svc(nam *dev)
 	if (found == False)
 	{
 		sent_back.db_err = DbErr_DeviceNotDefined;
-		return(&sent_back);
 	}
 		
 //
@@ -173,7 +177,7 @@ db_devinfo_svc *NdbmServer::devinfo_1_svc(nam *dev)
 /**
  * To retrieve all resources belonging to a device
  *
- * @param name The device name
+ * @param recev The device name list
  * 
  * @return This function returns the resource list and an error code which is set 
  *    if needed
@@ -223,7 +227,6 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 	{
 		std::string in_dev(recev->res_val.arr1_val[i]);
 
-		
 		if ((pos = in_dev.find(SEP_DEV)) == std::string::npos)
 		{
 			browse_back.db_err = DbErr_BadDevSyntax;
@@ -248,11 +251,9 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 	{
 		for (i = 0;i < dom_list.size();i++)
 		{
-		
 //
 // Find the db table for the specified domain
 //
-
 			for (j = 0;j < dbgen.TblNum;j++)
 			{
 				if (dbgen.TblName[j] == dom_list[i].get_domain())
@@ -263,15 +264,16 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 				browse_back.db_err = DbErr_DomainDefinition;
 				return(&browse_back);
 			}
-	
 //
 // Get all resources for the specified domain,family,member
 // The test to know if the resource is a new one is done by the index value
 // which is 1 for all new resource
 //
-
 			tmp_res_list.clear();
-			for (key = gdbm_firstkey(dbgen.tid[j]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[j], key))
+			datum	key2;
+			for (key = gdbm_firstkey(dbgen.tid[j]);
+				key.dptr != NULL;
+				key2 = key, key = gdbm_nextkey(dbgen.tid[j], key), free(key2.dptr))
 			{
 				long ind;
 				long found;
@@ -291,8 +293,7 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 				if (found == True)
 				{
 //
-// A resource for the device has been founded. Store its name in the resource
-// name list. 
+// A resource for the device has been found. Store its name in the resource name list. 
 //
 					std::string t(key.dptr,key.dsize);
 					tmp_res_list.push_back(t);
@@ -372,6 +373,7 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 	}
 	catch (NdbmError &err)
 	{		
+		free(key.dptr);
 		std::cerr << err.get_err_message() << std::endl;
 		browse_back.db_err = err.get_err_code();
 		return(&browse_back);
@@ -394,10 +396,10 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 	long res_nb = res_list_dev.size();
 	try
 	{		
-		browse_back.res_val.arr1_val = new char * [res_nb];
+		browse_back.res_val.arr1_val = new nam[res_nb];
 		for (i = 0;i < res_list_dev.size();i++)
 		{
-			browse_back.res_val.arr1_val[i] = new char [res_list_dev[i].size() + 1];
+			browse_back.res_val.arr1_val[i] = new char[res_list_dev[i].size() + 1];
 			strcpy(browse_back.res_val.arr1_val[i],res_list_dev[i].c_str());
 		}
 		browse_back.res_val.arr1_len = res_list_dev.size();
@@ -439,14 +441,11 @@ long *NdbmServer::devdel_1_svc(nam *dev)
 #ifdef DEBUG
 	std::cout << "In devdel_1_svc function for device " << *dev << std::endl;
 #endif
-
 	std::string user_device(*dev);
-
 //
 // Initialize parameter sent back to client
 //
 	sent_back = 0;
-	
 //
 // If the server is not connected to the database, return error
 //
@@ -455,14 +454,16 @@ long *NdbmServer::devdel_1_svc(nam *dev)
 		sent_back = DbErr_DatabaseNotConnected;
 		return(&sent_back);
 	}
-	
 //
 // Search for device name in the NAMES table
 //
 	long found = False;
 	try 
 	{
-		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
+		datum	key2;
+		for (key = gdbm_firstkey(dbgen.tid[0]);
+			key.dptr != NULL;
+			key2 = key, key = gdbm_nextkey(dbgen.tid[0], key), free(key2.dptr))
 		{
 			NdbmNamesCont cont(dbgen.tid[0],key);
 		
@@ -475,20 +476,17 @@ long *NdbmServer::devdel_1_svc(nam *dev)
 				long ind;
 				
 				NdbmNamesKey k(key);
-				
 //
 // Memorize key members
 //				
 				ds_name = k.get_ds_name();
 				ds_pers_name = k.get_ds_pers_name();
 				ind = k.get_dev_indi();
-
 //
 // Delete device from table
 //
 				gdbm_delete(dbgen.tid[0],key);
 				found = True;
-				
 //
 // Update device server device list (decrement all device index in device list
 // for all devices above the deleted one)
@@ -504,11 +502,11 @@ long *NdbmServer::devdel_1_svc(nam *dev)
 						gdbm_delete(dbgen.tid[0],new_key.get_key());
 					
 						new_key.upd_indi(ind - 1);
-						// dbco.build_datum();
 						
 						if (gdbm_store(dbgen.tid[0],new_key.get_key(),dbco.get_datum(),GDBM_INSERT) != 0)
 						{
 							sent_back = DbErr_DatabaseAccess;
+							free(key.dptr);
 							return(&sent_back);
 						}
 					}
@@ -517,6 +515,7 @@ long *NdbmServer::devdel_1_svc(nam *dev)
 				{
 					if (gdbm_error(dbgen.tid[0]) != 0)
 					{
+						free(key.dptr);
 						gdbm_clearerr(dbgen.tid[0]);
 						sent_back = DbErr_DatabaseAccess;
 						return(&sent_back);
@@ -531,16 +530,14 @@ long *NdbmServer::devdel_1_svc(nam *dev)
 			sent_back = DbErr_DatabaseAccess;
 			return(&sent_back);			
 		}
-
 //
 // If device not found in the NAMES table, search for it in the PS_NAMES table
 //
-
 		if (found == False)
 		{
-			for (key = gdbm_firstkey(dbgen.tid[dbgen.ps_names_index]); \
-		     	     key.dptr != NULL; \
-		     	     key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key))
+			for (key = gdbm_firstkey(dbgen.tid[dbgen.ps_names_index]); 
+		     	     key.dptr != NULL; 
+		     	     key2 = key, key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key), free(key2.dptr))
 			{
 				std::string ps_dev_name(key.dptr,key.dsize);
 				
@@ -548,6 +545,7 @@ long *NdbmServer::devdel_1_svc(nam *dev)
 				{			
 					gdbm_delete(dbgen.tid[dbgen.ps_names_index],key);
 					found = True;
+					free(key.dptr);
 					break;
 				}
 		
@@ -562,6 +560,7 @@ long *NdbmServer::devdel_1_svc(nam *dev)
 	}
 	catch (NdbmError &err)
 	{
+		free(key.dptr);
 		std::cerr << err.get_err_message() << std::endl;	
 		sent_back = err.get_err_code();
 		return(&sent_back);
@@ -572,21 +571,17 @@ long *NdbmServer::devdel_1_svc(nam *dev)
 		sent_back = DbErr_ServerMemoryAllocation;
 		return(&sent_back);
 	}
-	
 //
 // Return error if the device is not found
 //
-
 	if (found == False)
 	{
 		sent_back = DbErr_DeviceNotDefined;
 		return(&sent_back);
 	}
-		
 //
 // Return data
 //
-
 	return(&sent_back);
 
 }
@@ -595,7 +590,7 @@ long *NdbmServer::devdel_1_svc(nam *dev)
 /**
  * To delete all the resources belonging to a device
  * 
- * @param dev The device name
+ * @param recev The device name list
  *
  * @return This function returns a pointer to an error code
  */
@@ -700,8 +695,10 @@ db_psdev_error *NdbmServer::devdelres_1_svc(db_res *recev)
 // The test to know if the resource is a new one is done by the index value
 // which is 1 for all new resource
 //
-
-			for (key = gdbm_firstkey(dbgen.tid[j]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[j], key))
+			datum	key2;
+			for (key = gdbm_firstkey(dbgen.tid[j]);
+				key.dptr != NULL;
+				key2 = key, key = gdbm_nextkey(dbgen.tid[j], key), free(key2.dptr))
 			{
 				NdbmResKey reskey(key);
 
@@ -719,21 +716,17 @@ db_psdev_error *NdbmServer::devdelres_1_svc(db_res *recev)
 				if (found == True)
 				{				
 					resource = reskey.get_res_name();
-					
 //
 // Push this resource into resource array (already built as key)
 //
-
 					std::string tmp_res_key(fam);
 					tmp_res_key = tmp_res_key + '|' + memb + '|' + resource + "|1|";
 					res_list.push_back(tmp_res_key);
 				}
 			}
-			
 //
 // Now, remove all resources for this domain
 //
-
 			for (m = 0;m < res_list.size();m++)
 			{
 				try
@@ -810,13 +803,12 @@ db_psdev_error *NdbmServer::devdelres_1_svc(db_res *recev)
 //
 // Clear resource list
 //
-
 			res_list.clear();
-
 		}
 	}
 	catch (NdbmError &err)
 	{		
+		free(key.dptr);
 		std::cerr << err.get_err_message() << std::endl;
 		sent_back.error_code = err.get_err_code();
 		tmp_dev_name = dom_list[i].get_domain() + '/' + fam + '/' + memb;
@@ -839,13 +831,10 @@ db_psdev_error *NdbmServer::devdelres_1_svc(db_res *recev)
 		}
 		return(&sent_back);
 	}
-		
 //
 // leave fucntion
 //
-
 	return(&sent_back);
-
 }
 
 
@@ -905,7 +894,10 @@ db_info_svc *NdbmServer::info_1_svc()
 //
 	try 
 	{
-		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
+		datum	key2;
+		for (key = gdbm_firstkey(dbgen.tid[0]);
+			key.dptr != NULL;
+			key2 = key, key = gdbm_nextkey(dbgen.tid[0], key), free(key2.dptr))
 		{
 			dev_defined++;
 			NdbmNamesCont cont(dbgen.tid[0],key);
@@ -933,15 +925,13 @@ db_info_svc *NdbmServer::info_1_svc()
 //
 		for (key = gdbm_firstkey(dbgen.tid[dbgen.ps_names_index]);
 		     key.dptr != NULL;
-		     key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key))
+		     key2 = key, key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key), free(key2.dptr))
 		{
 			psdev_defined++;
 		}
-
 //
 // Then, count resources in each domain
 //
-
 		for (i = 1; i < dbgen.TblNum;i++)
 		{
 			if (i == dbgen.ps_names_index)
@@ -950,7 +940,7 @@ db_info_svc *NdbmServer::info_1_svc()
 			tmp_res = 0;				
 			for (key = gdbm_firstkey(dbgen.tid[i]);
 			     key.dptr != NULL;
-			     key = gdbm_nextkey(dbgen.tid[i], key))
+			     key2 = key, key = gdbm_nextkey(dbgen.tid[i], key), free(key2.dptr))
 			{
 				tmp_res++;
 			}
@@ -964,6 +954,7 @@ db_info_svc *NdbmServer::info_1_svc()
 	}
 	catch (NdbmError &err)
 	{
+		free(key.dptr);
 		std::cerr << err.get_err_message() << std::endl;	
 		info_back.db_err = err.get_err_code();
 		return(&info_back);
@@ -974,18 +965,14 @@ db_info_svc *NdbmServer::info_1_svc()
 		info_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&info_back);
 	}
-
 //
 // Sort exported devices domain list and resource domain list
 //
-
 	std::sort(dom_list.begin(),dom_list.end());
 	std::sort(res_list.begin(),res_list.end());
-			
 //
 // Return data
 //
-
 	info_back.dev_defined = dev_defined;
 	info_back.dev_exported = dev_exported;
 	info_back.psdev_defined = psdev_defined;
@@ -1010,7 +997,6 @@ db_info_svc *NdbmServer::info_1_svc()
 	}
 	
 	return(&info_back);
-
 }
 
 
@@ -1059,7 +1045,10 @@ long *NdbmServer::unreg_1_svc(db_res *recev)
 //
 	try 
 	{
-		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
+		datum	key2;
+		for (key = gdbm_firstkey(dbgen.tid[0]);
+			key.dptr != NULL;
+			key2 = key, key = gdbm_nextkey(dbgen.tid[0], key), free(key2.dptr))
 		{
 			NdbmNamesKey k(key);
 			
@@ -1126,6 +1115,7 @@ long *NdbmServer::unreg_1_svc(db_res *recev)
 	}
 	catch (NdbmError &err)
 	{
+		free(key.dptr);
 		std::cerr << err.get_err_message() << std::endl;	
 		sent_back = err.get_err_code();
 		return(&sent_back);
@@ -1136,21 +1126,15 @@ long *NdbmServer::unreg_1_svc(db_res *recev)
 		sent_back = DbErr_ServerMemoryAllocation;
 		return(&sent_back);
 	}
-	
 //
 // Set error code if no device have been found
 //
-
 	if (found == False)
 		sent_back = DbErr_DeviceServerNotDefined;
-
-				
 //
 // Return data
 //
-
 	return(&sent_back);
-	
 }
 
 
@@ -1233,7 +1217,10 @@ svcinfo_svc *NdbmServer::svcinfo_1_svc(db_res *recev)
 
 	try 
 	{
-		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
+		datum	key2;
+		for (key = gdbm_firstkey(dbgen.tid[0]);
+			key.dptr != NULL;
+			key2 = key, key = gdbm_nextkey(dbgen.tid[0], key), free(key2.dptr))
 		{
 			NdbmNamesKey k(key);
 			
@@ -1263,21 +1250,19 @@ svcinfo_svc *NdbmServer::svcinfo_1_svc(db_res *recev)
 			
 			found = True;
 		}
-
 //
 // If the user ds name was not a process name, init the class list with it
 //
 		if (found == False)
 			class_list.push_back(user_ds_name);
-
 //
 // Allocate vector to store each class device list
 //
 		nb_class = class_list.size();
 		dev_list = new std::vector<NdbmSvcDev> [nb_class];
-
+#if DEBUG
 		std::cerr << nb_class << std::endl;
-		
+#endif
 //
 // Get all device for each class in the list
 //
@@ -1322,6 +1307,7 @@ svcinfo_svc *NdbmServer::svcinfo_1_svc(db_res *recev)
 	}
 	catch (NdbmError &err)
 	{
+		free(key.dptr);
 		std::cerr << err.get_err_message() << std::endl;
 		delete [] dev_list;	
 		svcinfo_back.db_err = err.get_err_code();
@@ -1450,7 +1436,10 @@ long *NdbmServer::svcdelete_1_svc(db_res *recev)
 
 	try 
 	{
-		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
+		datum	key2;
+		for (key = gdbm_firstkey(dbgen.tid[0]);
+			key.dptr != NULL;
+			key2 = key, key = gdbm_nextkey(dbgen.tid[0], key), free(key2.dptr))
 		{
 			NdbmNamesKey k(key);
 			
@@ -1472,12 +1461,10 @@ long *NdbmServer::svcdelete_1_svc(db_res *recev)
 			ds_name_list.push_back(tmp);
 			found = True;
 		}
-
 //
 // If the ds_name was not a process name, init the class list with the user
 // ds name
 //
-		
 		if (found == False)
 			ds_name_list.push_back(user_ds_name);
 
@@ -1520,6 +1507,7 @@ long *NdbmServer::svcdelete_1_svc(db_res *recev)
 	}
 	catch (NdbmError &err)
 	{
+		free(key.dptr);
 		std::cerr << err.get_err_message() << std::endl;	
 		error_back = err.get_err_code();
 		return(&error_back);
@@ -1530,20 +1518,15 @@ long *NdbmServer::svcdelete_1_svc(db_res *recev)
 		error_back = DbErr_ServerMemoryAllocation;
 		return(&error_back);
 	}
-	
 //
 // Set error code if no device have been found
 //
-
 	if (found == False)
 		error_back = DbErr_DeviceServerNotDefined;
-
 //
 // Leave call
 //				
-
 	return(&error_back);
-	
 }
 
 
@@ -1611,7 +1594,10 @@ void  NdbmServer::delete_res(const std::string &dev_name)
 
 	try
 	{
-		for (key = gdbm_firstkey(dbgen.tid[i]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[i], key))
+		datum	key2;
+		for (key = gdbm_firstkey(dbgen.tid[i]);
+			key.dptr != NULL;
+			key2 = key, key = gdbm_nextkey(dbgen.tid[i], key), free(key2.dptr))
 		{
 			NdbmResKey reskey(key);
 
@@ -1635,6 +1621,7 @@ void  NdbmServer::delete_res(const std::string &dev_name)
 	}
 	catch (NdbmError &err)
 	{
+		free(key.dptr);
 		gdbm_clearerr(dbgen.tid[i]);		
 		throw;
 	}
@@ -1642,8 +1629,6 @@ void  NdbmServer::delete_res(const std::string &dev_name)
 	{
 		throw;
 	}
-
-
 //
 // Delete all resources in the list from db
 //
@@ -1780,7 +1765,10 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 	found = False;
 	try
 	{
-		for (key = gdbm_firstkey(dbgen.tid[i]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[i], key))
+		datum 	key2;
+		for (key = gdbm_firstkey(dbgen.tid[i]);
+			key.dptr != NULL;
+			key2 = key, key = gdbm_nextkey(dbgen.tid[i], key), free(key2.dptr))
 		{
 			NdbmResKey reskey(key);
 
@@ -1811,6 +1799,7 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 	}
 	catch (NdbmError &err)
 	{		
+		free(key.dptr);
 		std::cerr << err.get_err_message() << std::endl;
 		poll_back.db_err = err.get_err_code();
 		return(&poll_back);
@@ -1837,7 +1826,10 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 	found = False;
 	try 
 	{
-		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
+		datum	key2;
+		for (key = gdbm_firstkey(dbgen.tid[0]);
+			key.dptr != NULL;
+			key2 = key, key = gdbm_nextkey(dbgen.tid[0], key), free(key2.dptr))
 		{
 			NdbmNamesCont cont(dbgen.tid[0],key);
 		
@@ -1851,6 +1843,7 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 				dev_key.get_devinfo(poll_back);
 
 				found = True;
+				free(key.dptr);
 				break;
 			}		
 		}
@@ -1863,6 +1856,7 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 	}
 	catch (NdbmError &err)
 	{		
+		free(key.dptr);
 		std::cerr << err.get_err_message() << std::endl;	
 		poll_back.db_err = err.get_err_code();
 		return(&poll_back);

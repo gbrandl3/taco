@@ -8,12 +8,13 @@
 /* Some C++ include files */
 
 #include <iostream>
+#include <algorithm>
 #include <NdbmClass.h>
 #include <NdbmServer.h>
 
 
 /**
- * To store in the database (builded from resources files) the host_name, the 
+ * To store in the database (built from resources files) the host_name, the 
  * program number and the version number of the device server for a specific device
  * 
  * @param rece A pointer to a structure of the tab_dbdev type 
@@ -26,15 +27,11 @@
  */
 db_psdev_error *NdbmServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
 {
-	static db_psdev_error err;
-	int num_psdev;
-	psdev_elt *tmp;
-	long error;
-	register long i;
-
-/* Miscellaneous init */
-
-	num_psdev = rece->psdev_arr.psdev_arr_len;
+	static db_psdev_error 	err;
+	int 			num_psdev = rece->psdev_arr.psdev_arr_len;;
+//
+// Miscellaneous init
+//
 	err.error_code = 0;
 	err.psdev_err = 0;
 
@@ -42,41 +39,40 @@ db_psdev_error *NdbmServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
 	std::cout << "Begin db_psdev_register" << std::endl;
 	std::cout << "Host name : " << rece->h_name << std::endl;
 	std::cout << "PID = " << rece->pid << std::endl;
-	for (i = 0;i < num_psdev;i++)
+	for (int i = 0; i < num_psdev; i++)
 	{
-		tmp = &(rece->psdev_arr.psdev_arr_val[i]);
-		std::cout << "Pseudo device name : " << tmp->psdev_name << std::endl;
-		std::cout << "Refresh period : " << tmp->poll << std::endl;
+		std::cout << "Pseudo device name : " << rece->psdev_arr.psdev_arr_val[i].psdev_name << std::endl;
+		std::cout << "Refresh period : " << rece->psdev_arr.psdev_arr_val[i].poll << std::endl;
 	}
 #endif
-
-/* Return error code if the server is not connected */
-
+//
+// Return error code if the server is not connected */
+//
 	if (dbgen.connected == False)
 	{
 		err.error_code = DbErr_DatabaseNotConnected;
 		return(&err);
 	}
-
-/* For each pseudo device, register it in the PS_NAMES table */
-
-	for (i = 0;i < num_psdev;i++)
+//
+// For each pseudo device, register it in the PS_NAMES table
+//
+	for (int i = 0;i < num_psdev;i++)
 	{
-		tmp = &(rece->psdev_arr.psdev_arr_val[i]);
-		if (reg_ps(rece->h_name,rece->pid,tmp->psdev_name,
-			   tmp->poll,&error) == -1)
+		psdev_elt *tmp = &(rece->psdev_arr.psdev_arr_val[i]);
+		long error;
+		if (reg_ps(rece->h_name,rece->pid, tmp->psdev_name, tmp->poll, &error) == -1)
 		{
 			err.error_code =  error;
 			err.psdev_err = i + 1;
 			return(&err);
 		}
 	}
-
-/* Leave server */
-
+//
+// Leave server 
+//
 #ifdef DEBUG
 	std::cout << "End db_psdev_register" << std::endl;
-#endif /* DEBUG */
+#endif 
 	return(&err);
 }
 
@@ -94,141 +90,103 @@ db_psdev_error *NdbmServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
  * @return This function returns 0 is everything OK. Otherwise, the returned value
  *    is -1 and the error code is set to the appropiate error.
  */
-long NdbmServer::reg_ps(char *h_name,long pid,char *ps_name,long poll,long *p_error)
+long NdbmServer::reg_ps(char *h_name, long pid, char *ps_name, long poll, long *p_error)
 {
-	datum key,content;
-	register long i;
-	long l;
-	char *ps_name_low;
-	char key_buf[MAX_KEY];
-	char cont_buf[MAX_CONT];
-	register char *tbeg;
-	register char *tend;
-	unsigned int diff;
-	char d_name[40];
+	std::string 	ps_name_low(ps_name);
+//
+// Make a copy of the pseudo device name in lowercase letter 
+//
+	std::transform(ps_name_low.begin(), ps_name_low.end(), ps_name_low.begin(), ::tolower);
 
-/* Make a copy of the pseudo device name in lowercase letter */
-
-	l = strlen(ps_name);
-	if ((ps_name_low = (char *)malloc(l + 1)) == (char *)NULL)
+//
+// First, check that the name used for the pseudo device is not already used for a real device
+//
+	try
 	{
-		*p_error = DbErr_ServerMemoryAllocation;
-		return(-1);
-	}
-	for (i = 0;i < l;i++)
-		ps_name_low[i] = tolower(ps_name[i]);
-	ps_name_low[i] = '\0';
-
-/* First, check that the name used for the pseudo device is not already used
-   for a real device */
-
-	for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
-	{
-		content = gdbm_fetch(dbgen.tid[0],key);
-		if (content.dptr == NULL)
+		datum 	key,
+			key2;
+		for (key = gdbm_firstkey(dbgen.tid[0]);
+			key.dptr != NULL;
+			key2 = key, key = gdbm_nextkey(dbgen.tid[0], key), free(key2.dptr))
 		{
-			free(ps_name_low);
-			*p_error = DbErr_DatabaseAccess;
-			return(-1);
+			NdbmNamesCont cont(dbgen.tid[0],key);
+			if (cont.get_device_name() == ps_name_low)
+				break;
 		}
-		tbeg = content.dptr;
-		tend = strchr(tbeg,'|');
-		diff = (unsigned int)(tend - tbeg);
-		strncpy(d_name,tbeg,diff);
-		d_name[diff] = '\0';
-
-		if (strcmp(d_name,ps_name_low) == 0)
-			break;
-	}
-
-	if (key.dptr == NULL)
-	{
-		if (gdbm_error(dbgen.tid[0]) != 0)
+		if (key.dptr == NULL)
 		{
-			free(ps_name_low);
-			*p_error = DbErr_DatabaseAccess;
-			return(-1);
+			if (gdbm_error(dbgen.tid[0]) != 0)
+			{
+				*p_error = DbErr_DatabaseAccess;
+				return(DS_NOTOK);
+			}
 		}
-	}
-	else
-	{
-		free(ps_name_low);
-		*p_error = DbErr_NameAlreadyUsed;
-		return(-1);
-	}
-
-/* Now, try to retrieve a tuple in the PS_NAMES table with the same pseudo
-   device name */
-
-	strcpy(key_buf,ps_name_low);
-
-	key.dptr = key_buf;
-	key.dsize = strlen(key_buf);
-
-	content = gdbm_fetch(dbgen.tid[dbgen.ps_names_index],key);
-	if (content.dptr == NULL)
-	{
-
-/* In case of error */
-
-		if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
-		{
-			free(ps_name_low);
-			*p_error = DbErr_DatabaseAccess;
-			return(-1);
-		}
-
-/* Insert a new record in database */
-
 		else
 		{
-			strcpy(cont_buf,h_name);
-			strcat(cont_buf,"|");
-			sprintf(&(cont_buf[strlen(cont_buf)]),"%d",pid);
-			strcat(cont_buf,"|");
-			sprintf(&(cont_buf[strlen(cont_buf)]),"%d",poll);
-			strcat(cont_buf,"|");
+			*p_error = DbErr_NameAlreadyUsed;
+			return(DS_NOTOK);
+		}
+//
+// Now, try to retrieve a tuple in the PS_NAMES table with the same pseudo device name 
+//
+		key.dptr = const_cast<char *>(ps_name_low.c_str());
+		key.dsize = strlen(key.dptr);
 
-			content.dptr = cont_buf;
-			content.dsize = strlen(cont_buf);
-			
-			if (gdbm_store(dbgen.tid[dbgen.ps_names_index],key,content,GDBM_INSERT) != 0)
+		char	cont_buf[MAX_CONT];
+		snprintf(cont_buf, sizeof(cont_buf), "%s|%d|%d|", h_name, pid, poll);
+
+		datum content;
+		content.dptr = cont_buf;
+		content.dsize = strlen(cont_buf);
+
+		try
+		{
+			NdbmPSNamesCont cont(dbgen.tid[dbgen.ps_names_index],key);
+//
+// Update database information 
+//
+			if (gdbm_store(dbgen.tid[dbgen.ps_names_index],key,content,GDBM_REPLACE) != 0)
 			{
-				free(ps_name_low);
 				*p_error = DbErr_DatabaseAccess;
 				return(-1);
 			}
 		}
-	}
-
-	else
-	{
-
-/* Update database information */
-
-		strcpy(cont_buf,h_name);
-		strcat(cont_buf,"|");
-		sprintf(&(cont_buf[strlen(cont_buf)]),"%d",pid);
-		strcat(cont_buf,"|");
-		sprintf(&(cont_buf[strlen(cont_buf)]),"%d",poll);
-		strcat(cont_buf,"|");
-
-		content.dptr = cont_buf;
-		content.dsize = strlen(cont_buf);
-			
-		if (gdbm_store(dbgen.tid[dbgen.ps_names_index],key,content,GDBM_REPLACE) != 0)
+		catch ( ... )
 		{
-			free(ps_name_low);
-			*p_error = DbErr_DatabaseAccess;
-			return(-1);
+//
+// In case of error 
+//
+			if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
+			{
+				*p_error = DbErr_DatabaseAccess;
+				return(DS_NOTOK);
+			}
+//
+// Insert a new record in database 
+//
+			else if (gdbm_store(dbgen.tid[dbgen.ps_names_index],key,content,GDBM_INSERT) != 0)
+			{
+				*p_error = DbErr_DatabaseAccess;
+				return(DS_NOTOK);
+			}
 		}
-	}
-
-/* Free memory and leave function */
-
-	free(ps_name_low);
-	return(0);
-
+        }
+        catch (NdbmError &err)
+        {
+                std::cerr << err.get_err_message() << std::endl;
+                *p_error = err.get_err_code();
+                return(DS_NOTOK);
+        }
+        catch (std::bad_alloc)
+        {
+                std::cerr << "Memory allocation error in devserverlist" << std::endl;
+                *p_error = DbErr_ServerMemoryAllocation;
+                return(DS_NOTOK);
+        }
+//
+// Free memory and leave function 
+//
+	return(DS_OK);
 }
 
 
@@ -253,55 +211,52 @@ long NdbmServer::reg_ps(char *h_name,long pid,char *ps_name,long poll,long *p_er
  */
 db_psdev_error *NdbmServer::db_psdev_unreg_1_svc(arr1 *rece)
 {
-	static db_psdev_error err;
-	u_int num_psdev;
-	register long i;
-	long error;
-
-/* Miscellaneous init */
-
-	num_psdev = rece->arr1_len;
+	static db_psdev_error 	err;
+	u_int 			num_psdev = rece->arr1_len;;
+//
+// Miscellaneous init
+//
 	err.error_code = 0;
 	err.psdev_err = 0;
 
 #ifdef DEBUG
 	std::cout << "Begin db_psdev_unregister" << std::endl;
-	for (i = 0;i < num_psdev;i++)
+	for (int i = 0;i < num_psdev;i++)
 		std::cout << "Pseudo device name : " << rece->arr1_val[i] << std::endl;
 #endif
-
-/* Return error code if the server is not connected */
-
+//
+// Return error code if the server is not connected
+//
 	if (dbgen.connected == False)
 	{
 		err.error_code = DbErr_DatabaseNotConnected;
 		return(&err);
 	}
-
-/* For each pseudo device, unregister it in the PS_NAMES table */
-
-	for (i = 0;i < num_psdev;i++)
-	{
+//
+// For each pseudo device, unregister it in the PS_NAMES table
+//
+	u_int	i;
+	long	error;
+	for (i = 0; i < num_psdev; i++)
 		if (unreg_ps(rece->arr1_val[i],&error) == -1)
 		{
 			err.error_code =  error;
 			err.psdev_err = i + 1;
 			return(&err);
 		}
-	}
-
-/* Leave server */
-
+//
+// Leave server 
+//
 #ifdef DEBUG
 	std::cout << "End db_psdev_unregister" << std::endl;
-#endif /* DEBUG */
+#endif 
 	return(&err);
 }
 
 
 
 /**
- * To unregister pseuo device from the database PS_NAMES table
+ * To unregister pseudo device from the database PS_NAMES table
  *
  * @param ps_name The pseudo device name
  *
@@ -312,65 +267,40 @@ db_psdev_error *NdbmServer::db_psdev_unreg_1_svc(arr1 *rece)
  */
 long NdbmServer::unreg_ps(char *ps_name,long *p_error)
 {
-	register long i;
-	long l;
-	char *ps_name_low;
-	datum key,content;
-	char key_buf[MAX_KEY];
+	datum 		key;
 
-/* Make a copy of the pseudo device name in lowercase letter */
-
-	l = strlen(ps_name);
-	if ((ps_name_low = (char *)malloc(l + 1)) == (char *)NULL)
+	std::string 	ps_name_low(ps_name);
+//
+// Make a copy of the pseudo device name in lowercase letter 
+//
+	std::transform(ps_name_low.begin(), ps_name_low.end(), ps_name_low.begin(), ::tolower);
+//
+// Retrieve a tuple in the PS_NAMES table with the same pseudo device name */
+//
+	key.dptr = const_cast<char *>(ps_name_low.c_str());
+	key.dsize = strlen(key.dptr);
+	try
 	{
-		*p_error = DbErr_ServerMemoryAllocation;
-		return(-1);
-	}
-	for (i = 0;i < l;i++)
-		ps_name_low[i] = tolower(ps_name[i]);
-	ps_name_low[i] = '\0';
-
-/* Retrieve a tuple in the PS_NAMES table with the same pseudo device name */
-
-	strcpy(key_buf,ps_name_low);
-
-	key.dptr = key_buf;
-	key.dsize = strlen(key_buf);
-
-	content = gdbm_fetch(dbgen.tid[dbgen.ps_names_index],key);
-
-	if (content.dptr == NULL)
-	{
-		if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
-		{
-			free(ps_name_low);
-			*p_error = DbErr_DatabaseAccess;
-			return(-1);
-		}
-		else
-		{
-			free(ps_name_low);
-			*p_error = DbErr_DeviceNotDefined;
-			return(-1);
-		}
-	}
-	else
-	{
-
-/* Remove pseudo device */
-
+		NdbmPSNamesCont cont(dbgen.tid[dbgen.ps_names_index], key);
+//
+// Remove pseudo device
+//
 		if (gdbm_delete(dbgen.tid[dbgen.ps_names_index],key) != 0)
 		{
-			free(ps_name_low);
 			*p_error = DbErr_DatabaseAccess;
-			return(-1);
+			return(DS_NOTOK);
 		}
-
 	}
-
-/* Free memory and leave function */
-
-	free(ps_name_low);
-	return(0);
-
+	catch ( ... )
+	{
+		if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
+			*p_error = DbErr_DatabaseAccess;
+		else
+			*p_error = DbErr_DeviceNotDefined;
+		return(DS_NOTOK);
+	}
+//
+// Free memory and leave function
+//
+	return(DS_OK);
 }

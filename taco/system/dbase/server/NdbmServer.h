@@ -16,46 +16,30 @@ private:
 	char			**ptra;
 
 private:
-	int 	db_find(char *,char *,char **,char **,int *);
-	int 	db_devlist(char *,int *,db_res *);
-	int 	db_del(char *,char **);
-	int 	db_reinsert(arr1 *,char **,int);
+	int 	db_reinsert(arr1 *, nam *,int);
 
-	long 	upd_name(char *,char *,int,long,long *);
-	long 	del_name(device *,int *,char *,dena **,long *);
-	long 	is_dev_in_db(db_dev_in_db *,long);
-	long 	update_dev_list(device *,int);
-	long 	upd_res(char *,long,char,long *);
+	long 	upd_name(std::string, std::string, int) throw (long);
+	long	upd_res(const std::string &lin, const long numb, bool array) throw (long);
+	long 	del_name(device&, int&, std::string, std::vector<dena>&) throw (long);
+	long 	is_dev_in_db(db_dev_in_db *,long) throw (long);
+	long 	update_dev_list(device&, long) throw (long);
 
-	int 	stringOK(char *,char *);
-	int 	memb_fil(device *);
-	int 	fam_fil(device *);
+	bool	stringOK(std::string, std::string);
+	char 	*fam_fil(device*, const std::string&, const std::string&, int) throw (int);
+	char 	*memb_fil(device *, const std::string&, int) throw (int);
 
 	long 	reg_ps(char *,long,char *,long,long *);
 	long 	unreg_ps(char *,long *);
 
-//	int	db_find(const std::string, const std::string, char **) throw (int);
-//	int	db_devlist(std::string, db_res *);
-//	int	db_del(std::string);
+	int	db_find(const std::string, const std::string, nam *) throw (int);
+	int	db_devlist(std::string, db_res *);
 	int	db_insert(std::string, std::string, std::string);                                                        
-	int 	db_del(std::string, char **);
-//	int 	db_reinsert(arr1 *, char **, int);
+	int 	db_del(std::string, nam *);
 	int 	db_store_3(db_devinfo_3 &);
 	int 	db_store_2(db_devinfo_2 &);
 	int 	db_store(db_devinfo &);
-//	char 	*fam_fil(device *, const std::string &, const std::string &, int) throw (int);
-//	char 	*memb_fil(device *, const std::string &, int) throw (int);
-//	bool 	stringOK(const std::string, const std::string);
 	void 	delete_res(const std::string &);
 	long 	cmp_nocase(const std::string &, const std::string &);
-
-//	long 	reg_ps(const std::string &,long, const std::string &,long) throw (long);
-//	long 	unreg_ps(const std::string &) throw (long);
-//	long 	upd_name(std::string , std::string, int, long) throw (long);
-//	long 	del_name(device &,int &, std::string, std::vector<dena> &) throw (long);
-//	long 	is_dev_in_db(db_dev_in_db *,long) throw (long);
-//	long 	update_dev_list(device &,int) throw (long);
-//	long 	upd_res(const std::string &, long, bool) throw (long);
 
 	void	leave(void);
 

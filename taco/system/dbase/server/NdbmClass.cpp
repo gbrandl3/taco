@@ -1,5 +1,5 @@
 #include <cstdlib>
-
+#include "config.h"
 #include <macros.h>
 #include <db_setup.h>
 
@@ -55,7 +55,7 @@ NdbmNamesKey::~NdbmNamesKey()
 // Class constructor to be used with the record key
 NdbmNamesKey::NdbmNamesKey(const datum &call_key)
 {
-	key.dptr = 0;
+	key.dptr = NULL;
 	key.dsize = 0;
 	if (call_key.dptr != NULL)
 		str = std::string(call_key.dptr, call_key.dsize);
@@ -70,7 +70,7 @@ NdbmNamesKey::NdbmNamesKey(const std::string &server, const std::string &pers_na
 //
 // Allocate memory to store key
 //
-	key.dptr = 0;
+	key.dptr = NULL;
 	key.dsize = 0;
 	try
 	{
@@ -657,13 +657,14 @@ NdbmPSNamesCont::~NdbmPSNamesCont()
 
 NdbmPSNamesCont::NdbmPSNamesCont(GDBM_FILE db, datum key)
 {
-    datum content;
+	datum content;
 
-    content = gdbm_fetch(db,key);
-    if (content.dptr != NULL)
-	str = std::string(content.dptr, content.dsize);
-    else
-	throw NdbmError(DbErr_CantGetContent,MessGetContent);
+	content = gdbm_fetch(db,key);
+	if (content.dptr != NULL)
+		str = std::string(content.dptr, content.dsize);
+	else
+		throw NdbmError(DbErr_CantGetContent,MessGetContent);
+	free(content.dptr);
 }
 
 //
@@ -673,14 +674,14 @@ NdbmPSNamesCont::NdbmPSNamesCont(GDBM_FILE db, datum key)
 // [] operator overloading. It returns one content character
 char NdbmPSNamesCont::operator [] (long i)
 {
-    try
-    {
-	return(str.at(i));
-    }
-    catch(const std::out_of_range &)
-    {
-	throw NdbmError(DbErr_IndTooLarge, MessTooLarge);
-    }
+	try
+	{
+		return(str.at(i));
+	}
+	catch(const std::out_of_range &)
+	{
+		throw NdbmError(DbErr_IndTooLarge, MessTooLarge);
+	}
 }
 
 //
@@ -689,11 +690,11 @@ char NdbmPSNamesCont::operator [] (long i)
 // Method to return the host name from the record content
 std::string NdbmPSNamesCont::get_host_name(void) const
 {
-    std::string::size_type pos;
+	std::string::size_type pos;
 
-    if ((pos = str.find(SEP)) == std::string::npos)
-	throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
-    return str.substr(0, pos);	
+	if ((pos = str.find(SEP)) == std::string::npos)
+		throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
+	return str.substr(0, pos);	
 }
 
 // Method to return the process PID from the record content
@@ -744,14 +745,14 @@ long NdbmPSNamesCont::get_refresh(void) const
 
 void NdbmPSNamesCont::get_devinfo(db_devinfo_svc &data)
 {
-    strcpy(data.host_name,this->get_host_name().c_str());	
-    data.pid = this->get_pid();
-    data.device_class[0] = '\0';
-    data.server_name[0] = '\0';
-    data.personal_name[0] = '\0';
-    data.process_name[0] = '\0';
-    data.server_version = 0;
-    data.device_exported = False;
+	strcpy(data.host_name,this->get_host_name().c_str());	
+	data.pid = this->get_pid();
+	data.device_class[0] = '\0';
+	data.server_name[0] = '\0';
+	data.personal_name[0] = '\0';
+	data.process_name[0] = '\0';
+	data.server_version = 0;
+	data.device_exported = False;
 }
 
 
@@ -794,6 +795,8 @@ NdbmResKey::~NdbmResKey()
 // Class constructor to be used from individual element
 NdbmResKey::NdbmResKey(std::string &family,std::string &member,std::string &r_name,long indi=1)
 {
+	key.dptr = NULL;
+	key.dsize = 0;
 	try
 	{
 //
@@ -823,6 +826,8 @@ NdbmResKey::NdbmResKey(std::string &family,std::string &member,std::string &r_na
 // 
 NdbmResKey::NdbmResKey(std::string &key_str)
 {
+	key.dptr = NULL;
+	key.dsize = 0;
 	try
 	{
 		str = key_str;	
@@ -842,6 +847,8 @@ NdbmResKey::NdbmResKey(std::string &key_str)
 // Class constructor to be used with the record key
 NdbmResKey::NdbmResKey(datum user_key)
 {
+	key.dptr = NULL;
+	key.dsize = 0;
 	if (user_key.dptr != NULL)
 	{
 		str = std::string(user_key.dptr, user_key.dsize);
@@ -850,10 +857,10 @@ NdbmResKey::NdbmResKey(datum user_key)
 //
 		std::string::size_type pos = str.find_last_of('|',str.size() - 2);
 		inter_str = str.substr(0, pos + 1); 
+		build_datum();
 	}
 	else
 		throw NdbmError(DbErr_CantBuildKey,MessBuildKey);
-	build_datum();
 }
 
 //
@@ -885,6 +892,8 @@ void NdbmResKey::build_datum()
 		long l = strlen(str.c_str());
 		if (l != 0)
 		{
+			if (key.dsize)
+				delete [] key.dptr;
 			key.dptr = new char[l + 1];
 			strcpy(key.dptr, str.c_str());
 			key.dsize = l;
@@ -1010,13 +1019,14 @@ NdbmResCont::~NdbmResCont()
 
 NdbmResCont::NdbmResCont(GDBM_FILE db, datum key)
 {
-    datum content;
-
-    content = gdbm_fetch(db,key);
-    if (content.dptr != NULL)
-	str = std::string(content.dptr, content.dsize);
-    else
-	throw NdbmError(DbErr_CantGetContent,MessGetContent);
+	datum content = gdbm_fetch(db, key);
+	if (content.dptr != NULL)
+	{
+		str = std::string(content.dptr, content.dsize);
+		free(content.dptr);
+	}
+	else
+		throw NdbmError(DbErr_CantGetContent,MessGetContent);
 }
 
 //
@@ -1025,14 +1035,14 @@ NdbmResCont::NdbmResCont(GDBM_FILE db, datum key)
 // [] operator overloading. It returns one content character
 char NdbmResCont::operator [] (long i)
 {
-    try
-    {
-	return(str.at(i));
-    }
-    catch(const std::out_of_range &)
-    {
-	throw NdbmError(DbErr_IndTooLarge,MessTooLarge);
-    }
+	try
+	{
+		return(str.at(i));
+	}
+	catch(const std::out_of_range &)
+	{
+		throw NdbmError(DbErr_IndTooLarge,MessTooLarge);
+	}
 }
 
 //
@@ -1041,7 +1051,7 @@ char NdbmResCont::operator [] (long i)
 // Method to return the resource value
 std::string NdbmResCont::get_res_value(void) const
 {
-    return str;
+	return str;
 }
 
 

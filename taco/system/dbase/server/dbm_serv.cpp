@@ -1,5 +1,4 @@
 #include "config.h"
-
 #include <API.h>
 
 #include <DevErrors.h>
@@ -8,17 +7,24 @@
 #else
 #	include <stdlib.h>
 #endif
+#ifdef HAVE_SSTREAM
+#	include <sstream>
+#else
+#	include <strstream>
+#	define  stringstream	strstream
+#endif
 
 #include <sys/socket.h>
 #include <db_xdr.h>
 #include <fcntl.h>
 
-/* Some C++ include files */
-
 #include <iostream>
 #include <NdbmClass.h>
 #include <NdbmServer.h>
+#include <algorithm>
+#include <cctype>
 #include <string>
+
 
 NdbmServer::NdbmServer(const std::string user, const std::string password, const std::string db)
         : DBServer()
@@ -31,60 +37,36 @@ NdbmServer::NdbmServer(const std::string user, const std::string password, const
 	return;
 }
 
-/****************************************************************************
-*		Server code for db_getresource function                     *
-*    Function rule : To retrieve from the database (builded from resources  *
-*		     files) a resource value                                *
-*                                                                           *
-*    Argin : A pointer to a structure of the "arr1" type                    *
-*            The definition of the arr1 type is :                           *
-*            struct {                                                       *
-*              u_int arr1_len;     The number of strings                    *
-*              char **arr1_val;    A pointer to the array of strings        *
-*                  }                                                        *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a structure of the "db_res" type.   *
-*    The definition of this structure is :                                  *
-*    struct {                                                               *
-*      arr1 rev_val;   A structure of the arr1 type (see above) with the    *
-*                     resources values information transferred as strings   *
-*      int db_err;    The database error code                               *
-*                     0 if no error                                         *
-*          }                                                                *
-*                                                                           *
-*****************************************************************************/
-db_res *NdbmServer::db_getres_1_svc(arr1 *rece,struct svc_req *rqstp)
+/**
+ * To retrieve from the database (built from resources files) a resource value 
+ * 
+ * @param rece A pointer to a structure of the arr1 type, containing the names of the requested 
+ *		resources
+ * @param rqstp
+ * 
+ * @return a pointer to a structure db_res type, containing the resources and the 
+ * 	error code. 
+ */
+db_res *NdbmServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 {
-	int 		i,
-			j;
 	int 		k = 0;
-	u_int 		num_res,
-			diff,
-			err_db;
-	char 		*ptrc,
-			*temp;
-	char 		tab_name[80];
-	char 		rest[80];
-	struct sockaddr_in so;
+	u_int 		num_res = rece->arr1_len;
+	struct sockaddr_in 	so;
 #if defined __GLIBC__  &&  __GLIBC__ >= 2
-	socklen_t  	so_size;   /* from POSIX draft - already used by GLIBC */
+	socklen_t 		so_size;		// from POSIX draft - already used by GLIBC 
 #else
 	int 		so_size;
 #endif
 	u_short 	prot;
-	char 		*tmp1;
-	int 		k1 = 1;
 //
-// Return error code if the server is not connected to the database 
+// Return error code if the server is not connected to the database */
 //
 	if (dbgen.connected == False)
 	{
 		browse_back.db_err = DbErr_DatabaseNotConnected;
 		browse_back.res_val.arr1_len = 0;
 		browse_back.res_val.arr1_val = NULL;
-		return(&browse_back);
+		return (&browse_back);
 	}
 //
 // Retrieve the protocol used to send this request to server 
@@ -93,9 +75,9 @@ db_res *NdbmServer::db_getres_1_svc(arr1 *rece,struct svc_req *rqstp)
 
 #ifdef sun
 	if (rqstp->rq_xprt->xp_port == udp_port)
-                prot = IPPROTO_UDP;
-        else
-                prot = IPPROTO_TCP;
+		prot = IPPROTO_UDP;
+	else
+		prot = IPPROTO_TCP;
 #else
 	so_size = sizeof(so);
 	if (getsockname(rqstp->rq_xprt->xp_sock,(struct sockaddr *)&so, (socklen_t *)&so_size) == -1)
@@ -105,1310 +87,971 @@ db_res *NdbmServer::db_getres_1_svc(arr1 *rece,struct svc_req *rqstp)
 		return(&browse_back);
 	}
 
-	if (so.sin_port == getUDPPort())
+    	if (so.sin_port == getUDPPort())
 		prot = IPPROTO_UDP;
 	else
 		prot = IPPROTO_TCP;
-#endif /*solaris */
+#endif 
 
-	num_res = rece->arr1_len;
 #ifdef DEBUG
-	for(i=0; i<num_res;i++)
-	{
+	for (int i = 0; i < num_res; i++)
 		std::cout << "Resource name : " << rece->arr1_val[i] << std::endl;
-	}
 #endif
-/* Initialize send_back structure error code */
-
+//
+// Initialize browse_back structure error code 
+//
 	browse_back.db_err = 0;
-
-/* Allocate memory for the array of string sended back to client */
-
- 	if((browse_back.res_val.arr1_val = (char **)calloc(num_res,sizeof(nam))) == NULL)
+//
+// Allocate memory for the array of string sended back to client 
+//
+	try
+	{
+		browse_back.res_val.arr1_val = new nam[num_res];
+	} 
+	catch (const std::bad_alloc &)
 	{
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		browse_back.res_val.arr1_len = 0;
-		return(&browse_back);
+		return (&browse_back);
 	}
-
-/* Allocate memory for the temporary buffer used in the db_find function */
-
-	if ((tmp1 = (char *)malloc((size_t)SIZE)) == NULL)
+//
+// A loop on the resource's number to be looked for 
+//
+	for (int i = 0; i < num_res; i++)
 	{
-		browse_back.db_err = DbErr_ServerMemoryAllocation;
-		browse_back.res_val.arr1_len = 0;
-		return(&browse_back);
-	}
-
-/* A loop on the resource's number to be looked for */
-
-	for(i=0;i<num_res;i++)
-	{
-		ptrc = rece->arr1_val[i];
-
-/* Find the table name (DOMAIN) */
-		temp = (char *) strchr(ptrc,'/');
-		diff = (u_int)(temp - ptrc);
-		strncpy(tab_name,ptrc,diff);
-		tab_name[diff] = '\0';
-
-		strcpy(rest,temp + 1);
-
-/* Try to find the resource value from database */
-		if((err_db = db_find(tab_name, rest, &browse_back.res_val.arr1_val[i], &tmp1, &k1)) != 0 )
+		std::string ptrc(rece->arr1_val[i]);
+//
+// Find the table name (DOMAIN) 
+//
+		std::string::size_type 	pos = ptrc.find('/');
+		std::string	  	tab_name(ptrc.substr(0, pos));
+		std::string		rest(ptrc.substr(pos + 1));
+//
+// Try to find the resource value from database 
+//
+		try
 		{
-			for (j=0;j<=i;j++)
-				free(browse_back.res_val.arr1_val[j]);
-			free(tmp1);
+			db_find(tab_name, rest, &browse_back.res_val.arr1_val[i]);
+		}
+		catch (const int err_db)
+		{
+			for (int j = 0; j < i; j++)
+				delete [] browse_back.res_val.arr1_val[j];
+			delete [] browse_back.res_val.arr1_val;
 			browse_back.db_err = err_db;
 			browse_back.res_val.arr1_len = 0;
-			return(&browse_back);
+			return (&browse_back);
 		}
-
-/* Compute an estimation of the network packet size (Only if the UDP protocol
-   has been used to send this request to the server) */
+//
+// Compute an estimation of the network packet size (Only if the UDP protocol
+// has been used to send this request to the server) 
+//
 		if (prot == IPPROTO_UDP)
 		{
 			if ((k = strlen(browse_back.res_val.arr1_val[i]) + k) > SIZE - 1000)
 			{
-				for (j=0;j<=i;j++)
-					free(browse_back.res_val.arr1_val[j]);
-				free(tmp1);
+				for (int j = 0; j <= i; j++)
+					delete [] (browse_back.res_val.arr1_val[j]);
+				delete [] browse_back.res_val.arr1_val;
 				browse_back.db_err = DbErr_TooManyInfoForUDP;
 				browse_back.res_val.arr1_len = 0;
-				return(&browse_back);
+				return (&browse_back);
 			}
-
 		}
-
 	}
-
-/* Initialize the structure sended back to client */
+//
+// Initialize the structure sent back to client 
+//
 	browse_back.res_val.arr1_len = num_res;
-
-/* Free memory */
-	free(tmp1);
-
-/* Exit server */
-	return(&browse_back);
+//
+// Exit server 
+//
+	return (&browse_back);
 }
-
 
-
-/****************************************************************************
-*                                                                           *
-*		Server code for db_getdevlist function                      *
-*                               -------------                               *
-*                                                                           *
-*    Function rule : To retrieve all the names of the devices driven by a   *
-*                    device server.                                         *
-*                                                                           *
-*    Argin : The name of the device server                                  *
-*            The definition of the nam type is :                            *
-*            typedef char *nam;                                             *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a structure of the "db_res" type.   *
-*    The definition of this structure is :                                  *
-*    struct {                                                               *
-*      arr1 rev_val;   A structure of the arr1 type (see above) with the    *
-*                     devices names                                         *
-*      int db_err;    The database error code                               *
-*                     0 if no error                                         *
-*            }                                                              *
-*                                                                           *
-****************************************************************************/
+/**
+ * To retrieve all the names of the devices driven by a device server. 
+ * 
+ * @param dev_name The name of the device server 
+ * 
+ * @return a pointer to a structure of the db_res type, containing the device names
+ *	and the error code.
+ */
 db_res *NdbmServer::db_getdev_1_svc(nam *dev_name)
 {
-	char *temp;
-	int dev_num,err_db,i;
-
 #ifdef DEBUG
 	std::cout << "Device server name (getdevlist) : " << *dev_name << std::endl;
 #endif
-
-/* Initialize error code sended back to client */
-
+//
+// Initialize error code sended back to client 
+//
 	browse_back.db_err = 0;
-
-/* Return error code if the server is not connected to the database */
-
-	if (dbgen.connected == False)
+//
+// Return error code if the server is not connected to the database 
+//
+	if (!dbgen.connected)
 	{
 		browse_back.db_err = DbErr_DatabaseNotConnected;
 		browse_back.res_val.arr1_len = 0;
 		browse_back.res_val.arr1_val = NULL;
-		return(&browse_back);
+		return (&browse_back);
 	}
-
-/* Call database function */
-
-	if ((err_db = db_devlist(*dev_name,&dev_num,&browse_back)) != 0)
+//
+// Call database function 
+//
+	try
+	{
+		int dev_num = db_devlist(*dev_name, &browse_back);
+#ifdef DEBUG
+		for (int i = 0; i < dev_num; i++)
+			std::cout << "Device name : " << browse_back.res_val.arr1_val[i] << std::endl;
+#endif
+	}
+	catch (const int err_db)
 	{
 		browse_back.db_err = err_db;
+//		for (int i = 0;;);
 		browse_back.res_val.arr1_len = 0;
-		return(&browse_back);
-	}
-
-#ifdef DEBUG
-	for (i=0;i<dev_num;i++)
-		std::cout << "Device name : " << browse_back.res_val.arr1_val[i] << std::endl;
-#endif
-
-/* Exit server */
-
-	return(&browse_back);
-
+    	}
+//
+// Exit server 
+//
+	return (&browse_back);
 }
-
 
-
-/****************************************************************************
-*                                                                           *
-*		Code for db_find function                                   *
-*                        -------                                            *
-*                                                                           *
-*    Function rule : To retrieve a resource value in the database           *
-*                                                                           *
-*    Argin : - The table name where the ressource can be retrieved          *
-*            - A part of the resource name (FAMILY/MEMBER/RES.)             *
-*            - The adress where to put the resource value (as a string)     *
-*	     - The buffer's address used to store temporary results         *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
-int NdbmServer::db_find(char *tab_name,char *p_res_name,char **out,char **adr_tmp1,int *k1)
+/**
+ * To retrieve a resource value in the database 
+ *
+ * @param tab_name The table name where the ressource can be retrieved
+ * @param res_name A part of the resource name (FAMILY/MEMBER/RES.) 
+ * @param out The adress where to put the resource value (as a string)
+ *
+ * @return 0 if no errors occurs or the error code when there is a problem.  
+ */
+int NdbmServer::db_find(const std::string tab_name, const std::string res_name, nam *out) throw (int)
 {
-	reso 		res, 
-			ret;
-	unsigned int 	diff;
-	char 		*temp, 
-			*tmp;
-	int	 	k,
-			sec_res;
-	int 		ctr = 0;
-	GDBM_FILE	tab;
-	datum 		key,
-			resu, 
-			resu_out;
-	int 		res_numb = 1;
-	char 		ind_name[20];
-	int 		exit = 0;
-	char		indnr[4];
-	int 		i;
+	std::string	p_res_name(res_name),
+    			adr_tmp1;
+	int 		k,
+			ctr = 0,
+			res_numb = 1,
+	 		i;
+	bool		sec_res = (tab_name == "sec");
+	GDBM_FILE 	tab;
+	datum 		key;
 
 #ifdef DEBUG
 	std::cout << "Table name : " << tab_name << std::endl;
 #endif
+//
+// Get family name 
+//
+ 	std::string::size_type	pos = p_res_name.find("/");
+	std::string		family = p_res_name.substr(0, pos);
+	p_res_name.erase(0, pos + 1);
+//
+// Get member name 
+//
+	pos = p_res_name.find("/");
+	std::string	member = p_res_name.substr(0, pos);
+//
+// Get resource name 
+//
+	std::string	r_name = p_res_name.substr(pos + 1);
+//
+// For security domain, change all occurances of | by ^ (| is the field separator in NDBM !) 
+//
+	if (sec_res) 
+		std::transform(r_name.begin(), r_name.end(), r_name.begin(), DBServer::make_sec);
 
-/* Set a flag if the resource belongs to security domain */
-
-	if (strcmp(tab_name,"sec") == 0)
-		sec_res = True;
-	else
-		sec_res = False;
-
-/* Get family name */
-	tmp = (char *) strchr(p_res_name,'/');
-	diff = (u_int)(tmp++ - p_res_name);
-	strncpy(res.fam,p_res_name,diff);
-	res.fam[diff] = '\0';
-
-/* Get member name */
-	temp = (char *) strchr(tmp,'/');
-	diff = (u_int)(temp++ - tmp);
-	strncpy(res.member,tmp,diff);
-	res.member[diff] = '\0';
-
-/* Get resource name */
-	strcpy(res.r_name,temp);
-	
-/* For security domain, change all occurances of | by ^ (| is the field separator in NDBM !) */
-	if (sec_res == True)
-	{
-		k = strlen(res.r_name);
-		for (i = 0;i < k;i++)
-		{
-			if (res.r_name[i] == '|')
-				res.r_name[i] = SEC_SEP;
-		}
-	}
 #ifdef DEBUG
-	std::cout << "Family name : " << res.fam << std::endl;
-	std::cout << "Member name : " << res.member << std::endl;
-	std::cout << "Resource name : " << res.r_name << std::endl;
+	std::cout << "Family name : " << family << std::endl;
+	std::cout << "Member name : " << member << std::endl;
+	std::cout << "Resource name : " << r_name << std::endl;
 #endif
-
-/* Select the right resource table in the right database */
-	for (i = 0;i < dbgen.TblNum;i++)
-	{
-		if (strcmp(tab_name,dbgen.TblName[i].c_str()) == 0)
+//
+// Select the right resource table in the right database 
+//
+	for (i = 0; i < dbgen.TblNum; i++)
+		if (tab_name == dbgen.TblName[i])
 		{
 			tab = dbgen.tid[i];
 			break;
 		}
-	}
-
 	if (i == dbgen.TblNum)
-		return(DbErr_DomainDefinition);
-
-
-/* Try to retrieve the right tuple in table and loop in the case of an array of resources */
-	if ((resu_out.dptr = (char *)malloc(MAX_CONT)) == NULL)
+		throw int(DbErr_DomainDefinition);
+//
+// Try to retrieve the right tuple in table and loop in the case of an array of resources 
+//
+	try 
 	{
-		printf("Error in malloc for resu_out\n");
-		return(DbErr_ServerMemoryAllocation);
+		key.dptr = new char[MAX_KEY];
 	}
-	if ((key.dptr = (char *)malloc(MAX_KEY)) == NULL)
+	catch(const std::bad_alloc &)
 	{
-		free(resu_out.dptr);
-		printf("Error in malloc for key\n");
-		return(DbErr_ServerMemoryAllocation);
+		std::cerr << "Error in malloc for key" << std::endl;
+		throw int (DbErr_ServerMemoryAllocation);
 	}
 
-
+	std::string	outstring;
 	do
 	{
-		strcpy(key.dptr, res.fam);
-		strcat(key.dptr,"|");
-		strcat(key.dptr, res.member);
-		strcat(key.dptr,"|");
-		strcat(key.dptr, res.r_name);
-		strcat(key.dptr,"|");
-		sprintf(indnr,"%d",res_numb);
-		strcat(key.dptr, indnr);
-		strcat(key.dptr, "|");
+		std::stringstream	s;
+#if !HAVE_SSTREAM
+		s.seekp(0, ios::beg);
+#endif
+		s << family << "|" << member << "|" << r_name << "|" << res_numb << "|" << std::ends;
+#if !HAVE_SSTREAM
+		strcpy(key.dptr, s.str());
+		s.freeze(false);
+#else
+		strcpy(key.dptr, s.str().c_str());
+#endif
 		key.dsize = strlen(key.dptr);
 
-		resu = gdbm_fetch(tab, key);                                 
-		if (resu.dptr != NULL)
+		try
 		{
-			strncpy(resu_out.dptr, resu.dptr, resu.dsize);
-			resu_out.dptr[resu.dsize] = '\0';
-			resu_out.dsize = resu.dsize;
-			free(resu.dptr);
+			NdbmResCont resu(tab, key);
+	    		
 			if (ctr)
 			{
-/* Copy the new array element in the result buffer. If the temporary buffer is full, realloc memory for it. */
-				k = strlen(*adr_tmp1);
-				if (k > ((*k1 * SIZE) - LIM))
-				{
-					if ((*adr_tmp1 = (char *)realloc(*adr_tmp1,(size_t)((*k1 + 1) * SIZE))) == NULL)
-					{
-						free(key.dptr);
-						free(resu_out.dptr);
-						return(DbErr_ServerMemoryAllocation);
-					}
-					(*k1)++;
-				}
-				(*adr_tmp1)[k] = SEP_ELT;
-				(*adr_tmp1)[k + 1] = 0;
-				strcat(*adr_tmp1,resu_out.dptr);
+//
+// Copy the new array element in the result buffer. If the temporary buffer
+// is full, realloc memory for it. */
+//
+				adr_tmp1 += SEP_ELT;
+				adr_tmp1 += resu.get_res_value();
 			}
 			else
-				strcpy(*adr_tmp1,resu_out.dptr);
+				adr_tmp1 = resu.get_res_value();
 			ctr++;
 			res_numb++;
-		} 
-		else
-		{
-			exit = 1;
 		}
-	} while (!exit);
-
-
-/* If it is a normal resource,so copy the resource value to the result buffer */
-	if (ctr == 1)
-	{
-		if ((*out = (char *)malloc(strlen(*adr_tmp1) + 1)) == NULL)
+		catch ( ... )
 		{
-			free(key.dptr);
-			free(resu_out.dptr);
-			printf("Error in malloc for out\n");
-			return(DbErr_ServerMemoryAllocation);
-		}
-		strcpy(*out,*adr_tmp1);
-	}
-
-/* For an array of resource */
-	if (ctr > 1)
-	{
-		k = strlen(*adr_tmp1);
-		if ((*out = (char *)malloc(strlen(*adr_tmp1) + 10)) == NULL)
-		{
-			free(key.dptr);
-			free(resu_out.dptr);
-			return(DbErr_ServerMemoryAllocation);
-		}
-
-		(*out)[0] = INIT_ARRAY;
-		sprintf(&((*out)[1]),"%d",ctr);
-		k = strlen(*out);
-		(*out)[k] = SEP_ELT;
-		(*out)[k + 1] = 0;
-		strcat(*out,*adr_tmp1);
-	}
-	
-/* Return if database error */
-/*
-	if (resu == NULL && ctr != 0)
-	{
-		free(key.dptr);
-		free(resu_out.dptr);
-		return(DbErr_DatabaseAccess);
-	}
-*/
-
-/* Initialize resource value to N_DEF if the resource is not defined in the database */
-	if (resu.dptr == NULL && ctr == 0)
-	{
-		if ( (*out = (char *)malloc(10)) == NULL)
-		{
-			free(key.dptr);
-			free(resu_out.dptr);
-			return(DbErr_ServerMemoryAllocation);
-		}
-		strcpy(*out,"N_DEF");
-	}
-	
-/* For resource of the SEC domain, change all occurences of the ^ character to the | character */
-	if (sec_res == True)
-	{
-		k = strlen(*out);   
-   		for (i = 0;i < k;i++)
-		{
-			if ((*out)[i] == SEC_SEP)
-				(*out)[i] = '|';
+	    		break;
 		}
 	}
-		
-/* Reset the temporary buffer */
-	(*adr_tmp1)[0] = 0;
+	while (true);
+//
+// Reset the temporary buffer 
+//
+	delete [] key.dptr;
 
-	free(key.dptr);
-	free(resu_out.dptr);
-	return(0);
-
+	try
+	{
+		switch(ctr)
+		{
+//
+// If it is a normal resource,so copy the resource value to the result buffer 
+//
+			case 1 : 	
+				*out = new char[adr_tmp1.length() + 1];
+	    			strcpy(*out, adr_tmp1.c_str());
+				break;
+//
+// Initialize resource value to N_DEF if the resource is not defined in the database 
+//
+			case 0 : 	
+			    	*out = new char[10];
+			    	strcpy(*out, "N_DEF");
+				break;
+			default : 	
+				*out = new char[adr_tmp1.length() + 10];
+	    			(*out)[0] = INIT_ARRAY;
+	    			sprintf(&((*out)[1]), "%d", ctr);
+	    			k = strlen(*out);
+	    			(*out)[k] = SEP_ELT;
+	    			(*out)[k + 1] = '\0';
+	    			strcat(*out, adr_tmp1.c_str());
+				break;
+		}
+	}
+	catch(const std::bad_alloc &)
+	{
+		delete [] key.dptr;
+		std::cerr << "Error in malloc for out" << std::endl;
+		throw int (DbErr_ServerMemoryAllocation);
+	}
+//
+// For resource of the SEC domain, change all occurences of the ^ character to the | character 
+//
+	if (sec_res)
+		std::transform(*out, *out + strlen(*out), *out, &DBServer::make_unsec);
+	return (0);
 }
-
 
-
-/****************************************************************************
-*                                                                           *
-*		Code for db_devlist function                                *
-*                        ----------                                         *
-*                                                                           *
-*    Function rule : To retrieve all the devices name for a particular      *
-*                    device server                                          *
-*                                                                           *
-*    Argin : - The  device server name                                      *
-*            - The adress  of the db_res structure tobe initialized with    *
-*              the devices names                                            *
-*              (see the definition of the db_res structure above)           *
-*                                                                           *
-*    Argout : - The number of devices managed by the devices server         *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
-
-
-int NdbmServer::db_devlist(char *dev_na,int *dev_num,db_res *back)
+/**
+ * To retrieve all the devices name for a particular device server 
+ * 
+ * @param dev_name The device server name
+ * @param back The adress  of the db_res structure to be initialized with the devices names
+ *              (see the definition of the db_res structure above)
+ *    The number of devices managed by the devices server
+ *
+ * @return 0 if no errors occurs or the error code when there is a problem. 
+ */
+int NdbmServer::db_devlist(const std::string dev_name, db_res * back)
 {
-
-	register char **ptra;
-	register int d_num;
-	int i,j,tp;
-	char *tmp;
-	char *tbeg, *tend;
-	unsigned int diff;
-	device dev,dev1;
-	datum key;
-	datum resu;
-	int dev_numb = 1;
-	char indnr[4];
-	int exit = 0;
-
-	d_num = 0;
-
-/* Allocate memory for the pointer's array */
-
-	if ((ptra = (char **) calloc(MAXDEV,sizeof(nam))) == NULL)
-	{
-		back->res_val.arr1_val = NULL;
-		return(DbErr_ServerMemoryAllocation);
-	}
-
-/* Get device server type */
-
-	tmp = (char *) strchr(dev_na,'/'); 
-	diff = (u_int)(tmp++ - dev_na);
-	strncpy(dev.ds_class,dev_na,diff);
-	dev.ds_class[diff] = '\0';
-
-/* Get device type */
-
-	strcpy(dev.ds_name,tmp);
+	std::string	dev_na(dev_name);
+	std::vector<nam> ptra;
+	register int 	d_num = 0;
+	int 		i,
+			j,
+	 		dev_numb = 1;
+	datum 		key;
+	char 		indnr[4];
+//
+// Get device server type 
+//
+	std::string::size_type	pos = dev_na.find("/");
+	std::string		ds_class = dev_na.substr(0, pos);
+//
+// Get device type 
+//
+	std::string		ds_name = dev_na.substr(pos + 1);
 
 #ifdef DEBUG
-	std::cout << "Device server class (getdevlist) : " << dev.ds_class << std::endl;
-	std::cout << "Device server name (getdevlist) : " << dev.ds_name << std::endl;
-#endif /* DEBUG */
-
-/* Try to retrieve the right tuple in NAMES table */
-
-	key.dptr = (char *)malloc(MAX_KEY);
-	
-	do
+	std::cout << "Device server class (getdevlist) : " << ds_class << std::endl;
+	std::cout << "Device server name (getdevlist) : " << ds_name << std::endl;
+#endif 
+//
+// Try to retrieve the right tuple in NAMES table 
+//
+	try
 	{
-
-		strcpy(key.dptr, dev.ds_class);
-		strcat(key.dptr,"|");
-		strcat(key.dptr, dev.ds_name);
-		strcat(key.dptr,"|");
-		sprintf(indnr,"%d",dev_numb);
-		strcat(key.dptr, indnr);
-		strcat(key.dptr,"|");
+		key.dptr = new char[MAX_KEY];
+	}
+	catch (const std::bad_alloc &)
+	{
+		return (DbErr_ServerMemoryAllocation);
+	}
+    	do
+    	{
+		std::stringstream	s;
+#if !HAVE_SSTREAM
+		s.seekp(0, ios::beg);
+#endif
+		s << ds_class << "|" << ds_name << "|" << dev_numb << "|" << std::ends;
+#if !HAVE_SSTREAM
+		strcpy(key.dptr, s.str());
+		s.freeze(false);
+#else
+		strcpy(key.dptr, s.str().c_str());
+#endif
 		key.dsize = strlen(key.dptr);
 
-		resu = gdbm_fetch(dbgen.tid[0], key);                                 
-
-		if (resu.dptr != NULL)
+		try
 		{
-	
-/* Unpack the retrieved content */
-
-			tbeg = resu.dptr;
-			tend = (char *) strchr(tbeg,'|');
-			if(tend == NULL)
+			NdbmResCont resu(dbgen.tid[0], key);
+//
+// Unpack the retrieved content 
+//
+			std::string	dev_name = resu.get_res_value();
+			pos = dev_name.find('|');
+			if (pos == std::string::npos)
 			{
-				fprintf(stderr, "No separator in the content.\n");
-				free(key.dptr);
-				return(ERR_DEVNAME);
+				std::cerr << "No separator in the content." << std::endl;
+				delete [] key.dptr;
+				throw int (ERR_DEVNAME);
 			}
-			diff = (unsigned int)(tend++ - tbeg);
-			strncpy(dev1.d_name, tbeg, diff);
-			dev1.d_name[diff] = '\0';
-
-/* Allocate memory for device name */
-
-			if (d_num != 0 && (d_num & 0xF) == 0)
-			{
-				tp = d_num >> 4;
-				if ((ptra = (char **)realloc(ptra,sizeof(nam) * ((tp + 1) * MAXDEV))) == NULL)
-				{
-					for(j=0;j<d_num;j++)
-						free(ptra[j]);
-					free(key.dptr);
-					return(DbErr_MaxNumberOfDevice);
-				}
-			}
-			if ((ptra[d_num] = (char *)malloc(strlen(dev1.d_name) + 1)) == NULL)
-			{
-				for (j=0;j<d_num;j++)
-					free(ptra[j]);
-				free(key.dptr);
-				return(DbErr_ServerMemoryAllocation);
-			}
-
-/* Copy the device name */
-
-			strcpy(ptra[d_num],dev1.d_name);
+	    		std::string	d_name = dev_name.substr(0, pos);
+//
+// Allocate memory for device name 
+//
+			char *p = new char[d_name.length() + 1];
+//
+// Copy the device name 
+//
+			strcpy(p, d_name.c_str());
 			dev_numb++;
 			d_num++;
-			
+			ptra.push_back(p);
 		}
-		else
-			exit = 1;
-
-	}
-	while(!exit);
-
-/*
-	if (resu == 0)
-	{
-		return(DbErr_DeviceServerNotDefined);
-		return(DbErr_DatabaseAccess);
-	}
-*/
-/* Initialize the structure */
-
-	back->res_val.arr1_val = ptra;
-	back->res_val.arr1_len = d_num;
-
-	*dev_num = d_num;
-
-	if (resu.dptr == NULL && d_num == 0)
-	{
-		free(key.dptr);
-		return(DbErr_DeviceServerNotDefined);
-	}
-
-	free(key.dptr);
-	return(0);
-
-}
-
-
-
-/****************************************************************************
-*                                                                           *
-*		Server code for db_putresource function                     *
-*                               --------------                              *
-*                                                                           *
-*    Function rule : To insert or update resources    		    	    *
-*                                                                           *
-*    Argin : A pointer to a structure of the tab_putres type		    *
-*            The definition of the tab_putres type is :                     *
-*	     struct {							    *
-*		u_int tab_putres_len;	The number of resources to be       *
-*					updated or inserted		    *
-*		putres tab_putres_val;	A pointer to an array of putres     *
-*					structure. Each putres structure    *
-*					contains the resource name and      *
-*                                       the resource value		    *
-*		    }							    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This funtion returns 0 if no error occurs. Otherwise an error code is  *
-*    returned								    *
-*                                                                           *
-****************************************************************************/
-DevLong *NdbmServer::db_putres_1_svc(tab_putres *rece)
-{
-	int res_num;
-	int i,l, ret_res=0;
-	int ires;
-	static DevLong sent_back;
-	char domain[40];
-	char family[40];
-	char member[40];
-	char r_name[40];
-	unsigned int diff;
-	char *tmp,*temp;
-	register putres *tmp_ptr;
-	char ind_name[20];
-	char numb[20];
-	unsigned int ctr;
-	GDBM_FILE 	tab;
-	datum key;
-	datum content;
-	reso ret;
-	int flags = 0;
-	int res_numb = 1;
-	int exit = 0;
-	char indnr[4];
-
-	res_num = rece->tab_putres_len;
-
-#ifdef DEBUG
-	for (i=0;i<res_num;i++)
-		std::cout << "Resource name : " << rece->tab_putres_val[i].res_name << std::endl;
-#endif /* DEBUG */
-
-/* Initialize sent back error code */
-
-	sent_back = 0;
-
-/* Return error code if the server is not connected to the database */
-
-	if (dbgen.connected == False)
-	{
-		sent_back = DbErr_DatabaseNotConnected;
-		return(&sent_back); 
-	}
-	
-/* Allocate memory for key and content pointers */
-
-	if ((key.dptr = (char *)malloc(MAX_KEY)) == NULL)
-	{
-		sent_back = DbErr_ServerMemoryAllocation;
-		return(&sent_back); 
-	}
-	if ((content.dptr = (char *)malloc(MAX_CONT)) == NULL)
-	{
-		sent_back = DbErr_ServerMemoryAllocation;
-		return(&sent_back); 
-	}
-
-/* A loop for every resource */
-
-	for (ires = 0;ires < res_num;ires++)
-	{
-		tmp_ptr = &(rece->tab_putres_val[ires]);
-		res_numb = 1;
-
-/* Extract domain, family, member and resource name from the full resource name */
-
-		temp = (char *) strchr(tmp_ptr->res_name,'/');
-		diff = (unsigned int)(temp++ - tmp_ptr->res_name);
-		strncpy(domain,tmp_ptr->res_name,diff);
-		domain[diff] = 0;
-
-		tmp = (char *) strchr(temp,'/');
-		diff = (unsigned int)(tmp++ - temp);
-		strncpy(family,temp,diff);
-		family[diff] = 0;
-
-		temp = (char *) strchr(tmp,'/');
-		diff = (unsigned int)(temp++ - tmp);
-		strncpy(member,tmp,diff);
-		member[diff] = 0;
-
-		strcpy(r_name,temp);
-
-#ifdef DEBUG
-		std::cout << "Domain name : " << domain << std::endl;
-		std::cout << "Family name : " << family << std::endl;
-		std::cout << "Member name : " << member << std::endl;
-		std::cout << "Resource name : " << r_name << std::endl;
-#endif /* DEBUG */
-
-/* Select the right resource table in CS database */
-
-		for (i = 0;i < dbgen.TblNum;i++)
+		catch(const std::bad_alloc &)
 		{
-			if (strcmp(domain,dbgen.TblName[i].c_str()) == 0)
+			for (std::vector<nam>::iterator j = ptra.begin(); j != ptra.end(); ++j)
+				delete [] *j;
+			delete [] key.dptr;
+			return (DbErr_ServerMemoryAllocation);
+		}
+		catch (const int err)
+		{
+			for (std::vector<nam>::iterator j = ptra.begin(); j != ptra.end(); ++j)
+				delete [] *j;
+			delete [] key.dptr;
+			return err;
+		}
+		catch ( ... )
+		{
+	    		break;
+		}
+	} while (true);
+	delete [] key.dptr;
+//
+// Initialize the structure 
+//
+	try
+	{
+    		back->res_val.arr1_val = new nam[ptra.size()];
+    		back->res_val.arr1_len = ptra.size();
+		for (int j = 0; j < back->res_val.arr1_len; ++j)
+			back->res_val.arr1_val[j] = ptra[j];
+		if (back->res_val.arr1_len == 0)
+			throw int (DbErr_DeviceServerNotDefined);
+		return (back->res_val.arr1_len);
+	}
+	catch(const std::bad_alloc &)
+	{
+		return (DbErr_ServerMemoryAllocation);
+	}	
+}
+
+/**
+ * To insert or update resources 
+ *
+ * @param rece A pointer to a structure of the tab_putres type, containing
+ +	the resources and resource values
+ * 
+ * @return 0 if no error occurs. Otherwise an error code is returned
+ */
+DevLong *NdbmServer::db_putres_1_svc(tab_putres * rece)
+{
+	int 		res_num = rece->tab_putres_len,
+	 		i,
+			ret_res = 0,
+     			res_numb = 1;
+	std::string 	domain,
+    			family,
+    			member,
+    			r_name;
+	unsigned int 	ctr;
+	GDBM_FILE 	tab;
+	datum 		key,
+			content;
+
+#ifdef DEBUG
+	for (i = 0; i < res_num; i++)
+		std::cout << "Resource name : " << rece->tab_putres_val[i].res_name << std::endl;
+#endif 
+//
+// Initialize sent back error code 
+//
+	errcode = 0;
+//
+// Return error code if the server is not connected to the database
+//
+	if (!dbgen.connected)
+	{
+		errcode = DbErr_DatabaseNotConnected;
+		return (&errcode);
+   	}
+//
+// Allocate memory for key and content pointers 
+//
+	try
+	{
+    		key.dptr = new char[MAX_KEY];
+		content.dptr = new char[MAX_CONT];
+	}
+	catch (const std::bad_alloc &)
+	{
+		delete [] key.dptr;
+		errcode = DbErr_ServerMemoryAllocation;
+		return (&errcode);
+	}
+//
+// A loop for every resource 
+//
+	try
+	{
+    		for (int ires = 0; ires < res_num; ires++)
+    		{
+			putres 	*tmp_ptr = &(rece->tab_putres_val[ires]);
+			res_numb = 1;
+//
+// Extract domain, family, member and resource name from the full resource name 
+//
+			std::string		temp = tmp_ptr->res_name;
+			std::string::size_type	pos = temp.find('/');
+			domain = temp.substr(0, pos);
+			temp.erase(0, pos + 1);
+
+			pos = temp.find('/');
+			family = temp.substr(0, pos);
+			temp.erase(0, pos + 1);
+
+			pos = temp.find('/');
+			member = temp.substr(0, pos);
+			r_name = temp.substr(pos + 1);
+
+#ifdef DEBUG
+			std::cout << "Domain name : " << domain << std::endl;
+			std::cout << "Family name : " << family << std::endl;
+			std::cout << "Member name : " << member << std::endl;
+			std::cout << "Resource name : " << r_name << std::endl;
+#endif 
+//
+// Select the right resource table in CS database 
+//
+			for (i = 0; i < dbgen.TblNum; i++)
+			if (domain == dbgen.TblName[i])
 			{
 				tab = dbgen.tid[i];
 				break;
 			}
-		}
-
-		if (i == dbgen.TblNum)
-		{
-			sent_back = DbErr_DomainDefinition;
-			free(key.dptr);
-			free(content.dptr);
-			return(&sent_back); 
-		}
-
-
-/* Try to retrieve this resource from the database */
-
-		strcpy(key.dptr, family);
-		strcat(key.dptr,"|");
-		strcat(key.dptr, member);
-		strcat(key.dptr,"|");
-		strcat(key.dptr, r_name);
-		strcat(key.dptr,"|");
-		sprintf(indnr,"%d",res_numb);
-		strcat(key.dptr, indnr);
-		strcat(key.dptr,"|");
-		key.dsize = strlen(key.dptr);
-
-
-/* Delete the old information (single or array) if the array already exists */
-
-
-		while(( gdbm_delete(tab, key)) == 0)
-		{
-			res_numb++;
-			ret_res = 1;
-			strcpy(key.dptr, family);
-			strcat(key.dptr,"|");
-			strcat(key.dptr, member);
-			strcat(key.dptr,"|");
-			strcat(key.dptr, r_name);
-			strcat(key.dptr,"|");
-			sprintf(indnr,"%d",res_numb);
-			strcat(key.dptr, indnr);
-			strcat(key.dptr,"|");
-			key.dsize = strlen(key.dptr);
-		}
-
-/* If the new update is for an array */
-
-		if (tmp_ptr->res_val[0] == INIT_ARRAY)
-		{
-
-/* Retrieve the number of element in the array.
-   Initialize the loop counter "ctr" to number of element minus one because
-   it is not necessary to look for the element separator to extract the last
-   element value from the string. */
-
-			tmp = (char *) strchr(tmp_ptr->res_val,SEP_ELT);
-			diff = (u_int)(tmp++ - tmp_ptr->res_val) - 1;
-			strncpy(numb,&tmp_ptr->res_val[1],diff);
-			numb[diff] = 0;
-			ctr = (unsigned int)atoi(numb) - 1;
-			res_numb = 1;
-
-			for (l = 0;l < ctr;l++)
+			if (i == dbgen.TblNum)
+				throw long(DbErr_DomainDefinition);
+//
+// Delete the old information (single or array) if the array already exists
+//
+			for(res_numb = 1;;)
 			{
-
-/* Initialize database information */
-
-				strcpy(key.dptr,family);
-				strcat(key.dptr,"|");
-				strcat(key.dptr,member);
-				strcat(key.dptr,"|");
-				strcat(key.dptr,r_name);
-				strcat(key.dptr,"|");
-				sprintf(indnr,"%d",res_numb);
-				strcat(key.dptr, indnr);
-				strcat(key.dptr,"|");
+				std::stringstream 	s;
+#if !HAVE_SSTREAM
+				s.seekp(0, ios::beg);
+#endif
+				s << family << "|" << member << "|" << r_name << "|" << res_numb << "|" << std::ends;
+#if !HAVE_SSTREAM
+				strcpy(key.dptr, s.str());
+				s.freeze(false);
+#else
+				strcpy(key.dptr, s.str().c_str());
+#endif
 				key.dsize = strlen(key.dptr);
-
-/* Add one array element in the database */
-
-				temp = (char*) strchr(tmp,SEP_ELT);
-				diff = (u_int)(temp++ - tmp);
-				strncpy(content.dptr, tmp, diff);
-				content.dptr[diff] = '\0';
-				content.dsize = strlen(content.dptr);
+				if (gdbm_delete(tab, key))
+					break;  
 				res_numb++;
-				tmp = temp;
-				flags = GDBM_INSERT;
-
-				if (gdbm_store(tab, key, content, flags))
-				{
-					sent_back = DbErr_DatabaseAccess;
-					free(key.dptr);
-					free(content.dptr);
-					return(&sent_back);
-				}
+				ret_res = 1;
 			} 
-
-/* For the last element value */
-
-			strcpy(content.dptr,tmp);
-			content.dsize = strlen(content.dptr);
-			strcpy(key.dptr,family);
-			strcat(key.dptr,"|");
-			strcat(key.dptr,member);
-			strcat(key.dptr,"|");
-			strcat(key.dptr,r_name);
-			strcat(key.dptr,"|");
-			sprintf(indnr,"%d",res_numb);
-			strcat(key.dptr, indnr);
-			strcat(key.dptr,"|");
-			key.dsize = strlen(key.dptr);
-			res_numb++;
-
-			flags = GDBM_INSERT;
-			if (gdbm_store(tab, key, content, flags))
+//
+// If the new update is for an array 
+//
+			if (tmp_ptr->res_val[0] == INIT_ARRAY)
 			{
-				sent_back = DbErr_DatabaseAccess;
-				free(key.dptr);
-				free(content.dptr);
-				return(&sent_back);
-			}
-		}
-
-		else
-		{
-			if (ret_res == 1)
-			{
-
-/* If the resource is already defined in the database, just update the tuple */
-
-				strcpy(key.dptr, family);
-				strcat(key.dptr, "|");
-				strcat(key.dptr, member);
-				strcat(key.dptr, "|");
-				strcat(key.dptr, r_name);
-				strcat(key.dptr, "|");
-				res_numb=1;
-				sprintf(indnr,"%d",res_numb);
-				strcat(key.dptr, indnr);
-				strcat(key.dptr, "|");
-				key.dsize = strlen(key.dptr);
-
-				strcpy(content.dptr, tmp_ptr->res_val);
-				content.dsize = strlen(content.dptr);
-				flags = GDBM_REPLACE;
-
-				if (gdbm_store(tab, key, content, flags))
-				{ 
-					sent_back = DbErr_DatabaseAccess;
-					free(key.dptr);
-					free(content.dptr);
-					return(&sent_back);
+//
+// Retrieve the number of element in the array.
+// Initialize the loop counter "ctr" to number of element minus one because
+// it is not necessary to look for the element separator to extract the last
+// element value from the string. 
+//
+				std::string 	tmp = tmp_ptr->res_val;
+				pos = tmp.find(SEP_ELT);
+				int ctr = (unsigned int)atoi(tmp.substr(1, pos - 1).c_str()) - 1;
+				tmp.erase(0, pos + 1);
+				res_numb = 1;
+				for (int l = 0; l < ctr; l++)
+				{
+//
+// Initialize database information 
+//
+					std::stringstream 	s;
+#if !HAVE_SSTREAM
+					s.seekp(0, ios::beg);
+#endif
+					s << family << "|" << member << "|" << r_name << "|" << res_numb << "|" << std::ends;
+#if !HAVE_SSTREAM
+					strcpy(key.dptr, s.str());
+					s.freeze(false);
+#else
+					strcpy(key.dptr, s.str().c_str());
+#endif
+					key.dsize = strlen(key.dptr);
+//
+// Add one array element in the database 
+//
+					pos = tmp.find(SEP_ELT);
+					strcpy(content.dptr, tmp.substr(0, pos).c_str());
+					content.dsize = strlen(content.dptr);
+					res_numb++;
+					if (gdbm_store(tab, key, content, GDBM_INSERT))
+						throw long(DbErr_DatabaseAccess);
 				}
-			} /* end of updating a single tuple */
-
+//
+// For the last element value 
+//
+				strcpy(content.dptr, tmp.c_str());
+				content.dsize = strlen(content.dptr);
+				std::stringstream	s;
+#if !HAVE_SSTREAM
+				s.seekp(0, ios::beg);
+#endif
+				s << family << "|" << member << "|" << r_name << "|" << res_numb << "|" << std::ends;
+#if !HAVE_SSTREAM
+				strcpy(key.dptr, s.str());
+				s.freeze(false);
+#else
+				strcpy(key.dptr, s.str().c_str());
+#endif
+				key.dsize = strlen(key.dptr);
+				res_numb++;
+				if (gdbm_store(tab, key, content, GDBM_INSERT))
+					throw long(DbErr_DatabaseAccess);
+			}
 			else
 			{
-
-/* Insert a new tuple */
-				strcpy(key.dptr, family);
-				strcat(key.dptr, "|");
-				strcat(key.dptr, member);
-				strcat(key.dptr, "|");
-				strcat(key.dptr, r_name);
-				strcat(key.dptr, "|");
-				res_numb=1;
-				sprintf(indnr,"%d",res_numb);
-				strcat(key.dptr, indnr);
-				strcat(key.dptr, "|");
+				res_numb = 1;
+				std::stringstream	s;
+#if !HAVE_SSTREAM
+				s.seekp(0, ios::beg);
+#endif
+				s << family << "|" << member << "|" << r_name << "|" << res_numb << "|" << std::ends;
+#if !HAVE_SSTREAM
+				strcpy(key.dptr, s.str());
+				s.freeze(false);
+#else
+				strcpy(key.dptr, s.str().c_str());
+#endif
 				key.dsize = strlen(key.dptr);
-
 				strcpy(content.dptr, tmp_ptr->res_val);
 				content.dsize = strlen(content.dptr);
-				flags = GDBM_INSERT;
-
-				if (gdbm_store(tab, key, content, flags))
-				{ 
-					sent_back = DbErr_DatabaseAccess;
-					free(key.dptr);
-					free(content.dptr);
-					return(&sent_back);
-				}
-			} /* end of inserting a tuple */
-		} /* end of else (no array) */
-	} /* end of for for every resource */
-
-/* Leave server */
-
-	free(key.dptr);
-	free(content.dptr);
-	return(&sent_back);
-
+//
+// If the resource is already defined in the database, just update the tuple or
+// insert a new tuple 
+//
+				if (gdbm_store(tab, key, content, ret_res ? GDBM_REPLACE : GDBM_INSERT))
+					throw long(DbErr_DatabaseAccess);
+			}			
+		}
+	}				
+	catch (const long err)
+	{
+		errcode = err;
+	}
+//
+// Leave server 
+//
+	delete [] key.dptr;
+	delete [] content.dptr;
+	return (&errcode);
 }
-
 
-
-/****************************************************************************
-*                                                                           *
-*		Server code for db_delresource function                     *
-*                               --------------                              *
-*                                                                           *
-*    Function rule : To delete resources from the database (builded from    *
-*		     resource files)					    *
-*                                                                           *
-*    Argin : A pointer to a structure of the "arr1" type                    *
-*            The definition of the arr1 type is :                           *
-*            struct {                                                       *
-*              u_int arr1_len;     The number of strings                    *
-*              char **arr1_val;    A pointer to the array of strings        *
-*                  }                                                        *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a int. This int is the error code   *
-*    It is set to 0 is everything is correct. Otherwise, it is initialised  *
-*    with the error code.						    *
-*                                                                           *
-*****************************************************************************/
-
-
-#if 0
-int *NdbmServer::db_delres_1_svc(arr1 *rece,struct svc_req *rqstp)
-#endif
-DevLong *NdbmServer::db_delres_1_svc(arr1 *rece)
+/**
+ * To delete resources from the database (built from resource files)
+ * 
+ * @param rece  A pointer to a structure of the arr1 type, containing the names
+ *	of the resources to be deleted 
+ * 
+ * @return  function returns a pointer to a int. This int is the error code
+ *    It is set to 0 is everything is correct. Otherwise, it is initialised 
+ *    with the error code.
+ */
+DevLong *NdbmServer::db_delres_1_svc(arr1 * rece /* , struct svc_req *rqstp */)
 {
-	int i,j;
-	static DevLong sent_back;
-	u_int num_res,err_db;
-	register char *ptrc;
-	char **old_res;
-
-	num_res = rece->arr1_len;
+	u_int 	num_res = rece->arr1_len;
+	nam 	*old_res;
 
 #ifdef DEBUG
-	for(i=0;i<num_res;i++)
-	{
+	for (int i = 0; i < num_res; i++)
 		std::cout << "Resource to delete : " << rece->arr1_val[i] << std::endl;
-	}
 #endif
-
-/* Initialize error code */
-
-	sent_back = 0;
-
-/* Return error code if the server is not connected to the database files */
-
+//
+// Initialize error code 
+//
+	errcode = 0;
+//
+// Return error code if the server is not connected to the database files 
+//
 	if (dbgen.connected == False)
 	{
-		sent_back = DbErr_DatabaseNotConnected;
-		return(&sent_back);
+		errcode = DbErr_DatabaseNotConnected;
+		return (&errcode);
 	}
-
-/* Mark the server as not connected. This will prevent dbm_update to
-   add/modify resources during this call */
-
-	dbgen.connected = False;
-
-/* Allocate array for pointers to store deleted resources value */
-
-	if ((old_res = (char **)calloc(num_res,sizeof(char *))) == NULL)
+//
+// Mark the server as not connected. This will prevent dbm_update to
+// add/modify resources during this call 
+//
+	dbgen.connected = false;
+//
+// Allocate array for pointers to store deleted resources value 
+//
+	try
 	{
-		dbgen.connected = True;
-		sent_back = DbErr_ServerMemoryAllocation;
-		return(&sent_back);
-	}
-
-/* A loop on the resource's number to be deleted */
-
-	for(i = 0;i < num_res;i++)
-	{
-		ptrc = rece->arr1_val[i];
-
-/* Try to delete the resource from database */
-
-		if((err_db = db_del(ptrc,&(old_res[i]))) != 0 )
+    		old_res = new nam[num_res];
+		int	err_db;
+//
+// A loop on the resource's number to be deleted 
+//
+		for (int i = 0; i < num_res; i++)
 		{
-			if (i != 0)
-				db_reinsert(rece,old_res,i);
-			for (j = 0;j < i;j++)
+			std::string ptrc = rece->arr1_val[i];
+//
+// Try to delete the resource from database
+//
+			if ((err_db = db_del(ptrc, &(old_res[i]))) != 0)
 			{
-				if (old_res[j] != NULL)
-					free(old_res[j]);
+				if (i != 0)
+					db_reinsert(rece, old_res, i);
+				throw long(err_db);
 			}
-			free(old_res);
-			dbgen.connected = True;
-			sent_back = err_db;
-			return(&sent_back);
 		}
 	}
-
-/* Free memory and exit server */
-
-	dbgen.connected = True;
-	for (i = 0;i < num_res;i++)
+	catch(const std::bad_alloc &)
 	{
-		if (old_res[i] != NULL)
-			free(old_res[i]);
+		errcode = DbErr_ServerMemoryAllocation;
 	}
-	free(old_res);
-	return(&sent_back);
-
+	catch(const long err_db)
+	{
+		errcode = err_db;
+	}
+//
+// Free memory and exit server 
+//
+	for (int i = 0; i < num_res; i++)
+		delete [] old_res[i];
+	delete [] old_res;
+	dbgen.connected = true;
+	return (&errcode);
 }
-
-
 
-
-/****************************************************************************
-*                                                                           *
-*		Code for db_del function                                    *
-*                        ------                                             *
-*                                                                           *
-*    Function rule : To delete a resource from the database         	    *
-*                                                                           *
-*    Argin : - The full resource name (DOMAIN/FAMILY/MEMBER/R_NAME)	    *
-*	     - The address where to store the string to memorize the deleted*
-*	       resource value						    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
-
-int NdbmServer::db_del(char *res_name,char **p_oldres)
+/**
+ * To delete a resource from the database
+ *
+ * @param res_name The full resource name (DOMAIN/FAMILY/MEMBER/R_NAME)
+ * @param p_oldres The address where to store the string to memorize the deleted resource value
+ *
+ * @return 0 if no errors occurs or the error code when there is a problem.
+ */
+int NdbmServer::db_del(std::string res_name, nam *p_oldres)
 {
-	char t_name[40];
-	char family[40];
-	char member[40];
-	char r_name[40];
-	char indnr[10];
-	unsigned int diff;
-	char *temp,*tmp;
-	int i,k,k1;
-	int ctr = 0;
-	char *tmp_buf;
-	datum resu,key;
-	GDBM_FILE	tab;
-	int res_numb = 1;
-	int err;
-	int exit = 0;
-	int error = False;
-
-/* Miscellaneous init. */
-
-	t_name[0] = 0;
-
-/* Get table name */
-
-	if ((tmp = strchr(res_name,'/')) == (char *)NULL)
+	std::string 	t_name,
+			family,
+			member,
+			r_name;
+	int 		i,
+			k,
+			k1,
+			ctr = 0,
+			res_numb = 1,
+			err;
+	datum 		key;
+	GDBM_FILE 	tab;
+	std::string::size_type 	pos, 
+				last_pos;
+	static std::string	tmp_buf;
+//
+// Get table name 
+//
+	if ((pos = res_name.find('/')) == std::string::npos)
 	{
-		fprintf(stderr,"db_del : Error in resource name %s\n",res_name);
-		return(DbErr_BadResourceType);
+		std::cerr << "db_del : Error in resource name " << res_name << 	std::endl;
+		return (DbErr_BadResourceType);
 	}
-	diff = (u_int)(tmp++ - res_name);
-	strncpy(t_name,res_name,diff);
-	t_name[diff] = 0;
-
-/* Get family name */
-
-	if ((temp = strchr(tmp,'/')) == NULL)
+	t_name = res_name.substr(0, pos);
+//
+// Get family name 
+//
+	if ((pos = res_name.find('/', (last_pos = pos + 1))) == std::string::npos)
 	{
-		fprintf(stderr,"db_del : Error in resource name %s\n",res_name);
-		return(DbErr_BadResourceType);
+		std::cerr << "db_del : Error in resource name " << res_name << std::endl;
+		return (DbErr_BadResourceType);
 	}
-	diff = (u_int)(temp++ - tmp);
-	strncpy(family,tmp,diff);
-	family[diff] = '\0';
-
-/* Get member name */
-
-	if ((tmp = strchr(temp,'/')) == NULL)
+	family = res_name.substr(last_pos, pos - last_pos);
+//
+// Get member name 
+//
+	if ((pos = res_name.find('/', (last_pos = pos + 1))) == std::string::npos)
 	{
-		fprintf(stderr,"db_del : Error in resource name %s\n",res_name);
-		return(DbErr_BadResourceType);
+		std::cerr << "db_del : Error in resource name " << res_name << std::endl;
+		return (DbErr_BadResourceType);
 	}
-	diff = (u_int)(tmp++ - temp);
-	strncpy(member,temp,diff);
-	member[diff] = '\0';
-
-/* Get resource name */
-
-	strcpy(r_name,tmp);
+	member = res_name.substr(last_pos, pos - last_pos);
+//
+// Get resource name 
+//
+	r_name = res_name.substr(pos + 1);
 
 #ifdef DEBUG
 	std::cout << "Family name : " << family << std::endl;
 	std::cout << "Number name : " << member << std::endl;
 	std::cout << "Resource name : " << r_name << std::endl;
 #endif
-
-/* Select the right resource table in database */
-
-	for (i = 0;i < dbgen.TblNum;i++)
-	{
-		if (strcmp(t_name,dbgen.TblName[i].c_str()) == 0)
+//
+// Select the right resource table in database
+//
+	for (i = 0; i < dbgen.TblNum; i++)
+		if (t_name == dbgen.TblName[i])
 		{
 			tab = dbgen.tid[i];
 			break;
 		}
-	}
 	if (i == dbgen.TblNum)
-		return(DbErr_DomainDefinition);
-
-/* Allocate memory to store the old resource value (to reinsert it in case
-   of problem) and for the key */
-
-	if ((tmp_buf = (char *)malloc(SIZE)) == NULL)
-		return(DbErr_ServerMemoryAllocation);
-	k1 = 1;
-
-	if ((key.dptr = (char *)malloc(MAX_KEY)) == NULL)
+		return (DbErr_DomainDefinition);
+//
+// Allocate memory to store the old resource value (to reinsert it in case
+// of problem) and for the key
+//
+	try
 	{
-		free(tmp_buf);
-		return(DbErr_ServerMemoryAllocation);
+    		key.dptr = new char[MAX_KEY];
 	}
-
-/* Try to retrieve the right tuple in table and loop for the case of an
-   array of resource */
-
+	catch(const std::bad_alloc &)
+	{
+		return (DbErr_ServerMemoryAllocation);
+	}
+//
+// Try to retrieve the right tuple in table and loop for the case of an array of resource 
+//
 	do
 	{
-        	strcpy(key.dptr, family);
-        	strcat(key.dptr,"|");
-       		strcat(key.dptr, member);
-        	strcat(key.dptr,"|");
-        	strcat(key.dptr, r_name);
-        	strcat(key.dptr,"|");
-        	sprintf(indnr,"%d",res_numb);
-        	strcat(key.dptr, indnr);
-        	strcat(key.dptr,"|");
-        	key.dsize = strlen(key.dptr);
-	
-		resu = gdbm_fetch(tab,key);
-		if (resu.dptr != NULL)
+		std::stringstream	s;
+#if !HAVE_SSTREAM
+		s.seekp(0, ios::beg);
+#endif
+		s << family <<"|" << member << "|" << r_name << "|" << res_numb << "|" << std::ends;
+#if !HAVE_SSTREAM
+		strcpy(key.dptr, s.str());
+		s.freeze(false);
+#else
+		strcpy(key.dptr, s.str().c_str());
+#endif
+		key.dsize = strlen(key.dptr);
+
+		try
 		{
+			NdbmResCont	resu(tab, key);
 			if (ctr)
 			{
-
-/* Copy the new element in the temporary buffer. If it is full, reallocate
-   memory for it. */
-
-				k = strlen(tmp_buf);
-				if (k > ((k1 * SIZE) - LIM))
-				{
-					if ((tmp_buf = (char *)realloc(tmp_buf,((k1 + 1) * SIZE))) == NULL)
-						return(DbErr_ServerMemoryAllocation);
-					k1++;
-				}
-				tmp_buf[k] = SEP_ELT;
-				tmp_buf[k + 1] = 0;
-				strncat(tmp_buf,resu.dptr,resu.dsize);
-				tmp_buf[k + 1 + resu.dsize] = 0;
+//
+// Copy the new element in the temporary buffer. If it is full, reallocate
+// memory for it. 
+//
+				tmp_buf += SEP_ELT;
+				tmp_buf += resu.get_res_value();
 			}
 			else
-			{
-
-/* It is the first element, just copy it in the temporary buffer */
-
-				strncpy(tmp_buf,resu.dptr,resu.dsize);
-				tmp_buf[resu.dsize] = 0;
-			}
-
-/* Remove the tuple from database */
-
-			gdbm_delete(tab,key);
+//
+// It is the first element, just copy it in the temporary buffer/
+//
+				tmp_buf = resu.get_res_value();
+//
+// Remove the tuple from database 
+//
+			gdbm_delete(tab, key);
 			ctr++;
 			res_numb++;
 		}
-		else
+		catch ( ... )
 		{
-
-/* Is it an error or simply the data does not exist in the database */
-
-			err = gdbm_error(tab);
-			if (err != 0)
+//
+// Is it an error or simply the data does not exist in the database 
+//
+			if ((err = gdbm_error(tab)) != 0)
 			{
 				gdbm_clearerr(tab);
-				error = True;
+				return (DbErr_DatabaseAccess);
 			}
-			exit = 1;
+			break;
+		}
+	} while (true);
+	delete [] key.dptr;
+//
+// If it is a classical resource, copy the res. value in the real old res value buffer 
+//
+	try
+	{
+		switch (ctr)
+    		{
+			case 1: 	
+				*p_oldres = new char[tmp_buf.length() + 1];
+				strcpy(*p_oldres, tmp_buf.c_str());
+				break;
+			case 0: 	
+				return (DbErr_ResourceNotDefined);
+				break;
+			default:
+//
+// For an array of resource, add the number of resources at the beginning of the string 
+//
+				*p_oldres = new char[tmp_buf.length() + 10];
+				(*p_oldres)[0] = INIT_ARRAY;
+				sprintf(&((*p_oldres)[1]), "%d", ctr);
+				k = strlen(*p_oldres);
+				(*p_oldres)[k] = SEP_ELT;
+				(*p_oldres)[k + 1] = 0;
+				strcat(*p_oldres, tmp_buf.c_str());
 		}
 	}
-	while(!exit);
-	
-	free(key.dptr);
-
-/* If it is a classical resource, copy the res. value in the real old res value
-   buffer */
-
-	if (ctr == 1)
+	catch (const std::bad_alloc &)
 	{
-		if ((*p_oldres = (char *)malloc(strlen(tmp_buf) + 1)) == NULL)
-		{
-			*p_oldres = tmp_buf;
-			return(0);
-		}
-		strcpy(*p_oldres,tmp_buf);
+		return (DbErr_ServerMemoryAllocation);
 	}
-
-/* For an array of resource, add the number of resources at the beginning
-   of the string */
-
-	if (ctr > 1)
-	{
-		if((*p_oldres = (char *)malloc(strlen(tmp_buf) + 10)) == NULL)
-		{
-			free(tmp_buf);
-			return(DbErr_ServerMemoryAllocation);
-		}
-		(*p_oldres)[0] = INIT_ARRAY;
-		sprintf(&((*p_oldres)[1]),"%d",ctr);
-		k = strlen(*p_oldres);
-		(*p_oldres)[k] = SEP_ELT;
-		(*p_oldres)[k + 1] = 0;
-		strcat(*p_oldres,tmp_buf);
-	}
-
-/* Return if database error */
-
-	if (error == True)
-	{
-		free(tmp_buf);
-		return(DbErr_DatabaseAccess);
-	}
-
-/* Return if the resource is not found */
-
-	if ((error == False) && (ctr == 0))
-	{
-		free(tmp_buf);
-		return(DbErr_ResourceNotDefined);
-	}
-	
-/* Free memory and leave function */
-
-	free(tmp_buf);
-	return(0);
-
+//
+// Return if the resource is not found 
+//
+	return (0);
 }
-
 
-
-/****************************************************************************
-*                                                                           *
-*		Code for db_reinsert function                               *
-*                        -----------                                        *
-*                                                                           *
-*    Function rule : To reinsert a resource in the datbase                  *
-*		     This function is called only if the db_del function    *
-*		     returns a error					    *
-*                                                                           *
-*    Argin : - The array passed to the db_delresource server part	    *
-*	     - A array with the resource value				    *
-*	     - The number of resource to be reinserted			    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
-
-int NdbmServer::db_reinsert(arr1 *rece,char **res_value,int num_res)
+/**
+ * To reinsert a resource in the database. This function is called only if the db_del 
+ * function returns a error.
+ * 
+ * @param rece The array passed to the db_delresource server part
+ * @param res_value A array with the resource value
+ * @param num_res The number of resource to be reinserted
+ * 
+ * @return 0 if no errors occurs or the error code when there is a problem. 
+ */
+int NdbmServer::db_reinsert(arr1 * rece, nam *res_value, int num_res)
 {
-	tab_putres tmp;
-	int i,j;
-	DevLong *pi;
-	char *padding = NULL;
-	int num = 0;
-
-/* Find out how many devices are really to be reinserted */
-
-	for (i = 0;i < num_res;i++)
-	{
+	tab_putres 	tmp;
+	int 		j,
+			num = 0;
+//
+// Find out how many resources are really to be reinserted
+//
+	for (int i = 0; i < num_res; i++)
 		if (res_value[i] != NULL)
 			num++;
-	}
-
-/* If the error happens after several try to delte only resources which don't
-   exist, it  is not necessary to reinsert them ! */
-
+//
+// If the error happens after several try to delte only resources which don't
+// exist, it  is not necessary to reinsert them ! 
+//
 	if (num == 0)
-		return(0);
-	else
-		tmp.tab_putres_len = num;
-
-/* Allocate a array of putres structure (one structure for each res.) */
-
-	if ((tmp.tab_putres_val = (putres *)calloc(num,sizeof(putres))) == NULL)
-		return(-1);
-
-/* Initialise the array of putres structure with the resource name and resource
-   value */
-
-	j = 0;
-	for (i = 0;i < num_res;i++)
+		return (0);
+	tmp.tab_putres_len = num;
+//
+// Allocate a array of putres structure (one structure for each res.)
+//
+	try
 	{
+		tmp.tab_putres_val = new putres[num];
+	}
+	catch (const std::bad_alloc &)
+	{
+		return (DbErr_ServerMemoryAllocation);
+	}
+//
+// Initialise the array of putres structure with the resource name and resource value 
+//
+	j = 0;
+	for (int i = 0; i < num_res; i++)
 		if (res_value[i] != NULL)
 		{
 			tmp.tab_putres_val[j].res_name = rece->arr1_val[i];
 			tmp.tab_putres_val[j].res_val = res_value[i];
 			j++;
 		}
-	}
-
-/* Call the putresource function */
-
-	pi = db_putres_1_svc(&tmp);
-
-/* Leave function */
-
-	free(tmp.tab_putres_val);
-	return(0);
-
+//
+// Call the putresource function 
+//
+	DevLong *p = this->db_putres_1_svc(&tmp);
+//
+// Leave function 
+//
+	delete [] tmp.tab_putres_val;
+	return (0);
 }
 
-
-#if 0
-void leave()
+void NdbmServer::leave(void)
 {
-int i;
-
-/* Close database */
-
-	for (i = 0;i < dbgen.TblNum;i++) 
+//
+// Close database 
+//
+	for (int i = 0; i < dbgen.TblNum; i++)
 		gdbm_close(dbgen.tid[i]);
-
-/* Exit now */
-
+//
+// Exit now 
+//
 	exit(-1);
 }
-#endif

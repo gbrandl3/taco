@@ -15,71 +15,49 @@
 #include <fstream>
 
 
-
-/****************************************************************************
-*                                                                           *
-*		Server code for dbm_close function                          *
-*                               --------                                    *
-*                                                                           *
-*    Function rule : To close the database to be able to reload a new       *
-*		     database.						    *
-*                                                                           *
-*    Argin :  No argin							    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to an integer. This integer is simply  *
-*    an error code (0 if no error).					    * 
-*                                                                           *
-****************************************************************************/
-
+/**
+ * To close the database to be able to reload a new database.
+ *
+ * @return  This function returns a pointer to an integer. This integer is simply
+ *    an error code (0 if no error).
+ */
 DevLong *NdbmServer::db_clodb_1_svc()
 {
 	static DevLong errcode;
 
 #ifdef DEBUG
 	std::cout << "db_clodb()" << std::endl;
-#endif /* DEBUG */
-
-/* Return error code if the server is not connected to the database files */
-
+#endif 
+//
+// Return error code if the server is not connected to the database files
+//
 	if (dbgen.connected == False)
 	{
 		errcode = DbErr_DatabaseNotConnected;
 		return(&errcode);
 	}
-
-/* Disconnect server from database files */
+//
+// Disconnect server from database files
+//
 	for (int i = 0;i < dbgen.TblNum;i++)
 		gdbm_close(dbgen.tid[i]);
 	dbgen.connected = False;
-
-/* Leave server */
+//
+// Leave server 
+//
 	errcode = 0;
 	return(&errcode);
 }
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Server code for dbm_reopendb function                       *
-*                               ------------                                *
-*                                                                           *
-*    Function rule : Reopen the database after it has been updated by a     *
-*		     dbm_update command in a single user mode or after      *
-*		     the rebuilding from a backup file.			    *
-*									    *
-*                                                                           *
-*    Argin :  No argin							    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to an integer. This integer is simply  *
-*    an error code (0 if no error).					    * 
-*                                                                           *
-****************************************************************************/
-
+/**
+ * Reopen the database after it has been updated by a dbm_update command in 
+ * a single user mode or after the rebuilding from a backup file.
+ *
+ * @return This function returns a pointer to an integer. This integer is simply
+ *    an error code (0 if no error).
+ */
 DevLong *NdbmServer::db_reopendb_1_svc()
 {
 	static DevLong 	errcode;
@@ -88,9 +66,10 @@ DevLong *NdbmServer::db_reopendb_1_svc()
 
 #ifdef DEBUG
 	std::cout << "db_reopendb" << std::endl;
-#endif /* DEBUG */
-
-/* Find the dbm_database files */        
+#endif 
+//
+// Find the dbm_database files
+//
 	if ((ptr = (char *)getenv("DBM_DIR")) == NULL)
 	{
 		std::cerr << "dbm_server: Can't find environment variable DBM_DIR" << std::endl;
@@ -101,8 +80,9 @@ DevLong *NdbmServer::db_reopendb_1_svc()
 	std::string dir_name(ptr);
 	if (dir_name[dir_name.size() - 1] != '/')
 		dir_name.append(1,'/');
-
-/* Open database tables according to the definitions  */
+//
+// Open database tables according to the definitions
+//
 	for (int i = 0;i < dbgen.TblNum;i++)
 	{
 		std::string dbm_file(dir_name);
@@ -124,12 +104,13 @@ DevLong *NdbmServer::db_reopendb_1_svc()
 			return(&errcode);
 		}
 	} 
-	
-/* Mark the server as connected to the database */
+//
+// Mark the server as connected to the database
+//
 	dbgen.connected = True;
-
-/* Leave server */
+//
+// Leave server
+//
 	errcode = 0;
 	return(&errcode);
-
 }

@@ -11,21 +11,11 @@
 #include <NdbmServer.h>
 #include <errno.h>
 
-
-/****************************************************************************
-*                                                                           *
-*	Server code for the resdomainlist_1_svc function     	    	    *
-*                           -------------------                     	    *
-*                                                                           *
-*    Method rule : To retrieve resource domain list for all the resources    *
-*		   defined in the database				    *
-*                                                                           *
-*    Argin : No argin							    *
-*                                                                           *
-*    Argout : domain_list : The domain name list 			    *
-*                                                                           *                                                          *
-*                                                                           *
-****************************************************************************/
+/**
+ * To retrieve resource domain list for all the resources defined in the database
+ * 
+ * @return The domain name list
+ */
 db_res *NdbmServer::resdomainlist_1_svc()
 {
 #ifdef DEBUG
@@ -81,29 +71,20 @@ db_res *NdbmServer::resdomainlist_1_svc()
 }
 
 
-
-/****************************************************************************
-*                                                                           *
-*	Server code for the resfamilylist_1_svc function     	   	    *
-*                           -------------------                     	    *
-*                                                                           *
-*    Method rule : To retrieve all the family defined (in resources name)   *
-*		   for a specific domain				    *
-*                                                                           *
-*    Argin : - domain : The domain name					    *
-*                                                                           *
-*    Argout : - family_list : The family name list 			    *
-*                                                                           * 
-*                                                                           *
-****************************************************************************/
+/**
+ * To retrieve all the family defined (in resources name) for a specific domain
+ * 
+ * @param domain The domain name
+ *
+ * @return The family name list
+ */
 db_res *NdbmServer::resfamilylist_1_svc(nam* domain)
 {
 	long 		i;
-	
+	std::string 	user_domain(*domain);
 #ifdef DEBUG
-	std::cout << "In resfamilylist_1_svc function for domain " << *domain << std::endl;
+	std::cout << "In resfamilylist_1_svc function for domain " << user_domain << std::endl;
 #endif
-	std::string user_domain(*domain);
 	
 //
 // Initialize structure sent back to client
@@ -125,10 +106,8 @@ db_res *NdbmServer::resfamilylist_1_svc(nam* domain)
 // Find the db table for the specificated domain
 //
 	for (i = 0;i < dbgen.TblNum;i++)
-	{
 		if (dbgen.TblName[i] == user_domain)
 			break;
-	}
 	if (i == dbgen.TblNum)
 	{
 		browse_back.db_err = DbErr_DomainDefinition;
@@ -150,9 +129,9 @@ db_res *NdbmServer::resfamilylist_1_svc(nam* domain)
 			NdbmResKey reskey(key);
 			fam_list.add_if_new(reskey.get_res_fam_name());
 		}
-		free(key.dptr);
 		if (gdbm_error(dbgen.tid[i]) != 0)
 		{			
+			free(key.dptr);
 			gdbm_clearerr(dbgen.tid[i]);
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);
@@ -194,27 +173,19 @@ db_res *NdbmServer::resfamilylist_1_svc(nam* domain)
 }
 
 
-
-/****************************************************************************
-*                                                                           *
-*	Server code for the resmemberlist_1_svc function 	    	    *
-*                           -------------------                     	    *
-*                                                                           *
-*    Method rule : To retrieve all the family defined (in resources name)   *
-*		   for a specific couple domain,family			    *
-*                                                                           *
-*    Argin : - domain : The domain name					    *
-*	     - family : The family name					    *
-*                                                                           *
-*    Argout : - member_list : The member name list			    *
-*                                                                           *
-*                                                                           *
-****************************************************************************/
+/**
+ * To retrieve all the family defined (in resources name) for a specific couple domain,family
+ * 
+ * @param recev The domain name, the family name
+ *
+ * @return The member name list
+ */
 db_res *NdbmServer::resmemberlist_1_svc(db_res *recev)
 {
 	long 		i;
 	
-	
+	std::string user_domain(recev->res_val.arr1_val[0]);
+	std::string user_family(recev->res_val.arr1_val[1]);
 #ifdef DEBUG
 	std::cout << "In resmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << std::endl;
 #endif
@@ -238,12 +209,9 @@ db_res *NdbmServer::resmemberlist_1_svc(db_res *recev)
 //
 // Find the db table for the specificated domain
 //
-	std::string user_domain(recev->res_val.arr1_val[0]);
 	for (i = 0;i < dbgen.TblNum;i++)
-	{
 		if (dbgen.TblName[i] == user_domain)
 			break;
-	}
 	if (i == dbgen.TblNum)
 	{
 		browse_back.db_err = DbErr_DomainDefinition;
@@ -253,7 +221,6 @@ db_res *NdbmServer::resmemberlist_1_svc(db_res *recev)
 //
 // Get all resources family name defined in this table
 //
-	std::string user_family(recev->res_val.arr1_val[1]);
 	NdbmNameList 	memb_list;
 	try
 	{
@@ -269,9 +236,9 @@ db_res *NdbmServer::resmemberlist_1_svc(db_res *recev)
 				continue;
 			memb_list.add_if_new(reskey.get_res_memb_name());
 		}
-		free(key.dptr);
 		if (gdbm_error(dbgen.tid[i]) != 0)
 		{			
+			free(key.dptr);
 			gdbm_clearerr(dbgen.tid[i]);
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);
@@ -298,7 +265,6 @@ db_res *NdbmServer::resmemberlist_1_svc(db_res *recev)
 //
 // Build the structure returned to caller
 //
-		
 	browse_back.res_val.arr1_len = memb_list.size();
 	if (memb_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
 	{
@@ -310,31 +276,24 @@ db_res *NdbmServer::resmemberlist_1_svc(db_res *recev)
 //
 // Return data
 //
-
 	return(&browse_back);	
 }
 
 
-
-/****************************************************************************
-*                                                                           *
-*	Server code for the resresolist_1_svc function 	    	    	    *
-*                           -----------------                     	    *
-*                                                                           *
-*    Method rule : To retrieve a list of resources for a given device	    *
-*                                                                           *
-*    Argin : - domain : The device domain name				    *
-*	     - family : The device family name				    *
-*	     - member : The device member name				    *
-*                                                                           *
-*    Argout : - member_list : The member name list			    *
-*                                                                    	    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To retrieve a list of resources for a given device
+ *
+ * @param recev The device domain name, the device family name, the device member name
+ * 
+ * @return The member name list
+ */
 db_res *NdbmServer::resresolist_1_svc(db_res *recev)
 {
 	long 		i;
 	
+	std::string 	user_domain(recev->res_val.arr1_val[0]),
+			user_family(recev->res_val.arr1_val[1]),
+			user_member(recev->res_val.arr1_val[2]);
 #ifdef DEBUG
 	std::cout << "In resresolist_1_svc function for " << user_domain 
 			<< "/" << user_family << "/" << user_member << std::endl;
@@ -359,12 +318,9 @@ db_res *NdbmServer::resresolist_1_svc(db_res *recev)
 //
 // Find the db table for the specificated domain
 //
-	std::string 	user_domain(recev->res_val.arr1_val[0]);
 	for (i = 0;i < dbgen.TblNum;i++)
-	{
 		if (dbgen.TblName[i] == user_domain)
 			break;
-	}
 	if (i == dbgen.TblNum)
 	{
 		browse_back.db_err = DbErr_DomainDefinition;
@@ -377,8 +333,6 @@ db_res *NdbmServer::resresolist_1_svc(db_res *recev)
 // which is 1 for all new resource
 //
 	NdbmNameList 	reso_list;
-	std::string	user_family(recev->res_val.arr1_val[1]),
-			user_member(recev->res_val.arr1_val[2]);
 	try
 	{
 		datum 	key,
@@ -398,9 +352,9 @@ db_res *NdbmServer::resresolist_1_svc(db_res *recev)
 					continue;
 			reso_list.add_if_new(reskey.get_res_name());
 		}
-		free(key.dptr);
 		if (gdbm_error(dbgen.tid[i]) != 0)
 		{			
+			free(key.dptr);
 			gdbm_clearerr(dbgen.tid[i]);
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);
@@ -459,26 +413,22 @@ db_res *NdbmServer::resresolist_1_svc(db_res *recev)
 }
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the resresoval_1_svc function     	    	    *
-*                           ----------------                     	    *
-*                                                                           *
-*    Method rule : To retrieve a resource value (as strings)		    *
-*                                                                           *
-*    Argin : - domain : The device domain name				    *
-*	     - family : The device family name				    *
-*	     - member : The device member name				    *
-*	     - resource : The resource name				    *
-*                                                                           *
-*    Argout : - member_list : The member name list			    *
-*                                                                    	    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To retrieve a resource value (as strings)
+ * 
+ * @param recev The device domain name, the device family name, the device member name
+ * 		the resource name
+ * 
+ * @return  The member name list
+ */
 db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 {
 	long 		i;
 		
+	std::string 	user_domain(recev->res_val.arr1_val[0]),
+			user_family(recev->res_val.arr1_val[1]),
+			user_member(recev->res_val.arr1_val[2]),
+			user_reso(recev->res_val.arr1_val[3]);
 #ifdef DEBUG
 	std::cout << "In resresoval_1_svc function for " << user_domain \
 	<< "/" << user_family << "/" << user_member << "/" << user_reso << std::endl;
@@ -503,12 +453,9 @@ db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 //
 // Find the db table for the specificated domain
 //
-	std::string 	user_domain(recev->res_val.arr1_val[0]);
 	for (i = 0;i < dbgen.TblNum;i++)
-	{
 		if (dbgen.TblName[i] == user_domain)
 			break;
-	}
 	if (i == dbgen.TblNum)
 	{
 		browse_back.db_err = DbErr_DomainDefinition;
@@ -518,11 +465,7 @@ db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 //
 // Get a list of all members and resource name
 //
-	NdbmNameList 	reso_val;
 	NdbmDoubleNameList memb_res_list;
-	std::string	user_family(recev->res_val.arr1_val[1]),
-			user_member(recev->res_val.arr1_val[2]),
-			user_reso(recev->res_val.arr1_val[3]);
 	try
 	{
 		datum 	key,
@@ -564,9 +507,8 @@ db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 		return(&browse_back);
 	}
 
-
+	NdbmNameList 	reso_val;
 	long nb_memb = memb_res_list.first_name_length();
-
 	for (long k = 0; k < nb_memb; k++)
 	{
 		long nb_res = memb_res_list.sec_name_length(k);
@@ -583,7 +525,6 @@ db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 // Build the first field of the complete resource name
 //
 				res_val = user_domain + "/" + user_family + "/" + memb + "/" + resource + ": ";
-	
 //
 // Get resource value
 //
@@ -594,7 +535,6 @@ db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 						reskey.upd_indi(seq); 
 	
 					NdbmResCont rescont(dbgen.tid[i],reskey.get_key());
-			
 					if (seq == 1)
 						res_val += rescont.get_res_value();
 					else
@@ -635,7 +575,6 @@ db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 				browse_back.db_err = DbErr_ServerMemoryAllocation;
 				return(&browse_back);
 			}	
-
 		}
 	}
 			

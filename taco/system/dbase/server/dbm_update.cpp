@@ -1,344 +1,196 @@
-#include <API.h>
 #include <DevErrors.h>
-#include <db_xdr.h>
-
-// Some C++ include
-
-#include <iostream>
-#include <NdbmClass.h>
+#include <algorithm>
 #include <NdbmServer.h>
-#include <fstream>
-
-/* Some local functions declaration */
-
-//static long upd_name(char *,char *,int,long,long *);
-//static long del_name(device *,int *,char *,dena **,long *);
-//static long is_dev_in_db(db_dev_in_db *,long);
-//static long update_dev_list(device *,int);
-//static long upd_res(char *,long,char,long *);
-
-/* Some global variables */
-
-/* Variables defined in setacc_svc.c */
-
-//extern NdbmInfo dbgen;
-//extern db_res browse_back;
-
-
 
-
-/****************************************************************************
-*                                                                           *
-*	Server code for the upddev_1_svc function       	   	    *
-*                           ------------                       	    	    *
-*                                                                           *
-*    Method rule : To update device list(s)				    *
-*                                                                           *
-*    Argin : - dev : The device name					    *
-*                                                                           *
-*    Argout : - No argout						    *
-*                                                                           *
-*    This function returns a pointer to a structure with all device info    *
-*    and an error code which is set if needed				    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To update device list(s)
+ * 
+ * @param dev_list The device name
+ * 
+ * @return a pointer to a structure with all device info and an error code which is set if needed
+ *
+ */
 db_psdev_error *NdbmServer::upddev_1_svc(db_res *dev_list)
 {
-	static db_psdev_error sent_back;
-	long list_nb;
-	long i,last,ind;
-	char *ptr,*ptr_cp,*ptr_cp2;
-	char *lin,*tmp;
-	char last_dev[40];
-	char *ptr_free;
-
-	list_nb = dev_list->res_val.arr1_len;
+	long list_nb = dev_list->res_val.arr1_len;
 		
 #ifdef DEBUG
-	std::cout << "In upddev_1_svc function for " << list_nb << " device list(s)" << std::endl;
+	cout << "In upddev_1_svc function for " << list_nb << " device list(s)" << endl;
 #endif
-
-/* Initialize parameter sent back to client */
-
-	sent_back.error_code = 0;
-	sent_back.psdev_err = 0;
-	
-/* A loop on each device list */
-
-	for (i = 0;i < list_nb;i++)
+//
+// Initialize parameter sent back to client 
+//
+	psdev_back.error_code = 0;
+	psdev_back.psdev_err = 0;
+//
+// A loop on each device list 
+//
+	for (long i = 0; i < list_nb; i++)
 	{
-
-		last = False;
-				
-/* Allocate memory for strtok pointers */
-
-		lin = dev_list->res_val.arr1_val[i];
-
+//		
+// Allocate memory for strtok pointers
+//
+		std::string		lin(dev_list->res_val.arr1_val[i]);
+		std::string::size_type	pos = lin.find(":");
+		if(pos == std::string::npos)
+		{
+			std::cerr << "upd_name : no ':' found" << std::endl;
+			psdev_back.psdev_err = i + 1;
+			psdev_back.error_code = ERR_DEVNAME;
+			return(&psdev_back);
+		}
+		std::string		serv = lin.substr(0, pos);
+		lin.erase(0, pos + 1);
+		if (count(serv.begin(), serv.begin() + pos, '/') != 2)
+		{
+			std::cerr << "upd_name : 2 '/' in the name expected, " << lin.substr(0, pos) << std::endl;
+			throw long();
+		}
+		pos = serv.rfind('/');
+		serv.erase(pos);
 #ifdef DEBUG
 		std::cout << "Device list = " << lin << std::endl;
-#endif /* DEBUG */
-		
-		if ((ptr_cp = (char *)malloc(strlen(lin) + 1)) == NULL)
+#endif 
+//
+// Extract each device from the list and update table each time 
+//
+		int	ind(1);
+		bool	last;
+		do
 		{
-			sent_back.psdev_err = i + 1;
-			sent_back.error_code = DbErr_ClientMemoryAllocation;
-			return(&sent_back);
-		}
-	
-		if ((ptr = (char *)malloc(strlen(lin) + 1)) == NULL)
-		{
-			free(ptr_cp);
-			sent_back.psdev_err = i + 1;
-			sent_back.error_code = DbErr_ClientMemoryAllocation;
-			return(&sent_back);
-		}
-		ptr_free = ptr;
-		if ((ptr_cp2 = (char *)malloc(strlen(lin) + 1)) == NULL)
-		{
-			free(ptr_cp);
-			free(ptr);
-			sent_back.psdev_err = i + 1;
-			sent_back.error_code = DbErr_ClientMemoryAllocation;
-			return(&sent_back);
-		}
-		
-/* Find the last device in the list. If there is no , character in the line,
-   this means that there is only one device in the list */
-
-		tmp = strrchr(lin,',');
-		if (tmp == NULL)
-		{
-			tmp = strchr(lin,':');
-			last = True;
-		}
-		strcpy(last_dev,tmp + 1);
-	
-/* Extract each device from the list and update table each time */
-
-		strcpy(ptr_cp,lin);
-		strcpy(ptr_cp2,lin);
-		
-		ind = 1;
-		ptr = strtok(ptr_cp,",");
-		
-		if (upd_name(ptr,lin,ind,last,&sent_back.error_code) == -1)
-		{
-			free(ptr_cp);
-			free(ptr);
-			free(ptr_cp2);
-			sent_back.psdev_err = i + 1;
-			return(&sent_back);
-		}
-
-		ptr = strtok(ptr_cp2,","); /* Reinit. strtok internal pointer */
-	
-		while((ptr = strtok(NULL,",")) != NULL)
-		{
-			if (strcmp(ptr,last_dev) == 0)
-				last = True;
-			else
-				last = False;
-			
-			ind++;	
-			if (upd_name(ptr,lin,ind,last,&sent_back.error_code) == -1)
+			pos = lin.find(",");
+	    		last = (pos == std::string::npos);
+			std::string	dev = last ? lin : lin.substr(0, pos);
+			try
 			{
-				free(ptr_cp);
-				free(ptr_free);
-				free(ptr_cp2);
-				sent_back.psdev_err = i + 1;
-				return(&sent_back);
-			}
-		}
-		
-		free(ptr_cp);
-		free(ptr_free);
-		free(ptr_cp2);
-	
-	}
-
+	    			upd_name(serv, dev, ind);
+	    		}
+			catch(const long err)
+			{
+				psdev_back.psdev_err = i + 1;
+				psdev_back.error_code = err;
+				return(&psdev_back);
+	    		}
+	    		lin.erase(0, pos + 1);
+	    		ind++;	
+		}while(!last);
+    	}
 //
-// Free memory and return data
+// return data
 //
-
-	return(&sent_back);
-
+	return(&psdev_back);
 }
 
 
-
-/****************************************************************************
-*                                                                           *
-*		Code for upd_name function                                  *
-*                        --------                                           *
-*                                                                           *
-*    Function rule : To update the NAMES table in the database              *
-*                                                                           *
-*    Argin : - lin : The device name. The first time this function is called*
-*		     for a device list, this buffer also contains the DS    *
-*		     name and personal name				    *
-*	     - ptr : The complete device list				    *
-*	     - ind : The device indice list in the list (starting with 1)   *
-*	     - last : A flag set to true if the device is the last one in   *
-*		      the list						    *
-*                                                                           *
-*    Argout : p_err : Pointer for error code                                *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
-
-long NdbmServer::upd_name(char *lin,char *ptr,int ind,long last,long *p_err)
+/**
+ * To update the NAMES table in the database
+ * 
+ * @param serv The server name. The first time this function is called for a device list, 
+ *		this buffer also contains the DS name and personal name
+ * @param dev_name The device name
+ * @param ind The device index in the list (starting with 1)
+ * 
+ * @throw error code 
+ * 
+ * @return This function returns 0 if no errors occurs or the error code when there is a problem.
+ */
+long NdbmServer::upd_name(std::string serv, std::string dev_name, int ind) throw (long)
 {
-	static dena *tab_dena;
-	device dev, ret;
-	unsigned int diff;
-	register char *temp,*tmp, *tbeg;
-	int i,l;
-	int flags;
-	GDBM_FILE	tup;
-	static datum key, key_sto, key_sto2, key_2;
-	static datum resu, content, cont_sto;
-	static int ndev;
-	int exit = 0;
-	char prgnr[20];
-	char seqnr[4];
-	char temp_name[80];
-	static long key_sto_base_length;
+	static std::vector<dena>	tab_dena;
+	device 			dev; 
 
-/* Allocate memory for the dbm-structures (key and content) */
+	std::string::size_type	pos;
+	char 			prgnr[20],
+    				seqnr[4];
+	GDBM_FILE 		tup;
+	static datum 		key = {NULL, 0}, 
+				key_sto = {NULL, 0}, 
+				key_sto2 = {NULL, 0}, 
+				key_2 = {NULL, 0},
+				content = {NULL, 0}, 
+				cont_sto = {NULL, 0};
+	static int 		ndev = 0;
+	static long	 	key_sto_base_length = 0;
 
+//
+// Allocate memory for the dbm-structures (key and content)
+//
 	if (ind == 1)
 	{
-		key_sto.dptr = (char *)malloc(MAX_KEY);
-		if (key_sto.dptr == NULL)
+		tab_dena.clear();
+		try
 		{
-			*p_err = DbErr_ServerMemoryAllocation;
-			return(-1);
+			if (key_sto.dptr == NULL)
+				key_sto.dptr = new char[MAX_KEY];
+			if (key_2.dptr == NULL)
+				key_2.dptr = new char[MAX_KEY];	
+			if (content.dptr == NULL)
+				content.dptr = new char[MAX_CONT];
 		}
-		key_2.dptr = (char *)malloc(MAX_KEY);	
-		if (key_2.dptr == NULL)
+		catch(std::bad_alloc)
 		{
-			*p_err = DbErr_ServerMemoryAllocation;
-			return(-1);
-
+			delete [] key_sto.dptr;
+			delete [] key_2.dptr;
+			delete [] content.dptr;
+			throw long(DbErr_ServerMemoryAllocation);
 		}
-		content.dptr = (char *)malloc(MAX_CONT);
-		if (content.dptr == NULL)
-		{
-			*p_err = DbErr_ServerMemoryAllocation;
-			return(-1);
-		}
-
-/* Get device server class */
-
-		tmp = strchr(lin,'/');
-		diff = (unsigned int)(tmp++ - lin);
-		strncpy(dev.ds_class,lin,diff);
-		dev.ds_class[diff] = '\0';
-		strcpy(key_sto.dptr,dev.ds_class);
-		strcat(key_sto.dptr,"|");
-
-/* Get device server name */
-
-		temp = strchr(tmp,'/');
-		diff = (unsigned int)(temp++ - tmp);
-		strncpy(dev.ds_name,tmp,diff);
-		dev.ds_name[diff] = '\0';
-		strcat(key_sto.dptr,dev.ds_name);
+//
+// Get device server class
+//
+		pos = serv.find('/');
+		strcpy(dev.ds_class, serv.substr(0, pos).c_str());
+		strcpy(key_sto.dptr, dev.ds_class);
+		strcat(key_sto.dptr, "|");
+//
+// Get device server name 
+//
+		strcpy(dev.ds_name, serv.substr(pos + 1).c_str());
+		strcat(key_sto.dptr, dev.ds_name);
 		strcat(key_sto.dptr, "|");
 		key_sto.dsize = strlen(key_sto.dptr);
 		key_sto_base_length = key_sto.dsize;
-
-/* Get device name */
-
-		temp = strchr(lin,':');
-		diff = (unsigned int)(temp - lin);
-		strcpy(dev.d_name,temp + 1);
-		strcpy(content.dptr,temp + 1);
-		strcat(content.dptr, "|");
 	}
-	else
-	{
-		strcpy(dev.d_name,lin);
-		strcpy(content.dptr,dev.d_name);
-		strcat(content.dptr,"|");
-	}
-
-
-
-/* Allocate memory for the dena structures array */
-
-	if (ind == 1)
-	{
-		if ((tab_dena = (dena *)calloc(MAXDEV,sizeof(dena))) == NULL)
-		{
-			free(content.dptr);
-			free(key_2.dptr);
-			free(key_sto.dptr);
-			*p_err = DbErr_ServerMemoryAllocation;
-			return(-1);
-		}
+//
+// Get device name
+//
+	strcpy(dev.d_name, dev_name.c_str());
+	strcpy(content.dptr, dev.d_name);
+	strcat(content.dptr, "|");
 #ifdef DEBUG
-		std::cout << "Memory allocated for the dena structures array" << std::endl;
+	cout << "Device server class : " << dev.ds_class << endl;
+	cout << "Device server name : " << dev.ds_name << endl;
+	cout << "Device name : " << dev.d_name << endl;
+	cout << "Device number (in device list) : " << ind << endl;
 #endif /* DEBUG */
-	}
-	
-/* Call the del_name function */
-
-	if (ind == 1)
+//
+// Call the del_name function
+//
+	try
 	{
-		if (del_name(&dev,&ndev,ptr,&tab_dena,p_err))
-		{
-			free(content.dptr);
-			free(key_2.dptr);
-			free(key_sto.dptr);
-			free(tab_dena);
-			return(-1);
-		}
-#ifdef DEBUG
-		std::cout << "Device server class : " << dev.ds_class << std::endl;
-		std::cout << "Device server name : " << dev.ds_name << std::endl;
-		std::cout << "Device name : " << dev.d_name << std::endl;
-		std::cout << "Device number (in device list) : " << ind << std::endl;
-		
-		std::cout << "Returned from the del_name function" << std::endl;
-#endif /* DEBUG */
+		del_name(dev, ndev, dev_name, tab_dena);
+	}
+	catch(...)
+	{
+		return(-1);
 	}
 
-
-/* Check, if the only device server is to be removed */ 
-
-	if (strcmp(dev.d_name,"%") != 0)
+//
+// Check, if the only device server is to be removed  
+//
+	if (std::string(dev.d_name) != std::string("%"))
 	{
-
-/* Initialize the new tuple with the right pn and vn values */
-
-		for (i = 0;i < ndev;i++)
-		{
-			if (strcmp(dev.d_name,tab_dena[i].devina) == 0)
-				break;
-		}
-
+//
+// Initialize the new tuple with the right pn and vn values 
+//
+		int 		i;
+		std::stringstream	s;
+		for (i = 0;i < ndev && strcmp(dev.d_name,tab_dena[i].devina);i++);
 		if (i == ndev)
 		{
-
-/* Initialize the content for dbm-database */
-
-			strcat(content.dptr, "not_exp");
-			strcat(content.dptr, "|");
-			strcat(content.dptr, "0");
-			strcat(content.dptr, "|");
-			strcat(content.dptr, "0");
-			strcat(content.dptr, "|");
-			strcat(content.dptr, "unknown");
-			strcat(content.dptr, "|");
-			strcat(content.dptr, "unknown");
-			strcat(content.dptr, "|");
-			strcat(content.dptr, "0");
-			strcat(content.dptr, "|");
-			strcat(content.dptr, "unknown");
-			strcat(content.dptr, "|");
+//
+// Initialize the content for dbm-database 
+//
+			strcat(content.dptr, "not_exp|0|0|unknown|unknown|0|unknown|");
 			content.dsize = strlen(content.dptr);
 		}
 		else
@@ -350,965 +202,669 @@ long NdbmServer::upd_name(char *lin,char *ptr,int ind,long last,long *p_err)
 			strcpy(dev.d_class,tab_dena[i].od_class);
 			strcpy(dev.d_type,tab_dena[i].od_type);
 			strcpy(dev.proc_name,tab_dena[i].od_proc);
-		
-/* Initialize the content for dbm-database */
-
-			strcat(content.dptr, tab_dena[i].oh_name);
-			strcat(content.dptr, "|");
-			sprintf(prgnr,"%d", tab_dena[i].opn);
-			strcat(content.dptr, prgnr);
-			strcat(content.dptr, "|");
-			sprintf(prgnr, "%d", tab_dena[i].ovn);
-			strcat(content.dptr, prgnr);
-			strcat(content.dptr, "|");
-			strcat(content.dptr, tab_dena[i].od_class);
-			strcat(content.dptr, "|");
-			strcat(content.dptr, tab_dena[i].od_type);
-			strcat(content.dptr, "|");
-			sprintf(prgnr,"%d", tab_dena[i].opid);
-			strcat(content.dptr, prgnr);
-			strcat(content.dptr, "|");
-			strcat(content.dptr, tab_dena[i].od_proc);
-			strcat(content.dptr, "|");
+//
+// Initialize the content for dbm-database 
+//
+#if !HAVE_SSTREAM
+			s.seekp(0, ios::beg);
+#endif
+			s << tab_dena[i].oh_name << "|" << tab_dena[i].opn << "|" << tab_dena[i].ovn << "|" 
+				<< tab_dena[i].od_class << "|" << tab_dena[i].od_type << "|" << tab_dena[i].opid 
+				<< "|" << tab_dena[i].od_proc << "|";
+#ifdef DEBUG
+			std::cout << " update_name " << s.str() << std::endl;
+#endif
+#if !HAVE_SSTREAM
+			content.dptr = s.str();
+        		s.freeze(false);
+#else
+			content.dptr = const_cast<char *>(s.str().data());
+#endif
 			content.dsize = strlen(content.dptr);
 		}
 		dev.indi = ind;
-		sprintf(seqnr, "%d", ind);
+		snprintf(seqnr, sizeof(seqnr), "%d", ind);
 		key_sto.dptr[key_sto_base_length] = '\0';
 		strcat(key_sto.dptr, seqnr);
 		strcat(key_sto.dptr, "|");
 		key_sto.dsize = strlen(key_sto.dptr);
-
-/* Insert tuple in NAMES table */
+//
+// Insert tuple in NAMES table
+//
 #ifdef DEBUG
 		std::cout << "Insert tuple in NAMES table" << std::endl;
-#endif /* DEBUG */
-
-		flags = GDBM_INSERT;
-
+#endif 
 		key_sto2 = key_sto;
 		cont_sto = content;
 
-		if ((i = gdbm_store(dbgen.tid[0],key_sto2,cont_sto,flags)) != 0)
+		if ((i = gdbm_store(dbgen.tid[0], key_sto2, cont_sto, GDBM_INSERT)) != 0)
 		{
-			free(content.dptr);
-			free(key_2.dptr);
-			free(key_sto.dptr);
-			free(tab_dena);
+			delete [] content.dptr;
+			delete [] key_2.dptr;
+			delete [] key_sto.dptr;
+			tab_dena.clear();
 			if (i == 1) 
-				*p_err = DbErr_DoubleTupleInNames;
+				throw long(DbErr_DoubleTupleInNames);
 			else
-				*p_err = DbErr_DatabaseAccess;
+				throw long(DbErr_DatabaseAccess);
 			return(-1);
 		}
-
 	}
-	
-/* Free memory if it is the last device in the list */
-
-	if (last == True)
-	{
-		free(content.dptr);
-		free(key_2.dptr);
-		free(key_sto.dptr);
-		free(tab_dena);
-	}
-	
-/* Leave function */
-
+//
+// Leave function 
+//
 	return(0);
-	
 }
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for del_name function                                  *
-*                        --------                                           *
-*                                                                           *
-*    Function rule : To delete (in the database) all the devices for a      *
-*                    specific device server.                                *
-*                                                                           *
-*    Argin : - The device server network name                               *
-*	     - The address of a buffer where is saved all the device's names*
-*              in charge of a device server.                                *
-*              The string follows this format :                             *
-*              D.S. network name:device name 1,device name 2,...            *
-*                                                                           *
-*    Argout : - The number of device that have been deleted                 *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
-
-
-long NdbmServer::del_name(device *devi,int *pndev,char *ptr,dena **buf,long *p_err)
+/**
+ * To delete (in the database) all the devices for a specific device server.
+ * 
+ * @param devi The device server network name
+ * @param ptr
+ * @param buf The address of a buffer where is saved all the device's names
+ *            in charge of a device server.  The string follows this format :
+ *            D.S. network name:device name 1,device name 2,...
+ *
+ * @param pndev The number of device that have been deleted 
+ * 
+ * @return 0 if no errors occurs or the error code when there is a problem.
+ */
+long NdbmServer::del_name(device &devi, int &pndev, std::string ptr, std::vector<dena> &buf) throw (long)
 {
-	int i,j,l,tp;
-	register char *ptr1;
-	datum key;
-	datum content;
-	device ret;
-	char *tbeg, *tend;
-	int diff;
-	char seqnr[20];
-	int exit_loop,seq;
-	char key_buf[MAX_KEY];
-	char *devname;
-	int resu;
-	long nb_dev;
-	db_dev_in_db *ptr_dev;
-
-/* Miscellaneous init. */
-
-	i = 0;
-	exit_loop = False;
-	seq = 1;
-
-/* Remove all the devices already registered in the database with the same
-   device server/personal name */
-   
+	int 	j,
+		l,
+		tp;
+	datum 	key,
+		content;
+	int 	seq = 1;
+	long 	nb_dev;
+//
+// Remove all the devices already registered in the database with the same
+// device server/personal name 
+// 
+	int 	i = 0;
 	do
 	{
-
-/* Build key */
-
-		strcpy(key_buf,devi->ds_class);
-		strcat(key_buf,"|");
-		strcat(key_buf,devi->ds_name);
-		strcat(key_buf,"|");
-		sprintf(&(key_buf[strlen(key_buf)]),"%d",seq);
-		strcat(key_buf,"|");
-
-		key.dptr = key_buf;
-		key.dsize = strlen(key_buf);
-
-/* Try to get data out of database */
-
-		content = gdbm_fetch(dbgen.tid[0],key);
-
-		if (content.dptr == NULL)
+//
+// Build key 
+//
+		std::stringstream	s;
+#if !HAVE_SSTREAM
+        	s.seekp(0, ios::beg);
+#endif
+		s << devi.ds_class << "|" << devi.ds_name << "|" << seq << "|" << std::ends;
+#ifdef DEBUG
+		std::cerr << s.str() << std::endl;
+#endif
+#if !HAVE_SSTREAM
+        	key.dptr = s.str();
+        	s.freeze(false);
+#else
+		key.dptr = const_cast<char *>(s.str().data());
+#endif
+		key.dsize = strlen(key.dptr);
+#ifdef DEBUG
+		std::cerr << key.dptr << std::endl << key.dsize << std::endl;
+#endif
+//
+// Try to get data out of database
+//
+		try
 		{
-			if (gdbm_error(dbgen.tid[0]) == 0)
-				exit_loop = True;
-			else
-			{
-				*p_err = DbErr_DatabaseAccess;
-		   		return(-1);
-			}
-		}
-		else
-		{
+			NdbmNamesCont	cont(dbgen.tid[0],key);
+//
+// Copy all the database information in a "dena" structure 
+//
+			dena			_dena;
 
-/* Realloc memory for the dena structures array if necessary */
-
-			if ((i != 0) && (i & 0xF) == 0)
-			{
-				tp = i >> 4;
-				*buf = (dena *)realloc(*buf,sizeof(dena) * ((tp + 1) * MAXDEV))	;
-			}
-
-/* Copy all the database information in a "dena" structure */
-
-			tbeg = content.dptr;
-			tend = strchr(tbeg,'|');
-			diff = (unsigned int)(tend++ - tbeg);
-			strncpy((*buf)[i].devina, tbeg, diff);
-			(*buf)[i].devina[diff] = '\0';
-		
-			tbeg = tend;
-			tend = strchr(tbeg,'|');
-			diff = (unsigned int)(tend++ - tbeg);
-			strncpy((*buf)[i].oh_name, tbeg, diff);
-			(*buf)[i].oh_name[diff] = '\0';
-		
-			tbeg = tend;
-			tend = strchr(tbeg,'|');
-			diff = (unsigned int)(tend++ - tbeg);
-			strncpy(seqnr, tbeg, diff);
-			seqnr[diff] = '\0';
-			(*buf)[i].opn = atoi(seqnr);
-		
-			tbeg = tend;
-			tend = strchr(tbeg,'|');
-			diff = (unsigned int)(tend++ - tbeg);
-			strncpy(seqnr, tbeg, diff);
-			seqnr[diff] = '\0';
-			(*buf)[i].ovn = atoi(seqnr);
-
-			tbeg = tend;
-			tend = strchr(tbeg,'|');
-			diff = (unsigned int)(tend++ - tbeg);
-			strncpy((*buf)[i].od_type, tbeg, diff);
-			(*buf)[i].od_type[diff] = '\0';       
-
-			tbeg = tend;
-			tend = strchr(tbeg,'|');
-			diff = (unsigned int)(tend++ - tbeg);
-			strncpy((*buf)[i].od_class, tbeg, diff);
-			(*buf)[i].od_class[diff] = '\0';       
-
-			tbeg = tend;
-			tend = strchr(tbeg,'|');
-			diff = (unsigned int)(tend++ - tbeg);
-			strncpy(seqnr,tbeg,diff);
-			seqnr[diff] = 0;
-			(*buf)[i].opid = atoi(seqnr);
-
-			tbeg = tend;
-			tend = strchr(tbeg,'|');
-			diff = (unsigned int)(tend++ - tbeg);
-			strncpy((*buf)[i].od_proc,tbeg,diff);
-			(*buf)[i].od_proc[diff] = '\0';
+			strcpy(_dena.devina, cont.get_device_name().c_str());
+			strcpy(_dena.oh_name, cont.get_host_name().c_str());
+			_dena.opn = cont.get_p_num();
+			_dena.ovn = cont.get_v_num();
+			strcpy(_dena.od_type, cont.get_device_type().c_str());
+			strcpy(_dena.od_class, cont.get_device_class().c_str());
+			_dena.opid = cont.get_pid();
+			strcpy(_dena.od_proc, cont.get_process_name().c_str());
 			i++;
-
-/* Delete database entry */
-
-			gdbm_delete(dbgen.tid[0],key);
+			buf.push_back(_dena);
+//
+// Delete database entry
+//
+			gdbm_delete(dbgen.tid[0], key);
 			seq++;
 		}
-	}while (exit_loop == False);
-
-/* Compute how many devices are defined in the list */
-
-	nb_dev = 1;
-	l = strlen(ptr);
-	for (j = 0;j < l;j++)
-	{
-		if (ptr[j] == ',')
-			nb_dev++;
-	}
-
-/* Allocate memory for the structure array */
-
-	if ((ptr_dev = (db_dev_in_db *)calloc(nb_dev,sizeof(db_dev_in_db))) == NULL)
-	{
-		*p_err = DbErr_ServerMemoryAllocation;
-		return(-1);
-	}
-	
-/* Init structure array */
-
-	ptr1 = strtok(ptr,",");
-	strcpy(ptr_dev[0].dev_name,ptr1);
-
-	j = 0;	
-	while(1)
-	{
-		if ((ptr1 = strtok(NULL,",")) == NULL)
-			break;
-		j++;
-		strcpy(ptr_dev[j].dev_name,ptr1);
-	}
-	
-/* In case of device in the device list which was not previously member of
-   this device server, try to retrieve a tuple in the database for each device
-   of the list */
-   	
-	resu = is_dev_in_db(ptr_dev,nb_dev);
-
-/* Delete remaining device(s) from db */
-
-	if (resu == 0)
-	{
-		for (j = 0;j < nb_dev;j++)
+		catch ( ... )
 		{
-			if (ptr_dev[j].found == True)
-			{
-				key.dptr = ptr_dev[j].key_buf;
-				key.dsize = strlen(ptr_dev[j].key_buf);
-				
-				gdbm_delete(dbgen.tid[0],key);
-				if (update_dev_list(&(ptr_dev[j].dev_info),ptr_dev[j].seq + 1) == ERR_DEVNAME)
-				{
-					free(ptr_dev);
-					*p_err = DbErr_DatabaseAccess;
-					return(-1);
-				}
-			}
+			if (gdbm_error(dbgen.tid[0]) == 0)
+				break;
+			else
+				throw long(DbErr_DatabaseAccess);
 		}
-	}
-	else if (resu == ERR_DEVNAME)
+	}while (true);
+//
+// Compute how many devices are defined in the list
+//
+	nb_dev = count(ptr.begin(), ptr.end(), ',') + 1;
+//
+// Allocate memory for the structure array
+//
+	db_dev_in_db 	*ptr_dev; 
+	try
 	{
-		free(ptr_dev);
-		*p_err = DbErr_DatabaseAccess;
-		return(-1);
+		ptr_dev = new db_dev_in_db[nb_dev];
+//
+// Init structure array 
+//
+	    	std::string ptr1 = ptr;
+		std::string::size_type	pos = ptr1.find(',');
+    		j = 0;	
+    		do
+    		{
+			strcpy(ptr_dev[j].dev_name, ptr1.substr(0, pos).c_str());
+			ptr_dev[j].found = False;
+			ptr1.erase(0, pos + 1);
+			j++;
+	    	}while((pos = ptr1.find(',')) != std::string::npos);
+//
+// In case of device in the device list which was not previously member of
+// this device server, try to retrieve a tuple in the database for each device
+// of the list
+// Delete remaining device(s) from db
+//
+	    	if (!is_dev_in_db(ptr_dev, nb_dev))
+			for (long j = 0;j < nb_dev;j++)
+		    		if (ptr_dev[j].found)
+		    		{
+					key.dptr = ptr_dev[j].key_buf;
+					key.dsize = strlen(key.dptr);
+					gdbm_delete(dbgen.tid[0], key);
+					update_dev_list(ptr_dev[j].dev_info, ptr_dev[j].seq + 1);
+	    			}
 	}
-
-/* Leave function */
-
-	free(ptr_dev);
-	*pndev = i;
+	catch(const std::bad_alloc &)
+	{
+		throw long(DbErr_ServerMemoryAllocation);
+	}
+	catch(const long err)
+	{
+		delete [] ptr_dev;
+		throw long(DbErr_DatabaseAccess);
+	}
+//
+// Leave function 
+//
+	delete [] ptr_dev;
+	pndev = i;
 	return(0);
-
 }
-
 
-
-/****************************************************************************
-*                                                                           *
-*		Code for is_dev_in_db function                              *
-*                        ------------                                       *
-*                                                                           *
-*    Function rule : To check if a device is known in the database	    *
-*                                                                           *
-*    Argin : - devname : The device name				    *
-*                                                                           *
-*    Argout : - p_dev : Pointer to a device structure with fields set if the*
-*			device is defined in the database		    *
-*	      - p_seq : The device sequence database entry field	    *
-*	      - p_key : The database entry key				    *
-*                                                                           *
-*    This function returns 0 if there is a device in the datbase	    *
-*    If the device is not defined in the database, the function returns     *
-*    ERR_DEV_NOT_FOUND. In case of failure, the function returns ERR_DEVNAME*
-*                                                                           *
-****************************************************************************/
-
-long NdbmServer::is_dev_in_db(db_dev_in_db *ptr,long nb_dev)
+/**
+ * To check if a device is known in the database
+ * 
+ * @param ptr The device name
+ * @param nb_dev
+ * 
+ * @return 0 if there is a device in the database
+ *    If the device is not defined in the database, the function returns
+ *    ERR_DEV_NOT_FD. In case of failure, the function returns ERR_DEVNAME
+ */
+long NdbmServer::is_dev_in_db(db_dev_in_db *ptr,long nb_dev) throw (long)
 {
-	static datum key;
-	static datum content;
-	register char *tbeg;
-	register char *tend;
-	static unsigned int diff;
-	char seq_str[20];
-	char key_buf[MAX_KEY];
-	device dev;
-	long j;
-	
-	for (key = gdbm_firstkey(dbgen.tid[0]); key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
+	device 		dev;
+	datum		key2;
+
+	for (datum key = gdbm_firstkey(dbgen.tid[0]); 
+		key.dptr != NULL;
+		key2 = key, key = gdbm_nextkey(dbgen.tid[0], key2), free(key2.dptr))
 	{
-
-/* Extract dserver name */
-
-		tend = strchr(key.dptr,'|');
-		if (tend == NULL)
-		{	
-		   	return(ERR_DEVNAME);
-		}
-		diff = (unsigned int)(tend++ - key.dptr);
-		strncpy(dev.ds_class,key.dptr,diff);
-		dev.ds_class[diff] = '\0';
-
-/* Extract personal name */
-
-		tbeg = tend;
-		tend = strchr(tbeg,'|');
-		if (tend == NULL)
-		{	
-	   		return(ERR_DEVNAME);
-	   	}
-		diff = (unsigned int)(tend++ - tbeg);
-		strncpy(dev.ds_name, tbeg, diff);
-		dev.ds_name[diff] = '\0';
-
-/* Extract sequence field */
-
-		tbeg = tend;
-		tend = strchr(tbeg,'|');
-		if (tend == NULL)
-		{	
-	   		return(ERR_DEVNAME);
-	   	}
-		diff = (unsigned int)(tend++ - tbeg);
-		strncpy(seq_str,tbeg,diff);
-		seq_str[diff] = '\0';
-
-/* Make a copy of the key */
-
-		strncpy(key_buf,key.dptr,key.dsize);
-		key_buf[key.dsize] = '\0';
-
-/* Get db content */
-
-		content = gdbm_fetch(dbgen.tid[0], key);
-		if (content.dptr != NULL)
+		NdbmNamesKey	namesKey(key);
+//
+// Extract dserver name
+//
+		strcpy(dev.ds_class, namesKey.get_ds_name().c_str());
+//
+// Extract personal name
+//
+		strcpy(dev.ds_name, namesKey.get_ds_pers_name().c_str());
+//
+// Make a copy of the key
+//
+		std::string	key_buf(key.dptr, key.dsize);
+//
+// Get db content 
+//
+		try
 		{
-			tend = strchr(content.dptr,'|');
-			if (tend == NULL)
-			{	
-	   			return(ERR_DEVNAME);
-	   		}
-			diff = (unsigned int)(tend++ - content.dptr);
-			strncpy(dev.d_name,content.dptr,diff);
-			dev.d_name[diff] = '\0';
-
-/* Wanted device ? */
-
-			for (j = 0;j < nb_dev;j++)
-			{
-				if (strcmp(dev.d_name,ptr[j].dev_name) == 0)
+			NdbmNamesCont	cont(dbgen.tid[0], key);
+			strcpy(dev.d_name, cont.get_device_name().c_str());
+//
+// Wanted device ? 
+//
+			for (long j = 0;j < nb_dev;j++)
+				if (dev.d_name == ptr[j].dev_name)
 				{
 					ptr[j].found = True;
-					ptr[j].seq = atoi(seq_str);
-					strcpy(ptr[j].key_buf,key_buf);
+					ptr[j].seq = namesKey.get_dev_indi();
+					strcpy(ptr[j].key_buf, key_buf.c_str());
 					ptr[j].dev_info = dev;
 				}
-			}
+		}
+		catch ( ... )
+		{
+			if (gdbm_error(dbgen.tid[0]) == 0)
+				break;
+			else
+				throw long(ERR_DEV_NOT_FD);
 		}
 	}
 	return(0);
 }
-
-
 
-
-/****************************************************************************
-*                                                                           *
-*		Code for update_dev_list function                           *
-*                        ---------------                                    *
-*                                                                           *
-*    Function rule : To update a device server device list when one of the  *
-*		     device is removed from the list. This means to update  *
-*		     the sequence field of all the remaining devices	    *
-*                                                                           *
-*    Argin : - p_ret : The removed device structure with the device         *
-*		       information					    *
-*	     - seq : The sequence field of the first device to be updated   *
-*                                                                           *
-*    Argout : No argout							    *
-*                                                                           *
-*    This function returns 0 if there is no problem. Otherwise, it returns  *
-*    ERR_DEVNAME							    *
-*                                                                           *
-*****************************************************************************/
-
-long NdbmServer::update_dev_list(device *p_ret,int seq)
+/**
+ * To update a device server device list when one of the device is removed from the list. 
+ * This means to update the sequence field of all the remaining devices
+ * 
+ * @param p_ret The removed device structure with the device information
+ * @param seq The sequence field of the first device to be updated
+ *
+ * @return 0 if there is no problem. Otherwise, it returns  ERR_DEVNAME
+ */
+long NdbmServer::update_dev_list(device &p_ret, long seq) throw (long)
 {
-	datum key;
-	datum content;
-	char key_buf[MAX_KEY];
-	char cont_sto[MAX_CONT];
-	int exit_loop = False;
-	int ind_in_key;
-	int new_seq;
-
-/* Miscellaneous init */
-
-	strcpy(key_buf,p_ret->ds_class);
-	strcat(key_buf,"|");
-	strcat(key_buf,p_ret->ds_name);
-	strcat(key_buf,"|");
-	ind_in_key = strlen(key_buf);
-
+	datum 	key;
+//
+// Miscellaneous init 
+//
+	std::cout << p_ret.ds_class << " " << p_ret.ds_name << std::endl;
+	std::string key_buf = std::string(p_ret.ds_class) + "|" + std::string(p_ret.ds_name) + "|";
+#ifdef DEBUG
 	std::cout << "before loop in update-dev_list function" << std::endl;
+#endif
 	do
 	{
-	
-
-/* Build the key */
-
-		sprintf(&(key_buf[ind_in_key]),"%d",seq);
-		strcat(key_buf,"|");
-
-		key.dptr = key_buf;
-		key.dsize = strlen(key_buf);
-
-/* Tried to get data from the database */
-
-		content = gdbm_fetch(dbgen.tid[0],key);
-		if (content.dptr == NULL)
+//
+// Build the key 
+//
+#if !HAVE_SSTREAM
+		std::stringstream	s(const_cast<char *>(key_buf.c_str()), key_buf.length());
+        	s.seekp(0, ios::beg);
+#else
+		std::stringstream	s(key_buf);
+#endif
+		s << seq << "|" <<  std::ends;
+#if !HAVE_SSTREAM
+        	key.dptr = s.str();
+        	s.freeze(false);
+#else
+		key.dptr = const_cast<char *>(s.str().data());
+        	strcpy(key.dptr, s.str().c_str());
+#endif
+		key.dsize = strlen(key.dptr);
+//
+// Tried to get data from the database 
+//
+		try
 		{
-			if (gdbm_error(dbgen.tid[0]) == 0)
-				exit_loop = True;
-			else
-			{
-	   			return(ERR_DEVNAME);
-			}
-		}
-		else
-		{
+			NdbmNamesCont	cont(dbgen.tid[0],key);	
+//
+// Delete the entry and store a new one with a modifed sequence field 
+//
+			if (gdbm_delete(dbgen.tid[0], key) != 0)
+				throw long(ERR_DEVNAME);
+#if !HAVE_SSTREAM
+			s.seekp(0, ios::beg);
+			s << key_buf;
+#else
+			s.str(key_buf);
+#endif
+			s << (seq - 1) << "|" << std::ends;;
+#if !HAVE_SSTREAM
+			key.dptr = s.str();
+			s.freeze(false);
+#else
+			key.dptr = const_cast<char *>(s.str().data());
+#endif
+			key.dsize = strlen(key.dptr);
 
-/* Copy the old database content */
-
-			strncpy(cont_sto,content.dptr,content.dsize);
-			cont_sto[content.dsize] = '\0';
-
-/* Delete the entry and store a new one with a modifed sequence field */
-
-			if (gdbm_delete(dbgen.tid[0],key) != 0)
-			{
-	   			return(ERR_DEVNAME);
-			}
-
-			new_seq = seq;
-			new_seq--;
-			sprintf(&(key_buf[ind_in_key]),"%d",new_seq);
-			strcat(key_buf,"|");
-		
-			key.dptr = key_buf;
-			key.dsize = strlen(key_buf);
-			content.dptr = cont_sto;
-			content.dsize = strlen(cont_sto);
-
-			if (gdbm_store(dbgen.tid[0],key,content,GDBM_INSERT) != 0)
-			{
-	   			return(ERR_DEVNAME);
-			}
-
+			if (gdbm_store(dbgen.tid[0], key, cont.get_datum(), GDBM_INSERT) != 0)
+				throw long(ERR_DEVNAME);
 			seq++;
 		}
-	}while (exit_loop == False);
+		catch ( ... )
+		{
+			if (gdbm_error(dbgen.tid[0]) == 0)
+				break;
+			else
+				throw long(ERR_DEV_NOT_FD);
+		}
+	}while(true);
+#ifdef DEBUG
 	std::cout << "after loop in update-dev_list function" << std::endl;	
+#endif
 	return(0);
 }
 
 
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the updres_1_svc function       	   	    *
-*                           ------------                       	    	    *
-*                                                                           *
-*    Method rule : To update resource(s)				    *
-*                                                                           *
-*    Argin : - dev : The device name					    *
-*                                                                           *
-*    Argout : - No argout						    *
-*                                                                           *
-*    This function returns a pointer to a structure with all device info    *
-*    and an error code which is set if needed				    *
-*                                                                           *
-****************************************************************************/
-
-
+/**
+ * To update resource(s)
+ * 
+ * @param res_list The resource list 
+ * 
+ * @return a pointer to a structure with all device info and an error code which is set if needed
+ */
 db_psdev_error *NdbmServer::updres_1_svc(db_res *res_list)
 {
-	static db_psdev_error sent_back;
-	long list_nb;
-	long i,last,ind;
-	char *ptr,*ptr_cp,*ptr_cp2;
-	char *lin,*tmp;
-	char last_dev[40];
-	char pat[2];
-	char *ptr_free;
+	long 	list_nb = res_list->res_val.arr1_len,
+		ind = 1,
+		i;
 
-	list_nb = res_list->res_val.arr1_len;
-		
 #ifdef DEBUG
 	std::cout << "In updres_1_svc function for " << list_nb << " resource(s)" << std::endl;
 #endif
-
-/* Initialize parameter sent back to client */
-
-	sent_back.error_code = 0;
-	sent_back.psdev_err = 0;
-
-/* A loop on each resources */
-
-	for (i = 0;i < list_nb;i++)
+//
+// Initialize parameter sent back to client 
+//
+	psdev_back.error_code = 0;
+	psdev_back.psdev_err = 0;
+//
+// A loop on each resource 
+//
+	try
 	{
-		
-/* Allocate memory for strtok pointers */
-
-		lin = res_list->res_val.arr1_val[i];
+    		for (i = 0; i < list_nb; i++)
+    		{
+//
+// Allocate memory for strtok pointers 
+//
+			std::string lin = res_list->res_val.arr1_val[i];
+			std::string::size_type	pos = 0;
 
 #ifdef DEBUG
-		std::cout << "Resource list = " << lin << std::endl;
-#endif /* DEBUG */
-
-/* Only one update if the resource is a simple one */
-
-		if (strchr(lin,SEP_ELT) == NULL)
-		{
-			if (upd_res(lin,1,False,&sent_back.error_code) == -1)
-			{
-				sent_back.psdev_err = i + 1;
-				return(&sent_back);
-			}
-		}
-		else
-		{		
-			if ((ptr_cp = (char *)malloc(strlen(lin) + 1)) == NULL)
-			{
-				sent_back.psdev_err = i + 1;
-				sent_back.error_code = DbErr_ClientMemoryAllocation;
-				return(&sent_back);
-			}
-	
-			if ((ptr = (char *)malloc(strlen(lin) + 1)) == NULL)
-			{
-				free(ptr_cp);
-				sent_back.psdev_err = i + 1;
-				sent_back.error_code = DbErr_ClientMemoryAllocation;
-				return(&sent_back);
-			}
-			ptr_free = ptr;
-			if ((ptr_cp2 = (char *)malloc(strlen(lin) + 1)) == NULL)
-			{
-				free(ptr_cp);
-				free(ptr);
-				sent_back.psdev_err = i + 1;
-				sent_back.error_code = DbErr_ClientMemoryAllocation;
-				return(&sent_back);
-			}
-				
-/* Extract each resource from the list and update table each time */
-
-			strcpy(ptr_cp,lin);
-			strcpy(ptr_cp2,lin);
-		
-			ind = 1;
-			pat[0] = SEP_ELT;
-			pat[1] = '\0';
-			
-			ptr = strtok(ptr_cp,pat);
-		
-			if (upd_res(ptr,ind,False,&sent_back.error_code) == -1)
-			{
-				free(ptr_cp);
-				free(ptr);
-				free(ptr_cp2);
-				sent_back.psdev_err = i + 1;
-				return(&sent_back);
-			}
-
-			ptr = strtok(ptr_cp2,pat); /* Reinit. strtok internal pointer */
-	
-			while((ptr = strtok(NULL,pat)) != NULL)
-			{
-				ind++;	
-				if (upd_res(ptr,ind,True,&sent_back.error_code) == -1)
+			std::cout << "Resource list = " << lin << std::endl;
+#endif
+//
+// Only one update if the resource is a simple one 
+//
+			if ((pos = lin.find(SEP_ELT)) == std::string::npos)
+				upd_res(lin, ind, false);
+			else
+			{		
+				do 
 				{
-					free(ptr_cp);
-					free(ptr_free);
-					free(ptr_cp2);
-					sent_back.psdev_err = i + 1;
-					return(&sent_back);
-				}
-			}
-		
-			free(ptr_cp);
-			free(ptr_free);
-			free(ptr_cp2);
-	
+					upd_res(lin.substr(0, pos), ind, true); 
+					lin.erase(0, pos + 1);
+					ind++;	
+				}while((pos = lin.find(SEP_ELT)) != std::string::npos);
+				upd_res(lin, ind, true); 
+	    		}
 		}
 	}
-
-//
-// Free memory and return data
-//
-
-	return(&sent_back);
-
+	catch(const std::bad_alloc &)
+	{
+		psdev_back.psdev_err = i + 1;
+		psdev_back.error_code = DbErr_ClientMemoryAllocation;
+	}
+	catch(const long err)
+	{
+		psdev_back.psdev_err = i + 1;
+		psdev_back.error_code = err;
+	}
+	return(&psdev_back);
 }
 
-
 
-
-/****************************************************************************
-*                                                                           *
-*		Code for upd_res function                                   *
-*                        -------                                            *
-*                                                                           *
-*    Function rule : To update a resource in the appropriate table in       *
-*                    database                                               *
-*                                                                           *
-*    Argin : - A pointer to the modified resource definition (without space *
-*              and tab characters)                                          *
-*            - The number of the resource in the array (one if the resource *
-*              type is not an array)					    *
-*            - A flag to inform the function that this resource is a member *
-*              of an array                                                  *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no errors occurs or the error code when     *
-*    there is a problem.                                                    *
-*                                                                           *
-****************************************************************************/
-
-long NdbmServer::upd_res(char *lin,long numb,char array,long *p_err)
+/**
+ * To update a resource in the appropriate table in database 
+ * 
+ * @param lin A pointer to the modified resource definition (without space and tab characters)
+ * @param numb The number of the resource in the array (one if the resource type is not an array)
+ * @param array A flag to inform the function that this resource is a member of an array 
+ *
+ * @return 0 if no errors occurs or the error code when there is a problem.
+ */
+long NdbmServer::upd_res(const std::string &lin, const long numb, bool array) throw (long)
 {
-	static char t_name[80];
-	static reso res;
-	reso ret;
-	unsigned int diff;
-	register char *temp,*tmp;
-	int i,l,resu;
-	int flags;
-	static GDBM_FILE	tab;
-	datum key;
-	datum content;
-	char ind_name[20];
-	char seqnr[4];
-	int res_numb;
-	static int res_pas;
-	static int sec_res;
-	int ctr = 0;
-	int resu1;
-	datum cont;
-	datum key_array;
-	char res_db[MAX_RES];
-	int old_res_array;
+	static std::string 	t_name;
+	std::string::size_type	pos,
+				last_pos;
+	int	 		i,
+				l,
+				indi,
+				resu;
+	static GDBM_FILE 	tab;
+	static datum 		key = {NULL, 0},
+     				content = {NULL, 0},
+    				key_array = {NULL, 0};
+	int 			res_numb;
+	static bool 		sec_res;
+	int 			ctr = 0;
+	bool 			old_res_array;	
+	static std::string	family,
+				member,
+				r_name,
+				r_val;
 
 	if (numb == 1)
 	{
+		if (key.dptr == NULL)
+    			key.dptr = new char[MAX_KEY];
+		if (content.dptr == NULL)
+    			content.dptr = new char[MAX_CONT];
+		if (key_array.dptr == NULL)
+			key_array.dptr = new char[MAX_KEY];
+//
+// Get table name 
+//
+		pos = lin.find('/');
+		t_name = lin.substr(0, pos).c_str();
 		
-/* Get table name */
-
-		temp = strchr(lin,'/');
-		diff = (unsigned int)(temp++ - lin);
-		strncpy(t_name,lin,diff);
-		t_name[diff] = '\0';
-		
-		if (strcmp(t_name,"sec") == 0)
-			sec_res = True;
-		else
-			sec_res = False;
-
-/* Get family name */
-
-		tmp = strchr(temp,'/');
-		diff = (unsigned int)(tmp++ - temp);
-		strncpy(res.fam,temp,diff);
-		res.fam[diff] = '\0';
-
-/* Get member name */
-
-		temp = strchr(tmp,'/');
-		diff = (unsigned int)(temp++ - tmp);
-		strncpy(res.member,tmp,diff);
-		res.member[diff] = '\0';
-
-/* Get resource name */
-
-		tmp = strchr(temp,':');
-		diff = (unsigned int)(tmp - temp);
-		strncpy(res.r_name,temp,diff);
-		res.r_name[diff] = '\0';
-		
-/* If the resource belongs to Security domain, change every occurance of
-   | by a ^ character */
-   
-   		if (sec_res == True)
-		{
-			l = strlen(res.r_name);
-			for (i = 0;i < l;i++)
-			{
-				if (res.r_name[i] == '|')
-					res.r_name[i] = SEC_SEP;
-			}
-		}
-
-/* Get resource value (resource values are stored in the database as 
-   case dependent strings */
-
-		strcpy(res.r_val,tmp + 1);
-	}
-	else
-		strcpy(res.r_val,lin);
-		
-/* For security domain, change every occurance of | by a ^ */
-
-   	if (sec_res == True)
-	{
-		l = strlen(res.r_val);
-		for (i = 0;i < l;i++)
-		{
-			if (res.r_val[i] == '|')
-				res.r_val[i] = SEC_SEP;
-		}
-	}
-
-/* Initialise resource number */
-
-	res.indi = numb;
-
-#ifdef DEBUG
-	std::cout << "Table name : " << t_name << std::endl;
-	std::cout << "Family name : " << res.fam << std::endl;
-	std::cout << "Number name : " << res.member << std::endl;
-	std::cout << "Resource name : " << res.r_name << std::endl;
-	std::cout << "Resource value : " << res.r_val << std::endl;
-	std::cout << "Sequence number : " << res.indi << std::endl << std::endl;
-#endif /* DEBUG */
-
-/* Select the right resource table in database */
-
-	if (numb == 1)
-	{
+		sec_res = (t_name == "sec");
+//
+// Get family name 
+//
+		pos = lin.find('/', (last_pos = pos + 1));
+		family = lin.substr(last_pos, pos - last_pos);
+//
+// Get member name 
+//
+		pos = lin.find('/', (last_pos = pos + 1));
+		member = lin.substr(last_pos, pos - last_pos);
+//
+// Get resource name 
+//
+		pos = lin.find(':', (last_pos = pos + 1));
+		r_name = lin.substr(last_pos, pos - last_pos);
+//
+// If the resource belongs to Security domain, change every occurance of
+// | by a ^ character 
+// 
+   		if (sec_res)
+			transform(r_name.begin(), r_name.end(), r_name.begin(), DBServer::make_sec);
+//
+// Select the right resource table in database 
+//
 		for (i = 1;i < dbgen.TblNum;i++)
-		{
-			if (strcmp(t_name,dbgen.TblName[i].c_str()) == 0)
+			if (t_name == dbgen.TblName[i])
 			{
 				tab = dbgen.tid[i];
 				break;
 			}
-		}
-
 		if (i == dbgen.TblNum)
-		{
-			*p_err = DbErr_DomainDefinition;
-			return(-1);
-		}
+			throw long(DbErr_DomainDefinition);
+#ifdef DEBUG
+		std::cout << "Table name : " << t_name << std::endl;
+		std::cout << "Family name : " << family << std::endl;
+		std::cout << "Number name : " << member << std::endl;
+		std::cout << "Resource name : " << r_name << std::endl;
+		std::cout << "Resource value : " << r_val << std::endl;
+		std::cout << "Sequence number : " << indi << std::endl << std::endl;
+#endif 
+//
+// Get resource value (resource values are stored in the database as case dependent strings)
+//
+		r_val = lin.substr(pos + 1);
 	}
-
-/* Try to retrieve the right tuple in table */
-
-	key.dptr = (char *)malloc(MAX_KEY);
-	content.dptr = (char *)malloc(MAX_CONT);
-
-	res_numb = numb;
-
-	strcpy(key.dptr, res.fam);
-	strcat(key.dptr, "|");
-	strcat(key.dptr, res.member);
-	strcat(key.dptr, "|");
-	strcat(key.dptr, res.r_name);
-	strcat(key.dptr, "|");
-	sprintf(seqnr,"%d", numb);
-	strcat(key.dptr, seqnr);
-	strcat(key.dptr, "|");
-	key.dsize = strlen(key.dptr);
-
-
-/* If the resource value is %, remove all the resources.
-   If this function is called for a normal resource, I must also 
-   remove all the old resources with the old name. This is necessary if there
-   is an update of a resource which was previously an array */
-
-	if ((strcmp(res.r_val,"%") == 0) || (array == False))
+	else
+		r_val = lin;
+//
+// For security domain, change every occurance of | by a ^ 
+//
+	if (sec_res)
+		transform(r_val.begin(), r_val.end(), r_val.begin(), DBServer::make_sec);
+//
+// Initialise resource number 
+//
+	indi = numb;
+//
+// Try to retrieve the right tuple in table 
+//
+	try
 	{
-		key_array.dptr = (char *)malloc(MAX_KEY);
-		while(1)
-		{
-			strcpy(key.dptr, res.fam);
-			strcat(key.dptr, "|");
-			strcat(key.dptr, res.member);
-			strcat(key.dptr, "|");
-			strcat(key.dptr, res.r_name);
-			strcat(key.dptr, "|");
-			sprintf(seqnr,"%d", res_numb);
-			strcat(key.dptr, seqnr);
-			strcat(key.dptr, "|");
-			key.dsize = strlen(key.dptr);
-
-			cont = gdbm_fetch(tab,key);
-			if (cont.dptr == NULL)
+    		res_numb = numb;
+		std::stringstream	s;
+#if !HAVE_SSTREAM
+        	s.seekp(0, ios::beg);
+#endif
+		s << family << "|" << member << "|" << r_name << "|" << numb << "|" << std::ends;
+#if !HAVE_SSTREAM
+        	strcpy(key.dptr, s.str());
+        	s.freeze(false);
+#else
+        	strcpy(key.dptr, s.str().c_str());
+#endif
+    		key.dsize = strlen(key.dptr);
+//
+// If the resource value is %, remove all the resources.
+// If this function is called for a normal resource, I must also 
+// remove all the old resources with the old name. This is necessary if there
+// is an update of a resource which was previously an array 
+//
+    		if (r_val == "%" || !array)
+    		{
+			while(1)
 			{
-				if (gdbm_error(tab) == 0)
-					break;
-				else
+#if !HAVE_SSTREAM
+				s.seekp(0, ios::beg);
+#else
+				s.str("");
+#endif
+				s << family << "|" << member << "|" << r_name << "|" << res_numb << "|" << std::ends;
+#if !HAVE_SSTREAM
+				strcpy(key.dptr, s.str());
+				s.freeze(false);
+#else
+				strcpy(key.dptr, s.str().c_str());
+#endif
+    				key.dsize = strlen(key.dptr);
+				try
 				{
-					gdbm_clearerr(tab);
-					free(key.dptr);
-					free(content.dptr);
-					free(key_array.dptr);
-					*p_err = DbErr_DatabaseAccess;
-					return(-1);
+					NdbmResCont	cont(tab, key);
+					ctr++;
 				}
-			}
-			ctr++;
-			strncpy(res_db,cont.dptr,cont.dsize);
-			res_db[cont.dsize] = '\0';
-
-/* The resource already exists in db. Check if one element with indoce 2 also
-   exists. It it is the case, the resource is an array */
-
-			if (ctr == 1)
-			{
-				strcpy(key_array.dptr, res.fam);
-				strcat(key_array.dptr, "|");
-				strcat(key_array.dptr, res.member);
-				strcat(key_array.dptr, "|");
-				strcat(key_array.dptr, res.r_name);
-				strcat(key_array.dptr, "|2|");
-				key_array.dsize = strlen(key_array.dptr);
-
-				cont = gdbm_fetch(tab,key_array);
-				if (cont.dptr == NULL)
+				catch ( ... )
 				{
 					if (gdbm_error(tab) == 0)
-						old_res_array = False;
+						break;
 					else
 					{
 						gdbm_clearerr(tab);
-						free(key.dptr);
-						free(content.dptr);
-						free(key_array.dptr);
-						*p_err = DbErr_DatabaseAccess;
-						return(-1);
+						throw long(DbErr_DatabaseAccess);
 					}
 				}
-				else
-					old_res_array = True;
+//
+// The resource already exists in db. Check if one element with index 2 also
+// exists. It it is the case, the resource is an array 
+//
+				if (ctr == 1)
+				{
+#if !HAVE_SSTREAM
+					s.seekp(0, ios::beg);
+#else
+					s.str("");
+#endif
+					s << family << "|" << member << "|" << r_name << "|2|" << std::ends;
+#if !HAVE_SSTREAM
+					strcpy(key_array.dptr, s.str());
+					s.freeze(false);
+#else
+					strcpy(key_array.dptr, s.str().c_str());
+#endif
+					key_array.dsize = strlen(key_array.dptr);
+
+					try
+					{
+						NdbmResCont	cont(tab, key_array);
+						old_res_array = true;
+					}
+					catch ( ... )
+					{
+						if (gdbm_error(tab) == 0)
+							old_res_array = false;
+						else
+						{
+							gdbm_clearerr(tab);
+							throw long(DbErr_DatabaseAccess);
+						}
+					}
+				}
+				gdbm_delete(tab, key);
+				res_numb++;
 			}
+			if (r_val == "%") 
+				return(0);
+    		}
+//
+// Insert a new tuple 
+//
+#if !HAVE_SSTREAM
+		s.seekp(0, ios::beg);
+#else
+		s.str("");
+#endif
+		s << family << "|" << member << "|" << r_name << "|" << numb << "|" << std::ends;
+#if !HAVE_SSTREAM
+		strcpy(key.dptr, s.str());
+		s.freeze(false);
+#else
+		strcpy(key.dptr, s.str().c_str());
+#endif
+		key.dsize = strlen(key.dptr);
 
-			gdbm_delete(tab,key);
-			res_numb++;
-		}
+		strcpy(content.dptr, r_val.c_str());
+		content.dsize = r_val.length();
 
-		free(key_array.dptr);
-		if (strcmp(res.r_val,"%") == 0)
+		switch(gdbm_store(tab, key, content, GDBM_REPLACE))
 		{
-			free(key.dptr);
-			free(content.dptr);
-			return(0);
+			case 0 : break;
+			case 1 : throw long (DbErr_DoubleTupleInRes);
+			default: throw long (DbErr_DatabaseAccess);
 		}
 	}
-
-/* Insert a new tuple */
-
-	strcpy(key.dptr, res.fam);
-	strcat(key.dptr, "|");
-	strcat(key.dptr, res.member);
-	strcat(key.dptr, "|");
-	strcat(key.dptr, res.r_name);
-	strcat(key.dptr, "|");
-	sprintf(seqnr,"%d", numb);
-	strcat(key.dptr, seqnr);
-	strcat(key.dptr, "|");
-	key.dsize = strlen(key.dptr);
-
-	strcpy(content.dptr, res.r_val);
-	content.dsize = strlen(res.r_val);
-	flags = GDBM_REPLACE;
-
-	if ((i = gdbm_store(tab,key,content,flags)) != 0)
+	catch(const long err)
 	{
-		if (i == 1)
-			*p_err = DbErr_DoubleTupleInRes;
-		else
-			*p_err = DbErr_DatabaseAccess;
-		free(key.dptr);
-		free(content.dptr);
-		return(-1);
+		throw err;
 	}
-	
-	free(key.dptr);
-	free(content.dptr);
+	catch(const std::bad_alloc &)
+	{
+		throw long(DbErr_ServerMemoryAllocation);
+	}
 	return(0);
-
 }
 
 
 
-/****************************************************************************
-*                                                                           *
-*	Server code for the secpass_1_svc function       	   	    *
-*                           -------------                       	    *
-*                                                                           *
-*    Method rule : To device domain list for all the device name defined    *
-*		   in the NAMES and PS_NAMES tables			    *
-*                                                                           *
-*    Argin : No argin							    *
-*                                                                           *
-*    Argout : domain_list : The domain name list 			    *
-*                                                                           *
-*                                                                           *
-****************************************************************************/
-
-
+/**
+ * Read the password from the password file
+ *
+ * @return the password as a resource for the system
+ */
 db_res *NdbmServer::secpass_1_svc()
 {
-	long i,j;
-	char pass[80];
-	char *base;
+	char 		pass[80];
 	
 #ifdef DEBUG
 	std::cout << "In secpass_1_svc function" << std::endl;
@@ -1317,54 +873,40 @@ db_res *NdbmServer::secpass_1_svc()
 //
 // Initialize structure sent back to client
 //
-
 	browse_back.db_err = 0;
 	browse_back.res_val.arr1_len = 0;
 	browse_back.res_val.arr1_val = NULL;
-	
 	pass[0] = '\0';
-
 //
 // Build security file name
 //
-
-	base = (char *)getenv("DBM_DIR");
-	std::string f_name(base);
+	std::string f_name((char *)getenv("DBM_DIR"));
 	f_name.append("/.sec_pass");	
-
 //
 // Try to open the file
 //
-
 	std::ifstream f(f_name.c_str());
-	
 	if (!f)
 	{
 		browse_back.db_err = DbErr_NoPassword;
 		return(&browse_back);
 	}
-	
 //
 // Get password
 //
-
-	f.getline(pass,sizeof(pass));
-	
+	f.getline(pass, sizeof(pass));
 	if (strlen(pass) == 0)
 	{
 		browse_back.db_err = DbErr_NoPassword;
 		return(&browse_back);
 	}
-
 //
 // Init data sent back to client 
 //	
-	
 	try
 	{
 		browse_back.res_val.arr1_val = new char * [1];
 		browse_back.res_val.arr1_val[0] = new char [strlen(pass) + 1];
-	
 		strcpy(browse_back.res_val.arr1_val[0],pass);
 	}
 	catch (std::bad_alloc)
@@ -1373,12 +915,8 @@ db_res *NdbmServer::secpass_1_svc()
 		return(&browse_back);
 	}
 	browse_back.res_val.arr1_len = 1;
-
-	
 //
 // Return data
 //
-
 	return(&browse_back);
-	
 }
