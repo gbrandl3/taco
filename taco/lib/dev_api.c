@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.19 $
+ Version    :	$Revision: 1.20 $
 
- Date	    :	$Date: 2004-10-26 11:35:36 $
+ Date	    :	$Date: 2005-02-22 13:55:24 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -29,6 +29,24 @@
 #include <Admin.h>
 #include <DevErrors.h>
 #include <API_xdr_vers3.h>
+
+#if HAVE_SYS_SIGNAL_H
+#	include <sys/signal.h>
+#elif HAVE_SIGNAL_H
+#	include <signal.h>
+#else
+#error could not find signal.h
+#endif
+
+#if !HAVE_SIGHANDLER_T
+#	if !HAVE___SIGHANDLER_T
+		typedef RETSIGTYPE (*SIGHANDLER_T) (int);
+#	else
+#		define	SIGHANDLER_T	__sighandler_t
+#	endif
+#else
+#	define	SIGHANDLER_T	sighandler_t
+#endif
 
 #if (!defined WIN32)
 #	if ( (defined OSK) || (defined _OSK))
@@ -466,13 +484,13 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
  * check if there is already a open connection to
  * this device server
  */
-	if ((n_svr_conn=dev_query_svr (host_name,prog_number,vers_number)) < 0)
+	if ((n_svr_conn = dev_query_svr(host_name,prog_number,vers_number)) < 0)
 	{
 		*error = DevErr_ExceededMaximumNoOfServers;
 		return(-1);
 	}
 
-	if ( svr_conns[n_svr_conn].no_conns == 0)
+	if (svr_conns[n_svr_conn].no_conns == 0)
 	{
 /*
  * Before a new handle can be created, verify whether it is possible to connect
@@ -588,12 +606,117 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
 	}
 	else
 	{
+		SIGHANDLER_T	oldsighandler = signal(SIGPIPE, SIG_IGN);
 /* 
  * a connection already exists to this server, reuse it
  */
 		dev_printdebug (DBG_API, "dev_import() : reuse already open client handle\n");
 		clnt        = svr_conns[n_svr_conn].clnt;
 		vers_number = svr_conns[n_svr_conn].vers_number;
+
+		clnt_stat = clnt_call (clnt, NULLPROC, (xdrproc_t)xdr_void,  NULL,
+				    (xdrproc_t)xdr_void,  NULL, TIMEVAL(timeout));
+		signal(SIGPIPE, oldsighandler);
+		if (clnt_stat != RPC_SUCCESS)
+		{
+			clnt_destroy(svr_conns[n_svr_conn].clnt);
+			if (svr_conns[n_svr_conn].rpc_protocol == D_UDP)
+			{
+				clnt = clnt_create(svr_conns[n_svr_conn].server_host, svr_conns[n_svr_conn].prog_number, 
+							svr_conns[n_svr_conn].vers_number, "udp");
+/*
+ * This part was added for compatibility reasons with the old libray version 3.
+ * If the server is not version 4, the version number must be set to 1.
+ * Even if the last library version was 3, because 1 indicates the RPC service version.
+ *
+ * To make the version check the null procedure of the service is called. A version
+ * mismatch will be returned, if the service runs version 3 software.
+ * The RPC version number will be set to one in this case.
+ */
+				if (clnt != NULL)
+				{
+					clnt_control(clnt, CLSET_RETRY_TIMEOUT, (char *) &api_retry_timeout);
+					clnt_control(clnt, CLSET_TIMEOUT, (char *) &api_timeout);
+					clnt_stat = clnt_call (clnt, NULLPROC, (xdrproc_t)xdr_void,  NULL,
+						(xdrproc_t)xdr_void,  NULL, TIMEVAL(timeout));
+					if (clnt_stat == RPC_PROGVERSMISMATCH )
+					{
+/*
+ * Destroy version 4 handle.
+ */
+						clnt_destroy (clnt);
+
+/*
+ * Set version number to 1 and recreate the client handle.
+ */
+						vers_number = DEVSERVER_VERS;
+						clnt = clnt_create(svr_conns[n_svr_conn].server_host, svr_conns[n_svr_conn].prog_number, 
+							svr_conns[n_svr_conn].vers_number,"udp");
+					}
+					svr_conns[n_svr_conn].clnt = clnt;
+					svr_conns[n_svr_conn].udp_clnt = clnt;
+					svr_conns[n_svr_conn].tcp_clnt = NULL;
+				}
+			}
+			else if ( svr_conns[n_svr_conn].rpc_protocol == D_TCP )
+			{
+				struct sockaddr_in	serv_adr;
+				int			tcp_socket;
+#if !defined vxworks
+				struct hostent	*ht = gethostbyname(host_name);
+				memcpy((char *)&serv_adr.sin_addr, ht->h_addr, (size_t)ht->h_length);
+#else  /* !vxworks */
+				int	host_addr = hostGetByName(host_name);
+				memcpy((char*)&serv_adr.sin_addr, (char*)&host_addr, 4);
+#endif /* !vxworks */
+				serv_adr.sin_family = AF_INET;
+				serv_adr.sin_port = 0;
+				tcp_socket = RPC_ANYSOCK;
+
+				clnt = clnttcp_create(&serv_adr, svr_conns[n_svr_conn].prog_number, 
+						svr_conns[n_svr_conn].vers_number, &tcp_socket, 0, 0);
+/*
+ * This part was added for compatibility reasons with the old libray version 3.
+ * If the server is not version 4, the version number must be set to 1.
+ * Even if the last library version was 3, because 1 indicates the RPC service version.
+ *
+ * To make the version check the null procedure of the service is called. A version mismatch will
+ * be returned, if the service runs version 3 software. The RPC version number will be set to one 
+ * in this case.
+ */
+				if (clnt != NULL)
+				{
+					clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &api_retry_timeout);
+					clnt_control (clnt, CLSET_TIMEOUT, (char *) &api_timeout);
+
+					clnt_stat = clnt_call (clnt, NULLPROC, (xdrproc_t)xdr_void,  NULL,
+				   		(xdrproc_t)xdr_void,  NULL, TIMEVAL(timeout));
+					if ( clnt_stat == RPC_PROGVERSMISMATCH )
+					{
+/*
+ * Destroy version 4 handle.
+ */
+						clnt_destroy (clnt);
+/*
+ * Set version number to 1 and recreate the client handle.
+ */
+#if !defined (WIN32)
+						close (tcp_socket);
+#else
+						closesocket (tcp_socket);
+#endif /* WIN32 */
+						tcp_socket = RPC_ANYSOCK;
+
+						vers_number = DEVSERVER_VERS;
+						clnt = clnttcp_create(&serv_adr, svr_conns[n_svr_conn].prog_number, 
+								svr_conns[n_svr_conn].vers_number, &tcp_socket, 0, 0);
+					}
+					svr_conns[n_svr_conn].clnt = clnt;
+					svr_conns[n_svr_conn].tcp_clnt = clnt;
+					svr_conns[n_svr_conn].udp_clnt = NULL;
+				}
+			}
+		}
 	}
 
 /*
@@ -1558,17 +1681,13 @@ long _DLLFunc dev_query_svr (char* host, long prog_number, long vers_number)
 			if (next_conn < 0) 
 				next_conn = i;
 		}
-		else
-		{
-			if ((strcmp(svr_conns[i].server_host,host) == 0) &&
+		else if ((strcmp(svr_conns[i].server_host,host) == 0) &&
 			    (svr_conns[i].prog_number == prog_number))
-			{
+		{
 /*
  * client already has a connection to this server
  */
-				next_conn = i;
-				return (next_conn);
-			}
+				return (i);
 		}
 	}
 
@@ -1576,21 +1695,20 @@ long _DLLFunc dev_query_svr (char* host, long prog_number, long vers_number)
  * server not found amongst already connected servers.
  * is there still place for another server connection ?
  */
-	if (next_conn < 0)
-		return (next_conn);
-
+	if (next_conn >= 0)
+	{
 /*
  * yes, initialise the server table
  */
-	strncpy(svr_conns[next_conn].server_host,host, sizeof(svr_conns[next_conn].server_host));
-	svr_conns[next_conn].prog_number 	= prog_number;
-	svr_conns[next_conn].vers_number 	= vers_number;
-	svr_conns[next_conn].rpc_conn_status    = GOOD_SVC_CONN;
-	svr_conns[next_conn].rpc_error_flag     = GOOD_SVC_CONN;
-	svr_conns[next_conn].rpc_conn_counter   = 0;
-	svr_conns[next_conn].rpc_protocol       = D_TCP;
-	svr_conns[next_conn].first_access_time  = False;
-
+		strncpy(svr_conns[next_conn].server_host,host, sizeof(svr_conns[next_conn].server_host));
+		svr_conns[next_conn].prog_number 	= prog_number;
+		svr_conns[next_conn].vers_number 	= vers_number;
+		svr_conns[next_conn].rpc_conn_status    = GOOD_SVC_CONN;
+		svr_conns[next_conn].rpc_error_flag     = GOOD_SVC_CONN;
+		svr_conns[next_conn].rpc_conn_counter   = 0;
+		svr_conns[next_conn].rpc_protocol       = D_TCP;
+		svr_conns[next_conn].first_access_time  = False;
+	}
 	return(next_conn);
 }
 
@@ -1655,7 +1773,7 @@ long _DLLFunc check_rpc_connection (devserver ds, long *error)
 	CLIENT				*clnt = NULL;
 	enum clnt_stat		clnt_stat;
 	Db_devinf_imp		devinfo;
-	devserver			new_ds = NULL;
+	devserver		new_ds = NULL;
 	struct sockaddr_in	serv_adr;
 #if !defined vxworks
 	struct hostent		*ht;
@@ -1778,7 +1896,7 @@ long _DLLFunc check_rpc_connection (devserver ds, long *error)
 
 /*
  * Store the current RPC timeout off the old connection. 
- * reopen a connection with the same protocol than before.
+ * Reopen a connection with the same protocol than before.
  */
 	if ( svr_conns[ds->no_svr_conn].rpc_protocol == D_UDP )
 	{
@@ -2721,16 +2839,11 @@ long _DLLFunc dev_rpc_connection (devserver ds, long *error)
  */
         if (ds->clnt == NULL)
         {
-                if ( reinstall_rpc_connection (ds, error) == DS_NOTOK )
 /*
- * an unexpected problem occurred, return an error
+ * if an unexpected problem occurred, return an error
+ * else the import worked , dev_putget() can carry on !
  */
-                        return (DS_NOTOK);
-                else
-/*
- * the import worked , dev_putget() can carry on !
- */
-                        return (DS_OK);
+                return reinstall_rpc_connection (ds, error);
         }
 
 /*
