@@ -113,6 +113,50 @@ So, check this please and use another prefix!])
 ])
 
 dnl
+dnl	TACO_DEFINES
+dnl
+dnl    	uses $target, $target_alias, $target_cpu, $target_vendor, $target_os
+dnl
+dnl	produces $taco_CFLAGS
+dnl
+AC_DEFUN([TACO_DEFINES],
+[
+	AC_REQUIRE([AC_CANONICAL_SYSTEM])
+	case "$target" in
+		i[[3456]]86-*-linux-* | i[[3456]]86-*-linux | i[[3456]]86-*-cygwin*)
+			taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -Dx86=1 -DNDBM" ;;
+		i386-*-freebsd* )
+			taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -Dx86=1 -DNDBM" ;;
+		m68k-*-linux-*)
+			taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -Dm68k=1 -DNDBM" ;;
+		powerpc-apple-darwin*)
+			taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -DDARWIN -DNDBM" ;;
+		*-*-solar*-* | *-*-sun*-*)
+			taco_CFLAGS="-Dunix=1 -D__unix=1 -D_solaris=1 -D__solaris__=1 -DNDBM" ;;
+		*-*-hp*-*)
+			taco_CFLAGS="-Dunix=1 -D__unix=1 -D__hpux=1 -D__hpux10=1 -D__hp9000s700=1 -D__hpux9000s700=1 -DNDBM" ;;
+		*-*-OS?-*)
+			taco_CFLAGS="-D_UCC=1" ;;
+		*)	AC_MSG_ERROR([unknown target : $target])
+			taco_CFLAGS="unknown $target" ;;
+	esac
+	AC_ARG_ENABLE(multithreading,
+		AC_HELP_STRING([--enable-multithreading], [allow multithreading default=yes]),
+		[
+			if test x$enableval = xno ; then
+				extraflags=""
+			else
+				extraflags="-D_REENTRANT"
+			fi
+		],
+		[ extraflags="-D_REENTRANT"])
+	taco_CFLAGS="$taco_CFLAGS $extraflags"
+	CFLAGS="$CFLAGS $taco_CFLAGS"
+	CXXFLAGS="$CXXFLAGS $taco_CFLAGS"
+	AC_SUBST(taco_CFLAGS)
+])
+
+dnl
 dnl	TACO_CHECK_TACO_SYSTEM
 dnl
 dnl    	uses $target, $target_alias, $target_cpu, $target_vendor, $target_os
@@ -120,25 +164,10 @@ dnl
 dnl	produces $taco_config 
 dnl
 AC_DEFUN([TACO_CHECK_TACO_SYSTEM], 
-    [
-    	AC_REQUIRE([AC_CANONICAL_SYSTEM])
-    	case "$target" in
-            i[[3456]]86-*-linux|i[[3456]]86-*-linux-*|i[[3456]]-*-cygwin*)
-                        taco_config="unix=1 __unix=1 linux=1 x86=1";;
-            m68k-*-linux-*) 
-			taco_config="unix=1 __unix=1 linux=1 68k=1";;
-            *-*-solar*-* | *-*-sun*-*)
-                        taco_config="unix=1 __unix=1 _solaris=1 __solaris__=1";;
-            *-*-hp*-*)
-			taco_config="unix=1 __unix=1 __hpux=1 __hpux10=1 __hp9000s700=1 __hpux9000s700=1";;
-            *-*-OS?-*)      
-			taco_config="_UCC=1";;
-            *)              
-			taco_config="unknown $target" ;;
-    	esac
-    	AC_SUBST(taco_config)
-    ]
-)
+[
+	AC_REQUIRE([TACO_DEFINES])
+    	AC_SUBST([taco_config], ["$taco_CFLAGS"])
+])
 
 dnl
 dnl	TACO_CHECK_EXTRA_LIBS

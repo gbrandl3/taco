@@ -2,13 +2,11 @@ AC_DEFUN([TACO_PYTHON_BINDING],
 [
 	PYTHON_PROG(2.0, [yes])
 	PYTHON_DEVEL
-	if test "$ac_python_dir" != "no" ; then
+	if test "x$taco_python_binding" = "xyes" ; then
 		ac_save_CFLAGS="$CFLAGS"
 		CFLAGS="$CFLAGS $PYTHON_CPPFLAGS"
 		AC_CHECK_HEADERS(Numeric/arrayobject.h, [taco_python_binding=yes], [taco_python_binding=no], [#include <Python.h>])
 		CFLAGS="$ac_save_CFLAGS"
-	else
-		taco_python_binding=no
 	fi	
 	AM_CONDITIONAL(PYTHON_BINDING, test $taco_python_binding = yes)
 ])
@@ -242,43 +240,6 @@ AC_DEFUN([X_AND_MOTIF],
 
 	AC_SUBST(MOTIF_LIBS)
 	AC_SUBST(MOTIF_INCLUDES)
-])
-
-AC_DEFUN([TACO_DEFINES],
-[
- 	AC_REQUIRE([AC_CANONICAL_SYSTEM])
-	case "$target" in
-            i[[3456]]86-*-linux-* | i[[3456]]86-*-linux | i[[3456]]86-*-cygwin*)
-                        taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -Dx86=1 -DNDBM" ;;
-	    i386-*-freebsd* )
-                        taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -Dx86=1 -DNDBM" ;;
-            m68k-*-linux-*) 
-                        taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -Dm68k=1 -DNDBM" ;;
-	    powerpc-apple-darwin*)
-                        taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -DDARWIN -DNDBM" ;;
-            *-*-solar*-* | *-*-sun*-*)
-                        taco_CFLAGS="-Dunix=1 -D__unix=1 -D_solaris=1 -D__solaris__=1 -DNDBM" ;;
-            *-*-hp*-*)
-                        taco_CFLAGS="-Dunix=1 -D__unix=1 -D__hpux=1 -D__hpux10=1 -D__hp9000s700=1 -D__hpux9000s700=1 -DNDBM" ;;
-            *-*-OS?-*)      
-                        taco_CFLAGS="-D_UCC=1" ;;
-            *)		AC_MSG_ERROR([unknown target : $target])
-                        taco_CFLAGS="unknown $target" ;;
-        esac
-        AC_ARG_ENABLE(multithreading,
-	   [  --enable-multithreading allow multithreading default=yes],
- 	   [
-		if test x$enableval = xno ; then
-			extraflags=""
-		else
-		    extraflags="-D_REENTRANT"
-		fi
-	   ],
-	   [ extraflags="-D_REENTRANT"] 
-       )
-       taco_CFLAGS="$taco_CFLAGS $extraflags"
-       CFLAGS="$CFLAGS $taco_CFLAGS"
-       CXXFLAGS="$CXXFLAGS $taco_CFLAGS" 
 ])
 
 AC_DEFUN([TACO_GDBM_SUPPORT],
