@@ -13,11 +13,14 @@ else
 setenv DBTABLES_CUSTOM TEST
 endif
 
-# Uncomment the next line if you want to start the TACO services in secure mode
-# setenv TACO_SECURE_MODE yes
+# if you want to start the TACO services in secure mode set "yes" else "no"
+setenv TACO_SECURE_MODE no
 
-# Uncomment the next line if you want to start the TACO services with logging
-#setenv TACO_LOGGING yes
+# if you want to start the TACO services with logging set "yes" else "no"
+setenv TACO_LOGGING yes
+
+# set the database type "dbm" or "mysql"
+setenv TACO_DATABASE dbm
 
 # It is unlikely that the rest of the file needs a modification
 if (${?DSHOME}) then

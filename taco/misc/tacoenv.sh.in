@@ -9,11 +9,14 @@ sbindir=@sbindir@
 # Add your domain tables here (comma separated)
 DBTABLES_CUSTOM=${DBTABLES_CUSTOM:-TEST}
 
-# Uncomment the next line if you want to start the TACO services in secure mode
-#TACO_SECURE_MODE=yes
+# if you want to start the TACO services in secure mode set "yes" else "no"
+TACO_SECURE_MODE=no
 
-# Uncomment the next line if you want to start the TACO services with logging
-#TACO_LOGGING=yes
+# if you want to start the TACO services with logging set "yes" else "no"
+TACO_LOGGING=yes
+
+# set the database type "dbm" or "mysql"
+TACO_DATABASE=dbm
 
 # It is unlikely that the rest of the file needs a modification
 export DSHOME=${DSHOME:-@prefix@}

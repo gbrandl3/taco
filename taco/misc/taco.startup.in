@@ -31,7 +31,7 @@ dbase()
   	# fill the database if there are no
   	# database files present (names.pag)
 
-  	if [ ! -r $DBM_DIR/names.pag ]  
+  	if [ ! -r $DBM_DIR/names ]  
   	then
       		echo "calling db_fillup to fill database"
       		db_fillup 0
@@ -45,9 +45,20 @@ manager()
 	killall Manager
 	unreg 100
 
+	if test "x$TACO_LOGGING" = "xyes" ; then
+		taco_manager_flags="-log"
+	fi
+	if test "x$TACO_SECURITY" = "xyes" ; then
+		taco_manager_flags="$taco_manager_flags -security"
+	fi		
+	taco_manager_flags="$taco_manager_flags -${TACO_DATABASE:-dbm}"
+
 # now start the Manager 
+	if ! test -d $LOGPATH ; then
+		mkdir -p $LOGPATH
+	fi
     	echo "starting the Manager ..."
-    	Manager -log 
+    	Manager $taco_manager_flags 
 	sleep 1
     	echo "Manager started"
 }
