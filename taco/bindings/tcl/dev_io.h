@@ -11,8 +11,9 @@
  * Description: This file is necessary to compile dev_io.c
  *           	It contains all the necessary datas
  *
- * Version:	$Revision: 1.1 $
- * Date:	$Date: 2003-03-18 16:28:30 $
+ * Version:	$Revision: 1.2 $
+ *
+ * Date:	$Date: 2003-05-07 13:19:25 $
 */
 
 #ifndef DEV_IO_H
@@ -23,14 +24,10 @@
 #include <DevErrors.h>
 #include <Admin.h>
 #include <dev_xdr.h>
-// #include <maxe_xdr.h>
 
 #include <tcl.h>
-#include <tk.h>
 
 #include <string.h>
-
-
 
 /* general defines */
 #define False 0

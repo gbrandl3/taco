@@ -14,9 +14,9 @@
  *         		set var 1
  *         		dev_io_debug var
  *         
- * Version:	$Revision: 1.1 $
+ * Version:	$Revision: 1.2 $
  *
- * Date:	$Date: 2003-03-18 16:28:29 $
+ * Date:	$Date: 2003-05-07 13:19:25 $
  *
  */
 
@@ -32,45 +32,40 @@
 /*            level                                                */
 /* --------------------------------------------------------------- */
 /* =============================================================== */
-int dev_io_debug (clientdata, interp, argc, argv)
+int dev_io_debug (ClientData clientdata, Tcl_Interp *interp, int argc, char *argv)
 /*SUPPRESS761*/
-                  ClientData clientdata;
-                  Tcl_Interp *interp;
-                  int argc;
-                  char *argv[]; 
-                  
 {
- char *LevelString;
- int ReturnedCode;
- long Value;
+	char 	*LevelString;
+	int 	ReturnedCode;
+	long 	Value;
  
- /* -------------------------- */
- /* Test of the input argument */
- /* -------------------------- */   
- if (argc != 2)
-    {
-     printf("dev_io_debug Error : should be.... dev_io_debug 'level'\n");
-     return TCL_ERROR;
-    }
- LevelString  = Tcl_GetVar(interp,argv[1],0);
- ReturnedCode = Tcl_ExprLong(interp,LevelString,&Value);
- if (ReturnedCode==TCL_ERROR)
-    {
-     printf("dev_io_debug Error : bad argin %s\n",argv[1]);
-     return TCL_ERROR;
-    }
+/* -------------------------- */
+/* Test of the input argument */
+/* -------------------------- */   
+	if (argc != 2)
+	{
+		printf("dev_io_debug Error : should be.... dev_io_debug 'level'\n");
+		return TCL_ERROR;
+	}
+	LevelString  = Tcl_GetVar(interp,argv[1],0);
+	ReturnedCode = Tcl_ExprLong(interp,LevelString,&Value);
+	if (ReturnedCode==TCL_ERROR)
+	{
+		printf("dev_io_debug Error : bad argin %s\n",argv[1]);
+		return TCL_ERROR;
+	}
     
- /* ------------------------- */
- /* Call of SetDebugMode      */
- /* ------------------------- */
- ReturnedCode = SetDebugMode(Value);
- if (ReturnedCode==False)
-    {
-     printf("Error in SetDebugMode(Value)...bad Value %d\n",Value);
-     return TCL_ERROR;
-    }
+/* ------------------------- */
+/* Call of SetDebugMode      */
+/* ------------------------- */
+	ReturnedCode = SetDebugMode(Value);
+	if (ReturnedCode==False)
+	{
+		printf("Error in SetDebugMode(Value)...bad Value %d\n",Value);
+		return TCL_ERROR;
+	}
     
- return TCL_OK;
+	return TCL_OK;
 }
       
  

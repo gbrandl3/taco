@@ -11,9 +11,10 @@
  * Description: This is the include file for the new commands
  *	  	inside a tcl interpreter named db_io_get, 
  *	  	db_io_put and db_io_debug
- * Version:	$Revision: 1.1 $
  *
- * Date:	$Date: 2003-03-18 16:28:24 $
+ * Version:	$Revision: 1.2 $
+ *
+ * Date:	$Date: 2003-05-07 13:19:25 $
 */
 
 #ifndef DB_IO_H
@@ -21,7 +22,6 @@
 
 #include <API.h>
 #include <tcl.h>
-#include <tk.h>
 
 /* Number of types recognized by db_io_get */
 #define NUMBER_OF_TYPES_KNOWN 11

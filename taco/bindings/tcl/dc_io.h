@@ -8,9 +8,9 @@
  *
  * Original: 	June, 1996
  *
- * Version:	$Revision: 1.1 $
+ * Version:	$Revision: 1.2 $
  *
- * Date:	$Date: 2003-03-18 16:28:25 $
+ * Date:	$Date: 2003-05-07 13:19:25 $
  *
  */
 
@@ -19,10 +19,8 @@
 
 #include <API.h>
 #include <dc.h>
-// #include <maxe_xdr.h>
 
 #include <tcl.h>
-#include <tk.h>
 
 #include <dev_io.h>
 
@@ -48,15 +46,5 @@ typedef struct DC_IMPORTED_DEVICE {
                                    datco dc;
                                    struct DC_IMPORTED_DEVICE *Next;
                                   } DC_IMPORTED_DEVICE;
-
-
-
-
-
-
-
-
-
-
 
 #endif		
