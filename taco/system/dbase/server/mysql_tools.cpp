@@ -886,9 +886,9 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 			j,
 			dev_length,
 			name_length;
-    std::vector<SvcDev> 	dev_list;
+    std::vector<SvcDev> dev_list;
 	
-    std::string 		user_ds_name(recev->res_val.arr1_val[0]),
+    std::string 	user_ds_name(recev->res_val.arr1_val[0]),
     			user_pers_name(recev->res_val.arr1_val[1]);
 		
 #ifdef DEBUG
