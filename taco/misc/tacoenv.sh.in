@@ -7,7 +7,7 @@ bindir=@bindir@
 sbindir=@sbindir@
 
 # Add your domain tables here (comma seperated)
-DBTABLES_CUSTOM=TEST
+DBTABLES_CUSTOM=${DBTABLES_CUSTOM:-TEST}
 
 # Uncomment the next line if you want to start the TACO services in secure mode
 #TACO_SECURE_MODE=yes
@@ -15,17 +15,17 @@ DBTABLES_CUSTOM=TEST
 # It is unlikely that the rest of the file needs a modification
 export DSHOME="${DSHOME:-@prefix@}"
 export DBTABLES="NAMES,PS_NAMES,CLASS,SYS,ERROR,CMDS,SEC,EVENTS,${DBTABLES_CUSTOM}"
-export RES_BASE_DIR="${DSHOME}/dbase/res"
+export RES_BASE_DIR="${RES_BASE_DIR:-${DSHOME}/dbase/res}"
 export DBM_DIR="${DSHOME}/dbase/dbm"
 export NETHOST="${NETHOST:-`uname -n`}"
 if [ "$DSHOME" = "$prefix" ] ; then
-	export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}${LD_LIBRARY_PATH:+:}@libdir@"
-	export PATH="${PATH}${PATH:+:}@bindir@:@sbindir@"
+	export LD_LIBRARY_PATH="@libdir@${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}"
+	export PATH="@bindir@:@sbindir@${PATH:+:}${PATH}"
 else
-	export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}${LD_LIBRARY_PATH:+:}${DSHOME}/lib/@taco_install_path@"
-	export PATH="${PATH}${PATH:+:}${DSHOME}/bin/@taco_install_path@:${DSHOME}/system/bin/@taco_install_path@"
+	export LD_LIBRARY_PATH="${DSHOME}/lib/@taco_install_path@${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}"
+	export PATH="${DSHOME}/bin/@taco_install_path@:${DSHOME}/system/bin/@taco_install_path@${PATH:+:}${PATH}"
 fi
 
-export PYTHONPATH="${PYTHONPATH}${PYTHONPATH:+:}${DSHOME}/python/@taco_install_path@"
+export PYTHONPATH="${DSHOME}/python/@taco_install_path@${PYTHONPATH:+:}${PYTHONPATH}"
 unset DBTABLES_CUSTOM
 
