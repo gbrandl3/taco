@@ -16,9 +16,9 @@
  *
  * Original:   	November 1996
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2003-05-21 16:15:19 $
+ * Date:	$Date: 2003-05-22 08:13:18 $
  *
  * Copyright (c) 1996 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -47,8 +47,8 @@
  * This library has simply one C module in which half of the functions to convert
  * TACO Kernel data types to strings (char *) and the other half to convert strings
  * (following a defined format) to TACO kernel data types. Example :
- *
- * tc_DevShort_to_str  and   tc_str_to_DevShort.
+ * 
+ * @em tc_DevShort_to_str  and   @em tc_str_to_DevShort.
  *
  * In directory, one can find an archived version of the library with the
  * corresponding target in the Makefile. The reason is that a shared library
