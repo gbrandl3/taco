@@ -215,10 +215,10 @@ long NdbmServer::upd_name(std::string serv, std::string dev_name, int ind) throw
 			std::cout << " update_name " << s.str() << std::endl;
 #endif
 #if !HAVE_SSTREAM
-			content.dptr = s.str();
+			strcat(content.dptr, s.str());
         		s.freeze(false);
 #else
-			content.dptr = const_cast<char *>(s.str().c_str());
+			strcat(content.dptr, const_cast<char *>(s.str().c_str()));
 #endif
 			content.dsize = strlen(content.dptr);
 		}
