@@ -7,13 +7,13 @@
  Description	: Main programm for all device servers
 
  Author(s)  	: Jens Meyer
- 		  $Author: jkrueger1 $
+ 		  $Author: andy_gotz $
 
  Original   	: March 1991
 
- Version	: $Revision: 1.14 $
+ Version	: $Revision: 1.15 $
 
- Date		: $Date: 2005-02-22 15:59:56 $
+ Date		: $Date: 2005-03-29 09:48:32 $
 
  Copyright (c) 1990-2002 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -326,7 +326,7 @@ int main (int argc, char **argv)
 /*
  * VXWORKS and NOMAIN routine to create a device server - device_server()
  */
-void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_device, char** device_list)
+void device_server (char *server_name, char *pers_name, int nodb_opt, int pn, int n_device, char** device_list)
 {
 	char    		host_name [HOST_NAME_LENGTH],
 				dsn_name [37],
@@ -343,7 +343,6 @@ void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_
 	int			pid = 0;
 	short			m_opt = False,
 				s_opt = True,
-				nodb_opt = False,
 				sig,
 				i,
 				j;
@@ -395,7 +394,7 @@ void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_
 /*
  * option nodb means run device server without database
  */
-	if (nodb > 0)
+	if (nodb_opt > 0)
 	{
 		config_flags.no_database = True;
 		xdr_load_kernel(&error);
