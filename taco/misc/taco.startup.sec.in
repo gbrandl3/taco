@@ -10,7 +10,11 @@ environ()
 # setup TACO environment variables
 	prefix=${DSHOME:-@prefix@}
 	exec_prefix=@exec_prefix@
-	. @sysconfdir@/tacoenv.sh
+	if test -f @sysconfdir@/tacoenv.sh ; then
+		. @sysconfdir@/tacoenv.sh
+	else
+		. @templatedir@/tacoenv.sh
+	fi
 
 	echo "You are working on host $HOSTNAME machine -"
 	echo ""
