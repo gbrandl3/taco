@@ -81,8 +81,9 @@ void default_sig(int signo)
         time_t 		tps = time((time_t *)0);
         struct tm 	*time_tm = localtime(&tps);
         char 		*tps_str = asctime(time_tm);
-
-#warning tps_str[24] = 0;
+	char		*p;
+	p = strchr(tps_str, '\n');
+	*p = '\0';
         fprintf(stderr,"%s : signal %d received !!!\n",tps_str,signo);
 #ifndef _solaris
         fprintf(stderr,"Server requested from %x\n",transp_sta->xp_raddr.sin_addr.s_addr);
@@ -870,10 +871,12 @@ void one_more_request(void)
 #endif /* DEBUG */
 			if (db_putresource(psd_name,&res_serv_put,1,&error))
 			{
+				char		*p;
 				tps = time((time_t *)0);
 				time_tm = localtime(&tps);
 				tps_str = asctime(time_tm);
-				tps_str[24] = 0;
+				p = strchr(tps_str, '\n');
+				*p = '\0';
 				fprintf(stderr,"%s dc_server_wr : Can't update request resources\n",tps_str);
 			}
 			req.start = ctr_mul_st;
@@ -892,10 +895,12 @@ void one_more_request(void)
 #endif /* DEBUG */
 			if (db_putresource(psd_name,&res_serv_put,1,&error))
 			{
+				char	*p;
 				tps = time((time_t *)0);
 				time_tm = localtime(&tps);
 				tps_str = asctime(time_tm);
-				tps_str[24] = 0;
+				p = strchr(tps_str, '\n');
+				*p = '\0';
 				fprintf(stderr,"%s dc_server_wr : Can't update request resources\n",tps_str);
 			}
 		}
