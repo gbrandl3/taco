@@ -13,9 +13,9 @@
 
  Original:	June 1991
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2003-12-08 14:23:32 $
+ Date:		$Date: 2004-09-17 15:34:03 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                       Grenoble, France
@@ -30,14 +30,15 @@
  */
 #ifdef _IDENT
 static char DevCmdsh[] = 
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevCmds.h,v 1.3 2003-12-08 14:23:32 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevCmds.h,v 1.4 2004-09-17 15:34:03 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
 #if !defined(FORTRAN)
-typedef long DevCommand;
-typedef long DevEvent;
-typedef long DevArgType;
+#include <dev_xdr.h>
+typedef long 	DevCommand;
+typedef long 	DevEvent;
+typedef long 	DevArgType;
 typedef long int (*DevCommandFunction)();
 #endif /* FORTRAN */
 
@@ -708,35 +709,35 @@ typedef long int (*DevCommandFunction)();
 /*
  *  definitions for class command list
  */
-
 #if !defined(FORTRAN)
-typedef struct _DevCommandListEntry {
-                                     DevCommand 	cmd;
-                                     DevCommandFunction fn;
-				     DevArgType		argin_type;
-				     DevArgType		argout_type;
-				     long		min_access;
-				     char		*cmd_name;
-                                    }
-	       DevCommandListEntry;
+typedef struct _DevCommandListEntry 
+	{
+		DevCommand 		cmd;
+                DevCommandFunction 	fn;
+		DevArgType		argin_type;
+		DevArgType		argout_type;
+		long			min_access;
+		DevString		cmd_name;
+	} DevCommandListEntry;
 
 typedef struct _DevCommandListEntry *DevCommandList;
 
 /* events */
-typedef struct _DevEventListEntry {
-                                     DevEvent         event;
-                                     DevArgType         argout_type;
-                                  }
-               DevEventListEntry;
+typedef struct _DevEventListEntry 
+	{
+        	DevEvent	event;
+                DevArgType      argout_type;
+		DevString	event_name;
+        } DevEventListEntry;
 
 typedef struct _DevEventListEntry *DevEventList;    
 
 /* for global command table */
-typedef struct _DevCmdNameListEntry {
-                                     int value;
-				     char *name;
-				     }
-               DevCmdNameListEntry;
+typedef struct _DevCmdNameListEntry 
+	{
+		int value;
+		DevString name;
+	} DevCmdNameListEntry;
 
 #endif /* FORTRAN */
 #endif /* _DevCmds_h */

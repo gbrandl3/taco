@@ -11,9 +11,9 @@
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.13 $
+ Version:	$Revision: 1.14 $
 
- Date:		$Date: 2004-09-17 07:56:18 $
+ Date:		$Date: 2004-09-17 15:34:03 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -1136,11 +1136,9 @@ long ds__destroy (void *ptr_ds, long *error)
 	short	i;
 
 #ifndef __cplusplus
-	DevServer 	ds;
-
-	ds       = (DevServer) ptr_ds;
+	DevServer 	ds = (DevServer) ptr_ds;
 #else
-	DeviceBase 		*device = (DeviceBase*) ptr_ds;
+	DeviceBase 	*device = (DeviceBase*) ptr_ds;
 
 #endif /* __cplusplus */
 
@@ -1149,27 +1147,25 @@ long ds__destroy (void *ptr_ds, long *error)
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nds__destroy() : entering routine\n");
 
 /*
- * If the object was exported, delete the entry in the
- * list of exported devices before freeing the object.
+ * If the object was exported, delete the entry in the list of exported devices before freeing the object.
  */
-
 	for (i=0; i<max_no_of_devices; i++)
 	{
 		if (devices[i].export_status == EXPORTED)
 		{
-			/*
-          * compare the device name
-          */
+/*
+ * compare the device name
+ */
 #ifndef __cplusplus
 			if (strcmp (ds->devserver.name, devices[i].export_name) == 0)
 #else
 			if (strcmp (device->GetDevName(), devices[i].export_name) == 0)
 #endif /* __cplusplus */
 			{
-				/*
-	     * Delete the device from the export list
-	     * and block all connected client connections.
-	     */
+/*
+ * Delete the device from the export list
+ * and block all connected client connections.
+ */
 				devices[i].export_status = NOT_EXPORTED;
 #ifndef __cplusplus
 				devices[i].ds            = NULL;
@@ -1190,10 +1186,9 @@ long ds__destroy (void *ptr_ds, long *error)
 		}
 	}
 
-	/*
-    * Destroy the object.
-    */
-
+/*
+ * Destroy the object.
+ */
 #ifndef __cplusplus
 	if ( (ds__method_finder (ds, DevMethodDestroy)(ds, error)) == DS_NOTOK )
 	{
@@ -1209,14 +1204,11 @@ long ds__destroy (void *ptr_ds, long *error)
 /**@ingroup dsAPI
  * RPC procedure corresponding to dev_cmd_query().
  *
- * Retrieves all available information from the command list of the 
- * specified device.
+ * Retrieves all available information from the command list of the specified device.
  *
- * Information about one command is stored in a _dev_cmd_info structure 
- * defined in API_xdr.h.
+ * Information about one command is stored in a _dev_cmd_info structure defined in API_xdr.h.
  *
- * A sequence of these stuctures will be returned as well as the name of 
- * the device class.
+ * A sequence of these stuctures will be returned as well as the name of the device class.
  *
  * The _dev_query_out type is defined in API_xdr.h.
  *
@@ -1292,10 +1284,8 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 #endif /* __cplusplus */
 
 /*
- * Get number of implemented commands and allocate memory
- * for the command info sequence.
+ * Get number of implemented commands and allocate memory for the command info sequence.
  */
-
 #ifndef __cplusplus
 /*
  * OIC version
@@ -1315,8 +1305,7 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 		return (&dev_query_out);
 	}
 /*
- * Get information about command code, data types and class for
- * every implented command.
+ * Get information about command code, data types and class for every implemented command.
  */
 
 #ifndef __cplusplus
@@ -1346,10 +1335,9 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 #endif /* __cplusplus */
 
 /* 
- * if the device server command list has specified the command names
- * (by testing the first entry != NULL)
- * then tag them onto the end of the sequence so that the client
- * does not have to query the database for them (very useful if -nodb)
+ * if the device server command list has specified the command names (by testing the first entry != NULL)
+ * then tag them onto the end of the sequence so that the client does not have to query the database for 
+ * them (very useful if -nodb)
  *
  * andy 3/3/2002
  */
@@ -1369,7 +1357,6 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 #else
 	if ((device->commands_list.begin())->second.cmd_name != NULL)
 	{
-		dev_query_out.var_argument.length = 0;
 		for (u_long i = 0; i < dev_query_out.length; i++)
 		{
 			dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_cmd_query_4() : %d %d %s\n", i, dev_query_out.sequence[i].cmd,
@@ -1385,8 +1372,16 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 	return (&dev_query_out);
 }
 
-/* event query */
 /**@ingroup dsAPI
+ * RPC procedure corresponding to dev_event_query().
+ *
+ * Retrieves all available information from the event list of the specified device.
+ *
+ * Information about one command is stored in a _dev_event_info structure defined in API_xdr.h.
+ *
+ * A sequence of these stuctures will be returned as well as the name of the device class.
+ *
+ * The _dev_query_out type is defined in API_xdr.h.
  *
  * @param dev_query_in
  * @return
@@ -1396,6 +1391,7 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
 	static _dev_queryevent_out	dev_query_out = { 0, NULL, "", 0, 0, { 0, NULL}};
 	long        			ds_id;
 	long        			connection_id;
+	static DevVarArgument 		vararg[1024];
 #ifndef __cplusplus
  /*
   * OIC version
@@ -1450,16 +1446,13 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
 /*
  * Free last allocated memory for the command info sequence.
  */
-
 	if (dev_query_out.sequence != NULL)
 	{
 		free (dev_query_out.sequence);
 	}
 /*
- * Get number of implmented commands and allocate memory
- * for the command info sequence.
+ * Get number of implmented events and allocate memory for the event info sequence.
  */
-
 #ifndef __cplusplus
 /*
  * OIC version
@@ -1480,8 +1473,7 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
 	}
 
 /*
- * Get information about event code, data types and class for
- * every implented command.
+ * Get information about event code, data types and class for every implented event.
  */
 #ifndef __cplusplus
 /*
@@ -1509,6 +1501,36 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
 	snprintf (dev_query_out.class_name, sizeof(dev_query_out.class_name), "%s", device->GetClassName());
 #endif /* __cplusplus */
 
+/* 
+ * if the device server event list has specified the event names (by testing the first entry != NULL)
+ * then tag them onto the end of the sequence so that the client does not have to query the database for 
+ * them (very useful if -nodb)
+ */
+#ifndef __cplusplus
+	if (ds_ev[0].event_name != NULL)
+	{
+		for (i=0; i < dev_query_out.length; i++)
+		{
+        		vararg[i].argument_type      = D_STRING_TYPE;
+        		vararg[i].argument           = (DevArgument)&ds_ev[i].event_name;
+		}
+        	dev_query_out.var_argument.length = dev_query_out.length;
+        	dev_query_out.var_argument.sequence = vararg;
+	}
+#else
+	if ((device->events_list.begin())->second.event_name != NULL)
+	{
+		for (u_long i = 0; i < dev_query_out.length; i++)
+		{
+			dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_event_query_4() : %d %d %s\n", i, dev_query_out.sequence[i].event,
+								device->events_list[dev_query_out.sequence[i].event].event_name);
+			vararg[i].argument_type      = D_STRING_TYPE;
+			vararg[i].argument           = (DevArgument)&(device->events_list[dev_query_out.sequence[i].event].event_name);
+		}
+	        dev_query_out.var_argument.length = dev_query_out.length;
+	        dev_query_out.var_argument.sequence = vararg;
+	}
+#endif /* __cplusplus */
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_event_query_4() : leaving routine\n");
 	return (&dev_query_out);
 }
