@@ -8,11 +8,10 @@
  *
  * Original:    June 2000
  *
- * Date:	$Date: 2005-02-22 13:11:47 $
+ * Date:	$Date: 2005-02-24 16:00:50 $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * $Revision: 1.3 $
  *********************************************************************/
  
 #include <API.h>
