@@ -23,7 +23,7 @@ int main(int argc,char **argv)
 	{
 		case 1:
 			printf("enter device name [\"tl1/ps-d/d\"]? ");
-			if(NULL==gets(cmd_string) || '\0'==cmd_string[0])
+			if(NULL==fgets(cmd_string, sizeof(cmd_string), stdin) || '\0'==cmd_string[0])
 				strcpy(cmd_string,"tl1/ps-d/d");
 			break;
 		case 2:
@@ -56,7 +56,7 @@ int main(int argc,char **argv)
 /*
  * to get around the strange effects of scanf() wait for something read 
  */
-		for( ; gets(cmd_string) == (char *)0 ; );
+		for( ; fgets(cmd_string, sizeof(cmd_string), stdin) == (char *)0 ; );
 		status = sscanf(cmd_string,"%d",&cmd);
 
 		switch (cmd) 
@@ -92,7 +92,7 @@ int main(int argc,char **argv)
 				break;
 			case 5 : 
 				printf("set current to ?");
-				for( ; gets(cmd_string) == (char *)0 ; );
+				for( ; fgets(cmd_string, sizeof(cmd_string), stdin) == (char *)0 ; );
 				sscanf(cmd_string,"%f,",&setcurrent);
 				status = dev_putget(ps,DevSetValue,(char*)&setcurrent,D_FLOAT_TYPE, NULL,D_VOID_TYPE,&error);
 				printf("\nDevSetValue dev_putget() returned %d, ",status);
