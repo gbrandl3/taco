@@ -95,8 +95,8 @@ dnl
 		if test "x$taco_mysql" = "xyes" ; then
 			AC_LINK_IFELSE(
 				[AC_LANG_PROGRAM(
-[#ifdef HAVE_MYSQL_MYSQL_H
-#	include <mysql.h>
+[#if HAVE_MYSQL_MYSQL_H
+#	include <mysql/mysql.h>
 #else
 #	include <mysql.h> 
 #endif
