@@ -28,9 +28,14 @@ AC_DEFUN(TACO_MYSQL_SUPPORT,
 		esac], [mysql=yes])
 	if test "x$mysql" = "xyes" ; then
 		for i in /usr/include /usr/local/include ; do
-			AC_CHECK_FILE($i/mysql/mysql.h, [mysql=yes;CPPFLAGS="$CPPFLAGS -I$i";break],[mysql=no])
+			AC_CHECK_FILE($i/mysql/mysql.h, [
+				mysql=yes
+				MYSQL_LDFLAGS="-L`dirname $i`/lib/mysql/"
+				echo $MYSQL_LDFLAGS
+				AC_SUBST(MYSQL_LDFLAGS)
+				CPPFLAGS="$CPPFLAGS -I$i"
+				break],[mysql=no])
 		done
-		echo $CPPFLAGS
 		AC_CHECK_HEADERS([mysql/mysql.h], [mysql=yes], [mysql=no])
 	fi
 	AM_CONDITIONAL(MYSQLSUPPORT, test "x$mysql" = "xyes")
@@ -132,7 +137,7 @@ AC_DEFUN(TACO_DEFINES,
             i[[3456]]86-*-linux-* | i[[3456]]86-*-linux | i[[3456]]86-*-cygwin*)
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -Dx86=1 -DNDBM" ;;
 	    i386-unknown-freebsd* )
-                        taco_CFLAGS="-Dunix=1 -D__unix=1 -DFREEBSD -Dx86=1 -DNDBM" ;;
+                        taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -Dx86=1 -DNDBM" ;;
             m68k-*-linux-*) 
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -D68k=1 -DNDBM" ;;
             *-*-solar*-* | *-*-sun*-*)
@@ -169,13 +174,18 @@ AC_DEFUN(AC_FIND_GDBM,
 		TACO_GDBM_LDFLAGS=-L${withval}/lib,
 		])
 	LIBS_ORIG="$LIBS"
-	CXXFLAGS_ORIG="$CXXFLAGS"
-	CXXFLAGS="$CFLAGS $TACO_GDBM_INC" 
+	CPPFLAGS_ORIG="$CPPFLAGS"
+	CPPFLAGS="$CPPFLAGS $TACO_GDBM_INC" 
 	LIBS="$LIBS $TACO_GDBM_LIBS"
 	gdbm_header=gdbm.h
-	AC_CHECK_HEADER(gdbm.h,
-		[gdbm_header="gdbm.h"], [AC_CHECK_HEADER(gdbm/gdbm.h, [gdbm_header="gdbm/gdbm.h"], [MAKE_GDBM="yes"])])
-	AC_MSG_CHECKING([Try compile gdbm.h with C++])
+	for i in /usr/include /usr/local/include /usr/include/gdbm /usr/local/include/gdbm ; do
+		AC_CHECK_FILE($i/gdbm.h, [MAKE_GDBM=no;CPPFLAGS="$CPPFLAGS -I$i";break],[MAKE_GDBM=yes])
+		if test "$MAKE_GDBM" = "no" ; then
+			break
+		fi
+	done
+	AC_CHECK_HEADER(gdbm.h, [gdbm_header="gdbm.h"], [MAKE_GDBM="yes"])
+	AC_MSG_CHECKING([Compiles gdbm.h with C++])
 	AC_LANG_PUSH(C++)
 	AC_COMPILE_IFELSE(
 		[AC_LANG_PROGRAM(
@@ -194,6 +204,11 @@ public:
 // #error Broken
 ]
 )], [AC_CHECK_LIB(gdbm, gdbm_open)], [], [MAKE_GDBM="yes"])
+	if test "MAKE_GDBM" = "yes" ;then
+		AC_MSG_RESULT([no])
+	else
+		AC_MSG_RESULT([yes])
+	fi
 	AC_LANG_POP(C++)
 	if test x${ac_cv_lib_gdbm_gdbm_open} != xyes ; then
 		TACO_GDBM_LIBS="\$(top_builddir)/gdbm/libgdbm.la"
@@ -228,6 +243,7 @@ AC_DEFUN(TACO_DATAPORT_SRC,
 			i[[3456]]86-*-cygwin*|\
         		m68k-*-linux-* |\
             		*-*-solar*-* | *-*-sun*-* |\
+			i386-unknown-freebsd* |\
             		*-*-hp*-*)
 				DATAPORTUNIX="yes" ;;
             		*-*-OS?-*)      

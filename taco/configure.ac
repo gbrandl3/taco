@@ -1,13 +1,13 @@
 AC_INIT(TACO, 3.0-beta, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.53)
-AC_REVISION($Revision: 1.8 $)dnl
+AC_REVISION($Revision: 1.9 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR(lib/dev_api.c)
 
 TACO_INIT([no])
 
-LIB_VERSION="10.0.0"
+LIB_VERSION="10:0:0"
 AC_SUBST(LIB_VERSION)
 
 AM_INIT_AUTOMAKE([1.7])
@@ -23,7 +23,7 @@ AC_CHECK_SIZEOF(float)
 AC_CHECK_SIZEOF(double)
 
 LIBS_SAVE="$LIBS"
-LIBS="$LIBS -lpthread"
+AC_SEARCH_LIBS(pthread_cancel, [pthread c_r])
 AC_RUN_IFELSE(
 	AC_LANG_PROGRAM([
 #include <pthread.h>
@@ -145,6 +145,26 @@ AC_CHECK_HEADERS(sstream, [], [])
 AC_CHECK_HEADERS(strstream, [], [])
 AC_LANG_POP(C++)
 
+AC_CHECK_HEADERS([rpc.h rpc/rpc.h])
+AC_CHECK_MEMBERS([SVCXPRT.xp_fd, SVCXPRT.xp_sock], [], [], [
+#if HAVE_RPC_RPC_H
+#	include <rpc/rpc.h>
+#elif HAVE_RPC_H
+#	include <rpc.h>
+#else
+#error rpc.h not found
+#endif
+]) 
+AH_BOTTOM([
+#ifndef HAVE_SVCXPRT_XP_SOCK
+#ifdef HAVE_SVCXPRT_XP_FD
+#       define xp_sock xp_fd
+#else
+#       error "Can't find xp_sock"
+#endif
+#endif])
+
+
 AC_SUBST(QT_INCLUDES, ['-I/usr/lib/qt2/include'])
 AC_SUBST(UIC, ['/usr/lib/qt2/bin/uic'])
 AC_SUBST(MOC, ['/usr/lib/qt2/bin/moc'])
@@ -185,7 +205,6 @@ TACO_INCLUDES="-I\$(top_srcdir)/lib/xdr -I\$(top_srcdir)/lib -I\$(top_srcdir)/li
 AC_SEARCH_LIBS(dlopen, [dl])
 
 AC_SUBST(TACO_INCLUDES) 
-
 AC_FIND_GDBM
 if test "${MAKE_GDBM}" = "yes" ; then
      AC_CONFIG_SUBDIRS(gdbm)
