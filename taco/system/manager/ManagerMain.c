@@ -13,9 +13,9 @@
 
  Original: 	January 1991
 
- Version:	$Revision: 1.12 $
+ Version:	$Revision: 1.13 $
 
- Date:		$Date: 2004-03-05 11:03:56 $
+ Date:		$Date: 2004-03-11 16:11:21 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -23,6 +23,7 @@
 			All Rights Reserved
 **********************************************************************/
 
+#include "config.h"
 #include <API.h>
 #include <private/ApiP.h>
 #include <API_xdr_vers3.h>
@@ -30,7 +31,13 @@
 #include <signal.h>
 #include <sys/wait.h>
 #ifdef unix
-#include <unistd.h>
+#	ifdef HAVE_PATHS_H
+#		include <paths.h>
+#	else
+#		define _PATH_DEVNULL	"/dev/null"
+#	endif
+#	include <fcntl.h>
+#	include <unistd.h>
 #endif
 
 static void 	network_manager_1();
@@ -45,6 +52,11 @@ char		logfile [256];
 FILE		*system_log = NULL;
 
 int		pid = 0;
+
+#ifdef unix
+pid_t	become_daemon(void);
+#endif
+
 
 int main (int argc, char **argv)
 {
@@ -72,7 +84,9 @@ int main (int argc, char **argv)
 	int	i;
 	int     res;
 	char 	*dbase_used="NDBM";
-
+#ifdef unix
+static	int	fd_devnull = -1;
+#endif
 
 	pid = getpid ();
 
@@ -84,7 +98,9 @@ int main (int argc, char **argv)
 	}
 	else
 		snprintf(nethost, sizeof(nethost), "%s", nethost_env);
+#ifdef DEBUG
 	printf ("Environment variable NETHOST = %s\n",nethost);
+#endif
 #endif /* unix */
 
 /*
@@ -93,37 +109,45 @@ int main (int argc, char **argv)
 	if (argc > 1)
 	{
 		for (i=1; i<argc; i++)
-		{
-			if (strcmp (argv[i],"-oracle") == 0)
+			if (*argv[i] == '-')
 			{
-	         		c_flags.oracle	     = True;
-	         		c_flags.dbm   	     = False;
-				dbase_used = "ORACLE";
+				char *arg = argv[i] + 1;
+		
+				if (strcmp (arg, "oracle") == 0)
+				{
+	         			c_flags.oracle	     = True;
+	         			c_flags.dbm   	     = False;
+					dbase_used = "ORACLE";
+				}
+				else if (strcmp (arg, "mysql") == 0)
+				{
+	         			c_flags.mysql	     = True;
+	         			c_flags.dbm  	     = False;
+					dbase_used = "MYSQL";
+					dbm_name = "tango";
+				}
+				else if (strcmp (arg, "log") == 0)
+		 			c_flags.request_log = True;
+				else if (strcmp (arg, "security") == 0)
+		 			c_flags.security    = True;
+				else if (*arg == 'h')
+				{
+		 			printf("usage: Manager [ -dbm | -mysql | -oracle ] [-log] [-security] [-help] \n");
+					printf(" (note: default database is dbm)\n");
+					exit(0);
+				}
 			}
-			if (strcmp (argv[i],"-mysql") == 0)
-			{
-	         		c_flags.mysql	     = True;
-	         		c_flags.dbm  	     = False;
-				dbase_used = "MYSQL";
-				dbm_name = "tango";
-			}
-			if (strcmp (argv[i],"-log") == 0)
-		 		c_flags.request_log = True;
-			if (strcmp (argv[i],"-security") == 0)
-		 		c_flags.security    = True;
-			if (strncmp (argv[i],"-h",2) == 0)
-			{
-		 		printf("usage: Manager [ -dbm | -mysql | -oracle ] [-log] [-security] [-help] (note: default database is dbm)\n");
-				exit(0);
-			}
-		}
 	}
 
 
+#ifdef unix
+/*
+ * Try to become a daemon
+ */
+	pid = become_daemon();
 /*
  *  get environment variables 
  */
-#ifdef unix
 	if ( (dshome = (char *)getenv ("TACO_PATH")) == NULL )
 	{
 		printf ("Environment variable TACO_PATH not defined, assume database and message server are in path...\n");
@@ -680,3 +704,41 @@ static void startup_msg (void)
 }
 
 
+#ifdef unix
+/**
+ * This function makes the current process to a daemon.
+ *
+ * @return Process ID of the child if the process became a daemon otherwise the process ID of itself.
+ */
+pid_t	become_daemon(void)
+{
+	pid_t	pid = getpid();
+ 	int	fd_devnull = open(_PATH_DEVNULL, O_RDWR);
+	if (fd_devnull < 0)
+		return pid; 
+	while (fd_devnull <= 2) 
+	{
+        	int i = dup(fd_devnull);
+        	if (i < 0)
+        		return pid;
+        	fd_devnull = i;
+    	}
+
+      	if ((pid = fork ()) > 0)
+/*
+ * Stop the parent process
+ */ 
+		exit(0);
+	else if (pid == 0)
+	{
+/* 
+ * Child process 
+ */
+		dup2(fd_devnull, 0);
+		dup2(fd_devnull, 1);
+		dup2(fd_devnull, 2);
+		pid = getpid();
+	}
+	return pid;
+}
+#endif
