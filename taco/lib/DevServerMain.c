@@ -11,9 +11,9 @@
 
  Original   	: March 1991
 
- Version	: $Revision: 1.2 $
+ Version	: $Revision: 1.3 $
 
- Date		: $Date: 2003-05-02 09:12:48 $
+ Date		: $Date: 2003-05-12 07:06:20 $
 
  Copyright (c) 1990-2002 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -120,26 +120,24 @@ static SVCXPRT *transp_tcp;
 #if defined (vxworks) || (NOMAIN)
 void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_device, char** device_list)
 {
-
-        char    host_name [19];
-        char    dsn_name [37];
-        char    *proc_name;
-        char    *display;
-
-        char                    res_path [80];
-        char                    res_name[80];
+        char    		host_name [19],
+        			dsn_name [37],
+        			*proc_name,
+        			*display,
+        			res_path [80],
+        			res_name[80];
         DevVarStringArray       default_access;
         db_resource             res_tab;
 
-        long    prog_number=0;
-        long    status;
-        long    error = 0;
-        int     pid = 0;
-        short   m_opt = False;
-        short   s_opt = True;
-        short   nodb_opt = False;
-        short   sig;
-        short   i;
+        long    		prog_number=0,
+        			status,
+        			error = 0;
+        int     		pid = 0;
+        short   		m_opt = False,
+        			s_opt = True,
+        			nodb_opt = False,
+        			sig,
+        			i;
 
 /*
  * import database server  
@@ -148,8 +146,8 @@ void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_
  */
 	if ( db_import (&error) < 0 )
 	{
-	    dev_printerror_no (SEND,"db_import failed",error);
-	    exit(-1);
+		dev_printerror_no (SEND,"db_import failed",error);
+		exit(-1);
 	}		
 /*
  *  read device server's class name and personal name
@@ -160,18 +158,18 @@ void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_
 
         if ( strlen(proc_name) > 23 )
         {
-        	printf ( "Filename too long : server_name <= 23 char\n");
+        	fprintf ( stderr, "Filename too long : server_name <= 23 char\n");
            	exit (-1);
         }
 
         if ( strlen(pers_name) > 11 )
         {
-		printf ( "Personal DS_name too long : personal_dsname <= 11 char\n");
+		fprintf ( stderr, "Personal DS_name too long : personal_dsname <= 11 char\n");
 		exit (-1);
         }
 
 	memset  (dsn_name,0,sizeof(dsn_name));
-	strncat (dsn_name , proc_name, 23);
+	strncpy (dsn_name , proc_name, 23);
 	strncat (dsn_name , "/", 1);
 	strncat (dsn_name , pers_name, 11);
 /*
@@ -330,9 +328,9 @@ int main (int argc, char **argv)
 #ifndef _NT
 	if (argc < 2)
 	{
-/*	   printf ("usage :  %s personal_name {-m} {-s} {-nodb} {-pn program #} {-device dev1 ...}\n",argv[0]);*/
-	   printf ("usage :  %s personal_name {-nodb} {-pn program #} {-device device1 ...}\n",argv[0]);
-	   exit (1);
+/*	   	printf ("usage :  %s personal_name {-m} {-s} {-nodb} {-pn program #} {-device dev1 ...}\n",argv[0]);*/
+		fprintf (stderr, "usage :  %s personal_name {-nodb} {-pn program #} {-device device1 ...}\n",argv[0]);
+		exit (1);
 	}
 #else
 	if(0 !=(proc_name = (char *)strrchr (argv[0],'\\'))) {
@@ -368,7 +366,7 @@ int main (int argc, char **argv)
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
 		return(FALSE);
 #else
-		printf (msg);
+		fprintf (stderr, msg);
 		exit (-1);
 #endif
 	}
@@ -380,7 +378,7 @@ int main (int argc, char **argv)
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
 		return(FALSE);
 #else
-		printf (msg); 
+		fprintf (stderr, msg); 
 		exit (-1);
 #endif
 	}
@@ -433,7 +431,7 @@ int main (int argc, char **argv)
 				for (j=i+1; j<argc; j++)
 				{
 					config_flags.device_list[j-i-1] = (char*)malloc(strlen(argv[j])+1);
-					sprintf(config_flags.device_list[j-i-1],"%s",argv[j]);
+					strcpy(config_flags.device_list[j-i-1], argv[j]);
 				}
 				i = j;
 			}
@@ -686,7 +684,7 @@ int main (int argc, char **argv)
  * configuration structure.
  */
 		config_flags.prog_number = prog_number;
-		/*config_flags.vers_number = DEVSERVER_VERS;*/
+/*		config_flags.vers_number = DEVSERVER_VERS;*/
 		config_flags.vers_number = API_VERSION;
 
 		if (!svc_register(transp, prog_number, API_VERSION, 
