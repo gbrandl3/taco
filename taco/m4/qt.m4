@@ -1,15 +1,13 @@
 dnl
-dnl Module:
-dnl		$Id: qt.m4,v 1.1 2004-04-28 16:41:57 jkrueger1 Exp $
-dnl Description:
-dnl		autotool macros to get the Qt installation pathes
+dnl Description:autotool macros to get the Qt installation pathes
 dnl		adapted form the KDE2 acinclude.m4
-dnl Author:
-dnl		$Author: jkrueger1 $
-dnl		
-
-
-
+dnl
+dnl Author: 	$Author: jkrueger1 $
+dnl
+dnl Version:	$Revision: 1.2 $
+dnl
+dnl Date:	$Date: 2004-08-02 12:54:25 $
+dnl
 
 dnl
 dnl AC_MOC_ERROR_MESSAGE
@@ -170,7 +168,8 @@ AC_DEFUN([AC_USE_QT],
 		case $qtsubver in
 		   1) qt_verstring="QT_VERSION >= 310";;
 		   2) qt_verstring="QT_VERSION >= 320";;
-		   3) qt_verstring="QT_VERSION >= 300";;
+		   3) qt_verstring="QT_VERSION >= 330";;
+		   *) qt_verstring="QT_VERSION >= 300";;
 		esac
    	    else
     		qt_verstring="QT_VERSION >= 142 && QT_VERSION < 200"
@@ -179,12 +178,11 @@ AC_DEFUN([AC_USE_QT],
    	    qt_verstring=$3
 	fi
  
+	qt_dirs="$QTDIR /usr/local/qt /usr/lib/qt /usr/X11R6 /usr" 
 	if test $qtver = 3 ; then
-	    qt_dirs="$QTDIR /usr/lib/qt3 /usr/lib/qt"
+	    qt_dirs="$QTDIR /usr/lib/qt3 $qt_dirs"
 	elif test $qtver = 2; then
-   	    qt_dirs="$QTDIR /usr/lib/qt2 /usr/lib/qt"
-	else
-   	    qt_dirs="$QTDIR /usr/lib/qt"
+   	    qt_dirs="$QTDIR /usr/lib/qt2 /usr/lib/qt3 $qt_dirs"
 	fi
     ]
 )
@@ -300,19 +298,20 @@ dnl Things work just fine if you use just AC_PATH_X_DIRECT.
   		    qt_x_libraries=$ac_x_libraries
 		fi
  
-		if test "$qt_x_includes" = NO; then
-  		    AC_MSG_ERROR(
-[Can't find X includes. Please check your installation and add the correct paths!])
-		fi
+		case $target in
+			*-darwin*)	;;
+			*)
+				if test "$qt_x_includes" = NO; then
+  		    			AC_MSG_ERROR([Can't find X includes. Please check your installation and add the correct paths!])
+				fi
  
-		if test "$qt_x_libraries" = NO; then
-  		    AC_MSG_ERROR(
-[Can't find X libraries. Please check your installation and add the correct paths!])
-		fi
- 
+				if test "$qt_x_libraries" = NO; then
+					AC_MSG_ERROR([Can't find X libraries. Please check your installation and add the correct paths!])
+				fi
 # Record where we found X for the cache.
 		qt_cv_have_x="have_x=yes \
-         		qt_x_includes=$qt_x_includes qt_x_libraries=$qt_x_libraries"
+         		qt_x_includes=$qt_x_includes qt_x_libraries=$qt_x_libraries" ;;
+		esac
 	   ]
 	)dnl
 
@@ -538,7 +537,14 @@ dnl	LIB_QT		= name of the Qt lib
 dnl
 AC_DEFUN([AC_PATH_QT],
     [
-	AC_REQUIRE([AC_X_PATH])dnl
+	case $target in
+		powerpc-apple-darwin7.4.0 | *-*-darwin*)
+			QT_MISC_TESTS
+			;;
+		*)
+			AC_X_PATH
+			;;
+	esac
 	AC_USE_QT([$1], [$2])dnl
 	qt_was_given=yes
 	if test -z "$LIBQT"; then
@@ -585,10 +591,9 @@ dnl  	    AC_REQUIRE([AC_FIND_JPEG])
 #try to guess Qt locations
 		qt_incdirs=""
 		for dir in $qt_dirs; do
-   		    qt_incdirs="$qt_incdirs $dir/include $dir"
+   		    qt_incdirs="$qt_incdirs $dir/include $dir/include/qt"
 		done
-		qt_incdirs="$QTINC $qt_incdirs /usr/local/qt/include /usr/include/qt \
-			/usr/include /usr/X11R6/include/X11/qt /usr/X11R6/include/qt $x_includes"
+		qt_incdirs="$QTINC $qt_incdirs /usr/X11R6/include/X11/qt"
 		if test ! "$ac_qt_includes" = "NO"; then
    		    qt_incdirs="$ac_qt_includes $qt_incdirs"
 		fi
@@ -599,14 +604,15 @@ dnl  	    AC_REQUIRE([AC_FIND_JPEG])
   		    qt_header=qglobal.h
 		fi
  
-		AC_FIND_FILE($qt_header, $qt_incdirs, qt_incdir)
+		AC_FIND_HEADER([$qt_header], $qt_incdirs, [eval qt_incdir="\"$i\""], 
+			[AC_MSG_ERROR([QT header file no found in $qt_incdirs])])
 		ac_qt_includes="$qt_incdir"
- 
+
 		qt_libdirs=""
 		for dir in $qt_dirs; do
-   		    qt_libdirs="$qt_libdirs $dir/lib $dir"
+   		    qt_libdirs="$qt_libdirs $dir/lib $dir/lib/qt"
 		done
-		qt_libdirs="$QTLIB $qt_libdirs /usr/X11R6/lib /usr/lib /usr/local/qt/lib $x_libraries"
+		qt_libdirs="$QTLIB $qt_libdirs"
 		if test ! "$ac_qt_libraries" = "NO"; then
   		    qt_libdir=$ac_qt_libraries
 		else
@@ -707,14 +713,14 @@ For more details about this problem, look at the end of config.log."
 	AC_SUBST(qt_includes)
  
 	if test "$qt_includes" = "$x_includes" || test -z "$qt_includes"; then
- 	    QT_INCLUDES="";
+ 	    QT_INCLUDES="$X_INCLUDES";
 	else
  	    QT_INCLUDES="-I$qt_includes"
  	    all_includes="$QT_INCLUDES $all_includes"
 	fi
  
 	if test "$qt_libraries" = "$x_libraries" || test -z "$qt_libraries"; then
- 	    QT_LDFLAGS=""
+ 	    QT_LDFLAGS="$X_LDFLAGS"
 	else
  	    QT_LDFLAGS="-L$qt_libraries"
  	    all_libraries="$all_libraries $QT_LDFLAGS"
