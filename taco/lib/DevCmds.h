@@ -9,13 +9,13 @@
 		for command handling.
 
  Author(s):	Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original:	June 1991
 
- Version:	$Revision: 1.4 $
+ Version:	$Revision: 1.5 $
 
- Date:		$Date: 2004-09-17 15:34:03 $
+ Date:		$Date: 2004-11-03 14:59:13 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                       Grenoble, France
@@ -30,7 +30,7 @@
  */
 #ifdef _IDENT
 static char DevCmdsh[] = 
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevCmds.h,v 1.4 2004-09-17 15:34:03 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevCmds.h,v 1.5 2004-11-03 14:59:13 andy_gotz Exp $";
 #endif /* _IDENT */
 
 
@@ -81,7 +81,7 @@ typedef long int (*DevCommandFunction)();
 #define DevReadCommand          30		
 #define DevForce		31
 #define DevUnforce		32
-
+#define DevAbort		33
 /*
  * commands for power supplies
  */
@@ -702,9 +702,13 @@ typedef long int (*DevCommandFunction)();
 #define DevOpenDynOutput  1503
 #define DevCloseDynOutput 1504
 #define GetDevList        1505
+#define DevGetInfo        1506
 
 #define DevHookInstall    1510
 #define DevHookRelease    1511
+#define DevGetDrvDebug    1512
+#define DevSetDrvDebug    1513
+
 
 /*
  *  definitions for class command list
