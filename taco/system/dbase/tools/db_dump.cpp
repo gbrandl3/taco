@@ -15,7 +15,7 @@
 #include <sys/shm.h>
 
 #include <fcntl.h>
-#include <ndbm.h>
+#include <gdbm.h>
 
 #include <iostream>
 #include <string>
@@ -153,7 +153,7 @@ int db_read(char *dbm_file,char *TblName)
 {
 	//int 		flags = GDBM_READER | GDBM_NOLOCK;
 	int 		flags = 0666;
-	DBM		*tab_tid;
+	GDBM_FILE	tab_tid;
 	datum 		key,
         		key_out;
 	datum 		content,
@@ -198,7 +198,7 @@ int db_read(char *dbm_file,char *TblName)
 //
 // Open database file 
 //
-	tab_tid = dbm_open(dbm_file, 0, flags, (int)0666, NULL);
+	tab_tid = gdbm_open(dbm_file, 0, flags, (int)0666, NULL);
 
 	if (tab_tid == NULL)
 	{
@@ -215,9 +215,9 @@ int db_read(char *dbm_file,char *TblName)
 //
 // Display table contents 
 //
-	for (key = dbm_firstkey(tab_tid); key.dptr != NULL;key = dbm_nextkey(tab_tid, key))
+	for (key = gdbm_firstkey(tab_tid); key.dptr != NULL;key = gdbm_nextkey(tab_tid, key))
 	{
-		content = dbm_fetch(tab_tid, key);
+		content = gdbm_fetch(tab_tid, key);
 		if (content.dptr != NULL)
 		{
 			res_num++;
@@ -374,7 +374,7 @@ int db_read(char *dbm_file,char *TblName)
 //
 // Close database 
 //
-	dbm_close(tab_tid);
+	gdbm_close(tab_tid);
 
 	free(key_out.dptr);
 	free(content_out.dptr);
