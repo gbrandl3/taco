@@ -36,9 +36,7 @@ xdr_arr1(xdrs, objp)
 	arr1 *objp;
 #endif	/* __STDC__ */
 {
-	if (!xdr_array(xdrs, (caddr_t *)&objp->arr1_val,
-			(u_int *)&objp->arr1_len, MAXU_INT,
-			sizeof(nam), (xdrproc_t)xdr_nam))
+	if (!xdr_array(xdrs, (caddr_t *)&objp->arr1_val, (u_int *)&objp->arr1_len, MAXU_INT, sizeof(nam), (xdrproc_t)xdr_nam))
 	{
 		return (FALSE);
 	}

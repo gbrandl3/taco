@@ -171,6 +171,9 @@ long NdbmNamesKey::get_dev_indi(void)
 	long	indi;
 	st << str.substr(pos, (str.size() - 1) - pos);
 	st >> indi;
+#if !HAVE_SSTREAM
+	st.freeze(false);
+#endif
 	return indi;
 }
 
@@ -254,16 +257,11 @@ NdbmNamesCont::~NdbmNamesCont()
 // Class constructor to be used with the record key
 NdbmNamesCont::NdbmNamesCont(GDBM_FILE db, datum key)
 {
-	datum content;
-
-	content = gdbm_fetch(db, key);
-	if (content.dptr != NULL)
-		str = std::string(content.dptr, content.dsize);
+	dat = gdbm_fetch(db, key);
+	if (dat.dptr != NULL)
+		str = std::string(dat.dptr, dat.dsize);
 	else
 		throw NdbmError(DbErr_CantGetContent,MessGetContent);
-		
-	dat.dsize = 0;
-	dat.dptr = NULL;
 }
 
 //
@@ -285,25 +283,6 @@ char NdbmNamesCont::operator [] (long i)
 //
 //		Class methods
 //		-------------
-// Method to build a datum data from the already stored content
-void NdbmNamesCont::build_datum()
-{
-	long l = str.size();
-	if (l)
-	{
-		try
-		{
-			dat.dptr = new char[l + 1];
-			strcpy(dat.dptr,str.c_str());
-			dat.dsize = l;
-		}
-		catch (std::bad_alloc)
-		{
-			throw;
-		}
-	}
-}
-
 // Method to return the device name from the record content
 std::string NdbmNamesCont::get_device_name(void) const
 {
@@ -349,6 +328,9 @@ unsigned long NdbmNamesCont::get_p_num(void) const
 	st << str.substr(start, pos - start);
 	unsigned long 	pn;
 	st >> pn;
+#if !HAVE_SSTREAM
+	st.freeze(false);
+#endif
 	return pn;
 }
 
@@ -373,6 +355,9 @@ unsigned long NdbmNamesCont::get_v_num(void) const
 	st << str.substr(start, pos - start);
 	long 	vn;
 	st >> vn;
+#if !HAVE_SSTREAM
+	st.freeze(false);
+#endif
 	return vn;
 }
 
@@ -428,6 +413,9 @@ unsigned long NdbmNamesCont::get_pid() const
 	unsigned long	p;
 	st << str.substr(start, pos - start);
 	st >> p;
+#if !HAVE_SSTREAM
+	st.freeze(false);
+#endif
 	return p;
 }
 
@@ -531,11 +519,11 @@ void NdbmNamesCont::get_devinfo(db_poller_svc &data)
 // Method to update the already stored content as a unregister device
 void NdbmNamesCont::unreg()
 {
-    std::string::size_type 	start;
-    if ((start = str.find(SEP)) == std::string::npos)
-	throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
-    start++;
-    str.replace(start, str.size() - start, "not_exp|0|0|unknown|unknown|0|unknown|");	
+	std::string::size_type 	start;
+	if ((start = str.find(SEP)) == std::string::npos)
+		throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
+	start++;
+	str.replace(start, str.size() - start, "not_exp|0|0|unknown|unknown|0|unknown|");	
 }
 
 //****************************************************************************
@@ -711,38 +699,44 @@ std::string NdbmPSNamesCont::get_host_name(void) const
 // Method to return the process PID from the record content
 unsigned long NdbmPSNamesCont::get_pid(void) const
 {
-    std::string::size_type 	pos = 0,
-			start;
-    for (long i = 0;i < NB_SEP_PS_PID;i++)
-    {
-	if ((pos = str.find(SEP,pos)) == std::string::npos)
-	    throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
-	if (i != (NB_SEP_PS_PID - 1))
-	    pos++;
-	if (i == (NB_SEP_PS_PID - 2))
-	    start = pos;
-    }
+	std::string::size_type 	pos = 0,
+				start;
+	for (long i = 0;i < NB_SEP_PS_PID;i++)
+	{
+		if ((pos = str.find(SEP,pos)) == std::string::npos)
+			throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
+		if (i != (NB_SEP_PS_PID - 1))
+			pos++;
+		if (i == (NB_SEP_PS_PID - 2))
+			start = pos;
+	}
     
-    std::stringstream st;
-    st << str.substr(start, pos - start);
-    unsigned long 	p;
-    st >> p;
-    return p;
+	std::stringstream st;
+	st << str.substr(start, pos - start);
+	unsigned long 	p;
+	st >> p;
+#if !HAVE_SSTREAM
+	st.freeze(false);
+#endif
+	return p;
 }
 
 // Method to return the refresh period from the record content
 long NdbmPSNamesCont::get_refresh(void) const
 {
-    std::string::size_type pos;
+	std::string::size_type pos;
 	
-    if ((pos = str.find_last_of(SEP,str.size() - 2)) == std::string::npos)
-	throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
-    pos++;
-    std::stringstream st;
-    st << str.substr(pos, (str.size() - 1) - pos);
-    long	p;
-    st >> p;
-    return p;
+	if ((pos = str.find_last_of(SEP,str.size() - 2)) == std::string::npos)
+		throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
+	pos++;
+	std::stringstream st;
+	st << str.substr(pos, (str.size() - 1) - pos);
+	long	p;
+	st >> p;
+#if !HAVE_SSTREAM
+	st.freeze(false);
+#endif
+	return p;
 }
 
 // Method to return all the parameters from the record content necessary for
@@ -809,11 +803,7 @@ NdbmResKey::NdbmResKey(std::string &family,std::string &member,std::string &r_na
 //
 // Build key
 //
-#if !HAVE_SSTREAM
 		std::stringstream to;
-#else
-		std::stringstream to;
-#endif
 		to << inter_str << indi << '|' << std::ends;
 		str = to.str();
 #if !HAVE_SSTREAM
@@ -1070,11 +1060,13 @@ std::string NdbmResCont::get_res_value(void) const
 // The class default constuctor
 NdbmNameList::NdbmNameList()
 {
+	name_list.clear();
 }
 
 // The class destructor
 NdbmNameList::~NdbmNameList()
 {
+	name_list.clear();
 }
 
 //
@@ -1155,11 +1147,15 @@ long NdbmNameList::copy_to_C(char **&buf)
 // The class default constuctor
 NdbmDoubleNameList::NdbmDoubleNameList()
 {
+	first_list.clear();
+	sec_list.clear();
 }
 
 // The class destructor
 NdbmDoubleNameList::~NdbmDoubleNameList()
 {
+	first_list.clear();
+	sec_list.clear();
 }
 
 //
@@ -1177,25 +1173,25 @@ long NdbmDoubleNameList::sec_name_length(long first)
 }
 
 // This method add a name to the list if it is not already in the list
-void NdbmDoubleNameList::add(std::string &first,std::string &second)
+void NdbmDoubleNameList::add(std::string first,std::string second)
 {
-    long i;
-    long si = first_list.size();
+	long i;
+	long si = first_list.size();
 		
-    for (i = 0;i < si;i++)
-	if (first_list[i] == first)
-	    break;
+	for (i = 0; i < si; i++)
+		if (first_list[i] == first)
+			break;
 	
-    if (i == si)
-    {
-	first_list.push_back(first);
-	NdbmNameList tmp_list;		
-	tmp_list.add_if_new(second);
-	sec_list.push_back(tmp_list);
-    }
-    else
-	sec_list[i].add_if_new(second);
-    return;		
+	if (i == si)
+	{
+		first_list.push_back(first);
+		NdbmNameList tmp_list;		
+		tmp_list.add_if_new(second);
+		sec_list.push_back(tmp_list);
+	}
+	else
+		sec_list[i].add_if_new(second);
+	return;		
 }
 
 //****************************************************************************

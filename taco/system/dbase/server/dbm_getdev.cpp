@@ -85,8 +85,10 @@ db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 #else
 	int so_size;
 #endif
-	datum key, key_sto;
-	datum content;
+	datum 	key, 
+		key2, 
+		key_sto,
+		content;
 	char *tbeg, *tend;
 	char ret_host_name[20];
 	char ret_pn[20];
@@ -274,10 +276,10 @@ db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 				tend = strchr(tbeg, '|');
 				if (tend == NULL)
 				{
-					fprintf(stderr,
-					"No separator in db tuple\n");
+					fprintf(stderr, "No separator in db tuple\n");
 					browse_back.db_err = DbErr_DatabaseAccess;
 					browse_back.res_val.arr1_len = 0;
+					free(key.dptr);
 					free(key_sto.dptr);
 					return(&browse_back);
 				}
@@ -321,18 +323,22 @@ db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 						}
 						browse_back.db_err = err;
 						browse_back.res_val.arr1_len = 0;
+						free(key.dptr);
 						free(key_sto.dptr);
 						return(&browse_back);
 					}
 				} /* end of if */
 			} /* end of FOUND */
+			free(content.dptr);
 		} /* end of NOT NULL */
 
 		if (exit == 0)
 		{
-			key = gdbm_nextkey(dbgen.tid[0], key);
+			key2 = key;
+			key = gdbm_nextkey(dbgen.tid[0], key2);
 			if (key.dptr == NULL)
 				exit = 1;
+			free(key2.dptr);
 		}
 	} /* end of do */
 	while (!exit);
@@ -359,6 +365,7 @@ db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 	browse_back.res_val.arr1_len = dev_num;
 	browse_back.res_val.arr1_val = ptra;
 	browse_back.db_err = 0;
+	free(content.dptr);
 	free(key_sto.dptr);
 	return(&browse_back);
 

@@ -49,7 +49,6 @@ public:
 	char operator[] (long);
 
 	long 		length() {return str.length();}
-	void 		build_datum();
 	datum 		get_datum() {return dat;};
 	std::string	get_device_name(void) const;
 	std::string 	get_host_name(void) const;
@@ -188,7 +187,7 @@ public:
 	
 	long first_name_length() {return first_list.size();}
 	long sec_name_length(long);	
-	void add(std::string &,std::string &);
+	void add(std::string, std::string);
 	
 	void get_record(const long, const long, std::string &, std::string &);
 	

@@ -1,3 +1,5 @@
+#include "config.h"
+
 #include <API.h>
 
 #include <DevErrors.h>
@@ -17,10 +19,6 @@
 #include <NdbmClass.h>
 #include <NdbmServer.h>
 #include <string>
-
-#ifdef FreeBSD
-#define xp_sock xp_fd
-#endif
 
 NdbmServer::NdbmServer(const std::string user, const std::string password, const std::string db)
         : DBServer()
@@ -59,24 +57,28 @@ NdbmServer::NdbmServer(const std::string user, const std::string password, const
 *****************************************************************************/
 db_res *NdbmServer::db_getres_1_svc(arr1 *rece,struct svc_req *rqstp)
 {
-	int i,j;
-	int k = 0;
-	u_int num_res,diff,err_db;
-	char *ptrc,*temp;
-	char tab_name[80];
-	char rest[80];
+	int 		i,
+			j;
+	int 		k = 0;
+	u_int 		num_res,
+			diff,
+			err_db;
+	char 		*ptrc,
+			*temp;
+	char 		tab_name[80];
+	char 		rest[80];
 	struct sockaddr_in so;
 #if defined __GLIBC__  &&  __GLIBC__ >= 2
-	socklen_t  so_size;   /* from POSIX draft - already used by GLIBC */
+	socklen_t  	so_size;   /* from POSIX draft - already used by GLIBC */
 #else
-	int so_size;
+	int 		so_size;
 #endif
-	u_short prot;
-	char *tmp1;
-	int k1 = 1;
-
-/* Return error code if the server is not connected to the database */
-
+	u_short 	prot;
+	char 		*tmp1;
+	int 		k1 = 1;
+//
+// Return error code if the server is not connected to the database 
+//
 	if (dbgen.connected == False)
 	{
 		browse_back.db_err = DbErr_DatabaseNotConnected;
@@ -84,9 +86,9 @@ db_res *NdbmServer::db_getres_1_svc(arr1 *rece,struct svc_req *rqstp)
 		browse_back.res_val.arr1_val = NULL;
 		return(&browse_back);
 	}
-
-/* Retrieve the protocol used to send this request to server */
-
+//
+// Retrieve the protocol used to send this request to server 
+//
 	so_size = sizeof(so);
 
 #ifdef sun
@@ -280,7 +282,6 @@ db_res *NdbmServer::db_getdev_1_svc(nam *dev_name)
 *    there is a problem.                                                    *
 *                                                                           *
 ****************************************************************************/
-
 int NdbmServer::db_find(char *tab_name,char *p_res_name,char **out,char **adr_tmp1,int *k1)
 {
 	reso 		res, 
@@ -390,6 +391,7 @@ int NdbmServer::db_find(char *tab_name,char *p_res_name,char **out,char **adr_tm
 			strncpy(resu_out.dptr, resu.dptr, resu.dsize);
 			resu_out.dptr[resu.dsize] = '\0';
 			resu_out.dsize = resu.dsize;
+			free(resu.dptr);
 			if (ctr)
 			{
 /* Copy the new array element in the result buffer. If the temporary buffer is full, realloc memory for it. */

@@ -99,7 +99,6 @@ db_devinfo_svc *NdbmServer::devinfo_1_svc(nam *dev)
 //
 // If the server is not connected to the database, return error
 //
-
 	if (dbgen.connected == False)
 	{
 		sent_back.db_err = DbErr_DatabaseNotConnected;
@@ -109,7 +108,6 @@ db_devinfo_svc *NdbmServer::devinfo_1_svc(nam *dev)
 //
 // Search for device name in the NAMES table
 //
-
 	long found = False;
 	try 
 	{
@@ -186,7 +184,6 @@ db_devinfo_svc *NdbmServer::devinfo_1_svc(nam *dev)
 //
 // Return error if the device is not found
 //
-
 	if (found == False)
 	{
 		sent_back.db_err = DbErr_DeviceNotDefined;
@@ -196,7 +193,6 @@ db_devinfo_svc *NdbmServer::devinfo_1_svc(nam *dev)
 //
 // Return data
 //
-
 	return(&sent_back);
 
 }
@@ -480,8 +476,6 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 *    This function returns a pointer to an error code			    *
 *                                                                           *
 ****************************************************************************/
-
-
 long *NdbmServer::devdel_1_svc(nam *dev)
 {
 	datum 		key;
@@ -556,7 +550,7 @@ long *NdbmServer::devdel_1_svc(nam *dev)
 						gdbm_delete(dbgen.tid[0],new_key.get_key());
 					
 						new_key.upd_indi(ind - 1);
-						dbco.build_datum();
+						// dbco.build_datum();
 						
 						if (gdbm_store(dbgen.tid[0],new_key.get_key(),dbco.get_datum(),GDBM_INSERT) != 0)
 						{
@@ -1191,7 +1185,7 @@ long *NdbmServer::unreg_1_svc(db_res *recev)
 					NdbmNamesCont co(dbgen.tid[0],k.get_key());
 					found = True;
 					co.unreg();
-					co.build_datum();
+//					co.build_datum();
 		
 					gdbm_store(dbgen.tid[0],k.get_key(),co.get_datum(),GDBM_REPLACE);
 					indi++;

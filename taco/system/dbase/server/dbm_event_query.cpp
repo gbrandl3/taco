@@ -39,8 +39,9 @@ event_que *NdbmServer::db_event_query_1_svc(nam *pevent_name)
 {
 	static event_que back;
 	int i,found;
-	datum key;
-	datum content;
+	datum 		key, 
+			key2,
+			content;
 	char *tbeg,*tend;
 	GDBM_FILE	tab;
 	unsigned int diff;
@@ -91,7 +92,9 @@ event_que *NdbmServer::db_event_query_1_svc(nam *pevent_name)
 /* Try to retrieve a resource in the EVENTS table with a resource value equal
    to the command name */
 
-	for (key=gdbm_firstkey(tab);key.dptr!=NULL;key=gdbm_nextkey(tab, key))
+	for (key=gdbm_firstkey(tab);
+		key.dptr!=NULL;
+		key2 = key, key=gdbm_nextkey(tab, key), free(key2.dptr))
 	{
 
 		content = gdbm_fetch(tab,key);
@@ -104,7 +107,7 @@ event_que *NdbmServer::db_event_query_1_svc(nam *pevent_name)
 
 		strncpy(event_str,content.dptr,content.dsize);
 		event_str[content.dsize] = 0;
-
+		free(content.dptr);
 		if (strcmp(event_str,*pevent_name) == 0)
 		{
 			found = True;
@@ -121,6 +124,7 @@ event_que *NdbmServer::db_event_query_1_svc(nam *pevent_name)
 		tend = (char *)strchr(tbeg,'|');
 		if (tend == NULL)
 		{
+			free(key.dptr);
 			back.db_err = DbErr_DatabaseAccess;
 			back.xevent_code = 0;
 			return(&back);
@@ -136,6 +140,7 @@ event_que *NdbmServer::db_event_query_1_svc(nam *pevent_name)
 		tend = (char *)strchr(tbeg,'|');
 		if (tend == NULL)
 		{
+			free(key.dptr);
 			back.db_err = DbErr_DatabaseAccess;
 			back.xevent_code = 0;
 			return(&back);
@@ -151,6 +156,7 @@ event_que *NdbmServer::db_event_query_1_svc(nam *pevent_name)
 		tend = (char *)strchr(tbeg,'|');
 		if (tend == NULL)
 		{
+			free(key.dptr);
 			back.db_err = DbErr_DatabaseAccess;
 			back.xevent_code = 0;
 			return(&back);
@@ -172,6 +178,7 @@ event_que *NdbmServer::db_event_query_1_svc(nam *pevent_name)
 
 	else
 	{
+		free(key.dptr);
 		back.xevent_code = 0;
 		back.db_err = DbErr_ResourceNotDefined;
 	}

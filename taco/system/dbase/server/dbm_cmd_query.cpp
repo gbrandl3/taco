@@ -13,7 +13,6 @@
 #include <NdbmServer.h>
 
 
-
 /****************************************************************************
 *                                                                           *
 *		Server code for db_cmd_query function                       *
@@ -36,36 +35,35 @@
 *            }                                                              *
 *                                                                           *
 ****************************************************************************/
-
-
 cmd_que *NdbmServer::db_cmd_query_1_svc(nam *pcmd_name)
 {
-	static cmd_que back;
-	int i,found;
-	datum key;
-	datum content;
-	char *tbeg,*tend;
-	GDBM_FILE tab;
-	unsigned int diff;
-	int ds_num;
-	int team;
-	int cmd_num;
-	char fam[40];
-	char memb[40];
-	char r_name[40];
-	char cmd_str[50];
+	static cmd_que 	back;
+	int 		i,
+			found;
+	datum 		key, 
+			key2,
+			content;
+	char 		*tbeg,
+			*tend;
+	GDBM_FILE 	tab;
+	unsigned int 	diff;
+	int 		ds_num;
+	int 		team;
+	int 		cmd_num;
+	char 		fam[40];
+	char 		memb[40];
+	char 		r_name[40];
+	char 		cmd_str[50];
 
 #ifdef DEBUG
 	std::cout << "Command name : " << *pcmd_name << std::endl;
 #endif
 
 /* Initialize error code sended back to client */
-
 	back.db_err = 0;
 	found = False;
 
 /* Return error code if the server is not connected to the database files */
-
 	if (dbgen.connected == False)
 	{
 		back.db_err = DbErr_DatabaseNotConnected;
@@ -94,7 +92,9 @@ cmd_que *NdbmServer::db_cmd_query_1_svc(nam *pcmd_name)
 /* Try to retrieve a resource in the CMDS table with a resource value equal
    to the command name */
 
-	for (key=gdbm_firstkey(tab);key.dptr!=NULL;key=gdbm_nextkey(tab, key))
+	for (key=gdbm_firstkey(tab);
+		key.dptr!=NULL;
+		key2 = key, key=gdbm_nextkey(tab, key), free(key2.dptr))
 	{
 
 		content = gdbm_fetch(tab,key);
@@ -107,7 +107,7 @@ cmd_que *NdbmServer::db_cmd_query_1_svc(nam *pcmd_name)
 
 		strncpy(cmd_str,content.dptr,content.dsize);
 		cmd_str[content.dsize] = 0;
-
+		free(content.dptr);
 		if (strcmp(cmd_str,*pcmd_name) == 0)
 		{
 			found = True;
@@ -124,6 +124,7 @@ cmd_que *NdbmServer::db_cmd_query_1_svc(nam *pcmd_name)
 		tend = (char *)strchr(tbeg,'|');
 		if (tend == NULL)
 		{
+			free(content.dptr);
 			back.db_err = DbErr_DatabaseAccess;
 			back.xcmd_code = 0;
 			return(&back);
@@ -139,6 +140,7 @@ cmd_que *NdbmServer::db_cmd_query_1_svc(nam *pcmd_name)
 		tend = (char *)strchr(tbeg,'|');
 		if (tend == NULL)
 		{
+			free(content.dptr);
 			back.db_err = DbErr_DatabaseAccess;
 			back.xcmd_code = 0;
 			return(&back);
@@ -154,6 +156,7 @@ cmd_que *NdbmServer::db_cmd_query_1_svc(nam *pcmd_name)
 		tend = (char *)strchr(tbeg,'|');
 		if (tend == NULL)
 		{
+			free(content.dptr);
 			back.db_err = DbErr_DatabaseAccess;
 			back.xcmd_code = 0;
 			return(&back);
@@ -175,6 +178,7 @@ cmd_que *NdbmServer::db_cmd_query_1_svc(nam *pcmd_name)
 
 	else
 	{
+		free(content.dptr);
 		back.xcmd_code = 0;
 		back.db_err = DbErr_ResourceNotDefined;
 	}

@@ -277,10 +277,12 @@ DevLong *NdbmServer::db_devexp_3_svc(tab_dbdev_3 *rece)
 db_resimp *NdbmServer::db_devimp_1_svc(arr1 *de_name)
 {
 	int i,j,resu,num_dev,flags;
-	datum key;
-	datum content;
+	datum 			key,
+				key2,
+				content;
 	device ret;
-	register db_devinfo *stu_addr,*stu_addr1;	
+	register db_devinfo 	*stu_addr,
+				*stu_addr1;	
 	char *tbeg, *tend;
 	int diff;
 	int exit = 0;
@@ -413,13 +415,15 @@ db_resimp *NdbmServer::db_devimp_1_svc(arr1 *de_name)
 
 			if (exit == 0)
 			{
-		 		key = gdbm_nextkey(dbgen.tid[0], key); 
+				free(content.dptr);
+				key2 = key;
+		 		key = gdbm_nextkey(dbgen.tid[0], key2); 
 				if (key.dptr == NULL) 
 					exit = 1;
+				free(key2.dptr);
 		
 			} /*end of exit if */
-		} /* end of do */
-		while (!exit);
+		} while (!exit);
 
 /* In case of error */
 
@@ -440,9 +444,12 @@ db_resimp *NdbmServer::db_devimp_1_svc(arr1 *de_name)
 				back.db_imperr = DbErr_DatabaseAccess;
 			else
 				back.db_imperr = DbErr_DeviceNotExported;
+			free(key.dptr);
+			free(content.dptr);
 			return(&back);
 		}
-
+		free(key.dptr);
+		free(content.dptr);
 /* Allocate memory for the host_name string */
 
 		stu_addr1 = &(back.imp_dev.tab_dbdev_val[i]);
@@ -562,8 +569,8 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 	register int i;
 	device dev;
 	unsigned int diff;
-	datum key;
-	datum content, dev1;
+	datum 		key, key2,
+			content, dev1;
 	char dev_str[MAX_CONT];
 	char key_str[MAX_KEY];
 	int resu,d_num;
@@ -622,7 +629,9 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 	{
 
 		old_d_num = d_num;
-		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
+		for (key = gdbm_firstkey(dbgen.tid[0]);
+			key.dptr != NULL;
+			key2 = key, key = gdbm_nextkey(dbgen.tid[0], key2), free(key2.dptr))
 		{
 
 /* Extract personal name and sequence field from key */
@@ -648,6 +657,7 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 				if (gdbm_error(dbgen.tid[0]) != 0)
 				{
 					mis = DbErr_DatabaseAccess;
+					free(key.dptr);
 					return(&mis);
 				}
 			}
@@ -667,7 +677,10 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 			p_num[diff] = '\0';
 
 			if (strcmp(p_num,"0") == 0)
+			{
+				free(content.dptr);
 				continue;
+			}
 
 /* Extract device class */
 
@@ -698,7 +711,10 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 			proc_str[diff] = '\0';
 
 			if (strcmp(dev.ds_class,proc_str) != 0)
+			{
+				free(content.dptr);
 				continue;
+			}
 
 /* A device to be unregistered has been found, build the new database content */
 
@@ -734,6 +750,8 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 			if (gdbm_store(dbgen.tid[0], key, dev1, flags))
 			{
 				mis = DbErr_DatabaseAccess;
+				free(content.dptr);
+				free(key.dptr);
 				return(&mis);
 			}
 			d_num++;
@@ -742,8 +760,7 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 
 		if (old_d_num == d_num)
 			exit_loop = True;
-	}
-	while (exit_loop == False);
+	} while (exit_loop == False);
 
 /* Initialization needed to retrieve the right tuples in the NAMES table
    and to update the tuples (program and version number) assuming the input
@@ -829,15 +846,16 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 
 				if (gdbm_store(dbgen.tid[0], key, dev1, flags))
 				{
+					free(content.dptr);
 					mis = DbErr_DatabaseAccess;
 					return(&mis);
 				}
+				free(content.dptr);
 				dev_numb++;
 			}
 			else
 				exit = 1;
-		} 
-		while (!exit);
+		} while (!exit);
 	}
 
 /* In case of trouble */

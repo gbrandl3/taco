@@ -28,10 +28,6 @@
 ****************************************************************************/
 db_res *NdbmServer::devdomainlist_1_svc(void)
 {
-	datum 		key;
-	std::string 	domain;
-	NdbmNameList 	dom_list;
-	
 #ifdef DEBUG
 	std::cout << "In devdomainlist_1_svc function" << std::endl;
 #endif
@@ -52,35 +48,38 @@ db_res *NdbmServer::devdomainlist_1_svc(void)
 		return(&browse_back);
 	}
 
+	NdbmNameList 	dom_list;
 //
 // Get the domain name list from the NAMES table
 //
 	try 
 	{
-		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
+		datum key, key2;
+		for (key = gdbm_firstkey(dbgen.tid[0]); 
+			key.dptr != NULL;
+			key2 = key, key = gdbm_nextkey(dbgen.tid[0], key2), free(key2.dptr))
 		{
 			NdbmNamesCont cont(dbgen.tid[0],key);
-			domain = cont.get_dev_domain_name();
-			dom_list.add_if_new(domain);		
+			dom_list.add_if_new(cont.get_dev_domain_name());
 		}
+		free(key.dptr);
 		if (gdbm_error(dbgen.tid[0]) != 0)
 		{			
 			gdbm_clearerr(dbgen.tid[0]);
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return(&browse_back);			
 		}
-
 //
 // Add new domain from the PS_NAMES table
 //
 		for (key = gdbm_firstkey(dbgen.tid[dbgen.ps_names_index]); \
 		     key.dptr != NULL; \
-		     key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key))
+		     key2 = key, key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key), free(key2.dptr))
 		{
 			NdbmPSNamesKey pskey(key);
-			domain = pskey.get_psdev_domain_name();
-			dom_list.add_if_new(domain);
+			dom_list.add_if_new(pskey.get_psdev_domain_name());
 		}
+		free(key.dptr);
 		if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
 		{
 			gdbm_clearerr(dbgen.tid[dbgen.ps_names_index]);
@@ -100,7 +99,7 @@ db_res *NdbmServer::devdomainlist_1_svc(void)
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}
-	
+
 //
 // Sort domain name list
 //
@@ -116,7 +115,7 @@ db_res *NdbmServer::devdomainlist_1_svc(void)
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}
-	
+
 //
 // Return data
 //
@@ -141,7 +140,6 @@ db_res *NdbmServer::devdomainlist_1_svc(void)
 ****************************************************************************/
 db_res *NdbmServer::devfamilylist_1_svc(nam* domain)
 {
-	datum 		key;
 	std::string 	dom,
 			family;
 	NdbmNameList 	fam_list;
@@ -174,7 +172,10 @@ db_res *NdbmServer::devfamilylist_1_svc(nam* domain)
 //
 	try
 	{
-		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
+		datum 		key, key2;
+		for (key = gdbm_firstkey(dbgen.tid[0]); 
+			key.dptr != NULL; 
+			key2 = key, key = gdbm_nextkey(dbgen.tid[0], key2), free(key2.dptr))
 		{
 			NdbmNamesCont cont(dbgen.tid[0],key);
 		
@@ -185,6 +186,7 @@ db_res *NdbmServer::devfamilylist_1_svc(nam* domain)
 			family = cont.get_dev_fam_name();
 			fam_list.add_if_new(family);
 		}
+		free(key.dptr);
 		if (gdbm_error(dbgen.tid[0]) != 0)
 		{
 			gdbm_clearerr(dbgen.tid[0]);
@@ -198,7 +200,7 @@ db_res *NdbmServer::devfamilylist_1_svc(nam* domain)
 
 		for (key = gdbm_firstkey(dbgen.tid[dbgen.ps_names_index]); \
 		     key.dptr != NULL; \
-		     key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key))
+		     key2 = key, key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key), free(key2.dptr))
 		{
 			NdbmPSNamesKey pskey(key);
 		
@@ -209,6 +211,7 @@ db_res *NdbmServer::devfamilylist_1_svc(nam* domain)
 			family = pskey.get_psdev_fam_name();
 			fam_list.add_if_new(family);
 		}
+		free(key.dptr);
 		if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
 		{
 			gdbm_clearerr(dbgen.tid[dbgen.ps_names_index]);
@@ -274,7 +277,6 @@ db_res *NdbmServer::devfamilylist_1_svc(nam* domain)
 
 db_res *NdbmServer::devmemberlist_1_svc(db_res *recev)
 {
-	datum 		key;
 	std::string 	dom,
 			fam,
 			member;
@@ -314,7 +316,10 @@ db_res *NdbmServer::devmemberlist_1_svc(db_res *recev)
 
 	try
 	{
-		for (key = gdbm_firstkey(dbgen.tid[0]);key.dptr != NULL;key = gdbm_nextkey(dbgen.tid[0], key))
+		datum 		key, key2;
+		for (key = gdbm_firstkey(dbgen.tid[0]);
+			key.dptr != NULL;
+			key2 = key, key = gdbm_nextkey(dbgen.tid[0], key), free(key2.dptr))
 		{
 			NdbmNamesCont cont(dbgen.tid[0],key);
 		
@@ -328,6 +333,7 @@ db_res *NdbmServer::devmemberlist_1_svc(db_res *recev)
 			member = cont.get_dev_memb_name();
 			memb_list.add_if_new(member);
 		}
+		free(key.dptr);
 		if (gdbm_error(dbgen.tid[0]) != 0)
 		{
 			gdbm_clearerr(dbgen.tid[0]);
@@ -341,7 +347,7 @@ db_res *NdbmServer::devmemberlist_1_svc(db_res *recev)
 
 		for (key = gdbm_firstkey(dbgen.tid[dbgen.ps_names_index]); \
 		     key.dptr != NULL; \
-		     key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key))
+		     key2 = key, key = gdbm_nextkey(dbgen.tid[dbgen.ps_names_index], key), free(key2.dptr))
 		{
 			NdbmPSNamesKey pskey(key);
 		
@@ -355,6 +361,7 @@ db_res *NdbmServer::devmemberlist_1_svc(db_res *recev)
 			member = pskey.get_psdev_memb_name();
 			memb_list.add_if_new(member);
 		}
+		free(key.dptr);
 		if (gdbm_error(dbgen.tid[dbgen.ps_names_index]) != 0)
 		{
 			gdbm_clearerr(dbgen.tid[dbgen.ps_names_index]);
