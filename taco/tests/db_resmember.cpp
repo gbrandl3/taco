@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 		exit(-1);
 	}
 
-	string full_res_name(argv[1]);
+	std::string full_res_name(argv[1]);
 	std::transform(full_res_name.begin(), full_res_name.end(), full_res_name.begin(), ::tolower);
 	std::string domain(argv[1]);
 	if (domain == "sec")
