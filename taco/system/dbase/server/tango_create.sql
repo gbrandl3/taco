@@ -50,8 +50,8 @@ CREATE TABLE device (
 --
 
 
-INSERT INTO device VALUES ('sys/database/2',NULL,'sys','database','2',1,'nada','wow','DataBaseds/2',1,'DataBase','2','2003-07-11 09:43:17',NULL,NULL);
-INSERT INTO device VALUES ('dserver/DataBaseds/2',NULL,'dserver','DataBaseds','2',1,'nada','wow','DataBaseds/2',1,'DServer','2','2003-07-11 09:43:17',NULL,NULL);
+INSERT INTO device VALUES ('sys/database/2',NULL,'sys','database','2',0,'nada','wow','DataBaseds/2',0,'DataBase','2','2003-07-11 09:43:17',NULL,NULL);
+INSERT INTO device VALUES ('dserver/DataBaseds/2',NULL,'dserver','DataBaseds','2',0,'nada','wow','DataBaseds/2',0,'DServer','2','2003-07-11 09:43:17',NULL,NULL);
 
 --
 -- Table structure for table 'property'
