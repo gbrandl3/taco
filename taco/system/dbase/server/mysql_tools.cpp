@@ -78,7 +78,7 @@ db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
         query = "SELECT SUBSTRING_INDEX(SERVER,'/',1), SUBSTRING_INDEX(SERVER,'/',-1), HOST, IOR,";
         query += ("VERSION, CLASS, PID, SUBSTRING_INDEX(SERVER,'/',1), EXPORTED FROM device");
         query += (" WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + user_device + "'"); 
-        query += (" AND IOR LIKE 'rpc:%'"); 
+//        query += (" AND IOR LIKE 'rpc:%'"); 
     }
     else
     {
