@@ -59,7 +59,7 @@ int main(int argc,char *argv[])
 #ifdef DEBUG
 	cout  << "Full device server name : " << full_ds_name << endl;
 #endif 
-	if (count(full_ds_name.begin(), full_ds_name.begin(), '/') != 1)
+	if (count(full_ds_name.begin(), full_ds_name.end(), '/') != 1)
 	{
 		cerr << "db_servdel : Bad full device server name" << endl;
 		exit(-1);
