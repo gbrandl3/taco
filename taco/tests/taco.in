@@ -55,11 +55,7 @@ if test $# -gt 0 ; then
 				dir=`echo $prefix | cut -d'/' -f 2`
 			fi
 			rm -rf ${dc_destdir}/$dir
-			dir=`aclocal --print-ac-dir | cut -d'/' -f 1`
-			if [ -z "$dir" ] ; then
-				dir=`aclocal --print-ac-dir | cut -d'/' -f 2`
-			fi
-			rm -rf ${dc_destdir}/$dir
+			rm -rf ${dc_destdir}/@aclocaldir@
 			dir=`echo $appdefaultdir|cut -d'/' -f1` 
 			if [ -z "$dir" ] ; then
 				dir=`echo $appdefaultdir|cut -d'/' -f2` 
