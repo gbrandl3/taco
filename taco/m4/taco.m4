@@ -234,7 +234,7 @@ dnl
 AC_DEFUN(TACO_INIT,
     [
 	AC_REQUIRE([AC_CANONICAL_SYSTEM])
-	AM_INIT_AUTOMAKE([1.6.3])
+	AM_INIT_AUTOMAKE([1.7])
 	
 dnl	don't use static libraries
 dnl
