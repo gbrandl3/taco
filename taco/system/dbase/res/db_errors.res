@@ -1,5 +1,5 @@
 #
-#"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/system/dbase/res/db_errors.res,v 1.2 2004-03-10 14:14:29 jkrueger1 Exp $";
+#"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/system/dbase/res/db_errors.res,v 1.3 2004-03-18 14:32:37 jkrueger1 Exp $";
 #
 #/*+*******************************************************************
 #
@@ -19,8 +19,8 @@
 #
 # Number 401-499 database system error messages.
 #
-ERROR/0/0/401:	DbErr_CannotCreateClientHandle
-ERROR/0/0/402:	DbErr_RPCreception
+ERROR/0/0/401:	"Cannot create a client handle."
+ERROR/0/0/402:	"This request is not implemented on the server side."
 ERROR/0/0/403:	"Error during access to database."
 ERROR/0/0/404:	DbErr_BooleanResource
 ERROR/0/0/405:	DbErr_MemoryFree
