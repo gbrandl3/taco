@@ -1,3 +1,5 @@
+EXTRA_DIST		= $(bin_SCRIPTS)
+
 bin_PROGRAMS		= db_update \
 		 	db_info \
 		 	db_devinfo \
@@ -11,6 +13,7 @@ bin_PROGRAMS		= db_update \
 			db_devicetree
 
 bin_SCRIPTS		= db_fillup2
+
 if GDBMSUPPORT
 bin_PROGRAMS		+= db_fillup \
 		 	db_read 

@@ -47,7 +47,7 @@ BUILT_SOURCES		= gdbm.h
 CLEANFILES		= gdbm.h
 
 DISTCLEANFILES		= autoconf.h conv2gdbm junk.gdbm junkdbm.dir junkdbm.pag junkndbm.dir junkndbm.pag \
-			testdbm testgdbm testndbm
+			testdbm testgdbm testndbm gdbm.info
 
 nodist_include_HEADERS	= gdbm.h 
 

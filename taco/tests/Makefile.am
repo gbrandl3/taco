@@ -4,7 +4,7 @@ EXTRA_DIST 		= taco.in
 
 CLEANFILES 		= log taco
 
-DISTCLEANFILES 		= System.log atconfig
+DISTCLEANFILES 		= System.log atconfig *.lineno
 
 INCLUDES		= @TACO_INCLUDES@ @GDBM_CFLAGS@ -g -O0
 
