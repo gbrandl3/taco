@@ -9,13 +9,13 @@
 		handle remote devices.
 
  Author(s)  :	Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original   :	April 1993
 
- Version:	$Revision: 1.17 $
+ Version:	$Revision: 1.18 $
 
- Date:		$Date: 2004-10-26 11:35:36 $
+ Date:		$Date: 2004-11-25 19:37:56 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -49,6 +49,8 @@
 #	endif /* OSK | _OSK */
 #endif  /* _NT */
 
+/* pointer to global error message */
+extern char *dev_error_string;
 
 static long get_cmd_string PT_( (devserver ds, long cmd, char *cmd_str, size_t len, long *error) );
 
