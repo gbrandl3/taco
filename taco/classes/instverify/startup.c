@@ -74,7 +74,7 @@ long startup(char *svr_name, long *error)
 	ds_list = (Inst_verify *)malloc(n_devices*sizeof(Inst_verify*));
 	if(ds_list == NULL)
 	{
-		printf("can't allocate memory for object structures --> exit\n");
+		fprintf(stderr, "can't allocate memory for object structures --> exit\n");
 		return(DS_NOTOK);
 	}
    
