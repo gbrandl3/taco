@@ -33,17 +33,6 @@ fi
 
 case $1 in
 	start)
-		if test ${TACO_DATABASE:-dbm} = dbm ; then
-			if test ! \( -f "$DBM_DIR/names.pag" -o -f "$DBM_DIR/names" \) ; then
-				echo "Initialization of the database:"
-				if db_fillup 0 ; then
-					rc_status -v
-				else
-					rc_status -v
-					rc_exit
-				fi
-			fi
-		fi
 		if test "x$TACO_LOGGING" = xyes ; then 
 			log="-log"
 		fi
@@ -55,6 +44,19 @@ case $1 in
 		echo -n "Starting TACO services $sec_text"
 		startproc -s -q "$taco_manager" $dbase $log $security
 		rc_status -v
+		if test ${TACO_DATABASE:-dbm} = dbm ; then
+			new=`ls -l $DBM_DIR/* 2>/dev/null | awk '{print $5;}' | sort | uniq | wc -l`
+			if [ $new -eq 1 ] ;  then
+				echo "Initialization of the database:"
+				sleep 5
+				if db_fillup2 ; then
+					rc_status -v
+				else
+					rc_status -v
+					rc_exit
+				fi
+			fi
+		fi
 		;;
 	stop)
 		echo -n "Shutting down TACO services"
