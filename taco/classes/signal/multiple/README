@@ -1,0 +1,7 @@
+For the client interface which works directly on the resource database
+the library "libdssig.sl" has to be made.
+The multi signal makefile creates the library by calling
+	hpuxmake libdssig.sl
+
+The library will automatically be installed under
+	$DSHOME/lib/hpux10.2

@@ -1,0 +1,7 @@
+		README for AGPowerSupply C++ device server
+		==========================================
+			by Andy Gotz (goetz@esrf.fr)
+
+This directory contains an example of a TACO C++ device server - AGPowerSupply.
+It implements a simulated powersupply. It is a subclass of the PowerSupply
+class. To make this example do make `cat .config` all.

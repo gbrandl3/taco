@@ -1,0 +1,98 @@
+          README for Serial line device server in C++ for Linux x86
+                       by Manuel Perez -27/04/99
+
+                       Content of src/ directory
+
+
+
+Serialds	The new serial line device server written in C++ and
+		accessing the device through the system device 
+		descriptors /dev/ttySxxx
+		
+		source files:		src/Serial.cpp
+					src/startup.cpp
+					include/Serial.h
+
+		example of use: 	Serialds MP
+
+		example of resources:	dbm_devres mp/serialds/0
+						serialline : ttyS0
+						charlength : 8
+						simulation : 1
+						parity : none
+						stopbits : 1
+						baudrate : 9600
+						timeout : 1024
+
+
+test/octal	specific tool used for testing and configurating the
+		Parvus Octal Serial Line PC/104 board.
+		  
+		source files:		test/octal.c
+
+		generation from src/:	make octal
+					make loadoctal
+
+		example of use: 	octal led 0x390
+					octal init 0x3a0 5
+
+
+scripts/Parvus	configuration script which should be called at boot
+		time (typically from /etc/rc.d./serial).
+		Initializes the Parvus Octal Serial board on your system
+		according to the settings defined in file /etc/Parvus.cfg 
+		or in the file given as argument.
+
+		This script uses the configuration program called "octal".
+
+		This script uses the environment variable DSHOME to locate
+		the files used (variable defined typically in /etc/rc.config).
+
+
+
+
+test/miniterm	usefull tool for testing serial line communications.
+		All the characters typed will be sent (including
+		control ones) and all the character received are displayed
+		without any translation. The serial line settings are:
+		9600bauds, 8data bits, no parity, 1stop bit
+		  
+		source files:		test/miniterm.c
+
+		generation from src/:	make miniterm
+					make loadminiterm
+
+		example of use: 	miniterm /dev/ttyS1
+
+
+
+
+test/bridge	tool for testing serial line communications.
+		All the characters received or written on a serial line
+		will be transmitted to another one.
+		The serial line settings are:
+		9600bauds, 8data bits, no parity, 1stop bit
+		  
+		source files:		test/bridge.c
+
+		generation from src/:	make bridge
+					make loadbridge
+
+		example of use: 	bridge /dev/ttyS8 /dev/ttyS9
+
+
+
+test/bombing	tool for testing serial line communications.
+		Comparing a long string written and received on two
+		serial lines interconnected through a cable.
+		This interconnection can also be done over several
+		serial lines using cables and the "bridge" program.
+		  
+		source files:		test/bombing.c
+
+		generation from src/:	make bombing
+					make loadbombing
+
+		example of use: 	bombing /dev/ttyS8 /dev/ttyS9
+
+

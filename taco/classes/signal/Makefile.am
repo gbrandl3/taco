@@ -1,0 +1,1 @@
+SUBDIRS = doc single multiple
