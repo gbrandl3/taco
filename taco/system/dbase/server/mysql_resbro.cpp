@@ -431,7 +431,7 @@ db_res *MySQLServer::resresoval_1_svc(db_res *recev)
     	    query += (" AND MEMBER = '" + user_member + "'");
         if (user_reso != "*")
 	    query += (" AND NAME = '" + user_reso + "'");
-        query += (" ORDER BY MEMBER ASC, NAME aSC, COUNT ASC");
+        query += (" ORDER BY MEMBER ASC, NAME ASC, COUNT ASC");
     }
     else
     {
