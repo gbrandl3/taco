@@ -1,3 +1,4 @@
+#include "config.h"
 #include <DevErrors.h>
 #include <algorithm>
 #include <NdbmServer.h>

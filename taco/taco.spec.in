@@ -48,7 +48,6 @@ find tmp-install-dir -regex ".*%{_includedir}/.*" -a -not -type d | sed -e 's/^t
 cp @PACKAGE@.txt /tmp
 
 %clean
-make uninstall
 if test "$PWD" = "${PWD%/*}/@PACKAGE@-@VERSION@" ; then
 	rm -rf "$PWD"
 else
@@ -183,13 +182,13 @@ fi
 %_sbindir/dbm_server
 %_sbindir/StartServer
 %_sbindir/taco-config
-%_datadir/m4/extra.m4
-%_datadir/m4/findfile.m4
-%_datadir/m4/python.m4
-%_datadir/m4/qt.m4
-%_datadir/m4/rpm.m4
-%_datadir/m4/swig.m4
-%_datadir/m4/taco.m4
+%_datadir/aclocal/extra.m4
+%_datadir/aclocal/findfile.m4
+%_datadir/aclocal/python.m4
+%_datadir/aclocal/qt.m4
+%_datadir/aclocal/rpm.m4
+%_datadir/aclocal/swig.m4
+%_datadir/aclocal/taco.m4
 
 %package x-apps
 Summary: TACO control system X11 applications.
@@ -208,5 +207,8 @@ Provides: taco-x-apps
 @appdefaultdir@/XDevmenu
 
 %changelog
+* Wed Jun 02 2004 Jens Krüger <jens.krueger@frm2.tum.de>
+- Change the pathes for the autotool macros
+- remove the 'make uninstall' in the 'clean' section
 * Wed May 19 2004 Jens Krüger <jens.krueger@frm2.tum.de>
 - Change the variables from autotools to rpm

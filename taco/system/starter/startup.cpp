@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * File:        $Id: startup.cpp,v 1.4 2003-11-26 09:15:57 jkrueger1 Exp $
+ * File:        $Id: startup.cpp,v 1.5 2004-06-02 16:36:17 jkrueger1 Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
@@ -11,9 +11,9 @@
  *
  * Original:	January 2003
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Revision:	$Date: 2003-11-26 09:15:57 $
+ * Revision:	$Date: 2004-06-02 16:36:17 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -31,6 +31,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *****************************************************************************/
+#include "config.h"
 #include <API.h>
 #include <Device.H>
 #include <DevServer.h>

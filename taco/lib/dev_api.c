@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.14 $
+ Version    :	$Revision: 1.15 $
 
- Date	    :	$Date: 2004-04-16 12:57:09 $
+ Date	    :	$Date: 2004-06-02 16:36:14 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -2237,11 +2237,11 @@ long _DLLFunc rpc_check_host (char *host_name, long *error)
 /*
  * try to connect to the remote host.
  */
-#if defined (WIN32) || defined (linux) || defined (solaris) || defined (_XOPEN_SOURCE_EXTENDED) || defined(FreeBSD)
+#if defined (WIN32) || defined (linux) || defined (_solaris) || defined (_XOPEN_SOURCE_EXTENDED) || defined(FreeBSD)
 	connect (s,(struct sockaddr *)&peeraddr_in, sizeof(struct sockaddr_in));
 #else
 	connect (s, (void *) &peeraddr_in, sizeof(struct sockaddr_in));
-#endif /* WIN32 || linux || solaris */
+#endif /* WIN32 || linux || _solaris */
 
 /*
  *  select the socket and wait until the connection is ready for write access. 

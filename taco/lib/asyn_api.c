@@ -25,9 +25,9 @@
 
  Original   :	January 1997
 
- Version:	$Revision: 1.13 $
+ Version:	$Revision: 1.14 $
 
- Date:		$Date: 2004-04-16 12:57:09 $
+ Date:		$Date: 2004-06-02 16:36:13 $
 
  Copyright (c) 1997-2000 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -73,9 +73,8 @@
 #		else
 #			include <ioctl.h>
 #		endif
-#		if defined (linux) || defined (FreeBSD) 
-/* mutex locking for handling asyncronous request */
-/* here the mutex is instantiated. */
+#		if HAVE_PTHREAD_H
+/* mutex locking for handling asyncronous request:  here the mutex is instantiated. */
 #			ifdef _REENTRANT
 #				include <pthread.h>
 				pthread_mutex_t async_mutex = PTHREAD_MUTEX_INITIALIZER;

@@ -1,4 +1,4 @@
-pkgpyexec_LTLIBRARIES	= Server.la 
+pyexec_LTLIBRARIES	= Server.la 
 
 Server_la_LDFLAGS 	= -module 
 

@@ -11,9 +11,9 @@
 
  Original   :   December 1993
 
- Version    :	$Revision: 1.6 $
+ Version    :	$Revision: 1.7 $
 
- Date       :	$Date: 2004-03-03 11:38:16 $
+ Date       :	$Date: 2004-06-02 16:36:14 $
 
  Copyright (c) 1993 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -1777,15 +1777,15 @@ long _DLLFunc sec_svc_import (DevServerDevices *device, long connection_id,
 			getpeername ((int)device->si_tcp_socket, 
 #if defined (_XOPEN_SOURCE_EXTENDED)
 			    (struct sockaddr *)&(device->si_peeraddr), &ulen);
-#elif defined (_UCC) || defined(solaris)
+#elif defined (_UCC) 
 			    (struct sockaddr *)&(device->si_peeraddr), &len);
-#elif defined (linux) || defined(FreeBSD)
+#elif HAVE_SOCKLEN_T
 			    (struct sockaddr *)&(device->si_peeraddr), (socklen_t*)&len);
 #elif defined (WIN32)
 			    (struct sockaddr *)&(device->si_peeraddr), &len);
 #else
 			    (void *)&(device->si_peeraddr), &len);
-#endif /* _UCC || solaris || linux */
+#endif /* _UCC || _solaris || linux */
 		}
 		else
 		{
@@ -1844,15 +1844,15 @@ long _DLLFunc sec_svc_import (DevServerDevices *device, long connection_id,
 			getpeername ((int)device->si_tcp_socket, 
 #if defined (_XOPEN_SOURCE_EXTENDED)
 			    (struct sockaddr *)&(device->si_peeraddr), &ulen);
-#elif defined (_UCC) || (solaris)
+#elif defined (_UCC) 
 			    (struct sockaddr *)&(device->si_peeraddr), &len);
-#elif defined (linux) || defined (FreeBSD)
+#elif HAVE_SOCKLEN_T
 			    (struct sockaddr *)&(device->si_peeraddr), (socklen_t*)&len);
 #elif defined (WIN32)
 			    (struct sockaddr *)&(device->si_peeraddr), &len);
 #else
 			    (void *)&(device->si_peeraddr), &len);
-#endif /* _UCC || solaris || linux */
+#endif /* _UCC || _solaris || linux */
 		}
 		else
 		{
@@ -2363,15 +2363,15 @@ static long sec_verify_tcp_conn (DevServerDevices *device)
 			if ( getpeername ((int)device->si_tcp_socket,
 #if defined (_XOPEN_SOURCE_EXTENDED)
 			    (struct sockaddr *)&peeraddr, &ulen) == DS_NOTOK ||
-#elif defined (_UCC) || defined (solaris)
+#elif defined (_UCC) 
 			    (struct sockaddr *)&peeraddr, &len) == DS_NOTOK ||
-#elif defined (linux) || defined(FreeBSD)
+#elif HAVE_SOCKLEN_T
 			    (struct sockaddr *)&peeraddr, (socklen_t*)&len) == DS_NOTOK ||
 #elif defined (WIN32)
 			    (struct sockaddr *)&peeraddr, &len) == DS_NOTOK ||
 #else
 			    (void *)&peeraddr, &len) == DS_NOTOK ||
-#endif /* _UCC || solaris || linux */
+#endif /* _UCC || _solaris || linux */
 			    device->si_peeraddr.sin_addr.s_addr   != 
 
 			    peeraddr.sin_addr.s_addr           ||

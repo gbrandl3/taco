@@ -12,9 +12,9 @@
 
  Original:	June 1992
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2004-03-26 16:21:52 $
+ Date:		$Date: 2004-06-02 16:36:15 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -30,7 +30,7 @@
  */
 #ifdef _IDENT
 static char ApiPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.3 2004-03-26 16:21:52 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.4 2004-06-02 16:36:15 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -475,17 +475,19 @@ long 	relisten_events(devserver ds);
 /*
  * special case for Solaris C++ and OS9 because no prototype defined !
  */
-#if defined(solaris) || defined(_UCC)
 #ifdef __cplusplus
 extern "C"
 {
 #endif /* __cplusplus */
+#if 	!HAVE_DECL_GETHOSTNAME
 int 	gethostname(char *name, int namelen);
+#endif
+#if !HAVE_DECL_GET_MYADDRESS
 void 	get_myaddress(struct sockaddr_in *);
+#endif
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-#endif /* solaris || _UCC */
 
 #ifdef __cplusplus
 extern "C" configuration_flags  config_flags;

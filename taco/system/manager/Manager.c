@@ -11,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.6 $
+ Version:	$Revision: 1.7 $
 
- Date:		$Date: 2004-03-18 14:09:37 $
+ Date:		$Date: 2004-06-02 16:36:17 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -22,6 +22,7 @@
 
 **********************************************************************/
 
+#include "config.h"
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevErrors.h>

@@ -1,3 +1,4 @@
+#include "config.h"
 #ifdef _solaris
 #define PORTMAP
 #endif 

@@ -74,7 +74,7 @@ db_res *NdbmServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 	so_size = sizeof(so);
 
 #ifdef sun
-	if (rqstp->rq_xprt->xp_port == udp_port)
+	if (rqstp->rq_xprt->xp_port == getUDPPort())
 		prot = IPPROTO_UDP;
 	else
 		prot = IPPROTO_TCP;

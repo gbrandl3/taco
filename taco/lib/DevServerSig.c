@@ -13,15 +13,16 @@
 
  Original:	June 1991
 
- Version:	$Revision: 1.4 $
+ Version:	$Revision: 1.5 $
 
- Date:		$Date: 2003-05-16 13:53:10 $
+ Date:		$Date: 2004-06-02 16:36:13 $
 
  Copyright (c) 1990-1997 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
 
 *******************************************************************-*/
 
+#include "config.h"
 #include <signal.h>
 #include <API.h>
 #include <private/ApiP.h>

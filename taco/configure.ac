@@ -1,14 +1,13 @@
-AC_INIT(TACO, 3.0rc3, [taco-devel@lists.sourceforge.net])
-AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.39 $)dnl
+AC_INIT([TACO], [3.0], [taco-devel@lists.sourceforge.net])
+AC_PREREQ([2.57])
+AC_REVISION($Revision: 1.40 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
 
 TACO_INIT([no])
 
-LIB_VERSION="10:0:0"
-AC_SUBST(LIB_VERSION)
+AC_SUBST(LIB_VERSION, [10:0:0])
 
 AM_INIT_AUTOMAKE([dist-bzip2 1.7])
 
@@ -36,7 +35,11 @@ AC_PROG_RANLIB
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h malloc.h memory.h netdb.h netinet/in.h stddef.h stdlib.h string.h strings.h sys/file.h sys/ioctl.h sys/socket.h termios.h unistd.h sys/filio.h paths.h])
+AC_HEADER_TIME
+AC_HEADER_STAT
+AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h]) 
+AC_CHECK_HEADERS([pthread.h fcntl.h malloc.h memory.h netdb.h stddef.h stdlib.h string.h strings.h sys/file.h sys/ioctl.h termios.h unistd.h sys/filio.h paths.h siggen.h])
+AC_CHECK_HEADERS([varargs.h stdarg.h])
 
 AC_LANG_PUSH(C++)
 AC_CHECK_HEADERS([sstream strstream])
@@ -50,7 +53,8 @@ AC_TYPE_MODE_T
 AC_TYPE_OFF_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
-AC_HEADER_TIME
+AC_TYPE_SIGNAL
+AC_TYPE_UID_T
 AC_STRUCT_TM
 AC_C_VOLATILE
 AC_CHECK_TYPES(socklen_t, [],[],
@@ -65,6 +69,58 @@ AC_CHECK_TYPES(socklen_t, [],[],
 #endif])
 AC_CHECK_TYPES(time_t)
 
+AC_MSG_CHECKING([for number of parameters in va_start])
+AH_TEMPLATE([HAVE_VA_START_P1], [define whether the va_start macro expect only one parameter])
+AH_TEMPLATE([HAVE_VA_START_P1_P2], [define whether the va_start macro expect two parameters])
+AC_COMPILE_IFELSE([
+	AC_LANG_PROGRAM([[
+#if HAVE_STDARG_H
+#	include <stdarg.h>
+#elif HAVE_VARARGS_H
+#	include <varargs.h>
+#endif
+
+void dev_printerror (int mode, char *fmt, ...)
+{
+        va_list         args;
+        va_start(args, fmt);
+}
+]],
+[[dev_printerror(0, "%s", "Hello World\n");]])], [
+AC_DEFINE(HAVE_VA_START_P1_P2)
+AC_MSG_RESULT([2])], [AC_DEFINE(HAVE_VA_START_P1)
+AC_MSG_RESULT([1])])
+	
+AC_MSG_CHECKING([for WAIT_ANY in waitpid])
+AH_TEMPLATE([HAVE_WAIT_ANY], [defines whether the WAIT_ANY macro is defined or not])
+AH_VERBATIM([_HAVE_WAIT_ANY],
+[#if !HAVE_WAIT_ANY
+#	define WAIT_ANY 	(-1)
+#endif])
+AC_COMPILE_IFELSE([
+	AC_LANG_PROGRAM([[
+#if HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#if HAVE_SYS_WAIT_H
+#	include <sys/wait.h>
+#endif
+]],
+[[
+int	status;
+int 	pid = waitpid (WAIT_ANY, &status, WNOHANG);]])], [
+AC_MSG_RESULT([yes])
+AC_DEFINE(HAVE_WAIT_ANY)],
+[AC_MSG_RESULT([no])])
+
+
+AH_VERBATIM([_FIONREAD], [
+#if HAVE_SYS_IOCTL_H
+#	include <sys/ioctl.h>
+#endif
+#ifndef FIONREAD
+#	define	FIONREAD	TIOCISIZE
+#endif])
 
 # Checks for library functions.
 AC_FUNC_FORK
@@ -80,6 +136,11 @@ AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([alarm dup2 gethostbyname gethostname getpass gettimeofday isascii mblen memset putenv select socket strcasecmp strchr strcspn strdup strerror strncasecmp strrchr strspn strstr strtoul get_myaddress])
 
 AC_SEARCH_LIBS(dlopen, [dl])
+AC_SEARCH_LIBS(svc_run, [c nsl])
+AC_SEARCH_LIBS(socket, [c socket], [], [], [-lnsl])
+AC_SEARCH_LIBS(connect, [c socket], [], [], [-lnsl])
+AC_SEARCH_LIBS(nanosleep, [c rt c_r])
+AC_SEARCH_LIBS(inet_pton, [c socket nsl])
 
 TACO_CHECK_RPC
 TACO_CHECK_RPC_AND_THREADS

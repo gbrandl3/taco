@@ -9,13 +9,13 @@
  *
  * Description:	
  *
- * Version:	$Revision: 1.1 $
+ * Version:	$Revision: 1.2 $
  *
- * Date:	$Date: 2003-04-25 12:54:23 $
+ * Date:	$Date: 2004-06-02 16:36:16 $
  *
  */
 
-
+#include "config.h"
 #include <API.h>
 #include <dcP.h>
 #include <DevErrors.h>

@@ -1,3 +1,4 @@
+#include "config.h"
 #include <db_xdr.h>
 /* Some C++ include files */
 #include <string>

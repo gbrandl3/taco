@@ -12,9 +12,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.12 $
+ Version    :	$Revision: 1.13 $
 
- Date       : 	$Date: 2004-04-02 12:46:14 $
+ Date       : 	$Date: 2004-06-02 16:36:14 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -36,13 +36,14 @@
 /*
  * Include file for variable function arguments.
  */
-#ifdef sun
+#if HAVE_STDARG_H
+#	include <stdarg.h>
+#elif HAVE_VARARGS_H
 #	include <varargs.h>
+#endif
+
+#ifdef sun
 #	include <signal.h>
-#else
-#	ifndef OSK
-#		include <stdarg.h>
-#	endif
 #endif
 
 static long 		setup_config (long *error);
@@ -277,9 +278,9 @@ _DLLFunc void dev_printerror (DevShort mode, char *fmt, ...)
 /*
  * get variable argument list pointer in order to pass it to vsnprintf()
  */
-#if (defined sun) || (defined irix)
+#if HAVE_VA_START_P1
 	va_start(args);
-#else
+#elif HAVE_VA_START_P1_P2
 	va_start(args, fmt);
 #endif /* sun */
 
@@ -492,9 +493,9 @@ void _DLLFunc dev_printdebug (long debug_bits, char *fmt, ...)
 /*
  * get variable argument list pointer in order to pass it to vsnprintf()
  */
-#if (defined sun) || (defined irix)
+#if HAVE_VA_START_P1
 	va_start(args);
-#else
+#elif HAVE_VA_START_P1_P2
 	va_start(args, fmt);
 #endif /* sun */
 
@@ -625,9 +626,9 @@ _DLLFunc void dev_printdiag (DevShort mode, char *fmt, ...)
 /*
  * get variable argument list pointer in order to pass it to vsnprintf()
  */
-#if (defined sun) || (defined irix)
+#if HAVE_VA_START_P1
 	va_start(args);
-#else
+#elif HAVE_VA_START_P1_P2
 	va_start(args, fmt);
 #endif /* sun */
 

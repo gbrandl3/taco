@@ -388,7 +388,7 @@ AC_DEFUN([TACO_CHECK_RPC_AND_THREADS],
 [
 AC_CHECK_HEADERS([socket.h sys/socket.h rpc.h rpc/rpc.h])
 LIBS_SAVE="$LIBS"
-AC_SEARCH_LIBS(pthread_cancel, [pthread c_r])
+AC_SEARCH_LIBS(pthread_cancel, [pthread c_r nsl])
 AC_RUN_IFELSE(
 	AC_LANG_PROGRAM([
 #include <pthread.h>
@@ -491,7 +491,7 @@ const char hw[[[]]] = "Hello World!\n";],
   if (pid == 0)
     svc_run ();
 
-  inet_aton ("127.0.0.1", &sin.sin_addr);
+  inet_pton (AF_INET, "127.0.0.1", &sin.sin_addr);
   sin.sin_port = htons (svx->xp_port);
   sin.sin_family = AF_INET;
 

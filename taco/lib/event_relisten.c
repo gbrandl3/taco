@@ -1,3 +1,4 @@
+#include "config.h"
 #include <API.h>
 #include <Admin.h>
 #include <stdio.h>

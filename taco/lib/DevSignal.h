@@ -14,9 +14,9 @@
 
  Original:	June, 1991
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2003-11-28 15:50:54 $
+ Date:		$Date: 2004-06-02 16:36:13 $
 
  Copyleft (c) 1990 by European Synchrotron Radiation Facility, 
                       Grenoble, France
@@ -31,7 +31,7 @@
  */
 #ifdef _IDENT
 static char DevSignalh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevSignal.h,v 1.3 2003-11-28 15:50:54 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevSignal.h,v 1.4 2004-06-02 16:36:13 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -93,10 +93,10 @@ static char DevSignalh[] =
 #define NUSIG	_NSIG
 #endif /*__hpux */
 
-#if defined (solaris) || (sun) || (defined irix)
+#if defined (_solaris) || (sun) || (defined irix)
 #include <signal.h>
 #define NUSIG	NSIG
-#endif /* solaris */
+#endif /* _solaris */
 
 #ifdef lynx
 #include <signal.h>

@@ -1,3 +1,4 @@
+#include "config.h"
 #include <dbClass.h>
 #include <algorithm>
 #include <string>

@@ -131,7 +131,7 @@ AC_DEFUN([TACO_DEFINES],
 			taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -Dm68k=1 -DNDBM" ;;
 		powerpc-apple-darwin*)
 			taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -DDARWIN -DNDBM" ;;
-		*-*-solar*-* | *-*-sun*-*)
+		sparc-sun-solaris* | *-*-solar*-* | *-*-sun*-*)
 			taco_CFLAGS="-Dunix=1 -D__unix=1 -D_solaris=1 -D__solaris__=1 -DNDBM" ;;
 		*-*-hp*-*)
 			taco_CFLAGS="-Dunix=1 -D__unix=1 -D__hpux=1 -D__hpux10=1 -D__hp9000s700=1 -D__hpux9000s700=1 -DNDBM" ;;
@@ -154,6 +154,35 @@ AC_DEFUN([TACO_DEFINES],
 	CFLAGS="$CFLAGS $taco_CFLAGS"
 	CXXFLAGS="$CXXFLAGS $taco_CFLAGS"
 	AC_SUBST(taco_CFLAGS)
+	AC_CHECK_HEADERS([fcntl.h malloc.h memory.h netdb.h stddef.h stdlib.h string.h strings.h sys/file.h sys/ioctl.h termios.h unistd.h sys/filio.h paths.h])
+	AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h]) 
+
+	AC_LANG_PUSH(C++)
+	AC_CHECK_HEADERS([sstream strstream])
+	AC_LANG_POP(C++)
+
+# Checks for typedefs, structures, and compiler characteristics.
+	AC_HEADER_STDBOOL
+	AC_C_CONST
+	AC_C_INLINE
+	AC_TYPE_MODE_T
+	AC_TYPE_OFF_T
+	AC_TYPE_PID_T
+	AC_TYPE_SIZE_T
+	AC_HEADER_TIME
+	AC_STRUCT_TM
+	AC_C_VOLATILE
+	AC_CHECK_TYPES(socklen_t, [],[],
+	[#if HAVE_SYS_SOCKET_H
+#       include <sys/socket.h>
+#elif HAVE_SOCKET_H
+#       include <socket.h>
+#elif HAVE_NETDB_H
+#       include <netdb.h>
+#elif HAVE_ARPA_INET_H
+#       include <arpa/inet.h>
+#endif])
+	AC_CHECK_TYPES(time_t)
 ])
 
 dnl

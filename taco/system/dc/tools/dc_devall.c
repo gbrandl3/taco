@@ -1,3 +1,4 @@
+#include "config.h"
 #define _dc_h
 #include <API.h>
 #undef _dc_h

@@ -1,6 +1,6 @@
 AC_DEFUN([PYTHON_PROG],
 [
-	AM_PATH_PYTHON([$1]) 
+	AM_PATH_PYTHON([$1],[],[taco_python_binding=no]) 
 	AC_MSG_CHECKING([Python ])
  
 	AC_CACHE_VAL(ac_cv_python, [ac_cv_python=${PYTHONDIR:-/usr/local}])
