@@ -1,0 +1,20 @@
+AT_INIT
+AT_TESTED(taco)
+
+AT_BANNER([[Installing TACO system.]])
+
+AT_SETUP([TACO installation])
+AT_CHECK([taco install])
+AT_CLEANUP
+
+AT_BANNER([[Testing the database server.]])
+m4_include([dbase.at])
+
+AT_BANNER([[Testing the devices.]])
+m4_include([devices.at])
+
+AT_BANNER([[Uninstalling TACO system.]])
+
+AT_SETUP([TACO deinstallation])
+AT_CHECK([taco uninstall])
+AT_CLEANUP

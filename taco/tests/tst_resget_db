@@ -1,7 +1,0 @@
-#! /bin/sh
-. ./taco
-. ./test/$sysconfdir/tacoenv.sh
-
-if { ! ./db_connect ; } then exit 77 ; fi
-if [ "`./db_resget 'test/device/1/res1' 2>log`" != "resource 1" ] ; then exit  2 ; fi
-exit 0

@@ -1,0 +1,103 @@
+AT_SETUP([connection to the database])
+AT_CHECK([. taco
+. $sysconfdir/tacoenv.sh
+db_connect])
+AT_CLEANUP
+
+AT_SETUP([db_info command])
+AT_CHECK([taco db_info | grep DEVICE], [], [[		DEVICE STATISTICS
+]])
+AT_CLEANUP
+
+AT_SETUP([db_update command])
+AT_CHECK([taco db_update TEST/Inst_verify.res])
+AT_CLEANUP
+
+AT_SETUP([db_servinfo command])
+AT_CHECK([taco db_servinfo inst_verify/1], [], [[The device test/device/1 is defined for this server but is not exported
+]])
+AT_CLEANUP
+
+AT_SETUP([db_update command])
+AT_DATA([test.res], [[
+# This file contains only resources for the tests
+test/test/device:	test/device/1 \
+			test/device/2 \
+			test/device/3 
+test/device/1/res1:	"resource 1"
+test/device/1/res2:	2
+test/device/1/res3:	3.1
+test/device/1/res4:	1,1,1
+test/device/1/res5:	"A","B","C"
+]])
+AT_CHECK([RES_BASE_DIR=`pwd` taco db_update test.res])
+AT_CLEANUP
+
+AT_SETUP([db_update command failes])
+AT_DATA([test.res], [[
+# This file contains only resources for the tests
+test/test/devices:	test/device/1 
+test/device/1/res1:	"resource 1"
+]])
+AT_CHECK([RES_BASE_DIR=`pwd` taco db_update test.res 2>/dev/null], [255])  
+AT_CLEANUP
+
+AT_SETUP([db_read command])
+AT_CHECK([taco db_read names], [],
+[[names: agpspp|1|1|:  test/agps/1|not_exp|0|0|unknown|unknown|0|unknown|
+names: inst_verify|1|1|:  test/device/1|not_exp|0|0|unknown|unknown|0|unknown|
+names: test|test|3|:  test/device/3|not_exp|0|0|unknown|unknown|0|unknown|
+names: test|test|2|:  test/device/2|not_exp|0|0|unknown|unknown|0|unknown|
+names: test|test|1|:  test/device/1|not_exp|0|0|unknown|unknown|0|unknown|
+]])
+AT_CLEANUP
+
+AT_SETUP([db_getresource function])
+AT_CHECK([. taco 
+. $sysconfdir/tacoenv.sh
+db_resget test/device/1/res1], [], [[resource 1
+]])
+AT_CLEANUP
+
+AT_SETUP([db_putresource function])
+AT_CHECK([. taco 
+. $sysconfdir/tacoenv.sh
+db_resput test/device/2/res1 TEST], [])
+AT_CLEANUP
+
+AT_SETUP([db_delresource function])
+AT_CHECK([taco db_resdel test/device/2/res1], [])
+AT_CLEANUP
+
+AT_SETUP([existing domains])
+AT_CHECK([
+. taco
+. $sysconfdir/tacoenv.sh
+db_resdomain 
+], [], [[class
+cmds
+error
+events
+sec
+sys
+test
+]])
+AT_CLEANUP
+
+AT_SETUP([existing family test])
+AT_CHECK([
+. taco
+. $sysconfdir/tacoenv.sh
+db_resfamily test
+], [], [[device
+]])
+AT_CLEANUP
+
+AT_SETUP([existing member test])
+AT_CHECK([
+. taco
+. $sysconfdir/tacoenv.sh
+db_resmember test device
+], [], [[1
+]])
+AT_CLEANUP

@@ -1,10 +1,59 @@
 #!/bin/sh
 
-DSHOME=`pwd`/test@prefix@
-srcdir=`grep '^srcdir' Makefile | cut -d' ' -f 3`
-prefix=@prefix@
+set_env() {
+DSHOME=@abs_top_builddir@/tests/test/@prefix@
+srcdir=`grep '^srcdir' @abs_top_builddir@/tests/Makefile | cut -d' ' -f 3`
+prefix=@abs_top_builddir@/tests/test/@prefix@
 exec_prefix=@exec_prefix@
 bindir=@bindir@
 sbindir=@sbindir@
 sysconfdir=@sysconfdir@
+top_builddir=@abs_top_builddir@
+testbindir=${top_builddir}/tests
 
+}
+
+set_env
+
+if test $# -gt 0 ; then
+	case $1 in 
+		--version)	echo @PACKAGE_VERSION@;;
+		install) if [ -d test ] ; then
+				rm -rf test
+			fi
+			if { mkdir test; } ; then
+				dc_destdir=$testbindir/test
+				make -C $top_builddir DESTDIR=$dc_destdir install >log 2>&1
+				. $sysconfdir/tacoenv.sh
+				set_env
+				$sbindir/taco.startup >>log 2>&1
+				exit 0
+			fi
+			exit 1;;
+		uninstall)
+			. $sysconfdir/tacoenv.sh
+			killall Manager
+			dc_destdir=$testbindir/test
+			make -C $topsrcdir DESTDIR=$dc_destdir uninstall >/dev/null 2>&1
+			dir=`echo $prefix | cut -d'/' -f 1`
+			if [ -z "$dir" ] ; then
+				dir=`echo $prefix | cut -d'/' -f 2`
+			fi
+			rm -rf ${dc_destdir}/$dir
+			dir=`aclocal --print-ac-dir | cut -d'/' -f 1`
+			if [ -z "$dir" ] ; then
+				dir=`aclocal --print-ac-dir | cut -d'/' -f 2`
+			fi
+			rm -rf ${dc_destdir}/$dir
+			if { rmdir $testbindir/test; } ; then
+				exit 0
+			fi
+			exit 1 ;;
+		*)
+			. $sysconfdir/tacoenv.sh
+			set_env
+			prog=$1
+			shift 1
+			$bindir/$prog $@;;
+	esac
+fi
