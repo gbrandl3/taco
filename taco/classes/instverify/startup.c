@@ -1,6 +1,4 @@
-
 /*********************************************************************
- *
  * File:	startup.c
  *
  * Project:	Device Server Distribution
@@ -19,9 +17,12 @@
  *
  * Original:	10.5.95	
  *
+ * Version:	$Revision: 1.4 $
+ *
+ * Date:	$Date: 2004-07-13 10:18:25 $
+ *
  * Copyright (c) 1994 by European Synchrotron Radiation Facility, 
  *                     Grenoble, France
- *
  *********************************************************************/
 
 #include <Admin.h>
@@ -57,7 +58,7 @@ long startup(char *svr_name, long *error)
 			n_exported;
 	short		iret;
 
-/* debug_flag = 0xffffffff;*/
+/* 	debug_flag = 0xffffffff; */
 
 	if (db_getdevlist(svr_name,&dev_list,&n_devices,error))
 	{

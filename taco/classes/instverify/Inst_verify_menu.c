@@ -81,7 +81,7 @@ int main(int argc, char **argv)
 /*
  * to get around the strange effects of scanf() wait for something read 
  */
-		for( ; gets(cmd_string) == (char *)0 ; );
+		for( ; fgets(cmd_string, sizeof(cmd_string), stdin) == (char *)0 ; );
 
 		ret = sscanf(cmd_string,"%d",&cmd);
 		printf  ("\n");
