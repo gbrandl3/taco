@@ -13,9 +13,9 @@
 
  Original:      July 1993
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date: 		$Date: 2003-05-12 07:08:20 $
+ Date: 		$Date: 2003-05-16 13:52:03 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -39,15 +39,15 @@
 
 /**************  Device server development Teams definition  **************/
 
-#define CntrlTeamNumber DS_LSHIFT(1,DS_TEAM_SHIFT) /* CS - Control group */
-#define DasTeamNumber   DS_LSHIFT(2,DS_TEAM_SHIFT) /* CS - Data acquisition */
-#define ExpTeamNumber   DS_LSHIFT(3,DS_TEAM_SHIFT) /* Experiments-Programming */
-#define CrgTeamNumber   DS_LSHIFT(4,DS_TEAM_SHIFT) /* External - CRG */
-#define BlcTeamNumber   DS_LSHIFT(5,DS_TEAM_SHIFT) /* CS - Beam Line Control */
-#define SysTeamNumber   DS_LSHIFT(6,DS_TEAM_SHIFT) /* CS - System Team */
-#define MachTeamNumber  DS_LSHIFT(7,DS_TEAM_SHIFT) /* Machine - Theory Group */
-#define FRMTeamNumber   DS_LSHIFT(8,DS_TEAM_SHIFT) /* FRM-II - Garching */
-#define TestTeamNumber	DS_LSHIFT(99, DS_TEAM_SHIFT)	/* Only for tests */
+#define CntrlTeamNumber	DS_LSHIFT(1,DS_TEAM_SHIFT) /* CS - Control group */
+#define DasTeamNumber	DS_LSHIFT(2,DS_TEAM_SHIFT) /* CS - Data acquisition */
+#define ExpTeamNumber	DS_LSHIFT(3,DS_TEAM_SHIFT) /* Experiments-Programming */
+#define CrgTeamNumber	DS_LSHIFT(4,DS_TEAM_SHIFT) /* External - CRG */
+#define BlcTeamNumber	DS_LSHIFT(5,DS_TEAM_SHIFT) /* CS - Beam Line Control */
+#define SysTeamNumber	DS_LSHIFT(6,DS_TEAM_SHIFT) /* CS - System Team */
+#define MachTeamNumber	DS_LSHIFT(7,DS_TEAM_SHIFT) /* Machine - Theory Group */
+#define FRMTeamNumber	DS_LSHIFT(8,DS_TEAM_SHIFT) /* FRM-II - Garching */
+#define TestTeamNumber	DS_LSHIFT(63, DS_TEAM_SHIFT)	/* Only for tests */
 
 /**************  Device server error category definition  **************/
 
