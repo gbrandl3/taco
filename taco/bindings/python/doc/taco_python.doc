@@ -66,7 +66,7 @@ dev_query(mdevname):
    
     	input: 	- mdevname: device name in lower case
  
-    	returns dictionnary:
+    	returns dictionary:
  		- {} if error
    		-{cmd_name:[cmd,in_type,out_type], ...}
  	        cmd_name: command string
@@ -145,7 +145,7 @@ dev_io(mdevname,mdevcommand,*parin,**kw):
     	input:
        		- mdevname: device name in lower case
  		- parin: list of optional INPUT parameters
- 		- kw: dictionnary of optional OUTPUT parameters
+ 		- kw: dictionary of optional OUTPUT parameters
  
     	returns value:
  		- 1 : if no device ARGOUT or OUTPUT param provided
@@ -208,7 +208,7 @@ esrf_query(c_pointer):
 		- C object pointer given 
 				  by dev_import
 			
-        returns: a dictionnary
+        returns: a dictionary
 		{ 'cmd': [cmd,in_type,out_type], ... }
 		NULL:			error		
 		
@@ -226,7 +226,7 @@ esrf_getresource(device_name,recource name):
 		NULL:		 error				
 		
 
-esrf_putresource(devname,resname,objet):
+esrf_putresource(devname,resname,object):
 -----------------------------------------
     set a device resource value 
 
@@ -318,7 +318,7 @@ esrf_io(C_pointer,command_sring,command,input_type,output_type,
 		  for the moment: numeric only
 			
         returns: 
-		Python objet according to type:  if ok
+		Python object according to type:  if ok
 		NULL:				 error
 		
 	examples:
