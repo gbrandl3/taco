@@ -11,9 +11,9 @@
 
  Original   	: March 1991
 
- Version	: $Revision: 1.9 $
+ Version	: $Revision: 1.10 $
 
- Date		: $Date: 2004-03-09 09:35:48 $
+ Date		: $Date: 2004-05-27 07:26:14 $
 
  Copyright (c) 1990-2002 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -27,6 +27,7 @@
 #include <DevServerP.h>
 #include <DevSignal.h>
 #include <DevErrors.h>
+#include "db_setup.h"
 #if defined _NT
 #include <rpc/Pmap_pro.h>
 #include <rpc/pmap_cln.h>
@@ -124,7 +125,7 @@ static SVCXPRT *transp_tcp;
 #if defined (vxworks) || (NOMAIN)
 void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_device, char** device_list)
 {
-        char    		host_name [19],
+        char    		host_name [HOST_NAME_LENGTH],
         			dsn_name [37],
         			*proc_name,
         			*display,
@@ -303,7 +304,7 @@ int main (int argc, char **argv)
 {
 /*	SVCXPRT 		*transp; 
         			*transp_tcp; */
-	char    		host_name [19],
+	char    		host_name [HOST_NAME_LENGTH],
 				dsn_name [37],
 				*proc_name,
 				*display,
@@ -440,7 +441,7 @@ int main (int argc, char **argv)
 			}
 		}
 	}
-	memset  (dsn_name,0,sizeof(dsn_name));
+	memset  (dsn_name, 0, sizeof(dsn_name));
 	strncat (dsn_name , proc_name, 23);
 	strncat (dsn_name , "/", 1);
 	strncat (dsn_name , argv[1], 11);
@@ -490,7 +491,7 @@ int main (int argc, char **argv)
  * world. However, one has to keep in mind, that a bunch of other stuff
  * will fail, if FQDN exceeds SHORT_NAME_SIZE=32 - which is not too hard!
  */
-	if( gethostname(host_name, 19) != 0 )
+	if( gethostname(host_name, sizeof(host_name)) != 0 )
 	{
 		char            hostname[200];     /* hopefully enough! */
 		char		ip_str[SHORT_NAME_SIZE];
