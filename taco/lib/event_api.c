@@ -29,13 +29,13 @@
 		is totally under control of the device class.
 	
  Author(s)  :	Andy Goetz
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original   :	April 1999
 
- Version    :	$Revision: 1.10 $
+ Version    :	$Revision: 1.11 $
 
- Date       :	$Date: 2004-09-17 10:09:17 $
+ Date       :	$Date: 2005-03-29 09:52:23 $
 
  Copyleft (c) 1999 by European Synchrotron Radiation Facility,
                       Grenoble, France
@@ -1003,7 +1003,6 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long
 	{
 		*error = DevErr_CommandNotImplemented;
 		status = DS_NOTOK;
-		status = tango_dev_event_query(ds, vareventarr, error);
 		return(status);
 	}
 #endif /* TANGO */
