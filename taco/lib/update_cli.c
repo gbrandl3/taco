@@ -1,4 +1,4 @@
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/update_cli.c,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/update_cli.c,v 1.2 2003-03-18 16:16:33 jkrueger1 Exp $";
 
 /*+*******************************************************************
 
@@ -16,9 +16,9 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib
 
  Original   :   May 1998
 
- Version:       $Revision: 1.1 $
+ Version:       $Revision: 1.2 $
 
- Date:          $Date: 2003-03-14 12:22:07 $
+ Date:          $Date: 2003-03-18 16:16:33 $
 
  Copyright (c) 1998 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -89,38 +89,32 @@ static struct timeval timeout_update={60,0};
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_analyze_data function code                  	    	    *
-*               ---------------                                        	    *
-*                                                                           *
-*    Function rule : To check a resource file and to build simple device and*
-*		     resource definition from it. A simple device definition*
-*		     is a string like :					    *
-*			ds_name/pers_name/device:dev_a,dev_b,dev_c	    *
-*		     A simple resource definition follows the syntax :	    *
-*			dev_a/res_name:res_value			    *
-*									    *
-*    Argin : - in_type : Flag set to Db_File or Db_Buffer according to what *
-*			 should be analysed ( a file or a graphical appli.  *
-*			 buffer)					    *
-*	     - buffer : The file name (if Db_File) or the buffer (Db_Buffer)*
-*									    *
-*    Argout : - nb_devdef : Number of device definition			    *
-*	      - devdef : Device definition				    *
-*	      - nb_resdef : Number of resource definition		    *
-*	      - resdef : Resource definition				    *
-*	      - line_err : File line where error occurs			    *
-*             - p_error : Pointer for the error code in case of problems    *
-*                                                                           *
-*    In case of trouble, the function returns -1 and set the variable       *
-*    pointed to by "p_error". The function also initializes the line_err    *
-*    argout with the file line where the error occurs. Otherwise, the 	    *
-*    function returns 0             					    *
-*                                                                           *
-*****************************************************************************/
-
-
+/**
+ * To check a resource file and to build simple device and
+ * resource definition from it. A simple device definition
+ * is a string like :
+ *
+ * ds_name/pers_name/device:	dev_a,dev_b,dev_c
+ *
+ * A simple resource definition follows the syntax :
+ *
+ * dev_a/res_name:res_value			   
+ *
+ * @param in_type 	Flag set to Db_File or Db_Buffer according to what 
+ * 			should be analysed ( a file or a graphical appli. buffer)
+ * @param buffer 	The file name (if Db_File) or the buffer (Db_Buffer)
+ * @param nb_devdef 	Number of device definition returned.
+ * @param devdef 	Device definitions returned
+ * @param nb_resdef 	Number of resource definition returned
+ * @param resdef 	Resource definitions returned
+ * @param line_err 	File line where error occurs
+ * @param p_error 	Pointer for the error code in case of problems 
+ * 
+ * @return 	In case of trouble, the function returns DS_NOTOK and set the variable 
+ * 		pointed to by "p_error". The function also initializes the line_err
+ * 		argout with the file line where the error occurs. Otherwise, the 
+ * 		function returns DS_OK 
+ */
 long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***devdef, \
 		     long *nb_resdef,char ***resdef,long *error_line,long *p_error)
 {
@@ -147,26 +141,26 @@ long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***dev
 	    (nb_resdef == NULL) || (error_line == NULL))
 	{
 		*p_error = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	if ((in_type != Db_File) && (in_type != Db_Buffer))
 	{
 		*p_error = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Miscellaneous init. */
 
-	*p_error = 0;
+	*p_error = DS_OK;
 	*error_line = 0;
 	*nb_resdef = *nb_devdef = 0;
 	line_ptr = 0;
 
 /* Ask database server for a list of all resources domain */
 
-	if (db_getresdomainlist(&domain_nb,&domain_list,p_error) == -1)
+	if (db_getresdomainlist(&domain_nb,&domain_list,p_error) == DS_NOTOK)
 	{
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 /* open resource file */
@@ -176,7 +170,7 @@ long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***dev
 		if ((file = fopen(buffer,"r")) == NULL)
 		{
 			*p_error = DbErr_CantOpenResFile;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -271,7 +265,7 @@ long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***dev
 
 		switch(TestLine(line,line1,k))
 		{
-		case -1 :
+		case DS_NOTOK :
 			for (i = 0;i < domain_nb;i++)
 				free(domain_list[i]);
 			free(domain_list);
@@ -291,13 +285,13 @@ long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***dev
 				fclose(file); 
 			*error_line = line_ptr;
 			*p_error = DbErr_BadResSyntax;
-			return(-1);
+			return(DS_NOTOK);
 
-		case 0 : 
+		case DS_OK : 
 #ifdef DEBUG
 			printf("Device definition (name_line) \n");
 #endif /* DEBUG */
-			if (name_line(line1,&in,&line_ptr,&tmp_devdef,p_error) == -1)
+			if (name_line(line1,&in,&line_ptr,&tmp_devdef,p_error) == DS_NOTOK)
 			{
 				for (i = 0;i < domain_nb;i++)
 					free(domain_list[i]);
@@ -317,9 +311,9 @@ long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***dev
 				if (in_type == Db_File)
 					fclose(file);
 				*error_line = line_ptr;
-				return(-1);
+				return(DS_NOTOK);
 			}
-			if (check_dev(tmp_devdef,&err_dev,p_error) == -1)
+			if (check_dev(tmp_devdef,&err_dev,p_error) == DS_NOTOK)
 			{
 				if (in_type == Db_Buffer)
 				{
@@ -343,7 +337,7 @@ long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***dev
 				if (in_type == Db_File)
 					fclose(file);
 				*error_line = line_ptr;
-				return(-1);
+				return(DS_NOTOK);
 			}
 			nb_dev++;
 			if ((tmp_dev = (char **)realloc(tmp_dev,(sizeof(char *) * nb_dev))) == NULL)
@@ -360,7 +354,7 @@ long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***dev
 				if (in_type == Db_File)
 					fclose(file);
 				*p_error = DbErr_ClientMemoryAllocation;
-				return(-1);
+				return(DS_NOTOK);
 			}
 			tmp_dev[nb_dev - 1] = tmp_devdef;
 			break;
@@ -369,7 +363,7 @@ long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***dev
 #ifdef DEBUG
 			printf("Simple resource definition (check_res) \n");
 #endif /* DEBUG */
-		 	if (check_res(line1,domain_nb,domain_list,p_error) == -1)
+		 	if (check_res(line1,domain_nb,domain_list,p_error) == DS_NOTOK)
 			{
 				for (i = 0;i < domain_nb;i++)
 					free(domain_list[i]);
@@ -389,7 +383,7 @@ long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***dev
 				if (in_type == Db_File)
 					fclose(file);
 				*error_line = line_ptr;
-				return(-1);
+				return(DS_NOTOK);
 			}
 			nb_res++;
 			if ((tmp_res = (char **)realloc(tmp_res,(sizeof(char *) * nb_res))) == NULL)
@@ -412,7 +406,7 @@ long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***dev
 				if (in_type == Db_File)
 					fclose(file);
 				*p_error = DbErr_ClientMemoryAllocation;
-				return(-1);
+				return(DS_NOTOK);
 			}
 			if ((tmp_res[nb_res - 1] = (char *)malloc(strlen(line1) + 1)) == NULL)
 			{
@@ -434,7 +428,7 @@ long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***dev
 				if (in_type == Db_File)
 					fclose(file);
 				*p_error = DbErr_ClientMemoryAllocation;
-				return(-1);
+				return(DS_NOTOK);
 			}
 			strcpy(tmp_res[nb_res - 1],line1);
 			break;
@@ -443,7 +437,7 @@ long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***dev
 #ifdef DEBUG
 			printf("Array resource definition (res_line) \n");
 #endif /* DEBUG */
-			if (res_line(line1,&in,&line_ptr,&tmp_resdef,p_error) == -1)
+			if (res_line(line1,&in,&line_ptr,&tmp_resdef,p_error) == DS_NOTOK)
 			{
 				for (i = 0;i < domain_nb;i++)
 					free(domain_list[i]);
@@ -463,9 +457,9 @@ long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***dev
 				if (in_type == Db_File)
 					fclose(file);
 				*error_line = line_ptr;
-				return(-1);
+				return(DS_NOTOK);
 			}
-		 	if (check_res(tmp_resdef,domain_nb,domain_list,p_error) == -1)
+		 	if (check_res(tmp_resdef,domain_nb,domain_list,p_error) == DS_NOTOK)
 			{
 				for (i = 0;i < domain_nb;i++)
 					free(domain_list[i]);
@@ -485,7 +479,7 @@ long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***dev
 				if (in_type == Db_File)
 					fclose(file);
 				*error_line = line_ptr;
-				return(-1);
+				return(DS_NOTOK);
 			}
 			nb_res++;
 			if ((tmp_res = (char **)realloc(tmp_res,(sizeof(char *) * nb_res))) == NULL)
@@ -502,7 +496,7 @@ long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***dev
 				if (in_type == Db_File)
 					fclose(file);
 				*p_error = DbErr_ClientMemoryAllocation;
-				return(-1);
+				return(DS_NOTOK);
 			}
 			tmp_res[nb_res - 1] = tmp_resdef;
 			break;
@@ -535,36 +529,27 @@ long db_analyze_data(long in_type,const char *buffer,long *nb_devdef,char ***dev
 	*devdef = tmp_dev;
 	*nb_resdef = nb_res;
 	*resdef = tmp_res;
-	return(0);
+	return(DS_OK);
 
 }
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for TestLine  function                                 *
-*                        --------                                           *
-*                                                                           *
-*    Function rule : To change the line to lower case letters if it is      *
-*                    necessary and to return a value which indicate which   *
-*                    type of line it is (device definition, simple resource *
-*                    definition or resources array definition)              *
-*                                                                           *
-*    Argin : - A pointer to a buffer where is stored a line of the resource *
-*              file 						            *
-*	     - A pointer to a buffer where the modified line will be store  *
-*            - The length of the original line                              *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    Return value : -1 : Error  					    *
-*                    0 : It is a device definition line                     *
-*                    1 : It is a simple resource definition line            *
-*                    2 : It is definition for an array of resources         *
-*                                                                           *
-****************************************************************************/
-
+/*
+ * To change the line to lower case letters if it is
+ * necessary and to return a value which indicate which
+ * type of line it is (device definition, simple resource
+ * definition or resources array definition)
+ *
+ * @param line 	A pointer to a buffer where is stored a line of the resource file 						
+ * @param line1	A pointer to a buffer where the modified line will be store
+ * @param k     The length of the original line
+ *
+ * @return 	- DS_NOTOK Error  					
+ *		- DS_OK It is a device definition line
+ *              - 1 It is a simple resource definition line
+ *              - 2 It is definition for an array of resources
+ */
 static long TestLine(char *line,char *line1,int k)
 {
 	char *tmp;
@@ -581,7 +566,7 @@ printf("Start of TestLine \n");
 /* Return error in this line is not a definition line */
 
 	if ((tmp = strchr(line,':')) == NULL)
-		return(-1);
+		return(DS_NOTOK);
 
 /* Change all the letters before the : to lower case */
 
@@ -608,7 +593,7 @@ printf("Start of TestLine \n");
 					j++;
 			}
 		}
-		iret = 0;
+		iret = DS_OK;
 	}
 
 /* Now it is a resource definition line */
@@ -671,13 +656,13 @@ printf("Start of TestLine \n");
 /* If an odd number of " character has been detected, it is an error */
 
 	if (string)
-		iret = -1;
+		iret = DS_NOTOK;
 
 /* Leave function */
 
 	line1[i] = 0;
 	if ((strlen(line1) == diff) && (a == 0))
-		iret = -1;
+		iret = DS_NOTOK;
 #ifdef DEBUG
 printf("End of TestLine \n");
 #endif /* DEBUG */
@@ -687,23 +672,18 @@ printf("End of TestLine \n");
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for name_line function                                 *
-*                        ---------                                          *
-*                                                                           *
-*    Function rule : To extract from a resource file all the informations   *
-*                    concerning the device name                             *
-*                                                                           *
-*    Argin : - A pointer to a buffer where is stored a line of the resource *
-*              file (The first line with the "device" word in it )          *
-*	     - The pointer to the FILE structure of the resource file       *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-****************************************************************************/
-
-
+/**
+ * To extract from a resource file all the informations concerning the device name
+ *
+ * @param line1		A pointer to a buffer where is stored a line of the resource
+ *              	file (The first line with the "device" word in it )
+ * @param in
+ * @param p_line
+ * @param tmp_devdef
+ * @param p_error
+ *
+ * @return	DS_OK or DS_NOTOK
+ */
 static long name_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_devdef,long *p_error)
 {
 	char base[80];
@@ -727,7 +707,7 @@ static long name_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_devd
 	if ((ptr = (char *)malloc(k + 1)) == NULL)
 	{
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(ptr,line1);
 	if (line1[k - 1] == '\\')
@@ -774,7 +754,7 @@ static long name_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_devd
 		if ((ptr = (char *)realloc(ptr,strlen(ptr) + k + 1)) == NULL)
 		{
 			*p_error = DbErr_ClientMemoryAllocation;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		strcat(ptr,line1);
 		if (line1[k - 1] == '\\' )
@@ -789,33 +769,23 @@ static long name_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_devd
 /* Leave function */
 
 	*tmp_devdef = ptr;
-	return(0);
+	return(DS_OK);
 	 
 }
 
 
 
-
-/****************************************************************************
-*                                                                           *
-*		Code for check_res function                                 *
-*                        ---------                                          *
-*                                                                           *
-*    Function rule : To check that a simple resource definition line is     *
-*		     correct						    *
-*                                                                           *
-*    Argin : - lin : A pointer to the modified resource definition (without *
-*		     space and tab characters)                              *
-*	     - d_num : Number of resource domain known by the db server     *
-*	     - d_list : Name of resource domain known by the db server      *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no errors occurs or -1 if the resource      *
-*    definition is not valid.						    *
-*                                                                           *
-****************************************************************************/
-
+/**
+ * To check that a simple resource definition line is correct						
+ *
+ * @param lin  		A pointer to the modified resource definition (without
+ *		     	space and tab characters)
+ * @param d_num   	Number of resource domain known by the db server
+ * @param d_list   	Name of resource domain known by the db server
+ *
+ * @return    	This function returns DS_OK if no errors occurs or DS_NOTOK if the resource
+ *    		definition is not valid.						
+ */
 static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 {
 	char t_name[80];
@@ -829,7 +799,7 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 	if (temp == NULL)
 	{
 		*p_error = DbErr_BadResSyntax;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	diff = (unsigned int)(temp - lin);
 	strncpy(t_name,lin,diff);
@@ -839,7 +809,7 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 	if (l != 3)
 	{
 		*p_error = DbErr_BadResSyntax;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 /* Get domain name */
@@ -855,7 +825,7 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 	if (l > DOMAIN_NAME_LENGTH - 1)
 	{
 		*p_error = DbErr_DomainDefinition;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 /* Select the right resource table in database */
@@ -871,7 +841,7 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 	if (i == d_num)
 	{
 		*p_error = DbErr_DomainDefinition;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Check that the family, member and resource name field are not blank */
@@ -881,7 +851,7 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 	if (diff == 0)
 	{
 		*p_error = DbErr_BadResSyntax;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strncpy(t_name,tmp,diff);
 	t_name[diff] = '\0';
@@ -889,7 +859,7 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 	if (l > FAMILY_NAME_LENGTH - 1)
 	{
 		*p_error = DbErr_BadResSyntax;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 	tmp = strchr(temp,'/');
@@ -897,7 +867,7 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 	if (diff == 0)
 	{
 		*p_error = DbErr_BadResSyntax;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strncpy(t_name,temp,diff);
 	t_name[diff] = '\0';
@@ -905,14 +875,14 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 	if (l > MEMBER_NAME_LENGTH - 1)
 	{
 		*p_error = DbErr_BadResSyntax;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 	temp = strchr(tmp,':');	
 	if (temp == tmp)
 	{
 		*p_error = DbErr_BadResSyntax;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	diff = (unsigned int)(temp - tmp);
 	strncpy(t_name,tmp,diff);
@@ -921,34 +891,29 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 	if (l > RES_NAME_LENGTH - 1)
 	{
 		*p_error = DbErr_BadResSyntax;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Leave function */
 
-	return(0);
+	return(DS_OK);
 			
 }
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for res_line function                                  *
-*                        --------                                           *
-*                                                                           *
-*    Function rule : To extract from a resource file all the informations   *
-*                    concerning a resource array			    *
-*                                                                           *
-*    Argin : - A pointer to a buffer where is stored a line of the resource *
-*              file (The first line of the resource array definition)       *
-*	     - The pointer to the FILE structure of the resource file       *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-****************************************************************************/
-
-
+/**
+ * To extract from a resource file all the informations concerning a resource array			
+ *
+ * @param line1 	A pointer to a buffer where is stored a line of the resource
+ *              	file (The first line of the resource array definition)
+ * @param in
+ * @param p_line_ptr
+ * @param tmp_resdef
+ * @param p_error
+ *
+ * @return	DS_OK or DS_NOTOK
+ */
 static long res_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_resdef,long *p_error)
 {
 	unsigned int diff;
@@ -967,7 +932,7 @@ static long res_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_resde
 	if (tmp == NULL)
 	{
 		*p_error = DbErr_BadResSyntax;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	diff = (unsigned int)(tmp - line1) + 1;
 	strncpy(base,line1,diff);
@@ -979,7 +944,7 @@ static long res_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_resde
 	if ((ptr = (char *)malloc(k + 1)) == NULL)
 	{
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(ptr,line1);
 	if (line1[k - 1] == '\\')
@@ -1022,7 +987,7 @@ static long res_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_resde
 			{
 				free(ptr);
 				*p_error = DbErr_BadResSyntax;
-				return(-1);
+				return(DS_NOTOK);
 			}
 		}
 
@@ -1067,7 +1032,7 @@ static long res_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_resde
 		{
 			*p_error = DbErr_BadResSyntax;
 			free(ptr);
-			return(-1);
+			return(DS_NOTOK);
 		}
 		line1[j] = '\0';
 		k = strlen(line1);
@@ -1078,7 +1043,7 @@ static long res_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_resde
 		if ((ptr = (char *)realloc(ptr,strlen(ptr) + k + 1)) == NULL)
 		{
 			*p_error = DbErr_ClientMemoryAllocation;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		
 /* Add this new line to the result buffer */
@@ -1097,30 +1062,23 @@ static long res_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_resde
 /* Leave function */
 
 	*tmp_resdef = ptr;
-	return(0);
+	return(DS_OK);
 
 }
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for check_dev function                                 *
-*                        ---------                                          *
-*                                                                           *
-*    Function rule : To check that a simple device definition line is       *
-*		     correct						    *
-*                                                                           *
-*    Argin : - lin : A pointer to the modified resource definition (without *
-*		     space and tab characters)                              *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no errors occurs or -1 if the resource      *
-*    definition is not valid.						    *
-*                                                                           *
-****************************************************************************/
-
+/**
+ * To check that a simple device definition line is correct						
+ *
+ * @param lin 		A pointer to the modified resource definition (without
+ *			space and tab characters)
+ * @param p_err_dev	
+ * @param p_error
+ *
+ * @return    	This function returns DS_OK if no errors occurs or DS_NOTOK if the resource
+ *    		definition is not valid.						
+ */
 static long check_dev(char *lin,long *p_err_dev,long *p_error)
 {
 	char *ptr,*ptr1;
@@ -1134,14 +1092,14 @@ static long check_dev(char *lin,long *p_err_dev,long *p_error)
 	if ((ptr_cp = (char *)malloc(strlen(lin) + 1)) == NULL)
 	{
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 	if ((ptr = (char *)malloc(strlen(lin) + 1)) == NULL)
 	{
 		free(ptr_cp);
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	tmp_ptr = ptr;
 	
@@ -1162,7 +1120,7 @@ static long check_dev(char *lin,long *p_err_dev,long *p_error)
 		free(tmp_ptr);
 		*p_err_dev = cptr;
 		*p_error = DbErr_BadDevSyntax;
-		return(-1);
+		return(DS_NOTOK);
 	}	
 	
 	while((ptr = strtok(NULL,",")) != NULL)
@@ -1177,7 +1135,7 @@ static long check_dev(char *lin,long *p_err_dev,long *p_error)
 			free(tmp_ptr);
 			*p_err_dev = cptr;
 			*p_error = DbErr_BadDevSyntax;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 	
@@ -1186,28 +1144,20 @@ static long check_dev(char *lin,long *p_err_dev,long *p_error)
 
 	free(ptr_cp);
 	free(tmp_ptr);
-	return(0);
+	return(DS_OK);
 			
 }
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for get_error_line function                            *
-*                        --------------                                     *
-*                                                                           *
-*    Function rule : To retrieve line number in input buffer with a faulty  *
-*		     device definition					    *
-*                                                                           *
-*    Argin : - buffer : The input buffer				    *
-*	     - err_dev : The faulty device number in buffer		    *
-*                                                                           *
-*    Argout : - p_line : Pointer for line number                            *
-*                                                                           *
-*                                                                           *
-****************************************************************************/
-
+/**
+ * To retrieve line number in input buffer with a faulty device definition					
+ *
+ * @param buffer 	The input buffer				
+ * @param err_dev	The faulty device number in buffer		
+ * @param p_line 	Pointer for line number
+ *
+ */
 static void get_error_line(const char *buffer,long err_dev,long *p_line)
 {
 	long line_cptr = 0;
@@ -1241,35 +1191,27 @@ static void get_error_line(const char *buffer,long err_dev,long *p_line)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_upddev function code                       	    	    *
-*               ---------                                         	    *
-*                                                                           *
-*    Function rule : To update device list(s) into the database. This call  *
-*		     is used by the db_update facility for the update of any*
-*		     device server device list				    *
-*									    *
-*    Argin : - devdef_nb : Device list number				    *
-*	     - devdef : Device list					    *
-*									    *
-*    Argout : - deferr_nb : Which device definition is the error reason	    *
-*             - p_error : Pointer for the error code in case of problems    *
-*                                                                           *
-*    In case of trouble, the function returns -1 and set the variable       *
-*    pointed to by "p_error". The function also initializes the deferr_nb   *
-*    argout with the device definition  where the error occurs. Otherwise,  *
-*    the function returns 0             				    *
-*                                                                           *
-*****************************************************************************/
-
-
+/**
+ * To update device list(s) into the database. This call is used by the 
+ * db_update facility for the update of any device server device list				
+ *									
+ * @param devdef_nb 	Device list number				
+ * @param devdef 	Device list					
+ *									
+ * @param deferr_nb 	Which device definition is the error reason	
+ * @param p_error 	Pointer for the error code in case of problems
+ *
+ * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ *    		pointed to by "p_error". The function also initializes the deferr_nb
+ *    		argout with the device definition  where the error occurs. Otherwise,
+ *    		the function returns DS_OK             				
+ */
 long db_upddev(long devdef_nb,char **devdef,long *deferr_nb,long *p_error)
 {
 	db_psdev_error *recev;
 	int i,j,k;
 	long error;
-	long exit_code = 0;
+	long exit_code = DS_OK;
 	db_res sent;
 	struct timeval old_tout;
 	CLIENT *local_cl;
@@ -1285,12 +1227,12 @@ long db_upddev(long devdef_nb,char **devdef,long *deferr_nb,long *p_error)
 	if ((devdef_nb == 0) || (devdef == NULL) || (deferr_nb == NULL))
 	{
 		*p_error = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Miscellaneous init. */
 
-	*p_error = 0;
+	*p_error = DS_OK;
 	*deferr_nb = 0;
 		
 #ifdef ALONE
@@ -1302,7 +1244,7 @@ long db_upddev(long devdef_nb,char **devdef,long *deferr_nb,long *p_error)
 		if (cl == NULL)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout_update);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&timeout_update);
@@ -1328,7 +1270,7 @@ long db_upddev(long devdef_nb,char **devdef,long *deferr_nb,long *p_error)
 /* Initialize data sent to server. The db_err long is used to transfer the
    delete resource flag over the network !! */
 
-	sent.db_err = 0;
+	sent.db_err = DS_OK;
 	sent.res_val.arr1_len = devdef_nb;
 	
 	if ((sent.res_val.arr1_val = (char **)calloc(sizeof(char *),devdef_nb)) == NULL)
@@ -1336,7 +1278,7 @@ long db_upddev(long devdef_nb,char **devdef,long *deferr_nb,long *p_error)
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 	for (i = 0;i < devdef_nb;i++)
@@ -1350,7 +1292,7 @@ long db_upddev(long devdef_nb,char **devdef,long *deferr_nb,long *p_error)
 			clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 			clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 			*p_error = DbErr_ClientMemoryAllocation;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		strcpy(sent.res_val.arr1_val[i],devdef[i]);
 	}
@@ -1370,7 +1312,7 @@ long db_upddev(long devdef_nb,char **devdef,long *deferr_nb,long *p_error)
 			to_reconnection((void *)&sent,(void **)&recev,&local_cl,
 					(int)DB_UPDDEV,(long)0,DB_UDP,&error);
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			for (j = 0;j < devdef_nb;j++)
 				free(sent.res_val.arr1_val[j]);
@@ -1378,7 +1320,7 @@ long db_upddev(long devdef_nb,char **devdef,long *deferr_nb,long *p_error)
 			clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 			clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 			*p_error = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -1406,9 +1348,9 @@ long db_upddev(long devdef_nb,char **devdef,long *deferr_nb,long *p_error)
 				clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 				clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 				*p_error = error;
-				return(-1);
+				return(DS_NOTOK);
 			}
-			if ((recev->error_code == 0) || 
+			if ((recev->error_code == DS_OK) || 
 			    (recev->error_code != DbErr_DatabaseNotConnected))
 				break;
 		}
@@ -1416,7 +1358,7 @@ long db_upddev(long devdef_nb,char **devdef,long *deferr_nb,long *p_error)
 
 /* Any problems during database access ? */
 
-	if(recev->error_code != 0)
+	if(recev->error_code != DS_OK)
 	{
 		for (j = 0;j < devdef_nb;j++)
 			free(sent.res_val.arr1_val[j]);
@@ -1425,7 +1367,7 @@ long db_upddev(long devdef_nb,char **devdef,long *deferr_nb,long *p_error)
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*deferr_nb = recev->psdev_err;
 		*p_error = recev->error_code;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 /* Free memory used to send data to server */
@@ -1445,35 +1387,27 @@ long db_upddev(long devdef_nb,char **devdef,long *deferr_nb,long *p_error)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_updres function code                       	    	    *
-*               ---------                                         	    *
-*                                                                           *
-*    Function rule : To update resource(s) into the database. This call     *
-*		     is used by the db_update facility for the update of any*
-*		     resources						    *
-*									    *
-*    Argin : - resdef_nb : Resource number				    *
-*	     - resdef : Resource list					    *
-*									    *
-*    Argout : - deferr_nb : Which device definition is the error reason	    *
-*             - p_error : Pointer for the error code in case of problems    *
-*                                                                           *
-*    In case of trouble, the function returns -1 and set the variable       *
-*    pointed to by "p_error". The function also initializes the deferr_nb   *
-*    argout with the device definition  where the error occurs. Otherwise,  *
-*    the function returns 0             				    *
-*                                                                           *
-*****************************************************************************/
-
-
+/**
+ * To update resource(s) into the database. This call is used by the db_update 
+ * facility for the update of any resources						
+ *									
+ * @param resdef_nb 	Resource number				
+ * @param resdef 	Resource list					
+ *									
+ * @param deferr_nb 	Which device definition is the error reason	
+ * @param p_error 	Pointer for the error code in case of problems
+ *
+ * @return    	In case of trouble, the function returns DS_NOTOK and set the variable
+ *    		pointed to by "p_error". The function also initializes the deferr_nb
+ *    		argout with the device definition  where the error occurs. Otherwise,
+ *    		the function returns DS_OK             				
+ */
 long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 {
 	db_psdev_error *recev;
 	int i,j,k;
 	long error,con_type;
-	long exit_code = 0;
+	long exit_code = DS_OK;
 	db_res sent;
 	struct timeval old_tout;
 	long size,used_tcp;
@@ -1498,12 +1432,12 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 	if ((resdef_nb == 0) || (resdef == NULL) || (deferr_nb == NULL))
 	{
 		*p_error = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Miscellaneous init. */
 
-	*p_error = 0;
+	*p_error = DS_OK;
 	*deferr_nb = 0;
 
 /* Compute size of data sent to server */
@@ -1527,7 +1461,7 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 			if (cl == NULL)
 			{
 				*p_error = DbErr_CannotCreateClientHandle;
-				return(-1);
+				return(DS_NOTOK);
 			}
 			clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout_update);
 			clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&timeout_update);
@@ -1552,7 +1486,7 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 		if (cl_tcp == NULL)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl_tcp,CLSET_TIMEOUT,(char *)&timeout_update);
 		clnt_control(cl_tcp,CLSET_RETRY_TIMEOUT,(char *)&timeout_update);
@@ -1563,14 +1497,14 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 		if (ht == NULL)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}		
 #else /* !vxworks */
 		host_addr = hostGetByName(db_info.conf->server_host);
 		if (host_addr == 0)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 #endif /* !vxworks */
 
@@ -1592,7 +1526,7 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 		if (cl_tcp == NULL)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		
 		clnt_control(cl_tcp,CLSET_TIMEOUT,(char *)&timeout_update);
@@ -1616,7 +1550,7 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 /* Initialize data sent to server. The db_err long is used to transfer the
    delete resource flag over the network !! */
 
-	sent.db_err = 0;
+	sent.db_err = DS_OK;
 	sent.res_val.arr1_len = resdef_nb;
 	
 	if ((sent.res_val.arr1_val = (char **)calloc(sizeof(char *),resdef_nb)) == NULL)
@@ -1629,7 +1563,7 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 			clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		}
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 	for (i = 0;i < resdef_nb;i++)
@@ -1648,7 +1582,7 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 				clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 			}
 			*p_error = DbErr_ClientMemoryAllocation;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		strcpy(sent.res_val.arr1_val[i],resdef[i]);
 	}
@@ -1675,7 +1609,7 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 						(int)DB_UPDRES,(long)0,con_type,&error);
 			}
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			for (j = 0;j < resdef_nb;j++)
 				free(sent.res_val.arr1_val[j]);
@@ -1688,7 +1622,7 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 				clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 			}
 			*p_error = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -1721,9 +1655,9 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 					clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 				}
 				*p_error = error;
-				return(-1);
+				return(DS_NOTOK);
 			}
-			if ((recev->error_code == 0) || 
+			if ((recev->error_code == DS_OK) || 
 			    (recev->error_code != DbErr_DatabaseNotConnected))
 				break;
 		}
@@ -1731,7 +1665,7 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 
 /* Any problems during database access ? */
 
-	if(recev->error_code != 0)
+	if(recev->error_code != DS_OK)
 	{
 		for (j = 0;j < resdef_nb;j++)
 			free(sent.res_val.arr1_val[j]);
@@ -1745,7 +1679,7 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 		}
 		*deferr_nb = recev->psdev_err;
 		*p_error = recev->error_code;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 /* Free memory used to send data to server */
@@ -1769,31 +1703,24 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_secpass function code                           	    *
-*               ----------                                         	    *
-*                                                                           *
-*    Function rule : To retrieve the list of devices  domain  name	    *
-*                                                                           *
-*    Argout : - p_domain_nb : Pointer for domain number			    *
-*	      - ppp_list : Pointer for the domain name list. Memory is      *
-*			   allocated by this function		    	    *
-*             - p_error : Pointer for the error code in case of problems    *
-*                                                                           *
-*    In case of trouble, the function returns -1 and set the variable       *
-*    pointed to by "p_error". Otherwise, the function returns 0             *
-*                                                                           *
-*****************************************************************************/
-
-
+/**
+ * To retrieve the list of devices  domain  name	
+ *
+ * @param p_domain_nb 	Pointer for domain number			
+ * @param ppp_list 	Pointer for the domain name list. Memory is
+ *			allocated by this function		    	
+ * @param p_error 	Pointer for the error code in case of problems
+ *
+ * @return   		In case of trouble, the function returns DS_NOTOK and set the variable
+ *    			pointed to by "p_error". Otherwise, the function returns DS_OK
+ */
 long db_secpass(char **pass,long *p_error)
 {
 	db_res *recev;
 	int i,j;
 	long error;
 	long nb_domain;
-	long exit_code = 0;
+	long exit_code = DS_OK;
 	struct timeval old_tout;
 	CLIENT *local_cl;
 #ifndef _OSK
@@ -1808,12 +1735,12 @@ long db_secpass(char **pass,long *p_error)
 	if (pass == NULL)
 	{
 		*p_error = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Miscellaneous init. */
 
-	*p_error = 0;
+	*p_error = DS_OK;
 			
 #ifdef ALONE
 /* Create RPC connection if it's the first call */
@@ -1824,7 +1751,7 @@ long db_secpass(char **pass,long *p_error)
 		if (cl == NULL)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout_update);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&timeout_update);
@@ -1862,12 +1789,12 @@ long db_secpass(char **pass,long *p_error)
 			to_reconnection((void *)NULL,(void **)&recev,&local_cl,
 					(int)DB_SECPASS,(long)0,DB_UDP,&error);
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 			clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 			*p_error = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -1892,9 +1819,9 @@ long db_secpass(char **pass,long *p_error)
 				clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 				clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 				*p_error = error;
-				return(-1);
+				return(DS_NOTOK);
 			}
-			if ((recev->db_err == 0) || 
+			if ((recev->db_err == DS_OK) || 
 			    (recev->db_err != DbErr_DatabaseNotConnected))
 				break;
 		}
@@ -1902,12 +1829,12 @@ long db_secpass(char **pass,long *p_error)
 
 /* Any problems during database access ? */
 
-	if(recev->db_err != 0)
+	if(recev->db_err != DS_OK)
 	{
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = recev->db_err;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Allocate memory for password and copy it */
@@ -1916,7 +1843,7 @@ long db_secpass(char **pass,long *p_error)
 	{
 
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(*pass,recev->res_val.arr1_val[0]);
 	
@@ -1935,29 +1862,21 @@ long db_secpass(char **pass,long *p_error)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_delete_update function code                	    	    *
-*               ----------------                                      	    *
-*                                                                           *
-*    Function rule : To update resource(s) into the database. This call     *
-*		     is used by the db_update facility for the update of any*
-*		     resources						    *
-*									    *
-*    Argin : - resdef_nb : Resource number				    *
-*	     - resdef : Resource list					    *
-*									    *
-*    Argout : - deferr_nb : Which device definition is the error reason	    *
-*             - p_error : Pointer for the error code in case of problems    *
-*                                                                           *
-*    In case of trouble, the function returns -1 and set the variable       *
-*    pointed to by "p_error". The function also initializes the deferr_nb   *
-*    argout with the device definition  where the error occurs. Otherwise,  *
-*    the function returns 0             				    *
-*                                                                           *
-*****************************************************************************/
-
-
+/**
+ * To update resource(s) into the database. This call is used by the db_update 
+ * facility for the update of any resources						
+ *									
+ * @param resdef_nb 	Resource number				
+ * @param resdef 	Resource list					
+ *									
+ * @param deferr_nb 	Which device definition is the error reason	
+ * @param p_error 	Pointer for the error code in case of problems
+ *
+ * @return    	In case of trouble, the function returns DS_NOTOK and set the variable
+ *    		pointed to by "p_error". The function also initializes the deferr_nb
+ *    		argout with the device definition  where the error occurs. Otherwise,
+ *    		the function returns DS_OK             				
+ */
 long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 		      long devdef_nb,char **devdef,
 		      long resdef_nb,char **resdef,
@@ -1996,12 +1915,12 @@ long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 	{
 		p_error->error = DbErr_BadParameters;
 		p_error->type = DB_GLOBAL_ERROR;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Miscellaneous init. */
 
-	p_error->error = 0;
+	p_error->error = DS_OK;
 	p_error->type = 0;
 	p_error->number = 0;
 
@@ -2032,7 +1951,7 @@ long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 			{
 				p_error->error = DbErr_CannotCreateClientHandle;
 				p_error->type = DB_GLOBAL_ERROR;
-				return(-1);
+				return(DS_NOTOK);
 			}
 			clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout_update);
 			clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&timeout_update);
@@ -2058,7 +1977,7 @@ long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 		{
 			p_error->error = DbErr_CannotCreateClientHandle;
 			p_error->type = DB_GLOBAL_ERROR;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl_tcp,CLSET_TIMEOUT,(char *)&timeout_update);
 		clnt_control(cl_tcp,CLSET_RETRY_TIMEOUT,(char *)&timeout_update);
@@ -2070,7 +1989,7 @@ long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 		{
 			p_error->error = DbErr_CannotCreateClientHandle;
 			p_error->type = DB_GLOBAL_ERROR;
-			return(-1);
+			return(DS_NOTOK);
 		}		
 #else /* !vxworks */
 		host_addr = hostGetByName(db_info.conf->server_host);
@@ -2078,7 +1997,7 @@ long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 		{
 			p_error->error = DbErr_CannotCreateClientHandle;
 			p_error->type = DB_GLOBAL_ERROR;
-			return(-1);
+			return(DS_NOTOK);
 		}
 #endif /* !vxworks */
 
@@ -2101,7 +2020,7 @@ long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 		{
 			p_error->error = DbErr_CannotCreateClientHandle;
 			p_error->type = DB_GLOBAL_ERROR;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		
 		clnt_control(cl_tcp,CLSET_TIMEOUT,(char *)&timeout_update);
@@ -2144,7 +2063,7 @@ long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 			}
 			p_error->error = DbErr_ClientMemoryAllocation;
 			p_error->type = DB_GLOBAL_ERROR;
-			return(-1);
+			return(DS_NOTOK);
 		}
 
 		for (i = 0;i < dev_nb;i++)
@@ -2164,7 +2083,7 @@ long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 				}
 				p_error->error = DbErr_ClientMemoryAllocation;
 				p_error->type = DB_GLOBAL_ERROR;
-				return(-1);
+				return(DS_NOTOK);
 			}
 			strcpy(sent_data[0].arr1_val[i],dev_name_list[i]);
 		}
@@ -2192,7 +2111,7 @@ long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 			}
 			p_error->error = DbErr_ClientMemoryAllocation;
 			p_error->type = DB_GLOBAL_ERROR;
-			return(-1);
+			return(DS_NOTOK);
 		}
 
 		for (i = 0;i < devdef_nb;i++)
@@ -2215,7 +2134,7 @@ long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 				}
 				p_error->error = DbErr_ClientMemoryAllocation;
 				p_error->type = DB_GLOBAL_ERROR;
-				return(-1);
+				return(DS_NOTOK);
 			}
 			strcpy(sent_data[1].arr1_val[i],devdef[i]);
 		}
@@ -2246,7 +2165,7 @@ long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 			}
 			p_error->error = DbErr_ClientMemoryAllocation;
 			p_error->type = DB_GLOBAL_ERROR;
-			return(-1);
+			return(DS_NOTOK);
 		}
 
 		for (i = 0;i < resdef_nb;i++)
@@ -2272,7 +2191,7 @@ long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 				}
 				p_error->error = DbErr_ClientMemoryAllocation;
 				p_error->type = DB_GLOBAL_ERROR;
-				return(-1);
+				return(DS_NOTOK);
 			}
 			strcpy(sent_data[2].arr1_val[i],resdef[i]);
 		}
@@ -2301,7 +2220,7 @@ long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 						(int)DB_DEL_UPDATE,(long)0,con_type,&error);
 			}
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			for (k = 0;k < 3;k++)
 			{
@@ -2318,7 +2237,7 @@ long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 			}
 			p_error->type = DB_GLOBAL_ERROR;
 			p_error->error = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -2355,9 +2274,9 @@ long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 				}
 				p_error->error = error;
 				p_error->type = DB_GLOBAL_ERROR;
-				return(-1);
+				return(DS_NOTOK);
 			}
-			if ((recev->error == 0) || 
+			if ((recev->error == DS_OK) || 
 			    (recev->error != DbErr_DatabaseNotConnected))
 				break;
 		}
@@ -2365,7 +2284,7 @@ long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 
 /* Any problems during database access ? */
 
-	if(recev->error != 0)
+	if(recev->error != DS_OK)
 	{
 		for (k = 0;k < 3;k++)
 		{
@@ -2381,7 +2300,7 @@ long db_delete_update(long dev_nb,char **dev_name_list,long list_type,
 			clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		}
 		*p_error = *recev;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 /* Free memory used to send data to server */

@@ -1,5 +1,5 @@
 static char RcsId[]      =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/svc_api.c,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/svc_api.c,v 1.2 2003-03-18 16:16:27 jkrueger1 Exp $";
 /*+*******************************************************************
 
  File:		svc_api.c
@@ -13,9 +13,9 @@ static char RcsId[]      =
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-03-14 12:22:07 $
+ Date:		$Date: 2003-03-18 16:16:27 $
 
  Copyright (c) 19901997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -62,9 +62,13 @@ static char RcsId[]      =
  */
 
 #ifdef __cplusplus
-extern "C" configuration_flags      config_flags;
-#else
+extern "C" {
+#endif
+
 extern configuration_flags      config_flags;
+
+#ifdef __cplusplus
+};
 #endif
 
 /*
@@ -102,23 +106,18 @@ extern char *dev_error_stack;
 static long read_device_id 	PT_( (long device_id, long *ds_id,
 long *connection_id, long *error) );
 
-/*+**********************************************************************
- Function   :   extern _dev_import_out *rpc_dev_import_4()
-
- Description:   RPC procedure corresponding to dev_import().
-	    :   Registers a device as imported and returns
-		an identification for the device to the client.
-
- Arg(s) In  :   _dev_import_in *dev_import_in - input data structure.
-		struct svc_req *rqstp         - RPC request structure.
-
- Arg(s) Out :  	none
-
- Return(s)  :   _dev_import_out : contains an identification for
-		the device, the status of the function (0 or -1) and
-		an appropriate error number if the function fails.
-***********************************************************************-*/
-
+/**
+ * RPC procedure corresponding to dev_import().
+ *
+ * Registers a device as imported and returns
+ * an identification for the device to the client.
+ *
+ * @param dev_import_in 	input data structure.
+ * @param rqstp         	RPC request structure.
+ *
+ * @return  	an identification for the device, the status of the function (DS_OK or DS_NOTOK) and
+ *		an appropriate error number if the function fails.
+ */
 _dev_import_out * _DLLFunc rpc_dev_import_4 (_dev_import_in *dev_import_in,
 					     struct svc_req *rqstp)
 {
@@ -134,8 +133,8 @@ _dev_import_out * _DLLFunc rpc_dev_import_4 (_dev_import_in *dev_import_in,
 
 	device_id = 0;
 	dev_import_out.ds_id  = 0;
-	dev_import_out.status = 0;
-	dev_import_out.error  = 0;
+	dev_import_out.status = DS_OK;
+	dev_import_out.error  = DS_OK;
 	sprintf (dev_import_out.server_name, "%s", config_flags.server_name);
 
 	dev_import_out.var_argument.length   = 0;
@@ -223,21 +222,16 @@ _dev_import_out * _DLLFunc rpc_dev_import_4 (_dev_import_in *dev_import_in,
 }
 
 
-/*+**********************************************************************
- Function   :   extern _dev_free_out *rpc_dev_free_4()
-
- Description:   RPC procedure corresponding to dev_free().
-	    :   Unregisters an imported device. 
-
- Arg(s) In  :   _dev_free_in *dev_free_in - input data structure.
-
- Arg(s) Out :  	none
-
- Return(s)  :   _dev_free_out : contains 
-		the status of the function (0 or -1) and
-		an appropriate error number if the function fails.
-***********************************************************************-*/
-
+/**
+ * RPC procedure corresponding to dev_free().
+ *
+ * Unregisters an imported device. 
+ *
+ * @param dev_free_in  	input data structure.
+ *
+ * @return  	the status of the function (DS_OK or DS_NOTOK) and
+ *		an appropriate error number if the function fails.
+ */
 _dev_free_out * _DLLFunc rpc_dev_free_4 (_dev_free_in *dev_free_in)
 {
 	static _dev_free_out dev_free_out;
@@ -252,8 +246,8 @@ _dev_free_out * _DLLFunc rpc_dev_free_4 (_dev_free_in *dev_free_in)
 	    dev_free_in->ds_id);
 #endif /* EBUG */
 
-	dev_free_out.status = 0;
-	dev_free_out.error  = 0;
+	dev_free_out.status = DS_OK;
+	dev_free_out.error  = DS_OK;
 
 	dev_free_out.var_argument.length   = 0;
 	dev_free_out.var_argument.sequence = NULL;
@@ -297,26 +291,18 @@ _dev_free_out * _DLLFunc rpc_dev_free_4 (_dev_free_in *dev_free_in)
 	return (&dev_free_out);
 }
 
-
-/*+**********************************************************************
- Function   :   extern _client_data *rpc_dev_putget_4()
-
- Description:   RPC procedure corresponding to dev_putget().
-	    :   Executes commands on devices by calling
-		the command handler. 
-
- Arg(s) In  :   _server_data *server_data - contains information
-		about device identification, the command, and
-		the input and output arguments for the command.
-
- Arg(s) Out :  	none
-
- Return(s)  :   _client_data : contains the output arguments of
-		the executed command,
-		the status of the function (0 or -1) and
-		an appropriate error number if the function fails.
-***********************************************************************-*/
-
+/**
+ * RPC procedure corresponding to dev_putget().
+ *   
+ * Executes commands on devices by calling the command handler. 
+ * 
+ * @param server_data 	information about device identification, the command, and
+ *			the input and output arguments for the command.
+ *
+ * @return  	the output arguments of the executed command,
+ *		the status of the function (DS_OK or DS_NOTOK) and
+ *		an appropriate error number if the function fails.
+ */
 _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
 {
 	static _client_data	client_data;
@@ -477,7 +463,7 @@ _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
  *  is undefined, initialise argout to NULL before serialising.
  */
 
-	if (client_data.status == -1)
+	if (client_data.status == DS_NOTOK)
 	{
 		free (client_data.argout);
 		client_data.argout = NULL;
@@ -498,25 +484,18 @@ _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
 }
 
 
-/*+**********************************************************************
- Function   :   extern _client_data *rpc_dev_put_4()
-
- Description:   RPC procedure corresponding to dev_put().
-	    :   Executes commands on devices by calling
-		the command handler. 
-	    :   Returns no output arguments.
-
- Arg(s) In  :   _server_data *server_data - contains information
-		about device identification, the command, and
-		the input arguments for the command.
-
- Arg(s) Out :  	none
-
- Return(s)  :   _client_data : contains 
-		the status of the function (0 or -1) and
-		an appropriate error number if the function fails.
-***********************************************************************-*/
-
+/**
+ * RPC procedure corresponding to dev_put().
+ *
+ * Executes commands on devices by calling the command handler. 
+ *
+ * server_data - contains information
+ *		about device identification, the command, and
+ *		the input arguments for the command.
+ *
+ * @return(s)  	the status of the function (DS_OK or DS_NOTOK) and
+ *		an appropriate error number if the function fails.
+ */
 _client_data * _DLLFunc rpc_dev_put_4 (_server_data *server_data)
 {
 	static _client_data	client_data;
@@ -641,34 +620,27 @@ _client_data * _DLLFunc rpc_dev_put_4 (_server_data *server_data)
 }
 
 
-
-
-/*+**********************************************************************
- Function   :   extern _client_raw_data *rpc_dev_putget_raw_4()
-
- Description:   RPC procedure corresponding to dev_putget_raw().
-	    :   Executes commands on devices by calling
-		the command handler. 
-		The result is returned in a raw opaque format.
-
- Arg(s) In  :   _server_data *server_data - Contains information
-		about device identification, the command, and
-		the input and output arguments for the command.
-
- Arg(s) Out :  	none
-
- Return(s)  :   _client_raw_data :  Contains the output arguments of
-		the executed command and the length, they represent
-		in XDR format, in bytes.
-		Two output argument types are specified. One is used
-		to serialise the data on the server side and the other
-		to deserialise the data in ras opaque format on the
-		client side.
-
-		The status of the function (0 or -1) and
-		an appropriate error number if the function fails.
-***********************************************************************-*/
-
+/**
+ * RPC procedure corresponding to dev_putget_raw().
+ *
+ * Executes commands on devices by calling the command handler. 
+ *
+ * The result is returned in a raw opaque format.
+ *
+ * @param server_data 	information about device identification, the command, and
+ * 			the input and output arguments for the command.
+ * 
+ * @return  	the executed command and the length, they represent
+ *		in XDR format, in bytes.
+ *
+ *		Two output argument types are specified. One is used
+ *		to serialise the data on the server side and the other
+ *		to deserialise the data in ras opaque format on the
+ *		client side.
+ *
+ *		The status of the function (DS_OK or DS_NOTOK) and
+ *		an appropriate error number if the function fails.
+ */
 _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
 {
 	static _client_raw_data	client_data;
@@ -872,35 +844,30 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
 
 
 
-/*+**********************************************************************
- Function   :   extern _client_data *rpc_dev_put_asyn_4()
-
- Description:   The first part of the aynchronous call.
-		Will do the administration part of the call.
-		Ony the execution of the command is excluded
-		and handled in the second part of the call
-		(rpc_dev_put_asyn_cmd) after the reponse
-		is send back to the client.
-
-	    :	Errors are returned from this function to
-		the client. 
-
- Arg(s) In  :   _server_data *server_data - contains information
-		about device identification, the command, and
-		the input arguments for the command.
-
- Arg(s) Out :  	none
-
- Return(s)  :   none 
-***********************************************************************-*/
-
+/**
+ * The first part of the aynchronous call.
+ *
+ * Will do the administration part of the call.
+ * Only the execution of the command is excluded
+ * and handled in the second part of the call
+ * (rpc_dev_put_asyn_cmd) after the reponse
+ * is send back to the client.
+ *
+ * Errors are returned from this function to the client. 
+ *
+ * @param server_data 	information about device identification, the command, and
+ *			the input arguments for the command.
+ *
+ * @return(s)  	the status of the function (DS_OK or DS_NOTOK) and
+ *		an appropriate error number if the function fails.
+ */
 _client_data * _DLLFunc rpc_dev_put_asyn_4 (_server_data *server_data)
 {
 	static _client_data	client_data;
 	long			ds_id;
 	long 		connection_id;
 
-	asyn_error = 0;
+	asyn_error = DS_OK;
 
 #ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
@@ -918,7 +885,7 @@ _client_data * _DLLFunc rpc_dev_put_asyn_4 (_server_data *server_data)
 	client_data.argout_type = D_VOID_TYPE;
 	client_data.argout      = NULL;
 	client_data.status      = DS_OK;
-	client_data.error       = 0;
+	client_data.error       = DS_OK;
 
 	/*
     * Split up the device identification.
@@ -951,25 +918,16 @@ _client_data * _DLLFunc rpc_dev_put_asyn_4 (_server_data *server_data)
 	return (&client_data);
 }
 
-/*+**********************************************************************
- Function   :   extern void rpc_dev_put_asyn_cmd()
-
- Description:   The second part of the asynchronous call.
-		The command will be executed without 
-		any return values. 
-	    :   Sends the RPC repley before executing
-		this function.
-
- Arg(s) In  :   _server_data *server_data - contains information
-		about device identification, the command, and
-		the input arguments for the command.
-
- Arg(s) Out :  	none
-
- Return(s)  :   none 
-***********************************************************************-*/
-
-
+/**
+ * The second part of the asynchronous call.
+ *
+ * The command will be executed without any return values. 
+ *
+ * Sends the RPC reply before executing this function.
+ *
+ * @param server_data 	information about device identification, the 
+ *			command, and the input arguments for the command.
+ */
 void _DLLFunc rpc_dev_put_asyn_cmd (_server_data *server_data)
 {
 	static _client_data	client_data;
@@ -988,7 +946,7 @@ void _DLLFunc rpc_dev_put_asyn_cmd (_server_data *server_data)
 	long 		connection_id;
 	long			error;
 
-	error = 0;
+	error = DS_OK;
 
 #ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
@@ -1003,7 +961,7 @@ void _DLLFunc rpc_dev_put_asyn_cmd (_server_data *server_data)
     * the command.
     */
 
-	if ( asyn_error != 0 )
+	if ( asyn_error != DS_OK )
 	{
 		return;
 	}
@@ -1069,23 +1027,19 @@ void _DLLFunc rpc_dev_put_asyn_cmd (_server_data *server_data)
 
 
 
-/*+**********************************************************************
- Function   :   extern long dev_export()
-
- Description:	Function for exporting a device onto the network	
-	    :   Replaces the DevMethodDevExport which was originally
-	    :	implemented in the DevServerClass
-
- Arg(s) In  :   char *name   - name of the device.
-	    :	DevServer ds - pointer to the object.
-
- Arg(s) Out :	long *error  - Will contain an appropriate error
-			       code if the corresponding call
-			       returns a non-zero value.
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * Function for exporting a device onto the network	
+ *
+ * Replaces the DevMethodDevExport which was originally implemented in the 
+ * DevServerClass
+ *
+ * @param name  name of the device.
+ * @param ds 	pointer to the object.
+ * @param error Will contain an appropriate error code if the corresponding 
+ *		call returns a non-zero value.
+ *
+ * @return  DS_OK or DS_NOTOK
+ */
 #ifndef __cplusplus
 /*
  * OIC version
@@ -1121,7 +1075,7 @@ long dev_export (char *name, Device *ptr_dev, long *error)
 #endif
 
 
-   *error = 0;
+   *error = DS_OK;
 
 #ifdef EBUG
    dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
@@ -1294,8 +1248,8 @@ free_found:;
 #endif /* EBUG */
 
 
-      if ( db_dev_export (&devinfo,1,error) < 0 )
-	return (-1);
+      if ( db_dev_export (&devinfo,1,error) < DS_OK )
+	return (DS_NOTOK);
    }
 
 
@@ -1351,26 +1305,20 @@ free_found:;
 }
 
 
-/*+**********************************************************************
- Function   :   extern long ds__destroy()
-
- Description:   Searches and executes the destroy method 
-		for the object.
-		If no method is implemented in the object
-		class or its superclasses, the simple 
-		destroy method of the general device server
-		class will be executed.  The object pointer 
-		will be freed and set to NULL !!
-
- Arg(s) In  :   DevServer ds - pionter to the object structure.
-
- Arg(s) Out :	long *error - Will contain an appropriate error
-			      code if the corresponding call
-			      returns a non-zero value.
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * Searches and executes the destroy method for the object.
+ *
+ * If no method is implemented in the object class or its superclasses, the simple 
+ * destroy method of the general device server class will be executed.  
+ *
+ * The object pointer will be freed and set to NULL !!
+ *
+ *@param ds  	pointer to the object structure.
+ *@param error 	Will contain an appropriate error
+ *		code if the corresponding call returns a non-zero value.
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 long ds__destroy (void *ptr_ds, long *error)
 {
 	short	i;
@@ -1454,30 +1402,25 @@ long ds__destroy (void *ptr_ds, long *error)
 	return (DS_OK);
 }
 
-/*+**********************************************************************
- Function   :	_dev_query_out *rpc_dev_cmd_query_4()
-
- Description:   RPC procedure corresponding to dev_cmd_query().
-            :	Retrives all available information from
-		the command list of the specified device.
-
-	    :	Information about one command is stored in a
-		_dev_cmd_info structure defined in API_xdr.h.
-		A sequence of these stuctures will be returned
-		as well as the name of the device class.
-		The _dev_query_out type is defined in API_xdr.h.
-
- Arg(s) In  :	dev_query_in - input structure with the
-			       identification of the device.
-
- Arg(s) Out :	none
-
- Return(s)  :	*dev_query_out - pointer to structure containig
-				 a sequence of _dev_cmd_info structures,
-				 the name of the device class,
-				 an error and a status flag.
-***********************************************************************-*/
-
+/**
+ * RPC procedure corresponding to dev_cmd_query().
+ *
+ * Retrieves all available information from the command list of the 
+ * specified device.
+ *
+ * Information about one command is stored in a _dev_cmd_info structure 
+ * defined in API_xdr.h.
+ *
+ * A sequence of these stuctures will be returned as well as the name of 
+ * the device class.
+ *
+ * The _dev_query_out type is defined in API_xdr.h.
+ *
+ * @param dev_query_in 	input structure with the identification of the device.
+ *
+ * @returni	pointer to structure containig a sequence of _dev_cmd_info 
+ *		structures, the name of the device class, an error and a status flag.
+ */
 _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 {
 static _dev_query_out	dev_query_out = { 0, NULL, "", 0, 0, { 0, NULL}};
@@ -1507,8 +1450,8 @@ dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
 "\nrpc_dev_cmd_query_4() : entering routine\n");
 #endif /* EBUG */
 
-dev_query_out.error  = 0;
-dev_query_out.status = 0;
+dev_query_out.error  = DS_OK;
+dev_query_out.status = DS_OK;
 
 dev_query_out.var_argument.length   = 0;
 dev_query_out.var_argument.sequence = NULL;
@@ -1572,7 +1515,7 @@ dev_query_out.sequence = (_dev_cmd_info *) malloc
 if ( dev_query_out.sequence == NULL )
 {
 	dev_query_out.error  = DevErr_InsufficientMemory;
-	dev_query_out.status = -1;
+	dev_query_out.status = DS_NOTOK;
 	return (&dev_query_out);
 }
 
@@ -1602,7 +1545,7 @@ if (ret != DS_OK)
 {
 	free(dev_query_out.sequence);
 	dev_query_out.error  = error;
-	dev_query_out.status = -1;
+	dev_query_out.status = DS_NOTOK;
 	return (&dev_query_out);
 }
 
@@ -1648,26 +1591,17 @@ return (&dev_query_out);
 }
 
 
-/*+**********************************************************************
- Function   :	static long read_device_id ()
-
- Description:	Split up the device identification into its 
-		information fields.
-		ds_id -> Place in the array of exported devices.
-		connection_id -> Place in the connections (or
-		client access) array of an exported device.
-		export_count-> A counter to avoid access from
-		ancient clients of destroyed devices. 
-
- Arg(s) In  :	device_id   - client handle to access the device.
-
- Arg(s) Out :   long *ds_id         - access to exported device.
-		long *connection_id - access to device connections.
-		long *error - pointer to error code, in case routine fails.
-
- Return(s)  :	DS_OK / DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * Split up the device identification into its information fields.
+ *
+ * @param device_id   	client handle to access the device.
+ * @param ds_id 	access to exported device. Place in the array of exported devices.
+ * @param connection_id access to device connections. Place in the connections (or 
+ *			client access) array of an exported device.
+ * @param		long *error - pointer to error code, in case routine fails.
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 static long read_device_id (long device_id, long *ds_id, long *connection_id, long *error)
 {
 	long 	export_counter;
@@ -1677,7 +1611,7 @@ static long read_device_id (long device_id, long *ds_id, long *connection_id, lo
 	    "\nread_device_id() : entering routine\n");
 #endif /* EBUG */
 
-	*error = 0;
+	*error = DS_OK;
 
 	/*
     	* Split up the device identification
@@ -1714,28 +1648,21 @@ static long read_device_id (long device_id, long *ds_id, long *connection_id, lo
 
 
 
-/*+**********************************************************************
- Function   :   extern _client_data *rpc_dev_putget_local()
-
- Description:   RPC procedure corresponding to dev_putget_local().
-	    :   Executes commands on devices by calling
-		the command handler. 
-		The normal entry point rpc_dev_putget_4() cannot
-		be used, because reinitialising the static return
-		structure client_data would cause pointer clashes.
-
- Arg(s) In  :   _server_data *server_data - contains information
-		about device identification, the command, and
-		the input and output arguments for the command.
-
- Arg(s) Out :  	none
-
- Return(s)  :   _client_data : contains the output arguments of
-		the executed command,
-		the status of the function (0 or -1) and
-		an appropriate error number if the function fails.
-***********************************************************************-*/
-
+/**
+ * RPC procedure corresponding to dev_putget_local().
+ *
+ * Executes commands on devices by calling the command handler. 
+ *
+ * The normal entry point rpc_dev_putget_4() cannot be used, because reinitialising 
+ * the static return structure client_data would cause pointer clashes.
+ *
+ * @param server_data 	information about device identification, the command, and
+ *			the input and output arguments for the command.
+ *
+ * @return   	the output arguments of the executed command,
+ *		the status of the function (DS_OK or DS_NOTOK) and
+ *		an appropriate error number if the function fails.
+ */
 _client_data * _DLLFunc rpc_dev_putget_local (_server_data *server_data)
 {
 	_client_data	*client_data;
@@ -1887,7 +1814,7 @@ _client_data * _DLLFunc rpc_dev_putget_local (_server_data *server_data)
  *  is undefined, initialise argout to NULL before serialising.
  */
 
-	if (client_data->status == -1)
+	if (client_data->status == DS_NOTOK)
 	{
 		free (client_data->argout);
 		client_data->argout = NULL;
@@ -1896,23 +1823,17 @@ _client_data * _DLLFunc rpc_dev_putget_local (_server_data *server_data)
 	return (client_data);
 }
 
-/*+**********************************************************************
- Function   :   extern _dev_import_out *rpc_dev_ping_4()
-
- Description:   RPC procedure corresponding to dev_ping().
-	    :   Checks to see if the requested device is served
-		by this server.
-
- Arg(s) In  :   _dev_import_in *dev_import_in - input data structure.
-		struct svc_req *rqstp         - RPC request structure.
-
- Arg(s) Out :  	none
-
- Return(s)  :   _dev_import_out : contains an identification for
-		the device, the status of the function (0 or -1) and
-		an appropriate error number if the function fails.
-***********************************************************************-*/
-
+/**
+ * RPC procedure corresponding to dev_ping().
+ *
+ * Checks to see if the requested device is served by this server.
+ *
+ * @param dev_import_in 	input data structure.
+ * @param rqstp         	RPC request structure.
+ *
+ * @return  	an identification for the device, the status of the function 
+ *		(DS_OK or DS_NOTOK) and an appropriate error number if the call fails.
+ */
 _dev_import_out * _DLLFunc rpc_dev_ping_4 (_dev_import_in *dev_import_in,
 					   struct svc_req *rqstp)
 {
@@ -1925,8 +1846,8 @@ _dev_import_out * _DLLFunc rpc_dev_ping_4 (_dev_import_in *dev_import_in,
 #endif /* EBUG */
 
 	dev_import_out.ds_id  = 0;
-	dev_import_out.status = 0;
-	dev_import_out.error  = 0;
+	dev_import_out.status = DS_OK;
+	dev_import_out.error  = DS_OK;
 	sprintf (dev_import_out.server_name, "%s", config_flags.server_name);
 
 	dev_import_out.var_argument.length   = 0;

@@ -1,5 +1,5 @@
 static char RcsId[] = 
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/util_api.c,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/util_api.c,v 1.2 2003-03-18 16:16:33 jkrueger1 Exp $";
 
 /*+*******************************************************************
 
@@ -17,9 +17,9 @@ static char RcsId[] =
 
  Original   :	April 1993
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-03-14 12:22:07 $
+ Date:		$Date: 2003-03-18 16:16:33 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -109,28 +109,22 @@ static db_resource   res_tab [] = {
 };
 
 
-/*+**********************************************************************
- Function   :	extern long dev_putget_raw()
-
- Description:	dev_putget_raw execute commands on a device
-		by passing input data and retrieving 
-		output data in a raw opaque format.
-
- Arg(s) In  :	devserver ds       - handle to access the device.
-	    :   long cmd           - command to be executed.
-            :   DevArgument argin  - pointer to input arguments.
-            :   DevType argin_type - data type of input arguments.
-
- Arg(s) Out :	DevOpaque argout    - pointer to DevOpaque structure.
-            :   DevType argout_type - data type of output arguments,
-				      as specified for the command.
-            :	long *error         - Will contain an appropriate error 
-				      code if the corresponding call 
-				      returns a non-zero value.
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * execute commands on a device by passing input data and retrieving 
+ * output data in a raw opaque format.
+ *
+ * @param ds 		handle to access the device.
+ * @param cmd   	command to be executed.
+ * @param argin 	pointer to input arguments.
+ * @param argin_type 	data type of input arguments.
+ *
+ * @param argout    	pointer to DevOpaque structure (contains the result).
+ * @param argout_type 	data type of output arguments, as specified for the command.
+ * @param error         Will contain an appropriate error code if the corresponding call 
+ *			returns a non-zero value.
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 long _DLLFunc dev_putget_raw (devserver ds, long cmd, DevArgument argin,
 			      DevType argin_type, DevOpaque *argout,
 			      DevType argout_type, long *error)
@@ -141,7 +135,7 @@ long _DLLFunc dev_putget_raw (devserver ds, long cmd, DevArgument argin,
 	long			client_id = 0;
 	long 			status;
 
-	*error = 0;
+	*error = DS_OK;
 #ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API,
 	    "\ndev_putget_raw() : entering routine\n");
@@ -172,7 +166,7 @@ long _DLLFunc dev_putget_raw (devserver ds, long cmd, DevArgument argin,
 	if (  argin_type < 0 || argout_type < 0)
 	{
 		*error = DevErr_DevArgTypeNotRecognised;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 	/*
@@ -280,28 +274,23 @@ long _DLLFunc dev_putget_raw (devserver ds, long cmd, DevArgument argin,
 }
 
 
-/*+**********************************************************************
- Function   :	extern long dev_put_asyn()
-
- Description:	application interface to execute commands on a device
-		with only the possibility to pass input data. 
-		The function will return before the command
-		is executed. No errors or status of the command
-		will be returned.
-
- Arg(s) In  :	devserver ds       - handle to access the device.
-	    :   long cmd           - command to be executed.
-            :   DevArgument argin  - pointer to input arguments.
-            :   DevType argin_type - data type of input arguments.
-
- Arg(s) Out :	long *error        - Will contain an appropriate error 
-				     code if the corresponding call 
-				     returns a non-zero value.
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
-
-
+/**
+ * application interface to execute commands on a device
+ * with only the possibility to pass input data. 
+ * The function will return before the command
+ * is executed. No errors or status of the command
+ * will be returned.
+ * 
+ * @param ds       	handle to access the device.
+ * @param cmd           command to be executed.
+ * @param argin  	pointer to input arguments.
+ * @param argin_type 	data type of input arguments.
+ * @param error         Will contain an appropriate error 
+ * 			code if the corresponding call 
+ * 			returns a non-zero value.
+ * 
+ * @return	DS_OK or DS_NOTOK
+ */ 
 long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
 			    DevType argin_type, long *error )
 {
@@ -310,7 +299,7 @@ long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
 	enum clnt_stat		clnt_stat;
 	long			client_id = 0;
 
-	*error = 0;
+	*error = DS_OK;
 
 #ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API,
@@ -420,34 +409,31 @@ long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
 	*error = client_data.error;
 	return (client_data.status);
 }
+
 
-
-/*+**********************************************************************
- Function   : 	extern long dev_cmd_query()
-
- Description:	Returns a sequence of structures containig all
-		available commands, their names, their input and
-		output data types, and type describtions for one
-		device.
-            :	Commands and data types are read from the command
-		list in the device server by calling 
-		RPC_DEV_CMD_QUERY.
-            :	Command names are read from the command name list,
-		defined in DevCmds.h.
-            :	Data type describtions have to be specified as 
-		CLASS resources as:
-            :		CLASS/class_name/cmd_name/IN_TYPE:
-            :		CLASS/class_name/cmd_name/OUT_TYPE:
-
- Arg(s) In  :	ds - client handle for the associated device.
-
- Arg(s) Out :	varcmdarr - sequence of DevCmdInfo structures.
-		error     - Will contain an appropriate error code if the
-			    corresponding call returns a non-zero value.
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * Returns a sequence of structures containig all
+ * available commands, their names, their input and
+ * output data types, and type describtions for one
+ * device.
+ *
+ * Commands and data types are read from the command
+ * list in the device server by calling 
+ * RPC_DEV_CMD_QUERY.
+ *
+ * Command names are read from the command name list, defined in DevCmds.h. 
+ *
+ * Data type describtions have to be specified as CLASS resources as:
+ * 	- CLASS/class_name/cmd_name/IN_TYPE:
+ * 	- CLASS/class_name/cmd_name/OUT_TYPE:
+ *
+ * @param ds 		client handle for the associated device.
+ * @param varcmdarr 	sequence of DevCmdInfo structures.
+ * @param error     	Will contain an appropriate error code if the
+ *			corresponding call returns a non-zero value.
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error)
 {
 	_dev_query_in	dev_query_in;
@@ -464,7 +450,7 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 	static char	**cmd_names=NULL;
 	int		n_cmd_names;
 
-	*error = 0;
+	*error = DS_OK;
 #ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API,
 	    "\ndev_cmd_query() : entering routine\n");
@@ -569,7 +555,7 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 	if ( varcmdarr->sequence == NULL )
 	{
 		*error  = DevErr_InsufficientMemory;
-		return (-1);
+		return (DS_NOTOK);
 	}
 	memset ((char *)varcmdarr->sequence, 0,
 	    (varcmdarr->length * sizeof (DevCmdInfo)));
@@ -693,7 +679,7 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 
 			if (db_getresource (res_path, res_tab, res_tab_size, error) < 0)
 			{
-				return (-1);
+				return (DS_NOTOK);
 			}
 		}
 /*
@@ -720,29 +706,24 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 	*error = dev_query_out.error;
 	return (dev_query_out.status);
 }
+
 
-
-/*+**********************************************************************
- Function   :	static long get_cmd_string()
-
- Description:   Read the command name as a string from the
-		resource database.
-		The rsource name is:
-		CMD/team_no/server_no/cmd_ident:
-		DS_WARNING is returned, if the function was
-		executed correctly, but no command name
-		string was found in the database.
-
- Arg(s) In  :   long cmd      - error number
-
- Arg(s) Out :   char *cmd_str - command name as a string.
-		long *error   - Will contain an appropriate error
-			        code if the corresponding call
-		    	        returns a non-zero value.
-
- Return(s)  :   DS_OK or DS_NOTOK or DS_WARNING
-***********************************************************************-*/
-
+/**
+ * Read the command name as a string from the resource database.
+ * The resource name is:
+ * CMD/team_no/server_no/cmd_ident
+ * 
+ * @param cmd       	error number
+ * @param cmd_str  	command name as a string.
+ * @param error   	Will contain an appropriate error
+ * 			code if the corresponding call
+ * 			returns a non-zero value.
+ * 
+ * @return	DS_OK or DS_NOTOK or DS_WARNING
+ * 		DS_WARNING is returned, if the function was
+ * 		executed correctly, but no command name
+ * 		string was found in the database.
+ */ 
 static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
 {
 	char		res_path[LONG_NAME_SIZE];
@@ -759,7 +740,7 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
 	    "\nget_cmd_string() : entering routine\n");
 #endif /* EBUG */
 
-	*error = 0;
+	*error = DS_OK;
 
 	/*
  * Decode the command nuber into the fields:
@@ -832,39 +813,35 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
 	free (ret_str);
 	return (DS_OK);
 }
+
 
-
-/*+**********************************************************************
- Function   :	extern long dev_inform()
-
- Description:	Returns to the user a structure of device
-		information for every specified device client handle.
-            :   The information structure contains:
-		- the name of the device,
-		- the class name,
-		- the device type,
-		- the device server name,
-		- the host name of the device server
- 
- Arg(s) In  :	devserver *clnt_handles - pointer to a table of client handles.
-	    :   long num_devices        - number of devices.
-
- Arg(s) Out :	DevInfo **dev_info      - pinter to information structures.
-            :	error - Will contain an appropriate error code if the
-		        corresponding call returns a non-zero value.
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * Returns to the user a structure of device
+ * information for every specified device client handle.
+ * The information structure contains:
+ * 	- the name of the device,
+ *	- the class name,
+ *	- the device type,
+ *	- the device server name,
+ *	- the host name of the device server
+ * 
+ * @param clnt_handles 	pointer to a table of client handles.
+ * @param num_devices   number of devices.
+ * @param dev_info    	pointer to information structures returned.
+ * @param 		Will contain an appropriate error code if the
+ * 		        corresponding call returns a non-zero value.
+ * 
+ * @return DS_OK or DS_NOTOK
+ */
 long _DLLFunc dev_inform (devserver *clnt_handles, long num_devices,
-			  DevInfo * *dev_info, long *error)
+			  DevInfo **dev_info, long *error)
 {
 	devserver	*clnt_ptr;
 	DevInfo		*info_ptr;
 	long 		i;
 
 
-	*error = 0;
+	*error = DS_OK;
 
 #ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API,
@@ -925,32 +902,25 @@ long _DLLFunc dev_inform (devserver *clnt_handles, long num_devices,
 	return (DS_OK);
 }
 
-/*+**********************************************************************
- Function   :	long dev_rpc_timeout()
-
- Description:	Sets or reads the timeout for an UDP connection to
-		a server.
-		A request to set the timeout has to be asked
-		with CLSET_TIMEOUT. The timeout will be set
-		without any retry.
-		A request to read the timeout has to be asked with
-		CLGET_TIMEOUT.
-
- Arg(s) In  :	devserver ds           - handle to device.
-	    :	long request	       - indicates whether the timeout
-					 should be set or only read.
-	    :	struct timeval dev_timeout - timeout structure.
-
- Arg(s) Out :	error  - Will contain an appropriate error code if the
-		         corresponding call returns a non-zero value.
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * Sets or reads the timeout for an UDP connection to a server.
+ * 
+ * @param ds         	handle to device.
+ * @param request	indicates whether the timeout should be set or only read.
+ * 			A request to set the timeout has to be asked  with CLSET_TIMEOUT. 
+ * 			The timeout will be set without any retry.
+ *
+ * 			A request to read the timeout has to be asked with CLGET_TIMEOUT.
+ * @param dev_timeout 	timeout structure.
+ * @param error   	Will contain an appropriate error code if the
+ * 			corresponding call returns a non-zero value.
+ * 
+ * @return	DS_OK or DS_NOTOK
+ */ 
 long _DLLFunc dev_rpc_timeout (devserver ds, long request, 
 			       struct timeval *dev_timeout, long *error)
 {
-	*error = 0;
+	*error = DS_OK;
 
 	if (ds == NULL)
 	{
@@ -1035,27 +1005,25 @@ long _DLLFunc dev_rpc_timeout (devserver ds, long request,
 
 	return (DS_OK);
 }
-
+
 
 #if defined(_NT)
+/**
+ * walks the heap until allocated block pointed to
+ * by pointer id found and checks if heap is still OK.
+ * 
+ * @param pointer    	pointer to allocated block on heap.
+ * 
+ * @param error  	Will contain an appropriate error code if the
+ * 			corresponding call returns a zero value.
+ * 
+ * @return	size of allocated block on heap
+ */ 
 #if defined (__STDC__)
 size_t _DLLFunc msize(void* pointer, int* error) 
 #else
 /**/
 size_t msize(pointer, error) 
-/*+**********************************************************************
- Function   :	size_t msize()
-
- Description:	walks the heap until allocated block pointed to
-      by pointer id found and checks if heap is still OK.
-
- Arg(s) In  :	void* pointer    - pointer to allocated block on heap.
-
- Arg(s) Out :	error  - Will contain an appropriate error code if the
-		         corresponding call returns a zero value.
-
- Return(s)  :	size of allocated block on heap
-***********************************************************************-*/
 void* pointer;
 int*  error;
 #endif /* __STDC__ */
@@ -1085,25 +1053,21 @@ int*  error;
    return(ret_val);
 }
 #endif   /* _NT */
-
-/*+**********************************************************************
- Function   :	long get_i_nethost_by_device_name()
-
- Description:	Get the index for the nethost from the device
-		name. The nethost is specified in the device name
-		as "//nethost/domain/family/member". If the nethost
-		is not specified then return the index for the
-		default nethost (0). If the nethost is specified
-		but not imported then return -1.
-
- Arg(s) In  :	char *device_name - device name
-
- Arg(s) Out :	error  - Will contain an appropriate error code if the
-		         corresponding call returns a non-zero value.
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+
+/**
+ * Get the index for the nethost from the device
+ * name. The nethost is specified in the device name
+ * as "//nethost/domain/family/member". 
+ * 
+ * @param device_name  	device name
+ * @param error		Will contain an appropriate error code if the
+ * 			corresponding call returns a non-zero value.
+ * 
+ * @return 	returns the index for the nethost 	
+ *		If the nethost is not specified then return the index for the
+ * 		default nethost (0). If the nethost is specified
+ * 		but not imported then return DS_NOTOK.
+ */ 
 long _DLLFunc get_i_nethost_by_device_name (char *device_name, long *error)
 {
 	long i_nethost, i;
@@ -1140,7 +1104,7 @@ long _DLLFunc get_i_nethost_by_device_name (char *device_name, long *error)
  * (config_setup_multi() should be called to add it)
  */
 		{
-			i_nethost = -1;
+			i_nethost = DS_NOTOK;
 		}
 		free(nethost);
 	}
@@ -1155,21 +1119,17 @@ long _DLLFunc get_i_nethost_by_device_name (char *device_name, long *error)
 
 	return(i_nethost);
 }
-
-/*+**********************************************************************
- Function   :	long get_i_nethost_by_name()
-
- Description:	Get the index for the nethost from the nethost
-		name. 
-
- Arg(s) In  :	char *device_name - device name
-
- Arg(s) Out :	error  - Will contain an appropriate error code if the
-		         corresponding call returns a non-zero value.
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+
+/**
+ * Get the index for the nethost from the nethost name. 
+ *
+ * @param device_name 	device name
+ * @param error  	Will contain an appropriate error code if the
+ *		        corresponding call returns a non-zero value.
+ *
+ * @return 	the index of nethost or DS_NOTOK if not found in the list of known 
+ *		NETHOST's.
+ */
 long _DLLFunc get_i_nethost_by_name (char *nethost, long *error)
 {
 	long i;
@@ -1194,28 +1154,22 @@ long _DLLFunc get_i_nethost_by_name (char *nethost, long *error)
 		}
 	}
 	
-	return(-1);
+	return(DS_NOTOK);
 }
 
 
-/*+**********************************************************************
- Function   :	long get_i_nethost_by_name()
-
- Description:	Get the nethost name associated with this index
-
- Arg(s) In  :	long i_nethost - nethost index
-
- Arg(s) Out :	error  - Will contain an appropriate error code if the
-		         corresponding call returns a non-zero value.
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * Get the nethost name associated with this index
+ * 
+ * @param i_nethost 	nethost index
+ * @param error  	Will contain an appropriate error code if the
+ * 		        corresponding call returns a non-zero value.
+ * 
+ *  Return(s)  :	DS_OK or DS_NOTOK
+ */
 char* _DLLFunc get_nethost_by_index (long i_nethost, long *error)
 {
 	char *nethost;
-	
-
 /*
  * first check to see whether the requested nethost has been imported
  */
@@ -1230,22 +1184,19 @@ char* _DLLFunc get_nethost_by_index (long i_nethost, long *error)
 
 	return(nethost);
 }
+
 
-
-/*+**********************************************************************
- Function   :	long extract_device_name()
-
- Description:	Extract the domain/family/member part of name from the 
-		full device name "//nethost/domain/family/member?number" ,
-		return a pointer
-
- Arg(s) In  :	char *full_name - device name
-
- Arg(s) Out :	error  - Will contain an appropriate error code if the
-		         corresponding call returns a non-zero value.
-
- Return(s)  :	pointer to string containing only "domain/family/member"
-***********************************************************************-*/
+/**
+ * Extract the domain/family/member part of name from the 
+ * full device name "//nethost/domain/family/member?number" ,
+ * return a pointer
+ *
+ * @param full_name 	device name
+ * @param error  	Will contain an appropriate error code if the
+ *		        corresponding call returns a non-zero value.
+ *
+ * @return	pointer to string containing only "domain/family/member"
+ */
 	
 char* _DLLFunc extract_device_name (char *full_name, long *error)
 {
@@ -1277,7 +1228,7 @@ char* _DLLFunc extract_device_name (char *full_name, long *error)
 
 	return(device_name);
 }
-
+
 /*
  * global arrays required for multi-nethost support, memory is
  * allocated for them by nethost_alloc()
@@ -1286,20 +1237,14 @@ extern struct _devserver *msg_ds;
 extern struct _devserver *db_ds;
 extern short *auth_flag;
 
-/*+**********************************************************************
- Function   :	long nethost_alloc()
-
- Description:	alloc place for MIN_NETHOST to global array which contains
-		list of nethosts
-
- Arg(s) In  :	none
-
- Arg(s) Out :	error  - Will contain an appropriate error code if the
-		         corresponding call returns a non-zero value.
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * alloc place for MIN_NETHOST to global array which contains list of nethosts
+ * 
+ * @param error Will contain an appropriate error code if the
+ * 		corresponding call returns a non-zero value.
+ * 
+ * @return	DS_OK or DS_NOTOK
+ */ 
 long _DLLFunc nethost_alloc (long *error)
 {
 	static long first=1;
@@ -1362,28 +1307,24 @@ long _DLLFunc nethost_alloc (long *error)
 
 	return(DS_OK);
 }
+
 
-/*+**********************************************************************
- Function   : 	extern long dev_ping()
-
- Description:	Pings the device server to find out if this device
-		is being served. 
-
- Arg(s) In  :	ds - client handle for the associated device.
-
- Arg(s) Out : error     - Will contain an appropriate error code if the
-			    corresponding call returns a non-zero value.
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * Pings the device server to find out if this device is being served. 
+ *
+ * @param ds  	client handle for the associated device.
+ * @param error Will contain an appropriate error code if the
+ * 		corresponding call returns a non-zero value.
+ *
+ * @return	DS_OK or DS_NOTOK
+ */
 long _DLLFunc dev_ping (devserver ds, long *error)
 {
 	_dev_import_in	dev_import_in;
 	_dev_import_out	dev_import_out;
 	enum clnt_stat  clnt_stat;
 
-	*error = 0;
+	*error = DS_OK;
 #ifdef EBUG
 	dev_printdebug (DBG_TRACE | DBG_API,
 	    "\ndev_ping() : entering routine\n");

@@ -1,4 +1,4 @@
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/setacc_cli.c,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/setacc_cli.c,v 1.2 2003-03-18 16:16:26 jkrueger1 Exp $";
 
 /*+*******************************************************************
 
@@ -15,9 +15,9 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib
 
  Original   :   January 1991
 
- Version    :	$Revision: 1.1 $
+ Version    :	$Revision: 1.2 $
 
- Date       :	$Date: 2003-03-14 12:22:07 $
+ Date       :	$Date: 2003-03-18 16:16:26 $
  
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -108,27 +108,19 @@ static int host_addr;
 extern nethost_info *multi_nethost;
 
 
-/****************************************************************************
-*                                                                           *
-*		db_getresource function code                                *
-*               --------------                                              *
-*                                                                           *
-*    Function rule : To retrieve a resource value. The resource value is    *
-*                    stored as a atring in a database on a remote           *
-*                    computer                                               *
-*                                                                           *
-*    Argins : - A pointer to a string which defines the device name         *
-*             - A pointer to an array of db_resource structure defining the *
-*               resource to be retrieved                                    *
-*             - The number of resource to be retrieved                      *
-*                                                                           *
-*    Argout : - The error code if any                                       *
-*                                                                           *
-*    In case of trouble, the function returns -1 and set the err varaible   *
-*    pointed to by "perr". Otherwise, the function returns 0                *
-*                                                                           *
-*****************************************************************************/
-
+/**
+ * To retrieve a resource value. The resource value is stored as a atring in a 
+ * database on a remote computer
+ *
+ * @param dev_name	A pointer to a string which defines the device name
+ * @param res		A pointer to an array of db_resource structure defining the
+ *               	resource to be retrieved
+ * @param res_num	The number of resource to be retrieved
+ * @param perr 		The error code if any
+ *
+ * @return  	 In case of trouble, the function returns DS_NOTOK and set the err varaible
+ *    		pointed to by "perr". Otherwise, the function returns DS_OK
+ */
 int _DLLFunc db_getresource(char *dev_name, Db_resource res, 
 			    u_int res_num,long *perr)
 {
@@ -173,7 +165,7 @@ long try_reconnect = False;
 	if (dev_name == NULL || res == NULL || res_num == 0)
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 	for (i=0;i<(int)res_num;i++)
@@ -181,7 +173,7 @@ long try_reconnect = False;
 		if (res[i].resource_name == NULL || res[i].resource_adr == NULL)
 		{
 			*perr = DbErr_BadParameters;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -195,14 +187,14 @@ long try_reconnect = False;
 		if (l != 5)
 		{
 			*perr = DbErr_BadParameters;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		else
 		{
 			if (dev_name[1] != '/')
 			{
 				*perr = DbErr_BadParameters;
-				return(-1);
+				return(DS_NOTOK);
 			}
 		}
 	}
@@ -213,7 +205,7 @@ long try_reconnect = False;
 		if (l != 2)
 		{
 			*perr = DbErr_BadParameters;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -227,7 +219,7 @@ long try_reconnect = False;
 		if (cl == NULL)
 		{
 			*perr = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout_resource);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&timeout_resource);
@@ -238,7 +230,7 @@ long try_reconnect = False;
 /*
  * find out which nethost has been requested for this device
  */
-	if ((i_nethost = get_i_nethost_by_device_name(dev_name,perr)) < 0)
+	if ((i_nethost = get_i_nethost_by_device_name(dev_name,perr)) < DS_OK)
 	{
 
 /* The nethost is not imported, extract nethost name and import it */
@@ -278,7 +270,7 @@ long try_reconnect = False;
 			{
 				config_flags.configuration = False;
 				*perr = DbErr_CannotCreateClientHandle;
-				return(-1);
+				return(DS_NOTOK);
 			}
 		}
 	}
@@ -290,7 +282,7 @@ long try_reconnect = False;
 			{
 				multi_nethost[i_nethost].config_flags.configuration = False;
 				*perr = DbErr_CannotCreateClientHandle;
-				return(-1);
+				return(DS_NOTOK);
 			}
 		}
 	}
@@ -303,7 +295,7 @@ long try_reconnect = False;
 	if((send.arr1_val = (nam *)calloc(res_num,sizeof(nam))) == NULL)
 	{
 		*perr = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Build the full resource name (in lowercase letters) and initialize the array
@@ -319,7 +311,7 @@ long try_reconnect = False;
 			for (j=0;j<i;j++)
 				free(send.arr1_val[j]);
 			free(send.arr1_val);
-			return(-1);
+			return(DS_NOTOK);
 		}
 
 		strcpy(send.arr1_val[i],dev_name);
@@ -371,19 +363,19 @@ long try_reconnect = False;
 			}
 #endif /* ALONE */
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			for (j=0;j<(int)res_num;j++)
 				free(send.arr1_val[j]);
 			free(send.arr1_val);
 			*perr = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
 /* Any problems during database access ? */
 
-	if(recev->db_err != 0)
+	if(recev->db_err != DS_OK)
 	{
 		if (recev->db_err == DbErr_DatabaseNotConnected)
 		{
@@ -421,9 +413,9 @@ long try_reconnect = False;
 						free(send.arr1_val[j]);
 					free(send.arr1_val);
 					*perr = error;
-					return(-1);
+					return(DS_NOTOK);
 				}
-				if (recev->db_err == 0 || recev->db_err != DbErr_DatabaseNotConnected)
+				if (recev->db_err == DS_OK || recev->db_err != DbErr_DatabaseNotConnected)
 					break;
 			}
 		}
@@ -433,7 +425,7 @@ long try_reconnect = False;
 				free(send.arr1_val[j]);
 			free(send.arr1_val);
 			*perr = recev->db_err;
-			return(-1);
+			return(DS_NOTOK);
 		}
 
 /* If the server answers that there is too many info to send for the UDP
@@ -477,7 +469,7 @@ long try_reconnect = False;
 						free(send.arr1_val[j]);
 					free(send.arr1_val);
 					*perr = DbErr_CannotCreateClientHandle;
-					return(-1);
+					return(DS_NOTOK);
 				}
 
 				serv_adr.sin_family = AF_INET;
@@ -515,7 +507,7 @@ long try_reconnect = False;
 					free(send.arr1_val[j]);
 				free(send.arr1_val);
 				*perr = DbErr_CannotCreateClientHandle;
-				return(-1);
+				return(DS_NOTOK);
 			}
 
 			tcp_used = 1;
@@ -535,7 +527,7 @@ long try_reconnect = False;
 					free(send.arr1_val[j]);
 				free(send.arr1_val);
 				*perr = error;
-				return(-1);
+				return(DS_NOTOK);
 			}
 
 			if (recev->db_err == DbErr_DatabaseNotConnected)
@@ -567,15 +559,15 @@ long try_reconnect = False;
 							free(send.arr1_val[j]);
 						free(send.arr1_val);
 						*perr = error;
-						return(-1);
+						return(DS_NOTOK);
 					}
-					if (recev->db_err == 0 || recev->db_err != DbErr_DatabaseNotConnected)
+					if (recev->db_err == DS_OK || recev->db_err != DbErr_DatabaseNotConnected)
 						break;
 				}
 
 /* Any problems during database access ? */
 
-				if(recev->db_err != 0)
+				if(recev->db_err != DS_OK)
 				{
 #ifndef _NT
 					close(tcp_so);
@@ -587,7 +579,7 @@ long try_reconnect = False;
 						free(send.arr1_val[j]);
 					free(send.arr1_val);
 					*perr = recev->db_err;
-					return(-1);
+					return(DS_NOTOK);
 				}
 
 			}
@@ -618,7 +610,7 @@ long try_reconnect = False;
 				if (sscanf(&(ptrc[2]),"%hx",(short *)res[i].resource_adr) == -1)
 				{
 					*perr = DbErr_BadResourceType;
-					return(-1);
+					return(DS_NOTOK);
 				}
 			}
 			else
@@ -633,7 +625,7 @@ long try_reconnect = False;
 				if (sscanf(&(ptrc[2]),"%hx",(short *)res[i].resource_adr) == -1)
 				{
 					*perr = DbErr_BadResourceType;
-					return(-1);
+					return(DS_NOTOK);
 				}
 			}
 			else
@@ -648,7 +640,7 @@ long try_reconnect = False;
 				if (sscanf(&(ptrc[2]),"%x",(long *)res[i].resource_adr) == -1)
 				{
 					*perr = DbErr_BadResourceType;
-					return(-1);
+					return(DS_NOTOK);
 				}
 			}
 			else
@@ -663,7 +655,7 @@ long try_reconnect = False;
 				if (sscanf(&(ptrc[2]),"%x",(long *)res[i].resource_adr) == -1)
 				{
 					*perr = DbErr_BadResourceType;
-					return(-1);
+					return(DS_NOTOK);
 				}
 			}
 			else
@@ -684,7 +676,7 @@ long try_reconnect = False;
 			if((ptra = (char *)malloc(strlen(ptrc) + 1)) == NULL)
 			{
 				*perr = DbErr_ClientMemoryAllocation;
-				return(-1);
+				return(DS_NOTOK);
 			}
 
 			strcpy(ptra,ptrc);
@@ -705,7 +697,7 @@ long try_reconnect = False;
 			else
 			{
 				*perr = DbErr_BooleanResource;
-				return(-1);
+				return(DS_NOTOK);
 			}
 			break;
 
@@ -723,7 +715,7 @@ long try_reconnect = False;
 					{
 #endif /* OSK */
 						*perr = DbErr_ClientMemoryAllocation;
-						return(-1);
+						return(DS_NOTOK);
 					}
 
 					if (ptrc[0] == '0' && ptrc[1] == 'x')
@@ -731,7 +723,7 @@ long try_reconnect = False;
 						if (sscanf(&(ptrc[2]),"%hx",&tmp_short) == -1)
 						{
 							*perr = DbErr_BadResourceType;
-							return(-1);
+							return(DS_NOTOK);
 						}
 						*char_ptr = (char)tmp_short;
 					}
@@ -767,7 +759,7 @@ long try_reconnect = False;
 					{
 #endif /* OSK */
 						*perr = DbErr_ClientMemoryAllocation;
-						return(-1);
+						return(DS_NOTOK);
 					}
 
 /* Convert each array element */
@@ -787,7 +779,7 @@ long try_reconnect = False;
 							if (sscanf(&(numb[2]),"%hx",&tmp_short) == -1)
 							{
 								*perr = DbErr_BadResourceType;
-								return(-1);
+								return(DS_NOTOK);
 							}
 							char_ptr[l] = (char)tmp_short;
 						}
@@ -800,7 +792,7 @@ long try_reconnect = False;
 						if (sscanf(&(tmp[2]),"%hx",&tmp_short) == -1)
 						{
 							*perr = DbErr_BadResourceType;
-							return(-1);
+							return(DS_NOTOK);
 						}
 						char_ptr[l] = (char)tmp_short;
 					}
@@ -823,13 +815,13 @@ long try_reconnect = False;
 				if ((short_ptr = (short *)malloc(sizeof(short))) == NULL) {
 #endif /* OSK */
 					*perr = DbErr_ClientMemoryAllocation;
-					return(-1);
+					return(DS_NOTOK);
 									}
 
 				if (ptrc[0] == '0' && ptrc[1] == 'x') {
 					if (sscanf(&(ptrc[2]),"%hx",short_ptr) == -1) {
 						*perr = DbErr_BadResourceType;
-						return(-1);
+						return(DS_NOTOK);
 							  }
 									}
 				else {
@@ -860,7 +852,7 @@ long try_reconnect = False;
 				if ((short_ptr = (short *)calloc((ctr + 1),sizeof(short))) == NULL) {
 #endif /* OSK */
 					*perr = DbErr_ClientMemoryAllocation;
-					return(-1);
+					return(DS_NOTOK);
 									}
 
 /* Convert each array element */
@@ -877,7 +869,7 @@ long try_reconnect = False;
 					if (numb[0] == '0' && numb[1] == 'x') {
 						if (sscanf(&(numb[2]),"%hx",&(short_ptr[l])) == -1) {
 							*perr = DbErr_BadResourceType;
-							return(-1);
+							return(DS_NOTOK);
 						  }
 								    }
 					else
@@ -887,7 +879,7 @@ long try_reconnect = False;
 				if (tmp[0] == '0' && tmp[1] == 'x') {
 					if (sscanf(&(tmp[2]),"%hx",&(short_ptr[l])) == -1) {
 						*perr = DbErr_BadResourceType;
-						return(-1);
+						return(DS_NOTOK);
 							  }
 						}
 				else 
@@ -909,13 +901,13 @@ long try_reconnect = False;
 				if ((long_ptr = (long *)malloc(sizeof(long))) == NULL) {
 #endif /* OSK */
 					*perr = DbErr_ClientMemoryAllocation;
-					return(-1);
+					return(DS_NOTOK);
 									}
 
 				if (ptrc[0] == '0' && ptrc[1] == 'x') {
 					if (sscanf(&(ptrc[2]),"%x",long_ptr) == -1) {
 					*perr = DbErr_BadResourceType;
-					return(-1);
+					return(DS_NOTOK);
 						  }
 								}
 			    	else {
@@ -946,7 +938,7 @@ long try_reconnect = False;
 				if ((long_ptr = (long *)calloc((ctr + 1),sizeof(long))) == NULL) {
 #endif /* OSK */
 					*perr = DbErr_ClientMemoryAllocation;
-					return(-1);
+					return(DS_NOTOK);
 									}
 
 /* Convert each array element */
@@ -963,7 +955,7 @@ long try_reconnect = False;
 					if (numb[0] == '0' && numb[1] == 'x') {
 						if (sscanf(&(numb[2]),"%lx",&(long_ptr[l])) == -1) {
 						*perr = DbErr_BadResourceType;
-						return(-1);
+						return(DS_NOTOK);
 							  }
 							}
 					else
@@ -973,7 +965,7 @@ long try_reconnect = False;
 				if (tmp[0] == '0' && tmp[1] == 'x') {
 					if (sscanf(&(tmp[2]),"%lx",&(long_ptr[l])) == -1) {
 						*perr = DbErr_BadResourceType;
-						return(-1);
+						return(DS_NOTOK);
 							  }
 						}
 				else 
@@ -995,7 +987,7 @@ long try_reconnect = False;
 				if ((double_ptr = (double *)malloc(sizeof(double))) == NULL) {
 #endif /* OSK */
 					*perr = DbErr_ClientMemoryAllocation;
-					return(-1);
+					return(DS_NOTOK);
 									}
 
 				*double_ptr = atof(ptrc);
@@ -1024,7 +1016,7 @@ long try_reconnect = False;
 				if ((double_ptr = (double *)calloc((ctr + 1),sizeof(double))) == NULL) {
 #endif /* OSK */
 					*perr = DbErr_ClientMemoryAllocation;
-					return(-1);
+					return(DS_NOTOK);
 									}
 
 /* Convert each array element */
@@ -1059,7 +1051,7 @@ long try_reconnect = False;
 				if ((float_ptr = (float *)malloc(sizeof(float))) == NULL) {
 #endif /* OSK */
 					*perr = DbErr_ClientMemoryAllocation;
-					return(-1);
+					return(DS_NOTOK);
 									}
 
 				*float_ptr = (float)atof(ptrc);
@@ -1088,7 +1080,7 @@ long try_reconnect = False;
 				if ((float_ptr = (float *)calloc((ctr + 1),sizeof(float))) == NULL) {
 #endif /* OSK */
 					*perr = DbErr_ClientMemoryAllocation;
-					return(-1);
+					return(DS_NOTOK);
 									}
 
 /* Convert each array element */
@@ -1120,12 +1112,12 @@ long try_reconnect = False;
 				if ((str_ptr = (char **)malloc(sizeof(char *))) == NULL) {
 #endif /* OSK */
 					*perr = DbErr_ClientMemoryAllocation;
-					return(-1);
+					return(DS_NOTOK);
 									}
 
 				if((str_ptr[0] = (char *)malloc(strlen(ptrc) + 1)) == NULL)  {
 					*perr = DbErr_ClientMemoryAllocation;
-					return(-1);
+					return(DS_NOTOK);
 					}
 
 				strcpy(str_ptr[0],ptrc);
@@ -1156,7 +1148,7 @@ long try_reconnect = False;
 				if ((str_ptr = (char **)calloc((ctr + 1),sizeof(char *))) == NULL) {
 #endif /* OSK */
 					*perr = DbErr_ClientMemoryAllocation;
-					return(-1);
+					return(DS_NOTOK);
 									}
 
 /* Convert each array element */
@@ -1173,7 +1165,7 @@ long try_reconnect = False;
 							free(str_ptr[k]);
 						free(str_ptr);
 						*perr = DbErr_ClientMemoryAllocation;
-						return(-1);
+						return(DS_NOTOK);
 								}
 					strncpy(str_ptr[l],tmp,diff);
 					str_ptr[l][diff] = 0;
@@ -1184,7 +1176,7 @@ long try_reconnect = False;
 						free(str_ptr[k]);
 					free(str_ptr);
 					*perr = DbErr_ClientMemoryAllocation;
-					return(-1);
+					return(DS_NOTOK);
 									}
 				strcpy(str_ptr[l],tmp);
 
@@ -1203,7 +1195,7 @@ long try_reconnect = False;
 		if (!clnt_freeres(tcp_cl,(xdrproc_t)xdr_db_res,(char *)recev))
 		{
 			*perr = DbErr_MemoryFree;
-			return(-1);
+			return(DS_NOTOK);
 		}
 #ifndef _NT
 		close(tcp_so);
@@ -1218,7 +1210,7 @@ long try_reconnect = False;
 		if (!clnt_freeres(cl,xdr_db_res,(char *)recev)) 
 		{
 			*perr = DbErr_MemoryFree;
-			return(-1);
+			return(DS_NOTOK);
 		}
 #else
 		if (i_nethost == 0)
@@ -1226,7 +1218,7 @@ long try_reconnect = False;
 			if (!clnt_freeres(db_info.conf->clnt,(xdrproc_t)xdr_db_res,(char *)recev)) 
 			{
 				*perr = DbErr_MemoryFree;
-				return(-1);
+				return(DS_NOTOK);
 			}
 		}
 		else
@@ -1234,7 +1226,7 @@ long try_reconnect = False;
 			if (!clnt_freeres(multi_nethost[i_nethost].db_info->clnt,(xdrproc_t)xdr_db_res,(char *)recev)) 
 			{
 				*perr = DbErr_MemoryFree;
-				return(-1);
+				return(DS_NOTOK);
 			}
 		}
 #endif /* ALONE */
@@ -1242,8 +1234,8 @@ long try_reconnect = False;
 
 /* No error */
 
-	*perr = 0;
-	return(0);
+	*perr = DS_OK;
+	return(DS_OK);
 
 }
  
@@ -1265,8 +1257,8 @@ long try_reconnect = False;
 *                                                                           *
 *    Argout : - The error code if any                                       *
 *                                                                           *
-*    In case of trouble, the function returns -1 and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns 0                *
+*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
+*    pointed to by "perr". Otherwise, the function returns DS_OK                *
 *                                                                           *
 *****************************************************************************/
 
@@ -1316,7 +1308,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 	if (dev_name == NULL || res == NULL || res_num == 0)
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 	l = 0;
@@ -1324,7 +1316,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 	if (l != 2)
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 	for (i=0;i<(int)res_num;i++)
@@ -1332,43 +1324,43 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 		if (res[i].resource_adr == NULL || res[i].resource_name == NULL)
 		{
 			*perr = DbErr_BadParameters;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		if (res[i].resource_type == D_VAR_CHARARR && 
  		    ((DevVarCharArray *)(res[i].resource_adr))->length == 0)
 		{
 			*perr = DbErr_BadParameters;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		else if (res[i].resource_type == D_VAR_SHORTARR &&
 			((DevVarShortArray *)(res[i].resource_adr))->length == 0)
 		{
 			*perr = DbErr_BadParameters;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		else if (res[i].resource_type == D_VAR_LONGARR &&
 			((DevVarLongArray *)(res[i].resource_adr))->length == 0)
 		{
 			*perr = DbErr_BadParameters;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		else if (res[i].resource_type == D_VAR_DOUBLEARR &&
 			((DevVarDoubleArray *)(res[i].resource_adr))->length == 0)
 		{
 			*perr = DbErr_BadParameters;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		else if (res[i].resource_type == D_VAR_FLOATARR &&
 			((DevVarFloatArray *)(res[i].resource_adr))->length == 0)
 		{
 			*perr = DbErr_BadParameters;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		else if (res[i].resource_type == D_VAR_STRINGARR &&
 			((DevVarStringArray *)(res[i].resource_adr))->length == 0)
 		{
 			*perr = DbErr_BadParameters;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -1389,7 +1381,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 	if (strcmp(tmp_rname,"sec") == 0)
 	{
 		*perr = DbErr_DomainDefinition;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 #ifdef ALONE
@@ -1402,7 +1394,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 		{
 			clnt_pcreateerror("why : ");
 			*perr = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
@@ -1419,7 +1411,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 		{
 			config_flags.configuration = False;
 			*perr = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 #endif /* ALONE */
@@ -1434,7 +1426,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 	{
 #endif /* OSK */
 		*perr = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 	k1 = strlen(dev_name);
@@ -1455,7 +1447,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 				free(send.tab_putres_val[j].res_val);
 			}
 			free(send.tab_putres_val);
-			return(-1);
+			return(DS_NOTOK);
 		}
 
 		strcpy(tmp->res_name,dev_name);
@@ -1485,7 +1477,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 				}
 				free(tmp->res_name);
 				free(send.tab_putres_val);
-				return(-1);
+				return(DS_NOTOK);
 			}
 
 /* Convert resource value to string */
@@ -1507,7 +1499,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 				}
 				free(tmp->res_name);
 				free(send.tab_putres_val);
-				return(-1);
+				return(DS_NOTOK);
 			}
 
 /* Convert resource value to string */
@@ -1529,7 +1521,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 				}
 				free(tmp->res_name);
 				free(send.tab_putres_val);
-				return(-1);
+				return(DS_NOTOK);
 			}
 
 /* Convert resource value to string */
@@ -1551,7 +1543,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 				}
 				free(tmp->res_name);
 				free(send.tab_putres_val);
-				return(-1);
+				return(DS_NOTOK);
 			}
 
 /* Convert resource value to string */
@@ -1573,7 +1565,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 				}
 				free(tmp->res_name);
 				free(send.tab_putres_val);
-				return(-1);
+				return(DS_NOTOK);
 			}
 
 /* Convert resource value to string */
@@ -1595,7 +1587,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 				}
 				free(tmp->res_name);
 				free(send.tab_putres_val);
-				return(-1);
+				return(DS_NOTOK);
 			}
 
 /* Convert resource value to string */
@@ -1618,7 +1610,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 				}
 				free(tmp->res_name);
 				free(send.tab_putres_val);
-				return(-1);
+				return(DS_NOTOK);
 			}
 	
 /* Allocate memory for the string */
@@ -1633,7 +1625,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 				}
 				free(tmp->res_name);
 				free(send.tab_putres_val);
-				return(-1);
+				return(DS_NOTOK);
 			}
 
 /* Copy the string */
@@ -1655,7 +1647,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 				}
 				free(tmp->res_name);
 				free(send.tab_putres_val);
-				return(-1);
+				return(DS_NOTOK);
 			}
 
 /* Convert the boolean value to string */
@@ -1682,7 +1674,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 					}
 			free(tmp->res_name);
 			free(send.tab_putres_val);
-			return(-1);
+			return(DS_NOTOK);
 								}
 		tmp_arr[0] = 0;
 		k2 = 1;
@@ -1707,7 +1699,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 					free(tmp->res_name);
 					free(send.tab_putres_val);
 					free(tmp_arr);
-					return(-1);
+					return(DS_NOTOK);
 									}
 				k2++;
 						}
@@ -1724,7 +1716,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 			free(tmp->res_name);
 			free(send.tab_putres_val);
 			free(tmp_arr);
-			return(-1);
+			return(DS_NOTOK);
 							}
 
 /* Copy the temporary string */
@@ -1753,7 +1745,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 					}
 			free(tmp->res_name);
 			free(send.tab_putres_val);
-			return(-1);
+			return(DS_NOTOK);
 								}
 		tmp_arr[0] = 0;
 		k2 = 1;
@@ -1777,7 +1769,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 					free(tmp->res_name);
 					free(send.tab_putres_val);
 					free(tmp_arr);
-					return(-1);
+					return(DS_NOTOK);
 									}
 				k2++;
 						}
@@ -1794,7 +1786,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 			free(tmp->res_name);
 			free(send.tab_putres_val);
 			free(tmp_arr);
-			return(-1);
+			return(DS_NOTOK);
 							}
 
 /* Copy the temporary string */
@@ -1823,7 +1815,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 					}
 			free(tmp->res_name);
 			free(send.tab_putres_val);
-			return(-1);
+			return(DS_NOTOK);
 								}
 		tmp_arr[0] = 0;
 		k2 = 1;
@@ -1847,7 +1839,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 					free(tmp->res_name);
 					free(send.tab_putres_val);
 					free(tmp_arr);
-					return(-1);
+					return(DS_NOTOK);
 									}
 				k2++;
 						}
@@ -1864,7 +1856,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 			free(tmp->res_name);
 			free(send.tab_putres_val);
 			free(tmp_arr);
-			return(-1);
+			return(DS_NOTOK);
 							}
 
 /* Copy the temporary string */
@@ -1893,7 +1885,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 					}
 			free(tmp->res_name);
 			free(send.tab_putres_val);
-			return(-1);
+			return(DS_NOTOK);
 								}
 		tmp_arr[0] = 0;
 		k2 = 1;
@@ -1916,7 +1908,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 					free(tmp->res_name);
 					free(send.tab_putres_val);
 					free(tmp_arr);
-					return(-1);
+					return(DS_NOTOK);
 									}
 				k2++;
 						}
@@ -1933,7 +1925,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 			free(tmp->res_name);
 			free(send.tab_putres_val);
 			free(tmp_arr);
-			return(-1);
+			return(DS_NOTOK);
 							}
 
 /* Copy the temporary string */
@@ -1962,7 +1954,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 					}
 			free(tmp->res_name);
 			free(send.tab_putres_val);
-			return(-1);
+			return(DS_NOTOK);
 								}
 		tmp_arr[0] = 0;
 		k2 = 1;
@@ -1985,7 +1977,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 					free(tmp->res_name);
 					free(send.tab_putres_val);
 					free(tmp_arr);
-					return(-1);
+					return(DS_NOTOK);
 									}
 				k2++;
 						}
@@ -2002,7 +1994,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 			free(tmp->res_name);
 			free(send.tab_putres_val);
 			free(tmp_arr);
-			return(-1);
+			return(DS_NOTOK);
 							}
 
 /* Copy the temporary string */
@@ -2034,7 +2026,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 					}
 					free(tmp->res_name);
 					free(send.tab_putres_val);
-					return(-1);
+					return(DS_NOTOK);
 				}
 				tmp_arr[0] = 0;
 				k2 = 1;
@@ -2055,7 +2047,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 					free(tmp->res_name);
 					free(send.tab_putres_val);
 					free(tmp_arr);
-					return(-1);
+					return(DS_NOTOK);
 				}
 
 				k = strlen(tmp_arr);
@@ -2076,7 +2068,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 						free(tmp->res_name);
 						free(send.tab_putres_val);
 						free(tmp_arr);
-						return(-1);
+						return(DS_NOTOK);
 					}
 					k2++;
 				}
@@ -2095,7 +2087,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 				free(tmp->res_name);
 				free(send.tab_putres_val);
 				free(tmp_arr);
-				return(-1);
+				return(DS_NOTOK);
 			}
 
 /* Copy the temporary string */
@@ -2155,7 +2147,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 					}
 					free(send.tab_putres_val);
 					free(tmp_arr);
-					return(-1);
+					return(DS_NOTOK);
 				}
 
 				serv_adr.sin_family = AF_INET;
@@ -2187,7 +2179,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 				}
 				free(send.tab_putres_val);
 				free(tmp_arr);
-				return(-1);
+				return(DS_NOTOK);
 			}
 		}
 
@@ -2232,7 +2224,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 #endif /* ALONE */
 			if(recev == NULL)
 				break;
-			if ((*recev == 0) || (*recev != DbErr_DatabaseNotConnected))
+			if ((*recev == DS_OK) || (*recev != DbErr_DatabaseNotConnected))
 				break;
 						}
 							}
@@ -2253,7 +2245,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 #endif /* ALONE */
 		}
 
-		if (error != 0) {
+		if (error != DS_OK) {
 			for (j = 0;j < (int)res_num;j++) {
 				free(send.tab_putres_val[j].res_name);
 				free(send.tab_putres_val[j].res_val);
@@ -2270,7 +2262,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 				clnt_destroy(tcp_cl);
 						}
 			*perr = error;
-			return(-1);
+			return(DS_NOTOK);
 				}
 			}
 
@@ -2296,7 +2288,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 			clnt_destroy(tcp_cl);
 					}
 		*perr = *recev;
-		return(-1);
+		return(DS_NOTOK);
 			}
 
 /* If the TCP connection was necessary, close it and destroy the associated
@@ -2314,7 +2306,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 
 /* Leave function */
 
-	return(0);
+	return(DS_OK);
 
 }
 
@@ -2336,8 +2328,8 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res,
 *                                                                           *
 *    Argout : - The error code if any                                       *
 *                                                                           *
-*    In case of trouble, the function returns -1 and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns 0                *
+*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
+*    pointed to by "perr". Otherwise, the function returns DS_OK                *
 *                                                                           *
 *****************************************************************************/
 
@@ -2370,7 +2362,7 @@ int _DLLFunc db_delresource(char *dev_name,char **res_name,u_int res_num,long *p
 	if (dev_name == NULL || res_name == NULL || res_num == 0)
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 	l=0;
@@ -2378,7 +2370,7 @@ int _DLLFunc db_delresource(char *dev_name,char **res_name,u_int res_num,long *p
 	if (l != 2)
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 	for (i=0;i<(int)res_num;i++)
@@ -2386,7 +2378,7 @@ int _DLLFunc db_delresource(char *dev_name,char **res_name,u_int res_num,long *p
 		if (res_name[i] == NULL)
 		{
 			*perr = DbErr_BadParameters;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -2399,7 +2391,7 @@ int _DLLFunc db_delresource(char *dev_name,char **res_name,u_int res_num,long *p
 		if (cl == NULL)
 		{
 			*perr = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
@@ -2412,7 +2404,7 @@ int _DLLFunc db_delresource(char *dev_name,char **res_name,u_int res_num,long *p
 	if((send.arr1_val = (nam *)calloc(res_num,sizeof(nam))) == NULL)
 	{
 		*perr = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Build the full resource name (in lowercase letters) and initialize the array
@@ -2428,7 +2420,7 @@ int _DLLFunc db_delresource(char *dev_name,char **res_name,u_int res_num,long *p
 			for (j=0;j<i;j++)
 				free(send.arr1_val[j]);
 			free(send.arr1_val);
-			return(-1);
+			return(DS_NOTOK);
 		}
 
 		strcpy(send.arr1_val[i],dev_name);
@@ -2458,7 +2450,7 @@ int _DLLFunc db_delresource(char *dev_name,char **res_name,u_int res_num,long *p
 			free(send.arr1_val[j]);
 		free(send.arr1_val);
 		*perr = DbErr_DomainDefinition;
-		return(-1);
+		return(DS_NOTOK);
 	}
 		
 
@@ -2502,7 +2494,7 @@ int _DLLFunc db_delresource(char *dev_name,char **res_name,u_int res_num,long *p
 #endif /* ALONE */
 				if(recev == NULL)
 					break;
-				if ((*recev == 0) || (*recev != DbErr_DatabaseNotConnected))
+				if ((*recev == DS_OK) || (*recev != DbErr_DatabaseNotConnected))
 						break;
 			}
 
@@ -2524,13 +2516,13 @@ int _DLLFunc db_delresource(char *dev_name,char **res_name,u_int res_num,long *p
 				     i_nethost,DB_UDP,&error);
 #endif /* ALONE */
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			for (j = 0;j < (int)res_num;j++)
 				free(send.arr1_val[j]);
 			free(send.arr1_val);
 			*perr = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -2542,16 +2534,16 @@ int _DLLFunc db_delresource(char *dev_name,char **res_name,u_int res_num,long *p
 
 /* Any problem with database access ? */
 
-	if (*recev != 0)
+	if (*recev != DS_OK)
 	{
 		*perr = *recev;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* No error */
 
-	*perr = 0;
-	return(0);
+	*perr = DS_OK;
+	return(DS_OK);
 
 }
 
@@ -2576,8 +2568,8 @@ int _DLLFunc db_delresource(char *dev_name,char **res_name,u_int res_num,long *p
 *    are given here with the following syntax :				    *
 *		domain/family/member/r_name				    *
 *									    *
-*    In case of trouble, the function returns -1 and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns 0                *
+*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
+*    pointed to by "perr". Otherwise, the function returns DS_OK                *
 *                                                                           *
 *****************************************************************************/
 
@@ -2607,7 +2599,7 @@ long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
 	if ((res_list == NULL) || (res_num == 0))
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 	for (i = 0;i < (int)res_num;i++)
@@ -2617,7 +2609,7 @@ long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
 		if (l != 3)
 		{
 			*perr = DbErr_BadParameters;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -2630,7 +2622,7 @@ long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
 		if (cl == NULL)
 		{
 			*perr = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
@@ -2643,7 +2635,7 @@ long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
 	if((send.arr1_val = (nam *)calloc(res_num,sizeof(nam))) == NULL)
 	{
 		*perr = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Copy resource name (in lowercase letters) and initialize the array
@@ -2658,7 +2650,7 @@ long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
 			for (j = 0;j < i;j++)
 				free(send.arr1_val[j]);
 			free(send.arr1_val);
-			return(-1);
+			return(DS_NOTOK);
 		}
 
 		strcpy(send.arr1_val[i],res_list[i]);
@@ -2707,7 +2699,7 @@ long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
 #endif /* ALONE */
 				if(recev == NULL)
 					break;
-				if ((*recev == 0) || (*recev != DbErr_DatabaseNotConnected))
+				if ((*recev == DS_OK) || (*recev != DbErr_DatabaseNotConnected))
 						break;
 			}
 
@@ -2729,13 +2721,13 @@ long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
 				     i_nethost,DB_UDP,&error);
 #endif /* ALONE */
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			for (j = 0;j < (int)res_num;j++)
 				free(send.arr1_val[j]);
 			free(send.arr1_val);
 			*perr = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -2747,16 +2739,16 @@ long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
 
 /* Any problem with database access ? */
 
-	if (*recev != 0)
+	if (*recev != DS_OK)
 	{
 		*perr = *recev;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* No error */
 
-	*perr = 0;
-	return(0);
+	*perr = DS_OK;
+	return(DS_OK);
 
 }
 
@@ -2777,8 +2769,8 @@ long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
 *    Argout : - The number of deices for this device server                 *
 *             - The error code in case of problems                          *
 *                                                                           *
-*    In case of trouble, the function returns -1 and set the err varaible   *
-*    pointed to by "perr". Otherwise, the function returns 0                *
+*    In case of trouble, the function returns DS_NOTOK and set the err varaible   *
+*    pointed to by "perr". Otherwise, the function returns DS_OK                *
 *                                                                           *
 *****************************************************************************/
 
@@ -2814,14 +2806,14 @@ int _DLLFunc db_getdevlist(char *name,char ***tab, u_int *num_dev,long *perr)
 	if (name == NULL || tab == NULL)
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	k = 0;
 	NB_CHAR(k,name,'/');
 	if (k != 1)
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 #ifdef ALONE
@@ -2833,7 +2825,7 @@ int _DLLFunc db_getdevlist(char *name,char ***tab, u_int *num_dev,long *perr)
 		if (cl == NULL)
 		{
 			*perr = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
@@ -2848,7 +2840,7 @@ int _DLLFunc db_getdevlist(char *name,char ***tab, u_int *num_dev,long *perr)
 	if ((name1 = (char *)malloc(k + 1)) == NULL)
 	{
 		*perr = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(name1,name);
 	for(i=0;i<k;i++)
@@ -2878,11 +2870,11 @@ int _DLLFunc db_getdevlist(char *name,char ***tab, u_int *num_dev,long *perr)
 				     i_nethost,DB_UDP,&error);
 #endif /* ALONE */
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			free(name1);
 			*perr = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -2910,9 +2902,9 @@ int _DLLFunc db_getdevlist(char *name,char ***tab, u_int *num_dev,long *perr)
 			{
 				free(name1);
 				*perr = error;
-				return(-1);
+				return(DS_NOTOK);
 			}
-			if (recev->db_err == 0 || recev->db_err != DbErr_DatabaseNotConnected)
+			if (recev->db_err == DS_OK || recev->db_err != DbErr_DatabaseNotConnected)
 				break;
 		}
 	}
@@ -2923,10 +2915,10 @@ int _DLLFunc db_getdevlist(char *name,char ***tab, u_int *num_dev,long *perr)
 
 /* Any problems during database access ? */
 
-	if(recev->db_err != 0)
+	if(recev->db_err != DS_OK)
 	{
 		*perr = recev->db_err;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Allocate memory to copy device name. I know that it i smore time consuming 
@@ -2936,7 +2928,7 @@ int _DLLFunc db_getdevlist(char *name,char ***tab, u_int *num_dev,long *perr)
    	if ((*tab = (char **)calloc(recev->res_val.arr1_len,sizeof(char *))) == NULL)
 	{
 		*perr = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	for (i = 0;i < recev->res_val.arr1_len;i++)
 	{
@@ -2947,7 +2939,7 @@ int _DLLFunc db_getdevlist(char *name,char ***tab, u_int *num_dev,long *perr)
 				free((*tab)[j]);
 			free(*tab);
 			*perr = DbErr_ClientMemoryAllocation;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		strcpy((*tab)[i],recev->res_val.arr1_val[i]);
 	}
@@ -2966,8 +2958,8 @@ int _DLLFunc db_getdevlist(char *name,char ***tab, u_int *num_dev,long *perr)
 	
 /* No error */
 
-	*perr = 0;
-	return(0);
+	*perr = DS_OK;
+	return(DS_OK);
 
 }
 
@@ -2997,8 +2989,8 @@ int _DLLFunc db_getdevlist(char *name,char ***tab, u_int *num_dev,long *perr)
 *                                                                           *
 *    Argout : - The error code if any                                       *
 *                                                                           *
-*    In case of trouble, the function returns -1 and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns 0                *
+*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
+*    pointed to by "perr". Otherwise, the function returns DS_OK                *
 *                                                                           *
 *****************************************************************************/
 
@@ -3040,7 +3032,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 	if (devexp == NULL || dev_num == 0)
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 	for (i=0;i<(int)dev_num;i++)
@@ -3053,7 +3045,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 		            (devexp[i].device_class == NULL))
 			{
 				*perr = DbErr_BadParameters;
-				return(-1);
+				return(DS_NOTOK);
 			}
 		}
 		else
@@ -3065,7 +3057,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 		            (devexp[i].proc_name == NULL))
 			{
 				*perr = DbErr_BadParameters;
-				return(-1);
+				return(DS_NOTOK);
 			}
 		}
 		l = 0;
@@ -3073,7 +3065,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 		if (l != 2)
 		{
 			*perr = DbErr_BadParameters;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -3086,7 +3078,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 		if (cl == NULL)
 		{
 			*perr = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
@@ -3101,7 +3093,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 		if ((devexp2 = (db_devinfo_2 *)calloc(dev_num,sizeof(db_devinfo_2))) == NULL)
 		{
 			*perr = DbErr_ClientMemoryAllocation;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 	else
@@ -3109,7 +3101,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 		if ((devexp3 = (db_devinfo_3 *)calloc(dev_num,sizeof(db_devinfo_3))) == NULL)
 		{
 			*perr = DbErr_ClientMemoryAllocation;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -3133,7 +3125,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 					free(devexp2[i].dev_class);
 				}
 				free(devexp2);
-				return(-1);
+				return(DS_NOTOK);
 			}
 			strcpy(devexp2[i].host_name,devexp[i].host_name);
 			for (j=0;j<k;j++) 
@@ -3152,7 +3144,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				}
 				free(devexp2[i].host_name);
 				free(devexp2);
-				return(-1);
+				return(DS_NOTOK);
 			}
 			strcpy(devexp2[i].dev_name,devexp[i].device_name);
 			for (j=0;j<k;j++)
@@ -3172,7 +3164,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				free(devexp2[i].host_name);
 				free(devexp2[i].dev_name);
 				free(devexp2);
-				return(-1);
+				return(DS_NOTOK);
 			}
 			strcpy(devexp2[i].dev_type,devexp[i].device_type);
 
@@ -3191,7 +3183,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				free(devexp2[i].dev_name);
 				free(devexp2[i].dev_type);
 				free(devexp2);
-				return(-1);
+				return(DS_NOTOK);
 			}
 			strcpy(devexp2[i].dev_class,devexp[i].device_class);
 
@@ -3230,7 +3222,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 					free(devexp3[i].proc_name);
 				}
 				free(devexp3);
-				return(-1);
+				return(DS_NOTOK);
 			}
 			strcpy(devexp3[i].host_name,devexp[i].host_name);
 			for (j=0;j<k;j++) 
@@ -3250,7 +3242,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				}
 				free(devexp3[i].host_name);
 				free(devexp3);
-				return(-1);
+				return(DS_NOTOK);
 			}
 			strcpy(devexp3[i].dev_name,devexp[i].device_name);
 			for (j=0;j<k;j++)
@@ -3271,7 +3263,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				free(devexp3[i].host_name);
 				free(devexp3[i].dev_name);
 				free(devexp3);
-				return(-1);
+				return(DS_NOTOK);
 			}
 			strcpy(devexp3[i].dev_type,devexp[i].device_type);
 
@@ -3291,7 +3283,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				free(devexp3[i].dev_name);
 				free(devexp3[i].dev_type);
 				free(devexp3);
-				return(-1);
+				return(DS_NOTOK);
 			}
 			strcpy(devexp3[i].dev_class,devexp[i].device_class);
 
@@ -3331,7 +3323,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				free(devexp3[i].dev_type);
 				free(devexp3[i].dev_class);
 				free(devexp3);
-				return(-1);
+				return(DS_NOTOK);
 			}
 			strcpy(devexp3[i].proc_name,devexp[i].proc_name);
 			for (j=0;j<k;j++) 
@@ -3391,7 +3383,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 #endif /* ALONE */
 				if(pdb_err == NULL)
 					break;
-				if ((*pdb_err == 0) || (*pdb_err != DbErr_DatabaseNotConnected))
+				if ((*pdb_err == DS_OK) || (*pdb_err != DbErr_DatabaseNotConnected))
 					break;
 			}
 		}
@@ -3421,7 +3413,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 						i_nethost,DB_UDP,&error);
 #endif /* ALONE */
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			if (vers == DB_VERS_2)
 			{
@@ -3447,7 +3439,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				free(devexp3);
 			}
 			*perr = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -3479,16 +3471,16 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 
 /* Any trouble during database access ? */
 
-	if (*pdb_err != 0)
+	if (*pdb_err != DS_OK)
 	{
 		*perr = *pdb_err;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* No error */
 
-	*perr = 0;
-	return(0);
+	*perr = DS_OK;
+	return(DS_OK);
 
 }
  
@@ -3511,8 +3503,8 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 *               structure defines a device                                  *
 *             - The error code in case of problems                          *
 *                                                                           *
-*    In case of trouble, the function returns -1 and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns 0                *
+*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
+*    pointed to by "perr". Otherwise, the function returns DS_OK                *
 *                                                                           *
 *****************************************************************************/
 
@@ -3546,7 +3538,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 	if (name == NULL || tab == NULL || num_dev == 0) 
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /*
@@ -3585,7 +3577,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 		if (l != 2) 
 		{
 			*perr = DbErr_BadParameters;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -3598,7 +3590,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 		if (cl == NULL) 
 		{
 			*perr = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
@@ -3612,7 +3604,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 	if ((send.arr1_val = (nam *)calloc(num_dev,sizeof(nam))) == NULL) 
 	{
 		*perr = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	for (k=0;k<(int)num_dev;k++) 
 	{
@@ -3624,7 +3616,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 				free(send.arr1_val[i]);
 			free(send.arr1_val);
 			free(name_copy);
-			return(-1);
+			return(DS_NOTOK);
 		}
 		strcpy(send.arr1_val[k],name_copy[k]);
 		for(j=0;j<l;j++)
@@ -3640,7 +3632,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 		free(send.arr1_val);
 		free(name_copy);
 		*perr = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Structure initialization (structure sended to server) */
@@ -3695,7 +3687,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 #endif /* ALONE */
 				if(recev == NULL)
 					break;
-				if ((recev->db_imperr == 0) || (recev->db_imperr != DbErr_DatabaseNotConnected))
+				if ((recev->db_imperr == DS_OK) || (recev->db_imperr != DbErr_DatabaseNotConnected))
 					break;
 			}
 		}
@@ -3724,7 +3716,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 			}
 #endif /* ALONE */
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			*perr = error;
 			free(*tab);
@@ -3733,7 +3725,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 				free(send.arr1_val[i]);
 			free(send.arr1_val);
 			free(name_copy);
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -3746,12 +3738,12 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 
 /* Any problem with database access ? */	
 
-	if (recev->db_imperr != 0)
+	if (recev->db_imperr != DS_OK)
 	{
 		*perr = recev->db_imperr;
 		free(*tab);
 		*tab = NULL;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* No error,so copy the result into the caller structures */
@@ -3786,8 +3778,8 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 
 /* Leave function */
 
-	*perr = 0;
-	return(0);
+	*perr = DS_OK;
+	return(DS_OK);
 
 }
 
@@ -3807,8 +3799,8 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 *                                                                           *
 *    Argout : - The error caode in case of trouble                          *
 *                                                                           *
-*    In case of trouble, the function returns -1 and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns 0                *
+*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
+*    pointed to by "perr". Otherwise, the function returns DS_OK                *
 *                                                                           *
 *****************************************************************************/
 
@@ -3838,14 +3830,14 @@ int _DLLFunc db_svc_unreg(char *ds_netnam,long *perr)
 	if (ds_netnam == NULL)
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	j = 0;
 	NB_CHAR(j,ds_netnam,'/');
 	if (j != 1)
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 # ifdef ALONE
@@ -3857,7 +3849,7 @@ int _DLLFunc db_svc_unreg(char *ds_netnam,long *perr)
 		if (cl == NULL)
 		{
 			*perr = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
@@ -3872,7 +3864,7 @@ int _DLLFunc db_svc_unreg(char *ds_netnam,long *perr)
 	if ((ds_netnam1 = (char *)malloc(k + 1)) == NULL)
 	{
 		*perr = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(ds_netnam1,ds_netnam);
 	for (j=0;j<k;j++)
@@ -3910,7 +3902,7 @@ int _DLLFunc db_svc_unreg(char *ds_netnam,long *perr)
 #endif /* ALONE */
 				if(pdb_err == NULL)
 					break;
-				if ((*pdb_err == 0) || (*pdb_err != DbErr_DatabaseNotConnected))
+				if ((*pdb_err == DS_OK) || (*pdb_err != DbErr_DatabaseNotConnected))
 					break;
 			}
 		}
@@ -3931,10 +3923,10 @@ int _DLLFunc db_svc_unreg(char *ds_netnam,long *perr)
 				     i_nethost,DB_UDP,&error);
 #endif /* ALONE */
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			*perr = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}	
 
@@ -3944,16 +3936,16 @@ int _DLLFunc db_svc_unreg(char *ds_netnam,long *perr)
 
 /* Any problem during database access ? */
 
-	if (*pdb_err != 0)
+	if (*pdb_err != DS_OK)
 	{
 		*perr = *pdb_err;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* No error */
 
-	*perr = 0;
-	return(0);
+	*perr = DS_OK;
+	return(DS_OK);
 
 }
 
@@ -3977,8 +3969,8 @@ int _DLLFunc db_svc_unreg(char *ds_netnam,long *perr)
 *             - The host_name                                               *
 *             - The error code in case of trouble                           *
 *                                                                           *
-*    In case of trouble, the function returns -1 and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns 0                *
+*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
+*    pointed to by "perr". Otherwise, the function returns DS_OK                *
 *                                                                           *
 *****************************************************************************/
 
@@ -4008,14 +4000,14 @@ int _DLLFunc db_svc_check(char *ds_netname,char **pho_name, u_int *pp_num, u_int
 	if (ds_netname == NULL || pho_name == NULL || pp_num == NULL || pv_num == NULL)
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	k = 0;
 	NB_CHAR(k,ds_netname,'/');
 	if (k != 1)
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 #ifdef ALONE
@@ -4027,7 +4019,7 @@ int _DLLFunc db_svc_check(char *ds_netname,char **pho_name, u_int *pp_num, u_int
 		if (cl == NULL)
 		{
 			*perr = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
@@ -4042,7 +4034,7 @@ int _DLLFunc db_svc_check(char *ds_netname,char **pho_name, u_int *pp_num, u_int
 	if ((ds_netname1 = (char *)malloc(k + 1)) == NULL)
 	{
 		*perr = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(ds_netname1,ds_netname);
 	for (j=0;j<k;j++) 
@@ -4080,7 +4072,7 @@ int _DLLFunc db_svc_check(char *ds_netname,char **pho_name, u_int *pp_num, u_int
 #endif /* ALONE */
 				if(back == NULL)
 					break;
-				if ((back->db_err == 0) || (back->db_err != DbErr_DatabaseNotConnected))
+				if ((back->db_err == DS_OK) || (back->db_err != DbErr_DatabaseNotConnected))
 					break;
 			}
 		}
@@ -4101,11 +4093,11 @@ int _DLLFunc db_svc_check(char *ds_netname,char **pho_name, u_int *pp_num, u_int
 				     i_nethost,DB_UDP,&error);
 #endif /* ALONE */
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			free(ds_netname1);
 			*perr = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -4115,7 +4107,7 @@ int _DLLFunc db_svc_check(char *ds_netname,char **pho_name, u_int *pp_num, u_int
 
 /* Any problem during database access ? */
 
-	if (back->db_err != 0)
+	if (back->db_err != DS_OK)
 	{
 #ifdef ALONE
 		clnt_freeres(cl,(xdrproc_t)xdr_svc_inf,(char *)back);
@@ -4123,7 +4115,7 @@ int _DLLFunc db_svc_check(char *ds_netname,char **pho_name, u_int *pp_num, u_int
 		clnt_freeres(db_info.conf->clnt,(xdrproc_t)xdr_svc_inf,(char *)back);
 #endif
 		*perr = back->db_err;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Allocate memory to store host name and copy it */
@@ -4131,7 +4123,7 @@ int _DLLFunc db_svc_check(char *ds_netname,char **pho_name, u_int *pp_num, u_int
 	if ((*pho_name = (char *)malloc(strlen(back->ho_name) + 1)) == NULL)
 	{
 		*perr = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(*pho_name,back->ho_name);
 	
@@ -4144,8 +4136,8 @@ int _DLLFunc db_svc_check(char *ds_netname,char **pho_name, u_int *pp_num, u_int
 #else	
 	clnt_freeres(db_info.conf->clnt,(xdrproc_t)xdr_svc_inf,(char *)back);
 #endif
-	*perr = 0;
-	return(0);
+	*perr = DS_OK;
+	return(DS_OK);
 
 }
  
@@ -4167,8 +4159,8 @@ int _DLLFunc db_svc_check(char *ds_netname,char **pho_name, u_int *pp_num, u_int
 *    Argout : - The number of exported devices                              *
 *             - The error code in case of problems                          *
 *                                                                           *
-*    In case of trouble, the function returns -1 and set the err varaible   *
-*    pointed to by "perr". Otherwise, the function returns 0                *
+*    In case of trouble, the function returns DS_NOTOK and set the err varaible   *
+*    pointed to by "perr". Otherwise, the function returns DS_OK                *
 *                                                                           *
 *****************************************************************************/
 
@@ -4198,7 +4190,7 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 	if (num_dev == NULL || tab == NULL)
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 /* If the filter string is NULL, replace it with * chracters */
@@ -4211,7 +4203,7 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 	if (i > 2)
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 
@@ -4220,7 +4212,7 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 	if (test_star(filter))
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Verify that the first and the last characters are not /. */
@@ -4229,7 +4221,7 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 	if (filter[0] == '/' || filter[k - 1] == '/')
 	{
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Allocate memory for the db_res structures array if it's the first call
@@ -4240,7 +4232,7 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 		if ((tab_clstu = (devexp_res *)calloc(ST_ALLOC,sizeof(devexp_res))) == NULL)
 		{
 			*perr = DbErr_ClientMemoryAllocation;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		first_devexp++;
 	}
@@ -4254,7 +4246,7 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 		if (cl == NULL)
 		{
 			*perr = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
@@ -4269,7 +4261,7 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 	if ((filter1 = (char *)malloc(k + 1)) == NULL)
 	{
 		*perr = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(filter1,filter);
 	for(i=0;i<k;i++)
@@ -4283,7 +4275,7 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 		if ((tab_clstu = (devexp_res *)realloc(tab_clstu,sizeof(devexp_res) * tp)) == NULL)
 		{
 			*perr = DbErr_ClientMemoryAllocation;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		memset((void *)(&tab_clstu[func_ptr]),0,sizeof(devexp_res) << 3);
 	}
@@ -4315,7 +4307,7 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 #endif /* ALONE */
 				if(recev == NULL)
 					break;
-				if ((recev->db_err == 0) || (recev->db_err != DbErr_DatabaseNotConnected))
+				if ((recev->db_err == DS_OK) || (recev->db_err != DbErr_DatabaseNotConnected))
 					break;
 			}
 		}
@@ -4326,17 +4318,17 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 	if(recev == NULL)
 	{
 		*perr = error;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Any problems during database access ? */
 
-	if(recev->db_err != 0)
+	if(recev->db_err != DS_OK)
 	{
 		if (recev->db_err != DbErr_MaxDeviceForUDP)
 		{
 			*perr = recev->db_err;
-			return(-1);
+			return(DS_NOTOK);
 		}
 
 /* If the server answers that there is too many info to send for the UDP
@@ -4362,7 +4354,7 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 #endif /* !vxworks */
 #endif /* ALONE */
 					*perr = DbErr_CannotCreateClientHandle;
-					return(-1);
+					return(DS_NOTOK);
 				}
 
 				serv_adr.sin_family = AF_INET;
@@ -4387,7 +4379,7 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 			if (tcp_cl == NULL)
 			{
 				*perr = DbErr_CannotCreateClientHandle;
-				return(-1);
+				return(DS_NOTOK);
 			}
 
 /* Redo the call */
@@ -4411,7 +4403,7 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 
 						if(recev == NULL)
 							break;
-						if ((recev->db_err == 0) || (recev->db_err != DbErr_DatabaseNotConnected))
+						if ((recev->db_err == DS_OK) || (recev->db_err != DbErr_DatabaseNotConnected))
 							break;
 					}
 				}
@@ -4428,12 +4420,12 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 				closesocket(tcp_so);
 #endif
 				clnt_destroy(tcp_cl);
-				return(-1);
+				return(DS_NOTOK);
 			}
 
 /* Any problems during database access ? */
 
-			if(recev->db_err != 0)
+			if(recev->db_err != DS_OK)
 			{
 				*perr = recev->db_err;
 #ifndef _NT
@@ -4442,7 +4434,7 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 				closesocket(tcp_so);
 #endif
 				clnt_destroy(tcp_cl);
-				return(-1);
+				return(DS_NOTOK);
 			}
 
 			tcp_used = 1;
@@ -4477,7 +4469,7 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 	if ((*tab = new char *[full_dev_nb]) == NULL)
 	{
 		*perr = DbErr_ClientMemoryAllocation;
-		return -1;
+		return DS_NOTOK;
 	}
 	
 	for (i = 0;i < full_dev_nb;i++)
@@ -4490,7 +4482,7 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 					delete (*tab)[j];
 				delete *tab;
 				*perr = DbErr_ClientMemoryAllocation;
-				return -1;
+				return DS_NOTOK;
 			}
 			strcpy((*tab)[i],recev->res_val.arr1_val[i]);
 		}
@@ -4503,7 +4495,7 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 					delete (*tab)[k];
 				delete *tab;
 				*perr = DbErr_ClientMemoryAllocation;
-				return -1;
+				return DS_NOTOK;
 			}
 			strcpy((*tab)[i],tg_dev_name[j].c_str());
 		}
@@ -4552,8 +4544,8 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 
 /* No error */
 
-	*perr = 0;
-	return(0);
+	*perr = DS_OK;
+	return(DS_OK);
 	
 #else /* __STDCPP__ */
 
@@ -4599,8 +4591,8 @@ int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
 
 /* No error */
 
-	*perr = 0;
-	return(0);
+	*perr = DS_OK;
+	return(DS_OK);
 	
 #endif /* __STDCPP__ */
 
@@ -4662,8 +4654,8 @@ void kern_sort(char **tab,int n)
 *                                                                           *
 *    Argout : No argout                                                     *
 *                                                                           *
-*    This function returns 0 if the * is correctly used. Otherwise, the     *
-*    function returns -1						    *
+*    This function returns DS_OK if the * is correctly used. Otherwise, the     *
+*    function returns DS_NOTOK						    *
 *                                                                           *
 ****************************************************************************/
 int test_star(char *filter)
@@ -4706,17 +4698,17 @@ int test_star(char *filter)
 		j = 0;
 		NB_CHAR(j,filter_domain,'*');
 		if (j > 1)
-			return(-1);
+			return(DS_NOTOK);
 
 		j = 0;
 		NB_CHAR(j,filter_family,'*');
 		if (j > 1)
-			return(-1);
+			return(DS_NOTOK);
 
 		j = 0;
 		 NB_CHAR(j,filter_member,'*');
 		if (j > 1)
-			return(-1);
+			return(DS_NOTOK);
 
 		break;
 
@@ -4733,12 +4725,12 @@ int test_star(char *filter)
 		j = 0;
 		NB_CHAR(j,filter_domain,'*')
 		if (j > 1)
-			return(-1);
+			return(DS_NOTOK);
 
 		j = 0;
 		NB_CHAR(j,filter_family,'*');
 		if (j > 1)
-			return(-1);
+			return(DS_NOTOK);
 
 		break;
 
@@ -4750,12 +4742,12 @@ int test_star(char *filter)
 		j = 0;
 		NB_CHAR(j,filter_domain,'*')
 		if (j > 1)
-			return(-1);
+			return(DS_NOTOK);
 
 		break;
 	}
 
-	return(0);
+	return(DS_OK);
 
 }
 
@@ -4775,7 +4767,7 @@ int test_star(char *filter)
 *                                                                           *
 *    Argout : No argout                                                     *
 *                                                                           *
-*    This function returns 0 if no errors occurs or -1 if a problem occurs  *
+*    This function returns DS_OK if no errors occurs or DS_NOTOK if a problem occurs  *
 *                                                                           *
 ****************************************************************************/
 
@@ -4793,12 +4785,12 @@ int _DLLFunc db_freedevexp(char **ptr)
    by the db_getdevexp function), leave the function. */
 
 	if (ptr == NULL)
-		return(0);
+		return(DS_OK);
 
 /* At least one call to db_dataget function before using db_free ? */
 
 	if (first_devexp == 0) 
-		return(-1);
+		return(DS_NOTOK);
 
 /* Does this pointer exist in the tab_clstu array ? */
 
@@ -4809,7 +4801,7 @@ int _DLLFunc db_freedevexp(char **ptr)
 	}
 
 	if (i == func_ptr)
-		return(-1);
+		return(DS_NOTOK);
 
 /* TCP was used for this call ? */
 
@@ -4824,7 +4816,7 @@ int _DLLFunc db_freedevexp(char **ptr)
 		delete [] ptr;
 #else
 		if (!clnt_freeres(tab_clstu[i].cl,(xdrproc_t)xdr_db_res,(char *)&(tab_clstu[i].res)))
-			return(-1);
+			return(DS_NOTOK);
 #endif /* __STDCPP__ */
 
 #ifndef _NT
@@ -4846,11 +4838,11 @@ int _DLLFunc db_freedevexp(char **ptr)
 		delete ptr;
 #else
 		if (!clnt_freeres(tab_clstu[i].cl,(xdrproc_t)xdr_db_res,(char *)&(tab_clstu[i].res)))
-			return(-1);
+			return(DS_NOTOK);
 #endif
 	}
 
-	return(0);
+	return(DS_OK);
 	
 }
 
@@ -4869,8 +4861,8 @@ int _DLLFunc db_freedevexp(char **ptr)
 *    Argout : - The command code					    *
 * 	      - The error caode in case of trouble                          *
 *                                                                           *
-*    In case of trouble, the function returns -1 and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns 0                *
+*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
+*    pointed to by "perr". Otherwise, the function returns DS_OK                *
 *                                                                           *
 *****************************************************************************/
 
@@ -4900,7 +4892,7 @@ int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code,long *perr)
 	{
 		*cmd_code = 0;
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 # ifdef ALONE
@@ -4913,7 +4905,7 @@ int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code,long *perr)
 		{
 			*cmd_code = 0;
 			*perr = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
@@ -4953,7 +4945,7 @@ int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code,long *perr)
 #endif /* ALONE */
 				if(serv_ans == NULL)
 					break;
-				if ((serv_ans->db_err == 0) || (serv_ans->db_err != DbErr_DatabaseNotConnected))
+				if ((serv_ans->db_err == DS_OK) || (serv_ans->db_err != DbErr_DatabaseNotConnected))
 					break;
 			}
 		}
@@ -4974,28 +4966,28 @@ int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code,long *perr)
 				     i_nethost,DB_UDP,&error);
 #endif /* ALONE */
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			*cmd_code = 0;
 			*perr = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}	
 
 /* Any problem during database access ? */
 
-	if (serv_ans->db_err != 0)
+	if (serv_ans->db_err != DS_OK)
 	{
 		*cmd_code = 0;
 		*perr = serv_ans->db_err;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* No error */
 
 	*cmd_code = serv_ans->xcmd_code;
-	*perr = 0;
-	return(0);
+	*perr = DS_OK;
+	return(DS_OK);
 
 }
 
@@ -5013,8 +5005,8 @@ int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code,long *perr)
 *    Argout : - The command code					    *
 * 	      - The error caode in case of trouble                          *
 *                                                                           *
-*    In case of trouble, the function returns -1 and set the err variable   *
-*    pointed to by "perr". Otherwise, the function returns 0                *
+*    In case of trouble, the function returns DS_NOTOK and set the err variable   *
+*    pointed to by "perr". Otherwise, the function returns DS_OK                *
 *                                                                           *
 *****************************************************************************/
 
@@ -5044,7 +5036,7 @@ int _DLLFunc db_event_query(char *event_name, u_int *event_code,long *perr)
 	{
 		*event_code = 0;
 		*perr = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 # ifdef ALONE
@@ -5057,7 +5049,7 @@ int _DLLFunc db_event_query(char *event_name, u_int *event_code,long *perr)
 		{
 			*event_code = 0;
 			*perr = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
@@ -5097,7 +5089,7 @@ int _DLLFunc db_event_query(char *event_name, u_int *event_code,long *perr)
 #endif /* ALONE */
 				if(serv_ans == NULL)
 					break;
-				if ((serv_ans->db_err == 0) || (serv_ans->db_err != DbErr_DatabaseNotConnected))
+				if ((serv_ans->db_err == DS_OK) || (serv_ans->db_err != DbErr_DatabaseNotConnected))
 					break;
 			}
 		}
@@ -5118,28 +5110,28 @@ int _DLLFunc db_event_query(char *event_name, u_int *event_code,long *perr)
 				     i_nethost,DB_UDP,&error);
 #endif /* ALONE */
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			*event_code = 0;
 			*perr = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}	
 
 /* Any problem during database access ? */
 
-	if (serv_ans->db_err != 0)
+	if (serv_ans->db_err != DS_OK)
 	{
 		*event_code = 0;
 		*perr = serv_ans->db_err;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* No error */
 
 	*event_code = serv_ans->xevent_code;
-	*perr = 0;
-	return(0);
+	*perr = DS_OK;
+	return(DS_OK);
 
 }
 #endif /* _OSK */
@@ -5160,10 +5152,10 @@ int _DLLFunc db_event_query(char *event_name, u_int *event_code,long *perr)
 *                                                                           *
 *    Argout : No argout							    *
 *                                                                           *
-*    In case of major trouble, the function returns -1 and set the          *
+*    In case of major trouble, the function returns DS_NOTOK and set the          *
 *    error_code  variable of the error structure. In case of error for a    *
 *    pseudo device in the list, the function returns 1.			    *
-*    Otherwise, the function returns 0                			    *
+*    Otherwise, the function returns DS_OK                			    *
 *                                                                           *
 *****************************************************************************/
 
@@ -5187,7 +5179,7 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
         if (config_flags.no_database)
         {
                 p_err->error_code = DbErr_NoDatabase;
-		p_err->psdev_err = 0;
+		p_err->psdev_err = DS_OK;
                 return(DS_NOTOK);
         } 
 
@@ -5196,8 +5188,8 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
 	if ((psdev == NULL) || (num_psdev == 0))
 	{
 		p_err->error_code = DbErr_BadParameters;
-		p_err->psdev_err = 0;
-		return(-1);
+		p_err->psdev_err = DS_OK;
+		return(DS_NOTOK);
 	}
 
 	for (i = 0;i < num_psdev;i++)
@@ -5207,8 +5199,8 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
 		if (l != 2)
 		{
 			p_err->error_code = DbErr_BadParameters;
-			p_err->psdev_err = 0;
-			return(-1);
+			p_err->psdev_err = DS_OK;
+			return(DS_NOTOK);
 		}
 	}
 
@@ -5221,8 +5213,8 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
 		if (cl == NULL)
 		{
 			p_err->error_code = DbErr_CannotCreateClientHandle;
-			p_err->psdev_err = 0;
-			return(-1);
+			p_err->psdev_err = DS_OK;
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
@@ -5235,15 +5227,15 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
 	if ((tmp_x = (psdev_reg_x *)malloc(sizeof(psdev_reg_x))) == NULL)
 	{
 		p_err->error_code = DbErr_ClientMemoryAllocation;
-		p_err->psdev_err = 0;
-		return(-1);
+		p_err->psdev_err = DS_OK;
+		return(DS_NOTOK);
 	}
 	if ((tmp_x_low = (psdev_elt *)calloc(num_psdev,sizeof(psdev_elt))) == NULL)
 	{
 		free(tmp_x);
 		p_err->error_code = DbErr_ClientMemoryAllocation;
-		p_err->psdev_err = 0;
-		return(-1);
+		p_err->psdev_err = DS_OK;
+		return(DS_NOTOK);
 	}
 
 /* Init. the previously allocated structures */
@@ -5301,7 +5293,7 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
 #endif /* ALONE */
 				if(serv_ans == NULL)
 					break;
-				if ((serv_ans->error_code == 0) || (serv_ans->error_code != DbErr_DatabaseNotConnected))
+				if ((serv_ans->error_code == DS_OK) || (serv_ans->error_code != DbErr_DatabaseNotConnected))
 					break;
 			}
 		}
@@ -5322,13 +5314,13 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
 				     i_nethost,DB_UDP,&error);
 #endif /* ALONE */
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			free(tmp_x);
 			free(tmp_x_low);
 			p_err->error_code = error;
-			p_err->psdev_err = 0;
-			return(-1);
+			p_err->psdev_err = DS_OK;
+			return(DS_NOTOK);
 		}
 	}	
 
@@ -5339,7 +5331,7 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
 
 /* Any problem during database access ? */
 
-	if (serv_ans->error_code != 0)
+	if (serv_ans->error_code != DS_OK)
 	{
 		p_err->error_code = serv_ans->error_code;
 		p_err->psdev_err = serv_ans->psdev_err;
@@ -5348,9 +5340,9 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
 
 /* No error */
 
-	p_err->error_code = 0;
-	p_err->psdev_err = 0;
-	return(0);
+	p_err->error_code = DS_OK;
+	p_err->psdev_err = DS_OK;
+	return(DS_OK);
 
 }
 
@@ -5368,10 +5360,10 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
 *                                                                           *
 *    Argout : No argout							    *
 *                                                                           *
-*    In case of major trouble, the function returns -1 and set the          *
+*    In case of major trouble, the function returns DS_NOTOK and set the          *
 *    error_code  variable of the error structure. In case of error for a    *
 *    pseudo device in the list, the function returns 1.			    *
-*    Otherwise, the function returns 0                			    *
+*    Otherwise, the function returns DS_OK                			    *
 *                                                                           *
 *****************************************************************************/
 
@@ -5392,7 +5384,7 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
         if (config_flags.no_database)
         {
                 p_err->error_code = DbErr_NoDatabase;
-		p_err->psdev_err = 0;
+		p_err->psdev_err = DS_OK;
                 return(DS_NOTOK);
         } 
 /* Try to verify the function parameters  (non NULL pointer) */
@@ -5400,8 +5392,8 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 	if ((psdev_list == NULL) || (num_psdev == 0))
 	{
 		p_err->error_code = DbErr_BadParameters;
-		p_err->psdev_err = 0;
-		return(-1);
+		p_err->psdev_err = DS_OK;
+		return(DS_NOTOK);
 	}
 
 	for (i = 0;i < num_psdev;i++)
@@ -5411,8 +5403,8 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 		if (l != 2)
 		{
 			p_err->error_code = DbErr_BadParameters;
-			p_err->psdev_err = 0;
-			return(-1);
+			p_err->psdev_err = DS_OK;
+			return(DS_NOTOK);
 		}
 	}
 
@@ -5425,8 +5417,8 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 		if (cl == NULL)
 		{
 			p_err->error_code = DbErr_CannotCreateClientHandle;
-			p_err->psdev_err = 0;
-			return(-1);
+			p_err->psdev_err = DS_OK;
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
@@ -5439,8 +5431,8 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 	if((send.arr1_val = (nam *)calloc(num_psdev,sizeof(nam))) == NULL)
 	{
 		p_err->error_code = DbErr_ClientMemoryAllocation;
-		p_err->psdev_err = 0;
-		return(-1);
+		p_err->psdev_err = DS_OK;
+		return(DS_NOTOK);
 	}
 
 /* Initialize the array of pointer to pseudo device name */
@@ -5451,11 +5443,11 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 		if ((send.arr1_val[i] = (char *)malloc(l + 2)) == NULL)
 		{
 			p_err->error_code = DbErr_ClientMemoryAllocation;
-			p_err->psdev_err = 0;
+			p_err->psdev_err = DS_OK;
 			for (j = 0;j < i;j++)
 				free(send.arr1_val[j]);
 			free(send.arr1_val);
-			return(-1);
+			return(DS_NOTOK);
 		}
 
 		strcpy(send.arr1_val[i],psdev_list[i]);
@@ -5496,7 +5488,7 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 #endif /* ALONE */
 				if(serv_ans == NULL)
 					break;
-				if ((serv_ans->error_code == 0) || (serv_ans->error_code != DbErr_DatabaseNotConnected))
+				if ((serv_ans->error_code == DS_OK) || (serv_ans->error_code != DbErr_DatabaseNotConnected))
 					break;
 			}
 		}
@@ -5517,14 +5509,14 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 				     i_nethost,DB_UDP,&error);
 #endif /* ALONE */
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			for (i = 0;i < num_psdev;i++)
 				free(send.arr1_val[i]);
 			free(send.arr1_val);
 			p_err->error_code = error;
-			p_err->psdev_err = 0;
-			return(-1);
+			p_err->psdev_err = DS_OK;
+			return(DS_NOTOK);
 		}
 	}	
 
@@ -5536,7 +5528,7 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 
 /* Any problem during database access ? */
 
-	if (serv_ans->error_code != 0)
+	if (serv_ans->error_code != DS_OK)
 	{
 		p_err->error_code = serv_ans->error_code;
 		p_err->psdev_err = serv_ans->psdev_err;
@@ -5545,9 +5537,9 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 
 /* No error */
 
-	p_err->error_code = 0;
-	p_err->psdev_err = 0;
-	return(0);
+	p_err->error_code = DS_OK;
+	p_err->psdev_err = DS_OK;
+	return(DS_OK);
 
 }
 
@@ -5565,7 +5557,7 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 *                                                                           *
 *    Argout : The error code						    *
 *                                                                           *
-*    This function returns 0 if no errors occurs or -1 if a problem occurs  *
+*    This function returns DS_OK if no errors occurs or DS_NOTOK if a problem occurs  *
 *                                                                           *
 ****************************************************************************/
 int _DLLFunc db_svc_close(long *perr)
@@ -5593,7 +5585,7 @@ int _DLLFunc db_svc_close(long *perr)
 		if (cl == NULL)
 		{
 			*perr = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
@@ -5623,25 +5615,25 @@ int _DLLFunc db_svc_close(long *perr)
 				     i_nethost,DB_UDP,&error);
 #endif /* ALONE */
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			*perr = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
 /* Any trouble during database access ? */
 
-	if (*pdb_err != 0)
+	if (*pdb_err != DS_OK)
 	{
 		*perr = *pdb_err;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* No error */
 
-	*perr = 0;
-	return(0);
+	*perr = DS_OK;
+	return(DS_OK);
 
 }
 
@@ -5659,7 +5651,7 @@ int _DLLFunc db_svc_close(long *perr)
 *                                                                           *
 *    Argout : The error code						    *
 *                                                                           *
-*    This function returns 0 if no errors occurs or -1 if a problem occurs  *
+*    This function returns DS_OK if no errors occurs or DS_NOTOK if a problem occurs  *
 *                                                                           *
 ****************************************************************************/
 int _DLLFunc db_svc_reopen(long *perr)
@@ -5687,7 +5679,7 @@ int _DLLFunc db_svc_reopen(long *perr)
 		if (cl == NULL)
 		{
 			*perr = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
@@ -5717,24 +5709,24 @@ int _DLLFunc db_svc_reopen(long *perr)
 				     i_nethost,DB_UDP,&error);
 #endif /* ALONE */
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			*perr = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
 /* Any trouble during database access ? */
 
-	if (*pdb_err != 0)
+	if (*pdb_err != DS_OK)
 	{
 		*perr = *pdb_err;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* No error */
 
-	*perr = 0;
-	return(0);
+	*perr = DS_OK;
+	return(DS_OK);
 
 }

@@ -1,5 +1,5 @@
 static char RcsId[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/dev_xdr.c,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/dev_xdr.c,v 1.2 2003-03-18 16:16:26 jkrueger1 Exp $";
 
 /*+*******************************************************************
 
@@ -14,9 +14,9 @@ static char RcsId[] =
 
  Original:	January 1991
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-03-14 12:22:07 $
+ Date:		$Date: 2003-03-18 16:16:26 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -32,6 +32,10 @@ static char RcsId[] =
 
 #define STD_XDR_LENGTH	   4       /* Standart length of a XDR data block */
 
+static long adjust_size(const long value)
+{
+	return (value + STD_XDR_LENGTH - value % STD_XDR_LENGTH); 
+}
 
 /* D_VOID_TYPE */
 
@@ -140,26 +144,24 @@ long
 xdr_length_DevString (objp)
 	DevString *objp;
 {
-	long  length = 0;
+	/* number of bytes coded as unsigned int */
+	long  length = STD_XDR_LENGTH;
 	short add_bytes;
 
-	/* number of bytes coded as unsigned int */
-	length = STD_XDR_LENGTH;
-
 	/* length of the string in bytes */
-	length = length + strlen (*objp);
+	length += strlen (*objp);
 
 	/* only packets of four bytes can be send by XDR
 	 * Calculate the next multiple of four. */
-
+/*
 	if ( (add_bytes = (STD_XDR_LENGTH - 
 			  (length - (STD_XDR_LENGTH * 
 			  (int)(length / STD_XDR_LENGTH))))) == STD_XDR_LENGTH)
 	   {
 	   add_bytes = 0;
 	   }
-
-	length = length + add_bytes;
+*/
+	length = adjust_size(length); 
 
 	return (length);
 }
@@ -187,8 +189,8 @@ xdr_length_DevIntFloat(objp)
 {
 	long  length = 0;
 
-	length = length + xdr_length_DevLong  (&objp->state);
-	length = length + xdr_length_DevFloat (&objp->value);
+	length += xdr_length_DevLong  (&objp->state);
+	length += xdr_length_DevFloat (&objp->value);
 
 	return (length);
 }
@@ -217,8 +219,8 @@ xdr_length_DevFloatReadPoint(objp)
 {
 	long  length = 0;
 
-	length = length + xdr_length_DevFloat (&objp->set);
-	length = length + xdr_length_DevFloat (&objp->read);
+	length += xdr_length_DevFloat (&objp->set);
+	length += xdr_length_DevFloat (&objp->read);
 
 	return (length);
 }
@@ -249,9 +251,9 @@ xdr_length_DevStateFloatReadPoint(objp)
 {
 	long  length = 0;
 
-	length = length + xdr_length_DevShort (&objp->state);
-	length = length + xdr_length_DevFloat (&objp->set);
-	length = length + xdr_length_DevFloat (&objp->read);
+	length += xdr_length_DevShort (&objp->state);
+	length += xdr_length_DevFloat (&objp->set);
+	length += xdr_length_DevFloat (&objp->read);
 
 	return (length);
 }
@@ -280,8 +282,8 @@ xdr_length_DevLongReadPoint(objp)
 {
 	long  length = 0;
 
-	length = length + xdr_length_DevLong (&objp->set);
-	length = length + xdr_length_DevLong (&objp->read);
+	length += xdr_length_DevLong (&objp->set);
+	length += xdr_length_DevLong (&objp->read);
 
 	return (length);
 }
@@ -310,8 +312,8 @@ xdr_length_DevDoubleReadPoint(objp)
 {
 	long  length = 0;
 
-	length = length + xdr_length_DevDouble (&objp->set);
-	length = length + xdr_length_DevDouble (&objp->read);
+	length += xdr_length_DevDouble (&objp->set);
+	length += xdr_length_DevDouble (&objp->read);
 
 	return (length);
 }
@@ -340,21 +342,17 @@ long
 xdr_length_DevVarCharArray (objp)
 	DevVarCharArray *objp;
 {
-	long 	length = 0;
-
 	/*
 	 *  four bytes for the number of array elements
 	 */
-
-	length = length + xdr_length_DevLong ((long *)&objp->length);
+	long length = xdr_length_DevLong ((long *)&objp->length);
 
 	/*
 	 *  now calculate the length of the array
 	 */
 
-	length = length + 
-		 ( objp->length * xdr_length_DevBoolean(&objp->sequence[0]) );
-
+	length += (objp->length * sizeof(DevBoolean));
+	length = adjust_size(length);
 	return (length);
 }
 
@@ -379,14 +377,13 @@ xdr_length_DevVarStringArray (objp)
 	DevVarStringArray *objp;
 {
 	long 	type_length;
-	long 	length = 0;
 	short	i;
 
 	/*
 	 *  four bytes for the number of array elements
 	 */
 
-	length = length + xdr_length_DevLong ((long *)&objp->length);
+	long length = xdr_length_DevLong ((long *)&objp->length);
 
 	/*
 	 *  now find the lengthes of all strings in the array
@@ -394,13 +391,12 @@ xdr_length_DevVarStringArray (objp)
 	 */
 
 	for (i=0; (u_long)i<objp->length; i++ )
-	   {
-	   if ( (type_length = xdr_length_DevString (&objp->sequence[i])) 
-		 == -1 )
-		return (-1);
+	{
+	   	if ( (type_length = xdr_length_DevString (&objp->sequence[i])) == -1 )
+			return (-1);
 
-	   length = length + type_length;
-	   }
+	   	length = length + type_length;
+	}
 
 	return (length);
 }
@@ -425,20 +421,18 @@ long
 xdr_length_DevVarUShortArray (objp)
      	DevVarUShortArray *objp;
 {
-  	long length = 0;
-
 	/*
 	 *  four bytes for the number of array elements
 	 */
 
-  	length = length + xdr_length_DevLong ((long *)&objp->length);
+  	long length = xdr_length_DevLong ((long *)&objp->length);
 	
 	/*
 	 *  now calculate the length of the array
 	 */
 
-  	length = length + 
-		 ( objp->length * xdr_length_DevUShort(&objp->sequence[0]) );
+  	length += ( objp->length * sizeof(DevUShort));
+	length = adjust_size(length);
 
   	return (length);
 }
@@ -463,20 +457,18 @@ long
 xdr_length_DevVarShortArray (objp)
 	DevVarShortArray *objp;
 {
-	long 	length = 0;
-
 	/*
 	 *  four bytes for the number of array elements
 	 */
 
-	length = length + xdr_length_DevLong ((long *)&objp->length);
+	long length = xdr_length_DevLong ((long *)&objp->length);
 
 	/*
 	 *  now calculate the length of the array
 	 */
 
-	length = length + 
-		 ( objp->length * xdr_length_DevShort(&objp->sequence[0]) );
+  	length += ( objp->length * sizeof(DevShort));
+	length = adjust_size(length); 
 
 	return (length);
 }
@@ -500,20 +492,18 @@ long
 xdr_length_DevVarULongArray (objp)
 	DevVarULongArray *objp;
 {
-	long 	length = 0;
-
 	/*
 	 *  four bytes for the number of array elements
 	 */
 
-	length = length + xdr_length_DevLong ((long *)&objp->length);
+	long length = length + xdr_length_DevLong ((long *)&objp->length);
 
 	/*
 	 *  now calculate the length of the array
 	 */
 
-	length = length + 
-		 ( objp->length * xdr_length_DevLong((long *)&objp->sequence[0]) );
+	length += ( objp->length * sizeof(DevLong));
+	length = adjust_size(length);
 
 	return (length);
 }
@@ -537,20 +527,18 @@ long
 xdr_length_DevVarLongArray (objp)
 	DevVarLongArray *objp;
 {
-	long 	length = 0;
-
 	/*
 	 *  four bytes for the number of array elements
 	 */
 
-	length = length + xdr_length_DevLong ((long *)&objp->length);
+	long length = xdr_length_DevLong ((long *)&objp->length);
 
 	/*
 	 *  now calculate the length of the array
 	 */
 
-	length = length + 
-		 ( objp->length * xdr_length_DevLong(&objp->sequence[0]) );
+	length += ( objp->length * sizeof(DevLong));
+	length = adjust_size(length);
 
 	return (length);
 }
@@ -575,20 +563,18 @@ long
 xdr_length_DevVarFloatArray (objp)
 	DevVarFloatArray *objp;
 {
-	long 	length = 0;
-
 	/*
 	 *  four bytes for the number of array elements
 	 */
 
-	length = length + xdr_length_DevLong ((long *)&objp->length);
+	long length = xdr_length_DevLong ((long *)&objp->length);
 
 	/*
 	 *  now calculate the length of the array
 	 */
 
-	length = length + 
-		 ( objp->length * xdr_length_DevFloat(&objp->sequence[0]) );
+	length += ( objp->length * sizeof(DevFloat));
+	length = adjust_size(length);
 
 	return (length);
 }
@@ -612,20 +598,18 @@ long
 xdr_length_DevVarDoubleArray (objp)
 	DevVarDoubleArray *objp;
 {
-	long 	length = 0;
-
 	/*
 	 *  four bytes for the number of array elements
 	 */
 
-	length = length + xdr_length_DevLong ((long *)&objp->length);
+	long length = xdr_length_DevLong ((long *)&objp->length);
 
 	/*
 	 *  now calculate the length of the array
 	 */
 
-	length = length + 
-		 ( objp->length * xdr_length_DevDouble(&objp->sequence[0]) );
+	length += ( objp->length * sizeof(DevDouble));
+	length = adjust_size(length);
 
 	return (length);
 }
@@ -652,20 +636,18 @@ long
 xdr_length_DevVarFloatReadPointArray (objp)
 	DevVarFloatReadPointArray *objp;
 {
-	long 	length = 0;
-
 	/*
 	 *  four bytes for the number of array elements
 	 */
 
-	length = length + xdr_length_DevLong ((long *)&objp->length);
+	long length = xdr_length_DevLong ((long *)&objp->length);
 
 	/*
 	 *  now calculate the length of the array
 	 */
 
-	length = length + (objp->length * 
-		 xdr_length_DevFloatReadPoint(&objp->sequence[0]) );
+	length += (objp->length * sizeof(DevFloatReadPoint));
+	length = adjust_size(length);
 
 	return (length);
 }
@@ -691,20 +673,17 @@ long
 xdr_length_DevVarStateFloatReadPointArray (objp)
 	DevVarStateFloatReadPointArray *objp;
 {
-	long 	length = 0;
-
 	/*
 	 *  four bytes for the number of array elements
 	 */
-
-	length = length + xdr_length_DevLong ((long *)&objp->length);
+	long length = xdr_length_DevLong ((long *)&objp->length);
 
 	/*
 	 *  now calculate the length of the array
 	 */
 
-	length = length + (objp->length * 
-		 xdr_length_DevStateFloatReadPoint(&objp->sequence[0]) );
+	length += (objp->length * sizeof(DevStateFloatReadPoint));
+	length = adjust_size(length); 
 
 	return (length);
 }
@@ -730,20 +709,18 @@ long
 xdr_length_DevVarLongReadPointArray (objp)
 	DevVarLongReadPointArray *objp;
 {
-	long 	length = 0;
-
 	/*
 	 *  four bytes for the number of array elements
 	 */
 
-	length = length + xdr_length_DevLong ((long *)&objp->length);
+	long length = xdr_length_DevLong ((long *)&objp->length);
 
 	/*
 	 *  now calculate the length of the array
 	 */
 
-	length = length + (objp->length * 
-		 xdr_length_DevLongReadPoint(&objp->sequence[0]) );
+	length += (objp->length * sizeof(DevLongReadPoint));
+	length = adjust_size(length);
 
 	return (length);
 }

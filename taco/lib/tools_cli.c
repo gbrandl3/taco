@@ -1,4 +1,4 @@
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tools_cli.c,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tools_cli.c,v 1.2 2003-03-18 16:16:31 jkrueger1 Exp $";
 
 /*+*******************************************************************
 
@@ -16,9 +16,9 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib
 
  Original   :   April 1997
 
- Version:       $Revision: 1.1 $
+ Version:       $Revision: 1.2 $
 
- Date:          $Date: 2003-03-14 12:22:07 $
+ Date:          $Date: 2003-03-18 16:16:31 $
 
  Copyright (c) 1997 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -88,30 +88,23 @@ static struct timeval timeout_browse={60,0};
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_deviceinfo function code                       	    *
-*               -------------                                               *
-*                                                                           *
-*    Function rule : To get device information from the database	    *
-*									    *
-*    Argin : - dev_name : Device name					    * 
-*    Argout : - p_domain_nb : Pointer for domain number			    *
-*             - p_error : Pointer for the error code in case of problems    *
-*                                                                           *
-*    In case of trouble, the function returns -1 and set the variable       *
-*    pointed to by "p_error". Otherwise, the function returns 0             *
-*                                                                           *
-*****************************************************************************/
-
-
+/**
+ * To get device information from the database	
+ *									
+ * @param dev_name	Device name
+ * @param p_domain_nb 	Pointer for domain number			
+ * @param p_error 	Pointer for the error code in case of problems
+ *
+ * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ */
 long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info,long *p_error)
 {
 	db_devinfo_svc *recev;
 	int i,k;
 	char *name_sent;
 	long error;
-	long exit_code = 0;
+	long exit_code = DS_OK;
 	struct timeval old_tout;
 	CLIENT *local_cl;
 #ifndef _OSK
@@ -126,12 +119,12 @@ long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info,long *p_error)
 	if ((p_info == NULL) || (dev_name == NULL))
 	{
 		*p_error = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Miscellaneous init. */
 
-	*p_error = 0;
+	*p_error = DS_OK;
 			
 #ifdef ALONE
 /* Create RPC connection if it's the first call */
@@ -142,7 +135,7 @@ long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info,long *p_error)
 		if (cl == NULL)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout_browse);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&timeout_browse);
@@ -173,7 +166,7 @@ long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info,long *p_error)
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(name_sent,dev_name);
 	for(i = 0;i < k;i++)
@@ -193,12 +186,12 @@ long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info,long *p_error)
 			to_reconnection((void *)&name_sent,(void **)&recev,&local_cl,
 					(int)DB_DEVINFO,(long)0,DB_UDP,&error);
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 			clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 			*p_error = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -223,9 +216,9 @@ long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info,long *p_error)
 				clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 				clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 				*p_error = error;
-				return(-1);
+				return(DS_NOTOK);
 			}
-			if ((recev->db_err == 0) || 
+			if ((recev->db_err == DS_OK) || 
 			    (recev->db_err != DbErr_DatabaseNotConnected))
 				break;
 		}
@@ -233,14 +226,14 @@ long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info,long *p_error)
 
 /* Any problems during database access ? */
 
-	if(recev->db_err != 0)
+	if(recev->db_err != DS_OK)
 	{
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = recev->db_err;
 		clnt_freeres(local_cl,(xdrproc_t)xdr_db_devinfo_svc,(char *)recev);
 		free(name_sent);
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 /* Free memory used to send data to server */
@@ -275,32 +268,24 @@ long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info,long *p_error)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_deviceres function code                           	    *
-*               ------------                                         	    *
-*                                                                           *
-*    Function rule : To retrieve the list of resources for a given device   *
-*                                                                           *
-*    Argins : - dev_name : The device name				    *
-*                                                                           *
-*    Argout : - p_family_nb : Pointer for family number			    *
-*	      - ppp_list : Pointer for the family name list. Memory is      *
-*			   allocated by this function		    	    *
-*             - p_error : Pointer for the error code in case of problems    *
-*                                                                           *
-*    In case of trouble, the function returns -1 and set the variable       *
-*    pointed to by "p_error". Otherwise, the function returns 0             *
-*                                                                           *
-*****************************************************************************/
-
-
+/**
+ * To retrieve the list of resources for a given device
+ *
+ * @param dev_name 	The device name				
+ * @param p_family_nb 	Pointer for family number			
+ * @param ppp_list 	Pointer for the family name list. Memory is
+ *			allocated by this function		    	
+ * @param p_error 	Pointer for the error code in case of problems
+ *
+ * @return    	In case of trouble, the function returns DS_NOTOK and set the variable
+ *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ */
 long db_deviceres(long dev_nb,char **dev_name_list,long *p_res_nb,char ***ppp_list,long *p_error)
 {
 	db_res *recev;
 	int i,j,k;
 	long error;
-	long exit_code = 0;
+	long exit_code = DS_OK;
 	long nb_res;
 	db_res sent;
 	struct timeval old_tout;
@@ -319,13 +304,13 @@ long db_deviceres(long dev_nb,char **dev_name_list,long *p_res_nb,char ***ppp_li
 	    (dev_name_list == NULL) || (dev_nb == 0))
 	{
 		*p_error = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Miscellaneous init. */
 
 	*p_res_nb = 0;
-	*p_error = 0;
+	*p_error = DS_OK;
 		
 #ifdef ALONE
 /* Create RPC connection if it's the first call */
@@ -336,7 +321,7 @@ long db_deviceres(long dev_nb,char **dev_name_list,long *p_res_nb,char ***ppp_li
 		if (cl_tcp == NULL)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl_tcp,CLSET_TIMEOUT,(char *)&timeout_browse);
 		clnt_control(cl_tcp,CLSET_RETRY_TIMEOUT,(char *)&timeout_browse);
@@ -354,14 +339,14 @@ long db_deviceres(long dev_nb,char **dev_name_list,long *p_res_nb,char ***ppp_li
 		if (ht == NULL)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}		
 #else /* !vxworks */
 		host_addr = hostGetByName(db_info.conf->server_host);
 		if (host_addr == 0)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 #endif /* !vxworks */
 
@@ -383,7 +368,7 @@ long db_deviceres(long dev_nb,char **dev_name_list,long *p_res_nb,char ***ppp_li
 		if (cl_tcp == NULL)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		
 		clnt_control(cl_tcp,CLSET_TIMEOUT,(char *)&timeout_browse);
@@ -397,13 +382,13 @@ long db_deviceres(long dev_nb,char **dev_name_list,long *p_res_nb,char ***ppp_li
 
 /* Initialize data sent to server */
 
-	sent.db_err = 0;
+	sent.db_err = DS_OK;
 	sent.res_val.arr1_len = dev_nb;
 	
 	if ((sent.res_val.arr1_val = (char **)calloc(dev_nb,sizeof(char *))) == NULL)
 	{
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 	for (i = 0;i < dev_nb;i++)
@@ -415,7 +400,7 @@ long db_deviceres(long dev_nb,char **dev_name_list,long *p_res_nb,char ***ppp_li
 				free(sent.res_val.arr1_val[j]);
 			free(sent.res_val.arr1_val);	
 			*p_error = DbErr_ClientMemoryAllocation;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		strcpy(sent.res_val.arr1_val[i],dev_name_list[i]);
 		for(j = 0;j < k;j++)
@@ -437,13 +422,13 @@ long db_deviceres(long dev_nb,char **dev_name_list,long *p_res_nb,char ***ppp_li
 					(int)DB_DEVRES,(long)0,DB_TCP,&error);
 			cl_tcp = local_cl;
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			for (i = 0;i < dev_nb;i++)
 				free(sent.res_val.arr1_val[i]);
 			free(sent.res_val.arr1_val);
 			*p_error = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -469,9 +454,9 @@ long db_deviceres(long dev_nb,char **dev_name_list,long *p_res_nb,char ***ppp_li
 					free(sent.res_val.arr1_val[i]);
 				free(sent.res_val.arr1_val);
 				*p_error = error;
-				return(-1);
+				return(DS_NOTOK);
 			}
-			if ((recev->db_err == 0) || 
+			if ((recev->db_err == DS_OK) || 
 			    (recev->db_err != DbErr_DatabaseNotConnected))
 				break;
 		}
@@ -479,14 +464,14 @@ long db_deviceres(long dev_nb,char **dev_name_list,long *p_res_nb,char ***ppp_li
 
 /* Any problems during database access ? */
 
-	if(recev->db_err != 0)
+	if(recev->db_err != DS_OK)
 	{
 		for (i = 0;i < dev_nb;i++)
 			free(sent.res_val.arr1_val[i]);
 		free(sent.res_val.arr1_val);
 		*p_error = recev->db_err;
 		clnt_freeres(local_cl,(xdrproc_t)xdr_db_res,(char *)recev);
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Free memory used to send data to server */
@@ -507,7 +492,7 @@ long db_deviceres(long dev_nb,char **dev_name_list,long *p_res_nb,char ***ppp_li
 		if ((*ppp_list = (char **)calloc(nb_res,sizeof(char *))) == NULL)
 		{
 			*p_error = DbErr_ClientMemoryAllocation;
-			exit_code = -1;
+			exit_code = DS_NOTOK;
 		}
 		else 
 		{	
@@ -519,7 +504,7 @@ long db_deviceres(long dev_nb,char **dev_name_list,long *p_res_nb,char ***ppp_li
 						free((*ppp_list)[j]);
 					free(*ppp_list);
 					*p_error = DbErr_ClientMemoryAllocation;
-					exit_code = -1;
+					exit_code = DS_NOTOK;
 					break;
 				}
 				else
@@ -541,30 +526,22 @@ long db_deviceres(long dev_nb,char **dev_name_list,long *p_res_nb,char ***ppp_li
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_devicedelete function code                       	    *
-*               ---------------                                             *
-*                                                                           *
-*    Function rule : To delete a device (or a pseudo device) from the       *
-*		     database						    *
-*									    *
-*    Argin : - dev_name : Device name					    * 
-*    Argout : - p_error : Pointer for the error code in case of problems    *
-*                                                                           *
-*    In case of trouble, the function returns -1 and set the variable       *
-*    pointed to by "p_error". Otherwise, the function returns 0             *
-*                                                                           *
-*****************************************************************************/
-
-
+/**
+ * To delete a device (or a pseudo device) from the database						
+ *									
+ * @param dev_name 	Device name
+ * @param p_error 	Pointer for the error code in case of problems
+ *
+ * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ */
 long db_devicedelete(const char *dev_name,long *p_error)
 {
 	long *recev;
 	int i,k;
 	char *name_sent;
 	long error;
-	long exit_code = 0;
+	long exit_code = DS_OK;
 	struct timeval old_tout;
 	CLIENT *local_cl;
 #ifndef _OSK
@@ -579,12 +556,12 @@ long db_devicedelete(const char *dev_name,long *p_error)
 	if (dev_name == NULL)
 	{
 		*p_error = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Miscellaneous init. */
 
-	*p_error = 0;
+	*p_error = DS_OK;
 			
 #ifdef ALONE
 /* Create RPC connection if it's the first call */
@@ -595,7 +572,7 @@ long db_devicedelete(const char *dev_name,long *p_error)
 		if (cl == NULL)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout_browse);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&timeout_browse);
@@ -626,7 +603,7 @@ long db_devicedelete(const char *dev_name,long *p_error)
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(name_sent,dev_name);
 	for(i = 0;i < k;i++)
@@ -646,12 +623,12 @@ long db_devicedelete(const char *dev_name,long *p_error)
 			to_reconnection((void *)&name_sent,(void **)&recev,&local_cl,
 					(int)DB_DEVDEL,(long)0,DB_UDP,&error);
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 			clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 			*p_error = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -676,9 +653,9 @@ long db_devicedelete(const char *dev_name,long *p_error)
 				clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 				clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 				*p_error = error;
-				return(-1);
+				return(DS_NOTOK);
 			}
-			if ((*recev == 0) || 
+			if ((*recev == DS_OK) || 
 			    (*recev != DbErr_DatabaseNotConnected))
 				break;
 		}
@@ -686,13 +663,13 @@ long db_devicedelete(const char *dev_name,long *p_error)
 
 /* Any problems during database access ? */
 
-	if (*recev != 0)
+	if (*recev != DS_OK)
 	{
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		free(name_sent);
 		*p_error = *recev;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 /* Free memory used to send data to server */
@@ -710,31 +687,23 @@ long db_devicedelete(const char *dev_name,long *p_error)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_devicedeleteres function code                       	    *
-*               ------------------                                          *
-*                                                                           *
-*    Function rule : To delete all resources belonging to a device list	    *
-*									    *
-*    Argin : - dev_nb : The device name number				    *
-*	     - dev_name_list : The device name list			    * 
-*									    *
-*    Argout : - p_error : Pointer for the error code in case of problems    *
-*                                                                           *
-*    In case of trouble, the function returns -1 and set the variable       *
-*    pointed to by "p_error". Otherwise, the function returns 0             *
-*                                                                           *
-*****************************************************************************/
-
-
+/**
+ * To delete all resources belonging to a device list	
+ *									
+ * @param dev_nb  	The device name number				
+ * @param dev_name_list The device name list
+ * @param p_error 	Pointer for the error code in case of problems
+ *
+ * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ */
 long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 {
 	db_psdev_error *recev;
 	int i,j,k;
 	db_res sent;
 	long error;
-	long exit_code = 0;
+	long exit_code = DS_OK;
 	struct timeval old_tout;
 	CLIENT *local_cl;
 #ifndef _OSK
@@ -749,14 +718,14 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 	if ((dev_name_list == NULL) || (dev_nb == 0))
 	{
 		p_error->error_code = DbErr_BadParameters;
-		p_error->psdev_err = 0;
-		return(-1);
+		p_error->psdev_err = DS_OK;
+		return(DS_NOTOK);
 	}
 
 /* Miscellaneous init. */
 
-	p_error->error_code = 0;
-	p_error->psdev_err = 0;
+	p_error->error_code = DS_OK;
+	p_error->psdev_err = DS_OK;
 	
 			
 #ifdef ALONE
@@ -768,7 +737,7 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 		if (cl == NULL)
 		{
 			p_error->error_code = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout_browse);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&timeout_browse);
@@ -793,7 +762,7 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 /* Initialize data sent to server */
 
 
-	sent.db_err = 0;
+	sent.db_err = DS_OK;
 	sent.res_val.arr1_len = dev_nb;
 	
 	if ((sent.res_val.arr1_val = (char **)calloc(dev_nb,sizeof(char *))) == NULL)
@@ -801,7 +770,7 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		p_error->error_code = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 	for (i = 0;i < dev_nb;i++)
@@ -815,7 +784,7 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 			clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 			clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 			p_error->error_code = DbErr_ClientMemoryAllocation;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		strcpy(sent.res_val.arr1_val[i],dev_name_list[i]);
 		for(j = 0;j < k;j++)
@@ -840,7 +809,7 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 			to_reconnection((void *)&sent,(void **)&recev,&local_cl,
 					(int)DB_DEVDELALLRES,(long)0,DB_UDP,&error);
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			for (i = 0;i < dev_nb;i++)
 				free(sent.res_val.arr1_val[i]);
@@ -848,7 +817,7 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 			clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 			clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 			p_error->error_code = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -876,9 +845,9 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 				clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 				clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 				p_error->error_code = error;
-				return(-1);
+				return(DS_NOTOK);
 			}
-			if ((recev->error_code == 0) || 
+			if ((recev->error_code == DS_OK) || 
 			    (recev->error_code != DbErr_DatabaseNotConnected))
 				break;
 		}
@@ -886,7 +855,7 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 
 /* Any problems during database access ? */
 
-	if (recev->error_code != 0)
+	if (recev->error_code != DS_OK)
 	{
 		for (i = 0;i < dev_nb;i++)
 			free(sent.res_val.arr1_val[i]);
@@ -895,7 +864,7 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		p_error->error_code = recev->error_code;
 		p_error->psdev_err = recev->psdev_err;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 /* Free memory used to send data to server */
@@ -913,34 +882,23 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 }
 
 
-
-/****************************************************************************
-*                                                                           *
-*		db_stat function code                           	    *
-*               -------                                         	    *
-*                                                                           *
-*    Function rule : To retrieve global database information		    *
-*                                                                           *
-*    Argin : No argin							    *
-*									    *
-*    Argout : - p_info : Pointer to the structure where all the info will be*
-*		         stored. These info are the number of devices       *
-*		         defined in the database, the number of resources   *
-*		         defined in the database.......			    *
-*             - p_error : Pointer for the error code in case of problems    *
-*                                                                           *
-*    In case of trouble, the function returns -1 and set the variable       *
-*    pointed to by "p_error". Otherwise, the function returns 0             *
-*                                                                           *
-*****************************************************************************/
-
-
+/**
+ * To retrieve global database information		
+ *
+ * @param p_info 	Pointer to the structure where all the info will be
+ *		        stored. These info are the number of devices defined in the 
+ *			database, the number of resources defined in the database ...
+ * @param p_error 	Pointer for the error code in case of problems
+ *
+ * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ *    		pointed to by "p_error". Otherwise, the function returns DS_OK 
+ */
 long db_stat(db_stat_call *p_info,long *p_error)
 {
 	db_info_svc *recev;
 	int i;
 	long error;
-	long exit_code = 0;
+	long exit_code = DS_OK;
 	struct timeval old_tout;
 	CLIENT *local_cl;
 #ifndef _OSK
@@ -955,12 +913,12 @@ long db_stat(db_stat_call *p_info,long *p_error)
 	if (p_info == NULL)
 	{
 		*p_error = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Miscellaneous init. */
 
-	*p_error = 0;
+	*p_error = DS_OK;
 			
 #ifdef ALONE
 /* Create RPC connection if it's the first call */
@@ -971,7 +929,7 @@ long db_stat(db_stat_call *p_info,long *p_error)
 		if (cl == NULL)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout_browse);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&timeout_browse);
@@ -1009,12 +967,12 @@ long db_stat(db_stat_call *p_info,long *p_error)
 			to_reconnection((void *)NULL,(void **)&recev,&local_cl,
 					(int)DB_INFO,(long)0,DB_UDP,&error);
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 			clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 			*p_error = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -1039,9 +997,9 @@ long db_stat(db_stat_call *p_info,long *p_error)
 				clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 				clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 				*p_error = error;
-				return(-1);
+				return(DS_NOTOK);
 			}
-			if ((recev->db_err == 0) || 
+			if ((recev->db_err == DS_OK) || 
 			    (recev->db_err != DbErr_DatabaseNotConnected))
 				break;
 		}
@@ -1049,13 +1007,13 @@ long db_stat(db_stat_call *p_info,long *p_error)
 
 /* Any problems during database access ? */
 
-	if(recev->db_err != 0)
+	if(recev->db_err != DS_OK)
 	{
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = recev->db_err;
 		clnt_freeres(local_cl,(xdrproc_t)xdr_db_info_svc,(char *)recev);
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Allocate memory  to store domain name and element number */
@@ -1066,7 +1024,7 @@ long db_stat(db_stat_call *p_info,long *p_error)
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = DbErr_ClientMemoryAllocation;
 		clnt_freeres(local_cl,(xdrproc_t)xdr_db_info_svc,(char *)recev);
-		return(-1);
+		return(DS_NOTOK);
 	}
 	  if ((p_info->res_domain = (db_info_dom *)calloc(recev->res.dom_len,sizeof(db_info_dom))) == NULL)
 	{
@@ -1075,7 +1033,7 @@ long db_stat(db_stat_call *p_info,long *p_error)
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = DbErr_ClientMemoryAllocation;
 		clnt_freeres(local_cl,(xdrproc_t)xdr_db_info_svc,(char *)recev);
-		return(-1);
+		return(DS_NOTOK);
 	}
 		
 /* Copy result to client structure */
@@ -1112,31 +1070,23 @@ long db_stat(db_stat_call *p_info,long *p_error)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_servunreg function code                           	    *
-*               ------------                                        	    *
-*                                                                           *
-*    Function rule : To unregister a server from the database. This will    *
-*		     update all the server devices has been not exported    *
-*                                                                           *
-*    Argins : - ds_name : The device server name			    *
-*	      - pers_name : The device server personal name		    *
-*                                                                           *
-*    Argout : - p_error : Pointer for the error code in case of problems    *
-*                                                                           *
-*    In case of trouble, the function returns -1 and set the variable       *
-*    pointed to by "p_error". Otherwise, the function returns 0             *
-*                                                                           *
-*****************************************************************************/
-
-
+/**
+ * To unregister a server from the database. This will update all the server 
+ * devices has been not exported
+ *
+ * @param ds_name  	The device server name			
+ * @param pers_name 	The device server personal name		
+ * @param p_error  	Pointer for the error code in case of problems
+ *
+ * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ */
 long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 {
 	long *recev;
 	int i,j,k;
 	long error;
-	long exit_code = 0;
+	long exit_code = DS_OK;
 	db_res sent;
 	struct timeval old_tout;
 	CLIENT *local_cl;
@@ -1152,12 +1102,12 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 	if ((ds_name == NULL) || (pers_name == NULL))
 	{
 		*p_error = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Miscellaneous init. */
 
-	*p_error = 0;
+	*p_error = DS_OK;
 		
 #ifdef ALONE
 /* Create RPC connection if it's the first call */
@@ -1168,7 +1118,7 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 		if (cl == NULL)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout_browse);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&timeout_browse);
@@ -1193,7 +1143,7 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 
 /* Initialize data sent to server */
 
-	sent.db_err = 0;
+	sent.db_err = DS_OK;
 	sent.res_val.arr1_len = 2;
 	
 	if ((sent.res_val.arr1_val = (char **)calloc(sizeof(char *),2)) == NULL)
@@ -1201,7 +1151,7 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 	k = strlen(ds_name);
@@ -1210,7 +1160,7 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(sent.res_val.arr1_val[0],ds_name);
 	for(i = 0;i < k;i++)
@@ -1222,7 +1172,7 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(sent.res_val.arr1_val[1],pers_name);
 	for(i = 0;i < k;i++)
@@ -1242,7 +1192,7 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 			to_reconnection((void *)&sent,(void **)&recev,&local_cl,
 					(int)DB_SVCUNREG,(long)0,DB_UDP,&error);
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 			clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
@@ -1250,7 +1200,7 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 			free(sent.res_val.arr1_val[1]);
 			free(sent.res_val.arr1_val);
 			*p_error = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -1278,7 +1228,7 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 				free(sent.res_val.arr1_val[1]);
 				free(sent.res_val.arr1_val);
 				*p_error = error;
-				return(-1);
+				return(DS_NOTOK);
 			}
 			if ((*recev == 0) || 
 			    (*recev != DbErr_DatabaseNotConnected))
@@ -1288,7 +1238,7 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 
 /* Any problems during database access ? */
 
-	if(*recev != 0)
+	if(*recev != DS_OK)
 	{
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
@@ -1296,7 +1246,7 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 		free(sent.res_val.arr1_val[1]);
 		free(sent.res_val.arr1_val);
 		*p_error = *recev;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 /* Free memory used to send data to server */
@@ -1316,34 +1266,25 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_servinfo function code                           	    *
-*               -----------                                        	    *
-*                                                                           *
-*    Function rule : To device server information to the caller. These info *
-*		     are the device list, the server process name and its   *
-*		     pid plus the host name				    *
-*                                                                           *
-*    Argins : - ds_name : The device server name			    *
-*	      - pers_name : The device server personal name		    *
-*                                                                           *
-*    Argout : - p_inf : Pointer for the structure with DS info		    *
-*	      - p_error : Pointer for the error code in case of problems    *
-*                                                                           *
-*    In case of trouble, the function returns -1 and set the variable       *
-*    pointed to by "p_error". Otherwise, the function returns 0             *
-*                                                                           *
-*****************************************************************************/
-
-
+/**
+ * To device server information to the caller. These info are the device list, 
+ * the server process name and its pid plus the host name
+ *
+ * @param ds_name 	The device server name			
+ * @param pers_name 	The device server personal name		
+ * @param p_inf 	Pointer for the structure with DS info		
+ * @param p_error 	Pointer for the error code in case of problems
+ *
+ * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ */
 long db_servinfo(const char *ds_name,const char *pers_name, \
 		 db_svcinfo_call *p_inf,long *p_error)
 {
 	svcinfo_svc *recev;
 	int i,j,k;
 	long error,tmp,tmp_dev;
-	long exit_code = 0;
+	long exit_code = DS_OK;
 	db_res sent;
 	struct timeval old_tout;
 	CLIENT *local_cl;
@@ -1359,12 +1300,12 @@ long db_servinfo(const char *ds_name,const char *pers_name, \
 	if ((ds_name == NULL) || (pers_name == NULL) || (p_inf == NULL))
 	{
 		*p_error = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Miscellaneous init. */
 
-	*p_error = 0;
+	*p_error = DS_OK;
 	
 	p_inf->embedded_server_nb = 0;
 	p_inf->server = NULL;
@@ -1382,7 +1323,7 @@ long db_servinfo(const char *ds_name,const char *pers_name, \
 		if (cl == NULL)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout_browse);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&timeout_browse);
@@ -1407,7 +1348,7 @@ long db_servinfo(const char *ds_name,const char *pers_name, \
 
 /* Initialize data sent to server */
 
-	sent.db_err = 0;
+	sent.db_err = DS_OK;
 	sent.res_val.arr1_len = 2;
 	
 	if ((sent.res_val.arr1_val = (char **)calloc(sizeof(char *),2)) == NULL)
@@ -1415,7 +1356,7 @@ long db_servinfo(const char *ds_name,const char *pers_name, \
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 	k = strlen(ds_name);
@@ -1424,7 +1365,7 @@ long db_servinfo(const char *ds_name,const char *pers_name, \
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(sent.res_val.arr1_val[0],ds_name);
 	for(i = 0;i < k;i++)
@@ -1436,7 +1377,7 @@ long db_servinfo(const char *ds_name,const char *pers_name, \
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(sent.res_val.arr1_val[1],pers_name);
 	for(i = 0;i < k;i++)
@@ -1456,7 +1397,7 @@ long db_servinfo(const char *ds_name,const char *pers_name, \
 			to_reconnection((void *)&sent,(void **)&recev,&local_cl,
 					(int)DB_SVCINFO,(long)0,DB_UDP,&error);
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 			clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
@@ -1464,7 +1405,7 @@ long db_servinfo(const char *ds_name,const char *pers_name, \
 			free(sent.res_val.arr1_val[1]);
 			free(sent.res_val.arr1_val);
 			*p_error = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -1492,9 +1433,9 @@ long db_servinfo(const char *ds_name,const char *pers_name, \
 				free(sent.res_val.arr1_val[1]);
 				free(sent.res_val.arr1_val);
 				*p_error = error;
-				return(-1);
+				return(DS_NOTOK);
 			}
-			if ((recev->db_err == 0) || 
+			if ((recev->db_err == DS_OK) || 
 			    (recev->db_err != DbErr_DatabaseNotConnected))
 				break;
 		}
@@ -1502,7 +1443,7 @@ long db_servinfo(const char *ds_name,const char *pers_name, \
 
 /* Any problems during database access ? */
 
-	if(recev->db_err != 0)
+	if(recev->db_err != DS_OK)
 	{
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
@@ -1511,7 +1452,7 @@ long db_servinfo(const char *ds_name,const char *pers_name, \
 		free(sent.res_val.arr1_val);
 		*p_error = recev->db_err;
 		clnt_freeres(local_cl,(xdrproc_t)xdr_svcinfo_svc,(char *)recev);
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Copy received data into caller structure */
@@ -1533,7 +1474,7 @@ long db_servinfo(const char *ds_name,const char *pers_name, \
 		free(sent.res_val.arr1_val[1]);
 		free(sent.res_val.arr1_val);
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	for (i = 0;i < tmp;i++)
 	{
@@ -1552,7 +1493,7 @@ long db_servinfo(const char *ds_name,const char *pers_name, \
 			clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 			clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 			*p_error = DbErr_ClientMemoryAllocation;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		for (j = 0;j < tmp_dev;j++)
 		{
@@ -1579,37 +1520,25 @@ long db_servinfo(const char *ds_name,const char *pers_name, \
 
 }
 
-
 
-
-/****************************************************************************
-*                                                                           *
-*		db_servdelete function code                           	    *
-*               -------------                                        	    *
-*                                                                           *
-*    Function rule : To delete all the devices belonging to a device server *
-*		     in the static database				    *
-*                                                                           *
-*    Argins : - ds_name : The device server name			    *
-*	      - pers_name : The device server personal name		    *
-*	      - delres_flag : A flag set to True if device resources should *
-*			      also be deleted				    *
-*                                                                           *
-*    Argout : - p_error : Pointer for the error code in case of problems    *
-*                                                                           *
-*    In case of trouble, the function returns -1 and set the variable       *
-*    pointed to by "p_error". Otherwise, the function returns 0             *
-*                                                                           *
-*****************************************************************************/
-
-
+/**
+ * To delete all the devices belonging to a device server in the static database				
+ *
+ * @param ds_name  	The device server name			
+ * @param pers_name 	The device server personal name		
+ * @param delres_flag 	A flag set to True if device resources should also be deleted				
+ * @param p_error 	Pointer for the error code in case of problems
+ *
+ * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ */
 long db_servdelete(const char *ds_name,const char *pers_name, \
 		   long delres_flag,long *p_error)
 {
 	long *recev;
 	int i,j,k;
 	long error;
-	long exit_code = 0;
+	long exit_code = DS_OK;
 	db_res sent;
 	struct timeval old_tout;
 	CLIENT *local_cl;
@@ -1625,17 +1554,17 @@ long db_servdelete(const char *ds_name,const char *pers_name, \
 	if ((ds_name == NULL) || (pers_name == NULL))
 	{
 		*p_error = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	if ((delres_flag != True) && (delres_flag != False))
 	{
 		*p_error = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Miscellaneous init. */
 
-	*p_error = 0;
+	*p_error = DS_OK;
 		
 #ifdef ALONE
 /* Create RPC connection if it's the first call */
@@ -1646,7 +1575,7 @@ long db_servdelete(const char *ds_name,const char *pers_name, \
 		if (cl == NULL)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout_browse);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&timeout_browse);
@@ -1680,7 +1609,7 @@ long db_servdelete(const char *ds_name,const char *pers_name, \
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 	k = strlen(ds_name);
@@ -1689,7 +1618,7 @@ long db_servdelete(const char *ds_name,const char *pers_name, \
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(sent.res_val.arr1_val[0],ds_name);
 	for(i = 0;i < k;i++)
@@ -1701,7 +1630,7 @@ long db_servdelete(const char *ds_name,const char *pers_name, \
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(sent.res_val.arr1_val[1],pers_name);
 	for(i = 0;i < k;i++)
@@ -1721,12 +1650,12 @@ long db_servdelete(const char *ds_name,const char *pers_name, \
 			to_reconnection((void *)&sent,(void **)&recev,&local_cl,
 					(int)DB_SVCDELETE,(long)0,DB_UDP,&error);
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 			clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 			*p_error = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -1751,9 +1680,9 @@ long db_servdelete(const char *ds_name,const char *pers_name, \
 				clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 				clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 				*p_error = error;
-				return(-1);
+				return(DS_NOTOK);
 			}
-			if ((*recev == 0) || 
+			if ((*recev == DS_OK) || 
 			    (*recev != DbErr_DatabaseNotConnected))
 				break;
 		}
@@ -1761,12 +1690,12 @@ long db_servdelete(const char *ds_name,const char *pers_name, \
 
 /* Any problems during database access ? */
 
-	if(*recev != 0)
+	if(*recev != DS_OK)
 	{
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = *recev;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 /* Free memory used to send data to server */
@@ -1785,32 +1714,25 @@ long db_servdelete(const char *ds_name,const char *pers_name, \
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_getpoller function code                       	    *
-*               ------------                                          	    *
-*                                                                           *
-*    Function rule : To get poller information from a device name	    *
-*									    *
-*    Argin : - dev_name : Device name					    * 
-*    Argout : - poll : Pointer to the structure where poller info will be   *
-*		       stored. these info are : ds_name, ds pers. name,     *
-*		       host name, process name and PID			    *
-*	      - p_error : Pointer for the error code in case of problems    *
-*                                                                           *
-*    In case of trouble, the function returns -1 and set the variable       *
-*    pointed to by "p_error". Otherwise, the function returns 0             *
-*                                                                           *
-*****************************************************************************/
-
-
+/**
+ * To get poller information from a device name	
+ *									
+ * @param dev_name  	Device name
+ * @param poll 		Pointer to the structure where poller info will be
+ *		       	stored. these info are : ds_name, ds pers. name,
+ *		       	host name, process name and PID			
+ * @param p_error 	Pointer for the error code in case of problems
+ *
+ * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ */
 long db_getpoller(const char *dev_name,db_poller *poll,long *p_error)
 {
 	db_poller_svc *recev;
 	int i,k;
 	char *name_sent;
 	long error;
-	long exit_code = 0;
+	long exit_code = DS_OK;
 	struct timeval old_tout;
 	CLIENT *local_cl;
 #ifndef _OSK
@@ -1825,12 +1747,12 @@ long db_getpoller(const char *dev_name,db_poller *poll,long *p_error)
 	if ((dev_name == NULL) || (poll == NULL))
 	{
 		*p_error = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Miscellaneous init. */
 
-	*p_error = 0;
+	*p_error = DS_OK;
 			
 #ifdef ALONE
 /* Create RPC connection if it's the first call */
@@ -1841,7 +1763,7 @@ long db_getpoller(const char *dev_name,db_poller *poll,long *p_error)
 		if (cl == NULL)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout_browse);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&timeout_browse);
@@ -1872,7 +1794,7 @@ long db_getpoller(const char *dev_name,db_poller *poll,long *p_error)
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(name_sent,dev_name);
 	for(i = 0;i < k;i++)
@@ -1892,13 +1814,13 @@ long db_getpoller(const char *dev_name,db_poller *poll,long *p_error)
 			to_reconnection((void *)&name_sent,(void **)&recev,&local_cl,
 					(int)DB_GETPOLLER,(long)0,DB_UDP,&error);
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 			clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 			free(name_sent);
 			*p_error = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -1924,9 +1846,9 @@ long db_getpoller(const char *dev_name,db_poller *poll,long *p_error)
 				clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 				clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 				*p_error = error;
-				return(-1);
+				return(DS_NOTOK);
 			}
-			if ((recev->db_err == 0) || 
+			if ((recev->db_err == DS_OK) || 
 			    (recev->db_err != DbErr_DatabaseNotConnected))
 				break;
 		}
@@ -1934,14 +1856,14 @@ long db_getpoller(const char *dev_name,db_poller *poll,long *p_error)
 	
 /* Any problems during database access ? */
 
-	if(recev->db_err != 0)
+	if(recev->db_err != DS_OK)
 	{
 		free(name_sent);
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = recev->db_err;
 		clnt_freeres(local_cl,(xdrproc_t)xdr_db_poller_svc,(char *)recev);
-		return(-1);
+		return(DS_NOTOK);
 	}
 		
 /* Init caller structure */
@@ -1970,29 +1892,22 @@ long db_getpoller(const char *dev_name,db_poller *poll,long *p_error)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		db_initcache function code                       	    *
-*               ------------                                                *
-*                                                                           *
-*    Function rule : To initialize a resource cache for the specified domain*
-*									    *
-*    Argin : - domain : Domain name					    * 
-*    Argout : - p_error : Pointer for the error code in case of problems    *
-*                                                                           *
-*    In case of trouble, the function returns -1 and set the variable       *
-*    pointed to by "p_error". Otherwise, the function returns 0             *
-*                                                                           *
-*****************************************************************************/
-
-
+/**
+ * To initialize a resource cache for the specified domain
+ *									
+ * @param domain 	Domain name
+ * @param p_error  	Pointer for the error code in case of problems
+ *
+ * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ */
 long db_initcache(const char *domain,long *p_error)
 {
 	long *recev;
 	int i,k;
 	char *name_sent;
 	long error;
-	long exit_code = 0;
+	long exit_code = DS_OK;
 	struct timeval old_tout;
 	CLIENT *local_cl;
 #ifndef _OSK
@@ -2007,12 +1922,12 @@ long db_initcache(const char *domain,long *p_error)
 	if (domain == NULL)
 	{
 		*p_error = DbErr_BadParameters;
-		return(-1);
+		return(DS_NOTOK);
 	}
 
 /* Miscellaneous init. */
 
-	*p_error = 0;
+	*p_error = DS_OK;
 			
 #ifdef ALONE
 /* Create RPC connection if it's the first call */
@@ -2023,7 +1938,7 @@ long db_initcache(const char *domain,long *p_error)
 		if (cl == NULL)
 		{
 			*p_error = DbErr_CannotCreateClientHandle;
-			return(-1);
+			return(DS_NOTOK);
 		}
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout_browse);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&timeout_browse);
@@ -2054,7 +1969,7 @@ long db_initcache(const char *domain,long *p_error)
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	strcpy(name_sent,domain);
 	for(i = 0;i < k;i++)
@@ -2074,12 +1989,12 @@ long db_initcache(const char *domain,long *p_error)
 			to_reconnection((void *)&name_sent,(void **)&recev,&local_cl,
 					(int)DB_INITCACHE,(long)0,DB_UDP,&error);
 		}
-		if (error != 0)
+		if (error != DS_OK)
 		{
 			clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 			clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 			*p_error = error;
-			return(-1);
+			return(DS_NOTOK);
 		}
 	}
 
@@ -2104,9 +2019,9 @@ long db_initcache(const char *domain,long *p_error)
 				clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 				clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 				*p_error = error;
-				return(-1);
+				return(DS_NOTOK);
 			}
-			if ((*recev == 0) || 
+			if ((*recev == DS_OK) || 
 			    (*recev != DbErr_DatabaseNotConnected))
 				break;
 		}
@@ -2114,13 +2029,13 @@ long db_initcache(const char *domain,long *p_error)
 
 /* Any problems during database access ? */
 
-	if (*recev != 0)
+	if (*recev != DS_OK)
 	{
 		clnt_control(local_cl,CLSET_TIMEOUT,(char *)&old_tout);
 		clnt_control(local_cl,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 		free(name_sent);
 		*p_error = *recev;
-		return(-1);
+		return(DS_NOTOK);
 	}
 	
 /* Free memory used to send data to server */
