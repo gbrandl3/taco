@@ -1,11 +1,11 @@
-SUBDIRS 	= demo.server doc lib
+SUBDIRS 		= demo.server doc lib
 
-EXTRA_DIST 	= README Taco.pth h2py
+EXTRA_DIST 		= README Taco.pth h2py
 
-nodist_pkgpython_PYTHON	= DEVCMDS.py DEVERRORS.py DEVSTATES.py DEV_XDR.py 
-pkgpython_PYTHON	= ResDatabase.py TacoDevice.py TacoServer.py
+nodist_pkgpyexec_PYTHON	= DEVCMDS.py DEVERRORS.py DEVSTATES.py DEV_XDR.py 
+pkgpyexec_PYTHON	= ResDatabase.py TacoDevice.py TacoServer.py
 
-CLEANFILES = DEVCMDS.py DEVERRORS.py DEVSTATES.py DEV_XDR.py
+CLEANFILES 		= DEVCMDS.py DEVERRORS.py DEVSTATES.py DEV_XDR.py
 
 DEVCMDS.py:	$(top_srcdir)/lib/DevCmds.h
 	$(srcdir)/h2py $?
