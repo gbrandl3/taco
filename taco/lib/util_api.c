@@ -5,8 +5,7 @@
  Project    :	Device Servers with SUN-RPC
 
  Description:	Application Programmers Interface 
-		
-            :	Utilities for the interface to access and 
+            	Utilities for the interface to access and 
 		handle remote devices.
 
  Author(s)  :	Jens Meyer
@@ -14,15 +13,15 @@
 
  Original   :	April 1993
 
- Version:	$Revision: 1.8 $
+ Version:	$Revision: 1.9 $
 
- Date:		$Date: 2004-03-03 11:38:16 $
+ Date:		$Date: 2004-03-05 17:02:14 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
 
 ********************************************************************-*/
-#include <config.h>
+#include "config.h"
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevServer.h>
@@ -96,9 +95,12 @@ static db_resource   res_tab [] = {
 };
 
 
-/**
- * execute commands on a device by passing input data and retrieving 
- * output data in a raw opaque format.
+/**@ingroup syncAPI
+ * This function executes a command o the device associated with the passed client handle
+ * and returns the outgouing arguments as a block of opaque data in XDR format. All arguments
+ * have to be passed as pointers. Memory for the opaque block will be allocated by the
+ * RPC if the sequence pointer is initialised to NULL. The allocated memory can be freed with
+ * @ref dev_xdrfree() and the type identifier D_OPAQUE_TYPE.
  *
  * @param ds 		handle to access the device.
  * @param cmd   	command to be executed.
@@ -252,12 +254,30 @@ long _DLLFunc dev_putget_raw (devserver ds, long cmd, DevArgument argin,
 }
 
 
-/**
- * application interface to execute commands on a device
- * with only the possibility to pass input data. 
- * The function will return before the command
- * is executed. No errors or status of the command
- * will be returned.
+/**@ingroup asyncAPI
+ * This function executes a command asynchronously on the device associated with
+ * the passed client handle. The device must be remote and compiled with V6. Input
+ * and output data types must correspond to the types specified for this command
+ * in the device server's command list. Otherwise an error code will be returned. 
+ * All arguments have to be passed as pointer.
+ *
+ * Memory for outgoing arguments will be automatically allocated, if pointers are
+ * initialised to @b NULL. The memory allocated by XDR afterwards, the function
+ * @ref dev_xdrfree() must used.
+ *
+ * The client continues immediatly and does not wait for the server to execute the
+ * request. The callback function has to be specified otherwise an error will be
+ * returned. The callback function is triggered by making a call to @ref dev_synch().
+ * The client can pass data to the callback function via @ref user_data. The callback
+ * function receives the device server handle, user data and a @ref DevCallbackData
+ * structure as input. The function returns a (unique) id in @ref asynch_id for each call.
+ 
+ * This function is similar to @ref dev_put(). The only difference is, that it sends
+ * a request to execute a command to a device server and returns immediatly when the 
+ * command was received. The only errors which can be returned by this function are
+ * errors during the sending of the command. A correct return status only indicates that
+ * the command execution was started.
+ * <b> No failures during command execution can be reported back to the client.</b>
  * 
  * @param ds       	handle to access the device.
  * @param cmd           command to be executed.
@@ -381,21 +401,25 @@ long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
 }
 
 
-/**
- * Returns a sequence of structures containig all
- * available commands, their names, their input and
- * output data types, and type describtions for one
- * device.
+/**@ingroup syncAPI
+ * This function returns a sequence of @ref DevCmdInfo structures containing all available
+ * commands, their names, their input and output data types, and type descriptions for one
+ * device. Commands and data types are read from the command list in the device server. 
+ * Command names are read from the CMDS table of the resource database. Data type descriptions
+ * for input and output arguments for a command function have to be specified in the resource
+ * database in the CLASS table as:
+ * @verbatim
+	CLASS/class_name/cmd_name/IN_TYPE:	"Current in mA"
+	CLASS/class_name/cmd_name/OUT_TYPE:	"Power in MW"
+ * @endverbatim
+ * @verbatim class_name @endverbatim is the name of the device class. It will be retrieved from
+ * the device server.
  *
- * Commands and data types are read from the command
- * list in the device server by calling 
- * RPC_DEV_CMD_QUERY.
+ * @verbatim cmd_name @endverbatim is the name of the command. It will be retrieved from the 
+ * CMDS table in the resource database.
  *
- * Command names are read from the command name list, defined in DevCmds.h. 
- *
- * Data type describtions have to be specified as CLASS resources as:
- * 	- CLASS/class_name/cmd_name/IN_TYPE:
- * 	- CLASS/class_name/cmd_name/OUT_TYPE:
+ * Commands and data types are read from the command list in the device server by calling 
+ * @b RPC_DEV_CMD_QUERY.
  *
  * @param ds 		client handle for the associated device.
  * @param varcmdarr 	sequence of DevCmdInfo structures.
@@ -665,7 +689,7 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 }
 
 
-/**
+/**@ingroup internalAPI
  * Read the command name as a string from the resource database.
  * The resource name is:
  * CMD/team_no/server_no/cmd_ident
@@ -762,15 +786,16 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
 }
 
 
-/**
- * Returns to the user a structure of device
- * information for every specified device client handle.
- * The information structure contains:
- * 	- the name of the device,
- *	- the class name,
- *	- the device type,
- *	- the device server name,
- *	- the host name of the device server
+/**@ingroup syncAPI
+ * This funtion returns  to the user a structure containing device information for every specified 
+ * device client handle. The information structure contains:
+ * @li the name of the device,
+ * @li the class name,
+ * @li the device type,
+ * @li the device server name,
+ * @li the host name of the device server
+ * The returned information structures are allocated by this function with malloc(3C). It can be
+ * freed by using free(3C).
  * 
  * @param clnt_handles 	pointer to a table of client handles.
  * @param num_devices   number of devices.
@@ -839,7 +864,14 @@ long _DLLFunc dev_inform (devserver *clnt_handles, long num_devices,
 }
 
 /**
- * Sets or reads the timeout for an UDP connection to a server.
+ * Sets or reads the timeout for an RPC connection. A request to set the timeout has to be asked with
+ * CLSET_TIMEOUT as request parameter and the timeout specified by the timeval structure dev_timeout.
+ * The timeout will be set without any retry. A request to read the timeout has to ask with CLGET_TIMEOUT,
+ * and the current timeout will be returned in dev_timeout.
+ *
+ * All devices implemented in the same server and imported by the client use the same RPC connection. Changing
+ * the timeout of a RPC connection with this function means changing the timeout value for all devices of
+ * the same server.
  * 
  * @param ds         	handle to device.
  * @param request	indicates whether the timeout should be set or only read.
@@ -909,36 +941,32 @@ long _DLLFunc dev_rpc_timeout (devserver ds, long request,
 		return(DS_OK);
 	}
 		
-	/*
-	 * to be sure to work with the correct client handle
-	 * initialise the pointer again.
-	 */
-
+/*
+ * to be sure to work with the correct client handle
+ * initialise the pointer again.
+ */
 	ds->clnt = svr_conns[ds->no_svr_conn].clnt;
-
 	switch (request)
 	{
-		/*
-	    * Set the timeout for the connection.
-	    */
-	case CLSET_TIMEOUT:
-		clnt_control (ds->clnt, CLSET_RETRY_TIMEOUT, (char *) dev_timeout);
-		clnt_control (ds->clnt, CLSET_TIMEOUT, (char *) dev_timeout);
-		break;
+/*
+ * Set the timeout for the connection.
+ */
+		case CLSET_TIMEOUT:
+			clnt_control (ds->clnt, CLSET_RETRY_TIMEOUT, (char *) dev_timeout);
+			clnt_control (ds->clnt, CLSET_TIMEOUT, (char *) dev_timeout);
+			break;
+/*
+ * Get the timeout of the connection.
+ */
+		case CLGET_TIMEOUT:
+			clnt_control (ds->clnt, CLGET_RETRY_TIMEOUT, (char *) dev_timeout);
+			clnt_control (ds->clnt, CLGET_TIMEOUT, (char *) dev_timeout);
+			break;
 
-		/*
-	    * Set the timeout of the connection.
-	    */
-	case CLGET_TIMEOUT:
-		clnt_control (ds->clnt, CLGET_RETRY_TIMEOUT, (char *) dev_timeout);
-		clnt_control (ds->clnt, CLGET_TIMEOUT, (char *) dev_timeout);
-		break;
-
-	default:
-		*error = DevErr_UnknownInputParameter;
-		return (DS_NOTOK);
+		default:
+			*error = DevErr_UnknownInputParameter;
+			return (DS_NOTOK);
 	}
-
 	return (DS_OK);
 }
 
@@ -990,7 +1018,7 @@ int*  error;
 }
 #endif   /* _NT */
 
-/**
+/**ingroup internalAPI
  * Get the index for the nethost from the device
  * name. The nethost is specified in the device name
  * as "//nethost/domain/family/member". 
@@ -1063,7 +1091,7 @@ long _DLLFunc get_i_nethost_by_device_name (char *device_name, long *error)
 	return(i_nethost);
 }
 
-/**
+/**@ingroup internalAPI
  * Get the index for the nethost from the nethost name. 
  *
  * @param device_name 	device name
@@ -1104,7 +1132,7 @@ long _DLLFunc get_i_nethost_by_name (char *nethost, long *error)
 }
 
 
-/**
+/**@ingroup internalAPI
  * Get the nethost name associated with this index
  * 
  * @param i_nethost 	nethost index
@@ -1132,7 +1160,7 @@ char* _DLLFunc get_nethost_by_index (long i_nethost, long *error)
 }
 
 
-/**
+/**@ingroup internalAPI
  * Extract the domain/family/member part of name from the 
  * full device name "//nethost/domain/family/member?number" ,
  * return a pointer
@@ -1180,7 +1208,7 @@ extern struct _devserver *msg_ds;
 extern struct _devserver *db_ds;
 extern short *auth_flag;
 
-/**
+/**@ingroup internalAPI
  * alloc place for MIN_NETHOST to global array which contains list of nethosts
  * 
  * @param error Will contain an appropriate error code if the
@@ -1292,8 +1320,8 @@ long _DLLFunc nethost_alloc (long *error)
 }
 
 
-/**
- * Pings the device server to find out if this device is being served. 
+/**@ingroup syncAPI
+ * This function pings the device server to find out if this device is being served. 
  *
  * @param ds  	client handle for the associated device.
  * @param error Will contain an appropriate error code if the

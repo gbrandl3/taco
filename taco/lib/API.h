@@ -12,9 +12,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:		$Date: 2003-05-21 16:21:56 $
+ * Date:		$Date: 2004-03-05 17:02:14 $
  *
  *
  * Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
@@ -32,12 +32,12 @@
  *
  * Implement the device server (aka TACO) and the pplication programmer's interface (aka DSAPI).
  *
- * - version of DSAPI e.g. dev_import(), dev_putget(), dev_put()
- * - the list of DS error messages
- * - the list of device states (in ascii)
- * - general purpose DSAPI routines for printing error, debug and diagnostic messages
- * - implementing DSAPI security
- * - some more DSAPI related routines e.g. dev_put_asyn()
+ * @li version of DSAPI e.g. dev_import(), dev_putget(), dev_put()
+ * @li the list of DS error messages
+ * @li the list of device states (in ascii)
+ * @li general purpose DSAPI routines for printing error, debug and diagnostic messages
+ * @li implementing DSAPI security
+ * @li some more DSAPI related routines e.g. dev_put_asyn()
  */
 
 /*
@@ -45,7 +45,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.4 2003-05-21 16:21:56 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.5 2004-03-05 17:02:14 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*

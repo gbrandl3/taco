@@ -12,15 +12,15 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.5 $
+ Version    :	$Revision: 1.6 $
 
- Date       : 	$Date: 2004-02-11 10:27:32 $
+ Date       : 	$Date: 2004-03-05 17:02:14 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
 
 ********************************************************************-*/
-#include <config.h>
+#include "config.h"
 #include <API.h>
 #include <private/ApiP.h>
 #include <API_xdr_vers3.h>
@@ -142,7 +142,7 @@ long debug_flag = 0x0;
 }
 #endif
 
-/**@ingroup dsAPI
+/**@ingroup messageAPI
  * imports a message service.
  * DS_xxx parameters are used to name the
  * approriate error file and to display
@@ -232,17 +232,23 @@ char *DS_display, long *error)
  * lists. It will still use the old tricky function!!
  */
 #if (!defined OSK) && (!defined _GNU_PP)
-/**@ingroup dsAPI
- * Send device server error_string to a message 
- * service or to stdout, if a message service
- * is not imported.
- * Error strings can be only 256 characters long.
- * Longer texts can be send by storing short
- * strings in the message buffer with the WRITE
- * mode and send the whole buffer by using
- * the SEND mode with the last string.
+/**@ingroup messageAPI
+ * If a message service is imported, all error messages are sent to an error file, on the NETHOST, called:
+ * @verbatim
+	NETHOST:/DSHOME/api/error/hostname_program-number
+   @endverbatim
+ * where 
+ * @li NETHOST - the device server system host
+ * @li DSHOME  - the device server system directory on NETHOST
+ * @li hostname - the name of the host where the server is running.
+ * @li prog_number - the program number of the registered service.
+ * If no message service is imported, all error messages are sent to @stderr and printed on the terminal.
  *
- * a variable list of arguments which should contain 
+ * The mode parameter indicates, how to handle the error message buffer. Single messages can only be 256
+ * characters long. To printout longer messages, short strings can be buffered and printed later as a text.
+ * @li @b WRITE: writes error message to buffer.
+ * @li @b SEND: adds the last error message to the buffer, sends the buffer contents to an output devices and clears the buffer.
+ * @li @b CLEAR: clears the message buffer from all stored messages.
  *
  * @param mode  mode for message buffer : WRITE or SEND
  * @param fmt   format string in printf() style.
@@ -303,7 +309,7 @@ _DLLFunc void dev_printerror (DevShort mode, char *fmt, ...)
  * For OS9 version 2.4 and Solaris with g++
  */
 #else
-/**@ingroup dsAPI
+/**@ingroup messageAPI
  * Send device server error_string to a message 
  * service or to stdout, if a message service
  * is not imported.
@@ -364,7 +370,25 @@ _DLLFunc void dev_printerror (DevShort mode,char *fmt, char *str)
 }
 #endif /* OSK */
 
-/**@ingroup dsAPI
+/**@ingroup messageAPI
+ * If a message service is imported, all error messages are sent to an error file, on the NETHOST, called:
+ * @verbatim
+	NETHOST:/DSHOME/api/error/hostname_program-number
+   @endverbatim
+ * where 
+ * @li NETHOST - the device server system host
+ * @li DSHOME  - the device server system directory on NETHOST
+ * @li hostname - the name of the host where the server is running.
+ * @li prog_number - the program number of the registered service.
+ * If no message service is imported, all error messages are sent to @stderr and printed on the terminal.
+ *
+ * The mode parameter indicates, how to handle the error message buffer. Single messages can only be 256
+ * characters long. To printout longer messages, short strings can be buffered and printed later as a text.
+ * @li @b WRITE: writes error message to buffer.
+ * @li @b SEND: adds the last error message to the buffer, sends the buffer contents to an output devices and clears the buffer.
+ * @li @b CLEAR: clears the message buffer from all stored messages.
+ *
+ * @param mode  mode for message buffer : WRITE or SEND
  * retrieves the related error string for an error number
  * from the list in DevErrors.h or the rsource database
  * and sends the error string with the choosen mode 
@@ -389,8 +413,16 @@ void _DLLFunc dev_printerror_no (DevShort mode, char *comment, long dev_errno)
 
 
 /**@ingroup dsAPI
- * Description:   retrieves the related error string for an error number
- * from the list in DevErrors.h.
+ * This function returns the error string for a given error number. It first checks to see
+ * if the error is negative. If so it returns a standard error message "negative errors are not supported".
+ * Then it checks if the error is one of the kernel errors (e.g. NETHOST not defined, RPC timeout etc) and
+ * returns a corresponding error message. Then it checks to see if a dynamic error message was returned by
+ * the last @ref dev_put_get(), @ref dev_put(), or @ref dev_putget_asyn() call, if so it returns this error
+ * message. If none of the above are trus it searches the TACO database for the (static) error string. If an
+ * appropriate error string cannot be found in the database, this function returns a string, indicating the
+ * failure. <b>This function allocates memory for the return error string everytime using malloc(3C), it is
+ * the client's responsiblity to free this memory using free(3C)</b>
+ * \note This is common source of memory leaks in TACO clients.
  * 
  * @param dev_errno device server system error number.
  * 
@@ -406,14 +438,38 @@ _DLLFunc char * dev_error_str (long dev_errno)
  * lists. It will still use the old tricky function!!
  */
 #if (!defined OSK) && (!defined _GNU_PP)
-/**@ingroup dsAPI
- * Send debug string to a message service or to stdout, if a message service
- * is not imported.
+/**@ingroup messageAPI
+ * This function sends the debug information if the specified debug_bits are set.
+ * 
+ * Possible debug_bits (debug flags) are:
+ * @li @b DBG_TRACE
+ * @li @b DBG_ERROR
+ * @li @b DBG_INTERRUPT
+ * @li @b DBG_TIME
+ * @li @b DBG_WAIT
+ * @li @b DBG_EXCEPT
+ * @li @b DBG_SYNC
+ * @li @b DBG_HARDWARE
+ * @li @b DBG_STARTUP
+ * @li @b DBG_DEV_SVR_CLASS
+ * @li @b DBG_API
+ * @li @b DBG_COMMANDS
+ * @li @b DBG_METHODS
+ * @li @b DBG_SEC
+ * @li @b DBG_ASYNCH
+ * 
+ * If a message service is imported, all error messages are sent to an error file, on the NETHOST, called:
+ * @verbatim
+	NETHOST:/DSHOME/api/error/hostname_program-number
+   @endverbatim
+ * where 
+ * @li NETHOST - the device server system host
+ * @li DSHOME  - the device server system directory on NETHOST
+ * @li hostname - the name of the host where the server is running.
+ * @li prog_number - the program number of the registered service.
+ * If no message service is imported, all error messages are sent to @stderr and printed on the terminal.
  *
- * A debug string will be send if one of the debug_bits
- * related to the string is set in the global debug_flag.
- *
- * Debug strings can br only 256 characters long.
+ * Debug strings can be only 256 characters long.
  *
  * @param debug_bits  	debug bits on which to send the information.
  * @param fmt        	format string in printf() style.
@@ -531,7 +587,7 @@ void dev_printdebug (long debug_bits,char *fmt, char *str)
  * lists. It will still use the old tricky function!!
  */
 #if (!defined OSK) && (!defined _GNU_PP)
-/**@ingroup dsAPI
+/**@ingroup messageAPI
  * Send device server diagnostic_string to a message 
  * service or to stdout, if a message service
  * is not imported.
