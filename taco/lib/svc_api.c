@@ -7,13 +7,13 @@
  Description:	Server side of the API.  
 
  Author(s);	Jens Meyer
- 		$Author: andy_gotz $
+ 		$Author: jkrueger1 $
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.15 $
+ Version:	$Revision: 1.16 $
 
- Date:		$Date: 2004-11-25 19:39:30 $
+ Date:		$Date: 2005-02-22 13:40:10 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -1507,7 +1507,7 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
  * them (very useful if -nodb)
  */
 #ifndef __cplusplus
-	if (ds_ev[0].event_name != NULL)
+	if (ds_ev && ds_ev[0].event_name != NULL)
 	{
 		for (i=0; i < dev_query_out.length; i++)
 		{
