@@ -1,34 +1,24 @@
 AC_DEFUN([TACO_PYTHON_BINDING],
 [
-	AC_ARG_ENABLE(python-binding, AC_HELP_STRING(--enable-python-binding, [build the python binding library@<:@default=yes@:>@]),
-		[case "${enable_python_binding}" in
-			yes)	taco_python_binding=yes;;
-			*)	taco_python_binding=no;;
-		esac], [taco_python_binding=yes])
-	if test "x$taco_python_binding" = "xyes" ; then
-		TACO_PROG_PYTHON(2.1, [yes])
+	TACO_PROG_PYTHON(2.1, [yes])
+	if test "$ac_python_dir" != "no" ; then
 		ac_save_CFLAGS="$CFLAGS"
 		CFLAGS="$CFLAGS $PYTHON_INCLUDES"
-		AC_CHECK_HEADERS(Numeric/arrayobject.h, [], [taco_python_binding=no], [#include <Python.h>])
+		AC_CHECK_HEADERS(Numeric/arrayobject.h, [taco_python_binding=yes], [taco_python_binding=no], [#include <Python.h>])
 		CFLAGS="$ac_save_CFLAGS"
-	fi
+	else
+		taco_python_binding=no
+	fi	
 	AM_CONDITIONAL(PYTHON_BINDING, test $taco_python_binding = yes)
 ])
 
 AC_DEFUN([TACO_TCL_BINDING],
 [
-	AC_ARG_ENABLE(tcl-binding, AC_HELP_STRING(--enable-tcl-binding, [build the python binding library@<:@default=yes@:>@]),
-		[case "${enable_tcl_binding}" in
-			yes)	taco_tcl_binding=yes;;
-			*)	taco_tcl_binding=no;;
-		esac], [taco_tcl_binding=yes])
-	if test "x$taco_tcl_binding" = "xyes" ; then
-		AC_REQUIRE([TACO_PROG_TCL])
-		if test -n "$TCLINCLUDE" -a -n "$TCLLIB" ; then
-			taco_tcl_binding=yes
-		else
-			taco_tcl_binding=no
-		fi
+	AC_REQUIRE([TACO_PROG_TCL])
+	if test -n "$TCLINCLUDE" -a -n "$TCLLIB" -a "$TCLPACKAGE" != "no" ; then
+		taco_tcl_binding=yes
+	else
+		taco_tcl_binding=no
 	fi
 	AM_CONDITIONAL(TCL_BINDING, test $taco_tcl_binding = yes)
 ])
