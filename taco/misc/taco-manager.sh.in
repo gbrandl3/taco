@@ -1,0 +1,35 @@
+#!/bin/sh
+#
+
+# PROVIDE: taco_manager
+# REQUIRE: DAEMON rpcbind
+# BEFORE: LOGIN
+# KEYWORD: FreeBSD shutdown
+
+#
+# Add the following lines to /etc/rc.conf to enable taco-manager:
+#
+#taco_manager_enable="YES"
+#
+
+. /etc/rc.subr
+
+name=taco_manager
+rcvar=`set_rcvar`
+
+command=/taco/system/bin/freebsd5.2.1/i386/Manager
+required_files=/taco/etc/taco_freebsd.sh
+start_precmd="taco_precmd"
+
+taco_precmd()
+{
+	. /taco/etc/taco_freebsd.sh
+}
+
+# set defaults
+
+taco_manager_enable=${taco_manager_enable:-"NO"}
+taco_manager_flags=${taco_manager_flags:-"-dbm &"}
+
+load_rc_config $name
+run_rc_command "$1"
