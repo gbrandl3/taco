@@ -10,7 +10,8 @@ bin_PROGRAMS		= db_update \
 		 	db_devres \
 		 	db_resdel \
 		 	db_initcache \
-			db_devicetree
+			db_devicetree \
+			db_dump
 
 bin_SCRIPTS		= db_fillup2
 
@@ -59,3 +60,6 @@ db_devres_LDADD		= @TACO_CLIENT_LIBS@
 
 db_resdel_SOURCES	= db_resdel.cpp 
 db_resdel_LDADD		= @TACO_CLIENT_LIBS@
+
+db_dump_SOURCES		= db_dump.cpp 
+db_dump_LDADD		= @TACO_CLIENT_LIBS@ -lgdbm
