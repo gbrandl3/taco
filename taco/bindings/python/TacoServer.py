@@ -9,21 +9,15 @@ from DEV_XDR   import *
 from DEVSTATES import *
 from DEVERRORS import *
 
-
-
 class TacoServer:
 	"Taco Python super class"
 	
 #	Common variables for a class
-	
 	cmd_list = { DevState :[D_VOID_TYPE,D_SHORT_TYPE , 'state', 'DevState'],
 		     DevStatus:[D_VOID_TYPE,D_STRING_TYPE,'status','DevStatus']}
-
 	class_name = "PythonClass"
 	
-	
 #	Valriables for an object
-	
 	dev_name    = "NONE"
 	dev_state   = DEVUNKNOWN
 	dev_status  = "The device is in an unknown state"
@@ -47,7 +41,6 @@ class TacoServer:
 #
 # 	Print the command list of the object 
 #
-
 	def CommandList (self):
 		print Tab_dev_head
 		
@@ -82,7 +75,6 @@ class TacoServer:
 # 	Catch all not defined attributes and call cmd_io()
 # 	to check whether the called symbol is a command name
 #
-		
   	def __getattr__ (self, cmd_name):
       		self.command_name = cmd_name
         	print cmd_name
@@ -94,7 +86,6 @@ class TacoServer:
 # 	the object methode to execute.
 # 	Execute the correct methode for the requested command neme.
 #
-   
    	def cmd_io (self, *par, **kw):
 		cmd = DEVCMDS.__dict__[self.command_name]
 		cmd_list_values = self.cmd_list[cmd]
@@ -106,7 +97,6 @@ class TacoServer:
 #
 # Methods for server class
 #
-
 	def get_cmd_list (self):
 		return self.cmd_list
 		
@@ -120,11 +110,9 @@ class TacoServer:
 # function for server startup
 #
 
-def server_startup (devices, server_name='test', process_name='Python', 
-		    nodb=0, pn=0):
+def server_startup (devices, server_name='test', process_name='Python', nodb=0, pn=0):
 	if nodb == 0:
-		thread.start_new_thread (Server.startup, (process_name, 
-					 server_name, devices))
+		thread.start_new_thread (Server.startup, (process_name, server_name, devices))
 	else:
-		thread.start_new_thread (Server.startup_nodb, (process_name, 
-					 server_name, devices, pn))
+		thread.start_new_thread (Server.startup_nodb, (process_name, server_name, devices, pn))
+
