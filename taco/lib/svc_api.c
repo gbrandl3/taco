@@ -11,9 +11,9 @@
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.5 $
+ Version:	$Revision: 1.6 $
 
- Date:		$Date: 2003-05-09 06:33:49 $
+ Date:		$Date: 2003-05-12 07:08:21 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -1048,13 +1048,13 @@ long dev_export (char *name, void *ptr_ds, long *error)
 long dev_export (char *name, DeviceBase *ptr_dev, long *error)
 #endif
 {
-   db_devinf		devinfo;
-   DevServerDevices 	*new_devices;
-   char			*strptr;
-   char			proc_name[80];
-   char                 server_host[80];
-   long			next_free;
-   register long 	i;
+	db_devinf		devinfo;
+	DevServerDevices 	*new_devices;
+	char			*strptr,
+				proc_name[80],
+				server_host[80];
+	long			next_free;
+	register long 	i;
 
 #ifndef __cplusplus
 /*
@@ -1067,45 +1067,35 @@ long dev_export (char *name, DeviceBase *ptr_dev, long *error)
  * C++ version
  */
 	DeviceBase	*device;
-
 	device =        ptr_dev;
 #endif
 
-
-   *error = DS_OK;
+	*error = DS_OK;
 
 #ifdef EBUG
-   dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-		   "\ndev_export() : entering routine\n");
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\ndev_export() : entering routine\n");
 #endif /* EBUG */
 
-   /*
-    * If no space is yet allocated in the global device array,
-    * allocate the first block of devices.
-    */
+/*
+ * If no space is yet allocated in the global device array,
+ * allocate the first block of devices.
+ */
+	if ( max_no_of_devices == 0 )
+	{
+		devices = (DevServerDevices *) calloc (BLOCK_SIZE, sizeof(DevServerDevices));
+		if ( devices == NULL )
+		{
+			*error  = DevErr_InsufficientMemory;
+			return (DS_NOTOK);
+		}
 
-   if ( max_no_of_devices == 0 )
-      {
-      devices = (DevServerDevices *) calloc 
-				     (BLOCK_SIZE, sizeof(DevServerDevices));
-      if ( devices == NULL )
-	 {
-         *error  = DevErr_InsufficientMemory;
-         return (DS_NOTOK);
-	 }
-
-      max_no_of_devices = BLOCK_SIZE;
-
-      /*
-       * Initialise the allocated device array.
-       */
-
-      for (i=0; i<max_no_of_devices; i++)
-	 {
-         devices[i].export_status = NOT_EXPORTED;
-	 }
-      }
-
+		max_no_of_devices = BLOCK_SIZE;
+/*
+ * Initialise the allocated device array.
+ */
+		for (i=0; i<max_no_of_devices; i++)
+			devices[i].export_status = NOT_EXPORTED;
+	}
 /*
  * used to export a device of the specified name 
  * to the outside. ds points to the space allocated 
@@ -1115,191 +1105,150 @@ long dev_export (char *name, DeviceBase *ptr_dev, long *error)
  * by the dev_import function to determine what devices
  * are known to the server.
  */
-
-   for (i=0; i<max_no_of_devices; i++)
-      {
-      if (devices[i].export_status == NOT_EXPORTED)
-         {
-         next_free = i;
-         goto free_found;
-         }
-       }
-
+	for (i=0; i<max_no_of_devices; i++)
+	{
+		if (devices[i].export_status == NOT_EXPORTED)
+		{
+			next_free = i;
+			goto free_found;
+		}
+	}
 /*
  * If all allocated devices are already used, allocate
  * a new block of devices.
  */
+	if ( (max_no_of_devices + BLOCK_SIZE) > MAX_DEVICES )
+	{
+		*error = DevErr_ExceededMaximumNoOfDevices;
+		return (DS_NOTOK);
+	}
 
-   if ( (max_no_of_devices + BLOCK_SIZE) > MAX_DEVICES )
-      {
-      *error = DevErr_ExceededMaximumNoOfDevices;
-      return (DS_NOTOK);
-      }
-
-   new_devices = (DevServerDevices *) realloc 
-		 (devices, (unsigned int)((max_no_of_devices+BLOCK_SIZE) * 
-		 sizeof(DevServerDevices)));
-   if ( new_devices == NULL )
-      {
-      *error  = DevErr_InsufficientMemory;
-      return (DS_NOTOK);
-      }
-
-   devices = new_devices;
-
+	new_devices = (DevServerDevices *) realloc(devices, (unsigned int)((max_no_of_devices+BLOCK_SIZE) * sizeof(DevServerDevices)));
+	if ( new_devices == NULL )
+	{
+		*error  = DevErr_InsufficientMemory;
+		return (DS_NOTOK);
+	}
+	devices = new_devices;
 /*
  * Initialise the new allocated structures
  */
+	memset ((char *)&devices[max_no_of_devices], 0, (BLOCK_SIZE*sizeof(DevServerDevices)));
+	for (i=max_no_of_devices; i<(max_no_of_devices+BLOCK_SIZE); i++)
+		devices[i].export_status = NOT_EXPORTED;
 
-   memset ((char *)&devices[max_no_of_devices], 0, 
-           (BLOCK_SIZE*sizeof(DevServerDevices)));
+	next_free = max_no_of_devices;
+	max_no_of_devices += BLOCK_SIZE;
 
-   for (i=max_no_of_devices; i<(max_no_of_devices+BLOCK_SIZE); i++)
-      {
-      devices[i].export_status = NOT_EXPORTED;
-      }
-
-   next_free = max_no_of_devices;
-   max_no_of_devices = max_no_of_devices + BLOCK_SIZE;
-
-
-
-free_found:;
-
-   /*
-    *  convert the device name to lower case letters
-    */
-
-   TOLOWER(name)
+free_found:
+/*
+ *  convert the device name to lower case letters
+ */
+	TOLOWER(name)
 
 /* 
  * do not export the device to the static database if
  * no_database is selected ...
  */
-   if (!config_flags.no_database)
-   {
-   /*
-    *  export device to the static database.
-    *  device server configuration for this device
-    *  will be stored in the static database
-    */
-
-
-      devinfo.device_name = name;
-      strcpy(server_host,config_flags.server_host);
-      devinfo.host_name   = server_host;
-      devinfo.pn	       = (u_int)config_flags.prog_number;
-      devinfo.vn          = (u_int)config_flags.vers_number;
-
-   /*
-    * Extract the name of the executable
-    */
-      sprintf (proc_name,"%s", config_flags.server_name);
-      strptr = strchr (proc_name, '/');
-      *strptr = '\0'; 
-      devinfo.proc_name   = proc_name;
+	if (!config_flags.no_database)
+	{
+/*
+ *  export device to the static database.
+ *  device server configuration for this device
+ *  will be stored in the static database
+ */
+		devinfo.device_name = name;
+		strcpy(server_host, config_flags.server_host);
+		devinfo.host_name   = server_host;
+		devinfo.pn	    = (u_int)config_flags.prog_number;
+		devinfo.vn          = (u_int)config_flags.vers_number;
+/*
+ * Extract the name of the executable
+ */
+		snprintf (proc_name, sizeof(proc_name), "%s", config_flags.server_name);
+		strptr = strchr (proc_name, '/');
+		*strptr = '\0'; 
+		devinfo.proc_name   = proc_name;
 
 #ifndef __cplusplus
 /*
  * OIC version
  */
-      devinfo.device_class = 
-	(ds->devserver.class_pointer)->devserver_class.class_name;
+		devinfo.device_class = (ds->devserver.class_pointer)->devserver_class.class_name;
 #else
 /*
  * C++ version
  */
-   devinfo.device_class = const_cast<char *>(device->GetClassName());
-
+		devinfo.device_class = const_cast<char *>(device->GetClassName());
 #endif /* __cplusplus */
 
-   /*
-    *  check whether the pointer to the device type is
-    *  already initialised
-    */
-
+/*
+ *  check whether the pointer to the device type is
+ *  already initialised
+ */
 #ifndef __cplusplus
 /*
  * OIC version
  */
-      if ( strncmp (ds->devserver.dev_type, TYPE_INIT, strlen(TYPE_INIT)) != 0 )
-	 {
-         sprintf (ds->devserver.dev_type, TYPE_DEFAULT );
-	 }
-      devinfo.device_type  = ds->devserver.dev_type;
+      		if ( strncmp (ds->devserver.dev_type, TYPE_INIT, strlen(TYPE_INIT)) != 0 )
+         		sprintf (ds->devserver.dev_type, TYPE_DEFAULT );
+      		devinfo.device_type  = ds->devserver.dev_type;
 #else
 /*
  * C++ version
  */
-   devinfo.device_type  = const_cast<char *>(device->GetDevType());
+		devinfo.device_type  = const_cast<char *>(device->GetDevType());
 #endif /* __cplusplus */
-
-
 
 #ifdef EBUG
-      dev_printdebug (DBG_DEV_SVR_CLASS,
-   	   "dev_export() :  name = %s , class = %s , type = %s\n",
-	    devinfo.device_name, devinfo.device_class, devinfo.device_type);
-      dev_printdebug (DBG_DEV_SVR_CLASS,
-   	   "dev_export() :  host_name = %s , proc = %s , pn = %d , vn = %d\n",
-      	    devinfo.host_name, devinfo.proc_name, devinfo.pn, devinfo.vn );
+		dev_printdebug (DBG_DEV_SVR_CLASS,
+			"dev_export() :  name = %s , class = %s , type = %s\n",
+			devinfo.device_name, devinfo.device_class, devinfo.device_type);
+		dev_printdebug (DBG_DEV_SVR_CLASS,
+			"dev_export() :  host_name = %s , proc = %s , pn = %d , vn = %d\n",
+			devinfo.host_name, devinfo.proc_name, devinfo.pn, devinfo.vn );
 #endif /* EBUG */
-
-
-      if ( db_dev_export (&devinfo,1,error) < DS_OK )
-	return (DS_NOTOK);
-   }
-
-
+		if ( db_dev_export (&devinfo,1,error) < DS_OK )
+			return (DS_NOTOK);
+	}
 /*
-   Store the object pointer and the device name in the internal
-   devices array.
+ * Store the object pointer and the device name in the internal
+ * devices array.
  */
-
 #ifndef __cplusplus
 /*
  * OIC version
  */
-   devices[next_free].ds            = ds;
+	devices[next_free].ds            = ds;
 #else
 /*
  * C++ version
  */
-   devices[next_free].device            = device;
+	devices[next_free].device        = device;
 #endif /* __cplusplus */
-
-   devices[next_free].export_status = EXPORTED;
-   devices[next_free].export_counter++;
+	devices[next_free].export_status = EXPORTED;
+	devices[next_free].export_counter++;
 /*
-  If the export counter reaches its maximum value,
-  restart the counter.
+ * If the export counter reaches its maximum value,
+ * restart the counter.
  */
-
-   if (devices[next_free].export_counter > MAX_COUNT )
-      {
-      devices[next_free].export_counter = 1;
-      }
-
+	if (devices[next_free].export_counter > MAX_COUNT)
+      		devices[next_free].export_counter = 1;
 
 /*
  * The length of the device name can only be 80 characters!
  */
-   if ( strlen(name) < MAX_NAME_LENGTH )
-      {
-      sprintf (devices[next_free].export_name, "%s", name);
-      }
-   else
-      {
-      *error  = DevErr_NameStringToLong;
-      return (DS_NOTOK);
-      }
-
+	if ( strlen(name) < MAX_NAME_LENGTH )
+      		sprintf (devices[next_free].export_name, "%s", name);
+	else
+      	{
+      		*error  = DevErr_NameStringToLong;
+      		return (DS_NOTOK);
+      	}
 #ifdef EBUG
-   dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS,
-		   "dev_export() : leaving routine\n");
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "dev_export() : leaving routine\n");
 #endif /* EBUG */
-
-   return(DS_OK);
+	return(DS_OK);
 }
 
 

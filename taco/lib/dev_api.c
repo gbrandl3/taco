@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.3 $
+ Version    :	$Revision: 1.4 $
 
- Date	    :	$Date: 2003-05-02 09:12:48 $
+ Date	    :	$Date: 2003-05-12 07:08:20 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -209,10 +209,8 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 
 	len = strlen (name);
 	device_name = name;
-	for (i=0; i<len; i++,device_name++)
-	{
+	for (i=0; i<len; i++, device_name++)
 		*device_name = tolower (*device_name);
-	}
 	device_name = name;
 
 /*
@@ -649,17 +647,9 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 	 * if a single user or administration access is requested.
 	 */
 
-	if (!no_database)
-	{
-		if ( multi_nethost[i_nethost].config_flags.security == True )
-		{
-			if ( sec_tcp_connection (access, &clnt, &svr_conns[n_svr_conn], error)
-		    	== DS_NOTOK )
-			{
-				return (DS_NOTOK);
-			}
-		}
-	}
+	if (!no_database  && (multi_nethost[i_nethost].config_flags.security == True)
+		&& (sec_tcp_connection (access, &clnt, &svr_conns[n_svr_conn], error) == DS_NOTOK))
+		return (DS_NOTOK);
 
 
 #ifdef EBUG
@@ -674,10 +664,8 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 	 *  Store the current RPC timeout for the connection and
 	 *  change the timeout to a short api_timeout.
 	 */
- 	clnt_control (clnt, CLGET_RETRY_TIMEOUT,
- 	    (char *) &svr_conns[n_svr_conn].rpc_retry_timeout);
- 	clnt_control (clnt, CLGET_TIMEOUT,
- 	    (char *) &svr_conns[n_svr_conn].rpc_timeout);
+ 	clnt_control (clnt, CLGET_RETRY_TIMEOUT, (char *) &svr_conns[n_svr_conn].rpc_retry_timeout);
+ 	clnt_control (clnt, CLGET_TIMEOUT, (char *) &svr_conns[n_svr_conn].rpc_timeout);
  	clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &import_retry_timeout);
  	clnt_control (clnt, CLSET_TIMEOUT, (char *) &import_timeout);
 
@@ -703,17 +691,9 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 	    * field for the security connection for old versions.
 	    */
 
-		if (!no_database)
-		{
-			if ( multi_nethost[i_nethost].config_flags.security == True )
-			{
-				if ( free_connection_id_vers3 (
-			    	dev_import_in.connection_id, error) == DS_NOTOK )
-				{
-					return (DS_NOTOK);
-				}
-			}
-		}
+		if (!no_database && (multi_nethost[i_nethost].config_flags.security == True)
+			&& (free_connection_id_vers3(dev_import_in.connection_id, error) == DS_NOTOK))
+			return (DS_NOTOK);
 
 		/*
 	    * Import a device from an old version server.
@@ -3696,7 +3676,6 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
 
  Return(s)  :   DS_OK or DS_NOTOK
 ***********************************************************************-*/
-
 long _DLLFunc dev_notimported_init (char *device_name, long access, long i_nethost, devserver *ds_ptr, long *error)
 {
 #ifdef EBUG
@@ -3737,29 +3716,24 @@ long _DLLFunc dev_notimported_init (char *device_name, long access, long i_netho
 
 	return(DS_OK);
 }
-/*+**********************************************************************
- Function   :   long dev_import_timeout()
 
- Description:   Sets or reads the import timeout for an import()
-                of a server.  A request to set the timeout has to be asked
-                with CLSET_TIMEOUT. The timeout will be set without any retry.                  A request to read the timeout has to be asked with
-                CLGET_TIMEOUT.
-
- Arg(s) In  :   long request           - indicates whether the timeout
-                                         should be set or only read.
-            :   struct timeval dev_timeout - timeout structure.
-
- Arg(s) Out :   error  - Will contain an appropriate error code if the
-                         corresponding call returns a non-zero value.
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * Sets or reads the import timeout for an import()
+ * of a server.  A request to set the timeout has to be asked
+ * with CLSET_TIMEOUT. The timeout will be set without any retry.
+ * A request to read the timeout has to be asked with CLGET_TIMEOUT.
+ * 
+ * @param request 	indicates whether the timeout should be set or only read.
+ * @param dev_timeout 	timeout structure.
+ * @param error  	Will contain an appropriate error code if the
+ *                      corresponding call returns a non-zero value.
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 long _DLLFunc dev_import_timeout (long request, struct timeval *dev_timeout,
                                   long *error)
 {
         *error = 0;
-
 /*
  * the asynchronous timeout is stored as part of the device server handle
  * getting or seting this timeout means simply accessing this variable
@@ -3769,15 +3743,12 @@ long _DLLFunc dev_import_timeout (long request, struct timeval *dev_timeout,
                         import_timeout = *dev_timeout;
                         import_retry_timeout = *dev_timeout;
                         break;
-
                 case (CLGET_TIMEOUT) :
                         *dev_timeout = import_timeout;
                         break;
-
                 default:
                         *error = DevErr_UnknownInputParameter;
                         return (DS_NOTOK);
-
         }
         return(DS_OK);
 } 

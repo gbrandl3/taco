@@ -13,9 +13,9 @@
 
  Original:	June 1991
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-04-25 11:21:27 $
+ Date:		$Date: 2003-05-12 07:08:19 $
 
  Copyright (c) 1990-1997 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -166,27 +166,24 @@ long ds__signal (int sig, void (*action)(int), long *error)
  */
 void main_signal_handler (int signo)
 {
-
-	/*
-	 *  check limits for valid signals
-	 */
-
+/*
+ *  check limits for valid signals
+ */
 #if defined (unix)
-	if ( signo<1 || signo>=NUSIG)
+	if ( signo < 1 || signo >= NUSIG)
 #elif defined(_NT)
         if ( signo< SIGINT || signo>=NUSIG)
 #else
-	if ( signo<0 || signo>=NUSIG)
+	if ( signo < 0 || signo >= NUSIG)
 #endif /* unix */
-	   {
-	   return;
-	   }
+	{
+		return;
+	}
 	
- 	/*
-	 *  call of internal device server signal handling function
-	 *  related to signo.
-	 */
-
+/*
+ *  call of internal device server signal handling function
+ *  related to signo.
+ */
 #ifdef __cplusplus
 	if ( sig_tab[signo] != (void (*) (int)) SIG_DFL && 
 	     sig_tab[signo] != (void (*) (int)) SIG_IGN )
@@ -194,36 +191,32 @@ void main_signal_handler (int signo)
 	if ( sig_tab[signo] != (void (*) ()) SIG_DFL && 
 	     sig_tab[signo] != (void (*) ()) SIG_IGN )
 #endif
-	   {
-	   sig_tab[signo] (signo);
-	   }
+	{
+		sig_tab[signo] (signo);
+	}
 
-	/*
-	 *  filter signals for quitting the server
-	 */
+/*
+ *  filter signals for quitting the server
+ */
 
 #if defined (_NT)
-	if (signo==SIGINT || signo==SIGTERM || signo==SIGABRT || 
-	      signo==SIGBREAK)
+	if (signo==SIGINT || signo==SIGTERM || signo==SIGABRT || signo==SIGBREAK)
 #else
-	if (signo==SIGQUIT || signo==SIGINT || signo==SIGHUP ||
-	      signo==SIGTERM || signo==SIGABRT)
+	if (signo==SIGQUIT || signo==SIGINT || signo==SIGHUP || signo==SIGTERM || signo==SIGABRT)
 #endif /* _NT */
-     	   {
-      	   unregister_server ();
-      	   /*
-      	    * now we exit after returning from unregister_server()
-      	    * this flawless change allows to use unregister_server() at
-      	    * any instant without unwanted server exit - what a deal
-      	    */
-      	    
-      	    exit(1);
-	   }
+     	{
+		unregister_server ();
+/*
+ * now we exit after returning from unregister_server()
+ * this flawless change allows to use unregister_server() at
+ * any instant without unwanted server exit - what a deal
+ */
+      	    	exit(1);
+	}
 
-	/* 
-	 *  Set up signal handler again
-	 */
-
+/* 
+ *  Set up signal handler again
+ */
 	(void) signal (signo, main_signal_handler);
 }
 
@@ -237,57 +230,45 @@ void main_signal_handler (int signo)
 void unregister_server (void)
 {
 	long error = 0;
-  LOCK(async_mutex);
-
+	LOCK(async_mutex);
 /*
  * if this is a bona fida device server and it is using the database
  * then unregister server from database device table
  */
-
 	if (config_flags.device_server == True)
 	{
-		if (!config_flags.no_database)
-		{
-   			if ( db_svc_unreg (config_flags.server_name,
-			   		&error) < 0 )
-	   		{
+		if (!config_flags.no_database  
+			&& (db_svc_unreg (config_flags.server_name, &error) != DS_OK))
 	   			dev_printerror_no (SEND,"db_svc_unreg failed",error);
-	   		}		
-		}
-
-	/*
-	 *  destroy open client handles to message and database servers
-
+/*
+ *  destroy open client handles to message and database servers
 	 	clnt_destroy (db_info.conf->clnt);
 	 	clnt_destroy (msg_info.conf->clnt);
-	 */
+ */
 	}
-	/*
-	 * unregister synchronous version (4) of server from portmapper
-	 */
+/*
+ * unregister synchronous version (4) of server from portmapper
+ */
 	pmap_unset (config_flags.prog_number, API_VERSION);
-	/*
- 	 * unregister the asynchronous version (5) of the server from portmapper
- 	 */
+/*
+ * unregister the asynchronous version (5) of the server from portmapper
+ */
 	pmap_unset (config_flags.prog_number, ASYNCH_API_VERSION);
-	/*
-	 *  finally unregister version (1) used by gettransient_ut()
-	 */
+/*
+ *  finally unregister version (1) used by gettransient_ut()
+ */
 	pmap_unset (config_flags.prog_number, DEVSERVER_VERS);
-	
+/* 
+ * the server has been unregistred, so set flag to false! 
+ * otherwise, there may be more than one attempt to unregister the server
+ * in multithreaded apps.
+ */
+	config_flags.device_server = False;    
+	UNLOCK(async_mutex);
 /*
  * returning here and calling exit() later from main_signal_handler() will
  * permit us to call unregister_server() from a different signal handler
  * and continue to do something useful afterwards
- *
- *	exit(1);
  */
-
-  /* the server has been unregistred, so set flag to false! 
-     otherwise, there may be more than one attempt to unregister the server
-     in multithreaded apps.
-  */
-  config_flags.device_server = False;    
-  UNLOCK(async_mutex);
-
+	return;
 }

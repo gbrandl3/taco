@@ -8,11 +8,13 @@
 		software of the machine theory group 
 
  Author(s):     J. Meyer
+ 		$Author: jkrueger1 $
 
  Original:      June 1994
 
+ Version:	$Revision: 1.2 $
 
- $Author: jkrueger1 $
+ Date:		$Date: 2003-05-12 07:08:20 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France

@@ -63,7 +63,7 @@ libdsapi_la_LDFLAGS 	= -version-info $(subst .,:,@LIB_VERSION@)
 libdsapi_la_LIBADD  	= ./libdsapic.la ./libtacoapi.la 
 
 libdsapig___la_SOURCES 	= Device.C OICDevice.C DevServerMain.c startup.c  
-libdsapig___la_CFLAGS  	= -UCLIENTONLY  -x c++
+libdsapig___la_CFLAGS  	= -UCLIENTONLY  
 libdsapig___la_LDFLAGS 	= -version-info $(subst .,:,@LIB_VERSION@)
 libdsapig___la_LIBADD  	= ./libdsapic.la ./libtacoapig++.la 
 include_HEADERS		+= BlcDsNumbers.h CntrlDsNumbers.h DasDsNumbers.h MachDsNumbers.h SysNumbers.h 

@@ -9,14 +9,13 @@
 		device server programming teams.
 
  Author(s):     Jens Meyer
+ 		$Author: jkrueger1 $
 
  Original:      July 1993
 
+ Version:	$Revision: 1.2 $
 
- $Revision: 1.1 $
- $Date: 2003-04-25 11:21:28 $
-
- $Author: jkrueger1 $
+ Date: 		$Date: 2003-05-12 07:08:20 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -30,13 +29,13 @@
  * Definitions to code and decode the error and command numbers.
  */
 
-#define DS_TEAM_SHIFT   	26
-#define DS_IDENT_SHIFT   	18
-#define DS_CAT_SHIFT		12
+#define DS_TEAM_SHIFT	26
+#define DS_IDENT_SHIFT	18
+#define DS_CAT_SHIFT	12
 
-#define DS_TEAM_MASK          63      /* value = 0x3f */
-#define DS_IDENT_MASK         255     /* value = 0xff */
-#define DS_CAT_MASK           63      /* value = 0x3f */
+#define DS_TEAM_MASK	63      /* value = 0x3f */
+#define DS_IDENT_MASK	255     /* value = 0xff */
+#define DS_CAT_MASK	63      /* value = 0x3f */
 
 /**************  Device server development Teams definition  **************/
 
@@ -48,6 +47,7 @@
 #define SysTeamNumber   DS_LSHIFT(6,DS_TEAM_SHIFT) /* CS - System Team */
 #define MachTeamNumber  DS_LSHIFT(7,DS_TEAM_SHIFT) /* Machine - Theory Group */
 #define FRMTeamNumber   DS_LSHIFT(8,DS_TEAM_SHIFT) /* FRM-II - Garching */
+#define TestTeamNumber	DS_LSHIFT(99, DS_TEAM_SHIFT)	/* Only for tests */
 
 /**************  Device server error category definition  **************/
 
