@@ -16,6 +16,9 @@ endif
 # Uncomment the next line if you want to start the TACO services in secure mode
 # setenv TACO_SECURE_MODE yes
 
+# Uncomment the next line if you want to start the TACO services with logging
+#setenv TACO_LOGGING yes
+
 # It is unlikely that the rest of the file needs a modification
 if (${?DSHOME}) then
 ;

@@ -1,7 +1,7 @@
 export NETHOST=localhost
 export DBTABLES=NAMES,PS_NAMES,CLASS,SYS,ERROR,CMDS,SEC,EVENTS,TEST,PANDA
-export TACO_PATH=/taco/system/bin/freebsd5.2.1/i386
-export DSHOME=/taco
+export TACO_PATH=@sbindir@
+export DSHOME=@prefix@
 export RES_BASE_DIR=$DSHOME/dbase/res
 export DBM_DIR=$DSHOME/dbase/dbm
 export MYSQL_USER=root

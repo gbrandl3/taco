@@ -40,15 +40,16 @@ case $1 in
 				rc_exit
 			fi
 		fi
-		if test "x$TACO_SECURE_MODE" = xyes ; then
-			echo -n "Starting TACO services in secure mode"
-			startproc -s -q "$taco_manager" -security
-			rc_status -v
-		else
-			echo -n "Starting TACO services"
-			startproc -s -q "$taco_manager"
-			rc_status -v
+		if test "x$TACO_LOGGING" = xyes ; then 
+			log="-log"
 		fi
+		if test "x$TACO_SECURE_MODE" = xyes ; then
+			sec_text="in secure mode"
+			security="-security"
+		fi
+		echo -n "Starting TACO services $sec_text"
+		startproc -s -q "$taco_manager" $log $security
+		rc_status -v
 		;;
 	stop)
 		echo -n "Shutting down TACO services"

@@ -12,6 +12,9 @@ DBTABLES_CUSTOM=${DBTABLES_CUSTOM:-TEST}
 # Uncomment the next line if you want to start the TACO services in secure mode
 #TACO_SECURE_MODE=yes
 
+# Uncomment the next line if you want to start the TACO services with logging
+#TACO_LOGGING=yes
+
 # It is unlikely that the rest of the file needs a modification
 export DSHOME=${DSHOME:-@prefix@}
 export DBTABLES=NAMES,PS_NAMES,CLASS,SYS,ERROR,CMDS,SEC,EVENTS,${DBTABLES_CUSTOM}
