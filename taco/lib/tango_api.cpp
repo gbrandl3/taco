@@ -1,4 +1,4 @@
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango_api.cpp,v 1.5 2004-11-25 19:07:44 andy_gotz Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango_api.cpp,v 1.6 2004-12-02 14:45:12 andy_gotz Exp $";
 /*+*******************************************************************
 
  File       :	tango_api.c
@@ -17,8 +17,8 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib
 
  Original   :	December 1999
 
- $Revision: 1.5 $
- $Date: 2004-11-25 19:07:44 $
+ $Revision: 1.6 $
+ $Date: 2004-12-02 14:45:12 $
 
  $Author: andy_gotz $
 
@@ -93,19 +93,25 @@ extern char *dev_error_string;
 #undef DevState
 #undef RUNNING
 
-/*+**********************************************************************
- Function   :   extern long tango_db_import()
+/**
+ * @defgroup tangoAPI TANGO API for TACO
+ * @ingroup clientAPI
+ */
 
- Description:   import TANGO database
+/**
+ * @defgroup tangoAPIintern internal API for the TANGO API
+ * @ingroup tangoAPI
+ */
 
- Arg(s) In  :   char *db_name - name of the database
-            :   char *db_host - database host
-            :   long db_port  - database port
+/**@ingroup tangoAPI
+ * 
+ * import TANGO database
+ *
+ * @param error	  contains the error code if function returns DS_NOTOK
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 
- Arg(s) Out :   none
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
 
 long tango_db_import(long *error)
 {
@@ -151,17 +157,17 @@ long tango_db_import(long *error)
 	return(DS_OK);
 }
 
-/*+**********************************************************************
- Function   :   extern long tango_dev_import()
-
- Description:   import TANGO device
-
- Arg(s) In  :   char *dev_name - name of device
-
- Arg(s) Out :   none
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**@ingroup tangoAPI
+ * 
+ * import TANGO device
+ *
+ * @param dev_name name of device
+ * @param access security access level
+ * @param ds_ptr returned device server structure
+ * @param error	  contains the error code if function returns DS_NOTOK
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 
 long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, long *error)
 {
@@ -332,17 +338,15 @@ long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, long *erro
 	return(0);
 }
 
-/*+**********************************************************************
- Function   :   extern long tango_dev_free()
-
- Description:   free a TANGO device
-
- Arg(s) In  :   devserver ds  - device server structure
-
- Arg(s) Out :   none
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**@ingroup tangoAPI
+ * 
+ * free a TANGO device
+ *
+ * @param ds device server structure to free
+ * @param error	  contains the error code if function returns DS_NOTOK
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 
 long tango_dev_free(devserver ds, long *error)
 {
@@ -364,17 +368,15 @@ long tango_dev_free(devserver ds, long *error)
 	return(0);
 }
 
-/*+**********************************************************************
- Function   :   extern long tango_dev_reimport()
-
- Description:   reimport TANGO device
-
- Arg(s) In  :   char *dev_name - name of device
-
- Arg(s) Out :   none
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**@ingroup tangoAPI
+ * 
+ * reimport TANGO device
+ *
+ * @param ds device server structure of device to reimport
+ * @param error	  contains the error code if function returns DS_NOTOK
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 
 long tango_dev_reimport(devserver ds, long *error)
 {
@@ -424,22 +426,19 @@ long tango_dev_reimport(devserver ds, long *error)
 	return(0);
 }
 
-/*+**********************************************************************
- Function   :   extern long tango_dev_putget()
-
- Description:   execute a command on a TANGO device
-
- Arg(s) In  :   long id - device id
-		long cmd - command to execute
-		void *argin - pointer to argin
-		long argin_type - argin type
-		void *argout - pointer to argout
-		long argout_type - argout type
-
- Arg(s) Out :   long *error - error code, in case of failure
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**@ingroup tangoAPI
+ * 
+ * execute a command on a TANGO device
+ *
+ * @param cmd command to execute
+ * @param argin - pointer to argin
+ * @param argin_type - argin type
+ * @param argout pointer to argout
+ * @param argout_type argout type
+ * @param error	  contains the error code if function returns DS_NOTOK
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 
 long tango_dev_putget(devserver ds, long cmd, void *argin, long argin_type,
                       void *argout, long argout_type, long *error)
@@ -575,23 +574,20 @@ long tango_dev_putget(devserver ds, long cmd, void *argin, long argin_type,
 	return(0);
 }
 
-/*+**********************************************************************
- Function   :   extern long tango_dev_putget_raw()
-
- Description:   execute a command on a TANGO device and return the data in 
-		DEV_OPAQUE_TYPE
-
- Arg(s) In  :   long id - device id
-		long cmd - command to execute
-		void *argin - pointer to argin
-		long argin_type - argin type
-		void *argout - pointer to argout
-		long argout_type - argout type
-
- Arg(s) Out :   long *error - error code, in case of failure
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**@ingroup tangoAPI
+ * 
+ * execute a command on a TANGO device and return the data in DEV_OPAQUE_TYPE
+ *
+ * @param id device id
+ * @param cmd command to execute
+ * @param argin pointer to argin
+ * @param argin_type argin type
+ * @param argout pointer to argout
+ * @param argout_type argout type
+ * @param error	  contains the error code if function returns DS_NOTOK
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 
 long tango_dev_putget_raw(devserver ds, long cmd, void *argin, long argin_type,
                       void *argout, long argout_type, long *error)
@@ -720,29 +716,17 @@ long tango_dev_putget_raw(devserver ds, long cmd, void *argin, long argin_type,
 	return(DS_OK);
 }
 
-
-/*+**********************************************************************
-Function   : 	extern long tango_dev_cmd_query()
-
- Description:	Returns a sequence of structures containing all
-		available commands, names, input and output data types
-		for a TANGO device. 
-            :	Command names and data types are read from the command
-		list in the device server by calling device->cmd_query.
-            :	Command values are read from the TACO database
-            :	Data type descriptions have to be specified as 
-		CLASS resources as:
-            :		CLASS/class_name/cmd_name/IN_TYPE:
-            :		CLASS/class_name/cmd_name/OUT_TYPE:
-
- Arg(s) In  :	dev_id - device id in tango_device
-
- Arg(s) Out :	varcmdarr - sequence of DevCmdInfo structures.
-		error     - Will contain an appropriate error code if the
-			    corresponding call returns a non-zero value.
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**@ingroup tangoAPI
+ * 
+ * Returns a sequence of structures containing all available commands, names, input and output data types
+ * for a TANGO device
+ *
+ * @param ds device server structuer
+ * @param varcmdarr returned list of commands and their types
+ * @param error	  contains the error code if function returns DS_NOTOK
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 
 long tango_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error)
 {
@@ -784,19 +768,15 @@ long tango_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error)
 	return (DS_OK);
 }
 
-/*+**********************************************************************
-Function   : 	extern long tango_dev_ping()
-
- Description:	Ping a TANGO device
-
- Arg(s) In  :	devserver ds - device 
-
- Arg(s) Out :	varcmdarr - sequence of DevCmdInfo structures.
-		error     - Will contain an appropriate error code if the
-			    corresponding call returns a non-zero value.
-
- Return(s)  :	DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**@ingroup tangoAPI
+ * 
+ * ping a tango device
+ *
+ * @param ds device server structure
+ * @param error	  contains the error code if function returns DS_NOTOK
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 
 long tango_dev_ping (devserver ds, long *error)
 {
@@ -825,18 +805,17 @@ long tango_dev_ping (devserver ds, long *error)
 	return (DS_OK);
 }
 
-/*+**********************************************************************
- Function   :   extern long tango_argin_to_any()
-
- Description:   convert a TACO argin type to a TANGO type and return it in an Any
-
- Arg(s) In  :   long argin_type - argin type to convert
-                void *argin - pointer to argin
-
- Arg(s) Out :   long *error - error code, in case of failure
-
- Return(s)  :   CORBA::Any - argin converted to Any
-***********************************************************************-*/         
+/**@ingroup tangoAPI
+ * 
+ * convert a TACO argin type to a TANGO type and return it in an Any
+ *
+ * @param argin_type argin type to convert
+ * @param tango_type equivalent tango type
+ * @param pointer to argin
+ * @param error	  contains the error code if function returns DS_NOTOK
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 
 static CORBA::Any tango_argin_to_any(long argin_type, long tango_type, void *argin, long *error)
 {
@@ -1131,19 +1110,19 @@ static CORBA::Any tango_argin_to_any(long argin_type, long tango_type, void *arg
 	return(send);
 }
 
-/*+**********************************************************************
- Function   :   extern long tango_any_to_argout()
+/**@ingroup tangoAPI
+ * 
+ * extract a TANGO type from an Any and convert it to a TACO argout
+ *
+ * @param argout_type argout type to convert
+ * @param tango_type tango type to extract
+ * @param received Any returned by device server
+ * @param pointer to argout
+ * @param error	  contains the error code if function returns DS_NOTOK
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 
- Description:   extract a TANGO type from an Any and convert it to a TACO argout
-
- Arg(s) In  :   long argout_type - argout type to convert
-		CORBA::Any received - Any returned by device server
-                void *argout - pointer to argout
-
- Arg(s) Out :   long *error - error code, in case of failure
-
- Return(s)  :   void
-***********************************************************************-*/         
 
 static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any received, void *argout, long *error)
 {
@@ -1540,22 +1519,20 @@ static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any re
 
 	return;
 }
+
+/**@ingroup tangoAPI
+ * 
+ * extract a TANGO type from an Any and convert it to a TACO argout of DEV_OPAQUE_TYPE
+ *
+ * @param argout_type argout type to convert
+ * @param tango_type tango type to be extracted
+ * @param received Any returned by device server
+ * @param argout pointer to argout
+ * @param error	  contains the error code if function returns DS_NOTOK
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 	
-/*+**********************************************************************
- Function   :   extern long tango_any_to_argout_raw()
-
- Description:   extract a TANGO type from an Any and convert it to a TACO argout
-		of DEV_OPAQUE_TYPE
-
- Arg(s) In  :   long argout_type - argout type to convert
-		CORBA::Any received - Any returned by device server
-                void *argout - pointer to argout
-
- Arg(s) Out :   long *error - error code, in case of failure
-
- Return(s)  :   void
-***********************************************************************-*/         
-
 static void tango_any_to_argout_raw(long argout_type, long tango_type, CORBA::Any received, void *argout, long *error)
 {
 	dc_datacmd dc_datacmd;

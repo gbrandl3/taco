@@ -14,11 +14,11 @@
 //
 // Original:	June 1995
 //
-// $Revision: 1.4 $
+// $Revision: 1.5 $
 //
-// $Date: 2004-11-05 08:52:34 $
+// $Date: 2004-12-02 14:45:12 $
 //
-// $Author: jkrueger1 $
+// $Author: andy_gotz $
 //
 //+**********************************************************************
 		
@@ -32,6 +32,8 @@
 
 #define MAX_DEVICES 1000
 
+long minimal_access;
+
 long startup(char *svr_name, long *error)
 {
    char **dev_list;
@@ -40,6 +42,8 @@ long startup(char *svr_name, long *error)
    devserver ds[MAX_DEVICES];
    short state;
    long status;
+
+   //debug_flag = 0xffffffff;
 
    printf ("startup++() program to test dserver++ (server name = %s)\n",svr_name);
 //

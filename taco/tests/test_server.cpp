@@ -10,7 +10,19 @@
 TestDevice::TestDevice(const std::string name, long &error)
 	: Device(const_cast<char *>(name.c_str()), &error)
 {
-	commands_list[SendByteArray] = DeviceCommandListEntry(SendByteArray, static_cast<DeviceMemberFunction>(&TestDevice::tacoSendByteArray),
+	commands_map[DevState] = DeviceCommandMapEntry(DevState, static_cast<DeviceBaseMemberFunction>(&Device::State),
+				D_VOID_TYPE, D_SHORT_TYPE, 0, "State");
+	commands_map[DevStatus] = DeviceCommandMapEntry(DevStatus, static_cast<DeviceBaseMemberFunction>(&Device::Status),
+				D_VOID_TYPE, D_STRING_TYPE, 0, "Status");
+	commands_map[DevReset] = DeviceCommandMapEntry(DevReset, static_cast<DeviceBaseMemberFunction>(&Device::Reset),
+				D_VOID_TYPE, D_VOID_TYPE, 0, "Reset");
+	commands_map[DevOn] = DeviceCommandMapEntry(DevOn, static_cast<DeviceBaseMemberFunction>(&Device::On),
+				D_VOID_TYPE, D_VOID_TYPE, 0, "On");
+	commands_map[DevOff] = DeviceCommandMapEntry(DevOff, static_cast<DeviceBaseMemberFunction>(&Device::Off),
+				D_VOID_TYPE, D_VOID_TYPE, 0, "Off");
+	commands_map[DevClose] = DeviceCommandMapEntry(DevClose, static_cast<DeviceBaseMemberFunction>(&Device::Close),
+				D_VOID_TYPE, D_VOID_TYPE, 0, "Close");
+	commands_map[SendByteArray] = DeviceCommandMapEntry(SendByteArray, static_cast<DeviceBaseMemberFunction>(&TestDevice::tacoSendByteArray),
 				D_VOID_TYPE, D_VAR_CHARARR, 0, "SendByteArray");
 
 	events_list[HeartBeat] = DeviceEventListEntry(HeartBeat, D_LONG_TYPE, "HeartBeat");

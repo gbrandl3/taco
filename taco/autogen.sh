@@ -126,5 +126,5 @@ else
 	exit
 fi
 
-(cd gdbm && ./autogen.sh)
+(cd gdbm && sh autogen.sh)
 

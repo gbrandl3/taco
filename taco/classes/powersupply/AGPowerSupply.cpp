@@ -41,6 +41,7 @@
 static AGPowerSupply *agps_template;
 short AGPowerSupply::class_inited = 0;
 
+
 //+======================================================================
 // Function:    AGPowerSupply::GetResources()
 //
@@ -124,6 +125,7 @@ long AGPowerSupply::ClassInitialise (long *error)
 
    printf ("AGPowerSupply::ClassInitialise() called\n");
   
+   debug_flag = 0xffffffff;
 
 //
 // initialise the template powersupply so that DevMethodCreate has
@@ -212,6 +214,8 @@ AGPowerSupply::AGPowerSupply (char *name, long *error)
 // initialise the commands list to point to the commands list 
 // implemented for the AG PowerSupply class
 //
+        this->commands_map[DevState] = DeviceCommandMapEntry(DevState, (DeviceBaseMemberFunction)(&Device::State), 
+							D_VOID_TYPE, D_SHORT_TYPE, 0, "DevState");
         this->commands_map[DevStatus] = DeviceCommandMapEntry(DevStatus, (DeviceBaseMemberFunction)(&AGPowerSupply::Status), 
 							D_VOID_TYPE, D_STRING_TYPE, 0, "DevStatus");
         this->commands_map[DevOn] = DeviceCommandMapEntry(DevOn, (DeviceBaseMemberFunction)(&AGPowerSupply::On), 

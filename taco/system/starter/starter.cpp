@@ -1,18 +1,18 @@
 /*****************************************************************************
- * File:        $Id: starter.cpp,v 1.4 2003-12-08 15:17:42 jkrueger1 Exp $
+ * File:        $Id: starter.cpp,v 1.5 2004-12-02 14:45:13 andy_gotz Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
  * Description: Source code for implementing a starter server
  *
  * Author(s):   Jens Krüger
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2003-12-08 15:17:42 $
+ * Date:	$Date: 2004-12-02 14:45:13 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -48,15 +48,23 @@
 StarterDevice::StarterDevice(std::string name, long &error)
 	: Device(const_cast<char *>(name.c_str()), &error)
 {
-        commands_list[DevRun] = DeviceCommandListEntry(DevRun, static_cast<DeviceMemberFunction>( &StarterDevice::tacoDevRun),
+        commands_map[DevState] = DeviceCommandMapEntry(DevState, static_cast<DeviceBaseMemberFunction>( &Device::State),
+					D_VOID_TYPE,
+                                        D_SHORT_TYPE,
+                                        READ_ACCESS, "DevState");
+        commands_map[DevStatus] = DeviceCommandMapEntry(DevStatus, static_cast<DeviceBaseMemberFunction>( &Device::Status),
+					D_VOID_TYPE,
+                                        D_STRING_TYPE,
+                                        READ_ACCESS, "DevStatus");
+        commands_map[DevRun] = DeviceCommandMapEntry(DevRun, static_cast<DeviceBaseMemberFunction>( &StarterDevice::tacoDevRun),
 					D_VAR_STRINGARR,
                                         D_VOID_TYPE,
                                         ADMIN_ACCESS, "DevRun");
-        commands_list[DevStop] = DeviceCommandListEntry(DevStop, static_cast<DeviceMemberFunction>( &StarterDevice::tacoDevStop),
+        commands_map[DevStop] = DeviceCommandMapEntry(DevStop, static_cast<DeviceBaseMemberFunction>( &StarterDevice::tacoDevStop),
 					D_VAR_STRINGARR,
                                         D_VOID_TYPE,
                                         ADMIN_ACCESS, "DevStart");
-        commands_list[DevRestore] = DeviceCommandListEntry(DevRestore, static_cast<DeviceMemberFunction>( &StarterDevice::tacoDevRestart),
+        commands_map[DevRestore] = DeviceCommandMapEntry(DevRestore, static_cast<DeviceBaseMemberFunction>( &StarterDevice::tacoDevRestart),
 					D_VAR_STRINGARR,
                                         D_VOID_TYPE,
                                         ADMIN_ACCESS, "DevRestart");
