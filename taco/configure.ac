@@ -1,6 +1,6 @@
-AC_INIT(TACO, 3.0-rc2, [taco-devel@lists.sourceforge.net])
+AC_INIT(TACO, 3.0rc2, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.24 $)dnl
+AC_REVISION($Revision: 1.25 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -221,7 +221,7 @@ AM_MISSING_PROG([AUTOM4TE], [autom4te])
 
 AC_OUTPUT
 
-echo "
+AC_MSG_RESULT([
 
 Configuration (taco):
 
@@ -248,4 +248,4 @@ build:
 
 Please check whether the configuration I detected matches what you
 would like to have. 
-"
+])
