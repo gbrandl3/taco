@@ -2,14 +2,15 @@
  * Author:	E. Taurel
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2003-05-21 16:17:12 $
+ * Date:	$Date: 2004-03-26 16:38:43 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                      Grenoble, France
  */
 
+#include "config.h"
 #include <API.h>
 #include <dc.h>
 #include <dcP.h>
@@ -21,36 +22,41 @@
 #include <dc_xdr.h>
 
 #ifdef _OSK
-#ifdef _UCC
-#include <string.h>
-#include <stdlib.h>
-#else
-#include <strings.h>
-#endif /* _UCC */
-#include <inet/socket.h>
-#include <inet/netdb.h>
+#	ifdef _UCC
+#		include <string.h>
+#		include <stdlib.h>
+#	else
+#		include <strings.h>
+#	endif /* _UCC */
+#	include <inet/socket.h>
+#	include <inet/netdb.h>
 #else /* _OSK */
-#include <stdlib.h>
-#include <string.h>
-#ifndef _NT
-#include <sys/socket.h>
-#ifndef __hp9000s300
-#include <netinet/in.h>
-#endif
-#include <netdb.h>
-#include <unistd.h>
-#endif  /* _NT */
+#	include <stdlib.h>
+#	include <string.h>
+#	ifndef _NT
+#		include <sys/socket.h>
+#		ifndef __hp9000s300
+#			include <netinet/in.h>
+#		endif
+#		include <netdb.h>
+#		include <unistd.h>
+#	endif  /* _NT */
 #endif /* _OSK */
 
 /* Some global variables defined elsewhere */
 
 extern dc_nethost_info *dc_multi_nethost;
-
 
-
-
 /**@ingroup dcAPI
- * To retrieve from the data collector the history of a command result for a device. 
+ * In this function the caller retrieve the result history of one command for a single
+ * device. The client send to server a structure with 4 elements which are:
+ *	- The device name
+ *	- The command code from which the result history must be retrieved
+ *	- The command result data type
+ *	- The number of records to retrieve in the history.
+ * The data trenasffered from the server to the client are organised in the same way that the 
+ * devget function with the command time added in the xresh and xresh_clnt structures.
+ * A general error code has been added to inform the client of a global error like server ... .
  *
  * @param dc_ptr 	Device handle					
  * @param cmd_code 	The command code				
@@ -129,8 +135,7 @@ int dc_devget_history(datco *dc_ptr,long cmd_code,dc_hist *hist_buff,DevType arg
 	send.xnb_rec = nb_rec;
 
 /* 
- * Allocate memory for the array of "xresh_clnt" structure used by XDR
- * routine to deserialise data 
+ * Allocate memory for the array of "xresh_clnt" structure used by XDR routine to deserialise data 
  */
 	if ((tmp_ptr = (xresh_clnt *)calloc(nb_rec,sizeof(xresh_clnt))) == NULL)
 	{
