@@ -376,9 +376,11 @@ int MySQLServer::db_find(std::string tab_name, std::string p_res_name, char **ou
 		     strcat(*out, adr_tmp1.c_str());
 		     break;
     	}
+    	mysql_free_result(result);
     }
     catch(const std::bad_alloc &e)
     {
+    	mysql_free_result(result);
 	std::cerr << "Error in malloc for out" << std::endl;
 	throw e;
     }
