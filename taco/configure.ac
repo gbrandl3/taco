@@ -1,6 +1,6 @@
 AC_INIT([TACO], [3.1.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.59 $)dnl
+AC_REVISION($Revision: 1.60 $)dnl
 AC_COPYRIGHT([(C) 1990-2005 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -250,7 +250,7 @@ AC_SUBST(TEST_resdir, ['${resdatadir}/TEST'])
 dnl aclocaldir=`aclocal --print-ac-dir`
 AC_SUBST([aclocaldir], ['${datadir}/aclocal'])
 
-AC_SUBST(TACO_INCLUDES, ["-I\$(top_srcdir)/lib/xdr -I\$(top_srcdir)/lib -I\$(top_srcdir)/lib/dc -I\$(top_srcdir)/lib/dbase -I\$(top_srcdir)/lib/tc -I\$(top_srcdir)/lib/ascii] -I\$(top_srcdir)/lib/private") 
+AC_SUBST(TACO_INCLUDES, ["-I\$(top_srcdir)/lib/xdr -I\$(top_srcdir)/lib -I\$(top_srcdir)/lib/dc -I\$(top_srcdir)/lib/dbase -I\$(top_srcdir)/lib/tc -I\$(top_srcdir)/lib/ascii -I\$(top_srcdir)/lib/signal] -I\$(top_srcdir)/lib/private") 
 
 AC_SUBST(TACO_SERVER_LIBS, ["\$(top_builddir)/lib/libtaco.la \$(top_builddir)/lib/libtacomain.la"])
 AC_SUBST(TACO_SERVER_CXX_LIBS, ["\$(top_builddir)/lib/libtaco++.la \$(top_builddir)/lib/libtacomain.la"])

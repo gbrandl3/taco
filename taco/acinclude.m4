@@ -69,13 +69,13 @@ dnl
 		[mysql_includes="$withval"], [mysql_includes=""])
 
 	if test "x$mysql_libraries" != "x" ; then
-		MYSQL_LIBS="-L$mysql_libraries -lmysqlclient"
+		MYSQL_LIBS="-L$mysql_libraries -lmysqlclient -lm -lz"
 	elif test "x$mysql_prefix" != "x" ; then
-		MYSQL_LIBS="-L$mysql_prefix/lib/mysql -lmysqlclient"
+		MYSQL_LIBS="-L$mysql_prefix/lib/mysql -lmysqlclient -lm -lz"
 	elif test -n "$MYSQL_CONFIG" ; then
 		MYSQL_LIBS=`$MYSQL_CONFIG --libs`
 	elif test "x$prefix" != "xNONE" -a "x$prefix" != "x/usr"; then
-		MYSQL_LIBS="-L$prefix/lib -lmysqlclient"
+		MYSQL_LIBS="-L$prefix/lib -lmysqlclient -lm -lz"
 	fi
 
 	if test "x$mysql_includes" != "x" ; then
@@ -310,6 +310,8 @@ AC_DEFUN([X_AND_MOTIF],
 	CPPFLAGS_SAVE="$CPPFLAGS"
 	CPPFLAGS="$CPPFLAGS $MOTIF_INCLUDES"
 	LIBS_SAVE="$LIBS"
+	X_CFLAGS="$CPPFLAGS"
+	X_LDFLAGS="$LIBS $X_LDFLAGS $MOTIF_LIBS"
 	AC_CHECK_HEADERS([Xm/Xm.h Xm/XmAll.h], [
 		AC_CHECK_LIB(Xm, XmStringCreateLocalized, [], [motif_found=no], [$X_LDFLAGS -lXt -lX11])
 		break;

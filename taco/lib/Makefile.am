@@ -31,7 +31,7 @@ lib_LTLIBRARIES 	= libtaco.la libtaco++.la libtacomain.la
 
 noinst_LTLIBRARIES 	= libtacoc.la 
 
-INCLUDES		= @TACO_INCLUDES@ -I./signal
+INCLUDES		= @TACO_INCLUDES@ 
 
 ## AM_CPPFLAGS 		= -DEBUG
 

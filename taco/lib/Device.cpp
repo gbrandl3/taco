@@ -12,9 +12,9 @@
 //
 // Original:	March 1995
 //
-// Version:	$Revision: 1.6 $
+// Version:	$Revision: 1.7 $
 //
-// Date:	$Date: 2005-03-29 09:44:06 $
+// Date:	$Date: 2005-04-06 19:07:34 $
 //
 //-**********************************************************************
 		
@@ -327,6 +327,7 @@ long Device::Reset(void *vargin, void *vargout, long *error)
 long Device::Close(void *argin, void *vargout, long *error)
 {
 	delete this;
+	return(DS_OK);
 }
 
 /**
