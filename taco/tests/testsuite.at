@@ -23,7 +23,10 @@ m4_version_prereq([2.57])
 
 m4_define([AT_TACO_RUN_LOCAL],
 [. taco
+echo $sysconfdir
+echo $LD_LIBRARY_PATH
 . $sysconfdir/tacoenv.sh
+echo $LD_LIBRARY_PATH
 ])
 
 AT_INIT
@@ -33,6 +36,10 @@ AT_BANNER([[Installing TACO system.]])
 
 AT_SETUP([TACO installation])
 AT_CHECK([taco install])
+AT_CLEANUP
+
+AT_SETUP([Starting TACO])
+AT_CHECK([taco start])
 AT_CLEANUP
 
 AT_BANNER([[Testing the database server.]])
@@ -45,6 +52,10 @@ AT_BANNER([[Testing the starter server]])
 m4_include([starter.at])
 
 AT_BANNER([[Uninstalling TACO system.]])
+
+AT_SETUP([Stopping TACO])
+AT_CHECK([taco stop])
+AT_CLEANUP
 
 AT_SETUP([TACO deinstallation])
 AT_CHECK([taco uninstall])
