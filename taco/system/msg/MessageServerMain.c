@@ -12,9 +12,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-05-09 15:26:46 $
+ Date:		$Date: 2003-11-28 13:14:55 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -144,7 +144,7 @@ static void msgserver_prog_1 (struct svc_req *rqstp, SVCXPRT *transp)
 	switch (rqstp->rq_proc) 
 	{
 		case NULLPROC:
-#ifndef linux
+#if !defined (linux) && !defined(FreeBSD)
 			svc_sendreply(transp, xdr_void, NULL);
 #else
 			svc_sendreply(transp, (xdrproc_t)xdr_void, NULL);
@@ -156,7 +156,7 @@ static void msgserver_prog_1 (struct svc_req *rqstp, SVCXPRT *transp)
 			local = (char *(*)()) rpc_msg_send_1;
 			break;
 		case RPC_STARTUP_MSG:
-#ifndef linux
+#if !defined (linux) && !defined(FreeBSD)
 			svc_sendreply(transp, xdr_void, NULL);
 #else
 			svc_sendreply(transp, (xdrproc_t)xdr_void, NULL);
@@ -166,7 +166,7 @@ static void msgserver_prog_1 (struct svc_req *rqstp, SVCXPRT *transp)
 			return;
 
 		case RPC_QUIT_SERVER:
-#ifndef linux
+#if !defined (linux) && !defined(FreeBSD)
 			svc_sendreply(transp, xdr_void, NULL);
 #else
 			svc_sendreply(transp, (xdrproc_t)xdr_void, NULL);
@@ -190,7 +190,7 @@ static void msgserver_prog_1 (struct svc_req *rqstp, SVCXPRT *transp)
 	}
 
 	result = (*local)(&argument, rqstp);
-#ifndef linux
+#if !defined (linux) && !defined(FreeBSD)
 	if (result != NULL && !svc_sendreply(transp, xdr_result, result)) 
 #else
 	if (result != NULL && !svc_sendreply(transp, (xdrproc_t)xdr_result, result)) 
@@ -244,7 +244,7 @@ void register_msg (char *nethost, char **dshome)
 	register_data.prog_number = msg.prog_number;
 	register_data.vers_number = MSGSERVER_VERS;
 
-#ifndef linux
+#if !defined (linux) && !defined(FreeBSD)
 	clnt_stat = clnt_call (clnt, RPC_MSG_REGISTER,
 			       xdr__register_data,&register_data,
 			       xdr__msg_manager_data,&msg_manager_data,timeout);

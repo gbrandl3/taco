@@ -1,4 +1,3 @@
-
 /*********************************************************************
 
  File:		MessageServer.c
@@ -12,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-05-09 15:26:46 $
+ Date:		$Date: 2003-11-28 13:14:54 $
 
  Copyright (c) 1990 by	European Synchrotron Radiation Facility, 
 			Grenoble, France
@@ -26,7 +25,7 @@
 /*
  * Include files and Static Routine definitions
  */
-
+#include "config.h"
 #include <API.h>
 #include <private/ApiP.h>
 #include <Message.h>
@@ -35,7 +34,16 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <time.h>
+#if TIME_WITH_SYS_TIME
+# 	include <sys/time.h>
+#	include <time.h>
+#else
+#	if HAVE_SYS_TIME_H
+#		include <sys/time.h>
+#	else
+#		include <time.h>
+#	endif
+#endif
 
 extern MessageServerPart msg;
 
@@ -152,7 +160,7 @@ void msg_fault_handler (DevString error_msg)
         FILE *filepointer;
         char file_name [256];
         char *time_string;
-        long clock;
+        time_t clock;
         
         snprintf (file_name, sizeof(file_name), "%s%s.ERR",msg.ER_file_dir, msg.name);
 
@@ -199,7 +207,7 @@ _msg_out *rpc_msg_send_1 (_msg_data *msg_data)
         char 		acm [256];
         char 		*char_ptr;
         char 		*time_string;
-        long 		clock;
+        time_t 		clock;
         int 		fildes;
         int 		nbytes;
 	int 		j;
