@@ -1,0 +1,87 @@
+/*****************************************************************************
+ *
+ * File:        $Id: starter.h,v 1.1 2003-05-05 16:04:05 jkrueger1 Exp $
+ *
+ * Project:     Device Servers with sun-rpc
+ *
+ * Description: Source code for implementing a starter server
+ *
+ * Author(s):   Jens Krüger
+ * 		$Author: jkrueger1 $
+ *
+ * Original:    January 2003
+ *
+ * Version:	$Revision: 1.1 $
+ *
+ * Date:	$Date: 2003-05-05 16:04:05 $
+ *
+ * Copyright (C) 2003 Jens Krueger
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *****************************************************************************/
+
+#ifndef __STARTER_DEVICE_H__
+#define __STARTER_DEVICE_H__
+
+
+#include <API.h>
+#include <Device.H>
+#include <sys/types.h>
+#include <string>
+
+class StarterDevice : public Device
+{
+	friend long StarterSetup(char *pszServerName, long *plError);
+public:
+	StarterDevice(string name, long &error);
+	~StarterDevice();
+protected:
+//	long GetResources(char *name, long *error){}
+private:
+	/**
+	 * TACO command for starting Device server.
+	 */
+	long tacoDevRun(void *argin, void *argout, long *error);
+
+	/**
+	 * TACO command for stopping Device server.
+	 */
+	long tacoDevStop(void *argin, void *argout, long *error);
+
+	/**
+	 * TACO command for restarting Device server.
+	 */
+	long tacoDevRestart(void *argin, void *argout, long *error); 
+
+public:
+	/**
+	 * Implementation of TACO command DevRun
+	 */
+	void deviceRun(string proc, string pers, string option, string param);	
+	
+	/**
+	 * Implementation of TACO command DevStop.
+	 */
+	void deviceStop(pid_t pid);
+
+	/**
+	 * Implementation of TACO command DevRestart.
+	 */
+	void deviceReStart(pid_t pid, string proc, string pers, string option, string param);	
+	
+};
+
+
+#endif
