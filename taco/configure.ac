@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0-beta, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.10 $)dnl
+AC_REVISION($Revision: 1.11 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -214,7 +214,7 @@ dnl AC_CONFIG_FILES(classes/profibusdp/Makefile
 dnl 		classes/profibusdp/lib/Makefile
 dnl 		classes/profibusdp/driver/Makefile)
 
-AC_CONFIG_FILES(system/dbase/newserver/Makefile)
+dnl AC_CONFIG_FILES(system/dbase/newserver/Makefile)
 
 AC_CONFIG_FILES(m4/Makefile)
 
