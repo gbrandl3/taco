@@ -10,13 +10,13 @@
 		gettransient_ut -> New version. Reserves port for UDP and
 				   TCP protocol.
  Author(s):     Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original:      09.01.1991
 
- Version:	$Revision: 1.5 $
+ Version:	$Revision: 1.6 $
 
- Date:		$Date: 2005-02-22 13:45:12 $
+ Date:		$Date: 2005-03-29 09:55:06 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -26,7 +26,7 @@
 #include "config.h"
 #include <API.h>
 #include <private/ApiP.h>
-
+#include <DevServer.h>
 #include <Admin.h>
 
 #ifdef unix
