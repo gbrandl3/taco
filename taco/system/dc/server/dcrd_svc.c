@@ -86,6 +86,8 @@ extern outpar back_def;
 extern xresh_mast backh;
 extern xresh *ptr_xresh;
 
+void one_more_request(void);
+
 /* 
  * Signal handler for all the signals which kill the process 
  *
@@ -569,8 +571,8 @@ void register_dc(char *netman_host, char *host, u_long prog, u_long vers)
 		exit(1);
 	}
 
-	clnt_control(netman_clnt,CLSET_TIMEOUT,&retry_timeout);
-	clnt_control(netman_clnt,CLSET_TIMEOUT,&timeout);
+	clnt_control(netman_clnt,CLSET_TIMEOUT, (char *)&retry_timeout);
+	clnt_control(netman_clnt,CLSET_TIMEOUT, (char *)&timeout);
 
 /* Send informations to network manager */
 
@@ -578,8 +580,8 @@ void register_dc(char *netman_host, char *host, u_long prog, u_long vers)
 	register_data.prog_number = prog;
 	register_data.vers_number = vers;
 
-	clnt_stat = clnt_call(netman_clnt,RPC_DB_REGISTER,xdr__register_data,
-			&register_data,xdr_int,&res,timeout);
+	clnt_stat = clnt_call(netman_clnt,RPC_DB_REGISTER, (xdrproc_t)xdr__register_data, (char *)&register_data,
+							(xdrproc_t)xdr_int, (char *)&res,timeout);
 
 	if (clnt_stat != RPC_SUCCESS)
 	{
