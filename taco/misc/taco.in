@@ -45,7 +45,7 @@ case $1 in
 		startproc -s -q "$taco_manager" $dbase $log $security
 		rc_status -v
 		if test ${TACO_DATABASE:-dbm} = dbm ; then
-			new=`ls -l $DBM_DIR/* 2>/dev/null | awk '{print $5;}' | sort | uniq | wc -l`
+			new=`ls -l ${DBM_DIR}/* 2>/dev/null | awk '{print $5;}' | sort | uniq | wc -l`
 			if [ $new -eq 1 ] ;  then
 				echo "Initialization of the database:"
 				sleep 5
