@@ -1,3 +1,7 @@
+2005-03-10 10:30 jkrueger1:
+	* Manager change the daemonize process of the Manager.
+	* Startup-Scripts change the startup scripts for SuSE, Debian and 
+	BSD
 2005-02-24 17:00 jkrueger1:
 	* Fix problems with reconnecting the client to restarted device
 	server.
