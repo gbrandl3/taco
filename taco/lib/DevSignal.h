@@ -14,9 +14,9 @@
 
  Original:	June, 1991
 
- Version:	$Revision: 1.4 $
+ Version:	$Revision: 1.5 $
 
- Date:		$Date: 2004-06-02 16:36:13 $
+ Date:		$Date: 2005-02-22 13:48:39 $
 
  Copyleft (c) 1990 by European Synchrotron Radiation Facility, 
                       Grenoble, France
@@ -31,16 +31,21 @@
  */
 #ifdef _IDENT
 static char DevSignalh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevSignal.h,v 1.4 2004-06-02 16:36:13 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevSignal.h,v 1.5 2005-02-22 13:48:39 jkrueger1 Exp $";
 #endif /* _IDENT */
 
+#if HAVE_SYS_SIGNAL_H
+#	include <sys/signal.h>
+#elif HAVE_SIGNAL_H
+#	include <signal.h>
+#else
+#error could not find signal.h
+#endif
 
 #ifdef OSK
 /*
  * Get OS9 signal definition file
  */
-
-#include <signal.h> 
 
 /*
  * Define additional makros for OS9 
@@ -75,8 +80,6 @@ static char DevSignalh[] =
  * andy 8sep94
  */
 
-#include <signal.h>
-
 #define NUSIG	513   /* NUSIG is 1 greater than the highest defined signal */
                       /* use the same definition as used for Unibridge OSK  */
 
@@ -88,18 +91,15 @@ static char DevSignalh[] =
  */
 
 #ifdef __hpux
-#include <sys/signal.h>
 
 #define NUSIG	_NSIG
 #endif /*__hpux */
 
 #if defined (_solaris) || (sun) || (defined irix)
-#include <signal.h>
 #define NUSIG	NSIG
 #endif /* _solaris */
 
 #ifdef lynx
-#include <signal.h>
 
 #define SIG_ERR -1 /* SIG_ERR is NOT defined in signal.h, */
 		   /* contrary to what is said in the doc */
@@ -110,22 +110,18 @@ static char DevSignalh[] =
 
 
 #if defined(_NT)
-#include <signal.h>
 #define NUSIG   NSIG
 #endif  /* _NT */
 
 #ifdef linux
-#include <signal.h>
 #define NUSIG   _NSIG
 #endif /* linux */
 
 #ifdef FreeBSD
-#include <sys/signal.h>
 #define NUSIG   NSIG
 #endif /* linux */
 
 #ifdef vxworks
-#include <signal.h>
 #define NUSIG	_NSIGS
 #endif /* vxworks */
 

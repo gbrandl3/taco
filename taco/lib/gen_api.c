@@ -12,9 +12,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.13 $
+ Version    :	$Revision: 1.14 $
 
- Date       : 	$Date: 2004-06-02 16:36:14 $
+ Date       : 	$Date: 2005-02-22 13:51:58 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -42,8 +42,12 @@
 #	include <varargs.h>
 #endif
 
-#ifdef sun
+#if HAVE_SYS_SIGNAL_H
+#	include <sys/signal.h>
+#elif HAVE_SIGNAL_H
 #	include <signal.h>
+#else
+#error could not find signal.h
 #endif
 
 static long 		setup_config (long *error);
