@@ -2,7 +2,7 @@ noinst_HEADERS 		= PowerSupply.h AGPowerSupply.h
 
 INCLUDES		= @TACO_INCLUDES@
 
-LIBADD 			= @TACO_SERVER_CXX_LIBS@
+LIBADD 			= @TACO_SERVER_CXX_LIBS@ -lstdc++
 
 noinst_LTLIBRARIES 	= libPowersupply.la
 

@@ -23,7 +23,7 @@ libTACOndbm_la_SOURCES = dbm_serv.cpp \
 			dbm_miscbro.cpp \
 			dbm_update.cpp \
 			NdbmClass.cpp
-libTACOndbm_la_LIBADD	= @GDBM_LIBS@ 
+libTACOndbm_la_LIBADD	= @GDBM_LIBS@ -lstdc++
 INCLUDES		+= @GDBM_CFLAGS@ 
 AM_CPPFLAGS		+= -DNDBM -DUSE_GDBM
 endif
@@ -42,7 +42,7 @@ libTACOMySQL_la_SOURCES = mysql_serv.cpp \
 			mysql_clo_op.cpp \
 			mysql_miscbro.cpp \
 			mysql_update.cpp 
-libTACOMySQL_la_LIBADD	= @MYSQL_LIBS@ 
+libTACOMySQL_la_LIBADD	= @MYSQL_LIBS@ -lstdc++
 INCLUDES		+= @MYSQL_CFLAGS@ 
 AM_CPPFLAGS		+= -DUSE_MYSQL
 endif

@@ -31,7 +31,7 @@ INCLUDES		= @TACO_INCLUDES@
 
 libtacoc_la_SOURCES 	= gen_api.c dev_errors.c dev_states.c oic.c util_api.c asyn_api.c gettrans.c 
 libtacoc_la_LDFLAGS 	= -version-info @LIB_VERSION@
-libtacoc_la_LIBADD  	= xdr/libdsxdr.la
+libtacoc_la_LIBADD  	= xdr/libdsxdr.la -lc
 
 EXTRA_DIST 		= 
 
@@ -45,7 +45,7 @@ libtacoapi_la_LDFLAGS 	= -version-info @LIB_VERSION@
 
 libtacoapig___la_SOURCES = $(SRC_TACO_SPECIAL)
 libtacoapig___la_CFLAGS  = -DCLIENTONLY -x c++
-libtacoapig___la_LIBADD  = libtacoc.la
+libtacoapig___la_LIBADD  = libtacoc.la -lstdc++
 libtacoapig___la_LDFLAGS = -version-info @LIB_VERSION@
 
 if BUILD_SERVER
@@ -79,7 +79,7 @@ libdsapig___la_SOURCES 	+= startup.c
 endif
 libdsapig___la_CFLAGS  	= -UCLIENTONLY  
 libdsapig___la_LDFLAGS 	= -version-info @LIB_VERSION@
-libdsapig___la_LIBADD  	= libdsapic.la libtacoapig++.la 
+libdsapig___la_LIBADD  	= libdsapic.la libtacoapig++.la -lstdc++
 
 endif
 
