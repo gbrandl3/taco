@@ -1,0 +1,50 @@
+%****************************************************************************/
+%
+% File:		arch_int_pic.tex
+%
+% Project:	xdevmenu application documentation
+%
+% Description:	"Internal Architecture" figure
+%
+% Author(s):	Faranguiss Poncet
+%
+% Original:	March 1991
+%
+%
+% $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/doc/arch_int_pic.tex,v 1.1 2003-04-25 12:54:29 jkrueger1 Exp $
+%
+% Copyright (c) 1990 by European Synchrotron Radiation Facility, 
+%                       Grenoble, France
+%
+%		       All Rights Reserved
+%
+%****************************************************************************/
+\begin{figure}[hbtp]
+\unitlength=1.0mm
+\thicklines
+\begin{center}
+\begin{picture}(100,140)(0,0)
+
+\put(30,0){Device Servers}
+\put(0,10){\rule{100mm}{2mm}}
+\put(50,27){\framebox(40,10){dev\_interface.c}}
+\put(70,27){\vector(0,-1){14}}
+
+\put(-19,67){\oval(35,10)}
+\put(10,67){\line(-1,0){10}}
+\put(-30,65){xdevmenu.uil}
+
+\put(10,57){\framebox(50,20){xdevmenu.c}}
+\put(50,55){\vector(3,-4){12}}
+
+\put(50,97){\framebox(40,10){dev\_gui.c}}
+\put(50,79){\vector(3,4){12}}
+\put(70,97){\vector(0,-1){59}}
+\put(70,107){\vector(0,1){14}}
+
+\put(0,122){\rule{100mm}{2mm}}
+\put(30,130){Motif , Cern widgets}
+
+\end{picture}\end{center}
+\caption{Internal Architecture}
+\end{figure}

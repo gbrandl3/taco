@@ -1,0 +1,57 @@
+
+			xdevmenu README file
+			====================
+			 by Andy Gotz (12/10/99)
+
+This README file describes briefly how to compile and run xdevmenu.
+
+xdevmenu is a generic graphical program which can be used to execute
+commands on TACO device objects in a TACO control system (cf. http:
+//www.esrf.fr/computing/cs/taco/taco.html).
+
+This source code release contains all the source code needed to compile 
+and run xdevmenu except the Motif libraries. xdevmenu uses the Motif 1.2
+set of widgets and needs a Motif development kit. The present release
+uses the Lesstiff Motif widget implementation which is a free implementation
+of Motif (cf. http://www.lesstiff.org). 
+
+The present distirbution has been tailored and tested on Linux only for
+the moment (the code was originally developed for HP-UX and Solaris however).
+
+COMPILING
+---------
+
+To compile on Linux do the following :
+
+1. modify the src/Makefile to point to the correct Motif 1.2 and X11 paths
+   (presently set to /usr/local/Lesstiff/Motif1.2 and /usr/X11R6/)
+
+2. set DSHOME to your TACO dserver home directory e.g. ~dserver
+
+3. type make all in the root directory (this will make and install the
+   libraries ascapi and tcapi and make xdevmenu
+
+RUNNING
+-------
+
+To run xdevmenu do the following :
+
+1. copy bitmaps/* to /usr/X11/bitmaps
+
+2. set your LD_LIBRARY_PATH to include the dserver + Motif library paths
+   (e.g. setenv LD_LIBRARY_PATH ~dserver/lib/linux/x86:/usr/local/Lesstif/Motif1.2/lib)
+
+3. set NETHOST to your favourite TACO control system (e.g. setenv NETHOST libra)
+
+4. set XAPPLRESDIR to app-defaults (e.g. setenv XAPPLRESDIR ./app-defaults)
+
+5. type ./src/xdevmenu and have fun !
+
+BUGS
+----
+
+1. minor problem with Lesstif and the graphical window displaying the device
+   icons occurrs sometimes which clicking on the icon - the label moves to
+   the left of the gear button
+
+2. an error message is displayed when releasing a device but it works nonetheless !

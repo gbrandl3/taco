@@ -1,0 +1,126 @@
+%****************************************************************************/
+%
+% File:		dev_interface.tex
+%
+% Project:	xdevmenu application documentation
+%
+% Description:	"dev_interface.c" section
+%
+% Author(s):	Faranguiss Poncet
+%
+% Original:	March 1991
+%
+%
+% $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/doc/dev_interface.tex,v 1.1 2003-04-25 12:54:29 jkrueger1 Exp $
+%
+% Copyright (c) 1990 by European Synchrotron Radiation Facility, 
+%                       Grenoble, France
+%
+%		       All Rights Reserved
+%
+%****************************************************************************/
+This module makes the interface between the rest of the application code
+and the device server library calls.
+
+Another module which needs to call a device server function calls a function
+in this module which in turn will call device server routines if necessary after
+some transformation of data structure.
+
+This module contains a data structure definition.
+
+%\sy{1}	{Internal data structures and variables}
+\paragraph{Internal data structures and variables : }
+
+\begin{itemize}
+\item
+{\bf device\_entry\_structure : } the most important data structure defined in
+this module is "device\_entry\_structure". This data structure is used to store
+all the information about the device which could be used later on by the
+application. This information includes the device reference (returned by
+the device server when opening the connection to a device) and the command
+data structure. The command data structure contains all the command names
+available for a device and for each of them the information about input and
+output arguments.
+This data structure is useful because instead of asking for the list of
+available commands each time the user wants to execute a command on a device,
+this information is returned by the device server only once by the query command
+called when opening the connection to the device. This information is then
+stored in the data structure for the further use.
+\item
+{\bf device\_table : } it is the table in which each entry is a
+device\_entry\_structure, storing the above information for one device.
+\end{itemize}
+
+%\xs{1}
+
+%\sy{1}	{get\_device\_type}
+\paragraph{get\_device\_type : }
+
+This function is only a simulation function. Its purpose is to return the
+type of the device given its name. Since, there is no routine in the device
+server library providing this function, we had to code this function.
+
+Therefore this function will disappear, as soon as the device server library
+provides the equivalent function. 
+
+%\xs{1}
+
+%\sy{1}	{open\_selected\_device}
+\paragraph{open\_selected\_device : }
+
+This function is in charge of opening the selected device and also
+initializing all the internal data structures associated with that device.
+
+To perform its task, this function first calls the "dev\_import" routine to
+open the connection to the device server for the selected device. Once this
+routine has been performed successfully, this function calls the
+"dev\_cmd\_query" routine to get the list of available commands (and their
+arguments) for that device. Finally it stores all this information in one
+entry of the "device\_table" for the further use.
+
+%\xs{1}
+
+%\sy{1}	{get\_list\_cmd\_names}
+\paragraph{get\_list\_cmd\_names : }
+
+This function returns the number of commands and also the list of available
+commands for a device.
+
+It searches through the "device\_table" and finds the entry corresponding to the
+device whose name is passed as the input parameter. It then retrieves the
+information concerning the command names and the number of commands.
+
+%\xs{1}
+
+%\sy{1}	{get\_cmd\_in\_parameter}
+\paragraph{get\_cmd\_in\_parameter : }
+
+This function returns the name of a command's input argument and its data type.
+The input parameters for this function are the device name and the command
+name.
+
+This function searches through the "device\_table" to get the information. 
+Hence, the device server is not called.
+
+%\xs{1}
+
+%\sy{1}	{dev\_exec\_cmd}
+\paragraph{dev\_exec\_cmd : }
+
+This function is called to execute a command on a device. The input argument
+of the command is provided if it exists. The function calls the
+"dev\_put\_get" routine in the device server library, to execute the command
+and to get (if it exists) the output argument. This output argument is then
+returned to the caller.
+
+%\xs{1}
+
+%\sy{1}	{close\_selected\_device}
+\paragraph{close\_selected\_device : }
+
+This function is called to close the connection to a device. First of all this
+function calls the "dev\_free" routine of the device server library. It will 
+then free the entry corresponding to that device in the "device\_table".
+
+%\xs{1}
+

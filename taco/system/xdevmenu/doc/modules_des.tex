@@ -1,0 +1,85 @@
+%****************************************************************************/
+%
+% File:		modules_des.tex
+%
+% Project:	xdevmenu application documentation
+%
+% Description:	"Modules description" section
+%
+% Author(s):	Faranguiss Poncet
+%
+% Original:	March 1991
+%
+%
+% $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/doc/modules_des.tex,v 1.1 2003-04-25 12:54:30 jkrueger1 Exp $
+%
+% Copyright (c) 1990 by European Synchrotron Radiation Facility, 
+%                       Grenoble, France
+%
+%		       All Rights Reserved
+%
+%****************************************************************************/
+As described previously (section 2.1.2 Internal architecture), Xdevmenu is 
+composed of three C code modules and one uil file.
+
+In this section we are going to describe the role of each of these modules,
+present the data structures defined within the module, and give a short
+description of some of the most important functions defined within the module.
+
+\sy{1} {xdev\_global.h}
+This module contains one global constant and four global variables for all the 
+application~:
+\begin {itemize}
+\item
+{\bf UIDFILENAME : } the location concatenated with the name of the created uid 
+file for the access to that file at run time.
+\item 
+{\bf toplevel : } the top most widget created by the "main" function using
+Xtoolkit.
+\item
+{\bf dev\_selection\_dial : } this widget allows the selection of the device
+to be opened. It has to be known in different modules of the application since
+the user can open ( and therefore select ) dynamically another device using the
+option "open device". 
+\item
+{\bf error\_dial\_widget : } this widget allows an error dialogue 
+window\footnote[1]{ OSF/MOTIF concept : see OSF/MOTIF programmer's guide } 
+ to be
+displayed. It has to be known in different modules of the application because
+an error dialogue window is asked to be displayed in any of the modules.
+\item
+{\bf currentDevMask : } this string contains the current pathname of the 
+devices' location.
+\item
+{\bf currentDevFilMask : } this string contains the subdirectory filter which
+can be associated to the current pathname of the devices' location.
+\end {itemize}
+
+\xs{1}
+
+
+\newpage
+\sy{1}	{The uil file (xdevmenu.uil)}
+\input uil_file
+
+\xs{1}
+
+\newpage
+\sy{1}	{xdevmenu.c}
+\input xdev_c
+
+\xs{1}
+
+
+\newpage
+\sy{1}	{dev\_gui.c}
+\input dev_gui
+
+\xs{1}
+
+\newpage
+\sy{1}	{dev\_interface.c}
+\input dev_interface
+
+\xs{1}
+

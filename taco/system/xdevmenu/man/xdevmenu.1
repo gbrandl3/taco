@@ -1,0 +1,79 @@
+.TH XDEVMENU 1
+.SH NAME
+xdevmenu - provides a Motif based user interface to the actions which could be
+performed on devices in the control system.
+.SH SYNOPSIS
+.B xdevmenu
+.SH DESCRIPTION
+xdevmenu is now available on both HP 300/400's and 700/800's. 
+Depending on whether you are logged onto HP 300/400's or 700/800's, different
+instructions have to be followed.
+
+
+
+.B You are logged onto HP 300/400 machine :
+
+In order to make xdevmenu run, some environment variables have to be set first.
+NETHOST and XAPPLRESDIR have to be set to the following :
+
+- NETHOST=leo
+.br
+- XAPPLRESDIR=/virgo/users/b/appli/app-defaults
+.br
+
+The following path   /virgo/users/b/appli/s300/uid/%U   must be added to the 
+UIDPATH environment variable.
+
+The following path   /virgo/users/b/appli/s300/bin   must be added to the PATH 
+environment variable.
+
+The LANG environment variable has to be unset.
+
+In case a user is displaying on a black and white screen when executing 
+xdevmenu,
+XAPPLRESDIR has to be set to  /virgo/users/b/appli/app-defaults/black-white.
+
+Don't forget to use the xhost command and set the DISPLAY environment variable 
+correctly in order to allow the machine where xdevmenu is executed from, to 
+display on the requested terminal.
+
+
+
+.B You are logged onto Virgo :
+
+Each of the following path given for a HP 700/800 machine having to be set up 
+should be modified by removing  /virgo  from the beginning.
+
+
+
+.B You are logged onto HP 700 machine :
+
+NETHOST and XAPPLRESDIR have to be set to the following :
+
+- NETHOST=leo
+.br
+- XAPPLRESDIR=/virgo/users/b/appli/app-defaults
+.br
+
+The following path   /virgo/users/b/appli/s800/uid/%U   must be added to the
+UIDPATH environment variable.
+
+The following path   /virgo/users/b/appli/s800/bin   must be added to the PATH 
+environment variable.
+
+The LANG environment variable has to be unset.
+
+In case a user is displaying on a black and white screen when executing 
+xdevmenu, 
+XAPPLRESDIR has to be set to  /virgo/users/b/appli/app-defaults/black-white.
+
+Don't forget to use the xhost command and set the DISPLAY environment variable
+correctly in order to allow the machine where xdevmenu is executed from, to 
+display on the requested terminal.
+
+
+.SH SEE ALSO
+.PP
+xhost(1)
+.SH AUTHOR
+Francoise Barale, ESRF, Grenoble, France.

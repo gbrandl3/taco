@@ -1,0 +1,138 @@
+#ifndef __MYSQLSERVER_H__
+#define __MYSQLSERVER_H__
+
+#ifdef sun
+#define PORTMAP
+#endif
+
+#include <API.h>
+#include <cstdlib>
+#include <private/ApiP.h>
+#include <db_xdr.h>
+#include <signal.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <rpc/pmap_clnt.h>
+
+#include <mysql/mysql.h>
+
+// C++ include
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
+#ifdef sun
+#include <new>
+#endif
+
+// Special for database 
+#include <fcntl.h>
+
+#include "dbClass.h"
+
+class MySQLServer : public DBServer
+{
+private:
+    string	mysql_user,
+		mysql_passwd,
+		mysql_db;
+    MYSQL	mysql,
+		*mysql_conn;
+private:
+    int		db_find(string, string, char **, int *);
+    int		db_devlist(string, int *, db_res *);
+    int		db_del(string);
+    int		db_insert(string, string, string);                                                        
+    int 	db_store(db_devinfo_3 &);
+    int 	db_store(db_devinfo_2 &);
+    int 	db_store(db_devinfo &);
+    long	reg_ps(string, long, string, long, long *);
+    long	unreg_ps(string, long *);
+    long	db_update_names(const string, const string, const int, const string); 
+    long	db_insert_names(const string, const string, const int, const string); 
+    long	db_delete_names(const string, const string, const int, const string); 
+    long	upd_res(string, long, char, long *);
+public:
+    				MySQLServer(string, string, string);
+    virtual			~MySQLServer();
+    virtual db_res 		*db_getres_1_svc(arr1 *, struct svc_req *);
+    virtual db_res 		*db_getdev_1_svc(nam *);
+    virtual DevLong		*db_devexp_1_svc(tab_dbdev *);
+    virtual DevLong	   	*db_devexp_2_svc(tab_dbdev_2 *);
+    virtual DevLong	   	*db_devexp_3_svc(tab_dbdev_3 *);
+    virtual db_resimp		*db_devimp_1_svc(arr1 *);
+    virtual DevLong		*db_svcunr_1_svc(nam *);
+    virtual svc_inf		*db_svcchk_1_svc(nam *);
+    virtual db_res		*db_getdevexp_1_svc(nam *, struct svc_req *);
+    virtual DevLong		*db_clodb_1_svc(void);
+    virtual DevLong		*db_reopendb_1_svc(void);
+    virtual DevLong		*db_putres_1_svc(tab_putres *);
+    virtual DevLong		*db_delres_1_svc(arr1 */*, struct svc_req **/);
+    virtual cmd_que		*db_cmd_query_1_svc(nam *);
+    virtual event_que		*db_event_query_1_svc(nam *);
+    virtual db_psdev_error	*db_psdev_reg_1_svc(psdev_reg_x *);
+    virtual db_psdev_error	*db_psdev_unreg_1_svc(arr1 *);
+    virtual db_res		*devdomainlist_1_svc(void);
+    virtual db_res		*devfamilylist_1_svc(nam *);
+    virtual db_res		*devmemberlist_1_svc(db_res *);
+    virtual db_res		*resdomainlist_1_svc(void);
+    virtual db_res		*resfamilylist_1_svc(nam *);
+    virtual db_res		*resmemberlist_1_svc(db_res *);
+    virtual db_res		*resresolist_1_svc(db_res *);
+    virtual db_res		*resresoval_1_svc(db_res *);
+    virtual db_res		*devserverlist_1_svc(void);
+    virtual db_res		*devpersnamelist_1_svc(nam *);
+    virtual db_res		*hostlist_1_svc(void);
+    virtual db_devinfo_svc	*devinfo_1_svc(nam *);
+    virtual db_res		*devres_1_svc(db_res *);
+    virtual DevLong		*devdel_1_svc(nam *);
+    virtual db_psdev_error	*devdelres_1_svc(db_res *);
+    virtual db_info_svc		*info_1_svc();
+    virtual DevLong		*unreg_1_svc(db_res *);
+    virtual svcinfo_svc		*svcinfo_1_svc(db_res *);
+    virtual DevLong		*svcdelete_1_svc(db_res *);
+    virtual db_psdev_error	*upddev_1_svc(db_res *);
+    virtual db_psdev_error	*updres_1_svc (db_res *);
+    virtual db_res		*secpass_1_svc(void);
+    virtual db_poller_svc	*getpoller_1_svc(nam *);
+};
+/*
+class GDBMServer : public DBMServer
+{
+private:
+    vector<DBM>	tid;
+    long        ps_names_index;
+public:
+		GDBMServer();
+    virtual	~GDBMServer();
+};
+*/
+
+inline MySQLServer::MySQLServer(const string user, const string password, const string db)
+	: DBServer(),
+	  mysql_user(user),
+	  mysql_passwd(password),
+	  mysql_db(db),
+	  mysql_conn(NULL)
+{
+//
+// Open database tables according to the definition 
+//
+    mysql_init(&mysql);
+    if (*this->db_reopendb_1_svc() != 0)
+	return;
+    dbgen.connected = true;
+}
+
+inline MySQLServer::~MySQLServer()
+{
+    mysql_close(mysql_conn);
+    dbgen.connected = false;
+}
+
+#endif

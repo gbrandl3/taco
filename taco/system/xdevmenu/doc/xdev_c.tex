@@ -1,0 +1,65 @@
+%****************************************************************************/
+%
+% File:		xdev_c.tex
+%
+% Project:	xdevmenu application documentation
+%
+% Description:	"xdevmenu.c" section
+%
+% Author(s):	Faranguiss Poncet
+%
+% Original:	March 1991
+%
+%
+% $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/doc/xdev_c.tex,v 1.1 2003-04-25 12:54:30 jkrueger1 Exp $
+%
+% Copyright (c) 1990 by European Synchrotron Radiation Facility, 
+%                       Grenoble, France
+%
+%		       All Rights Reserved
+%
+%****************************************************************************/
+In this module all the static part of the user interface is built (from the uil
+file) and accessed.
+
+Most of the callback procedures are defined in this file and the link is made
+between the name of the callback in the uil file and the real name of the
+function in the code.
+
+This module contains the "main" function and in that way it calls Xtoolkit
+to create the top most widget. 
+
+There is not any specific data structure defined in this module.
+
+%\sy{1}	{init\_application function}
+\paragraph{init\_application function : }
+
+This function is in charge of accessing the UID file (which is the result of
+compilation of the UIL file) and to build the widgets using the Mrm library.
+
+Before doing this task this function calls two other functions
+"init\_device\_gui" and "init\_device\_interface" in order to initialize the
+internal data structures of those modules.
+
+%\xs{1}
+
+%\sy{1}	{exec\_sel\_cmd function}
+\paragraph{exec\_sel\_cmd function : }
+
+This callback function is called when the user has selected a command from the
+command list proposed for a device and asked for its execution.
+
+This function tests if there is any input argument for the selected command.
+If so a prompting dialogue window is displayed thanks to the "dev\_gui.c"
+function "show\_cmd\_in\_param". 
+If not the "exec\_sel\_cmd" function executes
+the command thanks to the "dev\_interface" function "dev\_exec\_cmd". In both
+cases the "exec\_sel\_cmd" function displays in the top part of the out and  
+error window\footnote[1]{ OSF/MOTIF concept : see OSF/MOTIF programmer's guide } 
+the output argument if any, else the date and the name of the executed 
+command only. If the result of the command is an error received from the
+device server, the latter is displayed in the bottom part of the same 
+window.
+
+%\xs{1}
+

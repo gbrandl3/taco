@@ -1,0 +1,51 @@
+%****************************************************************************/
+%
+% File:		uil_file.tex
+%
+% Project:	xdevmenu application documentation
+%
+% Description:	"The uil file (xdevmenu.uil)" section
+%
+% Author(s):	Faranguiss Poncet
+%
+% Original:	March 1991
+%
+%
+% $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/doc/uil_file.tex,v 1.1 2003-04-25 12:54:30 jkrueger1 Exp $
+%
+% Copyright (c) 1990 by European Synchrotron Radiation Facility, 
+%                       Grenoble, France
+%
+%		       All Rights Reserved
+%
+%****************************************************************************/
+The static part of the user interface is defined in this file. Therefore
+we find in this file the description for~:
+\begin{itemize}
+\item
+the main window\footnote[1]{OSF/MOTIF concept : see OSF/MOTIF programmer's
+guide}, with the menu bar\footnotemark[1] and associated pulldown
+menus\footnotemark[1],
+\item
+the file selection dialogue\footnotemark[1] used for "open device" function,
+\item
+the selection dialogue\footnotemark[1] used for the "execute command" function,
+\item
+the bulletinboard dialogue\footnotemark[1] used for the "option modification"
+function,
+\item
+the row-column\footnotemark[1] widget used within the working area of the main
+window, for the arrangement of the icons.
+\item
+the question dialogue window\footnotemark[1] used for confirming that a device 
+has to be closed.
+\item
+the error dialogue window\footnotemark[1] used for the display of error messages
+( ie  no selected device, device already opened .. ).
+\end{itemize}
+
+All these widgets are fetched at run time by the "xdevmenu.c" module.
+The other parts of the interface~: the definition of the individual icons, and
+the parameters prompting dialogue windows are created using Xm library without
+using uil.
+

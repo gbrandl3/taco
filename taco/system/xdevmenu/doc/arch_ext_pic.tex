@@ -1,0 +1,48 @@
+%****************************************************************************/
+%
+% File:		arch_ext_pic.tex
+%
+% Project:	xdevmenu application documentation
+%
+% Description:	"External Architecture" figure
+%
+% Author(s):	Faranguiss Poncet
+%
+% Original:	March 1991
+%
+%
+% $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/doc/arch_ext_pic.tex,v 1.1 2003-04-25 12:54:29 jkrueger1 Exp $
+%
+% Copyright (c) 1990 by European Synchrotron Radiation Facility, 
+%                       Grenoble, France
+%
+%		       All Rights Reserved
+%
+%****************************************************************************/
+\begin{figure}[hbtp]
+\unitlength=1.0mm
+\thicklines
+\begin{center}
+\begin{picture}(100,120)(0,0)
+
+\put(30,0){Device Servers}
+\put(0,10){\rule{100mm}{2mm}}
+\put(5,27){\framebox(90,10){libdsapi, libdbapi}}
+\put(50,27){\vector(0,-1){14}}
+
+\put(5,47){\framebox(90,20){Xdevmenu}}
+\put(50,47){\vector(0,-1){9}}
+
+\put(5,77){\framebox(40,10){libXm, libMrm}}
+\put(50,77){\framebox(40,10){libwsc}}
+\put(25,67){\vector(0,1){8}}
+\put(70,67){\vector(0,1){8}}
+
+\put(25,87){\vector(0,1){14}}
+\put(70,87){\vector(0,1){14}}
+\put(0,102){\rule{100mm}{2mm}}
+\put(30,110){User Interface}
+
+\end{picture}\end{center}
+\caption{External Architecture}
+\end{figure}

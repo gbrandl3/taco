@@ -1,0 +1,75 @@
+%****************************************************************************/
+%
+% File:		appli_arch.tex
+%
+% Project:	xdevmenu application documentation
+%
+% Description:	"Application architecture" section
+%
+% Author(s):	Faranguiss Poncet
+%
+% Original:	March 1991
+%
+%
+% $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/doc/appli_arch.tex,v 1.1 2003-04-25 12:54:29 jkrueger1 Exp $
+%
+% Copyright (c) 1990 by European Synchrotron Radiation Facility, 
+%                       Grenoble, France
+%
+%		       All Rights Reserved
+%
+%****************************************************************************/
+There are two kinds of architecture : external architecture and internal
+architecture.
+
+The external architecture shows the relationship of the application (as a whole)
+with other external components (libraries, other processes).
+
+The internal architecture shows the relationship of each of the internal
+application modules with each other and also with the external world.
+
+\sy{1}	{External architecture}
+
+This application will use the Motif libraries (Xm, Mrm) and Cern widgets
+library (libwsc) for the user interface part and it will use the device server
+libraries (libdsapi.a and libdbapi.a) for the operations concerning devices.
+
+Figure 1 represents the external architecture~:
+
+\input arch_ext_pic
+
+\xs{1}
+
+\sy{1}	{Internal architecture}
+
+Figure 2 represents the internal architecture :
+
+\input arch_int_pic
+
+The static description of the user interface is made in a UIL file. The C code
+part of the application is composed of three modules :
+\begin{itemize}
+\item
+{\bf xdevmenu.c : } the main module controlling the highest user interface part
+(main menu-bar, dialog boxes). It calls the dev\_interface.c functions to
+perform the device functions and the dev\_gui.c functions to perform pure user
+interface input/output functions. It also calls the MOTIF libraries routines to
+handle the user interface.
+\item
+{\bf dev\_interface.c : } device application interface module. This module
+offers the routines to be called by the main module (and in some cases by the
+dev\_gui module) in order to perform device operations.
+This module in turn will call the device server functions to effectively 
+perform these operations. This module represents the device
+interface from the xdevmenu point of view.
+\item
+{\bf dev\_gui.c : } device graphical user interface module. This module provides
+the means to display, to highlight a device as well as to remove it from the
+screen. This module is in charge of graphical representation of the devices,
+the commands and the command arguments.
+It uses MOTIF libraries functions to provide this device graphical
+representation.
+\end{itemize}
+
+\xs{1}
+
