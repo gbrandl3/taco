@@ -1,41 +1,41 @@
-SUBDIRS		= 
+SUBDIRS			= testserver
 
-EXTRA_DIST 	= taco.in 
+EXTRA_DIST 		= taco.in 
 
-CLEANFILES 	= log taco
+CLEANFILES 		= log taco
 
-DISTCLEANFILES 	= System.log atconfig
+DISTCLEANFILES 		= System.log atconfig
 
-INCLUDES	= @TACO_INCLUDES@ @TACO_GDBM_INC@ 
+INCLUDES		= @TACO_INCLUDES@ @TACO_GDBM_INC@ 
 
 test_asc_stat_SOURCES 	= test_asc_stat.c
 test_asc_stat_LDADD 	= @TACO_CLIENT_LIBS@ @TACO_ASCII_LIBS@ -ldl
 
 test_asc_dyn_LDADD 	= @TACO_CLIENT_LIBS@ -ldl 
-test_asc_dyn_SOURCES 	=	test_asc_dyn.c
+test_asc_dyn_SOURCES 	= test_asc_dyn.c
 
-test_tc_SOURCES 	=  test_tc.c
+test_tc_SOURCES 	= test_tc.c
 test_tc_LDADD		= @TACO_CLIENT_LIBS@ -ldl
 
-EXTRA_DIST 	+= testsuite.at $(TESTSUITE_AT) testsuite package.m4
+EXTRA_DIST 		+= testsuite.at $(TESTSUITE_AT) testsuite package.m4
 
-TESTSUITE 	= $(srcdir)/testsuite
+TESTSUITE 		= $(srcdir)/testsuite
 
-TESTSUITE_AT	= dbase.at devices.at starter.at
+TESTSUITE_AT		= dbase.at devices.at starter.at
 
-AUTOTEST 	= $(AUTOM4TE) --language=autotest
+AUTOTEST 		= $(AUTOM4TE) --language=autotest
 
-check_PROGRAMS 	= db_connect db_resget db_resput \
-		db_resdomain db_resfamily db_resmember dev_ping \
-		test_asc_dyn test_asc_stat test_tc test_starter \
-		test_cmd_query
+check_PROGRAMS 		= db_connect db_resget db_resput \
+			db_resdomain db_resfamily db_resmember dev_ping \
+			test_asc_dyn test_asc_stat test_tc test_starter \
+			test_cmd_query
 
-check_SCRIPT	= taco
+check_SCRIPT		= taco
 
-TESTS_ENVIRONMENT = 
+TESTS_ENVIRONMENT 	= 
 
 db_connect_SOURCES 	= db_connect.cpp
-db_connect_LDADD 	= @TACO_CLIENT_LIBS@ @TACO_GDBM@
+db_connect_LDADD 	= @TACO_CLIENT_LIBS@ @TACO_GDBM_LDFLAGS@ @TACO_GDBM_LIBS@
 
 db_resget_SOURCES 	= db_resget.cpp 
 db_resget_LDADD 	= @TACO_CLIENT_LIBS@

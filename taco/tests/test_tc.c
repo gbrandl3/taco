@@ -1,20 +1,20 @@
 /****************************************************************************
  * 
- * File         :   test_tc.c
+ * File:	test_tc.c
  *
- * Project      :   Type conversion library
+ * Project:	Type conversion library
  *
- * Description  :   The code for a C program (main) which test the shared
- *                   library libtcapi.sl
+ * Description:	The code for a C program (main) which test the shared
+ *              library libtcapi.sl
  *
- * Author       :   Faranguiss Poncet
- *			$Author: jkrueger1 $
+ * Author:	Faranguiss Poncet
+ *		$Author: jkrueger1 $
  *
- * Original     :   November 1996
+ * Original:	November 1996
  *
- * Version	: $Revision: 1.1 $
+ * Version: 	$Revision: 1.2 $
  *
- * Date		: $Date: 2003-04-25 12:03:34 $
+ * Date: 	$Date: 2003-06-06 09:35:57 $
  *
  * Copyright (c) 1996 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -52,23 +52,19 @@ int call_type_to_str (const char *type_name, const void *data_to_convert, char *
 
 #ifdef __hpux
 	if (shl_findsym(&TC_shl, func_name, TYPE_PROCEDURE, &p_conv_func) == -1)
-	{
-		fprintf(stderr, "call_type_to_str : cannot resolve symbol = %s\n", func_name);
-		return(-1);
-	}
 #else
 	p_conv_func = (long (*)()) dlsym(TC_shl, func_name);
 	if (p_conv_func == NULL)
+#endif /* __hpux */
 	{
 		fprintf(stderr, "call_type_to_str : cannot resolve symbol = %s\n", func_name);
-		return(-1);
-	};
-#endif /* __hpux */
+		return(DS_NOTOK);
+	}
 
 	if ( (*p_conv_func)(data_to_convert, res_function) != 0 )
 	{
 		fprintf(stderr, "call_type_to_str : error returned by conversion function.\n");
-		return(-1);
+		return(DS_NOTOK);
 	}
 	printf("call_type_to_str : normally finished.\n");
 	return(0);
@@ -85,23 +81,19 @@ int call_str_to_type (const char *type_name, const char *str_in, void  *res_func
 
 #ifdef __hpux
 	if (shl_findsym(&TC_shl, func_name, TYPE_PROCEDURE, &p_conv_func) == -1)
-	{
-		fprintf(stderr, "call_str_to_type : cannot resolve symbol = %s\n", func_name);
-	return(-1);
-	}
 #else
 	p_conv_func = (long (*)()) dlsym(TC_shl, func_name);
 	if (p_conv_func == NULL)
+#endif /* __hpux */
 	{
 		fprintf(stderr, "call_str_to_type : cannot resolve symbol = %s\n", func_name);
-		return(-1);
-	};
-#endif /* __hpux */
+		return(DS_NOTOK);
+	}
 
 	if ( (*p_conv_func)(str_in, res_function) != 0 )
 	{
 		fprintf(stderr, "call_str_to_type : error returned by conversion function.\n");
-		return(-1);
+		return(DS_NOTOK);
 	}
 	printf("call_str_to_type : normally finished.\n");
 	return(0);
@@ -179,15 +171,9 @@ int main (int argc, char **argv)
 /*** Load the type conversion shared library ***/
 #ifdef __hpux
 	TC_shl = shl_load(lib_path,BIND_IMMEDIATE,0);
-	if (TC_shl == NULL)
-	{
-		fprintf(stderr, "test_tc : Cannot load the type conversion shared library.\n");
-		fprintf(stderr, "test_tc : lib_path = %s\n", lib_path);
-		fprintf(stderr, "test_tc : program aborted.\n");
-		exit(-1);
-	}
 #else
 	TC_shl = dlopen(lib_path,1);
+#endif /* __hpux */
 	if (TC_shl == NULL)
 	{
 		fprintf(stderr, "test_tc : Cannot load the type conversion shared library.\n");
@@ -195,7 +181,6 @@ int main (int argc, char **argv)
 		fprintf(stderr, "test_tc : program aborted.\n");
 		exit(-1);
 	}
-#endif /* __hpux */
 
 	string_data = (DevString) malloc(501);
 	printf("\n\nLet's first try the conversion from types to string.\n\n");

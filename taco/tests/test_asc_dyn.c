@@ -12,9 +12,9 @@
  *
  * Original     :  	November 1996
  *
- * Version 	:	$Revision: 1.1 $
+ * Version 	:	$Revision: 1.2 $
  *
- * Date		:	$Date: 2003-04-25 12:03:34 $  
+ * Date		:	$Date: 2003-06-06 09:35:57 $  
  *
  * Copyright (c) 1996 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -64,7 +64,9 @@ int main (int argc, char **argv)
 	DevString	lib_path = NULL;
 	db_resource	res = {"path", D_STRING_TYPE, &lib_path};
 
-/*** Try to find the path for the type conversion library in Data Base ***/
+/*
+ * Try to find the path for the type conversion library in Data Base 
+ */
 	if (db_import(&err))
 	{
 		fprintf(stderr, "test_asc_dev : Cannot import static database to find libpath.\n");
@@ -92,7 +94,9 @@ int main (int argc, char **argv)
 #endif /* __hpux */
 
 
-/*** Load the ascii dev api  shared library ***/
+/*
+ * Load the ascii dev api  shared library 
+ */
 
 #ifdef __hpux
 	ASC_shl = shl_load(lib_path,BIND_IMMEDIATE,0);
@@ -115,58 +119,50 @@ int main (int argc, char **argv)
 	}
 #endif /* __hpux */
 
-/*** Find the dev_get function in the ascii dev api dynamic lib ***/
+/*
+ * Find the dev_get function in the ascii dev api dynamic lib 
+ */
 	strcpy (func_name, ASC_GET_FUNCTION);
 #ifdef __hpux
 	if (shl_findsym(&ASC_shl, func_name, TYPE_PROCEDURE, &p_get_func) == -1)
+#else
+	p_get_func = (long (*)()) dlsym(ASC_shl, func_name);
+	if (p_get_func == NULL)
+#endif /* __hpux */
 	{
 		fprintf(stderr, "test_asc_dev : cannot resolve symbol = %s\n", func_name);
 		p_get_func = NULL;
 	}
-#else
-	p_get_func = (long (*)()) dlsym(ASC_shl, func_name);
-	if (p_get_func == NULL)
-	{
-		fprintf(stderr, "test_asc_dev : cannot resolve symbol = %s\n", func_name);
-	};
-#endif /* __hpux */
 
-
-
-/*** Find the dev_put function in the ascii dev api dynamic lib ***/
-
+/* 
+ * Find the dev_put function in the ascii dev api dynamic lib 
+ */
 	strcpy (func_name, ASC_PUT_FUNCTION);
 #ifdef __hpux
 	if (shl_findsym(&ASC_shl, func_name, TYPE_PROCEDURE, &p_put_func) == -1)
+#else
+	p_put_func = (long (*)()) dlsym(ASC_shl, func_name);
+	if (p_put_func == NULL)
+#endif /* __hpux */
 	{
 		fprintf(stderr, "test_asc_dev : cannot resolve symbol = %s\n", func_name);
 		p_put_func = NULL;
 	}
-#else
-	p_put_func = (long (*)()) dlsym(ASC_shl, func_name);
-	if (p_put_func == NULL)
-	{
-		fprintf(stderr, "test_asc_dev : cannot resolve symbol = %s\n", func_name);
-	};
-#endif /* __hpux */
 
-
-/*** Find the dev_putget function in the ascii dev api dynamic lib ***/
-
+/*
+ * Find the dev_putget function in the ascii dev api dynamic lib 
+ */
 	strcpy (func_name, ASC_PUTGET_FUNCTION);
 #ifdef __hpux
 	if (shl_findsym(&ASC_shl, func_name, TYPE_PROCEDURE, &p_putget_func) == -1)
+#else
+	p_putget_func = (long (*)()) dlsym(ASC_shl, func_name);
+	if (p_putget_func == NULL)
+#endif /* __hpux */
 	{
 		fprintf(stderr, "test_asc_dev : cannot resolve symbol = %s\n", func_name);
 		p_putget_func = NULL;
 	}
-#else
-	p_putget_func = (long (*)()) dlsym(ASC_shl, func_name);
-	if (p_putget_func == NULL)
-	{
-		fprintf(stderr, "test_asc_dev : cannot resolve symbol = %s\n", func_name);
-	};
-#endif /* __hpux */
 
 	printf("\n\nLet's first try the dev_get_ascii command.\n\n");
 
@@ -219,7 +215,7 @@ int main (int argc, char **argv)
 
 		printf("\n\nType in the input argument respecting its format : ");
 /*************************************************************************
-	scanf("%s", in_arg);  replaced by the 6 following lines.
+		scanf("%s", in_arg);  replaced by the 6 following lines.
 *************************************************************************/
 		gets(in_arg);
 		if (gets(in_arg) == NULL)
@@ -267,7 +263,7 @@ int main (int argc, char **argv)
 
 		printf("\n\nType in the input argument respecting its format : ");
 /*************************************************************************
-	scanf("%s", in_arg);  replaced by the 6 following lines.
+		scanf("%s", in_arg);  replaced by the 6 following lines.
 *************************************************************************/
 		gets(in_arg);
 		if (gets(in_arg) == NULL)

@@ -14,7 +14,6 @@ testbindir=${top_builddir}/tests
 }
 
 set_env
-
 if test $# -gt 0 ; then
 	case $1 in 
 		--version)	echo @PACKAGE_VERSION@;;
