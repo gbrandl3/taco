@@ -2,7 +2,7 @@ CLASS_res_DATA	= Inst_verify_class.res
 
 CMDS_res_DATA	= dev_cmds.res 
 
-ERROR_res_DATA	= dev_errors.res 
+ERROR_res_DATA	= dev_errors.res db_errors.res
 
 EVENTS_res_DATA = 
 

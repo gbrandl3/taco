@@ -7,8 +7,13 @@
 # Description:   Resource file for the security system.
 #
 # Autor(s):      Jens Meyer
+#		 $Author: jkrueger1 $
 #
 # Original:      September 1993
+#
+# Version:	 $Revision: 1.2 $
+#
+# Date:		 $Date: 2004-03-04 15:28:03 $
 #
 # Copyright (c) 1990 by European Synchrotron Radiation Facility,
 #		Grenoble, France
@@ -18,19 +23,18 @@
 # found.
 #
 SEC/MINIMAL/ACC_RIGHT/default:	WRITE_ACCESS,	129.187.183,192.168.1	
-
 #
 #####################################################################
 #
 # user identification information
-#               taco-name     uid,     erlaubte IP(subnetz oder einzelrechener)
-#SEC/USER/IDENT/pedersen:        500, 129.187.183
-#SEC/USER/IDENT/dserver:		1000,		192.168.1
+#               taco-name     	uid,    IP(subnet or single computer)
+#SEC/USER/IDENT/pedersen:     	500, 	129.187.183
+#SEC/USER/IDENT/dserver:	1000,	192.168.1
 
 #
 # group identification information
-#
-#SEC/GROUP/IDENT/dserver:	200,		192.168.1,129.187.183
+#				gid
+#SEC/GROUP/IDENT/dserver:	200,	192.168.1,129.187.183
 #
 #
 #                     x add your own domains hers
