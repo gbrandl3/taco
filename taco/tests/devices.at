@@ -1,4 +1,4 @@
-AT_SETUP([Start Inst_verify server])
+AT_SETUP([Start Inst_verify device server])
 AT_DATA([instverify], [[3 
 0
 ]])
@@ -13,7 +13,7 @@ dev_ping -c 3 test/device/1 | grep status | cut -d' ' -f 4 | uniq], [],
 ]])
 AT_CLEANUP
 
-AT_SETUP([check the dev_cmd_query command to the test/device/1 device])
+AT_SETUP([dev_cmd_query command to test/device/1])
 AT_CHECK([AT_TACO_RUN_LOCAL
 test_cmd_query test/device/1], [],
 [[        12             DevReadValue         0         8
@@ -23,7 +23,7 @@ test_cmd_query test/device/1], [],
 )
 AT_CLEANUP
 
-AT_SETUP([client to the device])
+AT_SETUP([Send commands to test/device/1])
 AT_DATA([instverify], [[3
 0
 ]])
@@ -48,25 +48,25 @@ Select one commands (0 to quit) : ?
 ]])
 AT_CLEANUP
 
-AT_SETUP([])
+AT_SETUP([Gets device information])
 AT_CHECK([taco db_devinfo test/device/1 | egrep "(belongs|monitored)" ], [], 
 [[Device test/device/1 belongs to class : Inst_verifyClass
 It is monitored by the server : inst_verify/1 version 4
 ]])
 AT_CLEANUP
 
-AT_SETUP([])
+AT_SETUP([Test device information of not existing device])
 AT_CHECK([taco db_devinfo test/device/x], [255], 
 [[The device test/device/x is not defined in the database
 ]])
 AT_CLEANUP
 
-AT_SETUP([])
+AT_SETUP([Start AGPSpp device server ])
 AT_CHECK([nohup taco AGPSpp 1 >/dev/null &
 sleep 1])
 AT_CLEANUP
 
-AT_SETUP([])
+AT_SETUP([Send commands to the AGPSpp])
 AT_DATA([agps],
 [[4
 0
@@ -93,6 +93,6 @@ Select one of the following commands :
 cmd ?]]) 
 AT_CLEANUP
 
-AT_SETUP([])
+AT_SETUP([Stop the Inst_verify and AGPSpp device servers])
 AT_CHECK([killall Inst_verify AGPSpp])
 AT_CLEANUP
