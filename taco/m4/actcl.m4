@@ -32,9 +32,10 @@ dnl
 dnl check in a few common install locations
 dnl	
 	if test x"${TCLCONFIG}" = x ; then
-		for i in `ls -d /usr/lib 2>/dev/null` `ls -d /usr/local/lib 2>/dev/null` ; do
-			if test -f "$i/tclConfig.sh" ; then
-		    		TCLCONFIG=`(cd $i; pwd)`
+               for i in `ls /usr/lib/* /usr/local/lib/* 2>/dev/null | grep ':$'` ; do
+                        dir="`dirname $i`/`basename $i ':'`"
+                        if test -f "$dir/tclConfig.sh" ; then
+                                TCLCONFIG=$dir
 	    			break
 			fi
 		done
@@ -44,8 +45,10 @@ dnl
 	else
 		AC_MSG_RESULT(found $TCLCONFIG/tclConfig.sh)
 		. $TCLCONFIG/tclConfig.sh
-		TCLINCLUDE=-I$TCL_PREFIX/include
-		TCLLIB=$TCL_LIB_SPEC
+		TCL_PREFIX=`eval "echo $TCL_PREFIX"`
+		TCL_H=`find $TCL_PREFIX/include -type f -name tcl.h`
+		TCLINCLUDE="-I`dirname $TCL_H`"
+		TCLLIB=`eval "echo $TCL_LIB_SPEC"`
 	fi
 
 	if test -z "$TCLINCLUDE"; then
