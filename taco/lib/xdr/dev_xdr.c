@@ -11,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2003-05-12 11:47:49 $
+ Date:		$Date: 2004-07-12 09:20:04 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -196,16 +196,9 @@ long xdr_length_DevDoubleReadPoint(DevDoubleReadPoint *objp)
 /* D_VAR_CHARARR */
 bool_t xdr_DevVarCharArray(XDR *xdrs, DevVarCharArray *objp)
 {
-	if (!xdr_u_int(xdrs, &objp->length))
-		return (FALSE);
-        if (!xdr_bytes(xdrs, (char **)&objp->sequence, (u_int *)&objp->length, MAXU_INT)) 
-		return (FALSE);
-/*
-	if (!xdr_array(xdrs, (caddr_t *)&objp->sequence, (u_int *)&objp->length, 
-			MAXU_INT, sizeof(DevBoolean), (xdrproc_t)xdr_char)) 
-		return (FALSE);
-*/
-	return (TRUE);
+	if (!xdr_array(xdrs, (caddr_t *)&objp->sequence, (u_int *)&objp->length, MAXU_INT, sizeof(DevChar), (xdrproc_t)xdr_char)) 
+                return (FALSE);
+        return (TRUE);
 }
 
 long xdr_length_DevVarCharArray (DevVarCharArray *objp)
@@ -217,7 +210,7 @@ long xdr_length_DevVarCharArray (DevVarCharArray *objp)
 /*
  *  now calculate the length of the array
  */
-	length += (objp->length * sizeof(DevBoolean));
+	length += (objp->length * sizeof(DevChar));
 	length = adjust_size(length);
 	return (length);
 }
