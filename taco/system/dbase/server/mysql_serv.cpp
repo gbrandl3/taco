@@ -98,6 +98,8 @@ db_res *MySQLServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
     try
     {
     	browse_back.res_val.arr1_val = new nam[num_res];
+	for (int j = 0; j < num_res; ++j)
+		browse_back.res_val.arr1_val[j] = NULL;
 //
 // A loop on the resource's number to be looked for
 //
@@ -155,6 +157,9 @@ db_res *MySQLServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 //
 // Exit server 
 //
+#if DEBUG 
+    std::cout << "Exit db_getres_1_svc " << std::endl;
+#endif
     return(&browse_back);
 }
 
