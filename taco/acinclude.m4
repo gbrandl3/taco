@@ -397,7 +397,8 @@ AC_DEFUN([TACO_DATAPORT_SRC],
         		i[[3456]]86-*-linux |\
 			i[[3456]]86-*-cygwin*|\
         		m68k-*-linux-* |\
-            		*-*-solar*-* | *-*-sun*-* |\
+            		*-*-solaris* | *-*-sun*-* |\
+			*-*-darwin* |\
 			i386-*-freebsd* |\
             		*-*-hp*-*)
 				DATAPORTUNIX="yes" ;;
