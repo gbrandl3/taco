@@ -12,9 +12,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-04-25 11:21:22 $
+ Date:		$Date: 2003-05-16 13:44:00 $
 
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
@@ -25,12 +25,18 @@
 #ifndef _api_h
 #define _api_h
 
+/**
+ * @defgroup dsAPI Device Server API
+ * @ingroup API
+ * Functions to access to a device server.
+ */
+
 /*
  *  standart header string to use "what" or "ident".
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.2 2003-04-25 11:21:22 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.3 2003-05-16 13:44:00 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*
