@@ -6,12 +6,13 @@
 
  Description   :   The interface file (header file) for the library
 
- Author        :   Faranguiss Poncet
-
+ Author(s)     :   Faranguiss Poncet
+		   $Author: jkrueger1 $
  Original      :   November 1996
 
- $Revision: 1.1 $                               $Author: jkrueger1 $
- $Date: 2003-04-25 11:21:41 $                                     $State: Exp $
+ Version       :   $Revision: 1.2 $                               
+
+ Date          :   $Date: 2004-03-03 08:39:36 $
 
  Copyright (c) 1996 by European Synchrotron Radiation Facility,
                        Grenoble, France

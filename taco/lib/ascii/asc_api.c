@@ -12,9 +12,9 @@
  *
  * Original:   	November 1996
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:		$Date: 2003-05-21 16:18:09 $
+ * Date:		$Date: 2004-03-03 08:39:36 $
  *
  * Copyright (c) 1996 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -94,13 +94,9 @@ typedef struct
          } _asc_dev_info_type;
 
 
-
 static  _asc_dev_info_type    *asc_dev_array_ptr = NULL;
 static  int                   _asc_nb_block_dev_array = 1;
 static  int                   _asc_library_loaded = ASC_FALSE;
-
-
-
 
 
 static long _asc_load_library()
@@ -256,9 +252,6 @@ static long _asc_lookup_cmd(int index_dev, const char *cmd_name, long *cmd_code,
 	else
 		return(-1);
 }
-
-
-
 
 static long _asc_dev_connect(char *dev_name, const char *cmd_name, devserver *ds_ptr, long  *cmd_code,
 				       long  *in_type, long *out_type, char  **str_err )
