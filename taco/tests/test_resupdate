@@ -4,7 +4,11 @@ export NETHOST=${NETHOST:-`hostname`}
 export RES_BASE_DIR=`pwd`
 pers_name=`uname -n|cut -f1 -d'.'`
 echo startserver/$pers_name/device:     SYS/START/$pers_name >test.res
+echo inst_verify/pers1/device:	test/inst/dev1 >> test.res
+echo inst_verify/pers2/device:	test1/inst/dev1, test1/inst/dev2 >> test.res
 echo SYS/START/$pers_name/DEFAULT:      "Inst_verify/1", "AGPSpp/1" >>test.res
+echo test/inst/dev1/default:	0,1,2,3,4,5 >> test.res
+echo test/inst/dev1/hallo:	"HELLO" >> test.res
 while test $i -lt 1000 ; do 
 	echo $i  
 	../system/dbase/tools/db_update test.res  

@@ -26,17 +26,11 @@ int main(int argc,char **argv)
 #endif	
 	switch (argc)	
 	{
-		case 1:
-			std::cout << "enter device name [\"tl1/ps-d/d\"]?";
-			std::cin >> cmd_string;
-			if (cmd_string.empty())
-				cmd_string = "tl1/ps-d/d";
-			break;
 		case 2:
 			cmd_string = argv[1];
 			break;
 		default:
-			std::cerr << "usage: ps_menu [device name]" << std::endl;
+			std::cerr << "usage: " << *argv << " [device name]" << std::endl;
 			exit(1);
 	}
 
@@ -56,8 +50,11 @@ int main(int argc,char **argv)
 				<< std::setw(10) << varcmdarr.sequence[i].out_type  
 				<< std::endl; 
 	else
+	{
 		std::cout << "dev_cmd_query(" << cmd_string << ") returned " << status << " (error=" << error << ")" << std::endl
 			<< dev_error_str(error) << std::endl;
+		return 1;
+	}
 	return 0;
 }
 

@@ -6,7 +6,7 @@ CLEANFILES 		= log taco
 
 DISTCLEANFILES 		= System.log atconfig
 
-INCLUDES		= @TACO_INCLUDES@ @TACO_GDBM_INC@ -g -O0
+INCLUDES		= @TACO_INCLUDES@ @GDBM_CFLAGS@ -g -O0
 
 test_asc_stat_SOURCES 	= test_asc_stat.c
 test_asc_stat_LDADD 	= @TACO_CLIENT_LIBS@ @TACO_ASCII_LIBS@ 
@@ -27,16 +27,18 @@ AUTOTEST 		= $(AUTOM4TE) --language=autotest
 
 check_PROGRAMS 		= db_connect db_resget db_resput db_getdevexp \
 			db_resdomain db_resfamily db_resmember dev_ping \
-			db_getresoval db_devdomain db_devfamily db_devmember test_dev_import \
+			db_getresoval db_devdomain db_devfamily db_devmember \
+			db_devlist db_devperslist test_dev_export test_dev_import \
+			db_serverlist db_hostlist db_dsonhost \
 			test_asc_dyn test_asc_stat test_tc test_starter \
-			test_cmd_query test_con_params
+			dev_cmdquery dev_conparams
 
 check_SCRIPT		= taco
 
 TESTS_ENVIRONMENT 	= 
 
 db_connect_SOURCES 	= db_connect.cpp
-db_connect_LDADD 	= @TACO_CLIENT_LIBS@ @TACO_GDBM_LDFLAGS@ @TACO_GDBM_LIBS@
+db_connect_LDADD 	= @TACO_CLIENT_LIBS@ @GDBM_LIBS@
 
 db_resget_SOURCES 	= db_resget.cpp 
 db_resget_LDADD 	= @TACO_CLIENT_LIBS@
@@ -50,8 +52,26 @@ db_resdomain_LDADD 	= @TACO_CLIENT_LIBS@
 db_devdomain_SOURCES 	= db_devdomain.cpp 
 db_devdomain_LDADD 	= @TACO_CLIENT_LIBS@
 
+test_dev_export_SOURCES = db_devexp.cpp 
+test_dev_export_LDADD 	= @TACO_CLIENT_LIBS@
+
 db_resfamily_SOURCES 	= db_resfamily.cpp 
 db_resfamily_LDADD 	= @TACO_CLIENT_LIBS@
+
+db_devlist_SOURCES 	= db_devlist.cpp 
+db_devlist_LDADD 	= @TACO_CLIENT_LIBS@
+
+db_serverlist_SOURCES 	= db_serverlist.cpp 
+db_serverlist_LDADD 	= @TACO_CLIENT_LIBS@
+
+db_hostlist_SOURCES 	= db_hostlist.cpp 
+db_hostlist_LDADD 	= @TACO_CLIENT_LIBS@
+
+db_dsonhost_SOURCES 	= db_dsonhost.cpp 
+db_dsonhost_LDADD 	= @TACO_CLIENT_LIBS@
+
+db_devperslist_SOURCES 	= db_devperslist.cpp 
+db_devperslist_LDADD 	= @TACO_CLIENT_LIBS@
 
 db_devfamily_SOURCES 	= db_devfamily.cpp 
 db_devfamily_LDADD 	= @TACO_CLIENT_LIBS@
@@ -71,11 +91,11 @@ dev_ping_LDADD 		= @TACO_CLIENT_LIBS@
 test_starter_SOURCES	= test_start.cpp
 test_starter_LDADD	= @TACO_CLIENT_LIBS@
 
-test_cmd_query_SOURCES	= test_cmd_query.cpp
-test_cmd_query_LDADD	= @TACO_CLIENT_LIBS@
+dev_cmdquery_SOURCES	= test_cmd_query.cpp
+dev_cmdquery_LDADD	= @TACO_CLIENT_LIBS@
 
-test_con_params_SOURCES	= test_con_params.cpp
-test_con_params_LDADD	= @TACO_CLIENT_LIBS@
+dev_conparams_SOURCES	= test_con_params.cpp
+dev_conparams_LDADD	= @TACO_CLIENT_LIBS@
 
 db_getresoval_SOURCES	= db_getresoval.cpp
 db_getresoval_LDADD	= @TACO_CLIENT_LIBS@
