@@ -20,7 +20,7 @@ SUBDIRS 		= dbase xdr $(dc_dir) $(ascii_dir) $(datap_dir) private .
 
 include_HEADERS 	= API.h DevSec.h hdb.h hdb_out.h Admin.h DevCmds.h DevErrors.h DevStates.h DserverTeams.h macros.h
 
-lib_LTLIBRARIES 	= libtacoapi.la libdsapi.la libdsapinomain.la libtacoapig++.la libdsapig++.la 
+lib_LTLIBRARIES 	= libtacoapi.la libdsapi.la libtacoapig++.la libdsapig++.la libdsapinomain.la 
 
 noinst_LTLIBRARIES 	= libtacoc.la libdsapic.la
 
