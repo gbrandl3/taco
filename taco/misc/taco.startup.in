@@ -47,6 +47,9 @@ manager()
 
 	if test "x$TACO_LOGGING" = "xyes" ; then
 		taco_manager_flags="-log"
+		if ! test -d $LOGPATH ; then
+			mkdir -p $LOGPATH
+		fi
 	fi
 	if test "x$TACO_SECURITY" = "xyes" ; then
 		taco_manager_flags="$taco_manager_flags -security"
@@ -54,9 +57,6 @@ manager()
 	taco_manager_flags="$taco_manager_flags -${TACO_DATABASE:-dbm}"
 
 # now start the Manager 
-	if ! test -d $LOGPATH ; then
-		mkdir -p $LOGPATH
-	fi
     	echo "starting the Manager ..."
     	Manager $taco_manager_flags 
 	sleep 1
