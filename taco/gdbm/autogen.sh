@@ -1,15 +1,30 @@
-#!/bin/sh
-LIBTOOLIZE="libtoolize --force --copy --automake"
+#! /bin/sh
+for libtoolize in glibtoolize libtoolize ; do
+        LIBTOOLIZE=`which $libtoolize 2>/dev/null | grep -v '^no'`
+        if test "$LIBTOOLIZE" ; then
+                break;
+        fi
+done
+LIBTOOLIZE="$libtoolize --force --copy --automake"
 ACLOCAL="aclocal $aclocal_includes"
 AUTOHEADER="autoheader"
 AUTOMAKE="automake -a -c --foreign"
 AUTOCONF="autoconf"
 
-# Discover what version of autoconf we are using.
-autoversion=`$AUTOCONF --version | head -n 1`
+touch AUTHORS ChangeLog NEWS README
+if test ! -d config ; then mkdir config ; else rm -rf config/* ;  fi
 
-echo "Using $autoversion"
-case $autoversion in
+
+# Discover what version of autoconf we are using.
+autoconfversion=`$AUTOCONF --version | head -n 1`
+automakeversion=`$AUTOMAKE --version | head -n 1`
+libtoolversion=`$LIBTOOLIZE --version | head -n 1`
+
+echo "Using $autoconfversion"
+echo "Using $automakeversion"
+echo "Using $libtoolversion"
+
+case $autoconfversion in
     *2.5[2-79])
 	;;
     *)
@@ -40,7 +55,7 @@ else
 fi
 
 # 
-if { ! test -d config ; } ; then 
+if test ! -d config ; then 
 	mkdir config ; 
 else 
 	rm -rf config/* ;  
