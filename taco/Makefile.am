@@ -8,7 +8,7 @@ endif
 
 SUBDIRS = m4 $(gdbm) lib system classes doc misc bindings tests 
 
-EXTRA_DIST=Makefile.cvs taco.spec config/depcomp
+EXTRA_DIST=autogen.sh taco.spec config/depcomp
 
 include $(top_srcdir)/rpm_rules.mh
 
