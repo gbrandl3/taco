@@ -12,9 +12,9 @@
 
  Original:	July 1992
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2004-02-06 13:11:22 $
+ Date:		$Date: 2004-03-18 14:21:55 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -144,11 +144,9 @@ long
 xdr_length_DevRadiationDoseValue(objp)
 	DevRadiationDoseValue *objp;
 {
-	long 	length = 0;
-
-        length = length + xdr_length_DevShort (&objp->state);
-        length = length + xdr_length_DevShort (&objp->type);
-        length = length + xdr_length_DevFloat (&objp->read);
+	long 	length = xdr_length_DevShort (&objp->state);
+        length += xdr_length_DevShort (&objp->type);
+        length += xdr_length_DevFloat (&objp->read);
 
 	return (length);
 }
