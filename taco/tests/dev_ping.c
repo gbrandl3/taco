@@ -16,6 +16,7 @@
  *
  *********************************************************************/
 
+#include "config.h"
 #include <Admin.h>
 #include <API.h>
 #include <DevServer.h>
