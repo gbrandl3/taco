@@ -12,9 +12,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2003-11-28 13:14:55 $
+ Date:		$Date: 2004-02-03 09:27:03 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -37,7 +37,7 @@ void 		exit_child ();
 MessageServerPart msg;
 int	 	  pid = 0;
 
-main (int argc, char **argv)
+int main (int argc, char **argv)
 {
 	SVCXPRT *transp;
 	char	*nethost;
@@ -50,7 +50,7 @@ main (int argc, char **argv)
 		exit (1);
 	}
 
-	snprintf (msg.name, sizeof(msg.name), "%s",argv[0]);
+	strncpy (msg.name, argv[0], sizeof(msg.name) - 1);
 	nethost = argv[1]; 
 /*
  *  get process ID
@@ -133,14 +133,13 @@ static void msgserver_prog_1 (struct svc_req *rqstp, SVCXPRT *transp)
 		_msg_data 	rpc_msg_send_1_arg;
 	} argument;
 
-	char *result;
-	bool_t (*xdr_argument)(), (*xdr_result)();
-	char *(*local)();
+	char	*result,
+		*(*local)();
+	bool_t 	(*xdr_argument)(), (*xdr_result)();
 
-	/*
-	 *  call the right server routine
-	 */
-
+/*
+ *  call the right server routine
+ */
 	switch (rqstp->rq_proc) 
 	{
 		case NULLPROC:
@@ -161,8 +160,7 @@ static void msgserver_prog_1 (struct svc_req *rqstp, SVCXPRT *transp)
 #else
 			svc_sendreply(transp, (xdrproc_t)xdr_void, NULL);
 #endif /* !linux */
-			msg_alarm_handler (-1,"Network_Manager",
-				   msg.host_name,"NULL",msg.display);
+			msg_alarm_handler (-1, "Network_Manager", msg.host_name, "NULL", msg.display);
 			return;
 
 		case RPC_QUIT_SERVER:
@@ -183,8 +181,7 @@ static void msgserver_prog_1 (struct svc_req *rqstp, SVCXPRT *transp)
 
 	if (!svc_getargs(transp, (xdrproc_t)xdr_argument, (char *)&argument)) 
 	{
-		msg_fault_handler 
-		("svcerr_decode : server couldn't decode incoming arguments");
+		msg_fault_handler("svcerr_decode : server couldn't decode incoming arguments");
 		svcerr_decode(transp);
 		return;
 	}
@@ -196,15 +193,13 @@ static void msgserver_prog_1 (struct svc_req *rqstp, SVCXPRT *transp)
 	if (result != NULL && !svc_sendreply(transp, (xdrproc_t)xdr_result, result)) 
 #endif /* !linux */
 	{
-		msg_fault_handler 
-		("svcerr_systemerr : server couldn't send repply arguments");
+		msg_fault_handler("svcerr_systemerr : server couldn't send repply arguments");
 		svcerr_systemerr(transp);
 	}
 
 	if (!svc_freeargs(transp, (xdrproc_t)xdr_argument, (char *)&argument)) 
 	{
-		msg_fault_handler 
-		("svc_freeargs : server couldn't free arguments !!");
+		msg_fault_handler("svc_freeargs : server couldn't free arguments !!");
 		return;
 	}
 }
@@ -237,8 +232,7 @@ void register_msg (char *nethost, char **dshome)
 
 
 /*
- *  send server configuration to network manager
- *  and get back DSHOME and DISPLAY.
+ *  send server configuration to network manager and get back DSHOME and DISPLAY.
  */
 	register_data.host_name   = msg.host_name;
 	register_data.prog_number = msg.prog_number;
@@ -260,7 +254,7 @@ void register_msg (char *nethost, char **dshome)
 	}
 
 	*dshome = msg_manager_data.dshome;
-	snprintf (msg.display, sizeof(msg.display), "%s", msg_manager_data.display);
+	strncpy(msg.display, msg_manager_data.display, sizeof(msg.display) - 1);
 	clnt_destroy (clnt);
 }
 
