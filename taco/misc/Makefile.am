@@ -1,8 +1,8 @@
-EXTRA_DIST		= taco.startup.in taco-config.in tacoenv.sh.in tacoenv.csh.in taco.in taco-manager.sh.in
+EXTRA_DIST		= taco.startup.in taco.shutdown.in taco-config.in tacoenv.sh.in tacoenv.csh.in taco.in taco-manager.sh.in
 
-dist_sbin_SCRIPTS 	= taco.shutdown
+dist_sbin_SCRIPTS 	= off
 
-nodist_sbin_SCRIPTS 	= taco-config taco.startup 
+nodist_sbin_SCRIPTS 	= taco-config taco.startup taco.shutdown 
 
 nodist_template_SCRIPTS = taco taco-manager.sh
 
