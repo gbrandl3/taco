@@ -5,9 +5,9 @@
  *
  * Original:      1993
  *
- * Version:       $Revision: 1.3 $
+ * Version:       $Revision: 1.4 $
  *
- * Date:          $Date: 2003-05-21 16:17:12 $
+ * Date:          $Date: 2003-11-27 18:03:30 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -448,7 +448,7 @@ int dc_dinfo(char *dev_name,dc_devinf *dc_dev_info,long *error)
 				nethost[i - 2] = dev_name[i];
 			}
 			nethost[i - 2] = '\0';
-			sprintf(dv_name, sizeof(dv_name), "//%s/class/dc/1",nethost);
+			snprintf(dv_name, sizeof(dv_name), "//%s/class/dc/1",nethost);
 		}
 	}
 	else
