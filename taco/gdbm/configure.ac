@@ -19,7 +19,10 @@ AC_C_CONST
 AC_CHECK_HEADERS([stdlib.h string.h sys/file.h unistd.h fcntl.h sys/types.h memory.y])
 AC_CHECK_LIB(dbm, main)
 AC_CHECK_LIB(ndbm, main)
-AC_CHECK_FUNCS([rename ftruncate flock bcopy fsync])
+case "$host_os" in
+	linux-*)	AC_CHECK_FUNCS([rename ftruncate bcopy fsync]);;
+	*)	AC_CHECK_FUNCS([rename ftruncate flock bcopy fsync]);;
+esac
 AC_REPLACE_FUNCS(getopt)
 AC_TYPE_OFF_T
 AC_CHECK_MEMBERS([struct stat.st_blksize])
