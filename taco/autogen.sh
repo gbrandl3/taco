@@ -36,7 +36,7 @@ case $autoconfversion in
 esac
 
 case $automakeversion in
-    *1.[7-8]*)
+    *1.[7-9]*)
         ;;
     *)
         echo "This automake version is not supported by taco."
