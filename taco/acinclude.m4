@@ -140,7 +140,7 @@ AC_DEFUN([TACO_GRETA],
 		greta=no
 	fi
 	AM_CONDITIONAL(GRETABUILD, test "x$greta" = "xyes") 
-	AC_SUBST(GRETA)
+	AC_SUBST([GRETA], [greta])
 ])
 
 AC_DEFUN([TACO_ASCII_API],
