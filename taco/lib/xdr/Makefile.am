@@ -17,11 +17,11 @@ libdsxdrbase_la_SOURCES	= api_xdr.c api_xdr_vers3.c dev_xdr.c
 libdsxdr_la_SOURCES	= $(KERNEL_SOURCE) 
 libdsxdr_la_CFLAGS	=
 libdsxdr_la_LIBADD  	= libdsxdrbase.la
-libdsxdr_la_LDFLAGS	= -version-info $(subst .,:,@LIB_VERSION@)
+libdsxdr_la_LDFLAGS	= -version-info @LIB_VERSION@
 
 libdsxdr_all_la_SOURCES	= $(KERNEL_SOURCE) atte_xdr.c bpm_xdr.c bpss_xdr.c ct_xdr.c gpib_xdr.c grp_xdr.c \
 			haz_xdr.c icv101_xdr.c m4_xdr.c maxe_xdr.c mstat_xdr.c pin_xdr.c pss_xdr.c \
                 	ram_xdr.c rf_xdr.c seism_xdr.c slit_xdr.c thc_xdr.c union_xdr.c vgc_xdr.c vrif_xdr.c ws_xdr.c 
 libdsxdr_all_la_CFLAGS	= -D_XDR_ALL
 libdsxdr_all_la_LIBADD  = libdsxdrbase.la
-libdsxdr_all_la_LDFLAGS	= -version-info $(subst .,:,@LIB_VERSION@)
+libdsxdr_all_la_LDFLAGS	= -version-info @LIB_VERSION@

@@ -9,4 +9,4 @@ lib_LTLIBRARIES 	= libdbapi.la
 INCLUDES		= @TACO_INCLUDES@
 
 libdbapi_la_SOURCES	= $(API_SRC)
-libdbapi_la_LDFLAGS	= -version-info $(subst .,:,@LIB_VERSION@)
+libdbapi_la_LDFLAGS	= -version-info @LIB_VERSION@

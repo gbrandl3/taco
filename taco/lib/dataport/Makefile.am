@@ -10,6 +10,6 @@ else
 libdataport_la_SOURCES		= dataport_os9.c
 endif
 
-libdataport_la_LDFLAGS		= -version-info $(subst .,:,@LIB_VERSION@)
+libdataport_la_LDFLAGS		= -version-info @LIB_VERSION@
 
 INCLUDES			= @TACO_INCLUDES@
