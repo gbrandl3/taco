@@ -578,7 +578,7 @@ long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
         query << "INSERT INTO property_device(DEVICE,NAME,DOMAIN,FAMILY,MEMBER,COUNT,VALUE) VALUES('"
 	      << domain << "/" << family << "/" << member << "','" << name << "','"
 	      << domain << "','" << family << "','" << member << "','" 
-	      << numb << "','" << val << "')" << std::ends;
+	      << numb << "',\"" << val << "\")" << std::ends;
 
     }
     else
