@@ -7,9 +7,19 @@ you have to create a file '~/.rpmmacros' which contains the follwing contents.
 %_prefix 	/usr/local/dshome
 %_infodir       %{_prefix}/info
 %_sysconfdir	%{_prefix}/etc
+%_vendor        <Vendor name>,	e.g. FRM-II, TU Munich, FRG
+%_distribution  <Distribution name>, e.g. SuSE Linux 8.2 (i586)
 
 These definitions define some pathes used during the building and installation of the
 RPM's. These macros point per default to other directories so the RPM could not build
 successfully.
+
+The distribution name should be get from the files /etc/*-release. If the file 
+/etc/lsb-release exist take the content of the DISTRIB_DESCRIPTION variable otherwise
+the content of the first line of the /etc/redhat-release, /etc/SuSE-release, 
+/etc/mandrake-release, ... .
+
+The vendor name should be your institution or your name, that one may verify who built
+this rpm.
 
 Jens Krueger <jens.krueger@frm2.tum.de>
