@@ -12,15 +12,15 @@
 //
 // Original:	April 1995
 //
-// $Revision: 1.2 $
+// $Revision: 1.3 $
 //
-// $Date: 2003-05-02 09:53:40 $
+// $Date: 2004-11-05 08:52:34 $
 //
 // $Author: jkrueger1 $
 //
 //+**********************************************************************
 
-#include <Device.H>
+#include <Device.h>
 		
 class PowerSupply : public Device {
 

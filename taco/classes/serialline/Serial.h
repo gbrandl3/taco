@@ -19,7 +19,7 @@
 		
 #include <BlcDsNumbers.h>
 
-#include <Device.H>
+#include <Device.h>
 
 #define MAX_DEVICES 16
 

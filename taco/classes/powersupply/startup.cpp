@@ -14,9 +14,9 @@
 //
 // Original:	June 1995
 //
-// $Revision: 1.3 $
+// $Revision: 1.4 $
 //
-// $Date: 2004-03-26 16:26:08 $
+// $Date: 2004-11-05 08:52:34 $
 //
 // $Author: jkrueger1 $
 //
@@ -25,7 +25,7 @@
 #include <iostream>
 
 #include <API.h>
-#include <Device.H>
+#include <Device.h>
 #include <DevServer.h>
 #include <PowerSupply.h>
 #include <AGPowerSupply.h>

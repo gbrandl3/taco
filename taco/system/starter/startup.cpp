@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * File:        $Id: startup.cpp,v 1.5 2004-06-02 16:36:17 jkrueger1 Exp $
+ * File:        $Id: startup.cpp,v 1.6 2004-11-05 08:52:35 jkrueger1 Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
@@ -11,9 +11,9 @@
  *
  * Original:	January 2003
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Revision:	$Date: 2004-06-02 16:36:17 $
+ * Revision:	$Date: 2004-11-05 08:52:35 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -33,7 +33,7 @@
  *****************************************************************************/
 #include "config.h"
 #include <API.h>
-#include <Device.H>
+#include <Device.h>
 #include <DevServer.h>
 #include <dlfcn.h>
 #include <signal.h>

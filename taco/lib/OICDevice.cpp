@@ -15,11 +15,11 @@
 //
 // Original:	November 1996
 //
-// $Revision: 1.1 $
+// $Revision: 1.2 $
 //
-// $Date: 2004-11-04 14:02:40 $
+// $Date: 2004-11-05 08:52:35 $
 //
-// $Author: andy_gotz $
+// $Author: jkrueger1 $
 //
 //-**********************************************************************
 		
@@ -27,10 +27,10 @@
 #include <string.h>
 #include <API.h>
 #include <Admin.h>
-#include <Device.H>
+#include <Device.h>
 #include <DevServer.h>
 #include <DevServerP.h>
-#include <OICDevice.H>
+#include <OICDevice.h>
 #include <DevErrors.h>
 #include <DevStates.h>
 

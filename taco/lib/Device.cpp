@@ -8,13 +8,13 @@
 //		the device server base class in C++ (Device).
 //
 // Author(s):	Andy Goetz
-// 		$Author: andy_gotz $
+// 		$Author: jkrueger1 $
 //
 // Original:	March 1995
 //
-// Version:	$Revision: 1.3 $
+// Version:	$Revision: 1.4 $
 //
-// Date:	$Date: 2004-11-04 14:02:40 $
+// Date:	$Date: 2004-11-05 08:52:35 $
 //
 //-**********************************************************************
 		
@@ -22,7 +22,7 @@
 #include <string.h>
 #include <API.h>
 #include <Admin.h>
-#include <Device.H>
+#include <Device.h>
 #include <DevServer.h>
 #include <DevErrors.h>
 #include <DevStates.h>
