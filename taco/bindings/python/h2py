@@ -23,20 +23,19 @@
 
 import sys, re, string, getopt, os
 
-p_define = re.compile('^[\t ]*#[\t ]*define[\t ]+\([a-zA-Z0-9_]+\)[\t ]+')
+p_define = re.compile('(^[\t ]*#[\t ]*define[\t ]+)([a-zA-Z0-9_]+[\t \n]+)')
 
-p_macro = re.compile(
-  '^[\t ]*#[\t ]*define[\t ]+'
-  '\([a-zA-Z0-9_]+\)(\([_a-zA-Z][_a-zA-Z0-9]*\))[\t ]+')
+p_macro = re.compile('^[\t ]*#[\t ]*define[\t ]+'
+  '([a-zA-Z0-9_]+)\(([_a-zA-Z][_a-zA-Z0-9]*)\)[\t ]+')
 
-p_include = re.compile('^[\t ]*#[\t ]*include[\t ]+<\([a-zA-Z0-9_/\.]+\)')
+p_include = re.compile('^[\t ]*#[\t ]*include[\t ]+<([a-zA-Z0-9_/\.]+)')
 
-p_comment = re.compile('/\*\([^*]+\|\*+[^/]\)*\(\*+/\)?')
+p_comment = re.compile('/\*([^*]+|\*+[^/])*(\*+/)?')
 p_cpp_comment = re.compile('//.*')
 
 ignores = [p_comment, p_cpp_comment]
 
-p_char = re.compile("'\(\\\\.[^\\\\]*\|[^\\\\]\)'")
+p_char = re.compile("'(\\\\.[^\\\\]*\|[^\\\\])'")
 
 filedict = {}
 
@@ -59,7 +58,7 @@ def main():
 	opts, args = getopt.getopt(sys.argv[1:], 'i:')
 	for o, a in opts:
 		if o == '-i':
-			ignores.append(regex.compile(a))
+			ignores.append(re.compile(a))
 	if not args:
 		args = ['-']
 	for filename in args:
@@ -90,7 +89,7 @@ def process(fp, outfp, env = {}):
 		line = fp.readline()
 		if not line: break
 		lineno = lineno + 1
-		n = p_define.match(line)
+		n = p_define.match(line, 0)
 		if n >= 0:
 			# gobble up continuation lines
 			while line[-2:] == '\\\n':
@@ -98,39 +97,43 @@ def process(fp, outfp, env = {}):
 				if not nextline: break
 				lineno = lineno + 1
 				line = line + nextline
-			name = p_define.group(1)
-			body = line[n:]
+			name = n.group(2)
+			body = line[n.end(0):]
 			# replace ignored patterns by spaces
 			for p in ignores:
-				body = regsub.gsub(p, ' ', body)
+				body = re.sub(p, ' ', body)
 			# replace char literals by ord(...)
-			body = regsub.gsub(p_char, 'ord(\\0)', body)
+			body = re.sub(p_char, 'ord(\\0)', body)
 			stmt = '%s = %s\n' % (name, string.strip(body))
 			ok = 0
 			try:
 				exec stmt in env
 			except:
-				sys.stderr.write('Skipping: %s' % stmt)
+				sys.stderr.write('Skipping: %s' % line)
 			else:
 				outfp.write(stmt)
 		n =p_macro.match(line)
 		if n >= 0:
-			macro, arg = p_macro.group(1, 2)
-			body = line[n:]
+			macro, arg = n.group(1, 2)
+			while line[-2:] == '\\\n':
+				nextline = fp.readline()
+				if not nextline: break
+				lineno = lineno + 1
+				line = line + nextline
+			body = line[1 + n.end(2):]
 			for p in ignores:
-				body = regsub.gsub(p, ' ', body)
-			body = regsub.gsub(p_char, 'ord(\\0)', body)
+				body = re.sub(p, ' ', body)
+			body = re.sub(p_char, 'ord(\\0)', body)
 			stmt = 'def %s(%s): return %s\n' % (macro, arg, body)
 			try:
 				exec stmt in env
 			except:
-				sys.stderr.write('Skipping: %s' % stmt)
+				sys.stderr.write('Skipping: %s' % line)
 			else:
 				outfp.write(stmt)
-		if p_include.match(line) >= 0:
-			regs = p_include.regs
-			a, b = regs[1]
-			filename = line[a:b]
+		n = p_include.match(line) 
+		if n >= 0:
+			filename = n.group(1)
 			if not filedict.has_key(filename):
 				filedict[filename] = None
 				inclfp = None
