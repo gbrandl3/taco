@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * File:        $Id: starter.h,v 1.1 2003-05-05 16:04:05 jkrueger1 Exp $
+ * File:        $Id: starter.h,v 1.2 2003-05-16 14:04:08 jkrueger1 Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
@@ -11,9 +11,9 @@
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.1 $
+ * Version:	$Revision: 1.2 $
  *
- * Date:	$Date: 2003-05-05 16:04:05 $
+ * Date:	$Date: 2003-05-16 14:04:08 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -69,17 +69,20 @@ public:
 	/**
 	 * Implementation of TACO command DevRun
 	 */
-	void deviceRun(string proc, string pers, string option, string param);	
+	void deviceRun(const std::string proc, const std::string pers, const std::string option, const std::string param);	
 	
 	/**
 	 * Implementation of TACO command DevStop.
 	 */
-	void deviceStop(pid_t pid);
+	void deviceStop(const std::string proc, const std::string pers);
 
 	/**
 	 * Implementation of TACO command DevRestart.
 	 */
-	void deviceReStart(pid_t pid, string proc, string pers, string option, string param);	
+	void deviceReStart(const std::string proc, const std::string pers, const std::string option, const std::string param);	
+
+private:
+	pid_t StarterDevice::getpid(const std::string proc, const std::string pers);
 	
 };
 

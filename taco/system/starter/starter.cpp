@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * File:        $Id: starter.cpp,v 1.2 2003-05-07 14:53:11 jkrueger1 Exp $
+ * File:        $Id: starter.cpp,v 1.3 2003-05-16 14:04:08 jkrueger1 Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
@@ -11,9 +11,9 @@
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2003-05-07 14:53:11 $
+ * Date:	$Date: 2003-05-16 14:04:08 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -35,6 +35,8 @@
 #include "starter.h"
 #include <Starter.h>
 #include <iostream>
+#include <vector>
+#include <algorithm>
 #include <DevSec.h>
 #include <unistd.h>
 #include <signal.h>
@@ -44,7 +46,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-StarterDevice::StarterDevice(string name, long &error)
+StarterDevice::StarterDevice(std::string name, long &error)
 	: Device(const_cast<char *>(name.c_str()), &error)
 {
         commands_list[DevRun] = DeviceCommandListEntry(DevRun, static_cast<DeviceMemberFunction>( &StarterDevice::tacoDevRun),
@@ -52,7 +54,7 @@ StarterDevice::StarterDevice(string name, long &error)
                                         D_VOID_TYPE,
                                         ADMIN_ACCESS, "DevRun");
         commands_list[DevStop] = DeviceCommandListEntry(DevStop, static_cast<DeviceMemberFunction>( &StarterDevice::tacoDevStop),
-					D_LONG_TYPE,
+					D_VAR_STRINGARR,
                                         D_VOID_TYPE,
                                         ADMIN_ACCESS, "DevStart");
         commands_list[DevRestore] = DeviceCommandListEntry(DevRestore, static_cast<DeviceMemberFunction>( &StarterDevice::tacoDevRestart),
@@ -73,10 +75,10 @@ long StarterDevice::tacoDevRun(void *argin, void *argout, long *error)
 	DevVarStringArray	arr = *(DevVarStringArray *)argin;
 	if (arr.length > 1)
 	{
-		if (string(*arr.sequence) != "StartServer")
+		if (std::string(*arr.sequence) != "StartServer")
 			try 
 			{
-				this->deviceRun(*arr.sequence, arr.sequence[1], "-m", "");
+				this->deviceRun(*arr.sequence, arr.sequence[1], arr.length > 2 ? arr.sequence[2] : "-m", "");
 				return DS_OK;
 			}
 			catch (const long &e)
@@ -93,15 +95,25 @@ long StarterDevice::tacoDevRun(void *argin, void *argout, long *error)
 
 long StarterDevice::tacoDevStop(void *argin, void *argout, long *error) 
 {
-	try
+	DevVarStringArray	arr = *(DevVarStringArray *)argin;
+	if (arr.length > 1)
 	{
-		this->deviceStop((pid_t)*(DevLong*)argin);
-		return DS_OK;
+		if (std::string(*arr.sequence) != "StarterServer")
+			try
+			{
+				this->deviceStop(arr.sequence[0], arr.sequence[1]);
+				return DS_OK;
+			}
+			catch(const long &e)
+			{
+				*error = e;
+			}
+		else
+			*error = long(DevErr_DeviceIllegalParameter);
 	}
-	catch(const long &e)
-	{
-		*error = e;
-	}
+	else
+		*error = long(DbErr_BadParameters);
+	
 	return DS_NOTOK;
 }
 
@@ -109,13 +121,12 @@ long StarterDevice::tacoDevRestart(void *argin, void *argout, long *error)
 {
 	DevVarStringArray	arr = *(DevVarStringArray *)argin;
 	
-	if (arr.length > 2)
+	if (arr.length > 1)
 	{
-		if (string(*arr.sequence) != "StarterServer")
+		if (std::string(*arr.sequence) != "StarterServer")
 			try
 			{
-				pid_t pid = (pid_t)atol(*arr.sequence);
-				this->deviceReStart(pid, arr.sequence[1], arr.sequence[2], "-m", "");
+				this->deviceReStart(arr.sequence[0], arr.sequence[1], arr.length > 2 ? arr.sequence[2] : "-m", "");
 				return DS_OK;
 			}
 			catch (const long &e)
@@ -127,32 +138,85 @@ long StarterDevice::tacoDevRestart(void *argin, void *argout, long *error)
 	}
 	else
 		*error = long(DbErr_BadParameters);
+	return DS_NOTOK;
 }
 
-void StarterDevice::deviceRun(string proc, string pers, string options, string param)	
+void StarterDevice::deviceRun(const std::string proc, const std::string pers, const std::string options, const std::string param)	
 {
-	pid_t	pid = fork();
-	if (pid == 0)
+	DevVarStringArray	server_list = {0, NULL};
+	db_resource		server = {"default", D_VAR_STRINGARR, &server_list};	
+	long 			error;
+	std::string		newServer = proc + '/' + pers;
+	
+//
+// Get the list of all devices to be started on this machine
+// 
+	if (db_getresource(const_cast<char *>(this->GetDevName()) , &server, 1, &error) == DS_OK)
 	{
+		std::vector<std::string>	names_of_server;
+		names_of_server.clear();
+//
+// Save all full servernames and free the got list
+//
+		for (int i = 0; i < server_list.length; ++i)
+		{
+			names_of_server.push_back(server_list.sequence[i]);
+			free(server_list.sequence[i]);
+		}
+		free(server_list.sequence);	
+//
+// Exist the new server in the list?
+// If not add it, else look for a running process with the got pid
+//
+		if (std::find(names_of_server.begin(), names_of_server.end(), newServer) == names_of_server.end())
+			names_of_server.push_back(newServer);
+		else if (this->getpid(proc, name) != 0)
+			return;
+//
+// Store the new list in the database 
+//	
+		server_list.length = names_of_server.size();
+		server_list.sequence = new char *[names_of_server.size()];
+		for (int i = 0; i < names_of_server.size(); ++i)
+		{
+			server_list.sequence[i] = new char[names_of_server[i].length() + 1];
+			strcpy(server_list.sequence[i], names_of_server[i].c_str());
+		}
+		if (db_putresource(const_cast<char *>(this->GetDevName()) , &server, 1, &error) == DS_OK)
+		{
+			pid_t	pid = fork();
+			if (pid == 0)
+			{
 #ifdef EBUG
-		std::cerr << "Start Child" << endl;
+				std::cerr << "Start Child" << endl;
 #endif
-		int 	fd = open("/dev/null", O_APPEND);
-		dup2(fd, fileno(stdout));
-		execlp(proc.c_str(), proc.c_str(), pers.c_str(), options.c_str(), NULL);
-		close(fd);
-		perror("Execute failed");
-		exit(0);
-//		throw long(DevErr_CantFindExecutable);
+				int 	fd = open("/dev/null", O_APPEND);
+				dup2(fd, fileno(stdout));
+				execlp(proc.c_str(), proc.c_str(), pers.c_str(), options.c_str(), NULL);
+				close(fd);
+				perror("Execute failed");
+				delete server_list.sequence[--server_list.length];
+				db_putresource(const_cast<char *>(this->GetDevName()) , &server, 1, &error);
+				exit(-1);
+			}
+			else if (pid < 0)
+				throw long(DevErr_NoProcessWithPid);
+			return;
+		}
+		for (int i = 0; i < server_list.length; ++i)
+			delete server_list.sequence[i];
+		delete server_list.sequence;
 	}
-	else if (pid < 0)
-		throw long(DevErr_NoProcessWithPid);
-	return;
+	throw error;
 }
 	
-void StarterDevice::deviceStop(pid_t pid)
+void StarterDevice::deviceStop(const std::string proc, const std::string pers)
 {
-	if (pid == getpid())
+	pid_t pid = this->getpid(proc, pers);
+	
+	if (pid != 0)
+		return;
+	if (pid == ::getpid())
 		throw long(DevErr_DeviceIllegalParameter);
 	if (kill(pid, SIGTERM))
 		switch (errno)
@@ -167,18 +231,24 @@ void StarterDevice::deviceStop(pid_t pid)
 	return;
 }
 
-void StarterDevice::deviceReStart(pid_t pid, string proc, string pers, string option, string param)
+void StarterDevice::deviceReStart(const std::string proc, const std::string pers, const std::string option, const std::string param)
 {
 	try
 	{
-		if (pid <= 1)
-			throw long(0);
-		this->deviceStop(pid);
+		this->deviceStop(proc, pers);
+		this->deviceRun(proc, pers, option, param);
 	}
 	catch (const long &e)
 	{
 	}
-	this->deviceRun(proc, pers, option, param);
 	return;
 }	
-	
+
+pid_t StarterDevice::getpid(const std::string proc, const std::string pers)
+{	
+	db_svcinfo_call	server_info;
+	long		error;
+	if (db_servinfo(const_cast<char *>(proc.c_str()), const_cast<char *>(pers.c_str()), &server_info, &error) == DS_OK)
+		return server_info.pid;
+	throw error;
+}
