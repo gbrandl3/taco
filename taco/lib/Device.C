@@ -12,9 +12,9 @@
 //
 // Original:	March 1995
 //
-// Version:	$Revision: 1.9 $
+// Version:	$Revision: 1.10 $
 //
-// Date:	$Date: 2004-03-09 09:35:48 $
+// Date:	$Date: 2004-09-21 15:38:20 $
 //
 //-**********************************************************************
 		
@@ -441,11 +441,12 @@ void Device::Get_event_number(unsigned int *cmd_nb)
 long Device::Event_Query(_dev_event_info *event_info,long *error)
 {
 	*error = DS_OK;
+	long	i = 0;
 
-	for (long i = 0;i < this->n_events;i++)
+        for (std::map<DevEvent, DeviceEventListEntry>::iterator it = this->events_list.begin(); it != this->events_list.end(); ++it, ++i)
 	{
-		event_info[i].event = this->events_list[i].event;
-		event_info[i].out_type = this->events_list[i].argType;
+		event_info[i].event = it->second.event;
+		event_info[i].out_type = it->second.argType;
 	}
 	return(DS_OK);
 }
