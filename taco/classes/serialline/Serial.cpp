@@ -1724,18 +1724,24 @@ long Serial::SerSetParameter ( void *vargin, void *vargout, long *error)
  termin.c_iflag		&= ~ICRNL;
  termin.c_iflag		&= ~INLCR;
  termin.c_iflag		&= ~IGNCR;
+#if !defined(DARWIN)
  termout.c_oflag	&= ~ONOCR;
+#endif
 
 	//
 	// Do not convert \n -> \r+\n or \r -> \n
 	//
  termout.c_oflag	&= ~ONLCR;
+#if !defined (DARWIN)
  termout.c_oflag	&= ~OCRNL;
+#endif
 
 	//
 	// Do not force column to 0 if \r or \n are sent
 	//
+#if !defined(DARWIN)
  termout.c_oflag	&= ~ONLRET;
+#endif
 
 	//
 	// Do not expand tabs to 8 spaces

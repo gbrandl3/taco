@@ -1,7 +1,7 @@
 noinst_HEADERS 		= Serial.h
 INCLUDES		= @TACO_INCLUDES@
 
-Serialds_LDADD		= @TACO_SERVER_LIBS@ $(top_builddir)/lib/libdsapig++.la
+Serialds_LDADD		= $(top_builddir)/lib/dbase/libdbapi.la $(top_builddir)/lib/xdr/libdsxdr.la $(top_builddir)/lib/libdsapig++.la
 
 bin_PROGRAMS 		= Serialds
 
