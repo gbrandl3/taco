@@ -2,7 +2,7 @@
 #
 #	File:		ResDatabase.py
 #
-#	Project:     	Automatic Beamline Alignement
+#	Project:     	Automatic Beamline Alignment
 #
 #	Description:	Generic interface class to the TACO database.
 #       
