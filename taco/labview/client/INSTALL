@@ -1,0 +1,13 @@
+ Installation 
+
+ In order for TACOSilvia to work you must have Qt and a working TACO environment and the Labview-TACO-Lib 
+ developed by Andy Götz (see TACO homepage http://www.esrf.fr/taco). 
+ 
+ Step 1:  Building the TACO-Labview-Lib:  
+ To build the Taco-Labview-Lib simply execute the Makefile in the labview/server/src/ sub-directory.
+ (Don't forget to adapt the correct Labview installation Path in the Makefile)
+ 
+ Step 2:  Building TACOSilvia:  
+ To build TACOSiliva ensure that all TACO and Qt environment variables are properly set 
+ and simply execute the Makefile in the labview/client/ subdirectory.
+ (Don't forget to adapt the correct Labview installation Path in the Makefile)
