@@ -11,7 +11,7 @@
 % Original:	March 1991
 %
 %
-% $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/doc/dev_gui.tex,v 1.1 2003-04-25 12:54:29 jkrueger1 Exp $
+% $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/doc/dev_gui.tex,v 1.2 2003-12-17 14:24:25 jkrueger1 Exp $
 %
 % Copyright (c) 1990 by European Synchrotron Radiation Facility, 
 %                       Grenoble, France
@@ -29,16 +29,14 @@ out and error window.
 
 This module contains several data structure definitions.
 
-%\sy{1}	{Internal data structures and variables}
 \paragraph{Internal data structures and variables : }
 
 \begin{itemize}
-\item
-{\bf dev\_icon\_structure : } the most important data structure defined in this
-module is "dev\_icon\_structure". This data structure is used to make the
-correspondence between a device and its associated icon and out and error  
- window on the screen. The
-device is represented in the data structure by its name. The icon associated
+\item {\bf dev\_icon\_structure : } 
+the most important data structure defined in this module is "dev\_icon\_structure". 
+This data structure is used to make the correspondence between a device and its 
+associated icon and out and error window on the screen. 
+The device is represented in the data structure by its name. The icon associated
 with the device is represented by three widget ids. An icon is a collection
 of two pushbuttons\footnote[1]{OSF/MOTIF concept : see OSF/MOTIF programmer's
 guide} one with a string label and the other one with a pixmap
@@ -46,36 +44,37 @@ label. These two pushbuttons are grouped within a row-column\footnotemark[1]
 widget. Therefore to identify completely the icon we need the row-column widget
 id, string pushbutton widget id and the pixmap pushbutton widget id. 
 In order to have the output arguments of an executed command and the errors
-received from the device servers together in the same paned window\footnotemark[1], the dialogue shell\footnotemark[1] widget id, the paned window\footnotemark[1] widget id and the two scrolled text\footnotemark[1] widget ids for the
+received from the device servers together in the same paned window\footnotemark[1], 
+the dialogue shell\footnotemark[1] widget id, the paned window\footnotemark[1] widget 
+id and the two scrolled text\footnotemark[1] widget ids for the
 output arguments and error messages are also needed in this data structure.
-This data
-structure is then used in an array in which each entry corresponds to one
+This data structure is then used in an array in which each entry corresponds to one
 device. This array is named "dev\_icon\_table" in the code.
-\item
-{\bf cmd\_gui\_struct : } the second data structure is used to pass all the
-information necessary for the execution of a command to a callback procedure.
-The information contained within this structure is~: the device name, the
-command name, the data type of the input argument and the reference of the
-widget containing the value of the input argument.
-\item
-{\bf gui\_out\_3\_fields\_struct : } the third data structure is used to
-transform the value of data made of two or three fields to two or three string
-fields. This data structure is particularly used when we want to display the
+
+\item {\bf cmd\_gui\_struct : } 
+the second data structure is used to pass all the information necessary for the execution 
+of a command to a callback procedure.  The information contained within this structure is~: 
+the device name, the command name, the data type of the input argument and the reference of 
+the widget containing the value of the input argument.
+
+\item {\bf gui\_out\_3\_fields\_struct : } 
+the third data structure is used to transform the value of data made of two or three fields 
+to two or three string fields. This data structure is particularly used when we want to display the
 value of an output data structure (2 or 3 fields only). In that case we
 transform it first into "gui\_out\_3\_fields\_struct" data structure before
 displaying it in the top part of the paned window.
-\item
-{\bf dev\_icon\_table : } this is the table which makes the correspondence
-between one device and its associated icon.
-\item
-{\bf current\_selected\_device\_index : } the index into the "dev\_icon\_table" 
-of the selected device. 
+
+\item {\bf dev\_icon\_table : } 
+this is the table which makes the correspondence between one device and its associated icon.
+
+\item {\bf current\_selected\_device\_index : } 
+the index into the "dev\_icon\_table" of the selected device. 
 \end{itemize}
 
 %\xs{1}
 
 %\sy{1}	{show\_opened\_device}
-\paragraph{show\_opened\_device : }
+\paragraph*{show\_opened\_device : }
 
 This function is called by the "xdevmenu.c" module when the user selects a
 device. 
@@ -87,8 +86,7 @@ label and another pushbutton widget with string label.
 It creates also a window used for the display of all the executed commands for
 this device together with the possible errors received from this device server.
 This window is made of a paned window\footnotemark[1].
-Then the
-references of the three widgets and the name of the opened device are inserted
+Then the references of the three widgets and the name of the opened device are inserted
 in the "dev\_icon\_table".
 
 What is very important to notice is the names attributed to the widgets. For
@@ -99,14 +97,10 @@ by appending the device type string with "\_pixmap" for the pixmap pushbutton
 and with "\_label" for string pushbutton.
 
 This naming convention allows the definition in the resource file of the 
-application
-a different bitmap name for each type of device. Therefore the image of the
+application a different bitmap name for each type of device. Therefore the image of the
 icon can vary from one device type to another.
 
-%\xs{1}
-
-%\sy{1}	{show\_list\_cmd\_names}
-\paragraph{show\_list\_cmd\_names : }
+\paragraph*{show\_list\_cmd\_names : }
 
 This function is called by the "xdevmenu.c" module when the user has selected
 the "execute command" function in the "edit" pulldown
@@ -125,10 +119,7 @@ input argument.
 This function has three input parameters~: the reference to the selection
 dialogue widget, the number of commands, and an array of command names.
 
-%\xs{1}
-
-%\sy{1}	{show\_cmd\_in\_param}
-\paragraph{show\_cmd\_in\_param : }
+\paragraph*{show\_cmd\_in\_param : }
 
 This function is called by the "xdevmenu.c" module when the user has asked
 for the execution of a command if that command has an input parameter.
@@ -145,10 +136,7 @@ The input parameters for "show\_cmd\_in\_param" are~: the device name,
 the command name, the name of the input argument for that command and the
 data type of the input argument.
 
-%\xs{1}
-
-%\sy{1}	{show\_cmd\_out\_param}
-\paragraph{show\_cmd\_out\_param : }
+\paragraph*{show\_cmd\_out\_param : }
 
 This function is called in a callback procedure when a command has been
 executed successfully on a device. This function is in charge of displaying
@@ -159,10 +147,7 @@ is that in this function we convert every data type to one or several strings
 and then another function (gui\_display\_arg\_out) is called to display them
 to the user. 
 
-%\xs{1}
-
-%\sy{1}	{remove\_selected\_device}
-\paragraph{remove\_selected\_device : }
+\paragraph*{remove\_selected\_device : }
 
 This function is called by "xdevmenu.c" module when the connection to a device
 has been closed, in order to remove its associated icon.
@@ -172,5 +157,4 @@ the useful variable "current\_selected\_device\_index". It then destroys the
 seven widgets stored at that index in the table and finally it frees the
 table entry.
 
-%\xs{1}
 

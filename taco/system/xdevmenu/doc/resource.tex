@@ -11,7 +11,7 @@
 % Original:	March 1991
 %
 %
-% $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/doc/resource.tex,v 1.1 2003-04-25 12:54:30 jkrueger1 Exp $
+% $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/doc/resource.tex,v 1.2 2003-12-17 14:24:25 jkrueger1 Exp $
 %
 % Copyright (c) 1990 by European Synchrotron Radiation Facility, 
 %                       Grenoble, France
@@ -23,10 +23,10 @@ The user is provided with an application default resources file named
 "XDevmenu". However the user can modify any of the resources defined in that
 file by redefining them in his own .Xdefaults file.
 
-\sy{1}	{Default file location}
+\subsubsection{Default file location}
 
 In most cases if the application is installed properly, this file
-should be located on leo in the "/usr/lib/X11/app-defaults" directory.
+should be located on leo in the "/usr/X11R6/lib/X11/app-defaults" directory.
 
 If the file is not found there, check the environment variable "XAPPLRESDIR"
 and the environment variable "LANG". If the variable "XAPPLRESDIR" is defined
@@ -34,9 +34,7 @@ correctly then make sure that the environment variable "LANG" is unset.
 
 Note that a man page is available on leo, whisky and mars and can be helpful to set all the environment variables correctly.
 
-\xs{1}
-
-\sy{1}	{Customising the application}
+\subsubsection{Customising the application}
 
 The user can redefine any of the resources defined in the application default
 file, but he should not try to modify the default resources file directly as
@@ -44,9 +42,7 @@ he has not the write access on that file. Instead, the user should define those
 resources he wants to modify in his home login resources file, called usually
 ".Xdefaults".
 
-\xs{1}
-
-\sy{1}	{Some of the most important resources}
+\subsubsection{Some of the most important resources}
 
 To know about all of the available resources, the user is invited to have a look
 at the application default resources file. In this section we describe only
@@ -79,7 +75,5 @@ bitmap file name used in the icons representing all devices of type
 "ANY\_DEVICE". This resource allows the user to define different icon images
 depending on the type of the device being opened.
 \end{itemize}
-
-\xs{1}
 
 

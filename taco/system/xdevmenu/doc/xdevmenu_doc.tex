@@ -11,7 +11,7 @@
 % Original:	March 1991
 %
 %
-% $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/doc/xdevmenu_doc.tex,v 1.1 2003-04-25 12:54:30 jkrueger1 Exp $
+% $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/doc/xdevmenu_doc.tex,v 1.2 2003-12-17 14:24:25 jkrueger1 Exp $
 %
 % Copyright (c) 1990 by European Synchrotron Radiation Facility, 
 %                       Grenoble, France
@@ -19,36 +19,61 @@
 %		       All Rights Reserved
 %
 %****************************************************************************/
-\documentstyle[12pt, ESRF]{article}
+\documentstyle[12pt,a4]{article}
+
 \begin{document}
 
-\Title{Xdevmenu Documentation} {Fran\c{c}oise Barale, Faranguiss Poncet}
+\title{Xdevmenu} 
+\author{Fran\c{c}oise Barale, Faranguiss Poncet}
+\titlepage
+\begin{abstract}
+\input	abstract
+\end{abstract}
+%% \disclaimer
 
-\input	abstr
-\disclaimer
-
-\TOC
+\pagenumbering{roman}   
+\setcounter{page}{0}    
+\newpage
+\tableofcontents
+\pagestyle{myheadings}
+\pagenumbering{arabic}  
+\setcounter{page}{0}    
 \newpage
 
-\sx{1}	{overview}	{Application overview}
-	\sx{2}	{fct_over}	{Overview of the functions}
-	\newpage
-	\sx{2}	{appli_ui}	{Application user interface}
-	\newpage
-	\sx{2}	{open_issues}	{Open issues}
 \newpage
-\sx{1}	{soft_doc}	{Software documentation}
-	\sx{2}	{appli_arch}	{Application architecture}
-	\newpage
-	\sx{2}	{modules_des}	{Modules description}
-\newpage
-\sx{1}	{user_guide}	{User's guide}
-	\sx{2}	{resource}	{The resources file}
-	\newpage
-	\sx{2}	{sample}	{A sample execution}
-\newpage
-\sx{1}  {appendix}      {Appendix A}
 
+\section{Application overview}
+\input overview	
+\subsection{Overview of the functions}
+\input fct_over
+\newpage
+\subsection{Application user interface}
+\input appli_ui	
+\newpage
+\subsection{Open issues}
+\input open_issues	
+
+\newpage
+\section{User's guide}
+\input user_guide
+\subsection{The resources file}	
+\input resource	
+\newpage
+\subsection{A sample execution}
+\input sample	
+
+\newpage
+\section{Software documentation}
+\input soft_doc	
+\subsection{Application architecture}
+\input appli_arch	
+\newpage
+\subsection{Modules description}
+\input modules_des	
+
+\newpage
+\appendix{Appendix}
+\input appendix
 
 \end{document}             % End of document.
 

@@ -11,7 +11,7 @@
 % Original:	March 1991
 %
 %
-% $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/doc/appli_arch.tex,v 1.1 2003-04-25 12:54:29 jkrueger1 Exp $
+% $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/doc/appli_arch.tex,v 1.2 2003-12-17 14:24:25 jkrueger1 Exp $
 %
 % Copyright (c) 1990 by European Synchrotron Radiation Facility, 
 %                       Grenoble, France
@@ -28,19 +28,17 @@ with other external components (libraries, other processes).
 The internal architecture shows the relationship of each of the internal
 application modules with each other and also with the external world.
 
-\sy{1}	{External architecture}
+\subsubsection{External architecture}
 
 This application will use the Motif libraries (Xm, Mrm) and Cern widgets
 library (libwsc) for the user interface part and it will use the device server
 libraries (libdsapi.a and libdbapi.a) for the operations concerning devices.
 
-Figure 1 represents the external architecture~:
+Figure 1 represents the external architecture:
 
 \input arch_ext_pic
 
-\xs{1}
-
-\sy{1}	{Internal architecture}
+\subsubsection{Internal architecture}
 
 Figure 2 represents the internal architecture :
 
@@ -70,6 +68,3 @@ the commands and the command arguments.
 It uses MOTIF libraries functions to provide this device graphical
 representation.
 \end{itemize}
-
-\xs{1}
-

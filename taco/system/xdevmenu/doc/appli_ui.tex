@@ -11,7 +11,7 @@
 % Original:	March 1991
 %
 %
-% $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/doc/appli_ui.tex,v 1.1 2003-04-25 12:54:29 jkrueger1 Exp $
+% $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/doc/appli_ui.tex,v 1.2 2003-12-17 14:24:25 jkrueger1 Exp $
 %
 % Copyright (c) 1990 by European Synchrotron Radiation Facility, 
 %                       Grenoble, France
@@ -33,7 +33,7 @@ menu-bar\footnotemark[2] containing the "File", "Edit", "Options" and
 In this section each function of the application is explained from the user
 interface point of view.
 
-\sy{1}	{Open Device function}
+\subsubsection{Open Device function}
 
 To open the connection to a device the user should do the following :
 \begin{enumerate}
@@ -51,9 +51,7 @@ opened device, will be displayed within the application main window, together
 with the window ( the so called output and error window ) displaying the output
 arguments and errors for that device.
 
-\xs{1}
-
-\sy{1}	{Execute Command function}
+\subsubsection{Execute Command function}
 
 To execute a command on a device the condition is that the device should have
 already been opened by the "Open Device" function. If so, the user should do the
@@ -79,9 +77,7 @@ parameters they are displayed in the same area.
 If the command is not executed successfully the error will be displayed in the 
 bottom part of the out and error window.
 
-\xs{1}
-
-\sy{1}	{Show State function}
+\subsubsection{Show State function}
 
 To ask for the state information on a device the condition is that the device
 should have already been opened by the "Open Device" function. If so, the user
@@ -98,10 +94,8 @@ The result of the command is displayed in the top part of the out and error
 window.
 If the command is not executed successfully the error will be displayed in the 
 bottom part of this same window. 
-\xs{1}
 
-
-\sy{1}  {Show Out Arguments function}
+\subsubsection{Show Out Arguments function}
 
 To ask for the output and error window of a device the condition is that the 
 device should have already been opened by the "Open Device" function. If so, 
@@ -116,10 +110,8 @@ Select the "Show Out Arguments" command from the "Edit" pulldown menu,
 
 The output and error window appears containing both the command history and 
 error messages for this device. 
-\xs{1}
 
-
-\sy{1}  {Show Status function}
+\subsubsection{Show Status function}
 To ask for the status information on a device the condition is that the device
 should have already been opened by the "Open device" function. If so, there is 
 no need to select the device first and the user should click only on the icon
@@ -129,10 +121,8 @@ The result of the status command is displayed in the top part of the out and
 error window.
 If the command is not executed successfully the error will be displayed in the
 bottom part of this same window.
-\xs{1}
 
-\sy{1}	{Close Device function}
-
+\subsubsection{Close Device function}
 To close a device the condition is that this device should, of course, have
 already been opened by the "Open Device" function. If so, the user should do the
 following :
@@ -148,16 +138,10 @@ If the user hasn't selected the device before closing, an error message will be
 displayed in an error dialog window\footnotemark[1]. Before closing the device 
 the user is asked to confirm his request. 
  
-\xs{1}
-
-\sy{1}	{Help function}
-
+\subsubsection{Help function}
 This help function will be added in a further implementation.
 
-\xs{1}
-
-\sy{1}	{Options modification function}
-
+\subsubsection{Options modification function}
 For the moment, the only options the user can modify (using this function) is
 the "device location" and "subdirectory filter" option. These options contain 
 the location (in terms of Unix file system directory) of the device names.
@@ -174,6 +158,4 @@ If required, fill in the "Subdirectory Filter :" field,
 \item
 Select the "Change location" button in the prompt window.
 \end{enumerate}
-
-\xs{1}
 
