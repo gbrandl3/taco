@@ -60,7 +60,7 @@ if test $# -gt 0 ; then
 			. $sysconfdir/tacoenv.sh
 			set_env
 			shift 1
-			$sbindir/dbm_server dbm `uname -n` ;;
+			$sbindir/dbm_server dbm `uname -n|cut -f1 -d'.'` ;;
 		ldd)
 			. $sysconfdir/tacoenv.sh
 			set_env

@@ -9,13 +9,13 @@ DISTCLEANFILES 		= System.log atconfig
 INCLUDES		= @TACO_INCLUDES@ @TACO_GDBM_INC@ 
 
 test_asc_stat_SOURCES 	= test_asc_stat.c
-test_asc_stat_LDADD 	= @TACO_CLIENT_LIBS@ @TACO_ASCII_LIBS@ -ldl
+test_asc_stat_LDADD 	= @TACO_CLIENT_LIBS@ @TACO_ASCII_LIBS@ 
 
-test_asc_dyn_LDADD 	= @TACO_CLIENT_LIBS@ -ldl 
+test_asc_dyn_LDADD 	= @TACO_CLIENT_LIBS@ 
 test_asc_dyn_SOURCES 	= test_asc_dyn.c
 
 test_tc_SOURCES 	= test_tc.c
-test_tc_LDADD		= @TACO_CLIENT_LIBS@ -ldl
+test_tc_LDADD		= @TACO_CLIENT_LIBS@ 
 
 EXTRA_DIST 		+= testsuite.at $(TESTSUITE_AT) testsuite package.m4
 
@@ -53,7 +53,7 @@ db_resmember_SOURCES 	= db_resmember.cpp
 db_resmember_LDADD 	= @TACO_CLIENT_LIBS@
 
 dev_ping_SOURCES 	= dev_ping.c
-dev_ping_LDADD 		= @TACO_CLIENT_LIBS@ -ldl
+dev_ping_LDADD 		= @TACO_CLIENT_LIBS@ 
 
 test_starter_SOURCES	= test_start.cpp
 test_starter_LDADD	= @TACO_CLIENT_LIBS@
