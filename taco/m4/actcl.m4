@@ -46,7 +46,7 @@ dnl
 		AC_MSG_RESULT(found $TCLCONFIG/tclConfig.sh)
 		. $TCLCONFIG/tclConfig.sh
 		TCL_PREFIX=`eval "echo $TCL_PREFIX"`
-		TCL_H=`find $TCL_PREFIX/include -type f -name tcl.h`
+		TCL_H=`find $TCL_PREFIX/include -type f -name tcl.h | grep $TCL_VERSION`
 		TCLINCLUDE="-I`dirname $TCL_H`"
 		TCLLIB=`eval "echo $TCL_LIB_SPEC"`
 	fi
