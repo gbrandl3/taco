@@ -4,7 +4,7 @@
 
  Version:	$Version$
 
- Date:		$Date: 2004-04-15 08:17:11 $
+ Date:		$Date: 2004-04-15 15:49:28 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -251,7 +251,9 @@ struct cmd_que{
 typedef struct cmd_que cmd_que;
 /* for event querys */
 struct event_que{
+/** The database error code 0 if no error */
 	int db_err;
+/** The event code. 0 if the database query fails */
 	u_int xevent_code;
 };
 typedef struct event_que event_que;
