@@ -18,4 +18,4 @@ EXTRA_DIST=autogen.sh taco.spec README-RPM
 
 include $(top_srcdir)/rpm_rules.mh
 
-
+DISTCLEANFILES = pathes.h
