@@ -194,6 +194,26 @@ long AGPowerSupply::ClassInitialise (long *error)
 AGPowerSupply::AGPowerSupply (char *name, long *error)
               :PowerSupply (name, error)
 {
+   static Device::DeviceCommandListEntry commands_list[] = {
+     {DevState, &Device::State, D_VOID_TYPE, D_SHORT_TYPE,0,"DevState"},
+     {DevStatus, (DeviceMemberFunction)(&AGPowerSupply::Status), D_VOID_TYPE, D_STRING_TYPE,0,"DevStatus"},
+     {DevOn, (DeviceMemberFunction)(&AGPowerSupply::On), D_VOID_TYPE, D_VOID_TYPE,0,"DevOn"},
+     {DevOff, (DeviceMemberFunction)&AGPowerSupply::Off, D_VOID_TYPE, D_VOID_TYPE,0,"DevOff"},
+     {DevSetValue, (DeviceMemberFunction)&AGPowerSupply::SetValue, D_FLOAT_TYPE, D_VOID_TYPE,0,"DevSetValue"},
+     {DevReadValue, (DeviceMemberFunction)&AGPowerSupply::ReadValue, D_VOID_TYPE, D_FLOAT_READPOINT,0,"DevReadValue"},
+     {DevReset, (DeviceMemberFunction)&AGPowerSupply::Reset, D_VOID_TYPE, D_VOID_TYPE,0,"DevReset"},
+     {DevError, (DeviceMemberFunction)&AGPowerSupply::Error, D_VOID_TYPE, D_VOID_TYPE,0,"DevError"},
+     {DevLocal, (DeviceMemberFunction)&AGPowerSupply::Local, D_VOID_TYPE, D_VOID_TYPE,0,"DevLocal"},
+     {DevRemote, (DeviceMemberFunction)&AGPowerSupply::Remote, D_VOID_TYPE,
+D_VOID_TYPE,0,"DevRemote"},
+     {DevUpdate, (DeviceMemberFunction)&AGPowerSupply::Update, D_VOID_TYPE,
+D_STATE_FLOAT_READPOINT,0,"DevUpdate"},
+     {DevHello, (DeviceMemberFunction)&AGPowerSupply::Hello, D_STRING_TYPE,
+D_SHORT_TYPE,0,"DevHello"},
+   };
+      static long n_commands = sizeof(commands_list)/
+                            sizeof(DeviceCommandListEntry);
+
 	printf("AGPowerSupply::AGPowerSupply called, name %s\n",name);
 //
 // check to see if AGPowerSupply::ClassInitialise has been called
@@ -214,31 +234,9 @@ AGPowerSupply::AGPowerSupply (char *name, long *error)
 // initialise the commands list to point to the commands list 
 // implemented for the AG PowerSupply class
 //
-        this->commands_map[DevState] = DeviceCommandMapEntry(DevState, (DeviceBaseMemberFunction)(&Device::State), 
-							D_VOID_TYPE, D_SHORT_TYPE, 0, "DevState");
-        this->commands_map[DevStatus] = DeviceCommandMapEntry(DevStatus, (DeviceBaseMemberFunction)(&AGPowerSupply::Status), 
-							D_VOID_TYPE, D_STRING_TYPE, 0, "DevStatus");
-        this->commands_map[DevOn] = DeviceCommandMapEntry(DevOn, (DeviceBaseMemberFunction)(&AGPowerSupply::On), 
-							D_VOID_TYPE, D_VOID_TYPE, 0, "DevOn");
-        this->commands_map[DevOff] = DeviceCommandMapEntry(DevOff, (DeviceBaseMemberFunction)&AGPowerSupply::Off, 
-							D_VOID_TYPE, D_VOID_TYPE, 0, "DevOff");
-        this->commands_map[DevSetValue] = DeviceCommandMapEntry(DevSetValue, (DeviceBaseMemberFunction)&AGPowerSupply::SetValue, 
-							D_FLOAT_TYPE, D_VOID_TYPE, 0, "DevSetValue");
-        this->commands_map[DevReadValue] = DeviceCommandMapEntry(DevReadValue, (DeviceBaseMemberFunction)&AGPowerSupply::ReadValue, 
-							D_VOID_TYPE, D_FLOAT_READPOINT, 0, "DevReadValue");
-        this->commands_map[DevReset] = DeviceCommandMapEntry(DevReset, (DeviceBaseMemberFunction)&AGPowerSupply::Reset, 
-							D_VOID_TYPE, D_VOID_TYPE, 0, "DevReset");
-        this->commands_map[DevError] = DeviceCommandMapEntry(DevError, (DeviceBaseMemberFunction)&AGPowerSupply::Error, 
-							D_VOID_TYPE, D_VOID_TYPE, 0, "DevError");
-        this->commands_map[DevLocal] = DeviceCommandMapEntry(DevLocal, (DeviceBaseMemberFunction)&AGPowerSupply::Local, 
-							D_VOID_TYPE, D_VOID_TYPE, 0, "DevLocal");
-        this->commands_map[DevRemote] = DeviceCommandMapEntry(DevRemote, (DeviceBaseMemberFunction)&AGPowerSupply::Remote, 
-							D_VOID_TYPE, D_VOID_TYPE, 0, "DevRemote");
-        this->commands_map[DevUpdate] = DeviceCommandMapEntry(DevUpdate, (DeviceBaseMemberFunction)&AGPowerSupply::Update, 
-							D_VOID_TYPE, D_STATE_FLOAT_READPOINT, 0, "DevUpdate");
-        this->commands_map[DevHello] = DeviceCommandMapEntry(DevHello, (DeviceBaseMemberFunction)&AGPowerSupply::Hello, 
-							D_STRING_TYPE, D_SHORT_TYPE, 0, "DevHello");
-		this->n_commands = this->commands_map.size(); 
+   this->n_commands = n_commands;
+   this->commands_list = commands_list;
+
 //
 // initialise new AGPowerSupply with template, (this could 
 // also be done by overloading the operator=)
@@ -256,7 +254,8 @@ AGPowerSupply::AGPowerSupply (char *name, long *error)
 	this->set_u_limit = agps_template->set_u_limit;
 	this->set_l_limit = agps_template->set_l_limit;
 	this->polarity = agps_template->polarity;
-*/
+ */
+
 
 //
 // initialise powersupply with values defined in database
