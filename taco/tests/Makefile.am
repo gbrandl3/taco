@@ -31,7 +31,8 @@ check_PROGRAMS 		= db_connect db_resget db_resput db_getdevexp \
 			db_devlist db_devperslist dev_export dev_import \
 			db_serverlist db_hostlist db_dsonhost \
 			test_asc_dyn test_asc_stat test_tc test_starter \
-			dev_cmdquery dev_conparams
+			dev_cmdquery dev_conparams \
+			test_server test_client
 
 check_SCRIPT		= taco
 
@@ -127,4 +128,13 @@ atconfig:	$(top_builddir)/config.status
 
 clean-local:
 	$(SHELL) $(TESTSUITE) --clean
+
+noinst_HEADERS		= test_server.h test_serverP.h
+
+test_server_SOURCES 	= test_server.cpp
+test_server_LDADD 	= @TACO_SERVER_CXX_LIBS@ 
+
+test_client_SOURCES 	= test_client.cpp
+test_client_LDADD 	= @TACO_CLIENT_CXX_LIBS@ 
+
 

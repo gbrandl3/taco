@@ -146,3 +146,23 @@ db_devmember test device
 ]])
 AT_CLEANUP
 
+
+AT_SETUP([check db_export and db_servunreg])
+AT_DATA([test_server.res], [[
+test_server/1/device:	test/a/1
+]])
+AT_CHECK([
+RES_BASE_DIR=`pwd` taco db_update test_server.res
+AT_TACO_RUN_LOCAL
+db_devperslist test_server
+test_server 1 &
+sleep 5
+killall test_server
+sleep 1
+test_server 1 &
+sleep 5
+killall test_server
+], [], [[1
+]])
+AT_CLEANUP
+
