@@ -13,51 +13,50 @@
 
  Original   :   January 1991
 
- Version    :	$Revision: 1.4 $
+ Version    :	$Revision: 1.5 $
 
- Date       :	$Date: 2004-02-19 15:47:03 $
+ Date       :	$Date: 2004-03-05 15:07:00 $
  
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
 
  *-*******************************************************************/
-
+#include "config.h"
 #define PORTMAP
 
 #include <macros.h>
 #include <db_setup.h>
 #include <db_xdr.h>
+#include <API.h>
+#include <DevErrors.h>
 
 #if defined(_NT)
-#include <API.h>
-#include <ApiP.h>
-#include <DevErrors.h>
-#include <rpc.h>
-#if 0
-#include <nm_rpc.h>
-#endif
-
-
+#	include <ApiP.h>
+#	include <rpc.h>
+#	if 0
+#		include <nm_rpc.h>
+#	endif
 #else
-#include <API.h>
-#include <private/ApiP.h>
-#include <DevErrors.h>
-
-#ifdef _OSK
-#include <inet/socket.h>
-#include <inet/netdb.h>
-#include <strings.h>
-#else
-#include <string.h>
-#include <sys/socket.h>
-#ifndef vxworks
-#include <netdb.h>
-#else
-#include <hostLib.h>
-#include <taskLib.h>
-#endif
-#include <unistd.h>
-#endif /* _OSK */
+#	include <private/ApiP.h>
+#	ifdef _OSK
+#		include <inet/socket.h>
+#		include <inet/netdb.h>
+#		include <strings.h>
+#	else
+#		include <string.h>
+#		if HAVE_SYS_SOCKET_H
+#			include <sys/socket.h>
+#		else
+#			include <socket.h>
+#		endif
+#		if HAVE_NETDB_H
+#			include <netdb.h>
+#		else
+#			include <hostLib.h>
+#			include <taskLib.h>
+#		endif
+#		include <unistd.h>
+#	endif /* _OSK */
 #endif	/* _NT */
 
 #ifndef OSK
@@ -111,8 +110,9 @@ extern nethost_info *multi_nethost;
 
 
 /**@ingroup dbaseAPI
- * To retrieve a resource value. The resource value is stored as a atring in a 
- * database on a remote computer
+ * This function retrieve resources from the database, convert them to the desired type and 
+ * store them at the right place. A resource value is stored as a atring in a database on a 
+ * remote computer.
  *
  * @param dev_name	A pointer to a string which defines the device name
  * @param res		A pointer to an array of db_resource structure defining the
@@ -1220,8 +1220,9 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long 
 
 
 /**@ingroup dbaseAPI
- * To update or insert a resource value. The resource 
- * value is stored as a string in a database on a remote computer
+ * This function update already defined resource(s) or add new resources(s) if it (they) 
+ * do(es) not exist. Resource files are not updated by this function. It is not possible
+ * to update/insert resource(s) belonging to teh SEC domain.
  * 
  * @param dev_name 	a string which defines the device name
  * @param res      	A pointer to an array of db_resource structure defining the 
@@ -2220,9 +2221,10 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 
 
 
-/*
- * To delete resources. The resource value is stored as a atring in a 
- * database on a remote computer
+/**@ingroup dbaseAPI
+ * This function allows a user to remove resources from the database. The resource file
+ * where the resource was initially defined is not updated. It is not possible to delete
+ * resource(s) from the SEC domain with this function.
  *
  * @param dev_name	a string which defines the device name
  * @param res_name      an array of string defining the resource to be deleted
@@ -2234,7 +2236,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
  *
  * @see db_delreslist
  */
-int _DLLFunc db_delresource(char *dev_name,char **res_name,u_int res_num,long *perr)
+int _DLLFunc db_delresource(char *dev_name, char **res_name, u_int res_num, long *perr)
 {
 	int i,j,k,l;
 	arr1 send;
@@ -2650,9 +2652,8 @@ long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
 
 
 /**@ingroup dbaseAPI
- * To retrieve the deices names of the devices driven by
- * a device server. These informations can be found in a
- * database in a remote computer
+ * This function returns to the caller the device list for the device server with the
+ * full device server name ds_full_name.
  *
  * @param name		The name of the device server
  * @param tab		the string's array, where the found devices are stored in
@@ -2663,7 +2664,7 @@ long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
  * 	pointed to by "perr". Otherwise, the function returns DS_OK
  *
  */
-int _DLLFunc db_getdevlist(char *name,char ***tab, u_int *num_dev,long *perr)
+int _DLLFunc db_getdevlist(char *name, char ***tab, u_int *num_dev,long *perr)
 {
 	char *name1;
 	db_res *recev;
@@ -2854,18 +2855,23 @@ int _DLLFunc db_getdevlist(char *name,char ***tab, u_int *num_dev,long *perr)
 
 
 /**@ingroup dbaseAPI
- * To export a device. This means that after this function
- * has been executed by a device server,
- * a client is able to ask for host name,  		
- * program number and version number of the device server
- * in charge of a device.These three informations are
- * stored in a database
+ * This function stores into the database the network parameters for a device or a
+ * group of devices. The network parameters are all the informations needed by the
+ * RPC to build a connection between a client and the device server in charge of a
+ * device.
+ * This means that after this function has been executed by a device server, a client 
+ * is able to ask for 
+ * @li host name
+ * @li program number 
+ * @li version number of the device server in charge of a device.
+
+ * These informations are stored in a database
  *
  * This function is now supported in version 1,2 and 3
  *
  * The version 2 also send the process ID to the database server
- * The version 3 also send the device server process name
- * to the database. This is useful for multi-classes device server.
+ * The version 3 also send the device server process name to the database. This is 
+ * useful for multi-classes device server.
  *
  * @param devexp	an array of db_devinf structures defining the
  *               	devices to be exported
@@ -3368,10 +3374,13 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
  
 
 
-/*
- * To import a device. This means to ask for the host name
- * the program number and the version number of the device
+/**@ingroup dbaseAPI
+ * This function returns all the necessary parameters to buld RPC connection beween a client 
+ * and the device server in charge of a device. 
+ * This means to ask for the host name, the program number, and the version number of the device
  * server which drives a device.
+ * 
+ * It allows to retrieve thes RPC's information for several devices at the same time.
  *
  * @param name	 	an array of pointers to strings. Each string
  *               	contains the name of a device to be imported.
@@ -3662,8 +3671,9 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 
 
 /**@ingroup dbaseAPI
- * To unregister devices from database (to deinitialize
- * the host name, program number and version number for
+ * This unregisters (mark device(s) as not exported) for all the device(s) served by the 
+ * device server ds_name started with the personal name pers_name.
+ * (to deinitialize the host name, program number and version number for
  * all the devices driven by a device server)
  *
  * @param ds_netnam 	a string which contains the device server network name.
@@ -3672,7 +3682,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
  * @return   In case of trouble, the function returns DS_NOTOK and set the err variable
  *    pointed to by "perr". Otherwise, the function returns DS_OK
  */
-int _DLLFunc db_svc_unreg(char *ds_netnam,long *perr)
+int _DLLFunc db_svc_unreg(char *ds_netnam, long *perr)
 {
 	int i,j,k;
 	int *pdb_err;
@@ -3820,10 +3830,8 @@ int _DLLFunc db_svc_unreg(char *ds_netnam,long *perr)
 
 
 /**@ingroup dbaseAPI
- * To send back to the user the program numberand the
- * version number of a device server (to allow him to
- * test if the device server has not been killed by an
- * OS-9 kill)
+ * This function returns host name, program number and version number of the first 
+ * device found in the database for the device server with the full name ds_full_name.
  *
  * @param ds_netname	a string which contains the device server
  *               	network name.
@@ -3836,7 +3844,7 @@ int _DLLFunc db_svc_unreg(char *ds_netnam,long *perr)
  *    	pointed to by "perr". Otherwise, the function returns DS_OK
  *
  */
-int _DLLFunc db_svc_check(char *ds_netname,char **pho_name, u_int *pp_num, u_int *pv_num,long *perr)
+int _DLLFunc db_svc_check(char *ds_netname, char **pho_name, u_int *pp_num, u_int *pv_num,long *perr)
 {
 	int i,j,k;
 	svc_inf *back;
@@ -4007,8 +4015,9 @@ int _DLLFunc db_svc_check(char *ds_netname,char **pho_name, u_int *pp_num, u_int
 
 #ifndef _OSK
 /**@ingroup dbaseAPI
- * To retrieve the exported device names. These
- * information can be found in a databse on a remote computer
+ * This function allows a user to get the name of exported (and then ready to accept
+ * command) devices. With the filter parameter, it is possible to limit the devices
+ * name return by the function. This function is not available for OS-9 client.
  *
  * @param filter	A filter to select the exported device names.
  * @param tab		the string's array containing the found exported devices
@@ -4018,7 +4027,7 @@ int _DLLFunc db_svc_check(char *ds_netname,char **pho_name, u_int *pp_num, u_int
  * @return   In case of trouble, the function returns DS_NOTOK and set the err varaible
  *    pointed to by "perr". Otherwise, the function returns DS_OK
  */
-int _DLLFunc db_getdevexp(char *filter,char ***tab, u_int *num_dev,long *perr)
+int _DLLFunc db_getdevexp(char *filter, char ***tab, u_int *num_dev,long *perr)
 {
 	char *filter1;
 	register db_res *recev;
@@ -4583,9 +4592,10 @@ int test_star(char *filter)
 
 
 
-/*
- * To free all the memory needed by the db_getdevexp
- * function (essentially allocated by XDR routines)
+/**@ingroup dbaseAPI
+ * The @ref db_getdevexp function can return a lot of device names and allocate memory
+ * to store them. This call is a local call and frees all the memory allocated by the
+ * db_getdevexp funtion.
  *
  * @param ptr The pointer to the array of exported device name strings.
  *   This pointer must have been initialized by a db_getdevexp function.
@@ -4672,7 +4682,8 @@ int _DLLFunc db_freedevexp(char **ptr)
 
 
 /**@ingroup dbaseAPI
- * To retrieve, from the database, the code associated to a command string
+ * The static database is also used to store (as resources) command name associated to command code
+ * (in the CMD domain). This function returns the command code associated to a command name.
  *
  * @param cmd_name	The command name
  * @param cmd_code	The command code
@@ -4808,8 +4819,9 @@ int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code,long *perr)
 
 
 /**@ingroup dbaseAPI
- * To retrieve, from the database, the code associated to a event string	
- * 
+ * The static database is also used to store (as resources) event name associated to event code
+ * (in the EVENT domain). This function returns the event code associated to a event name.
+ *
  * @param event_name	The event name					
  * @param event_code	The event code					
  * @param perr		The error caode in case of trouble
@@ -4817,8 +4829,7 @@ int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code,long *perr)
  * @return   In case of trouble, the function returns DS_NOTOK and set the err variable
  *    pointed to by "perr". Otherwise, the function returns DS_OK
  */
-
-int _DLLFunc db_event_query(char *event_name, u_int *event_code,long *perr)
+int _DLLFunc db_event_query(char *event_name, u_int *event_code, long *perr)
 {
 	int i;
 	event_que *serv_ans;
@@ -4947,7 +4958,10 @@ int _DLLFunc db_event_query(char *event_name, u_int *event_code,long *perr)
 
 
 /**@ingroup dbaseAPI
- * To register pseudo devices in the static database
+ * This function is used to register pseudo devices into the database. This feature
+ * has been implemented only for control system debug purpose. It helps the debugger
+ * to know which process has created pseudo devices and on which computer they are
+ * running.
  *
  * @param psdev		The array of pseudo devices information structures
  *               	In each structure, the caller initialize the pseudo device
@@ -5152,7 +5166,7 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
 
 
 /**@ingroup dbaseAPI
- * To unregister pseudo devices from the static database
+ * This function is used to unregister pseudo devices from the database.
  *
  * @param psdev_list	The pseudo devices name list
  * @param num_psdev	The pseudo devices number
@@ -5344,7 +5358,10 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 
 
 /**@ingroup dbaseAPI
- * To close the open connection of the database server to the database
+ * This function asks the database server to close all the files needed to store 
+ * database data (the ndbm files) allowing another process to open these files.
+ * When this function is called, no further call to database server will work until
+ * the  @ref db_svc_reopen function will be executed.
  *
  * @param perr	The error code
  * 
@@ -5433,7 +5450,7 @@ int _DLLFunc db_svc_close(long *perr)
 
 
 /**@ingroup dbaseAPI
- * To reopen the database and the database tables in the database server.
+ * This function asks the database server to reopen database files.
  * 
  * @param perr	The error code
  * 

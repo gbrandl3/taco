@@ -14,48 +14,48 @@
 
  Original   :   April 1997
 
- Version:       $Revision: 1.2 $
+ Version:       $Revision: 1.3 $
 
- Date:          $Date: 2003-05-16 13:40:27 $
+ Date:          $Date: 2004-03-05 15:07:00 $
 
  Copyright (c) 1997 by European Synchrotron Radiation Facility,
                        Grenoble, France
 
 
  *-*******************************************************************/
-
+#include "config.h"
 #define PORTMAP
 
 #include <macros.h>
 #include <db_setup.h>
 #include <db_xdr.h>
 
+#include <API.h>
+#include <DevErrors.h>
 #if defined(_NT)
-#include <API.h>
-#include <ApiP.h>
-#include <DevErrors.h>
-#include <nm_rpc.h>
-
+#	include <ApiP.h>
+#	include <nm_rpc.h>
 #else
-#include <API.h>
-#include <private/ApiP.h>
-#include <DevErrors.h>
-
-#ifdef _OSK
-#include <inet/socket.h>
-#include <inet/netdb.h>
-#include <strings.h>
-#else
-#include <string.h>
-#include <sys/socket.h>
-#ifndef vxworks
-#include <netdb.h>
-#else
-#include <hostLib.h>
-#include <taskLib.h>
-#endif
-#include <unistd.h>
-#endif /* _OSK */
+#	include <private/ApiP.h>
+#	ifdef _OSK
+#		include <inet/socket.h>
+#		include <inet/netdb.h>
+#		include <strings.h>
+#	else
+#		include <string.h>
+#		if HAVE_SYS_SOCKET_H
+#			include <sys/socket.h>
+#		else
+#			include <socket.h>
+#		endif
+#		if HAVE_NETDB_H
+#			include <netdb.h>
+#		else
+#			include <hostLib.h>
+#			include <taskLib.h>
+#		endif
+#		include <unistd.h>
+#	endif /* _OSK */
 #endif	/* _NT */
 
 #ifndef OSK
@@ -87,10 +87,16 @@ static struct timeval timeout_browse={60,0};
 
 
 /**@ingroup dbaseAPI
- * To get device information from the database	
+ * This function returns to the caller a structure with many device informations.
+ * These informations are
+ * @li the name of the server in charge of the device
+ * @li the host where it is running
+ * @li the device server program number
+ * @li the device class,
+ * @li ...
  *									
  * @param dev_name	Device name
- * @param p_domain_nb 	Pointer for domain number			
+ * @param p_info 	Pointer for device informations			
  * @param p_error 	Pointer for the error code in case of problems
  *
  * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
@@ -267,18 +273,19 @@ long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info,long *p_error)
 
 
 /**@ingroup dbaseAPI
- * To retrieve the list of resources for a given device
+ * This function returns to the caller the list of all resources for a list of devices. The resources are
+ * returned as string(s) with the following syntax: "device name/resource name : resource value".
  *
- * @param dev_name 	The device name				
- * @param p_family_nb 	Pointer for family number			
- * @param ppp_list 	Pointer for the family name list. Memory is
- *			allocated by this function		    	
+ * @param dev_nb 	The number of device name(s)				
+ * @param dev_name_list The device name list			
+ * @param p_res_nb	The number of resource(s) 
+ * @param ppp_list	Resource(s) list (allocated by this function)
  * @param p_error 	Pointer for the error code in case of problems
  *
  * @return    	In case of trouble, the function returns DS_NOTOK and set the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_deviceres(long dev_nb,char **dev_name_list,long *p_res_nb,char ***ppp_list,long *p_error)
+long db_deviceres(long dev_nb, char **dev_name_list, long *p_res_nb, char ***ppp_list, long *p_error)
 {
 	db_res *recev;
 	int i,j,k;
@@ -525,7 +532,7 @@ long db_deviceres(long dev_nb,char **dev_name_list,long *p_res_nb,char ***ppp_li
 
 
 /**@ingroup dbaseAPI
- * To delete a device (or a pseudo device) from the database						
+ * This function deletes a (pseudo) device from the list of devices registered in the database.
  *									
  * @param dev_name 	Device name
  * @param p_error 	Pointer for the error code in case of problems
@@ -686,7 +693,7 @@ long db_devicedelete(const char *dev_name,long *p_error)
 
 
 /**@ingroup dbaseAPI
- * To delete all resources belonging to a device list	
+ * This function deletes all the resources belonging to a list of devices from the database.	
  *									
  * @param dev_nb  	The device name number				
  * @param dev_name_list The device name list
@@ -881,7 +888,10 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 
 
 /**@ingroup dbaseAPI
- * To retrieve global database information		
+ * This function returns the database global informations as
+ * @li the number of exported devices defined in the database
+ * @li the number of resources defined for each device domain
+ * @li ...
  *
  * @param p_info 	Pointer to the structure where all the info will be
  *		        stored. These info are the number of devices defined in the 
@@ -1069,8 +1079,8 @@ long db_stat(db_stat_call *p_info,long *p_error)
 
 
 /**@ingroup dbaseAPI
- * To unregister a server from the database. This will update all the server 
- * devices has been not exported
+ * This function marks all devices driven by the device server with a full name ds_full_name
+ * as not exported devices.
  *
  * @param ds_name  	The device server name			
  * @param pers_name 	The device server personal name		
@@ -1265,8 +1275,12 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 
 
 /**@ingroup dbaseAPI
- * To device server information to the caller. These info are the device list, 
- * the server process name and its pid plus the host name
+ * This function returns miscellaneous informations for a device server started with
+ * a personal name. These informations are
+ * @li the number and name of device served by the server
+ * @li the device server process name
+ * @li the process id (PID) of the server process
+ * @li the host name where the server process is running
  *
  * @param ds_name 	The device server name			
  * @param pers_name 	The device server personal name		
@@ -1276,8 +1290,7 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
  * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_servinfo(const char *ds_name,const char *pers_name, \
-		 db_svcinfo_call *p_inf,long *p_error)
+long db_servinfo(const char *ds_name,const char *pers_name, db_svcinfo_call *p_inf, long *p_error)
 {
 	svcinfo_svc *recev;
 	int i,j,k;
@@ -1520,7 +1533,8 @@ long db_servinfo(const char *ds_name,const char *pers_name, \
 
 
 /**@ingroup dbaseAPI
- * To delete all the devices belonging to a device server in the static database				
+ * This function deletes a device server from the database and if needed, all the server
+ * device resources.
  *
  * @param ds_name  	The device server name			
  * @param pers_name 	The device server personal name		
@@ -1530,8 +1544,7 @@ long db_servinfo(const char *ds_name,const char *pers_name, \
  * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_servdelete(const char *ds_name,const char *pers_name, \
-		   long delres_flag,long *p_error)
+long db_servdelete(const char *ds_name,const char *pers_name, long delres_flag, long *p_error)
 {
 	long *recev;
 	int i,j,k;
@@ -1713,7 +1726,12 @@ long db_servdelete(const char *ds_name,const char *pers_name, \
 
 
 /**@ingroup dbaseAPI
- * To get poller information from a device name	
+ * This function returns to the caller informations about the device poller in charge
+ * of a device. A poller is a process in charge of "polling" the device in order to
+ * store device command result into the TACO data collector. The poller informations are
+ * @li the poller name
+ * @li the host where it is running
+ * @li ...
  *									
  * @param dev_name  	Device name
  * @param poll 		Pointer to the structure where poller info will be
@@ -1899,7 +1917,7 @@ long db_getpoller(const char *dev_name,db_poller *poll,long *p_error)
  * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_initcache(const char *domain,long *p_error)
+long db_initcache(const char *domain, long *p_error)
 {
 	long *recev;
 	int i,k;

@@ -14,51 +14,50 @@
 
  Original   :   December 1997
 
- Version    :	$Revision: 1.2 $
+ Version    :	$Revision: 1.3 $
 
- Date	    :	$Date: 2003-05-16 13:40:27 $
+ Date	    :	$Date: 2004-03-05 15:06:54 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
 
  *-*******************************************************************/
-
+#include "config.h"
 #define PORTMAP
 
 #include <macros.h>
 #include <db_setup.h>
 #include <db_xdr.h>
 
+#include <API.h>
+#include <DevErrors.h>
 #if defined(_NT)
-#include <API.h>
-#include <ApiP.h>
-#include <DevErrors.h>
-#include <rpc.h>
-
+#	include <ApiP.h>
+#	include <rpc.h>
 #else
-#include <API.h>
-#include <private/ApiP.h>
-#if 0
-#include <ApiP.h>
-#endif
-
-#include <DevErrors.h>
-
-#ifdef _OSK
-#include <inet/socket.h>
-#include <inet/netdb.h>
-#include <strings.h>
-#else
-#include <string.h>
-#include <sys/socket.h>
-#ifndef vxworks
-#include <netdb.h>
-#else
-#include <hostLib.h>
-#include <taskLib.h>
-#endif
-#include <unistd.h>
-#endif /* _OSK */
+#	include <private/ApiP.h>
+#	if 0
+#		include <ApiP.h>
+#	endif
+#	ifdef _OSK
+#		include <inet/socket.h>
+#		include <inet/netdb.h>
+#		include <strings.h>
+#	else
+#		include <string.h>
+#		if HAVE_SYS_SOCKET_H
+#			include <sys/socket.h>
+#		else
+#			include <socket.h>
+#		endif
+#		if HAVE_NETDB_H
+#			include <netdb.h>
+#		else
+#			include <hostLib.h>
+#			include <taskLib.h>
+#		endif
+#		include <unistd.h>
+#	endif /* _OSK */
 #endif	/* _NT */
 
 #ifndef OSK
@@ -83,7 +82,8 @@ static struct timeval timeout_browse={60,0};
 
 
 /**@ingroup dbaseAPI
- * To retrieve the list of devices  domain  name
+ * This function returns to the caller a list of domain used for all devices defined
+ * in the database.
  * 
  * @param p_domain_nb 	Pointer for domain number
  * @param ppp_list  	Pointer for the domain name list. Memory is 
@@ -265,8 +265,8 @@ long db_getdevdomainlist(long *p_domain_nb,char ***ppp_list,long *p_error)
 
 
 /**@ingroup dbaseAPI
- * 
- * To retrieve the list of devices family name when the domain name is known
+ * This function returns to the caller a list of families for all devices defined in the 
+ * database with the first field set to a given domain name.
  * 
  * @param domain 	The domain name
  * @param p_family_nb 	Pointer for family number returned
@@ -470,7 +470,8 @@ long db_getdevfamilylist(char *domain,long *p_family_nb,char ***ppp_list,long *p
 
 
 /**@ingroup dbaseAPI
- * To retrieve the list of devices member name when the domain and family names are known
+ * This function returns to the caller a list of members for all devices defined in the database with
+ * the first field name set to a given domain and the second field name set to a given family.
  *
  * @param domain 	The domain name
  * @param family 	The family name
@@ -701,7 +702,8 @@ long db_getdevmemberlist(char *domain,char *family,long *p_member_nb,
 
 
 /**@ingroup dbaseAPI
- * To retrieve the list of resources  domain  name
+ * This function returns to the caller a list of domain used for all resources defined in the
+ * database.
  * 
  * @param p_domain_nb : Pointer for domain number
  * @param ppp_list : Pointer for the domain name list. Memory is allocated by this function
@@ -881,7 +883,8 @@ long db_getresdomainlist(long *p_domain_nb,char ***ppp_list,long *p_error)
 
 
 /**@ingroup dbaseAPI
- * To retrieve the list of resources family name when the domain name is known
+ * This function returns to the caller a list of families for all resources defined in the 
+ * database with the first field name set to a given domain name.
  *
  * @param domain 	The domain name
  * @param p_family_nb 	Pointer for family number
@@ -1084,7 +1087,8 @@ long db_getresfamilylist(char *domain,long *p_family_nb,char ***ppp_list,long *p
 
 
 /**@ingroup dbaseAPI
- * To retrieve the list of resources member name when the domain and family names are known
+ * This function returns to the caller a list of members for all resources defined in the database
+ * with the first field name set to a given domain and the second field name set to a given family.
  *
  * @param domain 	The domain name
  * @param family 	The family name
@@ -1321,7 +1325,8 @@ long db_getresmemberlist(char *domain,char *family,long *p_member_nb, \
 
 
 /**@ingroup dbaseAPI
- * To retrieve the list of resources name when the domain, family and member names are known
+ * This function returns to the caller a list of resources name for all resources defined in the database
+ * for a device with a specified domain, family, and member field name.
  *
  * @param domain  	The domain name
  * @param family  	The family name
@@ -1577,12 +1582,13 @@ long db_getresresolist(char *domain,char *family,char *member, \
 
 
 /**@ingroup dbaseAPI
- * To retrieve resource value when domain,family,member
- * and resource name are provided. Member and/or resource
- * names can be the wildcard "*". Resources are returned
- * in the following syntax:
+ * This function returns to the caller a list of resource values for all resource with
+ * a domain, family, member, and name specified in the first four function parameters.
+ * Member and resource field name can be set to wildcard (*).
+ * Resources are returned in the following syntax:
  *
  * domain/family/member/resource: resource_value
+ * 
  * If the wildcard is not used, only one resource value is returned.
  * If the wildcard is used, this call could return many data, use a TCP connection for 
  * this call 
@@ -1877,7 +1883,7 @@ long db_getresresoval(char *domain,char *family,char *member,char *resource, \
 
 
 /**@ingroup dbaseAPI
- * To retrieve the list of devices server
+ * This function returns to the caller a list of device server executeable name.
  * 
  * @param p_server_nb  	Pointer for server number returned
  * @param ppp_list  	Pointer for the server name list. Memory is allocated by this function
@@ -2056,7 +2062,8 @@ long db_getdsserverlist(long *p_server_nb,char ***ppp_list,long *p_error)
 
 
 /**@ingroup dbaseAPI
- * To retrieve the list of devices server personal name when the device server name is known
+ * This function returns to the caller a list of devices server personal name for device server
+ * with a given executeable name.
  * 
  * @param server 	The device server name
  * @param p_pers_nb 	Pointer for personal name number
@@ -2259,7 +2266,7 @@ long db_getdspersnamelist(char *server,long *p_pers_nb,char ***ppp_list,long *p_
 
 
 /**@ingroup dbaseAPI
- * To retrieve the list of host where device server should run
+ * This function returns to the caller a list of host name where device server should run.
  *
  * @param p_host_nb  	Pointer for host number returned
  * @param ppp_list  	Pointer for the host name list. Memory is allocated by this function
@@ -2438,7 +2445,7 @@ long db_gethostlist(long *p_host_nb,char ***ppp_list,long *p_error)
 
 
 /**@ingroup dbaseAPI
- * To a list of device server which should run on a host
+ * This function returns to the caller a list of device server which should run on the specified host.
  *
  * @param host  	The host name
  * @param p_ds_nb  	Pointer or the device server list number returned
@@ -2448,7 +2455,7 @@ long db_gethostlist(long *p_host_nb,char ***ppp_list,long *p_error)
  * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_getdsonhost(char *host,long *p_ds_nb,db_svc **ds_list,long *p_error)
+long db_getdsonhost(char *host, long *p_ds_nb, db_svc **ds_list,long *p_error)
 {
 	db_svcarray_net *recev;
 	char *host_sent;

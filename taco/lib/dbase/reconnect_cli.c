@@ -13,15 +13,15 @@
 
  Original   :   September 1998
   
- Version    :	$Revision: 1.3 $
+ Version    :	$Revision: 1.4 $
 
- Date	    : 	$Date: 2003-12-09 13:38:28 $
+ Date	    : 	$Date: 2004-03-05 15:07:00 $
 
  Copyright (c) 1998 by European Synchrotron Radiation Facility,
                        Grenoble, France
   
  *-*******************************************************************/
-
+#include "config.h"
 #define PORTMAP
 
 #include <macros.h>
@@ -32,23 +32,27 @@
 #include <DevErrors.h>
 
 #if defined(_NT)
-#include <rpc.h>
+#	include <rpc.h>
 #else
-#ifdef _OSK
-#include <inet/socket.h>
-#include <inet/netdb.h>
-#include <strings.h>
-#else
-#include <string.h>
-#include <sys/socket.h>
-#ifndef vxworks
-#include <netdb.h>
-#else
-#include <hostLib.h>
-#include <taskLib.h>
-#endif
-#include <unistd.h>
-#endif /* _OSK */
+#	ifdef _OSK
+#		include <inet/socket.h>
+#		include <inet/netdb.h>
+#		include <strings.h>
+#	else
+#		include <string.h>
+#		if HAVE_SYS_SOCKET_H
+#			include <sys/socket.h>
+#		else
+#			inclucde <socket.h>
+#		endif
+#		if HAVE_NETDB_H
+#			include <netdb.h>
+#		else
+#			include <hostLib.h>
+#			include <taskLib.h>
+#		endif
+#		include <unistd.h>
+#	endif /* _OSK */
 #endif	/* _NT */
 
 #ifndef OSK
@@ -65,8 +69,7 @@ extern nethost_info 		*multi_nethost;
 
 
 /**@ingroup dbaseAPI
- * To do automatic reconnection with the database server
- * if it has been killed or restarted.		
+ * To do automatic reconnection with the database server if it has been killed or restarted.		
  *
  * @param p_data	A pointer to the data to pass to the server	
  * @param pp_resul	A double pointer to the place where the result should be stored							

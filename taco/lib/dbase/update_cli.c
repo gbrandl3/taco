@@ -14,52 +14,54 @@
 
  Original   :   May 1998
 
- Version:       $Revision: 1.2 $
+ Version:       $Revision: 1.3 $
 
- Date:          $Date: 2003-05-16 13:40:27 $
+ Date:          $Date: 2004-03-05 15:07:00 $
 
  Copyright (c) 1998 by European Synchrotron Radiation Facility,
                        Grenoble, France
 
 
  *-*******************************************************************/
-
+#include "config.h"
 #define PORTMAP
 
 #include <macros.h>
 #include <db_setup.h>
 #include <db_xdr.h>
 
+#include <API.h>
+#include <DevErrors.h>
 #if defined(_NT)
-#include <API.h>
-#include <ApiP.h>
-#include <DevErrors.h>
-#include <rpc.h>
-#if 0
-#include <nm_rpc.h>
-#endif
+#	include <ApiP.h>
+#	include <rpc.h>
+#	if 0
+#		include <nm_rpc.h>
+#	endif
 
 
 #else
-#include <API.h>
-#include <private/ApiP.h>
-#include <DevErrors.h>
+#	include <private/ApiP.h>
 
-#ifdef _OSK
-#include <inet/socket.h>
-#include <inet/netdb.h>
-#include <strings.h>
-#else
-#include <string.h>
-#include <sys/socket.h>
-#ifndef vxworks
-#include <netdb.h>
-#else
-#include <hostLib.h>
-#include <taskLib.h>
-#endif
-#include <unistd.h>
-#endif /* _OSK */
+#	ifdef _OSK
+#		include <inet/socket.h>
+#		include <inet/netdb.h>
+#		include <strings.h>
+#	else
+#		include <string.h>
+#		if HAVE_SYS_SOCKET_H
+#			include <sys/socket.h>
+#		else
+#			include <socket.h>
+#		endif
+#		if HAVE_NETDB_H
+#			include <netdb.h>
+#		else
+#			include <hostLib.h>
+#			include <taskLib.h>
+#		endif
+#		include <unistd.h>
+#	endif /* _OSK */
 #endif	/* _NT */
 
 #ifndef OSK
@@ -92,9 +94,10 @@ static struct timeval timeout_update={60,0};
 
 
 /**@ingroup dbaseAPI
- * To check a resource file and to build simple device and
- * resource definition from it. A simple device definition
- * is a string like :
+ * This function analyses a buffer (file or buffer) assuming that this buffer is 
+ * used to update the database and returns device definition list and resource
+ * definition list.
+ * A simple device definition  is a string like :
  *
  * ds_name/pers_name/device:	dev_a,dev_b,dev_c
  *
@@ -1166,8 +1169,9 @@ static void get_error_line(const char *buffer,long err_dev,long *p_line)
 
 
 /**@ingroup dbaseAPI
- * To update device list(s) into the database. This call is used by the 
- * db_update facility for the update of any device server device list				
+ * This function updates the database with the new device definition contained in the device
+ * definition list.
+ * This call is used by the db_update facility for the update of any device server device list.
  *									
  * @param devdef_nb 	Device list number				
  * @param devdef 	Device list					
@@ -1180,7 +1184,7 @@ static void get_error_line(const char *buffer,long err_dev,long *p_line)
  *    		argout with the device definition  where the error occurs. Otherwise,
  *    		the function returns DS_OK             				
  */
-long db_upddev(long devdef_nb,char **devdef,long *deferr_nb,long *p_error)
+long db_upddev(long devdef_nb, char **devdef, long *deferr_nb, long *p_error)
 {
 	db_psdev_error *recev;
 	int i,j,k;
@@ -1362,8 +1366,9 @@ long db_upddev(long devdef_nb,char **devdef,long *deferr_nb,long *p_error)
 
 
 /**@ingroup dbaseAPI
- * To update resource(s) into the database. This call is used by the db_update 
- * facility for the update of any resources						
+ * This function updates the database with the new resource definition contained in 
+ * the resource definition list.
+ * This call is used by the db_update facility for the update of any resources.
  *									
  * @param resdef_nb 	Resource number				
  * @param resdef 	Resource list					
@@ -1678,17 +1683,17 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 
 
 /**@ingroup dbaseAPI
- * To retrieve the list of devices  domain  name	
+ * The static databse is also used to store tsecurity resources. A very simple system protects
+ * security resources from beeing updated by a user if the administrator choose to protect them.
+ * This function returns database protection data to the caller allowing an application to ask
+ * its user for security resources password.
  *
- * @param p_domain_nb 	Pointer for domain number			
- * @param ppp_list 	Pointer for the domain name list. Memory is
- *			allocated by this function		    	
- * @param p_error 	Pointer for the error code in case of problems
+ * @param pass 		Database security password
  *
  * @return   		In case of trouble, the function returns DS_NOTOK and set the variable
  *    			pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_secpass(char **pass,long *p_error)
+long db_secpass(char **pass, long *p_error)
 {
 	db_res *recev;
 	int i,j;
