@@ -187,7 +187,7 @@ AC_DEFUN([TACO_DEFINES],
             m68k-*-linux-*) 
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -Dm68k=1 -DNDBM" ;;
 	    powerpc-apple-darwin*)
-                        taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -DNDBM" ;;
+                        taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -DDARWIN -DNDBM" ;;
             *-*-solar*-* | *-*-sun*-*)
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -D_solaris=1 -D__solaris__=1 -DNDBM" ;;
             *-*-hp*-*)
