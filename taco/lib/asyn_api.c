@@ -25,9 +25,9 @@
 
  Original   :	January 1997
 
- Version:	$Revision: 1.8 $
+ Version:	$Revision: 1.9 $
 
- Date:		$Date: 2004-03-09 09:35:49 $
+ Date:		$Date: 2004-03-09 17:02:48 $
 
  Copyright (c) 1997-2000 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -138,8 +138,15 @@ long synch_svc_udp_sock;
 long synch_svc_tcp_sock;
 long asynch_svc_tcp_sock;
 
+/**
+ * @defgroup asyncAPI Asynchronous Device Client API
+ * @ingroup clientAPI
+ * These functions are used by the DSAPI clients to send and receive aynchronously request to a
+ * device server. The notion of client-server refers to sender and receiver of each DSAPI call.
+ * This means a device server itself can become a DSAPI client if it accesses a device.
+ */
 
-/**@ingroup dsAPI
+/**@ingroup asyncAPI
  * This function executes a command asynchronously on the device associated with the passed
  * client handle. The device must be remote and compiled with V6. Input and output data types
  * must correspond to the types specified for this command in the device server's command list.
@@ -397,7 +404,7 @@ long _DLLFunc dev_putget_asyn (devserver ds, long cmd,
 	return (DS_OK);
 }
 
-/**@ingroup dsAPI
+/**@ingroup asyncAPI
  * Application interface to execute commands on a device asynchronously with the possibility 
  * to pass input data and to receive output data in raw format. raw format means that the XDR 
  * data are not decoded by the client instead they are returned as a string of bytes whichthe 
@@ -1194,7 +1201,7 @@ long _DLLFunc asynch_rpc_register(long *error)
 	return(DS_OK);
 }
 
-/**@ingroup dsAPI
+/**@ingroup asyncAPI
  * Function to check whether the asynchronous server has been imported, and if not to import it.
  * 
  * @param ds       	handle to access the device.
@@ -1388,7 +1395,7 @@ long asynch_server_import(devserver ds, long *error)
 	return(DS_OK);
 }
 
-/**@ingroup dsAPI
+/**@ingroup asyncAPI
  * function to check whether the asynchronous client has been imported, if not then import it.
  *
  * @param client       	handle to access the device.
@@ -1524,7 +1531,7 @@ long asynch_client_import(devserver client, long *error)
 	return(DS_OK);
 }
 
-/**@ingroup dsAPI
+/**@ingroup asyncAPI
  * function to check whether the asynchronous client has been importedand return an error if it has not
  *
  * @param client       	handle to access the device.
@@ -1570,14 +1577,11 @@ long asynch_client_check(devserver client, long *error)
 
 #define getdtablesize() FD_SETSIZE
 
-/**@ingroup dsAPI
- * function to resynchronise the client with the
- * pending asynchronous calls. this function will
- * use select() to check and/or wait for any replies 
- * send by device servers and receive them. if a non
- * zero timeout is specified the dev_synch() call
- * will return after the timeout (regardless if there
- * are any calls still pending). 
+/**@ingroup asyncAPI
+ * This function checks to see if any asynchronously replies are pending. If so it triggers the associated callback
+ * routines. The call will wait for a maximum of timeout time before returning if no replies are received otherwise
+ * it returns immediately after unpacking all received replies. A timeout of zero means check to see if any replies
+ * are pending otherwise returning immediately.
  *
  * @param timeout       The time before returning in case of no answer of any device	
  * @param error         Will contain an appropriate error code if the 
@@ -2012,11 +2016,9 @@ _asynch_client_raw_data* _DLLFunc rpc_raw_asynch_reply_5(_asynch_client_raw_data
 	return(asynch_client_raw_data);
 }
 
-/**@ingroup dsAPI
- * function to add a request to the array of pending requests
- * it will keep track of requests id and pointers to the
- * status, error, argout and argout_type. Also manages 
- * events as recurring asynchronous replies.
+/**@ingroup asyncAPI
+ * This function adds a request to the array of pending requests.  It will keep track of requests id 
+ * and pointers to the status, error, argout and argout_type. Also manages events as recurring asynchronous replies.
  * 
  * @param ds       	handle to access the device.
  * @param asynch_type   
@@ -2123,7 +2125,7 @@ long _DLLFunc asynch_add_request(devserver ds, long asynch_type, long event_type
 	return(DS_OK);
 }
 
-/**@ingroup dsAPI
+/**@ingroup asyncAPI
  * function to return the index corresponding to the asynchronous
  * request id in the list of client_asynch_request[] (only
  * for valid pending requests i.e. flag==DS_PENDING)
@@ -2144,7 +2146,7 @@ long _DLLFunc asynch_get_index( long asynch_id)
 	return(DS_NOTOK);
 }
 
-/**@ingroup dsAPI
+/**@ingroup asyncAPIxdr
  * XDR function to decode the client data sent by the server
  * its main difference to the standard (synchronous) version 
  * of client_data is that the asynch_id is sent before the
@@ -2232,7 +2234,7 @@ bool_t xdr__asynch_client_data(XDR *xdrs, _asynch_client_data *objp)
   	return (TRUE);
 }
 
-/** @ingroup dsAPI
+/** @ingroup asyncAPIxdr
  * XDR function to decode the raw client data sent by the server
  * its main difference to the standard (synchronous) version 
  * of client_raw_data is that the asynch_id is sent before the
@@ -2329,15 +2331,13 @@ bool_t xdr__asynch_client_raw_data(XDR *xdrs, _asynch_client_raw_data *objp)
   	return (TRUE);
 }
 
-/**@ingroup dsAPI
- * function to flush the buffer of batched asynchronous calls
- * sent by the client to the server.
+/**@ingroup asyncAPI
+ * This function flushes the buffer of batched asynchronous calls sent by the client to the server.
  * 
  * @param ds       	handle to access the device.
  *
  * @return DS_OK 
  *********************************************************************-*/
-
 long _DLLFunc dev_flush(devserver ds)
 {
 	enum clnt_stat clnt_stat;
@@ -2415,7 +2415,7 @@ long _DLLFunc dev_pending(devserver ds)
 	}
 }
 
-/**@ingroup dsAPI
+/**@ingroup asyncAPI
  * This function sets or reads the timeout for an asynchronous call to the device ds. 
  * A request to set the timeout has to be asked with CLSET_TIMEOUT. The timeout will be 
  * set without any retry.  A request to read the timeout has to be asked with CLGET_TIMEOUT.
@@ -2463,8 +2463,8 @@ long _DLLFunc dev_asynch_timeout (devserver ds, long request,
 	return(DS_OK);
 }
 
-/**@ingroup dsAPI
- * function to check whether there are any stale asynchronous 
+/**@ingroup asyncAPI
+ * This function checks whether there are any stale asynchronous 
  * client handles lying around (because the client has disappeared
  * without doing a dev_free() for example) if so it will close
  * the tcp sockets and free the entry in the svr_conn[] table.
@@ -2501,8 +2501,8 @@ void asynch_client_cleanup(long *error)
 	return;
 }
 
-/**@ingroup dsAPI
- * function to check whether any asynchronous calls have timedout 
+/**@ingroup asyncAPI
+ * This function checks whether any asynchronous calls have timedout 
  * if so then trigger their callback with error=RPC_TIMEOUT
  * and remove them from the list of pending calls. If ds!=NULL
  * then treat only pending asynchronous calls for the specified
@@ -2642,8 +2642,8 @@ void asynch_timed_out(devserver ds_tout)
 	return;
 }
 
-/**@ingroup dsAPI
- * function to check whether the an asynchronous client handle
+/**@ingroup asyncAPI
+ * This function checks whether the an asynchronous client handle
  * is still valid. If not it will close the tcp sockets and 
  * free the entry in the svr_conn[] table. Function used by
  * asynch_client_cleanup() and asynch_timed_out().

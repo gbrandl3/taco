@@ -12,9 +12,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.7 $
+ Version    :	$Revision: 1.8 $
 
- Date       : 	$Date: 2004-03-09 09:35:50 $
+ Date       : 	$Date: 2004-03-09 17:02:49 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -45,12 +45,12 @@
 #endif
 #endif
 
-static long setup_config 	(long *error);
-extern _DLLFunc long setup_config_multi 	(char *nethost, long *error);
-static void msg_write 		(_Int msg_type, char *msg_string);
-static void msg_send 		(_Int msg_type);
-static void msg_clear 		(_Int msg_type);
-static char *get_error_string 	(long error);
+static long 		setup_config (long *error);
+extern _DLLFunc long 	setup_config_multi(char *nethost, long *error);
+static void 		msg_write(_Int msg_type, char *msg_string);
+static void 		msg_send (_Int msg_type);
+static void 		msg_clear(_Int msg_type);
+static char 		*get_error_string(long error);
 
 /*
  * UCC has not prototype for putenv() , define one ! 
@@ -142,11 +142,21 @@ long debug_flag = 0x0;
 }
 #endif
 
+/**
+ * @defgroup messageAPI Message API
+ * @ingroup API
+ * Functions to send some messages to the user or administrator.
+ */
+/**
+ * @defgroup messageAPIintern Internal functions
+ * @ingroup messageAPI
+ * These function will be used internal by the message API.
+ */
+
+
 /**@ingroup messageAPI
- * imports a message service.
- * DS_xxx parameters are used to name the
- * approriate error file and to display
- * a correct error window. 
+ * This function imports a message service.  The parameters are used to name the
+ * approriate error file and to display a correct error window. 
  *
  * @param DS_name 	name of the device server
  * @param DS_host       host of the device server
@@ -158,8 +168,7 @@ long debug_flag = 0x0;
  *
  * @return	DS_OK or DS_NOTOK
  */
-long _DLLFunc msg_import (char *DS_name, char *DS_host, long DS_prog_number,
-char *DS_display, long *error)
+long _DLLFunc msg_import (char *DS_name, char *DS_host, long DS_prog_number, char *DS_display, long *error)
 {
 	CLIENT		*clnt;
 	char		*hstring;
@@ -719,8 +728,8 @@ void dev_printdiag (DevShort mode,char *fmt,char *str)
 #endif /* OSK */
 
 
-/**@ingroup dsAPI
- * writing messages into the message buffer  
+/**@ingroup messageAPIintern
+ * This function writes a messages into the message buffer  
  *
  * @param msg_type   type of message: error or debug
  * @param msg_string message string
@@ -826,8 +835,8 @@ static void msg_write (_Int msg_type, char *msg_string)
 }
 
 
-/**@ingroup dsAPI
- * sends the contents of the message buffer to the message server or stdout, if no
+/**@ingroup messageAPIintern
+ * This function sends the contents of the message buffer to the message server or stdout, if no
  * message service is imported.
  *
  * @param msg_type     type of message: error or debug
@@ -936,8 +945,8 @@ static void msg_send (_Int msg_type)
 	}
 }
 
-/**@ingroup dsAPI
- * frees the contents of the message buffer
+/**@ingroup messageAPIintern
+ * This functions frees the contents of the message buffer.
  * 
  * @param msg_type type of message: error or debug
  */
@@ -950,8 +959,8 @@ static void msg_clear (_Int msg_type)
 	message_buffer[msg_type].messages = NULL;
 }
 
-/**@ingroup dsAPI
- * imports the static database service
+/**@ingroup databaseAPI
+ * This function imports the static database service.
  *
  * @param error Will contain an appropriate error
  *		code if the corresponding call returns a non-zero value.
@@ -1205,7 +1214,7 @@ long _DLLFunc db_import_multi (char *nethost, long *error)
 	return (DS_OK);
 }
 
-/**@ingroup internalAPI
+/**@ingroup dsAPIintern
  * This function gets the necessary configuration information for a static database service and a message
  * service from  a network manager.
  *
@@ -1428,10 +1437,10 @@ struct _devserver 	*msg_ds,
 
 
 /**@ingroup dsAPI
- * gets the necessary configuration information for a static database service and a message
+ * This function gets the necessary configuration information for a static database service and a message
  * service from  a network manager in a multi-nethost environment.
  *
- * The host of the network manager is specified by the nethost_name parameter.    
+ * The host of the network manager is specified by the nethost parameter.    
  *
  * @param nethost  name of nethost to configure
  *
@@ -1766,15 +1775,15 @@ long db_ChangeDefaultNethost(char* nethost,long *error)
 }
 /* Function: */
 
-/**@ingroup internalAPI
- * Formats the error string with a timestamp. The resulting string contains at
+/**@ingroup dsAPIintern
+ * This function formats the error string with a timestamp. The resulting string contains at
  * first the time stamp and then the message divided by a blank. The returned
  * string is malloced and has to be freed by the caller.
  * 
- * @param time_stamp time stamp string containing date and time
- * @param message the error message.
+ * @param time_stamp 	time stamp string containing date and time
+ * @param message 	the error message.
  * 
- * @return error string in case of failure NULL
+ * @return formatted error message, in case of failure NULL
  */
 static char* format_error_string(const char* time_stamp,const char* message )
 {
@@ -1785,8 +1794,8 @@ static char* format_error_string(const char* time_stamp,const char* message )
 }
 
 
-/**@ingroup internalAPI
- * Read the error string from the global error table or from the resource database.
+/**@ingroup dsAPIintern
+ * This function reads the error string from the global error table or from the resource database.
  *
  * The resource name is: ERROR/team_no/server_no/error_ident
  * 
@@ -1796,12 +1805,12 @@ static char* format_error_string(const char* time_stamp,const char* message )
  */ 
 static char *get_error_string (long error)
 {
-	char				res_path[LONG_NAME_SIZE];
-	char				res_name[SHORT_NAME_SIZE];
-	char				*ret_str = NULL;
-	char				*error_str = NULL;
+	char		res_path[LONG_NAME_SIZE];
+	char		res_name[SHORT_NAME_SIZE];
+	char		*ret_str = NULL;
+	char		*error_str = NULL;
 	db_resource 	res_tab;
-	long				db_error;
+	long		db_error;
 	unsigned short 	error_number_mask = 0xfff;
 	unsigned short 	team;
 	unsigned short 	server;
@@ -1812,7 +1821,6 @@ static char *get_error_string (long error)
 	char		*time_stamp;
 	static char	*no_error_mess=(char*)"No error message stored in the database for negative errors\n";
 	static char	*db_error_mess=(char*)"Failed to get error message from database\n";
-
 
 	dev_printdebug (DBG_TRACE | DBG_API, "\nget_error_string() : entering routine\n");
 
@@ -1927,7 +1935,7 @@ static char *get_error_string (long error)
 }
 
 /**@ingroup dsAPI
- * This function is a server side call for generatig dynamic error strings. If called
+ * This function is a server side call for generating dynamic error strings. If called
  * by the server while executing a @ref dev_putget() it will make a copy of the error
  * string and transmit it back to the client. The client can recover the error string 
  * by calling @ref dev_error_string() immediatly after the return of the @ref dev_putget()
@@ -1968,7 +1976,7 @@ long dev_error_push (char *error_string)
  *
  * @return DS_OK 
  */
-long dev_error_clear ()
+long dev_error_clear(void)
 {
 	if (dev_error_stack != NULL)
 	{
@@ -1980,6 +1988,20 @@ long dev_error_clear ()
 
 #define MAXLEVEL 10
 #define MAX_ERR_STR 80
+/**@ingroup dsAPI
+ * This function is a server side call for generating dynamic error strings. If called
+ * by the server while executing a @ref dev_putget() it will make a copy of the error
+ * string and transmit it back to the client. The client can recover the error string 
+ * by calling @ref dev_error_string() immediatly after the return of the @ref dev_putget()
+ * call in question. Not if a new call to @ref dev_putget() is made the error string
+ * returned by the previous call(s) is lost. This function can be called multiple times
+ * to stack errors if necessary e.g. to return errors from multiple nested calls.
+ *
+ * The error messages will be intended by some spaces given by the value level.
+ * @see dev_error_push
+ *
+ * @return DS_OK
+ */
 long dev_error_push_level(const char * message,int level)
 {
 	char tmp_store[MAX_ERR_STR];

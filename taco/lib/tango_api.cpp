@@ -17,9 +17,9 @@
  *
  * Original   :	December 1999
  *
- * Version    :	$Revision: 1.2 $
+ * Version    :	$Revision: 1.3 $
  *
- * Date	      : $Date: 2004-02-11 15:25:00 $
+ * Date	      : $Date: 2004-03-09 17:02:49 $
  *
  * Copyleft (c) 1999 by European Synchrotron Radiation Facility,
  *                      Grenoble, France
@@ -86,7 +86,7 @@ extern char *dev_error_string;
 
 /**
  * @defgroup tangoAPI TANGO API for TACO
- * @ingroup API
+ * @ingroup clientAPI
  */
 
 /**
@@ -1802,7 +1802,7 @@ static void tango_any_to_argout_raw(long argout_type, long tango_type, CORBA::An
 	return;
 }
 	
-/**@ tangoAPIintern
+/**@ingroup tangoAPIintern
  * convert a TANGO type code to a TACO type code
  * 
  * @param tango_type - TANGo type code
@@ -1875,7 +1875,7 @@ static long tango_to_taco_type(long tango_type)
 extern DevCmdNameListEntry DevCmdNameList[];
 extern int max_cmds;
 
-/**@ tangoAPIintern
+/**@ingroup tangoAPIintern
  * Read the command value corresponding to the command string from the TACO resource 
  * database. This is the reverse of the function get_cmd_string() in util_api.c. 
  * The resource name must follow the convention :
@@ -1951,7 +1951,7 @@ static long get_cmd_value (char *class_name, char *cmd_name, long *cmd_value, lo
 	return (DS_OK);
 }
 
-/**@ tangoAPIintern
+/**@ingroup tangoAPIintern
  * Check TANGO device connection. If not imported then import it. If bad connection 
  * has been signalled then reimport. Returns DS_OK if device has been (re)imported correctly.
  * 
@@ -2012,7 +2012,7 @@ static long tango_dev_check(devserver ds, long *error)
 	return(DS_OK);
 }
 
-/**@ tangoAPIintern
+/**@ingroup tangoAPIintern
  * Recover TANGO error string stack from DevFailed exception.
  * 
  * @param tango_exception DevFailed exception

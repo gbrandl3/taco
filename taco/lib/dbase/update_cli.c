@@ -14,9 +14,9 @@
 
  Original   :   May 1998
 
- Version:       $Revision: 1.4 $
+ Version:       $Revision: 1.5 $
 
- Date:          $Date: 2004-03-09 09:35:50 $
+ Date:          $Date: 2004-03-09 17:02:50 $
 
  Copyright (c) 1998 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -93,7 +93,7 @@ static struct timeval timeout_update={60,0};
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIupdate
  * This function analyses a buffer (file or buffer) assuming that this buffer is 
  * used to update the database and returns device definition list and resource
  * definition list.
@@ -540,7 +540,7 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
 
 
 
-/*
+/**@ingroup dbaseAPIintern
  * To change the line to lower case letters if it is
  * necessary and to return a value which indicate which
  * type of line it is (device definition, simple resource
@@ -677,7 +677,7 @@ printf("End of TestLine \n");
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIintern
  * To extract from a resource file all the informations concerning the device name
  *
  * @param line1		A pointer to a buffer where is stored a line of the resource
@@ -780,7 +780,7 @@ static long name_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_devd
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIintern
  * To check that a simple resource definition line is correct						
  *
  * @param lin  		A pointer to the modified resource definition (without
@@ -880,7 +880,7 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIintern
  * To extract from a resource file all the informations concerning a resource array			
  *
  * @param line1 	A pointer to a buffer where is stored a line of the resource
@@ -1046,7 +1046,7 @@ static long res_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_resde
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIintern
  * To check that a simple device definition line is correct						
  *
  * @param lin 		A pointer to the modified resource definition (without
@@ -1128,7 +1128,7 @@ static long check_dev(char *lin,long *p_err_dev,long *p_error)
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIintern
  * To retrieve line number in input buffer with a faulty device definition					
  *
  * @param buffer 	The input buffer				
@@ -1169,7 +1169,7 @@ static void get_error_line(const char *buffer,long err_dev,long *p_line)
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIupdate
  * This function updates the database with the new device definition contained in the device
  * definition list.
  * This call is used by the db_update facility for the update of any device server device list.
@@ -1366,7 +1366,7 @@ long db_upddev(long devdef_nb, char **devdef, long *deferr_nb, long *p_error)
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIupdate
  * This function updates the database with the new resource definition contained in 
  * the resource definition list.
  * This call is used by the db_update facility for the update of any resources.
@@ -1683,7 +1683,7 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPImisc
  * The static databse is also used to store tsecurity resources. A very simple system protects
  * security resources from beeing updated by a user if the administrator choose to protect them.
  * This function returns database protection data to the caller allowing an application to ask
@@ -1843,7 +1843,7 @@ long db_secpass(char **pass, long *p_error)
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIupdate
  * To update resource(s) into the database. This call is used by the db_update 
  * facility for the update of any resources						
  *									

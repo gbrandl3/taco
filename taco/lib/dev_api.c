@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.9 $
+ Version    :	$Revision: 1.10 $
 
- Date	    :	$Date: 2004-03-09 09:35:49 $
+ Date	    :	$Date: 2004-03-09 17:02:49 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -135,7 +135,7 @@ extern "C" {
 server_connections	 	svr_conns [NFILE];
 
 
-/**@ingroup dsAPI
+/**@ingroup syncAPI
  * This function opens a connection to a device and returns a client handle for the connection.
  * This function can distinguish between local and remote devices.
  *
@@ -801,7 +801,7 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 
 
 
-/**@ingroup dsAPI
+/**@ingroup syncAPI
  * This function executes a command synchronously on the device associatied with the passed client handle.
  * The device might be remote or local. Input and output data types must correspond to the types specified
  * for this command in te device server's command list. Othewise an error code will be returned. All arguments
@@ -975,7 +975,7 @@ long _DLLFunc dev_putget (devserver ds, long cmd,DevArgument argin,
 }
 
 
-/**@ingroup dsAPI
+/**@ingroup syncAPI
  * This function executes a command on the device associated with the passed client handle, without
  * returning any output data. The device might be remote or local. Input data types must correspond
  * to the types specified for this command in the device server's command list. Othewise an error 
@@ -1134,7 +1134,7 @@ long _DLLFunc dev_put (devserver ds, long cmd,DevArgument argin,
 	return (client_data.status);
 }
 
-/**@ingroup dsAPI
+/**@ingroup syncAPI
  * This function closes the connection to a device associated with the passed client handle.
  *
  * @param ds	handle to device.
@@ -1529,7 +1529,7 @@ long _DLLFunc dev_query_svr (char* host, long prog_number, long vers_number)
 }
 
 
-/**@ingroup dsAPI
+/**@ingroup syncAPI
  * This function frees the memory for device server data allocated by XDR. An example for the user
  * of this function is the freeing of a D_VAR_FLOATARR data type. Using this function you don't have
  * to care about the length of the internal sequence of float values. Just pass a pointer to a 
@@ -3097,10 +3097,8 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
 
 
 /**@ingroup dsAPI
- * Allocate and initialise the devserver structure
- * for a device which has not been successfully
- * imported so that it can be imported during a
- * future call to dev_putget().
+ * Allocate and initialise the devserver structure for a device which has not been successfully
+ * imported so that it can be imported during a future call to dev_putget().
  *
  * @param device_name 	the device name
  * @param access 	access right requested by client

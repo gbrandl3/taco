@@ -12,9 +12,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:		$Date: 2004-03-05 17:02:14 $
+ * Date:		$Date: 2004-03-09 17:02:48 $
  *
  *
  * Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
@@ -40,12 +40,30 @@
  * @li some more DSAPI related routines e.g. dev_put_asyn()
  */
 
+/**
+ * @defgroup dsAPIintern Internal functions to the Device Server API
+ * @ingroup dsAPI
+ * These functions will be called by the Device Server API
+ */
+
+/**@defgroup clientAPI Client API
+ * @ingroup API
+ */
+
+/**
+ * @defgroup syncAPI Synchronous Client API
+ * @ingroup clientAPI
+ * These functions are used by Device Server API (DSAPI) clients to send a synchronous request
+ * to a device server. The notation of client-server refers to sender and receiver of each DSAPI
+ * call. This means a device server itself can become a DSAPI client it accesses a device.
+ */
+
 /*
  *  standard header string to use "what" or "ident".
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.5 2004-03-05 17:02:14 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.6 2004-03-09 17:02:48 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*

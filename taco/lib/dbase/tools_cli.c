@@ -14,9 +14,9 @@
 
  Original   :   April 1997
 
- Version:       $Revision: 1.3 $
+ Version:       $Revision: 1.4 $
 
- Date:          $Date: 2004-03-05 15:07:00 $
+ Date:          $Date: 2004-03-09 17:02:49 $
 
  Copyright (c) 1997 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -86,7 +86,7 @@ static struct timeval timeout_browse={60,0};
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIdevice
  * This function returns to the caller a structure with many device informations.
  * These informations are
  * @li the name of the server in charge of the device
@@ -272,7 +272,7 @@ long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info,long *p_error)
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIdevice
  * This function returns to the caller the list of all resources for a list of devices. The resources are
  * returned as string(s) with the following syntax: "device name/resource name : resource value".
  *
@@ -531,7 +531,7 @@ long db_deviceres(long dev_nb, char **dev_name_list, long *p_res_nb, char ***ppp
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIdevice
  * This function deletes a (pseudo) device from the list of devices registered in the database.
  *									
  * @param dev_name 	Device name
@@ -692,7 +692,7 @@ long db_devicedelete(const char *dev_name,long *p_error)
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIdevice
  * This function deletes all the resources belonging to a list of devices from the database.	
  *									
  * @param dev_nb  	The device name number				
@@ -887,7 +887,7 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 }
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPImisc
  * This function returns the database global informations as
  * @li the number of exported devices defined in the database
  * @li the number of resources defined for each device domain
@@ -1078,7 +1078,7 @@ long db_stat(db_stat_call *p_info,long *p_error)
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIserver
  * This function marks all devices driven by the device server with a full name ds_full_name
  * as not exported devices.
  *
@@ -1274,7 +1274,7 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIserver
  * This function returns miscellaneous informations for a device server started with
  * a personal name. These informations are
  * @li the number and name of device served by the server
@@ -1532,7 +1532,7 @@ long db_servinfo(const char *ds_name,const char *pers_name, db_svcinfo_call *p_i
 }
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIserver
  * This function deletes a device server from the database and if needed, all the server
  * device resources.
  *
@@ -1725,7 +1725,7 @@ long db_servdelete(const char *ds_name,const char *pers_name, long delres_flag, 
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIdevice
  * This function returns to the caller informations about the device poller in charge
  * of a device. A poller is a process in charge of "polling" the device in order to
  * store device command result into the TACO data collector. The poller informations are
@@ -1908,8 +1908,8 @@ long db_getpoller(const char *dev_name,db_poller *poll,long *p_error)
 
 
 
-/**@ingroup dbaseAPI
- * To initialize a resource cache for the specified domain
+/**@ingroup dbaseAPImisc
+ * This functions initialises a resource cache for the specified domain.
  *									
  * @param domain 	Domain name
  * @param p_error  	Pointer for the error code in case of problems

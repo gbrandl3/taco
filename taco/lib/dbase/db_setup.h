@@ -1,9 +1,9 @@
 /*
  * Author:	$Author: jkrueger1 $
  * 
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:		$Date: 2003-05-21 16:21:57 $
+ * Date:		$Date: 2004-03-09 17:02:49 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -15,8 +15,60 @@
 
 /**@defgroup dbaseAPI	Database API
  * @ingroup API
- * Functions to access to the TACO database.
+ * Functions to allow a database client to:
+ *	- retrieve, update, insert delete resources.
+ *	- retrieve device list, mark device as exported, return device information
+ *	- retrieve all or part of the exported devices
+ *	- register and unregister pseudo devices
+ *	- browse the database
+ *	- retrieve command and event codes from command or event name
+ *
+ * These functions are briefly described here. Man pages are available for all of them to get
+ * complete information. The library (client part of RPC calls) is available for HP-UX, Solaris,
+ * OS-9, Linux, and FreeBSD.
  */
+
+/**@defgroup dbaseAPIintern Internal functions of the database API
+ * @ingroup dbaseAPI
+ */
+
+/**@defgroup dbaseAPIresource Resource oriented calls
+ * @ingroup dbaseAPI
+ * These functions are linked to resources.
+ */
+
+/**@defgroup dbaseAPIexport Exported device list oriented calls 
+ * @ingroup dbaseAPI
+ * These functions are used to get information on which devices are available for request in the control system.
+ */
+
+/**@defgroup dbaseAPIdevice Device oriented calls
+ * @ingroup dbaseAPI
+ * These functions are device oriented.
+ */
+
+/**@defgroup dbaseAPIserver Server oriented calls
+ * @ingroup dbaseAPI
+ * These functions deals with device server.
+ */
+
+/**@defgroup dbaseAPIbrowse Database browsing oriented calls
+ * @ingroup dbaseAPI
+ * All these functions allow database browsing.
+ */
+
+/**@defgroup dbaseAPIps Pseudo device oriented calls
+ * @ingroup dbaseAPI
+ */
+
+/**@defgroup dbaseAPIupdate Database update calls
+ * @ingroup dbaseAPI
+ */
+
+/**@defgroup dbaseAPImisc Miscellaneous calls
+ * @ingroup dbaseAPI
+ */
+
 #ifndef _db_setup_h
 #define _db_setup_h
 

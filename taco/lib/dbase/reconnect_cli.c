@@ -13,9 +13,9 @@
 
  Original   :   September 1998
   
- Version    :	$Revision: 1.5 $
+ Version    :	$Revision: 1.6 $
 
- Date	    : 	$Date: 2004-03-09 09:35:50 $
+ Date	    : 	$Date: 2004-03-09 17:02:49 $
 
  Copyright (c) 1998 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -68,7 +68,7 @@ extern configuration_flags 	config_flags;
 extern nethost_info 		*multi_nethost;
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIintern
  * To do automatic reconnection with the database server if it has been killed or restarted.		
  *
  * @param p_data	A pointer to the data to pass to the server	

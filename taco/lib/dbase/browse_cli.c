@@ -14,9 +14,9 @@
 
  Original   :   December 1997
 
- Version    :	$Revision: 1.3 $
+ Version    :	$Revision: 1.4 $
 
- Date	    :	$Date: 2004-03-05 15:06:54 $
+ Date	    :	$Date: 2004-03-09 17:02:49 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -81,7 +81,7 @@ static struct timeval timeout_browse={60,0};
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIbrowse
  * This function returns to the caller a list of domain used for all devices defined
  * in the database.
  * 
@@ -264,7 +264,7 @@ long db_getdevdomainlist(long *p_domain_nb,char ***ppp_list,long *p_error)
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIbrowse
  * This function returns to the caller a list of families for all devices defined in the 
  * database with the first field set to a given domain name.
  * 
@@ -469,7 +469,7 @@ long db_getdevfamilylist(char *domain,long *p_family_nb,char ***ppp_list,long *p
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIbrowse
  * This function returns to the caller a list of members for all devices defined in the database with
  * the first field name set to a given domain and the second field name set to a given family.
  *
@@ -701,7 +701,7 @@ long db_getdevmemberlist(char *domain,char *family,long *p_member_nb,
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIbrowse
  * This function returns to the caller a list of domain used for all resources defined in the
  * database.
  * 
@@ -882,7 +882,7 @@ long db_getresdomainlist(long *p_domain_nb,char ***ppp_list,long *p_error)
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIbrowse
  * This function returns to the caller a list of families for all resources defined in the 
  * database with the first field name set to a given domain name.
  *
@@ -1086,7 +1086,7 @@ long db_getresfamilylist(char *domain,long *p_family_nb,char ***ppp_list,long *p
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIbrowse
  * This function returns to the caller a list of members for all resources defined in the database
  * with the first field name set to a given domain and the second field name set to a given family.
  *
@@ -1324,7 +1324,7 @@ long db_getresmemberlist(char *domain,char *family,long *p_member_nb, \
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIbrowse
  * This function returns to the caller a list of resources name for all resources defined in the database
  * for a device with a specified domain, family, and member field name.
  *
@@ -1581,7 +1581,7 @@ long db_getresresolist(char *domain,char *family,char *member, \
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIbrowse
  * This function returns to the caller a list of resource values for all resource with
  * a domain, family, member, and name specified in the first four function parameters.
  * Member and resource field name can be set to wildcard (*).
@@ -1882,7 +1882,7 @@ long db_getresresoval(char *domain,char *family,char *member,char *resource, \
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIbrowse
  * This function returns to the caller a list of device server executeable name.
  * 
  * @param p_server_nb  	Pointer for server number returned
@@ -2061,7 +2061,7 @@ long db_getdsserverlist(long *p_server_nb,char ***ppp_list,long *p_error)
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIbrowse
  * This function returns to the caller a list of devices server personal name for device server
  * with a given executeable name.
  * 
@@ -2265,7 +2265,7 @@ long db_getdspersnamelist(char *server,long *p_pers_nb,char ***ppp_list,long *p_
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIbrowse
  * This function returns to the caller a list of host name where device server should run.
  *
  * @param p_host_nb  	Pointer for host number returned
@@ -2444,7 +2444,7 @@ long db_gethostlist(long *p_host_nb,char ***ppp_list,long *p_error)
 
 
 
-/**@ingroup dbaseAPI
+/**@ingroup dbaseAPIbrowse
  * This function returns to the caller a list of device server which should run on the specified host.
  *
  * @param host  	The host name
