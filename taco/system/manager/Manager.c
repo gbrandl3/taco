@@ -11,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.5 $
+ Version:	$Revision: 1.6 $
 
- Date:		$Date: 2004-03-03 08:42:05 $
+ Date:		$Date: 2004-03-18 14:09:37 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -33,8 +33,8 @@ void 			quit_server ();
 extern config_flags 	c_flags;
 extern char		*dshome;
 extern char		*display;
-extern char		nethost [SHORT_NAME_SIZE];
-extern char		logfile [256];
+extern char		nethost [];
+extern char		logfile [];
 
 static server_conf	db_conf  = {0,0,0};
 static server_conf	msg_conf = {0,0,0};
