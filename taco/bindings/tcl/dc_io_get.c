@@ -14,9 +14,9 @@
  *              The syntax is :
  *              dc_io_get stat error device command
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2003-05-07 13:19:25 $
+ * Date:	$Date: 2003-05-07 13:42:42 $
  *
 */
 
@@ -25,6 +25,7 @@
 #include <dc_io.h>
 #include <dev_io.h>
 #include <debug.h>
+#include <maxe_xdr.h>
 
 /* ----------------- */
 /* global variables  */
@@ -439,7 +440,7 @@ int dc_io_get (ClientData clientdata, Tcl_Interp *interp, int argc, char **argv)
 				printf("dc_io_get: ArgoutRequired= D_MOTOR_FLOAT\n");
 			F_D_MOTOR_FLOAT(interp,"",OUTPUT);
 			break;
-		default				:
+		default	:
 			printf ("ERROR during the output argument setting.. \n");
 			free (StringTemp); 
 			return TCL_ERROR;
@@ -547,7 +548,7 @@ int dc_io_get (ClientData clientdata, Tcl_Interp *interp, int argc, char **argv)
 			break;
 		case D_FLOAT_TYPE:
 			TclAux = (char *) malloc (TCLAUX_LENGTH*sizeof(char));
-			sprintf(TclAux,"%f",*((float*)OutputArg));
+			snprintf(TclAux, TCLAUX_LENGTH, "%f",*((float*)OutputArg));
 			Tcl_AppendResult(interp,TclAux,NULL); 
 			break;
 		case D_DOUBLE_TYPE:
@@ -615,7 +616,7 @@ int dc_io_get (ClientData clientdata, Tcl_Interp *interp, int argc, char **argv)
 			j = ((DevVarCharArray*)OutputArg)->length;      
 			TclAux = (char *) malloc (j * sizeof(char) + 1 );
 			strncpy ((char*)TclAux,(char *)((DevVarCharArray*)OutputArg)->sequence,j);
-			*(TclAux+j) = NULL;
+			*(TclAux+j) = '\0';
 			Tcl_AppendResult(interp,TclAux,NULL);
                  
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
@@ -688,7 +689,7 @@ int dc_io_get (ClientData clientdata, Tcl_Interp *interp, int argc, char **argv)
 				snprintf (StringTemp, STRING_TMP_SIZE, "%d",DeviceStatus);
 				Tcl_SetVar (interp,State,StringTemp,0);
 				StringAux = dev_error_str(DeviceError);
-				sprintf (StringTemp, STRING_TMP_SIZE, "%s [%d]",StringAux,DeviceError);
+				snprintf (StringTemp, STRING_TMP_SIZE, "%s [%d]",StringAux,DeviceError);
 				Tcl_SetVar (interp,Error,StringTemp,0);
 				free (StringTemp); 
 				free (StringAux);
@@ -745,7 +746,7 @@ int dc_io_get (ClientData clientdata, Tcl_Interp *interp, int argc, char **argv)
 			for (i=0;i<j;i++)
 			{
 				TclTemp = (float*)( ((DevVarFloatArray*)OutputArg)->sequence+i);
-				sprintf(TclAux,"%g",*((float*)TclTemp));
+				snprintf(TclAux, TCLAUX_LENGTH, "%g",*((float*)TclTemp));
 				Tcl_AppendElement(interp,TclAux);
 			}
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
@@ -935,7 +936,7 @@ int dc_io_get (ClientData clientdata, Tcl_Interp *interp, int argc, char **argv)
 			printf("Converting the time in tcl...");
 		free (TclAux);
 		TclAux = (char *) calloc (TCLAUX_LENGTH,sizeof(char));
-		sprintf(TclAux, TCLAUX_LENGTH, "%s", ctime(&(DCHist.time))); /* Converting time to string */
+		snprintf(TclAux, TCLAUX_LENGTH, "%s", ctime(&(DCHist.time))); /* Converting time to string */
 		R = strlen(TclAux);
 		TclAux[R-1] = '\0'; /* Remove the \n character */
 		Tcl_SetVar(interp,ArginName,TclAux,0);

@@ -31,9 +31,9 @@
  *
  *		In this version only two modes of debug are possible (0=no debug mode 1=debug mode)
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2003-05-07 13:19:25 $
+ * Date:	$Date: 2003-05-07 13:42:42 $
  */
 
 /* Codecenter comments to supress some warnings at load-time */
@@ -42,6 +42,7 @@
 /*SUPPRESS65*/
 #include <dev_io.h>
 #include <debug.h>
+#include <maxe_xdr.h>
 
 #define	STRING_TMP_LENGTH 250
 
@@ -83,11 +84,9 @@ static struct DEVICE_TYPE DeviceType [NUMBER_OF_TYPES]= {
                    {D_VAR_SFRPARR,"array-of-(short_float_float)",},
                    {D_VAR_LRPARR,"array-of-(long_long)",},
                    {D_OPAQUE_TYPE,"array-of-char",},
-#if 0
                    {D_MULMOVE_TYPE,"long[8]_long[8]_float[8]",},
                    {D_MOTOR_LONG,"long_long",},
                    {D_MOTOR_FLOAT,"long_float",},
-#endif
                   };
                   
 /*
@@ -732,7 +731,6 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			R=F_D_OPAQUE_TYPE(interp,argv[5],INPUT);
 			strcpy(StringTemp,"F_D_OPAQUE_TYPE");
 			break;
-#if 0
 		case D_MULMOVE_TYPE:
 			if(TCL_TEST) 
 				printf("dev_io: ArginRequired= D_MULMOVE_TYPE\n");
@@ -751,7 +749,6 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			R=F_D_MOTOR_FLOAT(interp,argv[5],INPUT);
 			strcpy(StringTemp,"F_D_MOTOR_FLOAT");
 			break;
-#endif
 		default:
 			printf ("ERROR during the conversion of the argin..type unknown \n");
 			free (StringTemp);
@@ -904,7 +901,6 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 				printf("dev_io: ArgoutRequired= D_OPAQUE_TYPE\n");
 			F_D_OPAQUE_TYPE(interp,"",OUTPUT);
 			break;
-#if 0
 		case D_MULMOVE_TYPE		:
 			if(TCL_TEST) 
 				printf("dev_io: ArgoutRequired= D_MULMOVE_TYPE	\n");
@@ -920,7 +916,6 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 				printf("dev_io: ArgoutRequired= D_MOTOR_FLOAT\n");
 			F_D_MOTOR_FLOAT(interp,"",OUTPUT);
 			break;
-#endif
 		default				:
 			printf ("ERROR during the output argument setting.. \n");
 			free (StringTemp); 
@@ -1345,7 +1340,6 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 				return TCL_OK;
 			}
 			break;
-#if 0
 		case D_MULMOVE_TYPE:
 			TclAux = (char*) malloc (TCLAUX_LENGTH*sizeof(char));
 			for (i=0;i<8;i++)
@@ -1378,7 +1372,6 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			snprintf(TclAux, TCLAUX_LENGTH, "%f",&( ((DevMotorFloat*)OutputArg)->value));
 			Tcl_AppendResult(interp,TclAux,NULL);
 			break;
-#endif
 		default:
 			printf ("ERROR, output argument type is unknown.. \n");
 			free (StringTemp); 
