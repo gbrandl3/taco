@@ -11,9 +11,9 @@
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.6 $
+ Version:	$Revision: 1.7 $
 
- Date:		$Date: 2003-05-12 07:08:21 $
+ Date:		$Date: 2004-01-14 11:09:13 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -1629,7 +1629,7 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
  */
 	for ( i=0; (u_long)i<dev_query_out.length; i++ )
 	{
-		dev_query_out.sequence[i].event    = NULL;
+		dev_query_out.sequence[i].event    = 0;
 		dev_query_out.sequence[i].out_type = ds_ev[i].argout_type;
 	}
 
