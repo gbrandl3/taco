@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0-beta, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.53)
-AC_REVISION($Revision: 1.6 $)dnl
+AC_REVISION($Revision: 1.7 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR(lib/dev_api.c)
@@ -168,7 +168,7 @@ AC_CONFIG_FILES(bindings/Makefile bindings/tcl/Makefile)
 dnl Initialize the test suite
 AC_CONFIG_TESTDIR(tests)
 AC_CONFIG_FILES(tests/Makefile tests/atlocal)
-AC_CONFIG_FILES(tests/testserver/Makefile)
+dnl AC_CONFIG_FILES(tests/testserver/Makefile)
 AC_CONFIG_FILES(tests/taco, [chmod +x tests/taco])
 AM_MISSING_PROG([AUTOM4TE], [autom4te])
 
