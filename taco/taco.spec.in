@@ -4,7 +4,7 @@ Version: @VERSION@
 Release: @RPM_RELEASE@
 Copyright: GPL
 Group: Utilities/TACO
-Source: @PACKAGE@-@VERSION@.tar.gz 
+Source: @PACKAGE@-@VERSION@.tar.bz2 
 Prefix: %{_prefix}
 Vendor: FRMII, TU München, FRG
 Distribution:@DISTRIBUTION@
@@ -36,7 +36,7 @@ TACO has been designed to be portable and runs on a large number of platforms (e
 %setup -n @PACKAGE@-@VERSION@
 
 %build
-./configure --enable-fast-install=yes --enable-greta --enable-xdevmenu --with-motif=/usr/X11R6/LessTif/Motif1.2 --prefix=%_prefix
+./configure --enable-fast-install=yes --enable-greta --enable-xdevmenu --prefix=%_prefix
 make 
 
 %install
