@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0-rc2, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.23 $)dnl
+AC_REVISION($Revision: 1.24 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -36,11 +36,10 @@ AC_PROG_RANLIB
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS([arpa/inet.h fcntl.h malloc.h memory.h netdb.h netinet/in.h stddef.h stdlib.h string.h strings.h sys/file.h sys/ioctl.h sys/socket.h termios.h unistd.h])
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h malloc.h memory.h netdb.h netinet/in.h stddef.h stdlib.h string.h strings.h sys/file.h sys/ioctl.h sys/socket.h termios.h unistd.h sys/filio.h])
 
 AC_LANG_PUSH(C++)
-AC_CHECK_HEADERS(sstream, [], [])
-AC_CHECK_HEADERS(strstream, [], [])
+AC_CHECK_HEADERS([sstream strstream])
 AC_LANG_POP(C++)
 
 # Checks for typedefs, structures, and compiler characteristics.
