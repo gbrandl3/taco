@@ -8,8 +8,20 @@ AT_CHECK([taco db_info | grep DEVICE], [], [[		DEVICE STATISTICS
 ]])
 AT_CLEANUP
 
+AT_SETUP([db_getresresoval command])
+AT_CHECK([AT_TACO_RUN_LOCAL 
+db_getresoval CMDS/0/0/1], [], [[cmds/0/0/1: DevOn
+]])
+AT_CLEANUP
+
 AT_SETUP([db_update command])
 AT_CHECK([taco db_update TEST/Inst_verify.res])
+AT_CLEANUP
+
+AT_SETUP([db_devres command])
+AT_CHECK([taco db_devres test/device/1], [], 
+[[test/device/1/status: Off
+]])
 AT_CLEANUP
 
 AT_SETUP([db_servinfo command])

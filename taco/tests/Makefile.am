@@ -27,8 +27,9 @@ AUTOTEST 		= $(AUTOM4TE) --language=autotest
 
 check_PROGRAMS 		= db_connect db_resget db_resput \
 			db_resdomain db_resfamily db_resmember dev_ping \
+			db_getresoval \
 			test_asc_dyn test_asc_stat test_tc test_starter \
-			test_cmd_query
+			test_cmd_query 
 
 check_SCRIPT		= taco
 
@@ -59,8 +60,10 @@ test_starter_SOURCES	= test_start.cpp
 test_starter_LDADD	= @TACO_CLIENT_LIBS@
 
 test_cmd_query_SOURCES	= test_cmd_query.cpp
-test_cmd_query_LDFLAGS	= -g 
 test_cmd_query_LDADD	= @TACO_CLIENT_LIBS@
+
+db_getresoval_SOURCES	= db_getresoval.cpp
+db_getresoval_LDADD	= @TACO_CLIENT_LIBS@
 
 $(srcdir)/package.m4:	$(top_srcdir)/configure.ac
 	{\
