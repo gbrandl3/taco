@@ -6,3 +6,5 @@ Makefile.in
 .libs
 *.lo
 *.la
+*.tar.gz
+*.tar.bz2
