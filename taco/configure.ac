@@ -1,6 +1,6 @@
-AC_INIT(TACO, 3.0-rc1, [taco-devel@lists.sourceforge.net])
+AC_INIT(TACO, 3.0-rc2, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.15 $)dnl
+AC_REVISION($Revision: 1.16 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -96,10 +96,6 @@ AC_SUBST(X_LDFLAGS, ['-L/usr/X11R6/lib'])
 
 AC_SUBST(appdefaultdir)
 
-pythondir='${prefix}/python'
-
-aclocaldir=`aclocal --print-ac-dir`
-AC_SUBST(aclocaldir)
 sbindir='${exec_prefix}'/system/bin/${taco_install_path}
 AC_SUBST(sbindir)
 AC_SUBST(datadir, ['${prefix}/etc'])
@@ -118,6 +114,11 @@ AC_SUBST(PS_NAMES_resdir, ['${resdatadir}/PS_NAMES'])
 AC_SUBST(SYS_resdir, ['${resdatadir}/SYS'])
 AC_SUBST(SEC_resdir, ['${resdatadir}/SEC'])
 AC_SUBST(TEST_resdir, ['${resdatadir}/TEST'])
+AC_SUBST(pythondir, ['${prefix}/python'])
+
+dnl aclocaldir=`aclocal --print-ac-dir`
+AC_SUBST([aclocaldir], ['${datadir}/m4'])
+
 
 AC_SUBST(TACO_INCLUDES, ["-I\$(top_srcdir)/lib/xdr -I\$(top_srcdir)/lib -I\$(top_srcdir)/lib/dc -I\$(top_srcdir)/lib/dbase -I\$(top_srcdir)/lib/tc -I\$(top_srcdir)/lib/ascii]") 
 
@@ -220,6 +221,8 @@ Configuration (taco):
 	Source code location:	${srcdir}
 	Version:		${VERSION}
 	Compiler:		${CC},${CXX}
+
+	Motif:			${motif_found}
 	
 build:
 	gdbm:			${MAKE_GDBM}
