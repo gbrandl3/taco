@@ -8,9 +8,9 @@
  *
  * Original:    December 99
  * 
- * Date:	$Date: 2004-07-09 12:59:33 $
+ * Date:	$Date: 2005-02-22 13:13:57 $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
  *********************************************************************/
 
@@ -89,9 +89,12 @@ static PyObject* esrf_import(PyObject *self,PyObject *args)
 		printf("-- esrf_import: devname = %s\n",devname); 
 
 	ds_pt = malloc(sizeof(devserver));
-	devstatus = dev_import(devname,readwrite,ds_pt,&error);
-/* for test */
-/* 	devstatus = dev_import(devname,10,ds_pt,&error);*/
+	if (!ds_pt)
+	{
+		printf("Could not allocate memory for the device\n");
+		onError("Could not allocate memory for the device");
+	}
+	devstatus = dev_import(devname, readwrite, ds_pt, &error);
 	if (devstatus != 0)
 	{
 		free(ds_pt); 
@@ -117,7 +120,7 @@ static PyObject* esrf_debug(PyObject *self,PyObject *args)
 /* 
  * get the flag value 
  */
-	if (!PyArg_ParseTuple(args,"d",&flag))
+	if (!PyArg_ParseTuple(args, "d", &flag))
 		onError("usage: esrf_debug (<flag>)")
    
 	Py_INCREF(Py_None);
@@ -130,7 +133,7 @@ static PyObject* esrf_debug(PyObject *self,PyObject *args)
  * @param self unused
  * @param args	list of arguments C object pointer given by dev_import
  *
- * @returns a dictionnary
+ * @returns a dictionary
  *		{ 'cmd': [cmd,in_type,out_type], ... }
  *		NULL:			error	
  */ 
@@ -159,10 +162,10 @@ static PyObject* esrf_query(PyObject *self, PyObject *args)
 		onError("esrf_query failed ");
 
 /*  
- * build the output dictionnary  
+ * build the output dictionary  
  */
 	if ( (mydict = PyDict_New()) == NULL)
-		onError("cannot build commands dictionnary");
+		onError("cannot build commands dictionary");
        
 	for (i = 0; i < varcmdarr.length; i++)
 	{
@@ -194,7 +197,7 @@ static PyObject* esrf_query(PyObject *self, PyObject *args)
 			onError("cannot build command descriptors list");
 
 		if (PyMapping_SetItemString(mydict,varcmdarr.sequence[i].cmd_name,mylist)==-1)
-			onError("cannot build command descriptors list in dictionnary");
+			onError("cannot build command descriptors list in dictionary");
 	}   
       
 	if (flag != 0)
@@ -232,7 +235,7 @@ static PyObject *esrf_getresource(PyObject *self, PyObject *args)
 	if (flag != 0)
 		printf("-- esrf_getresource: enter\n");
 	if (!PyArg_ParseTuple(args,"ss",&devname,&resname))
-      onError("usage: esrf_getresource(<devname>,<resname>)")
+		onError("usage: esrf_getresource(<devname>,<resname>)")
       
 	if (flag != 0)
 	{
@@ -430,13 +433,13 @@ static PyObject* esrf_tcpudp(PyObject *self, PyObject *args)
 
 	ds = (devserver *) PyCObject_AsVoidPtr(py_ds_pt);
    
-	if (!strcmp(mymode,"tcp"))
+	if (!strcmp(mymode, "tcp"))
 	{
 		if (flag != 0)
 			printf("-- esrf_tcpudp: setting mode tcp \n");
 		protocol = D_TCP;
 	}
-	else if ( !strcmp(mymode,"udp") )
+	else if (!strcmp(mymode, "udp"))
 	{
 		if (flag != 0)
 			printf("-- esrf_tcpudp: setting mode udp \n");
@@ -708,7 +711,7 @@ void free_argout (long ds_in,DevArgument ds_argin)
  *				- input parameter
  * @param kwarg	dictionary (for output with keywords)
  *			
- * @return Python objet according to type:  if ok
+ * @return Python object according to type:  if ok
  *		NULL:				 error	
  */
 static PyObject* esrf_io(PyObject *self, PyObject *args, PyObject *kwarg)
@@ -1462,19 +1465,19 @@ static PyObject *esrf_dc_info(PyObject *self, PyObject *args)
  * Array for functions mapping 
  */
 static struct PyMethodDef Taco_methods[] = {
-   {"esrf_import",	esrf_import,	1},
-   {"esrf_query",	esrf_query,	1},
-   {"esrf_tcpudp",	esrf_tcpudp,	1},
-   {"esrf_timeout",	esrf_timeout,	1},
-   {"esrf_getdevlist",	esrf_getdevlist,1},
-   {"esrf_getresource",	esrf_getresource,1},
-   {"esrf_putresource",	esrf_putresource,1},
-   {"esrf_delresource",	esrf_delresource,1},
-   {"esrf_io",		(PyCFunction)esrf_io, 1|2},
-   {"esrf_debug",	esrf_debug, 	1},
-   {"esrf_dc_info",	esrf_dc_info, 1},
-   {"esrf_dc_import",	esrf_dc_import, 1},
-   {NULL,	NULL}
+	{"esrf_import",		esrf_import,	1},
+	{"esrf_query",		esrf_query,	1},
+	{"esrf_tcpudp",		esrf_tcpudp,	1},
+	{"esrf_timeout",	esrf_timeout,	1},
+	{"esrf_getdevlist",	esrf_getdevlist,1},
+	{"esrf_getresource",	esrf_getresource,1},
+	{"esrf_putresource",	esrf_putresource,1},
+	{"esrf_delresource",	esrf_delresource,1},
+	{"esrf_io",		(PyCFunction)esrf_io, 1|2},
+	{"esrf_debug",		esrf_debug, 	1},
+	{"esrf_dc_info",	esrf_dc_info, 1},
+	{"esrf_dc_import",	esrf_dc_import, 1},
+	{NULL,	NULL}
 };
 
 
@@ -1489,23 +1492,21 @@ void initTaco()
 #ifdef NUMPY
 	import_array();
 #endif
-    
 	d = PyModule_GetDict(m);
-	ErrorObject = Py_BuildValue("s","Taco.error");
-	PyDict_SetItemString(d,"error",ErrorObject);
+	ErrorObject = Py_BuildValue("s", "Taco.error");
+	PyDict_SetItemString(d, "error", ErrorObject);
     
 	if (PyErr_Occurred())
 	Py_FatalError("Can't initialize module Taco");
 
 /* 
- * we create here a global dictionnary and a global tuple for  esrf_io further init parameters 
+ * we create here a global dictionary and a global tuple for  esrf_io further init parameters 
  */
 	if ((glob_tuple = PyList_New(0)) == NULL)
 		printf("initTaco: cannot create global tuple\n");
     
 	if ( (glob_dict = PyDict_New()) == NULL)
 		printf("Cannot create global dict\n");
-#ifdef DEBUG           
-	printf("Taco module init\n");
-#endif
+	if (flag)
+		printf("Taco module init\n");
 }

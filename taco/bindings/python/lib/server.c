@@ -8,11 +8,11 @@
  *
  * Original:    June 2000
  *
- * Date:	$Date: 2004-05-14 15:05:21 $
+ * Date:	$Date: 2005-02-22 13:11:47 $
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * $Revision: 1.2 $
+ * $Revision: 1.3 $
  *********************************************************************/
  
 #include <API.h>
@@ -50,8 +50,7 @@ static PyObject *Server_startup(PyObject *self, PyObject *args)
 /* 
  * start the device server
  */
-	device_server (name, pers_name, 0, 0, 0, NULL);
-			
+	device_server (name, pers_name, (int)0, (int)0, (int)0, (char **)NULL);
         return PyInt_FromLong(0L);
 }
 
@@ -186,7 +185,7 @@ void initServer()
 	py_dict = PyModule_GetDict (py_module);
 	
 /* 
- * Add the valriable taco_error to the exception object 
+ * Add the variable taco_error to the exception object 
  */
 	py_exception_dict = PyDict_New();
 	PyDict_SetItemString (py_exception_dict, "taco_error", Py_BuildValue ("i", 0));		      
@@ -204,17 +203,18 @@ void initServer()
  * @return DS_OK in case of no failure otherwise DS_NOTOK
  */
 long startup (char *svc_name, long *error)
-{
-	Python	 	ds_python[MAX_PY_DEVICE];
-	PyObject 	*Py_device,
-			*py_name;
-	char		*dev_name;
-	int		nu_of_devices,
-			exported_devices = 0,
-			i;
-		
+{ 
+	DevMethodFunction	fn;
+	Python	 		ds_python[MAX_PY_DEVICE];
+	PyObject 		*Py_device,
+				*py_name;
+	char			*dev_name;
+	int			nu_of_devices,
+				exported_devices = 0,
+				i;
+/*		
 	debug_flag = (DEBUG_ON_OFF | DBG_ERROR | DBG_STARTUP | DBG_COMMANDS | DBG_METHODS);
-
+*/
    	dev_printdebug (DBG_TRACE | DBG_STARTUP, "startup() : executing\n");
 
 /*
@@ -223,13 +223,12 @@ long startup (char *svc_name, long *error)
 	nu_of_devices = PyTuple_Size (Py_devices);	
 	for (i = 0;  i < nu_of_devices; i++)
 	{
-		Py_device = PyTuple_GetItem (Py_devices, i);
+		Py_device = PyTuple_GetItem(Py_devices, i);
 /*
  * Read the device name
  */
-		py_name   = PyObject_CallMethod (Py_device, "get_dev_name", NULL);
+		py_name   = PyObject_CallMethod(Py_device, "get_dev_name", NULL);
 		dev_name = PyString_AsString(py_name);
-		 	
 /*
  * Create the device
  */
@@ -249,13 +248,17 @@ long startup (char *svc_name, long *error)
 /*
  * Initialise the device
  */
-		if (ds__method_finder(ds_python[i], DevMethodInitialise)(ds_python[i], error) != DS_OK)
+		fn = ds__method_finder(ds_python[i], DevMethodInitialise);
+		if (fn != NULL)
 		{
-			dev_printerror(SEND, "initialise failed (%d): %s\n", *error, dev_error_str (*error));
-			continue;
+			if ((fn)(ds_python[i], error) != DS_OK)
+			{
+				dev_printerror(SEND, "initialise failed (%d): %s\n", *error, dev_error_str (*error));
+				continue;
+			}
+			else 
+				dev_printdebug(DBG_STARTUP, "\t\t- Initialised\n");
 		}
-		else 
-			dev_printdebug(DBG_STARTUP, "\t\t- Initialised\n");
 	   
 /*
  * Export the device on the network
