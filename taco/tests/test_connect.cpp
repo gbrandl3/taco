@@ -75,7 +75,7 @@ int main(int argc,char **argv)
 	status = dev_event_query(ps, &events, &error);
 	if (status != DS_OK)
 	{
-		std::cout << "dev_cmd_query() returned " << status << " (error=" << error << ")" << std::endl
+		std::cout << "dev_event_query() returned " << status << " (error=" << error << ")" << std::endl
 			<< dev_error_str(error) << std::endl;
 		exit(1);
 	}

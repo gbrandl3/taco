@@ -129,6 +129,7 @@ Query commands
              8       0       6                        "Status"
             10       0       0                        "Close"
 Query events
+    4228120578           3                        "HeartBeat"
 ])
 AT_CLEANUP
 
