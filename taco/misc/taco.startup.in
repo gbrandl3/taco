@@ -51,8 +51,8 @@ dbase()
 manager()
 {
 # first kill any Manager running and make sure program no. 100 is free
-	killall Manager
-	unreg 100
+	@sbindir@/off Manager
+	@sbindir@/unreg 100
 
 	if test "x$TACO_LOGGING" = "xyes" ; then
 		taco_manager_flags="-log"
