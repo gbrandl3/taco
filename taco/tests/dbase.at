@@ -30,14 +30,14 @@ AT_CLEANUP
 AT_SETUP([db_update command])
 AT_DATA([test.res], [[
 # This file contains only resources for the tests
-test/test/device:	test/device/1 \
-			test/device/2 \
-			test/device/3 
-test/device/1/res1:	"resource 1"
-test/device/1/res2:	2
-test/device/1/res3:	3.1
-test/device/1/res4:	1,1,1
-test/device/1/res5:	"A","B","C"
+test/test/device:	test/device/2 \
+			test/device/3 \
+			test/device/4 
+test/device/2/res1:	"resource 1"
+test/device/2/res2:	2
+test/device/2/res3:	3.1
+test/device/2/res4:	1,1,1
+test/device/2/res5:	"A","B","C"
 ]])
 AT_CHECK([RES_BASE_DIR=`pwd` taco db_update test.res])
 AT_CLEANUP
@@ -45,8 +45,8 @@ AT_CLEANUP
 AT_SETUP([db_update command failes])
 AT_DATA([test.res], [[
 # This file contains only resources for the tests
-test/test/devices:	test/device/1 
-test/device/1/res1:	"resource 1"
+test/test/devices:	test/device/2 
+test/device/2/res1:	"resource 1"
 ]])
 AT_CHECK([RES_BASE_DIR=`pwd` taco db_update test.res 2>/dev/null], [255])  
 AT_CLEANUP
@@ -57,28 +57,28 @@ AT_CHECK([taco db_read names | sort], [],
 NAMES: inst_verify|1|1|: test/device/1|not_exp|0|0|unknown|unknown|0|unknown|
 NAMES: python|test|1|: test/python/test1|not_exp|0|0|unknown|unknown|0|unknown|
 NAMES: python|test|2|: test/python/test2|not_exp|0|0|unknown|unknown|0|unknown|
-NAMES: test|test|1|: test/device/1|not_exp|0|0|unknown|unknown|0|unknown|
-NAMES: test|test|2|: test/device/2|not_exp|0|0|unknown|unknown|0|unknown|
-NAMES: test|test|3|: test/device/3|not_exp|0|0|unknown|unknown|0|unknown|
+NAMES: test|test|1|: test/device/2|not_exp|0|0|unknown|unknown|0|unknown|
+NAMES: test|test|2|: test/device/3|not_exp|0|0|unknown|unknown|0|unknown|
+NAMES: test|test|3|: test/device/4|not_exp|0|0|unknown|unknown|0|unknown|
 ]])
 AT_CLEANUP
 
 AT_SETUP([db_getresource function])
-AT_CHECK(AT_TACO_RUN_LOCAL([db_resget test/device/1/res1]), [], [[resource 1
+AT_CHECK(AT_TACO_RUN_LOCAL([db_resget test/device/2/res1]), [], [[resource 1
 ]])
 AT_CLEANUP
 
 AT_SETUP([db_putresource function])
-AT_CHECK([AT_TACO_RUN_LOCAL([db_resput test/device/2/res1 TEST])
-AT_TACO_RUN_LOCAL([db_resget test/device/2/res1])
-AT_TACO_RUN_LOCAL([db_resput test/device/2/res1 TEST TEST2 TEST3])
-AT_TACO_RUN_LOCAL([db_resget test/device/2/res1])], [], [[TEST
+AT_CHECK([AT_TACO_RUN_LOCAL([db_resput test/device/3/res1 TEST])
+AT_TACO_RUN_LOCAL([db_resget test/device/3/res1])
+AT_TACO_RUN_LOCAL([db_resput test/device/3/res1 TEST TEST2 TEST3])
+AT_TACO_RUN_LOCAL([db_resget test/device/3/res1])], [], [[TEST
 TEST,TEST2,TEST3
 ]])
 AT_CLEANUP
 
 AT_SETUP([db_delresource function])
-AT_CHECK([taco db_resdel test/device/2/res1], [])
+AT_CHECK([taco db_resdel test/device/3/res1], [])
 AT_CLEANUP
 
 AT_SETUP([check existing resource domains])
@@ -99,6 +99,7 @@ AT_CLEANUP
 
 AT_SETUP([check existing resource members])
 AT_CHECK(AT_TACO_RUN_LOCAL([db_resmember test device]), [], [[1
+2
 ]])
 AT_CLEANUP
 
@@ -121,6 +122,7 @@ AT_CLEANUP
 
 AT_SETUP([check existing device members])
 AT_CHECK(AT_TACO_RUN_LOCAL([db_devmember test device]), [], [[1
+2
 ]])
 AT_CLEANUP
 
