@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.21 $
+ Version    :	$Revision: 1.22 $
 
- Date	    :	$Date: 2005-02-22 15:59:56 $
+ Date	    :	$Date: 2005-02-23 07:20:20 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -42,7 +42,11 @@
 #	if !HAVE___SIGHANDLER_T
 		typedef RETSIGTYPE (*SIGHANDLER_T) (int);
 #	else
-#		define	SIGHANDLER_T	__sighandler_t
+#		ifdef FreeBSD
+#			define	SIGHANDLER_T	__sighandler_t*
+#		else
+#			define	SIGHANDLER_T	__sighandler_t
+#		endif
 #	endif
 #else
 #	define	SIGHANDLER_T	sighandler_t
