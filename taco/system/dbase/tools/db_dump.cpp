@@ -29,6 +29,7 @@ int db_read(char *,char *);
 
 int line_ptr;
 std::map<std::string, int> device_map;
+std::map<std::string, int> property_map;
 std::map<std::string,int>::iterator ipos;
 
 
@@ -172,7 +173,7 @@ int db_read(char *dbm_file,char *TblName)
 #endif /* linux */
 	string		key_str, content_str, device_tmp;
 	string		domain, family, member, personal_name, process;
-	string		device, host, program_no, pid, server;
+	string		device, host, program_no, pid, server, device_property;
 	string		version, device_type, device_class, count;
 	string		name, value, poll_rate;
 	string::size_type pos;
@@ -294,6 +295,8 @@ int db_read(char *dbm_file,char *TblName)
 				{
 					device_map[device] = device_map[device]+1;
 				}
+
+				cout << "DELETE FROM device where name='" << device << "';" << endl;
 				cout << "INSERT INTO device SET "
 				     << "name='" << device << "',"
 				     << "domain='" << domain << "',"
@@ -340,6 +343,7 @@ int db_read(char *dbm_file,char *TblName)
 					poll_rate = content_str.substr(0,pos);
 
 
+					cout << "DELETE FROM device where name='" << device << "';" << endl;
 					cout << "INSERT INTO device SET "
 				     	<< "name='" << device << "',"
 				     	<< "domain='" << domain << "',"
@@ -376,6 +380,22 @@ int db_read(char *dbm_file,char *TblName)
 					{
 						value.insert(pos,"\\");
 						pos = value.find("'",pos+2);
+					}
+//
+// count how many times this device property has been encountered 
+//
+
+					device = domain + "/" + family +  "/" +  member;
+					device_property = device + "/" + name;
+					ipos = property_map.find(device_property);
+					if (ipos == property_map.end())
+					{
+						property_map[device_property] = 1;
+						cout << "DELETE FROM property_device WHERE device='" << device << "' AND name='" << name << "';" << endl;
+					}
+					else
+					{
+						property_map[device_property] = property_map[device_property]+1;
 					}
 					cout << "INSERT INTO property_device SET "
 					     << "device='" << domain <<"/" << family << "/" << member << "',"
