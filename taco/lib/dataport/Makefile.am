@@ -1,16 +1,15 @@
-include_HEADERS		=boolean.h  dataport.h  dataportP.h  sema.h  shared.h
+include_HEADERS			= boolean.h  dataport.h  dataportP.h  sema.h  shared.h
 
-EXTRA_libdataport_la_SOURCES=dataport_ux.c dataport_os9.c shared.c sema.c
+EXTRA_libdataport_la_SOURCES	= dataport_ux.c dataport_os9.c shared.c sema.c
 
-lib_LTLIBRARIES=libdataport.la
-
-## libdataport_la_SOURCES = 
+lib_LTLIBRARIES			= libdataport.la
 
 if DATAPORT_UNIX
-libdataport_la_SOURCES	= dataport_ux.c shared.c sema.c 
+libdataport_la_SOURCES		= dataport_ux.c shared.c sema.c 
 else
-libdataport_la_SOURCES	= dataport_os9.c
+libdataport_la_SOURCES		= dataport_os9.c
 endif
 
-libdataport_la_LDFLAGS=-version-info $(subst .,:,@LIB_VERSION@)
+libdataport_la_LDFLAGS		= -version-info $(subst .,:,@LIB_VERSION@)
 
+INCLUDES			= @TACO_INCLUDES@

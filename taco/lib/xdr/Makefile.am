@@ -1,14 +1,14 @@
-include_HEADERS=API_xdr.h API_xdr_vers3.h DevServerXdr.h DevXdrKernel.h macros.h xdr_typelist.h \
-		atte_xdr.h bpm_xdr.h bpss_xdr.h ct_xdr.h daemon_xdr.h dev_xdr.h \
-		gpib_xdr.h grp_xdr.h haz_xdr.h icv101_xdr.h m4_xdr.h maxe_xdr.h \
-		mclock_xdr.h mstat_xdr.h pin_xdr.h pss_xdr.h ram_xdr.h \
-		rf_xdr.h seism_xdr.h slit_xdr.h thc_xdr.h union_xdr.h vgc_xdr.h \
-		vrif_xdr.h ws_xdr.h 
+include_HEADERS		= API_xdr.h API_xdr_vers3.h DevServerXdr.h DevXdrKernel.h xdr_typelist.h \
+			atte_xdr.h bpm_xdr.h bpss_xdr.h ct_xdr.h daemon_xdr.h dev_xdr.h \
+			gpib_xdr.h grp_xdr.h haz_xdr.h icv101_xdr.h m4_xdr.h maxe_xdr.h \
+			mclock_xdr.h mstat_xdr.h pin_xdr.h pss_xdr.h ram_xdr.h \
+			rf_xdr.h seism_xdr.h slit_xdr.h thc_xdr.h union_xdr.h vgc_xdr.h \
+			vrif_xdr.h ws_xdr.h 
 
 lib_LTLIBRARIES		= libdsxdr.la libdsxdr_all.la
 noinst_LTLIBRARIES	= libdsxdrbase.la
 
-INCLUDES		= -I$(top_srcdir)/dbase/include ${TACO_INCLUDES}
+INCLUDES		= @TACO_INCLUDES@
 
 KERNEL_SOURCE		= DevXdrKernel.c 
 
