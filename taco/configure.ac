@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0-beta, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.53)
-AC_REVISION($Revision: 1.5 $)dnl
+AC_REVISION($Revision: 1.6 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR(lib/dev_api.c)
@@ -25,55 +25,48 @@ AC_CHECK_HEADERS(sstream, [], [])
 AC_CHECK_HEADERS(strstream, [], [])
 AC_LANG_POP(C++)
 
+AC_SUBST(QT_INCLUDES, ['-I/usr/lib/qt2/include'])
+AC_SUBST(UIC, ['/usr/lib/qt2/bin/uic'])
+AC_SUBST(MOC, ['/usr/lib/qt2/bin/moc'])
+AC_SUBST(QT_LDFLAGS, ['-L/usr/lib/qt2/lib'])
+AC_SUBST(LIBSM, ['-lSM -lICE'])
+AC_SUBST(LIB_X11, ['-lX11 $(LIBSOCKET)'])
+AC_SUBST(LIB_QT, ['-lqt $(LIBPNG) $(LIBJPEG) -lXext $(LIB_X11) $(LIBSM)'])
+AC_SUBST(X_LDFLAGS, ['-L/usr/X11R6/lib'])
+
 AC_SUBST(appdefaultdir)
 
-sbindir='${exec_prefix}/system/bin'
-sbindir="$sbindir/$taco_install_path"
-datadir='${prefix}/etc'
-docdir='${prefix}/doc'
 pythondir='${prefix}/python'
-templatedir='${prefix}/templates/taco'
-resdatadir='${prefix}/dbase/res'
-dbmdir='${prefix}/dbase/dbm'
-CMDS_resdir='${resdatadir}/CMDS'
-ERROR_resdir='${resdatadir}/ERROR'
-CLASS_resdir='${resdatadir}/CLASS'
-NAMES_resdir='${resdatadir}/NAMES'
-PS_NAMES_resdir='${resdatadir}/PS_NAMES'
-EVENTS_resdir='${resdatadir}/EVENTS'
-SYS_resdir='${resdatadir}/SYS'
-SEC_resdir='${resdatadir}/SEC'
-TEST_resdir='${resdatadir}/TEST'
+
 aclocaldir=`aclocal --print-ac-dir`
 AC_SUBST(aclocaldir)
+sbindir='${exec_prefix}'/system/bin/${taco_install_path}
 AC_SUBST(sbindir)
-AC_SUBST(datadir)
-AC_SUBST(docdir)
+AC_SUBST(datadir, ['${prefix}/etc'])
+AC_SUBST(docdir, ['${prefix}/doc'])
 AC_SUBST(etcdir)
-AC_SUBST(templatedir)
-AC_SUBST(resdatadir)
-AC_SUBST(dbmdir)
+AC_SUBST(templatedir, ['${prefix}/templates/taco'])
+AC_SUBST(resdatadir, ['${prefix}/dbase/res'])
+AC_SUBST(dbmdir, ['${prefix}/dbase/dbm'])
 AC_SUBST(initdir)
-AC_SUBST(CMDS_resdir)
-AC_SUBST(ERROR_resdir)
-AC_SUBST(CLASS_resdir)
-AC_SUBST(EVENTS_resdir)
-AC_SUBST(NAMES_resdir)
-AC_SUBST(PS_NAMES_resdir)
-AC_SUBST(SYS_resdir)
-AC_SUBST(SEC_resdir)
-AC_SUBST(TEST_resdir)
+AC_SUBST(CMDS_resdir, ['${resdatadir}/CMDS'])
+AC_SUBST(ERROR_resdir, ['${resdatadir}/ERROR'])
+AC_SUBST(CLASS_resdir, ['${resdatadir}/CLASS'])
+AC_SUBST(EVENTS_resdir, ['${resdatadir}/EVENTS'])
+AC_SUBST(NAMES_resdir, ['${resdatadir}/NAMES'])
+AC_SUBST(PS_NAMES_resdir, ['${resdatadir}/PS_NAMES'])
+AC_SUBST(SYS_resdir, ['${resdatadir}/SYS'])
+AC_SUBST(SEC_resdir, ['${resdatadir}/SEC'])
+AC_SUBST(TEST_resdir, ['${resdatadir}/TEST'])
 
 TACO_INCLUDES="-I\$(top_srcdir)/lib/xdr -I\$(top_srcdir)/lib -I\$(top_srcdir)/lib/dc -I\$(top_srcdir)/lib/dbase\
 		-I\$(top_srcdir)/lib/tc -I\$(top_srcdir)/lib/ascii" 
 
 AC_SUBST(TACO_INCLUDES) 
-AC_CHECK_HEADERS([ndbm.h gdbm/ndbm.h])
-AC_FIND_GDBM
-AC_FUNC_DBM_FETCH
 
-if test -n "${MAKE_GDBM}" ; then
-     AC_CONFIG_SUBDIRS(gdbm-1.7.3)
+AC_FIND_GDBM
+if test "${MAKE_GDBM}" = "yes" ; then
+     AC_CONFIG_SUBDIRS(gdbm)
 fi
 
 TACO_SERVER_LIBS="\$(top_builddir)/lib/libdsapi.la \
@@ -117,6 +110,7 @@ AC_CONFIG_FILES(Makefile
 	  misc/taco.startup.sec
 	  doc/Makefile
 	  lib/Makefile
+	  lib/Doxyfile
 	  lib/private/Makefile
 	  lib/dbase/Makefile
 	  lib/dataport/Makefile
@@ -144,6 +138,10 @@ AC_CONFIG_FILES(Makefile
 	  taco.spec
 )
 
+dnl AC_CONFIG_FILES(system/dbdev/Makefile
+dnl		system/dbdev/src/Makefile
+dnl		system/dbdev/doc/Makefile)
+
 AC_CONFIG_FILES(classes/instverify/Makefile)
 AC_CONFIG_FILES(classes/powersupply/Makefile)
 AC_CONFIG_FILES(classes/serialline/Makefile)
@@ -154,6 +152,10 @@ AC_CONFIG_FILES(classes/signal/Makefile
 		classes/signal/multiple/doc/Makefile
 		classes/signal/single/Makefile
 		classes/signal/single/doc/Makefile)
+
+dnl AC_CONFIG_FILES(classes/profibusdp/Makefile
+dnl 		classes/profibusdp/lib/Makefile
+dnl 		classes/profibusdp/driver/Makefile)
 
 AC_CONFIG_FILES(system/dbase/newserver/Makefile)
 
@@ -166,6 +168,7 @@ AC_CONFIG_FILES(bindings/Makefile bindings/tcl/Makefile)
 dnl Initialize the test suite
 AC_CONFIG_TESTDIR(tests)
 AC_CONFIG_FILES(tests/Makefile tests/atlocal)
+AC_CONFIG_FILES(tests/testserver/Makefile)
 AC_CONFIG_FILES(tests/taco, [chmod +x tests/taco])
 AM_MISSING_PROG([AUTOM4TE], [autom4te])
 
@@ -180,6 +183,7 @@ Configuration (taco):
 	Compiler:		${CC},${CXX}
 	
 build:
+	gdbm:			${MAKE_GDBM}
 	dataport API:		${DATAPORT}
 	data collector API:	${dc}
 	ASCII API:		${ascii}

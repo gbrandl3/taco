@@ -107,7 +107,7 @@ AC_DEFUN(TACO_XDEVMENU,
 AC_DEFUN(X_AND_MOTIF,
 [
 	AC_REQUIRE([AC_PATH_XTRA])
-	AC_ARG_WITH(motif, AC_HELP_STRING([--with-motif@<:@=ARG@:>@], [Motif @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the Motif installation, e.g. '/usr/local/myMotif']),
+	AC_ARG_WITH(motif, AC_HELP_STRING([--with-motif@<:@=ARG@:>@], [Motif @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the Motif installation, e.g. '/usr/local/myMotif']), [
 		case  "$with_motif" in
 			yes) 	MOTIF_LIBS="-lXm" ;;
 			no)  	AC_MSG_WARN([You need Motif/Lesstif for greta/xdevmenu]);;
@@ -156,23 +156,32 @@ AC_DEFUN(TACO_DEFINES,
 
 AC_DEFUN(AC_FIND_GDBM,
 [
+	MAKE_GDBM=no
+	AC_ARG_WITH(gdbm, AC_HELP_STRING([--with-gdbm=ARG], [ ARG is the path to the gdbm installation, e.g. '/usr/local/gdbm']),
+		[
+		TACO_GDBM_INC=-I${withval}/include
+		TACO_GDBM_LDFLAGS=-L${withval}/lib,
+		])
 	LIBS_ORIG="$LIBS"
-	AC_CHECK_LIB(gdbm,gdbm_open)		 
-	AM_CONDITIONAL(BUILD_GDBM, test x${ac_cv_lib_gdbm_gdbm_open} = xyes)
-	if test x${ac_cv_lib_gdbm_gdbm_open} = xyes ; then
-	          TACO_GDBM="-lgdbm"
-dnl		this required for RedHat
-		  TACO_GDBM_INC="-I/usr/include/gdbm"
-		  MAKE_GDBM=""		  	
-	else
-		  TACO_GDBM="-L\$(top_srcdir)/gdbm -lgdbm"
-		  TACO_GDBM_INC="-I\$(top_srcdir)/gdbm"
-		  MAKE_GDBM="gdbm"
+	CFLAGS_ORIG="$CFLAGS"
+	CFLAGS="$CFLAGS $TACO_GDBM_INC" 
+	AC_CHECK_HEADER(gdbm.h,
+		[], [AC_CHECK_HEADER(gdbm/gdbm.h, [], [MAKE_GDBM="yes"])])
+	if test "$MAKE_GDBM" != "yes" ; then
+		AC_CHECK_LIB(gdbm, gdbm_open)		 
 	fi
-	AC_SUBST(TACO_GDBM)
+	if test x${ac_cv_lib_gdbm_gdbm_open} != xyes ; then
+		TACO_GDBM_LIBS="\$(top_builddir)/gdbm/libgdbm.la"
+		TACO_GDBM_INC="-I\$(top_builddir)/gdbm"
+		MAKE_GDBM="yes"
+	else
+		AC_SUBST(TACO_GDBM_LIBS, ["-lgdbm"])
+	fi
+	AM_CONDITIONAL(BUILD_GDBM, test x${MAKE_GDBM} = xyes)
 	AC_SUBST(TACO_GDBM_INC)
+	AC_SUBST(TACO_GDBM_LDFLAGS)
 	AC_SUBST(MAKE_GDBM)	
-	LIBS="$LIBS_ORIG"
+dnl	LIBS="$LIBS_ORIG"
 ]
 )
 
@@ -206,7 +215,7 @@ AC_DEFUN(TACO_DATAPORT_SRC,
 ])
 
 AC_DEFUN([AC_FUNC_DBM_FETCH],
-    [AC_CACHE_CHECK(whether dbm_fetch declaration needs parameters, 
+	[AC_CACHE_CHECK([whether dbm_fetch declaration needs parameters], 
 		   ac_cv_func_dbm_fetch_void,
 	[AC_TRY_COMPILE(
 [
