@@ -77,7 +77,9 @@ check-local:	atconfig atlocal $(TESTSUITE) taco
 
 $(TESTSUITE):	$(srcdir)/testsuite.at $(TESTSUITE_AT) $(srcdir)/package.m4
 	$(AUTOTEST) -I $(srcdir) $@.at -o $@.tmp
-	mv $@.tmp $@
+	sed  -e's/5>&1//g' $@.tmp > $@
+	chmod +x $@
+	rm -f $@.tmp	
 
 atconfig:	$(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
