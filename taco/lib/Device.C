@@ -8,14 +8,13 @@
 //		the device server base class in C++ (Device).
 //
 // Author(s):	Andy Goetz
+// 		$Author: jkrueger1 $
 //
 // Original:	March 1995
 //
-// $Revision: 1.2 $
+// Version:	$Revision: 1.3 $
 //
-// $Date: 2003-05-02 09:12:48 $
-//
-// $Author: jkrueger1 $
+// Date:	$Date: 2003-05-06 15:43:05 $
 //
 //-**********************************************************************
 		
@@ -64,30 +63,20 @@ long Device::ClassInitialise( long *error )
 Device::Device (char *devname, long *error)
 {
 	dev_printdebug(DBG_TRACE,"Device::Device() called, devname = %s\n",devname);
-
 	*error = DS_OK;
-
 //
 // check if ClassInitialise() has been called
 //
-	if (Device::class_inited != 1)
-	{
-		if (Device::ClassInitialise(error) != DS_OK)
-		{
-			return;
-		}
-	}
-
+	if (Device::class_inited != 1 && Device::ClassInitialise(error) != DS_OK)
+		return;
 //
 // initialise class_name (this should be done here because class_name
 // is NOT a static member of the device class for the case of device
 // server with several embedded classes. Also initialises, device
 // type
 //
-	
 	this->class_name = (char *)"DeviceClass";
 	snprintf(this->dev_type, sizeof(this->dev_type) - 1, TYPE_DEFAULT);
-
 //
 // initialise the device name
 //
@@ -99,12 +88,15 @@ Device::Device (char *devname, long *error)
 		return;
 	}
 	strcpy(this->name, devname);
-
 //
 // initialise the commands list
 //
 	this->commands_list[DevState] = DeviceCommandListEntry(long(DevState), (DeviceMemberFunction)&Device::State, D_VOID_TYPE, D_SHORT_TYPE, 0L, "State");
 	this->commands_list[DevStatus] = DeviceCommandListEntry(long(DevStatus), (DeviceMemberFunction)&Device::Status, D_VOID_TYPE, D_STRING_TYPE, 0L, "Status");
+	this->commands_list[DevOn] = DeviceCommandListEntry(long(DevOn), (DeviceMemberFunction)&Device::On, D_VOID_TYPE, D_VOID_TYPE, 0L, "On");
+	this->commands_list[DevOff] = DeviceCommandListEntry(long(DevOff), (DeviceMemberFunction)&Device::Off, D_VOID_TYPE, D_VOID_TYPE, 0L, "Off");
+	this->commands_list[DevReset] = DeviceCommandListEntry(long(DevReset), (DeviceMemberFunction)&Device::Reset, D_VOID_TYPE, D_VOID_TYPE, 0L, "Reset");
+	this->commands_list[DevClose] = DeviceCommandListEntry(long(DevClose), (DeviceMemberFunction)&Device::Close, D_VOID_TYPE, D_VOID_TYPE, ADMIN_ACCESS, "Close");
 	this->n_commands = this->commands_list.size();
 	this->state = DEVON;
 }
@@ -147,7 +139,7 @@ long Device::Command (long cmd, void* argin, long argin_type,
 //
 // add code to execute a command here
 //
-	for (int i = 0; i < this->n_commands; i++)
+	for (int i = 0; i < this->commands_list.size(); i++)
 	{
 		if (cmd == this->commands_list[i].cmd)
 		{
@@ -223,11 +215,19 @@ long Device::StateMachine(long cmd, long *error)
 //
 // default state machine is to allow all commands
 //
-	switch (cmd) 
+	switch (state)
 	{
-		default : break;
+		case DEVOFF :
+			if (cmd == DevOff)
+				return DS_NOTOK;
+			break;
+		case DEVON :
+			if (cmd == DevOn || cmd == DevClose)
+				return DS_NOTOK;
+			break; 
+		default : 
+			return DS_OK;
 	}
-
 	return(DS_OK);
 }
 
@@ -286,6 +286,41 @@ long Device::Status(void *vargin, void *vargout, long *error)
 }
 
 /**
+ *
+ */
+long Device::On(void *vargin, void *vargout, long *error)
+{
+	this->state = DEVON;
+	return DS_OK;
+}
+
+/**
+ *
+ */
+long Device::Off(void *vargin, void *vargout, long *error)
+{
+	this->state = DEVOFF;
+	return DS_OK;
+}
+
+/**
+ *
+ */
+long Device::Reset(void *vargin, void *vargout, long *error)
+{
+	this->state = DEVOFF;
+	return DS_OK;
+}
+
+/**
+ *
+ */
+long Device::Close(void *argin, void *vargout, long *error)
+{
+	delete this;
+}
+
+/**
  * Method to return the number of commands implemented in the device class 
  *
  * @param cmd_nb pointer to command number
@@ -310,7 +345,7 @@ long Device::Command_Query(_dev_cmd_info *cmd_info,long *error)
 {
 	*error = DS_OK;
 
-	for (long i = 0;i < this->n_commands;i++)
+	for (long i = 0;i < this->commands_list.size(); i++)
 	{
 		cmd_info[i].cmd = this->commands_list[i].cmd;
 		cmd_info[i].in_type = this->commands_list[i].arginType;
@@ -349,7 +384,7 @@ long Device::Get_min_access_right(long cmd,long *min_access,long *error)
 {
 	*error = DS_OK;
 
-	for (long i = 0;i < this->n_commands;i++)
+	for (long i = 0;i < this->commands_list.size(); i++)
 		if (cmd == this->commands_list[i].cmd)
 		{
 			*min_access = this->commands_list[i].minAccess;

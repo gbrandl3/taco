@@ -12,9 +12,9 @@
 //
 // Original:	February 1995
 //
-// $Revision: 1.2 $
+// $Revision: 1.3 $
 //
-// $Date: 2003-05-02 09:12:48 $
+// $Date: 2003-05-06 15:43:05 $
 //
 // $Author: jkrueger1 $
 //
@@ -47,7 +47,10 @@ private :
 public:
 	virtual long State(void *vargin, void *vargout , long *error);
 	virtual long Status(void *vargin, void *vargout, long *error);
-
+	virtual long On(void *vargin, void *vargout, long *error);
+	virtual long Off(void *vargin, void *vargout, long *error);
+	virtual long Reset(void *vargin, void *vargout, long *error);
+	virtual long Close(void *vargin, void *vargout, long *error);
 // 
 // class variables
 //
