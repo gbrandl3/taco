@@ -15,15 +15,15 @@
 //
 // Original:	June 1995
 //
-// $Revision: 1.1 $
+// $Revision: 1.2 $
 //
-// $Date: 2003-04-25 12:22:28 $
+// $Date: 2004-02-19 15:36:33 $
 //
 // $Author: jkrueger1 $
 //
 //+**********************************************************************
 		
-#include <iostream.h>
+#include <iostream>
 
 #include <API.h>
 #include <Device.H>
