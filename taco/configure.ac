@@ -1,13 +1,13 @@
-AC_INIT([TACO], [3.0.6], [taco-devel@lists.sourceforge.net])
+AC_INIT([TACO], [3.1.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.53 $)dnl
+AC_REVISION($Revision: 1.54 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
 
 TACO_INIT([no])
 
-AC_SUBST(LIB_VERSION, [10:1:0])
+AC_SUBST(LIB_VERSION, [11:0:0])
 
 AM_INIT_AUTOMAKE([dist-bzip2 1.7])
 
@@ -226,10 +226,10 @@ AC_SUBST([aclocaldir], ['${datadir}/aclocal'])
 
 AC_SUBST(TACO_INCLUDES, ["-I\$(top_srcdir)/lib/xdr -I\$(top_srcdir)/lib -I\$(top_srcdir)/lib/dc -I\$(top_srcdir)/lib/dbase -I\$(top_srcdir)/lib/tc -I\$(top_srcdir)/lib/ascii] -I\$(top_srcdir)/lib/private") 
 
-AC_SUBST(TACO_SERVER_LIBS, ["\$(top_builddir)/lib/libdsapi.la \$(top_builddir)/lib/dbase/libdbapi.la \$(top_builddir)/lib/xdr/libdsxdr.la"])
-AC_SUBST(TACO_SERVER_CXX_LIBS, ["\$(top_builddir)/lib/libdsapig++.la \$(top_builddir)/lib/dbase/libdbapi.la \$(top_builddir)/lib/xdr/libdsxdr.la"])
-AC_SUBST(TACO_CLIENT_LIBS, ["\$(top_builddir)/lib/libtacoapi.la \$(top_builddir)/lib/dbase/libdbapi.la \$(top_builddir)/lib/xdr/libdsxdr.la"])
-AC_SUBST(TACO_CLIENT_CXX_LIBS, ["\$(top_builddir)/lib/libtacoapig++.la \$(top_builddir)/lib/dbase/libdbapi.la \$(top_builddir)/lib/xdr/libdsxdr.la"])
+AC_SUBST(TACO_SERVER_LIBS, ["\$(top_builddir)/lib/libtaco.la \$(top_builddir)/lib/libtacomain.la"])
+AC_SUBST(TACO_SERVER_CXX_LIBS, ["\$(top_builddir)/lib/libtaco++.la \$(top_builddir)/lib/libtacomain.la"])
+AC_SUBST(TACO_CLIENT_LIBS, ["\$(top_builddir)/lib/libtaco.la"])
+AC_SUBST(TACO_CLIENT_CXX_LIBS, ["\$(top_builddir)/lib/libtaco++.la"])
 
 TACO_DEFINES
 TACO_SERVER_T
