@@ -1,4 +1,4 @@
-SUBDIRS			= testserver
+SUBDIRS			= ## testserver
 
 EXTRA_DIST 		= taco.in 
 
