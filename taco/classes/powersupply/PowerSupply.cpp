@@ -13,20 +13,19 @@
 //
 // Original:	April 1995
 //
-// $Revision: 1.1 $
+// $Revision: 1.2 $
 //
-// $Date: 2003-04-25 12:22:28 $
+// $Date: 2003-05-02 09:53:40 $
 //
 // $Author: jkrueger1 $
 //
 //+**********************************************************************
 		
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
+#include <cstdlib>
+#include <string>
+#include <cmath>
 #include <Admin.h>
 #include <API.h>
-#include <Device.H>
 #include <PowerSupply.h>
 #include <DevServer.h>
 #include <DevErrors.h>

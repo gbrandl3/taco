@@ -192,102 +192,99 @@ long AGPowerSupply::ClassInitialise (long *error)
 AGPowerSupply::AGPowerSupply (char *name, long *error)
               :PowerSupply (name, error)
 {
-   static Device::DeviceCommandListEntry commands_list[] = {
-         {DevState, &Device::State, D_VOID_TYPE, D_SHORT_TYPE},
-         {DevStatus, (DeviceMemberFunction)(&AGPowerSupply::Status), D_VOID_TYPE, D_STRING_TYPE},
-         {DevOn, (DeviceMemberFunction)(&AGPowerSupply::On), D_VOID_TYPE, D_VOID_TYPE},
-         {DevOff, (DeviceMemberFunction)&AGPowerSupply::Off, D_VOID_TYPE, D_VOID_TYPE},
-         {DevSetValue, (DeviceMemberFunction)&AGPowerSupply::SetValue, D_FLOAT_TYPE, D_VOID_TYPE},
-         {DevReadValue, (DeviceMemberFunction)&AGPowerSupply::ReadValue, D_VOID_TYPE, D_FLOAT_READPOINT},
-         {DevReset, (DeviceMemberFunction)&AGPowerSupply::Reset, D_VOID_TYPE, D_VOID_TYPE},
-         {DevError, (DeviceMemberFunction)&AGPowerSupply::Error, D_VOID_TYPE, D_VOID_TYPE},
-         {DevLocal, (DeviceMemberFunction)&AGPowerSupply::Local, D_VOID_TYPE, D_VOID_TYPE},
-         {DevRemote, (DeviceMemberFunction)&AGPowerSupply::Remote, D_VOID_TYPE, D_VOID_TYPE},
-         {DevUpdate, (DeviceMemberFunction)&AGPowerSupply::Update, D_VOID_TYPE, D_STATE_FLOAT_READPOINT},
-         {DevHello, (DeviceMemberFunction)&AGPowerSupply::Hello, D_STRING_TYPE, D_SHORT_TYPE},
-                                                           };
-   static long n_commands = sizeof(commands_list)/
-			    sizeof(DeviceCommandListEntry);
-
-   printf("AGPowerSupply::AGPowerSupply called, name %s\n",name);
-
+	printf("AGPowerSupply::AGPowerSupply called, name %s\n",name);
 //
 // check to see if AGPowerSupply::ClassInitialise has been called
 //
-   if (AGPowerSupply::class_inited != 1)
-   {
-      if (AGPowerSupply::ClassInitialise(error) != DS_OK)
-      {
-         return;
-      }
-   }
+	if (AGPowerSupply::class_inited != 1)
+	{
+		if (AGPowerSupply::ClassInitialise(error) != DS_OK)
+			return;
+	}
 
 //
 // AGPowerSupplyClass is a subclass of PowerSupplyClass
 //
-
-   this->class_name = (char*)malloc(strlen("AGPowerSupplyClass")+1);
-   sprintf(this->class_name,"AGPowerSupplyClass");
+	this->class_name = (char*)malloc(strlen("AGPowerSupplyClass")+1);
+	strcpy(this->class_name, "AGPowerSupplyClass");
 
 //
 // initialise the commands list to point to the commands list 
 // implemented for the AG PowerSupply class
 //
-
-   this->n_commands = n_commands;
-   this->commands_list = commands_list;
-
+        this->commands_list[DevStatus] = DeviceCommandListEntry(DevStatus, (DeviceMemberFunction)(&AGPowerSupply::Status), 
+							D_VOID_TYPE, D_STRING_TYPE, 0, "DevStatus");
+        this->commands_list[DevOn] = DeviceCommandListEntry(DevOn, (DeviceMemberFunction)(&AGPowerSupply::On), 
+							D_VOID_TYPE, D_VOID_TYPE, 0, "DevOn");
+        this->commands_list[DevOff] = DeviceCommandListEntry(DevOff, (DeviceMemberFunction)&AGPowerSupply::Off, 
+							D_VOID_TYPE, D_VOID_TYPE, 0, "DevOff");
+        this->commands_list[DevSetValue] = DeviceCommandListEntry(DevSetValue, (DeviceMemberFunction)&AGPowerSupply::SetValue, 
+							D_FLOAT_TYPE, D_VOID_TYPE, 0, "DevSetValue");
+        this->commands_list[DevReadValue] = DeviceCommandListEntry(DevReadValue, (DeviceMemberFunction)&AGPowerSupply::ReadValue, 
+							D_VOID_TYPE, D_FLOAT_READPOINT, 0, "DevReadValue");
+        this->commands_list[DevReset] = DeviceCommandListEntry(DevReset, (DeviceMemberFunction)&AGPowerSupply::Reset, 
+							D_VOID_TYPE, D_VOID_TYPE, 0, "DevReset");
+        this->commands_list[DevError] = DeviceCommandListEntry(DevError, (DeviceMemberFunction)&AGPowerSupply::Error, 
+							D_VOID_TYPE, D_VOID_TYPE, 0, "DevError");
+        this->commands_list[DevLocal] = DeviceCommandListEntry(DevLocal, (DeviceMemberFunction)&AGPowerSupply::Local, 
+							D_VOID_TYPE, D_VOID_TYPE, 0, "DevLocal");
+        this->commands_list[DevRemote] = DeviceCommandListEntry(DevRemote, (DeviceMemberFunction)&AGPowerSupply::Remote, 
+							D_VOID_TYPE, D_VOID_TYPE, 0, "DevRemote");
+        this->commands_list[DevUpdate] = DeviceCommandListEntry(DevUpdate, (DeviceMemberFunction)&AGPowerSupply::Update, 
+							D_VOID_TYPE, D_STATE_FLOAT_READPOINT, 0, "DevUpdate");
+        this->commands_list[DevHello] = DeviceCommandListEntry(DevHello, (DeviceMemberFunction)&AGPowerSupply::Hello, 
+							D_STRING_TYPE, D_SHORT_TYPE, 0, "DevHello");
+	this->n_commands = this->commands_list.size(); 
 //
 // initialise new AGPowerSupply with template, (this could 
 // also be done by overloading the operator=)
 //
 
-/*   this->state = agps_template->state;
-   this->set_val = agps_template->set_val;
-   this->channel = agps_template->channel;
-   this->n_ave = agps_template->n_ave;
-   this->conv_unit = (char*)malloc(strlen(agps_template->conv_unit)+1);
-   sprintf(this->conv_unit,"%s",agps_template->conv_unit);
-   this->set_offset = agps_template->set_offset;
-   this->read_offset = agps_template->read_offset;
-   this->set_u_limit = agps_template->set_u_limit;
-   this->set_l_limit = agps_template->set_l_limit;
-   this->polarity = agps_template->polarity;*/
+/*
+	this->state = agps_template->state;
+	this->set_val = agps_template->set_val;
+	this->channel = agps_template->channel;
+	this->n_ave = agps_template->n_ave;
+	this->conv_unit = (char*)malloc(strlen(agps_template->conv_unit)+1);
+	sprintf(this->conv_unit,"%s",agps_template->conv_unit);
+	this->set_offset = agps_template->set_offset;
+	this->read_offset = agps_template->read_offset;
+	this->set_u_limit = agps_template->set_u_limit;
+	this->set_l_limit = agps_template->set_l_limit;
+	this->polarity = agps_template->polarity;
+*/
 
 //
 // initialise powersupply with values defined in database
 //
-
-   if (this->GetResources(this->name,error) != DS_OK)
-   {
-      printf("AGPowerSupply::AGPowerSupply(): GetResources() failed, error %d\n",*error);
-      return;
-   }
+	if (this->GetResources(this->name,error) != DS_OK)
+	{
+		fprintf(stderr, "AGPowerSupply::AGPowerSupply(): GetResources() failed, error %d\n",*error);
+		return;
+	}
 
 //
 // interpret the initial state of the powersupply
 //
-   if (this->state == DEVON)
-   {
-      printf("AGPowerSupply::AGPowerSupply() switching ON\n");
-      On(NULL,NULL,error);
+	if (this->state == DEVON)
+	{
+		printf("AGPowerSupply::AGPowerSupply() switching ON\n");
+		On(NULL,NULL,error);
 //
 // if switched ON then set the current too
 //
-      SetValue((void*)&(this->set_val),NULL,error);
-   }
-   else
-   {
-      printf("AGPowerSupply::AGPowerSupply() switching OFF\n");
+		SetValue((void*)&(this->set_val),NULL,error);
+	}
+	else
+	{
+		printf("AGPowerSupply::AGPowerSupply() switching OFF\n");
 //
 // default is to assume the powersupply is OFF
 //
-      Off(NULL,NULL,error);
-   }
-
-   printf("leaving AGPowerSupply::AGPowerSupply() and all OK\n");
-
-   return;
+		Off(NULL,NULL,error);
+	}
+	printf("leaving AGPowerSupply::AGPowerSupply() and all OK\n");
+	return;
 }
 
 //+======================================================================
@@ -302,174 +299,152 @@ AGPowerSupply::AGPowerSupply (char *name, long *error)
 //-=====================================================================
 long AGPowerSupply::StateMachine (long cmd, long *error)
 {
-   long iret = 0;
-   long int p_state, n_state;
+	long iret = 0;
+	long int p_state, n_state;
 
-   p_state = this->state;
+	p_state = this->state;
 
 //
 // before checking out the state machine assume that the state
 // doesn't change i.e. new state == old state
 //
-   n_state = p_state;
+	n_state = p_state;
 
-   switch (p_state) {
-   
-   case (DEVOFF) :
-   {
-      switch (cmd) {
-      
-      case (DevOn) : n_state = DEVON;
-                     break;
-
-      case (DevError) : n_state = DEVFAULT;
-                        break;
-
-      case (DevLocal) : n_state = DEVLOCAL;
-                        break;
-
+	switch (p_state) 
+	{
+		case (DEVOFF) :
+	      		switch (cmd) 
+			{
+				case (DevOn) : 
+					n_state = DEVON;
+					break;
+				case (DevError) : 
+					n_state = DEVFAULT;
+					break;
+				case (DevLocal) : 
+					n_state = DEVLOCAL;
+					break;
 // following commands are ignored in this state
-
-      case (DevSetValue) :
-      case (DevReadValue) : iret = -1;
-                            *error = DevErr_CommandIgnored;
-                            break;
-
+				case (DevSetValue) :
+				case (DevReadValue) : 
+					iret = DS_NOTOK;
+					*error = DevErr_CommandIgnored;
+					break;
 // following commands don't change the state machine
-
-      case (DevReset) : 
-      case (DevRemote) : 
-      case (DevOff) : 
-      case (DevState) : 
-      case (DevUpdate) :
-      case (DevStatus) : break;
-
-      default : break;
-      }
-      
-      break;
-   }
-
-   case (DEVON) :
-   {
-      switch (cmd) {
-
-      case (DevOff) : n_state = DEVOFF;
-                      break;
-      case (DevError) : n_state = DEVFAULT;
-                        break;
-      case (DevLocal) : n_state = DEVLOCAL;
-                        break;
-
+				case (DevReset) : 
+				case (DevRemote) : 
+				case (DevOff) : 
+				case (DevState) : 
+				case (DevUpdate) :
+				case (DevStatus) : 
+					break;
+				default : 
+					break;
+			}
+			break;
+		case (DEVON) :
+			switch (cmd) 
+			{
+				case (DevOff) : 
+					n_state = DEVOFF;
+					break;
+				case (DevError) : 
+					n_state = DEVFAULT;
+					break;
+				case (DevLocal) : 
+					n_state = DEVLOCAL;
+					break;
 // following commands violate the state machine
-
-      case (DevRemote) : 
-      case (DevReset) : iret = -1;
-                        (*error) = DevErr_AttemptToViolateStateMachine;
-                        break;
-
+				case (DevRemote) : 
+				case (DevReset) : 
+					iret = DS_NOTOK;
+					(*error) = DevErr_AttemptToViolateStateMachine;
+					break;
 // the following commands don't change the state of the machine
-
-      case (DevState) : 
-      case (DevStatus) : 
-      case (DevReadValue) : 
-      case (DevSetValue) :
-      case (DevUpdate) :
-      case (DevRun) : break;
-
-      default : break;
-      }
-
-      break;
-   }
-   case (DEVLOCAL) :
-   {
-      switch (cmd) {
-
-      case (DevRemote) : n_state = DEVOFF;
-                         break;
-
+				case (DevState) : 
+				case (DevStatus) : 
+				case (DevReadValue) : 
+				case (DevSetValue) :
+				case (DevUpdate) :
+				case (DevRun) : 
+					break;
+				default : 
+					break;
+			}
+			break;
+		case (DEVLOCAL) :
+			switch (cmd) 
+			{
+				case (DevRemote) : 
+					n_state = DEVOFF;
+					break;
 // the following commands violate the state machine 
-
-      case (DevOn) :
-      case (DevOff) :
-      case (DevRun) :
-      case (DevReset) :
-      case (DevStandby) :
-      case (DevError) : iret = -1;
-                        (*error) = DevErr_AttemptToViolateStateMachine;
-                        break;
-
+				case (DevOn) :
+				case (DevOff) :
+				case (DevRun) :
+				case (DevReset) :
+				case (DevStandby) :
+				case (DevError) : 
+					iret = DS_NOTOK;
+					(*error) = DevErr_AttemptToViolateStateMachine;
+					break;
 // following commands are ignored 
-
-      case (DevSetValue) : iret = -1;
-                           *error = DevErr_CommandIgnored;
-                           break;
-
+				case (DevSetValue) : 
+					iret = DS_NOTOK; 
+					*error = DevErr_CommandIgnored;
+					break;
 // the following commands don't change the state of the machine
-
-      case (DevState) :
-      case (DevStatus) :
-      case (DevLocal) :
-      case (DevUpdate) :
-      case (DevReadValue) : break;
-
-      default : break;
-
-      }
-
-      break;
-   }
-   case (DEVFAULT) :
-   {
-      switch (cmd) {
-
-      case (DevReset) : n_state = DEVOFF;
-                        break;
-      
+				case (DevState) :
+				case (DevStatus) :
+				case (DevLocal) :
+				case (DevUpdate) :
+				case (DevReadValue) : 
+					break;
+				default : 
+					break;
+			}
+			break;
+		case (DEVFAULT) :
+			switch (cmd) 
+			{
+				case (DevReset) : 
+					n_state = DEVOFF;
+					break;
 // the following commands violate the state machine
-
-      case (DevOff) :
-      case (DevRemote) :
-      case (DevOn) :
-      case (DevLocal) : iret = -1;
-                        (*error) = DevErr_AttemptToViolateStateMachine;
-                        break;
-
+				case (DevOff) :
+				case (DevRemote) :
+				case (DevOn) :
+				case (DevLocal) : 
+					iret = DS_NOTOK;
+					(*error) = DevErr_AttemptToViolateStateMachine;
+					break;
 // following commands are ignored
-
-      case (DevSetValue) : 
-      case (DevReadValue) : iret = -1;
-                            *error = DevErr_CommandIgnored;
-                            break;
-
+				case (DevSetValue) : 
+				case (DevReadValue) : 
+					iret = DS_NOTOK;
+					*error = DevErr_CommandIgnored;
+					break;
 // the following commands don't change the stae of the machine
-
-      case (DevState) : 
-      case (DevStatus) : 
-      case (DevUpdate) :
-      case (DevError) : break;
-
-      default : break;
-
-      }
-      break;
-   }
-
-   default : break;
-   }
+				case (DevState) : 
+				case (DevStatus) : 
+				case (DevUpdate) :
+				case (DevError) : 
+					break;
+				default : 
+					break;
+			}
+			break;
+		default : 
+			break;
+	}
 
 //
 // update powersupply's private variable n_state so that other methods
 // can use it too.
 //
-
-   this->n_state = n_state;
-
-   printf("AGPowerSupply::StateMachine(): p_state %2d n_state %2d, iret %2d\n",
-          p_state,n_state, iret);
-
-   return(iret);
+	this->n_state = n_state;
+	printf("AGPowerSupply::StateMachine(): p_state %2d n_state %2d, iret %2d\n", p_state,n_state, iret);
+	return(iret);
 }
 
 //+=====================================================================
