@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0-rc2, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.18 $)dnl
+AC_REVISION($Revision: 1.19 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -138,6 +138,7 @@ TACO_TCL_BINDING
 TACO_MYSQL_SUPPORT
 TACO_GRETA
 TACO_XDEVMENU
+TACO_ALARM
 
 AC_SUBST([RPM_RELEASE], 0)
 AM_RPM_INIT
@@ -180,6 +181,7 @@ AC_CONFIG_FILES(Makefile
 	  system/xdevmenu/Makefile
 	  system/xdevmenu/doc/Makefile
 	  system/starter/Makefile
+	  system/alarm/Makefile
 	  taco.spec
 )
 
@@ -230,13 +232,14 @@ Configuration (taco):
 build:
 	gdbm:			${MAKE_GDBM}
 	dataport API:		${DATAPORT}
-	data collector API:	${dc}
+	data collector API:	${taco_dc}
 	ASCII API:		${ascii}
 	database server with:
 		DBM support:	yes
-		mySQL support:	${mysql}
+		mySQL support:	${taco_mysql}
 	greta:			${greta}
 	xdevmenu:		${xdevmenu}
+	S_Alarm:		${alarm}
 	bindings:
 		python :	${taco_python_binding}
 		TCL:		${taco_tcl_binding}
