@@ -203,7 +203,7 @@ AC_DEFUN([TACO_TANGO],
 			yes)    taco_tango=yes;;
 			no)     taco_tango=no;;
 			*)      AC_MSG_ERROR([bad value ${enable_tango} for --enable-tango]);;
-		esac], [taco_tango=yes])
+		esac], [taco_tango=no])
 	AM_CONDITIONAL(TANGO_BUILD, test "x$taco_tango" = "xyes")
 	if test "x$taco_tango" = "xyes" ; then
 		WITH_CORBA
