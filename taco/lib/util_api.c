@@ -13,9 +13,9 @@
 
  Original   :	April 1993
 
- Version:	$Revision: 1.15 $
+ Version:	$Revision: 1.16 $
 
- Date:		$Date: 2004-09-17 07:56:18 $
+ Date:		$Date: 2004-09-17 10:09:17 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -50,7 +50,7 @@
 #endif  /* _NT */
 
 
-static long get_cmd_string PT_( (devserver ds, long cmd, char *cmd_str, long *error) );
+static long get_cmd_string PT_( (devserver ds, long cmd, char *cmd_str, size_t len, long *error) );
 
 /****************************************
  *          Globals	                *
@@ -542,22 +542,13 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
 		}
 		else
 		{
-			if (!ds->no_database)
+			if ((ret_stat = get_cmd_string(ds, varcmdarr->sequence[i].cmd, varcmdarr->sequence[i].cmd_name, 
+						sizeof(varcmdarr->sequence[i].cmd_name), error)) == DS_NOTOK)
 			{
-				if ((ret_stat = get_cmd_string(ds, varcmdarr->sequence[i].cmd, varcmdarr->sequence[i].cmd_name, error)) == DS_NOTOK)
-				{
 /*
  * An error will be only returned if the database access fails.
  */
 					return (DS_NOTOK);
-				}
-			}
-			if (ds->no_database || ret_stat == DS_WARNING)
-			{
-				snprintf(varcmdarr->sequence[i].cmd_name, sizeof(varcmdarr->sequence[i].cmd_name), "command_%li/%li/%li", 
-							((varcmdarr->sequence[i].cmd >> DS_TEAM_SHIFT) & DS_TEAM_MASK),
-                                                        ((varcmdarr->sequence[i].cmd >> DS_IDENT_SHIFT) & DS_IDENT_MASK),
-                                                        (varcmdarr->sequence[i].cmd & 0xFFF));
 			}
 		}
 		if (!ds->no_database)
@@ -647,7 +638,7 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
  * 		executed correctly, but no command name
  * 		string was found in the database.
  */ 
-static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
+static long get_cmd_string (devserver ds, long cmd, char *cmd_str, size_t len, long *error)
 {
 	char		res_path[LONG_NAME_SIZE];
 	char		res_name[SHORT_NAME_SIZE];
@@ -672,51 +663,52 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, long *error)
 	server = server & DS_IDENT_MASK;
 	cmds_ident = (_Int)(cmd & cmd_number_mask);
 
+	if (!ds->no_database) 
+	{
 /*
  * Create the resource path and the resource structure.
  * First check to see whether the device belongs to another nethost domain i.e. i_nethost != 0
  */
-	if (ds->i_nethost > 0)
-	{
-		snprintf(res_path, sizeof(res_path), "//%s/CMDS/%d/%d", 
-		   get_nethost_by_index(ds->i_nethost, error), team, server);
-	}
+		if (ds->i_nethost > 0)
+		{
+			snprintf(res_path, sizeof(res_path), "//%s/CMDS/%d/%d", get_nethost_by_index(ds->i_nethost, error), team, server);
+		}
 /*
  * use default nethost
  */
-	else
-	{
-		snprintf(res_path, sizeof(res_path), "CMDS/%d/%d", team, server);
-	}
+		else
+		{
+			snprintf(res_path, sizeof(res_path), "CMDS/%d/%d", team, server);
+		}
 
-	snprintf (res_name, sizeof(res_name), "%d", cmds_ident);
-	dev_printdebug (DBG_API, "get_cmds_string() : res_path = %s\n", res_path);
-	dev_printdebug (DBG_API, "get_cmds_string() : res_name = %s\n", res_name);
+		snprintf (res_name, sizeof(res_name), "%d", cmds_ident);
+		dev_printdebug (DBG_API, "get_cmds_string() : res_path = %s\n", res_path);
+		dev_printdebug (DBG_API, "get_cmds_string() : res_name = %s\n", res_name);
 
-	res_tab.resource_name = res_name;
-	res_tab.resource_type = D_STRING_TYPE;
-	res_tab.resource_adr  = &ret_str;
+		res_tab.resource_name = res_name;
+		res_tab.resource_type = D_STRING_TYPE;
+		res_tab.resource_adr  = &ret_str;
 
 /*
  * Read the command name string from the database.
  */
-	if (db_getresource (res_path, &res_tab, 1, error) == DS_NOTOK)
-	{
-		dev_printdebug (DBG_API | DBG_ERROR, "get_cmd_string() : db_getresource failed with error %d\n", *error);
-
-		return (DS_NOTOK);
+		if (db_getresource (res_path, &res_tab, 1, error) == DS_NOTOK)
+		{
+			dev_printdebug (DBG_API | DBG_ERROR, "get_cmd_string() : db_getresource failed with error %d\n", *error);
+			return (DS_NOTOK);
+		}
 	}
 /*
- * If the variable ret_str is still NULL, no resource value was found
- * in the database, but the function was executed without error.
+ * If the variable ret_str is still NULL, no resource value was found in the database, but the function was executed without error.
  * In this case return the value DS_WARNING.
  */
 	if ( ret_str == NULL )
 	{
+		snprintf(cmd_str, len, "command_%li/%li/%li", team, server, cmds_ident); 
 		return (DS_WARNING);
 	}
 
-	strncpy(cmd_str, ret_str, SHORT_NAME_SIZE);
+	snprintf(cmd_str, len, "%s", ret_str);
 	free (ret_str);
 	return (DS_OK);
 }

@@ -33,9 +33,9 @@
 
  Original   :	April 1999
 
- Version    :	$Revision: 1.9 $
+ Version    :	$Revision: 1.10 $
 
- Date       :	$Date: 2004-03-26 16:33:47 $
+ Date       :	$Date: 2004-09-17 10:09:17 $
 
  Copyleft (c) 1999 by European Synchrotron Radiation Facility,
                       Grenoble, France
@@ -241,8 +241,7 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 		return(DS_NOTOK);
 	}
 /*
- * If the security system is configured, 
- * verify the security key
+ * If the security system is configured, verify the security key
  */
 
 	if (!ds->no_database)
@@ -257,9 +256,8 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 	}
 
 /*
- * in order to received events the client needs to register
- * an RPC service to receive the answer. Check if the client has done
- * this, if not then register the client.
+ * in order to received events the client needs to register an RPC service to receive the answer. Check if the 
+ * client has done this, if not then register the client.
  */
 	if (config_flags.asynch_rpc != True)
 	{
@@ -268,18 +266,15 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 	}
 	
 /*
- * events use the asynchronous service of the device server - 
- * make sure it is imported. 
+ * events use the asynchronous service of the device server - make sure it is imported. 
  */
-
 	if (asynch_server_import(ds,error) != DS_OK)
 	{
 		return (DS_NOTOK);
 	}
 
 /*
- * store the pointers to the return arguments so that event can
- * be passed back asynchronously to the client
+ * store the pointers to the return arguments so that event can be passed back asynchronously to the client
  */
 	event_type = event_type;
 	if (asynch_add_request(ds, D_EVENT_TYPE, event_type, argout, argout_type, callback, user_data, &event_id, &event_index, error) != DS_OK)
@@ -287,11 +282,9 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 		return(DS_NOTOK);
 	}
 
-
-	/*
-	 *  fill in data transfer structures server_data
-	 *  and client_data.
-	 */
+/*
+ *  fill in data transfer structures server_data and client_data.
+ */
 
 	server_data.ds_id	= ds->ds_id;
 	server_data.client_id	= client_id;
@@ -303,13 +296,11 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 
 	dev_printdebug (DBG_ASYNCH, "dev_event_listen_x() : server data -> \n");
 	dev_printdebug (DBG_ASYNCH, "ds_id=%d  cmd=%d  outtype=%d\n",
-	    server_data.ds_id, server_data.cmd,
-	    server_data.argout_type);
+	    	server_data.ds_id, server_data.cmd, server_data.argout_type);
 
 /*
- * additional arguments, in this case asynch_id and the return argument
- * pointers are passed to the device server via the variable argument 
- * array
+ * additional arguments, in this case asynch_id and the return argument pointers are passed to the device server 
+ * via the variable argument array
  */
 	server_data.var_argument.length = iarg = 0;
 	vararg[iarg].argument_type	= D_ULONG_TYPE;
@@ -338,16 +329,12 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 
         dev_printdebug (DBG_TRACE | DBG_ASYNCH, "\ndev_event_listen_x() : client data -> ");
         dev_printdebug (DBG_ASYNCH, "event_type=%d asynch_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
-	    event_type,event_id,
-	    config_flags.server_name,config_flags.server_host,
-	    config_flags.prog_number,config_flags.vers_number);
+	    	event_type,event_id, config_flags.server_name,config_flags.server_host, config_flags.prog_number,config_flags.vers_number);
 
 /*
- *  call RPC_DEV_PUTGET_ASYN using the client handle which has
- *  been opened to the asynchronous service of the server and
+ *  call RPC_DEV_PUTGET_ASYN using the client handle which has been opened to the asynchronous service of the server and
  *  ONE-WAY rpc i.e. xdr routine = xdr_void && timeout = zero
  */
-
 	clnt_stat = clnt_call (ds->asynch_clnt, RPC_EVENT_LISTEN,
 		    (xdrproc_t)xdr__server_data, (caddr_t) &server_data,
 		    (xdrproc_t)xdr_void, (caddr_t) NULL, TIMEVAL(zero_timeout));
@@ -356,7 +343,6 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 /*
  * Check for errors on the RPC connection.
  */
-
 	if ( clnt_stat != RPC_TIMEDOUT)
 	{
 		if ( dev_rpc_error (ds, clnt_stat, error) == DS_NOTOK )
@@ -371,12 +357,10 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 		}
 	}
 
-	/*
-	 * return the asynch_id to the client for identification purposes
-	 */
-
+/*
+ * return the asynch_id to the client for identification purposes
+ */
 	*event_id_ptr = event_id;
-
 	return (DS_OK);
 }
 
@@ -430,8 +414,7 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
 
 
 /*
- * for all registered clients if event type corresponds then notify
- * them by sending them the output arguments
+ * for all registered clients if event type corresponds then notify them by sending them the output arguments
  */
 	for (i=0; i<EVENT_MAX_CLIENTS; i++)
 		if (event_client_list != NULL)
@@ -454,8 +437,7 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
 		    			event_client_list[i].id, client.server_name, client.server_host, client.prog_number, client.vers_number);
 
 /*
- * to send an event to the client asynchronously the client rpc service
- * must be imported. make sure it is imported.
+ * to send an event to the client asynchronously the client rpc service must be imported. make sure it is imported.
  */
         			UNLOCK(async_mutex);
 				if (asynch_client_check(&client, &error) != DS_OK)
@@ -466,22 +448,16 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
         			LOCK(async_mutex);
 
 /*
- * tag asynchronous information onto client_data so that client
- * can identify the reply
- *
- * return time command was executed by server to client tagged on
- * (simulate gettimeofday() with time() on VxWorks)
+ * Tag asynchronous information onto client_data so that client can identify the reply. Return time command 
+ * was executed by server to client tagged on (simulate gettimeofday() with time() on VxWorks)
  */
-
 #if defined (vxworks) || (WIN32)
 				time(&tea_time);
 				timenow.tv_sec = tea_time;
 				timenow.tv_usec = 0;
 #else
 				gettimeofday(&timenow,&tz);
-
 #endif /* !vxworks */
-
                         	dev_printdebug (DBG_ASYNCH, "\ndev_event_fire() : send event to client (time={%d,%d})\n",
 				   	timenow.tv_sec,timenow.tv_usec);
 
@@ -502,7 +478,6 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
 
 #ifdef NEVER 
 /* no need for this management - simply point to argout ? 
- *
  * allocate space for client data and copy argout to this area
  */
         			if (asynch_client_data.argout_type != D_VOID_TYPE)
@@ -533,8 +508,7 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
 				asynch_client_data.var_argument.sequence = vararg;
 		
 /*
- * send event using ONE-WAY rpc i.e. timeout=0 , this way the server
- * gets rid of the replies immediately.
+ * send event using ONE-WAY rpc i.e. timeout=0 , this way the server gets rid of the replies immediately.
  */
         			clnt_stat = clnt_call (client.asynch_clnt, RPC_PUTGET_ASYN_REPLY,
 	                    	   	(xdrproc_t)xdr__asynch_client_data, (caddr_t) &asynch_client_data,
@@ -543,24 +517,18 @@ void _DLLFunc dev_event_fire (DeviceBase *device, long event,
                         	dev_printdebug (DBG_ASYNCH, "\ndev_event_fire() : send event to client (clnt_stat %d)\n",clnt_stat);
 
 /*
- * because we are using "one-way rpc" to send the reply to the client
- * the normal status is RPC_TIMEDOUT, any other status is an error
- * what to do with the error ? how to inform the client ? maybe I could
- * try sending the error with clnt_call() and what if that fails ?
- * have to think out something here. maybe interpret the error and
- * then send it back via a special error channel ?
+ * because we are using "one-way rpc" to send the reply to the client the normal status is RPC_TIMEDOUT, any 
+ * other status is an error what to do with the error ? how to inform the client ? maybe I could try sending 
+ * the error with clnt_call() and what if that fails ? have to think out something here. maybe interpret the 
+ * error and then send it back via a special error channel ?
  *
- * for the moment ignore all errors except for RPC_CANTSEND. this
- * (normally) occurs when the server tries to send an answer to a
- * stale client handle (e.g. client has died). in this case call
- * shutdown the client tcp socket and call the event_client_cleanup()
- * routine to destroy the client handle.
+ * for the moment ignore all errors except for RPC_CANTSEND. this (normally) occurs when the server tries to 
+ * send an answer to a stale client handle (e.g. client has died). in this case call shutdown the client tcp 
+ * socket and call the event_client_cleanup() routine to destroy the client handle.
  *
- * note : there is no point calling dev_rpc_error() here because the
- *        client devserver structure does not refer to a real device
- *        but to a pseudo device server. any attempt to recreate the
- *        connection will result in a crash (because not all fields
- *        are correctly initialised).
+ * note : there is no point calling dev_rpc_error() here because the client devserver structure does not refer 
+ *        to a real device but to a pseudo device server. any attempt to recreate the connection will result 
+ *        in a crash (because not all fields are correctly initialised).
  *
  * andy 25/6/97
  */
@@ -623,8 +591,7 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 	LOCK(async_mutex);
 
 /*
- * save the device's nethost in an intermediate variable
- * to make it more accessible
+ * save the device's nethost in an intermediate variable to make it more accessible
  */
 	if (!ds->no_database)
 	{
@@ -633,15 +600,13 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 	}
 
 /*
- * Identify a local device.
- * Device is local if local_flag == True.
+ * Identify a local device. Device is local if local_flag == True.
  */
 	local_flag =(_Int)( ds->ds_id >> LOCALACCESS_SHIFT);
 	local_flag = local_flag & LOCALACCESS_MASK;
 
 /*
- * Verify the RPC connection if the device is not local.
- * Events are not supported for local devices.
+ * Verify the RPC connection if the device is not local.  Events are not supported for local devices.
  */
 	if ( local_flag != True )
 	{
@@ -658,8 +623,7 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 		return(DS_NOTOK);
 	}
 /*
- * If the security system is configured, 
- * verify the security key
+ * If the security system is configured, verify the security key
  */
 	if (!ds->no_database && (nethost->config_flags.security == True)
 		&& (verify_sec_key (ds, &client_id, error) == DS_NOTOK))
@@ -669,8 +633,7 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 		}
 
 /*
- * events use the asynchronous service of the device server - 
- * make sure it is imported. 
+ * events use the asynchronous service of the device server - make sure it is imported. 
  */
 	UNLOCK(async_mutex);
 	if (asynch_server_import(ds,error) != DS_OK)
@@ -678,10 +641,8 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 
 	LOCK(async_mutex);
 /*
- * store the pointers to the return arguments so that event can
- * be passed back asynchronously to the client
- *
- *  fill in data transfer structures server_data and client_data.
+ * store the pointers to the return arguments so that event can be passed back asynchronously to the client
+ * fill in data transfer structures server_data and client_data.
  */
 	server_data.ds_id	= ds->ds_id;
 	server_data.client_id	= client_id;
@@ -691,9 +652,8 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 	server_data.argout_type	= D_VOID_TYPE;
 	server_data.argin	= (char *) NULL;
 /*
- * additional arguments, in this case asynch_id and the return argument
- * pointers are passed to the device server via the variable argument 
- * array
+ * additional arguments, in this case asynch_id and the return argument pointers are passed to the device 
+ * server via the variable argument array
  */
 	server_data.var_argument.length = iarg = 0;
 	vararg[iarg].argument_type	= D_ULONG_TYPE;
@@ -731,11 +691,9 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 	    event_type,event_id, config_flags.server_name,config_flags.server_host, config_flags.prog_number,config_flags.vers_number);
 
 /*
- *  call RPC_EVENT_LISTEN using the client handle which has
- *  been opened to the asynchronous service of the server and
- *  ONE-WAY rpc i.e. xdr routine = xdr_void && timeout = zero
+ * call RPC_EVENT_LISTEN using the client handle which has been opened to the asynchronous service of the 
+ * server and ONE-WAY rpc i.e. xdr routine = xdr_void && timeout = zero
  */
-
 	clnt_stat = clnt_call (ds->asynch_clnt, RPC_EVENT_UNLISTEN,
 			    (xdrproc_t)xdr__server_data, (caddr_t) &server_data,
 			    (xdrproc_t)xdr_void, (caddr_t) NULL, TIMEVAL(zero_timeout));
@@ -996,7 +954,7 @@ static db_resource   res_tab [] = {
 	{(char *)"Out_Type", D_STRING_TYPE, NULL},
 };
 
-static long get_event_string PT_( (devserver ds, long event, char *event_str, long *error) );
+static long get_event_string PT_( (devserver ds, long event, char *event_str, size_t len, long *error) );
 
 /**@ingroup eventAPI
  * Returns a sequence of structures containing all
@@ -1056,8 +1014,7 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long
 		return (DS_NOTOK);
 
 /*
- *  fill in data transfer structures dev_query_in
- *  and dev_query_out.
+ *  fill in data transfer structures dev_query_in and dev_query_out.
  */
 	dev_query_in.ds_id = ds->ds_id;
 	dev_query_in.var_argument.length   = 0;
@@ -1130,19 +1087,15 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long
 	memset ((char *)vareventarr->sequence, 0, (vareventarr->length * sizeof (DevEventInfo)));
 
 /*
- * Now get command and types name strings for the returned
- * command sequence. Command names are retrieved from the
- * global command-name-list and name strings for the data types
- * are searched in the resource CLASS table of the object class.
- * 
+ * Now get event and types name strings for the returned event sequence. Event names are retrieved from the global 
+ * event-name-list and name strings for the data types are searched in the resource CLASS table of the object class.
  * Undefined names will be initialised with NULL.
  */
 	for ( i=0; (u_long)i<vareventarr->length; i++ )
 	{
 /*
- * initialise vareventarr->sequence[i] with command and
- * argument types, returned with dev_query_out from the
- * device servers command list.
+ * initialise vareventarr->sequence[i] with command and argument types, returned with dev_query_out from the
+ * device servers event list.
  */
 		vareventarr->sequence[i].event      = dev_query_out.sequence[i].event;
 		vareventarr->sequence[i].out_type = dev_query_out.sequence[i].out_type;
@@ -1150,7 +1103,7 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long
 /*
  * check to see if device server returned event names
  */
-                if (i < n_event_names && n_event_names > 0)
+                if (n_event_names > 0 && i < n_event_names && strlen(event_names[i]))
                 {
                         strncpy(vareventarr->sequence[i].event_name,event_names[i], sizeof(vareventarr->sequence[i].event_name));
                         free(event_names[i]);
@@ -1158,29 +1111,25 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long
                 else
                 {
 /*
- * get command name string from the resource database
+ * get event name string from the resource database
  */
-			if (!ds->no_database)
+			if ((ret_stat = get_event_string(ds, vareventarr->sequence[i].event, vareventarr->sequence[i].event_name, 
+							sizeof(vareventarr->sequence[i].event_name), error)) == DS_NOTOK)
 			{
-				if ((ret_stat = get_event_string (ds, vareventarr->sequence[i].event, vareventarr->sequence[i].event_name, error)) == DS_NOTOK)
 /*
  * An error will be only returned if the database access fails.
  */
 					return (DS_NOTOK);
 			}
-			else
-				snprintf(vareventarr->sequence[i].event_name, sizeof(vareventarr->sequence[i].event_name), "event%s",i);
 		}
 
 /*
- *  Check wether command name was found.
- *  If the name was not found, get_event_string() returns DS_WARNING.
+ *  Check wether event name was found. If the name was not found, get_event_string() returns DS_WARNING.
  */
-		if (!ds->no_database && (ret_stat != DS_WARNING))
+		if (!ds->no_database) 
 		{
 /*
- * Limit the class_name and the command_name
- * strings to 19 characters. This is the limit
+ * Limit the class_name and the event name strings to MAX_RESOURCE_FIELD_LENGTH characters. This is the limit
  * of the static database name fields.
  */
 			length = strlen (dev_query_out.class_name);
@@ -1196,11 +1145,8 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long
 			event_name[(_Int)length] = '\0';
 
 /*
- * setup resource path to read information about
- * data types from the CLASS resource table.
- *
- * but first check to see whether the device belongs to another
- * nethost domain i.e. i_nethost != 0
+ * Setup resource path to read information about data types from the CLASS resource table,
+ * but first check to see whether the device belongs to another nethost domain i.e. i_nethost != 0
  */
 			if (ds->i_nethost > -1)
 				snprintf(res_path, sizeof(res_path), "//%s/CLASS/%s/%s", get_nethost_by_index(ds->i_nethost, error), class_name, event_name);
@@ -1248,11 +1194,12 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long
  * @param ds		client device handle
  * @param event      	event number
  * @param event_str 	event name as a string.
- * @param error   	Will contain an appropriate error code if the 
- *			corresponding call returns a non-zero value.
+ * @param len		size of the event_str (must be shorter than the space of event_str to avoid buffer overruns)
+ * @param error   	Will contain an appropriate error code if the corresponding call returns a non-zero value.
+ *
  * @return DS_OK or DS_NOTOK or DS_WARNING
  */
-static long get_event_string (devserver ds, long event, char *event_str, long *error)
+static long get_event_string (devserver ds, long event, char *event_str, size_t len, long *error)
 {
 	char		res_path[LONG_NAME_SIZE],
 			res_name[SHORT_NAME_SIZE],
@@ -1267,9 +1214,8 @@ static long get_event_string (devserver ds, long event, char *event_str, long *e
 
 	*error = 0;
 
-	/*
- * Decode the command nuber into the fields:
- * team, server and events_ident.
+/*
+ * Decode the event nuber into the fields: team, server and events_ident.
  */
 	team   = (_Int)(event >> DS_TEAM_SHIFT);
 	team   = team & DS_TEAM_MASK;
@@ -1277,48 +1223,49 @@ static long get_event_string (devserver ds, long event, char *event_str, long *e
 	server = server & DS_IDENT_MASK;
 	events_ident = (_Int)(event & event_number_mask);
 
+	if (!ds->no_database)
+	{
 /*
- * Create the resource path and the resource structure.
- *
- * first check to see whether the device belongs to another
+ * Create the resource path and the resource structure.  First check to see whether the device belongs to another
  * nethost domain i.e. i_nethost != 0
  */
-	if (ds->i_nethost > 0)
-		snprintf(res_path, sizeof(res_path), "//%s/EVENTS/%d/%d", get_nethost_by_index(ds->i_nethost, error), team, server);
+		if (ds->i_nethost > 0)
+			snprintf(res_path, sizeof(res_path), "//%s/EVENTS/%d/%d", get_nethost_by_index(ds->i_nethost, error), team, server);
 /*
  * use default nethost
  */
-	else
-		snprintf(res_path, sizeof(res_path),"EVENTS/%d/%d", team, server);
+		else
+			snprintf(res_path, sizeof(res_path),"EVENTS/%d/%d", team, server);
 
-	snprintf (res_name, sizeof(res_name), "%d", events_ident);
-	dev_printdebug (DBG_API, "get_events_string() : res_path = %s\n", res_path);
-	dev_printdebug (DBG_API, "get_events_string() : res_name = %s\n", res_name);
+		snprintf(res_name, sizeof(res_name), "%d", events_ident);
+		dev_printdebug (DBG_API, "get_events_string() : res_path = %s\n", res_path);
+		dev_printdebug (DBG_API, "get_events_string() : res_name = %s\n", res_name);
 
-	res_tab.resource_name = res_name;
-	res_tab.resource_type = D_STRING_TYPE;
-	res_tab.resource_adr  = &ret_str;
+		res_tab.resource_name = res_name;
+		res_tab.resource_type = D_STRING_TYPE;
+		res_tab.resource_adr  = &ret_str;
 
 /*
- * Read the command name string from the database.
+ * Read the event name string from the database.
  */
+		if (db_getresource (res_path, &res_tab, 1, error) == DS_NOTOK)
+		{
+			dev_printdebug (DBG_API | DBG_ERROR, "get_event_string() : db_getresource failed with error %d\n", *error);
 
-	if (db_getresource (res_path, &res_tab, 1, error) == DS_NOTOK)
-	{
-		dev_printdebug (DBG_API | DBG_ERROR, "get_event_string() : db_getresource failed with error %d\n", *error);
-
-		return (DS_NOTOK);
+			return (DS_NOTOK);
+		}
 	}
-
 /*
- * If the variable ret_str is still NULL, no resource value was found
- * in the database, but the function was executed without error.
- * In this case return the value DS_WARNING.
+ * If the variable ret_str is still NULL, no resource value was found in the database, but the function was executed without 
+ * error. In this case return the value DS_WARNING.
  */
 	if ( ret_str == NULL )
+	{
+		snprintf(event_str, len, "event_%li/%li/%li", team, server, events_ident);
 		return (DS_WARNING);
+	}
 
-	snprintf (event_str, sizeof(event_str), "%s", ret_str);
+	snprintf (event_str, len, "%s", ret_str);
 	free (ret_str);
 	return (DS_OK);
 }
