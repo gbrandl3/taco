@@ -1,0 +1,7 @@
+2004-09-22 10:00 jkrueger1:
+	* Add a new test for querying of commands and events list of the
+	devices
+	* Fix some bugs in querying commands and events list of the
+	devices
+	* Tested on FreeBSD IA64 architecture
+	
