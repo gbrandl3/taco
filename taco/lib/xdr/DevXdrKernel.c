@@ -12,9 +12,9 @@
 
  Original:	November 1993
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2004-09-17 07:56:18 $
+ Date:		$Date: 2004-09-21 13:43:16 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -420,7 +420,7 @@ long xdr_get_type (type, xdr_type, error)
 		dev_printdebug(DBG_TRACE | DBG_API, "\nxdr_get_type() : assign xdr_type->size.\n");
 		xdr_type->size       = DevData_List[type].size;
 		dev_printdebug(DBG_TRACE | DBG_API, "\nxdr_get_type() : assign xdr_type->xdr_length.\n");
-//		xdr_type->xdr_length = DevData_List[type].xdr_length;
+		xdr_type->xdr_length = DevData_List[type].xdr_length;
 		dev_printdebug (DBG_TRACE | DBG_API, "\nxdr_get_type() : leaving routine.\n");
 		return (DS_OK);
 	}
