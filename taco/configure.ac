@@ -1,6 +1,6 @@
 AC_INIT(TACO, 3.0rc3, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.57)
-AC_REVISION($Revision: 1.36 $)dnl
+AC_REVISION($Revision: 1.37 $)dnl
 AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -106,7 +106,7 @@ AC_SUBST(X_LDFLAGS, ['-L/usr/X11R6/lib'])
 
 AC_SUBST(appdefaultdir)
 
-AC_SUBST(docdir, ['${datadir}/taco/doc'])
+AC_SUBST(docdir, ['${datadir}/doc/packages/taco'])
 AC_SUBST(templatedir, ['${datadir}/taco/templates'])
 AC_SUBST(resdatadir, ['${datadir}/taco/dbase/res'])
 AC_SUBST(dbmdir, ['${datadir}/taco/dbase/dbm'])
