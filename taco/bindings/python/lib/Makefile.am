@@ -15,7 +15,3 @@ noinst_HEADERS		= taco.h python.h pythonP.h
 
 Taco_la_SOURCES		= taco.c taco_types.c server.c python.c
 
-#		Module library
-SH_LIB   = 	Taco.so
-MOD_LIB  =      Server.so ## ln -s $(SH_LIB) $(MOD_LIB)
-
