@@ -22,24 +22,27 @@ TACO_LOGGING=yes
 TACO_DATABASE=dbm
 
 # It is unlikely that the rest of the file needs a modification
-export DSHOME=${DSHOME:-${prefix}}
-export DBTABLES=NAMES,PS_NAMES,CLASS,SYS,ERROR,CMDS,SEC,EVENTS,${DBTABLES_CUSTOM}
-export RES_BASE_DIR=${RES_BASE_DIR:-@resdatadir@}
-export DBM_DIR=@dbmdir@
-export LOGPATH=${DSHOME}/log
-export NETHOST=${NETHOST:-`hostname|cut -f1 -d'.'`}
+DSHOME=${DSHOME:-${prefix}}
+DBTABLES=NAMES,PS_NAMES,CLASS,SYS,ERROR,CMDS,SEC,EVENTS,${DBTABLES_CUSTOM}
+RES_BASE_DIR=${RES_BASE_DIR:-@resdatadir@}
+DBM_DIR=@dbmdir@
+LOGPATH=${DSHOME}/log
+NETHOST=${NETHOST:-`hostname|cut -f1 -d'.'`}
 if [ "$DSHOME" = "$prefix" ] ; then
-	export LD_LIBRARY_PATH=@libdir@${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
-	export TACO_PATH=@sbindir@
-	export PATH=${TACO_PATH}:@bindir@${PATH:+:}${PATH}
+	LD_LIBRARY_PATH=@libdir@${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
+	TACO_PATH=@sbindir@
+	PATH=${TACO_PATH}:@bindir@${PATH:+:}${PATH}
 else
-	export LD_LIBRARY_PATH=${DSHOME}/lib/${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
-	export TACO_PATH=${DSHOME}/sbin/
-	export PATH=${TACO_PATH}:${DSHOME}/bin/${PATH:+:}${PATH}
+	LD_LIBRARY_PATH=${DSHOME}/lib/${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
+	TACO_PATH=${DSHOME}/sbin/
+	PATH=${TACO_PATH}:${DSHOME}/bin/${PATH:+:}${PATH}
 fi
 
-export PYTHONPATH=@pkgpythondir@:@pkgpyexecdir@${PYTHONPATH:+:}${PYTHONPATH}
+PYTHONPATH=@pkgpythondir@:@pkgpyexecdir@${PYTHONPATH:+:}${PYTHONPATH}
 unset DBTABLES_CUSTOM
 
-export MYSQL_USER=root
-export MYSQL_PASSWORD=
+MYSQL_USER=root
+MYSQL_PASSWORD=
+
+export DSHOME DBTABLES RES_BASE_DIR DBM_DIR LOGPATH NETHOST LD_LIBRARY_PATH TACO_PATH PATH PYTHONPATH MYSQL_USER MYSQL_PASSWORD
+
