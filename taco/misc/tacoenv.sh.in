@@ -13,7 +13,7 @@ pyexecdir=@pyexecdir@
 DBTABLES_CUSTOM=${DBTABLES_CUSTOM:-TEST}
 
 # if you want to start the TACO services in secure mode set "yes" else "no"
-TACO_SECURE_MODE=no
+TACO_SECURITY=no
 
 # if you want to start the TACO services with logging set "yes" else "no"
 TACO_LOGGING=yes
@@ -39,7 +39,7 @@ else
 fi
 
 LD_LIBRARY_PATH=@GCC_LIBRARY_PATH@:${LD_LIBRARY_PATH}
-PYTHONPATH=@pkgpythondir@:@pkgpyexecdir@${PYTHONPATH:+:}${PYTHONPATH}
+PYTHONPATH=@pythondir@:@pyexecdir@${PYTHONPATH:+:}${PYTHONPATH}
 unset DBTABLES_CUSTOM
 
 MYSQL_USER=root

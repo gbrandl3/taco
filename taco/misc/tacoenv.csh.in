@@ -17,7 +17,7 @@ setenv DBTABLES_CUSTOM TEST
 endif
 
 # if you want to start the TACO services in secure mode set "yes" else "no"
-setenv TACO_SECURE_MODE no
+setenv TACO_SECURITY no
 
 # if you want to start the TACO services with logging set "yes" else "no"
 setenv TACO_LOGGING yes
