@@ -22,7 +22,9 @@
 extern "C" 
 {
     u_long gettransient(const char *);
+#if !defined( FreeBSD)
     void get_myaddress(struct sockaddr_in *);
+#endif
 //  int gethostname(char *,size_t);
 }
 

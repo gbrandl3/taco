@@ -70,7 +70,7 @@ db_res *MySQLServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
         prot = IPPROTO_TCP;
 #else
     so_size = sizeof(so);
-    if (getsockname(rqstp->rq_xprt->xp_sock,(struct sockaddr *)&so,&so_size) == -1)
+    if (getsockname(rqstp->rq_xprt->xp_sock,(struct sockaddr *)&so, (socklen_t *)&so_size) == -1)
     {
 	browse_back.db_err = DbErr_TooManyInfoForUDP;
 	browse_back.res_val.arr1_len = 0;

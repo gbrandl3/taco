@@ -63,7 +63,7 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 // Retrieve the protocol used to send this request to the server/
 //
     so_size = sizeof(so);
-    if (getsockname(rqstp->rq_xprt->xp_sock,(struct sockaddr *)&so,&so_size) == -1)
+    if (getsockname(rqstp->rq_xprt->xp_sock,(struct sockaddr *)&so, (socklen_t *)&so_size) == -1)
     {
 	browse_back.db_err = DbErr_MaxDeviceForUDP;
 	browse_back.res_val.arr1_len = 0;
