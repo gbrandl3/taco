@@ -7,13 +7,13 @@
  Description:   Public include file for the device server security
 
  Author(s):     Jens Meyer
-		$Author: andy_gotz $
+		$Author: jkrueger1 $
 
  Original:      September 1993
 
- Version:	$Revision: 1.5 $
+ Version:	$Revision: 1.6 $
  
- Date:		$Date: 2004-11-03 15:06:03 $
+ Date:		$Date: 2005-02-22 15:59:56 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -73,7 +73,7 @@ typedef struct	_SecUserAuth {
 	long		uid;
 	char		*group_name;
 	long 		gid;
-	char		host_name[32];
+	char		host_name[HOST_NAME_LENGTH];
 	u_long  	ip;
 	} SecUserAuth;
 

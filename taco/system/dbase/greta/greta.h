@@ -113,9 +113,9 @@ typedef struct _dev_window
 	long 		chaine_res_nb[CH_TAB_SIZE];
 	unsigned long 	pid;
 	unsigned long	pn;
-	char		host_name[20];
-	char		proc_name[40];
-	char		pers_name[12];
+	char		host_name[HOST_NAME_LENGTH];
+	char		proc_name[PROC_NAME_LENGTH];
+	char		pers_name[DSPERS_NAME_LENGTH];
 	long		exported;
 }dev_window;
 
@@ -135,9 +135,9 @@ typedef struct _dev_window_dc
 	long 		chaine_res_nb[CH_TAB_SIZE];
 	unsigned long 	pid;
 	unsigned long 	pn;
-	char		host_name[20];
-	char		proc_name[40];
-	char		pers_name[12];
+	char		host_name[HOST_NAME_LENGTH];
+	char		proc_name[PROC_NAME_LENGTH];
+	char		pers_name[DSPERS_NAME_LENGTH];
 	long 		exported;
 }dev_window_dc;
 	
@@ -163,9 +163,9 @@ typedef struct _serv_window
 	char 		*chaine_dev_arr[CH_TAB_SIZE];
 	unsigned long 	pid;
 	unsigned long 	pn;
-	char		host_name[20];
-	char		proc_name[40];
-	char		pers_name[12];
+	char		host_name[HOST_NAME_LENGTH];
+	char		proc_name[PROC_NAME_LENGTH];
+	char		pers_name[DSPERS_NAME_LENGTH];
 	long		restart;
 }serv_window;
 

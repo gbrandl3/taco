@@ -3,9 +3,9 @@
  * Author:	Emanuel Taurel
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2003-05-21 16:17:12 $
+ * Date:	$Date: 2005-02-22 15:59:57 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                     Grenoble, France
@@ -78,7 +78,7 @@ typedef struct _dc_cmd_mretdat{
 
 typedef struct _datco {
 	char device_name[24];
-	char dc_host_name[24];
+	char dc_host_name[HOST_NAME_LENGTH];
 	int indice;
 	long net_ind;
 	}datco;

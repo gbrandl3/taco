@@ -11,9 +11,9 @@
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.16 $
+ Version:	$Revision: 1.17 $
 
- Date:		$Date: 2005-02-22 13:40:10 $
+ Date:		$Date: 2005-02-22 15:59:56 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -929,8 +929,8 @@ long dev_export (char *name, DeviceBase *ptr_dev, long *error)
 	db_devinf		devinfo;
 	DevServerDevices 	*new_devices;
 	char			*strptr,
-				proc_name[80],
-				server_host[80];
+				proc_name[PROC_NAME_LENGTH],
+				server_host[HOST_NAME_LENGTH];
 	long			next_free;
 	register long 	i;
 

@@ -12,8 +12,8 @@
 
  Original:	January 1991
 
- $Revision: 1.3 $
- $Date: 2004-07-08 17:02:33 $
+ $Revision: 1.4 $
+ $Date: 2005-02-22 15:59:57 $
 
  $Author: jkrueger1 $
 
@@ -34,9 +34,9 @@ extern void msg_fault_handler(DevString);
 typedef struct _MessageServerPart 
 {
 	char	name [256];
-	char	host_name [32];
+	char	host_name [HOST_NAME_LENGTH];
 	long	prog_number;
-	char	display [32];
+	char	display [HOST_NAME_LENGTH + 10]; // e.g. hostname.1234:1234
 	char	ER_file_dir [256];
 	char	pipe_dir [256];
 	char	aw_path [256];

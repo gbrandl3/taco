@@ -11,9 +11,9 @@
 
  Original:      January 1991
 
- Version:	$Revision: 1.4 $
+ Version:	$Revision: 1.5 $
 
- Date:		$Date: 2004-03-03 08:42:05 $
+ Date:		$Date: 2005-02-22 15:59:57 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -61,7 +61,7 @@ typedef struct 	{
 		} config_flags;
 
 typedef struct 	{
-		char 	host_name [32];
+		char 	host_name [HOST_NAME_LENGTH];
 		long 	prog_number;
 		long 	vers_number;
 		} server_conf;

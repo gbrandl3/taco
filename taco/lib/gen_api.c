@@ -12,9 +12,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.14 $
+ Version    :	$Revision: 1.15 $
 
- Date       : 	$Date: 2005-02-22 13:51:58 $
+ Date       : 	$Date: 2005-02-22 15:59:56 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -977,7 +977,7 @@ long _DLLFunc db_import (long *error)
 	CLIENT		*clnt;
         enum clnt_stat  clnt_stat;
 	char		*hstring;
-	char		nethost[SHORT_NAME_SIZE], 
+	char		nethost[HOST_NAME_LENGTH], 
 			*nethost_env;
 
 	*error = DS_OK;
@@ -1230,14 +1230,14 @@ long _DLLFunc db_import_multi (char *nethost, long *error)
  */
 static long setup_config (long *error)
 {
-	char				nethost[SHORT_NAME_SIZE], 
+	char				nethost[HOST_NAME_LENGTH], 
 					*nethost_env;
 	CLIENT				*clnt;
 	enum clnt_stat			clnt_stat;
 	int				pid;
 	static _manager_data 		manager_data;
 	static _register_data  		register_data;
-	static char			host_name[SHORT_NAME_SIZE];
+	static char			host_name[HOST_NAME_LENGTH];
 	static struct _devserver	msg_ds, db_ds;
 
 	dev_printdebug (DBG_TRACE | DBG_API, "\nsetup_config() : entering routine\n");
@@ -1267,7 +1267,7 @@ static long setup_config (long *error)
  *  create registration information that is send to
  *  the network manager and stored in the System.log file.
  */
-	gethostname (host_name,32);
+	gethostname (host_name, sizeof(host_name));
 
 #if !defined (_NT)
 #if !defined (vxworks)
@@ -1425,7 +1425,7 @@ static long setup_config (long *error)
  */
 	if (max_nethost <= 0) 
 		nethost_alloc(error);
-	strncpy(nethost,nethost_env,SHORT_NAME_SIZE);
+	strncpy(nethost,nethost_env,HOST_NAME_LENGTH);
 //	snprintf(nethost, sizeof(nethost), "%s",nethost_env);
 
 	strcpy(multi_nethost[0].nethost,nethost);
@@ -1456,7 +1456,7 @@ long setup_config_multi (char *nethost, long *error)
 {
 	_manager_data 		manager_data={0};
 	_register_data  	register_data;
-	static char		host_name[SHORT_NAME_SIZE];
+	static char		host_name[HOST_NAME_LENGTH];
 	CLIENT			*clnt;
 	enum clnt_stat		clnt_stat;
 	int			pid;
@@ -1545,7 +1545,7 @@ long setup_config_multi (char *nethost, long *error)
  *  create registration information to be sent to
  *  the network manager and stored in the System.log file.
  */
-	gethostname (host_name,32);
+	gethostname (host_name, sizeof(host_name));
 
 #if !defined (_NT)
 #if !defined (vxworks)

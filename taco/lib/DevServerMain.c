@@ -11,9 +11,9 @@
 
  Original   	: March 1991
 
- Version	: $Revision: 1.13 $
+ Version	: $Revision: 1.14 $
 
- Date		: $Date: 2005-02-22 14:14:47 $
+ Date		: $Date: 2005-02-22 15:59:56 $
 
  Copyright (c) 1990-2002 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -239,8 +239,8 @@ int main (int argc, char **argv)
 
 /*
  *  read device server's class name and personal name
- *  check for lenght of names : server process name <= DS_NAME_LENGTH char
- *                              personal name       <= DSPERS_NAME_LENGTH char
+ *  check for lenght of names : server process name < DS_NAME_LENGTH char
+ *                              personal name       < DSPERS_NAME_LENGTH char
  */
 #ifndef _NT
 	if (argc < 2)
@@ -348,9 +348,10 @@ void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_
 				i,
 				j;
 
-	if ( strlen(server_name) > 23 )
+	if (strlen(server_name) >= DS_NAME_LENGTH)
 	{
-		char msg[]="Filename to long : server_name <= 23 char\n";
+		char msg[80];
+		snprintf(msg, sizeof(msg),"Filename to long : server_name <= %d char's\n", DS_NAME_LENGTH - 1);
 #ifdef _NT
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
 		return(FALSE);
@@ -360,9 +361,10 @@ void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_
 #endif
 	}
 
-	if ( strlen(pers_name) > 11 )
+	if (strlen(pers_name) >= DSPERS_NAME_LENGTH)
 	{
-		char msg[]= "Personal DS_name to long : personal_dsname <= 11 char\n";
+		char msg[80];
+		snprintf(msg, sizeof(msg), "Personal DS_name to long : personal_dsname <= %d char's\n", DSPERS_NAME_LENGTH - 1);
 #ifdef _NT
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
 		return(FALSE);
@@ -382,10 +384,10 @@ void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_
 		pmap_unset (prog_number, ASYNCH_API_VERSION);
 	}
 
-	memset  (dsn_name,0,sizeof(dsn_name));
-	strncpy (dsn_name , server_name, DSPERS_NAME_LENGTH - 1);
-	strncat (dsn_name , "/", 1);
-	strncat (dsn_name , pers_name, 11);
+	memset  (dsn_name, 0, sizeof(dsn_name));
+	strncpy (dsn_name, server_name, DS_NAME_LENGTH - 1);
+	strncat (dsn_name, "/", 1);
+	strncat (dsn_name, pers_name, DSPERS_NAME_LENGTH - 1);
 /*
  * make sure all config flags are set to zero before starting
  */

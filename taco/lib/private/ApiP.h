@@ -12,9 +12,9 @@
 
  Original:	June 1992
 
- Version:	$Revision: 1.4 $
+ Version:	$Revision: 1.5 $
 
- Date:		$Date: 2004-06-02 16:36:15 $
+ Date:		$Date: 2005-02-22 15:59:57 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -30,7 +30,7 @@
  */
 #ifdef _IDENT
 static char ApiPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.4 2004-06-02 16:36:15 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.5 2005-02-22 15:59:57 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -165,8 +165,8 @@ typedef struct {
 		DevBoolean 	database_server;
 		DevBoolean 	startup;
 		DevBoolean 	security;
-		char		server_name[80];
-		char		server_host[80];
+		char		server_name[PROC_NAME_LENGTH];
+		char		server_host[HOST_NAME_LENGTH];
 		long		prog_number;
 		long		vers_number;
 		DevBoolean	device_server;

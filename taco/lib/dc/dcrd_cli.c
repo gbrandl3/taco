@@ -4,9 +4,9 @@
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2004-06-02 16:36:15 $
+ * Date:	$Date: 2005-02-22 15:59:57 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -2408,7 +2408,7 @@ static long build_nethost_arr(dc_dev_imp *p_input,unsigned int num_dev,
 			j,
 			k;
 	char 		*tmp,
-			nethost[80];
+			nethost[HOST_NAME_LENGTH];
 	long 		nb_nethost = 0,
 			nb_block = 1,
 			old_nb_elt,

@@ -14,9 +14,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.20 $
+ Version    :	$Revision: 1.21 $
 
- Date	    :	$Date: 2005-02-22 13:55:24 $
+ Date	    :	$Date: 2005-02-22 15:59:56 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -263,7 +263,7 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
 	char			*device_name,
 				device_class[SHORT_NAME_SIZE],
 				device_type[SHORT_NAME_SIZE],
-				host_name[SHORT_NAME_SIZE];
+				host_name[HOST_NAME_LENGTH];
 	long			prog_number,
 				vers_number,
 				i_nethost,
@@ -276,7 +276,7 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
 				no_database = False;
 	char			name [256],
 				*hstring,
-				nethost[80],
+				nethost[HOST_NAME_LENGTH],
 				*prog_url;
 
 /*
@@ -1782,7 +1782,7 @@ long _DLLFunc check_rpc_connection (devserver ds, long *error)
 #endif /* !vxworks */
 	int			tcp_socket;
 	char			*device_name;
-	char			host_name[SHORT_NAME_SIZE];
+	char			host_name[HOST_NAME_LENGTH];
 	char			*hstring;
 	long			prog_number;
 	long			vers_number;

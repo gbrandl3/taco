@@ -11,9 +11,9 @@
 
  Original   :   December 1993
 
- Version    :	$Revision: 1.7 $
+ Version    :	$Revision: 1.8 $
 
- Date       :	$Date: 2004-06-02 16:36:14 $
+ Date       :	$Date: 2005-02-22 15:59:56 $
 
  Copyright (c) 1993 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -292,7 +292,7 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
 	    * get the IP address of the users host
 	    */
 
-		gethostname (user_auth.host_name, SHORT_NAME_SIZE);
+		gethostname (user_auth.host_name, HOST_NAME_LENGTH);
 #if !defined vxworks
 		if ( (host_info = gethostbyname (user_auth.host_name)) == NULL )
 		{

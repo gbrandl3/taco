@@ -197,9 +197,9 @@ int dc_res_management(long *error_ptr)
 				to = 1000;
 	DevVarStringArray 	host_dc = {0, NULL};
 	int 			nb_put_class_res = 0;
-	char			hostna[64],
-				hostna_wo_dot[64],
-				tmp_host_name[64],
+	char			hostna[HOST_NAME_LENGTH],
+				hostna_wo_dot[HOST_NAME_LENGTH],
+				tmp_host_name[HOST_NAME_LENGTH],
 	 			*net_def = NULL,
 	 			res_name[32],
 				*def,
@@ -322,8 +322,8 @@ int dc_res_serv_nb(long *error_ptr)
 	int 		nb_put_class_res = 0;
 	db_resource 	put_class_res[2],
 			net_res[2];
-	char 		hostna[64],
-			hostna_wo_dot[64];
+	char 		hostna[HOST_NAME_LENGTH],
+			hostna_wo_dot[HOST_NAME_LENGTH];
 	unsigned int 	diff;
 	char 		*tmp,
 			res_name_rd[64],
@@ -410,7 +410,7 @@ int dc_res_request(long *error_ptr)
 	int 		nb_put_class_res = 0;
 	db_resource 	put_class_res[4],
 			net_res[4];
-	char 		hostna[64],
+	char 		hostna[HOST_NAME_LENGTH],
 			dev_name[64];
 	unsigned char 	ho = 0,
 			net = 0;
@@ -588,8 +588,8 @@ int dc_class_dc(long *error_ptr)
 			data_size = 1234;
 	db_resource 	put_class_res[7];
 	int 		nb_put_class_res = 0;
-	char 		hostna[64],
-			hostna_wo_dot[64];
+	char 		hostna[HOST_NAME_LENGTH],
+			hostna_wo_dot[HOST_NAME_LENGTH];
 	unsigned int 	diff;
 	char 		*tmp,
 			*taco_path;

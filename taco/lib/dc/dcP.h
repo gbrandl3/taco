@@ -1,9 +1,9 @@
  /*
  Author:	$Author: jkrueger1 $
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2003-04-25 11:21:43 $
+ Date:		$Date: 2005-02-22 15:59:57 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -150,7 +150,7 @@ typedef struct _cmd_sz {
 	}cmd_sz;
 
 typedef struct _dchost {
-	char dc_host_name[24];
+	char dc_host_name[HOST_NAME_LENGTH];
 	CLIENT *rpc_handle;
 	int nb_connect;
 	char dc_req_name[40];
@@ -161,7 +161,7 @@ typedef struct _dchost {
 
 typedef struct _dc_nethost_info {
 	dchost dchost_arr[DC_MAX];
-	char nethost[SHORT_NAME_SIZE];
+	char nethost[HOST_NAME_LENGTH];
 	long first_imp;
 	DevVarStringArray host_dc;
 	long max_call_rd;
