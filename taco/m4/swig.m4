@@ -18,31 +18,33 @@ AC_DEFUN([SWIG_PROG],[
 			AC_MSG_WARN([$swig_tmp])
 		fi
 		SWIG="echo \"error: $swig_tmp\" ; false"
-	elif test -n "$1" ; then
-		# Check the SWIG version
-		AC_MSG_CHECKING([for SWIG version])
-		[swig_version=`$SWIG -version 2>&1 | grep 'SWIG Version' | sed 's/.*\([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/g'`]
-		AC_MSG_RESULT([$swig_version])
-		if test -n "$swig_version" ; then
-			# Calculate the required version number
-			[swig_tmp=`(echo $1 | sed 's/[^0-9]\+/ /g')`]
-			[swig_tmp0=`(echo $swig_tmp | cut -d' ' -f1)`]
-			[swig_tmp1=`(echo $swig_tmp | cut -d' ' -f2)`]
-			[swig_tmp2=`(echo $swig_tmp | cut -d' ' -f3)`]
-			[swig_required_version=$(( 1000000 * ${swig_tmp0:-0} + 1000 * ${swig_tmp1:-0} + ${swig_tmp2:-0} ))]
+	else
+		if test -n "$1" ; then
+			# Check the SWIG version
+			AC_MSG_CHECKING([for SWIG version])
+			[swig_version=`$SWIG -version 2>&1 | grep 'SWIG Version' | sed 's/.*\([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/g'`]
+			AC_MSG_RESULT([$swig_version])
+			if test -n "$swig_version" ; then
+				# Calculate the required version number
+				[swig_tmp=`(echo $1 | sed 's/[^0-9]\+/ /g')`]
+				[swig_tmp0=`(echo $swig_tmp | cut -d' ' -f1)`]
+				[swig_tmp1=`(echo $swig_tmp | cut -d' ' -f2)`]
+				[swig_tmp2=`(echo $swig_tmp | cut -d' ' -f3)`]
+				[swig_required_version=$(( 1000000 * ${swig_tmp0:-0} + 1000 * ${swig_tmp1:-0} + ${swig_tmp2:-0} ))]
 
-			# Calculate the available version number
-			[swig_tmp=`(echo $swig_version | sed 's/[^0-9]\+/ /g')`]
-			[swig_tmp0=`(echo $swig_tmp | cut -d' ' -f1)`]
-			[swig_tmp1=`(echo $swig_tmp | cut -d' ' -f2)`]
-			[swig_tmp2=`(echo $swig_tmp | cut -d' ' -f3)`]
-			[swig_tmp=$(( 1000000 * ${swig_tmp0:-0} + 1000 * ${swig_tmp1:-0} + ${swig_tmp2:-0} ))]
-
-			if test $swig_required_version -gt $swig_tmp ; then
-				AC_MSG_WARN([SWIG version $1 or above is required, you have $swig_version])
+				# Calculate the available version number
+				[swig_tmp=`(echo $swig_version | sed 's/[^0-9]\+/ /g')`]
+				[swig_tmp0=`(echo $swig_tmp | cut -d' ' -f1)`]
+				[swig_tmp1=`(echo $swig_tmp | cut -d' ' -f2)`]
+				[swig_tmp2=`(echo $swig_tmp | cut -d' ' -f3)`]
+				[swig_tmp=$(( 1000000 * ${swig_tmp0:-0} + 1000 * ${swig_tmp1:-0} + ${swig_tmp2:-0} ))]
+	
+				if test $swig_required_version -gt $swig_tmp ; then
+					AC_MSG_WARN([SWIG version $1 or above is required, you have $swig_version])
+				fi
+			else
+				AC_MSG_WARN([cannot determine SWIG version])
 			fi
-		else
-			AC_MSG_WARN([cannot determine SWIG version])
 		fi
 
 		# Check if a SWIG runtime library is available
@@ -90,6 +92,9 @@ AC_DEFUN([SWIG_PYTHON],[
 	AC_REQUIRE([PYTHON_DEVEL])
 	test "x$1" != "xno" && swig_shadow=" -shadow"
 	AC_SUBST([SWIG_PYTHON_OPT],[-python$swig_shadow])
+	if test "$SWIG" ; then
+		AC_SUBST([SWIG_LIB], [`$SWIG -swiglib`])
+	fi
 	AC_SUBST([SWIG_PYTHON_CPPFLAGS],[$PYTHON_CPPFLAGS])
 	AC_SUBST([SWIG_PYTHON_LIBS],["$SWIG_RUNTIME_LIBS_DIR -lswigpy"])
 ])
