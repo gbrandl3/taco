@@ -1,11 +1,22 @@
-AC_DEFUN(TACO_PYTHON_SERVER,
+AC_DEFUN(TACO_PYTHON_BINDING,
 [
 	TACO_PROG_PYTHON(2.1, [yes])
 	ac_save_CFLAGS="$CFLAGS"
 	CFLAGS="$CFLAGS $PYTHON_INCLUDES"
-	AC_CHECK_HEADERS(Numeric/arrayobject.h, [python_array=yes], [python_array=no], [#include <Python.h>])
+	AC_CHECK_HEADERS(Numeric/arrayobject.h, [taco_python_binding=yes], [taco_python_binding=no], [#include <Python.h>])
 	CFLAGS="$ac_save_CFLAGS"
-	AM_CONDITIONAL(PYTHON_SERVER_BUILD, test "x$python_array" != "xno")
+	AM_CONDITIONAL(PYTHON_BINDING, test $taoc_python_binding = yes)
+])
+
+AC_DEFUN(TACO_TCL_BINDING,
+[
+	TACO_PROG_TCL
+	if test -n "$TCLINCLUDE" -a -n "$TCLLIB" ; then
+		taco_tcl_binding=yes
+	else
+		taco_tcl_binding=no
+	fi
+	AM_CONDITIONAL(TCL_BINDING, test $taco_tcl_binding = yes)
 ])
 
 AC_DEFUN(TACO_MYSQL_SUPPORT,

@@ -1,7 +1,7 @@
 AC_INIT(TACO, 3.0-beta, [taco-devel@lists.sourceforge.net])
 AC_PREREQ(2.53)
-AC_REVISION($Revision: 1.4 $)dnl
-AC_COPYRIGHT([(C) 19??-2003 ESRF])
+AC_REVISION($Revision: 1.5 $)dnl
+AC_COPYRIGHT([(C) 1990-2003 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR(lib/dev_api.c)
 
@@ -99,7 +99,8 @@ AC_SUBST(TACO_CLIENT_CXX_LIBS)
 AC_SUBST(TACO_CLIENT_LIBS)
 TACO_DEFINES
 TACO_DATAPORT_SRC
-TACO_PYTHON_SERVER
+TACO_PYTHON_BINDING
+TACO_TCL_BINDING
 TACO_MYSQL_SUPPORT
 TACO_GRETA
 TACO_XDEVMENU
@@ -187,7 +188,9 @@ build:
 		mySQL support:	${mysql}
 	greta:			${greta}
 	xdevmenu:		${xdevmenu}
-	python server:		${python_array}
+	bindings:
+		python :	${taco_python_binding}
+		TCL:		${taco_tcl_binding}
 
 Please check whether the configuration I detected matches what you
 would like to have. 
