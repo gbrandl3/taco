@@ -2,6 +2,7 @@
 @comment %**start of header (This is for running Texinfo on a region.)
 @setfilename gdbm.info
 @settitle gdbm
+@include version.texi
 @dircategory Programming & development tools
 @direntry
 * GDBM: (gdbm).			The GNU database manager.
@@ -49,18 +50,18 @@ into another language, under the above conditions for modified versions.
 @sp 4
 @center Manual by Pierre Gaumond, Philip A. Nelson and Jason Downs
 @sp 1
-@center Edition 1.5
+@center Edition @value{EDITION}
 @sp 1
-@center for GNU @code{dbm}, Version 1.8.3.
+@center for GNU @code{dbm}, Version @value{VERSION} 
 @page
 @null
 @vskip 0pt plus 1filll
 Copyright @copyright{} 1993-99 Free Software Foundation, Inc.
 @sp 2
 
-This is Edition 1.5 of the @cite{GNU @code{dbm} Manual}, for @code{gdbm}
-Version 1.8.3. @*
-Last updated October 15, 2002
+This is Edition @value{EDITION} of the @cite{GNU @code{dbm} Manual}, for @code{gdbm}
+Version @value{VERSION}. @*
+Last updated @value{UPDATED}
 
 Published by the Free Software Foundation @*
 675 Massachusetts Avenue, @*
