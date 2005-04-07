@@ -105,7 +105,7 @@ AC_DEFUN([TACO_DEFINES],
 [
 	AC_REQUIRE([AC_CANONICAL_SYSTEM])
 	case "$target" in
-		i[[3456]]86-*-linux-* | i[[3456]]86-*-linux | i[[3456]]86-*-cygwin*)
+		i[[3456]]86-*-linux-* | i[[3456]]86-*-linux | i[[3456]]86-*-cygwin* | x86_64-*-linux-*)
 			taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -Dx86=1 -DNDBM" ;;
 		ia64-*-freebsd* )
 			taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -DNDBM" ;;
