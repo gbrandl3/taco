@@ -7,13 +7,13 @@
  Description	: Main programm for all device servers
 
  Author(s)  	: Jens Meyer
- 		  $Author: andy_gotz $
+ 		  $Author: jkrueger1 $
 
  Original   	: March 1991
 
- Version	: $Revision: 1.15 $
+ Version	: $Revision: 1.16 $
 
- Date		: $Date: 2005-03-29 09:48:32 $
+ Date		: $Date: 2005-04-11 16:01:20 $
 
  Copyright (c) 1990-2002 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -245,7 +245,23 @@ int main (int argc, char **argv)
 #ifndef _NT
 	if (argc < 2)
 	{
-		fprintf (stderr, "usage :  %s personal_name {-nodb} {-pn program #} {-device device1 ...}\n",argv[0]);
+		fprintf( stderr, "Usage: %s personal_name [OPTIONS]\n\n",
+			argv[0] );
+		
+		fprintf( stderr, "   -device device1 [device2 ... ] : "
+			"only export these devices\n" );
+		
+		fprintf( stderr, "   -m                             : "
+			"enable logging via message server\n" );
+		
+		fprintf( stderr, "   -nodb                          : "
+			"do not use database server for resource handling\n" );
+		
+		fprintf( stderr, "   -pn program #                  : "
+			"use this rpc program number\n" );
+		
+		fprintf( stderr, "   -s                             : "
+			"use startup function from server\n" );
 		exit (1);
 	}
 #else
@@ -319,14 +335,25 @@ int main (int argc, char **argv)
 			}
 		}
 	}
-	device_server(proc_name, argv[1], nodb_opt, prog_number, device_no, device_list);
+       device_server(proc_name, argv[1], m_opt, s_opt, nodb_opt, prog_number, device_no, device_list);
 }
 #endif /* vxworks || NOMAIN */
 
-/*
+/**
+ * @ingroup dsAPIintern
  * VXWORKS and NOMAIN routine to create a device server - device_server()
+ *
+ * @param server_name device server name registered in the database
+ * @param pers_name   personal device server name registered in the database
+ * @param m_opt       if it is TRUE use the message server for sending messages
+ * @param s_opt             if TRUE call the 'startup' function of the server
+ * @param nodb              if TRUE do not use the database server for the resources
+ * @param pn        if different from 0 use this RPC program number
+ * @param n_device    number of devices to export
+ * @param device_list list of devices
  */
-void device_server (char *server_name, char *pers_name, int nodb_opt, int pn, int n_device, char** device_list)
+void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int nodb, int pn, int n_device, char** device_list)
+
 {
 	char    		host_name [HOST_NAME_LENGTH],
 				dsn_name [37],
@@ -341,9 +368,7 @@ void device_server (char *server_name, char *pers_name, int nodb_opt, int pn, in
 				status,
 				error = 0;
 	int			pid = 0;
-	short			m_opt = False,
-				s_opt = True,
-				sig,
+	short			sig,
 				i,
 				j;
 
@@ -394,7 +419,7 @@ void device_server (char *server_name, char *pers_name, int nodb_opt, int pn, in
 /*
  * option nodb means run device server without database
  */
-	if (nodb_opt > 0)
+	if (nodb > 0)
 	{
 		config_flags.no_database = True;
 		xdr_load_kernel(&error);
@@ -525,7 +550,7 @@ void device_server (char *server_name, char *pers_name, int nodb_opt, int pn, in
 	(void) signal(SIGQUIT, main_signal_handler);
 #endif /* OSK || _OSK */
 
-	if (nodb_opt == False)
+	if (nodb == False)
 	{
 /*
  *  if database required then import database server  
@@ -698,40 +723,34 @@ void device_server (char *server_name, char *pers_name, int nodb_opt, int pn, in
 	tcp_socket = transp_tcp->xp_sock;
 	synch_svc_tcp_sock = transp_tcp->xp_sock;
 /*
- * if the process has got this far then it is a bona-fida device server 
- * set the appropiate flag
+ * if the process has got this far then it is a bona-fida device server set the appropiate flag
  */
 	config_flags.device_server = True;
-
 /*
- * Register the asynchronous rpc service so that the device server
- * can receive asynchronous calls from clients. The asynchronous
- * calls are sent as batched tcp requests without wait. The server
- * will return the results to the client asynchronously using batched
- * tcp.
+ * startup message service 
+ */
+	if (m_opt ==True)
+	{	
+		display=getenv("DISPLAY");
+		if(msg_import(dsn_name,host_name,prog_number,display,&error)!=DS_OK)
+/* 
+ * we dont care 
+ */
+			fprintf(stderr, "can not import message service\n");
+	}
+/*
+ * Register the asynchronous rpc service so that the device server can receive asynchronous calls 
+ * from clients. The asynchronous calls are sent as batched tcp requests without wait. The server
+ * will return the results to the client asynchronously using batched TCP.
  */
 	status = asynch_rpc_register(&error);
 	if (status != DS_OK)
 	{
 		dev_printerror_no (SEND,"failed to register asynchronus rpc",error);
+	}
 /* 
  * DO NOT abort server, continue (without asynchronous server) ...
- * 
- * startup message service 
- */
-		if (m_opt ==True)
-	    	{	
-			display=getenv("DISPLAY");
-			if(msg_import(dsn_name,host_name,prog_number,display,&error)!=DS_OK)
-/* 
- * we dont care 
-*/
-				fprintf(stderr, "can not import message service\n");
-	    	}
-	}
-
-/*
- *  startup device server
+ * startup device server
  */
 	if (s_opt == True)
 	{

@@ -12,9 +12,9 @@
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.18 $
+ Version    :	$Revision: 1.19 $
 
- Date       : 	$Date: 2005-04-04 16:03:18 $
+ Date       : 	$Date: 2005-04-11 16:01:20 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -535,7 +535,6 @@ void _DLLFunc dev_printdebug (long debug_bits, char *fmt, ...)
 	}
 
 	va_end(args);
-
 }
 
 /*
@@ -1823,7 +1822,7 @@ static char *get_error_string (long error)
 	static char	*no_error_mess=(char*)"No error message stored in the database for negative errors\n";
 	static char	*db_error_mess=(char*)"Failed to get error message from database\n";
 
-	dev_printdebug (DBG_TRACE | DBG_API, "\nget_error_string() : entering routine\n");
+	dev_printdebug (DBG_TRACE | DBG_API, "\nget_error_string() : entering routine %d\n", error);
 
 	db_error = DS_OK;
 
@@ -1885,8 +1884,8 @@ static char *get_error_string (long error)
 
 	snprintf (res_path, sizeof(res_path), "ERROR/%d/%d", team, server);
 	snprintf (res_name, sizeof(res_name), "%d", error_ident);
-	dev_printdebug (DBG_API, "get_error_string() : res_path = %s\n", res_path);
-	dev_printdebug (DBG_API, "get_error_string() : res_name = %s\n", res_name);
+	dev_printdebug (DBG_TRACE | DBG_API, "get_error_string() : res_path = %s\n", res_path);
+	dev_printdebug (DBG_TRACE | DBG_API, "get_error_string() : res_name = %s\n", res_name);
 
 	res_tab.resource_name = res_name;
 	res_tab.resource_type = D_STRING_TYPE;

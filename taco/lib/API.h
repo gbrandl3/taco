@@ -12,9 +12,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:		$Date: 2004-10-26 11:27:44 $
+ * Date:		$Date: 2005-04-11 16:01:20 $
  *
  *
  * Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
@@ -75,7 +75,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.9 2004-10-26 11:27:44 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.10 2005-04-11 16:01:20 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*
@@ -452,7 +452,7 @@ extern char *dev_error_string;
 #ifdef __cplusplus
 extern "C" {
 #endif
-void device_server (char *server_name, char *pers_name, int nodb, int pn, int n_device, char** device_list); 
+void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int nodb, int pn, int n_device, char** device_list); 
 #ifdef __cplusplus
 }
 #endif
