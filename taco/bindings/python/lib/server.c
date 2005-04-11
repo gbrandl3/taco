@@ -8,9 +8,9 @@
  *
  * Original:    June 2000
  *
- * Date:	$Date: 2005-02-24 16:00:50 $
+ * Date:	$Date: 2005-04-11 16:02:19 $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
  *********************************************************************/
  
@@ -49,7 +49,7 @@ static PyObject *Server_startup(PyObject *self, PyObject *args)
 /* 
  * start the device server
  */
-	device_server (name, pers_name, (int)0, (int)0, (int)0, (char **)NULL);
+	device_server (name, pers_name, (int)0, (int)0, (int)0, (int)0, (int)0, (char **)NULL);
         return PyInt_FromLong(0L);
 }
 
@@ -93,7 +93,7 @@ static PyObject *Server_startup_nodb (PyObject *self, PyObject *args)
 /* 
  * start the device server
  */
-	device_server (name, pers_name, 1, pn, n_device, device_list);
+	device_server (name, pers_name, 0, 0, 1, pn, n_device, device_list);
 			
         return PyInt_FromLong(0L);
 }
