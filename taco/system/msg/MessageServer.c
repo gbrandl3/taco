@@ -11,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.7 $
+ Version:	$Revision: 1.8 $
 
- Date:		$Date: 2005-02-24 15:55:38 $
+ Date:		$Date: 2005-04-11 15:54:56 $
 
  Copyright (c) 1990 by	European Synchrotron Radiation Facility, 
 			Grenoble, France
@@ -26,6 +26,7 @@
  * Include files and Static Routine definitions
  */
 #include "config.h"
+#include <errno.h>
 #include <API.h>
 #include <private/ApiP.h>
 #include <Message.h>
@@ -97,6 +98,9 @@ void msg_initialise (char *dshome)
         snprintf (msg.aw_path, sizeof(msg.aw_path), "%s/system/bin/sun4/S_Alarm", dshome );
 #endif /* sun */
 
+  	fprintf (logFile, "\n%s Error message dir : %s", getTimeString("MessageServer"), msg.ER_file_dir);
+  	fprintf (logFile, "\n%s Pipe message dir : %s", getTimeString("MessageServer"), msg.pipe_dir);
+  	fprintf (logFile, "\n%s Alarm window program : %s", getTimeString("MessageServer"), msg.aw_path);
 }
 
 
@@ -120,19 +124,19 @@ void msg_alarm_handler(short alarm_type,
 	if (( pid = fork () ) < 0 )
 	{
   		fprintf (logFile, "\n%s Cannot start alarm window because fork failed!", getTimeString("MessageServer"));
-		fprintf (logFile, "\n\nError in %s on host %s !\n",server_name,host_name);
+		fprintf (logFile, "\n%s Error in %s on host %s !", getTimeString("MessageServer"), server_name, host_name);
 
 		switch (alarm_type)
 		{
 			case 2 :
-				fprintf (logFile,"%s cannot open error file :  %s\n",file_name, getTimeString("MessageServer"));
+				fprintf (logFile,"\n%s cannot open error file :  %s", getTimeString("MessageServer"), file_name);
 				break;
 			case 1 :
 			case 0 :
-				fprintf (logFile,"%s error file :  %s\n", getTimeString("MessageServer"), file_name);
+				fprintf (logFile,"\n%s error file :  %s", getTimeString("MessageServer"), file_name);
 				break;
 			case -1 :
-				fprintf (logFile,"%s exiting!\n", getTimeString("MessageServer"));
+				fprintf (logFile,"\n%s exiting!", getTimeString("MessageServer"));
 				kill(getpid(), SIGQUIT);
 		}
 		return;
@@ -151,7 +155,7 @@ void msg_alarm_handler(short alarm_type,
 		cmd_argv[i++] = display; 
 		cmd_argv[i] = 0; 
 		execv (msg.aw_path, cmd_argv);
-		fprintf (logFile,"\n%s can not start Alarm Window !\n", getTimeString("MessageServer"));
+		fprintf (logFile,"\n%s can not start Alarm Window !", getTimeString("MessageServer"));
 		fflush(logFile);
 		exit (-1);
 	}
@@ -282,9 +286,12 @@ _msg_out *rpc_msg_send_1 (_msg_data *msg_data)
 /*
  * write debug or diagnostic messages to named pipe !
  */
-	fildes = open (pipe_name,O_WRONLY);
+	fildes = open (pipe_name, O_APPEND | O_WRONLY);
+	if (fildes == -1)
+		fildes = open(pipe_name, O_CREAT | O_WRONLY);
 	if (fildes == -1)
 	{
+  		fprintf (logFile, "\n%s Pipe name : %s, %d %s", getTimeString("MessageServer"), pipe_name, errno, strerror(errno));
 		msg_out.error = DevErr_CannotOpenPipe;
 		msg_out.status = -1;
 		return (&msg_out);

@@ -11,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.9 $
+ Version:	$Revision: 1.10 $
 
- Date:		$Date: 2005-02-24 15:55:38 $
+ Date:		$Date: 2005-04-11 15:54:56 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -113,13 +113,13 @@ int main (int argc, char **argv)
   	gethostname (msg.host_name, sizeof(msg.host_name) - 1);
 	msg.host_name[sizeof(msg.host_name) - 1] = '\0';
 
-	fprintf(logFile, "\n%s Starting with program number %d on host %s\n", getTimeString("MessageServer"), msg.prog_number, msg.host_name);
+	fprintf(logFile, "\n%s Starting with program number %d on host %s", getTimeString("MessageServer"), msg.prog_number, msg.host_name);
 	fflush(logFile);
 /*
  *  register message-server to netwok manager
  */
 	register_msg (nethost, &dshome);
-	fprintf(logFile, "%s registered on NETHOST %s with home=%s and DISPLAY=%s\n", getTimeString("MessageServer"), nethost, dshome, msg.display);
+	fprintf(logFile, "\n%s registered on NETHOST %s with home=%s and DISPLAY=%s", getTimeString("MessageServer"), nethost, dshome, msg.display);
 	fflush(logFile);
 	
 /*
@@ -133,14 +133,14 @@ int main (int argc, char **argv)
 	transp = svcudp_create(RPC_ANYSOCK);
 	if (transp == NULL) 
 	{
-		fprintf(logFile, "%s Cannot create udp service, exiting...\n", getTimeString("MessageServer"));
+		fprintf(logFile, "\n%s Cannot create udp service, exiting...", getTimeString("MessageServer"));
 		fflush(logFile);
 		kill (pid,SIGQUIT);
 	}
 
 	if (!svc_register(transp, msg.prog_number, MSGSERVER_VERS, msgserver_prog_1, IPPROTO_UDP)) 
 	{
-		fprintf(logFile, "%s Unable to register server, exiting...\n", getTimeString("MessageServer")); 
+		fprintf(logFile, "\n%s Unable to register server, exiting...", getTimeString("MessageServer")); 
 		fflush(logFile);
 		kill (pid,SIGQUIT);
 	}
@@ -149,16 +149,16 @@ int main (int argc, char **argv)
  *  startup message server
  */
         msg_initialise (dshome);
-	fprintf(logFile, "%s initialized\n", getTimeString("MessageServer"));
+	fprintf(logFile, "\n%s initialized", getTimeString("MessageServer"));
 	fflush(logFile);
 
 /*
  *  set server into wait status
  */
-	fprintf(logFile, "%s ready to run\n", getTimeString("MessageServer"));
+	fprintf(logFile, "\n%s ready to run", getTimeString("MessageServer"));
 	fflush(logFile);
 	svc_run();
-	fprintf(logFile, "%s svc_run returned\n", getTimeString("MessageServer"));
+	fprintf(logFile, "\n%s svc_run returned. Exiting.", getTimeString("MessageServer"));
 	fflush(logFile);
 	kill (pid,SIGQUIT);
 }
@@ -297,9 +297,9 @@ void register_msg (char *nethost, char **dshome)
 void unreg_server (int signo)
 {
 	pmap_unset(msg.prog_number, MSGSERVER_VERS);
-	fprintf(logFile, "\n%s received signal %d.\n", getTimeString("MessageServer"), signo);
-	fprintf(logFile, "\n%s unregistered.\n", getTimeString("MessageServer"));
-	fprintf(logFile, "\n%s exited.\n", getTimeString("MessageServer"));
+	fprintf(logFile, "\n%s received signal %d.", getTimeString("MessageServer"), signo);
+	fprintf(logFile, "\n%s unregistered.", getTimeString("MessageServer"));
+	fprintf(logFile, "\n%s exited.", getTimeString("MessageServer"));
 	fflush(logFile);
 	fclose(logFile);
 	exit(1);
