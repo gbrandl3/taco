@@ -72,14 +72,10 @@ AT_CLEANUP
 AT_SETUP([db_putresource function])
 AT_CHECK([AT_TACO_RUN_LOCAL([db_resput test/device/3/res1 TEST])
 AT_TACO_RUN_LOCAL([db_resget test/device/3/res1])
-AT_TACO_RUN_LOCAL([db_resput test/device/3/res1 TEST TEST2 TEST3 ])
+AT_TACO_RUN_LOCAL([db_resput test/device/3/res1 TEST TEST2 TEST3])
 AT_TACO_RUN_LOCAL([db_resget test/device/3/res1])], [], [[TEST
 TEST,TEST2,TEST3
 ]])
-AT_CLEANUP
-
-AT_SETUP([db_putresource long resource function])
-AT_CHECK([AT_TACO_RUN_LOCAL([db_resput test/device/3/res1 thisisalongresourcewhichisshouldbelongerthan23characterslong])], [])
 AT_CLEANUP
 
 AT_SETUP([db_delresource function])
@@ -149,6 +145,18 @@ AT_TACO_RUN_LOCAL([test_server 1 &])
 sleep 5
 AT_TACO_RUN_LOCAL([off test_server >>log])
 ], [], [[1
+Number of devices: 1
+Device::Device() called, devname = test/a/1
+Device::ClassInitialise() called
+
+dev_export() : entering routine
+dev_export() : leaving routine
+Number of devices: 1
+Device::Device() called, devname = test/a/1
+Device::ClassInitialise() called
+
+dev_export() : entering routine
+dev_export() : leaving routine
 ]])
 AT_CLEANUP
 

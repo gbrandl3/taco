@@ -130,6 +130,12 @@ Query commands
             10       0       0                        "Close"
 Query events
     4228120578           3                        "HeartBeat"
+Number of devices: 1
+Device::Device() called, devname = test/a/1
+Device::ClassInitialise() called
+
+dev_export() : entering routine
+dev_export() : leaving routine
 ])
 AT_CLEANUP
 

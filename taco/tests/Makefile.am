@@ -23,7 +23,7 @@ EXTRA_DIST 		+= testsuite.at $(TESTSUITE_AT) testsuite local.at
 
 TESTSUITE 		= testsuite
 
-TESTSUITE_AT		= dbase.at devices.at starter.at
+TESTSUITE_AT		= dbase.at devices.at starter.at message.at
 
 AUTOTEST 		= $(AUTOM4TE) --language=autotest
 

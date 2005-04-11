@@ -1,0 +1,17 @@
+AT_SETUP([Test the dev_printerror without message server])
+AT_CHECK([AT_TACO_RUN_LOCAL([test_server 1 &])
+sleep 1
+AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [Number of devices: 1
+Device::Device() called, devname = test/a/1
+Device::ClassInitialise() called
+
+dev_export() : entering routine
+dev_export() : leaving routine
+])
+AT_CLEANUP
+AT_SETUP([Test the dev_printerror with message server])
+AT_CHECK([AT_TACO_RUN_LOCAL([test_server 1 -m &])
+sleep 1
+AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [])
+AT_CLEANUP
+
