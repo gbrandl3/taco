@@ -1,16 +1,16 @@
 AC_DEFUN([PYTHON_PROG],
 [
-	AM_PATH_PYTHON([$1],[],[taco_python_binding=no]) 
-	AC_MSG_CHECKING([Python ])
- 
-	AC_CACHE_VAL(ac_cv_python, [ac_cv_python=${PYTHONDIR:-/usr/local}])
- 
 	AC_ARG_WITH(python, AC_HELP_STRING([--with-python=pythondir], [use python installed in pythondir]),
 		[ac_python_dir=$withval], [ac_python_dir=$ac_cv_python])
+	if test "x$ac_python_dir" != "xno"  ; then
+		AM_PATH_PYTHON([$1],[],[taco_python_binding=no]) 
+		AC_MSG_CHECKING([Python ])
  
-dnl	AC_MSG_RESULT($ac_python_dir)
+		AC_CACHE_VAL(ac_cv_python, [ac_cv_python=${PYTHONDIR:-/usr/local}])
+  		AC_CACHE_VAL(ac_cv_python_version, [ac_cv_python_version="$PYTHON_VERSION"])
+dnl		AC_MSG_RESULT($ac_python_dir)
+	fi
  
-  	AC_CACHE_VAL(ac_cv_python_version, [ac_cv_python_version="$PYTHON_VERSION"])
 ])
 
 dnl PYTHON_DEVEL()
@@ -18,11 +18,7 @@ dnl
 dnl Checks for Python and tries to get the include path to 'Python.h'.
 dnl It provides the $(PYTHON_CPPFLAGS) output variable.
 AC_DEFUN([PYTHON_DEVEL],[
- 	AC_REQUIRE([PYTHON_PROG])
-	AC_REQUIRE([AC_CANONICAL_TARGET])
 	taco_python_binding=no
-	AC_CACHE_CHECK([python version], ac_cv_python_version, [ac_cv_python_version="$PYTHON_VERSION"])
-	ac_python_version=$ac_cv_python_version
 
 	AC_ARG_WITH(python-libraries, AS_HELP_STRING([--with-python-libraries=DIR], [Directory where python library is installed (optional)]),
 		[python_libraries="$withval"], [python_libraries=""])
@@ -30,6 +26,10 @@ AC_DEFUN([PYTHON_DEVEL],[
                 [python_includes="$withval"], [python_includes=""])
 
 	if test "x$ac_python_dir" != "xno"  ; then
+ 		AC_REQUIRE([PYTHON_PROG])
+		AC_REQUIRE([AC_CANONICAL_TARGET])
+		AC_CACHE_CHECK([python version], ac_cv_python_version, [ac_cv_python_version="$PYTHON_VERSION"])
+		ac_python_version=$ac_cv_python_version
 		AC_MSG_NOTICE([checking for Python${ac_python_version} devel])
 dnl
 dnl Get the cflags and libraries

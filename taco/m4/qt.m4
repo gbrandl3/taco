@@ -4,9 +4,9 @@ dnl		adapted form the KDE2 acinclude.m4
 dnl
 dnl Author: 	$Author: jkrueger1 $
 dnl
-dnl Version:	$Revision: 1.4 $
+dnl Version:	$Revision: 1.5 $
 dnl
-dnl Date:	$Date: 2005-02-24 16:01:31 $
+dnl Date:	$Date: 2005-04-11 15:38:25 $
 dnl
 
 dnl
@@ -537,41 +537,18 @@ dnl	LIB_QT		= name of the Qt lib
 dnl
 AC_DEFUN([AC_PATH_QT],
     [
-	case $target in
-		powerpc-apple-darwin7.4.0 | *-*-darwin*)
-			QT_MISC_TESTS
-			;;
-		*)
-			AC_X_PATH
-			;;
-	esac
-	AC_USE_QT([$1], [$2])dnl
-	qt_was_given=yes
-	if test -z "$LIBQT"; then
-  	    LIBQT="-lqt"
-  	    qt_was_given=no
-  	    int_qt="-lqt"
-	else
-  	    int_qt="$LIBQT"
-	fi
-	if test $qtver = 2; then
-dnl  	    AC_REQUIRE([AC_FIND_PNG])
-dnl  	    AC_REQUIRE([AC_FIND_JPEG])
-  	    LIBQT="$LIBQT $LIBPNG $LIBJPEG"
-	fi
- 
-	AC_MSG_CHECKING([for Qt])
- 
-	LIBQT="$LIBQT $X_PRE_LIBS -lXext -lX11 $LIBSM $LIBSOCKET"
 	ac_qt_includes=NO 
 	ac_qt_libraries=NO 
 	ac_qt_bindir=NO
 	qt_libraries=""
 	qt_includes=""
+	qt_libs_given=no
+
 	AC_ARG_WITH(qt-dir,AC_HELP_STRING([--with-qt-dir=DIR],[where the root of Qt is installed]),
     	    [   ac_qt_includes="$withval"/include
        	    	ac_qt_libraries="$withval"/lib
        	    	ac_qt_bindir="$withval"/bin
+		ac_qt_dir="$withval"
     	    ]
 	)
  
@@ -579,14 +556,39 @@ dnl  	    AC_REQUIRE([AC_FIND_JPEG])
     	    [ac_qt_includes="$withval"]
 	)
  
-	qt_libs_given=no
- 
 	AC_ARG_WITH(qt-libraries, AC_HELP_STRING([--with-qt-libraries=DIR], [where the Qt library is installed.]),
     	    [   ac_qt_libraries="$withval"
        		qt_libs_given=yes
     	    ]
 	)
-	AC_CACHE_VAL(ac_cv_have_qt,
+
+	if test "x$ac_qt_dir" != "xno"  ; then
+	    case $target in
+		powerpc-apple-darwin7.4.0 | *-*-darwin*)
+			QT_MISC_TESTS
+			;;
+		*)
+			AC_X_PATH
+			;;
+	    esac
+	    LIBQT="$LIBQT $X_PRE_LIBS -lXext -lX11 $LIBSM $LIBSOCKET"
+	    AC_USE_QT([$1], [$2])dnl
+	    qt_was_given=yes
+	    if test -z "$LIBQT"; then
+  	        LIBQT="-lqt"
+  	        qt_was_given=no
+  	        int_qt="-lqt"
+	    else
+  	        int_qt="$LIBQT"
+	    fi
+	    if test $qtver = 2; then
+dnl  	        AC_REQUIRE([AC_FIND_PNG])
+dnl  	        AC_REQUIRE([AC_FIND_JPEG])
+  	        LIBQT="$LIBQT $LIBPNG $LIBJPEG"
+	    fi
+ 
+	    AC_MSG_CHECKING([for Qt])
+	    AC_CACHE_VAL(ac_cv_have_qt,
 	    [
 #try to guess Qt locations
 		qt_incdirs=""
@@ -699,49 +701,49 @@ For more details about this problem, look at the end of config.log."
 			have_qt="yes"
 			int_qt=$LIBQT
 		fi
-	    ]
-	)
-	eval "$ac_cv_have_qt"
+	    ])
+	    eval "$ac_cv_have_qt"
  
-	if test "$have_qt" != yes; then
-  	    AC_MSG_RESULT([$have_qt]);
-	else
-  	    ac_cv_have_qt="have_qt=yes \
-    	    ac_qt_includes=$ac_qt_includes ac_qt_libraries=$ac_qt_libraries"
-  	    AC_MSG_RESULT([libraries $ac_qt_libraries, headers $ac_qt_includes])
-  	    qt_libraries="$ac_qt_libraries"
-  	    qt_includes="$ac_qt_includes"
-	fi
+	    if test "$have_qt" != yes; then
+  	        AC_MSG_RESULT([$have_qt]);
+	    else
+  	        ac_cv_have_qt="have_qt=yes \
+    	        ac_qt_includes=$ac_qt_includes ac_qt_libraries=$ac_qt_libraries"
+  	        AC_MSG_RESULT([libraries $ac_qt_libraries, headers $ac_qt_includes])
+  	        qt_libraries="$ac_qt_libraries"
+  	        qt_includes="$ac_qt_includes"
+	    fi
  
-	if test ! "$qt_libs_given" = "yes"; then
-	    AC_CHECK_QT_DIRECT(qt_libraries= ,[])
-	fi
+	    if test ! "$qt_libs_given" = "yes"; then
+	        AC_CHECK_QT_DIRECT(qt_libraries= ,[])
+	    fi
  
-	AC_SUBST(qt_libraries)
-	AC_SUBST(qt_includes)
+	    AC_SUBST(qt_libraries)
+	    AC_SUBST(qt_includes)
  
-	if test "$qt_includes" = "$x_includes" || test -z "$qt_includes"; then
+	    if test "$qt_includes" = "$x_includes" || test -z "$qt_includes"; then
  	    QT_INCLUDES="$X_INCLUDES";
-	else
- 	    QT_INCLUDES="-I$qt_includes"
- 	    all_includes="$QT_INCLUDES $all_includes"
-	fi
+	    else
+ 	        QT_INCLUDES="-I$qt_includes"
+ 	        all_includes="$QT_INCLUDES $all_includes"
+	    fi
  
-	if test "$qt_libraries" = "$x_libraries" || test -z "$qt_libraries"; then
- 	    QT_LDFLAGS="$X_LDFLAGS"
-	else
- 	    QT_LDFLAGS="-L$qt_libraries"
- 	    all_libraries="$all_libraries $QT_LDFLAGS"
-	fi
+	    if test "$qt_libraries" = "$x_libraries" || test -z "$qt_libraries"; then
+ 	        QT_LDFLAGS="$X_LDFLAGS"
+	    else
+ 	        QT_LDFLAGS="-L$qt_libraries"
+ 	        all_libraries="$all_libraries $QT_LDFLAGS"
+	    fi
  
-	AC_SUBST(QT_INCLUDES)
-	AC_SUBST(QT_LDFLAGS)
-	if test x"$have_qt" = x"yes" ; then
+	    AC_SUBST(QT_INCLUDES)
+	    AC_SUBST(QT_LDFLAGS)
+	    if test x"$have_qt" = x"yes" ; then
 		AC_PATH_QT_MOC_UIC
  
 		LIB_QT="$int_qt "'$(LIBPNG) $(LIBJPEG) -lXext $(LIB_X11) $(LIBSM)'
+	    fi
+	    AC_SUBST(LIB_QT)
 	fi
-	AC_SUBST(LIB_QT)
     ]
 )
 
