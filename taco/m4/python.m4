@@ -34,25 +34,24 @@ AC_DEFUN([PYTHON_DEVEL],[
 dnl
 dnl Get the cflags and libraries
 dnl
+		PYTHON_LIBS=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('LIBS'), distutils.sysconfig.get_config_var('SYSLIBS')"`
 		if test "x$python_includes" != "x" ; then
-	                PYTHON_CPPFLAGS="-I$python_includes"
-			AC_FIND_FILE(Python.h, $python_includes, python_incdir)
+			python_incdirs=${python_includes}
 	        elif test "x$python_prefix" != "x" ; then
-	                PYTHON_CPPFLAGS="-I$python_prefix/include"
-			AC_FIND_FILE(Python.h, $python_prefix/include, python_incdir)
+			python_incdirs=${python_prefix}/include
 	        else 
 			python_incdirs="$ac_python_dir/include /usr/include /usr/local/include/"
 			case $target in
 		 		powerpc-apple-darwin*)	
 					python_incdirs="$python_incdirs /System/Library/Frameworks/Python.framework/Versions/${ac_python_version}/include" ;;
 			esac
-			AC_FIND_FILE(Python.h, $python_incdirs, python_incdir)
-	
-			if test ! -r $python_incdir/Python.h; then
-				AC_FIND_FILE(python${ac_python_version}/Python.h, $python_incdirs, python_incdir)
-				python_incdir=$python_incdir/python${ac_python_version}
-			fi
 	        fi
+		AC_FIND_FILE(Python.h, $python_incdirs, python_incdir)
+	
+		if test ! -r $python_incdir/Python.h; then
+			AC_FIND_FILE(python${ac_python_version}/Python.h, $python_incdirs, python_incdir)
+			python_incdir=$python_incdir/python${ac_python_version}
+		fi
 	  	if test -r $python_incdir/Python.h ; then
 			python_includes=-I$python_incdir
 			PYTHON_CPPFLAGS=-I$python_incdir
@@ -60,29 +59,38 @@ dnl
 		fi
 		result=yes
 		if test "x$taco_python_binding" = "xyes" ; then 
-	      	  	if test "x$python_libraries" != "x" ; then
-				AC_FIND_FILE(libpython${ac_python_version}.a, $python_libraries, python_libdir)
-	        	elif test "x$python_prefix" != "x" ; then
-				AC_FIND_FILE(libpython${ac_python_version}.a, $python_prefix/lib, python_libdir)
-	        	else 
-				python_libdirs="$ac_python_dir/lib /usr/lib /usr/local /usr/lib"
-				AC_FIND_FILE(libpython${ac_python_version}.a, $python_libdirs, python_libdir)
-				if test ! -r $python_libdir/libpython${ac_python_version}.a; then
-	  				AC_FIND_FILE(python${ac_python_version}/config/libpython${ac_python_version}.a, $python_libdirs, python_libdir)
-	  	    			python_libdir=$python_libdir/python${ac_python_version}/config
-				fi
+	        	if test "x$python_prefix" != "x" ; then
+				python_libraries=${$python_prefix/lib}
+	      	  	elif test "x$python_libraries" == "x" ; then
+				python_libraries="$ac_python_dir/lib /usr/lib /usr/local /usr/lib"
 			fi
-	  		if test -r $python_libdir/libpython${ac_python_version}.a; then
-				PYTHON_LDFLAGS="-L$python_libdir -lpython${ac_python_version} $LIBDL $LIBSOCKET"
-				taco_python_bindings=yes
+			ac_save_LIBS="$LIBS"
+			ac_save_LDFLAGS="$LDFLAGS"
+			for i in ${python_libraries} ; do
+				LDFLAGS="$ac_save_LDFLAGS -L${i} ${PYTHON_LIBS}"
+				PYTHON_LIB=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('LDLIBRARY')"`
+				if test -z "$PYTHON_LIB" ; then
+					PYTHON_LIB=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('LIBRARY')"`
+				fi	
+				AC_CHECK_LIB([python], [Py_Initialize], [
+					PYTHON_LDFLAGS="-L${i} -lpython"
+					break], 
+					AC_CHECK_LIB([python${ac_python_version}], [Py_Initialize], [
+					PYTHON_LDFLAGS="-L${i} -lpython${ac_python_version}"
+					break], []), [])
+			done
+			LIBS="${ac_save_LIBS}"
+			LDFLAGS="$ac_save_LDFLAGS"
+	  		if test -n "$PYTHON_LDFLAGS" ; then
+				taco_python_binding=yes
 				AC_MSG_RESULT([Python (devel and runtime) found.])
 			else
-				AC_MSG_RESULT([libpython${ac_python_version}.a not found.])
+				taco_python_binding=no
+				AC_MSG_RESULT([Python library version ${ac_python_version} not found.])
  	 	    	fi
 		else
 	    	    	AC_MSG_RESULT([Python.h not found.])
 	  	fi
- 
 		AC_SUBST(PYTHON_CPPFLAGS)
 		AC_SUBST(PYTHON_LDFLAGS)
 	fi 
