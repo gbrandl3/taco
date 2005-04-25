@@ -60,7 +60,7 @@ dnl
 		result=yes
 		if test "x$taco_python_binding" = "xyes" ; then 
 	        	if test "x$python_prefix" != "x" ; then
-				python_libraries=${$python_prefix/lib}
+				python_libraries=${python_prefix}/lib
 	      	  	elif test "x$python_libraries" == "x" ; then
 				python_libraries="$ac_python_dir/lib /usr/lib /usr/local /usr/lib"
 			fi

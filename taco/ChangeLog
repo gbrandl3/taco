@@ -1,3 +1,11 @@
+2005-04-25 18:00 jkrueger1:
+	* m4/python.m4: Bugfix wrong written variable substitution
+	(worked on Linux not on FreeBSD)
+2005-04-21 13:00 jkrueger1:
+	* Fix some problems with the detection of the Python development
+	environment
+	* improve the detection of the TACO libraries for projects using
+	TACO
 2005-04-11 19:00 jkrueger1:
 	* Fix some problems with the MessageServer
 	* Integrate the Message server test
