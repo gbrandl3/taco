@@ -10,13 +10,13 @@
 
  Author(s)  :	Andy Goetz
 		Jens Meyer
- 		$Author: andy_gotz $
+ 		$Author: jkrueger1 $
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.24 $
+ Version    :	$Revision: 1.25 $
 
- Date	    :	$Date: 2005-03-29 09:42:28 $
+ Date	    :	$Date: 2005-05-02 13:34:45 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -612,6 +612,7 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
 		svr_conns[n_svr_conn].tcp_clnt = clnt;
 		svr_conns[n_svr_conn].udp_clnt = NULL;
 		svr_conns[n_svr_conn].asynch_clnt = NULL;
+		svr_conns[n_svr_conn].tcp_socket = -1;
 	}
 	else
 	{
@@ -723,6 +724,7 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
 					svr_conns[n_svr_conn].clnt = clnt;
 					svr_conns[n_svr_conn].tcp_clnt = clnt;
 					svr_conns[n_svr_conn].udp_clnt = NULL;
+					svr_conns[n_svr_conn].tcp_socket = tcp_socket;
 				}
 			}
 		}
@@ -1503,8 +1505,7 @@ long _DLLFunc taco_dev_free(devserver ds, long *error)
 
 /*
  *  In any case close the RPC connection to the device.
- *  If the last device on a connection is freed,
- *  destroy the handle.
+ *  If the last device on a connection is freed, destroy the handle.
  */
 	if (--(svr_conns[ds->no_svr_conn].no_conns) == 0)
 	{
@@ -1513,10 +1514,11 @@ long _DLLFunc taco_dev_free(devserver ds, long *error)
  */
 		if (svr_conns[ds->no_svr_conn].tcp_clnt != NULL)
 		{
+			if (svr_conns[ds->no_svr_conn].tcp_socket != -1)
 #if !defined (WIN32)
-			close (svr_conns[ds->no_svr_conn].tcp_socket);
+				close (svr_conns[ds->no_svr_conn].tcp_socket);
 #else
-			closesocket (svr_conns[ds->no_svr_conn].tcp_socket);
+				closesocket (svr_conns[ds->no_svr_conn].tcp_socket);
 #endif /* WIN32 */
 			clnt_destroy (svr_conns[ds->no_svr_conn].tcp_clnt);
 		}
@@ -1944,6 +1946,7 @@ long _DLLFunc check_rpc_connection (devserver ds, long *error)
 					clnt = clnt_create (host_name,prog_number, vers_number,"udp");
 				}
 			}
+			svr_conns[ds->no_svr_conn].tcp_socket = tcp_socket;
 		}
 	}
 	else
@@ -2019,10 +2022,11 @@ long _DLLFunc check_rpc_connection (devserver ds, long *error)
 /*
  *  if tcp protocol was used, close the old socket first.
  */
+			if (svr_conns[ds->no_svr_conn].tcp_socket != -1)
 #if !defined (WIN32)
-               		close (svr_conns[ds->no_svr_conn].tcp_socket);
+               			close (svr_conns[ds->no_svr_conn].tcp_socket);
 #else
-              		closesocket (svr_conns[ds->no_svr_conn].tcp_socket);
+              			closesocket (svr_conns[ds->no_svr_conn].tcp_socket);
 #endif /* WIN32 */
 
 	 		clnt_destroy(svr_conns[ds->no_svr_conn].tcp_clnt);

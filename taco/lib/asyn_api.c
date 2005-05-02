@@ -21,13 +21,13 @@
 		calls and D_EVENT_TYPE for asynchronous events.
 
  Author(s)  :	Andy Goetz
- 		$Author: andy_gotz $
+ 		$Author: jkrueger1 $
 
  Original   :	January 1997
 
- Version:	$Revision: 1.15 $
+ Version:	$Revision: 1.16 $
 
- Date:		$Date: 2004-11-25 19:40:39 $
+ Date:		$Date: 2005-05-02 13:34:45 $
 
  Copyright (c) 1997-2000 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -1368,8 +1368,8 @@ long asynch_server_import(devserver ds, long *error)
 		svr_conns[ds->no_svr_conn].asynch_timeout = asynch_timeout;
 #ifdef _UCC
                 svr_conns[ds->no_svr_conn].asynch_listen_tcp_socket = ds_rpc_svc_fd;
-                svr_conns[ds->no_svr_conn].asynch_callback_tcp_socket = tcp_socket;
 #endif /* _UCC */
+                svr_conns[ds->no_svr_conn].asynch_callback_tcp_socket = tcp_socket;
 
                 dev_printdebug (DBG_ASYNCH,
                 	"\nasynch_server_import() : imported asynchronous server (host=%s) at prog no=%d socket in=%d out=%d\n",
