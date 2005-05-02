@@ -1,3 +1,9 @@
+2005-05-02 13:00 jkrueger1:
+	* lib/dev_api.c: Bugfix: close of not initialized TCP socket
+	variable exits Python if an imported device is deleted (freed)
+2005-04-26 10:00 jkrueger1:
+	* m4/python.m4: Bugfix: detection of libpython failes due to the
+	cached values of the detection result.
 2005-04-25 18:00 jkrueger1:
 	* m4/python.m4: Bugfix wrong written variable substitution
 	(worked on Linux not on FreeBSD)
