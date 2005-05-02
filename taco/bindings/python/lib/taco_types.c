@@ -8,9 +8,9 @@
  *
  * Original:    March 99
  * 
- * Date:	$Date: 2005-02-22 13:16:29 $
+ * Date:	$Date: 2005-05-02 13:36:57 $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
  *********************************************************************/
 #include "config.h"
@@ -46,21 +46,13 @@ double p2c_DOUBLE(PyObject *, long *);
 DevString p2c_STRING(PyObject *, long *);     
 
 
-/********************************************************************
-
-          display_single
-	  
-print of the "single" value according to the type
-	
-   	Arguments:
-	   	ds_argin:  structure containing the value
-   		ds_in: data type
-   	ms: IN or OUT (for appropriate display)
-   
-   	returns: 
-		nothing
-   
-*********************************************************************/
+/**
+ * prints out the "single" value according to the type
+ *
+ * @param ds_argin  structure containing the value
+ * @param ds_in data type
+ * @param ms IN or OUT (for appropriate display)
+ */
 void display_single(DevArgument ds_argin,long ds_in,char * ms)
 {
    switch (ds_in)
@@ -94,21 +86,14 @@ void display_single(DevArgument ds_argin,long ds_in,char * ms)
    }
 }
 
-/***************************************************************
-
-  		p2c_BOOLEAN
-		
-Retrieves a BOOLEAN from python object:
-
-	Arguments:
-		- item: python object
-		- err:  error code 
-				0: no error
-				1: error
-				
-	Returns:
-		C value
-****************************************************************/
+/**
+ * Retrieves a BOOLEAN from python object:
+ *
+ * @param item python object
+ * @param err  error code 0: no error, 1: error
+ *
+ * @return C value
+ */
 char p2c_BOOLEAN(PyObject *item,long *err)
 {
    *err = 0;
@@ -121,21 +106,14 @@ char p2c_BOOLEAN(PyObject *item,long *err)
    }
 }
 
-/***************************************************************
-
-  		p2c_USHORT
-		
-Retrieves an unsigned short from python object:
-
-	Arguments:
-		- item: python object
-		- err:  error code 
-				0: no error
-				1: error
-				
-	Returns:
-		C value
-****************************************************************/
+/**
+ * Retrieves an unsigned short from python object
+ *
+ * @param item python object
+ * @param err  error code 0: no error 1: error
+ *
+ * @return C value
+ */
 unsigned short p2c_USHORT(PyObject *item,long *err)
 {
    *err = 0;
@@ -150,21 +128,14 @@ unsigned short p2c_USHORT(PyObject *item,long *err)
    }
 }
 
-/***************************************************************
-
-  		p2c_SHORT
-		
-Retrieves a SHORT from python object:
-
-	Arguments:
-		- item: python object
-		- err:  error code 
-				0: no error
-				1: error
-				
-	Returns:
-		C value
-****************************************************************/
+/**
+ * Retrieves a SHORT from python object:
+ *
+ * @param item python object
+ * @param err  error code 0: no error 1: error
+ *
+ * @return C value
+ */
 short p2c_SHORT(PyObject *item,long *err)
 {
    *err = 0;
@@ -179,21 +150,14 @@ short p2c_SHORT(PyObject *item,long *err)
    }
 }
 
-/***************************************************************
-
-  		p2c_ULONG
-		
-Retrieves an unsigned long from python object:
-
-	Arguments:
-		- item: python object
-		- err:  error code 
-				0: no error
-				1: error
-				
-	Returns:
-		C value
-****************************************************************/
+/**
+ * Retrieves an unsigned long from python object:
+ *
+ * @param item python object
+ * @param err  error code 0: no error 1: error
+ *
+ * @return C value
+ */
 unsigned long p2c_ULONG(PyObject *item,long *err)
 {
    *err = 0;
@@ -208,21 +172,14 @@ unsigned long p2c_ULONG(PyObject *item,long *err)
    }
 }
 
-/***************************************************************
-
-  		p2c_LONG
-		
-Retrieves a LONG from python object:
-
-	Arguments:
-		- item: python object
-		- err:  error code 
-				0: no error
-				1: error
-				
-	Returns:
-		C value
-****************************************************************/
+/**
+ * Retrieves a LONG from python object:
+ *
+ * @param item python object
+ * @param err  error code 0: no error 1: error
+ *
+ * @returns C value
+ */
 long p2c_LONG(PyObject *item,long *err)
 {
    *err = 0;
@@ -237,21 +194,14 @@ long p2c_LONG(PyObject *item,long *err)
    }
 }
 
-/***************************************************************
-
-  		p2c_FLOAT
-		
-Retrieves a FLOAT from python object:
-
-	Arguments:
-		- item: python object
-		- err:  error code 
-				0: no error
-				1: error
-				
-	Returns:
-		C value
-****************************************************************/
+/**
+ * Retrieves a FLOAT from python object:
+ *
+ * @param item python object
+ * @param err  error code 0: no error 1: error
+ *
+ * @returns C value
+ */
 float p2c_FLOAT(PyObject *item,long *err)
 {
    *err = 0;
@@ -269,21 +219,14 @@ float p2c_FLOAT(PyObject *item,long *err)
 }
 
 
-/***************************************************************
-
-  		p2c_DOUBLE
-		
-Retrieves a DOUBLE from python object:
-
-	Arguments:
-		- item: python object
-		- err:  error code 
-				0: no error
-				1: error
-				
-	Returns:
-		C value
-****************************************************************/
+/**
+ * Retrieves a DOUBLE from python object:
+ *
+ * @param item python object
+ * @param err  error code 0: no error 1: error
+ *
+ * @returns C value
+ */
 double p2c_DOUBLE(PyObject *item,long *err)
 {
    *err = 0;
@@ -300,21 +243,14 @@ double p2c_DOUBLE(PyObject *item,long *err)
    }
 }
 
-/***************************************************************
-
-  		p2c_STRING
-		
-Retrieves a STRING from python object:
-
-	Arguments:
-		- item: python object
-		- err:  error code 
-				0: no error
-				1: error
-				
-	Returns:
-		C value
-****************************************************************/
+/**
+ * Retrieves a STRING from python object:
+ *
+ * @param item python object
+ * @param err  error code 0: no error 1: error
+ *
+ * @returns C value
+ */
 char* p2c_STRING(PyObject *item,long *err)
 {
    *err = 0;
@@ -327,22 +263,16 @@ char* p2c_STRING(PyObject *item,long *err)
    }
 }
 
-/********************************************************************
-      	get_argin_single
-      
-retrieve from python object, the "single" value
-      
-	Arguments:
-      		- ds_argin: structure to fill with the python item
-      		- ds_in: data type 
-      		- item: python object
-      		- mymess: to fill in case of error (allocation made by caller !!
-      
-      	Returns:  
-		0:  no error
-                -1: error
-      
-*********************************************************************/
+/**
+ * retrieve from python object, the "single" value
+ *
+ * @param ds_argin structure to fill with the python item
+ * @param ds_in data type 
+ * @param item python object
+ * @param mymess: to fill in case of error (allocation made by caller !!)
+ *
+ * @return  0:  no error -1: error
+ */
 long get_argin_single(DevArgument ds_argin, long ds_in, PyObject *item, char* mymess)
 {
    int len;
@@ -440,21 +370,13 @@ long get_argin_single(DevArgument ds_argin, long ds_in, PyObject *item, char* my
    return(0);
 }
 
-/********************************************************************
-
-          display_array
-	  
-print of the "array" value according to the type
-	  
-   	Arguments:
-		- ds_argin:  structure containing the data
-   		- ds_in: data type
-   		- ms: IN or OUT for display
-   
-   	Returns: 
-		nothing
-   
-*********************************************************************/
+/**
+ * print out the "array" value according to the type
+ * 	  
+ * @param ds_argin  structure containing the data
+ * @param ds_in data type
+ * @param ms IN or OUT for display
+ */
 void display_array(DevArgument ds_argin,long ds_in, char* ms)
 {
    long i;
@@ -520,22 +442,16 @@ void display_array(DevArgument ds_argin,long ds_in, char* ms)
 }
 
 
-/********************************************************************
-      get_argin_array
-      
-retrieve from python object, the "array" value
-      
-      	Arguments:
-		- ds_argin: structure to fill with the python item
-      		- ds_in: data type 
-      		- mytuple: the python tuple
-      		- mymess: to fill in case of error (allocation made by caller !!
-      
-      	Returns:  
-		- 0: no error
-                - -1: error
-      
-*********************************************************************/
+/**
+ * retrieve from python object, the "array" value
+ *  
+ * @param ds_argin structure to fill with the python item
+ * @param ds_in data type 
+ * @param mytuple the python tuple
+ * @param mymess to fill in case of error (allocation made by caller !!)
+ * 
+ * @return  0: no error -1: error
+ */
 long get_argin_array(DevArgument ds_argin, long ds_in, 
                       PyObject *mytuple, char* mymess)
 {
@@ -751,23 +667,16 @@ long get_argin_array(DevArgument ds_argin, long ds_in,
    return(0);
 }
 
-/*******************************************************************
-
-		get_dmulmove_longfloatarr
-	
-reads an tuple from python and stores it in
-ds_arg, according to the type
-	
-	Arguments:
-		- ds_arg: long* or float* to store the tuple
-		- ds_type: D_LONG_TYPE or D_FLOAT_TYPE
-		- mytuple: the tuple of 8 elements
-		- mymess: string with the message in case of error
-	
-	returns: 
-		- 0 OK
-	        - -1 pb
-********************************************************************/
+/**
+ * reads an tuple from python and stores it in ds_arg, according to the type
+ *	
+ * @param ds_arg long* or float* to store the tuple
+ * @param ds_type D_LONG_TYPE or D_FLOAT_TYPE
+ * @param mytuple the tuple of 8 elements
+ * @param mymess string with the message in case of error
+ * 	
+ * @return 0 OK -1 pb
+ */
 long get_dmulmove_longfloatarr(DevArgument ds_arg,long ds_type,
       PyObject * mytuple, long len, char* mymess)
 {
@@ -805,21 +714,15 @@ long get_dmulmove_longfloatarr(DevArgument ds_arg,long ds_type,
    return(0);
 }
 
-/********************************************************************
-
-          display_special
-	  
-print of the "special" value according to the type
-	  
-   	Arguments:
-		- ds_argin:  structure containing the value
-   		- ds_in: data type
-   		- ms: IN or OUT (for appropriate display)
-   
-   	returns: 
-		nothing
-   
-*********************************************************************/
+/**
+ * print out the "special" value according to the type
+ *
+ * @param ds_argin structure containing the value
+ * @param ds_in data type
+ * @param ms IN or OUT (for appropriate display)
+ * 
+ * @return nothing
+ */
 void display_special(DevArgument ds_argin,long ds_in,char * ms)
 {
    long i;
@@ -883,22 +786,16 @@ void display_special(DevArgument ds_argin,long ds_in,char * ms)
    }
 }
 
-/********************************************************************
-      get_argin_special
-      
-retrieve from python object, the "special" structure
-      
-      	Arguments:
-		- ds_argin: structure to fill with the python item
-      		- ds_in: data type 
-      		- mytuple: the python tuple
-      		- mymess: to fill in case of error (allocation made by caller !!
-      
-      	returns:  
-		0: no error
-                -1: error
-      
-*********************************************************************/
+/**
+ * retrieve from python object, the "special" structure
+ * 
+ * @param - ds_argin: structure to fill with the python item
+ * @param - ds_in: data type 
+ * @param - mytuple: the python tuple
+ * @param - mymess: to fill in case of error (allocation made by caller !!
+ *
+ * @return  0 no error -1 error
+ */
 long get_argin_special(DevArgument ds_argin, long ds_in, 
                       PyObject *mytuple, char* mymess)
 {
@@ -1162,22 +1059,16 @@ long get_argin_special(DevArgument ds_argin, long ds_in,
 
 
 
-/********************************************************************
-      get_argout_single
-      
-build from C argout object, the python value
-      
-      Arguments:
-      		- ds_argout: C data
-      		- ds_out: data type 
-      		- item: python object
-      		- mymess: to fill in case of error (allocation made by caller !!)
-      
-      returns:  
-      		0: no error
-                -1: error
-      
-*********************************************************************/
+/**
+ * build from C argout object, the python value
+ *
+ * @param ds_argout C data
+ * @param ds_out data type 
+ * @param item python object
+ * @param mymess to fill in case of error (allocation made by caller !!)
+ *
+ * @return  0 no error -1 error
+ */
 long get_argout_single(DevArgument ds_argout, long ds_out, 
                       PyObject **item, char* mymess)
 {
@@ -1224,23 +1115,16 @@ long get_argout_single(DevArgument ds_argout, long ds_out,
    return(0);
 }
 
-/********************************************************************
-      get_argout_array
-      
-build from C structure, the python list
-      
-      	Arguments:
-		- ds_argout: C structure 
-      		- ds_out: data type 
-      		- mylist: the python list
-      		- mymess: to fill in case of error 
-		  (allocation made by caller !!
-      
-      	returns:  
-		0: no error
-                -1: error
-      
-*********************************************************************/
+/**
+ * build from C structure, the python list
+ *
+ * @param ds_argout C structure 
+ * @param ds_out data type 
+ * @param mylist the python list
+ * @param mymess to fill in case of error (allocation made by caller !!)
+ *
+ * @return 0: no error -1: error
+ */
 long get_argout_array(DevArgument ds_argout, long ds_out, 
                       PyObject **mylist, char* mymess)
 {
@@ -1440,23 +1324,16 @@ long get_argout_array(DevArgument ds_argout, long ds_out,
 }
 
 
-/********************************************************************
-      get_argout_special
-      
-build from C structure, the python list
-      
-      	Arguments:
-		- ds_argout: C structure 
-      		- ds_out: data type 
-      		- mylist: the python list
-      		- mymess: to fill in case of error 
-		  (allocation made by caller !!
-      
-      	returns:  
-		0: no error
-                -1: error
-      
-*********************************************************************/
+/**
+ * build from C structure, the python list
+ *
+ * @param ds_argout C structure 
+ * @param ds_out data type 
+ * @param mylist the python list
+ * @param mymess to fill in case of error (allocation made by caller !!)
+ * 
+ * @return 0: no error -1: error
+ */
 long get_argout_special(DevArgument ds_argout, long ds_out, 
                       PyObject **mylist, char* mymess)
 {
@@ -1558,23 +1435,17 @@ long get_argout_special(DevArgument ds_argout, long ds_out,
 
    return(0);
 }
-/********************************************************************
-      check_type
-      
-sets some useful variables accoding to type
-      
-      	Arguments:
-		- ds_ty: taco data type 
-      		- is_a_single: pointer to value =1 if single, 
-					0 otherwise 
-      		- is_an_array: pointer to value =1 if an array, 0 otherwise
-      		- is_a_special: pointer to value =1 if special type, 0 otherwise
-      
-      	returns:  
-		0: no error
-                -1: error
-      
-*********************************************************************/
+
+/**
+ * sets some useful variables accoding to type
+ *
+ * @param ds_ty taco data type 
+ * @param is_a_single pointer to value =1 if single, 0 otherwise 
+ * @param is_an_array pointer to value =1 if an array, 0 otherwise
+ * @param is_a_special pointer to value =1 if special type, 0 otherwise
+ *
+ * @return 0: no error -1: error
+ */
 long check_type(long ds_ty, long *is_a_single, 
                 long *is_an_array, long *is_a_special)
 {   
@@ -1625,21 +1496,14 @@ long check_type(long ds_ty, long *is_a_single,
 }   
 
 #ifdef NUMPY
-/**************************************************
-
-	check_provided
-
-Check that the array typenum is compatible with
-taco
-
-	arguments:
-		typenum:	array type
-		ds_out:		argout type
-
-        returns: 
-		0:		compatible
-		-1:		NOT compatible	
-***************************************************/
+/**
+ * Check that the array typenum is compatible with taco
+ *
+ * @param typenum:	array type
+ * @param ds_out:		argout type
+ *
+ * @return 0: compatible -1: NOT compatible	
+ */
 long check_provided(long typenum,long ds_out)
 {
     switch (ds_out)
@@ -1679,19 +1543,13 @@ long check_provided(long typenum,long ds_out)
     }  
 }
 
-/**************************************************
-
-	Ctype2numeric
-
-Returns the Numeric type coresponding to C argout type.
-
-	arguments:
-		ds_out:		argout type
-
-        returns: 
-		-1:		no conversion possible
-		else:		numeric type	
-***************************************************/
+/**
+ * Returns the Numeric type coresponding to C argout type.
+ *
+ * @param ds_out argout type
+ *
+ * @return -1:no conversion possible else numeric type	
+ */
 long Ctype2numeric(long ds_out)
 {
     switch (ds_out)
@@ -1714,20 +1572,13 @@ long Ctype2numeric(long ds_out)
 }
 #endif /*NUMPY*/
 
-/**************************************************
-
-	lenoftype
-
-Returns the number of bytes for the basic element of
-taco variable array data.
-
-	arguments:
-		ds_out:		type
-
-        returns: 
-		-1:		cannot calculate
-		else:		number of bytes	
-***************************************************/
+/**
+ * Returns the number of bytes for the basic element of taco variable array data.
+ * 
+ * @param ds_out type
+ * 
+ * @return -1: cannot calculate else: number of bytes	
+ */
 long lenoftype(long ds_out)
 {
     switch (ds_out)
