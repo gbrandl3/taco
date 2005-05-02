@@ -8,9 +8,9 @@
  *
  * Original:    December 99
  * 
- * Date:	$Date: 2005-02-22 13:13:57 $
+ * Date:	$Date: 2005-05-02 13:46:59 $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
  *********************************************************************/
 
@@ -207,7 +207,7 @@ static PyObject* esrf_query(PyObject *self, PyObject *args)
 }
 
 /**
- * Asks for commands 
+ * Asks for device resource 
  *	
  * @param self
  * @param args	list of arguments:
@@ -1497,7 +1497,7 @@ void initTaco()
 	PyDict_SetItemString(d, "error", ErrorObject);
     
 	if (PyErr_Occurred())
-	Py_FatalError("Can't initialize module Taco");
+		Py_FatalError("Can't initialize module Taco");
 
 /* 
  * we create here a global dictionary and a global tuple for  esrf_io further init parameters 
