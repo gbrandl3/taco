@@ -11,9 +11,9 @@
 
  Original:      January 1991
 
- Version:	$Revision: 1.4 $
+ Version:	$Revision: 1.5 $
 
- Date:		$Date: 2004-11-10 16:43:25 $
+ Date:		$Date: 2005-05-02 07:53:19 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -76,7 +76,7 @@ bool_t xdr_DevVarArgumentArray(XDR *xdrs, DevVarArgumentArray *objp)
         if (!xdr_array(xdrs, (caddr_t *)&objp->sequence, (u_int *)&objp->length, 
 		MAXU_INT, sizeof(DevVarArgument), (xdrproc_t)xdr_DevVarArgument)) 
 	{
-		dev_printdebug(DBG_TRACE | DBG_API, "xdr_DevVarArgumentArray() : leaving routine, xdr_array faild.");
+		dev_printdebug(DBG_TRACE | DBG_API, "xdr_DevVarArgumentArray() : leaving routine, xdr_array failed.");
                 return (FALSE);
 	}
 	dev_printdebug(DBG_TRACE | DBG_API, "xdr_DevVarArgumentArray() : leaving routine.\n");
