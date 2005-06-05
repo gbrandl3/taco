@@ -3,6 +3,9 @@
 #include <cstdlib>
 #include <vector>
 #include <algorithm>
+#ifdef _solaris
+#include "_count.h"
+#endif /* _solaris */
 #include <functional>
 #include <iostream>
 #include <fstream>
@@ -47,6 +50,7 @@ char 				sec_first = TRUE;
 std::vector<std::string> 	tblName;
 int 				TblNum = 0;
 
+using namespace std;
 
 /****************************************************************************
 *                                                                           *
@@ -198,7 +202,9 @@ static int from_res(void)
 	    		temp = std::string(line, strlen(line) - 1);	// remove colon
 //	    		res_dir = base_dir;
 
+#ifndef _solaris
 #warning this seems to be not ok
+#endif /* _solaris */
 #if defined(linux) || defined(sun) || defined(FreeBSD)
 	    		res_dir = "/" + temp;
 #else
@@ -521,7 +527,11 @@ static int dev_name(const std::string line, int numb)
 
 	std::cerr << "dev_name = " << lin << std::endl;
 // Verify device name syntax */
+#ifndef _solaris
 	if (std::count(lin.begin(), lin.end(), '/') != 4)
+#else
+	if (_sol::count(lin.begin(), lin.end(), '/') != 4)
+#endif /* _solaris */
 		return(ERR_DEVNAME);
 
 // Initialize host name, device type and device class */
@@ -898,7 +908,11 @@ static int rs_val(std::string lin, int ind)
 		return(ERR_RESVAL);
 	}
 
+#ifndef _solaris
 	if (std::count(r_name.begin(), r_name.end(), '/') != 3)
+#else
+	if (_sol::count(r_name.begin(), r_name.end(), '/') != 3)
+#endif /* _solaris */
 	{
 		std::cerr << "Resource path does not match 'table/family/member/resource'" << std::endl;
 		return(ERR_RESVAL);

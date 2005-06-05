@@ -90,7 +90,11 @@ db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
         std::string             member,
                                 family,
                                 domain;
+#ifndef _solaris
         switch(std::count(device_name.begin(), device_name.end(), '/'))
+#else
+        switch(NdbmServer::count(device_name.begin(), device_name.end(), '/'))
+#endif /* _solaris */
         {
                 case 2 : 
 			pos =  device_name.find('/');
@@ -261,7 +265,11 @@ char* NdbmServer::fam_fil(device *dev1, const std::string &family, const std::st
 //
 // Extract the family part of the device name in the retrieved tuple 
 //
+#ifndef _solaris
 	if (std::count(tmp.begin(), tmp.end(), '/') != 2)
+#else
+	if (NdbmServer::count(tmp.begin(), tmp.end(), '/') != 2)
+#endif /* _solaris */
 		throw int(1);
 	std::string::size_type	first = tmp.find('/'),
 				second = tmp.rfind('/');
@@ -315,7 +323,11 @@ char *NdbmServer::memb_fil(device *dev2, const std::string &member, int prot) th
 //
 // Extract the member part of the device name in the retrieved tuple */
 //
+#ifndef _solaris
 	if (std::count(tmp.begin(), tmp.end(), '/') != 2)
+#else
+	if (NdbmServer::count(tmp.begin(), tmp.end(), '/') != 2)
+#endif /* _solaris */
 		throw int(1);
 	pos = tmp.rfind('/');
 #ifdef DEBUG

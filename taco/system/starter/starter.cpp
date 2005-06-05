@@ -1,18 +1,18 @@
 /*****************************************************************************
- * File:        $Id: starter.cpp,v 1.6 2005-02-24 15:54:58 jkrueger1 Exp $
+ * File:        $Id: starter.cpp,v 1.7 2005-06-05 20:43:50 andy_gotz Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
  * Description: Source code for implementing a starter server
  *
  * Author(s):   Jens Krüger
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2005-02-24 15:54:58 $
+ * Date:	$Date: 2005-06-05 20:43:50 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -37,6 +37,9 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#ifdef _solaris
+#include "_count.h"
+#endif /* _solaris */
 #include <DevSec.h>
 #include <unistd.h>
 #if HAVE_SIGNAL_H

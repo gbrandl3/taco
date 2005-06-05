@@ -237,7 +237,7 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 		std::string fam_memb(in_dev,pos + 1,in_dev.size());
 		
 		NdbmDomDev tmp(in_domain,fam_memb);				
-		std::vector<NdbmDomDev>::iterator p = find(dom_list.begin(),dom_list.end(),tmp);
+		std::vector<NdbmDomDev>::iterator p = std::find(dom_list.begin(),dom_list.end(),tmp);
 				
 		if (p == dom_list.end())
 		{
@@ -654,7 +654,7 @@ db_psdev_error *NdbmServer::devdelres_1_svc(db_res *recev)
 		std::string fam_memb(in_dev,pos + 1,in_dev.size());
 		
 		NdbmDomDev tmp(in_domain,fam_memb);				
-		std::vector<NdbmDomDev>::iterator p = find(dom_list.begin(),dom_list.end(),tmp);
+		std::vector<NdbmDomDev>::iterator p = std::find(dom_list.begin(),dom_list.end(),tmp);
 				
 		if (p == dom_list.end())
 		{

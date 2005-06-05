@@ -8,7 +8,13 @@ noinst_LTLIBRARIES 	= libPowersupply.la
 
 libPowersupply_la_SOURCES = PowerSupply.cpp
 
-AGPSpp_LDADD		= @TACO_SERVER_CXX_LIBS@ libPowersupply.la 
+if SOLARIS_CXX
+AGPSpp_LDADD		= @TACO_DEVSERVER_MAIN@ @TACO_SERVER_NOMAIN_CXX_STATIC_LIBS@ \
+			  libPowersupply.la
+else
+AGPSpp_LDADD		= @TACO_SERVER_CXX_LIBS@ \
+			  libPowersupply.la 
+endif
 
 bin_PROGRAMS 		= AGPSpp ps_menu
 

@@ -693,7 +693,7 @@ long NdbmServer::upd_res(const std::string &lin, const long numb, bool array) th
 // | by a ^ character 
 // 
    		if (sec_res)
-			transform(r_name.begin(), r_name.end(), r_name.begin(), DBServer::make_sec);
+			std::transform(r_name.begin(), r_name.end(), r_name.begin(), DBServer::make_sec);
 //
 // Select the right resource table in database 
 //
@@ -724,7 +724,7 @@ long NdbmServer::upd_res(const std::string &lin, const long numb, bool array) th
 // For security domain, change every occurance of | by a ^ 
 //
 	if (sec_res)
-		transform(r_val.begin(), r_val.end(), r_val.begin(), DBServer::make_sec);
+		std::transform(r_val.begin(), r_val.end(), r_val.begin(), DBServer::make_sec);
 //
 // Initialise resource number 
 //

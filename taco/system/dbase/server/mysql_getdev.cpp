@@ -40,7 +40,7 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
     }
 
 #ifdef sun
-    if (rqstp->rq_xprt->xp_port == udp_port)
+    if (rqstp->rq_xprt->xp_port == getUDPPort())
 	prot = IPPROTO_UDP;
     else
 	prot = IPPROTO_TCP;
@@ -89,7 +89,11 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 	    tmpf.replace(index, 1, 1, '%');
     }
 
+#ifndef _solaris
     switch(count(tmpf.begin(), tmpf.end(), '/'))
+#else
+    switch(MySQLServer::count(tmpf.begin(), tmpf.end(), '/'))
+#endif /* !_solaris */
     {
 	case 2 : pos = tmpf.find('/');
 		 domain = tmpf.substr(0, pos);	

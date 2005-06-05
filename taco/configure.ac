@@ -1,6 +1,6 @@
 AC_INIT([TACO], [3.1.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.60 $)dnl
+AC_REVISION($Revision: 1.61 $)dnl
 AC_COPYRIGHT([(C) 1990-2005 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -58,6 +58,12 @@ if test x"$CC" = x"gcc" ; then
 	AC_MSG_RESULT([$GCC_LIB_PATH])
 fi
 AC_SUBST([GCC_LIBRARY_PATH], [$GCC_LIB_PATH])
+
+# Check for Solaris CC compiler (added by Andy)
+AC_MSG_CHECKING([for Solaris CC compiler])
+AM_CONDITIONAL(SOLARIS_CXX, ! echo `$CXX -V`|grep Forte)
+AC_MSG_RESULT([$SOLARIS_CXX])
+AC_SUBST([SOLARIS_CXX], [$SOLARIS_CXX])
 
 # Checks for header files.
 AC_FUNC_ALLOCA
@@ -254,8 +260,10 @@ AC_SUBST(TACO_INCLUDES, ["-I\$(top_srcdir)/lib/xdr -I\$(top_srcdir)/lib -I\$(top
 
 AC_SUBST(TACO_SERVER_LIBS, ["\$(top_builddir)/lib/libtaco.la \$(top_builddir)/lib/libtacomain.la"])
 AC_SUBST(TACO_SERVER_CXX_LIBS, ["\$(top_builddir)/lib/libtaco++.la \$(top_builddir)/lib/libtacomain.la"])
+AC_SUBST(TACO_SERVER_NOMAIN_CXX_STATIC_LIBS, ["\$(top_builddir)/lib/.libs/libtaco++.a \$(top_builddir)/lib/dbase/.libs/libdbapi.a \$(top_builddir)/lib/xdr/.libs/libdsxdr.a"])
 AC_SUBST(TACO_CLIENT_LIBS, ["\$(top_builddir)/lib/libtaco.la"])
 AC_SUBST(TACO_CLIENT_CXX_LIBS, ["\$(top_builddir)/lib/libtaco++.la"])
+AC_SUBST(TACO_DEVSERVER_MAIN, ["\$(top_builddir)/lib/DevServerMain.o"])
 
 TACO_DEFINES
 TACO_SERVER_T

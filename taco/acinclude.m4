@@ -502,6 +502,7 @@ AC_RUN_IFELSE(
 #	error "Can't find rpc.h"
 #endif
 #include <arpa/inet.h>
+#include <netdb.h>
 
 #define PROGNUM 1234
 #define VERSNUM 1
@@ -569,6 +570,7 @@ const char hw[[[]]] = "Hello World!\n";],
   struct timeval wait = [{ 5, 0 }];
   int sock = RPC_ANYSOCK;
   struct rpc_arg a;
+  struct hostent *ht;
 
   printf(hw);
   svx = svcudp_create (RPC_ANYSOCK);
@@ -583,7 +585,15 @@ const char hw[[[]]] = "Hello World!\n";],
   if (pid == 0)
     svc_run ();
 
-  inet_pton (AF_INET, "127.0.0.1", &sin.sin_addr);
+/*
+ * inet_pton is not defined for solaris 7 ...
+ * inet_pton (AF_INET, "127.0.0.1", &sin.sin_addr);
+ */
+  ht = gethostbyname("127.0.0.1");
+  if (ht == NULL) return 1;
+  memcpy ( (char *)&sin.sin_addr, ht->h_addr, (size_t) ht->h_length );
+
+
   sin.sin_port = htons (svx->xp_port);
   sin.sin_family = AF_INET;
 

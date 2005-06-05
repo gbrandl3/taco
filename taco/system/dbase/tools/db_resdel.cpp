@@ -7,6 +7,9 @@
 #include <string>
 #include <cctype>
 #include <algorithm>
+#ifdef _solaris
+#include "_count.h"
+#endif /* _solaris */
 
 using namespace std;
 
@@ -40,7 +43,11 @@ int main(int argc,char *argv[])
 //
 // Test resource name syntax
 //
+#ifndef _solaris
 	if (count(full_res_name.begin(), full_res_name.end(), '/') != 3)
+#else
+	if (_sol::count(full_res_name.begin(), full_res_name.end(), '/') != 3)
+#endif /* _solaris */
 	{
 		cerr << "db_resdel : Bad resource name" << endl;
 		exit(-1);

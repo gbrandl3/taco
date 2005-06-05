@@ -9,13 +9,13 @@
 
  Author(s);	Andy Goetz 
 		Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original:	June 1990
 
- Version:	$Revision: 1.7 $
+ Version:	$Revision: 1.8 $
 
- Date:		$Date: 2004-06-02 16:36:13 $
+ Date:		$Date: 2005-06-05 20:43:50 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -92,14 +92,14 @@ static long command_handler	PT_( (DevServer ds, long cmd,
 				DevArgument argout, long argout_type, 
 				long *error) );
 static long error_handler	PT_( (DevServer ds, long *error) );
-static long destroy		PT_( ( DevServer ds, long *error) );
+static long device_destroy		PT_( ( DevServer ds, long *error) );
 
 static DevMethodListEntry methods_list[] = {
  {DevMethodClassInitialise, (DevMethodFunction)class_initialise},
  {DevMethodDevExport, (DevMethodFunction)dev_export},
  {DevMethodCommandHandler, (DevMethodFunction)command_handler},
  {DevMethodErrorHandler, (DevMethodFunction)error_handler},
- {DevMethodDestroy, (DevMethodFunction)destroy},
+ {DevMethodDestroy, (DevMethodFunction)device_destroy},
 };
 
 /*
@@ -282,12 +282,12 @@ static long error_handler (DevServer ds, long *error)
  * 
  * @return  DS_OK or DS_NOTOK
  */
-static long destroy (DevServer ds, long *error)
+static long device_destroy (DevServer ds, long *error)
 {
-	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\ndestroy() : entering routine\n");
+	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\ndevice_destroy() : entering routine\n");
 
 /*
- * this very simple version of destroy simply does a
+ * this very simple version of device_destroy simply does a
  * free on the space occupied by the object
  */
 	free (ds->devserver.name);

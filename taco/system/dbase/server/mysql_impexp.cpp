@@ -230,8 +230,25 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
             }
 	    if (mysql_query(mysql_conn, query.c_str()) != 0)
 	    {
+/*
+ * unknown compiler directive for Solaris CC. Return an error.
+ * 
+ * andy 11may2005
+ *
 #warning What happens if this point is reached ?
 		throw;
+ */
+	    	for (int j = 0; j < i; j++)
+	    	{
+		    stu_addr = &(back.imp_dev.tab_dbdev_val[j]);
+		    delete [] stu_addr->dev_name;
+		    delete [] stu_addr->host_name;
+		    delete [] stu_addr->dev_type;
+		    delete [] stu_addr->dev_class;
+	    	}
+	    	back.imp_dev.tab_dbdev_len = 0;
+		back.db_imperr = DbErr_DatabaseAccess;
+	    	return(&back);
 	    }
 	    MYSQL_RES	*result = mysql_store_result(mysql_conn);
 	    MYSQL_ROW	row;

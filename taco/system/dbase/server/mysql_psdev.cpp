@@ -84,8 +84,12 @@ long MySQLServer::reg_ps(std::string h_name, long pid, std::string ps_name, long
 //
 // Make a copy of the pseudo device name in lowercase letter 
 //
-	transform(ps_name_low.begin(), ps_name_low.end(), ps_name_low.begin(), ::tolower);
+	std::transform(ps_name_low.begin(), ps_name_low.end(), ps_name_low.begin(), ::tolower);
+#ifndef _solaris
 	if (count(ps_name_low.begin(), ps_name_low.end(), '/') != 2)
+#else
+	if (MySQLServer::count(ps_name_low.begin(), ps_name_low.end(), '/') != 2)
+#endif /* !_solaris */
 	{
 		*p_error = DbErr_BadDevSyntax;
 		return (-1);
@@ -287,8 +291,12 @@ long MySQLServer::unreg_ps(std::string ps_name, long *p_error)
 //
 // Make a copy of the pseudo device name in lowercase letter 
 //
-    transform(ps_name_low.begin(), ps_name_low.end(), ps_name_low.begin(), ::tolower);
+    std::transform(ps_name_low.begin(), ps_name_low.end(), ps_name_low.begin(), ::tolower);
+#ifndef _solaris
     if (count(ps_name_low.begin(), ps_name_low.end(), '/') != 2)
+#else
+    if (MySQLServer::count(ps_name_low.begin(), ps_name_low.end(), '/') != 2)
+#endif /* !_solaris */
     {
 	*p_error = DbErr_BadDevSyntax;
 	return (-1);

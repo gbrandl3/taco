@@ -7,6 +7,9 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#ifdef _solaris
+#include "_count.h"
+#endif /* _solaris */
 
 using namespace std;
 
@@ -57,7 +60,11 @@ int main(int argc,char *argv[])
 	cout  << "Device name : " << dev_name << endl;
 #endif /* DEBUG */
 
+#ifndef _solaris
     if (count(dev_name.begin(), dev_name.end(), '/') != 2)
+#else
+    if (_sol::count(dev_name.begin(), dev_name.end(), '/') != 2)
+#endif /* _solaris */
 	{
 		cerr << "db_devres : Bad device name" << endl;
 		exit(-1);

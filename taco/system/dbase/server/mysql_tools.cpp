@@ -291,7 +291,7 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 //
 // Sort resource name list
 //
-    sort(res_list_dev.begin(),res_list_dev.end());
+    std::sort(res_list_dev.begin(),res_list_dev.end());
 // 
 // Build the structure returned to caller
 //
@@ -689,8 +689,8 @@ db_info_svc *MySQLServer::info_1_svc()
 //
 // Sort exported devices domain list and resource domain list
 //
-    sort(dom_list.begin(),dom_list.end());
-    sort(res_list.begin(),res_list.end());
+    std::sort(dom_list.begin(),dom_list.end());
+    std::sort(res_list.begin(),res_list.end());
 //
 // Return data
 //

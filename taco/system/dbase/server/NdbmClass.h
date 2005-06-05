@@ -367,8 +367,13 @@ struct DATUM : public datum
 	DATUM(const DATUM &a) { dptr = NULL; dsize = 0; copy(a); };
 	DATUM(const datum &a) { dptr = NULL; dsize = 0; copy(a); }
 	~DATUM() { clear(); };
+#ifndef _solaris
 	DATUM & DATUM::operator =(const DATUM &a) { copy(a); };
 	DATUM & DATUM::operator =(const datum &a) { copy(a); };
+#else
+	DATUM & DATUM::operator =(const DATUM &a) { copy(a); return *this;};
+	DATUM & DATUM::operator =(const datum &a) { copy(a); return *this;};
+#endif /* !_solaris */
 private:
 	void clear(void)
 	{

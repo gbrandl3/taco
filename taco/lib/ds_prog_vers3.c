@@ -9,13 +9,13 @@
 		which was used up to library version 3.
 
  Author(s)  :	Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original   :	November 1994
 
- Version    :	$Revision: 1.4 $
+ Version    :	$Revision: 1.5 $
 
- Date	    :	$Date: 2004-10-26 11:32:14 $
+ Date	    :	$Date: 2005-06-05 20:43:50 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -51,6 +51,9 @@ extern configuration_flags      config_flags;
  * Defined in DevServerMain.c and initialised with the
  * minimal access right given in the security database.
  */
+#ifdef __cplusplus
+extern "C"
+#endif /* _cplusplus */
 long minimal_access = WRITE_ACCESS;
 
 void _WINAPI devserver_prog_1	PT_( (struct svc_req *rqstp,SVCXPRT *transp) );

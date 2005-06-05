@@ -6,7 +6,9 @@
 
 DBServer	*dbm;
 
+#ifndef _solaris
 #warning remove the casts if this version is stable and change the db_xdr.h file
+#endif /* !_solaris */
 
 /**@defgroup dbServer The database server
  */

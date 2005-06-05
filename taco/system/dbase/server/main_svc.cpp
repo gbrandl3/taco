@@ -757,7 +757,9 @@ static void db_setupprog_1(struct svc_req *rqstp, SVCXPRT *transp)
 		case DB_GETPERS:
 		case DB_GETHOST:
 		case DB_DEVRES: 	
+#ifndef _solaris
 #warning Reslistdev must be implemented res_list_dev.clear();
+#endif /* !_solaris */
 		case DB_SECPASS: 	
 			if (reinterpret_cast<db_res *>(result)->db_err == 0)
 			{
@@ -782,13 +784,17 @@ static void db_setupprog_1(struct svc_req *rqstp, SVCXPRT *transp)
 		case DB_INFO:
 			if (reinterpret_cast<db_info_svc *>(result)->dev.dom_val != 0)
 			{
+#ifndef _solaris
 #warning Domain list must be implemented
+#endif /* _solaris */
 //				dom_list.clear();
 				delete [] reinterpret_cast<db_info_svc *>(result)->dev.dom_val;
 			}
 			if (reinterpret_cast<db_info_svc *>(result)->res.dom_val != 0)
 			{
+#ifndef _solaris
 #warning Resource list must be implemented
+#endif /* _solaris */
 //				res_list.clear();
 				delete [] reinterpret_cast<db_info_svc *>(result)->res.dom_val;
 			}

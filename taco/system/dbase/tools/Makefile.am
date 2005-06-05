@@ -63,3 +63,4 @@ db_resdel_LDADD		= @TACO_CLIENT_LIBS@
 
 db_dump_SOURCES		= db_dump.cpp 
 db_dump_LDADD		= @TACO_CLIENT_LIBS@ @GDBM_LIBS@
+db_dump_LDFLAGS		= -static

@@ -1,19 +1,19 @@
 /*****************************************************************************
  *
- * File:        $Id: startup.cpp,v 1.6 2004-11-05 08:52:35 jkrueger1 Exp $
+ * File:        $Id: startup.cpp,v 1.7 2005-06-05 20:43:50 andy_gotz Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
  * Description: Source code for implementing a starter server
  *
  * Author(s):   Jens Krüger
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original:	January 2003
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Revision:	$Date: 2004-11-05 08:52:35 $
+ * Revision:	$Date: 2005-06-05 20:43:50 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -45,6 +45,10 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#ifdef _solaris
+#include "_count.h"
+#endif /* _solaris */
+
 
 static std::string	devServer;
 
@@ -200,7 +204,11 @@ long ServerSetup(char *pszServerName, long *plError)
 #ifdef EBUG
 		std::cout << "start TACO server " << server_name << std::endl;
 #endif
+#ifndef _solaris
 		if (std::count(server_name.begin(), server_name.end(), '/') != 1)
+#else
+		if (_sol::count(server_name.begin(), server_name.end(), '/') != 1)
+#endif /* _solaris */
 		{
 			std::cerr << " Server name \"" << server_name << "\"not correctly defined" << std::endl;
 			continue;
