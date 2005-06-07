@@ -5,8 +5,8 @@ include_HEADERS		= API_xdr.h API_xdr_vers3.h DevServerXdr.h DevXdrKernel.h xdr_t
 			rf_xdr.h seism_xdr.h slit_xdr.h thc_xdr.h union_xdr.h vgc_xdr.h \
 			vrif_xdr.h ws_xdr.h 
 
-lib_LTLIBRARIES		= libdsxdr.la libdsxdr_all.la
-noinst_LTLIBRARIES	= libdsxdrbase.la
+#lib_LTLIBRARIES	= libdsxdr.la libdsxdr_all.la
+noinst_LTLIBRARIES	= libdsxdr.la libdsxdr_all.la libdsxdrbase.la
 
 INCLUDES		= @TACO_INCLUDES@
 

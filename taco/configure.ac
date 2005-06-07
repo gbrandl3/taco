@@ -1,6 +1,6 @@
 AC_INIT([TACO], [3.1.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.61 $)dnl
+AC_REVISION($Revision: 1.62 $)dnl
 AC_COPYRIGHT([(C) 1990-2005 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -260,7 +260,7 @@ AC_SUBST(TACO_INCLUDES, ["-I\$(top_srcdir)/lib/xdr -I\$(top_srcdir)/lib -I\$(top
 
 AC_SUBST(TACO_SERVER_LIBS, ["\$(top_builddir)/lib/libtaco.la \$(top_builddir)/lib/libtacomain.la"])
 AC_SUBST(TACO_SERVER_CXX_LIBS, ["\$(top_builddir)/lib/libtaco++.la \$(top_builddir)/lib/libtacomain.la"])
-AC_SUBST(TACO_SERVER_NOMAIN_CXX_STATIC_LIBS, ["\$(top_builddir)/lib/.libs/libtaco++.a \$(top_builddir)/lib/dbase/.libs/libdbapi.a \$(top_builddir)/lib/xdr/.libs/libdsxdr.a"])
+AC_SUBST(TACO_SERVER_NOMAIN_CXX_STATIC_LIBS, ["\$(top_builddir)/lib/.libs/libtaco++.a"])
 AC_SUBST(TACO_CLIENT_LIBS, ["\$(top_builddir)/lib/libtaco.la"])
 AC_SUBST(TACO_CLIENT_CXX_LIBS, ["\$(top_builddir)/lib/libtaco++.la"])
 AC_SUBST(TACO_DEVSERVER_MAIN, ["\$(top_builddir)/lib/DevServerMain.o"])
