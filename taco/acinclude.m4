@@ -295,6 +295,7 @@ AC_DEFUN([TACO_ALARM],
 AC_DEFUN([X_AND_MOTIF],
 [
 	AC_REQUIRE([AC_PATH_XTRA])
+	appdefaultdir="`echo $X_LDFLAGS | cut -c3- `/X11/app-defaults"
 	motif_found=yes;
 	AC_ARG_WITH(motif, AC_HELP_STRING([--with-motif@<:@=ARG@:>@], [Motif @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the Motif installation, e.g. '/usr/local/myMotif']), [
 		case  "$with_motif" in
