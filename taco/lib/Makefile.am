@@ -47,13 +47,13 @@ SRC_TACO_SPECIAL 	= dev_api.c sec_api.c event_api.c \
 			svc_api.c DevServerSig.c  event_relisten.c 
 
 libtaco_la_SOURCES 	= $(SRC_TACO_SPECIAL) 
-libtaco_la_LIBADD  	= xdr/libdsxdr.la dbase/libdbapi.la signal/libsignal.la libtacoc.la -lc
+libtaco_la_LIBADD  	= xdr/libdsxdr_all.la dbase/libdbapi.la signal/libsignal.la libtacoc.la -lc
 #libtaco_la_LIBADD  	= libtacoc.la
 libtaco_la_LDFLAGS 	= -version-info @LIB_VERSION@
 
 libtaco___la_SOURCES 	= $(SRC_TACO_SPECIAL) Device.cpp OICDevice.cpp 
 libtaco___la_CFLAGS  	= -x c++
-libtaco___la_LIBADD  	= xdr/libdsxdr.la dbase/libdbapi.la signal/libsignal.la libtacoc.la -lstdc++
+libtaco___la_LIBADD  	= xdr/libdsxdr_all.la dbase/libdbapi.la signal/libsignal.la libtacoc.la -lstdc++
 #libtaco___la_LIBADD  	= libtacoc.la -lstdc++ 
 libtaco___la_LDFLAGS 	= -version-info @LIB_VERSION@
 
