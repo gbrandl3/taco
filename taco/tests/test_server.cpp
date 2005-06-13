@@ -10,8 +10,21 @@
 TestDevice::TestDevice(const std::string name, long &error)
 	: Device(const_cast<char *>(name.c_str()), &error)
 {
-	commands_list[SendByteArray] = DeviceCommandListEntry(SendByteArray, static_cast<DeviceMemberFunction>(&TestDevice::tacoSendByteArray),
-				D_VOID_TYPE, D_VAR_CHARARR, 0, "SendByteArray");
+	static Device::DeviceCommandListEntry commands_list[] = {
+		{DevState, &Device::State, D_VOID_TYPE, D_SHORT_TYPE, 0, "DevState"},
+		{DevStatus, &Device::Status, D_VOID_TYPE, D_STRING_TYPE, 0, "DevStatus"},
+		{DevOn, &Device::On, D_VOID_TYPE, D_VOID_TYPE, 0, "DevOn"},
+		{DevOff, &Device::Off, D_VOID_TYPE, D_VOID_TYPE, 0, "DevOff"},
+		{DevReset, &Device::Reset, D_VOID_TYPE, D_VOID_TYPE, 0, "DevReset"},
+		{SendByteArray, (DeviceMemberFunction)&TestDevice::tacoSendByteArray, D_VOID_TYPE, D_VAR_CHARARR, 0, "SendByteArray"},
+		};
+	static long n_commands = sizeof(commands_list) / sizeof(DeviceCommandListEntry);
+//
+// initialise the commands list to point to the commands list
+// implemented for the AG PowerSupply class
+//
+	this->n_commands = n_commands;
+	this->commands_list = commands_list;
 
 	events_list[HeartBeat] = DeviceEventListEntry(HeartBeat, D_LONG_TYPE, "HeartBeat");
 	this->class_name = "TestDevice";
