@@ -61,10 +61,12 @@ if test $# -gt 0 ; then
 				dir=`echo $appdefaultdir|cut -d'/' -f2` 
 			fi
 			rm -rf ${dc_destdir}/$dir
-			if { rmdir $testbindir/test; } ; then
-				exit 0
+			if test -d $testbindir/test ; then
+				if { ! rmdir $testbindir/test; } ; then
+					exit 1
+				fi
 			fi
-			exit 1 ;;
+			exit 0 ;;
 		unreg)
 			. $templatedir/tacoenv.sh 
 			set_env
