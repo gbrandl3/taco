@@ -22,9 +22,9 @@ int main(int argc, char **argv)
 {
 	long 		error;
 	static int 	dev_num;
-	char 		hostna[32],
-			dev_name[40],
-			devname[60];
+	char 		hostna[HOST_NAME_LENGTH],
+			dev_name[DEV_NAME_LENGTH],
+			devname[DEV_NAME_LENGTH];
 	char 		*tmp;
 	int 		i,
 			l;

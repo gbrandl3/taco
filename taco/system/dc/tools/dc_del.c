@@ -1,3 +1,4 @@
+#include "config.h"
 #include <API.h>
 #include <stdio.h>
 #include <string.h>
@@ -5,10 +6,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
-
-
-
-
 
 /****************************************************************************
 *                                                                           *
@@ -35,9 +32,9 @@ int main(int argc, char **argv)
 			*rsh,
 			*net;
 	unsigned int 	diff;
-	char 		hostna[32],
-	 		dev_name[40],
-	 		psd_name[80],
+	char 		hostna[HOST_NAME_LENGTH],
+	 		dev_name[DEV_NAME_LENGTH],
+	 		psd_name[PROC_NAME_LENGTH],
 	 		cmd[160];
 	int 		i;
 	struct stat 	fista;

@@ -57,8 +57,8 @@ int main(int argc, char **argv)
 			dat_size = 0,
 			cell_num = 0;
 	int 		nb_tot;
-	char 		hostna[32],
-			dev_name[40];
+	char 		hostna[HOST_NAME_LENGTH],
+			dev_name[DEV_NAME_LENGTH];
 	int 		ptr_size,
 			alloc_size;
 	db_resource 	res1[] = {

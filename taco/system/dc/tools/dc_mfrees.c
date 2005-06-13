@@ -35,8 +35,8 @@ int main(int argc, char **argv)
 	char 		*tmp;
 	unsigned int 	diff;
 	DevLong		dat_size = 0;
-	char 		hostna[32],
-			dev_name[40];
+	char 		hostna[HOST_NAME_LENGTH],
+			dev_name[DEV_NAME_LENGTH];
 	int 		alloc_size;
 	db_resource 	res1[] = {
 				{"data_size",D_LONG_TYPE, &dat_size},

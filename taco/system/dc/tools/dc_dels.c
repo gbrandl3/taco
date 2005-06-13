@@ -41,8 +41,8 @@ int main(int argc, char **argv)
 	DevLong 	dev_num,
 			dat_size,
 			cell_num;
-	char 		hostna[32],
-			dev_name[40];
+	char 		hostna[HOST_NAME_LENGTH],
+			dev_name[DEV_NAME_LENGTH];
 	int 		ptr_size,
 			alloc_size;
 	db_resource 	res1[] = {

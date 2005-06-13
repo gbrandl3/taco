@@ -1,3 +1,4 @@
+#include "config.h"
 #include <API.h>
 #include <stdio.h>
 #include <string.h>
@@ -45,9 +46,9 @@ int main(int argc, char **argv)
 				s_dc_path,
 				dc_login;
 	unsigned int 		diff;
-	char 			hostna[32],
-				dev_name[40],
-				psd_name[80],
+	char 			hostna[HOST_NAME_LENGTH],
+				dev_name[DEV_NAME_LENGTH],
+				psd_name[PROC_NAME_LENGTH],
 				cmd[160],
 				*rsh;
 	int 			i,
@@ -224,7 +225,7 @@ int dc_res_management(long *error_ptr)
 		return -1;
 	}
 
-	gethostname(hostna, sizeof(hostna));
+	taco_gethostname(hostna, sizeof(hostna));
 	if ((host = gethostbyname(hostna)) == (struct hostent *)NULL)
 	{
 		fprintf(stderr,"dc_init: Can't retrieve host network address\n");
@@ -411,7 +412,7 @@ int dc_res_request(long *error_ptr)
 	db_resource 	put_class_res[4],
 			net_res[4];
 	char 		hostna[HOST_NAME_LENGTH],
-			dev_name[64];
+			dev_name[DEV_NAME_LENGTH];
 	unsigned char 	ho = 0,
 			net = 0;
 	struct hostent *host;

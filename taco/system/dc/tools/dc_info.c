@@ -46,8 +46,8 @@ main(argc,argv)
 int argc;
 char *argv[];
 {
-	char resname_rd[40];
-	char resname_wr[40];
+	char resname_rd[RES_NAME_LENGTH];
+	char resname_wr[RES_NAME_LENGTH];
 	int i,j,k,resu,found;
 	int nb_dom_sum,nb_dom;
 	int cptr = 0;

@@ -43,8 +43,8 @@ int main(int argc, char **argv)
 	int i,j,l;
 	char *addr;
 	long error;
-	char hostna[32];
-	char dev_name[40];
+	char hostna[HOST_NAME_LENGTH];
+	char dev_name[DEV_NAME_LENGTH];
 	int		 ptr_size,alloc_size;
 	int 		nb_tot;
 	char 		*tmp_ch;

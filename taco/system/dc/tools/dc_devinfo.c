@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 			ind;
 	extern int	optind,
 			optopt;
-	char 		devname[80];
+	char 		devname[DEV_NAME_LENGTH];
 	long 		error;
 	dc_devinf 	dcdev;
 	int 		verbose = False;
