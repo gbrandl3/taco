@@ -122,12 +122,11 @@ AT_TACO_RUN_LOCAL([test_connect test/a/1])
 AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [Set protocol to TCP
 Query commands
     4228120577       0       9                        "SendByteArray"
-             1       0       0                        "On"
-             2       0       0                        "Off"
-             3       0       0                        "Reset"
-             4       0       2                        "State"
-             8       0       6                        "Status"
-            10       0       0                        "Close"
+             1       0       0                        "DevOn"
+             2       0       0                        "DevOff"
+             3       0       0                        "DevReset"
+             4       0       2                        "DevState"
+             8       0       6                        "DevStatus"
 Query events
     4228120578           3                        "HeartBeat"
 Number of devices: 1
