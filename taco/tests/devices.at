@@ -129,12 +129,6 @@ Query commands
              8       0       6                        "DevStatus"
 Query events
     4228120578           3                        "HeartBeat"
-Number of devices: 1
-Device::Device() called, devname = test/a/1
-Device::ClassInitialise() called
-
-dev_export() : entering routine
-dev_export() : leaving routine
 ])
 AT_CLEANUP
 

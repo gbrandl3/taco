@@ -145,18 +145,6 @@ AT_TACO_RUN_LOCAL([test_server 1 &])
 sleep 5
 AT_TACO_RUN_LOCAL([off test_server >>log])
 ], [], [[1
-Number of devices: 1
-Device::Device() called, devname = test/a/1
-Device::ClassInitialise() called
-
-dev_export() : entering routine
-dev_export() : leaving routine
-Number of devices: 1
-Device::Device() called, devname = test/a/1
-Device::ClassInitialise() called
-
-dev_export() : entering routine
-dev_export() : leaving routine
 ]])
 AT_CLEANUP
 
