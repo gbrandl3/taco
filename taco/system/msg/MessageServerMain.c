@@ -11,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.10 $
+ Version:	$Revision: 1.11 $
 
- Date:		$Date: 2005-04-11 15:54:56 $
+ Date:		$Date: 2005-06-13 13:52:20 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -87,7 +87,7 @@ int main (int argc, char **argv)
 /*
  * install signal handling
  */
-	(void) signal(SIGHUP,  unreg_server);
+	(void) signal(SIGHUP,  SIG_IGN);
 	(void) signal(SIGINT,  unreg_server);
 	(void) signal(SIGQUIT, unreg_server);
 	(void) signal(SIGTERM, unreg_server);
@@ -110,7 +110,7 @@ int main (int argc, char **argv)
  * common base leading to a race condition!
  */
   	msg.prog_number = gettransient("MessageServer");
-  	gethostname (msg.host_name, sizeof(msg.host_name) - 1);
+  	taco_gethostname (msg.host_name, sizeof(msg.host_name) - 1);
 	msg.host_name[sizeof(msg.host_name) - 1] = '\0';
 
 	fprintf(logFile, "\n%s Starting with program number %d on host %s", getTimeString("MessageServer"), msg.prog_number, msg.host_name);
