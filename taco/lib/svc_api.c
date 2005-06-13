@@ -11,9 +11,9 @@
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.17 $
+ Version:	$Revision: 1.18 $
 
- Date:		$Date: 2005-02-22 15:59:56 $
+ Date:		$Date: 2005-06-13 14:04:59 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -1027,7 +1027,7 @@ free_found:
  *  will be stored in the static database
  */
 		devinfo.device_name = name;
-		strcpy(server_host, config_flags.server_host);
+		strncpy(server_host, config_flags.server_host, sizeof(server_host));
 		devinfo.host_name   = server_host;
 		devinfo.pn	    = (u_int)config_flags.prog_number;
 		devinfo.vn          = (u_int)config_flags.vers_number;
