@@ -52,29 +52,16 @@ db_psdev_error *NdbmServer::upddev_1_svc(db_res *dev_list)
 #ifdef DEBUG
 		std::cout << "Device list = " << lin << std::endl;
 #endif 
-//
-// Extract each device from the list and update table each time 
-//
-		int	ind(1);
-		bool	last;
-		do
+		try
 		{
-			pos = lin.find(",");
-	    		last = (pos == std::string::npos);
-			std::string	dev = last ? lin : lin.substr(0, pos);
-			try
-			{
-	    			upd_name(serv, dev, ind);
-	    		}
-			catch(const long err)
-			{
-				psdev_back.psdev_err = i + 1;
-				psdev_back.error_code = err;
-				return(&psdev_back);
-	    		}
-	    		lin.erase(0, pos + 1);
-	    		ind++;	
-		}while(!last);
+			upd_name(serv, lin, 1);
+		}
+		catch(const long err)
+		{
+			psdev_back.psdev_err = i + 1;
+			psdev_back.error_code = err;
+			return(&psdev_back);
+		}
     	}
 //
 // return data
@@ -97,7 +84,7 @@ db_psdev_error *NdbmServer::upddev_1_svc(db_res *dev_list)
  */
 long NdbmServer::upd_name(std::string serv, std::string dev_name, int ind) throw (long)
 {
-	static std::vector<dena>	tab_dena;
+	std::vector<dena>	tab_dena;
 	device 			dev; 
 
 	std::string::size_type	pos;
@@ -116,53 +103,38 @@ long NdbmServer::upd_name(std::string serv, std::string dev_name, int ind) throw
 //
 // Allocate memory for the dbm-structures (key and content)
 //
-	if (ind == 1)
+	tab_dena.clear();
+	try
 	{
-		tab_dena.clear();
-		try
-		{
-			if (key_sto.dptr == NULL)
-				key_sto.dptr = new char[MAX_KEY];
-			if (key_2.dptr == NULL)
-				key_2.dptr = new char[MAX_KEY];	
-			if (content.dptr == NULL)
-				content.dptr = new char[MAX_CONT];
-		}
-		catch(std::bad_alloc)
-		{
-			delete [] key_sto.dptr;
-			delete [] key_2.dptr;
-			delete [] content.dptr;
-			throw long(DbErr_ServerMemoryAllocation);
-		}
+		if (key_sto.dptr == NULL)
+                       key_sto.dptr = new char[MAX_KEY];
+		if (key_2.dptr == NULL)
+                       key_2.dptr = new char[MAX_KEY];
+		if (content.dptr == NULL)
+                       content.dptr = new char[MAX_CONT];
+	}
+	catch(std::bad_alloc)
+	{
+		delete [] key_sto.dptr;
+		delete [] key_2.dptr;
+		delete [] content.dptr;
+		throw long(DbErr_ServerMemoryAllocation);
+	}
 //
 // Get device server class
 //
-		pos = serv.find('/');
-		strcpy(dev.ds_class, serv.substr(0, pos).c_str());
-		strcpy(key_sto.dptr, dev.ds_class);
-		strcat(key_sto.dptr, "|");
+	pos = serv.find('/');
+	strcpy(dev.ds_class, serv.substr(0, pos).c_str());
+	strcpy(key_sto.dptr, dev.ds_class);
+	strcat(key_sto.dptr, "|");
 //
 // Get device server name 
 //
-		strcpy(dev.ds_name, serv.substr(pos + 1).c_str());
-		strcat(key_sto.dptr, dev.ds_name);
-		strcat(key_sto.dptr, "|");
-		key_sto.dsize = strlen(key_sto.dptr);
-		key_sto_base_length = key_sto.dsize;
-	}
-//
-// Get device name
-//
-	strcpy(dev.d_name, dev_name.c_str());
-	strcpy(content.dptr, dev.d_name);
-	strcat(content.dptr, "|");
-#ifdef DEBUG
-	cout << "Device server class : " << dev.ds_class << endl;
-	cout << "Device server name : " << dev.ds_name << endl;
-	cout << "Device name : " << dev.d_name << endl;
-	cout << "Device number (in device list) : " << ind << endl;
-#endif /* DEBUG */
+	strcpy(dev.ds_name, serv.substr(pos + 1).c_str());
+	strcat(key_sto.dptr, serv.substr(pos + 1).c_str());
+	strcat(key_sto.dptr, "|");
+	key_sto.dsize = strlen(key_sto.dptr);
+	key_sto_base_length = key_sto.dsize;
 //
 // Call the del_name function
 //
@@ -175,80 +147,85 @@ long NdbmServer::upd_name(std::string serv, std::string dev_name, int ind) throw
 		return(-1);
 	}
 
+#ifdef DEBUG
+       cout << "Device server class : " << serv.substr(0, pos) << endl;
+       cout << "Device server name : " << serv.substr(pos + 1) << endl;
+#endif
+
 //
 // Check, if the only device server is to be removed  
 //
-	if (std::string(dev.d_name) != std::string("%"))
+	if (dev_name != "%")
 	{
 //
 // Initialize the new tuple with the right pn and vn values 
 //
-		int 		i;
-		std::stringstream	s;
-		for (i = 0;i < ndev && strcmp(dev.d_name,tab_dena[i].devina);i++);
-		if (i == ndev)
+		int                     i;
+		int                     nb_dev = count(dev_name.begin(), dev_name.end(), ',') + 1;
+		std::string             ptr1 = dev_name;
+		for(int j = 0; j < nb_dev; ++j)
 		{
+			std::string::size_type  pos = ptr1.find(',');
+			strcpy(content.dptr, ptr1.substr(0, pos).c_str());
+			strcat(content.dptr, "|");
+			ptr1.erase(0, pos + 1);
+			for (i = 0; i < ndev && strcmp(dev.d_name,tab_dena[i].devina); ++i);
+			if (i == ndev)
+			{
 //
 // Initialize the content for dbm-database 
 //
-			strcat(content.dptr, "not_exp|0|0|unknown|unknown|0|unknown|");
-			content.dsize = strlen(content.dptr);
-		}
-		else
-		{
-			dev.pn = tab_dena[i].opn;
-			dev.vn = tab_dena[i].ovn;
-			dev.pid = tab_dena[i].opid;
-			strcpy(dev.h_name,tab_dena[i].oh_name);
-			strcpy(dev.d_class,tab_dena[i].od_class);
-			strcpy(dev.d_type,tab_dena[i].od_type);
-			strcpy(dev.proc_name,tab_dena[i].od_proc);
+				strcat(content.dptr, "not_exp|0|0|unknown|unknown|0|unknown|");
+			}
+			else
+			{
 //
 // Initialize the content for dbm-database 
 //
+				std::stringstream       s;
 #if !HAVE_SSTREAM
-			s.seekp(0, ios::beg);
+				s.seekp(0, std::ios::beg);
 #endif
-			s << tab_dena[i].oh_name << "|" << tab_dena[i].opn << "|" << tab_dena[i].ovn << "|" 
-				<< tab_dena[i].od_class << "|" << tab_dena[i].od_type << "|" << tab_dena[i].opid 
-				<< "|" << tab_dena[i].od_proc << "|";
+				s << tab_dena[i].oh_name << "|" << tab_dena[i].opn << "|" << tab_dena[i].ovn << "|" 
+					<< tab_dena[i].od_class << "|" << tab_dena[i].od_type << "|" << tab_dena[i].opid 
+					<< "|" << tab_dena[i].od_proc << "|";
 #ifdef DEBUG
-			std::cout << " update_name " << s.str() << std::endl;
+				std::cout << " update_name " << s.str() << std::endl;
 #endif
 #if !HAVE_SSTREAM
-			strcat(content.dptr, s.str());
-        		s.freeze(false);
+				strcat(content.dptr, s.str());
+        			s.freeze(false);
 #else
-			strcat(content.dptr, const_cast<char *>(s.str().c_str()));
+				strcat(content.dptr, const_cast<char *>(s.str().c_str()));
 #endif
+			}
 			content.dsize = strlen(content.dptr);
-		}
-		dev.indi = ind;
-		snprintf(seqnr, sizeof(seqnr), "%d", ind);
-		key_sto.dptr[key_sto_base_length] = '\0';
-		strcat(key_sto.dptr, seqnr);
-		strcat(key_sto.dptr, "|");
-		key_sto.dsize = strlen(key_sto.dptr);
+			snprintf(seqnr, sizeof(seqnr), "%d", j + 1);
+			key_sto.dptr[key_sto_base_length] = '\0';
+			strcat(key_sto.dptr, seqnr);
+			strcat(key_sto.dptr, "|");
+			key_sto.dsize = strlen(key_sto.dptr);
 //
 // Insert tuple in NAMES table
 //
 #ifdef DEBUG
-		std::cout << "Insert tuple in NAMES table" << std::endl;
+			std::cout << "Insert tuple in NAMES table" << std::endl;
 #endif 
-		key_sto2 = key_sto;
-		cont_sto = content;
+			key_sto2 = key_sto;
+			cont_sto = content;
 
-		if ((i = gdbm_store(dbgen.tid[0], key_sto2, cont_sto, GDBM_INSERT)) != 0)
-		{
-			delete [] content.dptr;
-			delete [] key_2.dptr;
-			delete [] key_sto.dptr;
-			tab_dena.clear();
-			if (i == 1) 
-				throw long(DbErr_DoubleTupleInNames);
-			else
-				throw long(DbErr_DatabaseAccess);
-			return(-1);
+			if ((i = gdbm_store(dbgen.tid[0], key_sto2, cont_sto, GDBM_INSERT)) != 0)
+			{
+				delete [] content.dptr;
+				delete [] key_2.dptr;
+				delete [] key_sto.dptr;
+				tab_dena.clear();
+				if (i == 1) 
+					throw long(DbErr_DoubleTupleInNames);
+				else
+					throw long(DbErr_DatabaseAccess);
+				return(-1);
+			}
 		}
 	}
 //
@@ -293,7 +270,7 @@ long NdbmServer::del_name(device &devi, int &pndev, std::string ptr, std::vector
 //
 		std::stringstream	s;
 #if !HAVE_SSTREAM
-        	s.seekp(0, ios::beg);
+        	s.seekp(0, std::ios::beg);
 #endif
 		s << devi.ds_class << "|" << devi.ds_name << "|" << seq << "|" << std::ends;
 #ifdef DEBUG
@@ -364,15 +341,13 @@ long NdbmServer::del_name(device &devi, int &pndev, std::string ptr, std::vector
 // Init structure array 
 //
 	    	std::string ptr1 = ptr;
-		std::string::size_type	pos = ptr1.find(',');
-    		j = 0;	
-    		do
+    		for(int j = 0; j < nb_dev; ++j)
     		{
+			std::string::size_type  pos = ptr1.find(',');
 			strcpy(ptr_dev[j].dev_name, ptr1.substr(0, pos).c_str());
 			ptr_dev[j].found = False;
 			ptr1.erase(0, pos + 1);
-			j++;
-	    	}while((pos = ptr1.find(',')) != std::string::npos);
+	    	}
 //
 // In case of device in the device list which was not previously member of
 // this device server, try to retrieve a tuple in the database for each device
@@ -496,7 +471,7 @@ long NdbmServer::update_dev_list(device &p_ret, long seq) throw (long)
 //
 #if !HAVE_SSTREAM
 		std::stringstream	s(const_cast<char *>(key_buf.c_str()), key_buf.length());
-        	s.seekp(0, ios::beg);
+        	s.seekp(0, std::ios::beg);
 #else
 		std::stringstream	s(key_buf);
 #endif
@@ -520,7 +495,7 @@ long NdbmServer::update_dev_list(device &p_ret, long seq) throw (long)
 			if (gdbm_delete(dbgen.tid[0], key) != 0)
 				throw long(ERR_DEVNAME);
 #if !HAVE_SSTREAM
-			s.seekp(0, ios::beg);
+			s.seekp(0, std::ios::beg);
 			s << key_buf;
 #else
 			s.str(key_buf);
@@ -737,7 +712,7 @@ long NdbmServer::upd_res(const std::string &lin, const long numb, bool array) th
     		res_numb = numb;
 		std::stringstream	s;
 #if !HAVE_SSTREAM
-        	s.seekp(0, ios::beg);
+        	s.seekp(0, std::ios::beg);
 #endif
 		s << family << "|" << member << "|" << r_name << "|" << numb << "|" << std::ends;
 #if !HAVE_SSTREAM
@@ -758,7 +733,7 @@ long NdbmServer::upd_res(const std::string &lin, const long numb, bool array) th
 			while(1)
 			{
 #if !HAVE_SSTREAM
-				s.seekp(0, ios::beg);
+				s.seekp(0, std::ios::beg);
 #else
 				s.str("");
 #endif
@@ -792,7 +767,7 @@ long NdbmServer::upd_res(const std::string &lin, const long numb, bool array) th
 				if (ctr == 1)
 				{
 #if !HAVE_SSTREAM
-					s.seekp(0, ios::beg);
+					s.seekp(0, std::ios::beg);
 #else
 					s.str("");
 #endif
@@ -831,7 +806,7 @@ long NdbmServer::upd_res(const std::string &lin, const long numb, bool array) th
 // Insert a new tuple 
 //
 #if !HAVE_SSTREAM
-		s.seekp(0, ios::beg);
+		s.seekp(0, std::ios::beg);
 #else
 		s.str("");
 #endif
