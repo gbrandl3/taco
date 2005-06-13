@@ -13,9 +13,9 @@
 
  Original   :	April 1993
 
- Version:	$Revision: 1.20 $
+ Version:	$Revision: 1.21 $
 
- Date:		$Date: 2005-06-13 09:38:00 $
+ Date:		$Date: 2005-06-13 14:03:13 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -1402,3 +1402,58 @@ long _DLLFunc dev_ping (devserver ds, long *error)
 	*error = dev_import_out.error;
 	return (dev_import_out.status);
 }
+
+/**@ingroup internalAPI
+ * This is the TACO specific implementation of the well known 'gethostname'
+ * UNIX call. The difference inside this function is the use of the IP address
+ * if there is not enough space for storing the full qualified host name
+ *
+ * @param host_name a NUL-terminated hostname in the array name that has a length of len bytes
+ * @param len length of the array host_name
+ *
+ * @return 0 on success else -1
+ */
+int taco_gethostname(char *host_name, size_t len)
+{
+	char    hostname[255];                  /* hopefully enough! */
+	if (host_name != NULL)
+		*host_name = '\0';
+	int ret = gethostname(hostname, sizeof(hostname));
+	if (ret != 0)
+	{
+		fprintf(stderr, "unable to retrieve hostname!\n");
+		return DS_NOTOK;
+	}
+	{
+#if !defined(vxworks)
+		struct hostent  *host_info;
+		if ((host_info = gethostbyname(hostname)) == NULL)
+		{
+			fprintf(stderr, "unable to get IP for host %s\n", hostname);
+			return DS_NOTOK;
+		}
+		if (strlen(host_info->h_name) < len)
+			strcpy(host_name, host_info->h_name);
+		else
+			snprintf(host_name, len, "%d.%d.%d.%d", (u_char) host_info->h_addr[0],
+				(u_char) host_info->h_addr[1], (u_char) host_info->h_addr[2], (u_char) host_info->h_addr[3]);
+#else  /* vxworks */
+		if (strlen(hostname) < len)
+			strcpy(host_name, hostname);
+		else
+		{
+			union
+			{
+				int    int_addr;
+				u_char char_addr[4];
+			} host_addr;
+			host_addr.int_addr = hostGetByName(hostname);
+			snprintf(host_name, len, "%d.%d.%d.%d", (u_char) host_addr.char_addr[0],
+                               (u_char) host_addr.char_addr[1], (u_char) host_addr.char_addr[2], (u_char) host_addr.char_addr[3]);
+		}
+#endif /* vxworks */
+	}
+	return DS_OK;
+}
+
+
