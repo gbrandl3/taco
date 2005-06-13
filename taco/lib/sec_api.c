@@ -11,9 +11,9 @@
 
  Original   :   December 1993
 
- Version    :	$Revision: 1.8 $
+ Version    :	$Revision: 1.9 $
 
- Date       :	$Date: 2005-02-22 15:59:56 $
+ Date       :	$Date: 2005-06-13 14:06:15 $
 
  Copyright (c) 1993 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -288,10 +288,9 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
 		dev_printdebug (DBG_SEC, "dev_security() : group_name = %s\n", user_auth.group_name);
 		dev_printdebug (DBG_SEC, "dev_security() : gid        = %d\n", user_auth.gid);
 
-		/*
-	    * get the IP address of the users host
-	    */
-
+/*
+ * get the IP address of the users host
+ */
 		gethostname (user_auth.host_name, HOST_NAME_LENGTH);
 #if !defined vxworks
 		if ( (host_info = gethostbyname (user_auth.host_name)) == NULL )
@@ -334,7 +333,6 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
 		{
 			return (DS_NOTOK);
 		}
-
 		auth_flag[i_nethost] = True;
 	}
 
@@ -350,9 +348,7 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
 /*
  * Do the identification and access right checks.
  */
-
-	if ( sec_check (dev_name, requested_access, user_auth, error)
-		== DS_NOTOK )
+	if ( sec_check (dev_name, requested_access, user_auth, error) == DS_NOTOK )
 	{
 		return (DS_NOTOK);
 	}
@@ -360,7 +356,6 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
 /*
  * get the next free place in the list of connections.
  */
-
 	if ( get_connection_id (connection_id, error) == DS_NOTOK )
 	{
 		return (DS_NOTOK);
