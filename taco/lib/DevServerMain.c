@@ -11,9 +11,9 @@
 
  Original   	: March 1991
 
- Version	: $Revision: 1.16 $
+ Version	: $Revision: 1.17 $
 
- Date		: $Date: 2005-04-11 16:01:20 $
+ Date		: $Date: 2005-06-13 14:08:04 $
 
  Copyright (c) 1990-2002 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -481,41 +481,8 @@ void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, in
  * world. However, one has to keep in mind, that a bunch of other stuff
  * will fail, if FQDN exceeds SHORT_NAME_SIZE=32 - which is not too hard!
  */
-	if( gethostname(host_name, sizeof(host_name)) != 0 )
-	{
-		char            hostname[200];     /* hopefully enough! */
-		char		ip_str[SHORT_NAME_SIZE];
-#if !defined(vxworks)
-		struct hostent	*host_info;
-#else  /* !vxworks */
-		union 		{ 
-					int    int_addr;
-					u_char char_addr[4];
-				}  host_addr;
-#endif /* !vxworks */
-		
-		if( gethostname(hostname,sizeof(hostname)) != 0 )
-		{
-			fprintf(stderr, "unable to retrieve hostname!\n");
-			exit(DS_NOTOK);
-		}
-
-#if !defined(vxworks)
-		if ( (host_info = gethostbyname(hostname)) == NULL )
-		{
-			fprintf(stderr, "unable to get IP for host %s\n", hostname);
-			exit(DS_NOTOK);
-		}
-		snprintf(ip_str, sizeof(ip_str), "%d.%d.%d.%d", (u_char) host_info->h_addr[0],
-			    (u_char) host_info->h_addr[1], (u_char) host_info->h_addr[2], (u_char) host_info->h_addr[3]);
-#else  /* !vxworks */
-		host_addr.int_addr = hostGetByName(hostname);
-		snprintf (ip_str, sizeof(ip_str), "%d.%d.%d.%d", (u_char) host_addr.char_addr[0],
-			    (u_char) host_addr.char_addr[1], (u_char) host_addr.char_addr[2], (u_char) host_addr.char_addr[3]);
-#endif /* !vxworks */
-
-		strncpy(host_name,ip_str, sizeof(host_name));
-	}
+	if( taco_gethostname(host_name, sizeof(host_name)) != 0 )
+		exit(DS_NOTOK);
 
 	TOLOWER(dsn_name);
 	TOLOWER(host_name);
