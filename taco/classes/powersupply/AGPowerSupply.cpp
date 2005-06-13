@@ -195,21 +195,18 @@ AGPowerSupply::AGPowerSupply (char *name, long *error)
               :PowerSupply (name, error)
 {
    static Device::DeviceCommandListEntry commands_list[] = {
-     {DevState, &Device::State, D_VOID_TYPE, D_SHORT_TYPE,0,"DevState"},
-     {DevStatus, (DeviceMemberFunction)(&AGPowerSupply::Status), D_VOID_TYPE, D_STRING_TYPE,0,"DevStatus"},
-     {DevOn, (DeviceMemberFunction)(&AGPowerSupply::On), D_VOID_TYPE, D_VOID_TYPE,0,"DevOn"},
-     {DevOff, (DeviceMemberFunction)&AGPowerSupply::Off, D_VOID_TYPE, D_VOID_TYPE,0,"DevOff"},
-     {DevSetValue, (DeviceMemberFunction)&AGPowerSupply::SetValue, D_FLOAT_TYPE, D_VOID_TYPE,0,"DevSetValue"},
-     {DevReadValue, (DeviceMemberFunction)&AGPowerSupply::ReadValue, D_VOID_TYPE, D_FLOAT_READPOINT,0,"DevReadValue"},
-     {DevReset, (DeviceMemberFunction)&AGPowerSupply::Reset, D_VOID_TYPE, D_VOID_TYPE,0,"DevReset"},
-     {DevError, (DeviceMemberFunction)&AGPowerSupply::Error, D_VOID_TYPE, D_VOID_TYPE,0,"DevError"},
-     {DevLocal, (DeviceMemberFunction)&AGPowerSupply::Local, D_VOID_TYPE, D_VOID_TYPE,0,"DevLocal"},
-     {DevRemote, (DeviceMemberFunction)&AGPowerSupply::Remote, D_VOID_TYPE,
-D_VOID_TYPE,0,"DevRemote"},
-     {DevUpdate, (DeviceMemberFunction)&AGPowerSupply::Update, D_VOID_TYPE,
-D_STATE_FLOAT_READPOINT,0,"DevUpdate"},
-     {DevHello, (DeviceMemberFunction)&AGPowerSupply::Hello, D_STRING_TYPE,
-D_SHORT_TYPE,0,"DevHello"},
+     {DevState, &Device::State, D_VOID_TYPE, D_SHORT_TYPE, 0, "DevState"},
+     {DevStatus, (DeviceMemberFunction)(&AGPowerSupply::Status), D_VOID_TYPE, D_STRING_TYPE, 0, "DevStatus"},
+     {DevOn, (DeviceMemberFunction)(&AGPowerSupply::On), D_VOID_TYPE, D_VOID_TYPE, 0, "DevOn"},
+     {DevOff, (DeviceMemberFunction)&AGPowerSupply::Off, D_VOID_TYPE, D_VOID_TYPE, 0, "DevOff"},
+     {DevSetValue, (DeviceMemberFunction)&AGPowerSupply::SetValue, D_FLOAT_TYPE, D_VOID_TYPE, 0, "DevSetValue"},
+     {DevReadValue, (DeviceMemberFunction)&AGPowerSupply::ReadValue, D_VOID_TYPE, D_FLOAT_READPOINT, 0, "DevReadValue"},
+     {DevReset, (DeviceMemberFunction)&AGPowerSupply::Reset, D_VOID_TYPE, D_VOID_TYPE, 0, "DevReset"},
+     {DevError, (DeviceMemberFunction)&AGPowerSupply::Error, D_VOID_TYPE, D_VOID_TYPE, 0, "DevError"},
+     {DevLocal, (DeviceMemberFunction)&AGPowerSupply::Local, D_VOID_TYPE, D_VOID_TYPE, 0, "DevLocal"},
+     {DevRemote, (DeviceMemberFunction)&AGPowerSupply::Remote, D_VOID_TYPE, D_VOID_TYPE, 0, "DevRemote"},
+     {DevUpdate, (DeviceMemberFunction)&AGPowerSupply::Update, D_VOID_TYPE, D_STATE_FLOAT_READPOINT, 0, "DevUpdate"},
+     {DevHello, (DeviceMemberFunction)&AGPowerSupply::Hello, D_STRING_TYPE, D_SHORT_TYPE, 0, "DevHello"},
    };
       static long n_commands = sizeof(commands_list)/
                             sizeof(DeviceCommandListEntry);
