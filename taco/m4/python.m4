@@ -34,7 +34,7 @@ AC_DEFUN([PYTHON_DEVEL],[
 dnl
 dnl Get the cflags and libraries
 dnl
-		PYTHON_LIBS=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('LIBS'), distutils.sysconfig.get_config_var('SYSLIBS')"`
+		PYTHON_LIBS=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('LIBS'), distutils.sysconfig.get_config_var('SYSLIBS'), distutils.sysconfig.get_config_var('LDFLAGS')"`
 		if test "x$python_includes" != "x" ; then
 			python_incdirs=${python_includes}
 	        elif test "x$python_prefix" != "x" ; then
