@@ -12,11 +12,11 @@
 //
 // Original:	February 1995
 //
-// $Revision: 1.3 $
+// $Revision: 1.4 $
 //
-// $Date: 2005-03-29 09:45:48 $
+// $Date: 2005-06-13 09:38:54 $
 //
-// $Author: andy_gotz $
+// $Author: jkrueger1 $
 //
 //+**********************************************************************
 
@@ -48,18 +48,19 @@ public:
 
 typedef long (Device::* DeviceMemberFunction)(void*, void*, long* );
 typedef struct _DeviceCommandListEntry {
-                                     DevCommand         cmd;
-                                     DeviceMemberFunction  fn;
-                                     DevArgType         argin_type;
-                                     DevArgType         argout_type;
-                                     long               min_access;
-                                     char               *cmd_name;
-/*
-				_DeviceCommandListEntry() : cmd(0), fn(NULL), argin_type(0), argout_type(0), min_access(0), cmd_name(NULL) {};
+                                DevCommand         	cmd;
+                                DeviceMemberFunction  	fn;
+                                DevArgType         	argin_type;
+                                DevArgType         	argout_type;
+                                long               	min_access;
+                                char               	*cmd_name;
+#if 0
+				_DeviceCommandListEntry() 
+					: cmd(0), fn(NULL), argin_type(0), argout_type(0), min_access(0), cmd_name(NULL) {};
 				_DeviceCommandListEntry(DevCommand _cmd, DeviceMemberFunction f, DevArgType in, DevArgType out, 
 							long acc, char *_cmd_name = NULL) 
 					: cmd(_cmd), fn(f), argin_type(in), argout_type(out), min_access(acc), cmd_name(_cmd_name)	{};
- */					
+#endif
                                     }
                DeviceCommandListEntry;
 
