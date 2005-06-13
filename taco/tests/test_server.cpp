@@ -62,7 +62,7 @@ extern "C" long startup(char *serverName, long *error)
 	char            **dev_list;
 	unsigned int    dev_no;
 
-        debug_flag = (DEBUG_ON_OFF | DBG_TRACE | DBG_STARTUP);
+//      debug_flag = (DEBUG_ON_OFF | DBG_TRACE | DBG_STARTUP);
 
 	if (db_getdevlist(serverName, &dev_list, &dev_no, error) != DS_OK)
 	{
