@@ -138,7 +138,7 @@ AC_DEFUN([TACO_DEFINES],
 	AC_SUBST(taco_CFLAGS)
 	AC_CHECK_HEADERS([fcntl.h malloc.h memory.h netdb.h stddef.h stdlib.h string.h strings.h])
 	AC_CHECK_HEADERS([sys/file.h sys/ioctl.h termios.h unistd.h sys/filio.h paths.h])
-	AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h]) 
+	AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h sys/param.h]) 
 
 	AC_LANG_PUSH(C++)
 	AC_CHECK_HEADERS([sstream strstream])
