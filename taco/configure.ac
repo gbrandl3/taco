@@ -1,6 +1,6 @@
 AC_INIT([TACO], [3.1.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.62 $)dnl
+AC_REVISION($Revision: 1.63 $)dnl
 AC_COPYRIGHT([(C) 1990-2005 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -61,7 +61,7 @@ AC_SUBST([GCC_LIBRARY_PATH], [$GCC_LIB_PATH])
 
 # Check for Solaris CC compiler (added by Andy)
 AC_MSG_CHECKING([for Solaris CC compiler])
-AM_CONDITIONAL(SOLARIS_CXX, ! echo `$CXX -V`|grep Forte)
+AM_CONDITIONAL(SOLARIS_CXX, [echo `$CXX -V`|grep Forte])
 AC_MSG_RESULT([$SOLARIS_CXX])
 AC_SUBST([SOLARIS_CXX], [$SOLARIS_CXX])
 
