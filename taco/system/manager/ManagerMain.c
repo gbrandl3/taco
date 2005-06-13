@@ -9,13 +9,13 @@
 		dummy database under OS9.
 
  Author(s):     Jens Meyer
- 		$Author: andy_gotz $
+ 		$Author: jkrueger1 $
 
  Original: 	January 1991
 
- Version:	$Revision: 1.21 $
+ Version:	$Revision: 1.22 $
 
- Date:		$Date: 2005-03-29 10:05:42 $
+ Date:		$Date: 2005-06-13 13:53:37 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -60,7 +60,7 @@ static void 	startup_msg();
 config_flags	c_flags = {False,False,False,False,False,False,False,True};
 char 		*dshome  = NULL;
 char		*display = NULL;
-char	 	nethost [SHORT_NAME_SIZE];
+char	 	nethost [HOST_NAME_LENGTH];
 char		logfile [256];
 FILE		*system_log = NULL;
 
@@ -115,7 +115,7 @@ static	int	fd_devnull = -1;
 	if ( (nethost_env = (char *)getenv ("NETHOST")) == NULL ) /* Flawfinder: ignore */
 	{
 		printf ("Environment variable NETHOST not defined, using local host ...\n");
-		gethostname (nethost, sizeof(nethost) - 1);
+		taco_gethostname (nethost, sizeof(nethost) - 1);
 	}
 	else
 		snprintf(nethost, sizeof(nethost), "%s", nethost_env);
