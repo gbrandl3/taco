@@ -44,8 +44,8 @@ AC_DEFUN([TACO_BASE_PATH],
 		for i in $taco_standard_dirs ; do
         		taco_libdirs="$taco_libdirs $i/lib"
 		done
-	       	AC_FIND_LIB([dsxdr], [xdr_length_DevChar], [$taco_libdirs], [eval taco_libdir="\"$i\""; LIB_TACO="-ldsxdr"], 
-			[AC_MSG_ERROR([In the following dirs: $taco_libdirs, there are no taco libraries installed.])], [-ltacoapi -ldbapi]) 
+	       	AC_FIND_LIB([taco], [xdr_length_DevChar], [$taco_libdirs], [eval taco_libdir="\"$i\""; LIB_TACO="-ltaco"], 
+			[AC_MSG_ERROR([In the following dirs: $taco_libdirs, there are no taco libraries installed.])], []) 
         	ac_taco_libraries="$taco_libdir"
  
         	if test "$ac_taco_includes" = NO || test "$ac_taco_libraries" = NO; then
@@ -259,13 +259,13 @@ AC_DEFUN([TACO_CHECK_TACO],
 	ac_taco_save_LDFLAGS="$LDFLAGS"
 	LDFLAGS="$LDFLAGS  -L${taco_libraries}"
 	ac_taco_save_LIBS="$LIBS"
-	AC_CHECK_LIB([dbapi], [db_getresource], [LIB_TACO="$LIB_TACO -ldbapi"], [], [$LIB_TACO -ltacoapi])
-	AC_CHECK_LIB([tacoapi], [dev_ping], [LIB_TACO_CLIENT="-ltacoapi"], [], [$LIB_TACO])
-	AC_CHECK_LIB([dsapi], [startup], [LIB_TACO_SERVER="-ldsapi -ltacoapi"], [], [$LIB_TACO -ltacoapi]) 
+	AC_CHECK_LIB([taco], [db_getresource], [LIB_TACO="-ltaco"], [], [])
+	AC_CHECK_LIB([taco], [dev_ping], [LIB_TACO_CLIENT="-ltaco"], [], [])
+	AC_CHECK_LIB([taco], [startup], [LIB_TACO_SERVER="$LIB_TACO -ltacomain"], [], [-ltacomain]) 
  	AC_LANG_SAVE
 	AC_LANG_CPLUSPLUS
-	AC_CHECK_LIB([tacoapig++], [dev_ping], [LIB_TACO_CXX_CLIENT="-ltacoapig++"], [], [$LIB_TACO])
-	AC_CHECK_LIB([dsapig++], [startup], [LIB_TACO_CXX_SERVER="-ldsapig++ -ltacoapig++"], [], [$LIB_TACO -ltacoapig++]) 
+	AC_CHECK_LIB([taco++], [dev_ping], [LIB_TACO_CXX_CLIENT="-ltaco++"], [], [$LIB_TACO])
+	AC_CHECK_LIB([taco++], [startup], [LIB_TACO_CXX_SERVER="-ltaco++ -ltacomain"], [], [-ltacomain]) 
 	AC_LANG_RESTORE
 	LIBS="$ac_tavo_save_LIBS"
 	LDFLAGS="$ac_taco_save_LDFLAGS"
