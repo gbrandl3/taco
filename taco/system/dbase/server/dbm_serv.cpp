@@ -298,7 +298,7 @@ int NdbmServer::db_find(const std::string tab_name, const std::string res_name, 
 	{
 		std::stringstream	s;
 #if !HAVE_SSTREAM
-		s.seekp(0, ios::beg);
+		s.seekp(0, std::ios::beg);
 #endif
 		s << family << "|" << member << "|" << r_name << "|" << res_numb << "|" << std::ends;
 #if !HAVE_SSTREAM
@@ -430,7 +430,7 @@ int NdbmServer::db_devlist(const std::string dev_name, db_res * back)
     	{
 		std::stringstream	s;
 #if !HAVE_SSTREAM
-		s.seekp(0, ios::beg);
+		s.seekp(0, std::ios::beg);
 #endif
 		s << ds_class << "|" << ds_name << "|" << dev_numb << "|" << std::ends;
 #if !HAVE_SSTREAM
@@ -609,7 +609,7 @@ DevLong *NdbmServer::db_putres_1_svc(tab_putres * rece)
 			{
 				std::stringstream 	s;
 #if !HAVE_SSTREAM
-				s.seekp(0, ios::beg);
+				s.seekp(0, std::ios::beg);
 #endif
 				s << family << "|" << member << "|" << r_name << "|" << res_numb << "|" << std::ends;
 #if !HAVE_SSTREAM
@@ -647,7 +647,7 @@ DevLong *NdbmServer::db_putres_1_svc(tab_putres * rece)
 //
 					std::stringstream 	s;
 #if !HAVE_SSTREAM
-					s.seekp(0, ios::beg);
+					s.seekp(0, std::ios::beg);
 #endif
 					s << family << "|" << member << "|" << r_name << "|" << res_numb << "|" << std::ends;
 #if !HAVE_SSTREAM
@@ -675,7 +675,7 @@ DevLong *NdbmServer::db_putres_1_svc(tab_putres * rece)
 				content.dsize = strlen(content.dptr);
 				std::stringstream	s;
 #if !HAVE_SSTREAM
-				s.seekp(0, ios::beg);
+				s.seekp(0, std::ios::beg);
 #endif
 				s << family << "|" << member << "|" << r_name << "|" << res_numb << "|" << std::ends;
 #if !HAVE_SSTREAM
@@ -694,7 +694,7 @@ DevLong *NdbmServer::db_putres_1_svc(tab_putres * rece)
 				res_numb = 1;
 				std::stringstream	s;
 #if !HAVE_SSTREAM
-				s.seekp(0, ios::beg);
+				s.seekp(0, std::ios::beg);
 #endif
 				s << family << "|" << member << "|" << r_name << "|" << res_numb << "|" << std::ends;
 #if !HAVE_SSTREAM
@@ -897,7 +897,7 @@ int NdbmServer::db_del(std::string res_name, nam *p_oldres)
 	{
 		std::stringstream	s;
 #if !HAVE_SSTREAM
-		s.seekp(0, ios::beg);
+		s.seekp(0, std::ios::beg);
 #endif
 		s << family <<"|" << member << "|" << r_name << "|" << res_numb << "|" << std::ends;
 #if !HAVE_SSTREAM

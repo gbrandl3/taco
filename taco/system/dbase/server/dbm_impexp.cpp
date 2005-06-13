@@ -509,7 +509,7 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 			key3.dptr = new char[MAX_KEY];
 			std::stringstream        s;
 #if !HAVE_SSTREAM
-			s.seekp(0, ios::beg);
+			s.seekp(0, std::ios::beg);
 #endif
 			s << dev.ds_class << "|" << dev.ds_name << "|" << dev_numb << "|" << std::ends;
 #if !HAVE_SSTREAM
@@ -688,7 +688,7 @@ int NdbmServer::db_store(db_devinfo &dev_stu)
 //
 		std::stringstream    s;
 #if !HAVE_SSTREAM
-		s.seekp(0, ios::beg);
+		s.seekp(0, std::ios::beg);
 #endif
 		s << dev_stu.dev_name << "|" << dev_stu.host_name << "|" << dev_stu.p_num <<  "|"
 			<< dev_stu.v_num << "|" << dev_stu.dev_type << "|" << dev_stu.dev_class << "|"
@@ -760,7 +760,7 @@ int NdbmServer::db_store_2(db_devinfo_2 &dev_stu)
 //
 		std::stringstream    s;
 #if !HAVE_SSTREAM
-		s.seekp(0, ios::beg);
+		s.seekp(0, std::ios::beg);
 #endif
 		s << dev_stu.dev_name << "|" << dev_stu.host_name << "|" << dev_stu.p_num <<  "|"
 			<< dev_stu.v_num << "|" << dev_stu.dev_type << "|" << dev_stu.dev_class << "|"
@@ -834,7 +834,7 @@ int NdbmServer::db_store_3(db_devinfo_3 &dev_stu)
 //
 		std::stringstream    s;
 #if !HAVE_SSTREAM
-		s.seekp(0, ios::beg);
+		s.seekp(0, std::ios::beg);
 #endif
 		s << dev_stu.dev_name << "|" << dev_stu.host_name << "|" << dev_stu.p_num <<  "|"
 			<< dev_stu.v_num << "|" << dev_stu.dev_type << "|" << dev_stu.dev_class << "|"

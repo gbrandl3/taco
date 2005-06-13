@@ -37,7 +37,7 @@ extern "C"
 #if !HAVE_DECL_GET_MYADDRESS
 	void get_myaddress(struct sockaddr_in *);
 #endif
-//	int gethostname(char *,size_t);
+	int taco_gethostname(char *,size_t);
 }
 
 typedef char *(* DbRpcLocalFunc)(...);
@@ -64,6 +64,9 @@ std::string getTimeString(std::string name)
 
 static void un_register_prog(int signo)
 {
+	if (signo == SIGHUP)
+		return;
+
 	logStream << getTimeString("dbm_server") << "signal " << signo << " received." << std::endl;
 	logStream << getTimeString("dbm_server") << "unregister database server." << std::endl;
 	logStream.flush();
@@ -149,7 +152,7 @@ int main(int argc,char **argv)
 	int 			i,
 				j;
 	char 			*ptr,
-    				hostna[32];
+    				hostna[HOST_NAME_LENGTH];
 	struct sigaction 	sighand;
 	struct sockaddr_in 	so;
 #ifdef sun
@@ -266,7 +269,7 @@ int main(int argc,char **argv)
 #ifdef ALONE
 	transp_udp = svcudp_create(RPC_ANYSOCK);
 	transp_tcp = svctcp_create(RPC_ANYSOCK,0,0);
-	gethostname(hostna, sizeof(hostna));
+	taco_gethostname(hostna, sizeof(hostna));
 	std::cout << "Server host name : " << hostna << endl;
 #else
 //
@@ -288,7 +291,7 @@ int main(int argc,char **argv)
 
 	logStream << getTimeString("dbm_server") << "Program number : " << pgnum << std::endl;
 
-	gethostname(hostna, sizeof(hostna));
+	taco_gethostname(hostna, sizeof(hostna));
 	logStream << getTimeString("dbm_server") << "Server host name : " << hostna << std::endl;
 
 //
@@ -297,7 +300,7 @@ int main(int argc,char **argv)
 // for compatibility with old release of device server. */
 //
 	register_db((char *)netmanhost.c_str(), hostna, pgnum, DB_SETUPVERS);
-	logStream << getTimeString("dbm_server") << "registered on host : " << hostna << std::endl;
+	logStream << getTimeString("dbm_server") << "registered on host : " << netmanhost << std::endl;
 //
 // M. Diehl, 15.11.99
 // Since gettransient() does not bind sockets and pmap_set
