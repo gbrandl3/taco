@@ -232,7 +232,7 @@ int main(int argc, char **argv)
 		exit(-1);
 	}
 
-	gethostname(hostna,sizeof(hostna));
+	taco_gethostname(hostna,sizeof(hostna));
 
 /* Added code to manage transient program number and to get host name*/
 

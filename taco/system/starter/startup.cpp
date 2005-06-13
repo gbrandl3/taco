@@ -1,19 +1,19 @@
 /*****************************************************************************
  *
- * File:        $Id: startup.cpp,v 1.7 2005-06-05 20:43:50 andy_gotz Exp $
+ * File:        $Id: startup.cpp,v 1.8 2005-06-13 13:50:38 jkrueger1 Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
  * Description: Source code for implementing a starter server
  *
  * Author(s):   Jens Krüger
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original:	January 2003
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Revision:	$Date: 2005-06-05 20:43:50 $
+ * Revision:	$Date: 2005-06-13 13:50:38 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -33,6 +33,7 @@
  *****************************************************************************/
 #include "config.h"
 #include <API.h>
+#include <private/ApiP.h>
 #include <Device.h>
 #include <DevServer.h>
 #include <dlfcn.h>
@@ -143,11 +144,6 @@ long startup(char *pszServerName, long *plError)
 	return ServerSetup(pszServerName, plError);
 }
 
-
-#ifndef HOST_NAME_MAX
-#define HOST_NAME_MAX   255
-#endif
-
 /**
  * This methods sets up the devices. At first it looks for the desired device libraries by
  * calling loadLibraries and looks for the devices it has to export. Then it tries to create
@@ -162,9 +158,9 @@ long ServerSetup(char *pszServerName, long *plError)
 {
 	devServer = std::string(pszServerName);
 
-        char    hostname[HOST_NAME_MAX + 1];
+        char    hostname[HOST_NAME_LENGTH];
 
-        if (gethostname(hostname, HOST_NAME_MAX))
+        if (taco_gethostname(hostname, HOST_NAME_LENGTH))
 		return DS_NOTOK;
 	std::string		devName("sys/start/");
 	std::string::size_type	pos = std::string(hostname).find('.');

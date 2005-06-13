@@ -283,7 +283,7 @@ int main(int argc, char **argv)
 		fprintf(stderr,"dc_server_rd : Can't change max number of files\n");
 		exit(-1);
 	}
-	gethostname(hostna,sizeof(hostna));
+	taco_gethostname(hostna,sizeof(hostna));
 
 /* Added code to manage transient program number and to get host name*/
 	sock_udp = sock_tcp = RPC_ANYSOCK;
@@ -856,8 +856,8 @@ static int shm_size(char *host_name)
 	static long cell_num;
 	static long dat_size1;
 	unsigned int diff;
-	char dev_name[40];
-	char hostna[32];
+	char dev_name[DEV_NAME_LENGTH];
+	char hostna[HOST_NAME_LENGTH];
 	char *tmp;
 	long error;
 	int nb_tot;
