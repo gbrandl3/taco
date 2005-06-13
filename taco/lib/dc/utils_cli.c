@@ -5,9 +5,9 @@
  *
  * Original:      1993
  *
- * Version:       $Revision: 1.6 $
+ * Version:       $Revision: 1.7 $
  *
- * Date:          $Date: 2004-06-02 16:36:15 $
+ * Date:          $Date: 2005-06-13 13:58:11 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -68,7 +68,7 @@ int dc_info(char *serv_name,servinf *dc_inf,long *error)
 	dc_infox_back 	*recev;
 	struct hostent 	*host;
 	unsigned char	tmp = 0;
-	char 		dev_name[40],
+	char 		dev_name[DEV_NAME_LENGTH],
 			*tmp_ptr;
 	db_devinf_imp 	*serv_net;
 	CLIENT 		*cl_info;
@@ -229,7 +229,7 @@ int dc_devall(char *serv_name,char ***devnametab,int *dev_n,long *error)
 	dc_devallx_back *recev;
 	struct hostent 	*host;
 	unsigned char 	tmp = 0;
-	char 		dev_name[40];
+	char 		dev_name[DEV_NAME_LENGTH];
 	char 		*tmp_ptr;
 	db_devinf_imp 	*serv_net;
 	CLIENT 		*cl_info;
@@ -415,8 +415,8 @@ int dc_dinfo(char *dev_name,dc_devinf *dc_dev_info,long *error)
 	DevVarStringArray 	host_dc;
 	db_resource 		res_tab;
 	long 			nethost_defined = False;
-	char 			dv_name[40];
-	char 			nethost[40];
+	char 			dv_name[DEV_NAME_LENGTH];
+	char 			nethost[HOST_NAME_LENGTH];
 
 /* 
  * Try to verify function parameters 
@@ -543,13 +543,13 @@ int dc_devinfo(char *serv_name,char *dev_name,dc_devinf *dc_dev_info,long *error
 	dc_devinfx_back *recev;
 	struct hostent 	*host;
 	unsigned char 	tmp = 0;
-	char 		dev_name1[40];
+	char 		dev_name1[DEV_NAME_LENGTH];
 	char 		*tmp_ptr;
 	db_devinf_imp 	*serv_net;
 	CLIENT 		*cl_info;
 	cmd_infox 	*tmp1;
 	char 		*tmp_name;
-	char 		nethost[40];
+	char 		nethost[HOST_NAME_LENGTH];
 	unsigned int 	diff;
 	char 		*tmp2;
 

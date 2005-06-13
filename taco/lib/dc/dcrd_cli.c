@@ -4,9 +4,9 @@
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2005-02-22 15:59:57 $
+ * Date:	$Date: 2005-06-13 13:58:11 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -510,7 +510,7 @@ static long init_imp(long i_nethost, long *perr)
 {
 	long		error;
 	int 		i;
-	char 		dc_dev_name[40];
+	char 		dc_dev_name[DEV_NAME_LENGTH];
 	db_resource 	dcclass_tab[] = {
 				{"host",D_VAR_STRINGARR},
 				{"max_call",D_LONG_TYPE},
@@ -602,8 +602,8 @@ static int comp(const void *vpa,const void *vpb)
  */
 static int rpc_connect(char *serv_name,CLIENT **prpc,int ind,long i_net,long *perr)
 {
-	char 			tmp_name[40],
-				psd_name[40];
+	char 			tmp_name[DEV_NAME_LENGTH],
+				psd_name[DEV_NAME_LENGTH];
 	struct hostent 		*host;
 	int 			i,
 				nb_server,
@@ -728,7 +728,7 @@ static int test_server(int ind,serv *serv_info,int min,CLIENT **clnt_ptr,long i_
 			*ret_str,
 			*tmp_ptr,
 			*tmp1,
-			ret_array[40];
+			ret_array[DEV_NAME_LENGTH];
 	unsigned int 	diff;
 	long 		error;
 	db_devinf_imp 	*serv_net_ptr;
@@ -2730,7 +2730,7 @@ static long dc_get_i_nethost_by_name(char *nethost)
  */
 static long dc_get_i_nethost_in_call(char *dev_name,nethost_call *net_array,long nb_net)
 {
-	char 		nethost[40];
+	char 		nethost[DEV_NAME_LENGTH];
 	register long 	i;
 
 	get_nethost(dev_name,nethost);

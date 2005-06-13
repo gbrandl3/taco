@@ -4,9 +4,9 @@
  *
  * Original:      1992
  *
- * Version:       $Revision: 1.6 $
+ * Version:       $Revision: 1.7 $
  *
- * Date:          $Date: 2004-06-02 16:36:15 $
+ * Date:          $Date: 2005-06-13 13:58:11 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -51,8 +51,8 @@ int 		first = 0,
  		call_numb = 0,
  		max_call = 0,
 		err_count = 0;
-char 		psd_name[40],
- 		tmp_name[40];
+char 		psd_name[DEV_NAME_LENGTH],
+ 		tmp_name[DEV_NAME_LENGTH];
 struct timeval 	time_out;
 
 /* 
@@ -952,11 +952,11 @@ static int rpc_connect(long *perr)
  */
 static int test_server(serv *serv_info, int min, long *perr)
 {
-	char 		serv1[40],
+	char 		serv1[PROC_NAME_LENGTH],
 			*tmp_ptr,
 			*ret_str,
 	 		*tmp1,
-			ret_array[40];
+			ret_array[PROC_NAME_LENGTH];
 	db_devinf_imp 	*serv_net_ptr;
 	long 		error;
 	CLIENT 		*cl_write;
@@ -1048,9 +1048,9 @@ static int test_server(serv *serv_info, int min, long *perr)
  */
 int get_dc_host(char **p_serv_name,long *perr)
 {
-	static char 		hostna[32];
-	char 			dcdev_name[40],
-				res_name[32],
+	static char 		hostna[HOST_NAME_LENGTH];
+	char 			dcdev_name[DEV_NAME_LENGTH],
+				res_name[RES_NAME_LENGTH],
 				*def_name,
 				*tmp_ptr;
 	struct hostent 		*host;
@@ -1068,7 +1068,7 @@ int get_dc_host(char **p_serv_name,long *perr)
 /* 
  * Get host name and host network IP number 
  */
-	gethostname(hostna,sizeof(hostna));
+	taco_gethostname(hostna,sizeof(hostna));
 	if ((host = gethostbyname(hostna)) == NULL)
 	{
 		*perr = DcErr_CantGetDcHostInfo;
@@ -1248,10 +1248,10 @@ static int rpc_reconnect(long *perr)
  */
 static int re_test_server(serv *serv_info,int min,int nb_server,long *perr)
 {
-	char 		serv1[40],
+	char 		serv1[PROC_NAME_LENGTH],
 	 		*tmp_ptr,
 			*ret_str,
-			ret_array[40],
+			ret_array[PROC_NAME_LENGTH],
 	 		*tmp1;
 	int 		old,
 			res,

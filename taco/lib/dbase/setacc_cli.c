@@ -9,13 +9,13 @@
             :   Interface to access static database
 
  Author(s)  :   Emmanuel Taurel
-		$Author: andy_gotz $
+		$Author: jkrueger1 $
 
  Original   :   January 1991
 
- Version    :	$Revision: 1.8 $
+ Version    :	$Revision: 1.9 $
 
- Date       :	$Date: 2005-03-29 10:10:09 $
+ Date       :	$Date: 2005-06-13 14:00:32 $
  
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -150,7 +150,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long 
 	int 		tcp_so;
 	long 		error;
 	long 		i_nethost;
-	char 		nethost[40];
+	char 		nethost[HOST_NAME_LENGTH];
 	long 		try_reconnect = False;
 #ifndef _OSK
 	struct timeval 	tout;
@@ -4994,7 +4994,7 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
 	psdev_elt *tmp_x_low;
 	long error;
 	db_psdev_error *serv_ans;
-	static char hostna[32];
+	static char hostna[HOST_NAME_LENGTH];
 	long i_nethost = 0;
 #ifndef _OSK
 	struct timeval tout;
@@ -5076,7 +5076,7 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
 	tmp_x->pid = taskIdSelf();
 #endif /* !vxworks */
 #endif /* _NT */
-	gethostname(hostna,sizeof(hostna));
+	taco_gethostname(hostna,sizeof(hostna));
 	tmp_x->h_name = hostna;
 
 	tmp_x->psdev_arr.psdev_arr_len = num_psdev;
