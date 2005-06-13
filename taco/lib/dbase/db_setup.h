@@ -1,9 +1,9 @@
 /*
  * Author:	$Author: jkrueger1 $
  * 
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:		$Date: 2004-03-26 16:37:09 $
+ * Date:		$Date: 2005-06-13 14:01:15 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -107,7 +107,18 @@
 
 #define	DEV_CLASS_LENGTH	24
 #define DEV_TYPE_LENGTH		24
-#define	HOST_NAME_LENGTH	20
+#if HAVE_SYS_PARAM_H
+#	include <sys/param.h>
+#endif
+#ifndef HOST_NAME_MAX
+#	ifdef MAXHOSTNAMELEN
+#		define HOST_NAME_LENGTH 	MAXHOSTNAMELEN
+#	else
+#		define  HOST_NAME_LENGTH        20
+#	endif
+#else
+#	define  HOST_NAME_LENGTH        	HOST_NAME_MAX
+#endif
 #define	PROC_NAME_LENGTH	40
 #define DSPERS_NAME_LENGTH	12
 #define DS_NAME_LENGTH		24
