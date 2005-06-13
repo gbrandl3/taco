@@ -25,9 +25,9 @@
 
  Original   :	January 1997
 
- Version:	$Revision: 1.16 $
+ Version:	$Revision: 1.17 $
 
- Date:		$Date: 2005-05-02 13:34:45 $
+ Date:		$Date: 2005-06-13 14:07:22 $
 
  Copyright (c) 1997-2000 by European Synchrotron Radiation Facility,
                             Grenoble, France
@@ -1098,7 +1098,7 @@ static SVCXPRT 	*asynch_trans_tcp,
 long _DLLFunc asynch_rpc_register(long *error)
 {
 	long pid;
-	char hostname[32];
+	char hostname[HOST_NAME_LENGTH];
 	static int asynch_sock_tcp=RPC_ANYSOCK, asynch_sock_udp=RPC_ANYSOCK;
 
 /*
@@ -1123,7 +1123,7 @@ long _DLLFunc asynch_rpc_register(long *error)
 #else  /* !vxworks */
                         pid = taskIdSelf ();
 #endif /* !vxworks */
-			gethostname(hostname,sizeof(hostname));
+			taco_gethostname(hostname,sizeof(hostname));
 			snprintf(config_flags.server_name, sizeof(config_flags.server_name), "%s/%d",hostname,pid);
 			strncpy(config_flags.server_host,hostname, sizeof(config_flags.server_host));
 
