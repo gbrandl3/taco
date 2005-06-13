@@ -1,3 +1,28 @@
+2005-06-13 17:00 jkrueger1:
+	* m4/taco.m4: Change the detection of the taco-lib
+	* autogen.sh: Add the detection of newest autotools on the system
+	(useful on FreeBSD systems)
+	* system/dbase/tools: Add the '-h' options to the command line
+	paramters
+2005-05-20 18:20 jkrueger1:
+	* configure.ac m4/taco.m4: Detection of sys/param.h header file
+	* lib/util_api.c: Bugfix - if hostname longer than 20 bytes
+	* lib/dbase/db_setup.h: Use sys/param.h if exists
+	* system/dbase/server/main_svc.cpp: write the NETHOST instead of
+	host
+2005-05-20 15:15 jkrueger1:
+	* system/msg/MessageServerMain.c system/dbase/server/main_srv.cpp:
+	Ignore the HUP signal
+2005-05-19 10:00 jkrueger1:
+	* Ensure the use of full qualified hostnames to ensure the
+	communication between client and server.
+2005-05-18 15:00 jkrueger1:
+	* m4/python.m4: Improve the detection of the Python library
+	* autogen.sh gdbm/autogen.sh: Improve the detection and use of
+	the different versions of automake, autoconf, and libtool
+	(solves problems on FreeBSD)
+2005-05-17 17:00 jkrueger1:
+	* Allow hostnames longer than 20 bytes.
 2005-05-02 13:00 jkrueger1:
 	* lib/dev_api.c: Bugfix: close of not initialized TCP socket
 	variable exits Python if an imported device is deleted (freed)
