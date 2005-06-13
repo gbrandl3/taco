@@ -84,17 +84,17 @@ else
 	endif
 endif
 
-if test x"$TACO_LOGGING" = x"yes" -a ! -d $LOGPATH ; then
-        mkdir -p $LOGPATH
-fi
+if (( x"$TACO_LOGGING" == x"yes") && ( ! -d $LOGPATH )) then
+	mkdir -p $LOGPATH
+endif
 
-if test ! -d $sbindir/system/error ; then
+if ( ! -d $sbindir/system/error ) then
         mkdir -p $sbindir/system/error
-fi
+endif
 
-if test ! -d $sbindir/system/pipe ; then
+if ( ! -d $sbindir/system/pipe ) then
         mkdir -p $sbindir/system/pipe
-fi
+endif
 
 setenv LD_LIBRARY_PATH @GCC_LIBRARY_PATH@:${LD_LIBRARY_PATH}
 
