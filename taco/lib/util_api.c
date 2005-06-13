@@ -13,9 +13,9 @@
 
  Original   :	April 1993
 
- Version:	$Revision: 1.19 $
+ Version:	$Revision: 1.20 $
 
- Date:		$Date: 2005-02-22 13:43:21 $
+ Date:		$Date: 2005-06-13 09:38:00 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -589,7 +589,9 @@ long _DLLFunc taco_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long 
 
 			if (db_getresource (res_path, res_tab, res_tab_size, error) < 0)
 			{
-//				return (DS_NOTOK);
+/*
+				return (DS_NOTOK);
+*/
 			}
 		}
 /*
