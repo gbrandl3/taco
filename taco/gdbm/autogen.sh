@@ -1,15 +1,33 @@
 #! /bin/sh
-for libtoolize in glibtoolize libtoolize ; do
+for libtoolize in glibtoolize libtoolize libtoolize15 libtoolize13 ; do
         LIBTOOLIZE=`which $libtoolize 2>/dev/null | grep -v '^no'`
         if test "$LIBTOOLIZE" ; then
-                break;
+		aclocal_includes=`dirname $LIBTOOLIZE | sed -e 's%bin%share/aclocal%'`
+		break;
+	fi
+done
+
+for autoconf in autoconf autoconf259 autoconf253 ; do
+	AUTOCONF=`which $autoconf 2>/dev/null | grep -v '^no'`
+	if test "$AUTOCONF" ; then
+		ac_postfix=`basename $AUTOCONF | sed -e "s/autoconf//"`
+		break;
         fi
 done
+
+for automake in automake automake19 automake18 automake17 ; do
+	AUTOMAKE=`which $automake 2>/dev/null | grep -v '^no'`
+	if test "$AUTOMAKE" ; then
+		am_postfix=`basename $AUTOMAKE | sed -e "s/automake//"`
+		break
+	fi
+done
+
 LIBTOOLIZE="$libtoolize --force --copy --automake"
-ACLOCAL="aclocal $aclocal_includes"
-AUTOHEADER="autoheader"
-AUTOMAKE="automake -a -c --foreign"
-AUTOCONF="autoconf"
+ACLOCAL="aclocal${am_postfix} -I $aclocal_includes"
+AUTOHEADER="autoheader${ac_postfix}"
+AUTOMAKE="$automake -a -c --foreign"
+AUTOCONF="$autoconf"
 
 touch AUTHORS ChangeLog NEWS README
 if test ! -d config ; then mkdir config ; else rm -rf config/* ;  fi
