@@ -13,6 +13,14 @@
 
 using namespace std;
 
+void usage(const char *cmd)
+{
+	cerr << "usage : " << cmd << " [options] <resource name>" << endl;
+	cerr << " Delete a resource from the static database." << std::endl;
+	cerr << "     options : -h display this message" << std::endl;
+	exit(-1);
+}
+
 /****************************************************************************
 *                                                                           *
 *		Code for db_resdel command                                  *
@@ -23,28 +31,34 @@ using namespace std;
 *    Synopsis : db_resdel [ resource name ]               		    *
 *                                                                           *
 ****************************************************************************/
-
-
 int main(int argc,char *argv[])
 {
 	long error;
+        extern int      optopt;
+        extern int      optind;
+        int             c;
+
 //
 // Argument test and device name structure
 //
-
-	if (argc != 2)
-	{
-		cerr << "db_resdel usage : db_resdel <resource name>" << endl;
-		exit(-1);
-	}
+        while ((c = getopt(argc,argv,"rh")) != -1)
+                switch (c)
+                {
+                        case 'h':
+                        case '?':
+                                usage(argv[0]);
+                                break;
+                }
+        if (optind != argc - 1)
+                usage(argv[0]);
 	
-	string full_res_name(argv[1]);
+	string full_res_name(argv[optind]);
 	transform(full_res_name.begin(), full_res_name.end(), full_res_name.begin(), ::tolower);
 //
 // Test resource name syntax
 //
 #ifndef _solaris
-	if (count(full_res_name.begin(), full_res_name.end(), '/') != 3)
+	if (std::count(full_res_name.begin(), full_res_name.end(), '/') != 3)
 #else
 	if (_sol::count(full_res_name.begin(), full_res_name.end(), '/') != 3)
 #endif /* _solaris */

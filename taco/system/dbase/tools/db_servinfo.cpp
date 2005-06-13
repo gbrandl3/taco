@@ -12,6 +12,14 @@
 
 using namespace std;
 
+void usage(const char *cmd)
+{
+	cerr << "usage : " << cmd << " [options] <full device server name>" << endl;
+	cerr << "  Diplay device server informations" << std::endl;
+	cerr << "       options : -h display this message" << std::endl;
+	exit(-1);
+}
+
 /****************************************************************************
 *                                                                           *
 *		Code for db_servinfo command                                *
@@ -25,24 +33,33 @@ using namespace std;
 int main(int argc,char *argv[])
 {
 	long error;
+        extern int      optopt;
+        extern int      optind;
+        int             c;
 
-/* Argument test and device name structure*/
+//
+// Argument test and device name structure
+//
+        while ((c = getopt(argc,argv,"h")) != -1)
+                switch (c)
+                {
+                        case 'h':
+                        case '?':
+                                usage(argv[0]);
+                                break;
+                }
+        if (optind != argc - 1)
+                usage(argv[0]);
 
-	if (argc != 2)
-	{
-		cerr << "db_servinfo usage : db_servinfo <full device server name>" << endl;
-		exit(-1);
-	}
-
-	string full_ds_name(argv[1]);
+	string full_ds_name(argv[optind]);
 
 #ifdef DEBUG
 	cout  << "Server name : " << full_ds_name << endl;
 #endif /* DEBUG */
-#ifndef _solaris 
-    if (count(full_ds_name.begin(), full_ds_name.end(), '/') != 1)
+#ifndef _solaris
+	if (std::count(full_ds_name.begin(), full_ds_name.end(), '/') != 1)
 #else
-    if (_sol::count(full_ds_name.begin(), full_ds_name.end(), '/') != 1)
+	if (_sol::count(full_ds_name.begin(), full_ds_name.end(), '/') != 1)
 #endif /* _solaris */
 	{
 		cerr << "db_servinfo : Bad full device server name" << endl;

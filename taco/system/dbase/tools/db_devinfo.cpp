@@ -12,6 +12,14 @@
 
 using namespace std;
 
+void usage(const char *cmd)
+{
+	std::cerr << "usage : " << cmd << " [options] <device name>" << std::endl;
+	std::cerr << " display informations of the device" << std::endl;
+	std::cerr << "          options: -h display this message" << std::endl;
+	exit(-1);
+}
+
 /****************************************************************************
 *                                                                           *
 *		Code for db_devinfo command                                 *
@@ -23,31 +31,39 @@ using namespace std;
 *                                                                           *
 ****************************************************************************/
 
-
 int main(int argc,char *argv[])
 {
-    long 		error;
+	long 		error;
 	db_devinfo_call info;
 	char **dev_list;
 	unsigned int dev_nb;
+        extern int      optopt;
+        extern int      optind;
+        int             c;
+
 //
 // Argument test and device name structure
 //
-	if (argc != 2)
-	{
-		cerr << "db_devinfo usage : db_devinfo <device name>" << endl;
-		exit(-1);
-	}
+        while ((c = getopt(argc, argv, "h")) != -1)
+                switch (c)
+                {
+                	case 'h':
+                	case '?':
+				usage(argv[0]);
+                }
 
-	string dev_name(argv[1]);
+	if (optind != argc - 1)
+		usage(argv[0]);
+
+	string dev_name(argv[optind]);
 
 #ifdef DEBUG
 	cout  << "Device name : " << dev_name << endl;
 #endif 
 #ifndef _solaris
-    if (count(dev_name.begin(), dev_name.end(), '/') != 2)
+	if (std::count(dev_name.begin(), dev_name.end(), '/') != 2)
 #else
-    if (_sol::count(dev_name.begin(), dev_name.end(), '/') != 2)
+	if (_sol::count(dev_name.begin(), dev_name.end(), '/') != 2)
 #endif /* _solaris */
 	{
 		cerr << "db_devinfo : Bad device name" << endl;

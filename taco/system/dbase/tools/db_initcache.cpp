@@ -9,6 +9,17 @@
 
 using namespace std;
 
+void usage(const char *cmd)
+{
+	cerr << "usage : " << cmd << " [options] <domain name>" << endl;
+	cerr << " Initialize a database server resource cache" << endl;
+	cerr << " This command clears the old cache and (re)initialize it" << std::endl;
+	cerr << " with the contents of the RES database table for the" << std::endl;
+	cerr << " wanted domain" << std::endl;
+	cerr << "      options : -h display this message" << std::endl;
+	exit(-1);
+}
+
 /****************************************************************************
 *                                                                           *
 *		Code for db_initcache command                               *
@@ -25,14 +36,26 @@ using namespace std;
 int main(int argc,char *argv[])
 {
 	long error;
+        extern char     *optarg;
+        extern int      optind,
+                        opterr,
+                        optopt;
+        int             c;
+
+
+// Argument test and domain name modification
+        while((c = getopt(argc, argv, "h")) != -1)
+                switch(c)
+                {
+                        case 'h':
+                        case '?':
+				usage(argv[0]);
+		}
 //
 // Argument test and device name structure
 //
-	if (argc != 2)
-	{
-		cerr << "db_initcache usage : db_initcache <domain name>" << endl;
-		exit(-1);
-	}
+	if (optind != argc - 1)
+		usage(argv[0]);
 
 	string dom_name(argv[1]);
 

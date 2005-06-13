@@ -3,7 +3,10 @@
 #include <cstdlib>
 #include <sys/wait.h>
 
+#define _db_setup_h
 #include <API.h>
+#undef _db_setup_h
+#include "db_setup.h"
 
 /* For database only */
 
@@ -26,6 +29,13 @@ int db_read(std::string , std::string);
 /* Global variables definitions */
 int line_ptr;
 
+void usage(const char *cmd)
+{
+	std::cerr << " usage: " << cmd << " [options] <domain name|all>" << std::endl;
+	std::cerr << " Read all resource from specified or all domains" << std::endl;
+	std::cerr << "     options : -h display this message" << std::endl;
+	exit(-1);
+}
 
 /****************************************************************************
 *                                                                           *
@@ -48,14 +58,23 @@ int main(int argc,char **argv)
 	std::vector<std::string> 	TblName;
 	bool 				names(False),
 					ps_names(False);
+        extern int      optopt;
+        extern int      optind;
+        int             c;
+
 //
-// Argument test and domain name modification 
+// Argument test and device name structure
 //
-	if (argc != 2)
-	{
-		std::cerr <<  argv[0] << " usage: " << argv[0] << " <domain name|all>" << std::endl;
-		exit(-1);
-	}
+        while ((c = getopt(argc,argv,"rh")) != -1)
+                switch (c)
+                {
+                	case 'h':
+                	case '?':
+                        	usage(argv[0]);
+                        	break;
+                }
+	if (optind != argc - 1)
+		usage(argv[0]);
 
 	std::string	domain(argv[1]);
 	std::transform(domain.begin(), domain.end(), domain.begin(), ::tolower);

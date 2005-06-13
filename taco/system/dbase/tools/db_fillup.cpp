@@ -50,42 +50,54 @@ char 				sec_first = TRUE;
 std::vector<std::string> 	tblName;
 int 				TblNum = 0;
 
-using namespace std;
 
-/****************************************************************************
-*                                                                           *
-*		Code for db_fillup command                                  *
-*                        ---------                                          *
-*                                                                           *
-*    Command rule : To fill up the static database with the contents of all *
-*                   the resource files founded in the directory (and sub-   *
-*                   directories) pointed to by the RES_BASE_DIR environment *
-*                   variable. Database will be created in the directory     *
-*                   defined by DBM_DIR environment variable.                *
-*		    The database name is supposed to be given by DBNAME     *
-*		    environment variable and the tables (domains) by        *
-*		    DBTABLES environment variable.                          *
-*                                                                           *
-*    Synopsis : db_fillup <0/1>                             		    *
-*                                                                           *
-****************************************************************************/
+void usage(const char *cmd)
+{
+	std::cerr << "usage : " << cmd << " [options] <data source>" << std::endl << std::endl;
+	std::cerr << " fills the database from different sources" << std::endl;
+	std::cerr << "     data source : 0 from resource files" << std::endl;
+	std::cerr << "                   1 from previously backuped database" << std::endl;
+	std::cerr << "     options : -h display this message" << std::endl;
+	exit(-1);
+}
+
+/**
+ * To fill up the static database with the contents of all the resource files 
+ * found in the directory (and subdirectories) pointed to by the RES_BASE_DIR 
+ * environment variable. Database will be created in the directory defined by 
+ * DBM_DIR environment variable. 
+ * 
+ * The database name is supposed to be given by DBNAME environment variable 
+ * and the tables (domains) by DBTABLES environment variable. 
+ *
+ * Synopsis : db_fillup <0/1>
+ */
 int main(int argc,char **argv)
 {
+        extern char     *optarg;
+        extern int      optind,
+                        opterr,
+                        optopt;
+        int             c;
+
+// Argument test and domain name modification
+        while((c = getopt(argc, argv, "h")) != -1)
+                switch(c)
+                {
+                        case 'h':
+                        case '?':
+                                usage(argv[0]);
+		}
+
 //
 // Arguments number test
 // 
-	if(argc != 2) 
-	{
-		std::cerr << "db_fillup usage : db_fillup <data source>" << std::endl << std::endl;
-		std::cerr << "     data source parameter values" << std::endl;
-		std::cerr << "               0: from resource files" << std::endl;
-		std::cerr << "               1: from previously backuped database" << std::endl;
-		exit(-1);
-	}
+	if(optind != argc - 1) 
+		usage(argv[0]);
 //
 // Choose the right function according to data source parameter 
 //
-   	switch (int ds = atoi(argv[1])) 
+   	switch (int ds = atoi(argv[optind])) 
    	{
 		case 0 : return from_res();
 		case 1 : return from_file();
@@ -105,7 +117,7 @@ static int from_file(void)
 	std::cerr << "From backup file" << std::endl;
 #endif /* DEBUG */
 
-/* Build the right command string for the db_build command */
+// Build the right command string for the db_build command 
 	if ((iret = system("cp $DBM_DIR/backup/* $DBM_DIR/.")) != 0)
 		return iret;
 	if ((iret = system("chmod 0664 $DBM_DIR/*.dir")) != 0)
@@ -120,19 +132,19 @@ static int from_file(void)
 static int from_res(void)
 {
 	std::string	res_dir,
-    		inter,
-    		file_name,
-    		temp,
-    		base_dir,
-    		dbm_dir,
-    		dbm_file;
-	char	line[256],
-     		*ptr,
-		*tmp;
+    			inter,
+    			file_name,
+    			temp,
+    			base_dir,
+    			dbm_dir,
+    			dbm_file;
+	char		line[256],
+     			*ptr,
+			*tmp;
 	struct shmid_ds buf;
-	int 	flags;
+	int 		flags;
 //
-// Get base directory name */
+// Get base directory name 
 //
 	if ((ptr = getenv("RES_BASE_DIR")) == NULL)
 	{
@@ -142,14 +154,14 @@ static int from_res(void)
 
 	res_dir = base_dir = ptr;
 //
-// Change working directory */
+// Change working directory 
 	if (chdir(res_dir.c_str()))
 	{
 		perror ("db_fillup : Can't cd to resource base directory \n");
 		return (-1);
 	}
 //
-// Find the dbm_database files */        
+// Find the dbm_database files         
 //
 	if ((ptr = (char *)getenv("DBM_DIR")) == NULL)
 	{
@@ -161,12 +173,12 @@ static int from_res(void)
 	if (dbm_dir[dbm_dir.length() - 1] != '/')
 		dbm_dir += "/";
 //
-// Create the database tables */
+// Create the database tables 
 	create_db();
 
 	flags = GDBM_WRITER; // O_RDWR;
 //
-// Open database tables of the database */
+// Open database tables of the database 
 	int i = 0;
 	for (std::vector<std::string>::iterator it = tblName.begin(); it != tblName.end(); it++)
 	{
@@ -182,7 +194,7 @@ static int from_res(void)
 		i++;
 	}
 //
-// Get the contents of this directory */
+// Get the contents of this directory 
 	FILE	*file;
 	if ((file = popen("ls -R1p", "r")) == NULL)
 	{
@@ -190,7 +202,7 @@ static int from_res(void)
 		leave();
 	}
 //
-// pipe examination */
+// pipe examination 
 	while(fgets(line, sizeof(line), file) != NULL)
 	{
 		line[strlen(line) - 1] = '\0';		// remove newline
@@ -201,19 +213,10 @@ static int from_res(void)
 	    		line[strlen(line) - 1] = '\0';		// remove newline
 	    		temp = std::string(line, strlen(line) - 1);	// remove colon
 //	    		res_dir = base_dir;
-
-#ifndef _solaris
-#warning this seems to be not ok
-#endif /* _solaris */
-#if defined(linux) || defined(sun) || defined(FreeBSD)
-	    		res_dir = "/" + temp;
-#else
-		    	res_dir = temp;
-#endif /* linux, sun */
 		    	res_dir = temp;
 		}
 //
-// Is it a file ? If yes, build the right file name */
+// Is it a file ? If yes, build the right file name 
 //
 		else if ((strchr(line,(int)'/') == NULL) && ((tmp = strstr(line,".res")) != NULL))
 		{
@@ -229,7 +232,7 @@ static int from_res(void)
 
 	}
 //
-// Close database */
+// Close database 
 	for (std::vector<GDBM_FILE>::iterator it = tid.begin(); it < tid.end(); ++it)
 		gdbm_close(*it);
 	tid.clear();
@@ -253,7 +256,7 @@ static int read_file(const std::string f_name)
 
 	std::cout << "File name : " << f_name << std::endl;
 //
-// Open resource file */
+// Open resource file 
 	if (!fil.is_open()) 
 	{
 		std::cerr << "db_fillup : Couldn't open resource file " << f_name << std::endl;
@@ -262,8 +265,8 @@ static int read_file(const std::string f_name)
 	}
 	line_ptr = 0;
 
-//   If the file line is a name definition, call dev_name function. 
-//If the file line is a resource value definition, call rs_val function */
+// If the file line is a name definition, call dev_name function. 
+// If the file line is a resource value definition, call rs_val function 
 	while(!fil.eof()) 
 	{
         	fil.getline(line,sizeof(line)); 
@@ -331,22 +334,21 @@ static int read_file(const std::string f_name)
  */
 static int TestLine(char *line,char *line1,int k)
 {
-	char *tmp;
-	u_int diff;
+	char 	*tmp;
+	u_int 	diff;
 	int 	i_string = 0,
 		iret = 1,
 		i,
 		l1 = 0;
 //
-// Return error in this line is not a definition line */
-
+// Return error in this line is not a definition line 
 	if ((tmp = strchr(line,(int)':')) == NULL) 
 	{	
 		std::cerr << "No delimiter in definition line ':' found" << std::endl;
 		return(-1);
 	}
 //
-// Change all the letters before the : to lower case */
+// Change all the letters before the : to lower case 
 	diff = (u_int)(tmp - line) + 1;
 	i = 0;
 	for (int j = 0; j < diff; j++)
@@ -357,7 +359,7 @@ static int TestLine(char *line,char *line1,int k)
 	line1[i] = 0;
 //
 // Is is a device defintion line ? In this case, all the line must be 
-//translated to lower case letter */
+// translated to lower case letter 
 	if (strstr(line1, "device:") != NULL)
 	{
 		for (int j = diff; j < k; j++)
@@ -368,22 +370,22 @@ static int TestLine(char *line,char *line1,int k)
 		iret = 0;
 	}
 //
-// Now it is a resource definition line */
+// Now it is a resource definition line 
 	else
 	{
-// If the last character is \ , this is a resource array definition */
+// If the last character is \ , this is a resource array definition 
 		if (line[k - 1] == '\\')
 			iret = 2;
 		for (int j = diff; j < k; j++)
 		{
-// If the " character is detected, set a flag. If the flag is already set, reset it */
+// If the " character is detected, set a flag. If the flag is already set, reset it 
 			if (line[j] == '"')
 			{
 				i_string = !i_string;
 				continue;
 			}
 // When the string flag is set, copy character from the original line to the
-//   new one without any modifications */
+// new one without any modifications 
 			if (i_string)
 			{
 				line1[i++] = line[j];
@@ -391,14 +393,14 @@ static int TestLine(char *line,char *line1,int k)
 				continue;
 			}
 // If the , character is detected not in a string definition, this is a
-//   resource array definition */
+// resource array definition 
 			if (line[j] == ',')
 			{
 				line1[i++] = SEP_ELT;
 				iret = 2;
 				continue;
 			}
-// Remove space and tab */
+// Remove space and tab 
 	    		if (line[j] != ' ' && line[j] != '\t')
 			{
 				line1[i++] = line[j];
@@ -406,13 +408,13 @@ static int TestLine(char *line,char *line1,int k)
 			}
 		}
 	}
-// If an odd number of " character has been detected, it is an error */
+// If an odd number of " character has been detected, it is an error 
 	if (i_string)
     	{
 		std::cerr << "incomplete string (missing \"?)" << std::endl;
 		iret = -1;
     	}
-// Leave function */
+// Leave function 
 	line1[i] = 0;
 	if (strlen(line1) == diff && l1 == 0)
     	{
@@ -448,15 +450,15 @@ static void dev_line(char *line1, std::ifstream &file, const std::string f_name,
     			ind;
     	register char 	*ptr1;
 
-// Make a copy of the device server network name */
+// Make a copy of the device server network name 
 	tmp = strchr(line1,(int)':');
 	diff = (u_int)(tmp - line1) + 1;
 	base = std::string(line1, diff);
 
-// Copy the first line in the result buffer */
+// Copy the first line in the result buffer 
 	ptr = line1;
 
-// Following lines examination (discard space or tab at beginning of line) */
+// Following lines examination (discard space or tab at beginning of line) 
 	k = strlen(line1);
 	while(line1[k - 1] == '\\')
 	{
@@ -484,7 +486,7 @@ static void dev_line(char *line1, std::ifstream &file, const std::string f_name,
 		leave();
 	} 
 //
-// Fill up db with the other device names */
+// Fill up db with the other device names 
 	while((ptr1 = strtok(NULL,"\\")) != NULL)
 	{
 		ind++;
@@ -526,22 +528,22 @@ static int dev_name(const std::string line, int numb)
 	std::string		lin(line);
 
 	std::cerr << "dev_name = " << lin << std::endl;
-// Verify device name syntax */
+// Verify device name syntax
 #ifndef _solaris
-	if (std::count(lin.begin(), lin.end(), '/') != 4)
+        if (std::count(lin.begin(), lin.end(), '/') != 4)
 #else
-	if (_sol::count(lin.begin(), lin.end(), '/') != 4)
+       if (_sol::count(lin.begin(), lin.end(), '/') != 4)
 #endif /* _solaris */
 		return(ERR_DEVNAME);
 
-// Initialize host name, device type and device class */
+// Initialize host name, device type and device class
 
 	strcpy(dev.h_name,"not_exp");
 	strcpy(dev.d_type,"unknown");
 	strcpy(dev.d_class,"unknown");
 	strcpy(dev.proc_name,"unknown");
 
-// Get device server class */
+// Get device server class
 	if ((pos = lin.find_first_of("/")) > sizeof(dev.ds_class) - 1)
 	{
 		std::cerr << "Device server class to long (max. " << (sizeof(dev.ds_class) - 1) << " chars)" << std::endl; 
@@ -551,7 +553,7 @@ static int dev_name(const std::string line, int numb)
 	dev.ds_class[pos] = '\0';
 	lin.erase(0, pos + 1);
 
-// Get device server name */
+// Get device server name
 	if ((pos = lin.find_first_of("/")) > sizeof(dev.ds_name) - 1)
 	{
 		std::cerr << "Device server name to long (max. " << (sizeof(dev.ds_name) - 1) << " chars)" << std::endl;
@@ -561,7 +563,7 @@ static int dev_name(const std::string line, int numb)
 	dev.ds_name[pos] = '\0';
 	lin.erase(0, pos + 1);
 
-// Get device name */
+// Get device name
 	pos = lin.find_first_of(":");
 	lin.erase(0, pos + 1);
 	if (lin.length() > sizeof(dev.d_name) - 1)
@@ -573,7 +575,7 @@ static int dev_name(const std::string line, int numb)
 		return(ERR_DEVNAME);
 	strcpy(dev.d_name, lin.c_str());
 
-// Initialize the other columns */
+// Initialize the other columns
 	dev.pn = 0;
 	dev.vn = 0;
 	dev.indi = numb;
@@ -593,10 +595,10 @@ static int dev_name(const std::string line, int numb)
 		<< "Device server process name : " << dev.proc_name << std::endl;
 #endif
 
-// Verify that no device with the same name is already registered in the database */
+// Verify that no device with the same name is already registered in the database
 	key_sto.dptr = (char *)malloc(MAX_KEY); 
 
-// Go through the table to detect any double instance */
+// Go through the table to detect any double instance
 	std::vector<GDBM_FILE>::iterator 	t = tid.begin();
 	for (key = gdbm_firstkey(*t); key.dptr != NULL;key = gdbm_nextkey(*t, key))
 	{
@@ -631,7 +633,7 @@ static int dev_name(const std::string line, int numb)
 	}
 
 
-// Insert tuple in NAMES table */
+// Insert tuple in NAMES table
 	if ((keyn.dptr = (char *)malloc(line.length())) == NULL)
 	{
 		std::cerr << "Error in memory allocation for the key." << std::endl;
@@ -722,7 +724,7 @@ static int res_line(std::string line1, std::ifstream &file, const std::string f_
     			*tmp,
     			pat[2];
 //
-// Make a copy of the resource array name */
+// Make a copy of the resource array name
 //
 	std::string::size_type pos = line1.find(':') + 1;
 	if (pos > sizeof(base) - 1)
@@ -735,7 +737,7 @@ static int res_line(std::string line1, std::ifstream &file, const std::string f_
 	base[pos] = 0;
 	l_base = pos;
 //
-// Copy the first line in the resulting buffer */
+// Copy the first line in the resulting buffer
 	int k = line1.length();
 	if (k > SIZE)
 	{
@@ -751,14 +753,14 @@ static int res_line(std::string line1, std::ifstream &file, const std::string f_
 	if (line1[k - 1] == '\\') 
 		ptr[k - 1] = SEP_ELT;
 
-// Following line examination */
+// Following line examination
 	while (line1[k - 1] == '\\') 
 	{
 		file.getline(line, siz_line);
 		line_ptr++;
 		line[strlen(line) - 1] = 0;
 
-// Verify the new line is not a simple resource definition */
+// Verify the new line is not a simple resource definition 
 		if ((ptr2 = strchr(line,(int)':')) != NULL) 
 		{
 			diff = (u_int)(ptr2 - line);
@@ -775,7 +777,7 @@ static int res_line(std::string line1, std::ifstream &file, const std::string f_
 		k = strlen(line);
 		int j = 0;
 // Remove space and tab characters except if they are between two ".
-//Replace the , character by 0x02 except if they are between two ". */
+// Replace the , character by 0x02 except if they are between two ".
 		for (int i = 0; i < k; i++) 
 		{
 			if (line[i] == '"') 
@@ -797,7 +799,7 @@ static int res_line(std::string line1, std::ifstream &file, const std::string f_
 				line1[j++] = line[i];
 		}
 
-// Error if odd number of " characters */
+// Error if odd number of " characters
 		if (i_string)
 		{
 			std::cerr << "unmatched \"" << std::endl;
@@ -806,14 +808,14 @@ static int res_line(std::string line1, std::ifstream &file, const std::string f_
 		line1[j] = 0;
 		k = line1.length();
 
-// Add this new line to the result buffer */
+// Add this new line to the result buffer
 		strcat(ptr,line1.c_str());
 		int l = strlen(ptr);
 		if (line1[k - 1] == '\\') 
 	    		ptr[l - 1] = (ptr[l - 2] == SEP_ELT) ? '\0' : SEP_ELT;		
 
 // Test to verify that the array (in ascii characters) is not bigger than
-//  the allocated memory and realloc memory if needed. */
+// the allocated memory and realloc memory if needed.
     		if (l > ((k1 * SIZE) - LIM)) 
     		{
 			if ((ptr = (char *)realloc((void *)ptr,(size_t)(l + SIZE))) == 0) 
@@ -825,13 +827,13 @@ static int res_line(std::string line1, std::ifstream &file, const std::string f_
 		}
 	}
 
-// Make two copies of the "ptr" string */
+// Make two copies of the "ptr" string 
 	ptr2 = (char*)malloc(strlen(ptr) + 1);
 	strcpy(ptr2,ptr);
 	ptr3 = (char*)malloc(strlen(ptr) + 1);
 	strcpy(ptr3,ptr);
 
-// Fill up db with the first array element */
+// Fill up db with the first array element
 	ind = 1;
 	pat[0] = SEP_ELT;
 	pat[1] = 0;
@@ -843,8 +845,8 @@ static int res_line(std::string line1, std::ifstream &file, const std::string f_
 		leave();
 	}
 
-// Fill up the db with the other elements of the resource array */
-// Reinitialize strtok internal pointer */
+// Fill up the db with the other elements of the resource array
+// Reinitialize strtok internal pointer 
 	ptr1 = strtok(ptr,pat);
 	while ((ptr1 = strtok(NULL,pat)) != NULL) 
 	{
@@ -859,12 +861,12 @@ static int res_line(std::string line1, std::ifstream &file, const std::string f_
 		}
 	}
 
-// Free memory */
+// Free memory
 	free(ptr);
 	free(ptr2);
 	free(ptr3);
 
-// Leave function */
+// Leave function
 	return(0);
 }
 
@@ -892,7 +894,7 @@ static int rs_val(std::string lin, int ind)
 	std::string::size_type	pos = lin.find(':'),
 				_pos;
 
-/* Verify that the resource syntax is correct */
+// Verify that the resource syntax is correct 
 	if (pos == std::string::npos)
 	{
 		std::cerr << "No delimiter ':' found in line " << lin << std::endl;
@@ -917,7 +919,7 @@ static int rs_val(std::string lin, int ind)
 		std::cerr << "Resource path does not match 'table/family/member/resource'" << std::endl;
 		return(ERR_RESVAL);
 	}
-/* Get table name */
+// Get table name */
 	_pos = 1 + (pos = r_name.find('/'));
 	if (pos > DOMAIN_NAME_LENGTH -1)
 	{
@@ -1127,21 +1129,11 @@ bool nocase_compare(char c1, char c2)
 {
 	return toupper(c1) == toupper(c2);
 }
-
-
-/****************************************************************************
-*                                                                           *
-*		Code for create_db function                                 *
-*                        ---------                                          *
-*                                                                           *
-*    Function rule : To create database tables in CREATE mode and then      *
-*    		     close them to be able to open them in RDWR mode.       *
-*                                                                           *
-*    Argin : No argin							    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-****************************************************************************/
+
+/**
+ * To create database tables in CREATE mode and then  
+ * close them to be able to open them in RDWR mode.       
+ */
 static void create_db(void)
 {
 	int 	diff,

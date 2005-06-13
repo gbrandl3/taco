@@ -28,11 +28,28 @@ int main(int argc,char *argv[])
 	db_stat_call inf;
 	time_t sec;
 	char *ti;
+	extern char     *optarg;
+        extern int      optind,
+                        opterr,
+                        optopt;
+        int             c;
+
+
+// Argument test and domain name modification
+        while((c = getopt(argc, argv, "h")) != -1)
+                switch(c)
+                {
+                        case 'h':
+                        case '?':
+                                std::cerr << " usage: " << argv[0] << " [options] " << std::endl;
+                                std::cerr << " displays statistics information about the use of the database" << std::endl;
+				std::cerr << "       options : -h display this message" << std::endl;
+				exit(-1);
+		}
 
 //
 // Connect to database server
 //
-
 	if (db_import(&error) == -1)
 	{
 		cerr << "db_devinfo : Impossible to connect to database server" << endl;

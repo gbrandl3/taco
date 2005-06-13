@@ -9,14 +9,21 @@
 
 using namespace std;
 
+void usage(const char *cmd)
+{
+	cerr << "usage : " << cmd << " [options] <file name>" << endl;
+	cerr << " Read resource and device informations from the file" << std::endl;
+	cerr << " and put them into the database" << std::endl;
+	cerr << "       options : -h display this message" << std::endl;
+	exit(-1);
+}
 /****************************************************************************
 *                                                                           *
 *		Code for db_update command                                  *
 *                        ---------                                          *
 *                                                                           *
-*    Command rule : To delete a device and its resources from the database. *
-*                   The -r option is used if the user does not want device  *
-*		    resources to be also deleted			    *
+*    Command rule : Read resource and device informations from the file and *
+*                   put these into the database.                            *
 *                                                                           *
 *    Synopsis : db_update <file name>               		    	    *
 *                                                                           *
@@ -35,16 +42,25 @@ int main(int argc, char **argv)
 	char 	*pa;
 	long 	pass = True;
 	char 	*answer;
+        extern int      optopt;
+        extern int      optind;
+        int             c;
+
 //
 // Argument test and device name structure
 //
-	if (argc != 2)
-	{
-		cerr << "db_update usage : db_update <file name>" << endl;
-		exit(-1);
-	}
+        while ((c = getopt(argc,argv,"h")) != -1)
+                switch (c)
+                {
+                        case 'h':
+                        case '?':
+                                usage(argv[0]);
+                                break;
+                }
+        if (optind != argc - 1)
+                usage(argv[0]);
 
-	string file_name(argv[1]);
+	string file_name(argv[optind]);
 
 //
 // Get environment variable

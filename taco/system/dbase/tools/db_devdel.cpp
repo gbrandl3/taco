@@ -13,6 +13,15 @@
 
 using namespace std;
 
+void usage(const char *cmd)
+{
+	std::cerr << "usage : " << cmd << " [options] <device name>" << std::endl;
+	std::cerr << " deletes a device and (optional) its resources from the database. " << std::endl;
+	std::cerr << "        options : -r delete also resources of the device" << std::endl;
+	std::cerr << "                  -h display this message" << std::endl;
+	exit(1);
+}
+
 /****************************************************************************
 *                                                                           *
 *		Code for db_devdel command                                  *
@@ -36,34 +45,30 @@ int main(int argc,char *argv[])
 //
 // Argument test and device name structure
 //
-	while ((c = getopt(argc,argv,"r")) != -1)
+	while ((c = getopt(argc,argv,"rh")) != -1)
 	{
 		switch (c)
 		{
 		case 'r':
 			del_res = False;
 			break;
+		case 'h':
 		case '?':
-		cerr << "db_devdel usage : db_devdel [-r] <device name>" << endl;
-		exit(-1);
+			usage(argv[0]);
 			break;
 		}
 	}
-    if (optind != argc - 1)
-	{
-		cerr << "db_devdel usage : db_devdel [-r] <device name>" << endl;
-		exit(-1);
-	}
+    	if (optind != argc - 1)
+		usage(argv[0]);
 
-    string dev_name(argv[optind]);
+    	string dev_name(argv[optind]);
 #ifdef DEBUG
 	cout  << "Device name : " << dev_name << endl;
 #endif /* DEBUG */
-
 #ifndef _solaris
-    if (count(dev_name.begin(), dev_name.end(), '/') != 2)
+	if (std::count(dev_name.begin(), dev_name.end(), '/') != 2)
 #else
-    if (_sol::count(dev_name.begin(), dev_name.end(), '/') != 2)
+	if (_sol::count(dev_name.begin(), dev_name.end(), '/') != 2)
 #endif /* _solaris */
 	{
 		cerr << "db_devres : Bad device name" << endl;

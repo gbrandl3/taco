@@ -13,6 +13,15 @@
 
 using namespace std;
 
+void usage(const char *cmd)
+{
+	cerr << "usage : " << cmd << " [options] <full device server name>" << endl;
+	cerr << "  Delete all the devices and optional their resources of a device server" << std::endl;
+	cerr << "       options : -r all resources of the devices deleted" << std::endl;
+	cerr << "                 -h display this message" << std::endl;
+	exit(-1);
+}
+
 /****************************************************************************
 *                                                                           *
 *		Code for db_servdel command                                 *
@@ -37,33 +46,27 @@ int main(int argc,char *argv[])
 //
 // Argument test and device name structure
 //
-	while ((c = getopt(argc,argv,"r")) != -1)
-	{
+	while ((c = getopt(argc,argv,"rh")) != -1)
 		switch (c)
 		{
-		case 'r':
-			del_res = False;
-			break;
-			
-		case '?':
-			cerr << "db_servdel usage : db_servdel [-r] <full device server name>" << endl;
-			exit(-1);
-			break;
+			case 'r':
+				del_res = False;
+				break;
+			case 'h':
+			case '?':
+				usage(argv[0]);
 		}
-	}
 
 	if (optind != argc - 1)
-	{
-		cerr << "db_servdel usage : db_servdel [-r] <full device server name>" << endl;
-		exit(-1);
-	}
+		usage(argv[0]);
+
 	string full_ds_name(argv[optind]);
 
 #ifdef DEBUG
 	cout  << "Full device server name : " << full_ds_name << endl;
 #endif 
 #ifndef _solaris
-	if (count(full_ds_name.begin(), full_ds_name.end(), '/') != 1)
+        if (std::count(full_ds_name.begin(), full_ds_name.end(), '/') != 1)
 #else
 	if (_sol::count(full_ds_name.begin(), full_ds_name.end(), '/') != 1)
 #endif /* _solaris */
@@ -72,10 +75,8 @@ int main(int argc,char *argv[])
 		exit(-1);
 	}
 //
-// Extract device server and personal name from full device server
-// name
+// Extract device server and personal name from full device server name
 //
-
 	string::size_type pos,start;
 
 	if ((pos = full_ds_name.find('/')) == string::npos)
