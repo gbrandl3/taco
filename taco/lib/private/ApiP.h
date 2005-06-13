@@ -8,13 +8,13 @@
 		programmers interface.
 
  Author(s):	Jens Meyer
- 		$Author: andy_gotz $
+ 		$Author: jkrueger1 $
 
  Original:	June 1992
 
- Version:	$Revision: 1.6 $
+ Version:	$Revision: 1.7 $
 
- Date:		$Date: 2005-03-29 09:40:54 $
+ Date:		$Date: 2005-06-13 14:02:14 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -30,7 +30,7 @@
  */
 #ifdef _IDENT
 static char ApiPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.6 2005-03-29 09:40:54 andy_gotz Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.7 2005-06-13 14:02:14 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -419,6 +419,11 @@ long dev_error_push_level PT_( (const char * message,int level) );
  * used for relistening events on client reconnect 
  */
 long 	relisten_events(devserver ds);
+
+/*
+ * used for determination of the hostname
+ */
+int taco_gethostname(char *host_name, size_t len);
 
 #ifdef __cplusplus
 }
