@@ -12,9 +12,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:		$Date: 2005-04-11 16:01:20 $
+ * Date:		$Date: 2005-06-13 09:39:36 $
  *
  *
  * Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
@@ -75,7 +75,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.10 2005-04-11 16:01:20 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.11 2005-06-13 09:39:36 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*
@@ -286,7 +286,9 @@ typedef void (*DevCallbackFunction(devserver, void*, DevCallbackData));
 /*
  * data collector library include file
  */
+#if 0
 #include <dc.h>
+#endif
 
 #if !defined(_NT)
  /*
