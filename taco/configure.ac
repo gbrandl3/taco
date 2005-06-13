@@ -1,6 +1,6 @@
 AC_INIT([TACO], [3.1.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.63 $)dnl
+AC_REVISION($Revision: 1.64 $)dnl
 AC_COPYRIGHT([(C) 1990-2005 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -11,7 +11,7 @@ AC_SUBST(LIB_VERSION, [11:0:0])
 
 AM_INIT_AUTOMAKE([dist-bzip2 1.7])
 
-AM_PROG_LIBTOOL
+dnl AM_PROG_LIBTOOL
 
 AC_CHECK_SIZEOF(char)
 AC_CHECK_SIZEOF(short)
@@ -33,14 +33,14 @@ AC_PROG_RANLIB
 AC_PROG_AWK
 AC_CHECK_PROGS(HOSTNAME, hostname)
 if test "$HOSTNAME" ; then
-	hostname=`hostname -s`;
+	hostname=`hostname`;
 fi
 if test "$hostname" ; then
-	HOSTNAME='hostname -s'
+	HOSTNAME='hostname'
 else 
 	hostname=`hostname`
 	if test -z "$hostname" ; then
-		HOSTNAME='uname -n | cut cut -f1 -d'.''
+		HOSTNAME='uname -n'
 	fi
 fi
 AC_SUBST([HOSTNAME])
@@ -59,6 +59,76 @@ if test x"$CC" = x"gcc" ; then
 fi
 AC_SUBST([GCC_LIBRARY_PATH], [$GCC_LIB_PATH])
 
+AC_ARG_ENABLE(longhostname, AC_HELP_STRING([--disable-longhostname], [disable the use of long hostnames [default=enabled]]),
+[
+	case ${enableval} in
+		no)
+			taco_use_longhostnames=no
+			;;
+		*)
+			taco_use_longhostnames=yes
+			;;
+       	esac
+],
+[
+	taco_use_longhostnames=yes
+])
+
+AC_ARG_ENABLE(debug, AC_HELP_STRING([--enable-debug=ARG], [enables debug symbols (yes|no|full) [default=no]]),
+[
+	case ${enableval} in
+		yes)
+			taco_debug_code="yes"
+			;;
+		full)
+			taco_debug_code="full"
+			;;
+		*)
+			taco_debug_code="no"
+			;;
+	esac
+],
+[
+	taco_debug_code=no
+])
+
+if test x"$CC" = x"gcc"; then
+       if test "$taco_debug_code" != "no"; then
+               if test $taco_debug_code = "full"; then
+                       CFLAGS=`echo $CFLAGS | sed -e"s/-O2//g"`
+                       CFLAGS="-g3 -fno-inline $CFLAGS"
+               else
+                       CFLAGS="-g -O2 $CFLAGS"
+               fi
+       else
+               CFLAGS="-O2 $CFLAGS"
+       fi
+fi
+if test -z "$LDFLAGS" && test "$taco_debug_code" = "no" && test x"$CC" = x"gcc"; then
+       LDFLAGS=""
+fi
+
+if test x"$CXX" = x"g++" || test x"$CXX" = x"KCC"; then
+       if test "$taco_debug_code" != "no"; then
+               if test x"$CXX" = x"KCC"; then
+                       CXXFLAGS="+K0 -Wall -pedantic -W -Wpointer-arith -Wwrite-strings $CXXFLAGS"
+               else
+                       if test "$taco_debug_code" = "full"; then
+                               CXXFLAGS=`echo $CXXFLAGS | sed -e"s/-O2//g"`
+                               CXXFLAGS="-g3 -fno-inline $CXXFLAGS"
+                       else
+                               CXXFLAGS="-g -O2 $CXXFLAGS"
+                       fi
+               fi
+       else
+               if test x"$CXX" = "xKCC"; then
+                       CXXFLAGS="+K3 $CXXFLAGS"
+               else
+                       CXXFLAGS="-O2 $CXXFLAGS"
+               fi
+       fi
+fi
+
 # Check for Solaris CC compiler (added by Andy)
 AC_MSG_CHECKING([for Solaris CC compiler])
 AM_CONDITIONAL(SOLARIS_CXX, [echo `$CXX -V`|grep Forte])
@@ -75,7 +145,7 @@ AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h])
 AC_CHECK_HEADERS([pthread.h fcntl.h malloc.h memory.h netdb.h stddef.h stdlib.h string.h strings.h sys/file.h sys/ioctl.h termios.h unistd.h sys/filio.h paths.h siggen.h])
 AC_CHECK_HEADERS([varargs.h stdarg.h])
 AC_CHECK_HEADERS([rpc/pmap_prot.h rpc/pmap_prot.h])
-AC_CHECK_HEADERS([signal.h sys/signal.h])
+AC_CHECK_HEADERS([signal.h sys/signal.h sys/param.h])
 AC_TYPE_SIGNAL
 AC_CHECK_DECLS([signal], [], [],
 [
@@ -359,7 +429,8 @@ AC_CONFIG_TESTDIR(tests)
 AC_CONFIG_FILES(tests/Makefile tests/atlocal)
 dnl AC_CONFIG_FILES(tests/testserver/Makefile)
 AC_CONFIG_FILES(tests/taco, [chmod +x tests/taco])
-AM_MISSING_PROG([AUTOM4TE], [autom4te])
+AC_CHECK_PROGS([AUTOM4TE], [autom4te autom4te259 autom4te253])
+AM_MISSING_PROG([AUTOM4TE], [$AUTOM4TE])
 
 AC_OUTPUT
 
