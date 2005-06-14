@@ -640,15 +640,17 @@ AC_DEFUN([LINUX_DISTRIBUTION],
 AC_DEFUN([WITH_CORBA],
 [
 #	AC_REQUIRE([AC_PATH_XTRA])
-	corba_found=yes;
+	corba_found=no;
 	AC_ARG_WITH(corba, AC_HELP_STRING([--with-corba@<:@=ARG@:>@], [CORBA @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the omniORB CORBA installation, e.g. '/usr/local/omniORB']), [
 		case  "$with_corba" in
 			yes) 	CORBA_LIBS="-lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread" 
-				CORBA_INCLUDES="-I$withval/include" ;;
+				CORBA_INCLUDES="-I$withval/include"
+				corba_found=yes;;
 			no)  	AC_MSG_WARN([Disable build of TANGO])
 				corba_found=no;;
 			*) 	CORBA_LIBS="-L$withval/lib -lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"
-				CORBA_INCLUDES="-I$withval/include" ;;
+				CORBA_INCLUDES="-I$withval/include"
+				corba_found=yes;;
 		esac      
 		],[CORBA_LIBS="-lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"; CORBA_INCLUDES="-I$withval/include"])
 	CPPFLAGS_SAVE="$CPPFLAGS"
@@ -668,15 +670,17 @@ AC_DEFUN([WITH_CORBA],
 AC_DEFUN([WITH_TANGO],
 [
 #	AC_REQUIRE([AC_PATH_XTRA])
-	tango_found=yes;
+	tango_found=no;
 	AC_ARG_WITH(tango, AC_HELP_STRING([--with-tango@<:@=ARG@:>@], [TANGO @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the TANGO installation, e.g. '/usr/local/tango']), [
 		case  "$with_tango" in
 			yes) 	TANGO_LIBS="-ltango" 
-				TANGO_INCLUDES="-I$withval/include" ;;
+				TANGO_INCLUDES="-I$withval/include" 
+				tango_found=yes;;
 			no)  	AC_MSG_WARN([Disable build of TANGO])
 				tango_found=no;;
 			*) 	TANGO_LIBS="-L$withval/lib -ltango"
-				TANGO_INCLUDES="-I$withval/include" ;;
+				TANGO_INCLUDES="-I$withval/include"
+				tango_found=yes;;
 		esac      
 		],[TANGO_LIBS="-ltango"; TANGO_INCLUDES="-I$withval/include"])
 	CPPFLAGS_SAVE="$CPPFLAGS"
