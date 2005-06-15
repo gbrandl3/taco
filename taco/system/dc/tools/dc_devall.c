@@ -21,6 +21,16 @@ void kern_sort_1(char **tab, int *tab_num, int n);
 /* Some global variables */
 DevVarStringArray 	host_dc = {0, NULL};
 
+
+void usage(const char *cmd)
+{
+	fprintf(stderr, "usage : %s [options]\n", cmd);
+	fprintf(stderr, "  Display all the devices registered in the data collector\n");
+	fprintf(stderr, "     options: -p display only 'pseudo' devices\n");
+	fprintf(stderr, "              -h display this message\n");
+	exit(-1);
+}
+
 /****************************************************************************
 *                                                                           *
 *		Code for dc_devall command                                  *
@@ -54,14 +64,10 @@ int main(int argc, char **argv)
                         	break;
 			case 'h':
 			case '?':
-				fprintf(stderr,"dc_devall usage : dc_devall [-p]\n");
-				exit(-1);
+				usage(argv[0]);
 		}
 	if (optind != argc)
-        {
-		fprintf(stderr,"dc_devall usage : dc_devall [-p]\n");
-                exit(-1);
-        }
+		usage(argv[0]);
 
 /* Import static database */
 

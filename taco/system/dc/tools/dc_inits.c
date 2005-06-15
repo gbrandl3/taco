@@ -35,6 +35,14 @@ void from_scratch(int ptr_size, int alloc_size, int dat_size, int nb_tot);
 void get_shm_buffer(int ptr_size, int alloc_size, int dat_size, int nb_tot);
 void create_sem(void);
 
+void usage(const char *cmd)
+{
+	fprintf(stderr, "usage : %s [options]\n", cmd);
+	fprintf(stderr, "  Initialize the data collector system. This initialisation\n");
+	fprintf(stderr, "  can be done from scratch or from a previously backuped database\n");
+	fprintf(stderr, "          options: -h display this message\n");
+	exit(-1);
+}
 /****************************************************************************
 *                                                                           *
 *		Code for dc_inits command                                   *
@@ -67,13 +75,21 @@ int main(int argc, char **argv)
 				{"data_size", D_LONG_TYPE, &dat_size},
 		    	};
 	int 		res1_size = sizeof(res1) / sizeof(db_resource);
+        int             c;
+        extern int      optind,
+                        optopt;
 
-/* Arguments number test */
-	if(argc != 1) 
-	{
-		fprintf(stderr, "dc_inits usage : dc_inits\n");
-		exit(-1);
-	}
+/* Argument test */
+       while ((c = getopt(argc, argv, "h")) != -1)
+                switch(c)
+                {
+                        case 'h' :
+                        case '?' :
+                                usage(argv[0]);
+                }
+        if (optind != argc)
+                usage(argv[0]);
+
 
 /* Import static database */
 

@@ -7,6 +7,17 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+void usage(const char *cmd)
+{
+	fprintf(stderr, "usage : %s [options] <password>\n", cmd);
+	fprintf(stderr, " Remove the data collector system from memory. The data collector\n"); 
+	fprintf(stderr, " system could be distributed on several hosts. This command will\n");
+	fprintf(stderr, " retrieve on which host this system is running (with resources) and\n");
+	fprintf(stderr, " will run a local command (with remote shell) on each host\n");
+	fprintf(stderr, "       options : -h display this message\n");
+	exit(-1);
+}
+
 /****************************************************************************
 *                                                                           *
 *		Code for dc_del command                                     *
@@ -16,7 +27,7 @@
 *		    The data collector system could be distributed on       *
 *		    several hosts. This command will retrieve on which host *
 *		    this system is running (with resources) and will run a  *
-*		    local command (with remote shell) on ecah host          *
+*		    local command (with remote shell) on each host          *
 *                                                                           *
 *    Synopsis : dc_del <password> 					    *
 *                                                                           *
@@ -49,12 +60,20 @@ int main(int argc, char **argv)
 	int res2_size = sizeof(res2) / sizeof(db_resource);
 	int res1_size = sizeof(res1) / sizeof(db_resource);
 
+        int             c;
+        extern int      optind,
+                        optopt;
+
 /* Argument test */
-	if (argc != 2) 
-	{
-		fprintf(stderr,"dc_del usage : dc_del <password>\n");
-		exit(-1);
-	}
+       while ((c = getopt(argc, argv, "h")) != -1)
+                switch(c)
+                {
+                        case 'h' :
+                        case '?' :
+                                usage(argv[0]);
+                }
+        if (optind != argc - 1)
+                usage(argv[0]);
 
 /* Import static database */
 	if (db_import(&error)) 
@@ -121,7 +140,7 @@ int main(int argc, char **argv)
 /* Build the string which is the remsh command */
 		snprintf(cmd, sizeof(cmd), 
 			"%s %s -l %s \"echo \\\"NETHOST=%s;export NETHOST; %s/%s/dc_dels %s \\\" | sh \" | tee /usr/tmp/dcdelsta", 
-			rsh, host_dc.sequence[i], dc_login, net, dc_path, s_dc_path, argv[1]);
+			rsh, host_dc.sequence[i], dc_login, net, dc_path, s_dc_path, argv[optind]);
 #ifdef DEBUG
 		fprintf(stderr, "Command string : %s\n", cmd);
 #endif /* DEBUG */

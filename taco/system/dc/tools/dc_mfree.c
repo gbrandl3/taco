@@ -8,6 +8,17 @@
 #include <sys/stat.h>
 
 
+void usage(const char *cmd)
+{
+	fprintf(stderr,"usage : %s [options]\n", cmd);
+	fprintf(stderr, " Display information about the data collector data buffer.\n");
+	fprintf(stderr, " The data collector system could be distributed on several hosts.\n"); 
+	fprintf(stderr, " This command will retrieve on which host this system is running\n"); 
+	fprintf(stderr, " (with resources) and will run a local command (with remote shell) on each host.\n");
+	fprintf(stderr, "         options : -h display this message\n");
+	exit(-1);
+}
+
 /****************************************************************************
 *                                                                           *
 *		Code for dc_mfree command                                   *
@@ -18,7 +29,7 @@
 *		    The data collector system could be distributed on       *
 *		    several hosts. This command will retrieve on which host *
 *		    this system is running (with resources) and will run a  *
-*		    local command (with remote shell) on ecah host          *
+*		    local command (with remote shell) on each host          *
 *                                                                           *
 *    Synopsis : dc_mfree		    				    *
 *                                                                           *
@@ -49,13 +60,21 @@ int main(int argc, char **argv)
 				};
 	int 			res1_size = sizeof(res1) / sizeof(db_resource);
 	int 			res2_size = sizeof(res2) / sizeof(db_resource);
+        int             c;
+        extern int      optind,
+                        optopt;
 
 /* Argument test */
-	if (argc != 1) 
-	{
-		fprintf(stderr,"dc_mfree usage : dc_mfree\n");
-		exit(-1);
-	}
+       while ((c = getopt(argc, argv, "h")) != -1)
+                switch(c)
+                {
+                        case 'h' :
+                        case '?' :
+                                usage(argv[0]);
+                }
+        if (optind != argc)
+                usage(argv[0]);
+
 
 /* Import static database */
 	if (db_import(&error)) 

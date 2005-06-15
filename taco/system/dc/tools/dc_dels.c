@@ -17,6 +17,14 @@
 
 #include <dcP.h>
 
+void usage(const char *cmd)
+{
+	fprintf(stderr, "usage : %s [options] <system password>\n", cmd);
+	fprintf(stderr, " Remove the data collector system from memory.\n");
+	fprintf(stderr, "       options : -h display this message\n");
+	exit(-1);
+}
+
 /****************************************************************************
 *                                                                           *
 *		Code for dc_dels command                                    *
@@ -52,13 +60,20 @@ int main(int argc, char **argv)
 				{"password",D_STRING_TYPE, &passwd},
 		     	};
 	int res1_size = sizeof(res1) / sizeof(db_resource);
+        int             c;
+        extern int      optind,
+                        optopt;
 
 /* Argument test */
-	if (argc != 2) 
-	{
-		fprintf(stderr, "dc_dels usage : dc_dels <system password>\n");
-		exit(-1);
-	}
+       while ((c = getopt(argc, argv, "h")) != -1)
+                switch(c)
+                {
+                        case 'h' :
+                        case '?' :
+                                usage(argv[0]);
+                }
+        if (optind != argc - 1)
+                usage(argv[0]);
 
 /* Import static database */
 	if (db_import(&error)) 
@@ -93,13 +108,13 @@ int main(int argc, char **argv)
 	alloc_size = (int)(dat_size / 256);
 
 /* Check password validity */
-	l1 = strlen(argv[1]);
+	l1 = strlen(argv[optind]);
 	if (passwd == NULL) 
 		l2 = 0;
 	else
 		l2 = strlen(passwd);
 
-	if ((l1 != l2) || strcmp(argv[1],passwd)) 
+	if ((l1 != l2) || strcmp(argv[optind],passwd)) 
 	{
 		fprintf(stderr, "dc_dels : Bad password\n");
 		fprintf(stderr, "dc_dels : Sorry but I exit\n");

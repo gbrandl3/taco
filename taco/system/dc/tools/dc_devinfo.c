@@ -53,6 +53,15 @@ void printtype(int type);
 void get_print_daemon(char *devname);
 void ask_daemon(char *devname);
 
+void usage(const char *cmd)
+{
+	fprintf(stderr, "usage : %s [options] <device name>\n", cmd);
+	fprintf(stderr, " Display the command registered in the data collector for a device\n");
+	fprintf(stderr, "      options: -v enable verbose mode (print out additional informations)\n");
+	fprintf(stderr, "               -h display this message\n");
+	exit(-1);
+}
+
 /****************************************************************************
 *                                                                           *
 *		Code for dc_devinfo command                                 *
@@ -99,15 +108,10 @@ int main(int argc, char **argv)
 				break;
 			case 'h' :
 			case '?' :
-				fprintf(stderr,"dc_devinfo usage : dc_devinfo [-v] <device name>\n");
-				exit(-1);
+				usage(argv[0]);
 		}
 	if (optind != argc - 1)
-	{
-		fprintf(stderr,"dc_devinfo usage : dc_devinfo [-v] <device name>\n");
-		exit(-1);
-	}
-
+		usage(argv[0]);
 
 	l = strlen(argv[optind]);
 	for (i = 0; i < l; i++)

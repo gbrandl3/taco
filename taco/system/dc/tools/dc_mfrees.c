@@ -9,6 +9,14 @@
 
 #include <dcP.h>
 
+void usage(const char *cmd)
+{
+	fprintf(stderr, "usage : %s [options]\n", cmd);
+	fprintf(stderr, " Give informations about the data buffer memory. It prints the\n");
+	fprintf(stderr, " amount of free memory and the size of the largest free area.\n");
+	fprintf(stderr, "        options : -h display this message\n");
+	exit(-1);
+}
 /****************************************************************************
 *                                                                           *
 *		Code for dc_mfrees command                                  *
@@ -42,13 +50,21 @@ int main(int argc, char **argv)
 				{"data_size",D_LONG_TYPE, &dat_size},
 			};
 	int 		res1_size = sizeof(res1) / sizeof(db_resource);
+        int             c;
+        extern int      optind,
+                        optopt;
 
-/* Arguments number test */
-	if(argc != 1) 
-	{
-		fprintf(stderr,"dc_mfrees usage : dc_mfrees \n");
-		exit(-1);
-	}
+/* Argument test */
+       while ((c = getopt(argc, argv, "h")) != -1)
+                switch(c)
+                {
+                        case 'h' :
+                        case '?' :
+                                usage(argv[0]);
+                }
+        if (optind != argc)
+                usage(argv[0]);
+
 
 /* Import static database */
 	if (db_import(&error)) 

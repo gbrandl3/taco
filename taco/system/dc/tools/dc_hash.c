@@ -4,6 +4,18 @@
 #include <string.h>
 #include <stdlib.h>
 
+void usage(const char *cmd)
+{
+	fprintf(stderr, "usage : %s [options] <device name>\n", cmd);
+	fprintf(stderr, "  Remove the data collector system from memory.\n");
+	fprintf(stderr, "  The data collector system could be distributed on\n");
+	fprintf(stderr, "  several hosts. This command will retrieve on which host\n");
+	fprintf(stderr, "  this system is running (with resources) and will run a\n");
+	fprintf(stderr, "  local command (with remote shell) on each host\n");
+	fprintf(stderr, "         options: -h display this message\n");
+	exit(-1);
+}
+
 /****************************************************************************
 *                                                                           *
 *		Code for dc_hash command                                    *
@@ -13,7 +25,7 @@
 *		    The data collector system could be distributed on       *
 *		    several hosts. This command will retrieve on which host *
 *		    this system is running (with resources) and will run a  *
-*		    local command (with remote shell) on ecah host          *
+*		    local command (with remote shell) on each host          *
 *                                                                           *
 *    Synopsis : dc_hash <device name>					    *
 *                                                                           *
@@ -35,21 +47,29 @@ int main(int argc, char **argv)
 		     	};
 	int 		res1_size = sizeof(res1) / sizeof(db_resource);
 
+	int		c;
+        extern int      optind,
+                        optopt;
+
 /* Argument test */
-	if (argc != 2) 
-	{
-		fprintf(stderr,"dc_hash usage : dc_hash <device name>\n");
-		exit(-1);
-	}
+       while ((c = getopt(argc, argv, "h")) != -1)
+                switch(c)
+                {
+                        case 'h' :
+                        case '?' :
+                                usage(argv[0]);
+                }
+        if (optind != argc - 1)
+                usage(argv[0]);
 
 /* Check device name validity */
-	l = strlen(argv[1]);
+	l = strlen(argv[optind]);
 	for (i=0; i < l && i < sizeof(devname) - 1; i++)
-		devname[i] = tolower(argv[1][i]);
+		devname[i] = tolower(argv[optind][i]);
 	devname[l] = 0;
 
 	i = 0;
-	NB_CHAR(i,argv[1],'/');
+	NB_CHAR(i,argv[optind],'/');
 	if (i != 2) 
 	{
 		fprintf(stderr,"%s : Bad device name\n",argv[0]);

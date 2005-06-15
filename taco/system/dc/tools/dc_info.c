@@ -22,6 +22,19 @@
 
 db_resource res2[2];
 
+void usage(const char *cmd)
+{
+	fprintf(stderr,"usage : %s [options]\n", cmd);
+	fprintf(stderr, "  Display some main information on the data collector system.\n"); 
+	fprintf(stderr, "  These information are :\n");
+	fprintf(stderr, "   - The hosts where data collector are running\n");
+	fprintf(stderr, "   - The number of read and write servers on every hosts\n");
+	fprintf(stderr, "   - The number of devices register in the data collector\n");
+	fprintf(stderr, "   - The number of devices register in the data collector for every domain\n");
+	fprintf(stderr, "   - The data buffer size and the free memory in this data buffer\n");
+	fprintf(stderr, "         options: -h display this message\n");
+	exit(-1);
+}
 /****************************************************************************
 *                                                                           *
 *		Code for dc_info command                                    *
@@ -39,7 +52,7 @@ db_resource res2[2];
 *			- The data buffer size and the free memory in this  *
 *			  data buffer					    *
 *                                                                           *
-*    Synopsis : dc_info <database name>    				    *
+*    Synopsis : dc_info                    				    *
 *                                                                           *
 ****************************************************************************/
 main(argc,argv)
@@ -62,13 +75,22 @@ char *argv[];
 					{"host",D_VAR_STRINGARR,&host_dc},
 				};
 	int 			res1_size = sizeof(res1) / sizeof(db_resource);
+        int             c;
+        extern int      optind,
+                        optopt;
 
 /* Argument test */
-	if (argc != 1) 
-	{
-		fprintf(stderr,"dc_info usage : dc_info \n");
-		exit(-1);
-	}
+       while ((c = getopt(argc, argv, "h")) != -1)
+                switch(c)
+                {
+                        case 'h' :
+                        case '?' :
+                                usage(argv[0]);
+                }
+        if (optind != argc)
+                usage(argv[0]);
+
+
 
 /* Miscellaneous init. */
 	for (i= 0;i < MAX_DOM;i++) 

@@ -20,6 +20,19 @@
 
 char *gethostname_wo_dot(int length);
 
+void usage(const char *cmd)
+{
+	fprintf(stderr, "usage : %s [options]\n", cmd);
+	fprintf(stderr, " Initialise the data collector and create the shared memory\n");
+	fprintf(stderr, " segments used by the data collector.\n"); 
+	fprintf(stderr, " The data collector system could be distributed on several hosts.\n");
+	fprintf(stderr, " This command will retrieve on which host this system is running\n");
+	fprintf(stderr, " (with resources) and will run a local command (with remote shell)\n");
+	fprintf(stderr, " on each host\n");
+	fprintf(stderr, "          options: -h display this message\n");
+	exit(-1);
+}
+
 /****************************************************************************
 *                                                                           *
 *		Code for dc_init command                                    *
@@ -64,13 +77,21 @@ int main(int argc, char **argv)
 		     		};
 	int 			res2_size = sizeof(res2) / sizeof(db_resource),
 				res1_size = sizeof(res1) / sizeof(db_resource);
+        int             c;
+        extern int      optind,
+                        optopt;
 
-/* Arguments number test */
-	if(argc != 1)
-	{
-		fprintf(stderr,"dc_init usage : dc_init\n");
-		exit(-1);
-	}
+/* Argument test */
+       while ((c = getopt(argc, argv, "h")) != -1)
+                switch(c)
+                {
+                        case 'h' :
+                        case '?' :
+                                usage(argv[0]);
+                }
+        if (optind != argc)
+                usage(argv[0]);
+
 
 /* Import static database */
 	if (db_import(&error))

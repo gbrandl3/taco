@@ -18,6 +18,13 @@
 
 #include <dcP.h>
 
+void usage(const char *cmd)
+{
+	fprintf(stderr, "usage : %s [options] <shm name> <offset(in hex)>\n", cmd);
+	fprintf(stderr, " Display the content of a shared memory area in hexadecimal values.\n");
+	fprintf(stderr, "      options : -h display this message\n");
+	exit(-1);
+}
 
 /****************************************************************************
 *                                                                           *
@@ -59,29 +66,37 @@ int main(int argc, char **argv)
 		     	};
 	int 		res1_size = sizeof(res1) / sizeof(db_resource);
 
+        int             c;
+        extern int      optind,
+                        optopt;
 
 /* Argument test */
-	if (argc != 3) 
-	{
-		fprintf(stderr,"dc_patch usage : dc_patch <shm name> <offset(in hex)> \n");
-		exit(-1);
-	}
+       while ((c = getopt(argc, argv, "h")) != -1)
+                switch(c)
+                {
+                        case 'h' :
+                        case '?' :
+                                usage(argv[0]);
+                }
+        if (optind != argc - 2)
+                usage(argv[0]);
 
-	if (argv[2][0] != '0') 
+
+	if (argv[optind + 1][0] != '0') 
 	{
 		fprintf(stderr, "Offset must be specified in hex. format (0x...)\n");
 		exit(-1);
 	}
 	else 
 	{
-		argv[2][1] = tolower(argv[2][1]);
-		if (argv[2][1] != 'x') 
+		argv[optind + 1][1] = tolower(argv[optind + 1][1]);
+		if (argv[optind + 1][1] != 'x') 
 		{
 			fprintf(stderr, "Offset must be specified in hex. format (0x...)\n");
 			exit(-1);
 		}
 	}
-	offset = strtoul(argv[2],(char **)NULL,0);
+	offset = strtoul(argv[optind + 1],(char **)NULL,0);
 
 /* Verify argument validity */
 	if (offset < 0) 
@@ -91,14 +106,14 @@ int main(int argc, char **argv)
 	}
 
 /* Change shared memory name to lowercase letters */
-	l = strlen(argv[1]);
+	l = strlen(argv[optind]);
 	if ((shm_name = (char *)malloc(l + 1)) == NULL) 
 	{
 		fprintf(stderr,"dc_mem : Can't alloc memory, exiting...\n");
 		exit(-1);
 	}
 	for (i = 0;i < l;i++)
-		shm_name[i] = tolower(argv[1][i]);
+		shm_name[i] = tolower(argv[optind][i]);
 	shm_name[l] = 0;
 	
 /* Correct shared memory name ? */
