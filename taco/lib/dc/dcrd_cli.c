@@ -1,12 +1,12 @@
 /*
  * Author(s):	Emmanuel Taurel
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2005-06-13 13:58:11 $
+ * Date:	$Date: 2005-06-16 20:43:34 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -38,14 +38,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#ifndef _NT
+#ifndef WIN32
 #include <sys/socket.h>
 #ifndef __hp9000s300
 #include <netinet/in.h>
 #endif
 #include <netdb.h>
 #include <unistd.h>
-#endif /* _NT */
+#endif /* WIN32 */
 #endif /* _OSK */
 
 /* Some global variables */
@@ -569,7 +569,7 @@ static long init_imp(long i_nethost, long *perr)
  * @param b
  * @return 
  */
-#ifndef _NT
+#ifndef WIN32
 static int comp(serv *a, serv *b)
 {
 #else
@@ -577,7 +577,7 @@ static int comp(const void *vpa,const void *vpb)
 {
 	const serv *a=vpa;
 	const serv *b=vpb;
-#endif  /* _NT */
+#endif  /* WIN32 */
 	if (a->request < b->request)
 		return(-1);
 	else if (a->request == b->request)
@@ -675,11 +675,11 @@ static int rpc_connect(char *serv_name,CLIENT **prpc,int ind,long i_net,long *pe
 /* 
  * Sort the serv_info table in the ascending order 
  */
-#ifndef _NT
+#ifndef WIN32
 	qsort(&(serv_info[0]),nb_server,sizeof(serv),(int (*)())comp);
 #else
 	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
-#endif  /* _NT */
+#endif  /* WIN32 */
 
 /* 
  * Test every server and build the connection with the first one which answers 
@@ -2226,11 +2226,11 @@ int rpc_reconnect_rd(int ind,long i_net,long *perr)
 /* 
  * Sort the serv_info table in the ascending order 
  */
-#ifndef _NT
+#ifndef WIN32
 	qsort(&(serv_info[0]),nb_server,sizeof(serv),(int (*)())comp);
 #else
 	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
-#endif  /* _NT */
+#endif  /* WIN32 */
 
 /* 
  * Test every server and keep the connection with the first one which answers 

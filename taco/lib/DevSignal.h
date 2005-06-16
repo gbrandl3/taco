@@ -10,13 +10,13 @@
 		allows the use of the same makros on every system. 
 		 
  Author(s):	Jens Meyer 
-		$Author: jkrueger1 $
+		$Author: andy_gotz $
 
  Original:	June, 1991
 
- Version:	$Revision: 1.6 $
+ Version:	$Revision: 1.7 $
 
- Date:		$Date: 2005-02-24 15:59:36 $
+ Date:		$Date: 2005-06-16 20:41:37 $
 
  Copyleft (c) 1990 by European Synchrotron Radiation Facility, 
                       Grenoble, France
@@ -31,10 +31,10 @@
  */
 #ifdef _IDENT
 static char DevSignalh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevSignal.h,v 1.6 2005-02-24 15:59:36 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevSignal.h,v 1.7 2005-06-16 20:41:37 andy_gotz Exp $";
 #endif /* _IDENT */
 
-#if HAVE_SIGNAL_H
+#if HAVE_SIGNAL_H || WIN32
 #	include <signal.h>
 #elif HAVE_SYS_SIGNAL_H
 #	include <sys/signal.h>
@@ -109,9 +109,9 @@ static char DevSignalh[] =
 #endif /* OSK */
 
 
-#if defined(_NT)
+#if defined(WIN32)
 #define NUSIG   NSIG
-#endif  /* _NT */
+#endif  /* WIN32 */
 
 #ifdef linux
 #define NUSIG   _NSIG

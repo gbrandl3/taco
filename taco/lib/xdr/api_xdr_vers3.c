@@ -9,13 +9,13 @@
 		reasons.
 
  Author(s): 	Jens Meyer
-		$Author: jkrueger1 $
+		$Author: andy_gotz $
 
  Original:      November 1994
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2003-05-09 15:30:26 $
+ Date:		$Date: 2005-06-16 20:43:37 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -49,7 +49,7 @@ bool_t xdr__server_data_3 (XDR *xdrs, _server_data_3 *objp)
 	{
 		char msg[512];
         	snprintf (msg, sizeof(msg), "xdr__server_data() : error = %d", error);
-#ifdef _NT
+#ifdef WIN32
 		PRINTF(msg);
 #else
 		fprintf (stderr, "%s\n", msg);
@@ -80,7 +80,7 @@ bool_t xdr__client_data_3 (XDR *xdrs, _client_data_3 *objp)
 	{
 		char msg[512];
         	snprintf (msg, sizeof(msg), "xdr__client_data() : error = %d", error);
-#ifdef _NT
+#ifdef WIN32
 		PRINTF(msg);
 #else
 		fprintf (stderr, "'%s\n", msg);
@@ -126,7 +126,7 @@ bool_t xdr__client_raw_data_3 (XDR *xdrs, _client_raw_data_3 *objp)
 		{
 			char msg[512];
 			snprintf (msg, sizeof(msg), "xdr__client_raw_data() : error = %d", error);
-#ifdef _NT
+#ifdef WIN32
 			PRINTF(msg);
 #else
         		fprintf (stderr, "%s\n", msg);
@@ -150,7 +150,7 @@ bool_t xdr__client_raw_data_3 (XDR *xdrs, _client_raw_data_3 *objp)
 		{
 			char msg[512];
         		snprintf (msg, sizeof(msg), "xdr__client_raw_data() : error = %d", error);
-#ifdef _NT
+#ifdef WIN32
 			PRINTF(msg);
 #else
         		fprintf (stderr, "%s\n", msg);

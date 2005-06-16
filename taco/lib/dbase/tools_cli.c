@@ -10,20 +10,22 @@
                 calls
 
  Author(s)  :   Emmanuel Taurel
-                $Author: jkrueger1 $
+                $Author: andy_gotz $
 
  Original   :   April 1997
 
- Version:       $Revision: 1.4 $
+ Version:       $Revision: 1.5 $
 
- Date:          $Date: 2004-03-09 17:02:49 $
+ Date:          $Date: 2005-06-16 20:43:33 $
 
  Copyright (c) 1997 by European Synchrotron Radiation Facility,
                        Grenoble, France
 
 
  *-*******************************************************************/
+#ifndef WIN32
 #include "config.h"
+#endif /* WIN32 */
 #define PORTMAP
 
 #include <macros.h>
@@ -32,9 +34,9 @@
 
 #include <API.h>
 #include <DevErrors.h>
-#if defined(_NT)
-#	include <ApiP.h>
-#	include <nm_rpc.h>
+#if defined(WIN32)
+#	include <private/ApiP.h>
+#	include <rpc.h>
 #else
 #	include <private/ApiP.h>
 #	ifdef _OSK
@@ -56,7 +58,7 @@
 #		endif
 #		include <unistd.h>
 #	endif /* _OSK */
-#endif	/* _NT */
+#endif	/* WIN32 */
 
 #ifndef OSK
 #include <stdlib.h>

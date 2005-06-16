@@ -8,19 +8,21 @@
 		servers and clients using the SUN-RPC.
 
  Author(s)  :	Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.19 $
+ Version    :	$Revision: 1.20 $
 
- Date       : 	$Date: 2005-04-11 16:01:20 $
+ Date       : 	$Date: 2005-06-16 20:41:38 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
 
 ********************************************************************-*/
+#ifndef WIN32
 #include "config.h"
+#endif /* WIN32 */
 #include <API.h>
 #include <private/ApiP.h>
 #include <API_xdr_vers3.h>
@@ -42,6 +44,7 @@
 #	include <varargs.h>
 #endif
 
+#ifndef WIN32
 #if HAVE_SIGNAL_H
 #	include <signal.h>
 #elif HAVE_SYS_SIGNAL_H
@@ -49,6 +52,9 @@
 #else
 #error could not find signal.h
 #endif
+#else /* !WIN32 */
+#include <signal.h>
+#endif /* !WIN32 */
 
 extern _DLLFunc long 	setup_config_multi(char *nethost, long *error);
 static void 		msg_write(_Int msg_type, char *msg_string);
@@ -285,6 +291,8 @@ _DLLFunc void dev_printerror (DevShort mode, char *fmt, ...)
 	va_start(args);
 #elif HAVE_VA_START_P1_P2
 	va_start(args, fmt);
+#elif WIN32
+	va_start(args, fmt);
 #endif /* sun */
 
 	vsnprintf (buffer, sizeof(buffer), fmt, args);
@@ -304,7 +312,7 @@ _DLLFunc void dev_printerror (DevShort mode, char *fmt, ...)
 			msg_send ( ERROR_TYPE );
 		else
 		{
-#ifdef _NT
+#ifdef WIN32
 			char msg [1024];
 			snprintf ( msg, sizeof(msg), "\n\n%s\n", 
 			    message_buffer[ERROR_TYPE].messages);
@@ -368,7 +376,7 @@ _DLLFunc void dev_printerror (DevShort mode,char *fmt, char *str)
 			msg_send ( ERROR_TYPE );
 		else
 		{
-#ifdef _NT
+#ifdef WIN32
 			char msg[1024];
 			snprintf ( msg, sizeof(msg), "\n\n%s\n", 
 			    message_buffer[ERROR_TYPE].messages);
@@ -500,6 +508,8 @@ void _DLLFunc dev_printdebug (long debug_bits, char *fmt, ...)
 	va_start(args);
 #elif HAVE_VA_START_P1_P2
 	va_start(args, fmt);
+#elif WIN32
+	va_start(args, fmt);
 #endif /* sun */
 
 /*
@@ -524,7 +534,7 @@ void _DLLFunc dev_printdebug (long debug_bits, char *fmt, ...)
 			}
 			else
 			{
-#ifdef _NT
+#ifdef WIN32
 				PRINTF(debug_string); //conout( debug_string );
 #else
 				printf ( debug_string );
@@ -583,7 +593,7 @@ void dev_printdebug (long debug_bits,char *fmt, char *str)
 			}
 			else
 			{
-#ifdef _NT
+#ifdef WIN32
 				PRINTF(debug_string); //conout ( debug_string );
 #else
 				printf ( debug_string );
@@ -632,6 +642,8 @@ _DLLFunc void dev_printdiag (DevShort mode, char *fmt, ...)
 	va_start(args);
 #elif HAVE_VA_START_P1_P2
 	va_start(args, fmt);
+#elif WIN32
+	va_start(args, fmt);
 #endif /* sun */
 
 /*
@@ -653,7 +665,7 @@ _DLLFunc void dev_printdiag (DevShort mode, char *fmt, ...)
 			msg_send ( DIAG_TYPE );
 		else
 		{
-#ifdef _NT
+#ifdef WIN32
 			char msg[1024];
 			snprintf (msg, sizeof(msg), "%s", message_buffer[DIAG_TYPE].messages);
 			PRINTF(msg); //conout(msg);
@@ -717,7 +729,7 @@ void dev_printdiag (DevShort mode,char *fmt,char *str)
 			msg_send ( DIAG_TYPE );
 		else
 		{
-#ifdef _NT
+#ifdef WIN32
 			char msg[1024];
 			snprintf (msg, sizeof(msg), "%s", message_buffer[DIAG_TYPE].messages);
 			PRINTF(msg); //conout(msg);
@@ -772,12 +784,12 @@ static void msg_write (_Int msg_type, char *msg_string)
 		len = strlen(time_string) + strlen(msg_string) + 1;
 		if ( (message_buffer[msg_type].messages = (char *)malloc (len)) == NULL )
 		{
-#ifdef _NT
+#ifdef WIN32
 			PRINTF("msg_write() : Insufficient memory for allocation !");
 #else
 			printf ("msg_write() : Insufficient memory for allocation !");
 #endif
-#if !defined (_NT)
+#if !defined (WIN32)
 #if !defined (vxworks)
 			pid = getpid ();
 #else  /* !vxworks */
@@ -786,7 +798,7 @@ static void msg_write (_Int msg_type, char *msg_string)
 			kill (pid,SIGQUIT);
 #else
 			raise(SIGTERM);
-#endif	/* _NT */
+#endif	/* WIN32 */
 		}
 
 		message_buffer[msg_type].nbytes = len;
@@ -805,7 +817,7 @@ static void msg_write (_Int msg_type, char *msg_string)
 
 		if ((help=(char *)realloc(message_buffer[msg_type].messages,len)) == NULL)
 		{
-#ifdef _NT
+#ifdef WIN32
 			{
 				char msg[1024];
 				PRINTF("msg_write() : Insufficient memory for reallocation !");
@@ -818,7 +830,7 @@ static void msg_write (_Int msg_type, char *msg_string)
 			printf ("message_buffer contents :\n%s",
 			    message_buffer[msg_type].messages );
 #endif
-#if !defined (_NT)
+#if !defined (WIN32)
 #if !defined (vxworks)
 			pid = getpid ();
 #else  /* !vxworks */
@@ -827,7 +839,7 @@ static void msg_write (_Int msg_type, char *msg_string)
 			kill (pid,SIGQUIT);
 #else
 			raise(SIGTERM);
-#endif /* _NT */
+#endif /* WIN32 */
 		}
 
 		message_buffer[msg_type].nbytes = len;
@@ -872,7 +884,7 @@ static void msg_send (_Int msg_type)
 		    (xdrproc_t)xdr__msg_out, (caddr_t) &msg_out, TIMEVAL(timeout));
 		if (clnt_stat != RPC_SUCCESS)
 		{
-#ifdef _NT
+#ifdef WIN32
 			{
 				char msg[1024];
 				PRINTF(clnt_sperror (msg_info.conf->clnt,"msg_send()"));
@@ -889,7 +901,7 @@ static void msg_send (_Int msg_type)
  *  exit server if message server connection fails
  */
 
-#if !defined (_NT)
+#if !defined (WIN32)
 #if !defined (vxworks)
 			pid = getpid ();
 #else  /* !vxworks */
@@ -898,7 +910,7 @@ static void msg_send (_Int msg_type)
 			kill (pid,SIGQUIT);
 #else
 			raise(SIGTERM);
-#endif /* _NT */
+#endif /* WIN32 */
 			return;
 		}
 
@@ -906,7 +918,7 @@ static void msg_send (_Int msg_type)
 		{
 			if (msg_type == ERROR_TYPE)
 			{
-#ifdef _NT
+#ifdef WIN32
 				{
 					char msg[1024];
 					snprintf (msg, sizeof(msg), "Message Server : error number %d",msg_out.error);
@@ -925,7 +937,7 @@ static void msg_send (_Int msg_type)
  *  process an error message
  */
 
-#if !defined (_NT)
+#if !defined (WIN32)
 #if !defined (vxworks)
 				pid = getpid ();
 #else  /* !vxworks */
@@ -934,7 +946,7 @@ static void msg_send (_Int msg_type)
 				kill (pid,SIGQUIT);
 #else
 				raise(SIGTERM);
-#endif /* _NT */
+#endif /* WIN32 */
 				return;
 			}
 			dev_printerror_no (WRITE,"Message Server : ",msg_out.error);
@@ -1267,15 +1279,15 @@ long setup_config (long *error)
  */
 	gethostname (host_name, sizeof(host_name));
 
-#if !defined (_NT)
+#if !defined (WIN32)
 #if !defined (vxworks)
         pid = getpid ();
 #else  /* !vxworks */
         pid = taskIdSelf ();
 #endif /* !vxworks */
-#else  /* !_NT */
+#else  /* !WIN32 */
         pid = _getpid ();
-#endif /* !_NT */
+#endif /* !WIN32 */
 	register_data.host_name   = host_name;
 	register_data.prog_number = pid;
 	register_data.vers_number = 0;
@@ -1545,15 +1557,15 @@ long setup_config_multi (char *nethost, long *error)
  */
 	gethostname (host_name, sizeof(host_name));
 
-#if !defined (_NT)
+#if !defined (WIN32)
 #if !defined (vxworks)
         pid = getpid ();
 #else  /* !vxworks */
         pid = taskIdSelf ();
 #endif /* !vxworks */
-#else /* !_NT */
+#else /* !WIN32 */
 	pid = _getpid ();
-#endif	/* !_NT */
+#endif	/* !WIN32 */
 	register_data.host_name   = host_name;
 	register_data.prog_number = pid;
 	register_data.vers_number = 0;

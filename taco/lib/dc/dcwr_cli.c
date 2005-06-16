@@ -1,12 +1,12 @@
 /*
  * Author(s):     Emmanuel Taurel
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
  * Original:      1992
  *
- * Version:       $Revision: 1.7 $
+ * Version:       $Revision: 1.8 $
  *
- * Date:          $Date: 2005-06-13 13:58:11 $
+ * Date:          $Date: 2005-06-16 20:43:34 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -26,13 +26,13 @@
 #include <stdlib.h> 
 #include <string.h>
 #include <sys/types.h>
-#ifndef _NT
+#ifndef WIN32
 #include <sys/socket.h>
 #ifndef __hp9000s300
 #include <netinet/in.h>
 #endif
 #include <netdb.h>
-#endif  /* _NT */
+#endif  /* WIN32 */
 #else /* _OSK */
 #ifdef _UCC
 #include <stdlib.h>
@@ -908,11 +908,11 @@ static int rpc_connect(long *perr)
 /* 
  * Sort the serv_info table in the ascending order 
  */
-#ifndef _NT
+#ifndef WIN32
 	qsort(&(serv_info[0]),nb_server,sizeof(serv),(int (*)())comp);
 #else
 	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
-#endif   /* _NT */
+#endif   /* WIN32 */
 
 /* 
  * Test every server and keep the connection with the first one which answers 
@@ -1202,11 +1202,11 @@ static int rpc_reconnect(long *perr)
  * Sort the serv_info table in the ascending order 
  */
 
-#ifndef _NT
+#ifndef WIN32
 	qsort(&(serv_info[0]),nb_server,sizeof(serv),(int (*)())comp);
 #else
 	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
-#endif   /* _NT */
+#endif   /* WIN32 */
 
 /* 
  * Test every server and keep the connection with the first one which answers 

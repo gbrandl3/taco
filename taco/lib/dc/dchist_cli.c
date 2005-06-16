@@ -1,10 +1,10 @@
 /*
  * Author:	E. Taurel
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2004-03-26 16:38:43 $
+ * Date:	$Date: 2005-06-16 20:43:34 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                      Grenoble, France
@@ -33,14 +33,14 @@
 #else /* _OSK */
 #	include <stdlib.h>
 #	include <string.h>
-#	ifndef _NT
+#	ifndef WIN32
 #		include <sys/socket.h>
 #		ifndef __hp9000s300
 #			include <netinet/in.h>
 #		endif
 #		include <netdb.h>
 #		include <unistd.h>
-#	endif  /* _NT */
+#	endif  /* WIN32 */
 #endif /* _OSK */
 
 /* Some global variables defined elsewhere */

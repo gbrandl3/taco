@@ -1,11 +1,11 @@
 /*
- Author(s):     $Author: jkrueger1 $
+ Author(s):     $Author: andy_gotz $
 
  Original:      
 
- Version:       $Revision: 1.3 $
+ Version:       $Revision: 1.4 $
 
- Date:          $Date: 2004-05-07 15:12:00 $
+ Date:          $Date: 2005-06-16 20:43:33 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -16,7 +16,7 @@
 #include <macros.h>
 #include <db_xdr.h>
 
-#if defined (_NT) 
+#if defined (WIN32) 
 #include <rpc.h>
 #if 0
 #include <nm_rpc.h>

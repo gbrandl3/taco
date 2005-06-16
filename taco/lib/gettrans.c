@@ -14,16 +14,18 @@
 
  Original:      09.01.1991
 
- Version:	$Revision: 1.6 $
+ Version:	$Revision: 1.7 $
 
- Date:		$Date: 2005-03-29 09:55:06 $
+ Date:		$Date: 2005-06-16 20:41:38 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility,
                             Grenoble, France
 
 ********************************************************************-*/
 
+#ifndef WIN32
 #include "config.h"
+#endif /* WIN32 */
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevServer.h>
@@ -37,7 +39,7 @@
 #	else
 #		include <socket.h>
 #	endif
-#elif defined _NT
+#elif defined WIN32
 #	include <rpc/pmap_pro.h>
 #	include <rpc/pmap_cln.h>
 #endif
@@ -143,13 +145,17 @@ Complete reimplementation of the transient RPC prognum allocation scheme :
 
 int gettransient(const char *ds_name)
 {
-#ifdef _NT
+/*
+#ifdef WIN32
 	LPpmaplist      plist, 
 			p;
 #else
+ */
         struct pmaplist *plist, 
-			*p;
+						*p;
+/*
 #endif
+ */
 	u_long		base = 0x50000000, 
 			key = 131, 
 			maxoffset = 0x10000000;
@@ -168,7 +174,7 @@ int gettransient(const char *ds_name)
 
 	if (first)
 	{
-#if defined (_NT)
+#if defined (WIN32)
         	pid = _getpid ();
 #else
 #if !defined (vxworks)

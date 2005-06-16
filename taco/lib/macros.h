@@ -8,13 +8,13 @@
  * 		Macros for function declarations and prototypes.
  *
  * Author(s):     Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original:      July 1994
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:		$Date: 2003-05-22 08:09:18 $
+ * Date:		$Date: 2005-06-16 20:41:37 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -92,7 +92,7 @@ int gettimeofday(struct timeval *,struct timezone *);
 #endif /* __cplusplus */
 #endif /* _UCC */
 
-#endif /* (_NT) && (_WIN32) */
+#endif /* (WIN32) && (_WIN32) */
 #endif /* FORTRAN */
 
 /*
@@ -154,7 +154,7 @@ typedef unsigned int	size_t;
  * Macros used for the Netmanage PC software !
  */
 
-#if !defined (_NT)  /* UNIX definitions */
+#if !defined (WIN32)  /* UNIX definitions */
 #if !defined (linux)
 #define _LPfd_set	struct fd_set *
 #else /* !(linux) */
@@ -168,10 +168,10 @@ typedef unsigned int	size_t;
 #define HWALK(p)
 #define PRINTF(a)	printf(a)
 
-#else /* (_NT) */
+#else /* (WIN32) */
 #define _LPfd_set	struct fd_set *
 #define	_Int		short
-#define _WINAPI     	WINAPI	   /* needed for MSVC++ */
+#define _WINAPI     	WINAPIV	   /* needed for MSVC++ */
 #define TIMEVAL(a)    	(struct timeval*)&a	  /* needed for NetManage's RPC clnt_call() */
 #define MAXU_INT    	0xFFFFFFFF
 
@@ -215,9 +215,11 @@ extern HANDLE hConOut;
 #ifdef WIN32
 #include <NT_debug.h>
 #define PRINTF(a)      MessageBox(NULL,a,NULL,MB_OK|MB_ICONASTERISK);
+#define snprintf _snprintf
+#define vsnprintf _vsnprintf
 #endif  /* WIN32 */
 
-#endif /* (_NT) */
+#endif /* (WIN32) */
 
 
 

@@ -8,13 +8,13 @@
 		programmers interface.
 
  Author(s):	Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original:	June 1992
 
- Version:	$Revision: 1.7 $
+ Version:	$Revision: 1.8 $
 
- Date:		$Date: 2005-06-13 14:02:14 $
+ Date:		$Date: 2005-06-16 20:43:37 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -30,7 +30,7 @@
  */
 #ifdef _IDENT
 static char ApiPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.7 2005-06-13 14:02:14 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.8 2005-06-16 20:43:37 andy_gotz Exp $";
 #endif /* _IDENT */
 
 
@@ -493,7 +493,7 @@ int taco_gethostname(char *host_name, size_t len);
 extern "C"
 {
 #endif /* __cplusplus */
-#if 	!HAVE_DECL_GETHOSTNAME
+#if 	!HAVE_DECL_GETHOSTNAME && !WIN32
 int 	gethostname(char *name, int namelen);
 #endif
 #if !HAVE_DECL_GET_MYADDRESS
@@ -526,11 +526,17 @@ typedef struct _tango_device {
 #ifdef _REENTRANT
 #	include <pthread.h>
        	extern pthread_mutex_t async_mutex;
+
 #	define LOCK(mutex) 	(pthread_mutex_lock(&(mutex)))
 #	define UNLOCK(mutex) 	(pthread_mutex_unlock(&(mutex)))
 #else /*_REENTRANT*/
+#ifndef WIN32
 #	define LOCK(mutex) 	void
 #	define UNLOCK(mutex) 	void
+#else /* !WIN32 */
+#	define LOCK(mutex) 
+#	define UNLOCK(mutex)
+#endif /* !WIN32 */
 #endif
 
 #endif /* _apiP_h */

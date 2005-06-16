@@ -21,20 +21,22 @@
 		calls and D_EVENT_TYPE for asynchronous events.
 
  Author(s)  :	Andy Goetz
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original   :	January 1997
 
- Version:	$Revision: 1.17 $
+ Version:	$Revision: 1.18 $
 
- Date:		$Date: 2005-06-13 14:07:22 $
+ Date:		$Date: 2005-06-16 20:41:37 $
 
  Copyright (c) 1997-2000 by European Synchrotron Radiation Facility,
                             Grenoble, France
 
 ********************************************************************-*/
 
+#ifndef WIN32
 #include "config.h"
+#endif /* WIN32 */
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevServer.h>
@@ -46,7 +48,7 @@
 #include <errno.h>
 #include <assert.h>
 
-#if !defined (_NT)
+#if !defined (WIN32)
 #	if ( defined (OSK) || defined (_OSK))
 
 #		include <inet/socket.h>
@@ -81,7 +83,7 @@
 #			endif
 #		endif /* linux */
 #	endif /* OSK || _OSK */
-#endif /* _NT */
+#endif /* WIN32 */
 
 #ifdef _UCC
 #	include <rpc/rpc.h>
@@ -1347,11 +1349,11 @@ long asynch_server_import(devserver ds, long *error)
 				dev_printerror(SEND,"%s",hstring);
 				*error = DevErr_RPCFailed;
 			}
-#if !defined (_NT)
+#if !defined (WIN32)
                         close (tcp_socket);
 #else
                         closesocket (tcp_socket);
-#endif /* _NT */
+#endif /* WIN32 */
 			clnt_destroy(asynch_clnt_tcp);
 			UNLOCK(async_mutex);
 			return(DS_NOTOK);

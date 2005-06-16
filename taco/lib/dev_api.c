@@ -10,19 +10,21 @@
 
  Author(s)  :	Andy Goetz
 		Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original   :	January 1991
 
- Version    :	$Revision: 1.25 $
+ Version    :	$Revision: 1.26 $
 
- Date	    :	$Date: 2005-05-02 13:34:45 $
+ Date	    :	$Date: 2005-06-16 20:41:38 $
 
  Copyright (c) 1990-2000 by European Synchrotron Radiation Facility, 
                             Grenoble, France
 
 ********************************************************************-*/
+#ifndef WIN32
 #include "config.h"
+#endif /* WIN32 */
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevServer.h>
@@ -30,6 +32,7 @@
 #include <DevErrors.h>
 #include <API_xdr_vers3.h>
 
+#ifndef WIN32
 #if HAVE_SIGNAL_H
 #	include <signal.h>
 #elif HAVE_SYS_SIGNAL_H
@@ -37,7 +40,11 @@
 #else
 #error could not find signal.h
 #endif
+#else /* !WIN32 */
+#include <signal.h>
+#endif /* !WIN32 */
 
+#ifndef WIN32
 #if !HAVE_SIGHANDLER_T
 #	if !HAVE___SIGHANDLER_T
 		typedef RETSIGTYPE (*SIGHANDLER_T) (int);
@@ -51,6 +58,9 @@
 #else
 #	define	SIGHANDLER_T	sighandler_t
 #endif
+#else /* !WIN32 */
+		typedef (*SIGHANDLER_T) (int);
+#endif /* WIN32 */
 
 #if (!defined WIN32)
 #	if ( (defined OSK) || (defined _OSK))
@@ -96,7 +106,7 @@
 #			include <rpc/pmap_prot.h>
 #		endif
 #	endif /* OSK || _OSK */
-#elif defined _NT
+#elif defined WIN32
 #	include <rpc/pmap_pro.h>
 #	include <rpc/pmap_cln.h>
 #endif /* WIN32 */
@@ -616,7 +626,9 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
 	}
 	else
 	{
+#ifndef WIN32
 		SIGHANDLER_T	oldsighandler = signal(SIGPIPE, SIG_IGN);
+#endif /* !WIN32 */
 /* 
  * a connection already exists to this server, reuse it
  */
@@ -626,7 +638,9 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
 
 		clnt_stat = clnt_call (clnt, NULLPROC, (xdrproc_t)xdr_void,  NULL,
 				    (xdrproc_t)xdr_void,  NULL, TIMEVAL(timeout));
+#ifndef WIN32
 		signal(SIGPIPE, oldsighandler);
+#endif /* WIN32 */
 		if (clnt_stat != RPC_SUCCESS)
 		{
 			clnt_destroy(svr_conns[n_svr_conn].clnt);

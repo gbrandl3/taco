@@ -7,13 +7,13 @@
  Description:   xdr_routines for API-library functions.
 
  Author(s): 	Jens Meyer
-		$Author: jkrueger1 $
+		$Author: andy_gotz $
 
  Original:      January 1991
 
- Version:	$Revision: 1.5 $
+ Version:	$Revision: 1.6 $
 
- Date:		$Date: 2005-05-02 07:53:19 $
+ Date:		$Date: 2005-06-16 20:43:37 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -50,7 +50,7 @@ bool_t xdr_DevVarArgument (XDR *xdrs, DevVarArgument *objp)
 	{
 		char msg[512];
 		snprintf(msg, sizeof(msg), "xdr_DevVarArgument() : error = %d", error);
-#ifdef _NT
+#ifdef WIN32
 		PRINTF(msg);
 #else
 		fprintf(stderr, msg);
@@ -107,7 +107,7 @@ bool_t xdr__server_data(XDR *xdrs, _server_data *objp)
 	{
 		char msg[512];
 		snprintf (msg, sizeof(msg), "xdr__server_data() : error = %d", error);
-#ifdef _NT
+#ifdef WIN32
 		PRINTF(msg);
 #else
 		fprintf (stderr, "%s\n", msg);
@@ -146,7 +146,7 @@ bool_t xdr__client_data(XDR *xdrs, _client_data *objp)
 	{
 		char msg[512];
 		snprintf (msg, sizeof(msg), "xdr__client_data() : error = %d", error);
-#ifdef _NT
+#ifdef WIN32
 		PRINTF(msg);
 #else
 		fprintf (stderr, "%s\n", msg);
@@ -194,7 +194,7 @@ bool_t xdr__client_raw_data(XDR *xdrs, _client_raw_data *objp)
 		{
 			char msg[512];
 			snprintf (msg, sizeof(msg), "xdr__client_raw_data() : error = %d", error);
-#ifdef _NT
+#ifdef WIN32
 			PRINTF(msg);
 #else
 			fprintf (stderr, "%s\n", msg);
@@ -217,7 +217,7 @@ bool_t xdr__client_raw_data(XDR *xdrs, _client_raw_data *objp)
 		{
 			char msg[512];
 			snprintf (msg, sizeof(msg), "xdr__client_raw_data() : error = %d", error);
-#ifdef _NT
+#ifdef WIN32
 			PRINTF(msg);
 #else
 			fprintf (stderr, "%s\n", msg);

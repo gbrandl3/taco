@@ -7,19 +7,21 @@
  Description	: Main programm for all device servers
 
  Author(s)  	: Jens Meyer
- 		  $Author: jkrueger1 $
+ 		  $Author: andy_gotz $
 
  Original   	: March 1991
 
- Version	: $Revision: 1.17 $
+ Version	: $Revision: 1.18 $
 
- Date		: $Date: 2005-06-13 14:08:04 $
+ Date		: $Date: 2005-06-16 20:41:36 $
 
  Copyright (c) 1990-2002 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
 
 *******************************************************************-*/
+#ifndef WIN32
 #include "config.h"
+#endif /* WIN32 */
 #include <API.h>
 #include <private/ApiP.h>
 #include <Admin.h>
@@ -28,7 +30,7 @@
 #include <DevSignal.h>
 #include <DevErrors.h>
 #include "db_setup.h"
-#if defined _NT
+#if defined WIN32
 #include <rpc/Pmap_pro.h>
 #include <rpc/pmap_cln.h>
 #include <process.h>
@@ -38,7 +40,7 @@
 #undef NODATETIMEPICK
 #else
 #include <rpc/pmap_clnt.h>
-#endif	/* _NT */
+#endif	/* WIN32 */
 #ifdef _UCC
 #include <errno.h>
 #include <rpc/rpc.h>
@@ -132,7 +134,7 @@ static SVCXPRT *transp_tcp;
 	}		
 #endif
 /**/
-#ifdef _NT  /* _NT */
+#ifdef WIN32  /* WIN32 */
 
 #include "resource.h"
 
@@ -145,9 +147,9 @@ static SVCXPRT *transp_tcp;
 #else
 #define IS_WIN32 FALSE
 #endif
-#define IS_NT      IS_WIN32 && (BOOL)(GetVersion() < 0x80000000)
-#define IS_WIN32S  IS_WIN32 && (BOOL)(!(IS_NT) && (LOBYTE(LOWORD(GetVersion()))<4))
-#define IS_WIN95 (BOOL)(!(IS_NT) && !(IS_WIN32S)) && IS_WIN32
+#define ISWIN32      IS_WIN32 && (BOOL)(GetVersion() < 0x80000000)
+#define IS_WIN32S  IS_WIN32 && (BOOL)(!(ISWIN32) && (LOBYTE(LOWORD(GetVersion()))<4))
+#define IS_WIN95 (BOOL)(!(ISWIN32) && !(IS_WIN32S)) && IS_WIN32
 
 	/***** Globals for Windows *****/
 
@@ -197,7 +199,7 @@ WM_COMMAND_handler( HWND hWnd, WPARAM wParam, LPARAM lParam);
 static BOOL /* RPC and TACO initialization (Device Server's main) */
 application_main (int argc, char **argv)  /* Windows does not use main()! */
 
-#else /* _NT */
+#else /* WIN32 */
 /**@ingroup dsAPI
  * Main routine for all device servers.
  *
@@ -213,7 +215,7 @@ application_main (int argc, char **argv)  /* Windows does not use main()! */
  * @return 1 DS_NOTOK
  */
 int main (int argc, char **argv)
-#endif /* _NT */
+#endif /* WIN32 */
 {
 	char    		host_name [HOST_NAME_LENGTH],
 				dsn_name [DS_NAME_LENGTH + DSPERS_NAME_LENGTH + 1],
@@ -242,7 +244,7 @@ int main (int argc, char **argv)
  *  check for lenght of names : server process name < DS_NAME_LENGTH char
  *                              personal name       < DSPERS_NAME_LENGTH char
  */
-#ifndef _NT
+#ifndef WIN32
 	if (argc < 2)
 	{
 		fprintf( stderr, "Usage: %s personal_name [OPTIONS]\n\n",
@@ -270,7 +272,7 @@ int main (int argc, char **argv)
 		if(strncmp(proc_name+strlen(proc_name)-4,".exe",4) == 0)
     			proc_name[strlen(proc_name)-4]='\0';
 	}
-#endif  /* !_NT */
+#endif  /* !WIN32 */
 
 /*
  * make sure all config flags are set to zero before starting
@@ -335,7 +337,10 @@ int main (int argc, char **argv)
 			}
 		}
 	}
-       device_server(proc_name, argv[1], m_opt, s_opt, nodb_opt, prog_number, device_no, device_list);
+    status = device_server(proc_name, argv[1], m_opt, s_opt, nodb_opt, prog_number, device_no, device_list);
+#ifdef WIN32
+	return status;
+#endif /* WIN32 */
 }
 #endif /* vxworks || NOMAIN */
 
@@ -352,7 +357,7 @@ int main (int argc, char **argv)
  * @param n_device    number of devices to export
  * @param device_list list of devices
  */
-void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int nodb, int pn, int n_device, char** device_list)
+int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int nodb, int pn, int n_device, char** device_list)
 
 {
 	char    		host_name [HOST_NAME_LENGTH],
@@ -363,6 +368,7 @@ void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, in
 				res_name[80];
 	DevVarStringArray	default_access;
 	db_resource		res_tab;
+	void		*test_heap;
 
 	long			prog_number=0,
 				status,
@@ -376,7 +382,7 @@ void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, in
 	{
 		char msg[80];
 		snprintf(msg, sizeof(msg),"Filename to long : server_name <= %d char's\n", DS_NAME_LENGTH - 1);
-#ifdef _NT
+#ifdef WIN32
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
 		return(FALSE);
 #else
@@ -389,7 +395,7 @@ void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, in
 	{
 		char msg[80];
 		snprintf(msg, sizeof(msg), "Personal DS_name to long : personal_dsname <= %d char's\n", DSPERS_NAME_LENGTH - 1);
-#ifdef _NT
+#ifdef WIN32
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
 		return(FALSE);
 #else
@@ -444,7 +450,7 @@ void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, in
  *  and create device server network name
  */
 
-#if defined (_NT)
+#if defined (WIN32)
 	pid = _getpid ();
 #elif !defined (vxworks)
 	pid = getpid ();
@@ -509,9 +515,9 @@ void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, in
 	(void) signal(SIGPIPE, main_signal_handler);
 #endif /* unix */
 
-#if defined (_NT)
+#if defined (WIN32)
 	(void) signal(SIGBREAK,main_signal_handler);
-#endif /* _NT */
+#endif /* WIN32 */
 
 #if ( OSK || _OSK )
 	(void) signal(SIGQUIT, main_signal_handler);
@@ -595,7 +601,7 @@ void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, in
 	if (transp == NULL) 
 	{
 		char msg[]="Cannot create udp service, exiting...\n";
-#if defined(_NT)
+#if defined(WIN32)
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
 		return (FALSE);
 #else
@@ -626,7 +632,7 @@ void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, in
 		if (!svc_register(transp, prog_number, API_VERSION, devserver_prog_4, IPPROTO_UDP)) 
 		{
 			char msg[]="Unable to register server (UDP,4), retry...\n"; 
-#if defined(_NT)
+#if defined(WIN32)
 			MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
 			return(FALSE);
 #else
@@ -646,7 +652,7 @@ void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, in
 	if (synch_svc_udp_sock == -1)
 	{
 		char msg[]="Unable to register server (UDP,4), exiting...\n"; 
-#if defined(_NT)
+#if defined(WIN32)
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
 		return(FALSE);
 #else
@@ -662,7 +668,7 @@ void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, in
 	if (transp_tcp == NULL) 
 	{
 		char msg[]= "Cannot create tcp service, exiting...\n";
-#if defined(_NT)
+#if defined(WIN32)
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
 		return (FALSE);
 #else
@@ -674,7 +680,7 @@ void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, in
         if (!svc_register(transp_tcp, prog_number, API_VERSION, devserver_prog_4, IPPROTO_TCP))
 	{
 		char msg[]= "Unable to register server (TCP,4), exiting...\n";
-#if defined(_NT)
+#if defined(WIN32)
 		MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
 		raise(SIGABRT);
 		return (FALSE);
@@ -730,7 +736,7 @@ void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, in
 		if ( status != DS_OK )
 		{
 			dev_printerror_no (SEND,"startup failed",error);
-#if defined(_NT)
+#if defined(WIN32)
 			raise(SIGABRT);
 #else
 			kill (pid,SIGQUIT);
@@ -744,7 +750,7 @@ void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, in
  */
 		if ( status == 1 )
 		{
-#if defined(_NT)
+#if defined(WIN32)
 			raise(SIGABRT);
 #else
 			kill (pid,SIGQUIT);
@@ -753,7 +759,7 @@ void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, in
 		config_flags.startup = True;
 	}
 
-#ifndef _NT
+#ifndef WIN32
 /*
  *  set server into wait status
  */
@@ -761,7 +767,7 @@ void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, in
 		
 	fprintf (stderr, "svc_run returned\n"); 
 	kill (pid,SIGQUIT);
-#else   /* _NT */
+#else   /* WIN32 */
 /*
  * show up the main dialog
  */
@@ -769,7 +775,7 @@ void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, in
 #endif
 }
 
-#ifdef _NT
+#ifdef WIN32
 /***********************************************************************
 //
 //  FUNCTION: WinMain(HANDLE, HANDLE, LPSTR, int)
@@ -790,6 +796,7 @@ int APIENTRY WinMain(
 {
 	MSG win_msg;
 	HANDLE hAccelTable;
+
 
 	/*
 	 * parse NT's command-line into gArgv and gArgc
@@ -913,7 +920,7 @@ InitApplication(HINSTANCE hInstance)
         if (IS_WIN95) {
 			wc.lpszMenuName  = "DS_MAIN_W95";
         } else {
-			wc.lpszMenuName  = "DS_MAIN_NT";
+			wc.lpszMenuName  = "DS_MAINWIN32";
         }
         wc.lpszClassName = gszAppName;
 
@@ -949,6 +956,15 @@ InitInstance(HINSTANCE hInstance, int nCmdShow)
 	int loop, xorg, yorg;
 	HWND hWnd;
 	char title[256];
+#ifdef WIN32
+	long error;
+	void *test_heap;
+#endif /* WIN32 */
+
+#ifdef WIN32
+	test_heap = malloc(4096);
+	msize(test_heap,&error);
+#endif /* WIN32 */
 
 	strcpy(title, TITLE_STR);
 	strcat(title, gszAppName);
@@ -969,6 +985,11 @@ InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	// construct a Debug Console
 	hConsole= ConstructDbgCon(hInstance, hWnd, gszAppName);
+
+#ifdef WIN32
+		test_heap = malloc(4096);
+		msize(test_heap,&error);
+#endif /* WIN32 */
 
 	/*** go, connect to TACO ***/
 	if(-1 == rpc_nt_init()) {
@@ -1606,7 +1627,7 @@ WorkerThreadMain(LPDWORD lpdwParam)
 	return 0;      // will terminate rpc worker thread
 }
 
-#endif  /* _NT */
+#endif  /* WIN32 */
 
 /*+**********************************************************************
  Function   :   static void devserver_prog_4()
@@ -1664,16 +1685,16 @@ static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp)
 
         	case RPC_QUIT_SERVER:
 			svc_sendreply(transp, (xdrproc_t)xdr_void, (caddr_t)NULL);
-#if defined (_NT)
+#if defined (WIN32)
                 	raise(SIGABRT);
-#else  /* _NT */
+#else  /* WIN32 */
 #if !defined (vxworks)
                 	pid = getpid ();
 #else  /* !vxworks */
                 	pid = taskIdSelf ();
 #endif /* !vxworks */
                 	kill (pid,SIGQUIT);
-#endif /* _NT */
+#endif /* WIN32 */
 			return;
 
 		case RPC_CHECK:

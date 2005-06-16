@@ -7,19 +7,21 @@
  Description:   xdr_routines for device server data passing.
 
  Author(s):	Jens Meyer
-		$Author: jkrueger1 $
+		$Author: andy_gotz $
 
  Original:	January 1991
 
- Version:	$Revision: 1.4 $
+ Version:	$Revision: 1.5 $
 
- Date:		$Date: 2004-07-12 09:20:04 $
+ Date:		$Date: 2005-06-16 20:43:37 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
 		       Grenoble, France
 
 *******************************************************************-*/
+#ifndef WIN32
 #include "config.h"
+#endif /* WIN32 */
 #include <dev_xdr.h>
 
 /*

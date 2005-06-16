@@ -8,13 +8,13 @@
  *		the applications programmers interface.
  *
  * Author(s):	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:		$Date: 2005-06-13 09:39:36 $
+ * Date:		$Date: 2005-06-16 20:41:38 $
  *
  *
  * Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
@@ -75,7 +75,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.11 2005-06-13 09:39:36 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.12 2005-06-16 20:41:38 andy_gotz Exp $";
 #endif /* _IDENT */
 
 /*
@@ -290,7 +290,7 @@ typedef void (*DevCallbackFunction(devserver, void*, DevCallbackData));
 #include <dc.h>
 #endif
 
-#if !defined(_NT)
+#if !defined(WIN32)
  /*
  * HDB library include file
  */
@@ -454,7 +454,7 @@ extern char *dev_error_string;
 #ifdef __cplusplus
 extern "C" {
 #endif
-void device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int nodb, int pn, int n_device, char** device_list); 
+int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int nodb, int pn, int n_device, char** device_list); 
 #ifdef __cplusplus
 }
 #endif

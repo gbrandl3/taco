@@ -9,19 +9,20 @@
 		style for servers running under HPUX, SUN and OS9.
 
  Author(s):	Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original:	June 1991
 
- Version:	$Revision: 1.7 $
+ Version:	$Revision: 1.8 $
 
- Date:		$Date: 2005-02-24 15:59:36 $
+ Date:		$Date: 2005-06-16 20:41:38 $
 
  Copyright (c) 1990-1997 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
 
 *******************************************************************-*/
 
+#ifndef WIN32
 #include "config.h"
 #if HAVE_SIGNAL_H
 #	include <signal.h>
@@ -30,6 +31,9 @@
 #else
 #error could not find signal.h
 #endif
+#else /* !WIN32 */
+#include <signal.h>
+#endif /* !WIN32 */
 
 #include <API.h>
 #include <private/ApiP.h>
@@ -95,7 +99,7 @@ long ds__signal (int sig, void (*action)(int), long *error)
 
 #if defined (unix)
 	if ( sig<1 || sig>=NUSIG)
-#elif defined(_NT)
+#elif defined(WIN32)
 	if ( sig<SIGINT || sig>=NUSIG)
 #else
 	if ( sig<0 || sig>=NUSIG)
@@ -173,7 +177,7 @@ void main_signal_handler (int signo)
  */
 #if defined (unix)
 	if ( signo < 1 || signo >= NUSIG)
-#elif defined(_NT)
+#elif defined(WIN32)
 	if ( signo< SIGINT || signo>=NUSIG)
 #else
 	if ( signo < 0 || signo >= NUSIG)
@@ -197,11 +201,11 @@ void main_signal_handler (int signo)
  *  filter signals for quitting the server
  */
 
-#if defined (_NT)
+#if defined (WIN32)
 	if (signo==SIGINT || signo==SIGTERM || signo==SIGABRT || signo==SIGBREAK)
 #else
 	if (signo==SIGQUIT || signo==SIGINT || signo==SIGHUP || signo==SIGTERM || signo==SIGABRT)
-#endif /* _NT */
+#endif /* WIN32 */
      	{
 		unregister_server ();
 /*

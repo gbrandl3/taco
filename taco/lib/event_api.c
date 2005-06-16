@@ -33,15 +33,17 @@
 
  Original   :	April 1999
 
- Version    :	$Revision: 1.11 $
+ Version    :	$Revision: 1.12 $
 
- Date       :	$Date: 2005-03-29 09:52:23 $
+ Date       :	$Date: 2005-06-16 20:41:37 $
 
  Copyleft (c) 1999 by European Synchrotron Radiation Facility,
                       Grenoble, France
 ********************************************************************-*/
 
+#ifndef WIN32
 #include "config.h"
+#endif /* WIN32 */
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevServer.h>
@@ -51,7 +53,7 @@
 #include <DevErrors.h>
 #include <API_xdr_vers3.h>
 
-#if !defined _NT
+#if !defined WIN32
 #	include <errno.h>
 #	if ( (defined OSK) || (defined _OSK))
 #		include <inet/socket.h>
@@ -79,7 +81,7 @@
 #			include <sys/types.h>
 #		endif
 #	endif /* OSK || _OSK */
-#endif /* _NT */
+#endif /* WIN32 */
 #ifdef _UCC
 #include <rpc/rpc.h>
 #include <_os9_sockets.h>

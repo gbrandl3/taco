@@ -1,13 +1,13 @@
 /*
  *
  * Author(s):     Emmanuel Taurel
- *                $Author: jkrueger1 $
+ *                $Author: andy_gotz $
  *
  * Original:      1993
  *
- * Version:       $Revision: 1.7 $
+ * Version:       $Revision: 1.8 $
  *
- * Date:          $Date: 2005-06-13 13:58:11 $
+ * Date:          $Date: 2005-06-16 20:43:36 $
  *
  * Copyright (c) 1990 by European Synchrotron Radiation Facility,
  *                       Grenoble, France
@@ -25,13 +25,13 @@
 #ifndef _OSK
 #include <stdlib.h> 
 #include <sys/types.h>
-#ifndef _NT
+#ifndef WIN32
 #include <sys/socket.h>
 #ifndef __hp9000s300
 #include <netinet/in.h>
 #endif
 #include <netdb.h>
-#endif  /* _NT */
+#endif  /* WIN32 */
 #else /* _OSK */
 #ifdef _UCC
 #include <string.h>

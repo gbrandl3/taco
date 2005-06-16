@@ -1,4 +1,6 @@
+#ifndef WIN32
 #include "config.h"
+#endif /* WIN32 */
 #include <API.h>
 #include <Admin.h>
 #include <stdio.h>

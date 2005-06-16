@@ -7,19 +7,21 @@
  Description:	Server side of the API.  
 
  Author(s);	Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.18 $
+ Version:	$Revision: 1.19 $
 
- Date:		$Date: 2005-06-13 14:04:59 $
+ Date:		$Date: 2005-06-16 20:41:38 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
 
 ********************************************************************-*/
+#ifndef WIN32
 #include "config.h"
+#endif /* WIN32 */
 /*
  * Include files and Static Routine definitions
  */
@@ -27,11 +29,13 @@
 /*
  * C++ version
  */
+#ifndef WIN32
 #ifdef HAVE_SYS_TYPES_H
 #	include <sys/types.h>
 #else
 #	include <types.h>
 #endif
+#endif /* !WIN32 */
 
 #include <API.h>
 #include <private/ApiP.h>

@@ -9,13 +9,13 @@
 		version 4.27 of the original file svc_api.c.
 
  Author(s);	Andy Gotz
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original:	July 1995
 
- Version:	$Revision: 1.6 $
+ Version:	$Revision: 1.7 $
 
- Date:		$Date: 2005-02-22 13:36:34 $
+ Date:		$Date: 2005-06-16 20:41:38 $
 
  Copyright (c) 1995-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -25,7 +25,9 @@
  * Include files and Static Routine definitions
  */
 
+#ifndef WIN32
 #include "config.h"
+#endif /* WIN32 */
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevServer.h>
@@ -156,7 +158,7 @@ DevMethodFunction ds__method_finder (void *ptr_ds, DevMethod method)
  *  unregister server and exit
  */
 
-#if !defined (_NT)
+#if !defined (WIN32)
 #if !defined (vxworks)
         pid = getpid ();
 #else  /* !vxworks */

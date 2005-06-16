@@ -9,19 +9,21 @@
             :   Interface to access static database
 
  Author(s)  :   Emmanuel Taurel
-		$Author: jkrueger1 $
+		$Author: andy_gotz $
 
  Original   :   January 1991
 
- Version    :	$Revision: 1.9 $
+ Version    :	$Revision: 1.10 $
 
- Date       :	$Date: 2005-06-13 14:00:32 $
+ Date       :	$Date: 2005-06-16 20:43:34 $
  
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
 
  *-*******************************************************************/
+#ifndef WIN32
 #include "config.h"
+#endif /* WIN32 */
 #define PORTMAP
 
 #include <macros.h>
@@ -30,8 +32,8 @@
 #include <API.h>
 #include <DevErrors.h>
 
-#if defined(_NT)
-#	include <ApiP.h>
+#if defined(WIN32)
+#	include <private/ApiP.h>
 #	include <rpc.h>
 #	if 0
 #		include <nm_rpc.h>
@@ -57,7 +59,7 @@
 #		endif
 #		include <unistd.h>
 #	endif /* _OSK */
-#endif	/* _NT */
+#endif	/* WIN32 */
 
 #ifndef OSK
 #include <stdlib.h>
@@ -482,7 +484,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long 
  */
 			if(recev == NULL)
 			{
-#ifndef _NT
+#ifndef WIN32
 				close(tcp_so);
 #else
 				closesocket(tcp_so);
@@ -513,7 +515,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long 
 					recev = db_getres_1(&send,tcp_cl,&error);
 					if(recev == NULL)
 					{
-#ifndef _NT
+#ifndef WIN32
 						close(tcp_so);
 #else
 						closesocket(tcp_so);
@@ -533,7 +535,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long 
  */
 				if(recev->db_err != DS_OK)
 				{
-#ifndef _NT
+#ifndef WIN32
 					close(tcp_so);
 #else
 					closesocket(tcp_so);
@@ -1174,7 +1176,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long 
 			*perr = DbErr_MemoryFree;
 			return(DS_NOTOK);
 		}
-#ifndef _NT
+#ifndef WIN32
 		close(tcp_so);
 #else
 		closesocket(tcp_so);
@@ -2168,7 +2170,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 			if (k2 != 0)
 				free(tmp_arr);
 			if (big_packet == 1) {
-#ifndef _NT
+#ifndef WIN32
 				close(tcp_so);
 #else
 				closesocket(tcp_so);
@@ -2194,7 +2196,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 
 	if (*recev != 0) {
 		if (big_packet == 1) {
-#ifndef _NT
+#ifndef WIN32
 			close(tcp_so);
 #else
 			closesocket(tcp_so);
@@ -2210,7 +2212,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 
 	if (big_packet == 1)
 	{
-#ifndef _NT
+#ifndef WIN32
 		close(tcp_so);
 #else
 		closesocket(tcp_so);
@@ -3086,7 +3088,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 /* Get process ID (specific for version 2) */
 
 			if (i == 0)
-#if defined(_NT)
+#if defined(WIN32)
 				pid = _getpid();
 #else
 #if !defined (vxworks)
@@ -3192,15 +3194,15 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 /* Get process ID (specific for version 2) */
 
 			if (i == 0)
-#if defined(_NT)
+#if defined(WIN32)
 				pid = _getpid();
-#else  /* _NT */
+#else  /* WIN32 */
 #if !defined (vxworks)
 				pid = getpid();
 #else  /* !vxworks */
 				pid = taskIdSelf();
 #endif /* !vxworks */
-#endif /* _NT */
+#endif /* WIN32 */
 			devexp3[i].pid = pid;
 
 /* Copy process name (specific for version 3) */
@@ -4287,7 +4289,7 @@ int _DLLFunc db_getdevexp(char *filter, char ***tab, u_int *num_dev,long *perr)
 			if(recev == NULL)
 			{
 				*perr = error;
-#ifndef _NT
+#ifndef WIN32
 				close(tcp_so);
 #else
 				closesocket(tcp_so);
@@ -4301,7 +4303,7 @@ int _DLLFunc db_getdevexp(char *filter, char ***tab, u_int *num_dev,long *perr)
 			if(recev->db_err != DS_OK)
 			{
 				*perr = recev->db_err;
-#ifndef _NT
+#ifndef WIN32
 				close(tcp_so);
 #else
 				closesocket(tcp_so);
@@ -4662,7 +4664,7 @@ int _DLLFunc db_freedevexp(char **ptr)
 			return(DS_NOTOK);
 #endif /* __STDCPP__ */
 
-#ifndef _NT
+#ifndef WIN32
 		close(tab_clstu[i].tcp_so);
 #else
 		closesocket(tab_clstu[i].tcp_so);
@@ -5067,15 +5069,15 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
 
 /* Init. the previously allocated structures */
 
-#if defined(_NT)
+#if defined(WIN32)
 	tmp_x->pid = _getpid();
-#else  /* _NT */
+#else  /* WIN32 */
 #if !defined (vxworks)
 	tmp_x->pid = getpid();
 #else  /* !vxworks */
 	tmp_x->pid = taskIdSelf();
 #endif /* !vxworks */
-#endif /* _NT */
+#endif /* WIN32 */
 	taco_gethostname(hostna,sizeof(hostna));
 	tmp_x->h_name = hostna;
 

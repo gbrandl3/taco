@@ -1,67 +1,140 @@
+static char RcsId[] ="$Header: /home/jkrueger1/sources/taco/backup/taco/lib/NT_debug.c,v 1.3 2005-06-16 20:41:37 andy_gotz Exp $";
 /*
-    debug.c
+    NT_debug.c
 
     Functions to support a popup console/debug window
 
- Author:	$Author: jkrueger1 $
-  
- Version:	$Version$
-
- Date:		$Date: 2003-04-25 11:21:28 $
-
- Copyright (c) 1990 by European Synchrotron Radiation Facility,
-                      Grenoble, France
+  $Author: andy_gotz $
+  $Date: 2005-06-16 20:41:37 $
+  $Locker:  $
+ 
 
 */
-
+#include <API.h>
 #include <windows.h>
 #include <stdio.h>
-#include "resource.h"       // main symbols
+#include "resource.h"
 #include "NT_debug.h"
 
 //
 // Constants
 //
-#define MAXLISTLINES    300     // max list lines we keep
-#define IDC_LIST        1       // listbox id
+#define MAXLISTLINES    500     // max list lines we keep
+#define IDC_LIST        -777    // listbox id
 
 //
 // local data
 //
 static HWND hWndDebugList= NULL;
+static HWND hWndDebug= NULL;          // handle of debug/console window
+static HANDLE hWndMain=NULL;          // the main window handle
+static char* szAppName=NULL;          // the application's name
+static HINSTANCE hAppInst=NULL;       // the application's module handle
+static HANDLE hDbgPrintEvent=NULL;    // synch. event for printing
 
 //
 // global data
 //
-HWND ghWndDebug= NULL;    // handle of debug/console window
 int giDebugLevel= 0;      // default is debuglevel == 0
-HWND ghWndMain;           // the main window handle
-char* gszAppName;         // the application's name
-HINSTANCE ghAppInstance;  // the application's module handle
 DWORD   gdEval;
-
 //
 // prototypes
 //
 #ifdef _DEBUG
-static BOOL assert_globals();
+static BOOL assert_handles();
 #endif
+static LRESULT CALLBACK DebugWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+static void LastErrorBox();
+
+//
+// Construct the debug console environment
+//
+HWND 
+ConstructDbgCon(HINSTANCE hInst, HWND hWnd, char* appName)
+{
+	hAppInst= hInst;
+	hWndMain= hWnd;
+	szAppName= appName;
+
+#ifdef _DEBUG
+	if(!assert_handles()) return 0;
+#endif
+
+    //
+    // See if we have a debug window or not.
+    // If not then try to create one.
+    //
+    if (!hWndDebug) 
+	{
+	
+    //
+    // define the window`class we want to register
+    //
+	WNDCLASS wc;
+	char buf[256];
+
+	wc.lpszClassName    = "Debug";
+    wc.style            = CS_HREDRAW | CS_VREDRAW;
+    wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
+    wc.hIcon            = LoadIcon(hAppInst,"Icon");
+    wc.lpszMenuName     = NULL;
+    wc.hbrBackground    = GetStockObject(WHITE_BRUSH);
+    wc.hInstance        = hAppInst;
+    wc.lpfnWndProc      = DebugWndProc;
+    wc.cbClsExtra       = 0;
+    wc.cbWndExtra       = 0;
+    
+    RegisterClass(&wc);
+
+	//
+	// create the debug console
+	//
+    wsprintf(buf, "%s - Console", (LPSTR)szAppName);
+    hWndDebug = CreateWindow("Debug",
+			buf,
+			WS_OVERLAPPED | /*WS_VISIBLE |*/ WS_CAPTION /*| WS_SYSMENU*/
+			| WS_BORDER | WS_THICKFRAME /*| WS_MINIMIZEBOX*/ ,
+			GetSystemMetrics(SM_CXSCREEN) / 2-100,
+			GetSystemMetrics(SM_CYSCREEN) * 3 / 4-75,
+			GetSystemMetrics(SM_CXSCREEN) / 2,
+			GetSystemMetrics(SM_CYSCREEN) / 4,
+			hWndMain,
+			0,
+			hAppInst,
+			NULL
+			);
+
+	if (!hWndDebug) {
+		LastErrorBox();
+		return NULL;
+		}
+    }
+
+	if(NULL == hDbgPrintEvent) {
+		hDbgPrintEvent= CreateEvent(NULL, FALSE, TRUE, NULL);
+		if(NULL== hDbgPrintEvent) {
+			LastErrorBox();
+			return NULL;
+		}
+	}
+	return hWndDebug;
+}
 
 //
 // Set the current debug level
 //
-
-void SetDebugLevel(int i)
+void 
+SetDebugLevel(int i)
 {
     HMENU hMenu;
     int m;
 	char buf[32];
 
 #ifdef _DEBUG
-	if(!assert_globals()) return;
+	if(!assert_handles()) return;
 #endif
 
-	hMenu = GetMenu(ghWndMain); 
+	hMenu = GetMenu(hWndMain); 
 	for (m=IDM_DEBUG0; m<=IDM_DEBUG4; m++) {
 		CheckMenuItem(hMenu, m, MF_UNCHECKED);
 	}
@@ -72,113 +145,69 @@ void SetDebugLevel(int i)
     // Save the debug level
     //
     sprintf(buf, "%d", giDebugLevel);
-	WriteProfileString(gszAppName, "debug", buf);
+	WriteProfileString(szAppName, "debug", buf);
 }
 
 //
 // return saved debug level from .INI file
 //
-
-int GetDebugLevel()
+int 
+GetDebugLevel()
 {
 #ifdef _DEBUG
-	if(!assert_globals()) return giDebugLevel;
+	if(!assert_handles()) return giDebugLevel;
 #endif
 
-	return GetProfileInt(gszAppName, "debug", 1);
+	return GetProfileInt(szAppName, "debug", 1);
 }
 
+#ifdef _DEBUG
 //
 // Show a message box with assertion failure info in it
 //
-
-void __AssertMsg(LPSTR exp, LPSTR file, int line)
+void 
+__AssertMsg(LPSTR exp, LPSTR file, int line)
 {
     char buf[256];
     int i;
 
-#ifdef _DEBUG
-	if(!assert_globals()) return;
-#endif
+	if(!assert_handles()) return;
 
     wsprintf(buf, 
              "Exp: %s\nFile: %s, Line %d",
              (LPSTR)exp,
              (LPSTR)file,
              line);
-    i = MessageBox(ghWndMain,
-                   buf,
-                   "Assertion failure", 
-                   MB_OK | MB_ICONEXCLAMATION);
+    i = MessageBox(hWndMain,
+              buf,
+              "Assertion failure", 
+              MB_OK | MB_ICONEXCLAMATION);
 }
+#endif
 
 //
 // function to add a string to the end of the debug list
 //
-
-void cdecl DbgOut(LPSTR lpFormat, ...) 
+void cdecl 
+DbgOut(LPSTR lpFormat, ...) 
 {
     int i;
     char buf[256];
 
-#ifdef _DEBUG
-	if(!assert_globals()) return;
-#endif
-
-    //
-    // See if we have a debug window or not.
-    // If not then try to create one.
-    //
-
-    if (!ghWndDebug) 
-	{
-	
-    //
-    // define the window`class we want to register
-    //
-	WNDCLASS wc;
-
-	wc.lpszClassName    = "Debug";
-    wc.style            = CS_HREDRAW | CS_VREDRAW;
-    wc.hCursor          = LoadCursor(NULL, IDC_ARROW);
-    wc.hIcon            = LoadIcon(ghAppInstance,"Icon");
-    wc.lpszMenuName     = NULL;
-    wc.hbrBackground    = GetStockObject(WHITE_BRUSH);
-    wc.hInstance        = ghAppInstance;
-    wc.lpfnWndProc      = DebugWndProc;
-    wc.cbClsExtra       = 0;
-    wc.cbWndExtra       = 0;
-    
-    RegisterClass(&wc);
-
-	//
-	// create the debug console
-	//
-    wsprintf(buf, "%s - Console", (LPSTR)gszAppName);
-    ghWndDebug = CreateWindow("Debug",
-			buf,
-			WS_OVERLAPPED /*| WS_VISIBLE | WS_CAPTION | WS_SYSMENU*/
-			| WS_BORDER | WS_THICKFRAME /*| WS_MINIMIZEBOX*/ ,
-			GetSystemMetrics(SM_CXSCREEN) / 2-100,
-			GetSystemMetrics(SM_CYSCREEN) * 3 / 4-75,
-			GetSystemMetrics(SM_CXSCREEN) / 2,
-			GetSystemMetrics(SM_CYSCREEN) / 4,
-			ghWndMain,
-			0,
-			ghAppInstance,
-			NULL
-			);
-
-	if (!ghWndDebug) {
+	// wait in case another thread is using the printing channel
+	if(WAIT_FAILED== WaitForSingleObject(hDbgPrintEvent, INFINITE)) {
 		LastErrorBox();
-		return;
-		}
-    }
+		return ;
+	}
+
+#ifdef _DEBUG
+	if(!assert_handles()) return;
+#endif
 
     //
     // format the string
     //
-//    wvsprintf(buf, lpFormat, (LPSTR)(&lpFormat+1));
+    // wvsprintf(buf, lpFormat, (LPSTR)(&lpFormat+1));
     vsprintf(buf, lpFormat, (LPSTR)(&lpFormat+1));
 
     //
@@ -210,14 +239,20 @@ void cdecl DbgOut(LPSTR lpFormat, ...)
     // enable the repaint now
     //
     SendMessage(hWndDebugList, WM_SETREDRAW, (WPARAM) TRUE, (LPARAM) 0);
+	
+	// printing done, we can give the print channel to another thread
+	if(!SetEvent(hDbgPrintEvent)) {
+		LastErrorBox();
+		return ;
+	}
 }
 
 
 //
 // Format the last error and display in a MessgaeBox
 //
-
-void LastErrorBox()
+static void 
+LastErrorBox()
 {
 	LPVOID lpMsgBuf;
  
@@ -243,8 +278,8 @@ void LastErrorBox()
 //
 // Measure an item in our debug listbox
 //
-
-static void MeasureDebugItem(HWND hWnd, LPMEASUREITEMSTRUCT lpMIS)
+static void 
+MeasureDebugItem(HWND hWnd, LPMEASUREITEMSTRUCT lpMIS)
 {
     TEXTMETRIC tm;
     HDC hDC;
@@ -259,8 +294,8 @@ static void MeasureDebugItem(HWND hWnd, LPMEASUREITEMSTRUCT lpMIS)
 //
 // Display an item in our debug listbox
 //
-
-void DrawDebugItem(HWND hWnd, LPDRAWITEMSTRUCT lpDI)
+static void 
+DrawDebugItem(HWND hWnd, LPDRAWITEMSTRUCT lpDI)
 {
     HBRUSH hbrBkGnd;
     RECT rc;
@@ -309,13 +344,14 @@ void DrawDebugItem(HWND hWnd, LPDRAWITEMSTRUCT lpDI)
 // Window procedure for debug window
 //
 
-LRESULT CALLBACK DebugWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+static LRESULT CALLBACK 
+DebugWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
    HMENU hMenu;
    PAINTSTRUCT ps;
 
 #ifdef _DEBUG
-	if(!assert_globals()) return 0;
+	if(!assert_handles()) return 0;
 #endif
 
     switch(msg) {
@@ -336,7 +372,7 @@ LRESULT CALLBACK DebugWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                             0,
                             hWnd,
                             (HMENU)IDC_LIST,
-                            ghAppInstance,
+                            hAppInst,
                             (LPSTR)NULL
                             );
 
@@ -368,11 +404,11 @@ LRESULT CALLBACK DebugWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         break;
 
     case WM_DESTROY:
-        ghWndDebug = NULL;
+        hWndDebug = NULL;
         break;
 
 	case WM_SHOWWINDOW:
-		hMenu = GetMenu(ghWndMain); 
+		hMenu = GetMenu(hWndMain); 
 		if( wParam) {
 			CheckMenuItem(hMenu, ID_VIEW_CONSOLE, MF_CHECKED);
 		} else {
@@ -394,20 +430,21 @@ LRESULT CALLBACK DebugWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 // the utilities defined in this module.
 //
 #ifdef _DEBUG
-static BOOL assert_globals()
+static BOOL 
+assert_handles()
 {
-	if(NULL == gszAppName)  {
-		MessageBox(NULL,"Debug/Console library: 'gszAppName' not initalised",                    
+	if(NULL == szAppName)  {
+		MessageBox(NULL,"Debug/Console library: 'szAppName' not initalised",                    
 			"Assertion failure", 
             MB_OK | MB_ICONEXCLAMATION);
 		return FALSE;
-	} else if (0 == ghWndMain) {
-		MessageBox(NULL,"Debug/Console library: 'ghWndMain' not initalised",                    
+	} else if (0 == hWndMain) {
+		MessageBox(NULL,"Debug/Console library: 'hWndMain' not initalised",                    
 			"Assertion failure", 
             MB_OK | MB_ICONEXCLAMATION);
 		return FALSE;
-	} else if(0 == ghAppInstance) {
-		MessageBox(NULL,"Debug/Console library: 'ghAppInstance' not initalised",                    
+	} else if(0 == hAppInst) {
+		MessageBox(NULL,"Debug/Console library: 'hAppInst' not initalised",                    
 			"Assertion failure", 
             MB_OK | MB_ICONEXCLAMATION);
 		return FALSE;

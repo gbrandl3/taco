@@ -9,19 +9,21 @@
 		handle remote devices.
 
  Author(s)  :	Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original   :	April 1993
 
- Version:	$Revision: 1.21 $
+ Version:	$Revision: 1.22 $
 
- Date:		$Date: 2005-06-13 14:03:13 $
+ Date:		$Date: 2005-06-16 20:41:37 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
 
 ********************************************************************-*/
+#ifndef WIN32
 #include "config.h"
+#endif /* WIN32 */
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevServer.h>
@@ -30,7 +32,7 @@
 #include <Admin.h>
 #include <DevErrors.h>
 
-#if !defined _NT
+#if !defined WIN32
 #	if  ( OSK | _OSK )
 #		include <inet/socket.h>
 #		include <inet/netdb.h>
@@ -47,7 +49,7 @@
 #			include <netdb.h>
 #		endif 
 #	endif /* OSK | _OSK */
-#endif  /* _NT */
+#endif  /* WIN32 */
 
 /* pointer to global error message */
 extern char *dev_error_string;
@@ -943,7 +945,7 @@ long _DLLFunc dev_rpc_timeout (devserver ds, long request,
 }
 
 
-#if defined(_NT)
+#if defined(WIN32)
 /**
  * walks the heap until allocated block pointed to
  * by pointer id found and checks if heap is still OK.
@@ -988,7 +990,7 @@ int*  error;
    }
    return(ret_val);
 }
-#endif   /* _NT */
+#endif   /* WIN32 */
 
 /**ingroup clientAPIintern
  * Get the index for the nethost from the device

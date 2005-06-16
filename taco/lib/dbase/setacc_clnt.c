@@ -12,13 +12,13 @@
 	    :   This code was originally generated using "rpcgen"
 
  Author(s)  :   Emmanuel Taurel
-                $Author: jkrueger1 $
+                $Author: andy_gotz $
 
  Original   :   January 1991
 
- Version:       $Revision: 1.1 $
+ Version:       $Revision: 1.2 $
 
- Date:          $Date: 2003-04-25 11:21:42 $
+ Date:          $Date: 2005-06-16 20:43:33 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -29,7 +29,7 @@
 #include <db_setup.h>
 #include <db_xdr.h>
 
-#if defined(_NT)
+#if defined(WIN32)
 #include <rpc.h>
 #if 0
 #include <nm_rpc.h>
@@ -105,10 +105,16 @@ db_res
 
 	memset((void *)&res, 0, sizeof(res));
 
+
 	clnt_stat = clnt_call(clnt, DB_GETDEV, (xdrproc_t)xdr_nam, 
 	                      (caddr_t)argp, (xdrproc_t)xdr_db_res, 
 		              (caddr_t)&res, TIMEVAL(TimeOut));
 
+/*
+	clnt_stat = clnt_call(clnt, DB_GETDEV, (xdrproc_t)xdr_wrapstring, 
+	                      (caddr_t)argp, (xdrproc_t)xdr_db_res, 
+		              (caddr_t)&res, TIMEVAL(TimeOut));
+ */
 	if (clnt_stat != RPC_SUCCESS)
 	{
 		if (clnt_stat == RPC_TIMEDOUT)

@@ -13,9 +13,9 @@
 
  Original:	June 1990
 
- Version:	$Revision: 1.8 $
+ Version:	$Revision: 1.9 $
 
- Date:		$Date: 2005-06-05 20:43:50 $
+ Date:		$Date: 2005-06-16 20:41:37 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -26,7 +26,9 @@
  * Include files and Static Routine definitions
  */
 
+#ifndef WIN32
 #include "config.h"
+#endif /* WIN32 */
 #include <errno.h>
 
 #include <API.h>
@@ -338,7 +340,7 @@ long dev_cmd (void *ptr_ds, long cmd, DevArgument argin,  long argin_type,
                (ds, cmd, argin, argin_type, argout, argout_type, error));
 }
 
-#if !defined(_NT)
+#if !defined(WIN32)
 /**@ingroup dsAPI
  * The function supports the checking of pending  device server commands  (rpc requests) 
  * on all open sockets.  If commands are available on filedesciptors (sockets), the next 
@@ -447,5 +449,5 @@ long ds__svcrun (long *error)
 	}
 	return (DS_OK);
 }
-#endif  /* _NT */
+#endif  /* WIN32 */
 

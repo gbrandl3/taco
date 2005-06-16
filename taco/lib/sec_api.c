@@ -7,18 +7,20 @@
  Description:   Interface for the security system
 
  Author(s)  :   Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: andy_gotz $
 
  Original   :   December 1993
 
- Version    :	$Revision: 1.9 $
+ Version    :	$Revision: 1.10 $
 
- Date       :	$Date: 2005-06-13 14:06:15 $
+ Date       :	$Date: 2005-06-16 20:41:37 $
 
  Copyright (c) 1993 by European Synchrotron Radiation Facility,
                        Grenoble, France
 ********************************************************************-*/
+#ifndef WIN32
 #include "config.h"
+#endif /* WIN32 */
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevServer.h>
@@ -152,10 +154,10 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
 	static SecUserAuth	user_auth;
 	char			*user_name;
 	char			ip_str[SHORT_NAME_SIZE];
-#if !defined _UCC && !defined _NT && !defined vxworks
+#if !defined _UCC && !defined WIN32 && !defined vxworks
 	struct passwd		*passwd_info;
 	struct group		*group_info;
-#endif /* !_UCC && !_NT && !vxworks */
+#endif /* !_UCC && !WIN32 && !vxworks */
 #if !defined vxworks
 	struct hostent		*host_info;
 #else  /* !vxworks */
@@ -242,10 +244,10 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
 		}
 #endif /* OSK | _OSK */
 
-#if defined (_NT)
+#if defined (WIN32)
 		user_auth.uid = PC_USER_ID;
 		user_auth.user_name = PC_USER_NAME;
-#endif /* _NT */
+#endif /* WIN32 */
 
 #if defined (vxworks)
 		user_auth.uid = VW_USER_ID;
@@ -275,10 +277,10 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
 		user_auth.gid        = 0;
 #endif /* OSK | _OSK */
 
-#if defined (_NT)
+#if defined (WIN32)
 		user_auth.group_name = PC_GROUP_NAME;
 		user_auth.gid        = PC_GROUP_ID;
-#endif	/* _NT */
+#endif	/* WIN32 */
 
 #if defined (vxworks)
 		user_auth.group_name = VW_GROUP_NAME;
@@ -1357,15 +1359,15 @@ static long create_client_id (SecUserAuth user_auth, long *ret_client_id,
 	 * get the process ID.
 	 */
 
-#if !defined (_NT)
+#if !defined (WIN32)
 #if !defined (vxworks)
         pid = getpid ();
 #else  /* !vxworks */
         pid = taskIdSelf ();
 #endif /* !vxworks */
-#else  /* !_NT */
+#else  /* !WIN32 */
         pid = (long)_getpid();
-#endif /* !_NT */
+#endif /* !WIN32 */
 
 	/*
 	 * create the client ID.

@@ -13,9 +13,9 @@
 
  Original:	March 1990
 
- Version:	$Revision: 1.7 $
+ Version:	$Revision: 1.8 $
 
- Date:		$Date: 2005-03-29 09:47:16 $
+ Date:		$Date: 2005-06-16 20:41:37 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -37,7 +37,7 @@
  */
 #ifdef _IDENT
 static char DevServerh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServer.h,v 1.7 2005-03-29 09:47:16 andy_gotz Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServer.h,v 1.8 2005-06-16 20:41:37 andy_gotz Exp $";
 #endif /* _IDENT */
 
 typedef long DevMethod;
@@ -204,7 +204,7 @@ long dev_export  PT_( (char *dev_name, void *ptr_ds, long *error) );
  * NT stuff for DevServerMain and its various Window elements
  */
 
-#ifdef _NT
+#ifdef WIN32
 extern HINSTANCE 	ghAppInstance; /*  the application's module handle */
 extern HWND 		ghWndMain;     /*  the main window handle */
 extern char* 		gszAppName;    /*  the application's name */
@@ -235,6 +235,6 @@ typedef struct {
 	} MainWndTextDisplay;
 extern MainWndTextDisplay gMWndTxtDisplay;
 
-#endif  /* _NT */
+#endif  /* WIN32 */
 
 #endif /* _DevServer_h */
