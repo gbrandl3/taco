@@ -106,16 +106,8 @@ db_res *MySQLServer::resfamilylist_1_svc(nam* domain)
 // Get all resources family name defined in this table
 //
     std::string query;
-    if (mysql_db == "tango")
-    {
-    	query = "SELECT DISTINCT FAMILY FROM property_device WHERE DOMAIN = '";
-    	query += (user_domain + "' ORDER BY FAMILY ASC");
-    }
-    else
-    {
-    	query = "SELECT DISTINCT FAMILY FROM RESOURCE WHERE DOMAIN = '";
-    	query += (user_domain + "' ORDER BY FAMILY ASC");
-    }
+    query = "SELECT DISTINCT FAMILY FROM property_device WHERE DOMAIN = '";
+    query += (user_domain + "' ORDER BY FAMILY ASC");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	std::cerr << mysql_error(mysql_conn) << std::endl;
@@ -195,16 +187,8 @@ db_res *MySQLServer::resmemberlist_1_svc(db_res *recev)
 // Get all resources family name defined in this table
 //
     std::string query;
-    if (mysql_db == "tango")
-    {
-    	query = "SELECT DISTINCT MEMBER FROM property_device WHERE DOMAIN = '";
-    	query += (user_domain + "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC");
-    }
-    else
-    {
-    	query = "SELECT DISTINCT MEMBER FROM RESOURCE WHERE DOMAIN = '";
-    	query += (user_domain + "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC");
-    }
+    query = "SELECT DISTINCT MEMBER FROM property_device WHERE DOMAIN = '";
+    query += (user_domain + "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	std::cerr << mysql_error(mysql_conn) << std::endl;
@@ -288,14 +272,7 @@ db_res *MySQLServer::resresolist_1_svc(db_res *recev)
 //
     std::string query;
 
-	if (mysql_db == "tango")
-	{
-		query = "SELECT DISTINCT NAME FROM property_device WHERE DOMAIN = '";
-	}
-	else
-	{
-		query = "SELECT DISTINCT NAME FROM RESOURCE WHERE DOMAIN = '";
-	}
+	query = "SELECT DISTINCT NAME FROM property_device WHERE DOMAIN = '";
     	query += (user_domain + "' AND FAMILY = '" + user_family);
 	if (user_member != "*")
 	{
@@ -391,26 +368,13 @@ db_res *MySQLServer::resresoval_1_svc(db_res *recev)
 //
     std::string query;
 
-    if (mysql_db == "tango")
-    {
-    	query = "SELECT MEMBER, NAME, COUNT, VALUE FROM property_device WHERE ";
-    	query += (" DOMAIN = '" + user_domain + "' AND FAMILY = '" + user_family + "'");
-        if (user_member != "*")
+    query = "SELECT MEMBER, NAME, COUNT, VALUE FROM property_device WHERE ";
+    query += (" DOMAIN = '" + user_domain + "' AND FAMILY = '" + user_family + "'");
+    if (user_member != "*")
     	    query += (" AND MEMBER = '" + user_member + "'");
-        if (user_reso != "*")
+    if (user_reso != "*")
 	    query += (" AND NAME = '" + user_reso + "'");
-        query += (" ORDER BY MEMBER ASC, NAME ASC, COUNT ASC");
-    }
-    else
-    {
-    	query = "SELECT MEMBER, NAME, INDEX_RES, RESVAL FROM RESOURCE WHERE ";
-    	query += (" DOMAIN = '" + user_domain + "' AND FAMILY = '" + user_family + "'");
-        if (user_member != "*")
-    	    query += (" AND MEMBER = '" + user_member + "'");
-        if (user_reso != "*")
-	    query += (" AND NAME = '" + user_reso + "'");
-        query += (" ORDER BY MEMBER ASC, NAME ASC, INDEX_RES ASC");
-    }
+    query += (" ORDER BY MEMBER ASC, NAME ASC, COUNT ASC");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	std::cerr << mysql_error(mysql_conn) << std::endl;

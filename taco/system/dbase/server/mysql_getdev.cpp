@@ -71,14 +71,7 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 //
     std::string tmpf(*fil_name);
     std::string query;
-    if (mysql_db == "tango")
-    {
-        query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM device WHERE ";
-    }
-    else
-    {
-        query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM NAMES WHERE ";
-    }
+    query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM device WHERE ";
 /*
  * replace * with mysql wildcard %
  */
@@ -100,50 +93,22 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 		 pos = tmpf.find('/', 1 + (last_pos = pos));
 		 family = tmpf.substr(last_pos + 1, (pos - last_pos));
 		 member = tmpf.substr(pos + 1);
-		 if (mysql_db == "tango")
-                 {
-		     query += (" CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) LIKE '" + tmpf + "'");
-                 }
-                 else
-                 {
-		     query += (" CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) LIKE '" + tmpf + "'");
-                 }
+		 query += (" CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) LIKE '" + tmpf + "'");
 		 break;
 	case 1 : pos = tmpf.find('/');
 		 domain = tmpf.substr(0, pos);	
 		 family = tmpf.substr(pos + 1);
-		 if (mysql_db == "tango")
-                 {
-		     query += (" CONCAT(DOMAIN, '/', FAMILY) LIKE '" + tmpf + "'");
-                 }
-                 else
-                 {
-		     query += (" CONCAT(DOMAIN, '/', FAMILY) LIKE '" + tmpf + "'");
-                 }
+		 query += (" CONCAT(DOMAIN, '/', FAMILY) LIKE '" + tmpf + "'");
 		 break;
 	case 0 : domain = tmpf;		
-                 if (mysql_db == "tango")
-                 {
-		     query += (" DOMAIN LIKE '" + tmpf + "'");
-                 }
-                 else
-                 {
-		     query += (" DOMAIN LIKE '" + tmpf + "'");
-                 }
+		 query += (" DOMAIN LIKE '" + tmpf + "'");
 		 break;
 	default: std::cerr << "To many '/' in device name." << std::endl;
 		 browse_back.db_err = 1;
 		 browse_back.res_val.arr1_len = 0;
 		 return (&browse_back);		 		 
     }
-    if (mysql_db == "tango")
-    {
-        query += (" AND EXPORTED != 0 AND IOR LIKE 'rpc:%'");
-    }
-    else
-    {
-        query += (" AND PROGRAM_NUMBER != 0");
-    }
+    query += (" AND EXPORTED != 0 AND IOR LIKE 'rpc:%'");
 #ifdef DEBUG
     std::cout << "filter domain : " << domain << std::endl;
     std::cout << "filter family : " << family << std::endl;

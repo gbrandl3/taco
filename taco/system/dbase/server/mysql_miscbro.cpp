@@ -39,14 +39,7 @@ db_res *MySQLServer::devserverlist_1_svc()
 // Sort device server name list
 //
     std::string query;
-    if (mysql_db == "tango")
-    {
-        query = "SELECT DISTINCT SUBSTRING_INDEX(SERVER,'/',1) FROM device ORDER BY SERVER ASC";
-    }
-    else
-    {
-        query = "SELECT DISTINCT DEVICE_SERVER_CLASS FROM NAMES ORDER BY DEVICE_SERVER_CLASS ASC";
-    }
+    query = "SELECT DISTINCT SUBSTRING_INDEX(SERVER,'/',1) FROM device ORDER BY SERVER ASC";
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	std::cerr << mysql_error(mysql_conn) << std::endl;
@@ -131,16 +124,8 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
 //
     std::string query;
 
-    if (mysql_db == "tango")
-    {
-        query = "SELECT DISTINCT SUBSTRING_INDEX(SERVER,'/',-1) FROM device WHERE SERVER like '";
-        query += (user_server + "/%' ORDER BY SERVER ASC");
-    }
-    else
-    {
-        query = "SELECT DISTINCT DEVICE_SERVER_NAME FROM NAMES WHERE DEVICE_SERVER_CLASS = '";
-        query += (user_server + "' ORDER BY DEVICE_SERVER_NAME ASC");
-    }
+    query = "SELECT DISTINCT SUBSTRING_INDEX(SERVER,'/',-1) FROM device WHERE SERVER like '";
+    query += (user_server + "/%' ORDER BY SERVER ASC");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	std::cerr << mysql_error(mysql_conn) << std::endl;
@@ -219,14 +204,7 @@ db_res *MySQLServer::hostlist_1_svc()
 // and sort device server host list
 //
 	std::string query;
-	if (mysql_db == "tango")
-	{
-		query = "SELECT DISTINCT HOST FROM device WHERE EXPORTED != 0 ORDER BY HOST ASC";
-	}
-	else
-	{
-		query = "SELECT DISTINCT HOSTNAME FROM NAMES WHERE HOSTNAME != 'not_exp' ORDER BY HOSTNAME ASC";
-	}
+	query = "SELECT DISTINCT HOST FROM device WHERE EXPORTED != 0 ORDER BY HOST ASC";
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
 		std::cerr << mysql_error(mysql_conn) << std::endl;

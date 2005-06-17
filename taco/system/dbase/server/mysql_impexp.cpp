@@ -217,17 +217,9 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
 //
 	    std::string dev_name(de_name->arr1_val[i]);
 	    std::string query;
-            if (mysql_db == "tango")
-	    {
-	        query = "SELECT HOST, IOR, VERSION, CLASS";
-	        query += (" FROM device WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + dev_name + "'" );
-	        query += (" AND IOR LIKE 'rpc:%'");
-            }
-            else
-            {
-	        query = "SELECT HOSTNAME, PROGRAM_NUMBER, VERSION_NUMBER, DEVICE_TYPE, DEVICE_CLASS";
-	        query += (" FROM NAMES WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + dev_name + "'");
-            }
+	    query = "SELECT HOST, IOR, VERSION, CLASS";
+	    query += (" FROM device WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + dev_name + "'" );
+	    query += (" AND IOR LIKE 'rpc:%'");
 	    if (mysql_query(mysql_conn, query.c_str()) != 0)
 	    {
 /*
@@ -260,21 +252,12 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
 // Unpack the content 
 //
 	    	    ret_host_name = row[0];
-                    if (mysql_db == "tango")
-                    {
-		    	std::string ior(row[1]);
-			std::string pgm_no;
-			pgm_no = ior.substr(ior.rfind(':')+1);
-                        ret_pn = atoi(pgm_no.c_str());
-                        ret_dev_type = "DevType_Default";
-                        ret_dev_class = row[3];
-                    }
-                    else
-                    {
-	    	        ret_pn = atoi(row[1]);
-	    	        ret_dev_type = row[3];
-	    	        ret_dev_class = row[4];
-                    }
+		    std::string ior(row[1]);
+		    std::string pgm_no;
+		    pgm_no = ior.substr(ior.rfind(':')+1);
+                    ret_pn = atoi(pgm_no.c_str());
+                    ret_dev_type = "DevType_Default";
+                    ret_dev_class = row[3];
 	    	    ret_vn = atoi(row[2]);
 	    	}
 //
@@ -404,18 +387,8 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
 // the device server process name, do a full traversal of the database 
 //
     std::string query;
-    if (mysql_db == "tango")
-    {
-        query = "UPDATE device SET EXPORTED = 0 WHERE";
-        query += (" SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
-    }
-    else
-    {
-        query = "UPDATE NAMES SET PROGRAM_NUMBER = 0, VERSION_NUMBER = 0,";
-        query += (" DEVICE_TYPE = 'unknown', PROCESS_ID = 0 WHERE");
-        query += (" DEVICE_SERVER_CLASS = '" + ds_class + "' AND");
-        query += (" PROCESS_NAME = '" + ds_name + "' AND PROCESS_ID != 0");
-    }
+    query = "UPDATE device SET EXPORTED = 0 WHERE";
+    query += (" SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
 #ifdef DEBUG
     std::cout << "MySQLServer::db_svcunr_1_svc(): query = " << query << std::endl;
 #endif /* DEBUG */
@@ -432,18 +405,8 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
 //
     if ((d_num = mysql_affected_rows(mysql_conn)) == 0)
     {
-        if (mysql_db == "tango")
-        {
-            query = "UPDATE device SET EXPORTED = 0 WHERE";
-            query += (" SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
-        }
-        else
-        {
-     	    query = "UPDATE NAMES SET PROGRAM_NUMBER = 0, VERSION_NUMBER = 0,";
-    	    query += (" DEVICE_TYPE = 'unknown', PROCESS_ID = 0 WHERE");
-	    query += (" DEVICE_SERVER_CLASS = '" + ds_class + "' AND");
-	    query += (" DEVICE_SERVER_NAME = '" + ds_name + "'");
-        }
+        query = "UPDATE device SET EXPORTED = 0 WHERE";
+        query += (" SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
 #ifdef DEBUG
         std::cout << "MySQLServer::db_svcunr_1_svc(): query = " << query << std::endl;
 #endif /* DEBUG */
@@ -525,18 +488,8 @@ svc_inf *MySQLServer::db_svcchk_1_svc(nam *dsn_name)
 // Initialization needed to retrieve the right tuples in the NAMES table 
 //
     std::string query;
-    if (mysql_db == "tango")
-    {
-        query = "SELECT HOST, IOR, VERSION FROM device WHERE";
-        query += (" SERVER = '" + ds_class + "/" + ds_name + "'");
-    }
-    else
-    {
-        query = "SELECT HOSTNAME, PROGRAM_NUMBER, VERSION_NUMBER FROM NAMES WHERE";
-        query += (" DEVICE_SERVER_CLASS = '" + ds_class + "' AND");
-        query += (" DEVICE_SERVER_NAME = '" + ds_name + "' AND");
-        query += (" INDEX_NUMBER = 1");
-    }
+    query = "SELECT HOST, IOR, VERSION FROM device WHERE";
+    query += (" SERVER = '" + ds_class + "/" + ds_name + "'");
 //
 // Try to retrieve the tuples 
 //
@@ -580,25 +533,12 @@ int MySQLServer::db_store(db_devinfo &dev_stu)
 // Try to retrieve the right tuple in the NAMES table 
 //
     std::stringstream query;
-    if (mysql_db == "tango")
-    {
-        query << "UPDATE device SET HOST = '" << dev_stu.host_name <<  "',"
+    query << "UPDATE device SET HOST = '" << dev_stu.host_name <<  "',"
           << " IOR = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
           << " VERSION = '" << dev_stu.v_num << "',"
           << " CLASS = '" << dev_stu.dev_class << "',"
           << " PID = 0 , SERVER = 'unknown'"
           << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << std::ends; 	
-    }
-    else
-    {
-        query << "UPDATE NAMES SET HOSTNAME = '" << dev_stu.host_name <<  "',"
-          << " PROGRAM_NUMBER = " << dev_stu.p_num << ","
-          << " VERSION_NUMBER = " << dev_stu.v_num << ","
-          << " DEVICE_TYPE = '" << dev_stu.dev_type << "',"
-          << " DEVICE_CLASS = '" << dev_stu.dev_class << "',"
-          << " PROCESS_ID = 0, PROCESS_NAME = 'unknown'"
-          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << std::ends; 	
-    }
     try
     {
 #if !HAVE_SSTREAM
@@ -638,25 +578,12 @@ int MySQLServer::db_store(db_devinfo_2 &dev_stu)
 // Try to retrieve the right tuple in the NAMES table 
 //
     std::stringstream query;
-    if (mysql_db == "tango")
-    {
-        query << "UPDATE device SET HOST = '" << dev_stu.host_name <<  "',"
+    query << "UPDATE device SET HOST = '" << dev_stu.host_name <<  "',"
           << " IOR = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
           << " VERSION = '" << dev_stu.v_num << "',"
           << " CLASS = '" << dev_stu.dev_class << "',"
           << " PID = " << dev_stu.pid << ", SERVER = 'unknown'"
           << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', member) = '" << dev_stu.dev_name << "'" << std::ends; 	
-    }
-    else
-    {
-        query << "UPDATE NAMES SET HOSTNAME = '" << dev_stu.host_name <<  "',"
-          << " PROGRAM_NUMBER = " << dev_stu.p_num << ","
-          << " VERSION_NUMBER = " << dev_stu.v_num << ","
-          << " DEVICE_TYPE = '" << dev_stu.dev_type << "',"
-          << " DEVICE_CLASS = '" << dev_stu.dev_class << "',"
-          << " PROCESS_ID = " << dev_stu.pid << ", PROCESS_NAME = 'unknown'" 
-          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << std::ends; 	
-    }
 
     try
     {
@@ -697,9 +624,7 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
 // Try to retrieve the right tuple in the NAMES table 
 //
     std::stringstream query;
-    if (mysql_db == "tango")
-    {
-        query << "UPDATE device SET HOST = '" << dev_stu.host_name <<  "',"
+    query << "UPDATE device SET HOST = '" << dev_stu.host_name <<  "',"
           << " IOR = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
           << " VERSION = '" << dev_stu.v_num << "',"
           << " CLASS = '" << dev_stu.dev_class << "',"
@@ -707,17 +632,6 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
           << " PID = " << dev_stu.pid << ","
 	  << " EXPORTED = 1" 
           << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << std::ends; 	
-    }
-    else
-    {
-        query << "UPDATE NAMES SET HOSTNAME = '" << dev_stu.host_name <<  "',"
-          << " PROGRAM_NUMBER = " << dev_stu.p_num << ","
-          << " VERSION_NUMBER = " << dev_stu.v_num << ","
-          << " DEVICE_TYPE = '" << dev_stu.dev_type << "',"
-          << " DEVICE_CLASS = '" << dev_stu.dev_class << "',"
-          << " PROCESS_ID = " << dev_stu.pid << ", PROCESS_NAME = '" << dev_stu.proc_name << "'"
-          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << std::ends; 	
-    }
 #ifdef DEBUG
     std::cout << "MySQLServer::db_store(): query = " << query.str() << std::endl;
 #endif /* DEBUG */

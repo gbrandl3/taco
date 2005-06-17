@@ -46,18 +46,8 @@ cmd_que *MySQLServer::db_cmd_query_1_svc(nam *pcmd_name)
 // Try to retrieve a resource in the CMDS table with a resource value equal
 // to the command name 
 //
-    std::string query;
-
-    if (mysql_db == "tango")
-    {
-    	query = "SELECT FAMILY, MEMBER, NAME FROM property_device WHERE ";
-	query += ("DOMAIN = 'cmds' AND VALUE = '" + req_cmd + "'");
-    }
-    else
-    {
-    	query = "SELECT FAMILY, MEMBER, NAME FROM RESOURCE WHERE ";
-    	query += ("DOMAIN = 'cmds' AND RESVAL = '" + req_cmd + "'");
-    }
+    std::string query = "SELECT FAMILY, MEMBER, NAME FROM property_device WHERE ";
+    query += ("DOMAIN = 'cmds' AND VALUE = '" + req_cmd + "'");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	std::cerr << mysql_error(mysql_conn) << std::endl;

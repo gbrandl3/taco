@@ -99,14 +99,7 @@ long MySQLServer::reg_ps(std::string h_name, long pid, std::string ps_name, long
 // for a real device 
 //
 	std::string query; 
-	if (mysql_db == "tango")
-	{
-    		query = "SELECT COUNT(*) FROM device WHERE NAME = '" + ps_name_low + "' AND CLASS NOT LIKE 'PseudoDevice'";
-	}
-	else
-	{
-    		query = "SELECT COUNT(*) FROM NAMES WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + ps_name_low + "'";
-	}
+    	query = "SELECT COUNT(*) FROM device WHERE NAME = '" + ps_name_low + "' AND CLASS NOT LIKE 'PseudoDevice'";
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
 		std::cerr << mysql_error(mysql_conn) << std::endl; 
@@ -140,16 +133,8 @@ long MySQLServer::reg_ps(std::string h_name, long pid, std::string ps_name, long
     std::stringstream strquery;
     try
     {
-	if (mysql_db == "tango")
-        {
-    	    strquery << "UPDATE device SET HOST = '" << h_name << "', PID = " << pid << " IOR = 'DC:" << poll << "'"
+    	strquery << "UPDATE device SET HOST = '" << h_name << "', PID = " << pid << " IOR = 'DC:" << poll << "'"
 	      << " WHERE DEVICE = '" << ps_name_low << "'" << std::ends;
-	}
-	else
-	{
-    	    strquery << "UPDATE PS_NAMES SET HOST = '" << h_name << "', PROCESS_ID = " << pid << " POLL = " << poll
-	      << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << ps_name_low << "'" << std::ends;
-	}
 #if !HAVE_SSTREAM
     	if (mysql_query(mysql_conn, strquery.str()) != 0)
 #else
@@ -186,18 +171,9 @@ long MySQLServer::reg_ps(std::string h_name, long pid, std::string ps_name, long
 		member = ps_name_low.substr(last_pos, (pos - last_pos));
 
 	    strquery.seekp(0);
-	    if (mysql_db == "tango")
-	    {
-		strquery << "INSERT INTO device (NAME, DOMAIN, FAMILY, MEMBER, HOST, PID, IOR, EXPORTED, SERVER, CLASS, VERSION) VALUES('"
+	    strquery << "INSERT INTO device (NAME, DOMAIN, FAMILY, MEMBER, HOST, PID, IOR, EXPORTED, SERVER, CLASS, VERSION) VALUES('"
                    << ps_name_low << "', '" << domain << "', '" << family << "', '" << member << "', '" << h_name << "', "
 		   << pid << ", 'DC:" << poll << "',1,'DataCollector','PseudoDevice',1)" << std::ends;
-	    }
-	    else
-	    {
-		strquery << "INSERT INTO PS_NAMES (DOMAIN, FAMILY, MEMBER, HOST, PROCESS_ID, POLL) VALUES('"
-	  	   << domain << "', '" << family << "', '" << member << "', '" << h_name << "', " 
-		   << pid << ", " << poll << ")" << std::ends;
-	    }
 #if !HAVE_SSTREAM
 	    if (mysql_query(mysql_conn, strquery.str()) != 0)
 	    	throw long(DbErr_DatabaseAccess);
@@ -305,14 +281,7 @@ long MySQLServer::unreg_ps(std::string ps_name, long *p_error)
 // Retrieve a tuple in the PS_NAMES table with the same pseudo device name 
 //
     std::string query;
-    if (mysql_db == "tango")
-    {
-        query = "DELETE FROM device WHERE NAME = '" + ps_name_low + "'";
-    }
-    else
-    {
-        query = "DELETE FROM PS_NAMES WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + ps_name_low + "'";
-    }
+    query = "DELETE FROM device WHERE NAME = '" + ps_name_low + "'";
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	std::cerr << mysql_error(mysql_conn) << std::endl;

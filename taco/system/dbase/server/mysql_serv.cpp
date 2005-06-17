@@ -270,18 +270,9 @@ int MySQLServer::db_find(std::string tab_name, std::string p_res_name, char **ou
 // array of resources 
 //
     std::string query;
-    if (mysql_db == "tango")
-    {
-        query = "SELECT COUNT, VALUE FROM property_device ";
-        query += ("WHERE DEVICE = '" + tab_name + "/" + family + "/" + member + "' AND NAME = '" + r_name);
-        query += "' ORDER BY COUNT ASC";
-    }
-    else
-    {
-        query = "SELECT INDEX_RES, RESVAL FROM RESOURCE WHERE DOMAIN = '" + tab_name ;
-        query += ("' AND FAMILY = '" + family + "' AND MEMBER = '" + member + "' AND NAME = '" + r_name);
-        query += "' ORDER BY INDEX_RES ASC";
-    }
+    query = "SELECT COUNT, VALUE FROM property_device ";
+    query += ("WHERE DEVICE = '" + tab_name + "/" + family + "/" + member + "' AND NAME = '" + r_name);
+    query += "' ORDER BY COUNT ASC";
 #ifdef DEBUG
     std::cout << "MySQLServer::db_find(): query = " << query << std::endl;
 #endif /* DEBUG */
@@ -395,14 +386,8 @@ int MySQLServer::db_devlist(std::string dev_na, int *dev_num, db_res *back)
 //
 //  
     std::string query;
-    if (mysql_db == "tango")
-    {
-    	query = "SELECT NAME FROM device WHERE SERVER = '" + ds_class + "/" + ds_name + "'";
-    }
-    else
-    {
-    	query = "SELECT DEVICENAME FROM NAMES WHERE DEVICE_SERVER_CLASS = '" + ds_class + "' AND DEVICE_SERVER_NAME = '" + ds_name + "'";
-    }
+    query = "SELECT NAME FROM device WHERE SERVER = '" + ds_class + "/" + ds_name + "'";
+    query = "SELECT DEVICENAME FROM NAMES WHERE DEVICE_SERVER_CLASS = '" + ds_class + "' AND DEVICE_SERVER_NAME = '" + ds_name + "'";
 #ifdef DEBUG
     std::cout << "MySQLServer::db_devlist(): query " << query << std::endl;
 #endif /* DEBUG */
@@ -697,17 +682,9 @@ int MySQLServer::db_insert(std::string res_name, std::string number, std::string
 	return(DbErr_DomainDefinition);
 //
     std::string query;
-    if (mysql_db == "tango")
-    {
-        query = "INSERT INTO property_device(DEVICE,NAME,DOMAIN,FAMILY,MEMBER,COUNT,VALUE) VALUES('" + domain + "/" + family + "/" + member + "','" + r_name + "','"; 
-	query += (domain + "','" + family +"','" + member + "','");
-        query += (number + "','" + content + "')");
-    }
-    else
-    {
-        query = "INSERT INTO RESOURCE VALUES('" + domain + "','" + family + "','" + member + "','"; 
-        query += (r_name + "','" + number + "','" + content + "')");
-    }
+    query = "INSERT INTO property_device(DEVICE,NAME,DOMAIN,FAMILY,MEMBER,COUNT,VALUE) VALUES('" + domain + "/" + family + "/" + member + "','" + r_name + "','"; 
+    query += (domain + "','" + family +"','" + member + "','");
+    query += (number + "','" + content + "')");
 #ifdef DEBUG
     std::cout << "MySQLServer::db_insert(): query = " << query;
 #endif /* DEBUG */
@@ -792,16 +769,8 @@ int MySQLServer::db_del(std::string res_name)
 // array of resource 
 //
     std::string query;
-    if (mysql_db == "tango")
-    {
-        query = "DELETE FROM property_device WHERE DEVICE = '" + t_name + "/" + family + "/" + member + "'";
-	query += " AND NAME = '" + r_name + "'";
-    }
-    else
-    {
-        query = "DELETE FROM RESOURCE WHERE DOMAIN = " + t_name + " AND FAMILY = ";
-        query += (family + " AND MEMBER = " + member + " NAME = " + r_name);
-    }
+    query = "DELETE FROM property_device WHERE DEVICE = '" + t_name + "/" + family + "/" + member + "'";
+    query += " AND NAME = '" + r_name + "'";
 
 #ifdef DEBUG
     std::cout << "db_del : query = " << query << std::endl;

@@ -75,17 +75,8 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 	}
 	dev_list.push_back(lin);
 
-	std::string query;
-	if (mysql_db == "tango")
-	{
-            query = "SELECT NAME FROM device WHERE ";
-            query += (" SERVER LIKE '" + ds_class + "/" + ds_name + "'");
-	}
-	else
-	{
-	    query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER), INDEX_NUMBER  FROM NAMES WHERE DEVICE_SERVER_CLASS = '";
-	    query += ( ds_class + "' AND DEVICE_SERVER_NAME = '" + ds_name + "' ORDER BY INDEX_NUMBER ASC");
-	}
+	std::string query = "SELECT NAME FROM device WHERE ";
+        query += (" SERVER LIKE '" + ds_class + "/" + ds_name + "'");
 #ifdef DEBUG
         std::cout << "MySQLServer::upddev_1_svc(): query = " << query << std::endl;
 #endif /* DEBUG */
@@ -147,33 +138,30 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 //
 // Delete devices which the same name but registered for other servers
 //
-	if (mysql_db == "tango")
+	for (std::vector<std::string>::iterator it = dev_list.begin(); it != dev_list.end(); ++it)
 	{
-		for (std::vector<std::string>::iterator it = dev_list.begin(); it != dev_list.end(); ++it)
-		{
 #ifdef DEBUG
-			std::cout << "Checking device : "<< *it << std::endl;
+		std::cout << "Checking device : "<< *it << std::endl;
 #endif
 // if device was not exported by the same server
-			if ( ( find(db_dev_list.begin(), db_dev_list.end(), *it)) == db_dev_list.end() )
-                        {
+		if ( ( find(db_dev_list.begin(), db_dev_list.end(), *it)) == db_dev_list.end() )
+                {
 #ifdef DEBUG
-				std::cout << "Not found -> delete" << std::endl;
+			std::cout << "Not found -> delete" << std::endl;
 #endif
 // clean it from the database if an entry exists
-				query = "DELETE FROM device WHERE NAME = '" + *it + "'";
-				if (mysql_query(mysql_conn, query.c_str()) != 0)
-                                {
-					std::cerr << mysql_error(mysql_conn) << std::endl;
-					psdev_back.error_code = DbErr_DatabaseAccess;
-					psdev_back.psdev_err = i + 1;
-					return (&psdev_back);
-				}
-#ifdef DEBUG
-				if (mysql_affected_rows(mysql_conn) == 1)
-					std::cout << "Deleted existing device : "<< *it << std::endl;
-#endif
+			query = "DELETE FROM device WHERE NAME = '" + *it + "'";
+			if (mysql_query(mysql_conn, query.c_str()) != 0)
+                        {
+				std::cerr << mysql_error(mysql_conn) << std::endl;
+				psdev_back.error_code = DbErr_DatabaseAccess;
+				psdev_back.psdev_err = i + 1;
+				return (&psdev_back);
 			}
+#ifdef DEBUG
+			if (mysql_affected_rows(mysql_conn) == 1)
+				std::cout << "Deleted existing device : "<< *it << std::endl;
+#endif
 		}
 	}
 
@@ -205,40 +193,8 @@ long MySQLServer::db_update_names(const std::string ds_class, const std::string 
     if (count(dev_name.begin(), dev_name.end(), '/') != 2)
 	return DbErr_BadResourceType;
     std::stringstream query;
-
-    if (mysql_db == "tango")
-    {
-
 // the TANGO database does not have an index number in the device table therefore do nothing
-
-	return 0;
-    }
-    else
-    {
-        query << "UPDATE NAMES SET INDEX_NUMBER = " << ind 
-	      << " WHERE DEVICE_SERVER_CLASS = '" << ds_class << "' AND DEVICE_SERVER_NAME = '" << ds_name
-	      << "' AND CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_name <<"'" << std::ends;
-
-#if !HAVE_SSTREAM    
-        if (mysql_query(mysql_conn, query.str()) != 0)
-#else
-        if (mysql_query(mysql_conn, query.str().c_str()) != 0)
-#endif
-        {
-	    std::cerr << __LINE__ << mysql_error(mysql_conn) << std::endl;
-#if !HAVE_SSTREAM
-	    query.freeze(false);
-#endif
-	    return DbErr_DatabaseAccess;
-        }
-#if !HAVE_SSTREAM    
-        query.freeze(false);
-#endif
-        if (mysql_affected_rows(mysql_conn) == 1)
-	    return 0;
-        else
-	    return DbErr_DeviceNotDefined;
-    }
+    return 0;
 }
 
 /**
@@ -256,17 +212,8 @@ long MySQLServer::db_delete_names(const std::string ds_class, const std::string 
     if (count(dev_name.begin(), dev_name.end(), '/') != 2)
 	return DbErr_BadResourceType;
 
-    std::string query;
-    if (mysql_db == "tango")
-    {
-	query = "DELETE FROM device WHERE SERVER LIKE '" + ds_class + "/" + ds_name
+    std::string query = "DELETE FROM device WHERE SERVER LIKE '" + ds_class + "/" + ds_name
                          + "' AND NAME = '" + dev_name + "'";
-    }
-    else
-    {
-        query = "DELETE FROM NAMES WHERE DEVICE_SERVER_CLASS = '" + ds_class + "' AND DEVICE_SERVER_NAME = '"
-	       + ds_name + "' AND CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + dev_name + "'";
-    }
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	std::cerr << __LINE__ << mysql_error(mysql_conn) << std::endl;
@@ -307,24 +254,15 @@ long MySQLServer::db_insert_names(const std::string ds_class, const std::string 
     pos = dev_name.find('/', (last_pos = pos + 1));
     member = dev_name.substr(last_pos, (pos - last_pos));
 
-    if (mysql_db == "tango")
-    {
-        query << "INSERT INTO device(NAME, CLASS, SERVER, DOMAIN, FAMILY, MEMBER, IOR, PID, VERSION, EXPORTED)"
+    query << "INSERT INTO device(NAME, CLASS, SERVER, DOMAIN, FAMILY, MEMBER, IOR, PID, VERSION, EXPORTED)"
 	      << " VALUES('" << domain << "/" << family << "/" << member << "','" 
 	      << ds_class << "', '" << ds_class << "/" << ds_name << "', '" << domain << "', '" << family
 	      << "', '" << member << "', 'nada', 0, 0, 0)" << std::ends;
 //	      << "', '" << member << "', 'rpc::0', 0, 0, 0)" << std::ends;
 
 #if DEBUG
-        std::cout << query.str() << std::endl;
+    std::cout << query.str() << std::endl;
 #endif
-    }
-    else
-    {
-        query << "INSERT INTO NAMES(DEVICE_SERVER_CLASS, DEVICE_SERVER_NAME, INDEX_NUMBER, DOMAIN, FAMILY, MEMBER)"
-	      << " VALUES('" << ds_class << "', '" << ds_name << "', " << ind << ", '" << domain << "', '" << family
-	      << "', '" << member << "')" << std::ends;
-    }
 #if !HAVE_SSTREAM
     if (mysql_query(mysql_conn, query.str()) != 0)
 #else
@@ -552,17 +490,8 @@ long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
 //
     if (val == "%" || !array)
     {
-	std::string query;
-        if (mysql_db == "tango")
-        {
-            query = "DELETE FROM property_device WHERE DEVICE = '" + domain + "/" + family + "/" + member + "'";
-            query += " AND NAME = '" + name + "'";
-        }
-        else
-        {
-	    std::string query = "DELETE FROM RESOURCE WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER, '/', NAME) = '";
-	    query += (domain + '/' + family + '/' + member + '/' + name + "'");
-        }                                                                
+	std::string query = "DELETE FROM property_device WHERE DEVICE = '" + domain + "/" + family + "/" + member + "'";
+        query += " AND NAME = '" + name + "'";
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
 	    std::cerr << __LINE__ << mysql_error(mysql_conn) << std::endl;
@@ -577,19 +506,10 @@ long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
 	if (val != "%")
 	{
     		std::stringstream query;
-    		if (mysql_db == "tango")
-    		{
-			query << "INSERT INTO property_device(DEVICE,NAME,DOMAIN,FAMILY,MEMBER,COUNT,VALUE) VALUES('"
+		query << "INSERT INTO property_device(DEVICE,NAME,DOMAIN,FAMILY,MEMBER,COUNT,VALUE) VALUES('"
 			<< domain << "/" << family << "/" << member << "','" << name << "','"
 			<< domain << "','" << family << "','" << member << "','" 
 			<< numb << "',\"" << val << "\")" << std::ends;
-		}
-		else
-    		{
-			query << "INSERT INTO RESOURCE(DOMAIN, FAMILY, MEMBER, NAME, INDEX_RES, RESVAL) VALUES('"
-				<< domain << "', '" << family << "', '" << member << "', '" << name << "', " << numb
-				<< ", '" << val << "')" << std::ends;
-		}
 #ifdef DEBUG
 		std::cout << "MySQLServer::upd_res(): query = " << query.str() << std::endl;
 #endif /* DEBUG */

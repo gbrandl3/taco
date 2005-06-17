@@ -34,15 +34,7 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
 //
 // Get the domain name list from the NAMES table
 //
-    std::string query;
-    if (mysql_db == "tango")
-    {
-        query = "SELECT DISTINCT DOMAIN FROM device ORDER BY DOMAIN ASC";
-    }
-    else
-    {
-        query = "SELECT DISTINCT DOMAIN FROM NAMES ORDER BY DOMAIN ASC";
-    }
+    std::string query = "SELECT DISTINCT DOMAIN FROM device ORDER BY DOMAIN ASC";
 #ifdef DEBUG
     std::cout << "MySQLServer::devdomainlist_1_svc(): query " << query << std::endl;
 #endif /* DEBUG */
@@ -58,21 +50,6 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
     while((row = mysql_fetch_row(result)) != NULL)
     	dom_list.push_back(row[0]);
     mysql_free_result(result);
-
-    if (mysql_db != "tango")
-    {
-        query = "SELECT DISTINCT DOMAIN FROM PS_NAMES ORDER BY DOMAIN ASC";
-        if (mysql_query(mysql_conn, query.c_str()) != 0)
-        {
-	    std::cerr << mysql_error(mysql_conn) << std::endl;
-	    browse_back.db_err = DbErr_DatabaseAccess;
-	    return (&browse_back);
-        }
-        result = mysql_store_result(mysql_conn);
-        while((row = mysql_fetch_row(result)) != NULL)
-    	    dom_list.push_back(row[0]);
-        mysql_free_result(result);
-    }
 
 //
 // Build the structure returned to caller
@@ -133,15 +110,7 @@ db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
 //
 // Get the family name list for the wanted domain in the NAMES table
 //
-    std::string query;
-    if (mysql_db == "tango")
-    {
-        query = "SELECT DISTINCT FAMILY FROM device WHERE DOMAIN = '" + user_domain + "' ORDER BY FAMILY ASC";
-    }
-    else
-    {
-        query = "SELECT DISTINCT FAMILY FROM NAMES WHERE DOMAIN = '" + user_domain + "' ORDER BY FAMILY ASC";
-    }
+    std::string query = "SELECT DISTINCT FAMILY FROM device WHERE DOMAIN = '" + user_domain + "' ORDER BY FAMILY ASC";
 #ifdef DEBUG
     std::cout << "MySQLServer::devfamilylist_1_svc(): query " << query << std::endl;
 #endif /* DEBUG */
@@ -157,27 +126,6 @@ db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
     while((row = mysql_fetch_row(result)) != NULL)
     	fam_list.push_back(row[0]);
     mysql_free_result(result);
-//
-// Add family name list for the wanted domain in from the PS_NAMES table
-//
-    if (mysql_db != "tango")
-    {
-        query = "SELECT DISTINCT FAMILY FROM PS_NAMES WHERE DOMAIN = '" + user_domain + "' ORDER BY FAMILY ASC";
-        if (mysql_query(mysql_conn, query.c_str()) != 0)
-        {
-	    std::cerr << mysql_error(mysql_conn) << std::endl;
-	    browse_back.db_err = DbErr_DatabaseAccess;
-	    return (&browse_back);
-        }
-        result = mysql_store_result(mysql_conn);
-        while((row = mysql_fetch_row(result)) != NULL)
-    	    fam_list.push_back(row[0]);
-        mysql_free_result(result);
-    }
-//
-// Sort family name list
-//
-
 //
 // Build the sequence returned to caller
 //
@@ -241,17 +189,8 @@ db_res *MySQLServer::devmemberlist_1_svc(db_res *recev)
 //
 // Get the member name list for the wanted domain and family from NAMES table
 //
-    std::string query;
-    if (mysql_db == "tango")
-    {
-        query = "SELECT DISTINCT MEMBER FROM device WHERE DOMAIN = '" + user_domain;
-        query += "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC";
-    }
-    else
-    {
-        query = "SELECT DISTINCT MEMBER FROM NAMES WHERE DOMAIN = '" + user_domain;
-        query += "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC";
-    }
+    std::string query = "SELECT DISTINCT MEMBER FROM device WHERE DOMAIN = '" + user_domain;
+    query += "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC";
 #ifdef DEBUG
     std::cout << "MySQLServer::devfamilylist_1_svc(): query " << query << std::endl;
 #endif /* DEBUG */
@@ -267,26 +206,6 @@ db_res *MySQLServer::devmemberlist_1_svc(db_res *recev)
     while((row = mysql_fetch_row(result)) != NULL)
     	memb_list.push_back(row[0]);
     mysql_free_result(result);
-//
-// Add member name for the wanted domain and family from PS_NAMES table
-// Sort member name list
-//
-    if (mysql_db != "tango")
-    {
-        query = "SELECT DISTINCT MEMBER FROM PS_NAMES WHERE DOMAIN = '" + user_domain;
-        query += "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC";
-        if (mysql_query(mysql_conn, query.c_str()) != 0)
-        {
-	    std::cerr << mysql_error(mysql_conn) << std::endl;
-	    browse_back.db_err = DbErr_DatabaseAccess;
-	    return (&browse_back);
-        }
-        result = mysql_store_result(mysql_conn);
-  
-        while((row = mysql_fetch_row(result)) != NULL)
-    	    memb_list.push_back(row[0]);
-        mysql_free_result(result);
-    }
 //
 // Build the structure returned to caller
 //
