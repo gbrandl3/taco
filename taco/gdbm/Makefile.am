@@ -24,6 +24,7 @@ testdbm_LDADD		= libgdbm.la libgdbm_compat.la
 
 conv2gdbm_SOURCES	= conv2gdbm.c
 conv2gdbm_LDADD		= libgdbm_compat.la libgdbm.la 
+conv2gdbm_LDFLAGS	= -static
 
 endif
 
