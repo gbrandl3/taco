@@ -1,4 +1,4 @@
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_access.cpp,v 1.1 2005-03-29 09:27:49 andy_gotz Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_access.cpp,v 1.2 2005-06-19 19:26:52 andy_gotz Exp $";
 /********************************************************************
 
  File       :	attribute_access.cpp
@@ -9,121 +9,14 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib
 	
  Author(s)  :	Jens Meyer
 
- Original   :	Sptember2002
+ Original   :	September2002
 
- $Revision: 1.1 $
- $Date: 2005-03-29 09:27:49 $
+ $Revision: 1.2 $
+ $Date: 2005-06-19 19:26:52 $
 
  $Author: andy_gotz $
 
- $Log: not supported by cvs2svn $
- Revision 8.84  2005/01/18 21:58:55  goetz
- changed prototype of ds__signal() back to extern C
-
- Revision 8.83  2004/11/26 13:25:56  meyer
- Corrected multi tango host gandling in dev_api.c and attr_access.cpp
-
- Revision 8.82  2004/10/26 11:05:30  goetz
- patched rpc_check_host for suse72
-
- Revision 8.81  2004/09/13 10:44:10  pons
- Minor fix in tango_api.cpp:get_cmd_value()
-
-// Revision 8.80  2004/09/10  17:05:39  17:05:39  pons (Jean-Luc Pons)
-// Added taco/tango command mapping
-// 
-// Revision 8.79  2004/08/04  08:51:25  08:51:25  pons (Jean-Luc Pons)
-// Added support D_VAR_CHARARR in tango_api
-// 
-// Revision 8.78  2004/03/24  06:29:24  06:29:24  kimdon (David Kimdon)
-// make it possible for C++ device servers to use only libdsapi++
-// 
-// Revision 8.77  2004/01/20  14:23:38  14:23:38  pons (Jean-Luc Pons)
-// fixed a bug in rpc_check_host()
-// 
- Revision 8.76  2004/01/13 14:30:21  meyer
- Bug correction in dev_put_asyn() and TACO initialisation even for TANGO usage!
-
-// Revision 8.75  2003/11/26  09:35:05  09:35:05  verdier ()
-// just a little mistake....
-// 
- Revision 8.74  2003/11/26 09:20:01  verdier
- Array attribute added in query cmd
-
- Revision 8.73  2003/11/26 09:02:45  goetz
- changed rpc_check_host() algorithm for Solaris; intermediate checkin for Verdier
-
- Revision 8.72  2003/10/23 11:48:04  goetz
- added support for spectrum attributes
-
- Revision 8.71  2003/10/23 11:26:59  verdier
- Changed source for TANGO Spectrum or Image attribute reading to the device!
-
- Revision 8.70  2003/08/06 18:16:15  goetz
- include errno.h in API.h
-
- Revision 8.69  2003/06/30 11:21:35  goetz
- tango command numbers for taco are auto-generated if they are not defined in the kernel nor database
-
- Revision 8.68  2003/06/27 11:58:50  meyer
- Bug corrections for attributes
-
- Revision 8.67  2003/06/26 17:25:44  meyer
- Changed source for TANGO attribute reading to the device!
-
- Revision 8.66  2003/06/12 08:46:22  meyer
- Case insensitve attribute access in attr_access.cpp
-
- Revision 8.65  2003/05/14 13:34:24  goetz
- fixed bug with DevState and DevStatus commands for tango devices
-
- Revision 8.64  2003/04/25 15:11:55  meyer
- Corrected bugs in attr_access.cpp and MDSSignal_config.c
-
- Revision 8.63  2003/04/23 14:52:05  goetz
- set cmd_value to zero if not defined for TANGO devices
-
- Revision 8.62  2003/04/23 14:40:46  goetz
- fixed bug in mapping State and Status to DevState and DevStatus in tango_api.cpp
-
- Revision 8.61  2003/04/22 19:30:58  goetz
- ported toGNU 3.2 on Solaris
-
- Revision 8.60  2003/02/24 08:28:30  meyer
- Added DevStatus to attribute access
-
- Revision 8.58  2003/02/11 08:45:53  goetz
- fixed memory leak in tango_get_cmd_value()
-
- Revision 8.57  2003/02/06 13:33:47  goetz
- added header to cern_select
-
-// Revision 8.56  2003/02/05  20:08:24  20:08:24  goetz (Andy Goetz)
-// improved tango device management - made it dynamic, struct based, non vectorial
-// 
- Revision 8.55  2003/02/05 13:36:49  goetz
- modified to run multiple copies of the same device server on Windows; debug messages changed to dprintf() on Windows
-
- Revision 8.54  2002/11/26 17:35:57  meyer
- First release of attribute interface
-
-// Revision 8.52  2002/11/07  16:24:32  16:24:32  meyer (Jens Meyer)
-// Added functionality for state reading and abort.
-// 
-// Revision 8.51  2002/11/07  12:40:26  12:40:26  meyer (Jens Meyer)
-// Tested for attribute read, write and query
-// 
- Revision 8.50  2002/10/30 17:50:59  meyer
- First version with taco/tango attribute interface
-
- Revision 2.2  2002/10/28 11:52:54  meyer
- Tango problem
-
- Revision 2.1  2002/10/15 14:24:47  meyer
- *** empty log message ***
-
- 
- Copyright (c) 1999 by European Synchrotron Radiation Facility,
+  Copyright (c) 1999 by European Synchrotron Radiation Facility,
                        Grenoble, France
 
 *********************************************************************/ 
