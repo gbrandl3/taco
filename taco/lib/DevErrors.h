@@ -8,13 +8,13 @@
 
  Author(s):	Andy Goetz
 		Jens Meyer
-		$Author§
+		$Author: jkrueger1 $
 
  Original:	March 1990
 
- Version:	$Revision: 1.3 $
+ Version:	$Revision: 1.4 $
 
- Date:		$Date: 2004-11-03 15:01:35 $
+ Date:		$Date: 2005-06-22 09:08:46 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -29,7 +29,7 @@
  */
 #ifdef _IDENT
 static char DevErrorsh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevErrors.h,v 1.3 2004-11-03 15:01:35 andy_gotz Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevErrors.h,v 1.4 2005-06-22 09:08:46 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*
