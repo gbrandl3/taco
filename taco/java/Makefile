@@ -5,7 +5,7 @@
 all:	jar
 
 classList:
-	find . \( -name "*.java" \) | grep -v remotetea | grep -v examples | grep -v tests | grep -v "oncrpc/ant" > ./.classes
+	find . \( -name "*.java" \) | grep -v remotetea | grep -v examples | grep -v tests | grep -v "oncrpc/ant" | grep -v CVS > ./.classes
 
 jdoc:	classList
 	touch doc/package-list

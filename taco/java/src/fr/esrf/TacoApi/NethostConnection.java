@@ -54,9 +54,11 @@ class NethostConnection {
 
       // Starts by connecting to the default nethost if not already done
       connectDefaultNehost();
+      if(hostName.length()==0)
+        return defNethost;
 
       // Check that the nethost name is not the default one
-      if(hostName.length()>0 && !hostName.equals(defNethost.name)) {
+      if(!hostName.equals(defNethost.name)) {
 
           NethostConnection newNethost = getNethostByName(hostName);
           if(newNethost==null) {
@@ -313,6 +315,9 @@ class NethostConnection {
       InetAddress netHostAdress;
       OncRpcUdpClient manager;
 
+      if(name.length() == 0)
+        throw new TacoException("Environment variable NETHOST not defined");
+
       try {
         netHostAdress = InetAddress.getByName(name);
       } catch (UnknownHostException e) {
@@ -329,7 +334,7 @@ class NethostConnection {
         manager.setRetransmissionTimeout(managerTimeout);
 
       } catch (Exception e) {
-        throw new TacoException(e.getMessage(), TacoException.DevErr_NoNetworkManagerAvailable);
+        throw new TacoException("No network manager available on " + name);
       }
 
       // All is OK, we can store netHost information
@@ -507,7 +512,7 @@ class NethostConnection {
 
       String netHost = System.getProperty("NETHOST", "null");
       if( netHost.equals("null") )
-        throw new TacoException(TacoException.DevErr_NethostNotDefined);
+        throw new TacoException("Environment variable NETHOST not defined");
 
       defNethost = new NethostConnection(netHost.toLowerCase());
 
