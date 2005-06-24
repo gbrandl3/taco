@@ -11,6 +11,9 @@
  Original   :	June 2005
 
  $Log: not supported by cvs2svn $
+ Revision 1.1  2005/06/23 16:19:45  jlpons
+ Initial import
+
 
  Copyright (c) 2005 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
@@ -49,7 +52,7 @@ public class TacoDevice implements ServerListener {
   public final static int ACCESS_ADMIN     = 99;
 
   // Do not modify this line (it is used by the install script)
-  public final String apiRelease = "$Revision: 1.1 $".substring(11,15);
+  public final String apiRelease = "$Revision: 1.2 $".substring(11,15);
 
   // Private member
   private String  deviceName;         // Full device name
@@ -430,6 +433,9 @@ public class TacoDevice implements ServerListener {
     // Check full syntax: //hostName/domain/family/member
     ret = Pattern.matches("//[a-zA-Z_0-9]+/[a-zA-Z_0-9[-]]+/[a-zA-Z_0-9[-]]+/[a-zA-Z_0-9[-]]+", name);
 
+    // Check full syntax: //xxx.xxx.xxx/hostName/domain/family/member
+    ret = Pattern.matches("//[a-zA-Z_0-9]+\\.[a-zA-Z_0-9]+\\.[a-zA-Z_0-9]+/[a-zA-Z_0-9[-]]+/[a-zA-Z_0-9[-]]+/[a-zA-Z_0-9[-]]+", name);
+
     // Check full syntax: //ipAddress/domain/family/member
     if (ret == false)
        ret = Pattern.matches("//[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+/[a-zA-Z_0-9[-]]+/[a-zA-Z_0-9[-]]+/[a-zA-Z_0-9[-]]+", name);
@@ -453,7 +459,7 @@ public class TacoDevice implements ServerListener {
 
       TacoDevice dev1  = new TacoDevice("sr/testdev/1");
       TacoDevice dev2  = new TacoDevice("sr/testdev/2");
-      TacoDevice dev3  = new TacoDevice("//160.103.10.160/sr/rf-tra/tra3");
+      TacoDevice dev3  = new TacoDevice("//aries.esrf.fr/sr/rf-tra/tra3");
 
       System.out.println("----------------------");
       System.out.println(dev1.getInfo());
