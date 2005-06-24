@@ -139,6 +139,29 @@ AC_DEFUN([TACO_DEFINES],
 	AC_CHECK_HEADERS([fcntl.h malloc.h memory.h netdb.h stddef.h stdlib.h string.h strings.h])
 	AC_CHECK_HEADERS([sys/file.h sys/ioctl.h termios.h unistd.h sys/filio.h paths.h])
 	AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h sys/param.h]) 
+	AC_CHECK_HEADERS([signal.h sys/signal.h])
+	AC_TYPE_SIGNAL
+	AC_CHECK_DECLS([signal], [], [], [
+#if HAVE_SIGNAL_H
+#       include <signal.h>
+#elif HAVE_SYS_SIGNAL_H
+#       include <sys/signal.h>
+#endif
+	])
+	AC_CHECK_FUNCS([signal], [], [], [
+#if HAVE_SIGNAL_H
+#       include <signal.h>
+#elif HAVE_SYS_SIGNAL_H
+#       include <sys/signal.h>
+#endif
+	])
+	AC_CHECK_TYPES([sighandler_t, __sighandler_t], [], [], [
+#if HAVE_SIGNAL_H
+#       include <signal.h>
+#elif HAVE_SYS_SIGNAL_H
+#       include <sys/signal.h>
+#endif
+	])
 
 	AC_LANG_PUSH(C++)
 	AC_CHECK_HEADERS([sstream strstream])
@@ -305,7 +328,7 @@ dnl
 	
 	AC_PROG_LIBTOOL
 
-	AC_PREFIX_DEFAULT(${DSHOME:-/usr/local/dshome})
+	AC_PREFIX_DEFAULT(${DSHOME:-/usr/local/taco})
 dnl
 dnl	essential for automatic make in development
 dnl
