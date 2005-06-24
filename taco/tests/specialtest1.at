@@ -1,0 +1,88 @@
+AT_SETUP([Test db_devdel command])
+AT_CHECK([taco db_devdel -r test/a/1
+taco db_devdel -r test/longfamily/long])
+AT_CLEANUP
+
+AT_SETUP([Test the connection to the testserver devices])
+AT_DATA([test_server.res], [[
+# This file contains only resources for the tests
+test_server/1/device:   test/a/1 \
+                        test/a/2
+
+test/a/1/type: TestDevice
+test/a/2/type: TestDevice2
+test/a/2/longresource: 25
+]])
+AT_CHECK([
+RES_BASE_DIR=`pwd` taco db_update test_server.res
+AT_TACO_RUN_LOCAL([test_server 1 &])
+sleep 5
+AT_TACO_RUN_LOCAL([test_client2 test/a/1 test/a/2 test/a/1 test/a/2])
+AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [Longresource = 25
+Exported 1
+Type 1
+Server test_server
+Personal 1
+Class TestDevice
+Process test_server
+Version 4
+Resource[[0]] = test/a/1/type: TestDevice
+CMD[[0]] = SendByteArray
+CMD[[1]] = DevOn
+CMD[[2]] = DevOff
+CMD[[3]] = DevReset
+CMD[[4]] = DevState
+CMD[[5]] = DevStatus
+Ping : test/a/1 - 0
+Exported 1
+Type 1
+Server test_server
+Personal 1
+Class TestDevice2
+Process test_server
+Version 4
+Resource[[0]] = test/a/2/longresource: 25
+Resource[[1]] = test/a/2/type: TestDevice2
+CMD[[0]] = command_0/0/0
+CMD[[1]] = command_63/1/1
+CMD[[2]] = DevOn
+CMD[[3]] = DevOff
+CMD[[4]] = DevReset
+CMD[[5]] = DevState
+CMD[[6]] = DevStatus
+Ping : test/a/2 - 0
+Exported 1
+Type 1
+Server test_server
+Personal 1
+Class TestDevice
+Process test_server
+Version 4
+Resource[[0]] = test/a/1/type: TestDevice
+CMD[[0]] = SendByteArray
+CMD[[1]] = DevOn
+CMD[[2]] = DevOff
+CMD[[3]] = DevReset
+CMD[[4]] = DevState
+CMD[[5]] = DevStatus
+Ping : test/a/1 - 0
+Exported 1
+Type 1
+Server test_server
+Personal 1
+Class TestDevice2
+Process test_server
+Version 4
+Resource[[0]] = test/a/2/longresource: 25
+Resource[[1]] = test/a/2/type: TestDevice2
+CMD[[0]] = command_0/0/0
+CMD[[1]] = command_63/1/1
+CMD[[2]] = DevOn
+CMD[[3]] = DevOff
+CMD[[4]] = DevReset
+CMD[[5]] = DevState
+CMD[[6]] = DevStatus
+Ping : test/a/2 - 0
+])
+AT_CLEANUP
+

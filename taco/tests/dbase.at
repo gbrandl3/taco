@@ -132,7 +132,13 @@ AT_CLEANUP
 
 AT_SETUP([check db_export and db_servunreg])
 AT_DATA([test_server.res], [[
-test_server/1/device:	test/a/1
+# This file contains only resources for the tests
+test_server/1/device:	test/a/1 \
+			test/longfamily/long
+
+test/a/1/type: TestDevice
+test/longfamily/long/type: TestDevice2
+test/longfamily/long/longresource: 25
 ]])
 AT_CHECK([
 RES_BASE_DIR=`pwd` taco db_update test_server.res
@@ -145,6 +151,25 @@ AT_TACO_RUN_LOCAL([test_server 1 &])
 sleep 5
 AT_TACO_RUN_LOCAL([off test_server >>log])
 ], [], [[1
+Longresource = 25
+Longresource = 25
 ]])
 AT_CLEANUP
+
+AT_SETUP([db_update command with extra long names])
+AT_DATA([test.res], [[
+# This file contains only resources for the tests
+test/test/device:	test/longfamilyname/longmembername 
+
+test/longfamilyname/longmembername/longresourcename1:	"resource 1"
+test/longfamilyname/longmembername/longresourcename2:	2
+test/longfamilyname/longmembername/longresourcename3:	3.1
+]])
+AT_CHECK([RES_BASE_DIR=`pwd` taco db_update test.res])
+AT_CLEANUP
+
+AT_SETUP([check value from resources with extra long names])
+AT_CHECK(AT_TACO_RUN_LOCAL([db_getresoval test/longfamilyname/longmembername/longresourcename2]), [], [[test/longfamilyname/longmembername/longresourcename2: 2
+]])
+AT_CLEANUP 
 

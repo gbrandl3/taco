@@ -72,12 +72,28 @@ extern "C" long startup(char *serverName, long *error)
         else
         {
 		dev_printdebug(DBG_TRACE | DBG_STARTUP, "Number of devices: %d\n", dev_no);
+		DeviceBase	**dev = new DeviceBase*[dev_no];
 		for (unsigned int i = 0; i < dev_no; ++i)
 		{
 			long		lError;
-			DeviceBase	*dev = new TestDevice(dev_list[i], lError);
-			if (dev)
-				dev_export(dev_list[i], dev, error);
+			db_resource	r;
+			char		*type;
+                	r.resource_name = "type";
+                	r.resource_type = D_STRING_TYPE;
+                	r.resource_adr = &type;
+                	if (db_getresource( dev_list[i], &r, 1, &lError) == DS_OK) 
+			{
+				if (std::string(type) == "TestDevice")
+				dev[i] = new TestDevice(dev_list[i], lError);
+				else if (std::string(type) == "TestDevice2")
+					dev[i] = new TestDevice2(dev_list[i], lError);
+				else
+					continue;
+				if (dev[i])
+					dev_export(dev_list[i], dev[i], error);
+			}
+			else
+				fprintf(stdout, "could not get resource \"type\": %d\n", lError); 
 			free(dev_list[i]);
 		}
 		free(dev_list);
@@ -87,3 +103,38 @@ extern "C" long startup(char *serverName, long *error)
 	return DS_OK;
 }
 
+TestDevice2::TestDevice2(const std::string name, long &error)
+	: Device(const_cast<char *>(name.c_str()), &error)
+{
+	static Device::DeviceCommandListEntry commands_list[] = {
+		{DevState, &Device::State, D_VOID_TYPE, D_SHORT_TYPE, 0, "DevState"},
+		{DevStatus, &Device::Status, D_VOID_TYPE, D_STRING_TYPE, 0, "DevStatus"},
+		{DevOn, &Device::On, D_VOID_TYPE, D_VOID_TYPE, 0, "DevOn"},
+		{DevOff, &Device::Off, D_VOID_TYPE, D_VOID_TYPE, 0, "DevOff"},
+		{DevReset, &Device::Reset, D_VOID_TYPE, D_VOID_TYPE, 0, "DevReset"},
+		{ReadByteArray, (DeviceMemberFunction)&TestDevice2::tacoRead, D_VAR_CHARARR, D_VOID_TYPE, 0, "ReadByteArray"},
+		};
+
+	this->class_name = "TestDevice2";
+	long	value;
+	db_resource	r;
+        r.resource_name = "longresource";
+        r.resource_type = D_LONG_TYPE;
+        r.resource_adr = &value;
+        if (db_getresource(const_cast<char *>(name.c_str()), &r, 1, &error) == DS_OK) 
+	{
+		std::cout << "Longresource = " << value << std::endl;
+	}
+}
+
+TestDevice2::~TestDevice2()
+{
+}
+
+long TestDevice2::tacoRead(void *argin, void *argout, long *error)
+{
+	*error = DS_OK;
+	DevVarCharArray	*p; 
+	p = (DevVarCharArray *)argin;
+	return DS_OK;
+}

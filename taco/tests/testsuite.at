@@ -43,6 +43,7 @@ m4_include([dbase.at])
 
 AT_BANNER([[Testing the devices.]])
 m4_include([devices.at])
+m4_include([specialtest1.at])
 
 AT_BANNER([[Testing the starter server]])
 m4_include([starter.at])

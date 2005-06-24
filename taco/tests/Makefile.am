@@ -23,7 +23,7 @@ EXTRA_DIST 		+= testsuite.at $(TESTSUITE_AT) testsuite local.at
 
 TESTSUITE 		= testsuite
 
-TESTSUITE_AT		= dbase.at devices.at starter.at message.at
+TESTSUITE_AT		= dbase.at devices.at starter.at message.at specialtest1.at
 
 AUTOTEST 		= $(AUTOM4TE) --language=autotest
 
@@ -34,7 +34,7 @@ check_PROGRAMS 		= db_connect db_resget db_resput db_getdevexp \
 			db_serverlist db_hostlist db_dsonhost \
 			test_asc_dyn test_asc_stat test_tc test_starter \
 			dev_cmdquery dev_conparams \
-			test_server test_client test_status test_connect
+			test_server test_client test_client2 test_status test_connect
 
 check_SCRIPT		= taco
 
@@ -138,6 +138,9 @@ test_server_LDADD 	= @TACO_SERVER_CXX_LIBS@ -lstdc++
 
 test_client_SOURCES 	= test_client.cpp
 test_client_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
+
+test_client2_SOURCES 	= test_client2.cpp
+test_client2_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 test_status_SOURCES 	= test_status.cpp
 test_status_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
