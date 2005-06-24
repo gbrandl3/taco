@@ -13,9 +13,9 @@
 
  Original   :	April 1993
 
- Version:	$Revision: 1.22 $
+ Version:	$Revision: 1.23 $
 
- Date:		$Date: 2005-06-16 20:41:37 $
+ Date:		$Date: 2005-06-24 10:44:36 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility, 
                        Grenoble, France
@@ -1418,9 +1418,10 @@ long _DLLFunc dev_ping (devserver ds, long *error)
 int taco_gethostname(char *host_name, size_t len)
 {
 	char    hostname[255];                  /* hopefully enough! */
+	int ret;
 	if (host_name != NULL)
 		*host_name = '\0';
-	int ret = gethostname(hostname, sizeof(hostname));
+	ret = gethostname(hostname, sizeof(hostname));
 	if (ret != 0)
 	{
 		fprintf(stderr, "unable to retrieve hostname!\n");
