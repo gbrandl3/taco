@@ -387,7 +387,6 @@ int MySQLServer::db_devlist(std::string dev_na, int *dev_num, db_res *back)
 //  
     std::string query;
     query = "SELECT NAME FROM device WHERE SERVER = '" + ds_class + "/" + ds_name + "'";
-    query = "SELECT DEVICENAME FROM NAMES WHERE DEVICE_SERVER_CLASS = '" + ds_class + "' AND DEVICE_SERVER_NAME = '" + ds_name + "'";
 #ifdef DEBUG
     std::cout << "MySQLServer::db_devlist(): query " << query << std::endl;
 #endif /* DEBUG */
