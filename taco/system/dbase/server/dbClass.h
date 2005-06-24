@@ -66,6 +66,8 @@ protected:
 	std::vector<NdbmDomain> 	res_list;
 	std::vector<std::string> 	res_list_dev;
 
+	std::ofstream		m_logStream;
+
 public:
 	void	setPgNum(const u_long pNum)  {pgnum = pNum;};
 	u_long	getPgNum(void) {return pgnum;};
@@ -73,6 +75,12 @@ public:
 	u_short	getUDPPort(void) {return udp_port;}; 
 	void	setTCPPort(const u_short tcp) {tcp_port = tcp;};
 	u_short	getTCPPort(void) {return tcp_port;}; 
+
+	void	setLogstream(const std::ofstream &log) 
+	{
+		std::cout.rdbuf(log.rdbuf());
+		std::cerr.rdbuf(log.rdbuf());
+	}
 
 public:
 	virtual db_res 		*db_getres_1_svc(arr1 *, struct svc_req *) = 0;

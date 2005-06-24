@@ -263,6 +263,7 @@ int main(int argc,char **argv)
 #else
 #	error select either GDBM or mySQL as database type
 #endif
+	dbm->setLogstream(logStream);
 //
 // RPC business !!!!!!!!!!!!!!!!!!!! 
 //
