@@ -1,4 +1,4 @@
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/tango_api.cpp,v 1.1 2005-03-29 09:27:50 andy_gotz Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/tango_api.cpp,v 1.2 2005-06-24 10:45:26 andy_gotz Exp $";
 /*+*******************************************************************
 
  File       :	tango_api.c
@@ -17,8 +17,8 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib
 
  Original   :	December 1999
 
- $Revision: 1.1 $
- $Date: 2005-03-29 09:27:50 $
+ $Revision: 1.2 $
+ $Date: 2005-06-24 10:45:26 $
 
  $Author: andy_gotz $
 
@@ -31,11 +31,11 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib
 ********************************************************************-*/
 
 #include <tango.h>
-//#include <OB/OBPolicies.h> 
 #define TANGO_API
 #include "config.h"
 #include <API.h>
 #include <ApiP.h>
+#include <dc.h>
 #include <stdio.h>
 #include <assert.h>
 #include <iostream.h>
