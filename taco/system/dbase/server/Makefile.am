@@ -5,7 +5,7 @@ sbin_PROGRAMS		= dbm_server
 lib_LTLIBRARIES 	= 
 
 INCLUDES		= @TACO_INCLUDES@ 
-AM_CPPFLAGS		= 
+AM_CPPFLAGS		= -DDEBUG
 
 if GDBMSUPPORT
 lib_LTLIBRARIES 	+= libTACOndbm.la 
@@ -25,7 +25,7 @@ libTACOndbm_la_SOURCES = dbm_serv.cpp \
 			NdbmClass.cpp
 libTACOndbm_la_LIBADD	= @GDBM_LIBS@ -lstdc++
 INCLUDES		+= @GDBM_CFLAGS@ 
-AM_CPPFLAGS		+= -DNDBM -DUSE_GDBM
+AM_CPPFLAGS		+= -DNDBM -DUSE_GDBM -DDEBUG
 endif
 
 if MYSQLSUPPORT
@@ -44,8 +44,10 @@ libTACOMySQL_la_SOURCES = mysql_serv.cpp \
 			mysql_update.cpp 
 libTACOMySQL_la_LIBADD	= @MYSQL_LIBS@ -lstdc++
 INCLUDES		+= @MYSQL_CFLAGS@ 
-AM_CPPFLAGS		+= -DUSE_MYSQL
+AM_CPPFLAGS		+= -DUSE_MYSQL -DDEBUG
 endif
 
-dbm_server_SOURCES 	= main_svc.cpp dbm.cpp dbm_xdr.cpp db_serv.cpp
+dbm_server_CFLAGS	= -DDEBUG
+dbm_server_SOURCES 	= main_svc.cpp dbm.cpp db_serv.cpp
 dbm_server_LDADD	= @TACO_SERVER_LIBS@ $(lib_LTLIBRARIES) -lstdc++
+dbm_server_LDFLAGS	= -static
