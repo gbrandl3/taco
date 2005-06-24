@@ -1,10 +1,10 @@
  /*
 
- Author:	$Author: jkrueger1 $
+ Author:	$Author: andy_gotz $
 
  Version:	$Version$
 
- Date:		$Date: 2004-04-15 15:49:28 $
+ Date:		$Date: 2005-06-24 14:42:30 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -20,6 +20,10 @@
 #ifdef __STDCPP__
 #include <vector>
 #include <string>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 typedef char *nam;
@@ -747,6 +751,10 @@ extern int  *db_reopendb_1();
 #ifndef ALONE
 bool_t _WINAPI
  xdr_register_data();
+#endif
+
+#ifdef __cplusplus
+ }
 #endif
 
 #endif /* _setacc.h */
