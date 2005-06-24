@@ -16,7 +16,7 @@ db_psdev_error *NdbmServer::upddev_1_svc(db_res *dev_list)
 	long list_nb = dev_list->res_val.arr1_len;
 		
 #ifdef DEBUG
-	cout << "In upddev_1_svc function for " << list_nb << " device list(s)" << endl;
+	std::cout << "In upddev_1_svc function for " << list_nb << " device list(s)" << std::endl;
 #endif
 //
 // Initialize parameter sent back to client 
@@ -148,8 +148,8 @@ long NdbmServer::upd_name(std::string serv, std::string dev_name, int ind) throw
 	}
 
 #ifdef DEBUG
-       cout << "Device server class : " << serv.substr(0, pos) << endl;
-       cout << "Device server name : " << serv.substr(pos + 1) << endl;
+	std::cout << "Device server class : " << serv.substr(0, pos) << std::endl;
+	std::cout << "Device server name : " << serv.substr(pos + 1) << std::endl;
 #endif
 
 //
