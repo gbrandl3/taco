@@ -584,10 +584,10 @@ svc_inf *NdbmServer::db_svcchk_1_svc(nam *dsn_nam)
 			ret_dev_class,
 			sto(*dsn_nam);
 #ifdef DEBUG
-//	std::cout << "Device server name (check function) : " << std::sto << endl;
+	std::cout << "Device server name (check function) : " << sto << endl;
 #endif /* DEBUG */
 //
-// Miscalaneous initialization
+// Miscellaneous initialization
 //
 	svc_info.p_num = 1;
 	svc_info.v_num = 1;
