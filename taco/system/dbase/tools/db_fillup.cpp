@@ -1171,7 +1171,7 @@ static void create_db(void)
 			t = env_string;
 			env_string.erase();
 		}
-		transform(t.begin(), t.end(), t.begin(), ::tolower);
+		std::transform(t.begin(), t.end(), t.begin(), ::tolower);
 		if (t.length() > (DOMAIN_NAME_LENGTH -1))
 		{
 	    		std::cerr << "Table name '" << t << "' too long in DBTABLES (max. " << (DOMAIN_NAME_LENGTH - 1) << " chars)" << std::endl;
