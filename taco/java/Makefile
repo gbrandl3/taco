@@ -15,6 +15,7 @@ jdoc:	classList
 	@echo "-------------------------------------"
 
 jar:	classList
+	if ! test -d lib ; then mkdir lib ; fi
 	javac -classpath remotetea.jar -d lib @.classes
 	jar cvf Taco.jar -C lib .
 
