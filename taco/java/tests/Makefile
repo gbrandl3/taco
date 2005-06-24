@@ -11,4 +11,4 @@ compil:	classList
 	javac -classpath ../Taco.jar @.classes
 
 run:
-	java -DNETHOST=$(NETHOST) -classpath ../Taco.jar:. Client1
+	java -DNETHOST=$(NETHOST) -classpath ../Taco.jar:../remotetea.jar:. Client1
