@@ -114,6 +114,14 @@ TestDevice2::TestDevice2(const std::string name, long &error)
 		{DevReset, &Device::Reset, D_VOID_TYPE, D_VOID_TYPE, 0, "DevReset"},
 		{ReadByteArray, (DeviceMemberFunction)&TestDevice2::tacoRead, D_VAR_CHARARR, D_VOID_TYPE, 0, "ReadByteArray"},
 		};
+	static long n_commands = sizeof(commands_list) / sizeof(DeviceCommandListEntry);
+//
+// initialise the commands list to point to the commands list
+// implemented for the AG PowerSupply class
+//
+	this->n_commands = n_commands;
+	this->commands_list = commands_list;
+
 
 	this->class_name = "TestDevice2";
 	long	value;
