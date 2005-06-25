@@ -88,6 +88,11 @@ int main(int argc,char **argv)
 		std::cout << "Ping : " << argv[i] << " - " << dev_ping(ps, &error) << std::endl;
 		dev_free(ps, &error);
 	}
+	if (error != 0)
+	{
+		std::cout << "Failed : error " << error << std::endl;
+		dev_printerror_no(SEND,NULL,error);
+	}
 	return 0;
 }
 
