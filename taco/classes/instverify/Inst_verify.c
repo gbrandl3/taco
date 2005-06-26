@@ -6,11 +6,11 @@
  * Description:	Dummy class to test control system installations
  *
  * Author(s):	J.Meyer
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
  * Original:	10.5.95
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
  * Date:	$Date
  *
@@ -302,6 +302,9 @@ static long  dev_setvalue(Inst_verify ds, DevFloat *argin, DevVoid *argout, long
  *
  */
 	ds->inst_verify.set_value = *argin;
+#ifdef DEBUG
+	printf("Inst_verify, dev_setvalue(), value = %f\n",ds->inst_verify.set_value);
+#endif /*PRINT*/
 	return(DS_OK);
 }
 

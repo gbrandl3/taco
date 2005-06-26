@@ -13,9 +13,9 @@
 
  Original:	March 1990
 
- Version:	$Revision: 1.8 $
+ Version:	$Revision: 1.9 $
 
- Date:		$Date: 2005-06-16 20:41:37 $
+ Date:		$Date: 2005-06-26 13:45:25 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                             Grenoble, France
@@ -28,7 +28,6 @@
 #include <API.h>
 
 #ifdef __cplusplus
-#include <DeviceBase.h>
 #include <Device.h>
 #endif /* __cplusplus */
 
@@ -37,7 +36,7 @@
  */
 #ifdef _IDENT
 static char DevServerh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServer.h,v 1.8 2005-06-16 20:41:37 andy_gotz Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServer.h,v 1.9 2005-06-26 13:45:25 andy_gotz Exp $";
 #endif /* _IDENT */
 
 typedef long DevMethod;
@@ -127,7 +126,7 @@ typedef struct _DevServerAccess {
 /*
  * C++ version
  */
-	DeviceBase		*device;
+	Device			*device;
 #endif
 		char  			export_name[LONG_NAME_SIZE];
 		long 			export_status;
@@ -188,10 +187,10 @@ long dev_cmd PT_( (void *ptr_ds, long cmd, DevArgument argin,
 			long *error) );
 
 #ifdef __cplusplus
-void dev_event_fire PT_( (DeviceBase *device, long event_type,
+void dev_event_fire PT_( (Device *device, long event_type,
 				DevArgument argout, DevType argout_type,
 	 			long event_status, long event_error) );
-long dev_export (char *name, DeviceBase *ptr_dev, long *error);
+long dev_export (char *name, Device *ptr_dev, long *error);
 }
 #else
 void dev_event_fire PT_( (DevServer ds, long event_type,

@@ -11,9 +11,9 @@
 
  Original:	Feb 1994
 
- Version:	$Revision: 1.19 $
+ Version:	$Revision: 1.20 $
 
- Date:		$Date: 2005-06-16 20:41:38 $
+ Date:		$Date: 2005-06-26 13:45:25 $
 
  Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
                            Grenoble, France
@@ -278,7 +278,7 @@ _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
 /*
  * C++ version
  */
-	DeviceBase		*device;
+	Device			*device;
 #endif /* __cplusplus */
 	long			ds_id;
 	long 			connection_id;
@@ -451,7 +451,7 @@ _client_data * _DLLFunc rpc_dev_put_4 (_server_data *server_data)
 /*
  * C++ version
  */
-	DeviceBase		*device;
+	Device			*device;
 #endif /* __cplusplus */
 	long			ds_id;
 	long 		connection_id;
@@ -584,7 +584,7 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
 /*
  * C++ version
  */
-	DeviceBase			*device;
+	Device				*device;
 #endif /* __cplusplus */
 	long				ds_id;
 	long 			connection_id;
@@ -828,7 +828,7 @@ void _DLLFunc rpc_dev_put_asyn_cmd (_server_data *server_data)
 /*
  * C++ version
  */
-	DeviceBase		*device;
+	Device			*device;
 #endif /* __cplusplus */
 	long			ds_id;
 	long 			connection_id;
@@ -927,7 +927,7 @@ long dev_export (char *name, void *ptr_ds, long *error)
 /*
  * C++ version
  */
-long dev_export (char *name, DeviceBase *ptr_dev, long *error)
+long dev_export (char *name, Device *ptr_dev, long *error)
 #endif
 {
 	db_devinf		devinfo;
@@ -948,7 +948,7 @@ long dev_export (char *name, DeviceBase *ptr_dev, long *error)
 /*
  * C++ version
  */
-	DeviceBase	*device;
+	Device		*device;
 	device =        ptr_dev;
 #endif
 
@@ -1142,7 +1142,7 @@ long ds__destroy (void *ptr_ds, long *error)
 #ifndef __cplusplus
 	DevServer 	ds = (DevServer) ptr_ds;
 #else
-	DeviceBase 	*device = (DeviceBase*) ptr_ds;
+	Device	 	*device = (Device*) ptr_ds;
 
 #endif /* __cplusplus */
 
@@ -1239,7 +1239,7 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
 /*
  * C++ version
  */
-	DeviceBase	*device;
+	Device		*device;
 	long 		error;
 	long 		ret;
 	u_long		i;
@@ -1408,7 +1408,7 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
 /*
  * C++ version
  */
-	DeviceBase			*device;
+	Device				*device;
 	long 				error;
 	long 				ret;
 #endif
@@ -1615,7 +1615,7 @@ _client_data * _DLLFunc rpc_dev_putget_local (_server_data *server_data)
 /*
  * C++ version
  */
-	DeviceBase		*device;
+	Device			*device;
 #endif
 	long			ds_id;
 	long 		connection_id;

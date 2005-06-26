@@ -14,13 +14,13 @@
  *		is normally done from startup().
  *
  * Author(s);	A. Goetz 
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
  * Original:	October 1996
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2004-02-19 15:45:03 $
+ * Date:	$Date: 2005-06-26 13:45:21 $
  *
  * Copyleft (c) 1990 by European Synchrotron Radiation Facility, 
  *                      Grenoble, France
@@ -33,7 +33,6 @@
 #include <DevErrors.h>
 #include <DevServerP.h>
 #ifdef __cplusplus
-#include "DeviceBase.h"
 #include "Device.H"
 #endif //__cplusplus
 
@@ -66,7 +65,7 @@ long startup(char *svr_name, long *error)
 #ifndef __cplusplus
 	DevServer 	ds_list[1];
 #else
-	DeviceBase 	*ds_list[1];
+	Device	 	*ds_list[1];
 #endif /* __cplusplus */ 
 	int 		i,
 			status;

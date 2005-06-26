@@ -12,9 +12,9 @@
 //
 // Original:	March 1995
 //
-// Version:	$Revision: 1.7 $
+// Version:	$Revision: 1.8 $
 //
-// Date:	$Date: 2005-04-06 19:07:34 $
+// Date:	$Date: 2005-06-26 13:45:25 $
 //
 //-**********************************************************************
 		
@@ -95,12 +95,6 @@ Device::Device (DevString devname, long *error)
 //
 // initialise the commands list
 //
-//	this->commands_map[DevState] = DeviceCommandMapEntry(long(DevState), (DeviceBaseMemberFunction)&Device::State, D_VOID_TYPE, D_SHORT_TYPE, 0L, "State");
-//	this->commands_map[DevStatus] = DeviceCommandMapEntry(long(DevStatus), (DeviceBaseMemberFunction)&Device::Status, D_VOID_TYPE, D_STRING_TYPE, 0L, "Status");
-//	this->commands_map[DevOn] = DeviceCommandMapEntry(long(DevOn), (DeviceBaseMemberFunction)&Device::On, D_VOID_TYPE, D_VOID_TYPE, 0L, "On");
-//	this->commands_map[DevOff] = DeviceCommandMapEntry(long(DevOff), (DeviceBaseMemberFunction)&Device::Off, D_VOID_TYPE, D_VOID_TYPE, 0L, "Off");
-//	this->commands_map[DevReset] = DeviceCommandMapEntry(long(DevReset), (DeviceBaseMemberFunction)&Device::Reset, D_VOID_TYPE, D_VOID_TYPE, 0L, "Reset");
-//	this->commands_map[DevClose] = DeviceCommandMapEntry(long(DevClose), (DeviceBaseMemberFunction)&Device::Close, D_VOID_TYPE, D_VOID_TYPE, ADMIN_ACCESS, "Close");
 	this->n_commands = this->commands_map.size();
 	this->state = DEVON;
 }
@@ -136,7 +130,7 @@ long Device::GetResources(char *name, long *error )
 long Device::Command (long cmd, void* argin, long argin_type,
                       void* argout, long argout_type, long *error)
 {
-	DeviceBaseMemberFunction member_fn;
+	DeviceMemberFunction member_fn;
 
 	dev_printdebug(DBG_TRACE,"Device::Command() called, cmd = %d\n",cmd);
 
@@ -499,7 +493,7 @@ unsigned int Device::GetCommandNumber()
 			this->commands_map[this->commands_list[i].cmd] = 
 				DeviceCommandMapEntry(
 				this->commands_list[i].cmd, 
-				(DeviceBaseMemberFunction)this->commands_list[i].fn, 
+				(DeviceMemberFunction)this->commands_list[i].fn, 
 				this->commands_list[i].argin_type, 
 				this->commands_list[i].argout_type, 
 				this->commands_list[i].min_access, 

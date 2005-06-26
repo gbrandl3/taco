@@ -72,7 +72,7 @@ extern "C" long startup(char *serverName, long *error)
         else
         {
 		dev_printdebug(DBG_TRACE | DBG_STARTUP, "Number of devices: %d\n", dev_no);
-		DeviceBase	**dev = new DeviceBase*[dev_no];
+		Device	**dev = new Device*[dev_no];
 		for (unsigned int i = 0; i < dev_no; ++i)
 		{
 			long		lError;

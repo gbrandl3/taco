@@ -26,7 +26,7 @@ libtacotango___la_LDFLAGS 	= -version-info @LIB_VERSION@
 
 include_HEADERS		+= ../BlcDsNumbers.h ../CntrlDsNumbers.h ../DasDsNumbers.h ../MachDsNumbers.h ../SysNumbers.h 
 
-include_HEADERS		+= ../DeviceBase.h ../Device.h ../OICDevice.h 
+include_HEADERS		+= ../Device.h ../OICDevice.h 
 include_HEADERS		+= ../DevServer.h  ../DevServerP.h  ../DevSignal.h  ../NT_debug.h  ../Starter.h
 include_HEADERS		+= ../signal/MDSSignal.h 
 include_HEADERS		+= attr_api.h

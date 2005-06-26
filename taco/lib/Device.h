@@ -12,21 +12,22 @@
 //
 // Original:	February 1995
 //
-// $Revision: 1.4 $
+// $Revision: 1.5 $
 //
-// $Date: 2005-06-13 09:38:54 $
+// $Date: 2005-06-26 13:45:25 $
 //
-// $Author: jkrueger1 $
+// $Author: andy_gotz $
 //
 //+**********************************************************************
 
 #ifndef _TACO_DEVICE_H
 #define _TACO_DEVICE_H
 		
-#include "DeviceBase.h"
 #include "db_setup.h"
+#include <iostream>
+#include <map>
 
-class Device : public DeviceBase
+class Device 
 {
 //
 // private members
@@ -61,10 +62,39 @@ typedef struct _DeviceCommandListEntry {
 							long acc, char *_cmd_name = NULL) 
 					: cmd(_cmd), fn(f), argin_type(in), argout_type(out), min_access(acc), cmd_name(_cmd_name)	{};
 #endif
-                                    }
-               DeviceCommandListEntry;
+               } DeviceCommandListEntry;
 
 typedef struct _DeviceCommandListEntry *DeviceCommandList;
+
+typedef struct  _DeviceCommandMapEntry {
+				DevCommand              cmd;
+				DeviceMemberFunction        fn;
+				DevArgType              arginType;
+				DevArgType              argoutType;
+				long                    minAccess;
+				char                    *cmd_name;
+				_DeviceCommandMapEntry() : cmd(0), fn(NULL), arginType(0), argoutType(0), minAccess(0), cmd_name(NULL) {};
+				_DeviceCommandMapEntry(DevCommand _cmd, DeviceMemberFunction f, DevArgType in, DevArgType out,
+				long acc, char *_cmd_name = NULL)
+				: cmd(_cmd), fn(f), arginType(in), argoutType(out), minAccess(acc), cmd_name(_cmd_name) {};
+			    } DeviceCommandMapEntry;
+
+typedef std::map<DevCommand, DeviceCommandMapEntry>             DeviceCommandMap;
+
+typedef struct  _DeviceEventListEntry {
+                                DevEvent        event;
+                                DevArgType      argType;
+                                char            *event_name;
+                                _DeviceEventListEntry() : event(0), argType(0), event_name(NULL) {};
+                                _DeviceEventListEntry(DevEvent _event, DevArgType type, char *_event_name)
+                                        : event(_event), argType(type), event_name(_event_name) {};
+                 } DeviceEventListEntry;
+        
+typedef std::map<DevEvent, DeviceEventListEntry>    DeviceEventList;
+
+
+	DeviceCommandMap commands_map;
+	DeviceEventList events_list;
 
 	virtual long State(void *vargin, void *vargout , long *error);
 	virtual long Status(void *vargin, void *vargout, long *error);
@@ -107,8 +137,8 @@ typedef struct _DeviceCommandListEntry *DeviceCommandList;
 	virtual const char 	*GetDevName(){return this->name;};
 	virtual unsigned int 	GetCommandNumber();
 	virtual long 		CommandQuery(_dev_cmd_info *sequence);
-//	virtual unsigned 	GetEventNumber(void){return this->n_events;};
-	virtual long		EventQuery(_dev_event_info *);
+        virtual unsigned        GetEventNumber(void) {return events_list.size();}
+        virtual long            EventQuery(_dev_event_info *);
 	virtual long		GetMinAccessRight(const long);
 //
 // protected members - accessible only be derived classes
@@ -124,9 +154,11 @@ protected:
 	long n_state; 		// convenience variable for storing next device state
 	long n_commands;	// number of commands
    	DeviceCommandList commands_list; // array of commands (for backwards compatibility @ ESRF)
-  
 private: 
 	Device(){};
 };
+
+#define TYPE_DEFAULT            "DevType_Default"
+#define TYPE_INIT               "DevType_"
 
 #endif /* _TACO_DEVICE_H */

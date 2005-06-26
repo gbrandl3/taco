@@ -33,9 +33,9 @@
 
  Original   :	April 1999
 
- Version    :	$Revision: 1.12 $
+ Version    :	$Revision: 1.13 $
 
- Date       :	$Date: 2005-06-16 20:41:37 $
+ Date       :	$Date: 2005-06-26 13:45:25 $
 
  Copyleft (c) 1999 by European Synchrotron Radiation Facility,
                       Grenoble, France
@@ -390,7 +390,7 @@ void _DLLFunc dev_event_fire (DevServer ds, long event,
 /*
  * C++ version
  */
-void _DLLFunc dev_event_fire (DeviceBase *device, long event,
+void _DLLFunc dev_event_fire (Device *device, long event,
 	DevArgument argout, DevType argout_type, 
 	long event_status, long event_error)
 #endif /* __cplusplus */
