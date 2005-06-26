@@ -20,7 +20,7 @@ libtacotango___la_SOURCES = ../dev_api.c ../sec_api.c ../event_api.c \
 			../signal/MDSSignal_config.c \
 			tango_api.cpp attr_api.cpp attr_access.cpp
 libtacotango___la_CFLAGS  	= -x c++ -DTANGO
-libtacotango___la_LIBADD  	= ../xdr/libdsxdr.la  ../dbase/libdbapi.la \
+libtacotango___la_LIBADD  	= ../xdr/libdsxdr_all.la  ../dbase/libdbapi.la \
 				../dc/libdcapi.la -lstdc++ 
 libtacotango___la_LDFLAGS 	= -version-info @LIB_VERSION@
 
