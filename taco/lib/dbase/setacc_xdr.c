@@ -1,11 +1,11 @@
 /*
- Author(s):     $Author: andy_gotz $
+ Author(s):     $Author: jkrueger1 $
 
  Original:      
 
- Version:       $Revision: 1.4 $
+ Version:       $Revision: 1.5 $
 
- Date:          $Date: 2005-06-16 20:43:33 $
+ Date:          $Date: 2005-06-27 11:24:23 $
 
  Copyright (c) 1990 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -45,13 +45,13 @@ bool_t _WINAPI xdr_arr1(XDR *xdrs, arr1 *objp)
 /* For db_dev_export version 1 */
 bool_t _WINAPI xdr_db_devinfo(XDR *xdrs, db_devinfo *objp)
 {
-	if (!xdr_string(xdrs, &objp->dev_name, 24))
+	if (!xdr_string(xdrs, &objp->dev_name, DEV_NAME_LENGTH /* 24 */))
 		return (FALSE);
-	if (!xdr_string(xdrs, &objp->host_name, 20))
+	if (!xdr_string(xdrs, &objp->host_name, HOST_NAME_LENGTH /* 20 */))
 		return (FALSE);
-	if (!xdr_string(xdrs, &objp->dev_type, 24))
+	if (!xdr_string(xdrs, &objp->dev_type, DEV_TYPE_LENGTH /* 24 */))
 		return (FALSE);
-	if (!xdr_string(xdrs, &objp->dev_class, 24))
+	if (!xdr_string(xdrs, &objp->dev_class, DEV_CLASS_LENGTH /* 24 */))
 		return (FALSE);
 	if (!xdr_u_int(xdrs, &objp->p_num))
 		return (FALSE);
