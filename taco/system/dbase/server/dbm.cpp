@@ -443,7 +443,9 @@ DevLong *unreg_1_svc(db_res *recev)
 svcinfo_svc *svcinfo_1_svc(db_res *recev)
 {
 #ifdef DEBUG
+#ifndef _solaris
 	std::cerr << __FUNCTION__ << std::endl;
+#endif /* !_solaris */
 #endif
 	return dbm->svcinfo_1_svc(recev);
 }
