@@ -119,8 +119,7 @@ AT_SETUP([Test the command and event lists of a device])
 AT_CHECK([AT_TACO_RUN_LOCAL([test_server 1 &])
 sleep 5
 AT_TACO_RUN_LOCAL([test_connect test/a/1])
-AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [Longresource = 25
-Set protocol to TCP
+AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [Set protocol to TCP
 Query commands
     4228120577       0       9                        "SendByteArray"
              1       0       0                        "DevOn"

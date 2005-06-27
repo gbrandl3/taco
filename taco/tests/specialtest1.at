@@ -7,25 +7,28 @@ AT_SETUP([Test the connection to the testserver devices])
 AT_DATA([test_server.res], [[
 # This file contains only resources for the tests
 test_server/1/device:   test/a/1 \
-                        test/a/2
+                        test/family/long_member \
+			longtest/longest_family_name/longest_member_name
 
 test/a/1/type: TestDevice
-test/a/2/type: TestDevice2
-test/a/2/longresource: 25
+test/family/long_member/type: TestDevice2
+test/family/long_member/longresource: 25
+longtest/longest_family_name/longest_member_name/type: TestDevice2
+longtest/longest_family_name/longest_member_name/longest_possible_resource_name1: 31
 ]])
 AT_CHECK([
 RES_BASE_DIR=`pwd` taco db_update test_server.res
 AT_TACO_RUN_LOCAL([test_server 1 &])
 sleep 5
-AT_TACO_RUN_LOCAL([test_client2 test/a/1 test/a/2 test/a/1 test/a/2])
-AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [Longresource = 25
-Exported 1
+AT_TACO_RUN_LOCAL([test_client2 test/a/1 test/family/long_member test/a/1 test/family/long_member longtest/longest_family_name/longest_member_name])
+AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [Exported 1
 Type 1
 Server test_server
 Personal 1
 Class TestDevice
 Process test_server
 Version 4
+test/a/1 imported.
 Resource[[0]] = test/a/1/type: TestDevice
 CMD[[0]] = SendByteArray
 CMD[[1]] = DevOn
@@ -41,15 +44,16 @@ Personal 1
 Class TestDevice2
 Process test_server
 Version 4
-Resource[[0]] = test/a/2/longresource: 25
-Resource[[1]] = test/a/2/type: TestDevice2
+test/family/long_member imported.
+Resource[[0]] = test/family/long_member/longresource: 25
+Resource[[1]] = test/family/long_member/type: TestDevice2
 CMD[[0]] = ReadByteArray
 CMD[[1]] = DevOn
 CMD[[2]] = DevOff
 CMD[[3]] = DevReset
 CMD[[4]] = DevState
 CMD[[5]] = DevStatus
-Ping : test/a/2 - 0
+Ping : test/family/long_member - 0
 Exported 1
 Type 1
 Server test_server
@@ -57,6 +61,7 @@ Personal 1
 Class TestDevice
 Process test_server
 Version 4
+test/a/1 imported.
 Resource[[0]] = test/a/1/type: TestDevice
 CMD[[0]] = SendByteArray
 CMD[[1]] = DevOn
@@ -72,15 +77,36 @@ Personal 1
 Class TestDevice2
 Process test_server
 Version 4
-Resource[[0]] = test/a/2/longresource: 25
-Resource[[1]] = test/a/2/type: TestDevice2
+test/family/long_member imported.
+Resource[[0]] = test/family/long_member/longresource: 25
+Resource[[1]] = test/family/long_member/type: TestDevice2
 CMD[[0]] = ReadByteArray
 CMD[[1]] = DevOn
 CMD[[2]] = DevOff
 CMD[[3]] = DevReset
 CMD[[4]] = DevState
 CMD[[5]] = DevStatus
-Ping : test/a/2 - 0
+Ping : test/family/long_member - 0
+Exported 1
+Type 1
+Server test_server
+Personal 1
+Class TestDevice2
+Process test_server
+Version 4
+longtest/longest_family_name/longest_member_name imported.
+Resource[[0]] = longtest/longest_family_name/longest_member_name/longest_possible_resource_name1: 31
+Resource[[1]] = longtest/longest_family_name/longest_member_name/longresourcename1: resource 1
+Resource[[2]] = longtest/longest_family_name/longest_member_name/longresourcename2: 2
+Resource[[3]] = longtest/longest_family_name/longest_member_name/longresourcename3: 3.1
+Resource[[4]] = longtest/longest_family_name/longest_member_name/type: TestDevice2
+CMD[[0]] = ReadByteArray
+CMD[[1]] = DevOn
+CMD[[2]] = DevOff
+CMD[[3]] = DevReset
+CMD[[4]] = DevState
+CMD[[5]] = DevStatus
+Ping : longtest/longest_family_name/longest_member_name - 0
 ])
 AT_CLEANUP
 

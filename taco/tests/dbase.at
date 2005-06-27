@@ -152,12 +152,10 @@ AT_TACO_RUN_LOCAL([test_server 1 &])
 sleep 5
 AT_TACO_RUN_LOCAL([off test_server >>log])
 ], [], [[1
-Longresource = 25
-Longresource = 25
 ]])
 AT_CLEANUP
 
-AT_SETUP([db_update command with extra long names])
+AT_SETUP([db_update command with maximum name sizes])
 AT_DATA([test.res], [[
 # This file contains only resources for the tests
 test/test/device:	longtest/longest_family_name/longest_member_name 

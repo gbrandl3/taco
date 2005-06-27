@@ -129,7 +129,7 @@ TestDevice2::TestDevice2(const std::string name, long &error)
         r.resource_name = "longresource";
         r.resource_type = D_LONG_TYPE;
         r.resource_adr = &value;
-        if (db_getresource(const_cast<char *>(name.c_str()), &r, 1, &error) == DS_OK) 
+        if (db_getresource(const_cast<char *>(name.c_str()), &r, 1, &error) != DS_OK) 
 	{
 		std::cout << "Longresource = " << value << std::endl;
 	}

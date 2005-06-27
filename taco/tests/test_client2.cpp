@@ -57,7 +57,7 @@ int main(int argc,char **argv)
 			std::cout << dev_error_str(error) << std::endl;
 			continue;
 		}
-
+		std::cout << argv[i] << " imported." << std::endl;
 		DevVarStringArray	resList;
 		if (db_deviceres(1, &argv[i], (long *)(&resList.length), &resList.sequence, &error) != DS_OK)
 		{
