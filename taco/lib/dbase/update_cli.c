@@ -10,13 +10,13 @@
 	        update facility
 		
  Author(s)  :   Emmanuel Taurel
-                $Author: andy_gotz $
+                $Author: jkrueger1 $
 
  Original   :   May 1998
 
- Version:       $Revision: 1.6 $
+ Version:       $Revision: 1.7 $
 
- Date:          $Date: 2005-06-16 20:43:34 $
+ Date:          $Date: 2005-06-27 09:30:10 $
 
  Copyright (c) 1998 by European Synchrotron Radiation Facility,
                        Grenoble, France
@@ -693,7 +693,7 @@ printf("End of TestLine \n");
  */
 static long name_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_devdef,long *p_error)
 {
-	char base[80];
+	char base[RES_NAME_LENGTH + DEV_NAME_LENGTH];
 	unsigned int diff;
 	char *tmp;
 	int i,k,j;
@@ -796,7 +796,7 @@ static long name_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_devd
  */
 static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 {
-	char t_name[80];
+	char t_name[RES_NAME_LENGTH + DEV_NAME_LENGTH];
 	unsigned int diff;
 	register char *temp,*tmp;
 	int i,l;
@@ -823,7 +823,8 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 	
 /* Get domain name */
 	tmp = strchr(lin,'/');			/* first '/' found */
-	diff = (unsigned int)(tmp++ - lin);
+	diff = (unsigned int)(tmp - lin);
+	tmp++;
 	if (diff > DOMAIN_NAME_LENGTH - 1)
 	{
 		*p_error = DbErr_DomainDefinition;
@@ -833,14 +834,9 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 	t_name[diff] = '\0';
 	
 /* Select the right resource table in database */
-
 	for (i = 0;i < d_num;i++)
-	{
 		if (strcmp(t_name,d_list[i]) == 0)
-		{
 			break;
-		}
-	} 
 /* Table name not found */
 	if (i == d_num)
 	{
@@ -850,7 +846,8 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 
 /* Check that the family, member and resource name field are not blank */
 	temp = strchr(tmp,'/');			/* second '/' found */
-	diff = (unsigned int)(temp++ - tmp);
+	diff = (unsigned int)(temp - tmp);
+	temp++;
 	if (diff <= 0 || diff > FAMILY_NAME_LENGTH - 1)
 	{
 		*p_error = DbErr_BadResSyntax;
@@ -858,7 +855,8 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 	}
 	
 	tmp = strchr(temp,'/');			/* third '/' found */
-	diff = (unsigned int)(tmp++ - temp);
+	diff = (unsigned int)(tmp - temp);
+	tmp++;
 	if (diff <= 0 || diff > MEMBER_NAME_LENGTH - 1)
 	{
 		*p_error = DbErr_BadResSyntax;
@@ -901,8 +899,8 @@ static long res_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_resde
 	int i,j,k,l;
 	int string = 0;
 	register char *ptr,*ptr2;
-	char base[80];
-	char t_name[80];
+	char base[RES_NAME_LENGTH + DEV_NAME_LENGTH];
+	char t_name[RES_NAME_LENGTH + DEV_NAME_LENGTH];
 	char tmp_line[160];
 	long length_to_eol;
 
