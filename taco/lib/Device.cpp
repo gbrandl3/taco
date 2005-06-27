@@ -8,13 +8,13 @@
 //		the device server base class in C++ (Device).
 //
 // Author(s):	Andy Goetz
-// 		$Author: andy_gotz $
+// 		$Author: jkrueger1 $
 //
 // Original:	March 1995
 //
-// Version:	$Revision: 1.8 $
+// Version:	$Revision: 1.9 $
 //
-// Date:	$Date: 2005-06-26 13:45:25 $
+// Date:	$Date: 2005-06-27 07:50:58 $
 //
 //-**********************************************************************
 		
@@ -116,7 +116,7 @@ long Device::GetResources(char *name, long *error )
 
 
 /**
- * function to execute a command ona device
+ * function to execute a command on a device
  *
  * @param cmd 		command to execute
  * @param argin 	pointer to input argument
@@ -144,8 +144,7 @@ long Device::Command (long cmd, void* argin, long argin_type,
 	{
 		if (cmd == it->second.cmd)
 		{
-			if (argin_type != it->second.arginType ||
-			    argout_type != it->second.argoutType)
+			if (argin_type != it->second.arginType || argout_type != it->second.argoutType)
 			{
 				*error = DevErr_IncompatibleCmdArgumentTypes;
 				return(DS_NOTOK);
@@ -160,7 +159,6 @@ long Device::Command (long cmd, void* argin, long argin_type,
 //
 // now execute the command
 //
-
 			member_fn = it->second.fn;
 			return (this->*member_fn)(argin,argout,error);
 		}
