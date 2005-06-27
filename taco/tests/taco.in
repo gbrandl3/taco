@@ -15,6 +15,7 @@ testbindir=${top_builddir}/tests
 appdefaultdir=@appdefaultdir@
 LD_LIBRARY_PATH=@GCC_LIBRARY_PATH@:@libdir@${LD_LIBRARY_PATH:+:}
 export DSHOME
+export DBTABLES_CUSTOM=TEST,LONGTEST
 }
 
 unset NETHOST

@@ -87,6 +87,7 @@ AT_CHECK(AT_TACO_RUN_LOCAL([db_resdomain]), [], [[class
 cmds
 error
 events
+longtest
 sec
 sys
 test
@@ -159,17 +160,19 @@ AT_CLEANUP
 AT_SETUP([db_update command with extra long names])
 AT_DATA([test.res], [[
 # This file contains only resources for the tests
-test/test/device:	test/longfamilyname/longmembername 
+test/test/device:	longtest/longest_family_name/longest_member_name 
 
-test/longfamilyname/longmembername/longresourcename1:	"resource 1"
-test/longfamilyname/longmembername/longresourcename2:	2
-test/longfamilyname/longmembername/longresourcename3:	3.1
+longtest/longest_family_name/longest_member_name/longresourcename1:	"resource 1"
+longtest/longest_family_name/longest_member_name/longresourcename2:	2
+longtest/longest_family_name/longest_member_name/longresourcename3:	3.1
+longtest/longest_family_name/longest_member_name/longest_possible_resource_name1: a	
 ]])
 AT_CHECK([RES_BASE_DIR=`pwd` taco db_update test.res])
 AT_CLEANUP
 
 AT_SETUP([check value from resources with extra long names])
-AT_CHECK(AT_TACO_RUN_LOCAL([db_getresoval test/longfamilyname/longmembername/longresourcename2]), [], [[test/longfamilyname/longmembername/longresourcename2: 2
+AT_CHECK(AT_TACO_RUN_LOCAL([db_getresoval longtest/longest_family_name/longest_member_name/longest_possible_resource_name1]), [], 
+	[[longtest/longest_family_name/longest_member_name/longest_possible_resource_name1: a
 ]])
 AT_CLEANUP 
 
