@@ -11,6 +11,9 @@
  Original   :	June 2005
 
  $Log: not supported by cvs2svn $
+ Revision 1.2  2005/06/24 08:41:33  jlpons
+ Added full hostname syntax for nethost
+
  Revision 1.1  2005/06/23 16:19:45  jlpons
  Initial import
 
@@ -52,7 +55,7 @@ public class TacoDevice implements ServerListener {
   public final static int ACCESS_ADMIN     = 99;
 
   // Do not modify this line (it is used by the install script)
-  public final String apiRelease = "$Revision: 1.2 $".substring(11,15);
+  public final String apiRelease = "$Revision: 1.3 $".substring(11,15);
 
   // Private member
   private String  deviceName;         // Full device name
@@ -434,7 +437,8 @@ public class TacoDevice implements ServerListener {
     ret = Pattern.matches("//[a-zA-Z_0-9]+/[a-zA-Z_0-9[-]]+/[a-zA-Z_0-9[-]]+/[a-zA-Z_0-9[-]]+", name);
 
     // Check full syntax: //xxx.xxx.xxx/hostName/domain/family/member
-    ret = Pattern.matches("//[a-zA-Z_0-9]+\\.[a-zA-Z_0-9]+\\.[a-zA-Z_0-9]+/[a-zA-Z_0-9[-]]+/[a-zA-Z_0-9[-]]+/[a-zA-Z_0-9[-]]+", name);
+    if (ret == false)
+      ret = Pattern.matches("//[a-zA-Z_0-9]+\\.[a-zA-Z_0-9]+\\.[a-zA-Z_0-9]+/[a-zA-Z_0-9[-]]+/[a-zA-Z_0-9[-]]+/[a-zA-Z_0-9[-]]+", name);
 
     // Check full syntax: //ipAddress/domain/family/member
     if (ret == false)
@@ -457,22 +461,18 @@ public class TacoDevice implements ServerListener {
 
     try {
 
-      TacoDevice dev1  = new TacoDevice("sr/testdev/1");
+      TacoDevice dev1  = new TacoDevice("test/jlp/1");
       TacoDevice dev2  = new TacoDevice("sr/testdev/2");
       TacoDevice dev3  = new TacoDevice("//aries.esrf.fr/sr/rf-tra/tra3");
-
-      System.out.println("----------------------");
-      System.out.println(dev1.getInfo());
-      System.out.println("----------------------");
-      System.out.println(dev2.getInfo());
-      System.out.println("----------------------");
-      System.out.println(dev3.getInfo());
-      System.out.println("----------------------");
 
       while(true) {
 
         long t0 = System.currentTimeMillis();
         try {
+
+          TacoData setPoint = new TacoData();
+          setPoint.insert((int)2);
+          dev1.put(8727,setPoint);
 
           TacoData state = dev1.get(TacoConst.DevState);
           short stateValue = state.extractShort();

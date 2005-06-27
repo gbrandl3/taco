@@ -32,6 +32,7 @@ public class TacoData implements TacoConst {
   /** Construct an argout DeviceData that will receive the data. */
   public TacoData() {
     type = D_VOID_TYPE;
+    value = new XdrVoid();
   }
 
   /** Construct an empty argout DeviceData that will receive the data.
@@ -282,15 +283,15 @@ public class TacoData implements TacoConst {
   /**
    * Returns the XdrAble of this TacoData object.
    */
-  XdrAble getXdrValue() {
+  public XdrAble getXdrValue() {
     return value;
   }
 
   /**
-   * Sets the valie.
+   * Sets the value.
    * @param value XdrAble value
    */
-  void setXdrValue(XdrAble value) {
+  public void setXdrValue(XdrAble value) {
     this.value = value;
   }
 

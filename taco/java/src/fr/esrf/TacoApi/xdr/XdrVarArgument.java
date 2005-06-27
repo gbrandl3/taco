@@ -28,12 +28,8 @@ public class XdrVarArgument implements XdrAble {
    * @param argin TacoData
    */
   public XdrVarArgument(TacoData argin) throws TacoException {
-    try {
-      type = argin.getType();
-      vArg = XdrTacoType.createXdr(type);
-    } catch (IOException e) {
-      throw new TacoException("Unsupported argin type : " + argin.getType());
-    }
+     type = argin.getType();
+     vArg = argin.getXdrValue();
   }
 
   /**
