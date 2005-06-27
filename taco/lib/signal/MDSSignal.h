@@ -9,13 +9,13 @@
  *		
  *
  * Author(s):	Ingrid Fladmark
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
  * Original:	24th of january 1997
  *
- * Date:	$Date: 2005-03-30 06:28:13 $
+ * Date:	$Date: 2005-06-27 12:53:06 $
  *
  * Copyright(c) 1994 by European Synchrotron Radiation Facility, 
  *                     Grenoble, France
@@ -51,6 +51,10 @@ extern MDSSignalClass mDSSignalClass;
  * Defined in module MDSSignal_config.c
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 long dev_get_sig_config (char *device_name, DevVarStringArray *argout,
                          long *error);
 
@@ -61,6 +65,9 @@ long dev_get_sig_config_from_name (char *device_name, char *signal_name ,
 		                   DevVarStringArray *argout, long *error);
 
 void get_sig_prop_suffix (DevVarStringArray *suf_list );
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif /*_MDSSIGNAL_H*/
