@@ -1,3 +1,6 @@
+2005-06-27 15:00 jkrueger1:
+	* lib/Device.cpp lib/dbase/update_cli.c setacc_xdr.c: Fix the
+	problems with long device and resource names.
 2005-06-15 12:00 jkrueger1:
         * system/dc/tools: Add the -h option to all tools to get help
         output
