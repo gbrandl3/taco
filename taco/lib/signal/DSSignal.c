@@ -7,13 +7,13 @@
  * Description:	A class to specify signal properties and signal treatment.
  *
  * Author(s):	J.Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original:	June 1996
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2005-03-30 06:28:13 $
+ * Date:	$Date: 2005-06-29 06:30:07 $
  *
  * Copyright(c) 1996 by European Synchrotron Radiation Facility, 
  *                     Grenoble, France
@@ -27,6 +27,7 @@
 #include <DevServer.h>
 #include <DevServerP.h>
 #include <DSSignalP.h>
+#include <MDSSignal.h>
 
 #include <string.h>
 #include <stdlib.h>
