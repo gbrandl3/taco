@@ -10,14 +10,13 @@ bin_PROGRAMS		= db_update \
 		 	db_devres \
 		 	db_resdel \
 		 	db_initcache \
-			db_devicetree \
-			db_dump
+			db_devicetree 
 
 bin_SCRIPTS		= db_fillup2
 
 if GDBMSUPPORT
 bin_PROGRAMS		+= db_fillup \
-		 	db_read 
+		 	db_read db_dump
 endif
 
 INCLUDES		= @TACO_INCLUDES@ @GDBM_CFLAGS@
