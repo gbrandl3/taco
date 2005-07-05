@@ -830,14 +830,19 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 	std::string	ds_class("");
 	svcinfo_back.embedded_len = nb_class;
 	svcinfo_back.embedded_val = new svcinfo_server[nb_class];
-	for (long i = 0;i < nb_class;i++)
+	for (long i = 0; i < nb_class; ++i)
 	{
 	    svcinfo_back.embedded_val[i].server_name = NULL;
 	    svcinfo_back.embedded_val[i].dev_val = NULL;
 	}
-   	if (row[2] != NULL) strcpy(svcinfo_back.host_name, row[2]);
-	if (row[0] != NULL) strcpy(svcinfo_back.process_name, row[0]);
-  	if (row[5] != NULL) svcinfo_back.pid = atoi(row[5]);
+   	if (row[2] != NULL) 
+		strncpy(svcinfo_back.host_name, row[2], HOST_NAME_LENGTH - 1);
+	svcinfo_back.host_name[HOST_NAME_LENGTH - 1] = '\0';
+	if (row[6] != NULL) 
+		strncpy(svcinfo_back.process_name, row[0], PROC_NAME_LENGTH - 1);
+	svcinfo_back.process_name[PROC_NAME_LENGTH - 1] = '\0';
+  	if (row[5] != NULL) 
+		svcinfo_back.pid = atoi(row[5]);
 	if (row[3] != NULL)
 	{
                 std::string ior(row[3]);
@@ -851,11 +856,6 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
         {
 	    if (ds_class != row[0])
 	    {
-		ds_class = row[0];
-	    	name_length = ds_class.length();
-	    	svcinfo_back.embedded_val[i].server_name = new char [name_length + 1];
-	    	strcpy(svcinfo_back.embedded_val[i].server_name, ds_class.c_str());
-
 	    	dev_length = dev_list.size();
 		if (dev_length != 0)
 		{
@@ -871,10 +871,16 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 		    i++;
 		}
 		dev_list.clear();
+
+		ds_class = row[0];
+	    	name_length = ds_class.length();
+	    	svcinfo_back.embedded_val[i].server_name = new char [name_length + 1];
+	    	strcpy(svcinfo_back.embedded_val[i].server_name, ds_class.c_str());
 	    }
 	    SvcDev	dev;
 	    dev.name = row[1];
-	    if (row[4] != NULL) dev.flag = atoi(row[4]);
+	    if (row[4] != NULL) 
+		dev.flag = atoi(row[4]);
 	    dev_list.push_back(dev);	    
     	}while ((row = mysql_fetch_row(result)) != NULL);
 	dev_length = dev_list.size();
