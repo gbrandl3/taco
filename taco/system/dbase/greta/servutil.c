@@ -12,8 +12,8 @@
  Original      :  June 1998
 
 
- $Revision: 1.1 $
- $Date: 2003-04-25 12:54:10 $
+ $Revision: 1.2 $
+ $Date: 2005-07-05 15:00:17 $
 
 ****************************************************************************/
 
@@ -114,7 +114,6 @@ long db_builddevicelist(char *ds_name,char *pers_name,db_svcinfo_call *p_info,
 /* Compute resulting string size (don't forget spaces at beginning of each
    lines) */
 
-
 	for (i = 0;i < p_info->embedded_server_nb;i++)
 	{
 		if (all_ds == True)
@@ -182,23 +181,27 @@ long db_builddevicelist(char *ds_name,char *pers_name,db_svcinfo_call *p_info,
 		{
 			if (strcmp(p_info->server[i].server_name,ds_name) == 0)
 			{
-				nb_dev = 0;
-				strcpy(tmp,ds_name);
-				strcat(tmp,"/");
-				strcat(tmp,pers_name);
-				strcat(tmp,"/device : ");
+				if (i == 0)
+				{
+					nb_dev = 0;
+					strcpy(tmp,ds_name);
+					strcat(tmp,"/");
+					strcat(tmp,pers_name);
+					strcat(tmp,"/device : ");
+				}
 				for (j = 0;j < p_info->server[i].device_nb;j++)
 				{
-					nb_dev++;
-					strcat(tmp,p_info->server[i].device[j].dev_name);
-					if (nb_dev != p_info->server[i].device_nb)
+					if (nb_dev > 0)
 						strcat(tmp,",");
-					if ((nb_dev != 0) && ((nb_dev % 4) == 0) && (nb_dev != p_info->server[i].device_nb))
+					strcat(tmp,p_info->server[i].device[j].dev_name);
+					nb_dev++;
+					if (((nb_dev % 4) == 0) && (j != p_info->server[i].device_nb - 1))
 					{
 						strcat(tmp,"\\\n                              ");
 					}
 				}
-				strcat(tmp,"\n");
+				if (i == p_info->embedded_server_nb - 1)
+					strcat(tmp,"\n");
 			}
 		}
 	}

@@ -11,8 +11,8 @@
  Original      :  October 1996
 
 
- $Revision: 1.2 $				$Author: jkrueger1 $
- $Date: 2004-06-02 16:36:16 $					$State: Exp $
+ $Revision: 1.3 $				$Author: jkrueger1 $
+ $Date: 2005-07-05 15:00:17 $					$State: Exp $
 
  Copyright (c) 1996 by European Synchrotron Radiation Facility,
 		       Grenoble, France
@@ -350,13 +350,13 @@ ServSelOKCb( Widget w, XtPointer client_data, XtPointer call_data)
 	{
 		if (all_ds == True)
 		{
-			devtpl_nb = devtpl_nb + info.server[i].device_nb;
+			devtpl_nb += info.server[i].device_nb;
 		}
 		else
 		{
 			if (strcmp(ds_name,info.server[i].server_name) == 0)
 			{
-				devtpl_nb = info.server[i].device_nb;
+				devtpl_nb += info.server[i].device_nb;
 			}
 		}
 	}
