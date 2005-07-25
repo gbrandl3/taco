@@ -1,3 +1,22 @@
+# Toolkit for building distributed control systems or any other distributed system.
+#
+# Copyright (c) 2003-2005 Jens Krüger <jkrueger1@users.sf.net>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+
 EXTRA_DIST		= $(bin_SCRIPTS)
 
 bin_PROGRAMS		= db_update \
@@ -10,6 +29,8 @@ bin_PROGRAMS		= db_update \
 		 	db_devres \
 		 	db_resdel \
 		 	db_initcache \
+			db_hostlist \
+			db_devicelist \
 			db_devicetree 
 
 bin_SCRIPTS		= db_fillup2
@@ -60,6 +81,12 @@ db_devres_LDADD		= @TACO_CLIENT_LIBS@
 db_resdel_SOURCES	= db_resdel.cpp 
 db_resdel_LDADD		= @TACO_CLIENT_LIBS@
 
-db_dump_SOURCES		= db_dump.cpp 
+db_dump_SOURCES		= db_dump.cpp
 db_dump_LDADD		= @TACO_CLIENT_LIBS@ @GDBM_LIBS@
-db_dump_LDFLAGS		= -static
+
+db_hostlist_SOURCES	= db_hostlist.cpp
+db_hostlist_LDADD	= @TACO_CLIENT_LIBS@
+
+db_devicelist_SOURCES	= db_devicelist.cpp
+db_devicelist_LDADD	= @TACO_CLIENT_LIBS@
+
