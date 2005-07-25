@@ -1,12 +1,51 @@
+/*
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 ESRF, www.esrf.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:	db_dump.cpp
+ *
+ * Description: To dump all device servers and resources of a domain (table) or
+ *		all domains (tables) in SQL statements to be able to be imported 
+ *		into the tango MySQL database. The database directory has to be 
+ *		given by the environment variable DBM_DIR. 
+ * 		Synopsis : db_dump [domain/all] 
+ *
+ * Author(s):
+ *              $Author: jkrueger1 $
+ *
+ * Version:     $Revision: 1.5 $
+ *
+ * Date:        $Date: 2005-07-25 11:31:53 $
+ */
+
 #include <cstdio>
 #include <string>
 #include <cstdlib>
+#include <vector>
+#include <map>
 #include <sys/wait.h>
 
+#define _db_setup_h
 #include <API.h>
+#undef _db_setup_h
+#include "db_setup.h"
 
-/* For database only */
-
+// For database only 
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -15,38 +54,15 @@
 #include <gdbm.h>
 
 #include <iostream>
-#include <string>
 #include <algorithm>
-#include <map>
 
-using namespace std;
+// Function definitions 
+static int db_dump_resources(std::string, std::string);
+static int db_dump_names(std::string);
+static int db_dump_psnames(std::string);
 
-/* Function definitions */
-
-int db_read(char *,char *);
-
-/* Global variables definitions */
-
+// Global variables definitions 
 int line_ptr;
-std::map<std::string, int> device_map;
-std::map<std::string, int> property_map;
-std::map<std::string,int>::iterator ipos;
-
-
-/****************************************************************************
-*                                                                           *
-*		Code for db_dump command 				    *
-*                        -------                                            *
-*                                                                           *
-*    Command rule : To dump all device servers and resources of a domain    *
-*		    (table) or all domains (tables) in SQL statements to    *
-*                   be able to be imported into the tango MySQL database    *
-*                   The database directory has to be given by the           *
-*                   environment variable DBM_DIR.                           *
-*                                                                           *
-*    Synopsis : db_dump [domain/all]                                        *
-*                                                                           *
-****************************************************************************/
 
 int main(int argc,char *argv[])
 {
@@ -59,165 +75,294 @@ int main(int argc,char *argv[])
     	int 	i,
         	j,
         	l;
-	int 	res_num[MAXDOMAIN];
-	char 	TblName[MAXDOMAIN][12];
-	char 	tblname[MAXDOMAIN][14];
-	int 	TblNum = 0;
+	int 	res_num;
+	std::vector<std::string> tblname;
 	int 	names = False;
 	int 	ps_names = False;
+	extern char 	*optarg;
+	extern int 	optind, 
+			opterr, 
+			optopt;
+	int 		c;
 
-/* Argument test and domain name modification */
 
-	if (argc != 2)
+// Argument test and domain name modification 
+	while((c = getopt(argc, argv, "h")) != -1)
 	{
-		cerr <<  argv[0] << " usage: " << argv[0] << " <domain name|all>" << endl;
-		exit(-1);
+		switch(c)
+		{
+			case 'h':
+			case '?':
+				std::cerr << " usage: " << argv[0] << " [options] [domain name]" << std::endl;
+				std::cerr << " dumps all servers and its devices and all resources" << std::endl;
+				std::cerr << "         options : -h display this message" << std::endl;
+				exit(-1);
+		}
 	}
 
-	string	domain(argv[1]);
+	std::string	domain;
+	if (argc > 1)
+		domain = argv[optind];
+	else
+		domain = "all";
+
 	transform(domain.begin(), domain.end(), domain.begin(), ::tolower);
 
-/* Find the dbm_database table names */        
-
+// Find the dbm_database table names 
 	if ((ptr = (char *)getenv("DBTABLES")) == NULL)
 	{
-		cerr << "db_read: Can't find environment variable DBTABLES" << endl;
+		std::cerr << "db_dump: Can't find environment variable DBTABLES" << std::endl;
 		exit(-1);
 	}
 
-	tbeg = ptr;
-	while ((tend = (char *)strchr(tbeg,',')) != NULL)
+	std::string dbtables(ptr);
+	transform(dbtables.begin(), dbtables.end(), dbtables.begin(), ::tolower);
+	std::string::size_type pos;
+	while ((pos = dbtables.find(',')) != std::string::npos)
 	{
-		diff = (unsigned int)(tend++ - tbeg);
-		strncpy(TblName[TblNum], tbeg, diff);
-		TblName[TblNum][diff] = '\0';
-		TblNum++;
-		tbeg = tend;
+		tblname.push_back(dbtables.substr(0, pos));
+		dbtables.erase(0, pos + 1);
 	}
-	strcpy (TblName[TblNum++], tbeg);
+	tblname.push_back(dbtables);
 	
-/* Change the database table names to lowercase letter names and check if there 
-   is a names and ps_names tables defined */
-
-	for (i = 0;i < TblNum;i++)
+// Change the database table names to lowercase letter names and check if there 
+// is a names and ps_names tables defined 
+	for (std::vector<std::string>::iterator i = tblname.begin();i != tblname.end(); ++i)
 	{
-		for (j = 0;j < (int)strlen(TblName[i]);j++)
-			tblname[i][j] = tolower(TblName[i][j]);
-		tblname[i][j] = '\0';
-		if (strcmp(tblname[i],"names") == 0)
+		if (*i == "names")
 			names = True;
-		if (strcmp(tblname[i],"ps_names") == 0)
+		if (*i == "ps_names")
 			ps_names = True;
 	}
 
-/* If no names or ps_names tables are defined, add them to the list */
-
+// If no names or ps_names tables are defined, add them to the list 
 	if (names == False)
-	{
-		strcpy(tblname[TblNum],"names");
-		TblNum++;
-	}
+		tblname.push_back("names");
 	if (ps_names == False)
-	{
-		strcpy(tblname[TblNum],"ps_names");
-		TblNum++;
-	}	
+		tblname.push_back("ps_names");
 	
-/* Take the environment variable DBM_DIR */
-
+// Take the environment variable DBM_DIR 
 	if ((ptr = getenv("DBM_DIR")) == NULL)
 	{
-		cerr << "db_read: Can't find environment variable DBM_DIR" << endl;
+		std::cerr << "db_dump: Can't find environment variable DBM_DIR" << std::endl;
 		exit(-1);
 	}
-	string dbm_dir(ptr);
+	std::string dbm_dir(ptr);
 
 	if (dbm_dir[dbm_dir.length() - 1] != '/')
 		dbm_dir += '/';
 
-/* Read the database tables of the database */
-   	for (int i = 0; i < TblNum; i++)
-	{
-		if ((domain == string(tblname[i])) || (domain == "all")) 
+	unsigned int TblNum = tblname.size();
+// Read the database tables of the database 
+   	for (unsigned int i = 0; i < TblNum; i++)
+		if ((domain == tblname[i]) || (domain == "all")) 
 		{
-			string dbm_file(dbm_dir);
-			dbm_file +=  string(tblname[i]);
-			res_num[i] = db_read(const_cast<char *>(dbm_file.c_str()), tblname[i]);
+			std::string dbm_file(dbm_dir);
+			dbm_file +=  tblname[i];
+			if (tblname[i] == "names")
+				res_num = db_dump_names(dbm_file);
+			else if (tblname[i] == "ps_names")
+				res_num = db_dump_psnames(dbm_file);
+			else
+				res_num = db_dump_resources(dbm_file, tblname[i]);
 			if (domain != "all") 
 				return 0;
 		}
-	}
-	for (ipos = device_map.begin(); ipos != device_map.end(); ipos++)
-	{
-		if (ipos->second > 1)
-		{
-			cout << "WARNING - the following device " << ipos->first << " has " << ipos->second << " entries in the NAMES table !\n";
-		}
-	}
 	return 1;
 }
 
-int db_read(char *dbm_file,char *TblName)
+int db_dump_names(std::string dbm_file)
 {
-	//int 		flags = GDBM_READER | GDBM_NOLOCK;
-	int 		flags = 0666;
-	GDBM_FILE	tab_tid;
-	datum 		key,
-        		key_out;
-	datum 		content,
-        		content_out;
-	int 		res_num = 0;
-	long 		err;
-#ifdef linux
-	static long 	connected = False;
-#endif /* linux */
-	string		key_str, content_str, device_tmp;
-	string		domain, family, member, personal_name, process;
-	string		device, host, program_no, pid, server, device_property;
-	string		version, device_type, device_class, count;
-	string		name, value, poll_rate;
-	string::size_type pos;
-	
-	key_out.dptr = (char *)malloc(MAX_KEY);
-	content_out.dptr = (char *)malloc(MAX_CONT);
+	int 			flags = GDBM_READER | GDBM_NOLOCK;
+	GDBM_FILE		tab_tid;
+	datum 			key,
+        			key_out;
+	datum 			content,
+        			content_out;
+	int 			res_num = 0;
+	long 			err;
+	std::string		key_str, content_str;
+	std::string		device, personal_name,server;
+	std::string::size_type 	pos;
 
-#if 0 //def linux
-//
-// Connect process to db if it is not already done 
-//
-	if (connected == False)
-	{
-		if (db_import(&err) != 0)
-		{
-	    		cerr << "db_read: can't connect to database server" << endl;
-			exit(-1);
-		}
-		connected = True;
-	}
-//
-// Ask server to disconnect from DBM files 
-//
-	if (db_svc_close(&err) == -1)
-	{
-		cerr << "db_read: Server failed when tries to disconnect to DBM files" << endl;
-		exit(-1);
-	}	
-#endif /* linux */
+	std::map<std::string, std::vector<std::string> > ds; 
+
+	key_out.dptr = new char[MAX_KEY];
+	content_out.dptr = new char[MAX_CONT];
 //
 // Open database file 
 //
-	tab_tid = gdbm_open(dbm_file, 0, flags, (int)0666, NULL);
-
-	if (tab_tid == NULL)
+	if ((tab_tid = gdbm_open(const_cast<char *>(dbm_file.c_str()), 0, flags, (int)0666, NULL)) == NULL)
 	{
-		cerr << "db_read: Can't open " << dbm_file << " table" << endl;
-#if 0 //def linux
+		std::cerr << "db_dump: Can't open " << dbm_file << " table" << std::endl;
+		exit(-1);
+	}	
 //
-// Ask server to disconnect from DBM files 
+// Display table contents 
 //
-		if (db_svc_reopen(&err) == -1)
-	   		cerr << "db_read: Server failed when tries to reconnect to DBM files" << endl;
-#endif /* linux */		
+	for (key = gdbm_firstkey(tab_tid); key.dptr != NULL;key = gdbm_nextkey(tab_tid, key))
+	{
+		content = gdbm_fetch(tab_tid, key);
+		if (content.dptr != NULL)
+		{
+			strncpy(content_out.dptr, content.dptr, content.dsize);
+			content_out.dptr[content.dsize] = '\0';
+			content_str = content_out.dptr;
+			strncpy(key_out.dptr, key.dptr, key.dsize);
+			key_out.dptr[key.dsize] = '\0';
+			key_str = key_out.dptr;
+
+			pos = key_str.find("|");
+			server = key_str.substr(0,pos);
+			key_str = key_str.substr(pos+1);
+			pos = key_str.find("|");
+			personal_name = key_str.substr(0,pos);
+
+			std::string server_name = server + "/" + personal_name;
+
+			pos = content_str.find("|");
+			device = content_str.substr(0,pos);
+
+			if (ds.find(server_name) == ds.end())
+			{
+				std::vector<std::string> tmp;
+				tmp.push_back(device);
+				ds.insert(std::pair<std::string, std::vector<std::string> >(server_name, tmp));
+			}			
+			else
+				ds[server_name].push_back(device);
+		}
+	}
+	for (std::map<std::string, std::vector<std::string> >::iterator i = ds.begin(); i != ds.end(); ++i)
+	{
+		std::cout << i->first << ":\t";
+		for (std::vector<std::string>::iterator j = i->second.begin(); j != i->second.end(); ++j)
+		{
+			if (j != i->second.begin())
+//				std::cout << ",";
+				std::cout << " \\" << std::endl << "\t\t";
+			std::cout << *j;
+		}
+		std::cout << std::endl << std::endl;
+	}
+//
+// Close database 
+//
+	gdbm_close(tab_tid);
+
+	delete [] key_out.dptr;
+	delete [] content_out.dptr;
+	return(res_num);
+}
+
+int db_dump_psnames(std::string dbm_file)
+{
+	int 			flags = GDBM_READER | GDBM_NOLOCK;
+	GDBM_FILE		tab_tid;
+	datum 			key,
+        			key_out;
+	datum 			content,
+        			content_out;
+	int 			res_num = 0;
+	long 			err;
+	std::string		key_str, content_str, device_tmp;
+	std::string		device, domain, family, member;
+	std::string		host, pid, poll_rate;
+	std::string::size_type 	pos;
+
+	key_out.dptr = new char[MAX_KEY];
+	content_out.dptr = new char[MAX_CONT];
+//
+// Open database file 
+//
+	if ((tab_tid = gdbm_open(const_cast<char *>(dbm_file.c_str()), 0, flags, (int)0666, NULL)) == NULL)
+	{
+		std::cerr << "db_dump: Can't open " << dbm_file << " table" << std::endl;
+		exit(-1);
+	}	
+//
+// Display table contents 
+//
+	for (key = gdbm_firstkey(tab_tid); key.dptr != NULL;key = gdbm_nextkey(tab_tid, key))
+	{
+		content = gdbm_fetch(tab_tid, key);
+		if (content.dptr != NULL)
+		{
+			strncpy(content_out.dptr, content.dptr, content.dsize);
+			content_out.dptr[content.dsize] = '\0';
+			content_str = content_out.dptr;
+			strncpy(key_out.dptr, key.dptr, key.dsize);
+			key_out.dptr[key.dsize] = '\0';
+			key_str = key_out.dptr;
+			device = key_str;
+
+			pos = key_str.find("/");
+			domain = key_str.substr(0,pos);
+			key_str = key_str.substr(pos+1);
+			pos = key_str.find("/");
+			family = key_str.substr(0,pos);
+			key_str = key_str.substr(pos+1);
+			pos = key_str.find("/");
+			member = key_str.substr(0,pos);
+
+			pos = content_str.find("|");
+			host = content_str.substr(0,pos);
+			content_str = content_str.substr(pos+1);
+			pos = content_str.find("|");
+			pid = content_str.substr(0,pos);
+			content_str = content_str.substr(pos+1);
+			pos = content_str.find("|");
+			poll_rate = content_str.substr(0,pos);
+
+#if 0
+			std::cout << "INSERT INTO device SET "
+	     			<< "name='" << device << "',"
+	     			<< "domain='" << domain << "',"
+	     			<< "family='" << family << "',"
+	     			<< "member='" << member << "',"
+	     			<< "ior='DC:" << host << ":" << poll_rate << "',"
+	     			<< "host='" << host << "',"
+	     			<< "server='datacollector',"
+	     			<< "pid='" << pid << "',"
+	     			<< "class='PseudoDevice',"
+	     			<< "version='1'"
+	     			<< ", exported=1"
+	     			<< ";" << std::endl;
+#endif
+		}
+	}
+//
+// Close database 
+//
+	gdbm_close(tab_tid);
+
+	delete [] key_out.dptr;
+	delete [] content_out.dptr;
+	return(res_num);
+}
+
+int db_dump_resources(std::string dbm_file, std::string domain)
+{
+	int 			flags = GDBM_READER | GDBM_NOLOCK;
+	GDBM_FILE		tab_tid;
+	datum 			key,
+        			key_out;
+	datum 			content,
+        			content_out;
+	int 			res_num = 0;
+	long 			err;
+	std::string		key_str, content_str;
+	std::string		family, member, name, value;
+	std::string::size_type pos;
+	
+	key_out.dptr = new char[MAX_KEY];
+	content_out.dptr = new char[MAX_CONT];
+//
+// Open database file 
+//
+	if ((tab_tid = gdbm_open(const_cast<char *>(dbm_file.c_str()), 0, flags, (int)0666, NULL)) == NULL)
+	{
+		std::cerr << "db_dump: Can't open " << dbm_file << " table" << std::endl;
 		exit(-1);
 	}	
 //
@@ -235,197 +380,39 @@ int db_read(char *dbm_file,char *TblName)
 			strncpy(key_out.dptr, key.dptr, key.dsize);
 			key_out.dptr[key.dsize] = '\0';
 			key_str = key_out.dptr;
-//			cout << TblName << ": " << key_out.dptr << ": " << content_out.dptr << endl;
-			if (strcmp(TblName,"names") == 0)
+	
+			pos = key_str.find("|");
+			family = key_str.substr(0,pos);
+			key_str = key_str.substr(pos+1);
+			pos = key_str.find("|");
+			member = key_str.substr(0,pos);
+			key_str = key_str.substr(pos+1);
+			pos = key_str.find("|");
+			name = key_str.substr(0,pos);
+			key_str = key_str.substr(pos+1);
+#if 0
+			pos = key_str.find("|");
+			count = key_str.substr(0,pos);
+			key_str = key_str.substr(pos+1);
+#endif
+			value = content_str;
+			pos = value.find("'");
+			while (pos != std::string::npos)
 			{
-
-				pos = key_str.find("|");
-				server = key_str.substr(0,pos);
-				key_str = key_str.substr(pos+1);
-				pos = key_str.find("|");
-				personal_name = key_str.substr(0,pos);
-				key_str = key_str.substr(pos+1);
-				pos = key_str.find("|");
-				count = key_str.substr(0,pos);
-
-				pos = content_str.find("|");
-				device = content_str.substr(0,pos);
-				content_str = content_str.substr(pos+1);
-				pos = content_str.find("|");
-				host = content_str.substr(0,pos);
-				content_str = content_str.substr(pos+1);
-				pos = content_str.find("|");
-				program_no = content_str.substr(0,pos);
-				content_str = content_str.substr(pos+1);
-				pos = content_str.find("|");
-				version = content_str.substr(0,pos);
-				content_str = content_str.substr(pos+1);
-				pos = content_str.find("|");
-				device_type = content_str.substr(0,pos);
-				content_str = content_str.substr(pos+1);
-				pos = content_str.find("|");
-				device_class = content_str.substr(0,pos);
-				content_str = content_str.substr(pos+1);
-				pos = content_str.find("|");
-				pid = content_str.substr(0,pos);
-				content_str = content_str.substr(pos+1);
-				pos = content_str.find("|");
-				process = content_str.substr(0,pos);
-
-				device_tmp = device;
-				pos = device_tmp.find("/");
-				domain = device_tmp.substr(0,pos);
-				device_tmp = device_tmp.substr(pos+1);
-				pos = device_tmp.find("/");
-				family = device_tmp.substr(0,pos);
-				device_tmp = device_tmp.substr(pos+1);
-				pos = device_tmp.find("/");
-				member = device_tmp.substr(0,pos);
-
-//
-// count how many times each device is in the "names" table
-//
-
-				ipos = device_map.find(device);
-				if (ipos == device_map.end())
-				{
-					device_map[device] = 1;
-				}
-				else
-				{
-					device_map[device] = device_map[device]+1;
-				}
-
-				cout << "DELETE FROM device where name='" << device << "';" << endl;
-				cout << "INSERT INTO device SET "
-				     << "name='" << device << "',"
-				     << "domain='" << domain << "',"
-				     << "family='" << family << "',"
-				     << "member='" << member << "',"
-				     << "ior='rpc:" << host << ":" << program_no << "',"
-				     << "host='" << host << "',"
-				     << "server='" << server << "/" << personal_name << "',"
-				     << "pid='" << pid << "',"
-				     << "class='" << device_class << "',"
-				     << "version='" << version << "'";
-				     if (atoi(program_no.c_str()) != 0)
-				     {
-				     	cout << ", exported=1";
-				     }
-				     else
-				     {
-				     	cout << ", exported=0";
-				     }
-				     cout << ";" << endl;
+				value.insert(pos,"\\");
+				pos = value.find("'",pos+2);
 			}
-			else
-			{
-				if (strcmp(TblName,"ps_names") == 0)
-				{
-					device = key_str;
-					pos = key_str.find("/");
-					domain = key_str.substr(0,pos);
-					key_str = key_str.substr(pos+1);
-					pos = key_str.find("/");
-					family = key_str.substr(0,pos);
-					key_str = key_str.substr(pos+1);
-					pos = key_str.find("/");
-					member = key_str.substr(0,pos);
-
-
-					pos = content_str.find("|");
-					host = content_str.substr(0,pos);
-					content_str = content_str.substr(pos+1);
-					pos = content_str.find("|");
-					pid = content_str.substr(0,pos);
-					content_str = content_str.substr(pos+1);
-					pos = content_str.find("|");
-					poll_rate = content_str.substr(0,pos);
-
-
-					cout << "DELETE FROM device where name='" << device << "';" << endl;
-					cout << "INSERT INTO device SET "
-				     	<< "name='" << device << "',"
-				     	<< "domain='" << domain << "',"
-				     	<< "family='" << family << "',"
-				     	<< "member='" << member << "',"
-				     	<< "ior='DC:" << host << ":" << poll_rate << "',"
-				     	<< "host='" << host << "',"
-				     	<< "server='datacollector',"
-				     	<< "pid='" << pid << "',"
-				     	<< "class='PseudoDevice',"
-				     	<< "version='1'"
-				     	<< ", exported=1"
-				     	<< ";" << endl;
-				}
-				else
-				{
-					domain = TblName;
-					pos = key_str.find("|");
-					family = key_str.substr(0,pos);
-					key_str = key_str.substr(pos+1);
-					pos = key_str.find("|");
-					member = key_str.substr(0,pos);
-					key_str = key_str.substr(pos+1);
-					pos = key_str.find("|");
-					name = key_str.substr(0,pos);
-					key_str = key_str.substr(pos+1);
-					pos = key_str.find("|");
-					count = key_str.substr(0,pos);
-					key_str = key_str.substr(pos+1);
-
-					value = content_str;
-					pos = value.find("'");
-					while (pos != string::npos)
-					{
-						value.insert(pos,"\\");
-						pos = value.find("'",pos+2);
-					}
-//
-// count how many times this device property has been encountered 
-//
-
-					device = domain + "/" + family +  "/" +  member;
-					device_property = device + "/" + name;
-					ipos = property_map.find(device_property);
-					if (ipos == property_map.end())
-					{
-						property_map[device_property] = 1;
-						cout << "DELETE FROM property_device WHERE device='" << device << "' AND name='" << name << "';" << endl;
-					}
-					else
-					{
-						property_map[device_property] = property_map[device_property]+1;
-					}
-					cout << "INSERT INTO property_device SET "
-					     << "device='" << domain <<"/" << family << "/" << member << "',"
-					     << "domain='" << domain << "',"
-					     << "family='" << family << "',"
-					     << "member='" << member << "',"
-					     << "name='" << name << "',"
-					     << "count='" << count << "',"
-					     << "value='" << value << "'" 
-					     << ";" << endl;
-				}
-			}
+			std::cout << domain << "/" << family << "/" << member << "/" << name 
+				<< ":	\"" << value << "\"" << std::endl;
 		}
 	}
+	std::cout << std::endl;
 //
 // Close database 
 //
 	gdbm_close(tab_tid);
 
-	free(key_out.dptr);
-	free(content_out.dptr);
-#if 0 //def linux
-//
-// Ask server to reconnect to DBM files 
-//
-	if (db_svc_reopen(&err) == -1)
-	{
-		cerr << "db_read: Server failed when tries to reconnect to DBM files" << endl;
-		exit(-1);
-	}	
-#endif /* linux */
+	delete [] key_out.dptr;
+	delete [] content_out.dptr;
 	return(res_num);
 }

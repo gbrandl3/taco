@@ -1,3 +1,36 @@
+/*
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 2004-2005 Jens Krüger <jkrueger1@users.sf.net>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:	db_devicetree.cpp
+ *
+ * Description: To display at tree of devices on the different hosts
+ *		and device types 
+ *              Synopsis : db_devicetree
+ *
+ * Author(s):	Jens Krüger
+ *              $Author: jkrueger1 $
+ *
+ * Version:     $Revision: 1.2 $
+ *
+ * Date:        $Date: 2005-07-25 11:33:50 $
+ */
+
 /* TACO include file */
 #include <API.h>
 
@@ -35,15 +68,6 @@ typedef struct _host
 
 typedef std::vector<Thost>	Tnethost;
 
-/****************************************************************************
-*                                                                           
-*    Code for db_listservers
-*                                                                           
-*    To get a list of device servers from a special nethost.
-*                                                                           
-*    db_listservers NETHOST
-*                                                                           
-****************************************************************************/
 int main(int argc, char **argv)
 {
 	Tnethost	nethost;
@@ -151,79 +175,6 @@ int main(int argc, char **argv)
 					(d->exported ? " : exported" : " : not exported") << std::endl;
 		}
 	}
-#if 0		
-		long	n_ds;
-		db_svc	*ds;
-		if (Db_getdsonhost(host_list[i], &n_ds, &ds,&error) == DS_OK)
-		{
-			for (int j = 0; j < n_ds; ++j)
-			{
-				std::string server_name(ds[j].server_name);
-				server_name += '/';
-				server_name += ds[j].personal_name;
-				std::cout << "    " << server_name << std::endl;
-				u_int n_dev;
-				char **device_names;
-				if (db_getdevlist(const_cast<char *>(server_name.c_str()), &device_names, &n_dev, &error) == DS_OK)
-				{
-					for (int k = 0; k < n_dev; ++k)
-						std::cout << "              " << device_names[k] << std::endl;
-				}
-			}
-			free(ds);
-		}
-	}
-#endif
 	return 0;
 }
 
-
-long Db_getdsonhost(char *host, long *n_ds, db_svc **ds, long *perror)
-{
-	long 	n_server;
-	char	**server_names;
-
-	*n_ds = 0;
-	*ds = NULL;
-	if (db_getdsserverlist(&n_server, &server_names, perror) == DS_OK)
-	{
-		for (int i = 0; i < n_server; ++i)
-		{
-			long	n_pers;
-			char 	**pers_names;
-			if (db_getdspersnamelist(server_names[i], &n_pers, &pers_names, perror) == DS_OK)
-			{
-				for (int j = 0; j < n_pers; ++j)
-				{
-					db_svcinfo_call	info;
-					if (db_servinfo(server_names[i], pers_names[j], &info, perror) == DS_OK)
-					{
-						if (!strcmp(host, info.host_name))
-						{
-							int n = *n_ds;
-							db_svc	help;
-							if (!*ds)
-								*ds = (db_svc *)malloc(sizeof(db_svc));
-							else
-								*ds = (db_svc *)realloc(*ds, sizeof(db_svc) * (1 + n));
-							help.pid = info.pid;
-							help.program_num = info.program_num;
-							strncpy(help.server_name, server_names[i], sizeof(help.server_name) - 1);
-							help.server_name[sizeof(help.server_name) - 1] = '\0'; 
-							strncpy(help.personal_name, pers_names[j], sizeof(help.personal_name) - 1);
-							help.personal_name[sizeof(help.personal_name) - 1] = '\0'; 
-							strncpy(help.host_name, host, sizeof(help.host_name) - 1);
-							help.host_name[sizeof(help.host_name) - 1] = '\0'; 
-							memcpy(*ds + n, &help, sizeof(help));
-							(*n_ds)++;	
-						}
-					}
-				}
-				db_freedevexp(pers_names);
-			}
-		}	
-		db_freedevexp(server_names);
-		return DS_OK;
-	}
-	return DS_NOTOK;
-}

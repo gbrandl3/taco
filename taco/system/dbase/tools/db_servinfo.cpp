@@ -1,3 +1,35 @@
+/*
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 ESRF, www.esrf.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:	db_servinfo.cpp
+ *
+ * Description: To display device server info
+ *		Synopsis : db_servinfo [ full device server name ]
+ *
+ * Author(s):
+ *              $Author: jkrueger1 $
+ *
+ * Version:     $Revision: 1.4 $
+ *
+ * Date:        $Date: 2005-07-25 11:27:02 $
+ */
+
 /* TACO include file */
 
 #include <API.h>
@@ -20,16 +52,6 @@ void usage(const char *cmd)
 	exit(-1);
 }
 
-/****************************************************************************
-*                                                                           *
-*		Code for db_servinfo command                                *
-*                        -----------                                        *
-*                                                                           *
-*    Command rule : To display device server info			    *
-*                                                                           *
-*    Synopsis : db_servinfo [ full device server name ]                     *
-*                                                                           *
-****************************************************************************/
 int main(int argc,char *argv[])
 {
 	long error;
@@ -91,7 +113,7 @@ int main(int argc,char *argv[])
 
 	if (db_import(&error) == -1)
 	{
-		cerr << "db_devinfo : Impossible to connect to database server" << endl;
+		cerr << "db_servinfo : Impossible to connect to database server" << endl;
 		exit(-1);
 	}
 

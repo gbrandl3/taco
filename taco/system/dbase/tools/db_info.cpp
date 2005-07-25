@@ -1,3 +1,35 @@
+/*
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 ESRF, www.esrf.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:	db_info.cpp
+ *
+ * Description: To get device and resources informations from the static database 
+ *		Synopsis : db_info
+ *
+ * Author(s):
+ *              $Author: jkrueger1 $
+ *
+ * Version:     $Revision: 1.3 $
+ *
+ * Date:        $Date: 2005-07-25 11:29:23 $
+ */
+
 /* TACO include file */
 
 #include <API.h>
@@ -11,17 +43,6 @@
 
 using namespace std;
 
-/****************************************************************************
-*                                                                           *
-*		Code for db_info command                                    *
-*                        -------                                            *
-*                                                                           *
-*    Command rule : To get device and resources informations from the static*
-*		    database using ndbm package				    *
-*                                                                           *
-*    Synopsis : db_info              		   			    *
-*                                                                           *
-****************************************************************************/
 int main(int argc,char *argv[])
 {
 	long error;
@@ -52,7 +73,7 @@ int main(int argc,char *argv[])
 //
 	if (db_import(&error) == -1)
 	{
-		cerr << "db_devinfo : Impossible to connect to database server" << endl;
+		cerr << "db_info : Impossible to connect to database server" << endl;
 		exit(-1);
 	}
 //

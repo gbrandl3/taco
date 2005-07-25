@@ -1,3 +1,35 @@
+/*
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 ESRF, www.esrf.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:	db_devres.cpp
+ *
+ * Description: To get device resources from the static database.
+ *		Synopsis : db_devres [ device name ]
+ *
+ * Author(s):
+ *              $Author: jkrueger1 $
+ *
+ * Version:     $Revision: 1.4 $
+ *
+ * Date:        $Date: 2005-07-25 11:32:30 $
+ */
+
 /* TACO include file */
 
 #include <API.h>
@@ -19,18 +51,6 @@ void usage(const char *cmd)
 	std::cerr << "          options: -h display this message" << std::endl;
         exit(1);
 }
-
-/****************************************************************************
-*                                                                           *
-*		Code for db_devres command                                  *
-*                        ---------                                          *
-*                                                                           *
-*    Command rule : To get device resources from the static database.       *
-*                                                                           *
-*    Synopsis : db_devres [ device name ]               		    *
-*                                                                           *
-****************************************************************************/
-
 
 int main(int argc,char *argv[])
 {
@@ -74,7 +94,7 @@ int main(int argc,char *argv[])
 
 	if (db_import(&error) == -1)
 	{
-		cerr << "db_devinfo : Impossible to connect to database server" << endl;
+		cerr << "db_devres : Impossible to connect to database server" << endl;
 		exit(-1);
 	}
 
@@ -101,5 +121,5 @@ int main(int argc,char *argv[])
 	else
 	for (int i = 0; i < res_nb; i++)
 			cout << res_list[i] << endl;
-    return 0;
-	}
+    	return 0;
+}

@@ -1,3 +1,37 @@
+/*
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 ESRF, www.esrf.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:	db_devdel.cpp
+ *
+ * Description: To delete a device and its resources from the database. 
+ *              The -r option is used if the user does not want device
+ *		resources to be also deleted
+ *              Synopsis : db_devdel [-r] <device name>
+ *
+ * Author(s):
+ *              $Author: jkrueger1 $
+ *
+ * Version:     $Revision: 1.4 $
+ *
+ * Date:        $Date: 2005-07-25 11:34:25 $
+ */
+
 /* TACO include file */
 
 #include <API.h>
@@ -22,18 +56,6 @@ void usage(const char *cmd)
 	exit(1);
 }
 
-/****************************************************************************
-*                                                                           *
-*		Code for db_devdel command                                  *
-*                        ---------                                          *
-*                                                                           *
-*    Command rule : To delete a device and its resources from the database. *
-*                   The -r option is used if the user does not want device  *
-*		    resources to be also deleted			    *
-*                                                                           *
-*    Synopsis : db_devdel [-r] <device name>               		    *
-*                                                                           *
-****************************************************************************/
 int main(int argc,char *argv[])
 {
 	long 		error;
@@ -71,7 +93,7 @@ int main(int argc,char *argv[])
 	if (_sol::count(dev_name.begin(), dev_name.end(), '/') != 2)
 #endif /* _solaris */
 	{
-		cerr << "db_devres : Bad device name" << endl;
+		cerr << "db_devdel : Bad device name" << endl;
 		exit(-1);
 	}
 
@@ -81,7 +103,7 @@ int main(int argc,char *argv[])
 
 	if (db_import(&error) == -1)
 	{
-		cerr << "db_devinfo : Impossible to connect to database server" << endl;
+		cerr << "db_devdel : Impossible to connect to database server" << endl;
 		exit(-1);
 	}
 
@@ -89,7 +111,7 @@ int main(int argc,char *argv[])
 // Ask database server to remove device
 // Display error message if the call fails
 //
-    if (db_devicedelete(dev_name.c_str(), &error) == -1)
+        if (db_devicedelete(dev_name.c_str(), &error) == -1)
 	{
 		if (error == DbErr_DeviceNotDefined)
 			cerr << "Device " << dev_name << " is not defined in the database" << endl;
@@ -107,15 +129,15 @@ int main(int argc,char *argv[])
 
 	if (del_res == True)
 	{
-	char *tmp = const_cast<char *>(dev_name.c_str());
-    	db_error 	err;
-	if (db_devicedeleteres(1, &tmp, &err) == -1)
+		char *tmp = const_cast<char *>(dev_name.c_str());
+    		db_error 	err;
+		if (db_devicedeleteres(1, &tmp, &err) == -1)
 		{
 			cerr << "The call to database server to delete device resources failed with error " << err.error_code << endl;
 			cerr << "Error message : " << dev_error_str(err.error_code) << endl;
 		}
 	}
-    return 0;
+    	return 0;
 }
 
 
