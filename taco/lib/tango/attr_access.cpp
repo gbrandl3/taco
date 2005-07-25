@@ -1,25 +1,41 @@
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_access.cpp,v 1.2 2005-06-19 19:26:52 andy_gotz Exp $";
-/********************************************************************
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File       :	attribute_access.cpp
+ *
+ * Project    :	Interface to TACO signals and TANGO attributes
+ *
+ * Description:	
+ *	
+ * Author(s)  :	Jens Meyer
+ * 		$Author: jkrueger1 $
+ *
+ * Original   :	September2002
+ *
+ * Version    :	$Revision: 1.3 $
+ *
+ * Date       : $Date: 2005-07-25 13:00:43 $
+ *
+ *********************************************************************/ 
 
- File       :	attribute_access.cpp
-
- Project    :	Interface to TACO signals and TANGO attributes
-
- Description:	
-	
- Author(s)  :	Jens Meyer
-
- Original   :	September2002
-
- $Revision: 1.2 $
- $Date: 2005-06-19 19:26:52 $
-
- $Author: andy_gotz $
-
-  Copyright (c) 1999 by European Synchrotron Radiation Facility,
-                       Grenoble, France
-
-*********************************************************************/ 
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_access.cpp,v 1.3 2005-07-25 13:00:43 jkrueger1 Exp $";
 
 #include <attr_api.h>
 
@@ -29,24 +45,24 @@ static long tango_dev_error_string(Tango::DevFailed tango_exception);
 // global TACO error message string
 extern char *dev_error_string;
 
+#ifdef DevState
 #undef DevState
+#endif
+#ifdef RUNNING
 #undef RUNNING
+#endif
 
-/*+**********************************************************************
- Function   :   AttrAccess::AttrAccess()
-
- Description:   Constructor for the attribute access class.
- 					 Takes a four field attribute name as input.
-					 Verifies whether it is TACO or a TANGO attribute
-					 and opens a connection to the underlying device.
-					 
- Arg(s) In  :   char *full_attr_name 	- name of Taco or TANGO attribute
- 					 long	access			 	- Taco security access
- 
- Arg(s) Out :   long	*error  				- Taco error code
-
- Return(s)  :   none
-***********************************************************************-*/
+/**
+ * Constructor for the attribute access class.
+ * 
+ * Takes a four field attribute name as input.
+ * Verifies whether it is TACO or a TANGO attribute
+ * and opens a connection to the underlying device.
+ *					 
+ * @param full_attr_name name of Taco or TANGO attribute
+ * @param access Taco security access
+ * @param error pointer to take the Taco error code
+ */
 AttrAccess::AttrAccess (char *full_attr_name, long access, long *error)
 {
 	char	*str_ptr;
@@ -148,19 +164,11 @@ AttrAccess::AttrAccess (char *full_attr_name, long access, long *error)
 
 
 
-/*+**********************************************************************
- Function   :   AttrAccess::~AttrAccess()
-
- Description:   Destructor for the attribute access class.
-					 Closes the connection to an attribute and
-					 cleans-up the memory.
-					 
- Arg(s) In  :   none
- 
- Arg(s) Out :   none
-
- Return(s)  :   none
-***********************************************************************-*/
+/**
+ * Destructor for the attribute access class.
+ *
+ * Closes the connection to an attribute and cleans-up the memory.
+ */
 AttrAccess::~AttrAccess()
 {
 	long	error;
@@ -201,24 +209,18 @@ AttrAccess::~AttrAccess()
 
 
 
-/*+**********************************************************************
- Function   :   long AttrAccess::attr_cmd_query()
-
- Description:   Maps the read and write functionality of attributes
-					 to Taco commands.
-					 A read only attribute can execute only DevRead and
-					 a read/write attribute the commands DevRead and
-					 DevWrite.
-					 
- Arg(s) In  :   none
- 
- Arg(s) Out :   DevVarCmdArray *varcmdarr - Pointer to command array.
- 					 long	*error  				   - Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-long AttrAccess::attr_cmd_query (DevVarCmdArray *attr_cmd_query_array,
-											long *error)
+/**
+ * Maps the read and write functionality of attributes to Taco commands.
+ *
+ * A read only attribute can execute only DevRead and a read/write attribute 
+ * the commands DevRead and DevWrite.
+ *					 
+ * @param varcmdarr Pointer to command array.
+ * @param error pointer to take the Taco error code
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
+long AttrAccess::attr_cmd_query (DevVarCmdArray *attr_cmd_query_array, long *error)
 {
 	DevCmdInfo *cmd_info;
 	
@@ -323,37 +325,32 @@ long AttrAccess::attr_cmd_query (DevVarCmdArray *attr_cmd_query_array,
 }
 
 
-
-
-
-long AttrAccess::read_attr_config (DevVarStringArray *attr_config_array,
-											  long *error)
+/**
+ *
+ *
+ * @param attr_config_array
+ * @param error
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
+long AttrAccess::read_attr_config (DevVarStringArray *attr_config_array, long *error)
 {
 	*error = 0;
-	
 	return (DS_OK);
 }
 
-
-
-
-
-/*+**********************************************************************
- Function   :   long AttrAccess::write_attr()
-
- Description:   Writes the input argument to the attribute.
- 					 The input value is casted if necessary and
-					 written via the TACO command or the
-					 TANGO write_attribute() methode.
-					 
- Arg(s) In  :   DevArgument argin 	- Input argument
- 					 DevType argin_type	- Type of input argument
- 
- Arg(s) Out :   long	*error  				   - Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * Writes the input argument to the attribute.
+ *
+ * The input value is casted if necessary and written via the TACO command or the
+ * TANGO write_attribute() methode.
+ *					 
+ * @param argin Input argument
+ * @param argin_type Type of input argument
+ * @param error pointer to take the Taco error code
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
 long AttrAccess::write_attr (DevArgument argin, DevType argin_type, long *error)
 {
 	long							input_type;
@@ -494,26 +491,20 @@ long AttrAccess::write_attr (DevArgument argin, DevType argin_type, long *error)
 	return (DS_OK);
 }
 
-
-
-/*+**********************************************************************
- Function   :   long AttrAccess::read_attr()
-
- Description:   Reads the value of an attribute.
- 					 The output data is casted to the requested data type
-					 if possible.
-					 The TACO command DEvReadSigValues or the TANGO methode
-					 read_attribute() are used to read the value.
-					 
- Arg(s) In  :   none
- 
- Arg(s) Out :   DevArgument argout 	- Output argument
- 					 DevType argout_type	- Requested type for output argument
- 					 long	*error  			- Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * Reads the value of an attribute.
+ *
+ * The output data is casted to the requested data type if possible.
+ *
+ * The TACO command DEvReadSigValues or the TANGO methode read_attribute() are used to 
+ * read the value.
+ *					 
+ * @param argout Output argument
+ * @param argout_type Requested type for output argument
+ * @param error Taco error code
+ * 
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
 long AttrAccess::read_attr (DevArgument argout, DevType argout_type, long *error)
 {
 	Tango::DeviceAttribute	attr_values;
@@ -700,24 +691,22 @@ long AttrAccess::read_attr (DevArgument argout, DevType argout_type, long *error
 	return (DS_OK);
 }
 
-/*+**********************************************************************
- Function   :   long AttrAccess:to_xdr_sequence:()
-
- Description:   Convert a Tango sequence to the request TAco sequence
-					 
- Arg(s) In  :   argin		Tango data read.
-                data_type	argin and argout type.
- 
- Arg(s) Out :   argout		Taco data returned
-                long	*error  	- Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**
+ * Convert a Tango sequence to the request TACO sequence
+ *
+ * @param attribute
+ * @param argout Tango data returned.
+ * @param tango_type
+ * @param taco_type
+ * @param error Taco error code
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
 long AttrAccess::to_taco_sequence(Tango::DeviceAttribute attribute, 
                                  DevArgument argout,
-								 DevType tango_type,
-								 DevType taco_type,
-								 long *error)
+				 DevType tango_type,
+				 DevType taco_type,
+				 long *error)
 {
 	vector<short>	s_vect;
 	vector<long>	l_vect;
@@ -819,25 +808,24 @@ long AttrAccess::to_taco_sequence(Tango::DeviceAttribute attribute,
 		break;										
 	}
 }
-/*+**********************************************************************
- Function   :   long AttrAccess:to_xdr_sequence:()
 
- Description:   Encode the outgoing arguments into XDR format.
-	            Decode the arguments afterwards, to get the same memory
-	            allocation by XDR as the dev_putget() working with RPCs.
-					 
- Arg(s) In  :   argin		data read.
-                data_type	argin and argout type.
- 
- Arg(s) Out :   argout		data returned
-                long	*error  	- Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**
+ * Encode the outgoing arguments into XDR format.
+ *
+ * Decode the arguments afterwards, to get the same memory
+ * allocation by XDR as the dev_putget() working with RPCs.
+ *
+ * @param argin	data read.
+ * @param argout data returned
+ * @param data_type argin and argout type.  
+ * @param error Taco error code
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
 long AttrAccess::to_xdr_sequence(DevArgument argin, 
                                  DevArgument argout,
-								 DevType data_type,
-								 long *error)
+				 DevType data_type,
+				 long *error)
 {
 	DevDataListEntry type_info;
 	XDR 	xdrs_en;
@@ -919,22 +907,17 @@ long AttrAccess::to_xdr_sequence(DevArgument argin,
 }
 
 
-/*+**********************************************************************
- Function   :   long AttrAccess::create_attr_access()
-
- Description:   Opens a connection to the device of the attribute
- 					 and initialises the attribute configuration structure.
-					 The TANGO attribute_config structure is used to store
-					 the values. All necessary information for TACO is 
-					 read and also written into the TANGO attribute config
-					 structure. 
-					 
- Arg(s) In  :   none
- 
- Arg(s) Out :   long	*error  	- Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**
+ * Opens a connection to the device of the attribute and initialises the attribute 
+ * configuration structure.
+ *
+ * The TANGO attribute_config structure is used to store the values. All necessary 
+ * information for TACO is read and also written into the TANGO attribute config structure. 
+ *					 
+ * @param error Taco error code
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
 long AttrAccess::create_attr_access (long *error)
 {
 	DevVarCmdArray     cmd_array;
@@ -1158,26 +1141,20 @@ long AttrAccess::create_attr_access (long *error)
 	//cout << "Std. Unit : " << attr_config.standard_unit	<< endl;				
 }
 
-
-
-/*+**********************************************************************
- Function   :   long AttrAccess::convert_data()
-
- Description:   Converts a data of a given type to another
- 					 data type.
-					 
- Arg(s) In  :   long data_type		- type of data to convert
- 					 void *data_ptr		- data to convert
-					 long conv_data_type - requested data type
-					 
- Arg(s) Out :   void *conv_data_ptr	- converted data
- 					 long	*error  			- Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK   
-***********************************************************************-*/
+/**
+ * Converts a data of a given type to another data type.
+ *
+ * @param data_type type of data to convert
+ * @param data_ptr data to convert
+ * @param conv_data_type requested data type
+ * @param conv_data_ptr	converted data
+ * @param error Taco error code
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
 long AttrAccess::convert_data (long data_type, void *data_ptr,
-										 long conv_data_type, void *conv_data_ptr, 
-										 long *error)
+				 long conv_data_type, void *conv_data_ptr, 
+				 long *error)
 {
 	static char		c_string_value[80];
 	char				**str_ptr;
@@ -1307,21 +1284,16 @@ long AttrAccess::convert_data (long data_type, void *data_ptr,
 }	
 
 
-/*+**********************************************************************
- Function   :   long AttrAccess::check_requested_data_type()
-
- Description:   Checks whether the attribute data type can be
- 					 casted into the requested data type.
-					 
- Arg(s) In  :   long request_type	- requested data type
- 					 long attr_type		- attribute data type
-					 
- Arg(s) Out :   long	*error  			- Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK   
-***********************************************************************-*/
-long AttrAccess::check_requested_data_type (long request_type, long attr_type, 
-														  long *error)
+/**
+ * Checks whether the attribute data type can be casted into the requested data type.
+ *					 
+ * @param request_type requested data type
+ * @param attr_type attribute data type
+ * @param error Taco error code
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
+long AttrAccess::check_requested_data_type (long request_type, long attr_type, long *error)
 {
 	*error = 0;
 	if ( request_type != attr_type )
@@ -1383,17 +1355,13 @@ long AttrAccess::check_requested_data_type (long request_type, long attr_type,
 
 
 
-/*+**********************************************************************
- Function   :   long AttrAccess::get_tango_data_type()
-
- Description:   Converts TACO data type to TANGO data type 
-					 
- Arg(s) In  :   long taco_data_type - TACO data type
- 
- Arg(s) Out :   none
-
- Return(s)  :   long tango_data_type - TANGO data type
-***********************************************************************-*/
+/**
+ * Converts TACO data type to TANGO data type 
+ *					 
+ * @param taco_data_type TACO data type
+ *
+ * @return TANGO data type
+ */
 long	AttrAccess::get_tango_data_type (long taco_data_type)
 {
 	switch (taco_data_type)
@@ -1444,18 +1412,13 @@ long	AttrAccess::get_tango_data_type (long taco_data_type)
 		}
 }
 
-
-/*+**********************************************************************
- Function   :   long AttrAccess::get_taco_data_type()
-
- Description:   Converts TANGO data type to TACO data type 
-					 
- Arg(s) In  :   long tango_data_type - TANGO data type
- 
- Arg(s) Out :   none
-
- Return(s)  :   long taco_data_type - TACO data type
-***********************************************************************-*/
+/**
+ * Converts TANGO data type to TACO data type 
+ *					 
+ * @param tango_data_type TANGO data type
+ * 
+ * @return TACO data type
+ */
 long	AttrAccess::get_taco_data_type (long tango_data_type)
 {
 	switch (tango_data_type)
@@ -1497,20 +1460,16 @@ long	AttrAccess::get_taco_data_type (long tango_data_type)
 }
 
 
-/*+**********************************************************************
- Function   :   long AttrAccess::search_attr_name()
-
- Description:   Searches the requested attribute in the TACO and
- 					 the TANGO system.
-					 The TACO database is searched first. If the name is
-					 not defined for TACO the TANGO database is searched. 
-					 
- Arg(s) In  :   none
- 
- Arg(s) Out :   long	*error  	- Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**
+ * Searches the requested attribute in the TACO and the TANGO system.
+ *
+ * The TACO database is searched first. If the name is not defined for TACO the 
+ * TANGO database is searched. 
+ * 
+ * @param error Taco error code
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
 long AttrAccess::search_attr_name (long *error)
 {
 	short	i;
@@ -1603,19 +1562,14 @@ long AttrAccess::search_attr_name (long *error)
 
 
 
-/*+**********************************************************************
- Function   :   long AttrAccess::search_tango_attr_name()
-
- Description:   Searches the requested attribute only in
- 					 the TANGO system. This is used if the attribute
-					 name contains the tango: prefix. 
-					 
- Arg(s) In  :   none
- 
- Arg(s) Out :   long	*error  	- Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**
+ * Searches the requested attribute only in the TANGO system. This is used 
+ * if the attribute name contains the tango: prefix. 
+ *
+ * @param error Taco error code
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
 long AttrAccess::search_tango_attr_name (long *error)
 {
 	short	i;
@@ -1683,21 +1637,14 @@ long AttrAccess::search_tango_attr_name (long *error)
 	return (DS_NOTOK);
 }
 
-
-
-
-/*+**********************************************************************
- Function   :   long tango_dev_error_string()
-
- Description:   Recover TANGO error string stack from DevFailed exception.
-
- Arg(s) In  :   Tango::DevFailed e - DevFailed exception
-
- Arg(s) Out :   char *dev_error_string - global pointer to error string
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * Recover TANGO error string stack from DevFailed exception.
+ *
+ * @param e DevFailed exception
+ * @param dev_error_string global pointer to error string
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
 static long tango_dev_error_string(Tango::DevFailed tango_exception)
 {
    for (int i=0; i<tango_exception.errors.length(); i++)
@@ -1722,19 +1669,16 @@ static long tango_dev_error_string(Tango::DevFailed tango_exception)
 }
 
 
-/*+**********************************************************************
- Function   :   long AttrAccess::read_state()
-
- Description:   Reads the state of the TACO or TANGO device
- 					 of the attribute handle.
-					 Maps the TANGO states to TACO state values.
-					 
- Arg(s) In  :   none
- 
- Arg(s) Out :   long	*error  	- Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**
+ * Reads the state of the TACO or TANGO device of the attribute handle.
+ * Maps the TANGO states to TACO state values.
+ *
+ * @param argout
+ * @param argout_type
+ * @param error Taco error code
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
 long AttrAccess::read_state (DevArgument argout, DevType argout_type, long *error)
 {
 	Tango::DeviceData	tango_argout;
@@ -1836,18 +1780,15 @@ long AttrAccess::read_state (DevArgument argout, DevType argout_type, long *erro
 
 
 
-/*+**********************************************************************
- Function   :   long AttrAccess::read_status()
-
- Description:   Reads the status of the TACO or TANGO device
- 					 of the attribute handle.
-					 
- Arg(s) In  :   none
- 
- Arg(s) Out :   long	*error  	- Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**
+ * Reads the status of the TACO or TANGO device of the attribute handle.
+ *
+ * @param argout
+ * @param argout_type
+ * @param error Taco error code
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
 long AttrAccess::read_status (DevArgument argout, DevType argout_type, long *error)
 {
 	Tango::DeviceData	tango_argout;
@@ -1902,24 +1843,14 @@ long AttrAccess::read_status (DevArgument argout, DevType argout_type, long *err
 	return (DS_OK);
 }
 
-
-
-
-
-/*+**********************************************************************
- Function   :   long AttrAccess::abort()
-
- Description:   Sends the abort command to the TACO or TANGO device
- 					 of the attribute handle.
-					 Should be used to abort running action which has
-					 set the device into a moving state. 
-					 
- Arg(s) In  :   none
- 
- Arg(s) Out :   long	*error  	- Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**
+ * Sends the abort command to the TACO or TANGO device of the attribute handle.
+ * Should be used to abort running action which has set the device into a moving state. 
+ *
+ * @param error Taco error code
+ * 
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
 long	AttrAccess::abort	(long *error)
 {
 	*error = 0;

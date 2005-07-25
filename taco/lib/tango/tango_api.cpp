@@ -1,34 +1,46 @@
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/tango_api.cpp,v 1.2 2005-06-24 10:45:26 andy_gotz Exp $";
-/*+*******************************************************************
-
- File       :	tango_api.c
-
- Project    :	Interfacing TACO (based on SUN/RPC) to TANGO (based on CORBA)
-
- Description:	TACO to TANGO Application Programmer's Interface
-
-		Source code to implement the taco interface to tango via
-		the Device Server C API (DSAPI) using the TANGO C++ interface. 
-		This means it will be possible to use the TACO dev_putget() 
-		call from TACO programs which have been linked with C++
-		to talk to TANGO device servers.
-	
- Author(s)  :	Andy Goetz
-
- Original   :	December 1999
-
- $Revision: 1.2 $
- $Date: 2005-06-24 10:45:26 $
-
- $Author: andy_gotz $
-
-
-
-
- Copyleft (c) 1999 by European Synchrotron Radiation Facility,
-                      Grenoble, France
-
-********************************************************************-*/
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File       :	tango_api.c
+ *
+ * Project    :	Interfacing TACO (based on SUN/RPC) to TANGO (based on CORBA)
+ *
+ * Description:	TACO to TANGO Application Programmer's Interface
+ *
+ *		Source code to implement the taco interface to tango via
+ *		the Device Server C API (DSAPI) using the TANGO C++ interface. 
+ *		This means it will be possible to use the TACO dev_putget() 
+ *		call from TACO programs which have been linked with C++
+ *		to talk to TANGO device servers.
+ *	
+ * Author(s)  :	Andy Goetz
+ * 		$Author: jkrueger1 $
+ *
+ * Original   :	December 1999
+ *
+ * Version    : $Revision: 1.3 $
+ *
+ * Date       : $Date: 2005-07-25 13:00:43 $
+ *
+ ********************************************************************-*/
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/tango_api.cpp,v 1.3 2005-07-25 13:00:43 jkrueger1 Exp $";
 
 #include <tango.h>
 #define TANGO_API
@@ -1993,18 +2005,13 @@ static void tango_any_to_argout_raw(long argout_type, long tango_type, CORBA::An
 	return;
 }
 	
-/*+**********************************************************************
- Function   :   static long tango_to_taco_type()
-
- Description:   convert a TANGO type code to a TACO type code
-
- Arg(s) In  :   long tango_type - TANGo type code
-
- Arg(s) Out :   none
-
- Return(s)  :   TACO type code
-***********************************************************************-*/
-
+/**@ingroup tangoAPI
+ * convert a TANGO type code to a TACO type code
+ *
+ * @param tango_type TANGO type code
+ * 
+ * @return TACO type code
+ */
 static long tango_to_taco_type(long tango_type)
 {
 	long taco_type;
@@ -2071,37 +2078,29 @@ static long tango_to_taco_type(long tango_type)
 extern DevCmdNameListEntry DevCmdNameList[];
 extern int max_cmds;
 
-/*+**********************************************************************
- Function   :	static long get_cmd_value()
-
- Description:   Read the command value corresponding to the command string
-		from the TACO resource database. This is the reverse of
-		the function get_cmd_string() in util_api.c. 
-		The resource name must follow the convention :
-		CLASS/class_name/CMD/cmd_string: value
-		e.g. class/database/cmd/dbinfo: 10000
-
-		FIRST : try to get the command from the global table
-		of commands DevCmdNameList[]. If it is not there then
-		try the database. This new algorithm means that TANGO
-		servers which use "standard" TACO commands will not need
-		to define anything in the database.
-
-		DS_WARNING is returned, if the function was
-		executed correctly, but no command name
-		value was found in the database.
-
- Arg(s) In  :   char *class_name - class name
-		char *cmd_name   - command name
-
- Arg(s) Out :   long *cmd_value  - command value
-		long *error   - Will contain an appropriate error
-			        code if the corresponding call
-		    	        returns a non-zero value.
-
- Return(s)  :   DS_OK or DS_NOTOK or DS_WARNING
-***********************************************************************-*/
-
+/**@ingroup tangoAPI
+ * Read the command value corresponding to the command string from the TACO resource 
+ * database. This is the reverse of the function get_cmd_string() in util_api.c. 
+ *
+ * The resource name must follow the convention :
+ * <b>CLASS/class_name/CMD/cmd_string: value</b>
+ *
+ * e.g. class/database/cmd/dbinfo: 10000
+ *
+ * FIRST : try to get the command from the global table of commands DevCmdNameList[]. 
+ * If it is not there then try the database. This new algorithm means that TANGO
+ * servers which use "standard" TACO commands will not need to define anything in the database.
+ *
+ * @param class_name class name
+ * @param cmd_name command name
+ * @param cmd_value command value
+ * @param error will contain an appropriate error code if the corresponding call
+ *		    	        returns a non-zero value.
+ *
+ * @return DS_NOTOK in case of failure, DS_WARNING is returned, if the function was 
+ *	executed correctly, but no command name value was found in the database, DS_OK 
+ *	otherwise
+ */
 static long get_cmd_value (char *class_name, char *cmd_name, long *cmd_value, long *error)
 {
 	static unsigned int tango_auto_cmd = DevTangoBase;
@@ -2182,20 +2181,14 @@ static long get_cmd_value (char *class_name, char *cmd_name, long *cmd_value, lo
 	return (DS_OK);
 }
 
-/*+**********************************************************************
- Function   :   static long tango_dev_check()
- 
- Description:   Check TANGO device connection. If not imported then
-		import it. If bad connection has been signalled then reimport.	
-		Returns DS_OK if device has been (re)imported correctly.
- 
- Arg(s) In  :   devserver ds - client handle
- 
- Arg(s) Out :   devserver ds - updated if device (re)imported correctly
- 
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**@ingroup tangoAPI
+ * Check TANGO device connection. If not imported then import it. If bad connection 
+ * has been signalled then reimport.	
+ *
+ * @param ds  client handle, updated if device (re)imported correctly
+ * 
+ * @return DS_OK if device has been (re)imported correctly or DS_NOTOK
+ */
 static long tango_dev_check(devserver ds, long *error)
 {
 	long dev_id;
@@ -2253,18 +2246,16 @@ static long tango_dev_check(devserver ds, long *error)
 
 	return(DS_OK);
 }
-/*+**********************************************************************
- Function   :   static long tango_dev_error_string()
- 
- Description:   Recover TANGO error string stack from DevFailed exception.
- 
- Arg(s) In  :   Tango::DevFailed e - DevFailed exception
- 
- Arg(s) Out :   char *dev_error_string - global pointer to error string
- 
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
 
+/**@ingroup tangoAPI
+ * Recover TANGO error string stack from DevFailed exception.
+ *
+ * @param e DevFailed exception
+ * @param dev_error_string global pointer to error string
+ *
+ *  
+ * @return DS_OK or DS_NOTOK
+ */
 static long tango_dev_error_string(Tango::DevFailed tango_exception)
 {
 	for (int i=0; i<tango_exception.errors.length(); i++)

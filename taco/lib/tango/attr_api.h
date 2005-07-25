@@ -1,25 +1,42 @@
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File       :	attr_api.h
+ *
+ * Project    :	Interface to TACO signals and TANGO attributes
+ *
+ * Description:	
+ *	
+ * Author(s)  :	Jens Meyer
+ * 		$Author: jkrueger1 $
+ *
+ * Original   :	September 2002
+ *
+ * Version:	$Revision: 1.2 $
+ *
+ * Date:	$Date: 2005-07-25 13:00:43 $
+ *
+ *********************************************************************/ 
 
-/********************************************************************
-
- File       :	attr_api.h
-
- Project    :	Interface to TACO signals and TANGO attributes
-
- Description:	
-	
- Author(s)  :	Jens Meyer
-
- Original   :	September 2002
-
- $Revision: 1.1 $
- $Date: 2005-03-29 09:27:50 $
-
- $Author: andy_gotz $
-
- Copyleft (c) 2002-2005 by European Synchrotron Radiation Facility,
-                       Grenoble, France
-
-*********************************************************************/ 
+#ifndef	ATTR_API_H
+#define	ATTR_API_H
 
 #include <tango.h>
 #include "config.h"
@@ -82,3 +99,5 @@ class AttrAccess
 		long	to_xdr_sequence(DevArgument , DevArgument , DevType , long *);	
 
 };
+
+#endif

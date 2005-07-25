@@ -1,43 +1,56 @@
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_api.cpp,v 1.1 2005-03-29 09:27:50 andy_gotz Exp $";
-/********************************************************************
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File       :	attr_api.cpp
+ *
+ * Project    :	Interface to TACO signals and TANGO attributes
+ *
+ * Description:	
+ *	
+ * Author(s)  :	Jens Meyer
+ * 		$Author: jkrueger1 $
+ *
+ * Original   :	September 2002
+ *
+ * Version    : $Revision: 1.2 $
+ *
+ * Date       : $Date: 2005-07-25 13:00:43 $
+ *
+ *********************************************************************/ 
 
- File       :	attr_api.cpp
-
- Project    :	Interface to TACO signals and TANGO attributes
-
- Description:	
-	
- Author(s)  :	Jens Meyer
-
- Original   :	September 2002
-
- $Revision: 1.1 $
- $Date: 2005-03-29 09:27:50 $
-
- $Author: andy_gotz $
-
- Copyright (c) 2002-2005 by European Synchrotron Radiation Facility,
-                       Grenoble, France
-
-*********************************************************************/ 
 #include <attr_api.h>
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_api.cpp,v 1.2 2005-07-25 13:00:43 jkrueger1 Exp $";
 
-/*+**********************************************************************
- Function   :   long attribute_import()
-
- Description:   Hook to TACO dev_import().
- 					 Takes a four field attribute name as input.
-					 Verifies whether it is TACO or a TANGO attribute
-					 and opens a connection to the underlying device.
-
- Arg(s) In  :   char *attribute_name - name of Taco or TANGO attribute
- 					 long	access			 - Taco security access
-
- Arg(s) Out :   devserver *ds_ptr 	 - pointer for client handle to attribute
- 					 long	*error			 - Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**
+ * Hook to TACO dev_import().
+ *
+ * Takes a four field attribute name as input.  Verifies whether it is TACO or a TANGO attribute
+ * and opens a connection to the underlying device.  
+ *
+ * @param attribute_name name of Taco or TANGO attribute
+ * @param access Taco security access
+ * @param ds_ptr pointer for client handle to attribute
+ * @param error	Taco error code
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
 long attribute_import (char *attribute_name, long access, 
 							  devserver *ds_ptr, long *error)
 {
@@ -83,18 +96,14 @@ long attribute_import (char *attribute_name, long access,
 	return (DS_OK);
 }
 
-/*+**********************************************************************
- Function   :   long attribute_free()
-
- Description:   Hook to TACO dev_free().
- 					 Frees the connectio to an attribute.
-					 
- Arg(s) In  :   devserver ds - client handle to attribute
- 
- Arg(s) Out :   long	*error  - Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**
+ * Hook to TACO dev_free(). Frees the connectio to an attribute.
+ *
+ * @param ds client handle to attribute
+ * @param error Taco error code
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
 long attribute_free (devserver ds, long *error)
 {
 	AttrAccess	*attr;
@@ -109,20 +118,17 @@ long attribute_free (devserver ds, long *error)
 }
 
 
-/*+**********************************************************************
- Function   :   long attribute_cmd_query()
-
- Description:   Hook to TACO dev_cmd_query().
- 					 Maps the read and write functionality of attributes
-					 to Taco commands.
-					 
- Arg(s) In  :   devserver ds 					- client handle to attribute
- 
- Arg(s) Out :   DevVarCmdArray *varcmdarr - Pointer to command array.
- 					 long	*error  				   - Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**
+ * Hook to TACO dev_cmd_query().
+ *
+ * Maps the read and write functionality of attributes to Taco commands.
+ *
+ * @param ds client handle to attribute
+ * @param varcmdarr Pointer to command array.
+ * @param error Taco error code
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
 long attribute_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error)
 {
 	AttrAccess	*attr;
@@ -140,27 +146,24 @@ long attribute_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error)
 
 
 
-/*+**********************************************************************
- Function   :   long attribute_putget()
-
- Description:   Hook to TACO dev_putget().
- 					 Calls the correct attribute access methode for 
-					 commands defined for the attribute access.
-					 
- Arg(s) In  :   devserver ds 			- client handle to attribute
- 					 long cmd				- command to execute
-					 DevArgument argin	- input argument to write attribute
-					 DevType argin_type	- data type of input argument
- 
- Arg(s) Out :   DevArgument argout  - output argument to read attribute
- 					 DevType argout_type - data type of output argument
- 					 long	*error  			- Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**
+ * Hook to TACO dev_putget().
+ *
+ * Calls the correct attribute access methode for commands defined for the attribute access.
+ *
+ * @param ds client handle to attribute
+ * @param cmd command to execute
+ * @param argin input argument to write attribute
+ * @param argin_type data type of input argument
+ * @param argout output argument to read attribute
+ * @param argout_type data type of output argument
+ * @param error Taco error code
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
 long attribute_putget (devserver ds, long cmd, DevArgument argin,
-			  				 DevType argin_type,DevArgument argout,
-			  				 DevType argout_type, long *error)
+			 DevType argin_type,DevArgument argout,
+			 DevType argout_type, long *error)
 {
 	AttrAccess	*attr;
 
@@ -213,24 +216,19 @@ long attribute_putget (devserver ds, long cmd, DevArgument argin,
 	return (DS_OK);
 }
 
-
-
-/*+**********************************************************************
- Function   :   long attribute_put()
-
- Description:   Hook to TACO dev_put().
- 					 Calls the correct attribute access methode to  
-					 write attribute values.
-					 
- Arg(s) In  :   devserver ds 			- client handle to attribute
- 					 long cmd				- command to execute
-					 DevArgument argin	- input argument to write attribute
-					 DevType argin_type	- data type of input argument
- 
- Arg(s) Out :   long	*error  			- Taco error code
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
+/**
+ * Hook to TACO dev_put().
+ *
+ * Calls the correct attribute access methode to  write attribute values.
+ *
+ * @param ds client handle to attribute
+ * @param cmd command to execute
+ * @param argin input argument to write attribute
+ * @param argin_type data type of input argument
+ * @param error Taco error code
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
 long attribute_put (devserver ds, long cmd, DevArgument argin,
 		       		  DevType argin_type, long *error)
 {
