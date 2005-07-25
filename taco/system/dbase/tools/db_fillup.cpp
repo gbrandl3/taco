@@ -1,3 +1,43 @@
+/*
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 ESRF, www.esrf.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:	db_fillup.cpp
+ *
+ * Description: To fill up the static database with the contents of all the 
+ *		resource files found in the directory (and subdirectories) 
+ *		pointed to by the RES_BASE_DIR environment variable. Database 
+ *		will be created in the directory defined by DBM_DIR environment 
+ *		variable. 
+ * 
+ * 		The database name is supposed to be given by DBNAME environment 
+ *		variable and the tables (domains) by DBTABLES environment variable. 
+ *
+ * 		Synopsis : db_fillup <0/1>
+ *
+ * Author(s):
+ *              $Author: jkrueger1 $
+ *
+ * Version:     $Revision: 1.11 $
+ *
+ * Date:        $Date: 2005-07-25 11:30:27 $
+ */
+
 #include <cstdio>
 #include <string>
 #include <cstdlib>
@@ -61,17 +101,6 @@ void usage(const char *cmd)
 	exit(-1);
 }
 
-/**
- * To fill up the static database with the contents of all the resource files 
- * found in the directory (and subdirectories) pointed to by the RES_BASE_DIR 
- * environment variable. Database will be created in the directory defined by 
- * DBM_DIR environment variable. 
- * 
- * The database name is supposed to be given by DBNAME environment variable 
- * and the tables (domains) by DBTABLES environment variable. 
- *
- * Synopsis : db_fillup <0/1>
- */
 int main(int argc,char **argv)
 {
         extern char     *optarg;
@@ -101,7 +130,7 @@ int main(int argc,char **argv)
    	{
 		case 0 : return from_res();
 		case 1 : return from_file();
-		default: std::cout << "Bad value (" << ds << ") for the data source parameter." << std::endl;
+		default: std::cerr << "Bad value (" << ds << ") for the data source parameter." << std::endl;
 	}
 	return 1;
 }
@@ -183,11 +212,15 @@ static int from_res(void)
 	for (std::vector<std::string>::iterator it = tblName.begin(); it != tblName.end(); it++)
 	{
 		std::string dbm_file = dbm_dir + *it;
-		GDBM_FILE	t;
-		t = gdbm_open(const_cast<char *>(dbm_file.c_str()), 0, flags, 0666, NULL);
+		GDBM_FILE t = gdbm_open(const_cast<char *>(dbm_file.c_str()), 0, flags, 0666, NULL);
+		if (t == NULL && gdbm_errno == GDBM_CANT_BE_WRITER)
+		{
+			flags |= GDBM_NOLOCK;
+			t = gdbm_open(const_cast<char *>(dbm_file.c_str()), 0, flags, 0666, NULL);
+		}		
 		if (t == NULL)
 		{
-	   		std::cerr << "db_fillup : Can't open " << tblName[i] << " table" << std::endl;
+	   		std::cerr << "db_fillup (" << gdbm_errno << ") : Can't open table : " << tblName[i] << std::endl;
 			leave();
 		}
 		tid.push_back(t);
