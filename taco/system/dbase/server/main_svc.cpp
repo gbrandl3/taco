@@ -1,3 +1,36 @@
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:
+ *
+ * Description:
+ *
+ * Authors:
+ *		$Author: jkrueger1 $
+ *
+ * Version:	$Revision: 1.20 $
+ *
+ * Date:	$Date: 2005-07-25 08:49:30 $
+ *
+ */
+
 #ifdef sun
 #define PORTMAP
 #endif
@@ -5,12 +38,18 @@
 #include "config.h"
 
 #ifdef DARWIN
-#include <rpc/types.h>
-#include <netinet/in.h>
-#include <rpc/xdr.h>
-#include <rpc/auth.h>
-#include <rpc/clnt.h>
-#include "svc.h"
+#	include <rpc/types.h>
+#	include <netinet/in.h>
+#	include <rpc/xdr.h>
+#	include <rpc/auth.h>
+#	include <rpc/clnt.h>
+#	if HAVE_SVC_H 
+# 		include <svc.h>
+#	elif !HAVE_RPC_SVC_H
+#		include <rpc/svc.h>
+#	else
+#		include "svc.h"
+#	endif
 #endif
 
 #include <dbClass.h>
@@ -761,9 +800,6 @@ static void db_setupprog_1(struct svc_req *rqstp, SVCXPRT *transp)
 		case DB_GETPERS:
 		case DB_GETHOST:
 		case DB_DEVRES: 	
-#ifndef _solaris
-#warning Reslistdev must be implemented res_list_dev.clear();
-#endif /* !_solaris */
 		case DB_SECPASS: 	
 			if (reinterpret_cast<db_res *>(result)->db_err == 0)
 			{
@@ -788,18 +824,10 @@ static void db_setupprog_1(struct svc_req *rqstp, SVCXPRT *transp)
 		case DB_INFO:
 			if (reinterpret_cast<db_info_svc *>(result)->dev.dom_val != 0)
 			{
-#ifndef _solaris
-#warning Domain list must be implemented
-#endif /* _solaris */
-//				dom_list.clear();
 				delete [] reinterpret_cast<db_info_svc *>(result)->dev.dom_val;
 			}
 			if (reinterpret_cast<db_info_svc *>(result)->res.dom_val != 0)
 			{
-#ifndef _solaris
-#warning Resource list must be implemented
-#endif /* _solaris */
-//				res_list.clear();
 				delete [] reinterpret_cast<db_info_svc *>(result)->res.dom_val;
 			}
 			break;
