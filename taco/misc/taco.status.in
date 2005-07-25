@@ -1,4 +1,4 @@
-#!/bin/sh -v
+#!/bin/sh
 # Toolkit for building distributed control systems or any other distributed system.
 #
 # Copyright (c) 1990-2005 ESRF, www.esrf.fr
@@ -17,32 +17,21 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
-# taco.shutdown - shutdown TACO manager + database
+# taco.status - status TACO manager + database + message server
 #
 
-environ()
+prog_status()
 {
-# setup TACO environment variables
-	prefix=${DSHOME:-@prefix@}
-	exec_prefix=@exec_prefix@
-	if test -f @sysconfdir@/tacoenv.sh ; then
-		. @sysconfdir@/tacoenv.sh
+	if ps ax | grep $1 | grep -v grep >/dev/null; then
+		echo $1 running
 	else
-		. @templatedir@/tacoenv.sh
+		echo $1 missed
 	fi
-
-	echo "You are working on host $HOSTNAME machine -"
-	echo ""
-	echo "DSHOME 		= $DSHOME"
-	echo "DBM_DIR		= $DBM_DIR"
-	echo "RES_BASE_DIR	= $RES_BASE_DIR"
-	echo "DBTABLES	= $DBTABLES"
-	echo ""
-	echo "PATH = $PATH"
 }
 
 #
 #  Here is the heart of the script:
 #
-environ
-@sbindir@/off Manager
+prog_status Manager
+prog_status MessageServer
+prog_status dbm_server
