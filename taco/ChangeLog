@@ -1,3 +1,21 @@
+2005-07-25 10:30 jkrueger1:
+        * system/dbase/server/dbm_clo_op.cpp: Fix: open problems with database
+        files on NFS file systems
+2005-07-20 10:30 jkrueger1:
+	* prepare the communication between 32 and 64 bit operation systems.
+	Mainly the XDR specific part was adopted.
+2005-07-19 15:00 jkrueger1:
+	* system/dbase/server/mysql_tools.cpp: Fix: database server crashes
+	if a device server contains more than one device class and
+	'db_devicetree' was called and then 'db_devres' on a device belonging
+	to the server with more than one device class
+	* misc/taco.status.in: New to check the status of Manager, dbm_server,
+	and MessageServer
+	* system/dbase/tools/db_hostlist.cpp: List all hosts known in database
+	* system/dbase/tools/db_devicelist.cpp: List all devices known in
+	database
+	* system/Makefile.am system/dbase/Makefile.am: FIX: Build database in
+	always
 2005-06-27 15:00 jkrueger1:
 	* lib/Device.cpp lib/dbase/update_cli.c setacc_xdr.c: Fix the
 	problems with long device and resource names.
