@@ -1,25 +1,40 @@
-/*+*******************************************************************
-
- File:		DevErrors.h
-
- Project:	Device Server Errors
-
- Description:	Public include file for device server error messages
-
- Author(s):	Andy Goetz
-		Jens Meyer
-		$Author: jkrueger1 $
-
- Original:	March 1990
-
- Version:	$Revision: 1.4 $
-
- Date:		$Date: 2005-06-22 09:08:46 $
-
- Copyright (c) 1990 by European Synchrotron Radiation Facility, 
-                       Grenoble, France
-
-********************************************************************-*/
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
+ * File:		DevErrors.h
+ *
+ * Project:	Device Server Errors
+ *
+ * Description:	Public include file for device server error messages
+ *
+ * Author(s):	Andy Goetz
+ *		Jens Meyer
+ *		$Author: jkrueger1 $
+ *
+ * Original:	March 1990
+ *
+ * Version:	$Revision: 1.5 $
+ *
+ * Date:		$Date: 2005-07-25 13:08:21 $
+ *
+ ********************************************************************-*/
 
 #ifndef _DevErrors_h
 #define _DevErrors_h
@@ -29,7 +44,7 @@
  */
 #ifdef _IDENT
 static char DevErrorsh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevErrors.h,v 1.4 2005-06-22 09:08:46 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevErrors.h,v 1.5 2005-07-25 13:08:21 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*

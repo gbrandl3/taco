@@ -1,4 +1,22 @@
-/****************************************************************************
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * File:   	tc_str.h
  *
@@ -12,20 +30,14 @@
  *              $Author: jkrueger1 $
  * Original:   	November 1996
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2003-05-21 16:15:19 $
- *
- * Copyright (c) 1996 by European Synchrotron Radiation Facility,
- *                       Grenoble, France
- *
- *                       All Rights Reserved
+ * Date:	$Date: 2005-07-25 13:01:35 $
  *
  *****************************************************************************/
 
-
-#ifndef tc_str_h
-#define tc_str_h
+#ifndef TC_STR_H
+#define TC_STR_H
 
 #include <dev_xdr.h>
 #include <maxe_xdr.h>

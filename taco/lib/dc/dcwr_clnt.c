@@ -1,18 +1,37 @@
-/*
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:	dcwr_clnt.c
+ *
+ * Description:
  * 
- * Author(s):     Emmanuel Taurel
+ * Author(s):   Emmanuel Taurel
  *		$Author: jkrueger1 $
  *
- * Original:      1992
+ * Original:    1992
  *
- * Version:       $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:          $Date: 2004-06-02 16:36:15 $
+ * Date:        $Date: 2005-07-25 12:55:41 $
  *
- * Copyright (c) 1990 by European Synchrotron Radiation Facility,
- *                       Grenoble, France
- *
- */
+ ******************************************************************************/
 
 
 #include "config.h"

@@ -1,23 +1,40 @@
-//+**********************************************************************
-//
-// File:	DeviceBase.h
-//
-// Project:	Device Servers in C++
-//
-// Description:	public include file containing definitions and declarations 
-//		for implementing the device server Device base class in C++
-//		(DeviceClass).
-//
-// Author(s):	Björn Pedersen
-// 		$Author: andy_gotz $
-//
-// Original:	 
-//
-// $Revision: 1.3 $
-//
-// $Date: 2004-11-24 20:46:09 $
-//
-//+**********************************************************************
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 2000-2005 by Björn Pedersen <bpedersen@users.sf.net>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:	DeviceBase.h
+ *
+ * Project:	Device Servers in C++
+ *
+ * Description:	public include file containing definitions and declarations 
+ *		for implementing the device server Device base class in C++
+ *		(DeviceClass).
+ *
+ * Author(s):	Björn Pedersen
+ * 		$Author: jkrueger1 $
+ *
+ * Original:	 
+ *
+ * Version:	$Revision: 1.4 $
+ *
+ * Date:	$Date: 2005-07-25 13:08:22 $
+ *
+ *+**********************************************************************/
 
 #ifndef _TACO_DEVICE_BASE_H
 #define _TACO_DEVICE_BASE_H

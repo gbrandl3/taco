@@ -1,23 +1,36 @@
-/*********************************************************************
-
- File:          Admin.h
-
- Project:       Device Servers with SUN-RPC
-
- Description:   Public include for applications wanting to
-                to use the device server administrator.
-
- Author:	$Author: jkrueger1 $
-
- Version:	$Revision: 1.1 $
- 
- Date:		$Date: 2003-03-14 12:22:07 $
-
- Copyright (c) 1990 by European Synchrotron Radiation Facility,
-                       Grenoble, France
-
-                       All Rights Reserved
-
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:        Admin.h
+ * 
+ * Project:     Device Servers with SUN-RPC
+ * 
+ * Description: Public include for applications wanting to
+ *              to use the device server administrator.
+ * 
+ * Author:	$Author: jkrueger1 $
+ * 
+ * Version:	$Revision: 1.2 $
+ *  
+ * Date:	$Date: 2005-07-25 13:08:21 $
+ * 
  *********************************************************************/
 
 #ifndef _admin_h
@@ -28,7 +41,7 @@
  */
 #ifdef _IDENT
 static char Adminh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/Admin.h,v 1.1 2003-03-14 12:22:07 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/Admin.h,v 1.2 2005-07-25 13:08:21 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 

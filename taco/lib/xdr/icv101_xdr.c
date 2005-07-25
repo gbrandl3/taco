@@ -1,26 +1,42 @@
-/*+*******************************************************************
-
- File:          icv101_xdr.c
-
- Project:       Device Servers with sun-rpc
-
- Description:   xdr_routines for icv101 types
-
- Author(s):     Timo Mettala
-		$Author: jkrueger1 $
-
- Original:      March  1993
-
- Version:	$Revision: 1.2 $
-
- Date:		$Date: 2004-02-06 13:11:22 $
-
- Copyright (c) 1993 by European Synchrotron Radiation Facility,
-                      Grenoble, France
-*******************************************************************-*/
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:        icv101_xdr.c
+ *
+ * Project:     Device Servers with sun-rpc
+ *
+ * Description: xdr_routines for icv101 types
+ *
+ * Author(s):   Timo Mettala
+ *		$Author: jkrueger1 $
+ *
+ * Original:    March  1993
+ *
+ * Version:	$Revision: 1.3 $
+ *
+ * Date:	$Date: 2005-07-25 13:05:45 $
+ *
+ *******************************************************************-*/
 
 static char RcsId[] =
-"$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/icv101_xdr.c,v 1.2 2004-02-06 13:11:22 jkrueger1 Exp $";
+"$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/icv101_xdr.c,v 1.3 2005-07-25 13:05:45 jkrueger1 Exp $";
 
 #include "dev_xdr.h"
 #include "icv101_xdr.h"

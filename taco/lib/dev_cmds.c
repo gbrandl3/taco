@@ -1,126 +1,38 @@
-static char RcsId[]      =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/dev_cmds.c,v 1.1 2005-03-29 09:43:07 andy_gotz Exp $";
-
-/*+*******************************************************************
-
- File:		dev_cmds.c
-
- Project:	Device Servers 
-
- Description:	List of command names
-
- Author(s):	Andy Gotz
-
- Original:	March 1992
-
- $Log: not supported by cvs2svn $
- Revision 4.6  2004/09/01 11:35:56  pons
- Added few tango command mappings
-
- Revision 4.5  2003/10/24 13:04:37  goetz
- added DevReadSigValues; corrected DevSetFrequency
-
- Revision 4.4  2002/11/07 13:40:26  meyer
- Added DevAbort
-
- Revision 4.3  2002/10/24 09:06:59  meyer
- Changed TangoState and TangoStatus to DevState and DevStatus.
-
- * Revision 4.2  2002/10/23  18:58:18  18:58:18  meyer (Jens Meyer)
- * Added TangoState and TangoStatus
- * 
- * Revision 4.1  2001/03/21  18:34:54  18:34:54  goetz (Andy Goetz)
- * removed counter and gategen commands
- * 
- Revision 4.0  1994/03/14 18:23:45  meyer
- Library version with Security System.
-
- * Revision 3.50  94/03/12  13:58:45  13:58:45  meyer (Jens Meyer)
- * Extended command list with min_access.
- * 
- * Revision 3.24  93/07/23  10:40:16  10:40:16  domingue ( Marie-Christine Dominguez)
- * Add new commands for M4 server
- * 
- * Revision 3.23  1993/07/23  09:00:53  epaud
- * Suppress command for VDL
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
  *
- * Revision 3.22  93/07/13  17:12:58  17:12:58  epaud (Francis Epaud)
- * Remove command for VDL which are now in a private file
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  * 
- * Revision 3.21  93/06/14  09:51:33  09:51:33  claustre (Laurent Claustre)
- * New command for LINAC
- * 
- * Revision 3.20  93/06/08  14:20:58  14:20:58  mettala (Timo Mettala)
- * New commands for icv150
- * 
- * Revision 3.19  93/06/08  10:31:02  10:31:02  meyer
- * Added command for powermeter.
- * 
- * Revision 3.18  93/06/07  08:54:33  08:54:33  domingue ( Marie-Christine Dominguez)
- * Hbm, Clutch and M4 commands
- * 
- * Revision 3.17  93/06/04  15:54:58  15:54:58  claustre (Laurent Claustre)
- * Add commands for LINAC MASTER
- * 
- * Revision 3.16  93/05/27  15:39:52  15:39:52  mettala (Timo Mettala)
- * Again new commands for steppermotors !
- * 
- * Revision 3.15  93/05/03  16:38:17  16:38:17  mettala (Timo Mettala)
- * Added new commands for steppermotors
- * 
- * Revision 3.14  93/02/19  17:28:01  17:28:01  epaud (Francis Epaud)
- * Add LECROY 1551 counter and CAEN V462 gate generator device servers
- * 
- * Revision 3.13  92/12/14  18:40:17  18:40:17  mettala (Timo Mettala)
- * Added commands for maxe, attenuators and slits
- * 
- * Revision 3.14  92/12/14  17:55:27  17:55:27  mettala (Timo Mettala)
- * corrected error in slit commands
- * 
- * Revision 3.13  92/12/14  09:38:11  09:38:11  mettala (Timo Mettala)
- * Added commands dfor maxe, slits and attenuator
- * 
- * Revision 3.12  92/11/02  10:19:18  10:19:18  dserver ()
- * Add data acquisition server VDL (VME Digital Lockin).   F.Epaud.
- * 
- * Revision 3.11  92/10/23  14:45:49  14:45:49  meyer ()
- * Added commands for FrontEnd class.
- * 
- * Revision 3.10  92/09/24  16:26:21  16:26:21  meyer ()
- * added commands for LINAC
- * 
- * Revision 3.9  92/09/02  09:01:57  09:01:57  meyer ()
- * deletetd control characters in file.
- * 
- * Revision 3.8  92/09/02  08:06:52  08:06:52  meyer ()
- * added DevReadAlarm for LIEN autmat.
- * 
- * Revision 3.7  92/09/01  10:40:50  10:40:50  mettala ()
- * added three new cmds for encoder steppermotors
- * 
- * Revision 3.6  92/09/01  14:18:26  14:18:26  meyer ()
- * added commands for LIEN automat and Update Daemon.
- * 
- * Revision 3.4  92/08/31  07:14:54  07:14:54  mettala
- * Added new commands for steppermotors
- * 
- * Revision 3.3  92/08/03  16:17:18  16:17:18  chaize (Jean Michel Chaize)
- * add commands for seismic survey server
- * 
- * Revision 3.2  92/06/17  16:38:58  16:38:58  meyer (Jens Meyer)
- * added commands for current transformer.
- * 
- * Revision 3.1  92/06/02  17:08:56  17:08:56  meyer ()
- * Cut to long steppermotor commands to 19 characters.
- * 
- * Revision 3.0  92/03/31  09:49:31  09:49:31  meyer ()
- * New major library release (3.x)
- * 
-
- Copyright (c) 1992 by European Synchrotron Radiation Facility, 
-                      Grenoble, France
-
-********************************************************************-*/
+ * File:		dev_cmds.c
+ *
+ * Project:	Device Servers 
+ *
+ * Description:	List of command names
+ *
+ * Author(s):	Andy Gotz
+ *
+ * Original:	March 1992
+ *
+ * Version:	$Revision: 1.2 $
+ *
+ * Date:	$Date: 2005-07-25 13:08:28 $
+ *
+ ********************************************************************-*/
 
 #include <DevCmds.h>
 

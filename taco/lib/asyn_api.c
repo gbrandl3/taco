@@ -1,38 +1,53 @@
-/*+*******************************************************************
-
- File       :	asyn_api.c
-
- Project    :	Device Servers with SUN-RPC
-
- Description:	Asynchronous Application Programmer's Interface
-
-		Source code to implement the asynchronous part
-		of the Device Server C API (DSAPI). Includes all
-		calls directly or indirectly related to the asynchronous
-		DSAPI. 
-
-		The asynchronous api can also be used to receive events.
-		An event is simply an asynchronous call which can reoccur
-		as opposed to a simple asynchronous call which has only
-		one reply. The code has been modified to support events 
-		as a type of asynchronism using the same mechanisms.
-		Each asynchronous call will be identified by its type
-		which can be D_ASYNCH_TYPE for simple asynchonous
-		calls and D_EVENT_TYPE for asynchronous events.
-
- Author(s)  :	Andy Goetz
- 		$Author: andy_gotz $
-
- Original   :	January 1997
-
- Version:	$Revision: 1.18 $
-
- Date:		$Date: 2005-06-16 20:41:37 $
-
- Copyright (c) 1997-2000 by European Synchrotron Radiation Facility,
-                            Grenoble, France
-
-********************************************************************-*/
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File       :	asyn_api.c
+ *
+ * Project    :	Device Servers with SUN-RPC
+ *
+ * Description:	Asynchronous Application Programmer's Interface
+ *
+ *		Source code to implement the asynchronous part
+ *		of the Device Server C API (DSAPI). Includes all
+ *		calls directly or indirectly related to the asynchronous
+ *		DSAPI. 
+ *
+ *		The asynchronous api can also be used to receive events.
+ *		An event is simply an asynchronous call which can reoccur
+ *		as opposed to a simple asynchronous call which has only
+ *		one reply. The code has been modified to support events 
+ *		as a type of asynchronism using the same mechanisms.
+ *		Each asynchronous call will be identified by its type
+ *		which can be D_ASYNCH_TYPE for simple asynchonous
+ *		calls and D_EVENT_TYPE for asynchronous events.
+ *
+ * Author(s)  :	Andy Goetz
+ * 		$Author: jkrueger1 $
+ *
+ * Original   :	January 1997
+ *
+ * Version:	$Revision: 1.19 $
+ *
+ * Date:	$Date: 2005-07-25 13:08:28 $
+ *
+ ********************************************************************-*/
 
 #ifndef WIN32
 #include "config.h"

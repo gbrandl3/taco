@@ -1,25 +1,41 @@
-/*+*******************************************************************
-
- File:		DevServerP.h
-
- Project:	Device Servers with SUN-RPC
-
- Description:	Private include file for applications using the device
- 		server class.
-
- Author(s):	Andy Goetz , Jens Meyer
-		$Author: jkrueger1 $
-
- Original:	March 1990
-
- Version:	$Revision: 1.3 $
-
- Date:		$Date: 2003-04-25 11:21:26 $
-
- Copyright (c) 1990-1997 by European Synchrotron Radiation Facility, 
-                            Grenoble, France
-
-********************************************************************-*/
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * 
+ * File:	DevServerP.h
+ *
+ * Project:	Device Servers with SUN-RPC
+ *
+ * Description:	Private include file for applications using the device
+ * 		server class.
+ *
+ * Author(s):	Andy Goetz
+ *		Jens Meyer
+ *		$Author: jkrueger1 $
+ *
+ * Original:	March 1990
+ *
+ * Version:	$Revision: 1.4 $
+ *
+ * Date:	$Date: 2005-07-25 13:08:22 $
+ *
+ ********************************************************************-*/
 
 #ifndef _DevServerP_h
 #define _DevServerP_h
@@ -29,7 +45,7 @@
  */
 #ifdef _IDENT
 static char DevServerPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServerP.h,v 1.3 2003-04-25 11:21:26 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServerP.h,v 1.4 2005-07-25 13:08:22 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*

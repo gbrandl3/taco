@@ -1,26 +1,41 @@
-/*+*******************************************************************
-
- File:          api_xdr_vers3.c
-
- Project:       Device Servers with sun-rpc
-
- Description:   xdr_routines for API-library functions for the
-		old version3. This file is needed for compatibility
-		reasons.
-
- Author(s): 	Jens Meyer
-		$Author: andy_gotz $
-
- Original:      November 1994
-
- Version:	$Revision: 1.3 $
-
- Date:		$Date: 2005-06-16 20:43:37 $
-
- Copyright (c) 1990 by European Synchrotron Radiation Facility,
-		       Grenoble, France
-
-*******************************************************************-*/
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:        api_xdr_vers3.c
+ * 
+ * Project:     Device Servers with sun-rpc
+ *
+ * Description: xdr_routines for API-library functions for the
+ *		old version3. This file is needed for compatibility
+ *		reasons.
+ *
+ * Author(s): 	Jens Meyer
+ *		$Author: jkrueger1 $
+ *
+ * Original:    November 1994
+ *
+ * Version:	$Revision: 1.4 $
+ *
+ * Date:	$Date: 2005-07-25 13:05:45 $
+ *
+ *******************************************************************-*/
 
 #include <DevXdrKernel.h>
 #include <API_xdr_vers3.h>

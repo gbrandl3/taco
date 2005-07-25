@@ -1,25 +1,41 @@
-/*+*******************************************************************
-
- File:		oic.c
-
- Project:	Device Servers in C++
-
- Description:	source code for Objects In C (OIC) a method for creating 
-		classes in C. The source code has been derived from the
-		version 4.27 of the original file svc_api.c.
-
- Author(s);	Andy Gotz
- 		$Author: andy_gotz $
-
- Original:	July 1995
-
- Version:	$Revision: 1.7 $
-
- Date:		$Date: 2005-06-16 20:41:38 $
-
- Copyright (c) 1995-1997 by European Synchrotron Radiation Facility, 
-                           Grenoble, France
-********************************************************************-*/
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:	oic.c
+ *
+ * Project:	Device Servers in C++
+ *
+ * Description:	source code for Objects In C (OIC) a method for creating 
+ *		classes in C. The source code has been derived from the
+ *		version 4.27 of the original file svc_api.c.
+ *
+ * Author(s);	Andy Gotz
+ * 		$Author: jkrueger1 $
+ *
+ * Original:	July 1995
+ *
+ * Version:	$Revision: 1.8 $
+ *
+ * Date:	$Date: 2005-07-25 13:08:28 $
+ *
+ ********************************************************************-*/
 
 /*
  * Include files and Static Routine definitions

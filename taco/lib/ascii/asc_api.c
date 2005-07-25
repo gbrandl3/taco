@@ -1,25 +1,37 @@
-
-/****************************************************************************
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * File:   	asc_api.c
  *
  * Project:   	ASCII based interface to device server API
  *
- * Description:   The code for dev_get_ascii, dev_put_ascii and dev_putget_ascii
+ * Description: The code for dev_get_ascii, dev_put_ascii and dev_putget_ascii
  *
- * Author(s):   	Faranguiss Poncet
+ * Author(s):   Faranguiss Poncet
  *		$Author: jkrueger1 $
  *
  * Original:   	November 1996
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:		$Date: 2004-03-09 09:35:50 $
- *
- * Copyright (c) 1996 by European Synchrotron Radiation Facility,
- *                       Grenoble, France
- *
- *                       All Rights Reserved
+ * Date:	$Date: 2005-07-25 12:51:32 $
  *
  *****************************************************************************/
 

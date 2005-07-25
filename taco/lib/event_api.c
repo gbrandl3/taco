@@ -1,45 +1,61 @@
-/*+*******************************************************************
-
- File       :	event_api.c
-
- Project    :	Device Servers with SUN-RPC
-
- Description:	Event Application Programmer's Interface
-
-		Source code to implement the event api of the Device 
-		Server C API (DSAPI). Includes all calls specific to 
-		events DSAPI. Because events use the same mechanisms
-		as the asynchronous calls additional code can be found in
-		asyn_api.c. The semantics for events consists of
-		a client registering interest in an event (by calling
-		dev_event_listen()). This is transmitted to the 
-		device server where the client is registered. When
-		a device server has an event it wants to distribute
-		to registered clients it has to dispatch it (by calling
-		dev_event_fire()). If a client is not interested
-		in an event anymore it (or wants to exit) it must
-		unregister (by calling dev_event_unlisten()).
-
-		Although it is possible to support different types of events 
-		in the first implementation only user events are supported. 
-		User events are events which are specific to a device server 
-		and are totally managed by the device class. This means the 
-		device class generates the events which it then passes on to 
-		the DSAPI to dispatch.  The period and timing of user events 
-		is totally under control of the device class.
-	
- Author(s)  :	Andy Goetz
- 		$Author: andy_gotz $
-
- Original   :	April 1999
-
- Version    :	$Revision: 1.13 $
-
- Date       :	$Date: 2005-06-26 13:45:25 $
-
- Copyleft (c) 1999 by European Synchrotron Radiation Facility,
-                      Grenoble, France
-********************************************************************-*/
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File       :	event_api.c
+ *
+ * Project    :	Device Servers with SUN-RPC
+ *
+ * Description:	Event Application Programmer's Interface
+ *
+ *		Source code to implement the event api of the Device 
+ *		Server C API (DSAPI). Includes all calls specific to 
+ *		events DSAPI. Because events use the same mechanisms
+ *		as the asynchronous calls additional code can be found in
+ *		asyn_api.c. The semantics for events consists of
+ *		a client registering interest in an event (by calling
+ *		dev_event_listen()). This is transmitted to the 
+ *		device server where the client is registered. When
+ *		a device server has an event it wants to distribute
+ *		to registered clients it has to dispatch it (by calling
+ *		dev_event_fire()). If a client is not interested
+ *		in an event anymore it (or wants to exit) it must
+ *		unregister (by calling dev_event_unlisten()).
+ *
+ *		Although it is possible to support different types of events 
+ *		in the first implementation only user events are supported. 
+ *		User events are events which are specific to a device server 
+ *		and are totally managed by the device class. This means the 
+ *		device class generates the events which it then passes on to 
+ *		the DSAPI to dispatch.  The period and timing of user events 
+ *		is totally under control of the device class.
+ *	
+ * Author(s)  :	Andy Goetz
+ * 		$Author: jkrueger1 $
+ *
+ * Original   :	April 1999
+ *
+ * Version    :	$Revision: 1.14 $
+ *
+ * Date       :	$Date: 2005-07-25 13:08:28 $
+ *
+ ********************************************************************-*/
 
 #ifndef WIN32
 #include "config.h"

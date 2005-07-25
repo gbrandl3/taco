@@ -1,27 +1,44 @@
-//+**********************************************************************
-//
-// File:	OICDevice.c
-//
-// Project:	OICDevice Servers in C++
-//
-// Description:	source code file which implements a "wrapper" for old Objects
-//		In C (OIC) device classes (belonging to the root class 
-//		DevServer) in C++ for use in C++ classes derived from the 
-//		Device base class. 
-//
-//		OICDevice is derived from the Device class
-//
-// Author(s):	Andy Goetz
-//
-// Original:	November 1996
-//
-// $Revision: 1.4 $
-//
-// $Date: 2005-03-29 09:57:58 $
-//
-// $Author: andy_gotz $
-//
-//-**********************************************************************
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:	OICDevice.c
+ *
+ * Project:	OICDevice Servers in C++
+ *
+ * Description:	source code file which implements a "wrapper" for old Objects
+ *		In C (OIC) device classes (belonging to the root class 
+ *		DevServer) in C++ for use in C++ classes derived from the 
+ *		Device base class. 
+ *
+ *		OICDevice is derived from the Device class
+ *
+ * Author(s):	Andy Goetz
+ * 		$Author: jkrueger1 $
+ *
+ * Original:	November 1996
+ *
+ * Version:	$Revision: 1.5 $
+ *
+ * Date:	$Date: 2005-07-25 13:08:28 $
+ *
+ *-**********************************************************************/
 		
 #include <stdlib.h>
 #include <string.h>
