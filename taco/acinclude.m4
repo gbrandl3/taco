@@ -693,16 +693,16 @@ AC_DEFUN([WITH_TANGO],
 	tango_found=no;
 	AC_ARG_WITH(tango, AC_HELP_STRING([--with-tango@<:@=ARG@:>@], [TANGO @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the TANGO installation, e.g. '/usr/local/tango']), [
 		case  "$with_tango" in
-			yes) 	TANGO_LIBS="-ltango" 
+			yes) 	TANGO_LIBS="-ltango -llog4tango" 
 				TANGO_INCLUDES="-I$withval/include" 
 				tango_found=yes;;
 			no)  	AC_MSG_WARN([Disable build of TANGO])
 				tango_found=no;;
-			*) 	TANGO_LIBS="-L$withval/lib -ltango"
+			*) 	TANGO_LIBS="-L$withval/lib -ltango -llog4tango"
 				TANGO_INCLUDES="-I$withval/include"
 				tango_found=yes;;
 		esac      
-		],[TANGO_LIBS="-ltango"; TANGO_INCLUDES="-I$withval/include"])
+		],[TANGO_LIBS="-ltango -llog4tango"; TANGO_INCLUDES="-I$withval/include"])
 	CPPFLAGS_SAVE="$CPPFLAGS"
 	CPPFLAGS="$CPPFLAGS $TANGO_INCLUDES"
 	LIBS_SAVE="$LIBS"
