@@ -21,7 +21,7 @@ libtacotango___la_SOURCES = ../dev_api.c ../sec_api.c ../event_api.c \
 			tango_api.cpp attr_api.cpp attr_access.cpp
 libtacotango___la_CFLAGS  	= -x c++ -DTANGO
 libtacotango___la_LIBADD  	= ../xdr/libdsxdr_all.la  ../dbase/libdbapi.la \
-				../dc/libdcapi.la -lstdc++ 
+				../dc/libdcapi.la @TANGO_LIBS@ @CORBA_LIBS@ -lstdc++ 
 libtacotango___la_LDFLAGS 	= -version-info @LIB_VERSION@
 
 include_HEADERS		+= ../BlcDsNumbers.h ../CntrlDsNumbers.h ../DasDsNumbers.h ../MachDsNumbers.h ../SysNumbers.h 
