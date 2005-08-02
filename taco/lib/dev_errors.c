@@ -26,13 +26,13 @@
  *
  * Author(s):	Andy Goetz
  *		Jens Meyer
- *		$Author: jkrueger1 $
+ *		$Author: jensmeyer $
  *
  * Original:	9 March 1992
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2005-07-25 13:08:28 $
+ * Date:        $Date: 2005-08-02 09:16:42 $
  *
  ********************************************************************-*/
 
@@ -174,6 +174,7 @@ DevErrListEntry DevErr_List[] = {
 
 { DevErr_AttributeNotFound,"Attribute name is neither defined for TACO nor for TANGO"},
 { DevErr_CannotConvertAttributeDataType,"Cannot cast attribute data type to the requested type"},
+{ DevErr_TangoAttributeValueIsNotValid,"The Tango attribute value is INVALID!"},
 };
 
 

@@ -26,13 +26,13 @@
  *
  * Author(s):	Andy Goetz
  *		Jens Meyer
- *		$Author: jkrueger1 $
+ *		$Author: jensmeyer $
  *
  * Original:	March 1990
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:		$Date: 2005-07-25 13:08:21 $
+ * Date:		$Date: 2005-08-02 09:13:53 $
  *
  ********************************************************************-*/
 
@@ -44,7 +44,7 @@
  */
 #ifdef _IDENT
 static char DevErrorsh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevErrors.h,v 1.5 2005-07-25 13:08:21 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevErrors.h,v 1.6 2005-08-02 09:13:53 jensmeyer Exp $";
 #endif /* _IDENT */
 
 /*
@@ -430,6 +430,7 @@ typedef struct { short err_type;
 #define DevErr_AttributeNotFound					 1100
 #define DevErr_TangoAccessFailed					 1101
 #define DevErr_CannotConvertAttributeDataType 1102
+#define DevErr_TangoAttributeValueIsNotValid  1103
 
 /* Errors 1200-1210 for attenuators */
 #define DevErr_FluorescentScreenPlaced          1200
