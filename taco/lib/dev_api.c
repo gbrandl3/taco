@@ -27,13 +27,13 @@
  *
  * Author(s)  :	Andy Goetz
  *		Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: jensmeyer $
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.27 $
+ * Version    :	$Revision: 1.28 $
  *
- * Date	    :	$Date: 2005-07-25 13:08:28 $
+ * Date	    :	$Date: 2005-08-02 09:19:49 $
  *
  ********************************************************************-*/
 
@@ -238,18 +238,27 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_import() : entering routine\n");
 
 #ifdef TANGO
-/*
- * Check for a four field attribute name /domain/family/member/attribute
- * to open access for attribute reading and writing
- */
-	attribute_name = extract_device_name(dev_name, error);
-	count = 0;
-	str_ptr = attribute_name;
+
+	/*
+	 * Check for a four field attribute name 
+	 *  /domain/family/member/attribute 
+	 * to open access for attribute reading and writing
+	 */
+	 
+	if (strncasecmp(dev_name,"tango:",6) == 0)
+		attribute_name = extract_device_name (dev_name+6, error);
+	else
+		attribute_name = extract_device_name (dev_name, error);
+	
+	count = 0; 
+	str_ptr = attribute_name;	
 	while ( (str_ptr = strchr (str_ptr, '/')) != NULL )
-	{
+		{
 		count ++;
 		str_ptr++;
-	}
+		}
+
+
 
 	if ( count == 3 )
 	{
@@ -259,7 +268,7 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 		if ( !config_flags.configuration )
 			if ( (setup_config (error)) < 0 )
 				return (DS_NOTOK);
-                return attribute_import (attribute_name, access, ds_ptr, error);
+                return attribute_import (dev_name, access, ds_ptr, error);
 	}
 
 /*
@@ -267,7 +276,7 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
  */
 	if (strncasecmp(dev_name,"tango:",6) == 0)
 	{
-		status = tango_dev_import(dev_name+6,access, ds_ptr, error);
+		status = tango_dev_import((dev_name+6),access, ds_ptr, error);
 		printf("dev_import(): tango_dev_import(%s) returned %d\n",dev_name,status);
 		return(status);
 	}
