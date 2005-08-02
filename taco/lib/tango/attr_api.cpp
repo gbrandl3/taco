@@ -25,18 +25,18 @@
  * Description:	
  *	
  * Author(s)  :	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: jensmeyer $
  *
  * Original   :	September 2002
  *
- * Version    : $Revision: 1.2 $
+ * Version    : $Revision: 1.3 $
  *
- * Date       : $Date: 2005-07-25 13:00:43 $
+ * Date       : $Date: 2005-08-02 12:14:29 $
  *
  *********************************************************************/ 
 
 #include <attr_api.h>
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_api.cpp,v 1.2 2005-07-25 13:00:43 jkrueger1 Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_api.cpp,v 1.3 2005-08-02 12:14:29 jensmeyer Exp $";
 
 /**
  * Hook to TACO dev_import().
@@ -178,6 +178,20 @@ long attribute_putget (devserver ds, long cmd, DevArgument argin,
 				return (DS_NOTOK);
 				}
 			break;
+	
+		case DevReadSetValue:
+		 	if ( attr->read_set_attr (argout, argout_type, error) == DS_NOTOK )
+				{
+				return (DS_NOTOK);
+				}
+			break;	
+			
+		case DevIOState:
+		 	if ( attr->read_attr_state (argout, argout_type, error) == DS_NOTOK )
+				{
+				return (DS_NOTOK);
+				}
+			break;		
 			
 		case DevWrite:
 		 	if ( attr->write_attr (argin, argin_type, error) == DS_NOTOK )
@@ -207,6 +221,13 @@ long attribute_putget (devserver ds, long cmd, DevArgument argin,
 				}
 			break;
 			
+		case DevReadConfig:
+		 	if ( attr->read_attr_config (argout, argout_type, error) == DS_NOTOK )
+				{
+				return (DS_NOTOK);
+				}
+			break;
+							
 		default:
 			*error = DevErr_CommandNotImplemented;
 			return (DS_NOTOK);		

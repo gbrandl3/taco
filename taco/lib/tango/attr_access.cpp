@@ -25,17 +25,17 @@
  * Description:	
  *	
  * Author(s)  :	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: jensmeyer $
  *
  * Original   :	September2002
  *
- * Version    :	$Revision: 1.3 $
+ * Version    :	$Revision: 1.4 $
  *
- * Date       : $Date: 2005-07-25 13:00:43 $
+ * Date       : $Date: 2005-08-02 12:13:48 $
  *
  *********************************************************************/ 
 
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_access.cpp,v 1.3 2005-07-25 13:00:43 jkrueger1 Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_access.cpp,v 1.4 2005-08-02 12:13:48 jensmeyer Exp $";
 
 #include <attr_api.h>
 
@@ -51,7 +51,9 @@ extern char *dev_error_string;
 #ifdef RUNNING
 #undef RUNNING
 #endif
-
+#ifdef WRITE
+#undef WRITE
+#endif
 /**
  * Constructor for the attribute access class.
  * 
@@ -63,6 +65,7 @@ extern char *dev_error_string;
  * @param access Taco security access
  * @param error pointer to take the Taco error code
  */
+
 AttrAccess::AttrAccess (char *full_attr_name, long access, long *error)
 {
 	char	*str_ptr;
@@ -71,9 +74,10 @@ AttrAccess::AttrAccess (char *full_attr_name, long access, long *error)
 	*error 				= 0;
 	tango_device 		= False;
 	taco_signal_index = (-1);
+	quality_last_read = Tango::ATTR_VALID;
 	
 	sprintf (attr_name, "%s", full_attr_name);
-
+	
 	/*
 	 * test for a valid four field attribute name
 	 */
@@ -99,7 +103,7 @@ AttrAccess::AttrAccess (char *full_attr_name, long access, long *error)
 	 
 	if (strncasecmp(attr_name, "tango:", 6) == 0)
 		{
-		sprintf (device_name, "%s", (attr_name));
+		sprintf (device_name, "%s", (attr_name+6));
 		tango_device = True;
 		}
 	else
@@ -214,6 +218,10 @@ AttrAccess::~AttrAccess()
  *
  * A read only attribute can execute only DevRead and a read/write attribute 
  * the commands DevRead and DevWrite.
+ * The attribute configuration is returned by the command DevReadConfig.
+ * The command DevReadSetValue and DevIOState can be used only for Tango
+ * attributes. DevReadSetValue returns the read and the set point of an attribute
+ * as an array. DevIOState returns the quality of the last read attribute.
  *					 
  * @param varcmdarr Pointer to command array.
  * @param error pointer to take the Taco error code
@@ -222,21 +230,22 @@ AttrAccess::~AttrAccess()
  */
 long AttrAccess::attr_cmd_query (DevVarCmdArray *attr_cmd_query_array, long *error)
 {
-	DevCmdInfo *cmd_info;
+	DevCmdInfo  *cmd_info;
+	unsigned int 	cmd_counter;
 	
 	*error = 0;
 	
 	/*
 	 * Get the number of commands to return
 	 */
-	 
+	cmd_counter = 5;
 	if ( attr_config.writable != Tango::READ )
 		{
-		attr_cmd_query_array->length   = 5;
+		cmd_counter++;
 		}
-	else
+	if ( tango_device == True )
 		{
-		attr_cmd_query_array->length   = 4;
+		cmd_counter = cmd_counter +2;
 		}
 	
 	/*
@@ -245,57 +254,102 @@ long AttrAccess::attr_cmd_query (DevVarCmdArray *attr_cmd_query_array, long *err
  	 */
 	
 	cmd_info = (DevCmdInfo *) malloc
-	    		  (attr_cmd_query_array->length * sizeof (DevCmdInfo));
+	    		  (cmd_counter * sizeof (DevCmdInfo));
 	if ( cmd_info == NULL )
 	{
 		*error  = DevErr_InsufficientMemory;
 		return (DS_NOTOK);
 	}	 
 	
+	
 	/*
 	 * Command DevRead to read attribute values
 	 */
 	 
-	cmd_info[0].cmd = 28;
-	sprintf (cmd_info[0].cmd_name, "DevRead");
-	cmd_info[0].in_name = NULL;
-	cmd_info[0].in_type = D_VOID_TYPE;
-	cmd_info[0].out_name = NULL;
-	cmd_info[0].out_type = get_taco_data_type (attr_config.data_type);
+	cmd_counter = 0; 
+	cmd_info[cmd_counter].cmd = 28;
+	sprintf (cmd_info[cmd_counter].cmd_name, "DevRead");
+	cmd_info[cmd_counter].in_name = NULL;
+	cmd_info[cmd_counter].in_type = D_VOID_TYPE;
+	cmd_info[cmd_counter].out_name = NULL;
+	cmd_info[cmd_counter].out_type = get_taco_data_type (attr_config.data_type);
 	
 	/*
 	 * Command DevAbort to stop a moving device via the attribute handle
 	 */
 	 
-	cmd_info[1].cmd = 33;
-	sprintf (cmd_info[1].cmd_name, "DevAbort");
-	cmd_info[1].in_name = NULL;
-	cmd_info[1].in_type = D_VOID_TYPE;
-	cmd_info[1].out_name = NULL;
-	cmd_info[1].out_type = D_VOID_TYPE;	
+	cmd_counter++;
+	cmd_info[cmd_counter].cmd = 33;
+	sprintf (cmd_info[cmd_counter].cmd_name, "DevAbort");
+	cmd_info[cmd_counter].in_name = NULL;
+	cmd_info[cmd_counter].in_type = D_VOID_TYPE;
+	cmd_info[cmd_counter].out_name = NULL;
+	cmd_info[cmd_counter].out_type = D_VOID_TYPE;	
 	
 	/*
 	 * Command DevState to read the device state via a attribute handle
 	 */
 	 
-	cmd_info[2].cmd = 4;
-	sprintf (cmd_info[2].cmd_name, "DevState");
-	cmd_info[2].in_name = NULL;
-	cmd_info[2].in_type = D_VOID_TYPE;
-	cmd_info[2].out_name = NULL;
-	cmd_info[2].out_type = D_SHORT_TYPE;	
+	cmd_counter++;
+	cmd_info[cmd_counter].cmd = 4;
+	sprintf (cmd_info[cmd_counter].cmd_name, "DevState");
+	cmd_info[cmd_counter].in_name = NULL;
+	cmd_info[cmd_counter].in_type = D_VOID_TYPE;
+	cmd_info[cmd_counter].out_name = NULL;
+	cmd_info[cmd_counter].out_type = D_SHORT_TYPE;	
 
 	/*
 	 * Command DevStatus to read the device status via a attribute handle
 	 */
 	 
-	cmd_info[3].cmd = 8;
-	sprintf (cmd_info[3].cmd_name, "DevStatus");
-	cmd_info[3].in_name = NULL;
-	cmd_info[3].in_type = D_VOID_TYPE;
-	cmd_info[3].out_name = NULL;
-	cmd_info[3].out_type = D_STRING_TYPE;	
+	cmd_counter++;
+	cmd_info[cmd_counter].cmd = 8;
+	sprintf (cmd_info[cmd_counter].cmd_name, "DevStatus");
+	cmd_info[cmd_counter].in_name = NULL;
+	cmd_info[cmd_counter].in_type = D_VOID_TYPE;
+	cmd_info[cmd_counter].out_name = NULL;
+	cmd_info[cmd_counter].out_type = D_STRING_TYPE;	
 	
+	/*
+	  * Command DevReadConfig to read the attribute properties
+	  */
+	  
+	cmd_counter++;
+	cmd_info[cmd_counter].cmd = 605;
+	sprintf (cmd_info[cmd_counter].cmd_name, "DevReadConfig");
+	cmd_info[cmd_counter].in_name = NULL;
+	cmd_info[cmd_counter].in_type = D_VOID_TYPE;
+	cmd_info[cmd_counter].out_name = NULL;
+	cmd_info[cmd_counter].out_type = D_VAR_STRINGARR;
+
+
+	/* Is this an Tango attribute? For Taco signals no setpoint information available */
+	if ( tango_device == True )
+	 	{	
+		/*
+	  		* Command DevReadSetValue to read the device read and set point as an array
+	  		*/
+		cmd_counter++;
+		cmd_info[cmd_counter].cmd = 39;
+		sprintf (cmd_info[cmd_counter].cmd_name, "DevReadSetValue");
+		cmd_info[cmd_counter].in_name  = NULL;
+		cmd_info[cmd_counter].in_type  = D_VOID_TYPE;
+		cmd_info[cmd_counter].out_name = NULL;
+		cmd_info[cmd_counter].out_type = get_taco_array_data_type (attr_config.data_type);
+
+		/*
+			*
+			*/
+		cmd_counter++;
+		cmd_info[cmd_counter].cmd = 150;
+		sprintf (cmd_info[cmd_counter].cmd_name, "DevIOState");
+		cmd_info[cmd_counter].in_name  = NULL;
+		cmd_info[cmd_counter].in_type  = D_VOID_TYPE;
+		cmd_info[cmd_counter].out_name = NULL;
+		cmd_info[cmd_counter].out_type = D_SHORT_TYPE;
+
+		}
+		
 	/*
 	 * Command DevWrite to write attribute values
 	 */
@@ -304,38 +358,117 @@ long AttrAccess::attr_cmd_query (DevVarCmdArray *attr_cmd_query_array, long *err
 	
 	if ( attr_config.writable != Tango::READ )
 		{
-		cmd_info[4].cmd = 29;
-		sprintf (cmd_info[4].cmd_name, "DevWrite");
-		cmd_info[4].in_name = NULL;
+		cmd_counter++;
+		cmd_info[cmd_counter].cmd = 29;
+		sprintf (cmd_info[cmd_counter].cmd_name, "DevWrite");
+		cmd_info[cmd_counter].in_name = NULL;
 		if ( tango_device == False )
 			{
-			cmd_info[4].in_type = get_taco_data_type (taco_write_type);
+			cmd_info[cmd_counter].in_type = get_taco_data_type (taco_write_type);
 			}
 		else
 			{
-			cmd_info[4].in_type = get_taco_data_type (attr_config.data_type);
+			cmd_info[cmd_counter].in_type = get_taco_data_type (attr_config.data_type);
 			}
 
-		cmd_info[4].out_name = NULL;
-		cmd_info[4].out_type = D_VOID_TYPE;
-		}
-	
+		cmd_info[cmd_counter].out_name = NULL;
+		cmd_info[cmd_counter].out_type = D_VOID_TYPE;		
+		}	
+	 
+	attr_cmd_query_array->length   = ++cmd_counter; 	
 	attr_cmd_query_array->sequence = cmd_info;	
 	return (DS_OK);
 }
 
 
+
 /**
+ *  Returns the Tango attribute properties or Taco signal configuration
+ *	 values as a string array.
+ *	 All values which are in the Taco signal definition are returned in the
+ *  order. Some extra fields are added for Tango spectrum and image attributes.
  *
- *
- * @param attr_config_array
- * @param error
+ * @param argout - Taco string array with attribute properties
+ * @param argout_type - D_VAR_STRINGARR
+ * @param error pointer to take the Taco error code
  *
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
-long AttrAccess::read_attr_config (DevVarStringArray *attr_config_array, long *error)
+
+long AttrAccess::read_attr_config (DevArgument argout, 
+											 DevType argout_type, long *error)
 {
+	DevVarStringArray 	property_array;
+	char						*property_ptrs[20];
+	char 						data_type[80];
+	char						max_dim_x[80];
+	char						max_dim_y[80];
+	
 	*error = 0;
+	
+	property_ptrs[0] = "17";
+	property_ptrs[1] = (char *)attr_config.name.c_str();
+	property_ptrs[2] = (char *)attr_config.label.c_str();
+	property_ptrs[3] = (char *)attr_config.unit.c_str();
+	property_ptrs[4] = (char *)attr_config.format.c_str();
+	property_ptrs[5] = (char *)attr_config.description.c_str();
+	property_ptrs[6] = (char *)attr_config.max_value.c_str();
+	property_ptrs[7] = (char *)attr_config.min_value.c_str();
+	property_ptrs[8] = (char *)attr_config.alarms.max_alarm.c_str();
+	property_ptrs[9] = (char *)attr_config.alarms.min_alarm.c_str();
+	property_ptrs[10] =(char *)attr_config.alarms.delta_val.c_str();;
+	property_ptrs[11] =(char *)attr_config.alarms.delta_t.c_str();;
+	property_ptrs[12] =(char *)attr_config.standard_unit.c_str();
+	
+	// translate enumeration type
+	switch (attr_config.writable)
+		{
+		case Tango::READ:
+			property_ptrs[13] = READ_ATTR;
+			break;
+		case Tango::WRITE:
+			property_ptrs[13] = WRITE_ATTR;
+			break;
+		case Tango::READ_WRITE:
+			property_ptrs[13] = READ_WRITE_ATTR;
+			break;
+		case Tango::READ_WITH_WRITE:
+			property_ptrs[13] = READ_WITH_WRITE_ATTR;
+			break;		
+		}
+		
+	sprintf (data_type, "%d", attr_config.data_type);
+	property_ptrs[14] = data_type;
+
+	// translate enumeration type
+	switch (attr_config.data_format)
+		{
+		case Tango::SCALAR:
+			property_ptrs[15] = SCALAR_FORMAT;
+			break;
+		case Tango::SPECTRUM:
+			property_ptrs[15] = SPECTRUM_FORMAT;
+			break;
+		case Tango::IMAGE:
+			property_ptrs[15] = IMAGE_FORMAT;
+			break;
+		}	
+	
+	sprintf (max_dim_x, "%d", attr_config.max_dim_x);
+	property_ptrs[16] = max_dim_x;
+	sprintf (max_dim_y, "%d", attr_config.max_dim_y);
+	property_ptrs[17] = max_dim_y;
+	
+	property_array.length = 18;
+	property_array.sequence = property_ptrs;
+	
+	//	Allocate and fill XDR argout
+	
+	if ( to_xdr_sequence(&property_array, argout, D_VAR_STRINGARR, error) == DS_NOTOK )
+		{
+		return DS_NOTOK;
+		}
+	
 	return (DS_OK);
 }
 
@@ -365,6 +498,16 @@ long AttrAccess::write_attr (DevArgument argin, DevType argin_type, long *error)
 	
 	*error = 0;
 	
+	/*
+	 * Check for a writabe attribute
+	 */
+	 
+	if ( attr_config.writable == Tango::READ )
+		{
+		*error = DevErr_CommandNotImplemented;
+		return (DS_NOTOK);
+		}
+	 
 	/*
 	 * Switch Taco to Tango data type definitions
 	 */
@@ -491,12 +634,130 @@ long AttrAccess::write_attr (DevArgument argin, DevType argin_type, long *error)
 	return (DS_OK);
 }
 
+
+/**
+ * Reads the read and set point of an attribute as an array.
+ * This can be used only for Tango attributes. Taco attributes don`t
+ * have an associated set point.
+ *					 
+ * @param argout read and set point array
+ * @param argout_type Requested type for output argument
+ * @param error Taco error code
+ * 
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
+
+long AttrAccess::read_set_attr (DevArgument argout, DevType argout_type, long *error)
+{
+	Tango::DeviceAttribute	attr_values;
+	long					request_type;
+	long					outgoing_type;
+
+	*error = 0;
+	
+	/*
+	 * Switch Taco to Tango data type definitions
+	 */
+	 
+	request_type = get_tango_data_type (argout_type);
+	 
+	
+	/*
+	 * Read the attribute value from the device
+	 */
+	
+	if ( tango_device == False )
+	 	{
+		// No set point handling implemented for Taco signals
+		
+		*error = DevErr_CommandNotImplemented;
+		return (DS_NOTOK);
+		}		
+		
+	else
+		{
+		/* 
+		 * Read from a TANGO device
+		 */
+		try
+			{
+			attr_values = tango_obj->read_attribute (signal_name);
+			
+			// Check the validity of data.
+			// If not valid return an error
+			
+			quality_last_read = attr_values.get_quality();
+			if ( quality_last_read == Tango::ATTR_INVALID )
+				{
+				*error = DevErr_TangoAttributeValueIsNotValid;
+				return (DS_NOTOK);
+				}
+			
+			//	Switch on TANGO argout
+			switch (attr_config.data_type)
+				{
+				case Tango::DEV_DOUBLE:
+					outgoing_type = Tango::DEVVAR_DOUBLEARRAY;
+					break;
+
+				case Tango::DEV_LONG:
+					outgoing_type = Tango::DEVVAR_LONGARRAY;
+					break;
+
+				case Tango::DEV_SHORT:
+					outgoing_type = Tango::DEVVAR_SHORTARRAY;
+					break;
+
+				case Tango::DEV_STRING:
+					outgoing_type = Tango::DEVVAR_STRINGARRAY;
+					break;
+
+				case Tango::DEVVAR_SHORTARRAY:
+				case Tango::DEVVAR_LONGARRAY:
+				case Tango::DEVVAR_DOUBLEARRAY:
+					outgoing_type = attr_config.data_type;
+					break;										
+				}
+			
+			// check the correct data type
+			
+			if ( request_type != outgoing_type )
+				{
+				*error = DevErr_CannotConvertAttributeDataType;
+				return (DS_NOTOK);
+				}	
+				
+			// extract the sequence of read and setpoint
+			return to_taco_sequence (attr_values, argout, 
+										   outgoing_type, argout_type, error);
+			}
+		catch (Tango::DevFailed &e)
+			{	
+			//
+			// recover TANGO error string and save it in the
+			// global error string so that
+			// it can be printed out with dev_error_str()
+			//
+			
+         tango_dev_error_string (e);
+         *error = DevErr_TangoAccessFailed;
+			
+         return(DS_NOTOK);				
+			}			 
+		}
+
+
+	return (DS_OK);
+}
+
+
+
 /**
  * Reads the value of an attribute.
  *
  * The output data is casted to the requested data type if possible.
  *
- * The TACO command DEvReadSigValues or the TANGO methode read_attribute() are used to 
+ * The TACO command DevReadSigValues or the TANGO methode read_attribute() are used to 
  * read the value.
  *					 
  * @param argout Output argument
@@ -505,6 +766,7 @@ long AttrAccess::write_attr (DevArgument argin, DevType argin_type, long *error)
  * 
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
+
 long AttrAccess::read_attr (DevArgument argout, DevType argout_type, long *error)
 {
 	Tango::DeviceAttribute	attr_values;
@@ -512,7 +774,7 @@ long AttrAccess::read_attr (DevArgument argout, DevType argout_type, long *error
 	float					float_value;
 	long					long_value;
 	short					short_value;
-	string					string_value;
+	string				string_value;
 	char					*c_str_ptr;
 	long					request_type;
 	void					*data_ptr;
@@ -602,6 +864,17 @@ long AttrAccess::read_attr (DevArgument argout, DevType argout_type, long *error
 		try
 			{
 			attr_values = tango_obj->read_attribute (signal_name);
+			
+			// Check the validity of data.
+			// If not valid return an error
+			
+			quality_last_read = attr_values.get_quality();
+			if ( quality_last_read == Tango::ATTR_INVALID )
+				{
+				*error = DevErr_TangoAttributeValueIsNotValid;
+				return (DS_NOTOK);
+				}
+			
 			//	Switch on TANGO argout
 			switch (attr_config.data_type)
 				{
@@ -624,8 +897,16 @@ long AttrAccess::read_attr (DevArgument argout, DevType argout_type, long *error
 				case Tango::DEVVAR_SHORTARRAY:
 				case Tango::DEVVAR_LONGARRAY:
 				case Tango::DEVVAR_DOUBLEARRAY:
-					return to_taco_sequence(attr_values, argout,
+					if ( attr_config.data_type != request_type )
+						{
+						*error = DevErr_CannotConvertAttributeDataType;
+						return (DS_NOTOK);
+						}
+					else
+						{
+						return to_taco_sequence(attr_values, argout,
 								attr_config.data_type, argout_type, error);
+						}
 					break;										
 				}
 			}
@@ -691,6 +972,63 @@ long AttrAccess::read_attr (DevArgument argout, DevType argout_type, long *error
 	return (DS_OK);
 }
 
+
+/**
+ * Reads the quality factor of the last read value of an attribute.
+ * Only Tango attributes have a quality value.
+ * The value is returnd as a short value:
+ *	ATTR_VALID    = 0
+ * ATTR_INVALID  = -1
+ *	ATTR_ALARM    = 1
+ * ATTR_WARNING  = 2
+ * ATTR_CHANGING = 3
+ *      				 
+ * @param argout - quality of attribute value
+ * @param argout_type D_SHORT_TYPE
+ * @param error Taco error code
+ * 
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
+
+long AttrAccess::read_attr_state (DevArgument argout, DevType argout_type, long *error)
+{
+	short	*quality = (short *)argout;
+	
+	/*
+	 * Read the attribute quality value for the last attribute read
+	 */
+	
+	if ( tango_device == False )
+	 	{
+		// No quality handling implemented for Taco signals
+		
+		*error = DevErr_CommandNotImplemented;
+		return (DS_NOTOK);
+		}
+			
+	switch (quality_last_read)
+		{
+		case Tango::ATTR_VALID:
+			*quality = QUALITY_VALID;
+			break;
+		case Tango::ATTR_INVALID:
+			*quality = QUALITY_INVALID;
+			break;
+		case Tango::ATTR_ALARM:
+			*quality = QUALITY_ALARM;
+			break;
+		case Tango::ATTR_WARNING:
+			*quality = QUALITY_WARNING;
+			break;
+		case Tango::ATTR_CHANGING:
+			*quality = QUALITY_CHANGING;
+			break;
+		}
+	
+	return (DS_OK);
+}
+
+
 /**
  * Convert a Tango sequence to the request TACO sequence
  *
@@ -702,6 +1040,7 @@ long AttrAccess::read_attr (DevArgument argout, DevType argout_type, long *error
  *
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
+
 long AttrAccess::to_taco_sequence(Tango::DeviceAttribute attribute, 
                                  DevArgument argout,
 				 DevType tango_type,
@@ -1074,9 +1413,12 @@ long AttrAccess::create_attr_access (long *error)
 		attr_config.description = signal_config.sequence[4];
 		attr_config.max_value = signal_config.sequence[5];
 		attr_config.min_value = signal_config.sequence[6];
-		attr_config.max_alarm = signal_config.sequence[7];
-		attr_config.min_alarm = signal_config.sequence[8];
 		attr_config.standard_unit = signal_config.sequence[11];					
+
+		attr_config.alarms.max_alarm = signal_config.sequence[7];
+		attr_config.alarms.min_alarm = signal_config.sequence[8];		
+		attr_config.alarms.delta_val = signal_config.sequence[9];
+		attr_config.alarms.delta_t   = signal_config.sequence[10];
 		}
 		
 	else
@@ -1461,6 +1803,61 @@ long	AttrAccess::get_taco_data_type (long tango_data_type)
 
 
 /**
+ * When returning read and set point as for Tango 
+ *	attributes, the result is always returned as an
+ *	array of the attribute data type.
+ *	Converts TANGO data type to TACO data type, but
+ *	returns alaways the array type. 
+ *
+ * @tango_data_type - TANGO data type
+ *
+ *	@return TACO array data type
+ */
+ 
+long	AttrAccess::get_taco_array_data_type (long tango_data_type)
+{
+	switch (tango_data_type)
+		{
+		case Tango::DEV_STRING:
+			return (D_VAR_STRINGARR);
+			break;
+			
+		case Tango::DEV_SHORT:
+			return (D_VAR_SHORTARR);
+			break;
+			
+		case Tango::DEV_LONG:
+			return (D_VAR_LONGARR);
+			break;
+
+		case Tango::DEV_FLOAT:
+			return (D_VAR_FLOATARR);
+			break;			
+			
+		case Tango::DEV_DOUBLE:
+			return (D_VAR_DOUBLEARR);
+			break;
+			
+		case Tango::DEVVAR_SHORTARRAY:
+			return D_VAR_SHORTARR;
+			break;
+			
+		case Tango::DEVVAR_LONGARRAY:
+			return D_VAR_LONGARR;
+			break;
+			
+		case Tango::DEVVAR_DOUBLEARRAY:
+			return D_VAR_DOUBLEARR;
+			break;
+
+		default:
+			return (D_VOID_TYPE);
+			break;
+		}
+}
+
+
+/**
  * Searches the requested attribute in the TACO and the TANGO system.
  *
  * The TACO database is searched first. If the name is not defined for TACO the 
@@ -1470,6 +1867,7 @@ long	AttrAccess::get_taco_data_type (long tango_data_type)
  *
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
+
 long AttrAccess::search_attr_name (long *error)
 {
 	short	i;

@@ -25,13 +25,13 @@
  * Description:	
  *	
  * Author(s)  :	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: jensmeyer $
  *
  * Original   :	September 2002
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2005-07-25 13:00:43 $
+ * Date:	$Date: 2005-08-02 12:14:48 $
  *
  *********************************************************************/ 
 
@@ -50,7 +50,23 @@
  */
  
 extern "C" void free_var_str_array (DevVarStringArray *str_array);
-								 									 
+
+// defines to translate TANGO enum types
+
+#define READ_ATTR							"read"
+#define WRITE_ATTR	  					"write"
+#define READ_WRITE_ATTR	 				"read_write"
+#define READ_WITH_WRITE_ATTR			"read_with_write"
+
+#define SCALAR_FORMAT					"scalar"
+#define SPECTRUM_FORMAT 				"spectrum"
+#define IMAGE_FORMAT						"image"
+
+#define QUALITY_VALID					0
+#define QUALITY_INVALID					(-1)
+#define QUALITY_ALARM					1
+#define QUALITY_WARNING					2
+#define QUALITY_CHANGING				3									 
 
 /*
  * Attribute access class
@@ -63,23 +79,31 @@ class AttrAccess
    	~AttrAccess ();
 
 		long  read_attr  (DevArgument argout, DevType argout_type, long *error);
+		long  read_attr_state (DevArgument argout, DevType argout_type, long *error);
+		long  read_set_attr  (DevArgument argout, DevType argout_type, long *error);
 		long  write_attr (DevArgument argin,  DevType argin_type,  long *error);
 		long  attr_cmd_query (DevVarCmdArray *attr_cmd_query_array,long *error);
 		long  read_state (DevArgument argout, DevType argout_type, long *error);
 		long  read_status (DevArgument argout, DevType argout_type, long *error);
 		long	abort	(long *error);	
-		long  read_attr_config (DevVarStringArray *attr_config_array,long *error);			
+		long  read_attr_config (DevArgument argout, DevType argout_type, 
+									   long *error);			
 	protected:
 		long	search_attr_name (long *error);
 		long	search_tango_attr_name (long *error);
 		long	create_attr_access (long *error);
 		long	get_tango_data_type (long taco_data_type);
 		long	get_taco_data_type (long tango_data_type);
+		long	get_taco_array_data_type (long tango_data_type);
 		long  check_requested_data_type (long request_type, long attr_type, 
 												   long *error);
 		long  convert_data (long data_type, void *data_ptr,
-								  long conv_data_type, void *conv_data_ptr, long *error);															
-	
+								  long conv_data_type, void *conv_data_ptr, long *error);
+		long	to_taco_sequence(Tango::DeviceAttribute , DevArgument , 
+								    DevType , DevType, long *);	
+		long	to_xdr_sequence(DevArgument , DevArgument , DevType , long *);	
+		
+			
 		char	attr_name[80];
 		char	device_name[80];
 		char 	signal_name[80];
@@ -87,7 +111,8 @@ class AttrAccess
 		Tango::DeviceProxy	*tango_obj;
 		devserver             taco_obj;
 		
-		Tango::AttributeInfo	attr_config;
+		Tango::AttributeInfoEx		attr_config;
+		Tango::AttrQuality			quality_last_read;
 		short	tango_device;
 		
 		long	taco_signal_index;
@@ -95,8 +120,7 @@ class AttrAccess
 		long	taco_write_cmd;
 		long	taco_write_type;
 
-		long	to_taco_sequence(Tango::DeviceAttribute , DevArgument , DevType , DevType, long *);	
-		long	to_xdr_sequence(DevArgument , DevArgument , DevType , long *);	
+
 
 };
 
