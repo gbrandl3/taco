@@ -18,7 +18,8 @@ libtacotango___la_SOURCES = ../dev_api.c ../sec_api.c ../event_api.c \
 			../Device.cpp ../OICDevice.cpp \
 			../signal/DSSignal.c ../signal/MDSSignal.c \
 			../signal/MDSSignal_config.c \
-			tango_api.cpp attr_api.cpp attr_access.cpp
+			tango_api.cpp attr_api.cpp attr_access.cpp \
+			db_exp.cpp
 libtacotango___la_CFLAGS  	= -x c++ -DTANGO
 libtacotango___la_LIBADD  	= ../xdr/libdsxdr_all.la  ../dbase/libdbapi.la \
 				../dc/libdcapi.la @TANGO_LIBS@ @CORBA_LIBS@ -lstdc++ 
