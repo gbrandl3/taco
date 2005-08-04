@@ -1,13 +1,13 @@
 AC_INIT([TACO], [3.1.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.65 $)dnl
+AC_REVISION($Revision: 1.66 $)dnl
 AC_COPYRIGHT([(C) 1990-2005 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
 
 TACO_INIT([no])
 
-AC_SUBST(LIB_VERSION, [11:0:0])
+AC_SUBST(LIB_VERSION, [11:1:0])
 
 AM_INIT_AUTOMAKE([dist-bzip2 1.7])
 
