@@ -23,11 +23,11 @@
  * Description:	
  *
  * Author(s):	
- *		$Author: jkrueger1 $
+ *		$Author: jensmeyer $
  * 
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2005-07-25 13:02:28 $
+ * Date:	$Date: 2005-08-04 10:33:25 $
  *
  ******************************************************************************/
 
@@ -539,6 +539,8 @@ long _DLLFunc db_updres (long resdef_nb,char **resdef,long *deferr_nb,long *erro
 long _DLLFunc db_secpass (char **pass,long *error);
 long _DLLFunc db_delete_update(long dev_nb,char **dev_name_list,long list_type,long devdef_nb,char **devdef,long resdef_nb,char **resdef,db_delupd_error *p_error);
 
+int _DLLFunc db_getdevexp_tango  (char *filter,char ***device_tab,u_int *dev_num,long *error);
+int _DLLFunc db_freedevexp_tango (char **buffer);
 }
 #endif /* __cplusplus */
 
