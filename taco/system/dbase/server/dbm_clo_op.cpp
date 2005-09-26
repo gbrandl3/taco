@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: jensmeyer $
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.13 $
  *
- * Date:	$Date: 2005-07-25 08:19:09 $
+ * Date:	$Date: 2005-09-26 16:18:23 $
  *
  */
 
@@ -152,7 +152,7 @@ DevLong *NdbmServer::db_reopendb_1_svc()
 		}
 		if (dbgen.tid[i] == NULL)
 		{
-			std::cerr <<"dbm_server (" << gbdm_errno << "): Can't open table : " << dbgen.TblName[i] << std::endl; 
+			std::cerr <<"dbm_server (" << gdbm_errno << "): Can't open table : " << dbgen.TblName[i] << std::endl; 
 			errcode = DbErr_DatabaseAccess;
 			return(&errcode);
 		}
