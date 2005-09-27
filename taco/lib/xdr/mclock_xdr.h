@@ -26,11 +26,11 @@
  *  		load macro.
  *
  * Author(s):
- *		$Author: jkrueger1 $
+ *		$Author: jensmeyer $
  * 
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2005-09-27 08:30:22 $
  *
  **************************************************************************/
 
@@ -92,3 +92,4 @@ long	xdr_length_DevStructMasterClock();
 					 xdr_length_DevStructMasterClock, \
 					 A)
 
+#endif /*MCLOCK_XDR_H*/
