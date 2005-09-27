@@ -23,11 +23,11 @@
  * Description:
  *
  * Author(s):	Emanuel Taurel
- *		$Author: jkrueger1 $
+ *		$Author: jensmeyer $
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2005-07-25 12:55:41 $
+ * Date:	$Date: 2005-09-27 08:04:04 $
  *
  *****************************************************************************/
 
@@ -45,6 +45,9 @@
  This functions are only for internal use
  */
 
+#ifndef WIN32
+#include "config.h"
+#endif /* WIN32 */
 #include <SysNumbers.h>
 
 /* Structures definitions */
