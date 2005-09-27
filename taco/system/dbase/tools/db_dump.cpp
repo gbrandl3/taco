@@ -26,11 +26,11 @@
  * 		Synopsis : db_dump [domain/all] 
  *
  * Author(s):
- *              $Author: jkrueger1 $
+ *              $Author: jensmeyer $
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2005-07-25 11:31:53 $
+ * Date:        $Date: 2005-09-27 08:20:07 $
  */
 
 #include <cstdio>
@@ -41,7 +41,9 @@
 #include <sys/wait.h>
 
 #define _db_setup_h
+#define DC_H
 #include <API.h>
+#undef DC_H
 #undef _db_setup_h
 #include "db_setup.h"
 
@@ -106,7 +108,7 @@ int main(int argc,char *argv[])
 	else
 		domain = "all";
 
-	transform(domain.begin(), domain.end(), domain.begin(), ::tolower);
+	std::transform(domain.begin(), domain.end(), domain.begin(), ::tolower);
 
 // Find the dbm_database table names 
 	if ((ptr = (char *)getenv("DBTABLES")) == NULL)
@@ -116,7 +118,7 @@ int main(int argc,char *argv[])
 	}
 
 	std::string dbtables(ptr);
-	transform(dbtables.begin(), dbtables.end(), dbtables.begin(), ::tolower);
+	std::transform(dbtables.begin(), dbtables.end(), dbtables.begin(), ::tolower);
 	std::string::size_type pos;
 	while ((pos = dbtables.find(',')) != std::string::npos)
 	{

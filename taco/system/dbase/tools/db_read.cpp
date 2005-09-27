@@ -27,11 +27,11 @@
  * 		Synopsis : db_read [domain/all]
  *
  * Author(s):
- *              $Author: jkrueger1 $
+ *              $Author: jensmeyer $
  *
- * Version:     $Revision: 1.6 $
+ * Version:     $Revision: 1.7 $
  *
- * Date:        $Date: 2005-07-25 11:28:33 $
+ * Date:        $Date: 2005-09-27 08:19:15 $
  */
 
 #include <cstdio>
@@ -40,7 +40,9 @@
 #include <sys/wait.h>
 
 #define _db_setup_h
+#define DC_H
 #include <API.h>
+#undef DC_H
 #undef _db_setup_h
 #include "db_setup.h"
 
