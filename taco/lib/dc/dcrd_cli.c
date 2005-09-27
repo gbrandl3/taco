@@ -23,13 +23,13 @@
  * Description:
  *
  * Author(s):	Emmanuel Taurel
- *		$Author: jkrueger1 $
+ *		$Author: jensmeyer $
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2005-07-25 12:55:41 $
+ * Date:	$Date: 2005-09-27 08:15:29 $
  *
  ******************************************************************************/
 
@@ -503,7 +503,10 @@ int dc_import(dc_dev_imp *dc_devimp, unsigned int num_device, long *error)
 		free(caller_num[j]);
 		free(nethost_array[j].nethost);
 		for (l = 0;l < ind_net_call[j];l++)
-			free(devname_arr[j][l]);
+		{
+			if (devname_arr[j][l] != NULL)
+				free(devname_arr[j][l]);
+		}
 		free(devname_arr[j]);
 	}
 	free(caller_num);
@@ -928,12 +931,26 @@ static int check_dc(int ind,int dev_numb,char **devname_arr,int *call_numb,dc_de
 				if (ind1 == (int)dc_multi_nethost[i_net].host_dc.length)
 				{
 					*(caller_arr[call_numb[i]].dc_dev_error) = (recev->taberr.taberr_val[j]).deverr;
+					dev_err--;
 					j++;
 				}
 				else
 				{
 					call_numb[k] = call_numb[i];
-					devname_arr[k++] = devname_arr[i];
+					if (i == 0)
+						devname_arr[k++] = devname_arr[i];
+					else
+					{
+						if (i != k)
+						{
+							free(devname_arr[k]);
+							devname_arr[k++] = devname_arr[i];
+							devname_arr[i] = NULL;
+						}
+						else
+							k++;
+					}
+					dev_err--;					
 					j++;
 					dev_unknown++;
 				}
