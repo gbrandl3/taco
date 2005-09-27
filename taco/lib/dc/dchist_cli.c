@@ -23,11 +23,11 @@
  * Description:
  *
  * Author(s):	E. Taurel
- *		$Author: jkrueger1 $
+ *		$Author: jensmeyer $
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2005-07-25 12:55:41 $
+ * Date:	$Date: 2005-09-27 08:08:16 $
  *
  ****************************************************************************/
 
@@ -102,7 +102,7 @@ int dc_devget_history(datco *dc_ptr,long cmd_code,dc_hist *hist_buff,DevType arg
 	int 		tmp_err;
 	long 		err,
 			error1;
-//	int 		ret = 0;
+	int 		ret = 0;
 	long 		i_net;
 	dc_nethost_info *tmp_net;
 
@@ -218,6 +218,7 @@ int dc_devget_history(datco *dc_ptr,long cmd_code,dc_hist *hist_buff,DevType arg
 		hist_buff[i].cmd_error = tmp_err;
 		if (tmp_err != 0)
 		{
+			ret++;
 			hist_buff[i].time = (recev->xresb_clnt.xresh_clnt_val[i].xtime / 10) + TIME_OFF;
 			if (((tmp_err >> DS_CAT_SHIFT) & DS_CAT_MASK) == WarningError)
 				hist_buff[i].argout = (DevArgument)recev->xresb_clnt.xresh_clnt_val[i].xargout;
@@ -238,5 +239,5 @@ int dc_devget_history(datco *dc_ptr,long cmd_code,dc_hist *hist_buff,DevType arg
  * Leave function 
  */
 	*error = 0;
-	return(DS_OK);
+	return(ret);
 }
