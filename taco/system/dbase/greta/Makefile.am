@@ -26,6 +26,7 @@ SRC_GRETA		= greta.c greta_creation.c bxutil-c.c greta_cb.c greta_xs.c \
 EXTRA_PROGRAMS		= greta greta_ndbm
 bin_PROGRAMS		= @GRETA@
 
+appdefaultdir		= $(datadir)/taco/app-defaults
 appdefault_DATA		= GReta
 
 EXTRA_DIST		= GReta greta.uil

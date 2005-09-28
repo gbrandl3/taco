@@ -27,6 +27,7 @@ SRC 		= xdev_bxutil.c xdev_creation.c xdev_gui.c xdevmenu.uil\
 		
 bin_PROGRAMS	= xdevmenu
 
+appdefaultdir	= $(datadir)/taco/app-defaults
 appdefault_DATA	= XDevmenu XDevmenu_bw
 
 EXTRA_DIST	+= ${appdefault_DATA} xdevmenu.uil
