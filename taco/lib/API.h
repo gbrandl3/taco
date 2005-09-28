@@ -26,13 +26,13 @@
  *		the applications programmers interface.
  *
  * Author(s):	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: jensmeyer $
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2005-07-25 13:08:21 $
+ * Date:	$Date: 2005-09-28 13:51:11 $
  *
  *********************************************************************-*/
 
@@ -89,7 +89,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.13 2005-07-25 13:08:21 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.14 2005-09-28 13:51:11 jensmeyer Exp $";
 #endif /* _IDENT */
 
 /*
@@ -300,9 +300,8 @@ typedef void (*DevCallbackFunction(devserver, void*, DevCallbackData));
 /*
  * data collector library include file
  */
-#if 0
 #include <dc.h>
-#endif
+
 
 #if !defined(WIN32)
  /*
