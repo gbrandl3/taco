@@ -31,16 +31,16 @@
  *		to talk to TANGO device servers.
  *	
  * Author(s)  :	Andy Goetz
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original   :	December 1999
  *
- * Version    : $Revision: 1.3 $
+ * Version    : $Revision: 1.4 $
  *
- * Date       : $Date: 2005-07-25 13:00:43 $
+ * Date       : $Date: 2005-09-28 16:08:27 $
  *
  ********************************************************************-*/
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/tango_api.cpp,v 1.3 2005-07-25 13:00:43 jkrueger1 Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/tango_api.cpp,v 1.4 2005-09-28 16:08:27 andy_gotz Exp $";
 
 #include <tango.h>
 #define TANGO_API
@@ -261,20 +261,53 @@ long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, long *erro
 // to make them compatible with TACO (on request of Laurent Farvacque)
 //
 // andy 08apr03
+// 
+// added following commands - Insert, Extract, On, Off, Reset, Open, Close
 //
-			if ((*cmd_query)[i].cmd_name == "State" || (*cmd_query)[i].cmd_name == "Status")
+			if ((*cmd_query)[i].cmd_name == "State")
 			{
-				if ((*cmd_query)[i].cmd_name == "State")
-				{
-					tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevState")+1);
-					sprintf(tango_device_tmp.cmd_name[i],"DevState");
-				}
-				else
-				{
-					tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevStatus")+1);
-					sprintf(tango_device_tmp.cmd_name[i],"DevStatus");
-				}
-				
+				tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevState")+1);
+				sprintf(tango_device_tmp.cmd_name[i],"DevState");
+			}
+			else if ((*cmd_query)[i].cmd_name == "Status")
+			{
+				tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevStatus")+1);
+				sprintf(tango_device_tmp.cmd_name[i],"DevStatus");
+			}
+			else if ((*cmd_query)[i].cmd_name == "Insert")
+			{
+				tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevInsert")+1);
+				sprintf(tango_device_tmp.cmd_name[i],"DevInsert");
+			}
+			else if ((*cmd_query)[i].cmd_name == "Extract")
+			{
+				tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevExtract")+1);
+				sprintf(tango_device_tmp.cmd_name[i],"DevExtract");
+			}
+			else if ((*cmd_query)[i].cmd_name == "Open")
+			{
+				tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevOpen")+1);
+				sprintf(tango_device_tmp.cmd_name[i],"DevOpen");
+			}
+			else if ((*cmd_query)[i].cmd_name == "Close")
+			{
+				tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevClose")+1);
+				sprintf(tango_device_tmp.cmd_name[i],"DevClose");
+			}
+			else if ((*cmd_query)[i].cmd_name == "On")
+			{
+				tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevOn")+1);
+				sprintf(tango_device_tmp.cmd_name[i],"DevOn");
+			}
+			else if ((*cmd_query)[i].cmd_name == "Off")
+			{
+				tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevOff")+1);
+				sprintf(tango_device_tmp.cmd_name[i],"DevOff");
+			}
+			else if ((*cmd_query)[i].cmd_name == "Reset")
+			{
+				tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevReset")+1);
+				sprintf(tango_device_tmp.cmd_name[i],"DevReset");
 			}
 			else
 			{
@@ -478,9 +511,39 @@ long tango_dev_putget(devserver ds, long cmd, void *argin, long argin_type,
 			{
 				cmd_name = "State";
 			}
-			if (strcmp(cmd_name,"DevStatus") == 0)
+			else if (strcmp(cmd_name,"DevStatus") == 0)
 			{
 				cmd_name = "Status";
+			}
+// added following commands - Insert, Extract, On, Off, Reset, Open, Close
+//
+			else if (strcmp(cmd_name,"DevOn") == 0)
+			{
+				cmd_name = "On";
+			}
+			else if (strcmp(cmd_name,"DevOff") == 0)
+			{
+				cmd_name = "Off";
+			}
+			else if (strcmp(cmd_name,"DevInsert") == 0)
+			{
+				cmd_name = "Insert";
+			}
+			else if (strcmp(cmd_name,"DevExtract") == 0)
+			{
+				cmd_name = "Extract";
+			}
+			else if (strcmp(cmd_name,"DevOpen") == 0)
+			{
+				cmd_name = "Open";
+			}
+			else if (strcmp(cmd_name,"DevClose") == 0)
+			{
+				cmd_name = "Close";
+			}
+			else if (strcmp(cmd_name,"DevReset") == 0)
+			{
+				cmd_name = "Reset";
 			}
 			break;
 		}
