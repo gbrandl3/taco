@@ -25,9 +25,9 @@
  * Author(s):	Emanuel Taurel
  *		$Author: jensmeyer $
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2005-09-27 08:04:04 $
+ * Date:	$Date: 2005-09-28 12:42:25 $
  *
  *****************************************************************************/
 
@@ -45,9 +45,6 @@
  This functions are only for internal use
  */
 
-#ifndef WIN32
-#include "config.h"
-#endif /* WIN32 */
 #include <SysNumbers.h>
 
 /* Structures definitions */
