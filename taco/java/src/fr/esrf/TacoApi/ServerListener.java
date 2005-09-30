@@ -22,6 +22,6 @@ package fr.esrf.TacoApi;
 interface ServerListener {
 
  /** Trigerred when the server has lost the connection. */
- public void disconnectFromServer();
+ public void disconnectFromServer(ServerConnection source);
 
 }

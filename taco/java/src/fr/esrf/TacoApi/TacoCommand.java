@@ -25,21 +25,23 @@ import java.util.Vector;
  */
 public class TacoCommand {
   
-  public int    cmdCode = 0;
-  public String cmdName = "UnknownCommand";
-  public String inName  = "Not specified";
-  public int    inType  = 0;
-  public String outName = "Not specified";
-  public int    outType = 0;
+  public int     cmdCode = 0;
+  public String  cmdName = "UnknownCommand";
+  public String  inName  = "Not specified";
+  public int     inType  = 0;
+  public String  outName = "Not specified";
+  public int     outType = 0;
+  public boolean hasCache = false;
 
   public String toString() {
 
-    return "cmdCode:" + cmdCode + "\n" +
-           "cmdName:" + cmdName + "\n" +
-           "inType :" + XdrTacoType.getTypeName(inType) + "\n" +
-           "inName :" + inName + "\n" +
-           "outType:" + XdrTacoType.getTypeName(outType) + "\n" +
-           "outName:" + outName;
+    return "cmdCode :" + cmdCode + "\n" +
+           "cmdName :" + cmdName + "\n" +
+           "inType  :" + XdrTacoType.getTypeName(inType) + "\n" +
+           "inName  :" + inName + "\n" +
+           "outType :" + XdrTacoType.getTypeName(outType) + "\n" +
+           "outName :" + outName + "\n" +
+           "hasCache:" + hasCache;
 
   }
 

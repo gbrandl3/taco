@@ -22,6 +22,7 @@ import org.acplt.oncrpc.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Vector;
+import java.io.IOException;
 
 import fr.esrf.TacoApi.xdr.*;
 
@@ -69,7 +70,8 @@ class ServerConnection {
         serverList.add(servInfo);
       }
       // Register this device
-      servInfo.registerListener(sl);
+      if(sl!=null)
+        servInfo.registerListener(sl);
 
     }
 
@@ -136,6 +138,7 @@ class ServerConnection {
     }
 
   }
+
 
   /**
    * Gets the command list of the specified device
@@ -215,6 +218,68 @@ class ServerConnection {
   }
 
   /**
+   * Executes a Taco command from the data collector.
+   * @param in Input args
+   * @param timeout timeout in millisec
+   * @return output args
+   */
+  XdrDCClientData dcPutGet(XdrDCServerData in,int timeout) throws TacoException {
+
+    XdrDCClientData out = new XdrDCClientData();
+    out.type = in.argoutType;
+    rpcCall(RPC_DC_DEVGET,in,out,timeout);
+    if (out.error != 0)
+      throw new TacoException(out.error);
+    return out;
+
+  }
+
+  TacoCommand[] commandQueryDC(String devName,NethostConnection nh) throws TacoException {
+
+    //XdrOutPar info = new XdrOutPar();
+    //rpcCall(7,new XdrStrings(new String[]{devName}),info,adminTimeout);
+    //TacoCommand[] allCmds = new TacoCommand[nbCmd];
+    //return allCmds;
+
+    XdrDCInfo info = new XdrDCInfo();
+    rpcCall(RPC_DC_DEVINFO,new XdrString(devName),info,adminTimeout);
+
+    if(info.errCode!=0)
+      throw new TacoException(info.errCode);
+
+    int nbCmd = info.cmdInfo.value.length;
+    int i;
+    TacoCommand[] allCmds = new TacoCommand[nbCmd];
+    for (i = 0; i < nbCmd; i++) {
+      allCmds[i] = new TacoCommand();
+      allCmds[i].cmdCode = info.cmdInfo.value[i].cmdCode;
+      allCmds[i].inType  = 0; // VOID
+      allCmds[i].outType = info.cmdInfo.value[i].outType;
+      allCmds[i].hasCache = true;
+    }
+
+    if(nh!=null) {
+      // Try to get them from the DB or from the internal hash map.
+      Integer[] codes = new Integer[nbCmd];
+      for (i = 0; i < nbCmd; i++) codes[i] = new Integer(allCmds[i].cmdCode);
+      String[] cmdNames = nh.getCommandNames(codes);
+      for (i = 0; i < nbCmd; i++) allCmds[i].cmdName = cmdNames[i];
+    }
+
+    return allCmds;
+
+  }
+
+  /**
+   * Destroy this connection.
+   */
+  void destroy() {
+    try {
+      destroy(0);
+    }  catch (TacoException e) {}
+  }
+
+  /**
    * Returns the host from where this server has been exported.
    */
   String getHostName() {
@@ -253,6 +318,10 @@ class ServerConnection {
   private static final int RPC_DEV_PUTGET    = 3;
   private static final int RPC_DEV_PUT       = 4;
   private static final int RPC_DEV_CMD_QUERY = 5;
+
+  // DC commands
+  private final static int RPC_DC_DEVGET      = 4;
+  private final static int RPC_DC_DEVINFO     = 6;
 
   /**
    * Connect a Server.
@@ -312,21 +381,13 @@ class ServerConnection {
   }
 
   /**
-   * Register the specified listener to this server.
-   * @param l Listener that will receive server envent
-   */
-  private void registerListener(ServerListener l) {
-    serverListener.add(l);
-  }
-
-  /**
    * Destroy the server and fire TacoException(errorToFire if != 0).
    * No call or access to this object should be done after a
    * call to this function.
    * @param errorToFire TacoException to be fired
    * @throws TacoException Fire TacoException(errorToFire)
    */
-  private void destroy(int errorToFire) throws TacoException {
+   private void destroy(int errorToFire) throws TacoException {
 
     // We have to be globaly serialized here
     // Do not make slow or blocking calls inside this block
@@ -334,7 +395,7 @@ class ServerConnection {
 
       // Disconnect all registered devices
       for (int i = 0; i < serverListener.size(); i++)
-        ((ServerListener) serverListener.get(i)).disconnectFromServer();
+        ((ServerListener) serverListener.get(i)).disconnectFromServer(this);
       // Mark this server as destroyed
       client = null;
       // Remove from the global list
@@ -347,6 +408,15 @@ class ServerConnection {
       throw new TacoException(errorToFire);
 
   }
+
+  /**
+   * Register the specified listener to this server.
+   * @param l Listener that will receive server envent
+   */
+  private void registerListener(ServerListener l) {
+    serverListener.add(l);
+  }
+
 
   /**
    * Set the timeout for this server.
@@ -414,7 +484,7 @@ class ServerConnection {
           //throw new TacoException(TacoException.DevErr_RPCTimedOut);
 
           if(protocol == TacoDevice.PROTOCOL_UDP) {
-            // In UDP we destroy the server to froce
+            // In UDP we destroy the server to force
             // a reconnection.
             destroy(TacoException.DevErr_RPCTimedOut);
           } else {

@@ -11,6 +11,9 @@
  Original   :	June 2005
 
  $Log: not supported by cvs2svn $
+ Revision 1.3  2005/06/27 09:31:49  jlpons
+ Fixed argin encoding bug
+
  Revision 1.2  2005/06/24 08:41:33  jlpons
  Added full hostname syntax for nethost
 
@@ -54,23 +57,47 @@ public class TacoDevice implements ServerListener {
   /** Security, Single user administration */
   public final static int ACCESS_ADMIN     = 99;
 
+  /** Device access */
+  public final static int SOURCE_DEVICE = 0;
+  /** Data collector access */
+  public final static int SOURCE_CACHE  = 1;
+  /** Cache access and Device access when DC fails */
+  public final static int SOURCE_CACHE_DEVICE = 2;
+
   // Do not modify this line (it is used by the install script)
-  public final String apiRelease = "$Revision: 1.3 $".substring(11,15);
+  public final String apiRelease = "$Revision: 1.4 $".substring(11,15);
+
+  // Timeout before reinporting the device from the database
+  private static long dbImportTimeout = 30000L; // 30 sec
 
   // Private member
-  private String  deviceName;         // Full device name
-  private String  shortName;          // Device name without the nethost
-  private boolean firstImport;        // First Import flag
-  private int     protocol;           // Connection protocol
-  private HashMap commandList;        // The command list
-  private int     timeout;            // RPC timeout
-  private int     access;             // Security access
-  private int     deviceId;           // Device ID (Server side)
-  private String  devType;            // Device type
-  private String  devClass;           // Device class
-  private String processName;         // processName
-  private ServerConnection dsHandle;  // Server handle
-  private NethostConnection nhHandle; // Nethost handle
+  private String  deviceName;                // Full device name
+  private String  shortName;                 // Device name without the nethost
+  private int     protocol;                  // Connection protocol
+  private int     source;                    // DC / Device access
+  private HashMap commandList;               // The command list (from the device)
+  private int     timeout;                   // RPC timeout
+  private int     access;                    // Security access
+  private int     deviceId;                  // Device ID (Server side)
+  private String  devType;                   // Device type
+  private String  devClass;                  // Device class
+  private String  devProcessName;               // processName
+  private String  dcType;                   // Device type
+  private String  dcClass;                  // Device class
+  private String  hostName;                  // hostname
+  private int     progNumber;                // RPC prog number
+  private String  hostDCReadName;            // hostname (dc_read)
+  private int     progDCReadNumber;          // RPC prog number (dc_read)
+  private String  hostDCWriteName;            // hostname (dc_write)
+  private int     progDCWriteNumber;          // RPC prog number (dc_write)
+  private boolean firstImport;               // First Import flag
+  private long    lastDevImportTime;         // Time of the db_import(device)
+  private TacoException lastDevImportError;  // Last device import error
+  private long    lastDcImportTime;          // Time of the db_import(device)
+  private TacoException lastDcImportError;   // Last device import error
+  private ServerConnection dcHandle;         // DC server handle
+  private ServerConnection dsHandle;         // Server handle
+  private NethostConnection nhHandle;        // Nethost handle
 
   /**
    * Constructs the specified device.
@@ -78,15 +105,20 @@ public class TacoDevice implements ServerListener {
    * @param protocol Protocol type (TCP/UDP)
    * @throws TacoException in case of major Taco failure (No Manager or NETHOST not defined)
    */
-  public TacoDevice(String name,int protocol) throws TacoException {
+  public TacoDevice(String name,int protocol,int source) throws TacoException {
 
-    this.protocol      = protocol;
-    this.commandList   = null;
-    this.dsHandle      = null;
-    this.firstImport   = true;
-    this.timeout       = ServerConnection.serverTimeout;
-    this.access        = ACCESS_WRITE;
-    this.processName   = "";
+    this.protocol        = protocol;
+    this.commandList     = null;
+    this.dsHandle        = null;
+    this.dcHandle        = null;
+    this.firstImport     = true;
+    this.lastDevImportTime  = 0;
+    this.timeout         = ServerConnection.serverTimeout;
+    this.access          = ACCESS_WRITE;
+    this.devProcessName     = "";
+    this.lastDevImportError = null;
+    this.lastDcImportError  = null;
+    this.source             = source;
 
     if(name.startsWith("taco:"))
       deviceName = name.substring(5).toLowerCase();
@@ -96,7 +128,7 @@ public class TacoDevice implements ServerListener {
     // Check the syntax
     checkDeviceSyntax(deviceName);
 
-    // Extract '//nethost/' of detected
+    // Extract '//nethost/' if detected
     String netHost = "";
     if(deviceName.startsWith("//")) {
 
@@ -122,14 +154,23 @@ public class TacoDevice implements ServerListener {
    * @throws TacoException in case of major Taco failure (No Manager or NETHOST not defined)
    */
   public TacoDevice(String name) throws TacoException {
-    this(name,PROTOCOL_UDP);
+    this(name,PROTOCOL_UDP,SOURCE_DEVICE);
+  }
+
+  /**
+   * Constructs the specified device (UDP protocol).
+   * @param name Name of the device to be imported
+   * @throws TacoException in case of major Taco failure (No Manager or NETHOST not defined)
+   */
+  public TacoDevice(String name,int protocol) throws TacoException {
+    this(name,protocol,SOURCE_DEVICE);
   }
 
   /**
    * Sets the security access level for this device.
    * @param access Security access
    */
-  public void setAccess(int access) {
+  public void setSecurityAccess(int access) {
     this.access = access;
   }
 
@@ -137,8 +178,31 @@ public class TacoDevice implements ServerListener {
    * Returns the security access level for this device.
    * @return
    */
-  public int getAccess() {
+  public int getSecurityAccess() {
     return access;
+  }
+
+  /**
+   * Sets the source for this device and force a reimport.
+   * @param s Source
+   * @see #SOURCE_DEVICE
+   * @see #SOURCE_CACHE_DEVICE
+   * @see #SOURCE_CACHE
+   */
+  synchronized public void setSource(int s) throws TacoException {
+    if (s != this.source) {
+      this.source = s;
+      free();
+    }
+  }
+
+  /**
+   * Return the current source.
+   * @return Source value
+   * @see #setSource
+   */
+  public int getSource() {
+    return source;
   }
 
   /**
@@ -165,25 +229,22 @@ public class TacoDevice implements ServerListener {
 
   /**
    * Returns the RPC of this device (in milliSec)
-   * @throws TacoException in case of failure
    */
-  public int getTimeout() throws TacoException {
+  public int getTimeout() {
     return timeout;
   }
 
   /**
-   * Dynamicaly change the protocol of this device
+   * Dynamicaly change the protocol of this device and force a reimport
    * @param protocol protocol
+   * @see #PROTOCOL_TCP
+   * @see #PROTOCOL_UDP
    */
   synchronized public void setProtocol(int protocol) throws TacoException {
 
     if (protocol != this.protocol) {
       this.protocol = protocol;
-      // Unregister the connection
-      if (dsHandle != null)
-        dsHandle.freeDevice(deviceId, false, 0, 0, this);
-      // Force reimport of next command
-      dsHandle = null;
+      free();
     }
 
   }
@@ -208,7 +269,10 @@ public class TacoDevice implements ServerListener {
       if(cmds[i].cmdName.equalsIgnoreCase(name))
         return cmds[i].cmdCode;
     }
-    throw new TacoException("Command " + name + " not found for this device.");
+    if(source!=SOURCE_CACHE)
+      throw new TacoException("Device command " + name + " not found for this device.");
+    else
+      throw new TacoException("DC command " + name + " not found for this device.");
 
   }
 
@@ -230,12 +294,21 @@ public class TacoDevice implements ServerListener {
 
     // Note: All procedure that call import device must be synchronized
     importDevice();
-    return "Devname:   " + deviceName + "\n" +
-           "DevClass:  " + devClass + "\n" +
-           "DevType:   " + devType + "\n" +
-           "DsName:    " + processName + "\n" +
-           "Host:      " + dsHandle.getHostName() + "\n" +
-           "Nethost:   " + nhHandle.getName();
+
+    if(source!=SOURCE_CACHE) {
+      return "Devname:   " + deviceName + "\n" +
+             "DevClass:  " + devClass + "\n" +
+             "DevType:   " + devType + "\n" +
+             "DsName:    " + devProcessName + "\n" +
+             "Host:      " + dsHandle.getHostName() + "\n" +
+             "Nethost:   " + nhHandle.getName();
+    } else {
+      return "Devname:   " + deviceName + "\n" +
+             "DevClass:  " + dcClass + "\n" +
+             "DevType:   " + dcType + "\n" +
+             "Host:      " + dcHandle.getHostName() + "\n" +
+             "Nethost:   " + nhHandle.getName();
+    }
 
   }
 
@@ -256,6 +329,52 @@ public class TacoDevice implements ServerListener {
   }
 
   /**
+   * Executes a command on a device.
+   * @param cmd Command
+   * @param argin Argin value (null can be passed for D_VOID_TYPE)
+   * @return Data got from the device (if any)
+   */
+  private TacoData devPutGet(TacoCommand cmd,TacoData argin) throws TacoException {
+
+    if (argin == null) argin = new TacoData();
+    TacoData argout = new TacoData(cmd.outType);
+
+    // Build ServerDara structure
+    XdrServerData dataIn = new XdrServerData();
+    dataIn.dsId = deviceId;
+    dataIn.cmdCode = cmd.cmdCode;
+    dataIn.arginType = argin.getType();
+    dataIn.argoutType = argout.getType();
+    dataIn.argin = new XdrVarArgument(argin);
+    dataIn.vArgs = new XdrVarArguments();
+    dataIn.secAccessRight = access;
+    dataIn.secClientId = 0; // TODO: Manage security
+    XdrClientData dataOut = dsHandle.putGet(dataIn, timeout);
+    argout.setXdrValue(dataOut.argout.vArg);
+    return argout;
+
+  }
+
+  /**
+   * Executes a command on a device via the data collector.
+   * @param cmd Command
+   * @return Data got from the DC (if any)
+   */
+  private TacoData dcDevGet(TacoCommand cmd) throws TacoException {
+
+    // Build ServerDara structure
+    TacoData argout = new TacoData(cmd.outType);
+    XdrDCServerData dataIn = new XdrDCServerData();
+    dataIn.cmdCode = cmd.cmdCode;
+    dataIn.devName = shortName;
+    dataIn.argoutType = argout.getType();
+    XdrDCClientData dataOut = dcHandle.dcPutGet(dataIn, timeout);
+    argout.setXdrValue(dataOut.argout);
+    return argout;
+
+  }
+
+  /**
    * Executes a command om a device.
    * @param cmdCode Command code
    * @param argin Argin value (null can be passed for D_VOID_TYPE)
@@ -268,24 +387,36 @@ public class TacoDevice implements ServerListener {
 
     // Get command info
     TacoCommand cmd = (TacoCommand)commandList.get( new Integer(cmdCode) );
-    if(cmd==null) throw new TacoException("Device command not found " + cmdCode);
 
-    if(argin==null)  argin  = new TacoData();
-    TacoData         argout = new TacoData(cmd.outType);
+    switch(source) {
 
-    // Build ServerDara structure
-    XdrServerData dataIn = new XdrServerData();
-    dataIn.dsId       = deviceId;
-    dataIn.cmdCode    = cmdCode;
-    dataIn.arginType  = argin.getType();
-    dataIn.argoutType = argout.getType();
-    dataIn.argin      = new XdrVarArgument(argin);
-    dataIn.vArgs      = new XdrVarArguments();
-    dataIn.secAccessRight = access;
-    dataIn.secClientId    = 0; // TODO: Manage security
-    XdrClientData dataOut = dsHandle.putGet(dataIn,timeout);
-    argout.setXdrValue(dataOut.argout.vArg);
-    return argout;
+      case SOURCE_DEVICE:
+        if(cmd==null) throw new TacoException("Device command not found " + cmdCode);
+        return devPutGet(cmd,argin);
+
+      case SOURCE_CACHE_DEVICE:
+        if(cmd==null) throw new TacoException("Device command not found " + cmdCode);
+        if(cmd.hasCache) {
+          try {
+            TacoData argout = dcDevGet(cmd);
+            return argout;
+          } catch (TacoException e) {
+            // Cache failed
+            return devPutGet(cmd,argin);
+          }
+        }
+        return devPutGet(cmd,argin);
+
+      case SOURCE_CACHE:
+        if(cmd==null) throw new TacoException("DC command not found " + cmdCode);
+        if(cmd.hasCache)
+          return dcDevGet(cmd);
+        else
+          throw new TacoException("The command " + cmd.cmdName + " is not polled by the DC");
+
+    }
+
+    throw new TacoException("Wrong source parameter");
 
   }
 
@@ -316,17 +447,31 @@ public class TacoDevice implements ServerListener {
 
   /**
    * Retreive resource of this device from the static database.
-   * @param resNames Array of resource name
-   * @return Resource values
+   * @param  resName resource name
+   * @return Resource value or an empty array if the resource does not
+   * exists
    */
-  public String[] getResources(String[] resNames) throws TacoException {
+  public String[] getResources(String resName) throws TacoException {
 
     // We do not need to be imported to do this call
     // Build argin
-    String[] fullNames = new String[resNames.length];
-    for(int i=0;i<resNames.length;i++)
-      fullNames[i] = shortName + "/" + resNames[i].toLowerCase();
-    return nhHandle.dbGetResource(fullNames);
+    String[] fullName = new String[]{ shortName + "/" + resName.toLowerCase() };
+    String result = nhHandle.dbGetResource(fullName)[0];
+
+    if(result.equals("N_DEF"))
+      return new String[0];
+
+    if( result.charAt(0) == 5 ) {
+
+      // We have an array
+      return nhHandle.extractResourceArray(result);
+
+    } else {
+
+      // Simple resource
+      return new String[]{result};
+
+    }
 
   }
 
@@ -336,57 +481,176 @@ public class TacoDevice implements ServerListener {
    */
   public synchronized void free() throws TacoException {
 
-     if( dsHandle!=null )
+     if( dsHandle!=null ) {
        // TODO: Manage security
        dsHandle.freeDevice(deviceId,true,access,0,this);
+       dsHandle = null;
+     }
+
+    if( dcHandle!=null ) {
+       dcHandle.destroy();
+       dcHandle = null;
+    }
 
      // Deimported this device
     firstImport = true;
-    dsHandle = null;
+    lastDevImportTime = 0;
 
   }
 
   /**
-   * Retrieve server information from the database and connect to the server.
-   * !!! Important Note: All procedure that call importDevice must be synchronized to this !!!
-   * @throws TacoException in case of failure
+   * Retreive server info from the database.
    */
-   private void importDevice() throws TacoException {
+  private void dbImportDevice() throws TacoException {
 
-    // Check if we are already imported
-    if(dsHandle!=null) return;
+    long now = System.currentTimeMillis();
+
+    if ((now - lastDevImportTime) > dbImportTimeout) {
+      lastDevImportTime = now;
+
+      //  -- (re)import the device here -------------------------------------
+
+      try {
+
+        String[] devNames;
+        devNames = new String[]{shortName};
+
+        XdrDevInfos argout = nhHandle.dbImportDevice(devNames);
+        devType = argout.value[0].devType;
+        devClass = argout.value[0].devClass;
+        hostName = argout.value[0].hostName;
+        progNumber = argout.value[0].progNumber;
+        lastDevImportError = null;
+
+      } catch (TacoException e) {
+        lastDevImportError = e;
+      }
+
+    }
+
+    if (lastDevImportError != null)
+      throw lastDevImportError;
+
+  }
+
+  /**
+   * Retreive DC info from the database.
+   */
+  private void dbImportDc() throws TacoException {
+
+    long now = System.currentTimeMillis();
+
+    if ((now - lastDcImportTime) > dbImportTimeout) {
+      lastDcImportTime = now;
+
+      //  -- (re)import the device here -------------------------------------
+
+      try {
+
+        String dcWriteName = nhHandle.getDcServerWriteName();
+        String dcReadName = nhHandle.getDcServerReadName();
+        String[] devNames = new String[]{dcWriteName,dcReadName};
+        XdrDevInfos argout = nhHandle.dbImportDevice(devNames);
+        dcType  = argout.value[1].devType;
+        dcClass = argout.value[1].devClass;
+        hostDCWriteName = argout.value[0].hostName;
+        progDCWriteNumber = argout.value[0].progNumber;
+        hostDCReadName = argout.value[1].hostName;
+        progDCReadNumber = argout.value[1].progNumber;
+        lastDcImportError = null;
+
+      } catch (TacoException e) {
+        lastDcImportError = e;
+      }
+
+    }
+
+    if (lastDcImportError != null) {
+      throw new TacoException("DC system import failed.\nHint: Use SOURCE_DEVICE to avoid this message\n"+lastDcImportError.getErrorString());
+    }
+
+  }
+
+  /**
+   * Retreive DC server info from the database.
+   */
+  private void initDc() throws TacoException {
+
+    TacoCommand[]    allCmds;
+    ServerConnection dcRead;
+    ServerConnection dcWrite;
+
+    // Connect the DC write server to get the polling config
+    try {
+      dcWrite = ServerConnection.connectServer(nhHandle.getName(),
+                                               hostDCWriteName,
+                                               progDCWriteNumber,
+                                               1,
+                                               PROTOCOL_TCP,
+                                               null);
+    } catch (TacoException e) {
+      throw new TacoException("DC write server "+nhHandle.getDcServerWriteName()+" not responding");
+    }
+    
+    // Get the list of polled commands
+    allCmds = dcWrite.commandQueryDC(shortName, nhHandle);
+    dcWrite.destroy();
+
+    if( commandList==null ) {
+      // Build the command hashMap
+      commandList = new HashMap();
+      for (int i = 0; i < allCmds.length; i++)
+        commandList.put(new Integer(allCmds[i].cmdCode), allCmds[i]);
+    } else {
+      // Update cache field
+      for (int i = 0; i < allCmds.length; i++) {
+        TacoCommand cmd = (TacoCommand)commandList.get( new Integer(allCmds[i].cmdCode) );
+        if(cmd!=null) cmd.hasCache = true;
+      }
+    }
+
+    // Now connect to the dc_read
+    dcRead = ServerConnection.connectServer(nhHandle.getName(),
+                                            hostDCReadName,
+                                            progDCReadNumber,
+                                            1,
+                                            PROTOCOL_TCP,
+                                            this);
+
+    // We are now ready to exectute commands via DC
+    dcHandle = dcRead;
+
+  }
+
+  /**
+   * Init device access.
+   * @throws TacoException
+   */
+  private void initDev() throws TacoException {
 
     TacoCommand[] allCmds;
     ServerConnection newDs;
-
-    //TODO: Better handling of reconnection
-    // We should try to reconnect first to the server
-    // if we have already been imported
-
-    // Get server info from the DB
-    XdrDevInfos argout = nhHandle.dbImportDevice(shortName);
-    devType = argout.value[0].devType;
-    devClass = argout.value[0].devClass;
 
     try {
 
       // Connect the server
       newDs = ServerConnection.connectServer(nhHandle.getName(),
-                                             argout.value[0].hostName,
-                                             argout.value[0].progNumber,
-                                             argout.value[0].versNumber,
+                                             hostName,
+                                             progNumber,
+                                             4, /* Current Taco server release */
+                                             /* argout.value[0].versNumber,*/
                                              protocol,
                                              this);
 
       // Retreive deviceId from the server
       // TODO:Manage secutiry
-      XdrImportOut impOut = newDs.importDevice(shortName, access,0,0);
+      XdrImportOut impOut = newDs.importDevice(shortName, access, 0, 0);
       deviceId = impOut.dsId;
-      processName = impOut.serverMame;
+      devProcessName = impOut.serverMame;
 
       // Get the command list to be able to manage
       // putGet argin and argout type
-      allCmds = newDs.commandQuery(deviceId,nhHandle);
+      allCmds = newDs.commandQuery(deviceId, nhHandle);
 
     } catch (TacoException e) {
 
@@ -404,8 +668,40 @@ public class TacoDevice implements ServerListener {
       commandList.put(new Integer(allCmds[i].cmdCode), allCmds[i]);
 
     // We are now ready to exectute commands
-    dsHandle    = newDs;
+    dsHandle = newDs;
     firstImport = false;
+
+  }
+
+  /**
+   * Retrieve server information from the database and connect to the server.
+   * !!! Important Note: All procedure that call importDevice must be synchronized to this !!!
+   * @throws TacoException in case of failure
+   */
+   private void importDevice() throws TacoException {
+
+    // Check if we are imported
+    switch(source) {
+
+      case SOURCE_DEVICE:
+        if(dsHandle!=null) return;
+        dbImportDevice();
+        initDev();
+        break;
+      case SOURCE_CACHE_DEVICE:
+        if(dsHandle!=null && dcHandle!=null) return;
+        dbImportDevice();
+        initDev();
+        dbImportDc();
+        initDc();
+        break;
+      case SOURCE_CACHE:
+        if(dcHandle!=null) return;
+        dbImportDc();
+        initDc();
+        break;
+
+    }
 
   }
 
@@ -413,7 +709,7 @@ public class TacoDevice implements ServerListener {
    * (Expert usage) Should not be called.
    * Fired when a server lost the connection.
    */
-  synchronized public void disconnectFromServer() {
+  synchronized public void disconnectFromServer(ServerConnection source) {
 
     // No calls to the the API or other slow calls
     // can be made here else we will face deadlock
@@ -421,7 +717,11 @@ public class TacoDevice implements ServerListener {
 
     // Unreference the server and force a reimport
     // on the next call to a command
-    dsHandle = null;
+    if(source == dsHandle)
+      dsHandle = null;
+
+    if(source == dcHandle)
+      dcHandle = null;
 
   }
 
@@ -461,31 +761,40 @@ public class TacoDevice implements ServerListener {
 
     try {
 
-      TacoDevice dev1  = new TacoDevice("test/jlp/1");
-      TacoDevice dev2  = new TacoDevice("sr/testdev/2");
-      TacoDevice dev3  = new TacoDevice("//aries.esrf.fr/sr/rf-tra/tra3");
+      TacoDevice dev1  = new TacoDevice("//aries/sr/d-ct/1");
+      TacoDevice dev2  = new TacoDevice("sr/jlp/1");
+      TacoDevice dev3  = new TacoDevice("//aries/sr/rf-klys/tra3");
+      dev1.setSource(SOURCE_CACHE);
+      dev2.setSource(SOURCE_DEVICE);
+      dev3.setSource(SOURCE_CACHE);
+      //TacoDevice dev3  = new TacoDevice("//aries.esrf.fr/sr/rf-tra/tra3");
+
+      //TacoCommand[] cmd = dev1.commandQuery();
+      //for(int i=0;i<cmd.length;i++) {
+      //  System.out.println(cmd[i]);
+      //}
 
       while(true) {
 
         long t0 = System.currentTimeMillis();
         try {
 
-          TacoData setPoint = new TacoData();
-          setPoint.insert((int)2);
-          dev1.put(8727,setPoint);
-
-          TacoData state = dev1.get(TacoConst.DevState);
-          short stateValue = state.extractShort();
-          System.out.println("State = " + stateValue + " [" + XdrTacoType.getStateName(stateValue) + "]");
+          int cmdCode = dev1.getCommandCode("DevReadValue");
+          TacoData values = dev1.get(cmdCode);
+          float[] vals = values.extractFloatArray();
+          System.out.println("DevReadValue " + vals[0]);
 
           TacoData state2 = dev2.get(TacoConst.DevState);
           short stateValue2 = state2.extractShort();
-          System.out.println("State = " + stateValue2 + " [" + XdrTacoType.getStateName(stateValue2) + "]");
+          System.out.println("State (sr/jlp/1)= " + stateValue2 + " [" + XdrTacoType.getStateName(stateValue2) + "]");
 
-          TacoData strArr = dev3.get(TacoConst.DevGetSigConfig);
-          String[] cfgSig = strArr.extractStringArray();
-          System.out.println("Config = Array of " + cfgSig.length);
+          TacoData state3 = dev3.get(TacoConst.DevState);
+          short stateValue3 = state3.extractShort();
+          System.out.println("State (sr/rf-klys/tra3)= " + stateValue3 + " [" + XdrTacoType.getStateName(stateValue3) + "]");
 
+          TacoData values3 = dev3.get(TacoConst.DevReadSigValues);
+          double[]  dvalues3 = values3.extractDoubleArray();
+          System.out.println("Values (sr/rf-klys/tra3) read " + dvalues3.length + " values");
 
         } catch (TacoException e1) {
           System.out.println("TacoException: " + e1.getErrorString());

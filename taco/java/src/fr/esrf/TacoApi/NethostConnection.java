@@ -145,7 +145,6 @@ class NethostConnection {
 
   }
 
-
   /**
    * Returns the command name associated to the code given code
    * if not found in the private hash map.
@@ -231,13 +230,13 @@ class NethostConnection {
 
   /**
    * Get device server information from the database of this nethost.
-   * @param devName device name (without the nethost)
+   * @param devNames device names (without the nethost)
    * @return XdrDevInfos
    * @throws TacoException
    */
-  XdrDevInfos dbImportDevice(String devName) throws TacoException {
+  XdrDevInfos dbImportDevice(String[] devNames) throws TacoException {
 
-    XdrStrings argin = new XdrStrings(new String[]{devName});
+    XdrStrings argin = new XdrStrings(devNames);
     XdrDevInfos argout = new XdrDevInfos();
     dataBaseCall(RPC_DB_DEVIMP,argin,argout);
     return argout;
@@ -258,6 +257,48 @@ class NethostConnection {
 
   }
 
+  /**
+   * Convert a string array returned by the DB to
+   * a java string array.
+   * @param resValue resource value
+   * @return The string array.
+   */
+  String[] extractResourceArray(String resValue) {
+
+    // The first bytes contains the number of items as string (Not used here)
+    int idx = resValue.indexOf((char)2);
+    resValue = resValue.substring(idx+1);
+    String splitElt = new String(new char[]{2});
+    String[] splitted = resValue.split(splitElt);
+    return splitted;
+
+  }
+
+
+  /** Return the DC server name */
+  String getDcServerReadName() throws TacoException {
+
+    if (lastDCError == null && dcServerReadName == null)
+      initDC();
+
+    if (dcServerReadName != null)
+      return dcServerReadName;
+
+    throw lastDCError;
+
+  }
+
+  String getDcServerWriteName() throws TacoException {
+
+    if (lastDCError == null && dcServerReadName == null)
+      initDC();
+
+    if (dcServerWriteName != null)
+      return dcServerWriteName;
+
+    throw lastDCError;
+
+  }
 
   // --------------------------------------------------------------
   // Private stuff
@@ -295,8 +336,14 @@ class NethostConnection {
   private int             dbVersNumber;
   private OncRpcUdpClient dbClient = null;
   private long            lastConnection;
-  private HashMap         errorList;                       // Database cache for errors
-  private HashMap         commandList;                     // Database chace for commands
+  private HashMap         errorList;        // Database cache for errors
+  private HashMap         commandList;      // Database chace for commands
+
+  // DC stuff
+  private String          dcServerReadName = null;
+  private String          dcServerWriteName = null;
+  private String          dcHostName = null;
+  private TacoException   lastDCError = null;
 
   // Static variables
   private static Object            nethostMonitor = new Object();   // Global nethost monitor
@@ -342,7 +389,76 @@ class NethostConnection {
       this.dbClient = null;
       this.manager = manager;
       this.lastConnection = 0;
+
       initDBChache();
+
+  }
+
+  // Initialise DC for this host
+  private void initDC() {
+
+    try {
+
+      // Search the dc_host/dc_read which handle the device name.
+
+      String[] dcHost = dbGetResource(new String[]{"class/dc/1/host"});
+      if (dcHost[0].equals("N_DEF"))
+        throw new TacoException("No DC system on " + getName());
+
+      if (dcHost[0].charAt(0) == 5) {
+        // We have an array
+        throw new TacoException("Multi host for DC not supported");
+      }
+
+      InetAddress dcHostAdd = null;
+
+      // Resolve the dc host
+      dcHostName = dcHost[0];
+
+      try {
+        dcHostAdd = InetAddress.getByName(dcHostName);
+      } catch (UnknownHostException e) {
+        throw new TacoException("Cannot resolve the DC Host ip address: " + dcHost[0]);
+      }
+
+      // Create the pseudo DC device name and select the less loaded
+
+      int subNet = (int) dcHostAdd.getAddress()[3];
+      subNet &= 0xFF;
+      int min = Integer.MAX_VALUE;
+      int idx = 0;
+
+      String[] resNames = new String[10];
+      for (int j = 0; j < 10; j++)
+        resNames[j] = "sys/dc_rd_" + subNet + "/request/" + (j + 1);
+
+      // Select the less loaded
+
+      String[] requests = dbGetResource(resNames);
+      if (requests[0].equals("N_DEF")) {
+        throw new TacoException("Cannot select the dc_read server");
+      }
+
+      for (int j = 0; j < 10; j++) {
+        int callNumber = Integer.MAX_VALUE;
+        try {
+          callNumber = Integer.parseInt(requests[j]);
+        } catch (Exception e) {}
+        if (callNumber < min) {
+          min = callNumber;
+          idx = j;
+        }
+      }
+
+      // Create the pseudo device name
+      dcServerReadName = "sys/dc_rd_" + subNet + "/" + (idx + 1);
+      dcServerWriteName = "sys/dc_wr_" + subNet + "/" + (idx + 1);
+
+    } catch (TacoException e) {
+      dcServerReadName = null;
+      dcHostName = null;
+      lastDCError = e;
+    }
 
   }
 
