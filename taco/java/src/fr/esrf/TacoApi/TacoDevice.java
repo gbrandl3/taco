@@ -11,6 +11,9 @@
  Original   :	June 2005
 
  $Log: not supported by cvs2svn $
+ Revision 1.4  2005/09/30 16:38:13  jlpons
+ Implented DC access
+
  Revision 1.3  2005/06/27 09:31:49  jlpons
  Fixed argin encoding bug
 
@@ -65,7 +68,7 @@ public class TacoDevice implements ServerListener {
   public final static int SOURCE_CACHE_DEVICE = 2;
 
   // Do not modify this line (it is used by the install script)
-  public final String apiRelease = "$Revision: 1.4 $".substring(11,15);
+  public final String apiRelease = "$Revision: 1.5 $".substring(11,15);
 
   // Timeout before reinporting the device from the database
   private static long dbImportTimeout = 30000L; // 30 sec
@@ -451,7 +454,7 @@ public class TacoDevice implements ServerListener {
    * @return Resource value or an empty array if the resource does not
    * exists
    */
-  public String[] getResources(String resName) throws TacoException {
+  public String[] getResource(String resName) throws TacoException {
 
     // We do not need to be imported to do this call
     // Build argin
@@ -763,7 +766,7 @@ public class TacoDevice implements ServerListener {
 
       TacoDevice dev1  = new TacoDevice("//aries/sr/d-ct/1");
       TacoDevice dev2  = new TacoDevice("sr/jlp/1");
-      TacoDevice dev3  = new TacoDevice("//aries/sr/rf-klys/tra3");
+      TacoDevice dev3  = new TacoDevice("//aries/sr/d-fbpm/peak-h");
       dev1.setSource(SOURCE_CACHE);
       dev2.setSource(SOURCE_DEVICE);
       dev3.setSource(SOURCE_CACHE);
@@ -784,17 +787,18 @@ public class TacoDevice implements ServerListener {
           float[] vals = values.extractFloatArray();
           System.out.println("DevReadValue " + vals[0]);
 
-          TacoData state2 = dev2.get(TacoConst.DevState);
-          short stateValue2 = state2.extractShort();
-          System.out.println("State (sr/jlp/1)= " + stateValue2 + " [" + XdrTacoType.getStateName(stateValue2) + "]");
+//          TacoData state2 = dev2.get(TacoConst.DevState);
+//          short stateValue2 = state2.extractShort();
+//          System.out.println("State (sr/jlp/1)= " + stateValue2 + " [" + XdrTacoType.getStateName(stateValue2) + "]");
 
-          TacoData state3 = dev3.get(TacoConst.DevState);
-          short stateValue3 = state3.extractShort();
-          System.out.println("State (sr/rf-klys/tra3)= " + stateValue3 + " [" + XdrTacoType.getStateName(stateValue3) + "]");
+//          TacoData state3 = dev3.get(TacoConst.DevState);
+//          short stateValue3 = state3.extractShort();
+//          System.out.println("State (sr/rf-klys/tra3)= " + stateValue3 + " [" + XdrTacoType.getStateName(stateValue3) + "]");
 
-          TacoData values3 = dev3.get(TacoConst.DevReadSigValues);
-          double[]  dvalues3 = values3.extractDoubleArray();
-          System.out.println("Values (sr/rf-klys/tra3) read " + dvalues3.length + " values");
+          cmdCode = dev3.getCommandCode("DevUpdate");
+          TacoData values3 = dev3.get(cmdCode);
+          float[] dvalues3 = values3.extractStateFloatReadPoint();
+          System.out.println("Values sr/d-fbpm/peak-h read " + dvalues3[0] + " , " + dvalues3[1]);
 
         } catch (TacoException e1) {
           System.out.println("TacoException: " + e1.getErrorString());
