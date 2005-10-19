@@ -30,9 +30,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.21 $
+ * Version    :	$Revision: 1.22 $
  *
- * Date       : $Date: 2005-07-25 13:08:28 $
+ * Date       : $Date: 2005-10-19 12:24:15 $
  *
  ********************************************************************-*/
 
@@ -246,6 +246,7 @@ long _DLLFunc msg_import (char *DS_name, char *DS_host, long DS_prog_number, cha
  	 */
 
 	strncpy (msg_info.conf->device_name, "MessageServer", sizeof(msg_info.conf->device_name));
+        msg_info.conf->device_name[sizeof(msg_info.conf->device_name) - 1] = '\0';
 	msg_info.conf->clnt = clnt;
 	msg_info.conf->ds_id = 0;
 	msg_info.conf->no_svr_conn = 1;
@@ -1095,12 +1096,14 @@ long _DLLFunc db_import (long *error)
  * pass the information to the database server_info structure
  */
 	strncpy (db_info.conf->device_name, "DatabaseServer", sizeof(db_info.conf->device_name));
+        db_info.conf->device_name[sizeof(db_info.conf->device_name) - 1] = '\0';
 	db_info.conf->clnt = clnt;
 	db_info.conf->ds_id = 0;
 	db_info.conf->no_svr_conn = 1;
 
 	config_flags.database_server = True;
 	strncpy(nethost, nethost_env, sizeof(nethost));
+        nethost[sizeof(nethost) - 1] = '\0';
 
 /*
  * for multi-nethost support copy the default configuration
@@ -1223,6 +1226,7 @@ long _DLLFunc db_import_multi (char *nethost, long *error)
  * pass the information to the database server_info structure
  */
 	strncpy(nethost_i->db_info->device_name,"DatabaseServer", sizeof(nethost_i->db_info->device_name));
+	nethost_i->db_info->device_name[sizeof(nethost_i->db_info->device_name)] = '\0';
 	nethost_i->db_info->clnt = clnt;
 	nethost_i->db_info->ds_id = 0;
 	nethost_i->db_info->no_svr_conn = 1;
@@ -1288,6 +1292,7 @@ long setup_config (long *error)
 		return (DS_NOTOK);
 	}
 	strncpy(nethost, nethost_env, sizeof(nethost));
+        nethost[sizeof(nethost) - 1] = '\0';
 
 /*
  *  create registration information that is send to
@@ -1452,9 +1457,11 @@ long setup_config (long *error)
 	if (max_nethost <= 0) 
 		nethost_alloc(error);
 	strncpy(nethost,nethost_env,HOST_NAME_LENGTH);
+        nethost[sizeof(nethost) - 1] = '\0';
 //	snprintf(nethost, sizeof(nethost), "%s",nethost_env);
 
-	strcpy(multi_nethost[0].nethost,nethost);
+	strncpy(multi_nethost[0].nethost,nethost, sizeof(multi_nethost[0].nethost));
+        multi_nethost[0].nethost[sizeof(multi_nethost[0].nethost) - 1] = '\0';
 	multi_nethost[0].config_flags = config_flags;
 	multi_nethost[0].db_info = db_info.conf;
 	multi_nethost[0].msg_info = msg_info.conf;
@@ -1705,7 +1712,8 @@ long setup_config_multi (char *nethost, long *error)
  */
 	xdr_free((xdrproc_t)xdr__manager_data, (char *)&manager_data);
 	clnt_destroy (clnt);
-	strcpy(multi_nethost[i_nethost].nethost,nethost);
+	strncpy(multi_nethost[i_nethost].nethost,nethost, sizeof(multi_nethost[i_nethost].nethost));
+        multi_nethost[i_nethost].nethost[sizeof(multi_nethost[i_nethost].nethost) - 1] = '\0';
 
 	multi_nethost[i_nethost].config_flags.configuration = True;
 	if (i_nethost == 0)
@@ -1734,7 +1742,7 @@ long setup_config_multi (char *nethost, long *error)
  * specified in the Kernel of the system. 
  */
 #ifndef _UCC
-			snprintf(nethost_tmp, 64, "NETHOST=%s", nethost);
+			snprintf(nethost_tmp, HOST_NAME_LENGTH + 20, "NETHOST=%s", nethost);
 			putenv(nethost_tmp);
 			nethost_env = (char *)getenv ("NETHOST");
 #endif /*!_UCC*/
@@ -2045,5 +2053,6 @@ long dev_error_push_level(const char * message,int level)
 		tmp_store[cnt]=' ';
 	tmp_store[0]='\n';
 	strncpy(tmp_store+level,message,MAX_ERR_STR-level);
+        tmp_store[MAX_ERR_STR - 1] = '\0'; 
 	return dev_error_push(tmp_store);
 }

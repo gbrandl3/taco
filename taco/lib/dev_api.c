@@ -27,13 +27,13 @@
  *
  * Author(s)  :	Andy Goetz
  *		Jens Meyer
- * 		$Author: jensmeyer $
+ * 		$Author: jkrueger1 $
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.28 $
+ * Version    :	$Revision: 1.29 $
  *
- * Date	    :	$Date: 2005-08-02 09:19:49 $
+ * Date	    :	$Date: 2005-10-19 12:24:15 $
  *
  ********************************************************************-*/
 
@@ -450,8 +450,11 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
 		dev_printdebug(DBG_API, "host = %s  pn = %d  vn = %d\n",devinfo[0].host_name, devinfo[0].pn, devinfo[0].vn);
 
 		strncpy(device_class, devinfo[0].device_class, sizeof(device_class));
+		device_class[sizeof(device_class) - 1] = '\0';
 		strncpy(device_type, devinfo[0].device_type, sizeof(device_type));
+		device_type[sizeof(device_type) - 1] = '\0';
 		strncpy(host_name, devinfo[0].host_name, sizeof(host_name));
+		host_name[sizeof(host_name) - 1] = '\0';
 		prog_number = devinfo[0].pn;
 		vers_number = API_VERSION;
 
@@ -505,8 +508,11 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
  * Initialise all missing fields in the client handle.
  */
 			strncpy((*ds_ptr)->device_class,device_class, sizeof((*ds_ptr)->device_class));
+			(*ds_ptr)->device_class[sizeof((*ds_ptr)->device_class) - 1] = '\0';
 			strncpy((*ds_ptr)->device_type,device_type, sizeof((*ds_ptr)->device_type));
+			(*ds_ptr)->device_type[sizeof((*ds_ptr)->device_type) - 1] = '\0';
 			strncpy((*ds_ptr)->server_host,host_name, sizeof((*ds_ptr)->server_host));
+			(*ds_ptr)->server_host[sizeof((*ds_ptr)->server_host) - 1] = '\0';
 			(*ds_ptr)->prog_number      = prog_number;
 			(*ds_ptr)->vers_number      = vers_number;
 
@@ -558,6 +564,7 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
  */
                         dev_notimported_init(device_name,access,i_nethost,ds_ptr,error);
 			strncpy((*ds_ptr)->server_host,host_name, sizeof((*ds_ptr)->server_host));
+			(*ds_ptr)->server_host[sizeof((*ds_ptr)->server_host) - 1] = '\0';
 			(*ds_ptr)->prog_number      = prog_number;
 			(*ds_ptr)->vers_number      = vers_number;
 			return(DS_OK);
@@ -899,10 +906,15 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
  * pass the information back to the user
  */
 			strncpy((*ds_ptr)->device_name,device_name, sizeof((*ds_ptr)->device_name));
+			(*ds_ptr)->device_name[sizeof((*ds_ptr)->device_name) - 1] = '\0';
 			strncpy((*ds_ptr)->device_class,device_class, sizeof((*ds_ptr)->device_class));
+			(*ds_ptr)->device_class[sizeof((*ds_ptr)->device_class) - 1] = '\0';
 			strncpy((*ds_ptr)->device_type,device_type, sizeof((*ds_ptr)->device_type));
+			(*ds_ptr)->device_type[sizeof((*ds_ptr)->device_type) - 1] = '\0';
 			strncpy((*ds_ptr)->server_name,dev_import_out.server_name, sizeof((*ds_ptr)->server_name));
+			(*ds_ptr)->server_name[sizeof((*ds_ptr)->server_name) - 1] = '\0';
 			strncpy((*ds_ptr)->server_host,host_name, sizeof((*ds_ptr)->server_host));
+			(*ds_ptr)->server_host[sizeof((*ds_ptr)->server_host) - 1] = '\0';
 			(*ds_ptr)->prog_number      = prog_number;
 			(*ds_ptr)->vers_number      = vers_number;
 			(*ds_ptr)->clnt 	    = clnt;
@@ -1707,6 +1719,7 @@ long _DLLFunc dev_query_svr (char* host, long prog_number, long vers_number)
 		next_conn   = 0;
 
 		strncpy(svr_conns[next_conn].server_host,host, sizeof(svr_conns[next_conn].server_host));
+		svr_conns[next_conn].server_host[sizeof(svr_conns[next_conn].server_host) - 1] = '\0';
 		svr_conns[next_conn].prog_number 	   = prog_number;
 		svr_conns[next_conn].vers_number 	   = vers_number;
 		svr_conns[next_conn].rpc_conn_status    = GOOD_SVC_CONN;
@@ -1750,6 +1763,7 @@ long _DLLFunc dev_query_svr (char* host, long prog_number, long vers_number)
  * yes, initialise the server table
  */
 		strncpy(svr_conns[next_conn].server_host,host, sizeof(svr_conns[next_conn].server_host));
+		svr_conns[next_conn].server_host[sizeof(svr_conns[next_conn].server_host) - 1] = '\0';
 		svr_conns[next_conn].prog_number 	= prog_number;
 		svr_conns[next_conn].vers_number 	= vers_number;
 		svr_conns[next_conn].rpc_conn_status    = GOOD_SVC_CONN;
@@ -1897,6 +1911,7 @@ long _DLLFunc check_rpc_connection (devserver ds, long *error)
 		if ( db_dev_import (&device_name, &devinfo, 1, error) == DS_OK )
 		{
 			strncpy (host_name, devinfo[0].host_name, sizeof(host_name));
+			host_name[sizeof(host_name)] = '\0';
 			prog_number  = devinfo[0].pn;
 			vers_number  = API_VERSION;
 
@@ -1919,6 +1934,7 @@ long _DLLFunc check_rpc_connection (devserver ds, long *error)
  * with the same program number
  */
 		strncpy(host_name, ds->server_host, sizeof(host_name));
+		host_name[sizeof(host_name)] = '\0';
 		prog_number = ds->prog_number;
 		vers_number = ds->vers_number;
 	}
@@ -2095,6 +2111,7 @@ long _DLLFunc check_rpc_connection (devserver ds, long *error)
 		else
 		    	svr_conns[ds->no_svr_conn].tcp_clnt = clnt;
 		strncpy (svr_conns[ds->no_svr_conn].server_host, host_name, sizeof(svr_conns[ds->no_svr_conn].server_host));
+		svr_conns[ds->no_svr_conn].server_host[sizeof(svr_conns[ds->no_svr_conn].server_host) - 1] = '\0';
 /*
  * update program and version number because they could have changed and increment the connection 
  * counter to force a reimport of the device (in dev_rpc_connection())
@@ -2233,10 +2250,15 @@ long _DLLFunc check_rpc_connection (devserver ds, long *error)
  * pass the information back to the user
  */
 		    	strncpy(ds->device_name,new_ds->device_name, sizeof(ds->device_name));
+			ds->device_name[sizeof(ds->device_name) - 1] = '\0';
 			strncpy(ds->device_class,new_ds->device_class, sizeof(ds->device_class));
+			ds->device_class[sizeof(ds->device_class) - 1] = '\0';
 			strncpy(ds->device_type,new_ds->device_type, sizeof(ds->device_type));
+			ds->device_type[sizeof(ds->device_type) - 1] = '\0';
 			strncpy(ds->server_name,new_ds->server_name, sizeof(ds->server_name));
+			ds->server_name[sizeof(ds->server_name) - 1] = '\0';
 			strncpy(ds->server_host,new_ds->server_host, sizeof(ds->server_host));
+			ds->server_host[sizeof(ds->server_host) - 1] = '\0';
 			ds->prog_number      = new_ds->prog_number;
 			ds->vers_number      = new_ds->vers_number;
 			ds->clnt 	     = new_ds->clnt;
@@ -2395,10 +2417,15 @@ long _DLLFunc reinstall_rpc_connection (devserver ds, long *error)
  * pass the information back to the user
  */
 	strncpy(ds->device_name,new_ds->device_name, sizeof(ds->device_name));
+	ds->device_name[sizeof(ds->device_name) - 1] = '\0';
 	strncpy(ds->device_class,new_ds->device_class, sizeof(ds->device_class));
+	ds->device_class[sizeof(ds->device_class) - 1] = '\0';
 	strncpy(ds->device_type,new_ds->device_type, sizeof(ds->device_type));
+	ds->device_type[sizeof(ds->device_type) - 1] = '\0';
 	strncpy(ds->server_name,new_ds->server_name, sizeof(ds->server_name));
+	ds->server_name[sizeof(ds->server_name) - 1] = '\0';
 	strncpy(ds->server_host,new_ds->server_host, sizeof(ds->server_host));
+	ds->server_host[sizeof(ds->server_host) - 1] = '\0';
 	ds->prog_number      = new_ds->prog_number;
 	ds->vers_number      = new_ds->vers_number;
 	ds->clnt 	     = new_ds->clnt;
@@ -2664,7 +2691,9 @@ static long dev_import_local (_dev_import_in  *dev_import_in, devserver  *ds_ptr
  * pass the information back to the user
  */
 			strncpy((*ds_ptr)->device_name,dev_import_in->device_name, sizeof((*ds_ptr)->device_name));
+			(*ds_ptr)->device_name[sizeof((*ds_ptr)->device_name) - 1] = '\0';
 			strncpy((*ds_ptr)->server_name,dev_import_out->server_name, sizeof((*ds_ptr)->server_name));
+			(*ds_ptr)->server_name[sizeof((*ds_ptr)->server_name) - 1] = '\0';
 			(*ds_ptr)->dev_access       = dev_import_in->access_right;
 			(*ds_ptr)->clnt             = NULL;
 			(*ds_ptr)->ds_id            = ds_id;
@@ -3247,10 +3276,15 @@ long _DLLFunc dev_notimported_init (char *device_name, long access, long i_netho
         }
 	memset((char *)*ds_ptr, 0, sizeof(struct _devserver));
         strncpy((*ds_ptr)->device_name, device_name, sizeof((*ds_ptr)->device_name));
+	(*ds_ptr)->device_name[sizeof((*ds_ptr)->device_name) - 1] = '\0';
         strncpy((*ds_ptr)->device_class,"Unknown", sizeof((*ds_ptr)->device_class));
+	(*ds_ptr)->device_class[sizeof((*ds_ptr)->device_class) - 1] = '\0';
         strncpy((*ds_ptr)->device_type,"Unknown", sizeof((*ds_ptr)->device_type));
+	(*ds_ptr)->device_type[sizeof((*ds_ptr)->device_type) - 1] = '\0';
         strncpy((*ds_ptr)->server_name,"Unknown", sizeof((*ds_ptr)->server_name));
+	(*ds_ptr)->server_name[sizeof((*ds_ptr)->server_name) - 1] = '\0';
         strncpy((*ds_ptr)->server_host,"Unknown", sizeof((*ds_ptr)->server_host));
+	(*ds_ptr)->server_host[sizeof((*ds_ptr)->server_host) - 1] = '\0';
         (*ds_ptr)->clnt             = NULL;
         (*ds_ptr)->ds_id            = 0;
         (*ds_ptr)->no_svr_conn      = 0;
