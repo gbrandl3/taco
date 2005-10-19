@@ -11,6 +11,9 @@
  Original   :	June 2005
 
  $Log: not supported by cvs2svn $
+ Revision 1.7  2005/10/19 13:20:01  jlpons
+ getInfo() does not throw an exception when not connected.
+
  Revision 1.6  2005/10/10 13:28:26  jlpons
  New algorithm for SOURCE_CACHE_DEVICE strategu
 
@@ -74,7 +77,7 @@ public class TacoDevice implements ServerListener {
   public final static int SOURCE_CACHE_DEVICE = 2;
 
   // Do not modify this line (it is used by the install script)
-  public final String apiRelease = "$Revision: 1.7 $".substring(11,15);
+  public final String apiRelease = "$Revision: 1.8 $".substring(11,15);
 
   // Timeout before reinporting the device from the database
   private static long dbImportTimeout = 30000L; // 30 sec
@@ -104,7 +107,6 @@ public class TacoDevice implements ServerListener {
   private TacoException lastDevImportError;  // Last device import error
   private long    lastDcImportTime;          // Time of the db_import(device)
   private TacoException lastDcImportError;   // Last device import error
-  private boolean isPseudoDevice;            // Pseude device
   private ServerConnection dcHandle;         // DC server handle
   private ServerConnection dsHandle;         // Server handle
   private NethostConnection nhHandle;        // Nethost handle
@@ -129,7 +131,6 @@ public class TacoDevice implements ServerListener {
     this.lastDevImportError = null;
     this.lastDcImportError  = null;
     this.source             = source;
-    this.isPseudoDevice     = false;
 
     if(name.startsWith("taco:"))
       deviceName = name.substring(5).toLowerCase();
@@ -321,13 +322,28 @@ public class TacoDevice implements ServerListener {
                "Nethost:   " + nhHandle.getName();
 
       case SOURCE_CACHE_DEVICE:
+        if (dcHandle != null) {
+          return "Devname:   " + deviceName + "\n" +
+                 "DevClass:  " + dcClass + "\n" +
+                 "DevType:   " + dcType + "\n" +
+                 "DsName:    " + devProcessName + "\n" +
+                 "Host:      " + dcHandle.getHostName() + "\n" +
+                 "Nethost:   " + nhHandle.getName();
+        } else {
+          return "Devname:   " + deviceName + "\n" +
+                 "DevClass:  " + dcClass + "\n" +
+                 "DevType:   " + dcType + "\n" +
+                 "DsName:    " + devProcessName + "\n" +
+                 "Host:      " + dsHandle.getHostName() + "\n" +
+                 "Nethost:   " + nhHandle.getName();
+        }
       case SOURCE_CACHE:
         return "Devname:   " + deviceName + "\n" +
                "DevClass:  " + dcClass + "\n" +
                "DevType:   " + dcType + "\n" +
+               "DsName:    " + devProcessName + "\n" +
                "Host:      " + dcHandle.getHostName() + "\n" +
-               "Nethost:   " + nhHandle.getName() + "\n" +
-               "isPseudo:  " + isPseudoDevice;
+               "Nethost:   " + nhHandle.getName();
     }
 
     return "No info";
@@ -413,23 +429,33 @@ public class TacoDevice implements ServerListener {
     switch(source) {
 
       case SOURCE_DEVICE:
+
         if(cmd==null) throw new TacoException("Device command not found " + cmdCode);
         return devPutGet(cmd,argin);
 
       case SOURCE_CACHE_DEVICE:
+
         if(cmd==null) throw new TacoException("Device command not found " + cmdCode);
-        if(cmd.hasCache) {
+        if(cmd.hasCache && dcHandle!=null) {
           try {
             TacoData argout = dcDevGet(cmd);
             return argout;
           } catch (TacoException e) {
             // Cache failed
-            return devPutGet(cmd,argin);
+            if(dsHandle!=null)
+              return devPutGet(cmd,argin);
+            else
+              throw e;
           }
+        } else {
+          if(dsHandle!=null)
+            return devPutGet(cmd,argin);
+          else
+            throw new TacoException("Failed to execute " + cmd.cmdName );
         }
-        return devPutGet(cmd,argin);
 
       case SOURCE_CACHE:
+
         if(cmd==null) throw new TacoException("DC command not found " + cmdCode);
         if(cmd.hasCache)
           return dcDevGet(cmd);
@@ -721,37 +747,25 @@ public class TacoDevice implements ServerListener {
 
       case SOURCE_CACHE_DEVICE:
 
-        TacoException e1 = null;
-        boolean mayBePseudo = false;
+        TacoException devErr = null;
+        if (dsHandle != null || dcHandle != null) return;
 
-        if(isPseudoDevice && dcHandle!=null) return;
-        if(dsHandle!=null && dcHandle!=null) return;
-        if(!isPseudoDevice) {
-          try {
-            dbImportDevice();
-            initDev();
-          } catch (TacoException e) {
-            if(e.getCode()==TacoException.DbErr_DeviceNotDefined) {
-              //We may have a pseudo device
-              mayBePseudo = true;
-              e1 = e;
-            } else
-              throw e;
-          }
+        try {
+          dbImportDevice();
+          initDev();
+        } catch (TacoException e) {
+          devErr = e;
         }
+
         try {
           dbImportDc();
           initDc();
-        } catch (TacoException e) {
-          if(mayBePseudo)
-            // We have an unkown device here
-            throw e1;
-          else
-            throw e;
-        }
-        if(mayBePseudo) isPseudoDevice = true;
-        break;
+        } catch (TacoException e) {}
 
+        if(dsHandle == null && dcHandle == null)
+          throw devErr;
+
+        break;
 
     }
 
@@ -813,18 +827,12 @@ public class TacoDevice implements ServerListener {
 
     try {
 
-      TacoDevice dev1  = new TacoDevice("//aries/sr/d-ct/2");
+      TacoDevice dev1  = new TacoDevice("//aries/sr/d-ct/1");
       TacoDevice dev2  = new TacoDevice("sr/jlp/1");
       TacoDevice dev3  = new TacoDevice("//aries/sr/d-fbpm/peak-h");
-      dev1.setSource(SOURCE_CACHE);
-      dev2.setSource(SOURCE_DEVICE);
+      dev1.setSource(SOURCE_CACHE_DEVICE);
+      dev2.setSource(SOURCE_CACHE_DEVICE);
       dev3.setSource(SOURCE_CACHE_DEVICE);
-      //TacoDevice dev3  = new TacoDevice("//aries.esrf.fr/sr/rf-tra/tra3");
-
-      //TacoCommand[] cmd = dev1.commandQuery();
-      //for(int i=0;i<cmd.length;i++) {
-      //  System.out.println(cmd[i]);
-      //}
 
       while(true) {
 
@@ -836,13 +844,9 @@ public class TacoDevice implements ServerListener {
           float[] vals = values.extractFloatArray();
           System.out.println("DevReadValue " + vals[0]);
 
-//          TacoData state2 = dev2.get(TacoConst.DevState);
-//          short stateValue2 = state2.extractShort();
-//          System.out.println("State (sr/jlp/1)= " + stateValue2 + " [" + XdrTacoType.getStateName(stateValue2) + "]");
-
-//          TacoData state3 = dev3.get(TacoConst.DevState);
-//          short stateValue3 = state3.extractShort();
-//          System.out.println("State (sr/rf-klys/tra3)= " + stateValue3 + " [" + XdrTacoType.getStateName(stateValue3) + "]");
+          TacoData state2 = dev2.get(TacoConst.DevState);
+          short stateValue2 = state2.extractShort();
+          System.out.println("State (sr/jlp/1)= " + stateValue2 + " [" + XdrTacoType.getStateName(stateValue2) + "]");
 
           cmdCode = dev3.getCommandCode("DevUpdate");
           TacoData values3 = dev3.get(cmdCode);
