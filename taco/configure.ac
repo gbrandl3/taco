@@ -1,13 +1,31 @@
-AC_INIT([TACO], [3.1.0], [taco-devel@lists.sourceforge.net])
+dnl Toolkit for building distributed control systems or any other distributed system.
+dnl
+dnl Copyright (C) 2003-2005  Jens Krueger <jkrueger1@users.sf.net>
+dnl
+dnl This library is free software; you can redistribute it and/or
+dnl modify it under the terms of the GNU Lesser General Public
+dnl License as published by the Free Software Foundation; either
+dnl version 2.1 of the License, or (at your option) any later version.
+dnl
+dnl This library is distributed in the hope that it will be useful,
+dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+dnl Lesser General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU Lesser General Public
+dnl License along with this library; if not, write to the Free Software
+dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+AC_INIT([TACO], [3.90.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.66 $)dnl
+AC_REVISION($Revision: 1.67 $)dnl
 AC_COPYRIGHT([(C) 1990-2005 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
 
 TACO_INIT([no])
 
-AC_SUBST(LIB_VERSION, [11:1:0])
+AC_SUBST(LIB_VERSION, [1:0:0])
 
 AM_INIT_AUTOMAKE([dist-bzip2 1.7])
 
@@ -16,6 +34,8 @@ dnl AM_PROG_LIBTOOL
 AC_CHECK_SIZEOF(char)
 AC_CHECK_SIZEOF(short)
 AC_CHECK_SIZEOF(unsigned short)
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(unsigned int)
 AC_CHECK_SIZEOF(long)
 AC_CHECK_SIZEOF(unsigned long)
 AC_CHECK_SIZEOF(float)
@@ -144,7 +164,7 @@ AC_HEADER_STAT
 AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h]) 
 AC_CHECK_HEADERS([pthread.h fcntl.h malloc.h memory.h netdb.h stddef.h stdlib.h string.h strings.h sys/file.h sys/ioctl.h termios.h unistd.h sys/filio.h paths.h siggen.h])
 AC_CHECK_HEADERS([varargs.h stdarg.h])
-AC_CHECK_HEADERS([rpc/pmap_prot.h rpc/pmap_prot.h])
+AC_CHECK_HEADERS([svc.h rpc/svc.h rpc/pmap_prot.h rpc/pmap_prot.h])
 AC_CHECK_HEADERS([signal.h sys/signal.h sys/param.h])
 AC_TYPE_SIGNAL
 AC_CHECK_DECLS([signal], [], [],
@@ -369,6 +389,7 @@ AC_CONFIG_FILES(Makefile
 		misc/tacoenv.csh
 		misc/taco.startup
 		misc/taco.shutdown
+		misc/taco.status
 		doc/Makefile
 		lib/Makefile
 		lib/Doxyfile

@@ -30,9 +30,9 @@
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.11 $
+ * Version    :	$Revision: 1.12 $
  *
- * Date       :	$Date: 2005-07-25 13:02:28 $
+ * Date       :	$Date: 2005-10-19 11:26:31 $
  * 
  *-*******************************************************************/
 #ifndef WIN32
@@ -3557,14 +3557,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 #ifdef ALONE
 	recev = db_devimp_1(&send,cl,&error);
 #else
-	if (i_nethost == 0)
-	{
-		recev = db_devimp_1(&send,db_info.conf->clnt,&error);
-	}
-	else
-	{
-		recev = db_devimp_1(&send, multi_nethost[i_nethost].db_info->clnt,&error);
-	}
+	recev = db_devimp_1(&send, multi_nethost[i_nethost].db_info->clnt,&error);
 #endif /* ALONE */
 
 /* If the server is not connected to the database (because a database update
@@ -3587,14 +3580,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 #ifdef ALONE
 				recev = db_devimp_1(&send,cl,&error);
 #else
-				if (i_nethost == 0)
-				{
-					recev = db_devimp_1(&send,db_info.conf->clnt,&error);
-				}
-				else
-				{
-					recev = db_devimp_1(&send,multi_nethost[i_nethost].db_info->clnt, &error);
-				}
+				recev = db_devimp_1(&send,multi_nethost[i_nethost].db_info->clnt, &error);
 #endif /* ALONE */
 				if(recev == NULL)
 					break;
@@ -3613,18 +3599,9 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 #ifdef ALONE
 			to_reconnection((void *)&send,(void **)&recev,&cl,(int)DB_DEVIMP,0,DB_UDP,&error);
 #else
-			if (i_nethost == 0)
-			{
-				to_reconnection((void *)&send,(void **)&recev,
-					&db_info.conf->clnt,(int)DB_DEVIMP,
-					i_nethost,DB_UDP,&error);
-			}
-			else
-			{
-				to_reconnection((void *)&send,(void **)&recev,
+			to_reconnection((void *)&send,(void **)&recev,
 					&multi_nethost[i_nethost].db_info->clnt,
 				        (int)DB_DEVIMP,i_nethost,DB_UDP,&error);
-			}
 #endif /* ALONE */
 		}
 		if (error != DS_OK)
@@ -3676,15 +3653,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 #ifdef ALONE
 	clnt_freeres(cl,xdr_db_resimp,(char *)recev);
 #else
-	if (i_nethost == 0)
-	{
-		clnt_freeres(db_info.conf->clnt,(xdrproc_t)xdr_db_resimp,(char *)recev);
-	}
-	else
-	{
-		clnt_freeres(multi_nethost[i_nethost].db_info->clnt,
-		             (xdrproc_t)xdr_db_resimp,(char *)recev);
-	}
+	clnt_freeres(multi_nethost[i_nethost].db_info->clnt, (xdrproc_t)xdr_db_resimp,(char *)recev);
 #endif /* ALONE */
 
 /* Leave function */

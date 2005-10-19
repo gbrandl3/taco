@@ -1,3 +1,8 @@
+2005-10-19 13:00 jkrueger1:
+	* lib/dbase/setacc_cli.c: Fix: some problems with dev_import and not
+	set NETHOST environment variable. Imports of devices on different host
+	may crash if the import came in the following order. //host1/dev1, 
+	//host2/dev2, //host1/dev3, ...
 2005-07-25 10:30 jkrueger1:
         * system/dbase/server/dbm_clo_op.cpp: Fix: open problems with database
         files on NFS file systems

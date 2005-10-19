@@ -10,9 +10,9 @@ public class Client1 implements TacoConst {
 
     try {
 
-      TacoDevice dev1  = new TacoDevice("sr/testdev/1");
-      TacoDevice dev2  = new TacoDevice("sr/testdev/2");
-      TacoDevice dev3  = new TacoDevice("//aries/sr/rf-tra/tra3");
+      TacoDevice dev1  = new TacoDevice("//172.25.17.1/reseda/rs232/husco1");
+//      TacoDevice dev2  = new TacoDevice("sr/testdev/2");
+//      TacoDevice dev3  = new TacoDevice("//aries/sr/rf-tra/tra3");
 
       while(true) {
 
