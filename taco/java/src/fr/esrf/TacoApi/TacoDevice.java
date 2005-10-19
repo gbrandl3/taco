@@ -11,6 +11,9 @@
  Original   :	June 2005
 
  $Log: not supported by cvs2svn $
+ Revision 1.6  2005/10/10 13:28:26  jlpons
+ New algorithm for SOURCE_CACHE_DEVICE strategu
+
  Revision 1.5  2005/10/10 09:24:02  jlpons
  Fixed TacoDevice.getResource()
 
@@ -71,7 +74,7 @@ public class TacoDevice implements ServerListener {
   public final static int SOURCE_CACHE_DEVICE = 2;
 
   // Do not modify this line (it is used by the install script)
-  public final String apiRelease = "$Revision: 1.6 $".substring(11,15);
+  public final String apiRelease = "$Revision: 1.7 $".substring(11,15);
 
   // Timeout before reinporting the device from the database
   private static long dbImportTimeout = 30000L; // 30 sec
@@ -298,10 +301,14 @@ public class TacoDevice implements ServerListener {
   /**
    * Return device info.
    */
-  public synchronized String getInfo() throws TacoException {
+  public synchronized String getInfo() {
 
     // Note: All procedure that call import device must be synchronized
-    importDevice();
+    try {
+      importDevice();
+    } catch(TacoException e) {
+      return e.getErrorString();
+    }
 
     switch(source) {
 
@@ -606,7 +613,7 @@ public class TacoDevice implements ServerListener {
     } catch (TacoException e) {
       throw new TacoException("DC write server "+nhHandle.getDcServerWriteName()+" not responding");
     }
-    
+
     // Get the list of polled commands
     allCmds = dcWrite.commandQueryDC(shortName, nhHandle);
     dcWrite.destroy();
@@ -806,7 +813,7 @@ public class TacoDevice implements ServerListener {
 
     try {
 
-      TacoDevice dev1  = new TacoDevice("//aries/sr/d-ct/1");
+      TacoDevice dev1  = new TacoDevice("//aries/sr/d-ct/2");
       TacoDevice dev2  = new TacoDevice("sr/jlp/1");
       TacoDevice dev3  = new TacoDevice("//aries/sr/d-fbpm/peak-h");
       dev1.setSource(SOURCE_CACHE);
