@@ -1,4 +1,4 @@
-static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon.c,v 1.1 2005-09-28 20:08:33 andy_gotz Exp $";
+static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon.c,v 1.2 2005-10-20 06:50:54 jkrueger1 Exp $";
 
 /*********************************************************************
 
@@ -17,8 +17,10 @@ static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/u
 
 
  *********************************************************************/
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
-#include <config.h>
 #include <API.h>
 #include <Admin.h>
 #include <DevErrors.h>
@@ -32,8 +34,8 @@ static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/u
 #include <ud_serverP.h>
 
 #include <daemon_xdr.h>
-#include <daemon.h>
 #include <private/ApiP.h>
+#include <daemon.h>
 
 /*
  * public methods
