@@ -18,7 +18,7 @@ dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_INIT([TACO], [3.90.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.67 $)dnl
+AC_REVISION($Revision: 1.68 $)dnl
 AC_COPYRIGHT([(C) 1990-2005 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -431,6 +431,7 @@ dnl		system/dbdev/doc/Makefile)
 AC_CONFIG_FILES(classes/instverify/Makefile)
 AC_CONFIG_FILES(classes/powersupply/Makefile)
 AC_CONFIG_FILES(classes/serialline/Makefile)
+AC_CONFIG_FILES(classes/updatedaemon/Makefile)
 
 AC_CONFIG_FILES(m4/Makefile)
 
