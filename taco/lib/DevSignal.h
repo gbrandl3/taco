@@ -32,21 +32,25 @@
  *
  * Original:	June, 1991
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2005-07-25 13:08:22 $
+ * Date:	$Date: 2005-10-20 06:51:52 $
  *
  ********************************************************************-*/
 
 #ifndef _DevSignal_h
 #define _DevSignal_h
 
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 /*
  *  standart header string to use "what" or "ident".
  */
 #ifdef _IDENT
 static char DevSignalh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevSignal.h,v 1.8 2005-07-25 13:08:22 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevSignal.h,v 1.9 2005-10-20 06:51:52 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 #if HAVE_SIGNAL_H || WIN32
