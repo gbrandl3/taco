@@ -452,7 +452,8 @@ class NethostConnection {
 
       // Create the pseudo device name
       dcServerReadName = "sys/dc_rd_" + subNet + "/" + (idx + 1);
-      dcServerWriteName = "sys/dc_wr_" + subNet + "/" + (idx + 1);
+      // Select always the dc_wr_1
+      dcServerWriteName = "sys/dc_wr_" + subNet + "/1";
 
     } catch (TacoException e) {
       dcServerReadName = null;

@@ -11,6 +11,9 @@
  Original   :	June 2005
 
  $Log: not supported by cvs2svn $
+ Revision 1.8  2005/10/19 16:37:18  jlpons
+ Changed the SOURCE_CACHE_DEVICE algorithm
+
  Revision 1.7  2005/10/19 13:20:01  jlpons
  getInfo() does not throw an exception when not connected.
 
@@ -77,7 +80,7 @@ public class TacoDevice implements ServerListener {
   public final static int SOURCE_CACHE_DEVICE = 2;
 
   // Do not modify this line (it is used by the install script)
-  public final String apiRelease = "$Revision: 1.8 $".substring(11,15);
+  public final String apiRelease = "$Revision: 1.9 $".substring(11,15);
 
   // Timeout before reinporting the device from the database
   private static long dbImportTimeout = 30000L; // 30 sec
@@ -91,17 +94,17 @@ public class TacoDevice implements ServerListener {
   private int     timeout;                   // RPC timeout
   private int     access;                    // Security access
   private int     deviceId;                  // Device ID (Server side)
-  private String  devType;                   // Device type
-  private String  devClass;                  // Device class
-  private String  devProcessName;               // processName
-  private String  dcType;                   // Device type
-  private String  dcClass;                  // Device class
-  private String  hostName;                  // hostname
+  private String  devType="";                // Device type
+  private String  devClass="";               // Device class
+  private String  devProcessName="";         // processName
+  private String  dcType="";                 // Device type
+  private String  dcClass="";                // Device class
+  private String  hostName="";               // hostname
   private int     progNumber;                // RPC prog number
   private String  hostDCReadName;            // hostname (dc_read)
   private int     progDCReadNumber;          // RPC prog number (dc_read)
-  private String  hostDCWriteName;            // hostname (dc_write)
-  private int     progDCWriteNumber;          // RPC prog number (dc_write)
+  private String  hostDCWriteName;           // hostname (dc_write)
+  private int     progDCWriteNumber;         // RPC prog number (dc_write)
   private boolean firstImport;               // First Import flag
   private long    lastDevImportTime;         // Time of the db_import(device)
   private TacoException lastDevImportError;  // Last device import error
@@ -827,7 +830,7 @@ public class TacoDevice implements ServerListener {
 
     try {
 
-      TacoDevice dev1  = new TacoDevice("//aries/sr/d-ct/1");
+      TacoDevice dev1  = new TacoDevice("//aries/elin/v-rv/1");
       TacoDevice dev2  = new TacoDevice("sr/jlp/1");
       TacoDevice dev3  = new TacoDevice("//aries/sr/d-fbpm/peak-h");
       dev1.setSource(SOURCE_CACHE_DEVICE);
@@ -839,13 +842,13 @@ public class TacoDevice implements ServerListener {
         long t0 = System.currentTimeMillis();
         try {
 
-          int cmdCode = dev1.getCommandCode("DevReadValue");
+          int cmdCode = dev1.getCommandCode("DevState");
           TacoData values = dev1.get(cmdCode);
-          float[] vals = values.extractFloatArray();
-          System.out.println("DevReadValue " + vals[0]);
+          short stateValue2 = values.extractShort();
+          System.out.println("State (elin/v-rv/1)= " + stateValue2 + " [" + XdrTacoType.getStateName(stateValue2) + "]");
 
           TacoData state2 = dev2.get(TacoConst.DevState);
-          short stateValue2 = state2.extractShort();
+          stateValue2 = state2.extractShort();
           System.out.println("State (sr/jlp/1)= " + stateValue2 + " [" + XdrTacoType.getStateName(stateValue2) + "]");
 
           cmdCode = dev3.getCommandCode("DevUpdate");
