@@ -1,4 +1,4 @@
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/poller.c,v 1.1 2005-09-28 20:08:33 andy_gotz Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/poller.c,v 1.2 2005-11-06 06:41:17 andy_gotz Exp $";
 
 #ifndef _OSK
 #include <sys/types.h>
@@ -2807,12 +2807,12 @@ int main(int argc,char *argv[])
   	daemon_device_struct_type *current_device_ptr;
   	int polldevice;
   	char *addr;
-#ifdef sun
+#ifdef _old_sun_code
 #ifndef __cplusplus
   	int sig_mask;
   	struct sigvec sighand;
 #endif
-#endif /* sun */
+#endif /* _solaris */
   	struct timeval pause;
 #if (OSK || _OSK)
   	int proc_pid;
@@ -2833,8 +2833,7 @@ int main(int argc,char *argv[])
 #if (OSK || _OSK) 
   	intercept(user_sig);
 #else
-#ifdef sun
-#ifdef __cplusplus
+#ifdef _solaris
 	sigset_t sigs_to_block;
 	sigemptyset(&sigs_to_block);
 	sigaddset(&sigs_to_block,SIGHUP);
@@ -2853,7 +2852,7 @@ int main(int argc,char *argv[])
 	sigaction(SIGINT,&sa,0);
 	sigaction(SIGTERM,&sa,0);
 	sigaction(SIGALRM,&sa,0);
-#else
+#ifdef __old_sun_code
   	sig_mask = sigmask(SIGHUP | SIGPIPE);
   	sigsetmask(sig_mask);
 
@@ -2875,7 +2874,7 @@ int main(int argc,char *argv[])
   	(void) sigset (SIGINT,  signal_handler);
   	(void) sigset (SIGTERM, signal_handler);
   	(void) sigset (SIGALRM, signal_handler);
-#endif /* sun */
+#endif /* _solaris */
 #endif /* _OSK */
 
 
