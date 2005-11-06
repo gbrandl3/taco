@@ -17,13 +17,13 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-sbin_PROGRAMS	=dcwr_alo dcrd_alo
+sbin_PROGRAMS	=dc_wr_alo dc_rd_alo
 
 AM_CPPFLAGS	= -DALONE
 INCLUDES	=-I$(top_srcdir)/dbase/include @TACO_INCLUDES@
 LIBDC		=../library/libdcmem.la
 
-dcwr_alo_SOURCES=dc_devall.c \
+dc_wr_alo_SOURCES=dc_devall.c \
 		dc_devinf.c \
 		dc_inf.c \
 		dc_put.c \
@@ -31,13 +31,13 @@ dcwr_alo_SOURCES=dc_devall.c \
 		dcwr_svc.c \
 		dcwr_xdr.c 
 
-dcwr_alo_LDADD	= @TACO_SERVER_LIBS@ $(LIBDC)
+dc_wr_alo_LDADD	= @TACO_SERVER_LIBS@ $(LIBDC)
 
-dcrd_alo_SOURCES=dc_devall.c \
+dc_rd_alo_SOURCES=dc_devall.c \
 		dc_devinf.c \
 		dc_inf.c \
 		dc_read.c \
 		dcrd_svc.c \
 		dcrd_xdr.c 
 
-dcrd_alo_LDADD	= @TACO_SERVER_LIBS@ $(LIBDC)
+dc_rd_alo_LDADD	= @TACO_SERVER_LIBS@ $(LIBDC)
