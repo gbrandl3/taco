@@ -18,7 +18,7 @@ dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_INIT([TACO], [3.90.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.68 $)dnl
+AC_REVISION($Revision: 1.69 $)dnl
 AC_COPYRIGHT([(C) 1990-2005 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -323,7 +323,7 @@ AC_SUBST(UIC, ['/usr/lib/qt3/bin/uic'])
 AC_SUBST(MOC, ['/usr/lib/qt3/bin/moc'])
 AC_SUBST(QT_LDFLAGS, ['-L/usr/lib/qt3/lib'])
 AC_SUBST(LIBSM, ['-lSM -lICE'])
-AC_SUBST(LIB_X11, ['-lX11 $(LIBSOCKET)'])
+AC_SUBST(LIB_X11, ['-lX11 $(LIBSM) $(LIBSOCKET)'])
 AC_SUBST(LIB_QT, ['-lqt $(LIBPNG) $(LIBJPEG) -lXext $(LIB_X11) $(LIBSM)'])
 AC_SUBST(X_LDFLAGS, ['-L/usr/X11R6/lib'])
 
@@ -348,8 +348,8 @@ AC_SUBST([aclocaldir], ['${datadir}/aclocal'])
 
 AC_SUBST(TACO_INCLUDES, ["-I\$(top_srcdir)/lib/xdr -I\$(top_srcdir)/lib -I\$(top_srcdir)/lib/dc -I\$(top_srcdir)/lib/dbase -I\$(top_srcdir)/lib/tc -I\$(top_srcdir)/lib/ascii -I\$(top_srcdir)/lib/signal] -I\$(top_srcdir)/lib/private") 
 
-AC_SUBST(TACO_SERVER_LIBS, ["\$(top_builddir)/lib/libtaco.la \$(top_builddir)/lib/libtacomain.la"])
-AC_SUBST(TACO_SERVER_CXX_LIBS, ["\$(top_builddir)/lib/libtaco++.la \$(top_builddir)/lib/libtacomain.la"])
+AC_SUBST(TACO_SERVER_LIBS, ["\$(top_builddir)/lib/libtacomain.la \$(top_builddir)/lib/libtaco.la"])
+AC_SUBST(TACO_SERVER_CXX_LIBS, ["\$(top_builddir)/lib/libtacomain.la \$(top_builddir)/lib/libtaco++.la"])
 AC_SUBST(TACO_SERVER_NOMAIN_CXX_STATIC_LIBS, ["\$(top_builddir)/lib/.libs/libtaco++.a"])
 AC_SUBST(TACO_CLIENT_LIBS, ["\$(top_builddir)/lib/libtaco.la"])
 AC_SUBST(TACO_CLIENT_CXX_LIBS, ["\$(top_builddir)/lib/libtaco++.la"])
