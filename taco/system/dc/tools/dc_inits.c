@@ -61,9 +61,12 @@ int main(int argc, char **argv)
 	long 		error;
 	char 		*tmp;
 	unsigned int 	diff;
-	DevLong 	dev_num = 0,
-			dat_size = 0,
-			cell_num = 0;
+/*
+ * changed the default values from zero to the values I have on id11
+ */
+	DevLong 	dev_num = 100,
+			dat_size = 252488,
+			cell_num = 50;
 	int 		nb_tot;
 	char 		hostna[HOST_NAME_LENGTH],
 			dev_name[DEV_NAME_LENGTH];
