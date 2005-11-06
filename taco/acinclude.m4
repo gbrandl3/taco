@@ -329,9 +329,9 @@ AC_DEFUN([X_AND_MOTIF],
 	CPPFLAGS="$CPPFLAGS $MOTIF_INCLUDES"
 	LIBS_SAVE="$LIBS"
 dnl	X_CFLAGS="$CPPFLAGS"
-dnl	X_LDFLAGS="$LIBS $X_LDFLAGS $MOTIF_LIBS"
+	X_LDFLAGS="$LIBS $X_LDFLAGS $MOTIF_LIBS"
 	AC_CHECK_HEADERS([Xm/Xm.h Xm/XmAll.h], [
-		AC_CHECK_LIB(Xm, XmStringCreateLocalized, [], [motif_found=no], [$X_LDFLAGS -lXt -lX11])
+		AC_CHECK_LIB(Xm, XmStringCreateLocalized, [], [motif_found=no], [$X_LDFLAGS -lXt -lX11 -lSM -lICE])
 		break;
 	], [motif_found=no])
 	CPPFLAGS="$CPPFLAGS_SAVE"
