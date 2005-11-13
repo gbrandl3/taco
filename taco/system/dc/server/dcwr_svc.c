@@ -562,7 +562,8 @@ static int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_ser
 	tmp = (unsigned char)host->h_addr[3];
 
 /* Build the pseudo device server name */
-	strcpy(ds_name, "dc_server_wr/");
+	/*strcpy(ds_name, "dc_server_wr/"); - problems exporting the dc server, try a shorter name*/
+	strcpy(ds_name, "dc_wr_alo/");
 	strcpy(h_name, host->h_name);
 	if ((tmp1 = strchr(h_name,'.')) != NULL)
 	{
@@ -634,10 +635,12 @@ static int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_ser
 		}
 		else
 		{
+			fprintf(stderr,"dc_server_wr : I am not defined, try to define me in the database...\n");
 /* Build the device definition string */
 			strcpy(dev_def,ds_name);
 			strcat(dev_def,"/device:");
 			strcat(dev_def,d_name);
+			fprintf(stderr,"dc_server_wr : device definition = %s\n",dev_def);
 
 			dev_def_array = calloc(1,sizeof(char *));
 			dev_def_array[0] = dev_def;
@@ -651,7 +654,7 @@ static int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_ser
 /* Export me to the outside world */
 			if (db_dev_export(&devinfo,1,&error) == -1)
 			{
-				fprintf(stderr,"dc_server_wr : Can't export me to outside world, exiting...\n");
+				fprintf(stderr,"dc_server_wr : Can't export me to outside world even after trying to define myself, exiting...\n");
 				fprintf(stderr,"dc_server_wr : Error code : %d\n",error);
 				return(-1);
 			}
@@ -785,9 +788,18 @@ static int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_ser
  */
 static int shm_size(char *host_name)
 {
+/*
 	static long 	dev_num,
 			dat_size1,
 			cell_num;
+ */
+/*
+ * changed the default values from zero to the values I have on id11
+ */
+        static long     dev_num = 100,
+                        dat_size1 = 252488,
+                        cell_num = 50;
+
 	unsigned int 	diff;
 	int 		nb_tot;
 	char 		dev_name[DEV_NAME_LENGTH],
@@ -806,7 +818,6 @@ static int shm_size(char *host_name)
 	strcat(dev_name,hostna);
 
 /* Retrieve data collector memories size */
-	dev_num = dat_size1 = cell_num = 0;
 	res1[0].resource_adr = &dev_num;
 	res1[1].resource_adr = &cell_num;
 	res1[2].resource_adr = &dat_size1;
