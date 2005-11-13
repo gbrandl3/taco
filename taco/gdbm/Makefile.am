@@ -64,6 +64,6 @@ gdbm.h:	gdbm.proto gdbmerrno.h gdbm.proto2
 	cat $(srcdir)/gdbm.proto2 >> gdbm.h
 	chmod -w gdbm.h
 
-ndbm.h:
+ndbm.h: gdbm.h
 	rm -f ndbm.h
 	cp $(srcdir)/ndbm.h ndbm.h
