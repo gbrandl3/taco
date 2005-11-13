@@ -63,6 +63,7 @@ dnl disable the build of gdbm if gdbm support of database server is disabled
 	AM_CONDITIONAL(BUILD_GDBM, test "x$taco_build_gdbm" = "xyes")
 	AC_SUBST(GDBM_CFLAGS)
 	AC_SUBST(GDBM_LIBS)
+	AC_SUBST(GDBM_COMPAT_LIBS)
 	AC_SUBST(MYSQL_CFLAGS)
 	AC_SUBST(MYSQL_LIBS)
 ])
@@ -370,6 +371,7 @@ dnl
 	TACO_GDBM_LDFLAGS="$GDBM_LIBS"
 
 	GDBM_LIBS="$GDBM_LIBS -lgdbm"
+	GDBM_COMPAT_LIBS="$GDBM_LIBS -lgdbm_compat"
 
 	if test "x$gdbm_includes" != "x" ; then
 		GDBM_CFLAGS="-I$gdbm_includes"
