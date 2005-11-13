@@ -44,11 +44,11 @@ int main(int argc, char **argv)
 			l2;
 	long 		error;
 	char 		*tmp;
-	DevString	passwd = NULL;
+	DevString	passwd = "setup";
 	unsigned int diff;
-	DevLong 	dev_num,
-			dat_size,
-			cell_num;
+	DevLong 	dev_num=100,
+			dat_size=252488,
+			cell_num=50;
 	char 		hostna[HOST_NAME_LENGTH],
 			dev_name[DEV_NAME_LENGTH];
 	int 		ptr_size,

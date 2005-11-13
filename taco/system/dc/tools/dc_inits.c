@@ -7,6 +7,7 @@
 #include <sys/shm.h>
 #include <sys/sem.h>
 #include <errno.h>
+#include <netdb.h>
 #include <dcP.h>
 
 #ifdef linux
@@ -72,15 +73,31 @@ int main(int argc, char **argv)
 			dev_name[DEV_NAME_LENGTH];
 	int 		ptr_size,
 			alloc_size;
+        DevVarStringArray       host_dc = {0, NULL};
+	char 		*dc_default_host[] = {NULL}; 
+	long		max_call = 0;
 	db_resource 	res1[] = {
 				{"dev_number", D_LONG_TYPE, &dev_num},
 				{"cellar_number", D_LONG_TYPE, &cell_num},
 				{"data_size", D_LONG_TYPE, &dat_size},
 		    	};
+	db_resource	res2[] = {
+				{"host", D_VAR_STRINGARR, &host_dc},
+			};
+	db_resource	res3[] = {
+				{"max_call", D_LONG_TYPE, &max_call},
+			};
+        db_resource     res4[1];
 	int 		res1_size = sizeof(res1) / sizeof(db_resource);
+	int 		res2_size = sizeof(res2) / sizeof(db_resource);
+	int 		res3_size = sizeof(res3) / sizeof(db_resource);
         int             c;
         extern int      optind,
                         optopt;
+	struct 	hostent	*host;
+	unsigned char	network;
+	char		res_name[RES_NAME_LENGTH];
+	char		*dc_default_network = NULL;
 
 /* Argument test */
        while ((c = getopt(argc, argv, "h")) != -1)
@@ -105,6 +122,11 @@ int main(int argc, char **argv)
 
 /* Build device name. It is a function of the host name */
 	gethostname(hostna,sizeof(hostna));
+	if ((host = gethostbyname(hostna)) == NULL)
+	{
+		fprintf(stderr, "dc_inits : Cannot get the host information , gethostbyname() failed\n");
+		exit(-1);
+	}
 	if ((tmp = strchr(hostna,'.')) != NULL) 
 	{
 		diff = (u_int)(tmp - hostna);
@@ -112,6 +134,8 @@ int main(int argc, char **argv)
 	}
 	strcpy(dev_name,"CLASS/DC/");
 	strcat(dev_name,hostna);
+	network = (unsigned char)host->h_addr[2];
+		
 
 /* Retrieve data collector memories size */
 	if (db_getresource(dev_name,res1,res1_size,&error)) 
@@ -134,6 +158,69 @@ int main(int argc, char **argv)
 
 /* Create memories and semaphores */
 	from_scratch(ptr_size,alloc_size,dat_size,nb_tot);
+
+/* In order to make the data collector run without any resources
+ * defined in the database this code will define the current host
+ * as the single host on which the dc runs if no hosts are defined
+ *
+ * andy 09nov05
+ */
+
+        if (db_getresource("CLASS/DC/1",res2,res2_size,&error))
+        {
+                fprintf(stderr,"dc_inits : Can't retrieve host resources\n");
+                fprintf(stderr,"dc_inits : Error code : %d\n",error);
+        }
+        if (host_dc.length == 0)
+        {
+                fprintf(stderr,"dc_inits : Resource host not defined\n");
+                fprintf(stderr,"dc_inits : I define %s as the default !\n",hostna);
+		dc_default_host[0] = hostna;
+		host_dc.length = 1;
+		host_dc.sequence = dc_default_host;
+        	if (db_putresource("CLASS/DC/1",res2,res2_size,&error))
+		{
+                	fprintf(stderr,"dc_inits : Failed to put default dc host in database\n");
+                	fprintf(stderr,"dc_inits : Error code : %d\n",error);
+        	}
+        }
+        if (db_getresource("CLASS/DC/1",res3,res3_size,&error))
+        {
+                fprintf(stderr,"dc_inits : Can't retrieve max_call resources\n");
+                fprintf(stderr,"dc_inits : Error code : %d\n",error);
+        }
+        if (max_call == 0)
+        {
+		max_call = 1000;
+                fprintf(stderr,"dc_inits : Maximum number of calls not defined\n");
+                fprintf(stderr,"dc_inits : I define %d as the default !\n",max_call);
+        	if (db_putresource("CLASS/DC/1",res3,res3_size,&error))
+		{
+                	fprintf(stderr,"dc_inits : Failed to put default max_call in database\n");
+                	fprintf(stderr,"dc_inits : Error code : %d\n",error);
+        	}
+        }
+	snprintf(res_name, sizeof(res_name), "%u_default",network);
+	dc_default_network = NULL;
+	res4[0].resource_name = res_name;
+	res4[0].resource_type = D_STRING_TYPE;
+	res4[0].resource_adr = &dc_default_network;
+	if (db_getresource("class/dc/1",res4,1,&error) == DS_OK)
+	{
+		if (dc_default_network == NULL)
+		{
+			dc_default_network = hostna;
+			res4[0].resource_adr = &dc_default_network;
+                	fprintf(stderr,"dc_inits : Data collector network default host not defined\n");
+                	fprintf(stderr,"dc_inits : I define %s as the default !\n",hostna);
+        		if (db_putresource("CLASS/DC/1",res4,1,&error))
+			{
+                		fprintf(stderr,"dc_inits : Failed to put default network host in database\n");
+                		fprintf(stderr,"dc_inits : Error code : %d\n",error);
+        		}
+		}
+	}
+
 	return 0;
 }
 

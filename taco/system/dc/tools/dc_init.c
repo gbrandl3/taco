@@ -605,9 +605,9 @@ int dc_res_request(long *error_ptr)
 
 int dc_class_dc(long *error_ptr)
 {
-	DevLong 	dev_number = 1234,
-			cellar_number = 1234,
-			data_size = 1234;
+	DevLong 	dev_number = 100,
+			cellar_number = 252488,
+			data_size = 50;
 	db_resource 	put_class_res[7];
 	int 		nb_put_class_res = 0;
 	char 		hostna[HOST_NAME_LENGTH],
@@ -615,7 +615,7 @@ int dc_class_dc(long *error_ptr)
 	unsigned int 	diff;
 	char 		*tmp,
 			*taco_path;
-	DevString	pass = NULL,
+	DevString	pass = "setup",
 			path = NULL,
 			s_path = NULL,
 			login = NULL;
