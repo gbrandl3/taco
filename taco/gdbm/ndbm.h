@@ -32,10 +32,12 @@
 
 
 /* The data and key structure.  This structure is defined for compatibility. */
+#ifndef _GDBM_H_
 typedef struct {
 	char *dptr;
 	int   dsize;
       } datum;
+#endif
 
 
 /* The file information header. This is good enough for most applications. */
@@ -43,29 +45,35 @@ typedef struct {int dummy[10];} DBM;
 
 
 /* These are the routines (with some macros defining them!) */
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-extern DBM 	*dbm_open ();
+extern DBM 	*dbm_open (...);
 
-extern void	 dbm_close ();
+extern void	 dbm_close (...);
 
-extern datum	 dbm_fetch ();
+extern datum	 dbm_fetch (...);
 
-extern int	 dbm_store ();
+extern int	 dbm_store (...);
 
-extern int	 dbm_delete ();
+extern int	 dbm_delete (...);
 
-extern int	 dbm_delete ();
+extern int	 dbm_delete (...);
 
-extern datum	 dbm_firstkey ();
+extern datum	 dbm_firstkey (...);
 
-extern datum	 dbm_nextkey ();
+extern datum	 dbm_nextkey (...);
 
 #define		 dbm_error(dbf)  (0)
 
 #define		 dbm_clearerr(dbf)
 
-extern int	 dbm_dirfno ();
+extern int	 dbm_dirfno (...);
 
-extern int	 dbm_pagfno ();
+extern int	 dbm_pagfno (...);
 
-extern int	 dbm_rdonly ();
+extern int	 dbm_rdonly (...);
+#ifdef __cplusplus
+}
+#endif
