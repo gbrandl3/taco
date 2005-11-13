@@ -31,11 +31,11 @@
  * 		Synopsis : db_fillup <0/1>
  *
  * Author(s):
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
- * Version:     $Revision: 1.11 $
+ * Version:     $Revision: 1.12 $
  *
- * Date:        $Date: 2005-07-25 11:30:27 $
+ * Date:        $Date: 2005-11-13 19:51:35 $
  */
 
 #include <cstdio>
@@ -229,7 +229,7 @@ static int from_res(void)
 //
 // Get the contents of this directory 
 	FILE	*file;
-	if ((file = popen("ls -R1p", "r")) == NULL)
+	if ((file = popen("ls -R1pL", "r")) == NULL)
 	{
 		std::cerr << "db_fillup : Can't get contents of directory" << std::endl;
 		leave();
@@ -1251,11 +1251,14 @@ static void create_db(void)
 
 /* Create database tables of the database definition */
 
+/*
 #if defined(linux) || defined(FreeBSD)
     	int flags = GDBM_WRCREAT; // O_CREAT | O_RDWR;
 #else
     	int flags = O_CREAT;
 #endif
+ */
+	int flags = GDBM_WRCREAT; /* all platforms use gdbm now - andy 8nov05 */
 
 /* Set the file permission mask in order to create db files with access for
    the rest of the world. The dbm_open */
