@@ -631,7 +631,8 @@ static int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_ser
 	tmp = (unsigned char)host->h_addr[3];
 
 /* Build the pseudo device server name */
-	strcpy(ds_name,"dc_server_rd/");
+	/*strcpy(ds_name,"dc_server_rd/"); - this name is too long for the database, changed it */
+	strcpy(ds_name,"dc_rd_alo/");
 	strcpy(h_name,host->h_name);
 	if ((tmp1 = strchr(h_name,'.')) != NULL)
 	{
@@ -852,9 +853,18 @@ static int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_ser
  */
 static int shm_size(char *host_name)
 {
+/*
 	static long dev_num;
 	static long cell_num;
 	static long dat_size1;
+ */
+/*
+ * changed the default values from zero to the values I have on id11
+  */
+        static long dev_num = 100,
+	            dat_size1 = 252488,
+		    cell_num = 50;
+
 	unsigned int diff;
 	char dev_name[DEV_NAME_LENGTH];
 	char hostna[HOST_NAME_LENGTH];
@@ -875,7 +885,6 @@ static int shm_size(char *host_name)
 
 /* Retrieve data collector memories size */
 
-	dev_num = dat_size1 = 0;
 	res1[0].resource_adr = &dev_num;
 	res1[1].resource_adr = &cell_num;
 	res1[2].resource_adr = &dat_size1;
