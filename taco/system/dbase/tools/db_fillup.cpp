@@ -33,9 +33,9 @@
  * Author(s):
  *              $Author: andy_gotz $
  *
- * Version:     $Revision: 1.12 $
+ * Version:     $Revision: 1.13 $
  *
- * Date:        $Date: 2005-11-13 19:51:35 $
+ * Date:        $Date: 2005-11-16 11:16:14 $
  */
 
 #include <cstdio>
@@ -746,7 +746,8 @@ static int res_line(std::string line1, std::ifstream &file, const std::string f_
     	int 		l_base,
 			ind,
     			i_string = 0,
-    			k1 = 1;
+    			k1 = 1,
+			k = 0;
 	register char 	*ptr,
 			*ptr1,
 			*ptr2,
@@ -771,7 +772,7 @@ static int res_line(std::string line1, std::ifstream &file, const std::string f_
 	l_base = pos;
 //
 // Copy the first line in the resulting buffer
-	int k = line1.length();
+	k = line1.length();
 	if (k > SIZE)
 	{
 		std::cerr << "Resource line \"" << line1 << "\" too long. Max " << SIZE << "chars." << std::endl;
@@ -791,7 +792,8 @@ static int res_line(std::string line1, std::ifstream &file, const std::string f_
 	{
 		file.getline(line, siz_line);
 		line_ptr++;
-		line[strlen(line) - 1] = 0;
+		// this chops off the last character! - andy 16nov2005
+		//line[strlen(line) - 1] = 0;
 
 // Verify the new line is not a simple resource definition 
 		if ((ptr2 = strchr(line,(int)':')) != NULL) 
@@ -839,7 +841,10 @@ static int res_line(std::string line1, std::ifstream &file, const std::string f_
 			return(ERR_RESVAL);
 		}
 		line1[j] = 0;
-		k = line1.length();
+		// length() is not a reliable indicator of string size, 
+		// it gives the maximum length this string ever had - andy 16nov2005
+		//k = line1.length();
+		k = strlen(line1.c_str());
 
 // Add this new line to the result buffer
 		strcat(ptr,line1.c_str());
