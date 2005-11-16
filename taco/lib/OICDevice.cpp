@@ -30,13 +30,13 @@
  *		OICDevice is derived from the Device class
  *
  * Author(s):	Andy Goetz
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original:	November 1996
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2005-07-25 13:08:28 $
+ * Date:	$Date: 2005-11-16 08:27:14 $
  *
  *-**********************************************************************/
 		
@@ -154,6 +154,7 @@ OICDevice::OICDevice (DevString devname, DevServerClass devclass, long *error)
 // values from the DevServer object and DevServerClass class.
 //
 	this->n_commands = oicclass->devserver_class.n_commands;
+	this->commands_list = (Device::DeviceCommandListEntry*)malloc(this->n_commands*sizeof(DeviceCommandListEntry));
 //
 // copy the list of commands and their input and output argument
 // types to the DeviceCommandListEntry. This code makes the assumption
@@ -167,33 +168,41 @@ OICDevice::OICDevice (DevString devname, DevServerClass devclass, long *error)
 		DevArgType _argin_type, _argout_type;
 		long _min_access;
 		char *_cmd_name;
+		DeviceCommandMapEntry cmd_map;
 		
-        _cmd = oicclass->devserver_class.commands_list[i].cmd;
+        	_cmd = oicclass->devserver_class.commands_list[i].cmd;
 		_fn = (DeviceMemberFunction)NULL;
 		_argin_type = (oicclass->devserver_class.commands_list[i].argin_type);
 		_argout_type = (oicclass->devserver_class.commands_list[i].argout_type);
 		_min_access = (oicclass->devserver_class.commands_list[i].min_access);
 		_cmd_name = (char*)(oicclass->devserver_class.commands_list[i].cmd_name);
         
-        this->commands_list[i].cmd = _cmd;
-        this->commands_list[i].fn = _fn;
-        this->commands_list[i].argin_type = _argin_type;
-        this->commands_list[i].argout_type = _argout_type;
-        this->commands_list[i].min_access = _min_access;
-        this->commands_list[i].cmd_name = _cmd_name;
+        	this->commands_list[i].cmd = _cmd;
+        	this->commands_list[i].fn = _fn;
+        	this->commands_list[i].argin_type = _argin_type;
+        	this->commands_list[i].argout_type = _argout_type;
+        	this->commands_list[i].min_access = _min_access;
+        	this->commands_list[i].cmd_name = _cmd_name;
 /*
- * the following does not work because commands_list is not a map anymore ...
+ * initialise the commands map at the same time
  *
- * andy 21dec2004
+ * andy 16nov2005
+ */
 
 	
-		this->commands_list[oicclass->devserver_class.commands_list[i].cmd] = 
-			Device::DeviceCommandListEntry(_cmd, _fn, _argin_type, _argout_type, _min_access, _cmd_name);
- *
+		cmd_map.cmd = _cmd;
+		cmd_map.fn = _fn;
+		cmd_map.arginType = _argin_type;
+		cmd_map.argoutType = _argout_type;
+		cmd_map.minAccess = _min_access;
+		cmd_map.cmd_name = _cmd_name;
+		this->commands_map[_cmd] =  cmd_map;
+		/*
+			Device::DeviceCommandMapEntry(_cmd, _fn, _argin_type, _argout_type, _min_access, _cmd_name);
 		printf("OICDevice::OICDevice() command(%d) cmd=%d argin_type=%d argout_type=%d min_access=%d\n",
 			i,this->commands_list[i].cmd,this->commands_list[i].argin_type,
 			this->commands_list[i].argout_type,this->commands_list[i].min_access);
-*/
+		*/
 	}
 // same for the new event list 
 	this->n_events = oicclass->devserver_class.n_events;
@@ -222,6 +231,10 @@ OICDevice::OICDevice (DevString devname, DevServerClass devclass, long *error)
  *		
  * BIG QUESTION MARK - do we need this method at all ?
  * why not simply use the base class Command method ?
+ *
+ * ANSWER - YES. This method calls the C method finder
+ * to execute the command which the base class Command
+ * does not do!
  *
  * @param cmd 		command to execute
  * @param argin 	pointer to input argument
