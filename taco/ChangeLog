@@ -1,3 +1,10 @@
+2005-11-16 09:30 andy_gotz:
+	* fixed problems with data collector starting without resources
+	and dc write api not working correctly
+	* updated db_dump tool
+	* fixed bug in security mode for C++ device servers (which could cause them
+	to take all the available memory and eventually crash the system !)
+	* updated taco library version to 11.0.2 and taco package to 3.91.0
 2005-10-19 13:00 jkrueger1:
 	* lib/dbase/setacc_cli.c: Fix: some problems with dev_import and not
 	set NETHOST environment variable. Imports of devices on different host
