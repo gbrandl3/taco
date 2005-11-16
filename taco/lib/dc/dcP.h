@@ -23,11 +23,11 @@
  * Description:
  *
  * Author(s):	
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 12:55:41 $
+ * Date:	$Date: 2005-11-16 08:27:41 $
  *  
  ******************************************************************************/
 
@@ -96,7 +96,7 @@
 #define CMD_HEADER_SIZE	sizeof(int) * 3 /* Cmd header size */
 
 #define	HIST	100			/* Keep the last 100 results */
-#define	TIME_OFF	713000000	/* Offset to substract from time */
+#define	TIME_OFF	1072224000	/* Offset to substract from time  - epoch 2005*/
 
 #define NB_STRUCT	64		/* Number of structures (dc_devdef) */
 #define NB_STRUCT_SHIFT	6		/* Number of shift (dc_devdef) */
