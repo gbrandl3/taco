@@ -26,13 +26,13 @@
  *		the device server base class in C++ (Device).
  *
  * Author(s):	Andy Goetz
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original:	March 1995
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2005-07-25 13:08:22 $
+ * Date:	$Date: 2005-11-16 08:20:40 $
  *
  *-**********************************************************************/
 		
@@ -107,10 +107,6 @@ Device::Device (DevString devname, long *error)
 	}
 	strcpy(this->name, devname);
 //
-// the following commands will not be added by default, it is up to the device subclass to add these
-// if needed - andy 24nov2004
-//
-//
 // initialise the commands list
 //
 	this->n_commands = this->commands_map.size();
@@ -158,10 +154,9 @@ long Device::Command (long cmd, void* argin, long argin_type,
 //
 // add code to execute a command here
 //
-	for (std::map<DevCommand, DeviceCommandMapEntry>::iterator it = this->commands_map.begin(); it != this->commands_map.end(); ++it)
+	std::map<DevCommand, DeviceCommandMapEntry>::iterator it = this->commands_map.find(cmd);
+	if (it != this->commands_map.end())
 	{
-		if (cmd == it->second.cmd)
-		{
 			if (argin_type != it->second.arginType || argout_type != it->second.argoutType)
 			{
 				*error = DevErr_IncompatibleCmdArgumentTypes;
@@ -179,7 +174,6 @@ long Device::Command (long cmd, void* argin, long argin_type,
 //
 			member_fn = it->second.fn;
 			return (this->*member_fn)(argin,argout,error);
-		}
 	}
 
 //
@@ -403,12 +397,16 @@ long Device::Get_min_access_right(long cmd,long *min_access,long *error)
 {
 	*error = DS_OK;
 
-	for (long i = 0;i < this->commands_map.size(); i++)
-		if (cmd == this->commands_map[i].cmd)
-		{
-			*min_access = this->commands_map[i].minAccess;
-			return(DS_OK);
-		}
+	int _commands_map_size = this->commands_map.size();
+	if (_commands_map_size == 0)
+		_commands_map_size = GetCommandNumber();
+	std::map<DevCommand, DeviceCommandMapEntry>::iterator it = this->commands_map.find(cmd);
+	if (it != this->commands_map.end())
+	{
+//		printf("Device::Get_min_access_right(): commands_map[%d].cmd = %d\n",cmd,this->commands_map[cmd].cmd);
+		*min_access = it->second.minAccess;
+		return(DS_OK);
+	}
 	*error = DevErr_CommandNotImplemented;
 	return(DS_NOTOK);
 }
@@ -494,12 +492,13 @@ long Device::EventQuery(_dev_event_info *event_info)
 unsigned int Device::GetCommandNumber()
 {
 //
-//
 // in the new scheme of things the command list is a map instead of
-// an array. if the map has not commands then assume the device class
-// has initialised the array and not the map. copy the array contents
-// to the map. this should only be done once because afterwards the
-// the map will be initialised - andy 24nov2004
+// an array. if the map has no commands then assume the device class
+// has initialised the commands list and not the map (ESRF case). In
+// this case copy the array contents to the map. This should only be 
+// done once because afterwards the map will be initialised 
+//
+// - andy 24nov2004
 //
 	if (commands_map.size() == 0) 
 	{
@@ -516,6 +515,7 @@ unsigned int Device::GetCommandNumber()
 				this->commands_list[i].cmd_name);
 		}
 	}
-	return commands_map.size();
+	int _commands_map_size = commands_map.size();
+	return _commands_map_size;
 }
 
