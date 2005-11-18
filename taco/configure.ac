@@ -16,16 +16,16 @@ dnl You should have received a copy of the GNU Lesser General Public
 dnl License along with this library; if not, write to the Free Software
 dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_INIT([TACO], [3.91.0], [taco-devel@lists.sourceforge.net])
+AC_INIT([TACO], [3.92.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.71 $)dnl
+AC_REVISION($Revision: 1.72 $)dnl
 AC_COPYRIGHT([(C) 1990-2005 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
 
 TACO_INIT([no])
 
-AC_SUBST(LIB_VERSION, [11:2:0])
+AC_SUBST(LIB_VERSION, [11:3:0])
 
 AM_INIT_AUTOMAKE([dist-bzip2 1.7])
 
