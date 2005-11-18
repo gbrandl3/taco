@@ -17,7 +17,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 include_HEADERS		= dc.h  dcP.h  dc_xdr.h  dcrd_xdr.h  dcwr_xdr.h
-lib_LTLIBRARIES		= libdcapi.la
+#lib_LTLIBRARIES	= libdcapi.la
+noinst_LTLIBRARIES      = libdcapi.la
+
+
 
 libdcapi_la_SOURCES	= dc_sdev.c dchist_cli.c dcrd_xdr.c dcrd_cli.c \
 			dcrd_clnt.c dcwr_xdr.c dcwr_cli.c dcwr_clnt.c utils_cli.c
