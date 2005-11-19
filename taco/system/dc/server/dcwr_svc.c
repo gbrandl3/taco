@@ -627,13 +627,14 @@ static int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_ser
 
 	if (db_dev_export(&devinfo,1,&error))
 	{
-		if (error != DbErr_DeviceNotDefined)
+/*
+		if (error != DbErr_DeviceNotDefined || error != DbErr_DatabaseAccess)
 		{
 			fprintf(stderr,"dc_server_wr : Can't export me to outside world, exiting...\n");
 			fprintf(stderr,"dc_server_wr : Error code : %d\n",error);
-			return(-1);
 		}
 		else
+ */
 		{
 			fprintf(stderr,"dc_server_wr : I am not defined, try to define me in the database...\n");
 /* Build the device definition string */
@@ -648,7 +649,7 @@ static int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_ser
 			if (db_upddev(1,dev_def_array,&dev_def_err,&error) == -1)
 			{
 				fprintf(stderr,"dc_server_wr: Pseudo device for dc server not defined in db\n");
-				fprintf(stderr," and I can't defined it. Error = %d\n",error);
+				fprintf(stderr," and I can't define it. Error = %d\n",error);
 				return(-1);
 			}
 /* Export me to the outside world */
