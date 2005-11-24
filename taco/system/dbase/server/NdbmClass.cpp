@@ -25,9 +25,9 @@
  * Author(s):
  *		$Author: jkrueger1 $
  * 
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2005-07-25 08:23:34 $
+ * Date:	$Date: 2005-11-24 08:48:34 $
  *
  */
 #include <cstdlib>
@@ -589,7 +589,7 @@ std::string NdbmPSNamesKey::get_psdev_domain_name(void) const
 	
 	if (pos == std::string::npos)
 		throw NdbmError(DbErr_BadDevSyntax,MessDevSyntax);
-	return str.substr(0, pos + 1);
+	return str.substr(0, pos);
 }
 
 //! Method to return the pseudo device name family part from the key content
