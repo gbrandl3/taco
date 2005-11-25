@@ -23,11 +23,11 @@
  * Description:
  *
  * Author(s):
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  * 
- * Version:	$Revision: 1.14 $
+ * Version:	$Revision: 1.15 $
  *
- * Date:	$Date: 2005-11-24 08:48:34 $
+ * Date:	$Date: 2005-11-25 10:08:36 $
  *
  */
 #include <cstdlib>
@@ -146,7 +146,8 @@ void NdbmNamesKey::build_datum()
 			if (key.dsize)
 				delete [] key.dptr;
 			key.dptr = new char[l + 1];
-			strcpy(key.dptr,str.c_str());
+			strncpy(key.dptr,str.c_str(),l);
+	                key.dptr[l] = 0; /* NULL terminate string - andy 23nov2005 */
 			key.dsize = l;
 		}
 		catch (std::bad_alloc)
@@ -273,9 +274,9 @@ NdbmNamesCont::~NdbmNamesCont()
 }
 
 //! Class constructor to be used with the record key
-NdbmNamesCont::NdbmNamesCont(GDBM_FILE db, datum key)
+NdbmNamesCont::NdbmNamesCont(GDBM_FILE db, datum call_key)
 {
-	dat = gdbm_fetch(db, key);
+	dat = gdbm_fetch(db, call_key);
 	if (dat.dptr != NULL)
 		str = std::string(dat.dptr, dat.dsize);
 	else
@@ -558,10 +559,10 @@ NdbmPSNamesKey::~NdbmPSNamesKey()
 }
 
 //! Class constructor to be used with the record key
-NdbmPSNamesKey::NdbmPSNamesKey(datum key)
+NdbmPSNamesKey::NdbmPSNamesKey(datum call_key)
 {
-    if (key.dptr != NULL)
-	str = std::string(key.dptr, key.dsize);
+    if (call_key.dptr != NULL)
+	str = std::string(call_key.dptr, call_key.dsize);
     else
 	throw NdbmError(DbErr_CantBuildKey,MessBuildKey);
 }
@@ -643,11 +644,11 @@ NdbmPSNamesCont::~NdbmPSNamesCont()
 }
 
 //! Class constructor to be used with the record key
-NdbmPSNamesCont::NdbmPSNamesCont(GDBM_FILE db, datum key)
+NdbmPSNamesCont::NdbmPSNamesCont(GDBM_FILE db, datum call_key)
 {
 	datum content;
 
-	content = gdbm_fetch(db,key);
+	content = gdbm_fetch(db,call_key);
 	if (content.dptr != NULL)
 		str = std::string(content.dptr, content.dsize);
 	else
@@ -967,9 +968,9 @@ NdbmResCont::~NdbmResCont()
 }
 
 //! Class constructor to be used with the record key
-NdbmResCont::NdbmResCont(GDBM_FILE db, datum key)
+NdbmResCont::NdbmResCont(GDBM_FILE db, datum call_key)
 {
-	datum content = gdbm_fetch(db, key);
+	datum content = gdbm_fetch(db, call_key);
 	if (content.dptr != NULL)
 	{
 		str = std::string(content.dptr, content.dsize);
