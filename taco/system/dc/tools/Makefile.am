@@ -32,7 +32,8 @@ bin_PROGRAMS = 	dc_del \
 		dc_mfree \
 		dc_mfrees \
 		dc_devall \
-		dc_patch
+		dc_patch \
+		dc_cmd
 
 ##		dc_test \
 
@@ -59,5 +60,7 @@ dc_mfree_SOURCES = dc_mfree.c
 dc_mfrees_SOURCES = dc_mfrees.c
 
 dc_patch_SOURCES = dc_patch.c
+
+dc_cmd_SOURCES = dc_cmd.c
 
 ## dc_test_SOURCES = dc_test.c
