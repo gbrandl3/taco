@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.15 $
+ * Version:	$Revision: 1.16 $
  *
- * Date:	$Date: 2005-07-25 08:30:51 $
+ * Date:	$Date: 2005-11-25 10:04:19 $
  *
  */
 
@@ -856,8 +856,13 @@ int NdbmServer::db_store_3(db_devinfo_3 &dev_stu)
 /*
  * WARNING !!!
  * This does not solve the problem of double device names in different servers
+ *
+ * checking the process name causes a problem at the ESRF because we use
+ * dynamic creation of devices which have different process names to
+ * the real process name! REMOVE THIS CHECK - andy 23nov2005
  */
-			if (cont.get_device_name() == dev_stu.dev_name && k.get_ds_name() == dev_stu.proc_name)
+//			if (cont.get_device_name() == dev_stu.dev_name && k.get_ds_name() == dev_stu.proc_name)
+			if (cont.get_device_name() == dev_stu.dev_name)
 				break;
 		}
 		if (key.dptr == NULL)
