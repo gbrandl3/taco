@@ -5,6 +5,7 @@
 #include <Admin.h>
 #include <pss_xdr.h>
 #include <SysNumbers.h>
+#include <dc.h>
 
 /**********************************/
 /* Return the command name of cmd */
@@ -33,11 +34,13 @@ char *GetCmdName(long cmd)
   server = (_Int)(cmd >> DS_IDENT_SHIFT);
   server = server & DS_IDENT_MASK;
   cmds_ident = (_Int)(cmd & cmd_number_mask);
-  
+ 
+#ifdef TANGO 
   if( team == DevTangoBase ) {  
     sprintf(ret,"TangoCommand%d",cmds_ident);    
     return ret;  
   }
+#endif
 
   sprintf(res_path, "CMDS/%d/%d", team, server);
   sprintf (res_name, "%d", cmds_ident);
@@ -145,20 +148,26 @@ int main(int argc,char *argv[])
   long dc_error=0;
   int ret;
   int i,j;
-  char c;
+  char c[BUFSIZ];
 
   DevShort  arg_short;
+  DevUShort arg_ushort;
   DevLong   arg_long;
+  DevULong  arg_ulong;
   DevFloat  arg_float;
   DevDouble arg_double;
   DevStateFloatReadPoint arg_stfloat;
  
   DevVarShortArray   arg_shortarr;
+  DevVarUShortArray  arg_ushortarr;
   DevVarLongArray    arg_longarr;
+  DevVarULongArray   arg_ulongarr;
   DevVarFloatArray   arg_floatarr;
   DevVarDoubleArray  arg_doublearr;
   DevDaresburyStatus arg_pss;
   DevString          arg_string;
+
+  setbuf(stdin, (char *)NULL);
 
   if( argc!=2 ) {
     printf("Usage : dc_cmd device_name\n");
@@ -171,7 +180,6 @@ int main(int argc,char *argv[])
     printf("Warning: Failed to load PSS xdr type:%s\n",dev_error_str(error));
     error = 0;
   }
-
   /* Fill the dc import structure */
 
   dc_imp.device_name = argv[1];
@@ -219,10 +227,10 @@ int main(int argc,char *argv[])
     }
 
     printf("\n Enter command to execute:");
-    rewind(stdin);
-    c=getchar();
+    fgets(c, sizeof(c), stdin);
+    j=atoi(c);
+    
     printf("\n");
-    j=c-'0';
     if(j>dc_inf.devinf_nbcmd) printf("Value out of range\n");
     else {
       if(j<=0) j=0;
@@ -241,6 +249,18 @@ int main(int argc,char *argv[])
 	    }
 	    break;
 	  
+	  case D_ULONG_TYPE:
+
+            if(  dc_devget(dc_imp.dc_ptr,dc_inf.devcmd[j-1].devinf_cmd,
+		 &arg_ulong,D_ULONG_TYPE,&error)<0 )
+            {
+	      printf("%s : %s\n",GetCmdName(dc_inf.devcmd[j-1].devinf_cmd),
+				 dev_error_str(error));
+            } else {
+	      printf("Value = %u \n",arg_ulong);
+	    }
+	    break;
+
 	  case D_LONG_TYPE:
 
             if(  dc_devget(dc_imp.dc_ptr,dc_inf.devcmd[j-1].devinf_cmd,
@@ -250,6 +270,18 @@ int main(int argc,char *argv[])
 				 dev_error_str(error));
             } else {
 	      printf("Value = %d \n",arg_long);
+	    }
+	    break;
+
+	  case D_USHORT_TYPE:
+
+            if(  dc_devget(dc_imp.dc_ptr,dc_inf.devcmd[j-1].devinf_cmd,
+		 &arg_ushort,D_USHORT_TYPE,&error)<0 )
+            {
+	      printf("%s : %s\n",GetCmdName(dc_inf.devcmd[j-1].devinf_cmd),
+				 dev_error_str(error));
+            } else {
+	      printf("Value = %u \n",arg_ushort);
 	    }
 	    break;
 
@@ -279,6 +311,22 @@ int main(int argc,char *argv[])
 	    }
 	    break;
 
+	  case D_VAR_USHORTARR:
+
+	    arg_ushortarr.length=0;
+	    arg_ushortarr.sequence=NULL;
+
+            if(  dc_devget(dc_imp.dc_ptr,dc_inf.devcmd[j-1].devinf_cmd,
+		 &arg_ushortarr,D_VAR_USHORTARR,&error)<0 )
+            {
+	      printf("%s : %s\n",GetCmdName(dc_inf.devcmd[j-1].devinf_cmd),
+				 dev_error_str(error));
+            } else {
+              for(i=0;i<arg_ushortarr.length;i++)
+	        printf("Arr[%2d] = %u \n",i,arg_ushortarr.sequence[i]);
+	    }
+	    break;
+	  
 	  case D_VAR_SHORTARR:
 
 	    arg_shortarr.length=0;
@@ -295,6 +343,22 @@ int main(int argc,char *argv[])
 	    }
 	    break;
 	  
+	  case D_VAR_ULONGARR:
+
+	    arg_ulongarr.length=0;
+	    arg_ulongarr.sequence=NULL;
+
+            if(  dc_devget(dc_imp.dc_ptr,dc_inf.devcmd[j-1].devinf_cmd,
+		 &arg_ulongarr,D_VAR_ULONGARR,&error)<0 )
+            {
+	      printf("%s : %s\n",GetCmdName(dc_inf.devcmd[j-1].devinf_cmd),
+				 dev_error_str(error));
+            } else {
+              for(i=0;i<arg_ulongarr.length;i++)
+	        printf("Arr[%2d] = %d \n",i,arg_ulongarr.sequence[i]);
+	    }
+	    break;
+
 	  case D_VAR_LONGARR:
 
 	    arg_longarr.length=0;
