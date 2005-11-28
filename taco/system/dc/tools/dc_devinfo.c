@@ -247,7 +247,15 @@ void printtype(int type)
 			printf("     with D_SHORT_TYPE\n");
 			break;
 
+		case D_USHORT_TYPE : 
+			printf("     with D_USHORT_TYPE\n");
+			break;
+
 		case D_LONG_TYPE : 
+			printf("     with D_LONG_TYPE\n");
+			break;
+
+		case D_ULONG_TYPE : 
 			printf("     with D_LONG_TYPE\n");
 			break;
 
@@ -279,8 +287,16 @@ void printtype(int type)
 			printf("     with D_VAR_SHORTARR\n");
 			break;
 
+		case D_VAR_USHORTARR : 
+			printf("     with D_VAR_USHORTARR\n");
+			break;
+
 		case D_VAR_LONGARR : 
 			printf("     with D_VAR_LONGARR\n");
+			break;
+
+		case D_VAR_ULONGARR : 
+			printf("     with D_VAR_ULONGARR\n");
 			break;
 
 		case D_VAR_FLOATARR : 
