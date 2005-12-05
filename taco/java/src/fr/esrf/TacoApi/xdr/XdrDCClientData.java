@@ -35,9 +35,11 @@ public class XdrDCClientData implements XdrAble {
           throws OncRpcException, IOException {
 
     error = xdr.xdrDecodeInt();
-    int ptrSize = xdr.xdrDecodeInt();  // Not used (should be 1)
-    argout = XdrTacoType.createXdr(type);
-    argout.xdrDecode(xdr);
+    if( error==0 ) {
+      int ptrSize = xdr.xdrDecodeInt();  // Not used (should be 1)
+      argout = XdrTacoType.createXdr(type);
+      argout.xdrDecode(xdr);
+    }
 
   }
 
