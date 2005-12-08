@@ -26,6 +26,7 @@ setenv sbindir @sbindir@
 setenv datadir @datadir@
 setenv pythondir @pythondir@
 setenv pyexecdir @pyexecdir@
+setenv localstatedir @localstatedir@
 
 ### USER SETUP START
 
@@ -69,7 +70,7 @@ setenv RES_BASE_DIR @resdatadir@
 endif
 
 setenv DBM_DIR @dbmdir@
-setenv LOGPATH @datadir@/taco/log
+setenv LOGPATH @logdir@
 if (${?NETHOST}) then
 ;
 else

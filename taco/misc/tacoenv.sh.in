@@ -26,6 +26,7 @@ sbindir=@sbindir@
 datadir=@datadir@
 pythondir=@pythondir@
 pyexecdir=@pyexecdir@
+localstatedir=@localstatedir@
 
 ### USER SETUP START
 # Add your domain tables here (comma separated)
@@ -56,7 +57,7 @@ unset DBTABLES_CUSTOM
 
 RES_BASE_DIR=${RES_BASE_DIR:-@resdatadir@}
 DBM_DIR=@dbmdir@
-LOGPATH=@datadir@/taco/log
+LOGPATH=@logdir@
 NETHOST=${NETHOST:-`@HOSTNAME@`}
 if test "$DSHOME" = "$prefix" ; then
 	LD_LIBRARY_PATH=@libdir@${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}

@@ -18,7 +18,7 @@ dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_INIT([TACO], [3.92.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.73 $)dnl
+AC_REVISION($Revision: 1.74 $)dnl
 AC_COPYRIGHT([(C) 1990-2005 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -332,7 +332,8 @@ AC_SUBST(appdefaultdir)
 AC_SUBST(docdir, ['${datadir}/doc/packages/taco'])
 AC_SUBST(templatedir, ['${datadir}/taco/templates'])
 AC_SUBST(resdatadir, ['${datadir}/taco/dbase/res'])
-AC_SUBST(dbmdir, ['${datadir}/taco/dbase/dbm'])
+AC_SUBST(dbmdir, ['${localstatedir}/cache/taco'])
+AC_SUBST(logdir, ['${localstatedir}/log/taco'])
 AC_SUBST(CMDS_resdir, ['${resdatadir}/CMDS'])
 AC_SUBST(ERROR_resdir, ['${resdatadir}/ERROR'])
 AC_SUBST(CLASS_resdir, ['${resdatadir}/CLASS'])
