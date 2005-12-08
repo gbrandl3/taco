@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:	$Date: 2005-07-25 08:31:56 $
+ * Date:	$Date: 2005-12-08 09:52:05 $
  *
  */
 
@@ -93,7 +93,7 @@ db_psdev_error *NdbmServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
 	{
 		psdev_elt *tmp = &(rece->psdev_arr.psdev_arr_val[i]);
 		long error;
-		if (reg_ps(rece->h_name,rece->pid, tmp->psdev_name, tmp->poll, &error) == -1)
+		if (reg_ps(rece->h_name,rece->pid, tmp->psdev_name, tmp->poll, &error) == DS_NOTOK)
 		{
 			err.error_code =  error;
 			err.psdev_err = i + 1;
@@ -121,7 +121,7 @@ db_psdev_error *NdbmServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
  * @param p_error Pointer for an error code
  *
  * @return This function returns 0 is everything OK. Otherwise, the returned value
- *    is -1 and the error code is set to the appropiate error.
+ *    is DS_NOTOK and the error code is set to the appropiate error.
  */
 long NdbmServer::reg_ps(char *h_name, long pid, char *ps_name, long poll, long *p_error)
 {
@@ -181,7 +181,7 @@ long NdbmServer::reg_ps(char *h_name, long pid, char *ps_name, long poll, long *
 			if (gdbm_store(dbgen.tid[dbgen.ps_names_index],key,content,GDBM_REPLACE) != 0)
 			{
 				*p_error = DbErr_DatabaseAccess;
-				return(-1);
+				return(DS_NOTOK);
 			}
 		}
 		catch ( ... )
@@ -271,7 +271,7 @@ db_psdev_error *NdbmServer::db_psdev_unreg_1_svc(arr1 *rece)
 	u_int	i;
 	long	error;
 	for (i = 0; i < num_psdev; i++)
-		if (unreg_ps(rece->arr1_val[i],&error) == -1)
+		if (unreg_ps(rece->arr1_val[i],&error) == DS_NOTOK)
 		{
 			err.error_code =  error;
 			err.psdev_err = i + 1;
@@ -296,7 +296,7 @@ db_psdev_error *NdbmServer::db_psdev_unreg_1_svc(arr1 *rece)
  * @param p_error Pointer for an error code
  *
  * @return This function returns 0 is everything OK. Otherwise, the returned value
- *    is -1 and the error code is set to the appropiate error.
+ *    is DS_NOTOK and the error code is set to the appropiate error.
  */
 long NdbmServer::unreg_ps(char *ps_name,long *p_error)
 {
