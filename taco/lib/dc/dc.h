@@ -23,11 +23,11 @@
  * Description:
  *
  * Author(s):	Emanuel Taurel
- *		$Author: jensmeyer $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2005-09-28 12:42:25 $
+ * Date:	$Date: 2005-12-09 14:33:03 $
  *
  *****************************************************************************/
 
@@ -66,22 +66,15 @@ typedef struct _dc_error {
 	int dev_error;
 	}dc_error,*Dc_error;
 
-#ifdef OLDDC
 typedef struct _dc_cmd_dat {
 	int cmd;
 	long cmd_error;
-	unsigned int length;
-	char *sequence;
-	}dc_cmd_dat,*Dc_cmd_dat;
-#else 
-typedef struct _dc_cmd_dat {
-	int cmd;
-	long cmd_error;
+#ifndef OLDDC
 	int cmd_time;
+#endif
 	unsigned int length;
 	char *sequence;
 	}dc_cmd_dat,*Dc_cmd_dat;
-#endif /* OLDDC */
 
 typedef struct _dc_dev_dat {
 	char *device_name;
@@ -103,35 +96,26 @@ typedef struct _datco {
 	long net_ind;
 	}datco;
 
+typedef struct _dc_dev_retdat {
 #ifdef OLDDC
-typedef struct _dc_dev_retdat {
 	devserver ds_ptr;
-	DevArgument argout;
-	DevType argout_type;
-	long *cmd_error;
-	}dc_dev_retdat;
 #else
-typedef struct _dc_dev_retdat {
 	datco *dc_ptr;
+#endif 
 	DevArgument argout;
 	DevType argout_type;
 	long *cmd_error;
 	}dc_dev_retdat;
-#endif /* OLDDC */
 
+typedef struct _dc_dev_mretdat {
 #ifdef OLDDC 
-typedef struct _dc_dev_mretdat {
 	devserver ds_ptr;
-	unsigned int nb_cmd;
-	dc_cmd_mretdat *cmd_mretdat;
-	}dc_dev_mretdat;
 #else
-typedef struct _dc_dev_mretdat {
 	datco *dc_ptr;
+#endif
 	unsigned int nb_cmd;
 	dc_cmd_mretdat *cmd_mretdat;
 	}dc_dev_mretdat;
-#endif /* OLDDC */
 
 typedef struct _dc_dev_imp {
 	char *device_name;
