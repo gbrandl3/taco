@@ -30,9 +30,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.22 $
+ * Version    :	$Revision: 1.23 $
  *
- * Date       : $Date: 2005-10-19 12:24:15 $
+ * Date       : $Date: 2005-12-09 16:06:07 $
  *
  ********************************************************************-*/
 
@@ -137,6 +137,9 @@ dbserver_info		db_info;
 msgserver_info		msg_info;
 static _message_buffer 	message_buffer [NUMBER_OF_MSG_TYPES];
 
+
+struct _devserver 	*msg_ds, 
+			*db_ds;
 /*
  * multi-nethost support requires an array of nethost_info structures
  * to keep track of the multple nethosts and their databases and
@@ -1268,7 +1271,7 @@ long setup_config (long *error)
 	static _manager_data 		manager_data;
 	static _register_data  		register_data;
 	static char			host_name[HOST_NAME_LENGTH];
-	static struct _devserver	msg_ds, db_ds;
+//	static struct _devserver	msg_ds, db_ds;
 
 	dev_printdebug (DBG_TRACE | DBG_API, "\nsetup_config() : entering routine\n");
 
@@ -1421,8 +1424,10 @@ long setup_config (long *error)
  * reimported, simply point to a static _devserver structure which
  * is locally allocated in static space
  */
-	msg_info.conf=(devserver)&msg_ds;
-	db_info.conf =(devserver)&db_ds;
+	if (max_nethost <= 0) 
+		nethost_alloc(error);
+	msg_info.conf=(devserver)msg_ds;
+	db_info.conf =(devserver)db_ds;
 
 	snprintf (msg_info.conf->server_host, sizeof(msg_info.conf->server_host), "%s", 
 	    manager_data.msg_info.host_name);
@@ -1468,9 +1473,6 @@ long setup_config (long *error)
 	return setup_config_multi(nethost,error);
 }
 
-
-struct _devserver 	*msg_ds, 
-			*db_ds;
 
 /**@ingroup dsAPI
  * This function gets the necessary configuration information for a static database service and a message
