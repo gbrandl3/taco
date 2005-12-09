@@ -30,9 +30,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.23 $
+ * Version    :	$Revision: 1.24 $
  *
- * Date       : $Date: 2005-12-09 16:06:07 $
+ * Date       : $Date: 2005-12-09 16:11:09 $
  *
  ********************************************************************-*/
 
@@ -1271,8 +1271,9 @@ long setup_config (long *error)
 	static _manager_data 		manager_data;
 	static _register_data  		register_data;
 	static char			host_name[HOST_NAME_LENGTH];
-//	static struct _devserver	msg_ds, db_ds;
-
+#if 0
+	static struct _devserver	msg_ds, db_ds;
+#endif
 	dev_printdebug (DBG_TRACE | DBG_API, "\nsetup_config() : entering routine\n");
 
 #ifdef WIN32
