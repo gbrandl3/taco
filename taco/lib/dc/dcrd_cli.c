@@ -23,13 +23,13 @@
  * Description:
  *
  * Author(s):	Emmanuel Taurel
- *		$Author: jensmeyer $
+ *		$Author: jkrueger1 $
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2005-09-27 08:15:29 $
+ * Date:	$Date: 2005-12-09 13:49:52 $
  *
  ******************************************************************************/
 
@@ -119,7 +119,7 @@ int dc_import(dc_dev_imp *dc_devimp, unsigned int num_device, long *error)
 			j,
 			l,
 	 		**caller_num,
-	 		dev_unk,
+	 		dev_unk = 0,
 			dev,
 			back = 0;
 	nethost_call	*nethost_array;
