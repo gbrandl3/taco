@@ -23,13 +23,13 @@
  * Description:
  *
  * Author(s):   Emmanuel Taurel
- *              $Author: jensmeyer $
+ *              $Author: jkrueger1 $
  *
  * Original:    1993
  *
- * Version:     $Revision: 1.10 $
+ * Version:     $Revision: 1.11 $
  *
- * Date:        $Date: 2005-09-28 12:44:17 $
+ * Date:        $Date: 2005-12-09 14:23:34 $
  *
  *****************************************************************************/
 
@@ -665,7 +665,7 @@ int dc_devinfo(char *serv_name,char *dev_name,dc_devinf *dc_dev_info,long *error
 		*error = DcErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strncpy(send, tmp_name, l);
+	strcpy(send, tmp_name);
 	for (i = 0;i < l;i++)
 		send[i] = tolower(send[i]);
 
