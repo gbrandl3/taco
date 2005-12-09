@@ -1,8 +1,7 @@
 /*
  * Toolkit for building distributed control systems or any other distributed system.
  *
- * Copyright(c) 1994-2005 by European Synchrotron Radiation Facility,
- *                     Grenoble, France
+ * Description: interface python - taco
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -23,13 +22,13 @@
  * Description: interface python - taco
  *
  * Author(s):   MCD
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
  * Original:    March 99
  * 
- * Date:	$Date: 2005-07-25 13:33:42 $
+ * Date:	$Date: 2005-12-09 15:09:01 $
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  */
  
 #include "config.h"
@@ -37,6 +36,7 @@
 #include <Python.h>
 #include <ctype.h>
 
+/* for taco */
 #include <Admin.h>
 #include <API.h>
 #include <DevServer.h>
@@ -52,17 +52,37 @@
 #	endif
 #endif 
 
-#include "taco.h"
+#define _taco_py
 
-long get_dmulmove_longfloatarr(DevArgument ds_arg,long ds_type, PyObject * mytuple, long len, char* mymess);
-char p2c_BOOLEAN(PyObject *, long *);     
-unsigned short p2c_USHORT(PyObject *, long *);     
-short p2c_SHORT(PyObject *, long *);     
-unsigned long p2c_ULONG(PyObject *, long *);     
-long p2c_LONG(PyObject *, long *);     
-float p2c_FLOAT(PyObject *, long *);     
-double p2c_DOUBLE(PyObject *, long *);     
-DevString p2c_STRING(PyObject *, long *);     
+long get_argin_single(DevArgument ds_argin, long ds_in, 
+                      PyObject *item, char* mymess);
+long get_argin_array(DevArgument ds_argin, long ds_in, 
+                      PyObject *mytuple, char* mymess);
+long get_argin_special(DevArgument ds_argin, long ds_in, 
+                      PyObject *mytuple, char* mymess);
+long get_argout_single(DevArgument ds_argout, long ds_out, 
+                      PyObject **item, char* mymess);
+long get_argout_array(DevArgument ds_argout, long ds_out, 
+                      PyObject **mylist, char* mymess);
+long get_argout_special(DevArgument ds_argout, long ds_out, 
+                      PyObject **mylist, char* mymess);
+long check_type(long ds_ty, long *is_a_single, 
+                long *is_an_array, long *is_a_special);
+void display_single(DevArgument ds_argin,long ds_in,char * ms);
+void display_array(DevArgument ds_argin,long ds_in, char* ms);
+void display_special(DevArgument ds_argin,long ds_in,char * ms);
+long get_dmulmove_longfloatarr(DevArgument ds_arg,long ds_type,
+      PyObject * mytuple, long len, char* mymess);
+char p2c_BOOLEAN(PyObject *item,long *err);     
+unsigned short p2c_USHORT(PyObject *item,long *err);     
+short p2c_SHORT(PyObject *item,long *err);     
+unsigned long p2c_ULONG(PyObject *item,long *err);     
+long p2c_LONG(PyObject *item,long *err);     
+float p2c_FLOAT(PyObject *item,long *err);     
+double p2c_DOUBLE(PyObject *item,long *err);     
+DevString p2c_STRING(PyObject *item,long *err);     
+long Ctype2numeric(long ds_out);
+long lenoftype(long ds_out);     
 
 
 /**
@@ -74,6 +94,8 @@ DevString p2c_STRING(PyObject *, long *);
  */
 void display_single(DevArgument ds_argin,long ds_in,char * ms)
 {
+   long i;
+
    switch (ds_in)
    {
       case D_BOOLEAN_TYPE:
@@ -100,6 +122,14 @@ void display_single(DevArgument ds_argin,long ds_in,char * ms)
      case D_STRING_TYPE:
           printf("-- esrf_io: %s: string: %s\n",ms,*(DevString*)(ds_argin));
 	  break;
+	  
+     case D_OPAQUE_TYPE:
+          printf("-- esrf_io: %s: opaque type diplayed as char array: ",ms);
+	  		 for  (i=0; i< ((DevVarCharArray *)(ds_argin))->length; i++)
+	     		 printf("%d ",((DevVarCharArray *)(ds_argin))->sequence[i]);
+	  		 printf("\n");
+	  break;
+	  	  
      default:
           printf("display_single: %s unknown type %d\n",ms,ds_in);
    }
@@ -296,8 +326,9 @@ long get_argin_single(DevArgument ds_argin, long ds_in, PyObject *item, char* my
 {
    int len;
    long merr;
+	char *str_buf;
    
-   if (ds_in != D_STRING_TYPE)
+   if (ds_in != D_STRING_TYPE && ds_in != D_OPAQUE_TYPE)
    {
       /* check that item is a number */    
       if ( PyNumber_Check(item) == 0)
@@ -376,13 +407,28 @@ long get_argin_single(DevArgument ds_argin, long ds_in, PyObject *item, char* my
 	 *(DevString *)(ds_argin) = p2c_STRING(item,&merr);
 	 if (merr != 0)
          {
-	    strcpy(mymess, "argin cannot be cast as C string\n");
+	    strcpy(mymess,"argin cannot be cast as C string\n");
 	    return(-1);
 	 }
          break;
-	 
+
+    case D_OPAQUE_TYPE:
+	 	/*
+		   * OPAQUE type in python is handled as string
+			*/
+    	str_buf =  p2c_STRING(item,&merr);    
+	 	if (merr != 0)
+    		{
+	   	strcpy(mymess,"argin cannot be cast as opaque type\n");
+	   	return(-1);
+	 		}
+		
+		((DevVarCharArray *)(ds_argin))->length = strlen (str_buf);
+		((DevVarCharArray *)(ds_argin))->sequence = str_buf;
+    	break;
+	 	 
       default:
-         sprintf(mymess, "get_argin_single: unknown type %d\n",ds_in);
+         sprintf(mymess,"get_argin_single: unknown type %d\n",ds_in);
 	 return(-1);
    }
 
@@ -403,7 +449,6 @@ void display_array(DevArgument ds_argin,long ds_in, char* ms)
    switch (ds_in)
    {
       case D_VAR_CHARARR:
-      case D_OPAQUE_TYPE:
           printf("-- esrf_io: %s: char array: ",ms);
 	  for  (i=0; i< ((DevVarCharArray *)(ds_argin))->length; i++)
 	     printf("%d ",((DevVarCharArray *)(ds_argin))->sequence[i]);
@@ -483,7 +528,6 @@ long get_argin_array(DevArgument ds_argin, long ds_in,
    switch (ds_in) 
    {
       case D_VAR_CHARARR:
-      case D_OPAQUE_TYPE:
          ((DevVarCharArray *)(ds_argin))->length = len;
          ((DevVarCharArray *)(ds_argin))->sequence = 
 	      (char *) malloc(sizeof(char)*len);
@@ -1091,7 +1135,8 @@ long get_argin_special(DevArgument ds_argin, long ds_in,
 long get_argout_single(DevArgument ds_argout, long ds_out, 
                       PyObject **item, char* mymess)
 {
-   
+   int len;
+
    switch (ds_out) 
    {
       case D_BOOLEAN_TYPE:
@@ -1125,6 +1170,11 @@ long get_argout_single(DevArgument ds_argout, long ds_out,
       case D_STRING_TYPE:
          *item = PyString_FromString((DevString) (*((DevString *)(ds_argout))));
          break;
+	
+    	case D_OPAQUE_TYPE:
+         len = ((DevVarCharArray *)(ds_argout))->length;  
+         *item = PyString_FromStringAndSize( (DevString) (((DevVarCharArray *)(ds_argout))->sequence), len);        
+         break;         
 	 
       default:
          sprintf(mymess,"get_argout_single: unknown type %d\n",ds_out);
@@ -1154,7 +1204,6 @@ long get_argout_array(DevArgument ds_argout, long ds_out,
    switch (ds_out) 
    {
       case D_VAR_CHARARR:
-      case D_OPAQUE_TYPE:
          len = ((DevVarCharArray *)(ds_argout))->length;
 	 
 	 if ( (*mylist = PyList_New(len)) == NULL)
@@ -1481,11 +1530,11 @@ long check_type(long ds_ty, long *is_a_single,
       case D_FLOAT_TYPE:
       case D_DOUBLE_TYPE:
       case D_STRING_TYPE:
+		case D_OPAQUE_TYPE:
          *is_a_single = 1;
 	 return(0);
 	 break;
       case D_VAR_CHARARR:
-      case D_OPAQUE_TYPE:
       case D_VAR_SHORTARR:
       case D_VAR_LONGARR:
       case D_VAR_ULONGARR:

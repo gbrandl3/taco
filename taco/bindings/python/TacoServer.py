@@ -26,24 +26,34 @@
 # Description:  Generic interface class to the TACO database.
 #
 # Author(s):    J.Meyer
-#               $Author: jkrueger1 $
+#               $Author: andy_gotz $
 #
 # Original:     Mai 2001
 #
-# Version:      $Revision: 1.4 $
+# Version:      $Revision: 1.5 $
 #
-# Date:         $Date: 2005-07-25 13:43:42 $
+# Date:         $Date: 2005-12-09 15:09:01 $
 #
 
 """ TACO device server """
 
-__author__ = "Jens Meyer, $Author: jkrueger1 $"
-__date__ = "$Date: 2005-07-25 13:43:42 $"
-__revision__ = "$Revision: 1.4 $"
+__author__ = "Jens Meyer, $Author: andy_gotz $"
+__date__ = "$Date: 2005-12-09 15:09:01 $"
+__revision__ = "$Revision: 1.5 $"
 
+import thread
 import Server
 import DEVCMDS
 import DEVSTATES 
+
+from TacoDevice import *
+
+from DEVCMDS   import *
+from DEV_XDR   import *
+from DEVSTATES import *
+from DEVERRORS import *
+from BLCDSNUMBERS import *
+
 
 # Dictionnary for the correspondance between type number (in ascii
 # representation) and a string for user
@@ -90,8 +100,10 @@ class TacoServer:
 	
 # Common variables for a class
     cmd_list = { 
-       DEVCMDS.DevState : [DEVCMDS.D_VOID_TYPE, DEVCMDS.D_SHORT_TYPE , 'DevState', 'DevState'],
-       DEVCMDS.DevStatus:[DEVCMDS.D_VOID_TYPE, DEVCMDS.D_STRING_TYPE, 'DevStatus','DevStatus'],
+#       DEVCMDS.DevState : [DEVCMDS.D_VOID_TYPE, DEVCMDS.D_SHORT_TYPE , 'DevState', 'DevState'],
+#       DEVCMDS.DevStatus:[DEVCMDS.D_VOID_TYPE, DEVCMDS.D_STRING_TYPE, 'DevStatus','DevStatus'],
+       DevState : [D_VOID_TYPE, D_SHORT_TYPE , 'DevState', 'DevState'],
+       DevStatus:[D_VOID_TYPE, D_STRING_TYPE, 'DevStatus','DevStatus'],
     }
 
     class_name = "PythonClass"
@@ -234,8 +246,9 @@ def server_startup (devices, server_name = 'test', process_name = 'Python', nodb
                   please try another. Normally there is no need to create your 
                   own number.
     """
+
     if nodb == 0:
-        Server.startup(process_name, server_name, devices)
+        thread.start_new_thread (Server.startup, (process_name, server_name, devices))
     else:
-        Server.startup_nodb(process_name, server_name, devices, procnum)
+        thread.start_new_thread (Server.startup_nodb, (process_name, server_name, devices, pn))
 

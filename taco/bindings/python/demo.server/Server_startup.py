@@ -25,37 +25,59 @@
 # Description:  Example script how to start a TACO device server written in Python
 #
 # Author(s):    J.Meyer
-#               $Author: jkrueger1 $
+#               $Author: andy_gotz $
 #
 # Original:     Mai 2001
 #
-# Version:      $Revision: 1.4 $
+# Version:      $Revision: 1.5 $
 #
-# Date:         $Date: 2005-07-25 13:43:42 $
+# Date:         $Date: 2005-12-09 15:09:01 $
 #
 
-import TacoServer
+from TacoServer import *
 import MyServer
+import  YourServer
+import os
 
 def start():
+	process_name = 'Python'
+	server_name  = 'test'
+	
+	full_name = process_name + "/" + server_name
+	print full_name
+
+	#devices = TacoServer.dev_getdevlist (full_name)
+	devices = ("test/python/my", "test/python/your")
+	print devices
+	
+	dev = []
 	#
 	# Create two device objects
 	#
-	x = MyServer.MyServer('test/python/test1')
-	y = MyServer.MyServer('test/python/test2')
-
+	x=MyServer.MyServer ("test/python/my")
+	dev.append(x)
+	y=YourServer.YourServer ("test/python/your")
+	dev.append(y)
 	#
-	# Export to the network and start the device server thread
+	# Put the two objects to be exported 
+	# on the network in a list (no longer a tuple!!!!!)
 	#
-	# With a device server definition in the resource database as:
-	# process_name/server_name/device:
+	# Export to the network and start the 
+	# device server thread
 	#
-	# e.g.:
-	# Python/test/device:	test/python/test1 \
-	#			test/python/test2
+	# With a device server definition in the resource 
+	# database as:
+	# Python/test/device:	id/python/test1 \
+	#			id/python/test2
 	#	
 	# 
-	TacoServer.server_startup((x, y), process_name = 'Python', server_name = 'test')
+	server_startup (dev, process_name=process_name,  server_name=server_name)
 
 if __name__ == "__main__":
+
+    	print 'Blocked waiting for GDB attach (pid = %d)' % (os.getpid(),)
+      	raw_input ('Press Enter to continue: ')
+
 	start()
+	import time
+	time.sleep(1000)

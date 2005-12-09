@@ -25,23 +25,24 @@
 # Description:  Generic interface class to the TACO database.
 #
 # Author(s):    J.Meyer
-#               $Author: jkrueger1 $
+#               $Author: andy_gotz $
 #
 # Original:     Mai 2001
 #
-# Version:      $Revision: 1.3 $
+# Version:      $Revision: 1.4 $
 #
-# Date:         $Date: 2005-07-25 13:43:42 $
+# Date:         $Date: 2005-12-09 15:09:01 $
 #
 
 """ TACO demo server class """
 
-__author__ = "$Author: jkrueger1 $"
-__date__ = "$Date: 2005-07-25 13:43:42 $"
-__revision__ = "$Revision: 1.3 $"
+__author__ = "$Author: andy_gotz $"
+__date__ = "$Date: 2005-12-09 15:09:01 $"
+__revision__ = "$Revision: 1.4 $"
 
 import TacoServer
 from DEVCMDS import *
+from DEVSTATES import *
 from DEV_XDR import *
 
 from TacoDevice import Dev_Exception, dev_getresource
