@@ -31,9 +31,9 @@
  *
  * Original   :	April 1993
  *
- * Version:	$Revision: 1.24 $
+ * Version:	$Revision: 1.25 $
  *
- * Date:		$Date: 2005-07-25 13:08:28 $
+ * Date:		$Date: 2005-12-09 14:20:52 $
  *
  ********************************************************************-*/
 #ifndef WIN32
@@ -1094,14 +1094,14 @@ long _DLLFunc get_i_nethost_by_name (char *nethost, long *error)
 {
 	long i;
 	
+/* no nethost specified */
+	if(nethost==NULL)
+	    return DS_NOTOK;
+
 /*
  * loop through the array of imported nethosts looking for the 
  * specified nethost
  */
-/* no hethost specified */
-	if(nethost==NULL)
-	    return -1;
-
 	for (i=0; i<max_nethost; i++)
 	{
 /*
@@ -1117,7 +1117,7 @@ long _DLLFunc get_i_nethost_by_name (char *nethost, long *error)
 		}
 	}
 	
-	return(DS_NOTOK);
+	return DS_NOTOK;
 }
 
 
@@ -1433,10 +1433,9 @@ long _DLLFunc dev_ping (devserver ds, long *error)
 int taco_gethostname(char *host_name, size_t len)
 {
 	char    hostname[255];                  /* hopefully enough! */
-	int ret;
+	int	ret = gethostname(hostname, sizeof(hostname));
 	if (host_name != NULL)
 		*host_name = '\0';
-	ret = gethostname(hostname, sizeof(hostname));
 	if (ret != 0)
 	{
 		fprintf(stderr, "unable to retrieve hostname!\n");
