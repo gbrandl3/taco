@@ -65,7 +65,7 @@ libtacoc_la_LDFLAGS 	= -version-info @LIB_VERSION@
 EXTRA_DIST 		= 
 
 SRC_TACO_SPECIAL 	= dev_api.c sec_api.c event_api.c \
-			svc_api.c DevServerSig.c  event_relisten.c 
+			svc_api.c DevServerSig.c  event_relisten.c startup.c
 
 libtaco_la_SOURCES 	= $(SRC_TACO_SPECIAL) 
 libtaco_la_LIBADD  	= xdr/libdsxdr_all.la dbase/libdbapi.la signal/libsignal.la $(dc_lib) libtacoc.la -lc
@@ -78,7 +78,7 @@ libtaco___la_LDFLAGS 	= -version-info @LIB_VERSION@
 
 libtacomain_la_SOURCES 	= DevServerMain.c 
 if BUILTIN_STARTUP
-libtacomain_la_SOURCES 	+= startup.c
+#libtacomain_la_SOURCES 	+= startup.c
 endif
 libtacomain_la_LDFLAGS 	= -version-info @LIB_VERSION@
 

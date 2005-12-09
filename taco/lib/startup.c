@@ -32,13 +32,13 @@
  *		is normally done from startup().
  *
  * Author(s);	A. Goetz 
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
  * Original:	October 1996
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2005-07-25 13:08:28 $
+ * Date:	$Date: 2005-12-09 15:11:25 $
  *
  *********************************************************************/
 
@@ -48,7 +48,7 @@
 #include <DevErrors.h>
 #include <DevServerP.h>
 #ifdef __cplusplus
-#include "Device.H"
+#include "Device.h"
 #endif //__cplusplus
 
 extern long debug_flag;
