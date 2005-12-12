@@ -30,9 +30,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.25 $
+ * Version    :	$Revision: 1.26 $
  *
- * Date       : $Date: 2005-12-12 15:36:47 $
+ * Date       : $Date: 2005-12-12 15:41:07 $
  *
  ********************************************************************-*/
 
@@ -1025,7 +1025,7 @@ long _DLLFunc db_import (long *error)
 		return (DS_NOTOK);
 
 /*
- * Create message server client handle with data from
+ * Create database server client handle with data from
  * global dbserver_info structure.
  *
  * Create a client handle for version 3! 
