@@ -30,9 +30,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.24 $
+ * Version    :	$Revision: 1.25 $
  *
- * Date       : $Date: 2005-12-09 16:11:09 $
+ * Date       : $Date: 2005-12-12 15:36:47 $
  *
  ********************************************************************-*/
 
@@ -1783,7 +1783,7 @@ long db_ChangeDefaultNethost(char* nethost,long *error)
 /* 
  * lookup in nethost array 
  */
-	if (i_nethost < 0);
+	if (i_nethost < 0)
 	{
 /* 
  * lookup failed, try to import the host 
@@ -1799,18 +1799,17 @@ long db_ChangeDefaultNethost(char* nethost,long *error)
  * this should never happen 
  */
 			return (DS_NOTOK);
+	}
 /* 
  * set the default nethost vars from multi-nethost array 
  *
  * HINT: some day, there should be a global index, and all
  * functions could use multi_nethost[glob_index]  
  */
-		config_flags = multi_nethost[i_nethost].config_flags;
-		db_info.conf = multi_nethost[i_nethost].db_info;
-		msg_info.conf = multi_nethost[i_nethost].msg_info;
-		return (DS_OK);
-	}
-	return DS_NOTOK;
+	config_flags = multi_nethost[i_nethost].config_flags;
+	db_info.conf = multi_nethost[i_nethost].db_info;
+	msg_info.conf = multi_nethost[i_nethost].msg_info;
+	return (DS_OK);
 }
 /* Function: */
 
