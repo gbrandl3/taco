@@ -184,7 +184,7 @@ int main(int argc, char **argv)
 	}
 
 /* Print polling intervall */
-	printf("\nThe polling interval is (in 1/10 s) : %d\n",dcdev.devinf_poll);
+	printf("\nThe polling interval is : %.1f s\n", dcdev.devinf_poll / 10.0);
 
 /* Are some data available ? */
 
@@ -207,13 +207,13 @@ int main(int argc, char **argv)
 
 /* Print interval between the last five records */
 
-		printf("\nDelta (in 1/10s) between the last six records :\n");
-		printf("%d, %d, %d, %d, %d\n",dcdev.devinf_delta[0],
-					      dcdev.devinf_delta[1],
-					      dcdev.devinf_delta[2],
-					      dcdev.devinf_delta[3],
-					      dcdev.devinf_delta[4]);
-		printf("Data not updated since %d tenth(s) of a second\n",dcdev.devinf_diff_time);
+		printf("\nDelta (in s) between the last five records :\n");
+		printf("%.1f, %.1f, %.1f, %.1f, %.1f\n",dcdev.devinf_delta[0] / 10.0,
+					      dcdev.devinf_delta[1] / 10.0,
+					      dcdev.devinf_delta[2] / 10.0,
+					      dcdev.devinf_delta[3] / 10.0,
+					      dcdev.devinf_delta[4] / 10.0);
+		printf("Data not updated since %.1f s\n",dcdev.devinf_diff_time / 10.0);
 
 /* If the verbose mode is required, print daemon info. */
 		if (verbose == True)
