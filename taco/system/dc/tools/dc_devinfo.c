@@ -137,7 +137,7 @@ int main(int argc, char **argv)
 	}
 
 /* Display device information */
-	fprintf(stderr, "The device %s is registered in the dc with %d command(s)\n",argv[1],dcdev.devinf_nbcmd);
+	fprintf(stderr, "The device %s is registered in the dc with %d command(s)\n", devname, dcdev.devinf_nbcmd);
 
 /* Retrieve command name from resources */
 
