@@ -65,7 +65,7 @@ dc_devinfx_back *dc_devinfo_1(char **rece)
 	req_call  = 1;
 
 /* Try to retrieve a record in the device_info part of the pointers area
-   with the saem device name */
+   with the same device name */
 	strcpy(d_name,*rece);
 	resu = search_dev(d_name,&data,&mem,&ind,&error);
 
