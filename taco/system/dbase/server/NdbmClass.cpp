@@ -23,11 +23,11 @@
  * Description:
  *
  * Author(s):
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  * 
- * Version:	$Revision: 1.15 $
+ * Version:	$Revision: 1.16 $
  *
- * Date:	$Date: 2005-11-25 10:08:36 $
+ * Date:	$Date: 2005-12-15 14:39:56 $
  *
  */
 #include <cstdlib>
@@ -725,14 +725,14 @@ long NdbmPSNamesCont::get_refresh(void) const
 //! Method to return all the parameters from the record content necessary for the devinfo call
 void NdbmPSNamesCont::get_devinfo(db_devinfo_svc &data)
 {
-	strcpy(data.host_name,this->get_host_name().c_str());	
+	strncpy(data.host_name,this->get_host_name().c_str(), HOST_NAME_LENGTH);	
 	data.pid = this->get_pid();
-	data.device_class[0] = '\0';
+	strncpy(data.device_class, "Pseudo device", DEV_CLASS_LENGTH); 
 	data.server_name[0] = '\0';
 	data.personal_name[0] = '\0';
 	data.process_name[0] = '\0';
 	data.server_version = 0;
-	data.device_exported = False;
+	data.device_exported = true;
 }
 
 /**@class NdbmResKey
