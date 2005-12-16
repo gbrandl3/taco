@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:	$Date: 2005-07-25 08:38:51 $
+ * Date:	$Date: 2005-12-16 12:04:26 $
  *
  */
 
@@ -166,8 +166,8 @@ long MySQLServer::reg_ps(std::string h_name, long pid, std::string ps_name, long
     std::stringstream strquery;
     try
     {
-    	strquery << "UPDATE device SET HOST = '" << h_name << "', PID = " << pid << " IOR = 'DC:" << poll << "'"
-	      << " WHERE DEVICE = '" << ps_name_low << "'" << std::ends;
+    	strquery << "UPDATE device SET HOST = '" << h_name << "', PID = " << pid << ", IOR = 'DC:" << poll << "'"
+	      << " WHERE NAME = '" << ps_name_low << "'" << std::ends;
 #if !HAVE_SSTREAM
     	if (mysql_query(mysql_conn, strquery.str()) != 0)
 #else
