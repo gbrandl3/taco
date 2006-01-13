@@ -11,6 +11,9 @@
  Original   :	June 2005
 
  $Log: not supported by cvs2svn $
+ Revision 1.10  2005/12/05 15:52:42  jlpons
+ Fixed DC decoding bug
+
  Revision 1.9  2005/10/20 16:14:17  jlpons
  Fixed DC issue
 
@@ -83,7 +86,7 @@ public class TacoDevice implements ServerListener {
   public final static int SOURCE_CACHE_DEVICE = 2;
 
   // Do not modify this line (it is used by the install script)
-  public final String apiRelease = "$Revision: 1.10 $".substring(11,15);
+  public final String apiRelease = "$Revision: 1.11 $".substring(11,15);
 
   // Timeout before reinporting the device from the database
   private static long dbImportTimeout = 30000L; // 30 sec
@@ -833,10 +836,11 @@ public class TacoDevice implements ServerListener {
 
     try {
 
-      TacoDevice dev1  = new TacoDevice("sy/rf-tra/tra0");
+      TacoDevice dev1  = new TacoDevice("sr/v-ip/c7-7");
+//        TacoDevice dev1  = new TacoDevice("sr/d-ct/1");
 //      TacoDevice dev2  = new TacoDevice("sr/jlp/1");
 //      TacoDevice dev3  = new TacoDevice("//aries/sr/d-fbpm/peak-h");
-        dev1.setSource(SOURCE_CACHE_DEVICE);
+        dev1.setSource(SOURCE_DEVICE);
 //      dev2.setSource(SOURCE_CACHE_DEVICE);
 //      dev3.setSource(SOURCE_CACHE_DEVICE);
 

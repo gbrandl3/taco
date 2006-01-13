@@ -54,9 +54,11 @@ public class XdrVarArgument implements XdrAble {
           throws OncRpcException, IOException {
 
     type = xdr.xdrDecodeInt();
-    int ptrSize = xdr.xdrDecodeInt();  // Not used (should be 1)
-    vArg = XdrTacoType.createXdr(type);
-    vArg.xdrDecode(xdr);
+    int ptrSize = xdr.xdrDecodeInt();
+    if(ptrSize!=0) {
+      vArg = XdrTacoType.createXdr(type);
+      vArg.xdrDecode(xdr);
+    }
 
   }
 
