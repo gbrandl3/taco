@@ -18,11 +18,23 @@ libtacotango___la_SOURCES = ../dev_api.c ../sec_api.c ../event_api.c \
 			../Device.cpp ../OICDevice.cpp \
 			../signal/DSSignal.c ../signal/MDSSignal.c \
 			../signal/MDSSignal_config.c \
+			../dc/dc_sdev.c ../dc/dcrd_clnt.c ../dc/dcwr_clnt.c \
+			../dc/dchist_cli.c ../dc/dcrd_xdr.c ../dc/dcwr_xdr.c \
+			../dc/dcrd_cli.c ../dc/dcwr_cli.c ../dc/utils_cli.c \
 			tango_api.cpp attr_api.cpp attr_access.cpp \
-			db_exp.cpp
+			db_exp.cpp ../startup.c
 libtacotango___la_CFLAGS  	= -x c++ -DTANGO
+if CLIENT_TCP
+libtacotango___la_CFLAGS += -DCLIENT_TCP
+endif
+if SOLARIS_CXX
 libtacotango___la_LIBADD  	= ../xdr/libdsxdr_all.la  ../dbase/libdbapi.la \
-				../dc/libdcapi.la @TANGO_LIBS@ @CORBA_LIBS@ -lstdc++ 
+				@TANGO_LIBS@ @CORBA_LIBS@ -lCstd
+else
+libtacotango___la_LIBADD  	= ../xdr/libdsxdr_all.la  ../dbase/libdbapi.la \
+				@TANGO_LIBS@ @CORBA_LIBS@ -lstdc++ 
+endif
+#				../dc/libdcapi.la @TANGO_LIBS@ @CORBA_LIBS@ -lstdc++ 
 libtacotango___la_LDFLAGS 	= -version-info @LIB_VERSION@
 
 include_HEADERS		+= ../BlcDsNumbers.h ../CntrlDsNumbers.h ../DasDsNumbers.h ../MachDsNumbers.h ../SysNumbers.h 
