@@ -19,7 +19,7 @@
 
 INCLUDES=@TACO_INCLUDES@ -DDEBUG
 
-LDADD = @TACO_CLIENT_LIBS@ ../library/libdcmem.la @TACO_DC_LIBS@
+LDADD = @TACO_CLIENT_LIBS@ ../library/libdcmem.la 
 
 bin_PROGRAMS = 	dc_del \
 		dc_dels \
