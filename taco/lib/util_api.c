@@ -27,13 +27,13 @@
  *		handle remote devices.
  *
  * Author(s)  :	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original   :	April 1993
  *
- * Version:	$Revision: 1.25 $
+ * Version:	$Revision: 1.26 $
  *
- * Date:		$Date: 2005-12-09 14:20:52 $
+ * Date:		$Date: 2006-01-22 21:12:48 $
  *
  ********************************************************************-*/
 #ifndef WIN32
@@ -1199,6 +1199,9 @@ char* _DLLFunc extract_device_name (char *full_name, long *error)
 extern struct _devserver *msg_ds;
 extern struct _devserver *db_ds;
 extern short *auth_flag;
+extern dbserver_info           db_info;
+extern msgserver_info          msg_info;
+
 
 /**@ingroup clientAPIintern
  * alloc place for MIN_NETHOST to global array which contains list of nethosts
@@ -1292,6 +1295,8 @@ long _DLLFunc nethost_alloc (long *error)
 		multi_nethost[i].db_info = (devserver)&db_ds[i];
 		multi_nethost[i].msg_info = (devserver)&msg_ds[i];
 	}
+	db_info.conf = db_ds;
+	msg_info.conf = msg_ds;
 /* 
  * set new entries to False to indicate that they are free to be used
  */
