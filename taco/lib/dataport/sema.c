@@ -23,11 +23,11 @@
  * Description:
  *
  * Author(s):
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 12:54:15 $
+ * Date:	$Date: 2006-01-22 21:14:20 $
  *
  ******************************************************************************/
 
@@ -92,7 +92,12 @@ int define_sema (int number,int key_num,int create)
 /* 
  * Set initial value of semaphore to 1 
  */
+#ifdef _solaris
+		sem.val = 1;
+		semctl(semid,0,SETVAL,sem);
+#else
 		semctl(semid,0,SETVAL,1);
+#endif
   	}
   	else
 		semid = semget(key_value,number,0666);
