@@ -25,13 +25,13 @@
  * Description: Interface for the security system
  *
  * Author(s)  : Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original   : December 1993
  *
- * Version    :	$Revision: 1.11 $
+ * Version    :	$Revision: 1.12 $
  *
- * Date       :	$Date: 2005-07-25 13:08:28 $
+ * Date       :	$Date: 2006-01-22 21:06:04 $
  *
  ********************************************************************-*/
 #ifndef WIN32
@@ -2249,8 +2249,11 @@ long _DLLFunc sec_tcp_connection (long requested_access, CLIENT * *clnt,
          *  Initialise the current RPC timeout to the new connection.
          */
 
+	/* avoids retries at all costs - andy 20jan06 */
+	/*clnt_control (*clnt, CLSET_RETRY_TIMEOUT,
+		      (char *) &svr_conn->rpc_retry_timeout);*/
 	clnt_control (*clnt, CLSET_RETRY_TIMEOUT,
-		      (char *) &svr_conn->rpc_retry_timeout);
+		      (char *) &svr_conn->rpc_timeout);
 	clnt_control (*clnt, CLSET_TIMEOUT, (char *) &svr_conn->rpc_timeout);
 
 	/*
