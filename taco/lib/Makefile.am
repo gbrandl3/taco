@@ -31,10 +31,13 @@ endif
 
 if DC_BUILD
  dc_dir=dc
- dc_lib=dc/libdcapi.la
+ dc_src=dc/dc_sdev.c dc/dcrd_clnt.c dc/dcwr_clnt.c \
+        dc/dchist_cli.c dc/dcrd_xdr.c dc/dcwr_xdr.c \
+        dc/dcrd_cli.c dc/dcwr_cli.c dc/utils_cli.c 
+
 else
  dc_dir=
- dc_lib=
+ dc_src=
 endif
 
 if TANGO_BUILD
@@ -57,9 +60,12 @@ INCLUDES		= @TACO_INCLUDES@
 ## AM_CPPFLAGS 		= -DEBUG
 
 libtacoc_la_SOURCES 	= gen_api.c dev_cmds.c dev_errors.c dev_states.c oic.c \
-			util_api.c asyn_api.c gettrans.c ds_prog_vers3.c DevServer.c 
+			util_api.c asyn_api.c gettrans.c ds_prog_vers3.c DevServer.c
 
 libtacoc_la_LDFLAGS 	= -version-info @LIB_VERSION@
+if CLIENT_TCP
+libtacoc_la_CFLAGS 	= -DCLIENT_TCP
+endif
 #libtacoc_la_LIBADD  	= xdr/libdsxdr.la dbase/libdbapi.la signal/libsignal.la -lc
 
 EXTRA_DIST 		= 
@@ -67,13 +73,17 @@ EXTRA_DIST 		=
 SRC_TACO_SPECIAL 	= dev_api.c sec_api.c event_api.c \
 			svc_api.c DevServerSig.c  event_relisten.c startup.c
 
-libtaco_la_SOURCES 	= $(SRC_TACO_SPECIAL) 
-libtaco_la_LIBADD  	= xdr/libdsxdr_all.la dbase/libdbapi.la signal/libsignal.la $(dc_lib) libtacoc.la -lc
+libtaco_la_SOURCES 	= $(SRC_TACO_SPECIAL) $(dc_src)
+libtaco_la_LIBADD  	= xdr/libdsxdr_all.la dbase/libdbapi.la signal/libsignal.la libtacoc.la -lc
 libtaco_la_LDFLAGS 	= -version-info @LIB_VERSION@
 
-libtaco___la_SOURCES 	= $(SRC_TACO_SPECIAL) Device.cpp OICDevice.cpp 
+libtaco___la_SOURCES 	= $(SRC_TACO_SPECIAL) Device.cpp OICDevice.cpp $(dc_src)
 libtaco___la_CFLAGS  	= -x c++
-libtaco___la_LIBADD  	= xdr/libdsxdr_all.la dbase/libdbapi.la signal/libsignal.la $(dc_lib) libtacoc.la -lstdc++
+if SOLARIS_CXX
+libtaco___la_LIBADD  	= xdr/libdsxdr_all.la dbase/libdbapi.la signal/libsignal.la libtacoc.la -lCstd
+else
+libtaco___la_LIBADD  	= xdr/libdsxdr_all.la dbase/libdbapi.la signal/libsignal.la libtacoc.la -lstdc++
+endif
 libtaco___la_LDFLAGS 	= -version-info @LIB_VERSION@
 
 libtacomain_la_SOURCES 	= DevServerMain.c 
