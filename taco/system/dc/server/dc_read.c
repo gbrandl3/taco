@@ -4,7 +4,7 @@
 #undef _dc_h
 #include <dc.h>
 #include <DevErrors.h>
-
+#define DC_SERVER 1
 #include "dcrd_xdr.h"
 #include <dcP.h>
 

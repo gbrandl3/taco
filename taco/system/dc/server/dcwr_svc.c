@@ -18,7 +18,7 @@
 #include <sys/shm.h>
 #include <sys/sem.h>
 #include <sys/resource.h>
-
+#define DC_SERVER 1
 #include <dc_xdr.h>
 #include <dcP.h>
 

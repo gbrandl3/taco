@@ -1,7 +1,7 @@
 #include "config.h"
 #include <API.h>
 #include <DevErrors.h>
-
+#define DC_SERVER 1
 #include <dc_xdr.h>
 #include <dcP.h>
 

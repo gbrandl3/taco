@@ -19,7 +19,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/resource.h>
-
+#define DC_SERVER 1
 #include <dc_xdr.h>
 #include <dcP.h>
 
