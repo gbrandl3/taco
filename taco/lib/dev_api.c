@@ -27,13 +27,13 @@
  *
  * Author(s)  :	Andy Goetz
  *		Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.29 $
+ * Version    :	$Revision: 1.30 $
  *
- * Date	    :	$Date: 2005-10-19 12:24:15 $
+ * Date	    :	$Date: 2006-01-22 21:03:32 $
  *
  ********************************************************************-*/
 
@@ -555,7 +555,13 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
  * No old connection exists to this server. Create new client handle the device server.
  */
 		dev_printdebug (DBG_API, "dev_import() : open a new client handle \n");
+#ifdef CLIENT_TCP
+		dev_printdebug (DBG_API, "dev_import() : create tcp client\n"); 
 		clnt = clnt_create (host_name, prog_number, vers_number, "tcp");
+#else
+		dev_printdebug (DBG_API, "dev_import() : create udp client\n"); 
+		clnt = clnt_create (host_name, prog_number, vers_number, "udp");
+#endif /* CLIENT_TCP */
 		if (clnt == NULL)
 		{
 /*
@@ -605,7 +611,11 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
  * Set version number to 1 and recreate the client handle.
  */
 				vers_number = DEVSERVER_VERS;
+#ifdef CLIENT_TCP
 				clnt = clnt_create (host_name,prog_number, vers_number,"tcp");
+#else
+				clnt = clnt_create (host_name,prog_number, vers_number,"tcp");
+#endif /* CLIENT_TCP */
 				if (clnt == NULL)
 				{
 					*error = DevErr_CannotCreateClientHandle;
@@ -831,7 +841,9 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
  * imported next time round.
  */
                 dev_notimported_init(device_name,access,i_nethost,ds_ptr,error);
-		clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *)&svr_conns[n_svr_conn].rpc_retry_timeout);
+		/* avoid retries at all costs - use the same timeout for both (andy 20jan06) */
+		/*clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *)&svr_conns[n_svr_conn].rpc_retry_timeout);*/
+		clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *)&svr_conns[n_svr_conn].rpc_timeout);
 		clnt_control (clnt, CLSET_TIMEOUT, (char *)&svr_conns[n_svr_conn].rpc_timeout);
 
 /*
@@ -853,7 +865,9 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
 /*
  *  reinstall current connnection timeout.
  */
-	clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &svr_conns[n_svr_conn].rpc_retry_timeout);
+	/* avoid retries at all costs - use the same timeout for both (andy 20jan06) */
+	/*clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &svr_conns[n_svr_conn].rpc_retry_timeout);*/
+	clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &svr_conns[n_svr_conn].rpc_timeout);
 	clnt_control (clnt, CLSET_TIMEOUT, (char *) &svr_conns[n_svr_conn].rpc_timeout);
 
 /*
@@ -923,7 +937,11 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
 			(*ds_ptr)->rpc_conn_counter = svr_conns[n_svr_conn].rpc_conn_counter;
 			(*ds_ptr)->dev_access       = access;
 			(*ds_ptr)->i_nethost        = i_nethost;
+#ifdef CLIENT_TCP
 			(*ds_ptr)->rpc_protocol     = D_TCP;
+#else
+			(*ds_ptr)->rpc_protocol     = D_UDP;
+#endif /* CLIENT_TCP */
 			(*ds_ptr)->asynch_clnt      = NULL;
 			(*ds_ptr)->asynch_timeout   = asynch_timeout;
 			(*ds_ptr)->pending          = 0;
@@ -1653,7 +1671,9 @@ DON'T - 26/3/98
 /*
  * Reinstall the current connection timeout.
  */
-		clnt_control (ds->clnt, CLSET_RETRY_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_retry_timeout);
+		/* avoid retries at all costs - andy 20jan06 */
+		/*clnt_control (ds->clnt, CLSET_RETRY_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_retry_timeout);*/
+		clnt_control (ds->clnt, CLSET_RETRY_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_timeout);
 		clnt_control (ds->clnt, CLSET_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_timeout);
 	}
 
@@ -2136,7 +2156,9 @@ long _DLLFunc check_rpc_connection (devserver ds, long *error)
 /*
  *  Initialise the current RPC timeout to the new connection. 
  */
-		clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_retry_timeout);
+		/* avoid retries at all costs - andy 20jan06 */
+		/*clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_retry_timeout);*/
+		clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_timeout);
 		clnt_control (clnt, CLSET_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_timeout);
 
 /*
@@ -3243,7 +3265,9 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
  *  Initialise the current RPC timeout to the new connection. 
  *
  */
-	clnt_control (ds->clnt, CLSET_RETRY_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_retry_timeout);
+	/* avoid retries at all costs - andy 20jan06 */
+	/*clnt_control (ds->clnt, CLSET_RETRY_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_retry_timeout);*/
+	clnt_control (ds->clnt, CLSET_RETRY_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_timeout);
 	clnt_control (ds->clnt, CLSET_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_timeout);
 
 	return (DS_OK);
