@@ -17,7 +17,6 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 include_HEADERS		= dc.h  dcP.h  dc_xdr.h  dcrd_xdr.h  dcwr_xdr.h
-#lib_LTLIBRARIES	= libdcapi.la
 noinst_LTLIBRARIES      = libdcapi.la
 
 
