@@ -207,10 +207,18 @@ AC_DEFUN([TACO_DC_API],
 			*)	AC_MSG_ERROR([bad value ${enable_dc} for --enable-dc]);;
 		esac], [taco_dc=yes])
 	AM_CONDITIONAL(DC_BUILD, test "x$taco_dc" = "xyes") 
-	if test "x$taco_dc" = "xyes" ; then
-		TACO_DC_LIBS="\$(top_builddir)/lib/dc/libdcapi.la"
-	fi
-	AC_SUBST(TACO_DC_LIBS)
+#	if test "x$taco_dc" = "xyes" ; then
+#		TACO_DC_LIBS="\$(top_builddir)/lib/dc/libdcapi.la"
+#		TACO_DC_LIBS=
+#	fi
+#	AC_SUBST(TACO_DC_LIBS)
+	AC_ARG_ENABLE(tango_poller, AC_HELP_STRING([--enable-tango_poller], [enable the data collector to poll tango devices @<:@default=no@:>@]),
+		[case "${enable_tango_poller}" in
+			yes)	tango_poller=yes;;
+			no)	tango_poller=no;;
+			*)	AC_MSG_ERROR([bad value ${enable_tango_poller} for --enable-tango_poller]);;
+		esac], [tango_poller=yes])
+	AM_CONDITIONAL(TANGO_POLLER, test "x$tango_poller" = "xyes") 
 ])
 
 AC_DEFUN([TACO_TANGO],
@@ -718,3 +726,15 @@ AC_DEFUN([WITH_TANGO],
 	AC_SUBST(TANGO_LIBS)
 	AC_SUBST(TANGO_INCLUDES)
 ])
+
+AC_DEFUN([TACO_CLIENT_TCP],
+[
+        AC_ARG_ENABLE(client_tcp, AC_HELP_STRING([--enable-client_tcp], [client connections will be TCP by default (if disabled they will be UDP)@<:@default=yes@:>@]),
+                [case "${enable_client_tcp}" in
+                        yes)    taco_client_tcp=yes;;
+                        no)     taco_client_tcp=no;;
+                        *)      AC_MSG_ERROR([bad value ${client_tcp} for --enable-client_tcp]);;
+                esac], [taco_client_tcp=yes])
+        AM_CONDITIONAL(CLIENT_TCP, test "x$taco_client_tcp" = "xyes")
+])
+
