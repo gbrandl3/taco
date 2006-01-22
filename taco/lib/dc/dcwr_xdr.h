@@ -23,13 +23,13 @@
  * Description: XDR structures definition for teh write part of dc server
  *
  * Author(s):   Emmanuel Taurel
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
  * Original:      1992
  *
- * Version:       $Revision: 1.2 $
+ * Version:       $Revision: 1.3 $
  *
- * Date:          $Date: 2005-07-25 12:55:41 $
+ * Date:          $Date: 2006-01-22 21:22:08 $
  *
 *******************************************************************************/
 
@@ -46,7 +46,7 @@ struct cmd_dat {
 	} xsequence;
 };
 typedef struct cmd_dat cmd_dat;
-bool_t xdr_cmd_dat();
+bool_t xdr_cmd_dat(XDR *xdrs, cmd_dat *objp);
 
 
 struct dev_dat {
@@ -57,25 +57,25 @@ struct dev_dat {
 	} xcmd_dat;
 };
 typedef struct dev_dat dev_dat;
-bool_t xdr_dev_dat();
+bool_t xdr_dev_dat(XDR *xdrs, dev_dat *objp);
 
 
 typedef struct {
 	u_int dev_datarr_len;
 	dev_dat *dev_datarr_val;
 } dev_datarr;
-bool_t xdr_dev_datarr();
+bool_t xdr_dev_datarr(XDR *xdrs, dev_datarr *objp);
 
 
 typedef char *name;
-bool_t xdr_name();
+bool_t xdr_name(XDR *xdrs, name *objp);
 
 
 typedef struct {
 	u_int name_arr_len;
 	name *name_arr_val;
 } name_arr;
-bool_t xdr_name_arr();
+bool_t xdr_name_arr(XDR *xdrs, name_arr *objp);
 
 
 struct dc_cmd_x {
@@ -83,7 +83,7 @@ struct dc_cmd_x {
 	int cmd_argout;
 };
 typedef struct dc_cmd_x dc_cmd_x;
-bool_t xdr_dc_cmd_x();
+bool_t xdr_dc_cmd_x(XDR *xdrs, dc_cmd_x *objp);
 
 
 struct dc_dev_x {
@@ -95,14 +95,14 @@ struct dc_dev_x {
 	} dc_cmd_ax;
 };
 typedef struct dc_dev_x dc_dev_x;
-bool_t xdr_dc_dev_x();
+bool_t xdr_dc_dev_x(XDR *xdrs, dc_dev_x *objp);
 
 
 typedef struct {
 	u_int dc_open_in_len;
 	dc_dev_x *dc_open_in_val;
 } dc_open_in;
-bool_t xdr_dc_open_in();
+bool_t xdr_dc_open_in(XDR *xdrs, dc_open_in *objp);
 
 
 struct dc_xdr_error {
@@ -110,14 +110,14 @@ struct dc_xdr_error {
 	int dev_error;
 };
 typedef struct dc_xdr_error dc_xdr_error;
-bool_t xdr_dc_xdr_error();
+bool_t xdr_dc_xdr_error(XDR *xdrs, dc_xdr_error *objp);
 
 struct dom_x {
 	char *dom_name;
 	int dom_nb_dev;
 };
 typedef struct dom_x dom_x;
-bool_t xdr_dom_x();
+bool_t xdr_dom_x(XDR *xdrs, dom_x *objp);
 
 struct dc_infox {
 	unsigned int free_mem;
@@ -129,7 +129,7 @@ struct dc_infox {
 	} dom_ax;
 };
 typedef struct dc_infox dc_infox;
-bool_t xdr_dc_infox();
+bool_t xdr_dc_infox(XDR *xdrs, dc_infox *objp);
 
 
 struct dc_infox_back {
@@ -137,7 +137,7 @@ struct dc_infox_back {
 	dc_infox back;
 };
 typedef struct dc_infox_back dc_infox_back;
-bool_t xdr_dc_infox_back();
+bool_t xdr_dc_infox_back(XDR *xdrs, dc_infox_back *objp);
 
 
 struct dc_devallx_back {
@@ -145,7 +145,7 @@ struct dc_devallx_back {
 	name_arr dev_name;
 };
 typedef struct dc_devallx_back dc_devallx_back;
-bool_t xdr_dc_devallx_back();
+bool_t xdr_dc_devallx_back(XDR *xdrs, dc_devallx_back *objp);
 
 
 struct cmd_infox {
@@ -154,7 +154,7 @@ struct cmd_infox {
 	int cmd_timex;
 };
 typedef struct cmd_infox cmd_infox;
-bool_t xdr_cmd_infox();
+bool_t xdr_cmd_infox(XDR *xdrs, cmd_infox *objp);
 
 
 struct dev_infx {
@@ -170,7 +170,7 @@ struct dev_infx {
 	int deltax[5];
 };
 typedef struct dev_infx dev_infx;
-bool_t xdr_dev_infx();
+bool_t xdr_dev_infx(XDR *xdrs, dev_infx *objp);
 
 
 struct dc_devinfx_back {
@@ -178,6 +178,6 @@ struct dc_devinfx_back {
 	dev_infx device;
 };
 typedef struct dc_devinfx_back dc_devinfx_back;
-bool_t xdr_dc_devinfx_back();
+bool_t xdr_dc_devinfx_back(XDR *xdrs, dc_devinfx_back *objp);
 
 #endif

@@ -23,13 +23,13 @@
  * Description:
  *
  * Author(s):	Emmanuel Taurel
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.13 $
  *
- * Date:	$Date: 2005-12-09 13:49:52 $
+ * Date:	$Date: 2006-01-22 21:18:25 $
  *
  ******************************************************************************/
 
@@ -40,6 +40,8 @@
 
 #include <private/ApiP.h>
 #include <DevErrors.h>
+
+extern dbserver_info           db_info;
 
 #include <dc_xdr.h>
 
@@ -88,7 +90,7 @@ static long dc_get_i_nethost_in_call(char *,nethost_call *,long);
 static long init_imp(long,long *);
 static void get_nethost(char *,char *);
 static char *dc_extract_device_name(char *);
-static int comp();
+static int comp(const void*, const void*);
 static int check_dc(int,int,char **,int *,dc_dev_imp *,int *,long,long *);
 static int call_dcserv(int,long *,dc_dev_retdat *,int,int *,long,long,long *);
 static int call_dcservm(long,long *,dc_dev_mretdat *,int,int *,long,long *);
@@ -594,14 +596,14 @@ static long init_imp(long i_nethost, long *perr)
  * @return 
  */
 #ifndef WIN32
-static int comp(serv *a, serv *b)
+static int comp(const void *vpa,const void *vpb)
 {
 #else
 static int comp(const void *vpa,const void *vpb)
 {
-	const serv *a=vpa;
-	const serv *b=vpb;
 #endif  /* WIN32 */
+	serv *a=(serv*)vpa;
+	serv *b=(serv*)vpb;
 	if (a->request < b->request)
 		return(-1);
 	else if (a->request == b->request)
@@ -700,7 +702,8 @@ static int rpc_connect(char *serv_name,CLIENT **prpc,int ind,long i_net,long *pe
  * Sort the serv_info table in the ascending order 
  */
 #ifndef WIN32
-	qsort(&(serv_info[0]),nb_server,sizeof(serv),(int (*)())comp);
+	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
+/*	qsort(&(serv_info[0]),nb_server,sizeof(serv),(int (*)())comp);*/
 #else
 	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
 #endif  /* WIN32 */
@@ -790,9 +793,9 @@ static int test_server(int ind,serv *serv_info,int min,CLIENT **clnt_ptr,long i_
  */
 
 #ifdef OSK
-	if ((tmp1 = index(serv_net_ptr[0].host_name,'.')) != NULL)
+	if ((tmp1 = index(serv_net_ptr->host_name,'.')) != NULL)
 #else
-	if ((tmp1 = strchr(serv_net_ptr[0].host_name,'.')) != NULL)
+	if ((tmp1 = strchr(serv_net_ptr->host_name,'.')) != NULL)
 #endif /* OSK */
 	{
 		diff = (u_int)(tmp1 - serv_net_ptr[0].host_name);
@@ -802,7 +805,7 @@ static int test_server(int ind,serv *serv_info,int min,CLIENT **clnt_ptr,long i_
 /* 
  * Build the RPC connection to the data collector server 
  */
-	cl_read = clnt_create(serv_net_ptr[0].host_name,serv_net_ptr[0].pn,serv_net_ptr[0].vn,"tcp");
+	cl_read = clnt_create(serv_net_ptr->host_name,serv_net_ptr->pn,serv_net_ptr->vn,"tcp");
 	free(serv_net_ptr);
 	if (cl_read == NULL)
 	{
@@ -2265,7 +2268,8 @@ int rpc_reconnect_rd(int ind,long i_net,long *perr)
  * Sort the serv_info table in the ascending order 
  */
 #ifndef WIN32
-	qsort(&(serv_info[0]),nb_server,sizeof(serv),(int (*)())comp);
+	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
+/*	qsort(&(serv_info[0]),nb_server,sizeof(serv),(int (*)())comp);*/
 #else
 	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
 #endif  /* WIN32 */
@@ -2481,13 +2485,13 @@ static long build_nethost_arr(dc_dev_imp *p_input,unsigned int num_dev,
 				old_nb_elt = nb_block * NETHOST_BLOCK;
 				nb_block++;
 				new_nb_elt = nb_block * NETHOST_BLOCK;
-				if ((*p_array = realloc(*p_array,(new_nb_elt * sizeof(nethost_call)))) == NULL)
+				if ((*p_array = (nethost_call*)realloc(*p_array,(new_nb_elt * sizeof(nethost_call)))) == NULL)
 				{
 					*p_err = DcErr_ClientMemoryAllocation;
 					return(DS_NOTOK);
 				}
 				
-				if ((*p_ind = realloc(*p_ind,(new_nb_elt * sizeof(long)))) == NULL)
+				if ((*p_ind = (long *)realloc(*p_ind,(new_nb_elt * sizeof(long)))) == NULL)
 				{
 					*p_err = DcErr_ClientMemoryAllocation;
 					return(DS_NOTOK);
@@ -2503,7 +2507,7 @@ static long build_nethost_arr(dc_dev_imp *p_input,unsigned int num_dev,
 /* 
  * Allocate memory for a new nethost name 
  */
-			if (((*p_array)[nb_nethost - 1].nethost = malloc(strlen(nethost) + 1)) == NULL)
+			if (((*p_array)[nb_nethost - 1].nethost = (char*)malloc(strlen(nethost) + 1)) == NULL)
 			{
 				for (k = 0;k < nb_nethost;k++)
 					free((*p_array)[k].nethost);

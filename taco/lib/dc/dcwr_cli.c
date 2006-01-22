@@ -1,6 +1,9 @@
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/dc/dcwr_cli.c,v 1.10 2005-11-13 19:59:36 andy_gotz Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/dc/dcwr_cli.c,v 1.11 2006-01-22 21:19:46 andy_gotz Exp $";
 
 /* $Log: not supported by cvs2svn $
+/* Revision 1.10  2005/11/13 19:59:36  andy_gotz
+/* reinstated the old esrf version, the sourceforge one had too many bugs
+/*
  * Revision 4.12  2003/01/27 09:53:36  taurel
  * The bug fix in release 4.11 was buggy!! Fix it now(I hope).
  *
@@ -208,16 +211,12 @@ extern dbserver_info db_info;
 
 /* Some functions declaration */
 
-static int test_server();
-static int re_test_server();
-static int rpc_reconnect();
-static int rpc_connect();
-#ifndef _NT
-static int comp();
-#else
+static int test_server(serv *serv_info,int min,long *perr);
+static int re_test_server(serv *serv_info,int min,int nb_server,long *perr);
+static int rpc_reconnect(long *perr);
+static int rpc_connect(long *perr);
 static int comp(const void*, const void*);
 static int get_dc_host(char **p_serv_name,long *perr);
-#endif   /* _NT */
 
 
 
@@ -931,10 +930,10 @@ dc_error *perr;
 *                                                                           *
 *****************************************************************************/
 
-static int comp(a,b)
-serv *a;
-serv *b;
+static int comp(const void *vpa,const void *vpb)
 {
+	serv *a = (serv*)vpa;
+	serv *b = (serv*)vpb;
 	if (a->request < b->request)
 		return(-1);
 	else if (a->request == b->request)
@@ -962,8 +961,7 @@ serv *b;
 *                                                                           *
 *****************************************************************************/
 
-static int rpc_connect(perr)
-long *perr;
+static int rpc_connect(long *perr)
 {
 	char *serv_name;
 	struct hostent *host;
@@ -1064,7 +1062,7 @@ long *perr;
 /* Sort the serv_info table in the ascending order */
 
 #ifndef _NT
-	qsort(&(serv_info[0]),nb_server,sizeof(serv),(int (*)())comp);
+	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
 #else
 	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
 #endif   /* _NT */
@@ -1115,10 +1113,7 @@ long *perr;
 *****************************************************************************/
 
 
-static int test_server(serv_info,min,perr)
-serv *serv_info;
-int min;
-long *perr;
+static int test_server(serv *serv_info,int min,long *perr)
 {
 	char serv1[40];
 	char *tmp_ptr;
@@ -1228,9 +1223,7 @@ long *perr;
 *                                                                           *
 *****************************************************************************/
 
-int get_dc_host(p_serv_name,perr)
-char **p_serv_name;
-long *perr;
+int get_dc_host(char **p_serv_name,long *perr)
 {
 	static char hostna[32];
 	char dcdev_name[40];
@@ -1344,8 +1337,7 @@ long *perr;
 *                                                                           *
 *****************************************************************************/
 
-static int rpc_reconnect(perr)
-long *perr;
+static int rpc_reconnect(long *perr)
 {
 	int i,res,nb_server;
 	long error;
@@ -1395,11 +1387,7 @@ long *perr;
 
 /* Sort the serv_info table in the ascending order */
 
-#ifndef _NT
-	qsort(&(serv_info[0]),nb_server,sizeof(serv),(int (*)())comp);
-#else
 	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
-#endif   /* _NT */
 
 /* Test every server and keep the connection with the first one which answers */
 
@@ -1449,10 +1437,7 @@ long *perr;
 *****************************************************************************/
 
 
-static int re_test_server(serv_info,min,nb_server,perr)
-serv *serv_info;
-int min;
-long *perr;
+static int re_test_server(serv *serv_info,int min,int nb_server,long *perr)
 {
 	char serv1[40];
 	char *tmp_ptr;

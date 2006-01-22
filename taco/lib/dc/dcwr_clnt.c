@@ -23,13 +23,13 @@
  * Description:
  * 
  * Author(s):   Emmanuel Taurel
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
  * Original:    1992
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2005-07-25 12:55:41 $
+ * Date:        $Date: 2006-01-22 21:21:43 $
  *
  ******************************************************************************/
 
@@ -120,7 +120,7 @@ dc_infox_back *dc_info_1(void *argp,CLIENT *clnt,long *perr)
 
 	memset((char *)&res, 0, sizeof(res));
 
-	clnt_stat = clnt_call(clnt, DC_INFO,(xdrproc_t)xdr_void, argp,(xdrproc_t)xdr_dc_infox_back, (caddr_t)&res, TIMEOUT);
+	clnt_stat = clnt_call(clnt, DC_INFO,(xdrproc_t)xdr_void, (char*)argp,(xdrproc_t)xdr_dc_infox_back, (caddr_t)&res, TIMEOUT);
 	if (clnt_stat != RPC_SUCCESS) 
 	{
 		dev_printdebug(DBG_ERROR,"dc_info clnt_call returned : %s\n",clnt_sperrno(clnt_stat));
@@ -142,7 +142,7 @@ dc_devallx_back *dc_devall_1(void *argp,CLIENT *clnt,long *perr)
 
 	memset((char *)&res, 0, sizeof(res));
 
-	clnt_stat = clnt_call(clnt, DC_DEVALL,(xdrproc_t)xdr_void, argp,(xdrproc_t)xdr_dc_devallx_back, (caddr_t)&res, TIMEOUT);
+	clnt_stat = clnt_call(clnt, DC_DEVALL,(xdrproc_t)xdr_void, (char*)argp,(xdrproc_t)xdr_dc_devallx_back, (caddr_t)&res, TIMEOUT);
 	if (clnt_stat != RPC_SUCCESS) 
 	{
 		dev_printdebug(DBG_ERROR,"dc_devall clnt_call returned : %s\n",clnt_sperrno(clnt_stat));
