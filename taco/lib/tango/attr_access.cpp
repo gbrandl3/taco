@@ -25,17 +25,17 @@
  * Description:	
  *	
  * Author(s)  :	Jens Meyer
- * 		$Author: jensmeyer $
+ * 		$Author: andy_gotz $
  *
  * Original   :	September2002
  *
- * Version    :	$Revision: 1.4 $
+ * Version    :	$Revision: 1.5 $
  *
- * Date       : $Date: 2005-08-02 12:13:48 $
+ * Date       : $Date: 2006-02-20 11:24:06 $
  *
  *********************************************************************/ 
 
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_access.cpp,v 1.4 2005-08-02 12:13:48 jensmeyer Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_access.cpp,v 1.5 2006-02-20 11:24:06 andy_gotz Exp $";
 
 #include <attr_api.h>
 
@@ -1285,17 +1285,17 @@ long AttrAccess::create_attr_access (long *error)
 		{
 		try
 			{
-   		tango_obj = new Tango::DeviceProxy (device_name);
+   				tango_obj = new Tango::DeviceProxy (device_name);
 			
 			/*
-		 	 * Set the data source to direct device access
+		 	 * DO NOT Set the data source to direct device access
+			 * 
+			 * use default of CACHE then DEVICE - ag+jm 26jan2006
 		 	 */
 		 
-		 	
-			tango_obj->set_source(Tango::DEV);
+				//tango_obj->set_source(Tango::DEV);
 			
 			
-			// printf ("Imported TANGO device : %s\n", device_name);
 			}
 		
 		catch (Tango::DevFailed &e)
