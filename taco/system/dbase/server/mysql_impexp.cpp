@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:	$Date: 2005-07-25 08:37:42 $
+ * Date:	$Date: 2006-02-20 11:25:09 $
  *
  */
 
@@ -678,8 +678,8 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
    	if (mysql_query(mysql_conn, query.str().c_str()) != 0)
 	    throw long(DbErr_DatabaseAccess);
 #endif
-   	if (mysql_affected_rows(mysql_conn) == 0)
-	    throw long(DbErr_DatabaseAccess);
+        if (mysql_affected_rows(mysql_conn) == 0)
+	            throw long(DbErr_DeviceNotDefined);
     }
     catch(const long err)
     {
