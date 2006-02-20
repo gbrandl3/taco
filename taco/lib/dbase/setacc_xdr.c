@@ -23,13 +23,13 @@
  * Description:
  *
  * Author(s):     
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  * 
  * Original:      
  *
- * Version:     $Revision: 1.6 $
+ * Version:     $Revision: 1.7 $
  *
- * Date:        $Date: 2005-07-25 13:02:28 $
+ * Date:        $Date: 2006-02-20 11:22:05 $
  *
  ****************************************************************************/
 
@@ -186,7 +186,13 @@ bool_t _WINAPI xdr_svc_inf(XDR *xdrs, svc_inf *objp)
 
 bool_t _WINAPI xdr_putres(XDR *xdrs, putres *objp)
 {
-	if (!xdr_string(xdrs,&objp->res_name, RES_NAME_LENGTH))
+/*
+ * dirty fix for Laurent Claustre to enable him to store longer
+ * names in mysql (which supports up to 256 character names currently)
+ *
+ * andy 31jan06
+ */
+	if (!xdr_string(xdrs,&objp->res_name, LONG_RES_NAME_LENGTH))
 		return(FALSE);
 	if (!xdr_wrapstring(xdrs,&objp->res_val))
 		return(FALSE);
