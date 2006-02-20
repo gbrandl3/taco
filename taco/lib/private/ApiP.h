@@ -26,13 +26,13 @@
  *		programmers interface.
  *
  * Author(s):	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original:	June 1992
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2005-07-25 12:56:54 $
+ * Date:	$Date: 2006-02-20 11:22:52 $
  *
  ********************************************************************-*/
 
@@ -45,7 +45,7 @@
  */
 #ifdef _IDENT
 static char ApiPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.10 2005-07-25 12:56:54 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.11 2006-02-20 11:22:52 andy_gotz Exp $";
 #endif /* _IDENT */
 
 
@@ -97,7 +97,7 @@ static char ApiPh[] =
  */
 
 #ifndef _UCC
-#define NFILE 256 /* maximum number of server connections per process */
+#define NFILE 512 /* maximum number of server connections per process */
 #else
 #define NFILE 100 /* maximum number of server connections per process */
 #endif
