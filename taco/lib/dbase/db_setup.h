@@ -23,11 +23,11 @@
  * Description:	
  *
  * Author(s):	
- *		$Author: jensmeyer $
+ *		$Author: andy_gotz $
  * 
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2005-08-04 10:33:25 $
+ * Date:	$Date: 2006-02-20 11:20:51 $
  *
  ******************************************************************************/
 
@@ -154,6 +154,7 @@
 #endif
 #define DEV_NAME_LENGTH		DOMAIN_NAME_LENGTH + FAMILY_NAME_LENGTH + MEMBER_NAME_LENGTH 
 #define RES_NAME_LENGTH		32
+#define LONG_RES_NAME_LENGTH	80
 #ifdef NDBM
 #define RES_VAL_LENGTH		2048
 #else
