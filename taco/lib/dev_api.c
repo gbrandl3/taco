@@ -31,9 +31,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.30 $
+ * Version    :	$Revision: 1.31 $
  *
- * Date	    :	$Date: 2006-01-22 21:03:32 $
+ * Date	    :	$Date: 2006-02-20 11:20:02 $
  *
  ********************************************************************-*/
 
@@ -277,7 +277,7 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 	if (strncasecmp(dev_name,"tango:",6) == 0)
 	{
 		status = tango_dev_import((dev_name+6),access, ds_ptr, error);
-		printf("dev_import(): tango_dev_import(%s) returned %d\n",dev_name,status);
+		dev_printdebug (DBG_TRACE | DBG_API, "dev_import(): tango_dev_import(%s) returned %d\n",dev_name,status);
 		return(status);
 	}
 #endif /* TANGO */
@@ -614,7 +614,7 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
 #ifdef CLIENT_TCP
 				clnt = clnt_create (host_name,prog_number, vers_number,"tcp");
 #else
-				clnt = clnt_create (host_name,prog_number, vers_number,"tcp");
+				clnt = clnt_create (host_name,prog_number, vers_number,"udp");
 #endif /* CLIENT_TCP */
 				if (clnt == NULL)
 				{
@@ -660,8 +660,13 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
  */
 		svr_conns[n_svr_conn].clnt        = clnt;
 		svr_conns[n_svr_conn].vers_number = vers_number;
+#ifdef CLIENT_TCP
 		svr_conns[n_svr_conn].tcp_clnt = clnt;
 		svr_conns[n_svr_conn].udp_clnt = NULL;
+#else
+		svr_conns[n_svr_conn].tcp_clnt = NULL;
+		svr_conns[n_svr_conn].udp_clnt = clnt;
+#endif /* CLIENT_TCP */
 		svr_conns[n_svr_conn].asynch_clnt = NULL;
 		svr_conns[n_svr_conn].tcp_socket = -1;
 	}
@@ -896,8 +901,13 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
 			{
 				svr_conns[n_svr_conn].clnt        = clnt;
 				svr_conns[n_svr_conn].vers_number = vers_number;
+#ifdef CLIENT_TCP
 				svr_conns[n_svr_conn].tcp_clnt    = clnt;
 				svr_conns[n_svr_conn].udp_clnt    = NULL;
+#else
+				svr_conns[n_svr_conn].tcp_clnt    = NULL;
+				svr_conns[n_svr_conn].udp_clnt    = clnt;
+#endif /* CLIENT_TCP */
 				svr_conns[n_svr_conn].asynch_clnt = NULL;
 			}
 			else
@@ -1745,10 +1755,18 @@ long _DLLFunc dev_query_svr (char* host, long prog_number, long vers_number)
 		svr_conns[next_conn].rpc_conn_status    = GOOD_SVC_CONN;
 		svr_conns[next_conn].rpc_error_flag     = GOOD_SVC_CONN;
 		svr_conns[next_conn].rpc_conn_counter   = 0;
+#if CLIENT_TCP
 		svr_conns[next_conn].rpc_protocol       = D_TCP;
+#else
+		svr_conns[next_conn].rpc_protocol       = D_UDP;
+#endif /* CLIENT_TCP */
 		svr_conns[next_conn].first_access_time  = False;
 		svr_conns[next_conn].open_si_connections    = 0;
+#if CLIENT_TCP
 		svr_conns[next_conn].rpc_protocol_before_si = D_TCP;
+#else
+		svr_conns[next_conn].rpc_protocol_before_si = D_UDP;
+#endif /* CLIENT_TCP */
 
 		return(next_conn);
 	}
@@ -1789,7 +1807,11 @@ long _DLLFunc dev_query_svr (char* host, long prog_number, long vers_number)
 		svr_conns[next_conn].rpc_conn_status    = GOOD_SVC_CONN;
 		svr_conns[next_conn].rpc_error_flag     = GOOD_SVC_CONN;
 		svr_conns[next_conn].rpc_conn_counter   = 0;
+#if CLIENT_TCP
 		svr_conns[next_conn].rpc_protocol       = D_TCP;
+#else
+		svr_conns[next_conn].rpc_protocol       = D_UDP;
+#endif /* CLIENT_TCP */
 		svr_conns[next_conn].first_access_time  = False;
 	}
 	return(next_conn);
@@ -3172,12 +3194,13 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
 					return (DS_NOTOK);
 				}
 			}
+			if (svr_conns[ds->no_svr_conn].rpc_protocol == D_TCP) 
+				svr_conns[ds->no_svr_conn].tcp_clnt = svr_conns[ds->no_svr_conn].clnt;
 			svr_conns[ds->no_svr_conn].rpc_protocol = D_UDP;
 
 /*
  * try to solve problem with Ultra-C/C++ 2.0.1 by not destroying the TCP client handle, keep it for reuse
  */
-			svr_conns[ds->no_svr_conn].tcp_clnt = svr_conns[ds->no_svr_conn].clnt;
 			svr_conns[ds->no_svr_conn].clnt = svr_conns[ds->no_svr_conn].udp_clnt = clnt;
 			ds->clnt = clnt;
 
@@ -3240,8 +3263,9 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
 					return (DS_NOTOK);
 				}
 			}
+			if (svr_conns[ds->no_svr_conn].rpc_protocol == D_UDP) 
+				svr_conns[ds->no_svr_conn].udp_clnt = svr_conns[ds->no_svr_conn].clnt;
 			svr_conns[ds->no_svr_conn].rpc_protocol = D_TCP;
-			svr_conns[ds->no_svr_conn].udp_clnt = svr_conns[ds->no_svr_conn].clnt;
 			svr_conns[ds->no_svr_conn].clnt = svr_conns[ds->no_svr_conn].tcp_clnt = clnt;
 			ds->clnt = clnt;
 
