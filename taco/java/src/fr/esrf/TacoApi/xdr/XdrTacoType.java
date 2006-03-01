@@ -52,7 +52,7 @@ public class XdrTacoType implements TacoConst {
       case D_LONG_TYPE:
         return new XdrInt();
       case D_FLOAT_TYPE:
-        return new XdrInt();
+        return new XdrFloat();
       case D_DOUBLE_TYPE:
         return new XdrDouble();
       case D_STRING_TYPE:

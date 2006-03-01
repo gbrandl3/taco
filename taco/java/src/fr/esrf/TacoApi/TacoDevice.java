@@ -11,6 +11,9 @@
  Original   :	June 2005
 
  $Log: not supported by cvs2svn $
+ Revision 1.11  2006/01/13 10:33:57  jlpons
+ Fixed argout decoding bug
+
  Revision 1.10  2005/12/05 15:52:42  jlpons
  Fixed DC decoding bug
 
@@ -86,7 +89,7 @@ public class TacoDevice implements ServerListener {
   public final static int SOURCE_CACHE_DEVICE = 2;
 
   // Do not modify this line (it is used by the install script)
-  public final String apiRelease = "$Revision: 1.11 $".substring(11,15);
+  public final String apiRelease = "$Revision: 1.12 $".substring(11,15);
 
   // Timeout before reinporting the device from the database
   private static long dbImportTimeout = 30000L; // 30 sec
@@ -836,11 +839,12 @@ public class TacoDevice implements ServerListener {
 
     try {
 
-      TacoDevice dev1  = new TacoDevice("sr/v-ip/c7-7");
+      TacoDevice dev1  = new TacoDevice("sr/m-hp/1");
 //        TacoDevice dev1  = new TacoDevice("sr/d-ct/1");
 //      TacoDevice dev2  = new TacoDevice("sr/jlp/1");
 //      TacoDevice dev3  = new TacoDevice("//aries/sr/d-fbpm/peak-h");
-        dev1.setSource(SOURCE_DEVICE);
+        dev1.setSource(SOURCE_CACHE_DEVICE);
+//        dev1.setProtocol(PROTOCOL_TCP);
 //      dev2.setSource(SOURCE_CACHE_DEVICE);
 //      dev3.setSource(SOURCE_CACHE_DEVICE);
 
@@ -849,10 +853,10 @@ public class TacoDevice implements ServerListener {
         long t0 = System.currentTimeMillis();
         try {
 
-          int cmdCode = dev1.getCommandCode("DevState");
+          int cmdCode = dev1.getCommandCode("DevReadDisplay");
           TacoData values = dev1.get(cmdCode);
-          short stateValue2 = values.extractShort();
-          System.out.println("State (id14/vip/71)= " + stateValue2 + " [" + XdrTacoType.getStateName(stateValue2) + "]");
+          float statusValue = values.extractFloat();
+          System.out.println("Display = " + statusValue );
 
 //          TacoData state2 = dev2.get(TacoConst.DevState);
 //          stateValue2 = state2.extractShort();
