@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.20 $
+ * Version:	$Revision: 1.21 $
  *
- * Date:	$Date: 2005-07-25 08:49:30 $
+ * Date:	$Date: 2006-03-08 16:27:44 $
  *
  */
 
@@ -337,7 +337,7 @@ int main(int argc,char **argv)
 //
 // Send these informations to network manager. Even if the server is now 
 // supporting version one and two, register it in the Manager with version 1
-// for compatibility with old release of device server. */
+// for compatibility with old release of device server. 
 //
 	register_db((char *)netmanhost.c_str(), hostna, pgnum, DB_SETUPVERS);
 	logStream << getTimeString("dbm_server") << "registered on host : " << netmanhost << std::endl;
