@@ -217,7 +217,7 @@ AC_DEFUN([TACO_DC_API],
 			yes)	tango_poller=yes;;
 			no)	tango_poller=no;;
 			*)	AC_MSG_ERROR([bad value ${enable_tango_poller} for --enable-tango_poller]);;
-		esac], [tango_poller=yes])
+		esac], [tango_poller=no])
 	AM_CONDITIONAL(TANGO_POLLER, test "x$tango_poller" = "xyes") 
 ])
 
