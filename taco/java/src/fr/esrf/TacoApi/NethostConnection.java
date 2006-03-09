@@ -443,6 +443,9 @@ class NethostConnection {
         int callNumber = Integer.MAX_VALUE;
         try {
           callNumber = Integer.parseInt(requests[j]);
+          if(callNumber==0)
+            // This dc_rd is probaly not running, ignore it
+            callNumber = Integer.MAX_VALUE;
         } catch (Exception e) {}
         if (callNumber < min) {
           min = callNumber;
