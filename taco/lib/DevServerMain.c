@@ -29,9 +29,9 @@
  *
  * Original   	: March 1991
  *
- * Version	: $Revision: 1.21 $
+ * Version	: $Revision: 1.22 $
  *
- * Date		: $Date: 2006-03-29 14:52:07 $
+ * Date		: $Date: 2006-03-29 15:07:59 $
  *
  *******************************************************************-*/
 #ifndef WIN32
@@ -504,7 +504,7 @@ InitApplication(HINSTANCE hInstance)
         if (IS_WIN95) {
 			wc.lpszMenuName  = "DS_MAIN_W95";
         } else {
-			wc.lpszMenuName  = "DS_MAINWIN32";
+			wc.lpszMenuName  = "DS_MAIN_NT";
         }
         wc.lpszClassName = gszAppName;
 
