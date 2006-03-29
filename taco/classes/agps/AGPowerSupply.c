@@ -54,7 +54,9 @@ static char RcsId[] = "@(#) $Header: /segfs/dserver/classes/powersupply/ag/src/R
 
 
  *********************************************************************/
+#ifndef WIN32
 #include <config.h>
+#endif /* WIN32 */
 #ifdef linux
 #include <stddef.h>
 #include <stdio.h>
