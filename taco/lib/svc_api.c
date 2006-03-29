@@ -29,9 +29,9 @@
  *
  * Original:	Feb 1994
  *
- * Version:	$Revision: 1.22 $
+ * Version:	$Revision: 1.23 $
  *
- * Date:		$Date: 2005-12-09 15:11:25 $
+ * Date:		$Date: 2006-03-29 14:52:35 $
  *
  ********************************************************************-*/
 #ifndef WIN32
@@ -1858,6 +1858,14 @@ extern long minimal_access;
 static void _WINAPI devserver_prog_4    PT_( (struct svc_req *rqstp,SVCXPRT *transp) );
 static long svc_check           PT_( (long *error) );
 
+#ifdef WIN32  /* WIN32 */
+
+#include "resource.h"
+
+#define TITLE_STR 	"TACO-Device Server: "
+#define	MB_ERR		(MB_OK | MB_ICONEXCLAMATION)
+#define	MB_INFO		(MB_OK | MB_ICONINFORMATION)
+#endif /* WIN32 */
 
 /**
  * @ingroup dsAPIintern
