@@ -29,9 +29,9 @@
  *
  * Original   	: March 1991
  *
- * Version	: $Revision: 1.20 $
+ * Version	: $Revision: 1.21 $
  *
- * Date		: $Date: 2005-12-09 15:11:25 $
+ * Date		: $Date: 2006-03-29 14:52:07 $
  *
  *******************************************************************-*/
 #ifndef WIN32
@@ -846,8 +846,8 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			svc_unregister(config_flags.prog_number, API_VERSION);
 			svc_unregister(config_flags.prog_number, ASYNCH_API_VERSION);
 
-			svc_destroy(transp);
-			svc_destroy(transp_tcp);
+			if (transp != 0) svc_destroy(transp);
+			if (transp_tcp != 0) svc_destroy(transp_tcp);
 		   /*
 			* RPC & Winsock cleanup.
 			*/
