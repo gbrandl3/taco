@@ -1,0 +1,41 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: agps - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\opid11\LOCALS~1\Temp\RSP5E.tmp" with contents
+[
+/nologo /MLd /W3 /Gm /GX /ZI /Od /I "D:\oncrpc\win32\include" /I "D:\workspace\taco\lib" /I "D:\workspace\taco\lib\private" /I "D:\workspace\taco\lib\xdr" /I "D:\workspace\taco\lib\dbase" /I "D:\workspace\taco\lib\dc" /I "D:\workspace\taco\classes\agps" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_NT" /Fp"Debug/agps.pch" /YX /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"D:\workspace\taco\classes\agps\AGPowerSupply.c"
+"D:\workspace\taco\classes\agps\PowerSupply.c"
+"D:\workspace\taco\classes\agps\startup.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\opid11\LOCALS~1\Temp\RSP5E.tmp" 
+Creating temporary file "C:\DOCUME~1\opid11\LOCALS~1\Temp\RSP5F.tmp" with contents
+[
+tacomain.lib libtaco.lib oncrpc.lib version.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib /nologo /subsystem:windows /incremental:yes /pdb:"Debug/agps.pdb" /debug /machine:I386 /out:"Debug/agps.exe" /pdbtype:sept /libpath:"D:\oncrpc\win32\librpc\lib\oncrpc_static\Debug" /libpath:"D:\workspace\taco\lib\win32\msvs6\libtaco\Debug" /libpath:"D:\workspace\taco\lib\win32\msvs6\libtaco\tacomain\Debug" 
+.\Debug\AGPowerSupply.obj
+.\Debug\PowerSupply.obj
+.\Debug\startup.obj
+..\..\..\DSMain.res
+]
+Creating command line "link.exe @C:\DOCUME~1\opid11\LOCALS~1\Temp\RSP5F.tmp"
+<h3>Output Window</h3>
+Compiling...
+AGPowerSupply.c
+d:\workspace\taco\classes\agps\agpowersupply.c(208) : warning C4101: 'status' : unreferenced local variable
+PowerSupply.c
+startup.c
+Linking...
+   Creating library Debug/agps.lib and object Debug/agps.exp
+
+
+
+<h3>Results</h3>
+agps.exe - 0 error(s), 1 warning(s)
+</pre>
+</body>
+</html>
