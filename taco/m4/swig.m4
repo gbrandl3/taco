@@ -46,13 +46,17 @@ AC_DEFUN([SWIG_PROG],[
 				AC_MSG_WARN([cannot determine SWIG version])
 			fi
 		fi
-
-		# Check if a SWIG runtime library is available
-		SWIG_RUNTIME_LIBS_DIR="${SWIG%/bin*}/lib"
-		AC_MSG_CHECKING([for SWIG runtime libraries in $SWIG_RUNTIME_LIBS_DIR])
-		swig_tmp=`find "$SWIG_RUNTIME_LIBS_DIR" -name 'libswig*' -maxdepth 1`
-		test -n "$swig_tmp" && swig_tmp=yes || swig_tmp=no
-		AC_MSG_RESULT([$swig_tmp])
+	
+		if test $swig_tmp -lt 1003020 ; then
+			# Check if a SWIG runtime library is available
+			SWIG_RUNTIME_LIBS_DIR="${SWIG%/bin*}/lib"
+			AC_MSG_CHECKING([for SWIG runtime libraries in $SWIG_RUNTIME_LIBS_DIR])
+			swig_tmp=`find "$SWIG_RUNTIME_LIBS_DIR" -maxdepth 1 -name 'libswig*'`
+			test -n "$swig_tmp" && swig_tmp=yes || swig_tmp=no
+			AC_MSG_RESULT([$swig_tmp])
+		else
+			swig_tmp="yes"
+		fi
 	fi
 	AC_SUBST([SWIG_RUNTIME_LIBS_DIR])
 ])
