@@ -322,7 +322,8 @@ AC_DEFUN([TACO_ALARM],
 AC_DEFUN([X_AND_MOTIF],
 [
 	AC_REQUIRE([AC_PATH_XTRA])
-	appdefaultdir="`echo $X_LDFLAGS | cut -c3- `/X11/app-defaults"
+	tmp='for i in $X_LDFLAGS ; do if test `echo $i | cut -c1-2` = "-L" ; then echo $i; break; fi; done | cut -c3- '
+	appdefaultdir=`eval $tmp`/X11/app-defaults
 	motif_found=yes;
 	AC_ARG_WITH(motif, AC_HELP_STRING([--with-motif@<:@=ARG@:>@], [Motif @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the Motif installation, e.g. '/usr/local/myMotif']), [
 		case  "$with_motif" in
@@ -338,7 +339,7 @@ AC_DEFUN([X_AND_MOTIF],
 	CPPFLAGS="$CPPFLAGS $MOTIF_INCLUDES"
 	LIBS_SAVE="$LIBS"
 dnl	X_CFLAGS="$CPPFLAGS"
-	X_LDFLAGS="$LIBS $X_LDFLAGS $MOTIF_LIBS"
+	X_LDFLAGS="$LIBS $X_LDFLAGS $MOTIF_LIBS $X_LIBS"
 	AC_CHECK_HEADERS([Xm/Xm.h Xm/XmAll.h], [
 		AC_CHECK_LIB(Xm, XmStringCreateLocalized, [], [motif_found=no], [$X_LDFLAGS -lXt -lX11 -lSM -lICE])
 		break;
