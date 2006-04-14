@@ -423,7 +423,7 @@ public:
 	AC_LANG_POP(C++)
 	if test x${ac_cv_lib_gdbm_gdbm_open} != xyes ; then
 		GDBM_LIBS="\$(top_builddir)/gdbm/libgdbm.la"
-		GDBM_CFLAGS="-I\$(top_builddir)/gdbm"
+		GDBM_CFLAGS="-I\$(top_srcdir)/gdbm -I\$(top_builddir)/gdbm"
 		taco_build_gdbm="yes"
 	fi
 	LIBS="$save_LIBS"
