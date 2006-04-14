@@ -47,6 +47,9 @@
 #else
 #include <ndbm.h>
 #endif
+#if HAVE_STRING_H
+#include <string.h>
+#endif
 
 #define TRUE  1
 #define FALSE 0
