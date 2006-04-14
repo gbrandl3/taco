@@ -40,7 +40,7 @@ bin_PROGRAMS		+= db_fillup \
 		 	db_read db_dump
 endif
 
-INCLUDES		= @TACO_INCLUDES@ @GDBM_CFLAGS@
+AM_CPPFLAGS		= @TACO_INCLUDES@ @GDBM_CFLAGS@
 
 db_devicetree_SOURCES  = db_devicetree.cpp
 db_devicetree_LDADD    = @TACO_CLIENT_LIBS@
