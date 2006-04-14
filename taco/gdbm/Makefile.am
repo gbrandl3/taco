@@ -65,5 +65,7 @@ gdbm.h:	gdbm.proto gdbmerrno.h gdbm.proto2
 	chmod -w gdbm.h
 
 ndbm.h: gdbm.h
-	rm -f ndbm.h
-	cp $(srcdir)/ndbm.h ndbm.h
+	if test $(srcdir) != $(PWD) ; then \
+		rm -f ndbm.h ; \
+		cp $(srcdir)/ndbm.h ndbm.h ; \
+	fi
