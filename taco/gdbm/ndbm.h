@@ -30,9 +30,8 @@
 #define  DBM_INSERT  0
 #define  DBM_REPLACE 1
 
-
 /* The data and key structure.  This structure is defined for compatibility. */
-#ifndef _GDBM_H_
+#ifndef  _GDBM_H_ 
 typedef struct {
 	char *dptr;
 	int   dsize;
@@ -49,31 +48,29 @@ typedef struct {int dummy[10];} DBM;
 extern "C" {
 #endif
 
-extern DBM 	*dbm_open (...);
+extern DBM 	*dbm_open (char *, int, int);
 
-extern void	 dbm_close (...);
+extern void	 dbm_close (DBM *);
 
-extern datum	 dbm_fetch (...);
+extern datum	 dbm_fetch (DBM *, datum);
 
-extern int	 dbm_store (...);
+extern int	 dbm_store (DBM*, datum, datum, int);
 
-extern int	 dbm_delete (...);
+extern int	 dbm_delete (DBM*, datum);
 
-extern int	 dbm_delete (...);
+extern datum	 dbm_firstkey (DBM *);
 
-extern datum	 dbm_firstkey (...);
-
-extern datum	 dbm_nextkey (...);
+extern datum	 dbm_nextkey (DBM *);
 
 #define		 dbm_error(dbf)  (0)
 
 #define		 dbm_clearerr(dbf)
 
-extern int	 dbm_dirfno (...);
+extern int	 dbm_dirfno (DBM *);
 
-extern int	 dbm_pagfno (...);
+extern int	 dbm_pagfno (DBM *);
 
-extern int	 dbm_rdonly (...);
+extern int	 dbm_rdonly (DBM *);
 #ifdef __cplusplus
 }
 #endif
