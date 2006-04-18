@@ -1,18 +1,18 @@
 /*****************************************************************************
- * File:        $Id: starter.cpp,v 1.8 2005-06-26 13:45:26 andy_gotz Exp $
+ * File:        $Id: starter.cpp,v 1.9 2006-04-18 06:28:14 jkrueger1 Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
  * Description: Source code for implementing a starter server
  *
  * Author(s):   Jens Krüger
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2005-06-26 13:45:26 $
+ * Date:	$Date: 2006-04-18 06:28:14 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -54,6 +54,8 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+
+long minimal_access = WRITE_ACCESS;
 
 StarterDevice::StarterDevice(std::string name, long &error)
 	: Device(const_cast<char *>(name.c_str()), &error)

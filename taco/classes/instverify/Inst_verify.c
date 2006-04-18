@@ -6,11 +6,11 @@
  * Description:	Dummy class to test control system installations
  *
  * Author(s):	J.Meyer
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
  * Original:	10.5.95
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
  * Date:	$Date
  *
@@ -35,6 +35,8 @@ static	long	class_initialise();
 static	long	object_create();
 static	long	object_initialise();
 static	long	state_handler();
+
+long minimal_access = WRITE_ACCESS;
 
 static	DevMethodListEntry methods_list[] = {
    	{DevMethodClassInitialise,	class_initialise},

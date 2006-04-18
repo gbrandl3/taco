@@ -1,4 +1,4 @@
-static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon.c,v 1.2 2005-10-20 06:50:54 jkrueger1 Exp $";
+static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon.c,v 1.3 2006-04-18 06:25:59 jkrueger1 Exp $";
 
 /*********************************************************************
 
@@ -36,6 +36,8 @@ static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/u
 #include <daemon_xdr.h>
 #include <private/ApiP.h>
 #include <daemon.h>
+
+/* long minimal_access = WRITE_ACCESS; */
 
 /*
  * public methods

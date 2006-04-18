@@ -47,6 +47,7 @@ short Serial::debug = 0;
 extern Serial *device_ds[];
 extern unsigned int n_devices;
 
+long minimal_access = WRITE_ACCESS;
 
 //
 // In order to save space on the stack declare the buffer used as
