@@ -23,13 +23,13 @@
  * Description: TACO server in Python
  *
  * Author(s):   J. Meyer
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
  * Original:    June 2000
  *
- * Date:	$Date: 2005-12-09 15:09:01 $
+ * Date:	$Date: 2006-04-18 06:23:31 $
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  */
  
 #include <API.h>
@@ -96,24 +96,20 @@ static PyObject *Server_startup_nodb (PyObject *self, PyObject *args)
 /*
  * Get all device names
  */
-
 	n_device = PySequence_Size (Py_devices);
-    for (i=0; i<n_device; i++)
-    {
-    	Py_device = PySequence_GetItem (Py_devices, i);
+        for (i = 0; i < n_device; i++)
+	{
+		Py_device = PySequence_GetItem (Py_devices, i);
+/*
+ * Read the device name
+ */
+		py_name  = PyObject_CallMethod (Py_device, "get_dev_name", NULL);
+		device_list[i] = PyString_AsString(py_name);
+	}
 
-           /*
-            * Read the device name
-            */
-
-	   py_name  = PyObject_CallMethod (Py_device, "get_dev_name", NULL);
-           device_list[i] = PyString_AsString(py_name);
-	   }
-
-	/* 
-	 * start the device server
-	 */
-	 
+/* 
+ * start the device server
+ */
 	device_server (name, pers_name, 0, 1, 1, pn, n_device, device_list);
 			
         return PyInt_FromLong(0L);
@@ -237,36 +233,29 @@ long startup (char *svc_name, long *error)
 */
    	dev_printdebug (DBG_TRACE | DBG_STARTUP, "startup() : executing\n");
 
-   	dev_printdebug (DBG_TRACE | DBG_STARTUP,
-                   "startup() : executing\n");
-
-	/*
-	 * Loop over all devices to create
-	 */
-	 
+/*
+ * Loop over all devices to create
+ */
 	nu_of_devices = PySequence_Size (Py_devices);	
-	for (i=0; i<nu_of_devices; i++)
-	   {
-	   Py_device = PySequence_GetItem (Py_devices, i);
-	   
-	   /*
-	    * Read the device name
-	    */
-
-	   py_name   = PyObject_CallMethod (Py_device, "get_dev_name", NULL);
-	   dev_name = PyString_AsString(py_name);
-		 	
-	   /*
-	    * Create the device
-	    */
-	 
-     	   if (ds__create(dev_name, pythonClass, &(ds_python[i]), error) 
-	                  != DS_OK)
-              {
-              printf ("startup() - create %s failed: %s\n", dev_name, dev_error_str (*error));
-	      return (DS_NOTOK);
-              }
-           else printf ("startup() - created %s\n",dev_name);
+	for (i = 0; i < nu_of_devices; i++)
+	{
+		Py_device = PySequence_GetItem(Py_devices, i);
+/*
+ * Read the device name
+ */
+		py_name   = PyObject_CallMethod(Py_device, "get_dev_name", NULL);
+		dev_name = PyString_AsString(py_name);
+/*
+ * Create the device
+ */
+		if (ds__create(dev_name, pythonClass, &(ds_python[i]), error) != DS_OK)
+		{
+			dev_printerror(SEND, "create failed (%d): %s\n", *error, dev_error_str (*error));
+//	      		return (DS_NOTOK);
+			continue;
+		}
+		else 
+			dev_printdebug(DBG_STARTUP, "\t\t- Created\n");
 	   
 	   /*
 	    * Store the pointer to the python object to use
