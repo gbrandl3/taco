@@ -26,13 +26,13 @@
  *		the device server base class in C++ (Device).
  *
  * Author(s):	Andy Goetz
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original:	March 1995
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2005-11-16 08:20:40 $
+ * Date:	$Date: 2006-04-20 06:44:45 $
  *
  *-**********************************************************************/
 		
@@ -82,6 +82,8 @@ Device::Device (DevString devname, long *error)
 {
 	dev_printdebug(DBG_TRACE,"Device::Device() called, devname = %s\n",devname);
 	*error = DS_OK;
+	this->commands_map.clear();
+	this->events_list.clear();
 //
 // check if ClassInitialise() has been called
 //

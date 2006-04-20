@@ -25,13 +25,13 @@
  * Description	: Main programm for all device servers
  *
  * Author(s)  	: Jens Meyer
- * 		  $Author: andy_gotz $
+ * 		  $Author: jkrueger1 $
  *
  * Original   	: March 1991
  *
- * Version	: $Revision: 1.22 $
+ * Version	: $Revision: 1.23 $
  *
- * Date		: $Date: 2006-03-29 15:07:59 $
+ * Date		: $Date: 2006-04-20 06:44:45 $
  *
  *******************************************************************-*/
 #ifndef WIN32
@@ -352,7 +352,7 @@ int main (int argc, char **argv)
 			}
 		}
 	}
-    status = device_server(proc_name, argv[1], m_opt, s_opt, nodb_opt, prog_number, device_no, device_list);
+	status = device_server(proc_name, argv[1], m_opt, s_opt, nodb_opt, prog_number, device_no, device_list);
 #ifdef WIN32
 	return status;
 #endif /* WIN32 */

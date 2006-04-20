@@ -66,7 +66,6 @@ libtacoc_la_LDFLAGS 	= -version-info @LIB_VERSION@
 if CLIENT_TCP
 libtacoc_la_CFLAGS 	= -DCLIENT_TCP
 endif
-#libtacoc_la_LIBADD  	= xdr/libdsxdr.la dbase/libdbapi.la signal/libsignal.la -lc
 
 EXTRA_DIST 		= 
 
@@ -79,11 +78,7 @@ libtaco_la_LDFLAGS 	= -version-info @LIB_VERSION@
 
 libtaco___la_SOURCES 	= $(SRC_TACO_SPECIAL) Device.cpp OICDevice.cpp $(dc_src)
 libtaco___la_CFLAGS  	= -x c++
-if SOLARIS_CXX
-libtaco___la_LIBADD  	= xdr/libdsxdr_all.la dbase/libdbapi.la signal/libsignal.la libtacoc.la -lCstd
-else
-libtaco___la_LIBADD  	= xdr/libdsxdr_all.la dbase/libdbapi.la signal/libsignal.la libtacoc.la -lstdc++
-endif
+libtaco___la_LIBADD  	= xdr/libdsxdr_all.la dbase/libdbapi.la signal/libsignal.la libtacoc.la @LIB_STDCXX@
 libtaco___la_LDFLAGS 	= -version-info @LIB_VERSION@
 
 libtacomain_la_SOURCES 	= DevServerMain.c 
