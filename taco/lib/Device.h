@@ -31,9 +31,9 @@
  *
  * Original:	February 1995
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2005-07-25 13:08:22 $
+ * Date:	$Date: 2006-04-20 06:44:05 $
  *
  +**********************************************************************/
 
@@ -72,7 +72,7 @@ typedef struct _DeviceCommandListEntry {
                                 DevArgType         	argout_type;
                                 long               	min_access;
                                 char               	*cmd_name;
-#if 0
+#ifdef TACO_EXT
 				_DeviceCommandListEntry() 
 					: cmd(0), fn(NULL), argin_type(0), argout_type(0), min_access(0), cmd_name(NULL) {};
 				_DeviceCommandListEntry(DevCommand _cmd, DeviceMemberFunction f, DevArgType in, DevArgType out, 
@@ -171,7 +171,7 @@ protected:
 	long n_state; 		// convenience variable for storing next device state
 	long n_commands;	// number of commands
    	DeviceCommandList commands_list; // array of commands (for backwards compatibility @ ESRF)
-private: 
+protected: 
 	Device(){};
 };
 
