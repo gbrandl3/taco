@@ -352,7 +352,7 @@ AC_DEFUN([TACO_SERVER],
         AC_LANG_CPLUSPLUS
 	ac_save_CXXFLAGS="$CXXFLAGS"
 	CXXFLAGS="$CXXFLAGS -I$taco_includes"
-	AC_CHECK_HEADERS([Device.H], [], [AC_MSG_ERROR([In the following dirs: \"$taco_includes\", there are no Device.H header installed.])], [
+	AC_CHECK_HEADERS([Device.h], [], [AC_MSG_ERROR([In the following dirs: \"$taco_includes\", there are no Device.h header installed.])], [
 #include <API.h>
 ])
 	AC_LANG_RESTORE
