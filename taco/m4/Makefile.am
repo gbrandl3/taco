@@ -1,4 +1,4 @@
-aclocal_macros	= extra.m4 findfile.m4 python.m4 swig.m4 qt.m4 taco.m4 rpm.m4 
+aclocal_macros	= extra.m4 findfile.m4 python.m4 swig.m4 qt.m4 taco.m4 rpm.m4 tacoext.m4
 
 ### rpm_rules.mh
 
