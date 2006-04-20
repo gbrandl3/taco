@@ -1,3 +1,23 @@
+2006-04-17 12:30 jkrueger1:
+	* lib/svc_api.c lib/Device.cpp: Fix query command informations for
+	empty command lists
+2006-04-16 18:30 jkrueger1:
+	* misc/taco-*.pc.in: Use pkg-config for detecting the right options
+	for the client and server libs
+2006-04-14 18:30 jkrueger1:
+	* m4/swig.m4: Fix the order of command line options of the find
+	command, changes due to newer versions of SWIG
+	* m4/tacoext.m4: Added
+	* gdbm/Makefile.am: Fix the ndbm.h problem
+	* gdbm/ndbm.h: Fix: GCC 4 problems with missed parameters
+        * acinclude.m4: Fix the ndbm.h problem 
+        * ext: Add the directory for extending TACO to improve the building
+	of C++ based device servers
+	* lib/svc_api.c: device_server() put all from config_flags to 
+	multi_nethost[0].config_flags before calling startup
+	* lib/gen_api.c lib/sec_api.c: use taco_gethostname instead of gethostname
+	* system/msg system/manager: Add more messages and reformat the output
+	* system/dbase/server: Log all transactions on the database
 2005-11-16 09:30 andy_gotz:
 	* fixed problems with data collector starting without resources
 	and dc write api not working correctly
