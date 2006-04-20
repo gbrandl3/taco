@@ -18,7 +18,7 @@
 #
 
 EXTRA_DIST		= taco.startup.in taco.shutdown.in taco-config.in tacoenv.sh.in tacoenv.csh.in taco.SuSE.in taco-manager.sh.in \
-			  taco.debian.in taco.status.in
+			  taco.debian.in taco.status.in taco-server.pc.in taco-server++.pc.in taco-client.pc.in taco-client++.pc.in
 
 dist_sbin_SCRIPTS 	= off
 
@@ -27,6 +27,10 @@ nodist_sbin_SCRIPTS 	= taco-config taco.startup taco.shutdown taco.status
 nodist_template_SCRIPTS = taco.SuSE taco.debian taco-manager.sh
 
 nodist_template_DATA 	= tacoenv.sh tacoenv.csh
+
+pkgconfigdir		= @libdir@/pkgconfig
+
+nodist_pkgconfig_DATA	= taco-server.pc taco-server++.pc taco-client.pc taco-client++.pc
 
 install-data-hook:	$(nodist_template_DATA)
 	$(mkinstalldirs) $(DESTDIR)${sysconfdir}
