@@ -25,13 +25,13 @@
  * Description: Interface for the security system
  *
  * Author(s)  : Jens Meyer
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original   : December 1993
  *
- * Version    :	$Revision: 1.12 $
+ * Version    :	$Revision: 1.13 $
  *
- * Date       :	$Date: 2006-01-22 21:06:04 $
+ * Date       :	$Date: 2006-04-20 06:40:09 $
  *
  ********************************************************************-*/
 #ifndef WIN32
@@ -309,7 +309,7 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
 /*
  * get the IP address of the users host
  */
-		gethostname (user_auth.host_name, HOST_NAME_LENGTH);
+		taco_gethostname (user_auth.host_name, HOST_NAME_LENGTH);
 #if !defined vxworks
 		if ( (host_info = gethostbyname (user_auth.host_name)) == NULL )
 		{

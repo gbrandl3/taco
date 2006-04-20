@@ -30,9 +30,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.26 $
+ * Version    :	$Revision: 1.27 $
  *
- * Date       : $Date: 2005-12-12 15:41:07 $
+ * Date       : $Date: 2006-04-20 06:40:09 $
  *
  ********************************************************************-*/
 
@@ -1302,7 +1302,7 @@ long setup_config (long *error)
  *  create registration information that is send to
  *  the network manager and stored in the System.log file.
  */
-	gethostname (host_name, sizeof(host_name));
+	taco_gethostname (host_name, sizeof(host_name));
 
 #if !defined (WIN32)
 #if !defined (vxworks)
@@ -1581,7 +1581,7 @@ long setup_config_multi (char *nethost, long *error)
  *  create registration information to be sent to
  *  the network manager and stored in the System.log file.
  */
-	gethostname (host_name, sizeof(host_name));
+	taco_gethostname (host_name, sizeof(host_name));
 
 #if !defined (WIN32)
 #if !defined (vxworks)
