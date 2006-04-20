@@ -44,13 +44,13 @@ info_TEXINFOS		= gdbm.texinfo
 
 noinst_HEADERS 		= gdbmdefs.h extern.h systems.h gdbmconst.h proto.h gdbmerrno.h
 
-BUILT_SOURCES		= gdbm.h ndbm.h
-CLEANFILES		= gdbm.h ndbm.h
+BUILT_SOURCES		= gdbm.h 
+CLEANFILES		= gdbm.h 
 
 DISTCLEANFILES		= autoconf.h conv2gdbm junk.gdbm junkdbm.dir junkdbm.pag junkndbm.dir junkndbm.pag \
 			testdbm testgdbm testndbm gdbm.info
 
-nodist_include_HEADERS	= gdbm.h ndbm.h
+nodist_include_HEADERS	= gdbm.h 
 
 EXTRA_DIST 		= autogen.sh gdbm.3 gdbm.texinfo \
 			gdbm.info gdbm.proto gdbm.proto2 \
@@ -64,8 +64,3 @@ gdbm.h:	gdbm.proto gdbmerrno.h gdbm.proto2
 	cat $(srcdir)/gdbm.proto2 >> gdbm.h
 	chmod -w gdbm.h
 
-ndbm.h: gdbm.h
-	if test $(srcdir) != $(PWD) ; then \
-		rm -f ndbm.h ; \
-		cp $(srcdir)/ndbm.h ndbm.h ; \
-	fi
