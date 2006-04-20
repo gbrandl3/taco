@@ -11,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.8 $
+ Version:	$Revision: 1.9 $
 
- Date:		$Date: 2005-04-11 15:54:56 $
+ Date:		$Date: 2006-04-20 06:33:17 $
 
  Copyright (c) 1990 by	European Synchrotron Radiation Facility, 
 			Grenoble, France
@@ -98,9 +98,9 @@ void msg_initialise (char *dshome)
         snprintf (msg.aw_path, sizeof(msg.aw_path), "%s/system/bin/sun4/S_Alarm", dshome );
 #endif /* sun */
 
-  	fprintf (logFile, "\n%s Error message dir : %s", getTimeString("MessageServer"), msg.ER_file_dir);
-  	fprintf (logFile, "\n%s Pipe message dir : %s", getTimeString("MessageServer"), msg.pipe_dir);
-  	fprintf (logFile, "\n%s Alarm window program : %s", getTimeString("MessageServer"), msg.aw_path);
+  	fprintf (logFile, "%s Error message dir : %s\n", getTimeString("MessageServer"), msg.ER_file_dir);
+  	fprintf (logFile, "%s Pipe message dir : %s\n", getTimeString("MessageServer"), msg.pipe_dir);
+  	fprintf (logFile, "%s Alarm window program : %s\n", getTimeString("MessageServer"), msg.aw_path);
 }
 
 
@@ -123,20 +123,20 @@ void msg_alarm_handler(short alarm_type,
  */
 	if (( pid = fork () ) < 0 )
 	{
-  		fprintf (logFile, "\n%s Cannot start alarm window because fork failed!", getTimeString("MessageServer"));
-		fprintf (logFile, "\n%s Error in %s on host %s !", getTimeString("MessageServer"), server_name, host_name);
+  		fprintf (logFile, "%s Cannot start alarm window because fork failed!\n", getTimeString("MessageServer"));
+		fprintf (logFile, "%s Error in %s on host %s !\n", getTimeString("MessageServer"), server_name, host_name);
 
 		switch (alarm_type)
 		{
 			case 2 :
-				fprintf (logFile,"\n%s cannot open error file :  %s", getTimeString("MessageServer"), file_name);
+				fprintf (logFile,"%s cannot open error file :  %s\n", getTimeString("MessageServer"), file_name);
 				break;
 			case 1 :
 			case 0 :
-				fprintf (logFile,"\n%s error file :  %s", getTimeString("MessageServer"), file_name);
+				fprintf (logFile,"%s error file :  %s\n", getTimeString("MessageServer"), file_name);
 				break;
 			case -1 :
-				fprintf (logFile,"\n%s exiting!", getTimeString("MessageServer"));
+				fprintf (logFile,"%s exiting!\n\n", getTimeString("MessageServer"));
 				kill(getpid(), SIGQUIT);
 		}
 		return;
@@ -155,7 +155,7 @@ void msg_alarm_handler(short alarm_type,
 		cmd_argv[i++] = display; 
 		cmd_argv[i] = 0; 
 		execv (msg.aw_path, cmd_argv);
-		fprintf (logFile,"\n%s can not start Alarm Window !", getTimeString("MessageServer"));
+		fprintf (logFile,"%s can not start Alarm Window !\n", getTimeString("MessageServer"));
 		fflush(logFile);
 		exit (-1);
 	}
@@ -247,7 +247,7 @@ _msg_out *rpc_msg_send_1 (_msg_data *msg_data)
 			time (&clock);
 			time_string = ctime (&clock);
 
-			if ( (filepointer = fopen (file_name,"a")) == NULL)
+			if ((filepointer = fopen(file_name,"a")) == NULL)
 			{
 				snprintf (error_msg, sizeof(error_msg), "rpc_msg_send :\ncannot open error file > %s\n", file_name);
 				msg_fault_handler (error_msg);
@@ -257,13 +257,13 @@ _msg_out *rpc_msg_send_1 (_msg_data *msg_data)
 				return (&msg_out);
 			}
 		
-			fprintf (filepointer,"\n     %s%s",time_string, msg_data->message_buffer);
-			fclose (filepointer);
+			fprintf(filepointer,"\n     %s%s",time_string, msg_data->message_buffer);
+			fclose(filepointer);
 			chmod(file_name, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 /*
  * open alarm window
  */
-			msg_alarm_handler (0,msg_data->devserver_name, msg_data->host_name,file_name, msg_data->display);
+			msg_alarm_handler(0 ,msg_data->devserver_name, msg_data->host_name,file_name, msg_data->display);
 			return (&msg_out);
 			break;
 
@@ -271,13 +271,13 @@ _msg_out *rpc_msg_send_1 (_msg_data *msg_data)
  * get pipe name for debug or diagnostic messages !
  */
             	case DEBUG_TYPE:
-			snprintf (pipe_name, sizeof(pipe_name), "%s%s_%d.DBG",  msg.pipe_dir,
+			snprintf(pipe_name, sizeof(pipe_name), "%s%s_%d.DBG",  msg.pipe_dir,
                                                msg_data->host_name,
 					       msg_data->prog_number);
 			break;
 
 		case DIAG_TYPE:
-			snprintf (pipe_name, sizeof(pipe_name), "%s%s_%d.DIA",  msg.pipe_dir,
+			snprintf(pipe_name, sizeof(pipe_name), "%s%s_%d.DIA",  msg.pipe_dir,
                                                msg_data->host_name,
 					       msg_data->prog_number);
 			break;
@@ -291,7 +291,7 @@ _msg_out *rpc_msg_send_1 (_msg_data *msg_data)
 		fildes = open(pipe_name, O_CREAT | O_WRONLY);
 	if (fildes == -1)
 	{
-  		fprintf (logFile, "\n%s Pipe name : %s, %d %s", getTimeString("MessageServer"), pipe_name, errno, strerror(errno));
+  		fprintf (logFile, "%s Pipe name : %s, %d %s\n", getTimeString("MessageServer"), pipe_name, errno, strerror(errno));
 		msg_out.error = DevErr_CannotOpenPipe;
 		msg_out.status = -1;
 		return (&msg_out);

@@ -13,9 +13,9 @@
 
  Original: 	January 1991
 
- Version:	$Revision: 1.22 $
+ Version:	$Revision: 1.23 $
 
- Date:		$Date: 2005-06-13 13:53:37 $
+ Date:		$Date: 2006-04-20 06:33:17 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -336,7 +336,7 @@ static	int	fd_devnull = -1;
 	{
 		char *logpath = getenv("LOGPATH");
 		snprintf (logfile, sizeof(logfile), "%s/Manager.log", logpath ? logpath : homepath);
-		if ( (system_log = fopen (logfile, "w")) == NULL )
+		if ( (system_log = fopen (logfile, "a")) == NULL )
 		{
 			fprintf (stderr,"\ncannot open Manager.log file (%s), exiting...\n", logfile);
 			fprintf(stderr, "LOGPATH or DSHOME path may be wrong\n");
@@ -407,7 +407,7 @@ static	int	fd_devnull = -1;
 			fprintf (stderr,"\ndatabase server startup failed, exiting...\n");
 			if (c_flags.request_log)
 			{
-				fprintf (system_log, "\n%sdatabase server startup failed, exiting...\n", getTimeString("Manager"));
+				fprintf (system_log, "%s : Database server startup failed, exiting...\n", getTimeString("Manager"));
 				fflush(system_log);
 			}
 			kill (pid,SIGQUIT);
@@ -436,8 +436,8 @@ static	int	fd_devnull = -1;
 			svc_destroy(transp); 
 			if (c_flags.request_log)
 			{
-				fprintf(system_log, "%s Manager execvp arguments for database : \n", getTimeString("Manager"));
-				fprintf(system_log, "\t%s %s %s %s %s %s\n",homedir,cmd_argv[0],cmd_argv[1],cmd_argv[2],cmd_argv[3],cmd_argv[4]);
+				fprintf(system_log, "%s Manager execvp arguments for database : ", getTimeString("Manager"));
+				fprintf(system_log, "%s %s %s %s %s %s\n",homedir,cmd_argv[0],cmd_argv[1],cmd_argv[2],cmd_argv[3],cmd_argv[4]);
 				fflush(system_log);
 			}
 			execvp (homedir, cmd_argv);
@@ -445,8 +445,8 @@ static	int	fd_devnull = -1;
 			fprintf (stderr,"\nexecvp failed, database_server not started\n");
 			if (c_flags.request_log)
 			{
-				fprintf(system_log, "\n%s execv failed, database_server not started\n", getTimeString("Manager"));
-				fprintf(system_log, "\t\tError = %d (%s)\n", errno, strerror(errno));
+				fprintf(system_log, "%s execv failed, database_server not started : ", getTimeString("Manager"));
+				fprintf(system_log, "Error = %d (%s)\n", errno, strerror(errno));
 				fflush(system_log);
 			}
 			kill (pid,SIGQUIT);
@@ -461,7 +461,7 @@ static	int	fd_devnull = -1;
 		fprintf (stderr,"\nmessage server startup failed, exiting...\n");
 		if (c_flags.request_log)
 		{
-			fprintf (system_log, "\n%s message server startup failed, exiting...\n", getTimeString("Manager"));
+			fprintf (system_log, "%s Message server startup failed, exiting...\n", getTimeString("Manager"));
 			fflush(system_log);
 		}
 		kill (pid,SIGQUIT);
@@ -479,8 +479,8 @@ static	int	fd_devnull = -1;
 		svc_destroy(transp); 
 		if (c_flags.request_log)
 		{
-			fprintf(system_log, "\n%s Manager execvp arguments for message server :\n", getTimeString("Manager"));
-			fprintf(system_log, "\t%s %s %s\n",homedir,cmd_argv[0],cmd_argv[1]);
+			fprintf(system_log, "%s Manager execvp arguments for message server :", getTimeString("Manager"));
+			fprintf(system_log, "%s %s %s\n",homedir,cmd_argv[0],cmd_argv[1]);
 			fflush(system_log);
 		}
 		execvp (homedir,cmd_argv);
@@ -488,8 +488,8 @@ static	int	fd_devnull = -1;
 		fprintf (stderr,"\nexecvp failed, message server not started\n");
 		if (c_flags.request_log)
 		{
-			fprintf(system_log,"\n%s execv failed, message server not started\n", getTimeString("Manager"));
-			fprintf(system_log, "\t\tError = %d (%s)\n", errno, strerror(errno));
+			fprintf(system_log,"%s execv failed, message server not started : ", getTimeString("Manager"));
+			fprintf(system_log, "Error = %d (%s)\n", errno, strerror(errno));
 			fflush(system_log);
 		}
 		kill (pid,SIGQUIT);
@@ -516,7 +516,7 @@ static	int	fd_devnull = -1;
 			fprintf (stderr,"\nos9exec failed, os9_dbsu-server not started\n");
 			if (c_flags.request_log)
 			{
-				fprintf (system_log, "\nos9exec failed, os9_dbsu-server not started\n");
+				fprintf (system_log, "os9exec failed, os9_dbsu-server not started\n");
 				fflush(system_log);
 			}
 			kill (pid,SIGQUIT);
@@ -542,8 +542,8 @@ static	int	fd_devnull = -1;
  */
 	if (c_flags.request_log)
 	{
-      		fprintf (system_log,"\n%s Network Manager started subprocesses ", getTimeString("Manager"));
-      		fprintf (system_log,"NETHOST = %s   PID = %d\n\n",nethost,pid);
+      		fprintf (system_log,"%s Network Manager started subprocesses : ", getTimeString("Manager"));
+      		fprintf (system_log,"NETHOST = %s   PID = %d\n",nethost,pid);
 		fclose (system_log);
 	}
 	
@@ -558,7 +558,7 @@ static	int	fd_devnull = -1;
 	pid = become_daemon();
 #endif
 	svc_run();
-	fprintf(system_log, "\n%s svc_run returned: Manager stopped\n", getTimeString("Manager"));
+	fprintf(system_log, "%s svc_run returned: Manager stopped\n", getTimeString("Manager"));
 	fflush(system_log);
 	kill (pid,SIGQUIT);
 }
@@ -732,7 +732,7 @@ static void startup_msg (void)
 			{
 				if ((system_log = fopen (logfile, "a")) != NULL )
 	   			{
-      					fprintf (system_log, "\n%s startup finished.\n", getTimeString("Manager"));
+      					fprintf (system_log, "%s startup finished.\n", getTimeString("Manager"));
 					fclose (system_log);
 	   			}
 				else

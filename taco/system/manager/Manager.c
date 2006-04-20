@@ -11,9 +11,9 @@
 
  Original:	January 1991
 
- Version:	$Revision: 1.9 $
+ Version:	$Revision: 1.10 $
 
- Date:		$Date: 2005-02-24 15:56:05 $
+ Date:		$Date: 2006-04-20 06:33:17 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -75,7 +75,7 @@ _msg_manager_data *rpc_msg_register_1 (_register_data *register_data)
        		if ( (system_log = fopen (logfile, "a")) != NULL )
 		{
 			fprintf (system_log, "%s Message Server registered ", getTimeString("Manager"));
-			fprintf (system_log, "(msg_host = %s  prog_nu = %d  vers_nu = %d)\n\n",
+			fprintf (system_log, "(msg_host = %s  prog_nu = %d  vers_nu = %d)\n",
 					    msg_conf.host_name, msg_conf.prog_number, msg_conf.vers_number);
 			fclose (system_log);
 		}
@@ -120,7 +120,7 @@ int *rpc_db_register_1 (_register_data *register_data)
 		if ( (system_log = fopen (logfile, "a")) != NULL )
 		{
 			fprintf (system_log, "%s Database Server registered ", getTimeString("Manager"));
-			fprintf (system_log, "(db_host = %s  prog_nu = %d  vers_nu = %d)\n\n",
+			fprintf (system_log, "(db_host = %s  prog_nu = %d  vers_nu = %d)\n",
 					    db_conf.host_name, db_conf.prog_number, db_conf.vers_number);
 			fclose (system_log);
 		}
@@ -205,8 +205,8 @@ void unreg_server (int signo)
 	if ( c_flags.request_log == True )
 		if ( (system_log = fopen (logfile, "a")) != NULL )
 		{
-			fprintf (system_log, "\n%s Received signal %d\n", getTimeString("Manager"), signo);
-			fprintf (system_log, "\n%s System shutdown.\n", getTimeString("Manager"));
+			fprintf (system_log, "%s Received signal %d\n", getTimeString("Manager"), signo);
+			fprintf (system_log, "%s System shutdown.\n\n", getTimeString("Manager"));
 			fclose (system_log);
 		}
 
