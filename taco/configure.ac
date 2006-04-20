@@ -16,9 +16,9 @@ dnl You should have received a copy of the GNU Lesser General Public
 dnl License along with this library; if not, write to the Free Software
 dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_INIT([TACO], [3.94.0], [taco-devel@lists.sourceforge.net])
+AC_INIT([TACO], [3.95.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.77 $)dnl
+AC_REVISION($Revision: 1.78 $)dnl
 AC_COPYRIGHT([(C) 1990-2006 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -154,6 +154,11 @@ AC_MSG_CHECKING([for Solaris CC compiler])
 AM_CONDITIONAL(SOLARIS_CXX, [$CXX -V 2>&1 |grep Sun])
 AC_MSG_RESULT([$SOLARIS_CXX])
 AC_SUBST([SOLARIS_CXX], [$SOLARIS_CXX])
+if test x"$SOLARIS_CXX" != x ; then
+    AC_SUBST([LIB_STDCXX], [-lCstd])
+else
+    AC_SUBST([LIB_STDCXX], [-lstdc++])
+fi
 
 # Checks for header files.
 AC_FUNC_ALLOCA
@@ -286,6 +291,14 @@ AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([alarm dup2 gethostbyname gethostname getpass gettimeofday isascii mblen memset putenv select socket strcasecmp strchr strcspn strdup strerror strncasecmp strrchr strspn strstr strtoul get_myaddress])
 AC_CHECK_FUNCS([setsid])
+AC_CHECK_FUNCS([waitpid wait4 getcwd strdup chown chmod lchmod mknod mkfifo \
+    fchmod fstat ftruncate strchr readlink link utime utimes lutimes strftime \
+    memmove lchown vsnprintf snprintf vasprintf asprintf setsid glob strpbrk \
+    strlcat strlcpy strtol mallinfo getgroups setgroups geteuid getegid \
+    setlocale setmode open64 lseek64 mkstemp64 mtrace va_copy __va_copy \
+    strerror putenv iconv_open locale_charset nl_langinfo \
+    sigaction sigprocmask])
+
 
 AC_SEARCH_LIBS(dlopen, [dl])
 AC_SEARCH_LIBS(svc_run, [c nsl])
@@ -455,6 +468,18 @@ AC_CONFIG_TESTDIR(tests)
 AC_CONFIG_FILES(tests/Makefile tests/atlocal)
 dnl AC_CONFIG_FILES(tests/testserver/Makefile)
 AC_CONFIG_FILES(tests/taco, [chmod +x tests/taco])
+
+
+SWIG_PROG([1.3.17])
+SWIG_PYTHON([yes])
+
+AC_CONFIG_FILES([ext/Makefile ext/lib/Makefile ext/doc/Makefile])
+AC_CONFIG_FILES([ext/server/Makefile ext/server/include/Makefile ext/server/src/Makefile])
+AC_CONFIG_FILES([ext/common/Makefile ext/common/include/Makefile ext/common/src/Makefile ext/common/res/Makefile ext/common/python/Makefile])
+AC_CONFIG_FILES([ext/client/Makefile ext/client/include/Makefile ext/client/src/Makefile ext/client/python/Makefile])
+
+AC_CONFIG_FILES([misc/taco-server.pc misc/taco-server++.pc misc/taco-client.pc misc/taco-client++.pc])
+
 AC_CHECK_PROGS([AUTOM4TE], [autom4te autom4te259 autom4te253])
 AM_MISSING_PROG([AUTOM4TE], [$AUTOM4TE])
 
