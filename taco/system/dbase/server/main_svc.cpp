@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.21 $
+ * Version:	$Revision: 1.22 $
  *
- * Date:	$Date: 2006-03-08 16:27:44 $
+ * Date:	$Date: 2006-04-20 06:31:44 $
  *
  */
 
@@ -124,7 +124,7 @@ static void un_register_prog(int signo)
 	logStream << getTimeString("dbm_server") << "close connection to database." << std::endl;
 	logStream.flush();
 	delete dbm;
-	logStream << getTimeString("dbm_server") << "exit server." << std::endl;
+	logStream << getTimeString("dbm_server") << "exit server." << std::endl << std::endl;
 	logStream.flush();
 	logStream.close();
 	exit(1);
@@ -291,7 +291,7 @@ int main(int argc,char **argv)
 	else
 		logfile = std::string("DatabaseServer.log");
 
-	logStream.open(logfile.c_str(), std::ios::out | std::ios::trunc);
+	logStream.open(logfile.c_str(), std::ios::out | std::ios::app);
 #endif
 
 	if (!dbm)
@@ -744,6 +744,7 @@ static void db_setupprog_1(struct svc_req *rqstp, SVCXPRT *transp)
 #ifndef ALONE
 		case RPC_QUIT_SERVER:
 			svc_sendreply(transp,(xdrproc_t)xdr_void,NULL);
+			logStream << getTimeString("dbm_server") << " RPC_QUIT_SERVER : " << std::endl;
 			pid = getpid();
 			kill(pid,SIGQUIT);
 			return;
