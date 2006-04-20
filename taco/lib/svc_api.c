@@ -25,13 +25,13 @@
  * Description:	Server side of the API.  
  *
  * Author(s);	Jens Meyer
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original:	Feb 1994
  *
- * Version:	$Revision: 1.23 $
+ * Version:	$Revision: 1.24 $
  *
- * Date:		$Date: 2006-03-29 14:52:35 $
+ * Date:		$Date: 2006-04-20 06:42:08 $
  *
  ********************************************************************-*/
 #ifndef WIN32
@@ -1386,8 +1386,9 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
         	dev_query_out.var_argument.sequence = vararg;
 	}
 #else
-	if ((device->commands_map.begin())->second.cmd_name != NULL)
+	if (device->commands_map.begin() != device->commands_map.end() && (device->commands_map.begin())->second.cmd_name != NULL)
 	{
+	        dev_printdebug(DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_cmd_query_4() : %d %p\n", (device->commands_map.begin())->first, (device->commands_map.begin())->second.cmd_name);
 		for (u_long i = 0; i < dev_query_out.length; i++)
 		{
 			dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_cmd_query_4() : %d %d %s\n", i, dev_query_out.sequence[i].cmd,
@@ -1883,6 +1884,7 @@ static long svc_check           PT_( (long *error) );
 int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int nodb, int pn, int n_device, char** device_list)
 
 {
+	extern nethost_info     *multi_nethost;
 	char    		host_name [HOST_NAME_LENGTH],
 				dsn_name [37],
 		//		*proc_name,
@@ -2254,7 +2256,8 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
  * Set the startup configuration flag to SERVER_STARTUP
  * during the startup phase.
  */
-		config_flags.startup = SERVER_STARTUP;
+	    	config_flags.startup = SERVER_STARTUP;
+		multi_nethost[0].config_flags = config_flags;
 		status = startup(config_flags.server_name,&error);
 		if ( status != DS_OK )
 		{
@@ -2279,7 +2282,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 			kill (pid,SIGQUIT);
 #endif
 		}
-		config_flags.startup = True;
+		multi_nethost[0].config_flags.startup = config_flags.startup = True;
 	}
 
 #ifndef WIN32
