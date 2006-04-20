@@ -1,0 +1,241 @@
+Every package version has a CVS release tag of the following format:
+	package version 'N.N.N' -> release tag 'taco-ext-N-N-N'
+
+2004-04-21  Sebastian Huber  <sebastian-huber@web.de>
+
+Version: 1.4.0
+Library version (libTACOExtensions): 6:0:0
+Changes:
+	* The default client network protocol is now TCP.
+	* Consistent network methods for C++ and Python client.
+	* Ignore device types for old servers.
+	* Added the bufferedString() function to the server.
+	* New state machine method parameters.
+	* Consistent device resource methods for server and clients (C++ and Python).
+Bug fixes:
+	* Several bug fixes in the device resource related methods.
+
+2003-10-28  Sebastian Huber  <sebastian-huber@web.de>
+
+Version: 1.3.2
+Library version (libTACOExtensions): 5:0:0
+Changes:
+	* Added device resource info query method to TACO::Client.
+Bug fixes:
+	* Moved device resource related operators from TACO namespace into global namespace.
+	* Added explicit base class constructor calls.
+	* Added missing connection checks to TACO::Client.
+
+2003-08-11  Sebastian Huber  <sebastian-huber@web.de>
+
+Version: 1.3.1
+Library version (libTACOExtensions): 4:0:1
+Changes:
+	* Added automatic client connection and device on.
+	* More robust execute() method of the TACO::Client.
+	* It is now possible to extend the error description of a TACO::Exception from the left side.
+
+2003-07-18  Sebastian Huber  <sebastian-huber@web.de>
+
+Version: 1.3.0
+Library version (libTACOExtensions): 3:0:0
+Changes:
+	* DevVarCharArray is now used instead of DevString to transport strings.
+	* Support for device resource info.
+	* Support for update and query device resources.
+	* Improved exception class.
+	* Implemented copy constructor and assignment operator for TACO::Client.
+	* Improved SWIG M4 macro.
+	* Changed device version type from long to std::string. This enables simple usage
+	  of the version string provided by config.h.
+	* Added event mangagement functions to TACO::Client.
+	* TACOStates.h redefines OVERFLOW to TACO_MATH_OVERFLOW due to a name conflict with math.h.
+
+2003-02-10  Sebastian Huber  <sebastian-huber@web.de>
+
+Version: 1.2.1
+Changes:
+	* Improved m4 macros and new install directory.
+	* Added Python install directory to TACO_SET_DIRS() macro.
+Bug fix:
+	* OVERFLOW define workaround.
+
+2003-01-28  Sebastian Huber  <sebastian-huber@web.de>
+
+Version: 1.2.0
+Library version (libTACOExtensions): 2:0:0
+Changes:
+	* Added python client methods for network protocol and timeout.
+	* Compiles now with gcc version 3.2.1.
+	* Improved SWIG Autoconf file.
+
+2002-12-14  Sebastian Huber  <sebastian-huber@web.de>
+
+	* m4/swig.m4:
+	Replaced errors with warnings.
+
+	* m4/taco.m4:
+	Moved AC_PREFIX_DEFAULT() from TACO_SYSTEM() to TACO_SET_DIRS().
+	Removed TACO_LDFLAGS output variable.
+
+2002-12-11  Sebastian Huber  <sebastian-huber@web.de>
+
+	* client/include/TACOClient.h, client/src/TACOClient.cpp:
+	Renamed 'state' and 'status' to 'deviceState' and 'deviceStatus'.
+	Made 'deviceTypes' non-virtual.  Introduced member prefix.
+
+	* client/python/TACOClient.py:
+	Renamed 'state' and 'status' to 'deviceState' and 'deviceStatus'.
+
+	* server/include/TACOServer.h, server/src/TACOServer.cpp:
+	Renamed 'state', 'setState' and 'status' to 'deviceState', 'setDeviceState'
+	and 'deviceStatus'.  Added 'deviceName' method.  Added destructor definition.
+	Made 'deviceStatus' and 'deviceVersion' non-virtual.
+
+2002-12-03  Sebastian Huber  <sebastian-huber@web.de>
+
+	Version 1.1.5
+
+	* m4/taco.m4, m4/python.m4, m4/swig.m4:
+	Moved files from 'taco/frmII/auto/m4' to this project.
+
+	* m4/rpm.m4:
+	New RPM Autoconf file.
+
+2002-11-28  Sebastian Huber  <sebastian-huber@web.de>
+
+	Version 1.1.4
+	Library version (libTACOExtensions) 1:0:0
+
+	* client/include/TACOClient.h, client/src/TACOClient.cpp:
+	Methods to get the device network protocol or connection timeout
+	throws now the INTERNAL_ERROR exception.
+
+	* server/include/TACOServer.h, server/src/TACOServer.cpp:
+	Server function type is now a protected member of 'TACO::Server'.
+	Code cleanup.  Improved documentation.
+
+2002-11-27  Sebastian Huber  <sebastian-huber@web.de>
+	* client/python/TACOPythonClient.h, client/python/TACOPythonClient.cpp,
+	client/include/TACOClient.h, common/src/TACOStates.cpp:
+	Added missing 'std::'.
+
+	* server/include/TACOServer.h, server/src/TACOServer.cpp:
+	Added static member functions to set and get the server name.
+	Introduced member prefix.
+
+2002-11-25  Sebastian Huber  <sebastian-huber@web.de>
+	* server/include/TACOServer.h, server/src/TACOServer.cpp:
+	Added server exception class with methods to push a message onto the error stack.
+	Changed visibility of some methods.
+
+2002-11-21  Sebastian Huber  <sebastian-huber@web.de>
+	* common/include/TACOBasicErrors.h, common/res/TACOBasicErrors.res:
+	Added INTERNAL_ERROR.
+
+	* common/include/TACOException.h, common/src/TACOException.cpp:
+	'errorDescription' is now a non-static member.
+	Removed error number output in 'what' method.
+
+2002-11-15  Sebastian Huber  <sebastian-huber@web.de>
+
+	* configure.in:
+	Autoconf 2.56, Automake 1.7.1 and Libtool 1.4.3 are now required in order to pass
+	a 'make distcheck'.
+
+	* lib/Makefile.am:
+	Improved source path specification.
+
+2002-10-29  Sebastian Huber  <sebastian-huber@web.de>
+
+	* server/src/TACOServer.cpp:
+	Bugfix: Corrected wrong data type for indices in CommandQuery and EventQuery.
+
+2002-10-24  Sebastian Huber  <sebastian-huber@web.de>
+
+	* server/include/TACOServer.h:
+	Code cleanup.
+
+	* client/include/TACOClient.h, client/src/TACOClient.cpp:
+	Added method to get the current network protocol.
+	Added methods to get and set the connection timeout.
+
+	* common/include/TACOBasicErrors.h, common/res/TACOBasicErrors.res:
+	Added errors UNKNOWN_NETWORK_PROTOCOL, RANGE_ERROR, INVALID_VALUE and RUNTIME_ERROR.
+
+2002-10-23  Sebastian Huber  <sebastian-huber@web.de>
+
+	* client/include/TACOClient.h, client/src/TACOClient.cpp:
+	Added method to set the network protocol.
+
+2002-10-12  Sebastian Huber  <sebastian-huber@web.de>
+
+	Version 1.1.3
+
+	* common/python/Makefile.am:
+	Bugfix: Added library build directory to LDFLAGS.
+
+2002-10-11  Sebastian Huber  <sebastian-huber@web.de>
+
+	Version 1.1.2
+
+	Every libray has now its own version.
+
+	* common/include/TACOStates.h, common/src/TACOStates.cpp:
+	Bugfix: DevStates.h doesn't include the required macro.h.
+	Added TACO::stateDescription function.
+
+	* common/python/*:
+	Added Python module for TACO states.
+
+	* client/python/TACOPythonClient.cpp:
+	Removed state constants from _TACOClient module.
+
+	* client/python/TACOClient.py:
+	Adjusted to new state concept.
+
+	* client/include/TACOClient.h, client/src/TACOClient.cpp:
+	Adjusted to new state concept.
+
+	* server/include/TACOServer.h, server/src/TACOServer.cpp:
+	Adjusted to new state concept.
+
+2002-10-10  Sebastian Huber  <sebastian-huber@web.de>
+
+	Version 1.1.1
+
+	* common/include/TACOStates.h:
+	Renamed State::OFF to State::DEVICE_OFF.
+	Additional states State::OFF, State::OVERFLOW, State::PRESELECTION_REACHED and State::STARTED.
+
+	* common/python/TACOPythonClient.cpp:
+	Changed include order of TACOStates.h and Python.h due to problems with a '#define OVERFLOW'.
+
+	* client/include/TACOClient.h:
+	Adjusted TACO::Client::isDeviceOn method to renamed state State::DEVICE_OFF.
+
+	* server/include/TACOServer.h, server/src/TACOServer.cpp:
+	Adjusted server to renamed state State::DEVICE_OFF.
+
+2002-10-08  Sebastian Huber  <sebastian-huber@web.de>
+
+	Version 1.1.0
+
+	* server/include/TACOServer.h, server/src/TACOServer.cpp:
+	Changed the server exception base class from 'long' to `TACO::Exception'.
+	Client and server have now the same exception base class.
+
+	* common/include/TACOExtension.h, common/src/TACOExtension.cpp:
+	Renamed function TACO::queryEventType to TACO::queryEventInfo.
+
+	* taco-ext.spec.in:
+	Cleaning rule can now cope with build directories which contain whitespace.
+
+2002-10-04  Sebastian Huber  <sebastian-huber@web.de>
+
+	Version 1.0.0
+
+	Initial release of the TACO extensions project.  It provides
+	a server, client and exception base class and some C++ wrapper
+	functions of C API functions.  A Python client class is also
+	included.

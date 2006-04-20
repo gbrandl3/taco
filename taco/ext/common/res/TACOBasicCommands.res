@@ -1,0 +1,6 @@
+CMDS/0/0/4001: "DevVersion"
+CMDS/0/0/4002: "DevTypes"
+CMDS/0/0/4003: "DevUpdateResource"
+CMDS/0/0/4004: "DevQueryResource"
+CMDS/0/0/4005: "DevUpdate"
+CMDS/0/0/4006: "DevQueryResourceInfo"
