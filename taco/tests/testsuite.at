@@ -51,6 +51,9 @@ m4_include([starter.at])
 AT_BANNER([[Testing message server]])
 m4_include([message.at])
 
+AT_BANNER([[Testing extensions]])
+m4_include([ext.at])
+
 AT_BANNER([[Uninstalling TACO system.]])
 
 AT_SETUP([Stopping TACO])

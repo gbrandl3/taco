@@ -1,0 +1,30 @@
+AT_SETUP([Test extended server])
+AT_DATA([test.res], [[
+# This file contains only resources for the tests
+TestExtServer/ext/device:    test/ext/dev0
+test/ext/dev0/type:     "TestExtServer"
+]])
+AT_CHECK([
+RES_BASE_DIR=`pwd` taco db_update test.res
+AT_TACO_RUN_LOCAL([TestExtServer ext &])
+sleep 4
+AT_TACO_RUN_LOCAL([test_connect test/ext/dev0])
+AT_TACO_RUN_LOCAL([off TestExtServer >>log 2>&1])
+], [], [test/ext/dev0: init complete.
+Set protocol to TCP
+Query commands
+             1       0       0                        "DevOn"
+             2       0       0                        "DevOff"
+             3       0       0                        "DevReset"
+             4       0       2                        "DevState"
+             8       0       9                        "DevStatus"
+          4001       0       9                        "DevVersion"
+          4002       0      24                        "DevTypes"
+          4003       9       0                        "DevUpdateResource"
+          4004       9       9                        "DevQueryResource"
+          4005       0       0                        "DevUpdate"
+          4006       0       9                        "DevQueryResourceInfo"
+Query events
+])
+AT_CLEANUP
+

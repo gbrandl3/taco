@@ -19,11 +19,11 @@ test_asc_dyn_SOURCES 	= test_asc_dyn.c
 test_tc_SOURCES 	= test_tc.c
 test_tc_LDADD		= @TACO_CLIENT_LIBS@ 
 
-EXTRA_DIST 		+= testsuite.at $(TESTSUITE_AT) testsuite local.at
+EXTRA_DIST 		+= testsuite.at $(TESTSUITE_AT) testsuite local.at ext.at
 
 TESTSUITE 		= testsuite
 
-TESTSUITE_AT		= dbase.at devices.at starter.at message.at specialtest1.at
+TESTSUITE_AT		= dbase.at devices.at starter.at message.at specialtest1.at ext.at
 
 AUTOTEST 		= $(AUTOM4TE) --language=autotest
 
@@ -34,7 +34,8 @@ check_PROGRAMS 		= db_connect db_resget db_resput db_getdevexp \
 			db_serverlist db_hostlist db_dsonhost \
 			test_asc_dyn test_asc_stat test_tc test_starter \
 			dev_cmdquery dev_conparams \
-			test_server test_client test_client2 test_status test_connect
+			test_server test_client test_client2 test_status test_connect \
+			TestExtServer
 
 check_SCRIPT		= taco
 
@@ -131,7 +132,7 @@ atconfig:	$(top_builddir)/config.status
 clean-local:
 	if test -f $(TESTSUITE) ; then $(SHELL) $(TESTSUITE) --clean ; fi	
 
-noinst_HEADERS		= test_server.h test_serverP.h
+noinst_HEADERS		= test_server.h test_serverP.h TestExtServer.h
 
 test_server_SOURCES 	= test_server.cpp
 test_server_LDADD 	= @TACO_SERVER_CXX_LIBS@ -lstdc++
@@ -148,3 +149,6 @@ test_status_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 test_connect_SOURCES 	= test_connect.cpp
 test_connect_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
+TestExtServer_CPPFLAGS  = -I$(top_srcdir)/ext/common/include -I$(top_srcdir)/ext/server/include -DTACO_EXT
+TestExtServer_SOURCES	= TestExtServer.cpp TestExtServerStartup.cpp
+TestExtServer_LDADD	= @TACO_SERVER_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/lib/libTACOExtensions.la
