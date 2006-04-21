@@ -1,3 +1,8 @@
+2006-04-21 06:30 jkrueger1:
+	* ext/common/include/TACOStates.h: Fix: SWIG >= 1.3.27 has problems
+	with some defines and #error directives
+	* system/dbase/tools/Makefile.am: Fix: Do not use a installed 'ndbm.h'
+	for building the 'db_dump' tool 
 2006-04-17 12:30 jkrueger1:
 	* lib/svc_api.c lib/Device.cpp: Fix query command informations for
 	empty command lists
