@@ -6,17 +6,19 @@
 #include <macros.h>
 #include <DevStates.h>
 
-#if STOPPED != 43
-# error unexpected STOPPED value
+#if !defined(SWIG) 
+#	if STOPPED != 43
+# 		error unexpected STOPPED value
+#	endif
+
+#	undef STOPPED
+
+#	if RUNNING != 44
+# 		error unexpected RUNNING value
+#	endif
+
+#	undef RUNNING
 #endif
-
-#undef STOPPED
-
-#if RUNNING != 44
-# error unexpected RUNNING value
-#endif
-
-#undef RUNNING
 
 // Rename OVERFLOW if defined, in order to avoid conflicts with 'math.h'
 #ifdef OVERFLOW
