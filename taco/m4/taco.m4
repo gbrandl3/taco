@@ -181,7 +181,10 @@ AC_DEFUN([TACO_DEFINES],
 	AC_STRUCT_TM
 	AC_C_VOLATILE
 	AC_CHECK_TYPES(socklen_t, [],[],
-	[#if HAVE_SYS_SOCKET_H
+	[#if HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#if HAVE_SYS_SOCKET_H
 #       include <sys/socket.h>
 #elif HAVE_SOCKET_H
 #       include <socket.h>
