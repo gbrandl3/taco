@@ -61,6 +61,7 @@ INCLUDES		= @TACO_INCLUDES@
 
 libtacoc_la_SOURCES 	= gen_api.c dev_cmds.c dev_errors.c dev_states.c oic.c \
 			util_api.c asyn_api.c gettrans.c ds_prog_vers3.c DevServer.c
+libtacoc_la_LIBADD	= @PTHREAD_LIBS@
 
 libtacoc_la_LDFLAGS 	= -version-info @LIB_VERSION@
 if CLIENT_TCP
