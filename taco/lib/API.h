@@ -26,13 +26,13 @@
  *		the applications programmers interface.
  *
  * Author(s):	Jens Meyer
- * 		$Author: jensmeyer $
+ * 		$Author: jkrueger1 $
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.14 $
+ * Version:	$Revision: 1.15 $
  *
- * Date:	$Date: 2005-09-28 13:51:11 $
+ * Date:	$Date: 2006-07-05 14:10:16 $
  *
  *********************************************************************-*/
 
@@ -89,7 +89,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.14 2005-09-28 13:51:11 jensmeyer Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.15 2006-07-05 14:10:16 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*
@@ -447,9 +447,9 @@ extern _DLLFunc long debug_flag;	/* global that is used in gen_api.c */
 		extern _DLLFunc void  dev_printdebug	PT_( (long mode, char *var_args, ...) );
 		extern _DLLFunc void  dev_printdiag	PT_( (DevShort mode, char *var_args, ...) );
 #	else
-		extern _DLLFunc void  dev_printerror	(DevShort mode,char *fmt, char *str);
-		extern _DLLFunc void  dev_printdebug	( ... );
-		extern _DLLFunc void  dev_printdiag	( ... );
+		extern _DLLFunc void  dev_printerror	(DevShort mode,char *fmt, ... );
+		extern _DLLFunc void  dev_printdebug	(DevLong mode, char *fmt,  ... );
+		extern _DLLFunc void  dev_printdiag	(DevShort mode, char *fmt,  ... );
 #	endif
 #	ifdef __cplusplus
 		}
