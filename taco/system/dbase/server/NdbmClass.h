@@ -25,9 +25,9 @@
  * Author(s):
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2005-07-25 08:24:18 $
+ * Date:	$Date: 2006-07-05 14:40:54 $
  *
  */
 
@@ -401,8 +401,8 @@ struct DATUM : public datum
 	DATUM(const datum &a) { dptr = NULL; dsize = 0; copy(a); }
 	~DATUM() { clear(); };
 #ifndef _solaris
-	DATUM & DATUM::operator =(const DATUM &a) { copy(a); };
-	DATUM & DATUM::operator =(const datum &a) { copy(a); };
+	DATUM & operator =(const DATUM &a) { copy(a); };
+	DATUM & operator =(const datum &a) { copy(a); };
 #else
 	DATUM & DATUM::operator =(const DATUM &a) { copy(a); return *this;};
 	DATUM & DATUM::operator =(const datum &a) { copy(a); return *this;};
