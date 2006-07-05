@@ -6,17 +6,17 @@
 #include <macros.h>
 #include <DevStates.h>
 
-#if !defined(SWIG) 
+#ifdef STOPPED
 #	if STOPPED != 43
 # 		error unexpected STOPPED value
 #	endif
-
 #	undef STOPPED
+#endif
 
+#ifdef RUNNING
 #	if RUNNING != 44
 # 		error unexpected RUNNING value
 #	endif
-
 #	undef RUNNING
 #endif
 
