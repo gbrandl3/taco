@@ -33,7 +33,7 @@ class ServerConnection {
 
   // API timeouts (milliSec)
   static final int serverTimeout             = 3000;    // Default RPC timeout
-  private static final int adminTimeout      = 2000;    // Timeout for RPC admin calls (milliSec)
+  private static final int adminTimeout      = 4000;    // Timeout for RPC admin calls (milliSec)
   private static final int connectionUdpTimeout = 100;  // Timeout for connection to server (UDP protocol)
 
   // -----------------------------------------------------------------------------------
