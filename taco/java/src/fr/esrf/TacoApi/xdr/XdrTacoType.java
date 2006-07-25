@@ -29,7 +29,7 @@ import fr.esrf.TacoApi.TacoConst;
 public class XdrTacoType implements TacoConst {
 
   final static int LONG_NAME_SIZE = 80;
-  final static int SHORT_NAME_SIZE = 20;
+  final static int SHORT_NAME_SIZE = 32;
 
   /**
    * Creates an XdrAble object for the given type.

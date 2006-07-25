@@ -11,6 +11,9 @@
  Original   :	June 2005
 
  $Log: not supported by cvs2svn $
+ Revision 1.14  2006/07/21 08:36:26  jlpons
+ Changed the admin timeout
+
  Revision 1.13  2006/03/09 16:24:52  jlpons
  Correction in NethostConnection.initDC() for invalid dc_rd
 
@@ -95,7 +98,7 @@ public class TacoDevice implements ServerListener {
   public final static int SOURCE_CACHE_DEVICE = 2;
 
   // Do not modify this line (it is used by the install script)
-  public final String apiRelease = "$Revision: 1.14 $".substring(11,15);
+  public final String apiRelease = "$Revision: 1.15 $".substring(11,15);
 
   // Timeout before reinporting the device from the database
   private static long dbImportTimeout = 30000L; // 30 sec
@@ -845,7 +848,7 @@ public class TacoDevice implements ServerListener {
 
     try {
 
-      TacoDevice dev1  = new TacoDevice("//aries/fe/id/11");
+      TacoDevice dev1  = new TacoDevice("//crunch/id11/beamline/1");
 //        TacoDevice dev1  = new TacoDevice("sr/d-ct/1");
 //      TacoDevice dev2  = new TacoDevice("sr/jlp/1");
 //      TacoDevice dev3  = new TacoDevice("//aries/sr/d-fbpm/peak-h");
@@ -864,10 +867,10 @@ public class TacoDevice implements ServerListener {
           short stateValue = values.extractShort();
           System.out.println("State = " + stateValue );
 
-//            TacoCommand[] cmds = dev1.commandQuery();
-//          for(int i=0;i<cmds.length;i++) {
-//            System.out.println(cmds[i].cmdName);
-//          }
+          TacoCommand[] cmds = dev1.commandQuery();
+          for(int i=0;i<cmds.length;i++) {
+            System.out.println(cmds[i].cmdName);
+          }
 
 //          TacoData state2 = dev2.get(TacoConst.DevState);
 //          stateValue2 = state2.extractShort();
