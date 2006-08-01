@@ -43,11 +43,11 @@ echo "Using $automakeversion"
 echo "Using $libtoolversion"
 
 case $autoconfversion in
-    *2.5[9])
+    *2.5[9]|*2.6[0-9])
 	;;
     *)
 	echo "This autoconf version is not supported by taco."
-	echo "taco only supports autoconf 2.5[9]."
+	echo "taco only supports autoconf 2.5[9] 2.6X."
 	exit
 	;;
 esac

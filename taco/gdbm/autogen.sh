@@ -43,11 +43,11 @@ echo "Using $automakeversion"
 echo "Using $libtoolversion"
 
 case $autoconfversion in
-    *2.5[2-79])
+    *2.5[2-79]|*2.6[0-9])
 	;;
     *)
 	echo "This autoconf version is not supported by gdbm."
-	echo "gdbm only supports autoconf 2.13 and 2.5[2-79]."
+	echo "gdbm only supports autoconf 2.5[2-79] and 2.6X."
 	exit
 	;;
 esac
