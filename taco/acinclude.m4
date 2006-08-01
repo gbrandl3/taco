@@ -50,6 +50,7 @@ AC_DEFUN([TACO_DBM_SERVER],
 [
 	TACO_MYSQL_SUPPORT
 	TACO_GDBM_SUPPORT
+	TACO_SQLITE3_SUPPORT
 	AM_CONDITIONAL(MYSQLSUPPORT, test "x$taco_mysql" = "xyes")
 dnl disable gdbm support of the dbm server if mysql support of database server is disabled
 	if test "x$taco_mysql" != "xyes" ; then 	
@@ -66,6 +67,17 @@ dnl disable the build of gdbm if gdbm support of database server is disabled
 	AC_SUBST(GDBM_COMPAT_LIBS)
 	AC_SUBST(MYSQL_CFLAGS)
 	AC_SUBST(MYSQL_LIBS)
+])
+
+AC_DEFUN([TACO_SQLITE3_SUPPORT],
+[
+	AC_ARG_ENABLE(sqlite3, AC_HELP_STRING(--enable-sqlite3, [build the database server with SQLite3 support @<:@default=yes@:>@]),
+		[case "${enable_sqlite3}" in
+			yes)	taco_sqlite3=yes;;
+			no)	taco_sqlite3=no;;
+			*)	AC_MSG_ERROR([bad value ${enable_sqlite3} for --enable-sqlite3]);;
+		esac], [taco_sqlite3=yes])	
+	PKG_CHECK_MODULES(SQLITE3, sqlite3 >= 3.0.0, [taco_sqlite3=yes], [taco_sqlite3=no])
 ])
 
 AC_DEFUN([TACO_MYSQL_SUPPORT],
@@ -512,7 +524,13 @@ AC_DEFUN([TACO_CHECK_RPC_AND_THREADS],
 [
 AC_CHECK_HEADERS([socket.h sys/socket.h rpc.h rpc/rpc.h])
 LIBS_SAVE="$LIBS"
-AC_SEARCH_LIBS(pthread_cancel, [pthread c_r nsl])
+PTHREAD_LIBS=""
+AC_SEARCH_LIBS(pthread_create, [pthread c_r nsl])
+if test $ac_cv_search_pthread_create != "none required" ; then
+	PTHREAD_LIBS="$ac_cv_search_pthread_create"
+fi
+AC_SEARCH_LIBS(pthread_mutex_unlock, [], [], [$PTHREAD_LIBS])
+AC_SUBST([PTHREAD_LIBS])
 AC_RUN_IFELSE(
 	AC_LANG_PROGRAM([
 #include <pthread.h>
