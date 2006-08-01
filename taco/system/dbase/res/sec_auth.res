@@ -11,9 +11,9 @@
 #
 # Original:      September 1993
 #
-# Version:	 $Revision: 1.2 $
+# Version:	 $Revision: 1.3 $
 #
-# Date:		 $Date: 2004-03-04 15:28:03 $
+# Date:		 $Date: 2006-08-01 16:34:15 $
 #
 # Copyright (c) 1990 by European Synchrotron Radiation Facility,
 #		Grenoble, France
@@ -38,5 +38,5 @@ SEC/MINIMAL/ACC_RIGHT/default:	WRITE_ACCESS,	129.187.183,192.168.1
 #
 #
 #                     x add your own domains hers
-#SEC/GROUP/ACC_RIGHT/resi: dserver,WRITE_ACCESS
-#SEC/USER/ACC_RIGHT/resi: pedersen,ADMIN_ACCESS 
+#SEC/GROUP/ACC_RIGHT/resi: 	dserver,	WRITE_ACCESS
+#SEC/USER/ACC_RIGHT/resi: 	pedersen,	ADMIN_ACCESS 
