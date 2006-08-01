@@ -1,3 +1,21 @@
+/*
+ * Extensions for the convenient access to TACO
+ * Copyright (C) 2002-2004 Sebastian Huber <sebastian-huber@web.de>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 #include <Python.h>
 #include "TACOClient.h"
 #include "TACOPythonClientConverters.h"
@@ -907,12 +925,12 @@ void initTACOClient(int i)
 		PyDict_SetItemString(d, "__author__", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyString_FromString("$Revision: 1.1 $"))
+	if (tmp = PyString_FromString("$Revision: 1.2 $"))
 	{
 		PyDict_SetItemString(d, "__revision__", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyString_FromString("$Date: 2006-04-20 06:26:26 $"))
+	if (tmp = PyString_FromString("$Date: 2006-08-01 15:52:52 $"))
 	{
 		PyDict_SetItemString(d, "__date__", tmp);
 		Py_DECREF(tmp);
