@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * File:        $Id: starter.h,v 1.5 2004-11-05 08:52:35 jkrueger1 Exp $
+ * File:        $Id: starter.h,v 1.6 2006-08-01 16:35:19 jkrueger1 Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
@@ -11,9 +11,9 @@
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2004-11-05 08:52:35 $
+ * Date:	$Date: 2006-08-01 16:35:19 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -81,7 +81,7 @@ public:
 	void deviceReStart(const std::string proc, const std::string pers, const std::string option, const std::string param);	
 
 private:
-	pid_t StarterDevice::getpid(const std::string proc, const std::string pers);
+	pid_t getpid(const std::string proc, const std::string pers);
 	
 };
 
