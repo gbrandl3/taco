@@ -1,5 +1,5 @@
 /*****************************************************************************
- * File:        $Id: starter.cpp,v 1.9 2006-04-18 06:28:14 jkrueger1 Exp $
+ * File:        $Id: starter.cpp,v 1.10 2006-08-01 16:39:51 jkrueger1 Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
@@ -10,9 +10,9 @@
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:	$Date: 2006-04-18 06:28:14 $
+ * Date:	$Date: 2006-08-01 16:39:51 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -55,9 +55,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-long minimal_access = WRITE_ACCESS;
+DevLong minimal_access = WRITE_ACCESS;
 
-StarterDevice::StarterDevice(std::string name, long &error)
+StarterDevice::StarterDevice(std::string name, DevLong &error)
 	: Device(const_cast<char *>(name.c_str()), &error)
 {
         commands_map[DevState] = DeviceCommandMapEntry(DevState, static_cast<DeviceMemberFunction>( &Device::State),
@@ -89,7 +89,7 @@ StarterDevice::~StarterDevice()
 	return;
 }
 
-long StarterDevice::tacoDevRun(void *argin, void *argout, long *error) 
+DevLong StarterDevice::tacoDevRun(void *argin, void *argout, DevLong *error) 
 {
 	DevVarStringArray	arr = *(DevVarStringArray *)argin;
 	if (arr.length > 1)
@@ -100,19 +100,19 @@ long StarterDevice::tacoDevRun(void *argin, void *argout, long *error)
 				this->deviceRun(*arr.sequence, arr.sequence[1], arr.length > 2 ? arr.sequence[2] : "-m", "");
 				return DS_OK;
 			}
-			catch (const long &e)
+			catch (const DevLong &e)
 			{
 				*error = e;
 			}
 		else
-			*error = long(DevErr_DeviceIllegalParameter);
+			*error = DevLong(DevErr_DeviceIllegalParameter);
 	}
 	else
-		*error = long(DbErr_BadParameters);
+		*error = DevLong(DbErr_BadParameters);
 	return DS_NOTOK;
 }
 
-long StarterDevice::tacoDevStop(void *argin, void *argout, long *error) 
+DevLong StarterDevice::tacoDevStop(void *argin, void *argout, DevLong *error) 
 {
 	DevVarStringArray	arr = *(DevVarStringArray *)argin;
 	if (arr.length > 1)
@@ -123,20 +123,20 @@ long StarterDevice::tacoDevStop(void *argin, void *argout, long *error)
 				this->deviceStop(arr.sequence[0], arr.sequence[1]);
 				return DS_OK;
 			}
-			catch(const long &e)
+			catch(const DevLong &e)
 			{
 				*error = e;
 			}
 		else
-			*error = long(DevErr_DeviceIllegalParameter);
+			*error = DevLong(DevErr_DeviceIllegalParameter);
 	}
 	else
-		*error = long(DbErr_BadParameters);
+		*error = DevLong(DbErr_BadParameters);
 	
 	return DS_NOTOK;
 }
 
-long StarterDevice::tacoDevRestart(void *argin, void *argout, long *error) 
+DevLong StarterDevice::tacoDevRestart(void *argin, void *argout, DevLong *error) 
 {
 	DevVarStringArray	arr = *(DevVarStringArray *)argin;
 	
@@ -148,15 +148,15 @@ long StarterDevice::tacoDevRestart(void *argin, void *argout, long *error)
 				this->deviceReStart(arr.sequence[0], arr.sequence[1], arr.length > 2 ? arr.sequence[2] : "-m", "");
 				return DS_OK;
 			}
-			catch (const long &e)
+			catch (const DevLong &e)
 			{
 				*error = e;
 			}		
 		else 
-			*error = long(DevErr_DeviceIllegalParameter);
+			*error = DevLong(DevErr_DeviceIllegalParameter);
 	}
 	else
-		*error = long(DbErr_BadParameters);
+		*error = DevLong(DbErr_BadParameters);
 	return DS_NOTOK;
 }
 
@@ -164,7 +164,7 @@ void StarterDevice::deviceRun(const std::string proc, const std::string pers, co
 {
 	DevVarStringArray	server_list = {0, NULL};
 	db_resource		server = {"default", D_VAR_STRINGARR, &server_list};	
-	long 			error;
+	DevLong 			error;
 	std::string		newServer = proc + '/' + pers;
 	
 //
@@ -219,7 +219,7 @@ void StarterDevice::deviceRun(const std::string proc, const std::string pers, co
 				exit(-1);
 			}
 			else if (pid < 0)
-				throw long(DevErr_NoProcessWithPid);
+				throw DevLong(DevErr_NoProcessWithPid);
 			return;
 		}
 		for (int i = 0; i < server_list.length; ++i)
@@ -236,14 +236,14 @@ void StarterDevice::deviceStop(const std::string proc, const std::string pers)
 	if (pid == 0)
 		return;
 	if (pid == ::getpid())
-		throw long(DevErr_DeviceIllegalParameter);
+		throw DevLong(DevErr_DeviceIllegalParameter);
 	if (kill(pid, SIGTERM))
 		switch (errno)
 		{
 			case ESRCH :
-				throw long(DevErr_NoProcessWithPid);
+				throw DevLong(DevErr_NoProcessWithPid);
 			default:
-				throw long(DevErr_CantKillProcess);
+				throw DevLong(DevErr_CantKillProcess);
 		}
 	int status;
 	waitpid(pid, &status, 0); 
@@ -257,7 +257,7 @@ void StarterDevice::deviceReStart(const std::string proc, const std::string pers
 		this->deviceStop(proc, pers);
 		this->deviceRun(proc, pers, option, param);
 	}
-	catch (const long &e)
+	catch (const DevLong &e)
 	{
 	}
 	return;
@@ -266,7 +266,7 @@ void StarterDevice::deviceReStart(const std::string proc, const std::string pers
 pid_t StarterDevice::getpid(const std::string proc, const std::string pers)
 {	
 	db_svcinfo_call	server_info;
-	long		error;
+	DevLong		error;
 
 	if (db_servinfo(const_cast<char *>(proc.c_str()), const_cast<char *>(pers.c_str()), &server_info, &error) == DS_OK)
 		return server_info.pid;

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- * File:        $Id: starter.h,v 1.6 2006-08-01 16:35:19 jkrueger1 Exp $
+ * File:        $Id: starter.h,v 1.7 2006-08-01 16:39:51 jkrueger1 Exp $
  *
  * Project:     Device Servers with sun-rpc
  *
@@ -11,9 +11,9 @@
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2006-08-01 16:35:19 $
+ * Date:	$Date: 2006-08-01 16:39:51 $
  *
  * Copyright (C) 2003 Jens Krueger
  *
@@ -42,27 +42,27 @@
 
 class StarterDevice : public Device
 {
-	friend long StarterSetup(char *pszServerName, long *plError);
+	friend DevLong StarterSetup(char *pszServerName, DevLong *plError);
 public:
-	StarterDevice(std::string name, long &error);
+	StarterDevice(std::string name, DevLong &error);
 	~StarterDevice();
 protected:
-//	long GetResources(char *name, long *error){}
+//	DevLong GetResources(char *name, DevLong *error){}
 private:
 	/**
 	 * TACO command for starting Device server.
 	 */
-	long tacoDevRun(void *argin, void *argout, long *error);
+	DevLong tacoDevRun(void *argin, void *argout, DevLong *error);
 
 	/**
 	 * TACO command for stopping Device server.
 	 */
-	long tacoDevStop(void *argin, void *argout, long *error);
+	DevLong tacoDevStop(void *argin, void *argout, DevLong *error);
 
 	/**
 	 * TACO command for restarting Device server.
 	 */
-	long tacoDevRestart(void *argin, void *argout, long *error); 
+	DevLong tacoDevRestart(void *argin, void *argout, DevLong *error); 
 
 public:
 	/**
