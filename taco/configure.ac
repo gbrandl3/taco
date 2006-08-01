@@ -16,9 +16,9 @@ dnl You should have received a copy of the GNU Lesser General Public
 dnl License along with this library; if not, write to the Free Software
 dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_INIT([TACO], [3.95.1], [taco-devel@lists.sourceforge.net])
+AC_INIT([TACO], [3.95.2], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.79 $)dnl
+AC_REVISION($Revision: 1.80 $)dnl
 AC_COPYRIGHT([(C) 1990-2006 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -166,7 +166,7 @@ AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_HEADER_TIME
 AC_HEADER_STAT
-AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h]) 
+AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h sys/types.h]) 
 AC_CHECK_HEADERS([pthread.h fcntl.h malloc.h memory.h netdb.h stddef.h stdlib.h string.h strings.h sys/file.h sys/ioctl.h termios.h unistd.h sys/filio.h paths.h siggen.h])
 AC_CHECK_HEADERS([varargs.h stdarg.h])
 AC_CHECK_HEADERS([svc.h rpc/svc.h rpc/pmap_prot.h rpc/pmap_prot.h])
@@ -213,16 +213,21 @@ AC_TYPE_SIGNAL
 AC_TYPE_UID_T
 AC_STRUCT_TM
 AC_C_VOLATILE
-AC_CHECK_TYPES(socklen_t, [],[],
-[#if HAVE_SYS_SOCKET_H
-#	include	<sys/socket.h>
-#elif HAVE_SOCKET_H
-#	include <socket.h>
-#elif HAVE_NETDB_H
-#	include <netdb.h>
-#elif HAVE_ARPA_INET_H
-#	include <arpa/inet.h>
-#endif])
+
+dnl AC_CHECK_TYPES(socklen_t, [],[],
+dnl [#if HAVE_SYS_SOCKET_H
+dnl #	if HAVE_SYS_TYPES_H
+dnl #		include <sys/types.h>
+dnl #	endif
+dnl #	include	<sys/socket.h>
+dnl #elif HAVE_SOCKET_H
+dnl #	include <socket.h>
+dnl #elif HAVE_NETDB_H
+dnl #	include <netdb.h>
+dnl #elif HAVE_ARPA_INET_H
+dnl #	include <arpa/inet.h>
+dnl #endif])
+
 AC_CHECK_TYPES(time_t)
 
 AC_MSG_CHECKING([for number of parameters in va_start])
@@ -489,7 +494,8 @@ if test x"${taco_dbserver}" = x"yes" ; then
 	taco_dbserver_support="
 	 	with:
 		DBM support:	${taco_gdbm}
-		mySQL support:	${taco_mysql}"
+		mySQL support:	${taco_mysql}
+		SQLite3 support:${taco_sqlite3}"
 fi
 
 AC_MSG_RESULT([
