@@ -1,15 +1,33 @@
+/*
+ * Extensions for the convenient access to TACO
+ * Copyright (C) 2002-2004 Sebastian Huber <sebastian-huber@web.de>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
 #include <TACOBasicCommands.h>
 #include <TACOConverters.h>
 #include <TACOStringConverters.h>
 
 #include <TACOServer.h>
 
-std::string TACO::Server::sStringBuffer;
 std::string TACO::Server::sServerName;
+std::string TACO::Server::sStringBuffer;
 
 TACO::Server::Server( const std::string& name, DevLong& error) throw (TACO::Exception)
 	: Device(const_cast<char *>(name.c_str()), &error),
-          mInitialized( false), mName( name), mVersion( "unknown"), mAlwaysAllowDeviceUpdate( false)
+	mInitialized( false), mName( name), mVersion( "unknown"), mAlwaysAllowDeviceUpdate( false)
 {
 	addCommand( Command::DEVICE_ON, &tacoDeviceOn, D_VOID_TYPE, D_VOID_TYPE);
 	addCommand( Command::DEVICE_OFF, &tacoDeviceOff, D_VOID_TYPE, D_VOID_TYPE);
@@ -22,13 +40,13 @@ TACO::Server::Server( const std::string& name, DevLong& error) throw (TACO::Exce
 	addCommand( Command::DEVICE_UPDATE_RESOURCE, &tacoDeviceUpdateResource, D_VAR_CHARARR, D_VOID_TYPE);
 	addCommand( Command::DEVICE_UPDATE, &tacoDeviceUpdate, D_VOID_TYPE, D_VOID_TYPE);
 	addCommand( Command::DEVICE_QUERY_RESOURCE_INFO, &tacoDeviceQueryResourceInfo, D_VOID_TYPE, D_VAR_CHARARR);
-	setDeviceState( State::DEVICE_OFF);
+	setDeviceState(State::DEVICE_OFF);
 	setServerName("TACO::Server");
 }
 
-DevLong TACO::Server::Command( DevCommand command, void* argin, DevType inputType, void* argout, DevType outputType, DevLong* error)
+DevLong TACO::Server::Command(DevCommand command, void* argin, DevType inputType, void* argout, DevType outputType, DevLong* error)
 {
-	short status;
+	DevShort status;
 	try {
 		lock();
 		CommandMap::const_iterator i( mCommandMap.find( command));
@@ -85,7 +103,7 @@ const char* TACO::Server::GetDevName()
 	return mName.c_str();
 }
 
-DevLong TACO::Server::GetMinAccessRight( DevCommand command)
+DevLong TACO::Server::GetMinAccessRight(DevCommand command)
 {
 	CommandMap::const_iterator i( mCommandMap.find( command));
 	if (i == mCommandMap.end()) {
@@ -135,9 +153,20 @@ const std::string& TACO::Server::bufferedString( const std::string& temporaryStr
 	return sStringBuffer;
 }
 
-bool TACO::Server::stateMachine( short state, DevCommand command) throw (TACO::Exception)
+bool TACO::Server::stateMachine( DevShort state, DevCommand command) throw (TACO::Exception)
 {
 	switch (state) {
+	case State::FAULT:
+		switch (command) {
+		case Command::DEVICE_STATE:
+		case Command::DEVICE_STATUS:
+		case Command::DEVICE_VERSION:
+		case Command::DEVICE_RESET:
+		case Command::DEVICE_TYPES:
+			return true;
+		default:
+			return false;
+		}
 	case State::DEVICE_OFF:
 		switch (command) {
 		case Command::DEVICE_STATE:
@@ -186,7 +215,7 @@ void TACO::Server::deviceReset() throw (TACO::Exception)
 	deviceOff();
 }
 
-short TACO::Server::deviceState() throw (TACO::Exception)
+DevShort TACO::Server::deviceState() throw (TACO::Exception)
 {
 	return mState;
 }
@@ -223,6 +252,11 @@ std::string TACO::Server::serverName() throw (TACO::Exception)
 	} else {
 		return sServerName;
 	}
+}
+
+void TACO::Server::setServerName(const std::string &serverName) throw (::TACO::Exception)
+{
+	sServerName = serverName;
 }
 
 void TACO::Server::setDeviceVersion( const std::string& version) throw (TACO::Exception)
