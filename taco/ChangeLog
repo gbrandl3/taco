@@ -1,3 +1,13 @@
+2006-08-01 18:25 jkrueger1:
+	* ext/ : Add the copyright into the head of the files
+	* system/starter: Use the 'DevLong' version of 'long'
+2006-07-05 16:00 jkrueger1:
+        * configure.ac m4/taco.m4: Move the code for the detection of the
+        'socklen_t' structure to taco.m4 file.
+        * system/dbase/server/NdbmClass.h system/starter.h: FIX: wrong definitions
+        of the methods (gcc: 4.1.X)
+	* lib/Makefile: improve the handling of the pthread library
+	* lib/API.h: Make code more C99 standard compatible
 2006-04-21 06:30 jkrueger1:
 	* ext/common/include/TACOStates.h: Fix: SWIG >= 1.3.27 has problems
 	with some defines and #error directives
