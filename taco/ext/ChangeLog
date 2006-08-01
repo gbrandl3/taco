@@ -1,6 +1,14 @@
 Every package version has a CVS release tag of the following format:
 	package version 'N.N.N' -> release tag 'taco-ext-N-N-N'
 
+2006-08-01  Jens Krueger <jens.krueger@frm2.tum.de>
+Version: 7.2.0
+Library version (libTACOExtensions): 7.2.0
+Changes:
+	* New implementation of TACOClient for Python (written in C++)
+	* New default state machine
+	* Add the copyright to the files
+
 2004-04-21  Sebastian Huber  <sebastian-huber@web.de>
 
 Version: 1.4.0
