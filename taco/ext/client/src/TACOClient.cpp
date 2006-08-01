@@ -1,3 +1,22 @@
+/*
+ * Extensions for the convenient access to TACO
+ * Copyright (C) 2002-2004 Sebastian Huber <sebastian-huber@web.de>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
 #include "config.h"
 
 #include <vector>
@@ -97,7 +116,7 @@ static std::string getCmdName(const DevCommand cmd)
         unsigned short  team,
                         server,
                         cmds_ident;
-        DevLong            error;
+        DevLong         error;
 
         team = (unsigned short) (cmd  >> DS_TEAM_SHIFT) & DS_TEAM_MASK;
         server = (unsigned short) (cmd << DS_IDENT_SHIFT) & DS_IDENT_MASK;
@@ -125,8 +144,8 @@ static std::string getCmdName(const DevCommand cmd)
 void TACO::Client::connectClient() throw (TACO::Exception)
 {
 	disconnectClient();
-	DevLong 	e;
-	DevLong    dc_error;
+	DevLong e;
+	DevLong dc_error;
 	std::string	sTemp = mName;
 
 	db_devinfo_call info;
