@@ -29,13 +29,25 @@
  *
  * Original   	: March 1991
  *
- * Version	: $Revision: 1.23 $
+ * Version	: $Revision: 1.24 $
  *
- * Date		: $Date: 2006-04-20 06:44:45 $
+ * Date		: $Date: 2006-08-04 06:55:57 $
  *
  *******************************************************************-*/
 #ifndef WIN32
 #include "config.h"
+#ifdef unix
+#       ifdef HAVE_PATHS_H
+#               include <paths.h>
+#       else
+#               define _PATH_DEVNULL    "/dev/null"
+#       endif
+#       if HAVE_SYS_TYPES_H
+#             include <sys/types.h>
+#       endif
+#       include <fcntl.h>
+#       include <unistd.h>
+#endif
 #endif /* WIN32 */
 #include <API.h>
 #include <private/ApiP.h>
@@ -215,6 +227,57 @@ static BOOL /* RPC and TACO initialization (Device Server's main) */
 application_main (int argc, char **argv)  /* Windows does not use main()! */
 
 #else /* WIN32 */
+#ifdef unix
+/**@ingroup dsAPIintern
+ * This function makes the current process to a daemon.
+ *
+ * @return Process ID of the child if the process became a daemon otherwise the process ID of itself.
+ */
+pid_t   become_daemon(void)
+{
+        pid_t   pid = getpid();
+        int     fd_devnull = open(_PATH_DEVNULL, O_RDWR);
+        if (fd_devnull < 0)
+                return pid;
+        while (fd_devnull <= 2)
+        {
+                int i = dup(fd_devnull);
+                if (i < 0)
+                        return pid;
+                fd_devnull = i;
+        }
+
+        if ((pid = fork ()) > 0)
+/*
+ * Stop the parent process
+ */
+                exit(0);
+        else if (pid == 0)
+        {
+/*
+ * Child process and try to detach the terminal
+ */
+#if HAVE_SETSID
+                setsid();
+#elif defined (TIOCNOTTY)
+                {
+                        int i = open("/dev/tty", O_RDWR, 0);
+                        if (i != -1)
+                        {
+                                ioctl(i, (int)TIOCNOTTY, (char *)NULL);
+                                close(i);
+                        }
+                }
+#endif
+                dup2(fd_devnull, 0);
+                dup2(fd_devnull, 1);
+                dup2(fd_devnull, 2);
+                pid = getpid();
+        }
+        return pid;
+}
+#endif
+
 /**@ingroup dsAPI
  * Main routine for all device servers.
  *
@@ -239,6 +302,9 @@ int main (int argc, char **argv)
 				res_path [80],
 				res_name[80],
 				**device_list;
+#if 0
+	pid_t			pid;
+#endif
 	DevVarStringArray	default_access;
 	db_resource		res_tab;
 
@@ -249,6 +315,9 @@ int main (int argc, char **argv)
 	short			m_opt = False,
 				s_opt = True,
 				nodb_opt = False,
+#ifdef unix
+				daemon_opt = False,
+#endif
 				device_no,
 				sig,
 				i,
@@ -279,6 +348,10 @@ int main (int argc, char **argv)
 		
 		fprintf( stderr, "   -s                             : "
 			"use startup function from server\n" );
+#ifdef unix
+		fprintf( stderr, "   -d                             : "
+			"start as daemon\n");
+#endif
 		exit (1);
 	}
 #else
@@ -317,21 +390,24 @@ int main (int argc, char **argv)
 		{
 			if (strcmp (argv[i],"-m") == 0)
 				m_opt = True;
-			if (strcmp (argv[i],"-s") == 0)
+			else if (strcmp (argv[i],"-s") == 0)
 				s_opt = True;
-
-			if (strcmp (argv[i], "-n") == 0)
+#ifdef unix
+			else if (strcmp (argv[i],"-d") == 0)
+				daemon_opt = True;
+#endif
+			else if (strcmp (argv[i], "-n") == 0)
 			{
 			}
 /*
  * option -nodb means run device server without database
  */
-			if (strcmp (argv[i],"-nodb") == 0)
+			else if (strcmp (argv[i],"-nodb") == 0)
 				nodb_opt = True;
 /*
  * option -pn specifies program number (to be used in conjunction with -nodb)
  */
-			if (strcmp (argv[i],"-pn") == 0)
+			else if (strcmp (argv[i],"-pn") == 0)
 			{
 				sscanf(argv[i+1],"%d",&prog_number);
 				i++;
@@ -339,7 +415,7 @@ int main (int argc, char **argv)
 /*
  * option -device means remaining command line arguments are device names
  */
-			if (strcmp (argv[i],"-device") == 0)
+			else if (strcmp (argv[i],"-device") == 0)
 			{
 				device_no = argc-i-1;
 				device_list = (char**)malloc(device_no*sizeof(char));
@@ -352,6 +428,10 @@ int main (int argc, char **argv)
 			}
 		}
 	}
+#ifdef unix
+	if (daemon_opt == True)
+		pid = become_daemon();
+#endif
 	status = device_server(proc_name, argv[1], m_opt, s_opt, nodb_opt, prog_number, device_no, device_list);
 #ifdef WIN32
 	return status;

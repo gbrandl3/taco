@@ -1,3 +1,6 @@
+2006-08-03 14:00 jkrueger1:
+	* lib/DevServerMain.c: on unix like systems the server may be started
+	as daemon, use option -d
 2006-08-01 18:25 jkrueger1:
 	* ext/ : Add the copyright into the head of the files
 	* system/starter: Use the 'DevLong' version of 'long'
