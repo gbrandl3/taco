@@ -31,9 +31,9 @@
  *
  * Original   : May 1998
  *
- * Version:     $Revision: 1.8 $
+ * Version:     $Revision: 1.9 $
  *
- * Date:        $Date: 2005-07-25 13:02:28 $
+ * Date:        $Date: 2006-09-06 18:54:31 $
  *
  *-*******************************************************************/
 
@@ -93,14 +93,13 @@ extern int first;
 extern dbserver_info db_info;
 #endif /* ALONE */
 
+#define MAX_LINE_LENGTH 160
 
 /* Some local functions */
 
-static long TestLine(char *,char *,int);
-static long name_line(char *,ana_input *,long *,char **,long *);
-static long check_res(char *,long,char **,long *);
-static long res_line(char *,ana_input *,long *,char **,long *);
-static long check_dev(char *,long *,long *);
+static long TestLine(char *, char **, ana_input *, DevULong *, DevLong *);
+static long check_res(char *,long, char **, long *);
+static long check_dev(char *,long, char **, long *, long *);
 static void get_error_line(const char *,long ,long *);
 
 /* Static and Global variables */
@@ -142,9 +141,11 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
 	FILE *file;
 	long domain_nb;
 	char **domain_list;
-	long line_ptr,err_dev;
-	char line[160];
-	char line1[160];
+	DevULong line_ptr;
+	DevLong	err_dev;
+	DevLong	iret = DS_OK;
+	char line[MAX_LINE_LENGTH + 1];
+	char *line1 = NULL;
 	int i,j,k;
 	char *tmp_devdef;
 	char *tmp_resdef;
@@ -155,6 +156,8 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
 	char *ptr;
 	long length_to_eol;
 	ana_input in;
+
+	*p_error = DS_OK;
 
 /* Try to verify function parameters */
 
@@ -200,33 +203,30 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
 	if (in_type == Db_File)
 	{
 		ptr = fgets(line,sizeof(line),file);
-		
-		in.in_type = in_type;
 		in.f = file;
 		in.buf = NULL;
 	}
 	else
 	{
 		ptr = (char *)buffer;
-		
-		in.in_type = in_type;
 		in.buf = &ptr;
 		in.f = NULL;
 	}
+	in.in_type = in_type;
 		
 /* Resource file exploration */
 
-	while(ptr != NULL)
+	while(ptr != NULL && iret == DS_OK)
 	{
 		if (in_type == Db_Buffer)
 		{
 			length_to_eol = strcspn(ptr,"\n");
 			strncpy(line,ptr,length_to_eol);
 			line[length_to_eol] = '\0';
-			k = strlen(line);
 		}
 		else
-			k = strlen(line) - 1;
+			line[strlen(line) - 1] = '\0';
+		k = strlen(line);
 		line_ptr++;
 		
 /* Skip comment line */
@@ -245,7 +245,6 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
 		}
 		
 /* Skip empty line */
-
 		if (k == 0)
 		{
 			if (in_type == Db_Buffer)
@@ -258,7 +257,7 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
 				ptr = fgets(line,sizeof(line),file);
 			continue;
 		}
-		if (line[k] == 0x0a)
+		if (line[k] == '\n')
 			line[k] = '\0';
 
 		for (i = 0;i < k;i++)
@@ -268,7 +267,6 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
 		}
 		
 /* Skip line with blank characters only */
-
 		if (i == k)
 		{
 			if (in_type == Db_Buffer)
@@ -284,242 +282,61 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
 
 /* Test resource file line and do something according to test result */
 
-		switch(TestLine(line,line1,k))
+		switch(TestLine(line, &line1, &in, &line_ptr, p_error))
 		{
 		case DS_NOTOK :
-			for (i = 0;i < domain_nb;i++)
-				free(domain_list[i]);
-			free(domain_list);
-			if (nb_dev != 0)
-			{
-				for (j = 0;j < nb_dev;j++)
-					free(tmp_dev[j]);
-				free(tmp_dev);
-			}
-			if (nb_res != 0)
-			{
-				for (j = 0;j < nb_res;j++)
-					free(tmp_res[j]);
-				free(tmp_res);
-			}
-			if (in_type == Db_File)
-				fclose(file); 
+			if (in_type == Db_Buffer)
+				get_error_line(buffer,err_dev,&line_ptr);
 			*error_line = line_ptr;
-			*p_error = DbErr_BadResSyntax;
-			return(DS_NOTOK);
+			iret = DS_NOTOK;
 
 		case DS_OK : 
 #ifdef DEBUG
 			printf("Device definition (name_line) \n");
 #endif /* DEBUG */
-			if (name_line(line1,&in,&line_ptr,&tmp_devdef,p_error) == DS_NOTOK)
-			{
-				for (i = 0;i < domain_nb;i++)
-					free(domain_list[i]);
-				free(domain_list);
-				if (nb_dev != 0)
-				{
-					for (j = 0;j < nb_dev;j++)
-						free(tmp_dev[j]);
-					free(tmp_dev);
-				}
-				if (nb_res != 0)
-				{
-					for (j = 0;j < nb_res;j++)
-						free(tmp_res[j]);
-					free(tmp_res);
-				}
-				if (in_type == Db_File)
-					fclose(file);
-				*error_line = line_ptr;
-				return(DS_NOTOK);
-			}
-			if (check_dev(tmp_devdef,&err_dev,p_error) == DS_NOTOK)
+			if (check_dev(line1, domain_nb, domain_list, &err_dev, p_error) == DS_NOTOK)
 			{
 				if (in_type == Db_Buffer)
-				{
 					get_error_line(buffer,err_dev,&line_ptr);
-				}
-				for (i = 0;i < domain_nb;i++)
-					free(domain_list[i]);
-				free(domain_list);
-				if (nb_dev != 0)
-				{
-					for (j = 0;j < nb_dev;j++)
-						free(tmp_dev[j]);
-					free(tmp_dev);
-				}
-				if (nb_res != 0)
-				{
-					for (j = 0;j < nb_res;j++)
-						free(tmp_res[j]);
-					free(tmp_res);
-				}
-				if (in_type == Db_File)
-					fclose(file);
 				*error_line = line_ptr;
-				return(DS_NOTOK);
+				iret = DS_NOTOK;
 			}
-			nb_dev++;
-			if ((tmp_dev = (char **)realloc(tmp_dev,(sizeof(char *) * nb_dev))) == NULL)
+			if ((tmp_dev = (char **)realloc(tmp_dev,(sizeof(char *) * (nb_dev + 1)))) == NULL)
 			{
-				for (i = 0;i < domain_nb;i++)
-					free(domain_list[i]);
-				free(domain_list);
-				if (nb_res != 0)
-				{
-					for (j = 0;j < nb_res;j++)
-						free(tmp_res[j]);
-					free(tmp_res);
-				}
-				if (in_type == Db_File)
-					fclose(file);
 				*p_error = DbErr_ClientMemoryAllocation;
-				return(DS_NOTOK);
+				iret = DS_NOTOK;
 			}
-			tmp_dev[nb_dev - 1] = tmp_devdef;
+			if ((tmp_dev[nb_dev] = (char *)malloc(strlen(line1) + 1)) == NULL)
+			{
+				*p_error = DbErr_ClientMemoryAllocation;
+				iret = DS_NOTOK;
+			}
+			strcpy(tmp_dev[nb_dev], line1); 
+			nb_dev++;
 			break;
-
 		case 1 :
 #ifdef DEBUG
 			printf("Simple resource definition (check_res) \n");
 #endif /* DEBUG */
 		 	if (check_res(line1,domain_nb,domain_list,p_error) == DS_NOTOK)
 			{
-				for (i = 0;i < domain_nb;i++)
-					free(domain_list[i]);
-				free(domain_list);
-				if (nb_res != 0)
-				{
-					for (j = 0;j < nb_res;j++)
-						free(tmp_res[j]);
-					free(tmp_res);
-				}
-				if (nb_dev != 0)
-				{
-					for (j = 0;j < nb_dev;j++)
-						free(tmp_dev[j]);
-					free(tmp_dev);
-				}
-				if (in_type == Db_File)
-					fclose(file);
+				if (in_type == Db_Buffer)
+					get_error_line(buffer,err_dev,&line_ptr);
 				*error_line = line_ptr;
-				return(DS_NOTOK);
+				iret = DS_NOTOK;
 			}
+			if ((tmp_res = (char **)realloc(tmp_res,(sizeof(char *) * (nb_res + 1)))) == NULL)
+			{
+				*p_error = DbErr_ClientMemoryAllocation;
+				iret = DS_NOTOK;
+			}
+			if ((tmp_res[nb_res] = (char *)malloc(strlen(line1) + 1)) == NULL)
+			{
+				*p_error = DbErr_ClientMemoryAllocation;
+				iret = DS_NOTOK;
+			}
+			strcpy(tmp_res[nb_res],line1);
 			nb_res++;
-			if ((tmp_res = (char **)realloc(tmp_res,(sizeof(char *) * nb_res))) == NULL)
-			{
-				for (i = 0;i < domain_nb;i++)
-					free(domain_list[i]);
-				free(domain_list);
-				if (nb_res != 0)
-				{
-					for (j = 0;j < nb_res;j++)
-						free(tmp_res[j]);
-					free(tmp_res);
-				}
-				if (nb_dev != 0)
-				{
-					for (j = 0;j < nb_dev;j++)
-						free(tmp_dev[j]);
-					free(tmp_dev);
-				}
-				if (in_type == Db_File)
-					fclose(file);
-				*p_error = DbErr_ClientMemoryAllocation;
-				return(DS_NOTOK);
-			}
-			if ((tmp_res[nb_res - 1] = (char *)malloc(strlen(line1) + 1)) == NULL)
-			{
-				for (i = 0;i < domain_nb;i++)
-					free(domain_list[i]);
-				free(domain_list);
-				if (nb_dev != 0)
-				{
-					for (j = 0;j < nb_dev;j++)
-						free(tmp_dev[j]);
-					free(tmp_dev);
-				}
-				if (nb_res != 0)
-				{
-					for (j = 0;j < nb_res;j++)
-						free(tmp_res[j]);
-					free(tmp_res);
-				}
-				if (in_type == Db_File)
-					fclose(file);
-				*p_error = DbErr_ClientMemoryAllocation;
-				return(DS_NOTOK);
-			}
-			strcpy(tmp_res[nb_res - 1],line1);
-			break;
-
-		case 2 :
-#ifdef DEBUG
-			printf("Array resource definition (res_line) \n");
-#endif /* DEBUG */
-			if (res_line(line1,&in,&line_ptr,&tmp_resdef,p_error) == DS_NOTOK)
-			{
-				for (i = 0;i < domain_nb;i++)
-					free(domain_list[i]);
-				free(domain_list);
-				if (nb_dev != 0)
-				{
-					for (j = 0;j < nb_dev;j++)
-						free(tmp_dev[j]);
-					free(tmp_dev);
-				}
-				if (nb_res != 0)
-				{
-					for (j = 0;j < nb_res;j++)
-						free(tmp_res[j]);
-					free(tmp_res);
-				}
-				if (in_type == Db_File)
-					fclose(file);
-				*error_line = line_ptr;
-				return(DS_NOTOK);
-			}
-		 	if (check_res(tmp_resdef,domain_nb,domain_list,p_error) == DS_NOTOK)
-			{
-				for (i = 0;i < domain_nb;i++)
-					free(domain_list[i]);
-				free(domain_list);
-				if (nb_res != 0)
-				{
-					for (j = 0;j < nb_res;j++)
-						free(tmp_res[j]);
-					free(tmp_res);
-				}
-				if (nb_dev != 0)
-				{
-					for (j = 0;j < nb_dev;j++)
-						free(tmp_dev[j]);
-					free(tmp_dev);
-				}
-				if (in_type == Db_File)
-					fclose(file);
-				*error_line = line_ptr;
-				return(DS_NOTOK);
-			}
-			nb_res++;
-			if ((tmp_res = (char **)realloc(tmp_res,(sizeof(char *) * nb_res))) == NULL)
-			{
-				for (i = 0;i < domain_nb;i++)
-					free(domain_list[i]);
-				free(domain_list);
-				if (nb_dev != 0)
-				{
-					for (j = 0;j < nb_dev;j++)
-						free(tmp_dev[j]);
-					free(tmp_dev);
-				}
-				if (in_type == Db_File)
-					fclose(file);
-				*p_error = DbErr_ClientMemoryAllocation;
-				return(DS_NOTOK);
-			}
-			tmp_res[nb_res - 1] = tmp_resdef;
 			break;
 		}
 		
@@ -534,14 +351,33 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
 		else
 			ptr = fgets(line,sizeof(line),file);
 	}
-		
-/* Close resource file */
 
+	if (iret != DS_OK)
+	{
+		if (nb_dev != 0)
+		{
+			for (j = 0;j < nb_dev;j++)
+				free(tmp_dev[j]);
+			free(tmp_dev);
+			tmp_dev = NULL;
+			nb_dev = 0;
+		}
+		if (nb_res != 0)
+		{
+			for (j = 0;j < nb_res;j++)
+				free(tmp_res[j]);
+			free(tmp_res);
+			tmp_res = NULL;
+			nb_res = 0;
+		}
+	}
+
+/* Close resource file */
 	if (in_type == Db_File)
 		fclose(file);
-
 /* Leave function */
-
+	if (line1)
+		free(line1);
 	for (i = 0;i < domain_nb;i++)
 		free(domain_list[i]);
 	free(domain_list);
@@ -550,8 +386,7 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
 	*devdef = tmp_dev;
 	*nb_resdef = nb_res;
 	*resdef = tmp_res;
-	return(DS_OK);
-
+	return iret;
 }
 
 
@@ -571,9 +406,12 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
  *              - 1 It is a simple resource definition line
  *              - 2 It is definition for an array of resources
  */
-static long TestLine(char *line,char *line1,int k)
+static long TestLine(char *line, char **line1, ana_input *in, DevULong *p_line_ptr, DevLong *p_error)
 {
 	char *tmp;
+	char *ptr = *line1;
+	char tmp_line[MAX_LINE_LENGTH + 1];
+	size_t k = strlen(line);	
 	unsigned int diff;
 	int string = 0;
 	int iret = 1;
@@ -585,171 +423,48 @@ printf("Start of TestLine \n");
 #endif /* DEBUG */
 
 /* Return error in this line is not a definition line */
-
+	*p_error = DS_OK;
 	if ((tmp = strchr(line,':')) == NULL)
-		return(DS_NOTOK);
-
-/* Change all the letters before the : to lower case */
-
-	diff = (unsigned int)(tmp - line) + 1;
-	i = 0;
-	for (j=0;j<diff;j++)
 	{
-		if (line[j] != ' ' && line[j] != 0x09)
-			line1[i++] = tolower(line[j]);
+		*p_error = DbErr_BadResSyntax;
+		return DS_NOTOK;
 	}
-	line1[i] = 0;
-
-/* Is it a device definition line ? In this case, all the line must be 
-   translated to lower case letter */
-
-	if (strstr(line1,"device:") != NULL)
-	{
-		for (j = diff;j < k;j++)
-		{
-			if (line[j] != ' ' && line[j] != 0x09)
-			{
-				line1[i++] = tolower(line[j]);
-				if ((line[j] == ',') && (line[j + 1] == ','))
-					j++;
-			}
-		}
-		iret = DS_OK;
-	}
-
-/* Now it is a resource definition line */
-
-	else
-	{
-
-/* If the last character is \ , this is a resource array definition */
-
-		if (line[k - 1] == '\\')
-			iret = 2;
-
-		for (j = diff;j < k;j++)
-		{
-
-/* If the " character is detected, set a flag. If the flag is already set,
-   reset it */
-
-			if (line[j] == '"')
-			{
-				if (string)
-					string = 0;
-				else
-					string = 1;
-				continue;
-			}
-
-/* When the string flag is set, copy character from the original line to the
-   new one without any modifications */
-
-			if (string)
-			{
-				line1[i++] = line[j];
-				a = 1;
-				continue;
-			}
-
-/* If the , character is detected not in a string definition, this is a
-   resource array definition */
-
-			if (line[j] == ',')
-			{
-				line1[i++] = SEP_ELT;
-				if (line[j + 1] == ',')
-					j++;
-				iret = 2;
-				continue;
-			}
-
-/* Remove space and tab */
-
-			if (line[j] != ' ' && line[j] != 0x09)
-			{
-				line1[i++] = line[j];
-				a = 1;
-			}
-		}
-	}
-
-/* If an odd number of " character has been detected, it is an error */
-
-	if (string)
-		iret = DS_NOTOK;
-
-/* Leave function */
-
-	line1[i] = 0;
-	if ((strlen(line1) == diff) && (a == 0))
-		iret = DS_NOTOK;
-#ifdef DEBUG
-printf("End of TestLine \n");
-#endif /* DEBUG */
-	return(iret);
-
-}
-
-
-
-/**@ingroup dbaseAPIintern
- * To extract from a resource file all the informations concerning the device name
- *
- * @param line1		A pointer to a buffer where is stored a line of the resource
- *              	file (The first line with the "device" word in it )
- * @param in
- * @param p_line_ptr
- * @param tmp_devdef
- * @param p_error
- *
- * @return	DS_OK or DS_NOTOK
- */
-static long name_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_devdef,long *p_error)
-{
-	char base[RES_NAME_LENGTH + DEV_NAME_LENGTH];
-	unsigned int diff;
-	char *tmp;
-	int i,k,j;
-	char *ptr;
-	char tmp_line[160];
-	long length_to_eol;
-
-/* Make a copy of the device server network name */
-
-	tmp = strchr(line1,':');
-	diff = (unsigned int)(tmp - line1) + 1;
-	strncpy(base,line1,diff);
-	base[diff] = '\0';
-
-/* Copy the first line in the result buffer */
-
-	k = strlen(line1);
-	if ((ptr = (char *)malloc(k + 1)) == NULL)
+	diff = tmp - line;
+	if (k > MAX_LINE_LENGTH)
+		return DS_NOTOK;
+	if (ptr)
+		free(ptr);
+	if ((ptr = malloc(k + 1)) == NULL)
 	{
 		*p_error = DbErr_ClientMemoryAllocation;
-		return(DS_NOTOK);
+		return DS_NOTOK;
 	}
-	strcpy(ptr,line1);
-	if (line1[k - 1] == '\\')
+	strcpy(tmp_line, line);
+	for (i = 0, j = 0; i < diff; ++i)
+		if (!isspace(tmp_line[i]))
+			ptr[j++] = tmp_line[i];
+	for (; i < k; ++i)
+		ptr[j++] = tmp_line[i];
+	ptr[j] = '\0';
+
+/* If the last character is \ , this is a resource array definition */
+	while(tmp_line[k - 1] == '\\')
 	{
-		if (line1[k - 2] != ',')
-			ptr[k - 1] = ',';
+		if (tmp_line[k - 2] != ',')
+			ptr[j - 1] = ',';
 		else
-			ptr[k - 1] = '\0';
-	}
-
-/* Following lines examination (discard space or tab at beginning of line) */
-
-	while(line1[k - 1] == '\\')
-	{
+		{
+			--j;
+			ptr[j] = '\0';
+		}
 		if (in->in_type == Db_File)
 		{
-			fgets(tmp_line,sizeof(tmp_line),in->f);
+			fgets(tmp_line, sizeof(tmp_line) - 1, in->f);
 			tmp_line[strlen(tmp_line) - 1] = '\0';
 		}
 		else
 		{
+			size_t length_to_eol;
 			*(in->buf) = strstr(*(in->buf),"\n");
 			(*(in->buf))++;
 			length_to_eol = strcspn(*(in->buf),"\n");
@@ -757,45 +472,98 @@ static long name_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_devd
 			tmp_line[length_to_eol] = '\0';
 		}
 		(*p_line_ptr)++;
-
 		k = strlen(tmp_line);
-		j = 0;
-		for (i = 0;i < k;i++)
-		{
-			if (tmp_line[i] != ' ' && tmp_line[i] != 0x09)
-			{
-				line1[j++] = tolower(tmp_line[i]);
-				if ((tmp_line[i] == ',') && (tmp_line[i + 1] == ','))
-					i++;
-			}
-		}
-		line1[j] = '\0';
-		
-		k = strlen(line1);
-		if ((ptr = (char *)realloc(ptr,strlen(ptr) + k + 1)) == NULL)
+		if ((ptr = realloc(ptr, strlen(ptr) + k + 1)) == NULL)
 		{
 			*p_error = DbErr_ClientMemoryAllocation;
-			return(DS_NOTOK);
+			return DS_NOTOK;
 		}
-		strcat(ptr,line1);
-		if (line1[k - 1] == '\\' )
-		{
-			if (line1[k - 2] != ',')
-				ptr[strlen(ptr) - 1] = ',';
-			else
-				ptr[strlen(ptr) - 1] = '\0';
-		}
+		for (i = 0; i < k; ++i)
+			if (!isspace(tmp_line[i]))
+				ptr[j++] = tmp_line[i];
+		ptr[j] = '\0';
 	}
 
+/* Change all the letters before the : to lower case */
+	tmp = strchr(ptr,':');
+	diff = (unsigned int)(tmp - ptr) + 1;
+	k = strlen(ptr);
+	if ((tmp = malloc(k + 1)) == NULL)
+	{
+		*p_error = DbErr_ClientMemoryAllocation;
+		return DS_NOTOK;
+	}
+	i = 0;
+	for (j = 0; j < diff; j++)
+		tmp[i++] = tolower(ptr[j]);
+	tmp[i] = '\0';
+
+/* Is it a device definition line ? In this case, all the line must be 
+   translated to lower case letter */
+	if (strstr(tmp, "device:") != NULL)
+	{
+		for (j = diff; j < k; j++)
+			if (!isspace(ptr[j]))
+			{
+				tmp[i++] = tolower(ptr[j]);
+				if ((ptr[j] == ',') && (ptr[j + 1] == ','))
+					j++;
+			}
+		iret = DS_OK;
+	}
+/* Now it is a resource definition line */
+	else
+	{
+		a = 1;
+		for (j = diff; j < k;j++)
+		{
+/* If the " character is detected, set a flag. If the flag is already set, reset it */
+			if (ptr[j] == '"')
+			{
+				string = !string;
+				continue;
+			}
+/* When the string flag is set, copy character from the original line to the resource
+   definition */
+			if (string)
+			{
+				tmp[i++] = ptr[j];
+				continue;
+			}
+/* If the , character is detected not in a string definition, this is a
+   resource array definition */
+			if (ptr[j] == ',')
+			{
+				tmp[i++] = SEP_ELT;
+				if (ptr[j + 1] == ',')
+					j++;
+				a = 1;
+				continue;
+			}
+/* Remove space and tab */
+			if ((!a) || (!isspace(ptr[j])))
+			{
+				tmp[i++] = ptr[j];
+				a = 0;
+			}
+		}
+	}
+	free(ptr);
+/* If an odd number of " character has been detected, it is an error */
+	if (string)
+		iret = DS_NOTOK;
+
 /* Leave function */
-
-	*tmp_devdef = ptr;
-	return(DS_OK);
-
+	tmp[i] = 0;
+	if ((strlen(tmp) == diff) && (a == 0))
+		iret = DS_NOTOK;
+#ifdef DEBUG
+printf("End of TestLine \n");
+#endif /* DEBUG */
+	*line1 = tmp;
+	return(iret);
 }
-
 
-
 /**@ingroup dbaseAPIintern
  * To check that a simple resource definition line is correct						
  *
@@ -895,172 +663,6 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
 
 
 /**@ingroup dbaseAPIintern
- * To extract from a resource file all the informations concerning a resource array			
- *
- * @param line1 	A pointer to a buffer where is stored a line of the resource
- *              	file (The first line of the resource array definition)
- * @param in
- * @param p_line_ptr
- * @param tmp_resdef
- * @param p_error
- *
- * @return	DS_OK or DS_NOTOK
- */
-static long res_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_resdef,long *p_error)
-{
-	unsigned int diff;
-	char *tmp;
-	int i,j,k,l;
-	int string = 0;
-	register char *ptr,*ptr2;
-	char base[RES_NAME_LENGTH + DEV_NAME_LENGTH];
-	char t_name[RES_NAME_LENGTH + DEV_NAME_LENGTH];
-	char tmp_line[160];
-	long length_to_eol;
-
-/* Make a copy of the resource array name */
-
-	tmp = strchr(line1,':');
-	if (tmp == NULL)
-	{
-		*p_error = DbErr_BadResSyntax;
-		return(DS_NOTOK);
-	}
-	diff = (unsigned int)(tmp - line1) + 1;
-	strncpy(base,line1,diff);
-	base[diff] = 0;
-
-/* Copy the first line in the resulting buffer */
-
-	k = strlen(line1);
-	if ((ptr = (char *)malloc(k + 1)) == NULL)
-	{
-		*p_error = DbErr_ClientMemoryAllocation;
-		return(DS_NOTOK);
-	}
-	strcpy(ptr,line1);
-	if (line1[k - 1] == '\\')
-	{
-		if (line1[k - 2] != SEP_ELT)
-			ptr[k - 1] = SEP_ELT;
-		else
-			ptr[k - 1] = '\0';
-	}
-
-/* Following line examination */
-
-	while (line1[k - 1] == '\\')
-	{
-		if (in->in_type == Db_File)
-		{
-			fgets(tmp_line,sizeof(tmp_line),in->f);
-			tmp_line[strlen(tmp_line) - 1] = '\0';
-		}
-		else
-		{
-			*(in->buf) = strstr(*(in->buf),"\n");
-			(*(in->buf))++;
-			length_to_eol = strcspn(*(in->buf),"\n");
-			strncpy(tmp_line,*(in->buf),length_to_eol);
-			tmp_line[length_to_eol] = '\0';
-		}
-		(*p_line_ptr)++;
-
-/* Verify the new line is not a simple resource definition */
-
-		if ((ptr2 = strchr(tmp_line,':')) != NULL)
-		{
-			diff = (unsigned int)(ptr2 - tmp_line);
-			strncpy(t_name,tmp_line,diff);
-			t_name[diff] = '\0';
-			k = 0;
-			NB_CHAR(k,t_name,'/');
-			if (k == 3)
-			{
-				free(ptr);
-				*p_error = DbErr_BadResSyntax;
-				return(DS_NOTOK);
-			}
-		}
-
-		k = strlen(tmp_line);
-		j = 0;
-
-/* Remove space and tab characters except if they are between two ".
-   Replace the , character by 0x02 except if they are between two ". */
-
-		for (i = 0;i < k;i++)
-		{
-			if (tmp_line[i] == '"')
-			{
-				if (string)
-					string = 0;
-				else
-					string = 1;
-				continue;
-			}
-
-			if (string)
-			{
-				line1[j++] = tmp_line[i];
-				continue;
-			}
-
-			if (tmp_line[i] == ',')
-			{
-				line1[j++] = SEP_ELT;
-				if (tmp_line[i + 1] == ',')
-					i++;
-				continue;
-			}
-
-			if (tmp_line[i] != ' ' && tmp_line[i] != 0x09)
-				line1[j++] = tmp_line[i];
-		}
-
-/* Error if odd number of " characters */
-
-		if (string)
-		{
-			*p_error = DbErr_BadResSyntax;
-			free(ptr);
-			return(DS_NOTOK);
-		}
-		line1[j] = '\0';
-		k = strlen(line1);
-
-/* Test to verify that the array (in ascii characters) is not bigger than
-   the allocated memory and realloc memory if needed. */
-   
-		if ((ptr = (char *)realloc(ptr,strlen(ptr) + k + 1)) == NULL)
-		{
-			*p_error = DbErr_ClientMemoryAllocation;
-			return(DS_NOTOK);
-		}
-		
-/* Add this new line to the result buffer */
-
-		strcat(ptr,line1);
-		l = strlen(ptr);
-		if (line1[k - 1] == '\\')
-		{
-			if (ptr[l - 2] == SEP_ELT)
-				ptr[l - 1] = '\0';
-			else
-				ptr[l - 1] = SEP_ELT;
-		}
-	}
-	
-/* Leave function */
-
-	*tmp_resdef = ptr;
-	return(DS_OK);
-
-}
-
-
-
-/**@ingroup dbaseAPIintern
  * To check that a simple device definition line is correct						
  *
  * @param lin 		A pointer to the modified resource definition (without
@@ -1071,13 +673,19 @@ static long res_line(char *line1,ana_input *in,long *p_line_ptr,char **tmp_resde
  * @return    	This function returns DS_OK if no errors occurs or DS_NOTOK if the resource
  *    		definition is not valid.						
  */
-static long check_dev(char *lin,long *p_err_dev,long *p_error)
+static long check_dev(char *lin,long d_num, char **d_list, long *p_err_dev,long *p_error)
 {
 	char *ptr,*ptr1;
 	char *ptr_cp;
 	char *tmp_ptr;
 	long l,size;
 	long cptr = 0;
+        char t_name[RES_NAME_LENGTH + DEV_NAME_LENGTH];
+        unsigned int diff;
+        char *temp,*tmp;
+        int i;
+
+	*p_error = DS_OK;
 
 /* Allocate memory for strok pointers */
 
@@ -1096,22 +704,17 @@ static long check_dev(char *lin,long *p_err_dev,long *p_error)
 	tmp_ptr = ptr;
 	
 /* Verify that each device definition is correct */
-
 	strcpy(ptr_cp,lin);
 		
-	ptr = strtok(ptr_cp,",");
-	ptr1 = strchr(ptr,':');
-	ptr1++;
-	size = strlen(ptr1);
-	cptr++;
+	ptr = strtok(ptr_cp,":");
 	l = 0;
 	NB_CHAR(l,ptr,'/');
-	if ((l != 4) || (size > (DEV_NAME_LENGTH - 1)))
+	if ((l != 2)) 
 	{
 		free(ptr_cp);
 		free(tmp_ptr);
-		*p_err_dev = cptr;
 		*p_error = DbErr_BadDevSyntax;
+		*p_err_dev = 0;
 		return(DS_NOTOK);
 	}	
 	
@@ -1127,16 +730,35 @@ static long check_dev(char *lin,long *p_err_dev,long *p_error)
 			free(tmp_ptr);
 			*p_err_dev = cptr;
 			*p_error = DbErr_BadDevSyntax;
-			return(DS_NOTOK);
+			break;
+		}
+/* Get domain name */
+		tmp = strchr(ptr,'/');                  /* first '/' found */
+		diff = (unsigned int)(tmp - ptr);
+		if (diff > DOMAIN_NAME_LENGTH - 1)
+		{
+			*p_error = DbErr_DomainDefinition;
+			break;
+		}
+        	strncpy(t_name,ptr,diff);               /* store domain */
+        	t_name[diff] = '\0';
+
+/* Select the right resource table in database */
+		for (i = 0;i < d_num;i++)
+			if (strcmp(t_name,d_list[i]) == 0)
+				break;
+/* Table name not found */
+		if (i == d_num)
+		{
+			*p_error = DbErr_DomainDefinition;
+			break;
 		}
 	}
 	
-
 /* Leave function */
-
 	free(ptr_cp);
 	free(tmp_ptr);
-	return(DS_OK);
+	return (*p_error == DS_OK ? DS_OK : DS_NOTOK);
 			
 }
 
@@ -1155,7 +777,7 @@ static void get_error_line(const char *buffer,long err_dev,long *p_line)
 	long line_cptr = 0;
 	char *ptr;
 	long length_to_eol,l;
-	char line[160];
+	char line[MAX_LINE_LENGTH + 1];
 	long sum_comma = 0;
 
 	ptr = (char *)buffer;
@@ -1438,7 +1060,7 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 
 	size = 0;
 	for (i = 0;i < resdef_nb;i++)
-		size = size + strlen(resdef[i]) + 4;
+		size += strlen(resdef[i]) + 4;
 	if (size > UDP_MAX_SIZE)
 		used_tcp = True;
 	else
