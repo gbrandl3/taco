@@ -27,13 +27,13 @@
  *		handle remote devices.
  *
  * Author(s)  :	Jens Meyer
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original   :	April 1993
  *
- * Version:	$Revision: 1.26 $
+ * Version:	$Revision: 1.27 $
  *
- * Date:		$Date: 2006-01-22 21:12:48 $
+ * Date:		$Date: 2006-09-06 18:56:29 $
  *
  ********************************************************************-*/
 #ifndef WIN32
@@ -1446,6 +1446,9 @@ int taco_gethostname(char *host_name, size_t len)
 		fprintf(stderr, "unable to retrieve hostname!\n");
 		return DS_NOTOK;
 	}
+	if (strlen(hostname) < len)
+		strcpy(host_name, hostname);
+	else
 	{
 #if !defined(vxworks)
 		struct hostent  *host_info;
@@ -1460,19 +1463,14 @@ int taco_gethostname(char *host_name, size_t len)
 			snprintf(host_name, len, "%d.%d.%d.%d", (u_char) host_info->h_addr[0],
 				(u_char) host_info->h_addr[1], (u_char) host_info->h_addr[2], (u_char) host_info->h_addr[3]);
 #else  /* vxworks */
-		if (strlen(hostname) < len)
-			strcpy(host_name, hostname);
-		else
+		union
 		{
-			union
-			{
-				int    int_addr;
-				u_char char_addr[4];
-			} host_addr;
-			host_addr.int_addr = hostGetByName(hostname);
-			snprintf(host_name, len, "%d.%d.%d.%d", (u_char) host_addr.char_addr[0],
-                               (u_char) host_addr.char_addr[1], (u_char) host_addr.char_addr[2], (u_char) host_addr.char_addr[3]);
-		}
+			int    int_addr;
+			u_char char_addr[4];
+		} host_addr;
+		host_addr.int_addr = hostGetByName(hostname);
+		snprintf(host_name, len, "%d.%d.%d.%d", (u_char) host_addr.char_addr[0],
+                        (u_char) host_addr.char_addr[1], (u_char) host_addr.char_addr[2], (u_char) host_addr.char_addr[3]);
 #endif /* vxworks */
 	}
 	return DS_OK;
