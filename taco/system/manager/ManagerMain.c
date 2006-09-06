@@ -13,9 +13,9 @@
 
  Original: 	January 1991
 
- Version:	$Revision: 1.23 $
+ Version:	$Revision: 1.24 $
 
- Date:		$Date: 2006-04-20 06:33:17 $
+ Date:		$Date: 2006-09-06 18:43:31 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -159,8 +159,6 @@ static	int	fd_devnull = -1;
 				}
 			}
 	}
-
-
 #ifdef unix
 /*
  *  get environment variables 
@@ -203,12 +201,26 @@ static	int	fd_devnull = -1;
 	}
 	else
 		fclose (fptr);
+/*
+ *  delete old Manager.log and open a new
+ *  Manager.log file for writing system information
+ */
+	if (c_flags.request_log)
+	{
+		char *logpath = getenv("LOGPATH");
+		snprintf (logfile, sizeof(logfile), "%s/Manager.log", logpath ? logpath : homepath);
+		if ( (system_log = fopen (logfile, "a")) == NULL )
+		{
+			fprintf (stderr,"\ncannot open Manager.log file (%s), exiting...\n", logfile);
+			fprintf(stderr, "LOGPATH or DSHOME path may be wrong\n");
+			kill (pid,SIGQUIT);
+		}
+	}
 
 #ifdef unix
 /*
  * Check the environment if DBM database is used !!
  */
-
 	if (c_flags.oracle == False )
 	{
 		if ( (dbtables = (char *)getenv ("DBTABLES")) == NULL )
@@ -329,26 +341,12 @@ static	int	fd_devnull = -1;
 	}
 
 /*
- *  delete old Manager.log and open a new
- *  Manager.log file for writing system information
- */
-	if (c_flags.request_log)
-	{
-		char *logpath = getenv("LOGPATH");
-		snprintf (logfile, sizeof(logfile), "%s/Manager.log", logpath ? logpath : homepath);
-		if ( (system_log = fopen (logfile, "a")) == NULL )
-		{
-			fprintf (stderr,"\ncannot open Manager.log file (%s), exiting...\n", logfile);
-			fprintf(stderr, "LOGPATH or DSHOME path may be wrong\n");
-			kill (pid,SIGQUIT);
-		}
-	}
-	
-/*
  *  Start the database server on a remote host, if the
  *  DBHOST environment variable is set and 
  *  specifies not the local host.
  */
+	fprintf(system_log, "%s dbhost : %s, nethost : %s\n", getTimeString("Manager"), dbhost, nethost);
+	fflush(system_log);
 	if (strcmp (dbhost, nethost) && strcmp (dbhost, "localhost"))
 	{
 #ifdef unix
@@ -402,6 +400,11 @@ static	int	fd_devnull = -1;
 	}
 	else
 	{
+		if (c_flags.request_log)
+		{
+			fprintf(system_log, "%s try to start database server\n", getTimeString("Manager"));
+			fflush(system_log);
+		}
         	if ((db_pid = fork ()) < 0)
 		{
 			fprintf (stderr,"\ndatabase server startup failed, exiting...\n");
@@ -412,13 +415,22 @@ static	int	fd_devnull = -1;
 			}
 			kill (pid,SIGQUIT);
 		}
-
+		if (c_flags.request_log)
+		{
+			fprintf(system_log, "%s fork returned : %d\n", getTimeString("Manager"), db_pid);
+			fflush(system_log);
+		}
 		if (!db_pid)
 		{
 /* 
  * Set path to DBM server 
  */
 			snprintf (homedir, sizeof(homedir), "%s/%s", homepath, dbm_server);
+			if (c_flags.request_log)
+			{
+				fprintf(system_log, "%s try to start : %s\n", getTimeString("Manager"), homedir);
+				fflush(system_log);
+			}
 /* 
  * Set arguments for execv 
  */
@@ -433,13 +445,15 @@ static	int	fd_devnull = -1;
 			cmd_argv[i++] = nethost; 
 			cmd_argv[i] = 0;
 
-			svc_destroy(transp); 
 			if (c_flags.request_log)
 			{
 				fprintf(system_log, "%s Manager execvp arguments for database : ", getTimeString("Manager"));
 				fprintf(system_log, "%s %s %s %s %s %s\n",homedir,cmd_argv[0],cmd_argv[1],cmd_argv[2],cmd_argv[3],cmd_argv[4]);
+				fprintf(system_log, "%s svc_destroy for database : %p\n", getTimeString("Manager"), transp);
 				fflush(system_log);
 			}
+			if (transp)
+				svc_destroy(transp); 
 			execvp (homedir, cmd_argv);
 			
 			fprintf (stderr,"\nexecvp failed, database_server not started\n");
@@ -476,13 +490,15 @@ static	int	fd_devnull = -1;
 		cmd_argv[i++] = nethost; 
 		cmd_argv[i] = 0;
 
-		svc_destroy(transp); 
 		if (c_flags.request_log)
 		{
 			fprintf(system_log, "%s Manager execvp arguments for message server :", getTimeString("Manager"));
 			fprintf(system_log, "%s %s %s\n",homedir,cmd_argv[0],cmd_argv[1]);
+			fprintf(system_log, "%s svc_destroy for message server : %p\n", getTimeString("Manager"), transp);
 			fflush(system_log);
 		}
+		if (transp)
+			svc_destroy(transp); 
 		execvp (homedir,cmd_argv);
 
 		fprintf (stderr,"\nexecvp failed, message server not started\n");
