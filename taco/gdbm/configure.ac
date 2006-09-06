@@ -10,6 +10,7 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_INSTALL
 AM_PROG_LIBTOOL
+AC_CHECK_PROG([MAKEINDEX], [makeindex])
 
 AC_ARG_ENABLE(compat, AC_HELP_STRING([--disable-compat], [disable compatibility mode to ndbm and dbm @<:@default=enabled@:>@]),
 	[], [enable_compat=yes])
