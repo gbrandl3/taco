@@ -6,12 +6,11 @@ test/ext/dev0/type:     "TestExtServer"
 ]])
 AT_CHECK([
 RES_BASE_DIR=`pwd` taco db_update test.res
-AT_TACO_RUN_LOCAL([TestExtServer ext &])
+AT_TACO_RUN_TEST([TestExtServer ext -d])
 sleep 4
 AT_TACO_RUN_LOCAL([test_connect test/ext/dev0])
 AT_TACO_RUN_LOCAL([off TestExtServer >>log 2>&1])
-], [], [test/ext/dev0: init complete.
-Set protocol to TCP
+], [], [Set protocol to TCP
 Query commands
              1       0       0                        "DevOn"
              2       0       0                        "DevOff"

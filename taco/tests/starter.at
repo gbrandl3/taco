@@ -5,7 +5,7 @@ AT_DATA([starter.res], [[
 echo startserver/$pers_name/device:	SYS/START/$pers_name >starter.res
 echo SYS/START/$pers_name/DEFAULT:	"Inst_verify/1", "AGPSpp/1" >>starter.res
 AT_CHECK([RES_BASE_DIR=`pwd` taco db_update starter.res; 
-nohup taco StartServer `uname -n | cut -f1 -d'.'` 2>/dev/null&  
+taco StartServer $pers_name -d 
 sleep 5
 ])
 AT_CLEANUP

@@ -116,7 +116,8 @@ AT_TACO_RUN_LOCAL([off AGPSpp >>log 2>&1])])
 AT_CLEANUP
 
 AT_SETUP([Test the command and event lists of a device])
-AT_CHECK([AT_TACO_RUN_LOCAL([test_server 1 &])
+AT_CHECK([
+AT_TACO_RUN_TEST([test_server 1 -d])
 sleep 5
 AT_TACO_RUN_LOCAL([test_connect test/a/1])
 AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [Set protocol to TCP

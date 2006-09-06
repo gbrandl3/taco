@@ -3,7 +3,20 @@ AT_CHECK(AT_TACO_RUN_LOCAL([db_connect]))
 AT_CLEANUP
 
 AT_SETUP([db_info command])
-AT_CHECK([taco db_info | grep DEVICE], [], [[		DEVICE STATISTICS
+AT_CHECK([taco db_info | tail -14], [], [[		DEVICE STATISTICS
+
+4 devices are defined in database
+0 of the defined devices are actually exported:
+0 pseudo devices are defined in the database
+
+		RESOURCE STATISTICS
+
+791 resources are defined in database:
+    2 resources for the CLASS domain
+    518 resources for the CMDS domain
+    266 resources for the ERROR domain
+    3 resources for the SEC domain
+    2 resources for the TEST domain
 ]])
 AT_CLEANUP
 
@@ -27,6 +40,37 @@ AT_CHECK([taco db_servinfo inst_verify/1], [], [[The device test/device/1 is def
 ]])
 AT_CLEANUP
 
+AT_SETUP([db_analyze_data function])
+AT_DATA([test.res], [[
+# This file contains only resources for the tests
+test/test/device:	test/device/2 \
+			test/device/3 \
+			test/device/4 
+test/device/2/res1:	"resource 1"
+test/device/2/res2:	2
+test/device/2/res3:	3.1
+test/device/2/res4:	1,1,1
+test/device/2/res5:	"A","B","C"
+test/device/2/res6:	1,2,3,\
+			4
+test/device/2/res7:	1,2,3\
+			,4
+]])
+AT_CHECK([RES_BASE_DIR=`pwd` AT_TACO_RUN_LOCAL db_analyze test.res], [],
+[[File analysis is OK
+1 device list defined
+test/test/device:test/device/2,test/device/3,test/device/4
+7 resources defined
+test/device/2/res1:resource 1
+test/device/2/res2:2
+test/device/2/res3:3.1
+test/device/2/res4:1^B1^B1
+test/device/2/res5:A^BB^BC
+test/device/2/res6:1^B2^B3^B4
+test/device/2/res7:1^B2^B3^B4
+]])
+AT_CLEANUP
+
 AT_SETUP([db_update command])
 AT_DATA([test.res], [[
 # This file contains only resources for the tests
@@ -39,7 +83,14 @@ test/device/2/res3:	3.1
 test/device/2/res4:	1,1,1
 test/device/2/res5:	"A","B","C"
 ]])
-AT_CHECK([RES_BASE_DIR=`pwd` taco db_update test.res])
+AT_CHECK([RES_BASE_DIR=`pwd` taco db_update test.res
+taco db_devres test/device/2], [],
+[[test/device/2/res1: resource 1
+test/device/2/res2: 2
+test/device/2/res3: 3.1
+test/device/2/res4: 1,1,1
+test/device/2/res5: A,B,C
+]])
 AT_CLEANUP
 
 AT_SETUP([db_update command failes])
@@ -144,11 +195,11 @@ test/longfamily/long/longresource: 25
 AT_CHECK([
 RES_BASE_DIR=`pwd` taco db_update test_server.res
 AT_TACO_RUN_LOCAL([db_devperslist test_server])
-AT_TACO_RUN_LOCAL([test_server 1 &])
+AT_TACO_RUN_TEST([test_server 1 -d])
 sleep 5
 AT_TACO_RUN_LOCAL([off test_server >>log])
 sleep 1
-AT_TACO_RUN_LOCAL([test_server 1 &])
+AT_TACO_RUN_TEST([test_server 1 -d])
 sleep 5
 AT_TACO_RUN_LOCAL([off test_server >>log])
 ], [], [[1
@@ -173,4 +224,16 @@ AT_CHECK(AT_TACO_RUN_LOCAL([db_getresoval longtest/longest_family_name/longest_m
 	[[longtest/longest_family_name/longest_member_name/longest_possible_resource_name1: a
 ]])
 AT_CLEANUP 
+
+AT_SETUP([db_servinfo with extremly long server names])
+AT_DATA([test.res], [[
+# This file contains only resources for the tests
+longest_testserver/srv0/device:         test/device/1,test/device/2
+]])
+AT_CHECK([RES_BASE_DIR=`pwd` taco db_update test.res
+AT_TACO_RUN_LOCAL([db_servinfo longest_testserver/srv0])
+], [], [[The device test/device/1 is defined for this server but is not exported
+The device test/device/2 is defined for this server but is not exported
+]])
+AT_CLEANUP
 

@@ -22,7 +22,11 @@
 m4_version_prereq([2.57])
 
 m4_define([AT_TACO_RUN_LOCAL],
-[. taco && . $templatedir/tacoenv.sh && $@
+[. taco && . $sysconfdir/tacoenv.sh && LD_LIBRARY_PATH=${libdir}:${LD_LIBRARY_PATH} $@
+])
+
+m4_define([AT_TACO_RUN_TEST],
+[taco local $@
 ])
 
 AT_INIT
