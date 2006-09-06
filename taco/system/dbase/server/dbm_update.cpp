@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.16 $
+ * Version:	$Revision: 1.17 $
  *
- * Date:	$Date: 2005-07-25 08:34:04 $
+ * Date:	$Date: 2006-09-06 18:36:32 $
  *
  */
 
@@ -611,6 +611,7 @@ db_psdev_error *NdbmServer::updres_1_svc(db_res *res_list)
 				upd_res(lin, ind, false);
 			else
 			{		
+				ind = 1;
 				do 
 				{
 					upd_res(lin.substr(0, pos), ind, true); 
