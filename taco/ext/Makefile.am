@@ -17,8 +17,6 @@
 
 SUBDIRS = lib common server client doc
 
-EXTRA_DIST = @PACKAGE@.spec
-
 ACLOCAL_AMFLAGS = -I m4 -I @DSHOME@/share/aclocal
 
 DISTCHECK_CONFIGURE_FLAGS= DSHOME=@DSHOME@
