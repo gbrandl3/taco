@@ -1,3 +1,22 @@
+2006-09-06 17:15 jkrueger1:
+        * tests: add a test for the resource parser 'db_analyze_data' function
+        * lib/dbase/util_cli.c: Rewrite the resource parser
+2006-09-05 15:00 jkrueger1:
+	* tests: Improve the db_update test routine
+	* system/dbase/server/dbm_update.cpp: Fix arrays of data are broken and
+	following resources from the resource files are added
+2006-08-28 23:00 jkrueger1:
+	* lib/util_api.c: Use the first host name if the host name length is 
+	short enough to use it.
+2006-08-18 14:30 jkrueger1:
+	* tests : Fix some problems with the checks if no libraries in the path
+	* misc/Makefile.am: Fix: uninstall problem of the environment scripts
+	* misc/tacoenv.sh: Fix: problems with the libraries
+	* bindings/python/lib/taco.c: Fix: free of a static allocated memory
+	(reported by Michael Wagner FZ Juelich), substitute strcpy by strncpy
+	* m4/taco.m4: enable fast install option as default
+	* gdbm/configure.ac: Add detection of makeindex program
+	* autogen.sh gdbm/autogen.sh: Enable usage of autconf-2.6x
 2006-08-03 14:00 jkrueger1:
 	* lib/DevServerMain.c: on unix like systems the server may be started
 	as daemon, use option -d
