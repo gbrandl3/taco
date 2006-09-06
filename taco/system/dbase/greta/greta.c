@@ -67,6 +67,27 @@ int main(argc, argv)
     Widget   mainWindow;
     
     /* Begin user code block <declarations> */
+#include <unistd.h>
+    int c;
+    extern int optind;
+    extern char *optarg;
+
+    while ((c = getopt(argc, argv, "hn:")) != EOF)
+        switch(c)
+        {
+            case 'n' :
+                {
+                    char tmp[100];
+                    snprintf(tmp, sizeof(tmp), "NETHOST=%s", optarg);
+                    if (putenv(tmp))
+			printf("could not set NETHOST environment variable\n");
+                }
+                break;
+            default:
+                printf("Usage: %s [-n nethost]\n", argv[0]);
+                exit(1);
+        }
+    
     /* End user code block <declarations> */
     
     /*
@@ -96,7 +117,6 @@ int main(argc, argv)
 #endif
     
     /* Begin user code block <create_shells> */
-
        /****************mouse pointer d'attente ?*********************/
     
     /* End user code block <create_shells> */
