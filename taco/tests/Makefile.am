@@ -35,7 +35,9 @@ check_PROGRAMS 		= db_connect db_resget db_resput db_getdevexp \
 			test_asc_dyn test_asc_stat test_tc test_starter \
 			dev_cmdquery dev_conparams \
 			test_server test_client test_client2 test_status test_connect \
-			TestExtServer
+			TestExtServer \
+			longest_testserver \
+                        db_analyze
 
 check_SCRIPT		= taco
 
@@ -107,6 +109,9 @@ db_getresoval_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 db_getdevexp_SOURCES	= db_getdevexp.cpp
 db_getdevexp_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
+db_analyze_SOURCES      = db_analyze.cpp
+db_analyze_LDADD        = @TACO_CLIENT_CXX_LIBS@ -lstdc++
+
 package.m4:	$(top_srcdir)/configure.ac
 	{\
 		echo '# Signature of the current package.'; \
@@ -136,6 +141,7 @@ noinst_HEADERS		= test_server.h test_serverP.h TestExtServer.h
 
 test_server_SOURCES 	= test_server.cpp
 test_server_LDADD 	= @TACO_SERVER_CXX_LIBS@ -lstdc++
+test_server_LDFLAGS 	= -no-install
 
 test_client_SOURCES 	= test_client.cpp
 test_client_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
@@ -149,6 +155,10 @@ test_status_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 test_connect_SOURCES 	= test_connect.cpp
 test_connect_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
+longest_testserver_SOURCES = test_server.cpp
+longest_testserver_LDADD = @TACO_SERVER_CXX_LIBS@ -lstdc++
+
 TestExtServer_CPPFLAGS  = -I$(top_srcdir)/ext/common/include -I$(top_srcdir)/ext/server/include -DTACO_EXT
 TestExtServer_SOURCES	= TestExtServer.cpp TestExtServerStartup.cpp
 TestExtServer_LDADD	= @TACO_SERVER_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/lib/libTACOExtensions.la
+TestExtServer_LDFLAGS	= -no-install

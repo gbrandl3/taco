@@ -1,9 +1,9 @@
 #!/bin/sh
 
 set_env() {
-DSHOME=@abs_top_builddir@/tests/test/@prefix@
+DSHOME=@abs_top_builddir@/tests/test@prefix@
 srcdir=`grep '^srcdir' @abs_top_builddir@/tests/Makefile | cut -d' ' -f 3`
-prefix=@abs_top_builddir@/tests/test/@prefix@
+prefix=@abs_top_builddir@/tests/test@prefix@
 exec_prefix=@exec_prefix@
 bindir=@bindir@
 sbindir=@sbindir@
@@ -13,8 +13,11 @@ templatedir=@templatedir@
 top_builddir=@abs_top_builddir@
 testbindir=${top_builddir}/tests
 appdefaultdir=@appdefaultdir@
-LD_LIBRARY_PATH=@GCC_LIBRARY_PATH@:@libdir@${LD_LIBRARY_PATH:+:}
-export DSHOME
+localstatedir=@localstatedir@
+infodir=@infodir@
+libdir=@libdir@
+LD_LIBRARY_PATH=@GCC_LIBRARY_PATH@:${libdir}:${LD_LIBRARY_PATH:+:}
+export DSHOME LD_LIBRARY_PATH
 export DBTABLES_CUSTOM=TEST,LONGTEST
 }
 
@@ -29,28 +32,33 @@ if test $# -gt 0 ; then
 			fi
 			if { mkdir test; } ; then
 				dc_destdir=$testbindir/test
-				(cd $top_builddir && make DESTDIR=$dc_destdir install >/dev/null 2>&1)
-				for i in $sysconfdir $templatedir ; do
-					(cd $i && mv tacoenv.sh t && sed -e 's%^prefix=.*$%prefix=@abs_top_builddir@/tests/test/@prefix@%' t > tacoenv.sh)
+				(cd $top_builddir && make DESTDIR=$dc_destdir install) >log 2>&1
+				for i in $sysconfdir ; do
+					(cd $i && mv tacoenv.sh t && sed -e 's%^prefix=.*$%prefix=@abs_top_builddir@/tests/test/@prefix@%' t > tacoenv.sh && rm -f t)
 				done
 				exit $?
 			fi
 			exit 1;;
 		start)
-			. $templatedir/tacoenv.sh 
+			. $sysconfdir/tacoenv.sh 
 			mkdir -p ${LOGPATH}
 			set_env
 			TACO_PATH=$sbindir
 			export TACO_PATH
-			$sbindir/taco.startup >log 2>&1
+			$sbindir/taco.startup >>log 2>&1
 			exit 0;;
 		stop)
-			# . $templatedir/tacoenv.sh 
-			$sbindir/taco.shutdown 
+			. $sysconfdir/tacoenv.sh 
+			$sbindir/taco.shutdown >>log 2>&1
 			;;
 		uninstall)
 			dc_destdir=$testbindir/test
-			(cd $top_builddir && make DESTDIR=$dc_destdir uninstall >/dev/null 2>&1)
+			rm -f ${localstatedir}/cache/taco/*
+			rm -f ${localstatedir}/log/taco/*
+			rm -f ${templatedir}/*
+			rm -f ${infodir}/dir
+			rm -f ${sbindir}/system/pipe/*
+			(cd $top_builddir && make DESTDIR=$dc_destdir uninstall) >>log 2>&1
 			dir=`echo $prefix | cut -d'/' -f 1`
 			if [ -z "$dir" ] ; then
 				dir=`echo $prefix | cut -d'/' -f 2`
@@ -62,40 +70,52 @@ if test $# -gt 0 ; then
 				dir=`echo $appdefaultdir|cut -d'/' -f2` 
 			fi
 			rm -rf ${dc_destdir}/$dir
-			if test -d $testbindir/test ; then
-				if { ! rmdir $testbindir/test; } ; then
+			if test -d $dc_destdir ; then
+				if { ! rmdir $dc_destdir 2>/dev/null; } ; then
+					tmp=`find $dc_destdir -type f`
+					if test x"$tmp" = x"${infodir}/dir" ;then
+						rm -rf $dc_destdir
+						exit $?
+					fi
 					exit 1
 				fi
 			fi
 			exit 0 ;;
 		unreg)
-			. $templatedir/tacoenv.sh 
+			. $sysconfdir/tacoenv.sh 
 			set_env
 			shift 1
 			$sbindir/unreg $@ ;;
 
 		dbm_server)
-			. $templatedir/tacoenv.sh 
+			. $sysconfdir/tacoenv.sh 
 			set_env
 			shift 1
 			$sbindir/dbm_server dbm `uname -n|cut -f1 -d'.'` ;;
 		ldd)
-			. $templatedir/tacoenv.sh 
+			. $sysconfdir/tacoenv.sh 
 			set_env
 			shift 1
 			ldd $bindir/$1 ;;
 		StartServer)
-			. $templatedir/tacoenv.sh 
+			. $sysconfdir/tacoenv.sh 
 			set_env
 			prog=$1
 			shift 1
-			$sbindir/$prog $@;;
+			LD_LIBRARY_PATH=${libdir}:${LD_LIBRARY_PATH} $sbindir/$prog $@;;
+		local)
+			shift 1
+			prog=$1
+			shift 1
+			. $sysconfdir/tacoenv.sh 
+			set_env
+			LD_LIBRARY_PATH=${libdir}:${LD_LIBRARY_PATH} $prog $@ ;;
 		*)
 			prog=$1
 			shift 1
-			. $templatedir/tacoenv.sh 
+			. $sysconfdir/tacoenv.sh 
 			set_env
-			$bindir/$prog $@;;
+			LD_LIBRARY_PATH=${libdir}:${LD_LIBRARY_PATH} $bindir/$prog $@ ;;
 	esac
 else
 	export LD_LIBRARY_PATH
