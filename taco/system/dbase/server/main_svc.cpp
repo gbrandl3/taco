@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.22 $
+ * Version:	$Revision: 1.23 $
  *
- * Date:	$Date: 2006-04-20 06:31:44 $
+ * Date:	$Date: 2006-09-06 18:38:44 $
  *
  */
 
@@ -200,7 +200,6 @@ int main(int argc,char **argv)
 #endif
 	char			*mysql_user="root";
 	char			*mysql_password="";
- 
 		
 //
 // Install signal handler
@@ -230,7 +229,8 @@ int main(int argc,char **argv)
 	extern char	*optarg;
 
 #ifdef DEBUG
-	for (int i = 0; i< argc; i++) printf("argv[%d] %s ",i,argv[i]); printf("\n");
+	for (int i = 0; i< argc; i++) 
+		std::cout << "argv[" << i << "] = " << argv[i] << std::endl;
 #endif
 #ifdef USE_MYSQL
 	if (getenv("MYSQL_USER") != NULL)
@@ -239,27 +239,12 @@ int main(int argc,char **argv)
 		mysql_password = getenv("MYSQL_PASSWORD");
 #endif
 
-	while ((c = getopt(argc, argv, "t:h:u:p")) != EOF)
+	std::string database_type;
+	while ((c = getopt(argc, argv, "t:h:lp:u:")) != EOF)
 		switch(c)
 		{
 			case 't' :	
-#ifdef USE_GDBM
-				if (std::string(optarg) == "dbm")
-					dbm = new NdbmServer("", "", "");
-				else
-#endif
-#ifdef USE_MYSQL
-				if (std::string(optarg) == "mysql")
-				{
-#ifdef DEBUG
-					std::cout << "going to connect to mysql database with user = " << mysql_user;
-					std::cout << ", password = " << mysql_password << std::endl;
-#endif
-					dbm = new MySQLServer(mysql_user, mysql_password, argv[optind]);
-				}
-				else
-#endif
-					usage(*argv);
+				database_type = optarg;
 				break;
 #ifdef USE_MYSQL
 			case 'u' :
@@ -271,6 +256,7 @@ int main(int argc,char **argv)
 #endif
 			case 'l' :
 				enable_logging = false;
+				break;
 			case '?' :
 			case 'h' :	
 			default  :
@@ -294,14 +280,24 @@ int main(int argc,char **argv)
 	logStream.open(logfile.c_str(), std::ios::out | std::ios::app);
 #endif
 
-	if (!dbm)
-#if defined(USE_GDBM) 
-    		dbm = new NdbmServer("", "", "");
-#elif defined (USE_MYSQL)
-		dbm = new MySQLServer(mysql_user, mysql_password, argv[optind]);
-#else
-#	error select either GDBM or mySQL as database type
+#ifdef USE_GDBM
+	if (database_type == "dbm")
+		dbm = new NdbmServer("", "", "");
+	else
 #endif
+#ifdef USE_MYSQL
+	if (database_type == "mysql")
+	{
+#ifdef DEBUG
+		std::cout << "going to connect to mysql database with user = " << mysql_user;
+		std::cout << ", password = " << mysql_password << std::endl;
+#endif
+		dbm = new MySQLServer(mysql_user, mysql_password, argv[optind]);
+	}
+	else
+#endif
+		usage(*argv);
+
 	dbm->setLogstream(logStream);
 //
 // RPC business !!!!!!!!!!!!!!!!!!!! 
