@@ -23,13 +23,13 @@
  * Description: interface python - Taco
  *
  * Author(s):   MCD
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
  * Original:    December 99
  * 
- * Date:	$Date: 2005-12-09 15:09:01 $
+ * Date:	$Date: 2006-09-06 18:49:37 $
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  */
 
 #include "config.h"
@@ -369,15 +369,17 @@ static PyObject* esrf_putresource(PyObject *self,PyObject *args)
    }
    
    pt_res.resource_name = mystring;
-   strcpy(mystring,resname);
+   strncpy(mystring, resname, sizeof(mystring) - 1);
+   mystring[sizeof(mystring) - 1] = '\0';
+
    pt_res.resource_type = (short)D_STRING_TYPE;
    my_stringval = &(mystringval[0]);
    pt_res.resource_adr = (void *)(&(my_stringval));
-   strcpy(mystringval,resval);
+   strncpy(mystringval, resval, sizeof(mystringval) - 1);
+   mystringval[sizeof(mystringval) - 1] = '\0';
 
    num_res = 1;
    ret = db_putresource(devname,&pt_res,num_res,&error);
-   free(my_stringval);
    if (ret != 0)
    {
       printf("error on db_putresource : (%d) %s\n",error,dev_error_str(error));
