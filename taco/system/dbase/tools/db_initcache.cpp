@@ -27,19 +27,19 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2005-07-25 11:29:03 $
+ * Date:        $Date: 2006-09-06 18:34:15 $
  */
 
+#include "config.h"
 /* TACO include file */
-
 #include <API.h>
 
 /* Include files */
 #include <string>
 #include <iostream>
-#include <string>
+#include <cstdlib>
 
 using namespace std;
 
@@ -50,8 +50,9 @@ void usage(const char *cmd)
 	cerr << " This command clears the old cache and (re)initialize it" << std::endl;
 	cerr << " with the contents of the RES database table for the" << std::endl;
 	cerr << " wanted domain" << std::endl;
-	cerr << "      options : -h display this message" << std::endl;
-	exit(-1);
+	cerr << "        options : -h display this message" << std::endl;
+	cerr << "                  -n nethost" << std::endl;
+	exit(1);
 }
 
 int main(int argc,char *argv[])
@@ -65,9 +66,16 @@ int main(int argc,char *argv[])
 
 
 // Argument test and domain name modification
-        while((c = getopt(argc, argv, "h")) != -1)
+        while((c = getopt(argc, argv, "hn:")) != -1)
                 switch(c)
                 {
+			case 'n':
+				{
+					char s[160];
+					snprintf(s, sizeof(s), "NETHOST=%s", optarg);
+					putenv(s);
+				}
+			break;
                         case 'h':
                         case '?':
 				usage(argv[0]);

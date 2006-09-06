@@ -27,16 +27,17 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2005-07-25 11:27:30 $
+ * Date:        $Date: 2006-09-06 18:34:15 $
  */
 
+#include "config.h"
 /* TACO include file */
-
 #include <API.h>
 
 /* Include files */
+#include <cstdlib>
 #include <unistd.h>
 #include <iostream>
 #include <string>
@@ -50,9 +51,10 @@ using namespace std;
 void usage(const char *cmd)
 {
 	cerr << "usage : " << cmd << " [options] <full device server name>" << endl;
-	cerr << "  Delete all the devices and optional their resources of a device server" << std::endl;
-	cerr << "       options : -r all resources of the devices deleted" << std::endl;
-	cerr << "                 -h display this message" << std::endl;
+	cerr << "  Delete a server, all its devices and optional their resources" << std::endl;
+	cerr << "        options : -r all resources of the devices deleted" << std::endl;
+	cerr << "                  -h display this message" << std::endl;
+	cerr << "                  -n nethost" << std::endl;
 	exit(-1);
 }
 
@@ -67,9 +69,16 @@ int main(int argc,char *argv[])
 //
 // Argument test and device name structure
 //
-	while ((c = getopt(argc,argv,"rh")) != -1)
+	while ((c = getopt(argc,argv,"hn:r")) != -1)
 		switch (c)
 		{
+			case 'n':
+				{
+					char s[160];
+					snprintf(s, sizeof(s), "NETHOST=%s", optarg);
+					putenv(s);
+				}
+			break;
 			case 'r':
 				del_res = False;
 				break;

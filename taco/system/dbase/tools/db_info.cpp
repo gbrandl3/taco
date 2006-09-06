@@ -25,13 +25,13 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2005-07-25 11:29:23 $
+ * Date:        $Date: 2006-09-06 18:34:15 $
  */
 
+#include "config.h"
 /* TACO include file */
-
 #include <API.h>
 
 /* Include files */
@@ -40,9 +40,18 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
+#include <cstdlib>
 
 using namespace std;
 
+void usage(const char *cmd)
+{
+	cerr << "usage : " << cmd << " [options]" << endl;
+        cerr << " displays statistics information about the use of the database" << std::endl;
+	cerr << "        options : -h display this message" << std::endl;
+	cerr << "                  -n nethost" << std::endl;
+	exit(1);
+}
 int main(int argc,char *argv[])
 {
 	long error;
@@ -60,14 +69,20 @@ int main(int argc,char *argv[])
         while((c = getopt(argc, argv, "h")) != -1)
                 switch(c)
                 {
+			case 'n':
+				{
+					char s[160];
+					snprintf(s, sizeof(s), "NETHOST=%s", optarg);
+					putenv(s);
+				}
+			break;
                         case 'h':
                         case '?':
-                                std::cerr << " usage: " << argv[0] << " [options] " << std::endl;
-                                std::cerr << " displays statistics information about the use of the database" << std::endl;
-				std::cerr << "       options : -h display this message" << std::endl;
 				exit(-1);
 		}
 
+	if (optind != argc)
+		usage(argv[0]);
 //
 // Connect to database server
 //

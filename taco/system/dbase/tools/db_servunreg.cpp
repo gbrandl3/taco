@@ -25,19 +25,20 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2005-07-25 11:26:37 $
+ * Date:        $Date: 2006-09-06 18:34:15 $
  */
 
+#include "config.h"
 /* TACO include file */
-
 #include <API.h>
 
 /* Include files */
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <cstdlib>
 #ifdef _solaris
 #include "_count.h"
 #endif /* _solaris */
@@ -48,8 +49,9 @@ void usage(const char *cmd)
 {
 	cerr << "usage : " << cmd << " [options] <full device server name>" << endl;
 	cerr << " Unregister a device server from the static database." << std::endl;
-	cerr << "      options : -h display this message" << std::endl;
-	exit(-1);
+	cerr << "        options : -h display this message" << std::endl;
+	cerr << "                  -n nethost" << std::endl;
+	exit(1);
 }
 
 int main(int argc,char *argv[])
@@ -59,14 +61,22 @@ int main(int argc,char *argv[])
 	db_devinfo_call info;
         extern int      optopt;
         extern int      optind;
+	extern char	*optarg;
         int             c;
 
 //
 // Argument test and device name structure
 //
-        while ((c = getopt(argc,argv,"h")) != -1)
+        while ((c = getopt(argc,argv,"hn:")) != -1)
                 switch (c)
                 {
+			case 'n':
+				{
+					char s[160];
+					snprintf(s, sizeof(s), "NETHOST=%s", optarg);
+					putenv(s);
+				}
+			break;
                         case 'h':
                         case '?':
                                 usage(argv[0]);

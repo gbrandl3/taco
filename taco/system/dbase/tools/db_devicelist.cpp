@@ -25,35 +25,66 @@
  * Author(s):	Jens Krüger
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2005-07-25 11:35:32 $
+ * Date:        $Date: 2006-09-06 18:34:15 $
  */
 
+#include "config.h"
 /* TACO include file */
 #include <API.h>
 
 /* Include files */
+#include <cstdlib>
 #include <iostream>
 #include <string>
+
+void usage(const char *cmd)
+{
+	std::cerr << "usage : " << cmd << " [options] <device name>" << std::endl;
+	std::cerr << " displays all devices according to their servers. " << std::endl;
+	std::cerr << "        options : -h display this message" << std::endl;
+	std::cerr << "                  -n nethost" << std::endl;
+	exit(1);
+}
 
 int main(int argc, char **argv)
 {
 	long 		error;
+	extern int 	optopt;
+	extern int	optind;
+	extern char 	*optarg;
+	int 		c;
+
 //
 // Argument test and device name structure
 //
-	if (argc != 1)
+	while ((c = getopt(argc,argv,"hn:")) != -1)
 	{
-		std::cerr << "usage : " << *argv << std::endl;
-		exit(-1);
+		switch (c)
+		{
+		case 'n':
+			{
+				char s[160];
+				snprintf(s, sizeof(s), "NETHOST=%s", optarg);
+				putenv(s);
+			}
+			break;
+		case 'h':
+		case '?':
+			usage(argv[0]);
+			break;
+		}
 	}
+    	if (optind != argc)
+		usage(argv[0]);
+
 //
 // Connect to database server
 //
 	if (db_import(&error) == -1)
 	{
-		std::cerr << *argv << " : Impossible to connect to database server" << std::endl;
+		std::cerr << *argv << " : Impossible to connect to database server " << error << std::endl;
 		exit(-1);
 	}
 

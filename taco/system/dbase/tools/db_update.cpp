@@ -26,19 +26,20 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2005-07-25 11:25:50 $
+ * Date:        $Date: 2006-09-06 18:34:15 $
  */
 
+#include "config.h"
 /* TACO include file */
-
 #include <API.h>
 
 /* Include files */
 #include <unistd.h>
 #include <iostream>
 #include <string>
+#include <cstdlib>
 
 using namespace std;
 
@@ -47,8 +48,9 @@ void usage(const char *cmd)
 	cerr << "usage : " << cmd << " [options] <file name>" << endl;
 	cerr << " Read resource and device informations from the file" << std::endl;
 	cerr << " and put them into the database" << std::endl;
-	cerr << "       options : -h display this message" << std::endl;
-	exit(-1);
+	cerr << "        options : -h display this message" << std::endl;
+	cerr << "                  -n nethost" << std::endl;
+	exit(1);
 }
 
 int main(int argc, char **argv)
@@ -67,14 +69,22 @@ int main(int argc, char **argv)
 	char 	*answer;
         extern int      optopt;
         extern int      optind;
+	extern char	*optarg;
         int             c;
 
 //
 // Argument test and device name structure
 //
-        while ((c = getopt(argc,argv,"h")) != -1)
+        while ((c = getopt(argc,argv,"hn:")) != -1)
                 switch (c)
                 {
+			case 'n':
+				{
+					char s[160];
+					snprintf(s, sizeof(s), "NETHOST=%s", optarg);
+					putenv(s);
+				}
+			break;
                         case 'h':
                         case '?':
                                 usage(argv[0]);
@@ -88,26 +98,22 @@ int main(int argc, char **argv)
 //
 // Get environment variable
 //
-
-	if ((ptr = (char *)getenv("RES_BASE_DIR")) == NULL)
+	string base("");
+	if ((ptr = (char *)getenv("RES_BASE_DIR")) != NULL)
 	{
-		cerr << "Can't find environment variable RES_BASE_DIR" << endl;
-		exit(-1);
+		base = ptr;
+		base += '/';
 	}
-	string base(ptr);
 //
 // Build real file name path
 //
-
-	base.append(1,'/');
-	file_name.insert(0,base);
+	file_name.insert(0, base);
 #ifdef DEBUG
 	cout  << "File name : " << file_name << endl;
 #endif /* DEBUG */
 //
 // Connect to database server
 //
-
 	if (db_import(&error) == DS_NOTOK)
 	{
 		cerr << "db_update : Impossible to connect to database server" << endl;

@@ -27,16 +27,17 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2005-07-25 11:34:25 $
+ * Date:        $Date: 2006-09-06 18:34:15 $
  */
 
 /* TACO include file */
-
+#include "config.h"
 #include <API.h>
 
 /* Include files */
+#include <cstdlib>
 #include <unistd.h>
 #include <iostream>
 #include <string>
@@ -53,6 +54,7 @@ void usage(const char *cmd)
 	std::cerr << " deletes a device and (optional) its resources from the database. " << std::endl;
 	std::cerr << "        options : -r delete also resources of the device" << std::endl;
 	std::cerr << "                  -h display this message" << std::endl;
+	std::cerr << "                  -n nethost" << std::endl;
 	exit(1);
 }
 
@@ -62,17 +64,25 @@ int main(int argc,char *argv[])
 	long 		del_res = True;
 	extern int 	optopt;
 	extern int	optind;
+	extern char 	*optarg;
 	int 		c;
 
 //
 // Argument test and device name structure
 //
-	while ((c = getopt(argc,argv,"rh")) != -1)
+	while ((c = getopt(argc,argv,"hrn:")) != -1)
 	{
 		switch (c)
 		{
 		case 'r':
 			del_res = False;
+			break;
+		case 'n':
+			{
+				char s[160];
+				snprintf(s, sizeof(s), "NETHOST=%s", optarg);
+				putenv(s);
+			}
 			break;
 		case 'h':
 		case '?':

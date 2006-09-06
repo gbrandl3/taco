@@ -26,9 +26,9 @@
  * Author(s):	Jens Krüger
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2005-07-25 11:33:50 $
+ * Date:        $Date: 2006-09-06 18:34:15 $
  */
 
 /* TACO include file */
@@ -68,18 +68,47 @@ typedef struct _host
 
 typedef std::vector<Thost>	Tnethost;
 
+void usage(const char *cmd)
+{
+	std::cerr << "usage : " << cmd << " [options] <device name>" << std::endl;
+	std::cerr << " displays all devices in a tree according to their host and servers. " << std::endl;
+	std::cerr << "        options : -h display this message" << std::endl;
+	std::cerr << "                  -n nethost" << std::endl;
+	exit(1);
+}
+
 int main(int argc, char **argv)
 {
 	Tnethost	nethost;
 	long 		error;
+	extern int 	optopt;
+	extern int	optind;
+	extern char 	*optarg;
+	int 		c;
+
 //
 // Argument test and device name structure
 //
-	if (argc != 1)
+	while ((c = getopt(argc,argv,"hn:")) != -1)
 	{
-		std::cerr << "usage : " << *argv << std::endl;
-		exit(-1);
+		switch (c)
+		{
+		case 'n':
+			{
+				char s[160];
+				snprintf(s, sizeof(s), "NETHOST=%s", optarg);
+				putenv(s);
+			}
+			break;
+		case 'h':
+		case '?':
+			usage(argv[0]);
+			break;
+		}
 	}
+    	if (optind != argc)
+		usage(argv[0]);
+
 //
 // Connect to database server
 //

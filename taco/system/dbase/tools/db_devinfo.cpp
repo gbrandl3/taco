@@ -25,19 +25,21 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2005-07-25 11:32:54 $
+ * Date:        $Date: 2006-09-06 18:34:15 $
  */
 
 /* TACO include file */
 
+#include "config.h"
 #include <API.h>
 
 /* Include files */
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <cstdlib>
 #ifdef _solaris
 #include "_count.h"
 #endif /* _solaris */
@@ -48,8 +50,9 @@ void usage(const char *cmd)
 {
 	std::cerr << "usage : " << cmd << " [options] <device name>" << std::endl;
 	std::cerr << " display informations of the device" << std::endl;
-	std::cerr << "          options: -h display this message" << std::endl;
-	exit(-1);
+	std::cerr << "         options: -h display this message" << std::endl;
+	std::cerr << "                  -n nethost" << std::endl;
+	exit(1);
 }
 
 int main(int argc,char *argv[])
@@ -60,14 +63,22 @@ int main(int argc,char *argv[])
 	unsigned int dev_nb;
         extern int      optopt;
         extern int      optind;
+	extern char	*optarg;
         int             c;
 
 //
 // Argument test and device name structure
 //
-        while ((c = getopt(argc, argv, "h")) != -1)
+        while ((c = getopt(argc, argv, "hn:")) != -1)
                 switch (c)
                 {
+			case 'n':
+				{
+					char s[160];
+					snprintf(s, sizeof(s), "NETHOST=%s", optarg);
+					putenv(s);
+				}
+			break;
                 	case 'h':
                 	case '?':
 				usage(argv[0]);
