@@ -52,7 +52,7 @@ install-data-hook:	$(nodist_template_DATA)
 	fi
 
 uninstall-local:
-	if { basename ${prefix} | grep inst ; } ; then rm -f $(DESTDIR)/$(sysconfdir)/tacoenv.sh $(DESTDIR)/$(sysconfdir)/tacoenv.csh ; fi
+	rm -f $(DESTDIR)/$(sysconfdir)/tacoenv.sh $(DESTDIR)/$(sysconfdir)/tacoenv.csh 
 
 CLEANFILES		= tacoenv.tmp 
 

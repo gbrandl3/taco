@@ -35,12 +35,12 @@ environ()
 
 	echo "You are working on host $HOSTNAME machine -"
 	echo ""
-	echo "DSHOME 		= $DSHOME"
-	echo "DBM_DIR		= $DBM_DIR"
-	echo "RES_BASE_DIR	= $RES_BASE_DIR"
-	echo "DBTABLES	= $DBTABLES"
+	echo "DSHOME       = $DSHOME"
+	echo "DBM_DIR      = $DBM_DIR"
+	echo "RES_BASE_DIR = $RES_BASE_DIR"
+	echo "DBTABLES     = $DBTABLES"
 	echo ""
-	echo "PATH = $PATH"
+	echo "PATH         = $PATH"
 }
 
 dbase()
@@ -51,16 +51,18 @@ dbase()
 	if test "${TACO_DATABASE:-dbm}" = "dbm" ; then
 		new=`ls -l $DBM_DIR/* 2>/dev/null | awk '{print $5;}' | sort | uniq | wc -l`
 		if [ $new -eq 1 ] ;  then
-	      		echo "calling db_fillup to fill database"
-	      		db_fillup2
-	      		echo "dbm database fillup done"
+	      		echo "calling db_fillup to fill up database"
+			sleep 5
+    			LD_LIBRARY_PATH=${libdir}:${LD_LIBRARY_PATH} ${bindir}/db_fillup2
+	      		echo "dbm database fill up done"
 	  	fi
 	elif test "x${TACO_DATABASE}" = "xmysql" ; then
 		new=`echo 'select count(*) from property_device;' | mysql -u $MYSQL_USER -D tango | grep -v count`
 		if [ $new -eq 0 ] ; then
-			echo "calling db_fillup to fill database"
-			db_fillup2
-			echo "mysql database fillup done"
+			echo "calling db_fillup to fill up database"
+			sleep 5
+    			LD_LIBRARY_PATH=${libdir}:${LD_LIBRARY_PATH} ${bindir}/db_fillup2
+			echo "mysql database fill up done"
 		fi
 	fi
 }
@@ -84,7 +86,7 @@ manager()
 
 # now start the Manager 
     	echo "starting the Manager ..."
-    	Manager $taco_manager_flags 
+    	LD_LIBRARY_PATH=${libdir}:${LD_LIBRARY_PATH} ${sbindir}/Manager $taco_manager_flags 
     	echo "Manager started"
 }
 
