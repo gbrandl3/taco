@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2006-09-07 08:03:48 $
+ * Date:	$Date: 2006-09-07 09:07:59 $
  *
  */
 
@@ -47,6 +47,7 @@ DBServer::DBServer()
 	char 	*ptr;
 	if ((ptr = (char *)getenv("DBTABLES")) == NULL)
 	{
+		std::cerr << "dbm_server: Can't find environment variable DBTABLES" << std::endl;
 		logStream << "dbm_server: Can't find environment variable DBTABLES" << std::endl;
 		logStream.flush();
 		exit(-1);
