@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2005-07-25 08:27:41 $
+ * Date:	$Date: 2006-09-07 08:03:48 $
  *
  */
 
@@ -37,6 +37,7 @@
 #include <string>
 #include <unistd.h>
 
+extern std::ofstream   logStream;
 
 DBServer::DBServer()
 {
@@ -46,7 +47,8 @@ DBServer::DBServer()
 	char 	*ptr;
 	if ((ptr = (char *)getenv("DBTABLES")) == NULL)
 	{
-		std::cerr << "dbm_server: Can't find environment variable DBTABLES" << std::endl;
+		logStream << "dbm_server: Can't find environment variable DBTABLES" << std::endl;
+		logStream.flush();
 		exit(-1);
 	}
 //
