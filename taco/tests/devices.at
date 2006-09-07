@@ -2,7 +2,7 @@ AT_SETUP([Start Inst_verify device server])
 AT_DATA([instverify], [[3 
 0
 ]])
-AT_CHECK([nohup taco Inst_verify 1 >>log & 
+AT_CHECK([taco Inst_verify 1 -d >>log 
 sleep 1])
 AT_CLEANUP
 
@@ -60,7 +60,7 @@ AT_CHECK([taco db_devinfo test/device/x], [255],
 AT_CLEANUP
 
 AT_SETUP([Start AGPSpp device server ])
-AT_CHECK([nohup taco AGPSpp 1 >/dev/null &
+AT_CHECK([taco AGPSpp 1 -d >/dev/null 
 sleep 1])
 AT_CLEANUP
 

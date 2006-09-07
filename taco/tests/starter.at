@@ -1,4 +1,4 @@
-AT_SETUP([start server])
+AT_SETUP([launching starter server])
 pers_name=`uname -n|cut -f1 -d'.'`
 AT_DATA([starter.res], [[
 ]])
@@ -10,7 +10,7 @@ sleep 5
 ])
 AT_CLEANUP
 
-AT_SETUP([starter server : Restart])
+AT_SETUP([Starter server : Restart])
 AT_DATA([starter], [[
 8
 Inst_verify 1
