@@ -335,7 +335,7 @@ AC_DEFUN([X_AND_MOTIF],
 [
 	AC_REQUIRE([AC_PATH_XTRA])
 	tmp='for i in $X_LDFLAGS ; do if test `echo $i | cut -c1-2` = "-L" ; then echo $i; break; fi; done | cut -c3- '
-	appdefaultdir=`eval $tmp`/X11/app-defaults
+	appdefaultdir="\${DESTDIR}"`eval $tmp`/X11/app-defaults
 	motif_found=yes;
 	AC_ARG_WITH(motif, AC_HELP_STRING([--with-motif@<:@=ARG@:>@], [Motif @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the Motif installation, e.g. '/usr/local/myMotif']), [
 		case  "$with_motif" in
