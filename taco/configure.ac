@@ -18,7 +18,7 @@ dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_INIT([TACO], [3.95.3], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.82 $)dnl
+AC_REVISION($Revision: 1.83 $)dnl
 AC_COPYRIGHT([(C) 1990-2006 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -28,8 +28,6 @@ TACO_INIT
 AC_SUBST(LIB_VERSION, [11:9:0])
 
 AM_INIT_AUTOMAKE([dist-bzip2 1.7])
-
-dnl AM_PROG_LIBTOOL
 
 AC_CHECK_SIZEOF(char)
 AC_CHECK_SIZEOF(short)
@@ -388,9 +386,8 @@ TACO_MANAGER
 TACO_DATABASE_SERVER
 TACO_CLIENT_TCP
 
-if test "x${taco_build_gdbm}" = "xyes" ; then
-     AC_CONFIG_SUBDIRS(gdbm)
-fi
+AC_CONFIG_SUBDIRS(gdbm)
+
 TACO_MESSAGE_SERVER
 
 dnl the startup routine should not be built in the dsapi library on Mac OS X systems
