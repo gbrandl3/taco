@@ -18,7 +18,7 @@ dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_INIT([TACO], [3.95.3], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.81 $)dnl
+AC_REVISION($Revision: 1.82 $)dnl
 AC_COPYRIGHT([(C) 1990-2006 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -531,6 +531,9 @@ build:
 		TCL:		${taco_tcl_binding}
 
 	TANGO support:		${taco_tango}
+
+install:
+	Fast install:           ${enable_fast_install}
 
 Please check whether the configuration I detected matches what you
 would like to have. 
