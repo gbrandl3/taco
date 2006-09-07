@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.23 $
+ * Version:	$Revision: 1.24 $
  *
- * Date:	$Date: 2006-09-06 18:38:44 $
+ * Date:	$Date: 2006-09-07 09:28:07 $
  *
  */
 
@@ -200,6 +200,16 @@ int main(int argc,char **argv)
 #endif
 	char			*mysql_user="root";
 	char			*mysql_password="";
+ 
+	char 			*logpath = getenv("LOGPATH");
+	if (logpath == NULL)
+		logpath = getenv("DSHOME");
+	std::string logfile;
+	if (logpath)
+        	logfile = std::string(logpath) + "/DatabaseServer.log";
+	else
+		logfile = std::string("DatabaseServer.log");
+	logStream.open(logfile.c_str(), std::ios::out | std::ios::app);
 		
 //
 // Install signal handler
@@ -266,18 +276,7 @@ int main(int argc,char **argv)
 
 	if (optind != (argc - 2))
 		usage(*argv); 			
-	std::string 	netmanhost(argv[argc - 1]),
-			logfile;
-
-	char *logpath = getenv("LOGPATH");
-	if (logpath == NULL)
-		logpath = getenv("DSHOME");
-	if (logpath)
-        	logfile = std::string(logpath) + "/DatabaseServer.log";
-	else
-		logfile = std::string("DatabaseServer.log");
-
-	logStream.open(logfile.c_str(), std::ios::out | std::ios::app);
+	std::string 	netmanhost(argv[argc - 1]);
 #endif
 
 #ifdef USE_GDBM
