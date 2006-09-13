@@ -25,17 +25,17 @@
  * Description:	
  *	
  * Author(s)  :	Jens Meyer
- * 		$Author: andy_gotz $
+ * 		$Author: jlpons $
  *
  * Original   :	September2002
  *
- * Version    :	$Revision: 1.5 $
+ * Version    :	$Revision: 1.6 $
  *
- * Date       : $Date: 2006-02-20 11:24:06 $
+ * Date       : $Date: 2006-09-13 15:55:44 $
  *
  *********************************************************************/ 
 
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_access.cpp,v 1.5 2006-02-20 11:24:06 andy_gotz Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_access.cpp,v 1.6 2006-09-13 15:55:44 jlpons Exp $";
 
 #include <attr_api.h>
 
@@ -492,6 +492,7 @@ long AttrAccess::write_attr (DevArgument argin, DevType argin_type, long *error)
 	float							float_value;
 	long							long_value;
 	short							short_value;
+	unsigned short					ushort_value;
 	string						string_value;
 	char							*c_str_ptr;
 	void							*data_ptr;
@@ -543,6 +544,18 @@ long AttrAccess::write_attr (DevArgument argin, DevType argin_type, long *error)
 			data_ptr = (void *)&short_value;
 			break;
 			
+		case Tango::DEV_USHORT:
+			data_ptr = (void *)&ushort_value;
+			break;
+			
+		case Tango::DEV_BOOLEAN:
+			data_ptr = (void *)&short_value;
+			break;
+			
+		case Tango::DEV_UCHAR:
+			data_ptr = (void *)&short_value;
+			break;
+			
 		case Tango::DEV_STRING:
 			data_ptr = (void *)&(c_str_ptr);
 			break;
@@ -575,16 +588,7 @@ long AttrAccess::write_attr (DevArgument argin, DevType argin_type, long *error)
 		{
 		try
 			{
-			/*
-			 * Convert input data if necessary to the attribute data type
-			 */
-			 
-			if ( convert_data (input_type, argin, 
-							       attr_config.data_type, data_ptr, error) == DS_NOTOK )
-				{
-				return (DS_NOTOK);
-				}
-			
+			 			
 			/*
 			 * Fill the TANGO attribute data object and write 
 			 * the attribute value.
@@ -595,25 +599,199 @@ long AttrAccess::write_attr (DevArgument argin, DevType argin_type, long *error)
 			switch (attr_config.data_type)
 				{
 				case Tango::DEV_DOUBLE:
-					// cout << "Write value = " << double_value << endl;
+					if ( convert_data (input_type, argin, 
+							       attr_config.data_type, data_ptr, error) == DS_NOTOK )
+					{
+						return (DS_NOTOK);
+					}
 					attr_values << double_value;
+					tango_obj->write_attribute (attr_values);
+					break;
+					
+				case Tango::DEV_FLOAT:
+					if ( convert_data (input_type, argin, 
+							       attr_config.data_type, data_ptr, error) == DS_NOTOK )
+					{
+						return (DS_NOTOK);
+					}
+					attr_values << *((float *)data_ptr);
+					tango_obj->write_attribute (attr_values);
 					break;
 					
 				case Tango::DEV_LONG:
+					if ( convert_data (input_type, argin, 
+							       attr_config.data_type, data_ptr, error) == DS_NOTOK )
+					{
+						return (DS_NOTOK);
+					}
 					attr_values << *((long *)data_ptr);
+					tango_obj->write_attribute (attr_values);
 					break;
 					
 				case Tango::DEV_SHORT:
+					if ( convert_data (input_type, argin, 
+							       attr_config.data_type, data_ptr, error) == DS_NOTOK )
+					{
+						return (DS_NOTOK);
+					}
 					attr_values << *((short *)data_ptr);
+					tango_obj->write_attribute (attr_values);
+					break;
+					
+				case Tango::DEV_USHORT:
+					if ( convert_data (input_type, argin, 
+							       attr_config.data_type, data_ptr, error) == DS_NOTOK )
+					{
+						return (DS_NOTOK);
+					}
+					attr_values << *((unsigned short *)data_ptr);
+					tango_obj->write_attribute (attr_values);
+					break;
+					
+				case Tango::DEV_BOOLEAN:
+					if ( convert_data (input_type, argin, 
+							       attr_config.data_type, data_ptr, error) == DS_NOTOK )
+					{
+						return (DS_NOTOK);
+					}
+					bool b_value = (bool)(*((short *)data_ptr));
+					attr_values << b_value;
+					tango_obj->write_attribute (attr_values);
+					break;
+					
+				case Tango::DEV_UCHAR:
+					if ( convert_data (input_type, argin, 
+							       attr_config.data_type, data_ptr, error) == DS_NOTOK )
+					{
+						return (DS_NOTOK);
+					}
+					unsigned char uc_value = (unsigned char)(*((short *)data_ptr));
+					attr_values << uc_value;
+					tango_obj->write_attribute (attr_values);
 					break;
 					
 				case Tango::DEV_STRING:
+					if ( convert_data (input_type, argin, 
+							       attr_config.data_type, data_ptr, error) == DS_NOTOK )
+					{
+						return (DS_NOTOK);
+					}
 					string_value = *((char **)data_ptr);
 					attr_values << string_value;
-					break;										
+					tango_obj->write_attribute (attr_values);
+					break;
+					
+				case Tango::DEVVAR_SHORTARRAY:
+				{
+					if( input_type!=attr_config.data_type )
+					{
+						*error = DevErr_CannotConvertAttributeDataType;
+						return (DS_NOTOK);
+					}
+				    DevVarShortArray *s_arr = (DevVarShortArray *)argin;
+					if(is_boolean) {
+					  vector<bool> b_vec;
+					  for(int i=0;i<s_arr->length;i++)
+						b_vec.push_back((bool)(s_arr->sequence[i]));
+					  Tango::DeviceAttribute	attr_b(signal_name,b_vec);
+					  tango_obj->write_attribute (attr_b);					
+					} else if(is_uchar) {
+					  vector<unsigned char> uc_vec;
+					  for(int i=0;i<s_arr->length;i++)
+						uc_vec.push_back((unsigned char)(s_arr->sequence[i]));
+					  Tango::DeviceAttribute	attr_uc(signal_name,uc_vec);
+					  tango_obj->write_attribute (attr_uc);										
+					} else {
+					  vector<short> s_vec;
+					  for(int i=0;i<s_arr->length;i++)
+						s_vec.push_back(s_arr->sequence[i]);
+					  Tango::DeviceAttribute	attr_s(signal_name,s_vec);
+					  tango_obj->write_attribute (attr_s);
+					}
 				}
+			    break;
 				
-			tango_obj->write_attribute (attr_values);
+				case Tango::DEVVAR_USHORTARRAY:
+				{
+					if( input_type!=attr_config.data_type )
+					{
+						*error = DevErr_CannotConvertAttributeDataType;
+						return (DS_NOTOK);
+					}
+					DevVarUShortArray *us_arr = (DevVarUShortArray *)argin;
+					vector<unsigned short> us_vec;
+					for(int i=0;i<us_arr->length;i++)
+						us_vec.push_back(us_arr->sequence[i]);
+					Tango::DeviceAttribute	attr_us(signal_name,us_vec);
+					tango_obj->write_attribute (attr_us);					
+				}
+			    break;
+				
+				case Tango::DEVVAR_LONGARRAY:
+				{
+					if( input_type!=attr_config.data_type )
+					{
+						*error = DevErr_CannotConvertAttributeDataType;
+						return (DS_NOTOK);
+					}
+					DevVarLongArray *l_arr = (DevVarLongArray *)argin;
+					vector<long> l_vec;
+					for(int i=0;i<l_arr->length;i++)
+						l_vec.push_back(l_arr->sequence[i]);
+					Tango::DeviceAttribute	attr_l(signal_name,l_vec);
+					tango_obj->write_attribute (attr_l);					
+				}
+			    break;
+				
+				case Tango::DEVVAR_FLOATARRAY:
+				{
+					if( input_type!=attr_config.data_type )
+					{
+						*error = DevErr_CannotConvertAttributeDataType;
+						return (DS_NOTOK);
+					}
+					DevVarFloatArray *f_arr = (DevVarFloatArray *)argin;
+					vector<float> f_vec;
+					for(int i=0;i<f_arr->length;i++)
+						f_vec.push_back(f_arr->sequence[i]);
+					Tango::DeviceAttribute	attr_f(signal_name,f_vec);
+					tango_obj->write_attribute (attr_f);					
+				}
+			    break;
+				
+				case Tango::DEVVAR_DOUBLEARRAY:
+				{
+					if( input_type!=attr_config.data_type )
+					{
+						*error = DevErr_CannotConvertAttributeDataType;
+						return (DS_NOTOK);
+					}
+					DevVarDoubleArray *d_arr = (DevVarDoubleArray *)argin;
+					vector<double> d_vec;
+					for(int i=0;i<d_arr->length;i++)
+						d_vec.push_back(d_arr->sequence[i]);
+					Tango::DeviceAttribute	attr_d(signal_name,d_vec);
+					tango_obj->write_attribute (attr_d);					
+				}
+			    break;
+				
+				case Tango::DEVVAR_STRINGARRAY:
+				{
+					if( input_type!=attr_config.data_type )
+					{
+						*error = DevErr_CannotConvertAttributeDataType;
+						return (DS_NOTOK);
+					}
+					DevVarStringArray *str_arr = (DevVarStringArray *)argin;
+					vector<string> str_vec;
+					for(int i=0;i<str_arr->length;i++)
+						str_vec.push_back(str_arr->sequence[i]);
+					Tango::DeviceAttribute	attr_str(signal_name,str_vec);
+					tango_obj->write_attribute (attr_str);					
+				}
+			    break;
+				
+				}
 			}
 		
 		catch (Tango::DevFailed &e)
@@ -699,6 +877,10 @@ long AttrAccess::read_set_attr (DevArgument argout, DevType argout_type, long *e
 				case Tango::DEV_DOUBLE:
 					outgoing_type = Tango::DEVVAR_DOUBLEARRAY;
 					break;
+					
+				case Tango::DEV_FLOAT:
+					outgoing_type = Tango::DEVVAR_FLOATARRAY;
+					break;
 
 				case Tango::DEV_LONG:
 					outgoing_type = Tango::DEVVAR_LONGARRAY;
@@ -707,14 +889,29 @@ long AttrAccess::read_set_attr (DevArgument argout, DevType argout_type, long *e
 				case Tango::DEV_SHORT:
 					outgoing_type = Tango::DEVVAR_SHORTARRAY;
 					break;
+					
+				case Tango::DEV_USHORT:
+					outgoing_type = Tango::DEVVAR_USHORTARRAY;
+					break;
+					
+				case Tango::DEV_BOOLEAN:
+					outgoing_type = Tango::DEVVAR_SHORTARRAY;
+					break;
+					
+				case Tango::DEV_UCHAR:
+					outgoing_type = Tango::DEVVAR_SHORTARRAY;
+					break;
 
 				case Tango::DEV_STRING:
 					outgoing_type = Tango::DEVVAR_STRINGARRAY;
 					break;
 
 				case Tango::DEVVAR_SHORTARRAY:
+				case Tango::DEVVAR_USHORTARRAY:
 				case Tango::DEVVAR_LONGARRAY:
+				case Tango::DEVVAR_FLOATARRAY:
 				case Tango::DEVVAR_DOUBLEARRAY:
+				case Tango::DEVVAR_STRINGARRAY:
 					outgoing_type = attr_config.data_type;
 					break;										
 				}
@@ -729,7 +926,7 @@ long AttrAccess::read_set_attr (DevArgument argout, DevType argout_type, long *e
 				
 			// extract the sequence of read and setpoint
 			return to_taco_sequence (attr_values, argout, 
-										   outgoing_type, argout_type, error);
+										   outgoing_type, argout_type, true, error);
 			}
 		catch (Tango::DevFailed &e)
 			{	
@@ -774,7 +971,8 @@ long AttrAccess::read_attr (DevArgument argout, DevType argout_type, long *error
 	float					float_value;
 	long					long_value;
 	short					short_value;
-	string				string_value;
+	unsigned short			ushort_value;
+	string					string_value;
 	char					*c_str_ptr;
 	long					request_type;
 	void					*data_ptr;
@@ -881,6 +1079,10 @@ long AttrAccess::read_attr (DevArgument argout, DevType argout_type, long *error
 				case Tango::DEV_DOUBLE:
 					attr_values >> double_value;
 					break;
+					
+				case Tango::DEV_FLOAT:
+					attr_values >> float_value;
+					break;
 
 				case Tango::DEV_LONG:
 					attr_values >> long_value;
@@ -889,14 +1091,37 @@ long AttrAccess::read_attr (DevArgument argout, DevType argout_type, long *error
 				case Tango::DEV_SHORT:
 					attr_values >> short_value;
 					break;
+					
+				case Tango::DEV_USHORT:
+					attr_values >> ushort_value;
+					break;
+					
+				case Tango::DEV_BOOLEAN:
+					{
+				    bool bool_value;
+					attr_values >> bool_value;
+					short_value = (short)bool_value;
+					}
+					break;
+					
+				case Tango::DEV_UCHAR:
+					{
+				    unsigned char uc_value;
+					attr_values >> uc_value;
+					short_value = (short)uc_value;
+					}
+					break;
 
 				case Tango::DEV_STRING:
 					attr_values >> string_value;
 					break;
 
 				case Tango::DEVVAR_SHORTARRAY:
+				case Tango::DEVVAR_USHORTARRAY:
 				case Tango::DEVVAR_LONGARRAY:
+				case Tango::DEVVAR_FLOATARRAY:
 				case Tango::DEVVAR_DOUBLEARRAY:
+				case Tango::DEVVAR_STRINGARRAY:
 					if ( attr_config.data_type != request_type )
 						{
 						*error = DevErr_CannotConvertAttributeDataType;
@@ -905,7 +1130,7 @@ long AttrAccess::read_attr (DevArgument argout, DevType argout_type, long *error
 					else
 						{
 						return to_taco_sequence(attr_values, argout,
-								attr_config.data_type, argout_type, error);
+								attr_config.data_type, argout_type, false, error);
 						}
 					break;										
 				}
@@ -945,7 +1170,13 @@ long AttrAccess::read_attr (DevArgument argout, DevType argout_type, long *error
 			break;
 			
 		case Tango::DEV_SHORT:
+		case Tango::DEV_BOOLEAN:
+		case Tango::DEV_UCHAR:
 			data_ptr = (void *)&short_value;
+			break;
+			
+		case Tango::DEV_USHORT:
+			data_ptr = (void *)&ushort_value;
 			break;
 			
 		case Tango::DEV_STRING:
@@ -962,6 +1193,9 @@ long AttrAccess::read_attr (DevArgument argout, DevType argout_type, long *error
 	 	attr_config.data_type==Tango::DEV_FLOAT		||
 	 	attr_config.data_type==Tango::DEV_LONG		||
 	 	attr_config.data_type==Tango::DEV_SHORT		||
+	 	attr_config.data_type==Tango::DEV_USHORT	||
+	 	attr_config.data_type==Tango::DEV_BOOLEAN	||
+	 	attr_config.data_type==Tango::DEV_UCHAR		||
 	 	attr_config.data_type==Tango::DEV_STRING)
 		{
 			if ( convert_data (attr_config.data_type, data_ptr, 
@@ -1045,11 +1279,18 @@ long AttrAccess::to_taco_sequence(Tango::DeviceAttribute attribute,
                                  DevArgument argout,
 				 DevType tango_type,
 				 DevType taco_type,
+				 long get_setpoint,
 				 long *error)
 {
+	vector<unsigned char>	uc_vect;
 	vector<short>	s_vect;
+	vector<bool>	b_vect;
+	vector<unsigned short>	us_vect;
 	vector<long>	l_vect;
+	vector<float>	f_vect;
 	vector<double>	d_vect;
+	vector<string>	str_vect;
+	
 	int		nb_data;
 	short	status;
 
@@ -1057,18 +1298,65 @@ long AttrAccess::to_taco_sequence(Tango::DeviceAttribute attribute,
 	switch(tango_type)
 	{
 	case Tango::DEVVAR_SHORTARRAY:
-		attribute >> s_vect;
-		nb_data = s_vect.size();
+		if(is_boolean) {
+			attribute >> b_vect;
+			if(get_setpoint)
+			  nb_data = b_vect.size();
+			else
+			  nb_data = attribute.get_nb_read();
+		} else if(is_uchar) {
+			attribute >> uc_vect;
+			if(get_setpoint)
+			  nb_data = uc_vect.size();
+			else
+			  nb_data = attribute.get_nb_read();		
+		} else {
+			attribute >> s_vect;
+			if(get_setpoint)
+			  nb_data = s_vect.size();
+			else
+			  nb_data = attribute.get_nb_read();		
+		}
+		break;										
+		
+	case Tango::DEVVAR_USHORTARRAY:
+		attribute >> us_vect;
+		if(get_setpoint)
+		  nb_data = us_vect.size();
+		else
+		  nb_data = attribute.get_nb_read();
 		break;										
 
 	case Tango::DEVVAR_LONGARRAY:
 		attribute >> l_vect;
-		nb_data = l_vect.size();
+		if(get_setpoint)
+		  nb_data = l_vect.size();
+		else
+		  nb_data = attribute.get_nb_read();
 		break;										
 
 	case Tango::DEVVAR_DOUBLEARRAY:
 		attribute >> d_vect;
-		nb_data = d_vect.size();
+		if(get_setpoint)
+		  nb_data = d_vect.size();
+		else
+		  nb_data = attribute.get_nb_read();
+		break;										
+		
+	case Tango::DEVVAR_FLOATARRAY:
+		attribute >> f_vect;
+		if(get_setpoint)
+		  nb_data = f_vect.size();
+		else
+		  nb_data = attribute.get_nb_read();
+		break;
+		
+	case Tango::DEVVAR_STRINGARRAY:
+		attribute >> str_vect;
+		if(get_setpoint)
+		  nb_data = str_vect.size();
+		else
+		  nb_data = attribute.get_nb_read();
 		break;										
 	}
 	//	fill Taco argout
@@ -1082,10 +1370,21 @@ long AttrAccess::to_taco_sequence(Tango::DeviceAttribute attribute,
 			switch(tango_type)
 			{
 			case Tango::DEVVAR_SHORTARRAY:
-				sa.sequence[i] = (short)s_vect[i];
+			    if(is_boolean)
+				  sa.sequence[i] = (short)b_vect[i];
+				else if(is_uchar)
+				  sa.sequence[i] = (short)uc_vect[i];
+				else
+				  sa.sequence[i] = (short)s_vect[i];
+				break;
+			case Tango::DEVVAR_USHORTARRAY:
+				sa.sequence[i] = (short)us_vect[i];
 				break;
 			case Tango::DEVVAR_LONGARRAY:
 				sa.sequence[i] = (short)l_vect[i];
+				break;
+			case Tango::DEVVAR_FLOATARRAY:
+				sa.sequence[i] = (short)f_vect[i];
 				break;
 			case Tango::DEVVAR_DOUBLEARRAY:
 				sa.sequence[i] = (short)d_vect[i];
@@ -1094,6 +1393,40 @@ long AttrAccess::to_taco_sequence(Tango::DeviceAttribute attribute,
 		//	Allocate and fill XDR argout
 		status = to_xdr_sequence(&sa, argout, taco_type, error);
 		delete sa.sequence;
+		return status;
+		break;
+		
+	case D_VAR_USHORTARR:
+		DevVarUShortArray	usa;
+		usa.length = nb_data;
+		usa.sequence = new unsigned short[nb_data];
+		for (int i=0 ; i<nb_data ; i++)
+			switch(tango_type)
+			{
+			case Tango::DEVVAR_SHORTARRAY:
+			    if(is_boolean)
+				  usa.sequence[i] = (unsigned short)b_vect[i];
+				else if(is_uchar)
+				  usa.sequence[i] = (unsigned short)uc_vect[i];				
+				else
+				  usa.sequence[i] = (unsigned short)s_vect[i];
+				break;
+			case Tango::DEVVAR_USHORTARRAY:
+				usa.sequence[i] = (unsigned short)us_vect[i];
+				break;
+			case Tango::DEVVAR_LONGARRAY:
+				usa.sequence[i] = (unsigned short)l_vect[i];
+				break;
+			case Tango::DEVVAR_FLOATARRAY:
+				usa.sequence[i] = (unsigned short)f_vect[i];
+				break;
+			case Tango::DEVVAR_DOUBLEARRAY:
+				usa.sequence[i] = (unsigned short)d_vect[i];
+				break;
+			}
+		//	Allocate and fill XDR argout
+		status = to_xdr_sequence(&usa, argout, taco_type, error);
+		delete usa.sequence;
 		return status;
 		break;
 
@@ -1105,10 +1438,21 @@ long AttrAccess::to_taco_sequence(Tango::DeviceAttribute attribute,
 			switch(tango_type)
 			{
 			case Tango::DEVVAR_SHORTARRAY:
-				la.sequence[i] = (long)s_vect[i];
+			    if(is_boolean)
+				  la.sequence[i] = (long)b_vect[i];
+				else if(is_uchar)
+				  la.sequence[i] = (long)uc_vect[i];
+				else
+				  la.sequence[i] = (long)s_vect[i];
+				break;
+			case Tango::DEVVAR_USHORTARRAY:
+				la.sequence[i] = (long)us_vect[i];
 				break;
 			case Tango::DEVVAR_LONGARRAY:
 				la.sequence[i] = (long)l_vect[i];
+				break;
+			case Tango::DEVVAR_FLOATARRAY:
+				la.sequence[i] = (long)f_vect[i];
 				break;
 			case Tango::DEVVAR_DOUBLEARRAY:
 				la.sequence[i] = (long)d_vect[i];
@@ -1120,20 +1464,66 @@ long AttrAccess::to_taco_sequence(Tango::DeviceAttribute attribute,
 		return status;
 		break;
 
-	case D_VAR_DOUBLEARR:
-		DevVarDoubleArray	da;
-		da.length = nb_data;
-		da.sequence = new double[nb_data];
-		double	value;
+	case D_VAR_FLOATARR:
+		DevVarFloatArray fa;
+		fa.length = nb_data;
+		fa.sequence = new float[nb_data];
 		for (int i=0 ; i<nb_data ; i++)
 		{
 			switch(tango_type)
 			{
 			case Tango::DEVVAR_SHORTARRAY:
-				da.sequence[i] = (double)s_vect[i];
+			    if(is_boolean)
+				  fa.sequence[i] = (float)b_vect[i];
+				else if(is_uchar)
+				  fa.sequence[i] = (float)uc_vect[i];
+				else
+				  fa.sequence[i] = (float)s_vect[i];				
+				break;
+			case Tango::DEVVAR_USHORTARRAY:
+				fa.sequence[i] = (float)us_vect[i];
+				break;
+			case Tango::DEVVAR_LONGARRAY:
+				fa.sequence[i] = (float)l_vect[i];
+				break;
+			case Tango::DEVVAR_FLOATARRAY:
+				fa.sequence[i] = (float)f_vect[i];
+				break;
+			case Tango::DEVVAR_DOUBLEARRAY:
+				fa.sequence[i] = (float)d_vect[i];
+				break;
+			}
+		}
+		//	Allocate and fill XDR argout
+		status = to_xdr_sequence(&fa, argout, taco_type, error);
+		delete fa.sequence;
+		return status;
+		break;										
+		
+	case D_VAR_DOUBLEARR:
+		DevVarDoubleArray	da;
+		da.length = nb_data;
+		da.sequence = new double[nb_data];
+		for (int i=0 ; i<nb_data ; i++)
+		{
+			switch(tango_type)
+			{
+			case Tango::DEVVAR_SHORTARRAY:
+			    if(is_boolean)
+				  da.sequence[i] = (double)b_vect[i];
+				else if(is_uchar)
+				  da.sequence[i] = (double)uc_vect[i];
+				else
+				  da.sequence[i] = (double)s_vect[i];				
+				break;
+			case Tango::DEVVAR_USHORTARRAY:
+				da.sequence[i] = (double)us_vect[i];
 				break;
 			case Tango::DEVVAR_LONGARRAY:
 				da.sequence[i] = (double)l_vect[i];
+				break;
+			case Tango::DEVVAR_FLOATARRAY:
+				da.sequence[i] = (double)f_vect[i];
 				break;
 			case Tango::DEVVAR_DOUBLEARRAY:
 				da.sequence[i] = (double)d_vect[i];
@@ -1143,6 +1533,27 @@ long AttrAccess::to_taco_sequence(Tango::DeviceAttribute attribute,
 		//	Allocate and fill XDR argout
 		status = to_xdr_sequence(&da, argout, taco_type, error);
 		delete da.sequence;
+		return status;
+		break;										
+		
+	case D_VAR_STRINGARR:
+	    if(tango_type != Tango::DEVVAR_STRINGARRAY) {
+			*error = DevErr_CannotConvertAttributeDataType;
+			return (DS_NOTOK);
+		}
+		DevVarStringArray stra;
+		stra.length = nb_data;
+		stra.sequence = (char **)malloc(nb_data * sizeof(char *));
+		for (int i=0 ; i<nb_data ; i++)
+		{
+		  int lgth = str_vect[i].length();
+		  stra.sequence[i] = (char *)malloc(lgth+1);
+		  strcpy(stra.sequence[i],str_vect[i].c_str());		  
+		}
+		//	Allocate and fill XDR argout
+		status = to_xdr_sequence(&stra, argout, taco_type, error);
+		for(int i=0;i<nb_data;i++) free(stra.sequence[i]);
+		free(stra.sequence);
 		return status;
 		break;										
 	}
@@ -1267,6 +1678,8 @@ long AttrAccess::create_attr_access (long *error)
 	
 	
 	*error = 0;
+	is_boolean = false;
+	is_uchar = false;
 	
 	/* 
 	 * create the connection to the device
@@ -1448,20 +1861,47 @@ long AttrAccess::create_attr_access (long *error)
 			//	Check if scalar or sequence( for spectrum or image)
 			switch (attr_config.data_type)
 			{
+			case Tango::DEV_BOOLEAN:
+			    is_boolean = true;
+				if (attr_config.data_format==Tango::SPECTRUM ||
+					attr_config.data_format==Tango::IMAGE)
+					attr_config.data_type = Tango::DEVVAR_SHORTARRAY;
+					break;
+			case Tango::DEV_UCHAR:
+			    is_uchar = true;
+				if (attr_config.data_format==Tango::SPECTRUM ||
+					attr_config.data_format==Tango::IMAGE)
+					attr_config.data_type = Tango::DEVVAR_SHORTARRAY;
+					break;
 			case Tango::DEV_SHORT:
 				if (attr_config.data_format==Tango::SPECTRUM ||
 					attr_config.data_format==Tango::IMAGE)
 					attr_config.data_type = Tango::DEVVAR_SHORTARRAY;
+					break;
+			case Tango::DEV_USHORT:
+				if (attr_config.data_format==Tango::SPECTRUM ||
+					attr_config.data_format==Tango::IMAGE)
+					attr_config.data_type = Tango::DEVVAR_USHORTARRAY;
 					break;
 			case Tango::DEV_LONG:
 				if (attr_config.data_format==Tango::SPECTRUM ||
 					attr_config.data_format==Tango::IMAGE)
 					attr_config.data_type = Tango::DEVVAR_LONGARRAY;
 					break;
+			case Tango::DEV_FLOAT:
+				if (attr_config.data_format==Tango::SPECTRUM ||
+					attr_config.data_format==Tango::IMAGE)
+					attr_config.data_type = Tango::DEVVAR_FLOATARRAY;
+					break;
 			case Tango::DEV_DOUBLE:
 				if (attr_config.data_format==Tango::SPECTRUM ||
 					attr_config.data_format==Tango::IMAGE)
 					attr_config.data_type = Tango::DEVVAR_DOUBLEARRAY;
+					break;
+			case Tango::DEV_STRING:
+				if (attr_config.data_format==Tango::SPECTRUM ||
+					attr_config.data_format==Tango::IMAGE)
+					attr_config.data_type = Tango::DEVVAR_STRINGARRAY;
 					break;
 			}
 		
@@ -1505,6 +1945,7 @@ long AttrAccess::convert_data (long data_type, void *data_ptr,
 	float				*float_ptr;
 	long				*long_ptr;
 	short				*short_ptr;	
+	unsigned short		*ushort_ptr;	
 	
 	*error = 0;
 	cout.precision(10);
@@ -1586,12 +2027,16 @@ long AttrAccess::convert_data (long data_type, void *data_ptr,
 			break;
 			
 		case Tango::DEV_SHORT:
+		case Tango::DEV_BOOLEAN:
+		case Tango::DEV_UCHAR:
 			short_ptr = (short *)data_ptr;
 			// cout << "Read value = " << *short_ptr << endl;
 			
 			switch (conv_data_type)
 				{
 				case Tango::DEV_SHORT:
+				case Tango::DEV_BOOLEAN:
+				case Tango::DEV_UCHAR:
 					*((short *)conv_data_ptr) = *short_ptr;
 					break;
 					
@@ -1615,6 +2060,35 @@ long AttrAccess::convert_data (long data_type, void *data_ptr,
 				}
 			break;			
 
+		case Tango::DEV_USHORT:
+			ushort_ptr = (unsigned short *)data_ptr;
+			// cout << "Read value = " << *ushort_ptr << endl;
+			
+			switch (conv_data_type)
+				{
+				case Tango::DEV_USHORT:
+					*((unsigned short *)conv_data_ptr) = *ushort_ptr;
+					break;
+					
+				case Tango::DEV_LONG:
+					*((long *)conv_data_ptr) = *ushort_ptr;
+					break;					
+					
+				case Tango::DEV_FLOAT:
+					*((float *)conv_data_ptr) = *ushort_ptr;
+					break;					
+					
+				case Tango::DEV_DOUBLE:
+					*((double *)conv_data_ptr) = *ushort_ptr;
+					break;
+					
+				case Tango::DEV_STRING:
+					sprintf (c_string_value, "%u", *ushort_ptr);
+					c_str_ptr = &c_string_value[0];
+					*((char **)conv_data_ptr) = c_str_ptr;
+					break;														
+				}
+			break;			
 			
 		default:
 			*error = DevErr_CannotConvertAttributeDataType;
@@ -1643,8 +2117,32 @@ long AttrAccess::check_requested_data_type (long request_type, long attr_type, l
 		switch (request_type)
 			{
 			case Tango::DEV_SHORT:
-				*error = DevErr_CannotConvertAttributeDataType;
-				return (DS_NOTOK);
+				if( attr_type != Tango::DEV_BOOLEAN &&
+				    attr_type != Tango::DEV_UCHAR ) {
+				  *error = DevErr_CannotConvertAttributeDataType;
+				  return (DS_NOTOK);
+				}
+				break;
+				
+			case Tango::DEV_USHORT:
+				if( attr_type != Tango::DEV_USHORT ) {
+				  *error = DevErr_CannotConvertAttributeDataType;
+				  return (DS_NOTOK);
+				}
+				break;
+				
+			case Tango::DEV_BOOLEAN:
+				if( attr_type != Tango::DEV_SHORT) {
+				  *error = DevErr_CannotConvertAttributeDataType;
+				  return (DS_NOTOK);
+				}
+				break;
+				
+			case Tango::DEV_UCHAR:
+				if( attr_type != Tango::DEV_SHORT ) {
+				  *error = DevErr_CannotConvertAttributeDataType;
+				  return (DS_NOTOK);
+				}
 				break;
 				
 			case Tango::DEV_LONG:
@@ -1711,9 +2209,13 @@ long	AttrAccess::get_tango_data_type (long taco_data_type)
 		case D_STRING_TYPE:
 			return (Tango::DEV_STRING);
 			break;
-			
+						
 		case D_SHORT_TYPE:
 			return (Tango::DEV_SHORT);
+			break;
+
+		case D_USHORT_TYPE:
+			return (Tango::DEV_USHORT);
 			break;
 			
 		case D_LONG_TYPE:
@@ -1734,6 +2236,10 @@ long	AttrAccess::get_tango_data_type (long taco_data_type)
 
 		case D_VAR_SHORTARR:
 			return (Tango::DEVVAR_SHORTARRAY);
+			break;
+			
+		case D_VAR_USHORTARR:
+			return (Tango::DEVVAR_USHORTARRAY);
 			break;
 
 		case D_VAR_LONGARR:
@@ -1773,6 +2279,18 @@ long	AttrAccess::get_taco_data_type (long tango_data_type)
 			return (D_SHORT_TYPE);
 			break;
 			
+		case Tango::DEV_USHORT:
+			return (D_USHORT_TYPE);
+			break;
+			
+		case Tango::DEV_BOOLEAN:
+			return (D_SHORT_TYPE);
+			break;
+			
+		case Tango::DEV_UCHAR:
+			return (D_SHORT_TYPE);
+			break;
+			
 		case Tango::DEV_LONG:
 			return (D_LONG_TYPE);
 			break;
@@ -1788,11 +2306,20 @@ long	AttrAccess::get_taco_data_type (long tango_data_type)
 		case Tango::DEVVAR_SHORTARRAY:
 			return D_VAR_SHORTARR;
 			break;
+		case Tango::DEVVAR_USHORTARRAY:
+			return D_VAR_USHORTARR;
+			break;
 		case Tango::DEVVAR_LONGARRAY:
 			return D_VAR_LONGARR;
 			break;
+		case Tango::DEVVAR_FLOATARRAY:
+			return D_VAR_FLOATARR;
+			break;
 		case Tango::DEVVAR_DOUBLEARRAY:
 			return D_VAR_DOUBLEARR;
+			break;
+		case Tango::DEVVAR_STRINGARRAY:
+			return D_VAR_STRINGARR;
 			break;
 
 		default:
@@ -1826,6 +2353,18 @@ long	AttrAccess::get_taco_array_data_type (long tango_data_type)
 			return (D_VAR_SHORTARR);
 			break;
 			
+		case Tango::DEV_USHORT:
+			return (D_VAR_USHORTARR);
+			break;
+			
+		case Tango::DEV_BOOLEAN:
+			return (D_VAR_SHORTARR);
+			break;
+			
+		case Tango::DEV_UCHAR:
+			return (D_VAR_SHORTARR);
+			break;
+			
 		case Tango::DEV_LONG:
 			return (D_VAR_LONGARR);
 			break;
@@ -1842,12 +2381,24 @@ long	AttrAccess::get_taco_array_data_type (long tango_data_type)
 			return D_VAR_SHORTARR;
 			break;
 			
+		case Tango::DEVVAR_USHORTARRAY:
+			return D_VAR_USHORTARR;
+			break;
+			
 		case Tango::DEVVAR_LONGARRAY:
 			return D_VAR_LONGARR;
 			break;
 			
+		case Tango::DEVVAR_FLOATARRAY:
+			return D_VAR_FLOATARR;
+			break;
+			
 		case Tango::DEVVAR_DOUBLEARRAY:
 			return D_VAR_DOUBLEARR;
+			break;
+			
+		case Tango::DEVVAR_STRINGARRAY:
+			return D_VAR_STRINGARR;
 			break;
 
 		default:

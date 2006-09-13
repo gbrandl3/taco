@@ -25,13 +25,13 @@
  * Description:	
  *	
  * Author(s)  :	Jens Meyer
- * 		$Author: jensmeyer $
+ * 		$Author: jlpons $
  *
  * Original   :	September 2002
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-08-02 12:14:48 $
+ * Date:	$Date: 2006-09-13 15:55:44 $
  *
  *********************************************************************/ 
 
@@ -100,7 +100,7 @@ class AttrAccess
 		long  convert_data (long data_type, void *data_ptr,
 								  long conv_data_type, void *conv_data_ptr, long *error);
 		long	to_taco_sequence(Tango::DeviceAttribute , DevArgument , 
-								    DevType , DevType, long *);	
+								    DevType , DevType,long , long *);	
 		long	to_xdr_sequence(DevArgument , DevArgument , DevType , long *);	
 		
 			
@@ -114,6 +114,8 @@ class AttrAccess
 		Tango::AttributeInfoEx		attr_config;
 		Tango::AttrQuality			quality_last_read;
 		short	tango_device;
+		short   is_boolean;
+		short   is_uchar;
 		
 		long	taco_signal_index;
 		long	taco_access;
