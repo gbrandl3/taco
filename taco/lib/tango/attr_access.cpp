@@ -29,13 +29,13 @@
  *
  * Original   :	September2002
  *
- * Version    :	$Revision: 1.6 $
+ * Version    :	$Revision: 1.7 $
  *
- * Date       : $Date: 2006-09-13 15:55:44 $
+ * Date       : $Date: 2006-09-13 16:09:10 $
  *
  *********************************************************************/ 
 
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_access.cpp,v 1.6 2006-09-13 15:55:44 jlpons Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_access.cpp,v 1.7 2006-09-13 16:09:10 jlpons Exp $";
 
 #include <attr_api.h>
 
@@ -649,6 +649,7 @@ long AttrAccess::write_attr (DevArgument argin, DevType argin_type, long *error)
 					break;
 					
 				case Tango::DEV_BOOLEAN:
+				{
 					if ( convert_data (input_type, argin, 
 							       attr_config.data_type, data_ptr, error) == DS_NOTOK )
 					{
@@ -657,9 +658,11 @@ long AttrAccess::write_attr (DevArgument argin, DevType argin_type, long *error)
 					bool b_value = (bool)(*((short *)data_ptr));
 					attr_values << b_value;
 					tango_obj->write_attribute (attr_values);
-					break;
+				}
+				break;
 					
 				case Tango::DEV_UCHAR:
+				{
 					if ( convert_data (input_type, argin, 
 							       attr_config.data_type, data_ptr, error) == DS_NOTOK )
 					{
@@ -668,9 +671,11 @@ long AttrAccess::write_attr (DevArgument argin, DevType argin_type, long *error)
 					unsigned char uc_value = (unsigned char)(*((short *)data_ptr));
 					attr_values << uc_value;
 					tango_obj->write_attribute (attr_values);
-					break;
+				}
+				break;
 					
 				case Tango::DEV_STRING:
+				{
 					if ( convert_data (input_type, argin, 
 							       attr_config.data_type, data_ptr, error) == DS_NOTOK )
 					{
@@ -679,7 +684,8 @@ long AttrAccess::write_attr (DevArgument argin, DevType argin_type, long *error)
 					string_value = *((char **)data_ptr);
 					attr_values << string_value;
 					tango_obj->write_attribute (attr_values);
-					break;
+				}
+				break;
 					
 				case Tango::DEVVAR_SHORTARRAY:
 				{
