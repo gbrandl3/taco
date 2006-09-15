@@ -23,11 +23,11 @@
  * Description:
  *
  * Author(s):
- *		$Author: jkrueger1 $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2005-07-25 08:22:57 $
+ * Date:	$Date: 2006-09-15 16:38:42 $
  *
  */
 
@@ -177,6 +177,7 @@ inline MySQLServer::MySQLServer(const std::string user, const std::string passwo
 // Open database tables according to the definition 
 //
 	mysql_init(&mysql);
+	mysql_options(&mysql,MYSQL_READ_DEFAULT_GROUP,"client");
 	if (*this->db_reopendb_1_svc() != 0)
 		return;
 	dbgen.connected = true;
