@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2005-07-25 08:40:25 $
+ * Date:	$Date: 2006-09-15 16:42:40 $
  *
  */
 
@@ -77,7 +77,7 @@ db_res *MySQLServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 // Retrieve the protocol used to send this request to server 
 //
     so_size = sizeof(so);
-#ifdef sun
+#ifdef unix
     if (rqstp->rq_xprt->xp_port == getUDPPort())
         prot = IPPROTO_UDP;
     else

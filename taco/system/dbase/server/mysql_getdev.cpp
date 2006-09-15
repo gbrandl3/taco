@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2005-07-25 08:37:08 $
+ * Date:	$Date: 2006-09-15 16:42:39 $
  *
  */
 
@@ -72,7 +72,7 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 	return(&browse_back);
     }
 
-#ifdef sun
+#ifdef unix
     if (rqstp->rq_xprt->xp_port == getUDPPort())
 	prot = IPPROTO_UDP;
     else

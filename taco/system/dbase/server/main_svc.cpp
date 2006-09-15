@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.24 $
+ * Version:	$Revision: 1.25 $
  *
- * Date:	$Date: 2006-09-07 09:28:07 $
+ * Date:	$Date: 2006-09-15 16:42:39 $
  *
  */
 
@@ -482,6 +482,9 @@ int main(int argc,char **argv)
 		logStream.flush();
 		exit(1);
 	}
+	dbm->setUDPPort(udp_port);
+	dbm->setTCPPort(tcp_port);
+	
 	logStream << getTimeString("dbm_server") << "ready to run" << std::endl;
 	svc_run();
 	logStream << getTimeString("dbm_server") << "svc_run returned" << std::endl;
