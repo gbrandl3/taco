@@ -9,13 +9,13 @@
 		dummy database under OS9.
 
  Author(s):     Jens Meyer
- 		$Author: jkrueger1 $
+ 		$Author: jlpons $
 
  Original: 	January 1991
 
- Version:	$Revision: 1.24 $
+ Version:	$Revision: 1.25 $
 
- Date:		$Date: 2006-09-06 18:43:31 $
+ Date:		$Date: 2006-09-15 16:44:02 $
 
  Copyright (c) 1990 by  European Synchrotron Radiation Facility,
 			Grenoble, France
@@ -345,8 +345,11 @@ static	int	fd_devnull = -1;
  *  DBHOST environment variable is set and 
  *  specifies not the local host.
  */
-	fprintf(system_log, "%s dbhost : %s, nethost : %s\n", getTimeString("Manager"), dbhost, nethost);
-	fflush(system_log);
+	if (c_flags.request_log)
+	{
+		fprintf(system_log, "%s dbhost : %s, nethost : %s\n", getTimeString("Manager"), dbhost, nethost);
+		fflush(system_log);
+	}
 	if (strcmp (dbhost, nethost) && strcmp (dbhost, "localhost"))
 	{
 #ifdef unix
@@ -574,8 +577,11 @@ static	int	fd_devnull = -1;
 	pid = become_daemon();
 #endif
 	svc_run();
-	fprintf(system_log, "%s svc_run returned: Manager stopped\n", getTimeString("Manager"));
-	fflush(system_log);
+	if (c_flags.request_log)
+	{	
+		fprintf(system_log, "%s svc_run returned: Manager stopped\n", getTimeString("Manager"));	
+		fflush(system_log);
+	}
 	kill (pid,SIGQUIT);
 }
 
