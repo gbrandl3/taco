@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: andy_gotz $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2006-02-20 11:25:09 $
+ * Date:	$Date: 2006-09-15 16:41:46 $
  *
  */
 
@@ -251,7 +251,7 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
 	    std::string dev_name(de_name->arr1_val[i]);
 	    std::string query;
 	    query = "SELECT HOST, IOR, VERSION, CLASS";
-	    query += (" FROM device WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + dev_name + "'" );
+	    query += (" FROM device WHERE name = '" + dev_name + "'" );
 	    query += (" AND IOR LIKE 'rpc:%'");
 	    if (mysql_query(mysql_conn, query.c_str()) != 0)
 	    {
