@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:	$Date: 2005-07-25 08:39:16 $
+ * Date:	$Date: 2006-09-15 16:40:19 $
  *
  */
 
@@ -316,7 +316,6 @@ db_res *MySQLServer::resresolist_1_svc(db_res *recev)
                 query += ("' ORDER BY NAME ASC");
 	}
 
-    query += (user_member + "' ORDER BY NAME ASC");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	std::cerr << mysql_error(mysql_conn) << std::endl;
