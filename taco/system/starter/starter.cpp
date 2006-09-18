@@ -1,19 +1,4 @@
 /*****************************************************************************
- * File:        $Id: starter.cpp,v 1.10 2006-08-01 16:39:51 jkrueger1 Exp $
- *
- * Project:     Device Servers with sun-rpc
- *
- * Description: Source code for implementing a starter server
- *
- * Author(s):   Jens Krüger
- * 		$Author: jkrueger1 $
- *
- * Original:    January 2003
- *
- * Version:	$Revision: 1.10 $
- *
- * Date:	$Date: 2006-08-01 16:39:51 $
- *
  * Copyright (C) 2003 Jens Krueger
  *
  * This program is free software; you can redistribute it and/or
@@ -29,31 +14,57 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ * File:        $File$
+ *
+ * Project:     Device Servers with sun-rpc
+ *
+ * Description: Source code for implementing a starter server
+ *
+ * Author(s):   Jens Krueger
+ * 		$Author: jkrueger1 $
+ *
+ * Original:    January 2003
+ *
+ * Version:	$Revision: 1.11 $
+ *
+ * Date:	$Date: 2006-09-18 21:45:36 $
+ *
  *****************************************************************************/
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include "starter.h"
 #include <Starter.h>
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #ifdef _solaris
-#include "_count.h"
+#	include "_count.h"
 #endif /* _solaris */
 #include <DevSec.h>
-#include <unistd.h>
+#if HAVE_UNISTD_H
+#	include <unistd.h>
+#endif
 #if HAVE_SIGNAL_H
 #       include <signal.h>
 #elif HAVE_SYS_SIGNAL_H
 #       include <sys/signal.h>
 #else
-#error Could not find signal.h
+#	error Could not find signal.h
 #endif
 #include <cerrno>
 #include <cstdio>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/wait.h>
+#if HAVE_FCNTL_H
+#	include <fcntl.h>
+#endif
+#if HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#if HAVE_SYS_WAIT_H
+#	include <sys/wait.h>
+#endif
 
 DevLong minimal_access = WRITE_ACCESS;
 

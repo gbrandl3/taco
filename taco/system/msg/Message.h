@@ -1,28 +1,39 @@
-
-/*********************************************************************
-
- File:		Message.h
-
- Project:	Device Servers with sun-rpc
-
- Description:	Include file for applications using 
-                the Message-Server.
-
- Author(s):	Jens Meyer
- 		$Author: jkrueger1 $
-
- Original:	January 1991
-
- Version:	$Revision: 1.5 $
-
- Date:		$Date: 2005-02-24 15:55:38 $
-
- Copyright (c) 1990 by European Synchrotron Radiation Facility, 
-                       Grenoble, France
-
-		       All Rights Reserved
-
- *********************************************************************/
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:		Message.h
+ *
+ * Project:	Device Servers with sun-rpc
+ *
+ * Description:	Include file for applications using 
+ *                the Message-Server.
+ *
+ * Author(s):	Jens Meyer
+ * 		$Author: jkrueger1 $
+ *
+ * Original:	January 1991
+ *
+ * Version:	$Revision: 1.6 $
+ *
+ * Date:		$Date: 2006-09-18 21:46:20 $
+ */
 
 #ifndef _Message_h
 #define _Message_h

@@ -1,36 +1,59 @@
-
-/* 
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
  * File : 	dc_hash.c
+ *
+ * Project      : Data collector
+ *
+ * Description  :
+ *
  *
  * Author(s):	Emmanuel TAUREL
  *		$Author: jkrueger1 $
  *
  * Original:	May 1993
  *
- * Description:	
+ * Version      : $Revision: 1.3 $
  *
- * Version:	$Revision: 1.2 $
- *
- * Date:	$Date: 2004-06-02 16:36:16 $
+ * Date         : $Date: 2006-09-18 21:48:25 $
  *
  */
-
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <API.h>
 #include <dcP.h>
 #include <DevErrors.h>
 #include <errno.h>
 
-#ifdef sun
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/sem.h>
-#else
-#include <sys/sem.h>
+#if HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#if HAVE_SYS_IPC_H
+#	include <sys/ipc.h>
+#endif
+#if HAVE_SYS_SEM_H
+#	include <sys/sem.h>
 #endif
 
 #include <string.h>
-
 /* External variable */
 
 extern int time_out;

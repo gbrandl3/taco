@@ -1,20 +1,4 @@
 /*****************************************************************************
- *
- * File:        $Id: starter.h,v 1.7 2006-08-01 16:39:51 jkrueger1 Exp $
- *
- * Project:     Device Servers with sun-rpc
- *
- * Description: Source code for implementing a starter server
- *
- * Author(s):   Jens Krüger
- * 		$Author: jkrueger1 $
- *
- * Original:    January 2003
- *
- * Version:	$Revision: 1.7 $
- *
- * Date:	$Date: 2006-08-01 16:39:51 $
- *
  * Copyright (C) 2003 Jens Krueger
  *
  * This program is free software; you can redistribute it and/or
@@ -30,6 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ * File:        $Id: starter.h,v 1.8 2006-09-18 21:45:36 jkrueger1 Exp $
+ *
+ * Project:     Device Servers with sun-rpc
+ *
+ * Description: Source code for implementing a starter server
+ *
+ * Author(s):   Jens Krüger
+ * 		$Author: jkrueger1 $
+ *
+ * Original:    January 2003
+ *
+ * Version:	$Revision: 1.8 $
+ *
+ * Date:	$Date: 2006-09-18 21:45:36 $
+ *
  *****************************************************************************/
 
 #ifndef __STARTER_DEVICE_H__

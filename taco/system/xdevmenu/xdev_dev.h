@@ -1,26 +1,40 @@
-/****************************************************************************
-
- File          :  xdev_dev.h
-
- Project       :  Xdevmenu application (new generation made by BX)
-
- Description   :  The header file containing all functions and data types
-                  exported to the reste of the application by xdev_dev.c module.
-
- Author        :  Builder Xcessory then completed by Faranguiss Poncet
-
- Original      :  February 1997
-
- $Revision: 1.1 $				$Author: jkrueger1 $
- $Date: 2003-04-25 12:54:28 $					$State: Exp $
-
- Copyright (c) 1997 by European Synchrotron Radiation Facility,
-		       Grenoble, France
-
-                       All Rights Reserved
-
-****************************************************************************/
-
+/*****************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:        xdev_dev.h
+ *
+ * Project:     Xdevmenu application (new generation made by BX)
+ *
+ * Description: The header file containing all functions and data types
+ *              exported to the reste of the application by xdev_dev.c module.
+ *
+ * Author(s):   Builder Xcessory then completed by Faranguiss Poncet
+ *              $Author: jkrueger1 $
+ *
+ * Original:    February 1997
+ *
+ * Version:     $Revision: 1.2 $
+ *
+ * Date:        $Date: 2006-09-18 21:43:56 $
+ *
+ */
 
 #ifndef _xdev_dev_h
 #define _xdev_dev_h

@@ -1,4 +1,44 @@
-#include "config.h"
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File         : dc_info.c
+ *
+ * Project      : Data collector
+ *
+ * Description  :
+ *
+ *
+ * Author       :
+ *                $Author: jkrueger1 $
+ *
+ * Original     :
+ *
+ * Version      : $Revision: 1.5 $
+ *
+ * Date         : $Date: 2006-09-18 21:50:15 $
+ *
+ */
+
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #define _dc_h
 #include <API.h>
 #undef _dc_h
@@ -7,12 +47,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef sun
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#else
-#include <sys/shm.h>
+#if HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#if HAVE_SYS_IPC_H
+#	include <sys/ipc.h>
+#endif
+#if HAVE_SYS_SHM_H
+#	include <sys/shm.h>
+#endif
+#if HAVE_UNISTD_H
+#	include <unistd.h>
 #endif
 
 #include <errno.h>

@@ -1,20 +1,4 @@
 /*****************************************************************************
- *
- * File:        $Id: startup.cpp,v 1.8 2005-06-13 13:50:38 jkrueger1 Exp $
- *
- * Project:     Device Servers with sun-rpc
- *
- * Description: Source code for implementing a starter server
- *
- * Author(s):   Jens Krüger
- * 		$Author: jkrueger1 $
- *
- * Original:	January 2003
- *
- * Version:	$Revision: 1.8 $
- *
- * Revision:	$Date: 2005-06-13 13:50:38 $
- *
  * Copyright (C) 2003 Jens Krueger
  *
  * This program is free software; you can redistribute it and/or
@@ -30,16 +14,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ * File:        $Id: startup.cpp,v 1.9 2006-09-18 21:45:36 jkrueger1 Exp $
+ *
+ * Project:     Device Servers with sun-rpc
+ *
+ * Description: Source code for implementing a starter server
+ *
+ * Author(s):   Jens Krüger
+ * 		$Author: jkrueger1 $
+ *
+ * Original:	January 2003
+ *
+ * Version:	$Revision: 1.9 $
+ *
+ * Revision:	$Date: 2006-09-18 21:45:36 $
+ *
  *****************************************************************************/
-#include "config.h"
+
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <API.h>
 #include <private/ApiP.h>
 #include <Device.h>
 #include <DevServer.h>
-#include <dlfcn.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
+#if HAVE_DLFCN_H
+#	include <dlfcn.h>
+#endif
+#if HAVE_SIGNAL_H
+#	include <signal.h>
+#endif
+#if HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#if HAVE_SYS_WAIT_H
+#	include <sys/wait.h>
+#endif
 #include <errno.h>
 #include "starter.h"
 
@@ -47,7 +58,7 @@
 #include <string>
 #include <algorithm>
 #ifdef _solaris
-#include "_count.h"
+#	include "_count.h"
 #endif /* _solaris */
 
 

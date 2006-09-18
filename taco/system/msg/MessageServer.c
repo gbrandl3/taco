@@ -1,46 +1,67 @@
-/*********************************************************************
-
- File:		MessageServer.c
-
- Project:	Device Servers with sun-rpc
-
- Description:	Source code for implementing a Message-Server 
-
- Author(s):	Jens Meyer
- 		$Author: jkrueger1 $
-
- Original:	January 1991
-
- Version:	$Revision: 1.9 $
-
- Date:		$Date: 2006-04-20 06:33:17 $
-
- Copyright (c) 1990 by	European Synchrotron Radiation Facility, 
-			Grenoble, France
-
-			All Rights Reserved
-
- *********************************************************************/
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:	MessageServer.c
+ *
+ * Project:	Device Servers with sun-rpc
+ *
+ * Description:	Source code for implementing a Message-Server 
+ *
+ * Author(s):	Jens Meyer
+ * 		$Author: jkrueger1 $
+ *
+ * Original:	January 1991
+ *
+ * Version:	$Revision: 1.10 $
+ *
+ * Date:	$Date: 2006-09-18 21:46:20 $
+ */
 
 /*
  * Include files and Static Routine definitions
  */
-#include "config.h"
+
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <errno.h>
 #include <API.h>
 #include <private/ApiP.h>
 #include <Message.h>
 #include <DevErrors.h>
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#if HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#if HAVE_SYS_STAT_H
+#	include <sys/stat.h>
+#endif
+#if HAVE_FCNTL_H
+#	include <fcntl.h>
+#endif
 #if HAVE_SIGNAL_H
 #       include <signal.h>
 #elif HAVE_SYS_SIGNAL_H
 #       include <sys/signal.h>
 #else
-#error Could not find signal.h
+#	error Could not find signal.h
 #endif
 #if TIME_WITH_SYS_TIME
 # 	include <sys/time.h>
@@ -48,7 +69,7 @@
 #else
 #	if HAVE_SYS_TIME_H
 #		include <sys/time.h>
-#	else
+#	elif HAVE_TIME_H
 #		include <time.h>
 #	endif
 #endif

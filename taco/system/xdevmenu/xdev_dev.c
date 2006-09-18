@@ -1,26 +1,47 @@
-/****************************************************************************
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File           : xdev_dev.c
+ *
+ * Project        : Xdevmenu application (new generation made by BX)
+ *
+ * Description    : The interface module between TACO and the rest of the appli
+ *
+ * Author         : Faranguiss Poncet
+ *                  $Author: jkrueger1 $
+ *
+ * Original       : February 1997
+ *
+ * Version      : $Revision: 1.2 $
+ *
+ * Date         : $Date: 2006-09-18 21:43:56 $
+ *
+ */
 
- File          :  xdev_dev.c
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
- Project       :  Xdevmenu application (new generation made by BX)
-
- Description   :  The interface module between TACO and the rest of the appli
-
- Author        :  Faranguiss Poncet
-
- Original      :  February 1997
-
- $Revision: 1.1 $				$Author: jkrueger1 $
- $Date: 2003-04-25 12:54:28 $					$State: Exp $
-
- Copyright (c) 1997 by European Synchrotron Radiation Facility,
-		       Grenoble, France
-
-                       All Rights Reserved
-
-****************************************************************************/
-
-#include <time.h>
+#if HAVE_TIME_H
+#	include <time.h>
+#endif
 
 #include <API.h>       /* devserver interface include files */
 #include <asc_api.h>   /* Ascii Dev interface to device server API */
@@ -55,7 +76,7 @@ static char                       local_lapsed_str[501]; /*** 501 chars ***/
 
 
 /****  RCS identification keyword understandable by "what" command ***/
-static char rcsid[] = "@(#)xdevmenu application $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/xdev_dev.c,v 1.1 2003-04-25 12:54:28 jkrueger1 Exp $";
+static char rcsid[] = "@(#)xdevmenu application $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/xdev_dev.c,v 1.2 2006-09-18 21:43:56 jkrueger1 Exp $";
 
 
 /****************************************************************************

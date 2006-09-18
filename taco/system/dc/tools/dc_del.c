@@ -1,11 +1,55 @@
-#include "config.h"
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File         : dc_del.c
+ *
+ * Project      : Data collector
+ *
+ * Description  :
+ *
+ *
+ * Author       :
+ *                $Author: jkrueger1 $
+ *
+ * Original     :
+ *
+ * Version      : $Revision: 1.5 $
+ *
+ * Date         : $Date: 2006-09-18 21:50:15 $
+ *
+ */
+
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <API.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/stat.h>
+#if HAVE_UNISTD_H
+#	include <unistd.h>
+#endif
+#if HAVE_SYS_STAT_H
+#	include <sys/stat.h>
+#endif
 
 void usage(const char *cmd)
 {

@@ -1,29 +1,46 @@
-/********************************************************************
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:          ManagerMain.c
+ *
+ * Project:       Device Servers with sun-rpc
+ *
+ * Description:   Main Programm for a Network Manager running under
+ *            HPUX or SUN or without message server and with a
+ *            dummy database under OS9.
+ *
+ * Author(s):     Jens Meyer
+ *            $Author: jkrueger1 $
+ *
+ * Original:  January 1991
+ *
+ * Version:   $Revision: 1.26 $
+ *
+ * Date:              $Date: 2006-09-18 21:47:02 $
+ *
+ */
 
- File:          ManagerMain.c
+#ifdef HAVE_CONFIG_H
+#     include "config.h"
+#endif
 
- Project:       Device Servers with sun-rpc
-
- Description:   Main Programm for a Network Manager running under
-		HPUX or SUN or without message server and with a
-		dummy database under OS9.
-
- Author(s):     Jens Meyer
- 		$Author: jlpons $
-
- Original: 	January 1991
-
- Version:	$Revision: 1.25 $
-
- Date:		$Date: 2006-09-15 16:44:02 $
-
- Copyright (c) 1990 by  European Synchrotron Radiation Facility,
-			Grenoble, France
-
-			All Rights Reserved
-**********************************************************************/
-
-#include "config.h"
 #include <API.h>
 #include <private/ApiP.h>
 #include <API_xdr_vers3.h>
@@ -33,23 +50,29 @@
 #elif HAVE_SYS_SIGNAL_H
 #	include <sys/signal.h>
 #else
-#error Could not find signal.h
+#	error Could not find signal.h
 #endif
-#include <sys/wait.h>
+#ifdef HAVE_SYS_WAIT_H
+#	include <sys/wait.h>
+#else
+#	error Could not find sys/wait.h
+#endif
 #include <errno.h>
 #include <string.h>
 
 
-#ifdef unix
-#	ifdef HAVE_PATHS_H
-#		include <paths.h>
-#	else
-#		define _PATH_DEVNULL	"/dev/null"
-#	endif
-#	if HAVE_SYS_TYPES_H
+#ifdef HAVE_PATHS_H
+#	include <paths.h>
+#else
+#	define _PATH_DEVNULL	"/dev/null"
+#endif
+#if HAVE_SYS_TYPES_H
 #	include <sys/types.h>
-#	endif
+#endif
+#if HAVE_FCNTL_H
 #	include <fcntl.h>
+#endif
+#if HAVE_UNISTD_H
 #	include <unistd.h>
 #endif
 

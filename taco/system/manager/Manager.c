@@ -1,28 +1,43 @@
-/*********************************************************************
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:          Manager.c
+ * 
+ * Project:       Device Servers with sun-rpc
+ *
+ * Description:   Source code for implementing a Network Manager
+ *
+ * Author(s):     Jens Meyer
+ * 		$Author: jkrueger1 $
+ *
+ * Original:	January 1991
+ *
+ * Version:	$Revision: 1.11 $
+ *
+ * Date:		$Date: 2006-09-18 21:47:02 $
+ *
+ */
 
- File:          Manager.c
-
- Project:       Device Servers with sun-rpc
-
- Description:   Source code for implementing a Network Manager
-
- Author(s):     Jens Meyer
- 		$Author: jkrueger1 $
-
- Original:	January 1991
-
- Version:	$Revision: 1.10 $
-
- Date:		$Date: 2006-04-20 06:33:17 $
-
- Copyright (c) 1990 by  European Synchrotron Radiation Facility,
-			Grenoble, France
-
-			All Rights Reserved
-
-**********************************************************************/
-
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevErrors.h>
@@ -32,7 +47,7 @@
 #elif HAVE_SYS_SIGNAL_H
 #       include <sys/signal.h>
 #else
-#error Could not find signal.h
+#	error Could not find signal.h
 #endif
 
 void 			quit_server ();
