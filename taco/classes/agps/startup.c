@@ -1,57 +1,51 @@
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:        startup.c
+ *
+ * Project:     Device Servers with sun-rpc
+ *
+ * Description:	Startup procedure for AGPowerSupplyClass. The
+ * 		startup procedure is the first procedure called
+ *		from main() when the device server starts up.
+ *		All toplevel devices to be created for the device 
+ *		server should be done in startup(). The startup 
+ *		should make use of the database to determine which 
+ *		devices it should create. Initialisation of devices
+ *		is normally done from startup().
+ *
+ * Author(s):   A. Goetz 
+ *              $Author: jkrueger1 $
+ *
+ * Original:    November 1990
+ *
+ * Version:     $Revision: 1.9 $
+ *
+ * Date:        $Date: 2006/04/20 06:33:17 $
+ */
+
 static char RcsId[] = "$Header: /segfs/dserver/classes/powersupply/ag/src/RCS/startup.c,v 1.12 2003/12/10 20:57:59 goetz Exp $";
 
-/*********************************************************************
-
- File:		startup.c
-
- Project:	Device Servers
-
- Description:	Startup procedure for AGPowerSupplyClass. The
-		startup procedure is the first procedure called
-		from main() when the device server starts up.
-		All toplevel devices to be created for the device 
-		server should be done in startup(). The startup 
-		should make use of the database to determine which 
-		devices it should create. Initialisation of devices
-		is normally done from startup().
-
- Author(s);	A. Goetz 
-
- Original:	November 1990
-
- $Log: startup.c,v $
- Revision 1.12  2003/12/10 20:57:59  goetz
- y
- ls
-
- Revision 1.11  2000/06/22 09:06:49  goetz
- *** empty log message ***
-
- * Revision 1.10  97/12/02  15:26:13  15:26:13  klotz (W.D. Klotz)
- * Win_NT_95_released_NOV_97
- * 
- * Revision 1.5  97/12/02  15:22:01  15:22:01  klotz (W.D. Klotz)
- * Win_NT_95_released_NOV_97
- * 
- * Revision 1.4  97/12/01  16:01:28  16:01:28  goetz (Andy Goetz)
- * *** empty log message ***
- * 
- * Revision 1.3  96/11/27  10:42:05  10:42:05  goetz (Andy Goetz)
- * changed dev_no from int to u_int
- * 
- * Revision 1.2  96/09/17  17:21:57  17:21:57  klotz (W.D. Klotz)
- * WD Klotz: checked NT build
- * 
- * Revision 1.1  95/07/27  17:54:57  17:54:57  goetz (Andy Goetz)
- * Initial revision
- * 
-
- Copyleft (c) 1990 by European Synchrotron Radiation Facility, 
-                      Grenoble, France
-
-
-
- *********************************************************************/
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
 #include <Admin.h>
 #include <API.h>

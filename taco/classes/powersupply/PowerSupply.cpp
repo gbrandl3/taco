@@ -1,26 +1,45 @@
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:	PowerSupply.cpp
+ *
+ * Project:	Device Servers in C++
+ *
+ * Description:	source code file containing the implementation of the
+ *		the powersupply base class for device classes in C++ 
+ *		(PowerSupply)
+ *
+ * Author(s):	Andy Goetz
+ *              $Author: jkrueger1 $
+ *
+ * Original:	April 1995
+ *
+ * Version:     $Revision: 1.3 $
+ *
+ * Date:        $Date: 2006-09-18 22:39:09 $
+ */
 
-//+**********************************************************************
-//
-// File:	PowerSupply.c
-//
-// Project:	Device Servers in C++
-//
-// Description:	source code file containing the implementation of the
-//		the powersupply base class for device classes in C++ 
-//		(PowerSupply)
-//
-// Author(s):	Andy Goetz
-//
-// Original:	April 1995
-//
-// $Revision: 1.2 $
-//
-// $Date: 2003-05-02 09:53:40 $
-//
-// $Author: jkrueger1 $
-//
-//+**********************************************************************
-		
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 #include <cstdlib>
 #include <string>
 #include <cmath>

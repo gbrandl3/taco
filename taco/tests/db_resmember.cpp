@@ -1,3 +1,40 @@
+/*
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 ESRF, www.esrf.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:        db_resmember.cpp
+ *
+ * Description: Code for db_resmember test program
+ *              Command rule : To get the list of all members for a specified domain and family
+ *              Synopsis : db_resmember <domain name> <family name>
+ *
+ * Author(s):
+ *              $Author: jkrueger1 $
+ *
+ * Version:     $Revision: 1.4 $
+ *
+ * Date:        $Date: 2006-09-18 22:34:41 $
+ */
+
+#ifdef HAVE_CONFIG_H
+#       include "config.h"
+#endif
+
 /* TACO include file */
 #include <API.h>
 
@@ -7,16 +44,6 @@
 #include <cctype>
 #include <algorithm>
 
-/****************************************************************************
-*                                                                           
-*    Code for db_resfamily command                                  
-*                        ---------                                          
-*                                                                           
-*    Command rule : To get a resource from the static database.          
-*                                                                           
-*    Synopsis : db_resfamily domain_name family
-*                                                                           
-****************************************************************************/
 int main(int argc, char *argv[])
 {
 	long error;
@@ -34,7 +61,7 @@ int main(int argc, char *argv[])
 	std::string domain(argv[1]);
 	if (domain == "sec")
 	{
-		std::cerr << "db_resdel : SEC is not a authorized domain name" << std::endl;
+		std::cerr << *argv << " : SEC is not a authorized domain name" << std::endl;
 		exit(-1);
 	}
 	std::string family(argv[2]);
@@ -43,7 +70,7 @@ int main(int argc, char *argv[])
 //
 	if (db_import(&error) == -1)
 	{
-		std::cerr << "db_devinfo : Impossible to connect to database server" << std::endl;
+		std::cerr << *argv << " : Impossible to connect to database server" << std::endl;
 		exit(-1);
 	}
 //

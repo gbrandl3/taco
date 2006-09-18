@@ -15,7 +15,7 @@ testbindir=${top_builddir}/tests
 appdefaultdir=@appdefaultdir@
 localstatedir=@localstatedir@
 infodir=@infodir@
-libdir=@libdir@
+libdir=${DESTDIR}@libdir@
 LD_LIBRARY_PATH=@GCC_LIBRARY_PATH@:${libdir}:${LD_LIBRARY_PATH:+:}
 export DSHOME LD_LIBRARY_PATH
 export DBTABLES_CUSTOM=TEST,LONGTEST
@@ -40,6 +40,7 @@ if test $# -gt 0 ; then
 			fi
 			exit 1;;
 		start)
+			DESTDIR=$testbindir/test
 			. $sysconfdir/tacoenv.sh 
 			mkdir -p ${LOGPATH}
 			set_env
@@ -74,6 +75,10 @@ if test $# -gt 0 ; then
 				if { ! rmdir $dc_destdir 2>/dev/null; } ; then
 					tmp=`find $dc_destdir -type f`
 					if test x"$tmp" = x"${infodir}/dir" ;then
+						rm -rf $dc_destdir
+						exit $?
+					fi
+					if test x"$tmp" = x ; then
 						rm -rf $dc_destdir
 						exit $?
 					fi

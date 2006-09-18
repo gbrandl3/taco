@@ -17,21 +17,24 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * File:	db_update.cpp
+ * File:	db_analyze.cpp
  *
  * Description: Read resource and device informations from the file and put 
  *		these into the database.
- *		Synopsis : db_update <file name>
+ *		Synopsis : db_analyze <file name>
  *
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.1 $
+ * Version:     $Revision: 1.2 $
  *
- * Date:        $Date: 2006-09-06 19:04:37 $
+ * Date:        $Date: 2006-09-18 22:34:41 $
  */
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 /* TACO include file */
 #include <API.h>
 
@@ -116,7 +119,7 @@ int main(int argc, char **argv)
 //
 	if (db_import(&error) == DS_NOTOK)
 	{
-		cerr << "db_update : Impossible to connect to database server" << endl;
+		cerr << *argv << " : Impossible to connect to database server" << endl;
 		exit(-1);
 	}
 //

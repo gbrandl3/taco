@@ -1,22 +1,42 @@
-/*********************************************************************
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
  * File:	Inst_verify.c
  *
  * Project:	Device Server Distribution
  *
  * Description:	Dummy class to test control system installations
  *
- * Author(s):	J.Meyer
- *		$Author: jkrueger1 $
+ * Author(s):   Jens Meyer
+ *              $Author: jkrueger1 $
  *
  * Original:	10.5.95
  *
- * Version:	$Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:	$Date
- *
- * Copyright(c) 1994 by European Synchrotron Radiation Facility, 
- *                     Grenoble, France
- *********************************************************************/
+ * Date:        $Date: 2006-09-18 22:38:27 $
+ */
+
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
 #include <API.h>
 #include <DevServer.h>

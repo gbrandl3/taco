@@ -1,3 +1,39 @@
+/*
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 ESRF, www.esrf.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:        test_connect.cpp
+ *
+ * Description: Code for test_connect test program
+ *              Synopsis : test_connect <device name>
+ *
+ * Author(s):
+ *              $Author: jkrueger1 $
+ *
+ * Version:     $Revision: 1.5 $
+ *
+ * Date:        $Date: 2006-09-18 22:34:41 $
+ */
+
+#ifdef HAVE_CONFIG_H
+#       include "config.h"
+#endif
+
 #include <Admin.h>
 #include <API.h>
 #include <DevServer.h>
@@ -33,7 +69,7 @@ int main(int argc,char **argv)
 			cmd_string = argv[1];
 			break;
 		default:
-			std::cerr << "usage: test_connect [device name]" << std::endl;
+			std::cerr << "usage: " << *argv << " [device name]" << std::endl;
 			exit(1);
 	}
 

@@ -1,69 +1,49 @@
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:        PowerSupply.c
+ *
+ * Project:     Device Servers with sun-rpc
+ *
+ * Description:	Source code to implement PowerSupplyClass. This class
+ *		is at present a placeholder for its subclasses. It will
+ *		be used in the future for implementing any common methods
+ *		which could be required for subclasses of the PowerSupply
+ *		Class. At present there are no common methods, powersupplies
+ *		only share a common data structure.
+ *
+ * Author(s):   A. Goetz
+ *              $Author: jkrueger1 $
+ *
+ * Original:    October 1990
+ *
+ * Version:     $Revision: 1.9 $
+ *
+ * Date:        $Date: 2006/04/20 06:33:17 $
+ */
+
 static char RcsId[] = " $Header: /segfs/dserver/dev/classes/powersupply/ag/src/RCS/PowerSupply.c,v 1.1 2003/12/10 20:57:52 goetz Exp $ ";
 
-/*********************************************************************
-
- File:		PowerSupply.c
-
- Project:	Device Servers
-
- Description:	Source code to implement PowerSupplyClass. This class
-		is at present a placeholder for its subclasses. It will
-		be used in the future for implementing any common methods
-		which could be required for subclasses of the PowerSupply
-		Class. At present there are no common methods, powersupplies
-		only share a common data structure.
-		
-
- Author(s);	Andy Goetz
-
- Original:	October 1990
-
- $Log: PowerSupply.c,v $
- Revision 1.1  2003/12/10 20:57:52  goetz
- Initial revision
-
- Revision 1.8  2003/08/20 10:54:35  chaize
- add DevSetTest command
-
- Revision 1.7  2003/08/20 08:33:16  chaize
- cleanup makefile
-
- Revision 1.6  1997/01/08 15:19:30  goetz
- added conditional statements around HWALK() so that it is defined for NT only
-
- * Revision 1.5  96/09/17  17:18:07  17:18:07  klotz (W.D. Klotz)
- * WD Klotz: checked NT build
- * 
- * Revision 1.3  94/01/31  11:27:27  11:27:27  goetz (Andy Goetz)
- * JMC's version - the correct one
- * ,.
- * 
- * Revision 1.2  94/01/26  19:29:28  19:29:28  goetz (Andy Goetz)
- * added resource initialising in the DevMethodInitialise and a method for 
- * comparing the read and set values and return a boolean.
- * 
- * Revision 1.1  94/01/12  16:45:48  16:45:48  goetz (Andy Goetz)
- * Initial revision
- * 
- * Revision 1.1  92/04/01  14:10:45  14:10:45  goetz (Andy Goetz)
- * Initial revision
- * 
- * Revision 1.3  90/11/15  09:51:09  09:51:09  goetz (Andy Goetz)
- * *** empty log message ***
- * 
- * Revision 1.2  90/11/02  15:40:11  15:40:11  goetz (Andy Goetz)
- * object_create, class_initialise, and state_handler now really static
- * 
- * Revision 1.1  90/11/02  11:09:01  11:09:01  goetz (Andy Goetz)
- * Initial revision
- * 
-
- Copyleft (c) 1990 by European Synchrotron Radiation Facility, 
-                      Grenoble, France
-
-
-
- *********************************************************************/
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
 #include <API.h>
 #include <DevServer.h>
