@@ -31,9 +31,9 @@
  *
  * Original:	June 1990
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2005-07-25 13:08:22 $
+ * Date:	$Date: 2006-09-18 22:31:43 $
  *
  ********************************************************************-*/
 
@@ -41,9 +41,9 @@
  * Include files and Static Routine definitions
  */
 
-#ifndef WIN32
-#include "config.h"
-#endif /* WIN32 */
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif 
 #include <errno.h>
 
 #include <API.h>

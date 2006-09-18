@@ -27,19 +27,19 @@
  *
  * Author(s)  :	Andy Goetz
  *		Jens Meyer
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.31 $
+ * Version    :	$Revision: 1.32 $
  *
- * Date	    :	$Date: 2006-02-20 11:20:02 $
+ * Date	    :	$Date: 2006-09-18 22:31:44 $
  *
  ********************************************************************-*/
 
-#ifndef WIN32
-#include "config.h"
-#endif /* WIN32 */
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif 
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevServer.h>
@@ -47,7 +47,6 @@
 #include <DevErrors.h>
 #include <API_xdr_vers3.h>
 
-#ifndef WIN32
 #if HAVE_SIGNAL_H
 #	include <signal.h>
 #elif HAVE_SYS_SIGNAL_H
@@ -55,9 +54,6 @@
 #else
 #error could not find signal.h
 #endif
-#else /* !WIN32 */
-#include <signal.h>
-#endif /* !WIN32 */
 
 #ifndef WIN32
 #if !HAVE_SIGHANDLER_T

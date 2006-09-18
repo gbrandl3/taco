@@ -30,15 +30,15 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.27 $
+ * Version    :	$Revision: 1.28 $
  *
- * Date       : $Date: 2006-04-20 06:40:09 $
+ * Date       : $Date: 2006-09-18 22:31:44 $
  *
  ********************************************************************-*/
 
-#ifndef WIN32
-#include "config.h"
-#endif /* WIN32 */
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif 
 #include <API.h>
 #include <private/ApiP.h>
 #include <API_xdr_vers3.h>
@@ -60,7 +60,6 @@
 #	include <varargs.h>
 #endif
 
-#ifndef WIN32
 #if HAVE_SIGNAL_H
 #	include <signal.h>
 #elif HAVE_SYS_SIGNAL_H
@@ -68,9 +67,6 @@
 #else
 #error could not find signal.h
 #endif
-#else /* !WIN32 */
-#include <signal.h>
-#endif /* !WIN32 */
 
 extern _DLLFunc long 	setup_config_multi(char *nethost, long *error);
 static void 		msg_write(_Int msg_type, char *msg_string);

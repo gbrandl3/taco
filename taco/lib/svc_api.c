@@ -29,14 +29,14 @@
  *
  * Original:	Feb 1994
  *
- * Version:	$Revision: 1.24 $
+ * Version:	$Revision: 1.25 $
  *
- * Date:		$Date: 2006-04-20 06:42:08 $
+ * Date:		$Date: 2006-09-18 22:31:44 $
  *
  ********************************************************************-*/
-#ifndef WIN32
-#include "config.h"
-#endif /* WIN32 */
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif 
 /*
  * Include files and Static Routine definitions
  */

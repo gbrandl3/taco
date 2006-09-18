@@ -31,14 +31,15 @@
  *
  * Original:	June 1991
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:	$Date: 2005-07-25 13:08:22 $
+ * Date:	$Date: 2006-09-18 22:31:43 $
  *
  *******************************************************************-*/
 
-#ifndef WIN32
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #if HAVE_SIGNAL_H
 #	include <signal.h>
 #elif HAVE_SYS_SIGNAL_H
@@ -46,11 +47,8 @@
 #else
 #error could not find signal.h
 #endif
-#else /* !WIN32 */
-#include <signal.h>
-#endif /* !WIN32 */
-
 #include <API.h>
+
 #include <private/ApiP.h>
 #include <DevServer.h>
 #include <DevErrors.h>

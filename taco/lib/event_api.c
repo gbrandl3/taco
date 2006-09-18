@@ -51,15 +51,15 @@
  *
  * Original   :	April 1999
  *
- * Version    :	$Revision: 1.14 $
+ * Version    :	$Revision: 1.15 $
  *
- * Date       :	$Date: 2005-07-25 13:08:28 $
+ * Date       :	$Date: 2006-09-18 22:31:44 $
  *
  ********************************************************************-*/
 
-#ifndef WIN32
-#include "config.h"
-#endif /* WIN32 */
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif 
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevServer.h>

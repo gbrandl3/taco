@@ -29,13 +29,14 @@
  *
  * Original   	: March 1991
  *
- * Version	: $Revision: 1.24 $
+ * Version	: $Revision: 1.25 $
  *
- * Date		: $Date: 2006-08-04 06:55:57 $
+ * Date		: $Date: 2006-09-18 22:31:43 $
  *
  *******************************************************************-*/
-#ifndef WIN32
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #ifdef unix
 #       ifdef HAVE_PATHS_H
 #               include <paths.h>
@@ -48,7 +49,7 @@
 #       include <fcntl.h>
 #       include <unistd.h>
 #endif
-#endif /* WIN32 */
+
 #include <API.h>
 #include <private/ApiP.h>
 #include <Admin.h>

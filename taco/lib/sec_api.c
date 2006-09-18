@@ -29,14 +29,14 @@
  *
  * Original   : December 1993
  *
- * Version    :	$Revision: 1.13 $
+ * Version    :	$Revision: 1.14 $
  *
- * Date       :	$Date: 2006-04-20 06:40:09 $
+ * Date       :	$Date: 2006-09-18 22:31:44 $
  *
  ********************************************************************-*/
-#ifndef WIN32
-#include "config.h"
-#endif /* WIN32 */
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif 
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevServer.h>
