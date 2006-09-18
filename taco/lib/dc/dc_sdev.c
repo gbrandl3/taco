@@ -25,26 +25,28 @@
  * Author(s):	E. Taurel
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2005-07-25 12:55:41 $
+ * Date:	$Date: 2006-09-18 22:13:30 $
  *
  ******************************************************************************/
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <API.h>
-#include <dc.h>
-#include <dcP.h>
+#include "dc.h"
+#include "dcP.h"
 
 #include <DevErrors.h>
 #include <DevCmds.h>
 
 
 #ifdef OSK
-#include <strings.h>
+#	include <strings.h>
 #else
-#include <stdlib.h>
-#include <string.h>
+#	include <stdlib.h>
+#	include <string.h>
 #endif
 
 /* Some variables defined elsewhere */

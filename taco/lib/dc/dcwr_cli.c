@@ -1,196 +1,76 @@
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/dc/dcwr_cli.c,v 1.11 2006-01-22 21:19:46 andy_gotz Exp $";
-
-/* $Log: not supported by cvs2svn $
-/* Revision 1.10  2005/11/13 19:59:36  andy_gotz
-/* reinstated the old esrf version, the sourceforge one had too many bugs
-/*
- * Revision 4.12  2003/01/27 09:53:36  taurel
- * The bug fix in release 4.11 was buggy!! Fix it now(I hope).
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
  *
- * Revision 4.11  2002/11/08 14:26:16  taurel
- * Fix bug in dc_import when DC is splitted on several hosts (multiple free of the same memory block)
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
  *
- * Revision 4.10  2001/06/13  08:21:26  08:21:26  taurel (Emmanuel Taurel)
- * Remove all the dev_printdebug calls for C++ compatibility
- * 
- * Revision 4.9  2000/10/19  09:15:43  09:15:43  taurel (E.Taurel)
- * No change, check out and in for test purpose only
- * 
- * Revision 4.8  99/06/02  12:59:13  12:59:13  taurel (E.Taurel)
- * No change, checked-in only for correct verion number
- * 
- * Revision 4.7  99/06/02  12:44:02  12:44:02  taurel (E.Taurel)
- * Fix bug with DC time for dc_devget_history
- * 
- * Revision 4.6  98/11/10  15:09:38  15:09:38  taurel (E.Taurel)
- * No change in lib. Only add func def. in dc.h include file
- * 
- * Revision 4.5  98/10/20  13:58:12  13:58:12  taurel (E.Taurel)
- * Fix a memory laek in the dc_devgetm function
- * 
- * Revision 4.4  98/09/03  10:41:42  10:41:42  taurel (E.Taurel)
- * Change dc_muli_nethost definition in dchist_cli.c file
- * 
- * Revision 4.3  98/09/02  09:24:05  09:24:05  taurel (E.Taurel)
- * Adapted to any number of nethosts
- * 
- * Revision 4.2  98/08/25  10:05:17  10:05:17  klotz (W.D. Klotz)
- * Version_used_for_NT
- * 
- * Revision 4.1  96/12/31  15:21:35  15:21:35  taurel (E.Taurel)
- * Remove .esrf.fr at the end of nethost before any connection to server
- * 
- * Revision 4.0  96/12/06  11:24:05  11:24:05  taurel (E.Taurel)
- * Multi-nethost release of dc library
- * 
- * Revision 3.19  96/11/25  15:22:15  15:22:15  klotz (W.D. Klotz)
- * untested NT compilation
- * 
- * Revision 3.18  96/06/14  10:48:46  10:48:46  taurel (E.Taurel)
- * Change for release 5 of db software (pseudo devices in dc_open and dc_close)
- * Also added the dc_dinfo call.
- * 
- * Revision 3.17  96/01/05  16:03:12  16:03:12  taurel (Emmanuel TAUREL)
- * Ported to Solaris in compatibility mode
- * 
- * Revision 3.16  95/12/21  16:07:01  16:07:01  taurel (Emmanuel TAUREL)
- * Change include files policy for the ULTRA-C compiler.
- * 
- * Revision 3.15  95/12/15  17:24:53  17:24:53  taurel (Emmanuel TAUREL)
- * Check out for debug purpose. No change.
- * 
- * Revision 3.14  95/10/10  13:55:25  13:55:25  taurel (Emmanuel TAUREL)
- * Return date in the dc_devget_history even if the command has failed.
- * 
- * Revision 3.13  94/05/27  17:05:52  17:05:52  taurel (Emmanuel TAUREL)
- * Forgotten to remove added printf for test purpose !
- * 
- * Revision 3.12  94/05/27  17:01:18  17:01:18  taurel (Emmanuel TAUREL)
- * Fix a bug in the dc_check function.
- * Free the memory allocated by XDR !.
- * .
- * 
- * Revision 3.11  94/02/15  14:27:18  14:27:18  taurel (Emmanuel Taurel)
- * Fix a bug in the dc_devget_history
- * function and in the reconnection (use max_call_rd instead of max_call)
- * 
- * Revision 3.10  94/01/25  13:46:40  13:46:40  taurel (Emmanuel TAUREL)
- * New release with these modif :
- * 
- * - Now, use the new XDR type system
- * - Fix a bug in the dc_devgetv and dc_devgetm function when the dc is not
- *   distributed on several hosts and when some devices are not corretly
- *   dc imported.
- * - Fix another bug in the dc_devget_history for the time returned to the
- *   caller.
- * 
- * Revision 3.9  93/12/02  17:27:42  17:27:42  taurel (Emmanuel Taurel)
- * Check in after minor modifications
- * for compilation without complaints from C compiler on different
- * computer system and hardware.
- * .
- * 
- * Revision 3.8  93/12/02  15:07:33  15:07:33  taurel (Emmanuel Taurel)
- * No change since last ci. This
- * co was just for test.
- * 
- * Revision 3.7  93/12/02  15:00:47  15:00:47  taurel (Emmanuel Taurel)
- * Change in the rpc_connect and 
- * rpc_reconnect functions. Now, before we decide to connect the caller 
- * process to a data collector server, the data collector server is
- * testted to verify if it answers correctly.
- * 
- * Revision 3.6  93/10/06  17:29:39  17:29:39  taurel (Emmanuel Taurel)
- * Modified the dc_info call for the
- * beam line. In the beam line control system, you can't predict the
- * device domain name (in utils_cli.c file).
- * .
- * 
- * Revision 3.5  93/10/06  08:53:58  08:53:58  taurel (Emmanuel Taurel)
- * A bug in the dc_devgetm function.
- * PAss the address of error1 to the rpc_reconnect function instead of 
- * error1 itself.
- * 
- * Revision 3.4  93/09/30  08:52:39  08:52:39  taurel (Emmanuel Taurel)
- * Change for the DS_WARNING feature
- * .
- * 
- * Revision 3.3  93/08/13  08:24:32  08:24:32  taurel (Emmanuel TAUREL)
- * Don't use clnt_control to change timeout with TCP
- * connection. This can be the reason of a server exit id the caller dies 
- * before the server sends the answer.
- * .
- * 
- * Revision 3.2  93/07/30  10:30:14  10:30:14  taurel (Emmanuel Taurel)
- * Fix a bug in the rpc_reconnect_rd function of the
- * dcrd_cli.c file
- * 
- * Revision 3.1  93/06/14  17:30:57  17:30:57  taurel (Emmanuel Taurel)
- * Add a new call to dc library : dc_devget_history
- * 
- * Revision 3.0  93/05/18  16:22:19  16:22:19  taurel (Emmanuel TAUREL)
- * Adapted for SUN release of the dc system (without RTDB).
- * 
- * Revision 2.3  93/04/20  08:37:17  08:37:17  taurel (Emmanuel Taurel)
- * Change in dcrd_cli.c file for the sun C compiler.
- * 
- * Revision 2.2  93/03/11  09:08:06  09:08:06  taurel (Emmanuel Taurel)
- * Check in to update release number to 2.2. Thebug was in the 
- * dcrd_cli.c file.
- * 
- * Revision 2.1  93/03/05  09:49:56  09:49:56  taurel (Emmanuel Taurel)
- * Added the new dc_dataconvert function
- * for pseudo devices.
- * .
- * .
- * 
- * Revision 1.4  93/02/22  14:17:01  14:17:01  taurel (Emmanuel Taurel)
- * Change in the include files. For s300, don't include the netinet/in.h file.
- * This file is included by API.h file and with s300 include files, it is
- * not possible to include it several times !
- * 
- * Revision 1.3  93/02/04  09:15:52  09:15:52  taurel (Emmanuel Taurel)
- * Major change to be able to cope with the distributed release of the
- * data collector.
- * 
- * Revision 1.2  92/10/28  17:29:43  17:29:43  taurel (Emmanuel Taurel)
- * Some modifications due to first real tests.
- * 
- * Revision 1.1  92/08/27  09:02:32  09:02:32  taurel (Emmanuel Taurel)
- * Initial revision
- *  */
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File           : dcwr_cli.c
+ *
+ * Project        : 
+ *
+ * Description    :
+ *
+ * Author         : E. Taurel
+ *                $Author: jkrueger1 $
+ *
+ * Original       : August 1992
+ *
+ * Version      : $Revision: 1.12 $
+ *
+ * Date         : $Date: 2006-09-18 22:13:30 $
+ *
+ */
 
-
-#include <config.h>
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <API.h>
 #include <ApiP.h>
 #include <DevErrors.h>
 #include <db_setup.h>
 
-#include <dc.h>
-#include <dcP.h>
-#include <dc_xdr.h>
+#include "dc.h"
+#include "dcP.h"
+#include "dc_xdr.h"
 
 #ifndef _OSK
-#include <stdlib.h> 
-#include <string.h>
-#include <sys/types.h>
-#ifndef _NT
-#include <sys/socket.h>
-#ifndef __hp9000s300
-#include <netinet/in.h>
-#endif
-#include <netdb.h>
-#endif  /* _NT */
+#	include <stdlib.h> 
+#	include <string.h>
+#	if HAVE_SYS_TYPES_H
+#		include <sys/types.h>
+#	endif
+#	if HAVE_SYS_SOCKET_H
+#		include <sys/socket.h>
+#	endif
+#	if HAVE_NETINET_IN_H
+#		include <netinet/in.h>
+#	endif
+#	if HAVE_NETDB_H
+#		include <netdb.h>
+#	endif  
 #else /* _OSK */
-#ifdef _UCC
-#include <stdlib.h>
-#include <string.h>
-#else
-#include <strings.h>
-#endif /* _UCC */
-#include <inet/socket.h>
-#include <inet/netdb.h>
+#	ifdef _UCC
+#		include <stdlib.h>
+#		include <string.h>
+#	else
+#		include <strings.h>
+#	endif /* _UCC */
+#	include <inet/socket.h>
+#	include <inet/netdb.h>
 #endif /* _OSK */
 
 /* Some global variables */

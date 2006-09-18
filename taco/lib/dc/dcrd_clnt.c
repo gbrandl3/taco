@@ -27,23 +27,27 @@
  * 
  * Original:    1993
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2005-07-25 12:55:41 $
+ * Date:        $Date: 2006-09-18 22:13:30 $
  *
  *****************************************************************************/
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevErrors.h>
 #include <Admin.h>
 
 #ifndef OSK
-#include <time.h>
+#	if HAVE_TIME_H
+#		include <time.h>
+#	endif
 #endif
 
-#include <dc_xdr.h>
+#include "dc_xdr.h"
 
 #ifndef NULL
 #define NULL  0

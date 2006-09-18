@@ -23,15 +23,17 @@
  * Description:
  *
  * Author(s):	E. Taurel
- *		$Author: jensmeyer $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2005-09-27 08:08:16 $
+ * Date:	$Date: 2006-09-18 22:13:30 $
  *
  ****************************************************************************/
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <API.h>
 #include <dc.h>
 #include <dcP.h>
@@ -54,14 +56,18 @@
 #else /* _OSK */
 #	include <stdlib.h>
 #	include <string.h>
-#	ifndef WIN32
+#	if HAVE_SYS_SOCKET_H 
 #		include <sys/socket.h>
-#		ifndef __hp9000s300
-#			include <netinet/in.h>
-#		endif
+#	endif
+#	if HAVE_NETINET_IN_H
+#		include <netinet/in.h>
+#	endif
+#	if HAVE_NETDB_H
 #		include <netdb.h>
+#	endif
+#	if HAVE_UNISTD_H
 #		include <unistd.h>
-#	endif  /* WIN32 */
+#	endif  
 #endif /* _OSK */
 
 /* Some global variables defined elsewhere */

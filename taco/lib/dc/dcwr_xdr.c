@@ -27,15 +27,19 @@
  *
  * Original:    1992
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2005-07-25 12:55:41 $
+ * Date:        $Date: 2006-09-18 22:13:30 $
  *
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 #include <API.h>
-#include <dc.h>
-#include <dcwr_xdr.h>
+#include "dc.h"
+#include "dcwr_xdr.h"
 
 static const unsigned int maxi=(unsigned int)~0;
 

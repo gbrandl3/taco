@@ -27,40 +27,46 @@
  *
  * Original:    1993
  *
- * Version:     $Revision: 1.11 $
+ * Version:     $Revision: 1.12 $
  *
- * Date:        $Date: 2005-12-09 14:23:34 $
+ * Date:        $Date: 2006-09-18 22:13:30 $
  *
  *****************************************************************************/
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevErrors.h>
 
-#include <dc.h>
-#include <dcP.h>
-#include <dc_xdr.h>
+#include "dc.h"
+#include "dcP.h"
+#include "dc_xdr.h"
 
 #ifndef _OSK
-#include <stdlib.h> 
-#include <sys/types.h>
-#ifndef WIN32
-#include <sys/socket.h>
-#ifndef __hp9000s300
-#include <netinet/in.h>
-#endif
-#include <netdb.h>
-#endif  /* WIN32 */
+#	include <stdlib.h> 
+#	if HAVE_SYS_TYPES_H
+#		include <sys/types.h>
+#	endif
+#	if HAVE_SYS_SOCKET_H
+#		include <sys/socket.h>
+#	endif
+#	if HAVE_NETINET_IN_H
+#		include <netinet/in.h>
+#	endif
+#	if HAVE_NETDB_H
+#		include <netdb.h>
+#	endif
 #else /* _OSK */
-#ifdef _UCC
-#include <string.h>
-#include <stdlib.h>
-#else
-#include <strings.h>
-#endif /* _UCC */
-#include <inet/socket.h>
-#include <inet/netdb.h>
+#	ifdef _UCC
+#		include <string.h>
+#		include <stdlib.h>
+#	else
+#		include <strings.h>
+#	endif /* _UCC */
+#	include <inet/socket.h>
+#	include <inet/netdb.h>
 #endif
 
 

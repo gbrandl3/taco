@@ -23,17 +23,19 @@
  * Description:
  *
  * Author(s):	Emmanuel Taurel
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2006-01-22 21:18:25 $
+ * Date:	$Date: 2006-09-18 22:13:30 $
  *
  ******************************************************************************/
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <API.h>
 #include <dc.h>
 #include <dcP.h>
@@ -43,32 +45,33 @@
 
 extern dbserver_info           db_info;
 
-#include <dc_xdr.h>
+#include "dc_xdr.h"
 
 #ifdef _OSK
-
-#ifdef _UCC
-#include <stdlib.h>
-#include <string.h>
-#else
-#include <strings.h>
-#endif
-
-#include <inet/socket.h>
-#include <inet/netdb.h>
+#	ifdef _UCC
+#		include <stdlib.h>
+#		include <string.h>
+#	else
+#		include <strings.h>
+#	endif
+#	include <inet/socket.h>
+#	include <inet/netdb.h>
 #else /* _OSK */
-
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#ifndef WIN32
-#include <sys/socket.h>
-#ifndef __hp9000s300
-#include <netinet/in.h>
-#endif
-#include <netdb.h>
-#include <unistd.h>
-#endif /* WIN32 */
+#	include <stdlib.h>
+#	include <string.h>
+#	include <ctype.h>
+#	if HAVE_SYS_SOCKET_H
+#		include <sys/socket.h>
+#	endif
+#	if HAVE_NETINET_IN_H
+#		include <netinet/in.h>
+#	endif
+#	if HAVE_NETDB_H
+#		include <netdb.h>
+#	endif
+#	if HAVE_UNISTD_H
+#		include <unistd.h>
+#	endif 
 #endif /* _OSK */
 
 /* Some global variables */

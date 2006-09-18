@@ -23,23 +23,25 @@
  * Description:
  * 
  * Author(s):   Emmanuel Taurel
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
  * Original:    1992
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2006-01-22 21:21:43 $
+ * Date:        $Date: 2006-09-18 22:13:30 $
  *
  ******************************************************************************/
 
 
-#include "config.h"
+#if HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevErrors.h>
 #include <Admin.h>
-#include <dc_xdr.h>
+#include "dc_xdr.h"
 
 #ifndef NULL
 #define NULL  (0)
