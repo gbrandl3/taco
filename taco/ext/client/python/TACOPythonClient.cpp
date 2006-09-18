@@ -16,6 +16,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 #include <Python.h>
 #include "TACOClient.h"
 #include "TACOPythonClientConverters.h"
@@ -925,12 +930,12 @@ void initTACOClient(int i)
 		PyDict_SetItemString(d, "__author__", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyString_FromString("$Revision: 1.2 $"))
+	if (tmp = PyString_FromString("$Revision: 1.3 $"))
 	{
 		PyDict_SetItemString(d, "__revision__", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyString_FromString("$Date: 2006-08-01 15:52:52 $"))
+	if (tmp = PyString_FromString("$Date: 2006-09-18 22:35:47 $"))
 	{
 		PyDict_SetItemString(d, "__date__", tmp);
 		Py_DECREF(tmp);
