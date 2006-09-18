@@ -1,23 +1,46 @@
-/* 
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
  * File	: 	db_io_put.c
  *
- * Author(s): 	Denis Beauvois
- * 		Gilbert Pepellin
- * 		Jens Meyer
- *		$Author: jkrueger1 $
- *
- * Original:   	june, 1996
+ * Project:     TACO TCL bindings
  *
  * Description: This file contains the necessary function for putting
  *  		informations in the database of the esrf
  *  		This function is added to the tcl interpreter
  *
- * Version:	$Revision: 1.2 $
+ * Author(s):   Denis Beauvois
+ *              Gilbert Pepellin
+ *              J.Meyer
+ *              $Author: jkrueger1 $
  *
- * Date:	$Date: 2003-05-07 13:19:25 $
+ * Original:    June, 1996
  *
+ * Version:     $Revision: 1.3 $
+ *
+ * Date:        $Date: 2006-09-18 22:04:49 $
  */
- 
+
+#ifdef HAVE_CONFIG_H
+#       include "config.h"
+#endif
 
 /*SUPPRESS763*/
 #include <db_io.h>

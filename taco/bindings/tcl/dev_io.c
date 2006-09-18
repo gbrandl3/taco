@@ -1,13 +1,26 @@
-
-/*
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
  * File : 	dev_io.c
  *
- * Author(s): 	Denis Beauvois, ESRF
- * 		Jens Meyer
- * 		Gilbert Pepellin
- *		$Author: jkrueger1 $
- *
- * Original:    june 1996
+ * Project:     TACO TCL bindings
  *
  * Description: This file contains the c commands for talking to the esrf devices
  * 		from Tcl/Tk.
@@ -31,10 +44,21 @@
  *
  *		In this version only two modes of debug are possible (0=no debug mode 1=debug mode)
  *
- * Version:	$Revision: 1.4 $
+ * Author(s):   Denis Beauvois
+ *              Gilbert Pepellin
+ *              J.Meyer
+ *              $Author: jkrueger1 $
  *
- * Date:	$Date: 2004-07-14 09:35:46 $
+ * Original:    June, 1996
+ *
+ * Version:     $Revision: 1.5 $
+ *
+ * Date:        $Date: 2006-09-18 22:04:49 $
  */
+
+#ifdef HAVE_CONFIG_H
+#       include "config.h"
+#endif
 
 /* Codecenter comments to supress some warnings at load-time */
 /*SUPPRESS569*/ /*The statement cannot be reached in switch() */
