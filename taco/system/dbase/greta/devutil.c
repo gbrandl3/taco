@@ -1,27 +1,47 @@
-/****************************************************************************
-
- File           : devutil.c
-
- Project        : GRETA application
-
- Description    : The module which contains all the utilities used to display
- 		  device server information (device list, device resources..)
-
- Author         : E. Taurel
-		  $Author: jkrueger1 $
-
- Original       : June 1998
-
- Version	: $Revision: 1.4 $
-
- Date		: $Date: 2005-02-24 15:57:59 $
-
-****************************************************************************/
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File           : devutil.c
+ * 
+ * Project        : GRETA application
+ * 
+ * Description    : The module which contains all the utilities used to display
+ * 		  device server information (device list, device resources..)
+ *
+ * Author         : E. Taurel
+ *		  $Author: jkrueger1 $
+ *
+ * Original       : June 1998
+ *
+ * Version	: $Revision: 1.5 $
+ *
+ * Date		: $Date: 2006-09-18 21:59:06 $
+ *
+ */
 
 /*
  * Standard includes for builtins.
  */
-#include "config.h" 
+#ifdef HAVE_CONFIG_H
+#	include "config.h" 
+#endif
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>

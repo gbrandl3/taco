@@ -1,5 +1,44 @@
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File           : greta_misc.c
+ *
+ * Project        : GRETA application
+ *
+ * Description    : 
+ *
+ * Author         : 
+ *                $Author: jkrueger1 $
+ *
+ * Original       : June 1998
+ *
+ * Version      : $Revision: 1.3 $
+ *
+ * Date         : $Date: 2006-09-18 21:59:06 $
+ *
+ */
+
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <greta.h>
-#include "config.h"
 
 /* Some local function */
 
@@ -114,7 +153,7 @@ long devresfile_create(char *file, char *res_text)
   char     message_txt[301];
 
 
-  strcpy(revision_text , "$Revision: 1.2 $");
+  strcpy(revision_text , "$Revision: 1.3 $");
   rev_nb_pointer = strstr(revision_text, ":");
   rev_nb_pointer++;
   nb_chars = strcspn(rev_nb_pointer, "$");
@@ -183,7 +222,7 @@ file_create(char *file, char *res_text)
   char     message_txt[301];
 
 
-  strcpy(revision_text , "$Revision: 1.2 $");
+  strcpy(revision_text , "$Revision: 1.3 $");
   rev_nb_pointer = strstr(revision_text, ":");
   rev_nb_pointer++;
   nb_chars = strcspn(rev_nb_pointer, "$");
