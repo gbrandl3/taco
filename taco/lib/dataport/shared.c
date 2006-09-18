@@ -25,21 +25,30 @@
  * Author(s):	
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 12:54:15 $
+ * Date:	$Date: 2006-09-18 22:18:01 $
  *
  ****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 #include <string.h>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
+#if HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#if HAVE_SYS_IPC_H
+#	include <sys/ipc.h>
+#endif
+#if HAVE_SYS_SHM_H
+#	include <sys/shm.h>
+#endif
 #include <errno.h>
-#include <shared.h>
-#include <boolean.h>
-#include <errno.h>
+#include "shared.h"
+#include "boolean.h"
 
 static int shmid = -1;
 

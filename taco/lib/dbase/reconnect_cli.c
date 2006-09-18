@@ -31,19 +31,19 @@
  *
  * Original   : September 1998
  *  
- * Version    :	$Revision: 1.8 $
+ * Version    :	$Revision: 1.9 $
  *
- * Date	      : $Date: 2005-07-25 13:02:28 $
+ * Date	      : $Date: 2006-09-18 22:15:37 $
  *
  *-*******************************************************************/
-#ifndef WIN32
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
 #endif /* WIN32 */
 #define PORTMAP
 
 #include <macros.h>
-#include <db_setup.h>
-#include <db_xdr.h>
+#include "db_setup.h"
+#include "db_xdr.h"
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevErrors.h>

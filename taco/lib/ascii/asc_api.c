@@ -29,9 +29,9 @@
  *
  * Original:   	November 1996
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2005-07-25 12:51:32 $
+ * Date:	$Date: 2006-09-18 22:18:41 $
  *
  *****************************************************************************/
 
@@ -70,6 +70,10 @@
  * This library uses the TACO type conversion library to do the necessary type
  * conversion to (output data) and from (input data) strings.
  */
+
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <stdlib.h>
 #include <string.h>
 

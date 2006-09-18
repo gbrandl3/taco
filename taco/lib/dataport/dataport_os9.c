@@ -25,18 +25,25 @@
  * Author(s):
  * 		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2005-07-25 12:54:15 $
+ * Date:	$Date: 2006-09-18 22:18:01 $
  *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <signal.h>
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
-#include <dataport.h>
-#include <dataportP.h>
-#include <sema.h>
+#include <stdio.h>
+
+#if HAVE_SIGNAL_H
+#	include <signal.h>
+#endif
+
+#include "dataport.h"
+#include "dataportP.h"
+include "sema.h"
 #include <events.h>
 
 #include <errno.h>

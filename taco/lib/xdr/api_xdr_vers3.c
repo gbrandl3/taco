@@ -31,11 +31,15 @@
  *
  * Original:    November 1994
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2006-09-18 22:07:20 $
  *
  *******************************************************************-*/
+
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
 #include <DevXdrKernel.h>
 #include <API_xdr_vers3.h>

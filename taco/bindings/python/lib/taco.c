@@ -27,12 +27,15 @@
  *
  * Original:    December 99
  * 
- * Date:	$Date: 2006-09-06 18:49:37 $
+ * Date:	$Date: 2006-09-18 22:02:25 $
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  */
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 #include <Python.h>
 
 #include <ctype.h>

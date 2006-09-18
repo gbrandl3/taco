@@ -29,10 +29,14 @@
  *
  * Original:	June 2000
  *
- * Date:	$Date: 2005-07-25 13:33:42 $
+ * Date:	$Date: 2006-09-18 22:02:25 $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  */
+
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
 #include <API.h>
 #include <DevServer.h>

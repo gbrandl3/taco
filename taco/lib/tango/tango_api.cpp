@@ -31,20 +31,22 @@
  *		to talk to TANGO device servers.
  *	
  * Author(s)  :	Andy Goetz
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original   :	December 1999
  *
- * Version    : $Revision: 1.4 $
+ * Version    : $Revision: 1.5 $
  *
- * Date       : $Date: 2005-09-28 16:08:27 $
+ * Date       : $Date: 2006-09-18 22:09:12 $
  *
  ********************************************************************-*/
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/tango_api.cpp,v 1.4 2005-09-28 16:08:27 andy_gotz Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/tango_api.cpp,v 1.5 2006-09-18 22:09:12 jkrueger1 Exp $";
 
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <tango.h>
 #define TANGO_API
-#include "config.h"
 #include <API.h>
 #include <ApiP.h>
 #include <dc.h>

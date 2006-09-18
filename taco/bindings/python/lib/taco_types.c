@@ -22,16 +22,18 @@
  * Description: interface python - taco
  *
  * Author(s):   MCD
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
  * Original:    March 99
  * 
- * Date:	$Date: 2005-12-09 15:09:01 $
+ * Date:	$Date: 2006-09-18 22:02:25 $
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  */
  
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
 #include <Python.h>
 #include <ctype.h>

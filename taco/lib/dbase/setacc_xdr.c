@@ -23,18 +23,22 @@
  * Description:
  *
  * Author(s):     
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  * 
  * Original:      
  *
- * Version:     $Revision: 1.7 $
+ * Version:     $Revision: 1.8 $
  *
- * Date:        $Date: 2006-02-20 11:22:05 $
+ * Date:        $Date: 2006-09-18 22:15:37 $
  *
  ****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 #include <macros.h>
-#include <db_xdr.h>
+#include "db_xdr.h"
 
 #if defined (WIN32) 
 #include <rpc.h>

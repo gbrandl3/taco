@@ -29,15 +29,18 @@
  *
  * Original:    March  1993
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2006-09-18 22:07:20 $
  *
  *******************************************************************-*/
 
 static char RcsId[] =
-"$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/icv101_xdr.c,v 1.3 2005-07-25 13:05:45 jkrueger1 Exp $";
+"$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/icv101_xdr.c,v 1.4 2006-09-18 22:07:20 jkrueger1 Exp $";
 
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include "dev_xdr.h"
 #include "icv101_xdr.h"
 

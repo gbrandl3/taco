@@ -26,50 +26,51 @@
  *              Interface to access static database
  *
  * Author(s)  : Emmanuel Taurel
- *		$Author: jensmeyer $
+ *		$Author: jkrueger1 $
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.1 $
+ * Version    :	$Revision: 1.2 $
  *
- * Date       :	$Date: 2005-08-04 10:39:27 $
+ * Date       :	$Date: 2006-09-18 22:09:12 $
  * 
  *-*******************************************************************/
 using namespace std;
 #include <tango.h>
 
-#ifndef WIN32
-#include "config.h"
-#endif /* WIN32 */
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif 
 #define PORTMAP
 
 #include <macros.h>
 #include <db_setup.h>
 #include <db_xdr.h>
 #include <API.h>
+#include <private/ApiP.h>
 #include <DevErrors.h>
 
 #if defined(WIN32)
-#	include <private/ApiP.h>
 #	include <rpc.h>
 #	if 0
 #		include <nm_rpc.h>
 #	endif
 #else
-#	include <private/ApiP.h>
-#		include <string.h>
-#		if HAVE_SYS_SOCKET_H
-#			include <sys/socket.h>
-#		else
-#			include <socket.h>
-#		endif
-#		if HAVE_NETDB_H
-#			include <netdb.h>
-#		else
-#			include <hostLib.h>
-#			include <taskLib.h>
-#		endif
+#	include <string.h>
+#	if HAVE_SYS_SOCKET_H
+#		include <sys/socket.h>
+#	else
+#		include <socket.h>
+#	endif
+#	if HAVE_NETDB_H
+#		include <netdb.h>
+#	else
+#		include <hostLib.h>
+#		include <taskLib.h>
+#	endif
+#	if HAVE_UNISTD_H
 #		include <unistd.h>
+#	endif
 #endif	/* WIN32 */
 
 #include <math.h>

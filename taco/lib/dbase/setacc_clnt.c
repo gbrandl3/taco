@@ -32,15 +32,19 @@
  *
  * Original   : January 1991
  *
- * Version    : $Revision: 1.3 $
+ * Version    : $Revision: 1.4 $
  *
- * Date       : $Date: 2005-07-25 13:02:28 $
+ * Date       : $Date: 2006-09-18 22:15:37 $
  *
  *-*******************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 #include <macros.h>
-#include <db_setup.h>
-#include <db_xdr.h>
+#include "db_setup.h"
+#include "db_xdr.h"
 
 #if defined(WIN32)
 #include <rpc.h>
@@ -52,7 +56,9 @@
 #include <rpc/rpc.h>
 #endif
 
-#include <time.h>
+#if HAVE_TIME_H
+#	include <time.h>
+#endif
 #include <DevErrors.h>
 
 

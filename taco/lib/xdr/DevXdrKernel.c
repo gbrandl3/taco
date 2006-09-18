@@ -30,12 +30,15 @@
  *
  * Original:	November 1993
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2006-09-18 22:07:20 $
  *
  *******************************************************************-*/
 
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <DevXdrKernel.h>
 #include <Admin.h>
 

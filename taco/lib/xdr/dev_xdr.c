@@ -25,19 +25,20 @@
  * Description: xdr_routines for device server data passing.
  *
  * Author(s):	Jens Meyer
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2005-11-29 13:19:02 $
+ * Date:	$Date: 2006-09-18 22:07:20 $
  *
  *******************************************************************-*/
 
-#ifndef WIN32
-#include "config.h"
-#endif /* WIN32 */
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 #include <dev_xdr.h>
 
 /*

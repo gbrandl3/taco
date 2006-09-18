@@ -25,18 +25,21 @@
  * Description:	
  *	
  * Author(s)  :	Jens Meyer
- * 		$Author: jlpons $
+ * 		$Author: jkrueger1 $
  *
  * Original   :	September2002
  *
- * Version    :	$Revision: 1.7 $
+ * Version    :	$Revision: 1.8 $
  *
- * Date       : $Date: 2006-09-13 16:09:10 $
+ * Date       : $Date: 2006-09-18 22:09:12 $
  *
  *********************************************************************/ 
 
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_access.cpp,v 1.7 2006-09-13 16:09:10 jlpons Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_access.cpp,v 1.8 2006-09-18 22:09:12 jkrueger1 Exp $";
 
+#infdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <attr_api.h>
 
 // copy from tango_api.cpp, because declared as static function

@@ -31,27 +31,27 @@
  * 
  * Original   :   April 1997
  * 
- * Version    :   $Revision: 1.6 $
+ * Version    :   $Revision: 1.7 $
  * 
- * Date       :   $Date: 2005-07-25 13:02:28 $
+ * Date       :   $Date: 2006-09-18 22:15:37 $
  *-*******************************************************************/
 
-#ifndef WIN32
-#include "config.h"
-#endif /* WIN32 */
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif 
 #define PORTMAP
 
 #include <macros.h>
-#include <db_setup.h>
-#include <db_xdr.h>
+#include "db_setup.h"
+#include "db_xdr.h"
 
 #include <API.h>
+#include <private/ApiP.h>
 #include <DevErrors.h>
+
 #if defined(WIN32)
-#	include <private/ApiP.h>
 #	include <rpc.h>
 #else
-#	include <private/ApiP.h>
 #	ifdef _OSK
 #		include <inet/socket.h>
 #		include <inet/netdb.h>

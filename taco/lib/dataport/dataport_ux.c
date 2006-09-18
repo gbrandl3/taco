@@ -25,19 +25,27 @@
  * Author(s):
  *		$Author: jkrueger1 $
  * 
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2005-07-25 12:54:15 $
+ * Date:	$Date: 2006-09-18 22:18:01 $
  *
  ****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 #include <stdio.h>
-#include <dataport.h>
-#include <boolean.h>
-#include <shared.h>
-#include <sema.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
+#include "dataport.h"
+#include "boolean.h"
+#include "shared.h"
+#include "sema.h"
+#if HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#if HAVE_SYS_IPC_H
+#	include <sys/ipc.h>
+#endif
 #include <errno.h>
 #include <macros.h>
 

@@ -30,13 +30,13 @@
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.12 $
+ * Version    :	$Revision: 1.13 $
  *
- * Date       :	$Date: 2005-10-19 11:26:31 $
+ * Date       :	$Date: 2006-09-18 22:15:37 $
  * 
  *-*******************************************************************/
-#ifndef WIN32
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
 #endif /* WIN32 */
 #define PORTMAP
 
@@ -44,16 +44,15 @@
 #include <db_setup.h>
 #include <db_xdr.h>
 #include <API.h>
+#include <private/ApiP.h>
 #include <DevErrors.h>
 
 #if defined(WIN32)
-#	include <private/ApiP.h>
 #	include <rpc.h>
 #	if 0
 #		include <nm_rpc.h>
 #	endif
 #else
-#	include <private/ApiP.h>
 #	ifdef _OSK
 #		include <inet/socket.h>
 #		include <inet/netdb.h>

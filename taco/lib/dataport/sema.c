@@ -23,19 +23,29 @@
  * Description:
  *
  * Author(s):
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-01-22 21:14:20 $
+ * Date:	$Date: 2006-09-18 22:18:01 $
  *
  ******************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 #include <string.h>
 #include <stdio.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/sem.h>
+#if HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#if HAVE_SYS_IPC_H
+#	include <sys/ipc.h>
+#endif
+#if HAVE_SYS_SEM_H
+#	include <sys/sem.h>
+#endif
 #include <errno.h>
 #include "sema.h"
 #include "boolean.h"
