@@ -351,9 +351,9 @@ AC_DEFUN([X_AND_MOTIF],
 	CPPFLAGS="$CPPFLAGS $MOTIF_INCLUDES"
 	LIBS_SAVE="$LIBS"
 dnl	X_CFLAGS="$CPPFLAGS"
-	X_LDFLAGS="$LIBS $X_LDFLAGS $MOTIF_LIBS $X_LIBS"
+dnl	X_LDFLAGS="$LIBS $X_LDFLAGS $MOTIF_LIBS $X_LIBS"
 	AC_CHECK_HEADERS([Xm/Xm.h Xm/XmAll.h], [
-		AC_CHECK_LIB(Xm, XmStringCreateLocalized, [], [motif_found=no], [$X_LDFLAGS -lXt -lX11 -lSM -lICE])
+		AC_CHECK_LIB(Xm, XmStringCreateLocalized, [], [motif_found=no], [$X_LIBS -lXt -lX11 -lSM -lICE])
 		break;
 	], [motif_found=no])
 	CPPFLAGS="$CPPFLAGS_SAVE"
@@ -455,8 +455,8 @@ AC_DEFUN([TACO_DATAPORT_SRC],
 		[DATAPORT="yes"])
 	if test "x$DATAPORT" = "xyes" ; then
 		case "$target" in
-			ia64-*-linux-* | \
-			x86_64-*-linux-* | \
+			ia64-*-linux* | \
+			x86_64-*-linux* | \
         		i[[3456]]86-*-linux-* |\
         		i[[3456]]86-*-linux |\
 			i[[3456]]86-*-cygwin*|\
@@ -529,7 +529,7 @@ AC_SEARCH_LIBS(pthread_create, [pthread c_r nsl])
 if test $ac_cv_search_pthread_create != "none required" ; then
 	PTHREAD_LIBS="$ac_cv_search_pthread_create"
 fi
-AC_SEARCH_LIBS(pthread_mutex_unlock, [], [], [$PTHREAD_LIBS])
+AC_SEARCH_LIBS(pthread_mutex_unlock, [$PTHREAD_LIBS])
 AC_SUBST([PTHREAD_LIBS])
 AC_RUN_IFELSE(
 	AC_LANG_PROGRAM([
