@@ -18,7 +18,7 @@ dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_INIT([TACO], [3.95.3], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.83 $)dnl
+AC_REVISION($Revision: 1.84 $)dnl
 AC_COPYRIGHT([(C) 1990-2006 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -164,11 +164,11 @@ AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_HEADER_TIME
 AC_HEADER_STAT
-AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h sys/types.h]) 
+AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h sys/types.h sys/sem.h sys/shm.h]) 
 AC_CHECK_HEADERS([pthread.h fcntl.h malloc.h memory.h netdb.h stddef.h stdlib.h string.h strings.h sys/file.h sys/ioctl.h termios.h unistd.h sys/filio.h paths.h siggen.h])
 AC_CHECK_HEADERS([varargs.h stdarg.h])
 AC_CHECK_HEADERS([svc.h rpc/svc.h rpc/pmap_prot.h rpc/pmap_prot.h])
-AC_CHECK_HEADERS([signal.h sys/signal.h sys/param.h])
+AC_CHECK_HEADERS([signal.h sys/signal.h sys/param.h sys/resource.h])
 AC_TYPE_SIGNAL
 AC_CHECK_DECLS([signal], [], [],
 [
@@ -521,7 +521,7 @@ build:
 	server API:		${taco_server_libs}
 	dataport API:		${DATAPORT}
 	data collector API:	${taco_dc}
-	TANGO poller :		${tango_poller}
+	TANGO poller:		${tango_poller}
 	ASCII API:		${taco_ascii}
 	bindings:
 		python :	${taco_python_binding}
