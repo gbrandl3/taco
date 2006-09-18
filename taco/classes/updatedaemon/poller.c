@@ -1,20 +1,61 @@
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/poller.c,v 1.2 2005-11-06 06:41:17 andy_gotz Exp $";
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:        poller.c
+ *
+ * Project:     Device Servers 
+ *
+ * Description: 
+ *
+ * Author(s):   
+ *              $Author: jkrueger1 $
+ *
+ * Original:    
+ *
+ * Version:     $Revision: 1.3 $
+ *
+ * Date:        $Date: 2006-09-18 22:41:09 $
+ */
 
-#ifndef _OSK
-#include <sys/types.h>
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/poller.c,v 1.3 2006-09-18 22:41:09 jkrueger1 Exp $";
+
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
+#ifdef HAVE_SYS_TYPES_H
+#	include <sys/types.h>
 #endif
 
 #include <dataport.h>
 
-#ifndef _OSK
-#include <time.h>
+#if HAVE_TIME_H
+#	include <time.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+#if HAVE_UNISTD_H
+#	include <unistd.h>
 #endif
 /* #include <strings.h> */
 
-#include <config.h>
 #include <API.h>
 #include <DevServer.h> 
 #include <DevErrors.h>
@@ -643,12 +684,7 @@ long store_command(char *command_name,int command_type,
 
 
 /****************************************************************************/
-#if (OSK || _OSK)
-long initialise_ipc(int pid)
-#else
 long initialise_ipc(pid_t pid)
-#endif
-
 {
   long error;
 
@@ -656,7 +692,7 @@ long initialise_ipc(pid_t pid)
   fprintf(stderr,"initialise_ipc()\n");
 #endif
 
-  Make_Dataport_Name (dataport_name,(char *)DAEMON_DATAPORT,pid);
+  Make_Dataport_Name (dataport_name, sizeof(dataport_name) - 1, (char *)DAEMON_DATAPORT,pid);
 
   dp=OpenDataport (dataport_name,sizeof(dataport_struct_type));
   if (dp==NULL)
@@ -2814,11 +2850,7 @@ int main(int argc,char *argv[])
 #endif
 #endif /* _solaris */
   	struct timeval pause;
-#if (OSK || _OSK)
-  	int proc_pid;
-#else
   	pid_t proc_pid;
-#endif
   	long pid,i;
 
 /* Close all the open file gotten from the ud_daemon which is a server.
@@ -2891,11 +2923,7 @@ int main(int argc,char *argv[])
   	}
   	sscanf (argv[1],"%ld",&pid);
 
-#if (OSK || _OSK)
-  	proc_pid = (int) pid;
-#else
   	proc_pid = (pid_t) pid;
-#endif
 
   	status = initialise_ipc(proc_pid);
   	if (status!=DS_OK)

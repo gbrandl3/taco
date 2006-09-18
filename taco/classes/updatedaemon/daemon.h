@@ -1,104 +1,41 @@
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:        daemon.h
+ *
+ * Project:     Device Servers
+ *
+ * Description: include file for the update daemon programs 
+ *
+ * Author(s);   Michael Schofield
+ *              $Author: jkrueger1 $
+ *
+ * Original:    September 1992
+ *
+ * Version:     $Revision: 1.9 $
+ *
+ * Date:        $Date: 2006/04/20 06:33:17 $
+ */
 
-/*********************************************************************
-
- File:          daemon.h
-
- Project:       Device Servers
-
- Description:   include file for the update daemon programs 
-
- Author(s);     Michael Schofield
-
- Original:      September 1992
-
- $Log: daemon.h,v $
- Revision 4.19  2005/01/24 08:12:18  taurel
- Fix some compile time error in order to compile poller on Linux with CPP compiler.
-
- Revision 4.18  2004/01/15 11:40:56  taurel
- With Linux, the select call may change the timeout struc. Re-set it before any select call.
-
- Revision 4.17  2003/12/11 16:39:03  taurel
- POrted
-
- * Revision 4.16  2002/07/04  08:58:07  08:58:07  taurel (Emmanuel Taurel)
- * Added TACO_PATH env. variable to find poller path
- * 
- Revision 4.15  2001/05/11 17:13:52  taurel
- No change, check out only for debug purpose
-
- * Revision 4.14  2000/10/17  17:01:03  17:01:03  taurel (E.Taurel)
- * Remove some fancy printf
- * 
- * Revision 4.13  2000/10/17  15:47:34  15:47:34  goetz (Andy Goetz)
- * daemon renamed ud_daemon for Linux port
- * 
- * Revision 4.12  2000/06/15  10:36:19  10:36:19  taurel (Emmanuel Taurel)
- * The
- * 
- * Revision 4.11  99/02/25  15:59:55  15:59:55  taurel (Emmanuel TAUREL)
- * change algo. used for the signal_valid data in order to spped up data exchange between daemon and poller.
- * 
- * Revision 4.10  99/02/04  13:23:46  13:23:46  taurel (Emmanuel Taurel)
- * Add closing open file in poller startup and remove check before sending signal to poller
- * 
- * Revision 4.9  99/01/13  14:24:23  14:24:23  taurel (E.Taurel)
- * Fix bug in datac.c when the open_dc function called by the store_data function
- * 
- * Revision 4.8  96/12/04  11:32:55  11:32:55  taurel (E.Taurel)
- * Added a printf to print the number of devices
- * retrived from db with the ud_poll_list resource.
- * 
- * Revision 4.7  96/03/11  10:43:16  10:43:16  taurel (E.Taurel)
- * No change, co just for test.
- * 
- * Revision 4.6  96/02/27  15:51:03  15:51:03  taurel (Emmanuel TAUREL)
- * Ported to Solaris.
- * 
- * Revision 4.5  95/03/20  10:43:13  10:43:13  taurel (Emmanuel TAUREL)
- * Change variable name from errno to dev_errno for
- * device server error.
- * 
- * Revision 4.4  95/01/12  16:02:12  16:02:12  taurel (Emmanuel TAUREL)
- * Nothing change. co and ci jutest purpose.
- * 
- * Revision 4.3  95/01/11  15:17:42  15:17:42  taurel (Emmanuel TAUREL)
- * Remove some printf
- * 
- * Revision 4.2  95/01/11  15:14:40  15:14:40  taurel (Emmanuel TAUREL)
- * Change dataport name
- * 
- * Revision 4.1  95/01/03  17:30:34  17:30:34  taurel (Emmanuel TAUREL)
- * Ported to OS-9 ULTRA-C. Also fix two bugs for OS-9 :
- *   - Now time spent in command execution is correct
- *   - Correctly removed the dataport when the daemon is correctly killed.
- * 
- * Revision 4.0  94/10/17  14:56:00  14:56:00  taurel (Emmanuel TAUREL)
- * First
- * 
- * Revision 3.4  94/06/28  18:49:49  18:49:49  servant (Florence Servant)
- * *** empty log message ***
- * 
- * Revision 3.3  93/12/03  09:09:32  09:09:32  taurel (Emmanuel TAUREL)
- * Change
- * 
- * Revision 3.2  93/09/28  09:41:15  09:41:15  taurel (Emmanuel TAUREL)
- * Modified for the new API release (3.25) so, don't use the
- * DevCmdNameList array anymore in the poller. The poller has also been
- * modified for the DS_WARNING system.
- * 
- * Revision 1.2  93/02/03  15:00:26  15:00:26  schofiel (Michael Schofield)
- * Precautionary checkin
- * 
- * Revision 1.1  92/10/09  09:23:37  09:23:37  schofiel (Michael Schofield)
- * Initial revision
- * 
-
- Copyleft (c) 1992 by European Synchrotron Radiation Facility,
-                      Grenoble, France
-
-
- *********************************************************************/
+#ifndef DAEMON_H
+#define DAEMON_H
 
 #include <DevServer.h>
 
@@ -247,8 +184,9 @@ void print_devdata();
 long open_dc (daemon_device_struct_type *,long *);
 
 #ifdef _OSK
-void Make_Dataport_Name (char *,char *,int);
-#else
-void Make_Dataport_Name (char *,char *,pid_t);
+#define pid_t int
 #endif
 
+void Make_Dataport_Name (char *, size_t, char *,pid_t);
+
+#endif

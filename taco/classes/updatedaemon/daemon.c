@@ -1,22 +1,41 @@
-static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon.c,v 1.3 2006-04-18 06:25:59 jkrueger1 Exp $";
+/******************************************************************************
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+ *                            Grenoble, France
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:        daemon.c
+ *
+ * Project:     Device Servers
+ *
+ * Description: source code to implement DaemonClass
+ *
+ * Author(s):   Michael Schofield
+ *              $Author: jkrueger1 $
+ *
+ * Original:    April 1992
+ *
+ * Version:     $Revision: 1.4 $
+ *
+ * Date:        $Date: 2006-09-18 22:41:09 $
+ */
 
-/*********************************************************************
+static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon.c,v 1.4 2006-09-18 22:41:09 jkrueger1 Exp $";
 
- File:		daemon.c
-
- Project:	Device Servers
-
- Description:	source code to implement DaemonClass
-
- Author(s);	Michael Schofield
-
- Original:	April 1992
-
- Copyleft (c) 1992 by European Synchrotron Radiation Facility, 
-                      Grenoble, France
-
-
- *********************************************************************/
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
 #endif
@@ -209,13 +228,9 @@ int retkill;
      fprintf(stderr,"SEND A SIGINT SIGNAL : %d\n",SIGINT);
 #endif
 
-printf ("UD_DAEMON is going to kill UD_POLLER (signal handler)\n");fflush(stdout);
+     printf ("UD_DAEMON is going to kill UD_POLLER (signal handler)\n");fflush(stdout);
 /* OSD */
-#if (OSK || _OSK)
-     retkill = kill ((int)(dipc->poller_id),SIGINT);    /* Stop poller */
-#else
      retkill = kill ((pid_t)(dipc->poller_id),SIGINT);    /* Stop poller */
-#endif
 
 #if defined (EBUG)
      fprintf (stderr, "retkill = %d\n",retkill);
@@ -250,20 +265,13 @@ printf ("UD_DAEMON is going to kill UD_POLLER (signal handler)\n");fflush(stdout
                DS_NOTOK - otherwise
 
 *************************************************************************/
-long initialise_ipc(pid)
-
-#if (OSK || _OSK)
-int pid;
-#else
-pid_t pid;
-#endif
-
+long initialise_ipc(pid_t pid)
 {
 #if defined(EBUG)
   fprintf(stderr,"initialise_ipc()\n");
 #endif
 
-  Make_Dataport_Name (dataport_name,DAEMON_DATAPORT,pid);
+  Make_Dataport_Name (dataport_name, sizeof(dataport_name) - 1, DAEMON_DATAPORT, pid);
 
   dp=OpenDataport (dataport_name,sizeof(dataport_struct_type));
   if (dp==NULL)
@@ -392,11 +400,7 @@ long let_go_dp()
   	if (dipc->signal_valid==TRUE)
   	{
 /* OSD */
-#if (OSK || _OSK)
-    		kill ((int)(dipc->poller_id), SIGUSR1); 
-#else
     		kill ((pid_t)(dipc->poller_id), SIGUSR1);
-#endif
 /*   		dipc->signal_valid=FALSE;*/
   	}
 
@@ -584,12 +588,10 @@ long *error;
    char pn[60],sn[60],s[60];
    char *pers_name,*svr_name,*svr;
    char *pol_name[3]; 
-   int proc_pid, fork_pid;
    extern int os9forkc();
    extern char **_environ;
-#else
-   pid_t proc_pid, fork_pid;
 #endif
+   pid_t proc_pid, fork_pid;
 
    static char pid_string[10];
    char *path_res,*name_res;
@@ -1598,11 +1600,7 @@ long *error;
    long res3_size = sizeof(res3) / sizeof(db_resource);
    long resource1_size = sizeof(resource1) / sizeof(db_resource);
    long resource2_size = sizeof(resource2) / sizeof(db_resource);
-#ifdef unix  
    pid_t pid;
-#else
-   int pid;
-#endif
 
    /*********************************************************/
    /**   retrieve the resource file name                   **/
