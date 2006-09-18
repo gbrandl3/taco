@@ -1,3 +1,18 @@
+2006-09-18 23:30 jkrueger1:
+	* tests: add the copyright to all test commands
+	* bindings/python bindings/tcl classes/agps classes/instverify
+	classes/powersupply classes/serialline classes/signal/multiple 
+	classes/signal/single classes/updatedaemon system/dbase/greta
+	system/dc/library system/dc/server system/dc/tools system/manager
+	system/msg system/starter system/xdevmenu: 
+	include the config.h file, add the copyright 
+	* ext: include the config.h file
+	* system/alarm system/dbase/tools/_count.h: add the copyright
+	* AUTHORS: add some developers
+	* m4/taco.m4: Add the x86_64 architecture
+	* acinclude.m4: Add the x86_64 architecture, fix a problem with the
+	detection of the correct pthread installation
+	* configure.ac: add the detection of sys/sem.h sys/shm.h sys/resource.h
 2006-09-06 17:15 jkrueger1:
         * tests: add a test for the resource parser 'db_analyze_data' function
         * lib/dbase/util_cli.c: Rewrite the resource parser
