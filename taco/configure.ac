@@ -18,14 +18,14 @@ dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_INIT([TACO], [3.95.3], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.84 $)dnl
+AC_REVISION($Revision: 1.85 $)dnl
 AC_COPYRIGHT([(C) 1990-2006 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
 
 TACO_INIT
 
-AC_SUBST(LIB_VERSION, [11:9:0])
+AC_SUBST(LIB_VERSION, [11:10:0])
 
 AM_INIT_AUTOMAKE([dist-bzip2 1.7])
 
@@ -385,6 +385,7 @@ TACO_ALARM
 TACO_MANAGER
 TACO_DATABASE_SERVER
 TACO_CLIENT_TCP
+TACO_FRM_EXT
 
 AC_CONFIG_SUBDIRS(gdbm)
 
@@ -528,6 +529,7 @@ build:
 		TCL:		${taco_tcl_binding}
 
 	TANGO support:		${taco_tango}
+	FRM extensions :	${taco_frm_ext}
 
 install:
 	Fast install:           ${enable_fast_install}
