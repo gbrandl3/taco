@@ -25,21 +25,21 @@
  * Description:	
  *	
  * Author(s)  :	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original   :	September 2002
  *
- * Version    : $Revision: 1.4 $
+ * Version    : $Revision: 1.5 $
  *
- * Date       : $Date: 2006-09-18 22:09:12 $
+ * Date       : $Date: 2006-09-19 09:31:24 $
  *
  *********************************************************************/ 
 
-#infdef HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 #	include "config.h"
 #endif
 #include <attr_api.h>
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_api.cpp,v 1.4 2006-09-18 22:09:12 jkrueger1 Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_api.cpp,v 1.5 2006-09-19 09:31:24 andy_gotz Exp $";
 
 /**
  * Hook to TACO dev_import().
