@@ -18,7 +18,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * File:        $File$
+ * File:        $RCSfile: _count.h,v $
  *
  * Project:     Device Servers with sun-rpc
  *
@@ -29,13 +29,12 @@
  *
  * Original:    January 2003
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2006-09-18 21:45:36 $
+ * Date:        $Date: 2006-09-19 08:44:28 $
  *
  *****************************************************************************/
-/*
- */
+
 #ifdef _solaris
 namespace _sol {
         template <class Iterator, class T>

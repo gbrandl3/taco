@@ -18,16 +18,16 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * File:
+ * File:	$RCSfile: _count.h,v $
  *
  * Description: to fix broken std::count() on Solaris CC
  *
  * Author(s):	Andy Goetz
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2006-09-18 22:00:11 $
+ * Date:        $Date: 2006-09-19 08:48:31 $
  *
  */
 

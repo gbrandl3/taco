@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * File:        $File$
+ * File:        $RCSfile: starter.cpp,v $
  *
  * Project:     Device Servers with sun-rpc
  *
@@ -26,11 +26,11 @@
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2006-09-18 21:45:36 $
+ * Date:	$Date: 2006-09-19 08:45:02 $
  *
- *****************************************************************************/
+ */
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
