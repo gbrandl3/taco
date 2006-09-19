@@ -757,3 +757,14 @@ AC_DEFUN([TACO_CLIENT_TCP],
         AM_CONDITIONAL(CLIENT_TCP, test "x$taco_client_tcp" = "xyes")
 ])
 
+AC_DEFUN([TACO_FRM_EXT],
+[
+        AC_ARG_ENABLE(frm_ext, AC_HELP_STRING([--enable_frm_ext], [build the FRM extensions libraries servers @<:@default=no@:>@]),
+                [case "${enable_frm_ext}" in
+                        yes)    taco_frm_ext=yes;;
+                        no)     taco_frm_ext=no;;
+                        *)      AC_MSG_ERROR([bad value ${enable_frm_ext} for --enable_frm_ext]);;
+                esac], [taco_frm_ext=no])
+        AM_CONDITIONAL(FRM_EXT, [test x"${taco_frm_ext}" = x"yes"])
+])
+
