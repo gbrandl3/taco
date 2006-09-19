@@ -72,7 +72,7 @@ int main(argc, argv)
     extern int optind;
     extern char *optarg;
 
-    while ((c = getopt(argc, argv, "hn:")) != EOF)
+    while ((c = getopt(argc, argv, "hn:")) != -1)
         switch(c)
         {
             case 'n' :
