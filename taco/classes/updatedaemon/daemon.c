@@ -25,16 +25,16 @@
  * Description: source code to implement DaemonClass
  *
  * Author(s):   Michael Schofield
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
  * Original:    April 1992
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2006-09-18 22:41:09 $
+ * Date:        $Date: 2006-09-19 09:29:39 $
  */
 
-static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon.c,v 1.4 2006-09-18 22:41:09 jkrueger1 Exp $";
+static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon.c,v 1.5 2006-09-19 09:29:39 andy_gotz Exp $";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -62,16 +62,16 @@ static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/u
  * public methods
  */
 
-static long class_initialise();
-static long object_create();
-static long state_handler();
-static long object_initialise();
+static long class_initialise(long *error);
+static long object_create(char *name, DevServer *ds_ptr, long *error);
+static long state_handler(Daemon ds, DevCommand cmd, long *error);
+static long object_initialise(DevServer ds,long *error);
 
 static DevMethodListEntry methods_list[] = {
- {DevMethodClassInitialise, class_initialise},
- {DevMethodCreate, object_create},
- {DevMethodInitialise, object_initialise},
- {DevMethodStateHandler, state_handler},
+ {DevMethodClassInitialise, (DevMethodFunction)class_initialise},
+ {DevMethodCreate, (DevMethodFunction)object_create},
+ {DevMethodInitialise, (DevMethodFunction)object_initialise},
+ {DevMethodStateHandler, (DevMethodFunction)state_handler},
 };
 
 DaemonClassRec daemonClassRec = {
@@ -119,57 +119,56 @@ static db_resource res_class[] = {
 static  int res_class_size = sizeof(res_class)/sizeof(db_resource);
 
 static char* polres_name[] = {
-			        "ud_poll_list",
+			        (char*)"ud_poll_list",
                               };
 
 static char* devres[] = {
-			   "ud_command_list",
-			   "ud_poll_interval",
+			   (char*)"ud_command_list",
+			   (char*)"ud_poll_interval",
                          };
 
 /*
  * public commands
  */
 
-static long dev_off();  
-static long dev_on();   
-static long dev_state();
-static long dev_getdeviceident();
-static long dev_getdevicename();
-static long dev_initialisecmd();
-static long dev_initialisedev();
-static long dev_startpolling();
-static long dev_stoppolling();
-static long dev_changeinterval();
-static long dev_definemode();
-static long dev_pstatus();
-static long dev_dastatus();
-static long dev_longstatus();
-static long dev_haltsystem();
-static long dev_saveconfi();
-static long dev_removedevice();
-static long dev_poll_list_uptodate();
-static long dev_status();
+static long dev_off (Daemon ds, void *argin, void *argout, long *error);  
+static long dev_on (Daemon ds, DevVoid *argin, DevVoid *argout, long *error);
+static long dev_state (Daemon ds, DevVoid *argin, DevShort *argout, long *error);
+static long dev_getdeviceident (Daemon ds, DevString *argin, DevLong *argout, long *error);
+static long dev_getdevicename (Daemon ds, DevLong *argin, DevString *argout, long *error);
+static long dev_initialisecmd (Daemon ds, struct DevDaemonStruct *argin, DevLong *argout, long *error);
+static long dev_initialisedev (Daemon ds, struct DevDaemonStruct *argin, DevLong *argout, DevBoolean db_update, long *error);
+static long dev_startpolling (Daemon ds, DevLong *argin, DevVoid *argout, long *error);
+static long dev_stoppolling (Daemon ds, DevLong *argin, DevVoid *argout, long *error);
+static long dev_changeinterval(Daemon ds, DevDaemonData *argin, DevVoid *argout, long *error);
+static long dev_definemode(Daemon ds, DevDaemonData *argin, DevVoid *argout, long *error);
+static long dev_pstatus(Daemon ds, DevLong *argin, DevDaemonStatus *argout, long *error);
+static long dev_dastatus(Daemon ds, DevLong *argin, DevDaemonStatus *argout, long *error);
+static long dev_longstatus (Daemon ds,DevVoid *argin, DevString *argout,long *error);
+static long dev_saveconfi(Daemon ds, DevVoid *argin, DevVoid *argout, long *error);
+static long dev_removedevice(Daemon ds, DevLong *argin, DevVoid *argout, long *error);
+static long dev_poll_list_uptodate(Daemon ds,char *argin,long *error);
+static long dev_status (Daemon ds, DevVoid *argin, DevString *argout, long *error);
 
 void check_timestamp();
 
 static DevCommandListEntry commands_list[] = {
 /* {DevOff,                dev_off,            D_VOID_TYPE,   D_VOID_TYPE}, */
 /* {DevOn,                 dev_on,             D_VOID_TYPE,   D_VOID_TYPE}, */
- {DevState,              dev_state,          D_VOID_TYPE,   D_SHORT_TYPE},
- {DevGetDeviceIdent,     dev_getdeviceident, D_STRING_TYPE, D_LONG_TYPE},
- {DevGetDeviceName,      dev_getdevicename,  D_LONG_TYPE,   D_STRING_TYPE},
- {DevInitialiseDevice,   dev_initialisecmd,  D_DAEMON_STRUCT, D_LONG_TYPE},
- {DevStartPolling,       dev_startpolling,   D_LONG_TYPE,   D_VOID_TYPE},
- {DevStopPolling,        dev_stoppolling,    D_LONG_TYPE,   D_VOID_TYPE},
- {DevChangeInterval,     dev_changeinterval, D_DAEMON_DATA, D_VOID_TYPE},
- {DevLongStatus,         dev_longstatus,     D_VOID_TYPE,   D_STRING_TYPE},
- {DevDefineMode,         dev_definemode,     D_DAEMON_DATA, D_VOID_TYPE},
- {DevPollStatus,         dev_pstatus,        D_LONG_TYPE,   D_DAEMON_STATUS},
- {DevAccessStatus,       dev_dastatus,       D_LONG_TYPE,   D_DAEMON_STATUS},
- {DevSaveConfi,      	 dev_saveconfi,      D_VOID_TYPE,   D_VOID_TYPE},
- {DevRemoveDevice,	 dev_removedevice,   D_LONG_TYPE,   D_VOID_TYPE},
- {DevStatus,             dev_status,         D_VOID_TYPE,   D_STRING_TYPE}, 
+ {DevState,              (DevCommandFunction)dev_state,          D_VOID_TYPE,   D_SHORT_TYPE},
+ {DevGetDeviceIdent,     (DevCommandFunction)dev_getdeviceident, D_STRING_TYPE, D_LONG_TYPE},
+ {DevGetDeviceName,      (DevCommandFunction)dev_getdevicename,  D_LONG_TYPE,   D_STRING_TYPE},
+ {DevInitialiseDevice,   (DevCommandFunction)dev_initialisecmd,  D_DAEMON_STRUCT, D_LONG_TYPE},
+ {DevStartPolling,       (DevCommandFunction)dev_startpolling,   D_LONG_TYPE,   D_VOID_TYPE},
+ {DevStopPolling,        (DevCommandFunction)dev_stoppolling,    D_LONG_TYPE,   D_VOID_TYPE},
+ {DevChangeInterval,     (DevCommandFunction)dev_changeinterval, D_DAEMON_DATA, D_VOID_TYPE},
+ {DevLongStatus,         (DevCommandFunction)dev_longstatus,     D_VOID_TYPE,   D_STRING_TYPE},
+ {DevDefineMode,         (DevCommandFunction)dev_definemode,     D_DAEMON_DATA, D_VOID_TYPE},
+ {DevPollStatus,         (DevCommandFunction)dev_pstatus,        D_LONG_TYPE,   D_DAEMON_STATUS},
+ {DevAccessStatus,       (DevCommandFunction)dev_dastatus,       D_LONG_TYPE,   D_DAEMON_STATUS},
+ {DevSaveConfi,      	 (DevCommandFunction)dev_saveconfi,      D_VOID_TYPE,   D_VOID_TYPE},
+ {DevRemoveDevice,	 (DevCommandFunction)dev_removedevice,   D_LONG_TYPE,   D_VOID_TYPE},
+ {DevStatus,             (DevCommandFunction)dev_status,         D_VOID_TYPE,   D_STRING_TYPE}, 
 };
 
 static long n_commands = sizeof(commands_list)/sizeof(DevCommandListEntry);
@@ -207,8 +206,7 @@ DevVarStringArray stringarray;
  Return(s)  :  nothing - should return to API signal handler
 
 *************************************************************************/
-void signal_handler(signal)
-int signal;
+void signal_handler(int signal)
 {
 
 int retkill;
@@ -265,7 +263,11 @@ int retkill;
                DS_NOTOK - otherwise
 
 *************************************************************************/
+#if (OSK || _OSK)
+long initialise_ipc(int pid)
+#else
 long initialise_ipc(pid_t pid)
+#endif
 {
 #if defined(EBUG)
   fprintf(stderr,"initialise_ipc()\n");
@@ -476,10 +478,7 @@ printf ("  It will raise a SIGINT signal itself\n");fflush(stdout);
                DS_NOTOK - otherwise
 
 *************************************************************************/
-long get_response_dp(message,data,error)
-char *message;
-long *data;
-long *error;
+long get_response_dp(char *message,long *data,long *error)
 {
    int finished=FALSE;
    register int i;
@@ -575,8 +574,7 @@ long *error;
  Function   :  get_response_dp(message,data,error)
 
 *************************************************************************/
-static long class_initialise(error)
-long *error;
+static long class_initialise(long *error)
 {
    int iret = DS_OK;
    long status;
@@ -826,10 +824,7 @@ long *error;
                DS_NOTOK - otherwise
 
 *************************************************************************/
-static long object_create(name, ds_ptr, error)
-char *name;
-DevServer *ds_ptr;
-long *error;
+static long object_create(char *name, DevServer *ds_ptr, long *error)
 {
    int iret = DS_OK;
    Daemon dae;
@@ -888,9 +883,7 @@ long *error;
                DS_NOTOK - otherwise
 
 *************************************************************************/
-static long object_initialise(ds,error)
-DevServer ds;
-long *error;
+static long object_initialise(DevServer ds,long *error)
 {
    long status; 
    int i;
@@ -941,7 +934,7 @@ long *error;
 #if defined(EBUG)
      fprintf(stderr,"call dev_initialisedev() with argin = %s\n",argin.dev_n);
 #endif
-     status = dev_initialisedev (ds, &(argin.dev_n), &argout, db_update, error);
+     status = dev_initialisedev ((Daemon)ds, (struct DevDaemonStruct *)&(argin.dev_n), &argout, db_update, error);
    }
   
 #if defined(EBUG)
@@ -975,10 +968,7 @@ long *error;
 
 *************************************************************************/
 
-static long state_handler( ds, cmd, error)
-Daemon ds;
-DevCommand cmd;
-long *error;
+static long state_handler(Daemon ds, DevCommand cmd, long *error)
 {
     
   long int p_state, n_state;
@@ -1040,11 +1030,7 @@ long *error;
  Arg(s) Out:	void *argout - none
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
-static long dev_off (ds, argin, argout, error)
-Daemon ds;
-void *argin;
-void *argout;
-long *error;
+static long dev_off (Daemon ds, void *argin, void *argout, long *error)
 {
    long status;
    char mess[255];
@@ -1087,11 +1073,7 @@ long *error;
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_on (ds, argin, argout, error)
-Daemon ds;
-DevVoid *argin;
-DevVoid *argout;
-long *error;
+static long dev_on (Daemon ds, DevVoid *argin, DevVoid *argout, long *error)
 {
    long status;
    char mess[255];
@@ -1135,11 +1117,7 @@ long *error;
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_state (ds, argin, argout, error)
-Daemon ds;
-DevVoid *argin;
-DevShort *argout;
-long *error;
+static long dev_state (Daemon ds, DevVoid *argin, DevShort *argout, long *error)
 {
    long status;
    char mess[255];
@@ -1192,11 +1170,7 @@ long *error;
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_status (ds, argin, argout, error)
-Daemon ds;
-DevVoid *argin;
-DevString *argout;
-long *error;
+static long dev_status (Daemon ds, DevVoid *argin, DevString *argout, long *error)
 {
   long status;
   char mess[255];
@@ -1231,11 +1205,7 @@ long *error;
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_getdeviceident (ds, argin, argout, error)
-Daemon ds;
-DevString *argin;
-DevLong *argout;
-long *error;
+static long dev_getdeviceident (Daemon ds, DevString *argin, DevLong *argout, long *error)
 {
    long status;
    char mess[255];
@@ -1298,11 +1268,7 @@ long *error;
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_getdevicename (ds, argin, argout, error)
-Daemon ds;
-DevLong *argin;
-DevString *argout;
-long *error;
+static long dev_getdevicename (Daemon ds, DevLong *argin, DevString *argout, long *error)
 {
    long status;
    static char mess[255];
@@ -1355,11 +1321,7 @@ long *error;
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_initialisecmd (ds, argin, argout, error)
-Daemon ds;
-struct DevDaemonStruct *argin;
-DevLong *argout;
-long *error;
+static long dev_initialisecmd (Daemon ds, struct DevDaemonStruct *argin, DevLong *argout, long *error)
 {
 
   long status; 
@@ -1476,12 +1438,7 @@ long *error;
 
 }
 
-static long dev_initialisedev (ds, argin, argout, db_update, error)
-Daemon ds;
-struct DevDaemonStruct *argin;
-DevLong *argout;
-DevBoolean db_update;
-long *error;
+static long dev_initialisedev (Daemon ds, struct DevDaemonStruct *argin, DevLong *argout, DevBoolean db_update, long *error)
 {
    long status;
    char mess[255];
@@ -1584,11 +1541,7 @@ long *error;
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_saveconfi(ds, argin, argout, error)
-Daemon ds;
-DevVoid *argin;
-DevVoid *argout;
-long *error;
+static long dev_saveconfi(Daemon ds, DevVoid *argin, DevVoid *argout, long *error)
 {
    unsigned int i,j,l;
    long status;
@@ -1828,11 +1781,7 @@ long *error;
  Arg(s) Out:	DevVoid *argout - none 
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
-static long dev_removedevice(ds, argin, argout, error)
-Daemon ds;
-DevLong *argin;
-DevVoid *argout;
-long *error;
+static long dev_removedevice(Daemon ds, DevLong *argin, DevVoid *argout, long *error)
 {
  long status;
  char mess[255];
@@ -1894,10 +1843,7 @@ long *error;
 }  
 
   
-static long dev_poll_list_uptodate(ds,argin,error)
-Daemon ds;
-char *argin;
-long *error;
+static long dev_poll_list_uptodate(Daemon ds,char *argin,long *error)
 {
   unsigned int i,j,l,new_memory,num_resource;
   long status;
@@ -2046,11 +1992,7 @@ long *error;
  Arg(s) Out:	long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_startpolling (ds, argin, argout, error)
-Daemon ds;
-DevLong *argin;
-DevVoid *argout;
-long *error;
+static long dev_startpolling (Daemon ds, DevLong *argin, DevVoid *argout, long *error)
 {
    long status;
    char mess[255];
@@ -2105,11 +2047,7 @@ long *error;
  Arg(s) Out:	long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_stoppolling (ds, argin, argout, error)
-Daemon ds;
-DevLong *argin;
-DevVoid *argout;
-long *error;
+static long dev_stoppolling (Daemon ds, DevLong *argin, DevVoid *argout, long *error)
 {
    long status;
    char mess[255];
@@ -2156,11 +2094,7 @@ long *error;
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_pstatus(ds, argin, argout, error)
-Daemon ds;
-DevLong *argin;
-DevDaemonStatus *argout;
-long *error;
+static long dev_pstatus(Daemon ds, DevLong *argin, DevDaemonStatus *argout, long *error)
 {
    long status;
    static char mess[255];
@@ -2212,11 +2146,7 @@ long *error;
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_longstatus (ds,argin,argout,error)
-Daemon ds;
-DevVoid *argin;
-DevString *argout;
-long *error;
+static long dev_longstatus (Daemon ds,DevVoid *argin, DevString *argout,long *error)
 {
    long status;
    static char mess[255];
@@ -2262,11 +2192,7 @@ long *error;
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_dastatus(ds, argin, argout, error)
-Daemon ds;
-DevLong *argin;
-DevDaemonStatus *argout;
-long *error;
+static long dev_dastatus(Daemon ds, DevLong *argin, DevDaemonStatus *argout, long *error)
 {
    long status;
    static char mess[255];
@@ -2314,11 +2240,7 @@ long *error;
  Arg(s) Out:	long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_changeinterval(ds, argin, argout, error)
-Daemon ds;
-DevDaemonData *argin;
-DevVoid *argout;
-long *error;
+static long dev_changeinterval(Daemon ds, DevDaemonData *argin, DevVoid *argout, long *error)
 {
    long status;
    static char mess[255];
@@ -2401,11 +2323,7 @@ long *error;
  Arg(s) Out:	long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_definemode(ds, argin, argout, error)
-Daemon ds;
-DevDaemonData *argin;
-DevVoid *argout;
-long *error;
+static long dev_definemode(Daemon ds, DevDaemonData *argin, DevVoid *argout, long *error)
 {
    long status;
    long data[5];

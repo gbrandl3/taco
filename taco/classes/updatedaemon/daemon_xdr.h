@@ -57,13 +57,13 @@ struct DevDaemonStatus {
 	char ContinueAfterError;
 };
 typedef struct DevDaemonStatus 	DevDaemonStatus;
-bool_t 				xdr_DevDaemonStatus();
-long 				xdr_length_DevDaemonStatus();
+bool_t 				xdr_DevDaemonStatus(XDR *xdrs, DevDaemonStatus *objp);
+long 				xdr_length_DevDaemonStatus(DevDaemonStatus *objp);
 #define D_DAEMON_STATUS         43
 #define LOAD_DAEMON_STATUS(A)   xdr_load_type ( D_DAEMON_STATUS, \
-                                                xdr_DevDaemonStatus, \
+                                                (DevDataFunction)xdr_DevDaemonStatus, \
                                                 sizeof(DevDaemonStatus), \
-                                                xdr_length_DevDaemonStatus, \
+                                                (DevDataLengthFunction)xdr_length_DevDaemonStatus, \
                                                 A )
 
 
@@ -72,13 +72,13 @@ struct DevDaemonData {
       	long long_data;
 };
 typedef struct DevDaemonData 	DevDaemonData;
-bool_t 				xdr_DevDaemonData();
-long 				xdr_length_DevDaemonData();
+bool_t 				xdr_DevDaemonData(XDR *xdrs, DevDaemonData *objp);
+long 				xdr_length_DevDaemonData(DevDaemonData *objp);
 #define D_DAEMON_DATA           44
 #define LOAD_DAEMON_DATA(A)   	xdr_load_type ( D_DAEMON_DATA, \
-                                                xdr_DevDaemonData, \
+                                                (DevDataFunction)xdr_DevDaemonData, \
                                                 sizeof(DevDaemonData), \
-                                                xdr_length_DevDaemonData, \
+                                                (DevDataLengthFunction)xdr_length_DevDaemonData, \
                                                 A )
 
 struct DevDaemonStruct {
@@ -87,13 +87,13 @@ struct DevDaemonStruct {
       	DevLong poller_frequency;
 };
 typedef struct DevDaemonStruct 	DevDaemonStruct;
-bool_t 				xdr_DevDaemonStruct();
-long 				xdr_length_DevDaemonStruct();
+bool_t 				xdr_DevDaemonStruct(XDR *xdrs, DevDaemonStruct *objp);
+long 				xdr_length_DevDaemonStruct(DevDaemonStruct *objp);
 #define D_DAEMON_STRUCT         NewDevBase + 1 
 #define LOAD_DAEMON_NEWD(A)   	xdr_load_type ( D_DAEMON_STRUCT, \
-                                                xdr_DevDaemonStruct, \
+                                                (DevDataFunction)xdr_DevDaemonStruct, \
                                                 sizeof(DevDaemonStruct), \
-                                                xdr_length_DevDaemonStruct, \
+                                                (DevDataLengthFunction)xdr_length_DevDaemonStruct, \
                                                 A )
 
 #endif /* _daemon_xdr_h */

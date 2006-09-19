@@ -25,13 +25,13 @@
  * Description: source code file testing the update daemon server 
  *
  * Author(s):   
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
  * Original:    
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-18 22:41:09 $
+ * Date:        $Date: 2006-09-19 09:29:39 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -60,7 +60,7 @@
 
 
 /****************************************************************************/
-void printerror(error)   long    error;
+void printerror(long    error)
 {
    long i;
 
@@ -75,9 +75,9 @@ void printerror(error)   long    error;
 
 
 /****************************************************************************/
-void print_boolean(bool)   char bool;
+void print_boolean(char flag)
 {
-   if (bool == TRUE)
+   if (flag == TRUE)
    {
      printf ("TRUE\n");
    }
@@ -88,9 +88,7 @@ void print_boolean(bool)   char bool;
 }
 
 
-main(argc,argv)
-unsigned int argc;
-char **argv;
+main(unsigned int argc, char **argv)
 {
         char cstr[60];
 	char *cmdstr;

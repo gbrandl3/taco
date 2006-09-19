@@ -25,16 +25,16 @@
  * Description: xdr_routines for update daemon types.
  *
  * Author(s):   Jens Meyer
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
  * Original:    July 1992
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2006-09-18 22:41:09 $
+ * Date:        $Date: 2006-09-19 09:29:39 $
  */
 
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon_xdr.c,v 1.2 2006-09-18 22:41:09 jkrueger1 Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon_xdr.c,v 1.3 2006-09-19 09:29:39 andy_gotz Exp $";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -52,9 +52,7 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/cla
 
 
 bool_t
-xdr_DevDaemonStatus(xdrs, objp)
-	XDR *xdrs;
-	DevDaemonStatus *objp;
+xdr_DevDaemonStatus(XDR *xdrs, DevDaemonStatus *objp)
 {
 	if (!xdr_char(xdrs, &objp->BeingPolled)) {
 		return (FALSE);
@@ -84,8 +82,7 @@ xdr_DevDaemonStatus(xdrs, objp)
 }
 
 long
-xdr_length_DevDaemonStatus(objp)
-        DevDaemonStatus *objp;
+xdr_length_DevDaemonStatus(DevDaemonStatus *objp)
         {
         long  length = 0;
 
@@ -104,9 +101,7 @@ xdr_length_DevDaemonStatus(objp)
 
 
 bool_t
-xdr_DevDaemonData(xdrs, objp)
-	XDR *xdrs;
-	DevDaemonData *objp;
+xdr_DevDaemonData(XDR *xdrs, DevDaemonData *objp)
 {
 	if (!xdr_long(xdrs, &objp->ddid)) {
 		return (FALSE);
@@ -119,8 +114,7 @@ xdr_DevDaemonData(xdrs, objp)
 }
 
 long
-xdr_length_DevDaemonData(objp)
-        DevDaemonData *objp;
+xdr_length_DevDaemonData(DevDaemonData *objp)
         {
         long  length = 0;
 
@@ -135,9 +129,7 @@ xdr_length_DevDaemonData(objp)
 /* Structure for new device process resources */
 
 bool_t
-xdr_DevDaemonStruct(xdrs, objp)
-	XDR *xdrs;
-	DevDaemonStruct *objp;
+xdr_DevDaemonStruct(XDR *xdrs, DevDaemonStruct *objp)
 {
 	if (!xdr_wrapstring(xdrs, &objp->dev_n)) 
 	{
@@ -157,8 +149,7 @@ xdr_DevDaemonStruct(xdrs, objp)
 
 
 long
-xdr_length_DevDaemonStruct(objp)
-        DevDaemonStruct *objp;
+xdr_length_DevDaemonStruct(DevDaemonStruct *objp)
         {
         long  length = 0;
 
