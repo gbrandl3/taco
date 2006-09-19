@@ -18,21 +18,21 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * File:		Message.h
+ * File:	Message.h
  *
  * Project:	Device Servers with sun-rpc
  *
  * Description:	Include file for applications using 
- *                the Message-Server.
+ *              the Message-Server.
  *
  * Author(s):	Jens Meyer
  * 		$Author: jkrueger1 $
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:		$Date: 2006-09-18 21:46:20 $
+ * Date:	$Date: 2006-09-19 08:49:53 $
  */
 
 #ifndef _Message_h

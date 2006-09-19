@@ -30,11 +30,11 @@
  *
  * Original:    January 1997
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2006-09-18 21:43:56 $
+ * Date:        $Date: 2006-09-19 08:50:58 $
  *
- *****************************************************************************/
+ */
 
 #ifndef _xdev_gui_h
 #define _xdev_gui_h

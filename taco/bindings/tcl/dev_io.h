@@ -32,22 +32,10 @@
  *
  * Original: 	June 1996
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2006-09-18 22:04:49 $
+ * Date:        $Date: 2006-09-19 08:51:58 $
  */
-
-
-/* 
- *
- *		$Author: jkrueger1 $
- *		
- *             
- *
- * Version:	$Revision: 1.4 $
- *
- * Date:	$Date: 2006-09-18 22:04:49 $
-*/
 
 #ifndef DEV_IO_H
 #define DEV_IO_H 
