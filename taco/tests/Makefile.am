@@ -19,11 +19,13 @@ test_asc_dyn_SOURCES 	= test_asc_dyn.c
 test_tc_SOURCES 	= test_tc.c
 test_tc_LDADD		= @TACO_CLIENT_LIBS@ 
 
-EXTRA_DIST 		+= testsuite.at $(TESTSUITE_AT) testsuite local.at ext.at
+EXTRA_DIST 		+= testsuite.at $(TESTSUITE_AT) testsuite 
+
+# local.at ext.at cleanup.at
 
 TESTSUITE 		= testsuite
 
-TESTSUITE_AT		= dbase.at devices.at starter.at message.at specialtest1.at ext.at
+TESTSUITE_AT		= dbase.at devices.at starter.at message.at specialtest1.at local.at ext.at cleanup.at
 
 AUTOTEST 		= $(AUTOM4TE) --language=autotest
 
@@ -35,7 +37,7 @@ check_PROGRAMS 		= db_connect db_resget db_resput db_getdevexp \
 			test_asc_dyn test_asc_stat test_tc test_starter \
 			dev_cmdquery dev_conparams \
 			test_server test_client test_client2 test_status test_connect \
-			TestExtServer \
+			TestExtServer ExtServerClient \
 			longest_testserver \
                         db_analyze
 
@@ -162,3 +164,8 @@ TestExtServer_CPPFLAGS  = -I$(top_srcdir)/ext/common/include -I$(top_srcdir)/ext
 TestExtServer_SOURCES	= TestExtServer.cpp TestExtServerStartup.cpp
 TestExtServer_LDADD	= @TACO_SERVER_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/lib/libTACOExtensions.la
 TestExtServer_LDFLAGS	= -no-install
+
+ExtServerClient_CPPFLAGS= -I$(top_srcdir)/ext/common/include -I$(top_srcdir)/ext/client/include -DTACO_EXT
+ExtServerClient_SOURCES = ExtServerClient.cpp
+ExtServerClient_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/lib/libTACOExtensions.la
+ExtServerClient_LDFLAGS = -no-install

@@ -28,6 +28,8 @@ protected:
 
 	void deviceUpdate(void) throw (::TACO::Exception);
 
+	void deviceReset(void) throw (::TACO::Exception);
+
 	void v_Init(void) throw (::TACO::Exception);
 };
 

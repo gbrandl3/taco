@@ -29,7 +29,6 @@ RES_BASE_DIR=`pwd` taco db_update test.res
 AT_TACO_RUN_TEST([TestExtServer ext -d])
 sleep 4
 AT_TACO_RUN_LOCAL([test_connect test/ext/dev0])
-AT_TACO_RUN_LOCAL([off TestExtServer >>log 2>&1])
 ], [], [Set protocol to TCP
 Query commands
              1       0       0                        "DevOn"
@@ -47,3 +46,59 @@ Query events
 ])
 AT_CLEANUP
 
+AT_SETUP([Test TACO exceptions])
+AT_DATA([testextclient], [[1
+2
+3
+0
+]])
+AT_CHECK(AT_TACO_RUN_LOCAL([ExtServerClient test/ext/dev0  < testextclient]), [0], 
+[[
+test_menu for test/ext/dev0 ()
+____________________________________
+1.State 
+2.Status
+3.Reset
+
+Select one commands (0 to quit) : ?1
+The state is Off(1)
+
+test_menu for test/ext/dev0 ()
+____________________________________
+1.State 
+2.Status
+3.Reset
+
+Select one commands (0 to quit) : ?2
+Status :  device off
+
+test_menu for test/ext/dev0 ()
+____________________________________
+1.State
+2.Status
+3.Reset
+
+Select one commands (0 to quit) : ?3
+
+test_menu for test/ext/dev0 ()
+____________________________________
+1.State
+2.Status
+3.Reset
+
+Select one commands (0 to quit) : ?0
+]], 
+[[can't reset device: deviceReset() : tried to execute a command which is not implemented
+]])
+AT_CLEANUP
+
+AT_SETUP([Stopping extended server])
+AT_CHECK([AT_TACO_RUN_LOCAL([off TestExtServer | grep -v Killing])], [0], 
+[[There are 1 TestExtServer processes:
+
+]])
+AT_CLEANUP
+
+AT_SETUP([Expected failure])
+AT_XFAIL_IF(false)
+AT_CLEANUP

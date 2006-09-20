@@ -26,9 +26,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2006-09-18 22:34:41 $
+ * Date:        $Date: 2006-09-20 16:33:04 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -63,18 +63,18 @@ const char *Test::Ext::Server::GetClassName(void)
 
 void Test::Ext::Server::deviceOff(void) throw (::TACO::Exception)
 {
-	Server::deviceOff();
+	::TACO::Server::deviceOff();
 }
 
 void Test::Ext::Server::deviceOn(void)
 	throw (::TACO::Exception)
 {
-	Server::deviceOn(  );
+	::TACO::Server::deviceOn(  );
 }
 
 short Test::Ext::Server::deviceState( void ) throw (::TACO::Exception)
 {
-	return Server::deviceState(  );
+	return ::TACO::Server::deviceState(  );
 }
 
 void Test::Ext::Server::deviceUpdate(void) throw (::TACO::Exception)
@@ -84,4 +84,16 @@ void Test::Ext::Server::deviceUpdate(void) throw (::TACO::Exception)
 void Test::Ext::Server::v_Init(void) throw (::TACO::Exception)
 {
 	std::cout << deviceName() << ": init complete." << std::endl;
+}
+
+void Test::Ext::Server::deviceReset(void) throw (::TACO::Exception)
+{
+	try
+	{
+		throw ::TACO::Exception(::TACO::Error::COMMAND_NOT_IMPLEMENTED);
+	}
+	catch (::TACO::Exception &e)
+	{
+		throw "deviceReset() : " >> e;
+	}
 }

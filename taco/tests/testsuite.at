@@ -59,11 +59,5 @@ AT_BANNER([[Testing extensions]])
 m4_include([ext.at])
 
 AT_BANNER([[Uninstalling TACO system.]])
+m4_include([cleanup.at])
 
-AT_SETUP([Stopping TACO])
-AT_CHECK([taco stop >>log 2>&1])
-AT_CLEANUP
-
-AT_SETUP([TACO deinstallation])
-AT_CHECK([taco uninstall])
-AT_CLEANUP
