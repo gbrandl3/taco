@@ -18,7 +18,7 @@ dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_INIT([TACO], [3.95.3], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.85 $)dnl
+AC_REVISION($Revision: 1.86 $)dnl
 AC_COPYRIGHT([(C) 1990-2006 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -28,6 +28,19 @@ TACO_INIT
 AC_SUBST(LIB_VERSION, [11:10:0])
 
 AM_INIT_AUTOMAKE([dist-bzip2 1.7])
+
+# Checks for programs.
+AC_PROG_CXX
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
+AC_PROG_AWK
+AC_PROG_YACC
+AC_PROG_LEX 
+
 
 AC_CHECK_SIZEOF(char)
 AC_CHECK_SIZEOF(short)
@@ -39,16 +52,13 @@ AC_CHECK_SIZEOF(unsigned long)
 AC_CHECK_SIZEOF(float)
 AC_CHECK_SIZEOF(double)
 
-# Checks for programs.
-AC_PROG_CXX
-AC_PROG_CC
-AC_PROG_CPP
-AC_PROG_AWK
-AC_PROG_INSTALL
-AC_PROG_LN_S
-AC_PROG_MAKE_SET
-AC_PROG_RANLIB
-AC_PROG_AWK
+dnl wanted by: classes/binem/code/rebin.c:124
+dnl AC_CHECK_FUNCS([floor sqrt]) 
+dnl wanted by: lib/config/rsync.h:110
+dnl AC_CHECK_HEADERS([limits.h syslog.h utime.h]) 
+dnl AC_HEADER_DIRENT 
+dnl AC_HEADER_MAJOR 
+
 AC_CHECK_PROGS(HOSTNAME, hostname)
 if test "$HOSTNAME" ; then
 	hostname=`hostname`;
@@ -159,16 +169,19 @@ else
 fi
 
 # Checks for header files.
-AC_FUNC_ALLOCA
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_HEADER_TIME
 AC_HEADER_STAT
+AC_HEADER_STDBOOL
+
 AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h sys/types.h sys/sem.h sys/shm.h]) 
 AC_CHECK_HEADERS([pthread.h fcntl.h malloc.h memory.h netdb.h stddef.h stdlib.h string.h strings.h sys/file.h sys/ioctl.h termios.h unistd.h sys/filio.h paths.h siggen.h])
 AC_CHECK_HEADERS([varargs.h stdarg.h])
 AC_CHECK_HEADERS([svc.h rpc/svc.h rpc/pmap_prot.h rpc/pmap_prot.h])
-AC_CHECK_HEADERS([signal.h sys/signal.h sys/param.h sys/resource.h])
+AC_CHECK_HEADERS([signal.h sys/signal.h sys/param.h sys/resource.h sys/time.h])
+AC_CHECK_HEADERS([float.h]) 
+
 AC_TYPE_SIGNAL
 AC_CHECK_DECLS([signal], [], [],
 [
@@ -200,15 +213,14 @@ AC_CHECK_HEADERS([sstream strstream])
 AC_LANG_POP(C++)
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
 AC_C_CONST
 AC_C_INLINE
 AC_TYPE_MODE_T
 AC_TYPE_OFF_T
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
-AC_TYPE_SIGNAL
 AC_TYPE_UID_T
+AC_TYPE_SIGNAL
 AC_STRUCT_TM
 AC_C_VOLATILE
 
@@ -288,20 +300,22 @@ AC_FUNC_MALLOC
 AC_FUNC_MEMCMP
 AC_FUNC_REALLOC
 AC_FUNC_SELECT_ARGTYPES
-AC_TYPE_SIGNAL
+AC_FUNC_ALLOCA
+AC_FUNC_STRFTIME 
 AC_FUNC_STAT
 AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([alarm dup2 gethostbyname gethostname getpass gettimeofday isascii mblen memset putenv select socket strcasecmp strchr strcspn strdup strerror strncasecmp strrchr strspn strstr strtoul get_myaddress])
-AC_CHECK_FUNCS([setsid])
-AC_CHECK_FUNCS([waitpid wait4 getcwd strdup chown chmod lchmod mknod mkfifo \
-    fchmod fstat ftruncate strchr readlink link utime utimes lutimes strftime \
-    memmove lchown vsnprintf snprintf vasprintf asprintf setsid glob strpbrk \
-    strlcat strlcpy strtol mallinfo getgroups setgroups geteuid getegid \
-    setlocale setmode open64 lseek64 mkstemp64 mtrace va_copy __va_copy \
-    strerror putenv iconv_open locale_charset nl_langinfo \
-    sigaction sigprocmask])
 
+AC_CHECK_FUNCS([alarm dup2 gethostbyname gethostname getpass gettimeofday isascii mblen memset putenv])
+AC_CHECK_FUNCS([select socket strcasecmp strchr strcspn strdup strerror strncasecmp strrchr strspn strstr])
+AC_CHECK_FUNCS([strtoul get_myaddress modf])
+AC_CHECK_FUNCS([waitpid wait4 getcwd strdup chown chmod lchmod mknod mkfifo]) 
+AC_CHECK_FUNCS([fchmod fstat ftruncate strchr readlink link utime utimes lutimes])
+AC_CHECK_FUNCS([strftime memmove lchown vsnprintf snprintf vasprintf asprintf])
+AC_CHECK_FUNCS([setsid glob strpbrk strlcat strlcpy strtol mallinfo getgroups])
+AC_CHECK_FUNCS([setgroups geteuid getegid setlocale setmode open64 lseek64 mkstemp64])
+AC_CHECK_FUNCS([mtrace va_copy __va_copy strerror putenv iconv_open locale_charset])
+AC_CHECK_FUNCS([nl_langinfo sigaction sigprocmask])
 
 AC_SEARCH_LIBS(dlopen, [dl])
 AC_SEARCH_LIBS(svc_run, [c nsl])
@@ -529,7 +543,7 @@ build:
 		TCL:		${taco_tcl_binding}
 
 	TANGO support:		${taco_tango}
-	FRM extensions :	${taco_frm_ext}
+	Extensions :		${taco_ext}
 
 install:
 	Fast install:           ${enable_fast_install}
