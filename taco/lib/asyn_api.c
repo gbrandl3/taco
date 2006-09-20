@@ -43,9 +43,9 @@
  *
  * Original   :	January 1997
  *
- * Version:	$Revision: 1.20 $
+ * Version:	$Revision: 1.21 $
  *
- * Date:	$Date: 2006-09-18 22:31:43 $
+ * Date:	$Date: 2006-09-20 15:58:44 $
  *
  ********************************************************************-*/
 
@@ -65,7 +65,6 @@
 
 #if !defined (WIN32)
 #	if ( defined (OSK) || defined (_OSK))
-
 #		include <inet/socket.h>
 #		include <inet/netdb.h>
 #	else

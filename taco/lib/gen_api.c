@@ -30,9 +30,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.28 $
+ * Version    :	$Revision: 1.29 $
  *
- * Date       : $Date: 2006-09-18 22:31:44 $
+ * Date       : $Date: 2006-09-20 15:58:44 $
  *
  ********************************************************************-*/
 
@@ -1928,7 +1928,6 @@ static char *get_error_string (long error)
 /*
  * Read the error string from the database.
  */
-
 	if (db_getresource (res_path, &res_tab, 1, &db_error) == DS_NOTOK)
 	{
 		dev_printdebug (DBG_API | DBG_ERROR, "get_error_string() : db_getresource failed with error %d\n", db_error);

@@ -31,9 +31,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.32 $
+ * Version    :	$Revision: 1.33 $
  *
- * Date	    :	$Date: 2006-09-18 22:31:44 $
+ * Date	    :	$Date: 2006-09-20 15:58:44 $
  *
  ********************************************************************-*/
 
@@ -52,7 +52,7 @@
 #elif HAVE_SYS_SIGNAL_H
 #	include <sys/signal.h>
 #else
-#error could not find signal.h
+#	error could not find signal.h
 #endif
 
 #ifndef WIN32
@@ -173,12 +173,12 @@ long _DLLFunc	dev_notimported_init PT_( (char *device_name, long access, long i_
 #ifdef __cplusplus
 extern "C" {
 #endif
-	extern configuration_flags      config_flags;
-	extern nethost_info 		*multi_nethost;
+extern configuration_flags      config_flags;
+extern nethost_info 		*multi_nethost;
 /*
  * dynamic error string
  */
-	extern char 			*dev_error_string;
+extern char 			*dev_error_string;
 #ifdef __cplusplus
 };
 #endif
@@ -1378,10 +1378,10 @@ long _DLLFunc taco_dev_put (devserver ds, long cmd,DevArgument argin,
  */
         if (client_data.var_argument.length == 1)
         {
-                dev_error_string = (char*)malloc( strlen(*(char**)client_data.var_argument.sequence[0].argument)+1);
-	    	assert(dev_error_string != NULL);
+		dev_error_string = (char*)malloc( strlen(*(char**)client_data.var_argument.sequence[0].argument)+1);
+		assert(dev_error_string != NULL);
 		if (dev_error_string)
-                	strcpy(dev_error_string,*(char**)client_data.var_argument.sequence[0].argument);
+			strcpy(dev_error_string,*(char**)client_data.var_argument.sequence[0].argument);
         }
 
 /*
