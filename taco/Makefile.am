@@ -12,7 +12,13 @@ else
 classes=
 endif
 
-SUBDIRS = m4 $(gdbm) lib ext system $(classes) doc misc bindings tests 
+if BUILD_EXT
+ext=ext
+else
+ext=
+endif
+
+SUBDIRS = m4 $(gdbm) lib $(ext) system $(classes) doc misc bindings tests 
 
 EXTRA_DIST=autogen.sh taco.spec.in README-RPM
 
