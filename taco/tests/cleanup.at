@@ -1,0 +1,7 @@
+AT_SETUP([Stopping TACO])
+AT_CHECK([taco stop >>log 2>&1])
+AT_CLEANUP
+
+AT_SETUP([TACO deinstallation])
+AT_CHECK([taco uninstall])
+AT_CLEANUP
