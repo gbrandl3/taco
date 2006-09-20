@@ -490,7 +490,12 @@ void TACO::Client::executeCore( DevCommand cmd, void* argin, DevType inType, voi
 	else
 		res = dev_putget(mDeviceHandle, cmd, argin, inType, argout, outType, &e); 
 	if (res != DS_OK)
-		throw Exception( e);
+	{
+// 0x7FFF largest error number, hopefully never used
+// If this number isn't used the generated error string will be used
+		Exception ex(e, plainErrorString(0x7FFF));
+		throw ex;
+	}
 }
 
 void TACO::Client::checkDeviceType( const std::string& type) throw (TACO::Exception)
