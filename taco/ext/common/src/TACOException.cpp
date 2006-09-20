@@ -64,26 +64,26 @@ void TACO::pushErrorMessage( const std::string& msg) throw ()
 
 TACO::Exception& operator>>( const std::string& msg, TACO::Exception& e) throw ()
 {
-	e.mErrorDescription = msg + e.mErrorDescription;
+	e = TACO::Exception(DevLong(e), msg + e.what());
 	return e;
 }
 
 TACO::Exception::Exception( DevLong errorNumber) throw ()
 	: mErrorNumber( errorNumber), mErrorDescription( TACO::plainErrorString( errorNumber))
 {
-	// VOID
+	// std::cerr << "DevLong :" << what() << std::endl;
 }
 
 TACO::Exception::Exception( DevLong errorNumber, const std::string& errorDescription) throw ()
 	: mErrorNumber( errorNumber), mErrorDescription( errorDescription)
 {
-	// VOID
+	// std::cerr << "DevLong, const std::string& " << what() << std::endl;
 }
 
 TACO::Exception::Exception( const TACO::Exception& e) throw ()
 	: std::exception(), mErrorNumber( e.mErrorNumber), mErrorDescription( e.mErrorDescription)
 {
-	// VOID
+	// std::cerr << "const TACO::Exception& " << what() << std::endl;
 }
 
 TACO::Exception& TACO::Exception::operator=( const TACO::Exception& e) throw ()

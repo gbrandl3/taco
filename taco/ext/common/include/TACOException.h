@@ -62,7 +62,6 @@ TACO::Exception& operator>>( const std::string& msg, TACO::Exception& e) throw (
  */
 class TACO::Exception : public std::exception {
 public:
-	friend Exception& (::operator >>) ( const std::string& msg, Exception& e) throw ();
 
 	//! Creates an exception object and sets the error number of the exception
 	Exception( DevLong errorNumber = 0) throw ();
@@ -101,5 +100,8 @@ private:
 	//! Error description
 	std::string mErrorDescription;
 };
+
+
+::TACO::Exception& (operator >>) ( const std::string& msg, ::TACO::Exception& e) throw ();
 
 #endif	// TACO_EXCEPTION_H
