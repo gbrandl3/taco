@@ -20,6 +20,8 @@
 #ifndef	TACO_EXCEPTION_H
 #define	TACO_EXCEPTION_H
 
+#define THROW() throw()
+
 #include <string>
 #include <exception>
 
@@ -62,36 +64,35 @@ TACO::Exception& operator>>( const std::string& msg, TACO::Exception& e) throw (
  */
 class TACO::Exception : public std::exception {
 public:
-
 	//! Creates an exception object and sets the error number of the exception
-	Exception( DevLong errorNumber = 0) throw ();
+	Exception( DevLong errorNumber = 0) THROW ();
 
 	//! Creates an exception object and sets the error number and description of the exception
-	Exception( DevLong errorNumber, const std::string& errorDescription) throw ();
+	Exception( DevLong errorNumber, const std::string& errorDescription) THROW ();
 
 	//! Copy constructor
-	Exception( const Exception& e) throw ();
+	Exception( const Exception& e) THROW ();
 
 	//! Assignment operator
-	Exception& operator=( const Exception& e) throw ();
+	Exception& operator=( const Exception& e) THROW ();
 
 	//! Destoys the exception object
-	~Exception() throw ()
+	~Exception() THROW ()
 	{
 		// VOID
 	}
 
 	//! Converts to DevLong automatically
-	operator DevLong() const throw ()
+	operator DevLong() const THROW ()
 	{
 		return mErrorNumber;
 	}
 
 	//! Extends the error description from the right side (new = old + msg)
-	Exception& operator<<( const std::string& msg) throw ();
+	Exception& operator<<( const std::string& msg) THROW ();
 
 	//! Returns the error description to the exception
-	const char *what() const throw ();
+	const char *what() const THROW ();
 
 private:
 	//! %TACO error number
@@ -102,6 +103,6 @@ private:
 };
 
 
-::TACO::Exception& (operator >>) ( const std::string& msg, ::TACO::Exception& e) throw ();
+::TACO::Exception& (operator >>) ( const std::string& msg, ::TACO::Exception& e) THROW ();
 
 #endif	// TACO_EXCEPTION_H
