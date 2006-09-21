@@ -392,7 +392,7 @@ dnl
 	TACO_GDBM_LDFLAGS="$GDBM_LIBS"
 
 	GDBM_LIBS="$GDBM_LIBS -lgdbm"
-	GDBM_COMPAT_LIBS="$GDBM_LIBS -lgdbm_compat"
+	GDBM_COMPAT_LIBS="-lgdbm_compat"
 
 	if test "x$gdbm_includes" != "x" ; then
 		GDBM_CFLAGS="-I$gdbm_includes"
@@ -436,6 +436,7 @@ public:
 	if test x${ac_cv_lib_gdbm_gdbm_open} != xyes ; then
 		GDBM_LIBS="\$(top_builddir)/gdbm/libgdbm.la"
 		GDBM_CFLAGS="-I\$(top_srcdir)/gdbm -I\$(top_builddir)/gdbm"
+		GDBM_COMPAT_LIBS="\$(top_builddir)/gdbm/libgdbm_compat.la"
 		taco_build_gdbm="yes"
 	fi
 	LIBS="$save_LIBS"
