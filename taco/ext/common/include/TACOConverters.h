@@ -75,7 +75,11 @@ namespace TACO {
 
 	inline std::vector<std::string > convert( DevVarStringArray* argin) throw()
 	{
-		return std::vector<std::string>( argin->sequence, argin->sequence + argin->length);
+		std::vector<std::string> tmp;
+		tmp.clear();
+		for (unsigned int i = 0; i < argin->length; ++i)
+			tmp.push_back(argin->sequence[i]);
+		return tmp;
 	}
 
 	inline std::vector<short> convert( DevVarShortArray* argin) throw()

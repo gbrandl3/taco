@@ -410,7 +410,9 @@ namespace TACO {
 		std::vector<std::string> object()
 		{
 			if (t.sequence != 0) {
-				v.assign( t.sequence, t.sequence + t.length);
+				v.clear();
+				for (unsigned int i = 0; i < t.length; ++i)
+					v.push_back(t.sequence[i]);
 			} else {
 				v.clear();
 			}
