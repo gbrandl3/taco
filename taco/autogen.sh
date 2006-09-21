@@ -1,7 +1,7 @@
 #! /bin/sh
 
 for libtoolize in glibtoolize libtoolize libtoolize15 libtoolize13 ; do
-        LIBTOOLIZE=`which $libtoolize 2>/dev/null | grep -v '^no'`
+        LIBTOOLIZE=`which $libtoolize 2>/dev/null | grep -v 'no'`
         if test "$LIBTOOLIZE" ; then
 		aclocal_includes=`dirname $LIBTOOLIZE | sed -e 's%bin%share/aclocal%'`
                 break;
