@@ -23,6 +23,7 @@ AT_CHECK(AT_TACO_RUN_LOCAL([db_connect]))
 AT_CLEANUP
 
 AT_SETUP([db_info command])
+AT_XFAIL_IF([test x"$python" != x"yes"])
 AT_CHECK([taco db_info | tail -14], [], [[		DEVICE STATISTICS
 
 4 devices are defined in database
@@ -166,6 +167,7 @@ test
 AT_CLEANUP
 
 AT_SETUP([check existing resource families])
+AT_XFAIL_IF([test x"$python" != x"yes"])
 AT_CHECK(AT_TACO_RUN_LOCAL([db_resfamily test]), [], [[device
 python
 ]])
