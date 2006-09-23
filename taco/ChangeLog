@@ -1,3 +1,6 @@
+2006-09-22 18:30 jkrueger1:
+	* test: improve the test according to the enabled/disabled options
+	* m4/python.m4: add the '--enable-python' option
 2006-09-18 23:30 jkrueger1:
 	* tests: add the copyright to all test commands
 	* bindings/python bindings/tcl classes/agps classes/instverify
