@@ -1,8 +1,10 @@
 AC_DEFUN([PYTHON_PROG],
 [
+	AC_ARG_ENABLE(python, AC_HELP_STRING([--enable-python], [enable the pyhton bindings [[default=yes]]]),
+		[ac_enable_python="$enableval"], [ac_enable_python="yes"]) 
 	AC_ARG_WITH(python, AC_HELP_STRING([--with-python=pythondir], [use python installed in pythondir]),
 		[ac_python_dir=$withval], [ac_python_dir=$ac_cv_python])
-	if test "x$ac_python_dir" != "xno"  ; then
+	if test "x$ac_python_dir" != "xno" -a x"$ac_enable_python" = x"yes" ; then
 		AM_PATH_PYTHON([$1],[],[taco_python_binding=no]) 
 		AC_MSG_CHECKING([Python ])
  
@@ -20,13 +22,13 @@ dnl It provides the $(PYTHON_CPPFLAGS) output variable.
 AC_DEFUN([PYTHON_DEVEL],[
 	taco_python_binding=no
 
+ 	AC_REQUIRE([PYTHON_PROG])
 	AC_ARG_WITH(python-libraries, AS_HELP_STRING([--with-python-libraries=DIR], [Directory where python library is installed (optional)]),
 		[python_libraries="$withval"], [python_libraries=""])
 	AC_ARG_WITH(python-includes, AS_HELP_STRING([--with-python-includes=DIR], [Directory where python header files are installed (optional)]),
                 [python_includes="$withval"], [python_includes=""])
-
-	if test "x$ac_python_dir" != "xno"  ; then
- 		AC_REQUIRE([PYTHON_PROG])
+	
+	if test "x$ac_python_dir" != "xno" -a x"$ac_enable_python" = x"yes" ; then
 		AC_REQUIRE([AC_CANONICAL_TARGET])
 		AC_CACHE_CHECK([python version], ac_cv_python_version, [ac_cv_python_version="$PYTHON_VERSION"])
 		ac_python_version=$ac_cv_python_version
