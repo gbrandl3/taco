@@ -1,4 +1,6 @@
 #! /bin/sh -v
 @PYTHON_BINDING_TRUE@ python=yes
 @PYTHON_BINDING_FALSE@ python=no
+@BUILD_EXT_TRUE@ extensions=yes
+@BUILD_EXT_FALSE@ extensions=no
 unset RES_BASE_DIR DSHOME || true
