@@ -25,6 +25,9 @@ TestExtServer/ext/device:    test/ext/dev0
 test/ext/dev0/type:     "TestExtServer"
 ]])
 AT_CHECK([
+if test x"$extensions" != xyes ; then
+	exit 77
+fi
 RES_BASE_DIR=`pwd` taco db_update test.res
 AT_TACO_RUN_TEST([TestExtServer ext -d])
 sleep 4
@@ -52,7 +55,11 @@ AT_DATA([testextclient], [[1
 3
 0
 ]])
-AT_CHECK(AT_TACO_RUN_LOCAL([ExtServerClient test/ext/dev0  < testextclient]), [0], 
+AT_CHECK([
+if test x"$extensions" != xyes ; then
+	exit 77
+fi
+AT_TACO_RUN_LOCAL([ExtServerClient test/ext/dev0  < testextclient])], [0], 
 [[
 test_menu for test/ext/dev0 ()
 ____________________________________
@@ -93,12 +100,13 @@ Select one commands (0 to quit) : ?0
 AT_CLEANUP
 
 AT_SETUP([Stopping extended server])
-AT_CHECK([AT_TACO_RUN_LOCAL([off TestExtServer | grep -v Killing])], [0], 
+AT_CHECK([
+if test x"$extensions" != xyes ; then
+	exit 77
+fi
+AT_TACO_RUN_LOCAL([off TestExtServer | grep -v Killing])], [0], 
 [[There are 1 TestExtServer processes:
 
 ]])
 AT_CLEANUP
 
-AT_SETUP([Expected failure])
-AT_XFAIL_IF(false)
-AT_CLEANUP
