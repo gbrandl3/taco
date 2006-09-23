@@ -23,8 +23,9 @@ AT_CHECK(AT_TACO_RUN_LOCAL([db_connect]))
 AT_CLEANUP
 
 AT_SETUP([db_info command])
-AT_XFAIL_IF([test x"$python" != x"yes"])
-AT_CHECK([taco db_info | tail -14], [], [[		DEVICE STATISTICS
+if test x"$python" == xyes ; then
+	if test x"$extensions" == xyes ; then
+		AT_CHECK([taco db_info | tail -14], [], [[		DEVICE STATISTICS
 
 4 devices are defined in database
 0 of the defined devices are actually exported:
@@ -39,6 +40,58 @@ AT_CHECK([taco db_info | tail -14], [], [[		DEVICE STATISTICS
     3 resources for the SEC domain
     2 resources for the TEST domain
 ]])
+	else
+		AT_CHECK([taco db_info | tail -14], [], [[		DEVICE STATISTICS
+
+4 devices are defined in database
+0 of the defined devices are actually exported:
+0 pseudo devices are defined in the database
+
+		RESOURCE STATISTICS
+
+790 resources are defined in database:
+    2 resources for the CLASS domain
+    512 resources for the CMDS domain
+    243 resources for the ERROR domain
+    3 resources for the SEC domain
+    2 resources for the TEST domain
+]])
+	fi
+else
+	if test x"$extensions" == xyes ; then
+		AT_CHECK([taco db_info | tail -14], [], [[		DEVICE STATISTICS
+
+2 devices are defined in database
+0 of the defined devices are actually exported:
+0 pseudo devices are defined in the database
+
+		RESOURCE STATISTICS
+
+790 resources are defined in database:
+    2 resources for the CLASS domain
+    518 resources for the CMDS domain
+    266 resources for the ERROR domain
+    3 resources for the SEC domain
+    1 resources for the TEST domain
+]])
+	else
+		AT_CHECK([taco db_info | tail -14], [], [[		DEVICE STATISTICS
+
+2 devices are defined in database
+0 of the defined devices are actually exported:
+0 pseudo devices are defined in the database
+
+		RESOURCE STATISTICS
+
+761 resources are defined in database:
+    2 resources for the CLASS domain
+    512 resources for the CMDS domain
+    243 resources for the ERROR domain
+    3 resources for the SEC domain
+    1 resources for the TEST domain
+]])
+	fi
+fi
 AT_CLEANUP
 
 AT_SETUP([db_getresresoval command])
@@ -124,8 +177,8 @@ AT_CHECK([RES_BASE_DIR=`pwd` taco db_update test.res 2>/dev/null], [255])
 AT_CLEANUP
 
 AT_SETUP([db_read command])
-AT_XFAIL_IF([test x"$python" != x"yes"])
-AT_CHECK([taco db_read names | sort], [],
+if test x"$python" == x"yes" ; then
+	AT_CHECK([taco db_read names | sort], [],
 [[NAMES: agpspp|1|1|: test/agps/1|not_exp|0|0|unknown|unknown|0|unknown|
 NAMES: inst_verify|1|1|: test/device/1|not_exp|0|0|unknown|unknown|0|unknown|
 NAMES: python|test|1|: test/python/test1|not_exp|0|0|unknown|unknown|0|unknown|
@@ -134,6 +187,15 @@ NAMES: test|test|1|: test/device/2|not_exp|0|0|unknown|unknown|0|unknown|
 NAMES: test|test|2|: test/device/3|not_exp|0|0|unknown|unknown|0|unknown|
 NAMES: test|test|3|: test/device/4|not_exp|0|0|unknown|unknown|0|unknown|
 ]])
+else 
+	AT_CHECK([taco db_read names | sort], [],
+[[NAMES: agpspp|1|1|: test/agps/1|not_exp|0|0|unknown|unknown|0|unknown|
+NAMES: inst_verify|1|1|: test/device/1|not_exp|0|0|unknown|unknown|0|unknown|
+NAMES: test|test|1|: test/device/2|not_exp|0|0|unknown|unknown|0|unknown|
+NAMES: test|test|2|: test/device/3|not_exp|0|0|unknown|unknown|0|unknown|
+NAMES: test|test|3|: test/device/4|not_exp|0|0|unknown|unknown|0|unknown|
+]])
+fi
 AT_CLEANUP
 
 AT_SETUP([db_getresource function])
@@ -167,10 +229,14 @@ test
 AT_CLEANUP
 
 AT_SETUP([check existing resource families])
-AT_XFAIL_IF([test x"$python" != x"yes"])
-AT_CHECK(AT_TACO_RUN_LOCAL([db_resfamily test]), [], [[device
+if test x"$python" == x"yes" ; then 
+	AT_CHECK(AT_TACO_RUN_LOCAL([db_resfamily test]), [], [[device
 python
 ]])
+else
+	AT_CHECK(AT_TACO_RUN_LOCAL([db_resfamily test]), [], [[device
+]])
+fi
 AT_CLEANUP
 
 AT_SETUP([check existing resource members])
@@ -190,11 +256,16 @@ AT_CHECK(AT_TACO_RUN_LOCAL([db_devdomain]), [], [[test
 AT_CLEANUP
 
 AT_SETUP([check existing device families])
-AT_XFAIL_IF([test x"$python" != x"yes"])
-AT_CHECK(AT_TACO_RUN_LOCAL([db_devfamily test]), [], [[agps
+if test x"$python" == x"yes" ; then
+	AT_CHECK(AT_TACO_RUN_LOCAL([db_devfamily test]), [], [[agps
 device
 python
 ]])
+else
+	AT_CHECK(AT_TACO_RUN_LOCAL([db_devfamily test]), [], [[agps
+device
+]])
+fi
 AT_CLEANUP
 
 AT_SETUP([check existing device members])
