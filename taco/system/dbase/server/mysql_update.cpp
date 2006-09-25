@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2005-07-25 08:41:28 $
+ * Date:	$Date: 2006-09-25 08:14:12 $
  *
  */
 
@@ -127,6 +127,8 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 	db_dev_list.clear();
 	while ((row = mysql_fetch_row(result)) != NULL)
 	    db_dev_list.push_back(row[0]);	
+	mysql_free_result(result);
+
 	int 	ind = 1;
 #ifdef DEBUG
 	std::cout << "Some devices deleted " << std::endl;

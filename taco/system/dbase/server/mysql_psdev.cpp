@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2005-12-16 12:04:26 $
+ * Date:	$Date: 2006-09-25 08:13:00 $
  *
  */
 
@@ -145,6 +145,7 @@ long MySQLServer::reg_ps(std::string h_name, long pid, std::string ps_name, long
 	{
 		if (atoi(row[0]))
     		{
+			mysql_free_result(result);
 			*p_error = DbErr_NameAlreadyUsed;
 			return(-1);
 		}
