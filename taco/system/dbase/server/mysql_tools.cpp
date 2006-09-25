@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2005-07-25 08:41:01 $
+ * Date:	$Date: 2006-09-25 08:17:45 $
  *
  */
 
@@ -566,6 +566,7 @@ db_info_svc *MySQLServer::info_1_svc()
 	else
 	    (*p).count += nc.count;
     }
+    mysql_free_result(result); 
 //
 // Now, count pseudo_devices
 //
@@ -872,7 +873,7 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 		strncpy(svcinfo_back.host_name, row[2], HOST_NAME_LENGTH - 1);
 	svcinfo_back.host_name[HOST_NAME_LENGTH - 1] = '\0';
 	if (row[6] != NULL) 
-		strncpy(svcinfo_back.process_name, row[0], PROC_NAME_LENGTH - 1);
+		strncpy(svcinfo_back.process_name, row[6], PROC_NAME_LENGTH - 1);
 	svcinfo_back.process_name[PROC_NAME_LENGTH - 1] = '\0';
   	if (row[5] != NULL) 
 		svcinfo_back.pid = atoi(row[5]);
@@ -1196,5 +1197,6 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
 //
 // Return data
 //
+    mysql_free_result(result);
     return(&poll_back);
 }
