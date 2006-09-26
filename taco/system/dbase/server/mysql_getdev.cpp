@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jlpons $
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2006-09-15 16:42:39 $
+ * Date:	$Date: 2006-09-26 12:29:35 $
  *
  */
 
@@ -104,7 +104,7 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 //
     std::string tmpf(*fil_name);
     std::string query;
-    query = "SELECT CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) FROM device WHERE ";
+    query = "SELECT name FROM device WHERE ";
 /*
  * replace * with mysql wildcard %
  */
@@ -121,27 +121,33 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
     switch(MySQLServer::count(tmpf.begin(), tmpf.end(), '/'))
 #endif /* !_solaris */
     {
-	case 2 : pos = tmpf.find('/');
-		 domain = tmpf.substr(0, pos);	
-		 pos = tmpf.find('/', 1 + (last_pos = pos));
-		 family = tmpf.substr(last_pos + 1, (pos - last_pos));
-		 member = tmpf.substr(pos + 1);
-		 query += (" CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) LIKE '" + tmpf + "'");
+	case 2 : if( tmpf != "%/%/%" ) {	
+		   pos = tmpf.find('/');
+		   domain = tmpf.substr(0, pos);	
+		   pos = tmpf.find('/', 1 + (last_pos = pos));
+		   family = tmpf.substr(last_pos + 1, (pos - last_pos));
+		   member = tmpf.substr(pos + 1);
+		   query += (" name LIKE '" + tmpf + "'");
+                   query += (" AND EXPORTED != 0 AND IOR LIKE 'rpc:%'");
+		 } else {
+                   query += (" EXPORTED != 0 AND IOR LIKE 'rpc:%'");
+		 }
 		 break;
 	case 1 : pos = tmpf.find('/');
 		 domain = tmpf.substr(0, pos);	
 		 family = tmpf.substr(pos + 1);
 		 query += (" CONCAT(DOMAIN, '/', FAMILY) LIKE '" + tmpf + "'");
+                 query += (" AND EXPORTED != 0 AND IOR LIKE 'rpc:%'");
 		 break;
 	case 0 : domain = tmpf;		
 		 query += (" DOMAIN LIKE '" + tmpf + "'");
+                 query += (" AND EXPORTED != 0 AND IOR LIKE 'rpc:%'");
 		 break;
 	default: std::cerr << "To many '/' in device name." << std::endl;
 		 browse_back.db_err = 1;
 		 browse_back.res_val.arr1_len = 0;
 		 return (&browse_back);		 		 
     }
-    query += (" AND EXPORTED != 0 AND IOR LIKE 'rpc:%'");
 #ifdef DEBUG
     std::cout << "filter domain : " << domain << std::endl;
     std::cout << "filter family : " << family << std::endl;
