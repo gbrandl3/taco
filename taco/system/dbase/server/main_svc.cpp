@@ -23,19 +23,20 @@
  * Description:
  *
  * Authors:
- *		$Author: jlpons $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.25 $
+ * Version:	$Revision: 1.26 $
  *
- * Date:	$Date: 2006-09-15 16:42:39 $
+ * Date:	$Date: 2006-09-27 12:32:01 $
  *
  */
 
 #ifdef sun
 #define PORTMAP
 #endif
-
-#include "config.h"
+#if HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
 #ifdef DARWIN
 #	include <rpc/types.h>
@@ -52,12 +53,23 @@
 #	endif
 #endif
 
-#include <dbClass.h>
+#include "dbClass.h"
 #ifdef USE_MYSQL
-#	include <MySqlServer.h>
+#	include "MySqlServer.h"
 #endif
 #ifdef USE_GDBM
-#	include <NdbmServer.h>
+#	include "NdbmServer.h"
+#endif
+#ifdef USE_SQLITE3
+#	include "Sqlite3Server.h"
+#endif
+#if HAVE_RPC_RPC_H
+#	include <rpc/rpc.h>
+#elif HAVE_RPC_H
+#	include <rpc.h>
+#endif
+#if HAVE_RPC_PMAP_CLNT_H
+#	include <rpc/pmap_clnt.h>
 #endif
 
 #include <fstream>
@@ -144,6 +156,11 @@ void usage(const char *argv)
 #ifdef USE_GDBM
 	types += "dbm";
 #endif
+#ifdef USE_SQLITE3
+	if (!types.empty())
+		types += '|';
+	types += "sqlite3";
+#endif
 #ifdef USE_MYSQL
 	if (!types.empty())
 		types += '|';
@@ -159,9 +176,23 @@ void usage(const char *argv)
 #ifdef USE_GDBM
 	std::cerr << "                        'dbm' stands for the dbm, ndbm, and gdbm" << std::endl;
 #endif
+#ifdef USE_SQLITE3
+	std::cerr << "                        'sqlite3' stands for the SQLite3 database engine" << std::endl;
+#endif
 #ifdef USE_MYSQL
 	std::cerr << "                        'mysql' stands for the MySQL database" << std::endl;
-	std::cerr << "                        database_name for MySQL database should be tango" << std::endl;
+#endif
+#if USE_MYSQL || USE_SQLITE3
+	std::cerr << "                        database_name for "
+#if USE_MYSQL
+	"'MySQL' " 
+#endif
+#if USE_SQLITE3
+	"'SQLite3' "
+#endif
+	"database should be 'tango'" << std::endl;
+#endif
+#ifdef USE_MYSQL
 	std::cerr << "       -u user        - user for MySQL database" << std::endl;
 	std::cerr << "       -p password    - password for MySQL database" << std::endl;
 	std::cerr << "       -l             - disable logging" << std::endl;
@@ -292,6 +323,13 @@ int main(int argc,char **argv)
 		std::cout << ", password = " << mysql_password << std::endl;
 #endif
 		dbm = new MySQLServer(mysql_user, mysql_password, argv[optind]);
+	}
+	else
+#endif
+#ifdef USE_SQLITE3
+	if (database_type == "sqlite3")
+	{
+		dbm = new SQLite3Server(argv[optind]);
 	}
 	else
 #endif
