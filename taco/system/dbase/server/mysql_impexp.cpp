@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jlpons $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2006-09-15 16:41:46 $
+ * Date:	$Date: 2006-09-27 12:37:51 $
  *
  */
 
@@ -420,7 +420,8 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
 // the device server process name, do a full traversal of the database 
 //
     std::string query;
-    query = "UPDATE device SET EXPORTED = 0 WHERE";
+    query = "UPDATE device SET EXPORTED = 0 , IOR = 'rpc:not_exp:0',";
+    query += " VERSION = 0, PID = 0, CLASS = 'unknown', HOST = 'not_exp' WHERE ";
     query += (" SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
 #ifdef DEBUG
     std::cout << "MySQLServer::db_svcunr_1_svc(): query = " << query << std::endl;
@@ -431,25 +432,7 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
 	return (&errcode);
     }
     
-//
-// Initialization needed to retrieve the right tuples in the NAMES table
-// and to update the tuples (program and version number) assuming the input
-// name is a device server name
-//
-    if ((d_num = mysql_affected_rows(mysql_conn)) == 0)
-    {
-        query = "UPDATE device SET EXPORTED = 0 WHERE";
-        query += (" SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
-#ifdef DEBUG
-        std::cout << "MySQLServer::db_svcunr_1_svc(): query = " << query << std::endl;
-#endif /* DEBUG */
-	if (mysql_query(mysql_conn, query.c_str()) != 0)
-	{
-	    errcode = DbErr_DatabaseAccess;
-	    return (&errcode);
-	}
-	d_num = mysql_affected_rows(mysql_conn);
-    }
+    d_num = mysql_affected_rows(mysql_conn);
 //
 // In case of trouble 
 //
