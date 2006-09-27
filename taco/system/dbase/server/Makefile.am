@@ -66,6 +66,25 @@ INCLUDES		+= @MYSQL_CFLAGS@
 AM_CPPFLAGS		+= -DUSE_MYSQL -DDEBUG
 endif
 
+if SQLITE3SUPPORT
+lib_LTLIBRARIES		+= libTACOSQLite3.la
+libTACOSQLite3_la_SOURCES = sqlite3_serv.cpp \
+			sqlite3_devbro.cpp \
+			sqlite3_resbro.cpp \
+			sqlite3_impexp.cpp \
+			sqlite3_getdev.cpp \
+			sqlite3_tools.cpp \
+			sqlite3_cmd_query.cpp \
+			sqlite3_event_query.cpp \
+			sqlite3_psdev.cpp \
+			sqlite3_clo_op.cpp \
+			sqlite3_miscbro.cpp \
+			sqlite3_update.cpp 
+libTACOSQLite3_la_LIBADD= @SQLITE3_LIBS@ -lstdc++
+INCLUDES		+= @SQLITE3_CFLAGS@ 
+AM_CPPFLAGS		+= -DUSE_SQLITE3 -DDEBUG
+endif
+
 dbm_server_CFLAGS	= -DDEBUG
 dbm_server_SOURCES 	= main_svc.cpp dbm.cpp db_serv.cpp
 dbm_server_LDADD	= @TACO_SERVER_LIBS@ $(lib_LTLIBRARIES) -lstdc++
