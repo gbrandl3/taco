@@ -26,9 +26,9 @@
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2006-09-27 07:08:10 $
+ * Date:	$Date: 2006-09-27 12:19:43 $
  *
  */
 
@@ -108,6 +108,7 @@ DevLong StarterDevice::tacoDevRun(void *argin, void *argout, DevLong *error)
 		if (std::string(*arr.sequence) != "StartServer")
 			try 
 			{
+				std::cerr << "StarterDevice::tacoDevRun() : " << arr.length << std::endl;
 				this->deviceRun(*arr.sequence, arr.sequence[1], arr.length > 2 ? arr.sequence[2] : "-m", "");
 				return DS_OK;
 			}
@@ -201,7 +202,10 @@ void StarterDevice::deviceRun(const std::string proc, const std::string pers, co
 		if (std::find(names_of_server.begin(), names_of_server.end(), newServer) == names_of_server.end())
 			names_of_server.push_back(newServer);
 		else if (this->getpid(proc, pers) != 0)
+		{
+			std::cerr << "Process " << proc << " already running." << std::endl;
 			return;
+		}
 //
 // Store the new list in the database 
 //	
@@ -218,7 +222,7 @@ void StarterDevice::deviceRun(const std::string proc, const std::string pers, co
 			if (pid == 0)
 			{
 #ifdef EBUG
-				std::cerr << "Start Child" << std::endl;
+				std::cerr << "Start Child : " << proc << " " << pers << " " << options << std::endl;
 #endif
 				int 	fd = open("/dev/null", O_APPEND);
 				dup2(fd, fileno(stdout));
