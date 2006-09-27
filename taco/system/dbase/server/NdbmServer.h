@@ -25,20 +25,17 @@
  * Author(s):
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2005-07-25 08:24:44 $
+ * Date:	$Date: 2006-09-27 12:24:36 $
  *
  */
 
 #ifndef __NDBMSERVER_H__
 #define __NDBMSERVER_H__
 
-#ifdef sun
-#define PORTMAP
-#endif
-
 #include "dbClass.h"
+#include "NdbmClass.h"
 
 /**@ingroup dbServerClasses
  */
