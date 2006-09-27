@@ -38,8 +38,10 @@ AT_SETUP([TACO installation])
 AT_CHECK([taco install])
 AT_CLEANUP
 
+AT_BANNER([Testing TACO system (GDBM database backend)])
+
 AT_SETUP([Starting TACO])
-AT_CHECK([unset RES_BASE_DIR; taco start ; sleep 10])
+AT_CHECK([unset RES_BASE_DIR; TACO_DATABASE=gdbm; taco start ; sleep 10])
 AT_CLEANUP
 
 AT_BANNER([[Testing the database server.]])
@@ -57,6 +59,37 @@ m4_include([message.at])
 
 AT_BANNER([[Testing extensions]])
 m4_include([ext.at])
+
+AT_SETUP([Stopping TACO])
+AT_CHECK([taco stop])
+AT_CLEANUP
+
+AT_BANNER([Testing TACO system (SQLite3 database backend)])
+
+sqlite3=yes
+AT_SETUP([Starting TACO])
+AT_CHECK([unset RES_BASE_DIR; TACO_DATABASE=sqlite3 taco start ; sleep 10])
+AT_CLEANUP
+
+AT_BANNER([[Testing the database server.]])
+m4_include([dbase.at])
+
+AT_BANNER([[Testing the devices.]])
+m4_include([devices.at])
+m4_include([specialtest1.at])
+
+AT_BANNER([[Testing the starter server]])
+m4_include([starter.at])
+
+AT_BANNER([[Testing message server]])
+m4_include([message.at])
+
+AT_BANNER([[Testing extensions]])
+m4_include([ext.at])
+
+AT_SETUP([Stopping TACO])
+AT_CHECK([taco stop])
+AT_CLEANUP
 
 AT_BANNER([[Uninstalling TACO system.]])
 m4_include([cleanup.at])
