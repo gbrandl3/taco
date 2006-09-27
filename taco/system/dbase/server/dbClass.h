@@ -25,16 +25,21 @@
  * Author(s):
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2005-07-25 08:47:19 $
+ * Date:	$Date: 2006-09-27 12:27:16 $
  *
  */
 
 #ifndef	__DB_CLASS__H__
 #define	__DB_CLASS__H__
+
+#if HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 #ifdef sun
-#define PORTMAP
+#	define PORTMAP
 #endif
 
 #include <API.h>
@@ -45,15 +50,27 @@
 #elif HAVE_SYS_SIGNAL_H
 #	include <sys/signal.h>
 #else
-#error Could not find signal.h
+#	error Could not find signal.h
 #endif
 #include <errno.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <rpc/pmap_clnt.h>
+#if HAVE_SYS_TYPES_H
+#	include <sys/types.h>
+#endif
+#if HAVE_SYS_SOCKET_H
+#	include <sys/socket.h>
+#endif
+#if HAVE_NETINET_IN_H
+#	include <netinet/in.h>
+#endif
+#if HAVE_ARPA_INET_H
+#	include <arpa/inet.h>
+#endif
+#if HAVE_NETDB_H
+#	include <netdb.h>
+#endif
+#if HAVE_RPC_PMAP_CLNT_H
+#	include <rpc/pmap_clnt.h>
+#endif
 
 // C++ include
 #include <iostream>
@@ -63,13 +80,15 @@
 #include <cstdlib>
 
 #ifdef sun
-#include <new>
+#	include <new>
 #endif
 
 // Special for database 
-#include <fcntl.h>
+#if HAVE_FCNTL_H
+#	include <fcntl.h>
+#endif
 
-#include <NdbmClass.h>
+#include "NdbmClass.h"
 
 /**@ingroup dbServerClasses
  */
