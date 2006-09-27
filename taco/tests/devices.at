@@ -19,11 +19,11 @@ dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 dnl 02111-1307, USA.
 
 AT_SETUP([Start Inst_verify device server])
-AT_DATA([instverify], [[3 
-0
+AT_CHECK([taco Inst_verify 1 -d 
+sleep 1
+ps x | grep Inst_verify | grep -v grep | wc -l], [],
+[[1
 ]])
-AT_CHECK([taco Inst_verify 1 -d >>log 
-sleep 1])
 AT_CLEANUP
 
 AT_SETUP([ping to the device test/device1/1])
@@ -132,17 +132,33 @@ AT_CLEANUP
 
 AT_SETUP([Stop the Inst_verify and AGPSpp device servers])
 AT_CHECK([AT_TACO_RUN_LOCAL([off Inst_verify | grep -v Killing])
-AT_TACO_RUN_LOCAL([off AGPSpp | grep -v Killing])],
+AT_TACO_RUN_LOCAL([off AGPSpp | grep -v Killing])
+sleep 2
+ps x | grep Inst_verify | grep -v grep | wc -l
+ps x | grep AGPSpp | grep -v grep | wc -l
+],
 [0],
 [[There are 1 Inst_verify processes:
 
 There are 1 AGPSpp processes:
 
+0
+0
 ]])
 AT_CLEANUP
 
 AT_SETUP([Test the command and event lists of a device])
+AT_DATA([test_server.res], [[
+# This file contains only resources for the tests
+test_server/1/device:	test/a/1 \
+			test/longfamily/long
+
+test/a/1/type: TestDevice
+test/longfamily/long/type: TestDevice2
+test/longfamily/long/longresource: 25
+]])
 AT_CHECK([
+RES_BASE_DIR=`pwd` taco db_update test_server.res
 AT_TACO_RUN_TEST([test_server 1 -d])
 sleep 5
 AT_TACO_RUN_LOCAL([test_connect test/a/1])
