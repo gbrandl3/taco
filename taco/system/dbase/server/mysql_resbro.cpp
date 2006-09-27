@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jlpons $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2006-09-15 16:40:19 $
+ * Date:	$Date: 2006-09-27 12:35:23 $
  *
  */
 
@@ -435,7 +435,7 @@ db_res *MySQLServer::resresoval_1_svc(db_res *recev)
 	{
 	    if (res_val.length() != 0)
 		reso_list.push_back(res_val);
-	    res_val = user_domain + "/" + user_family + "/" + row[0] + "/" + row[1] + ":" + row[3];
+	    res_val = user_domain + "/" + user_family + "/" + row[0] + "/" + row[1] + ": " + row[3];
 	}
 	else
 	    res_val += ("," + std::string(row[3]));
