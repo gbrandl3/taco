@@ -56,6 +56,14 @@ dbase()
     			LD_LIBRARY_PATH=${libdir}:${LD_LIBRARY_PATH} ${bindir}/db_fillup2
 	      		echo "dbm database fill up done"
 	  	fi
+	elif test x"${TACO_DATABASE}" = x"sqlite3" ; then
+		new=`sqlite3 ${DBM_DIR}/tango 'select count(*) from property_device'` 
+		if [ $new -eq 0 ] ; then
+			echo "calling db_fillup to fill up database"
+			sleep 5
+    			LD_LIBRARY_PATH=${libdir}:${LD_LIBRARY_PATH} ${bindir}/db_fillup2
+			echo "sqlite3 database fill up done"
+		fi
 	elif test "x${TACO_DATABASE}" = "xmysql" ; then
 		new=`echo 'select count(*) from property_device;' | mysql -u $MYSQL_USER -D tango | grep -v count`
 		if [ $new -eq 0 ] ; then
