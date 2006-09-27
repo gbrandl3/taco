@@ -43,8 +43,12 @@ setenv TACO_SECURITY no
 # if you want to start the TACO services with logging set "yes" else "no"
 setenv TACO_LOGGING yes
 
-# set the database type "dbm" or "mysql"
+# set the database type "dbm", "sqlite3", or "mysql"
+if (${?TACO_DATABASE}) then
+;
+else
 setenv TACO_DATABASE dbm
+endif
 
 # set the mySQL user for the taco database
 set env MYSQL_USER root
