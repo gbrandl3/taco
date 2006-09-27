@@ -23,61 +23,23 @@
  * Description:
  *
  * Author(s):
- *		$Author: jlpons $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2006-09-15 16:38:42 $
+ * Date:	$Date: 2006-09-27 12:23:29 $
  *
  */
 
 #ifndef __MYSQLSERVER_H__
 #define __MYSQLSERVER_H__
 
-#ifdef sun
-#define PORTMAP
-#endif
-#include "config.h"
-
-#include <API.h>
-#include <cstdlib>
-#include <private/ApiP.h>
-#include <db_xdr.h>
-#if HAVE_SIGNAL_H
-#	include <signal.h>
-#elif HAVE_SYS_SIGNAL_H
-#	include <sys/signal.h>
-#else
-#error Could not find signal.h
-#endif
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <rpc/pmap_clnt.h>
-
+#include "dbClass.h"
 #ifdef HAVE_MYSQL_MYSQL_H
 #	include <mysql/mysql.h>
 #else
 #	include <mysql.h>
 #endif
-
-// C++ include
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-
-#ifdef sun
-#include <new>
-#endif
-
-// Special for database 
-#include <fcntl.h>
-
-#include "dbClass.h"
 
 /**@ingroup dbServerClasses
  */
