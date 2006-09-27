@@ -25,9 +25,9 @@
  * Author(s):
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2006-07-05 14:40:54 $
+ * Date:	$Date: 2006-09-27 12:25:41 $
  *
  */
 
@@ -41,10 +41,10 @@
 #include <string>
 
 #ifdef USE_GDBM
-#include <gdbm.h>
+#	include <gdbm.h>
 
-#define gdbm_error(dbf) 	(0)
-#define gdbm_clearerr(dbf)
+#	define gdbm_error(dbf) 	(0)
+#	define gdbm_clearerr(dbf)
 
 /**@ingroup dbServerClasses
  */
