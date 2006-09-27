@@ -1,3 +1,17 @@
+2006-09-27 14:00 jkrueger1:
+	* system/manager: Use a enum value for storing the information about
+	the database backend type
+	* misc: Enable the use of the SQLite3 database backend
+	* system/dbase/server/sqlite3_*.cpp: Implement a first SQLite3 database
+	backend
+	* system/dbase/server: Clean up some code in the headers files
+	* system/dbase/server/dbm_tools.cpp: Count even all not exported devices
+	in the db_srvinfo method
+	* system/dbase/server/mysql_*.cpp: Fix some problems detected by the 
+	checks of the SQLite3 backend
+	* configure.ac: enable the 'rpc/pmap_clnt.h' header check
+	* acinclude.m4: enable the use of the SQLite3 database backend
+	* system/starter/starter.cpp: Add some additional debugging output
 2006-09-22 18:30 jkrueger1:
 	* test: improve the test according to the enabled/disabled options
 	* m4/python.m4: add the '--enable-python' option
