@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.13 $
  *
- * Date:	$Date: 2005-07-25 08:48:00 $
+ * Date:	$Date: 2006-09-27 12:29:19 $
  *
  */
 
@@ -935,21 +935,16 @@ db_info_svc *NdbmServer::info_1_svc()
 			dev_defined++;
 			NdbmNamesCont cont(dbgen.tid[0],key);
 		
-			pg = cont.get_p_num();			
-			if (pg != 0)
+			domain_name = cont.get_dev_domain_name();
+			NdbmDomain tmp(domain_name, 0);				
+			std::vector<NdbmDomain>::iterator p = std::find(dom_list.begin(),dom_list.end(),tmp);
+				
+			if (p == dom_list.end())
+				dom_list.push_back(tmp);
+			if (cont.get_p_num())			
 			{
 				dev_exported++;
-
-				domain_name = cont.get_dev_domain_name();
-				NdbmDomain tmp(domain_name);				
-				std::vector<NdbmDomain>::iterator p = std::find(dom_list.begin(),dom_list.end(),tmp);
-				
-				if (p == dom_list.end())
-				{
-					dom_list.push_back(tmp);
-				}
-				else
-					(*p).inc_nb();
+				(*p).inc_nb();
 			}
 		}
 		
@@ -981,7 +976,7 @@ db_info_svc *NdbmServer::info_1_svc()
 			{
 				NdbmDomain tmp(dbgen.TblName[i],tmp_res);
 				res_list.push_back(tmp);
-				res_num = res_num + tmp_res;
+				res_num += tmp_res;
 			}
 		}
 	}
