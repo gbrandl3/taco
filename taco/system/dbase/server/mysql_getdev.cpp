@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jlpons $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.13 $
  *
- * Date:	$Date: 2006-09-26 12:29:35 $
+ * Date:	$Date: 2006-09-27 13:01:41 $
  *
  */
 
@@ -127,27 +127,23 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 		   pos = tmpf.find('/', 1 + (last_pos = pos));
 		   family = tmpf.substr(last_pos + 1, (pos - last_pos));
 		   member = tmpf.substr(pos + 1);
-		   query += (" name LIKE '" + tmpf + "'");
-                   query += (" AND EXPORTED != 0 AND IOR LIKE 'rpc:%'");
-		 } else {
-                   query += (" EXPORTED != 0 AND IOR LIKE 'rpc:%'");
+		   query += (" name LIKE '" + tmpf + "' AND");
 		 }
 		 break;
 	case 1 : pos = tmpf.find('/');
 		 domain = tmpf.substr(0, pos);	
 		 family = tmpf.substr(pos + 1);
-		 query += (" CONCAT(DOMAIN, '/', FAMILY) LIKE '" + tmpf + "'");
-                 query += (" AND EXPORTED != 0 AND IOR LIKE 'rpc:%'");
+		 query += (" CONCAT(DOMAIN, '/', FAMILY) LIKE '" + tmpf + "' AND");
 		 break;
 	case 0 : domain = tmpf;		
-		 query += (" DOMAIN LIKE '" + tmpf + "'");
-                 query += (" AND EXPORTED != 0 AND IOR LIKE 'rpc:%'");
+		 query += (" DOMAIN LIKE '" + tmpf + "' AND");
 		 break;
 	default: std::cerr << "To many '/' in device name." << std::endl;
 		 browse_back.db_err = 1;
 		 browse_back.res_val.arr1_len = 0;
 		 return (&browse_back);		 		 
     }
+    query += (" EXPORTED != 0 AND IOR LIKE 'rpc:%'");
 #ifdef DEBUG
     std::cout << "filter domain : " << domain << std::endl;
     std::cout << "filter family : " << family << std::endl;
