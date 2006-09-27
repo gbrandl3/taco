@@ -77,7 +77,20 @@ AC_DEFUN([TACO_SQLITE3_SUPPORT],
 			no)	taco_sqlite3=no;;
 			*)	AC_MSG_ERROR([bad value ${enable_sqlite3} for --enable-sqlite3]);;
 		esac], [taco_sqlite3=yes])	
-	PKG_CHECK_MODULES(SQLITE3, sqlite3 >= 3.0.0, [taco_sqlite3=yes], [taco_sqlite3=no])
+	PKG_CHECK_MODULES(SQLITE3, sqlite3 >= 3.0.0, 
+		[taco_sqlite3=yes
+		SQLITE3_CLFAGS=`$PKG_CONFIG --cflags sqlite3`
+		SQLITE3_LIBS=`$PKG_CONFIG --libs-only-l sqlite3`
+		SQLITE3_LDFLAGS=`$PKG_CONFIG --libs-only-L sqlite3`
+		save_CFLAGS="$CFLAGS"
+		CFLAGS="$CFLAGS $SQLITE_CFLAGS"
+		AC_CHECK_HEADERS([sqlite3.h])
+		CFLAGS="$save_CFLAGS"
+		], [taco_sqlite3=no])
+	AC_SUBST([SQLITE3_CFLAGS], [$SQLITE3_CFLAGS])
+	AC_SUBST([SQLITE3_LIBS], [$SQLITE3_LIBS])
+	AC_SUBST([SQLITE3_LDFLAGS], [$SQLITE3_LDFLAGS])
+	AM_CONDITIONAL(SQLITE3SUPPORT, test x"$taco_sqlite3" = x"yes")
 ])
 
 AC_DEFUN([TACO_MYSQL_SUPPORT],
