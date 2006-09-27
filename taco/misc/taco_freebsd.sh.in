@@ -18,6 +18,7 @@
 #
 export NETHOST=localhost
 export DBTABLES=NAMES,PS_NAMES,CLASS,SYS,ERROR,CMDS,SEC,EVENTS,TEST
+export TACO_DATABASE=dbm
 export TACO_PATH=@sbindir@
 export DSHOME=@prefix@
 export RES_BASE_DIR=$DSHOME/dbase/res
