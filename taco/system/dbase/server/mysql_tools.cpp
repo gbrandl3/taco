@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.14 $
+ * Version:	$Revision: 1.15 $
  *
- * Date:	$Date: 2006-09-25 08:17:45 $
+ * Date:	$Date: 2006-09-27 12:34:04 $
  *
  */
 
@@ -555,16 +555,16 @@ db_info_svc *MySQLServer::info_1_svc()
     {
 	NameCount	nc;
 	nc.name = row[0];
-	nc.count = atoi(row[1]);
-	dev_defined += nc.count;
+	nc.count = 0;
+	dev_defined += atoi(row[1]);
 	std::vector<NameCount>::iterator p;
 	for (p = dom_list.begin(); p != dom_list.end(); ++p)
 	    if ((*p).name == nc.name)
 		break;
 	if (p == dom_list.end())
 	    dom_list.push_back(nc);
-	else
-	    (*p).count += nc.count;
+//	else
+//	    (*p).count += nc.count;
     }
     mysql_free_result(result); 
 //
