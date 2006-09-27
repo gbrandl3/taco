@@ -25,9 +25,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2006-09-06 18:34:15 $
+ * Date:        $Date: 2006-09-27 12:40:44 $
  */
 
 /* TACO include file */
@@ -113,10 +113,10 @@ int main(int argc,char *argv[])
 // Ask device resources to database server
 // Display error message if the call fails
 //
-    char *tmp = const_cast<char *>(dev_name.c_str());
-    char **res_list;
-    long res_nb;
-    if (db_deviceres(1, &tmp, &res_nb, &res_list, &error) == -1)
+	char *tmp = const_cast<char *>(dev_name.c_str());
+	char **res_list;
+	long res_nb;
+	if (db_deviceres(1, &tmp, &res_nb, &res_list, &error) == -1)
 	{
 		cerr << "The call to database server failed with error " << error << endl;
 		cerr << "Error message : " << dev_error_str(error) << endl;

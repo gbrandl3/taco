@@ -26,9 +26,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2006-09-18 22:34:41 $
+ * Date:        $Date: 2006-09-27 12:43:12 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -67,7 +67,6 @@ int main(int argc, char *argv[])
 	{
 		std::cerr << *argv << " : Bad resource name" << std::endl;
 		exit(-1);
-
 	}
 //
 // Extract device name from full resource name
