@@ -25,9 +25,15 @@ AT_DATA([starter.res], [[
 echo startserver/$pers_name/device:	SYS/START/$pers_name >starter.res
 echo SYS/START/$pers_name/DEFAULT:	"Inst_verify/1", "AGPSpp/1" >>starter.res
 AT_CHECK([RES_BASE_DIR=`pwd` taco db_update starter.res; 
-taco StartServer $pers_name -d 
+taco StartServer $pers_name -d
 sleep 5
-])
+ps x | grep StartServer | grep -v grep | wc -l
+ps x | grep Inst_verify | grep -v grep | wc -l
+ps x | grep AGPSpp | grep -v grep | wc -l
+], [], [[1
+1
+1
+]])
 AT_CLEANUP
 
 AT_SETUP([Starter server : Restart])
