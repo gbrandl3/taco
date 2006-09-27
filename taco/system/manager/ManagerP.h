@@ -29,9 +29,9 @@
  *
  * Original:      January 1991
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:		$Date: 2006-09-18 21:47:02 $
+ * Date:		$Date: 2006-09-27 12:12:27 $
  *
  *
  *		       All Rights Reserved
@@ -65,15 +65,15 @@ static char 	*ora_name	    = "res";
 static char	*ora_tns	    = "/usr/local/oracle";
 
 
+typedef enum{E_ORACLE = 0, E_MYSQL, E_GDBM, E_SQLITE} dbm_type;
+
 typedef struct 	{
 		short	msg_server;
 		short	db_server;
 		short	startup;
 		short	security;
 		short	request_log;
-		short	oracle;
-		short	mysql;
-		short	dbm;
+		dbm_type dbm;
 		} config_flags;
 
 typedef struct 	{

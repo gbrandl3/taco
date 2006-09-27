@@ -31,9 +31,9 @@
  *
  * Original:  January 1991
  *
- * Version:   $Revision: 1.26 $
+ * Version:   $Revision: 1.27 $
  *
- * Date:              $Date: 2006-09-18 21:47:02 $
+ * Date:              $Date: 2006-09-27 12:12:27 $
  *
  */
 
@@ -80,7 +80,7 @@ static void 	network_manager_1();
 static void 	network_manager_4();
 static void 	startup_msg();
 
-config_flags	c_flags = {False,False,False,False,False,False,False,True};
+config_flags	c_flags = {False,False,False,False,False,E_GDBM};
 char 		*dshome  = NULL;
 char		*display = NULL;
 char	 	nethost [HOST_NAME_LENGTH];
@@ -159,15 +159,18 @@ static	int	fd_devnull = -1;
 		
 				if (strcmp (arg, "oracle") == 0)
 				{
-	         			c_flags.oracle	     = True;
-	         			c_flags.dbm   	     = False;
+	         			c_flags.dbm   	     = E_ORACLE;
 					dbase_used = "ORACLE";
 				}
 				else if (strcmp (arg, "mysql") == 0)
 				{
-	         			c_flags.mysql	     = True;
-	         			c_flags.dbm  	     = False;
+	         			c_flags.dbm  	     = E_MYSQL;
 					dbase_used = "MYSQL";
+					dbm_name = "tango";
+				}
+				else if (strcmp (arg, "sqlite3") == 0)
+				{
+	         			c_flags.dbm  	     = E_SQLITE;
 					dbm_name = "tango";
 				}
 				else if (strcmp (arg, "log") == 0)
@@ -244,7 +247,7 @@ static	int	fd_devnull = -1;
 /*
  * Check the environment if DBM database is used !!
  */
-	if (c_flags.oracle == False )
+	if (c_flags.dbm != E_ORACLE)
 	{
 		if ( (dbtables = (char *)getenv ("DBTABLES")) == NULL )
 		{
@@ -258,7 +261,7 @@ static	int	fd_devnull = -1;
 			fprintf (stderr, "RES_BASE_DIR must be defined!\n");
 			exit (-1);
 		}
-		if (c_flags.mysql == False)
+		if (c_flags.dbm != E_MYSQL)
 		{
 			if ( (dbtables = (char *)getenv ("DBM_DIR")) == NULL )
 			{
@@ -379,9 +382,9 @@ static	int	fd_devnull = -1;
 /*
  *  startup database server on a remote host
  */
-		if ( c_flags.oracle == False )
+		if ( c_flags.dbm == E_ORACLE )
 	      	{
-			if (c_flags.mysql == False)
+			if (c_flags.dbm == E_MYSQL)
 			{
 /* 
  * DBM startup sequence 
@@ -463,10 +466,20 @@ static	int	fd_devnull = -1;
 			i = 0;
 			cmd_argv[i++] = dbm_server; 
 			cmd_argv[i++] = "-t";
-			if (c_flags.mysql == True)
-				cmd_argv[i++] = "mysql";
-			else
-				cmd_argv[i++] = "dbm";
+			switch (c_flags.dbm)
+			{
+				case E_MYSQL :
+					cmd_argv[i++] = "mysql";
+					break;
+				case E_GDBM :
+					cmd_argv[i++] = "dbm";
+					break;
+				case E_SQLITE :
+					cmd_argv[i++] = "sqlite3";
+					break;
+				default:
+					break;
+			}
 			cmd_argv[i++] = dbm_name; 
 			cmd_argv[i++] = nethost; 
 			cmd_argv[i] = 0;
