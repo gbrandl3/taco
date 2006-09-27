@@ -25,10 +25,11 @@ AT_CLEANUP
 AT_SETUP([db_info command])
 if test x"$python" == xyes ; then
 	if test x"$extensions" == xyes ; then
-		AT_CHECK([taco db_info | tail -14], [], [[		DEVICE STATISTICS
+		AT_CHECK([taco db_info | tail -15], [], [[		DEVICE STATISTICS
 
 4 devices are defined in database
 0 of the defined devices are actually exported:
+    0 for the TEST domain
 0 pseudo devices are defined in the database
 
 		RESOURCE STATISTICS
@@ -41,10 +42,11 @@ if test x"$python" == xyes ; then
     2 resources for the TEST domain
 ]])
 	else
-		AT_CHECK([taco db_info | tail -14], [], [[		DEVICE STATISTICS
+		AT_CHECK([taco db_info | tail -15], [], [[		DEVICE STATISTICS
 
 4 devices are defined in database
 0 of the defined devices are actually exported:
+    0 for the TEST domain
 0 pseudo devices are defined in the database
 
 		RESOURCE STATISTICS
@@ -59,10 +61,11 @@ if test x"$python" == xyes ; then
 	fi
 else
 	if test x"$extensions" == xyes ; then
-		AT_CHECK([taco db_info | tail -14], [], [[		DEVICE STATISTICS
+		AT_CHECK([taco db_info | tail -15], [], [[		DEVICE STATISTICS
 
 2 devices are defined in database
 0 of the defined devices are actually exported:
+    0 for the TEST domain
 0 pseudo devices are defined in the database
 
 		RESOURCE STATISTICS
@@ -75,10 +78,11 @@ else
     1 resources for the TEST domain
 ]])
 	else
-		AT_CHECK([taco db_info | tail -14], [], [[		DEVICE STATISTICS
+		AT_CHECK([taco db_info | tail -15], [], [[		DEVICE STATISTICS
 
 2 devices are defined in database
 0 of the defined devices are actually exported:
+    0 for the TEST domain
 0 pseudo devices are defined in the database
 
 		RESOURCE STATISTICS
@@ -178,7 +182,9 @@ AT_CLEANUP
 
 AT_SETUP([db_read command])
 if test x"$python" == x"yes" ; then
-	AT_CHECK([taco db_read names | sort], [],
+	AT_CHECK([
+if test x"$sqlite3" == x"yes"; then exit 77; fi
+taco db_read names | sort], [],
 [[NAMES: agpspp|1|1|: test/agps/1|not_exp|0|0|unknown|unknown|0|unknown|
 NAMES: inst_verify|1|1|: test/device/1|not_exp|0|0|unknown|unknown|0|unknown|
 NAMES: python|test|1|: test/python/test1|not_exp|0|0|unknown|unknown|0|unknown|
@@ -188,7 +194,9 @@ NAMES: test|test|2|: test/device/3|not_exp|0|0|unknown|unknown|0|unknown|
 NAMES: test|test|3|: test/device/4|not_exp|0|0|unknown|unknown|0|unknown|
 ]])
 else 
-	AT_CHECK([taco db_read names | sort], [],
+	AT_CHECK([
+if test x"$sqlite3" == x"yes"; then exit 77; fi
+taco db_read names | sort], [],
 [[NAMES: agpspp|1|1|: test/agps/1|not_exp|0|0|unknown|unknown|0|unknown|
 NAMES: inst_verify|1|1|: test/device/1|not_exp|0|0|unknown|unknown|0|unknown|
 NAMES: test|test|1|: test/device/2|not_exp|0|0|unknown|unknown|0|unknown|
@@ -321,12 +329,12 @@ AT_CLEANUP
 AT_SETUP([db_servinfo with extremly long server names])
 AT_DATA([test.res], [[
 # This file contains only resources for the tests
-longest_testserver/srv0/device:         test/device/1,test/device/2
+longest_testserver/srv0/device:         test/device/10,test/device/20
 ]])
 AT_CHECK([RES_BASE_DIR=`pwd` taco db_update test.res
 AT_TACO_RUN_LOCAL([db_servinfo longest_testserver/srv0])
-], [], [[The device test/device/1 is defined for this server but is not exported
-The device test/device/2 is defined for this server but is not exported
+], [], [[The device test/device/10 is defined for this server but is not exported
+The device test/device/20 is defined for this server but is not exported
 ]])
 AT_CLEANUP
 
