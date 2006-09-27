@@ -26,9 +26,9 @@
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.13 $
  *
- * Date:	$Date: 2006-09-19 08:45:02 $
+ * Date:	$Date: 2006-09-27 07:08:10 $
  *
  */
 
@@ -218,7 +218,7 @@ void StarterDevice::deviceRun(const std::string proc, const std::string pers, co
 			if (pid == 0)
 			{
 #ifdef EBUG
-				std::cerr << "Start Child" << endl;
+				std::cerr << "Start Child" << std::endl;
 #endif
 				int 	fd = open("/dev/null", O_APPEND);
 				dup2(fd, fileno(stdout));
