@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jlpons $
  *
- * Version:	$Revision: 1.16 $
+ * Version:	$Revision: 1.17 $
  *
- * Date:	$Date: 2006-10-02 13:51:13 $
+ * Date:	$Date: 2006-10-02 14:50:38 $
  *
  */
 
@@ -1113,7 +1113,7 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
     std::string query;
 
     query = "SELECT DEVICE FROM property_device WHERE DOMAIN = 'sys' AND";
-    query += ("name = '" + std::string(POLL_RES) + "' AND UPPER(value) = UPPER('" + user_device + "')");
+    query += (" name = '" + std::string(POLL_RES) + "' AND UPPER(value) = UPPER('" + user_device + "')");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	std::cerr << mysql_error(mysql_conn) << std::endl;
@@ -1143,7 +1143,7 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
 //
 // get poller device info from the NAMES table
 //
-    query = "SELECT DEVICE_SERVER_CLASS, DEVICE_SERVER_NAME, HOSTNAME, PROCESS_NAME, PROCESS_ID FROM NAMES";
+    query = "SELECT server, host, pid FROM device";
     query += (" WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + poller_name + "'");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
@@ -1154,11 +1154,15 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
     result = mysql_store_result(mysql_conn);
     if ((row = mysql_fetch_row(result)) != NULL)
     {
-	strcpy(poll_back.server_name, row[0]);
-	strcpy(poll_back.personal_name, row[1]);
-	strcpy(poll_back.host_name, row[2]);
-	strcpy(poll_back.process_name, row[3]);
-	poll_back.pid = atoi(row[4]);
+      std::string full_srv_name(row[0]);
+      std::string::size_type pos = full_srv_name.find('/');
+      std::string srv_name = full_srv_name.substr(0,pos);
+      std::string pers_name = full_srv_name.substr(pos+1,full_srv_name.length());
+      strcpy(poll_back.server_name, srv_name.c_str());
+      strcpy(poll_back.personal_name, pers_name.c_str());
+      strcpy(poll_back.host_name, row[1]);
+      strcpy(poll_back.process_name, srv_name.c_str()); // Here process = server name
+      poll_back.pid = atoi(row[2]);
     }
     else
     {
