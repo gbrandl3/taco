@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.15 $
+ * Version:	$Revision: 1.16 $
  *
- * Date:	$Date: 2006-09-27 12:34:04 $
+ * Date:	$Date: 2006-10-02 13:51:13 $
  *
  */
 
@@ -728,11 +728,6 @@ long *MySQLServer::unreg_1_svc(db_res *recev)
 
 
 
-typedef struct
-{
-    std::string	name;
-    int		flag;
-}SvcDev;
 /**
  * retrieve device server info from the database
  *
@@ -743,20 +738,22 @@ typedef struct
  */
 svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 {
-    long 		indi,
-			i,
+    long 		i,
 			j,
 			dev_length,
 			name_length;
-    std::vector<SvcDev> dev_list;
 	
     std::string 	user_ds_name(recev->res_val.arr1_val[0]),
     			user_pers_name(recev->res_val.arr1_val[1]);
+
+    std::string query;
+    MYSQL_RES *result,*result2;
+    MYSQL_ROW row,row2;
 		
 #ifdef DEBUG
     std::cout << "in svcinfo_1_svc function for " << user_ds_name << "/" << user_pers_name << std::endl;
 #endif
-	
+
 //
 // initialize structure sent back to client
 //
@@ -771,7 +768,7 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
     try
     {
 	svcinfo_back.process_name = new char [PROC_NAME_LENGTH];
-	svcinfo_back.process_name[0] = '\0';
+	strcpy(svcinfo_back.process_name , "unknown");
 	svcinfo_back.host_name = new char [HOST_NAME_LENGTH];
 	svcinfo_back.host_name[0] = '\0';
     }
@@ -790,153 +787,146 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 	svcinfo_back.db_err = DbErr_DatabaseNotConnected;
 	return(&svcinfo_back);
     }
-//
-// First, suppose that the ds_name is a PROCESS name
-//
-    std::string query;
-    query = "SELECT DISTINCT CLASS FROM device";
-    query += (" WHERE server = '" + user_ds_name + "/" + user_pers_name + "'");
-
-    if (mysql_query(mysql_conn, query.c_str()) != 0)
-    {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
-	svcinfo_back.db_err = DbErr_DatabaseAccess;
-	return (&svcinfo_back);
-    }
-    MYSQL_RES *result = mysql_store_result(mysql_conn);
-    MYSQL_ROW row;
     
-    std::string 	class_list("");
-    int		nb_class = 0;
-    while ((row = mysql_fetch_row(result)) != NULL)
-    {
-	if (class_list.empty())
-	    class_list = "'" + std::string(row[0]) + "'";
-	else
-	    class_list += (", '" + std::string(row[0]) + "'");
-	++nb_class;
-    }
-    mysql_free_result(result);
-
 //
-// Get all device for each class in the list
+// Get server informations
 //
-//
-// If the ds_name was not a process name, init the class list with the user ds name
-//
-    query = "SELECT SUBSTRING_INDEX(SERVER,'/',1), NAME, HOST, IOR, EXPORTED, ";
-    query += ("PID, SERVER FROM device WHERE ");
-    if (nb_class == 0)
-    {
-	nb_class = 1;
-	class_list = "'" + user_ds_name + "'";
-	query += ("CLASS IN (" + class_list + ") AND SERVER LIKE '%/" + user_pers_name + "'");
-    }
-    else
-    {
-	query += ("SERVER = '"+ user_ds_name + "/" + user_pers_name + "'");
-    }
-    query += (" AND IOR NOT LIKE 'ior:%' ORDER BY CLASS");
+    
+    query = "SELECT pid,host,name,ior,exported FROM device WHERE server='" 
+            + user_ds_name + "/" + user_pers_name + "' AND ior NOT LIKE 'ior:%'";
+	    
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	std::cerr << mysql_error(mysql_conn) << std::endl;
 	svcinfo_back.db_err = DbErr_DatabaseAccess;
 	return (&svcinfo_back);
     }
+    
     result = mysql_store_result(mysql_conn);
-    if (mysql_num_rows(result) == 0)
+
+    dev_length = mysql_num_rows(result);
+    
+    if (dev_length == 0)
     {
-//
-// Set error code if no device have been found
-//
 	mysql_free_result(result);
 	svcinfo_back.db_err = DbErr_DeviceServerNotDefined;
 	return(&svcinfo_back);
-    } 
-//
-// Allocate vector to store each class device list
-//
-    if ((row = mysql_fetch_row(result)) != NULL)
-    {
-//
-// Initialize structure sent-back to client
-//
-	std::string	ds_class("");
-	svcinfo_back.embedded_len = nb_class;
-	svcinfo_back.embedded_val = new svcinfo_server[nb_class];
-	for (long i = 0; i < nb_class; ++i)
-	{
-	    svcinfo_back.embedded_val[i].server_name = NULL;
-	    svcinfo_back.embedded_val[i].dev_val = NULL;
-	}
-   	if (row[2] != NULL) 
-		strncpy(svcinfo_back.host_name, row[2], HOST_NAME_LENGTH - 1);
-	svcinfo_back.host_name[HOST_NAME_LENGTH - 1] = '\0';
-	if (row[6] != NULL) 
-		strncpy(svcinfo_back.process_name, row[6], PROC_NAME_LENGTH - 1);
-	svcinfo_back.process_name[PROC_NAME_LENGTH - 1] = '\0';
-  	if (row[5] != NULL) 
-		svcinfo_back.pid = atoi(row[5]);
-	if (row[3] != NULL)
-	{
-                std::string ior(row[3]);
-                std::string pgm_no;
-                pgm_no = ior.substr(ior.rfind(':')+1);
-                svcinfo_back.program_num = atoi(pgm_no.c_str());
-        }
-	long i = 0;
-        dev_list.clear();
-	do
-        {
-	    if (ds_class != row[0])
-	    {
-	    	dev_length = dev_list.size();
-		if (dev_length != 0)
-		{
-	    	    svcinfo_back.embedded_val[i].dev_val = new svcinfo_dev [dev_length];
-	    	    for (long j = 0; j < dev_length; j++)
-		    {
-		    	svcinfo_back.embedded_val[i].dev_val[j].name = NULL;
-		    	svcinfo_back.embedded_val[i].dev_val[j].name = new char [dev_list[j].name.length() + 1];
-		    	strcpy(svcinfo_back.embedded_val[i].dev_val[j].name, dev_list[j].name.c_str());
-		    	svcinfo_back.embedded_val[i].dev_val[j].exported_flag = dev_list[j].flag;
-		    }
-		    svcinfo_back.embedded_val[i].dev_len = dev_length;
-		    i++;
-		}
-		dev_list.clear();
-
-		ds_class = row[0];
-	    	name_length = ds_class.length();
-	    	svcinfo_back.embedded_val[i].server_name = new char [name_length + 1];
-	    	strcpy(svcinfo_back.embedded_val[i].server_name, ds_class.c_str());
-	    }
-	    SvcDev	dev;
-	    dev.name = row[1];
-	    if (row[4] != NULL) 
-		dev.flag = atoi(row[4]);
-	    dev_list.push_back(dev);	    
-    	}while ((row = mysql_fetch_row(result)) != NULL);
-	dev_length = dev_list.size();
-	svcinfo_back.embedded_val[i].dev_val = new svcinfo_dev [dev_length];
-	for (long j = 0; j < dev_length; j++)
-	{
-	    svcinfo_back.embedded_val[i].dev_val[j].name = NULL;
-	    svcinfo_back.embedded_val[i].dev_val[j].name = new char [dev_list[j].name.length() + 1];
-	    strcpy(svcinfo_back.embedded_val[i].dev_val[j].name, dev_list[j].name.c_str());
-	    svcinfo_back.embedded_val[i].dev_val[j].exported_flag = dev_list[j].flag;
-	}
-	svcinfo_back.embedded_val[i].dev_len = dev_length;
     }
-    else
-    {
-	mysql_free_result(result);
-        return(&svcinfo_back);
+    
+    row = mysql_fetch_row(result);
+    
+    svcinfo_back.pid = atoi(row[0]);
+    std::string ior(row[3]);
+    std::string pgm_no;
+    pgm_no = ior.substr(ior.rfind(':')+1);
+    svcinfo_back.program_num = atoi(pgm_no.c_str());
+    if(row[1]!=NULL) {
+      strncpy(svcinfo_back.host_name, row[1], HOST_NAME_LENGTH - 1);
+      svcinfo_back.host_name[HOST_NAME_LENGTH - 1] = '\0';
     }
+    
+    if( row[1]==NULL || svcinfo_back.pid == 0 ) {
+    
+       // We have here a server that has not been started
+       // Do not search for embedded server
+              
+       svcinfo_back.embedded_len = 1;
+       svcinfo_back.embedded_val = new svcinfo_server[1];
+       svcinfo_back.embedded_val[0].server_name = new char [user_ds_name.length() + 1];
+       strcpy(svcinfo_back.embedded_val[0].server_name,user_ds_name.c_str());
+       svcinfo_back.embedded_val[0].dev_len = dev_length;
+       svcinfo_back.embedded_val[0].dev_val = new svcinfo_dev [dev_length];
+       for(i=0;i<dev_length;i++) {
+         std::string dev_name(row[2]);
+         svcinfo_back.embedded_val[0].dev_val[i].name = new char [dev_name.length()+1];
+         strcpy(svcinfo_back.embedded_val[0].dev_val[i].name, dev_name.c_str());
+         svcinfo_back.embedded_val[0].dev_val[i].exported_flag = atoi(row[4]);        
+	 row = mysql_fetch_row(result);
+       }
+       
+       mysql_free_result(result);
+       return(&svcinfo_back);
+           
+    }
+    
     mysql_free_result(result);
+    
 //
-// Leave function
+// Search for embedded server
 //
+// As we don't have the process name column within the 'tango' database scheme,
+// we will use the couple host,pid instead. Note that with TACO the server
+// name and the process name can be different, this happens when you have 
+// several servers embedded whithin a process.
+// Note that we CAN'T use the class column as the class name can be different
+// from the server name.
+
+    query = "SELECT DISTINCT server FROM device WHERE host='";
+    query += svcinfo_back.host_name;
+    query += "' and server like '%/" + user_pers_name + "' and pid=";
+    char pid_str[256];
+    sprintf(pid_str,"%d",svcinfo_back.pid);
+    query += pid_str;
+	    
+    if (mysql_query(mysql_conn, query.c_str()) != 0)
+    {
+	std::cerr << mysql_error(mysql_conn) << std::endl;
+	svcinfo_back.db_err = DbErr_DatabaseAccess;
+	return (&svcinfo_back);
+    }
+    
+    result = mysql_store_result(mysql_conn);
+    
+    name_length = mysql_num_rows(result);
+       
+    svcinfo_back.embedded_len = name_length;
+    svcinfo_back.embedded_val = new svcinfo_server[name_length];
+    for(i=0;i<name_length;i++) {
+    
+      row = mysql_fetch_row(result);
+      std::string full_srv_name(row[0]);
+      std::string::size_type pos = full_srv_name.find('/');
+      std::string srv_name = full_srv_name.substr(0,pos);
+      svcinfo_back.embedded_val[i].server_name = new char [srv_name.length() + 1];
+      strcpy(svcinfo_back.embedded_val[i].server_name,srv_name.c_str());
+      
+      if(name_length==1) {
+        // When there is only one server within a process, we can say
+	// that the server name is also the process name.
+        strncpy(svcinfo_back.process_name, srv_name.c_str(), PROC_NAME_LENGTH - 1);
+        svcinfo_back.process_name[PROC_NAME_LENGTH - 1] = '\0';        
+      }
+      
+      // Retrieve the device list
+      query = "SELECT name,exported FROM device WHERE server='" + full_srv_name + "'";
+	    
+      if (mysql_query(mysql_conn, query.c_str()) != 0)
+      {
+        mysql_free_result(result);
+	std::cerr << mysql_error(mysql_conn) << std::endl;
+	svcinfo_back.db_err = DbErr_DatabaseAccess;
+	return (&svcinfo_back);
+      }
+      
+      result2 = mysql_store_result(mysql_conn);
+      
+      dev_length = mysql_num_rows(result2);
+      svcinfo_back.embedded_val[i].dev_len = dev_length;
+      svcinfo_back.embedded_val[i].dev_val = new svcinfo_dev [dev_length];
+      
+      for(j=0;j<dev_length;j++) {
+        row2 = mysql_fetch_row(result2);
+        std::string dev_name(row2[0]);
+        svcinfo_back.embedded_val[i].dev_val[j].name = new char [dev_name.length()+1];
+        strcpy(svcinfo_back.embedded_val[i].dev_val[j].name, dev_name.c_str());
+        svcinfo_back.embedded_val[i].dev_val[j].exported_flag = atoi(row2[1]);        
+      }
+      
+      mysql_free_result(result2);      
+                  
+    }
+        
+    mysql_free_result(result);      
     return(&svcinfo_back);
 }
 
@@ -952,9 +942,16 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
  */
 long *MySQLServer::svcdelete_1_svc(db_res *recev)
 {
-    std::string 		user_ds_name(recev->res_val.arr1_val[0]),
+    long 		i,
+			dev_length;
+	
+    std::string 	user_ds_name(recev->res_val.arr1_val[0]),
 			user_pers_name(recev->res_val.arr1_val[1]);
 		
+    std::string query;
+    MYSQL_RES *result;
+    MYSQL_ROW row;
+    
 #ifdef DEBUG
     std::cout << "In svcdelete_1_svc function for " << user_ds_name << "/" << user_pers_name << std::endl;
 #endif
@@ -976,92 +973,70 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
+    
 //
-// First, suppose that the ds_name is a PROCESS name
+// Delete only the specified server (not the process) as we don't have the 
+// process name column whithin the 'tango' scheme.
+// Note that we CAN'T use the class column as the class name can be different
+// from the server name.
 //
-    std::string query;
-    query = "SELECT DISTINCT CLASS FROM device WHERE SERVER = '" + user_ds_name + "/" + user_pers_name + "'";
+    
+    query = "SELECT name FROM device WHERE server='" 
+            + user_ds_name + "/" + user_pers_name + "' AND ior NOT LIKE 'ior:%'";
+	    
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	std::cerr << mysql_error(mysql_conn) << std::endl;
 	errcode = DbErr_DatabaseAccess;
 	return (&errcode);
     }
-    MYSQL_RES *result = mysql_store_result(mysql_conn);
-    MYSQL_ROW row;
-    std::string class_list("");
-
-    while((row = mysql_fetch_row(result)) != NULL)
-    {
-	if (class_list.empty())
-	    class_list = "'" + std::string(row[0]) + "'";
-	else
-	    class_list += (", '" + std::string(row[0]) + "'");
-    }
-    mysql_free_result(result);
-//
-// If the ds_name was not a process name, init the class list with the user ds name
-//
-    query = "SELECT NAME FROM device WHERE ";
-    if (class_list.empty())
-    {
-	class_list = "'" + user_ds_name + "'";
-	query += ("class IN (" + class_list + ") AND server LIKE '%/" + user_pers_name + "'");
-    }
-    else
-    {
-	query += ("server = '"+ user_ds_name + "/" + user_pers_name + "'");
-    }
-    query += (" AND IOR NOT LIKE 'ior:%'");
-    if (mysql_query(mysql_conn, query.c_str()) != 0)
-    {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
-	errcode = DbErr_DatabaseAccess;
-	return (&errcode);
-    }
-    std::string	dev_list("");
+    
     result = mysql_store_result(mysql_conn);
-    while((row = mysql_fetch_row(result)) != NULL)
+
+    dev_length = mysql_num_rows(result);
+    
+    if (dev_length == 0)
     {
-	if (dev_list.empty())
-	    dev_list = "'" + std::string(row[0]) + "'";
-	else
-	    dev_list += ", '" + std::string(row[0]) + "'";
-    }
-    mysql_free_result(result);
-    if (dev_list.empty())
-    {
+	mysql_free_result(result);
 	errcode = DbErr_DeviceServerNotDefined;
 	return (&errcode);
     }
-//
-// Delete every resource for all devices in the ds name list
-//
-	if (del_res == true)
-	{
-		query = "DELETE FROM property_device WHERE DEVICE IN (" + dev_list + ")";
-
-		if (mysql_query(mysql_conn, query.c_str()) != 0)
-		{
-			std::cerr << mysql_error(mysql_conn) << std::endl;
-			errcode = DbErr_DatabaseAccess;
-			return (&errcode);
-		}
-	}
-//
-// Delete every devices for each ds name in the list
-//
-	query = "DELETE FROM device WHERE name IN (" + dev_list + ")";
-	if (mysql_query(mysql_conn, query.c_str()) != 0)
-	{
-		std::cerr << mysql_error(mysql_conn) << std::endl;
-		errcode = DbErr_DatabaseAccess;
-		return (&errcode);
-	}
-//
-// Leave call
-//				
+    
+                      
+    for(i=0;i<dev_length;i++) {
+       
+      row = mysql_fetch_row(result);
+    
+      std::string dev_name(row[0]);
+         
+      if (del_res == true) {
+	 
+        query = "DELETE FROM property_device WHERE device='" + dev_name + "'";
+        if (mysql_query(mysql_conn, query.c_str()) != 0)
+        {
+          mysql_free_result(result);
+          std::cerr << mysql_error(mysql_conn) << std::endl;
+          errcode = DbErr_DatabaseAccess;
+          return (&errcode);
+        }
+	   
+      }
+	 
+      query = "DELETE FROM device WHERE name='" + dev_name + "'";
+      if (mysql_query(mysql_conn, query.c_str()) != 0)
+      {
+        mysql_free_result(result);
+        std::cerr << mysql_error(mysql_conn) << std::endl;
+        errcode = DbErr_DatabaseAccess;
+        return (&errcode);
+      }
+	 
+	 
+    }
+       
+    mysql_free_result(result);
     return(&errcode);
+           
 }
 
 
