@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.1 $
+ * Version:	$Revision: 1.2 $
  *
- * Date:	$Date: 2006-09-27 12:21:35 $
+ * Date:	$Date: 2006-10-04 19:26:19 $
  *
  */
 
@@ -732,11 +732,6 @@ long *SQLite3Server::unreg_1_svc(db_res *recev)
 
 
 
-typedef struct
-{
-    std::string	name;
-    int		flag;
-}SvcDev;
 /**
  * retrieve device server info from the database
  *
@@ -747,15 +742,13 @@ typedef struct
  */
 svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
 {
-    long 		indi,
-			i,
-			j,
-			dev_length,
+	long 		dev_length,
 			name_length;
-    std::vector<SvcDev> dev_list;
-	
-    std::string 	user_ds_name(recev->res_val.arr1_val[0]),
-    			user_pers_name(recev->res_val.arr1_val[1]);
+
+	std::string 	user_ds_name(recev->res_val.arr1_val[0]),
+    			user_pers_name(recev->res_val.arr1_val[1]),
+			query;
+
 		
 #ifdef DEBUG
 	std::cout << "in svcinfo_1_svc function for " << user_ds_name << "/" << user_pers_name << std::endl;
@@ -775,9 +768,9 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
 	try
 	{
 		svcinfo_back.process_name = new char [PROC_NAME_LENGTH];
-		svcinfo_back.process_name[0] = '\0';
+		strcpy(svcinfo_back.process_name , "unknown");
 		svcinfo_back.host_name = new char [HOST_NAME_LENGTH];
-		svcinfo_back.host_name[0] = '\0';
+		strcpy(svcinfo_back.host_name, "not_exp");
     	}
 	catch (std::bad_alloc)
 	{
@@ -795,11 +788,11 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
 		return(&svcinfo_back);
 	}
 //
-// First, suppose that the ds_name is a PROCESS name
+// Get server informations
 //
-	std::string query;
-	query = "SELECT DISTINCT CLASS FROM device";
-	query += (" WHERE server = '" + user_ds_name + "/" + user_pers_name + "'");
+	query = "SELECT PID, HOST, NAME, IOR, EXPORTED FROM device WHERE server='"
+		+ user_ds_name + "/" + user_pers_name + "' AND IOR NOT LIKE 'ior:%'";
+
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
@@ -811,130 +804,129 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
 	std::string 	class_list("");
 	int		nb_class = 0;
 	int		k = ncol;
-	
-	for (int i = 0; i < nrow; ++i, k += ncol, ++nb_class)
-	{
-		if (class_list.empty())
-			class_list = "'" + std::string(result[k]) + "'";
-		else
-			class_list += (", '" + std::string(result[k]) + "'");
-	}
-	sqlite3_free_table(result);
 
-//
-// Get all device for each class in the list
-//
-//
-// If the ds_name was not a process name, init the class list with the user ds name
-//
-//	query = "SELECT SUBSTRING_INDEX(SERVER,'/',1), NAME, HOST, IOR, EXPORTED, ";
-	query = "SELECT SERVER, NAME, HOST, IOR, EXPORTED, PID, SERVER FROM device WHERE ";
-	if (nb_class == 0)
+	dev_length = nrow;
+
+	if (dev_length == 0)
 	{
-		nb_class = 1;
-		class_list = "'" + user_ds_name + "'";
-		query += ("CLASS IN (" + class_list + ") AND SERVER LIKE '%/" + user_pers_name + "'");
+		sqlite3_free_table(result);
+		svcinfo_back.db_err = DbErr_DeviceServerNotDefined;
+ 		return(&svcinfo_back);
 	}
-	else
+
+	svcinfo_back.pid = atoi(result[k]);
+	std::string ior(result[k + 3]);
+	std::string pgm_no = ior.substr(ior.rfind(':') + 1);
+	svcinfo_back.program_num = atoi(pgm_no.c_str());
+	if(result[k + 1] != NULL) 
 	{
-		query += ("SERVER = '"+ user_ds_name + "/" + user_pers_name + "'");
+		strncpy(svcinfo_back.host_name, result[k + 1], HOST_NAME_LENGTH - 1);
+		svcinfo_back.host_name[HOST_NAME_LENGTH - 1] = '\0';
 	}
-	query += (" AND IOR NOT LIKE 'ior:%' ORDER BY CLASS");
-#ifdef DEBUG
-	std::cout << "SQLite3Server::svcinfo_1_svc() : query = " << query << std::endl;
-#endif
+
+	if (result[ncol + 1] == NULL || svcinfo_back.pid == 0 ) 
+	{
+//
+// We have here a server that has not been started
+// Do not search for embedded server
+//
+		svcinfo_back.embedded_len = 1;
+		svcinfo_back.embedded_val = new svcinfo_server[1];
+		svcinfo_back.embedded_val[0].server_name = new char [user_ds_name.length() + 1];
+		strcpy(svcinfo_back.embedded_val[0].server_name, user_ds_name.c_str());
+		svcinfo_back.embedded_val[0].dev_len = dev_length;
+		svcinfo_back.embedded_val[0].dev_val = new svcinfo_dev [dev_length];
+		for(int i = 0; i < dev_length; i++, k += ncol) 
+		{
+			std::string dev_name(result[k + 2]);
+			svcinfo_back.embedded_val[0].dev_val[i].name = new char [dev_name.length()+1];
+			strcpy(svcinfo_back.embedded_val[0].dev_val[i].name, dev_name.c_str());
+			svcinfo_back.embedded_val[0].dev_val[i].exported_flag = atoi(result[k + 4]);
+		}
+		sqlite3_free_table(result);
+//
+// Leave function
+//
+		return(&svcinfo_back);
+	}
+//
+// Search for embedded server
+//
+// As we don't have the process name column within the 'tango' database scheme,
+// we will use the couple host,pid instead. Note that with TACO the server
+// name and the process name can be different, this happens when you have
+// several servers embedded whithin a process.
+// Note that we CAN'T use the class column as the class name can be different
+// from the server name.
+//
+	query = "SELECT DISTINCT SERVER FROM DEVICE WHERE HOST ='";
+	query += std::string(svcinfo_back.host_name) + "' AND SERVER LIKE '%/" + user_pers_name + "' AND PID = ";
+	char pid_str[32];
+	snprintf(pid_str, sizeof(pid_str), "%d", svcinfo_back.pid);
+	query += pid_str;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		std::cout << sqlite3_errmsg(db) << std::endl;
 		svcinfo_back.db_err = DbErr_DatabaseAccess;
 		return (&svcinfo_back);
 	}
-	if (nrow == 0)
-	{
-//
-// Set error code if no device have been found
-//
-		sqlite3_free_table(result);
-		svcinfo_back.db_err = DbErr_DeviceServerNotDefined;
-		return(&svcinfo_back);
-	} 
-//
-// Allocate vector to store each class device list
-//
-//
-// Initialize structure sent-back to client
-//
-	std::string	ds_class("");
-	svcinfo_back.embedded_len = nb_class;
-	svcinfo_back.embedded_val = new svcinfo_server[nb_class];
-	for (long i = 0; i < nb_class; ++i)
-	{
-	    svcinfo_back.embedded_val[i].server_name = NULL;
-	    svcinfo_back.embedded_val[i].dev_val = NULL;
-	}
-   	if (result[ncol + 2] != NULL) 
-		strncpy(svcinfo_back.host_name, result[ncol + 2], HOST_NAME_LENGTH - 1);
-	svcinfo_back.host_name[HOST_NAME_LENGTH - 1] = '\0';
-	if (result[ncol + 6] != NULL) 
-		strncpy(svcinfo_back.process_name, result[ncol + 6], PROC_NAME_LENGTH - 1);
-	svcinfo_back.process_name[PROC_NAME_LENGTH - 1] = '\0';
-  	if (result[ncol + 5] != NULL) 
-		svcinfo_back.pid = atoi(result[ncol + 5]);
-	if (result[ncol + 3] != NULL)
-	{
-                std::string ior(result[ncol + 3]);
-                std::string pgm_no;
-                pgm_no = ior.substr(ior.rfind(':')+1);
-                svcinfo_back.program_num = atoi(pgm_no.c_str());
-        }
-	i = 0;
-        dev_list.clear();
-	int l = ncol;
-	for (int k = 0; k < nrow; ++k, l += ncol)
-        {
-	    if (ds_class != result[l])
-	    {
-	    	dev_length = dev_list.size();
-		if (dev_length != 0)
-		{
-	    	    svcinfo_back.embedded_val[i].dev_val = new svcinfo_dev [dev_length];
-	    	    for (long j = 0; j < dev_length; j++)
-		    {
-		    	svcinfo_back.embedded_val[i].dev_val[j].name = NULL;
-		    	svcinfo_back.embedded_val[i].dev_val[j].name = new char [dev_list[j].name.length() + 1];
-		    	strcpy(svcinfo_back.embedded_val[i].dev_val[j].name, dev_list[j].name.c_str());
-		    	svcinfo_back.embedded_val[i].dev_val[j].exported_flag = dev_list[j].flag;
-		    }
-		    svcinfo_back.embedded_val[i].dev_len = dev_length;
-		    i++;
-		}
-		dev_list.clear();
 
-		ds_class = result[l];
-	    	name_length = ds_class.length();
-	    	svcinfo_back.embedded_val[i].server_name = new char [name_length + 1];
-	    	strcpy(svcinfo_back.embedded_val[i].server_name, ds_class.c_str());
-	    }
-	    SvcDev	dev;
-	    dev.name = result[l + 1];
-	    if (result[l + 4] != NULL) 
-		dev.flag = atoi(result[l + 4]);
-	    dev_list.push_back(dev);	    
-    	}
-	dev_length = dev_list.size();
-	svcinfo_back.embedded_val[i].dev_val = new svcinfo_dev [dev_length];
-	for (long j = 0; j < dev_length; j++)
+	name_length = ncol;
+
+	svcinfo_back.embedded_len = name_length;
+	svcinfo_back.embedded_val = new svcinfo_server[name_length];
+	k = ncol;
+	for(int i = 0; i < name_length; i++, k += ncol) 
 	{
-	    svcinfo_back.embedded_val[i].dev_val[j].name = NULL;
-	    svcinfo_back.embedded_val[i].dev_val[j].name = new char [dev_list[j].name.length() + 1];
-	    strcpy(svcinfo_back.embedded_val[i].dev_val[j].name, dev_list[j].name.c_str());
-	    svcinfo_back.embedded_val[i].dev_val[j].exported_flag = dev_list[j].flag;
+		std::string full_srv_name(result[k]);
+		std::string::size_type pos = full_srv_name.find('/');
+		std::string srv_name = full_srv_name.substr(0,pos);
+		svcinfo_back.embedded_val[i].server_name = new char [srv_name.length() + 1];
+		strcpy(svcinfo_back.embedded_val[i].server_name, srv_name.c_str());
+
+		if(name_length == 1) 
+		{
+//
+// When there is only one server within a process, we can say
+// that the server name is also the process name.
+//
+			strncpy(svcinfo_back.process_name, srv_name.c_str(), PROC_NAME_LENGTH - 1);
+			svcinfo_back.process_name[PROC_NAME_LENGTH - 1] = '\0';
+		}
+//
+// Retrieve the device list
+//
+		char 	**result2;
+		char 	*zErrMsg2;
+		int	nrow2,
+			ncol2;
+
+		query = "SELECT NAME, EXPORTED FROM DEVICE WHERE SERVER ='" + full_srv_name + "'";
+		if (sqlite3_get_table(db, query.c_str(), &result2, &nrow2, &ncol2, &zErrMsg2) != SQLITE_OK)
+		{
+			std::cout << sqlite3_errmsg(db) << std::endl;
+			sqlite3_free_table(result);
+			svcinfo_back.db_err = DbErr_DatabaseAccess;
+			return (&svcinfo_back);
+		}
+		dev_length = nrow2;
+		svcinfo_back.embedded_val[i].dev_len = dev_length;
+		svcinfo_back.embedded_val[i].dev_val = new svcinfo_dev [dev_length];
+
+		long	l = ncol2;
+		for(int j = 0; j < dev_length; ++j, l += ncol2) 
+		{
+		        std::string dev_name(result2[l]);
+			svcinfo_back.embedded_val[i].dev_val[j].name = new char [dev_name.length()+1];
+			strcpy(svcinfo_back.embedded_val[i].dev_val[j].name, dev_name.c_str());
+			svcinfo_back.embedded_val[i].dev_val[j].exported_flag = atoi(result2[l + 1]);
+		}
+		sqlite3_free_table(result2);
 	}
-	svcinfo_back.embedded_val[i].dev_len = dev_length;
-	sqlite3_free_table(result);
 //
 // Leave function
 //
+	sqlite3_free_table(result);
 	return(&svcinfo_back);
 }
 
@@ -950,11 +942,11 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
  */
 long *SQLite3Server::svcdelete_1_svc(db_res *recev)
 {
-    std::string 		user_ds_name(recev->res_val.arr1_val[0]),
+	std::string 	user_ds_name(recev->res_val.arr1_val[0]),
 			user_pers_name(recev->res_val.arr1_val[1]);
 		
 #ifdef DEBUG
-    std::cout << "In svcdelete_1_svc function for " << user_ds_name << "/" << user_pers_name << std::endl;
+	std::cout << "In svcdelete_1_svc function for " << user_ds_name << "/" << user_pers_name << std::endl;
 #endif
 //
 // Get delete resource flag
@@ -964,27 +956,76 @@ long *SQLite3Server::svcdelete_1_svc(db_res *recev)
 //
 // Initialize structure sent back to client
 //
-    errcode = 0;
+	errcode = 0;
 //
 // If the server is not connected to the database, returns error
 //
-    if (dbgen.connected == False)
-    {
-	std::cout << "I'm not connected to database." << std::endl;
-	errcode = DbErr_DatabaseNotConnected;
-	return(&errcode);
-    }
+	if (dbgen.connected == False)
+	{
+		std::cout << "I'm not connected to database." << std::endl;
+		errcode = DbErr_DatabaseNotConnected;
+		return(&errcode);
+	}
 //
-// First, suppose that the ds_name is a PROCESS name
+// Delete only the specified server (not the process) as we don't have the
+// process name column whithin the 'tango' scheme.
+// Note that we CAN'T use the class column as the class name can be different
+// from the server name.
 //
-    std::string query;
-    query = "SELECT DISTINCT CLASS FROM device WHERE SERVER = '" + user_ds_name + "/" + user_pers_name + "'";
+	std::string query;
+	query = "SELECT DISTINCT CLASS FROM device WHERE SERVER = '" + user_ds_name + "/" + user_pers_name + "'";
+	query = "SELECT NAME FROM DEVICE WHERE SERVER = '"
+		+ user_ds_name + "/" + user_pers_name + "' AND IOR NOT LIKE 'ior:%'";
+
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		std::cout << sqlite3_errmsg(db) << std::endl;
 		errcode = DbErr_DatabaseAccess;
 		return (&errcode);
 	}
+	int dev_length = ncol;
+	if (dev_length == 0)
+	{
+		sqlite3_free_table(result);
+		std::cout << sqlite3_errmsg(db) << std::endl;
+		errcode = DbErr_DeviceServerNotDefined;
+		return (&errcode);
+	}
+
+	int k = ncol;
+	char	**result2,
+		*zErrMsg2;
+	int	ncol2,
+		nrow2;
+	for(int i = 0; i < dev_length; ++i) 
+	{
+		std::string dev_name(result[k]);
+		if (del_res == true) 
+		{
+			query = "DELETE FROM PROPERTY_DEVICE WHERE DEVICE = '" + dev_name + "'";
+			if (sqlite3_get_table(db, query.c_str(), &result2, &nrow2, &ncol2, &zErrMsg2) != SQLITE_OK)
+			{
+				sqlite3_free_table(result);
+				std::cout << sqlite3_errmsg(db) << std::endl;
+				errcode = DbErr_DatabaseAccess;
+				return (&errcode);
+			}
+			sqlite3_free_table(result2);
+		}
+
+		query = "DELETE FROM DEVICE WHERE NAME = '" + dev_name + "'";
+		if (sqlite3_get_table(db, query.c_str(), &result2, &nrow2, &ncol2, &zErrMsg2) != SQLITE_OK)
+		{
+			sqlite3_free_table(result);
+			std::cout << sqlite3_errmsg(db) << std::endl;
+			errcode = DbErr_DatabaseAccess;
+			return (&errcode);
+		}
+		sqlite3_free_table(result2);
+	}
+	sqlite3_free_table(result);
+
+
 	std::string class_list("");
 	int j = ncol;
 	for (int i = 0; i < nrow; ++i, j += ncol)
@@ -994,71 +1035,10 @@ long *SQLite3Server::svcdelete_1_svc(db_res *recev)
 		else
 			class_list += (", '" + std::string(result[j]) + "'");
 	}
-	sqlite3_free_table(result);
-//
-// If the ds_name was not a process name, init the class list with the user ds name
-//
-    query = "SELECT NAME FROM device WHERE ";
-    if (class_list.empty())
-    {
-	class_list = "'" + user_ds_name + "'";
-	query += ("class IN (" + class_list + ") AND server LIKE '%/" + user_pers_name + "'");
-    }
-    else
-    {
-	query += ("server = '"+ user_ds_name + "/" + user_pers_name + "'");
-    }
-    query += (" AND IOR NOT LIKE 'ior:%'");
-	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
-	{
-		std::cout << sqlite3_errmsg(db) << std::endl;
-		errcode = DbErr_DatabaseAccess;
-		return (&errcode);
-	}
-	std::string	dev_list("");
-	j = ncol;
-	for (int i = 0; i < nrow; ++i, j += ncol)
-	{
-		if (dev_list.empty())
-			dev_list = "'" + std::string(result[j]) + "'";
-		else
-			dev_list += ", '" + std::string(result[j]) + "'";
-	}
-	sqlite3_free_table(result);
-	if (dev_list.empty())
-	{
-		errcode = DbErr_DeviceServerNotDefined;
-		return (&errcode);
-	}
-//
-// Delete every resource for all devices in the ds name list
-//
-	if (del_res == true)
-	{
-		query = "DELETE FROM property_device WHERE DEVICE IN (" + dev_list + ")";
-
-		if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
-		{
-			std::cout << sqlite3_errmsg(db) << std::endl;
-			errcode = DbErr_DatabaseAccess;
-			return (&errcode);
-		}
-		sqlite3_free_table(result);
-	}
-//
-// Delete every devices for each ds name in the list
-//
-	query = "DELETE FROM device WHERE name IN (" + dev_list + ")";
-	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
-	{
-		std::cout << sqlite3_errmsg(db) << std::endl;
-		errcode = DbErr_DatabaseAccess;
-		return (&errcode);
-	}
-	sqlite3_free_table(result);
 //
 // Leave call
 //				
+	sqlite3_free_table(result);
 	return(&errcode);
 }
 
@@ -1133,10 +1113,10 @@ db_poller_svc *SQLite3Server::getpoller_1_svc(nam *dev)
 //
 // Search for a resource "ud_poll_list" with its value set to caller device name
 //
-    std::string query;
+	std::string query;
 
-    query = "SELECT DEVICE FROM property_device WHERE DOMAIN = 'sys' AND";
-    query += ("name = '" + std::string(POLL_RES) + "' AND UPPER(value) = UPPER('" + user_device + "')");
+	query = "SELECT DEVICE FROM property_device WHERE DOMAIN = 'sys' AND";
+	query += (" name = '" + std::string(POLL_RES) + "' AND UPPER(value) = UPPER('" + user_device + "')");
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		std::cout << sqlite3_errmsg(db) << std::endl;
@@ -1164,8 +1144,8 @@ db_poller_svc *SQLite3Server::getpoller_1_svc(nam *dev)
 //
 // get poller device info from the NAMES table
 //
-    query = "SELECT DEVICE_SERVER_CLASS, DEVICE_SERVER_NAME, HOSTNAME, PROCESS_NAME, PROCESS_ID FROM NAMES";
-    query += (" WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + poller_name + "'");
+	query = "SELECT SERVER, HOST, PID FROM device";
+	query += (" WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + poller_name + "'");
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		std::cout << sqlite3_errmsg(db) << std::endl;
@@ -1174,11 +1154,17 @@ db_poller_svc *SQLite3Server::getpoller_1_svc(nam *dev)
     	}
 	if (nrow != 0)
 	{
-		strcpy(poll_back.server_name, result[ncol]);
-		strcpy(poll_back.personal_name, result[ncol + 1]);
-		strcpy(poll_back.host_name, result[ncol + 2]);
-		strcpy(poll_back.process_name, result[ncol + 3]);
-		poll_back.pid = atoi(result[ncol + 4]);
+		std::string full_srv_name(result[ncol]);
+		std::string::size_type pos = full_srv_name.find('/');
+		std::string srv_name = full_srv_name.substr(0, pos);
+		std::string pers_name = full_srv_name.substr(pos + 1);
+
+		strcpy(poll_back.server_name, srv_name.c_str());
+		strcpy(poll_back.personal_name, pers_name.c_str());
+		strcpy(poll_back.host_name, result[ncol + 1]);
+		strcpy(poll_back.process_name, srv_name.c_str()); // Here process = server name
+		poll_back.pid = atoi(result[ncol + 2]);
+
     	}
 	else
 	{
