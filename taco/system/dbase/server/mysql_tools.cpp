@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jlpons $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.17 $
+ * Version:	$Revision: 1.18 $
  *
- * Date:	$Date: 2006-10-02 14:50:38 $
+ * Date:	$Date: 2006-10-04 19:24:43 $
  *
  */
 
@@ -770,7 +770,7 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 	svcinfo_back.process_name = new char [PROC_NAME_LENGTH];
 	strcpy(svcinfo_back.process_name , "unknown");
 	svcinfo_back.host_name = new char [HOST_NAME_LENGTH];
-	svcinfo_back.host_name[0] = '\0';
+	strcpy(svcinfo_back.host_name, "not_exp");
     }
     catch (std::bad_alloc)
     {
@@ -864,8 +864,8 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
     query = "SELECT DISTINCT server FROM device WHERE host='";
     query += svcinfo_back.host_name;
     query += "' and server like '%/" + user_pers_name + "' and pid=";
-    char pid_str[256];
-    sprintf(pid_str,"%d",svcinfo_back.pid);
+    char pid_str[32];
+    snprintf(pid_str, sizeof(pid_str), "%d", svcinfo_back.pid);
     query += pid_str;
 	    
     if (mysql_query(mysql_conn, query.c_str()) != 0)
@@ -1157,7 +1157,7 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
       std::string full_srv_name(row[0]);
       std::string::size_type pos = full_srv_name.find('/');
       std::string srv_name = full_srv_name.substr(0,pos);
-      std::string pers_name = full_srv_name.substr(pos+1,full_srv_name.length());
+      std::string pers_name = full_srv_name.substr(pos+1);
       strcpy(poll_back.server_name, srv_name.c_str());
       strcpy(poll_back.personal_name, pers_name.c_str());
       strcpy(poll_back.host_name, row[1]);
