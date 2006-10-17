@@ -44,7 +44,7 @@ EXTRA_DIST 		+= testsuite.at $(TESTSUITE_AT) testsuite
 
 TESTSUITE 		= testsuite
 
-TESTSUITE_AT		= dbase.at devices.at starter.at message.at specialtest1.at local.at ext.at cleanup.at
+TESTSUITE_AT		= dbase.at devices.at starter.at message.at specialtest1.at local.at ext.at cleanup.at gdbm.at
 
 AUTOTEST 		= $(AUTOM4TE) --language=autotest
 

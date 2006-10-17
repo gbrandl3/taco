@@ -45,6 +45,7 @@ AT_CHECK([unset RES_BASE_DIR; TACO_DATABASE=gdbm; taco start ; sleep 10])
 AT_CLEANUP
 
 AT_BANNER([[Testing the database server.]])
+m4_include([gdbm.at])
 m4_include([dbase.at])
 
 AT_BANNER([[Testing the devices.]])
@@ -66,7 +67,6 @@ AT_CLEANUP
 
 AT_BANNER([Testing TACO system (SQLite3 database backend)])
 
-sqlite3=yes
 AT_SETUP([Starting TACO])
 AT_CHECK([unset RES_BASE_DIR; TACO_DATABASE=sqlite3 taco start ; sleep 10])
 AT_CLEANUP
