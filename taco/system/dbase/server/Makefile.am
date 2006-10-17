@@ -17,7 +17,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-noinst_HEADERS		= NdbmClass.h NdbmServer.h MySqlServer.h dbClass.h svc.h
+noinst_HEADERS		= dbClass.h svc.h
 
 sbin_PROGRAMS		= dbm_server
 
@@ -27,6 +27,7 @@ INCLUDES		= @TACO_INCLUDES@
 AM_CPPFLAGS		= -DDEBUG
 
 if GDBMSUPPORT
+noinst_HEADERS		+= NdbmClass.h NdbmServer.h 
 lib_LTLIBRARIES 	+= libTACOndbm.la 
 
 libTACOndbm_la_SOURCES = dbm_serv.cpp \
@@ -48,6 +49,7 @@ AM_CPPFLAGS		+= -DNDBM -DUSE_GDBM -DDEBUG
 endif
 
 if MYSQLSUPPORT
+noinst_HEADERS		+= MySqlServer.h 
 lib_LTLIBRARIES		+= libTACOMySQL.la
 libTACOMySQL_la_SOURCES = mysql_serv.cpp \
 			mysql_devbro.cpp \
@@ -67,6 +69,7 @@ AM_CPPFLAGS		+= -DUSE_MYSQL -DDEBUG
 endif
 
 if SQLITE3SUPPORT
+noinst_HEADERS		+= Sqlite3Server.h
 lib_LTLIBRARIES		+= libTACOSQLite3.la
 libTACOSQLite3_la_SOURCES = sqlite3_serv.cpp \
 			sqlite3_devbro.cpp \
