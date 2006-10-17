@@ -53,11 +53,11 @@ case $autoconfversion in
 esac
 
 case $automakeversion in
-    *1.[7-9]*)
+    *1.[7-9]*|*1.1[0-9]*)
         ;;
     *)
         echo "This automake version is not supported by taco."
-        echo "taco only supports automake 1.[7-9].*."
+        echo "taco only supports automake 1.[7-9].* and 1.1[0-9]."
         echo "You may download it from ftp://ftp.gnu.org/gnu/automake"
         exit
         ;;
