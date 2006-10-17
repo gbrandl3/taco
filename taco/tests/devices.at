@@ -19,7 +19,7 @@ dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 dnl 02111-1307, USA.
 
 AT_SETUP([Start Inst_verify device server])
-AT_CHECK([taco Inst_verify 1 -d 
+AT_CHECK([taco Inst_verify 1 -m -d 
 sleep 1
 ps x | grep Inst_verify | grep -v grep | wc -l], [],
 [[1
@@ -80,8 +80,11 @@ AT_CHECK([taco db_devinfo test/device/x], [255],
 AT_CLEANUP
 
 AT_SETUP([Start AGPSpp device server ])
-AT_CHECK([taco AGPSpp 1 -d >/dev/null 
-sleep 1])
+AT_CHECK([taco AGPSpp 1 -m -d 
+sleep 1
+ps x | grep Inst_verify | grep -v grep | wc -l], [],
+[[1
+]])
 AT_CLEANUP
 
 AT_SETUP([Send commands to the AGPSpp])
@@ -159,7 +162,7 @@ test/longfamily/long/longresource: 25
 ]])
 AT_CHECK([
 RES_BASE_DIR=`pwd` taco db_update test_server.res
-AT_TACO_RUN_TEST([test_server 1 -d])
+AT_TACO_RUN_TEST([test_server 1 -m -d])
 sleep 5
 AT_TACO_RUN_LOCAL([test_connect test/a/1])
 AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [Set protocol to TCP

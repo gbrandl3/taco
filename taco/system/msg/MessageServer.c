@@ -29,9 +29,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2006-09-18 21:46:20 $
+ * Date:	$Date: 2006-10-17 13:54:02 $
  */
 
 /*
@@ -76,6 +76,7 @@
 
 extern MessageServerPart 	msg;
 extern FILE		 	*logFile;
+
 char *getTimeString(const char *name);
 
 /***************************************
@@ -309,10 +310,10 @@ _msg_out *rpc_msg_send_1 (_msg_data *msg_data)
  */
 	fildes = open (pipe_name, O_APPEND | O_WRONLY);
 	if (fildes == -1)
-		fildes = open(pipe_name, O_CREAT | O_WRONLY);
+		fildes = open(pipe_name, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
 	if (fildes == -1)
 	{
-  		fprintf (logFile, "%s Pipe name : %s, %d %s\n", getTimeString("MessageServer"), pipe_name, errno, strerror(errno));
+  		fprintf (logFile, "%s Pipe name : %s, %d (%s)\n", getTimeString("MessageServer"), pipe_name, errno, strerror(errno));
 		msg_out.error = DevErr_CannotOpenPipe;
 		msg_out.status = -1;
 		return (&msg_out);
