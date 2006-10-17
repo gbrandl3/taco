@@ -1,3 +1,9 @@
+2006-10-17 16:00 jkrueger1:
+	* system/msg/MessageServer.c: fix access rights for opened message files
+	* tests : improve the test environment
+2006-10-17 08:00 jkrueger1:
+	* autogen.sh : Add the usage of automake 1.1X
+	* system/dbase/server/Makefile.am: add Sqlite3Server.h to the distribution
 2006-09-27 14:00 jkrueger1:
 	* system/manager: Use a enum value for storing the information about
 	the database backend type
