@@ -16,9 +16,9 @@ dnl You should have received a copy of the GNU Lesser General Public
 dnl License along with this library; if not, write to the Free Software
 dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_INIT([TACO], [3.96.0], [taco-devel@lists.sourceforge.net])
+AC_INIT([TACO], [3.96.1], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.88 $)dnl
+AC_REVISION($Revision: 1.89 $)dnl
 AC_COPYRIGHT([(C) 1990-2006 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -178,7 +178,7 @@ AC_HEADER_STDBOOL
 AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h sys/types.h sys/sem.h sys/shm.h]) 
 AC_CHECK_HEADERS([pthread.h fcntl.h malloc.h memory.h netdb.h stddef.h stdlib.h string.h strings.h sys/file.h sys/ioctl.h termios.h unistd.h sys/filio.h paths.h siggen.h])
 AC_CHECK_HEADERS([varargs.h stdarg.h])
-AC_CHECK_HEADERS([svc.h rpc/svc.h rpc/pmap_prot.h rpc/pmap_clnt.h])
+AC_CHECK_HEADERS([svc.h rpc/svc.h rpc/pmap_prot.h])
 AC_CHECK_HEADERS([signal.h sys/signal.h sys/param.h sys/resource.h sys/time.h])
 AC_CHECK_HEADERS([float.h]) 
 
