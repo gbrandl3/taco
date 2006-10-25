@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.13 $
  *
- * Date:	$Date: 2006-09-27 12:37:51 $
+ * Date:	$Date: 2006-10-25 09:03:29 $
  *
  */
 
@@ -420,8 +420,10 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
 // the device server process name, do a full traversal of the database 
 //
     std::string query;
-    query = "UPDATE device SET EXPORTED = 0 , IOR = 'rpc:not_exp:0',";
-    query += " VERSION = 0, PID = 0, CLASS = 'unknown', HOST = 'not_exp' WHERE ";
+    // do not destroy the information where the device server was last running
+    //query = "UPDATE device SET EXPORTED = 0 , IOR = 'rpc:not_exp:0',";
+    //query += " VERSION = 0, PID = 0, CLASS = 'unknown', HOST = 'not_exp' WHERE ";
+    query = "UPDATE device SET EXPORTED = 0, STOPPED = NOW() WHERE ";
     query += (" SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
 #ifdef DEBUG
     std::cout << "MySQLServer::db_svcunr_1_svc(): query = " << query << std::endl;
@@ -565,8 +567,6 @@ int MySQLServer::db_store(db_devinfo &dev_stu)
    	if (mysql_query(mysql_conn, query.str().c_str()) != 0)
 	    throw long(DbErr_DatabaseAccess);
 #endif
-   	if (mysql_affected_rows(mysql_conn) == 0)
-	    throw long(DbErr_DeviceNotDefined);
     }
     catch(const long err)
     {
@@ -611,8 +611,6 @@ int MySQLServer::db_store(db_devinfo_2 &dev_stu)
    	if (mysql_query(mysql_conn, query.str().c_str()) != 0)
 	    throw long(DbErr_DatabaseAccess);
 #endif
-   	if (mysql_affected_rows(mysql_conn) == 0)
-	    throw long(DbErr_DeviceNotDefined);
     }
     catch(const long err)
     {
@@ -636,6 +634,44 @@ int MySQLServer::db_store(db_devinfo_2 &dev_stu)
  */
 int MySQLServer::db_store(db_devinfo_3 &dev_stu)
 {
+    std::stringstream query_device;
+/*
+ * first test to see if device is defined so that the error "DeviceNotDefined" can be detectected
+ * (for compatibility reasons with the dbm database)
+ *
+ * andy 23oct06
+ */
+    query_device << "SELECT NAME FROM device WHERE name = '" << dev_stu.dev_name << "';" << std::ends;
+    try
+    {
+#if !HAVE_SSTREAM
+        if (mysql_query(mysql_conn, query_device.str()) != 0)
+            throw long(DbErr_DatabaseAccess);
+        query_device.freeze(false);
+#else
+        if (mysql_query(mysql_conn, query_device.str().c_str()) != 0)
+            throw long(DbErr_DatabaseAccess);
+#endif
+    }
+    catch(const long err)
+    {
+	//std::cerr << "MySQLServer::db_store(): error = " << mysql_error(mysql_conn) << std::endl;
+    	if (enable_logging) logStream << getTimeString("MySQLServer::db_store()") << " error = " << mysql_error(mysql_conn) << std::endl;
+	throw err;
+    }
+
+    MYSQL_RES   *result = mysql_store_result(mysql_conn);
+    MYSQL_ROW   row;
+    int         n_rows;
+    if ((n_rows = mysql_num_rows(result)) == 0)
+    {
+        mysql_free_result(result); 
+        if (enable_logging) logStream << getTimeString("MySQLServer::db_store()") << " device = " << dev_stu.dev_name << " not defined !" << std::endl;
+        if (enable_logging) logStream.flush();
+        throw long(DbErr_DeviceNotDefined);
+    }
+    mysql_free_result(result); 
+
 //
 // Try to retrieve the right tuple in the NAMES table 
 //
@@ -646,11 +682,11 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
           << " CLASS = '" << dev_stu.dev_class << "',"
 //        << " PID = " << dev_stu.pid << ", SERVER = '" << dev_stu.proc_name << "'"
           << " PID = " << dev_stu.pid << ","
-	  << " EXPORTED = 1" 
+	  << " EXPORTED = 1," 
+	  << " STARTED = NOW()"
           << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << std::ends; 	
-#ifdef DEBUG
-    std::cout << "MySQLServer::db_store(): query = " << query.str() << std::endl;
-#endif /* DEBUG */
+    if (enable_logging) logStream << getTimeString("MySQLServer::db_store()") << " query = " << query.str() << std::endl;
+    if (enable_logging) logStream.flush();
     try
     {
 #if !HAVE_SSTREAM
@@ -661,12 +697,11 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
    	if (mysql_query(mysql_conn, query.str().c_str()) != 0)
 	    throw long(DbErr_DatabaseAccess);
 #endif
-        if (mysql_affected_rows(mysql_conn) == 0)
-	            throw long(DbErr_DeviceNotDefined);
     }
     catch(const long err)
     {
-	std::cerr << "MySQLServer::db_store(): error = " << mysql_error(mysql_conn) << std::endl;
+	//std::cerr << "MySQLServer::db_store(): error = " << mysql_error(mysql_conn) << std::endl;
+    	if (enable_logging) logStream << getTimeString("MySQLServer::db_store()") << " error = " << mysql_error(mysql_conn) << std::endl;
 	throw err;
     }
 //
