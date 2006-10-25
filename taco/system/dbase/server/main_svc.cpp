@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.26 $
+ * Version:	$Revision: 1.27 $
  *
- * Date:	$Date: 2006-09-27 12:32:01 $
+ * Date:	$Date: 2006-10-25 09:08:10 $
  *
  */
 
@@ -100,7 +100,7 @@ static void db_setupprog_1(struct svc_req *, SVCXPRT *);
 
 extern	DBServer	*dbm;
 
-bool	enable_logging = true;
+bool	enable_logging = false;
 std::ofstream	logStream;
 
 std::string getTimeString(std::string name)
@@ -195,7 +195,7 @@ void usage(const char *argv)
 #ifdef USE_MYSQL
 	std::cerr << "       -u user        - user for MySQL database" << std::endl;
 	std::cerr << "       -p password    - password for MySQL database" << std::endl;
-	std::cerr << "       -l             - disable logging" << std::endl;
+	std::cerr << "       -l             - enable logging" << std::endl;
 #endif
 	exit(1);
 }
@@ -296,7 +296,7 @@ int main(int argc,char **argv)
 				break;
 #endif
 			case 'l' :
-				enable_logging = false;
+				enable_logging = true;
 				break;
 			case '?' :
 			case 'h' :	
