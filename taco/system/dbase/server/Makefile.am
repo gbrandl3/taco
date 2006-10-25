@@ -24,7 +24,7 @@ sbin_PROGRAMS		= dbm_server
 lib_LTLIBRARIES 	= 
 
 INCLUDES		= @TACO_INCLUDES@ 
-AM_CPPFLAGS		= -DDEBUG
+AM_CPPFLAGS		= -DNODEBUG
 
 if GDBMSUPPORT
 noinst_HEADERS		+= NdbmClass.h NdbmServer.h 
@@ -45,7 +45,7 @@ libTACOndbm_la_SOURCES = dbm_serv.cpp \
 			NdbmClass.cpp
 libTACOndbm_la_LIBADD	= @GDBM_LIBS@ -lstdc++
 INCLUDES		+= @GDBM_CFLAGS@ 
-AM_CPPFLAGS		+= -DNDBM -DUSE_GDBM -DDEBUG
+AM_CPPFLAGS		+= -DNDBM -DUSE_GDBM -DNODEBUG
 endif
 
 if MYSQLSUPPORT
@@ -65,7 +65,7 @@ libTACOMySQL_la_SOURCES = mysql_serv.cpp \
 			mysql_update.cpp 
 libTACOMySQL_la_LIBADD	= @MYSQL_LIBS@ -lstdc++
 INCLUDES		+= @MYSQL_CFLAGS@ 
-AM_CPPFLAGS		+= -DUSE_MYSQL -DDEBUG
+AM_CPPFLAGS		+= -DUSE_MYSQL -DNODEBUG
 endif
 
 if SQLITE3SUPPORT
@@ -85,10 +85,10 @@ libTACOSQLite3_la_SOURCES = sqlite3_serv.cpp \
 			sqlite3_update.cpp 
 libTACOSQLite3_la_LIBADD= @SQLITE3_LIBS@ -lstdc++
 INCLUDES		+= @SQLITE3_CFLAGS@ 
-AM_CPPFLAGS		+= -DUSE_SQLITE3 -DDEBUG
+AM_CPPFLAGS		+= -DUSE_SQLITE3 -DNODEBUG
 endif
 
-dbm_server_CFLAGS	= -DDEBUG
+dbm_server_CFLAGS	= -DNODEBUG
 dbm_server_SOURCES 	= main_svc.cpp dbm.cpp db_serv.cpp
 dbm_server_LDADD	= @TACO_SERVER_LIBS@ $(lib_LTLIBRARIES) -lstdc++
 dbm_server_LDFLAGS	= -static
