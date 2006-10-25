@@ -23,11 +23,11 @@
  * Description:
  *
  * Author(s):
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:	$Date: 2006-09-27 12:23:29 $
+ * Date:	$Date: 2006-10-25 09:10:32 $
  *
  */
 
@@ -40,6 +40,12 @@
 #else
 #	include <mysql.h>
 #endif
+
+// logging variables
+
+extern std::ofstream   logStream;
+extern std::string getTimeString(std::string name);
+extern bool enable_logging;
 
 /**@ingroup dbServerClasses
  */
