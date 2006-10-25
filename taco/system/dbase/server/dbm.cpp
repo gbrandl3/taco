@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2006-09-07 08:04:34 $
+ * Date:	$Date: 2006-10-25 09:09:18 $
  *
  */
 
@@ -39,6 +39,7 @@
 
 DBServer	*dbm;
 extern std::ofstream   logStream;
+extern bool enable_logging;
 
 std::string getTimeString(std::string);
 
@@ -60,9 +61,9 @@ std::string getTimeString(std::string);
  */
 int *db_clodb_1_svc(void)
 {
-	logStream << getTimeString("dbm_server") << "DB_CLODB : "; 
+	if (enable_logging) logStream << getTimeString("dbm_server") << "DB_CLODB : "; 
 	int *ret = reinterpret_cast<int *>(dbm->db_clodb_1_svc());
-	logStream << *ret << std::endl;
+	if (enable_logging) logStream << *ret << std::endl;
 	return ret;
 }
 
@@ -74,9 +75,9 @@ int *db_clodb_1_svc(void)
  */
 int *db_reopendb_1_svc(void)
 {
-	logStream << getTimeString("dbm_server") << "DB_REOPENDB : ";
+	if (enable_logging) logStream << getTimeString("dbm_server") << "DB_REOPENDB : ";
 	int *ret = reinterpret_cast<int *>(dbm->db_reopendb_1_svc());
-	logStream << *ret << std::endl;
+	if (enable_logging) logStream << *ret << std::endl;
 	return ret;
 }
 
@@ -163,11 +164,11 @@ db_res *db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
  */
 int *db_devexp_1_svc(tab_dbdev *rece)
 {
-	logStream << getTimeString("dbm_server") << " DB_DEVEXP1 : ";
+	if (enable_logging) logStream << getTimeString("dbm_server") << " DB_DEVEXP1 : ";
 	int *ret = reinterpret_cast<int *>(dbm->db_devexp_1_svc(rece));
-	logStream << *ret << std::endl;
+	if (enable_logging) logStream << *ret << std::endl;
 	for (unsigned int i = 0; i < rece->tab_dbdev_len; ++i)
-		logStream << getTimeString("dbm_server") << "           : " << rece->tab_dbdev_val[i].dev_name << "(" 
+		if (enable_logging) logStream << getTimeString("dbm_server") << "           : " << rece->tab_dbdev_val[i].dev_name << "(" 
 			<< rece->tab_dbdev_val[i].host_name << ")" << std::endl;
 	return ret;
 }
@@ -184,11 +185,11 @@ int *db_devexp_1_svc(tab_dbdev *rece)
  */
 int *db_devexp_2_svc(tab_dbdev_2 *rece)
 {
-	logStream << getTimeString("dbm_server") << " DB_DEVEXP2 : ";
+	if (enable_logging) logStream << getTimeString("dbm_server") << " DB_DEVEXP2 : ";
 	int *ret = reinterpret_cast<int *>(dbm->db_devexp_2_svc(rece));
-	logStream << *ret << std::endl;
+	if (enable_logging) logStream << *ret << std::endl;
 	for (unsigned int i = 0; i < rece->tab_dbdev_len; ++i)
-		logStream << getTimeString("dbm_server") << "           : " << rece->tab_dbdev_val[i].dev_name << "(" 
+		if (enable_logging) logStream << getTimeString("dbm_server") << "           : " << rece->tab_dbdev_val[i].dev_name << "(" 
 			<< rece->tab_dbdev_val[i].host_name << ")" << std::endl;
 	return ret;
 }
@@ -203,11 +204,11 @@ int *db_devexp_2_svc(tab_dbdev_2 *rece)
  */
 int *db_devexp_3_svc(tab_dbdev_3 *rece)
 {
-	logStream << getTimeString("dbm_server") << " DB_DEVEXP3 : ";
+	if (enable_logging) logStream << getTimeString("dbm_server") << " DB_DEVEXP3 : ";
 	int *ret = reinterpret_cast<int *>(dbm->db_devexp_3_svc(rece));
-	logStream << *ret << std::endl;
+	if (enable_logging) logStream << *ret << std::endl;
 	for (unsigned int i = 0; i < rece->tab_dbdev_len; ++i)
-		logStream << getTimeString("dbm_server") << "           : " << rece->tab_dbdev_val[i].dev_name << "(" 
+		if (enable_logging) logStream << getTimeString("dbm_server") << "           : " << rece->tab_dbdev_val[i].dev_name << "(" 
 			<< rece->tab_dbdev_val[i].host_name << ")" << std::endl;
 	return ret;
 }
@@ -222,11 +223,11 @@ int *db_devexp_3_svc(tab_dbdev_3 *rece)
  */
 db_resimp *db_devimp_1_svc(arr1 *de_name)
 {
-	logStream << getTimeString("dbm_server") << " DB_DEVIMP1 : " << std::endl;
+	if (enable_logging) logStream << getTimeString("dbm_server") << " DB_DEVIMP1 : " << std::endl;
 	db_resimp *ret = reinterpret_cast<db_resimp *>(dbm->db_devimp_1_svc(de_name));
-//	logStream << *ret << std::endl;
+//	if (enable_logging) logStream << *ret << std::endl;
         for (u_int i = 0; i < de_name->arr1_len; ++i)
-		logStream << getTimeString("dbm_server") << "           : " << de_name->arr1_val[i] << std::endl;
+		if (enable_logging) logStream << getTimeString("dbm_server") << "           : " << de_name->arr1_val[i] << std::endl;
 	return ret;
 }
 
@@ -239,10 +240,10 @@ db_resimp *db_devimp_1_svc(arr1 *de_name)
  */
 int *db_svcunr_1_svc(nam *dsn_name)
 {
-	logStream << getTimeString("dbm_server") << " DB_SVCUNR : ";
+	if (enable_logging) logStream << getTimeString("dbm_server") << " DB_SVCUNR : ";
 	int *ret = reinterpret_cast<int *>(dbm->db_svcunr_1_svc(dsn_name));
-	logStream << *ret << std::endl;
-	logStream << getTimeString("dbm_server") << "           : " << *dsn_name << std::endl;
+	if (enable_logging) logStream << *ret << std::endl;
+	if (enable_logging) logStream << getTimeString("dbm_server") << "           : " << *dsn_name << std::endl;
 	return ret;
 }
 
@@ -301,12 +302,12 @@ db_res *hostlist_1_svc()
  */
 db_psdev_error *db_psdev_reg_1_svc(psdev_reg_x *rece)
 {
-	logStream << getTimeString("dbm_server") << " DB_PSDEV_REG : ";
+	if (enable_logging) logStream << getTimeString("dbm_server") << " DB_PSDEV_REG : ";
 	db_psdev_error *ret = dbm->db_psdev_reg_1_svc(rece);
-	logStream << ret->error_code << "(" << ret->psdev_err << ")" << std::endl;
-	logStream << getTimeString("dbm_server") << "              : " << rece->h_name << std::endl;
+	if (enable_logging) logStream << ret->error_code << "(" << ret->psdev_err << ")" << std::endl;
+	if (enable_logging) logStream << getTimeString("dbm_server") << "              : " << rece->h_name << std::endl;
 	for (unsigned int i = 0; i < rece->psdev_arr.psdev_arr_len; ++i)
-		logStream << getTimeString("dbm_server") << "              : " << rece->psdev_arr.psdev_arr_val[i].psdev_name << std::endl;
+		if (enable_logging) logStream << getTimeString("dbm_server") << "              : " << rece->psdev_arr.psdev_arr_val[i].psdev_name << std::endl;
 	return ret;
 }
 
@@ -319,11 +320,11 @@ db_psdev_error *db_psdev_reg_1_svc(psdev_reg_x *rece)
  */
 db_psdev_error *db_psdev_unreg_1_svc(arr1 *rece)
 {
-	logStream << getTimeString("dbm_server") << " DB_PSDEV_REG : ";
+	if (enable_logging) logStream << getTimeString("dbm_server") << " DB_PSDEV_REG : ";
 	db_psdev_error *ret = dbm->db_psdev_unreg_1_svc(rece);
-	logStream << ret->error_code << "(" << ret->psdev_err << ")" << std::endl;
+	if (enable_logging) logStream << ret->error_code << "(" << ret->psdev_err << ")" << std::endl;
 	for (unsigned int i = 0; i < rece->arr1_len; ++i)
-		logStream << getTimeString("dbm_server") << "              : " << rece->arr1_val[i] << std::endl;
+		if (enable_logging) logStream << getTimeString("dbm_server") << "              : " << rece->arr1_val[i] << std::endl;
 	return ret;
 }
 
@@ -420,11 +421,11 @@ db_res *db_getdev_1_svc(nam *dev_name)
  */
 int *db_putres_1_svc(tab_putres *rece)
 {
-	logStream << getTimeString("dbm_server") << " DB_PUTRES : ";
+	if (enable_logging) logStream << getTimeString("dbm_server") << " DB_PUTRES : ";
 	int *ret = reinterpret_cast<int *>(dbm->db_putres_1_svc(rece));
-	logStream << *ret << std::endl;
+	if (enable_logging) logStream << *ret << std::endl;
 	for(unsigned int i = 0; i < rece->tab_putres_len; ++i)
-		logStream << getTimeString("dbm_server") << "           : " << rece->tab_putres_val[i].res_name << "(" << 
+		if (enable_logging) logStream << getTimeString("dbm_server") << "           : " << rece->tab_putres_val[i].res_name << "(" << 
 					rece->tab_putres_val[i].res_val << ")" << std::endl;
 	return ret;
 }
@@ -440,11 +441,11 @@ int *db_putres_1_svc(tab_putres *rece)
  */
 int *db_delres_1_svc(arr1 *rece, struct svc_req *rqstp)
 {
-	logStream << getTimeString("dbm_server") << " DB_DELRES : ";
+	if (enable_logging) logStream << getTimeString("dbm_server") << " DB_DELRES : ";
 	int *ret = reinterpret_cast<int *>(dbm->db_delres_1_svc(rece));
-	logStream << *ret << std::endl;
+	if (enable_logging) logStream << *ret << std::endl;
 	for (unsigned int i = 0; i < rece->arr1_len; ++i)
-		logStream << getTimeString("dbm_server") << "           : " << rece->arr1_val[0] << std::endl;
+		if (enable_logging) logStream << getTimeString("dbm_server") << "           : " << rece->arr1_val[0] << std::endl;
 	return ret;
 }
 
@@ -481,10 +482,10 @@ db_res *devres_1_svc(db_res *recev)
  */
 DevLong *devdel_1_svc(nam *dev)
 {
-	logStream << getTimeString("dbm_server") << " DB_DEVDEL : ";
+	if (enable_logging) logStream << getTimeString("dbm_server") << " DB_DEVDEL : ";
 	DevLong *ret = dbm->devdel_1_svc(dev);
-	logStream << *ret << std::endl;
-	logStream << getTimeString("dbm_server") << "           : " << *dev << std::endl;
+	if (enable_logging) logStream << *ret << std::endl;
+	if (enable_logging) logStream << getTimeString("dbm_server") << "           : " << *dev << std::endl;
 	return ret;
 }
 
@@ -497,11 +498,11 @@ DevLong *devdel_1_svc(nam *dev)
  */
 db_psdev_error *devdelres_1_svc(db_res *recev)
 {
-	logStream << getTimeString("dbm_server") << " DB_DEVDELALLRES : ";
+	if (enable_logging) logStream << getTimeString("dbm_server") << " DB_DEVDELALLRES : ";
 	db_psdev_error *ret = dbm->devdelres_1_svc(recev);
-	logStream << ret->error_code << "(" << ret->psdev_err << ")"  << std::endl;
+	if (enable_logging) logStream << ret->error_code << "(" << ret->psdev_err << ")"  << std::endl;
 	for (unsigned int i = 0; i < recev->res_val.arr1_len; ++i)
-		logStream << getTimeString("dbm_server") << "                 : " << recev->res_val.arr1_val[i] << std::endl;
+		if (enable_logging) logStream << getTimeString("dbm_server") << "                 : " << recev->res_val.arr1_val[i] << std::endl;
 	return ret;
 }
 
@@ -525,11 +526,11 @@ db_info_svc *info_1_svc(void)
  */
 DevLong *unreg_1_svc(db_res *recev)
 {
-	logStream << getTimeString("dbm_server") << " DB_UNREG : "; 
+	if (enable_logging) logStream << getTimeString("dbm_server") << " DB_UNREG : "; 
 	DevLong *ret = dbm->unreg_1_svc(recev);
-	logStream << *ret << std::endl;
+	if (enable_logging) logStream << *ret << std::endl;
 	for (unsigned int i = 0; i < recev->res_val.arr1_len; ++i)
-		logStream << getTimeString("dbm_server") << "             : " << recev->res_val.arr1_val[i] << std::endl;
+		if (enable_logging) logStream << getTimeString("dbm_server") << "             : " << recev->res_val.arr1_val[i] << std::endl;
 	return ret;
 }
 
@@ -561,11 +562,11 @@ svcinfo_svc *svcinfo_1_svc(db_res *recev)
  */
 DevLong *svcdelete_1_svc(db_res *recev)
 {
-	logStream << getTimeString("dbm_server") << " DB_SVCDELETE : ";
+	if (enable_logging) logStream << getTimeString("dbm_server") << " DB_SVCDELETE : ";
 	DevLong *ret = dbm->svcdelete_1_svc(recev);
-	logStream << *ret << std::endl;
+	if (enable_logging) logStream << *ret << std::endl;
 	for (unsigned int i = 0; i < recev->res_val.arr1_len; ++i)
-		logStream << getTimeString("dbm_server") << "              : " << recev->res_val.arr1_val[i] << std::endl;
+		if (enable_logging) logStream << getTimeString("dbm_server") << "              : " << recev->res_val.arr1_val[i] << std::endl;
 	return ret;
 }
 
@@ -590,11 +591,11 @@ db_poller_svc *getpoller_1_svc(nam *dev)
  */
 db_psdev_error *upddev_1_svc(db_res *dev_list)
 {
-	logStream << getTimeString("dbm_server") << " DB_UPDDEV : ";
+	if (enable_logging) logStream << getTimeString("dbm_server") << " DB_UPDDEV : ";
 	db_psdev_error *ret = dbm->upddev_1_svc(dev_list);
-	logStream << ret->error_code << "(" << ret->psdev_err << ")"  << std::endl;
+	if (enable_logging) logStream << ret->error_code << "(" << ret->psdev_err << ")"  << std::endl;
 	for (unsigned int i = 0; i < dev_list->res_val.arr1_len; ++i)
-		logStream << getTimeString("dbm_server") << "           : " << dev_list->res_val.arr1_val[i] << std::endl;
+		if (enable_logging) logStream << getTimeString("dbm_server") << "           : " << dev_list->res_val.arr1_val[i] << std::endl;
 	return ret;
 }
 
@@ -607,11 +608,11 @@ db_psdev_error *upddev_1_svc(db_res *dev_list)
  */
 db_psdev_error *updres_1_svc(db_res *res_list)
 {
-	logStream << getTimeString("dbm_server") << " DB_UPDRES : ";
+	if (enable_logging) logStream << getTimeString("dbm_server") << " DB_UPDRES : ";
 	db_psdev_error *ret = dbm->updres_1_svc(res_list);
-	logStream << ret->error_code << "(" << ret->psdev_err << ")"  << std::endl;
+	if (enable_logging) logStream << ret->error_code << "(" << ret->psdev_err << ")"  << std::endl;
 	for (unsigned int i = 0; i < res_list->res_val.arr1_len; ++i)
-		logStream << getTimeString("dbm_server") << "           : " << res_list->res_val.arr1_val[i] << std::endl;
+		if (enable_logging) logStream << getTimeString("dbm_server") << "           : " << res_list->res_val.arr1_val[i] << std::endl;
 	return ret;
 }
 
