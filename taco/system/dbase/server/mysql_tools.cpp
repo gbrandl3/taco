@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.18 $
+ * Version:	$Revision: 1.19 $
  *
- * Date:	$Date: 2006-10-04 19:24:43 $
+ * Date:	$Date: 2006-10-25 08:58:58 $
  *
  */
 
@@ -698,14 +698,18 @@ long *MySQLServer::unreg_1_svc(db_res *recev)
     if (class_list.empty())
     {
 	class_list = "'" + user_ds_name + "'";
-	query = "UPDATE device SET EXPORTED = 0 , IOR = 'rpc:not_exp:0',";
-	query += " VERSION = 0, CLASS = 'unknown' WHERE CLASS IN (";
+	// do no destroy useful information about device server
+	//query = "UPDATE device SET EXPORTED = 0 , IOR = 'rpc:not_exp:0',";
+	//query += " VERSION = 0, CLASS = 'unknown' WHERE CLASS IN (";
+	query = "UPDATE device SET EXPORTED = 0 WHERE CLASS IN (";
 	query += (class_list + ") AND SERVER LIKE '%" + user_pers_name + "'");
     }
     else
     {
-	query = "UPDATE device SET EXPORTED = 0 , IOR = 'rpc:not_exp:0',";
-	query += " VERSION = 0, CLASS = 'unknown' WHERE class IN (";
+	// do no destroy useful information about device server
+	//query = "UPDATE device SET EXPORTED = 0 , IOR = 'rpc:not_exp:0',";
+	//query += " VERSION = 0, CLASS = 'unknown' WHERE class IN (";
+	query = "UPDATE device SET EXPORTED = 0 WHERE class IN (";
 	query += (class_list + ") AND SERVER = '"+ user_ds_name + "/" + user_pers_name + "'");
     }
 
