@@ -25,9 +25,9 @@
  * Author(s):
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.1 $
+ * Version:	$Revision: 1.2 $
  *
- * Date:	$Date: 2006-09-27 12:21:35 $
+ * Date:	$Date: 2006-10-25 10:58:40 $
  *
  */
 
@@ -88,6 +88,10 @@
 #endif
 
 #include "dbClass.h"
+
+extern std::ofstream   logStream;
+extern std::string getTimeString(std::string name);
+extern bool enable_logging;
 
 /**@ingroup dbServerClasses
  */

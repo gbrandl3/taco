@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.1 $
+ * Version:	$Revision: 1.2 $
  *
- * Date:	$Date: 2006-09-27 12:21:35 $
+ * Date:	$Date: 2006-10-25 10:58:40 $
  *
  */
 
@@ -425,9 +425,11 @@ DevLong *SQLite3Server::db_svcunr_1_svc(nam *dsn_name)
 // the device server process name, do a full traversal of the database 
 //
 	std::string query;
-        query = "UPDATE device SET EXPORTED = 0 , IOR = 'rpc:not_exp:0',";
-        query += " VERSION = 0, PID = 0, CLASS = 'unknown', HOST = 'not_exp' WHERE ";
-        query += (" SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
+	// do not destroy the information where the device server was last running
+//	query = "UPDATE device SET EXPORTED = 0 , IOR = 'rpc:not_exp:0',";
+//	query += " VERSION = 0, PID = 0, CLASS = 'unknown', HOST = 'not_exp' WHERE ";
+	query = "UPDATE device SET EXPORTED = 0, STOPPED = DATETIME('NOW') WHERE ";
+	query += (" SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
 #ifdef DEBUG
         std::cout << "SQLite3Server::db_svcunr_1_svc(): query = " << query << std::endl;
 #endif /* DEBUG */
@@ -649,6 +651,38 @@ int SQLite3Server::db_store(db_devinfo_2 &dev_stu)
  */
 int SQLite3Server::db_store(db_devinfo_3 &dev_stu)
 {
+//
+// first test to see if device is defined so that the error "DeviceNotDefined" can be detectected
+// (for compatibility reasons with the dbm database)
+//
+//
+	std::stringstream query_device;
+	query_device << "SELECT NAME FROM device WHERE name = '" << dev_stu.dev_name << "';" << std::ends;
+	try
+	{
+#if !HAVE_SSTREAM
+		if (sqlite3_get_table(db, queryi_device.str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
+			throw long(DbErr_DatabaseAccess);
+		query_device.freeze(false);
+#else
+		if (sqlite3_get_table(db, query_device.str().c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
+			throw long(DbErr_DatabaseAccess);
+#endif
+	}
+	catch(const long err)
+	{
+		if (enable_logging) logStream << getTimeString("SQLite3Server::db_store()") << " error = " << sqlite3_errmsg(db) << std::endl;
+		throw err;
+	}
+	if (nrow == 0)
+	{
+		sqlite3_free_table(result);
+        	if (enable_logging) logStream << getTimeString("SQLite3Server::db_store()") << " device = " << dev_stu.dev_name << " not defined !" << std::endl;
+        	if (enable_logging) logStream.flush();
+        	throw long(DbErr_DeviceNotDefined);
+    	}
+	sqlite3_free_table(result);
+
 	std::string tmp = dev_stu.dev_name; 
 	std::string::size_type pos = tmp.find('/');
 	std::string domain = tmp.substr(0, pos);
@@ -665,12 +699,12 @@ int SQLite3Server::db_store(db_devinfo_3 &dev_stu)
           << " VERSION = '" << dev_stu.v_num << "',"
           << " CLASS = '" << dev_stu.dev_class << "',"
 //        << " PID = " << dev_stu.pid << ", SERVER = '" << dev_stu.proc_name << "'"
-          << " PID = " << dev_stu.pid << "," << " EXPORTED = 1" 
+          << " PID = " << dev_stu.pid << "," << " EXPORTED = 1," 
+	  << " STARTED = DATETIME('NOW')"
           << " WHERE DOMAIN = '" << domain << "' AND FAMILY = '" << family << "' AND  MEMBER = '" << member << "'"
 	  << std::ends; 	
-#ifdef DEBUG
-    std::cout << "SQLite3Server::db_store(): query = " << query.str() << std::endl;
-#endif /* DEBUG */
+    if (enable_logging) logStream << getTimeString("SQLite3Server::db_store()") << " query = " << query.str() << std::endl;
+    if (enable_logging) logStream.flush();
     try
     {
 #if !HAVE_SSTREAM
@@ -686,7 +720,7 @@ int SQLite3Server::db_store(db_devinfo_3 &dev_stu)
     catch(const long err)
     {
 	sqlite3_free_table(result);
-	std::cout << "SQLite3Server::db_store(): error = " << sqlite3_errmsg(db) << std::endl;
+	if (enable_logging) logStream << "SQLite3Server::db_store(): error = " << sqlite3_errmsg(db) << std::endl;
 	throw err;
     }
 //

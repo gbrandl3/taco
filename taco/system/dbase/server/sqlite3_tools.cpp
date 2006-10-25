@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2006-10-04 19:26:19 $
+ * Date:	$Date: 2006-10-25 10:58:41 $
  *
  */
 
@@ -698,11 +698,13 @@ long *SQLite3Server::unreg_1_svc(db_res *recev)
 //
 // Unregister every devices for each ds name in the list
 //
-//
 // If the ds_name was not a process name, init the class list with the user ds name
 //
-	query = "UPDATE device SET EXPORTED = 0 , IOR = 'rpc:not_exp:0',";
-	query += " VERSION = 0, PID = 0, CLASS = 'unknown' WHERE CLASS IN (";
+	// do no destroy useful information about device server
+//	query = "UPDATE device SET EXPORTED = 0 , IOR = 'rpc:not_exp:0',";
+//	query += " VERSION = 0, PID = 0, CLASS = 'unknown' WHERE CLASS IN (";
+	query = "UPDATE device SET EXPORTED = 0 WHERE CLASS IN (";
+
 	if (class_list.empty())
     	{
 		class_list = "'" + user_ds_name + "'";
