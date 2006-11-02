@@ -53,7 +53,7 @@ AC_DEFUN([TACO_DBM_SERVER],
 	TACO_SQLITE3_SUPPORT
 	AM_CONDITIONAL(MYSQLSUPPORT, test "x$taco_mysql" = "xyes")
 dnl disable gdbm support of the dbm server if mysql support of database server is disabled
-	if test "x$taco_mysql" != "xyes" ; then 	
+	if test x"$taco_mysql" != x"yes" -a x"$taco_sqlite3" != x"yes" ; then 	
 		taco_gdbm=yes
 	fi
 dnl disable the build of gdbm if gdbm support of database server is disabled
@@ -83,9 +83,12 @@ AC_DEFUN([TACO_SQLITE3_SUPPORT],
 		SQLITE3_LIBS=`$PKG_CONFIG --libs-only-l sqlite3`
 		SQLITE3_LDFLAGS=`$PKG_CONFIG --libs-only-L sqlite3`
 		save_CFLAGS="$CFLAGS"
-		CFLAGS="$CFLAGS $SQLITE_CFLAGS"
+		save_CPPFLAGS="$CPPFLAGS"
+		CFLAGS="$CFLAGS $SQLITE3_CFLAGS"
+		CPPFLAGS="$CPPFLAGS $SQLITE3_CFLAGS"
 		AC_CHECK_HEADERS([sqlite3.h])
 		CFLAGS="$save_CFLAGS"
+		CPPFLAGS="$save_CPPFLAGS"
 		], [taco_sqlite3=no])
 	AC_SUBST([SQLITE3_CFLAGS], [$SQLITE3_CFLAGS])
 	AC_SUBST([SQLITE3_LIBS], [$SQLITE3_LIBS])
