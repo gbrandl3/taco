@@ -18,27 +18,27 @@
 #
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-ext
-ACLOCAL_AMFLAGS = -I m4
+ACLOCAL_AMFLAGS = -I m4 
+
+SUBDIRS = m4 
 
 if BUILD_GDBM
-gdbm=gdbm
-else
-gdbm=
+SUBDIRS += gdbm
 endif
 
-if BUILD_SERVER
-classes=classes
-else
-classes=
-endif
+SUBDIRS += lib
 
 if BUILD_EXT
-ext=ext
-else
-ext=
+SUBDIRS += ext
 endif
 
-SUBDIRS = m4 $(gdbm) lib $(ext) system $(classes) doc misc bindings tests 
+SUBDIRS += system
+
+if BUILD_SERVER
+SUBDIRS += classes
+endif
+
+SUBDIRS += doc misc bindings tests 
 
 EXTRA_DIST=autogen.sh taco.spec.in README-RPM
 
