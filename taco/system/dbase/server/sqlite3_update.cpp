@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.1 $
+ * Version:	$Revision: 1.2 $
  *
- * Date:	$Date: 2006-09-27 12:21:35 $
+ * Date:	$Date: 2006-11-02 15:30:18 $
  *
  */
 
@@ -157,7 +157,9 @@ db_psdev_error *SQLite3Server::upddev_1_svc(db_res *dev_list)
 			}
 			else
 			{
+#ifdef DEBUG
 				std::cout << " not found." << std::endl;
+#endif
 				switch(psdev_back.error_code = db_delete_names(ds_class, ds_name, ind, *it))
 				{
 					case DbErr_BadDevSyntax: 	
