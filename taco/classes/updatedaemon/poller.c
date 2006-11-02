@@ -29,12 +29,12 @@
  *
  * Original:    
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-18 22:41:09 $
+ * Date:        $Date: 2006-11-02 15:40:47 $
  */
 
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/poller.c,v 1.3 2006-09-18 22:41:09 jkrueger1 Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/poller.c,v 1.4 2006-11-02 15:40:47 jkrueger1 Exp $";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -2900,12 +2900,12 @@ int main(int argc,char *argv[])
   	sigvec(SIGALRM,&sighand,NULL);
 #endif
 #else
-  	(void) sigignore (SIGHUP);              
-  	(void) sigignore (SIGPIPE);    
+  	(void) signal(SIGHUP, SIG_IGN);              
+  	(void) signal(SIGPIPE, SIG_IGN);    
   	(void) sigset(SIGUSR1, user_signal);
-  	(void) sigset (SIGINT,  signal_handler);
-  	(void) sigset (SIGTERM, signal_handler);
-  	(void) sigset (SIGALRM, signal_handler);
+  	(void) sigset(SIGINT,  signal_handler);
+  	(void) sigset(SIGTERM, signal_handler);
+  	(void) sigset(SIGALRM, signal_handler);
 #endif /* _solaris */
 #endif /* _OSK */
 
