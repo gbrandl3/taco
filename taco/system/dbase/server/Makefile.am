@@ -83,7 +83,7 @@ libTACOSQLite3_la_SOURCES = sqlite3_serv.cpp \
 			sqlite3_clo_op.cpp \
 			sqlite3_miscbro.cpp \
 			sqlite3_update.cpp 
-libTACOSQLite3_la_LIBADD= @SQLITE3_LIBS@ -lstdc++
+libTACOSQLite3_la_LIBADD= @SQLITE3_LDFLAGS@ @SQLITE3_LIBS@ -lstdc++
 INCLUDES		+= @SQLITE3_CFLAGS@ 
 AM_CPPFLAGS		+= -DUSE_SQLITE3 -DNODEBUG
 endif
