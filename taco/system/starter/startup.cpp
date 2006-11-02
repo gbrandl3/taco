@@ -26,19 +26,19 @@
  *
  * Original:	January 2003
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Revision:	$Date: 2006-09-19 08:45:02 $
+ * Revision:	$Date: 2006-11-02 15:33:27 $
  *
  */
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
 #endif
-#include <API.h>
-#include <private/ApiP.h>
-#include <Device.h>
-#include <DevServer.h>
+#include "API.h"
+#include "private/ApiP.h"
+#include "Device.h"
+#include "DevServer.h"
 #if HAVE_DLFCN_H
 #	include <dlfcn.h>
 #endif
