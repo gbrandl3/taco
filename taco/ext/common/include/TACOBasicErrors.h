@@ -20,6 +20,7 @@
 #ifndef TACO_BASIC_ERRORS_H
 #define TACO_BASIC_ERRORS_H
 
+#include <dev_xdr.h>
 #include <DevErrors.h>
 
 #define DevErr_ExecutionDenied 4010

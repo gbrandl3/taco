@@ -20,6 +20,7 @@
 #ifndef TACO_BASIC_COMMANDS_H
 #define TACO_BASIC_COMMANDS_H
 
+#include <dev_xdr.h>
 #include <DevCmds.h>
 
 #define TACO_COMMAND_DEVICE_VERSION 4001
