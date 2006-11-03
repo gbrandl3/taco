@@ -1,3 +1,20 @@
+2006-11-03 11:00 jkrueger1:
+	* Makefile.am: Improve the dependency handling
+	* acinclude.m4: Fix the check for installed sqlite3
+	* classes/updatedaemon/poller.c: Fix the signal handling on BSD systems
+	* m4/taco.m4: look for RPC header files
+	* system/dbase/server/Makefile.am: Improve the SQLite3 support
+	* system/dbase/server/Sqlite3Server.h: Enable dynamic logging
+	* system/dbase/server/sqlite3_impexp.cpp system/dbase/server/sqlite3_tools.cpp
+	system/dbase/server/sqlite3_update.cpp: Adopt changes from mySQL part
+	* system/starter/startup.cpp: prefer local header files
+	* tests/dbase.at tests/devices.at tests/gdbm.at tests/specialtest1.at
+	tests/starter.at: Fix shell command problems on BSD systems
+2006-10-27 12:00 andy_gotz:
+	* system/dbase/server/MySqlServer.h system/dbase/server/dbm.cpp
+	system/dbase/server/main_svc.cpp: Enable dynamic logging
+	* system/dbase/server/mysql_impexp.cpp system/dbase/server/mysql_tools.cpp: 
+	Save informations of last server
 2006-10-17 16:00 jkrueger1:
 	* system/msg/MessageServer.c: fix access rights for opened message files
 	* tests : improve the test environment
