@@ -38,10 +38,12 @@ longtest/longest_family_name/longest_member_name/longest_possible_resource_name1
 ]])
 AT_CHECK([
 RES_BASE_DIR=`pwd` taco db_update test_server.res
-AT_TACO_RUN_LOCAL([test_server 1 &])
+AT_TACO_RUN_LOCAL([test_server 1 -d])
 sleep 5
+printf "%d\n" `ps x | grep test_server | grep -v grep | wc -l`
 AT_TACO_RUN_LOCAL([test_client2 test/a/1 test/family/long_member test/a/1 test/family/long_member longtest/longest_family_name/longest_member_name])
-AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [Exported 1
+AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [1
+Exported 1
 Type 1
 Server test_server
 Personal 1
