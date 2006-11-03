@@ -35,14 +35,17 @@ AC_DEFUN([TACO_EXTENSIONS],[
 
 	# Check TACO extensions library
 	LIB_TACO="$LIB_TACO -lTACOExtensions"
-	LIBS="$taco_save_libs $LIB_TACO -ltacoapig++"
+	LIBS="$taco_save_libs $LIB_TACO -ltacomain -ltaco++"
 	AC_MSG_CHECKING([for TACO extensions library])
 	AC_LINK_IFELSE(AC_LANG_PROGRAM(
 	[[#include <TACOExtensions.h>]],[[TACO::errorString( 0)]]), [taco_try=ok], [taco_try=failed])
-	AC_MSG_RESULT($taco_try)
 	if test $taco_try = failed ; then
-		AC_MSG_ERROR([it seems that the TACO extension library is not installed])
+		LIBS="$taco_save_libs $LIB_TACO -ltacoapig++"
+		AC_LINK_IFELSE(AC_LANG_PROGRAM(
+		[[#include <TACOExtensions.h>]],[[TACO::errorString( 0)]]), 
+		[taco_try=ok], [AC_MSG_ERROR([it seems that the TACO extension library is not installed])])
 	fi
+	AC_MSG_RESULT($taco_try)
 	AC_LANG_RESTORE
 	LDFLAGS="$taco_save_ldflags"
 	CPPFLAGS="$taco_save_cppflags"
