@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2006-10-25 10:58:40 $
+ * Date:	$Date: 2006-11-03 09:39:08 $
  *
  */
 
@@ -426,10 +426,10 @@ DevLong *SQLite3Server::db_svcunr_1_svc(nam *dsn_name)
 //
 	std::string query;
 	// do not destroy the information where the device server was last running
-//	query = "UPDATE device SET EXPORTED = 0 , IOR = 'rpc:not_exp:0',";
-//	query += " VERSION = 0, PID = 0, CLASS = 'unknown', HOST = 'not_exp' WHERE ";
-	query = "UPDATE device SET EXPORTED = 0, STOPPED = DATETIME('NOW') WHERE ";
-	query += (" SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
+	query = "UPDATE device SET EXPORTED = 0, STOPPED = DATETIME('NOW'), IOR = 'rpc:not_exp:0'";
+	query += " ,VERSION = 0, PID = 0, CLASS = 'unknown', HOST = 'not_exp'";
+//	query = "UPDATE device SET EXPORTED = 0, STOPPED = DATETIME('NOW')";
+	query += (" WHERE SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
 #ifdef DEBUG
         std::cout << "SQLite3Server::db_svcunr_1_svc(): query = " << query << std::endl;
 #endif /* DEBUG */
