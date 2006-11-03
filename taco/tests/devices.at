@@ -21,7 +21,7 @@ dnl 02111-1307, USA.
 AT_SETUP([Start Inst_verify device server])
 AT_CHECK([taco Inst_verify 1 -m -d 
 sleep 1
-ps x | grep Inst_verify | grep -v grep | wc -l], [],
+printf "%d\n" `ps x | grep Inst_verify | grep -v grep | wc -l`], [],
 [[1
 ]])
 AT_CLEANUP
@@ -82,7 +82,7 @@ AT_CLEANUP
 AT_SETUP([Start AGPSpp device server ])
 AT_CHECK([taco AGPSpp 1 -m -d 
 sleep 1
-ps x | grep Inst_verify | grep -v grep | wc -l], [],
+printf "%d\n" `ps x | grep Inst_verify | grep -v grep | wc -l`], [],
 [[1
 ]])
 AT_CLEANUP
@@ -137,8 +137,8 @@ AT_SETUP([Stop the Inst_verify and AGPSpp device servers])
 AT_CHECK([AT_TACO_RUN_LOCAL([off Inst_verify | grep -v Killing])
 AT_TACO_RUN_LOCAL([off AGPSpp | grep -v Killing])
 sleep 2
-ps x | grep Inst_verify | grep -v grep | wc -l
-ps x | grep AGPSpp | grep -v grep | wc -l
+printf "%d\n" `ps x | grep Inst_verify | grep -v grep | wc -l`
+printf "%d\n" `ps x | grep AGPSpp | grep -v grep | wc -l`
 ],
 [0],
 [[There are 1 Inst_verify processes:
