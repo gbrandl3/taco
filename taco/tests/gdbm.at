@@ -19,7 +19,7 @@ dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 dnl 02111-1307, USA.
 
 AT_SETUP([db_read command])
-if test x"$python" == x"yes" ; then
+if test x"$python" = x"yes" ; then
 	AT_CHECK([
 taco db_read names | sort], [],
 [[NAMES: agpspp|1|1|: test/agps/1|not_exp|0|0|unknown|unknown|0|unknown|

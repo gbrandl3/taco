@@ -23,8 +23,8 @@ AT_CHECK(AT_TACO_RUN_LOCAL([db_connect]))
 AT_CLEANUP
 
 AT_SETUP([db_info command])
-if test x"$python" == xyes ; then
-	if test x"$extensions" == xyes ; then
+if test x"$python" = x"yes" ; then
+	if test x"$extensions" = x"yes" ; then
 		AT_CHECK([taco db_info | tail -15], [], [[		DEVICE STATISTICS
 
 4 devices are defined in database
@@ -60,7 +60,7 @@ if test x"$python" == xyes ; then
 ]])
 	fi
 else
-	if test x"$extensions" == xyes ; then
+	if test x"$extensions" = x"yes" ; then
 		AT_CHECK([taco db_info | tail -15], [], [[		DEVICE STATISTICS
 
 2 devices are defined in database
@@ -211,7 +211,7 @@ test
 AT_CLEANUP
 
 AT_SETUP([check existing resource families])
-if test x"$python" == x"yes" ; then 
+if test x"$python" = x"yes" ; then 
 	AT_CHECK(AT_TACO_RUN_LOCAL([db_resfamily test]), [], [[device
 python
 ]])
@@ -238,7 +238,7 @@ AT_CHECK(AT_TACO_RUN_LOCAL([db_devdomain]), [], [[test
 AT_CLEANUP
 
 AT_SETUP([check existing device families])
-if test x"$python" == x"yes" ; then
+if test x"$python" = x"yes" ; then
 	AT_CHECK(AT_TACO_RUN_LOCAL([db_devfamily test]), [], [[agps
 device
 python
