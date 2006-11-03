@@ -25,9 +25,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2006-09-18 22:34:41 $
+ * Date:        $Date: 2006-11-03 16:06:22 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -74,6 +74,7 @@ int main(int argc,char **argv)
 	{
 		db_devinfo_call devinfo;
 		
+		std::cout << i << std::endl;
 		if (db_deviceinfo(argv[i], &devinfo, &error) != DS_OK)
 		{
 			std::cout << "Db_deviceinfo : " << dev_error_str(error) << std::endl;

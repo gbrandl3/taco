@@ -43,6 +43,7 @@ sleep 5
 printf "%d\n" `ps x | grep test_server | grep -v grep | wc -l`
 AT_TACO_RUN_LOCAL([test_client2 test/a/1 test/family/long_member test/a/1 test/family/long_member longtest/longest_family_name/longest_member_name])
 AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [1
+1
 Exported 1
 Type 1
 Server test_server
@@ -59,6 +60,7 @@ CMD[[3]] = DevReset
 CMD[[4]] = DevState
 CMD[[5]] = DevStatus
 Ping : test/a/1 - 0
+2
 Exported 1
 Type 1
 Server test_server
@@ -76,6 +78,7 @@ CMD[[3]] = DevReset
 CMD[[4]] = DevState
 CMD[[5]] = DevStatus
 Ping : test/family/long_member - 0
+3
 Exported 1
 Type 1
 Server test_server
@@ -92,6 +95,7 @@ CMD[[3]] = DevReset
 CMD[[4]] = DevState
 CMD[[5]] = DevStatus
 Ping : test/a/1 - 0
+4
 Exported 1
 Type 1
 Server test_server
@@ -109,6 +113,7 @@ CMD[[3]] = DevReset
 CMD[[4]] = DevState
 CMD[[5]] = DevStatus
 Ping : test/family/long_member - 0
+5
 Exported 1
 Type 1
 Server test_server
