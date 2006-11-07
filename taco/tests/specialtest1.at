@@ -20,7 +20,8 @@ dnl 02111-1307, USA.
 
 AT_SETUP([Test db_devdel command])
 AT_CHECK([taco db_devdel -r test/a/1
-taco db_devdel -r test/longfamily/long])
+taco db_devdel -r test/longfamily/long
+taco db_devdel -r longtest/longest_family_name/longest_member_name])
 AT_CLEANUP
 
 AT_SETUP([Test the connection to the testserver devices])
@@ -42,7 +43,8 @@ AT_TACO_RUN_LOCAL([test_server 1 -d])
 sleep 5
 printf "%d\n" `ps x | grep test_server | grep -v grep | wc -l`
 AT_TACO_RUN_LOCAL([test_client2 test/a/1 test/family/long_member test/a/1 test/family/long_member longtest/longest_family_name/longest_member_name])
-AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [1
+dnl AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])
+], [], [1
 1
 Exported 1
 Type 1
