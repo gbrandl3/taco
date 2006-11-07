@@ -552,6 +552,7 @@ AC_RUN_IFELSE(
 	AC_LANG_PROGRAM([
 #include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #if HAVE_SOCKET_H
