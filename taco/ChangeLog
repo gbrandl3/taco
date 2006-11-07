@@ -1,3 +1,10 @@
+2006-11-07 17:00 jkrueger1:
+	* configure.ac: New version number
+	* acinclude.m4: Add 'stdlib.h' include for the 'exit' function
+	* tests/test_client2.cpp specialtest.at: Improve the tests
+	* lib/dbase/utils_api.c: use isspace macro instead of the number of '\t'
+	* system/dbase/server/dbm_impexp.cpp system/dbase/server/dbm_update.cpp:
+	add dynamic logging
 2006-11-03 11:00 jkrueger1:
 	* Makefile.am: Improve the dependency handling
 	* acinclude.m4: Fix the check for installed sqlite3
