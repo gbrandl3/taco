@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2006-10-25 09:03:29 $
+ * Date:	$Date: 2006-11-07 15:52:15 $
  *
  */
 
@@ -655,7 +655,6 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
     }
     catch(const long err)
     {
-	//std::cerr << "MySQLServer::db_store(): error = " << mysql_error(mysql_conn) << std::endl;
     	if (enable_logging) logStream << getTimeString("MySQLServer::db_store()") << " error = " << mysql_error(mysql_conn) << std::endl;
 	throw err;
     }
