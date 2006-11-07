@@ -27,13 +27,13 @@
  *	        update facility
  *		
  * Author(s)  : Emmanuel Taurel
- *              $Author: andy_gotz $
+ *              $Author: jkrueger1 $
  *
  * Original   : May 1998
  *
- * Version:     $Revision: 1.11 $
+ * Version:     $Revision: 1.12 $
  *
- * Date:        $Date: 2006-10-30 07:13:42 $
+ * Date:        $Date: 2006-11-07 15:50:15 $
  *
  *-*******************************************************************/
 
@@ -535,11 +535,10 @@ printf("Start of TestLine \n");
 				if (ptr[j + 1] == ',')
 					j++;
 				a = 1;
-				continue;
 			}
 /* Remove space and tab */
-            if (ptr[j] != ' ' && ptr[j] != 0x09)
-            {
+			else if (!isspace(ptr[j]))
+            		{
 				tmp[i++] = ptr[j];
 				a = 0;
 			}

@@ -23,11 +23,11 @@
  * Description:	
  *
  * Author(s):	
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  * 
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:	$Date: 2006-02-20 11:20:51 $
+ * Date:	$Date: 2006-11-07 15:50:15 $
  *
  ******************************************************************************/
 
@@ -143,22 +143,25 @@
 #define	PROC_NAME_LENGTH	40
 #define DSPERS_NAME_LENGTH	12
 #if 0
-#define DS_NAME_LENGTH		24
+#	define DS_NAME_LENGTH	24
 #endif
 #define DS_NAME_LENGTH		PROC_NAME_LENGTH + DSPERS_NAME_LENGTH
 #define DOMAIN_NAME_LENGTH	9
 #define FAMILY_NAME_LENGTH	20
 #define MEMBER_NAME_LENGTH	20
 #if 0
-#define DEV_NAME_LENGTH		24
+#	define DEV_NAME_LENGTH	24
 #endif
 #define DEV_NAME_LENGTH		DOMAIN_NAME_LENGTH + FAMILY_NAME_LENGTH + MEMBER_NAME_LENGTH 
 #define RES_NAME_LENGTH		32
 #define LONG_RES_NAME_LENGTH	80
+#if 0
+#	define LONG_RES_NAME_LENGTH	DEV_NAME_LENGTH + RES_NAME_LENGTH
+#endif
 #ifdef NDBM
-#define RES_VAL_LENGTH		2048
+#	define RES_VAL_LENGTH	2048
 #else
-#define RES_VAL_LENGTH		24
+#	define RES_VAL_LENGTH	24
 #endif
 #define LONG_RES_VAL_LENGTH	256
 
