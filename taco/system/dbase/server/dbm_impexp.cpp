@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.16 $
+ * Version:	$Revision: 1.17 $
  *
- * Date:	$Date: 2005-11-25 10:04:19 $
+ * Date:	$Date: 2006-11-07 15:55:00 $
  *
  */
 
@@ -64,17 +64,15 @@ DevLong *NdbmServer::db_devexp_1_svc(tab_dbdev *rece)
 	u_int 		num_dev = rece->tab_dbdev_len;;
 	static DevLong 	errcode;
 
-#ifdef DEBUG
-	for (int i = 0; i < num_dev; i++)
-	{
-		std::cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl;
-		std::cout << "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl;
-		std::cout << "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl;
-		std::cout << "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl;
-		std::cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl;
-		std::cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl;
-	}
-#endif
+
+	if (enable_logging)
+		for (int i = 0; i < num_dev; i++)
+			logStream << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl
+				<< "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl
+				<< "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl
+				<< "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl
+				<< "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl
+				<< "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl;
 //
 // Initialize error code sent back to client 
 //
@@ -117,18 +115,15 @@ DevLong *NdbmServer::db_devexp_2_svc(tab_dbdev_2 *rece)
 	u_int 		num_dev = rece->tab_dbdev_len;
 	static DevLong 	errcode;
 
-#ifdef DEBUG
-	for (int i = 0; i < num_dev; i++)
-	{
-		std::cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl;
-		std::cout << "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl;
-		std::cout << "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl;
-		std::cout << "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl;
-		std::cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl;
-		std::cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl;
-		std::cout << "Device server PID : " << rece->tab_dbdev_val[i].pid << std::endl;
-	}
-#endif
+	if (enable_logging)
+		for (int i = 0; i < num_dev; i++)
+			logStream << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl
+				<< "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl
+				<< "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl
+				<< "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl
+				<< "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl
+				<< "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl
+				<< "Device server PID : " << rece->tab_dbdev_val[i].pid << std::endl;
 //
 // Initialize error code sent back to client
 //
@@ -169,19 +164,16 @@ DevLong *NdbmServer::db_devexp_3_svc(tab_dbdev_3 *rece)
 	u_int 		num_dev = rece->tab_dbdev_len;;
 	static DevLong 	errcode;
 
-#ifdef DEBUG
-	for (int i = 0; i < num_dev; i++)
-	{
-		std::cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl;
-		std::cout << "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl;
-		std::cout << "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl;
-		std::cout << "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl;
-		std::cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl;
-		std::cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl;
-		std::cout << "Device server PID : " << rece->tab_dbdev_val[i].pid << std::endl;
-		std::cout << "Device server process name : " << rece->tab_dbdev_val[i].proc_name << std::endl;
-	}
-#endif
+	if (enable_logging)
+		for (int i = 0; i < num_dev; i++)
+			logStream << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl
+				<< "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl
+				<< "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl
+				<< "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl
+				<< "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl
+				<< "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl
+				<< "Device server PID : " << rece->tab_dbdev_val[i].pid << std::endl
+				<< "Device server process name : " << rece->tab_dbdev_val[i].proc_name << std::endl;
 //
 // Initialize error code sent back to client 
 //

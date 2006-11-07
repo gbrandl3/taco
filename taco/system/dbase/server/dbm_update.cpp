@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.17 $
+ * Version:	$Revision: 1.18 $
  *
- * Date:	$Date: 2006-09-06 18:36:32 $
+ * Date:	$Date: 2006-11-07 15:55:29 $
  *
  */
 
@@ -35,6 +35,7 @@
 #include <DevErrors.h>
 #include <algorithm>
 #include <NdbmServer.h>
+
 
 /**
  * To update device list(s)
@@ -48,9 +49,8 @@ db_psdev_error *NdbmServer::upddev_1_svc(db_res *dev_list)
 {
 	long list_nb = dev_list->res_val.arr1_len;
 		
-#ifdef DEBUG
-	std::cout << "In upddev_1_svc function for " << list_nb << " device list(s)" << std::endl;
-#endif
+	logStream << "In upddev_1_svc function for " << list_nb << " device list(s)" << std::endl;
+
 //
 // Initialize parameter sent back to client 
 //
@@ -68,7 +68,8 @@ db_psdev_error *NdbmServer::upddev_1_svc(db_res *dev_list)
 		std::string::size_type	pos = lin.find(":");
 		if(pos == std::string::npos)
 		{
-			std::cerr << "upd_name : no ':' found" << std::endl;
+			if (enable_logging)
+				logStream << "upd_name : no ':' found : " << lin << std::endl;
 			psdev_back.psdev_err = i + 1;
 			psdev_back.error_code = ERR_DEVNAME;
 			return(&psdev_back);
@@ -77,14 +78,14 @@ db_psdev_error *NdbmServer::upddev_1_svc(db_res *dev_list)
 		lin.erase(0, pos + 1);
 		if (count(serv.begin(), serv.begin() + pos, '/') != 2)
 		{
-			std::cerr << "upd_name : 2 '/' in the name expected, " << lin.substr(0, pos) << std::endl;
+			if (enable_logging)
+				logStream << "upd_name : 2 '/' in the name expected, " << lin.substr(0, pos) << std::endl;
 			throw long();
 		}
 		pos = serv.rfind('/');
 		serv.erase(pos);
-#ifdef DEBUG
-		std::cout << "Device list = " << lin << std::endl;
-#endif 
+		if (enable_logging)
+			logStream << "Device list = " << lin << std::endl;
 		try
 		{
 			upd_name(serv, lin, 1);
@@ -177,14 +178,16 @@ long NdbmServer::upd_name(std::string serv, std::string dev_name, int ind) throw
 	}
 	catch(...)
 	{
+		if (enable_logging)
+			logStream << "Could not delete " << dev_name << std::endl;
 		return(-1);
 	}
 
-#ifdef DEBUG
-	std::cout << "Device server class : " << serv.substr(0, pos) << std::endl;
-	std::cout << "Device server name : " << serv.substr(pos + 1) << std::endl;
-#endif
-
+	if (enable_logging)
+	{
+		logStream << "Device server class : " << serv.substr(0, pos) << std::endl;
+		logStream << "Device server name : " << serv.substr(pos + 1) << std::endl;
+	}
 //
 // Check, if the only device server is to be removed  
 //
@@ -222,9 +225,10 @@ long NdbmServer::upd_name(std::string serv, std::string dev_name, int ind) throw
 				s << tab_dena[i].oh_name << "|" << tab_dena[i].opn << "|" << tab_dena[i].ovn << "|" 
 					<< tab_dena[i].od_class << "|" << tab_dena[i].od_type << "|" << tab_dena[i].opid 
 					<< "|" << tab_dena[i].od_proc << "|";
-#ifdef DEBUG
-				std::cout << " update_name " << s.str() << std::endl;
-#endif
+
+				if (enable_logging)
+					logStream << " update_name " << s.str() << std::endl;
+
 #if !HAVE_SSTREAM
 				strcat(content.dptr, s.str());
         			s.freeze(false);
@@ -241,9 +245,9 @@ long NdbmServer::upd_name(std::string serv, std::string dev_name, int ind) throw
 //
 // Insert tuple in NAMES table
 //
-#ifdef DEBUG
-			std::cout << "Insert tuple in NAMES table" << std::endl;
-#endif 
+			if (enable_logging)
+				logStream << "Insert tuple in NAMES table " << key_sto.dptr << " " << content.dptr << std::endl;
+
 			key_sto2 = key_sto;
 			cont_sto = content;
 
@@ -306,9 +310,10 @@ long NdbmServer::del_name(device &devi, int &pndev, std::string ptr, std::vector
         	s.seekp(0, std::ios::beg);
 #endif
 		s << devi.ds_class << "|" << devi.ds_name << "|" << seq << "|" << std::ends;
-#ifdef DEBUG
-		std::cerr << s.str() << std::endl;
-#endif
+
+		if (enable_logging)
+			logStream << "del_name : " << s.str() << std::endl;
+
 #if !HAVE_SSTREAM
         	strcpy(key.dptr, s.str());
         	s.freeze(false);
@@ -316,9 +321,9 @@ long NdbmServer::del_name(device &devi, int &pndev, std::string ptr, std::vector
 		strcpy(key.dptr, const_cast<char *>(s.str().c_str()));
 #endif
 		key.dsize = strlen(key.dptr);
-#ifdef DEBUG
-		std::cerr << key.dptr << std::endl << key.dsize << std::endl;
-#endif
+
+		if (enable_logging)
+			logStream << key.dsize << " " << key.dptr << std::endl;
 //
 // Try to get data out of database
 //
@@ -491,11 +496,13 @@ long NdbmServer::update_dev_list(device &p_ret, long seq) throw (long)
 //
 // Miscellaneous init 
 //
-	std::cout << p_ret.ds_class << " " << p_ret.ds_name << std::endl;
+	if (enable_logging)
+		logStream << p_ret.ds_class << " " << p_ret.ds_name << std::endl;
 	std::string key_buf = std::string(p_ret.ds_class) + "|" + std::string(p_ret.ds_name) + "|";
-#ifdef DEBUG
-	std::cout << "before loop in update-dev_list function" << std::endl;
-#endif
+
+	if (enable_logging)
+		logStream << "before loop in update-dev_list function" << std::endl;
+
 	key.dptr = new char [MAX_KEY];
 	do
 	{
@@ -558,9 +565,10 @@ long NdbmServer::update_dev_list(device &p_ret, long seq) throw (long)
 		}
 	}while(true);
 	delete [] key.dptr;
-#ifdef DEBUG
-	std::cout << "after loop in update-dev_list function" << std::endl;	
-#endif
+
+	if (enable_logging)
+		logStream << "after loop in update-dev_list function" << std::endl;	
+
 	return(0);
 }
 
@@ -580,9 +588,8 @@ db_psdev_error *NdbmServer::updres_1_svc(db_res *res_list)
 		ind = 1,
 		i;
 
-#ifdef DEBUG
-	std::cout << "In updres_1_svc function for " << list_nb << " resource(s)" << std::endl;
-#endif
+	if (enable_logging)
+		logStream << "In updres_1_svc function for " << list_nb << " resource(s)" << std::endl;
 //
 // Initialize parameter sent back to client 
 //
@@ -601,9 +608,9 @@ db_psdev_error *NdbmServer::updres_1_svc(db_res *res_list)
 			std::string lin = res_list->res_val.arr1_val[i];
 			std::string::size_type	pos = 0;
 
-#ifdef DEBUG
-			std::cout << "Resource list = " << lin << std::endl;
-#endif
+			if (enable_logging)
+				logStream << "Resource list = " << lin << std::endl;
+
 //
 // Only one update if the resource is a simple one 
 //
@@ -714,14 +721,14 @@ long NdbmServer::upd_res(const std::string &lin, const long numb, bool array) th
 			}
 		if (i == dbgen.TblNum)
 			throw long(DbErr_DomainDefinition);
-#ifdef DEBUG
-		std::cout << "Table name : " << t_name << std::endl;
-		std::cout << "Family name : " << family << std::endl;
-		std::cout << "Number name : " << member << std::endl;
-		std::cout << "Resource name : " << r_name << std::endl;
-		std::cout << "Resource value : " << r_val << std::endl;
-		std::cout << "Sequence number : " << indi << std::endl << std::endl;
-#endif 
+
+		if (enable_logging)
+			logStream << "Table name : " << t_name << std::endl
+				<< "Family name : " << family << std::endl
+				<< "Number name : " << member << std::endl
+				<< "Resource name : " << r_name << std::endl
+				<< "Resource value : " << r_val << std::endl
+				<< "Sequence number : " << indi << std::endl << std::endl;
 //
 // Get resource value (resource values are stored in the database as case dependent strings)
 //
