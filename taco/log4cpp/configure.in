@@ -1,0 +1,136 @@
+AC_INIT(log4cpp, 0.3.5rc3)
+
+# autoconf 2.50 or higher to rebuild aclocal.m4, because the
+# AC_CREATE_PREFIX_CONFIG_H macro needs the AS_DIRNAME macro.
+AC_PREREQ(2.50)
+
+#
+# +1 : ? : +1  == new interface that does not break old one
+# +1 : ? : 0   == new interface that breaks old one
+#  ? : ? : 0   == no new interfaces, but breaks apps
+#  ? :+1 : ?   == just some internal changes, nothing breaks but might work 
+#                 better
+# CURRENT : REVISION : AGE
+LT_VERSION=4:5:0
+
+AC_SUBST(LT_VERSION)
+
+#AC_CONFIG_SRCDIR(configure.in)
+AC_CONFIG_AUX_DIR(config)
+AM_CONFIG_HEADER(include/config.h)
+
+AM_INIT_AUTOMAKE
+
+# General "with" options
+# ----------------------------------------------------------------------------
+AC_ARG_WITH(idsa, [  --with-idsa             include idsa support])
+
+# Checks for programs
+# ----------------------------------------------------------------------------
+AC_CANONICAL_HOST
+
+AM_PROG_LIBTOOL
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+
+AC_PROG_CXX([g++ c++ gpp aCC CC cxx cc++ cl FCC KCC RCC xlC_r xlC QCC])
+
+AC_PROG_CXXCPP
+AC_LANG(C++)
+
+# Checks header files
+# ----------------------------------------------------------------------------
+AC_CHECK_HEADERS([unistd.h])
+AC_CHECK_HEADERS([io.h])
+
+# Checks local idioms
+# ----------------------------------------------------------------------------
+AC_C_INT64_T
+AC_CXX_HAVE_SSTREAM
+AC_FUNC_SNPRINTF
+
+# syslog_test
+AC_CHECK_FUNCS([syslog])
+AC_CHECK_FUNCS([gettimeofday])
+AC_CHECK_FUNCS([ftime])
+
+# Checks for libraries
+# ----------------------------------------------------------------------------
+
+# for RemoteSyslogAppender
+AC_CHECK_LIB(socket,socket, LIBS="-lsocket $LIBS",,)
+AC_CHECK_LIB(nsl,gethostbyname, LIBS="-lnsl $LIBS",,)
+
+# idsa_test
+if test "x$with_idsa" = xyes; then
+    AC_CHECK_LIB([idsa], [idsa_open])
+    if test "$ac_cv_lib_idsa_idsa_open" = no; then
+        AC_MSG_ERROR([could not locate idsa library])
+    fi
+fi
+
+# check for doxygen
+# ----------------------------------------------------------------------------
+BB_ENABLE_DOXYGEN
+
+# check for omnithreads
+BB_CHECK_OMNITHREADS
+BB_CHECK_PTHREADS
+
+LOG4CPP_CFLAGS="$CXXFLAGS"
+LOG4CPP_LIBS="-llog4cpp"
+LOG4CPP_LIBDEPS="$LIBS"
+LOG4CPP_VERSION="$VERSION"
+
+# CXX fine tuning
+case "$host" in
+    *-dec-osf*)	  
+	CXXFLAGS="$CXXFLAGS -std strict_ansi_errors" 
+	;;
+    *)	
+	;;
+esac
+
+PETI_PEDANTIC_GCC
+
+# Create files
+# ----------------------------------------------------------------------------
+
+AC_CONFIG_LIBCONFIG_IN([log4cpp])
+AC_CONFIG_PKGCONFIG_IN([log4cpp], [C++ library for flexible logging, modeled after Log4j])
+
+AC_CONFIG_FILES([
+Makefile
+log4cpp.spec
+log4cpp.pc
+log4cpp-config
+doc/Makefile
+doc/Doxyfile
+doc/html/Makefile
+src/Makefile
+include/Makefile
+include/log4cpp/Makefile
+include/log4cpp/threading/Makefile
+tests/Makefile
+])
+dnl msvc6/Makefile
+dnl msvc6/log4cpp/Makefile
+dnl msvc6/log4cppDLL/Makefile
+dnl msvc6/testCategory/Makefile
+dnl msvc6/testDLL/Makefile
+dnl msvc6/testMain/Makefile
+dnl msvc6/testNDC/Makefile
+dnl msvc6/testNTEventLog/Makefile
+dnl msvc6/testPattern/Makefile
+dnl bcb5/Makefile
+dnl bcb5/log4cpp/Makefile
+dnl bcb5/testCategory/Makefile
+dnl bcb5/testConfig/Makefile
+dnl bcb5/testFixedContextCategory/Makefile
+dnl bcb5/testmain/Makefile
+dnl bcb5/testNDC/Makefile
+dnl bcb5/testPattern/Makefile
+dnl ])
+AC_OUTPUT
+
+AC_CREATE_PREFIX_CONFIG_H([include/log4cpp/config.h], $PACKAGE_TARNAME, [include/config.h])
