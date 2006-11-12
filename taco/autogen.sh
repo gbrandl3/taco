@@ -24,7 +24,7 @@ for automake in automake automake19 automake18 automake17 ; do
 done
 
 LIBTOOLIZE="$libtoolize --force --copy --automake"
-ACLOCAL="aclocal${am_postfix} -I m4 -I $aclocal_includes"
+ACLOCAL="aclocal${am_postfix} -I m4 -I $aclocal_includes" 
 AUTOHEADER="autoheader${ac_postfix}"
 AUTOMAKE="$automake -a -c --foreign"
 AUTOCONF="$autoconf"
@@ -109,7 +109,7 @@ fi
 # Generate the Makefiles and configure files
 if ( $ACLOCAL --version ) < /dev/null > /dev/null 2>&1; then
 	echo "Building macros..."
-	$ACLOCAL
+	$ACLOCAL -I log4cpp
 	echo "done."
 else
 	echo "aclocal not found -- aborting"
@@ -144,4 +144,5 @@ else
 fi
 
 (cd gdbm && sh autogen.sh)
+(cd log4cpp && sh autogen.sh)
 

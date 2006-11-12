@@ -16,9 +16,9 @@ dnl You should have received a copy of the GNU Lesser General Public
 dnl License along with this library; if not, write to the Free Software
 dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_INIT([TACO], [3.96.2], [taco-devel@lists.sourceforge.net])
+AC_INIT([TACO], [3.97.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.90 $)dnl
+AC_REVISION($Revision: 1.91 $)dnl
 AC_COPYRIGHT([(C) 1990-2006 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -401,7 +401,10 @@ TACO_DATABASE_SERVER
 TACO_CLIENT_TCP
 TACO_FRM_EXT
 
-AC_CONFIG_SUBDIRS(gdbm)
+AM_PATH_LOG4CPP([0.3.4], [taco_build_log4cpp=no], [taco_build_log4cpp=yes])
+AM_CONDITIONAL(BUILD_LOG4CPP, test "x$taco_build_log4cpp" = "xyes")
+
+AC_CONFIG_SUBDIRS([gdbm log4cpp])
 
 TACO_MESSAGE_SERVER
 
@@ -523,6 +526,7 @@ Configuration (taco):
 	TANGO:			${tango_found}
 	
 build:
+	log4cpp:		${taco_build_log4cpp}
 	gdbm:			${taco_build_gdbm}
 	manager:		${taco_manager}
 	database server:	${taco_dbserver} ${taco_dbserver_support}

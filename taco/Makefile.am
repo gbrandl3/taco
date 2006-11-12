@@ -17,13 +17,17 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-DISTCHECK_CONFIGURE_FLAGS = --enable-ext
-ACLOCAL_AMFLAGS = -I m4 
+DISTCHECK_CONFIGURE_FLAGS = --enable-ext --enable-gdbm --enable-sqlite3
+ACLOCAL_AMFLAGS = -I m4 -I log4cpp
 
 SUBDIRS = m4 
 
 if BUILD_GDBM
 SUBDIRS += gdbm
+endif
+
+if BUILD_LOG4CPP
+SUBDIRS += log4cpp
 endif
 
 SUBDIRS += lib
