@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2006-11-03 09:39:08 $
+ * Date:	$Date: 2006-11-12 16:45:58 $
  *
  */
 
@@ -425,9 +425,9 @@ DevLong *SQLite3Server::db_svcunr_1_svc(nam *dsn_name)
 // the device server process name, do a full traversal of the database 
 //
 	std::string query;
-	// do not destroy the information where the device server was last running
+// do not destroy the information where the device server was last running
 	query = "UPDATE device SET EXPORTED = 0, STOPPED = DATETIME('NOW'), IOR = 'rpc:not_exp:0'";
-	query += " ,VERSION = 0, PID = 0, CLASS = 'unknown', HOST = 'not_exp'";
+	query += ", VERSION = 0, PID = 0, CLASS = 'unknown', HOST = 'not_exp' ";
 //	query = "UPDATE device SET EXPORTED = 0, STOPPED = DATETIME('NOW')";
 	query += (" WHERE SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
 #ifdef DEBUG
