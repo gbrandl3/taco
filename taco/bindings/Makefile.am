@@ -17,18 +17,17 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
+SUBDIRS = 
+
 if PYTHON_BINDING
-python=python
-else
-python=
+SUBDIRS += python
 endif
 
 if TCL_BINDING
-tcl=tcl
-else
-tcl=
+SUBDIRS += tcl
 endif
 
-labview= 
+if LABVIEW_BINDING
+SUBDIRS += labview 
+endif
 
-SUBDIRS = $(tcl) $(python) $(labview)
