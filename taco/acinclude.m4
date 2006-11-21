@@ -46,6 +46,27 @@ AC_DEFUN([TACO_TCL_BINDING],
 	AM_CONDITIONAL(TCL_BINDING, test $taco_tcl_binding = yes)
 ])
 
+AC_DEFUN([TACO_LABVIEW_BINDING],
+[
+	taco_labview_binding="no"
+	AC_ARG_ENABLE(labview, AC_HELP_STRING(--enable-labview, [build the binding for LabView @<:@default=yes@:>@]),
+                [case "${enable_labview}" in
+                        yes)    taco_labview=yes;;
+                        no)     taco_labview=no;;
+                        *)      AC_MSG_ERROR([bad value ${enable_labview} for --enable-labview]);;
+                esac], [taco_labview=yes])
+        AC_ARG_WITH(labview, AS_HELP_STRING([--with-labview=PFX], [Prefix where labview is installed, @<:@default=/usr/local/lv71@:>@]),
+                [labview_prefix="$withval"], [labview_prefix="/usr/local/lv71"])
+	ac_save_CPPFLAGS="CPPFLAGS"
+	CPPFLAGS="$CPPFLAGS -I${labview_prefix}/cintools"
+	AC_CHECK_HEADERS([extcode.h], [taco_labview_binding=yes
+		AC_SUBST([LABVIEW_INCLUDES], ["-I${labview_prefix}/cintools"])
+		AC_SUBST([LABVIEW_LIBS], ["-L${labview_prefix}/cintools -llv"])
+		]) 
+	CPPFLAGS="$ac_save_CPPFLAGS"
+	AM_CONDITIONAL(LABVIEW_BINDING, [test "$taco_labview_binding" = "yes"])
+])
+
 AC_DEFUN([TACO_DBM_SERVER],
 [
 	TACO_MYSQL_SUPPORT
