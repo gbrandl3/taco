@@ -12,13 +12,16 @@
  *
  * Original:	October 1999
  *
- * $Revision: 1.3 $
+ * $Revision: 1.4 $
  *
- * $Date: 2004-01-26 09:43:01 $
+ * $Date: 2006-11-21 14:47:57 $
  * 
  * Last Modified: 01.11.2003, Hartmut Gilde
  * 
  ******************************************************************************/
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
 #include <stdio.h>
 #include <time.h>

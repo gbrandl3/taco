@@ -66,13 +66,16 @@
  *
  * Original:	February 1999
  *
- * $Revision: 1.1 $
+ * $Revision: 1.2 $
  *
- * $Date: 2004-01-26 08:44:22 $
+ * $Date: 2006-11-21 14:47:57 $
  *
- * $Author: hgilde1 $
+ * $Author: jkrueger1 $
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.1  2004/01/26 08:44:22  hgilde1
+ * add labview bindings
+ *
  * Revision 1.1  2004/01/12 17:21:31  hgilde1
  *
  *
@@ -135,6 +138,9 @@
  *                  Grenoble, France
  *
  ******************************************************************************/
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
 #include <stdio.h>
 #include <time.h>
@@ -325,10 +331,10 @@ static long lv_dev_init(long *error)
 	class_lib = shl_load("/operation/dserver/lib/s700/lv_dsclass.sl", BIND_IMMEDIATE  | DYNAMIC_PATH, 0);
 	if (class_lib == NULL) perror("lv_dev_init(): shl_load(lv_dsclass.sl)");
 #else
-	taco_lib = dlopen("libtaco.so.0", RTLD_LAZY  | RTLD_GLOBAL);
-	if (taco_lib == NULL) printf("lv_dev_init(): dlopen(libtaco.so.0) error %s\n",dlerror());
-	class_lib = dlopen("liblvdsclass.so.0", RTLD_LAZY  );
-	if (class_lib == NULL) printf("lv_dev_init(): dlopen(liblvdsclass.so.0) error %s\n",dlerror());
+	taco_lib = dlopen("libtaco.so", RTLD_LAZY  | RTLD_GLOBAL);
+	if (taco_lib == NULL) printf("lv_dev_init(): dlopen(libtaco.so) error %s\n",dlerror());
+	class_lib = dlopen("lv_dsclass.so", RTLD_LAZY  );
+	if (class_lib == NULL) printf("lv_dev_init(): dlopen(lv_dsclass.so) error %s\n",dlerror());
 #endif /* hpux */
 #ifdef LV_DEBUG
 	if (lv_debug) printf("taco handle 0x%08x\n",taco_lib);
@@ -2224,7 +2230,8 @@ long lv_dev_timeout(char *name, long timeout, long *error)
   	{
       		if ((idevice=lv_dev_import(name,error)) == DS_NOTOK)
       		{
-         		return (mgPrivErrSentinel);
+         		/* return (mgPrivErrSentinel); */
+         		return (mgErrSentinel);
       		}
   	}
 	else
@@ -2233,7 +2240,8 @@ long lv_dev_timeout(char *name, long timeout, long *error)
       		{
 			if ((idevice=lv_dev_import(name,error)) == DS_NOTOK)
       			{
-         			return (mgPrivErrSentinel);
+         			/* return (mgPrivErrSentinel); */
+         			return (mgErrSentinel);
       			}
 		}
 	}
