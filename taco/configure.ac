@@ -18,7 +18,7 @@ dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_INIT([TACO], [3.97.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.92 $)dnl
+AC_REVISION($Revision: 1.93 $)dnl
 AC_COPYRIGHT([(C) 1990-2006 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -354,7 +354,7 @@ AC_SUBST(MOC, ['/usr/lib/qt3/bin/moc'])
 AC_SUBST(QT_LDFLAGS, ['-L/usr/lib/qt3/lib'])
 AC_SUBST(LIBSM, ['-lSM -lICE'])
 AC_SUBST(LIB_X11, ['-lX11 $(LIBSM) $(LIBSOCKET)'])
-AC_SUBST(LIB_QT, ['-lqt $(LIBPNG) $(LIBJPEG) -lXext $(LIB_X11) $(LIBSM)'])
+AC_SUBST(LIB_QT, ['-lqt-mt $(LIBPNG) $(LIBJPEG) -lXext $(LIB_X11) $(LIBSM)'])
 AC_SUBST(X_LDFLAGS, ['-L/usr/X11R6/lib'])
 
 AC_SUBST(appdefaultdir)
