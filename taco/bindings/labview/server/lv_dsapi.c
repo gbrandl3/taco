@@ -1,3 +1,4 @@
+#define BLA
 /******************************************************************************
  *
  * File:	lv_dev_api.c
@@ -66,31 +67,27 @@
  *
  * Original:	February 1999
  *
- * $Revision: 1.2 $
+ * $Revision: 1.3 $
  *
- * $Date: 2006-11-21 14:47:57 $
+ * $Date: 2006-11-21 16:38:19 $
  *
  * $Author: jkrueger1 $
  *
  * $Log: not supported by cvs2svn $
- * Revision 1.1  2004/01/26 08:44:22  hgilde1
- * add labview bindings
+ * Revision 1.17  2005/06/29 08:39:39  goetz
+ * going to add D_INT_FLOAT for the insertion device group
  *
- * Revision 1.1  2004/01/12 17:21:31  hgilde1
+ * Revision 1.16  2001/10/18  16:16:07  meyer
+ * Added D_VARCHAR_ARRAY and DEV_OPAQUE_TYPE.
  *
+ * Revision 1.15  2001/10/17  09:42:56  09:42:56  goetz (Andy Goetz)
+ * *** empty log message ***
+ * 
+ * Revision 1.14  2001/08/17 11:37:21  goetz
+ * added support for unsigned short types (same as signed short)
  *
- *
- *  Added Files:
- *  	labview/server/doc/lv_taco.pdf
- *  	labview/server/include/LabViewGeneric.h
- *  	labview/server/include/LabViewGenericP.h
- *  	labview/server/include/extcode.h
- *  	labview/server/res/LabViewGeneric.res
- *  	labview/server/src/Makefile
- * 	labview/server/src/lv_dsapi.c
- *  	labview/server/src/lv_dsclass.c
- *
- * These files are needed to built the Labview-TACO-interface lib.
+ * Revision 1.13  2000/12/04 13:09:48  goetz
+ * ported to Windows 95/98/NT based on TACO port of DSAPI 5.15 and ONCRPC
  *
  * Revision 1.11  20/0./2.  1.:6.:5.  1.:6.:5.  goetz (Andy Goetz)
  * added lv_db_getdevexp() call to interface - retrieve list of devices from
@@ -144,11 +141,13 @@
 
 #include <stdio.h>
 #include <time.h>
+#ifdef unix
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <unistd.h>
+#endif /* unix */
 #include <API.h>
-#include <ApiP.h>
+#include <private/ApiP.h>
 #include <Admin.h>
 #include <BlcDsNumbers.h>
 #include <DevServer.h>
@@ -156,14 +155,17 @@
 #include <DevSignal.h>
 #include <DevErrors.h>
 #include <maxe_xdr.h>
-#include <LabViewGeneric.h>
-#include <dc.h>
+#include <LabView.h>
+#ifdef _WINDOWS
+#include <windows.h>
+#endif /* _WINDOWS */
 
 #ifdef hpux
 #include <dl.h>
-#else
-#include <dlfcn.h>
 #endif /* hpux */
+#if defined solaris || linux
+#include <dlfcn.h>
+#endif /* solaris || linux */
 #include "extcode.h"
 
 static long lv_dev_init();
@@ -177,7 +179,6 @@ static long lv_argin_convert();
 static long lv_argout_prepare();
 static long lv_argout_convert();
 static long lv_startup();
-long lv_ds_debug();
 
 #define LV_MAX_DEVICES 1000
 #define LV_DEV_FREE 0
@@ -186,10 +187,14 @@ long lv_ds_debug();
 #define LV_DC_IMPORTED 4
 #define LV_DC_QUERYED 8
 
-#define LV_DS_DEBUG 1
-#define LV_DS_NO_DEBUG 0
-
 /* type definition for LV variable size data */
+
+typedef struct {
+  long dimSizes[1];
+  char arg1[1];
+} CharArray;
+
+typedef CharArray **CharArrayHdl;
 
 typedef struct {
   long dimSizes[1];
@@ -254,28 +259,33 @@ struct { char *name;
 #endif /* DC */
 } lv_device[LV_MAX_DEVICES];
 
-long (*_dev_import)(char *,long,devserver*,long*)=NULL;
-long (*_dev_cmd_query)(devserver,DevVarCmdArray*,long*)=NULL;
-long (*_dev_putget)(devserver,long,void*,long,void*,long,long*)=NULL;
-long (*_dev_xdrfree)(long,void*,long*)=NULL;
-long (*_dev_free)(devserver,long*)=NULL;
-long (*_dc_free)(dc_dev_free*,unsigned int,long*)=NULL;
-long (*_dev_rpc_protocol)(devserver,long,long*)=NULL;
-long (*_dev_rpc_timeout)(devserver,long,struct timeval*,long*)=NULL;
-char*(*_dev_error_str)(long)=NULL;
+#ifdef _WINDOWS
+#define EXPORT  extern __declspec (dllexport)
+#else
+#define EXPORT
+#endif /* _WINDOWS */
+
+EXPORT long (*_dev_import)(char *,long,devserver*,long*)=NULL;
+EXPORT long (*_dev_cmd_query)(devserver,DevVarCmdArray*,long*)=NULL;
+EXPORT long (*_dev_putget)(devserver,long,void*,long,void*,long,long*)=NULL;
+EXPORT long (*_dev_xdrfree)(long,void*,long*)=NULL;
+EXPORT long (*_dev_free)(devserver,long*)=NULL;
+EXPORT long (*_dc_free)(dc_dev_free*,unsigned int,long*)=NULL;
+EXPORT long (*_dev_rpc_protocol)(devserver,long,long*)=NULL;
+EXPORT long (*_dev_rpc_timeout)(devserver,long,struct timeval*,long*)=NULL;
+EXPORT char* (*_dev_error_str)(long)=NULL;
 #ifdef LV_DC
 long (*_dc_import)(dc_dev_imp*,long,long*)=NULL;
 long (*_dc_dinfo)(char*,dc_devinf*,long*)=NULL;
 long (*_dc_devget)(datco*,long,void*,long,long*)=NULL;
 #endif /* DC */
-long (*_db_import)(long*)=NULL;
-long (*_db_getresource)(char*,Db_resource,long,long*)=NULL;
-long (*_db_getdevexp)(char*,char***,long*,long*)=NULL;
-long (*_db_freedevexp)(char**)=NULL;
+EXPORT long (*_db_import)(long*)=NULL;
+EXPORT long (*_db_getresource)(char*,Db_resource,u_int,long*)=NULL;
+EXPORT long (*_db_getdevexp)(char*,char***,u_int*,long*)=NULL;
+EXPORT long (*_db_freedevexp)(char**)=NULL;
 long (*_lv_ds__main)(char*,char*)=NULL;
 long (*_lv_ds__cmd_get)()=NULL;
 long (*_lv_ds__cmd_put)()=NULL;
-long (*_lv_print_debug)(char*)=NULL;
 long *_debug_flag=NULL;
 
 /* initialise global pointers to NULL */
@@ -283,16 +293,19 @@ long *_debug_flag=NULL;
 #ifdef hpux
 shl_t taco_lib;
 shl_t class_lib;
-#else
+#endif /* hpux */
+#if defined solaris || linux
 void *taco_lib = NULL;
 void *class_lib = NULL;
-#endif /* hpux */
+#endif /* solaris || linux  */
 
 #ifdef LV_DEBUG_1
 static long lv_debug = 1;
 #else
 static long lv_debug = 0;
 #endif /* LV_DEBUG_1 */
+
+
 
 /******************************************************************************
  *
@@ -308,9 +321,10 @@ static long lv_debug = 0;
 
 static long lv_dev_init(long *error)
 {
-	long i, status;
-	struct rlimit no_file;
 
+#ifdef unix
+	long status;	
+	struct rlimit no_file;
 /* 
  * set no. of open files per process to maximum, this will avoid the error
  * "too many files open" in LabView when working with lots of device servers
@@ -345,83 +359,123 @@ static long lv_dev_init(long *error)
 		*error = DevErr_LVCannotLoadLibrary;
 		return(DS_NOTOK);
 	}
+#endif /* unix */
+#ifdef _WINDOWS
+	rpc_nt_init();
+#endif /* _WINDOWS */
 /*
  * and resolve the dsapi symbols
  */
 #ifdef hpux
 	status = shl_findsym(&taco_lib, "dev_import", TYPE_UNDEFINED, &_dev_import);
-#else
+#endif /* hpux */
+#if defined solaris || linux
 	_dev_import = dlsym(taco_lib, "dev_import");
-#endif
+#endif /* solaris || linux */
+#ifdef _WINDOWS
+	_dev_import = dev_import;
+#endif /* _WINDOWS */
 #ifdef LV_DEBUG
 	if (lv_debug) printf("_dev_import handle 0x%08x\n",_dev_import);
 #endif /* LV_DEBUG */
 
 #ifdef hpux
 	status = shl_findsym(&taco_lib, "dev_free", TYPE_UNDEFINED, &_dev_free);
-#else
+#endif /* hpux */
+#if defined solaris || linux
 	_dev_free = dlsym(taco_lib, "dev_free");
-#endif
+#endif /* solaris || linux */
+#ifdef _WINDOWS
+	_dev_free = dev_free;
+#endif /* _windows */
 #ifdef LV_DEBUG
 	if (lv_debug) printf("_dev_free handle 0x%08x\n",_dev_free);
 #endif /* LV_DEBUG */
 
 #ifdef hpux
 	status = shl_findsym(&taco_lib, "dc_free", TYPE_UNDEFINED, &_dc_free);
-#else
+#endif /* hpux */
+#if defined solaris || linux
 	_dc_free = dlsym(taco_lib, "dc_free");
-#endif
+#endif /* solaris || linux */
+#ifdef NO_WINDOWS
+	_dc_free = dc_free;
+#endif /* _WINDOWS */
 #ifdef LV_DEBUG
 	if (lv_debug) printf("_dc_free handle 0x%08x\n",_dc_free);
 #endif /* LV_DEBUG */
 
 #ifdef hpux
 	status = shl_findsym(&taco_lib, "dev_cmd_query", TYPE_UNDEFINED, &_dev_cmd_query);
-#else
+#endif /* hpux */
+#if defined solaris || linux
 	_dev_cmd_query = dlsym(taco_lib, "dev_cmd_query");
-#endif
+#endif /* solaris || linux */
+#ifdef _WINDOWS
+	_dev_cmd_query = dev_cmd_query;
+#endif /* _WINDOWS */
 #ifdef LV_DEBUG
 	if (lv_debug) printf("_dev_cmd_query handle 0x%08x\n",_dev_cmd_query);
 #endif /* LV_DEBUG */
 
 #ifdef hpux
 	status = shl_findsym(&taco_lib, "dev_putget", TYPE_UNDEFINED, &_dev_putget);
-#else
+#endif /* hpux */
+#if defined solaris || linux
 	_dev_putget = dlsym(taco_lib, "dev_putget");
-#endif
+#endif /* solaris || linux */
+#ifdef _WINDOWS
+	_dev_putget = dev_putget;
+#endif /* _WINDOWS */
 #ifdef LV_DEBUG
 	if (lv_debug) printf("_dev_putget handle 0x%08x\n",_dev_putget);
 #endif /* LV_DEBUG */
 
 #ifdef hpux
 	status = shl_findsym(&taco_lib, "dev_xdrfree", TYPE_UNDEFINED, &_dev_xdrfree);
-#else
+#endif /* hpux */
+#if defined solaris || linux
 	_dev_xdrfree = dlsym(taco_lib, "dev_xdrfree");
-#endif
+#endif /* solaris || linux */
+#ifdef _WINDOWS
+	_dev_xdrfree = dev_xdrfree;
+#endif /* _WINDOWS */
 #ifdef LV_DEBUG
 	if (lv_debug) printf("_dev_xdrfree handle 0x%08x\n",_dev_xdrfree);
 #endif /* LV_DEBUG */
 
 #ifdef hpux
 	status = shl_findsym(&taco_lib, "dev_rpc_protocol", TYPE_UNDEFINED, &_dev_rpc_protocol);
-#else
+#endif /* hpux */
+#if defined solaris || linux
 	_dev_rpc_protocol = dlsym(taco_lib, "dev_rpc_protocol");
-#endif
+#endif /* solaris || linux */
+#ifdef _WINDOWS
+	_dev_rpc_protocol = dev_rpc_protocol;
+#endif /* _WINDOWS */
 
 #ifdef hpux
 	status = shl_findsym(&taco_lib, "dev_rpc_timeout", TYPE_UNDEFINED, &_dev_rpc_timeout);
-#else
+#endif /* hpux */
+#if defined solaris || linux
 	_dev_rpc_timeout = dlsym(taco_lib, "dev_rpc_timeout");
-#endif
+#endif /* solaris || linux */
+#ifdef _WINDOWS
+	_dev_rpc_timeout = dev_rpc_timeout;
+#endif /* _WINDOWS */
 #ifdef LV_DEBUG
 	if (lv_debug) printf("_dev_rpc_timeout handle 0x%08x\n",_dev_rpc_timeout);
 #endif /* LV_DEBUG */
 
 #ifdef hpux
 	status = shl_findsym(&taco_lib, "dev_error_str", TYPE_UNDEFINED, &_dev_error_str);
-#else
+#endif /* hpux */
+#if defined solaris || linux
 	_dev_error_str = dlsym(taco_lib, "dev_error_str");
-#endif
+#endif /* solaris || linux */
+#ifdef _WINDOWS
+	_dev_error_str = dev_error_str;
+#endif /* _WINDOWS */
 #ifdef LV_DEBUG
 	if (lv_debug) printf("_dev_error_str handle 0x%08x\n",_dev_error_str);
 #endif /* LV_DEBUG */
@@ -429,129 +483,171 @@ static long lv_dev_init(long *error)
 #ifdef LV_DC
 #ifdef hpux
 	status = shl_findsym(&taco_lib, "dc_import", TYPE_UNDEFINED, &_dc_import);
-#else
+#endif /* hpux */
+#if defined solaris || linux
 	_dc_import = dlsym(taco_lib, "dc_import");
-#endif
+#endif /* solaris || linux */
+#ifdef _WINDOWS
+	_dc_import = dc_import;
+#endif /* _WINDOWS */
 #ifdef LV_DEBUG
 	if (lv_debug) printf("_dc_import handle 0x%08x\n",_dc_import);
 #endif /* LV_DEBUG */
 
 #ifdef hpux
 	status = shl_findsym(&taco_lib, "dc_dinfo", TYPE_UNDEFINED, &_dc_dinfo);
-#else
+#endif /* hpux */
+#if defined solaris || linux
 	_dc_dinfo = dlsym(taco_lib, "dc_dinfo");
-#endif
+#endif /* solaris || linux */
+#ifdef _WINDOWS
+	_dc_info = dc_info;
+#endif /* _WINDOWS */
 #ifdef LV_DEBUG
 	if (lv_debug) printf("_dc_dinfo handle 0x%08x\n",_dc_dinfo);
 #endif /* LV_DEBUG */
 
 #ifdef hpux
 	status = shl_findsym(&taco_lib, "dc_devget", TYPE_UNDEFINED, &_dc_devget);
-#else
+#endif /* hpux */
+#if defined solaris || linux
 	_dc_devget = dlsym(taco_lib, "dc_devget");
-#endif
+#endif /* solaris || linux */
+#ifdef _WINDOWS
+	_dc_devget = dc_devget;
+#endif /* _WINDOWS */
 #ifdef LV_DEBUG
 	if (lv_debug) printf("_dc_devget handle 0x%08x\n",_dc_devget);
 #endif /* LV_DEBUG */
 #endif /* DC */
 
-	if (class_lib == NULL) return(DS_NOTOK);
-
 #ifdef hpux
 	status = shl_findsym(&taco_lib, "db_import", TYPE_UNDEFINED, &_db_import);
-#else
+#endif /* hpux */
+#if defined solaris || linux
 	_db_import = dlsym(taco_lib, "db_import");
-#endif
+#endif /* solaris || linux */
+#ifdef _WINDOWS
+	_db_import = db_import;
+#endif /* _WINDOWS */
 #ifdef LV_DEBUG
 	if (lv_debug) printf("_db_import handle 0x%08x\n",_db_import);
 #endif /* LV_DEBUG */
 
 #ifdef hpux
 	status = shl_findsym(&taco_lib, "db_getresource", TYPE_UNDEFINED, &_db_getresource);
-#else
+#endif /* hpux */
+#if defined solaris || linux
 	_db_getresource = dlsym(taco_lib, "db_getresource");
-#endif
+#endif /* solaris || linux */
+#ifdef _WINDOWS
+	_db_getresource = db_getresource;
+#endif /* _WINDOWS */
 #ifdef LV_DEBUG
 	if (lv_debug) printf("_db_getresource handle 0x%08x\n",_db_getresource);
 #endif /* LV_DEBUG */
 
 #ifdef hpux
 	status = shl_findsym(&taco_lib, "db_getdevexp", TYPE_UNDEFINED, &_db_getdevexp);
-#else
+#endif /* hpux */
+#if defined solaris || linux
 	_db_getdevexp = dlsym(taco_lib, "db_getdevexp");
-#endif
+#endif /* solaris || linux */
+#ifdef _WINDOWS
+	_db_getdevexp = db_getdevexp;
+#endif /* _WINDOWS */
 #ifdef LV_DEBUG
 	if (lv_debug) printf("_db_getdevexp handle 0x%08x\n",_db_getdevexp);
 #endif /* LV_DEBUG */
 
 #ifdef hpux
 	status = shl_findsym(&taco_lib, "db_freedevexp", TYPE_UNDEFINED, &_db_freedevexp);
-#else
+#endif /* hpux */
+#if defined solaris || linux
 	_db_freedevexp = dlsym(taco_lib, "db_freedevexp");
-#endif
+#endif /* solaris || linux */
+#ifdef _WINDOWS
+	_db_freedevexp = db_freedevexp;
+#endif /* _WINDOWS */
 #ifdef LV_DEBUG
 	if (lv_debug) printf("_db_freedevexp handle 0x%08x\n",_db_freedevexp);
 #endif /* LV_DEBUG */
 
-#ifdef hpux
-	status = shl_findsym(&class_lib, "lv_ds__main", TYPE_UNDEFINED, &_lv_ds__main);
-#else
-	_lv_ds__main = dlsym(class_lib, "lv_ds__main");
-#endif
-#ifdef LV_DEBUG
-	if (lv_debug) printf("_lv_ds__main handle 0x%08x\n",_lv_ds__main);
-#endif /* LV_DEBUG */
-
-#ifdef hpux
-	status = shl_findsym(&class_lib, "lv_ds__cmd_get", TYPE_UNDEFINED, &_lv_ds__cmd_get);
-#else
-	_lv_ds__cmd_get = dlsym(class_lib, "lv_ds__cmd_get");
-#endif
-#ifdef LV_DEBUG
-	if (lv_debug) printf("_lv_ds__cmd_get handle 0x%08x\n",_lv_ds__cmd_get);
-#endif /* LV_DEBUG */
-
-#ifdef hpux
-	status = shl_findsym(&class_lib, "lv_ds__cmd_put", TYPE_UNDEFINED, &_lv_ds__cmd_put);
-#else
-	_lv_ds__cmd_put = dlsym(class_lib, "lv_ds__cmd_put");
-#endif
-#ifdef LV_DEBUG
-	if (lv_debug) printf("_lv_ds__cmd_put handle 0x%08x\n",_lv_ds__cmd_put);
-#endif /* LV_DEBUG */
-
-#ifdef hpux
-	status = shl_findsym(&class_lib, "lv_print_debug", TYPE_UNDEFINED, &_lv_print_debug);
-#else
-	_lv_print_debug = dlsym(class_lib, "lv_print_debug");
-#endif
-#ifdef LV_DEBUG
-	if (lv_debug) printf("_lv_print_debug handle 0x%08x\n",_lv_print_debug);
-#endif /* LV_DEBUG */
 
 #ifdef hpux
 	status = shl_findsym(&taco_lib, "debug_flag", TYPE_UNDEFINED, &_debug_flag);
-#else
+#endif /* hpux */
+#if defined solaris || linux
 	_debug_flag = dlsym(taco_lib, "debug_flag");
-#endif
+#endif /* solaris || linux */
+#ifdef _WINDOWS
+	_debug_flag = &debug_flag;
+#endif /* _WINDOWS */
 #ifdef LV_DEBUG
 	if (lv_debug) printf("_debug_flag handle 0x%08x\n",_debug_flag);
 #endif /* LV_DEBUG */
 /*	if (_debug_flag != NULL) *_debug_flag = 0xffffffff;*/
 
-	if ((taco_lib != NULL) && (_dev_import != NULL) && 
-	    (_dev_cmd_query != NULL) && (_dev_putget != NULL))
+#ifndef _WINDOWS
+	if (class_lib != NULL)
+	{
+#ifdef hpux
+		status = shl_findsym(&class_lib, "lv_ds__main", TYPE_UNDEFINED, &_lv_ds__main);
+#endif /* hpux */
+#if defined solaris || linux
+		_lv_ds__main = dlsym(class_lib, "lv_ds__main");
+#endif /* solaris || linux */
+#ifdef NO_WINDOWS
+		_lv_ds__main = lv_ds__main;
+#endif /* _WINDOWS */
+#ifdef LV_DEBUG
+		if (lv_debug) printf("_lv_ds__main handle 0x%08x\n",_lv_ds__main);
+#endif /* LV_DEBUG */
+
+#ifdef hpux
+		status = shl_findsym(&class_lib, "lv_ds__cmd_get", TYPE_UNDEFINED, &_lv_ds__cmd_get);
+#endif /* hpux */
+#if defined solaris || linux
+		_lv_ds__cmd_get = dlsym(class_lib, "lv_ds__cmd_get");
+#endif /* solaris || linux */
+#ifdef NO_WINDOWS
+		_lv_ds__cmd_get = lv_ds__cmd_get;
+#endif /* _WINDOWS */
+#ifdef LV_DEBUG
+		if (lv_debug) printf("_lv_ds__cmd_get handle 0x%08x\n",_lv_ds__cmd_get);
+#endif /* LV_DEBUG */
+
+#ifdef hpux
+		status = shl_findsym(&class_lib, "lv_ds__cmd_put", TYPE_UNDEFINED, &_lv_ds__cmd_put);
+#endif /* hpux */
+#if defined solaris || linux
+		_lv_ds__cmd_put = dlsym(class_lib, "lv_ds__cmd_put");
+#endif /* solaris || linux */
+#ifdef NO_WINDOWS
+		_lv_ds__cmd_put == lv_ds__cmd_put;
+#endif /* _WINDOWS */
+#ifdef LV_DEBUG
+		if (lv_debug) printf("_lv_ds__cmd_put handle 0x%08x\n",_lv_ds__cmd_put);
+#endif /* LV_DEBUG */
+	}
+#endif /* _WINDOWS */
+#ifdef unix
+	if ((_dev_import != NULL) && (_dev_cmd_query != NULL) && 
+		(_dev_putget != NULL))
+#endif /* unix */
 	{
 /*
  * import database - this is needed by calls like db_getdevexp()
  */
 		return((*_db_import)(error));
 	}
+#ifdef unix
 	else
 	{
 		*error = -1;
 	    	return(DS_NOTOK);
 	}
+#endif /* unix */
 }
 
 /******************************************************************************
@@ -566,9 +662,11 @@ static long lv_dev_init(long *error)
 
 static long lv_dev_import(char *name, long *error)
 {
-	long i, j, status, dev_status=-1;
+	long i, status, dev_status=-1;
 
+#ifdef unix
 	if (_dev_import == NULL)
+#endif /* unix */
 	{
 		if (lv_dev_init(error) != DS_OK) return(DS_NOTOK);
 	}
@@ -590,8 +688,13 @@ static long lv_dev_import(char *name, long *error)
 #ifdef LV_DEBUG
         if (lv_debug) printf("going to call dev_import(), name = %s\n",name);
 #endif /* LV_DEBUG */
-	
+
+#ifdef _WINDOWS
+	dev_status = dev_import(name, 0, &(lv_device[i].ds), error);
+#else
         dev_status = (*_dev_import)(name, 0, &(lv_device[i].ds), error);
+#endif /* _WINDOWS */
+
 #ifdef LV_DEBUG
 	if (lv_debug) printf("lv_dev_import(): dev_import() returned %d\n",dev_status);	
 #endif /* LV_DEBUG */
@@ -748,7 +851,8 @@ static long lv_dc_import(char *name, long *error)
 
 long lv_dev_free(char *name, long *error)
 {
-	long i, idev, status;
+	long idev, status;
+	u_int i;
 #ifdef LV_DC
 	static dc_dev_free dc_dev_free;
 #endif /* DC */
@@ -900,7 +1004,8 @@ static long lv_dev_search(char *name)
 
 static long lv_dev_cmd_args(long id, char *cmd, long *icmd, long *argin_type, long *argout_type,long *error)
 {
-	long i, status, found=0;
+	long status, found=0;
+	u_int i;
 
 	if ((lv_device[id].state & LV_DEV_QUERYED) == 0)
 	{
@@ -1001,7 +1106,7 @@ static long lv_dc_cmd_args(long id, char *cmd, long *icmd, long *argout_type,lon
 static long lv_argin_convert(long argin_type, void *argin_lv, void **argin_taco, long *error)
     
 {	
-  	long i;
+  	unsigned long i;
   /* fixed size data */
   	static DevShort argin_short;
   	static DevUShort argin_ushort;
@@ -1013,12 +1118,13 @@ static long lv_argin_convert(long argin_type, void *argin_lv, void **argin_taco,
   	static DevFloatReadPoint argin_frp;
   	static DevStateFloatReadPoint argin_sfrp;
   	static DevDoubleReadPoint argin_drp;
-  	long string_len;
   /* variable size data */
   	static DevString argin_string;
   	static LVStringHdl argin_string_hdl;
   	static DevVarStringArray argin_string_array={0,NULL};
   	static LVStringArrayHdl argin_string_array_hdl;
+        static DevVarCharArray argin_chararray;
+        static CharArrayHdl argin_chararray_hdl;
   	static DevVarShortArray argin_shortarray;
   	static ShortArrayHdl argin_shortarray_hdl;
   	static DevVarLongArray argin_longarray;
@@ -1036,6 +1142,11 @@ static long lv_argin_convert(long argin_type, void *argin_lv, void **argin_taco,
 	static DevMulMove argin_mulmove;
    	DevMotorLong argin_motlong;
   	static DevMotorFloat argin_motfloat;
+  	static DevIntFloat argin_intfloat;
+
+#ifdef LV_DEBUG
+	if (lv_debug) printf("lv_argin_convert(): argin_type %d\n",argin_type);
+#endif /* LV_DEBUG */
 
   	switch (argin_type) {
     
@@ -1048,6 +1159,7 @@ static long lv_argin_convert(long argin_type, void *argin_lv, void **argin_taco,
     
 
   	case D_SHORT_TYPE : 
+  	case D_USHORT_TYPE : 
     		*argin_taco = &argin_short;
     		argin_short = *(short*)argin_lv;
 #ifdef LV_DEBUG
@@ -1105,7 +1217,25 @@ static long lv_argin_convert(long argin_type, void *argin_lv, void **argin_taco,
     		}
     		break;
     
+        case D_VAR_CHARARR :
+        case D_OPAQUE_TYPE :
+                *argin_taco = &argin_chararray;
+                argin_chararray_hdl = (CharArrayHdl) argin_lv;
+                argin_chararray.length = (*argin_chararray_hdl)->dimSizes[0];
+                argin_chararray.sequence = (*argin_chararray_hdl)->arg1;
+#ifdef LV_DEBUG
+                if (lv_debug) printf("argin.length %d \n",argin_chararray.length
+);
+#endif /* LV_DEBUG */
+                for(i=0;i<argin_chararray.length;i++) {
+#ifdef LV_DEBUG
+                        if (lv_debug) printf("argin.sequence[%d] = %d\n",i,argin_chararray.sequence[i]);
+#endif /* LV_DEBUG */
+                }
+                break;
+
   	case D_VAR_SHORTARR :
+  	case D_VAR_USHORTARR :
     		*argin_taco = &argin_shortarray;
     		argin_shortarray_hdl = (ShortArrayHdl) argin_lv; 
     		argin_shortarray.length = (*argin_shortarray_hdl)->dimSizes[0];
@@ -1183,8 +1313,8 @@ static long lv_argin_convert(long argin_type, void *argin_lv, void **argin_taco,
   	case D_MOTOR_LONG :
     		*argin_taco = &argin_motlong;
     		argin_longarray_hdl = (LongArrayHdl) argin_lv; 
-    		argin_motlong.axisnum = (*argin_longarray_hdl)->arg1[i];
-    		argin_motlong.value = (*argin_longarray_hdl)->arg1[i+1];
+    		argin_motlong.axisnum = (*argin_longarray_hdl)->arg1[0];
+    		argin_motlong.value = (*argin_longarray_hdl)->arg1[1];
 #ifdef LV_DEBUG
     		if (lv_debug) printf("axisnum = %d value = %d\n",argin_motlong.axisnum,
               		argin_motlong.value );
@@ -1192,10 +1322,11 @@ static long lv_argin_convert(long argin_type, void *argin_lv, void **argin_taco,
     		break;
 
   	case D_MOTOR_FLOAT :
+    		if (lv_debug) printf("Entering D_MOTOR_FLOAT\n");
     		*argin_taco = &argin_motfloat;
     		argin_floatarray_hdl = (FloatArrayHdl) argin_lv; 
-    		argin_motfloat.axisnum = (long)(*argin_floatarray_hdl)->arg1[i];
-    		argin_motfloat.value = (*argin_floatarray_hdl)->arg1[i+1];
+    		argin_motfloat.axisnum = (long)(*argin_floatarray_hdl)->arg1[0];
+    		argin_motfloat.value = (*argin_floatarray_hdl)->arg1[1];
 #ifdef LV_DEBUG
     		if (lv_debug) printf("axisnum = %d value = %f\n",argin_motfloat.axisnum,
               		argin_motfloat.value );
@@ -1214,6 +1345,18 @@ static long lv_argin_convert(long argin_type, void *argin_lv, void **argin_taco,
                 		i,argin_mulmove.action[i],
                 		i,argin_mulmove.delay[i]);
 #endif /* LV_DEBUG */
+
+  	case D_INT_FLOAT_TYPE :
+    		*argin_taco = &argin_intfloat;
+    		argin_floatarray_hdl = (FloatArrayHdl) argin_lv; 
+    		argin_intfloat.state = (long)(*argin_floatarray_hdl)->arg1[0];
+    		argin_intfloat.value = (*argin_floatarray_hdl)->arg1[1];
+#ifdef LV_DEBUG
+    		if (lv_debug) printf("state = %d value = %f\n",argin_intfloat.state,
+              		argin_intfloat.value );
+#endif /* LV_DEBUG */
+    		break;
+
     		}
     		break;
     
@@ -1250,10 +1393,10 @@ static long lv_argout_prepare(long argout_type, void **argout_taco, long *error)
   	static DevStateFloatReadPoint argout_sfrp;
   	static DevDoubleReadPoint argout_drp;
   	static char *argout_char_ptr;
-  	long string_len;
   /* variable size data */
   	static DevString argout_string;
   	static DevVarStringArray argout_string_array;
+        static DevVarCharArray argout_chararray;
   	static DevVarShortArray argout_shortarray;
   	static DevVarLongArray argout_longarray;
   	static DevVarULongArray argout_ulongarray;
@@ -1277,6 +1420,7 @@ static long lv_argout_prepare(long argout_type, void **argout_taco, long *error)
     		break;
    
   	case D_SHORT_TYPE : 
+  	case D_USHORT_TYPE : 
     		*argout_taco = &argout_short;
     		break;
    
@@ -1318,6 +1462,13 @@ static long lv_argout_prepare(long argout_type, void **argout_taco, long *error)
     		argout_string_array.length = 0;
     		argout_string_array.sequence = NULL;
     		break;
+
+        case D_VAR_CHARARR :
+        case D_OPAQUE_TYPE :
+                *argout_taco = &argout_chararray;
+                argout_chararray.length = 0;
+                argout_chararray.sequence = NULL;
+                break;
 
   	case D_VAR_SHORTARR : 
   	case D_VAR_USHORTARR : 
@@ -1387,10 +1538,12 @@ static long lv_argout_prepare(long argout_type, void **argout_taco, long *error)
 static long lv_argout_convert(long argout_type, void *argout_taco, void *argout_lv, long *error)
 {	
   	static char *argout_char_ptr;
-  	long string_len, status, i;
+  	long string_len, status;
+	unsigned int i;
   /* variable size data */
   	static LVStringHdl argout_string_hdl;
   	static LVStringArrayHdl argout_string_array_hdl;
+	static CharArrayHdl argout_chararray_hdl;
   	static ShortArrayHdl argout_shortarray_hdl;
   	static short *argout_short_ptr;
   	static LongArrayHdl argout_longarray_hdl;
@@ -1514,7 +1667,34 @@ static long lv_argout_convert(long argout_type, void *argout_taco, void *argout_
     		(*_dev_xdrfree)(D_VAR_STRINGARR,argout_taco,error);
     		break;
 
+        case D_VAR_CHARARR :
+        case D_OPAQUE_TYPE :
+                argout_chararray_hdl = (CharArrayHdl)argout_lv;
+                if ( ( status = NumericArrayResize(uB, 1L, (UHandle*) &argout_chararray_hdl,((DevVarCharArray*)argout_taco)->length )) != noErr )
+                        return(status);
+                argout_char_ptr = (*argout_chararray_hdl)->arg1;
+
+                for(i=0;i<((DevVarCharArray*)argout_taco)->length;i++) {
+                        *(argout_char_ptr + i) = ((DevVarCharArray*)argout_taco)
+->sequence[i];
+#ifdef LV_DEBUG
+                        if (lv_debug) printf("Char[%d] = %d\n",i,*(argout_char_ptr + i));
+#endif /* LV_DEBUG */
+                }
+                (*argout_chararray_hdl)->dimSizes[0]= ((DevVarCharArray*)argout_taco)->length;
+                        if ( argout_type == D_VAR_CHARARR )
+                        {
+                        (*_dev_xdrfree)(D_VAR_CHARARR,argout_taco,error);
+                        }
+                        else
+                        {
+                                (*_dev_xdrfree)(D_OPAQUE_TYPE,argout_taco,error)
+;
+                        }
+                break;
+
   	case D_VAR_SHORTARR : 
+  	case D_VAR_USHORTARR : 
     		argout_shortarray_hdl = (ShortArrayHdl)argout_lv;
     		if ( ( status = NumericArrayResize(iW, 1L, (UHandle*) &argout_shortarray_hdl,((DevVarShortArray*)argout_taco)->length )) != noErr )
       			return(status);
@@ -1634,6 +1814,17 @@ static long lv_argout_convert(long argout_type, void *argout_taco, void *argout_
     		(*argout_floatarray_hdl)->dimSizes[0]= ((DevVarStateFloatReadPointArray*)argout_taco)->length*3;   
     		(*_dev_xdrfree)(D_VAR_SFRPARR,argout_taco,error);
     		break;  
+
+  	case D_INT_FLOAT_TYPE : 
+    		argout_floatarray_hdl = (FloatArrayHdl)argout_lv;
+    		if ( ( status = NumericArrayResize(fS, 1L, (UHandle*) &argout_floatarray_hdl,2 )) != noErr )
+      			return(status);
+    		argout_float_ptr = (*argout_floatarray_hdl)->arg1;
+    		*(argout_float_ptr + 0) = ((DevIntFloat*)argout_taco)->state;
+    		*(argout_float_ptr + 1) = ((DevIntFloat*)argout_taco)->value;
+    		(*argout_floatarray_hdl)->dimSizes[0]= 2;   
+    		break;  
+
   	}
   
   	return(status);
@@ -1649,10 +1840,11 @@ static long lv_argout_convert(long argout_type, void *argout_taco, void *argout_
  *
  ******************************************************************************/
 
-long lv_dev_putget(char *name, char *cmd, void *argin_lv, void *argout_lv, long *error)
+EXPORT long lv_dev_putget(char *name, char *cmd, void *argin_lv, void *argout_lv, long *error)
     
 {	
-  	long i, idevice, status, icmd, argin_type, argout_type;
+	unsigned int i;
+  	long idevice, status, icmd, argin_type, argout_type;
   	static void *argin_taco, *argout_taco;
   	static DevString argin_string;
   	static DevVarStringArray argin_string_array={0,NULL};
@@ -1749,7 +1941,7 @@ long lv_dev_putget(char *name, char *cmd, void *argin_lv, void *argout_lv, long 
  *
  ******************************************************************************/
 
-long lv_dc_devget(char *name, char *cmd, void *argout_lv, long *error)
+EXPORT long lv_dc_devget(char *name, char *cmd, void *argout_lv, long *error)
 {	
   	static long i, idevice, status, icmd, argin_type, argout_type;
 	static void *argout_taco;
@@ -1840,6 +2032,9 @@ static long lv_in_out_to_string(char *cmd_in_out, long in_type, long out_type)
       	case D_SHORT_TYPE : 
          	sprintf(cmd_in_out+strlen(cmd_in_out),"(short");
          	break;
+      	case D_USHORT_TYPE : 
+         	sprintf(cmd_in_out+strlen(cmd_in_out),"(ushort");
+         	break;
       	case D_LONG_TYPE : 
          	sprintf(cmd_in_out+strlen(cmd_in_out),"(long");
          	break;
@@ -1855,8 +2050,17 @@ static long lv_in_out_to_string(char *cmd_in_out, long in_type, long out_type)
       	case D_VAR_STRINGARR : 
          	sprintf(cmd_in_out+strlen(cmd_in_out),"(string array");
          	break;
+        case D_VAR_CHARARR :
+                sprintf(cmd_in_out+strlen(cmd_in_out),"(char array");
+                break;
+        case D_OPAQUE_TYPE :
+                sprintf(cmd_in_out+strlen(cmd_in_out),"(opaque");
+                break;
       	case D_VAR_SHORTARR : 
          	sprintf(cmd_in_out+strlen(cmd_in_out),"(short array");
+         	break;
+      	case D_VAR_USHORTARR : 
+         	sprintf(cmd_in_out+strlen(cmd_in_out),"(ushort array");
          	break;
       	case D_VAR_LONGARR : 
          	sprintf(cmd_in_out+strlen(cmd_in_out),"(long array");
@@ -1891,6 +2095,9 @@ static long lv_in_out_to_string(char *cmd_in_out, long in_type, long out_type)
       	case D_SHORT_TYPE : 
          	sprintf(cmd_in_out+strlen(cmd_in_out),",short)");
          	break;
+      	case D_USHORT_TYPE : 
+         	sprintf(cmd_in_out+strlen(cmd_in_out),",ushort)");
+         	break;
       	case D_LONG_TYPE : 
          	sprintf(cmd_in_out+strlen(cmd_in_out),",long)");
          	break;
@@ -1918,8 +2125,17 @@ static long lv_in_out_to_string(char *cmd_in_out, long in_type, long out_type)
       	case D_VAR_STRINGARR : 
          	sprintf(cmd_in_out+strlen(cmd_in_out),",string array)");
          	break;
+      	case D_VAR_CHARARR : 
+         	sprintf(cmd_in_out+strlen(cmd_in_out),",char array)");
+         	break;
+      	case D_OPAQUE_TYPE : 
+         	sprintf(cmd_in_out+strlen(cmd_in_out),",opaque)");
+         	break;
       	case D_VAR_SHORTARR : 
          	sprintf(cmd_in_out+strlen(cmd_in_out),",short array)");
+         	break;
+      	case D_VAR_USHORTARR : 
+         	sprintf(cmd_in_out+strlen(cmd_in_out),",ushort array)");
          	break;
       	case D_VAR_LONGARR : 
          	sprintf(cmd_in_out+strlen(cmd_in_out),",long array)");
@@ -1959,10 +2175,10 @@ static long lv_in_out_to_string(char *cmd_in_out, long in_type, long out_type)
  *
  ******************************************************************************/
 
-long lv_dev_cmd_query(char *name, void *argout_lv, long *error)
+EXPORT long lv_dev_cmd_query(char *name, void *argout_lv, long *error)
     
 {	
-  	long i, idevice, status, icmd, argin_type, argout_type, string_len;
+  	long i, idevice, status, string_len;
   	LVStringHdl argout_string_hdl;
   	LVStringArrayHdl argout_string_array_hdl;
   	static char cmd_in_out[256];
@@ -2026,7 +2242,7 @@ long lv_dev_cmd_query(char *name, void *argout_lv, long *error)
  *
  ******************************************************************************/
 
-long lv_dc_cmd_query(char *name, void *argout_lv, long *error)
+EXPORT long lv_dc_cmd_query(char *name, void *argout_lv, long *error)
 {	
   	long i, idevice, status, icmd, argin_type, argout_type, string_len;
   	LVStringHdl argout_string_hdl;
@@ -2091,9 +2307,10 @@ long lv_dc_cmd_query(char *name, void *argout_lv, long *error)
  *
  ******************************************************************************/
 
-long lv_db_getdevexp(char *filter, void *argout_lv, long *error)
+EXPORT long lv_db_getdevexp(char *filter, void *argout_lv, long *error)
 {	
-  	long i, idevice, status, icmd, n_devices, argout_type, string_len;
+  	long i, status, string_len;
+	u_int	n_devices; 
   	LVStringHdl argout_string_hdl;
   	LVStringArrayHdl argout_string_array_hdl;
   	char **devexp_list=NULL;
@@ -2138,7 +2355,7 @@ long lv_db_getdevexp(char *filter, void *argout_lv, long *error)
  *
  ******************************************************************************/
 
-long lv_dev_protocol(char *name, char *protocol, long *error)
+EXPORT long lv_dev_protocol(char *name, char *protocol, long *error)
 {
   	long idevice, status;
 /*
@@ -2204,7 +2421,7 @@ long lv_dev_protocol(char *name, char *protocol, long *error)
  *
  ******************************************************************************/
 
-long lv_dev_timeout(char *name, long timeout, long *error)
+EXPORT long lv_dev_timeout(char *name, long timeout, long *error)
 
 {
   	long idevice, status;
@@ -2230,7 +2447,7 @@ long lv_dev_timeout(char *name, long timeout, long *error)
   	{
       		if ((idevice=lv_dev_import(name,error)) == DS_NOTOK)
       		{
-         		/* return (mgPrivErrSentinel); */
+         		/*return (mgPrivErrSentinel);*/
          		return (mgErrSentinel);
       		}
   	}
@@ -2240,7 +2457,7 @@ long lv_dev_timeout(char *name, long timeout, long *error)
       		{
 			if ((idevice=lv_dev_import(name,error)) == DS_NOTOK)
       			{
-         			/* return (mgPrivErrSentinel); */
+         			/*return (mgPrivErrSentinel);*/
          			return (mgErrSentinel);
       			}
 		}
@@ -2262,17 +2479,18 @@ long lv_dev_timeout(char *name, long timeout, long *error)
  *
  * Function:    lv_ds_init()
  *
- * Description: Create and initialise LabViewGeneric device server
+ * Description: Create and initialise LabView device server
  *
  * Returns:     DS_OK=success , DS_NOTOK=fail
  *
  ******************************************************************************/
 
-long lv_ds_init(char *server_name, char *pers_name, long *error)
+EXPORT long lv_ds_init(char *server_name, char *pers_name, long *error)
 {
+#ifdef unix
     	if (taco_lib == NULL && class_lib == NULL) 
+#endif /* unix */
 	{
-		if (lv_ds_debug(1) != DS_OK) return(DS_NOTOK);
 		if (lv_dev_init(error) != DS_OK) return(DS_NOTOK);
 	}
 
@@ -2285,7 +2503,6 @@ long lv_ds_init(char *server_name, char *pers_name, long *error)
 	return(DS_OK);
 }     
 
-
 /******************************************************************************
  *
  * Function:    lv_ds__cmd_get()
@@ -2296,62 +2513,72 @@ long lv_ds_init(char *server_name, char *pers_name, long *error)
  *
  ******************************************************************************/
 
-long lv_ds_cmd_get(long *icmd, void *argin)
+EXPORT long lv_ds_cmd_get(long *icmd, void *argin)
 {
-	long i, str_len, error;
+	long str_len, error;
+	unsigned int i;
 	void *ds_argin;
+	static DevVarDoubleArray *dblarray_in;
 	static DevVarStringArray *strarray_in;
+	DblArrayHdl dblarray_hdl;
 	LVStringArrayHdl strarray_hdl;
 	LVStringHdl str_hdl;
-
-	static DevString *str_in;
-	LVStringHdl str_in_hdl;
-
+	double *dbl_ptr;
 
 	*icmd = 0;
-	
-#ifdef LV_DEBUG
-			/*if (lv_debug) printf("entering lv_ds_cmd_get");*/
-#endif /* LV_DEBUG */
 
-   if (taco_lib == NULL && class_lib == NULL)  {
+#ifdef unix
+        if (taco_lib == NULL && class_lib == NULL) 
+#endif /* unix */
+	{
 		if (lv_dev_init(&error) != DS_OK) return(DS_NOTOK);
 	}
 
-   if (_lv_ds__cmd_get != NULL) 
+        if (_lv_ds__cmd_get != NULL) 
 	{
 		*icmd = (*_lv_ds__cmd_get)(&ds_argin);
-		if ((*icmd == LVSetControlValue) || (*icmd == LVGetControlInfo)|| (*icmd == LVGetIndicatorInfo)) {
+		if ((*icmd == LVSetValue) || (*icmd == LVIODouble))
+		{
+			dblarray_in = (DevVarDoubleArray*)ds_argin;
+    			dblarray_hdl = (DblArrayHdl) argin;
+			if ( ( NumericArrayResize(fD, 1L, (UHandle*) &dblarray_hdl,dblarray_in->length )) != noErr )
+      				return(-1);
+    			(*dblarray_hdl)->dimSizes[0]= dblarray_in->length;
+    			dbl_ptr = (*dblarray_hdl)->arg1;
+
+    			for(i=0;i<dblarray_in->length;i++) {
+      				*(dbl_ptr + i) = dblarray_in->sequence[i];
+#ifdef LV_DEBUG
+      				if (lv_debug) printf("Double in [%d] = %f\n",i,*(dbl_ptr + i));
+#endif /* LV_DEBUG */
+    			}
+		}
+		if (*icmd == LVIOString)
+		{
 			strarray_in = (DevVarStringArray*)ds_argin;
-    		strarray_hdl = (LVStringArrayHdl) argin;
-			
-			if ( ( NumericArrayResize(iL, 1L, (UHandle*) &strarray_hdl,strarray_in->length )) != noErr ) {
-      		return(-1);
-			}
+    			strarray_hdl = (LVStringArrayHdl) argin;
+			if ( ( NumericArrayResize(iL, 1L, (UHandle*) &strarray_hdl,strarray_in->length )) != noErr )
+      				return(-1);
 
-    		(*strarray_hdl)->dimSizes[0] = strarray_in->length;
+    			(*strarray_hdl)->dimSizes[0] = strarray_in->length;
 
-    		for (i=0; i<(*strarray_hdl)->dimSizes[0]; i++) {
-      		str_len=strlen(strarray_in->sequence[i]);
-      		str_hdl = (*strarray_hdl)->arg1[i];
-
-      		if(NumericArrayResize(iB, 1L, (UHandle*)&str_hdl, str_len) != noErr) {
-        			return(-1);
-				}
-
-  				(*str_hdl)->dimSizes[0] = strlen(strarray_in->sequence[i]);
-  				strncpy((*str_hdl)->arg1,strarray_in->sequence[i],str_len);
-
+    			for (i=0; i<(*strarray_hdl)->dimSizes[0]; i++)
+    			{
+      				str_len=strlen(strarray_in->sequence[i]);
+      				str_hdl = (*strarray_hdl)->arg1[i];
+      				if(NumericArrayResize(iB, 1L, (UHandle*)&str_hdl, str_len) != noErr)
+        				return(-1);
+      				(*str_hdl)->dimSizes[0] = strlen(strarray_in->sequence[i]);
+      				strncpy((*str_hdl)->arg1,strarray_in->sequence[i],str_len);
 #ifdef LV_DEBUG
 				if (lv_debug) printf("String in [%d] = %s\n",i,strarray_in->sequence[i]);
 #endif /* LV_DEBUG */
-    		}
+    			}
 		}
 	}
 
 	return(0);
 }     
-
 
 /******************************************************************************
  *
@@ -2363,76 +2590,81 @@ long lv_ds_cmd_get(long *icmd, void *argin)
  *
  ******************************************************************************/
 
-long lv_ds_cmd_put(long icmd, void *argout)
+EXPORT long lv_ds_cmd_put(long icmd, void *argout)
 {
-	long i, error;
-	void** ds_argout;
-	DevVarDoubleArray dblarray_out;
-	static DevVarStringArray strarray_out; 
-
+	long error;
+	unsigned int i;
+	static DevVarDoubleArray dblarray_out;
+	static DevVarStringArray strarray_out = {0, NULL};
 	DblArrayHdl dblarray_hdl;
 	LVStringArrayHdl strarray_hdl;
 	LVStringHdl str_hdl;
 
-	static DevString str_in;
-	LVStringHdl str_in_hdl;
-	static DevDouble* dbl_in;
-
-
-   if (taco_lib == NULL && class_lib == NULL) {
+#ifdef unix
+        if (taco_lib == NULL && class_lib == NULL) lv_dev_init(&error);
+#endif /* unix */
+#ifdef _WINDOWS
 		lv_dev_init(&error);
-	}
-        
-	if (_lv_ds__cmd_put != NULL) 
-	{	
-		/* ---------------------------------------------------------- */
-		/* --------------------- SET CONTROL VALUE ------------------ */
-		/* ---------------------------------------------------------- */
-		if ((icmd == LVState) || (icmd == LVStatus) || (icmd == LVSetControlValue))
+#endif /* _WINDOWS */
+
+        if (_lv_ds__cmd_put != NULL) 
+	{
+		if (icmd == LVSetValue || icmd == LVState || icmd == LVStatus)
 		{
 			(*_lv_ds__cmd_put)(NULL);
 		}
-
-		/* ---------------------------------------------------------- */
-		/* --------------------- GET VI INFO ------------------------ */
-		/* --------------------- GET CONTROL LIST ------------------- */
-		/* --------------------- GET CONTROL INFO ------------------- */
-		/* --------------------- GET INDICATOR LIST ----------------- */
-		/* --------------------- GET INDICATOR INFO ----------------- */
-		/* ---------------------------------------------------------- */
-		if ((icmd == LVGetViInfo) || (icmd == LVGetControlList) || (icmd == LVGetControlInfo)|| (icmd == LVGetIndicatorList) || (icmd == LVGetIndicatorInfo))
+		if ((icmd == LVReadValue) || (icmd == LVIODouble))
+		{
+			dblarray_hdl = (DblArrayHdl) argout;
+    			dblarray_out.length = (*dblarray_hdl)->dimSizes[0];
+    			dblarray_out.sequence = (*dblarray_hdl)->arg1;
+#ifdef LV_DEBUG
+			if (lv_debug) printf("argout.length %d \n",dblarray_out.length);
+    			for(i=0;i<dblarray_out.length;i++) {
+      				if (lv_debug) printf("Double out [%d] = %f\n",i,dblarray_out.sequence[i]);
+			}
+#endif /* LV_DEBUG */
+			(*_lv_ds__cmd_put)(&dblarray_out);
+    		}
+		if (icmd == LVIOString)
 		{
 			strarray_hdl = (LVStringArrayHdl) argout;
-    		strarray_out.length = (*strarray_hdl)->dimSizes[0];
-    		strarray_out.sequence = (char**)realloc(strarray_out.sequence, strarray_out.length*sizeof(char*));
-    		for(i=0;i<strarray_out.length;i++) {
-       		str_hdl = (*strarray_hdl)->arg1[i];
-       		strarray_out.sequence[i] = (char*)malloc((*str_hdl)->dimSizes[0]+1);
-       		strncpy(strarray_out.sequence[i],(*str_hdl)->arg1,(*str_hdl)->dimSizes[0]);
+    			strarray_out.length = (*strarray_hdl)->dimSizes[0];
+    			strarray_out.sequence = (char**)realloc(strarray_out.sequence,
+			                        strarray_out.length*sizeof(char*));
+    			for(i=0;i<strarray_out.length;i++) {
+       				str_hdl = (*strarray_hdl)->arg1[i];
+       				strarray_out.sequence[i] = (char*)malloc((*str_hdl)->dimSizes[0]+1);
+       				strncpy(strarray_out.sequence[i],(*str_hdl)->arg1,(*str_hdl)->dimSizes[0]);
 				strarray_out.sequence[i][(*str_hdl)->dimSizes[0]] = 0;
-			}
-
+#ifdef LV_DEBUG
+      				if (lv_debug) printf("String out [%d] = %s\n",i,strarray_out.sequence[i]);
+#endif /* LV_DEBUG */
+    			}
+#ifdef LV_DEBUG
+			if (lv_debug) printf("argout.length %d \n",strarray_out.length);
+#endif /* LV_DEBUG */
 			(*_lv_ds__cmd_put)(&strarray_out);
-   			for(i=0;i<strarray_out.length;i++) {
-					free(strarray_out.sequence[i]);
-				}
+    			for(i=0;i<strarray_out.length;i++) {
+				free(strarray_out.sequence[i]);
 			}
-		}
+    		}
+	}
 
-		return(DS_OK);
-}    
- 
+	return(DS_OK);
+}     
+
 /******************************************************************************
  *
  * Function:    lv_ds_debug()
  *
- * Description: Set LabViewGeneric device server api debugging flag
+ * Description: Set LabView device server api debugging flag
  *
  * Returns:     DS_OK=success , DS_NOTOK=fail
  *
  ******************************************************************************/
 
-long lv_ds_debug(long debug)
+EXPORT long lv_ds_debug(long debug)
 
 {
    	lv_debug = debug;
@@ -2451,11 +2683,12 @@ long lv_ds_debug(long debug)
  *
  ******************************************************************************/
 
-char *lv_dev_error_str(long error_no)
+EXPORT char *lv_dev_error_str(long error_no)
 {
    	static char *error_str=NULL, *char_ptr;
    	static prev_error_no;
-   	long string_len, status, i;
+	long error;
+
 
    	if (prev_error_no > 0) if (error_str != NULL) free(error_str);
 
@@ -2464,7 +2697,7 @@ char *lv_dev_error_str(long error_no)
 		switch (error_no) {
 
 		case -1 : 
-			error_str = "Cannot load LabViewGeneric + TACO libraries (hint check you $LD_LIBRARY_PATH or $SHLIB_PATH)";
+			error_str = "Cannot load LabView + TACO libraries (hint check you $LD_LIBRARY_PATH or $SHLIB_PATH)";
 			break;
 		case -2 : 
 			error_str = "Command not available for this device";
@@ -2482,13 +2715,15 @@ char *lv_dev_error_str(long error_no)
 		}
 		else
 		{
+			if (_dev_error_str == NULL) lv_dev_init(&error);
+
    			if (_dev_error_str != NULL) 
 			{
 				error_str = (*_dev_error_str)(error_no);
 			}
 			else
 			{
-				error_str = "Cannot load LabViewGeneric + TACO libraries (hint check you $LD_LIBRARY_PATH or $SHLIB_PATH)";
+				error_str = "Cannot load LabView + TACO libraries (hint check you $LD_LIBRARY_PATH or $SHLIB_PATH)";
 			}
 		}
 	}

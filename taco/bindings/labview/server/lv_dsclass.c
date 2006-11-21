@@ -2,22 +2,58 @@
  *
  * File:	lv_dsclass.c
  *
- * Project:	Generic LabView device server startup and class
+ * Project:	LabView device server startup and class
  *
- * Description:	This file implements a generic LabView device class and startup
- *		and the related routines for retrieving control information about Labview VIs
+ * Description:	This file implements the LabView device class and startup
+ *		and the related routines necessary for writing TACO device
+ *		servers in LabView. 
  *
+ *		NOTE : 	this file includes routines which have been lifted
+ *		from the standard TACO DSAPI library source code
+ *		and hacked for the special requirements of the LabView
+ *		device servers (e.g. breaking the dev_putget() rpc
+ *		call into two parts - get and put). This breaks one
+ *		of the golden rules of good programming practice i.e.
+ *		don't duplicate code ! Because of the special needs
+ *		and limited time it was decided to do this - be warned
+ *		however !
  *
  * Author(s):	Andy Gotz
  *
  * Original:	October 1999
  *
- * $Revision: 1.4 $
+ * $Revision: 1.5 $
  *
- * $Date: 2006-11-21 14:47:57 $
- * 
- * Last Modified: 01.11.2003, Hartmut Gilde
- * 
+ * $Date: 2006-11-21 16:38:19 $
+ *
+ * $Author: jkrueger1 $
+ *
+ * $Log: not supported by cvs2svn $
+ * Revision 1.7  2000/02/21 16:04:36  goetz
+ * replaced all exit()'s and kill()'s with return(-1) so that Labview does not die
+ *
+ * Revision 1.6  2000/02/01 11:13:34  goetz
+ * fixed some bugs and improved debugging messages
+ *
+ * Revision 1.5  2000/01/31 23:07:39  goetz
+ * added LVIODouble and LVIOString commands, removed some bugs, added string arrays
+ *
+ * Revision 1.4  1999/10/19 14:30:46  goetz
+ * passing double values in using DevSetValues command works
+ *
+ * Revision 1.3  1999/10/19 14:22:35  goetz
+ * passing double values out using DevReadValue commands works
+ *
+ * Revision 1.2  1999/10/18 19:11:43  goetz
+ * lv_cmd_get() and lv_cmd_put() work without passing arguments to LabView
+ *
+ * Revision 1.1  1999/10/18 14:18:32  goetz
+ * Initial revision
+ *
+ *
+ * Copyleft 1999 by European Synchrotron Radiation Facility
+ *                  Grenoble, France
+ *
  ******************************************************************************/
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -28,7 +64,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <API.h>
-#include <ApiP.h>
+#include <private/ApiP.h>
 #include <Admin.h>
 #include <BlcDsNumbers.h>
 #include <DevServer.h>
@@ -36,8 +72,8 @@
 #include <DevSignal.h>
 #include <DevErrors.h>
 #include <maxe_xdr.h>
-#include <LabViewGenericP.h>
-#include <LabViewGeneric.h>
+#include <LabViewP.h>
+#include <LabView.h>
 
 extern configuration_flags      config_flags;
  
@@ -430,16 +466,8 @@ static char **lv_ds__string_in=NULL;
 static DevVarStringArray lv_ds__strarr_in;
 static double *lv_ds__double_in=NULL;
 static DevVarDoubleArray lv_ds__dblarr_in;
-void *lv_ds__argin, *lv_ds__argout;
+static void *lv_ds__argin, *lv_ds__argout;
 
-/*static char 	**lv_ds_ctrl_name_in = NULL;
-static double 	*lv_ds_ctrl_value_in = NULL;
-static double 	*lv_ds_ctrl_value_out = NULL;*/
-
-static DevString lv_ds__ctrl_name_in;
-static DevDouble lv_ds__ctrl_value_in;
-static DevDouble lv_ds__ctrl_value_out; 
-static DevDouble vi_double;
 /*=======================================================================
 
 Function   :	long lv_ds__cmd_get()
@@ -460,43 +488,34 @@ long lv_ds__cmd_get(void **lv_argin)
 	long error;
 
 	cmd_in = 0;
+
 	ds__svcrun(&error);
 
-		
-	if (((cmd_in == DevGetControlInfo) || (cmd_in == DevSetControlValue) || (cmd_in == DevGetIndicatorInfo)) && (lv_argin != NULL))
+	if (cmd_in == DevSetValue || cmd_in == DevLVIODouble || 
+	    cmd_in == DevLVIOString && lv_argin != NULL)
 	{
 		*lv_argin = lv_ds__argin;
-	}	
-
-
+	}
 /*
  * map TACO commands to LabView enumerated types {1, 2, 3, 4}
  */
 
 	switch (cmd_in)
-	{	
-
-		case DevGetViInfo :
-			cmd_in = LVGetViInfo;
-			     	break;
-		case DevGetControlList :
-			cmd_in = LVGetControlList;
+	{
+		case DevLVIOString : 
+			cmd_in = LVIOString;
 		       	break;
 
-		case DevGetControlInfo : 
-			cmd_in = LVGetControlInfo;
+		case DevLVIODouble : 
+			cmd_in = LVIODouble;
 		       	break;
 
-		case DevSetControlValue : 
-			cmd_in = LVSetControlValue;
+		case DevReadValue : 
+			cmd_in = LVReadValue;
 		       	break;
 
-		case DevGetIndicatorList : 
-			cmd_in = LVGetIndicatorList;
-		       	break;
-
-		case DevGetIndicatorInfo : 
-			cmd_in = LVGetIndicatorInfo;
+		case DevSetValue : 
+			cmd_in = LVSetValue;
 		       	break;
 
 		case DevState : 
@@ -530,21 +549,20 @@ Return(s)  :    minus one on failure, zero otherwise
 ========================================================================*/
 long lv_ds__cmd_put(void *lv_argout)
 {
-   long error;
-   int i;
+        long error;
 
-	
-	/*for (i = 0; i < ((DevVarStringArray *)lv_argout)->length; ++i) {
-		printf("string out a : %s\n", ((DevVarStringArray *)lv_argout)->sequence[i]);
-	}*/
-	if (((cmd_in == LVGetViInfo) || (cmd_in == LVGetControlList) || (cmd_in == LVGetControlInfo) || (cmd_in == LVGetIndicatorList) || (cmd_in == LVGetIndicatorInfo)) && (lv_ds__argout != NULL))
+
+	if (cmd_in == LVReadValue || cmd_in == LVIODouble && 
+	    lv_ds__argout != NULL)
+	{
+		*(DevVarDoubleArray*)lv_ds__argout = *(DevVarDoubleArray*)lv_argout;
+	}
+
+	if (cmd_in == LVIOString && lv_ds__argout != NULL)
 	{
 		*(DevVarStringArray*)lv_ds__argout = *(DevVarStringArray*)lv_argout;
 	}
-	if (cmd_in == LVSetControlValue && lv_ds__argout != NULL)
-	{
-		//*(DevVoid*)lv_ds__argout = *(DevVoid*)lv_argout;
-	}
+
         lv_ds__sendreply();
 
         return(DS_OK);
@@ -573,7 +591,8 @@ long *error;
    short		iret;
    static char 		**dev_list;
    static unsigned int	n_devices;
-   static LabViewGeneric	*ds_list;
+   static LabView	*ds_list;
+
 
    if (db_getdevlist(svr_name,&dev_list,&n_devices,error))
    {
@@ -591,7 +610,7 @@ long *error;
 /*
  * create, initialise and export all devices served by this server
  */
-   ds_list=(LabViewGeneric *)malloc(n_devices*sizeof(LabViewGeneric*));
+   ds_list=(LabView *)malloc(n_devices*sizeof(LabView*));
    if(ds_list==0)
    {
    	printf("can't allocate memory for object structures --> exit\n");
@@ -603,7 +622,7 @@ long *error;
 #ifdef LV_DEBUG
       printf("\t\tObject %s is\n",dev_list[i]);
 #endif /* LV_DEBUG */
-      if (ds__create(dev_list[i], (void*)labViewGenericClass, (void*)&(ds_list[i]),error) != 0)
+      if (ds__create(dev_list[i], (void*)labViewClass, (void*)&(ds_list[i]),error) != 0)
       {
    	  printf("create failed\n");
    	  continue;
@@ -616,7 +635,7 @@ long *error;
       }
 
 /*
- * initialise the newly created LabViewGeneric
+ * initialise the newly created LabView
  */
   
       if((ds__method_finder((void*)ds_list[i],DevMethodInitialise))
@@ -653,14 +672,14 @@ long *error;
    switch(n_exported)
    {
       case 0:	
-   	   printf("No devices exported - LabViewGeneric server exiting\n");
+   	   printf("No devices exported - LabView server exiting\n");
    	   *error = 0;
    	   iret = -1;
    	   break;
 
       case 1:	
 #ifdef LV_DEBUG
-   	   printf("LabViewGeneric server running with 1 device exported\n");
+   	   printf("LabView server running with 1 device exported\n");
 #endif /* LV_DEBUG */
    	   *error = 0;
    	   iret = 0;
@@ -668,7 +687,7 @@ long *error;
 
       default:
 #ifdef LV_DEBUG
-   	   printf("LabViewGeneric server running %d devices exported\n",n_exported);
+   	   printf("LabView server running %d devices exported\n",n_exported);
 #endif /* LV_DEBUG */
    	   *error = 0;
    	   iret = 0;
@@ -676,42 +695,22 @@ long *error;
    return(iret);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* 
- * LabViewGeneric device class (normally in LabViewGeneric.c)
+ * LabView device class (normally in LabView.c)
  */
 
-static long dev_getviinfo();
-static long dev_getcontrollist();
-static long dev_getcontrolinfo();
-static long dev_setcontrolvalue();
-static long dev_getindicatorlist();
-static long dev_getindicatorinfo();
+static long dev_io_double();
+static long dev_io_string();
+static long dev_readvalue();
+static long dev_setvalue();
 static long dev_state();
 static long dev_status();
 
 static	DevCommandListEntry commands_list[] = {
-   	{DevGetViInfo, dev_getviinfo, D_VOID_TYPE, D_VAR_STRINGARR},
-   	{DevGetControlList, dev_getcontrollist, D_VOID_TYPE, D_VAR_STRINGARR},
-   	{DevGetControlInfo, dev_getcontrolinfo, D_VAR_STRINGARR, D_VAR_STRINGARR},
-   	{DevSetControlValue, dev_setcontrolvalue, D_VAR_STRINGARR, D_VOID_TYPE},
-   	{DevGetIndicatorList, dev_getindicatorlist, D_VOID_TYPE, D_VAR_STRINGARR},
-   	{DevGetIndicatorInfo, dev_getindicatorinfo, D_VAR_STRINGARR, D_VAR_STRINGARR},
+   	{DevReadValue, dev_readvalue, D_VOID_TYPE, D_VAR_DOUBLEARR},
+   	{DevSetValue, dev_setvalue, D_VAR_DOUBLEARR, D_VOID_TYPE},
+   	{DevLVIODouble, dev_io_double, D_VAR_DOUBLEARR, D_VAR_DOUBLEARR},
+   	{DevLVIOString, dev_io_string, D_VAR_STRINGARR, D_VAR_STRINGARR},
    	{DevState, dev_state, D_VOID_TYPE, D_SHORT_TYPE},
    	{DevStatus, dev_status, D_VOID_TYPE, D_STRING_TYPE}
 };
@@ -726,25 +725,25 @@ static long state_handler();
 static	DevMethodListEntry methods_list[] = {
    	{DevMethodClassInitialise,	class_initialise},
    	{DevMethodInitialise,		object_initialise},
-  		{DevMethodCreate,				object_create},
+  	{DevMethodCreate,		object_create},
    	{DevMethodStateHandler,		state_handler},
    };
 
-LabViewGenericClassRec labViewGenericClassRec = {
+LabViewClassRec labViewClassRec = {
    /* n_methods */        4,
    /* methods_list */     methods_list,
    };
 
-LabViewGenericClass labViewGenericClass = (LabViewGenericClass)&labViewGenericClassRec;
+LabViewClass labViewClass = (LabViewClass)&labViewClassRec;
 /*
- * reserve space for a default copy of the LabViewGeneric object
+ * reserve space for a default copy of the LabView object
  */
 
-static LabViewGenericRec labViewGenericRec;
-static LabViewGeneric labViewGeneric = (LabViewGeneric)&labViewGenericRec;
+static LabViewRec labViewRec;
+static LabView labView = (LabView)&labViewRec;
 
 /*
- * LabViewGeneric resource tables used to access the static database
+ * LabView resource tables used to access the static database
  *
  */
 
@@ -779,37 +778,37 @@ long *error;
 {
 
 /*
- * LabViewGenericClass is a subclass of the DevServerClass
+ * LabViewClass is a subclass of the DevServerClass
  */
 
-   labViewGenericClass->devserver_class.superclass = devServerClass;
-   labViewGenericClass->devserver_class.class_name = (char*)malloc(sizeof("LabViewGenericClass")+1);
-   sprintf(labViewGenericClass->devserver_class.class_name,"LabViewGenericClass");
-   labViewGenericClass->devserver_class.class_inited = 1;
-   labViewGenericClass->devserver_class.n_commands = n_commands;
-   labViewGenericClass->devserver_class.commands_list = commands_list;
+   labViewClass->devserver_class.superclass = devServerClass;
+   labViewClass->devserver_class.class_name = (char*)malloc(sizeof("LabViewClass")+1);
+   sprintf(labViewClass->devserver_class.class_name,"LabViewClass");
+   labViewClass->devserver_class.class_inited = 1;
+   labViewClass->devserver_class.n_commands = n_commands;
+   labViewClass->devserver_class.commands_list = commands_list;
 
 /*
- * initialise LabViewGeneric with default values. these will be used
- * for every LabViewGeneric object created.
+ * initialise LabView with default values. these will be used
+ * for every LabView object created.
  */
 
-   labViewGeneric->devserver.class_pointer = (DevServerClass)labViewGenericClass;
+   labView->devserver.class_pointer = (DevServerClass)labViewClass;
 
-   labViewGenericClass->LabViewGeneric_class.config_param	= 0;
+   labViewClass->LabView_class.config_param	= 0;
 
-   labViewGeneric->devserver.state = DEVON;
+   labView->devserver.state = DEVON;
 
 /*
  * Interrogate the static database for default values
  *
  */
 
-   res_class[0].resource_adr	= &(labViewGeneric->devserver.n_state);
-   res_class[1].resource_adr	= &(labViewGenericClass->LabViewGeneric_class.config_param);
+   res_class[0].resource_adr	= &(labView->devserver.n_state);
+   res_class[1].resource_adr	= &(labViewClass->LabView_class.config_param);
 
 /*
-   if(db_getresource("CLASS/LabViewGeneric/DEFAULT", res_class, res_class_size, error))
+   if(db_getresource("CLASS/LabView/DEFAULT", res_class, res_class_size, error))
    {
       return(DS_NOTOK);
    }
@@ -834,15 +833,15 @@ char *name;
 DevServer *ds_ptr;
 long *error;
 {
-   LabViewGeneric ds;
+   LabView ds;
 
-   ds = (LabViewGeneric)malloc(sizeof(LabViewGenericRec));
+   ds = (LabView)malloc(sizeof(LabViewRec));
 
 /*
  * initialise device with default object
  */
 
-   *(LabViewGenericRec*)ds = *(LabViewGenericRec*)labViewGeneric;
+   *(LabViewRec*)ds = *(LabViewRec*)labView;
 
 /*
  * finally initialise the non-default values
@@ -862,23 +861,23 @@ Function:	static long object_initialise()
 
 Description:	routine to be called on initialisation of a device object
 
-Arg(s) In:	LabViewGeneric ds	- object to initialise
+Arg(s) In:	LabView ds	- object to initialise
 
 Arg(s) Out:
 
 		long *error     - pointer to error code, in case routine fails
 =============================================================================*/
 static long object_initialise(ds, error)
-LabViewGeneric ds;
+LabView ds;
 long  *error;
 {
 
-   ds->LabViewGeneric.read_value 	= 0;
-   ds->LabViewGeneric.set_value 	= 0;
+   ds->LabView.read_value 	= 0;
+   ds->LabView.set_value 	= 0;
 
 
-   res_object[0].resource_adr        = &(ds->LabViewGeneric.read_value);
-   res_object[1].resource_adr        = &(ds->LabViewGeneric.set_value);
+   res_object[0].resource_adr        = &(ds->LabView.read_value);
+   res_object[1].resource_adr        = &(ds->LabView.set_value);
    
 /*
    if(db_getresource(ds->devserver.name, res_object, res_object_size, error))
@@ -895,14 +894,14 @@ long  *error;
  Description:	this routine is reserved for checking wether the command
 		requested can be executed in the present state.
 
- Arg(s) In:	LabViewGeneric ds - device on which command is to executed
+ Arg(s) In:	LabView ds - device on which command is to executed
 		DevCommand cmd - command to be executed
 
  Arg(s) Out:	long *error - pointer to error code, in case routine fails
  =======================================================================*/
 
 static long state_handler( ds, cmd, error)
-LabViewGeneric ds;
+LabView ds;
 DevCommand cmd;
 long *error;
 {
@@ -933,12 +932,10 @@ long *error;
    		{
    			/* Allowed Command(s) */
 
-   			case (DevGetViInfo):	n_state = DEVON;break;
-   			case (DevGetControlList):	n_state = DEVON;break;
-   			case (DevGetControlInfo):	n_state = DEVON;break;
-   			case (DevSetControlValue):	n_state = DEVON;break;
-				case (DevGetIndicatorList):	n_state = DEVON;break;
-				case (DevGetIndicatorInfo):	n_state = DEVON;break;
+   			case (DevReadValue):	n_state = DEVON;break;
+   			case (DevSetValue):	n_state = DEVON;break;
+   			case (DevStatus):	break;
+   			case (DevState):	break;
    		}
    	}
    	break;
@@ -956,197 +953,30 @@ long *error;
  * public commands
  */
 
-
 /*============================================================================
- Function:      static long dev_getviinfo ()
+ Function:      static long dev_io_string ()
 
- Description:	Get an array of strings describing the VI
+ Description:	Set/Get an array of strings to a LabView device
    	
- Arg(s) In:	LabViewGeneric 	ds 	- 
-		DevVoid		*argin - none
+ Arg(s) In:	LabView 	ds 	- 
+		DevVarStringArray *argin  - Set values
    				  
- Arg(s) Out:	DevVarStringArray *argout - Get vi description  
+ Arg(s) Out:	DevVarStringArray *argout - Get values
 		long		*error	- pointer to error code, in case
 		 			  routine fails. Error code(s):
 					  none
  ============================================================================*/
 
-static long  dev_getviinfo(ds, argin, argout, error)
-LabViewGeneric 	ds;
-DevVoid 	*argin;
-DevVarStringArray *argout;
-long 		*error;
-{
-
-#ifdef LV_DEBUG
-   printf("LabViewGeneric dev_getviinfo()\n");
-#endif /*LV_DEBUG*/
-	
-   lv_ds__argout = (void*)argout;
-	return(DS_OK);
-}
-
-
-/*============================================================================
- Function:      static long dev_getcontrollist ()
-
- Description:	Get an array of strings Describing the controls found in the attached VI
-   	
- Arg(s) In:	LabViewGeneric 	ds 	- 
-		DevVoid		*argin - none
-   				  
- Arg(s) Out:	DevVarStringArray *argout - Get controls 
-		long		*error	- pointer to error code, in case
-		 			  routine fails. Error code(s):
-					  none
- ============================================================================*/
-
-static long  dev_getcontrollist(ds, argin, argout, error)
-LabViewGeneric 	ds;
-DevVoid 	*argin;
-DevVarStringArray *argout;
-long 		*error;
-{
-
-#ifdef LV_DEBUG
-   printf("LabViewGeneric dev_getcontrollist()\n");
-#endif /*LV_DEBUG*/
-
-   lv_ds__argout = (void*)argout;
-
-   return(DS_OK);
-}
-
-
-
-/*============================================================================
- Function:      static long dev_getcontrolinfo ()
-
- Description:	Get some info yout VI in a string array
-   	
- Arg(s) In:	LabViewGeneric 	ds 	- 
-		DevString *argin  - Name of control
-   				  
- Arg(s) Out:	DevVarDoubleArray *argout - Get Info values
-		long		*error	- pointer to error code, in case
-		 			  routine fails. Error code(s):
-					  none
- ============================================================================*/
-
-static long  dev_getcontrolinfo(ds, argin, argout, error)
-LabViewGeneric 	ds;
+static long  dev_io_string(ds, argin, argout, error)
+LabView 	ds;
 DevVarStringArray *argin;
 DevVarStringArray *argout;
 long 		*error;
-{
-
-#ifdef LV_DEBUG
-   printf("LabViewGeneric dev_getcontrolinfo()\n");
-#endif /* LV_DEBUG */
-
-   //lv_ds__argin = (void*)&lv_ds__ctrl_name_in;
-   lv_ds__argin = (void*)argin;
-   lv_ds__argout = (void*)argout;
-
-   return(DS_OK);
-}
-
-
-/*============================================================================
- Function:      static long dev_getindicatorlist ()
-
- Description:	Get an array of strings Describing the indicators found in the attached VI
-   	
- Arg(s) In:	LabViewGeneric 	ds 	- 
-		DevVoid		*argin - none
-   				  
- Arg(s) Out:	DevVarStringArray *argout - Get indicators 
-		long		*error	- pointer to error code, in case
-		 			  routine fails. Error code(s):
-					  none
- ============================================================================*/
-
-static long  dev_getindicatorlist(ds, argin, argout, error)
-LabViewGeneric 	ds;
-DevVoid 	*argin;
-DevVarStringArray *argout;
-long 		*error;
-{
-
-#ifdef LV_DEBUG
-   printf("LabViewGeneric dev_getindicatorlist()\n");
-#endif /*LV_DEBUG*/
-
-   lv_ds__argout = (void*)argout;
-
-   return(DS_OK);
-}
-
-
-/*============================================================================
- Function:      static long dev_getindicatorinfo ()
-
- Description:	Get some info about the indicator in a string array
-   	
- Arg(s) In:	LabViewGeneric 	ds 	- 
-		DevString *argin  - Name of control
-   				  
- Arg(s) Out:	DevVarDoubleArray *argout - Get Info values
-		long		*error	- pointer to error code, in case
-		 			  routine fails. Error code(s):
-					  none
- ============================================================================*/
-
-static long  dev_getindicatorinfo(ds, argin, argout, error)
-LabViewGeneric 	ds;
-DevVarStringArray *argin;
-DevVarStringArray *argout;
-long 		*error;
-{
-
-#ifdef LV_DEBUG
-   printf("LabViewGeneric dev_getindicatorinfo()\n");
-#endif /* LV_DEBUG */
-
-   lv_ds__argin = (void*)argin;
-   lv_ds__argout = (void*)argout;
-
-   return(DS_OK);
-}
-
-
-
-void lv_print_debug(char* text) {
-#ifdef LV_DEBUG
-   printf(text);
-#endif /*PRINT*/
-}
-
-
-/*============================================================================
- Function:      static long dev_setcontrolvalue()
-
- Description:	Set an array of doubles to a LabView device
-   	
- Arg(s) In:	LabViewGeneric 	ds 	- 
-		DevDouble *argin  - Set control value (delivered as string, has to be casted afterwards)
-   				  
- Arg(s) Out:	DevString		*argout - name of control
-		long		*error	- pointer to error code, in case
-		 			  routine fails. Error code(s):
-					  none
- ============================================================================*/
-
-static long  dev_setcontrolvalue(ds, argin, argout, error)
-LabViewGeneric 	ds;
-DevVarStringArray *argin;
-DevVoid *argout;
-long 		  *error;
 {
    long i, string_len;
 
 #ifdef LV_DEBUG
-   printf("START LabView dev_setcontrolvalue() START\n");
+   printf("LabView dev_io_string()\n");
 #endif /*PRINT*/
 
    lv_ds__strarr_in.length = argin->length;
@@ -1154,19 +984,114 @@ long 		  *error;
 
    lv_ds__argin = (void*)&lv_ds__strarr_in;
    lv_ds__argout = (void*)argout;
+
+   return(DS_OK);
+}
+/*============================================================================
+ Function:      static long dev_io_double ()
+
+ Description:	Set/Get an array of doubles to a LabView device
+   	
+ Arg(s) In:	LabView 	ds 	- 
+		DevVarDoubleArray *argin  - Set values
+   				  
+ Arg(s) Out:	DevVarDoubleArray *argout - Get values
+		long		*error	- pointer to error code, in case
+		 			  routine fails. Error code(s):
+					  none
+ ============================================================================*/
+
+static long  dev_io_double(ds, argin, argout, error)
+LabView 	ds;
+DevVarDoubleArray *argin;
+DevVarDoubleArray *argout;
+long 		*error;
+{
+   long i;
+
 #ifdef LV_DEBUG
-   printf("END LabView dev_setcontrolvalue END()\n");
+   printf("LabView dev_io_double()\n");
 #endif /*PRINT*/
-   return(DS_OK);   
+
+   lv_ds__dblarr_in.length = argin->length;
+   lv_ds__dblarr_in.sequence = argin->sequence;
+
+   lv_ds__argin = (void*)&lv_ds__dblarr_in;
+   lv_ds__argout = (void*)argout;
+
+   return(DS_OK);
+}
+/*============================================================================
+ Function:      static long dev_readvalue()
+
+ Description:	Read an array of doubles from a LabView device
+   	
+ Arg(s) In:	LabView 	ds 	- 
+		DevVoid  	*argin  - none
+   				  
+ Arg(s) Out:	DevVarDoubleArray	*argout - Read values
+		long		        *error	- pointer to error code, 
+					in case routine fails. 
+					Error code(s): none
+ ============================================================================*/
+
+static long  dev_readvalue(ds, argin, argout, error)
+LabView 	ds;
+DevVoid 	*argin;
+DevVarDoubleArray *argout;
+long 		*error;
+{
+
+#ifdef LV_DEBUG
+   printf("LabView dev_readvalue()\n");
+#endif /*PRINT*/
+
+   lv_ds__argout = (void*)argout;
+
+   return(DS_OK);
 }
 
+/*============================================================================
+ Function:      static long dev_setvalue()
+
+ Description:	Set an array of doubles to a LabView device
+   	
+ Arg(s) In:	LabView 	ds 	- 
+		DevVarDoubleArray *argin  - Set values
+   				  
+ Arg(s) Out:	DevVoid		*argout - none
+		long		*error	- pointer to error code, in case
+		 			  routine fails. Error code(s):
+					  none
+ ============================================================================*/
+
+static long  dev_setvalue(ds, argin, argout, error)
+LabView 	ds;
+DevVarDoubleArray *argin;
+DevVoid 	*argout;
+long 		*error;
+{
+   long i;
+
+
+   lv_ds__dblarr_in.length = argin->length;
+   lv_ds__dblarr_in.sequence = argin->sequence;
+
+#ifdef LV_DEBUG
+   printf("LabView dev_setvalue()\n");
+#endif /* LV_DEBUG */
+
+   lv_ds__argin = (void*)&lv_ds__dblarr_in;
+
+   return(DS_OK);
+}
 
 /*============================================================================
  Function:      static long dev_state()
 
  Description:	return the state of the device
 
- Arg(s) In:	 LabViewGeneric 	ds 	- 
+ Arg(s) In:	 LabView 	ds 	- 
 		 DevVoid  	*argin  - none
    				  
  Arg(s) Out:	 DevShort	*argout - returned state 
@@ -1176,13 +1101,13 @@ long 		  *error;
 
 static long dev_state(ds, argin, argout, error)
 
-LabViewGeneric	ds;
+LabView	ds;
 DevVoid		*argin;
 DevShort	*argout;
 long		*error;
 {
 #ifdef LV_DEBUG
-   printf("LabViewGeneric dev_state()\n");
+   printf("LabView dev_state()\n");
 #endif /* LV_DEBUG */
    *argout	= ds->devserver.state;
    return(DS_OK);
@@ -1193,7 +1118,7 @@ long		*error;
 
  Description:	return state of the device as an ASCII string
 
- Arg(s) In:	 LabViewGeneric 	ds 	- 
+ Arg(s) In:	 LabView 	ds 	- 
 		 DevVoid  	*argin  - none
    				  
  Arg(s) Out:	 DevString	*argout - contains string 
@@ -1201,7 +1126,7 @@ long		*error;
 
 static long dev_status(ds, argin, argout, error)
 
-LabViewGeneric        ds;
+LabView        ds;
 DevVoid         *argin;
 DevString	*argout;
 long		*error;
@@ -1209,9 +1134,9 @@ long		*error;
    static	char	str[80];
 
 #ifdef LV_DEBUG
-   printf("LabViewGeneric dev_status()\n");
+   printf("LabView dev_status()\n");
 #endif /* LV_DEBUG */
-   sprintf(str,"LabViewGeneric is %s\n", DEVSTATES[ds->devserver.state]);
+   sprintf(str,"LabView is %s\n", DEVSTATES[ds->devserver.state]);
    *argout = str;
    return (DS_OK);
 }
@@ -1406,7 +1331,7 @@ static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp)
 	{
 		ds__transp = transp;
 
-		return; /* LabViewGeneric will call sendreply() later */
+		return; /* LabView will call sendreply() later */
 	}
 
 	if (ds__result != NULL && !svc_sendreply(transp, xdr_result, (caddr_t)ds__result)) 
@@ -1718,7 +1643,7 @@ extern DevServerDevices *devices;
 /*+======================================================================
  Function   :   extern _client_data *rpc_cmd_get()
 
- Description:   RPC procedure corresponding to LabViewGeneric lv_ds__cmd_get().
+ Description:   RPC procedure corresponding to LabView lv_ds__cmd_get().
             :   Its only job is to unpack the input arguments and 
 		make them available to LabView.
 
@@ -1831,6 +1756,7 @@ static _client_data * _DLLFunc rpc_cmd_get (_server_data *server_data)
 
 	cmd_in = server_data->cmd;
 
+
 /*
  * in the simple case the command is passed directly on to the command_handler
  * method
@@ -1864,29 +1790,20 @@ static _client_data * _DLLFunc rpc_cmd_get (_server_data *server_data)
 
 static long lv_ds__sendreply()
 {
-/*printf(__FUNCTION__);
-printf("svc_freeargs\n");*/
-	{
-		DevVarStringArray *a = (DevVarStringArray *)lv_ds__argout;
-		int i;
-		printf("%p %p\n", a, &argument);
-		/*for (i = 0; i < a->length; ++i)
-			printf("string out a : %s\n", a->sequence[i]);*/
-	}
+
         if (!svc_freeargs(ds__transp, xdr_argument, (caddr_t) &argument))
         {
         	dev_printerror (SEND,
                         "svc_freeargs : server couldn't free arguments !!");
                         return;
 	}
-//printf("svc_sendreply\n");
+
         if (!svc_sendreply(ds__transp, xdr_result, (caddr_t)ds__result))
         {
                 dev_printerror (SEND,
                 "svcerr_systemerr : server couldn't send reply arguments");
                 /*svcerr_systemerr(transp);*/
         }
-//printf("done\n");
 }
 /*+======================================================================
  Function   :	static long read_device_id ()
