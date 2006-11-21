@@ -22,12 +22,12 @@ bin_PROGRAMS = TacoSilvia lv_menu
 TACO_LDFLAGS_EXT = -L$(top_builddir)/lib -L$(top_builddir)/lib/dbase 
 
 TacoSilvia_SOURCES = TacoSilvia.cpp LabviewClient.cpp main.cpp
-TacoSilvia_LDFLAGS = $(TACO_LDFLAGS_EXT) @QT_LDFLAGS@ @X_LDFLAGS@ 
-TacoSilvia_LDADD = $(LIB_TACO_EXT) @TACO_CLIENT_LIBS@  @LIB_QT@
+TacoSilvia_LDFLAGS = 
+TacoSilvia_LDADD = $(TACO_LDFLAGS_EXT) @QT_LDFLAGS@ @X_LDFLAGS@ $(LIB_TACO_EXT) @TACO_CLIENT_LIBS@  @LIB_QT@
 
 lv_menu_SOURCES = LabviewClient.cpp lv_menu.cpp
-lv_menu_LDFLAGS = $(TACO_LDFLAGS_EXT) 
-lv_menu_LDADD = $(LIB_TACO_EXT) @TACO_CLIENT_LIBS@
+lv_menu_LDFLAGS = 
+lv_menu_LDADD = $(TACO_LDFLAGS_EXT) $(LIB_TACO_EXT) @TACO_CLIENT_LIBS@
 
 EXTRA_DIST = am_edit Doxyfile.in
  
