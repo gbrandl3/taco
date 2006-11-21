@@ -18,7 +18,7 @@ dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_INIT([TACO], [3.97.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.91 $)dnl
+AC_REVISION($Revision: 1.92 $)dnl
 AC_COPYRIGHT([(C) 1990-2006 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -393,6 +393,7 @@ TACO_DATAPORT_SRC
 TACO_TANGO
 TACO_PYTHON_BINDING
 TACO_TCL_BINDING
+TACO_LABVIEW_BINDING
 TACO_GRETA
 TACO_XDEVMENU
 TACO_ALARM
@@ -479,9 +480,9 @@ AC_CONFIG_FILES(bindings/python/Makefile
 
 AC_CONFIG_FILES(bindings/Makefile bindings/tcl/Makefile)
 
-dnl AC_CONFIG_FILES(bindings/labview/Makefile
-dnl 		bindings/labview/client/Makefile
-dnl 		bindings/labview/server/Makefile)
+AC_CONFIG_FILES(bindings/labview/Makefile
+ 		bindings/labview/client/Makefile
+ 		bindings/labview/server/Makefile)
 
 dnl Initialize the test suite
 AC_CONFIG_TESTDIR(tests)
@@ -494,7 +495,6 @@ SWIG_PROG([1.3.17])
 SWIG_PYTHON([yes])
 
 AC_CONFIG_FILES([ext/Makefile ext/lib/Makefile ext/doc/Makefile])
-AC_CONFIG_FILES([ext/server/Makefile ext/server/include/Makefile ext/server/src/Makefile])
 AC_CONFIG_FILES([ext/common/Makefile ext/common/include/Makefile ext/common/src/Makefile ext/common/res/Makefile ext/common/python/Makefile])
 AC_CONFIG_FILES([ext/client/Makefile ext/client/include/Makefile ext/client/src/Makefile ext/client/python/Makefile])
 
@@ -545,6 +545,7 @@ build:
 	bindings:
 		python :	${taco_python_binding}
 		TCL:		${taco_tcl_binding}
+		LabVIEW:	${taco_labview_binding}
 
 	TANGO support:		${taco_tango}
 	Extensions :		${taco_ext}
