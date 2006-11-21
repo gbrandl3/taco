@@ -1,3 +1,21 @@
+2006-11-21 16:00 jkrueger1:
+	* configure.ac: Enable the TACO_LABVIE_BINDING macro
+	* acinclude.ac: Add the 'TACO_LABVIEW_BINDING' macro for detection and
+	configuration of the LabVIEW binding
+	* binding/Makefile.am: Improve the dependencies checking and add the 
+	labview directory
+	* labview/server/lv_dsclass.c labview/server/lv_dsapi.c: Add the 'config.h'
+	file and use the right libs
+	* bindings/labview/server/Makefile.am: Integrate it into the distribution
+	* bindings/labview/server/test.c: Small test program for the labview binding
+	* bindings/labview/server/extcode.h: Removed since it belongs to the LabVIEW
+	distribution/installation
+	* bindings/labview/server/doc bindings/labview/client/doc: Add the 
+	documentation
+	* bindings/labview/client/TacoSilvia.h: Improve doc
+	* bindings/labview/client/LabViewClient.cpp: use the 'config.h"
+	* labview: This directory is removed since the code is in the 
+	bindings/labview directory
 2006-11-07 17:00 jkrueger1:
 	* configure.ac: New version number
 	* acinclude.m4: Add 'stdlib.h' include for the 'exit' function
