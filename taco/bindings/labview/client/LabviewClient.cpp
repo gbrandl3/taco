@@ -14,19 +14,21 @@
 
  Original:	November 2003
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2004-01-26 08:44:22 $
+ Date:		$Date: 2006-11-21 14:53:04 $
 
  Copyright (c) 1990-1997 by FRM2 TU München, 
                             Garching, Germany
 
 ********************************************************************-*/
-
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
 #include <macros.h>
 #include <API.h>
-//#include <ApiP.h>
+#include <private/ApiP.h>
 #include <Admin.h>
 #include <BlcDsNumbers.h>
 #include <DevServer.h>
