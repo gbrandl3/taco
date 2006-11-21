@@ -60,16 +60,17 @@ class QControlsTable;
  *
  * <br><br>
  * \section install Installation 
- * In order for TACOSilvia to work you must have Qt and a working TACO environment. 
+ * In order for TACOSilvia to work you must have Qt and a working TACO environment and the Labview-TACO-Lib 
+ * developed by Andy Götz (see TACO homepage http://www.esrf.fr/taco). 
  * 
- * \subsection step1 Build TACOSilvia:  
- * To build TACOSiliva ensure that all TACO and Qt environment variables are properly set. 
- * Use the GNU standard command sequence for autotools sources: 
- * ./autogen.sh
- * ./configure
- * make
- * make install
+ * \subsection step1 Build the TACO-Labview-Lib:  
+ * To build the Taco-Labview-Lib simply execute the Makefile in the labview/server/src/ sub-directory.
+ * (Don't forget to adapt the correct Labview installation Path in the Makefile)
  * 
+ * \subsection step2 Build TACOSilvia:  
+ * To build TACOSiliva ensure that all TACO and Qt environment variables are properly set 
+ * and simply execute the Makefile in the labview/client/ subdirectory.
+ * (Don't forget to adapt the correct Labview installation Path in the Makefile)
  *
  *
  * <br><br> 
@@ -119,10 +120,10 @@ class QControlsTable;
  * 
  */
 
-//! <b>TacoSilvia</b> means <b>TACO</b> <b>S</b>erver <b>I</b>nterfacing <b>L</b>abview <b>V</b>irtual <b>I</b>nstrument <b>A</b>pplications. It represents a GUI application built with Qt and allows communication with arbitrary Labview Virtual Instruments(VIs) by means of getting and setting the control and indicator values of selected VIs. It uses the TACO client/server communication system to offer an interface to Labview applications. 
+//! <b>TacoSilvia</b> means <b>TACO</b> <b>S</b>erver <b>I</b>nterfacing <b>L</b>abview <b>V</b>irtual <b>I</b>nstrument <b>A</b>pplications. It represents a GUI application built with Qt and allows communication with arbitrary Labview Virtual Instruments(VIs) by means of getting and setting the control and indicator values of selected VIs. It uses TACO and the Labview-Taco-Lib to offer an interface to Labview applications. 
     
  
-/*!   The TACO-LV-Wrapper is strongly tied to a corresponding particular Labview VI that itself loads the VI to be controlled remotely and it is able to handle TACO client requests in Labview context. In that context, this pair acts as the TACO Device Server whereas another class is responsible for the client side: <b>LabviewClient</b>.  The LabviewClient class encapsulates the communication with labview via TACO and does all the type conversion and checking. 
+/*!   The Labview-Taco-Lib is strongly tied to a corresponding particular Labview VI that itself loads the VI to be controlled remotely and it is able to handle TACO client requests in Labview context. In that context, this pair acts as the TACO Device Server whereas another class is responsible for the client side: <b>LabviewClient</b>.  The LabviewClient class encapsulates the communication with labview via TACO and does all the type conversion and checking. 
  *   TacoSilvia just delegates the requests to that class in order to contact labview.
  *   Once a connection has been established (the device server has been imported) the controls (and the indicators too) of the selected virtual instrument can be listed and modified using the GUI functionality.   
  */
