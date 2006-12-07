@@ -93,7 +93,7 @@ include_HEADERS		+= BlcDsNumbers.h CntrlDsNumbers.h DasDsNumbers.h MachDsNumbers
 include_HEADERS		+= Device.h OICDevice.h 
 include_HEADERS		+= DevServer.h  DevServerP.h  DevSignal.h  NT_debug.h  Starter.h
 
-EXTRA_DIST		+= DeviceFRM.h OICDeviceFRM.h DeviceFRM.cpp OICDeviceFRM.cpp 
+EXTRA_DIST		+= DeviceFRM.h OICDeviceFRM.h DeviceFRM.cpp OICDeviceFRM.cpp Frm2DsNumbers.h
 EXTRA_DIST		+= NT_debug.c  Doxyfile.in
 
 doc:	Doxyfile $(include_HEADERS) $(libtaco_la_SOURCES) $(libtaco___la_SOURCES) 
