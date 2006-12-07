@@ -18,7 +18,7 @@ dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_INIT([TACO], [3.97.0], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.93 $)dnl
+AC_REVISION($Revision: 1.94 $)dnl
 AC_COPYRIGHT([(C) 1990-2006 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -494,9 +494,8 @@ AC_CONFIG_FILES(tests/taco, [chmod +x tests/taco])
 SWIG_PROG([1.3.17])
 SWIG_PYTHON([yes])
 
-AC_CONFIG_FILES([ext/Makefile ext/lib/Makefile ext/doc/Makefile])
-AC_CONFIG_FILES([ext/common/Makefile ext/common/include/Makefile ext/common/src/Makefile ext/common/res/Makefile ext/common/python/Makefile])
-AC_CONFIG_FILES([ext/client/Makefile ext/client/include/Makefile ext/client/src/Makefile ext/client/python/Makefile])
+AC_CONFIG_FILES([ext/Makefile ext/include/Makefile ext/src/Makefile ext/doc/Makefile])
+AC_CONFIG_FILES([ext/python/Makefile ext/res/Makefile])
 
 AC_CONFIG_FILES([misc/taco-server.pc misc/taco-server++.pc misc/taco-client.pc misc/taco-client++.pc])
 
