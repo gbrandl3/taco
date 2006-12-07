@@ -15,25 +15,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-EXTRA_DIST 		= TACOStates.i
+AM_CPPFLAGS 	= -I$(top_srcdir)/ext/include @TACO_INCLUDES@
 
-AM_CPPFLAGS 		= -I$(top_srcdir)/ext/common/include @TACO_INCLUDES@ @SWIG_PYTHON_CPPFLAGS@
+AM_CXXFLAGS 	= -Wall
 
-AM_CXXFLAGS 		= -Wall
+lib_LTLIBRARIES = libTACOExtensions.la
 
-nodist_python_PYTHON	= TACOStates.py
-
-pyexec_LTLIBRARIES 	= _TACOStates.la
-
-nodist__TACOStates_la_SOURCES = wrap_TACOStates.cpp
-_TACOStates_la_LDFLAGS 	= -avoid-version -module
-_TACOStates_la_LIBADD 	= -lstdc++ $(top_builddir)/ext/lib/libTACOExtensions.la
-
-TACOStates.py: 		wrap_TACOStates.cpp
-	@true
-
-wrap_TACOStates.cpp: 	$(srcdir)/TACOStates.i $(top_srcdir)/ext/common/include/TACOStates.h
-	@SWIG@ @SWIG_PYTHON_OPT@ -c++ -I$(top_srcdir)/ext/common/include -o $@ $(srcdir)/TACOStates.i
-
-CLEANFILES		= *.pyc *.pyo wrap_*.cpp TACOStates.py
-
+libTACOExtensions_la_SOURCES = TACOServer.cpp \
+	TACOException.cpp \
+	TACOExtensions.cpp \
+	TACOResources.cpp \
+	TACOStates.cpp \
+	TACOStringConverters.cpp \
+	TACOClient.cpp
+libTACOExtensions_la_LDFLAGS = -version-info @LIB_VERSION@
+libTACOExtensions_la_LIBADD = @TACO_SERVER_CXX_LIBS@ @LIB_STDCXX@

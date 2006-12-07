@@ -15,21 +15,38 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-AM_CPPFLAGS 		= -D_REENTRANT -I$(top_srcdir)/ext/common/include -I$(top_srcdir)/ext/client/include @TACO_INCLUDES@ @PYTHON_CPPFLAGS@
+EXTRA_DIST 		= TACOStates.i
+
+AM_CPPFLAGS 		= -I$(top_srcdir)/ext/include @TACO_INCLUDES@ @SWIG_PYTHON_CPPFLAGS@
 
 AM_CXXFLAGS 		= -Wall
 
+nodist_python_PYTHON	= TACOStates.py
+
+pyexec_LTLIBRARIES 	= _TACOStates.la TACOClient.la
+
+nodist__TACOStates_la_SOURCES = wrap_TACOStates.cpp
+_TACOStates_la_LDFLAGS 	= -avoid-version -module
+_TACOStates_la_LIBADD 	= @LIB_STDCXX@ ../src/libTACOExtensions.la
+
+TACOStates.py: 		wrap_TACOStates.cpp
+	@true
+
+wrap_TACOStates.cpp: 	$(srcdir)/TACOStates.i $(top_srcdir)/ext/include/TACOStates.h
+	@SWIG@ @SWIG_PYTHON_OPT@ -c++ -I$(top_srcdir)/ext/include -o $@ $(srcdir)/TACOStates.i
+
+CLEANFILES		= *.pyc *.pyo wrap_*.cpp TACOStates.py
+
+
+AM_CPPFLAGS 		+= -D_REENTRANT @PYTHON_CPPFLAGS@
+
 noinst_PYTHON		= test.py
  
-pyexec_LTLIBRARIES 	= TACOClient.la
-
 noinst_HEADERS 		= TACOPythonClient.h TACOPythonClientConverters.h
 
 TACOClient_la_SOURCES 	= TACOPythonClient.cpp TACOPythonClientConverters.cpp
 TACOClient_la_LDFLAGS 	= -pthread -avoid-version -module
-TACOClient_la_LIBADD 	= @LIB_STDCXX@ $(top_builddir)/ext/lib/libTACOExtensions.la @TACO_CLIENT_CXX_LIBS@
-
-CLEANFILES		= *.pyc
+TACOClient_la_LIBADD 	= @LIB_STDCXX@ ../src/libTACOExtensions.la @TACO_CLIENT_CXX_LIBS@
 
 install-data-hook:
 	rm -f $(DESTDIR)$(pythondir)/TACOClient.py*

@@ -930,12 +930,12 @@ void initTACOClient(int i)
 		PyDict_SetItemString(d, "__author__", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyString_FromString("$Revision: 1.3 $"))
+	if (tmp = PyString_FromString("$Revision: 1.1 $"))
 	{
 		PyDict_SetItemString(d, "__revision__", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyString_FromString("$Date: 2006-09-18 22:35:47 $"))
+	if (tmp = PyString_FromString("$Date: 2006-12-07 15:11:46 $"))
 	{
 		PyDict_SetItemString(d, "__date__", tmp);
 		Py_DECREF(tmp);

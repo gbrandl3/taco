@@ -24,4 +24,6 @@ include_HEADERS = TACOArgPutGet.h \
 	TACOResources.h \
 	TACOStates.h \
 	TACOStringConverters.h \
-	TACOTypes.h
+	TACOTypes.h \
+	TACOClient.h \
+	TACOServer.h
