@@ -23,7 +23,8 @@ LV_FLAGS 		= -DLV_DEBUG -DLV_DC -DLABVIEW -DNOMAIN
 
 AM_CPPFLAGS 		= @TACO_INCLUDES@ $(LV_FLAGS) @LABVIEW_INCLUDES@
 
-noinst_HEADERS 		= LabViewGeneric.h LabViewGenericP.h
+noinst_HEADERS 		= LabViewGeneric.h LabViewGenericP.h \
+			LabView.h LabViewP.h
 
 lv_dsapi_la_SOURCES 	= lv_dsapi.c 
 lv_dsapi_la_LDFLAGS 	= $(LV_FLAGS) -module

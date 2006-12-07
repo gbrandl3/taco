@@ -29,7 +29,7 @@ lv_menu_SOURCES = LabviewClient.cpp lv_menu.cpp
 lv_menu_LDFLAGS = 
 lv_menu_LDADD = $(TACO_LDFLAGS_EXT) $(LIB_TACO_EXT) @TACO_CLIENT_LIBS@
 
-EXTRA_DIST = am_edit Doxyfile.in
+EXTRA_DIST = Doxyfile.in
  
 AM_CPPFLAGS = @TACO_INCLUDES@ @QT_INCLUDES@ -I$(srcdir)/../server
 
@@ -45,7 +45,7 @@ nodist_TacoSilvia_SOURCES	= moc_TacoSilvia.cpp
 
 CLEANFILES = moc_* *.moc.cpp
 
-noinst_HEADERS = TacoSilvia.h LabviewClient.h 
+noinst_HEADERS = TacoSilvia.h LabviewClient.h Pixmaps.h
 
 doc:	Doxyfile.in
 	doxygen
