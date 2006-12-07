@@ -57,7 +57,7 @@ AC_DEFUN([TACO_LABVIEW_BINDING],
                 esac], [taco_labview=yes])
         AC_ARG_WITH(labview, AS_HELP_STRING([--with-labview=PFX], [Prefix where labview is installed, @<:@default=/usr/local/lv71@:>@]),
                 [labview_prefix="$withval"], [labview_prefix="/usr/local/lv71"])
-	ac_save_CPPFLAGS="CPPFLAGS"
+	ac_save_CPPFLAGS="$CPPFLAGS"
 	CPPFLAGS="$CPPFLAGS -I${labview_prefix}/cintools"
 	AC_CHECK_HEADERS([extcode.h], [taco_labview_binding=yes
 		AC_SUBST([LABVIEW_INCLUDES], ["-I${labview_prefix}/cintools"])
@@ -727,32 +727,47 @@ AC_DEFUN([LINUX_DISTRIBUTION],
 
 AC_DEFUN([WITH_CORBA],
 [
+	PKG_CHECK_MODULES(OMNIORB4, omniCOSDynamic4 >= 4.0.0, 
+		[corba_found=yes
+		CORBA_CLFAGS=`$PKG_CONFIG --cflags omniCOSDynamic4`
+		CORBA_LIBS=`$PKG_CONFIG --libs-only-l omniCOSDynamic4`
+		CORBA_LDFLAGS=`$PKG_CONFIG --libs-only-L omniCOSDynamic4`
+		save_CFLAGS="$CFLAGS"
+		save_CPPFLAGS="$CPPFLAGS"
+		CFLAGS="$CFLAGS $CORBA_CFLAGS"
+		CPPFLAGS="$CPPFLAGS $CORBA_CFLAGS"
+		AC_LANG_PUSH(C++)
+		AC_CHECK_HEADERS([omniORB4/CORBA.h], [],
+			AC_CHECK_LIB(omniORB4, init_server, [], [corba_found=no]))
+		CFLAGS="$save_CFLAGS"
+		CPPFLAGS="$save_CPPFLAGS"
+		AC_LANG_POP(C++)
+		], [corba_found=no])
 #	AC_REQUIRE([AC_PATH_XTRA])
-	corba_found=no;
-	AC_ARG_WITH(corba, AC_HELP_STRING([--with-corba@<:@=ARG@:>@], [CORBA @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the omniORB CORBA installation, e.g. '/usr/local/omniORB']), [
-		case  "$with_corba" in
-			yes) 	CORBA_LIBS="-lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread" 
-				CORBA_INCLUDES="-I$withval/include"
-				corba_found=yes;;
-			no)  	AC_MSG_WARN([Disable build of TANGO])
-				corba_found=no;;
-			*) 	CORBA_LIBS="-L$withval/lib -lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"
-				CORBA_INCLUDES="-I$withval/include"
-				corba_found=yes;;
-		esac      
-		],[CORBA_LIBS="-lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"; CORBA_INCLUDES="-I$withval/include"])
-	CPPFLAGS_SAVE="$CPPFLAGS"
-	CPPFLAGS="$CPPFLAGS $CORBA_INCLUDES"
-	LIBS_SAVE="$LIBS"
-#	AC_CHECK_HEADERS([omniORB4/CORBA.h], [
-#	AC_CHECK_LIB(omniORB4, init_server, [], [corba_found=no], [$CORBA_LDFLAGS -lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread])
-#		break;
-#	], [corba_found=no])
-	CPPFLAGS="$CPPFLAGS_SAVE"
-	LIBS="$LIBS_SAVE"
+#	corba_found=no;
+#	AC_ARG_WITH(corba, AC_HELP_STRING([--with-corba@<:@=ARG@:>@], [CORBA @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the omniORB CORBA installation, e.g. '/usr/local/omniORB']), [
+#		case  "$with_corba" in
+#			yes) 	CORBA_LIBS="-lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread" 
+#				CORBA_CLFAGS="-I$withval/include"
+#				corba_found=yes;;
+#			no)  	AC_MSG_WARN([Disable build of TANGO])
+#				corba_found=no;;
+#			*) 	CORBA_LIBS="-L$withval/lib -lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"
+#				CORBA_CLFAGS="-I$withval/include"
+#				corba_found=yes;;
+#		esac      
+#		],[CORBA_LIBS="-lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"; CORBA_CLFAGS="-I$withval/include"])
+#	CPPFLAGS_SAVE="$CPPFLAGS"
+#	CPPFLAGS="$CPPFLAGS $CORBA_CLFAGS"
+#	LIBS_SAVE="$LIBS"
+#	CPPFLAGS="$CPPFLAGS_SAVE"
+#	LIBS="$LIBS_SAVE"
 
-	AC_SUBST(CORBA_LIBS)
-	AC_SUBST(CORBA_INCLUDES)
+#	AC_SUBST(CORBA_LIBS)
+#	AC_SUBST(CORBA_INCLUDES)
+	AC_SUBST([CORBA_CFLAGS])
+	AC_SUBST([CORBA_LIBS])
+	AC_SUBST([CORBA_LDFLAGS])
 ])
 
 AC_DEFUN([WITH_TANGO],
