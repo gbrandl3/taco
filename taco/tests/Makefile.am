@@ -57,7 +57,7 @@ check_PROGRAMS 		= db_connect db_resget db_resput db_getdevexp \
 			dev_cmdquery dev_conparams \
 			test_server test_client test_client2 test_status test_connect \
 			longest_testserver \
-                        db_analyze
+                        db_analyze 
 
 check_SCRIPT		= taco
 
@@ -179,7 +179,7 @@ longest_testserver_SOURCES = test_server.cpp
 longest_testserver_LDADD = @TACO_SERVER_CXX_LIBS@ -lstdc++
 
 if BUILD_EXT
-check_PROGRAMS		+= TestExtServer ExtServerClient 
+check_PROGRAMS		+= TestExtServer ExtServerClient TestExtClient
 
 TestExtServer_CPPFLAGS  = -I$(top_srcdir)/ext/common/include -I$(top_srcdir)/ext/server/include -DTACO_EXT
 TestExtServer_SOURCES	= TestExtServer.cpp TestExtServerStartup.cpp
@@ -190,4 +190,9 @@ ExtServerClient_CPPFLAGS= -I$(top_srcdir)/ext/common/include -I$(top_srcdir)/ext
 ExtServerClient_SOURCES = ExtServerClient.cpp
 ExtServerClient_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/lib/libTACOExtensions.la
 ExtServerClient_LDFLAGS = -no-install
+
+TestExtClient_SOURCES 	= TestExtClient.cpp
+TestExtClient_CPPFLAGS  = -I$(top_srcdir)/ext/common/include -I$(top_srcdir)/ext/client/include -DTACO_EXT
+TestExtClient_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/lib/libTACOExtensions.la
+TestExtClient_LDFLAGS	= -no-install
 endif
