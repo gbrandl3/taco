@@ -35,7 +35,7 @@ dist-hook:
 #	perl -pi -e 's/\n/\r\n/g' `find $(distdir) -name '*.bpg'`
 
 distclean-local:
-	$(RM) CONTENTS TAGS log4cpp-config log4cpp.pc.in log4cpp-config.in
+	$(RM) -f CONTENTS TAGS log4cpp-config log4cpp.pc.in log4cpp-config.in
 
 CONTENTS::
 	find $(top_srcdir) \( ! -type l -a -name '*.cpp' -o -name '*.hh' -o -name Makefile.am \) > $@

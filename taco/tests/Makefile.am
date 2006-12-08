@@ -192,7 +192,7 @@ ExtServerClient_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/src/
 ExtServerClient_LDFLAGS = -no-install
 
 TestExtClient_SOURCES 	= TestExtClient.cpp
-TestExtClient_CPPFLAGS  = -I$(top_srcdir)/ext/common/include -I$(top_srcdir)/ext/client/include -DTACO_EXT
-TestExtClient_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/lib/libTACOExtensions.la
+TestExtClient_CPPFLAGS  = -I$(top_srcdir)/ext/include -DTACO_EXT
+TestExtClient_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/src/libTACOExtensions.la
 TestExtClient_LDFLAGS	= -no-install
 endif
