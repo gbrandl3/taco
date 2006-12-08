@@ -30,16 +30,16 @@ install-data-local:
 	done
 	$(mkinstalldirs) $(docdir)
 	cp -r html/. $(docdir)
-	$(RM) -r -f $(docdir)/CVS \
+	$(RM) -rf $(docdir)/CVS \
 		$(docdir)/Makefile.am \
 		$(docdir)/Makefile.in \
 		$(docdir)/Makefile
 
 uninstall-local:
-	$(RM) $(man3dir)/log4cpp.3
-	$(RM) $(man3dir)/log4cpp::*.3
-	$(RM) -r -f $(docdir)
+	$(RM) -f $(man3dir)/log4cpp.3
+	$(RM) -f $(man3dir)/log4cpp::*.3
+	$(RM) -rf $(docdir)
 
 clean-local:
-	$(RM) -r latex
-	$(RM) -r html/api man @PACKAGE_TARNAME@.ps @PACKAGE_TARNAME@.pdf
+	$(RM) -rf latex
+	$(RM) -rf html/api man @PACKAGE_TARNAME@.ps @PACKAGE_TARNAME@.pdf
