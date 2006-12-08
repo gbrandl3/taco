@@ -16,6 +16,10 @@
 #include <fcntl.h>
 #include <log4cpp/OstreamAppender.hh>
 
+#ifndef O_LARGEFILE
+#define O_LARGEFILE 0
+#endif
+
 namespace log4cpp {
 
     OstreamAppender::OstreamAppender(const std::string& name, std::ostream* stream) : 

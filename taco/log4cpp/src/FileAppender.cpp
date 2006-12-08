@@ -23,6 +23,10 @@
 #include <log4cpp/Category.hh>
 #include <log4cpp/FactoryParams.hh>
 
+#ifndef O_LARGEFILE
+#define O_LARGEFILE 0
+#endif
+
 namespace log4cpp {
 
     FileAppender::FileAppender(const std::string& name, 
@@ -31,7 +35,7 @@ namespace log4cpp {
                                mode_t mode) : 
             LayoutAppender(name),
             _fileName(fileName),
-            _flags(O_CREAT | O_APPEND | O_WRONLY | O_LARGEFILE),
+            _flags(O_CREAT | O_APPEND | O_WRONLY | O_LARGEFILE), 
             _mode(mode) {
         if (!append)
             _flags |= O_TRUNC;
