@@ -32,6 +32,7 @@ AC_CANONICAL_HOST
 AM_PROG_LIBTOOL
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
+AC_CHECK_TOOL([RM], [rm], [echo])
 
 AC_PROG_CXX([g++ c++ gpp aCC CC cxx cc++ cl FCC KCC RCC xlC_r xlC QCC])
 
