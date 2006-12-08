@@ -822,3 +822,7 @@ AC_DEFUN([TACO_FRM_EXT],
         AM_CONDITIONAL(BUILD_EXT, [test x"${taco_ext}" = x"yes"])
 ])
 
+AC_DEFUN([AC_PROG_RM],
+[
+	AC_CHECK_TOOL([RM], [rm], [echo])
+])
