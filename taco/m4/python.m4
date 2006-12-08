@@ -42,7 +42,8 @@ dnl
 	        elif test "x$python_prefix" != "x" ; then
 			python_incdirs=${python_prefix}/include
 	        else 
-			python_incdirs="$ac_python_dir/include /usr/include /usr/local/include/"
+#			python_incdirs="$ac_python_dir/include /usr/include /usr/local/include/"
+			python_incdirs=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('INCLUDEDIR'), distutils.sysconfig.get_config_var('CONFINCLUDEPY')"`
 			case $target in
 		 		powerpc-apple-darwin*)	
 					python_incdirs="$python_incdirs /System/Library/Frameworks/Python.framework/Versions/${ac_python_version}/include" ;;
@@ -64,7 +65,8 @@ dnl
 	        	if test "x$python_prefix" != "x" ; then
 				python_libraries=${python_prefix}/lib
 	      	  	elif test "x$python_libraries" == "x" ; then
-				python_libraries="$ac_python_dir/lib /usr/lib /usr/local /usr/lib"
+#				python_libraries="$ac_python_dir/lib /usr/lib /usr/local /usr/lib"
+				python_libraries=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('LIBDIR')"`
 			fi
 			ac_save_LIBS="$LIBS"
 			ac_save_LDFLAGS="$LDFLAGS"
