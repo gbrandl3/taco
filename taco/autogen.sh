@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 
 for libtoolize in glibtoolize libtoolize libtoolize15 libtoolize13 ; do
         LIBTOOLIZE=`which $libtoolize 2>/dev/null | grep -v 'no'`
@@ -7,7 +7,7 @@ for libtoolize in glibtoolize libtoolize libtoolize15 libtoolize13 ; do
                 break;
         fi
 done
-for autoconf in autoconf autoconf259 autoconf253 ; do
+for autoconf in autoconf autoconf261 autoconf260 autoconf259 autoconf253 ; do
 	AUTOCONF=`which $autoconf 2>/dev/null | grep -v '^no'`
 	if test "$AUTOCONF" ; then
 		ac_postfix=`basename $AUTOCONF | sed -e "s/autoconf//"`
