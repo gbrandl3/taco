@@ -1,3 +1,9 @@
+2006-12-08 10:00  jkrueger1:
+	* src/FileAppender.cpp src/OstreamAppender.cpp: Enable the use on
+	FreeBSD by defining the O_LARGFILE macro as 0
+	* autogen.sh: Enable the usage on FreeBSD by detecting the autotools
+	by name including the version numbers
+
 2005-04-28 11:29  francisandre
 
 	* src/CategoryStream.cpp: Fix CategoryStream::eol(CategoryStream&)
