@@ -727,11 +727,26 @@ AC_DEFUN([LINUX_DISTRIBUTION],
 
 AC_DEFUN([WITH_CORBA],
 [
-	PKG_CHECK_MODULES(OMNIORB4, omniCOSDynamic4 >= 4.0.0, 
-		[corba_found=yes
-		CORBA_CLFAGS=`$PKG_CONFIG --cflags omniCOSDynamic4`
-		CORBA_LIBS=`$PKG_CONFIG --libs-only-l omniCOSDynamic4`
-		CORBA_LDFLAGS=`$PKG_CONFIG --libs-only-L omniCOSDynamic4`
+	AC_REQUIRE([AC_PATH_XTRA])
+	corba_found=no;
+	AC_ARG_WITH(corba, AC_HELP_STRING([--with-corba@<:@=ARG@:>@], [CORBA @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the omniORB CORBA installation, e.g. '/usr/local/omniORB']), [
+		case  "$with_corba" in
+			yes) 	
+				PKG_CHECK_MODULES(OMNIORB4, omniCOSDynamic4 >= 4.0.0, 
+					[corba_found=yes
+					CORBA_CLFAGS=`$PKG_CONFIG --cflags omniCOSDynamic4`
+					CORBA_LIBS=`$PKG_CONFIG --libs-only-l omniCOSDynamic4`
+					CORBA_LDFLAGS=`$PKG_CONFIG --libs-only-L omniCOSDynamic4`
+					], [corba_found=no])
+				;;
+			no)  	AC_MSG_WARN([Disable build of TANGO])
+				corba_found=no;;
+			*) 	CORBA_LIBS="-L$withval/lib -lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"
+				CORBA_CLFAGS="-I$withval/include"
+				corba_found=yes;;
+		esac      
+		])
+	if test $corba_found = "yes" ; then
 		save_CFLAGS="$CFLAGS"
 		save_CPPFLAGS="$CPPFLAGS"
 		CFLAGS="$CFLAGS $CORBA_CFLAGS"
@@ -742,29 +757,7 @@ AC_DEFUN([WITH_CORBA],
 		CFLAGS="$save_CFLAGS"
 		CPPFLAGS="$save_CPPFLAGS"
 		AC_LANG_POP(C++)
-		], [corba_found=no])
-#	AC_REQUIRE([AC_PATH_XTRA])
-#	corba_found=no;
-#	AC_ARG_WITH(corba, AC_HELP_STRING([--with-corba@<:@=ARG@:>@], [CORBA @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the omniORB CORBA installation, e.g. '/usr/local/omniORB']), [
-#		case  "$with_corba" in
-#			yes) 	CORBA_LIBS="-lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread" 
-#				CORBA_CLFAGS="-I$withval/include"
-#				corba_found=yes;;
-#			no)  	AC_MSG_WARN([Disable build of TANGO])
-#				corba_found=no;;
-#			*) 	CORBA_LIBS="-L$withval/lib -lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"
-#				CORBA_CLFAGS="-I$withval/include"
-#				corba_found=yes;;
-#		esac      
-#		],[CORBA_LIBS="-lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"; CORBA_CLFAGS="-I$withval/include"])
-#	CPPFLAGS_SAVE="$CPPFLAGS"
-#	CPPFLAGS="$CPPFLAGS $CORBA_CLFAGS"
-#	LIBS_SAVE="$LIBS"
-#	CPPFLAGS="$CPPFLAGS_SAVE"
-#	LIBS="$LIBS_SAVE"
-
-#	AC_SUBST(CORBA_LIBS)
-#	AC_SUBST(CORBA_INCLUDES)
+	fi
 	AC_SUBST([CORBA_CFLAGS])
 	AC_SUBST([CORBA_LIBS])
 	AC_SUBST([CORBA_LDFLAGS])
