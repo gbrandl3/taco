@@ -23,7 +23,7 @@ include_HEADERS 	=
 
 lib_LTLIBRARIES 	= libtacotango++.la 
 
-INCLUDES		= @TACO_INCLUDES@ @CORBA_INCLUDES@ @TANGO_INCLUDES@
+INCLUDES		= @TACO_INCLUDES@ @CORBA_CFLAGS@ @TANGO_INCLUDES@
 
 AM_CPPFLAGS 		= -DTANGO
 
@@ -46,14 +46,13 @@ libtacotango___la_CFLAGS  	= -x c++ -DTANGO
 if CLIENT_TCP
 libtacotango___la_CFLAGS += -DCLIENT_TCP
 endif
+libtacotango___la_LIBADD  	= ../xdr/libdsxdr_all.la  ../dbase/libdbapi.la \
+				@TANGO_LIBS@ @CORBA_LDFLAGS@ @CORBA_LIBS@ 
 if SOLARIS_CXX
-libtacotango___la_LIBADD  	= ../xdr/libdsxdr_all.la  ../dbase/libdbapi.la \
-				@TANGO_LIBS@ @CORBA_LIBS@ -lCstd
+libtacotango___la_LIBADD  	+= -lCstd
 else
-libtacotango___la_LIBADD  	= ../xdr/libdsxdr_all.la  ../dbase/libdbapi.la \
-				@TANGO_LIBS@ @CORBA_LIBS@ -lstdc++ 
+libtacotango___la_LIBADD  	+= -lstdc++ 
 endif
-#				../dc/libdcapi.la @TANGO_LIBS@ @CORBA_LIBS@ -lstdc++ 
 libtacotango___la_LDFLAGS 	= -version-info @LIB_VERSION@
 
 include_HEADERS		+= ../BlcDsNumbers.h ../CntrlDsNumbers.h ../DasDsNumbers.h ../MachDsNumbers.h ../SysNumbers.h 
