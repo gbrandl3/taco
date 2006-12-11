@@ -36,7 +36,7 @@ namespace log4cpp {
         typedef enum {
             ENDLINE = 0,
 			EOL		= 0,
-			endline	= 0,
+			endline	= 0
 // changed by andy_gotz + jkrueger1 for Solaris CC, 11/12/2006
 			//eol		= 0
         } Separator;
