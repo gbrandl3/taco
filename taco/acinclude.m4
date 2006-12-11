@@ -742,13 +742,15 @@ AC_DEFUN([WITH_CORBA],
 			no)  	AC_MSG_WARN([Disable build of TANGO])
 				corba_found=no;;
 			*) 	CORBA_LIBS="-L$withval/lib -lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"
-				CORBA_CLFAGS="-I$withval/include"
+				CORBA_CFLAGS="-I$withval/include"
 				corba_found=yes;;
 		esac      
 		])
 	if test $corba_found = "yes" ; then
 		save_CFLAGS="$CFLAGS"
 		save_CPPFLAGS="$CPPFLAGS"
+		save_LDFLAGS="$LDFLAGS"
+		LDFLAGS="$LDFLAGS $CORBA_LDFLAGS"
 		CFLAGS="$CFLAGS $CORBA_CFLAGS"
 		CPPFLAGS="$CPPFLAGS $CORBA_CFLAGS"
 		AC_LANG_PUSH(C++)
@@ -756,6 +758,7 @@ AC_DEFUN([WITH_CORBA],
 			AC_CHECK_LIB(omniORB4, init_server, [], [corba_found=no]))
 		CFLAGS="$save_CFLAGS"
 		CPPFLAGS="$save_CPPFLAGS"
+		LDFLAGS="$save_LDFLAGS"
 		AC_LANG_POP(C++)
 	fi
 	AC_SUBST([CORBA_CFLAGS])
