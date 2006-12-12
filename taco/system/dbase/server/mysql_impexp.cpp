@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.14 $
+ * Version:	$Revision: 1.15 $
  *
- * Date:	$Date: 2006-11-07 15:52:15 $
+ * Date:	$Date: 2006-12-12 12:21:44 $
  *
  */
 
@@ -556,7 +556,7 @@ int MySQLServer::db_store(db_devinfo &dev_stu)
           << " VERSION = '" << dev_stu.v_num << "',"
           << " CLASS = '" << dev_stu.dev_class << "',"
           << " PID = 0 , SERVER = 'unknown'"
-          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << std::ends; 	
+          << " WHERE NAME = '" << dev_stu.dev_name << "'" << std::ends; 	
     try
     {
 #if !HAVE_SSTREAM
@@ -599,7 +599,7 @@ int MySQLServer::db_store(db_devinfo_2 &dev_stu)
           << " VERSION = '" << dev_stu.v_num << "',"
           << " CLASS = '" << dev_stu.dev_class << "',"
           << " PID = " << dev_stu.pid << ", SERVER = 'unknown'"
-          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', member) = '" << dev_stu.dev_name << "'" << std::ends; 	
+          << " WHERE NAME = '" << dev_stu.dev_name << "'" << std::ends; 	
 
     try
     {
@@ -683,7 +683,7 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
           << " PID = " << dev_stu.pid << ","
 	  << " EXPORTED = 1," 
 	  << " STARTED = NOW()"
-          << " WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" << dev_stu.dev_name << "'" << std::ends; 	
+          << " WHERE NAME = '" << dev_stu.dev_name << "'" << std::ends; 	
     if (enable_logging) logStream << getTimeString("MySQLServer::db_store()") << " query = " << query.str() << std::endl;
     if (enable_logging) logStream.flush();
     try

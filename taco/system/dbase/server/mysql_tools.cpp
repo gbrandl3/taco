@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.20 $
+ * Version:	$Revision: 1.21 $
  *
- * Date:	$Date: 2006-10-25 10:57:14 $
+ * Date:	$Date: 2006-12-12 12:21:44 $
  *
  */
 
@@ -359,7 +359,7 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
 //
     std::string query, where;
     query = "SELECT CLASS, SERVER FROM device ",
-    where = "WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + user_device + "'";   
+    where = "WHERE NAME = '" + user_device + "'";   
     
     if (mysql_query(mysql_conn, (query + where).c_str()) != 0)
     {
@@ -1144,7 +1144,7 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
 // get poller device info from the NAMES table
 //
     query = "SELECT server, host, pid FROM device";
-    query += (" WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + poller_name + "'");
+    query += (" WHERE NAME = '" + poller_name + "'");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	std::cerr << mysql_error(mysql_conn) << std::endl;
