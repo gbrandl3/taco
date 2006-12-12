@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: andy_gotz $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.13 $
  *
- * Date:	$Date: 2006-10-25 09:09:18 $
+ * Date:	$Date: 2006-12-12 17:23:08 $
  *
  */
 
@@ -546,7 +546,7 @@ svcinfo_svc *svcinfo_1_svc(db_res *recev)
 {
 #ifdef DEBUG
 #ifndef _solaris
-	std::cerr << __FUNCTION__ << std::endl;
+	std::cout << __FUNCTION__ << std::endl;
 #endif /* !_solaris */
 #endif
 	return dbm->svcinfo_1_svc(recev);

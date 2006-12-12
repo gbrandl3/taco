@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2006-09-27 12:35:23 $
+ * Date:	$Date: 2006-12-12 17:23:08 $
  *
  */
 
@@ -92,7 +92,7 @@ db_res *MySQLServer::resdomainlist_1_svc()
 #if 0
     if (dom_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
     {
-	std::cerr << "Memory allocation error in resdomainlist" << std::endl;
+	std::cout << "Memory allocation error in resdomainlist" << std::endl;
 	browse_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&browse_back);
     }
@@ -131,7 +131,7 @@ db_res *MySQLServer::resfamilylist_1_svc(nam* domain)
 //
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to the database" << std::endl;
+	std::cout << "I'm not connected to the database" << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -143,7 +143,7 @@ db_res *MySQLServer::resfamilylist_1_svc(nam* domain)
     query += (user_domain + "' ORDER BY FAMILY ASC");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return (&browse_back);
     }
@@ -172,7 +172,7 @@ db_res *MySQLServer::resfamilylist_1_svc(nam* domain)
 #if 0
     if (fam_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
     {
-	std::cerr << "Memory allocation error in resfamilylist" << std::endl;
+	std::cout << "Memory allocation error in resfamilylist" << std::endl;
 	browse_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&browse_back);
     }
@@ -212,7 +212,7 @@ db_res *MySQLServer::resmemberlist_1_svc(db_res *recev)
 //
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to the database" << std::endl;
+	std::cout << "I'm not connected to the database" << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -224,7 +224,7 @@ db_res *MySQLServer::resmemberlist_1_svc(db_res *recev)
     query += (user_domain + "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return (&browse_back);
     }
@@ -253,7 +253,7 @@ db_res *MySQLServer::resmemberlist_1_svc(db_res *recev)
 #if 0
     if (memb_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
     {
-		std::cerr << "Memory allocation error in resmemberlist" << std::endl;
+		std::cout << "Memory allocation error in resmemberlist" << std::endl;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
     }
@@ -294,7 +294,7 @@ db_res *MySQLServer::resresolist_1_svc(db_res *recev)
 //
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to the database" << std::endl;
+	std::cout << "I'm not connected to the database" << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -318,7 +318,7 @@ db_res *MySQLServer::resresolist_1_svc(db_res *recev)
 
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return (&browse_back);
     }
@@ -347,7 +347,7 @@ db_res *MySQLServer::resresolist_1_svc(db_res *recev)
 #if 0
     if (reso_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
     {
-	std::cerr << "Memory allocation error in resresolist" << std::endl;
+	std::cout << "Memory allocation error in resresolist" << std::endl;
 	browse_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&browse_back);
     }
@@ -391,7 +391,7 @@ db_res *MySQLServer::resresoval_1_svc(db_res *recev)
 //
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to the database" << std::endl;
+	std::cout << "I'm not connected to the database" << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -409,7 +409,7 @@ db_res *MySQLServer::resresoval_1_svc(db_res *recev)
     query += (" ORDER BY MEMBER ASC, NAME ASC, COUNT ASC");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return (&browse_back);
     }
@@ -461,7 +461,7 @@ db_res *MySQLServer::resresoval_1_svc(db_res *recev)
 #if 0
     if (reso_val.copy_to_C(browse_back.res_val.arr1_val) != 0)
     {
-	std::cerr << "Memory allocation error in resresoval" << std::endl;
+	std::cout << "Memory allocation error in resresoval" << std::endl;
 	browse_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&browse_back);
     }

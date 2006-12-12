@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2006-09-25 08:13:00 $
+ * Date:	$Date: 2006-12-12 17:23:08 $
  *
  */
 
@@ -70,7 +70,7 @@ db_psdev_error *MySQLServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
 //
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	psdev_back.error_code = DbErr_DatabaseNotConnected;
 	return(&psdev_back);
     }
@@ -135,7 +135,7 @@ long MySQLServer::reg_ps(std::string h_name, long pid, std::string ps_name, long
     	query = "SELECT COUNT(*) FROM device WHERE NAME = '" + ps_name_low + "' AND CLASS NOT LIKE 'PseudoDevice'";
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
-		std::cerr << mysql_error(mysql_conn) << std::endl; 
+		std::cout << mysql_error(mysql_conn) << std::endl; 
 		*p_error = DbErr_DatabaseAccess;
 		return(-1);
 	}
@@ -178,7 +178,7 @@ long MySQLServer::reg_ps(std::string h_name, long pid, std::string ps_name, long
 //
 // In case of error 
 //
-	    std::cerr << mysql_error(mysql_conn) << std::endl;
+	    std::cout << mysql_error(mysql_conn) << std::endl;
 	    throw long(DbErr_DatabaseAccess);
         }
 #if !HAVE_SSTREAM
@@ -258,7 +258,7 @@ db_psdev_error *MySQLServer::db_psdev_unreg_1_svc(arr1 *rece)
 //
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	psdev_back.error_code = DbErr_DatabaseNotConnected;
 	return(&psdev_back);
     }
@@ -318,7 +318,7 @@ long MySQLServer::unreg_ps(std::string ps_name, long *p_error)
     query = "DELETE FROM device WHERE NAME = '" + ps_name_low + "'";
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	*p_error = DbErr_DatabaseAccess;
 	return (-1);
     }

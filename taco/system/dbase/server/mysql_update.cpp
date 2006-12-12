@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2006-09-25 08:14:12 $
+ * Date:	$Date: 2006-12-12 17:23:09 $
  *
  */
 
@@ -115,7 +115,7 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 #endif /* DEBUG */
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
-	    std::cerr << mysql_error(mysql_conn) << std::endl;
+	    std::cout << mysql_error(mysql_conn) << std::endl;
 	    psdev_back.error_code = DbErr_DatabaseAccess;
 	    psdev_back.psdev_err = i + 1;
 	    return (&psdev_back);
@@ -136,13 +136,13 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
         for (std::vector<std::string>::iterator it = db_dev_list.begin(); it != db_dev_list.end(); ++it)
 	{
 #ifdef DEBUG
-	    std::cerr << " Device = " << *it; 
+	    std::cout << " Device = " << *it; 
 #endif
 	    std::vector<std::string>::iterator	it2;  
 	    if ((it2 = find(dev_list.begin(), dev_list.end(), *it)) != dev_list.end())
 	    {
 #ifdef DEBUG
-		std::cerr << " found." << std::endl;	
+		std::cout << " found." << std::endl;	
 #endif
 	        switch(psdev_back.error_code = db_update_names(ds_class, ds_name, ind, *it))
 	    	{
@@ -157,7 +157,9 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 	    }
 	    else
 	    {
-		std::cerr << " not found." << std::endl;
+#ifdef DEBUG
+		std::cout << " not found." << std::endl;
+#endif
 		switch(psdev_back.error_code = db_delete_names(ds_class, ds_name, ind, *it))
 		{
 		    case DbErr_BadResourceType: 	
@@ -167,7 +169,7 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 		}
 	    }
 #ifdef DEBUG
-	    std::cerr << " Return = " << psdev_back.error_code << std::endl;
+	    std::cout << " Return = " << psdev_back.error_code << std::endl;
 #endif
 	}
 //
@@ -188,7 +190,7 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 			query = "DELETE FROM device WHERE NAME = '" + *it + "'";
 			if (mysql_query(mysql_conn, query.c_str()) != 0)
                         {
-				std::cerr << mysql_error(mysql_conn) << std::endl;
+				std::cout << mysql_error(mysql_conn) << std::endl;
 				psdev_back.error_code = DbErr_DatabaseAccess;
 				psdev_back.psdev_err = i + 1;
 				return (&psdev_back);
@@ -251,7 +253,7 @@ long MySQLServer::db_delete_names(const std::string ds_class, const std::string 
                          + "' AND NAME = '" + dev_name + "'";
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << __LINE__ << mysql_error(mysql_conn) << std::endl;
+	std::cout << __LINE__ << mysql_error(mysql_conn) << std::endl;
 	return DbErr_DatabaseAccess;
     }
     if (mysql_affected_rows(mysql_conn) == 1)
@@ -304,7 +306,7 @@ long MySQLServer::db_insert_names(const std::string ds_class, const std::string 
     if (mysql_query(mysql_conn, query.str().c_str()) != 0)
 #endif
     {
-	std::cerr << __LINE__ << mysql_error(mysql_conn) << std::endl;
+	std::cout << __LINE__ << mysql_error(mysql_conn) << std::endl;
 #if !HAVE_SSTREAM
 	query.freeze(false);
 #endif
@@ -529,8 +531,8 @@ long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
         query += " AND NAME = '" + name + "'";
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
-	    std::cerr << __LINE__ << mysql_error(mysql_conn) << std::endl;
-	    std::cerr << query.c_str() << std::endl;
+	    std::cout << __LINE__ << mysql_error(mysql_conn) << std::endl;
+	    std::cout << query.c_str() << std::endl;
 	    *p_err = DbErr_DatabaseAccess;
 	    return(-1);
 	}
@@ -554,8 +556,8 @@ long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
 		if (mysql_query(mysql_conn, query.str().c_str()) != 0)
 #endif
 		{
-			std::cerr << __LINE__ << mysql_error(mysql_conn) << std::endl;
-			std::cerr << query.str() << std::endl;
+			std::cout << __LINE__ << mysql_error(mysql_conn) << std::endl;
+			std::cout << query.str() << std::endl;
 #if !HAVE_SSTREAM
 			query.freeze(false);
 #endif

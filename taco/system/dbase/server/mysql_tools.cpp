@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jlpons $
  *
- * Version:	$Revision: 1.21 $
+ * Version:	$Revision: 1.22 $
  *
- * Date:	$Date: 2006-12-12 12:21:44 $
+ * Date:	$Date: 2006-12-12 17:23:08 $
  *
  */
 
@@ -78,7 +78,7 @@ db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
     }
     catch (std::bad_alloc)
     {
-	std::cerr << "Memory allocation error in devinfo" << std::endl;
+	std::cout << "Memory allocation error in devinfo" << std::endl;
 	sent_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&sent_back);
     }
@@ -87,7 +87,7 @@ db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
 //
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to database" << std::endl;
+	std::cout << "I'm not connected to database" << std::endl;
 	sent_back.db_err = DbErr_DatabaseNotConnected;
 	return(&sent_back);
     }
@@ -223,7 +223,7 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 //
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to database" << std::endl;
+	std::cout << "I'm not connected to database" << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -276,7 +276,7 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 	}
 	else
 	{
-	    std::cerr << mysql_error(mysql_conn) << std::endl;
+	    std::cout << mysql_error(mysql_conn) << std::endl;
 	    browse_back.db_err = DbErr_DatabaseAccess;
 	    return (&browse_back);
 	}
@@ -308,7 +308,7 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 		delete [] browse_back.res_val.arr1_val;
 	    delete [] browse_back.res_val.arr1_val;
 			
-	    std::cerr << "Memory allocation error in devres_svc" << std::endl;
+	    std::cout << "Memory allocation error in devres_svc" << std::endl;
 	    browse_back.db_err = DbErr_ServerMemoryAllocation;
 	    return(&browse_back);
 	}
@@ -345,7 +345,7 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
 
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -363,7 +363,7 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
     
     if (mysql_query(mysql_conn, (query + where).c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	errcode = DbErr_DatabaseAccess;
 	return (&errcode);
     }
@@ -380,7 +380,7 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
     	query = "DELETE FROM device "; 
     	if (mysql_query(mysql_conn, (query + where).c_str()) != 0)
     	{
-	    std::cerr << mysql_error(mysql_conn) << std::endl;
+	    std::cout << mysql_error(mysql_conn) << std::endl;
 	    errcode = DbErr_DatabaseAccess;
 	    return (&errcode);
     	}
@@ -427,7 +427,7 @@ db_psdev_error *MySQLServer::devdelres_1_svc(db_res *recev)
 //
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	psdev_back.error_code = DbErr_DatabaseNotConnected;
 	return(&psdev_back);
     }
@@ -449,7 +449,7 @@ db_psdev_error *MySQLServer::devdelres_1_svc(db_res *recev)
 	query = "DELETE FROM property_device WHERE DEVICE = '" + in_dev + "'";
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
-	    std::cerr << mysql_error(mysql_conn) << std::endl;
+	    std::cout << mysql_error(mysql_conn) << std::endl;
 	    psdev_back.error_code = DbErr_DatabaseAccess;
 	    psdev_back.psdev_err = i;
 	    return (&psdev_back);
@@ -513,7 +513,7 @@ db_info_svc *MySQLServer::info_1_svc()
 //
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	info_back.db_err = DbErr_DatabaseNotConnected;
 	return(&info_back);
     }
@@ -524,7 +524,7 @@ db_info_svc *MySQLServer::info_1_svc()
     query = "SELECT DOMAIN, COUNT(*) FROM device WHERE EXPORTED != 0 GROUP BY DOMAIN";
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	info_back.db_err = DbErr_DatabaseAccess;
 	return (&info_back);
     }
@@ -546,7 +546,7 @@ db_info_svc *MySQLServer::info_1_svc()
     query = "SELECT DOMAIN, COUNT(*) FROM device WHERE EXPORTED = 0 GROUP BY domain";
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	info_back.db_err = DbErr_DatabaseAccess;
 	return (&info_back);
     }
@@ -573,7 +573,7 @@ db_info_svc *MySQLServer::info_1_svc()
     query = "SELECT COUNT(*) FROM device WHERE IOR LIKE 'DC:%'";
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     { 
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	info_back.db_err = DbErr_DatabaseAccess;
 	return (&info_back);
     }
@@ -587,7 +587,7 @@ db_info_svc *MySQLServer::info_1_svc()
     query = "SELECT DOMAIN, COUNT(*) FROM property_device GROUP BY domain";
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	info_back.db_err = DbErr_DatabaseAccess;
 	return (&info_back);
     }
@@ -662,7 +662,7 @@ long *MySQLServer::unreg_1_svc(db_res *recev)
 //
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -674,7 +674,7 @@ long *MySQLServer::unreg_1_svc(db_res *recev)
     query += (" WHERE SERVER = '" + user_ds_name + "/" + user_pers_name + "'");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
    	errcode = DbErr_DatabaseAccess;
 	return (&errcode);
     }
@@ -711,7 +711,7 @@ long *MySQLServer::unreg_1_svc(db_res *recev)
 
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	errcode = DbErr_DatabaseAccess;
 	return (&errcode);
     }
@@ -774,7 +774,7 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
     }
     catch (std::bad_alloc)
     {
-	std::cerr << "memory allocation error in svc_info" << std::endl;
+	std::cout << "memory allocation error in svc_info" << std::endl;
 	svcinfo_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&svcinfo_back);
     }
@@ -783,7 +783,7 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 //
     if (dbgen.connected == false)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	svcinfo_back.db_err = DbErr_DatabaseNotConnected;
 	return(&svcinfo_back);
     }
@@ -797,7 +797,7 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 	    
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	svcinfo_back.db_err = DbErr_DatabaseAccess;
 	return (&svcinfo_back);
     }
@@ -870,7 +870,7 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 	    
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	svcinfo_back.db_err = DbErr_DatabaseAccess;
 	return (&svcinfo_back);
     }
@@ -903,7 +903,7 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
       if (mysql_query(mysql_conn, query.c_str()) != 0)
       {
         mysql_free_result(result);
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	svcinfo_back.db_err = DbErr_DatabaseAccess;
 	return (&svcinfo_back);
       }
@@ -969,7 +969,7 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
 //
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -986,7 +986,7 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
 	    
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	errcode = DbErr_DatabaseAccess;
 	return (&errcode);
     }
@@ -1015,7 +1015,7 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
         if (mysql_query(mysql_conn, query.c_str()) != 0)
         {
           mysql_free_result(result);
-          std::cerr << mysql_error(mysql_conn) << std::endl;
+          std::cout << mysql_error(mysql_conn) << std::endl;
           errcode = DbErr_DatabaseAccess;
           return (&errcode);
         }
@@ -1026,7 +1026,7 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
       if (mysql_query(mysql_conn, query.c_str()) != 0)
       {
         mysql_free_result(result);
-        std::cerr << mysql_error(mysql_conn) << std::endl;
+        std::cout << mysql_error(mysql_conn) << std::endl;
         errcode = DbErr_DatabaseAccess;
         return (&errcode);
       }
@@ -1082,7 +1082,7 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
     }
     catch (std::bad_alloc)
     {
-	std::cerr << "Memory allocation error in devinfo" << std::endl;
+	std::cout << "Memory allocation error in devinfo" << std::endl;
 	poll_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&poll_back);
     }
@@ -1091,7 +1091,7 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
 //
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	poll_back.db_err = DbErr_DatabaseNotConnected;
 	return(&poll_back);
     }
@@ -1116,7 +1116,7 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
     query += (" name = '" + std::string(POLL_RES) + "' AND UPPER(value) = UPPER('" + user_device + "')");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	poll_back.db_err = DbErr_DatabaseAccess;
 	return (&poll_back);
     }
@@ -1147,7 +1147,7 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
     query += (" WHERE NAME = '" + poller_name + "'");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	poll_back.db_err = DbErr_DatabaseAccess;
 	return (&poll_back);
     }

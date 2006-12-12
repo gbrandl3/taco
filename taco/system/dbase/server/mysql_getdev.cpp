@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2006-09-27 13:01:41 $
+ * Date:	$Date: 2006-12-12 17:23:08 $
  *
  */
 
@@ -66,7 +66,7 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 //
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to database" << std::endl;
+	std::cout << "I'm not connected to database" << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	browse_back.res_val.arr1_len = 0;
 	return(&browse_back);
@@ -138,7 +138,7 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 	case 0 : domain = tmpf;		
 		 query += (" DOMAIN LIKE '" + tmpf + "' AND");
 		 break;
-	default: std::cerr << "To many '/' in device name." << std::endl;
+	default: std::cout << "To many '/' in device name." << std::endl;
 		 browse_back.db_err = 1;
 		 browse_back.res_val.arr1_len = 0;
 		 return (&browse_back);		 		 

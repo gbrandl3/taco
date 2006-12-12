@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2005-07-25 08:35:49 $
+ * Date:	$Date: 2006-12-12 17:23:08 $
  *
  */
 
@@ -58,7 +58,7 @@ cmd_que *MySQLServer::db_cmd_query_1_svc(nam *pcmd_name)
 //
     if (!dbgen.connected)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	cmd_queue.db_err = DbErr_DatabaseNotConnected;
 	cmd_queue.xcmd_code = 0;
 	return(&cmd_queue);
@@ -83,7 +83,7 @@ cmd_que *MySQLServer::db_cmd_query_1_svc(nam *pcmd_name)
     query += ("DOMAIN = 'cmds' AND VALUE = '" + req_cmd + "'");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	cmd_queue.db_err = DbErr_DatabaseAccess;
 	cmd_queue.xcmd_code = 0;
 	return (&cmd_queue);

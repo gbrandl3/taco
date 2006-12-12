@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jlpons $
  *
- * Version:	$Revision: 1.14 $
+ * Version:	$Revision: 1.15 $
  *
- * Date:	$Date: 2006-09-15 16:42:40 $
+ * Date:	$Date: 2006-12-12 17:23:08 $
  *
  */
 
@@ -311,7 +311,7 @@ int MySQLServer::db_find(std::string tab_name, std::string p_res_name, char **ou
 #endif /* DEBUG */
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	return (DbErr_DatabaseAccess);
     }
 	MYSQL_RES	*result = mysql_store_result(mysql_conn);
@@ -363,7 +363,7 @@ int MySQLServer::db_find(std::string tab_name, std::string p_res_name, char **ou
 	}
 	catch(const std::bad_alloc &e)
 	{
-		std::cerr << "Error in malloc for out" << std::endl;
+		std::cout << "Error in malloc for out" << std::endl;
 		throw e;
 	}
 //
@@ -426,7 +426,7 @@ int MySQLServer::db_devlist(std::string dev_na, int *dev_num, db_res *back)
     
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	return (DbErr_DatabaseAccess);
     }
     
@@ -519,7 +519,7 @@ DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
 	res_name = tmp_ptr->res_name;
 
 	if (db_del(res_name) != 0)
-	    std::cerr << "Could not delete resource" << res_name << std::endl;
+	    std::cout << "Could not delete resource" << res_name << std::endl;
 	res_val = tmp_ptr->res_val;
 //
 // Try to retrieve this resource from the database 
@@ -536,7 +536,7 @@ DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
 //
 		if ((pos = res_val.find(SEP_ELT)) == std::string::npos)
 		{
-			std::cerr << "Missing '" << SEP_ELT <<"' in resource value." << std::endl;
+			std::cout << "Missing '" << SEP_ELT <<"' in resource value." << std::endl;
 			errcode = DbErr_BadDevSyntax;
 			return (&errcode);
 		}
@@ -638,7 +638,7 @@ DevLong *MySQLServer::db_delres_1_svc(arr1 *rece/*, struct svc_req *rqstp*/)
 	if((errcode = db_del(rece->arr1_val[i])) != 0 )
 	{
 	    dbgen.connected = True;
-	    std::cerr << "Could not delete resource " << rece->arr1_val[i] << std::endl;
+	    std::cout << "Could not delete resource " << rece->arr1_val[i] << std::endl;
 	    return(&errcode);
     	}
     }
@@ -672,7 +672,7 @@ int MySQLServer::db_insert(std::string res_name, std::string number, std::string
 //
     if ((pos = res_name.find('/')) == std::string::npos)
     {
-	std::cerr << "db_del : Error in resource name " << res_name << std::endl;
+	std::cout << "db_del : Error in resource name " << res_name << std::endl;
 	return(DbErr_BadResourceType);
     }
     domain = res_name.substr(0, pos);
@@ -681,7 +681,7 @@ int MySQLServer::db_insert(std::string res_name, std::string number, std::string
 //
     if ((pos = res_name.find('/', (last_pos = pos + 1))) == std::string::npos)
     {
-	std::cerr << "db_insert : Error in resource name " << res_name << std::endl;
+	std::cout << "db_insert : Error in resource name " << res_name << std::endl;
 	return(DbErr_BadResourceType);
     }
     family = res_name.substr(last_pos, pos - last_pos);
@@ -690,7 +690,7 @@ int MySQLServer::db_insert(std::string res_name, std::string number, std::string
 //
     if ((pos = res_name.find('/', (last_pos = pos + 1))) == std::string::npos)
     {
-	std::cerr << "db_insert : Error in resource name " <<res_name << std::endl;
+	std::cout << "db_insert : Error in resource name " <<res_name << std::endl;
 	return(DbErr_BadResourceType);
     }
     member = res_name.substr(last_pos, pos - last_pos);
@@ -722,12 +722,12 @@ int MySQLServer::db_insert(std::string res_name, std::string number, std::string
 #endif /* DEBUG */
     if (mysql_query(mysql_conn, query.c_str()))
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	return (DbErr_DatabaseAccess);
     }
     if ((i = mysql_affected_rows(mysql_conn)) != 1)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	return (DbErr_DatabaseAccess);
     }
     return 0;
@@ -755,7 +755,7 @@ int MySQLServer::db_del(std::string res_name)
 //
     if ((pos = res_name.find('/')) == std::string::npos)
     {
-	std::cerr << "db_del : Error in resource name " << res_name << std::endl;
+	std::cout << "db_del : Error in resource name " << res_name << std::endl;
 	return(DbErr_BadResourceType);
     }
     t_name = res_name.substr(0, pos);
@@ -764,7 +764,7 @@ int MySQLServer::db_del(std::string res_name)
 //
     if ((pos = res_name.find('/', 1 + (last_pos = pos))) == std::string::npos)
     {
-	std::cerr << "db_del : Error in resource name " << res_name << std::endl;
+	std::cout << "db_del : Error in resource name " << res_name << std::endl;
 	return(DbErr_BadResourceType);
     }
     family = res_name.substr(last_pos + 1, pos - last_pos - 1);
@@ -773,7 +773,7 @@ int MySQLServer::db_del(std::string res_name)
 //
     if ((pos = res_name.find('/', 1 + (last_pos = pos))) == std::string::npos)
     {
-	std::cerr << "db_del : Error in resource name " <<res_name << std::endl;
+	std::cout << "db_del : Error in resource name " <<res_name << std::endl;
 	return(DbErr_BadResourceType);
     }
     member = res_name.substr(last_pos + 1, pos - last_pos - 1);
@@ -810,12 +810,12 @@ int MySQLServer::db_del(std::string res_name)
 
     if (mysql_query(mysql_conn, query.c_str()))
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	return (DbErr_DatabaseAccess);
     }
     if ((i = mysql_affected_rows(mysql_conn)) == -1)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	return (DbErr_DatabaseAccess);
     }
     return(0);

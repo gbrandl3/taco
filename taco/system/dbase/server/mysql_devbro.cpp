@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2005-07-25 08:36:24 $
+ * Date:	$Date: 2006-12-12 17:23:08 $
  *
  */
 
@@ -60,7 +60,7 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
 //
     if (!dbgen.connected)
     {
-	std::cerr << "I'm not connected to the database" << std::endl;
+	std::cout << "I'm not connected to the database" << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -73,7 +73,7 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
 #endif /* DEBUG */
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return (&browse_back);
     }
@@ -136,7 +136,7 @@ db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
 //
     if (!dbgen.connected)
     {
-	std::cerr << "I'm not connected to the database" << std::endl;
+	std::cout << "I'm not connected to the database" << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -149,7 +149,7 @@ db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
 #endif /* DEBUG */
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return (&browse_back);
     }
@@ -215,7 +215,7 @@ db_res *MySQLServer::devmemberlist_1_svc(db_res *recev)
 //
     if (!dbgen.connected)
     {
-	std::cerr << "I'm not connected to the database" << std::endl;
+	std::cout << "I'm not connected to the database" << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -229,7 +229,7 @@ db_res *MySQLServer::devmemberlist_1_svc(db_res *recev)
 #endif /* DEBUG */
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return (&browse_back);
     }

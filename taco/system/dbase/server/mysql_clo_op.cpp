@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2005-07-25 08:35:26 $
+ * Date:	$Date: 2006-12-12 17:23:08 $
  *
  */
 
@@ -52,7 +52,7 @@ DevLong *MySQLServer::db_clodb_1_svc(void)
 //
     if (!dbgen.connected)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -84,7 +84,7 @@ DevLong *MySQLServer::db_reopendb_1_svc(void)
 //
     if ((mysql_conn = mysql_real_connect(&mysql, "localhost", mysql_user.c_str(), mysql_passwd.c_str(), mysql_db.c_str(), 0, NULL, 0)) == NULL)
     {
-        std::cerr << mysql_error(&mysql) << std::endl;
+        std::cout << mysql_error(&mysql) << std::endl;
 	errcode = DbErr_DatabaseAccess;
         return (&errcode);
     }

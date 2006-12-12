@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2005-07-25 08:36:45 $
+ * Date:	$Date: 2006-12-12 17:23:08 $
  *
  */
 
@@ -61,7 +61,7 @@ event_que *MySQLServer::db_event_query_1_svc(nam *pevent_name)
 //
     if (!dbgen.connected)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	event_queue.db_err = DbErr_DatabaseNotConnected;
 	event_queue.xevent_code = 0;
 	return(&event_queue);

@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: jlpons $
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:	$Date: 2005-07-25 08:38:10 $
+ * Date:	$Date: 2006-12-12 17:23:08 $
  *
  */
 
@@ -61,7 +61,7 @@ db_res *MySQLServer::devserverlist_1_svc()
 //
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -75,7 +75,7 @@ db_res *MySQLServer::devserverlist_1_svc()
     query = "SELECT DISTINCT SUBSTRING_INDEX(SERVER,'/',1) FROM device ORDER BY SERVER ASC";
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return(&browse_back);			
     }
@@ -105,7 +105,7 @@ db_res *MySQLServer::devserverlist_1_svc()
 #if 0
     if (serv_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
     {
-	std::cerr << "Memory allocation error in devserverlist" << std::endl;
+	std::cout << "Memory allocation error in devserverlist" << std::endl;
 	browse_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&browse_back);
     }
@@ -145,7 +145,7 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
 //
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -161,7 +161,7 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
     query += (user_server + "/%' ORDER BY SERVER ASC");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cerr << mysql_error(mysql_conn) << std::endl;
+	std::cout << mysql_error(mysql_conn) << std::endl;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return(&browse_back);			
     }
@@ -191,7 +191,7 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
 #if 0
     if (pers_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
     {
-		std::cerr << "Memory allocation error in devpersnamelist" << std::endl;
+		std::cout << "Memory allocation error in devpersnamelist" << std::endl;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
     }
@@ -240,7 +240,7 @@ db_res *MySQLServer::hostlist_1_svc()
 	query = "SELECT DISTINCT HOST FROM device WHERE EXPORTED != 0 ORDER BY HOST ASC";
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
-		std::cerr << mysql_error(mysql_conn) << std::endl;
+		std::cout << mysql_error(mysql_conn) << std::endl;
 		browse_back.db_err = DbErr_DatabaseAccess;
 		return(&browse_back);			
 	}
@@ -265,7 +265,7 @@ db_res *MySQLServer::hostlist_1_svc()
 #if 0
 	if (host_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
 	{
-		std::cerr << "Memory allocation error in hostlist" << std::endl;
+		std::cout << "Memory allocation error in hostlist" << std::endl;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}

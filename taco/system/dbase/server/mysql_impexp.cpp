@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jlpons $
  *
- * Version:	$Revision: 1.15 $
+ * Version:	$Revision: 1.16 $
  *
- * Date:	$Date: 2006-12-12 12:21:44 $
+ * Date:	$Date: 2006-12-12 17:23:08 $
  *
  */
 
@@ -66,7 +66,7 @@ DevLong *MySQLServer::db_devexp_1_svc(tab_dbdev *rece)
 //
     if (!dbgen.connected)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -118,7 +118,7 @@ DevLong *MySQLServer::db_devexp_2_svc(tab_dbdev_2 *rece)
 //
     if (!dbgen.connected)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -174,7 +174,7 @@ DevLong *MySQLServer::db_devexp_3_svc(tab_dbdev_3 *rece)
 //
     if (dbgen.connected == False)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -227,7 +227,7 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
 //
     if (!dbgen.connected)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	back.db_imperr = DbErr_DatabaseNotConnected;
 	back.imp_dev.tab_dbdev_len = 0;
 	back.imp_dev.tab_dbdev_val = NULL;
@@ -392,7 +392,7 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
 //
     if (!dbgen.connected)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -480,7 +480,7 @@ svc_inf *MySQLServer::db_svcchk_1_svc(nam *dsn_name)
 //
     if (!dbgen.connected)
     {
-	std::cerr << "I'm not connected to database." << std::endl;
+	std::cout << "I'm not connected to database." << std::endl;
 	svc_info.db_err = DbErr_DatabaseNotConnected;
 	return(&svc_info);
     }
@@ -699,7 +699,7 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
     }
     catch(const long err)
     {
-	//std::cerr << "MySQLServer::db_store(): error = " << mysql_error(mysql_conn) << std::endl;
+	//std::cout << "MySQLServer::db_store(): error = " << mysql_error(mysql_conn) << std::endl;
     	if (enable_logging) logStream << getTimeString("MySQLServer::db_store()") << " error = " << mysql_error(mysql_conn) << std::endl;
 	throw err;
     }
