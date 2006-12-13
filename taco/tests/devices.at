@@ -82,7 +82,7 @@ AT_CLEANUP
 AT_SETUP([Start AGPSpp device server ])
 AT_CHECK([taco AGPSpp 1 -m -d 
 sleep 1
-printf "%d\n" `ps x | grep Inst_verify | grep -v grep | wc -l`], [],
+printf "%d\n" `ps x | grep AGPSpp | grep -v grep | wc -l`], [],
 [[1
 ]])
 AT_CLEANUP
