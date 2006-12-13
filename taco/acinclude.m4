@@ -816,6 +816,11 @@ AC_DEFUN([TACO_FRM_EXT],
                         *)      AC_MSG_ERROR([bad value ${enable_ext} for --enable-ext]);;
                 esac], [taco_ext=no])
         AM_CONDITIONAL(BUILD_EXT, [test x"${taco_ext}" = x"yes"])
+	if test x"${taco_ext}" = x"yes" ; then
+		SWIG_PYTHON
+	else
+		AM_CONDITIONAL(BUILD_PYTHON, false)
+	fi
 ])
 
 AC_DEFUN([AC_PROG_RM],
