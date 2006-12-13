@@ -10,7 +10,14 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_INSTALL
 AM_PROG_LIBTOOL
-AC_CHECK_PROG([MAKEINDEX], [makeindex])
+AC_CHECK_PROGS([MAKEINDEX], [makeindex], [:])
+AC_CHECK_PROGS([MAKEINFO], [makeinfo], [:])
+AC_CHECK_PROGS([TEXI2DVI], [texi2dvi], [:])
+if test $TEXI2DVI != ":" ; then
+	AC_CHECK_PROGS([DVIPS], [dvips], [:])
+else
+	AC_SUBST([DVIPS], [:])
+fi
 
 AC_ARG_ENABLE(compat, AC_HELP_STRING([--disable-compat], [disable compatibility mode to ndbm and dbm @<:@default=enabled@:>@]),
 	[], [enable_compat=yes])
