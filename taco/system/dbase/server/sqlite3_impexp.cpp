@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-11-12 16:45:58 $
+ * Date:	$Date: 2006-12-13 16:04:37 $
  *
  */
 
@@ -543,13 +543,6 @@ svc_inf *SQLite3Server::db_svcchk_1_svc(nam *dsn_name)
  */
 int SQLite3Server::db_store(db_devinfo &dev_stu)
 {
-	std::string tmp = dev_stu.dev_name; 
-	std::string::size_type pos = tmp.find('/');
-	std::string domain = tmp.substr(0, pos);
-	tmp.erase(0, pos + 1);
-	pos = tmp.find('/');
-	std::string family = tmp.substr(0, pos);
-	std::string member = tmp.substr(pos + 1);
 //
 // Try to retrieve the right tuple in the NAMES table 
 //
@@ -559,8 +552,7 @@ int SQLite3Server::db_store(db_devinfo &dev_stu)
           << " VERSION = '" << dev_stu.v_num << "',"
           << " CLASS = '" << dev_stu.dev_class << "',"
           << " PID = 0 , SERVER = 'unknown'"
-          << " WHERE DOMAIN = '" << domain << "' AND FAMILY = '" << family << "' AND  MEMBER = '" << member << "'"
-	  << std::ends; 	
+          << " WHERE NAME = '" << dev_stu.dev_name << "'" << std::ends; 	
 #ifdef DEBUG
 	std::cout << "SQLite3Server::db_store() : " << query << std::endl;
 #endif
@@ -598,13 +590,6 @@ int SQLite3Server::db_store(db_devinfo &dev_stu)
  */
 int SQLite3Server::db_store(db_devinfo_2 &dev_stu)
 {
-	std::string tmp = dev_stu.dev_name; 
-	std::string::size_type pos = tmp.find('/');
-	std::string domain = tmp.substr(0, pos);
-	tmp.erase(0, pos + 1);
-	pos = tmp.find('/');
-	std::string family = tmp.substr(0, pos);
-	std::string member = tmp.substr(pos + 1);
 //
 // Try to retrieve the right tuple in the NAMES table 
 //
@@ -614,8 +599,7 @@ int SQLite3Server::db_store(db_devinfo_2 &dev_stu)
           << " VERSION = '" << dev_stu.v_num << "',"
           << " CLASS = '" << dev_stu.dev_class << "',"
           << " PID = " << dev_stu.pid << ", SERVER = 'unknown'"
-          << " WHERE DOMAIN = '" << domain << "' AND FAMILY = '" << family << "' AND  MEMBER = '" << member << "'"
-	  << std::ends; 	
+          << " WHERE NAME = '" << dev_stu.dev_name << "'" << std::ends; 	
 
     try
     {
@@ -683,13 +667,6 @@ int SQLite3Server::db_store(db_devinfo_3 &dev_stu)
     	}
 	sqlite3_free_table(result);
 
-	std::string tmp = dev_stu.dev_name; 
-	std::string::size_type pos = tmp.find('/');
-	std::string domain = tmp.substr(0, pos);
-	tmp.erase(0, pos + 1);
-	pos = tmp.find('/');
-	std::string family = tmp.substr(0, pos);
-	std::string member = tmp.substr(pos + 1);
 //
 // Try to retrieve the right tuple in the NAMES table 
 //
@@ -701,8 +678,7 @@ int SQLite3Server::db_store(db_devinfo_3 &dev_stu)
 //        << " PID = " << dev_stu.pid << ", SERVER = '" << dev_stu.proc_name << "'"
           << " PID = " << dev_stu.pid << "," << " EXPORTED = 1," 
 	  << " STARTED = DATETIME('NOW')"
-          << " WHERE DOMAIN = '" << domain << "' AND FAMILY = '" << family << "' AND  MEMBER = '" << member << "'"
-	  << std::ends; 	
+          << " WHERE NAME = '" << dev_stu.dev_name << "'" << std::ends; 	
     if (enable_logging) logStream << getTimeString("SQLite3Server::db_store()") << " query = " << query.str() << std::endl;
     if (enable_logging) logStream.flush();
     try

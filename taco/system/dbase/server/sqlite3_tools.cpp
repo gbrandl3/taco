@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2006-10-25 10:58:41 $
+ * Date:	$Date: 2006-12-13 16:04:37 $
  *
  */
 
@@ -1147,7 +1147,7 @@ db_poller_svc *SQLite3Server::getpoller_1_svc(nam *dev)
 // get poller device info from the NAMES table
 //
 	query = "SELECT SERVER, HOST, PID FROM device";
-	query += (" WHERE CONCAT(DOMAIN, '/', FAMILY, '/', MEMBER) = '" + poller_name + "'");
+	query += (" WHERE NAME = '" + poller_name + "'");
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		std::cout << sqlite3_errmsg(db) << std::endl;
