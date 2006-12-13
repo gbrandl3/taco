@@ -15,7 +15,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-SUBDIRS = include src python res doc
+SUBDIRS = include src res doc
+
+if BUILD_PYTHON
+SUBDIRS += python 
+endif
 
 ACLOCAL_AMFLAGS = -I m4 -I @DSHOME@/share/aclocal
 
