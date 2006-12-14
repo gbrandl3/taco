@@ -42,7 +42,9 @@ CREATE TABLE device (
   version varchar(8) default NULL,
   started datetime default NULL,
   stopped datetime default NULL,
-  comment text
+  comment text,
+  KEY index_name (name(64),alias(64)),
+  KEY index_server (server(64))
 ) TYPE=MyISAM;
 
 --
@@ -152,7 +154,10 @@ CREATE TABLE property_device (
   updated timestamp(14) NOT NULL,
   accessed timestamp(14) NOT NULL,
   comment text,
-  KEY index_resource (device(64),name(64),count)
+  KEY index_resource (device(64),name(64),count),
+  KEY index_domain(domain(64)),
+  KEY index_family(family(64)),
+  KEY index_member(member(64))  
 ) TYPE=MyISAM;
 
 --
