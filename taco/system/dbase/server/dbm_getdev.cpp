@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.14 $
+ * Version:	$Revision: 1.15 $
  *
- * Date:	$Date: 2005-07-25 08:29:37 $
+ * Date:	$Date: 2006-12-15 12:43:53 $
  *
  */
 
@@ -150,11 +150,9 @@ db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
                         break;
         }
 
-#ifdef DEBUG
-	std::cout << "filter domain : " << domain << std::endl;
-	std::cout << "filter family : " << family << std::endl;
-	std::cout << "filter member : " << member << std::endl;
-#endif /* DEBUG */
+	logStream->debugStream() << "filter domain : " << domain << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "filter family : " << family << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "filter member : " << member << log4cpp::CategoryStream::ENDLINE;
 
 	browse_back.db_err = 0;
 	browse_back.res_val.arr1_len = 0;
@@ -214,7 +212,7 @@ db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 				temp = key.dptr;
 				if ((pos = temp.find('|')) == std::string::npos)
 				{
-					std::cerr << "No separator in db tuple" << std::endl;
+					logStream->errorStream() << "No separator in db tuple" << log4cpp::CategoryStream::ENDLINE;
 					browse_back.db_err = DbErr_DatabaseAccess;
 					browse_back.res_val.arr1_len = 0;
 					free(key.dptr);
@@ -231,9 +229,9 @@ db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
                                 temp = dev.d_name;
                                 pos = temp.find('/');
                                 std::string domain_tup =  temp.substr(0, pos);
-#ifdef DEBUG
-				std::cout << "Domain part from DB: " << domain_tup << std::endl;
-#endif /* DEBUG */
+
+				logStream->debugStream() << "Domain part from DB: " << domain_tup << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Call the stringOK function to verify that the retrieved devices device name is OK
 // If the domain part of the filter is *, directly call the fam_fil  function
@@ -292,9 +290,9 @@ char* NdbmServer::fam_fil(device *dev1, const std::string &family, const std::st
 // If the family part of the filter is *, directly call the memb_fil
 // function 
 //
-#ifdef DEBUG
-	std::cout << "Arrived in fam_fil function" << std::endl;
-#endif 
+
+	logStream->debugStream() << "Arrived in fam_fil function" << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Extract the family part of the device name in the retrieved tuple 
 //
@@ -307,9 +305,9 @@ char* NdbmServer::fam_fil(device *dev1, const std::string &family, const std::st
 	std::string::size_type	first = tmp.find('/'),
 				second = tmp.rfind('/');
 	std::string 		family_tup = tmp.substr(first + 1, second - first);
-#ifdef DEBUG
-	std::cerr << "Family part from DB : " << family_tup << 	std::endl;
-#endif
+
+	logStream->debugStream() << "Family part from DB : " << family_tup << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Special case for the data collector pseudo devices which are not real 
 // devices. It is impossible to execute command on them. So, don't return
@@ -350,9 +348,9 @@ char *NdbmServer::memb_fil(device *dev2, const std::string &member, int prot) th
 // the user. This means copy the device name in the special array (allocate
 // memory for the string) and increment the device name counter 
 //
-#ifdef DEBUG
-	std::cout << "Arrived in memb_fil function" << std::endl;
-#endif 
+
+	logStream->debugStream() << "Arrived in memb_fil function" << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Extract the member part of the device name in the retrieved tuple */
 //
@@ -363,9 +361,9 @@ char *NdbmServer::memb_fil(device *dev2, const std::string &member, int prot) th
 #endif /* _solaris */
 		throw int(1);
 	pos = tmp.rfind('/');
-#ifdef DEBUG
-	std::cout << "member part from DB : " << tmp.substr(pos + 1) << std::endl;
-#endif 
+
+	logStream->debugStream() << "member part from DB : " << tmp.substr(pos + 1) << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Call the stringOK function to verify that the member part of the
 // retrieved device is OK 
@@ -387,9 +385,9 @@ char *NdbmServer::memb_fil(device *dev2, const std::string &member, int prot) th
 		dev_num++;
 		if (prot == IPPROTO_UDP && dev_num == MAXDEV_UDP)
 			throw int(DbErr_MaxDeviceForUDP);
-#ifdef DEBUG
-		std::cout << "One more device name" << std::endl;
-#endif 
+
+		logStream->debugStream() << "One more device name" << log4cpp::CategoryStream::ENDLINE;
+
 	}
 	return p;
 }

@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.1 $
+ * Version:	$Revision: 1.2 $
  *
- * Date:	$Date: 2006-09-27 12:21:35 $
+ * Date:	$Date: 2006-12-15 12:43:54 $
  *
  */
 
@@ -66,7 +66,7 @@ db_res *SQLite3Server::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 //
 	if (dbgen.connected == False)
 	{
-		std::cout << "I'm not connected to database" << std::endl;
+		logStream->errorStream() << "I'm not connected to database" << log4cpp::CategoryStream::ENDLINE;
 		browse_back.db_err = DbErr_DatabaseNotConnected;
 		browse_back.res_val.arr1_len = 0;
 		return(&browse_back);
@@ -143,19 +143,19 @@ db_res *SQLite3Server::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 				query += " DOMAIN LIKE '" + tmpf + "' AND";
 			break;
 		default: 
-			std::cout << "To many '/' in device name." << std::endl;
+			logStream->errorStream() << "To many '/' in device name." << log4cpp::CategoryStream::ENDLINE;
 			browse_back.db_err = 1;
 			browse_back.res_val.arr1_len = 0;
 			return (&browse_back);		 		 
 	}
 	query += (" EXPORTED != 0 AND IOR LIKE 'rpc:%'");
-#ifdef DEBUG
-	std::cout << "SQLite3Server::db_getdevexp_1_svc() : " << std::endl;
-	std::cout << "filter domain : " << domain << std::endl;
-	std::cout << "filter family : " << family << std::endl;
-	std::cout << "filter member : " << member << std::endl;
-	std::cout << "SQLite3Server::db_getdevexp_1_svc() : " << query << std::endl;
-#endif 
+
+	logStream->debugStream() << "SQLite3Server::db_getdevexp_1_svc() : " << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "filter domain : " << domain << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "filter family : " << family << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "filter member : " << member << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "SQLite3Server::db_getdevexp_1_svc() : " << query << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Try to retrieve all tuples in the database NAMES table with the PN column
 // different than "not_exp" 
@@ -168,7 +168,7 @@ db_res *SQLite3Server::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 //
 // If a problem occurs during database function 
 //
-		std::cout << "SQLite3Server::db_getdevexp_1_svc() : " << sqlite3_errmsg(db) << std::endl;
+		logStream->errorStream() << "SQLite3Server::db_getdevexp_1_svc() : " << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
     		browse_back.db_err = DbErr_DatabaseAccess;
     		return(&browse_back);
 	}
@@ -192,9 +192,9 @@ db_res *SQLite3Server::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 		ptra = new nam[dev_num];
 		for (i = 0; i < dev_num; i++, j += ncol)
 		{
-#ifdef DEBUG
-			std::cout << "SQLite3Server::db_getdevexp_1_svc() : " << result[j] << std::endl;
-#endif
+
+			logStream->debugStream() << "SQLite3Server::db_getdevexp_1_svc() : " << result[j] << log4cpp::CategoryStream::ENDLINE;
+
 			ptra[i] = new char[strlen(result[j]) + 1]; 
 			strcpy(ptra[i], result[j]);
 		}

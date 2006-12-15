@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2006-09-27 12:29:19 $
+ * Date:	$Date: 2006-12-15 12:43:54 $
  *
  */
 
@@ -60,9 +60,9 @@ db_devinfo_svc *NdbmServer::devinfo_1_svc(nam *dev)
 	datum 		key;
 	std::string 	device;
 	
-#ifdef DEBUG
-	std::cout << "In devinfo_1_svc function for device " << *dev << std::endl;
-#endif
+
+	logStream->debugStream() << "In devinfo_1_svc function for device " << *dev << log4cpp::CategoryStream::ENDLINE;
+
 	std::string user_device(*dev);
 
 //
@@ -96,7 +96,7 @@ db_devinfo_svc *NdbmServer::devinfo_1_svc(nam *dev)
 	}
 	catch (std::bad_alloc)
 	{
-		std::cerr << "Memory allocation error in devinfo" << std::endl;
+		logStream->errorStream() << "Memory allocation error in devinfo" << log4cpp::CategoryStream::ENDLINE;
 		sent_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&sent_back);
 	}
@@ -182,12 +182,12 @@ db_devinfo_svc *NdbmServer::devinfo_1_svc(nam *dev)
 	catch (NdbmError &err)
 	{		
 		free(key.dptr);
-		std::cerr << err.get_err_message() << std::endl;	
+		logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;	
 		sent_back.db_err = err.get_err_code();
 	}
 	catch (std::bad_alloc)
 	{		
-		std::cerr << "Memory allocation error in devinfo" << std::endl;
+		logStream->errorStream() << "Memory allocation error in devinfo" << log4cpp::CategoryStream::ENDLINE;
 		sent_back.db_err = DbErr_ServerMemoryAllocation;
 	}
 	
@@ -232,9 +232,7 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 					sec_res = False;
 	std::string::size_type 		pos;
 	
-#ifdef DEBUG
-	std::cout << "In devres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << std::endl;
-#endif
+	logStream->debugStream() << "In devres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << log4cpp::CategoryStream::ENDLINE;
 	
 //
 // Initialize structure sent back to client
@@ -372,7 +370,7 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 				{
 					if (ind == 1)
 					{		
-						std::cerr << err.get_err_message() << std::endl;
+						logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;
 						browse_back.db_err = err.get_err_code();
 						return(&browse_back);
 					}
@@ -407,13 +405,13 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 	catch (NdbmError &err)
 	{		
 		free(key.dptr);
-		std::cerr << err.get_err_message() << std::endl;
+		logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;
 		browse_back.db_err = err.get_err_code();
 		return(&browse_back);
 	}
 	catch (std::bad_alloc)
 	{		
-		std::cerr << "Memory allocation error in devres_svc" << std::endl;
+		logStream->errorStream() << "Memory allocation error in devres_svc" << log4cpp::CategoryStream::ENDLINE;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}
@@ -445,7 +443,7 @@ db_res *NdbmServer::devres_1_svc(db_res *recev)
 				delete [] browse_back.res_val.arr1_val;
 			delete [] browse_back.res_val.arr1_val;
 			
-			std::cerr << "Memory allocation error in devres_svc" << std::endl;
+			logStream->errorStream() << "Memory allocation error in devres_svc" << log4cpp::CategoryStream::ENDLINE;
 			browse_back.db_err = DbErr_ServerMemoryAllocation;
 			return(&browse_back);
 		}
@@ -471,9 +469,8 @@ long *NdbmServer::devdel_1_svc(nam *dev)
 	std::string 	device;
 	static long 	sent_back;
 	
-#ifdef DEBUG
-	std::cout << "In devdel_1_svc function for device " << *dev << std::endl;
-#endif
+	logStream->debugStream() << "In devdel_1_svc function for device " << *dev << log4cpp::CategoryStream::ENDLINE;
+
 	std::string user_device(*dev);
 //
 // Initialize parameter sent back to client
@@ -594,13 +591,13 @@ long *NdbmServer::devdel_1_svc(nam *dev)
 	catch (NdbmError &err)
 	{
 		free(key.dptr);
-		std::cerr << err.get_err_message() << std::endl;	
+		logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;	
 		sent_back = err.get_err_code();
 		return(&sent_back);
 	}
 	catch (std::bad_alloc)
 	{
-		std::cerr << "Memory allocation error in devdel" << std::endl;
+		logStream->errorStream() << "Memory allocation error in devdel" << log4cpp::CategoryStream::ENDLINE;
 		sent_back = DbErr_ServerMemoryAllocation;
 		return(&sent_back);
 	}
@@ -645,10 +642,7 @@ db_psdev_error *NdbmServer::devdelres_1_svc(db_res *recev)
 	std::string::size_type pos;
 	long found;
 	
-#ifdef DEBUG
-	std::cout << "In devdelres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << std::endl;
-#endif
-
+	logStream->debugStream() << "In devdelres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << log4cpp::CategoryStream::ENDLINE;
 
 //
 // Initialize parameter sent back to client
@@ -805,7 +799,7 @@ db_psdev_error *NdbmServer::devdelres_1_svc(db_res *recev)
 				{
 					if (ind == 1)
 					{		
-						std::cerr << err.get_err_message() << std::endl;
+						logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;
 						tmp_dev_name = dom_list[i].get_domain() + '/' + fam + '/' + memb;
 						for (l = 0;l < recev->res_val.arr1_len;l++)
 						{
@@ -842,7 +836,7 @@ db_psdev_error *NdbmServer::devdelres_1_svc(db_res *recev)
 	catch (NdbmError &err)
 	{		
 		free(key.dptr);
-		std::cerr << err.get_err_message() << std::endl;
+		logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;
 		sent_back.error_code = err.get_err_code();
 		tmp_dev_name = dom_list[i].get_domain() + '/' + fam + '/' + memb;
 		for (l = 0;l < recev->res_val.arr1_len;l++)
@@ -854,7 +848,7 @@ db_psdev_error *NdbmServer::devdelres_1_svc(db_res *recev)
 	}
 	catch (std::bad_alloc)
 	{		
-		std::cerr << "Memory allocation error in devdelres_svc" << std::endl;
+		logStream->errorStream() << "Memory allocation error in devdelres_svc" << log4cpp::CategoryStream::ENDLINE;
 		sent_back.error_code = DbErr_ServerMemoryAllocation;
 		tmp_dev_name = dom_list[i].get_domain() + '/' + fam + '/' + memb;
 		for (l = 0;l < recev->res_val.arr1_len;l++)
@@ -889,10 +883,7 @@ db_info_svc *NdbmServer::info_1_svc()
 			tmp_res;
 	datum 		key;
 
-#ifdef DEBUG
-	std::cout << "In info_1_svc function" << std::endl;
-#endif /* DEBUG */
-
+	logStream->debugStream() << "In info_1_svc function" << log4cpp::CategoryStream::ENDLINE;
 //
 // Initialize parameter sent back to client
 //
@@ -983,13 +974,13 @@ db_info_svc *NdbmServer::info_1_svc()
 	catch (NdbmError &err)
 	{
 		free(key.dptr);
-		std::cerr << err.get_err_message() << std::endl;	
+		logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;	
 		info_back.db_err = err.get_err_code();
 		return(&info_back);
 	}
 	catch (std::bad_alloc)
 	{
-		std::cerr << "Memory allocation error in info" << std::endl;
+		logStream->errorStream() << "Memory allocation error in info" << log4cpp::CategoryStream::ENDLINE;
 		info_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&info_back);
 	}
@@ -1049,10 +1040,8 @@ long *NdbmServer::unreg_1_svc(db_res *recev)
 	std::string user_ds_name(recev->res_val.arr1_val[0]);
 	std::string user_pers_name(recev->res_val.arr1_val[1]);
 		
-#ifdef DEBUG
-	std::cout << "In unreg_1_svc function for " << user_ds_name \
-	<< "/" << user_pers_name << std::endl;
-#endif
+	logStream->debugStream() << "In unreg_1_svc function for " << user_ds_name \
+		<< "/" << user_pers_name << log4cpp::CategoryStream::ENDLINE;
 	
 //
 // Initialize structure sent back to client
@@ -1144,13 +1133,13 @@ long *NdbmServer::unreg_1_svc(db_res *recev)
 	catch (NdbmError &err)
 	{
 		free(key.dptr);
-		std::cerr << err.get_err_message() << std::endl;	
+		logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;	
 		sent_back = err.get_err_code();
 		return(&sent_back);
 	}
 	catch (std::bad_alloc)
 	{
-		std::cerr << "Memory allocation error in unreg_svc" << std::endl;
+		logStream->errorStream() << "Memory allocation error in unreg_svc" << log4cpp::CategoryStream::ENDLINE;
 		sent_back = DbErr_ServerMemoryAllocation;
 		return(&sent_back);
 	}
@@ -1197,10 +1186,8 @@ svcinfo_svc *NdbmServer::svcinfo_1_svc(db_res *recev)
 	std::string 	user_ds_name(recev->res_val.arr1_val[0]);
 	std::string 	user_pers_name(recev->res_val.arr1_val[1]);
 		
-#ifdef DEBUG
-	std::cout << "In svcinfo_1_svc function for " << user_ds_name 
-		<< "/" << user_pers_name << std::endl;
-#endif
+	logStream->debugStream() << "In svcinfo_1_svc function for " << user_ds_name 
+		<< "/" << user_pers_name << log4cpp::CategoryStream::ENDLINE;
 	
 //
 // Initialize structure sent back to client
@@ -1225,7 +1212,7 @@ svcinfo_svc *NdbmServer::svcinfo_1_svc(db_res *recev)
 	}
 	catch (std::bad_alloc)
 	{
-		std::cerr << "Memory allocation error in svc_info" << std::endl;
+		logStream->errorStream() << "Memory allocation error in svc_info" << log4cpp::CategoryStream::ENDLINE;
 		svcinfo_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&svcinfo_back);
 	}
@@ -1288,9 +1275,9 @@ svcinfo_svc *NdbmServer::svcinfo_1_svc(db_res *recev)
 //
 		nb_class = class_list.size();
 		dev_list = new std::vector<NdbmSvcDev> [nb_class];
-#if DEBUG
-		std::cerr << nb_class << std::endl;
-#endif
+
+		logStream->debugStream() << nb_class << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Get all device for each class in the list
 //
@@ -1336,14 +1323,14 @@ svcinfo_svc *NdbmServer::svcinfo_1_svc(db_res *recev)
 	catch (NdbmError &err)
 	{
 		free(key.dptr);
-		std::cerr << err.get_err_message() << std::endl;
+		logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;
 		delete [] dev_list;	
 		svcinfo_back.db_err = err.get_err_code();
 		return(&svcinfo_back);
 	}
 	catch (std::bad_alloc)
 	{
-		std::cerr << "Memory allocation error in svc_info" << std::endl;
+		logStream->errorStream() << "Memory allocation error in svc_info" << log4cpp::CategoryStream::ENDLINE;
 		delete [] dev_list;
 		svcinfo_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&svcinfo_back);
@@ -1399,7 +1386,7 @@ svcinfo_svc *NdbmServer::svcinfo_1_svc(db_res *recev)
 	}
 	catch (std::bad_alloc)
 	{
-		std::cerr << "Memory allocation error in svc_info" << std::endl;
+		logStream->errorStream() << "Memory allocation error in svc_info" << log4cpp::CategoryStream::ENDLINE;
 		delete [] dev_list;
 		svcinfo_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&svcinfo_back);
@@ -1437,10 +1424,9 @@ long *NdbmServer::svcdelete_1_svc(db_res *recev)
 	std::string 	user_ds_name(recev->res_val.arr1_val[0]);
 	std::string 	user_pers_name(recev->res_val.arr1_val[1]);
 		
-#ifdef DEBUG
-	std::cout << "In svcdelete_1_svc function for " << user_ds_name \
-	<< "/" << user_pers_name << std::endl;
-#endif
+
+	logStream->debugStream() << "In svcdelete_1_svc function for " << user_ds_name \
+		<< "/" << user_pers_name << log4cpp::CategoryStream::ENDLINE;
 	
 //
 // Initialize structure sent back to client
@@ -1536,13 +1522,13 @@ long *NdbmServer::svcdelete_1_svc(db_res *recev)
 	catch (NdbmError &err)
 	{
 		free(key.dptr);
-		std::cerr << err.get_err_message() << std::endl;	
+		logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;	
 		error_back = err.get_err_code();
 		return(&error_back);
 	}
 	catch (std::bad_alloc)
 	{
-		std::cerr << "Memory allocation error in svcdelete_svc" << std::endl;
+		logStream->errorStream() << "Memory allocation error in svcdelete_svc" << log4cpp::CategoryStream::ENDLINE;
 		error_back = DbErr_ServerMemoryAllocation;
 		return(&error_back);
 	}
@@ -1577,9 +1563,7 @@ void  NdbmServer::delete_res(const std::string &dev_name)
 			ind;
 	std::vector<std::string> 	res_list;
 	
-#ifdef DEBUG
-	std::cout << "In delete_res function for device " << dev_name << std::endl;
-#endif
+	logStream->debugStream() << "In delete_res function for device " << dev_name << log4cpp::CategoryStream::ENDLINE;
 	
 //
 // Extract domain, family and member name from device name
@@ -1727,9 +1711,7 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 			r_val;
 	long 		found;
 	
-#ifdef DEBUG
-	std::cout << "In getpoller_1_svc function for device " << *dev << std::endl;
-#endif
+	logStream->debugStream() << "In getpoller_1_svc function for device " << *dev << log4cpp::CategoryStream::ENDLINE;
 
 	std::string user_device(*dev);
 
@@ -1759,7 +1741,7 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 	}
 	catch (std::bad_alloc)
 	{
-		std::cerr << "Memory allocation error in devinfo" << std::endl;
+		logStream->errorStream() << "Memory allocation error in devinfo" << log4cpp::CategoryStream::ENDLINE;
 		poll_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&poll_back);
 	}
@@ -1828,13 +1810,13 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 	catch (NdbmError &err)
 	{		
 		free(key.dptr);
-		std::cerr << err.get_err_message() << std::endl;
+		logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;
 		poll_back.db_err = err.get_err_code();
 		return(&poll_back);
 	}
 	catch (std::bad_alloc)
 	{		
-		std::cerr << "Memory allocation error in getpoller_svc" << std::endl;
+		logStream->errorStream() << "Memory allocation error in getpoller_svc" << log4cpp::CategoryStream::ENDLINE;
 		poll_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&poll_back);
 	}
@@ -1885,13 +1867,13 @@ db_poller_svc *NdbmServer::getpoller_1_svc(nam *dev)
 	catch (NdbmError &err)
 	{		
 		free(key.dptr);
-		std::cerr << err.get_err_message() << std::endl;	
+		logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;	
 		poll_back.db_err = err.get_err_code();
 		return(&poll_back);
 	}
 	catch (std::bad_alloc)
 	{		
-		std::cerr << "Memory allocation error in getpoller_svc" << std::endl;
+		logStream->errorStream() << "Memory allocation error in getpoller_svc" << log4cpp::CategoryStream::ENDLINE;
 		poll_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&poll_back);
 	}

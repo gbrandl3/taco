@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.27 $
+ * Version:	$Revision: 1.28 $
  *
- * Date:	$Date: 2006-10-25 09:08:10 $
+ * Date:	$Date: 2006-12-15 12:43:54 $
  *
  */
 
@@ -72,8 +72,6 @@
 #	include <rpc/pmap_clnt.h>
 #endif
 
-#include <fstream>
-
 //
 // RPC function not defined within rpc include files !!
 // M. Diehl, 15.11.99
@@ -100,27 +98,15 @@ static void db_setupprog_1(struct svc_req *, SVCXPRT *);
 
 extern	DBServer	*dbm;
 
-bool	enable_logging = false;
-std::ofstream	logStream;
-
-std::string getTimeString(std::string name)
-{
-	time_t 		tps = time((time_t *)NULL);
-	struct tm 	*time_tm = localtime(&tps);
-	char 		*tps_str = asctime(time_tm);
-	tps_str[24] = '\0';
-	std::string	text = name + " : " + std::string(tps_str) + " : ";
-	return text;
-}
+log4cpp::Category       *logStream;
 
 static void un_register_prog(int signo)
 {
 	if (signo == SIGHUP)
 		return;
 
-	logStream << getTimeString("dbm_server") << "signal " << signo << " received." << std::endl;
-	logStream << getTimeString("dbm_server") << "unregister database server." << std::endl;
-	logStream.flush();
+	logStream->noticeStream() << "signal " << signo << " received." << log4cpp::CategoryStream::ENDLINE;
+	logStream->noticeStream() << "unregister database server." << log4cpp::CategoryStream::ENDLINE;
 #ifdef ALONE
 	pmap_unset(DB_SETUPPROG, DB_SETUPVERS);
 	pmap_unset(DB_SETUPPROG, DB_VERS_2);
@@ -133,12 +119,9 @@ static void un_register_prog(int signo)
 //
 // Added code to close database 
 //
-	logStream << getTimeString("dbm_server") << "close connection to database." << std::endl;
-	logStream.flush();
+	logStream->noticeStream() << "close connection to database." << log4cpp::CategoryStream::ENDLINE;
 	delete dbm;
-	logStream << getTimeString("dbm_server") << "exit server." << std::endl << std::endl;
-	logStream.flush();
-	logStream.close();
+	logStream->noticeStream() << "exit server." << log4cpp::CategoryStream::ENDLINE;
 	exit(1);
 }
 //
@@ -146,8 +129,7 @@ static void un_register_prog(int signo)
 //
 void default_sig(int signo)
 {
-	logStream << getTimeString("dbm_server") << "signal " << signo << " received! (ignored)." << std::endl;
-	logStream.flush();
+	logStream->noticeStream() << "signal " << signo << " received! (ignored)." << log4cpp::CategoryStream::ENDLINE;
 }
 
 void usage(const char *argv)
@@ -195,7 +177,6 @@ void usage(const char *argv)
 #ifdef USE_MYSQL
 	std::cerr << "       -u user        - user for MySQL database" << std::endl;
 	std::cerr << "       -p password    - password for MySQL database" << std::endl;
-	std::cerr << "       -l             - enable logging" << std::endl;
 #endif
 	exit(1);
 }
@@ -232,15 +213,21 @@ int main(int argc,char **argv)
 	char			*mysql_user="root";
 	char			*mysql_password="";
  
-	char 			*logpath = getenv("LOGPATH");
-	if (logpath == NULL)
-		logpath = getenv("DSHOME");
-	std::string logfile;
-	if (logpath)
-        	logfile = std::string(logpath) + "/DatabaseServer.log";
-	else
-		logfile = std::string("DatabaseServer.log");
-	logStream.open(logfile.c_str(), std::ios::out | std::ios::app);
+	char 			*logpath = getenv("LOGCONFIG");
+
+	try
+	{
+		if (!logpath)
+			throw 0;
+		log4cpp::PropertyConfigurator::configure(logpath);
+	}
+	catch (...)
+	{
+		logpath = "no";
+		log4cpp::BasicConfigurator::configure();
+	}
+	logStream = &log4cpp::Category::getInstance("taco.system.Database");
+	logStream->noticeStream() << "using " << logpath << " configuration file" << log4cpp::CategoryStream::ENDLINE;
 		
 //
 // Install signal handler
@@ -269,10 +256,9 @@ int main(int argc,char **argv)
 	extern int	optint;
 	extern char	*optarg;
 
-#ifdef DEBUG
 	for (int i = 0; i< argc; i++) 
-		std::cout << "argv[" << i << "] = " << argv[i] << std::endl;
-#endif
+		logStream->debugStream() << "argv[" << i << "] = " << argv[i] << log4cpp::CategoryStream::ENDLINE;
+
 #ifdef USE_MYSQL
 	if (getenv("MYSQL_USER") != NULL)
 		mysql_user = getenv("MYSQL_USER");
@@ -295,9 +281,6 @@ int main(int argc,char **argv)
 				mysql_password = optarg;
 				break;
 #endif
-			case 'l' :
-				enable_logging = true;
-				break;
 			case '?' :
 			case 'h' :	
 			default  :
@@ -318,10 +301,9 @@ int main(int argc,char **argv)
 #ifdef USE_MYSQL
 	if (database_type == "mysql")
 	{
-#ifdef DEBUG
-		std::cout << "going to connect to mysql database with user = " << mysql_user;
-		std::cout << ", password = " << mysql_password << std::endl;
-#endif
+		logStream->debugStream() << "going to connect to mysql database with user = " << mysql_user
+			<< ", password = " << mysql_password << log4cpp::CategoryStream::ENDLINE;
+
 		dbm = new MySQLServer(mysql_user, mysql_password, argv[optind]);
 	}
 	else
@@ -335,7 +317,7 @@ int main(int argc,char **argv)
 #endif
 		usage(*argv);
 
-	dbm->setLogstream(logStream);
+//	dbm->setLogstream(logStream);
 //
 // RPC business !!!!!!!!!!!!!!!!!!!! 
 //
@@ -356,16 +338,15 @@ int main(int argc,char **argv)
 //
 	if ((pgnum = gettransient("DatabaseServer")) == 0)
 	{
-		logStream << getTimeString("dbm_server") << "Can't get transcient program number" << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "Can't get transcient program number" << log4cpp::CategoryStream::ENDLINE;
 		exit(-1);
 	}
 	dbm->setPgNum(pgnum);
 
-	logStream << getTimeString("dbm_server") << "Program number : " << pgnum << std::endl;
+	logStream->noticeStream() << "Program number : " << pgnum << log4cpp::CategoryStream::ENDLINE;
 
 	taco_gethostname(hostna, sizeof(hostna));
-	logStream << getTimeString("dbm_server") << "Server host name : " << hostna << std::endl;
+	logStream->noticeStream() << "Server host name : " << hostna << log4cpp::CategoryStream::ENDLINE;
 
 //
 // Send these informations to network manager. Even if the server is now 
@@ -373,7 +354,7 @@ int main(int argc,char **argv)
 // for compatibility with old release of device server. 
 //
 	register_db((char *)netmanhost.c_str(), hostna, pgnum, DB_SETUPVERS);
-	logStream << getTimeString("dbm_server") << "registered on host : " << netmanhost << std::endl;
+	logStream->noticeStream() << "registered on host : " << netmanhost << log4cpp::CategoryStream::ENDLINE;
 //
 // M. Diehl, 15.11.99
 // Since gettransient() does not bind sockets and pmap_set
@@ -387,14 +368,12 @@ int main(int argc,char **argv)
 
 	if (transp_udp == NULL)
 	{
-		logStream << getTimeString("dbm_server") << "cannot create udp service." << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "cannot create udp service." << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 	if (transp_tcp == NULL)
 	{
-		logStream << getTimeString("dbm_server") << "cannot create tcp service." << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "cannot create tcp service." << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 //
@@ -411,76 +390,64 @@ int main(int argc,char **argv)
 #ifdef ALONE
 	if (!svc_register(transp_udp,DB_SETUPPROG,DB_SETUPVERS,setup_prog,IPPROTO_UDP))
 	{
-		logStream << getTimeString("dbm_server") << "unable to register (DB_SETUPPROG,DB_SETUPVERS,udp)" << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_SETUPVERS,udp)" << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,DB_SETUPPROG,DB_SETUPVERS,setup_prog,IPPROTO_TCP))
 	{
-		logStream << getTimeString("dbm_server") << "unable to register (DB_SETUPPROG,DB_SETUPVERS,tcp)" << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_SETUPVERS,tcp)" << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 	if (!svc_register(transp_udp,DB_SETUPPROG,DB_VERS_2,setup_prog,IPPROTO_UDP))
 	{
-		logStream << getTimeString("dbm_server") << "unable to register (DB_SETUPPROG,DB_VERS_2,udp)" << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_VERS_2,udp)" << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,DB_SETUPPROG,DB_VERS_2,setup_prog,IPPROTO_TCP))
 	{
-		logStream << getTimeString("dbm_server") << "unable to register (DB_SETUPPROG,DB_VERS_2,tcp)" << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_VERS_2,tcp)" << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 	if (!svc_register(transp_udp,DB_SETUPPROG,DB_VERS_3,setup_prog,IPPROTO_UDP))
 	{
-		logStream << getTimeString("dbm_server") << "unable to register (DB_SETUPPROG,DB_VERS_2,udp)" << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_VERS_2,udp)" << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,DB_SETUPPROG,DB_VERS_3, setup_prog,IPPROTO_TCP))
 	{
-		logStream << getTimeString("dbm_server") << "unable to register (DB_SETUPPROG,DB_VERS_2,tcp)" << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_VERS_2,tcp)" << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 
 #else
 	if (!svc_register(transp_udp,pgnum, DB_SETUPVERS, setup_prog, IPPROTO_UDP))
 	{
-		logStream << getTimeString("dbm_server") << "unable to register (" << pgnum << ", DB_SETUPVERS, udp)" << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "unable to register (" << pgnum << ", DB_SETUPVERS, udp)" << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,pgnum,DB_SETUPVERS, setup_prog,IPPROTO_TCP))
 	{
-		logStream << getTimeString("dbm_server") << "unable to register (" << pgnum << ",DB_SETUPVERS,tcp)" << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "unable to register (" << pgnum << ",DB_SETUPVERS,tcp)" << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 	if (!svc_register(transp_udp,pgnum, DB_VERS_2, setup_prog, IPPROTO_UDP))
 	{
-		logStream << getTimeString("dbm_server") << "unable to register (" << pgnum << ", DB_VERS_2, udp)" << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "unable to register (" << pgnum << ", DB_VERS_2, udp)" << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,pgnum,DB_VERS_2,setup_prog,IPPROTO_TCP))
 	{
-		logStream << getTimeString("dbm_server") << "unable to register (" << pgnum << ",DB_VERS_2,tcp)" << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "unable to register (" << pgnum << ",DB_VERS_2,tcp)" << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 	if (!svc_register(transp_udp,pgnum, DB_VERS_3, setup_prog, IPPROTO_UDP))
 	{
-		logStream << getTimeString("dbm_server") << "unable to register (" << pgnum << ", DB_VERS_2, udp)" << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "unable to register (" << pgnum << ", DB_VERS_2, udp)" << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,pgnum,DB_VERS_3,setup_prog,IPPROTO_TCP))
 	{
-		logStream << getTimeString("dbm_server") << "unable to register (" << pgnum << ",DB_VERS_2,tcp)" << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "unable to register (" << pgnum << ",DB_VERS_2,tcp)" << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 #endif 
@@ -491,8 +458,7 @@ int main(int argc,char **argv)
 #ifdef sun
 	if ((host = gethostbyname(hostna)) == NULL)
 	{
-		logStream << getTimeString("dbm_server") << "Unable to get my IP address" << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "Unable to get my IP address" << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 	ptmp_long = (unsigned long *)host->h_addr_list[0];
@@ -505,8 +471,7 @@ int main(int argc,char **argv)
 	if ((udp_port = pmap_getport(&so,pgnum,DB_SETUPVERS,IPPROTO_UDP)) == 0)
 #endif 
 	{
-		logStream << getTimeString("dbm_server") << "unable to retrieve udp port number" << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "unable to retrieve udp port number" << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 
@@ -516,18 +481,15 @@ int main(int argc,char **argv)
 	if ((tcp_port = pmap_getport(&so,pgnum,DB_SETUPVERS,IPPROTO_TCP)) == 0)
 #endif 
 	{
-		logStream << getTimeString("dbm_server") << "unable to retrieve tcp port number" << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "unable to retrieve tcp port number" << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 	dbm->setUDPPort(udp_port);
 	dbm->setTCPPort(tcp_port);
 	
-	logStream << getTimeString("dbm_server") << "ready to run" << std::endl;
+	logStream->noticeStream() << "ready to run" << log4cpp::CategoryStream::ENDLINE;
 	svc_run();
-	logStream << getTimeString("dbm_server") << "svc_run returned" << std::endl;
-	logStream.flush();
-	logStream.close();
+	logStream->fatalStream() << "svc_run returned" << log4cpp::CategoryStream::ENDLINE;
 	exit(1);
 }
 
@@ -780,7 +742,7 @@ static void db_setupprog_1(struct svc_req *rqstp, SVCXPRT *transp)
 #ifndef ALONE
 		case RPC_QUIT_SERVER:
 			svc_sendreply(transp,(xdrproc_t)xdr_void,NULL);
-			logStream << getTimeString("dbm_server") << " RPC_QUIT_SERVER : " << std::endl;
+			logStream->noticeStream() << " RPC_QUIT_SERVER : " << log4cpp::CategoryStream::ENDLINE;
 			pid = getpid();
 			kill(pid,SIGQUIT);
 			return;
@@ -802,7 +764,7 @@ static void db_setupprog_1(struct svc_req *rqstp, SVCXPRT *transp)
 		svcerr_systemerr(transp);
 	if (!svc_freeargs(transp, xdr_argument, (caddr_t)&argument))
 	{
-		logStream << getTimeString("dbm_server") << "unable to free arguments" << std::endl;
+		logStream->fatalStream() << "unable to free arguments" << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 //
@@ -932,7 +894,7 @@ static void register_db(const std::string netman_host,const std::string host, co
 	netman_clnt = clnt_create(const_cast<char *>(netman_host.c_str()), NMSERVER_PROG, NMSERVER_VERS, "udp");
 	if (netman_clnt == NULL)
 	{
-		logStream << getTimeString("dbm_server") << "Unable to create connection to network manager." << std::endl;
+		logStream->fatalStream() << "Unable to create connection to network manager." << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 
@@ -950,7 +912,7 @@ static void register_db(const std::string netman_host,const std::string host, co
 
 	if (clnt_stat != RPC_SUCCESS)
 	{
-		logStream << getTimeString("dbm_server") << "register_db failed !!!" << std::endl;
+		logStream->fatalStream() << "register_db failed !!!" << log4cpp::CategoryStream::ENDLINE;
 		exit(1);
 	}
 //

@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.1 $
+ * Version:	$Revision: 1.2 $
  *
- * Date:	$Date: 2006-09-27 12:21:35 $
+ * Date:	$Date: 2006-12-15 12:43:54 $
  *
  */
 
@@ -43,16 +43,16 @@
  */
 DevLong *SQLite3Server::db_clodb_1_svc(void)
 {
-    errcode = 0;
-#ifdef DEBUG
-    std::cout << "db_clodb()" << std::endl;
-#endif 
+    errcode = DS_OK;
+
+    logStream->debugStream() << "db_clodb()" << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Return error code if the server is not connected to the database files 
 //
     if (!dbgen.connected)
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -75,16 +75,15 @@ DevLong *SQLite3Server::db_clodb_1_svc(void)
  */
 DevLong *SQLite3Server::db_reopendb_1_svc(void)
 {
-#ifdef DEBUG
-	std::cout << "db_reopendb" << std::endl;
-#endif
+	logStream->debugStream() << "db_reopendb" << log4cpp::CategoryStream::ENDLINE;
+
 	errcode = DS_NOTOK;
 //
 // Open database tables according to the definition
 //
 	if(sqlite3_open(m_table.c_str(), &db))
 	{
-		std::cout  << "Can't open database: " <<  sqlite3_errmsg(db) << std::endl;
+		logStream->errorStream() << "Can't open database: " <<  sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
 		errcode = DbErr_DatabaseAccess;
 		sqlite3_close(db);
 		dbgen.connected = false;

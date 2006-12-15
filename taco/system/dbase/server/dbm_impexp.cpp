@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.17 $
+ * Version:	$Revision: 1.18 $
  *
- * Date:	$Date: 2006-11-07 15:55:00 $
+ * Date:	$Date: 2006-12-15 12:43:53 $
  *
  */
 
@@ -65,14 +65,14 @@ DevLong *NdbmServer::db_devexp_1_svc(tab_dbdev *rece)
 	static DevLong 	errcode;
 
 
-	if (enable_logging)
+	if (logStream->getPriority() >= log4cpp::Priority::DEBUG)
 		for (int i = 0; i < num_dev; i++)
-			logStream << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl
-				<< "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl
-				<< "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl
-				<< "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl
-				<< "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl
-				<< "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl;
+			logStream->debugStream() << "Device name : " << rece->tab_dbdev_val[i].dev_name << log4cpp::CategoryStream::ENDLINE
+				<< "Host name : " << rece->tab_dbdev_val[i].host_name << log4cpp::CategoryStream::ENDLINE
+				<< "Program number : " << rece->tab_dbdev_val[i].p_num << log4cpp::CategoryStream::ENDLINE
+				<< "Version number : " << rece->tab_dbdev_val[i].v_num << log4cpp::CategoryStream::ENDLINE
+				<< "Device type : " << rece->tab_dbdev_val[i].dev_type << log4cpp::CategoryStream::ENDLINE
+				<< "Device class : " << rece->tab_dbdev_val[i].dev_class << log4cpp::CategoryStream::ENDLINE;
 //
 // Initialize error code sent back to client 
 //
@@ -115,15 +115,15 @@ DevLong *NdbmServer::db_devexp_2_svc(tab_dbdev_2 *rece)
 	u_int 		num_dev = rece->tab_dbdev_len;
 	static DevLong 	errcode;
 
-	if (enable_logging)
+	if (logStream->getPriority() >= log4cpp::Priority::DEBUG)
 		for (int i = 0; i < num_dev; i++)
-			logStream << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl
-				<< "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl
-				<< "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl
-				<< "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl
-				<< "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl
-				<< "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl
-				<< "Device server PID : " << rece->tab_dbdev_val[i].pid << std::endl;
+			logStream->debugStream() << "Device name : " << rece->tab_dbdev_val[i].dev_name << log4cpp::CategoryStream::ENDLINE
+				<< "Host name : " << rece->tab_dbdev_val[i].host_name << log4cpp::CategoryStream::ENDLINE
+				<< "Program number : " << rece->tab_dbdev_val[i].p_num << log4cpp::CategoryStream::ENDLINE
+				<< "Version number : " << rece->tab_dbdev_val[i].v_num << log4cpp::CategoryStream::ENDLINE
+				<< "Device type : " << rece->tab_dbdev_val[i].dev_type << log4cpp::CategoryStream::ENDLINE
+				<< "Device class : " << rece->tab_dbdev_val[i].dev_class << log4cpp::CategoryStream::ENDLINE
+				<< "Device server PID : " << rece->tab_dbdev_val[i].pid << log4cpp::CategoryStream::ENDLINE;
 //
 // Initialize error code sent back to client
 //
@@ -164,16 +164,16 @@ DevLong *NdbmServer::db_devexp_3_svc(tab_dbdev_3 *rece)
 	u_int 		num_dev = rece->tab_dbdev_len;;
 	static DevLong 	errcode;
 
-	if (enable_logging)
+	if (logStream->getPriority() >= log4cpp::Priority::DEBUG)
 		for (int i = 0; i < num_dev; i++)
-			logStream << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl
-				<< "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl
-				<< "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl
-				<< "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl
-				<< "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl
-				<< "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl
-				<< "Device server PID : " << rece->tab_dbdev_val[i].pid << std::endl
-				<< "Device server process name : " << rece->tab_dbdev_val[i].proc_name << std::endl;
+			logStream->debugStream() << "Device name : " << rece->tab_dbdev_val[i].dev_name << log4cpp::CategoryStream::ENDLINE
+				<< "Host name : " << rece->tab_dbdev_val[i].host_name << log4cpp::CategoryStream::ENDLINE
+				<< "Program number : " << rece->tab_dbdev_val[i].p_num << log4cpp::CategoryStream::ENDLINE
+				<< "Version number : " << rece->tab_dbdev_val[i].v_num << log4cpp::CategoryStream::ENDLINE
+				<< "Device type : " << rece->tab_dbdev_val[i].dev_type << log4cpp::CategoryStream::ENDLINE
+				<< "Device class : " << rece->tab_dbdev_val[i].dev_class << log4cpp::CategoryStream::ENDLINE
+				<< "Device server PID : " << rece->tab_dbdev_val[i].pid << log4cpp::CategoryStream::ENDLINE
+				<< "Device server process name : " << rece->tab_dbdev_val[i].proc_name << log4cpp::CategoryStream::ENDLINE;
 //
 // Initialize error code sent back to client 
 //
@@ -224,10 +224,10 @@ db_resimp *NdbmServer::db_devimp_1_svc(arr1 *de_name)
 			ret_dev_type,
 			ret_dev_class;
 
-#ifdef DEBUG
+
 	for (int i = 0; i < num_dev; i++)
-		std::cout << "Device name (in import function) : " << de_name->arr1_val[i] << std::endl;
-#endif
+		logStream->debugStream() << "Device name (in import function) : " << de_name->arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Initialize error code sent back to client
 //
@@ -339,7 +339,7 @@ db_resimp *NdbmServer::db_devimp_1_svc(arr1 *de_name)
 				delete [] stu_addr->dev_type;
 				delete [] stu_addr->dev_class;
 			}
-			std::cerr << err.get_err_message() << std::endl;
+			logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;
 			back.db_imperr = err.get_err_code();
 			back.imp_dev.tab_dbdev_len = 0;
 			return (&back);
@@ -359,7 +359,7 @@ db_resimp *NdbmServer::db_devimp_1_svc(arr1 *de_name)
 				delete [] stu_addr->dev_class;
 			}
 			back.imp_dev.tab_dbdev_len = 0;
-			std::cerr << "Memory allocation error in devinfo" << std::endl;
+			logStream->errorStream() << "Memory allocation error in devinfo" << log4cpp::CategoryStream::ENDLINE;
 			back.db_imperr = DbErr_ServerMemoryAllocation;
 			return (&back);
 		}
@@ -418,9 +418,9 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 	int 		old_d_num;
 
 	std::string	device_name(*dsn_name);
-#ifdef DEBUG
-	std::cout << "Device server name (unregister function) : " << device_name << std::endl;
-#endif
+
+	logStream->debugStream() << "Device server name (unregister function) : " << device_name << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Miscellaneous initialization
 //
@@ -443,10 +443,10 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 //
 	strcpy(dev.ds_name, device_name.substr(pos + 1).c_str());
 
-#ifdef DEBUG
-	std::cout << "Device server class (unreg) : " << dev.ds_class << std::endl;
-	std::cout << "Device server name (unreg) : " << dev.ds_name << std::endl;
-#endif
+
+	logStream->debugStream() << "Device server class (unreg) : " << dev.ds_class << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device server name (unreg) : " << dev.ds_name << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Try to retrieve devices in database assuming that the input device server name is the
 // device server PROCESS name. As there is no key build on the device server process name, 
@@ -608,9 +608,9 @@ svc_inf *NdbmServer::db_svcchk_1_svc(nam *dsn_nam)
 			ret_dev_type,
 			ret_dev_class,
 			sto(*dsn_nam);
-#ifdef DEBUG
-	std::cout << "Device server name (check function) : " << sto << std::endl;
-#endif /* DEBUG */
+
+	logStream->debugStream() << "Device server name (check function) : " << sto << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Miscellaneous initialization
 //
@@ -635,10 +635,8 @@ svc_inf *NdbmServer::db_svcchk_1_svc(nam *dsn_nam)
 //
 	std::string	ds_name = sto.substr(pos + 1);
 
-#ifdef DEBUG
-	std::cout << "Device server class (check) : " << ds_class << std::endl;
-	std::cout << "Device server name (check) : " << ds_name << std::endl;
-#endif
+	logStream->debugStream() << "Device server class (check) : " << ds_class << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device server name (check) : " << ds_name << log4cpp::CategoryStream::ENDLINE;
 //
 // Initialization needed to retrieve the right tuples in the NAMES table
 //

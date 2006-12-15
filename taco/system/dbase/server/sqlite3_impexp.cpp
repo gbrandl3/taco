@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2006-12-13 16:04:37 $
+ * Date:	$Date: 2006-12-15 12:43:54 $
  *
  */
 
@@ -46,17 +46,17 @@ DevLong *SQLite3Server::db_devexp_1_svc(tab_dbdev *rece)
 {
     u_int 	num_dev = rece->tab_dbdev_len;;
 
-#ifdef DEBUG
+
     for (int i=0;i<num_dev;i++)
     {
-	std::cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl;
-	std::cout << "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl;
-	std::cout << "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl;
-	std::cout << "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl;
-	std::cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl;
-	std::cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl;
+	logStream->debugStream() << "Device name : " << rece->tab_dbdev_val[i].dev_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Host name : " << rece->tab_dbdev_val[i].host_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Program number : " << rece->tab_dbdev_val[i].p_num << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Version number : " << rece->tab_dbdev_val[i].v_num << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device type : " << rece->tab_dbdev_val[i].dev_type << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device class : " << rece->tab_dbdev_val[i].dev_class << log4cpp::CategoryStream::ENDLINE;
     }
-#endif
+
 //
 // Initialize error code sended back to client 
 //
@@ -66,7 +66,7 @@ DevLong *SQLite3Server::db_devexp_1_svc(tab_dbdev *rece)
 //
     if (!dbgen.connected)
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -97,18 +97,18 @@ DevLong *SQLite3Server::db_devexp_2_svc(tab_dbdev_2 *rece)
 {
     u_int 	num_dev = rece->tab_dbdev_len;;
 
-#ifdef DEBUG
+
     for (int i = 0; i < num_dev; i++)
     {
-	std::cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl;
-	std::cout << "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl;
-	std::cout << "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl;
-	std::cout << "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl;
-	std::cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl;
-	std::cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl;
-	std::cout << "Device server PID : " << rece->tab_dbdev_val[i].pid << std::endl;
+	logStream->debugStream() << "Device name : " << rece->tab_dbdev_val[i].dev_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Host name : " << rece->tab_dbdev_val[i].host_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Program number : " << rece->tab_dbdev_val[i].p_num << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Version number : " << rece->tab_dbdev_val[i].v_num << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device type : " << rece->tab_dbdev_val[i].dev_type << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device class : " << rece->tab_dbdev_val[i].dev_class << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device server PID : " << rece->tab_dbdev_val[i].pid << log4cpp::CategoryStream::ENDLINE;
     }
-#endif
+
 //
 // Initialize error code sended back to client 
 //
@@ -118,7 +118,7 @@ DevLong *SQLite3Server::db_devexp_2_svc(tab_dbdev_2 *rece)
 //
     if (!dbgen.connected)
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -152,19 +152,18 @@ DevLong *SQLite3Server::db_devexp_3_svc(tab_dbdev_3 *rece)
 {
     u_int 	num_dev = rece->tab_dbdev_len;
 
-#ifdef DEBUG
     for (int i = 0; i < num_dev; i++)
     {
-	std::cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl;
-	std::cout << "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl;
-	std::cout << "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl;
-	std::cout << "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl;
-	std::cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl;
-	std::cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl;
-	std::cout << "Device server PID : " << rece->tab_dbdev_val[i].pid << std::endl;
-	std::cout << "Device server process name : " << rece->tab_dbdev_val[i].proc_name << std::endl;
+	logStream->debugStream() << "Device name : " << rece->tab_dbdev_val[i].dev_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Host name : " << rece->tab_dbdev_val[i].host_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Program number : " << rece->tab_dbdev_val[i].p_num << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Version number : " << rece->tab_dbdev_val[i].v_num << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device type : " << rece->tab_dbdev_val[i].dev_type << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device class : " << rece->tab_dbdev_val[i].dev_class << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device server PID : " << rece->tab_dbdev_val[i].pid << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device server process name : " << rece->tab_dbdev_val[i].proc_name << log4cpp::CategoryStream::ENDLINE;
     }
-#endif
+
 //
 // Initialize error code sended back to client */
 //
@@ -174,7 +173,7 @@ DevLong *SQLite3Server::db_devexp_3_svc(tab_dbdev_3 *rece)
 //
     if (dbgen.connected == False)
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -214,10 +213,9 @@ db_resimp *SQLite3Server::db_devimp_1_svc(arr1 *de_name)
 	int 	ret_pn,
 		ret_vn;
 	
-#ifdef DEBUG
 	for (int i = 0; i < num_dev; i++)
-		std::cout << "Device name (in import function) : " << de_name->arr1_val[i] << std::endl;
-#endif
+		logStream->debugStream() << "Device name (in import function) : " << de_name->arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Initialize error code sended back to client */
 //
@@ -227,7 +225,7 @@ db_resimp *SQLite3Server::db_devimp_1_svc(arr1 *de_name)
 //
 	if (!dbgen.connected)
 	{
-		std::cout << "I'm not connected to database." << std::endl;
+		logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
 		back.db_imperr = DbErr_DatabaseNotConnected;
 		back.imp_dev.tab_dbdev_len = 0;
 		back.imp_dev.tab_dbdev_val = NULL;
@@ -253,9 +251,9 @@ db_resimp *SQLite3Server::db_devimp_1_svc(arr1 *de_name)
 	    query = "SELECT HOST, IOR, VERSION, CLASS";
 	    query += (" FROM device WHERE name = '" + dev_name + "'" );
 	    query += (" AND IOR LIKE 'rpc:%'");
-#ifdef DEBUG 
-		std::cout << "SQLite3Server::db_devimp_1_svc() : " << query << std::endl;
-#endif
+
+	    logStream->debugStream() << "SQLite3Server::db_devimp_1_svc() : " << query << log4cpp::CategoryStream::ENDLINE;
+
 	    if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	    {
 /*
@@ -278,9 +276,9 @@ db_resimp *SQLite3Server::db_devimp_1_svc(arr1 *de_name)
 		back.db_imperr = DbErr_DatabaseAccess;
 	    	return(&back);
 	    }
-#ifdef DEBUG 
-		std::cout << "SQLite3Server::db_devimp_1_svc() : " << nrow << " devices found " << std::endl;
-#endif
+
+	    logStream->debugStream() << "SQLite3Server::db_devimp_1_svc() : " << nrow << " devices found " << log4cpp::CategoryStream::ENDLINE;
+
             if (nrow == 1)
 	    {
 //
@@ -364,9 +362,9 @@ db_resimp *SQLite3Server::db_devimp_1_svc(arr1 *de_name)
 	back.imp_dev.tab_dbdev_len = 0;
 	back.db_imperr = DbErr_ServerMemoryAllocation;
     }
-#ifdef DEBUG 
-	std::cout << "SQLite3Server::db_devimp_1_svc() : finish" << back.db_imperr << std::endl;
-#endif
+
+	logStream->debugStream() << "SQLite3Server::db_devimp_1_svc() : finish" << back.db_imperr << log4cpp::CategoryStream::ENDLINE;
+
     return(&back);
 }
 
@@ -385,9 +383,7 @@ DevLong *SQLite3Server::db_svcunr_1_svc(nam *dsn_name)
 			device(*dsn_name);
 	std::string::size_type	pos;
 
-#ifdef DEBUG
-	std::cout << "Device server name (unregister function) : " << device << std::endl;
-#endif
+	logStream->debugStream() << "Device server name (unregister function) : " << device << log4cpp::CategoryStream::ENDLINE;
 //
 // Miscellaneous initialization 
 //
@@ -397,7 +393,7 @@ DevLong *SQLite3Server::db_svcunr_1_svc(nam *dsn_name)
 //
 	if (!dbgen.connected)
 	{
-		std::cout << "I'm not connected to database." << std::endl;
+		logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
 		errcode = DbErr_DatabaseNotConnected;
 		return(&errcode);
 	}
@@ -415,10 +411,9 @@ DevLong *SQLite3Server::db_svcunr_1_svc(nam *dsn_name)
 //
 	ds_name = device.substr(pos + 1);
 
-#ifdef DEBUG
-	std::cout << "Device server class (unreg) : " << ds_class << std::endl;
-	std::cout << "Device server name (unreg) : " << ds_name << std::endl;
-#endif
+	logStream->debugStream() << "Device server class (unreg) : " << ds_class << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device server name (unreg) : " << ds_name << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Try to retrieve devices in database assuming that the input device server
 // name is the device server PROCESS name. As there is no key build on
@@ -430,9 +425,9 @@ DevLong *SQLite3Server::db_svcunr_1_svc(nam *dsn_name)
 	query += ", VERSION = 0, PID = 0, CLASS = 'unknown', HOST = 'not_exp' ";
 //	query = "UPDATE device SET EXPORTED = 0, STOPPED = DATETIME('NOW')";
 	query += (" WHERE SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
-#ifdef DEBUG
-        std::cout << "SQLite3Server::db_svcunr_1_svc(): query = " << query << std::endl;
-#endif /* DEBUG */
+
+        logStream->debugStream() << "SQLite3Server::db_svcunr_1_svc(): query = " << query << log4cpp::CategoryStream::ENDLINE;
+
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		errcode = DbErr_DatabaseAccess;
@@ -460,9 +455,7 @@ svc_inf *SQLite3Server::db_svcchk_1_svc(nam *dsn_name)
 			device(*dsn_name);
     std::string::size_type	pos;
 
-#ifdef DEBUG
-    std::cout << "Device server name (check function) : " << device << std::endl;
-#endif 
+    logStream->debugStream() << "Device server name (check function) : " << device << log4cpp::CategoryStream::ENDLINE;
 //
 // Miscellaneous initialization */
 //
@@ -476,7 +469,7 @@ svc_inf *SQLite3Server::db_svcchk_1_svc(nam *dsn_name)
 //
     if (!dbgen.connected)
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
 	svc_info.db_err = DbErr_DatabaseNotConnected;
 	return(&svc_info);
     }
@@ -494,10 +487,9 @@ svc_inf *SQLite3Server::db_svcchk_1_svc(nam *dsn_name)
 //
 	ds_name = device.substr(pos + 1);
 
-#ifdef DEBUG
-	std::cout << "Device server class (check) : " << ds_class << std::endl;
-	std::cout << "Device server name (check) : " << ds_name << std::endl;
-#endif
+	logStream->debugStream() << "Device server class (check) : " << ds_class << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device server name (check) : " << ds_name << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Initialization needed to retrieve the right tuples in the NAMES table 
 //
@@ -553,9 +545,9 @@ int SQLite3Server::db_store(db_devinfo &dev_stu)
           << " CLASS = '" << dev_stu.dev_class << "',"
           << " PID = 0 , SERVER = 'unknown'"
           << " WHERE NAME = '" << dev_stu.dev_name << "'" << std::ends; 	
-#ifdef DEBUG
-	std::cout << "SQLite3Server::db_store() : " << query << std::endl;
-#endif
+
+	logStream->debugStream() << "SQLite3Server::db_store() : " << query << log4cpp::CategoryStream::ENDLINE;
+
 	try
 	{
 #if !HAVE_SSTREAM
@@ -655,14 +647,13 @@ int SQLite3Server::db_store(db_devinfo_3 &dev_stu)
 	}
 	catch(const long err)
 	{
-		if (enable_logging) logStream << getTimeString("SQLite3Server::db_store()") << " error = " << sqlite3_errmsg(db) << std::endl;
+		logStream->errorStream() << "SQLite3Server::db_store() error = " << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
 		throw err;
 	}
 	if (nrow == 0)
 	{
 		sqlite3_free_table(result);
-        	if (enable_logging) logStream << getTimeString("SQLite3Server::db_store()") << " device = " << dev_stu.dev_name << " not defined !" << std::endl;
-        	if (enable_logging) logStream.flush();
+        	logStream->errorStream() << "SQLite3Server::db_store() device = " << dev_stu.dev_name << " not defined !" << log4cpp::CategoryStream::ENDLINE;
         	throw long(DbErr_DeviceNotDefined);
     	}
 	sqlite3_free_table(result);
@@ -679,8 +670,7 @@ int SQLite3Server::db_store(db_devinfo_3 &dev_stu)
           << " PID = " << dev_stu.pid << "," << " EXPORTED = 1," 
 	  << " STARTED = DATETIME('NOW')"
           << " WHERE NAME = '" << dev_stu.dev_name << "'" << std::ends; 	
-    if (enable_logging) logStream << getTimeString("SQLite3Server::db_store()") << " query = " << query.str() << std::endl;
-    if (enable_logging) logStream.flush();
+    logStream->debugStream() << "SQLite3Server::db_store() query = " << query.str() << log4cpp::CategoryStream::ENDLINE;
     try
     {
 #if !HAVE_SSTREAM
@@ -696,7 +686,7 @@ int SQLite3Server::db_store(db_devinfo_3 &dev_stu)
     catch(const long err)
     {
 	sqlite3_free_table(result);
-	if (enable_logging) logStream << "SQLite3Server::db_store(): error = " << sqlite3_errmsg(db) << std::endl;
+	logStream->errorStream() << "SQLite3Server::db_store(): error = " << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
 	throw err;
     }
 //

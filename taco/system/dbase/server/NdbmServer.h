@@ -25,9 +25,9 @@
  * Author(s):
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2006-11-07 15:53:34 $
+ * Date:	$Date: 2006-12-15 12:43:53 $
  *
  */
 
@@ -36,10 +36,6 @@
 
 #include "dbClass.h"
 #include "NdbmClass.h"
-
-extern std::ofstream   logStream;
-extern std::string getTimeString(std::string name);
-extern bool enable_logging;
 
 /**@ingroup dbServerClasses
  */

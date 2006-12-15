@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2005-07-25 08:29:07 $
+ * Date:	$Date: 2006-12-15 12:43:53 $
  *
  */
 
@@ -70,9 +70,8 @@ event_que *NdbmServer::db_event_query_1_svc(nam *pevent_name)
 				r_name,
 				event_str,
 				req_event(*pevent_name);
-#ifdef DEBUG
-	std::cout << "Command name : " << req_event << std::endl;
-#endif
+
+	logStream->debugStream() << "Command name : " << req_event << log4cpp::CategoryStream::ENDLINE;
 //
 // Initialize error code sended back to client */
 //

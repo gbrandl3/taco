@@ -23,11 +23,11 @@
  * Description:
  *
  * Author(s):
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2006-10-25 09:10:32 $
+ * Date:	$Date: 2006-12-15 12:43:53 $
  *
  */
 
@@ -42,10 +42,6 @@
 #endif
 
 // logging variables
-
-extern std::ofstream   logStream;
-extern std::string getTimeString(std::string name);
-extern bool enable_logging;
 
 /**@ingroup dbServerClasses
  */

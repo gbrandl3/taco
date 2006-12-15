@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2006-09-07 09:07:59 $
+ * Date:	$Date: 2006-12-15 12:43:53 $
  *
  */
 
@@ -37,19 +37,16 @@
 #include <string>
 #include <unistd.h>
 
-extern std::ofstream   logStream;
-
 DBServer::DBServer()
 {
 //
 // Find the dbm_database table names
 //
+	logStream = &log4cpp::Category::getInstance("taco.system.Database");
 	char 	*ptr;
 	if ((ptr = (char *)getenv("DBTABLES")) == NULL)
 	{
-		std::cerr << "dbm_server: Can't find environment variable DBTABLES" << std::endl;
-		logStream << "dbm_server: Can't find environment variable DBTABLES" << std::endl;
-		logStream.flush();
+		logStream->fatalStream() << "dbm_server: Can't find environment variable DBTABLES" << log4cpp::CategoryStream::ENDLINE;
 		exit(-1);
 	}
 //
@@ -92,9 +89,7 @@ db_res *DBServer::secpass_1_svc()
 {
 	char pass[80];
 	
-#ifdef DEBUG
-	std::cout << "In secpass_1_svc function" << std::endl;
-#endif
+	logStream->debugStream() << "In secpass_1_svc function" << log4cpp::CategoryStream::ENDLINE;
 
 //
 // Initialize structure sent back to client

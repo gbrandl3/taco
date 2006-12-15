@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2005-07-25 08:28:17 $
+ * Date:	$Date: 2006-12-15 12:43:53 $
  *
  */
 
@@ -75,9 +75,7 @@ cmd_que *NdbmServer::db_cmd_query_1_svc(nam *pcmd_name)
 			cmd_str,
 			req_cmd(*pcmd_name);
 
-#ifdef DEBUG
-	std::cout << "Command name : " << req_cmd << std::endl;
-#endif
+	logStream->debugStream() << "Command name : " << req_cmd << log4cpp::CategoryStream::ENDLINE;
 //
 // Initialize error code sended back to client
 //

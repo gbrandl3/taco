@@ -25,9 +25,9 @@
  * Author(s):
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2006-09-27 12:27:16 $
+ * Date:	$Date: 2006-12-15 12:43:53 $
  *
  */
 
@@ -88,6 +88,12 @@
 #	include <fcntl.h>
 #endif
 
+#include <log4cpp/BasicConfigurator.hh>
+#include <log4cpp/PropertyConfigurator.hh>
+#include <log4cpp/Category.hh>
+
+// extern log4cpp::Category       &logStream;
+
 #include "NdbmClass.h"
 
 /**@ingroup dbServerClasses
@@ -118,7 +124,7 @@ protected:
 	std::vector<NdbmDomain> 	res_list;
 	std::vector<std::string> 	res_list_dev;
 
-	std::ofstream		m_logStream;
+ 	log4cpp::Category       *logStream;
 
 public:
 	void	setPgNum(const u_long pNum)  {pgnum = pNum;};
@@ -127,12 +133,6 @@ public:
 	u_short	getUDPPort(void) {return udp_port;}; 
 	void	setTCPPort(const u_short tcp) {tcp_port = tcp;};
 	u_short	getTCPPort(void) {return tcp_port;}; 
-
-	void	setLogstream(const std::ofstream &log) 
-	{
-		std::cout.rdbuf(log.rdbuf());
-		std::cerr.rdbuf(log.rdbuf());
-	}
 
 public:
 	virtual db_res 		*db_getres_1_svc(arr1 *, struct svc_req *) = 0;

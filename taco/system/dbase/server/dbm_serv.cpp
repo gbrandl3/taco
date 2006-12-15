@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.15 $
+ * Version:	$Revision: 1.16 $
  *
- * Date:	$Date: 2005-07-25 08:33:22 $
+ * Date:	$Date: 2006-12-15 12:43:54 $
  *
  */
 
@@ -126,10 +126,8 @@ db_res *NdbmServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 		prot = IPPROTO_TCP;
 #endif 
 
-#ifdef DEBUG
 	for (int i = 0; i < num_res; i++)
-		std::cout << "Resource name : " << rece->arr1_val[i] << std::endl;
-#endif
+		logStream->debugStream() << "Resource name : " << rece->arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
 //
 // Initialize browse_back structure error code 
 //
@@ -212,9 +210,7 @@ db_res *NdbmServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
  */
 db_res *NdbmServer::db_getdev_1_svc(nam *dev_name)
 {
-#ifdef DEBUG
-	std::cout << "Device server name (getdevlist) : " << *dev_name << std::endl;
-#endif
+	logStream->debugStream() << "Device server name (getdevlist) : " << *dev_name << log4cpp::CategoryStream::ENDLINE;
 //
 // Initialize error code sended back to client 
 //
@@ -235,10 +231,10 @@ db_res *NdbmServer::db_getdev_1_svc(nam *dev_name)
 	try
 	{
 		int dev_num = db_devlist(*dev_name, &browse_back);
-#ifdef DEBUG
+
 		for (int i = 0; i < dev_num; i++)
-			std::cout << "Device name : " << browse_back.res_val.arr1_val[i] << std::endl;
-#endif
+			logStream->debugStream() << "Device name : " << browse_back.res_val.arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+
 	}
 	catch (const int err_db)
 	{
@@ -273,9 +269,8 @@ int NdbmServer::db_find(const std::string tab_name, const std::string res_name, 
 	GDBM_FILE 	tab;
 	datum 		key;
 
-#ifdef DEBUG
-	std::cout << "Table name : " << tab_name << std::endl;
-#endif
+	logStream->debugStream() << "Table name : " << tab_name << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Get family name 
 //
@@ -297,11 +292,9 @@ int NdbmServer::db_find(const std::string tab_name, const std::string res_name, 
 	if (sec_res) 
 		std::transform(r_name.begin(), r_name.end(), r_name.begin(), DBServer::make_sec);
 
-#ifdef DEBUG
-	std::cout << "Family name : " << family << std::endl;
-	std::cout << "Member name : " << member << std::endl;
-	std::cout << "Resource name : " << r_name << std::endl;
-#endif
+	logStream->debugStream() << "Family name : " << family << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Member name : " << member << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Resource name : " << r_name << log4cpp::CategoryStream::ENDLINE;
 //
 // Select the right resource table in the right database 
 //
@@ -322,7 +315,7 @@ int NdbmServer::db_find(const std::string tab_name, const std::string res_name, 
 	}
 	catch(const std::bad_alloc &)
 	{
-		std::cerr << "Error in malloc for key" << std::endl;
+		logStream->errorStream() << "Error in malloc for key" << log4cpp::CategoryStream::ENDLINE;
 		throw int (DbErr_ServerMemoryAllocation);
 	}
 
@@ -403,7 +396,7 @@ int NdbmServer::db_find(const std::string tab_name, const std::string res_name, 
 	catch(const std::bad_alloc &)
 	{
 		delete [] key.dptr;
-		std::cerr << "Error in malloc for out" << std::endl;
+		logStream->errorStream() << "Error in malloc for out" << log4cpp::CategoryStream::ENDLINE;
 		throw int (DbErr_ServerMemoryAllocation);
 	}
 //
@@ -444,10 +437,9 @@ int NdbmServer::db_devlist(const std::string dev_name, db_res * back)
 //
 	std::string		ds_name = dev_na.substr(pos + 1);
 
-#ifdef DEBUG
-	std::cout << "Device server class (getdevlist) : " << ds_class << std::endl;
-	std::cout << "Device server name (getdevlist) : " << ds_name << std::endl;
-#endif 
+	logStream->debugStream() << "Device server class (getdevlist) : " << ds_class << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device server name (getdevlist) : " << ds_name << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Try to retrieve the right tuple in NAMES table 
 //
@@ -484,7 +476,7 @@ int NdbmServer::db_devlist(const std::string dev_name, db_res * back)
 			pos = dev_name.find('|');
 			if (pos == std::string::npos)
 			{
-				std::cerr << "No separator in the content." << std::endl;
+				logStream->errorStream() << "No separator in the content." << log4cpp::CategoryStream::ENDLINE;
 				delete [] key.dptr;
 				throw int (ERR_DEVNAME);
 			}
@@ -563,10 +555,8 @@ DevLong *NdbmServer::db_putres_1_svc(tab_putres * rece)
 	datum 		key,
 			content;
 
-#ifdef DEBUG
 	for (i = 0; i < res_num; i++)
-		std::cout << "Resource name : " << rece->tab_putres_val[i].res_name << std::endl;
-#endif 
+		logStream->debugStream() << "Resource name : " << rece->tab_putres_val[i].res_name << log4cpp::CategoryStream::ENDLINE;
 //
 // Initialize sent back error code 
 //
@@ -618,12 +608,10 @@ DevLong *NdbmServer::db_putres_1_svc(tab_putres * rece)
 			member = temp.substr(0, pos);
 			r_name = temp.substr(pos + 1);
 
-#ifdef DEBUG
-			std::cout << "Domain name : " << domain << std::endl;
-			std::cout << "Family name : " << family << std::endl;
-			std::cout << "Member name : " << member << std::endl;
-			std::cout << "Resource name : " << r_name << std::endl;
-#endif 
+			logStream->debugStream() << "Domain name : " << domain << log4cpp::CategoryStream::ENDLINE;
+			logStream->debugStream() << "Family name : " << family << log4cpp::CategoryStream::ENDLINE;
+			logStream->debugStream() << "Member name : " << member << log4cpp::CategoryStream::ENDLINE;
+			logStream->debugStream() << "Resource name : " << r_name << log4cpp::CategoryStream::ENDLINE;
 //
 // Select the right resource table in CS database 
 //
@@ -775,10 +763,8 @@ DevLong *NdbmServer::db_delres_1_svc(arr1 * rece /* , struct svc_req *rqstp */)
 	u_int 	num_res = rece->arr1_len;
 	nam 	*old_res;
 
-#ifdef DEBUG
 	for (int i = 0; i < num_res; i++)
-		std::cout << "Resource to delete : " << rece->arr1_val[i] << std::endl;
-#endif
+		logStream->debugStream() << "Resource to delete : " << rece->arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
 //
 // Initialize error code 
 //
@@ -868,7 +854,7 @@ int NdbmServer::db_del(std::string res_name, nam *p_oldres)
 //
 	if ((pos = res_name.find('/')) == std::string::npos)
 	{
-		std::cerr << "db_del : Error in resource name " << res_name << 	std::endl;
+		logStream->errorStream() << "db_del : Error in resource name " << res_name << 	log4cpp::CategoryStream::ENDLINE;
 		return (DbErr_BadResourceType);
 	}
 	t_name = res_name.substr(0, pos);
@@ -877,7 +863,7 @@ int NdbmServer::db_del(std::string res_name, nam *p_oldres)
 //
 	if ((pos = res_name.find('/', (last_pos = pos + 1))) == std::string::npos)
 	{
-		std::cerr << "db_del : Error in resource name " << res_name << std::endl;
+		logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::CategoryStream::ENDLINE;
 		return (DbErr_BadResourceType);
 	}
 	family = res_name.substr(last_pos, pos - last_pos);
@@ -886,7 +872,7 @@ int NdbmServer::db_del(std::string res_name, nam *p_oldres)
 //
 	if ((pos = res_name.find('/', (last_pos = pos + 1))) == std::string::npos)
 	{
-		std::cerr << "db_del : Error in resource name " << res_name << std::endl;
+		logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::CategoryStream::ENDLINE;
 		return (DbErr_BadResourceType);
 	}
 	member = res_name.substr(last_pos, pos - last_pos);
@@ -895,11 +881,9 @@ int NdbmServer::db_del(std::string res_name, nam *p_oldres)
 //
 	r_name = res_name.substr(pos + 1);
 
-#ifdef DEBUG
-	std::cout << "Family name : " << family << std::endl;
-	std::cout << "Number name : " << member << std::endl;
-	std::cout << "Resource name : " << r_name << std::endl;
-#endif
+	logStream->debugStream() << "Family name : " << family << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Number name : " << member << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Resource name : " << r_name << log4cpp::CategoryStream::ENDLINE;
 //
 // Select the right resource table in database
 //

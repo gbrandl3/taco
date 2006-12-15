@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jlpons $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.16 $
+ * Version:	$Revision: 1.17 $
  *
- * Date:	$Date: 2006-12-12 17:23:08 $
+ * Date:	$Date: 2006-12-15 12:43:54 $
  *
  */
 
@@ -655,7 +655,7 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
     }
     catch(const long err)
     {
-    	if (enable_logging) logStream << getTimeString("MySQLServer::db_store()") << " error = " << mysql_error(mysql_conn) << std::endl;
+    	logStream->errorStream() << "MySQLServer::db_store() error = " << mysql_error(mysql_conn) << log4cpp::CategoryStream::ENDLINE;
 	throw err;
     }
 
@@ -665,8 +665,7 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
     if ((n_rows = mysql_num_rows(result)) == 0)
     {
         mysql_free_result(result); 
-        if (enable_logging) logStream << getTimeString("MySQLServer::db_store()") << " device = " << dev_stu.dev_name << " not defined !" << std::endl;
-        if (enable_logging) logStream.flush();
+        logStream->errorStream() << "MySQLServer::db_store() device = " << dev_stu.dev_name << " not defined !" << log4cpp::CategoryStream::ENDLINE;
         throw long(DbErr_DeviceNotDefined);
     }
     mysql_free_result(result); 
@@ -684,8 +683,7 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
 	  << " EXPORTED = 1," 
 	  << " STARTED = NOW()"
           << " WHERE NAME = '" << dev_stu.dev_name << "'" << std::ends; 	
-    if (enable_logging) logStream << getTimeString("MySQLServer::db_store()") << " query = " << query.str() << std::endl;
-    if (enable_logging) logStream.flush();
+    logStream->debugStream() << "MySQLServer::db_store() query = " << query.str() << log4cpp::CategoryStream::ENDLINE;
     try
     {
 #if !HAVE_SSTREAM
@@ -699,8 +697,7 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
     }
     catch(const long err)
     {
-	//std::cout << "MySQLServer::db_store(): error = " << mysql_error(mysql_conn) << std::endl;
-    	if (enable_logging) logStream << getTimeString("MySQLServer::db_store()") << " error = " << mysql_error(mysql_conn) << std::endl;
+    	logStream->errorStream() << "MySQLServer::db_store() error = " << mysql_error(mysql_conn) << log4cpp::CategoryStream::ENDLINE;
 	throw err;
     }
 //

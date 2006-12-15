@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jensmeyer $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2005-09-26 16:18:23 $
+ * Date:	$Date: 2006-12-15 12:43:53 $
  *
  */
 
@@ -64,9 +64,7 @@ DevLong *NdbmServer::db_clodb_1_svc()
 {
 	static DevLong errcode;
 
-#ifdef DEBUG
-	std::cout << "db_clodb()" << std::endl;
-#endif 
+	logStream->debugStream() << "db_clodb()" << log4cpp::CategoryStream::ENDLINE;
 //
 // Return error code if the server is not connected to the database files
 //
@@ -103,15 +101,13 @@ DevLong *NdbmServer::db_reopendb_1_svc()
 	int 		flags = O_RDWR;
 	char 		*ptr;
 
-#ifdef DEBUG
-	std::cout << "db_reopendb" << std::endl;
-#endif 
+	logStream->debugStream() << "db_reopendb" << log4cpp::CategoryStream::ENDLINE;
 //
 // Find the dbm_database files
 //
 	if ((ptr = (char *)getenv("DBM_DIR")) == NULL)
 	{
-		std::cerr << "dbm_server: Can't find environment variable DBM_DIR" << std::endl;
+		logStream->errorStream() << "dbm_server: Can't find environment variable DBM_DIR" << log4cpp::CategoryStream::ENDLINE;
 		errcode = DbErr_DatabaseAccess;
 		return(&errcode);
 	}
@@ -137,7 +133,7 @@ DevLong *NdbmServer::db_reopendb_1_svc()
 				t = gdbm_open(const_cast<char *>(dbm_file.c_str()), 0, GDBM_NOLOCK | GDBM_WRCREAT, 0666, NULL);
 			if (t == NULL)
                 	{
-				std::cerr << "dbm_clo_op (" << gdbm_errno << "): Can't create file : " << dbm_file << std::endl;
+				logStream->errorStream() << "dbm_clo_op (" << gdbm_errno << "): Can't create file : " << dbm_file << log4cpp::CategoryStream::ENDLINE;
 				errcode = DbErr_DatabaseAccess;
 				return(&errcode);
                 	}
@@ -152,7 +148,7 @@ DevLong *NdbmServer::db_reopendb_1_svc()
 		}
 		if (dbgen.tid[i] == NULL)
 		{
-			std::cerr <<"dbm_server (" << gdbm_errno << "): Can't open table : " << dbgen.TblName[i] << std::endl; 
+			logStream->errorStream() <<"dbm_server (" << gdbm_errno << "): Can't open table : " << dbgen.TblName[i] << log4cpp::CategoryStream::ENDLINE;
 			errcode = DbErr_DatabaseAccess;
 			return(&errcode);
 		}

@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.1 $
+ * Version:	$Revision: 1.2 $
  *
- * Date:	$Date: 2006-09-27 12:21:35 $
+ * Date:	$Date: 2006-12-15 12:43:54 $
  *
  */
 
@@ -45,9 +45,7 @@ db_res *SQLite3Server::devserverlist_1_svc()
 	std::string 		server;
 	std::vector<std::string> serv_list;
 	
-#ifdef DEBUG
-	std::cout << "In devserverlist_1_svc function" << std::endl;
-#endif
+	logStream->debugStream() << "In devserverlist_1_svc function" << log4cpp::CategoryStream::ENDLINE;
 
 //
 // Initialize structure sent back to client
@@ -60,7 +58,7 @@ db_res *SQLite3Server::devserverlist_1_svc()
 //
 	if (dbgen.connected == False)
 	{
-		std::cout << "I'm not connected to database." << std::endl;
+		logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
 		browse_back.db_err = DbErr_DatabaseNotConnected;
 		return(&browse_back);
 	}
@@ -72,7 +70,7 @@ db_res *SQLite3Server::devserverlist_1_svc()
 	query = "SELECT DISTINCT SERVER FROM device ORDER BY SERVER ASC";
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		std::cout << sqlite3_errmsg(db) << std::endl;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
 		browse_back.db_err = DbErr_DatabaseAccess;
 		return(&browse_back);			
 	}
@@ -86,9 +84,8 @@ db_res *SQLite3Server::devserverlist_1_svc()
 		if (find(serv_list.begin(), serv_list.end(), tmp) == serv_list.end())
 		{
 			serv_list.push_back(tmp);		
-#ifdef DEBUG
-			std::cout << "devserverlist_1_svc(): server found " << tmp << std::endl;
-#endif /* DEBUG */
+
+			logStream->debugStream() << "devserverlist_1_svc(): server found " << tmp << log4cpp::CategoryStream::ENDLINE;
 		}
 	}
 	sqlite3_free_table(result);
@@ -108,7 +105,7 @@ db_res *SQLite3Server::devserverlist_1_svc()
 #if 0
     if (serv_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
     {
-	std::cout << "Memory allocation error in devserverlist" << std::endl;
+	logStream->errorStream() << "Memory allocation error in devserverlist" << log4cpp::CategoryStream::ENDLINE;
 	browse_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&browse_back);
     }
@@ -132,9 +129,7 @@ db_res *SQLite3Server::devpersnamelist_1_svc(nam *server)
 	std::string 		user_server(*server);
 	std::vector<std::string> pers_list;
 
-#ifdef DEBUG
-	std::cout << "In devpersnamelist_1_svc function for server " << user_server << std::endl;
-#endif
+	logStream->debugStream() << "In devpersnamelist_1_svc function for server " << user_server << log4cpp::CategoryStream::ENDLINE;
 
 //
 // Initialize structure sent back to client
@@ -147,7 +142,7 @@ db_res *SQLite3Server::devpersnamelist_1_svc(nam *server)
 //
 	if (dbgen.connected == False)
 	{
-		std::cout << "I'm not connected to database." << std::endl;
+		logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
 		browse_back.db_err = DbErr_DatabaseNotConnected;
 		return(&browse_back);
 	}
@@ -162,7 +157,7 @@ db_res *SQLite3Server::devpersnamelist_1_svc(nam *server)
 	query += (user_server + "/%' ORDER BY SERVER ASC");
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		std::cout << sqlite3_errmsg(db) << std::endl;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
 		browse_back.db_err = DbErr_DatabaseAccess;
 		return(&browse_back);			
     	}
@@ -176,9 +171,8 @@ db_res *SQLite3Server::devpersnamelist_1_svc(nam *server)
 		if (find(pers_list.begin(), pers_list.end(), tmp) == pers_list.end())
 		{
 			pers_list.push_back(tmp);		
-#ifdef DEBUG
-			std::cout << "SQLite3Server::devpersnamelist_1_svc(): server found " << tmp << std::endl;
-#endif /* DEBUG */
+
+			logStream->debugStream() << "SQLite3Server::devpersnamelist_1_svc(): server found " << tmp << log4cpp::CategoryStream::ENDLINE;
 		}
 	}
 	sqlite3_free_table(result);
@@ -198,7 +192,7 @@ db_res *SQLite3Server::devpersnamelist_1_svc(nam *server)
 #if 0
     if (pers_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
     {
-		std::cout << "Memory allocation error in devpersnamelist" << std::endl;
+		logStream->errorStream() << "Memory allocation error in devpersnamelist" << log4cpp::CategoryStream::ENDLINE;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
     }
@@ -219,9 +213,7 @@ db_res *SQLite3Server::hostlist_1_svc()
 {
 	std::vector<std::string>	host_list;
 	
-#ifdef DEBUG
-	std::cout << "In hostlist_1_svc function" << std::endl;
-#endif
+	logStream->debugStream() << "In hostlist_1_svc function" << log4cpp::CategoryStream::ENDLINE;
 
 //
 // Initialize structure sent back to client
@@ -247,7 +239,7 @@ db_res *SQLite3Server::hostlist_1_svc()
 	query = "SELECT DISTINCT HOST FROM device WHERE EXPORTED != 0 ORDER BY HOST ASC";
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		std::cout << sqlite3_errmsg(db) << std::endl;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
 		browse_back.db_err = DbErr_DatabaseAccess;
 		return(&browse_back);			
 	}
@@ -271,7 +263,7 @@ db_res *SQLite3Server::hostlist_1_svc()
 #if 0
 	if (host_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
 	{
-		std::cout << "Memory allocation error in hostlist" << std::endl;
+		logStream->errorStream() << "Memory allocation error in hostlist" << log4cpp::CategoryStream::ENDLINE;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}

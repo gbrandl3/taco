@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.1 $
+ * Version:	$Revision: 1.2 $
  *
- * Date:	$Date: 2006-09-27 12:21:35 $
+ * Date:	$Date: 2006-12-15 12:43:54 $
  *
  */
 
@@ -46,9 +46,7 @@ cmd_que *SQLite3Server::db_cmd_query_1_svc(nam *pcmd_name)
     int 		i;
     std::string 	req_cmd(*pcmd_name);
 
-#ifdef DEBUG
-    std::cout << "Command name : " << req_cmd << std::endl;
-#endif
+    logStream->debugStream() << "Command name : " << req_cmd << log4cpp::CategoryStream::ENDLINE;
 //
 // Initialize error code sended cmd_queue to client 
 //
@@ -58,7 +56,7 @@ cmd_que *SQLite3Server::db_cmd_query_1_svc(nam *pcmd_name)
 //
     if (!dbgen.connected)
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
 	cmd_queue.db_err = DbErr_DatabaseNotConnected;
 	cmd_queue.xcmd_code = 0;
 	return(&cmd_queue);
@@ -83,7 +81,7 @@ cmd_que *SQLite3Server::db_cmd_query_1_svc(nam *pcmd_name)
     query += ("DOMAIN = 'cmds' AND VALUE = '" + req_cmd + "'");
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		std::cout << sqlite3_errmsg(db) << std::endl;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
 		cmd_queue.db_err = DbErr_DatabaseAccess;
 		cmd_queue.xcmd_code = 0;
 		return (&cmd_queue);

@@ -28,6 +28,8 @@ nodist_template_SCRIPTS = taco.SuSE taco.debian taco-manager.sh
 
 nodist_template_DATA 	= tacoenv.sh tacoenv.csh
 
+sysconf_DATA		= taco_log.cfg
+
 pkgconfigdir		= @libdir@/pkgconfig
 
 nodist_pkgconfig_DATA	= taco-server.pc taco-server++.pc taco-client.pc taco-client++.pc

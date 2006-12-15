@@ -23,7 +23,7 @@ sbin_PROGRAMS		= dbm_server
 
 lib_LTLIBRARIES 	= 
 
-INCLUDES		= @TACO_INCLUDES@ 
+INCLUDES		= @TACO_INCLUDES@ -I$(top_srcdir)/log4cpp/include
 AM_CPPFLAGS		= -DNODEBUG
 
 if GDBMSUPPORT
@@ -88,7 +88,7 @@ INCLUDES		+= @SQLITE3_CFLAGS@
 AM_CPPFLAGS		+= -DUSE_SQLITE3 -DNODEBUG
 endif
 
-dbm_server_CFLAGS	= -DNODEBUG
+dbm_server_CFLAGS	= -DNODEBUG 
 dbm_server_SOURCES 	= main_svc.cpp dbm.cpp db_serv.cpp
-dbm_server_LDADD	= @TACO_SERVER_LIBS@ $(lib_LTLIBRARIES) -lstdc++
+dbm_server_LDADD	= @TACO_SERVER_LIBS@ $(lib_LTLIBRARIES) -lstdc++ $(top_builddir)/log4cpp/src/liblog4cpp.la
 dbm_server_LDFLAGS	= -static

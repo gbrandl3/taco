@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.1 $
+ * Version:	$Revision: 1.2 $
  *
- * Date:	$Date: 2006-09-27 12:21:35 $
+ * Date:	$Date: 2006-12-15 12:43:54 $
  *
  */
 
@@ -54,23 +54,21 @@ db_psdev_error *SQLite3Server::db_psdev_reg_1_svc(psdev_reg_x *rece)
 //
     psdev_back.error_code = psdev_back.psdev_err = 0;
 
-#ifdef DEBUG
-    std::cout << "Begin db_psdev_register" << std::endl;
-    std::cout << "Host name : " << rece->h_name << std::endl;
-    std::cout << "PID = " << rece->pid << std::endl;
+    logStream->debugStream() << "Begin db_psdev_register" << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "Host name : " << rece->h_name << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "PID = " << rece->pid << log4cpp::CategoryStream::ENDLINE;
     for (long i = 0; i < num_psdev; i++)
     {
 	tmp = &(rece->psdev_arr.psdev_arr_val[i]);
-	std::cout << "Pseudo device name : " << tmp->psdev_name << std::endl;
-	std::cout << "Refresh period : " << tmp->poll << std::endl;
+	logStream->debugStream() << "Pseudo device name : " << tmp->psdev_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Refresh period : " << tmp->poll << log4cpp::CategoryStream::ENDLINE;
     }
-#endif
 //
 // Return error code if the server is not connected 
 //
     if (dbgen.connected == False)
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
 	psdev_back.error_code = DbErr_DatabaseNotConnected;
 	return(&psdev_back);
     }
@@ -91,9 +89,7 @@ db_psdev_error *SQLite3Server::db_psdev_reg_1_svc(psdev_reg_x *rece)
 //
 // Leave server 
 //
-#ifdef DEBUG
-    std::cout << "End db_psdev_register" << std::endl;
-#endif 
+    logStream->debugStream() << "End db_psdev_register" << log4cpp::CategoryStream::ENDLINE;
     return(&psdev_back);
 }
 
@@ -135,7 +131,7 @@ long SQLite3Server::reg_ps(std::string h_name, long pid, std::string ps_name, lo
     	query = "SELECT COUNT(*) FROM device WHERE NAME = '" + ps_name_low + "' AND CLASS NOT LIKE 'PseudoDevice'";
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		std::cout << sqlite3_errmsg(db) << std::endl; 
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE; 
 		*p_error = DbErr_DatabaseAccess;
 		return(-1);
 	}
@@ -176,7 +172,7 @@ long SQLite3Server::reg_ps(std::string h_name, long pid, std::string ps_name, lo
 //
 // In case of error 
 //
-		std::cout << sqlite3_errmsg(db) << std::endl;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
 		throw long(DbErr_DatabaseAccess);
         }
 #if !HAVE_SSTREAM
@@ -246,17 +242,16 @@ db_psdev_error *SQLite3Server::db_psdev_unreg_1_svc(arr1 *rece)
 //
     psdev_back.error_code = psdev_back.psdev_err = 0;
 
-#ifdef DEBUG
-    std::cout << "Begin db_psdev_unregister" << std::endl;
+    logStream->debugStream() << "Begin db_psdev_unregister" << log4cpp::CategoryStream::ENDLINE;
     for (long i = 0;i < num_psdev;i++)
-	std::cout << "Pseudo device name : " << rece->arr1_val[i] << std::endl;
-#endif
+	logStream->debugStream() << "Pseudo device name : " << rece->arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+
 //
 // Return error code if the server is not connected 
 //
     if (dbgen.connected == False)
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
 	psdev_back.error_code = DbErr_DatabaseNotConnected;
 	return(&psdev_back);
     }
@@ -276,9 +271,7 @@ db_psdev_error *SQLite3Server::db_psdev_unreg_1_svc(arr1 *rece)
 //
 // Leave server */
 //
-#ifdef DEBUG
-    std::cout << "End db_psdev_unregister" << std::endl;
-#endif 
+    logStream->debugStream() << "End db_psdev_unregister" << log4cpp::CategoryStream::ENDLINE;
     return(&psdev_back);
 }
 
@@ -316,7 +309,7 @@ long SQLite3Server::unreg_ps(std::string ps_name, long *p_error)
 	query = "DELETE FROM device WHERE NAME = '" + ps_name_low + "'";
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		std::cout << sqlite3_errmsg(db) << std::endl;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
 		*p_error = DbErr_DatabaseAccess;
 		return (-1);
 	}
