@@ -34,11 +34,11 @@ lv_dsclass_la_SOURCES	= lv_dsclass.c LabViewGeneric.h LabViewGenericP.h
 lv_dsclass_la_LDFLAGS 	= $(LV_FLAGS) -module
 lv_dsclass_la_LIBADD 	= $(top_builddir)/lib/libtaco.la 
 
-rescmdsdir 		= ${prefix}/dbase/res/CMDS
-rescmds_DATA 		= LabviewGenericCmds.res
+## CMDS_res_DATA 	= LabviewGenericCmds.res
+noinst_DATA 		= LabviewGenericCmds.res
 
-restestdir 		= ${prefix}/dbase/res/TEST
-restest_DATA 		= LabviewGeneric.res
+## TEST_res_DATA 	= LabviewGeneric.res
+noinst_DATA 		+= LabviewGeneric.res
 
 EXTRA_DIST 		= LabviewGeneric.res LabviewGenericCmds.res
 
