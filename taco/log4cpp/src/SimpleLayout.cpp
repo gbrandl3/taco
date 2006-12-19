@@ -10,7 +10,9 @@
 #include "PortabilityImpl.hh"
 #include <log4cpp/SimpleLayout.hh>
 #include <log4cpp/Priority.hh>
+#ifdef HAVE_IOS
 #include <ios>
+#endif
 #ifdef LOG4CPP_HAVE_SSTREAM
 #include <sstream>
 #endif

@@ -63,7 +63,9 @@ namespace log4cpp {
             for(unsigned int i = _maxBackupIndex; i > 1; i--) {
                 std::string newName = oldName.str();
 #ifndef LOG4CPP_STLPORT_AND_BOOST_BUILD
-                                oldName.seekp(static_cast<std::ios::off_type>(n), std::ios::beg);
+/* change cast for old gcc 2.95 */
+                                //oldName.seekp(static_cast<std::ios::off_type>(n), std::ios::beg);
+                                oldName.seekp((std::stringbuf::off_type)n, std::ios::beg);
 #else
                                 // the direction parameter is broken in STLport 4.5.3, 
                                 // so we don't specify it (the code works without it)

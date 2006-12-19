@@ -12,7 +12,9 @@
 
 #include <log4cpp/Portability.hh>
 #include <log4cpp/Priority.hh>
+#ifdef LOG4CPP_HAVE_IOS
 #include <ios>
+#endif
 #ifdef LOG4CPP_HAVE_SSTREAM
 #include <sstream>
 #endif
@@ -110,6 +112,8 @@ namespace log4cpp {
             }
             return *this;
         }
+/* exclude this because old gcc 2.95 does not support const wstring */
+#if 0
 		template<typename T> CategoryStream& operator<<(const std::wstring& t) {
             if (getPriority() != Priority::NOTSET) {
                 if (!_wbuffer) {
@@ -121,6 +125,7 @@ namespace log4cpp {
             }
             return *this;
         }
+#endif
         /**
          * Set the width output on CategoryStream
          **/
@@ -132,7 +137,10 @@ namespace log4cpp {
         Priority::Value _priority;
 		union {
 			std::ostringstream* _buffer;
+/* exclude this because old gcc 2.95 does not support wostringstream */
+#if 0
 			std::wostringstream* _wbuffer;
+#endif
 		};
 
 		public:
