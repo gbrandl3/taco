@@ -30,9 +30,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.15 $
+ * Version:	$Revision: 1.16 $
  *
- * Date:	$Date: 2006-07-05 14:10:16 $
+ * Date:	$Date: 2006-12-21 08:18:21 $
  *
  *********************************************************************-*/
 
@@ -89,7 +89,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.15 2006-07-05 14:10:16 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.16 2006-12-21 08:18:21 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*
@@ -460,13 +460,13 @@ extern _DLLFunc long debug_flag;	/* global that is used in gen_api.c */
 	extern _DLLFunc void  dev_printdiag();
 #endif /* __STDC__ */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* global variable containing dynamic error string */
 
 extern char *dev_error_string;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int nodb, int pn, int n_device, char** device_list); 
 #ifdef __cplusplus
 }

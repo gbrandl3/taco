@@ -27,9 +27,9 @@
  * 
  * Author:	$Author: jkrueger1 $
  * 
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *  
- * Date:	$Date: 2005-07-25 13:08:21 $
+ * Date:	$Date: 2006-12-21 08:18:21 $
  * 
  *********************************************************************/
 
@@ -41,7 +41,7 @@
  */
 #ifdef _IDENT
 static char Adminh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/Admin.h,v 1.2 2005-07-25 13:08:21 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/Admin.h,v 1.3 2006-12-21 08:18:21 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -163,7 +163,13 @@ static struct _DevDebug_Entry {
 
 extern int os9forkc();
 #ifndef _OSK
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern char **environ;
+#ifdef __cplusplus
+}
+#endif
 #else
 
 #ifdef OSK
