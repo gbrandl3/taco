@@ -22,12 +22,12 @@ AC_DEFUN([TACO_PYTHON_BINDING],
 	PYTHON_PROG(2.0, [yes])
 	PYTHON_DEVEL
 	if test "x$taco_python_binding" = "xyes" ; then
-		ac_save_CFLAGS="$CFLAGS"
-		CFLAGS="$CFLAGS $PYTHON_CPPFLAGS"
+		ac_save_CPPFLAGS="$CPPFLAGS"
+		CPPFLAGS="$CFLAGS $PYTHON_CPPFLAGS"
 		AC_CHECK_HEADERS([numarray/arrayobject.h], [taco_python_binding=yes], 
 			AC_CHECK_HEADERS(Numeric/arrayobject.h, [taco_python_binding=yes], [taco_python_binding=no], [#include <Python.h>]),
 			[#include <Python.h>])
-		CFLAGS="$ac_save_CFLAGS"
+		CPPFLAGS="$ac_save_CPPFLAGS"
 	fi	
 	if test x"${taco_server_libs}" != x"yes" ; then
 		taco_python_binding=no
