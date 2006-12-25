@@ -29,9 +29,9 @@
  *
  * Original:	10.5.95
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2006-09-18 22:38:27 $
+ * Date:        $Date: 2006-12-25 19:24:34 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -86,7 +86,7 @@ static	DevCommandListEntry commands_list[] = {
    	{DevReadValue, dev_readvalue, D_VOID_TYPE, D_STATE_FLOAT_READPOINT},
    	{DevSetValue, dev_setvalue, D_FLOAT_TYPE, D_VOID_TYPE},
    	{DevState, dev_state, D_VOID_TYPE, D_SHORT_TYPE},
-   	{DevStatus, dev_status, D_VOID_TYPE, D_STRING_TYPE}
+   	{DevStatus, dev_status, D_VOID_TYPE, D_STRING_TYPE},
 };
 static long n_commands = sizeof(commands_list)/sizeof(DevCommandListEntry);
 
@@ -102,13 +102,13 @@ static Inst_verify inst_verify = (Inst_verify)&inst_verifyRec;
  */
 db_resource res_object[] = {
 	{"read",	D_FLOAT_TYPE, NULL},
-	{"set",	D_FLOAT_TYPE, NULL},
+	{"set",		D_FLOAT_TYPE, NULL},
    	};
 int res_object_size = sizeof(res_object)/sizeof(db_resource);
 
 db_resource res_class[] = {
 	{"state",       D_LONG_TYPE, NULL},
-	{"config",   D_LONG_TYPE, NULL},
+	{"config",   	D_LONG_TYPE, NULL},
    	};
 int res_class_size = sizeof(res_class)/sizeof(db_resource);
 
