@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jlpons $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.13 $
  *
- * Date:	$Date: 2006-12-12 17:23:08 $
+ * Date:	$Date: 2007-01-15 16:52:59 $
  *
  */
 
@@ -358,6 +358,21 @@ db_res *MySQLServer::resresolist_1_svc(db_res *recev)
     return(&browse_back);	
 }
 
+
+
+// Add quote to resource value containing separator
+void quote(std::string &value) {
+
+  std::string::size_type pos;
+  
+  if (((pos = value.find(',')) != std::string::npos) ||
+      ((pos = value.find(' ')) != std::string::npos))
+  {
+    value = "\"" + value + "\"";
+  }
+  
+}
+
 /**
  * To retrieve a device resource value (as strings)
  *
@@ -431,14 +446,17 @@ db_res *MySQLServer::resresoval_1_svc(db_res *recev)
 //
 // Build the first field of the complete resource name
 //
+	std::string r_value(row[3]);
+	quote(r_value);
+	
 	if (atoi(row[2]) == 1)
 	{
 	    if (res_val.length() != 0)
 		reso_list.push_back(res_val);
-	    res_val = user_domain + "/" + user_family + "/" + row[0] + "/" + row[1] + ": " + row[3];
+	    res_val = user_domain + "/" + user_family + "/" + row[0] + "/" + row[1] + ": " + r_value;
 	}
 	else
-	    res_val += ("," + std::string(row[3]));
+	    res_val += ("," + r_value);
     }
     reso_list.push_back(res_val);
     mysql_free_result(result);                                                                            

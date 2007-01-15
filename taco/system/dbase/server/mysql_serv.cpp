@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jlpons $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.15 $
+ * Version:	$Revision: 1.16 $
  *
- * Date:	$Date: 2006-12-12 17:23:08 $
+ * Date:	$Date: 2007-01-15 16:53:00 $
  *
  */
 
@@ -534,14 +534,16 @@ DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
 // it is not necessary to look for the element separator to extract the last
 // element value from the string. 
 //
-		if ((pos = res_val.find(SEP_ELT)) == std::string::npos)
-		{
-			std::cout << "Missing '" << SEP_ELT <<"' in resource value." << std::endl;
-			errcode = DbErr_BadDevSyntax;
-			return (&errcode);
-		}
-		int ctr = int(atoi(res_val.substr(1, pos - 1).c_str()) - 1);
-		res_numb = 1;
+	    
+  	    if ((pos = res_val.find(SEP_ELT)) == std::string::npos)
+	    {
+		std::cout << "Missing '" << SEP_ELT <<"' in resource value." << std::endl;
+		errcode = DbErr_BadResSyntax;
+		return (&errcode);
+	    }
+	    int ctr = int(atoi(res_val.substr(1, pos - 1).c_str()) - 1);
+	    res_numb = 1;
+	    res_val.erase(0, pos + 1);
 
 	    for (int l = 0; l < ctr; l++)
 	    {
@@ -552,8 +554,10 @@ DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
 //
 // Add one array element in the database 
 //
-		pos = res_val.find(SEP_ELT, 1 + (last_pos = pos));
-		content = res_val.substr(pos + 1, last_pos - pos);
+		pos = res_val.find(SEP_ELT);
+		content = res_val.substr(0, pos);
+		res_val.erase(0, pos + 1);
+				
 		if (db_insert(res_name, indnr, content) != 0)
 		{
 		    errcode = DbErr_DatabaseAccess;
@@ -563,7 +567,7 @@ DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
 //
 // For the last element value 
 
-	    content = res_val.substr(pos + 1);
+	    content = res_val;
 	    snprintf(indnr, sizeof(indnr), "%d",res_numb++);
 	    if (db_insert(res_name, indnr, content) != 0)
 	    {
