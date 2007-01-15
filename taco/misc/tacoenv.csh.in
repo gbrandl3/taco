@@ -48,7 +48,7 @@ setenv TACO_LOGGING yes
 if (${?TACO_DATABASE}) then
 ;
 else
-setenv TACO_DATABASE dbm
+setenv TACO_DATABASE @TACO_DATABASE@
 endif
 
 # set the mySQL user for the taco database

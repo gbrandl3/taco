@@ -40,7 +40,7 @@ TACO_SECURITY=no
 TACO_LOGGING=yes
 
 # set the database type "dbm", "sqlite3", or "mysql"
-TACO_DATABASE=${TACO_DATABASE:-dbm}
+TACO_DATABASE=${TACO_DATABASE:-@TACO_DATABASE@}
 
 # set the mySQL user for the taco database
 MYSQL_USER=root
