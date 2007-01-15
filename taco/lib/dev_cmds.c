@@ -28,12 +28,14 @@
  *
  * Original:	March 1992
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2005-07-25 13:08:28 $
+ * Date:	$Date: 2007-01-15 16:54:15 $
  *
  ********************************************************************-*/
 
+#include <ExpDsNumbers.h>
+#include <DevCcdCmds.h>
 #include <DevCmds.h>
 
 DevCmdNameListEntry DevCmdNameList[] = {
@@ -702,6 +704,79 @@ DevCmdNameListEntry DevCmdNameList[] = {
 {DevOn, "On"},
 {DevOpen, "Open"},
 {DevClose, "Close"},
+
+/*** DevCcdCmds ***/
+{DevCcdStart, "DevCcdStart"},
+{DevCcdStop, "DevCcdStop"},
+{DevCcdRead, "DevCcdRead"},
+{DevCcdSetExposure, "DevCcdSetExposure"},
+{DevCcdGetExposure, "DevCcdGetExposure"},
+{DevCcdSetRoI, "DevCcdSetRoI"},
+{DevCcdGetRoI, "DevCcdGetRoI"},
+{DevCcdSetBin, "DevCcdSetBin"},
+{DevCcdGetBin, "DevCcdGetBin"},
+{DevCcdSetTrigger, "DevCcdSetTrigger"},
+{DevCcdGetTrigger, "DevCcdGetTrigger"},
+{DevCcdGetLstErrMsg, "DevCcdGetLstErrMsg"},
+{DevCcdXSize, "DevCcdXSize"},
+{DevCcdYSize, "DevCcdYSize"},
+{DevCcdSetADC, "DevCcdSetADC"},
+{DevCcdGetADC, "DevCcdGetADC"},
+{DevCcdSetSpeed, "DevCcdSetSpeed"},
+{DevCcdGetSpeed, "DevCcdGetSpeed"},
+{DevCcdSetShutter, "DevCcdSetShutter"},
+{DevCcdGetShutter, "DevCcdGetShutter"},
+{DevCcdSetFrames, "DevCcdSetFrames"},
+{DevCcdGetFrames, "DevCcdGetFrames"},
+{DevCcdCommand, "DevCcdCommand"},
+{DevCcdDepth, "DevCcdDepth"},
+{DevCcdSetMode, "DevCcdSetMode"},
+{DevCcdGetMode, "DevCcdGetMode"},
+{DevCcdSetChannel, "DevCcdSetChannel"},
+{DevCcdGetChannel, "DevCcdGetChannel"},
+{DevCcdSetRingBuf, "DevCcdSetRingBuf"},
+{DevCcdGetRingBuf, "DevCcdGetRingBuf"},
+{DevCcdLive, "DevCcdLive"},
+{DevCcdWriteFile, "DevCcdWriteFile"},
+{DevCcdReset, "DevCcdReset"},
+{DevCcdGetIdent, "DevCcdGetIdent"},
+{DevCcdGetType, "DevCcdGetType"},
+{DevCcdSetKinWinSize, "DevCcdSetKinWinSize"},
+{DevCcdGetKinWinSize, "DevCcdGetKinWinSize"},
+{DevCcdSetKinetics, "DevCcdGetKinWinSize"},
+{DevCcdGetKinetics, "DevCcdGetKinetics"},
+{DevCcdCorrect, "DevCcdCorrect"},
+{DevCcdSetFilePar, "DevCcdSetFilePar"},
+{DevCcdGetFilePar, "DevCcdGetFilePar"},
+{DevCcdHeader, "DevCcdHeader"},
+{DevCcdSetFormat, "DevCcdSetFormat"},
+{DevCcdGetFormat, "DevCcdGetFormat"},
+{DevCcdSetViewFactor, "DevCcdSetViewFactor"},
+{DevCcdGetViewFactor, "DevCcdGetViewFactor"},
+{DevCcdSetHwPar, "DevCcdSetHwPar"},
+{DevCcdGetHwPar, "DevCcdGetHwPar"},
+{DevCcdGetCurrent, "DevCcdGetCurrent"},
+{DevCcdGetBuffer, "DevCcdGetBuffer"},
+{DevCcdGetBufferInfo, "DevCcdGetBufferInfo"},
+{DevCcdReadAll, "DevCcdReadAll"},
+{DevCcdWriteAll, "DevCcdWriteAll"},
+{DevCcdDezinger, "DevCcdDezinger"},
+{DevCcdSetThreshold, "DevCcdSetThreshold"},
+{DevCcdGetThreshold, "DevCcdGetThreshold"},
+{DevCcdSetMaxExposure, "DevCcdSetMaxExposure"},
+{DevCcdGetMaxExposure, "DevCcdGetMaxExposure"},
+{DevCcdSetGain, "DevCcdSetGain"},
+{DevCcdGetGain, "DevCcdGetGain"},
+{DevCcdReadJpeg, "DevCcdReadJpeg"},
+{DevCcdRefreshTime, "DevCcdRefreshTime"},
+{DevCcdOutputSize, "DevCcdOutputSize"},
+{DevCcdGetTGradient, "DevCcdGetTGradient"},
+{DevCcdGetChanges, "DevCcdGetChanges"},
+{DevCcdCalibrate, "DevCcdCalibrate"},
+{DevCcdSetThumbnail1, "DevCcdSetThumbnail1"},
+{DevCcdSetThumbnail2, "DevCcdSetThumbnail2"},
+{DevCcdWriteThumbnail1, "DevCcdWriteThumbnail1"},
+{DevCcdWriteThumbnail2, "DevCcdWriteThumbnail2"},
 };
 
 /*
