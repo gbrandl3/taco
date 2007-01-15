@@ -18,7 +18,8 @@
 #
 
 EXTRA_DIST		= taco.startup.in taco.shutdown.in taco-config.in tacoenv.sh.in tacoenv.csh.in taco.SuSE.in taco-manager.sh.in \
-			  taco.debian.in taco.status.in taco-server.pc.in taco-server++.pc.in taco-client.pc.in taco-client++.pc.in
+			  taco.debian.in taco.status.in taco-server.pc.in taco-server++.pc.in taco-client.pc.in taco-client++.pc.in \
+			  taco_log.cfg
 
 dist_sbin_SCRIPTS 	= off
 
