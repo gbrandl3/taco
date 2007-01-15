@@ -86,8 +86,6 @@ dnl disable the build of gdbm if gdbm support of database server is disabled
 	AC_SUBST(GDBM_CFLAGS)
 	AC_SUBST(GDBM_LIBS)
 	AC_SUBST(GDBM_COMPAT_LIBS)
-	AC_SUBST(MYSQL_CFLAGS)
-	AC_SUBST(MYSQL_LIBS)
 ])
 
 AC_DEFUN([TACO_SQLITE3_SUPPORT],
@@ -181,6 +179,8 @@ MYSQL       mysql,
 		LIBS="$save_LIBS"
 		CPPFLAGS="$save_CPPPLAGS"
 	fi
+	AC_SUBST(MYSQL_CFLAGS)
+l	AC_SUBST(MYSQL_LIBS)
 ])
 
 AC_DEFUN([TACO_SERVER_T],
@@ -211,10 +211,20 @@ AC_DEFUN([TACO_DATABASE_SERVER],
 	else
 		AM_CONDITIONAL(MYSQLSUPPORT, [false])
 		AM_CONDITIONAL(GDBMSUPPORT, [false])
+		AM_CONDITIONAL(SQLITE3SUPPORT, [false])
 		AM_CONDITIONAL(BUILD_GDBM, [false])
 		taco_build_gdbm=no
 	fi
 	AM_CONDITIONAL(BUILD_DATABASESERVER, [test x"${taco_dbserver}" = x"yes"])
+	if test x"taco_sqlite3" = x"yes" ; then
+		AC_SUBST([TACO_DATABASE], [sqlite3])
+	elif test x"taco_mysql" = x"yes" ; then
+		AC_SUBST([TACO_DATABASE], [mysql])
+	elif test x"taco_gdbm" = x"yes" ; then
+		AC_SUBST([TACO_DATABASE], [dbm])
+	else
+		AC_SUBST([TACO_DATABASE], [no])
+	fi
 ])
 
 AC_DEFUN([TACO_MANAGER],
