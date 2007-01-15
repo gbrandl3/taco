@@ -1,3 +1,11 @@
+2007-01-15 18:00 jkrueger1:
+	* misc/tacoenv.*.in: Change the default database type
+	* configure.ac: Change version number
+	* acinclude.m4: FIX: SQLITE3SUPPORT is undefined conditional if dbm 
+	server is disabled. Set default database backend.
+	* system/dbase/server/mysql_resbro.cpp system/dbase/server/mysql_serv.cpp:
+	import changes made by Jean-Luc in the 3_97_0 branch to fix the array
+	bug in resource files
 2006-12-07 16:30 jkrueger1:
 	* configure.ac ext: rearrange the sources in the 'ext' directory
 	* acinclude.m4: Improve the detection of the omniORB installation, use 
