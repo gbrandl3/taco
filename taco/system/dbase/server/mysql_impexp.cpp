@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.17 $
+ * Version:	$Revision: 1.18 $
  *
- * Date:	$Date: 2006-12-15 12:43:54 $
+ * Date:	$Date: 2007-01-16 08:04:01 $
  *
  */
 
@@ -524,7 +524,12 @@ svc_inf *MySQLServer::db_svcchk_1_svc(nam *dsn_name)
 	    
 	if (row[0] != NULL) strcpy(host_name, row[0]);
 	svc_info.ho_name = host_name;
-    	if (row[1] != NULL) svc_info.p_num = atoi(row[1]);
+    	if (row[1] != NULL) {
+	  std::string ior(row[1]);
+	  std::string pgm_no;
+	  pgm_no = ior.substr(ior.rfind(':')+1);
+          svc_info.p_num = atoi(pgm_no.c_str());
+	}
     	if (row[2] != NULL) svc_info.v_num = atoi(row[2]);
     }
     else
