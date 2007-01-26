@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+# -*- coding: iso-8859-15 -*-
 #
 # Toolkit for building distributed control systems or any other distributed system.
 #
@@ -29,9 +30,9 @@
 #
 # Original:     Mai 2001
 #
-# Version:      $Revision: 1.4 $
+# Version:      $Revision: 1.5 $
 #
-# Date:         $Date: 2005-07-25 13:43:42 $
+# Date:         $Date: 2007-01-26 07:25:44 $
 #
 
 """
@@ -58,8 +59,8 @@
 """
 
 __author__ = "Jens Meyer, $Author: jkrueger1 $"
-__date__ = "$Date: 2005-07-25 13:43:42 $"
-__revision__ = "$Revision: 1.4 $"
+__date__ = "$Date: 2007-01-26 07:25:44 $"
+__revision__ = "$Revision: 1.5 $"
 
 import sys, re, string, getopt, os
 
