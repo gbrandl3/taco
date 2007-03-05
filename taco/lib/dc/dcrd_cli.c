@@ -23,13 +23,13 @@
  * Description:
  *
  * Author(s):	Emmanuel Taurel
- *		$Author: jkrueger1 $
+ *		$Author: bourtemb $
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.14 $
+ * Version:	$Revision: 1.15 $
  *
- * Date:	$Date: 2006-09-18 22:13:30 $
+ * Date:	$Date: 2007-03-05 11:14:37 $
  *
  ******************************************************************************/
 
@@ -2281,9 +2281,11 @@ int rpc_reconnect_rd(int ind,long i_net,long *perr)
  * Test every server and keep the connection with the first one which answers 
  */
 	for (i = 0;i < nb_server;i++)
+	{
 		res = re_test_server(ind,serv_info,i,nb_server,i_net,&error);
 		if (res == 0)
 			return(DS_OK);
+	}
 	if (i == nb_server)
 	{
 		*perr = error;
