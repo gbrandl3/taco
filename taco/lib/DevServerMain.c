@@ -29,9 +29,9 @@
  *
  * Original   	: March 1991
  *
- * Version	: $Revision: 1.25 $
+ * Version	: $Revision: 1.26 $
  *
- * Date		: $Date: 2006-09-18 22:31:43 $
+ * Date		: $Date: 2007-03-22 15:54:39 $
  *
  *******************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -303,6 +303,7 @@ int main (int argc, char **argv)
 				res_path [80],
 				res_name[80],
 				**device_list;
+				char nethost[80];
 #if 0
 	pid_t			pid;
 #endif
@@ -349,6 +350,8 @@ int main (int argc, char **argv)
 		
 		fprintf( stderr, "   -s                             : "
 			"use startup function from server\n" );
+		fprintf( stderr, "   -n nethost                            : "
+			"use nethost instead of NETHOST environment\n" );
 #ifdef unix
 		fprintf( stderr, "   -d                             : "
 			"start as daemon\n");
@@ -397,8 +400,11 @@ int main (int argc, char **argv)
 			else if (strcmp (argv[i],"-d") == 0)
 				daemon_opt = True;
 #endif
-			else if (strcmp (argv[i], "-n") == 0)
+			else if (strcmp (argv[i], "-n") == 0 && (i + 1) < argc)
 			{
+				snprintf(nethost, sizeof(nethost), "NETHOST=%s", argv[i + 1]);
+				putenv(nethost);
+				++i;
 			}
 /*
  * option -nodb means run device server without database
