@@ -11,6 +11,15 @@
  Original   :	June 2005
 
  $Log: not supported by cvs2svn $
+ Revision 1.15.2.2  2007/02/19 12:14:28  jlpons
+ Fixed deadlock in reconnection mechanism
+
+ Revision 1.15.2.1  2007/01/31 09:42:04  jlpons
+ Added support for server running without database
+
+ Revision 1.15  2006/07/25 12:37:14  jlpons
+ Fixed a bug in XdrQueryOut (SHORT_NAME_SIZE)
+
  Revision 1.14  2006/07/21 08:36:26  jlpons
  Changed the admin timeout
 
@@ -98,7 +107,7 @@ public class TacoDevice implements ServerListener {
   public final static int SOURCE_CACHE_DEVICE = 2;
 
   // Do not modify this line (it is used by the install script)
-  public final String apiRelease = "$Revision: 1.15 $".substring(11,15);
+  public final String apiRelease = "$Revision: 1.16 $".substring(11,15);
 
   // Timeout before reinporting the device from the database
   private static long dbImportTimeout = 30000L; // 30 sec
@@ -131,6 +140,10 @@ public class TacoDevice implements ServerListener {
   private ServerConnection dcHandle;         // DC server handle
   private ServerConnection dsHandle;         // Server handle
   private NethostConnection nhHandle;        // Nethost handle
+  private boolean noDB;                      // No database flag
+  private boolean disconnectDev;             // Disconnection flag
+  private boolean disconnectDc;              // Disconnection flag
+  private boolean reconnectDev;              // Reconnect on device in SOURCE_CACHE_DEVICE
 
   /**
    * Constructs the specified device.
@@ -152,6 +165,9 @@ public class TacoDevice implements ServerListener {
     this.lastDevImportError = null;
     this.lastDcImportError  = null;
     this.source             = source;
+    this.disconnectDev      = false;
+    this.disconnectDc       = false;
+    this.reconnectDev       = false;
 
     if(name.startsWith("taco:"))
       deviceName = name.substring(5).toLowerCase();
@@ -161,23 +177,52 @@ public class TacoDevice implements ServerListener {
     // Check the syntax
     checkDeviceSyntax(deviceName);
 
-    // Extract '//nethost/' if detected
-    String netHost = "";
-    if(deviceName.startsWith("//")) {
+    // Check noDB
+    noDB = deviceName.indexOf('?')>=0;
 
-      int i = deviceName.indexOf('/',2);
-      if(i<0)
+    if( noDB ) {
+
+      // Force source device when noDB
+      this.source = SOURCE_DEVICE;
+
+      // Extract program number
+      int ip = deviceName.indexOf('?');
+      String portStr = deviceName.substring(ip+1);
+      try {
+        progNumber = Integer.parseInt(portStr);
+      } catch (NumberFormatException e) {
+        throw new TacoException("Invalid port number");
+      }
+
+      // Extract device name and host name
+      int is = deviceName.indexOf('/',2);
+      if(is<0)
         throw new TacoException("Wrong device name syntax");
-      shortName = deviceName.substring(i+1);
-      netHost = deviceName.substring(2,i);
+
+      shortName = deviceName.substring(is+1,ip);
+      hostName = deviceName.substring(2,is);
 
     } else {
-      shortName = deviceName;
-    }
 
-    // Connect to the nethost, this will fire TacoException
-    // on major Taco error (Manager not responding).
-    nhHandle = NethostConnection.connectNethost(netHost);
+      // Extract '//nethost/' if detected
+      String netHost = "";
+      if(deviceName.startsWith("//")) {
+
+        int i = deviceName.indexOf('/',2);
+        if(i<0)
+          throw new TacoException("Wrong device name syntax");
+        shortName = deviceName.substring(i+1);
+        netHost = deviceName.substring(2,i);
+
+      } else {
+        shortName = deviceName;
+      }
+
+      // Connect to the nethost, this will fire TacoException
+      // on major Taco error (Manager not responding).
+      nhHandle = NethostConnection.connectNethost(netHost);
+
+    }
 
   }
 
@@ -223,6 +268,12 @@ public class TacoDevice implements ServerListener {
    * @see #SOURCE_CACHE
    */
   synchronized public void setSource(int s) throws TacoException {
+
+    if( noDB ) {
+      System.out.println("TacoDevice.setSource() has not effect for server without database (SOURCE_DEVICE forced)");
+      return;
+    }
+
     if (s != this.source) {
       this.source = s;
       free();
@@ -315,6 +366,10 @@ public class TacoDevice implements ServerListener {
    */
   public String getCommandString(int code) {
 
+     if( noDB ) {
+       // Return a default value if noDB
+       return "Cmd" + code;
+     }
      // We do not need to be imported to do this call
      return nhHandle.getCommandNames(new Integer[]{new Integer(code)})[0];
 
@@ -335,12 +390,19 @@ public class TacoDevice implements ServerListener {
     switch(source) {
 
       case SOURCE_DEVICE:
-        return "Devname:   " + deviceName + "\n" +
-               "DevClass:  " + devClass + "\n" +
-               "DevType:   " + devType + "\n" +
-               "DsName:    " + devProcessName + "\n" +
-               "Host:      " + dsHandle.getHostName() + "\n" +
-               "Nethost:   " + nhHandle.getName();
+        if( noDB ) {
+          return "Devname:   " + deviceName + "\n" +
+                 "DevType:   No database\n" +
+                 "DsName:    " + devProcessName + "\n" +
+                 "Host:      " + dsHandle.getHostName();
+        } else {
+          return "Devname:   " + deviceName + "\n" +
+                 "DevClass:  " + devClass + "\n" +
+                 "DevType:   " + devType + "\n" +
+                 "DsName:    " + devProcessName + "\n" +
+                 "Host:      " + dsHandle.getHostName() + "\n" +
+                 "Nethost:   " + nhHandle.getName();
+        }
 
       case SOURCE_CACHE_DEVICE:
         if (dcHandle != null) {
@@ -522,6 +584,10 @@ public class TacoDevice implements ServerListener {
    */
   public String[] getResource(String resName) throws TacoException {
 
+    if( noDB ) {
+      throw new TacoException("No database therefore the process cannot query it (hint: try running with database)");
+    }
+
     // We do not need to be imported to do this call
     // Build argin
     String[] fullName = new String[]{ shortName + "/" + resName.toLowerCase() };
@@ -549,16 +615,18 @@ public class TacoDevice implements ServerListener {
    * after this call will force a reimport.
    */
   public synchronized void free() throws TacoException {
+  
+    checkHandles();
 
-     if( dsHandle!=null ) {
-       // TODO: Manage security
-       dsHandle.freeDevice(deviceId,true,access,0,this);
-       dsHandle = null;
-     }
+    if( dsHandle!=null ) {
+      // TODO: Manage security
+      dsHandle.freeDevice(deviceId,true,access,0,this);
+      dsHandle = null;
+    }
 
     if( dcHandle!=null ) {
-       dcHandle.destroy();
-       dcHandle = null;
+      dcHandle.destroy();
+      dcHandle = null;
     }
 
      // Deimported this device
@@ -571,6 +639,9 @@ public class TacoDevice implements ServerListener {
    * Retreive server info from the database.
    */
   private void dbImportDevice() throws TacoException {
+
+    // Nothing to do if no DB
+    if(noDB) return;
 
     long now = System.currentTimeMillis();
 
@@ -703,13 +774,23 @@ public class TacoDevice implements ServerListener {
     try {
 
       // Connect the server
-      newDs = ServerConnection.connectServer(nhHandle.getName(),
-                                             hostName,
-                                             progNumber,
-                                             4, /* Current Taco server release */
-                                             /* argout.value[0].versNumber,*/
-                                             protocol,
-                                             this);
+      if( noDB ) {
+        newDs = ServerConnection.connectServer(hostName,  /* Use hostName as nethostName when noDB */
+                                               hostName,
+                                               progNumber,
+                                               4, /* Current Taco server release */
+                                               /* argout.value[0].versNumber,*/
+                                               protocol,
+                                               this);
+      } else {
+        newDs = ServerConnection.connectServer(nhHandle.getName(),
+                                               hostName,
+                                               progNumber,
+                                               4, /* Current Taco server release */
+                                               /* argout.value[0].versNumber,*/
+                                               protocol,
+                                               this);
+      }
 
       // Retreive deviceId from the server
       // TODO:Manage secutiry
@@ -748,6 +829,8 @@ public class TacoDevice implements ServerListener {
    * @throws TacoException in case of failure
    */
    private void importDevice() throws TacoException {
+   
+    checkHandles();
 
     // Check if we are imported
     switch(source) {
@@ -767,13 +850,29 @@ public class TacoDevice implements ServerListener {
         break;
 
       case SOURCE_CACHE_DEVICE:
-
+      
         TacoException devErr = null;
+	
+        // Try to reconnect to the device when a device has been disconnected
+	// but not the DC. We check reconnectDev to avoid a systematic import 
+	// of an unreachable device.
+        if( dcHandle != null && dsHandle == null && reconnectDev ) {
+	
+          try {
+            dbImportDevice();
+            initDev();
+          } catch (TacoException e) {
+          }
+	  return;
+	  
+	}
+      
         if (dsHandle != null || dcHandle != null) return;
 
         try {
           dbImportDevice();
           initDev();
+	  reconnectDev = true;
         } catch (TacoException e) {
           devErr = e;
         }
@@ -796,20 +895,36 @@ public class TacoDevice implements ServerListener {
    * (Expert usage) Should not be called.
    * Fired when a server lost the connection.
    */
-  synchronized public void disconnectFromServer(ServerConnection source) {
+  public void disconnectFromServer(ServerConnection source) {
 
     // No calls to the the API or other slow calls
     // can be made here else we will face deadlock
     // problems.
 
-    // Unreference the server and force a reimport
-    // on the next call to a command
+    // Force a reimport on the next call to a command
     if(source == dsHandle)
-      dsHandle = null;
+      disconnectDev = true;
 
     if(source == dcHandle)
-      dcHandle = null;
+      disconnectDc = true;
 
+  }
+  
+  /**
+   * Check handles
+   */
+  private void checkHandles() {
+  
+    if(disconnectDev) {
+      dsHandle = null;
+      disconnectDev = false;
+    }
+    
+    if(disconnectDc) {
+      dcHandle = null;
+      disconnectDc = false;
+    }
+  
   }
 
   /**
@@ -835,6 +950,18 @@ public class TacoDevice implements ServerListener {
     if (ret == false)
        ret = Pattern.matches("[a-zA-Z_0-9[-]]+/[a-zA-Z_0-9[-]]+/[[a-zA-Z_0-9][-]]+", name);
 
+    // Check no DB syntax: //hostName/devname?port
+    if (ret == false)
+      ret = Pattern.matches("//[a-zA-Z_0-9]+/[a-zA-Z_0-9[-]/]+\\?[0-9]+", name);
+
+    // Check no DB syntax: //xxx.xxx.xxx/devname?port
+    if (ret == false)
+      ret = Pattern.matches("//[a-zA-Z_0-9]+\\.[a-zA-Z_0-9]+\\.[a-zA-Z_0-9]+/[a-zA-Z_0-9[-]/]+\\?[0-9]+", name);
+
+    // Check no DB syntax: //ipAddress/devname?port
+    if (ret == false)
+      ret = Pattern.matches("//[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+/[a-zA-Z_0-9[-]/]+\\?[0-9]+", name);
+
     if(ret == false )
       throw new TacoException("Wrong device name syntax for " + name);
 
@@ -848,38 +975,36 @@ public class TacoDevice implements ServerListener {
 
     try {
 
-      TacoDevice dev1  = new TacoDevice("//crunch/id11/beamline/1");
-//        TacoDevice dev1  = new TacoDevice("sr/d-ct/1");
-//      TacoDevice dev2  = new TacoDevice("sr/jlp/1");
+        TacoDevice dev1  = new TacoDevice("//id11tmp1/linkam?12345");
+//      TacoDevice dev2  = new TacoDevice("sr/v-ip/c1-1");
 //      TacoDevice dev3  = new TacoDevice("//aries/sr/d-fbpm/peak-h");
         dev1.setSource(SOURCE_CACHE_DEVICE);
-//        dev1.setProtocol(PROTOCOL_TCP);
+//      dev1.setProtocol(PROTOCOL_TCP);
 //      dev2.setSource(SOURCE_CACHE_DEVICE);
 //      dev3.setSource(SOURCE_CACHE_DEVICE);
+        dev1.setProtocol(PROTOCOL_TCP);
 
       while(true) {
 
         long t0 = System.currentTimeMillis();
         try {
 
-//          int cmdCode = dev1.getCommandCode("DevReadDisplay");
-          TacoData values = dev1.get(TacoConst.DevState);
-          short stateValue = values.extractShort();
-          System.out.println("State = " + stateValue );
+          TacoData values = dev1.get(dev1.getCommandCode("DevLinkamGetTemperature"));
+          System.out.println("Temp = " + values.extractFloat() );
 
-          TacoCommand[] cmds = dev1.commandQuery();
-          for(int i=0;i<cmds.length;i++) {
-            System.out.println(cmds[i].cmdName);
-          }
+//          TacoCommand[] cmds = dev1.commandQuery();
+//          for(int i=0;i<cmds.length;i++) {
+//            System.out.println(cmds[i].cmdName);
+//          }
 
 //          TacoData state2 = dev2.get(TacoConst.DevState);
-//          stateValue2 = state2.extractShort();
+//          short stateValue2 = state2.extractShort();
 //          System.out.println("State (sr/jlp/1)= " + stateValue2 + " [" + XdrTacoType.getStateName(stateValue2) + "]");
 
- //         cmdCode = dev3.getCommandCode("DevUpdate");
- //         TacoData values3 = dev3.get(cmdCode);
- //         float[] dvalues3 = values3.extractStateFloatReadPoint();
- //         System.out.println("Values sr/d-fbpm/peak-h read " + dvalues3[0] + " , " + dvalues3[1]);
+//          cmdCode = dev3.getCommandCode("DevUpdate");
+//          TacoData values3 = dev3.get(cmdCode);
+//          float[] dvalues3 = values3.extractStateFloatReadPoint();
+//          System.out.println("Values sr/d-fbpm/peak-h read " + dvalues3[0] + " , " + dvalues3[1]);
 
         } catch (TacoException e1) {
           System.out.println("TacoException: " + e1.getErrorString());
@@ -904,6 +1029,5 @@ public class TacoDevice implements ServerListener {
     }
 
   }
-
 
 }
