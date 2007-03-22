@@ -30,9 +30,9 @@
  *
  * Original:    January 1997
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-19 08:50:58 $
+ * Date:        $Date: 2007-03-22 13:59:23 $
  *
  */
 
@@ -48,7 +48,9 @@
 
 
 
-/*Widget  gui_widget_array[GUI_MAX_WIDGETS];*/
+/*** The gui_widget_array is now defined in xdev_gui.c and used with "extern"
+Widget  gui_widget_array[GUI_MAX_WIDGETS];
+**************************************************************************/
 
 
 /*

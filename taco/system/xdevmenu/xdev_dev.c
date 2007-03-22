@@ -29,9 +29,9 @@
  *
  * Original       : February 1997
  *
- * Version      : $Revision: 1.2 $
+ * Version      : $Revision: 1.3 $
  *
- * Date         : $Date: 2006-09-18 21:43:56 $
+ * Date         : $Date: 2007-03-22 13:59:22 $
  *
  */
 
@@ -67,7 +67,16 @@ typedef struct
 /****  local variables for this module  ****/
 static device_entry_structure     *dev_array[XDEV_MAX_DEV];
 
-static char                       local_out_str[20001]; /*** 20k bytes ***/
+/** local_out_str statically is 400k bytes : this is a limitation. **/
+/** The xdevmenu would do core dump if an execution of a command on a **/
+/** device returns a very long array (doubles, strings ...etc.).  **/
+/** To be entirely dynamic, this should be modified not only in xdevmenu's **/
+/** code but also in the ascii_dev library. In fact the string memory **/
+/** should be allocated and reallocated as needed just after the call to **/
+/** the dev_putget and this call is in ascii_dev_putget's code           **/
+static char                       local_out_str[400001]; /*** 400 k bytes ***/
+
+
 static char                       local_err_str[5001]; /*** 5k bytes ***/
 static char                       local_lapsed_str[501]; /*** 501 chars ***/
 
@@ -76,7 +85,7 @@ static char                       local_lapsed_str[501]; /*** 501 chars ***/
 
 
 /****  RCS identification keyword understandable by "what" command ***/
-static char rcsid[] = "@(#)xdevmenu application $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/xdev_dev.c,v 1.2 2006-09-18 21:43:56 jkrueger1 Exp $";
+static char rcsid[] = "@(#)xdevmenu application $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/xdev_dev.c,v 1.3 2007-03-22 13:59:22 jkrueger1 Exp $";
 
 
 /****************************************************************************
@@ -156,7 +165,11 @@ long dev_get_exported_devices( char *Dmask, char *Fmask, char *Mmask,
 
      if ( Dmask==NULL && Fmask==NULL && Mmask==NULL)
      { /*** return all exported devices ***/
+#ifdef TANGO
+        db_get_status = db_getdevexp_tango( NULL, dev_names, nb_dev, &error);
+#else
         db_get_status = db_getdevexp( NULL, dev_names, nb_dev, &error);
+#endif 
         if (db_get_status == 0)
            return(XDEV_OK);
         else
@@ -208,9 +221,11 @@ long dev_get_exported_devices( char *Dmask, char *Fmask, char *Mmask,
         strcat(dev_filter, Mmask);
      }
 
-
-
+#ifdef TANGO
+     db_get_status = db_getdevexp_tango( dev_filter, dev_names, nb_dev, &error);
+#else
      db_get_status = db_getdevexp( dev_filter, dev_names, nb_dev, &error);
+#endif 
      if (db_get_status == 0)
         return(XDEV_OK);
      else
@@ -246,7 +261,11 @@ long dev_free_dev_names(char ***dev_names, char **err_str)
      if (dev_names == NULL)
         return(XDEV_NOTOK);
 
-     db_free_status = db_freedevexp ( *dev_names ); 
+#ifdef TANGO
+     db_free_status = db_freedevexp_tango ( *dev_names );
+#else
+     db_free_status = db_freedevexp ( *dev_names );
+#endif 
 
      if (db_free_status == 0)
      {

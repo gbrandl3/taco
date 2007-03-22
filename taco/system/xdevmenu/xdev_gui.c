@@ -30,9 +30,9 @@
  *
  * Original       : February 1997
  *
- * Version      : $Revision: 1.2 $
+ * Version      : $Revision: 1.3 $
  *
- * Date         : $Date: 2006-09-18 21:43:56 $
+ * Date         : $Date: 2007-03-22 13:59:23 $
  *
  */
 
@@ -54,7 +54,8 @@
 
 #include "xdev_gui.h"
 
-extern Widget  gui_widget_array[]; 
+/** The following array is accessed by xdev_cb.c, xdev_gui.c, xdev_main.c **/
+Widget  gui_widget_array[GUI_MAX_WIDGETS];
 
 /*
  * Convenience functions from xdev_bxutil.c utilities file.

@@ -30,9 +30,9 @@
  *
  * Original:    February 1997
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2006-09-18 21:43:56 $
+ * Date:        $Date: 2007-03-22 13:59:23 $
  *
  */
 
@@ -77,6 +77,8 @@ long dev_change_timeout( int , long , char **);
 long dev_get_timeout( int , long *);
 
 long dev_change_rpc_protocol( int , char *, char **);
+
+int dev_sig_interface_exist ( int );
 
 
 #endif /* _xdev_dev_h */
