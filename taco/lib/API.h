@@ -30,9 +30,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.16 $
+ * Version:	$Revision: 1.17 $
  *
- * Date:	$Date: 2006-12-21 08:18:21 $
+ * Date:	$Date: 2007-03-22 15:47:08 $
  *
  *********************************************************************-*/
 
@@ -89,7 +89,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.16 2006-12-21 08:18:21 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.17 2007-03-22 15:47:08 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*
@@ -133,7 +133,6 @@ static char APIh[] =
 /*
  * Definition of some constants
  */
-
 #define MAX_NAME_LENGTH LONG_NAME_SIZE 	/* maximum length of name fields */
 #define MIN_NETHOST 	10		/* minimum number of NETHOSTs */
 
@@ -141,13 +140,11 @@ static char APIh[] =
  * Definitions for the states of the startup configuration
  * flag.
  */
-
-#define SERVER_STARTUP                        (-1)
+#define SERVER_STARTUP  (-1)
 
 /*
  * Definitions for available protocols
  */
-
 #define D_TCP	888
 #define D_UDP	999
 #define D_IIOP	1111
@@ -155,84 +152,80 @@ static char APIh[] =
 /*
  * definitions needed by asynchronous call (should be in macros.h)
  */
-
 #define DS_PENDING 3
 
-/*
+/**
  *  Structure for the administration of open RPC connections.
  */
-
 typedef struct _server_connections {
 	char            server_host[SHORT_NAME_SIZE];
 	long            prog_number;
 	long            vers_number;
 	CLIENT          *clnt;
 	_Int            no_conns;
-	/* indicates already detected RPC problems */
+	/** indicates already detected RPC problems */
 	long            rpc_error_flag;
-	/* number of times the connection was reestablished */
+	/** number of times the connection was reestablished */
 	_Int            rpc_conn_counter;
-	/* indicates the RPC connection status */
+	/** indicates the RPC connection status */
 	long            rpc_conn_status;
-	/* indicates the RPC protocol */
+	/** indicates the RPC protocol */
 	long            rpc_protocol;
 	int             tcp_socket;
-	/* timeout for RPC connection */
+	/** timeout for RPC connection */
 	struct timeval  rpc_timeout;
 	struct timeval  rpc_retry_timeout;
-	/* time stamp for delay time of VME access after a reboot */
+	/** time stamp for delay time of VME access after a reboot */
 	time_t          first_access_time;
-	/* for the security system with single user connections! */
+	/** for the security system with single user connections! */
 	long		open_si_connections;
 	long		rpc_protocol_before_si;
-	/* copy of UDP client handle for synchronous calls */
+	/** copy of UDP client handle for synchronous calls */
 	CLIENT         	*udp_clnt;
-	/* copy of TCP client handle for synchronous calls */
+	/** copy of TCP client handle for synchronous calls */
 	CLIENT         	*tcp_clnt;
-	/* client handle for asynchronous calls */
+	/** client handle for asynchronous calls */
 	CLIENT		*asynch_clnt; 
-	/* flag for asynchonous queue flushing */
+	/** flag for asynchonous queue flushing */
 	DevBoolean     	flushed; 
-	/* number of asynchronous requests with reply still pending */
+	/** number of asynchronous requests with reply still pending */
 	long		pending; 
-	/* timeout for asynchronous requests */
+	/** timeout for asynchronous requests */
 	struct timeval 	asynch_timeout;
 	int		asynch_listen_tcp_socket;
 	int		asynch_callback_tcp_socket;
-	 } server_connections;
+} server_connections;
 
-/*
+/**
  * type returned by a successful dev_import call, is used in all
  * subsequent calls to the api_lib for this device
  */
-
 typedef struct _devserver {
-	char        device_name[LONG_NAME_SIZE];
-	char        device_class[SHORT_NAME_SIZE];
-	char        device_type[SHORT_NAME_SIZE];
-	char        server_name[LONG_NAME_SIZE];
-	char        server_host[SHORT_NAME_SIZE];
-	long        prog_number;
-	long        vers_number;
-	CLIENT      *clnt;
-	long        ds_id;
-	_Int        no_svr_conn;
-	_Int	    rpc_conn_counter;
-	long	    dev_access;
-	long        i_nethost;
-	long        rpc_protocol;
-	struct timeval rpc_timeout;
-	CLIENT      *asynch_clnt;
-	struct timeval asynch_timeout;
-	long        pending;
-	int         no_database;
-	} *devserver;
+	char        	device_name[LONG_NAME_SIZE];
+	char        	device_class[SHORT_NAME_SIZE];
+	char        	device_type[SHORT_NAME_SIZE];
+	char        	server_name[LONG_NAME_SIZE];
+	char        	server_host[SHORT_NAME_SIZE];
+	long        	prog_number;
+	long        	vers_number;
+	CLIENT      	*clnt;
+	long        	ds_id;
+	_Int        	no_svr_conn;
+	_Int	    	rpc_conn_counter;
+	long	    	dev_access;
+	long        	i_nethost;
+	long        	rpc_protocol;
+	struct timeval 	rpc_timeout;
+	CLIENT      	*asynch_clnt;
+	struct timeval 	asynch_timeout;
+	long        	pending;
+	int         	no_database;
+} *devserver;
 
 
 /*
  * structures for a dev_cmd_query() call
  */
-
 typedef struct {
 	long    cmd;
 	char    cmd_name [SHORT_NAME_SIZE];
@@ -240,28 +233,27 @@ typedef struct {
 	long    in_type;
 	char	*out_name;
 	long    out_type;
-	} DevCmdInfo;
+} DevCmdInfo;
 
 typedef struct {
 	u_int          	length;
 	DevCmdInfo 	*sequence;
-	} DevVarCmdArray;
+} DevVarCmdArray;
 
 /*
  * structures for a dev_event_query() call
  */
-
 typedef struct {
 	long    event;
 	char    event_name [SHORT_NAME_SIZE];
 	char	*out_name;
 	long    out_type;
-	} DevEventInfo;
+} DevEventInfo;
 
 typedef struct {
 	u_int          	length;
 	DevEventInfo 	*sequence;
-	} DevVarEventArray;
+} DevVarEventArray;
 
 
 /*
@@ -273,26 +265,26 @@ typedef struct {
 	char    device_type[SHORT_NAME_SIZE];
 	char    server_name[LONG_NAME_SIZE];
 	char    server_host[SHORT_NAME_SIZE];
-	} DevInfo;
+} DevInfo;
 
-/*
+/**
  * structures for dev_putget_asyn() call
  */
-typedef struct _DevCallbackData { 	long asynch_id;
-					DevArgument argout;
-					DevType argout_type;
-					long status;
-					long error;
-					struct timeval time; }
-		DevCallbackData;
+typedef struct _DevCallbackData { 	
+	long 		asynch_id;
+	DevArgument 	argout;
+	DevType 	argout_type;
+	long 		status;
+	long 		error;
+	struct timeval 	time; 
+} DevCallbackData;
 
 typedef void (*DevCallbackFunction(devserver, void*, DevCallbackData));
 
 
-/*
+/**
  * modes for dev_printerror, dev_printerror_no, dev_printdiag !
  */
-
 #define CLEAR		0
 #define WRITE		1
 #define SEND      	2
@@ -304,7 +296,7 @@ typedef void (*DevCallbackFunction(devserver, void*, DevCallbackData));
 
 
 #if !defined(WIN32)
- /*
+/*
  * HDB library include file
  */
 #include <hdb_out.h>
@@ -432,8 +424,7 @@ extern _DLLFunc long debug_flag;	/* global that is used in gen_api.c */
 /*
  * For these functions, ANSI portotyping is in todays form not possible, because their
  * functionality base on type conversion for input arguments.
- */
-/* 
+ *
  * adding ANSI C support for function with variable argument lists
  *
  * - andy , 13sep94
