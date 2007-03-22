@@ -43,9 +43,9 @@
  *
  * Original   :	January 1997
  *
- * Version:	$Revision: 1.21 $
+ * Version:	$Revision: 1.22 $
  *
- * Date:	$Date: 2006-09-20 15:58:44 $
+ * Date:	$Date: 2007-03-22 14:24:36 $
  *
  ********************************************************************-*/
 
@@ -2414,8 +2414,11 @@ long _DLLFunc dev_flush(devserver ds)
 long _DLLFunc dev_pending(devserver ds)
 {
 #ifdef TANGO
-        if (ds->rpc_protocol == D_IIOP)
-                return(DS_NOTOK);
+	if (ds != NULL)
+	{
+        	if (ds->rpc_protocol == D_IIOP)
+                	return(DS_NOTOK);
+	}
 #endif /* TANGO */
 	LOCK(async_mutex);
 /*

@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.16 $
+ * Version:	$Revision: 1.17 $
  *
- * Date:	$Date: 2007-01-15 16:53:00 $
+ * Date:	$Date: 2007-03-22 14:25:53 $
  *
  */
 
@@ -127,9 +127,19 @@ db_res *MySQLServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 	    tab_name = ptrc.substr(0, pos);
 	    rest = ptrc.substr(pos + 1);
 //
-// Try to find the resource value from database 
+// Try to find the resource value from database or cache
 //
-	    if((err_db = db_find(tab_name, rest, &browse_back.res_val.arr1_val[i], &k1)) != 0)
+	    if( tab_name == "sec" || tab_name == "error" ) {
+	    
+	      err_db = db_find_from_cache(tab_name, rest, &browse_back.res_val.arr1_val[i], &k1);
+	    
+	    } else {
+
+	      err_db = db_find(tab_name, rest, &browse_back.res_val.arr1_val[i], &k1);
+	    
+	    }
+	    
+	    if(err_db != 0)
 	    {
 	    	for (int j = 0; j <= i; j++)
 		    delete [] browse_back.res_val.arr1_val[j];
@@ -138,6 +148,7 @@ db_res *MySQLServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 	    	browse_back.res_val.arr1_len = 0;
 	    	return(&browse_back);
 	    }
+	    
 //
 // Compute an estimation of the network packet size (Only if the UDP protocol
 // has been used to send this request to the server) 
@@ -273,17 +284,6 @@ int MySQLServer::db_find(std::string tab_name, std::string p_res_name, char **ou
     r_name = p_res_name.substr(pos + 1);
     if ((pos = r_name.find('/')) != std::string::npos)
 	r_name.erase(pos,1);
-//
-// For security domain, change all occurances of | by ^ (| is the field
-// separator in NDBM !) 
-// 
-    if (sec_res == True)
-    {
-	k = r_name.length();
-	for (int i = 0; i < k; i++)
-	    if (r_name[i] == '|')
-		r_name[i] = SEC_SEP;
-    }
 
 #ifdef NEVER
     std::cout << "Family name : " << family << std::endl;
@@ -366,17 +366,7 @@ int MySQLServer::db_find(std::string tab_name, std::string p_res_name, char **ou
 		std::cout << "Error in malloc for out" << std::endl;
 		throw e;
 	}
-//
-// For resource of the SEC domain, change all occurences of the ^ character
-// to the | character 
-//
-	if (sec_res)
-	{
-		k = strlen(*out);   
-		for (int i = 0;i < k;i++)
-			if ((*out)[i] == SEC_SEP)
-		(*out)[i] = '|';
-	}
+
 	return DS_OK;
 }
 
@@ -734,6 +724,12 @@ int MySQLServer::db_insert(std::string res_name, std::string number, std::string
 	std::cout << mysql_error(mysql_conn) << std::endl;
 	return (DbErr_DatabaseAccess);
     }
+    
+    // Update the cache
+    if( domain == "sec" || domain == "error" ) {
+      db_insert_into_cache(res_name,number,content);
+    }
+    
     return 0;
 }
 
@@ -762,7 +758,7 @@ int MySQLServer::db_del(std::string res_name)
 	std::cout << "db_del : Error in resource name " << res_name << std::endl;
 	return(DbErr_BadResourceType);
     }
-    t_name = res_name.substr(0, pos);
+    t_name = res_name.substr(0, pos);    
 //
 // Get family name 
 //
@@ -822,6 +818,12 @@ int MySQLServer::db_del(std::string res_name)
 	std::cout << mysql_error(mysql_conn) << std::endl;
 	return (DbErr_DatabaseAccess);
     }
+    
+    // Update the cache
+    if( t_name == "sec" || t_name == "error" ) {
+      db_delete_from_cache(res_name);
+    }
+    
     return(0);
 }
 

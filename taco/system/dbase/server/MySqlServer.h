@@ -25,9 +25,9 @@
  * Author(s):
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2006-12-15 12:43:53 $
+ * Date:	$Date: 2007-03-22 14:25:53 $
  *
  */
 
@@ -41,18 +41,52 @@
 #	include <mysql.h>
 #endif
 
+#include <map>
+
 // logging variables
+
+/* Handle cache key for resource cache map */
+
+class CacheResKey
+{
+public:
+	CacheResKey();
+	CacheResKey(std::string &,long);
+	CacheResKey(char *,long);
+	CacheResKey(CacheResKey &);
+	CacheResKey(const CacheResKey &);
+	
+	~CacheResKey();
+	
+	CacheResKey & operator=(CacheResKey &);
+	CacheResKey & operator=(const CacheResKey &);
+
+	std::string &get_fmn() {return fmn;}
+	long get_ind() {return ind;}
+	void inc_key_ind() {ind++;}
+		
+	friend bool operator<(const CacheResKey &,const CacheResKey &);
+		
+private:
+	std::string	fmn;
+	long 		ind;
+};
+
+typedef std::map<CacheResKey,std::string> cache;
 
 /**@ingroup dbServerClasses
  */
 class MySQLServer : public DBServer
 {
 private:
+
     std::string	mysql_user,
 		mysql_passwd,
 		mysql_db;
     MYSQL	mysql,
 		*mysql_conn;
+		
+    cache   	res_cache;
 
 /*
  * to fix broken std::count() on Solaris CC
@@ -86,6 +120,14 @@ private:
     long	db_insert_names(const std::string, const std::string, const int, const std::string); 
     long	db_delete_names(const std::string, const std::string, const int, const std::string); 
     long	upd_res(std::string, long, char, long *);
+    
+    // Cache function
+    long        fill_cache(std::string);
+    int         db_find_from_cache(std::string, std::string, char **, int *);
+    void        db_insert_into_cache(std::string, std::string, std::string);
+    void        db_insert_into_cache(std::string, long, std::string);
+    void        db_delete_from_cache(std::string);
+        
 public:
     				MySQLServer(std::string, std::string, std::string);
     virtual			~MySQLServer();
@@ -142,9 +184,28 @@ inline MySQLServer::MySQLServer(const std::string user, const std::string passwo
 //
 	mysql_init(&mysql);
 	mysql_options(&mysql,MYSQL_READ_DEFAULT_GROUP,"client");
+	/*
+	if(mysql_get_client_version() >= 50013)
+	{
+		my_bool my_auto_reconnect=1;
+		mysql_options(&mysql,MYSQL_OPT_RECONNECT,&my_auto_reconnect);
+	}
+	*/
 	if (*this->db_reopendb_1_svc() != 0)
 		return;
 	dbgen.connected = true;
+	
+	// Initialise cache
+	res_cache.clear();
+	if( fill_cache("sec")!=0 ) {
+	  logStream->fatalStream() << "Can't fill SEC resource cache !" << log4cpp::CategoryStream::ENDLINE;
+	  exit(-1);
+	}
+	if( fill_cache("error")!=0 ) {
+	  logStream->fatalStream() << "Can't fill ERROR resource cache !" << log4cpp::CategoryStream::ENDLINE;
+	  exit(-1);
+	}
+	
 }
 
 inline MySQLServer::~MySQLServer()
@@ -152,5 +213,6 @@ inline MySQLServer::~MySQLServer()
 	mysql_close(mysql_conn);
 	dbgen.connected = false;
 }
+
 
 #endif

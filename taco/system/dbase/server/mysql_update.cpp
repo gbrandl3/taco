@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jlpons $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.13 $
  *
- * Date:	$Date: 2006-12-12 17:23:09 $
+ * Date:	$Date: 2007-03-22 14:25:54 $
  *
  */
 
@@ -463,17 +463,7 @@ long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
 //
 	pos = lin.find(':', (last_pos = pos + 1));
 	name = lin.substr(last_pos, pos - last_pos);
-//
-// If the resource belongs to Security domain, change every occurance of
-// | by a ^ character 
-// 
-   	if (errcode == True)
-	{
-	    long l = name.length();
-	    for (int i = 0; i < l; i++)
-		if (name[i] == '|')
-			name[i] = SEC_SEP;
-	}
+
 //
 // Get resource value (resource values are stored in the database as 
 // case dependent std::strings 
@@ -482,16 +472,7 @@ long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
     }
     else
 	val = lin;
-//
-// For security domain, change every occurance of | by a ^ 
-//
-    if (errcode == True)
-    {
-	long l = val.length();
-	for (int i = 0; i < l; i++)
-	    if (val[i] == '|')
-		val[i] = SEC_SEP;
-    }
+
 //
 // Initialise resource number */
 //
@@ -519,6 +500,9 @@ long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
 	    return(-1);
 	}
     }
+
+    std::string full_res_name = domain + "/" + family + "/" + member + "/" + name;
+    
 //
 // If the resource value is %, remove all the resources.
 // If this function is called for a normal resource, I must also 
@@ -535,6 +519,10 @@ long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
 	    std::cout << query.c_str() << std::endl;
 	    *p_err = DbErr_DatabaseAccess;
 	    return(-1);
+	}
+	// Update the cache
+	if( domain == "sec" || domain == "error" ) {
+	  db_delete_from_cache(full_res_name);
 	}
     }
 //
@@ -567,6 +555,10 @@ long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
 #if !HAVE_SSTREAM
 		query.freeze(false);
 #endif
+		// Update the cache
+		if( domain == "sec" || domain == "error" ) {
+		  db_insert_into_cache(full_res_name,numb,val);
+		}
 	}
 	return DS_OK;
 }

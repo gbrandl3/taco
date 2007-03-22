@@ -25,13 +25,13 @@
  * Description:	
  *	
  * Author(s)  :	Jens Meyer
- * 		$Author: jlpons $
+ * 		$Author: jkrueger1 $
  *
  * Original   :	September 2002
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-13 15:55:44 $
+ * Date:	$Date: 2007-03-22 14:20:30 $
  *
  *********************************************************************/ 
 
@@ -66,7 +66,11 @@ extern "C" void free_var_str_array (DevVarStringArray *str_array);
 #define QUALITY_INVALID					(-1)
 #define QUALITY_ALARM					1
 #define QUALITY_WARNING					2
-#define QUALITY_CHANGING				3									 
+#define QUALITY_CHANGING				3
+
+#define SOURCE_DEVICE					0
+#define SOURCE_CACHE  					1
+#define SOURCE_CACHE_DEVICE			2									 
 
 /*
  * Attribute access class
@@ -87,7 +91,10 @@ class AttrAccess
 		long  read_status (DevArgument argout, DevType argout_type, long *error);
 		long	abort	(long *error);	
 		long  read_attr_config (DevArgument argout, DevType argout_type, 
-									   long *error);			
+									   long *error);
+		long  read_attr_mode  (DevArgument argout, DevType argout_type, long *error);
+		long  write_attr_mode (DevArgument argin,  DevType argin_type,  long *error);													
+	
 	protected:
 		long	search_attr_name (long *error);
 		long	search_tango_attr_name (long *error);

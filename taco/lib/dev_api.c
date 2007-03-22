@@ -31,9 +31,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.33 $
+ * Version    :	$Revision: 1.34 $
  *
- * Date	    :	$Date: 2006-09-20 15:58:44 $
+ * Date	    :	$Date: 2007-03-22 14:24:36 $
  *
  ********************************************************************-*/
 
@@ -116,6 +116,13 @@
 #		if HAVE_RPC_PMAP_PROT_H
 #			include <rpc/pmap_prot.h>
 #		endif
+#		if HAVE_PTHREAD_H
+/* mutex locking for handling asyncronous request:  here the mutex is instantiated. */
+#			ifdef _REENTRANT
+#				include <pthread.h>
+				pthread_mutex_t dev_api_mutex = PTHREAD_MUTEX_INITIALIZER;
+#			endif
+#		endif /* linux */
 #	endif /* OSK || _OSK */
 #elif defined WIN32
 #	include <rpc/pmap_pro.h>
@@ -249,10 +256,10 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 	count = 0; 
 	str_ptr = attribute_name;	
 	while ( (str_ptr = strchr (str_ptr, '/')) != NULL )
-		{
+	{
 		count ++;
 		str_ptr++;
-		}
+	}
 
 
 
@@ -795,6 +802,17 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
 		return (DS_NOTOK);
 
 	dev_printdebug (DBG_API, "dev_import() : import device %s from device server\n", device_name);
+
+/*
+ * we can still arrive here and the server has not been imported, check and return if so
+ */
+	if (clnt == NULL) 
+	{
+                dev_notimported_init(device_name,access,i_nethost,ds_ptr,error);
+		svr_conns[n_svr_conn].no_conns = 0; /* mark this connection as bad at the same time */
+		*error = 0;
+		return(DS_OK);
+	}
 
 /*
  *

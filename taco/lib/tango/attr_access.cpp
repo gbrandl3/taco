@@ -25,17 +25,17 @@
  * Description:	
  *	
  * Author(s)  :	Jens Meyer
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original   :	September2002
  *
- * Version    :	$Revision: 1.9 $
+ * Version    :	$Revision: 1.10 $
  *
- * Date       : $Date: 2006-09-19 09:31:24 $
+ * Date       : $Date: 2007-03-22 14:20:29 $
  *
  *********************************************************************/ 
 
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_access.cpp,v 1.9 2006-09-19 09:31:24 andy_gotz Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_access.cpp,v 1.10 2007-03-22 14:20:29 jkrueger1 Exp $";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -248,7 +248,7 @@ long AttrAccess::attr_cmd_query (DevVarCmdArray *attr_cmd_query_array, long *err
 		}
 	if ( tango_device == True )
 		{
-		cmd_counter = cmd_counter +2;
+		cmd_counter = cmd_counter +4;
 		}
 	
 	/*
@@ -351,6 +351,27 @@ long AttrAccess::attr_cmd_query (DevVarCmdArray *attr_cmd_query_array, long *err
 		cmd_info[cmd_counter].out_name = NULL;
 		cmd_info[cmd_counter].out_type = D_SHORT_TYPE;
 
+		/*
+	  		* Command DevReadMode to read the tango data source
+	  		*/
+		cmd_counter++;
+		cmd_info[cmd_counter].cmd = 250;
+		sprintf (cmd_info[cmd_counter].cmd_name, "DevReadMode");
+		cmd_info[cmd_counter].in_name  = NULL;
+		cmd_info[cmd_counter].in_type  = D_VOID_TYPE;
+		cmd_info[cmd_counter].out_name = NULL;
+		cmd_info[cmd_counter].out_type = D_SHORT_TYPE;
+
+		/*
+	  		* Command DevRetMode to set the tango data source
+	  		*/
+		cmd_counter++;
+		cmd_info[cmd_counter].cmd = 249;
+		sprintf (cmd_info[cmd_counter].cmd_name, "DevSetMode");
+		cmd_info[cmd_counter].in_name  = NULL;
+		cmd_info[cmd_counter].in_type  = D_SHORT_TYPE;
+		cmd_info[cmd_counter].out_name = NULL;
+		cmd_info[cmd_counter].out_type = D_VOID_TYPE;
 		}
 		
 	/*
@@ -2851,5 +2872,151 @@ long	AttrAccess::abort	(long *error)
 			}			 
 		}									
 	
+	return (DS_OK);
+}
+
+
+/**
+ * Reads the actual data source used when reading a Tango attribute.
+ * The value is returnd as a short value:
+ *	SOURCE_DEVICE					0
+ *	SOURCE_CACHE  					1
+ *	SOURCE_CACHE_DEVICE			2		
+ *      				 
+ * @param argout - data source of attribute value
+ * @param argout_type D_SHORT_TYPE
+ * @param error Taco error code
+ * 
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
+
+long AttrAccess::read_attr_mode (DevArgument argout, DevType argout_type, long *error)
+{
+	short	*source = (short *)argout;
+	*error = 0;
+	
+	/*
+	 * Read the attribute data source
+	 */
+	
+	if ( tango_device == False )
+	 	{
+		// No data source handling implemented for Taco signals
+		
+		*error = DevErr_CommandNotImplemented;
+		return (DS_NOTOK);
+		}
+	
+	try
+		{	
+		Tango::DevSource tango_source = tango_obj->get_source();
+		
+		switch (tango_source)
+			{
+			case Tango::DEV:
+				*source = SOURCE_DEVICE;
+				break;
+			
+			case Tango::CACHE:
+				*source = SOURCE_CACHE;
+				break;
+
+			case Tango::CACHE_DEV:
+				*source = SOURCE_CACHE_DEVICE;
+				break;
+			
+			default:
+				*source = DS_NOTOK;
+				break;
+			}		
+		}
+	catch (Tango::DevFailed &e)
+		{	
+		//
+		// recover TANGO error string and save it in the
+		// global error string so that
+		// it can be printed out with dev_error_str()
+		//
+			
+      tango_dev_error_string (e);
+      *error = DevErr_TangoAccessFailed;
+			
+      return(DS_NOTOK);				
+		}	
+	
+	return (DS_OK);
+}
+
+
+/**
+ * Set the data source used when reading a Tango attribute.
+ * The value can be set as a short value:
+ *	SOURCE_DEVICE					0
+ *	SOURCE_CACHE  					1
+ *	SOURCE_CACHE_DEVICE			2		
+ *      				 
+ * @param argout - data source of attribute value
+ * @param argout_type D_SHORT_TYPE
+ * @param error Taco error code
+ * 
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
+long AttrAccess::write_attr_mode (DevArgument argin, DevType argin_type, long *error)
+{
+	short	*source = (short *)argin;
+	*error = 0;
+	
+	/*
+	 * Set the attribute data source
+	 */
+	
+	if ( tango_device == False )
+	 	{
+		// No data source handling implemented for Taco signals
+		
+		*error = DevErr_CommandNotImplemented;
+		return (DS_NOTOK);
+		}
+		
+	Tango::DevSource tango_source;
+	switch (*source)
+		{
+		case SOURCE_DEVICE:
+			tango_source = Tango::DEV;
+			break;
+			
+		case SOURCE_CACHE:
+			tango_source = Tango::CACHE;
+			break;
+
+		case SOURCE_CACHE_DEVICE:
+			tango_source = Tango::CACHE_DEV;
+			break;
+			
+		default:
+			*error = DevErr_ParameterOutOfRange;
+			return (DS_NOTOK);
+			break;
+		}
+	
+	try
+		{	
+		tango_obj->set_source(tango_source);
+		}		
+		
+	catch (Tango::DevFailed &e)
+		{	
+		//
+		// recover TANGO error string and save it in the
+		// global error string so that
+		// it can be printed out with dev_error_str()
+		//
+			
+      tango_dev_error_string (e);
+      *error = DevErr_TangoAccessFailed;
+		
+		return(DS_NOTOK);
+		}
+				
 	return (DS_OK);
 }

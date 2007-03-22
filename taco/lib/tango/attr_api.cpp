@@ -25,13 +25,13 @@
  * Description:	
  *	
  * Author(s)  :	Jens Meyer
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original   :	September 2002
  *
- * Version    : $Revision: 1.5 $
+ * Version    : $Revision: 1.6 $
  *
- * Date       : $Date: 2006-09-19 09:31:24 $
+ * Date       : $Date: 2007-03-22 14:20:30 $
  *
  *********************************************************************/ 
 
@@ -39,7 +39,7 @@
 #	include "config.h"
 #endif
 #include <attr_api.h>
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_api.cpp,v 1.5 2006-09-19 09:31:24 andy_gotz Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_api.cpp,v 1.6 2007-03-22 14:20:30 jkrueger1 Exp $";
 
 /**
  * Hook to TACO dev_import().
@@ -230,6 +230,20 @@ long attribute_putget (devserver ds, long cmd, DevArgument argin,
 				return (DS_NOTOK);
 				}
 			break;
+			
+		case DevReadMode:
+		 	if ( attr->read_attr_mode (argout, argout_type, error) == DS_NOTOK )
+				{
+				return (DS_NOTOK);
+				}
+			break;
+			
+		case DevSetMode:
+		 	if ( attr->write_attr_mode (argin, argin_type, error) == DS_NOTOK )
+				{
+				return (DS_NOTOK);
+				}
+			break;						
 							
 		default:
 			*error = DevErr_CommandNotImplemented;
@@ -276,6 +290,13 @@ long attribute_put (devserver ds, long cmd, DevArgument argin,
 				return (DS_NOTOK);
 				}
 			break;
+			
+		case DevSetMode:
+		 	if ( attr->read_attr_mode (argin, argin_type, error) == DS_NOTOK )
+				{
+				return (DS_NOTOK);
+				}
+			break;				
 			
 		default:
 			*error = DevErr_ValueOutOfBounds;

@@ -63,7 +63,8 @@ libTACOMySQL_la_SOURCES = mysql_serv.cpp \
 			mysql_psdev.cpp \
 			mysql_clo_op.cpp \
 			mysql_miscbro.cpp \
-			mysql_update.cpp 
+			mysql_update.cpp \
+			mysql_cache.cpp
 libTACOMySQL_la_LIBADD	= @MYSQL_LIBS@ -lstdc++
 INCLUDES		+= @MYSQL_CFLAGS@ 
 AM_CPPFLAGS		+= -DUSE_MYSQL -DNODEBUG
