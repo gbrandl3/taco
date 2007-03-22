@@ -27,9 +27,9 @@
  * 
  * Author:	$Author: jkrueger1 $
  * 
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *  
- * Date:	$Date: 2006-12-21 08:18:21 $
+ * Date:	$Date: 2007-03-22 14:30:56 $
  * 
  *********************************************************************/
 
@@ -41,14 +41,13 @@
  */
 #ifdef _IDENT
 static char Adminh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/Admin.h,v 1.3 2006-12-21 08:18:21 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/Admin.h,v 1.4 2007-03-22 14:30:56 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
-/*
+/**
  *   Motif application
  */
-
 #define UNMAPPED	0
 #define MAPPED		1
 #define DEBUG		2
@@ -59,44 +58,39 @@ static char Adminh[] =
  *  Administrator Commands  *
  ****************************/
 
-/*
+/**
  *   Debug Commands
  */
-
 #define	DEBUG_ON	0
 #define	DEBUG_OFF	1
 #define	DEBUG_SET	2
 #define	DEBUG_RESET	3
 
-/*
+/**
  *   Diagnostics Commands
  */
-
 #define DIAG_ON		4
 #define DIAG_OFF	5
 #define DIAG_GEN	6
 #define DIAG_DEV	7
 
-/*
+/**
  *   Process Commands
  */
-
 #define ADMIN_IMPORT	8
 #define ADMIN_FREE	9
 #define QUIT_SERVER	10
 #define RESTART_SERVER	11
 
 
-/*
+/**
  *   Debug flags
  */
-
 #define DEBUG_ON_OFF	0x80000000	
 
-/*
+/**
  *   General Methods
  */
-
 #define COMMENT		0
 #define DBG_TRACE	0x1
 #define DBG_ERROR	0x2
@@ -125,17 +119,15 @@ static char Adminh[] =
 #define ALL		0x7FFFFFFF
 
 
-/*
+/**
  *   Steppermotor Methods
  */
-
 #define STEPPER		0x1000000
 
 
-/*
+/**
  *   Debug List for Motif application
  */
-
 #define NUM_LIST_ITEMS	25
 
 static struct _DevDebug_Entry {
