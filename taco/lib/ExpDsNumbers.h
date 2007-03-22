@@ -8,30 +8,13 @@
                 EXPG dserver projects
 
  Author(s):     V.Rey Bakaikoa
+		$Author: jkrueger1 $
 
  Original:      October 1993
 
- Updates:	04/06/96 R.Wilcke
-		Added macros.h as include file;
-		changed "<<" to DS_LSHIFT for FORTRAN compatibility.
+ Version:	$Revision: 1.2 $
 
-		28/05/97 R.Wilcke
-		Added definition of DevMstatBase;
-		define DevCcdBase with same value as DevPrincetonBase.
-
-		04/07/97 R.Wilcke
-		name change DevMstatBase -> DevMachstatBase
-
-		17/11/99 V.Rey Bakaikoa
-		add Frelon Camera project
-
-		22/02/00 D.Fernandez-Carreiras
-		define DevFrelonBase with same value as DevCcdBase.
-
-		06/07/04 Carlos Medrano & D.Fernandez-Carreiras 
-		add DevFastTomoBase
-
-
+ Date:		$Date: 2007-03-22 15:49:49 $
 
  Copyright (c) 1993 by European Synchrotron Radiation Facility,
                        Grenoble, France

@@ -1,80 +1,23 @@
 /*+*******************************************************************
 
-  File:					DevCcdCmds.h
+  File:		DevCcdCmds.h
 
   Project:      CCD Camera Server
 
   Description: 	Include file with the definitions for all 
-	              commands numbers for the CCD cameras
+	        commands numbers for the CCD cameras
 
-  Author(s): 		David Fernandez, Holger Witsch
+  Author(s): 	David Fernandez, Holger Witsch
+  		$Author: jkrueger1 $ 
 
-  Original:			September 2000
+  Original:	September 2000
 
-  $Author: andy_gotz $ 
-  $Date: 2007-01-10 12:55:20 $   
-  $Locker:  $ 
-  $Name: not supported by cvs2svn $   
-  $State: Exp $  
+  Date:		$Date: 2007-03-22 15:49:10 $   
 
-  $Log: not supported by cvs2svn $
-  Revision 1.7  2006/03/08 14:26:12  claustre
-  new commands for the marccd, Laurent C.
-
-  Revision 1.6  2006/03/08 14:10:53  claustre
-  David has added cmds for the frelon2k !!!
-
-  Revision 1.5  2004/05/06 06:48:49  meyer
-  Corrected #endif in file
-
-  Revision 1.4  2004/05/05 17:15:35  ahoms
-  Completed unification with Meteor2 commands.
-  Using RCS log in header.
-
-  Revision 1.3  2004/04/01 12:00:00  miraut
-  New commands to modify output image size
-
-  Revision 1.2  2004/03/19 12:00:00  claustre
-  Unified with others ccds and with .res file
-  /segfs/dserver/classes/ccd/res/ dir.
-
-  Revision 1.1.2.3  2004/01/27 12:00:00  meyer
-  Added DevCcdSetGain and DevCcdGetGain
-
-  Revision 1.1.2.2  2002/10/03 12:00:00  meyer
-  Added DevCcdSetMaxExposure and DevCcdGetMaxExposure
-
-  Revision 1.1.2.1  2001/09/07 12:00:00  meyer
-  Added DevCcdSetThreshold and DevCcdGetThreshold
-
-  Revision 1.1.1.7  2004/03/18 12:00:00  miraut
-  New commands to send Jpeg compressed images
-
-  Revision 1.1.1.6  2003/12/03 12:00:00  claustre
-  Added DevCcdDezinger special cmd for marccd
-
-  Revision 1.1.1.5  2003/04/17 12:00:00  fernande
-  Added DevCcdReadAll and DevCcdWriteAll
-
-  Revision 1.1.1.4  2002/08/01 12:00:00  fernande
-  MCD/DFC DevCcdStop replaces DevCcdAbortAcquis
-
-  Revision 1.1.1.3  2001/10/18 12:00:00  witsch
-  Added DevCcdGetBuffer and DevCcdGetBufferInfo
-
-  Revision 1.1.1.2  2001/06/06 12:00:00  fernande
-  include <ExpDsNumbers.h>
-
-  Revision 1.1.1.1  2001/05/21 12:00:00  witsch
-  DevCcdGetCurrent included (gets current frame number in ds)
-
-  Revision 1.1  2000/10/06 12:00:00  witsch
-  Initial revision: Some new commands included
+  Version:	$Revision: 1.2 $
 
   Copyright (c) 2000 by European Synchrotron Radiation Facility,
 				        Grenoble, France
-
-  Tab size is 2!
 
 *********************************************************************/
 
