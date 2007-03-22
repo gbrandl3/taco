@@ -30,9 +30,9 @@
  *
  * Original     : February 1993
  *
- * Version      : $Revision: 1.4 $
+ * Version      : $Revision: 1.5 $
  *
- * Date         : $Date: 2006-09-18 21:49:14 $
+ * Date         : $Date: 2007-03-22 13:44:47 $
  *
  */
 
@@ -252,6 +252,14 @@ int *perr;
    yet available */
 
 	ptr = int_array[ind].data_buf[data.ind_read];
+	
+	if (ptr == NULL)
+	{
+		*perr = DcErr_DeviceNotDefined;
+		return(-1);
+	}
+
+	
 	if (data.time == 0)
 	{
 		buf_size = ptr[1];
@@ -691,9 +699,19 @@ int *perr;
 	}
 
 /* If the device cmd have just been updated and the new command result not
-   yet available */
+   yet available. The ptr pointer is checked in the case of the search_dev 
+   function succeed but in between the device has been removed from the dc
+   by another process.  */
 
 	ptr = int_array[ind].data_buf[pret->ind_read];
+	
+	if (ptr == NULL)
+	{
+		*perr = DcErr_DeviceNotDefined;
+		return(-1);
+	}
+
+	
 	if (pret->time == 0)
 	{
 		buf_size = ptr[1];
@@ -862,6 +880,13 @@ int *perr;
    yet available */
 
 	ptr = int_array[ind].data_buf[pret->ind_read];
+	
+	if (ptr == NULL)
+	{
+		*perr = DcErr_DeviceNotDefined;
+		return(-1);
+	}
+	
 	if (pret->time == 0)
 	{
 		buf_size = ptr[1];
@@ -1308,6 +1333,13 @@ int *perr;
    yet available */
 
 	ptr = int_array[ind].data_buf[data.ind_read];
+	
+	if (ptr == NULL)
+	{
+		*perr = DcErr_DeviceNotDefined;
+		return(-1);
+	}
+	
 	if (data.time == 0)
 	{
 		buf_size = ptr[1];

@@ -30,9 +30,9 @@
  *
  * Original     : February 1993
  *
- * Version      : $Revision: 1.4 $
+ * Version      : $Revision: 1.5 $
  *
- * Date         : $Date: 2006-09-18 21:49:14 $
+ * Date         : $Date: 2007-03-22 13:44:46 $
  *
  */
 
@@ -264,6 +264,17 @@ int add_data(dev_dat *dev_info, dc_dev_param *pdata, int ind, int *perr)
 		else
 			continue;
 	}
+	
+/* Check that the data buffer is not NULL */
+
+	for (i = 0;i < nb_cmd;i++) 
+	{
+		if( dev_info->xcmd_dat.xcmd_dat_val[i].xsequence.xsequence_val==NULL &&
+		    dev_info->xcmd_dat.xcmd_dat_val[i].xcmd_error==0 ) {
+			dev_info->xcmd_dat.xcmd_dat_val[i].xcmd_error = DcErr_ErrDuringExtractFunction;
+		}			
+	}
+
 
 /* Change command result size to be a multiple of four (Command results are
    stored by packet of 4 bytes) */

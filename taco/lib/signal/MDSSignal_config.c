@@ -32,9 +32,9 @@
  *
  * Original:    4.12.1997
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:11:13 $
+ * Date:	$Date: 2007-03-22 13:48:29 $
  *
  *********************************************************************/
 
@@ -187,7 +187,7 @@ char *Parse(char **res,long res_nb,char *res_name ) {
 static char ret[512];
 
   int i,len,r,j,k;
-  int found=1;
+  int found=0;
   char c;
 
   len=strlen(res_name);
@@ -195,13 +195,13 @@ static char ret[512];
   i=0;
   ret[0]='\0';
 
-  while( (i<res_nb) && (found>0) )
+  while( (i<res_nb) && (!found) )
   {
-    found=strncasecmp( res_name , res[i] , len );
-    if( found>0 ) i++;
+    found=(strncasecmp( res_name , res[i] , len ) == 0);
+    if( !found ) i++;
   }
 
-  if( found==0 ) {
+  if( found ) {
    
     j=len+2;
     k=0;
