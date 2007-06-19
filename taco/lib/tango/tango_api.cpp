@@ -35,12 +35,12 @@
  *
  * Original   :	December 1999
  *
- * Version    : $Revision: 1.5 $
+ * Version    : $Revision: 1.6 $
  *
- * Date       : $Date: 2006-09-18 22:09:12 $
+ * Date       : $Date: 2007-06-19 10:07:21 $
  *
  ********************************************************************-*/
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/tango_api.cpp,v 1.5 2006-09-18 22:09:12 jkrueger1 Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/tango_api.cpp,v 1.6 2007-06-19 10:07:21 jkrueger1 Exp $";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -1412,6 +1412,32 @@ static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any re
 			}
 			break;
 		}
+
+		case D_OPAQUE_TYPE :
+		{
+			DevOpaque *argout_opaque;
+			const Tango::DevVarCharArray *tango_vsha;
+
+			if (tango_type != Tango::DEVVAR_CHARARRAY)
+			{
+				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
+						(const char*)"tango argout type is not Tango::DEVVAR_CHARARRAY", 
+				                (const char *)"tango_any_to_argout()");
+			}
+			received >>= tango_vsha;
+			argout_opaque = (DevOpaque*)argout;
+			if (argout_opaque->sequence == NULL)
+			{
+				argout_opaque->sequence = (char*)malloc(tango_vsha->length()*sizeof(char));
+			}
+			argout_opaque->length = tango_vsha->length();
+			for (long i=0; i< tango_vsha->length(); i++)
+			{
+				argout_opaque->sequence[i] = (*tango_vsha)[i];
+			}
+			break;
+		}
+
 
 		case D_VAR_CHARARR :
 		{
