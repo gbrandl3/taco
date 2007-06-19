@@ -31,9 +31,9 @@
  *
  * Original   :	April 1993
  *
- * Version:	$Revision: 1.28 $
+ * Version:	$Revision: 1.29 $
  *
- * Date:		$Date: 2006-09-18 22:31:44 $
+ * Date:		$Date: 2007-06-19 13:18:03 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -1363,7 +1363,7 @@ long _DLLFunc dev_ping (devserver ds, long *error)
  * strip nethost name, if present 
  */
 	if(ds->device_name[0]=='/' && ds->device_name[1]=='/') /* Net host part present */
-            	in_name_stripped = strchr(&(ds->device_name[2]), '/');
+            	in_name_stripped = strchr(&(ds->device_name[2]), '/') + 1;
         else
         	in_name_stripped = ds->device_name;
 			
