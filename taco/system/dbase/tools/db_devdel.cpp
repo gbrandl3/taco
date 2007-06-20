@@ -27,9 +27,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2006-09-06 18:34:15 $
+ * Date:        $Date: 2007-06-20 07:20:42 $
  */
 
 /* TACO include file */
@@ -78,11 +78,7 @@ int main(int argc,char *argv[])
 			del_res = False;
 			break;
 		case 'n':
-			{
-				char s[160];
-				snprintf(s, sizeof(s), "NETHOST=%s", optarg);
-				putenv(s);
-			}
+			setenv("NETHOST", optarg, 1);
 			break;
 		case 'h':
 		case '?':
@@ -94,6 +90,12 @@ int main(int argc,char *argv[])
 		usage(argv[0]);
 
     	string dev_name(argv[optind]);
+	if (dev_name.substr(0, 2) == "//")
+	{
+		std::string::size_type pos = dev_name.find("/", 2);
+		setenv("NETHOST", dev_name.substr(2, pos - 2).c_str(), 1);
+		dev_name.erase(0, pos + 1);
+	}
 #ifdef DEBUG
 	cout  << "Device name : " << dev_name << endl;
 #endif /* DEBUG */
