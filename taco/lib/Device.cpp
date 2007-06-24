@@ -30,9 +30,9 @@
  *
  * Original:	March 1995
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.13 $
  *
- * Date:	$Date: 2006-04-20 06:44:45 $
+ * Date:	$Date: 2007-06-24 22:16:10 $
  *
  *-**********************************************************************/
 		
@@ -416,7 +416,7 @@ long Device::Get_min_access_right(long cmd,long *min_access,long *error)
 /**
  * FRM compatibiliy version of Get_min_access_right (still unused)
  *
- * @param cmd		The command code
+ * @param cmd The command code
  *
  * @return the access right of the command if command found
  * 
