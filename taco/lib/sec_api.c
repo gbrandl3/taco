@@ -29,9 +29,9 @@
  *
  * Original   : December 1993
  *
- * Version    :	$Revision: 1.14 $
+ * Version    :	$Revision: 1.15 $
  *
- * Date       :	$Date: 2006-09-18 22:31:44 $
+ * Date       :	$Date: 2007-06-24 22:21:25 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -141,29 +141,22 @@ extern "C" {
  */
 short		*auth_flag;
 
-/*+*********************************************************************
- Function   :   static long dev_security()
-
- Description:   Gets the user authentication.
-		Verifies the access to the control system.
-		Checks the requested access right for the device.
-		Returns the client identification and the 
-		next free field in the list of connections to
-		device servers.
-
- Arg(s) In  :   char *dev_name	      - name of the device to access.
-		long requested_access - requested access right.
-
- Arg(s) Out :   long *ret_client_id   - a unique client identification.
-		long *connection_id   - the next free field in the list
-					of connections.
-		long *error           - pointer to error code,
-			                in case routine fails
-
- Return(s)  :   DS_OK      - Access OK.
-		DS_NOTOK   - Error, access denied.
-***********************************************************************-*/
-
+/**
+ * @ingroup secAPI
+ * Gets the user authentication.
+ * Verifies the access to the control system.
+ * Checks the requested access right for the device.
+ * Returns the client identification and the next free field in the list 
+ * of connections to device servers.
+ *  
+ * @param dev_name name of the device to access.
+ * @param requested_access requested access right.
+ * @param ret_client_id will be set to a unique client identification
+ * @param connection_id will be set to the next free field in the list of connections
+ * @param error pointer to error code in case routine fails
+ *
+ * @return DS_OK if the access is allowed , otherwise Error, access denied.
+ */
 long _DLLFunc dev_security (char *dev_name, long requested_access,
 			    long *ret_client_id, long *connection_id, long *error)
 {
@@ -384,28 +377,21 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
 	return (DS_OK);
 }
 
-/*+*********************************************************************
- Function   :   static long sec_check()
-
- Description:   Reads the default access rights from the resource
-		databse.
-		Verifies the user identification and control system
-		access.
-		Checks the requested access on the device.
-		If nothing was specified, checks the default access
-		right.
-
- Arg(s) In  :   char *dev_name	      - name of the device to access.
-		long access_right     - requested access right.
-		SecUserAuth user_auth - user authentication structure.
-
- Arg(s) Out :   long *error           - pointer to error code,
-			                in case routine fails
-
- Return(s)  :   DS_OK      - Access OK.
-		DS_NOTOK   - Error, access denied.
-***********************************************************************-*/
-
+/**
+ * @ingroup secAPIintern
+ * Reads the default access rights from the resource database.
+ * Verifies the user identification and control system access.
+ * Checks the requested access on the device. 
+ * If nothing was specified, checks the default access right.
+ *
+ * @param dev_name name of the device to access.
+ * @param access_right requested access right.
+ * @param user_auth user authentication structure.
+ *
+ * @param error pointer to error code, in case routine fails
+ * 
+ * @return DS_OK if access is allowed, otherwise DS_NOTOK 
+ */
 static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
 		       long *error)
 {
@@ -633,30 +619,21 @@ static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
 	return (DS_OK);
 }
 
-/*+*********************************************************************
- Function   :   static long check_access_hierarchy()
-
- Description:   Reads the three resource tables (DOMAIN/FAMILY/MEMBER)
-		for user or group access rights. 
-		Checks the user or group access rights specified in
-		these tables in the order MEMBER, FAMILY and
-		DOMAIN.
-
- Arg(s) In  :   char *dev_name		      - name of the device to access.
-		long requested_access         - requested access right.
-		char *name                    - name of user or group.
-		char *res_path		      - path to the resource tables
-						SEC/USER/ACC_RIGHT/ or
-						SEC/GROUP/ACC_RIGHT/.
-
- Arg(s) Out :   long *error                   - pointer to error code,
-			                        in case routine fails
-
- Return(s)  :   DS_OK      - Access OK.
-		DS_NOTOK   - Error, access denied.
-		DS_WARNING - No access right specification.
-***********************************************************************-*/
-
+/**
+ * @ingroup secAPIintern
+ * Reads the three resource tables (DOMAIN/FAMILY/MEMBER) for user or group access rights. 
+ * Checks the user or group access rights specified in these tables in the order MEMBER, 
+ * FAMILY, and DOMAIN.
+ *
+ * @param dev_name name of the device to access.
+ * @param access_right requested access right.
+ * @param name name of user or group.
+ * @param res_path path to the resource tables SEC/USER/ACC_RIGHT/ or SEC/GROUP/ACC_RIGHT/
+ *
+ * @param error pointer to error code, in case routine fails
+ *
+ * @return DS_OK if the access is allowed, DS_NOTOK if access denied, DS_WARNING if no access right specification.
+ */
 static long check_access_hierarchy (char *dev_name, long access_right, 
 				    char *name, char *res_path, long *error)
 {
@@ -782,28 +759,21 @@ static long check_access_hierarchy (char *dev_name, long access_right,
 	return (DS_WARNING);
 }
 
-/*+*********************************************************************
- Function   :   static long sec_user_ident()
-
- Description:   Checks whether the user has access to the control
-		system.
-		The user identification information will be read
-		and verified. If nothing is specified, the group
-		identification information will be read and 
-		verified. If also nothing was specified, the
-		default network access will be checked.
-
- Arg(s) In  :   SecUserAuth user_auth - user athentication structure.
-		SecDefaultAccess sec_default_access 
-				      - default access rights.
-
- Arg(s) Out :   long *error           - pointer to error code.
-			                Will return error if no access 
-					was given.
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * @ingroup secAPIintern
+ * Checks whether the user has access to the control system.
+ * The user identification information will be read and verified. 
+ * If nothing is specified, the group identification information will be read and verified. 
+ * If also nothing was specified, the default network access will be checked.
+ *
+ * @param user_auth user athentication structure.
+ * @param sec_default_access default access rights.
+ * @param i_nethost
+ *
+ * @param error pointer to error code. Will return error if no access was given.
+ *
+ * @return  DS_OK or DS_NOTOK
+ */
 static long sec_user_ident (SecUserAuth user_auth, 
 			    SecDefaultAccess sec_default_access,
 			    long i_nethost, long *error)
@@ -1109,24 +1079,18 @@ static long sec_user_ident (SecUserAuth user_auth,
 	return (DS_NOTOK);
 }
 
-/*+*********************************************************************
- Function   :   static long search_dev_name ()
-
- Description:   Extract the three parts:
-	       		DOMAINE,
-		        DOMAINE/FAMILY,
-			DOMAINE/FAMILY/MEMBER
-		from the device name and store them in a string array.
-
- Arg(s) In  :   char *dev_name   - device name. 
-
- Arg(s) Out :   char **str_array - extracted parts of the device name.
-		long *error      - pointer to error code,
-			           in case routine fails
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * @ingroup secAPIintern
+ * Extract the three parts: DOMAIN, DOMAIN/FAMILY, DOMAIN/FAMILY/MEMBER
+ * from the device name and store them in a string array.
+ *
+ * @param dev_name device name. 
+ *
+ * @param str_array extracted parts of the device name.
+ * @param error pointer to error code, in case routine fails
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 static long search_dev_name (char *dev_name, char str_array[3][LONG_NAME_SIZE],
 			     long *error)
 {
@@ -1196,32 +1160,24 @@ static long search_dev_name (char *dev_name, char str_array[3][LONG_NAME_SIZE],
 	return (DS_OK);
 }
 
-/*+*********************************************************************
- Function   :   static long check_access_right()
-
- Description:   Searches a specified access right for a user
-		or a group (given by name) in a variable 
-		string array of the format:
-			name1, 	 access_ right1, \
-			name2,   access_ right2, \
-			...................
-
-		Verifies the requested access if a maximum
-		access right was found for the name.
-
- Arg(s) In  :   char *name                    - name of user or group.
-		long requested_access         - requested access right.
-		DevVarStringArray *access_res - variable string array of
-						names and access rights.
-
- Arg(s) Out :   long *error                   - pointer to error code,
-			                        in case routine fails
-
- Return(s)  :   DS_OK      - Access OK.
-		DS_NOTOK   - Error, access denied.
-		DS_WARNING - No access right specification.
-***********************************************************************-*/
-
+/**
+ * @ingroup secAPIintern
+ * Searches a specified access right for a user or a group (given by name) in a variable 
+ * string array of the format:
+ *			name1, 	 access_ right1, \
+ *			name2,   access_ right2, \
+ *			...................
+ *
+ * Verifies the requested access if a maximum access right was found for the name.
+ *
+ * @param name name of user or group.
+ * @param requested_access requested access right.
+ * @param access_res variable string array of names and access rights.
+ * 
+ * @param error pointer to error code, in case routine fails
+ *
+ * @return DS_OK if access allowed, DS_NOTOK if access denied, DS_WARNING if oo access right specification.
+ */
 static long check_access_right (char *name, long requested_access,
 				DevVarStringArray *access_res, long *error)
 {
@@ -1311,20 +1267,12 @@ static long check_access_right (char *name, long requested_access,
 	return (DS_WARNING);
 }
 
-/*+*********************************************************************
- Function   :   static void free_var_str_array()
-
- Description:   Frees a variable string array.
-		Normally allcated be db_getresource().
-
- Arg(s) In  :   DevVarStringArray *str_array - pointer to the variable
-					       string array.
-
- Arg(s) Out :   none
-
- Return(s)  :   none
-***********************************************************************-*/
-
+/**
+ * @ingroup secAPIintern
+ * Frees a variable string array.  Normally allocated by db_getresource().
+ *
+ * @param str_array pointer to the variable string array.
+ */
 void _DLLFunc free_var_str_array (DevVarStringArray *str_array)
 {
 	short	i;
@@ -1339,22 +1287,17 @@ void _DLLFunc free_var_str_array (DevVarStringArray *str_array)
 	str_array->sequence = NULL;
 }
 
-/*+*********************************************************************
- Function   :   static long create_client_id()
-
- Description:   Creates a unique client ID from a time stamp,
-		the process ID, the IP address, the UID and the
-		GID. 
-
- Arg(s) In  :   SecUserAuth user_auth - user authentication structure.
-
- Arg(s) Out :   long *ret_client_id   - client ID.
-		long *error           - pointer to error code,
-			                in case routine fails
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * @ingroup secAPIintern
+ * Creates a unique client ID from a time stamp, the process ID, the IP address, the UID and the GID. 
+ * 
+ * @param user_auth user authentication structure.
+ *
+ * @param ret_client_id will be set to the client ID
+ * @param error pointer to error code, in case routine fails
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 static long create_client_id (SecUserAuth user_auth, long *ret_client_id, 
 			      long *error)
 {
@@ -1404,22 +1347,15 @@ static long create_client_id (SecUserAuth user_auth, long *ret_client_id,
 	return (DS_OK);
 }
 
-
-
-/*+**********************************************************************
- Function   :   static long get_connection_id ()
-
- Description:   Get the connection ID for a new server connection,
-		to store the security key.
-
- Arg(s) In  :   none
-
- Arg(s) Out :   long *connection_id - connection number.
-                long *error - pointer to error code, in case routine fails.
-
- Return(s)  :   DS_OK / DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * @ingroup secAPIintern
+ * Get the connection ID for a new server connection, to store the security key.
+ *
+ * @param connection_id will be set to the connection number.
+ * @param error pointer to error code, in case routine fails.
+ * 
+ * @return DS_OK / DS_NOTOK
+ */
 static long get_connection_id (long *connection_id, long *error)
 {
 	long   	*new_connections;
@@ -1489,20 +1425,17 @@ static long get_connection_id (long *connection_id, long *error)
 	return (DS_OK);
 }
 
-/*+**********************************************************************
- Function   :   static long get_connection_id ()
-
- Description:   Free the reserved field for the security connection.
-		For connections with old library versions the reserved
-		field can be freed.
-
- Arg(s) In   : 	long connection_id - connection number.
-
- Arg(s) Out  : 	long *error - pointer to error code, in case routine fails.
-
- Return(s)   :  DS_OK / DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * @ingroup secAPI
+ * Frees the reserved field for the security connection.  
+ * For connections with old library versions the reserved field can be freed.
+ *
+ * @param connection_id connection number.
+ * 
+ * @param error pointer to error code, in case routine fails.
+ * 
+ * @return DS_OK / DS_NOTOK
+ */
 long _DLLFunc free_connection_id_vers3 (long connection_id, long *error)
 {
 	dev_printdebug (DBG_TRACE | DBG_SEC, "free_connection_id_vers3() : entering routine\n");
@@ -1514,24 +1447,18 @@ long _DLLFunc free_connection_id_vers3 (long connection_id, long *error)
 	return (*error=DS_OK);
 }
 
-
-/*+*********************************************************************
- Function   :   long create_sec_key()
-
- Description:   Creates the security key from the requested
-                access right, the unique client identification
-		and the RPC client handle to the device server.
-		The security key is stored as reference in the 
-		list of connections with the given connection ID.
-
- Arg(s) In  :   devserver ds       - device server client handle.
-
- Arg(s) Out :   long *error       - pointer to error code,
-                                    in case routine fails
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
+/**
+ * @ingroup secAPI
+ * Creates the security key from the requested access right, the unique client identification
+ * and the RPC client handle to the device server.  
+ * The security key is stored as reference in the list of connections with the given connection ID.
+ *
+ * @param ds device server client handle.
+ * 
+ * @param error pointer to error code, in case routine fails
+ * 
+ * @return DS_OK or DS_NOTOK
+ */
 long _DLLFunc create_sec_key (devserver ds, long *error)
 {
 	long	connection_id;
@@ -1577,26 +1504,19 @@ long _DLLFunc create_sec_key (devserver ds, long *error)
 	return (DS_OK);
 }
 
-/*+*********************************************************************
- Function   :   long verify_sec_key()
-
- Description:   Verifies the information in the device server 
-		client handle, by creating a security key and
-		comparing this key with the stored key for the
-		connection.
-		If the security key is valid, the client ID is
-		returned.
-
- Arg(s) In  :   devserver ds    - device server client handle.
-
- Arg(s) Out :   long *ret_client_id - client ID.
-		long *error         - pointer to error code,
-                                      in case routine fails
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
-
+/**
+ * @ingroup secAPI
+ * Verifies the information in the device server client handle, by creating a security key and
+ * comparing this key with the stored key for the connection.
+ * If the security key is valid, the client ID is returned.
+ *
+ * @param ds device server client handle.
+ *
+ * @param ret_client_id will be set to the client ID.
+ * @param error pointer to error code, in case routine fails
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 long _DLLFunc verify_sec_key (devserver ds, long *ret_client_id, long *error)
 {
 	long	sec_key;
@@ -1650,20 +1570,13 @@ long _DLLFunc verify_sec_key (devserver ds, long *ret_client_id, long *error)
 }
 
 
-/*+*********************************************************************
- Function   :   long free_sec_key()
-
- Description:   Frees the field with the security key in the list
-		of connections. The field can be reused with the next
-		import of a device. 
-
- Arg(s) In  :   devserver ds    - device server client handle.
-
- Arg(s) Out :   none
-
- Return(s)  :   none
-***********************************************************************-*/
-
+/**
+ * @ingroup secAPI
+ * Frees the field with the security key in the list of connections. 
+ * The field can be reused with the next import of a device. 
+ *
+ * @param ds device server client handle.
+ */
 void _DLLFunc free_sec_key (devserver ds)
 {
 	long	connection_id;
@@ -1689,33 +1602,25 @@ void _DLLFunc free_sec_key (devserver ds)
 	dev_printdebug (DBG_TRACE | DBG_SEC, "free_sec_key() : leaving routine \n");
 }
 
-
-/*+*********************************************************************
- Function   :   long sec_svc_import()
-
- Description:   - test for single user request. A single user request
-		  can be only imported, if the device is not yet in 
-		  single user or administration mode.
-		- Sets the device in single user or administration
-		  mode if it was requested.
-		- Stores the client identification, connection_id
-		  access right and the peer address of the TCP socket
-		  for a single user.
-
- Arg(s) In  :   DevServerDevices *device - structure for the exported device.
-		long connection_id      - client connection to the device.
-		long client_id		- client identification for the 
-					  connection.
-		long access_right       - requested access on the device.
-		struct svc_req *rqstp   - RPC request structure.
-
- Arg(s) Out :   long *error           - pointer to error code,
-			                in case routine fails
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
-
+/**
+ * @ingroup secAPI
+ * Tests for single user request. 
+ * A single user request can be only imported, if the device is not yet in 
+ * single user or administration mode.
+ * Sets the device in single user or administration mode if it was requested.
+ * Stores the client identification, connection_id access right and the peer address 
+ * of the TCP socket for a single user.
+ *
+ * @param device structure for the exported device.
+ * @param connection_id client connection to the device.
+ * @param client_id client identification for the connection.
+ * @param access_right requested access on the device.
+ * @param rqstp RPC request structure.
+ *
+ * @param error pointer to error code, in case routine fails
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 long _DLLFunc sec_svc_import (DevServerDevices *device, long connection_id,
 			      long client_id, long access_right,
 			      struct svc_req *rqstp, long *error)
@@ -1883,25 +1788,19 @@ long _DLLFunc sec_svc_import (DevServerDevices *device, long connection_id,
 	return (DS_OK);
 }
 
-/*+*********************************************************************
- Function   :   long sec_svc_free()
-
- Description:   Frees the single user lock, if one was set 
-		for this connection.
-
- Arg(s) In  :   DevServerDevices *device - structure for the exported device.
-		long connection_id       - client connection to the device.
-		long client_id		 - client identification for the 
-					   connection.
-		long access_right        - requested access on the device.
-
- Arg(s) Out :   long *error           - pointer to error code,
-			                in case routine fails
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
-
+/**
+ * @ingroup secAPI
+ @ Frees the single user lock, if one was set for this connection.
+ *
+ * @param device structure for the exported device.
+ * @param connection_id client connection to the device.
+ * @param client_id client identification for the connection.
+ * @param access_right requested access on the device.
+ *
+ * @param error pointer to error code, in case routine fails
+ *
+ * @return DS_OK or DS_NOTOK
+ */
 long _DLLFunc sec_svc_free (DevServerDevices *device, long connection_id,
 			    long client_id, long access_right, long *error)
 {
@@ -1940,27 +1839,20 @@ long _DLLFunc sec_svc_free (DevServerDevices *device, long connection_id,
 	return (DS_OK);
 }
 
-/*+*********************************************************************
- Function   :   long sec_svc_cmd()
-
- Description:   
-		-Checks whether the granted access right is high
-		 enough to execute the command.
-
- Arg(s) In  :   DevServerDevices *device - structure for the exported device.
-		long connection_id       - client connection to the device.
-		long client_id		 - client identification for the 
-					   connection.
-		long access_right        - requested access on the device.
-		long cmd                 - requested command to execute.
-
- Arg(s) Out :   long *error           - pointer to error code,
-			                in case routine fails
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
-
+/**
+ * @ingroup secAPI
+ * Checks whether the granted access right is high enough to execute the command.
+ *
+ * @param device structure for the exported device.
+ * @param connection_id client connection to the device.
+ * @param client_id client identification for the connection.
+ * @param access_right requested access on the device.
+ * @param cmd requested command to execute.
+ *
+ * @param error pointer to error code, in case routine fails
+ * 
+ * @return DS_OK or DS_NOTOK
+ */
 long _DLLFunc sec_svc_cmd (DevServerDevices *device, long connection_id,
 			   long client_id, long access_right, long cmd,
 			   long *error)
@@ -2105,27 +1997,20 @@ long _DLLFunc sec_svc_cmd (DevServerDevices *device, long connection_id,
 }
 
 
-/*+*********************************************************************
- Function   :   long sec_tcp_connection()
-
- Description:   A single user must use a tcp connection.
-		Change the connection described by clnt and svr_conn
-		to TCP protocol.
-
- Arg(s) In  :   CLIENT *clnt - Actual client handle.
-			       Will be changed to a TCP handle if necessary.
-
- Arg(s) Out :   server_connections *svr_conn - connection structure
-					       with protocol and socket 
-					       information.
-		long *error                  - pointer to error code,
-			                       in case routine fails
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-
-
-long _DLLFunc sec_tcp_connection (long requested_access, CLIENT * *clnt,
+/**
+ * @ingroup secAPI
+ * A single user must use a tcp connection.
+ * Change the connection described by clnt and svr_conn to TCP protocol.
+ *
+ * @param requested_access 
+ * @param clnt Actual client handle. Will be changed to a TCP handle if necessary.
+ *
+ * @param svr_conn connection structure with protocol and socket information.
+ * @param error pointer to error code, in case routine fails
+ *
+ * @return DS_OK or DS_NOTOK
+ */
+long _DLLFunc sec_tcp_connection (long requested_access, CLIENT **clnt,
 				  server_connections *svr_conn, long *error)
 {
 	struct  sockaddr_in     serv_adr;
@@ -2274,25 +2159,14 @@ long _DLLFunc sec_tcp_connection (long requested_access, CLIENT * *clnt,
 	return (DS_OK);
 }
 
-
-/*+*********************************************************************
- Function   :   void sec_free_tcp_connection()
-
- Description:   A single user must use a tcp connection.
-		If the last single user access was closed on a 
-		connection, switch back to the initial protocol.
-
- Arg(s) In  :   
-		server_connections *svr_conn - connection structure
-					       with protocol and access
-					       counter.
- Arg(s) Out :   long *error                  - pointer to error code,
-			                       in case routine fails
-
- Return(s)  :   none
-***********************************************************************-*/
-
-
+/**
+ * @ingroup secAPI
+ * A single user must use a tcp connection.
+ * If the last single user access was closed on a connection, switch back to the initial protocol.
+ *
+ * @param ds device server client handle.
+ * @param svr_conn connection structure with protocol and access counter.
+ */
 void _DLLFunc sec_free_tcp_connection (devserver ds, server_connections *svr_conn)
 {
 	long 	error = 0;
@@ -2332,25 +2206,16 @@ void _DLLFunc sec_free_tcp_connection (devserver ds, server_connections *svr_con
 	return;
 }
 
-/*+*********************************************************************
- Function   :   static long sec_verify_tcp_conn()
-
- Description:   A single user must use a tcp connection.
-		The function validates the tcp connection to 
-		the client. If the connection was lost, the
-		single user od administration access on the 
-		device will be canceled.
-
- Arg(s) In  :   DevServerDevices *device - structure for the exported device.
-
- Arg(s) Out :   long *error           - pointer to error code,
-			                in case routine fails
-
- Return(s)  :   DS_OK    =  Connection valid.
-		DS_NOTOK = Connection no longer valid, single user
-			   access canceled.
-***********************************************************************-*/
-
+/**
+ * @ingroup secAPIintern
+ * A single user must use a tcp connection.
+ * The function validates the tcp connection to the client. If the connection was lost, the
+ * single user od administration access on the device will be canceled.
+ *
+ * @param device structure for the exported device.
+ * 
+ * @return DS_OK if Connection valid. DS_NOTOK if connection no longer valid, single user access canceled.
+ */
 static long sec_verify_tcp_conn (DevServerDevices *device)
 {
 	struct sockaddr_in	peeraddr;
