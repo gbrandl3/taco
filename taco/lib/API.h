@@ -30,9 +30,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.18 $
+ * Version:	$Revision: 1.19 $
  *
- * Date:	$Date: 2007-06-24 22:20:24 $
+ * Date:	$Date: 2007-06-24 22:28:39 $
  *
  *********************************************************************-*/
 
@@ -92,7 +92,7 @@
 
 /**
  * @defgroup secAPIintern Internal functions to the security system
- * @ingroup clientAPI
+ * @ingroup secAPI
  */
  
 
@@ -101,7 +101,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.18 2007-06-24 22:20:24 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.19 2007-06-24 22:28:39 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*
