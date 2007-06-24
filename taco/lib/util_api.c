@@ -31,9 +31,9 @@
  *
  * Original   :	April 1993
  *
- * Version:	$Revision: 1.29 $
+ * Version:	$Revision: 1.30 $
  *
- * Date:		$Date: 2007-06-19 13:18:03 $
+ * Date:		$Date: 2007-06-24 22:17:00 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -689,6 +689,7 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
  * @param ds		the device handle
  * @param cmd       	error number
  * @param cmd_str  	command name as a string.
+ * @param len		maximum len for the the command name string
  * @param error   	Will contain an appropriate error
  * 			code if the corresponding call
  * 			returns a non-zero value.

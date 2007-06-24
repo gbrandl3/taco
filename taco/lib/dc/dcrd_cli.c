@@ -23,13 +23,13 @@
  * Description:
  *
  * Author(s):	Emmanuel Taurel
- *		$Author: bourtemb $
+ *		$Author: jkrueger1 $
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.15 $
+ * Version:	$Revision: 1.16 $
  *
- * Date:	$Date: 2007-03-05 11:14:37 $
+ * Date:	$Date: 2007-06-24 22:18:49 $
  *
  ******************************************************************************/
 
@@ -594,9 +594,9 @@ static long init_imp(long i_nethost, long *perr)
  * To compare two values as requested by the qsort
  * function. The definition of this function is
  * available as a UNIX man page
- * @param a
- * @param b
- * @return 
+ * @param vpa
+ * @param vpb
+ * @return -1 if vpa < vpb, 0 if vpa == vpa, 1 otherwise 
  */
 #ifndef WIN32
 static int comp(const void *vpa,const void *vpb)

@@ -31,9 +31,9 @@
  *
  * Original   : May 1998
  *
- * Version:     $Revision: 1.12 $
+ * Version:     $Revision: 1.13 $
  *
- * Date:        $Date: 2006-11-07 15:50:15 $
+ * Date:        $Date: 2007-06-24 22:17:46 $
  *
  *-*******************************************************************/
 
@@ -396,7 +396,9 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
  *
  * @param line 	A pointer to a buffer where is stored a line of the resource file 						
  * @param line1	A pointer to a buffer where the modified line will be store
- * @param k     The length of the original line
+ * @param in
+ * @param p_line_ptr
+ * @param p_error pointer to the error code in case of error
  *
  * @return 	- DS_NOTOK Error  					
  *		- DS_OK It is a device definition line
@@ -663,6 +665,8 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
  *
  * @param lin 		A pointer to the modified resource definition (without
  *			space and tab characters)
+ * @param d_num
+ * @param d_list
  * @param p_err_dev	
  * @param p_error
  *
@@ -1316,7 +1320,7 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 
 
 /**@ingroup dbaseAPImisc
- * The static databse is also used to store tsecurity resources. A very simple system protects
+ * The static databse is also used to store security resources. A very simple system protects
  * security resources from beeing updated by a user if the administrator choose to protect them.
  * This function returns database protection data to the caller allowing an application to ask
  * its user for security resources password.
@@ -1394,7 +1398,6 @@ long db_secpass(char **pass, long *p_error)
 
 /* Any problem with server ? If yes and if it is a time-out, try to reconnect
    to a new database server. */
-
 	if(recev == NULL)
 	{
 		if(error == DevErr_RPCTimedOut)
@@ -1454,7 +1457,6 @@ long db_secpass(char **pass, long *p_error)
 
 	if ((*pass = (char *)malloc(strlen(recev->res_val.arr1_val[0]) + 1)) == NULL)
 	{
-
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
