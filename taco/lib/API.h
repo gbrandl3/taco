@@ -30,9 +30,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.17 $
+ * Version:	$Revision: 1.18 $
  *
- * Date:	$Date: 2007-03-22 15:47:08 $
+ * Date:	$Date: 2007-06-24 22:20:24 $
  *
  *********************************************************************-*/
 
@@ -84,12 +84,24 @@
  * call. This means a device server itself can become a DSAPI client it accesses a device.
  */
 
+/**
+ * @defgroup secAPI Interface for the security system
+ * @ingroup clientAPI
+ *
+ */
+
+/**
+ * @defgroup secAPIintern Internal functions to the security system
+ * @ingroup clientAPI
+ */
+ 
+
 /*
  *  standard header string to use "what" or "ident".
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.17 2007-03-22 15:47:08 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.18 2007-06-24 22:20:24 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*
