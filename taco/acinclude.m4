@@ -59,10 +59,12 @@ AC_DEFUN([TACO_LABVIEW_BINDING],
                 [labview_prefix="$withval"], [labview_prefix="/usr/local/lv71"])
 	ac_save_CPPFLAGS="$CPPFLAGS"
 	CPPFLAGS="$CPPFLAGS -I${labview_prefix}/cintools"
-	AC_CHECK_HEADERS([extcode.h], [taco_labview_binding=yes
-		AC_SUBST([LABVIEW_INCLUDES], ["-I${labview_prefix}/cintools"])
-		AC_SUBST([LABVIEW_LIBS], ["-L${labview_prefix}/cintools -llv"])
-		]) 
+	if test x"$taco_labview_binding" = x"yes" ; then
+		AC_CHECK_HEADERS([extcode.h], [taco_labview_binding=yes
+			AC_SUBST([LABVIEW_INCLUDES], ["-I${labview_prefix}/cintools"])
+			AC_SUBST([LABVIEW_LIBS], ["-L${labview_prefix}/cintools -llv"])
+			])
+	fi 
 	CPPFLAGS="$ac_save_CPPFLAGS"
 	AM_CONDITIONAL(LABVIEW_BINDING, [test "$taco_labview_binding" = "yes"])
 ])
