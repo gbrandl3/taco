@@ -41,7 +41,7 @@ AT_CLEANUP
 AT_BANNER([Testing TACO system (GDBM database backend)])
 
 AT_SETUP([Starting TACO])
-AT_CHECK([unset RES_BASE_DIR; TACO_DATABASE=gdbm; taco start ; sleep 10])
+AT_CHECK([unset RES_BASE_DIR; TACO_DATABASE=dbm taco start ; sleep 10])
 AT_CLEANUP
 
 AT_BANNER([[Testing the database server.]])
