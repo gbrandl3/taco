@@ -1,3 +1,15 @@
+2007-06-24 12:00 jkrueger1:
+	* lib/API.h lib/sec_api.c lib/dc/dcrd_cli.c lib/dbase/update_cli.c
+	lib/util_api.c lib/Device.cpp: add the security API into the doxygen 
+	generated documentation
+2007-06-19 15:00 jkrueger1:
+	* lib/util_api.c: Fix wrong device name in dev_ping if the device
+	name contains the nethost
+2007-06-19 12:00 jkrueger1:
+	* lib/tango/tango_api.cpp: Backport from branch: 3.97
+2007-01-16 09:00 jkrueger1:
+	* system/dbase/server/mysql_impexp.cpp: Fix: extraction of program
+	number (take it from the branch 3_97_0, done by Jean-Luc)
 2007-01-15 18:00 jkrueger1:
 	* misc/tacoenv.*.in: Change the default database type
 	* configure.ac: Change version number
