@@ -26,13 +26,13 @@
  *		the applications programmers interface.
  *
  * Author(s):	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: bourtemb $
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.19 $
+ * Version:	$Revision: 1.20 $
  *
- * Date:	$Date: 2007-06-24 22:28:39 $
+ * Date:	$Date: 2007-08-20 15:51:07 $
  *
  *********************************************************************-*/
 
@@ -101,7 +101,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.19 2007-06-24 22:28:39 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.20 2007-08-20 15:51:07 bourtemb Exp $";
 #endif /* _IDENT */
 
 /*
@@ -128,6 +128,9 @@ static char APIh[] =
 /*
  * Include system commands and states.
  */
+#ifndef HAVE_CONFIG_H
+#include <private/config.h>
+#endif
 #include <macros.h>
 #include <DevCmds.h>
 #include <DevStates.h>
