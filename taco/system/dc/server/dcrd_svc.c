@@ -26,13 +26,13 @@
  *
  *
  * Author       : E. Taurel
- *                $Author: jkrueger1 $
+ *                $Author: bourtemb $
  *
  * Original(s)  : February 1993
  *
- * Version      : $Revision: 1.10 $
+ * Version      : $Revision: 1.11 $
  *
- * Date         : $Date: 2006-09-18 21:49:14 $
+ * Date         : $Date: 2007-08-21 07:54:29 $
  *
  */
 
@@ -41,7 +41,7 @@
 #endif
 #ifdef _solaris
 #define PORTMAP
-#endif 
+#endif
 
 #include <API.h>
 #include <DevErrors.h>
@@ -119,6 +119,14 @@ int 		ctr,
 upd_reqnb 	req;
 hash_info 	mem;
 
+#include <dataport.h>
+Dataport *dp_rd;		/* pointer on the dataport */
+char dp_rd_name[15];	/* name of the shared memory (dataport) */
+typedef	struct {
+	int ctr;
+} Sharedstruct_rd;
+Sharedstruct_rd *shared_rd;
+
 db_resource 	res_serv_put,
 		res_serv_get[] = {
 			{"start_req",D_LONG_TYPE},
@@ -166,6 +174,7 @@ void un_register_prog(int signo)
 	pmap_unset(pgnum, DC_VERS);
 /* Added code to unregister the server from static db */
 	db_svc_unreg(ds_name, &error);
+	CloseDataport(dp_rd, dp_rd_name);
 	exit(-1);
 }
 
@@ -215,9 +224,9 @@ void default_sig(int signo)
 		fprintf(stderr,"utilities call\n");
 
 	fflush(stderr);
+	CloseDataport(dp_rd, dp_rd_name);
 }
 
-
 
 /**
  *
@@ -260,6 +269,48 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 #endif /* ALONE */
+
+/* Create the Dataport to have a diagnostic on the load of the server */
+	strncpy(dp_rd_name,"dc_rd_alo_",11);
+	strncat(dp_rd_name,argv[1],2);
+/* 
+ * If dataport exists, destroy it.
+ **********************************
+ */
+
+	if((dp_rd = OpenDataport(dp_rd_name,sizeof(Sharedstruct_rd))) != NULL)
+	{
+		CloseDataport(dp_rd, dp_rd_name);
+		printf("dataport %s already existed, destroyed !\n", dp_rd_name);
+	}
+/* 
+ * create a new dataport
+ **********************************
+ */
+	dp_rd = CreateDataport(dp_rd_name, sizeof(Sharedstruct_rd));
+	if (dp_rd==NULL)
+	{
+		fprintf(stderr,"Dataport %s can't be created\n",dp_rd_name);
+	}
+	else
+	{
+		printf("Dataport %s created\n",dp_rd_name);
+	}
+	shared_rd = (Sharedstruct_rd *)&(dp_rd->body);
+	if (AccessDataport(dp_rd) == -1)
+	{
+	   	fprintf(stderr,"Can't access Dataport %s, errno = %d\n", dp_rd_name,errno);
+	}
+/*
+ * Initialize the shared values now 
+ *
+ */
+	shared_rd->ctr	= 0;
+
+	if (ReleaseDataport(dp_rd) == -1)
+	{
+		fprintf(stderr,"Can't release Dataport %s, errno = %d\n", dp_rd_name,errno);
+	}
 
 /* Install signal handler */
 #ifdef OBSOLETE_SUN
@@ -328,6 +379,7 @@ int main(int argc, char **argv)
 	sigaction(SIGPROF, &sigact, NULL);
 #endif /* !linux */
 #endif /* OBSOLETE_SUN */
+
 
 /* Change max number of open files to 120 */
 	if (getrlimit(RLIMIT_NOFILE,&lim) == -1)
@@ -593,7 +645,6 @@ static void dc_prog_1(struct svc_req *rqstp, SVCXPRT *transp)
 	}
 }
 
-
 #ifndef ALONE
 /**
  * To send server information (host_name,program number   
@@ -648,7 +699,6 @@ static void register_dc(char *netman_host, char *host, u_long prog, u_long vers)
 }
 #endif /* ALONE */
 
-
 
 /**
  * To export the pseudo device associated with this 
@@ -900,7 +950,6 @@ static int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_ser
 	return(0);
 }
 
-
 
 /**
  * To retrieve from the static database the shared memory segment size.
@@ -971,7 +1020,6 @@ static int shm_size(char *host_name)
 	return(0);
 }
 
-
 
 /**
  *
@@ -1040,9 +1088,20 @@ void one_more_request(void)
 		}
 	}
 	ctr = ctr1;
+	if (AccessDataport(dp_rd) == -1)
+	{
+	   	fprintf(stderr,"Can't access Dataport %s, errno = % d\n", dp_rd_name,errno);
+		return;
+	}
+	shared_rd->ctr = ctr1;
+	
+	if (ReleaseDataport(dp_rd) == -1)
+	{
+	   	fprintf(stderr,"Can't release Dataport %s, errno = % d\n", dp_rd_name,errno);
+		return;
+	}
 }
 
-
 
 /**
  * To terminate the server in a proper way.

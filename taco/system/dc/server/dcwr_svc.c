@@ -26,13 +26,13 @@
  *
  *
  * Author(s)    : E. Taurel
- *                $Author: jkrueger1 $
+ *                $Author: bourtemb $
  *
  * Original     : February 1993
  *
- * Version      : $Revision: 1.11 $
+ * Version      : $Revision: 1.12 $
  *
- * Date         : $Date: 2006-09-18 21:49:14 $
+ * Date         : $Date: 2007-08-21 07:54:29 $
  *
  */
 
@@ -133,6 +133,14 @@ db_resource 	res_serv_put,
 int 		res_serv_get_size = sizeof(res_serv_get)/sizeof(db_resource),
  		res1_size = sizeof(res1) / sizeof(db_resource);
 
+#include <dataport.h>
+Dataport *dp_wr;		/* pointer on the dataport */
+char dp_wr_name[15];	/* name of the shared memory (dataport) */
+typedef	struct {
+	int ctr;
+} Sharedstruct_wr;
+Sharedstruct_wr *shared_wr;
+
 /* Three differents signal routines */
 void default_sig(int signo)
 {
@@ -147,6 +155,7 @@ void default_sig(int signo)
         fprintf(stderr,"Server requested from %x\n",transp_sta->xp_raddr.sin_addr.s_addr);
 #endif
 	fflush(stderr);
+	CloseDataport(dp_wr, dp_wr_name);
 }
 
 void un_register_prog(int signo)
@@ -155,6 +164,7 @@ void un_register_prog(int signo)
 	pmap_unset(pgnum, DC_VERS);
 /* Added code to unregister the server from static db */
 	db_svc_unreg(ds_name, &error);
+	CloseDataport(dp_wr, dp_wr_name);
 	exit(1);
 }
 
@@ -163,7 +173,7 @@ void time_out_prog(int signo)
 	time_out = True;
 }
 
-
+
 /**
  *
  * DATA COLLECTOR WRITE SERVER MAIN FUNCTION
@@ -207,6 +217,48 @@ int main(int argc, char **argv)
 	}
 	serv_num = argv[1];
 #endif /* ALONE */
+
+/* Create the Dataport to have a diagnostic on the load of the server */
+	strncpy(dp_wr_name,"dc_wr_alo_",11);
+	strncat(dp_wr_name,argv[1],2);
+/* 
+ * If dataport exists, destroy it.
+ **********************************
+ */
+
+	if((dp_wr = OpenDataport(dp_wr_name,sizeof(Sharedstruct_wr))) != NULL)
+	{
+		CloseDataport(dp_wr, dp_wr_name);
+		printf("dataport %s already existed, destroyed !\n", dp_wr_name);
+	}
+/* 
+ * create a new dataport
+ **********************************
+ */
+	dp_wr = CreateDataport(dp_wr_name, sizeof(Sharedstruct_wr));
+	if (dp_wr==NULL)
+	{
+		fprintf(stderr,"Dataport %s can't be created\n",dp_wr_name);
+	}
+	else
+	{
+		printf("Dataport %s created\n",dp_wr_name);
+	}
+	shared_wr = (Sharedstruct_wr *)&(dp_wr->body);
+	if (AccessDataport(dp_wr) == -1)
+	{
+	   	fprintf(stderr,"Can't access Dataport %s, errno = %d\n", dp_wr_name,errno);
+	}
+/*
+ * Initialize the shared values now 
+ *
+ */
+	shared_wr->ctr	= 0;
+
+	if (ReleaseDataport(dp_wr) == -1)
+	{
+		fprintf(stderr,"Can't release Dataport %s, errno = %d\n", dp_wr_name,errno);
+	}
 
 /* Install signal handlers */
 #ifdef OBSOLETE_SUN
@@ -527,7 +579,7 @@ static void dc_prog_1(struct svc_req *rqstp, SVCXPRT *transp)
 	}
 }
 
-
+
 #ifndef ALONE
 /**
  * To send server information (host_name,program number
@@ -579,7 +631,7 @@ static void register_dc(char *netman_host, char *host, u_long prog, u_long vers)
 }
 #endif /* ALONE */
 
-
+
 /**
  * To export the pseudo device associated with this
  * server, to request for server resources and to set the 
@@ -833,7 +885,7 @@ static int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_ser
 	return(0);
 }
 
-
+
 
 /**
  * To retrieve from the static database the shared memory 
@@ -906,7 +958,7 @@ static int shm_size(char *host_name)
 }
 
 
-
+
 
 /**
  * To count the request which arrive to this server and, 
@@ -976,9 +1028,21 @@ void one_more_request(void)
 		}
 	}
 	ctr = ctr1;
+	if (AccessDataport(dp_wr) == -1)
+	{
+	   	fprintf(stderr,"Can't access Dataport %s, errno = % d\n", dp_wr_name,errno);
+		return;
+	}
+	shared_wr->ctr = ctr1;
+	
+	if (ReleaseDataport(dp_wr) == -1)
+	{
+	   	fprintf(stderr,"Can't release Dataport %s, errno = % d\n", dp_wr_name,errno);
+		return;
+	}
 }
 
-
+
 /**
  * 
  * To terminate the server in a proper way.
@@ -996,5 +1060,6 @@ static void leave(int flag)
 		if (db_svc_unreg(ds_name, &error))
 			fprintf(stderr,"dc_server_wr : Error during server unregister...\n");
 /* Exit server */
+	CloseDataport(dp_wr, dp_wr_name);
 	exit(-1);
 }
