@@ -20,8 +20,9 @@
 sbin_PROGRAMS	=dc_wr_alo dc_rd_alo
 
 AM_CPPFLAGS	= -DALONE
-INCLUDES	=-I$(top_srcdir)/dbase/include @TACO_INCLUDES@
+INCLUDES	=-I$(top_srcdir)/dbase/include @TACO_INCLUDES@ -I$(top_srcdir)/lib/dataport/
 LIBDC		=../library/libdcmem.la
+LIBDATAPORT	=../../../lib/dataport/libdataport.la 
 
 dc_wr_alo_SOURCES=dc_devall.c \
 		dc_devinf.c \
@@ -31,7 +32,7 @@ dc_wr_alo_SOURCES=dc_devall.c \
 		dcwr_svc.c \
 		dcwr_xdr.c 
 
-dc_wr_alo_LDADD	= @TACO_SERVER_LIBS@ $(LIBDC)
+dc_wr_alo_LDADD	= @TACO_SERVER_LIBS@ $(LIBDC) $(LIBDATAPORT)
 
 dc_rd_alo_SOURCES=dc_devall.c \
 		dc_devinf.c \
@@ -40,4 +41,4 @@ dc_rd_alo_SOURCES=dc_devall.c \
 		dcrd_svc.c \
 		dcrd_xdr.c 
 
-dc_rd_alo_LDADD	= @TACO_SERVER_LIBS@ $(LIBDC)
+dc_rd_alo_LDADD	= @TACO_SERVER_LIBS@ $(LIBDC) $(LIBDATAPORT)
