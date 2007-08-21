@@ -25,13 +25,13 @@
  * Description    :
  *
  * Author         : E. Taurel
- *                $Author: jkrueger1 $
+ *                $Author: bourtemb $
  *
  * Original       : August 1992
  *
- * Version      : $Revision: 1.12 $
+ * Version      : $Revision: 1.13 $
  *
- * Date         : $Date: 2006-09-18 22:13:30 $
+ * Date         : $Date: 2007-08-21 07:48:31 $
  *
  */
 
@@ -98,7 +98,25 @@ static int rpc_connect(long *perr);
 static int comp(const void*, const void*);
 static int get_dc_host(char **p_serv_name,long *perr);
 
-
+long nb_wr_serv = 10;
+
+/* This function will return an integer between 1 and n */
+static int alea(int n)
+{
+   int i,partSize,maxUsefull,draw;
+
+   if(n <= 0)
+   	return 1;
+   i = n-1;
+   partSize   = (i == RAND_MAX) ?        1 : 1 + (RAND_MAX - i)/(i+1);
+   maxUsefull = partSize * i + (partSize-1);
+   
+   do
+   {
+      draw = rand();
+   } while (draw > maxUsefull);
+   return (draw/partSize + 1);
+}
 
 /****************************************************************************
 *                                                                           *
@@ -341,7 +359,7 @@ dc_error *perr;
 	{
 		perr->error_code = error;
 		perr->dev_error = 0;
-		if (error == DcErr_CantContactServer)
+		if ((error == DcErr_CantContactServer) || (error == DcErr_RPCTimedOut))
 			err_count++;
 		else
 			err_count = 0;
@@ -369,7 +387,6 @@ dc_error *perr;
 
 }
 
-
 
 /****************************************************************************
 *                                                                           *
@@ -599,7 +616,7 @@ dc_error *perr;
 	{
 		perr->error_code = error;
 		perr->dev_error = 0;
-		if (error == DcErr_CantContactServer)
+		if ((error == DcErr_CantContactServer) || (error == DcErr_RPCTimedOut))
 			err_count++;
 		else
 			err_count = 0;
@@ -627,7 +644,6 @@ dc_error *perr;
 
 }
 
-
 
 /****************************************************************************
 *                                                                           *
@@ -769,7 +785,7 @@ dc_error *perr;
 	{
 		perr->error_code = error;
 		perr->dev_error = 0;
-		if (error == DcErr_CantContactServer)
+		if ((error == DcErr_CantContactServer) || (error == DcErr_RPCTimedOut))
 			err_count++;
 		else
 			err_count = 0;
@@ -797,7 +813,6 @@ dc_error *perr;
 
 }
 
-
 
 /****************************************************************************
 *                                                                           *
@@ -822,7 +837,6 @@ static int comp(const void *vpa,const void *vpb)
 		return(1);
 }
 
-
 
 /****************************************************************************
 *                                                                           *
@@ -853,18 +867,9 @@ static int rpc_connect(long *perr)
 		{"max_call",D_LONG_TYPE},
 		{"timeout",D_LONG_TYPE},
 					};
-	static db_resource res_tab[] = {
-		{"1",D_LONG_TYPE},
-		{"2",D_LONG_TYPE},
-		{"3",D_LONG_TYPE},
-		{"4",D_LONG_TYPE},
-		{"5",D_LONG_TYPE},
-		{"6",D_LONG_TYPE},
-		{"7",D_LONG_TYPE},
-		{"8",D_LONG_TYPE},
-		{"9",D_LONG_TYPE},
-		{"10",D_LONG_TYPE},
-					};
+	int			rand_nb;
+	static db_resource	nb_serv_res[1];
+	char 			res_name_wr[64];
 
 /* If the RPC connection to static database server is not built, build one.
    The "config_flags" variable is defined as global by the device server
@@ -878,6 +883,31 @@ static int rpc_connect(long *perr)
 			return(-1);
 		}
 	}
+
+	/* Get the host name where the data collector is running */
+
+	if (get_dc_host(&serv_name,&error))
+	{
+		*perr = error;
+		return(-1);
+	}
+/*
+ * Get the number of data collector write servers
+ */	
+ 	strcpy(res_name_wr, serv_name);
+	strcat(res_name_wr, "_wr");
+	nb_serv_res[0].resource_name = res_name_wr;
+	nb_serv_res[0].resource_type = D_LONG_TYPE;
+	nb_serv_res[0].resource_adr = &nb_wr_serv;
+	if (db_getresource("class/dc/server_nb",nb_serv_res,1,perr))
+	{
+		fprintf(stderr,"rpc_connect: Can't retrieve class/dc/server_nb/%s resources\n",res_name_wr);
+		return -1;
+	}
+	
+	nb_server = nb_wr_serv;
+	srand((int)time(NULL));
+	rand_nb = alea(nb_server);
 
 /* Get the max number of call to server betwen each RPC reconnection */
 
@@ -906,52 +936,19 @@ static int rpc_connect(long *perr)
 	}
 	tmp = (unsigned char)host->h_addr[3];
 
-/* Build the pseudo device name used to retrieve request resource */
-
-	strcpy(tmp_name,"sys/dc_wr_");
-	sprintf(&(tmp_name[strlen(tmp_name)]),"%u",tmp);
-	strcpy(psd_name,tmp_name);
-	strcat(psd_name,"/request");
-
-/* Fullfil the resource array */
-
 	for (i = 0;i < 10;i++)
 	{
-		serv_info[i].request = 0xFFFFFFFF;
-		res_tab[i].resource_adr = &(serv_info[i].request);
 		serv_info[i].numb = i + 1;
 	}
-
-/* Get resource values from database */
-
-	if (db_getresource(psd_name,res_tab,10,&error))
-	{
-		*perr = DcErr_CantGetDcResources;
-		return(-1);
-	}
-
-/* Find how many servers are defined */
-
-	for (i = 0;i < 10;i++)
-	{
-		if (serv_info[i].request == 0xFFFFFFFF)
-			break;
-	}
-	nb_server = i;
-
-/* Sort the serv_info table in the ascending order */
-
-#ifndef _NT
-	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
-#else
-	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
-#endif   /* _NT */
+/* Build the pseudo device name used to retrieve request resource */
+	strcpy(tmp_name,"sys/dc_wr_");
+	sprintf(&(tmp_name[strlen(tmp_name)]),"%u",tmp);
 
 /* Test every server and keep the connection with the first one which answers */
 
 	for (i = 0;i < nb_server;i++)
 	{
-		res = test_server(serv_info,i,&error);
+		res = test_server(serv_info,(i+rand_nb) % nb_server,&error);
 		if (res == 0)
 			return(0);
 	}
@@ -968,7 +965,6 @@ static int rpc_connect(long *perr)
 
 }
 
-
 
 /****************************************************************************
 *                                                                           *
@@ -1015,7 +1011,6 @@ static int test_server(serv *serv_info,int min,long *perr)
 	strcpy(serv1,tmp_name);
 	strcat(serv1,"/");
 	sprintf(&(serv1[strlen(serv1)]),"%d",serv_info[min].numb);
-	
 /* Ask the static database for this server network parameters (host_name,
    program number and version number) */
 
@@ -1082,7 +1077,6 @@ static int test_server(serv *serv_info,int min,long *perr)
 }
 
 
-
 
 /****************************************************************************
 *                                                                           *
@@ -1194,7 +1188,6 @@ int get_dc_host(char **p_serv_name,long *perr)
 }
 
 
-
 
 
 /****************************************************************************
@@ -1222,58 +1215,24 @@ static int rpc_reconnect(long *perr)
 	int i,res,nb_server;
 	long error;
 	serv serv_info[10];
-	static db_resource res_tab1[] = {
-		{"1",D_LONG_TYPE},
-		{"2",D_LONG_TYPE},
-		{"3",D_LONG_TYPE},
-		{"4",D_LONG_TYPE},
-		{"5",D_LONG_TYPE},
-		{"6",D_LONG_TYPE},
-		{"7",D_LONG_TYPE},
-		{"8",D_LONG_TYPE},
-		{"9",D_LONG_TYPE},
-		{"10",D_LONG_TYPE},
-					};
+	int			rand_nb;
 #ifdef OSK
 	char *tmp1;
 	unsigned int diff;
 #endif /* OSK */
 
-/* Fullfil the resource array */
-
 	for (i = 0;i < 10;i++)
 	{
-		serv_info[i].request = 0xFFFFFFFF;
-		res_tab1[i].resource_adr = &(serv_info[i].request);
 		serv_info[i].numb = i + 1;
 	}
-
-/* Get resource values from database */
-
-	if (db_getresource(psd_name,res_tab1,10,&error))
-	{
-		*perr = DcErr_CantGetDcResources;
-		return(-1);
-	}
-
-/* Find how many servers are defined */
-
-	for (i = 0;i < 10;i++)
-	{
-		if (serv_info[i].request == 0xFFFFFFFF)
-			break;
-	}
-	nb_server = i;
-
-/* Sort the serv_info table in the ascending order */
-
-	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
+	nb_server = nb_wr_serv;
+	rand_nb = alea(nb_server);
 
 /* Test every server and keep the connection with the first one which answers */
 
 	for (i = 0;i < nb_server;i++)
 	{
-		res = re_test_server(serv_info,i,nb_server,&error);
+		res = re_test_server(serv_info,(i+rand_nb) % nb_server,nb_server,&error);
 		if (res == 0)
 			return(0);
 	}
@@ -1291,7 +1250,6 @@ static int rpc_reconnect(long *perr)
 }
 
 
-
 
 /****************************************************************************
 *                                                                           *
@@ -1340,14 +1298,13 @@ static int re_test_server(serv *serv_info,int min,int nb_server,long *perr)
    build a new rpc connection */
 
 	old = (int)(tmp_name[strlen(tmp_name) - 1]) - 0x30;
-	if (old == serv_info[min].numb)
+	if ((old == serv_info[min].numb) && (err_count < MAXERR))
 	{
 		cl_write = cl;
 		already_con = True;
 	}
 	else
 	{
-
 /* Build the device name associated with this server */
 
 		strcpy(serv1,tmp_name);
@@ -1402,8 +1359,6 @@ static int re_test_server(serv *serv_info,int min,int nb_server,long *perr)
 	{
 		if (already_con == False)
 			clnt_destroy(cl_write);
-		if (min == (nb_server - 1))
-			tmp_name[strlen(tmp_name) - 1] = '0';
 		*perr = error;
 		return(-1);
 	}
