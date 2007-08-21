@@ -20,7 +20,7 @@
 sbin_PROGRAMS	=dc_wr_alo dc_rd_alo
 
 AM_CPPFLAGS	= -DALONE
-INCLUDES	=-I$(top_srcdir)/dbase/include @TACO_INCLUDES@ -I$(top_srcdir)/lib/dataport/
+INCLUDES	=-I$(top_srcdir)/dbase/include @TACO_INCLUDES@ -I$(top_srcdir)/lib/dataport
 LIBDC		=../library/libdcmem.la
 LIBDATAPORT	=../../../lib/dataport/libdataport.la 
 
