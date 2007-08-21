@@ -23,11 +23,11 @@
  * Description:
  *
  * Author(s):	E. Taurel
- *		$Author: jkrueger1 $
+ *		$Author: bourtemb $
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2006-09-18 22:13:30 $
+ * Date:	$Date: 2007-08-21 07:28:50 $
  *
  ****************************************************************************/
 
@@ -134,8 +134,7 @@ int dc_devget_history(datco *dc_ptr,long cmd_code,dc_hist *hist_buff,DevType arg
  */
 	for (i = 0;i < max;i++)
 	{
-		if ((tmp_net->dchost_arr[i].nb_call == tmp_net->max_call_rd) ||
-		    (tmp_net->dchost_arr[i].cantcont_error == MAXERR))
+		if (tmp_net->dchost_arr[i].cantcont_error == MAXERR)
 		{
 			if (rpc_reconnect_rd(i,i_net,&error1))
 			{
@@ -194,7 +193,7 @@ int dc_devget_history(datco *dc_ptr,long cmd_code,dc_hist *hist_buff,DevType arg
 	if (recev == NULL)
 	{
 		free(tmp_ptr);
-		if (err == DcErr_CantContactServer)
+		if ((err == DcErr_CantContactServer) || (err == DcErr_RPCTimedOut))
 			tmp_net->dchost_arr[ind].cantcont_error++;
 		else
 			tmp_net->dchost_arr[ind].cantcont_error = 0;
