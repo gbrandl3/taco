@@ -23,13 +23,13 @@
  * Description:
  *
  * Author(s):	Emmanuel Taurel
- *		$Author: jkrueger1 $
+ *		$Author: bourtemb $
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.16 $
+ * Version:	$Revision: 1.17 $
  *
- * Date:	$Date: 2007-06-24 22:18:49 $
+ * Date:	$Date: 2007-08-21 07:42:00 $
  *
  ******************************************************************************/
 
@@ -100,7 +100,25 @@ static int call_dcservm(long,long *,dc_dev_mretdat *,int,int *,long,long *);
 static long set_err_nethv(long,long *,long,dc_dev_retdat *);
 static long set_err_nethm(long,long *,long,dc_dev_mretdat *);
 
-
+long nb_rd_serv = 10;
+
+/* This function will return an integer between 1 and n */
+static int alea(int n)
+{
+   int i,partSize,maxUsefull,draw;
+   
+   if(n <= 0)
+   	return 1;
+   i = n-1;
+   partSize   = (i == RAND_MAX) ?        1 : 1 + (RAND_MAX - i)/(i+1);
+   maxUsefull = partSize * i + (partSize-1);
+   
+   do
+   {
+      draw = rand();
+   } while (draw > maxUsefull);
+   return (draw/partSize + 1);
+}
 
 /**@ingroup dcAPI
  * Determine if a device is registered in the data
@@ -564,10 +582,10 @@ static long init_imp(long i_nethost, long *perr)
 	}
 
 #ifdef DEBUG
-	printf("Number of dc host : %d\n",host_dc.length);
-	for (i = 0;i < host_dc.length;i++) 
-		printf("Data collector host : %s\n",host_dc.sequence[i]);
-	printf("Number of calls between reconnection : %d\n",max_call_rd);
+	printf("Number of dc host : %d\n",tmp_net->host_dc.length);
+	for (i = 0;i < tmp_net->host_dc.length;i++) 
+		printf("Data collector host : %s\n",tmp_net->host_dc.sequence[i]);
+	printf("Number of calls between reconnection : %d\n",tmp_net->max_call_rd);
 #endif /* DEBUG */
 
 /* 
@@ -594,9 +612,9 @@ static long init_imp(long i_nethost, long *perr)
  * To compare two values as requested by the qsort
  * function. The definition of this function is
  * available as a UNIX man page
- * @param vpa
- * @param vpb
- * @return -1 if vpa < vpb, 0 if vpa == vpa, 1 otherwise 
+ * @param a
+ * @param b
+ * @return 
  */
 #ifndef WIN32
 static int comp(const void *vpa,const void *vpb)
@@ -640,22 +658,31 @@ static int rpc_connect(char *serv_name,CLIENT **prpc,int ind,long i_net,long *pe
 	long 			error;
 	serv 			serv_info[10];
 	unsigned char 		tmp = 0;
-	static db_resource 	res_tab[] = {
-					{"1",D_LONG_TYPE},
-					{"2",D_LONG_TYPE},
-					{"3",D_LONG_TYPE},
-					{"4",D_LONG_TYPE},
-					{"5",D_LONG_TYPE},
-					{"6",D_LONG_TYPE},
-					{"7",D_LONG_TYPE},
-					{"8",D_LONG_TYPE},
-					{"9",D_LONG_TYPE},
-					{"10",D_LONG_TYPE},
-					};
+	int			rand_nb;
+	static db_resource	nb_serv_res[1];
+	char 			res_name_rd[64];
 #ifdef OSK
 	char 			*tmp1;
 	unsigned int 		diff;
 #endif /* OSK */
+
+/*
+ * Get the number of data collector read servers
+ */
+ 	strcpy(res_name_rd, serv_name);
+	strcat(res_name_rd, "_rd");
+	nb_serv_res[0].resource_name = res_name_rd;
+	nb_serv_res[0].resource_type = D_LONG_TYPE;
+	nb_serv_res[0].resource_adr = &nb_rd_serv;
+	if (db_getresource("class/dc/server_nb",nb_serv_res,1,perr))
+	{
+		fprintf(stderr,"rpc_connect: Can't retrieve class/dc/server_nb/%s resources\n",res_name_rd);
+		return -1;
+	}
+	
+	nb_server = nb_rd_serv;
+	srand((int)time(NULL));
+	rand_nb = alea(nb_server);
 
 /* 
  * Get data collector server network information 
@@ -667,6 +694,10 @@ static int rpc_connect(char *serv_name,CLIENT **prpc,int ind,long i_net,long *pe
 	}
 	tmp = (unsigned int)host->h_addr[3];
 
+	for (i = 0;i < 10;i++)
+	{
+		serv_info[i].numb = i + 1;
+	}
 /* 
  * Build the pseudo device name used to retrieve request resource 
  */
@@ -675,48 +706,11 @@ static int rpc_connect(char *serv_name,CLIENT **prpc,int ind,long i_net,long *pe
 	strncpy(dc_multi_nethost[i_net].dchost_arr[ind].dc_req_name, psd_name, sizeof(dc_multi_nethost[i_net].dchost_arr[ind].dc_req_name));
 
 /* 
- * Fullfil the resource array 
- */
-	for (i = 0;i < 10;i++)
-	{
-		serv_info[i].request = 0xFFFFFFFF;
-		serv_info[i].numb = i + 1;
-		res_tab[i].resource_adr = &(serv_info[i].request);
-	}
-
-/* 
- * Get resource values from database 
- */
-	if (db_getresource(psd_name,res_tab,10,&error))
-	{
-		*perr = DcErr_CantGetDcResources;
-		return(DS_NOTOK);
-	}
-
-/* 
- * Find how many servers are defined 
- */
-	for (i = 0;i < 10;i++)
-		if (serv_info[i].request == 0xFFFFFFFF)
-			break;
-	nb_server = i;
-
-/* 
- * Sort the serv_info table in the ascending order 
- */
-#ifndef WIN32
-	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
-/*	qsort(&(serv_info[0]),nb_server,sizeof(serv),(int (*)())comp);*/
-#else
-	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
-#endif  /* WIN32 */
-
-/* 
  * Test every server and build the connection with the first one which answers 
  */
 	for (i = 0;i < nb_server;i++)
 	{
-		res = test_server(ind,serv_info,i,prpc,i_net,&error);
+		res = test_server(ind,serv_info,(i+rand_nb) % nb_server,prpc,i_net,&error);
 		if (res == 0)
 			return(DS_OK);
 	}
@@ -779,6 +773,7 @@ static int test_server(int ind,serv *serv_info,int min,CLIENT **clnt_ptr,long i_
 		dev_name[diff + 1] = 0;
 	}
 	snprintf(&(dev_name[strlen(dev_name)]), sizeof(dev_name) - strlen(dev_name), "%d",serv_info[min].numb);
+
 
 /* 
  * Ask the static database for this server network parameters (host_name,
@@ -1152,8 +1147,7 @@ int dc_devget(datco *dc_ptr,long cmd_code,DevArgument argout,DevType argout_type
 /* 
  * Is it necessary to reconnect to dc server ? 
  */
-	if ((tmp_net->dchost_arr[ind].nb_call == tmp_net->max_call_rd) || 
-	    (tmp_net->dchost_arr[ind].cantcont_error == MAXERR))
+	if (tmp_net->dchost_arr[ind].cantcont_error == MAXERR)
 	{
 		if (rpc_reconnect_rd(ind,dc_ptr->net_ind,&err))
 		{
@@ -1197,7 +1191,7 @@ int dc_devget(datco *dc_ptr,long cmd_code,DevArgument argout,DevType argout_type
 	if (recev == NULL)
 	{
 		*error = err;
-		if (err == DcErr_CantContactServer)
+		if ((err == DcErr_CantContactServer) || (err == DcErr_RPCTimedOut))
 			tmp_net->dchost_arr[ind].cantcont_error++;
 		else
 			tmp_net->dchost_arr[ind].cantcont_error = 0;
@@ -1427,8 +1421,7 @@ int dc_devgetv(dc_dev_retdat *dev_retdat,unsigned int num_device,long cmd_code,l
 		tmp_net = &dc_multi_nethost[i_net];
 		nb_dc_host = tmp_net->host_dc.length;
 		for (i = 0;i < nb_dc_host;i++)
-			if ((tmp_net->dchost_arr[i].nb_call == tmp_net->max_call_rd) || 
-			    (tmp_net->dchost_arr[i].cantcont_error == MAXERR))
+			if (tmp_net->dchost_arr[i].cantcont_error == MAXERR)
 			{
 				if (rpc_reconnect_rd(i,i_net,&error1))
 				{
@@ -1620,7 +1613,7 @@ static int call_dcserv(int num_device,long *dev_numb,dc_dev_retdat *dev_retdat,i
 	if (recev == NULL)
 	{
 		free(tmp_ptr);
-		if (err == DcErr_CantContactServer)
+		if ((err == DcErr_CantContactServer) || (err == DcErr_RPCTimedOut))
 		{
 			tmp_net->dchost_arr[ind].cantcont_error++;
 			for (i = 0;i < num_device;i++)
@@ -1892,8 +1885,7 @@ int dc_devgetm(dc_dev_mretdat *dev_mretdat,unsigned int num_device,long *error)
 
 		for (i = 0;i < nb_dc_host;i++)
 		{
-			if ((tmp_net->dchost_arr[i].nb_call == tmp_net->max_call_rd) ||
-			    (tmp_net->dchost_arr[i].cantcont_error == MAXERR))
+			if (tmp_net->dchost_arr[i].cantcont_error == MAXERR)
 			{
 				if (rpc_reconnect_rd(i,i_net,&error1))
 				{
@@ -2148,7 +2140,7 @@ static int call_dcservm(long num_device,long *dev_numb,dc_dev_mretdat *dev_mretd
 	{
 		free(tmp_ptr);
 		free(tmp_ptr_mint);
-		if (err == DcErr_CantContactServer)
+		if ((err == DcErr_CantContactServer) || (err == DcErr_RPCTimedOut))
 			tmp_net->dchost_arr[ind].cantcont_error++;
 		else
 			tmp_net->dchost_arr[ind].cantcont_error = 0;
@@ -2226,63 +2218,21 @@ int rpc_reconnect_rd(int ind,long i_net,long *perr)
 	long 			error;
 	dc_nethost_info 	*tmp_net;
 	serv 			serv_info[10];
-	static db_resource 	res_tab[] = {
-					{"1",D_LONG_TYPE},
-					{"2",D_LONG_TYPE},
-					{"3",D_LONG_TYPE},
-					{"4",D_LONG_TYPE},
-					{"5",D_LONG_TYPE},
-					{"6",D_LONG_TYPE},
-					{"7",D_LONG_TYPE},
-					{"8",D_LONG_TYPE},
-					{"9",D_LONG_TYPE},
-					{"10",D_LONG_TYPE},
-					};
+	int			rand_nb;
 
-/* 
- * Fullfil the resource array 
- */
 	for (i = 0;i < 10;i++)
 	{
-		serv_info[i].request = 0xFFFFFFFF;
 		serv_info[i].numb = i + 1;
-		res_tab[i].resource_adr = &(serv_info[i].request);
 	}
-
-/* 
- * Get resource values from database 
- */
-	tmp_net = &dc_multi_nethost[i_net];
-	if (db_getresource(tmp_net->dchost_arr[ind].dc_req_name,res_tab,10,&error))
-	{
-		*perr = DcErr_CantGetDcResources;
-		return(DS_NOTOK);
-	}
-
-/* 
- * Find how many servers are defined 
- */
-	for (i = 0;i < 10;i++)
-		if (serv_info[i].request == 0xFFFFFFFF)
-			break;
-	nb_server = i;
-
-/* 
- * Sort the serv_info table in the ascending order 
- */
-#ifndef WIN32
-	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
-/*	qsort(&(serv_info[0]),nb_server,sizeof(serv),(int (*)())comp);*/
-#else
-	qsort(&(serv_info[0]),nb_server,sizeof(serv),comp);
-#endif  /* WIN32 */
+	nb_server = nb_rd_serv;
+	rand_nb = alea(nb_server);
 
 /* 
  * Test every server and keep the connection with the first one which answers 
  */
 	for (i = 0;i < nb_server;i++)
 	{
-		res = re_test_server(ind,serv_info,i,nb_server,i_net,&error);
+		res = re_test_server(ind,serv_info,(i+rand_nb) % nb_server,nb_server,i_net,&error);
 		if (res == 0)
 			return(DS_OK);
 	}
@@ -2335,7 +2285,7 @@ static int re_test_server(int ind,serv *serv_info,int min,int nb_server,long i_n
    ask server network parameters and to build the RPC connection */
 
 	tmp_net = &dc_multi_nethost[i_net];
-	if (tmp_net->dchost_arr[ind].serv_num == serv_info[min].numb)
+	if ((tmp_net->dchost_arr[ind].serv_num == serv_info[min].numb) && (tmp_net->dchost_arr[ind].cantcont_error < MAXERR))
 	{
 		cl_read = tmp_net->dchost_arr[ind].rpc_handle;
 		already_con = True;
@@ -2405,11 +2355,8 @@ static int re_test_server(int ind,serv *serv_info,int min,int nb_server,long i_n
 
 /* Destroy the connection to this server. If it is the last server, let us say
    that we are not connected to any server on this host */
-
 		if (already_con == False)
 			clnt_destroy(cl_read);
-		if (min == (nb_server - 1))
-			tmp_net->dchost_arr[ind].serv_num = 0;
 		*perr = error;
 		return(-1);
 	}
