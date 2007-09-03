@@ -23,13 +23,13 @@
  * Description:
  *
  * Author(s):	Emmanuel Taurel
- *		$Author: bourtemb $
+ *		$Author: jkrueger1 $
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.17 $
+ * Version:	$Revision: 1.18 $
  *
- * Date:	$Date: 2007-08-21 07:42:00 $
+ * Date:	$Date: 2007-09-03 10:46:48 $
  *
  ******************************************************************************/
 
@@ -732,7 +732,7 @@ static int rpc_connect(char *serv_name,CLIENT **prpc,int ind,long i_net,long *pe
 /**@ingroup dcAPIintern
  * Test if a data collector server answer to request.
  *
- * This allow the data collector system to run even if
+ * This allows the data collector system to run even if
  * one of its server dies!				
  *
  * @param ind 		The indice in the array of dc host information	
