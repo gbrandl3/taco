@@ -28,7 +28,7 @@
  *
  * Version:	$Version$
  *
- * Date:		$Date: 2005-07-25 13:02:28 $
+ * Date:		$Date: 2007-09-03 08:34:07 $
  *  
  ******************************************************************************/
 
@@ -206,7 +206,7 @@ bool_t _WINAPI
 
 
 struct db_resimp {
-/** A structure of the tab_dbdev type with the informations needed 
+/** A structure of the tab_dbdev type with the information needed 
  (host_name, program number and version number) */
 	tab_dbdev 	imp_dev;
 /** The database error code (0 if no error occured) */

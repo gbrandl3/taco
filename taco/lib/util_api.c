@@ -31,9 +31,9 @@
  *
  * Original   :	April 1993
  *
- * Version:	$Revision: 1.30 $
+ * Version:	$Revision: 1.31 $
  *
- * Date:		$Date: 2007-06-24 22:17:00 $
+ * Date:		$Date: 2007-09-03 08:25:50 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -394,7 +394,7 @@ long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
 }
 
 /**@ingroup syncAPI
- * Returns a sequence of structures containig all available commands, their names, their input,
+ * Return a sequence of structures containig all available commands, their names, their input,
  * and output data types, and type describtions for one device.
  * @li Commands and data types are read from the command list in the device server by calling 
  * RPC_DEV_CMD_QUERY.
@@ -854,7 +854,7 @@ long _DLLFunc dev_inform (devserver *clnt_handles, long num_devices,
 }
 
 /**@ingroup clientAPI
- * Sets or reads the timeout for an RPC connection. A request to set the timeout has to be asked with
+ * Set or reads the timeout for an RPC connection. A request to set the timeout has to be asked with
  * CLSET_TIMEOUT as request parameter and the timeout specified by the timeval structure dev_timeout.
  * The timeout will be set without any retry. A request to read the timeout has to ask with CLGET_TIMEOUT,
  * and the current timeout will be returned in dev_timeout.

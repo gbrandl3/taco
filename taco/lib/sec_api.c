@@ -29,9 +29,9 @@
  *
  * Original   : December 1993
  *
- * Version    :	$Revision: 1.15 $
+ * Version    :	$Revision: 1.16 $
  *
- * Date       :	$Date: 2007-06-24 22:21:25 $
+ * Date       :	$Date: 2007-09-03 08:21:17 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -143,10 +143,10 @@ short		*auth_flag;
 
 /**
  * @ingroup secAPI
- * Gets the user authentication.
- * Verifies the access to the control system.
- * Checks the requested access right for the device.
- * Returns the client identification and the next free field in the list 
+ * Get the user authentication.
+ * Verify the access to the control system.
+ * Check the requested access right for the device.
+ * Return the client identification and the next free field in the list 
  * of connections to device servers.
  *  
  * @param dev_name name of the device to access.
@@ -379,9 +379,9 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
 
 /**
  * @ingroup secAPIintern
- * Reads the default access rights from the resource database.
- * Verifies the user identification and control system access.
- * Checks the requested access on the device. 
+ * Read the default access rights from the resource database.
+ * Verify the user identification and control system access.
+ * Check the requested access on the device. 
  * If nothing was specified, checks the default access right.
  *
  * @param dev_name name of the device to access.
@@ -621,8 +621,8 @@ static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
 
 /**
  * @ingroup secAPIintern
- * Reads the three resource tables (DOMAIN/FAMILY/MEMBER) for user or group access rights. 
- * Checks the user or group access rights specified in these tables in the order MEMBER, 
+ * Read the three resource tables (DOMAIN/FAMILY/MEMBER) for user or group access rights. 
+ * Check the user or group access rights specified in these tables in the order MEMBER, 
  * FAMILY, and DOMAIN.
  *
  * @param dev_name name of the device to access.
@@ -761,7 +761,7 @@ static long check_access_hierarchy (char *dev_name, long access_right,
 
 /**
  * @ingroup secAPIintern
- * Checks whether the user has access to the control system.
+ * Check whether the user has access to the control system.
  * The user identification information will be read and verified. 
  * If nothing is specified, the group identification information will be read and verified. 
  * If also nothing was specified, the default network access will be checked.
@@ -1168,7 +1168,7 @@ static long search_dev_name (char *dev_name, char str_array[3][LONG_NAME_SIZE],
  *			name2,   access_ right2, \
  *			...................
  *
- * Verifies the requested access if a maximum access right was found for the name.
+ * Verify the requested access if a maximum access right was found for the name.
  *
  * @param name name of user or group.
  * @param requested_access requested access right.
@@ -1269,7 +1269,7 @@ static long check_access_right (char *name, long requested_access,
 
 /**
  * @ingroup secAPIintern
- * Frees a variable string array.  Normally allocated by db_getresource().
+ * Free a variable string array.  Normally allocated by db_getresource().
  *
  * @param str_array pointer to the variable string array.
  */
@@ -1289,7 +1289,7 @@ void _DLLFunc free_var_str_array (DevVarStringArray *str_array)
 
 /**
  * @ingroup secAPIintern
- * Creates a unique client ID from a time stamp, the process ID, the IP address, the UID and the GID. 
+ * Create a unique client ID from a time stamp, the process ID, the IP address, the UID and the GID. 
  * 
  * @param user_auth user authentication structure.
  *
@@ -1427,7 +1427,7 @@ static long get_connection_id (long *connection_id, long *error)
 
 /**
  * @ingroup secAPI
- * Frees the reserved field for the security connection.  
+ * Free the reserved field for the security connection.  
  * For connections with old library versions the reserved field can be freed.
  *
  * @param connection_id connection number.
@@ -1449,7 +1449,7 @@ long _DLLFunc free_connection_id_vers3 (long connection_id, long *error)
 
 /**
  * @ingroup secAPI
- * Creates the security key from the requested access right, the unique client identification
+ * Create the security key from the requested access right, the unique client identification
  * and the RPC client handle to the device server.  
  * The security key is stored as reference in the list of connections with the given connection ID.
  *
@@ -1506,7 +1506,7 @@ long _DLLFunc create_sec_key (devserver ds, long *error)
 
 /**
  * @ingroup secAPI
- * Verifies the information in the device server client handle, by creating a security key and
+ * Verify the information in the device server client handle, by creating a security key and
  * comparing this key with the stored key for the connection.
  * If the security key is valid, the client ID is returned.
  *
@@ -1572,7 +1572,7 @@ long _DLLFunc verify_sec_key (devserver ds, long *ret_client_id, long *error)
 
 /**
  * @ingroup secAPI
- * Frees the field with the security key in the list of connections. 
+ * Free the field with the security key in the list of connections. 
  * The field can be reused with the next import of a device. 
  *
  * @param ds device server client handle.
@@ -1604,11 +1604,11 @@ void _DLLFunc free_sec_key (devserver ds)
 
 /**
  * @ingroup secAPI
- * Tests for single user request. 
+ * Test for single user request. 
  * A single user request can be only imported, if the device is not yet in 
  * single user or administration mode.
- * Sets the device in single user or administration mode if it was requested.
- * Stores the client identification, connection_id access right and the peer address 
+ * Set the device in single user or administration mode if it was requested.
+ * Store the client identification, connection_id access right and the peer address 
  * of the TCP socket for a single user.
  *
  * @param device structure for the exported device.
@@ -1790,7 +1790,7 @@ long _DLLFunc sec_svc_import (DevServerDevices *device, long connection_id,
 
 /**
  * @ingroup secAPI
- @ Frees the single user lock, if one was set for this connection.
+ * Free the single user lock, if one was set for this connection.
  *
  * @param device structure for the exported device.
  * @param connection_id client connection to the device.
@@ -1841,7 +1841,7 @@ long _DLLFunc sec_svc_free (DevServerDevices *device, long connection_id,
 
 /**
  * @ingroup secAPI
- * Checks whether the granted access right is high enough to execute the command.
+ * Check whether the granted access right is high enough to execute the command.
  *
  * @param device structure for the exported device.
  * @param connection_id client connection to the device.
@@ -2210,7 +2210,7 @@ void _DLLFunc sec_free_tcp_connection (devserver ds, server_connections *svr_con
  * @ingroup secAPIintern
  * A single user must use a tcp connection.
  * The function validates the tcp connection to the client. If the connection was lost, the
- * single user od administration access on the device will be canceled.
+ * single user or administration access on the device will be canceled.
  *
  * @param device structure for the exported device.
  * 
