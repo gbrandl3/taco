@@ -51,9 +51,9 @@
  *
  * Original   :	April 1999
  *
- * Version    :	$Revision: 1.15 $
+ * Version    :	$Revision: 1.16 $
  *
- * Date       :	$Date: 2006-09-18 22:31:44 $
+ * Date       :	$Date: 2007-09-03 08:14:38 $
  *
  ********************************************************************-*/
 
@@ -900,7 +900,7 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
 }
 
 /**@ingroup eventAPIsvc
- * rpc function used on the server side to unregister a clients. 
+ * rpc function used on the server side to unregister a client. 
  * It is removed from the global list of registered clients and 
  * will be not be sent events anymore by the dev_event_fire() call.
  *
@@ -975,7 +975,7 @@ static db_resource   res_tab [] = {
 static long get_event_string PT_( (devserver ds, long event, char *event_str, size_t len, long *error) );
 
 /**@ingroup eventAPI
- * Returns a sequence of structures containing all
+ * Return a sequence of structures containing all
  * available events, their names, their input and
  * output data types, and type describtions for one
  * device.

@@ -31,9 +31,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.34 $
+ * Version    :	$Revision: 1.35 $
  *
- * Date	    :	$Date: 2007-03-22 14:24:36 $
+ * Date	    :	$Date: 2007-09-03 08:11:16 $
  *
  ********************************************************************-*/
 
@@ -206,7 +206,7 @@ server_connections	 	svr_conns [NFILE];
  * This function opens a connection to a device and returns a client handle for the connection.
  * This function can distinguish between local and remote devices.
  *
- * If the control system is running with security on then the axxess parameter determines what 
+ * If the control system is running with security on then the access parameter determines what 
  * level of access permission the client wants on the device. The following levels are supported:
  * 	-# READ_ACCESS for read-only access
  * 	-# WRITE_ACCESS for read and write access (@b default)
@@ -1876,9 +1876,9 @@ long _DLLFunc dev_xdrfree (DevType type, DevArgument objptr, long *error)
 }
 
 /**@ingroup clientAPIintern 
- * Checks the RPC connection to a server.  If a tcp connection was detected as lost or 
+ * Check the RPC connection to a server. If a tcp connection was detected as lost or 
  * a udp connection has shown three timeouts in a row, the function tries to recreate the
- * RPC handle and to reimport the current device.  If one of the two steps fails, the 
+ * RPC handle and to reimport the current device. If one of the two steps fails, the 
  * connection to the server is marked as a bad connection.
  * 
  * @param ds 	handle to device.
@@ -2507,7 +2507,7 @@ long _DLLFunc reinstall_rpc_connection (devserver ds, long *error)
 
 
 /**@ingroup clientAPIintern
- * Checks whether the remote host is responding or not. Opens a TCP connection to the 
+ * Check whether the remote host is responding or not. Opens a TCP connection to the 
  * portmapper and tests the write access on the socket.
  * 
  * The VXWORKS version simply pings host to check if alive.
@@ -2943,7 +2943,7 @@ static long dev_putget_local (_server_data  *server_data,
 
 
 /**@ingroup clientAPIintern
- * Verifies the RPC connection to a server.
+ * Verify the RPC connection to a server.
  *
  * If the device is not fully imported then import it by calling reinstall_rpc_connection(). This is the
  * case for stateless import.
@@ -3079,7 +3079,7 @@ long _DLLFunc dev_rpc_error (devserver ds, enum clnt_stat clnt_stat, long *error
 /**@ingroup clientAPI
  * By calling this function with one of the two defined protocol parameters D_UDP and D_TCP (API.h), 
  * the transport protocol for an open RPC connection will be set to the chosen protocol. Before
- * switching the protocol, an RPC connection to a device server has to be opened by a @ref dev_import()
+ * switching the protocol, a RPC connection to a device server has to be opened by a @ref dev_import()
  * call.
  *
  * All devices implemented in the same server and imported by the client use the same RPC connection.
@@ -3365,7 +3365,7 @@ long _DLLFunc dev_notimported_init (char *device_name, long access, long i_netho
 }
 
 /**@ingroup clientAPI
- * Sets or reads the import timeout for an import() of a server.  A request to set the timeout
+ * Set or read the import timeout for an import() of a server.  A request to set the timeout
  * has to be asked with CLSET_TIMEOUT. The timeout will be set without any retry.
  * A request to read the timeout has to be asked with CLGET_TIMEOUT.
  * 
