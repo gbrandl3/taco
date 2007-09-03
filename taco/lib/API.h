@@ -26,13 +26,13 @@
  *		the applications programmers interface.
  *
  * Author(s):	Jens Meyer
- * 		$Author: bourtemb $
+ * 		$Author: jkrueger1 $
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.20 $
+ * Version:	$Revision: 1.21 $
  *
- * Date:	$Date: 2007-08-20 15:51:07 $
+ * Date:	$Date: 2007-09-03 08:01:19 $
  *
  *********************************************************************-*/
 
@@ -44,7 +44,7 @@
  * @ingroup API
  * Functions to access to a device server.
  *
- * Implement the device server (aka TACO) and the pplication programmer's interface (aka DSAPI).
+ * Implement the device server (aka TACO) and the application programmer's interface (aka DSAPI).
  *
  * @li version of DSAPI e.g. dev_import(), dev_putget(), dev_put()
  * @li the list of DS error messages
@@ -101,7 +101,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.20 2007-08-20 15:51:07 bourtemb Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.21 2007-09-03 08:01:19 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*
@@ -129,7 +129,7 @@ static char APIh[] =
  * Include system commands and states.
  */
 #ifndef HAVE_CONFIG_H
-#include <private/config.h>
+#	include <private/config.h>
 #endif
 #include <macros.h>
 #include <DevCmds.h>

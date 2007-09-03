@@ -31,9 +31,9 @@
  *
  * Original:	June 1991
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2006-09-18 22:31:43 $
+ * Date:	$Date: 2007-09-03 08:02:24 $
  *
  *******************************************************************-*/
 
@@ -86,7 +86,7 @@ extern configuration_flags config_flags;
  * HPUX, SUN and OS9. Based on the UNIX way of treating
  * signals.
  *
- * Activated signal handling funcion pointers are stored 
+ * Activated signal handling function pointers are stored 
  * in the global pointer table sig_tab.
  *
  * Actions like SIG_DFL and SIG_IGN are available for
