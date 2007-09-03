@@ -43,9 +43,9 @@
  *
  * Original   :	January 1997
  *
- * Version:	$Revision: 1.22 $
+ * Version:	$Revision: 1.23 $
  *
- * Date:	$Date: 2007-03-22 14:24:36 $
+ * Date:	$Date: 2007-09-03 08:04:59 $
  *
  ********************************************************************-*/
 
@@ -426,10 +426,10 @@ long _DLLFunc dev_putget_asyn (devserver ds, long cmd,
 /**@ingroup asyncAPI
  * Application interface to execute commands on a device asynchronously with the possibility 
  * to pass input data and to receive output data in raw format. raw format means that the XDR 
- * data are not decoded by the client instead they are returned as a string of bytes whichthe 
+ * data are not decoded by the client instead they are returned as a string of bytes which the 
  * command request will be dispatched to the server so that the client can continue.
  *
- * The result will be sent back to the client once the command has finished executing. it is up 
+ * The result will be sent back to the client once the command has finished executing. It is up 
  * to the client to resynchronise so that it can recuperate the result (c.f. using the dev_synch(), 
  * dev_wait() etc. calls).
  *
@@ -1551,7 +1551,7 @@ long asynch_client_import(devserver client, long *error)
 }
 
 /**@ingroup asyncAPI
- * function to check whether the asynchronous client has been importedand return an error if it has not
+ * function to check whether the asynchronous client has been imported and return an error if it has not
  *
  * @param client       	handle to access the device.
  * @param error         Will contain an appropriate error code if the 
