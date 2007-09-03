@@ -31,9 +31,9 @@
  * 
  * Original   :   April 1997
  * 
- * Version    :   $Revision: 1.7 $
+ * Version    :   $Revision: 1.8 $
  * 
- * Date       :   $Date: 2006-09-18 22:15:37 $
+ * Date       :   $Date: 2007-09-03 10:06:37 $
  *-*******************************************************************/
 
 #ifdef HAVE_CONFIG_H
@@ -102,8 +102,8 @@ static struct timeval timeout_browse={60,0};
 
 
 /**@ingroup dbaseAPIdevice
- * This function returns to the caller a structure with many device informations.
- * These informations are
+ * This function returns to the caller a structure with many device information.
+ * These information are
  * @li the name of the server in charge of the device
  * @li the host where it is running
  * @li the device server program number
@@ -111,10 +111,10 @@ static struct timeval timeout_browse={60,0};
  * @li ...
  *									
  * @param dev_name	Device name
- * @param p_info 	Pointer for device informations			
+ * @param p_info 	Pointer for device information
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
 long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info,long *p_error)
@@ -297,7 +297,7 @@ long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info,long *p_error)
  * @param ppp_list	Resource(s) list (allocated by this function)
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return    	In case of trouble, the function returns DS_NOTOK and set the variable
+ * @return    	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
 long db_deviceres(long dev_nb, char **dev_name_list, long *p_res_nb, char ***ppp_list, long *p_error)
@@ -552,7 +552,7 @@ long db_deviceres(long dev_nb, char **dev_name_list, long *p_res_nb, char ***ppp
  * @param dev_name 	Device name
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
 long db_devicedelete(const char *dev_name,long *p_error)
@@ -714,7 +714,7 @@ long db_devicedelete(const char *dev_name,long *p_error)
  * @param dev_name_list The device name list
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
 long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
@@ -903,17 +903,17 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 
 
 /**@ingroup dbaseAPImisc
- * This function returns the database global informations as
+ * This function returns the database global information as
  * @li the number of exported devices defined in the database
  * @li the number of resources defined for each device domain
  * @li ...
  *
  * @param p_info 	Pointer to the structure where all the info will be
- *		        stored. These info are the number of devices defined in the 
+ *		        stored. These information are the number of devices defined in the 
  *			database, the number of resources defined in the database ...
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK 
  */
 long db_stat(db_stat_call *p_info,long *p_error)
@@ -1101,7 +1101,7 @@ long db_stat(db_stat_call *p_info,long *p_error)
  * @param pers_name 	The device server personal name		
  * @param p_error  	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
 long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
@@ -1290,8 +1290,8 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 
 
 /**@ingroup dbaseAPIserver
- * This function returns miscellaneous informations for a device server started with
- * a personal name. These informations are
+ * This function returns miscellaneous information for a device server started with
+ * a personal name. These information are
  * @li the number and name of device served by the server
  * @li the device server process name
  * @li the process id (PID) of the server process
@@ -1302,7 +1302,7 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
  * @param p_inf 	Pointer for the structure with DS info		
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
 long db_servinfo(const char *ds_name,const char *pers_name, db_svcinfo_call *p_inf, long *p_error)
@@ -1556,7 +1556,7 @@ long db_servinfo(const char *ds_name,const char *pers_name, db_svcinfo_call *p_i
  * @param delres_flag 	A flag set to True if device resources should also be deleted				
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
 long db_servdelete(const char *ds_name,const char *pers_name, long delres_flag, long *p_error)
@@ -1741,9 +1741,9 @@ long db_servdelete(const char *ds_name,const char *pers_name, long delres_flag, 
 
 
 /**@ingroup dbaseAPIdevice
- * This function returns to the caller informations about the device poller in charge
+ * This function returns to the caller information about the device poller in charge
  * of a device. A poller is a process in charge of "polling" the device in order to
- * store device command result into the TACO data collector. The poller informations are
+ * store device command result into the TACO data collector. The poller information are
  * @li the poller name
  * @li the host where it is running
  * @li ...
@@ -1754,7 +1754,7 @@ long db_servdelete(const char *ds_name,const char *pers_name, long delres_flag, 
  *		       	host name, process name and PID			
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
 long db_getpoller(const char *dev_name,db_poller *poll,long *p_error)

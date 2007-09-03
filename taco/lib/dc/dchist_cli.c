@@ -23,11 +23,11 @@
  * Description:
  *
  * Author(s):	E. Taurel
- *		$Author: bourtemb $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:	$Date: 2007-08-21 07:28:50 $
+ * Date:	$Date: 2007-09-03 10:11:24 $
  *
  ****************************************************************************/
 
@@ -75,7 +75,7 @@
 extern dc_nethost_info *dc_multi_nethost;
 
 /**@ingroup dcAPI
- * In this function the caller retrieve the result history of one command for a single
+ * In this function the caller retrieves the result history of one command for a single
  * device. The client send to server a structure with 4 elements which are:
  *	- The device name
  *	- The command code from which the result history must be retrieved

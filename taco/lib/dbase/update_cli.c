@@ -31,9 +31,9 @@
  *
  * Original   : May 1998
  *
- * Version:     $Revision: 1.13 $
+ * Version:     $Revision: 1.14 $
  *
- * Date:        $Date: 2007-06-24 22:17:46 $
+ * Date:        $Date: 2007-09-03 10:08:38 $
  *
  *-*******************************************************************/
 
@@ -127,7 +127,7 @@ static struct timeval timeout_update={60,0};
  * @param error_line 	File line where error occurs
  * @param p_error 	Pointer for the error code in case of problems 
  * 
- * @return 	In case of trouble, the function returns DS_NOTOK and set the variable 
+ * @return 	In case of trouble, the function returns DS_NOTOK and sets the variable 
  * 		pointed to by "p_error". The function also initializes the line_err
  * 		argout with the file line where the error occurs. Otherwise, the 
  * 		function returns DS_OK 
@@ -816,7 +816,7 @@ static void get_error_line(const char *buffer,long err_dev,long *p_line)
  * @param deferr_nb 	Which device definition is the error reason	
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". The function also initializes the deferr_nb
  *    		argout with the device definition  where the error occurs. Otherwise,
  *    		the function returns DS_OK             				
@@ -1328,7 +1328,7 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
  * @param pass 		Database security password
  * @param p_error	Pointer to the error code in case of failure
  *
- * @return   		In case of trouble, the function returns DS_NOTOK and set the variable
+ * @return   		In case of trouble, the function returns DS_NOTOK and sets the variable
  *    			pointed to by "p_error". Otherwise, the function returns DS_OK
  */
 long db_secpass(char **pass, long *p_error)
@@ -1491,7 +1491,7 @@ long db_secpass(char **pass, long *p_error)
  *									
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return    	In case of trouble, the function returns DS_NOTOK and set the variable
+ * @return    	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". The function also initializes the deferr_nb
  *    		argout with the device definition  where the error occurs. Otherwise,
  *    		the function returns DS_OK             				
