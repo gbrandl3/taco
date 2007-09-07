@@ -29,9 +29,9 @@
  *
  * Original:	Feb 1994
  *
- * Version:	$Revision: 1.25 $
+ * Version:	$Revision: 1.26 $
  *
- * Date:		$Date: 2006-09-18 22:31:44 $
+ * Date:		$Date: 2007-09-07 14:15:49 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -778,7 +778,7 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
  *
  * Will do the administration part of the call. Only the execution of the command is excluded
  * and handled in the second part of the call (rpc_dev_put_asyn_cmd) after the reponse
- * is send back to the client. Errors are returned from this function to the client. 
+ * was sent back to the client. Errors are returned from this function to the client. 
  *
  * @param server_data 	information about device identification, the command, and
  *			the input arguments for the command.

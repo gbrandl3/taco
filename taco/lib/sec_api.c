@@ -29,9 +29,9 @@
  *
  * Original   : December 1993
  *
- * Version    :	$Revision: 1.16 $
+ * Version    :	$Revision: 1.17 $
  *
- * Date       :	$Date: 2007-09-03 08:21:17 $
+ * Date       :	$Date: 2007-09-07 14:09:40 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -1162,7 +1162,7 @@ static long search_dev_name (char *dev_name, char str_array[3][LONG_NAME_SIZE],
 
 /**
  * @ingroup secAPIintern
- * Searches a specified access right for a user or a group (given by name) in a variable 
+ * Search a specified access right for a user or a group (given by name) in a variable 
  * string array of the format:
  *			name1, 	 access_ right1, \
  *			name2,   access_ right2, \
@@ -1289,7 +1289,7 @@ void _DLLFunc free_var_str_array (DevVarStringArray *str_array)
 
 /**
  * @ingroup secAPIintern
- * Create a unique client ID from a time stamp, the process ID, the IP address, the UID and the GID. 
+ * Create a unique client ID from a timestamp, the process ID, the IP address, the UID and the GID. 
  * 
  * @param user_auth user authentication structure.
  *
@@ -1309,7 +1309,7 @@ static long create_client_id (SecUserAuth user_auth, long *ret_client_id,
 	*error = 0;
 
 	/*
-	 * get the time stamp.
+	 * get the timestamp.
 	 */
 
 	time (&time_stamp);

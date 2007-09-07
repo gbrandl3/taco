@@ -30,9 +30,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.31 $
+ * Version    :	$Revision: 1.32 $
  *
- * Date       : $Date: 2007-09-07 14:05:28 $
+ * Date       : $Date: 2007-09-07 14:11:15 $
  *
  ********************************************************************-*/
 
@@ -1814,7 +1814,7 @@ long db_ChangeDefaultNethost(char* nethost,long *error)
  * first the timestamp and then the message divided by a blank. The returned
  * string is malloced and has to be freed by the caller.
  * 
- * @param time_stamp 	time stamp string containing date and time
+ * @param time_stamp 	timestamp string containing date and time
  * @param message 	the error message.
  * 
  * @return formatted error message, in case of failure NULL
@@ -1861,7 +1861,7 @@ static char *get_error_string (long error)
 	db_error = DS_OK;
 
 /*
- * Get the time stamp
+ * Get the timestamp
  */
 	time (&sec);
 	time_stamp = ctime (&sec);
@@ -1960,7 +1960,7 @@ static char *get_error_string (long error)
 
 /*
  * Found the error string in the database. Return the string with 
- * a time stamp.
+ * a timestamp.
  */
 	error_str=format_error_string(time_stamp,ret_str);
 	free (ret_str);
