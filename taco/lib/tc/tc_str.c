@@ -33,9 +33,9 @@
  *
  * Original:   	November 1996
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2005-07-25 13:01:35 $
+ * Date:	$Date: 2007-09-07 14:48:07 $
  *
  *****************************************************************************/
 
@@ -368,7 +368,7 @@ long tc_DevVarLongReadPointArray_to_str( DevVarLongReadPointArray *d_lnrp_arr, c
 /*--------------   Conversion FROM STRING to types   ---------------------*/
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevVoid type!
+ * convert a string (char *) to a DevVoid type!
  *
  * Call example : 
  * @code
@@ -386,7 +386,7 @@ long tc_str_to_DevVoid(char *in_str, DevVoid *d_void)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevBoolean data
+ * convert a string (char *) to a DevBoolean data
  *
  * Call example : 
  * @code
@@ -412,7 +412,7 @@ long tc_str_to_DevBoolean(char *in_str, DevBoolean *d_boolean)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevShort number
+ * convert a string (char *) to a DevShort number
  *
  * Call example : 
  * @code
@@ -435,7 +435,7 @@ long tc_str_to_DevShort(char *in_str, DevShort *d_short)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevUShort number
+ * convert a string (char *) to a DevUShort number
  *
  * Call example : 
  * @code
@@ -458,7 +458,7 @@ long tc_str_to_DevUShort(char *in_str, DevUShort *d_ushort)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevLong number
+ * convert a string (char *) to a DevLong number
  *
  * Call example : 
  * @code
@@ -481,7 +481,7 @@ long tc_str_to_DevLong(char *in_str, DevLong *d_long)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevULong number
+ * convert a string (char *) to a DevULong number
  *
  * Call example : 
  * @code
@@ -504,7 +504,7 @@ long tc_str_to_DevULong(char *in_str, DevULong *d_ulong)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevFloat number
+ * convert a string (char *) to a DevFloat number
  *
  * Call example : 
  * @code
@@ -527,7 +527,7 @@ long tc_str_to_DevFloat(char *in_str, DevFloat *d_float)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevDouble number
+ * convert a string (char *) to a DevDouble number
  *
  * Call example : 
  * @code
@@ -550,7 +550,7 @@ long tc_str_to_DevDouble(char *in_str, DevDouble *d_double)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevString data
+ * convert a string (char *) to a DevString data
  *
  * Call example : 
  * @code
@@ -576,7 +576,7 @@ long tc_str_to_DevString(char *in_str, DevString *d_string)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevIntFloat data
+ * convert a string (char *) to a DevIntFloat data
  *
  * Call example : 
  * @code
@@ -601,7 +601,7 @@ long tc_str_to_DevIntFloat(char *in_str, DevIntFloat *d_intfl)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevFloatReadPoint data
+ * convert a string (char *) to a DevFloatReadPoint data
  *
  * Call example : 
  * @code
@@ -625,7 +625,7 @@ long tc_str_to_DevFloatReadPoint(char *in_str, DevFloatReadPoint *d_flrp)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevStateFloatReadPoint data
+ * convert a string (char *) to a DevStateFloatReadPoint data
  *
  * Call example : 
  * @code
@@ -650,7 +650,7 @@ long tc_str_to_DevStateFloatReadPoint(char *in_str, DevStateFloatReadPoint *d_st
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevLongReadPoint data
+ * convert a string (char *) to a DevLongReadPoint data
  *
  * Call example : 
  * @code
@@ -676,7 +676,7 @@ long tc_str_to_DevLongReadPoint(char *in_str, DevLongReadPoint *d_lngrp)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevDoubleReadPoint data
+ * convert a string (char *) to a DevDoubleReadPoint data
  *
  * Call example : 
  * @code
@@ -700,7 +700,7 @@ long tc_str_to_DevDoubleReadPoint(char *in_str, DevDoubleReadPoint *d_dblrp)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevVarCharArray data
+ * convert a string (char *) to a DevVarCharArray data
  *
  * Call example : 
  * @code
@@ -759,7 +759,7 @@ long tc_str_to_DevVarCharArray(char *in_str, DevVarCharArray *d_char_arr)
 /**@ingroup tcAPI
  ****************************************************************************
  *
- *  converts a string (char *) to a DevVarStringArray data
+ *  convert a string (char *) to a DevVarStringArray data
  *
  * Call example : 
  * @code
@@ -870,7 +870,7 @@ long tc_str_to_DevVarStringArray(char *in_str, DevVarStringArray *d_str_arr)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevVarUShortArray data
+ * convert a string (char *) to a DevVarUShortArray data
  *
  * Call example : 
  * @code
@@ -967,7 +967,7 @@ long tc_str_to_DevVarUShortArray(char *in_str, DevVarUShortArray *d_ushort_arr)
 
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevVarShortArray data
+ * convert a string (char *) to a DevVarShortArray data
  *
  * Call example : 
  * @code
@@ -1063,7 +1063,7 @@ long tc_str_to_DevVarShortArray(char *in_str, DevVarShortArray *d_short_arr)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevVarULongArray data
+ * convert a string (char *) to a DevVarULongArray data
  *
  * Call example : 
  * @code 
@@ -1161,7 +1161,7 @@ long tc_str_to_DevVarULongArray(char *in_str, DevVarULongArray *d_ulong_arr)
 
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevVarLongArray data
+ * convert a string (char *) to a DevVarLongArray data
  *
  * Call example : 
  * @code
@@ -1259,7 +1259,7 @@ long tc_str_to_DevVarLongArray(char *in_str, DevVarLongArray *d_long_arr)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevVarFloatArray data
+ * convert a string (char *) to a DevVarFloatArray data
  *
  * Call example : 
  * @code
@@ -1355,7 +1355,7 @@ long tc_str_to_DevVarFloatArray(char *in_str, DevVarFloatArray *d_float_arr)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevVarDoubleArray data
+ * convert a string (char *) to a DevVarDoubleArray data
  *
  * Call example : 
  * @code
@@ -1452,7 +1452,7 @@ long tc_str_to_DevVarDoubleArray(char *in_str, DevVarDoubleArray *d_double_arr)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevMulMove data
+ * convert a string (char *) to a DevMulMove data
  *
  * Call example : 
  * @code
@@ -1486,7 +1486,7 @@ long tc_str_to_DevMulMove(char *in_str, DevMulMove *d_mulmove)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevMotorLong data
+ * convert a string (char *) to a DevMotorLong data
  *
  * Call example : 
  * @code
@@ -1511,7 +1511,7 @@ long tc_str_to_DevMotorLong(char *in_str, DevMotorLong *d_motorl)
 }
 
 /**@ingroup tcAPI
- * converts a string (char *) to a DevMotorFloat data
+ * convert a string (char *) to a DevMotorFloat data
  *
  * Call example : 
  * @code

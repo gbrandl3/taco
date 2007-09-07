@@ -25,9 +25,9 @@
  * Author(s):	Emanuel Taurel
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:	$Date: 2005-12-09 14:33:03 $
+ * Date:	$Date: 2007-09-07 14:50:25 $
  *
  *****************************************************************************/
 
@@ -37,12 +37,12 @@
 /**
  @defgroup dcAPI Data Collector API
  @ingroup API
- This functions allow the access to the data collector server.
+ These functions allow the access to the data collector server.
  */
 /**
  @defgroup dcAPIintern Data Collector internal functions
  @ingroup dcAPI
- This functions are only for internal use
+ These functions are only for internal use
  */
 
 #include <SysNumbers.h>

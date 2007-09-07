@@ -25,9 +25,9 @@
  * Author(s):	E. Taurel
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2006-09-18 22:13:30 $
+ * Date:	$Date: 2007-09-07 14:51:06 $
  *
  ******************************************************************************/
 
@@ -65,7 +65,7 @@ extern DevDataListEntry DevData_List[];
  * @param num_cmd
  * @param error
  * 
- * @return In case of trouble, the function returns DS_NOTOK and set the err variable
+ * @return In case of trouble, the function returns DS_NOTOK and sets the err variable
  *     pointed to by "error". Otherwise, the function returns DS_OK 
  */ 
 int dc_dataconvert(dc_datacmd *data_cmd,unsigned int num_cmd,dc_error *error)

@@ -31,9 +31,9 @@
  *
  * Original   : May 1998
  *
- * Version:     $Revision: 1.14 $
+ * Version:     $Revision: 1.15 $
  *
- * Date:        $Date: 2007-09-03 10:08:38 $
+ * Date:        $Date: 2007-09-07 14:44:56 $
  *
  *-*******************************************************************/
 
@@ -389,8 +389,8 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
 
 
 /**@ingroup dbaseAPIintern
- * To change the line to lower case letters if it is
- * necessary and to return a value which indicate which
+ * Change the line to lower case letters if it is
+ * necessary and return a value which indicates which
  * type of line it is (device definition, simple resource
  * definition or resources array definition)
  *
