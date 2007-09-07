@@ -35,8 +35,8 @@
  *		a device server has an event it wants to distribute
  *		to registered clients it has to dispatch it (by calling
  *		dev_event_fire()). If a client is not interested
- *		in an event anymore it (or wants to exit) it must
- *		unregister (by calling dev_event_unlisten()).
+ *		in an event anymore (or wants to exit) it must
+ *		unregister itself (by calling dev_event_unlisten()).
  *
  *		Although it is possible to support different types of events 
  *		in the first implementation only user events are supported. 
@@ -51,9 +51,9 @@
  *
  * Original   :	April 1999
  *
- * Version    :	$Revision: 1.16 $
+ * Version    :	$Revision: 1.17 $
  *
- * Date       :	$Date: 2007-09-03 08:14:38 $
+ * Date       :	$Date: 2007-09-07 13:57:26 $
  *
  ********************************************************************-*/
 
@@ -144,8 +144,8 @@ bool_t _DLLFunc xdr__asynch_client_data PT_((XDR *xdrs, _asynch_client_data *obj
  * event (by calling dev_event_listen()). This is transmitted to the device server 
  * where the client is registered. When a device server has an event it wants 
  * to distribute to registered clients it has to dispatch it (by calling
- * dev_event_fire()). If a client is not interested in an event anymore it 
- * (or wants to exit) it must unregister (by calling dev_event_unlisten()).
+ * dev_event_fire()). If a client is not interested in an event anymore  
+ * (or wants to exit) it must unregister itself (by calling dev_event_unlisten()).
  * 
  * Although it is possible to support different types of events in the first 
  * implementation only user events are supported. User events are events which 

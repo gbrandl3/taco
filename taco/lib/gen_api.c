@@ -30,9 +30,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.29 $
+ * Version    :	$Revision: 1.30 $
  *
- * Date       : $Date: 2006-09-20 15:58:44 $
+ * Date       : $Date: 2007-09-07 14:01:19 $
  *
  ********************************************************************-*/
 
@@ -1811,7 +1811,7 @@ long db_ChangeDefaultNethost(char* nethost,long *error)
 
 /**@ingroup dsAPIintern
  * This function formats the error string with a timestamp. The resulting string contains at
- * first the time stamp and then the message divided by a blank. The returned
+ * first the timestamp and then the message divided by a blank. The returned
  * string is malloced and has to be freed by the caller.
  * 
  * @param time_stamp 	time stamp string containing date and time
