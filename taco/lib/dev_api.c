@@ -31,9 +31,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.35 $
+ * Version    :	$Revision: 1.36 $
  *
- * Date	    :	$Date: 2007-09-03 08:11:16 $
+ * Date	    :	$Date: 2007-09-07 13:32:24 $
  *
  ********************************************************************-*/
 
@@ -873,7 +873,7 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
 			clnt_destroy (clnt);
 /*
  * treat all rpc errors the same i.e. stateless import - andy 25jun02
- * check to see whether the import failed because of an RPC timeout
+ * check to see whether the import failed because of a RPC timeout
  * in which case "fool" the client into thinking the dev_import() was
  * successful.
  */
@@ -1877,7 +1877,7 @@ long _DLLFunc dev_xdrfree (DevType type, DevArgument objptr, long *error)
 
 /**@ingroup clientAPIintern 
  * Check the RPC connection to a server. If a tcp connection was detected as lost or 
- * a udp connection has shown three timeouts in a row, the function tries to recreate the
+ * an udp connection has shown three timeouts in a row, the function tries to recreate the
  * RPC handle and to reimport the current device. If one of the two steps fails, the 
  * connection to the server is marked as a bad connection.
  * 
@@ -2709,7 +2709,7 @@ long _DLLFunc rpc_check_host (char *host_name, long *error)
 }
 
 /**@ingroup clientAPIintern
- * Import a local device, without using an RPC.
+ * Import a local device, without using a RPC.
  *
  * @param dev_import_in 	
  * @param ds_ptr 	returns a handle to access the device
@@ -2769,7 +2769,7 @@ static long dev_import_local (_dev_import_in  *dev_import_in, devserver  *ds_ptr
 
 
 /**@ingroup clientAPIintern
- * Free a local device, without using an RPC.
+ * Free a local device, without using a RPC.
  * 
  * @param dev_free_in 	handle to access the device.
  * @param error Will contain an appropriate error 
@@ -2794,7 +2794,7 @@ static long dev_free_local (_dev_free_in  *dev_free_in, long* error)
 }
 
 /**@ingroup clientAPIintern
- * Execute a command on a local device, without using an RPC.
+ * Execute a command on a local device, without using a RPC.
  * Will not return any output arguments.
  * 
  * @param server_data	Input data structure.
@@ -2821,7 +2821,7 @@ static long dev_put_local (_server_data  *server_data, long* error)
 }
 
 /**@ingroup clientAPIintern
- * Execute a command on a local device, without using an RPC.
+ * Execute a command on a local device, without using a RPC.
  *
  * @param server_data 	Input data structure.
  * @param client_data 	Output data structure.

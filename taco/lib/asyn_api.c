@@ -43,9 +43,9 @@
  *
  * Original   :	January 1997
  *
- * Version:	$Revision: 1.23 $
+ * Version:	$Revision: 1.24 $
  *
- * Date:	$Date: 2007-09-03 08:04:59 $
+ * Date:	$Date: 2007-09-07 13:29:08 $
  *
  ********************************************************************-*/
 
@@ -183,7 +183,7 @@ long asynch_svc_tcp_sock;
  * asynch_id for each call.
  * 
  * The command request will be dispatched to the server so that the client can continue.
- * the result will be sent back to the client once the command has finished executing. It is 
+ * The result will be sent back to the client once the command has finished executing. It is 
  * up to the client to resynchronise so that it can recuperate the result (c.f. using the 
  * dev_synch(), dev_wait() etc. calls).  This version is with callback i.e. the client has to
  * specify a callback.
@@ -1720,7 +1720,7 @@ int ds_rpc_svc_fd;
 
 /**@ingroup dsAPI
  * rpc service to import the asynchronous service of 
- * a server. this function is called by the client the
+ * a server. This function is called by the client the
  * first time it (re)imports the asynchronous service
  * of the server. it will import the reply service of
  * the client and send a (synchronous) reply to the client.
@@ -1780,9 +1780,9 @@ _dev_import_out* _DLLFunc rpc_asynch_import_5(_dev_import_in *dev_import_in)
 
 /**@ingroup dsAPI
  * rpc service to free the asynchronous service of 
- * a server. this function is called by the client after
+ * a server. This function is called by the client after
  * it has freed the last device imported from that server.
- * it will free the imported reply service of the client 
+ * It will free the imported reply service of the client 
  * and send a (synchronous) reply to the client.
  *
  * @param dev_free_in 
@@ -1874,10 +1874,9 @@ _dev_free_out* _DLLFunc rpc_asynch_free_5(_dev_free_in *dev_free_in)
 }
 
 /**@ingroup dsAPI
- * function to receive an asynchronous reply sent
- * by a device server to the client. it will identify
- * the originating request, unpack the arguments correctly
- * and trigger the callback (if registered). 
+ * Receive an asynchronous reply sent by a device server to the client. It will
+ * identify the originating request, unpack the arguments correctly and trigger 
+ * the callback (if registered). 
  *
  * @param asynch_client_data
  *
