@@ -32,9 +32,9 @@
  *
  * Original   : December 1997
  *
- * Version    :	$Revision: 1.8 $
+ * Version    :	$Revision: 1.9 $
  *
- * Date	    :	$Date: 2007-09-03 08:31:54 $
+ * Date	    :	$Date: 2007-09-07 14:32:04 $
  *
  *-*******************************************************************/
 
@@ -96,7 +96,7 @@ static struct timeval timeout_browse={60,0};
 
 
 /**@ingroup dbaseAPIbrowse
- * This function returns to the caller a list of domain used for all devices defined
+ * This function returns to the caller a list of domains used for all devices defined
  * in the database.
  * 
  * @param p_domain_nb 	Pointer for domain number
@@ -716,7 +716,7 @@ long db_getdevmemberlist(char *domain,char *family,long *p_member_nb,
 
 
 /**@ingroup dbaseAPIbrowse
- * This function returns to the caller a list of domain used for all resources defined in the
+ * This function returns to the caller a list of domains used for all resources defined in the
  * database.
  * 
  * @param p_domain_nb : Pointer for domain number
@@ -1113,7 +1113,7 @@ long db_getresfamilylist(char *domain,long *p_family_nb,char ***ppp_list,long *p
  * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by p_error. Otherwise, the function returns DS_OK
  */
-long db_getresmemberlist(char *domain,char *family,long *p_member_nb, \
+long db_getresmemberlist(char *domain,char *family,long *p_member_nb, 
 			 char ***ppp_list,long *p_error)
 {
 	db_res *recev;
@@ -1354,7 +1354,7 @@ long db_getresmemberlist(char *domain,char *family,long *p_member_nb, \
  */
 
 
-long db_getresresolist(char *domain,char *family,char *member, \
+long db_getresresolist(char *domain,char *family,char *member, 
 		       long *p_reso_nb,char ***ppp_list,long *p_error)
 {
 	db_res *recev;
@@ -1618,7 +1618,7 @@ long db_getresresolist(char *domain,char *family,char *member, \
  * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable 
  *    		pointed to by p_error. Otherwise, the function returns DS_OK 
  */
-long db_getresresoval(char *domain,char *family,char *member,char *resource, \
+long db_getresresoval(char *domain,char *family,char *member,char *resource, 
 		      long *p_rval_nb,char ***ppp_list,long *p_error)
 {
 	db_res *recev;
@@ -1897,7 +1897,7 @@ long db_getresresoval(char *domain,char *family,char *member,char *resource, \
 
 
 /**@ingroup dbaseAPIbrowse
- * This function returns to the caller a list of device server executeable name.
+ * This function returns to the caller a list of device servers executeable name.
  * 
  * @param p_server_nb  	Pointer for server number returned
  * @param ppp_list  	Pointer for the server name list. Memory is allocated by this function
@@ -2076,7 +2076,7 @@ long db_getdsserverlist(long *p_server_nb,char ***ppp_list,long *p_error)
 
 
 /**@ingroup dbaseAPIbrowse
- * This function returns to the caller a list of devices server personal name for device server
+ * This function returns to the caller a list of device server personal names for device server
  * with a given executeable name.
  * 
  * @param server 	The device server name
@@ -2280,7 +2280,7 @@ long db_getdspersnamelist(char *server,long *p_pers_nb,char ***ppp_list,long *p_
 
 
 /**@ingroup dbaseAPIbrowse
- * This function returns to the caller a list of host name where device server should run.
+ * This function returns to the caller a list of host names where device server should run.
  *
  * @param p_host_nb  	Pointer for host number returned
  * @param ppp_list  	Pointer for the host name list. Memory is allocated by this function
@@ -2459,7 +2459,7 @@ long db_gethostlist(long *p_host_nb,char ***ppp_list,long *p_error)
 
 
 /**@ingroup dbaseAPIbrowse
- * This function returns to the caller a list of device server which should run on the specified host.
+ * This function returns to the caller a list of device servers which should run on the specified host.
  *
  * @param host  	The host name
  * @param p_ds_nb  	Pointer or the device server list number returned

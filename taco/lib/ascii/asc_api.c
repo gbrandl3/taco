@@ -29,9 +29,9 @@
  *
  * Original:   	November 1996
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2006-09-18 22:18:41 $
+ * Date:	$Date: 2007-09-07 14:24:51 $
  *
  *****************************************************************************/
 
@@ -48,7 +48,7 @@
  * The aim of this library is to give an ASCII based interface to the device
  * server API. It means one can execute a command on a device server simply by
  * specifying the device name and the command name with two strings. He (she)
- * is returned the output result and the eventual errors in the form of string
+ * is returned the output result and the possible errors in the form of string
  * as well. If the device server command requires an input argument, it is also
  * specified through a string.
  * 

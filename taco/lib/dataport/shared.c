@@ -25,9 +25,9 @@
  * Author(s):	
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:18:01 $
+ * Date:	$Date: 2007-09-07 14:26:52 $
  *
  ****************************************************************************/
 
@@ -55,7 +55,7 @@ static int shmid = -1;
 
 
 /**@ingroup dataportAPI
- * Get a nes shared memory segment
+ * Get a new shared memory segment
  *
  * @param size 	 The shared memory size wanted by the caller
  * @param key_num The key

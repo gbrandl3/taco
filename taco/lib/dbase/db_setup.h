@@ -25,9 +25,9 @@
  * Author(s):	
  *		$Author: jkrueger1 $
  * 
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2006-11-07 15:50:15 $
+ * Date:	$Date: 2007-09-07 14:33:11 $
  *
  ******************************************************************************/
 
@@ -70,7 +70,7 @@
 
 /**@defgroup dbaseAPIserver Server oriented calls
  * @ingroup dbaseAPI
- * These functions deals with device server.
+ * These functions deal with device server.
  */
 
 /**@defgroup dbaseAPIbrowse Database browsing oriented calls
