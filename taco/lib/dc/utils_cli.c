@@ -27,9 +27,9 @@
  *
  * Original:    1993
  *
- * Version:     $Revision: 1.12 $
+ * Version:     $Revision: 1.13 $
  *
- * Date:        $Date: 2006-09-18 22:13:30 $
+ * Date:        $Date: 2007-09-07 15:02:27 $
  *
  *****************************************************************************/
 
@@ -242,7 +242,7 @@ int dc_info(char *serv_name,servinf *dc_inf,long *error)
  * @param dev_n		Pointer where the number of devices in the list will be stored
  * @param error 	Pointer for error code
  *
- * @return    In case of trouble, the function returns DS_NOTOK and set the err variable
+ * @return    In case of trouble, the function returns DS_NOTOK and sets the err variable
  *    pointed to by "perr". Otherwise, the function returns DS_OK
  */
 int dc_devall(char *serv_name,char ***devnametab,int *dev_n,long *error)

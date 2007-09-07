@@ -27,9 +27,9 @@
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.18 $
+ * Version:	$Revision: 1.19 $
  *
- * Date:	$Date: 2007-09-03 10:46:48 $
+ * Date:	$Date: 2007-09-07 15:01:30 $
  *
  ******************************************************************************/
 
@@ -128,7 +128,7 @@ static int alea(int n)
  * @param num_device 	The device number
  * @param error 	Pointer to error code
  *
- * @return In case of major trouble, this function returns DS_NOTOK. It there is a 
+ * @return In case of major trouble, this function returns DS_NOTOK. If there is a 
  * 	problem on only some devices, this function returns the number of
  *	faulty devices. Otherwise, the function returns DS_OK
  */
@@ -550,7 +550,7 @@ int dc_import(dc_dev_imp *dc_devimp, unsigned int num_device, long *error)
  * @param i_nethost	The index in the multi nethost array of the nethost to initialize
  * @param perr 		A pointer to an error code
  *
- * @return In case of trouble, the function returns DS_NOTOK and set the err variable
+ * @return In case of trouble, the function returns DS_NOTOK and sets the err variable
  *    pointed to by "error". Otherwise, the function returns DS_OK 
  */
 static long init_imp(long i_nethost, long *perr)
@@ -730,7 +730,7 @@ static int rpc_connect(char *serv_name,CLIENT **prpc,int ind,long i_net,long *pe
 
 
 /**@ingroup dcAPIintern
- * Test if a data collector server answer to request.
+ * Test if a data collector server answers to request.
  *
  * This allows the data collector system to run even if
  * one of its server dies!				
@@ -840,7 +840,7 @@ static int test_server(int ind,serv *serv_info,int min,CLIENT **clnt_ptr,long i_
 
 /**@ingroup dcAPIintern
  * Send to a dc server on a specific host a dc_devdef request. The dc server will check 
- * it knows device and, if not send back an error
+ * if it knows the devices and, if not send back an error
  *
  * @param ind 		The number of the dc host in the list
  * @param dev_numb 	The number of devices
@@ -851,7 +851,7 @@ static int test_server(int ind,serv *serv_info,int min,CLIENT **clnt_ptr,long i_
  * @param dev_unk 	A pointer to store the name of unknown devices for this dc 
  * @param perr 		Pointer to error code
  *
- * @return In case of trouble, the function returns DS_NOTOK and set the err variable
+ * @return In case of trouble, the function returns DS_NOTOK and sets the err variable
  *    pointed to by "error". Otherwise, the function returns DS_OK 
  */
 static int check_dc(int ind,int dev_numb,char **devname_arr,int *call_numb,dc_dev_imp *caller_arr,int *dev_unk,long i_net,long *perr)
@@ -1032,9 +1032,9 @@ static int check_dc(int ind,int dev_numb,char **devname_arr,int *call_numb,dc_de
  * @param num_device 	The number of device to be freed
  * @param error 	Pointer to error code
  *
- * @return In case of major trouble, this function returns DS_NOTOK. It there is a  
+ * @return In case of major trouble, this function returns DS_NOTOK. If there is a  
  *    problem on only some devices, this function returns the number of
- *    faulty devices. Otherwise, the function returns DS_OK
+ *    faulty devices. Otherwise, the function returns DS_OK.
  */
 int dc_free(dc_dev_free *dc_devfree,unsigned int num_device,long *error)
 {
@@ -1117,7 +1117,7 @@ int dc_free(dc_dev_free *dc_devfree,unsigned int num_device,long *error)
  * @param argout   	Pointer where the command result will be stored
  * @param error 	Pointer to error code
  *
- * @return   In case of trouble, the function returns DS_NOTOK and set the variable 
+ * @return   In case of trouble, the function returns DS_NOTOK and sets the variable 
  *    pointed to by "error". Otherwise, the function returns DS_OK
  */
 int dc_devget(datco *dc_ptr,long cmd_code,DevArgument argout,DevType argout_type,long *error)
@@ -2252,8 +2252,8 @@ int rpc_reconnect_rd(int ind,long i_net,long *perr)
 
 
 /**@ingroup dcAPIintern
- * Test if a data collector server answer to request
- * This allow the data collector system to run even if one of its server dies!
+ * Test if a data collector server answers to request
+ * This allows the data collector system to run even if one of its server dies!
  * 
  * @param ind 		The indice in the array of dc host information
  * @param serv_info 	A pointer to an array of structures. There is one structure 
@@ -2263,7 +2263,7 @@ int rpc_reconnect_rd(int ind,long i_net,long *perr)
  * @param i_net 	Index into the multi nethost array
  * @param perr 		Pointer to error code
  *
- * @return DS_OK when no problem occurs. Otherwise the return value is DS_NOTOK and the error i
+ * @return DS_OK when no problem occurs. Otherwise the return value is DS_NOTOK and the error 
  *		variable is set according to the error
  */
 static int re_test_server(int ind,serv *serv_info,int min,int nb_server,long i_net,long *perr)
