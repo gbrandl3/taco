@@ -30,9 +30,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.30 $
+ * Version    :	$Revision: 1.31 $
  *
- * Date       : $Date: 2007-09-07 14:01:19 $
+ * Date       : $Date: 2007-09-07 14:05:28 $
  *
  ********************************************************************-*/
 
@@ -632,7 +632,7 @@ void dev_printdebug (long debug_bits,char *fmt, char *str)
  * is not imported.
  *
  * Diagnostic strings can be only 256 characters long.
- * Longer texts can be send by storing short
+ * Longer texts can be sent by storing short
  * strings in the message buffer with the WRITE
  * mode and send the whole buffer by using
  * the SEND mode with the last string.
