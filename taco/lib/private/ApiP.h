@@ -26,13 +26,13 @@
  *		programmers interface.
  *
  * Author(s):	Jens Meyer
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original:	June 1992
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2006-02-20 11:22:52 $
+ * Date:	$Date: 2007-09-28 06:37:09 $
  *
  ********************************************************************-*/
 
@@ -45,7 +45,7 @@
  */
 #ifdef _IDENT
 static char ApiPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.11 2006-02-20 11:22:52 andy_gotz Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.12 2007-09-28 06:37:09 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -528,6 +528,7 @@ extern "C" dbserver_info        db_info;
 typedef struct _tango_device {
    public :
           long flag;
+          short taco_state;
           //vector<string> cmd_name;
           char **cmd_name;
           long n_cmds;
