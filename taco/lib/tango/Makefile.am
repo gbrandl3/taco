@@ -29,6 +29,21 @@ AM_CPPFLAGS 		= -DTANGO
 
 EXTRA_DIST 		= 
 
+if SOLARIS_CXX
+libtacotango___la_SOURCES = ../dev_api.cpp ../sec_api.cpp ../event_api.cpp \
+			../svc_api.cpp ../DevServerSig.cpp  ../event_relisten.cpp \
+			../gen_api.cpp ../dev_cmds.cpp ../dev_errors.cpp ../dev_states.cpp \
+			../oic.cpp ../util_api.cpp ../asyn_api.cpp ../gettrans.cpp \
+			../ds_prog_vers3.cpp ../DevServer.cpp \
+			../Device.cpp ../OICDevice.cpp \
+			../signal/DSSignal.c ../signal/MDSSignal.c \
+			../signal/MDSSignal_config.c \
+			../dc/dc_sdev.c ../dc/dcrd_clnt.c ../dc/dcwr_clnt.c \
+			../dc/dchist_cli.c ../dc/dcrd_xdr.c ../dc/dcwr_xdr.c \
+			../dc/dcrd_cli.c ../dc/dcwr_cli.c ../dc/utils_cli.c \
+			tango_api.cpp attr_api.cpp attr_access.cpp \
+			db_exp.cpp ../startup.c
+else
 libtacotango___la_SOURCES = ../dev_api.c ../sec_api.c ../event_api.c \
 			../svc_api.c ../DevServerSig.c  ../event_relisten.c \
 			../gen_api.c ../dev_cmds.c ../dev_errors.c ../dev_states.c \
@@ -42,6 +57,8 @@ libtacotango___la_SOURCES = ../dev_api.c ../sec_api.c ../event_api.c \
 			../dc/dcrd_cli.c ../dc/dcwr_cli.c ../dc/utils_cli.c \
 			tango_api.cpp attr_api.cpp attr_access.cpp \
 			db_exp.cpp ../startup.c
+endif
+
 libtacotango___la_CFLAGS  	= -x c++ -DTANGO
 if CLIENT_TCP
 libtacotango___la_CFLAGS += -DCLIENT_TCP

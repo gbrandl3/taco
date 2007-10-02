@@ -744,7 +744,7 @@ AC_DEFUN([WITH_CORBA],
 	AC_ARG_WITH(corba, AC_HELP_STRING([--with-corba@<:@=ARG@:>@], [CORBA @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the omniORB CORBA installation, e.g. '/usr/local/omniORB']), [
 		case  "$with_corba" in
 			yes) 	
-				PKG_CHECK_MODULES(OMNIORB4, omniCOSDynamic4 >= 4.0.0, 
+				PKG_CHECK_MODULES(OMNIORB4, omniCOSDynamic4 >= 4.1.0, 
 					[corba_found=yes
 					CORBA_CLFAGS=`$PKG_CONFIG --cflags omniCOSDynamic4`
 					CORBA_LIBS=`$PKG_CONFIG --libs-only-l omniCOSDynamic4`

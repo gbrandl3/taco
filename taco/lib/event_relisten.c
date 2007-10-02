@@ -78,6 +78,8 @@ long relisten_events(devserver ds)
 		start->event_id = *(start->event_id_ptr);
 		start = start->next;
 	}
+
+	return DS_OK;
 }
 
 /**@ingroup eventAPI

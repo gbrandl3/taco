@@ -29,9 +29,9 @@
  *
  * Original:	Feb 1994
  *
- * Version:	$Revision: 1.26 $
+ * Version:	$Revision: 1.27 $
  *
- * Date:		$Date: 2007-09-07 14:15:49 $
+ * Date:		$Date: 2007-10-02 14:46:28 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -2293,6 +2293,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 		
 	fprintf (stderr, "svc_run returned\n"); 
 	kill (pid,SIGQUIT);
+	return 1;
 #else   /* WIN32 */
 /*
  * show up the main dialog

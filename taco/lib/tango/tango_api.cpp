@@ -35,12 +35,12 @@
  *
  * Original   :	December 1999
  *
- * Version    : $Revision: 1.6 $
+ * Version    : $Revision: 1.7 $
  *
- * Date       : $Date: 2007-06-19 10:07:21 $
+ * Date       : $Date: 2007-10-02 14:46:29 $
  *
  ********************************************************************-*/
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/tango_api.cpp,v 1.6 2007-06-19 10:07:21 jkrueger1 Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/tango_api.cpp,v 1.7 2007-10-02 14:46:29 jkrueger1 Exp $";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -52,7 +52,7 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib
 #include <dc.h>
 #include <stdio.h>
 #include <assert.h>
-#include <iostream.h>
+#include <iostream>
 #include <vector>
 #include <string>
 #ifdef linux
@@ -79,11 +79,13 @@ static long tango_dbase_init=0;
 /*
 typedef struct _tango_device {
 	long flag; 
+	short taco_state;
 	vector<string> cmd_name;
 	vector<long> cmd_value;
 	vector<long> argin_type;
 	vector<long> argout_type;
-	Tango::Device_var object;} _tango_device;
+	Tango::Device_var object;
+	} _tango_device;
 static vector<_tango_device> tango_device;
  */
 #define MAX_TANGO_DEVICE 1000
@@ -254,6 +256,9 @@ long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, long *erro
 		tango_device_tmp.argin_type = vector<long>(cmd_query->size());
 		tango_device_tmp.argout_type = vector<long>(cmd_query->size());
  */
+		long taco_state, tango_state;
+		taco_state = -1;
+		tango_state = -1;
 		for (i = 0;i < cmd_query->size();i++)
 		{
 			long error, tango_cmd_value;
@@ -266,10 +271,43 @@ long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, long *erro
 // 
 // added following commands - Insert, Extract, On, Off, Reset, Open, Close
 //
+// added special treatment for TacoState - if TacoState is implemented then map this
+// to DevState and not the Tango::State(). This allows Tango device servers to return
+// a long instead of a short
+//
+// andy 15jun07
+//
 			if ((*cmd_query)[i].cmd_name == "State")
+			{
+				if (taco_state == -1) 
+				{
+					tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevState")+1);
+					sprintf(tango_device_tmp.cmd_name[i],"DevState");
+					tango_state = i;
+				}
+				else 
+				{
+					tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("TangoState")+1);
+					sprintf(tango_device_tmp.cmd_name[i],"TangoState");
+					tango_state = i;
+				}
+			}
+			else if ((*cmd_query)[i].cmd_name == "TacoState")
 			{
 				tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevState")+1);
 				sprintf(tango_device_tmp.cmd_name[i],"DevState");
+				taco_state = i;
+				if (tango_state != -1)
+				{
+					tango_device_tmp.cmd_name[tango_state] = (char*)malloc(strlen("TangoState")+1);
+					sprintf(tango_device_tmp.cmd_name[tango_state],"TangoState");
+					// map State to a different command value to avoid confusion with TacoState
+					get_cmd_value((char*)dev_info.dev_class.c_str(),
+			              		tango_device_tmp.cmd_name[tango_state],
+			              		&tango_cmd_value,
+			              		&error);
+					tango_device_tmp.cmd_value[tango_state] = tango_cmd_value;
+				}
 			}
 			else if ((*cmd_query)[i].cmd_name == "Status")
 			{
@@ -323,6 +361,7 @@ long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, long *erro
 			tango_device_tmp.cmd_value[i] = tango_cmd_value;
 			tango_device_tmp.argin_type[i] = (*cmd_query)[i].in_type;
 			tango_device_tmp.argout_type[i] = (*cmd_query)[i].out_type;
+			tango_device_tmp.taco_state = taco_state;
 		}
 		delete cmd_query;
         	if ((*ds_ptr = (devserver)malloc(sizeof(struct _devserver))) == NULL)
@@ -511,6 +550,17 @@ long tango_dev_putget(devserver ds, long cmd, void *argin, long argin_type,
 			cmd_name = tango_device[dev_id].cmd_name[i_cmd];
 			if (strcmp(cmd_name,"DevState") == 0)
 			{
+				if (tango_device[dev_id].taco_state != -1) 
+				{
+					cmd_name = "TacoState";
+				}
+				else 
+				{
+					cmd_name = "State";
+				}
+			}
+			else if (strcmp(cmd_name,"TangoState") == 0)
+			{
 				cmd_name = "State";
 			}
 			else if (strcmp(cmd_name,"DevStatus") == 0)
@@ -688,15 +738,28 @@ long tango_dev_putget_raw(devserver ds, long cmd, void *argin, long argin_type,
 		{
 			i_cmd = i;
 			cmd_name = tango_device[dev_id].cmd_name[i_cmd];
-			if (strcmp(cmd_name,"DevState") == 0)
+			if (strcmp(cmd_name,"DevState") == 0 )
 			{
-				cmd_name = "State";
+				if (tango_device[dev_id].taco_state != -1) 
+				{
+					cmd_name = "TacoState";
+				}
+				else
+				{
+					cmd_name = "State";
+				}
+			}
+			if (strcmp(cmd_name,"TangoState") == 0)
+			{
+				if (tango_device[dev_id].taco_state != -1) 
+				{
+					cmd_name = "State";
+				}
 			}
 			if (strcmp(cmd_name,"DevStatus") == 0)
 			{
 				cmd_name = "Status";
 			}
-			break;
 			break;
 		}
 	}
