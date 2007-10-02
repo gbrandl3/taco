@@ -27,9 +27,9 @@
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.19 $
+ * Version:	$Revision: 1.20 $
  *
- * Date:	$Date: 2007-09-07 15:01:30 $
+ * Date:	$Date: 2007-10-02 14:18:39 $
  *
  ******************************************************************************/
 
@@ -1617,7 +1617,10 @@ static int call_dcserv(int num_device,long *dev_numb,dc_dev_retdat *dev_retdat,i
 		{
 			tmp_net->dchost_arr[ind].cantcont_error++;
 			for (i = 0;i < num_device;i++)
+			{
+				call_num = dev_numb[i];
 				*(dev_retdat[call_num].cmd_error) = err;
+			}
 			*nb_deverr = num_device;
 			return(0);
 		}
