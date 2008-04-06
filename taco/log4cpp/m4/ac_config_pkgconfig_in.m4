@@ -56,7 +56,7 @@ dnl  AC_CHECK_LIB(m,pow,
 dnl               GIMPPRINT_DEPLIBS="${GIMPPRINT_DEPLIBS} -lm")
 dnl  AC_CONFIG_PKGCONFIG_IN([gimpprint], [GIMP Print Top Quality Printer Drivers], [src/main])
 dnl
-dnl @version $Id: ac_config_pkgconfig_in.m4,v 1.1 2006-11-12 16:37:27 jkrueger1 Exp $
+dnl @version $Id: ac_config_pkgconfig_in.m4,v 1.2 2008-04-06 09:07:28 jkrueger1 Exp $
 dnl @author Roger Leigh <roger@whinlatter.uklinux.net>
 dnl
 ## AC_CONFIG_PKGCONFIG_IN(LIBRARY, DESCRIPTION, DESTINATION)

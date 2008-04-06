@@ -29,9 +29,9 @@
  *
  * Original   :	September 2002
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2007-03-22 14:20:30 $
+ * Date:	$Date: 2008-04-06 09:07:19 $
  *
  *********************************************************************/ 
 
@@ -79,36 +79,36 @@ extern "C" void free_var_str_array (DevVarStringArray *str_array);
 class AttrAccess 
 {
 	public:
-   	AttrAccess (char *full_attr_name, long access, long *error);
+   	AttrAccess (char *full_attr_name, long access, DevLong *error);
    	~AttrAccess ();
 
-		long  read_attr  (DevArgument argout, DevType argout_type, long *error);
-		long  read_attr_state (DevArgument argout, DevType argout_type, long *error);
-		long  read_set_attr  (DevArgument argout, DevType argout_type, long *error);
-		long  write_attr (DevArgument argin,  DevType argin_type,  long *error);
-		long  attr_cmd_query (DevVarCmdArray *attr_cmd_query_array,long *error);
-		long  read_state (DevArgument argout, DevType argout_type, long *error);
-		long  read_status (DevArgument argout, DevType argout_type, long *error);
-		long	abort	(long *error);	
+		long  read_attr  (DevArgument argout, DevType argout_type, DevLong *error);
+		long  read_attr_state (DevArgument argout, DevType argout_type, DevLong *error);
+		long  read_set_attr  (DevArgument argout, DevType argout_type, DevLong *error);
+		long  write_attr (DevArgument argin,  DevType argin_type,  DevLong *error);
+		long  attr_cmd_query (DevVarCmdArray *attr_cmd_query_array,DevLong *error);
+		long  read_state (DevArgument argout, DevType argout_type, DevLong *error);
+		long  read_status (DevArgument argout, DevType argout_type, DevLong *error);
+		long	abort	(DevLong *error);	
 		long  read_attr_config (DevArgument argout, DevType argout_type, 
-									   long *error);
-		long  read_attr_mode  (DevArgument argout, DevType argout_type, long *error);
-		long  write_attr_mode (DevArgument argin,  DevType argin_type,  long *error);													
+									   DevLong *error);
+		long  read_attr_mode  (DevArgument argout, DevType argout_type, DevLong *error);
+		long  write_attr_mode (DevArgument argin,  DevType argin_type,  DevLong *error);													
 	
 	protected:
-		long	search_attr_name (long *error);
-		long	search_tango_attr_name (long *error);
-		long	create_attr_access (long *error);
+		long	search_attr_name (DevLong *error);
+		long	search_tango_attr_name (DevLong *error);
+		long	create_attr_access (DevLong *error);
 		long	get_tango_data_type (long taco_data_type);
 		long	get_taco_data_type (long tango_data_type);
 		long	get_taco_array_data_type (long tango_data_type);
 		long  check_requested_data_type (long request_type, long attr_type, 
-												   long *error);
+												   DevLong *error);
 		long  convert_data (long data_type, void *data_ptr,
-								  long conv_data_type, void *conv_data_ptr, long *error);
+								  long conv_data_type, void *conv_data_ptr, DevLong *error);
 		long	to_taco_sequence(Tango::DeviceAttribute , DevArgument , 
-								    DevType , DevType,long , long *);	
-		long	to_xdr_sequence(DevArgument , DevArgument , DevType , long *);	
+								    DevType , DevType,long , DevLong *);	
+		long	to_xdr_sequence(DevArgument , DevArgument , DevType , DevLong *);	
 		
 			
 		char	attr_name[80];

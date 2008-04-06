@@ -31,9 +31,9 @@
  *
  * Original:	June 1991
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2007-09-03 08:02:24 $
+ * Date:	$Date: 2008-04-06 09:06:58 $
  *
  *******************************************************************-*/
 
@@ -54,10 +54,10 @@
 #include <DevErrors.h>
 #include <DevSignal.h>
 
-#ifndef WIN32
-#include <rpc/pmap_clnt.h>
+#if HAVE_RPC_PMAP_CLNT_H
+#	include <rpc/pmap_clnt.h>
 #else
-#include <rpc/pmap_cln.h>
+#	include <rpc/pmap_cln.h>
 #endif /* !WIN32 */
 
 /**
@@ -244,7 +244,7 @@ void main_signal_handler (int signo)
  */
 void unregister_server (void)
 {
-	long error = 0;
+	DevLong error = 0;
 	LOCK(async_mutex);
 /*
  * if this is a bona fida device server and it is using the database

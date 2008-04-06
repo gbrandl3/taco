@@ -10,9 +10,7 @@
 #include "PortabilityImpl.hh"
 #include <log4cpp/SimpleLayout.hh>
 #include <log4cpp/Priority.hh>
-#ifdef HAVE_IOS
 #include <ios>
-#endif
 #ifdef LOG4CPP_HAVE_SSTREAM
 #include <sstream>
 #endif
@@ -37,8 +35,7 @@ namespace log4cpp {
         return message.str();
     }
 
-   std::auto_ptr<Layout> create_simple_layout(const FactoryParams& params)
-   {
-      return std::auto_ptr<Layout>(new SimpleLayout);
-   }
+    std::auto_ptr<Layout> create_simple_layout(const FactoryParams& params) {
+        return std::auto_ptr<Layout>(new SimpleLayout);
+    }
 }

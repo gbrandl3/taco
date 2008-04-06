@@ -29,9 +29,9 @@
  *
  * Original:	October 1998
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-18 22:04:49 $
+ * Date:        $Date: 2008-04-06 09:06:34 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -67,11 +67,9 @@ int dev_io_protocol(ClientData clientdata, Tcl_Interp *interp,
 			*Error,
 			*DeviceName,
 			*SProtocol;
-	long 		LValue, 
-			ret;
-	struct timeval 	ti;
+	long		ret;
 	devserver 	ds;
-	long 		DeviceError;
+	DevLong 	DeviceError;
 	char 		StringTemp[250];
 	char 		*StringAux = NULL;
  
@@ -97,10 +95,10 @@ int dev_io_protocol(ClientData clientdata, Tcl_Interp *interp,
 	ret = dev_import (DeviceName,0,&ds,&DeviceError);
 	if (ret != DS_OK) /* dev_import failed */
 	{
-		snprintf (StringTemp, sizeof(StringTemp), "%d",ret);
+		snprintf (StringTemp, sizeof(StringTemp), "%ld",ret);
 		Tcl_SetVar (interp,State,StringTemp,0);
 		StringAux = dev_error_str(DeviceError);
-		snprintf (StringTemp, sizeof(StringTemp), "%s [%d]",StringAux,DeviceError);
+		snprintf (StringTemp, sizeof(StringTemp), "%s [%ld]",StringAux, (long)DeviceError);
 		Tcl_SetVar (interp,Error,StringTemp,0);
 		if(StringAux != NULL) 
 			free(StringAux);
@@ -112,10 +110,10 @@ int dev_io_protocol(ClientData clientdata, Tcl_Interp *interp,
 		ret = dev_rpc_protocol(ds,D_UDP,&DeviceError);
 		if (ret != DS_OK) /* dev_rpc_protocol failed */
 		{
-			snprintf (StringTemp, sizeof(StringTemp), "%d",ret);
+			snprintf (StringTemp, sizeof(StringTemp), "%ld",ret);
 			Tcl_SetVar (interp,State,StringTemp,0);
 			StringAux = dev_error_str(DeviceError);
-			snprintf (StringTemp, sizeof(StringTemp), "%s [%d]",StringAux,DeviceError);
+			snprintf (StringTemp, sizeof(StringTemp), "%s [%ld]",StringAux, (long)DeviceError);
 			Tcl_SetVar (interp,Error,StringTemp,0);
 			if(StringAux != NULL) 
 				free(StringAux);
@@ -127,10 +125,10 @@ int dev_io_protocol(ClientData clientdata, Tcl_Interp *interp,
 		ret = dev_rpc_protocol(ds,D_TCP,&DeviceError);
 		if (ret != DS_OK) /* dev_import failed */
 		{
-			snprintf (StringTemp, sizeof(StringTemp), "%d",ret);
+			snprintf (StringTemp, sizeof(StringTemp), "%ld",ret);
 			Tcl_SetVar (interp,State,StringTemp,0);
 			StringAux = dev_error_str(DeviceError);
-			snprintf (StringTemp, sizeof(StringTemp), "%s [%d]",StringAux,DeviceError);
+			snprintf (StringTemp, sizeof(StringTemp), "%s [%ld]",StringAux, (long)DeviceError);
 			Tcl_SetVar (interp,Error,StringTemp,0);
 			if(StringAux != NULL) 
 				free(StringAux);
@@ -141,10 +139,10 @@ int dev_io_protocol(ClientData clientdata, Tcl_Interp *interp,
 	{ /* SProtocol is neither UDP nor TCP */
 		ret=DS_NOTOK;
 		DeviceError=DevErr_UnknownInputParameter;
-		snprintf(StringTemp,  sizeof(StringTemp), "%d",ret);
+		snprintf(StringTemp,  sizeof(StringTemp), "%ld",ret);
 		Tcl_SetVar (interp,State,StringTemp,0);
 		StringAux = dev_error_str(DeviceError);
-		snprintf (StringTemp,  sizeof(StringTemp), "%s [%d]",StringAux,DeviceError);
+		snprintf (StringTemp,  sizeof(StringTemp), "%s [%ld]",StringAux, (long)DeviceError);
 		Tcl_SetVar (interp,Error,StringTemp,0);
 		if(StringAux != NULL) 
 			free(StringAux);

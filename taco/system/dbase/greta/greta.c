@@ -10,6 +10,9 @@
  * Code Generator Xcessory 2.0 (09/09/96)
  *
  */
+
+#include <stdlib.h>
+
 /*
  * Motif required Headers
  */
@@ -45,6 +48,9 @@ extern XtPointer SINGLE();
 extern void MENU_POST();
 extern Pixmap XPM_PIXMAP();
 extern void SET_BACKGROUND_COLOR();
+extern Widget CreatemainWindow(Widget);
+extern void DataInitialization();
+
 
 /* Begin user code block <globals> */
 /* End user code block <globals> */

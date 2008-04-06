@@ -29,9 +29,9 @@
  *
  * Original:    May 1993
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:21 $
  *
  *******************************************************************-*/
 
@@ -49,15 +49,15 @@ xdr_DevVarLongFloatSet(xdrs, objp)
 	XDR *xdrs;
 	DevVarLongFloatSet *objp;
 {
-	if (!xdr_long(xdrs, &objp->length)) {
+	if (!xdr_DevLong(xdrs, &objp->length)) {
 		return (FALSE);
      	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->axis,
-		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_long)) {
+		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
 	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->value,
-		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_long)) {
+		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
         }
      	if (!xdr_array(xdrs, (caddr_t *)&objp->valuef,
@@ -75,19 +75,19 @@ xdr_DevVarLongRead(xdrs, objp)
 	XDR *xdrs;
 	DevVarLongRead *objp;
 {
-	if (!xdr_long(xdrs, &objp->length)) {
+	if (!xdr_DevLong(xdrs, &objp->length)) {
 		return (FALSE);
      	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->value,
-		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_long)) {
+		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
 	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->stat,
-		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_long)) {
+		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
 	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->err,
-		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_long)) {
+		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
   	}
        return (TRUE);
@@ -101,7 +101,7 @@ xdr_DevVarPosRead(xdrs, objp)
 	XDR *xdrs;
 	DevVarPosRead *objp;
 {
-	if (!xdr_long(xdrs, &objp->length)) {
+	if (!xdr_DevLong(xdrs, &objp->length)) {
 		return (FALSE);
      	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->pos,
@@ -109,11 +109,11 @@ xdr_DevVarPosRead(xdrs, objp)
 	  	return (FALSE);
 	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->stat,
-		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_long)) {
+		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
 	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->err,
-		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_long)) {
+		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
   	}
 
@@ -128,7 +128,7 @@ xdr_DevVarAxeRead(xdrs, objp)
 	XDR *xdrs;
 	DevVarAxeRead *objp;
 {
-	if (!xdr_long(xdrs, &objp->length)) {
+	if (!xdr_DevLong(xdrs, &objp->length)) {
 		return (FALSE);
      	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->m_pos,
@@ -140,23 +140,23 @@ xdr_DevVarAxeRead(xdrs, objp)
 	  	return (FALSE);
 	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->m_stat,
-		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_long)) {
+		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
 	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->s_stat,
-		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_long)) {
+		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
 	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->swit,
-		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_long)) {
+		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
 	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->clutch,
-		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_long)) {
+		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
 	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->err,
-		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_long)) {
+		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
   	}
 
@@ -170,7 +170,7 @@ xdr_DevVarParRead(xdrs, objp)
 	XDR *xdrs;
 	DevVarParRead *objp;
 {
-	if (!xdr_long(xdrs, &objp->length)) {
+	if (!xdr_DevLong(xdrs, &objp->length)) {
 		return (FALSE);
      	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->veloc,
@@ -194,15 +194,15 @@ xdr_DevVarParRead(xdrs, objp)
 	  	return (FALSE);
 	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->stepmode,
-		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_long)) {
+		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
 	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->unit,
-		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_long)) {
+		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
 	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->err,
-		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_long)) {
+		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
   	}
 
@@ -217,11 +217,11 @@ xdr_DevVarErrRead(xdrs, objp)
 	XDR *xdrs;
 	DevVarErrRead *objp;
 {
-	if (!xdr_long(xdrs, &objp->length)) {
+	if (!xdr_DevLong(xdrs, &objp->length)) {
 		return (FALSE);
      	}
      	if (!xdr_array(xdrs, (caddr_t *)&objp->err,
-		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_long)) {
+		(u_int *)&objp->length, MAXU_INT, sizeof(long), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
   	}
 

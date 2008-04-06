@@ -29,12 +29,12 @@
  *
  * Original:    
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2006-09-18 22:41:09 $
+ * Date:        $Date: 2008-04-06 09:06:39 $
  */
 
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/datac.c,v 1.2 2006-09-18 22:41:09 jkrueger1 Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/datac.c,v 1.3 2008-04-06 09:06:39 jkrueger1 Exp $";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -84,7 +84,7 @@ extern long get_time();
 /*** FUNCTION QUEUE_DATA ***/
 
 long queue_data (char *name,devserver handle,int cmd,long cmd_error,
-                 int cmd_time,int length,char *sequence,long *error)
+                 int cmd_time,int length,char *sequence, DevLong *error)
 {
   int i,found,qcomm,k;
   int current_device=0;
@@ -307,9 +307,10 @@ long queue_data (char *name,devserver handle,int cmd,long cmd_error,
 
 /*** FUNCTION STORE_DATA ***/
 
-long store_data (int flag,daemon_device_struct_type *cdp,long *error_device)
+long store_data (int flag,daemon_device_struct_type *cdp, DevLong *error_device)
 {
-  long status,tmp_error;
+  long status;
+  DevLong tmp_error;
   dc_error error;
   int i,j;
   int offset;
@@ -464,7 +465,7 @@ void print_devdata()
 
 /*** FUNCTION OPEN_DC ***/
 
-long open_dc (daemon_device_struct_type *cdp,long *error)
+long open_dc (daemon_device_struct_type *cdp, DevLong *error)
 {
 
   static dc_dev dc_poll_list;

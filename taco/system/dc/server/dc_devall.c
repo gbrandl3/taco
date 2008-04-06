@@ -30,9 +30,9 @@
  *
  * Original     : February 1993
  *
- * Version      : $Revision: 1.4 $
+ * Version      : $Revision: 1.5 $
  *
- * Date         : $Date: 2006-09-18 21:49:14 $
+ * Date         : $Date: 2008-04-06 09:07:49 $
  *
  */
 
@@ -60,7 +60,7 @@ extern int req_call;
  * To return to the client a list with all the names of
  * devices defined in the local dc 
  * 
- * @param fill
+ * @param fill unused
  */
 dc_devallx_back *dc_devall_1(int *fill)
 {

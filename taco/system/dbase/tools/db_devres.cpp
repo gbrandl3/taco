@@ -25,14 +25,15 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.7 $
+ * Version:     $Revision: 1.8 $
  *
- * Date:        $Date: 2007-06-20 07:20:42 $
+ * Date:        $Date: 2008-04-06 09:07:47 $
  */
 
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 /* TACO include file */
-
-#include "config.h"
 #include <API.h>
 
 /* Include files */
@@ -41,10 +42,9 @@
 #include <algorithm>
 #include <cstdlib>
 #ifdef _solaris
-#include "_count.h"
+#	include "_count.h"
+#include <taco_utils.h>
 #endif /* _solaris */
-
-using namespace std;
 
 void usage(const char *cmd)
 {
@@ -52,12 +52,19 @@ void usage(const char *cmd)
 	std::cerr << " displays the resources of the device" << std::endl;
 	std::cerr << "         options: -h display this message" << std::endl;
 	std::cerr << "                  -n nethost" << std::endl;
+	std::cerr << "                  -v display the current version" << std::endl;
         exit(1);
+}
+
+void version(const char *cmd)
+{
+	std::cerr << cmd << " version " << VERSION << std::endl;
+	exit(0);
 }
 
 int main(int argc,char *argv[])
 {
-	long error;
+	DevLong error;
         extern int      optopt;
         extern int      optind;
 	extern char	*optarg;
@@ -65,12 +72,15 @@ int main(int argc,char *argv[])
 //
 // Argument test and device name structure
 //
-        while ((c = getopt(argc,argv,"hn:")) != -1)
+        while ((c = getopt(argc,argv,"hvn:")) != -1)
         {
                 switch (c)
                 {
 			case 'n':
 				setenv("NETHOST", optarg, 1);
+				break;
+			case 'v':
+				version(argv[0]);
 				break;
                 	case 'h':
                 	case '?':
@@ -80,7 +90,7 @@ int main(int argc,char *argv[])
     	if (optind != argc - 1)
 		usage(argv[0]);
 
-	string dev_name(argv[optind]);
+	std::string dev_name(argv[optind]);
 	if (dev_name.substr(0, 2) == "//")
 	{
 		std::string::size_type pos = dev_name.find("/", 2);
@@ -89,7 +99,7 @@ int main(int argc,char *argv[])
 	}
 
 #ifdef DEBUG
-	cout  << "Device name : " << dev_name << endl;
+	std::cout  << "Device name : " << dev_name << std::endl;
 #endif 
 #ifndef _solaris
 	if (std::count(dev_name.begin(), dev_name.end(), '/') != 2)
@@ -97,7 +107,7 @@ int main(int argc,char *argv[])
 	if (_sol::count(dev_name.begin(), dev_name.end(), '/') != 2)
 #endif /* _solaris */
 	{
-		cerr << "db_devres : Bad device name" << endl;
+		std::cerr << "db_devres : Bad device name" << std::endl;
 		exit(-1);
 	}
 
@@ -106,7 +116,7 @@ int main(int argc,char *argv[])
 //
 	if (db_import(&error) == -1)
 	{
-		cerr << "db_devres : Impossible to connect to database server" << endl;
+		std::cerr << "db_devres : Impossible to connect to database server" << std::endl;
 		exit(-1);
 	}
 
@@ -119,8 +129,8 @@ int main(int argc,char *argv[])
 	long res_nb;
 	if (db_deviceres(1, &tmp, &res_nb, &res_list, &error) == -1)
 	{
-		cerr << "The call to database server failed with error " << error << endl;
-		cerr << "Error message : " << dev_error_str(error) << endl;
+		std::cerr << "The call to database server failed with error " << error << std::endl;
+		std::cerr << "Error message : " << dev_error_str(error) << std::endl;
 		exit(-1);
 	}
 
@@ -129,9 +139,9 @@ int main(int argc,char *argv[])
 //
 
 	if (res_nb == 0)
-		cout << "The device " << dev_name << " does not have any resource defined in the database"<< endl;
+		std::cout << "The device " << dev_name << " does not have any resource defined in the database"<< std::endl;
 	else
 		for (int i = 0; i < res_nb; i++)
-			cout << res_list[i] << endl;
+			std::cout << res_list[i] << std::endl;
     	return 0;
 }

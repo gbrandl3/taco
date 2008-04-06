@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.5 $
+ * Version      : $Revision: 1.6 $
  *
- * Date         : $Date: 2006-09-18 21:50:16 $
+ * Date         : $Date: 2008-04-06 09:07:51 $
  *
  */
 
@@ -73,7 +73,7 @@ int main(int argc, char **argv)
 {
 	int 		shmid_alloc;
 	char 		*shmadr_alloc;
-	long 		error;
+	DevLong		error;
 	unsigned int 	free,
 			lfree;
 	float 		free_f,

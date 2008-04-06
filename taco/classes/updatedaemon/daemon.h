@@ -178,10 +178,10 @@ typedef struct _daemon_device_struct_type {
 /* Some functions declarations */
 
 void printerror(long);
-long queue_data (char *,devserver,int,long,int,int,char *,long *);
-long store_data (int,daemon_device_struct_type *,long *);
+long queue_data (char *,devserver,int,long,int,int,char *, DevLong *);
+long store_data (int,daemon_device_struct_type *, DevLong *);
 void print_devdata();
-long open_dc (daemon_device_struct_type *,long *);
+long open_dc (daemon_device_struct_type *, DevLong *);
 
 #ifdef _OSK
 #define pid_t int

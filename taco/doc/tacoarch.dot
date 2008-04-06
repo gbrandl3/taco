@@ -1,0 +1,53 @@
+digraph tacoarch {
+
+	{
+		rank=min;
+		device1 [shape=box, label="device 1"];
+		device2 [shape=box, label="device 2"];
+		device3 [shape=box, label="device 3"];
+		device4 [shape=box, label="device 4"];
+		ddummy1 [shape=point, size=0.1, label=""];
+		ddummy2 [shape=point, size=0.1, label=""];
+		ddummy3 [shape=point, size=0.1, label=""];
+	}
+
+	{
+		rank=same;
+		devserver1 [shape=circle,label="Device\nServer\1"];
+		devserver2 [shape=circle,label="Device\nServer\2"];
+		sdummy1 [shape=point, size=0.1, label=""];
+		sdummy2 [shape=point, size=0.1, label=""];
+		sdummy3 [shape=point, size=0.1, label=""];
+	}
+
+	{
+		rank=same;
+		manager [shape=circle, label="Manager"];
+		database [shape=circle, label="Database"];
+	}
+
+	{
+		rank=same;
+		client1 [shape=circle, label="Client 1"];
+		client2 [shape=circle, label="Client 2"];
+		client3 [shape=circle, label="Client 3"];
+		cdummy1 [shape=point, size=0.1, label=""];
+		cdummy2 [shape=point, size=0.1, label=""];
+		cdummy3 [shape=point, size=0.1, label=""];
+	}
+	devserver1 -> database;
+	devserver2 -> database;
+	devserver1 -> manager;
+	devserver2 -> manager;
+
+	client1 -> devserver1 [dir=both];
+	client2 -> devserver2 [dir=both];
+	client2 -> devserver1 [dir=both];
+	client3 -> devserver2 [dir=both];
+
+	device1 -> devserver1 [dir=both];
+	device2 -> devserver1 [dir=both];
+	device3	-> devserver1 [dir=both];
+
+	device4 -> devserver2 [dir=both];
+}

@@ -25,30 +25,42 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-06 18:34:15 $
+ * Date:        $Date: 2008-04-06 09:07:47 $
  */
-
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 /* TACO include file */
 #include <API.h>
 
 /* Include files */
 #include <iostream>
 #include <cstdlib>
+#ifdef _solaris
+#include <taco_utils.h>
+#endif /* _solaris */
+
 void usage(const char *cmd)
 {
 	std::cerr << "usage : " << cmd << " [options]" << std::endl;
 	std::cerr << " displays the list of all host used by a device server" << std::endl;
 	std::cerr << "         options: -h display this message" << std::endl;
 	std::cerr << "                  -n nethost" << std::endl;
+	std::cerr << "                  -v display the current version" << std::endl;
         exit(1);
+}
+
+void version(const char *cmd)
+{
+	std::cerr << cmd << " version " << VERSION << std::endl;
+	exit(0);
 }
 
 int main(int argc, char **argv)
 {
-	long 		error;
+	DevLong 	error;
         extern int      optopt;
         extern int      optind;
 	extern char	*optarg;
@@ -56,17 +68,15 @@ int main(int argc, char **argv)
 //
 // Argument test and device name structure
 //
-        while ((c = getopt(argc,argv,"hn:")) != -1)
+        while ((c = getopt(argc,argv,"hvn:")) != -1)
         {
                 switch (c)
                 {
 			case 'n':
-				{
-					char s[160];
-					snprintf(s, sizeof(s), "NETHOST=%s", optarg);
-					putenv(s);
-				}
-			break;
+				setenv("NETHOST", optarg, 1);
+				break;
+			case 'v':
+				version(argv[0]);
                 	case 'h':
                 	case '?':
 				usage(argv[0]);

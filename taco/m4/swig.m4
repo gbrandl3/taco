@@ -10,21 +10,21 @@
 AC_DEFUN([SWIG_PROG],[
 	AC_PATH_PROG([SWIG],[swig])
 
-	if test -z "$SWIG" ; then
+	AS_IF([test -z "$SWIG"],
+	      [ 
 		swig_tmp="SWIG is not installed, you may have a look at http://www.swig.org"
-		if test "x$2" = "xyes" ; then
-			AC_MSG_ERROR([$swig_tmp])
-		else
-			AC_MSG_WARN([$swig_tmp])
-		fi
+		AS_IF([test "x$2" = "xyes"], [AC_MSG_ERROR([$swig_tmp])], [AC_MSG_WARN([$swig_tmp])])
 		SWIG="echo \"error: $swig_tmp\" ; false"
-	else
-		if test -n "$1" ; then
+              ],
+	      [
+		AS_IF([test -n "$1"],
+                      [
 			# Check the SWIG version
 			AC_MSG_CHECKING([for SWIG version])
 			[swig_version=`$SWIG -version 2>&1 | grep 'SWIG Version' | sed 's/.*\([0-9]\+\.[0-9]\+\.[0-9]\+\).*/\1/g'`]
 			AC_MSG_RESULT([$swig_version])
-			if test -n "$swig_version" ; then
+			AS_IF([test -n "$swig_version"],
+                              [
 				# Calculate the required version number
 				[swig_tmp=`(echo $1 | sed 's/[^0-9]/ /g')`]
 				[swig_tmp0=`(echo $swig_tmp | cut -d' ' -f1)`]
@@ -39,25 +39,21 @@ AC_DEFUN([SWIG_PROG],[
 				[swig_tmp2=`(echo $swig_tmp | cut -d' ' -f3)`]
 				[swig_tmp=$(( 1000000 * ${swig_tmp0:-0} + 1000 * ${swig_tmp1:-0} + ${swig_tmp2:-0} ))]
 	
-				if test $swig_required_version -gt $swig_tmp ; then
-					AC_MSG_WARN([SWIG version $1 or above is required, you have $swig_version])
-				fi
-			else
-				AC_MSG_WARN([cannot determine SWIG version])
-			fi
-		fi
+				AS_IF([test $swig_required_version -gt $swig_tmp], 
+					[AC_MSG_WARN([SWIG version $1 or above is required, you have $swig_version])])
+			      ], [AC_MSG_WARN([cannot determine SWIG version])])
+		      ], [swig_tmp=0])
 	
-		if test $swig_tmp -lt 1003020 ; then
+		AS_IF([test $swig_tmp -lt 1003020],
+		      [
 			# Check if a SWIG runtime library is available
 			SWIG_RUNTIME_LIBS_DIR="${SWIG%/bin*}/lib"
 			AC_MSG_CHECKING([for SWIG runtime libraries in $SWIG_RUNTIME_LIBS_DIR])
 			swig_tmp=`find "$SWIG_RUNTIME_LIBS_DIR" -maxdepth 1 -name 'libswig*'`
 			test -n "$swig_tmp" && swig_tmp=yes || swig_tmp=no
 			AC_MSG_RESULT([$swig_tmp])
-		else
-			swig_tmp="yes"
-		fi
-	fi
+		      ], [swig_tmp="yes"])
+	      ])
 	AC_SUBST([SWIG_RUNTIME_LIBS_DIR])
 ])
 
@@ -93,11 +89,9 @@ AC_DEFUN([SWIG_MULTI_MODULE_SUPPORT],[
 AC_DEFUN([SWIG_PYTHON],[
 	AC_REQUIRE([SWIG_PROG])
 	AC_REQUIRE([PYTHON_DEVEL])
-	test "x$1" != "xno" && swig_shadow=" -shadow"
+	AS_IF([test "x$1" != "xno"], [swig_shadow=" -shadow"])
 	AC_SUBST([SWIG_PYTHON_OPT],[-python$swig_shadow])
-	if test "$SWIG" ; then
-		AC_SUBST([SWIG_LIB], [`$SWIG -swiglib`])
-	fi
+	AS_IF([test "$SWIG"], [AC_SUBST([SWIG_LIB], [`$SWIG -swiglib`])])
 	AM_CONDITIONAL(BUILD_PYTHON, [test x"$swig_tmp" = x"yes" -a x"$taco_python_binding" = x"yes"])
 	AC_SUBST([SWIG_PYTHON_CPPFLAGS],[$PYTHON_CPPFLAGS])
 	AC_SUBST([SWIG_PYTHON_LIBS],["-L$SWIG_RUNTIME_LIBS_DIR -lswigpy"])

@@ -26,13 +26,16 @@
  *
  * Original:    March 99
  * 
- * Date:	$Date: 2006-09-18 22:02:25 $
+ * Date:	$Date: 2008-04-06 09:06:32 $
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  */
  
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
+#endif
+#ifdef HAVE_FSTAT
+#undef HAVE_FSTAT
 #endif
 
 #include <Python.h>
@@ -585,8 +588,7 @@ long get_argin_array(DevArgument ds_argin, long ds_in,
 	 
       case D_VAR_ULONGARR:
          ((DevVarULongArray *)(ds_argin))->length = len;
-         ((DevVarULongArray *)(ds_argin))->sequence = 
-	      (unsigned long *) malloc(sizeof(unsigned long)*len);
+         ((DevVarULongArray *)(ds_argin))->sequence = (DevULong *) malloc(sizeof(DevULong)*len);
 	 
 	 for (i=0; i<len; i++)
 	 {
@@ -603,8 +605,7 @@ long get_argin_array(DevArgument ds_argin, long ds_in,
 	 
       case D_VAR_LONGARR:
          ((DevVarLongArray *)(ds_argin))->length = len;
-         ((DevVarLongArray *)(ds_argin))->sequence = 
-	      (long *) malloc(sizeof(long)*len);
+         ((DevVarLongArray *)(ds_argin))->sequence = (DevLong *) malloc(sizeof(DevLong)*len);
 	 
 	 for (i=0; i<len; i++)
 	 {

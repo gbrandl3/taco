@@ -29,9 +29,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:		$Date: 2006-09-18 21:47:02 $
+ * Date:		$Date: 2008-04-06 09:07:51 $
  *
  */
 
@@ -42,6 +42,9 @@
 #include <private/ApiP.h>
 #include <DevErrors.h>
 #include <ManagerP.h>
+#ifdef HAVE_RPC_PMAP_CLNT_H
+#	include <rpc/pmap_clnt.h>
+#endif
 #if HAVE_SIGNAL_H
 #       include <signal.h>
 #elif HAVE_SYS_SIGNAL_H

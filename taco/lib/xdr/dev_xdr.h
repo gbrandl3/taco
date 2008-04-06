@@ -30,9 +30,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:21 $
  *
  *******************************************************************-*/
 
@@ -40,6 +40,10 @@
 #define DEV_XDR_H
 
 #include <macros.h>
+
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,7 +61,7 @@ long    	_DLLFunc xdr_length_DevChar PT_((char *objp));
 
 #if !defined(FORTRAN)
 typedef void			DevVoid;
-long    			_DLLFunc xdr_length_DevVoid PT_((void *objp));
+long    			_DLLFunc xdr_length_DevVoid PT_((DevVoid *objp));
 #endif /* FORTRAN */
 #define D_VOID_TYPE             0L
 #if !defined(FORTRAN)
@@ -69,7 +73,7 @@ long    			_DLLFunc xdr_length_DevVoid PT_((void *objp));
 
 typedef char			DevBoolean;
 long    			_DLLFunc xdr_length_DevBoolean
-				         PT_((char *objp));
+				         PT_((DevBoolean *objp));
 #endif /* FORTRAN */
 #define	D_BOOLEAN_TYPE		1L
 #if !defined(FORTRAN)
@@ -81,7 +85,7 @@ long    			_DLLFunc xdr_length_DevBoolean
 
 typedef unsigned short      	DevUShort;
 long                        	_DLLFunc xdr_length_DevUShort
-					 PT_((unsigned short *objp));
+					 PT_((DevUShort *objp));
 #endif /* FORTRAN */
 #define D_USHORT_TYPE       	70L
 #if !defined(FORTRAN)
@@ -94,7 +98,7 @@ long                        	_DLLFunc xdr_length_DevUShort
 
 typedef short			DevShort;
 long  				_DLLFunc xdr_length_DevShort
-					 PT_((short *objp));
+					 PT_((DevShort *objp));
 #endif /* FORTRAN */
 #define D_SHORT_TYPE            2L
 #if !defined(FORTRAN)
@@ -103,34 +107,44 @@ long  				_DLLFunc xdr_length_DevShort
 						sizeof(DevShort), \
 						xdr_length_DevShort, \
 						A )
-
+#if SIZEOF_UNSIGNED_INT == 4
+typedef unsigned int 		DevULong;
+#elif SIZEOF_UNSIGNED_LONG == 4
 typedef unsigned long      	DevULong;
+#endif
+bool_t 				_DLLFunc xdr_DevULong
+		 			PT_((XDR *xdrs, DevULong *objp));
 long                        	_DLLFunc xdr_length_DevULong
-					 PT_((unsigned long *objp));
+					 PT_((DevULong *objp));
 #endif /* FORTRAN */
 #define D_ULONG_TYPE       	71L
 #if !defined(FORTRAN)
 #define LOAD_ULONG_TYPE(A) 	xdr_load_type (D_ULONG_TYPE, \
-                                               (DevDataFunction) xdr_u_long, \
+                                               (DevDataFunction) xdr_DevULong, \
                                                sizeof(DevULong), \
                                                xdr_length_DevULong, \
                                                A)
 
-
+#if SIZEOF_INT == 4
+typedef int			DevLong;
+#elif SIZEOF_LONG == 4
 typedef	long			DevLong;
-long    			_DLLFunc xdr_length_DevLong PT_((long *objp));
+#endif
+bool_t 				_DLLFunc xdr_DevLong
+		 			PT_((XDR *xdrs, DevLong *objp));
+long    			_DLLFunc xdr_length_DevLong PT_((DevLong *objp));
 #endif /* FORTRAN */
 #define D_LONG_TYPE             3L
 #if !defined(FORTRAN)
 #define LOAD_LONG_TYPE(A)	xdr_load_type (	D_LONG_TYPE, \
-						(DevDataFunction) xdr_long, \
+						(DevDataFunction) xdr_DevLong, \
 						sizeof(DevLong), \
 						xdr_length_DevLong, \
 						A )
 
 typedef float			DevFloat;
 long    			_DLLFunc xdr_length_DevFloat
-					 PT_((float *objp));
+					 PT_((DevFloat *objp));
 #endif /* FORTRAN */
 #define D_FLOAT_TYPE            4L
 #if !defined(FORTRAN)
@@ -142,7 +156,7 @@ long    			_DLLFunc xdr_length_DevFloat
 
 typedef double			DevDouble;
 long    			_DLLFunc xdr_length_DevDouble
-					 PT_((double *objp));
+					 PT_((DevDouble *objp));
 #endif /* FORTRAN */
 #define D_DOUBLE_TYPE           5L
 #if !defined(FORTRAN)
@@ -154,9 +168,9 @@ long    			_DLLFunc xdr_length_DevDouble
 
 typedef char   			*DevString;
 bool_t 				_DLLFunc xdr_DevString
-					 PT_((XDR *xdrs, char **objp));
+					 PT_((XDR *xdrs, DevString *objp));
 long   			        _DLLFunc xdr_length_DevString
-					 PT_((char **objp));
+					 PT_((DevString *objp));
 #endif /* FORTRAN */
 #define D_STRING_TYPE           6L
 #if !defined(FORTRAN)
@@ -168,8 +182,8 @@ long   			        _DLLFunc xdr_length_DevString
 
 
 struct DevIntFloat {
-	long  state;
-	float value;
+	DevLong  state;
+	DevFloat value;
 };
 typedef struct DevIntFloat 	DevIntFloat;
 bool_t 	_DLLFunc xdr_DevIntFloat PT_((XDR *xdrs, DevIntFloat *objp));
@@ -185,8 +199,8 @@ long    _DLLFunc xdr_length_DevIntFloat PT_((DevIntFloat *objp));
 
 
 struct DevFloatReadPoint {
-	float set;
-	float read;
+	DevFloat set;
+	DevFloat read;
 };
 typedef struct DevFloatReadPoint DevFloatReadPoint;
 bool_t 	_DLLFunc xdr_DevFloatReadPoint
@@ -204,9 +218,9 @@ long    _DLLFunc xdr_length_DevFloatReadPoint
 
 
 struct DevStateFloatReadPoint {
-	short state;
-	float set;
-	float read;
+	DevShort state;
+	DevFloat set;
+	DevFloat read;
 };
 typedef struct DevStateFloatReadPoint DevStateFloatReadPoint;
 bool_t 	_DLLFunc xdr_DevStateFloatReadPoint
@@ -224,8 +238,8 @@ long    _DLLFunc xdr_length_DevStateFloatReadPoint
 
 
 struct DevLongReadPoint {
-	long set;
-	long read;
+	DevLong set;
+	DevLong read;
 };
 typedef struct DevLongReadPoint 	DevLongReadPoint;
 bool_t 	_DLLFunc xdr_DevLongReadPoint
@@ -243,8 +257,8 @@ long    _DLLFunc xdr_length_DevLongReadPoint
 
 
 struct DevDoubleReadPoint {
-	double set;
-	double read;
+	DevDouble set;
+	DevDouble read;
 };
 typedef struct DevDoubleReadPoint 	DevDoubleReadPoint;
 bool_t 	_DLLFunc xdr_DevDoubleReadPoint
@@ -266,8 +280,8 @@ long    _DLLFunc xdr_length_DevDoubleReadPoint
  */
 
 struct DevVarCharArray {
-	u_int length;
-	char  *sequence;
+	DevULong   length;
+	DevChar    *sequence;
 };
 typedef struct DevVarCharArray 		DevVarCharArray;
 bool_t 	_DLLFunc xdr_DevVarCharArray
@@ -285,8 +299,8 @@ long   	_DLLFunc xdr_length_DevVarCharArray
 
 
 struct DevVarStringArray {
-	u_int 	  length;
-	DevString *sequence;
+	DevULong   length;
+	DevString  *sequence;
 };
 typedef struct DevVarStringArray 	DevVarStringArray;
 bool_t 	_DLLFunc xdr_DevVarStringArray
@@ -307,8 +321,8 @@ long   	_DLLFunc xdr_length_DevVarStringArray
  */
 
 struct DevVarUShortArray {
-  	u_int   length;
-  	u_short *sequence;
+  	DevULong  length;
+  	DevUShort *sequence;
 };
 typedef struct DevVarUShortArray 	DevVarUShortArray;
 bool_t  _DLLFunc xdr_DevVarUShortArray
@@ -327,8 +341,8 @@ long    _DLLFunc xdr_length_DevVarUShortArray
 
 
 struct DevVarShortArray {
-	u_int length;
-	short *sequence;
+	DevULong length;
+	DevShort *sequence;
 };
 typedef struct DevVarShortArray 	DevVarShortArray;
 bool_t	_DLLFunc xdr_DevVarShortArray
@@ -349,8 +363,8 @@ long   	_DLLFunc xdr_length_DevVarShortArray
  */
 
 struct DevVarULongArray {
-	u_int length;
-	unsigned long *sequence;
+	DevULong length;
+	DevULong *sequence;
 };
 typedef struct DevVarULongArray		DevVarULongArray;
 bool_t	_DLLFunc xdr_DevVarULongArray
@@ -368,8 +382,8 @@ long	_DLLFunc xdr_length_DevVarULongArray
 
 
 struct DevVarLongArray {
-	u_int length;
-	long  *sequence;
+	DevULong length;
+	DevLong  *sequence;
 };
 typedef struct DevVarLongArray 		DevVarLongArray;
 bool_t 	_DLLFunc xdr_DevVarLongArray
@@ -387,8 +401,8 @@ long   	_DLLFunc xdr_length_DevVarLongArray
 
 
 struct DevVarFloatArray {
-	u_int length;
-	float *sequence;
+	DevULong length;
+	DevFloat *sequence;
 };
 typedef struct DevVarFloatArray 	DevVarFloatArray;
 bool_t 	_DLLFunc xdr_DevVarFloatArray
@@ -406,8 +420,8 @@ long   	_DLLFunc xdr_length_DevVarFloatArray
 
 
 struct DevVarDoubleArray {
-	u_int length;
-	double *sequence;
+	DevULong  length;
+	DevDouble *sequence;
 };
 typedef struct DevVarDoubleArray 	DevVarDoubleArray;
 bool_t 	_DLLFunc xdr_DevVarDoubleArray
@@ -425,7 +439,7 @@ long   	_DLLFunc xdr_length_DevVarDoubleArray
 
 
 struct DevVarFloatReadPointArray {
-	u_int 		  length;
+	DevULong	  length;
 	DevFloatReadPoint *sequence;
 };
 typedef struct DevVarFloatReadPointArray DevVarFloatReadPointArray;
@@ -444,8 +458,8 @@ long   	_DLLFunc xdr_length_DevVarFloatReadPointArray
 
 
 struct DevVarStateFloatReadPointArray {
-	u_int 		        length;
-	DevStateFloatReadPoint *sequence;
+	DevULong        	length;
+	DevStateFloatReadPoint 	*sequence;
 };
 typedef struct DevVarStateFloatReadPointArray DevVarStateFloatReadPointArray;
 bool_t 	_DLLFunc xdr_DevVarStateFloatReadPointArray
@@ -464,7 +478,7 @@ long   	_DLLFunc xdr_length_DevVarStateFloatReadPointArray
 
 
 struct DevVarLongReadPointArray {
-	u_int 		  length;
+	DevULong 	  length;
 	DevLongReadPoint  *sequence;
 };
 typedef struct DevVarLongReadPointArray DevVarLongReadPointArray;
@@ -487,8 +501,8 @@ long   	_DLLFunc xdr_length_DevVarLongReadPointArray
  */
 
 struct DevOpaque {
-	u_int	length;
-	char    *sequence;
+	DevULong	length;
+	DevChar    	*sequence;
 };
 typedef struct DevOpaque 		DevOpaque;
 bool_t 					_DLLFunc xdr_DevOpaque

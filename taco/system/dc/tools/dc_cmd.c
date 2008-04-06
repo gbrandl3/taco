@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.3 $
+ * Version      : $Revision: 1.4 $
  *
- * Date         : $Date: 2006-09-18 21:50:15 $
+ * Date         : $Date: 2008-04-06 09:07:50 $
  *
  */
 
@@ -64,7 +64,7 @@ char *GetCmdName(long cmd)
   unsigned short  team;
   unsigned short  server;
   unsigned short  cmds_ident;
-  long error;
+  DevLong error;
 
  /*
   * Decode the command nuber into the fields:
@@ -186,8 +186,8 @@ int main(int argc,char *argv[])
 
   dc_dev_imp dc_imp;
   dc_devinf  dc_inf;
-  long error=0;
-  long dc_error=0;
+  DevLong error=0;
+  DevLong dc_error=0;
   int ret;
   int i,j;
   char c[BUFSIZ];

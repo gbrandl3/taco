@@ -28,7 +28,7 @@
 
 #include <TACOStringConverters.h>
 
-void* TACO::allocateDevArgument( DevType type) throw (TACO::Exception)
+DevArgument TACO::allocateDevArgument( DevArgType type) throw (TACO::Exception)
 {
 	void* r = 0;
 	if (type != D_VOID_TYPE) {
@@ -45,13 +45,13 @@ void* TACO::allocateDevArgument( DevType type) throw (TACO::Exception)
 	return r;
 }
 
-void TACO::freeDevArgument( void* arg) throw ()
+void TACO::freeDevArgument( DevArgument arg) throw ()
 {
 	free( arg);
 	arg = 0;
 }
 
-void TACO::freeDevArgument( DevType type, void* arg) throw (TACO::Exception)
+void TACO::freeDevArgument( DevArgType type, DevArgument arg) throw (TACO::Exception)
 {
 	switch (type) {
 	case D_BOOLEAN_TYPE:
@@ -115,7 +115,7 @@ void TACO::copy( const std::string& src, DevVarCharArray* dest) throw (TACO::Exc
 	}
 }
 
-std::string TACO::convertToString( DevType type, const void* input) throw (TACO::Exception)
+std::string TACO::convertToString( DevArgType type, const DevArgument input) throw (TACO::Exception)
 {
 	std::stringstream r;
 	switch (type) {
@@ -174,9 +174,9 @@ std::string TACO::convertToString( DevType type, const void* input) throw (TACO:
 	return r.str();
 }
 
-void* TACO::convertToDevArgument( DevType type, const std::string& input) throw (TACO::Exception)
+DevArgument TACO::convertToDevArgument( DevArgType type, const std::string& input) throw (TACO::Exception)
 {
-	void* r = allocateDevArgument( type);
+	DevArgument r = allocateDevArgument( type);
 	std::stringstream s( input);
 	switch (type) {
 	case D_BOOLEAN_TYPE: {

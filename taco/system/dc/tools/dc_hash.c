@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.5 $
+ * Version      : $Revision: 1.6 $
  *
- * Date         : $Date: 2006-09-18 21:50:15 $
+ * Date         : $Date: 2008-04-06 09:07:51 $
  *
  */
 
@@ -72,7 +72,7 @@ void usage(const char *cmd)
 ****************************************************************************/
 int main(int argc, char **argv)
 {
-	long 		error;
+	DevLong		error;
 	static int 	dev_num;
 	char 		hostna[HOST_NAME_LENGTH],
 			dev_name[DEV_NAME_LENGTH],
@@ -146,5 +146,5 @@ int main(int argc, char **argv)
 	ind = hash(devname,dev_num);
 	printf("Hashing function result : %d\n",ind);
 	printf("Offset (hexa) in the ptrs area to device record : %x\n",ind * sizeof(dc_dev_param));
-	return;
+	return 0;
 }

@@ -20,6 +20,9 @@
 
 #include <log4cpp/Category.hh>
 
+#include <log4cpp/AppendersFactory.hh>
+#include <log4cpp/LayoutsFactory.hh>
+
 // appenders
 #include <log4cpp/Appender.hh>
 #include <log4cpp/OstreamAppender.hh>
@@ -119,8 +122,7 @@ namespace log4cpp {
                 if (i2 == iEnd) {
                     // a new appender
                     currentAppender = appenderName;
-                    _allAppenders[currentAppender] = 
-                        instantiateAppender(currentAppender);
+                    _allAppenders[currentAppender] = instantiateAppender(currentAppender);
                 } else {
                     throw ConfigureFailure(std::string("partial appender definition : ") + key);
                 }
@@ -184,8 +186,8 @@ namespace log4cpp {
         }
     }
 
-    Appender* PropertyConfiguratorImpl::instantiateAppender(const std::string& appenderName) {
-        Appender* appender = NULL;
+    Appender *PropertyConfiguratorImpl::instantiateAppender(const std::string& appenderName) {
+        std::auto_ptr<Appender> appender;
         std::string appenderPrefix = std::string("appender.") + appenderName;
 
         // determine the type by the appenderName 
@@ -196,69 +198,25 @@ namespace log4cpp {
         std::string::size_type length = (*key).second.find_last_of(".");
         std::string appenderType = (length == std::string::npos) ?
             (*key).second : (*key).second.substr(length+1);
-
-        // and instantiate the appropriate object
-        if (appenderType == "ConsoleAppender") {
-            appender = new OstreamAppender(appenderName, &std::cout);
-        }
-        else if (appenderType == "FileAppender") {
-            std::string fileName = _properties.getString(appenderPrefix + ".fileName", "foobar");
-            bool append = _properties.getBool(appenderPrefix + ".append", true);
-            appender = new FileAppender(appenderName, fileName, append);
-        }
-        else if (appenderType == "RollingFileAppender") {
-            std::string fileName = _properties.getString(appenderPrefix + ".fileName", "foobar");
-            size_t maxFileSize = _properties.getInt(appenderPrefix + ".maxFileSize", 10*1024*1024);
-            int maxBackupIndex = _properties.getInt(appenderPrefix + ".maxBackupIndex", 1);
-            bool append = _properties.getBool(appenderPrefix + ".append", true);
-            appender = new RollingFileAppender(appenderName, fileName, maxFileSize, maxBackupIndex,
-                append);
-        }
-        else if (appenderType == "SyslogAppender") {
-            std::string syslogName = _properties.getString(appenderPrefix + ".syslogName", "syslog");
-            std::string syslogHost = _properties.getString(appenderPrefix + ".syslogHost", "localhost");
-            int facility = _properties.getInt(appenderPrefix + ".facility", -1) * 8; // * 8 to get LOG_KERN, etc. compatible values. 
-            int portNumber = _properties.getInt(appenderPrefix + ".portNumber", -1);
-            appender = new RemoteSyslogAppender(appenderName, syslogName, 
-                                                syslogHost, facility, portNumber);
-        }
-#ifdef LOG4CPP_HAVE_SYSLOG
-        else if (appenderType == "LocalSyslogAppender") {
-            std::string syslogName = _properties.getString(appenderPrefix + ".syslogName", "syslog");
-            int facility = _properties.getInt(appenderPrefix + ".facility", -1) * 8; // * 8 to get LOG_KERN, etc. compatible values. 
-            appender = new SyslogAppender(appenderName, syslogName, facility);
-        }
-#endif // LOG4CPP_HAVE_SYSLOG
-        else if (appenderType == "AbortAppender") {
-            appender = new AbortAppender(appenderName);
-        }
-#ifdef LOG4CPP_HAVE_LIBIDSA
-        else if (appenderType == "IdsaAppender") {
-            // default idsa name ???
-            std::string idsaName = _properties.getString(appenderPrefix + ".idsaName", "foobar");
-
-            appender = new IdsaAppender(appenderName, idsaname);
-        }
-#endif	// LOG4CPP_HAVE_LIBIDSA
-
-#ifdef WIN32
-        // win32 debug appender
-        else if (appenderType == "Win32DebugAppender") {
-            appender = new Win32DebugAppender(appenderName);
-        }
-        // win32 NT event log appender
-        else if (appenderType == "NTEventLogAppender") {
-            std::string source = _properties.getString(appenderPrefix + ".source", "foobar");
-            appender = new NTEventLogAppender(appenderName, source);
-        }
-#endif	// WIN32
-        else {
+	
+	log4cpp::AppendersFactory &af = log4cpp::AppendersFactory::getInstance();
+        if (!af.registered(appenderType))
             throw ConfigureFailure(std::string("Appender '") + appenderName + 
                                    "' has unknown type '" + appenderType + "'");
+	FactoryParams params;
+	for (Properties::const_iterator it = _properties.begin(); it != _properties.end(); ++it) {
+            std::string::size_type pos = it->first.find(appenderPrefix + ".");
+            if (!pos) {
+		pos = (appenderPrefix + ".").length();
+		params.storage_[it->first.substr(pos)] = it->second;
+            }
         }
+        params.storage_["name"] = appenderName;
+
+        appender = af.create(appenderType, params);
 
         if (appender->requiresLayout()) {
-            setLayout(appender, appenderName);
+            setLayout(appender.get(), appenderName);
         }
 
         // set threshold
@@ -272,7 +230,7 @@ namespace log4cpp {
                 " for threshold of appender '" + appenderName + "'");
         }
 
-        return appender;
+        return appender.release();
     }
 
     void PropertyConfiguratorImpl::setLayout(Appender* appender, const std::string& appenderName) {
@@ -289,34 +247,24 @@ namespace log4cpp {
         std::string layoutType = (length == std::string::npos) ? 
             (*key).second : (*key).second.substr(length+1);
  
-        Layout* layout;
-        // and instantiate the appropriate object
-        if (layoutType == "BasicLayout") {
-            layout = new BasicLayout();
-        }
-        else if (layoutType == "SimpleLayout") {
-            layout = new SimpleLayout();
-        }
-        else if (layoutType == "PatternLayout") {
-            // need to read the properties to configure this one
-            PatternLayout* patternLayout = new PatternLayout();
-
-            key = _properties.find(std::string("appender.") + appenderName + ".layout.ConversionPattern");
-            if (key == _properties.end()) {
-                // leave default pattern
-            } else {
-                // set pattern
-                patternLayout->setConversionPattern((*key).second);
-            }
-
-            layout = patternLayout;
-        }
-        else {
+	log4cpp::LayoutsFactory &lf = log4cpp::LayoutsFactory::getInstance();
+	if (!lf.registered(layoutType))
             throw ConfigureFailure(std::string("Unknown layout type '" + layoutType +
                                                "' for appender '") + appenderName + "'");
+	
+        std::string layoutPrefix = std::string("appender.") + appenderName + ".layout";
+	FactoryParams params;
+	for (Properties::const_iterator it = _properties.begin(); it != _properties.end(); ++it) {
+            std::string::size_type pos = it->first.find(layoutPrefix + ".");
+            if (!pos) {
+		pos = (layoutPrefix + ".").length();
+		params.storage_[it->first.substr(pos)] = it->second;
+            }
         }
+        params.storage_["name"] = layoutType;
+        std::auto_ptr<Layout> layout = lf.create(layoutType, params);    
 
-        appender->setLayout(layout);
+        appender->setLayout(layout.release());
     }
 
     /**

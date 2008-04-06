@@ -2,7 +2,7 @@ lib_LTLIBRARIES = liblog4cpp.la
 
 INCLUDES = -I$(top_srcdir)/include
 
-noinst_HEADERS = snprintf.c
+noinst_HEADERS = snprintf.c Localtime.hh
 
 liblog4cpp_la_SOURCES = \
 	Appender.cpp \
@@ -12,6 +12,7 @@ liblog4cpp_la_SOURCES = \
 	FactoryParams.cpp \
 	LayoutsFactory.cpp \
 	LevelEvaluator.cpp \
+	Localtime.cpp	\
 	PassThroughLayout.cpp \
 	TriggeringEventEvaluatorFactory.cpp \
 	LayoutAppender.cpp \
@@ -53,6 +54,7 @@ liblog4cpp_la_SOURCES = \
 	PThreads.cpp \
 	PortabilityImpl.hh \
 	PortabilityImpl.cpp \
-	AbortAppender.cpp
+	AbortAppender.cpp \
+	SmtpAppender.cpp
 
 liblog4cpp_la_LDFLAGS = -version-info @LT_VERSION@

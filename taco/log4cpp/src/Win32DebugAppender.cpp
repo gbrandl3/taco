@@ -43,7 +43,7 @@ namespace log4cpp {
     std::auto_ptr<Appender> create_win32_debug_appender(const FactoryParams& params)
     {
        std::string name;
-       params.get_for("win32 debug appender").required("name", name);
+       params.get_for("Win32DebugAppender").required("name", name);
        
        return std::auto_ptr<Appender>(new Win32DebugAppender(name));
     }

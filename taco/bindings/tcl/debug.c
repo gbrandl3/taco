@@ -35,9 +35,9 @@
  *
  * Original:    June, 1996
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-18 22:04:49 $
+ * Date:        $Date: 2008-04-06 09:06:33 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -56,7 +56,7 @@
 /*            level                                                */
 /* --------------------------------------------------------------- */
 /* =============================================================== */
-int dev_io_debug (ClientData clientdata, Tcl_Interp *interp, int argc, char *argv)
+int dev_io_debug (ClientData clientdata, Tcl_Interp *interp, int argc, char **argv)
 /*SUPPRESS761*/
 {
 	char 	*LevelString;
@@ -85,7 +85,7 @@ int dev_io_debug (ClientData clientdata, Tcl_Interp *interp, int argc, char *arg
 	ReturnedCode = SetDebugMode(Value);
 	if (ReturnedCode==False)
 	{
-		printf("Error in SetDebugMode(Value)...bad Value %d\n",Value);
+		printf("Error in SetDebugMode(Value)...bad Value %ld\n",Value);
 		return TCL_ERROR;
 	}
     

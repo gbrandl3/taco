@@ -1,0 +1,83 @@
+% Copyright (C) 2007 Jens Krüger <jens.krueger@frm2.tum.de>
+%
+% Permission to use, copy, modify, and distribute this software and its
+% documentation under the terms of the GNU General Public License is hereby 
+% granted. No representations are made about the suitability of this software 
+% for any purpose. It is provided "as is" without express or implied warranty.
+% See the GNU General Public License for more details.
+%
+\documentclass[a4paper,twoside]{article}
+\usepackage{a4wide}
+\usepackage{makeidx}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{epsf}
+\usepackage{taco}
+\usepackage{multicol}
+\usepackage{times}
+\usepackage{alltt}
+\usepackage[pdftex,
+            pagebackref=true,
+            colorlinks=true,
+            linkcolor=blue
+           ]{hyperref}
+\makeindex
+\setcounter{tocdepth}{1}
+\renewcommand{\footrulewidth}{0.4pt}
+\begin{document}
+\begin{titlepage}
+\includegraphics[width=\textwidth]{taco_logo}
+\begin{center}
+TACO\\[2ex]
+Manual for version @VERSION@\\[2ex]
+Written by the TACO developers\\[2ex]
+\copyright 1990-2007
+\end{center}
+\end{titlepage}
+\clearemptydoublepage
+\tableofcontents
+\clearemptydoublepage
+\pagenumbering{arabic}
+\include{latex/index}
+\part{User Manual}
+\input{latex/whatis}
+\newpage
+\include{latex/lite}
+\newpage
+\include{latex/install}
+\newpage
+\include{latex/started}
+\newpage
+\include{latex/ds_model}
+\newpage
+\include{latex/c}
+\newpage
+\include{latex/cplusplus}
+\newpage
+\include{latex/basicsteps}
+\newpage
+\include{latex/accesscontrol}
+\newpage
+\include{latex/private_types}
+\newpage
+\include{latex/testtool}
+\newpage
+\include{latex/python_and_taco}
+\newpage
+\include{latex/labview}
+\newpage
+\include{latex/dsapi}
+\newpage
+\include{latex/database_guide}
+\newpage
+\include{latex/events}
+\newpage
+\include{latex/signal}
+\newpage
+\part{Reference Manual}
+%\input{latex/refman}
+\newpage
+\part{Information for developers}
+\printindex
+\end{document}

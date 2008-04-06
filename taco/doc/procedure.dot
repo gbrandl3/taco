@@ -1,0 +1,19 @@
+digraph procedure {
+	{
+		rank=same;
+		specification [shape=box,label="SPECIFICATION"];
+		devserver [shape=box,label="DEVICE SERVER"];
+	}
+
+	understand [shape=circle,label="understand\ndevice"];
+	devdefinition [shape=circle,label="define device"];
+	cmddefinition [shape=circle,label="define\ncommands"];
+	design [shape=circle,label="design class"];
+	writedoc [shape=circle,label="write doc"];
+	code [shape=circle,label="code"];
+	debug [shape=circle,label="debug"];
+
+	specification -> understand -> devdefinition -> cmddefinition -> design -> writedoc -> code -> debug -> devserver;
+	devserver -> specification;
+	
+}

@@ -51,7 +51,7 @@ dnl   library (that has some headers) where some functionality is
 dnl   dependent on the OS-features detected at compile-time. No
 dnl   need to invent some "testpkg-confdefs.h.in" manually. :-)
 dnl
-dnl @version $Id: AC_CREATE_PREFIX_CONFIG_H.m4,v 1.1 2006-11-12 16:37:27 jkrueger1 Exp $
+dnl @version $Id: AC_CREATE_PREFIX_CONFIG_H.m4,v 1.2 2008-04-06 09:07:28 jkrueger1 Exp $
 dnl @author Guido Draheim <guidod@gmx.de>
 
 AC_DEFUN([AC_CREATE_PREFIX_CONFIG_H],

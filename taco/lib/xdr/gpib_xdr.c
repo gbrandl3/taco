@@ -29,9 +29,9 @@
  *
  * Original:    January 1992
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:21 $
  *
  *******************************************************************-*/
 
@@ -163,7 +163,7 @@ xdr_DevGpibRes(xdrs,objp)
         if (!xdr_char(xdrs, &objp->res1)) {
                 return (FALSE);
         }
-        if (!xdr_long(xdrs, &objp->frameCnt)) {
+        if (!xdr_DevLong(xdrs, &objp->frameCnt)) {
                 return (FALSE);
         }
         return (TRUE);

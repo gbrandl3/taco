@@ -62,7 +62,7 @@ typedef u_long in_addr_t;
 
 /* Version number of package */
 #ifndef LOG4CPP_VERSION
-#define LOG4CPP_VERSION  "0.3.5"
+#define LOG4CPP_VERSION  "1.0"
 #endif
 
 /* define if the compiler implements namespaces */
@@ -75,9 +75,23 @@ typedef u_long in_addr_t;
 #define LOG4CPP_HAVE_SSTREAM 1
 #endif
 
+#if defined(_MSC_VER)
+#    if _MSC_VER < 1300
+#       define LOG4CPP_HAS_WCHAR_T 0
+#    else
+#       define LOG4CPP_HAS_WCHAR_T 1
+#    endif
+#else
+#   define LOG4CPP_HAS_WCHAR_T 1
+#endif
+
 /* define if the C library has snprintf */
 #ifndef LOG4CPP_HAVE_SNPRINTF
 #define LOG4CPP_HAVE_SNPRINTF 1
+#endif
+
+#if defined(_MSC_VER) && _MSC_VER >= 1300
+#define LOG4CPP_HAVE_LOCALTIME_R 1
 #endif
 
 /* define to get around problems with ERROR in windows.h */
@@ -132,7 +146,9 @@ typedef u_long in_addr_t;
 #endif
 
 /* define mode_t. Move to Portability.hh if more platforms need it */
+#if !defined(__BORLANDC__)
 typedef int mode_t;
+#endif
 
 #if defined(_MSC_VER) && _MSC_VER == 1310
 // warning C4275: interface non dll class 'std::runtime_error' utilisée comme base 

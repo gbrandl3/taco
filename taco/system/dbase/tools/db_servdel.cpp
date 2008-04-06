@@ -27,12 +27,13 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.6 $
+ * Version:     $Revision: 1.7 $
  *
- * Date:        $Date: 2006-09-06 18:34:15 $
+ * Date:        $Date: 2008-04-06 09:07:47 $
  */
-
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 /* TACO include file */
 #include <API.h>
 
@@ -43,24 +44,30 @@
 #include <string>
 #include <algorithm>
 #ifdef _solaris
-#include "_count.h"
+#	include "_count.h"
+#include <taco_utils.h>
 #endif /* _solaris */
-
-using namespace std;
 
 void usage(const char *cmd)
 {
-	cerr << "usage : " << cmd << " [options] <full device server name>" << endl;
-	cerr << "  Delete a server, all its devices and optional their resources" << std::endl;
-	cerr << "        options : -r all resources of the devices deleted" << std::endl;
-	cerr << "                  -h display this message" << std::endl;
-	cerr << "                  -n nethost" << std::endl;
+	std::cerr << "usage : " << cmd << " [options] <full device server name>" << std::endl;
+	std::cerr << "  Delete a server, all its devices and optional their resources" << std::endl;
+	std::cerr << "        options : -r all resources of the devices deleted" << std::endl;
+	std::cerr << "                  -h display this message" << std::endl;
+	std::cerr << "                  -n nethost" << std::endl;
+	std::cerr << "                  -v display the current version" << std::endl;
 	exit(-1);
+}
+
+void version(const char *cmd)
+{
+	std::cerr << cmd << " version " << VERSION << std::endl;
+	exit(0);
 }
 
 int main(int argc,char *argv[])
 {
-	long error;
+	DevLong error;
 	long del_res = True;
 	long opt = False;
 	extern int optind;
@@ -69,19 +76,17 @@ int main(int argc,char *argv[])
 //
 // Argument test and device name structure
 //
-	while ((c = getopt(argc,argv,"hn:r")) != -1)
+	while ((c = getopt(argc,argv,"hrvn:")) != -1)
 		switch (c)
 		{
 			case 'n':
-				{
-					char s[160];
-					snprintf(s, sizeof(s), "NETHOST=%s", optarg);
-					putenv(s);
-				}
-			break;
+				setenv("NETHOST", optarg, 1);
+				break;
 			case 'r':
 				del_res = False;
 				break;
+			case 'v':
+				version(argv[0]);
 			case 'h':
 			case '?':
 				usage(argv[0]);
@@ -90,10 +95,10 @@ int main(int argc,char *argv[])
 	if (optind != argc - 1)
 		usage(argv[0]);
 
-	string full_ds_name(argv[optind]);
+	std::string full_ds_name(argv[optind]);
 
 #ifdef DEBUG
-	cout  << "Full device server name : " << full_ds_name << endl;
+	std::cout  << "Full device server name : " << full_ds_name << std::endl;
 #endif 
 #ifndef _solaris
         if (std::count(full_ds_name.begin(), full_ds_name.end(), '/') != 1)
@@ -101,26 +106,26 @@ int main(int argc,char *argv[])
 	if (_sol::count(full_ds_name.begin(), full_ds_name.end(), '/') != 1)
 #endif /* _solaris */
 	{
-		cerr << "db_servdel : Bad full device server name" << endl;
+		std::cerr << "db_servdel : Bad full device server name" << std::endl;
 		exit(-1);
 	}
 //
 // Extract device server and personal name from full device server name
 //
-	string::size_type pos,start;
+	std::string::size_type pos,start;
 
-	if ((pos = full_ds_name.find('/')) == string::npos)
+	if ((pos = full_ds_name.find('/')) == std::string::npos)
 	{
-		cout << "db_servdel : Can't split full device server" << endl;
+		std::cout << "db_servdel : Can't split full device server" << std::endl;
 		exit(-1);
 	}
 	
-	string ds_name(full_ds_name,0,pos);
-	string pers_name(full_ds_name.substr(pos + 1 ));
+	std::string ds_name(full_ds_name,0,pos);
+	std::string pers_name(full_ds_name.substr(pos + 1 ));
 	
 #ifdef DEBUG
-	cout << "DS name : " << ds_name << endl;
-	cout << "Pers. name : " << pers_name << endl;
+	std::cout << "DS name : " << ds_name << std::endl;
+	std::cout << "Pers. name : " << pers_name << std::endl;
 #endif /* DEBUG */
 
 //
@@ -129,7 +134,7 @@ int main(int argc,char *argv[])
 
 	if (db_import(&error) == -1)
 	{
-		cerr << "db_servdel : Impossible to connect to database server" << endl;
+		std::cerr << "db_servdel : Impossible to connect to database server" << std::endl;
 		exit(-1);
 	}
 
@@ -140,11 +145,11 @@ int main(int argc,char *argv[])
 	if (db_servdelete(ds_name.c_str(), pers_name.c_str(), del_res, &error) == -1)
 	{
 		if (error == DbErr_DeviceServerNotDefined)
-			cerr << "Server " << full_ds_name << " does not have any device in database" << endl;
+			std::cerr << "Server " << full_ds_name << " does not have any device in database" << std::endl;
 		else
 		{
-			cerr << "The call to database server failed with error " << error << endl;
-			cerr << "Error message : " << dev_error_str(error) << endl;
+			std::cerr << "The call to database server failed with error " << error << std::endl;
+			std::cerr << "Error message : " << dev_error_str(error) << std::endl;
 		}
 		exit(-1);
 	}

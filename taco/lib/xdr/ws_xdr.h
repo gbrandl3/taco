@@ -30,9 +30,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:24 $
  *
  *******************************************************************-*/
 
@@ -47,7 +47,7 @@ struct DevWsBeamFitParm {
 	DevVarFloatArray pos_array;
 	DevVarFloatArray meas_array;
 	DevVarFloatArray perc_array;
-	short mode;
+	DevShort         mode;
 };
 typedef struct DevWsBeamFitParm DevWsBeamFitParm;
 bool_t 	_DLLFunc xdr_DevWsBeamFitParm 

@@ -30,9 +30,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  *
  *******************************************************************-*/
 
@@ -44,8 +44,8 @@
  */
 
 struct DevVgcStat {
-	char status[8];
-	char error[8];
+	DevChar status[8];
+	DevChar error[8];
 };
 typedef struct DevVgcStat 	DevVgcStat;
 #ifdef __cplusplus
@@ -64,14 +64,14 @@ long   	_DLLFunc xdr_length_DevVgcStat PT_((DevVgcStat *objp));
                                                 A )
 
 struct DevVgcGauge {
-	char status[8];
-	char error[8];
-	char relay_status[16];
-	char type;
-	char number;
-	char gauge_status[8];
-	char gauge_error[8];
-	double pressure;
+	DevChar   status[8];
+	DevChar   error[8];
+	DevChar   relay_status[16];
+	DevChar   type;
+	DevChar   number;
+	DevChar   gauge_status[8];
+	DevChar   gauge_error[8];
+	DevDouble pressure;
 };
 typedef struct DevVgcGauge 	DevVgcGauge;
 #ifdef __cplusplus
@@ -91,13 +91,13 @@ long   	_DLLFunc xdr_length_DevVgcGauge PT_((DevVgcGauge *objp));
 
 
 struct DevVgcPiraniGauge {
-	char type;
-	char number;
-	char calibration;
-	double gas_factor;
-	char status[8];
-	char error[8];
-	double pressure;
+	DevChar   type;
+	DevChar   number;
+	DevChar   calibration;
+	DevDouble gas_factor;
+	DevChar   status[8];
+	DevChar   error[8];
+	DevDouble pressure;
 };
 typedef struct DevVgcPiraniGauge DevVgcPiraniGauge;
 #ifdef __cplusplus
@@ -113,15 +113,15 @@ long   	_DLLFunc xdr_length_DevVgcPiraniGauge
 
 
 struct DevVgcPenningGauge {
-	char type;
-	char number;
-	char filter;
-	int start_time;
-	char calibration;
-	double min_current;
-	char status[8];
-	char error[8];
-	double pressure;
+	DevChar   type;
+	DevChar   number;
+	DevChar   filter;
+	DevLong   start_time;
+	DevChar   calibration;
+	DevDouble min_current;
+	DevChar   status[8];
+	DevChar   error[8];
+	DevDouble pressure;
 };
 typedef struct DevVgcPenningGauge DevVgcPenningGauge;
 #ifdef __cplusplus
@@ -137,10 +137,10 @@ long   	_DLLFunc xdr_length_DevVgcPenningGauge
 
 
 struct DevVgcRelay {
-	char letter;
-	char status;
-	double setpoint;
-	char ass_gauge;
+	DevChar   letter;
+	DevChar   status;
+	DevDouble setpoint;
+	DevChar   ass_gauge;
 };
 typedef struct DevVgcRelay 	DevVgcRelay;
 #ifdef __cplusplus
@@ -154,10 +154,10 @@ long   	_DLLFunc xdr_length_DevVgcRelay PT_((DevVgcRelay *objp));
 
 
 struct DevVgcSystem {
-	char interlock;
-	char relay_conf;
-	char cold_cathode;
-	char ROM_version[4];
+	DevChar   interlock;
+	DevChar   relay_conf;
+	DevChar   cold_cathode;
+	DevChar   ROM_version[4];
 };
 typedef struct DevVgcSystem 	DevVgcSystem;
 #ifdef __cplusplus
@@ -171,16 +171,16 @@ long   	_DLLFunc xdr_length_DevVgcSystem PT_((DevVgcSystem *objp));
 
 
 struct DevVgcController {
-	DevVgcPiraniGauge pirani[2];
+	DevVgcPiraniGauge  pirani[2];
 	DevVgcPenningGauge penning[4];
-	DevVgcRelay relay[12];
-	int nb_pir;
-	int nb_pen;
-	int nb_relay;
-	DevVgcSystem syst;
-	char status[8];
-	char error[8];
-	char relay_status[16];
+	DevVgcRelay        relay[12];
+	DevLong            nb_pir;
+	DevLong            nb_pen;
+	DevLong            nb_relay;
+	DevVgcSystem       syst;
+	DevChar            status[8];
+	DevChar            error[8];
+	DevChar            relay_status[16];
 };
 typedef struct DevVgcController DevVgcController;
 #ifdef __cplusplus

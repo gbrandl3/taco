@@ -16,41 +16,29 @@ dnl You should have received a copy of the GNU Lesser General Public
 dnl License along with this library; if not, write to the Free Software
 dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_INIT([TACO], [3.98.1], [taco-devel@lists.sourceforge.net])
+AC_INIT([TACO], [3.99.29], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.99 $)dnl
-AC_COPYRIGHT([(C) 1990-2006 ESRF])
+AC_REVISION($Revision: 1.100 $)dnl
+AC_COPYRIGHT([(C) 1990-2008 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
 
-TACO_INIT
+AC_CONFIG_MACRO_DIR(m4)
 
-AC_SUBST(LIB_VERSION, [11:13:0])
+TACO_CHECK_SYSTEM
 
-AM_INIT_AUTOMAKE([dist-bzip2 1.7])
+AC_SUBST(LIB_VERSION, [13:0:0])
 
-# Checks for programs.
-AC_PROG_CXX
-AC_PROG_CC
-AC_PROG_CPP
-AC_PROG_INSTALL
-AC_PROG_LN_S
-AC_PROG_MAKE_SET
-AC_PROG_RANLIB
-AC_PROG_AWK
-AC_PROG_YACC
-AC_PROG_LEX 
-AC_PROG_RM
+TACO_CHECK_SIZEOF_TYPES
 
-AC_CHECK_SIZEOF(char)
-AC_CHECK_SIZEOF(short)
-AC_CHECK_SIZEOF(unsigned short)
-AC_CHECK_SIZEOF(int)
-AC_CHECK_SIZEOF(unsigned int)
-AC_CHECK_SIZEOF(long)
-AC_CHECK_SIZEOF(unsigned long)
-AC_CHECK_SIZEOF(float)
-AC_CHECK_SIZEOF(double)
+dnl AC_CHECK_TYPES([int8_t], AC_CHECK_SIZEOF(int8_t))
+dnl AC_CHECK_TYPES([uint8_t], AC_CHECK_SIZEOF(uint8_t))
+dnl AC_CHECK_TYPES([int16_t], AC_CHECK_SIZEOF(int16_t))
+dnl AC_CHECK_TYPES([uint16_t], AC_CHECK_SIZEOF(uint16_t))
+dnl AC_CHECK_TYPES([int32_t], AC_CHECK_SIZEOF(int32_t))
+dnl AC_CHECK_TYPES([uint32_t], AC_CHECK_SIZEOF(uint32_t))
+dnl AC_CHECK_TYPES([int64_t], AC_CHECK_SIZEOF(int64_t))
+dnl AC_CHECK_TYPES([uint64_t], AC_CHECK_SIZEOF(uint64_t))
 
 dnl wanted by: classes/binem/code/rebin.c:124
 dnl AC_CHECK_FUNCS([floor sqrt]) 
@@ -59,263 +47,10 @@ dnl AC_CHECK_HEADERS([limits.h syslog.h utime.h])
 dnl AC_HEADER_DIRENT 
 dnl AC_HEADER_MAJOR 
 
-AC_CHECK_PROGS(HOSTNAME, hostname)
-if test "$HOSTNAME" ; then
-	hostname=`hostname`;
-fi
-if test "$hostname" ; then
-	HOSTNAME='hostname'
-else 
-	hostname=`hostname`
-	if test -z "$hostname" ; then
-		HOSTNAME='uname -n'
-	fi
-fi
-AC_SUBST([HOSTNAME])
-
-GCC_LIB_PATH="" 
-if test x"$CC" = x"gcc" ; then
-	AC_MSG_CHECKING([for the path to the gcc library])
-	for i in `gcc -print-libgcc-file-name | tr '/' ' '` ; do 
-		if test x"$i" = x"gcc-lib" ; then 
-			break ; 
-		else 
-			GCC_LIB_PATH="${GCC_LIB_PATH}/${i}" 
-		fi  
-	done  
-	AC_MSG_RESULT([$GCC_LIB_PATH])
-fi
-AC_SUBST([GCC_LIBRARY_PATH], [$GCC_LIB_PATH])
-
-AC_ARG_ENABLE(longhostname, AC_HELP_STRING([--disable-longhostname], [disable the use of long hostnames [default=enabled]]),
-[
-	case ${enableval} in
-		no)
-			taco_use_longhostnames=no
-			;;
-		*)
-			taco_use_longhostnames=yes
-			;;
-       	esac
-],
-[
-	taco_use_longhostnames=yes
-])
-
-AC_ARG_ENABLE(debug, AC_HELP_STRING([--enable-debug=ARG], [enables debug symbols (yes|no|full) [default=no]]),
-[
-	case ${enableval} in
-		yes)
-			taco_debug_code="yes"
-			;;
-		full)
-			taco_debug_code="full"
-			;;
-		*)
-			taco_debug_code="no"
-			;;
-	esac
-],
-[
-	taco_debug_code=no
-])
-
-if test x"$CC" = x"gcc"; then
-       if test "$taco_debug_code" != "no"; then
-               if test $taco_debug_code = "full"; then
-                       CFLAGS=`echo $CFLAGS | sed -e"s/-O2//g"`
-                       CFLAGS="-g3 -fno-inline $CFLAGS"
-               else
-                       CFLAGS="-g -O2 $CFLAGS"
-               fi
-       else
-               CFLAGS="-O2 $CFLAGS"
-       fi
-fi
-if test -z "$LDFLAGS" && test "$taco_debug_code" = "no" && test x"$CC" = x"gcc"; then
-       LDFLAGS=""
-fi
-
-if test x"$CXX" = x"g++" || test x"$CXX" = x"KCC"; then
-       if test "$taco_debug_code" != "no"; then
-               if test x"$CXX" = x"KCC"; then
-                       CXXFLAGS="+K0 -Wall -pedantic -W -Wpointer-arith -Wwrite-strings $CXXFLAGS"
-               else
-                       if test "$taco_debug_code" = "full"; then
-                               CXXFLAGS=`echo $CXXFLAGS | sed -e"s/-O2//g"`
-                               CXXFLAGS="-g3 -fno-inline $CXXFLAGS"
-                       else
-                               CXXFLAGS="-g -O2 $CXXFLAGS"
-                       fi
-               fi
-       else
-               if test x"$CXX" = "xKCC"; then
-                       CXXFLAGS="+K3 $CXXFLAGS"
-               else
-                       CXXFLAGS="-O2 $CXXFLAGS"
-               fi
-       fi
-fi
-
-# Check for Solaris CC compiler (added by Andy)
-AC_MSG_CHECKING([for Solaris CC compiler])
-AM_CONDITIONAL(SOLARIS_CXX, [$CXX -V 2>&1 |grep Sun])
-AC_MSG_RESULT([$SOLARIS_CXX])
-AC_SUBST([SOLARIS_CXX], [$SOLARIS_CXX])
-if test x"$SOLARIS_CXX" != x ; then
-    AC_SUBST([LIB_STDCXX], [-lCstd])
-else
-    AC_SUBST([LIB_STDCXX], [-lstdc++])
-fi
-
-# Checks for header files.
-AC_HEADER_STDC
-AC_HEADER_SYS_WAIT
-AC_HEADER_TIME
-AC_HEADER_STAT
-AC_HEADER_STDBOOL
-
-AC_CHECK_HEADERS([arpa/inet.h netinet/in.h sys/socket.h sys/types.h sys/sem.h sys/shm.h]) 
-AC_CHECK_HEADERS([pthread.h fcntl.h malloc.h memory.h netdb.h stddef.h stdlib.h string.h strings.h sys/file.h sys/ioctl.h termios.h unistd.h sys/filio.h paths.h siggen.h])
-AC_CHECK_HEADERS([varargs.h stdarg.h])
-AC_CHECK_HEADERS([svc.h rpc/svc.h rpc/pmap_prot.h])
-AC_CHECK_HEADERS([signal.h sys/signal.h sys/param.h sys/resource.h sys/time.h])
-AC_CHECK_HEADERS([float.h]) 
-
-AC_TYPE_SIGNAL
-AC_CHECK_DECLS([signal], [], [],
-[
-#if HAVE_SIGNAL_H
-#	include <signal.h>
-#elif HAVE_SYS_SIGNAL_H
-#	include <sys/signal.h>
-#endif
-])
-AC_CHECK_FUNCS([signal], [], [], 
-[
-#if HAVE_SIGNAL_H
-#	include <signal.h>
-#elif HAVE_SYS_SIGNAL_H
-#	include <sys/signal.h>
-#endif
-])
-AC_CHECK_TYPES([sighandler_t, __sighandler_t], [], [],
-[
-#if HAVE_SIGNAL_H
-#	include <signal.h>
-#elif HAVE_SYS_SIGNAL_H
-#	include <sys/signal.h>
-#endif
-])
-
-AC_LANG_PUSH(C++)
-AC_CHECK_HEADERS([sstream strstream])
-AC_LANG_POP(C++)
-
-# Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
-AC_C_INLINE
-AC_TYPE_MODE_T
-AC_TYPE_OFF_T
-AC_TYPE_PID_T
-AC_TYPE_SIZE_T
-AC_TYPE_UID_T
-AC_TYPE_SIGNAL
-AC_STRUCT_TM
-AC_C_VOLATILE
-
-dnl AC_CHECK_TYPES(socklen_t, [],[],
-dnl [#if HAVE_SYS_SOCKET_H
-dnl #	if HAVE_SYS_TYPES_H
-dnl #		include <sys/types.h>
-dnl #	endif
-dnl #	include	<sys/socket.h>
-dnl #elif HAVE_SOCKET_H
-dnl #	include <socket.h>
-dnl #elif HAVE_NETDB_H
-dnl #	include <netdb.h>
-dnl #elif HAVE_ARPA_INET_H
-dnl #	include <arpa/inet.h>
-dnl #endif])
-
-AC_CHECK_TYPES(time_t)
-
-AC_MSG_CHECKING([for number of parameters in va_start])
-AH_TEMPLATE([HAVE_VA_START_P1], [define whether the va_start macro expect only one parameter])
-AH_TEMPLATE([HAVE_VA_START_P1_P2], [define whether the va_start macro expect two parameters])
-AC_COMPILE_IFELSE([
-	AC_LANG_PROGRAM([[
-#if HAVE_STDARG_H
-#	include <stdarg.h>
-#elif HAVE_VARARGS_H
-#	include <varargs.h>
-#endif
-
-void dev_printerror (int mode, char *fmt, ...)
-{
-        va_list         args;
-        va_start(args, fmt);
-}
-]],
-[[dev_printerror(0, "%s", "Hello World\n");]])], [
-AC_DEFINE(HAVE_VA_START_P1_P2)
-AC_MSG_RESULT([2])], [AC_DEFINE(HAVE_VA_START_P1)
-AC_MSG_RESULT([1])])
-	
-AC_MSG_CHECKING([for WAIT_ANY in waitpid])
-AH_TEMPLATE([HAVE_WAIT_ANY], [defines whether the WAIT_ANY macro is defined or not])
-AH_VERBATIM([_HAVE_WAIT_ANY],
-[#if !HAVE_WAIT_ANY
-#	define WAIT_ANY 	(-1)
-#endif])
-AC_COMPILE_IFELSE([
-	AC_LANG_PROGRAM([[
-#if HAVE_SYS_TYPES_H
-#	include <sys/types.h>
-#endif
-#if HAVE_SYS_WAIT_H
-#	include <sys/wait.h>
-#endif
-]],
-[[
-int	status;
-int 	pid = waitpid (WAIT_ANY, &status, WNOHANG);]])], [
-AC_MSG_RESULT([yes])
-AC_DEFINE(HAVE_WAIT_ANY)],
-[AC_MSG_RESULT([no])])
-
-
-AH_VERBATIM([_FIONREAD], [
-#if HAVE_SYS_IOCTL_H
-#	include <sys/ioctl.h>
-#endif
-#ifndef FIONREAD
-#	define	FIONREAD	TIOCISIZE
-#endif])
-
-# Checks for library functions.
-AC_FUNC_FORK
-AC_PROG_GCC_TRADITIONAL
-AC_FUNC_MALLOC
-AC_FUNC_MEMCMP
-AC_FUNC_REALLOC
-AC_FUNC_SELECT_ARGTYPES
-AC_FUNC_ALLOCA
-AC_FUNC_STRFTIME 
-AC_FUNC_STAT
-AC_FUNC_STRTOD
-AC_FUNC_VPRINTF
-
-AC_CHECK_FUNCS([alarm dup2 gethostbyname gethostname getpass gettimeofday isascii mblen memset putenv])
-AC_CHECK_FUNCS([select socket strcasecmp strchr strcspn strdup strerror strncasecmp strrchr strspn strstr])
-AC_CHECK_FUNCS([strtoul get_myaddress modf])
-AC_CHECK_FUNCS([waitpid wait4 getcwd strdup chown chmod lchmod mknod mkfifo]) 
-AC_CHECK_FUNCS([fchmod fstat ftruncate strchr readlink link utime utimes lutimes])
-AC_CHECK_FUNCS([strftime memmove lchown vsnprintf snprintf vasprintf asprintf])
-AC_CHECK_FUNCS([setsid glob strpbrk strlcat strlcpy strtol mallinfo getgroups])
-AC_CHECK_FUNCS([setgroups geteuid getegid setlocale setmode open64 lseek64 mkstemp64])
-AC_CHECK_FUNCS([mtrace va_copy __va_copy strerror putenv iconv_open locale_charset])
-AC_CHECK_FUNCS([nl_langinfo sigaction sigprocmask])
+TACO_CHECK_HOSTNAME
+TACO_CHECK_GCC_LIB_PATH
+TACO_ENABLE_LONGHOSTNAMES
+TACO_ENABLE_DEBUG
 
 AC_SEARCH_LIBS(dlopen, [dl])
 AC_SEARCH_LIBS(svc_run, [c nsl])
@@ -334,19 +69,7 @@ fi
 AC_SUBST(sbin_dir)
 AC_CONFIG_COMMANDS([pathes.h], [echo '#define sbindir "'${sbin_dir}'"' > pathes.h], [sbin_dir=$sbin_dir]) 
 
-TACO_CHECK_RPC
 TACO_CHECK_RPC_AND_THREADS
-AC_CHECK_DECLS([get_myaddress], [], [], [
-#if HAVE_RPC_RPC_H
-#       include <rpc/rpc.h>
-#elif HAVE_RPC_H
-#       include <rpc.h>
-#else
-#       error "Can't find rpc.h"
-#endif
-]) 
-AC_CHECK_FUNCS([get_myaddress])
-AC_CHECK_DECLS([gethostname])
 
 AC_PATH_QT([3], [0], no)
 AM_CONDITIONAL([BUILD_QT], [test x"$have_qt" = x"yes"])
@@ -362,20 +85,23 @@ dnl AC_SUBST(X_LDFLAGS, ['-L/usr/X11R6/lib'])
 
 AC_SUBST(appdefaultdir)
 
-AC_SUBST(docdir, ['${datadir}/doc/packages/taco'])
-AC_SUBST(templatedir, ['${datadir}/taco/templates'])
-AC_SUBST(resdatadir, ['${datadir}/taco/dbase/res'])
-AC_SUBST(dbmdir, ['${localstatedir}/cache/taco'])
-AC_SUBST(logdir, ['${localstatedir}/log/taco'])
-AC_SUBST(CMDS_resdir, ['${resdatadir}/CMDS'])
-AC_SUBST(ERROR_resdir, ['${resdatadir}/ERROR'])
-AC_SUBST(CLASS_resdir, ['${resdatadir}/CLASS'])
-AC_SUBST(EVENTS_resdir, ['${resdatadir}/EVENTS'])
-AC_SUBST(NAMES_resdir, ['${resdatadir}/NAMES'])
+AC_SUBST(docdir,        ['${datadir}/doc/packages/taco'])
+AC_SUBST(templatedir,   ['${datadir}/taco/templates'])
+AC_SUBST(resdatadir,    ['${datadir}/taco/dbase/res'])
+AC_SUBST(dbmdir,        ['${localstatedir}/cache/taco'])
+AC_SUBST(logdir,        ['${localstatedir}/log/taco'])
+AC_SUBST(rundir,        ['${localstatedir}/run'])
+AC_SUBST(pkgconfigdir,  ['${libdir}/pkgconfig'])
+
+AC_SUBST(CMDS_resdir,     ['${resdatadir}/CMDS'])
+AC_SUBST(ERROR_resdir,    ['${resdatadir}/ERROR'])
+AC_SUBST(CLASS_resdir,    ['${resdatadir}/CLASS'])
+AC_SUBST(EVENTS_resdir,   ['${resdatadir}/EVENTS'])
+AC_SUBST(NAMES_resdir,    ['${resdatadir}/NAMES'])
 AC_SUBST(PS_NAMES_resdir, ['${resdatadir}/PS_NAMES'])
-AC_SUBST(SYS_resdir, ['${resdatadir}/SYS'])
-AC_SUBST(SEC_resdir, ['${resdatadir}/SEC'])
-AC_SUBST(TEST_resdir, ['${resdatadir}/TEST'])
+AC_SUBST(SYS_resdir,      ['${resdatadir}/SYS'])
+AC_SUBST(SEC_resdir,      ['${resdatadir}/SEC'])
+AC_SUBST(TEST_resdir,     ['${resdatadir}/TEST'])
 
 dnl aclocaldir=`aclocal --print-ac-dir`
 AC_SUBST([aclocaldir], ['${datadir}/aclocal'])
@@ -390,7 +116,6 @@ AC_SUBST(TACO_CLIENT_CXX_LIBS, ["\$(top_builddir)/lib/libtaco++.la"])
 AC_SUBST(TACO_DEVSERVER_MAIN, ["\$(top_builddir)/lib/DevServerMain.o"])
 AC_SUBST(TANGO_CLIENT_CXX_LIBS, ["\$(top_builddir)/lib/tango/libtacotango++.la"])
 
-TACO_DEFINES
 TACO_SERVER_T
 TACO_DATAPORT_SRC
 TACO_TANGO
@@ -420,21 +145,30 @@ AM_RPM_INIT
 LINUX_DISTRIBUTION
 AM_CONDITIONAL(MAKE_RPMS, test x$make_rpms = xtrue)
 
+BB_ENABLE_DOXYGEN
+
 AC_CONFIG_FILES(Makefile 
 		misc/Makefile
 		misc/taco-config
-		misc/taco.SuSE
 		misc/taco.debian
-		misc/taco-manager.sh
 		misc/tacoenv.sh
 		misc/tacoenv.csh
 		misc/taco.startup
 		misc/taco.shutdown
 		misc/taco.status
+		misc/taco_log.cfg
+		misc/taco.SuSE
+		misc/dc.SuSE
+		misc/taco-manager.sh
+		misc/taco-dc.sh
 		doc/Makefile
+		doc/Doxyfile
+		doc/taco_manual.tex
+		doc/taco.sty
+		doc/index.doc
+		doc/started.doc
 		lib/Makefile
 		lib/Doxyfile
-		lib/private/Makefile
 		lib/dbase/Makefile
 		lib/dataport/Makefile
 		lib/xdr/Makefile
@@ -444,6 +178,7 @@ AC_CONFIG_FILES(Makefile
 		lib/tc/Makefile
 		lib/tango/Makefile
 		lib/signal/Makefile
+		lib/log4taco/Makefile
 		system/dbase/Makefile
 		system/dbase/server/Makefile
 		system/dbase/tools/Makefile
@@ -462,45 +197,92 @@ AC_CONFIG_FILES(Makefile
 		system/xdevmenu/doc/Makefile
 		system/starter/Makefile
 		system/alarm/Makefile
+		system/testcs/Makefile
 		taco.spec
 )
+
+AC_CONFIG_FILES([system/tools/Makefile])
 
 dnl AC_CONFIG_FILES(system/dbdev/Makefile
 dnl 		system/dbdev/src/Makefile)
 dnl		system/dbdev/doc/Makefile)
 
-AC_CONFIG_FILES(classes/instverify/Makefile)
-AC_CONFIG_FILES(classes/powersupply/Makefile)
-AC_CONFIG_FILES(classes/serialline/Makefile)
-AC_CONFIG_FILES(classes/updatedaemon/Makefile)
+AC_CONFIG_FILES([classes/instverify/Makefile])
+AC_CONFIG_FILES([classes/powersupply/Makefile])
+AC_CONFIG_FILES([classes/serialline/Makefile])
+AC_CONFIG_FILES([classes/updatedaemon/Makefile])
+AC_CONFIG_FILES([classes/agps/Makefile])
+AC_CONFIG_FILES([classes/motor/Makefile])
+AC_CONFIG_FILES([
+		classes/signal/Makefile 
+		classes/signal/single/Makefile 
+		classes/signal/multiple/Makefile
+		classes/signal/doc/Makefile
+		classes/signal/single/doc/Makefile
+		classes/signal/multiple/doc/Makefile
+		])
 
-AC_CONFIG_FILES(m4/Makefile)
+AC_CONFIG_FILES([
+		examples/Makefile
+		examples/helloworld/Makefile
+		])
 
-AC_CONFIG_FILES(bindings/python/Makefile 
+AC_CONFIG_FILES([m4/Makefile])
+
+AC_CONFIG_FILES([
+		bindings/python/Makefile 
 		bindings/python/lib/Makefile 
 		bindings/python/doc/Makefile 
-		bindings/python/demo.server/Makefile)
+		bindings/python/demo.server/Makefile
+		])
 
 AC_CONFIG_FILES(bindings/Makefile bindings/tcl/Makefile)
 
-AC_CONFIG_FILES(bindings/labview/Makefile
+AC_CONFIG_FILES([
+		bindings/labview/Makefile
  		bindings/labview/client/Makefile
- 		bindings/labview/server/Makefile)
+ 		bindings/labview/server/Makefile
+		])
 
 dnl Initialize the test suite
 AC_CONFIG_TESTDIR(tests)
 AC_CONFIG_FILES(tests/Makefile tests/atlocal)
 dnl AC_CONFIG_FILES(tests/testserver/Makefile)
-AC_CONFIG_FILES(tests/taco, [chmod +x tests/taco])
+AC_CONFIG_FILES(tests/taco, [
+mv tests/taco tests/t && \
+sed \
+-e's%^exec_prefix=/%exec_prefix=${DESTDIR}/%' \
+-e's%^bindir=/%bindir=${DESTDIR}/%' \
+-e's%^sbindir=/%sbindir=${DESTDIR}/%' \
+-e's%^datadir=/%datadir=${DESTDIR}/%' \
+-e's%^templatedir=/%templatedir=${DESTDIR}/%' \
+-e's%^appdefaultdir=/%appdefaultdir=${DESTDIR}/%' \
+-e's%^localstatedir=/%localstatedir=${DESTDIR}/%' \
+-e's%^sysconfdir=/%sysconfdir=${DESTDIR}/%' \
+-e's%^libdir=/%libdir=${DESTDIR}/%' \
+tests/t > tests/taco \
+&& rm tests/t && chmod +x tests/taco
+])
 
 
 SWIG_PROG([1.3.17])
 SWIG_PYTHON([yes])
 
-AC_CONFIG_FILES([ext/Makefile ext/include/Makefile ext/src/Makefile ext/doc/Makefile])
-AC_CONFIG_FILES([ext/python/Makefile ext/res/Makefile])
+AC_CONFIG_FILES([
+		ext/Makefile 
+		ext/include/Makefile 
+		ext/src/Makefile 
+		ext/doc/Makefile
+		ext/python/Makefile 
+		ext/res/Makefile
+		])
 
-AC_CONFIG_FILES([misc/taco-server.pc misc/taco-server++.pc misc/taco-client.pc misc/taco-client++.pc])
+AC_CONFIG_FILES([
+		misc/taco-server.pc 
+		misc/taco-server++.pc 
+		misc/taco-client.pc 
+		misc/taco-client++.pc
+		])
 
 AC_CHECK_PROGS([AUTOM4TE], [autom4te autom4te259 autom4te253])
 AM_MISSING_PROG([AUTOM4TE], [$AUTOM4TE])
@@ -511,8 +293,8 @@ if test x"${taco_dbserver}" = x"yes" ; then
 	taco_dbserver_support="
 	 	with:
 		DBM support:	${taco_gdbm}
-		mySQL support:	${taco_mysql}
-		SQLite3 support:${taco_sqlite3}"
+		mySQL support:	${enable_mysql}
+		SQLite3 support:${enable_sqlite3}"
 fi
 
 AC_MSG_RESULT([
@@ -521,36 +303,36 @@ Configuration (taco):
 
 	Source code location:	${srcdir}
 	Version:		${VERSION}
-	Compiler:		${CC},${CXX}
+	Compiler:		${ac_ct_CC},${ac_ct_CXX}
 
 	Motif:			${motif_found}
-	CORBA:			${corba_found}
-	TANGO:			${tango_found}
+	CORBA:			${with_corba}
+	TANGO:			${with_tango}
 	
 build:
 	log4cpp:		${taco_build_log4cpp}
 	gdbm:			${taco_build_gdbm}
-	manager:		${taco_manager}
-	database server:	${taco_dbserver} ${taco_dbserver_support}
-	message server:		${taco_message}
+	manager:		${enable_manager}
+	database server:	${enable_dbserver} ${taco_dbserver_support}
+	message server:		${enable_message}
 
-	greta:			${greta}
-	xdevmenu:		${xdevmenu}
-	S_Alarm:		${alarm}
+	greta:			${enable_greta}
+	xdevmenu:		${enable_xdevmenu}
+	S_Alarm:		${enable_alarm}
 
-	client tcp :		${taco_client_tcp}
-	server API:		${taco_server_libs}
-	dataport API:		${DATAPORT}
-	data collector API:	${taco_dc}
-	TANGO poller:		${tango_poller}
+	client tcp :		${enable_client_tcp}
+	server API:		${enable_server}
+	dataport API:		${enable_dataport}
+	data collector API:	${enable_dc}
+	TANGO poller:		${enable_tango_poller}
 	ASCII API:		${taco_ascii}
 	bindings:
 		python :	${taco_python_binding}
 		TCL:		${taco_tcl_binding}
 		LabVIEW:	${taco_labview_binding}
 
-	TANGO support:		${taco_tango}
-	Extensions :		${taco_ext}
+	TANGO support:		${enable_tango}
+	Extensions :		${enable_ext}
 
 install:
 	Fast install:           ${enable_fast_install}

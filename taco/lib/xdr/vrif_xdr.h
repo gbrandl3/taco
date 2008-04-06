@@ -30,9 +30,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:24 $
  *
  *******************************************************************-*/
 
@@ -44,8 +44,8 @@
  */
 
 struct DevVrifWdog {
-	char  Value;
-	char *PassWord;
+	DevChar   Value;
+	DevString PassWord;
 };
 typedef struct DevVrifWdog 	DevVrifWdog;
 bool_t 	_DLLFunc xdr_DevVrifWdog PT_((XDR *xdrs, DevVrifWdog *objp));
@@ -58,17 +58,17 @@ bool_t 	_DLLFunc xdr_DevVrifWdog PT_((XDR *xdrs, DevVrifWdog *objp));
 
 
 struct DevVrifVmeStat {
-	long  Address;
-	short Stop;
-	short Sysfail;
-	short Dtack;
-	short Berr;
-	short DtatStrobe;
-	short Iack;
-	short Lword;
-	short Am;
-	short Write;
-	short As;
+	DevLong  Address;
+	DevShort Stop;
+	DevShort Sysfail;
+	DevShort Dtack;
+	DevShort Berr;
+	DevShort DtatStrobe;
+	DevShort Iack;
+	DevShort Lword;
+	DevShort Am;
+	DevShort Write;
+	DevShort As;
 };
 typedef struct DevVrifVmeStat 	DevVrifVmeStat;
 bool_t 	_DLLFunc xdr_DevVrifVmeStat PT_((XDR *xdrs, DevVrifVmeStat *objp));
@@ -81,10 +81,10 @@ bool_t 	_DLLFunc xdr_DevVrifVmeStat PT_((XDR *xdrs, DevVrifVmeStat *objp));
 
 
 struct DevVrifPowerStat {
-	float Vcc;
-	short VccP2;
-	short Flag_p12v;
-	short Flag_m12v;
+	DevFloat Vcc;
+	DevShort VccP2;
+	DevShort Flag_p12v;
+	DevShort Flag_m12v;
 };
 typedef struct DevVrifPowerStat DevVrifPowerStat;
 bool_t 	_DLLFunc xdr_DevVrifPowerStat

@@ -19,15 +19,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * File:
- *
+ *		mysql_update.cpp
  * Description:
  *
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2007-03-22 14:25:54 $
+ * Date:	$Date: 2008-04-06 09:07:42 $
  *
  */
 
@@ -47,14 +47,20 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 {
     long 			list_nb = dev_list->res_val.arr1_len;
 		
-#ifdef DEBUG
-    std::cout << "In upddev_1_svc function for " << list_nb << " device list(s)" << std::endl;
-#endif
+
+    logStream->debugStream() << "In upddev_1_svc function for " << list_nb << " device list(s)" << log4cpp::eol;
 //
 // Initialize parameter sent back to client */
 //
     psdev_back.error_code = 0;
     psdev_back.psdev_err = 0;
+
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
+    {
+	logStream->errorStream() << "I'm not connected to database" << log4cpp::eol;
+	psdev_back.error_code = DbErr_DatabaseNotConnected;
+	return(&psdev_back);
+    }
 //
 // A loop on each device list */
 //
@@ -65,9 +71,7 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 //
 	std::string lin = dev_list->res_val.arr1_val[i];
 
-#ifdef DEBUG
-	std::cout << "Device list = " << lin << std::endl;
-#endif 
+	logStream->debugStream() << "Device list = " << lin << log4cpp::eol;
 //
 // Find the last device in the list. If there is no , character in the line,
 // this means that there is only one device in the list 
@@ -100,9 +104,7 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 	dev_list.clear();
 	while((pos = lin.find(',')) != std::string::npos)
 	{
-#ifdef DEBUG
-	    std::cout << "Line = " << lin << std::endl;
-#endif
+	    logStream->debugStream() << "Line = " << lin << log4cpp::eol;
 	    dev_list.push_back(lin.substr(0, pos));
 	    lin.erase(0, pos + 1);
 	}
@@ -110,12 +112,12 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 
 	std::string query = "SELECT NAME FROM device WHERE ";
         query += (" SERVER LIKE '" + ds_class + "/" + ds_name + "'");
-#ifdef DEBUG
-        std::cout << "MySQLServer::upddev_1_svc(): query = " << query << std::endl;
-#endif /* DEBUG */
+
+        logStream->debugStream() << "MySQLServer::upddev_1_svc(): query = " << query << log4cpp::eol;
+
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
-	    std::cout << mysql_error(mysql_conn) << std::endl;
+	    logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	    psdev_back.error_code = DbErr_DatabaseAccess;
 	    psdev_back.psdev_err = i + 1;
 	    return (&psdev_back);
@@ -130,20 +132,16 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 	mysql_free_result(result);
 
 	int 	ind = 1;
-#ifdef DEBUG
-	std::cout << "Some devices deleted " << std::endl;
-#endif
+
+	logStream->debugStream() << "Some devices deleted " << log4cpp::eol;
+
         for (std::vector<std::string>::iterator it = db_dev_list.begin(); it != db_dev_list.end(); ++it)
 	{
-#ifdef DEBUG
-	    std::cout << " Device = " << *it; 
-#endif
+	    logStream->debugStream() << " Device = " << *it; 
 	    std::vector<std::string>::iterator	it2;  
 	    if ((it2 = find(dev_list.begin(), dev_list.end(), *it)) != dev_list.end())
 	    {
-#ifdef DEBUG
-		std::cout << " found." << std::endl;	
-#endif
+		logStream->debugStream() << " found." << log4cpp::eol;	
 	        switch(psdev_back.error_code = db_update_names(ds_class, ds_name, ind, *it))
 	    	{
 		    case DbErr_BadResourceType: 	
@@ -157,9 +155,7 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 	    }
 	    else
 	    {
-#ifdef DEBUG
-		std::cout << " not found." << std::endl;
-#endif
+		logStream->debugStream() << " not found." << log4cpp::eol;
 		switch(psdev_back.error_code = db_delete_names(ds_class, ds_name, ind, *it))
 		{
 		    case DbErr_BadResourceType: 	
@@ -168,37 +164,29 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 						return (&psdev_back);
 		}
 	    }
-#ifdef DEBUG
-	    std::cout << " Return = " << psdev_back.error_code << std::endl;
-#endif
+	    logStream->debugStream() << " Return = " << psdev_back.error_code << log4cpp::eol;
 	}
 //
 // Delete devices which the same name but registered for other servers
 //
 	for (std::vector<std::string>::iterator it = dev_list.begin(); it != dev_list.end(); ++it)
 	{
-#ifdef DEBUG
-		std::cout << "Checking device : "<< *it << std::endl;
-#endif
+		logStream->debugStream() << "Checking device : "<< *it << log4cpp::eol;
 // if device was not exported by the same server
 		if ( ( find(db_dev_list.begin(), db_dev_list.end(), *it)) == db_dev_list.end() )
                 {
-#ifdef DEBUG
-			std::cout << "Not found -> delete" << std::endl;
-#endif
+			logStream->debugStream() << "Not found -> delete" << log4cpp::eol;
 // clean it from the database if an entry exists
 			query = "DELETE FROM device WHERE NAME = '" + *it + "'";
 			if (mysql_query(mysql_conn, query.c_str()) != 0)
                         {
-				std::cout << mysql_error(mysql_conn) << std::endl;
+				logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 				psdev_back.error_code = DbErr_DatabaseAccess;
 				psdev_back.psdev_err = i + 1;
 				return (&psdev_back);
 			}
-#ifdef DEBUG
 			if (mysql_affected_rows(mysql_conn) == 1)
-				std::cout << "Deleted existing device : "<< *it << std::endl;
-#endif
+				logStream->debugStream() << "Deleted existing device : "<< *it << log4cpp::eol;
 		}
 	}
 
@@ -253,7 +241,7 @@ long MySQLServer::db_delete_names(const std::string ds_class, const std::string 
                          + "' AND NAME = '" + dev_name + "'";
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << __LINE__ << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << __LINE__ << mysql_error(mysql_conn) << log4cpp::eol;
 	return DbErr_DatabaseAccess;
     }
     if (mysql_affected_rows(mysql_conn) == 1)
@@ -297,16 +285,15 @@ long MySQLServer::db_insert_names(const std::string ds_class, const std::string 
 	      << "', '" << member << "', 'nada', 0, 0, 0)" << std::ends;
 //	      << "', '" << member << "', 'rpc::0', 0, 0, 0)" << std::ends;
 
-#if DEBUG
-    std::cout << query.str() << std::endl;
-#endif
+    logStream->debugStream() << query.str() << log4cpp::eol;
+
 #if !HAVE_SSTREAM
     if (mysql_query(mysql_conn, query.str()) != 0)
 #else
     if (mysql_query(mysql_conn, query.str().c_str()) != 0)
 #endif
     {
-	std::cout << __LINE__ << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << __LINE__ << mysql_error(mysql_conn) << log4cpp::eol;
 #if !HAVE_SSTREAM
 	query.freeze(false);
 #endif
@@ -340,14 +327,20 @@ db_psdev_error *MySQLServer::updres_1_svc(db_res *res_list)
 				last_dev[DEV_NAME_LENGTH],
 				pat[2] = {SEP_ELT, '\0'};
 
-#ifdef DEBUG
-    std::cout << "In updres_1_svc function for " << list_nb << " resource(s)" << std::endl;
-#endif
+    logStream->debugStream() << "In updres_1_svc function for " << list_nb << " resource(s)" << log4cpp::eol;
+
 //
 // Initialize parameter sent back to client */
 //
     psdev_back.error_code = 0;
     psdev_back.psdev_err = 0;
+
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
+    {
+	logStream->errorStream() << "I'm not connected to database" << log4cpp::eol;
+	psdev_back.error_code = DbErr_DatabaseNotConnected;
+	return(&psdev_back);
+    }
 //
 // A loop on each resources */
 //
@@ -358,9 +351,8 @@ db_psdev_error *MySQLServer::updres_1_svc(db_res *res_list)
 //
 	std::string lin(res_list->res_val.arr1_val[i]);
 
-#ifdef DEBUG
-	std::cout << "Resource list = " << lin << std::endl;
-#endif
+	logStream->debugStream() << "Resource list = " << lin << log4cpp::eol;
+
 //
 // Only one update if the resource is a simple one */
 //
@@ -429,7 +421,7 @@ db_psdev_error *MySQLServer::updres_1_svc(db_res *res_list)
  *
  * @return 0 if no errors occurs or the error code when there is a problem.
  */
-long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
+long MySQLServer::upd_res(std::string lin, long numb, char array, DevLong *p_err)
 {
     unsigned int 	diff;
     static std::string	domain,
@@ -474,19 +466,18 @@ long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
 	val = lin;
 
 //
-// Initialise resource number */
+// Initialise resource number 
 //
-    numb;
-#ifdef DEBUG
-    std::cout << "Table name : " << domain << std::endl;
-    std::cout << "Family name : " << family << std::endl;
-    std::cout << "Number name : " << member << std::endl;
-    std::cout << "Resource name : " << name << std::endl;
-    std::cout << "Resource value : " << val << std::endl;
-    std::cout << "Sequence number : " << numb << std::endl << std::endl;
-#endif 
+
+    logStream->debugStream() << "Table name : " << domain << log4cpp::eol;
+    logStream->debugStream() << "Family name : " << family << log4cpp::eol;
+    logStream->debugStream() << "Number name : " << member << log4cpp::eol;
+    logStream->debugStream() << "Resource name : " << name << log4cpp::eol;
+    logStream->debugStream() << "Resource value : " << val << log4cpp::eol;
+    logStream->debugStream() << "Sequence number : " << numb << log4cpp::eol;
+
 //
-// Select the right resource table in database */
+// Select the right resource table in database 
 //
     if (numb == 1)
     {
@@ -515,8 +506,8 @@ long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
         query += " AND NAME = '" + name + "'";
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
-	    std::cout << __LINE__ << mysql_error(mysql_conn) << std::endl;
-	    std::cout << query.c_str() << std::endl;
+	    logStream->errorStream() << __LINE__ << mysql_error(mysql_conn) << log4cpp::eol;
+	    logStream->errorStream() << query.c_str() << log4cpp::eol;
 	    *p_err = DbErr_DatabaseAccess;
 	    return(-1);
 	}
@@ -535,17 +526,16 @@ long MySQLServer::upd_res(std::string lin, long numb, char array, long *p_err)
 			<< domain << "/" << family << "/" << member << "','" << name << "','"
 			<< domain << "','" << family << "','" << member << "','" 
 			<< numb << "',\"" << val << "\")" << std::ends;
-#ifdef DEBUG
-		std::cout << "MySQLServer::upd_res(): query = " << query.str() << std::endl;
-#endif /* DEBUG */
+		logStream->debugStream() << "MySQLServer::upd_res(): query = " << query.str() << log4cpp::eol;
+
 #if !HAVE_SSTREAM
 		if (mysql_query(mysql_conn, query.str()) != 0)
 #else
 		if (mysql_query(mysql_conn, query.str().c_str()) != 0)
 #endif
 		{
-			std::cout << __LINE__ << mysql_error(mysql_conn) << std::endl;
-			std::cout << query.str() << std::endl;
+			logStream->errorStream() << __LINE__ << mysql_error(mysql_conn) << log4cpp::eol;
+			logStream->errorStream() << query.str() << log4cpp::eol;
 #if !HAVE_SSTREAM
 			query.freeze(false);
 #endif

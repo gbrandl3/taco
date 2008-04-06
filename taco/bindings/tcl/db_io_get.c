@@ -35,9 +35,9 @@
  *
  * Original:	Nov 1997
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-18 22:04:49 $
+ * Date:        $Date: 2008-04-06 09:06:33 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -134,7 +134,7 @@ int db_io_get (ClientData clientdata, Tcl_Interp *interp, int argc, char **argv)
  
 /* status and error returned by db_getresource */
 	int 		db_status;
-	long 		db_error;
+	DevLong 	db_error;
 	char 		*db_serr;
 /* some working variables*/
 	int 		i,
@@ -184,7 +184,7 @@ int db_io_get (ClientData clientdata, Tcl_Interp *interp, int argc, char **argv)
 	{
 		printf("db_io_get. number of requested resources= %d\n",resnumber);
 		for(i=0; i<resnumber; i++) 
-			printf("db_io_get. res#%d= mem_allocated= %X, name= %s\n",i+1,(char*)LRes[i],(char*)LRes[i]);
+			printf("db_io_get. res#%d= mem_allocated= %p, name= %s\n",i+1,(char*)LRes[i],(char*)LRes[i]);
 		printf ("db_io_get. Parsing argument line...DONE\n");
 	}
  
@@ -218,7 +218,7 @@ int db_io_get (ClientData clientdata, Tcl_Interp *interp, int argc, char **argv)
 	{
 		snprintf (TmpString, sizeof(TmpString), "%d",db_status);
 		Tcl_SetVar(interp,State,TmpString,0);
-		snprintf( TmpString ,  sizeof(TmpString), "%s [%d]" , db_serr= dev_error_str(db_error) , db_error); 
+		snprintf( TmpString ,  sizeof(TmpString), "%s [%ld]" , db_serr= dev_error_str(db_error) , (long)db_error); 
 		Tcl_SetVar (interp,Error,TmpString,0);
 		if (TCL_TEST) 
 			printf("db_io_get: db_getresource failed. error:\n %s",db_serr);

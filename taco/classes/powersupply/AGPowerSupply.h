@@ -31,9 +31,9 @@
  *
  * Original:	June 1995
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2006-09-18 22:39:09 $
+ * Date:        $Date: 2008-04-06 09:06:36 $
  */
 
 #ifndef _AGPOWERSUPPLY_H
@@ -48,8 +48,8 @@ class AGPowerSupply : public PowerSupply {
 
 private :
 
-   long ClassInitialise (long *error );
-   long GetResources (char *res_name, long *error);
+   long ClassInitialise (DevLong *error );
+   long GetResources (char *res_name, DevLong *error);
 
    static short class_inited;
 
@@ -59,29 +59,29 @@ private :
 
 protected:
 
-   long StateMachine (long cmd, long *error);
+   long StateMachine (DevCommand cmd, DevLong *error);
 //
 // commands
 //
-   long Off (void *argin, void *argout, long *error);
-   long On (void *argin, void*argout, long *error);
-   long Status (void *argin, void*argout, long *error);
-   long SetValue (void *argin, void*argout, long *error);
-   long ReadValue (void *argin, void*argout, long *error);
-   long Reset (void *argin, void*argout, long *error);
-   long Error (void *argin, void*argout, long *error);
-   long Local (void *argin, void*argout, long *error);
-   long Remote (void *argin, void*argout, long *error);
-   long Update (void *argin, void*argout, long *error);
-   long Hello (void *argin, void*argout, long *error);
-//   long State (void *argin, void*argout, long *error);
+   long Off (DevArgument argin, DevArgument argout, DevLong *error);
+   long On (DevArgument argin, DevArgument argout, DevLong *error);
+   long Status (DevArgument argin, DevArgument argout, DevLong *error);
+   long SetValue (DevArgument argin, DevArgument argout, DevLong *error);
+   long ReadValue (DevArgument argin, DevArgument argout, DevLong *error);
+   long Reset (DevArgument argin, DevArgument argout, DevLong *error);
+   long Error (DevArgument argin, DevArgument argout, DevLong *error);
+   long Local (DevArgument argin, DevArgument argout, DevLong *error);
+   long Remote (DevArgument argin, DevArgument argout, DevLong *error);
+   long Update (DevArgument argin, DevArgument argout, DevLong *error);
+   long Hello (DevArgument argin, DevArgument argout, DevLong *error);
+//   long State (DevArgument argin, void*argout, DevLong *error);
 
 //
 // public members
 //
 public:
 
-   AGPowerSupply (char *name, long *error);
+   AGPowerSupply (char *name, DevLong *error);
    ~AGPowerSupply ();
 
 };

@@ -28,11 +28,11 @@
  * Author(s):	Ingrid Fladmark
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
  * Original:	24th of january 1997	
  *
- * Date:	$Date: 2005-07-25 12:59:10 $
+ * Date:	$Date: 2008-04-06 09:07:18 $
  *
  *********************************************************************/
 
@@ -56,7 +56,7 @@ typedef struct _MDSSignalPart
 	Dssignal	  *signal_obj;
 	DevVarStringArray *signals_properties;
 	char              **property_ptr;
-	long              *alarm_result;
+	DevLong           *alarm_result;
 } MDSSignalPart;
 
 

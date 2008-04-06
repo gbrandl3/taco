@@ -25,9 +25,9 @@
  * Author(s):
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2006-09-18 22:18:01 $
+ * Date:	$Date: 2008-04-06 09:07:04 $
  *
  ******************************************************************************/
 
@@ -47,6 +47,7 @@
 #	include <sys/sem.h>
 #endif
 #include <errno.h>
+#include <unistd.h>
 #include "sema.h"
 #include "boolean.h"
 

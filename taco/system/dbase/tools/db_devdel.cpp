@@ -27,13 +27,15 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.6 $
+ * Version:     $Revision: 1.7 $
  *
- * Date:        $Date: 2007-06-20 07:20:42 $
+ * Date:        $Date: 2008-04-06 09:07:46 $
  */
 
 /* TACO include file */
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 #include <API.h>
 
 /* Include files */
@@ -43,10 +45,9 @@
 #include <string>
 #include <algorithm>
 #ifdef _solaris
-#include "_count.h"
+#	include "_count.h"
+#include <taco_utils.h>
 #endif /* _solaris */
-
-using namespace std;
 
 void usage(const char *cmd)
 {
@@ -55,12 +56,19 @@ void usage(const char *cmd)
 	std::cerr << "        options : -r delete also resources of the device" << std::endl;
 	std::cerr << "                  -h display this message" << std::endl;
 	std::cerr << "                  -n nethost" << std::endl;
+	std::cerr << "                  -v display the current version" << std::endl;
 	exit(1);
+}
+
+void version(const char *cmd)
+{
+	std::cerr << cmd << " version " << VERSION << std::endl;
+	exit(0);
 }
 
 int main(int argc,char *argv[])
 {
-	long 		error;
+	DevLong		error;
 	long 		del_res = True;
 	extern int 	optopt;
 	extern int	optind;
@@ -70,7 +78,7 @@ int main(int argc,char *argv[])
 //
 // Argument test and device name structure
 //
-	while ((c = getopt(argc,argv,"hrn:")) != -1)
+	while ((c = getopt(argc,argv,"hrvn:")) != -1)
 	{
 		switch (c)
 		{
@@ -79,6 +87,9 @@ int main(int argc,char *argv[])
 			break;
 		case 'n':
 			setenv("NETHOST", optarg, 1);
+			break;
+		case 'v':
+			version(argv[0]);
 			break;
 		case 'h':
 		case '?':
@@ -89,7 +100,7 @@ int main(int argc,char *argv[])
     	if (optind != argc - 1)
 		usage(argv[0]);
 
-    	string dev_name(argv[optind]);
+    	std::string dev_name(argv[optind]);
 	if (dev_name.substr(0, 2) == "//")
 	{
 		std::string::size_type pos = dev_name.find("/", 2);
@@ -105,7 +116,7 @@ int main(int argc,char *argv[])
 	if (_sol::count(dev_name.begin(), dev_name.end(), '/') != 2)
 #endif /* _solaris */
 	{
-		cerr << "db_devdel : Bad device name" << endl;
+		std::cerr << "db_devdel : Bad device name" << std::endl;
 		exit(-1);
 	}
 
@@ -115,7 +126,7 @@ int main(int argc,char *argv[])
 
 	if (db_import(&error) == -1)
 	{
-		cerr << "db_devdel : Impossible to connect to database server" << endl;
+		std::cerr << "db_devdel : Impossible to connect to database server" << std::endl;
 		exit(-1);
 	}
 
@@ -126,11 +137,11 @@ int main(int argc,char *argv[])
         if (db_devicedelete(dev_name.c_str(), &error) == -1)
 	{
 		if (error == DbErr_DeviceNotDefined)
-			cerr << "Device " << dev_name << " is not defined in the database" << endl;
+			std::cerr << "Device " << dev_name << " is not defined in the database" << std::endl;
 		else
 		{
-			cerr << "The call to database server failed with error " << error << endl;
-			cerr << "Error message : " << dev_error_str(error) << endl;
+			std::cerr << "The call to database server failed with error " << error << std::endl;
+			std::cerr << "Error message : " << dev_error_str(error) << std::endl;
 		}
 		exit(-1);
 	}
@@ -145,8 +156,9 @@ int main(int argc,char *argv[])
     		db_error 	err;
 		if (db_devicedeleteres(1, &tmp, &err) == -1)
 		{
-			cerr << "The call to database server to delete device resources failed with error " << err.error_code << endl;
-			cerr << "Error message : " << dev_error_str(err.error_code) << endl;
+			std::cerr << "The call to database server to delete device resources failed with error " 
+				<< err.error_code << std::endl
+				<< "Error message : " << dev_error_str(err.error_code) << std::endl;
 		}
 	}
     	return 0;

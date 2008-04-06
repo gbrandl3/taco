@@ -25,16 +25,16 @@
  * Description: startup procedure for Update Daemon Class
  *
  * Author(s):   Michael Schofield
- *              $Author: andy_gotz $
+ *              $Author: jkrueger1 $
  *
  * Original:    April 1992
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-19 09:29:39 $
+ * Date:        $Date: 2008-04-06 09:06:39 $
  */
 
-static char RcsId[] = " $Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/startup.c,v 1.3 2006-09-19 09:29:39 andy_gotz Exp $ ";
+static char RcsId[] = " $Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/startup.c,v 1.4 2008-04-06 09:06:39 jkrueger1 Exp $ ";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -55,7 +55,7 @@ static char RcsId[] = " $Header: /home/jkrueger1/sources/taco/backup/taco/classe
 
 extern long debug_flag;
 
-long startup(char *svr_name, long *error)
+long startup(char *svr_name, DevLong *error)
 {
    char **dev_list;
    int i,j;

@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2006-12-15 12:43:54 $
+ * Date:	$Date: 2008-04-06 09:07:45 $
  *
  */
 
@@ -47,7 +47,7 @@ db_psdev_error *SQLite3Server::upddev_1_svc(db_res *dev_list)
 {
 	long list_nb = dev_list->res_val.arr1_len;
 		
-	logStream->debugStream() << "In upddev_1_svc function for " << list_nb << " device list(s)" << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "In upddev_1_svc function for " << list_nb << " device list(s)" << log4cpp::eol;
 
 //
 // Initialize parameter sent back to client */
@@ -64,8 +64,7 @@ db_psdev_error *SQLite3Server::upddev_1_svc(db_res *dev_list)
 //
 		std::string lin = dev_list->res_val.arr1_val[i];
 
-		logStream->debugStream() << "Device list = " << lin << log4cpp::CategoryStream::ENDLINE;
-
+		logStream->debugStream() << "Device list = " << lin << log4cpp::eol;
 //
 // Find the last device in the list. If there is no , character in the line,
 // this means that there is only one device in the list 
@@ -98,7 +97,7 @@ db_psdev_error *SQLite3Server::upddev_1_svc(db_res *dev_list)
 		dev_list.clear();
 		while((pos = lin.find(',')) != std::string::npos)
 		{
-			logStream->debugStream() << "Line = " << lin << log4cpp::CategoryStream::ENDLINE;
+			logStream->debugStream() << "Line = " << lin << log4cpp::eol;
 
 			dev_list.push_back(lin.substr(0, pos));
 			lin.erase(0, pos + 1);
@@ -108,11 +107,11 @@ db_psdev_error *SQLite3Server::upddev_1_svc(db_res *dev_list)
 		std::string query = "SELECT NAME FROM device WHERE ";
 		query += (" SERVER LIKE '" + ds_class + "/" + ds_name + "'");
 
-		logStream->debugStream() << "SQLite3Server::upddev_1_svc(): query = " << query << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "SQLite3Server::upddev_1_svc(): query = " << query << log4cpp::eol;
 
 		if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 		{
-			logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+			logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 			psdev_back.error_code = DbErr_DatabaseAccess;
 			psdev_back.psdev_err = i + 1;
 			return (&psdev_back);
@@ -126,7 +125,7 @@ db_psdev_error *SQLite3Server::upddev_1_svc(db_res *dev_list)
 
 		int 	ind = 1;
 
-		logStream->debugStream() << "Some devices to be to delete : " << db_dev_list.size() << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "Some devices to be to delete : " << db_dev_list.size() << log4cpp::eol;
 
 		for (std::vector<std::string>::iterator it = db_dev_list.begin(); it != db_dev_list.end(); ++it)
 		{
@@ -136,7 +135,7 @@ db_psdev_error *SQLite3Server::upddev_1_svc(db_res *dev_list)
 			std::vector<std::string>::iterator	it2;  
 			if ((it2 = find(dev_list.begin(), dev_list.end(), *it)) != dev_list.end())
 			{
-				logStream->debugStream() << " found." << log4cpp::CategoryStream::ENDLINE;	
+				logStream->debugStream() << " found." << log4cpp::eol;	
 
 				switch(psdev_back.error_code = db_update_names(ds_class, ds_name, ind, *it))
 				{
@@ -153,7 +152,7 @@ db_psdev_error *SQLite3Server::upddev_1_svc(db_res *dev_list)
 			}
 			else
 			{
-				logStream->debugStream() << " not found." << log4cpp::CategoryStream::ENDLINE;
+				logStream->debugStream() << " not found." << log4cpp::eol;
 
 				switch(psdev_back.error_code = db_delete_names(ds_class, ds_name, ind, *it))
 				{
@@ -164,25 +163,25 @@ db_psdev_error *SQLite3Server::upddev_1_svc(db_res *dev_list)
 						return (&psdev_back);
 				}
 			}
-			logStream->debugStream() << " Return = " << psdev_back.error_code << log4cpp::CategoryStream::ENDLINE;
+			logStream->debugStream() << " Return = " << psdev_back.error_code << log4cpp::eol;
 		}
 //
 // Delete devices which the same name but registered for other servers
 //
 		for (std::vector<std::string>::iterator it = dev_list.begin(); it != dev_list.end(); ++it)
 		{
-			logStream->debugStream() << "Checking device : "<< *it << log4cpp::CategoryStream::ENDLINE;
+			logStream->debugStream() << "Checking device : "<< *it << log4cpp::eol;
 
 // if device was not exported by the same server
 			if (find(db_dev_list.begin(), db_dev_list.end(), *it) == db_dev_list.end())
                 	{
-				logStream->debugStream() << "Not found -> delete" << log4cpp::CategoryStream::ENDLINE;
+				logStream->debugStream() << "Not found -> delete" << log4cpp::eol;
 
 // clean it from the database if an entry exists
 				query = "DELETE FROM device WHERE NAME = '" + *it + "'";
 				if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
                         	{
-					logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+					logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 					psdev_back.error_code = DbErr_DatabaseAccess;
 					psdev_back.psdev_err = i + 1;
 					return (&psdev_back);
@@ -242,7 +241,7 @@ long SQLite3Server::db_delete_names(const std::string ds_class, const std::strin
                          + "' AND NAME = '" + dev_name + "'";
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::eol;
 		return DbErr_DatabaseAccess;
     	}
 	sqlite3_free_table(result);
@@ -285,7 +284,7 @@ long SQLite3Server::db_insert_names(const std::string ds_class, const std::strin
 //	      << "', '" << member << "', 'rpc::0', 0, 0, 0)" << std::ends;
 
 
-	logStream->debugStream() << query.str() << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << query.str() << log4cpp::eol;
 
 #if !HAVE_SSTREAM
 	if (sqlite3_get_table(db, query.str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
@@ -293,7 +292,7 @@ long SQLite3Server::db_insert_names(const std::string ds_class, const std::strin
 	if (sqlite3_get_table(db, query.str().c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 #endif
 	{
-		logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::eol;
 #if !HAVE_SSTREAM
 		query.freeze(false);
 #endif
@@ -325,7 +324,7 @@ db_psdev_error *SQLite3Server::updres_1_svc(db_res *res_list)
 				last_dev[DEV_NAME_LENGTH],
 				pat[2] = {SEP_ELT, '\0'};
 
-	logStream->debugStream() << "In updres_1_svc function for " << list_nb << " resource(s)" << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "In updres_1_svc function for " << list_nb << " resource(s)" << log4cpp::eol;
 //
 // Initialize parameter sent back to client 
 //
@@ -341,7 +340,7 @@ db_psdev_error *SQLite3Server::updres_1_svc(db_res *res_list)
 //
 		std::string lin(res_list->res_val.arr1_val[i]);
 
-		logStream->debugStream() << "Resource list = " << lin << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "Resource list = " << lin << log4cpp::eol;
 //
 // Only one update if the resource is a simple one */
 //
@@ -410,7 +409,7 @@ db_psdev_error *SQLite3Server::updres_1_svc(db_res *res_list)
  *
  * @return 0 if no errors occurs or the error code when there is a problem.
  */
-long SQLite3Server::upd_res(std::string lin, long numb, char array, long *p_err)
+long SQLite3Server::upd_res(std::string lin, long numb, char array, DevLong *p_err)
 {
     unsigned int 	diff;
     static std::string	domain,
@@ -478,12 +477,12 @@ long SQLite3Server::upd_res(std::string lin, long numb, char array, long *p_err)
 //
     numb;
 
-    logStream->debugStream() << "Table name : " << domain << log4cpp::CategoryStream::ENDLINE;
-    logStream->debugStream() << "Family name : " << family << log4cpp::CategoryStream::ENDLINE;
-    logStream->debugStream() << "Number name : " << member << log4cpp::CategoryStream::ENDLINE;
-    logStream->debugStream() << "Resource name : " << name << log4cpp::CategoryStream::ENDLINE;
-    logStream->debugStream() << "Resource value : " << val << log4cpp::CategoryStream::ENDLINE;
-    logStream->debugStream() << "Sequence number : " << numb << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "Table name : " << domain << log4cpp::eol;
+    logStream->debugStream() << "Family name : " << family << log4cpp::eol;
+    logStream->debugStream() << "Number name : " << member << log4cpp::eol;
+    logStream->debugStream() << "Resource name : " << name << log4cpp::eol;
+    logStream->debugStream() << "Resource value : " << val << log4cpp::eol;
+    logStream->debugStream() << "Sequence number : " << numb << log4cpp::eol;
 
 //
 // Select the right resource table in database */
@@ -512,8 +511,8 @@ long SQLite3Server::upd_res(std::string lin, long numb, char array, long *p_err)
         query += " AND NAME = '" + name + "'";
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-	    logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
-	    logStream->errorStream() << query.c_str() << log4cpp::CategoryStream::ENDLINE;
+	    logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::eol;
+	    logStream->errorStream() << query.c_str() << log4cpp::eol;
 	    *p_err = DbErr_DatabaseAccess;
 	    return(-1);
 	}
@@ -530,7 +529,7 @@ long SQLite3Server::upd_res(std::string lin, long numb, char array, long *p_err)
 			<< domain << "','" << family << "','" << member << "','" 
 			<< numb << "',\"" << val << "\", DATETIME('now'), DATETIME('now'))" << std::ends;
 
-		logStream->debugStream() << "SQLite3Server::upd_res(): query = " << query.str() << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "SQLite3Server::upd_res(): query = " << query.str() << log4cpp::eol;
 
 #if !HAVE_SSTREAM
 		if (sqlite3_get_table(db, query.str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
@@ -538,8 +537,8 @@ long SQLite3Server::upd_res(std::string lin, long numb, char array, long *p_err)
 		if (sqlite3_get_table(db, query.str().c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 #endif
 		{
-			logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
-			logStream->errorStream() << query.str() << log4cpp::CategoryStream::ENDLINE;
+			logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::eol;
+			logStream->errorStream() << query.str() << log4cpp::eol;
 #if !HAVE_SSTREAM
 			query.freeze(false);
 #endif

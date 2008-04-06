@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:	$Date: 2006-12-15 12:43:53 $
+ * Date:	$Date: 2008-04-06 09:07:40 $
  *
  */
 
@@ -54,7 +54,7 @@
  */
 db_res *NdbmServer::devdomainlist_1_svc(void)
 {
-	logStream->debugStream() << "In devdomainlist_1_svc function" << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "In devdomainlist_1_svc function" << log4cpp::eol;
 
 //
 // Initialize structure sent back to client
@@ -113,13 +113,13 @@ db_res *NdbmServer::devdomainlist_1_svc(void)
 	}
 	catch (NdbmError &err)
 	{		
-		logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;	
+		logStream->errorStream() << err.get_err_message() << log4cpp::eol;	
 		browse_back.db_err = err.get_err_code();
 		return(&browse_back);
 	}
 	catch (std::bad_alloc)
 	{		
-		logStream->errorStream() << "Memory allocation error in devdomainlist" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Memory allocation error in devdomainlist" << log4cpp::eol;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}
@@ -135,7 +135,7 @@ db_res *NdbmServer::devdomainlist_1_svc(void)
 	browse_back.res_val.arr1_len = dom_list.size();
 	if (dom_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
 	{
-		logStream->errorStream() << "Memory allocation error in devdomainlist" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Memory allocation error in devdomainlist" << log4cpp::eol;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}
@@ -156,11 +156,11 @@ db_res *NdbmServer::devdomainlist_1_svc(void)
  *
  * @return The family name list
  */
-db_res *NdbmServer::devfamilylist_1_svc(nam* domain)
+db_res *NdbmServer::devfamilylist_1_svc(DevString* domain)
 {
 	
 	std::string 	user_domain(*domain);
-	logStream->debugStream() << "In devfamilylist_1_svc function for domain " << user_domain << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "In devfamilylist_1_svc function for domain " << user_domain << log4cpp::eol;
 	
 //
 // Initialize structure sent back to client
@@ -228,13 +228,13 @@ db_res *NdbmServer::devfamilylist_1_svc(nam* domain)
 	}
 	catch (NdbmError &err)
 	{
-		logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;		
+		logStream->errorStream() << err.get_err_message() << log4cpp::eol;		
 		browse_back.db_err = err.get_err_code();
 		return(&browse_back);
 	}
 	catch (std::bad_alloc)
 	{		
-		logStream->errorStream() << "Memory allocation error in devfamilylist" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Memory allocation error in devfamilylist" << log4cpp::eol;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);		
 	}
@@ -250,7 +250,7 @@ db_res *NdbmServer::devfamilylist_1_svc(nam* domain)
 	browse_back.res_val.arr1_len = fam_list.size();
 	if (fam_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
 	{
-		logStream->errorStream() << "Memory allocation error in devfamilylist" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Memory allocation error in devfamilylist" << log4cpp::eol;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}
@@ -278,7 +278,7 @@ db_res *NdbmServer::devmemberlist_1_svc(db_res *recev)
 	std::string user_domain(recev->res_val.arr1_val[0]);
 	std::string user_family(recev->res_val.arr1_val[1]);
 	
-	logStream->debugStream() << "In devmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "In devmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << log4cpp::eol;
 	
 //
 // Initialize structure sent back to client
@@ -348,13 +348,13 @@ db_res *NdbmServer::devmemberlist_1_svc(db_res *recev)
 	}
 	catch (NdbmError &err)
 	{
-		logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << err.get_err_message() << log4cpp::eol;
 		browse_back.db_err = err.get_err_code();
 		return(&browse_back);
 	}
 	catch (std::bad_alloc)
 	{		
-		logStream->errorStream() << "Memory allocation error in devmemberlist" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Memory allocation error in devmemberlist" << log4cpp::eol;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}
@@ -370,7 +370,7 @@ db_res *NdbmServer::devmemberlist_1_svc(db_res *recev)
 	browse_back.res_val.arr1_len = memb_list.size();
 	if (memb_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
 	{
-		logStream->errorStream() << "Memory allocation error in devmemberlist" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Memory allocation error in devmemberlist" << log4cpp::eol;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}

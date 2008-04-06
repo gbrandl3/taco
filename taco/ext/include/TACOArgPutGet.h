@@ -31,7 +31,7 @@
 namespace TACO {
 	template<typename T> class ArgBase {
 	public:
-		static DevType type()
+		static DevArgType type()
 		{
 			return ::TACO::type<T>();
 		}
@@ -170,9 +170,9 @@ namespace TACO {
 		DevVarUShortArray dv;
 	};
 
-	template <> class ArgPut<std::vector<long> > : public ArgBase<DevVarLongArray> {
+	template <> class ArgPut<std::vector<DevLong> > : public ArgBase<DevVarLongArray> {
 	public:
-		explicit ArgPut( const std::vector<long>& i) : v( i)
+		explicit ArgPut( const std::vector<DevLong>& i) : v( i)
 		{
 			// VOID
 		}
@@ -185,13 +185,13 @@ namespace TACO {
 		}
 	
 	private:
-		const std::vector<long>& v;
+		const std::vector<DevLong>& v;
 		DevVarLongArray dv;
 	};
 
-	template <> class ArgPut<std::vector<unsigned long> > : public ArgBase<DevVarULongArray> {
+	template <> class ArgPut<std::vector<DevULong> > : public ArgBase<DevVarULongArray> {
 	public:
-		explicit ArgPut( const std::vector<unsigned long>& i) : v( i)
+		explicit ArgPut( const std::vector<DevULong>& i) : v( i)
 		{
 			// VOID
 		}
@@ -204,7 +204,7 @@ namespace TACO {
 		}
 	
 	private:
-		const std::vector<unsigned long>& v;
+		const std::vector<DevULong>& v;
 		DevVarULongArray dv;
 	};
 

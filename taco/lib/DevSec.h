@@ -29,9 +29,9 @@
  *
  * Original:    September 1993
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  * 
- * Date:	$Date: 2005-07-25 13:08:22 $
+ * Date:	$Date: 2008-04-06 09:06:58 $
  *
  ********************************************************************-*/
 
@@ -121,14 +121,14 @@ extern "C" {
 #endif
 long _DLLFunc dev_security PT_( (char *dev_name, long requested_access,
 			long *ret_client_id, long *connection_id,
-			long *error) );
-long _DLLFunc create_sec_key PT_( (devserver ds, long *error) );
-long _DLLFunc verify_sec_key PT_( (devserver ds, long *client_id, long *error));
+			DevLong *error) );
+long _DLLFunc create_sec_key PT_( (devserver ds, DevLong *error) );
+long _DLLFunc verify_sec_key PT_( (devserver ds, long *client_id, DevLong *error));
 void _DLLFunc free_sec_key PT_( (devserver ds) );
 long _DLLFunc sec_tcp_connection PT_( (long requested_access, CLIENT * *clnt,
-			server_connections *svr_conn, long *error) );
+			server_connections *svr_conn, DevLong *error) );
 void _DLLFunc sec_free_tcp_connection PT_( (devserver ds,server_connections *svr_conn));
-long _DLLFunc free_connection_id_vers3 PT_( (long connection_id, long *error) );
+long _DLLFunc free_connection_id_vers3 PT_( (long connection_id, DevLong *error) );
 #ifdef __cplusplus
 }
 #endif
@@ -142,13 +142,13 @@ extern "C" {
 #endif
 long _DLLFunc sec_svc_import PT_( (DevServerDevices *device, long connection_id,
 			long client_id, long access_right,
-			struct svc_req *rqstp, long *error) );
+			struct svc_req *rqstp, DevLong *error) );
 long _DLLFunc sec_svc_free PT_( (DevServerDevices *device, long connection_id,
 			long client_id, long access_right,
-			long *error) );
+			DevLong *error) );
 long _DLLFunc sec_svc_cmd PT_( (DevServerDevices *device, long connection_id,
 			long client_id, long access_right,
-			long cmd, long *error) );
+			long cmd, DevLong *error) );
 void _DLLFunc free_var_str_array PT_( (DevVarStringArray *str_array) );
 #ifdef __cplusplus
 }
@@ -156,7 +156,7 @@ void _DLLFunc free_var_str_array PT_( (DevVarStringArray *str_array) );
 #endif /* _DevServer_h */
 
 long _DLLFunc free_connection_id_vers3
-			PT_( (long connection_id, long *error) );
+			PT_( (long connection_id, DevLong *error) );
 
 
 #endif /* _DevSec_h */

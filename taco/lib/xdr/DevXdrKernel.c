@@ -30,15 +30,16 @@
  *
  * Original:	November 1993
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:20 $
  *
  *******************************************************************-*/
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
 #endif
+#include <API.h>
 #include <DevXdrKernel.h>
 #include <Admin.h>
 
@@ -113,14 +114,14 @@ static long		number_of_private_xdr_types = 0;
  */ 
 #ifdef __STDC__
 long xdr_load_type (long type, DevDataFunction xdr, long size,
-			 DevDataLengthFunction xdr_length, long *error)
+			 DevDataLengthFunction xdr_length, DevLong *error)
 #else
 long xdr_load_type (type, xdr, size, xdr_length, error)
 	long 			type;
 	DevDataFunction 	xdr;
 	long 			size;
 	DevDataLengthFunction 	xdr_length;
-	long			*error;
+	DevLong			*error;
 #endif /* __STDC__ */
 {
 	int	i;
@@ -215,10 +216,10 @@ long xdr_load_type (type, xdr, size, xdr_length, error)
  * @return  DS_OK or DS_NOTOK
  */
 #ifdef __STDC__
-long xdr_load_kernel ( long *error )
+long xdr_load_kernel ( DevLong *error )
 #else
 long xdr_load_kernel ( error )
-	long			*error;
+	DevLong			*error;
 #endif /* __STDC__ */
 {
 	*error = 0;
@@ -393,12 +394,12 @@ long xdr_load_kernel ( error )
  * @return  DS_OK or DS_NOTOK
  */ 
 #ifdef __STDC__
-long xdr_get_type (long type, DevDataListEntry *xdr_type, long *error)
+long xdr_get_type (long type, DevDataListEntry *xdr_type, DevLong *error)
 #else
 long xdr_get_type (type, xdr_type, error)
 	long 			type;
 	DevDataListEntry 	*xdr_type;
-	long			*error;
+	DevLong			*error;
 #endif /* __STDC__ */
 {
 	int	i;

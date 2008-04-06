@@ -111,8 +111,7 @@ namespace log4cpp {
                     return; // fail silently                    
                 }
             }
-//          _ipAddr = *(pent->h_addr);
-           memcpy(&_ipAddr, pent->h_addr, sizeof(in_addr_t));
+            _ipAddr = *(pent->h_addr);
         }
         // Get a datagram socket.
         
@@ -138,7 +137,7 @@ namespace log4cpp {
         size_t messageLength = message.length();
         char *buf = new char [messageLength + 16];
         int priority = _facility + toSyslogPriority(event.priority);
-        int preambleLength = sprintf (buf, "<%d>", priority);
+        int preambleLength = ::sprintf (buf, "<%d>", priority);
         memcpy (buf + preambleLength, message.data(), messageLength);
 
         sockaddr_in sain;
@@ -174,8 +173,8 @@ namespace log4cpp {
     {
        std::string name, syslog_name, relayer;
        int facility = -1, port_number = -1;
-       params.get_for("remote syslog appender").required("name", name)("syslog_name", syslog_name)("relayer", relayer)
-                                               .optional("facility", facility)("port", port_number);
+       params.get_for("SyslogAppender").required("name", name)("syslogName", syslog_name)("syslogHost", relayer)
+                                               .optional("facility", facility)("portNumber", port_number);
        return std::auto_ptr<Appender>(new RemoteSyslogAppender(name, syslog_name, relayer, facility, port_number));
     }
 }

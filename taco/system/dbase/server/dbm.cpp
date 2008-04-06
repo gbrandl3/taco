@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.14 $
+ * Version:	$Revision: 1.15 $
  *
- * Date:	$Date: 2006-12-15 12:43:53 $
+ * Date:	$Date: 2008-04-06 09:07:40 $
  *
  */
 
@@ -62,7 +62,7 @@ int *db_clodb_1_svc(void)
 {
 	logStream->debugStream() << "DB_CLODB : "; 
 	int *ret = reinterpret_cast<int *>(dbm->db_clodb_1_svc());
-	logStream->debugStream() << *ret << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << *ret << log4cpp::eol;
 	return ret;
 }
 
@@ -76,7 +76,7 @@ int *db_reopendb_1_svc(void)
 {
 	logStream->debugStream() << "DB_REOPENDB : ";
 	int *ret = reinterpret_cast<int *>(dbm->db_reopendb_1_svc());
-	logStream->debugStream() << *ret << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << *ret << log4cpp::eol;
 	return ret;
 }
 
@@ -87,7 +87,7 @@ int *db_reopendb_1_svc(void)
  * 
  * @returns  pointer to a structure of the cmd_que type, containing the command and error code
  */
-cmd_que *db_cmd_query_1_svc(nam *pcmd_name)
+cmd_que *db_cmd_query_1_svc(DevString *pcmd_name)
 {
 	return dbm->db_cmd_query_1_svc(pcmd_name);
 }
@@ -109,7 +109,7 @@ db_res *devdomainlist_1_svc(void)
  *
  * @return The family name list
  */
-db_res *devfamilylist_1_svc(nam * domain)
+db_res *devfamilylist_1_svc(DevString * domain)
 {
 	return dbm->devfamilylist_1_svc(domain);
 }
@@ -134,7 +134,7 @@ db_res *devmemberlist_1_svc(db_res *recev)
  *
  * @return a pointer to a structure of the event_que type 
  */
-event_que *db_event_query_1_svc(nam *pevent_name)
+event_que *db_event_query_1_svc(DevString *pevent_name)
 {
 	return dbm->db_event_query_1_svc(pevent_name);
 }
@@ -148,7 +148,7 @@ event_que *db_event_query_1_svc(nam *pevent_name)
  * 
  * @return a pointer to a structure of the db_res type. 
  */
-db_res *db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
+db_res *db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rqstp)
 {
 	return dbm->db_getdevexp_1_svc(fil_name, rqstp);
 }
@@ -165,10 +165,10 @@ int *db_devexp_1_svc(tab_dbdev *rece)
 {
 	logStream->debugStream() << " DB_DEVEXP1 : ";
 	int *ret = reinterpret_cast<int *>(dbm->db_devexp_1_svc(rece));
-	logStream->debugStream() << *ret << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << *ret << log4cpp::eol;
 	for (unsigned int i = 0; i < rece->tab_dbdev_len; ++i)
 		logStream->debugStream() << "           : " << rece->tab_dbdev_val[i].dev_name << "(" 
-			<< rece->tab_dbdev_val[i].host_name << ")" << log4cpp::CategoryStream::ENDLINE;
+			<< rece->tab_dbdev_val[i].host_name << ")" << log4cpp::eol;
 	return ret;
 }
 
@@ -186,10 +186,10 @@ int *db_devexp_2_svc(tab_dbdev_2 *rece)
 {
 	logStream->debugStream() << " DB_DEVEXP2 : ";
 	int *ret = reinterpret_cast<int *>(dbm->db_devexp_2_svc(rece));
-	logStream->debugStream() << *ret << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << *ret << log4cpp::eol;
 	for (unsigned int i = 0; i < rece->tab_dbdev_len; ++i)
 		logStream->debugStream() << "           : " << rece->tab_dbdev_val[i].dev_name << "(" 
-			<< rece->tab_dbdev_val[i].host_name << ")" << log4cpp::CategoryStream::ENDLINE;
+			<< rece->tab_dbdev_val[i].host_name << ")" << log4cpp::eol;
 	return ret;
 }
 
@@ -205,10 +205,10 @@ int *db_devexp_3_svc(tab_dbdev_3 *rece)
 {
 	logStream->debugStream() << " DB_DEVEXP3 : ";
 	int *ret = reinterpret_cast<int *>(dbm->db_devexp_3_svc(rece));
-	logStream->debugStream() << *ret << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << *ret << log4cpp::eol;
 	for (unsigned int i = 0; i < rece->tab_dbdev_len; ++i)
 		logStream->debugStream() << "           : " << rece->tab_dbdev_val[i].dev_name << "(" 
-			<< rece->tab_dbdev_val[i].host_name << ")" << log4cpp::CategoryStream::ENDLINE;
+			<< rece->tab_dbdev_val[i].host_name << ")" << log4cpp::eol;
 	return ret;
 }
 
@@ -222,11 +222,11 @@ int *db_devexp_3_svc(tab_dbdev_3 *rece)
  */
 db_resimp *db_devimp_1_svc(arr1 *de_name)
 {
-	logStream->debugStream() << " DB_DEVIMP1 : " << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << " DB_DEVIMP1 : " << log4cpp::eol;
 	db_resimp *ret = reinterpret_cast<db_resimp *>(dbm->db_devimp_1_svc(de_name));
-//	logStream->debugStream() << *ret << log4cpp::CategoryStream::ENDLINE;
+//	logStream->debugStream() << *ret << log4cpp::eol;
         for (u_int i = 0; i < de_name->arr1_len; ++i)
-		logStream->debugStream() << "           : " << de_name->arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "           : " << de_name->arr1_val[i] << log4cpp::eol;
 	return ret;
 }
 
@@ -237,12 +237,12 @@ db_resimp *db_devimp_1_svc(arr1 *de_name)
  * 
  * @return an int which is an error code. Zero means no error
  */
-int *db_svcunr_1_svc(nam *dsn_name)
+int *db_svcunr_1_svc(DevString *dsn_name)
 {
 	logStream->debugStream() << " DB_SVCUNR : ";
 	int *ret = reinterpret_cast<int *>(dbm->db_svcunr_1_svc(dsn_name));
-	logStream->debugStream() << *ret << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "           : " << *dsn_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << *ret << log4cpp::eol;
+	logStream->debugStream() << "           : " << *dsn_name << log4cpp::eol;
 	return ret;
 }
 
@@ -254,7 +254,7 @@ int *db_svcunr_1_svc(nam *dsn_name)
  * 
  * @return a pointer to a stucture of the svc_inf type 
  */
-svc_inf *db_svcchk_1_svc(nam *dsn_name)
+svc_inf *db_svcchk_1_svc(DevString *dsn_name)
 {
 	return dbm->db_svcchk_1_svc(dsn_name);
 }
@@ -276,7 +276,7 @@ db_res *devserverlist_1_svc(void)
  *
  * @return The personal name list
  */
-db_res *devpersnamelist_1_svc(nam *server)
+db_res *devpersnamelist_1_svc(DevString *server)
 {
 	return dbm->devpersnamelist_1_svc(server);
 }
@@ -303,10 +303,10 @@ db_psdev_error *db_psdev_reg_1_svc(psdev_reg_x *rece)
 {
 	logStream->debugStream() << " DB_PSDEV_REG : ";
 	db_psdev_error *ret = dbm->db_psdev_reg_1_svc(rece);
-	logStream->debugStream() << ret->error_code << "(" << ret->psdev_err << ")" << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "              : " << rece->h_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << ret->error_code << "(" << ret->psdev_err << ")" << log4cpp::eol;
+	logStream->debugStream() << "              : " << rece->h_name << log4cpp::eol;
 	for (unsigned int i = 0; i < rece->psdev_arr.psdev_arr_len; ++i)
-		logStream->debugStream() << "              : " << rece->psdev_arr.psdev_arr_val[i].psdev_name << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "              : " << rece->psdev_arr.psdev_arr_val[i].psdev_name << log4cpp::eol;
 	return ret;
 }
 
@@ -321,9 +321,9 @@ db_psdev_error *db_psdev_unreg_1_svc(arr1 *rece)
 {
 	logStream->debugStream() << " DB_PSDEV_REG : ";
 	db_psdev_error *ret = dbm->db_psdev_unreg_1_svc(rece);
-	logStream->debugStream() << ret->error_code << "(" << ret->psdev_err << ")" << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << ret->error_code << "(" << ret->psdev_err << ")" << log4cpp::eol;
 	for (unsigned int i = 0; i < rece->arr1_len; ++i)
-		logStream->debugStream() << "              : " << rece->arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "              : " << rece->arr1_val[i] << log4cpp::eol;
 	return ret;
 }
 
@@ -344,7 +344,7 @@ db_res *resdomainlist_1_svc(void)
  *
  * @return The family name list
  */
-db_res *resfamilylist_1_svc(nam* domain)
+db_res *resfamilylist_1_svc(DevString *domain)
 {
 	return dbm->resfamilylist_1_svc(domain);
 }
@@ -406,7 +406,7 @@ db_res *db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
  * 
  * @return a pointer to a structure of the db_res type.
  */
-db_res *db_getdev_1_svc(nam *dev_name)
+db_res *db_getdev_1_svc(DevString *dev_name)
 {
 	return dbm->db_getdev_1_svc(dev_name);
 }
@@ -422,10 +422,10 @@ int *db_putres_1_svc(tab_putres *rece)
 {
 	logStream->debugStream() << " DB_PUTRES : ";
 	int *ret = reinterpret_cast<int *>(dbm->db_putres_1_svc(rece));
-	logStream->debugStream() << *ret << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << *ret << log4cpp::eol;
 	for(unsigned int i = 0; i < rece->tab_putres_len; ++i)
 		logStream->debugStream() << "           : " << rece->tab_putres_val[i].res_name << "(" << 
-					rece->tab_putres_val[i].res_val << ")" << log4cpp::CategoryStream::ENDLINE;
+					rece->tab_putres_val[i].res_val << ")" << log4cpp::eol;
 	return ret;
 }
 
@@ -442,9 +442,9 @@ int *db_delres_1_svc(arr1 *rece, struct svc_req *rqstp)
 {
 	logStream->debugStream() << " DB_DELRES : ";
 	int *ret = reinterpret_cast<int *>(dbm->db_delres_1_svc(rece));
-	logStream->debugStream() << *ret << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << *ret << log4cpp::eol;
 	for (unsigned int i = 0; i < rece->arr1_len; ++i)
-		logStream->debugStream() << "           : " << rece->arr1_val[0] << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "           : " << rece->arr1_val[0] << log4cpp::eol;
 	return ret;
 }
 
@@ -455,7 +455,7 @@ int *db_delres_1_svc(arr1 *rece, struct svc_req *rqstp)
  *
  * @return a pointer to a structure with all device info and an error code which is set if needed
  */
-db_devinfo_svc *devinfo_1_svc(nam *dev)
+db_devinfo_svc *devinfo_1_svc(DevString *dev)
 {
 	return dbm->devinfo_1_svc(dev);
 }
@@ -479,12 +479,12 @@ db_res *devres_1_svc(db_res *recev)
  * 
  * @return a pointer to an error code
  */
-DevLong *devdel_1_svc(nam *dev)
+DevLong *devdel_1_svc(DevString *dev)
 {
 	logStream->debugStream() << " DB_DEVDEL : ";
 	DevLong *ret = dbm->devdel_1_svc(dev);
-	logStream->debugStream() << *ret << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "           : " << *dev << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << *ret << log4cpp::eol;
+	logStream->debugStream() << "           : " << *dev << log4cpp::eol;
 	return ret;
 }
 
@@ -499,9 +499,9 @@ db_psdev_error *devdelres_1_svc(db_res *recev)
 {
 	logStream->debugStream() << " DB_DEVDELALLRES : ";
 	db_psdev_error *ret = dbm->devdelres_1_svc(recev);
-	logStream->debugStream() << ret->error_code << "(" << ret->psdev_err << ")"  << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << ret->error_code << "(" << ret->psdev_err << ")"  << log4cpp::eol;
 	for (unsigned int i = 0; i < recev->res_val.arr1_len; ++i)
-		logStream->debugStream() << "                 : " << recev->res_val.arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "                 : " << recev->res_val.arr1_val[i] << log4cpp::eol;
 	return ret;
 }
 
@@ -527,9 +527,9 @@ DevLong *unreg_1_svc(db_res *recev)
 {
 	logStream->debugStream() << " DB_UNREG : "; 
 	DevLong *ret = dbm->unreg_1_svc(recev);
-	logStream->debugStream() << *ret << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << *ret << log4cpp::eol;
 	for (unsigned int i = 0; i < recev->res_val.arr1_len; ++i)
-		logStream->debugStream() << "             : " << recev->res_val.arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "             : " << recev->res_val.arr1_val[i] << log4cpp::eol;
 	return ret;
 }
 
@@ -543,7 +543,7 @@ DevLong *unreg_1_svc(db_res *recev)
  */
 svcinfo_svc *svcinfo_1_svc(db_res *recev)
 {
-	logStream->debugStream() << "DB_SVCINFO " << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "DB_SVCINFO " << log4cpp::eol;
 	return dbm->svcinfo_1_svc(recev);
 }
 
@@ -559,9 +559,9 @@ DevLong *svcdelete_1_svc(db_res *recev)
 {
 	logStream->debugStream() << " DB_SVCDELETE : ";
 	DevLong *ret = dbm->svcdelete_1_svc(recev);
-	logStream->debugStream() << *ret << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << *ret << log4cpp::eol;
 	for (unsigned int i = 0; i < recev->res_val.arr1_len; ++i)
-		logStream->debugStream() << "              : " << recev->res_val.arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "              : " << recev->res_val.arr1_val[i] << log4cpp::eol;
 	return ret;
 }
 
@@ -572,7 +572,7 @@ DevLong *svcdelete_1_svc(db_res *recev)
  *
  * @return a pointer to an error code
  */
-db_poller_svc *getpoller_1_svc(nam *dev)
+db_poller_svc *getpoller_1_svc(DevString *dev)
 {
     return dbm->getpoller_1_svc(dev);
 }
@@ -588,9 +588,9 @@ db_psdev_error *upddev_1_svc(db_res *dev_list)
 {
 	logStream->debugStream() << " DB_UPDDEV : ";
 	db_psdev_error *ret = dbm->upddev_1_svc(dev_list);
-	logStream->debugStream() << ret->error_code << "(" << ret->psdev_err << ")"  << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << ret->error_code << "(" << ret->psdev_err << ")"  << log4cpp::eol;
 	for (unsigned int i = 0; i < dev_list->res_val.arr1_len; ++i)
-		logStream->debugStream() << "           : " << dev_list->res_val.arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "           : " << dev_list->res_val.arr1_val[i] << log4cpp::eol;
 	return ret;
 }
 
@@ -605,9 +605,9 @@ db_psdev_error *updres_1_svc(db_res *res_list)
 {
 	logStream->debugStream() << " DB_UPDRES : ";
 	db_psdev_error *ret = dbm->updres_1_svc(res_list);
-	logStream->debugStream() << ret->error_code << "(" << ret->psdev_err << ")"  << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << ret->error_code << "(" << ret->psdev_err << ")"  << log4cpp::eol;
 	for (unsigned int i = 0; i < res_list->res_val.arr1_len; ++i)
-		logStream->debugStream() << "           : " << res_list->res_val.arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "           : " << res_list->res_val.arr1_val[i] << log4cpp::eol;
 	return ret;
 }
 

@@ -22,6 +22,11 @@
 #endif
 
 #include <Python.h>
+
+#ifndef HAVE_PY_SSIZE_T
+typedef int Py_ssize_t;
+#endif
+
 #include "TACOClient.h"
 #include "TACOPythonClientConverters.h"
 #include "TACOBasicCommands.h"
@@ -930,12 +935,12 @@ void initTACOClient(int i)
 		PyDict_SetItemString(d, "__author__", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyString_FromString("$Revision: 1.1 $"))
+	if (tmp = PyString_FromString("$Revision: 1.2 $"))
 	{
 		PyDict_SetItemString(d, "__revision__", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyString_FromString("$Date: 2006-12-07 15:11:46 $"))
+	if (tmp = PyString_FromString("$Date: 2008-04-06 09:06:56 $"))
 	{
 		PyDict_SetItemString(d, "__date__", tmp);
 		Py_DECREF(tmp);

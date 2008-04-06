@@ -33,17 +33,8 @@
  * Version:     $Revision: 1.9 $
  *
  * Date:        $Date: 2006/04/20 06:33:17 $
- */
-
-
-
- Copyright (c) 1990 by European Synchrotron Radiation Facility, 
-                       Grenoble, France
-
-		       All Rights Reserved
-
+ *
  *********************************************************************/
-
 #ifndef _PowerSupply_h
 #define _PowerSupply_h
 

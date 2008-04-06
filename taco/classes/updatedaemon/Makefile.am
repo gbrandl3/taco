@@ -27,11 +27,12 @@ bin_PROGRAMS 		= ud_daemon ud_poller ud_daemon_menu
 ud_daemon_SOURCES  	= daemon.c startup.c daemon_xdr.c MakeDP.c
 
 ud_daemon_menu_SOURCES = daemon_menu.c daemon_xdr.c
+ud_daemon_menu_LDADD   = @TACO_CLIENT_LIBS@
 
 if TANGO_POLLER
 override CC		= $(CXX)
 ud_poller_SOURCES  	= poller.c MakeDP.c datac.c
-ud_poller_LDADD		= @TANGO_CLIENT_CXX_LIBS@ ../../lib/dataport/libdataport.la 
+ud_poller_LDADD		=  @TANGO_LIBS@ @CORBA_LDFLAGS@ @CORBA_LIBS@ @TANGO_CLIENT_CXX_LIBS@ ../../lib/dataport/libdataport.la 
 else
 ud_poller_SOURCES  	= poller.c MakeDP.c datac.c
 ud_poller_LDADD		= @TACO_CLIENT_LIBS@ ../../lib/dataport/libdataport.la

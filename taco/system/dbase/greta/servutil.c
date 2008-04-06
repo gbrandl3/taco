@@ -30,9 +30,9 @@
  *
  * Original     : June 1998
  *
- * Version      : $Revision: 1.3 $
+ * Version      : $Revision: 1.4 $
  *
- * Date         : $Date: 2006-09-18 21:59:06 $
+ * Date         : $Date: 2008-04-06 09:07:39 $
  *
  */
 
@@ -48,7 +48,7 @@
 #include <greta.h>
 
 long db_getserverdeviceres(char *ds_name,char *pers_name,db_svcinfo_call *p_info,
-			   char **p_str,long dev_nb,long all_ds,long *error)
+			   char **p_str,long dev_nb,long all_ds, DevLong *error)
 {
 	long i,j,ind;
 	long res_nb;
@@ -123,7 +123,7 @@ long db_getserverdeviceres(char *ds_name,char *pers_name,db_svcinfo_call *p_info
 
 
 long db_builddevicelist(char *ds_name,char *pers_name,db_svcinfo_call *p_info,
-			char **p_str,long all_ds,long *error)
+			char **p_str,long all_ds, DevLong *error)
 {
 	long i,j;
 	long size = 0;
@@ -232,7 +232,7 @@ long db_builddevicelist(char *ds_name,char *pers_name,db_svcinfo_call *p_info,
 
 
 long db_buildservinfo(char *ds_name,char *pers_name,db_svcinfo_call *p_info,
-		      char **p_str,long all_ds,long *error)
+		      char **p_str,long all_ds, DevLong *error)
 {
 	char tmp[100];
 	long i,j,nb_alloc;

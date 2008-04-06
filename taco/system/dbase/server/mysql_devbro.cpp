@@ -19,15 +19,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * File:
- *
+ *		mysql_devbro.cpp
  * Description:
  *
  * Authors:
- *		$Author: jlpons $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2006-12-12 17:23:08 $
+ * Date:	$Date: 2008-04-06 09:07:41 $
  *
  */
 
@@ -45,9 +45,7 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
 {
     std::vector<std::string>	dom_list;
 	
-#ifdef DEBUG
-    std::cout << "In devdomainlist_1_svc function" << std::endl;
-#endif
+    logStream->debugStream() << "In devdomainlist_1_svc function" << log4cpp::eol;
 
 //
 // Initialize structure sent back to client
@@ -58,9 +56,9 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
 //
 // If the server is not connected to the database, return error
 //
-    if (!dbgen.connected)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to the database" << std::endl;
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -68,12 +66,12 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
 // Get the domain name list from the NAMES table
 //
     std::string query = "SELECT DISTINCT DOMAIN FROM device ORDER BY DOMAIN ASC";
-#ifdef DEBUG
-    std::cout << "MySQLServer::devdomainlist_1_svc(): query " << query << std::endl;
-#endif /* DEBUG */
+
+    logStream->debugStream() << "MySQLServer::devdomainlist_1_svc(): query " << query << log4cpp::eol;
+
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return (&browse_back);
     }
@@ -97,12 +95,12 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
         dom_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
         (browse_back.res_val.arr1_val[i])[k] = '\0';
     }
-#ifdef DEBUG
-    std::cout << "Found the following domains" << std::endl;
+
+    logStream->debugStream() << "Found the following domains" << log4cpp::eol;
     for (std::vector<std::string>::iterator it = dom_list.begin(); it != dom_list.end(); ++it)
-	std::cout << *it << std::endl;
-    std::cout << std::endl;
-#endif
+	logStream->debugStream() << *it << log4cpp::eol;
+    logStream->debugStream() << log4cpp::eol;
+
 //
 // Return data
 //
@@ -116,14 +114,12 @@ db_res *MySQLServer::devdomainlist_1_svc(void)
  *
  * @return The family name list
  */
-db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
+db_res *MySQLServer::devfamilylist_1_svc(DevString * domain)
 {
     std::string		user_domain(*domain);
     std::vector<std::string>	fam_list;
 	
-#ifdef DEBUG
-    std::cout << "In devfamilylist_1_svc function for domain " << *domain << std::endl;
-#endif
+    logStream->debugStream() << "In devfamilylist_1_svc function for domain " << *domain << log4cpp::eol;
 	
 //
 // Initialize structure sent back to client
@@ -134,9 +130,9 @@ db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
 //
 // If the server is not connected to the database, return error
 //
-    if (!dbgen.connected)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to the database" << std::endl;
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -144,12 +140,12 @@ db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
 // Get the family name list for the wanted domain in the NAMES table
 //
     std::string query = "SELECT DISTINCT FAMILY FROM device WHERE DOMAIN = '" + user_domain + "' ORDER BY FAMILY ASC";
-#ifdef DEBUG
-    std::cout << "MySQLServer::devfamilylist_1_svc(): query " << query << std::endl;
-#endif /* DEBUG */
+
+    logStream->debugStream() << "MySQLServer::devfamilylist_1_svc(): query " << query << log4cpp::eol;
+
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return (&browse_back);
     }
@@ -172,12 +168,12 @@ db_res *MySQLServer::devfamilylist_1_svc(nam * domain)
         fam_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
         (browse_back.res_val.arr1_val[i])[k] = '\0';
     }
-#ifdef DEBUG
-    std::cout << "Found the following families in the domain " << user_domain << std::endl;
+
+    logStream->debugStream() << "Found the following families in the domain " << user_domain << log4cpp::eol;
     for (std::vector<std::string>::iterator it = fam_list.begin(); it != fam_list.end(); ++it)
-	std::cout << *it << std::endl;
-    std::cout << std::endl;
-#endif
+	logStream->debugStream() << *it << log4cpp::eol;
+    logStream->debugStream() << log4cpp::eol;
+
 //
 // Return data
 //
@@ -200,9 +196,7 @@ db_res *MySQLServer::devmemberlist_1_svc(db_res *recev)
     std::string user_domain(recev->res_val.arr1_val[0]);
     std::string user_family(recev->res_val.arr1_val[1]);
 	
-#ifdef DEBUG
-    std::cout << "In devmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << std::endl;
-#endif
+    logStream->errorStream() << "In devmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << log4cpp::eol;
 	
 //
 // Initialize structure sent back to client
@@ -213,9 +207,9 @@ db_res *MySQLServer::devmemberlist_1_svc(db_res *recev)
 //
 // If the server is not connected to the database, return error
 //
-    if (!dbgen.connected)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to the database" << std::endl;
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -224,12 +218,12 @@ db_res *MySQLServer::devmemberlist_1_svc(db_res *recev)
 //
     std::string query = "SELECT DISTINCT MEMBER FROM device WHERE DOMAIN = '" + user_domain;
     query += "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC";
-#ifdef DEBUG
-    std::cout << "MySQLServer::devfamilylist_1_svc(): query " << query << std::endl;
-#endif /* DEBUG */
+
+    logStream->debugStream() << "MySQLServer::devfamilylist_1_svc(): query " << query << log4cpp::eol;
+
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return (&browse_back);
     }

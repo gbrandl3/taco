@@ -32,9 +32,9 @@
  *
  * Original:	November 1996
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2005-07-25 13:08:28 $
+ * Date:	$Date: 2008-04-06 09:06:59 $
  *
  *+**********************************************************************/
 
@@ -66,7 +66,7 @@ private :
 //
 // not many OIC classes have this method
 //
-   long GetResources (char *res_name, long *error); 
+   long GetResources (char *res_name, DevLong *error); 
 
 
 //
@@ -75,19 +75,19 @@ private :
 
 public:
 
-   long State(void *vargin, void *vargout , long *error);
-   long Status(void *vargin, void *vargout, long *error);
+   long State(DevArgument vargin, DevArgument vargout , DevLong *error);
+   long Status(DevArgument vargin, DevArgument vargout, DevLong *error);
 
 // 
 // class variables
 //
   
-   OICDevice (DevString devname, DevServerClass devclass, long *error);
+   OICDevice (DevString devname, DevServerClass devclass, DevLong *error);
    ~OICDevice ();
    long Command ( long cmd, 
                   void *argin, long argin_type,
                   void *argout, long argout_type, 
-                  long *error);
+                  DevLong *error);
    DevMethodFunction MethodFinder( DevMethod method);
    
    inline short get_state(void) {return(this->ds->devserver.state);}
@@ -100,7 +100,7 @@ public:
 
 protected:
 
-   long StateMachine( long cmd, long *error);
+   long StateMachine( DevCommand cmd, DevLong *error);
    
 //
 // OICDevice member fields

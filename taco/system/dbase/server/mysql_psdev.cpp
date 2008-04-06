@@ -19,15 +19,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * File:
- *
+ *		mysql_psdev.cpp
  * Description:
  *
  * Authors:
- *		$Author: jlpons $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.13 $
  *
- * Date:	$Date: 2006-12-12 17:23:08 $
+ * Date:	$Date: 2008-04-06 09:07:41 $
  *
  */
 
@@ -54,23 +54,22 @@ db_psdev_error *MySQLServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
 //
     psdev_back.error_code = psdev_back.psdev_err = 0;
 
-#ifdef DEBUG
-    std::cout << "Begin db_psdev_register" << std::endl;
-    std::cout << "Host name : " << rece->h_name << std::endl;
-    std::cout << "PID = " << rece->pid << std::endl;
+    logStream->debugStream() << "Begin db_psdev_register" << log4cpp::eol;
+    logStream->debugStream() << "Host name : " << rece->h_name << log4cpp::eol;
+    logStream->debugStream() << "PID = " << rece->pid << log4cpp::eol;
     for (long i = 0; i < num_psdev; i++)
     {
 	tmp = &(rece->psdev_arr.psdev_arr_val[i]);
-	std::cout << "Pseudo device name : " << tmp->psdev_name << std::endl;
-	std::cout << "Refresh period : " << tmp->poll << std::endl;
+	logStream->debugStream() << "Pseudo device name : " << tmp->psdev_name << log4cpp::eol;
+	logStream->debugStream() << "Refresh period : " << tmp->poll << log4cpp::eol;
     }
-#endif
+
 //
 // Return error code if the server is not connected 
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	psdev_back.error_code = DbErr_DatabaseNotConnected;
 	return(&psdev_back);
     }
@@ -79,7 +78,7 @@ db_psdev_error *MySQLServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
 //
     for (long i = 0;i < num_psdev;i++)
     {
-	long	error;
+	DevLong	error;
 	tmp = &(rece->psdev_arr.psdev_arr_val[i]);
 	if (reg_ps(rece->h_name,rece->pid,tmp->psdev_name, tmp->poll,&error) == -1)
 	{
@@ -91,9 +90,7 @@ db_psdev_error *MySQLServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
 //
 // Leave server 
 //
-#ifdef DEBUG
-    std::cout << "End db_psdev_register" << std::endl;
-#endif 
+    logStream->debugStream() << "End db_psdev_register" << log4cpp::eol;
     return(&psdev_back);
 }
 
@@ -111,7 +108,7 @@ db_psdev_error *MySQLServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
  * @returns DS_OK is everything OK. Otherwise, the returned value is DS_NOTOK and 
  * 	the error code is set to the appropiate error.
  */
-long MySQLServer::reg_ps(std::string h_name, long pid, std::string ps_name, long poll, long *p_error)
+long MySQLServer::reg_ps(std::string h_name, long pid, std::string ps_name, long poll, DevLong *p_error)
 {
 	std::string	ps_name_low(ps_name);
 //
@@ -135,7 +132,7 @@ long MySQLServer::reg_ps(std::string h_name, long pid, std::string ps_name, long
     	query = "SELECT COUNT(*) FROM device WHERE NAME = '" + ps_name_low + "' AND CLASS NOT LIKE 'PseudoDevice'";
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
-		std::cout << mysql_error(mysql_conn) << std::endl; 
+		logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol; 
 		*p_error = DbErr_DatabaseAccess;
 		return(-1);
 	}
@@ -178,7 +175,7 @@ long MySQLServer::reg_ps(std::string h_name, long pid, std::string ps_name, long
 //
 // In case of error 
 //
-	    std::cout << mysql_error(mysql_conn) << std::endl;
+	    logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	    throw long(DbErr_DatabaseAccess);
         }
 #if !HAVE_SSTREAM
@@ -248,17 +245,17 @@ db_psdev_error *MySQLServer::db_psdev_unreg_1_svc(arr1 *rece)
 //
     psdev_back.error_code = psdev_back.psdev_err = 0;
 
-#ifdef DEBUG
-    std::cout << "Begin db_psdev_unregister" << std::endl;
+
+    logStream->debugStream() << "Begin db_psdev_unregister" << log4cpp::eol;
     for (long i = 0;i < num_psdev;i++)
-	std::cout << "Pseudo device name : " << rece->arr1_val[i] << std::endl;
-#endif
+	logStream->debugStream() << "Pseudo device name : " << rece->arr1_val[i] << log4cpp::eol;
+
 //
 // Return error code if the server is not connected 
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	psdev_back.error_code = DbErr_DatabaseNotConnected;
 	return(&psdev_back);
     }
@@ -278,9 +275,7 @@ db_psdev_error *MySQLServer::db_psdev_unreg_1_svc(arr1 *rece)
 //
 // Leave server */
 //
-#ifdef DEBUG
-    std::cout << "End db_psdev_unregister" << std::endl;
-#endif 
+    logStream->debugStream() << "End db_psdev_unregister" << log4cpp::eol;
     return(&psdev_back);
 }
 
@@ -318,7 +313,7 @@ long MySQLServer::unreg_ps(std::string ps_name, long *p_error)
     query = "DELETE FROM device WHERE NAME = '" + ps_name_low + "'";
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	*p_error = DbErr_DatabaseAccess;
 	return (-1);
     }

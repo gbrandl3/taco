@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.7 $
+ * Version      : $Revision: 1.8 $
  *
- * Date         : $Date: 2006-09-18 21:50:16 $
+ * Date         : $Date: 2008-04-06 09:07:51 $
  *
  */
 
@@ -99,7 +99,7 @@ void usage(const char *cmd)
 int main(int argc, char **argv)
 {
 	int 		ds;
-	long 		error;
+	DevLong		error;
 	char 		*tmp;
 	unsigned int 	diff;
 /*
@@ -193,7 +193,7 @@ int main(int argc, char **argv)
 
 /* Compute pointers area size and allocation table size */
 	nb_tot = dev_num + cell_num;
-	ptr_size = (int)((nb_tot * sizeof(dc_dev_param)) + (nb_tot * sizeof(int_level)));
+	ptr_size = (int)(nb_tot * (sizeof(dc_dev_param) + sizeof(int_level)));
 	alloc_size = (int)(dat_size / 256);
 
 /* Create memories and semaphores */
@@ -205,7 +205,6 @@ int main(int argc, char **argv)
  *
  * andy 09nov05
  */
-
         if (db_getresource("CLASS/DC/1",res2,res2_size,&error))
         {
                 fprintf(stderr,"dc_inits : Can't retrieve host resources\n");
@@ -288,7 +287,9 @@ void from_scratch(int ptr_size, int alloc_size, int dat_size, int nb_tot)
 	create_sem();
 	return;
 }
+
 
+
 /**
  * To reserve and clear the three buffers in three 
  * different shared memory segments. Thses three buffers are: 
@@ -305,10 +306,11 @@ void from_scratch(int ptr_size, int alloc_size, int dat_size, int nb_tot)
 
 void get_shm_buffer(int ptr_size, int alloc_size, int dat_size, int nb_tot)
 {
-	int 		i,
+	int 		i, j,
 			*tmp_ptr,
 			tmp_size;
 	dc_dev_param 	*array;
+	int_level 	*int_array; 
 
 /* Reserve the data buffer in a shared memory segment */
 	if ((shmid_datbuf = shmget((key_t)KEY_DATBUF,(size_t)dat_size,IPC_CREAT | 0666)) == -1) 
@@ -326,6 +328,9 @@ void get_shm_buffer(int ptr_size, int alloc_size, int dat_size, int nb_tot)
 		fprintf(stderr, "dc_inits : Error code : %d\n",errno);
 		exit(-1);
 	}
+#ifdef DEBUG
+	fprintf(stderr, "DATA : SHMID = %d (%d), ptr = %p\n", shmid_datbuf, dat_size, shmadr_datbuf);
+#endif
 
 /* Reserve the pointers buffer in shared memory */
 	if ((shmid_ptr = shmget((key_t)KEY_PTR,(size_t)ptr_size,IPC_CREAT | 0666)) == -1) 
@@ -349,6 +354,9 @@ void get_shm_buffer(int ptr_size, int alloc_size, int dat_size, int nb_tot)
 		shmctl(shmid_ptr,IPC_RMID,0);
 		exit(-1);
 	}
+#ifdef DEBUG
+	fprintf(stderr, "PTR : SHMID = %d (%d), ptr = %p\n", shmid_ptr, ptr_size, shmadr_ptr);
+#endif
 
 /* Reserve the allocation table also in shared memory */
 	if ((shmid_alloc = shmget((key_t)KEY_ALLOC,(size_t)alloc_size,IPC_CREAT | 0666)) == -1) 
@@ -376,10 +384,13 @@ void get_shm_buffer(int ptr_size, int alloc_size, int dat_size, int nb_tot)
 		shmctl(shmid_alloc,IPC_RMID,0);
 		exit(-1);
 	}
+#ifdef DEBUG
+	fprintf(stderr, "ALLOC : SHMID = %d (%d), ptr = %p\n", shmid_alloc, alloc_size, shmadr_alloc);
+#endif
 
 /* Clear the allocation area */
 
-	tmp_size = alloc_size >> 2;
+	tmp_size = alloc_size / sizeof(int);
 	tmp_ptr = (int *)shmadr_alloc;
 	for (i = 0;i < tmp_size;i++) 
 	{
@@ -392,8 +403,14 @@ void get_shm_buffer(int ptr_size, int alloc_size, int dat_size, int nb_tot)
 	for (i = 0;i < ptr_size;i++)
 		shmadr_ptr[i] = 0;
 	array = (dc_dev_param *)shmadr_ptr;
+	int_array = (int_level *)&array[nb_tot];
 	for (i = 0;i < nb_tot;i++)
+	{
 		array[i].next_rec = 1;
+		for (j = 0; j < HIST; ++j)
+			int_array[i].data_buf[j] = -1;
+	}
+
 	return;
 }
 

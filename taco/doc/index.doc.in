@@ -1,0 +1,168 @@
+/******************************************************************************
+ * Copyright (C) 2007 Jens Krüger <jens.krueger@frm2.tum.de>
+ *
+ * Permission to use, copy, modify, and distribute this software and its
+ * documentation under the terms of the GNU General Public License is hereby 
+ * granted. No representations are made about the suitability of this software 
+ * for any purpose. It is provided "as is" without express or implied warranty.
+ * See the GNU General Public License for more details.
+ *
+ */
+/*! \page index 
+\if logo_on
+<center>
+\htmlonly
+<h1>TACO</h1>
+<img align=center lowsrc="taco_logo.gif" src="taco_logo.gif" 
+     width=634 height=197 alt="TACO"><br>
+Version: @VERSION@
+\endhtmlonly
+</center>
+\endif
+
+<h2>Introduction</h2>
+TACO is a toolkit for implementing distributed object oriented control systems. It
+has been used at the <a href="http://www.esrf.eu">European Synchrotron Radiation Facility (ESRF)</a>
+\latexonly(see {\tt http://www.esrf.eu})\endlatexonly
+ in Grenoble
+(FRANCE) to control the accelerator complex and all beamlines.
+
+It is also used at
+<a href="http://www.frm2.tum.de">Neue Forschungsneutronenquelle "Heinz Maier-Leibnitz" (FRM II)</a>
+\latexonly(see {\tt http://www.frm2.tum.de/})\endlatexonly
+in Garching (Germany) to control the instruments and at the
+<a href="http://www.hartrao.ac.za">Hartebeesthoek Radio Astronomy Observatory (HartRAO)</a>
+\latexonly(see {\tt http://www.hartrao.ac.za})\endlatexonly
+in Hartebeesthoek (South Africa) to control a 26 meter radio telescope.
+
+TACO can be compared to other distributed object toolkits like CORBA, DCOM, and OPC
+(on Windows) with the main differences being :
+
+-# TACO is easy to use and understand,
+-# TACO is freely available,
+-# TACO is based on ONC/RPC (now part of the GNU C library),
+-# TACO is multi-platform.
+
+In TACO all control points are represented as devices. Devices are objects which belong
+to a control class. The class implements the logic necessary to control the device
+hardware/software.
+
+Devices are served by processes called device servers. Device servers are distributed
+over one or any number of machines.
+
+Clients which need to accesses devices do so through a application programmer's interface.
+The clients can access devices synchronously, asynchronously or by events.
+
+The network layers are kept entirely hidden from the device server and client programmer's by
+
+TACO. TACO supports a database for storing persistant information and keeping track of where
+devices are running.
+
+TACO is used to control an accelerator complex, experimental setups on beamlines (using
+synchrotron radiation and neutrons), a radio telescope, and other smaller projects.
+It is ideal for adding Ethernet control to embedded and non-embedded devices in a research,
+industrial or home environment.
+
+Refer to the appendix for a list of existing device servers.
+
+TACO can be downloaded from the
+<a href="http://taco.sourceforge.net">TACO website</a>
+\latexonly(see {\tt http://taco.sourceforge.net})\endlatexonly
+and installed from the source code. TACO is made available under the GNU Public Licence
+(see \ref license) without warranties. For news about recent developments in TACO go to the
+website.
+
+\n This manual is divided into three parts, each of which is divided into several 
+sections.
+
+The first part forms a user manual:
+<ul>
+<li>Section \ref whatis  Provides a brief overview of what TACO is, useful for newcomers to TACO.
+<li>Section \ref lite  What is the light version of TACO?
+<li>Section \ref install How to <a href="http://sourceforge.net/project/showfiles.php?group_id=38710">download</a>, compile and install TACO on your platfrom 
+
+<li>Section \ref started  For those who wants to get going quickly without having to read this manual.
+<li>Section \ref ds_model  DSM
+<li>Section \ref c  How to write TACO devices servers in C
+<li>Section \ref cplusplus  How to write a TACO device servers in C++
+<li>Section \ref basicsteps  How to integrate a new device in my system
+<li>Section \ref accesscontrol
+<li>Section \ref private_types  How to create new data types.
+<li>Section \ref testtool  Testing the running system
+<li>Section \ref python_and_taco
+<li>Section \ref labview
+<li>Section \ref dsapi
+<li>Section \ref database_guide
+<li>Section \ref events
+<li>Section \ref signal
+</ul>
+
+The second part forms a reference manual:
+
+<ul>
+<li>Section TACO API 
+<li>Section Signal API
+</ul>
+
+The third part provides information for developers:
+
+<ul>
+<li>Section 
+</ul>
+
+<h2>TACO license</h2>
+\anchor license
+\addindex license
+\addindex GPL
+
+Copyright &copy; 1991-2007 by 
+<a href="mailto:@PACKAGE_BUGREPORT@">TACO developers</a>.<p>
+
+TACO is a free software. You can redistribute it and/or modify it under the terms
+of the GNU General Public License as published by the Free Software Foundation(FSF);
+either version 2 of the License, or (at your option) any later version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY of FITNESS FOR A 
+PARTICULAR PURPOSE.
+See the 
+<a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html">
+GNU General Public License</a>
+for more details.
+
+<h2> Acknowledgement</h2>
+A lot of people have contributed to TACO since its beginning. The following people
+have contributed to the kernel of TACO in the form of system programming, bug fixes,
+ports etc :
+
+- Martin Diehl (FRM-II) - bug fixes
+- Andy G&ouml;tz (ESRF) - device server model, asynchronism, events, dsapi
+- Markhu Karhu (ESRF) - (original) ndbm database server
+- Wolf-Dieter Klotz (ESRF) - Windows port
+- Jens Kr&uuml;ger (FRM-II) - bug fixes
+- Jens Meyer (ESRF) - dsapi, dsxdr, security, manager
+- Bj&oslash;rn Pedersen (FRM-II) - bug fixes, improvements to events
+- Jon Quick (HartRAO) - bug fixes
+- Emmanuel Taurel (ESRF) - rtdb, Oracle and ndbm database server, dbapi, hdb
+
+The following people have written client interfaces to TACO :
+
+- Marie-Christine Dominguez (ESRF) - Python clients
+- Laurent Farvacque (ESRF) - Mathlab
+- Andy G&ouml;tz (ESRF) - Labview
+- Jens Meyer (ESRF) - Python servers
+- Gilbert Pepellin (ESRF) - Tcl
+- Faranguiss Poncet (ESRF) - xdevmenu
+- Gerry Swislow (CSS) - SPEC
+
+TACO would not be of much use without the device servers therefore it is only fair
+to mention the (long and incomplete) list of device server programmers :
+
+A.Beteva (ESRF), D.Carron (ESRF), J.M.Chaize (ESRF), M-C.Dominguez (ESRF),
+F.Epaud (ESRF), L.Farvacque (ESRF), D.Fernandez (ESRF), A.G&ouml;tz (ESRF), 
+S. Huber (FRM-II), S.Hunt (SLS), W.-D.Klotz (ESRF), M.Konijnenberg (AFOM), 
+J.Kr&uuml;ger (FRM-II), P.M&auml;kij&auml;rvi (ESRF), J.Meyer (ESRF),
+W. &Ouml;hme (Rossendorf), B.Pedersen (FRM-II), C.Penel (ESRF), M.Perez (ESRF), 
+M.Peru (ESRF), J.L.Pons (ESRF), J.Quick (HartRAO), B.Regad (ESRF), V.Rey (ESRF), 
+S. Roth (FRM-II), L.Roussier (Lure), B.Scaringella (ESRF), M.Schofield (ESRF),
+F.Sever (ESRF), E.Taurel (ESRF), P.Verdier (ESRF), R.Wilcke (ESRF), H.Witsch (ESRF)
+*/

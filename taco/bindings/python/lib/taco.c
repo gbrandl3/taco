@@ -27,13 +27,16 @@
  *
  * Original:    December 99
  * 
- * Date:	$Date: 2006-09-18 22:02:25 $
+ * Date:	$Date: 2008-04-06 09:06:32 $
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  */
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
+#endif
+#ifdef HAVE_FSTAT
+#undef HAVE_FSTAT
 #endif
 
 #include <Python.h>
@@ -67,11 +70,13 @@ static PyObject *ErrorObject;
 {PyErr_SetString(ErrorObject,message);return NULL;}
 
 static short devstatus;
-static long error;
+static DevLong error;
 static long readwrite = 0;
 static long db_imported = 0;
 static PyObject *glob_tuple;
 static PyObject *glob_dict;
+
+extern long check_provided(long typenum,long ds_out);
       				      		      
 /**
  * frees a device 
@@ -237,7 +242,7 @@ static PyObject *esrf_getresource(PyObject *self, PyObject *args)
    db_resource pt_res;
    static char mystring[200];
    unsigned int num_res;
-   long error;
+   DevLong error;
    int ret;
 
    static char* res_string = "";
@@ -356,7 +361,7 @@ static PyObject* esrf_putresource(PyObject *self,PyObject *args)
    static char mystringval[200];
    static char *my_stringval;
    unsigned int num_res;
-   long error;
+   DevLong error;
    int ret;
       
    if (flag != 0)
@@ -409,7 +414,7 @@ static PyObject *esrf_delresource(PyObject *self,PyObject *args)
    char *resname;
    int ret;
    unsigned int res_num;
-   long error;
+   DevLong error;
          
    if (flag != 0)
       printf("-- esrf_delresource: enter\n");
@@ -741,7 +746,7 @@ number
 	        0		OK
 		-1		error	
 ***************************************************/
-cmd2string(long cmd,char **mystring)
+int cmd2string(long cmd,char **mystring)
 {
    char			res_path[LONG_NAME_SIZE];
    char			res_name[SHORT_NAME_SIZE];
@@ -750,7 +755,7 @@ cmd2string(long cmd,char **mystring)
    unsigned short 	server;
    unsigned short 	cmds_ident;
    unsigned long 	cmd_number_mask = 0x3ffff;
-   long			error;
+   DevLong		error;
    char			*ret_str = NULL;
 
 /* Decode the command nuber into the fields:
@@ -838,7 +843,7 @@ long free_argin (long ds_in, DevArgument ds_argin, long is_in_an_array)
 **************************************************************/
 void free_argout (long ds_in,DevArgument ds_argin)
 {
-   long error;
+   DevLong error;
 
    if (ds_in != D_VOID_TYPE) {   
       if (flag != 0)
@@ -884,7 +889,8 @@ static PyObject* esrf_io(PyObject *self, PyObject *args, PyObject *kwarg)
 #endif
    static char *myouttype = NULL;	/* argument outtype= */
    char *array_2py=NULL;		/* to generate numeric for python */
-   long ret, error;
+   long ret;
+   DevLong error;
    static DevDataListEntry data_type;
    DevArgument ds_argin,ds_argout;
    long is_in_an_array,is_in_a_single,is_in_a_special;
@@ -1353,7 +1359,7 @@ void esrf_dc_free(void *self)
 
    dc_devfree = (dc_dev_free *)malloc(sizeof(dc_dev_free));
    dc_devfree[0].dc_ptr = (datco *) self;
-   dc_devfree[0].dc_dev_error = (long*) malloc(sizeof(long));
+   dc_devfree[0].dc_dev_error = (DevLong*) malloc(sizeof(DevLong));
 
    devstatus = dc_free(dc_devfree,1,&error);
 
@@ -1401,10 +1407,10 @@ static PyObject *esrf_dc_import(PyObject *self,PyObject *args)
       printf("esrf_dc_import: cannot allocate memory for dc access\n");
       onError("esrf_dc_import: cannot allocate memory for dc access");
    }
-   dc_devimp[0].device_name = (char*)malloc(sizeof(char)*strlen(devname));
+   dc_devimp[0].device_name = (DevString)malloc(sizeof(DevChar)*strlen(devname));
    strcpy(dc_devimp[0].device_name,devname);
    dc_devimp[0].dc_ptr = NULL;
-   dc_devimp[0].dc_dev_error = (long*) malloc(sizeof(long));
+   dc_devimp[0].dc_dev_error = (DevLong*) malloc(sizeof(DevLong));
    
    devstatus = dc_import((dc_dev_imp *)dc_devimp,1,&error);
 
@@ -1466,7 +1472,7 @@ static PyObject *esrf_dc_info(PyObject *self, PyObject *args)
    char *myhost=NULL;
    char **devnametab;
    dc_devinf dc_dev_info;
-   long error;
+   DevLong error;
    char *mystring;
 
    if (flag != 0)
@@ -1572,7 +1578,7 @@ static struct PyMethodDef Taco_methods[] = {
    {"esrf_tcpudp",	esrf_tcpudp,	1},
    {"esrf_timeout",	esrf_timeout,	1},
    {"esrf_getdevlist",	esrf_getdevlist,1},
-	{"esrf_getdevexp",	esrf_getdevexp,1},
+   {"esrf_getdevexp",	esrf_getdevexp,1},
    {"esrf_getresource",	esrf_getresource,1},
    {"esrf_putresource",	esrf_putresource,1},
    {"esrf_delresource",	esrf_delresource,1},

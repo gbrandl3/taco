@@ -39,44 +39,40 @@
 #define _PowerSupplyP_h
 
 typedef struct _PowerSupplyClassPart {
-                                       int nada;
-                                     }
-                PowerSupplyClassPart;
+	int nada;
+} PowerSupplyClassPart;
 
 typedef struct _PowerSupplyPart {
-                                  DevType type;
-                                  float set_val;
-                                  float read_val;
-                                  int channel;
-                                  int n_ave;
-                                  int fault_val;
-                                  float cal_val;
-                                  float conv_val;
-                                  char *conv_unit;
-                                  float set_offset;
-                                  float read_offset;
-                                  float set_u_limit;
-                                  float set_l_limit;
-                                  float idot_limit;
-                                  int polarity;
-                                  float delta_i;
-                                  long time_const;
-                                  long last_set_t;
-                                }
-                PowerSupplyPart;
+	DevType type;
+	float set_val;
+	float read_val;
+	int channel;
+	int n_ave;
+	int fault_val;
+	float cal_val;
+	float conv_val;
+	char *conv_unit;
+	float set_offset;
+	float read_offset;
+	float set_u_limit;
+	float set_l_limit;
+	float idot_limit;
+	int polarity;
+	float delta_i;
+	long time_const;
+	long last_set_t;
+} PowerSupplyPart;
 
 typedef struct _PowerSupplyClassRec {
-                                     DevServerClassPart devserver_class;
-                                   }
-               PowerSupplyClassRec;
+	DevServerClassPart devserver_class;
+} PowerSupplyClassRec;
 
 extern PowerSupplyClassRec powerSupplyClassRec;
 
 typedef struct _PowerSupplyRec {
-                                 DevServerPart devserver;
-                                 PowerSupplyPart powersupply;
-                               }
-                PowerSupplyRec;
+	DevServerPart 	devserver;
+	PowerSupplyPart powersupply;
+} PowerSupplyRec;
 
 #define DevMethodCheckReadValue 1000
 #define DevMethodPSInitialise   1001

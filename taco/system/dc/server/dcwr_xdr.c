@@ -30,9 +30,9 @@
  *
  * Original     : February 1993
  *
- * Version      : $Revision: 1.2 $
+ * Version      : $Revision: 1.3 $
  *
- * Date         : $Date: 2006-09-18 21:49:14 $
+ * Date         : $Date: 2008-04-06 09:07:50 $
  *
  */
 
@@ -146,7 +146,7 @@ xdr_cmd_dat(xdrs, objp)
 	if (!xdr_int(xdrs, &objp->xcmd)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->xcmd_error)) {
+	if (!xdr_DevLong(xdrs, &objp->xcmd_error)) {
 		return (FALSE);
 	}
 	if (!xdr_int(xdrs, &objp->xcmd_time)) {

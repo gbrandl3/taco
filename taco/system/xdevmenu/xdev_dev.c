@@ -29,9 +29,9 @@
  *
  * Original       : February 1997
  *
- * Version      : $Revision: 1.3 $
+ * Version      : $Revision: 1.4 $
  *
- * Date         : $Date: 2007-03-22 13:59:22 $
+ * Date         : $Date: 2008-04-06 09:08:04 $
  *
  */
 
@@ -80,12 +80,12 @@ static char                       local_out_str[400001]; /*** 400 k bytes ***/
 static char                       local_err_str[5001]; /*** 5k bytes ***/
 static char                       local_lapsed_str[501]; /*** 501 chars ***/
 
-
+int dev_find_cmd(DevVarCmdArray  cmd_table,  char  *cmd_name);
 
 
 
 /****  RCS identification keyword understandable by "what" command ***/
-static char rcsid[] = "@(#)xdevmenu application $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/xdev_dev.c,v 1.3 2007-03-22 13:59:22 jkrueger1 Exp $";
+static char rcsid[] = "@(#)xdevmenu application $Header: /home/jkrueger1/sources/taco/backup/taco/system/xdevmenu/xdev_dev.c,v 1.4 2008-04-06 09:08:04 jkrueger1 Exp $";
 
 
 /****************************************************************************
@@ -107,7 +107,7 @@ long dev_init()
 {
    int            ind_dev;
    unsigned int   stat_imp;
-   long           err;
+   DevLong        err;
    char           *err_str;
 
 
@@ -160,7 +160,7 @@ long dev_get_exported_devices( char *Dmask, char *Fmask, char *Mmask,
 {
      char    dev_filter[301];
      int     db_get_status, ln_filter;
-     long    error;
+     DevLong error;
 
 
      if ( Dmask==NULL && Fmask==NULL && Mmask==NULL)
@@ -475,7 +475,8 @@ void dev_find_sig_cmds(int  dev_ind)
 long dev_import_device(char *dev_name, int *dev_index, char **err_str)
 {
 
-   long               status, error;
+   long               status; 
+   DevLong	      error;
    devserver          dev_ptr;     
    DevVarCmdArray     cmd_table;
    DevVarStringArray  sig_conf;
@@ -792,7 +793,8 @@ long dev_read_sig_values(int  ind_dev, DevVarStringArray   *sig_conf,
                                        char  **error_str)
 {
 
-   long                 status, error;
+   long                 status; 
+   DevLong		error;
    int                  ind_end;
    struct timeval       first, second, lapsed;
    struct timezone      tzp;
@@ -898,7 +900,8 @@ long dev_free_sig_struct(long data_type,
 			      DevVarDoubleArray *sig_vals_d )
 {
 
-    long    status, error;
+    long    status; 
+    DevLong error;
     
     
     if (data_type == D_VAR_FLOATARR)
@@ -1235,7 +1238,7 @@ long dev_info_device( int  ind_dev, char **dev_name, char **dev_class,
    devserver           ds_id;
    long                status;
    DevInfo             *dev_info_ptr, dev_info_array[1];
-   long                err_code;
+   DevLong             err_code;
 
 
 
@@ -1327,7 +1330,8 @@ long dev_close_device( int  ind_dev, char   **error_str)
 {
 
    devserver            ds;
-   long                 err, status, ret_val;
+   long                 status, ret_val;
+   DevLong		err;
    char                 *temp_err_str;
    
 
@@ -1406,7 +1410,8 @@ long dev_get_timeout( int  ind_dev, long  *time_out)
 {
 
    devserver            ds;
-   long                 err, status;
+   DevLong              err;
+   long			status;
    struct timeval       tval;
    long                 time_ms;
    
@@ -1465,7 +1470,8 @@ long dev_change_timeout( int  ind_dev, long time_val, char   **error_str)
 {
 
    devserver            ds;
-   long                 err, status;
+   DevLong              err; 
+   long			status;
    struct timeval       tval;
    
 
@@ -1529,7 +1535,8 @@ long dev_change_rpc_protocol( int  ind_dev, char *rpc_pro, char   **error_str)
 {
 
    devserver            ds;
-   long                 val_protocol, err, status;
+   long                 val_protocol, status;
+   DevLong		err;
    struct timeval       tval;
    
 

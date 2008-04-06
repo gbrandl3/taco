@@ -41,7 +41,9 @@ namespace TACO {
 }
 
 //! Base class for all server devices
-class TACO::Server : public Device {
+class TACO::Server 
+	: public Device 
+{
 public:
 	//! Creates a server device
 	Server( const std::string& name, DevLong& error) throw (Exception);
@@ -105,7 +107,7 @@ public:
 	 *
 	 * @warning This is an internal method.  Do not use it!
 	 */
-	DevLong Command( DevCommand command, void* argin, DevType inputType, void* argout, DevType outputType, DevLong* error);
+	long Command( DevCommand command, DevArgument argin, DevArgType inputType, DevArgument argout, DevArgType outputType, DevLong* error);
 
 	/**
 	 * Internal method.
@@ -133,7 +135,7 @@ public:
 	 *
 	 * @warning This is an internal method.  Do not use it!
 	 */
-	DevLong GetMinAccessRight( DevCommand);
+	long GetMinAccessRight( DevCommand);
 
 	/**
 	 * Internal method.
@@ -147,7 +149,7 @@ public:
 	 *
 	 * @warning This is an internal method.  Do not use it!
 	 */
-	DevLong CommandQuery( _dev_cmd_info* info);
+	long CommandQuery( _dev_cmd_info* info);
 
 	/**
 	 * Internal method.
@@ -161,13 +163,13 @@ public:
 	 *
 	 * @warning This is an internal method.  Do not use it!
 	 */
-	DevLong EventQuery( _dev_event_info* info);
+	long EventQuery( _dev_event_info* info);
 
 	//@}
 
 protected:
 	//! Device command function pointer type
-	typedef void (*Function)(Server*, void*, void*);
+	typedef void (*Function)(Server*, DevArgument, DevArgument);
 
 	/**
 	 * Returns a buffered copy of the string.
@@ -236,15 +238,14 @@ protected:
 	}
 
 	//! Adds a command
-	void addCommand( DevCommand number, Function function, DevType inputType, DevType outputType, DevLong access = 0, std::string name = "") throw (Exception)
+	void addCommand( DevCommand number, Function function, DevArgType inputType, DevArgType outputType, DevLong access = 0, std::string name = "") throw (Exception)
 	{
 		if (hasCommand( number)) {
 			throw Exception( Error::INTERNAL_ERROR, "command exists already");
 		}
-		mCommandMap [number] = CommandMapEntry( function, inputType, outputType);
-//		commands_list[number] = DeviceCommandListEntry(number, NULL, (DevType)inputType, (DevType)outputType, access, commandName(number));
-//		commands_list[number] = DeviceCommandListEntry(number, NULL, (DevType)inputType, (DevType)outputType, access);
-//		this->n_commands = this->commands_list.size();
+		mCommandMap [number] = CommandMapEntry( function, inputType, outputType, access, name);
+//		char *t = const_cast<char *>(mCommandMap [number].cmdName.c_str());
+//		commands_map[number] = DeviceCommandMapEntry(number, (DeviceMemberFunction)NULL, inputType, outputType, access, t);
 	}
 
 	//! Returns true if the device has this resource
@@ -271,7 +272,7 @@ protected:
 	}
 
 	//! Adds an event
-	void addEvent( DevEvent number, DevType type) throw (Exception)
+	void addEvent( DevEvent number, DevArgType type) throw (Exception)
 	{
 		if (hasEvent( number)) {
 			throw Exception( Error::INTERNAL_ERROR, "event exists already");
@@ -281,7 +282,7 @@ protected:
 	}
 
 	//! Fires an event
-	void fireEvent( DevEvent event, DevArgument argout, DevType argoutType, DevLong status = DS_OK, DevLong error = 0) throw (Exception)
+	void fireEvent( DevEvent event, DevArgument argout, DevArgType argoutType, DevLong status = DS_OK, DevLong error = 0) throw (Exception)
 	{
 		lock();
 #ifdef RUNTIME_TYPE_CHECK
@@ -408,29 +409,38 @@ private:
 	//! Internal server command map entry
 	struct CommandMapEntry {
 		CommandMapEntry()
-			: function( 0), inputType( D_VOID_TYPE), outputType( D_VOID_TYPE), minAccess( 0)
+			: function( 0)
+			, inputType( D_VOID_TYPE)
+			, outputType( D_VOID_TYPE)
+			, minAccess( 0)
 		{
 		}
 
-		CommandMapEntry( Function iFunction, DevType iInputType, DevType iOutputType, DevLong iMinAccess = 0)
-			: function( iFunction), inputType( iInputType), outputType( iOutputType), minAccess( iMinAccess)
+		CommandMapEntry( Function iFunction, DevArgType iInputType, DevArgType iOutputType, DevLong iMinAccess = 0, std::string iCmdName = "")
+			: function( iFunction)
+			, inputType( iInputType)
+			, outputType( iOutputType)
+			, minAccess( iMinAccess)
+			, cmdName(iCmdName)
 		{
 		}
 
-		Function function;
+		Function 	function;
 		
-		DevType inputType;
+		DevArgType 	inputType;
 		
-		DevType outputType;
+		DevArgType 	outputType;
 
-		DevLong minAccess;
+		DevLong 	minAccess;
+
+		std::string	cmdName;
 	};
 
 	
 	char *commandName(const DevLong num)
 	{
-		char 	*cmd_name = new char[16];
-        	snprintf(cmd_name, 16, "(%li/%li/%li)", ((num >> DS_TEAM_SHIFT) & DS_TEAM_MASK), 
+		char 	*cmd_name = new char[32];
+        	snprintf(cmd_name, sizeof(cmd_name) - 1, "(%d/%d/%d)", ((num >> DS_TEAM_SHIFT) & DS_TEAM_MASK), 
 							((num >> DS_IDENT_SHIFT) & DS_IDENT_MASK), 
 							(num & 0xFFF));
 		return cmd_name;
@@ -447,13 +457,13 @@ private:
 			// VOID
 		}
 
-		EventMapEntry( DevType iType)
+		EventMapEntry( DevArgType iType)
 			: type( iType)
 		{
 			// VOID
 		}
 		
-		DevType type;
+		DevArgType type;
 	};
 	
 	//! Maps an event number to its event map entry
@@ -525,8 +535,11 @@ private:
 	//! Indicates if the device update is always allowed
 	bool mAlwaysAllowDeviceUpdate;
 
+protected:
 	//! Device command map
 	CommandMap mCommandMap;
+
+private:
 
 	//! Device resource set
 	ResourceInfoSet mResourceInfoSet;

@@ -31,9 +31,9 @@
  *
  * Original     : July 1998
  *
- * Version      : $Revision: 1.2 $
+ * Version      : $Revision: 1.3 $
  *
- * Date         : $Date: 2006-09-18 21:59:06 $
+ * Date         : $Date: 2008-04-06 09:07:38 $
  */
 
 #include <Xm/Xm.h>
@@ -80,7 +80,8 @@ void DevManageSecRes( Widget w, XtPointer client_data,long dc_flag,long *p_pass)
 	unsigned int diff;
 	char domain[20];
 	char *tmp,*err_mess;
-	long res,error;
+	long res;
+	DevLong error;
 	Widget w_curs;
  
  	int ind = (int)client_data;
@@ -193,7 +194,8 @@ void DevUpdateCb( Widget w, XtPointer client_data,XtPointer call_data,long dc_fl
 	long ind_ch,nb_chain_dev,nb_dev,nb_dev_del;
 	char **dev_list;
 	char **tmp_ptr;
-	long i,res,error;
+	long i,res;
+	DevLong error;
 	long nb_res,err_line,dev_err;
 	char **dev_def;
 	char **res_def;
@@ -505,7 +507,8 @@ void ServUpdateCb( Widget w, XtPointer client_data,XtPointer call_data)
 	long nb_dev;
 	char **dev_list;
 	char **tmp_ptr;
-	long i,j,res,error;
+	long i,j,res;
+	DevLong error;
 	long nb_res,err_line,dev_err;
 	long nb_dev1,nb_res1;
 	long nb_devf,nb_resf;
@@ -1037,7 +1040,8 @@ void ResUpdateCb(Widget w,XtPointer client_data,XtPointer call_data)
 	long nb_dev;
 	char **dev_list;
 	char **tmp_ptr;
-	long i,j,res,error,l;
+	long i,j,res,l;
+	DevLong error;
 	long nb_res,err_line,dev_err;
 	long nb_devf,nb_resf;
 	char **dev_def,**dev_deff;
@@ -1304,7 +1308,8 @@ void LoadUpdate( Widget w, XtPointer client_data, XtPointer call_data)
  	char panic_file[100];
 	char mess[300];
 	long nb_dev,nb_res;
-	long i,j,res,error;
+	long i,j,res;
+	DevLong error;
 	long err_line,dev_err;
 	char **dev_def;
 	char **res_def;

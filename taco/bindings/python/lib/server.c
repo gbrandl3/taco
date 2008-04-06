@@ -27,13 +27,16 @@
  *
  * Original:    June 2000
  *
- * Date:	$Date: 2006-09-18 22:02:25 $
+ * Date:	$Date: 2008-04-06 09:06:32 $
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  */
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
+#endif
+#ifdef HAVE_FSTAT
+#undef HAVE_FSTAT
 #endif
  
 #include <API.h>
@@ -46,7 +49,7 @@
 
 extern long     debug_flag;
 
-long		startup (char *svc_name, long *error);
+long		startup (char *svc_name, DevLong *error);
 void 		initServer();
 
 PyObject 	*Py_devices;
@@ -122,8 +125,8 @@ static PyObject *Server_startup_nodb (PyObject *self, PyObject *args)
 static PyObject *Server_cmd_string (PyObject *self, PyObject *args)
 {
 	static char     *ret_str = NULL;
-	long		cmd,
-			error;
+	long		cmd;
+	DevLong		error;
         char            res_path[256],
         		res_name[80];
         db_resource     res_tab;
@@ -222,7 +225,7 @@ void initServer()
  *
  * @return DS_OK in case of no failure otherwise DS_NOTOK
  */
-long startup (char *svc_name, long *error)
+long startup (char *svc_name, DevLong *error)
 { 
 	DevMethodFunction	fn;
 	Python	 		ds_python[MAX_PY_DEVICE];

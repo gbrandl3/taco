@@ -159,7 +159,7 @@ dnl
 dnl   # end of file
 dnl   ---------- >8 ----------
 dnl
-dnl @version $Id: rpm.m4,v 1.2 2004-05-19 15:38:06 jkrueger1 Exp $
+dnl @version $Id: rpm.m4,v 1.3 2008-04-06 09:07:33 jkrueger1 Exp $
 dnl @author Dale K. Hawkins <dhawkins@cdrgts.com>
 
 dnl AM_RPM_INIT
@@ -187,28 +187,29 @@ dnl echo rpm_prog is $rpm_prog
 
 	RPM_TARGET=""
 
-	if test x$enable_rpm_rules = xno ; then
+	AS_IF([test x$enable_rpm_rules = xno],
+              [
 		echo "Not trying to build rpms for your system (use --enable-rpm-rules to override) "
 		no_rpm=yes
-	else
-		if test x$rpm_prog != x ; then
-			if test x${RPM_PROG+set} != xset ; then
-				RPM_PROG=$rpm_prog
-			fi
-		fi
+	      ],
+	      [
+		AS_IF([test x$rpm_prog != x -a x${RPM_PROG+set} != xset], [RPM_PROG=$rpm_prog])
 
 		AC_PATH_PROGS(RPM_PROG, [rpmbuild rpm], no)
 		no_rpm=no
-		if test "$RPM_PROG" = "no" ; then
+		AS_IF([test "$RPM_PROG" = "no"], 
+		      [
 			echo *** RPM Configuration Failed
 			echo *** Failed to find the rpm program.  If you want to build rpm packages
 			echo *** indicate the path to the rpm program using  --with-rpm-prog=PROG
 			no_rpm=yes
 			RPM_MAKE_RULES=""
-		else
+		      ],
+		      [
 			AC_MSG_CHECKING(how rpm sets %{_rpmdir})
 			rpmdir=`rpm --eval %{_rpmdir}`
-			if test x$rpmdir = x"%{_rpmdir}" ; then
+			AS_IF([test x$rpmdir = x"%{_rpmdir}"],
+			      [
 				AC_MSG_RESULT([not set (cannot build rpms?)])
 				echo *** Could not determine the value of %{_rpmdir}
 				echo *** This could be because it is not set, or your version of rpm does not set it
@@ -217,9 +218,7 @@ dnl echo rpm_prog is $rpm_prog
 				echo *** You might still be able to create rpms, but I could not automate it for you
 				echo *** BTW, if you know this is wrong, please help to improve the rpm.m4 module
 				echo *** Send corrections, updates and fixes to dhawkins@cdrgts.com.  Thanks.
-			else
-				AC_MSG_RESULT([$rpmdir])
-			fi
+			      ], [AC_MSG_RESULT([$rpmdir])])
 			AC_MSG_CHECKING(how rpm sets %{_rpmfilename})
 			rpmfilename=$rpmdir/`rpm --eval %{_rpmfilename} | sed "s/%{ARCH}/${host_cpu}/g" | sed "s/%{NAME}/$PACKAGE/g" | sed "s/%{VERSION}/${VERSION}/g" | sed "s/%{RELEASE}/${RPM_RELEASE}/g"`
 			AC_MSG_RESULT([$rpmfilename])
@@ -228,8 +227,8 @@ dnl echo rpm_prog is $rpm_prog
 			RPM_TARGET=$rpmfilename
 			RPM_ARGS="-ta $rpm_extra_args"
 			RPM_TARBALL=${PACKAGE}-${VERSION}.tar.gz
-		fi
-	fi
+		      ])
+	      ])
 
 	case "${no_rpm}" in
 		yes) make_rpms=false;;

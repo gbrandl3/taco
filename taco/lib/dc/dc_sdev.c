@@ -25,9 +25,9 @@
  * Author(s):	E. Taurel
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2007-09-07 14:51:06 $
+ * Date:	$Date: 2008-04-06 09:07:14 $
  *
  ******************************************************************************/
 
@@ -76,7 +76,7 @@ int dc_dataconvert(dc_datacmd *data_cmd,unsigned int num_cmd,dc_error *error)
 				buf_size;
 	char 			*buf,
 				*buf1;
-	long 			err;
+	DevLong			err;
 	DevDataListEntry 	type_info;
 	DevType 		type;
 

@@ -41,8 +41,6 @@
  * Date:        $Date: 2006/04/20 06:33:17 $
  */
 
-static char RcsId[] = "@(#) $Header: /segfs/dserver/classes/powersupply/ag/src/RCS/AGPowerSupply.c,v 1.12 2003/12/10 20:58:24 goetz Exp $ ";
-
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif 
@@ -75,10 +73,12 @@ static char RcsId[] = "@(#) $Header: /segfs/dserver/classes/powersupply/ag/src/R
  * public methods
  */
 
-static long class_initialise(long *error);
-static long object_create(char *name,DevServer *ds_ptr,long *error);
-static long object_initialise(AGPowerSupply ds,long *error);
-static long state_handler(AGPowerSupply ds,DevCommand cmd,long *error);
+static long class_initialise(DevLong *error);
+static long object_create(char *name,DevServer *ds_ptr,DevLong *error);
+static long object_initialise(AGPowerSupply ds,DevLong *error);
+static long state_handler(AGPowerSupply ds,DevCommand cmd,DevLong *error);
+
+int mythread_start();
 
 static DevMethodListEntry methods_list[] = {
  {DevMethodClassInitialise, class_initialise},
@@ -114,7 +114,7 @@ static long dev_write();
 static long dev_read();
 
 static DevCommandListEntry commands_list[] = {
- {DevOff, dev_off, D_VOID_TYPE, D_VOID_TYPE, 0, "DevFuckOff"},
+ {DevOff, dev_off, D_VOID_TYPE, D_VOID_TYPE, 0, "DevOff"},
  {DevOn, dev_on, D_VOID_TYPE, D_VOID_TYPE, 0, "DevOn"},
  {DevState, dev_state, D_VOID_TYPE, D_SHORT_TYPE, 0, "DevState"},
  {DevSetValue, dev_setvalue, D_FLOAT_TYPE, D_VOID_TYPE, 0, "DevSetValue"},
@@ -192,7 +192,7 @@ void sighandler(long signal, long action)
  =======================================================================*/
 
 static long class_initialise(error)
-long *error;
+DevLong *error;
 {
    int iret=0;
    AGPowerSupply ps;
@@ -342,7 +342,7 @@ long *error;
 static long object_create(name, ds_ptr, error)
 char *name;
 DevServer *ds_ptr;
-long *error;
+DevLong *error;
 {
    int iret = 0;
    AGPowerSupply ps;
@@ -388,7 +388,7 @@ long *error;
  
 static long object_initialise(ps,error)
 AGPowerSupply ps;
-long *error;
+DevLong *error;
 {
    unsigned long ul_state=0;
    unsigned short us_channel=0;
@@ -481,8 +481,8 @@ long *error;
 
    dev_on(ps,NULL,NULL,error);
 
-   return(0);
-   }
+   return(DS_OK);
+}
 
 /*======================================================================
  Function:      static long state_handler()
@@ -499,7 +499,7 @@ long *error;
 static long state_handler( ps, cmd, error)
 AGPowerSupply ps;
 DevCommand cmd;
-long *error;
+DevLong *error;
 {
    long iret = 0;
    long int p_state, n_state;
@@ -739,9 +739,9 @@ static long dev_state (ps, argin, argout, error)
 AGPowerSupply ps;
 DevVoid *argin;
 DevShort *argout;
-long *error;
+DevLong *error;
 {
-	static n_called=0;
+	static int n_called=0;
 	long iret = 0;
 
 	/*printf("dev_state(%s): called\n",ps->devserver.name);*/
@@ -912,9 +912,9 @@ static long dev_error (ps, argin, argout, error)
 AGPowerSupply ps;
 DevVoid *argin;
 DevVoid *argout;
-long *error;
+DevLong *error;
 {
-	static error_no=0;
+	static int error_no=0;
 	char error_message[256];
 	long i, iret = 0;
 
@@ -1026,8 +1026,8 @@ long *error;
 
 /* 
    simulate a slow executing command by sleeping for 1 second
-	
-	sleep(1);
+
+ 	sleep(1);
  */
 
 	return(iret);

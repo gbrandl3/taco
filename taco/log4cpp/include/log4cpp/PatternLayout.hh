@@ -54,14 +54,15 @@ namespace log4cpp {
         /**
          * Formats the LoggingEvent in the style set by
 		 * the setConversionPattern call. By default, set
-		 * to "%%m%%n"
+		 * to "%m%n"
          **/
         virtual std::string format(const LoggingEvent& event);
 
         /**
          * Sets the format of log lines handled by this
-         * PatternLayout. By default, set to "%%m%%n".<br>
+         * PatternLayout. By default, set to "%m%n".<br>
          * Format characters are as follows:<br>
+         * <ul>
          * <li><b>%%</b> - a single percent sign</li>
          * <li><b>%%c</b> - the category</li>
          * <li><b>%%d</b> - the date\n
@@ -78,6 +79,7 @@ namespace log4cpp {
          * <li><b>%%R</b> - seconds since Jan 1, 1970</li>
          * <li><b>%%u</b> - clock ticks since process start</li>
          * <li><b>%%x</b> - the NDC</li>
+	 * </ul>
          * @param conversionPattern the conversion pattern
          * @exception ConfigureFailure if the pattern is invalid
          **/

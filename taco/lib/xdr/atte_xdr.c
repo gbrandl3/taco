@@ -29,9 +29,9 @@
  *
  * Original:    Nov 1991
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:20 $
  *
  *******************************************************************-*/
 
@@ -62,8 +62,8 @@ xdr_length_DevAtte(objp)
 {
         long  length = 0;
 
-        length = length + xdr_length_DevShort (&objp->number);
-        length = length + xdr_length_DevShort (&objp->filter);
+        length += xdr_length_DevShort (&objp->number);
+        length += xdr_length_DevShort (&objp->filter);
 
         return (length);
 }

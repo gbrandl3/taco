@@ -25,9 +25,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.11 $
+ * Version:     $Revision: 1.12 $
  *
- * Date:        $Date: 2006-09-18 22:34:41 $
+ * Date:        $Date: 2008-04-06 09:08:06 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -47,12 +47,12 @@ TestDevice::TestDevice(const std::string name, long &error)
 	: Device(const_cast<char *>(name.c_str()), &error)
 {
 	static Device::DeviceCommandListEntry commands_list[] = {
-		{DevState, &Device::State, D_VOID_TYPE, D_SHORT_TYPE, 0, "DevState"},
-		{DevStatus, &Device::Status, D_VOID_TYPE, D_STRING_TYPE, 0, "DevStatus"},
-		{DevOn, &Device::On, D_VOID_TYPE, D_VOID_TYPE, 0, "DevOn"},
-		{DevOff, &Device::Off, D_VOID_TYPE, D_VOID_TYPE, 0, "DevOff"},
-		{DevReset, &Device::Reset, D_VOID_TYPE, D_VOID_TYPE, 0, "DevReset"},
-		{SendByteArray, (DeviceMemberFunction)&TestDevice::tacoSendByteArray, D_VOID_TYPE, D_VAR_CHARARR, 0, "SendByteArray"},
+		DeviceCommandListEntry(DevState, &Device::State, D_VOID_TYPE, D_SHORT_TYPE, READ_ACCESS, "DevState"),
+		DeviceCommandListEntry(DevStatus, &Device::Status, D_VOID_TYPE, D_STRING_TYPE, READ_ACCESS, "DevStatus"),
+		DeviceCommandListEntry(DevOn, &Device::On, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevOn"),
+		DeviceCommandListEntry(DevOff, &Device::Off, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevOff"),
+		DeviceCommandListEntry(DevReset, &Device::Reset, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevReset"),
+		DeviceCommandListEntry(SendByteArray, (DeviceMemberFunction)&TestDevice::tacoSendByteArray, D_VOID_TYPE, D_VAR_CHARARR, WRITE_ACCESS, "SendByteArray"),
 		};
 	static long n_commands = sizeof(commands_list) / sizeof(DeviceCommandListEntry);
 //
@@ -143,12 +143,12 @@ TestDevice2::TestDevice2(const std::string name, long &error)
 	: Device(const_cast<char *>(name.c_str()), &error)
 {
 	static Device::DeviceCommandListEntry commands_list[] = {
-		{DevState, &Device::State, D_VOID_TYPE, D_SHORT_TYPE, 0, "DevState"},
-		{DevStatus, &Device::Status, D_VOID_TYPE, D_STRING_TYPE, 0, "DevStatus"},
-		{DevOn, &Device::On, D_VOID_TYPE, D_VOID_TYPE, 0, "DevOn"},
-		{DevOff, &Device::Off, D_VOID_TYPE, D_VOID_TYPE, 0, "DevOff"},
-		{DevReset, &Device::Reset, D_VOID_TYPE, D_VOID_TYPE, 0, "DevReset"},
-		{ReadByteArray, (DeviceMemberFunction)&TestDevice2::tacoRead, D_VAR_CHARARR, D_VOID_TYPE, 0, "ReadByteArray"},
+		DeviceCommandListEntry(DevState, &Device::State, D_VOID_TYPE, D_SHORT_TYPE, READ_ACCESS, "DevState"),
+		DeviceCommandListEntry(DevStatus, &Device::Status, D_VOID_TYPE, D_STRING_TYPE, READ_ACCESS, "DevStatus"),
+		DeviceCommandListEntry(DevOn, &Device::On, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevOn"),
+		DeviceCommandListEntry(DevOff, &Device::Off, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevOff"),
+		DeviceCommandListEntry(DevReset, &Device::Reset, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevReset"),
+		DeviceCommandListEntry(ReadByteArray, (DeviceMemberFunction)&TestDevice2::tacoRead, D_VAR_CHARARR, D_VOID_TYPE, READ_ACCESS, "ReadByteArray"),
 		};
 	static long n_commands = sizeof(commands_list) / sizeof(DeviceCommandListEntry);
 //

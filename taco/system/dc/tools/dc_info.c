@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.5 $
+ * Version      : $Revision: 1.6 $
  *
- * Date         : $Date: 2006-09-18 21:50:15 $
+ * Date         : $Date: 2008-04-06 09:07:51 $
  *
  */
 
@@ -100,7 +100,7 @@ void usage(const char *cmd)
 *    Synopsis : dc_info                    				    *
 *                                                                           *
 ****************************************************************************/
-main(argc,argv)
+int main(argc,argv)
 int argc;
 char *argv[];
 {
@@ -112,7 +112,7 @@ char *argv[];
 	int rd_num,wr_num;
 	float 			free_f,
 				data_f;
-	long 			error;
+	DevLong			error;
 	servinf 		dcinf[10];
 	dom_info 		dom_array[MAX_DOM];
 	DevVarStringArray 	host_dc = {0, NULL};

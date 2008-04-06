@@ -29,9 +29,9 @@
  *
  * Original   	: March 1991
  *
- * Version	: $Revision: 1.26 $
+ * Version	: $Revision: 1.27 $
  *
- * Date		: $Date: 2007-03-22 15:54:39 $
+ * Date		: $Date: 2008-04-06 09:06:58 $
  *
  *******************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -95,10 +95,6 @@
 #endif /* !vxworks */
 #endif /* OSK | _OSK */
 
-#ifdef FREEBSD
-#define xp_sock xp_fd
-#endif
-
 /* end of added includes */
 
 /*
@@ -110,7 +106,6 @@ void _WINAPI devserver_prog_1	PT_( (struct svc_req *rqstp,SVCXPRT *transp) );
 extern long minimal_access;
 
 static void _WINAPI devserver_prog_4	PT_( (struct svc_req *rqstp,SVCXPRT *transp) );
-static long svc_check 		PT_( (long *error) );
 
 
 /****************************************
@@ -302,7 +297,7 @@ int main (int argc, char **argv)
 				*display,
 				res_path [80],
 				res_name[80],
-				**device_list;
+				**device_list = NULL;
 				char nethost[80];
 #if 0
 	pid_t			pid;
@@ -319,8 +314,9 @@ int main (int argc, char **argv)
 				nodb_opt = False,
 #ifdef unix
 				daemon_opt = False,
+				pid_file = False,
 #endif
-				device_no,
+				device_no = 0,
 				sig,
 				i,
 				j;
@@ -350,11 +346,13 @@ int main (int argc, char **argv)
 		
 		fprintf( stderr, "   -s                             : "
 			"use startup function from server\n" );
-		fprintf( stderr, "   -n nethost                            : "
+		fprintf( stderr, "   -n nethost                     : "
 			"use nethost instead of NETHOST environment\n" );
 #ifdef unix
 		fprintf( stderr, "   -d                             : "
 			"start as daemon\n");
+		fprintf( stderr, "   -p pid_file                    : "
+			"write a pid file\n");
 #endif
 		exit (1);
 	}
@@ -402,8 +400,8 @@ int main (int argc, char **argv)
 #endif
 			else if (strcmp (argv[i], "-n") == 0 && (i + 1) < argc)
 			{
-				snprintf(nethost, sizeof(nethost), "NETHOST=%s", argv[i + 1]);
-				putenv(nethost);
+				snprintf(nethost, sizeof(nethost), "%s", argv[i + 1]);
+				setenv("NETHOST", nethost, 1);
 				++i;
 			}
 /*
@@ -438,11 +436,18 @@ int main (int argc, char **argv)
 #ifdef unix
 	if (daemon_opt == True)
 		pid = become_daemon();
+	else
+		pid = getpid();
 #endif
 	status = device_server(proc_name, argv[1], m_opt, s_opt, nodb_opt, prog_number, device_no, device_list);
 #ifdef WIN32
-	return status;
+	if (status == FALSE)
+		raise(SIGABRT);
+#else
+	if (status == DS_NOTOK)
+		kill(pid,SIGQUIT);
 #endif /* WIN32 */
+	return status;
 }
 #endif /* vxworks || NOMAIN */
 

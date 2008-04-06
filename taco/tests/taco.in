@@ -2,8 +2,9 @@
 
 set_env() {
 DSHOME=@abs_top_builddir@/tests/test@prefix@
+DESTDIR=@abs_top_builddir@/tests/test
 srcdir=`grep '^srcdir' @abs_top_builddir@/tests/Makefile | cut -d' ' -f 3`
-prefix=@abs_top_builddir@/tests/test@prefix@
+prefix=${DESTDIR}@prefix@
 exec_prefix=@exec_prefix@
 bindir=@bindir@
 sbindir=@sbindir@
@@ -15,10 +16,11 @@ testbindir=${top_builddir}/tests
 appdefaultdir=@appdefaultdir@
 localstatedir=@localstatedir@
 infodir=@infodir@
-libdir=${DESTDIR}@libdir@
+libdir=@libdir@
 LD_LIBRARY_PATH=@GCC_LIBRARY_PATH@:${libdir}:${LD_LIBRARY_PATH:+:}
 export DSHOME LD_LIBRARY_PATH
 export DBTABLES_CUSTOM=TEST,LONGTEST
+export sysconfdir
 }
 
 unset NETHOST
@@ -34,8 +36,35 @@ if test $# -gt 0 ; then
 				dc_destdir=$testbindir/test
 				(cd $top_builddir && make DESTDIR=$dc_destdir install) >log 2>&1
 				for i in $sysconfdir ; do
-					(cd $i && mv tacoenv.sh t && sed -e 's%^prefix=.*$%prefix=@abs_top_builddir@/tests/test/@prefix@%' t > tacoenv.sh && rm -f t)
+					(cd $i && mv tacoenv.sh t && sed \
+						-e 's|^prefix=.*$|prefix=@abs_top_builddir@/tests/test@prefix@|' \
+						-e 's|^exec_prefix=/|exec_prefix=@abs_top_builddir@/tests/test/|' \
+						-e 's|^libdir=/|libdir=@abs_top_builddir@/tests/test/|' \
+						-e 's|^bindir=/|bindir=@abs_top_builddir@/tests/test/|' \
+						-e 's|^sbindir=/|sbindir=@abs_top_builddir@/tests/test/|' \
+						-e 's|^datadir=/|datadir=@abs_top_builddir@/tests/test/|' \
+						-e 's|^localstatedir=/|localstatedir=@abs_top_builddir@/tests/test/|' \
+						-e 's|^sysconfdir=/|sysconfdir=@abs_top_builddir@/tests/test/|' t > tacoenv.sh && rm -f t)
 				done
+				for  i in $sbindir ; do
+					(cd $i && mv taco.startup t && sed \
+						-e 's|[ \t]prefix=.*$|\tprefix=@abs_top_builddir@/tests/test@prefix@|' \
+						-e 's|exec_prefix=/|exec_prefix=@abs_top_builddir@/tests/test/|' \
+						-e 's|datadir=/|datadir=@abs_top_builddir@/tests/test/|' \
+						-e 's|sysconfdir=/|sysconfdir=@abs_top_builddir@/tests/test/|' t > taco.startup && rm -f t \
+						&& chmod +x taco.startup)
+					(cd $i && mv taco.shutdown t && sed \
+						-e 's|[ \t]prefix=.*$|\tprefix=@abs_top_builddir@/tests/test@prefix@|' \
+						-e 's|exec_prefix=/|exec_prefix=@abs_top_builddir@/tests/test/|' \
+						-e 's|datadir=/|datadir=@abs_top_builddir@/tests/test/|' \
+						-e 's|sysconfdir=/|sysconfdir=@abs_top_builddir@/tests/test/|' t > taco.shutdown && rm -f t \
+						&& chmod +x taco.shutdown)
+				done
+				if ! test -d ${localstatedir}/log/taco ; then
+					mkdir -p ${localstatedir}/log/taco
+				fi
+				sed -e's|fileName=|fileName='$localstatedir'/log/taco/|' \
+					${templatedir}/taco_log.cfg > ${sysconfdir}/taco_log.cfg
 				exit $?
 			fi
 			exit 1;;
@@ -45,7 +74,7 @@ if test $# -gt 0 ; then
 			mkdir -p ${LOGPATH}
 			set_env
 			TACO_PATH=$sbindir
-			export TACO_PATH
+			export TACO_PATH sysconfdir LOGCONFIG
 			$sbindir/taco.startup >>log 2>&1
 			exit 0;;
 		stop)
@@ -56,9 +85,14 @@ if test $# -gt 0 ; then
 			dc_destdir=$testbindir/test
 			rm -f ${localstatedir}/cache/taco/*
 			rm -f ${localstatedir}/log/taco/*
+			rmdir ${localstatedir}/log/taco
+			rmdir ${localstatedir}/log
+			rmdir ${localstatedir}/cache/taco
+			rmdir ${localstatedir}/cache
 			rm -f ${templatedir}/*
 			rm -f ${infodir}/dir
 			rm -f ${sbindir}/system/pipe/*
+			rm -f ${sysconfdir}/*
 			(cd $top_builddir && make DESTDIR=$dc_destdir uninstall) >>log 2>&1
 			dir=`echo $prefix | cut -d'/' -f 1`
 			if [ -z "$dir" ] ; then
@@ -71,6 +105,12 @@ if test $# -gt 0 ; then
 				dir=`echo $appdefaultdir|cut -d'/' -f2` 
 			fi
 			rm -rf ${dc_destdir}/$dir
+			for i in ${localstatedir} ${templatedir} ${infodir} ${sbindir}/system/pipe ${sbindir}/system/error \
+				${sysconfdir} ; do
+				if test -n "$i" -a -d $i ; then
+					rmdir $i
+				fi
+			done
 			if test -d $dc_destdir ; then
 				if { ! rmdir $dc_destdir 2>/dev/null; } ; then
 					tmp=`find $dc_destdir -type f`

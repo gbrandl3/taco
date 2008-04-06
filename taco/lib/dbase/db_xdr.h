@@ -28,7 +28,7 @@
  *
  * Version:	$Version$
  *
- * Date:		$Date: 2007-09-03 08:34:07 $
+ * Date:		$Date: 2008-04-06 09:07:06 $
  *  
  ******************************************************************************/
 
@@ -37,6 +37,7 @@
 
 #include <macros.h>
 #include <db_setup.h>
+#include <dev_xdr.h>
 
 #ifdef __STDCPP__
 #include <vector>
@@ -47,10 +48,13 @@
 extern "C" {
 #endif
 
+#if 0
 typedef char *nam;
+#endif
+
 bool_t _WINAPI
 #if defined __STDC__ | defined __STDCPP__ 
- xdr_nam(XDR *, nam *);
+ xdr_nam(XDR *, DevString *);
 #else
  xdr_nam();
 #endif
@@ -58,7 +62,7 @@ bool_t _WINAPI
 
 struct arr1 {
 	u_int arr1_len;	/**! The number of strings */
-	nam *arr1_val;	/**! A pointer to the array of strings */
+	DevString *arr1_val;	/**! A pointer to the array of strings */
 };
 typedef struct arr1 arr1;
 bool_t _WINAPI
@@ -72,17 +76,17 @@ bool_t _WINAPI
 
 struct db_devinfo {
 /** The device name */
-	nam 	dev_name;
+	DevString 	dev_name;
 /** The host name */
-	nam 	host_name;
+	DevString 	host_name;
 /** The device type */
-	nam 	dev_type;
+	DevString 	dev_type;
 /** The device class */
-	nam 	dev_class;
+	DevString 	dev_class;
 /** The program number */
-	u_int 	p_num;
+	u_int 		p_num;
 /** The version number */
-	u_int 	v_num;
+	u_int 		v_num;
 };
 typedef struct db_devinfo db_devinfo;
 bool_t _WINAPI
@@ -110,13 +114,13 @@ bool_t _WINAPI
 
 struct db_devinfo_2 {
 /** The device name */
-	nam	dev_name;
+	DevString	dev_name;
 /** The host name */
-	nam	host_name;
+	DevString	host_name;
 /** The device type */
-	nam	dev_type;
+	DevString	dev_type;
 /** The device class */
-	nam	dev_class;
+	DevString	dev_class;
 /** The program number */
 	u_int 	p_num;
 /** The version number */
@@ -150,13 +154,13 @@ bool_t _WINAPI
 
 struct db_devinfo_3 {
 /** The host name */
-	nam 	dev_name;
+	DevString 	dev_name;
 /** The device type */
-	nam 	host_name;
+	DevString 	host_name;
 /** The device type */
-	nam 	dev_type;
+	DevString 	dev_type;
 /** The device class */
-	nam 	dev_class;
+	DevString 	dev_class;
 /** The program number */
 	u_int 	p_num;
 /** The version number */
@@ -164,7 +168,7 @@ struct db_devinfo_3 {
 /** The process ID */
 	u_int 	pid;
 /** The process name */
-	nam 	proc_name;
+	DevString 	proc_name;
 };
 typedef struct db_devinfo_3 db_devinfo_3;
 bool_t _WINAPI
@@ -223,7 +227,7 @@ bool_t _WINAPI
 
 struct svc_inf {
 /** the host name*/
-	nam	ho_name;
+	DevString	ho_name;
 /** the program number */
 	u_int 	p_num;
 /** the version number */
@@ -241,8 +245,8 @@ bool_t _WINAPI
 
 
 struct putres {
-	char *res_name;
-	char *res_val;
+	DevString res_name;
+	DevString res_val;
 };
 typedef struct putres putres;
 bool_t _WINAPI
@@ -302,16 +306,16 @@ bool_t _WINAPI
 
 typedef struct {
 	db_res res;
-	int tcp;
-	int tcp_so;
+	DevLong tcp;
+	DevLong tcp_so;
 	CLIENT  *cl;
 	}devexp_res;
 
 /* Added definition for db_psdev_register function */
 
 struct psdev_elt {
-	char *psdev_name;
-	long poll;
+	DevString 	psdev_name;
+	DevLong 	poll;
 };
 typedef struct psdev_elt psdev_elt;
 bool_t _WINAPI
@@ -324,7 +328,7 @@ bool_t _WINAPI
 
 struct psdev_reg_x {
 	u_int pid;
-	char *h_name;
+	DevString h_name;
 	struct {
 		u_int psdev_arr_len;
 		struct psdev_elt *psdev_arr_val;
@@ -339,8 +343,8 @@ bool_t _WINAPI
 #endif	/* __STDC__ */
 
 struct db_psdev_error {
-	long error_code;
-	long psdev_err;
+	DevLong error_code;
+	DevLong psdev_err;
 };
 typedef struct db_psdev_error db_psdev_error;
 bool_t _WINAPI
@@ -352,17 +356,17 @@ bool_t _WINAPI
 
 
 struct db_devinfo_svc {
-	long 		device_type;
-	long 		device_exported;
-	char		*device_class;
-	char		*server_name;
-	char 		*personal_name;
-	char 		*process_name;
-	unsigned long	server_version;
-	char 		*host_name;
-	unsigned long	pid;
-	unsigned long	program_num;
-	int 		db_err;
+	DevLong 	device_type;
+	DevLong 	device_exported;
+	DevString	device_class;
+	DevString	server_name;
+	DevString 	personal_name;
+	DevString 	process_name;
+	DevULong 	server_version;
+	DevString 	host_name;
+	DevULong 	pid;
+	DevULong 	program_num;
+	DevLong 	db_err;
 };
 typedef struct db_devinfo_svc db_devinfo_svc;
 bool_t _WINAPI
@@ -374,8 +378,8 @@ xdr_db_devinfo_svc();
 
 
 struct db_info_dom_svc {
-	char		*dom_name;
-	long		dom_elt;
+	DevString	dom_name;
+	DevLong		dom_elt;
 };
 typedef struct db_info_dom_svc db_info_dom_svc;
 bool_t _WINAPI
@@ -402,13 +406,13 @@ xdr_var_dom();
 
 
 struct db_info_svc {
-	long		dev_defined;
-	long		dev_exported;
-	long		psdev_defined;
-	long		res_number;
+	DevLong		dev_defined;
+	DevLong		dev_exported;
+	DevLong		psdev_defined;
+	DevLong		res_number;
 	var_dom		dev;
 	var_dom		res;
-	int		db_err;
+	DevLong		db_err;
 };
 typedef struct db_info_svc db_info_svc;
 bool_t _WINAPI
@@ -420,8 +424,8 @@ xdr_db_info_svc();
 
 
 struct svcinfo_dev {
-	long		exported_flag;
-	char		*name;
+	DevLong		exported_flag;
+	DevString	name;
 };
 typedef struct svcinfo_dev svcinfo_dev;
 bool_t _WINAPI
@@ -433,8 +437,8 @@ xdr_svcinfo_dev();
 
 
 struct svcinfo_server {
-	char		*server_name;
-	long		dev_len;
+	DevString	server_name;
+	DevLong		dev_len;
 	svcinfo_dev	*dev_val;
 };
 typedef struct svcinfo_server svcinfo_server;
@@ -448,13 +452,13 @@ xdr_svcinfo_server();
 
 
 struct svcinfo_svc {
-	char		*process_name;
-	unsigned long	pid;
-	unsigned long	program_num;
-	char		*host_name;
-	long		embedded_len;
+	DevString	process_name;
+	DevULong	pid;
+	DevULong	program_num;
+	DevString	host_name;
+	DevLong		embedded_len;
 	svcinfo_server	*embedded_val;
-	int 		db_err;
+	DevLong 	db_err;
 };
 typedef struct svcinfo_svc svcinfo_svc;
 bool_t _WINAPI
@@ -466,12 +470,12 @@ xdr_svcinfo_svc();
 
 
 struct db_poller_svc {
-	char		*server_name;
-	char		*personal_name;
-	char		*host_name;
-	char 		*process_name;
-	unsigned long	pid;
-	int 		db_err;
+	DevString	server_name;
+	DevString	personal_name;
+	DevString	host_name;
+	DevString 	process_name;
+	DevULong	pid;
+	DevLong 	db_err;
 };
 typedef struct db_poller_svc db_poller_svc;
 bool_t _WINAPI
@@ -506,11 +510,11 @@ bool_t _WINAPI
 
 
 struct db_svc_net {
-	char		*server_name;
-	char		*personal_name;
-	char		*host_name;
-	unsigned long	pid;
-	unsigned long	program_num;
+	DevString	server_name;
+	DevString	personal_name;
+	DevString	host_name;
+	DevULong	pid;
+	DevULong	program_num;
 };
 typedef struct db_svc_net db_svc_net;
 bool_t _WINAPI
@@ -525,7 +529,7 @@ bool_t _WINAPI
 struct db_svcarray_net {
 	u_int		length;
 	db_svc_net	*sequence;
-	long		db_err;
+	DevLong		db_err;
 };
 typedef struct db_svcarray_net db_svcarray_net;
 bool_t _WINAPI
@@ -537,8 +541,8 @@ bool_t _WINAPI
 
 
 struct ana_input{
-	long		in_type;
-	char		**buf;
+	DevLong		in_type;
+	DevString	*buf;
 	FILE		*f;
 };
 typedef struct ana_input ana_input;
@@ -546,164 +550,164 @@ typedef struct ana_input ana_input;
 
 /* Miscellaneous function */
 
-int to_reconnection(void *,void **,CLIENT **,int,long,long,long *);
+int to_reconnection(void *,void **,CLIENT **,int,long,long, DevLong *);
 void kern_sort(char **,int);
 #ifdef __STDCPP__
-long get_tango_exp_devices(char *,vector<string> &,long *);
+long get_tango_exp_devices(char *,vector<string> &, DevLong *);
 #endif
 
 /* Define some constantes */
 
 #ifdef ALONE
-#define DB_SETUPPROG ((u_long)21000023)
+#define DB_SETUPPROG ((DevULong)21000023)
 #endif
 
-#define DB_GETRES ((u_long)1)
-#define DB_GETDEV ((u_long)2)
-#define DB_DEVEXP ((u_long)3)
-#define DB_DEVIMP ((u_long)4)
-#define DB_SVCUNR ((u_long)5)
-#define DB_SVCCHK ((u_long)6)
-#define DB_GETDEVEXP ((u_long)7)
-#define DB_PUTRES ((u_long)10)
-#define DB_DELRES ((u_long)11)
-#define DB_CMDQUERY ((u_long)12)
-#define DB_PSDEV_REG ((u_long)13)
-#define DB_PSDEV_UNREG ((u_long)14)
-#define DB_GETDEVDOMAIN ((u_long)15)
-#define DB_GETDEVFAMILY ((u_long)16)
-#define DB_GETDEVMEMBER ((u_long)17)
-#define DB_GETRESDOMAIN ((u_long)19)
-#define DB_GETRESFAMILY ((u_long)20)
-#define DB_GETRESMEMBER ((u_long)21)
-#define DB_GETRESRESO ((u_long)22)
-#define DB_GETRESRESOVAL ((u_long)23)
-#define DB_GETSERVER ((u_long)24)
-#define DB_GETPERS ((u_long)25)
-#define DB_GETHOST ((u_long)26)
-#define DB_DEVINFO ((u_long)27)
-#define DB_DEVRES ((u_long)28)
-#define DB_DEVDEL ((u_long)29)
-#define DB_DEVDELALLRES ((u_long)30)
-#define DB_INFO ((u_long)31)
-#define DB_SVCUNREG ((u_long)32)
-#define DB_SVCINFO ((u_long)33)
-#define DB_SVCDELETE ((u_long)34)
-#define DB_UPDDEV ((u_long)35)
-#define DB_UPDRES ((u_long)36)
-#define DB_SECPASS ((u_long)37)
-#define DB_GETPOLLER ((u_long)38)
-#define DB_DEL_UPDATE ((u_long)39)
-#define DB_INITCACHE ((u_long)40)
-#define DB_GETDSHOST ((u_long)41)
-#define DB_EVENTQUERY ((u_long)42)
+#define DB_GETRES ((DevULong)1)
+#define DB_GETDEV ((DevULong)2)
+#define DB_DEVEXP ((DevULong)3)
+#define DB_DEVIMP ((DevULong)4)
+#define DB_SVCUNR ((DevULong)5)
+#define DB_SVCCHK ((DevULong)6)
+#define DB_GETDEVEXP ((DevULong)7)
+#define DB_PUTRES ((DevULong)10)
+#define DB_DELRES ((DevULong)11)
+#define DB_CMDQUERY ((DevULong)12)
+#define DB_PSDEV_REG ((DevULong)13)
+#define DB_PSDEV_UNREG ((DevULong)14)
+#define DB_GETDEVDOMAIN ((DevULong)15)
+#define DB_GETDEVFAMILY ((DevULong)16)
+#define DB_GETDEVMEMBER ((DevULong)17)
+#define DB_GETRESDOMAIN ((DevULong)19)
+#define DB_GETRESFAMILY ((DevULong)20)
+#define DB_GETRESMEMBER ((DevULong)21)
+#define DB_GETRESRESO ((DevULong)22)
+#define DB_GETRESRESOVAL ((DevULong)23)
+#define DB_GETSERVER ((DevULong)24)
+#define DB_GETPERS ((DevULong)25)
+#define DB_GETHOST ((DevULong)26)
+#define DB_DEVINFO ((DevULong)27)
+#define DB_DEVRES ((DevULong)28)
+#define DB_DEVDEL ((DevULong)29)
+#define DB_DEVDELALLRES ((DevULong)30)
+#define DB_INFO ((DevULong)31)
+#define DB_SVCUNREG ((DevULong)32)
+#define DB_SVCINFO ((DevULong)33)
+#define DB_SVCDELETE ((DevULong)34)
+#define DB_UPDDEV ((DevULong)35)
+#define DB_UPDRES ((DevULong)36)
+#define DB_SECPASS ((DevULong)37)
+#define DB_GETPOLLER ((DevULong)38)
+#define DB_DEL_UPDATE ((DevULong)39)
+#define DB_INITCACHE ((DevULong)40)
+#define DB_GETDSHOST ((DevULong)41)
+#define DB_EVENTQUERY ((DevULong)42)
 
 /* For ndbm only */
-#define DB_CLODB ((u_long)8)
-#define DB_REOPENDB ((u_long)9)
+#define DB_CLODB ((DevULong)8)
+#define DB_REOPENDB ((DevULong)9)
 /* For to_reconnection */
-#define DB_DEVEXP_2 ((u_long)1002)
-#define DB_DEVEXP_3 ((u_long)1003)
+#define DB_DEVEXP_2 ((DevULong)1002)
+#define DB_DEVEXP_3 ((DevULong)1003)
 
 #if defined __STDC__ | defined __STDCPP__
 
 /* Client call to server */
 
-extern db_res  * db_getres_1(arr1 *, CLIENT *, long *);
-extern db_res  * db_getdev_1(nam *, CLIENT *, long *);
-extern int * db_devexp_1(tab_dbdev *, CLIENT *, long *);
-extern int * db_devexp_2(tab_dbdev_2 *, CLIENT *, long *);
-extern int * db_devexp_3(tab_dbdev_3 *, CLIENT *, long *);
-extern db_resimp * db_devimp_1(arr1 *, CLIENT *, long *);
-extern int * db_svcunr_1(nam *, CLIENT *, long *);
-extern svc_inf * db_svcchk_1(nam *, CLIENT *, long *);
-extern db_res * db_getdevexp_1(nam *, CLIENT *, long *);
-extern int * db_putres_1(tab_putres *, CLIENT *, long *);
-extern int * db_delres_1(arr1 *, CLIENT *, long *);
-extern cmd_que * db_cmd_query_1(nam *, CLIENT *, long *);
+extern db_res  * db_getres_1(arr1 *, CLIENT *, DevLong *);
+extern db_res  * db_getdev_1(DevString *, CLIENT *, DevLong *);
+extern int * db_devexp_1(tab_dbdev *, CLIENT *, DevLong *);
+extern int * db_devexp_2(tab_dbdev_2 *, CLIENT *, DevLong *);
+extern int * db_devexp_3(tab_dbdev_3 *, CLIENT *, DevLong *);
+extern db_resimp * db_devimp_1(arr1 *, CLIENT *, DevLong *);
+extern int * db_svcunr_1(DevString *, CLIENT *, DevLong *);
+extern svc_inf * db_svcchk_1(DevString *, CLIENT *, DevLong *);
+extern db_res * db_getdevexp_1(DevString *, CLIENT *, DevLong *);
+extern int * db_putres_1(tab_putres *, CLIENT *, DevLong *);
+extern int * db_delres_1(arr1 *, CLIENT *, DevLong *);
+extern cmd_que * db_cmd_query_1(DevString *, CLIENT *, DevLong *);
 /*event query*/
-extern event_que * db_event_query_1(nam *, CLIENT *, long *);
-extern db_psdev_error * db_psdev_reg_1(psdev_reg_x *, CLIENT *, long *);
-extern db_psdev_error * db_psdev_unreg_1(arr1 *, CLIENT *, long *);
-extern long db_null_proc_1(CLIENT *clnt, long *perr);
+extern event_que * db_event_query_1(DevString *, CLIENT *, DevLong *);
+extern db_psdev_error * db_psdev_reg_1(psdev_reg_x *, CLIENT *, DevLong *);
+extern db_psdev_error * db_psdev_unreg_1(arr1 *, CLIENT *, DevLong *);
+extern long db_null_proc_1(CLIENT *clnt, DevLong *perr);
 
-extern db_res * db_getdevdomain_1(CLIENT *,long *);
-extern db_res * db_getdevfamily_1(nam *,CLIENT *,long *);
-extern db_res * db_getdevmember_1(db_res *,CLIENT *,long *);
-extern db_res * db_getresdomain_1(CLIENT *,long *);
-extern db_res * db_getresfamily_1(nam *,CLIENT *,long *);
-extern db_res * db_getresmember_1(db_res *,CLIENT *,long *);
-extern db_res * db_getresreso_1(db_res *,CLIENT *,long *);
-extern db_res * db_getresresoval_1(db_res *,CLIENT *,long *);
-extern db_res * db_getdsserver_1(CLIENT *,long *);
-extern db_res * db_getdspers_1(nam *,CLIENT *,long *);
-extern db_res * db_gethost_1(CLIENT *,long *);
-extern db_svcarray_net * db_getdsonhost_1(nam *,CLIENT *,long *);
+extern db_res * db_getdevdomain_1(CLIENT *,DevLong *);
+extern db_res * db_getdevfamily_1(DevString *,CLIENT *,DevLong *);
+extern db_res * db_getdevmember_1(db_res *,CLIENT *,DevLong *);
+extern db_res * db_getresdomain_1(CLIENT *,DevLong *);
+extern db_res * db_getresfamily_1(DevString *,CLIENT *,DevLong *);
+extern db_res * db_getresmember_1(db_res *,CLIENT *,DevLong *);
+extern db_res * db_getresreso_1(db_res *,CLIENT *,DevLong *);
+extern db_res * db_getresresoval_1(db_res *,CLIENT *,DevLong *);
+extern db_res * db_getdsserver_1(CLIENT *,DevLong *);
+extern db_res * db_getdspers_1(DevString *,CLIENT *,DevLong *);
+extern db_res * db_gethost_1(CLIENT *,DevLong *);
+extern db_svcarray_net * db_getdsonhost_1(DevString *,CLIENT *,DevLong *);
 
-extern db_devinfo_svc * db_deviceinfo_1(nam *,CLIENT *,long *);
-extern db_res * db_deviceres_1(db_res *,CLIENT *,long *);
-extern long *db_devicedelete_1(nam *,CLIENT *,long *);
-extern db_psdev_error *db_devicedeleteres_1(db_res *,CLIENT *,long *);
-extern db_info_svc * db_stat_1(CLIENT *,long *);
-extern long *db_servunreg_1(db_res *,CLIENT *,long *);
-extern svcinfo_svc *db_servinfo_1(db_res *,CLIENT *,long *);
-extern long *db_servdelete_1(db_res *,CLIENT *,long *);
-extern db_poller_svc *db_getpoll_1(nam *,CLIENT *,long *);
-extern long *db_initcache_1(nam *,CLIENT *,long *);
+extern db_devinfo_svc * db_deviceinfo_1(DevString *,CLIENT *,DevLong *);
+extern db_res * db_deviceres_1(db_res *,CLIENT *,DevLong *);
+extern long *db_devicedelete_1(DevString *,CLIENT *,DevLong *);
+extern db_psdev_error *db_devicedeleteres_1(db_res *,CLIENT *,DevLong *);
+extern db_info_svc * db_stat_1(CLIENT *,DevLong *);
+extern long *db_servunreg_1(db_res *,CLIENT *,DevLong *);
+extern svcinfo_svc *db_servinfo_1(db_res *,CLIENT *,DevLong *);
+extern long *db_servdelete_1(db_res *,CLIENT *,DevLong *);
+extern db_poller_svc *db_getpoll_1(DevString *,CLIENT *,DevLong *);
+extern long *db_initcache_1(DevString *,CLIENT *,DevLong *);
 
-extern db_psdev_error *db_upddev_1(db_res *,CLIENT *,long *);
-extern db_psdev_error *db_updres_1(db_res *,CLIENT *,long *);
-extern db_res *db_secpass_1(CLIENT *,long *);
-extern db_delupd_error *db_delete_update_1(db_arr1_array *,CLIENT *,long *);
+extern db_psdev_error *db_upddev_1(db_res *,CLIENT *,DevLong *);
+extern db_psdev_error *db_updres_1(db_res *,CLIENT *,DevLong *);
+extern db_res *db_secpass_1(CLIENT *,DevLong *);
+extern db_delupd_error *db_delete_update_1(db_arr1_array *,CLIENT *,DevLong *);
 
-extern int * db_clodb_1(CLIENT *, long *);
-extern int * db_reopendb_1(CLIENT *, long *);
+extern int * db_clodb_1(CLIENT *, DevLong *);
+extern int * db_reopendb_1(CLIENT *, DevLong *);
 
 /* Server functions */
 
 db_res *db_getres_1_svc(arr1 *,struct svc_req *);
-db_res *db_getdev_1_svc(nam *);
+db_res *db_getdev_1_svc(DevString *);
 int *db_putres_1_svc(tab_putres *);
 #if 0
 int *db_delres_1_svc(arr1 * /* ,struct svc_req * */);
 #endif
 int *db_delres_1_svc(arr1 *,struct svc_req *);
 
-cmd_que *db_cmd_query_1_svc(nam *);
-event_que *db_event_query_1_svc(nam *);
-db_res *db_getdevexp_1_svc(nam *,struct svc_req *);
+cmd_que *db_cmd_query_1_svc(DevString *);
+event_que *db_event_query_1_svc(DevString *);
+db_res *db_getdevexp_1_svc(DevString *,struct svc_req *);
 int *db_devexp_1_svc(tab_dbdev *);
 int *db_devexp_2_svc(tab_dbdev_2 *);
 int *db_devexp_3_svc(tab_dbdev_3 *);
 db_resimp *db_devimp_1_svc(arr1 *);
-int *db_svcunr_1_svc(nam *);
-svc_inf *db_svcchk_1_svc(nam *);
+int *db_svcunr_1_svc(DevString *);
+svc_inf *db_svcchk_1_svc(DevString *);
 db_psdev_error *db_psdev_reg_1_svc(psdev_reg_x *);
 db_psdev_error *db_psdev_unreg_1_svc(arr1 *);
 
 db_res *devdomainlist_1_svc(void);
-db_res *devfamilylist_1_svc(nam *);
+db_res *devfamilylist_1_svc(DevString *);
 db_res *devmemberlist_1_svc(db_res *);
 db_res *resdomainlist_1_svc(void);
-db_res *resfamilylist_1_svc(nam *);
+db_res *resfamilylist_1_svc(DevString *);
 db_res *resmemberlist_1_svc(db_res *);
 db_res *resresolist_1_svc(db_res *);
 db_res *resresoval_1_svc(db_res *);
 db_res *devserverlist_1_svc(void);
-db_res *devpersnamelist_1_svc(nam *);
+db_res *devpersnamelist_1_svc(DevString *);
 db_res *hostlist_1_svc(void);
-db_svcarray_net *getdsonhost_1_svc(nam *);
+db_svcarray_net *getdsonhost_1_svc(DevString *);
 
-db_devinfo_svc *devinfo_1_svc(nam *);
+db_devinfo_svc *devinfo_1_svc(DevString *);
 db_res *devres_1_svc(db_res *);
-long *devdel_1_svc(nam *);
+DevLong *devdel_1_svc(DevString *);
 db_psdev_error *devdelres_1_svc(db_res *);
 db_info_svc *info_1_svc(void);
-long *unreg_1_svc(db_res *);
+DevLong *unreg_1_svc(db_res *);
 svcinfo_svc *svcinfo_1_svc(db_res *);
-long *svcdelete_1_svc(db_res *);
-db_poller_svc *getpoller_1_svc(nam *);
-long *initcache_1_svc(nam *);
+DevLong *svcdelete_1_svc(db_res *);
+db_poller_svc *getpoller_1_svc(DevString *);
+DevLong *initcache_1_svc(DevString *);
 
 db_psdev_error *upddev_1_svc(db_res *);
 db_psdev_error *updres_1_svc(db_res *);

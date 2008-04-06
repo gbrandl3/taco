@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2006-12-15 12:43:54 $
+ * Date:	$Date: 2008-04-06 09:07:42 $
  *
  */
 
@@ -41,7 +41,7 @@
  * 
  * @return a pointer to a structure of the event_que type 
  */
-event_que *SQLite3Server::db_event_query_1_svc(nam *pevent_name)
+event_que *SQLite3Server::db_event_query_1_svc(DevString *pevent_name)
 {
     int 		i;
     std::string		fam,
@@ -49,7 +49,7 @@ event_que *SQLite3Server::db_event_query_1_svc(nam *pevent_name)
 			r_name,
 			event_str(*pevent_name);
 
-    logStream->debugStream() << "Command name : " << event_str << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "Command name : " << event_str << log4cpp::eol;
 //
 // Initialize error code sended event_queue to client 
 //
@@ -59,7 +59,7 @@ event_que *SQLite3Server::db_event_query_1_svc(nam *pevent_name)
 //
     if (!dbgen.connected)
     {
-	logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	event_queue.db_err = DbErr_DatabaseNotConnected;
 	event_queue.xevent_code = 0;
 	return(&event_queue);
@@ -86,7 +86,7 @@ event_que *SQLite3Server::db_event_query_1_svc(nam *pevent_name)
     query += ("DOMAIN = 'events' AND VALUE = '" + event_str + "'");
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
     	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		event_queue.db_err = DbErr_DatabaseAccess;
 		event_queue.xevent_code = 0;
 		return(&event_queue);

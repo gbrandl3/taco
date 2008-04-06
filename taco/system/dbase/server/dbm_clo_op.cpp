@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.14 $
+ * Version:	$Revision: 1.15 $
  *
- * Date:	$Date: 2006-12-15 12:43:53 $
+ * Date:	$Date: 2008-04-06 09:07:40 $
  *
  */
 
@@ -64,7 +64,7 @@ DevLong *NdbmServer::db_clodb_1_svc()
 {
 	static DevLong errcode;
 
-	logStream->debugStream() << "db_clodb()" << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "db_clodb()" << log4cpp::eol;
 //
 // Return error code if the server is not connected to the database files
 //
@@ -101,13 +101,13 @@ DevLong *NdbmServer::db_reopendb_1_svc()
 	int 		flags = O_RDWR;
 	char 		*ptr;
 
-	logStream->debugStream() << "db_reopendb" << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "db_reopendb" << log4cpp::eol;
 //
 // Find the dbm_database files
 //
 	if ((ptr = (char *)getenv("DBM_DIR")) == NULL)
 	{
-		logStream->errorStream() << "dbm_server: Can't find environment variable DBM_DIR" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "dbm_server: Can't find environment variable DBM_DIR" << log4cpp::eol;
 		errcode = DbErr_DatabaseAccess;
 		return(&errcode);
 	}
@@ -133,7 +133,7 @@ DevLong *NdbmServer::db_reopendb_1_svc()
 				t = gdbm_open(const_cast<char *>(dbm_file.c_str()), 0, GDBM_NOLOCK | GDBM_WRCREAT, 0666, NULL);
 			if (t == NULL)
                 	{
-				logStream->errorStream() << "dbm_clo_op (" << gdbm_errno << "): Can't create file : " << dbm_file << log4cpp::CategoryStream::ENDLINE;
+				logStream->errorStream() << "dbm_clo_op (" << gdbm_errno << "): Can't create file : " << dbm_file << log4cpp::eol;
 				errcode = DbErr_DatabaseAccess;
 				return(&errcode);
                 	}
@@ -148,7 +148,7 @@ DevLong *NdbmServer::db_reopendb_1_svc()
 		}
 		if (dbgen.tid[i] == NULL)
 		{
-			logStream->errorStream() <<"dbm_server (" << gdbm_errno << "): Can't open table : " << dbgen.TblName[i] << log4cpp::CategoryStream::ENDLINE;
+			logStream->errorStream() <<"dbm_server (" << gdbm_errno << "): Can't open table : " << dbgen.TblName[i] << log4cpp::eol;
 			errcode = DbErr_DatabaseAccess;
 			return(&errcode);
 		}

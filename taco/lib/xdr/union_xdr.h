@@ -29,9 +29,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  *
  *******************************************************************-*/
 
@@ -49,23 +49,23 @@
  */
 
 struct DevUnion {
-	short designator;
+	DevShort designator;
 	union {
-	      char B_data;
-	      short S_data;
-	      long L_data;
-	      float F_data;
-	      double D_data;
-	      char *STR_data;
-	      DevFloatReadPoint FRP_data;
+	      DevChar                B_data;
+	      DevShort               S_data;
+	      DevLong                L_data;
+	      DevFloat               F_data;
+	      DevDouble              D_data;
+	      DevString              STR_data;
+	      DevFloatReadPoint      FRP_data;
 	      DevStateFloatReadPoint SFRP_data;
-	      DevVarCharArray VCA_data;
-	      DevVarShortArray VSA_data;
-	      DevVarLongArray VLA_data;
-	      DevVarFloatArray VFA_data;
-	      DevBpmPosField BPMPF_data;
-	      DevBpmElecField BPMEF_data;
-	      DevWsBeamFitParm WSBFP_data;
+	      DevVarCharArray        VCA_data;
+	      DevVarShortArray       VSA_data;
+	      DevVarLongArray        VLA_data;
+	      DevVarFloatArray       VFA_data;
+	      DevBpmPosField         BPMPF_data;
+	      DevBpmElecField        BPMEF_data;
+	      DevWsBeamFitParm       WSBFP_data;
 	      }u;
 };
 typedef struct DevUnion 	DevUnion;

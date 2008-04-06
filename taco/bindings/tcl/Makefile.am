@@ -32,4 +32,4 @@ libtcltacoapi_la_LDFLAGS = -rdynamic
 
 AM_CPPFLAGS = @TACO_INCLUDES@ @TCL_CPPFLAGS@
 
-noinst_HEADERS = db_io.h dc_io.h debug.h dev_io.h
+noinst_HEADERS = db_io.h dc_io.h debug.h dev_io.h convert.h

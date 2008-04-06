@@ -19,21 +19,34 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * File:
- *
+ *		mysql_tools.cpp
  * Description:
  *
  * Authors:
- *		$Author: jlpons $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.22 $
+ * Version:	$Revision: 1.23 $
  *
- * Date:	$Date: 2006-12-12 17:23:08 $
+ * Date:	$Date: 2008-04-06 09:07:41 $
  *
  */
 
 #include <DevErrors.h>
 #include <MySqlServer.h>
 #include <algorithm>
+
+// Add quote to resource value containing separator
+void MySQLServer::db_quote(std::string &value) {
+
+  std::string::size_type pos;
+  
+  if (((pos = value.find(',')) != std::string::npos) ||
+      ((pos = value.find(' ')) != std::string::npos))
+  {
+    value = "\"" + value + "\"";
+  }
+  
+}
 
 
 /**
@@ -43,12 +56,11 @@
  *
  * @return a pointer to a structure with all device info and an error code which is set if needed
  */
-db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
+db_devinfo_svc *MySQLServer::devinfo_1_svc(DevString *dev)
 {
     std::string user_device(*dev);
-#ifdef DEBUG
-    std::cout << "In devinfo_1_svc function for device " << user_device << std::endl;
-#endif
+
+    logStream->debugStream() << "In devinfo_1_svc function for device " << user_device << log4cpp::eol;
 //
 // Initialize parameter sent back to client and allocate memory for string (bloody XDR)
 //
@@ -78,16 +90,16 @@ db_devinfo_svc *MySQLServer::devinfo_1_svc(nam *dev)
     }
     catch (std::bad_alloc)
     {
-	std::cout << "Memory allocation error in devinfo" << std::endl;
+	logStream->errorStream() << "Memory allocation error in devinfo" << log4cpp::eol;
 	sent_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&sent_back);
     }
 //
 // If the server is not connected to the database, return error
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to database" << std::endl;
+	logStream->errorStream() << "I'm not connected to database" << log4cpp::eol;
 	sent_back.db_err = DbErr_DatabaseNotConnected;
 	return(&sent_back);
     }
@@ -207,11 +219,9 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 	
     res_list_dev.clear();
 
-#ifdef DEBUG
-    std::cout << "In devres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << std::endl;
+    logStream->debugStream() << "In devres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << log4cpp::eol;
     for (long i = 0; i < recev->res_val.arr1_len; i++)
-	std::cout << " Device = " << recev->res_val.arr1_val[i] << std::endl;
-#endif
+	logStream->debugStream() << " Device = " << recev->res_val.arr1_val[i] << log4cpp::eol;
 //
 // Initialize structure sent back to client
 //
@@ -221,9 +231,9 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 //
 // If the server is not connected to the database, return error
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to database" << std::endl;
+	logStream->errorStream() << "I'm not connected to database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -231,11 +241,10 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
     for (long i = 0; i < recev->res_val.arr1_len; i++)
     {
 	std::string in_dev(recev->res_val.arr1_val[i]);
-#ifdef DEBUG
-	std::cout << " Device = " << in_dev << std::endl;
-#endif
+	logStream->debugStream() << " Device = " << in_dev << log4cpp::eol;
 	if (count(in_dev.begin(), in_dev.end(), SEP_DEV) != 2)
 	{
+	    logStream->errorStream() << "invalid number of separators " << SEP_DEV << log4cpp::eol;
 	    browse_back.db_err = DbErr_BadDevSyntax;
 	    return(&browse_back);
 	}
@@ -259,16 +268,20 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 	    MYSQL_ROW row;
 
 	    std::string resource("");
+	    
 	    while ((row = mysql_fetch_row(result)) != NULL)
 	    {
+	        std::string r_value(row[5]);
+	        db_quote(r_value);
+	    
 		if (atoi(row[4]) == 1)
 		{
 		    if (!resource.empty())
 		   	res_list_dev.push_back(resource);
-		    resource = std::string(row[0]) + "/" + row[1] + "/" + row[2] + "/" + row[3] + ": " + row[5];
+		    resource = std::string(row[0]) + "/" + row[1] + "/" + row[2] + "/" + row[3] + ": " + r_value;
 		}
 		else
-		    resource += ("," + std::string(row[5]));
+		    resource += ("," + r_value);
 	    }
 	    if (!resource.empty())
 		res_list_dev.push_back(resource);
@@ -276,7 +289,7 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 	}
 	else
 	{
-	    std::cout << mysql_error(mysql_conn) << std::endl;
+	    logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	    browse_back.db_err = DbErr_DatabaseAccess;
 	    return (&browse_back);
 	}
@@ -308,7 +321,7 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
 		delete [] browse_back.res_val.arr1_val;
 	    delete [] browse_back.res_val.arr1_val;
 			
-	    std::cout << "Memory allocation error in devres_svc" << std::endl;
+	    logStream->errorStream() << "Memory allocation error in devres_svc" << log4cpp::eol;
 	    browse_back.db_err = DbErr_ServerMemoryAllocation;
 	    return(&browse_back);
 	}
@@ -328,12 +341,11 @@ db_res *MySQLServer::devres_1_svc(db_res *recev)
  *
  * @return a pointer to an error code
  */
-DevLong *MySQLServer::devdel_1_svc(nam *dev)
+DevLong *MySQLServer::devdel_1_svc(DevString *dev)
 {
     std::string 	user_device(*dev);
-#ifdef DEBUG
-    std::cout << "In devdel_1_svc function for device " << user_device << std::endl;
-#endif
+
+    logStream->debugStream() << "In devdel_1_svc function for device " << user_device << log4cpp::eol;
 
 //
 // Initialize parameter sent back to client
@@ -343,14 +355,15 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
 // If the server is not connected to the database, return error
 //
 
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
     if (count(user_device.begin(), user_device.end(), SEP_DEV) != 2)
     {
+	logStream->errorStream() << "invalid number of separators " << SEP_DEV << log4cpp::eol;
 	errcode = DbErr_BadDevSyntax;
 	return(&errcode);
     }
@@ -363,7 +376,7 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
     
     if (mysql_query(mysql_conn, (query + where).c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	errcode = DbErr_DatabaseAccess;
 	return (&errcode);
     }
@@ -380,7 +393,7 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
     	query = "DELETE FROM device "; 
     	if (mysql_query(mysql_conn, (query + where).c_str()) != 0)
     	{
-	    std::cout << mysql_error(mysql_conn) << std::endl;
+	    logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	    errcode = DbErr_DatabaseAccess;
 	    return (&errcode);
     	}
@@ -413,9 +426,7 @@ DevLong *MySQLServer::devdel_1_svc(nam *dev)
  */
 db_psdev_error *MySQLServer::devdelres_1_svc(db_res *recev)
 {
-#ifdef DEBUG
-    std::cout << "In devdelres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << std::endl;
-#endif
+    logStream->debugStream() << "In devdelres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << log4cpp::eol;
 
 //
 // Initialize parameter sent back to client
@@ -425,9 +436,9 @@ db_psdev_error *MySQLServer::devdelres_1_svc(db_res *recev)
 //
 // If the server is not connected to the database, return error
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	psdev_back.error_code = DbErr_DatabaseNotConnected;
 	return(&psdev_back);
     }
@@ -441,6 +452,7 @@ db_psdev_error *MySQLServer::devdelres_1_svc(db_res *recev)
 		
 	if (count(in_dev.begin(), in_dev.end(), SEP_DEV) != 2)
 	{
+	    logStream->errorStream() << "invalid number of separators " << SEP_DEV << log4cpp::eol;
 	    psdev_back.error_code = DbErr_BadDevSyntax;
 	    psdev_back.psdev_err = i;
 	    return(&psdev_back);
@@ -449,13 +461,14 @@ db_psdev_error *MySQLServer::devdelres_1_svc(db_res *recev)
 	query = "DELETE FROM property_device WHERE DEVICE = '" + in_dev + "'";
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
-	    std::cout << mysql_error(mysql_conn) << std::endl;
+	    logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	    psdev_back.error_code = DbErr_DatabaseAccess;
 	    psdev_back.psdev_err = i;
 	    return (&psdev_back);
 	}
 	if (mysql_affected_rows(mysql_conn) == 0)
 	{
+	    logStream->errorStream() << "Could not delete : device not defined in the database" << log4cpp::eol;
 	    psdev_back.error_code = DbErr_DeviceNotDefined;
 	    psdev_back.psdev_err = i;
 	    return(&psdev_back);
@@ -492,9 +505,7 @@ db_info_svc *MySQLServer::info_1_svc()
     static std::vector<NameCount>	dom_list,
 				res_list;
 
-#ifdef DEBUG
-    std::cout << "In info_1_svc function" << std::endl;
-#endif 
+    logStream->debugStream() << "In info_1_svc function" << log4cpp::eol;
 
     dom_list.clear();
     res_list.clear();
@@ -511,9 +522,9 @@ db_info_svc *MySQLServer::info_1_svc()
 //
 // If the server is not connected to the database, return error
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	info_back.db_err = DbErr_DatabaseNotConnected;
 	return(&info_back);
     }
@@ -524,7 +535,7 @@ db_info_svc *MySQLServer::info_1_svc()
     query = "SELECT DOMAIN, COUNT(*) FROM device WHERE EXPORTED != 0 GROUP BY DOMAIN";
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	info_back.db_err = DbErr_DatabaseAccess;
 	return (&info_back);
     }
@@ -546,7 +557,7 @@ db_info_svc *MySQLServer::info_1_svc()
     query = "SELECT DOMAIN, COUNT(*) FROM device WHERE EXPORTED = 0 GROUP BY domain";
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	info_back.db_err = DbErr_DatabaseAccess;
 	return (&info_back);
     }
@@ -573,7 +584,7 @@ db_info_svc *MySQLServer::info_1_svc()
     query = "SELECT COUNT(*) FROM device WHERE IOR LIKE 'DC:%'";
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     { 
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	info_back.db_err = DbErr_DatabaseAccess;
 	return (&info_back);
     }
@@ -587,7 +598,7 @@ db_info_svc *MySQLServer::info_1_svc()
     query = "SELECT DOMAIN, COUNT(*) FROM property_device GROUP BY domain";
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	info_back.db_err = DbErr_DatabaseAccess;
 	return (&info_back);
     }
@@ -644,14 +655,12 @@ db_info_svc *MySQLServer::info_1_svc()
  *
  * @return a pointer to a long which will be set in case of error
  */
-long *MySQLServer::unreg_1_svc(db_res *recev)
+DevLong *MySQLServer::unreg_1_svc(db_res *recev)
 {
     std::string 		user_ds_name(recev->res_val.arr1_val[0]),
     			user_pers_name(recev->res_val.arr1_val[1]);
 		
-#ifdef DEBUG
-    std::cout << "In unreg_1_svc function for " << user_ds_name << "/" << user_pers_name << std::endl;
-#endif
+    logStream->debugStream() << "In unreg_1_svc function for " << user_ds_name << "/" << user_pers_name << log4cpp::eol;
 	
 //
 // Initialize structure sent back to client
@@ -660,9 +669,9 @@ long *MySQLServer::unreg_1_svc(db_res *recev)
 //
 // If the server is not connected to the database, returns error
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -674,7 +683,7 @@ long *MySQLServer::unreg_1_svc(db_res *recev)
     query += (" WHERE SERVER = '" + user_ds_name + "/" + user_pers_name + "'");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
    	errcode = DbErr_DatabaseAccess;
 	return (&errcode);
     }
@@ -711,7 +720,7 @@ long *MySQLServer::unreg_1_svc(db_res *recev)
 
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	errcode = DbErr_DatabaseAccess;
 	return (&errcode);
     }
@@ -750,9 +759,7 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
     MYSQL_RES *result,*result2;
     MYSQL_ROW row,row2;
 		
-#ifdef DEBUG
-    std::cout << "in svcinfo_1_svc function for " << user_ds_name << "/" << user_pers_name << std::endl;
-#endif
+    logStream->debugStream() << "in svcinfo_1_svc function for " << user_ds_name << "/" << user_pers_name << log4cpp::eol;
 
 //
 // initialize structure sent back to client
@@ -774,16 +781,16 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
     }
     catch (std::bad_alloc)
     {
-	std::cout << "memory allocation error in svc_info" << std::endl;
+	logStream->errorStream() << "memory allocation error in svc_info" << log4cpp::eol;
 	svcinfo_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&svcinfo_back);
     }
 //
 // if the server is not connected to the database, returns error
 //
-    if (dbgen.connected == false)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	svcinfo_back.db_err = DbErr_DatabaseNotConnected;
 	return(&svcinfo_back);
     }
@@ -797,7 +804,7 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 	    
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	svcinfo_back.db_err = DbErr_DatabaseAccess;
 	return (&svcinfo_back);
     }
@@ -870,7 +877,7 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 	    
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	svcinfo_back.db_err = DbErr_DatabaseAccess;
 	return (&svcinfo_back);
     }
@@ -902,8 +909,8 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 	    
       if (mysql_query(mysql_conn, query.c_str()) != 0)
       {
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
         mysql_free_result(result);
-	std::cout << mysql_error(mysql_conn) << std::endl;
 	svcinfo_back.db_err = DbErr_DatabaseAccess;
 	return (&svcinfo_back);
       }
@@ -940,7 +947,7 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
  *
  * @return a pointer to a structure with all the device server information
  */
-long *MySQLServer::svcdelete_1_svc(db_res *recev)
+DevLong *MySQLServer::svcdelete_1_svc(db_res *recev)
 {
     long 		i,
 			dev_length;
@@ -952,9 +959,7 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
     MYSQL_RES *result;
     MYSQL_ROW row;
     
-#ifdef DEBUG
-    std::cout << "In svcdelete_1_svc function for " << user_ds_name << "/" << user_pers_name << std::endl;
-#endif
+    logStream->debugStream() << "In svcdelete_1_svc function for " << user_ds_name << "/" << user_pers_name << log4cpp::eol;
 //
 // Get delete resource flag
 //
@@ -967,9 +972,9 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
 //
 // If the server is not connected to the database, returns error
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -986,7 +991,7 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
 	    
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	errcode = DbErr_DatabaseAccess;
 	return (&errcode);
     }
@@ -1014,8 +1019,8 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
         query = "DELETE FROM property_device WHERE device='" + dev_name + "'";
         if (mysql_query(mysql_conn, query.c_str()) != 0)
         {
+	  logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
           mysql_free_result(result);
-          std::cout << mysql_error(mysql_conn) << std::endl;
           errcode = DbErr_DatabaseAccess;
           return (&errcode);
         }
@@ -1025,8 +1030,8 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
       query = "DELETE FROM device WHERE name='" + dev_name + "'";
       if (mysql_query(mysql_conn, query.c_str()) != 0)
       {
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
         mysql_free_result(result);
-        std::cout << mysql_error(mysql_conn) << std::endl;
         errcode = DbErr_DatabaseAccess;
         return (&errcode);
       }
@@ -1047,13 +1052,12 @@ long *MySQLServer::svcdelete_1_svc(db_res *recev)
  *
  * @return a pointer to an error code
  */
-db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
+db_poller_svc *MySQLServer::getpoller_1_svc(DevString *dev)
 {
     std::string 	poller_name,
     		user_device(*dev);
-#ifdef DEBUG
-    std::cout << "In getpoller_1_svc function for device " << user_device << std::endl;
-#endif
+
+    logStream->debugStream() << "In getpoller_1_svc function for device " << user_device << log4cpp::eol;
 
 
 //
@@ -1082,16 +1086,16 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
     }
     catch (std::bad_alloc)
     {
-	std::cout << "Memory allocation error in devinfo" << std::endl;
+	logStream->errorStream() << "Memory allocation error in devinfo" << log4cpp::eol;
 	poll_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&poll_back);
     }
 //
 // If the server is not connected to the database, return error
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	poll_back.db_err = DbErr_DatabaseNotConnected;
 	return(&poll_back);
     }
@@ -1104,6 +1108,7 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
 	    break;
     if (i == dbgen.TblNum)
     {
+	logStream->errorStream() << "SYS domain not found" << log4cpp::eol;
 	poll_back.db_err = DbErr_DomainDefinition;
 	return(&poll_back);
     }
@@ -1116,7 +1121,7 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
     query += (" name = '" + std::string(POLL_RES) + "' AND UPPER(value) = UPPER('" + user_device + "')");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	poll_back.db_err = DbErr_DatabaseAccess;
 	return (&poll_back);
     }
@@ -1147,7 +1152,7 @@ db_poller_svc *MySQLServer::getpoller_1_svc(nam *dev)
     query += (" WHERE NAME = '" + poller_name + "'");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	poll_back.db_err = DbErr_DatabaseAccess;
 	return (&poll_back);
     }

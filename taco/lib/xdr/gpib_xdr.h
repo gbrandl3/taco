@@ -30,9 +30,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:21 $
  *
  *******************************************************************-*/
 
@@ -43,8 +43,8 @@
  * definitions for Gpib
  */
 struct DevGpibWrite {
-	short number;
-	char  *msg_str;
+	DevShort  number;
+	DevString msg_str;
 };
 typedef struct DevGpibWrite 	DevGpibWrite;
 bool_t 	_DLLFunc xdr_DevGpibWrite  PT_((XDR *xdrs, DevGpibWrite *objp));
@@ -59,7 +59,7 @@ bool_t 	_DLLFunc xdr_DevGpibWrite  PT_((XDR *xdrs, DevGpibWrite *objp));
 
 struct DevGpibMulWrite {
 	DevVarShortArray number_arr;
-	char  		 *msg_str;
+	DevString  	 msg_str;
 };
 typedef struct DevGpibMulWrite 	DevGpibMulWrite;
 bool_t 	_DLLFunc xdr_DevGpibMulWrite
@@ -73,20 +73,20 @@ bool_t 	_DLLFunc xdr_DevGpibMulWrite
 
 
 struct DevGpibRes {
-  	short number;  /* Device Number */
-      	char  sendDC;
-     	char  DoPPoll;
-    	char  readMode;
-   	char  readEnd1;
- 	char  readEnd2;
-	char  writeMode;
-	char  writeEnd1;
-       	char  writeEnd2;
-      	char  primAddr;
-     	char  readStat;
-    	char  readMask;
-   	char  res1;
-  	long  frameCnt;
+  	DevShort number;  /* Device Number */
+      	DevChar  sendDC;
+     	DevChar  DoPPoll;
+    	DevChar  readMode;
+   	DevChar  readEnd1;
+ 	DevChar  readEnd2;
+	DevChar  writeMode;
+	DevChar  writeEnd1;
+       	DevChar  writeEnd2;
+      	DevChar  primAddr;
+     	DevChar  readStat;
+    	DevChar  readMask;
+   	DevChar  res1;
+  	DevLong  frameCnt;
 };
 typedef struct DevGpibRes 	DevGpibRes;
 bool_t 	_DLLFunc xdr_DevGpibRes  PT_((XDR *xdrs, DevGpibRes *objp));
@@ -99,18 +99,18 @@ bool_t 	_DLLFunc xdr_DevGpibRes  PT_((XDR *xdrs, DevGpibRes *objp));
 
 
 struct DevGpibLoc {
-    	char  slave;
-      	char  startCtrl;
-     	char  fullAddr;
-    	char  sendREN;
-   	char  serialPoll;
-  	char  paraPoll;
- 	char  autoRead;
-	char  autoSRQ;
-      	char  defStat;
-      	char  writeStat;
-     	char  waitREN;
-    	char  res0;
+    	DevChar  slave;
+      	DevChar  startCtrl;
+     	DevChar  fullAddr;
+    	DevChar  sendREN;
+   	DevChar  serialPoll;
+  	DevChar  paraPoll;
+ 	DevChar  autoRead;
+	DevChar  autoSRQ;
+      	DevChar  defStat;
+      	DevChar  writeStat;
+     	DevChar  waitREN;
+    	DevChar  res0;
 };
 typedef struct DevGpibLoc 	DevGpibLoc;
 bool_t 	_DLLFunc xdr_DevGpibLoc  PT_((XDR *xdrs, DevGpibLoc *objp));

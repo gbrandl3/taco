@@ -30,9 +30,9 @@
  *
  * Original:	24th of january 1997
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2006-09-18 22:41:57 $
+ * Date:        $Date: 2008-04-06 09:06:38 $
  */
 
 #ifndef _MDSSIGNAL_H
@@ -65,12 +65,12 @@ extern MDSSignalClass mDSSignalClass;
  */
 
 long dev_get_sig_config (char *device_name, DevVarStringArray *argout,
-                         long *error);
+                         DevLong *error);
 
 long dev_get_sig_list (char *device_name, DevVarStringArray *argout, 
-		       long *error);
+		       DevLong *error);
 
 long dev_get_sig_config_from_name (char *device_name, char *signal_name , 
-		                   DevVarStringArray *argout, long *error);
+		                   DevVarStringArray *argout, DevLong *error);
 
 #endif /*_MDSSIGNAL_H*/

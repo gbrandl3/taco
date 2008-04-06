@@ -30,9 +30,9 @@
  *
  * Original:    April 1995
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2006-09-18 22:39:09 $
+ * Date:        $Date: 2008-04-06 09:06:37 $
  */
 
 
@@ -51,7 +51,8 @@ int main(int argc,char **argv)
 {
 
 	devserver ps;
-	long readwrite = 0, error;
+	long readwrite = 0;
+	DevLong error;
 	int cmd, status;
 	float setcurrent;
 	DevFloatReadPoint readcurrent;

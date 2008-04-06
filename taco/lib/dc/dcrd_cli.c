@@ -27,9 +27,9 @@
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.20 $
+ * Version:	$Revision: 1.21 $
  *
- * Date:	$Date: 2007-10-02 14:18:39 $
+ * Date:	$Date: 2008-04-06 09:07:15 $
  *
  ******************************************************************************/
 
@@ -46,6 +46,7 @@
 extern dbserver_info           db_info;
 
 #include "dc_xdr.h"
+#include "taco_utils.h"
 
 #ifdef _OSK
 #	ifdef _UCC
@@ -82,21 +83,21 @@ long dc_first_call = True;
 
 /* Some functions declaration */
 
-static int test_server(int,serv *,int,CLIENT **,long,long *);
-static int re_test_server(int,serv *,int,int,long,long *);
-static int rpc_connect(char *,CLIENT **,int,long,long *);
-static long build_nethost_arr(dc_dev_imp *,unsigned int,nethost_call **,long *,long**,long *);
-static long build_net_arr_index(dc_dev_retdat *,unsigned int,nethost_index **,long *,long *);
-static long build_net_arr_indexm(dc_dev_mretdat *,unsigned int,nethost_index **,long *,long *);
+static int test_server(int,serv *,int,CLIENT **,long,DevLong *);
+static int re_test_server(int,serv *,int,int,long,DevLong *);
+static int rpc_connect(char *,CLIENT **,int,long,DevLong *);
+static long build_nethost_arr(dc_dev_imp *,unsigned int,nethost_call **,long *,long**,DevLong *);
+static long build_net_arr_index(dc_dev_retdat *,unsigned int,nethost_index **,long *,DevLong *);
+static long build_net_arr_indexm(dc_dev_mretdat *,unsigned int,nethost_index **,long *,DevLong *);
 static long dc_get_i_nethost_by_name(char *);
 static long dc_get_i_nethost_in_call(char *,nethost_call *,long);
-static long init_imp(long,long *);
+static long init_imp(long,DevLong *);
 static void get_nethost(char *,char *);
 static char *dc_extract_device_name(char *);
 static int comp(const void*, const void*);
-static int check_dc(int,int,char **,int *,dc_dev_imp *,int *,long,long *);
-static int call_dcserv(int,long *,dc_dev_retdat *,int,int *,long,long,long *);
-static int call_dcservm(long,long *,dc_dev_mretdat *,int,int *,long,long *);
+static int check_dc(int,int,char **,int *,dc_dev_imp *,int *,long,DevLong *);
+static int call_dcserv(int,long *,dc_dev_retdat *,int,int *,long,long,DevLong *);
+static int call_dcservm(long,long *,dc_dev_mretdat *,int,int *,long,DevLong *);
 static long set_err_nethv(long,long *,long,dc_dev_retdat *);
 static long set_err_nethm(long,long *,long,dc_dev_mretdat *);
 
@@ -132,7 +133,7 @@ static int alea(int n)
  * 	problem on only some devices, this function returns the number of
  *	faulty devices. Otherwise, the function returns DS_OK
  */
-int dc_import(dc_dev_imp *dc_devimp, unsigned int num_device, long *error)
+int dc_import(dc_dev_imp *dc_devimp, unsigned int num_device, DevLong *error)
 {
 	char 		**tmp_dev,
 	 		*tmp,
@@ -146,8 +147,8 @@ int dc_import(dc_dev_imp *dc_devimp, unsigned int num_device, long *error)
 			dev,
 			back = 0;
 	nethost_call	*nethost_array;
-	long 		err,
-	 		i_nethost,
+	DevLong 	err;
+	long 		i_nethost,
 			i_net_call,
 	 		nb_dc_host,
 			nb_nethost,
@@ -229,9 +230,7 @@ int dc_import(dc_dev_imp *dc_devimp, unsigned int num_device, long *error)
 		env_nethost = getenv("NETHOST");
 		if (env_nethost != NULL)
 		{
-			l = strlen(env_nethost);
-			for (i = 0;i < l;i++)
-				env_nethost[i] = tolower(env_nethost[i]);
+			env_nethost = str_tolower(env_nethost);
 		}
 
 /* 
@@ -275,7 +274,7 @@ int dc_import(dc_dev_imp *dc_devimp, unsigned int num_device, long *error)
 	}
 
 /* 
- * Allocate memory for the nethost array (in tis call) and for the
+ * Allocates memory for the nethost array (in tis call) and for the
  * index array 
  */
 	if ((nethost_array = (nethost_call *)calloc(NETHOST_BLOCK,sizeof(nethost_call))) == NULL)
@@ -449,9 +448,7 @@ int dc_import(dc_dev_imp *dc_devimp, unsigned int num_device, long *error)
 			*error = DcErr_ClientMemoryAllocation;
 			return(DS_NOTOK);
 		}
-		strcpy(tmp_dev[index],classname);
-		for (j = 0;j < l;j++)
-			(tmp_dev[index])[j] = tolower((tmp_dev[index])[j]);
+		strcpy_tolower(tmp_dev[index],classname);
 		caller_num[i_net_call][index] = i;
 		ind_net_call[i_net_call]++;
 	}
@@ -553,9 +550,9 @@ int dc_import(dc_dev_imp *dc_devimp, unsigned int num_device, long *error)
  * @return In case of trouble, the function returns DS_NOTOK and sets the err variable
  *    pointed to by "error". Otherwise, the function returns DS_OK 
  */
-static long init_imp(long i_nethost, long *perr)
+static long init_imp(long i_nethost, DevLong *perr)
 {
-	long		error;
+	DevLong		error;
 	int 		i;
 	char 		dc_dev_name[DEV_NAME_LENGTH];
 	db_resource 	dcclass_tab[] = {
@@ -612,9 +609,9 @@ static long init_imp(long i_nethost, long *perr)
  * To compare two values as requested by the qsort
  * function. The definition of this function is
  * available as a UNIX man page
- * @param a
- * @param b
- * @return 
+ * @param vpa
+ * @param vpb
+ * @return -1 if vpa < vpb, 0 if vpa == vpa, 1 otherwise
  */
 #ifndef WIN32
 static int comp(const void *vpa,const void *vpb)
@@ -647,7 +644,7 @@ static int comp(const void *vpa,const void *vpb)
  * @return This function returns DS_OK when no problem occurs. Otherwise the return
  *    value is DS_NOTOK and the error variable is set according to the error
  */
-static int rpc_connect(char *serv_name,CLIENT **prpc,int ind,long i_net,long *perr)
+static int rpc_connect(char *serv_name,CLIENT **prpc,int ind,long i_net,DevLong *perr)
 {
 	char 			tmp_name[DEV_NAME_LENGTH],
 				psd_name[DEV_NAME_LENGTH];
@@ -655,7 +652,7 @@ static int rpc_connect(char *serv_name,CLIENT **prpc,int ind,long i_net,long *pe
 	int 			i,
 				nb_server,
 				res;
-	long 			error;
+	DevLong			error;
 	serv 			serv_info[10];
 	unsigned char 		tmp = 0;
 	int			rand_nb;
@@ -746,7 +743,7 @@ static int rpc_connect(char *serv_name,CLIENT **prpc,int ind,long i_net,long *pe
  * @return   This function returns DS_OK when no problem occurs. Otherwise the return
  *    value is DS_NOTOK and the error variable is set according to the error
  */
-static int test_server(int ind,serv *serv_info,int min,CLIENT **clnt_ptr,long i_net,long *perr)
+static int test_server(int ind,serv *serv_info,int min,CLIENT **clnt_ptr,long i_net,DevLong *perr)
 {
 	char 		dev_name[40],
 			*ret_str,
@@ -754,7 +751,7 @@ static int test_server(int ind,serv *serv_info,int min,CLIENT **clnt_ptr,long i_
 			*tmp1,
 			ret_array[DEV_NAME_LENGTH];
 	unsigned int 	diff;
-	long 		error;
+	DevLong		error;
 	db_devinf_imp 	*serv_net_ptr;
 	int 		res = 0;
 	CLIENT 		*cl_read;
@@ -854,9 +851,9 @@ static int test_server(int ind,serv *serv_info,int min,CLIENT **clnt_ptr,long i_
  * @return In case of trouble, the function returns DS_NOTOK and sets the err variable
  *    pointed to by "error". Otherwise, the function returns DS_OK 
  */
-static int check_dc(int ind,int dev_numb,char **devname_arr,int *call_numb,dc_dev_imp *caller_arr,int *dev_unk,long i_net,long *perr)
+static int check_dc(int ind,int dev_numb,char **devname_arr,int *call_numb,dc_dev_imp *caller_arr,int *dev_unk,long i_net,DevLong *perr)
 {
-	long 	error;
+	DevLong	error;
 	imppar 	send;
 	outpar 	*recev;
 	int 	dev_err,
@@ -1036,7 +1033,7 @@ static int check_dc(int ind,int dev_numb,char **devname_arr,int *call_numb,dc_de
  *    problem on only some devices, this function returns the number of
  *    faulty devices. Otherwise, the function returns DS_OK.
  */
-int dc_free(dc_dev_free *dc_devfree,unsigned int num_device,long *error)
+int dc_free(dc_dev_free *dc_devfree,unsigned int num_device,DevLong *error)
 {
 	int 		i,
 			l,
@@ -1120,12 +1117,12 @@ int dc_free(dc_dev_free *dc_devfree,unsigned int num_device,long *error)
  * @return   In case of trouble, the function returns DS_NOTOK and sets the variable 
  *    pointed to by "error". Otherwise, the function returns DS_OK
  */
-int dc_devget(datco *dc_ptr,long cmd_code,DevArgument argout,DevType argout_type,long *error)
+int dc_devget(datco *dc_ptr,long cmd_code,DevArgument argout,DevType argout_type,DevLong *error)
 {
 	int 		l;
 	xdevget 	send;
 	xres_clnt	*recev;
-	long 		err;
+	DevLong		err;
 	register int 	ind;
 	dc_nethost_info *tmp_net;
 
@@ -1230,12 +1227,12 @@ int dc_devget(datco *dc_ptr,long cmd_code,DevArgument argout,DevType argout_type
  *    problem on only some devices, this function returns the number of 
  *    faulty devices. Otherwise, the function returns DS_OK
  */
-int dc_devgetv(dc_dev_retdat *dev_retdat,unsigned int num_device,long cmd_code,long *error)
+int dc_devgetv(dc_dev_retdat *dev_retdat,unsigned int num_device,long cmd_code,DevLong *error)
 {
 	int 		tmpind;
+	DevLong		error1;
 	long 		**ptr_tabind,
 			***tab_ind,
-			error1,
 	 		nb_nethost,
 	 		max_nethost_call,
 	 		i_net,
@@ -1533,7 +1530,7 @@ int dc_devgetv(dc_dev_retdat *dev_retdat,unsigned int num_device,long cmd_code,l
  * @return In case of trouble, the function returns DS_NOTOK and set the err variable 
  *    pointed to by "error". Otherwise, the function returns DS_OK 
  */
-static int call_dcserv(int num_device,long *dev_numb,dc_dev_retdat *dev_retdat,int ind,int *nb_deverr,long cmd_code,long i_net,long *perr)
+static int call_dcserv(int num_device,long *dev_numb,dc_dev_retdat *dev_retdat,int ind,int *nb_deverr,long cmd_code,long i_net,DevLong *perr)
 {
 	int 		i,
 			l,
@@ -1544,7 +1541,7 @@ static int call_dcserv(int num_device,long *dev_numb,dc_dev_retdat *dev_retdat,i
 	xdevgetv 	send;
 	xresv_clnt 	*recev;
 	xres_clnt 	*tmp_ptr;
-	long 		err;
+	DevLong		err;
 	dc_nethost_info *tmp_net = &dc_multi_nethost[i_net];;
 
 /* 
@@ -1684,7 +1681,7 @@ static int call_dcserv(int num_device,long *dev_numb,dc_dev_retdat *dev_retdat,i
  *    problem on only some devices, this function returns the number of
  *    faulty devices. Otherwise, the function returns DS_OK
  */
-int dc_devgetm(dc_dev_mretdat *dev_mretdat,unsigned int num_device,long *error)
+int dc_devgetm(dc_dev_mretdat *dev_mretdat,unsigned int num_device,DevLong *error)
 {
 	int 		i,
 			j,
@@ -1697,8 +1694,8 @@ int dc_devgetm(dc_dev_mretdat *dev_mretdat,unsigned int num_device,long *error)
 			back = 0;
 	long 		**ptr_tabind,
 			***tab_ind,
-			error1,
 			nb_nethost;
+	DevLong		error1;
 	nethost_index 	*nethost_array;
 	dc_nethost_info *tmp_net;
 	long 		i_net,
@@ -1998,7 +1995,7 @@ int dc_devgetm(dc_dev_mretdat *dev_mretdat,unsigned int num_device,long *error)
  * @return In case of trouble, the function returns DS_NOTOK and set the err variable
  *    pointed to by "error". Otherwise, the function returns DS_OK 
  */
-static int call_dcservm(long num_device,long *dev_numb,dc_dev_mretdat *dev_mretdat,int ind,int *nb_deverr,long i_net,long *perr)
+static int call_dcservm(long num_device,long *dev_numb,dc_dev_mretdat *dev_mretdat,int ind,int *nb_deverr,long i_net,DevLong *perr)
 {
 	int 		i,
 			j,
@@ -2011,7 +2008,7 @@ static int call_dcservm(long num_device,long *dev_numb,dc_dev_mretdat *dev_mretd
 			ret = 0;
 	mpar 		send;
 	xresm_clnt 	*recev;
-	long 		err;
+	DevLong		err;
 	xres_clnt 	*tmp_ptr;
 	mint 		*tmp_ptr_mint;
 	register mxdev 	*tmp;
@@ -2213,12 +2210,12 @@ static int call_dcservm(long num_device,long *dev_numb,dc_dev_mretdat *dev_mretd
  * @return DS_OK when no problem occurs. Otherwise the return value is DS_NOTOK 
  *	and the error variable is set according to the error
  */
-int rpc_reconnect_rd(int ind,long i_net,long *perr)
+int rpc_reconnect_rd(int ind,long i_net,DevLong *perr)
 {
 	int 			i,
 				res,
 				nb_server;
-	long 			error;
+	DevLong			error;
 	dc_nethost_info 	*tmp_net;
 	serv 			serv_info[10];
 	int			rand_nb;
@@ -2269,14 +2266,14 @@ int rpc_reconnect_rd(int ind,long i_net,long *perr)
  * @return DS_OK when no problem occurs. Otherwise the return value is DS_NOTOK and the error 
  *		variable is set according to the error
  */
-static int re_test_server(int ind,serv *serv_info,int min,int nb_server,long i_net,long *perr)
+static int re_test_server(int ind,serv *serv_info,int min,int nb_server,long i_net,DevLong *perr)
 {
 	char dev_name[40];
 	char *ret_str;
 	char ret_array[40];
 	unsigned int diff;
 	char *tmp_ptr;
-	long error;
+	DevLong error;
 	db_devinf_imp *serv_net_ptr;
 	int res = 0;
 	int already_con = False;
@@ -2399,7 +2396,7 @@ static int re_test_server(int ind,serv *serv_info,int min,int nb_server,long i_n
  */
 static long build_nethost_arr(dc_dev_imp *p_input,unsigned int num_dev,
  			      nethost_call **p_array,long *p_nethost_nb,
-			      long **p_ind,long *p_err)
+			      long **p_ind,DevLong *p_err)
 {
 	register long 	i,
 			j,
@@ -2493,7 +2490,7 @@ static long build_nethost_arr(dc_dev_imp *p_input,unsigned int num_dev,
  */
 static long build_net_arr_index(dc_dev_retdat *p_input,unsigned int num_dev,
 				nethost_index **p_array,long *p_nethost_nb,
-				long *p_err)
+				DevLong *p_err)
 {
 	register long 	i,
 			j,
@@ -2580,7 +2577,7 @@ static long build_net_arr_index(dc_dev_retdat *p_input,unsigned int num_dev,
  */
 static long build_net_arr_indexm(dc_dev_mretdat *p_input,unsigned int num_dev,
 				 nethost_index **p_array,long *p_nethost_nb,
-				 long *p_err)
+				 DevLong *p_err)
 {
 	register long 	i,
 			j,

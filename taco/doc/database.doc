@@ -1,0 +1,624 @@
+/*! \page database_guide Database guide
+
+The TACO static database is used to keep three kinds of information about device 
+servers:
+-# Device server configuration data called resources. 
+-# Device and pseudo device information (location, type...). 
+-# Security data. 
+
+Resources are used to configure device server without recompilation. Device 
+information allows application software to build network connections with devices 
+through the device server API. Pseudo device information allow easier debugging 
+session. Security data are used by the device server API to check if a device 
+request is authorized. The database is filled up with a graphical interface called 
+\c greta or with the contents of resource file. A C library allows software to 
+get/store data from/into this database. A large set of utilities allows a simple 
+management of this database. 
+
+The database itself is either 
+- the dbm package which is part of the UNIX operating system. It is a file oriented 
+database. 
+- SQLite package, which is available for most platforms. It is also a file oriented
+database.
+- MySQL package, which is available for most platforms as a full database engine.
+
+TACO is a distributed control system. This is also true for the static database. 
+The C library get/store data from/into the database through a database server 
+across the network with RPC's. This is hidden to the user and implemented in the 
+C library functions.
+
+\section device_and_resource_definition Device and resource definition 
+
+\subsection the device_list The devices list 
+
+Within a TACO control system, every device must have a name build with the following 
+syntax:
+\verbatim
+DOMAIN/FAMILY/MEMBER 
+\endverbatim
+For example, the first attenuator device name on the ESRF beam line behind insertion 
+device 12 must be ID12/att/1 because the device domain is \e ID12, the device family 
+is \e att and the member is \e 1. 
+<b>A device name must be unique in a TACO control system.</b> 
+
+To identify every device server instance, a device server is started with a <b>personal 
+name</b> which is different for each instance. For example, a device server for PerkinElmer 
+vacuum pump called Perkin will be started with the personal name ID16 when it will drive 
+pump installed on ESRF beam line ID16 and will be started with the personal name ID11 
+when it will drive pumps on the ESRF beam line ID11. The device list must be entered 
+with the following format :
+\verbatim
+device server process name/personal name/device: device names list 
+\endverbatim
+
+device is a key word allowing the software to know that it is a device list. Example: 
+\verbatim
+BlValves/ID10/device: ID10/rv/1, ID10/rv/2 \ 
+			ID10/rv/3
+\endverbatim
+
+In this case, the device server process name is BlValves, the personal name is 
+\e ID10 and it drives three devices. The device server must be started on the 
+command line as <tt>BlValves ID10</tt>. In the device list, each device name 
+must be separated by a comma. If the list continue on the next line, use the 
+character at the end of the line. All devices driven by the same device server 
+must be defined in only one device list. A device name must not have more than 
+23 characters with a family and member name limited to 19 characters. A device 
+server process name is limited to 23 characters and the personal name to 11 
+characters.
+
+\subsection resource_definition Resource definition 
+
+A resource is defined with the following syntax:
+\verbatim
+device name/resource name: resource value 
+\endverbatim
+Example 
+\verbatim
+sy/ps-b/1/fbus_channel:	 2 
+sy/ps-b/1/upper_limit: 	456.5 
+sy/ps-b/1/fbus_desc: 	fb0 
+sy/ps-b/1/error_str: 	"G64 crate out of order" 
+sy/ps-b/1/linear_coeff: 8.123, 9.18, 10.78 \
+			7.32, 101.78, 27.2
+\endverbatim
+Resource name must not exceed 23 characters. Resource value are stored in the 
+database as ASCII characters and converted to the requested type when they are 
+returned to the caller. The available types are :
+- D_BOOLEAN_TYPE 
+- D_SHORT_TYPE 
+- D_LONG_TYPE 
+- D_FLOAT_TYPE 
+- D_DOUBLE_TYPE 
+- D_STRING_TYPE 
+- D_VAR_CHARARR_
+- D_VAR_SHORTARR
+- D_VAR_LONGARR
+- D_VAR_FLOATARR
+- D_VAR_STRINGARR
+
+For the D_BOOLEAN_TYPE, a resource value can be set in the resource file to 0, 
+1, False, True, Off, On. It is possible to define resources which are arrays 
+(resource linear coeff in the previous example). In this case, each array 
+element are separated by the , character. To continue the array on the next line, 
+use the character at the end of the line. It is also possible to give a resource 
+value as a hexadecimal number if the resource value begins with the 0x characters 
+(C syntax) and if it is converted to a numerical type. If the resource is a 
+string with spaces, the string must be enclosed with the " characters. 
+
+It is also possible to define resources for non physical devices and to use them 
+to configure any software. A resource definition can look like
+\verbatim
+class/tutu/titi/tata: "When will we eat?" 
+\endverbatim 
+and be retrieved by a C program. In this case, the second and third fields length 
+is limited to 19 characters. To delete resources from a resource file, init the 
+resource value with the character %.
+\verbatim
+ID10/att/1/upper_limit: % 
+\endverbatim
+
+will erase the resource upper limit for the device ID10/att/1 from the database.
+
+
+\section dbm_files  Domain names and NDBM files 
+
+The domain name is the device or resource name first field. In a TACO control 
+system, domain names are free. 
+
+
+The database server needs to know all the domain names involved in a control 
+system. This is done by the DBTABLES environment variable. 
+This variable is a list (comma separated) of all the domain used in the control 
+system.. It is recommended to have the CLASS, CMDS, ERROR, SYS and SEC domains 
+to get all the device server features running correctly. A NAMES and PS NAMES 
+pseudo domain names are automatically added to the list of the user defined 
+domain names. 
+
+The SEC domain is reserved for the security aspect of the device server model. 
+All the update, insert, delete from this domain are protected by a password. 
+The SYS domain is a generic domain for resources and devices which are part 
+of the beam line control system itself (data collector resources...) The CMDS 
+and ERROR domain are used to store error messages and commands strings. 
+
+If you are using the dbm database server backend data for each domain are stored 
+in different files (named according to the domains).
+Files used by the dbm or SQLite backend to keep data (one or two file(s) per 
+domain) are stored in a directory pointed to by the DBM_DIR environment variable 
+software also needed by the database server.
+
+\section greta Greta 
+
+Greta (Graphical Resource Editor for TACO) is the graphical interface to the TACO 
+static database. This tool allows the user to retrieve, add, delete or update 
+resources, to add, delete update device list for a device server, to save/load 
+data to/from a file, to get device, server or database information. For greta, 
+all the information stored into the database are splitted into three parts which 
+are :
+-# The device list : All the entities defined as served by a device server 
+-# The server list : List of all device server defined in the database 
+-# The resource list : All the resources defined in the database including resources
+which don't belong to any device
+
+\section greta_device_window The device window 
+
+To open a device window, click on File-Open device. A database device browsing 
+window is poped-up. Once a device is selected (by double click on the field name 
+or by pressing the filter button), pressing the open button or a double click on 
+the Member field will poped-up a device window. 
+
+The information part of the device window contains device information like device 
+server host, device server PID, device class... This sub-window is not editable. 
+The Resources sub-window displays all the resources defined for the selected 
+device and is editable. It is possible to update, delete, add device resource(s) 
+in this sub-window. The five window main buttons are :
+- Update to update the database with the contents of the above sub-window.
+A confirmation window is poped-up
+- Cancel to close the window without any database change 
+- Delete to delete the device from database. A window is poped up in order to 
+give the user the choice to delete device with or without its resources.
+- Ping to ping the device. The device answers to such request only if the device
+server is linked with DSAPI release 5.11 and above.
+- (Re)start to start or restart the device server in charge of the selected device.
+This feature is available only for device served by a device server linked with 
+database software release 5.0 and above and also if the "starter" device server 
+release 2.0 or above is running on the host where the device server is running. 
+If it is not the case, an alarm window is poped up. In all cases, a confirmation 
+window is poped up.
+
+Under the window File button, it is possible to :
+- Print window content 
+- Save window content to a file 
+- Close the window 
+
+Under the Edit button, the user will find the classical edit features plus the 
+"insert device resource" button. If some device resources are device name, by 
+selecting this device name and clicking in Edit-insert device resource, all the 
+resources belonging to the newly selected device will be added at the bottom of 
+the Resources subwindow. This feature is also possible by a click on the right 
+mouse button when the device name is selected. 
+
+It is possible to open up to 10 different device windows. The device name is 
+displayed in the window title.
+
+\image html devwindow.gif "Greta device window"
+\image latex devwindow.eps "Greta device window" width=14cm
+
+\subsection greta_server_window The server window 
+
+To open a server window, click on File-Open server. A database server browsing 
+window is poped-up. Once a server is selected (by double click on the field name 
+or by pressing the filter button), pressing the open button or a double click on 
+the Personal name field will poped-up a server window. The information part of 
+the device window contains server information like devices number defined for 
+this server, device name... This sub-window is not editable. The "In charge 
+device list" sub-window displays the list of device(s) defined for this server. 
+This list follows the syntax described in the device list chapter. This 
+sub-window is editable and the device list can be modified. The Resources 
+subwindow displays all the resources belonging to each server device and is 
+editable. It is possible to update, delete, add device resource(s) in this 
+sub-window. The five window main buttons are :
+- Update to update the database with the contents of the two editable subwindows. 
+A confirmation window is poped-up
+- Cancel to close the server window without any database change 
+- Unreg to unregister the server from the database. To unregister a server from 
+the database means to mark all its devices as non-exported (unable to answer to 
+network request). A confirmation window is poped-up.
+- Delete to delete the server from database. A window is poped up in order to 
+give the user the choice to delete the server with or without all its devices 
+resources.
+- (Re)start to restart the device server. This feature is available only for 
+device server linked with database software release 5.0 and above and also if 
+the "starter" device server release 2.0 or above is running on the host where 
+the selected device server is running. If it is not the case, an alarm window 
+is poped up. In all cases, a confirmation window is poped up.
+
+Under the window File button, it is possible to :
+- Print window content 
+- Save window content to a file 
+- Close the window 
+
+Under the Edit button, the user will find the classical edit features plus the 
+"insert device resource" button. If some device resources are device name, by 
+selecting this device name and clicking in Edit-insert device resource, all the 
+resources belonging to the newly selected device will be added at the bottom of 
+the Resources subwindow. This feature is also possible by a click on the right 
+mouse button when the device name is selected. 
+
+It is possible to open up to 10 different server windows. The server name is 
+displayed in the window title.
+
+\image html servwindow.gif "Greta server window"
+\image latex servwindow.eps "Greta server window" width=14cm
+
+\subsection greta_res_window The resource window 
+
+To open a resource window, click on File-Open resources. A database resource 
+browsing window is poped-up. Once a resource is selected (by double click on 
+the field name or by pressing the filter button), pressing the open button or 
+a double click on the Name field will poped-up a server window. It is always 
+proposed by greta to use the wildcard * as Member and/or Name field.
+
+
+
+The Resources sub-window displays all the resources selected This sub-window 
+is editable. It is possible to update, delete, add device resource(s) in this 
+sub-window. The two window main buttons are :
+- Update to update the database with the contents of the above sub-window.
+A confirmation window is poped-up
+- Cancel to close the window without any database change Under the window File 
+button, it is possible to :
+- Print window content 
+- Save window content to a file 
+- Close the window Under the Edit button, the user will find the classical 
+edit features. It is possible to open up to 10 different resources windows.
+
+\image html reswindow.gif "Greta resource window"
+\image latex reswindow.eps "Greta resource window" width=14cm
+
+\section greta_new_server_window  The new server window 
+
+The new server window allows a user to create new device server within the 
+database. This window is poped-up after a click on File-New server. The user 
+must fill in the server name field with the device server name and the personal 
+name field with the argument used to start the device server. The device list 
+must also be filled in as described in the device list chapter of this 
+documentation. When these three fields are filled in, clicking on OK will 
+register the server in the database. To define server device(s) resources, 
+open a server window as explained earlier.
+
+\image html newserver.gif "Greta new server window"
+\image latex newserver.eps "Greta new server window" width=14cm
+
+\section greta_file_window The load file window 
+
+Once a file as been selected in the file selection window, the file contents 
+is displayed in a separate window. This window is not editable. The two window 
+main buttons are :
+- Update to update the database with the contents of the above sub-window. 
+- Cancel to close the window without any database change
+
+\image html filewindow.gif "Greta file window"
+\image latex filewindow.eps "Greta file window" width=14cm
+
+\section the_option_menu The Option menu 
+
+Four options are implemented. These options are :
+- Server displayed with class resources. This option deals only with server
+window. When this option is chosen, class resources are also displayed in 
+the server window Resources part. Class resources are all the resources with 
+the following syntax :
+	- class/server_name/*/* 
+	- class/device_class/*/*
+- Display all embedded server in a process. This option is usefull when several 
+device servers are embedded in one process. If such a process is selected in the 
+server selection window, device list and device resources for all the server 
+embedded in the process will be displayed in the server window.
+- Display device data collector info. If this option is set, a forth part is added 
+to the device window. This sub-window (not editable) is entitled "DC/HDB information". 
+It displays data related to the device and the TACO data collector. If the device 
+is registered in the data collector, the command used for polling is displayed as 
+well as the time needed to execute the last command. The polling period is also 
+displayed and the time spent since the last command result update. Some information 
+about the poller process in charge of the device are also displayed (host where 
+the poller is running, its PID...)
+- Display device history database info. If this option is set, a forth part is 
+added to the device window. This sub-window is entitled "DC/HDB information". 
+It displays the storage mode chosen to store device data into HDB (History DataBase) 
+and the last nine records value with their record dates.
+
+If the last two options are selected, DC and HDB information are displayed in 
+the same sub-window of the device window.
+
+\subsection other_features Other features 
+
+Some miscellaneous features are also incorporated into greta. 
+
+Global-information : Display in greta main window general database information. 
+These information are the number of devices defined in the database, the number 
+of exported devices for each device's domain, the pseudo-devices number and the 
+number of resources for each domain. 
+
+Help-On version : Display a window with the greta software release number 
+
+File-Print : Print the greta main window 
+
+File-Exit : Exit the application
+
+\section resource_file Resource file 
+
+A resource file is the way to store resource and device information into the 
+static database. The user writes its resource file and updates the database with 
+one of the database utilities called db update. Then a C program (a device server 
+or any other C program) is able to retrieve these resources with a library call 
+and in the case of a device server, it is also able to mark its devices as exported 
+to the rest of the world (ready to accept requests). A resource file is divided 
+in two parts which are:
+- The list of devices driven by a particular instance of a device server. The 
+same device server can run on several computers. This list allows the system to 
+know that the this particular instance of the device server drive this list of 
+devices.
+- Resources definition 
+
+A resource file must have a suffix .res. Any line beginning with the # character 
+will be considered as a comment line. It is not allowed to begin comment at the 
+middle of a line. Blank lines are allowed. All the resource files must be stored 
+in directory and sub-directories under a defined path which is known to the static 
+database utilities by the RES_BASE_DIR environment variable. On most of the ESRF 
+beam line control system, the resource files base directory is dserver login 
+directory/dbase/res. For test purpose, another resource database is running on 
+margaux.
+
+\section Utilities 
+
+These utilities are commands run from the UNIX command line. They can be grouped 
+in three different parts which are:
+- Database administration commands 
+- Database user commands 
+- Security commands 
+
+These utilities are briefly describe below. Man pages are available to get complete 
+information.
+
+\section db_admin_tools Database administration commands 
+
+\subsection db_fillup 
+\verbatim
+db_fillup <data_source>
+\endverbatim
+This command creates the database into memory and load it with resource files 
+contents or with a database backup file according to the data source parameter. 
+This command directly access the ndbm files (not via the server) and therefore 
+needs the DBM_DIR and DBTABLES environment variables. To hide these environment 
+variables, this command is alittle script which set these environment variable 
+and then, call the real command with the argument given by the user. The setting 
+of these environment variables is done by a file called dbm env. Example :
+\verbatim
+db_fillup 0
+\endverbatim
+
+\subsection db_info 
+\verbatim
+db_info
+\endverbatim
+
+This command displays the total number of devices and resources defined in the 
+database as well as the number of devices and resources for each domain. Example: 
+\verbatim
+$db_info
+
+              DEVICE STATISTICS
+
+90 devices are defined in database 
+84 of the defined devices are actually exported:
+   0 for the CLASS domain 
+   6 for the SYS domain 
+   0 for the ERROR domain 
+   0 for the CMDS domain 
+   0 for the SEC domain 
+   78 for the ID16 domain 
+12 pseudo devices are defined in database
+
+              RESOURCE STATISTICS 
+4126 resources are defined in database:
+   42 resources for the CLASS domain 
+   28 resources for the SYS domain 
+   348 resources for the ERROR domain 
+   651 resources for the CMDS domain 
+   0 resources for the SEC domain 
+   3057 resources for the ID16 domain
+\endverbatim
+
+\subsection db_read 
+\verbatim
+db_read <domain name>
+\endverbatim
+This function displays all the data recorded in the database for a specific domain. 
+This command directly access the ndbm files (not via the server) and therefore 
+needs the DBM_DIR and DBTABLES environment variables. To hide these environment 
+variables, this command is a little script which set these environment variable 
+and then, call the real command with the argument given by the user. The setting 
+of these environment variables is done by a file called dbm env. Example :
+\verbatim
+$db_read class 
+CLASS: relayserver|id16|unittype|1|: icv196 
+CLASS: dc|1|host|1|: inel1 
+CLASS: dc|1|max_call|1|: 1000 
+CLASS: dc|1|36_default|1|: inel1 
+CLASS: dc|inel1|dev_number|1|: 100 
+CLASS: dc|inel1|cellar_number|1|: 50 
+CLASS: dc|inel1|path|1|: /users/b/dserver/system 
+CLASS: dc|inel1|login|1|: dserver 
+CLASS: dc|server.nb|inel1.rd|1|: 2
+\endverbatim
+
+\section database_user_cmd Database user commands 
+
+\subsection db_update 
+\verbatim
+db_update <file> 
+\endverbatim
+This command allows a user to load into the database all the resources and devices 
+list defined a resource file. It will insert new resources or update already 
+existing ones. It will also updates or insert device information. Example :
+\verbatim
+db_update FluoScreen_ID16.res
+\endverbatim
+
+\subsection db_devres 
+\verbatim
+db_devres <device_name> 
+\endverbatim
+db_devres displays all the resources belonging to a device. Example : 
+\verbatim
+$ db_devres id16/att/1 
+block1 : ID16/att1.b/1 
+number_of_blocks : 3 
+block3 : ID16/att1.b/3 
+unitnumber : 1 
+block2 : ID16/att1.b/2 
+fluorscreen : NO 
+attenuatornum : 1
+\endverbatim
+
+\subsection db_devinfo 
+\verbatim
+db_devinfo <device_name> 
+\endverbatim
+db_devinfo displays device (or pseudo device) information. For device, these 
+information are the host name where the device server in charge of the device 
+is running, the device server process identifier and the device server name. 
+For pseudo device, it is just the PID and the host of the process which created 
+the pseudo device. Example (for a real device) :
+\verbatim
+$ db_devinfo id16/att/1 
+Device id16/att/1 belongs to class : attenuatorClass 
+It is monitored by the server : attenuator/id16 version 1 
+The device server process name is : attenuator 
+This process is running on the computer : id161 with process ID : 117
+\endverbatim
+Example (for a pseudo device) : 
+\verbatim
+$ db_devinfo id16/bidon/1 
+Device id16/bidon/1 is a pseudo device 
+It is created by a process with PID : 234 running on host : inel1
+\endverbatim
+
+\subsection db_servinfo 
+\verbatim 
+db_servinfo <full device server name> 
+\endverbatim
+This command displays the device list for a specific device server. The device 
+server is specified by its full device server name which is the device server 
+process name/personal name. For device server with several embedded classes, 
+device belonging to each class wil be displayed. Example :
+\verbatim
+$ db_servinfo attenuator/id16 
+Device number 1 : id16/att/1 exported from host id161 
+The device server is part of the process : attenuator with PID : 45
+\endverbatim
+
+\subsection db_devdel 
+\verbatim
+db_devdel [-r] <device_name> 
+\endverbatim
+This command delete a device (or a pseudo device) and all its resources from 
+the database. The -r option prevents the command to also remove all the device 
+resources. Example :
+\verbatim
+$ db_devdel id12/att/1
+\endverbatim
+
+\subsection db_resdel 
+\verbatim
+db_resdel <device name/resource name>
+\endverbatim
+This command deletes a resource from the database. Example : 
+\verbatim
+$ db_resdel fe/id/10/io_word
+\endverbatim
+
+\subsection db_servdel 
+\verbatim
+db_servdel [-r] <full device server name>
+\endverbatim
+This command deletes all the device(s) belonging to a device server from the 
+database. It also deletes all the resources belonging to these devices. The -r 
+option prevents the command to delete resources. Example :
+\verbatim
+$ db_servdel attenuator/id16
+\endverbatim
+
+\subsection db_servunreg 
+\verbatim
+db_servunreg <full device server name>
+\endverbatim
+This command unregisters all the device(s) belonging to a device server from 
+the database. After this command, all the devices are not exported anymore. Example :
+\verbatim
+$ db_servunreg attenuator/id16
+\endverbatim
+
+\section dbase_sec_cmd Security commands 
+
+\subsection dbm_sec_passwd 
+\verbatim
+dbm_sec_passwd
+\endverbatim
+It is possible to protect security data (in the SEC domain) with a password. This 
+password will be asked for each insert/update into the SEC domain. \c dbm_sec_passwd 
+is the command which allows to define or change the password.
+
+\subsection dbm_sec_objinfo 
+\verbatim
+dbm_sec_objinfo <obj_name>
+\endverbatim
+\c dbm_sec_objinfo displays security data for a given object. A object can be a domain, 
+a family or a device.
+
+\subsection dbm_sec_userinfo 
+\verbatim
+dbm_sec_userinfo [-u user_name] [-g group_name]
+\endverbatim
+\c dbm_sec_userinfo returns all accesses specified for a user and (or) for a group.
+*/
+13.9 The C library A C library with 39 calls has been written which allows a C program to
+
+ffl retrieve, update, insert, delete resources. ffl retrieve device list, mark device as exported, return device information. ffl retrieve all or part of the exported devices. ffl register and unregister pseudo devices ffl browse the database ffl retrieve command code from command name These calls are briefly described here. Man pages are available for all of them to get complete information. The library (client part of RPC calls) is available for HP-UX, Solaris, OS-9 and Linux.
+
+13.10 Resource oriented calls All the following calls are linked to resources
+
+13.11 Exported device list oriented calls The two following calls are used to get information on which devices are available for request in the control system.
+
+13.12 Device oriented calls The following functions are device oriented.
+
+13.13 Server oriented calls The following functions deals with device server.
+
+13.14 Database browsing oriented calls All the following 11 calls allows database browsing
+
+13.15 Pseudo device oriented calls 13.15.1 db psdev register() int db.psdev.register (psdev, num.psdev, error)
+
+13.16 Database update calls 
+
+/*!  \page database_guide
+\section mult_taco Multi TACO control system access 
+
+With release 5.5 and above of database software, the \c db_getresource and 
+\c db_dev_import calls of the C library have been modified in order to allow 
+acess to multiple TACO control system. To specify which TACO control system 
+should be used, a forth field must be added to the device name. This forth 
+field is the name of the computer where the TACO anchor process is running 
+(The process called Manager). In this case, the naming syntax is :
+\verbatim
+//FACILITY/DOMAIN/FAMILY/MEMBER 
+\endverbatim
+The facility name is also known as NETHOST. Example of device name which 
+specify the machine control system : //ARIES/SR/D CT/1. Another example for 
+a device sy/ps-b/1 defined in a control system where the nethost is libra: 
+//LIBRA/SY/PS-B/1. For device where the nethost is not specifed, the NETHOST 
+environment variable is used. The \c db_dev_import enables a user to retrieve 
+necessary parameters to build RPC connections between clients and server for 
+several devices with the same call. The TACO control system defined by the 
+first device of the list will be used.
+
+*/

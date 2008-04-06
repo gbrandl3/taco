@@ -25,9 +25,9 @@
  * Author(s):
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2006-12-15 12:43:53 $
+ * Date:	$Date: 2008-04-06 09:07:40 $
  *
  */
 
@@ -127,46 +127,46 @@ private:
 	int 	db_store(db_devinfo_3 &);
 	int 	db_store(db_devinfo_2 &);
 	int 	db_store(db_devinfo &);
-	long	reg_ps(std::string, long, std::string, long, long *);
+	long	reg_ps(std::string, long, std::string, long, DevLong *);
 	long	unreg_ps(std::string, long *);
 	long	db_update_names(const std::string, const std::string, const int, const std::string); 
 	long	db_insert_names(const std::string, const std::string, const int, const std::string); 
 	long	db_delete_names(const std::string, const std::string, const int, const std::string); 
-	long	upd_res(std::string, long, char, long *);
+	long	upd_res(std::string, long, char, DevLong *);
 public:
     			SQLite3Server(std::string);
 	virtual		~SQLite3Server();
 	db_res 		*db_getres_1_svc(arr1 *, struct svc_req *);
-	db_res 		*db_getdev_1_svc(nam *);
+	db_res 		*db_getdev_1_svc(DevString *);
 	DevLong		*db_devexp_1_svc(tab_dbdev *);
 	DevLong	   	*db_devexp_2_svc(tab_dbdev_2 *);
 	DevLong	   	*db_devexp_3_svc(tab_dbdev_3 *);
 	db_resimp	*db_devimp_1_svc(arr1 *);
-	DevLong		*db_svcunr_1_svc(nam *);
-	svc_inf		*db_svcchk_1_svc(nam *);
-	db_res		*db_getdevexp_1_svc(nam *, struct svc_req *);
+	DevLong		*db_svcunr_1_svc(DevString *);
+	svc_inf		*db_svcchk_1_svc(DevString *);
+	db_res		*db_getdevexp_1_svc(DevString *, struct svc_req *);
 	DevLong		*db_clodb_1_svc(void);
 	DevLong		*db_reopendb_1_svc(void);
 	DevLong		*db_putres_1_svc(tab_putres *);
 	DevLong		*db_delres_1_svc(arr1 */*, struct svc_req **/);
-	cmd_que		*db_cmd_query_1_svc(nam *);
-	event_que	*db_event_query_1_svc(nam *);
+	cmd_que		*db_cmd_query_1_svc(DevString *);
+	event_que	*db_event_query_1_svc(DevString *);
 	db_psdev_error	*db_psdev_reg_1_svc(psdev_reg_x *);
 	db_psdev_error	*db_psdev_unreg_1_svc(arr1 *);
 	db_res		*devdomainlist_1_svc(void);
-	db_res		*devfamilylist_1_svc(nam *);
+	db_res		*devfamilylist_1_svc(DevString *);
 	db_res		*devmemberlist_1_svc(db_res *);
 	db_res		*resdomainlist_1_svc(void);
-	db_res		*resfamilylist_1_svc(nam *);
+	db_res		*resfamilylist_1_svc(DevString *);
 	db_res		*resmemberlist_1_svc(db_res *);
 	db_res		*resresolist_1_svc(db_res *);
 	db_res		*resresoval_1_svc(db_res *);
 	db_res		*devserverlist_1_svc(void);
-	db_res		*devpersnamelist_1_svc(nam *);
+	db_res		*devpersnamelist_1_svc(DevString *);
 	db_res		*hostlist_1_svc(void);
-	db_devinfo_svc	*devinfo_1_svc(nam *);
+	db_devinfo_svc	*devinfo_1_svc(DevString *);
 	db_res		*devres_1_svc(db_res *);
-	DevLong		*devdel_1_svc(nam *);
+	DevLong		*devdel_1_svc(DevString *);
 	db_psdev_error	*devdelres_1_svc(db_res *);
 	db_info_svc	*info_1_svc();
 	DevLong		*unreg_1_svc(db_res *);
@@ -174,7 +174,7 @@ public:
 	DevLong		*svcdelete_1_svc(db_res *);
 	db_psdev_error	*upddev_1_svc(db_res *);
 	db_psdev_error	*updres_1_svc (db_res *);
-	db_poller_svc	*getpoller_1_svc(nam *);
+	db_poller_svc	*getpoller_1_svc(DevString *);
 };
 
 inline SQLite3Server::SQLite3Server(const std::string tablename)

@@ -29,9 +29,9 @@
  *
  * Original:    January 1991
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  *
  *******************************************************************-*/
 
@@ -62,7 +62,7 @@ xdr_DevVrifVmeStat(xdrs, objp)
 	XDR *xdrs;
 	DevVrifVmeStat *objp;
 {
-	if (!xdr_long(xdrs, &objp->Address)) {
+	if (!xdr_DevLong(xdrs, &objp->Address)) {
 		return (FALSE);
 	}
 	if (!xdr_short(xdrs, &objp->Stop)) {

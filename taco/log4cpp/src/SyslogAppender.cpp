@@ -8,6 +8,7 @@
  */
 
 #include "PortabilityImpl.hh"
+
 #if LOG4CPP_HAVE_SYSLOG
 
 #include <unistd.h>
@@ -79,7 +80,7 @@ namespace log4cpp {
     {
        std::string name, syslog_name;
        int facility = 0;
-       params.get_for("syslog appender").required("name", name)("syslog_name", syslog_name)
+       params.get_for("LocalSyslogAppender").required("name", name)("syslogName", syslog_name)
                                         .optional("facility", facility);
        return std::auto_ptr<Appender>(new SyslogAppender(name, syslog_name, facility));
     }

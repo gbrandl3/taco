@@ -25,9 +25,9 @@
  * Author(s):
  *		$Author: jkrueger1 $
  * 
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2006-09-18 22:18:01 $
+ * Date:	$Date: 2008-04-06 09:07:03 $
  *
  ****************************************************************************/
 
@@ -48,6 +48,9 @@
 #endif
 #include <errno.h>
 #include <macros.h>
+
+extern int get_sema_nowait(int sph);
+extern int delete_shared (int sid);
 
 /**@ingroup dataportAPI
  * Build a unique key from the dataport name

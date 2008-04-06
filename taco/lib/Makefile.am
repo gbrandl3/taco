@@ -17,39 +17,36 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-if BUILD_DATAPORT
- datap_dir=dataport
-else
- datap_dir=
+SUBDIRS 		= dbase xdr signal
+			  
+
+if DC_BUILD
+SUBDIRS			+= dc
 endif
 
 if ASCII_BUILD
- ascii_dir=ascii tc
-else
- ascii_dir=
+SUBDIRS 		+= ascii tc
 endif
 
-if DC_BUILD
- dc_dir=dc
- dc_src=dc/dc_sdev.c dc/dcrd_clnt.c dc/dcwr_clnt.c \
-        dc/dchist_cli.c dc/dcrd_xdr.c dc/dcwr_xdr.c \
-        dc/dcrd_cli.c dc/dcwr_cli.c dc/utils_cli.c 
-
-else
- dc_dir=
- dc_src=
+if BUILD_DATAPORT
+SUBDIRS			+= dataport
 endif
+
+SUBDIRS			+= .
 
 if TANGO_BUILD
- tango_dir=tango
-else
- tango_dir=
+SUBDIRS			+= tango
 endif
 
-SUBDIRS 		= dbase xdr signal $(dc_dir) $(ascii_dir) $(datap_dir) \
-			  $(tango_dir) private .
+if BUILD_LOG4CPP
+SUBDIRS			+= log4taco
+endif
+
+nobase_include_HEADERS  = private/ApiP.h
 
 include_HEADERS 	= API.h DevSec.h hdb.h hdb_out.h Admin.h DevCmds.h DevErrors.h DevStates.h DserverTeams.h macros.h
+
+noinst_HEADERS		= taco_utils.h _count.h
 
 lib_LTLIBRARIES 	= libtaco.la libtaco++.la libtacomain.la
 
@@ -60,7 +57,7 @@ INCLUDES		= @TACO_INCLUDES@
 ## AM_CPPFLAGS 		= -DEBUG
 
 libtacoc_la_SOURCES 	= gen_api.c dev_cmds.c dev_errors.c dev_states.c oic.c \
-			util_api.c asyn_api.c gettrans.c ds_prog_vers3.c DevServer.c
+			util_api.c asyn_api.c gettrans.c ds_prog_vers3.c DevServer.c taco_utils.c timeouts.c
 libtacoc_la_LIBADD	= @PTHREAD_LIBS@
 
 libtacoc_la_LDFLAGS 	= -version-info @LIB_VERSION@
@@ -73,13 +70,19 @@ EXTRA_DIST 		=
 SRC_TACO_SPECIAL 	= dev_api.c sec_api.c event_api.c \
 			svc_api.c DevServerSig.c  event_relisten.c startup.c
 
-libtaco_la_SOURCES 	= $(SRC_TACO_SPECIAL) $(dc_src)
+libtaco_la_SOURCES 	= $(SRC_TACO_SPECIAL) 
 libtaco_la_LIBADD  	= xdr/libdsxdr_all.la dbase/libdbapi.la signal/libsignal.la libtacoc.la -lc
+if DC_BUILD
+libtaco_la_LIBADD	+= dc/libdcapi.la
+endif
 libtaco_la_LDFLAGS 	= -version-info @LIB_VERSION@
 
-libtaco___la_SOURCES 	= $(SRC_TACO_SPECIAL) Device.cpp OICDevice.cpp $(dc_src)
+libtaco___la_SOURCES 	= $(SRC_TACO_SPECIAL) Device.cpp OICDevice.cpp 
 libtaco___la_CFLAGS  	= -x c++
 libtaco___la_LIBADD  	= xdr/libdsxdr_all.la dbase/libdbapi.la signal/libsignal.la libtacoc.la @LIB_STDCXX@
+if DC_BUILD
+libtaco___la_LIBADD	+= dc/libdcapi.la
+endif
 libtaco___la_LDFLAGS 	= -version-info @LIB_VERSION@
 
 libtacomain_la_SOURCES 	= DevServerMain.c 
@@ -93,7 +96,7 @@ include_HEADERS		+= BlcDsNumbers.h CntrlDsNumbers.h DasDsNumbers.h MachDsNumbers
 include_HEADERS		+= Device.h OICDevice.h 
 include_HEADERS		+= DevServer.h  DevServerP.h  DevSignal.h  NT_debug.h  Starter.h
 
-EXTRA_DIST		+= DeviceFRM.h OICDeviceFRM.h DeviceFRM.cpp OICDeviceFRM.cpp Frm2DsNumbers.h
+EXTRA_DIST		+= Frm2DsNumbers.h ExpDsNumbers.h DevCcdCmds.h
 EXTRA_DIST		+= NT_debug.c  Doxyfile.in
 
 doc:	Doxyfile $(include_HEADERS) $(libtaco_la_SOURCES) $(libtaco___la_SOURCES) 

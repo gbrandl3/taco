@@ -1,0 +1,10 @@
+digraph states {
+	DEVLOCAL -> DEVOFF [label="DevRemote"];
+	DEVOFF -> DEVON [label="DevOn"];
+	DEVON -> DEVOFF [label="DevOff"];
+	DEVOFF -> DEVLOCAL [label="DevLocal"];
+	DEVON -> DEVLOCAL [label="DevLocal"];
+	DEVON -> DEVFAULT [label="DevError"];
+	DEVOFF -> DEVFAULT [label="DevError"];
+	DEVFAULT -> DEVOFF [label="DevReset"];
+}

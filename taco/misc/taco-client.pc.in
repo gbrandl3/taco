@@ -9,6 +9,6 @@ Version: @PACKAGE_VERSION@
 URL: http://taco.sourceforge.net
 Requires:
 Conflicts:
-Libs: -ltaco
+Libs: -L${libdir} -ltaco
 Libs.private: -lc -lm
-Cflags: @taco_CFLAGS@
+Cflags: -I${includedir} @taco_CFLAGS@

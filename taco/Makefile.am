@@ -18,7 +18,7 @@
 #
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-ext --enable-gdbm --enable-sqlite3
-ACLOCAL_AMFLAGS = -I m4 -I log4cpp
+ACLOCAL_AMFLAGS = -I m4 -I log4cpp -I log4cpp/m4
 
 SUBDIRS = m4 
 
@@ -42,7 +42,7 @@ if BUILD_SERVER
 SUBDIRS += classes
 endif
 
-SUBDIRS += doc misc bindings tests 
+SUBDIRS += doc misc bindings tests examples
 
 EXTRA_DIST=autogen.sh taco.spec.in README-RPM
 

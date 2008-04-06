@@ -1,7 +1,7 @@
 SUBDIRS = html
 
-man3dir = ${DESTDIR}/${mandir}/man3
-docdir  = ${DESTDIR}/${prefix}/doc/@PACKAGE_TARNAME@-@PACKAGE_VERSION@
+man3dir = $(mandir)/man3
+docdir  = $(prefix)/doc/@PACKAGE_TARNAME@-@PACKAGE_VERSION@
 
 EXTRA_DIST = \
 	mainPage.txt
@@ -20,26 +20,27 @@ pdf: @PACKAGE_TARNAME@.pdf
 	ln -s ./latex/refman.ps	 @PACKAGE_TARNAME@.ps
 	ln -s ./latex/refman.pdf @PACKAGE_TARNAME@.pdf
 
+build_man3_MANS = man/man3/log4cpp.3
 
 install-data-local:
-	$(mkinstalldirs) $(man3dir)
+	$(mkinstalldirs) $(DESTDIR)$(man3dir)
 	@for i in ./man/man3/log4cpp.3 ./man/man3/log4cpp_*.3; do \
 		inst=`basename $$i | sed 's/_/::/g'`; \
-		echo "$(INSTALL_DATA) $$i$(man3dir)/$$inst"; \
-		$(INSTALL_DATA) $$i $(man3dir)/$$inst; \
+		echo "$(INSTALL_DATA) $$i $(DESTDIR)$(man3dir)/$$inst"; \
+		$(INSTALL_DATA) $$i $(DESTDIR)$(man3dir)/$$inst; \
 	done
-	$(mkinstalldirs) $(docdir)
-	cp -r html/. $(docdir)
-	$(RM) -rf $(docdir)/CVS \
-		$(docdir)/Makefile.am \
-		$(docdir)/Makefile.in \
-		$(docdir)/Makefile
+	$(mkinstalldirs) $(DESTDIR)$(docdir)
+	cp -r html/. $(DESTDIR)$(docdir)
+	$(RM) -r -f $(DESTDIR)$(docdir)/CVS \
+		$(DESTDIR)$(docdir)/Makefile.am \
+		$(DESTDIR)$(docdir)/Makefile.in \
+		$(DESTDIR)$(docdir)/Makefile
 
 uninstall-local:
-	$(RM) -f $(man3dir)/log4cpp.3
-	$(RM) -f $(man3dir)/log4cpp::*.3
-	$(RM) -rf $(docdir)
+	$(RM) $(DESTDIR)$(man3dir)/log4cpp.3
+	$(RM) $(DESTDIR)$(man3dir)/log4cpp::*.3
+	$(RM) -r -f $(DESTDIR)$(docdir)
 
 clean-local:
-	$(RM) -rf latex
-	$(RM) -rf html/api man @PACKAGE_TARNAME@.ps @PACKAGE_TARNAME@.pdf
+	$(RM) -r latex
+	$(RM) -r html/api man @PACKAGE_TARNAME@.ps @PACKAGE_TARNAME@.pdf

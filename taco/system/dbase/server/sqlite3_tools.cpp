@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2006-12-15 12:43:54 $
+ * Date:	$Date: 2008-04-06 09:07:45 $
  *
  */
 
@@ -43,11 +43,11 @@
  *
  * @return a pointer to a structure with all device info and an error code which is set if needed
  */
-db_devinfo_svc *SQLite3Server::devinfo_1_svc(nam *dev)
+db_devinfo_svc *SQLite3Server::devinfo_1_svc(DevString *dev)
 {
 	std::string user_device(*dev);
 
-	logStream->debugStream() << "In devinfo_1_svc function for device " << user_device << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "In devinfo_1_svc function for device " << user_device << log4cpp::eol;
 
 //
 // Initialize parameter sent back to client and allocate memory for string (bloody XDR)
@@ -78,7 +78,7 @@ db_devinfo_svc *SQLite3Server::devinfo_1_svc(nam *dev)
 	}
 	catch (std::bad_alloc)
 	{
-		logStream->errorStream() << "Memory allocation error in devinfo" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Memory allocation error in devinfo" << log4cpp::eol;
 		sent_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&sent_back);
 	}
@@ -87,7 +87,7 @@ db_devinfo_svc *SQLite3Server::devinfo_1_svc(nam *dev)
 //
 	if (dbgen.connected == False)
 	{
-		logStream->errorStream() << "I'm not connected to database" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "I'm not connected to database" << log4cpp::eol;
 		sent_back.db_err = DbErr_DatabaseNotConnected;
 		return(&sent_back);
 	}
@@ -108,7 +108,7 @@ db_devinfo_svc *SQLite3Server::devinfo_1_svc(nam *dev)
 	else
 	{
 
-		logStream->debugStream() << "SQLite3Server::devinfo_1_svc() : " << nrow << " devices found" << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "SQLite3Server::devinfo_1_svc() : " << nrow << " devices found" << log4cpp::eol;
 
 		if(nrow != 0)
 		{
@@ -122,7 +122,7 @@ db_devinfo_svc *SQLite3Server::devinfo_1_svc(nam *dev)
 				strcpy(sent_back.personal_name, tmp.substr(pos + 1).c_str());
 
 				logStream->debugStream() << "SQLite3Server::devinfo_1_svc() : " << tmp.substr(0, pos) << " "
-					<< tmp.substr(pos + 1) << log4cpp::CategoryStream::ENDLINE;
+					<< tmp.substr(pos + 1) << log4cpp::eol;
 
 			}
 			if (result[ncol + 1] != NULL) 
@@ -219,9 +219,9 @@ db_res *SQLite3Server::devres_1_svc(db_res *recev)
 	
 	res_list_dev.clear();
 
-	logStream->debugStream() << "In devres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "In devres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << log4cpp::eol;
 	for (long i = 0; i < recev->res_val.arr1_len; i++)
-		logStream->debugStream() << " Device = " << recev->res_val.arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << " Device = " << recev->res_val.arr1_val[i] << log4cpp::eol;
 
 //
 // Initialize structure sent back to client
@@ -234,7 +234,7 @@ db_res *SQLite3Server::devres_1_svc(db_res *recev)
 //
 	if (dbgen.connected == False)
 	{
-		logStream->errorStream() << "I'm not connected to database" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "I'm not connected to database" << log4cpp::eol;
 		browse_back.db_err = DbErr_DatabaseNotConnected;
 		return(&browse_back);
 	}
@@ -243,7 +243,7 @@ db_res *SQLite3Server::devres_1_svc(db_res *recev)
 	{
 		std::string in_dev(recev->res_val.arr1_val[i]);
 
-		logStream->debugStream() << " Device = " << in_dev << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << " Device = " << in_dev << log4cpp::eol;
 
 		if (count(in_dev.begin(), in_dev.end(), SEP_DEV) != 2)
 		{
@@ -261,14 +261,14 @@ db_res *SQLite3Server::devres_1_svc(db_res *recev)
 		query += (" DEVICE = '" + in_dev);
 		query += ( + "' ORDER BY DOMAIN ASC, FAMILY ASC, MEMBER ASC, NAME ASC, COUNT ASC");
 
-		logStream->debugStream() << "QUERY = " << query << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "QUERY = " << query << log4cpp::eol;
 
 //
 // Get resource value for each element in the tmp_res_list list 
 //
 		if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 		{
-			logStream->errorStream() << "ERROR SQLite3Server::devres_1_svc : " << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+			logStream->errorStream() << "ERROR SQLite3Server::devres_1_svc : " << sqlite3_errmsg(db) << log4cpp::eol;
 			browse_back.db_err = DbErr_DatabaseAccess;
 			return (&browse_back);
 		}
@@ -291,7 +291,7 @@ db_res *SQLite3Server::devres_1_svc(db_res *recev)
 			if (!resource.empty())
 				res_list_dev.push_back(resource);
 			sqlite3_free_table(result);
-			logStream->errorStream() << "SQLite3Server::devres_1_svc : " << resource << log4cpp::CategoryStream::ENDLINE;
+			logStream->errorStream() << "SQLite3Server::devres_1_svc : " << resource << log4cpp::eol;
 		}
 	}
 //
@@ -321,7 +321,7 @@ db_res *SQLite3Server::devres_1_svc(db_res *recev)
 				delete [] browse_back.res_val.arr1_val;
 			delete [] browse_back.res_val.arr1_val;
 			
-			logStream->errorStream() << "Memory allocation error in devres_svc" << log4cpp::CategoryStream::ENDLINE;
+			logStream->errorStream() << "Memory allocation error in devres_svc" << log4cpp::eol;
 			browse_back.db_err = DbErr_ServerMemoryAllocation;
 			return(&browse_back);
 		}
@@ -341,11 +341,11 @@ db_res *SQLite3Server::devres_1_svc(db_res *recev)
  *
  * @return a pointer to an error code
  */
-DevLong *SQLite3Server::devdel_1_svc(nam *dev)
+DevLong *SQLite3Server::devdel_1_svc(DevString *dev)
 {
 	std::string 	user_device(*dev);
 
-	logStream->debugStream() << "In devdel_1_svc function for device " << user_device << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "In devdel_1_svc function for device " << user_device << log4cpp::eol;
 
 //
 // Initialize parameter sent back to client
@@ -356,7 +356,7 @@ DevLong *SQLite3Server::devdel_1_svc(nam *dev)
 //
 	if (dbgen.connected == False)
 	{
-		logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 		errcode = DbErr_DatabaseNotConnected;
 		return(&errcode);
 	}
@@ -372,17 +372,17 @@ DevLong *SQLite3Server::devdel_1_svc(nam *dev)
 	query = "SELECT CLASS, SERVER FROM device ",
 	where = "WHERE NAME = '" + user_device + "'";   
 
-	logStream->debugStream() << "SQLite3Server::devdel_1_svc() : " << query + where << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "SQLite3Server::devdel_1_svc() : " << query + where << log4cpp::eol;
 
 	if (sqlite3_get_table(db, (query + where).c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
     	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		errcode = DbErr_DatabaseAccess;
 		return (&errcode);
     	}
 
 
-	logStream->debugStream() << "SQLite3Server::devdel_1_svc() : " << nrow << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "SQLite3Server::devdel_1_svc() : " << nrow << log4cpp::eol;
 
 	if(nrow != 0)
 	{
@@ -392,11 +392,11 @@ DevLong *SQLite3Server::devdel_1_svc(nam *dev)
 		sqlite3_free_table(result);
 		query = "DELETE FROM device "; 
 
-		logStream->debugStream() << "SQLite3Server::devdel_1_svc() : " << query + where << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "SQLite3Server::devdel_1_svc() : " << query + where << log4cpp::eol;
 
 		if (sqlite3_get_table(db, (query + where).c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 		{
-			logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+			logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 			errcode = DbErr_DatabaseAccess;
 			return (&errcode);
 		}
@@ -423,7 +423,7 @@ DevLong *SQLite3Server::devdel_1_svc(nam *dev)
  */
 db_psdev_error *SQLite3Server::devdelres_1_svc(db_res *recev)
 {
-    logStream->debugStream() << "In devdelres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "In devdelres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << log4cpp::eol;
 
 //
 // Initialize parameter sent back to client
@@ -435,7 +435,7 @@ db_psdev_error *SQLite3Server::devdelres_1_svc(db_res *recev)
 //
     if (dbgen.connected == False)
     {
-	logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	psdev_back.error_code = DbErr_DatabaseNotConnected;
 	return(&psdev_back);
     }
@@ -457,7 +457,7 @@ db_psdev_error *SQLite3Server::devdelres_1_svc(db_res *recev)
 	query = "DELETE FROM property_device WHERE DEVICE = '" + in_dev + "'";
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-	    logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+	    logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 	    psdev_back.error_code = DbErr_DatabaseAccess;
 	    psdev_back.psdev_err = i;
 	    return (&psdev_back);
@@ -495,7 +495,7 @@ db_info_svc *SQLite3Server::info_1_svc()
 	static std::vector<NameCount>	dom_list,
 				res_list;
 
-	logStream->debugStream() << "In info_1_svc function" << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "In info_1_svc function" << log4cpp::eol;
 
 	dom_list.clear();
 	res_list.clear();
@@ -514,7 +514,7 @@ db_info_svc *SQLite3Server::info_1_svc()
 //
 	if (dbgen.connected == False)
 	{
-		logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 		info_back.db_err = DbErr_DatabaseNotConnected;
 		return(&info_back);
 	}
@@ -525,7 +525,7 @@ db_info_svc *SQLite3Server::info_1_svc()
 	query = "SELECT DOMAIN, COUNT(*) FROM device WHERE EXPORTED != 0 GROUP BY DOMAIN";
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		info_back.db_err = DbErr_DatabaseAccess;
 		return (&info_back);
 	}
@@ -546,7 +546,7 @@ db_info_svc *SQLite3Server::info_1_svc()
 	query = "SELECT DOMAIN, COUNT(*) FROM device WHERE EXPORTED = 0 GROUP BY domain";
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		info_back.db_err = DbErr_DatabaseAccess;
 		return (&info_back);
 	}
@@ -571,7 +571,7 @@ db_info_svc *SQLite3Server::info_1_svc()
 	query = "SELECT COUNT(*) FROM device WHERE IOR LIKE 'DC:%'";
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{ 
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		info_back.db_err = DbErr_DatabaseAccess;
 		return (&info_back);
     	}
@@ -585,7 +585,7 @@ db_info_svc *SQLite3Server::info_1_svc()
 	query = "SELECT DOMAIN, COUNT(*) FROM property_device GROUP BY domain";
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		info_back.db_err = DbErr_DatabaseAccess;
 		return (&info_back);
 	}
@@ -642,12 +642,12 @@ db_info_svc *SQLite3Server::info_1_svc()
  *
  * @return a pointer to a long which will be set in case of error
  */
-long *SQLite3Server::unreg_1_svc(db_res *recev)
+DevLong *SQLite3Server::unreg_1_svc(db_res *recev)
 {
     std::string 		user_ds_name(recev->res_val.arr1_val[0]),
     			user_pers_name(recev->res_val.arr1_val[1]);
 		
-    logStream->debugStream() << "In unreg_1_svc function for " << user_ds_name << "/" << user_pers_name << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "In unreg_1_svc function for " << user_ds_name << "/" << user_pers_name << log4cpp::eol;
 	
 //
 // Initialize structure sent back to client
@@ -658,7 +658,7 @@ long *SQLite3Server::unreg_1_svc(db_res *recev)
 //
     if (dbgen.connected == False)
     {
-	logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -669,11 +669,11 @@ long *SQLite3Server::unreg_1_svc(db_res *recev)
     query = "SELECT DISTINCT CLASS FROM device";
     query += (" WHERE SERVER = '" + user_ds_name + "/" + user_pers_name + "'");
 
-	logStream->debugStream() << " SQLite3Server::unreg_1_svc() : " << query << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << " SQLite3Server::unreg_1_svc() : " << query << log4cpp::eol;
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
    		errcode = DbErr_DatabaseAccess;
 		return (&errcode);
     	}
@@ -705,11 +705,11 @@ long *SQLite3Server::unreg_1_svc(db_res *recev)
 	else
 		query += (class_list + ") AND SERVER = '"+ user_ds_name + "/" + user_pers_name + "'");
 
-	logStream->debugStream() << " SQLite3Server::unreg_1_svc() : " << query << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << " SQLite3Server::unreg_1_svc() : " << query << log4cpp::eol;
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		errcode = DbErr_DatabaseAccess;
 		return (&errcode);
 	}
@@ -743,7 +743,7 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
     			user_pers_name(recev->res_val.arr1_val[1]),
 			query;
 
-	logStream->debugStream() << "in svcinfo_1_svc function for " << user_ds_name << "/" << user_pers_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "in svcinfo_1_svc function for " << user_ds_name << "/" << user_pers_name << log4cpp::eol;
 	
 //
 // initialize structure sent back to client
@@ -765,7 +765,7 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
     	}
 	catch (std::bad_alloc)
 	{
-		logStream->errorStream() << "memory allocation error in svc_info" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "memory allocation error in svc_info" << log4cpp::eol;
 		svcinfo_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&svcinfo_back);
 	}
@@ -774,7 +774,7 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
 //
 	if (dbgen.connected == false)
 	{
-		logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 		svcinfo_back.db_err = DbErr_DatabaseNotConnected;
 		return(&svcinfo_back);
 	}
@@ -787,7 +787,7 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		svcinfo_back.db_err = DbErr_DatabaseAccess;
 		return (&svcinfo_back);
 	}
@@ -857,7 +857,7 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
 	query += pid_str;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		svcinfo_back.db_err = DbErr_DatabaseAccess;
 		return (&svcinfo_back);
 	}
@@ -895,7 +895,7 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
 		query = "SELECT NAME, EXPORTED FROM DEVICE WHERE SERVER ='" + full_srv_name + "'";
 		if (sqlite3_get_table(db, query.c_str(), &result2, &nrow2, &ncol2, &zErrMsg2) != SQLITE_OK)
 		{
-			logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+			logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 			sqlite3_free_table(result);
 			svcinfo_back.db_err = DbErr_DatabaseAccess;
 			return (&svcinfo_back);
@@ -931,12 +931,12 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
  *
  * @return a pointer to a structure with all the device server information
  */
-long *SQLite3Server::svcdelete_1_svc(db_res *recev)
+DevLong *SQLite3Server::svcdelete_1_svc(db_res *recev)
 {
 	std::string 	user_ds_name(recev->res_val.arr1_val[0]),
 			user_pers_name(recev->res_val.arr1_val[1]);
 		
-	logStream->debugStream() << "In svcdelete_1_svc function for " << user_ds_name << "/" << user_pers_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "In svcdelete_1_svc function for " << user_ds_name << "/" << user_pers_name << log4cpp::eol;
 //
 // Get delete resource flag
 //
@@ -951,7 +951,7 @@ long *SQLite3Server::svcdelete_1_svc(db_res *recev)
 //
 	if (dbgen.connected == False)
 	{
-		logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 		errcode = DbErr_DatabaseNotConnected;
 		return(&errcode);
 	}
@@ -968,7 +968,7 @@ long *SQLite3Server::svcdelete_1_svc(db_res *recev)
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		errcode = DbErr_DatabaseAccess;
 		return (&errcode);
 	}
@@ -976,7 +976,7 @@ long *SQLite3Server::svcdelete_1_svc(db_res *recev)
 	if (dev_length == 0)
 	{
 		sqlite3_free_table(result);
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		errcode = DbErr_DeviceServerNotDefined;
 		return (&errcode);
 	}
@@ -995,7 +995,7 @@ long *SQLite3Server::svcdelete_1_svc(db_res *recev)
 			if (sqlite3_get_table(db, query.c_str(), &result2, &nrow2, &ncol2, &zErrMsg2) != SQLITE_OK)
 			{
 				sqlite3_free_table(result);
-				logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+				logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 				errcode = DbErr_DatabaseAccess;
 				return (&errcode);
 			}
@@ -1006,7 +1006,7 @@ long *SQLite3Server::svcdelete_1_svc(db_res *recev)
 		if (sqlite3_get_table(db, query.c_str(), &result2, &nrow2, &ncol2, &zErrMsg2) != SQLITE_OK)
 		{
 			sqlite3_free_table(result);
-			logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+			logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 			errcode = DbErr_DatabaseAccess;
 			return (&errcode);
 		}
@@ -1039,12 +1039,12 @@ long *SQLite3Server::svcdelete_1_svc(db_res *recev)
  *
  * @return a pointer to an error code
  */
-db_poller_svc *SQLite3Server::getpoller_1_svc(nam *dev)
+db_poller_svc *SQLite3Server::getpoller_1_svc(DevString *dev)
 {
     std::string 	poller_name,
     		user_device(*dev);
 
-    logStream->debugStream() << "In getpoller_1_svc function for device " << user_device << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "In getpoller_1_svc function for device " << user_device << log4cpp::eol;
 
 //
 // Initialize parameter sent back to client
@@ -1072,7 +1072,7 @@ db_poller_svc *SQLite3Server::getpoller_1_svc(nam *dev)
     }
     catch (std::bad_alloc)
     {
-	logStream->errorStream() << "Memory allocation error in devinfo" << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "Memory allocation error in devinfo" << log4cpp::eol;
 	poll_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&poll_back);
     }
@@ -1081,7 +1081,7 @@ db_poller_svc *SQLite3Server::getpoller_1_svc(nam *dev)
 //
     if (dbgen.connected == False)
     {
-	logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	poll_back.db_err = DbErr_DatabaseNotConnected;
 	return(&poll_back);
     }
@@ -1106,7 +1106,7 @@ db_poller_svc *SQLite3Server::getpoller_1_svc(nam *dev)
 	query += (" name = '" + std::string(POLL_RES) + "' AND UPPER(value) = UPPER('" + user_device + "')");
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		poll_back.db_err = DbErr_DatabaseAccess;
 		return (&poll_back);
     	}
@@ -1135,7 +1135,7 @@ db_poller_svc *SQLite3Server::getpoller_1_svc(nam *dev)
 	query += (" WHERE NAME = '" + poller_name + "'");
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		poll_back.db_err = DbErr_DatabaseAccess;
 		return (&poll_back);
     	}

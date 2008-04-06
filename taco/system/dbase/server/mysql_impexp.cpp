@@ -19,15 +19,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * File:
- *
+ *		mysql_impexp.cpp
  * Description:
  *
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.18 $
+ * Version:	$Revision: 1.19 $
  *
- * Date:	$Date: 2007-01-16 08:04:01 $
+ * Date:	$Date: 2008-04-06 09:07:41 $
  *
  */
 
@@ -46,17 +46,15 @@ DevLong *MySQLServer::db_devexp_1_svc(tab_dbdev *rece)
 {
     u_int 	num_dev = rece->tab_dbdev_len;;
 
-#ifdef DEBUG
     for (int i=0;i<num_dev;i++)
     {
-	std::cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl;
-	std::cout << "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl;
-	std::cout << "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl;
-	std::cout << "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl;
-	std::cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl;
-	std::cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl;
+	logStream->debugStream() << "Device name : " << rece->tab_dbdev_val[i].dev_name << log4cpp::eol;
+	logStream->debugStream() << "Host name : " << rece->tab_dbdev_val[i].host_name << log4cpp::eol;
+	logStream->debugStream() << "Program number : " << rece->tab_dbdev_val[i].p_num << log4cpp::eol;
+	logStream->debugStream() << "Version number : " << rece->tab_dbdev_val[i].v_num << log4cpp::eol;
+	logStream->debugStream() << "Device type : " << rece->tab_dbdev_val[i].dev_type << log4cpp::eol;
+	logStream->debugStream() << "Device class : " << rece->tab_dbdev_val[i].dev_class << log4cpp::eol;
     }
-#endif
 //
 // Initialize error code sended back to client 
 //
@@ -66,7 +64,7 @@ DevLong *MySQLServer::db_devexp_1_svc(tab_dbdev *rece)
 //
     if (!dbgen.connected)
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -97,18 +95,16 @@ DevLong *MySQLServer::db_devexp_2_svc(tab_dbdev_2 *rece)
 {
     u_int 	num_dev = rece->tab_dbdev_len;;
 
-#ifdef DEBUG
     for (int i = 0; i < num_dev; i++)
     {
-	std::cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl;
-	std::cout << "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl;
-	std::cout << "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl;
-	std::cout << "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl;
-	std::cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl;
-	std::cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl;
-	std::cout << "Device server PID : " << rece->tab_dbdev_val[i].pid << std::endl;
+	logStream->debugStream() << "Device name : " << rece->tab_dbdev_val[i].dev_name << log4cpp::eol;
+	logStream->debugStream() << "Host name : " << rece->tab_dbdev_val[i].host_name << log4cpp::eol;
+	logStream->debugStream() << "Program number : " << rece->tab_dbdev_val[i].p_num << log4cpp::eol;
+	logStream->debugStream() << "Version number : " << rece->tab_dbdev_val[i].v_num << log4cpp::eol;
+	logStream->debugStream() << "Device type : " << rece->tab_dbdev_val[i].dev_type << log4cpp::eol;
+	logStream->debugStream() << "Device class : " << rece->tab_dbdev_val[i].dev_class << log4cpp::eol;
+	logStream->debugStream() << "Device server PID : " << rece->tab_dbdev_val[i].pid << log4cpp::eol;
     }
-#endif
 //
 // Initialize error code sended back to client 
 //
@@ -118,7 +114,7 @@ DevLong *MySQLServer::db_devexp_2_svc(tab_dbdev_2 *rece)
 //
     if (!dbgen.connected)
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -152,19 +148,19 @@ DevLong *MySQLServer::db_devexp_3_svc(tab_dbdev_3 *rece)
 {
     u_int 	num_dev = rece->tab_dbdev_len;
 
-#ifdef DEBUG
+
     for (int i = 0; i < num_dev; i++)
     {
-	std::cout << "Device name : " << rece->tab_dbdev_val[i].dev_name << std::endl;
-	std::cout << "Host name : " << rece->tab_dbdev_val[i].host_name << std::endl;
-	std::cout << "Program number : " << rece->tab_dbdev_val[i].p_num << std::endl;
-	std::cout << "Version number : " << rece->tab_dbdev_val[i].v_num << std::endl;
-	std::cout << "Device type : " << rece->tab_dbdev_val[i].dev_type << std::endl;
-	std::cout << "Device class : " << rece->tab_dbdev_val[i].dev_class << std::endl;
-	std::cout << "Device server PID : " << rece->tab_dbdev_val[i].pid << std::endl;
-	std::cout << "Device server process name : " << rece->tab_dbdev_val[i].proc_name << std::endl;
+	logStream->debugStream() << "Device name : " << rece->tab_dbdev_val[i].dev_name << log4cpp::eol;
+	logStream->debugStream() << "Host name : " << rece->tab_dbdev_val[i].host_name << log4cpp::eol;
+	logStream->debugStream() << "Program number : " << rece->tab_dbdev_val[i].p_num << log4cpp::eol;
+	logStream->debugStream() << "Version number : " << rece->tab_dbdev_val[i].v_num << log4cpp::eol;
+	logStream->debugStream() << "Device type : " << rece->tab_dbdev_val[i].dev_type << log4cpp::eol;
+	logStream->debugStream() << "Device class : " << rece->tab_dbdev_val[i].dev_class << log4cpp::eol;
+	logStream->debugStream() << "Device server PID : " << rece->tab_dbdev_val[i].pid << log4cpp::eol;
+	logStream->debugStream() << "Device server process name : " << rece->tab_dbdev_val[i].proc_name << log4cpp::eol;
     }
-#endif
+
 //
 // Initialize error code sended back to client */
 //
@@ -172,9 +168,9 @@ DevLong *MySQLServer::db_devexp_3_svc(tab_dbdev_3 *rece)
 //
 // Return error code if the server is not connected to the database */
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected)
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -214,10 +210,8 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
     int 	ret_pn,
 		ret_vn;
 	
-#ifdef DEBUG
     for (int i = 0; i < num_dev; i++)
-	std::cout << "Device name (in import function) : " << de_name->arr1_val[i] << std::endl;
-#endif
+	logStream->debugStream() << "Device name (in import function) : " << de_name->arr1_val[i] << log4cpp::eol;
 //
 // Initialize error code sended back to client */
 //
@@ -227,7 +221,7 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
 //
     if (!dbgen.connected)
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	back.db_imperr = DbErr_DatabaseNotConnected;
 	back.imp_dev.tab_dbdev_len = 0;
 	back.imp_dev.tab_dbdev_val = NULL;
@@ -372,7 +366,7 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
  *
  * @return an int which is an error code. Zero means no error 
  */
-DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
+DevLong *MySQLServer::db_svcunr_1_svc(DevString *dsn_name)
 {
     int 		d_num = 0;
     std::string		ds_class,
@@ -380,9 +374,7 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
 			device(*dsn_name);
     std::string::size_type	pos;
 
-#ifdef DEBUG
-    std::cout << "Device server name (unregister function) : " << device << std::endl;
-#endif
+    logStream->debugStream() << "Device server name (unregister function) : " << device << log4cpp::eol;
 //
 // Miscellaneous initialization 
 //
@@ -392,7 +384,7 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
 //
     if (!dbgen.connected)
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -410,10 +402,8 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
 //
     ds_name = device.substr(pos + 1);
 
-#ifdef DEBUG
-    std::cout << "Device server class (unreg) : " << ds_class << std::endl;
-    std::cout << "Device server name (unreg) : " << ds_name << std::endl;
-#endif
+    logStream->debugStream() << "Device server class (unreg) : " << ds_class << log4cpp::eol;
+    logStream->debugStream() << "Device server name (unreg) : " << ds_name << log4cpp::eol;
 //
 // Try to retrieve devices in database assuming that the input device server
 // name is the device server PROCESS name. As there is no key build on
@@ -425,9 +415,9 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
     //query += " VERSION = 0, PID = 0, CLASS = 'unknown', HOST = 'not_exp' WHERE ";
     query = "UPDATE device SET EXPORTED = 0, STOPPED = NOW() WHERE ";
     query += (" SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
-#ifdef DEBUG
-    std::cout << "MySQLServer::db_svcunr_1_svc(): query = " << query << std::endl;
-#endif /* DEBUG */
+
+    logStream->debugStream() << "MySQLServer::db_svcunr_1_svc(): query = " << query << log4cpp::eol;
+
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	errcode = DbErr_DatabaseAccess;
@@ -456,7 +446,7 @@ DevLong *MySQLServer::db_svcunr_1_svc(nam *dsn_name)
  *
  * @return a pointer to a stucture of the svc_inf type
  */
-svc_inf *MySQLServer::db_svcchk_1_svc(nam *dsn_name)
+svc_inf *MySQLServer::db_svcchk_1_svc(DevString *dsn_name)
 {
     static char 	host_name[HOST_NAME_LENGTH];
     std::string		ds_class,
@@ -464,9 +454,8 @@ svc_inf *MySQLServer::db_svcchk_1_svc(nam *dsn_name)
 			device(*dsn_name);
     std::string::size_type	pos;
 
-#ifdef DEBUG
-    std::cout << "Device server name (check function) : " << device << std::endl;
-#endif 
+    logStream->debugStream() << "Device server name (check function) : " << device << log4cpp::eol;
+
 //
 // Miscellaneous initialization */
 //
@@ -478,9 +467,9 @@ svc_inf *MySQLServer::db_svcchk_1_svc(nam *dsn_name)
 //
 // Return error code if the server is not connected to the database 
 //
-    if (!dbgen.connected)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	svc_info.db_err = DbErr_DatabaseNotConnected;
 	return(&svc_info);
     }
@@ -498,10 +487,9 @@ svc_inf *MySQLServer::db_svcchk_1_svc(nam *dsn_name)
 //
     ds_name = device.substr(pos + 1);
 
-#ifdef DEBUG
-    std::cout << "Device server class (check) : " << ds_class << std::endl;
-    std::cout << "Device server name (check) : " << ds_name << std::endl;
-#endif
+    logStream->debugStream() << "Device server class (check) : " << ds_class << log4cpp::eol;
+    logStream->debugStream() << "Device server name (check) : " << ds_name << log4cpp::eol;
+
 //
 // Initialization needed to retrieve the right tuples in the NAMES table 
 //
@@ -660,7 +648,7 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
     }
     catch(const long err)
     {
-    	logStream->errorStream() << "MySQLServer::db_store() error = " << mysql_error(mysql_conn) << log4cpp::CategoryStream::ENDLINE;
+    	logStream->errorStream() << "MySQLServer::db_store() error = " << mysql_error(mysql_conn) << log4cpp::eol;
 	throw err;
     }
 
@@ -670,7 +658,7 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
     if ((n_rows = mysql_num_rows(result)) == 0)
     {
         mysql_free_result(result); 
-        logStream->errorStream() << "MySQLServer::db_store() device = " << dev_stu.dev_name << " not defined !" << log4cpp::CategoryStream::ENDLINE;
+        logStream->errorStream() << "MySQLServer::db_store() device = " << dev_stu.dev_name << " not defined !" << log4cpp::eol;
         throw long(DbErr_DeviceNotDefined);
     }
     mysql_free_result(result); 
@@ -688,7 +676,7 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
 	  << " EXPORTED = 1," 
 	  << " STARTED = NOW()"
           << " WHERE NAME = '" << dev_stu.dev_name << "'" << std::ends; 	
-    logStream->debugStream() << "MySQLServer::db_store() query = " << query.str() << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "MySQLServer::db_store() query = " << query.str() << log4cpp::eol;
     try
     {
 #if !HAVE_SSTREAM
@@ -702,7 +690,7 @@ int MySQLServer::db_store(db_devinfo_3 &dev_stu)
     }
     catch(const long err)
     {
-    	logStream->errorStream() << "MySQLServer::db_store() error = " << mysql_error(mysql_conn) << log4cpp::CategoryStream::ENDLINE;
+    	logStream->errorStream() << "MySQLServer::db_store() error = " << mysql_error(mysql_conn) << log4cpp::eol;
 	throw err;
     }
 //

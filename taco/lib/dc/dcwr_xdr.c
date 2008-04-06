@@ -27,9 +27,9 @@
  *
  * Original:    1992
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2006-09-18 22:13:30 $
+ * Date:        $Date: 2008-04-06 09:07:15 $
  *
  *****************************************************************************/
 
@@ -98,7 +98,7 @@ bool_t xdr_cmd_dat(XDR *xdrs, cmd_dat *objp)
 {
 	if (!xdr_int(xdrs, &objp->xcmd)) 
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->xcmd_error)) 
+	if (!xdr_DevLong(xdrs, &objp->xcmd_error)) 
 		return (FALSE);
 	if (!xdr_int(xdrs, &objp->xcmd_time)) 
 		return (FALSE);

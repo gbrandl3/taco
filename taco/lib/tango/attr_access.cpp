@@ -29,13 +29,11 @@
  *
  * Original   :	September2002
  *
- * Version    :	$Revision: 1.10 $
+ * Version    :	$Revision: 1.11 $
  *
- * Date       : $Date: 2007-03-22 14:20:29 $
+ * Date       : $Date: 2008-04-06 09:07:19 $
  *
  *********************************************************************/ 
-
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_access.cpp,v 1.10 2007-03-22 14:20:29 jkrueger1 Exp $";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -44,9 +42,6 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib
 
 // copy from tango_api.cpp, because declared as static function
 static long tango_dev_error_string(Tango::DevFailed tango_exception);
-
-// global TACO error message string
-extern char *dev_error_string;
 
 #ifdef DevState
 #undef DevState
@@ -69,7 +64,7 @@ extern char *dev_error_string;
  * @param error pointer to take the Taco error code
  */
 
-AttrAccess::AttrAccess (char *full_attr_name, long access, long *error)
+AttrAccess::AttrAccess (char *full_attr_name, long access, DevLong *error)
 {
 	char	*str_ptr;
 	short	count;
@@ -178,40 +173,38 @@ AttrAccess::AttrAccess (char *full_attr_name, long access, long *error)
  */
 AttrAccess::~AttrAccess()
 {
-	long	error;
+	DevLong	error;
 	
 	/* 
 	 * close access to the underlying device
 	 */
 	 
 	 if ( tango_device == False )
-	 	{
+	{
 		if ( taco_dev_free (taco_obj, &error) == DS_NOTOK )
-			{
-			printf ("Cannot free access to %s :\n%s\n", attr_name, 
-																	  dev_error_str (error));
+		{
+			printf ("Cannot free access to %s :\n%s\n", attr_name, dev_error_str (error));
 			return;
-			}
+		}
 			
 		// printf ("Freed TACO attribute : %s\n", attr_name);
-		}
+	}
 	else
-		{
+	{
 		try
-			{
-   		delete tango_obj;
+		{
+   			delete tango_obj;
 			
 			// printf ("Deleted TANGO attribute : %s\n", attr_name);
-			}
+		}
 		
 		catch (Tango::DevFailed &e)
-			{	
+		{	
 			tango_dev_error_string (e);
-			printf ("Cannot free access to %s :\n%s\n", attr_name, 
-																	  dev_error_string);
-         return;				
-			}
+//			printf ("Cannot free access to %s :\n%s\n", attr_name, (char *)e);
+			printf ("Cannot free access to %s :\n", attr_name);
 		}
+	}
 }
 
 
@@ -231,7 +224,7 @@ AttrAccess::~AttrAccess()
  *
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
-long AttrAccess::attr_cmd_query (DevVarCmdArray *attr_cmd_query_array, long *error)
+long AttrAccess::attr_cmd_query (DevVarCmdArray *attr_cmd_query_array, DevLong *error)
 {
 	DevCmdInfo  *cmd_info;
 	unsigned int 	cmd_counter;
@@ -420,7 +413,7 @@ long AttrAccess::attr_cmd_query (DevVarCmdArray *attr_cmd_query_array, long *err
  */
 
 long AttrAccess::read_attr_config (DevArgument argout, 
-											 DevType argout_type, long *error)
+											 DevType argout_type, DevLong *error)
 {
 	DevVarStringArray 	property_array;
 	char						*property_ptrs[20];
@@ -508,7 +501,7 @@ long AttrAccess::read_attr_config (DevArgument argout,
  *
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
-long AttrAccess::write_attr (DevArgument argin, DevType argin_type, long *error)
+long AttrAccess::write_attr (DevArgument argin, DevType argin_type, DevLong *error)
 {
 	long							input_type;
 	Tango::DeviceAttribute	attr_values;
@@ -832,10 +825,10 @@ long AttrAccess::write_attr (DevArgument argin, DevType argin_type, long *error)
 			// it can be printed out with dev_error_str()
 			//
 			
-         tango_dev_error_string (e);
-         *error = DevErr_TangoAccessFailed;
+         		tango_dev_error_string (e);
+         		*error = DevErr_TangoAccessFailed;
 			
-         return(DS_NOTOK);				
+         		return(DS_NOTOK);				
 			}		
 		}
 	
@@ -855,7 +848,7 @@ long AttrAccess::write_attr (DevArgument argin, DevType argin_type, long *error)
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
 
-long AttrAccess::read_set_attr (DevArgument argout, DevType argout_type, long *error)
+long AttrAccess::read_set_attr (DevArgument argout, DevType argout_type, DevLong *error)
 {
 	Tango::DeviceAttribute	attr_values;
 	long					request_type;
@@ -994,7 +987,7 @@ long AttrAccess::read_set_attr (DevArgument argout, DevType argout_type, long *e
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
 
-long AttrAccess::read_attr (DevArgument argout, DevType argout_type, long *error)
+long AttrAccess::read_attr (DevArgument argout, DevType argout_type, DevLong *error)
 {
 	Tango::DeviceAttribute	attr_values;
 	double					double_value;
@@ -1254,7 +1247,7 @@ long AttrAccess::read_attr (DevArgument argout, DevType argout_type, long *error
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
 
-long AttrAccess::read_attr_state (DevArgument argout, DevType argout_type, long *error)
+long AttrAccess::read_attr_state (DevArgument argout, DevType argout_type, DevLong *error)
 {
 	short	*quality = (short *)argout;
 	
@@ -1310,7 +1303,7 @@ long AttrAccess::to_taco_sequence(Tango::DeviceAttribute attribute,
 				 DevType tango_type,
 				 DevType taco_type,
 				 long get_setpoint,
-				 long *error)
+				 DevLong *error)
 {
 	vector<unsigned char>	uc_vect;
 	vector<short>	s_vect;
@@ -1463,7 +1456,7 @@ long AttrAccess::to_taco_sequence(Tango::DeviceAttribute attribute,
 	case D_VAR_LONGARR:
 		DevVarLongArray	la;
 		la.length = nb_data;
-		la.sequence = new long[nb_data];
+		la.sequence = new DevLong[nb_data];
 		for (int i=0 ; i<nb_data ; i++)
 			switch(tango_type)
 			{
@@ -1605,7 +1598,7 @@ long AttrAccess::to_taco_sequence(Tango::DeviceAttribute attribute,
 long AttrAccess::to_xdr_sequence(DevArgument argin, 
                                  DevArgument argout,
 				 DevType data_type,
-				 long *error)
+				 DevLong *error)
 {
 	DevDataListEntry type_info;
 	XDR 	xdrs_en;
@@ -1698,7 +1691,7 @@ long AttrAccess::to_xdr_sequence(DevArgument argin,
  *
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
-long AttrAccess::create_attr_access (long *error)
+long AttrAccess::create_attr_access (DevLong *error)
 {
 	DevVarCmdArray     cmd_array;
 	DevVarStringArray	 signal_config;
@@ -1966,7 +1959,7 @@ long AttrAccess::create_attr_access (long *error)
  */
 long AttrAccess::convert_data (long data_type, void *data_ptr,
 				 long conv_data_type, void *conv_data_ptr, 
-				 long *error)
+				 DevLong *error)
 {
 	static char		c_string_value[80];
 	char				**str_ptr;
@@ -2139,7 +2132,7 @@ long AttrAccess::convert_data (long data_type, void *data_ptr,
  *
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
-long AttrAccess::check_requested_data_type (long request_type, long attr_type, long *error)
+long AttrAccess::check_requested_data_type (long request_type, long attr_type, DevLong *error)
 {
 	*error = 0;
 	if ( request_type != attr_type )
@@ -2449,7 +2442,7 @@ long	AttrAccess::get_taco_array_data_type (long tango_data_type)
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
 
-long AttrAccess::search_attr_name (long *error)
+long AttrAccess::search_attr_name (DevLong *error)
 {
 	short	i;
 	DevVarStringArray	attr_list;
@@ -2549,7 +2542,7 @@ long AttrAccess::search_attr_name (long *error)
  *
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
-long AttrAccess::search_tango_attr_name (long *error)
+long AttrAccess::search_tango_attr_name (DevLong *error)
 {
 	short	i;
 	
@@ -2628,20 +2621,7 @@ static long tango_dev_error_string(Tango::DevFailed tango_exception)
 {
    for (int i=0; i<tango_exception.errors.length(); i++)
    {
-      if (i == 0)
-      {
-         dev_error_string = (char*)malloc(strlen
-									 (tango_exception.errors[i].desc.in())+1);
-         sprintf(dev_error_string, "%s", tango_exception.errors[i].desc.in());
-      }
-      else
-      {
-         dev_error_string = (char*)realloc(dev_error_string,strlen
-									 (dev_error_string) + strlen
-									 (tango_exception.errors[i].desc.in())+1);
-         sprintf(dev_error_string+strlen(dev_error_string), "%s",
-									 tango_exception.errors[i].desc.in());
-      }
+	 dev_error_push(const_cast<char *>(tango_exception.errors[i].desc.in()));
    }
 	
   return(DS_OK);
@@ -2658,7 +2638,7 @@ static long tango_dev_error_string(Tango::DevFailed tango_exception)
  *
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
-long AttrAccess::read_state (DevArgument argout, DevType argout_type, long *error)
+long AttrAccess::read_state (DevArgument argout, DevType argout_type, DevLong *error)
 {
 	Tango::DeviceData	tango_argout;
 	Tango::DevState 	tango_state;
@@ -2768,7 +2748,7 @@ long AttrAccess::read_state (DevArgument argout, DevType argout_type, long *erro
  *
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
-long AttrAccess::read_status (DevArgument argout, DevType argout_type, long *error)
+long AttrAccess::read_status (DevArgument argout, DevType argout_type, DevLong *error)
 {
 	Tango::DeviceData	tango_argout;
 	const char 			*tango_status;
@@ -2830,7 +2810,7 @@ long AttrAccess::read_status (DevArgument argout, DevType argout_type, long *err
  * 
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
-long	AttrAccess::abort	(long *error)
+long	AttrAccess::abort	(DevLong *error)
 {
 	*error = 0;
 	
@@ -2890,7 +2870,7 @@ long	AttrAccess::abort	(long *error)
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
 
-long AttrAccess::read_attr_mode (DevArgument argout, DevType argout_type, long *error)
+long AttrAccess::read_attr_mode (DevArgument argout, DevType argout_type, DevLong *error)
 {
 	short	*source = (short *)argout;
 	*error = 0;
@@ -2961,7 +2941,7 @@ long AttrAccess::read_attr_mode (DevArgument argout, DevType argout_type, long *
  * 
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
-long AttrAccess::write_attr_mode (DevArgument argin, DevType argin_type, long *error)
+long AttrAccess::write_attr_mode (DevArgument argin, DevType argin_type, DevLong *error)
 {
 	short	*source = (short *)argin;
 	*error = 0;

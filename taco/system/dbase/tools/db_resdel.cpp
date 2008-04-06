@@ -25,12 +25,13 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2006-09-06 18:34:15 $
+ * Date:        $Date: 2008-04-06 09:07:47 $
  */
-
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 /* TACO include file */
 #include <API.h>
 
@@ -41,23 +42,30 @@
 #include <cctype>
 #include <algorithm>
 #ifdef _solaris
-#include "_count.h"
+#	include "_count.h"
+#include <taco_utils.h>
 #endif /* _solaris */
 
-using namespace std;
 
 void usage(const char *cmd)
 {
-	cerr << "usage : " << cmd << " [options] <resource name>" << endl;
-	cerr << " Delete a resource from the static database." << std::endl;
-	cerr << "        options : -h display this message" << std::endl;
-	cerr << "                  -n nethost" << std::endl;
+	std::cerr << "usage : " << cmd << " [options] <resource name>" << std::endl;
+	std::cerr << " Delete a resource from the static database." << std::endl;
+	std::cerr << "        options : -h display this message" << std::endl;
+	std::cerr << "                  -n nethost" << std::endl;
+	std::cerr << "                  -v display the current version" << std::endl;
 	exit(1);
+}
+
+void version(const char *cmd)
+{
+	std::cerr << cmd << " version " << VERSION << std::endl;
+	exit(0);
 }
 
 int main(int argc,char *argv[])
 {
-	long error;
+	DevLong error;
         extern int      optopt;
         extern int      optind;
 	extern char 	*optarg;
@@ -66,26 +74,23 @@ int main(int argc,char *argv[])
 //
 // Argument test and device name structure
 //
-        while ((c = getopt(argc,argv,"hn:")) != -1)
+        while ((c = getopt(argc,argv,"hvn:")) != -1)
                 switch (c)
                 {
 			case 'n':
-				{
-					char s[160];
-					snprintf(s, sizeof(s), "NETHOST=%s", optarg);
-					putenv(s);
-				}
-			break;
+				setenv("NETHOST", optarg, 1);
+				break;
+			case 'v':
+				version(argv[0]);
                         case 'h':
                         case '?':
                                 usage(argv[0]);
-                                break;
                 }
         if (optind != argc - 1)
                 usage(argv[0]);
 	
-	string full_res_name(argv[optind]);
-	transform(full_res_name.begin(), full_res_name.end(), full_res_name.begin(), ::tolower);
+	std::string full_res_name(argv[optind]);
+	std::transform(full_res_name.begin(), full_res_name.end(), full_res_name.begin(), ::tolower);
 //
 // Test resource name syntax
 //
@@ -95,19 +100,19 @@ int main(int argc,char *argv[])
 	if (_sol::count(full_res_name.begin(), full_res_name.end(), '/') != 3)
 #endif /* _solaris */
 	{
-		cerr << "db_resdel : Bad resource name" << endl;
+		std::cerr << "db_resdel : Bad resource name" << std::endl;
 		exit(-1);
 	}
 //
 // Extract device name from full resource name
 //
-	string::size_type pos = full_res_name.rfind('/');
-	string res_name(full_res_name,pos + 1);
-	string dev_name(full_res_name,0,pos);
+	std::string::size_type pos = full_res_name.rfind('/');
+	std::string res_name(full_res_name,pos + 1);
+	std::string dev_name(full_res_name,0,pos);
 #ifdef DEBUG
-	cout << "Full resource name : " << full_res_name << endl;
-	cout << "Device name : " << dev_name << endl;
-	cout << "Resource name : " << res_name << endl;
+	std::cout << "Full resource name : " << full_res_name << std::endl;
+	std::cout << "Device name : " << dev_name << std::endl;
+	std::cout << "Resource name : " << res_name << std::endl;
 #endif /* DEBUG */
 
 //
@@ -115,10 +120,10 @@ int main(int argc,char *argv[])
 //
 
 	pos = full_res_name.find('/');
-	string domain(full_res_name,0,pos);
+	std::string domain(full_res_name,0,pos);
 	if (domain == "sec")
 	{
-		cout << "db_resdel : SEC is not a authorized domain name" << endl;
+		std::cout << "db_resdel : SEC is not a authorized domain name" << std::endl;
 		exit(-1);
 	}
 //
@@ -127,7 +132,7 @@ int main(int argc,char *argv[])
 
 	if (db_import(&error) == -1)
 	{
-		cerr << "db_resdel : Impossible to connect to database server" << endl;
+		std::cerr << "db_resdel : Impossible to connect to database server" << std::endl;
 		exit(-1);
 	}
 
@@ -141,13 +146,13 @@ int main(int argc,char *argv[])
 	{
 		if (error == DbErr_ResourceNotDefined)
 		{
-			cout << "The resource " << full_res_name << " does not exist in the database" << endl;
+			std::cerr << "The resource " << full_res_name << " does not exist in the database" << std::endl;
 			exit(-1);
 		}
 		else
 		{
-			cerr << "The call to database server failed with error " << error << endl;
-			cerr << "Error message : " << dev_error_str(error) << endl;
+			std::cerr << "The call to database server failed with error " << error << std::endl;
+			std::cerr << "Error message : " << dev_error_str(error) << std::endl;
 			exit(-1);
 		}
 	}

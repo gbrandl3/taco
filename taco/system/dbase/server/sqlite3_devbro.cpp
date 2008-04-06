@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2006-12-15 12:43:54 $
+ * Date:	$Date: 2008-04-06 09:07:42 $
  *
  */
 
@@ -45,7 +45,7 @@ db_res *SQLite3Server::devdomainlist_1_svc(void)
 {
     std::vector<std::string>	dom_list;
 	
-    logStream->debugStream() << "In devdomainlist_1_svc function" << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "In devdomainlist_1_svc function" << log4cpp::eol;
 
 //
 // Initialize structure sent back to client
@@ -58,7 +58,7 @@ db_res *SQLite3Server::devdomainlist_1_svc(void)
 //
     if (!dbgen.connected)
     {
-	logStream->errorStream() << "I'm not connected to the database" << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -67,11 +67,11 @@ db_res *SQLite3Server::devdomainlist_1_svc(void)
 //
     std::string query = "SELECT DISTINCT DOMAIN FROM device ORDER BY DOMAIN ASC";
 
-	logStream->debugStream() << "SQLite3Server::devdomainlist_1_svc(): query " << query << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "SQLite3Server::devdomainlist_1_svc(): query " << query << log4cpp::eol;
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		browse_back.db_err = DbErr_DatabaseAccess;
 		return (&browse_back);
 	}
@@ -94,9 +94,9 @@ db_res *SQLite3Server::devdomainlist_1_svc(void)
         (browse_back.res_val.arr1_val[i])[k] = '\0';
     }
 
-    logStream->debugStream() << "Found the following domains" << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "Found the following domains" << log4cpp::eol;
     for (std::vector<std::string>::iterator it = dom_list.begin(); it != dom_list.end(); ++it)
-	logStream->debugStream() << *it << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << *it << log4cpp::eol;
 //
 // Return data
 //
@@ -110,12 +110,12 @@ db_res *SQLite3Server::devdomainlist_1_svc(void)
  *
  * @return The family name list
  */
-db_res *SQLite3Server::devfamilylist_1_svc(nam * domain)
+db_res *SQLite3Server::devfamilylist_1_svc(DevString * domain)
 {
     std::string		user_domain(*domain);
     std::vector<std::string>	fam_list;
 	
-    logStream->debugStream() << "In devfamilylist_1_svc function for domain " << *domain << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "In devfamilylist_1_svc function for domain " << *domain << log4cpp::eol;
 	
 //
 // Initialize structure sent back to client
@@ -128,7 +128,7 @@ db_res *SQLite3Server::devfamilylist_1_svc(nam * domain)
 //
     if (!dbgen.connected)
     {
-	logStream->errorStream() << "I'm not connected to the database" << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -137,11 +137,11 @@ db_res *SQLite3Server::devfamilylist_1_svc(nam * domain)
 //
     std::string query = "SELECT DISTINCT FAMILY FROM device WHERE DOMAIN = '" + user_domain + "' ORDER BY FAMILY ASC";
 
-    logStream->debugStream() << "SQLite3Server::devfamilylist_1_svc(): query " << query << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "SQLite3Server::devfamilylist_1_svc(): query " << query << log4cpp::eol;
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		browse_back.db_err = DbErr_DatabaseAccess;
 		return (&browse_back);
 	}
@@ -163,9 +163,9 @@ db_res *SQLite3Server::devfamilylist_1_svc(nam * domain)
         (browse_back.res_val.arr1_val[i])[k] = '\0';
     }
 
-    logStream->debugStream() << "Found the following families in the domain " << user_domain << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "Found the following families in the domain " << user_domain << log4cpp::eol;
     for (std::vector<std::string>::iterator it = fam_list.begin(); it != fam_list.end(); ++it)
-	logStream->debugStream() << *it << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << *it << log4cpp::eol;
 
 //
 // Return data
@@ -189,7 +189,7 @@ db_res *SQLite3Server::devmemberlist_1_svc(db_res *recev)
     std::string user_domain(recev->res_val.arr1_val[0]);
     std::string user_family(recev->res_val.arr1_val[1]);
 	
-    logStream->debugStream() << "In devmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "In devmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << log4cpp::eol;
 	
 //
 // Initialize structure sent back to client
@@ -202,7 +202,7 @@ db_res *SQLite3Server::devmemberlist_1_svc(db_res *recev)
 //
     if (!dbgen.connected)
     {
-	logStream->errorStream() << "I'm not connected to the database" << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -212,11 +212,11 @@ db_res *SQLite3Server::devmemberlist_1_svc(db_res *recev)
     std::string query = "SELECT DISTINCT MEMBER FROM device WHERE DOMAIN = '" + user_domain;
     query += "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC";
 
-    logStream->debugStream() << "SQLite3Server::devfamilylist_1_svc(): query " << query << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "SQLite3Server::devfamilylist_1_svc(): query " << query << log4cpp::eol;
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		browse_back.db_err = DbErr_DatabaseAccess;
 		return (&browse_back);
 	}

@@ -31,7 +31,10 @@ bin_PROGRAMS		= db_update \
 		 	db_initcache \
 			db_hostlist \
 			db_devicelist \
-			db_devicetree 
+			db_devicetree \
+			sec_objinfo \
+			sec_passwd \
+			sec_userinfo
 
 bin_SCRIPTS		= db_fillup2
 
@@ -91,3 +94,11 @@ db_hostlist_LDADD	= @TACO_CLIENT_LIBS@
 db_devicelist_SOURCES	= db_devicelist.cpp
 db_devicelist_LDADD	= @TACO_CLIENT_LIBS@
 
+sec_objinfo_SOURCES 	= dbm_sec_objinfo.cpp 
+sec_objinfo_LDADD 	= @TACO_CLIENT_LIBS@ 
+
+sec_passwd_SOURCES  	= dbm_sec_passwd.cpp
+sec_passwd_LDADD	= @TACO_CLIENT_LIBS@ 
+
+sec_userinfo_SOURCES	= dbm_sec_userinfo.cpp
+sec_userinfo_LDADD	= @TACO_CLIENT_LIBS@

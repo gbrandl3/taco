@@ -30,9 +30,9 @@
  *
  * Original     : February 1993
  *
- * Version      : $Revision: 1.5 $
+ * Version      : $Revision: 1.6 $
  *
- * Date         : $Date: 2006-09-18 21:49:14 $
+ * Date         : $Date: 2008-04-06 09:07:50 $
  *
  */
 
@@ -52,7 +52,6 @@
 /* Variables defined in dc_svc.c */
 extern hash_info 	mem;
 extern char 		*addr_ptr,
-			*addr_alloc,
 			*addr_data;
 extern int 		dat_size,
 			alloc_size,
@@ -70,7 +69,7 @@ extern int 		req_call;
  *	- The offset in the pointer and data shared segment memories
  *	- The time interval between the last six poll 
  *
- * @param rece 
+ * @param rece The pointer to the device name
  * 
  */
 dc_devinfx_back *dc_devinfo_1(char **rece)
@@ -80,7 +79,7 @@ dc_devinfx_back *dc_devinfo_1(char **rece)
 	static cmd_infox cmd1[10];
 	unsigned int off;
 	char d_name[60];
-	long error;
+	DevLong error;
 	int_level *int_array;
 	unsigned int *ptr,*tmp_ptr;
 	int nb_tot;
@@ -152,8 +151,8 @@ dc_devinfx_back *dc_devinfo_1(char **rece)
 /* Compute offset to data buffer */
 		array = (dc_dev_param *)addr_ptr;
 		int_array = (int_level *)&array[nb_tot];
-		ptr = int_array[ind].data_buf[data.ind_read];
-		retinf.device.data_offset = (unsigned int)((char *)ptr - addr_data);
+		ptr = (unsigned int *)addr_ptr + (int)int_array[ind].data_buf[data.ind_read];
+		retinf.device.data_offset = (unsigned int)(int_array[ind].data_buf[data.ind_read]);
 		retinf.device.data_base = (unsigned int)addr_data;
 
 /* Compute the interval between the last five records */
@@ -163,7 +162,7 @@ dc_devinfx_back *dc_devinfo_1(char **rece)
 			ind1--;
 			if (ind1 < 0)
 				ind1 = HIST - 1;
-			if (int_array[ind].data_buf[ind1] == NULL) 
+			if (int_array[ind].data_buf[ind1] == -1) 
 			{
 				while(k < 5) 
 				{
@@ -172,7 +171,7 @@ dc_devinfx_back *dc_devinfo_1(char **rece)
 				}
 				break;
 			}
-			tmp_ptr = int_array[ind].data_buf[ind1];
+			tmp_ptr = (unsigned int *)addr_ptr + (int)int_array[ind].data_buf[ind1];
 			retinf.device.deltax[k] = ptr[0] - tmp_ptr[0];
 			ptr = tmp_ptr;
 		}

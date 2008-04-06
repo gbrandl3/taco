@@ -5,7 +5,7 @@
 #include "LabviewClient.h"
 
 
-void getUserInput(char* text, char** val_string) {
+void getUserInput(const char* text, char** val_string) {
 	char ch;
 	int char_count = 0;
 	

@@ -29,9 +29,9 @@
  *
  * Original:	10.5.95
  *
- * Version:     $Revision: 1.6 $
+ * Version:     $Revision: 1.7 $
  *
- * Date:        $Date: 2006-12-25 19:24:34 $
+ * Date:        $Date: 2008-04-06 09:06:35 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -124,7 +124,7 @@ int res_class_size = sizeof(res_class)/sizeof(db_resource);
 
  Arg(s) Out:	long *error - pointer to error code, in case routine fails
  =======================================================================*/
-static long class_initialise(long *error)
+static long class_initialise(DevLong *error)
 {
 /*
  * Inst_verifyClass is a subclass of the DevServerClass
@@ -197,7 +197,7 @@ Arg(s) Out:
 
 		long *error     - pointer to error code, in case routine fails
 =============================================================================*/
-static long object_initialise(Inst_verify ds, long *error)
+static long object_initialise(Inst_verify ds, DevLong *error)
 {
 	ds->inst_verify.read_value 	= 0;
 	ds->inst_verify.set_value 	= 0;

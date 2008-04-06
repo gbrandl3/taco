@@ -27,6 +27,8 @@ libTACOExtensions_la_SOURCES = TACOServer.cpp \
 	TACOResources.cpp \
 	TACOStates.cpp \
 	TACOStringConverters.cpp \
-	TACOClient.cpp
+	TACOClient.cpp \
+	TACOAdmin.cpp
+
 libTACOExtensions_la_LDFLAGS = -version-info @LIB_VERSION@
 libTACOExtensions_la_LIBADD = @TACO_SERVER_CXX_LIBS@ @LIB_STDCXX@

@@ -1,0 +1,202 @@
+/*! \page testtool A tool to test a TACO control system 
+
+\addindex testtool
+
+testcs is a TACO tool built to test a control system. It is able to test from a 
+single device server to a complete TACO control system. Testing a device server 
+is done by sending a network request to it and waiting for the answer. It does 
+not test the device served by the device server but only the device server ability 
+to answer to netwok request. 
+
+The tool takes its input directly from the TACO device server database and must 
+run on the same computer than the database. It is available for HP-UX, SunOS and 
+Solaris.
+
+\section Usage 
+
+Five option are available :
+- -k to test a TACO control system kernel servers. The kernel servers are :
+	- The manager 
+	- The database server 
+	- The data collector server(s) if the control system is running with a 
+	data collector
+- -d to test a device server. The full device server name must be specified
+(device server executable name/personal name)
+- -h to test all the device server running on a specific host. The host name must 
+be specified.
+- -a to test a complete control system. In this case, the tool will test the kernel
+servers and all the device servers running on all the hosts used in the control 
+system.
+- The last option -v is a verbose option. This option has a meaning only with the 
+-k,-h and -a options. In verbose mode, the tool displays the answer of all the 
+tested device server. In non verbose mode, only the faulty device server are 
+reported to the user.
+
+If the option -a is used, the tool will inform you of :
+
+- All the missing device servers which have not been started. 
+- All the started but dead device servers. A manual page is available under UNIX.
+
+\section  usage_example Usage example 
+
+\section testing_a_device_server Testing a device server 
+
+Test of a running device server called PneumValves started with the personal name 
+sr_c02.
+\verbatim
+$testcs -d pneumvalves/sr_c02 
+DS pneumvalves/sr_c02 : UDP version 1 ==> OK 
+DS pneumvalves/sr_c02 : TCP version 1 ==> OK 
+DS pneumvalves/sr_c02 : UDP version 4 ==> OK 
+DS pneumvalves/sr_c02 : TCP version 4 ==> OK 
+$
+\endverbatim
+
+If the device server is badly killed (with a kill -9 under UNIX or if the device 
+server has crashed).
+\verbatim
+$testcs -d pneumvalves/sr_c02 
+DS pneumvalves/sr_c02 : UDP version 1 ==> NOK, leaving test 
+DS process PID found in database : 17185 
+$
+\endverbatim
+
+If the device server is nicely killed. 
+\verbatim
+$testcs -d pneumvalves/sr_c02 
+DS pneumvalves/sr_c02 defined in database on host libra but not started 
+$
+\endverbatim
+If the device server is unregistered from the database (dbset_servunreg or 
+dbm_servunreg command) or has never been started.
+\verbatim
+$testcs -d pneumvalves/sr_c02 
+Device server is not running (PN in db = 0) 
+$
+\endverbatim
+If the device server is deleted from the database (dbset_servdel or dbm_servdel 
+command
+\verbatim
+$testcs -d pneumvalves/sr_c02 
+Device server not defined in database 
+$
+\endverbatim
+
+\section test_kernel Testing control system kernel servers 
+
+Example of the testcs answer started with option -k and -v on the ESRF machine 
+control system:
+\verbatim
+$ testcs -k -v 
+Manager : UDP version 1 ==> OK 
+Manager : UDP version 4 ==> OK 
+Database server : UDP version 1 ==> OK 
+Database server : UDP version 2 ==> OK 
+Database server : UDP version 3 ==> OK 
+Database server : TCP version 1 ==> OK 
+Database server : TCP version 2 ==> OK 
+Database server : TCP version 3 ==> OK 
+Data collector read server 1 on gemini : TCP version 1 ==> OK 
+Data collector read server 1 on gemini : UDP version 1 ==> OK 
+Data collector read server 2 on gemini : TCP version 1 ==> OK 
+Data collector read server 2 on gemini : UDP version 1 ==> OK 
+Data collector read server 3 on gemini : TCP version 1 ==> OK 
+Data collector read server 3 on gemini : UDP version 1 ==> OK 
+Data collector read server 4 on gemini : TCP version 1 ==> OK 
+Data collector read server 4 on gemini : UDP version 1 ==> OK 
+Data collector read server 5 on gemini : TCP version 1 ==> OK 
+Data collector read server 5 on gemini : UDP version 1 ==> OK 
+Data collector write server 1 on gemini : TCP version 1 ==> OK 
+Data collector write server 1 on gemini : UDP version 1 ==> OK 
+Data collector write server 2 on gemini : TCP version 1 ==> OK 
+Data collector write server 2 on gemini : UDP version 1 ==> OK 
+Data collector write server 3 on gemini : TCP version 1 ==> OK 
+Data collector write server 3 on gemini : UDP version 1 ==> OK 
+Data collector write server 4 on gemini : TCP version 1 ==> OK 
+Data collector write server 4 on gemini : UDP version 1 ==> OK 
+Data collector read server 1 on aries : TCP version 1 ==> OK 
+Data collector read server 1 on aries : UDP version 1 ==> OK 
+Data collector read server 2 on aries : TCP version 1 ==> OK 
+Data collector read server 2 on aries : UDP version 1 ==> OK 
+Data collector read server 3 on aries : TCP version 1 ==> OK 
+Data collector read server 3 on aries : UDP version 1 ==> OK 
+Data collector read server 4 on aries : TCP version 1 ==> OK 
+Data collector read server 4 on aries : UDP version 1 ==> OK 
+Data collector read server 5 on aries : TCP version 1 ==> OK 
+Data collector read server 5 on aries : UDP version 1 ==> OK 
+Data collector write server 1 on aries : TCP version 1 ==> OK 
+Data collector write server 1 on aries : UDP version 1 ==> OK 
+Data collector write server 2 on aries : TCP version 1 ==> OK 
+Data collector write server 2 on aries : UDP version 1 ==> OK 
+Data collector write server 3 on aries : TCP version 1 ==> OK 
+Data collector write server 3 on aries : UDP version 1 ==> OK 
+Data collector write server 4 on aries : TCP version 1 ==> OK 
+Data collector write server 4 on aries : UDP version 1 ==> OK 
+$
+\endverbatim
+
+\section testing_all_device_servers Testing all the device server running on a host
+
+This is a copy of the output of testcs started with the -h and -v option for one 
+of the ESRF machine control system VME:
+\verbatim
+$ testcs -h vme006 -v 
+Test host : vme006 
+DS plc/sy_s678 and pneumvalves/sy_s678 : UDP version 1 ==> OK 
+DS plc/sy_s678 and pneumvalves/sy_s678 : TCP version 1 ==> OK 
+DS plc/sy_s678 and pneumvalves/sy_s678 : UDP version 4 ==> OK 
+DS plc/sy_s678 and pneumvalves/sy_s678 : TCP version 4 ==> OK 
+DS ripc/sy_s678 and ripc-channel/sy_s678 : UDP version 1 ==> OK 
+DS ripc/sy_s678 and ripc-channel/sy_s678 : TCP version 1 ==> OK 
+DS arun/sy_s678 and pg.arun/sy_s678 : UDP version 1 ==> OK 
+DS arun/sy_s678 and pg.arun/sy_s678 : TCP version 1 ==> OK 
+DS arun/sy_s678 and pg.arun/sy_s678 : UDP version 4 ==> OK 
+DS arun/sy_s678 and pg.arun/sy_s678 : TCP version 4 ==> OK 
+DS magvaccoolingilds/sy and cellmagil/sy : UDP version 1 ==> OK 
+DS magvaccoolingilds/sy and cellmagil/sy : TCP version 1 ==> OK 
+DS thctrl/sy and srthc/sy : UDP version 1 ==> OK 
+DS thctrl/sy and srthc/sy : TCP version 1 ==> OK 
+DS thctrl/sy and srthc/sy : UDP version 4 ==> OK 
+DS thctrl/sy and srthc/sy : TCP version 4 ==> OK 
+$
+\endverbatim
+On this output, you can remark that device server with several embedded classes 
+are tested as one server (plc/sy_s678 and pneumvalves/sy_s678 are part of the same 
+device server process). It is also possible to detect old device server which are 
+registered in the RPC layers with version 1 only (ripc/sy_s678 and magvaccoolingilds 
+servers).
+
+\section testing_complete_control_system Testing a complete control system 
+
+The following is a result of testcs started on a ESRF beam line control system 
+with the -a option
+\verbatim
+$testcs -a 
+Testing control system kernel components 
+Getting information from the whole control system 
+On large control system, this may needs time ! 
+Getting information for : id101 
+Getting information for : id102 
+Getting information for : id106 
+Getting information for : tina 
+Control system with 34 server process(s) distributed on 4 host(s) 
+Testing device server(s) running on id101 
+Testing device server(s) running on id102 
+DS gpib/dummy and mcamb/id10 : UDP version1 ==> NOK !!!!!! 
+DS process PID found in database : 66 
+DS wxbpm/mcd defined in database on host id102 but not started 
+Testing device server(s) running on id106 
+Testing device server(s) running on tina 
+DS ud_daemon/ud_atte defined in database on host tina but not started 
+$
+\endverbatim
+This exmaple does not use the verbose mode of testcs. From the output, you can 
+conclude that
+
+- All the kernel conponents are running well (manager, database server and data 
+collector).
+- The control system is distributed on 4 hosts and uses 34 device servers. 
+- The deice server gpib/dummy is not running 
+- The device servers wxbpm/mcd and ud_daemon/ud atte have not been started.
+
+*/

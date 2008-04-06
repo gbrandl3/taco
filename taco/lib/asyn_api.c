@@ -43,9 +43,9 @@
  *
  * Original   :	January 1997
  *
- * Version:	$Revision: 1.24 $
+ * Version:	$Revision: 1.25 $
  *
- * Date:	$Date: 2007-09-07 13:29:08 $
+ * Date:	$Date: 2008-04-06 09:06:59 $
  *
  ********************************************************************-*/
 
@@ -130,7 +130,6 @@ extern "C" {
  * dynamic error variables
  */
 	extern char *dev_error_stack;
-	extern char *dev_error_string;
 #ifdef __cplusplus
 };
 #endif
@@ -206,7 +205,7 @@ long _DLLFunc dev_putget_asyn (devserver ds, long cmd,
                                DevArgument argin, DevType argin_type, 
                                DevArgument argout, DevType argout_type, 
                                DevCallbackFunction *callback, void *user_data,
-			       long *asynch_id_ptr, long *error)
+			       long *asynch_id_ptr, DevLong *error)
 {
 	_server_data		server_data;
 	DevVarArgument		vararg[10];
@@ -236,11 +235,6 @@ long _DLLFunc dev_putget_asyn (devserver ds, long cmd,
 /*
  * make sure dynamic error is initialised to nothing
  */
-	if (dev_error_string != NULL)
-	{
-		free(dev_error_string);
-		dev_error_string = NULL;
-	}
 /*
  *  check data types
  */
@@ -454,7 +448,7 @@ long _DLLFunc dev_putget_raw_asyn (devserver ds, long cmd,
                                 DevArgument argin, DevType argin_type, 
                                 DevArgument argout, DevType argout_type, 
                                 DevCallbackFunction *callback, void *user_data,
-			        long *asynch_id_ptr, long *error)
+			        long *asynch_id_ptr, DevLong *error)
 {
 	_server_data		server_data;
 	DevVarArgument		vararg[10];
@@ -694,8 +688,8 @@ static void _WINAPI devserver_prog_5 (struct svc_req *rqstp, SVCXPRT *transp)
 	struct _devserver 	client;
 	DevVarArgument 		vararg[10];
 	long 			asynch_id,
-				iarg,
-				error;
+				iarg;
+	DevLong			error;
 	static struct timeval 	timenow;
 #ifndef WIN32
 	static struct timezone 	tz;
@@ -1111,7 +1105,7 @@ static SVCXPRT 	*asynch_trans_tcp,
  *
  * @return DS_OK or DS_NOTOK
  */
-long _DLLFunc asynch_rpc_register(long *error)
+long _DLLFunc asynch_rpc_register(DevLong *error)
 {
 	long pid;
 	char hostname[HOST_NAME_LENGTH];
@@ -1203,7 +1197,11 @@ long _DLLFunc asynch_rpc_register(long *error)
 		}
 
   
+#if defined (FreeBSD) && (__cplusplus)
+  		if (!svc_register(asynch_trans_tcp, config_flags.prog_number, ASYNCH_API_VERSION, (void (*)(...))devserver_prog_5, IPPROTO_TCP))
+#else
   		if (!svc_register(asynch_trans_tcp, config_flags.prog_number, ASYNCH_API_VERSION, devserver_prog_5, IPPROTO_TCP))
+#endif
   		{
   			fprintf(stderr, "asynch_rpc_register(): cannot register asynchronous tcp service\n");
 			UNLOCK(async_mutex);
@@ -1229,7 +1227,7 @@ long _DLLFunc asynch_rpc_register(long *error)
  *
  * @return DS_OK or DS_NOTOK
  */
-long asynch_server_import(devserver ds, long *error)
+long asynch_server_import(devserver ds, DevLong *error)
 {
 	CLIENT 			*asynch_clnt_tcp;
 	_dev_import_in 		dev_import_in;
@@ -1423,7 +1421,7 @@ long asynch_server_import(devserver ds, long *error)
  *
  * @return DS_OK or DS_NOTOK
  */
-long asynch_client_import(devserver client, long *error)
+long asynch_client_import(devserver client, DevLong *error)
 {
 
 	long 				no_svr_conn;
@@ -1559,7 +1557,7 @@ long asynch_client_import(devserver client, long *error)
  *
  * @return DS_OK or DS_NOTOK
  */
-long asynch_client_check(devserver client, long *error)
+long asynch_client_check(devserver client, DevLong *error)
 {
 
 	long no_svr_conn;
@@ -1608,7 +1606,7 @@ long asynch_client_check(devserver client, long *error)
  *
  * @return DS_OK or DS_NOTOK
  */ 
-long _DLLFunc dev_synch(struct timeval *timeout, long *error)
+long _DLLFunc dev_synch(struct timeval *timeout, DevLong *error)
 {
 	fd_set 		zerofds, readfds;
 	int 		dtbsz = getdtablesize();
@@ -1722,7 +1720,7 @@ int ds_rpc_svc_fd;
  * rpc service to import the asynchronous service of 
  * a server. This function is called by the client the
  * first time it (re)imports the asynchronous service
- * of the server. it will import the reply service of
+ * of the server. It will import the reply service of
  * the client and send a (synchronous) reply to the client.
  *
  * @param dev_import_in 
@@ -1734,8 +1732,8 @@ _dev_import_out* _DLLFunc rpc_asynch_import_5(_dev_import_in *dev_import_in)
 	static struct _dev_import_out 	dev_import_out;
 	struct _devserver 		client;
 	long 				iarg, 
-					error, 
 					status;
+	DevLong				error; 
 
 	LOCK(async_mutex);
 
@@ -1875,8 +1873,8 @@ _dev_free_out* _DLLFunc rpc_asynch_free_5(_dev_free_in *dev_free_in)
 
 /**@ingroup dsAPI
  * Receive an asynchronous reply sent by a device server to the client. It will
- * identify the originating request, unpack the arguments correctly and trigger 
- * the callback (if registered). 
+ * identify the originating request, unpack the arguments correctly and trigger
+ * the callback (if registered).
  *
  * @param asynch_client_data
  *
@@ -1925,10 +1923,7 @@ _asynch_client_data* _DLLFunc rpc_asynch_reply_5(_asynch_client_data *asynch_cli
  */
 		if (asynch_client_data->var_argument.length == 3)
 		{
-			dev_error_string = (char*)malloc(strlen(*(char**)asynch_client_data->var_argument.sequence[iarg].argument)+1);
-			assert(dev_error_string != NULL);
-			if(dev_error_string)
-				strcpy(dev_error_string,*(char**)asynch_client_data->var_argument.sequence[iarg].argument);
+			dev_error_push(*(char**)asynch_client_data->var_argument.sequence[iarg].argument);
 		}
 
 		(*client_asynch_request.args[asynch_index].callback) (client_asynch_request.args[asynch_index].ds, 
@@ -2056,7 +2051,7 @@ long _DLLFunc asynch_add_request(devserver ds, long asynch_type, long event_type
                                  DevArgument argout, DevType argout_type, 
 				 DevCallbackFunction *callback, void *user_data, 
 				 long *id_ptr, long *asynch_index,
-				 long *error)
+				 DevLong *error)
 {
 	static long asynch_id = 0;
 #ifdef vxworks
@@ -2180,25 +2175,25 @@ long _DLLFunc asynch_get_index( long asynch_id)
 bool_t xdr__asynch_client_data(XDR *xdrs, _asynch_client_data *objp)
 {
 	DevDataListEntry	data_type;
-	long			error;	
+	DevLong			error;	
 	long			asynch_index;
 
-	if (!xdr_long(xdrs, &objp->asynch_id)) 
+	if (!xdr_DevLong(xdrs, &objp->asynch_id)) 
 	{
 		dev_printdebug (DBG_TRACE | DBG_ASYNCH,"cannot encode async_id: %ld\n",(long)objp->asynch_id);
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->status)) 
+	if (!xdr_DevLong(xdrs, &objp->status)) 
 	{
 		dev_printdebug (DBG_TRACE | DBG_ASYNCH,"cannot encode status: %ld\n",(long)objp->status);
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->error)) 
+	if (!xdr_DevLong(xdrs, &objp->error)) 
 	{
 		dev_printdebug (DBG_TRACE | DBG_ASYNCH,"cannot encode error: %ld\n",(long)objp->error);
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->argout_type)) 
+	if (!xdr_DevLong(xdrs, &objp->argout_type)) 
 	{
 		dev_printdebug (DBG_TRACE | DBG_ASYNCH,"cannot encode argout_type: %ld\n",(long)objp->argout_type);
 		return (FALSE);
@@ -2269,20 +2264,20 @@ bool_t xdr__asynch_client_raw_data(XDR *xdrs, _asynch_client_raw_data *objp)
 {
 	DevOpaque		*opaque;
 	DevDataListEntry	data_type;
-	long			error;	
+	DevLong			error;	
 	long			asynch_index;
 
-	if (!xdr_long(xdrs, &objp->asynch_id)) 
+	if (!xdr_DevLong(xdrs, &objp->asynch_id)) 
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->status)) 
+	if (!xdr_DevLong(xdrs, &objp->status)) 
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->error)) 
+	if (!xdr_DevLong(xdrs, &objp->error)) 
 		return (FALSE);
-        if (!xdr_long(xdrs, &objp->ser_argout_type)) 
+        if (!xdr_DevLong(xdrs, &objp->ser_argout_type)) 
                 return (FALSE);
-        if (!xdr_long(xdrs, &objp->deser_argout_type)) 
+        if (!xdr_DevLong(xdrs, &objp->deser_argout_type)) 
                 return (FALSE);
-        if (!xdr_long(xdrs, &objp->xdr_length)) 
+        if (!xdr_DevLong(xdrs, &objp->xdr_length)) 
                 return (FALSE);
 
 /*
@@ -2360,7 +2355,7 @@ long _DLLFunc dev_flush(devserver ds)
 {
 	enum clnt_stat clnt_stat;
 	struct timeval timeout = {1, 0};
-	long error;
+	DevLong error;
 	LOCK(async_mutex);
 
 /*
@@ -2450,7 +2445,7 @@ long _DLLFunc dev_pending(devserver ds)
  * @return DS_OK or DS_NOTOK
  */ 
 long _DLLFunc dev_asynch_timeout (devserver ds, long request,
-				  struct timeval *dev_timeout, long *error)
+				  struct timeval *dev_timeout, DevLong *error)
 {
 	*error = 0;
 
@@ -2493,7 +2488,7 @@ long _DLLFunc dev_asynch_timeout (devserver ds, long request,
  * @param error   	Will contain an appropriate error code if the
  *		        corresponding call returns a non-zero value.
  */
-void _DLLFunc asynch_client_cleanup(long *error)
+void _DLLFunc asynch_client_cleanup(DevLong *error)
 {
 	long 		i;
 	enum clnt_stat 	clnt_stat;
@@ -2534,8 +2529,8 @@ void _DLLFunc asynch_client_cleanup(long *error)
 void _DLLFunc asynch_timed_out(devserver ds_tout)
 {
 	long 		i, 
-			timediff, 
-			error;
+			timediff; 
+	DevLong		error;
 	struct timeval 	timenow;
 #ifdef vxworks
 	time_t 		tea_time;
@@ -2674,7 +2669,7 @@ void _DLLFunc asynch_timed_out(devserver ds_tout)
  *
  * @return DS_OK or DS_NOTOK
  */
-long _DLLFunc asynch_client_ping(long i,long *error)
+long _DLLFunc asynch_client_ping(long i,DevLong *error)
 {
 	enum clnt_stat 	clnt_stat;
 	long 		status;

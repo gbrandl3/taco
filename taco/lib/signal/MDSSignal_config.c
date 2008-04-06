@@ -32,9 +32,9 @@
  *
  * Original:    4.12.1997
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2007-03-22 13:48:29 $
+ * Date:	$Date: 2008-04-06 09:07:19 $
  *
  *********************************************************************/
 
@@ -296,7 +296,7 @@ void NowT() {
                                             routine fails.
  ============================================================================*/
 long dev_get_sig_list (char *device_name, DevVarStringArray *argout, 
-		       long *error)
+		       DevLong *error)
 {
         db_resource res_siglist[] = {
    	  {"signal_names",	D_VAR_STRINGARR, NULL},
@@ -419,7 +419,7 @@ long dev_get_sig_list (char *device_name, DevVarStringArray *argout,
                                             routine fails.
  ============================================================================*/
 long dev_get_sig_config (char *device_name, DevVarStringArray *argout, 
-			 long *error)
+			 DevLong *error)
 {
 	char             tmp[128];
 	char 		 *res;
@@ -761,7 +761,7 @@ long dev_get_sig_config (char *device_name, DevVarStringArray *argout,
                                             routine fails.
  ============================================================================*/
 long dev_get_sig_config_from_name (char *device_name, char *signal_name , 
-		                   DevVarStringArray *argout, long *error)
+		                   DevVarStringArray *argout, DevLong *error)
 {
   int found=0;
   int i;

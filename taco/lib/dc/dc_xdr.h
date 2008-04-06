@@ -23,11 +23,11 @@
  * Description: structures definition for XDR transfer 
  *
  * Author(s):	E. Taurel
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2006-01-22 21:16:33 $
+ * Date:	$Date: 2008-04-06 09:07:14 $
  *
  *******************************************************************************/
 
@@ -76,18 +76,19 @@ extern xres_hist_clnt *dc_devgeth_clnt_1();
 extern xresh_mast *dc_devgeth_1();
 #else /*__cplusplus*/
 extern "C" {
-extern xres_clnt *dc_devget_clnt_1(xdevget *argp, CLIENT *clnt, DevArgument argout, DevType argout_type, long *perr);
+extern xres_clnt *dc_devget_clnt_1(xdevget *argp, CLIENT *clnt, DevArgument argout, DevType argout_type, DevLong *perr);
+
 extern xres *dc_devget_1();
 
-extern xresv_clnt *dc_devgetv_clnt_1(xdevgetv *argp, CLIENT *clnt, xres_clnt *st_ptr, long *perr);
+extern xresv_clnt *dc_devgetv_clnt_1(xdevgetv *argp, CLIENT *clnt, xres_clnt *st_ptr, DevLong *perr);
 extern xresv *dc_devgetv_1(...);
 
-extern xresm_clnt *dc_devgetm_clnt_1(mpar *argp, CLIENT *clnt, mint *st_ptr, long *perr);
+extern xresm_clnt *dc_devgetm_clnt_1(mpar *argp, CLIENT *clnt, mint *st_ptr, DevLong *perr);
 extern mpar_back *dc_devgetm_1(...);
 
-extern outpar *dc_devdef_1(imppar *argp, CLIENT *clnt, long *perr);
+extern outpar *dc_devdef_1(imppar *argp, CLIENT *clnt, DevLong *perr);
 
-extern xres_hist_clnt *dc_devgeth_clnt_1(xdevgeth *argp, CLIENT *clnt, xresh_clnt *st_ptr, long *perr);
+extern xres_hist_clnt *dc_devgeth_clnt_1(xdevgeth *argp, CLIENT *clnt, xresh_clnt *st_ptr, DevLong *perr);
 extern xresh_mast *dc_devgeth_1(...);
 }
 #endif /* _cplusplus */
@@ -116,12 +117,12 @@ extern dc_infox_back *dc_info_1(int *fill);
 extern dc_devallx_back *dc_devall_1(int *fill);
 extern dc_devinfx_back *dc_devinfo_1(char **rece);
 #else
-extern dc_xdr_error *dc_open_1(dc_open_in *argp,CLIENT *clnt,long *perr);
-extern dc_xdr_error *dc_close_1(name_arr *argp,CLIENT *clnt,long *perr);
-extern dc_xdr_error *dc_dataput_1(dev_datarr *argp,CLIENT *clnt,long *perr);
-extern dc_infox_back *dc_info_1(void *argp,CLIENT *clnt,long *perr);
-extern dc_devallx_back *dc_devall_1(void *argp,CLIENT *clnt,long *perr);
-extern dc_devinfx_back *dc_devinfo_1(name *argp,CLIENT *clnt,long *perr);
+extern dc_xdr_error *dc_open_1(dc_open_in *argp,CLIENT *clnt, DevLong *perr);
+extern dc_xdr_error *dc_close_1(name_arr *argp,CLIENT *clnt, DevLong *perr);
+extern dc_xdr_error *dc_dataput_1(dev_datarr *argp,CLIENT *clnt, DevLong *perr);
+extern dc_infox_back *dc_info_1(void *argp,CLIENT *clnt, DevLong *perr);
+extern dc_devallx_back *dc_devall_1(void *argp,CLIENT *clnt, DevLong *perr);
+extern dc_devinfx_back *dc_devinfo_1(name *argp,CLIENT *clnt, DevLong *perr);
 #endif /* DC_CLIENT */
 
 

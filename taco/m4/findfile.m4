@@ -1,3 +1,7 @@
+#
+# AC_FIND_FILE([$1], [$2], [$3])
+#
+#
 AC_DEFUN([AC_FIND_FILE],
     [
 	$3=NO

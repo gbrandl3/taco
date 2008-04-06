@@ -23,13 +23,13 @@
  * Description:
  * 
  * Author(s):   Emmanuel Taurel
- *		$Author: bourtemb $
+ *		$Author: jkrueger1 $
  *
  * Original:    1992
  *
- * Version:     $Revision: 1.7 $
+ * Version:     $Revision: 1.8 $
  *
- * Date:        $Date: 2007-08-21 07:46:52 $
+ * Date:        $Date: 2008-04-06 09:07:15 $
  *
  ******************************************************************************/
 
@@ -55,7 +55,7 @@ static void sigpipe_handler(int signo)
 
 static struct timeval TIMEOUT = { 3, 0 };
 
-dc_xdr_error *dc_open_1(dc_open_in *argp,CLIENT *clnt,long *perr)
+dc_xdr_error *dc_open_1(dc_open_in *argp,CLIENT *clnt, DevLong *perr)
 {
 	static dc_xdr_error 	res;
 	enum clnt_stat 		clnt_stat;
@@ -80,7 +80,7 @@ dc_xdr_error *dc_open_1(dc_open_in *argp,CLIENT *clnt,long *perr)
 	return (&res);
 }
 
-dc_xdr_error *dc_close_1(name_arr *argp,CLIENT *clnt,long *perr)
+dc_xdr_error *dc_close_1(name_arr *argp,CLIENT *clnt, DevLong *perr)
 {
 	static dc_xdr_error 	res;
 	enum clnt_stat 		clnt_stat;
@@ -105,7 +105,7 @@ dc_xdr_error *dc_close_1(name_arr *argp,CLIENT *clnt,long *perr)
 	return (&res);
 }
 
-dc_xdr_error *dc_dataput_1(dev_datarr *argp,CLIENT *clnt,long *perr)
+dc_xdr_error *dc_dataput_1(dev_datarr *argp,CLIENT *clnt, DevLong *perr)
 {
 	static dc_xdr_error 	res;
 	enum clnt_stat 		clnt_stat;
@@ -130,7 +130,7 @@ dc_xdr_error *dc_dataput_1(dev_datarr *argp,CLIENT *clnt,long *perr)
 	return (&res);
 }
 
-dc_infox_back *dc_info_1(void *argp,CLIENT *clnt,long *perr)
+dc_infox_back *dc_info_1(void *argp,CLIENT *clnt, DevLong *perr)
 {
 	static dc_infox_back 	res;
 	enum clnt_stat 		clnt_stat;
@@ -155,7 +155,7 @@ dc_infox_back *dc_info_1(void *argp,CLIENT *clnt,long *perr)
 	return (&res);
 }
 
-dc_devallx_back *dc_devall_1(void *argp,CLIENT *clnt,long *perr)
+dc_devallx_back *dc_devall_1(void *argp,CLIENT *clnt, DevLong *perr)
 {
 	static dc_devallx_back 	res;
 	enum clnt_stat 		clnt_stat;
@@ -180,7 +180,7 @@ dc_devallx_back *dc_devall_1(void *argp,CLIENT *clnt,long *perr)
 	return (&res);
 }
 
-dc_devinfx_back *dc_devinfo_1(name *argp,CLIENT *clnt,long *perr)
+dc_devinfx_back *dc_devinfo_1(name *argp,CLIENT *clnt, DevLong *perr)
 {
 	static dc_devinfx_back 	res;
 	enum clnt_stat 		clnt_stat;
@@ -207,7 +207,7 @@ dc_devinfx_back *dc_devinfo_1(name *argp,CLIENT *clnt,long *perr)
 
 
 
-int dc_rpcwr_check_clnt_1(CLIENT *clnt,char **res,long *perr)
+int dc_rpcwr_check_clnt_1(CLIENT *clnt,char **res,DevLong *perr)
 {
 	enum clnt_stat clnt_stat;
 	void (* old_sighandler)(int);	

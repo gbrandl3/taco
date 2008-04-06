@@ -103,7 +103,7 @@ static PowerSupply powerSupply = (PowerSupply)&powerSupplyRec;
 static db_resource res_powersupply[] = {
                 {"delta_i", D_FLOAT_TYPE},
                 {"time_constant", D_LONG_TYPE},
-                                   };
+};
 
 static int res_powersupply_size = sizeof(res_powersupply)/sizeof(db_resource);
 
@@ -182,7 +182,7 @@ long *error;
 
 static long object_initialise(ds, error)
 PowerSupply ds;
-long *error;
+DevLong *error;
 {
 /*
  * this method does only one thing at present and that is initialise

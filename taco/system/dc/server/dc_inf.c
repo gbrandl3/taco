@@ -30,9 +30,9 @@
  *
  * Original     : February 1993
  *
- * Version      : $Revision: 1.4 $
+ * Version      : $Revision: 1.5 $
  *
- * Date         : $Date: 2006-09-18 21:49:14 $
+ * Date         : $Date: 2008-04-06 09:07:50 $
  *
  */
 
@@ -58,20 +58,20 @@ extern int req_call;
 
 
 
-/*
+/**
  * To return to the client a structure with : 
  *	- The amount of free memory in the data buffer
  *	- The amount of devices defined in this dc
  *	- The number of devices defined in each domain
  *
- * @param fill
+ * @param fill unused
  */
 dc_infox_back *dc_info_1(int *fill)
 {
 	static dc_infox_back ret;
 	static domain_info dom_array[MAX_DOM];
 	static dom_x dom_x_array[MAX_DOM];
-	long error;
+	DevLong error;
 	unsigned int free,lfree;
 	int nb_area;
 	int nb_tot,i,j;

@@ -26,12 +26,16 @@
  * 		Synopsis : db_dump [domain/all] 
  *
  * Author(s):
- *              $Author: andy_gotz $
+ *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.7 $
+ * Version:     $Revision: 1.8 $
  *
- * Date:        $Date: 2005-11-13 19:52:36 $
+ * Date:        $Date: 2008-04-06 09:07:47 $
  */
+
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
 #include <cstdio>
 #include <string>
@@ -55,8 +59,6 @@
 #include <algorithm>
 #include <map>
 
-using namespace std;
-
 /* Function definitions */
 
 int db_read(char *,char *);
@@ -69,8 +71,22 @@ std::map<std::string, int> device_map;
 std::map<std::string, int> property_map;
 std::map<std::string,int>::iterator ipos;
 int mysql_statements = 0;
-char *dbase = "gdbm";
+const char *dbase = "gdbm";
 
+void usage(const char *cmd)
+{
+	std::cerr <<  "usage: " << cmd << " [options] <domain name|all>" << std::endl;
+	std::cerr << " dumps all resources of the specified or all domains." << std::endl; 
+	std::cerr << "        options : -h display this message" << std::endl;
+	std::cerr << "                  -v display the current version" << std::endl;
+	exit(1);
+}
+
+void version(const char *cmd)
+{
+	std::cerr << cmd << " version " << VERSION << std::endl;
+	exit(0);
+}
 
 /****************************************************************************
 *                                                                           *
@@ -105,21 +121,35 @@ int main(int argc,char *argv[])
 	int 	names = False;
 	int 	ps_names = False;
 
-/* Argument test and domain name modification */
+        extern int      optopt;
+        extern int      optind;
+	extern char	*optarg;
+        int             c;
+//
+// Argument test and device name structure
+//
+        while ((c = getopt(argc,argv,"hv")) != -1)
+        {
+                switch (c)
+                {
+			case 'v':
+				version(argv[0]);
+				break;
+                	case 'h':
+                	case '?':
+				usage(argv[0]);
+                }
+        }
+    	if (optind != argc - 1)
+		usage(argv[0]);
 
-	if (argc != 2)
-	{
-		cerr <<  argv[0] << " usage: " << argv[0] << " <domain name|all>" << endl;
-		exit(-1);
-	}
-
-	string	domain(argv[1]);
-	transform(domain.begin(), domain.end(), domain.begin(), ::tolower);
+	std::string	domain(argv[optind]);
+	std::transform(domain.begin(), domain.end(), domain.begin(), ::tolower);
 
 /* Find the dbm_database table names */        
 	if ((ptr = (char *)getenv("DBTABLES")) == NULL)
 	{
-		cerr << "db_read: Can't find environment variable DBTABLES" << endl;
+		std::cerr << "db_read: Can't find environment variable DBTABLES" << std::endl;
 		exit(-1);
 	}
 	
@@ -165,10 +195,10 @@ int main(int argc,char *argv[])
 
 	if ((ptr = getenv("DBM_DIR")) == NULL)
 	{
-		cerr << "db_read: Can't find environment variable DBM_DIR" << endl;
+		std::cerr << "db_read: Can't find environment variable DBM_DIR" << std::endl;
 		exit(-1);
 	}
-	string dbm_dir(ptr);
+	std::string dbm_dir(ptr);
 
 	if (dbm_dir[dbm_dir.length() - 1] != '/')
 		dbm_dir += '/';
@@ -181,10 +211,10 @@ int main(int argc,char *argv[])
 	/* Read the database tables of the database */
 	   	for (int i = 0; i < TblNum; i++)
 		{
-			if ((domain == string(tblname[i])) || (domain == "all")) 
+			if ((domain == std::string(tblname[i])) || (domain == "all")) 
 			{
-				string dbm_file(dbm_dir);
-				dbm_file +=  string(tblname[i]);
+				std::string dbm_file(dbm_dir);
+				dbm_file +=  std::string(tblname[i]);
 				res_num[i] = db_read(const_cast<char *>(dbm_file.c_str()), tblname[i]);
 			}
 		}
@@ -192,18 +222,18 @@ int main(int argc,char *argv[])
 		{
 			if (ipos->second > 1)
 			{
-				cerr << "WARNING - the following device " << ipos->first << " has " << ipos->second << " entries in the NAMES table !\n";
+				std::cerr << "WARNING - the following device " << ipos->first << " has " << ipos->second << " entries in the NAMES table !\n";
 			}
 		}
 		dbase = "dbm";
 	}
 	if (mysql_statements == 0)
 	{
-		cerr << "WARNING - could not find any data in tables, are you sure the tables are correct ?\n";
+		std::cerr << "WARNING - could not find any data in tables, are you sure the tables are correct ?\n";
 	}
 	else
 	{
-		cerr << "INFORMATION - a total of " << mysql_statements << " mysql statements were generated \n";
+		std::cerr << "INFORMATION - a total of " << mysql_statements << " mysql statements were generated \n";
 	}
 	return 1;
 }
@@ -223,12 +253,12 @@ int db_read(char *dbm_file,char *TblName)
 #ifdef linux
 	static long 	connected = False;
 #endif /* linux */
-	string		key_str, content_str, device_tmp;
-	string		domain, family, member, personal_name, process;
-	string		device, host, program_no, pid, server, device_property;
-	string		version, device_type, device_class, count;
-	string		name, value, poll_rate;
-	string::size_type pos;
+	std::string		key_str, content_str, device_tmp;
+	std::string		domain, family, member, personal_name, process;
+	std::string		device, host, program_no, pid, server, device_property;
+	std::string		version, device_type, device_class, count;
+	std::string		name, value, poll_rate;
+	std::string::size_type pos;
 	
 
 #if 0 //def linux
@@ -239,7 +269,7 @@ int db_read(char *dbm_file,char *TblName)
 	{
 		if (db_import(&err) != 0)
 		{
-	    		cerr << "db_read: can't connect to database server" << endl;
+	    		std::cerr << "db_read: can't connect to database server" << std::endl;
 			exit(-1);
 		}
 		connected = True;
@@ -249,7 +279,7 @@ int db_read(char *dbm_file,char *TblName)
 //
 	if (db_svc_close(&err) == -1)
 	{
-		cerr << "db_read: Server failed when tries to disconnect to DBM files" << endl;
+		std::cerr << "db_read: Server failed when tries to disconnect to DBM files" << std::endl;
 		exit(-1);
 	}	
 #endif /* linux */
@@ -275,7 +305,7 @@ int db_read(char *dbm_file,char *TblName)
 // Ask server to disconnect from DBM files 
 //
 		if (db_svc_reopen(&err) == -1)
-	   		cerr << "db_read: Server failed when tries to reconnect to DBM files" << endl;
+	   		std::cerr << "db_read: Server failed when tries to reconnect to DBM files" << std::endl;
 #endif /* linux */		
 		return 0;
 	}
@@ -316,7 +346,7 @@ int db_read(char *dbm_file,char *TblName)
 //
 	if (db_svc_reopen(&err) == -1)
 	{
-		cerr << "db_read: Server failed when tries to reconnect to DBM files" << endl;
+		std::cerr << "db_read: Server failed when tries to reconnect to DBM files" << std::endl;
 		exit(-1);
 	}	
 #endif /* linux */
@@ -332,12 +362,12 @@ void analyse_content(char *TblName, datum *key, datum *content)
 #ifdef linux
 	static long 	connected = False;
 #endif /* linux */
-	string		key_str, content_str, device_tmp;
-	string		domain, family, member, personal_name, process;
-	string		device, host, program_no, pid, server, device_property;
-	string		version, device_type, device_class, count;
-	string		name, value, poll_rate;
-	string::size_type pos;
+	std::string		key_str, content_str, device_tmp;
+	std::string		domain, family, member, personal_name, process;
+	std::string		device, host, program_no, pid, server, device_property;
+	std::string		version, device_type, device_class, count;
+	std::string		name, value, poll_rate;
+	std::string::size_type pos;
 
 	key_out.dptr = (char *)malloc(MAX_KEY);
 	content_out.dptr = (char *)malloc(MAX_CONT);
@@ -350,7 +380,7 @@ void analyse_content(char *TblName, datum *key, datum *content)
 		strncpy((char*)key_out.dptr, (char*)key->dptr, key->dsize);
 		((char*)key_out.dptr)[key->dsize] = '\0';
 		key_str = (char*)key_out.dptr;
-//		cout << TblName << ": " << key_out.dptr << ": " << content_out.dptr << endl;
+//		std::cout << TblName << ": " << key_out.dptr << ": " << content_out.dptr << std::endl;
 		if (strcmp(TblName,"names") == 0)
 		{
 
@@ -411,8 +441,8 @@ void analyse_content(char *TblName, datum *key, datum *content)
 				device_map[device] = device_map[device]+1;
 			}
 
-			cout << "DELETE FROM device where name='" << device << "';" << endl;
-			cout << "INSERT INTO device SET "
+			std::cout << "DELETE FROM device where name='" << device << "';" << std::endl;
+			std::cout << "INSERT INTO device SET "
 			     << "name='" << device << "',"
 			     << "domain='" << domain << "',"
 			     << "family='" << family << "',"
@@ -425,13 +455,13 @@ void analyse_content(char *TblName, datum *key, datum *content)
 			     << "version='" << version << "'";
 			if (atoi(program_no.c_str()) != 0)
 			{
-			     cout << ", exported=1";
+			     std::cout << ", exported=1";
 		     	}
 		     	else
 		     	{
-			     	cout << ", exported=0";
+			     	std::cout << ", exported=0";
 		     	}
-		    	cout << ";" << endl;
+		    	std::cout << ";" << std::endl;
 			mysql_statements++;
 		}
 		else
@@ -459,8 +489,8 @@ void analyse_content(char *TblName, datum *key, datum *content)
 				poll_rate = content_str.substr(0,pos);
 
 
-				cout << "DELETE FROM device where name='" << device << "';" << endl;
-				cout << "INSERT INTO device SET "
+				std::cout << "DELETE FROM device where name='" << device << "';" << std::endl;
+				std::cout << "INSERT INTO device SET "
 				     	<< "name='" << device << "',"
 				     	<< "domain='" << domain << "',"
 				     	<< "family='" << family << "',"
@@ -472,7 +502,7 @@ void analyse_content(char *TblName, datum *key, datum *content)
 				     	<< "class='PseudoDevice',"
 				     	<< "version='1'"
 				     	<< ", exported=1"
-				     	<< ";" << endl;
+				     	<< ";" << std::endl;
 				mysql_statements++;
 			}
 			else
@@ -493,7 +523,7 @@ void analyse_content(char *TblName, datum *key, datum *content)
 
 				value = content_str;
 				pos = value.find("'");
-				while (pos != string::npos)
+				while (pos != std::string::npos)
 				{
 					value.insert(pos,"\\");
 					pos = value.find("'",pos+2);
@@ -508,13 +538,13 @@ void analyse_content(char *TblName, datum *key, datum *content)
 				if (ipos == property_map.end())
 				{
 					property_map[device_property] = 1;
-					cout << "DELETE FROM property_device WHERE device='" << device << "' AND name='" << name << "';" << endl;
+					std::cout << "DELETE FROM property_device WHERE device='" << device << "' AND name='" << name << "';" << std::endl;
 				}
 				else
 				{
 					property_map[device_property] = property_map[device_property]+1;
 				}
-				cout << "INSERT INTO property_device SET "
+				std::cout << "INSERT INTO property_device SET "
 				     << "device='" << domain <<"/" << family << "/" << member << "',"
 				     << "domain='" << domain << "',"
 				     << "family='" << family << "',"
@@ -522,7 +552,7 @@ void analyse_content(char *TblName, datum *key, datum *content)
 				     << "name='" << name << "',"
 				     << "count='" << count << "',"
 				     << "value='" << value << "'" 
-				     << ";" << endl;
+				     << ";" << std::endl;
 				mysql_statements++;
 			}
 		}

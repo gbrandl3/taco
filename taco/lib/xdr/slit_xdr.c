@@ -29,9 +29,9 @@
  *
  * Original:    September 1992
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  *
  *******************************************************************-*/
 
@@ -46,11 +46,11 @@ bool_t xdr_pslit_head(xdrs, objp)
         XDR *xdrs;
         pslit_head *objp;
 {
-        if (!xdr_long(xdrs, &objp->pmain_st))
+        if (!xdr_DevLong(xdrs, &objp->pmain_st))
                 return (FALSE);
-        if (!xdr_long(xdrs, &objp->dev_diag))
+        if (!xdr_DevLong(xdrs, &objp->dev_diag))
                 return (FALSE);
-        if (!xdr_long(xdrs, &objp->unit))
+        if (!xdr_DevLong(xdrs, &objp->unit))
                 return (FALSE);
 
         return (TRUE);
@@ -61,9 +61,9 @@ bool_t xdr_blade_state(xdrs, objp)
         XDR *xdrs;
         blade_state *objp;
 {
-        if (!xdr_long(xdrs, &objp->values_st))
+        if (!xdr_DevLong(xdrs, &objp->values_st))
                 return (FALSE);
-        if (!xdr_long(xdrs, &objp->mot_moving))
+        if (!xdr_DevLong(xdrs, &objp->mot_moving))
                 return (FALSE);
         if (!xdr_float(xdrs, &objp->mot_pos))
                 return (FALSE);
@@ -71,11 +71,11 @@ bool_t xdr_blade_state(xdrs, objp)
                 return (FALSE);
         if (!xdr_float(xdrs, &objp->temp))
                 return (FALSE);
-        if (!xdr_long(xdrs, &objp->brake))
+        if (!xdr_DevLong(xdrs, &objp->brake))
                 return (FALSE);
-        if (!xdr_long(xdrs, &objp->switch_st))
+        if (!xdr_DevLong(xdrs, &objp->switch_st))
                 return (FALSE);
-        if (!xdr_long(xdrs, &objp->tuned))
+        if (!xdr_DevLong(xdrs, &objp->tuned))
                 return (FALSE);
         return (TRUE);
 }
@@ -102,7 +102,7 @@ bool_t xdr_pslit_state(xdrs, objp)
         XDR *xdrs;
         pslit_state *objp;
 {
-        if (!xdr_long(xdrs, &objp->values_st))
+        if (!xdr_DevLong(xdrs, &objp->values_st))
                 return (FALSE);
         if (!xdr_float(xdrs, &objp->gap))
                 return (FALSE);
@@ -112,13 +112,13 @@ bool_t xdr_pslit_state(xdrs, objp)
                 return (FALSE);
         if (!xdr_float(xdrs, &objp->temp_2))
                 return (FALSE);
-        if (!xdr_long(xdrs, &objp->brake_1))
+        if (!xdr_DevLong(xdrs, &objp->brake_1))
                 return (FALSE);
-        if (!xdr_long(xdrs, &objp->brake_2))
+        if (!xdr_DevLong(xdrs, &objp->brake_2))
                 return (FALSE);
-        if (!xdr_long(xdrs, &objp->switch_1))
+        if (!xdr_DevLong(xdrs, &objp->switch_1))
                 return (FALSE);
-        if (!xdr_long(xdrs, &objp->switch_2))
+        if (!xdr_DevLong(xdrs, &objp->switch_2))
                 return (FALSE);
         return (TRUE);
 }

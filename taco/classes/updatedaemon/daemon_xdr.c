@@ -25,16 +25,16 @@
  * Description: xdr_routines for update daemon types.
  *
  * Author(s):   Jens Meyer
- *              $Author: andy_gotz $
+ *              $Author: jkrueger1 $
  *
  * Original:    July 1992
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-19 09:29:39 $
+ * Date:        $Date: 2008-04-06 09:06:39 $
  */
 
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon_xdr.c,v 1.3 2006-09-19 09:29:39 andy_gotz Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon_xdr.c,v 1.4 2008-04-06 09:06:39 jkrueger1 Exp $";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -57,10 +57,10 @@ xdr_DevDaemonStatus(XDR *xdrs, DevDaemonStatus *objp)
 	if (!xdr_char(xdrs, &objp->BeingPolled)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->PollFrequency)) {
+	if (!xdr_DevLong(xdrs, &objp->PollFrequency)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->TimeLastPolled)) {
+	if (!xdr_DevLong(xdrs, &objp->TimeLastPolled)) {
 		return (FALSE);
 	}
 	if (!xdr_char(xdrs, &objp->PollMode)) {
@@ -69,10 +69,10 @@ xdr_DevDaemonStatus(XDR *xdrs, DevDaemonStatus *objp)
 	if (!xdr_char(xdrs, &objp->DeviceAccessError)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->ErrorCode)) {
+	if (!xdr_DevLong(xdrs, &objp->ErrorCode)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->LastCommandStatus)) {
+	if (!xdr_DevLong(xdrs, &objp->LastCommandStatus)) {
 		return (FALSE);
 	}
 	if (!xdr_char(xdrs, &objp->ContinueAfterError)) {
@@ -86,14 +86,14 @@ xdr_length_DevDaemonStatus(DevDaemonStatus *objp)
         {
         long  length = 0;
 
-        length = length + xdr_length_DevChar (&objp->BeingPolled);
-        length = length + xdr_length_DevLong (&objp->PollFrequency);
-        length = length + xdr_length_DevLong (&objp->TimeLastPolled);
-        length = length + xdr_length_DevChar (&objp->PollMode);
-        length = length + xdr_length_DevChar (&objp->DeviceAccessError);
-        length = length + xdr_length_DevLong (&objp->ErrorCode);
-        length = length + xdr_length_DevLong (&objp->LastCommandStatus);
-        length = length + xdr_length_DevChar (&objp->ContinueAfterError);
+        length += xdr_length_DevChar (&objp->BeingPolled);
+        length += xdr_length_DevLong (&objp->PollFrequency);
+        length += xdr_length_DevLong (&objp->TimeLastPolled);
+        length += xdr_length_DevChar (&objp->PollMode);
+        length += xdr_length_DevChar (&objp->DeviceAccessError);
+        length += xdr_length_DevLong (&objp->ErrorCode);
+        length += xdr_length_DevLong (&objp->LastCommandStatus);
+        length += xdr_length_DevChar (&objp->ContinueAfterError);
 
         return (length);
 }
@@ -103,10 +103,10 @@ xdr_length_DevDaemonStatus(DevDaemonStatus *objp)
 bool_t
 xdr_DevDaemonData(XDR *xdrs, DevDaemonData *objp)
 {
-	if (!xdr_long(xdrs, &objp->ddid)) {
+	if (!xdr_DevLong(xdrs, &objp->ddid)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->long_data)) {
+	if (!xdr_DevLong(xdrs, &objp->long_data)) {
 		return (FALSE);
 	}
 
@@ -118,8 +118,8 @@ xdr_length_DevDaemonData(DevDaemonData *objp)
         {
         long  length = 0;
 
-        length = length + xdr_length_DevLong (&objp->ddid);
-        length = length + xdr_length_DevLong (&objp->long_data);
+        length += xdr_length_DevLong (&objp->ddid);
+        length += xdr_length_DevLong (&objp->long_data);
 
         return (length);
 }
@@ -139,7 +139,7 @@ xdr_DevDaemonStruct(XDR *xdrs, DevDaemonStruct *objp)
         {
 		return (FALSE);
 	}  
-	if (!xdr_long(xdrs, &objp->poller_frequency)) 
+	if (!xdr_DevLong(xdrs, &objp->poller_frequency)) 
 	{
 		return (FALSE);
 	}
@@ -153,9 +153,9 @@ xdr_length_DevDaemonStruct(DevDaemonStruct *objp)
         {
         long  length = 0;
 
-        length = length + xdr_length_DevChar (&objp->dev_n[0]);
-        length = length + xdr_length_DevVarStringArray (&objp->cmd_list);  
-        length = length + xdr_length_DevLong (&objp->poller_frequency);
+        length += xdr_length_DevChar (&objp->dev_n[0]);
+        length += xdr_length_DevVarStringArray (&objp->cmd_list);  
+        length += xdr_length_DevLong (&objp->poller_frequency);
 
         return (length);
 }

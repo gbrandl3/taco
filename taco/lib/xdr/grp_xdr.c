@@ -29,9 +29,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:21 $
  *
  *******************************************************************-*/
 
@@ -64,9 +64,9 @@ xdr_length_Frame(objp)
 {
         long  length = 0;
 
-	length = length + xdr_length_DevDouble (&objp->value);
-        length = length + xdr_length_DevShort (&objp->output);
-        length = length + xdr_length_DevShort (&objp->pause);
+	length += xdr_length_DevDouble (&objp->value);
+        length += xdr_length_DevShort (&objp->output);
+        length += xdr_length_DevShort (&objp->pause);
 
         return (length);
 
@@ -94,8 +94,8 @@ xdr_length_FramePair(objp)
 {
         long  length = 0;
 
-        length = length + xdr_length_Frame (&objp->dead);
-        length = length + xdr_length_Frame (&objp->live);
+        length += xdr_length_Frame (&objp->dead);
+        length += xdr_length_Frame (&objp->live);
 
         return (length);
 
@@ -124,8 +124,8 @@ xdr_length_DevGrpFramePair(objp)
 {
         long  length = 0;
 
-        length = length + xdr_length_DevLong ((long*)&objp->nb_framepair);
-        length = length + xdr_length_FramePair (&objp->framepair);
+        length += xdr_length_DevLong (&objp->nb_framepair);
+        length += xdr_length_FramePair (&objp->framepair);
 
         return (length);
 
@@ -157,14 +157,13 @@ xdr_length_DevGrpFramePairArray(objp)
          *  four bytes for the number of array elements
          */
 
-	length = length + xdr_length_DevLong ((long *)&objp->length);
+	length += xdr_length_DevLong (&objp->length);
 
         /*
          *  now calculate the length of the array
          */
 
-        length = length + (objp->length *
-                 xdr_length_DevGrpFramePair(&objp->sequence[0]) );
+        length += (objp->length * xdr_length_DevGrpFramePair(&objp->sequence[0]) );
 
         return (length);
 }

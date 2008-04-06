@@ -29,9 +29,9 @@
  *
  * Original:	May 1998 by Andy Gotz
  *
- * Version:     $Revision: 1.11 $
+ * Version:     $Revision: 1.12 $
  *
- * Date:        $Date: 2006-09-18 22:39:46 $
+ * Date:        $Date: 2008-04-06 09:06:37 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -91,7 +91,7 @@ static char buffer[SL_MAXSTRING];
 //
 // Arg(s) Out:	long *error - pointer to error code if routine fails.
 //-=======================================================================
-long Serial::GetResources (char *dev_name, long *error)
+long Serial::GetResources (char *dev_name, DevLong *error)
 {
  int	ires;
  char 	*parity_string;
@@ -244,7 +244,7 @@ long Serial::GetResources (char *dev_name, long *error)
 // Arg(s) Out:	long *error - pointer to error code if routine fails.
 //-=======================================================================
 
-long Serial::ClassInitialise (long *error)
+long Serial::ClassInitialise (DevLong *error)
 {
  char res_path[]="CLASS/Serial/DEFAULT";
  int iret=0;
@@ -323,7 +323,7 @@ long Serial::ClassInitialise (long *error)
 //		long *error - pointer to error code (in case of failure)
 //-=====================================================================
 
-Serial::Serial (char *name, long *error)
+Serial::Serial (char *name, DevLong *error)
               :Device (name, error)
 {
  short 			short_array[20];
@@ -332,22 +332,22 @@ Serial::Serial (char *name, long *error)
  //
  // Commands list available
  //
- this->commands_map[DevSerWriteString] = DeviceCommandMapEntry(
-   DevSerWriteString, (DeviceMemberFunction)(&Serial::SerWriteString), D_STRING_TYPE, D_LONG_TYPE, 0, "DevSerWriteString");
- this->commands_map[DevSerWriteChar] = DeviceCommandMapEntry(
-   DevSerWriteChar, (DeviceMemberFunction)(&Serial::SerWriteChar), D_VAR_CHARARR, D_LONG_TYPE, 0, "DevSerWriteChar");
- this->commands_map[DevSerReadString] = DeviceCommandMapEntry(
-   DevSerReadString, (DeviceMemberFunction)(&Serial::SerReadString), D_LONG_TYPE, D_STRING_TYPE, 0, "DevSerReadString");
- this->commands_map[DevSerReadChar] = DeviceCommandMapEntry(
-   DevSerReadChar, (DeviceMemberFunction)(&Serial::SerReadChar), D_LONG_TYPE, D_VAR_CHARARR, 0, "DevSerReadChar");
- this->commands_map[DevSerSetParameter] = DeviceCommandMapEntry(
-   DevSerSetParameter, (DeviceMemberFunction)(&Serial::SerSetParameter), D_VAR_SHORTARR, D_VOID_TYPE, 0, "DevSerSetParameter");
- this->commands_map[DevReset] = DeviceCommandMapEntry(
-   DevReset, (DeviceMemberFunction)(&Serial::Reset), D_VOID_TYPE, D_VOID_TYPE, 0, "DevReset");
- this->commands_map[DevState] = DeviceCommandMapEntry(
-   DevState, (DeviceMemberFunction)(&Serial::State), D_VOID_TYPE, D_SHORT_TYPE, 0, "DevState");
- this->commands_map[DevStatus] = DeviceCommandMapEntry(
-   DevStatus, (DeviceMemberFunction)(&Serial::Status), D_VOID_TYPE, D_STRING_TYPE, 0, "DevStatus");
+ this->commands_map[DevSerWriteString] = DeviceCommandListEntry(
+   DevSerWriteString, (DeviceMemberFunction)(&Serial::SerWriteString), D_STRING_TYPE, D_LONG_TYPE, WRITE_ACCESS, "DevSerWriteString");
+ this->commands_map[DevSerWriteChar] = DeviceCommandListEntry(
+   DevSerWriteChar, (DeviceMemberFunction)(&Serial::SerWriteChar), D_VAR_CHARARR, D_LONG_TYPE, WRITE_ACCESS, "DevSerWriteChar");
+ this->commands_map[DevSerReadString] = DeviceCommandListEntry(
+   DevSerReadString, (DeviceMemberFunction)(&Serial::SerReadString), D_LONG_TYPE, D_STRING_TYPE, WRITE_ACCESS, "DevSerReadString");
+ this->commands_map[DevSerReadChar] = DeviceCommandListEntry(
+   DevSerReadChar, (DeviceMemberFunction)(&Serial::SerReadChar), D_LONG_TYPE, D_VAR_CHARARR, WRITE_ACCESS, "DevSerReadChar");
+ this->commands_map[DevSerSetParameter] = DeviceCommandListEntry(
+   DevSerSetParameter, (DeviceMemberFunction)(&Serial::SerSetParameter), D_VAR_SHORTARR, D_VOID_TYPE, WRITE_ACCESS, "DevSerSetParameter");
+ this->commands_map[DevReset] = DeviceCommandListEntry(
+   DevReset, (DeviceMemberFunction)(&Serial::Reset), D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevReset");
+ this->commands_map[DevState] = DeviceCommandListEntry(
+   DevState, (DeviceMemberFunction)(&Serial::State), D_VOID_TYPE, D_SHORT_TYPE, WRITE_ACCESS, "DevState");
+ this->commands_map[DevStatus] = DeviceCommandListEntry(
+   DevStatus, (DeviceMemberFunction)(&Serial::Status), D_VOID_TYPE, D_STRING_TYPE, WRITE_ACCESS, "DevStatus");
 
 
 
@@ -546,7 +546,7 @@ Serial::~Serial()
 //
 // Arg(s) Out:	long *error - pointer to error code (in case of failure).
 //-=====================================================================
-long Serial::StateMachine (long cmd, long *error)
+long Serial::StateMachine (DevCommand cmd, DevLong *error)
 {
  long iret = 0;
  long int p_state, n_state;
@@ -614,7 +614,7 @@ long Serial::StateMachine (long cmd, long *error)
 //		long *error - pointer to error code, in case
 // 			      routine fails. possible error code(s)
 //-=====================================================================
-long Serial::SerWriteString ( void *vargin, void *vargout, long *error)
+long Serial::SerWriteString ( DevArgument vargin, DevArgument vargout, DevLong *error)
 {
  int 			nchar;
  static DevString 	*argin;
@@ -672,7 +672,7 @@ long Serial::SerWriteString ( void *vargin, void *vargout, long *error)
 //		long *error - pointer to error code, in case
 //		 	      routine fails; possible error code(s) are
 //-=====================================================================
-long Serial::SerWriteChar( void *vargin, void *vargout, long *error)
+long Serial::SerWriteChar( DevArgument vargin, DevArgument vargout, DevLong *error)
 {
  int 			nchar;
  static DevVarCharArray	*argin;
@@ -734,12 +734,12 @@ long Serial::SerWriteChar( void *vargin, void *vargout, long *error)
 //	 	              routine fails; possible error code(s)
 //                              are DevErr_DeviceTimeout
 //-=====================================================================
-long Serial::SerReadString ( void *vargin, void *vargout, long *error)
+long Serial::SerReadString ( DevArgument vargin, DevArgument vargout, DevLong *error)
 {
  static DevLong 	*argin;
  static DevString 	*argout;
  long 			read_type;
- long			nchar;
+ DevLong		nchar;
 
 
 
@@ -808,12 +808,12 @@ long Serial::SerReadString ( void *vargin, void *vargout, long *error)
 //	 	              routine fails; possible error code(s)
 //                              are DevErr_DeviceTimeout
 //-=====================================================================
-long Serial::SerReadChar ( void *vargin, void *vargout, long *error)
+long Serial::SerReadChar ( DevArgument vargin, DevArgument vargout, DevLong *error)
 {
  static DevLong 	*argin;
  static DevVarCharArray *argout;
  long 			read_type;
- long			nchar;
+ DevLong		nchar;
 
 
 
@@ -889,7 +889,7 @@ long Serial::SerReadChar ( void *vargin, void *vargout, long *error)
 //		  	      routine fails. possible error code(s)
 //                              are DevErr_DeviceTimeout
 //-=====================================================================
-long Serial::RawReadString (DevVoid *argin, DevString *argout, long *error)
+long Serial::RawReadString (DevVoid *argin, DevString *argout, DevLong *error)
 {
  int	nchar;
 
@@ -960,7 +960,7 @@ long Serial::RawReadString (DevVoid *argin, DevString *argout, long *error)
 //		  	      routine fails. possible error code(s)
 //                              are DevErr_DeviceTimeout
 //-=====================================================================
-long Serial::NCharReadString (DevLong *argin, DevString *argout, long *error)
+long Serial::NCharReadString (DevLong *argin, DevString *argout, DevLong *error)
 {
  fd_set		watchset;	// file descriptor set
  fd_set		inset;		// file descriptor set updated by select()
@@ -1177,7 +1177,7 @@ long Serial::NCharReadString (DevLong *argin, DevString *argout, long *error)
 //		  	      routine fails. possible error code(s)
 //                              are DevErr_DeviceTimeout
 //-=====================================================================
-long Serial::LineReadString (DevVoid *argin, DevString *argout, long *error)
+long Serial::LineReadString (DevVoid *argin, DevString *argout, DevLong *error)
 {
  fd_set		watchset;	// file descriptor set
  fd_set		inset;		// file descriptor set updated by select()
@@ -1411,7 +1411,7 @@ long Serial::LineReadString (DevVoid *argin, DevString *argout, long *error)
 //		  	      routine fails. possible error code(s)
 //                              are DevErr_DeviceTimeout
 //-=====================================================================
-long Serial::RawReadChar (DevVoid *argin, DevVarCharArray *argout, long *error)
+long Serial::RawReadChar (DevVoid *argin, DevVarCharArray *argout, DevLong *error)
 {
  static DevString 	*tmp_argout;
  int 	i;
@@ -1471,7 +1471,7 @@ long Serial::RawReadChar (DevVoid *argin, DevVarCharArray *argout, long *error)
 //		  	      routine fails. possible error code(s)
 //                              are DevErr_DeviceTimeout
 //-=====================================================================
-long Serial::NCharReadChar (DevLong *argin, DevVarCharArray *argout,long *error)
+long Serial::NCharReadChar (DevLong *argin, DevVarCharArray *argout,DevLong *error)
 {
  static DevString 	*tmp_argout;
  int 	i;
@@ -1531,7 +1531,7 @@ long Serial::NCharReadChar (DevLong *argin, DevVarCharArray *argout,long *error)
 //		  	      routine fails. possible error code(s)
 //                              are DevErr_DeviceTimeout
 //-=====================================================================
-long Serial::LineReadChar (DevVoid *argin, DevVarCharArray *argout, long *error)
+long Serial::LineReadChar (DevVoid *argin, DevVarCharArray *argout, DevLong *error)
 {
  static DevString 	*tmp_argout;
  int 	i;
@@ -1597,7 +1597,7 @@ long Serial::LineReadChar (DevVoid *argin, DevVarCharArray *argout, long *error)
 //		 	      routine fails. possible error code(s):
 //
 //-=====================================================================
-long Serial::SerSetParameter ( void *vargin, void *vargout, long *error)
+long Serial::SerSetParameter ( DevArgument vargin, DevArgument vargout, DevLong *error)
 {
  static DevVarShortArray *argin;
  struct termios		termin;
@@ -2018,7 +2018,7 @@ long Serial::SerSetParameter ( void *vargin, void *vargout, long *error)
 //   				  
 // Arg(s) Out:	DevVoid	*argout - none
 //-=====================================================================
-long Serial::Reset( void *vargin, void *vargout, long *error)
+long Serial::Reset( DevArgument vargin, DevArgument vargout, DevLong *error)
 {
  short 			short_array[20];
  DevVarShortArray	dargin_varsharr;
@@ -2105,7 +2105,7 @@ long Serial::Reset( void *vargin, void *vargout, long *error)
 //		long *error - pointer to error code (in the case of failure)
 //-=====================================================================
 
-long Serial::State ( void *vargin, void *vargout, long *error)
+long Serial::State ( DevArgument vargin, DevArgument vargout, DevLong *error)
 {
 
 
@@ -2139,7 +2139,7 @@ long Serial::State ( void *vargin, void *vargout, long *error)
 //		long *error - pointer to error code (in the case of failure)
 //-=====================================================================
 
-long Serial::Status ( void *vargin, void *vargout, long *error)
+long Serial::Status ( DevArgument vargin, DevArgument vargout, DevLong *error)
 {
  struct termios		termin;
  struct termios		termout;

@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.15 $
+ * Version:	$Revision: 1.16 $
  *
- * Date:	$Date: 2006-12-15 12:43:53 $
+ * Date:	$Date: 2008-04-06 09:07:40 $
  *
  */
 
@@ -60,7 +60,7 @@
  *
  * @return a pointer to a structure of the db_res type.
  */
-db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
+db_res *NdbmServer::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rqstp)
 {
 	std::string     device_name(*fil_name);
 	int 		i,
@@ -150,9 +150,9 @@ db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
                         break;
         }
 
-	logStream->debugStream() << "filter domain : " << domain << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "filter family : " << family << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "filter member : " << member << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "filter domain : " << domain << log4cpp::eol;
+	logStream->debugStream() << "filter family : " << family << log4cpp::eol;
+	logStream->debugStream() << "filter member : " << member << log4cpp::eol;
 
 	browse_back.db_err = 0;
 	browse_back.res_val.arr1_len = 0;
@@ -160,7 +160,7 @@ db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 /* Allocate memory for the pointer's array */
 	dev_num = 0;
 
-	std::vector<nam>        ptra;
+	std::vector<DevString>        ptra;
 
 /* Try to retrieve all tuples in the database NAMES table with the PN column different than "not_exp" */
 	for (key = gdbm_firstkey(dbgen.tid[0]);
@@ -212,7 +212,7 @@ db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 				temp = key.dptr;
 				if ((pos = temp.find('|')) == std::string::npos)
 				{
-					logStream->errorStream() << "No separator in db tuple" << log4cpp::CategoryStream::ENDLINE;
+					logStream->errorStream() << "No separator in db tuple" << log4cpp::eol;
 					browse_back.db_err = DbErr_DatabaseAccess;
 					browse_back.res_val.arr1_len = 0;
 					free(key.dptr);
@@ -230,7 +230,7 @@ db_res *NdbmServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
                                 pos = temp.find('/');
                                 std::string domain_tup =  temp.substr(0, pos);
 
-				logStream->debugStream() << "Domain part from DB: " << domain_tup << log4cpp::CategoryStream::ENDLINE;
+				logStream->debugStream() << "Domain part from DB: " << domain_tup << log4cpp::eol;
 
 //
 // Call the stringOK function to verify that the retrieved devices device name is OK
@@ -291,7 +291,7 @@ char* NdbmServer::fam_fil(device *dev1, const std::string &family, const std::st
 // function 
 //
 
-	logStream->debugStream() << "Arrived in fam_fil function" << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Arrived in fam_fil function" << log4cpp::eol;
 
 //
 // Extract the family part of the device name in the retrieved tuple 
@@ -306,7 +306,7 @@ char* NdbmServer::fam_fil(device *dev1, const std::string &family, const std::st
 				second = tmp.rfind('/');
 	std::string 		family_tup = tmp.substr(first + 1, second - first);
 
-	logStream->debugStream() << "Family part from DB : " << family_tup << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Family part from DB : " << family_tup << log4cpp::eol;
 
 //
 // Special case for the data collector pseudo devices which are not real 
@@ -349,7 +349,7 @@ char *NdbmServer::memb_fil(device *dev2, const std::string &member, int prot) th
 // memory for the string) and increment the device name counter 
 //
 
-	logStream->debugStream() << "Arrived in memb_fil function" << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Arrived in memb_fil function" << log4cpp::eol;
 
 //
 // Extract the member part of the device name in the retrieved tuple */
@@ -362,7 +362,7 @@ char *NdbmServer::memb_fil(device *dev2, const std::string &member, int prot) th
 		throw int(1);
 	pos = tmp.rfind('/');
 
-	logStream->debugStream() << "member part from DB : " << tmp.substr(pos + 1) << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "member part from DB : " << tmp.substr(pos + 1) << log4cpp::eol;
 
 //
 // Call the stringOK function to verify that the member part of the
@@ -386,7 +386,7 @@ char *NdbmServer::memb_fil(device *dev2, const std::string &member, int prot) th
 		if (prot == IPPROTO_UDP && dev_num == MAXDEV_UDP)
 			throw int(DbErr_MaxDeviceForUDP);
 
-		logStream->debugStream() << "One more device name" << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "One more device name" << log4cpp::eol;
 
 	}
 	return p;

@@ -30,9 +30,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  *
  *******************************************************************-*/
 
@@ -43,9 +43,9 @@
  * definitions for Thermocouples
  */
 struct DevThermocouple {
-	float temperature;
-	short th_broken;
-	short th_alarm;
+	DevFloat temperature;
+	DevShort th_broken;
+	DevShort th_alarm;
 };
 typedef struct DevThermocouple 	DevThermocouple;
 bool_t 	_DLLFunc xdr_DevThermocouple PT_((XDR *xdrs, DevThermocouple *objp));
@@ -69,12 +69,12 @@ long   	_DLLFunc xdr_length_DevVarTHArray PT_((DevVarTHArray *objp));
 
 
 struct DevLienState {
-	float	temp[64];
-	char	alarm[8];
-	char	cut[8];
-	char	output[8];
-	char	input[8];
-	char	err[8];
+	DevFloat	temp[64];
+	DevChar		alarm[8];
+	DevChar		cut[8];
+	DevChar		output[8];
+	DevChar		input[8];
+	DevChar		err[8];
 };
 typedef struct DevLienState 	DevLienState;
 bool_t 	_DLLFunc xdr_DevLienState PT_((XDR *xdrs, DevLienState *objp));

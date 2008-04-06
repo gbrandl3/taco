@@ -29,13 +29,16 @@
  *
  * Original:	June 2000
  *
- * Date:	$Date: 2006-09-18 22:02:25 $
+ * Date:	$Date: 2008-04-06 09:06:32 $
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  */
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
+#endif
+#ifdef HAVE_FSTAT
+#undef HAVE_FSTAT
 #endif
 
 #include <API.h>
@@ -47,6 +50,11 @@
 #include <pythonP.h>
 #include <python.h>
 
+extern long check_type(long , long *, long *, long *);
+extern long get_argout_single(DevArgument , long , PyObject **, char*);
+extern long get_argout_array(DevArgument , long , PyObject **, char* );
+extern long get_argin_array(DevArgument , long , PyObject *, char*);
+extern long get_argin_single(DevArgument , long , PyObject *, char*);
 
 /*
  * external python object

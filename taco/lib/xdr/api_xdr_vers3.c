@@ -31,9 +31,9 @@
  *
  * Original:    November 1994
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:20 $
  *
  *******************************************************************-*/
 
@@ -51,15 +51,15 @@
 bool_t xdr__server_data_3 (XDR *xdrs, _server_data_3 *objp)
 {
 	DevDataListEntry	data_type;
-	long			error;	
+	DevLong			error;	
 
-	if (!xdr_long(xdrs, &objp->ds_id)) 
+	if (!xdr_DevLong(xdrs, &objp->ds_id)) 
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->cmd)) 
+	if (!xdr_DevLong(xdrs, &objp->cmd)) 
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->argin_type)) 
+	if (!xdr_DevLong(xdrs, &objp->argin_type)) 
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->argout_type)) 
+	if (!xdr_DevLong(xdrs, &objp->argout_type)) 
 		return (FALSE);
 /*
  * Get the XDR data type from the loaded type list
@@ -84,13 +84,13 @@ bool_t xdr__server_data_3 (XDR *xdrs, _server_data_3 *objp)
 bool_t xdr__client_data_3 (XDR *xdrs, _client_data_3 *objp)
 {
 	DevDataListEntry	data_type;
-	long			error;	
+	DevLong			error;	
 
-	if (!xdr_long(xdrs, &objp->status)) 
+	if (!xdr_DevLong(xdrs, &objp->status)) 
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->error)) 
+	if (!xdr_DevLong(xdrs, &objp->error)) 
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->argout_type)) 
+	if (!xdr_DevLong(xdrs, &objp->argout_type)) 
 		return (FALSE);
 /*
  * Get the XDR data type from the loaded type list
@@ -123,15 +123,15 @@ bool_t xdr__client_raw_data_3 (XDR *xdrs, _client_raw_data_3 *objp)
 {
 	DevOpaque 		*opaque;
 	DevDataListEntry	data_type;
-	long			error;	
+	DevLong			error;	
 
-	if (!xdr_long(xdrs, &objp->status)) 
+	if (!xdr_DevLong(xdrs, &objp->status)) 
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->error)) 
+	if (!xdr_DevLong(xdrs, &objp->error)) 
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->deser_argout_type)) 
+	if (!xdr_DevLong(xdrs, &objp->deser_argout_type)) 
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->xdr_length)) 
+	if (!xdr_DevLong(xdrs, &objp->xdr_length)) 
 		return (FALSE);
 /*  On the server side encode the data with the data
  *  type specified for the command as return argument.
@@ -201,27 +201,27 @@ bool_t xdr__dev_import_out_3 (XDR *xdrs, _dev_import_out_3 *objp)
 {
         if (!xdr_opaque(xdrs, (caddr_t)objp->server_name, LONG_NAME_SIZE)) 
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->ds_id)) 
+	if (!xdr_DevLong(xdrs, &objp->ds_id)) 
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->status)) 
+	if (!xdr_DevLong(xdrs, &objp->status)) 
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->error)) 
+	if (!xdr_DevLong(xdrs, &objp->error)) 
 		return (FALSE);
 	return (TRUE);
 }
 
 bool_t xdr__dev_free_in_3 (XDR *xdrs, _dev_free_in_3 *objp)
 {
-	if (!xdr_long(xdrs, &objp->ds_id)) 
+	if (!xdr_DevLong(xdrs, &objp->ds_id)) 
 		return (FALSE);
 	return (TRUE);
 }
 
 bool_t xdr__dev_free_out_3 (XDR *xdrs, _dev_free_out_3 *objp)
 {
-	if (!xdr_long(xdrs, &objp->status)) 
+	if (!xdr_DevLong(xdrs, &objp->status)) 
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->error)) 
+	if (!xdr_DevLong(xdrs, &objp->error)) 
 		return (FALSE);
 	return (TRUE);
 }
@@ -231,7 +231,7 @@ bool_t xdr__dev_free_out_3 (XDR *xdrs, _dev_free_out_3 *objp)
  */
 bool_t xdr__dev_query_in_3 (XDR *xdrs, _dev_query_in_3 *objp)
 {
-	if (!xdr_long(xdrs, &objp->ds_id)) 
+	if (!xdr_DevLong(xdrs, &objp->ds_id)) 
 		return (FALSE);
 	return (TRUE);
 }	
@@ -243,9 +243,9 @@ bool_t xdr__dev_query_out_3(XDR *xdrs, _dev_query_out_3 *objp)
 		return (FALSE);
 	if (!xdr_opaque(xdrs, (caddr_t)objp->class_name, 20)) 
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->error)) 
+	if (!xdr_DevLong(xdrs, &objp->error)) 
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->status)) 
+	if (!xdr_DevLong(xdrs, &objp->status)) 
 		return (FALSE);
 	return (TRUE);
 }	
@@ -256,9 +256,9 @@ bool_t xdr__manager_data_3 (XDR *xdrs, _manager_data_3 *objp)
                 return (FALSE);
         if (!xdr__register_data(xdrs, &objp->db_info)) 
                 return (FALSE);
-        if (!xdr_long(xdrs, &objp->status)) 
+        if (!xdr_DevLong(xdrs, &objp->status)) 
                 return (FALSE);
-        if (!xdr_long(xdrs, &objp->error)) 
+        if (!xdr_DevLong(xdrs, &objp->error)) 
                 return (FALSE);
         return (TRUE);
 }

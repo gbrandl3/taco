@@ -1,10 +1,10 @@
+SUBDIRS = src include tests 
+
 if DOC
-SUBDIRS = src include tests doc 
-else
-SUBDIRS = src include tests
+SUBDIRS += doc 
 endif
 
-DIST_SUBDIRS = src include doc tests # msvc6 bcb5 
+## DIST_SUBDIRS = src include doc tests
 
 bin_SCRIPTS = log4cpp-config
 
@@ -15,7 +15,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = log4cpp.pc
 
 EXTRA_DIST = \
-	log4cpp.spec.in log4cpp.m4 \
+	log4cpp.spec.in log4cpp.spec log4cpp.m4 \
 	m4/ac_config_libconfig_in.m4 \
 	m4/ac_config_pkgconfig_in.m4 \
 	m4/AC_CREATE_PREFIX_CONFIG_H.m4 \
@@ -35,7 +35,7 @@ dist-hook:
 #	perl -pi -e 's/\n/\r\n/g' `find $(distdir) -name '*.bpg'`
 
 distclean-local:
-	$(RM) -f CONTENTS TAGS log4cpp-config log4cpp.pc.in log4cpp-config.in
+	$(RM) CONTENTS TAGS log4cpp-config
 
 CONTENTS::
 	find $(top_srcdir) \( ! -type l -a -name '*.cpp' -o -name '*.hh' -o -name Makefile.am \) > $@
@@ -43,6 +43,7 @@ CONTENTS::
 TAGS:: CONTENTS
 	etags `cat $<`
 
+      convenience.h \
 rpm: dist
 	rpm -ta $(PACKAGE)-$(VERSION).tar.gz
 	mv -f /usr/src/redhat/SRPMS/$(PACKAGE)-$(VERSION)-*.rpm $(top_srcdir)

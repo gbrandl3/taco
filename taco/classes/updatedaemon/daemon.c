@@ -25,16 +25,16 @@
  * Description: source code to implement DaemonClass
  *
  * Author(s):   Michael Schofield
- *              $Author: andy_gotz $
+ *              $Author: jkrueger1 $
  *
  * Original:    April 1992
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2006-09-19 09:29:39 $
+ * Date:        $Date: 2008-04-06 09:06:38 $
  */
 
-static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon.c,v 1.5 2006-09-19 09:29:39 andy_gotz Exp $";
+static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon.c,v 1.6 2008-04-06 09:06:38 jkrueger1 Exp $";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -62,10 +62,10 @@ static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/u
  * public methods
  */
 
-static long class_initialise(long *error);
-static long object_create(char *name, DevServer *ds_ptr, long *error);
-static long state_handler(Daemon ds, DevCommand cmd, long *error);
-static long object_initialise(DevServer ds,long *error);
+static long class_initialise(DevLong *error);
+static long object_create(char *name, DevServer *ds_ptr, DevLong *error);
+static long state_handler(Daemon ds, DevCommand cmd, DevLong *error);
+static long object_initialise(DevServer ds,DevLong *error);
 
 static DevMethodListEntry methods_list[] = {
  {DevMethodClassInitialise, (DevMethodFunction)class_initialise},
@@ -81,17 +81,15 @@ DaemonClassRec daemonClassRec = {
 
 DaemonClass daemonClass = (DaemonClass)&daemonClassRec;
 
-#if defined (TEST)
 db_resource class_tab [] = {
+#if defined (TEST)
    {"ud_test_path", D_STRING_TYPE},
    {"ud_test_name", D_STRING_TYPE},
-   };
 #else
-db_resource class_tab [] = {
    {"ud_poller_path", D_STRING_TYPE},
    {"ud_poller_name", D_STRING_TYPE},
-   };
 #endif
+   };
 
 db_resource pl_tab [] = {
    {"ud_poll_list",   D_VAR_STRINGARR},
@@ -131,24 +129,24 @@ static char* devres[] = {
  * public commands
  */
 
-static long dev_off (Daemon ds, void *argin, void *argout, long *error);  
-static long dev_on (Daemon ds, DevVoid *argin, DevVoid *argout, long *error);
-static long dev_state (Daemon ds, DevVoid *argin, DevShort *argout, long *error);
-static long dev_getdeviceident (Daemon ds, DevString *argin, DevLong *argout, long *error);
-static long dev_getdevicename (Daemon ds, DevLong *argin, DevString *argout, long *error);
-static long dev_initialisecmd (Daemon ds, struct DevDaemonStruct *argin, DevLong *argout, long *error);
-static long dev_initialisedev (Daemon ds, struct DevDaemonStruct *argin, DevLong *argout, DevBoolean db_update, long *error);
-static long dev_startpolling (Daemon ds, DevLong *argin, DevVoid *argout, long *error);
-static long dev_stoppolling (Daemon ds, DevLong *argin, DevVoid *argout, long *error);
-static long dev_changeinterval(Daemon ds, DevDaemonData *argin, DevVoid *argout, long *error);
-static long dev_definemode(Daemon ds, DevDaemonData *argin, DevVoid *argout, long *error);
-static long dev_pstatus(Daemon ds, DevLong *argin, DevDaemonStatus *argout, long *error);
-static long dev_dastatus(Daemon ds, DevLong *argin, DevDaemonStatus *argout, long *error);
-static long dev_longstatus (Daemon ds,DevVoid *argin, DevString *argout,long *error);
-static long dev_saveconfi(Daemon ds, DevVoid *argin, DevVoid *argout, long *error);
-static long dev_removedevice(Daemon ds, DevLong *argin, DevVoid *argout, long *error);
-static long dev_poll_list_uptodate(Daemon ds,char *argin,long *error);
-static long dev_status (Daemon ds, DevVoid *argin, DevString *argout, long *error);
+static long dev_off (Daemon ds, void *argin, void *argout, DevLong *error);  
+static long dev_on (Daemon ds, DevVoid *argin, DevVoid *argout, DevLong *error);
+static long dev_state (Daemon ds, DevVoid *argin, DevShort *argout, DevLong *error);
+static long dev_getdeviceident (Daemon ds, DevString *argin, DevLong *argout, DevLong *error);
+static long dev_getdevicename (Daemon ds, DevLong *argin, DevString *argout, DevLong *error);
+static long dev_initialisecmd (Daemon ds, struct DevDaemonStruct *argin, DevLong *argout, DevLong *error);
+static long dev_initialisedev (Daemon ds, struct DevDaemonStruct *argin, DevLong *argout, DevBoolean db_update, DevLong *error);
+static long dev_startpolling (Daemon ds, DevLong *argin, DevVoid *argout, DevLong *error);
+static long dev_stoppolling (Daemon ds, DevLong *argin, DevVoid *argout, DevLong *error);
+static long dev_changeinterval(Daemon ds, DevDaemonData *argin, DevVoid *argout, DevLong *error);
+static long dev_definemode(Daemon ds, DevDaemonData *argin, DevVoid *argout, DevLong *error);
+static long dev_pstatus(Daemon ds, DevLong *argin, DevDaemonStatus *argout, DevLong *error);
+static long dev_dastatus(Daemon ds, DevLong *argin, DevDaemonStatus *argout, DevLong *error);
+static long dev_longstatus (Daemon ds,DevVoid *argin, DevString *argout,DevLong *error);
+static long dev_saveconfi(Daemon ds, DevVoid *argin, DevVoid *argout, DevLong *error);
+static long dev_removedevice(Daemon ds, DevLong *argin, DevVoid *argout, DevLong *error);
+static long dev_poll_list_uptodate(Daemon ds,char *argin,DevLong *error);
+static long dev_status (Daemon ds, DevVoid *argin, DevString *argout, DevLong *error);
 
 void check_timestamp();
 
@@ -275,6 +273,9 @@ long initialise_ipc(pid_t pid)
 
   Make_Dataport_Name (dataport_name, sizeof(dataport_name) - 1, DAEMON_DATAPORT, pid);
 
+#if defined (EBUG)
+  fprintf(stderr, "dataport name : %s\n", dataport_name);
+#endif
   dp=OpenDataport (dataport_name,sizeof(dataport_struct_type));
   if (dp==NULL)
   {
@@ -478,7 +479,7 @@ printf ("  It will raise a SIGINT signal itself\n");fflush(stdout);
                DS_NOTOK - otherwise
 
 *************************************************************************/
-long get_response_dp(char *message,long *data,long *error)
+long get_response_dp(char *message,long *data,DevLong *error)
 {
    int finished=FALSE;
    register int i;
@@ -536,7 +537,7 @@ long get_response_dp(char *message,long *data,long *error)
      let_go_dp(); /* error obtained so release dp */
 
 #if defined(EBUG)
-  fprintf(stderr,"endf get_response_dp ()\n");
+  fprintf(stderr,"endf get_response_dp () : %s\n", dev_error_str(*error));
 #endif
 
      return(DS_NOTOK);
@@ -574,7 +575,7 @@ long get_response_dp(char *message,long *data,long *error)
  Function   :  get_response_dp(message,data,error)
 
 *************************************************************************/
-static long class_initialise(long *error)
+static long class_initialise(DevLong *error)
 {
    int iret = DS_OK;
    long status;
@@ -594,15 +595,17 @@ static long class_initialise(long *error)
    static char pid_string[10];
    char *path_res,*name_res;
    char *t_path;
+   long tmpError;
 
 
 /* setup signal handling, using API calls to ensure correct termination */
 
 /* OSD ? */
-   status = ds__signal (SIGINT, signal_handler, error);
-   status = ds__signal (SIGTERM, signal_handler, error);
-   status = ds__signal (SIGALRM, signal_handler, error);
-   status = ds__signal (SIGQUIT, signal_handler, error);
+   status = ds__signal (SIGINT, signal_handler, &tmpError);
+   status = ds__signal (SIGTERM, signal_handler, &tmpError);
+   status = ds__signal (SIGALRM, signal_handler, &tmpError);
+   status = ds__signal (SIGQUIT, signal_handler, &tmpError);
+   *error = (DevLong)tmpError;
 
 #if defined(TRACE)
    printf("class_initialise \n");
@@ -732,7 +735,7 @@ static long class_initialise(long *error)
 
 #if (OSK || _OSK)
  pol_name[0] = "ud_poller";
- sprintf (pid_string, "%ld", proc_pid);
+ snprintf (pid_string, sizeof(pid_string) - 1, "%ld", proc_pid);
  pol_name[1] = (char *) pid_string;
  pol_name[2] = NULL;
  fork_pid = os9exec (os9forkc, pol_name[0], pol_name, _environ, 0, 0, 3);
@@ -754,7 +757,7 @@ static long class_initialise(long *error)
    if (fork_pid == 0)   /* now the child process */
    {
     /* setup the poller argument, the daemon's process id */
-    sprintf (pid_string, "%ld", proc_pid);
+    snprintf (pid_string, sizeof(pid_string) - 1, "%ld", proc_pid);
 #if defined (FORKDEBUG)
     fprintf (stderr,"execl (%s,%s)\n",poller_path,pid_string);
 #endif
@@ -824,7 +827,7 @@ static long class_initialise(long *error)
                DS_NOTOK - otherwise
 
 *************************************************************************/
-static long object_create(char *name, DevServer *ds_ptr, long *error)
+static long object_create(char *name, DevServer *ds_ptr, DevLong *error)
 {
    int iret = DS_OK;
    Daemon dae;
@@ -883,7 +886,7 @@ static long object_create(char *name, DevServer *ds_ptr, long *error)
                DS_NOTOK - otherwise
 
 *************************************************************************/
-static long object_initialise(DevServer ds,long *error)
+static long object_initialise(DevServer ds,DevLong *error)
 {
    long status; 
    int i;
@@ -968,7 +971,7 @@ static long object_initialise(DevServer ds,long *error)
 
 *************************************************************************/
 
-static long state_handler(Daemon ds, DevCommand cmd, long *error)
+static long state_handler(Daemon ds, DevCommand cmd, DevLong *error)
 {
     
   long int p_state, n_state;
@@ -1030,7 +1033,7 @@ static long state_handler(Daemon ds, DevCommand cmd, long *error)
  Arg(s) Out:	void *argout - none
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
-static long dev_off (Daemon ds, void *argin, void *argout, long *error)
+static long dev_off (Daemon ds, void *argin, void *argout, DevLong *error)
 {
    long status;
    char mess[255];
@@ -1049,7 +1052,7 @@ static long dev_off (Daemon ds, void *argin, void *argout, long *error)
    {
 
 #if defined(EBUG)
- fprintf(stderr,"endf dev_off()\n");
+ fprintf(stderr,"endf dev_off() : %s\n", dev_error_str(*error));
 #endif
      return(DS_NOTOK);
    }
@@ -1073,7 +1076,7 @@ static long dev_off (Daemon ds, void *argin, void *argout, long *error)
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_on (Daemon ds, DevVoid *argin, DevVoid *argout, long *error)
+static long dev_on (Daemon ds, DevVoid *argin, DevVoid *argout, DevLong *error)
 {
    long status;
    char mess[255];
@@ -1092,7 +1095,7 @@ static long dev_on (Daemon ds, DevVoid *argin, DevVoid *argout, long *error)
    {
 
 #if defined(EBUG)
-     fprintf(stderr,"endf dev_on()\n");
+     fprintf(stderr,"endf dev_on() : %s\n", dev_error_str(*error));
 #endif
 
      return(DS_NOTOK);
@@ -1117,7 +1120,7 @@ static long dev_on (Daemon ds, DevVoid *argin, DevVoid *argout, long *error)
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_state (Daemon ds, DevVoid *argin, DevShort *argout, long *error)
+static long dev_state (Daemon ds, DevVoid *argin, DevShort *argout, DevLong *error)
 {
    long status;
    char mess[255];
@@ -1142,7 +1145,7 @@ static long dev_state (Daemon ds, DevVoid *argin, DevShort *argout, long *error)
    {
 
 #if defined(EBUG)
-     fprintf(stderr,"endf dev_state()\n");
+     fprintf(stderr,"endf dev_state() : %s\n", dev_error_str(*error));
 #endif
 
      return(DS_NOTOK);
@@ -1170,7 +1173,7 @@ static long dev_state (Daemon ds, DevVoid *argin, DevShort *argout, long *error)
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_status (Daemon ds, DevVoid *argin, DevString *argout, long *error)
+static long dev_status (Daemon ds, DevVoid *argin, DevString *argout, DevLong *error)
 {
   long status;
   char mess[255];
@@ -1181,7 +1184,7 @@ static long dev_status (Daemon ds, DevVoid *argin, DevString *argout, long *erro
  printf("Daemon, DevStatus(), entered\n");
 #endif /*PRINT*/
 
-   sprintf(str,"the device is :%s\n",DEVSTATES[ds->devserver.state]);
+   snprintf(str, sizeof(str) - 1, "the device is :%s\n",DEVSTATES[ds->devserver.state]);
    *argout = str;
 
 #ifdef PRINT
@@ -1205,7 +1208,7 @@ static long dev_status (Daemon ds, DevVoid *argin, DevString *argout, long *erro
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_getdeviceident (Daemon ds, DevString *argin, DevLong *argout, long *error)
+static long dev_getdeviceident (Daemon ds, DevString *argin, DevLong *argout, DevLong *error)
 {
    long status;
    char mess[255];
@@ -1236,7 +1239,7 @@ static long dev_getdeviceident (Daemon ds, DevString *argin, DevLong *argout, lo
    {
 
 #if defined(EBUG)
-     fprintf(stderr,"endf dev_getdeviceident()\n");
+     fprintf(stderr,"endf dev_getdeviceident() : %s\n", dev_error_str(*error));
 #endif
 
      return(DS_NOTOK);
@@ -1268,7 +1271,7 @@ static long dev_getdeviceident (Daemon ds, DevString *argin, DevLong *argout, lo
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_getdevicename (Daemon ds, DevLong *argin, DevString *argout, long *error)
+static long dev_getdevicename (Daemon ds, DevLong *argin, DevString *argout, DevLong *error)
 {
    long status;
    static char mess[255];
@@ -1290,7 +1293,7 @@ static long dev_getdevicename (Daemon ds, DevLong *argin, DevString *argout, lon
    {
 
 #if defined(EBUG)
-     fprintf(stderr,"endf dev_getdeviceident()\n");
+     fprintf(stderr,"endf dev_getdeviceident() : %s\n", dev_error_str(*error));
 #endif
      
      return(DS_NOTOK);
@@ -1321,7 +1324,7 @@ static long dev_getdevicename (Daemon ds, DevLong *argin, DevString *argout, lon
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_initialisecmd (Daemon ds, struct DevDaemonStruct *argin, DevLong *argout, long *error)
+static long dev_initialisecmd (Daemon ds, struct DevDaemonStruct *argin, DevLong *argout, DevLong *error)
 {
 
   long status; 
@@ -1383,7 +1386,7 @@ static long dev_initialisecmd (Daemon ds, struct DevDaemonStruct *argin, DevLong
     if (db_putresource((ds->devserver.name),pl_tab,pl_tab_size,error)!=0)
     {
 #ifdef PRINT
-     printf("db_putresource failed : %s %s \n",(ds->devserver.name),dev_error_str(error));
+     printf("db_putresource failed : %s %s \n",(ds->devserver.name),dev_error_str(*error));
      fflush(stdout);
 #endif
      *error = DbErr_BadResourceType;
@@ -1397,7 +1400,7 @@ static long dev_initialisecmd (Daemon ds, struct DevDaemonStruct *argin, DevLong
       if (status!=DS_OK)
       {
 #ifdef PRINT
-       printf("dev_poll_list_uptodate failed : %s %s \n",argin->dev_n,dev_error_str(error));
+       printf("dev_poll_list_uptodate failed : %s %s \n",argin->dev_n,dev_error_str(*error));
        fflush(stdout);
 #endif
        return(DS_NOTOK);
@@ -1405,7 +1408,7 @@ static long dev_initialisecmd (Daemon ds, struct DevDaemonStruct *argin, DevLong
        if (db_delresource(argin->dev_n,res4,2,error) != 0)
        {
 #ifdef PRINT
-        printf("db_delresource failed : %s %s \n",device_name,dev_error_str(error));
+        printf("db_delresource failed : %s %s \n",device_name,dev_error_str(*error));
         fflush(stdout);
 #endif
         *error = DbErr_ResourceNotDefined;
@@ -1438,7 +1441,7 @@ static long dev_initialisecmd (Daemon ds, struct DevDaemonStruct *argin, DevLong
 
 }
 
-static long dev_initialisedev (Daemon ds, struct DevDaemonStruct *argin, DevLong *argout, DevBoolean db_update, long *error)
+static long dev_initialisedev (Daemon ds, struct DevDaemonStruct *argin, DevLong *argout, DevBoolean db_update, DevLong *error)
 {
    long status;
    char mess[255];
@@ -1480,7 +1483,7 @@ static long dev_initialisedev (Daemon ds, struct DevDaemonStruct *argin, DevLong
   if (db_putresource((argin->dev_n),resource4,num_resource,error)!=0)
   {
 #ifdef PRINT
-   printf("db_putresource failed : %s %s \n",device_name,dev_error_str(error));
+   printf("db_putresource failed : %s %s \n",device_name,dev_error_str(*error));
    fflush(stdout);
 #endif
    *error = DbErr_BadResourceType;
@@ -1508,7 +1511,7 @@ static long dev_initialisedev (Daemon ds, struct DevDaemonStruct *argin, DevLong
    if (status!=DS_OK)
    {
 #if defined(EBUG)
-     fprintf(stderr,"endf dev_initialisedev()\n");
+     fprintf(stderr,"endf dev_initialisedev() : %s\n", dev_error_str(*error));
 #endif
      
      return(DS_NOTOK);
@@ -1527,7 +1530,6 @@ static long dev_initialisedev (Daemon ds, struct DevDaemonStruct *argin, DevLong
 
 }
 
-
 
 /************************************************************************
  Function:      static long dev_saveconfi()
@@ -1541,15 +1543,13 @@ static long dev_initialisedev (Daemon ds, struct DevDaemonStruct *argin, DevLong
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_saveconfi(Daemon ds, DevVoid *argin, DevVoid *argout, long *error)
+static long dev_saveconfi(Daemon ds, DevVoid *argin, DevVoid *argout, DevLong *error)
 {
    unsigned int i,j,l;
    long status;
    char n_svr[60],svr_n[60],path_f[80],allocstr[170],f_tmp[30];
    char *svr_name,*name_svr,*ns,*pathfile,*str,*tmp_f;
    FILE *fileptr;
-   DevVarStringArray cmd_list;
-   DevLong poll_int;
    long res3_size = sizeof(res3) / sizeof(db_resource);
    long resource1_size = sizeof(resource1) / sizeof(db_resource);
    long resource2_size = sizeof(resource2) / sizeof(db_resource);
@@ -1567,7 +1567,7 @@ static long dev_saveconfi(Daemon ds, DevVoid *argin, DevVoid *argout, long *erro
    name_svr = n_svr;
    ns = name_svr;
    svr_name = svr_n;
-   sprintf(svr_name,"%s",config_flags.server_name);
+   snprintf(svr_name, sizeof(svr_n) - 1, "%s",config_flags.server_name);
 
    i = 0;
    j = 0;
@@ -1588,7 +1588,7 @@ static long dev_saveconfi(Daemon ds, DevVoid *argin, DevVoid *argout, long *erro
 #if defined OSK 
   str[0]=0x30;
   str[1]=0x00;
-  sprintf(str,"del /h0/%s",name_svr);
+  snprintf(str, sizeof(allocstr) - 1, "del /h0/%s",name_svr);
   system(str);
 #endif
 
@@ -1599,11 +1599,11 @@ static long dev_saveconfi(Daemon ds, DevVoid *argin, DevVoid *argout, long *erro
    pid = getpid();
 
 #if defined unix
-   sprintf(tmp_f,"/tmp/f_tmpres_%d",pid);
+   snprintf(tmp_f, sizeof(f_tmp) - 1, "/tmp/f_tmpres_%d",pid);
 #endif
 
 #if defined OSK
-   sprintf(tmp_f,"/h0/f_tmpres_%d",pid);
+   snprintf(tmp_f, sizeof(tmp_f) - 1, "/h0/f_tmpres_%d",pid);
 #endif
    
    fileptr =(FILE *) fopen(tmp_f,"w+");
@@ -1646,15 +1646,16 @@ static long dev_saveconfi(Daemon ds, DevVoid *argin, DevVoid *argout, long *erro
    /***********************/
      
  
-   for (i = 0 ; i < (stringarray.length) ; i++)
+   for (i = 0 ; i < (stringarray.length) && strlen(stringarray.sequence[i]); i++)
    {
+     DevVarStringArray cmd_list = {0, NULL};
      resource1[0].resource_adr = &cmd_list;
 
      status = db_getresource(stringarray.sequence[i],resource1,resource1_size,error);
      if (status != DS_OK)
      {
 #ifdef PRINT
-   printf("db_getresource failed : %s %s \n",(stringarray.sequence[i],dev_error_str(error)));
+   printf("db_getresource failed : %s %s \n", stringarray.sequence[i], dev_error_str(*error));
    fflush(stdout);
 #endif
      *error = DbErr_ResourceNotDefined;
@@ -1673,7 +1674,7 @@ static long dev_saveconfi(Daemon ds, DevVoid *argin, DevVoid *argout, long *erro
 	   { fprintf(fileptr,"\n%s/ud_command_list:\t%s",(stringarray.sequence[i]),(cmd_list.sequence[j])); }
 	}
 	else
-           { fprintf(fileptr,"\n%s/ud_command_lit:\t%s \\",(stringarray.sequence[i]),(cmd_list.sequence[j])); } 
+           { fprintf(fileptr,"\n%s/ud_command_list:\t%s \\",(stringarray.sequence[i]),(cmd_list.sequence[j])); } 
       }
       else /* (j != 0) */ 
       {
@@ -1694,15 +1695,16 @@ static long dev_saveconfi(Daemon ds, DevVoid *argin, DevVoid *argout, long *erro
    /**  ud_poll_interval  **/
    /************************/
  
-   for (i = 0 ; i < (stringarray.length) ; i++)
+   for (i = 0 ; i < (stringarray.length) && strlen(stringarray.sequence[i]) ; i++)
    {
+     DevLong poll_int = 0;
      resource2[0].resource_adr = &poll_int;
 
      status = db_getresource(stringarray.sequence[i],resource2,resource2_size,error);;
      if (status != DS_OK)
      {
 #ifdef PRINT
-   printf("db_getresource failed : %s %s \n",(stringarray.sequence[i],dev_error_str(error)));
+   printf("db_getresource failed : %s %s \n",(stringarray.sequence[i],dev_error_str(*error)));
    fflush(stdout);
 #endif
      *error = DbErr_ResourceNotDefined;
@@ -1722,7 +1724,7 @@ static long dev_saveconfi(Daemon ds, DevVoid *argin, DevVoid *argout, long *erro
   if (status != DS_OK)
   {
 #ifdef PRINT
-   printf("db_getresource failed :  %s \n",dev_error_str(error));
+   printf("db_getresource failed :  %s \n",dev_error_str(*error));
    fflush(stdout);
 #endif
   *error = DbErr_ResourceNotDefined;
@@ -1737,11 +1739,11 @@ static long dev_saveconfi(Daemon ds, DevVoid *argin, DevVoid *argout, long *erro
   
  
 #if defined unix 
-  sprintf(str,"cp %s %s/%s",tmp_f,pathfile,name_svr);
+  snprintf(str, sizeof(allocstr) - 1, "cp %s %s/%s",tmp_f,pathfile,name_svr);
 #endif
 
 #if defined OSK
-  sprintf(str,"copy %s /h0/%s",tmp_f,name_svr);
+  sprintf(str, sizeof(allocstr) - 1, "copy %s /h0/%s",tmp_f,name_svr);
 #endif
 
   if ( system(str) != 0 )
@@ -1759,7 +1761,7 @@ static long dev_saveconfi(Daemon ds, DevVoid *argin, DevVoid *argout, long *erro
 #endif
 
 #if defined OSK
-  sprintf(str,"del %s ",tmp_f);
+  sprintf(str, sizeof(allocstr) - 1, "del %s ",tmp_f);
   system(str);
 #endif
 
@@ -1781,7 +1783,7 @@ static long dev_saveconfi(Daemon ds, DevVoid *argin, DevVoid *argout, long *erro
  Arg(s) Out:	DevVoid *argout - none 
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
-static long dev_removedevice(Daemon ds, DevLong *argin, DevVoid *argout, long *error)
+static long dev_removedevice(Daemon ds, DevLong *argin, DevVoid *argout, DevLong *error)
 {
  long status;
  char mess[255];
@@ -1811,7 +1813,7 @@ static long dev_removedevice(Daemon ds, DevLong *argin, DevVoid *argout, long *e
   if (status != DS_OK)
   {
 #ifdef PRINT
-     printf("dev_poll_list_uptodate failed : %s %s \n",mess,dev_error_str(error));
+     printf("dev_poll_list_uptodate failed : %s %s \n",mess,dev_error_str(*error));
      fflush(stdout);
 #endif
      return(DS_NOTOK);
@@ -1829,6 +1831,10 @@ static long dev_removedevice(Daemon ds, DevLong *argin, DevVoid *argout, long *e
   status=get_response_dp(mess,data,error);
   if (status != DS_OK)
   {
+#ifdef PRINT
+     printf("endf dev_removedevice : %s\n",dev_error_str(*error));
+     fflush(stdout);
+#endif
      return(DS_NOTOK);
   } 
   return(DS_OK);  
@@ -1843,7 +1849,7 @@ static long dev_removedevice(Daemon ds, DevLong *argin, DevVoid *argout, long *e
 }  
 
   
-static long dev_poll_list_uptodate(Daemon ds,char *argin,long *error)
+static long dev_poll_list_uptodate(Daemon ds,char *argin,DevLong *error)
 {
   unsigned int i,j,l,new_memory,num_resource;
   long status;
@@ -1877,7 +1883,7 @@ static long dev_poll_list_uptodate(Daemon ds,char *argin,long *error)
    if (status != DS_OK)
    {
 #ifdef PRINT
-     printf("db_getresource failed :  %s \n",dev_error_str(error));
+     printf("db_getresource failed :  %s \n",dev_error_str(*error));
      fflush(stdout);
 #endif
      *error = DbErr_ResourceNotDefined;
@@ -1938,7 +1944,7 @@ static long dev_poll_list_uptodate(Daemon ds,char *argin,long *error)
     if (db_putresource((ds->devserver.name),pl_tab,pl_tab_size,error)!=0)
     {
 #ifdef PRINT
-     printf("db_putresource failed : %s %s \n",(ds->devserver.name),dev_error_str(error));
+     printf("db_putresource failed : %s %s \n",(ds->devserver.name),dev_error_str(*error));
      fflush(stdout);
 #endif
      *error = DbErr_BadResourceType;
@@ -1962,7 +1968,7 @@ static long dev_poll_list_uptodate(Daemon ds,char *argin,long *error)
     if (db_delresource((ds->devserver.name),polres,num_resource,error) != 0)
     {
 #ifdef PRINT
-     printf("db_delresource failed : %s %s \n",device_name,dev_error_str(error));
+     printf("db_delresource failed : %s %s \n",device_name,dev_error_str(*error));
      fflush(stdout);
 #endif
      *error = DbErr_ResourceNotDefined;
@@ -1992,7 +1998,7 @@ static long dev_poll_list_uptodate(Daemon ds,char *argin,long *error)
  Arg(s) Out:	long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_startpolling (Daemon ds, DevLong *argin, DevVoid *argout, long *error)
+static long dev_startpolling (Daemon ds, DevLong *argin, DevVoid *argout, DevLong *error)
 {
    long status;
    char mess[255];
@@ -2047,7 +2053,7 @@ static long dev_startpolling (Daemon ds, DevLong *argin, DevVoid *argout, long *
  Arg(s) Out:	long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_stoppolling (Daemon ds, DevLong *argin, DevVoid *argout, long *error)
+static long dev_stoppolling (Daemon ds, DevLong *argin, DevVoid *argout, DevLong *error)
 {
    long status;
    char mess[255];
@@ -2094,7 +2100,7 @@ static long dev_stoppolling (Daemon ds, DevLong *argin, DevVoid *argout, long *e
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_pstatus(Daemon ds, DevLong *argin, DevDaemonStatus *argout, long *error)
+static long dev_pstatus(Daemon ds, DevLong *argin, DevDaemonStatus *argout, DevLong *error)
 {
    long status;
    static char mess[255];
@@ -2146,7 +2152,7 @@ static long dev_pstatus(Daemon ds, DevLong *argin, DevDaemonStatus *argout, long
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_longstatus (Daemon ds,DevVoid *argin, DevString *argout,long *error)
+static long dev_longstatus (Daemon ds,DevVoid *argin, DevString *argout,DevLong *error)
 {
    long status;
    static char mess[255];
@@ -2192,7 +2198,7 @@ static long dev_longstatus (Daemon ds,DevVoid *argin, DevString *argout,long *er
 		long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_dastatus(Daemon ds, DevLong *argin, DevDaemonStatus *argout, long *error)
+static long dev_dastatus(Daemon ds, DevLong *argin, DevDaemonStatus *argout, DevLong *error)
 {
    long status;
    static char mess[255];
@@ -2212,7 +2218,7 @@ static long dev_dastatus(Daemon ds, DevLong *argin, DevDaemonStatus *argout, lon
    {
 
 #if defined(EBUG)
-     fprintf(stderr,"endf dev_dastatus()\n");
+     fprintf(stderr,"endf dev_dastatus() : %s\n", dev_error_str(*error));
 #endif
 
      return(DS_NOTOK);
@@ -2240,7 +2246,7 @@ static long dev_dastatus(Daemon ds, DevLong *argin, DevDaemonStatus *argout, lon
  Arg(s) Out:	long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_changeinterval(Daemon ds, DevDaemonData *argin, DevVoid *argout, long *error)
+static long dev_changeinterval(Daemon ds, DevDaemonData *argin, DevVoid *argout, DevLong *error)
 {
    long status;
    static char mess[255];
@@ -2263,7 +2269,7 @@ static long dev_changeinterval(Daemon ds, DevDaemonData *argin, DevVoid *argout,
    if (status!=DS_OK)
    {
 #if defined(EBUG)
-     fprintf(stderr,"endf dev_changeinterval()\n");
+     fprintf(stderr,"endf dev_changeinterval() : %s\n", dev_error_str(*error));
 #endif
      return(DS_NOTOK);
    }
@@ -2290,8 +2296,8 @@ static long dev_changeinterval(Daemon ds, DevDaemonData *argin, DevVoid *argout,
      if (db_putresource(mess,&resource4,num_resource,error)!=0)
      {
 #ifdef PRINT
-   /*  printf("db_putresource failed : %s %s \n",devname,dev_error_str(error));
-     fflush(stdout); */
+     printf("db_putresource failed : %s %s \n",mess,dev_error_str(*error));
+     fflush(stdout);
 #endif
      }
    }
@@ -2323,7 +2329,7 @@ static long dev_changeinterval(Daemon ds, DevDaemonData *argin, DevVoid *argout,
  Arg(s) Out:	long *error - pointer to error code, in case routine fails
 *************************************************************************/
 
-static long dev_definemode(Daemon ds, DevDaemonData *argin, DevVoid *argout, long *error)
+static long dev_definemode(Daemon ds, DevDaemonData *argin, DevVoid *argout, DevLong *error)
 {
    long status;
    long data[5];
@@ -2344,7 +2350,7 @@ static long dev_definemode(Daemon ds, DevDaemonData *argin, DevVoid *argout, lon
    {
 
 #if defined(EBUG)
-     fprintf(stderr,"endf dev_definemode()\n");
+     fprintf(stderr,"endf dev_definemode() : %s\n", dev_error_str(*error));
 #endif
 
      return(DS_NOTOK);

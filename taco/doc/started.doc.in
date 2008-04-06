@@ -1,0 +1,69 @@
+/*! \page started Getting Started 
+
+\addindex started
+
+How to get started with TACO ?
+The best way is to download it and install it 
+first. Once it is compiled for your platform start the TACO manager and database 
+servers. Start a test device server and client to see if everything is working. 
+The final step is to write your own device server for your hardware and own 
+client for your application and start them. Voila you have a working TACO control 
+system! 
+
+Here is a step by step description of the above recipe :
+
+-# downloading - TACO can be downloaded from 
+   the 
+   <a href="http://sourceforge.net/project/showfiles.php?group_id=38710">TACO download site</a>.
+   \latexonly 
+   TACO download site (see {\tt http://sourceforge.net/project/showfiles.php?group\_id=38710})
+   \endlatexonly
+   The source files are taco-@VERSION@.tar.gz or taco-@VERSION@.tar.bz2. 
+-# unpacking - unpack the source code in a directory where you have sufficient 
+   free space for compiling using tar e.g.
+\verbatim
+tar -xzvf taco-@VERSION@.tar.gz
+\endverbatim
+   or
+\verbatim
+tar -zjvf taco-@VERSION@.tar.gz
+\endverbatim
+   and change to the directory 
+\verbatim
+cd taco-@VERSION@
+\endverbatim
+-# configuring - 
+run
+\verbatim
+./configure [configure_options]
+\endverbatim
+-# compiling - 
+run
+\verbatim
+make
+\endverbatim 
+-# testing - test TACO has correctly compiled 
+run
+\verbatim
+make check 
+\endverbatim 
+-# installing - install the TACO system
+run as root
+\verbatim
+make install
+\endverbatim
+-# start TACO - start TACO manager and database : 
+\verbatim
+taco.startup 
+\endverbatim
+-# install device - create a device entry in the TACO database 
+\verbatim
+db_update TEST/mydevice.res 
+\endverbatim
+-# start device server - position NETHOST and start your device server
+\verbatim
+export NETHOST=`hostname` 
+myds test&
+\endverbatim
+-# start your client - start your client and test your device server !
+

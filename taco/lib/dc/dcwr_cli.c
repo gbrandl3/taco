@@ -25,13 +25,13 @@
  * Description    :
  *
  * Author         : E. Taurel
- *                $Author: bourtemb $
+ *                $Author: jkrueger1 $
  *
  * Original       : August 1992
  *
- * Version      : $Revision: 1.13 $
+ * Version      : $Revision: 1.14 $
  *
- * Date         : $Date: 2007-08-21 07:48:31 $
+ * Date         : $Date: 2008-04-06 09:07:15 $
  *
  */
 
@@ -46,6 +46,8 @@
 #include "dc.h"
 #include "dcP.h"
 #include "dc_xdr.h"
+
+#include "taco_utils.h"
 
 #ifndef _OSK
 #	include <stdlib.h> 
@@ -91,12 +93,12 @@ extern dbserver_info db_info;
 
 /* Some functions declaration */
 
-static int test_server(serv *serv_info,int min,long *perr);
-static int re_test_server(serv *serv_info,int min,int nb_server,long *perr);
-static int rpc_reconnect(long *perr);
-static int rpc_connect(long *perr);
+static int test_server(serv *serv_info,int min, DevLong *perr);
+static int re_test_server(serv *serv_info,int min,int nb_server, DevLong *perr);
+static int rpc_reconnect(DevLong *perr);
+static int rpc_connect(DevLong *perr);
 static int comp(const void*, const void*);
-static int get_dc_host(char **p_serv_name,long *perr);
+static int get_dc_host(char **p_serv_name, DevLong *perr);
 
 long nb_wr_serv = 10;
 
@@ -151,7 +153,7 @@ dc_error *perr;
 	int i,j,k,l;
 	dc_open_in send;
 	register dc_dev_x *ptr;
-	long error;
+	DevLong error;
 	dc_xdr_error *recev;
 	long nb_psdev;
 	int *ps_dev_arr;
@@ -327,9 +329,7 @@ dc_error *perr;
 			free(send.dc_open_in_val);
 			return(-1);
 		}
-		strcpy(ptr->dev_name,tab[k].device_name);
-		for(j=0;j<l;j++)
-			ptr->dev_name[j] = tolower(ptr->dev_name[j]);
+		strcpy_tolower(ptr->dev_name,tab[k].device_name);
 	}
 
 /* Structure initialization (structure sended to server) */
@@ -420,7 +420,7 @@ dc_error *perr;
 	int i,j,k,l;
 	name_arr send;
 	dc_xdr_error *recev;
-	long error;
+	DevLong error;
 	int *ps_dev_arr;
 	long nb_psdev;
 	int elt,ind;
@@ -590,9 +590,7 @@ dc_error *perr;
 			free(send.name_arr_val);
 			return(-1);
 		}
-		strcpy(send.name_arr_val[k],dev_array[k]);
-		for(j=0;j<l;j++)
-			send.name_arr_val[k][j] = tolower(send.name_arr_val[k][j]);
+		strcpy_tolower(send.name_arr_val[k],dev_array[k]);
 	}
 
 /* Initialize the device number in the structure sent to the server */
@@ -676,7 +674,7 @@ dc_error *perr;
 	int i,j,k,l;
 	dev_datarr send;
 	register dev_dat *ptr;
-	long error;
+	DevLong error;
 	dc_xdr_error *recev;
 
 /* Try to verify the function parameters (non NULL pointer and two
@@ -757,9 +755,7 @@ dc_error *perr;
 			free(send.dev_datarr_val);
 			return(-1);
 		}
-		strcpy(ptr->xdev_name,dev_data[k].device_name);
-		for(j=0;j<l;j++)
-			ptr->xdev_name[j] = tolower(ptr->xdev_name[j]);
+		strcpy_tolower(ptr->xdev_name,dev_data[k].device_name);
 		ptr->xcmd_dat.xcmd_dat_len = dev_data[k].nb_cmd;
 		ptr->xcmd_dat.xcmd_dat_val = (cmd_dat *)dev_data[k].cmd_data;
 	}
@@ -855,12 +851,12 @@ static int comp(const void *vpa,const void *vpb)
 *                                                                           *
 *****************************************************************************/
 
-static int rpc_connect(long *perr)
+static int rpc_connect(DevLong *perr)
 {
 	char *serv_name;
 	struct hostent *host;
 	int i,res,nb_server;
-	long error;
+	DevLong error;
 	serv serv_info[10];
 	unsigned char tmp = 0;
 	static db_resource res_call[] = {
@@ -989,12 +985,12 @@ static int rpc_connect(long *perr)
 *****************************************************************************/
 
 
-static int test_server(serv *serv_info,int min,long *perr)
+static int test_server(serv *serv_info,int min,DevLong *perr)
 {
 	char serv1[40];
 	char *tmp_ptr;
 	db_devinf_imp *serv_net_ptr;
-	long error;
+	DevLong error;
 	CLIENT *cl_write;
 	char *ret_str;
 	char ret_array[40];
@@ -1097,7 +1093,7 @@ static int test_server(serv *serv_info,int min,long *perr)
 *                                                                           *
 *****************************************************************************/
 
-int get_dc_host(char **p_serv_name,long *perr)
+int get_dc_host(char **p_serv_name,DevLong *perr)
 {
 	static char hostna[32];
 	char dcdev_name[40];
@@ -1106,7 +1102,7 @@ int get_dc_host(char **p_serv_name,long *perr)
 	struct hostent *host;
 	db_devinf_imp *dc_net;
 	char *def_name;
-	long error;
+	DevLong error;
 	unsigned char ho = 0;
 	unsigned char net = 0;
 	static db_resource res_def[1];
@@ -1210,10 +1206,10 @@ int get_dc_host(char **p_serv_name,long *perr)
 *                                                                           *
 *****************************************************************************/
 
-static int rpc_reconnect(long *perr)
+static int rpc_reconnect(DevLong *perr)
 {
 	int i,res,nb_server;
-	long error;
+	DevLong error;
 	serv serv_info[10];
 	int			rand_nb;
 #ifdef OSK
@@ -1275,13 +1271,13 @@ static int rpc_reconnect(long *perr)
 *****************************************************************************/
 
 
-static int re_test_server(serv *serv_info,int min,int nb_server,long *perr)
+static int re_test_server(serv *serv_info,int min,int nb_server,DevLong *perr)
 {
 	char serv1[40];
 	char *tmp_ptr;
 	int old;
 	db_devinf_imp *serv_net_ptr;
-	long error;
+	DevLong error;
 	CLIENT *cl_write;
 	char *ret_str;
 	char ret_array[40];

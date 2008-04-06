@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2006-12-15 12:43:54 $
+ * Date:	$Date: 2008-04-06 09:07:43 $
  *
  */
 
@@ -60,7 +60,7 @@ db_res *SQLite3Server::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
     u_short 		prot;
     int 		k1 = 1;
 
-    logStream->debugStream() << "In db_getres_1_svc " << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "In db_getres_1_svc " << log4cpp::eol;
 //
 // Return error code if the server is not connected to the database 
 //
@@ -97,7 +97,7 @@ db_res *SQLite3Server::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
     num_res = rece->arr1_len;
 
     for(int i = 0; i < num_res; i++)
-	logStream->debugStream() << "Resource name : " << rece->arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Resource name : " << rece->arr1_val[i] << log4cpp::eol;
 
 //
 // Initialize browse_back structure error code 
@@ -109,7 +109,7 @@ db_res *SQLite3Server::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
     int i = 0;
     try
     {
-    	browse_back.res_val.arr1_val = new nam[num_res];
+    	browse_back.res_val.arr1_val = new DevString[num_res];
 	for (int j = 0; j < num_res; ++j)
 		browse_back.res_val.arr1_val[j] = NULL;
 //
@@ -169,7 +169,7 @@ db_res *SQLite3Server::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 //
 // Exit server 
 //
-    logStream->debugStream() << "Exit db_getres_1_svc " << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "Exit db_getres_1_svc " << log4cpp::eol;
     return(&browse_back);
 }
 
@@ -181,12 +181,12 @@ db_res *SQLite3Server::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
  *
  * @returns a pointer to a structure of the db_res type.
  */
-db_res *SQLite3Server::db_getdev_1_svc(nam *dev_name)
+db_res *SQLite3Server::db_getdev_1_svc(DevString *dev_name)
 {
     int 	dev_num,
 		err_db;
 
-    logStream->debugStream() << "Device server name (getdevlist) : " << *dev_name << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "Device server name (getdevlist) : " << *dev_name << log4cpp::eol;
 
 //
 // Initialize error code sended back to client 
@@ -213,7 +213,7 @@ db_res *SQLite3Server::db_getdev_1_svc(nam *dev_name)
     }
 
     for (int i = 0; i < dev_num; i++)
-	logStream->debugStream() << "Device name : " << browse_back.res_val.arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device name : " << browse_back.res_val.arr1_val[i] << log4cpp::eol;
 
 //
 // Exit server
@@ -245,7 +245,7 @@ int SQLite3Server::db_find(std::string tab_name, std::string p_res_name, char **
 			sec_res,
     			i;
 
-	logStream->debugStream() << "Table name : " << tab_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Table name : " << tab_name << log4cpp::eol;
 //
 // Set a flag if the resource belongs to security domain 
 //
@@ -279,9 +279,9 @@ int SQLite3Server::db_find(std::string tab_name, std::string p_res_name, char **
 	}
 	
 #ifdef NEVER
-	logStream->errorStream() << "Family name : " << family << log4cpp::CategoryStream::ENDLINE;
-	logStream->errorStream() << "Member name : " << member << log4cpp::CategoryStream::ENDLINE;
-	logStream->errorStream() << "Resource name : " << r_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "Family name : " << family << log4cpp::eol;
+	logStream->errorStream() << "Member name : " << member << log4cpp::eol;
+	logStream->errorStream() << "Resource name : " << r_name << log4cpp::eol;
 #endif
 //
 // Select the right resource table in the right database
@@ -300,11 +300,11 @@ int SQLite3Server::db_find(std::string tab_name, std::string p_res_name, char **
 	query += ("WHERE DEVICE = '" + tab_name + "/" + family + "/" + member + "' AND NAME = '" + r_name);
 	query += "' ORDER BY COUNT ASC";
 
-	logStream->debugStream() << "SQLite3Server::db_find(): query = " << query << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "SQLite3Server::db_find(): query = " << query << log4cpp::eol;
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		return (DbErr_DatabaseAccess);
     	}
 	*k1 = nrow;
@@ -353,7 +353,7 @@ int SQLite3Server::db_find(std::string tab_name, std::string p_res_name, char **
 	}
 	catch(const std::bad_alloc &e)
 	{
-		logStream->errorStream() << "Error in malloc for out" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Error in malloc for out" << log4cpp::eol;
 		throw e;
 	}
 //
@@ -397,8 +397,8 @@ int SQLite3Server::db_devlist(std::string dev_na, int *dev_num, db_res *back)
 	std::string ds_name = dev_na.substr(pos + 1);
 //
 
-	logStream->debugStream() << "Device server class (getdevlist) : " << ds_class << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "Device server name (getdevlist) : " << ds_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device server class (getdevlist) : " << ds_class << log4cpp::eol;
+	logStream->debugStream() << "Device server name (getdevlist) : " << ds_name << log4cpp::eol;
 
 //
 // Try to retrieve the right tuple in NAMES table 
@@ -407,16 +407,16 @@ int SQLite3Server::db_devlist(std::string dev_na, int *dev_num, db_res *back)
 	std::string query;
 	query = "SELECT NAME, CLASS FROM device WHERE SERVER = '" + ds_class + "/" + ds_name + "' ORDER BY CLASS";
 
-	logStream->debugStream() << "SQLite3Server::db_devlist(): query " << query << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "SQLite3Server::db_devlist(): query " << query << log4cpp::eol;
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		return (DbErr_DatabaseAccess);
 	}
 
 
-	logStream->debugStream() << "SQLite3Server::db_devlist(): " << nrow << " devices found " << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "SQLite3Server::db_devlist(): " << nrow << " devices found " << log4cpp::eol;
 
 	if (nrow == 0)
 		return DbErr_DeviceServerNotDefined;
@@ -427,7 +427,7 @@ int SQLite3Server::db_devlist(std::string dev_na, int *dev_num, db_res *back)
 	int j = ncol;
 	try
 	{
-		ptra = new nam[nrow];
+		ptra = new DevString[nrow];
 		for (i = 0; i < nrow; i++, j += ncol)
 		{
 //
@@ -478,7 +478,7 @@ DevLong *SQLite3Server::db_putres_1_svc(tab_putres *rece)
 	char 			indnr[16];
 
 	for (int i = 0; i < res_num; i++)
-		logStream->debugStream() << "Resource name : " << rece->tab_putres_val[i].res_name << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "Resource name : " << rece->tab_putres_val[i].res_name << log4cpp::eol;
 //
 // Initialize sent back error code 
 //
@@ -502,7 +502,7 @@ DevLong *SQLite3Server::db_putres_1_svc(tab_putres *rece)
 		res_name = tmp_ptr->res_name;
 
 		if (db_del(res_name) != 0)
-			logStream->errorStream() << "Could not delete resource" << res_name << log4cpp::CategoryStream::ENDLINE;
+			logStream->errorStream() << "Could not delete resource" << res_name << log4cpp::eol;
 		res_val = tmp_ptr->res_val;
 //
 // Try to retrieve this resource from the database 
@@ -510,7 +510,7 @@ DevLong *SQLite3Server::db_putres_1_svc(tab_putres *rece)
 // If the new update is for an array 
 //
 
-		logStream->debugStream() << "SQLite3Server::db_putres_1_svc() : Resource value : " << res_val << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "SQLite3Server::db_putres_1_svc() : Resource value : " << res_val << log4cpp::eol;
 
 		if (res_val[0] == INIT_ARRAY)
 		{
@@ -522,13 +522,13 @@ DevLong *SQLite3Server::db_putres_1_svc(tab_putres *rece)
 //
 			if ((pos = res_val.find(SEP_ELT)) == std::string::npos)
 			{
-				logStream->errorStream() << "Missing '" << SEP_ELT <<"' in resource value." << log4cpp::CategoryStream::ENDLINE;
+				logStream->errorStream() << "Missing '" << SEP_ELT <<"' in resource value." << log4cpp::eol;
 				errcode = DbErr_BadResSyntax;
 				return (&errcode);
 			}
 			int ctr = int(atoi(res_val.substr(1, pos - 1).c_str()) - 1);
 
-			logStream->debugStream() << "SQLite3Server::db_putres_1_svc() : array " << ctr << " members" << log4cpp::CategoryStream::ENDLINE;
+			logStream->debugStream() << "SQLite3Server::db_putres_1_svc() : array " << ctr << " members" << log4cpp::eol;
 
 			res_numb = 1;
 			res_val.erase(0, pos + 1);
@@ -545,7 +545,7 @@ DevLong *SQLite3Server::db_putres_1_svc(tab_putres *rece)
 				content = res_val.substr(0, pos);
 				res_val.erase(0, pos + 1);
 
-				logStream->debugStream() << "SQLite3Server::db_putres_1_svc() : " << l << ". member : " << content << log4cpp::CategoryStream::ENDLINE;
+				logStream->debugStream() << "SQLite3Server::db_putres_1_svc() : " << l << ". member : " << content << log4cpp::eol;
 
 				if (db_insert(res_name, indnr, content) != 0)
 				{
@@ -557,7 +557,7 @@ DevLong *SQLite3Server::db_putres_1_svc(tab_putres *rece)
 // For the last element value 
 			content = res_val;
 
-			logStream->debugStream() << "SQLite3Server::db_putres_1_svc() : last member : " << content << log4cpp::CategoryStream::ENDLINE;
+			logStream->debugStream() << "SQLite3Server::db_putres_1_svc() : last member : " << content << log4cpp::eol;
 
 			snprintf(indnr, sizeof(indnr), "%d",res_numb++);
 			if (db_insert(res_name, indnr, content) != 0)
@@ -599,7 +599,7 @@ DevLong *SQLite3Server::db_delres_1_svc(arr1 *rece/*, struct svc_req *rqstp*/)
     register char *ptrc;
 
     for(int i = 0; i < num_res; i++)
-	logStream->debugStream() << "Resource to delete : " << rece->arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Resource to delete : " << rece->arr1_val[i] << log4cpp::eol;
 
 //
 // Initialize error code 
@@ -632,7 +632,7 @@ DevLong *SQLite3Server::db_delres_1_svc(arr1 *rece/*, struct svc_req *rqstp*/)
 	if((errcode = db_del(rece->arr1_val[i])) != 0 )
 	{
 	    dbgen.connected = True;
-	    logStream->errorStream() << "Could not delete resource " << rece->arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+	    logStream->errorStream() << "Could not delete resource " << rece->arr1_val[i] << log4cpp::eol;
 	    return(&errcode);
     	}
     }
@@ -666,7 +666,7 @@ int SQLite3Server::db_insert(std::string res_name, std::string number, std::stri
 //
 	if ((pos = res_name.find('/')) == std::string::npos)
 	{
-		logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::eol;
 		return(DbErr_BadResourceType);
  	}
 	domain = res_name.substr(0, pos);
@@ -675,7 +675,7 @@ int SQLite3Server::db_insert(std::string res_name, std::string number, std::stri
 //
 	if ((pos = res_name.find('/', (last_pos = pos + 1))) == std::string::npos)
 	{
-		logStream->errorStream() << "db_insert : Error in resource name " << res_name << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "db_insert : Error in resource name " << res_name << log4cpp::eol;
 		return(DbErr_BadResourceType);
 	}
 	family = res_name.substr(last_pos, pos - last_pos);
@@ -684,7 +684,7 @@ int SQLite3Server::db_insert(std::string res_name, std::string number, std::stri
 //
 	if ((pos = res_name.find('/', (last_pos = pos + 1))) == std::string::npos)
 	{
-		logStream->errorStream() << "db_insert : Error in resource name " <<res_name << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "db_insert : Error in resource name " <<res_name << log4cpp::eol;
 		return(DbErr_BadResourceType);
 	}
 	member = res_name.substr(last_pos, pos - last_pos);
@@ -694,9 +694,9 @@ int SQLite3Server::db_insert(std::string res_name, std::string number, std::stri
 	r_name = res_name.substr(pos + 1);
 
 #ifdef NEVER
-	logStream->errorStream() << "Family name : " << family << log4cpp::CategoryStream::ENDLINE;
-	logStream->errorStream() << "Number name : " << member << log4cpp::CategoryStream::ENDLINE;
-	logStream->errorStream() << "Resource name : " << r_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "Family name : " << family << log4cpp::eol;
+	logStream->errorStream() << "Number name : " << member << log4cpp::eol;
+	logStream->errorStream() << "Resource name : " << r_name << log4cpp::eol;
 #endif
 //
 // Select the right resource table in database
@@ -713,11 +713,11 @@ int SQLite3Server::db_insert(std::string res_name, std::string number, std::stri
 	query += (domain + "','" + family +"','" + member + "','");
 	query += (number + "','" + content + "', DATETIME('now'), DATETIME('now'))");
 
-	logStream->debugStream() << "SQLite3Server::db_insert(): query = " << query << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "SQLite3Server::db_insert(): query = " << query << log4cpp::eol;
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		return (DbErr_DatabaseAccess);
 	}
 	sqlite3_free_table(result);
@@ -746,7 +746,7 @@ int SQLite3Server::db_del(std::string res_name)
 //
     if ((pos = res_name.find('/')) == std::string::npos)
     {
-	logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::eol;
 	return(DbErr_BadResourceType);
     }
     t_name = res_name.substr(0, pos);
@@ -755,7 +755,7 @@ int SQLite3Server::db_del(std::string res_name)
 //
     if ((pos = res_name.find('/', 1 + (last_pos = pos))) == std::string::npos)
     {
-	logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::eol;
 	return(DbErr_BadResourceType);
     }
     family = res_name.substr(last_pos + 1, pos - last_pos - 1);
@@ -764,7 +764,7 @@ int SQLite3Server::db_del(std::string res_name)
 //
     if ((pos = res_name.find('/', 1 + (last_pos = pos))) == std::string::npos)
     {
-	logStream->errorStream() << "db_del : Error in resource name " <<res_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "db_del : Error in resource name " <<res_name << log4cpp::eol;
 	return(DbErr_BadResourceType);
     }
     member = res_name.substr(last_pos + 1, pos - last_pos - 1);
@@ -775,9 +775,9 @@ int SQLite3Server::db_del(std::string res_name)
     r_name = res_name.substr(last_pos + 1);
 
 #ifdef NEVER
-    logStream->errorStream() << "Family name : " << family << log4cpp::CategoryStream::ENDLINE;
-    logStream->errorStream() << "Number name : " << member << log4cpp::CategoryStream::ENDLINE;
-    logStream->errorStream() << "Resource name : " << r_name << log4cpp::CategoryStream::ENDLINE;
+    logStream->errorStream() << "Family name : " << family << log4cpp::eol;
+    logStream->errorStream() << "Number name : " << member << log4cpp::eol;
+    logStream->errorStream() << "Resource name : " << r_name << log4cpp::eol;
 #endif
 //
 // Select the right resource table in database
@@ -795,11 +795,11 @@ int SQLite3Server::db_del(std::string res_name)
 	query = "DELETE FROM property_device WHERE DEVICE = '" + t_name + "/" + family + "/" + member + "'";
 	query += " AND NAME = '" + r_name + "'";
 
-	logStream->debugStream() << "db_del : query = " << query << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "db_del : query = " << query << log4cpp::eol;
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		return (DbErr_DatabaseAccess);
 	}
 	return(0);

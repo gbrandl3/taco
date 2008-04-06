@@ -32,9 +32,25 @@
  *
  * Original:    4.12.1997
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2006-09-18 22:41:57 $
+ * Date:        $Date: 2008-04-06 09:06:38 $
+ */
+
+/**
+ * @defgroup signalAPI Signal API
+ *
+ * A second way to extract the signal names and properties of a device was developed.
+ * This is read directly from the resource database without a connection to the device.
+ * This interface is used in applications like fsigmon, devsel, hdb_config, and the 
+ * hdb_filler which can read data only from the data collector without having access
+ * to a device server running on VME crate.
+ *
+ * To use this functionality your client must be linked with the shared library: libdssig.
+ * The functions were not integrated into the TACO API library, because it uses 
+ * internally the signal and multi signal class. This would cross reference the
+ * API library with the class library. Linking problems and Makefile changes would be
+ * the result. Available functions are:
  */
 
 #ifdef HAVE_CONFIG_H
@@ -49,6 +65,8 @@
 #include <DevServerP.h>
 #include <DSSignalP.h>
 #include <MDSSignal.h>
+
+extern void get_sig_prop_suffix (DevVarStringArray *suf_list);
 
 static DevVarStringArray signal_names={0,NULL};
 static DevVarStringArray prop_suff={0,NULL};
@@ -71,7 +89,7 @@ static	char    class_res_name[128];
 /**********************************/
 /* Definition of strdup() for OS9 */
 /**********************************/
-char *strdup(char *s) {
+static char *strdup(char *s) {
   char *f;
   f=(char *)malloc(strlen(s)+1);
   strcpy(f,s);
@@ -84,7 +102,7 @@ char *strdup(char *s) {
 
  Descritpion: Free data allocated by the module
  ============================================================================*/
-void FreeData()
+static void FreeData()
 {
   int i;
 
@@ -143,7 +161,7 @@ void FreeData()
 
  Descritpion: Extract the 3 fields of a device name
  ============================================================================*/
-void  Extract(char *dev_name , 
+static void  Extract(char *dev_name , 
               char *nethost,char *domain,char *family,char *member )
 {
   char *start,*end;
@@ -181,7 +199,7 @@ void  Extract(char *dev_name ,
 
  Descritpion: Search the resource res into the input resource array
  ============================================================================*/
-char *Parse(char **res,long res_nb,char *res_name ) {
+static char *Parse(char **res,long res_nb,char *res_name ) {
 
 static char ret[512];
 
@@ -230,7 +248,7 @@ static char ret[512];
 
  Descritpion: Reformat data returned by db_getresoval()
  ============================================================================*/
-void ReFormat(char *dev_name,char **arr,long res_nb )
+static void ReFormat(char *dev_name,char **arr,long res_nb )
 {
   int i,len;
   char *f;
@@ -255,7 +273,7 @@ void ReFormat(char *dev_name,char **arr,long res_nb )
 
 static double init_time;
 
-void InitT() {
+static void InitT() {
   double t;
   struct timeval tp;
   struct timezone tz;
@@ -265,7 +283,7 @@ void InitT() {
   init_time=tp.tv_sec+tp.tv_usec/1e6;
 }
 
-void NowT() {
+static void NowT() {
   double t;
   struct timeval tp;
   struct timezone tz;
@@ -281,21 +299,19 @@ void NowT() {
 #endif
 
 
-/*============================================================================
- Function:     	long dev_get_sig_list()
-
- Description:   Return the signal list for a device
-
- Arg(s) In:     char *device_name	  - Name of the device
-
- Arg(s) Out:    DevVarStringArray *argout - Array containing the 
-					    signal list for the
-					    device.
-                 long           *error    - pointer to error code, in case
-                                            routine fails.
- ============================================================================*/
+/**
+ * @ingroup signalAPI
+ * Return the signal list for a device
+ * 
+ * @param device_name Name of the device
+ *
+ * @param argout Array containing the signal list for the device.
+ * @param error pointer to error code, in case routine fails.
+ *
+ * @returns DS_OK if case of success, DS_NOTOK otherwise
+ */
 long dev_get_sig_list (char *device_name, DevVarStringArray *argout, 
-		       long *error)
+		       DevLong *error)
 {
         db_resource res_siglist[] = {
    	  {"signal_names",	D_VAR_STRINGARR, NULL},
@@ -402,23 +418,21 @@ long dev_get_sig_list (char *device_name, DevVarStringArray *argout,
   	return (DS_OK);
 }
 
-/*============================================================================
- Function:     	long dev_get_sig_config()
-
- Description:   Extract the signal configuration for a device from
-		the resource database. The result is the same as 
-		calling the command DevGetSigConfig on the device.
-
- Arg(s) In:      char *device_name	  - Name of the device
-
- Arg(s) Out:    DevVarStringArray *argout - Array containing the configuration
-					    of all signals known for this 
-					    device.
-                 long           *error    - pointer to error code, in case
-                                            routine fails.
- ============================================================================*/
+/**
+ * @ingroup signalAPI
+ * Extract the signal configuration for a device from the resource database. 
+ * The result is the same as calling the command DevGetSigConfig on the device.
+ *
+ * @param device_name Name of the device
+ * 
+ * @param argout Array containing the configuration of all signals known for this 
+ *		device.
+ * @param error pointer to error code, in case routine fails.
+ *
+ * @returns DS_OK if case of success, DS_NOTOK otherwise
+ */
 long dev_get_sig_config (char *device_name, DevVarStringArray *argout, 
-			 long *error)
+			 DevLong *error)
 {
 	char             tmp[128];
 	char 		 *res;
@@ -746,21 +760,20 @@ long dev_get_sig_config (char *device_name, DevVarStringArray *argout,
 	}
 }
 
-/*============================================================================
- Function:     	long dev_get_sig_config_from_name()
-
- Description:   Return the propertie array for one signal
-
- Arg(s) In:     char *dev_name	  	  - dev_name
- 		char *signal_name	  - signal name
-
- Arg(s) Out:    DevVarStringArray *argout - Array containing the configuration
-					    of the given signal
-                long           *error    - pointer to error code, in case
-                                            routine fails.
- ============================================================================*/
+/**
+ * @ingroup signalAPI
+ * Return the property array for one signal
+ *
+ * @param device_name device name
+ * @param signal_name signal name
+ *
+ * @param argout Array containing the configuration of the given signal
+ * @param error pointer to error code, in case routine fails.
+ *
+ * @returns DS_OK if case of success, DS_NOTOK otherwise
+ */
 long dev_get_sig_config_from_name (char *device_name, char *signal_name , 
-		                   DevVarStringArray *argout, long *error)
+		                   DevVarStringArray *argout, DevLong *error)
 {
   int found=0;
   int i;

@@ -29,9 +29,9 @@
  * 
  * Original:	July 1992
  * 
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  * 
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  * 
  *******************************************************************-*/
 
@@ -76,11 +76,11 @@ xdr_length_PSSInterlockStatus(objp)
 {
         long  length = 0;
 
-        length = length + xdr_length_DevLong ((long *)&objp->Module);
-        length = length + xdr_length_DevLong ((long *)&objp->GuardA);
-        length = length + xdr_length_DevLong ((long *)&objp->GuardB);
-        length = length + xdr_length_DevLong ((long *)&objp->GuardC);
-	length = length + xdr_length_DevShort((short *)&objp->Interlocks);
+        length += xdr_length_DevLong (&objp->Module);
+        length += xdr_length_DevLong (&objp->GuardA);
+        length += xdr_length_DevLong (&objp->GuardB);
+        length += xdr_length_DevLong (&objp->GuardC);
+	length += xdr_length_DevShort(&objp->Interlocks);
 
         return (length);
 
@@ -114,14 +114,13 @@ xdr_length_DevDaresburyStatus(objp)
          *  four bytes for the number of array elements
          */
 
-        length = length + xdr_length_DevLong ((long *)&objp->length);
+        length += xdr_length_DevLong (&objp->length);
 
         /*
          *  now calculate the length of the array
          */
 
-        length = length + (objp->length *
-                 xdr_length_PSSInterlockStatus(&objp->sequence[0]) );
+        length += (objp->length * xdr_length_PSSInterlockStatus(&objp->sequence[0]) );
 
         return (length);
 }

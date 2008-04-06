@@ -31,12 +31,16 @@
  * 		Synopsis : db_fillup <0/1>
  *
  * Author(s):
- *              $Author: andy_gotz $
+ *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.13 $
+ * Version:     $Revision: 1.14 $
  *
- * Date:        $Date: 2005-11-16 11:16:14 $
+ * Date:        $Date: 2008-04-06 09:07:47 $
  */
+
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
 #include <cstdio>
 #include <string>
@@ -44,7 +48,7 @@
 #include <vector>
 #include <algorithm>
 #ifdef _solaris
-#include "_count.h"
+#	include "_count.h"
 #endif /* _solaris */
 #include <functional>
 #include <iostream>
@@ -65,7 +69,6 @@
 #include <sys/shm.h>
 
 #include <fcntl.h>
-#include "config.h"
 #include <gdbm.h>
 
 // Function definitions 
@@ -97,8 +100,15 @@ void usage(const char *cmd)
 	std::cerr << " fills the database from different sources" << std::endl;
 	std::cerr << "     data source : 0 from resource files" << std::endl;
 	std::cerr << "                   1 from previously backuped database" << std::endl;
-	std::cerr << "     options : -h display this message" << std::endl;
+	std::cerr << "     options :    -h display this message" << std::endl;
+	std::cerr << "                  -v display the current version" << std::endl;
 	exit(-1);
+}
+
+void version(const char *cmd)
+{
+	std::cerr << cmd << " version " << VERSION << std::endl;
+	exit(0);
 }
 
 int main(int argc,char **argv)
@@ -110,9 +120,11 @@ int main(int argc,char **argv)
         int             c;
 
 // Argument test and domain name modification
-        while((c = getopt(argc, argv, "h")) != -1)
+        while((c = getopt(argc, argv, "hv")) != -1)
                 switch(c)
                 {
+			case 'v':
+				version(argv[0]);
                         case 'h':
                         case '?':
                                 usage(argv[0]);

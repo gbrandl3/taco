@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2006-12-15 12:43:54 $
+ * Date:	$Date: 2008-04-06 09:07:43 $
  *
  */
 
@@ -45,7 +45,7 @@ db_res *SQLite3Server::resdomainlist_1_svc()
 {
     std::vector<std::string> 	dom_list;
 	
-    logStream->debugStream() << "In resdomainlist_1_svc function" << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "In resdomainlist_1_svc function" << log4cpp::eol;
 
 //
 // Initialize structure sent back to client
@@ -90,7 +90,7 @@ db_res *SQLite3Server::resdomainlist_1_svc()
 #if 0
     if (dom_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
     {
-	logStream->errorStream() << "Memory allocation error in resdomainlist" << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "Memory allocation error in resdomainlist" << log4cpp::eol;
 	browse_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&browse_back);
     }
@@ -109,11 +109,11 @@ db_res *SQLite3Server::resdomainlist_1_svc()
  * 
  * @return The family name list
  */
-db_res *SQLite3Server::resfamilylist_1_svc(nam* domain)
+db_res *SQLite3Server::resfamilylist_1_svc(DevString* domain)
 {
     std::vector<std::string> 	fam_list;
 	
-    logStream->debugStream() << "In resfamilylist_1_svc function for domain " << *domain << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "In resfamilylist_1_svc function for domain " << *domain << log4cpp::eol;
 
     std::string user_domain(*domain);
 //
@@ -127,7 +127,7 @@ db_res *SQLite3Server::resfamilylist_1_svc(nam* domain)
 //
     if (dbgen.connected == False)
     {
-	logStream->errorStream() << "I'm not connected to the database" << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -139,7 +139,7 @@ db_res *SQLite3Server::resfamilylist_1_svc(nam* domain)
     query += (user_domain + "' ORDER BY FAMILY ASC");
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		browse_back.db_err = DbErr_DatabaseAccess;
 		return (&browse_back);
 	}
@@ -166,7 +166,7 @@ db_res *SQLite3Server::resfamilylist_1_svc(nam* domain)
 #if 0
     if (fam_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
     {
-	logStream->errorStream() << "Memory allocation error in resfamilylist" << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "Memory allocation error in resfamilylist" << log4cpp::eol;
 	browse_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&browse_back);
     }
@@ -191,7 +191,7 @@ db_res *SQLite3Server::resmemberlist_1_svc(db_res *recev)
     std::string 		user_domain(recev->res_val.arr1_val[0]),
   	   			user_family(recev->res_val.arr1_val[1]);
 	
-    logStream->debugStream() << "In resmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "In resmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << log4cpp::eol;
 	
 //
 // Initialize structure sent back to client
@@ -204,7 +204,7 @@ db_res *SQLite3Server::resmemberlist_1_svc(db_res *recev)
 //
     if (dbgen.connected == False)
     {
-	logStream->errorStream() << "I'm not connected to the database" << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -215,23 +215,23 @@ db_res *SQLite3Server::resmemberlist_1_svc(db_res *recev)
 	query = "SELECT DISTINCT MEMBER FROM property_device WHERE DOMAIN = '";
 	query += (user_domain + "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC");
 
-	logStream->debugStream() << "SQLite3Server::resmemberlist_1_svc() : " << query << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "SQLite3Server::resmemberlist_1_svc() : " << query << log4cpp::eol;
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		browse_back.db_err = DbErr_DatabaseAccess;
 		return (&browse_back);
 	}
 
-	logStream->debugStream() << "SQLite3Server::resmemberlist_1_svc() : " << nrow << " rows found" << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "SQLite3Server::resmemberlist_1_svc() : " << nrow << " rows found" << log4cpp::eol;
 
 
 	int j = ncol; 
 	memb_list.clear();
 	for (int i = 0; i < nrow; ++i, j += ncol)
 	{
-		logStream->debugStream() << "SQLite3Server::resmemberlist_1_svc() : " << result[j] << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "SQLite3Server::resmemberlist_1_svc() : " << result[j] << log4cpp::eol;
 
 		memb_list.push_back(result[j]);
 	}
@@ -255,13 +255,13 @@ db_res *SQLite3Server::resmemberlist_1_svc(db_res *recev)
 #if 0
     if (memb_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
     {
-		logStream->errorStream() << "Memory allocation error in resmemberlist" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Memory allocation error in resmemberlist" << log4cpp::eol;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
     }
 #endif
 
-	logStream->debugStream() << "SQLite3Server::resmemberlist_1_svc() : finish" << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "SQLite3Server::resmemberlist_1_svc() : finish" << log4cpp::eol;
 
 //
 // Return data
@@ -286,7 +286,7 @@ db_res *SQLite3Server::resresolist_1_svc(db_res *recev)
 	
 
     logStream->debugStream() << "In resresolist_1_svc function for " << user_domain \
-	<< "/" << user_family << "/" << user_member << log4cpp::CategoryStream::ENDLINE;
+	<< "/" << user_family << "/" << user_member << log4cpp::eol;
 
 //
 // Initialize structure sent back to client
@@ -299,7 +299,7 @@ db_res *SQLite3Server::resresolist_1_svc(db_res *recev)
 //
     if (dbgen.connected == False)
     {
-	logStream->errorStream() << "I'm not connected to the database" << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -323,7 +323,7 @@ db_res *SQLite3Server::resresolist_1_svc(db_res *recev)
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		browse_back.db_err = DbErr_DatabaseAccess;
 		return (&browse_back);
 	}
@@ -351,7 +351,7 @@ db_res *SQLite3Server::resresolist_1_svc(db_res *recev)
 #if 0
     if (reso_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
     {
-	logStream->errorStream() << "Memory allocation error in resresolist" << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "Memory allocation error in resresolist" << log4cpp::eol;
 	browse_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&browse_back);
     }
@@ -380,7 +380,7 @@ db_res *SQLite3Server::resresoval_1_svc(db_res *recev)
     			user_reso(recev->res_val.arr1_val[3]);
 		
     logStream->debugStream() << "In resresoval_1_svc function for " << user_domain \
-	<< "/" << user_family << "/" << user_member << "/" << user_reso << log4cpp::CategoryStream::ENDLINE;
+	<< "/" << user_family << "/" << user_member << "/" << user_reso << log4cpp::eol;
 	
 //
 // Initialize structure sent back to client
@@ -393,7 +393,7 @@ db_res *SQLite3Server::resresoval_1_svc(db_res *recev)
 //
     if (dbgen.connected == False)
     {
-	logStream->errorStream() << "I'm not connected to the database" << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -411,7 +411,7 @@ db_res *SQLite3Server::resresoval_1_svc(db_res *recev)
     query += (" ORDER BY MEMBER ASC, NAME ASC, COUNT ASC");
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		browse_back.db_err = DbErr_DatabaseAccess;
 		return (&browse_back);
 	}
@@ -462,7 +462,7 @@ db_res *SQLite3Server::resresoval_1_svc(db_res *recev)
 #if 0
     if (reso_val.copy_to_C(browse_back.res_val.arr1_val) != 0)
     {
-	logStream->errorStream() << "Memory allocation error in resresoval" << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "Memory allocation error in resresoval" << log4cpp::eol;
 	browse_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&browse_back);
     }

@@ -31,9 +31,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:21 $
  *
  *******************************************************************-*/
 
@@ -51,8 +51,8 @@ long   _DLLFunc xdr_length_DevBpmElec PT_((DevBpmElec objp));
 
 
 struct DevBpmMeasHead {
-	unsigned short 	mn;
-	unsigned short 	gms;
+	DevUShort 	mn;
+	DevUShort 	gms;
         struct {
 		u_int 	    length;
 		DevBpmElec *sequence;
@@ -63,9 +63,9 @@ bool_t _DLLFunc xdr_DevBpmMeasHead PT_((XDR *xdrs, DevBpmMeasHead *objp));
 long   _DLLFunc xdr_length_DevBpmMeasHead PT_((DevBpmMeasHead *objp));
 
 struct DevBpmPos { 
-	unsigned short 	mms;
-	float 		xcoord;
-	float 		zcoord;
+	DevUShort 	mms;
+	DevFloat	xcoord;
+	DevFloat	zcoord;
 };
 typedef struct DevBpmPos DevBpmPos;
 bool_t _DLLFunc xdr_DevBpmPos PT_((XDR *xdrs, DevBpmPos *objp));
@@ -97,17 +97,17 @@ bool_t _DLLFunc xdr_DevBpmElecMeasure
 long   _DLLFunc xdr_length_DevBpmElecMeasure PT_((DevBpmElecMeasure *objp));
 
 struct DevBpmMeasParm { 
-	long expbeamint;
-	long timewind;
-	long delaytim[6];
+	DevLong expbeamint;
+	DevLong timewind;
+	DevLong delaytim[6];
 };
 typedef struct DevBpmMeasParm DevBpmMeasParm;
 bool_t _DLLFunc xdr_DevBpmMeasParm PT_((XDR *xdrs, DevBpmMeasParm *objp));
 long   _DLLFunc xdr_length_DevBpmMeasParm PT_((DevBpmMeasParm *objp));
 
 struct DevBpmInjectHead	{ 
-	unsigned short min;
-	unsigned long  gis;
+	DevUShort min;
+	DevULong gis;
 	DevBpmMeasParm bpm_measpar;
 };
 typedef struct DevBpmInjectHead DevBpmInjectHead;

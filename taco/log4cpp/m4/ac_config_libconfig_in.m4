@@ -66,7 +66,7 @@ dnl
 dnl Based upon AC_CREATE_GENERIC_CONFIG (ac_create_generic_config.m4)
 dnl by Guido Draheim <guidod@gmx.de> and gtk-config by Owen Taylor.
 dnl
-dnl @version $Id: ac_config_libconfig_in.m4,v 1.1 2006-11-12 16:37:27 jkrueger1 Exp $
+dnl @version $Id: ac_config_libconfig_in.m4,v 1.2 2008-04-06 09:07:28 jkrueger1 Exp $
 dnl @author Roger Leigh <roger@whinlatter.uklinux.net>
 dnl
 # AC_CONFIG_LIBCONFIG_IN(LIBRARY, DESTINATION, MODULES)

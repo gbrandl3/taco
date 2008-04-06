@@ -19,15 +19,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * File:
- *
+ *		mysql_clo_op.cpp
  * Description:
  *
  * Authors:
- *		$Author: jlpons $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2006-12-12 17:23:08 $
+ * Date:	$Date: 2008-04-06 09:07:41 $
  *
  */
 
@@ -44,15 +44,14 @@
 DevLong *MySQLServer::db_clodb_1_svc(void)
 {
     errcode = 0;
-#ifdef DEBUG
-    std::cout << "db_clodb()" << std::endl;
-#endif 
+
+    logStream->debugStream() << "db_clodb()" << log4cpp::eol;
 //
 // Return error code if the server is not connected to the database files 
 //
     if (!dbgen.connected)
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -75,16 +74,15 @@ DevLong *MySQLServer::db_clodb_1_svc(void)
  */
 DevLong *MySQLServer::db_reopendb_1_svc(void)
 {
-#ifdef DEBUG
-    std::cout << "db_reopendb" << std::endl;
-#endif
     errcode = 0;
+
+    logStream->debugStream() << "db_reopendb" << log4cpp::eol;
 //
 // Open database tables according to the definition
 //
     if ((mysql_conn = mysql_real_connect(&mysql, "localhost", mysql_user.c_str(), mysql_passwd.c_str(), mysql_db.c_str(), 0, NULL, 0)) == NULL)
     {
-        std::cout << mysql_error(&mysql) << std::endl;
+        logStream->errorStream() << mysql_error(&mysql) << log4cpp::eol;
 	errcode = DbErr_DatabaseAccess;
         return (&errcode);
     }

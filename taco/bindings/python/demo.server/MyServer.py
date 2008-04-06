@@ -18,27 +18,27 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
-# File:         ResDatabase.py
+# File:         MyServer.py
 #
 # Project:      Automatic Beamline Alignment
 #
-# Description:  Generic interface class to the TACO database.
+# Description:  Test class for TACO servers in Python
 #
 # Author(s):    J.Meyer
 #               $Author: jkrueger1 $
 #
 # Original:     Mai 2001
 #
-# Version:      $Revision: 1.3 $
+# Version:      $Revision: 1.4 $
 #
-# Date:         $Date: 2005-07-25 13:43:42 $
+# Date:         $Date: 2008-04-06 09:06:31 $
 #
 
 """ TACO demo server class in python """
 
 __author__ = "$Author: jkrueger1 $"
-__date__ = "$Date: 2005-07-25 13:43:42 $"
-__revision__ = "$Revision: 1.3 $"
+__date__ = "$Date: 2008-04-06 09:06:31 $"
+__revision__ = "$Revision: 1.4 $"
 
 import TacoServer
 from DEVCMDS import *

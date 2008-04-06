@@ -30,9 +30,9 @@
  *
  * Original:	March 1993
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:21 $
  *
  *******************************************************************-*/
 
@@ -44,9 +44,9 @@
  */
 
 struct DevPattern {
-	short  channel;
-	short  gain;
-	short  end;
+	DevShort  channel;
+	DevShort  gain;
+	DevShort  end;
 };
 typedef struct DevPattern 	DevPattern;
 bool_t 	_DLLFunc xdr_DevPattern PT_((XDR *xdrs, DevPattern *objp));
@@ -72,13 +72,13 @@ bool_t 	_DLLFunc xdr_DevVarPatternArray
  */
 
 struct DevIcv101Mode {
-       long external_stop;
-       long external_start;
-       long continuous;
-       long main_frequency;
-       long sub_frequency;
-       long npfs2;
-       long npost;
+       DevLong external_stop;
+       DevLong external_start;
+       DevLong continuous;
+       DevLong main_frequency;
+       DevLong sub_frequency;
+       DevLong npfs2;
+       DevLong npost;
 };
 typedef struct DevIcv101Mode 	DevIcv101Mode;
 bool_t 	_DLLFunc xdr_DevIcv101Mode PT_((XDR *xdrs, DevIcv101Mode *objp));

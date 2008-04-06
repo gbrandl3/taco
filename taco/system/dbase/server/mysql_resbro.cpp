@@ -19,15 +19,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * File:
- *
+ *		mysql_resbro.cpp
  * Description:
  *
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2007-01-15 16:52:59 $
+ * Date:	$Date: 2008-04-06 09:07:41 $
  *
  */
 
@@ -45,9 +45,7 @@ db_res *MySQLServer::resdomainlist_1_svc()
 {
     std::vector<std::string> 	dom_list;
 	
-#ifdef DEBUG
-    std::cout << "In resdomainlist_1_svc function" << std::endl;
-#endif
+    logStream->debugStream() << "In resdomainlist_1_svc function" << log4cpp::eol;
 
 //
 // Initialize structure sent back to client
@@ -58,8 +56,9 @@ db_res *MySQLServer::resdomainlist_1_svc()
 //
 // If the server is not connected to the database, return error
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -89,14 +88,6 @@ db_res *MySQLServer::resdomainlist_1_svc()
         dom_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
         (browse_back.res_val.arr1_val[i])[k] = '\0';
     }
-#if 0
-    if (dom_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
-    {
-	std::cout << "Memory allocation error in resdomainlist" << std::endl;
-	browse_back.db_err = DbErr_ServerMemoryAllocation;
-	return(&browse_back);
-    }
-#endif
 //
 // Return data
 //
@@ -111,13 +102,11 @@ db_res *MySQLServer::resdomainlist_1_svc()
  * 
  * @return The family name list
  */
-db_res *MySQLServer::resfamilylist_1_svc(nam* domain)
+db_res *MySQLServer::resfamilylist_1_svc(DevString *domain)
 {
     std::vector<std::string> 	fam_list;
 	
-#ifdef DEBUG
-    std::cout << "In resfamilylist_1_svc function for domain " << *domain << std::endl;
-#endif
+    logStream->debugStream() << "In resfamilylist_1_svc function for domain " << *domain << log4cpp::eol;
 
     std::string user_domain(*domain);
 //
@@ -129,9 +118,9 @@ db_res *MySQLServer::resfamilylist_1_svc(nam* domain)
 //
 // If the server is not connected to the database, throw exception
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to the database" << std::endl;
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -143,7 +132,7 @@ db_res *MySQLServer::resfamilylist_1_svc(nam* domain)
     query += (user_domain + "' ORDER BY FAMILY ASC");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return (&browse_back);
     }
@@ -169,14 +158,6 @@ db_res *MySQLServer::resfamilylist_1_svc(nam* domain)
         fam_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
         (browse_back.res_val.arr1_val[i])[k] = '\0';
     }                                                                                                     
-#if 0
-    if (fam_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
-    {
-	std::cout << "Memory allocation error in resfamilylist" << std::endl;
-	browse_back.db_err = DbErr_ServerMemoryAllocation;
-	return(&browse_back);
-    }
-#endif
 //
 // Return data
 //
@@ -197,9 +178,7 @@ db_res *MySQLServer::resmemberlist_1_svc(db_res *recev)
     std::string 		user_domain(recev->res_val.arr1_val[0]),
   	   			user_family(recev->res_val.arr1_val[1]);
 	
-#ifdef DEBUG
-    std::cout << "In resmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << std::endl;
-#endif
+    logStream->debugStream() << "In resmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << log4cpp::eol;
 	
 //
 // Initialize structure sent back to client
@@ -210,9 +189,9 @@ db_res *MySQLServer::resmemberlist_1_svc(db_res *recev)
 //
 // If the server is not connected to the database, return error
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to the database" << std::endl;
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -224,7 +203,7 @@ db_res *MySQLServer::resmemberlist_1_svc(db_res *recev)
     query += (user_domain + "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return (&browse_back);
     }
@@ -250,14 +229,6 @@ db_res *MySQLServer::resmemberlist_1_svc(db_res *recev)
         memb_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
         (browse_back.res_val.arr1_val[i])[k] = '\0';
     }                                                                                                     
-#if 0
-    if (memb_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
-    {
-		std::cout << "Memory allocation error in resmemberlist" << std::endl;
-		browse_back.db_err = DbErr_ServerMemoryAllocation;
-		return(&browse_back);
-    }
-#endif
 //
 // Return data
 //
@@ -279,10 +250,8 @@ db_res *MySQLServer::resresolist_1_svc(db_res *recev)
     			user_family(recev->res_val.arr1_val[1]),
     			user_member(recev->res_val.arr1_val[2]);
 	
-#ifdef DEBUG
-    std::cout << "In resresolist_1_svc function for " << user_domain \
-	<< "/" << user_family << "/" << user_member << std::endl;
-#endif
+    logStream->debugStream() << "In resresolist_1_svc function for " << user_domain \
+	<< "/" << user_family << "/" << user_member << log4cpp::eol;
 //
 // Initialize structure sent back to client
 //
@@ -292,9 +261,9 @@ db_res *MySQLServer::resresolist_1_svc(db_res *recev)
 //
 // If the server is not connected to the database, return error
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to the database" << std::endl;
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -318,7 +287,7 @@ db_res *MySQLServer::resresolist_1_svc(db_res *recev)
 
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return (&browse_back);
     }
@@ -344,34 +313,12 @@ db_res *MySQLServer::resresolist_1_svc(db_res *recev)
         reso_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
         (browse_back.res_val.arr1_val[i])[k] = '\0';
     }
-#if 0
-    if (reso_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
-    {
-	std::cout << "Memory allocation error in resresolist" << std::endl;
-	browse_back.db_err = DbErr_ServerMemoryAllocation;
-	return(&browse_back);
-    }
-#endif
 //
 // Return data
 //
     return(&browse_back);	
 }
 
-
-
-// Add quote to resource value containing separator
-void quote(std::string &value) {
-
-  std::string::size_type pos;
-  
-  if (((pos = value.find(',')) != std::string::npos) ||
-      ((pos = value.find(' ')) != std::string::npos))
-  {
-    value = "\"" + value + "\"";
-  }
-  
-}
 
 /**
  * To retrieve a device resource value (as strings)
@@ -390,10 +337,8 @@ db_res *MySQLServer::resresoval_1_svc(db_res *recev)
     			user_member(recev->res_val.arr1_val[2]),
     			user_reso(recev->res_val.arr1_val[3]);
 		
-#ifdef DEBUG
-    std::cout << "In resresoval_1_svc function for " << user_domain \
-	<< "/" << user_family << "/" << user_member << "/" << user_reso << std::endl;
-#endif
+    logStream->debugStream() << "In resresoval_1_svc function for " << user_domain \
+	<< "/" << user_family << "/" << user_member << "/" << user_reso << log4cpp::eol;
 	
 //
 // Initialize structure sent back to client
@@ -404,9 +349,9 @@ db_res *MySQLServer::resresoval_1_svc(db_res *recev)
 //
 // If the server is not connected to the database, throw exception
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to the database" << std::endl;
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -424,7 +369,7 @@ db_res *MySQLServer::resresoval_1_svc(db_res *recev)
     query += (" ORDER BY MEMBER ASC, NAME ASC, COUNT ASC");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return (&browse_back);
     }
@@ -447,7 +392,7 @@ db_res *MySQLServer::resresoval_1_svc(db_res *recev)
 // Build the first field of the complete resource name
 //
 	std::string r_value(row[3]);
-	quote(r_value);
+	db_quote(r_value);
 	
 	if (atoi(row[2]) == 1)
 	{
@@ -476,14 +421,6 @@ db_res *MySQLServer::resresoval_1_svc(db_res *recev)
         reso_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
         (browse_back.res_val.arr1_val[i])[k] = '\0';
     }
-#if 0
-    if (reso_val.copy_to_C(browse_back.res_val.arr1_val) != 0)
-    {
-	std::cout << "Memory allocation error in resresoval" << std::endl;
-	browse_back.db_err = DbErr_ServerMemoryAllocation;
-	return(&browse_back);
-    }
-#endif
 //
 // Return data
 //

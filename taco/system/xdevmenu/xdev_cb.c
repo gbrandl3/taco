@@ -29,7 +29,7 @@
  *
  * Original      :  February 1997
  *
- * Date:	    $Date: 2006-09-18 21:43:56 $
+ * Date:	    $Date: 2008-04-06 09:08:04 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -53,6 +53,8 @@
 #include <Xm/ScrolledW.h>
 #include <Xm/PanedW.h>
 #include <Xm/MessageB.h>
+#include <Xm/List.h>
+#include <Xm/ToggleB.h>
 
 
 /*
@@ -101,7 +103,13 @@ extern Widget  gui_widget_array[];
 Widget		BxFindTopShell PROTOTYPE((Widget));
 WidgetList	BxWidgetIdsFromNames PROTOTYPE((Widget, char*, char*));
 
+void gui_display_dev_info(char  *, char  *, char  *, char  *, char  *);
 
+extern long dev_free_sig_struct(long , DevVarFloatArray *, DevVarDoubleArray *);
+extern long dev_read_sig_values(int , DevVarStringArray *, DevVarFloatArray *,
+                                       DevVarDoubleArray *, char **, char  **);
+extern void gui_display_sigs(DevVarStringArray , long , DevVarFloatArray ,
+                             DevVarDoubleArray , char  *);
 
 
 /*** for forward reference ***/
@@ -400,7 +408,7 @@ void ccb_help_version_text( Widget w, XtPointer client_data, XtPointer call_data
    size_t    nb_chars;
    int       cur_posit;
 
-   strcpy(revision_text , "$Revision: 1.2 $");
+   strcpy(revision_text , "$Revision: 1.3 $");
 
    rev_nb_pointer = strstr(revision_text, ":");
    rev_nb_pointer++;

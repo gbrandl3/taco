@@ -30,9 +30,9 @@
  *
  * Original     : 
  *
- * Version      : $Revision: 1.2 $
+ * Version      : $Revision: 1.3 $
  *
- * Date         : $Date: 2006-09-18 21:59:06 $
+ * Date         : $Date: 2008-04-06 09:07:39 $
  *
  */
 
@@ -44,6 +44,7 @@
 #	include <sys/stat.h>
 #endif
 #include <Xm/Text.h>
+#include <Xm/TextF.h>
 
 
 /* Some local functions */

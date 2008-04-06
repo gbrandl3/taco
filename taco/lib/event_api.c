@@ -35,8 +35,8 @@
  *		a device server has an event it wants to distribute
  *		to registered clients it has to dispatch it (by calling
  *		dev_event_fire()). If a client is not interested
- *		in an event anymore (or wants to exit) it must
- *		unregister itself (by calling dev_event_unlisten()).
+ *		in an event anymore (or wants to exit) it must unregister 
+ *		itself (by calling dev_event_unlisten()).
  *
  *		Although it is possible to support different types of events 
  *		in the first implementation only user events are supported. 
@@ -51,9 +51,9 @@
  *
  * Original   :	April 1999
  *
- * Version    :	$Revision: 1.17 $
+ * Version    :	$Revision: 1.18 $
  *
- * Date       :	$Date: 2007-09-07 13:57:26 $
+ * Date       :	$Date: 2008-04-06 09:06:59 $
  *
  ********************************************************************-*/
 
@@ -180,7 +180,7 @@ bool_t _DLLFunc xdr__asynch_client_data PT_((XDR *xdrs, _asynch_client_data *obj
 long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 	DevArgument argout, DevType argout_type, 
 	DevCallbackFunction *callback, void *user_data,
-	long *event_id_ptr, long *error)
+	long *event_id_ptr, DevLong *error)
 {
 	_server_data		server_data;
 	DevVarArgument		vararg[10];
@@ -414,7 +414,7 @@ void _DLLFunc dev_event_fire (Device *device, long event,
 	struct _devserver 	client;
 	DevVarArgument 		vararg[10];
 	long 			iarg;
-	long 			error;
+	DevLong			error;
 	static struct timeval 	timenow;
 #ifndef WIN32
 	static struct timezone 	tz;
@@ -581,7 +581,7 @@ void _DLLFunc dev_event_fire (Device *device, long event,
  * @return	DS_OK or DS_NOTOK
  */ 
 long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
-                                  long event_id, long *error)
+                                  long event_id, DevLong *error)
 {
 	_server_data		server_data;
 	DevVarArgument		vararg[10];
@@ -747,7 +747,7 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
  * @param error	Will contain an appropriate error code if the 
  *		corresponding call returns a non-zero value.
  */
-void _DLLFunc event_client_cleanup (long *error)
+void _DLLFunc event_client_cleanup (DevLong *error)
 {
 	long	i, 
 		i_client;
@@ -794,8 +794,8 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
 	long				i, 
 					i_client;
 	struct _devserver 		client;
-	long				status, 
-					error;
+	long				status; 
+	DevLong				error;
 	static long			first=1;
 
 /*
@@ -902,7 +902,7 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
 /**@ingroup eventAPIsvc
  * rpc function used on the server side to unregister a client. 
  * It is removed from the global list of registered clients and 
- * will be not be sent events anymore by the dev_event_fire() call.
+ * will not be sent events anymore by the dev_event_fire() call.
  *
  * @param server_data client data
  *
@@ -972,7 +972,7 @@ static db_resource   res_tab [] = {
 	{(char *)"Out_Type", D_STRING_TYPE, NULL},
 };
 
-static long get_event_string PT_( (devserver ds, long event, char *event_str, size_t len, long *error) );
+static long get_event_string PT_( (devserver ds, long event, char *event_str, size_t len, DevLong *error) );
 
 /**@ingroup eventAPI
  * Return a sequence of structures containing all
@@ -997,7 +997,7 @@ static long get_event_string PT_( (devserver ds, long event, char *event_str, si
  *
  * Return(s)  :	DS_OK or DS_NOTOK
  */
-long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long *error)
+long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, DevLong *error)
 {
 	_dev_query_in		dev_query_in;
 	_dev_queryevent_out	dev_query_out;
@@ -1216,7 +1216,7 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, long
  *
  * @return DS_OK or DS_NOTOK or DS_WARNING
  */
-static long get_event_string (devserver ds, long event, char *event_str, size_t len, long *error)
+static long get_event_string (devserver ds, long event, char *event_str, size_t len, DevLong *error)
 {
 	char		res_path[LONG_NAME_SIZE],
 			res_name[SHORT_NAME_SIZE],

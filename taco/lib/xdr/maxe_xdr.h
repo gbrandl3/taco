@@ -30,9 +30,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:22 $
  *
  *******************************************************************-*/
 
@@ -46,9 +46,9 @@
 
 #if !defined(FORTRAN)
 struct DevMulMove {
- 	long action[8];
-  	long delay[8];
-   	float position[8];
+ 	DevLong  action[8];
+  	DevLong  delay[8];
+   	DevFloat position[8];
 };
 typedef struct DevMulMove 	DevMulMove;
 bool_t 	_DLLFunc xdr_DevMulMove PT_((XDR *xdrs, DevMulMove *objp));
@@ -61,8 +61,8 @@ bool_t 	_DLLFunc xdr_DevMulMove PT_((XDR *xdrs, DevMulMove *objp));
 						NULL, \
 						A )
 struct DevMotorLong {
-       long axisnum;
-       long value;
+       DevLong axisnum;
+       DevLong value;
      };
 typedef struct DevMotorLong 	DevMotorLong;
 bool_t 	_DLLFunc xdr_DevMotorLong PT_((XDR *xdrs, DevMotorLong *objp));
@@ -75,8 +75,8 @@ bool_t 	_DLLFunc xdr_DevMotorLong PT_((XDR *xdrs, DevMotorLong *objp));
 						NULL, \
 						A )
 struct DevMotorFloat {
-       long axisnum;
-       float value;
+       DevLong  axisnum;
+       DevFloat value;
      };
 typedef struct DevMotorFloat 	DevMotorFloat;
 bool_t 	_DLLFunc xdr_DevMotorFloat PT_((XDR *xdrs, DevMotorFloat *objp));

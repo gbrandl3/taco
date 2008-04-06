@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.4 $
+ * Version      : $Revision: 1.5 $
  *
- * Date         : $Date: 2006-09-18 21:50:16 $
+ * Date         : $Date: 2008-04-06 09:07:51 $
  *
  */
 
@@ -89,7 +89,7 @@ int main(int argc, char **argv)
 	unsigned int tmp0,tmp1,tmp2,tmp3;
 	int i,j,l;
 	char *addr;
-	long error;
+	DevLong error;
 	char hostna[32];
 	char dev_name[40];
 	int ptr_size,alloc_size;

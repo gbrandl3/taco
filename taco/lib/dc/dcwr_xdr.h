@@ -23,13 +23,13 @@
  * Description: XDR structures definition for teh write part of dc server
  *
  * Author(s):   Emmanuel Taurel
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
  * Original:      1992
  *
- * Version:       $Revision: 1.3 $
+ * Version:       $Revision: 1.4 $
  *
- * Date:          $Date: 2006-01-22 21:22:08 $
+ * Date:          $Date: 2008-04-06 09:07:15 $
  *
 *******************************************************************************/
 
@@ -38,7 +38,7 @@
 
 struct cmd_dat {
 	int xcmd;
-	long xcmd_error;
+	DevLong xcmd_error;
 	int xcmd_time;
 	struct {
 		u_int xsequence_len;

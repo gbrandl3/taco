@@ -46,30 +46,26 @@
 #include <PowerSupplyP.h>
 
 typedef struct _AGPowerSupplyClassPart {
-                                         int nada;
-                                        }
-                AGPowerSupplyClassPart;
+	int nada;
+} AGPowerSupplyClassPart;
 
 typedef struct _AGPowerSupplyPart {
-                                    int nada;
-                                   }
-                AGPowerSupplyPart;
+	int nada;
+} AGPowerSupplyPart;
 
 typedef struct _AGPowerSupplyClassRec {
-                                         DevServerClassPart devserver_class;
-                                         PowerSupplyClassPart powersupply_class;
-                                         AGPowerSupplyClassPart agpowersupply_class;
-                                       }
-                AGPowerSupplyClassRec;
+	DevServerClassPart 	devserver_class;
+	PowerSupplyClassPart 	powersupply_class;
+	AGPowerSupplyClassPart agpowersupply_class;
+} AGPowerSupplyClassRec;
     
 extern AGPowerSupplyClassRec aGPowerSupplyClassRec;
 
 typedef struct _AGPowerSupplyRec {
-                                    DevServerPart devserver;
-                                    PowerSupplyPart powersupply;
-                                    AGPowerSupplyPart agpowersupply;
-                                  }
-                AGPowerSupplyRec;
+	DevServerPart devserver;
+	PowerSupplyPart powersupply;
+	AGPowerSupplyPart agpowersupply;
+} AGPowerSupplyRec;
 
 /*
  * private constants to be used in the AGPowerSupplyClass

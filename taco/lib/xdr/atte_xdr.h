@@ -29,9 +29,9 @@
  *
  * Original:    November 1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:20 $
  *
  *******************************************************************-*/
 
@@ -39,9 +39,9 @@
 #define ATTE_XDR_H
 
 struct DevAtte {
-		 short number;
-		 short filter;
-			};
+		 DevShort number;
+		 DevShort filter;
+	};
 typedef struct DevAtte 		DevAtte;
 bool_t 				_DLLFunc xdr_DevAtte PT_((XDR *xdrs, DevAtte *objp));
 long                            _DLLFunc xdr_length_DevAtte PT_((DevAtte *objp));

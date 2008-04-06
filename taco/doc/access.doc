@@ -1,0 +1,508 @@
+/*! \page accesscontrol Access Control and Security 
+
+In TACO an object can be a physical piece of hardware, an ensemble of hardware, 
+a logical device or a combination of all these [1]. Objects (devices) are created, 
+exported and stored in a process called a device server. Every device is exported 
+with a unique three field name consisting of DOMAIN/FAMILY/MEMBER and understands 
+a set of commands which are specific for a class of objects in the device server. 
+Every exported object can be accessed via the Remote Procedure Call (RPC) interface 
+of the device server. 
+
+A device server client uses the Application Programmers Interface (API) to access 
+devices. The API is based on the file paradigm which consists of opening the file, 
+reading/writing to the file and then closing the file. In the device server API 
+paradigm these actions are importing, accessing and freeing the device connection [1].
+
+\section the_problem  The Problem 
+
+One problem of TACO was the open access to devices from all over the network and 
+by all users on the network. Access restrictions were only possible by system 
+administration means, like restricted network access.  It was not possible to 
+protect sensitive actions on devices because, once a device was imported, all 
+commands could be executed. Also no possibility was given to block a device in 
+a kind of single user mode to do some action which required exclusive access for 
+a user (e.g. tuning or calibration of hardware). 
+
+To solve the above mentioned problems, a database supported security system was 
+needed. Sufficient control over users and groups of users, which are allowed to 
+access devices in the control system, had to be given. In order not to be 
+dependent on machines where the control system is running, access control for 
+networks and hosts had to be added. A list of hierarchical rights was established 
+to specify access modes to devices. Combining a minimal access right with a command 
+of a device, allows a protection for critical actions. A single user mode was 
+added to give clients the possibility to be sure, that a sequence of commands 
+on a device is not interrupted by other clients. 
+
+The solution described has been modelled on the Amoeba distributed operating 
+system [3] capability lists and the UNIX access control lists. Development effort
+has gone into making the system as flexible as possible, with reconfigurable 
+access rights at runtime and fast access verification for received RPC calls in 
+a device server.
+
+\section the_model The Model 
+
+\subsection users_groups_network Users, Groups and Networks 
+
+To guarantee sufficient access control the following points have to be verified 
+with the reference data in the security database:
+- If a user is explicitly specified in the database, the user name and the user
+ID must be correct. This avoids problems with badly configured user ID`s.
+- If no user data is available, the actual group name and group ID must be correct.
+- If the user or his group are verified, the IP-address of the host, where the
+client was started, has to be compared with the specified network access for the 
+user or his group.
+- If neither user data nor group data is available, only the specified minimal
+default access to the control system can be given. Also for no network access 
+specifications, a minimal default access can be granted.
+
+Figure 1 shows an example of possible access security database specifications.
+<table>
+ <tr>
+  <th>Entry</th>
+  <th>Name</th>
+  <th>ID</th>
+  <th>Network access</th>
+ </tr>
+ <tr>
+  <td>user</td> 	
+  <td>meyer</td>
+  <td>215</td>
+  <td> </td>
+ </tr>
+ <tr>
+  <td>user</td>
+  <td>taurel</td>
+  <td>261</td>
+  <td>160.103.10<br>160.103.5.68 </td>
+ </tr>
+ <tr>				
+  <td>user</td>
+  <td>operator 
+  <td>226</td>
+  <td>160.103.10<br>160.103.11<br>160.103.12</td>
+ </tr>
+ <tr>
+  <td>group</td>
+  <td>comp</td>
+  <td>101</td>
+  <td>160.103</td>
+ </tr> 
+ <tr>
+  <td>group</td>
+  <td>machine</td>
+  <td>102</td>
+  <td>160.103.10<br>160.103.11<br>160.103.12</td>
+ </tr>
+ <tr>
+  <td>default</td>
+  <td></td>
+  <td></td>
+  <td>160.103.10</td>
+ </tr>
+</table>
+Figure 18.1: The control system access table 
+
+\subsection access_rights Access Rights 
+
+Access rights on devices are requested by clients, when opening the connection 
+(importing) to a device. All predefined rights are hierarchical. A requested 
+access is limited by the highest possible right for a user or a group in the 
+security database. Possible rights are:
+- NO_ACCESS : No access to the device at all. 
+- READ_ACCESS : Commands which only read values from the device require
+the minimum access right READ_ACCESS.
+- WRITE_ACCESS : All commands which read and write values require the minimum 
+access right WRITE_ACCESS.
+- SI_WRITE_ACCESS : If this access right is requested, the device will be set
+into single user mode and all commands which require WRITE_ACCESS can be executed. 
+At the same time other clients can execute read commands.
+- SU_ACCESS : All commands which are classified as critical actions require super 
+user (SU_ACCESS) right to be executed. All read and write commands can also be 
+executed.
+- SI_SU_ACCESS : If this access right is requested, the device will be set into
+single user mode and all commands which require SU_ACCESS can be executed. At 
+the same time other clients can execute read commands.
+- ADMIN_ACCESS : The ADMIN_ACCESS is the highest access right. It will set the 
+device into the single user mode and will cancel another single user session 
+with lower access right. Even read commands from other clients are blocked.
+
+To change the access right to a device, the device connection must be freed and 
+afterwards reestablished with the new right.
+
+\subsection domain_family_member Domain, Family or Member 
+
+Access rights on devices for users or groups have to be specified in the security 
+database. To avoid entries for every device, the TACO device naming scheme 
+DOMAIN/FAMILY/MEMBER is used to enter wide range access specifications for users 
+or groups. Device access right entries in the security database are possible for
+- DOMAIN = a whole area of the ESRF, 
+- DOMAIN/FAMILY = a class of devices inside a domain, 
+- DOMAIN/FAMILY/MEMBER = a single device. 
+
+Figure 2 shows an example of possible device access specifications for the device, 
+its family or its domain.
+<table>
+ <tr>
+  <th>Entry</td>
+  <th>Domain/Family/Member</td>	
+  <th>Name</td>
+  <th>Access</td>
+ </tr>
+ <tr>
+  <td>user</td>
+  <td>SR/V-RV/C1-3</td>
+  <td>meyer</td>
+  <td>SU_ACCESS</td> 
+ </tr>
+ <tr>
+  <td>user</td>
+  <td>SR/V-RV</td>
+  <td>meyer<br>taurel</td>
+  <td>SI_WRITE_ACCESS<br>WRITE_ACCESS </td>
+ </tr>
+ <tr>
+  <td>user</td>
+  <td>SR</td>
+  <td>operator<br>meyer</td>
+  <td>WRITE_ACCESS<br>WRITE_ACCESS</td>
+				
+ </tr>
+ <tr>
+  <td>group</td>
+  <td>SR/V-RV/C1-3</td>
+  <td>dserver</td>
+  <td>ADMIN_ACCESS </td>
+ </tr>
+ <tr>
+  <td>group</td>
+  <td>SR/V-RV</td>
+  <td>vacuum</td>
+  <td>SI_SU_ACCESS</td>
+ </tr>
+ <tr>
+  <td>group</td>
+  <td>SR</td>
+  <td>dserver<br>operator
+  <td>WRITE_ACCESS<br>WRITE_ACCESS</td>
+ </tr>
+ <tr>
+  <td>default</td>
+  <td></td>
+  <td></td>
+  <td>READ_ACCESS</td>
+ </tr>
+</table>
+Figure 18.2: The device access table
+
+The access control system uses the following hierarchy to find the maximal access 
+right, for a requesting client, in the database. The device can only be imported, 
+if the requested access is lower or equal the maximal access right.
+
+-# Verify the user entry on the device (DOMAIN/FAMILY/MEMBER). 
+-# If nothing was specified, verify the user entry of the device class (DOMAIN/FAMILY) 
+-# If nothing was specified, verify the user entry for the domain. 
+-# If nothing was specified, verify the group entry in three steps as mentioned 
+the last three points.
+-# If no maximal access right was found in the user or group entries, a default
+value will be applied.
+
+\subsection verification_speed  Verification Speed and Reliability 
+
+In contrast to the design document of the security system, the final implementation 
+is based more on a good integration to the system than on a maximised verification 
+speed. Experience with the first version has shown that reliability and adaptation 
+to the general system design are more important than the highest possible verification 
+speed. In the first version it was tried to add to a connectionless (UDP) device 
+server, information on client connections. This kind of connection information 
+is very hard to verify and impossible to guarantee as valid information. Out of 
+this reason, the design had to be changed. Only the information on a single user 
+connection was left in a device server. To make a single user connection reliable, 
+it is always a TCP connection. A dead single user client can be detected and 
+deadlocks avoided. 
+
+Client authentication happens only once during the import of the first device. For 
+all other new connections only the device access must be verified. That requires 
+one or two database requests. A security key is created on the client side after 
+the import off a device. By verifying this key all parameters for the open client 
+connection to a device can guaranteed unchanged. Nothing can be modified on the 
+connection. Parameters necessary to check the device and command access are send 
+to the server with every access. The parameters are checked on the server side. 
+Sending parameters and verifying for every server access slow down the system, 
+but is better adapted to a connectionless system and runs more reliable. 
+
+Figure 3 and figure 4 show how the security key is created and how parameters are 
+transferred.
+
+\section integration_into_taco Integration into TACO 
+
+The security system is created as an optional part of TACO. At startup time a 
+resource of the central control system process (Network Manager) allows to 
+suppress or add the security system. This flexibility is necessary because the 
+security system will be implied for the machine control, but it is up to every 
+beam line responsible to use it in the beam line control systems. 
+
+To make database access as general as possible, the resource database was reused 
+for security data. A specially protected table (SEC domain) was added to avoid 
+any overwriting of data by unauthorised persons. With this solution all available 
+database access functions of the control system could be reused. This might be 
+not the fastest solution. One can imagine to suppress one or two database accesses 
+by creating a new security database and security service. But a major advantage 
+of the current solution was the very easy maintenance of a well defined interface.
+
+Figure 18.3: The security key creation
+
+Figure 18.4: Access control with the Security Key 
+
+The main part of the security system is part of the API library, added to the 
+import, access and free functions. Figure 5 shows the security aspects added to 
+the API library.
+
+\section complex_access_handling Complex Access Handling 
+
+The device server model (ref. [2]) of TACO allows two major ways for a device 
+server to communicate with other devices.
+-# The server - server connection (figure 6)
+Device servers can communicate with devices, served by any server in the control 
+system, via the RPC based API library functions.
+-# The internal communication (figure 7)
+The device server model also allows device classes to be linked into one server 
+process. Devices of the different classes can be exported and accessible by 
+clients via the network. Also a fast way of internal communication exists. It
+uses the same import, access and free functions for internal communication without 
+RPCs (see DSN101). Offering the same functionality as the external API. Proper 
+access control, in the case both interfaces are open for device access, can be 
+guaranteed in a transparent way for the user.
+
+Figure 18.5: The security system integration to the API
+
+Figure 18.6: Server - server connections 
+
+With the two above mentioned communication schemes access control and security 
+are guaranteed. Only the user/group ID of a device server process must have the 
+necessary access rights in the security database. This protects against the 
+starting of critical device servers by unauthorised persons. 
+
+One problem remains and can only be solved by the device server programmer 
+himself. 
+
+For example: What does a single user mode mean for a device which itself accesses 
+two underlying devices in other servers? Do these low level devices also have 
+to be set in single user mode or would this disturb other clients using the same 
+low level devices? This kind of access control over hierarchical levels can not 
+be given automatically. Needs might be different from case to case and requirements 
+are only known to the device server programmer. The access control system can only 
+give the tools to handle complex access hierarchies.
+
+\section Conclusion 
+
+Access control and security in a distributed control system has been presented. 
+Three points should be mentioned again: 
+-# With the TACO device naming convention a wide range access could be implemented 
+very easy. 
+-# The reuse of the resource database and its services offers a well defined 
+interface and easy maintenance of the security database. 
+-# Via the internal and external API, hierarchically structured access levels can 
+be controlled. 
+
+The main problem for TACO security is the OS9 operating system which, in the 
+currently used version, still requires super-user rights to execute RPCs. 
+
+Effort still has to go into a so-called device black box. A record should be kept 
+of the last n commands executed on a device. This record can be dumped or stored 
+in a database for offline analysis. It enables diagnostics to be carried out in 
+the event of device failure or crash.
+
+Figure 18.7: Internal and external API 
+
+\subsection the_current_implementation The Current Implementation 
+
+Security for a control system is used if the Network Manger was started with the 
+security option:
+\verbatim
+Manager -security 
+\endverbatim
+As default the security system is switched off. 
+
+If a device server exited and comes back to action, all clients which had open 
+connections will be reconnected automatically with the device accesses they had 
+before. During the reconnection the security database is read again and changes 
+are applied. 
+
+To achieve proper access control in a device server, the functions dev_import(), 
+dev_putget(), dev_put() and dev_free() must be used for internal communication 
+as described in DSN101. A single user connection is always a TCP connection. A 
+died single user or administrator client will be detected on the next access to 
+the server and the single user lock will be freed. 
+
+It is not possible to change the RPC protocol for a connection if a single user 
+mode is active. When freeing a single user mode, the protocol on the connection 
+will be set back to the initial protocol. 
+
+Tools are now available to handle security resources easily.
+- To protect the SEC table in the resource database a password can be set, which 
+will be requested on every update of the database.
+\verbatim
+sec_passwd database_name
+\endverbatim
+No password is set on libra, to give you the chance to modify and test everything.
+- To read all accesses specified for a user or a group in the security table.
+\verbatim
+sec_userinfo [-u user name] [-g group name]
+\endverbatim 
+If no user name or group name is specified, the actual login name and group 
+accesses are listed.
+- To list all users and groups which have a specified access right on a domain,
+a family or a member.
+\verbatim
+sec_objinfo domain[/family][/member] 
+\endverbatim
+Attention: A list of accesses on a family will not list users or groups with the 
+right to access the whole domain!
+
+\subsection howto_get_started How to get started? 
+
+To install a device server and his clients with configured access control, three 
+steps are necessary:
+
+-# The minimum access right for every command of the device server has to be
+added to the extended command list.
+\code
+static DevCommandListEntry commands.list[] = {
+{DevState, 	dev_read_state, 	D_VOID_TYPE, 	D_LONG_TYPE, 	READ_ACCESS}, 
+{DevStatus, 	dev_read_status, 	D_VOID_TYPE, 	D_STRING_TYPE, 	READ_ACCESS}, 
+{DevOpen, 	dev_open_valve, 	D_VOID_TYPE, 	D_VOID_TYPE, 	WRITE_ACCESS}, 
+{DevClose, 	dev_close_valve, 	D_VOID_TYPE, 	D_VOID_TYPE, 	WRITE_ACCESS}, 
+{DevSetCalib, 	dev_set_calib, 		D_VAR_LONGARR, 	D_VOID_TYPE, 	SU_ACCESS}, 
+};
+\endcode
+Dangerous commands can be protected and only be executed by a client with super user 
+rights or an administrator. Remember: 
+	- A device is locked in single user mode. Other clients than the single user
+can only access commands with the minimum access right READ_ACCESS.
+	- Recompiling an old device server with unchanged command list will set the 
+	minimum access right for all commands to WRITE_ACCESS.
+-# As a second step, the access control and security resources for users and groups
+using the device server must be set up.
+\verbatim
+# 
+# default access right, if no user or group entry can be 
+# found. 
+# 
+SEC/MINIMAL/ACC_RIGHT/default: 	READ_ACCESS, 160.103.5, \
+				160.103.2.132 
+# 
+# user resources for the SY domain 
+# 
+SEC/USER/ACC_RIGHT/sy: 		meyer, READ_ACCESS, \
+				taurel, WRITE_ACCESS 
+# 
+# user resources for device families in the SY domain 
+# 
+SEC/USER/ACC_RIGHT/sy|v-rv: 	meyer, SU_ACCESS, \
+				os9, WRITE_ACCESS
+# 
+# user resources for devices in the SY domain 
+# 
+SEC/USER/ACC_RIGHT/sy|v-rv|s9: 	meyer, ADMIN_ACCESS
+
+SEC/USER/ACC_RIGHT/sy|v-rv|s2: 	meyer, ADMIN_ACCESS 
+# 
+##################################################################### 
+# 
+# 
+# group resources for the SY domain 
+# 
+SEC/GROUP/ACC_RIGHT/sy: 	dserver, WRITE_ACCESS, \
+				os9, READ_ACCESS 
+# 
+# group resources for device families in the SY domain 
+# 
+SEC/GROUP/ACC_RIGHT/sy|v-rv: 	vacuum, SU_ACCESS 
+# 
+# group resources for devices in the SY domain 
+# 
+SEC/GROUP/ACC_RIGHT/sy|v-rv|s1: dserver, ADMIN_ACCESS 
+# 
+##################################################################### 
+# 
+# user identification information 
+# 
+SEC/USER/IDENT/meyer: 		215, 160.103.5.54, \
+				160.103.2.132
+
+SEC/USER/IDENT/taurel: 		261, 160.103.2, \
+				160.103.5.68 
+# 
+# group identification information 
+# 
+SEC/GROUP/IDENT/dserver: 	101, 160.103
+
+SEC/GROUP/IDENT/vacuum: 	310, 160.103.4.29 
+
+SEC/GROUP/IDENT/os9: 		0, 160.103.4.218 
+#
+\endverbatim
+The resources must be stored in the SEC table of the resource database. 
+The SEC table on libra is not protected. Everybody can try and set up 
+some resources. To avoid the total chaos when redefining the default 
+access or some global access on a whole domain, please put your resource 
+files in the directory:
+\verbatim
+libra:/users/d/dserver/dbase/res/SEC 
+\endverbatim
+Use the database tools find out the actual database contents and why an access 
+was denied.
+
+Specifying access control and security resources for OS9 clients, use as 
+predefined user and group name os9 with the uid = 0 and the gid = 0. Other names 
+are not possible, because any OS9 user must have the uid = 0 and super user rights 
+on a crate to run a device server. The name was changed from root to os9 to avoid 
+conflicts with the UNIX user root.
+-# The client has to request how he wants to access a device, when importing
+the device.
+\code
+#include DevSec.h
+
+char *dev_name = "SY/V-RV/S1"; 
+long readwrite = WRITE_ACCESS; 
+devserver pv; 
+long error = 0;
+
+/*
+* import the device 
+*/ 
+if ( dev_import (dev_name, readwrite, &pv, &error) == DS_NOTOK )
+{
+	return (DS_NOTOK); 
+}
+\endcode
+For Example, the requested WRITE_ACCESS was verified in the security database and 
+granted. The client can execute all commands on the device which are specifyed with 
+READ_ACCESS or WRITE_ACCESS in the command list of the device server. A command 
+specified with SU_ACCESS cannot be executed.
+
+Remember:
+- The access rights SI_WRITE_ACCESS and SI_SU_ACCESS will set the device into single 
+user mode.
+- Trying to import a device with SI_WRITE_ACCESS or SI_SU_ACCESS if another single 
+user is already logged in, will return an error.
+- Importing a device with ADMIN_ACCESS if another single user is already logged in, 
+will cancel the old single user session and set the device into administration mode.
+- Importing a device with any other access right will work, but only commands which 
+are specified in the command list for READ_ACCESS can be executed. All other commands 
+are locked for the time the single user is logged in.
+- In DevSec.h a list is defined, combining the defined access rights and the rights 
+as a string. This can be used to handle interactive input of access rights.
+\dontinclude DevSec.h
+\skip typedef struct _DevSecListEntry 
+\until define SEC_LIST_LENGTH 
+
+\subsection pending_problems Pending Problems 
+
+Here is a list of pending problems, which will be solved in the coming releases.
+- The search in the command list of a device server, for the minimum access right 
+of a command and the command function, is not yet optimised. The command list is 
+searched twice, because the command handler interface could not be changed for 
+compatibility reasons.
+
+*/

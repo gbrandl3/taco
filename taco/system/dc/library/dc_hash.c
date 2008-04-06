@@ -30,9 +30,9 @@
  *
  * Original:	May 1993
  *
- * Version      : $Revision: 1.3 $
+ * Version      : $Revision: 1.4 $
  *
- * Date         : $Date: 2006-09-18 21:48:25 $
+ * Date         : $Date: 2008-04-06 09:07:47 $
  *
  */
 #ifdef HAVE_CONFIG_H
@@ -122,7 +122,7 @@ int hash(char *dev_name,int hash_table_size)
 ****************************************************************************/
 
 
-int insert_dev(char *devname,dc_dev_param *pdata,hash_info *mem_info,long *perr)
+int insert_dev(char *devname,dc_dev_param *pdata,hash_info *mem_info, DevLong *perr)
 {
 	int ind,sem;
 	int nextfree;
@@ -286,7 +286,7 @@ int insert_dev(char *devname,dc_dev_param *pdata,hash_info *mem_info,long *perr)
 ****************************************************************************/
 
 
-int search_dev(char *devname,dc_dev_param *pdata,hash_info *mem_info,int *pind,long *perr)
+int search_dev(char *devname,dc_dev_param *pdata,hash_info *mem_info,int *pind, DevLong *perr)
 {
 	int ind,sem;
 	int first_loop;
@@ -372,7 +372,7 @@ int search_dev(char *devname,dc_dev_param *pdata,hash_info *mem_info,int *pind,l
 *                                                                           *
 ****************************************************************************/
 
-int delete_dev(char *devname,hash_info *mem_info,long *perr)
+int delete_dev(char *devname,hash_info *mem_info, DevLong *perr)
 {
 	int ind,prev_ind,sem,first_loop;
 	int first_ind,next_ind;
@@ -380,7 +380,7 @@ int delete_dev(char *devname,hash_info *mem_info,long *perr)
 	struct sembuf single_sops;
 	struct sembuf two_sops[2];
 	register dc_dev_param *tmp_parray;
-	register hash_size;
+	register int hash_size;
 	dc_dev_param tmp_data;
 	int semid;
 	int sig_rec;
@@ -551,7 +551,7 @@ int delete_dev(char *devname,hash_info *mem_info,long *perr)
 ****************************************************************************/
 
 
-int update_dev(int ind,dc_dev_param *pdata,hash_info *mem_info,long *perr)
+int update_dev(int ind,dc_dev_param *pdata,hash_info *mem_info, DevLong *perr)
 {
 	int semid,tmp_ind;
 	int hash_size;

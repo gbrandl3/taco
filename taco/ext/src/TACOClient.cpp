@@ -31,17 +31,17 @@
 
 #include <private/ApiP.h>
 
-void TACO::synchronize( double timeout) throw (TACO::Exception)
+void TACO::synchronize( double timeout) throw (::TACO::Exception)
 {
 	struct timeval t;
 	assign( t, timeout);
 	DevLong e;
 	if (dev_synch( &t, &e) != DS_OK) {
-		throw Exception( e);
+		throw ::TACO::Exception( e);
 	}
 }
 
-TACO::Client::Client( const std::string& name, DevLong access, bool connect) throw (TACO::Exception)
+TACO::Client::Client( const std::string& name, DevLong access, bool connect) throw (::TACO::Exception)
 	: mDeviceHandle( 0), 
 	  mName( name), 
 	  mAccess( access), 
@@ -69,12 +69,12 @@ TACO::Client::~Client() throw ()
 {
 	try {
 		disconnectClient();
-	} catch (Exception) {
+	} catch (::TACO::Exception) {
 		// VOID
 	}
 }
 
-TACO::Client::Client( const TACO::Client& client) throw (TACO::Exception)
+TACO::Client::Client( const TACO::Client& client) throw (::TACO::Exception)
 	: mDeviceHandle( 0),
 	  mName( client.mName),
 	  mAccess( client.mAccess),
@@ -88,7 +88,7 @@ TACO::Client::Client( const TACO::Client& client) throw (TACO::Exception)
 	}
 }
 
-TACO::Client& TACO::Client::operator=( const TACO::Client& client) throw (TACO::Exception)
+TACO::Client& TACO::Client::operator=( const TACO::Client& client) throw (::TACO::Exception)
 {
 	if (this != &client) {
 		mDeviceHandle = 0;
@@ -143,7 +143,7 @@ static std::string getCmdName(const DevCommand cmd)
         return cmdName;
 }
 
-void TACO::Client::connectClient() throw (TACO::Exception)
+void TACO::Client::connectClient() throw (::TACO::Exception)
 {
 	disconnectClient();
 	DevLong e;
@@ -174,7 +174,7 @@ void TACO::Client::connectClient() throw (TACO::Exception)
 	{
 		mDeviceHandle = 0;
 		mConnected = false;
-		throw Exception(e);
+		throw ::TACO::Exception(e);
 	}
 	if (db_deviceinfo(const_cast<char *>(sTemp.c_str()), &info, &e) != DS_OK)
 	{
@@ -182,9 +182,9 @@ void TACO::Client::connectClient() throw (TACO::Exception)
 		mConnected = false;
 		if (nethost_save != "" && db_ChangeDefaultNethost(const_cast<char *>(nethost_save.c_str()), &e))
 		{
-			throw Exception(e);
+			throw ::TACO::Exception(e);
 		}
-		throw Exception(e);
+		throw ::TACO::Exception(e);
 	}
 	mPseudo = info.device_type != DB_Device;
 	if (mPseudo)
@@ -194,15 +194,15 @@ void TACO::Client::connectClient() throw (TACO::Exception)
 		mConnected = dc_import(&m_dc, 1, &e) == DS_OK;
 	}
 	else
-		mConnected =  dev_import( const_cast<char*>(mName.c_str()), mAccess, &mDeviceHandle, &e) == DS_OK;
+	mConnected =  dev_import( const_cast<char*>(mName.c_str()), mAccess, &mDeviceHandle, &e) == DS_OK;
 	if (!mConnected)
 	{
 		mDeviceHandle = 0;
 		if (nethost_save != "" && db_ChangeDefaultNethost(const_cast<char *>(nethost_save.c_str()), &e))
 		{
-			throw Exception(e);
+			throw ::TACO::Exception(e);
 		}
-		throw Exception(e);
+		throw ::TACO::Exception(e);
 	}
 	setClientNetworkProtocol(TCP);
 
@@ -233,7 +233,7 @@ void TACO::Client::connectClient() throw (TACO::Exception)
 		{
 			mCommandInfoMap = queryAllCommandInfo( mDeviceHandle);
 			ArgGet<std::vector<std::string> > output;
-			executeCore( Command::DEVICE_TYPES, 0, D_VOID_TYPE, output.address(), output.type());
+			executeCore( ::TACO::Command::DEVICE_TYPES, 0, D_VOID_TYPE, output.address(), output.type());
 			std::vector<std::string> serverTypes( output.object());
 			std::vector<std::string>::const_iterator i( serverTypes.begin());
 			// mServerTypes is cleared by disconnectClient()
@@ -243,26 +243,26 @@ void TACO::Client::connectClient() throw (TACO::Exception)
 		}
 		checkDeviceTypes();
 	} 
-	catch (Exception) 
+	catch (::TACO::Exception) 
 	{
 		// Ignore this exception, because the old servers do not support device types
 		if (nethost_save != "" && db_ChangeDefaultNethost(const_cast<char *>(nethost_save.c_str()), &e))
 		{
 			mDeviceHandle = 0;
 			mConnected = false;
-			throw Exception(e);
+			throw ::TACO::Exception(e);
 		}
 	}
 }
 
-void TACO::Client::connectClient( const std::string& name, DevLong access) throw (TACO::Exception)
+void TACO::Client::connectClient( const std::string& name, DevLong access) throw (::TACO::Exception)
 {
 	mName = name;
 	mAccess = access;
 	connectClient();
 }
 
-void TACO::Client::disconnectClient() throw (TACO::Exception)
+void TACO::Client::disconnectClient() throw (::TACO::Exception)
 {
 	if (isClientConnected()) {
 		mServerTypes.clear();
@@ -272,12 +272,12 @@ void TACO::Client::disconnectClient() throw (TACO::Exception)
 			DevLong dc_error;
 			dc_dev_free d_free = {m_dc.dc_ptr, &dc_error};
 			if (dc_free(&d_free, 1, &e) != DS_OK)
-				throw Exception(e);
+				throw ::TACO::Exception(e);
 		}
 		else
 		{
 			if (dev_free( mDeviceHandle, &e) != DS_OK) {
-				throw Exception( e);
+				throw ::TACO::Exception( e);
 			}
 			mDeviceHandle = 0;
 		}
@@ -285,7 +285,7 @@ void TACO::Client::disconnectClient() throw (TACO::Exception)
 	}
 }
 
-TACO::NetworkProtocol TACO::Client::clientNetworkProtocol() throw (TACO::Exception)
+TACO::NetworkProtocol TACO::Client::clientNetworkProtocol() throw (::TACO::Exception)
 {
 	checkConnection();
         if (mPseudo)
@@ -296,22 +296,22 @@ TACO::NetworkProtocol TACO::Client::clientNetworkProtocol() throw (TACO::Excepti
 	case TCP:
 		return protocol;
 	default:
-		throw Exception( Error::INTERNAL_ERROR, "unknown network protocol");
+		throw ::TACO::Exception( ::TACO::Error::INTERNAL_ERROR, "unknown network protocol");
 	}
 }
 
-void TACO::Client::setClientNetworkProtocol( TACO::NetworkProtocol protocol) throw (TACO::Exception)
+void TACO::Client::setClientNetworkProtocol( TACO::NetworkProtocol protocol) throw (::TACO::Exception)
 {
 	checkConnection();
 	if (mPseudo)
 		return;
 	DevLong e;
 	if (dev_rpc_protocol( mDeviceHandle, static_cast<DevLong>( protocol), &e) != DS_OK) {	
-		throw Exception( e);
+		throw ::TACO::Exception( e);
 	}
 }
 
-double TACO::Client::clientNetworkTimeout() throw (TACO::Exception)
+double TACO::Client::clientNetworkTimeout() throw (::TACO::Exception)
 {
 	checkConnection();
 	DevLong e;
@@ -319,7 +319,7 @@ double TACO::Client::clientNetworkTimeout() throw (TACO::Exception)
 	if (!mPseudo)
 	{
 		if (dev_rpc_timeout( mDeviceHandle, CLGET_TIMEOUT, &tv, &e) != DS_OK) {	
-			throw Exception( e);
+			throw ::TACO::Exception( e);
 		}
 	}
 	double r;
@@ -327,7 +327,7 @@ double TACO::Client::clientNetworkTimeout() throw (TACO::Exception)
 	return r;
 }
 
-void TACO::Client::setClientNetworkTimeout( double timeout) throw (TACO::Exception)
+void TACO::Client::setClientNetworkTimeout( double timeout) throw (::TACO::Exception)
 {
 	checkConnection();
 	if (mPseudo)
@@ -336,151 +336,153 @@ void TACO::Client::setClientNetworkTimeout( double timeout) throw (TACO::Excepti
 	struct timeval tv;
 	assign( tv, timeout);
 	if (dev_rpc_timeout( mDeviceHandle, CLSET_TIMEOUT, &tv, &e) != DS_OK) {	
-		throw Exception( e);
+		throw ::TACO::Exception( e);
 	}
 }
 
-void TACO::Client::deviceOn() throw (TACO::Exception)
+void TACO::Client::deviceOn() throw (::TACO::Exception)
 {
 	if (!mPseudo)
-		return execute<void>( Command::DEVICE_ON);
+		return execute<void>( ::TACO::Command::DEVICE_ON);
 }
 
-void TACO::Client::deviceOff() throw (TACO::Exception)
+void TACO::Client::deviceOff() throw (::TACO::Exception)
 {
 	if (!mPseudo)
-		return execute<void>( Command::DEVICE_OFF);
+		return execute<void>( ::TACO::Command::DEVICE_OFF);
 }
 
-void TACO::Client::deviceReset() throw (TACO::Exception)
+void TACO::Client::deviceReset() throw (::TACO::Exception)
 {
 	if (!mPseudo)
-		return execute<void>( Command::DEVICE_RESET);
+		return execute<void>( ::TACO::Command::DEVICE_RESET);
 }
 
-short TACO::Client::deviceState() throw (TACO::Exception)
+short TACO::Client::deviceState() throw (::TACO::Exception)
 {
 	if (mPseudo)
 	{
 		return ::TACO::State::ON;
 	}
 	else
-		return execute<short>( Command::DEVICE_STATE);
+		return execute<short>( ::TACO::Command::DEVICE_STATE);
 }
 
-std::string TACO::Client::deviceStatus() throw (TACO::Exception)
+std::string TACO::Client::deviceStatus() throw (::TACO::Exception)
 {
 	if (mPseudo)
 	{
 		return "on";
 	}
 	else
-		return execute<std::string>( Command::DEVICE_STATUS);
+		return execute<std::string>( ::TACO::Command::DEVICE_STATUS);
 }
 
-std::string TACO::Client::deviceVersion() throw (TACO::Exception)
+std::string TACO::Client::deviceVersion() throw (::TACO::Exception)
 {
 	if (mPseudo)
 	{
 		return VERSION;
 	}
 	else
-		return execute<std::string>( Command::DEVICE_VERSION);
+		return execute<std::string>( ::TACO::Command::DEVICE_VERSION);
 }
 
-std::string TACO::Client::deviceQueryResource( const std::string& name) throw (TACO::Exception)
+std::string TACO::Client::deviceQueryResource( const std::string& name) throw (::TACO::Exception)
 {
-	return execute<std::string>( Command::DEVICE_QUERY_RESOURCE, name);
+	return execute<std::string>( ::TACO::Command::DEVICE_QUERY_RESOURCE, name);
 }
 
-void TACO::Client::deviceUpdateResource( const std::string& name, const std::string& value) throw (TACO::Exception)
+void TACO::Client::deviceUpdateResource( const std::string& name, const std::string& value) throw (::TACO::Exception)
 {
 //	std::cout << "updating resource " << name << std::endl;
 	if (!mPseudo)
-		return execute<void>( Command::DEVICE_UPDATE_RESOURCE, name + " " + value);
+		return execute<void>( ::TACO::Command::DEVICE_UPDATE_RESOURCE, name + " " + value);
 }
 
-void TACO::Client::deviceUpdate() throw (TACO::Exception)
+void TACO::Client::deviceUpdate() throw (::TACO::Exception)
 {
 	if (!mPseudo)
-		return execute<void>( Command::DEVICE_UPDATE);
+		return execute<void>( ::TACO::Command::DEVICE_UPDATE);
 }
 
-TACO::ResourceInfoSet TACO::Client::deviceQueryResourceInfo() throw (TACO::Exception)
+TACO::ResourceInfoSet TACO::Client::deviceQueryResourceInfo() throw (::TACO::Exception)
 {
 	ResourceInfoSet r;
 	if (!mPseudo)
 	{
-		std::string data( execute<std::string>( Command::DEVICE_QUERY_RESOURCE_INFO));
+		std::string data( execute<std::string>( ::TACO::Command::DEVICE_QUERY_RESOURCE_INFO));
 		data >> r;
 	}
 	return r;
 }
 
-DevLong TACO::Client::eventListen( DevEvent event, TACO::EventHandler* handler, void* userData) throw (TACO::Exception)
+DevLong TACO::Client::eventListen( DevEvent event, ::TACO::EventHandler* handler, void* userData) throw (::TACO::Exception)
 {
 	checkConnection();
-	DevLong id;
+	long id;
 	DevLong e;
 	if (dev_event_listen( mDeviceHandle, event, 0, D_VOID_TYPE, handler, userData, &id, &e) != DS_OK) {
-		throw Exception( e);
+		throw ::TACO::Exception( e);
 	}
 	return id;
 }
 
-void TACO::Client::eventUnlisten( DevEvent event, DevLong id) throw (TACO::Exception)
+void TACO::Client::eventUnlisten( DevEvent event, DevLong id) throw (::TACO::Exception)
 {
 	checkConnection();
 	DevLong e;
 	if (dev_event_unlisten( mDeviceHandle, event, id, &e) != DS_OK) {
-		throw Exception( e);
+		throw ::TACO::Exception( e);
 	}
 }
 
-void* TACO::Client::eventHandler( TACO::EventHandlerData data) throw ()
+void* TACO::Client::eventHandler( ::TACO::EventHandlerData data) throw ()
 {
 	return 0;
 }
 
-void TACO::Client::execute( DevCommand cmd, void* argin, DevType inType, void* argout, DevType outType) throw (TACO::Exception)
+void TACO::Client::execute( DevCommand cmd, DevArgument argin, DevArgType inType, DevArgument argout, DevArgType outType) throw (::TACO::Exception)
 {
 	checkConnection();
 
-	// There is one attempt for a bad server connection with reconnection,
-	// one for the device on and one for the command execution.
+// There is one attempt for a bad server connection with reconnection,
+// one for the device on and one for the command execution.
 	int executionAttempts = 3;
 	while (--executionAttempts >= 0) {
 		try {
 	        	executeCore( cmd, argin, inType, argout, outType);
 			return;
-		} catch (Exception& e) {
+		} catch (::TACO::Exception& e) {
 			if (e == DevErr_BadServerConnection) {
 				try {
 					reconnectClient();
-				} catch (Exception& e) {
+				} catch (::TACO::Exception& e) {
 					throw "automatic client reconnection failed: " >> e;
 				}
-			} else if (e == Error::EXECUTION_DENIED && mAutoDeviceOn) {
-				try {
-					ArgGet<short> state;
-					executeCore( Command::DEVICE_STATE, 0, D_VOID_TYPE, state.address(), state.type());
-					if (state.object() == State::DEVICE_OFF) {
-						executeCore( Command::DEVICE_ON, 0, D_VOID_TYPE, 0, D_VOID_TYPE);
-					} else {
-						throw;
+			} else if (e == ::TACO::Error::EXECUTION_DENIED) {
+				ArgGet<short> state;
+				executeCore( ::TACO::Command::DEVICE_STATE, 0, D_VOID_TYPE, state.address(), state.type());
+				if (mAutoDeviceOn) {
+					try {
+						if (state.object() == ::TACO::State::DEVICE_OFF) {
+							executeCore( ::TACO::Command::DEVICE_ON, 0, D_VOID_TYPE, 0, D_VOID_TYPE);
+						}
+					} catch (::TACO::Exception& e) {
+						throw "automatic device on failed: " >> e;
 					}
-				} catch (Exception& e) {
-					throw "automatic device on failed: " >> e;
+				} else {
+					throw e << " : device state " << state.object();
 				}
 			} else {
 				throw;
 			}
 		}
 	}
-	throw Exception( Error::RUNTIME_ERROR, "cannot execute command");
+	throw ::TACO::Exception( ::TACO::Error::RUNTIME_ERROR, "cannot execute command");
 }
 
-void TACO::Client::executeCore( DevCommand cmd, void* argin, DevType inType, void* argout, DevType outType) throw (TACO::Exception)
+void TACO::Client::executeCore( DevCommand cmd, DevArgument argin, DevArgType inType, DevArgument argout, DevArgType outType) throw (::TACO::Exception)
 {
 	DevLong e;
 	DevLong res;
@@ -493,19 +495,19 @@ void TACO::Client::executeCore( DevCommand cmd, void* argin, DevType inType, voi
 	{
 // 0x7FFF largest error number, hopefully never used
 // If this number isn't used the generated error string will be used
-		Exception ex(e, plainErrorString(0x7FFF));
+		::TACO::Exception ex(e, plainErrorString(0x7FFF));
 		throw ex;
 	}
 }
 
-void TACO::Client::checkDeviceType( const std::string& type) throw (TACO::Exception)
+void TACO::Client::checkDeviceType( const std::string& type) throw (::TACO::Exception)
 {
 	if (mServerTypes.find( type) == mServerTypes.end()) {
-		throw Exception( Error::RUNTIME_ERROR, "connected device has inappropriate device type");
+		throw ::TACO::Exception( ::TACO::Error::RUNTIME_ERROR, "connected device has inappropriate device type");
 	}
 }
 
-void TACO::Client::checkDeviceTypes() throw (TACO::Exception)
+void TACO::Client::checkDeviceTypes() throw (::TACO::Exception)
 {
 	DeviceTypeSet::const_iterator i( mClientTypes.begin());
 	while (i != mClientTypes.end()) {
@@ -513,22 +515,22 @@ void TACO::Client::checkDeviceTypes() throw (TACO::Exception)
 	}
 }
 
-void* TACO::Client::eventHandlerCaller( devserver unused, void* thisPointer, EventHandlerData eventHandlerData) throw ()
+void* TACO::Client::eventHandlerCaller( devserver unused, void* thisPointer, ::TACO::EventHandlerData eventHandlerData) throw ()
 {
 	return static_cast<Client*>( thisPointer)->eventHandler( eventHandlerData);
 }
 
-void TACO::Client::checkConnection() throw (TACO::Exception)
+void TACO::Client::checkConnection() throw (::TACO::Exception)
 {
 	if (!isClientConnected()) {
 		if (mAutoConnect) {
 			try {
 				connectClient();
-			} catch (Exception& e) {
+			} catch (::TACO::Exception& e) {
 				throw "automatic client connection failed: " >> e;
 			}
 		} else {
-			throw Exception( Error::RUNTIME_ERROR, "client not connected");
+			throw ::TACO::Exception( ::TACO::Error::RUNTIME_ERROR, "client not connected");
 		}
 	}
 }

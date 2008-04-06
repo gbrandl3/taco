@@ -25,13 +25,13 @@
  * Description: source code file testing the update daemon server 
  *
  * Author(s):   
- *              $Author: andy_gotz $
+ *              $Author: jkrueger1 $
  *
  * Original:    
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2006-09-19 09:29:39 $
+ * Date:        $Date: 2008-04-06 09:06:39 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -88,7 +88,7 @@ void print_boolean(char flag)
 }
 
 
-main(unsigned int argc, char **argv)
+int main(unsigned int argc, char **argv)
 {
         char cstr[60];
 	char *cmdstr;
@@ -100,7 +100,8 @@ main(unsigned int argc, char **argv)
 	unsigned int num_resource;
         struct DevDaemonStruct input_struct;	
 	devserver daemon;
-	long readwrite = 0, error;
+	long readwrite = 0; 
+	DevLong error;
 	int cmd, status;
 	int readout;
 	short devstate;
@@ -157,7 +158,7 @@ main(unsigned int argc, char **argv)
 /*
  * to get around the strange effects of scanf() wait for something read 
  */
-	   for( ; gets(cmd_string) == (char *)0 ; );
+	   for( ; fgets(cmd_string, sizeof(cmd_string), stdin) == (char *)0 ; );
 	   status = sscanf(cmd_string,"%d",&cmd);
 
 	   switch (cmd) {
@@ -201,7 +202,7 @@ main(unsigned int argc, char **argv)
 
 	   case (4) : printf("GET DEVICE IDENT\n");
 		      printf("Device : "); fflush(stdout);
-	              for( ; gets(cmd_string) == (char *)0 ; );
+	              for( ; fgets(cmd_string, sizeof(cmd_string), stdin) == (char *)0 ; );
 		      input_addr = input_string;
 	              sscanf(cmd_string,"%s,",input_string);
 		      printf("cmd_string = %s\n",input_string);
@@ -230,7 +231,7 @@ main(unsigned int argc, char **argv)
 	              /* New Device Name */				    
 		      printf("Device : "); fflush(stdout);
 	              scanf("%s",input_struct.dev_n);
-		      for( ; gets(cmd_string) == (char *)0 ; );
+		      for( ; fgets(cmd_string, sizeof(cmd_string), stdin) == (char *)0 ; );
 	              sscanf(cmd_string,"%s,",input_struct.dev_n);
 	              printf("cmd_string = %s\n",input_struct.dev_n);
 
@@ -265,7 +266,7 @@ main(unsigned int argc, char **argv)
 		      printf("Frequency : "); 
 		      fflush(stdout);
 		      scanf("%f",&(fsecs));
-		      for( ; gets(cmd_string) == (char *)0 ; );
+		      for( ; fgets(cmd_string, sizeof(cmd_string), stdin) == (char *)0 ; );
 	              /*
 		      sscanf(cmd_string,"%f,",&(fsecs));
 		      */
@@ -289,7 +290,7 @@ main(unsigned int argc, char **argv)
 	   
 	   case (6) : printf ("START POLLING\n");
 		      printf("Device id (0=server) : "); fflush(stdout);
-	              for( ; gets(cmd_string) == (char *)0 ; );
+	              for( ; fgets(cmd_string, sizeof(cmd_string), stdin) == (char *)0 ; );
 	              sscanf(cmd_string,"%d,",&ddid);
 		      status = dev_putget(daemon,DevStartPolling,
 					  &ddid,D_LONG_TYPE,
@@ -302,7 +303,7 @@ main(unsigned int argc, char **argv)
 
 	   case (7) : printf ("STOP POLLING\n");
 		      printf("Device id (0=server) : "); fflush(stdout);
-	              for( ; gets(cmd_string) == (char *)0 ; );
+	              for( ; fgets(cmd_string, sizeof(cmd_string), stdin) == (char *)0 ; );
 	              sscanf(cmd_string,"%d,",&ddid);
 		      status = dev_putget(daemon,DevStopPolling,
 					  &ddid,D_LONG_TYPE,
@@ -315,7 +316,7 @@ main(unsigned int argc, char **argv)
 
 	   case (8) : printf ("CHANGE POLL INTERVAL\n");
 		      printf("Device : "); fflush(stdout);
-	              for( ; gets(cmd_string) == (char *)0 ; );
+	              for( ; fgets(cmd_string, sizeof(cmd_string), stdin) == (char *)0 ; );
 		      input_addr = input_string;
 	              sscanf(cmd_string,"%s,",input_string);
 		      printf("cmd_string = %s\n",input_string);
@@ -333,7 +334,7 @@ main(unsigned int argc, char **argv)
 		       printf("Device ident = %d \n ",long_output);
 		       ddata.ddid = long_output;
 		       printf("New interval : "); fflush(stdout);
-	               for( ; gets(cmd_string) == (char *)0 ; );
+	               for( ; fgets(cmd_string, sizeof(cmd_string), stdin) == (char *)0 ; );
 	               sscanf(cmd_string,"%f,",&(fsecs));
 		       ddata.long_data = (long)(fsecs*10);
 		       status = dev_putget(daemon,DevChangeInterval,
@@ -365,7 +366,7 @@ main(unsigned int argc, char **argv)
 	   case (10) :printf("DEFINE MODE\n");
 	   
 		      printf("Device id (0=server) : "); fflush(stdout);
-	              for( ; gets(cmd_string) == (char *)0 ; );
+	              for( ; fgets(cmd_string, sizeof(cmd_string), stdin) == (char *)0 ; );
 	              sscanf(cmd_string,"%d,",&(ddata.ddid));
 		      printf("Access status : \n");
 		      printf("  1. SURVEY \n");
@@ -374,7 +375,7 @@ main(unsigned int argc, char **argv)
 		      while (readout<1 || readout>2)
 		      {
 		        printf("> "); fflush(stdout);
-	                for( ; gets(cmd_string) == (char *)0 ; );
+	                for( ; fgets(cmd_string, sizeof(cmd_string), stdin) == (char *)0 ; );
 	                sscanf(cmd_string,"%d,",&(readout));
 		      }
 		      switch (readout)
@@ -398,7 +399,7 @@ main(unsigned int argc, char **argv)
 
 	   case (11) :printf("POLL STATUS\n");
 		      printf("Device id (0=server) : "); fflush(stdout);
-	              for( ; gets(cmd_string) == (char *)0 ; );
+	              for( ; fgets(cmd_string, sizeof(cmd_string), stdin) == (char *)0 ; );
 	              sscanf(cmd_string,"%d,",&ddid);
 		      output_string=NULL;
 		      devname=NULL;
@@ -455,7 +456,7 @@ main(unsigned int argc, char **argv)
 
 	   case (12) :printf("DEVICE ACCESS STATUS\n");
 		      printf("Device id (0=server) : "); fflush(stdout);
-	              for( ; gets(cmd_string) == (char *)0 ; );
+	              for( ; fgets(cmd_string, sizeof(cmd_string), stdin) == (char *)0 ; );
 	              sscanf(cmd_string,"%d,",&ddid);
 		      devname=NULL;
 		      status = dev_putget(daemon,DevGetDeviceName,
@@ -499,7 +500,7 @@ main(unsigned int argc, char **argv)
 
 	   case (13): printf("NAME\n");
 		      printf("Device id (0=server) : "); fflush(stdout);
-	              for( ; gets(cmd_string) == (char *)0 ; );
+	              for( ; fgets(cmd_string, sizeof(cmd_string), stdin) == (char *)0 ; );
 	              sscanf(cmd_string,"%d,",&ddid);
 		      devname=NULL;
 		      status = dev_putget(daemon,DevGetDeviceName,
@@ -531,7 +532,7 @@ main(unsigned int argc, char **argv)
 	              /***  Ask a device id  ***/
 		      
 		      printf("Device : "); fflush(stdout);
-	              for( ; gets(cmd_string) == (char *)0 ; );
+	              for( ; fgets(cmd_string, sizeof(cmd_string), stdin) == (char *)0 ; );
 		      input_addr = input_string;
 	              sscanf(cmd_string,"%s,",input_string);
 		      printf("cmd_string = %s\n",input_string);

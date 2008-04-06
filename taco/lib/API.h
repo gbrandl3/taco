@@ -30,9 +30,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.21 $
+ * Version:	$Revision: 1.22 $
  *
- * Date:	$Date: 2007-09-03 08:01:19 $
+ * Date:	$Date: 2008-04-06 09:06:58 $
  *
  *********************************************************************-*/
 
@@ -101,7 +101,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.21 2007-09-03 08:01:19 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.22 2008-04-06 09:06:58 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*
@@ -325,119 +325,119 @@ extern "C" {
 #endif /* __cplusplus */
 extern _DLLFunc long  dev_import
 				PT_( (char *dev_name, long access,
-				devserver *ds_ptr, long *error) );
+				devserver *ds_ptr, DevLong *error) );
 extern _DLLFunc long  taco_dev_import
 				PT_( (char *dev_name, long access,
-				devserver *ds_ptr, long *error) );
+				devserver *ds_ptr, DevLong *error) );
 extern _DLLFunc long  dev_putget
 				PT_( (devserver ds, long cmd,
 				DevArgument argin,  DevType argin_type,
 				DevArgument argout, DevType argout_type,
-				long *error) );
+				DevLong *error) );
 extern _DLLFunc long  taco_dev_putget
 				PT_( (devserver ds, long cmd,
 				DevArgument argin,  DevType argin_type,
 				DevArgument argout, DevType argout_type,
-				long *error) );
+				DevLong *error) );
 extern _DLLFunc long  dev_put
 				PT_( (devserver ds, long cmd,
 				DevArgument argin,  DevType argin_type,
-				long *error) );
+				DevLong *error) );
 extern _DLLFunc long  taco_dev_put
 				PT_( (devserver ds, long cmd,
 				DevArgument argin,  DevType argin_type,
-				long *error) );
+				DevLong *error) );
 extern _DLLFunc long  dev_putget_raw
 				PT_( (devserver ds, long cmd,
 				DevArgument argin,  DevType argin_type,
 				DevOpaque *argout,  DevType argout_type,
-				long *error) );
+				DevLong *error) );
 extern _DLLFunc long  dev_put_asyn
 				PT_( (devserver ds, long cmd,
 				DevArgument argin,  DevType argin_type,
-				long *error) );
+				DevLong *error) );
 extern _DLLFunc long  dev_free
-				PT_( (devserver ds, long *error) );
+				PT_( (devserver ds, DevLong *error) );
 extern _DLLFunc long  taco_dev_free
-				PT_( (devserver ds, long *error) );
+				PT_( (devserver ds, DevLong *error) );
 extern _DLLFunc long  dev_xdrfree
 				PT_( (DevType type, DevArgument objptr,
-				long *error) );
+				DevLong *error) );
 extern _DLLFunc long  dev_cmd_query
 				PT_( (devserver ds, DevVarCmdArray *varcmdarr,
-				long *error) );
+				DevLong *error) );
 extern _DLLFunc long  taco_dev_cmd_query
                                 PT_( (devserver ds, DevVarCmdArray *varcmdarr,
-                                long *error) );
+                                DevLong *error) );
 extern _DLLFunc long  dev_event_query
 				PT_( (devserver ds, DevVarEventArray *vareventarr,
-				long *error) );
+				DevLong *error) );
 extern _DLLFunc long  dev_inform
 				PT_( (devserver *clnt_handles, long num_devices,
-				DevInfo * *dev_info, long *error) );
+				DevInfo **dev_info, DevLong *error) );
 extern _DLLFunc long  dev_rpc_protocol
 				PT_( (devserver ds, long protocol,
-				long *error) );
+				DevLong *error) );
 extern _DLLFunc long  dev_rpc_timeout
 				PT_( (devserver ds, long request,
-				struct timeval *timeout, long *error) );
+				struct timeval *timeout, DevLong *error) );
 extern _DLLFunc long  dev_ping
-				PT_( (devserver ds, long *error) );
+				PT_( (devserver ds, DevLong *error) );
 extern _DLLFunc long  dev_import_timeout
 				PT_( (long request, struct timeval *timeout, 
-				long *error) );
+				DevLong *error) );
 
 extern _DLLFunc long   db_import
-				PT_( (long *error) );
+				PT_( (DevLong *error) );
 extern _DLLFunc long   msg_import
 				PT_( (char *DS_name, char *DS_host,
 				long DS_prog_number, char *DS_display,
-				long *error) );
+				DevLong *error) );
 extern _DLLFunc char * dev_error_str
 				PT_( (long dev_errno) );
 extern _DLLFunc void  dev_printerror_no
-				PT_( (short mode, char *comment,
+				PT_( (short mode, const char *comment,
 				long dev_errno) );
 extern _DLLFunc long  dev_putget_asyn
 				PT_( (devserver ds, long cmd,
 				DevArgument argin,  DevType argin_type,
 				DevArgument argout, DevType argout_type,
 				DevCallbackFunction *callback, void *user_data,
-				long *asynch_id, long *error) );
+				long *asynch_id, DevLong *error) );
 
 extern _DLLFunc long  dev_putget_raw_asyn
 				PT_( (devserver ds, long cmd,
 				DevArgument argin,  DevType argin_type,
 				DevArgument argout, DevType argout_type,
 				DevCallbackFunction *callback, void *user_data,
-				long *asynch_id, long *error) );
+				long *asynch_id, DevLong *error) );
 
 extern _DLLFunc long dev_asynch_timeout 
 				PT_( (devserver ds, long request,
-				struct timeval *dev_timeout, long *error) );
+				struct timeval *dev_timeout, DevLong *error) );
 
 extern _DLLFunc long dev_event_listen 
 				PT_( (devserver ds, long event_type,
 				DevArgument argout, DevType argout_type,
 				DevCallbackFunction *callback, void *user_data,
-				long *event_id, long *error) );
+				long *event_id, DevLong *error) );
 
 extern _DLLFunc long dev_event_unlisten 
 				PT_( (devserver ds, long event_type,
-				long event_id, long *error) );
+				long event_id, DevLong *error) );
 
-extern _DLLFunc long dev_synch PT_( (struct timeval *timeout, long *error) );
+extern _DLLFunc long dev_synch PT_( (struct timeval *timeout, DevLong *error) );
 
 extern _DLLFunc long dev_pending PT_( (devserver) );
+
+
+extern _DLLFunc long debug_flag;	/* global that is used in gen_api.c */
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
-
-extern _DLLFunc long debug_flag;	/* global that is used in gen_api.c */
-
 /*
- * For these functions, ANSI portotyping is in todays form not possible, because their
+ * For these functions, ANSI prototyping is in todays form not possible, because their
  * functionality base on type conversion for input arguments.
  *
  * adding ANSI C support for function with variable argument lists
@@ -449,13 +449,13 @@ extern _DLLFunc long debug_flag;	/* global that is used in gen_api.c */
 		extern "C" {
 #	endif
 #	if (!defined _GNU_PP)
-		extern _DLLFunc void  dev_printerror	PT_( (DevShort mode, char *var_args, ...) );
-		extern _DLLFunc void  dev_printdebug	PT_( (long mode, char *var_args, ...) );
-		extern _DLLFunc void  dev_printdiag	PT_( (DevShort mode, char *var_args, ...) );
+		extern _DLLFunc void  dev_printerror	PT_( (DevShort mode, const char *var_args, ...) );
+		extern _DLLFunc void  dev_printdebug	PT_( (long mode, const char *var_args, ...) );
+		extern _DLLFunc void  dev_printdiag	PT_( (DevShort mode, const char *var_args, ...) );
 #	else
-		extern _DLLFunc void  dev_printerror	(DevShort mode,char *fmt, ... );
-		extern _DLLFunc void  dev_printdebug	(DevLong mode, char *fmt,  ... );
-		extern _DLLFunc void  dev_printdiag	(DevShort mode, char *fmt,  ... );
+		extern _DLLFunc void  dev_printerror	(DevShort mode, const char *fmt, ... );
+		extern _DLLFunc void  dev_printdebug	(DevLong mode, const char *fmt,  ... );
+		extern _DLLFunc void  dev_printdiag	(DevShort mode, const char *fmt,  ... );
 #	endif
 #	ifdef __cplusplus
 		}

@@ -36,9 +36,9 @@
  *
  * Original:	10.5.95	
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2006-09-18 22:38:27 $
+ * Date:        $Date: 2008-04-06 09:06:35 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -71,7 +71,7 @@ static Inst_verify	*ds_list;
  *
  * @return DS_NOTOK on failure, DS_OK otherwise
  */
-long startup(char *svr_name, long *error)
+long startup(char *svr_name, DevLong *error)
 {
 	long		i,	
 			status, 

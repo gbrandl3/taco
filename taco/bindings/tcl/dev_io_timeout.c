@@ -29,9 +29,9 @@
  *
  * Original:	October 1998
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-18 22:04:49 $
+ * Date:        $Date: 2008-04-06 09:06:34 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -71,7 +71,7 @@ int dev_io_timeout(ClientData clientdata, Tcl_Interp *interp,
 	long LValue, ret;
 	struct timeval ti;
 	devserver ds;
-	long DeviceError;
+	DevLong DeviceError;
 	char StringTemp[250];
 	char *StringAux=NULL;
  
@@ -99,10 +99,10 @@ int dev_io_timeout(ClientData clientdata, Tcl_Interp *interp,
 	ret = dev_import (DeviceName,0,&ds,&DeviceError);
 	if (ret != DS_OK) /* dev_import failed */
 	{
-		snprintf (StringTemp, sizeof(StringTemp), "%d",ret);
+		snprintf (StringTemp, sizeof(StringTemp), "%ld",ret);
 		Tcl_SetVar (interp,State,StringTemp,0);
 		StringAux = dev_error_str(DeviceError);
-		snprintf (StringTemp, sizeof(StringTemp), "%s [%d]",StringAux,DeviceError);
+		snprintf (StringTemp, sizeof(StringTemp), "%s [%ld]",StringAux, (long)DeviceError);
 		Tcl_SetVar (interp,Error,StringTemp,0);
 		if(StringAux != NULL) free(StringAux);
 		return TCL_OK;
@@ -114,18 +114,18 @@ int dev_io_timeout(ClientData clientdata, Tcl_Interp *interp,
 		ret = dev_rpc_timeout(ds,CLGET_TIMEOUT,&ti,&DeviceError);
 		if (ret != DS_OK) 
 		{
-			snprintf (StringTemp, sizeof(StringTemp), "%d",ret);
+			snprintf (StringTemp, sizeof(StringTemp), "%ld",ret);
 			Tcl_SetVar (interp,State,StringTemp,0);
 			StringAux = dev_error_str(DeviceError);
-			snprintf (StringTemp, sizeof(StringTemp), "%s [%d]",StringAux,DeviceError);
+			snprintf (StringTemp, sizeof(StringTemp), "%s [%ld]",StringAux, (long)DeviceError);
 			Tcl_SetVar (interp,Error,StringTemp,0);
 			if(StringAux != NULL) 
 				free(StringAux);
 			return TCL_OK;
 		}
 		if(DEBUG_TO) 
-			printf("TO returned: %d\n",ti.tv_sec);
-		snprintf(StringTemp, sizeof(StringTemp), "%d",ti.tv_sec);
+			printf("TO returned: %ld\n",ti.tv_sec);
+		snprintf(StringTemp, sizeof(StringTemp), "%ld",ti.tv_sec);
 		Tcl_AppendResult(interp,StringTemp,NULL);
 	} /* ends read TO */
 	if(LValue >= 1)
@@ -134,10 +134,10 @@ int dev_io_timeout(ClientData clientdata, Tcl_Interp *interp,
 		ret = dev_rpc_timeout(ds,CLSET_TIMEOUT,&ti,&DeviceError);
 		if (ret != DS_OK) 
 		{
-			snprintf (StringTemp, sizeof(StringTemp), "%d",ret);
+			snprintf (StringTemp, sizeof(StringTemp), "%ld",ret);
 			Tcl_SetVar (interp,State,StringTemp,0);
 			StringAux = dev_error_str(DeviceError);
-			snprintf (StringTemp, sizeof(StringTemp), "%s [%d]",StringAux,DeviceError);
+			snprintf (StringTemp, sizeof(StringTemp), "%s [%ld]",StringAux, (long)DeviceError);
 			Tcl_SetVar (interp,Error,StringTemp,0);
 			if(StringAux != NULL) 
 				free(StringAux);

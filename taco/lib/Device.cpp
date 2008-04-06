@@ -30,20 +30,22 @@
  *
  * Original:	March 1995
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2007-06-24 22:16:10 $
+ * Date:	$Date: 2008-04-06 09:06:59 $
  *
  *-**********************************************************************/
 		
 #include <stdlib.h>
-#include <string.h>
+#include <string>
 #include <API.h>
 #include <Admin.h>
 #include <Device.h>
 #include <DevServer.h>
 #include <DevErrors.h>
 #include <DevStates.h>
+
+#include <iostream>
 
 //
 // private global variables of the Device class which have only static scope
@@ -58,7 +60,7 @@ short Device::class_inited = 0;
  *
  * @return DS_OK 
  */
-long Device::ClassInitialise( long *error )
+long Device::ClassInitialise( DevLong *error )
 {
 	dev_printdebug(DBG_TRACE,"Device::ClassInitialise() called\n");
 	*error = DS_OK;
@@ -78,7 +80,7 @@ long Device::ClassInitialise( long *error )
  * @param error error code returned in the case of problems
  *
  */
-Device::Device (DevString devname, long *error)
+Device::Device (DevString devname, DevLong *error)
 {
 	dev_printdebug(DBG_TRACE,"Device::Device() called, devname = %s\n",devname);
 	*error = DS_OK;
@@ -123,7 +125,7 @@ Device::Device (DevString devname, long *error)
  *
  * @return DS_OK
  */
-long Device::GetResources(char *name, long *error )
+long Device::GetResources(const char *name, DevLong *error )
 {
 	dev_printdebug(DBG_TRACE,"Device::GetResources() called\n");
 	*error = DS_OK;
@@ -143,39 +145,38 @@ long Device::GetResources(char *name, long *error )
  *
  * @return DS_NOTOK in case of error otherwise DS_OK
  */
-long Device::Command (long cmd, void* argin, long argin_type,
-                      void* argout, long argout_type, long *error)
+long Device::Command (DevCommand cmd, DevArgument argin, DevArgType argin_type,
+                      DevArgument argout, DevArgType argout_type, DevLong *error)
 {
 	DeviceMemberFunction member_fn;
 
 	dev_printdebug(DBG_TRACE,"Device::Command() called, cmd = %d\n",cmd);
-
+//
 // call to GetCommandNumber() will initialise the commands_map if empty
-
 	GetCommandNumber();
 //
 // add code to execute a command here
-//
-	std::map<DevCommand, DeviceCommandMapEntry>::iterator it = this->commands_map.find(cmd);
+	DeviceCommandMap::iterator it = this->commands_map.find(cmd);
 	if (it != this->commands_map.end())
 	{
-			if (argin_type != it->second.arginType || argout_type != it->second.argoutType)
-			{
-				*error = DevErr_IncompatibleCmdArgumentTypes;
-				return(DS_NOTOK);
-			}
+		if (argin_type != it->second.argin_type 
+		   || argout_type != it->second.argout_type)
+		{
+			*error = DevErr_IncompatibleCmdArgumentTypes;
+			return(DS_NOTOK);
+		}
 //
 // check state machine
 //
-			if (this->StateMachine(cmd,error) != DS_OK)
-			{
+		if (this->StateMachine(cmd,error) != DS_OK)
+		{
 				return(DS_NOTOK);
-			}
+		}
 //
 // now execute the command
 //
-			member_fn = it->second.fn;
-			return (this->*member_fn)(argin,argout,error);
+		member_fn = it->second.fn;
+		return (this->*member_fn)(argin,argout,error);
 	}
 
 //
@@ -185,7 +186,9 @@ long Device::Command (long cmd, void* argin, long argin_type,
 // incorrectly interpreted, therefore if a command is not found 
 // then print a warning message.
 //
-	fprintf(stderr, "Device::Command(): command %d not found, maybe you need to recompile the class %s\n", cmd, this->class_name);
+	std::cerr << "Device::Command(): command " << cmd 
+	 	<< " not found, maybe you need to recompile the class "
+		<< this->class_name << std::endl;
 	*error = DevErr_CommandNotImplemented;
 	return(DS_NOTOK);
 }
@@ -199,9 +202,9 @@ Device::~Device ()
 //
 // add code to destroy a device here
 //
-/* M. Diehl  2.11.99
- * free the memory malloc'ed by Device::Device()
- */
+// M. Diehl  2.11.99
+// free the memory malloc'ed by Device::Device()
+//
 	if( name != NULL )
 	{
 		free(name);
@@ -219,7 +222,7 @@ Device::~Device ()
  *
  * @return DS_OK
  */
-long Device::StateMachine(long cmd, long *error)
+long Device::StateMachine(DevCommand cmd, DevLong *error)
 {
 	dev_printdebug(DBG_TRACE,"Device::StateMachine() called\n");
 	
@@ -255,7 +258,7 @@ long Device::StateMachine(long cmd, long *error)
  *
  * @return DS_OK
  */
-long Device::State(void *vargin, void *vargout, long *error)
+long Device::State(DevArgument, DevArgument vargout, DevLong *error)
 {
 	static short *pstate;
 	*error = DS_OK;
@@ -280,7 +283,7 @@ long Device::State(void *vargin, void *vargout, long *error)
  *
  * @return DS_OK
  */
-long Device::Status(void *vargin, void *vargout, long *error)
+long Device::Status(DevArgument, DevArgument vargout, DevLong *error)
 {
 	static char 	lstatus[20], 
 			**status;
@@ -300,7 +303,7 @@ long Device::Status(void *vargin, void *vargout, long *error)
 /**
  *
  */
-long Device::On(void *vargin, void *vargout, long *error)
+long Device::On(DevArgument, DevArgument, DevLong *error)
 {
 	*error = 0;
 	this->state = DEVON;
@@ -310,7 +313,7 @@ long Device::On(void *vargin, void *vargout, long *error)
 /**
  *
  */
-long Device::Off(void *vargin, void *vargout, long *error)
+long Device::Off(DevArgument, DevArgument, DevLong *error)
 {
 	*error = 0;
 	this->state = DEVOFF;
@@ -320,7 +323,7 @@ long Device::Off(void *vargin, void *vargout, long *error)
 /**
  *
  */
-long Device::Reset(void *vargin, void *vargout, long *error)
+long Device::Reset(DevArgument, DevArgument, DevLong *error)
 {
 	*error = 0;
 	this->state = DEVOFF;
@@ -330,7 +333,7 @@ long Device::Reset(void *vargin, void *vargout, long *error)
 /**
  *
  */
-long Device::Close(void *argin, void *vargout, long *error)
+long Device::Close(DevArgument, DevArgument, DevLong *error)
 {
 	delete this;
 	return(DS_OK);
@@ -357,15 +360,15 @@ void Device::Get_command_number(unsigned int *cmd_nb)
  *
  * @return DS_OK
  */
-long Device::Command_Query(_dev_cmd_info *cmd_info,long *error)
+long Device::Command_Query(_dev_cmd_info *cmd_info,DevLong *error)
 {
 	*error = DS_OK;
 	long	i = 0;
-	for (std::map<DevCommand, DeviceCommandMapEntry>::iterator it = this->commands_map.begin(); it != this->commands_map.end(); ++it, ++i)
+	for (std::map<DevCommand, DeviceCommandListEntry>::iterator it = this->commands_map.begin(); it != this->commands_map.end(); ++it, ++i)
 	{
 		cmd_info[i].cmd = it->second.cmd;
-		cmd_info[i].in_type = it->second.arginType;
-		cmd_info[i].out_type = it->second.argoutType;
+		cmd_info[i].in_type = it->second.argin_type;
+		cmd_info[i].out_type = it->second.argout_type;
 	}
 	return(DS_OK);
 }
@@ -382,7 +385,7 @@ long Device::Command_Query(_dev_cmd_info *cmd_info,long *error)
  */
 long Device::CommandQuery(_dev_cmd_info *cmd_info)
 {
-	long error;
+	DevLong error;
 	return this->Command_Query(cmd_info, &error);
 }
 
@@ -395,18 +398,18 @@ long Device::CommandQuery(_dev_cmd_info *cmd_info)
  *
  * @return DS_OK if command found otherwise DS_NOTOK
  */
-long Device::Get_min_access_right(long cmd,long *min_access,long *error)
+long Device::Get_min_access_right(DevCommand cmd,long *min_access,DevLong *error)
 {
 	*error = DS_OK;
 
 	int _commands_map_size = this->commands_map.size();
 	if (_commands_map_size == 0)
 		_commands_map_size = GetCommandNumber();
-	std::map<DevCommand, DeviceCommandMapEntry>::iterator it = this->commands_map.find(cmd);
+	std::map<DevCommand, DeviceCommandListEntry>::iterator it = this->commands_map.find(cmd);
 	if (it != this->commands_map.end())
 	{
 //		printf("Device::Get_min_access_right(): commands_map[%d].cmd = %d\n",cmd,this->commands_map[cmd].cmd);
-		*min_access = it->second.minAccess;
+		*min_access = it->second.min_access;
 		return(DS_OK);
 	}
 	*error = DevErr_CommandNotImplemented;
@@ -425,10 +428,10 @@ long Device::Get_min_access_right(long cmd,long *min_access,long *error)
  * @throw long error code of the Get_min_access_right function if command not found
  */
 
-long Device::GetMinAccessRight(const long cmd)
+long Device::GetMinAccessRight(const DevCommand cmd)
 {
-	long 	error,
-		min_access;
+	DevLong error;
+	long	min_access;
 	if (this->Get_min_access_right(cmd, &min_access, &error) == DS_OK)
 		return min_access;
 	throw error;
@@ -456,7 +459,7 @@ void Device::Get_event_number(unsigned int *cmd_nb)
  *
  * @return DS_OK
  */
-long Device::Event_Query(_dev_event_info *event_info,long *error)
+long Device::Event_Query(_dev_event_info *event_info,DevLong *error)
 {
 	*error = DS_OK;
 	long	i = 0;
@@ -481,7 +484,7 @@ long Device::Event_Query(_dev_event_info *event_info,long *error)
  */
 long Device::EventQuery(_dev_event_info *event_info)
 {
-	long error;
+	DevLong error;
 	return this->Event_Query(event_info, &error);
 }
 
@@ -506,16 +509,7 @@ unsigned int Device::GetCommandNumber()
 	{
 		dev_printdebug(DBG_TRACE,"Device::GetCommandNumber() initialise commands_map from commands_list array, n_commands = %d\n",this->n_commands);
    		for (int i = 0; i < this->n_commands; i++)
-   		{
-			this->commands_map[this->commands_list[i].cmd] = 
-				DeviceCommandMapEntry(
-				this->commands_list[i].cmd, 
-				(DeviceMemberFunction)this->commands_list[i].fn, 
-				this->commands_list[i].argin_type, 
-				this->commands_list[i].argout_type, 
-				this->commands_list[i].min_access, 
-				this->commands_list[i].cmd_name);
-		}
+			this->commands_map[this->commands_list[i].cmd] = this->commands_list[i]; 
 	}
 	int _commands_map_size = commands_map.size();
 	return _commands_map_size;

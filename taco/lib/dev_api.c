@@ -31,9 +31,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.36 $
+ * Version    :	$Revision: 1.37 $
  *
- * Date	    :	$Date: 2007-09-07 13:32:24 $
+ * Date	    :	$Date: 2008-04-06 09:06:59 $
  *
  ********************************************************************-*/
 
@@ -46,6 +46,8 @@
 #include <Admin.h>
 #include <DevErrors.h>
 #include <API_xdr_vers3.h>
+
+#include "taco_utils.h"
 
 #if HAVE_SIGNAL_H
 #	include <signal.h>
@@ -140,11 +142,11 @@
  */
 
 long _DLLFunc 	dev_query_svr PT_( (char* host,long prog_number,long vers_number) );
-static long 	dev_import_local PT_( (_dev_import_in  *dev_import_in, devserver  *ds_ptr, long* error) );
-static long 	dev_free_local PT_( (_dev_free_in  *dev_free_in, long* error) );
-static long 	dev_put_local PT_( (_server_data  *server_data, long* error) );
-static long 	dev_putget_local PT_( (_server_data  *server_data, _client_data  *client_data, long* error) );
-long _DLLFunc	dev_notimported_init PT_( (char *device_name, long access, long i_nethost, devserver *ds_ptr, long *error) );
+static long 	dev_import_local PT_( (_dev_import_in  *dev_import_in, devserver  *ds_ptr, DevLong* error) );
+static long 	dev_free_local PT_( (_dev_free_in  *dev_free_in, DevLong* error) );
+static long 	dev_put_local PT_( (_server_data  *server_data, DevLong* error) );
+static long 	dev_putget_local PT_( (_server_data  *server_data, _client_data  *client_data, DevLong* error) );
+long _DLLFunc	dev_notimported_init PT_( (char *device_name, long access, long i_nethost, devserver *ds_ptr, DevLong *error) );
 
 /*
  * local data used by each client is kept in external area
@@ -185,7 +187,6 @@ extern nethost_info 		*multi_nethost;
 /*
  * dynamic error string
  */
-extern char 			*dev_error_string;
 #ifdef __cplusplus
 };
 #endif
@@ -230,12 +231,12 @@ server_connections	 	svr_conns [NFILE];
  * 
  * @return DS_OK or DS_NOTOK
  */
-long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *error)
+long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, DevLong *error)
 {
-    long    status;
-    char    *str_ptr;
-    short   count;
-    char    *attribute_name;
+	long    status;
+	char    *str_ptr;
+	short   count;
+	char    *attribute_name;
 
 	*error = 0;
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_import() : entering routine\n");
@@ -261,15 +262,13 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
 		str_ptr++;
 	}
 
-
-
 	if ( count == 3 )
 	{
 /*
  * check wether the system is already configured
  */
 		if ( !config_flags.configuration )
-			if ( (setup_config (error)) < 0 )
+			if ( (setup_config_multi (NULL, error)) < 0 )
 				return (DS_NOTOK);
                 return attribute_import (dev_name, access, ds_ptr, error);
 	}
@@ -298,7 +297,7 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, long *
  * 
  * @return  DS_OK or DS_NOTOK
  */
-long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, long *error)
+long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, DevLong *error)
 {
 	static _dev_import_out	dev_import_out;
 	_dev_import_in		dev_import_in;
@@ -329,12 +328,7 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
  *  first convert the device name to lower case letters
  */
 	snprintf(name, sizeof(name), "%s", dev_name);
-
-	len = strlen (name);
-	device_name = name;
-	for (i = 0; i < len; i++, device_name++)
-		*device_name = tolower (*device_name);
-	device_name = name;
+	device_name = str_tolower(name);
 /*
  * now check to see whether the nethost is specified
  * in the device name e.g. "//nethost/domain/family/member"
@@ -1041,7 +1035,7 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, l
  */ 
 long _DLLFunc dev_putget (devserver ds, long cmd,DevArgument argin,
 			  DevType argin_type,DevArgument argout,
-			  DevType argout_type, long *error)
+			  DevType argout_type, DevLong *error)
 {
 	*error = 0;
 
@@ -1054,11 +1048,8 @@ long _DLLFunc dev_putget (devserver ds, long cmd,DevArgument argin,
 /*
  * make sure dynamic error string points to nothing
  */
-	if (dev_error_string != NULL)
-	{
-		free(dev_error_string);
-		dev_error_string = NULL;
-	}
+	dev_error_clear();
+
 #ifdef TANGO
         if (ds->rpc_protocol == D_IIOP)
         {
@@ -1088,7 +1079,7 @@ long _DLLFunc dev_putget (devserver ds, long cmd,DevArgument argin,
  */
 long _DLLFunc taco_dev_putget (devserver ds, long cmd,DevArgument argin,
 			  DevType argin_type,DevArgument argout,
-			  DevType argout_type, long *error)
+			  DevType argout_type, DevLong *error)
 {
 	_server_data		server_data;
 	_client_data		client_data;
@@ -1098,15 +1089,6 @@ long _DLLFunc taco_dev_putget (devserver ds, long cmd,DevArgument argin,
 	long			i_nethost;
 	nethost_info		*nethost;
 	long			status;
-
-/*
- * make sure dynamic error string points to nothing
- */
-	if (dev_error_string != NULL)
-	{
-		free(dev_error_string);
-		dev_error_string = NULL;
-	}
 
 /*
  *  check data types
@@ -1206,10 +1188,7 @@ long _DLLFunc taco_dev_putget (devserver ds, long cmd,DevArgument argin,
  */
 	if (client_data.var_argument.length == 1)
 	{
-		dev_error_string = (char*)malloc( strlen(*(char**)client_data.var_argument.sequence[0].argument)+1);
-	    	assert(dev_error_string != NULL);
-		if(dev_error_string)
-			strcpy(dev_error_string,*(char**)client_data.var_argument.sequence[0].argument);
+		dev_error_push(*(char**)client_data.var_argument.sequence[0].argument);
 	}
 
 /*
@@ -1242,7 +1221,7 @@ long _DLLFunc taco_dev_putget (devserver ds, long cmd,DevArgument argin,
  * Return(s)  :	DS_OK or DS_NOTOK
  */ 
 long _DLLFunc dev_put (devserver ds, long cmd,DevArgument argin,
-		       DevType argin_type, long *error )
+		       DevType argin_type, DevLong *error )
 {
 	*error = 0;
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_put() : entering routine\n");
@@ -1254,11 +1233,7 @@ long _DLLFunc dev_put (devserver ds, long cmd,DevArgument argin,
 /*
  * make sure dynamic error string points to nothing
  */
-        if (dev_error_string != NULL)
-        {
-                free(dev_error_string);
-                dev_error_string = NULL;
-        }
+        dev_error_clear();
 
 #ifdef TANGO
 	if (ds->rpc_protocol == D_IIOP)
@@ -1287,7 +1262,7 @@ long _DLLFunc dev_put (devserver ds, long cmd,DevArgument argin,
  * @return DS_OK or DS_NOTOK
  */
 long _DLLFunc taco_dev_put (devserver ds, long cmd,DevArgument argin,
-		       DevType argin_type, long *error )
+		       DevType argin_type, DevLong *error )
 {
 	_server_data		server_data;
 	_client_data		client_data;
@@ -1297,15 +1272,6 @@ long _DLLFunc taco_dev_put (devserver ds, long cmd,DevArgument argin,
 	long			client_id = 0;
 	long			i_nethost;
 	nethost_info		*nethost;
-
-/*
- * make sure dynamic error string points to nothing
- */
-	if (dev_error_string != NULL)
-	{
-		free(dev_error_string);
-		dev_error_string = NULL;
-	}
 
 /*
  * save the device's nethost in an intermediate variable
@@ -1396,10 +1362,7 @@ long _DLLFunc taco_dev_put (devserver ds, long cmd,DevArgument argin,
  */
         if (client_data.var_argument.length == 1)
         {
-		dev_error_string = (char*)malloc( strlen(*(char**)client_data.var_argument.sequence[0].argument)+1);
-		assert(dev_error_string != NULL);
-		if (dev_error_string)
-			strcpy(dev_error_string,*(char**)client_data.var_argument.sequence[0].argument);
+		dev_error_push(*(char**)client_data.var_argument.sequence[0].argument);
         }
 
 /*
@@ -1424,7 +1387,7 @@ long _DLLFunc taco_dev_put (devserver ds, long cmd,DevArgument argin,
  *
  * @return DS_OK or DS_NOTOK
  */
-long _DLLFunc dev_free (devserver ds, long *error)
+long _DLLFunc dev_free (devserver ds, DevLong *error)
 {
 	*error = 0;
 
@@ -1436,6 +1399,11 @@ long _DLLFunc dev_free (devserver ds, long *error)
 		*error = DevErr_DeviceNotImportedYet;
 		return(DS_NOTOK);
 	}
+/*
+ * make sure dynamic error string points to nothing
+ */
+	dev_error_clear();
+
 #ifdef TANGO
 	if (ds->rpc_protocol == D_IIOP)
 	{
@@ -1456,7 +1424,7 @@ long _DLLFunc dev_free (devserver ds, long *error)
  * 
  * return DS_OK or DS_NOTOK
  */
-long _DLLFunc taco_dev_free(devserver ds, long *error)
+long _DLLFunc taco_dev_free(devserver ds, DevLong *error)
 {
 	static _dev_free_out	dev_free_out;
 	_dev_free_in		dev_free_in;
@@ -1697,8 +1665,10 @@ DON'T - 26/3/98
  */
 		/* avoid retries at all costs - andy 20jan06 */
 		/*clnt_control (ds->clnt, CLSET_RETRY_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_retry_timeout);*/
-		clnt_control (ds->clnt, CLSET_RETRY_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_timeout);
+#if 0
+		clnt_control (ds->clnt, CLSET_RETRY_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_retry_timeout);
 		clnt_control (ds->clnt, CLSET_TIMEOUT, (char *) &svr_conns[ds->no_svr_conn].rpc_timeout);
+#endif
 	}
 
 /*
@@ -1850,7 +1820,7 @@ long _DLLFunc dev_query_svr (char* host, long prog_number, long vers_number)
  *
  * @return  DS_OK or DS_NOTOK
  */
-long _DLLFunc dev_xdrfree (DevType type, DevArgument objptr, long *error)
+long _DLLFunc dev_xdrfree (DevType type, DevArgument objptr, DevLong *error)
 {
 	DevDataListEntry        data_type;
 
@@ -1887,7 +1857,7 @@ long _DLLFunc dev_xdrfree (DevType type, DevArgument objptr, long *error)
  * 
  * Return(s)  :	DS_OK or DS_NOTOK
  */
-long _DLLFunc check_rpc_connection (devserver ds, long *error)
+long _DLLFunc check_rpc_connection (devserver ds, DevLong *error)
 {
 	CLIENT				*clnt = NULL;
 	enum clnt_stat		clnt_stat;
@@ -2379,10 +2349,10 @@ long _DLLFunc check_rpc_connection (devserver ds, long *error)
  * 
  * @return DS_OK or DS_NOTOK
  */ 
-long _DLLFunc reinstall_rpc_connection (devserver ds, long *error)
+long _DLLFunc reinstall_rpc_connection (devserver ds, DevLong *error)
 {
 	devserver	new_ds;
-	long		h_error;
+	DevLong		h_error;
 	long		i_nethost;
 	nethost_info	*nethost;
 	long		status;
@@ -2518,7 +2488,7 @@ long _DLLFunc reinstall_rpc_connection (devserver ds, long *error)
  * 
  * @return DS_OK or DS_NOTOK
  */
-long _DLLFunc rpc_check_host (char *host_name, long *error)
+long _DLLFunc rpc_check_host (char *host_name, DevLong *error)
 {
 #if !defined vxworks
 #if ( (! OSK) && (! _OSK))
@@ -2719,7 +2689,7 @@ long _DLLFunc rpc_check_host (char *host_name, long *error)
  *
  * @return DS_OK or DS_NOTOK
  */
-static long dev_import_local (_dev_import_in  *dev_import_in, devserver  *ds_ptr, long* error)
+static long dev_import_local (_dev_import_in  *dev_import_in, devserver  *ds_ptr, DevLong* error)
 {
 	_dev_import_out		*dev_import_out;
 	long			ds_id;
@@ -2778,7 +2748,7 @@ static long dev_import_local (_dev_import_in  *dev_import_in, devserver  *ds_ptr
  * 
  * @return DS_OK or DS_NOTOK
  */ 
-static long dev_free_local (_dev_free_in  *dev_free_in, long* error)
+static long dev_free_local (_dev_free_in  *dev_free_in, DevLong* error)
 {
 	_dev_free_out		*dev_free_out;
 
@@ -2804,7 +2774,7 @@ static long dev_free_local (_dev_free_in  *dev_free_in, long* error)
  * 
  * Return(s)  :	DS_OK or DS_NOTOK
  */ 
-static long dev_put_local (_server_data  *server_data, long* error)
+static long dev_put_local (_server_data  *server_data, DevLong* error)
 {
 	_client_data	*client_data;
 
@@ -2832,7 +2802,7 @@ static long dev_put_local (_server_data  *server_data, long* error)
  * @return DS_OK or DS_NOTOK
  */
 static long dev_putget_local (_server_data  *server_data,
-			      _client_data  *client_data, long* error)
+			      _client_data  *client_data, DevLong *error)
 {
 	_client_data	*ret_data;
 	DevDataListEntry type_info;
@@ -2958,7 +2928,7 @@ static long dev_putget_local (_server_data  *server_data,
  * 
  * @return DS_OK or DS_NOTOK
  */ 
-long _DLLFunc dev_rpc_connection (devserver ds, long *error)
+long _DLLFunc dev_rpc_connection (devserver ds, DevLong *error)
 {
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_rpc_connection() : entering routine\n");
 
@@ -3023,7 +2993,7 @@ long _DLLFunc dev_rpc_connection (devserver ds, long *error)
  * 
  * @return DS_OK or DS_NOTOK
  */
-long _DLLFunc dev_rpc_error (devserver ds, enum clnt_stat clnt_stat, long *error)
+long _DLLFunc dev_rpc_error (devserver ds, enum clnt_stat clnt_stat, DevLong *error)
 {
 	char	*hstring;
 
@@ -3095,7 +3065,7 @@ long _DLLFunc dev_rpc_error (devserver ds, enum clnt_stat clnt_stat, long *error
  * 
  * @return DS_OK or DS_NOTOK
  */
-long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
+long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, DevLong *error)
 {
 	struct 	sockaddr_in 	serv_adr;
 #if !defined vxworks
@@ -3325,7 +3295,7 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, long *error)
  *
  * @return DS_OK or DS_NOTOK
  */
-long _DLLFunc dev_notimported_init (char *device_name, long access, long i_nethost, devserver *ds_ptr, long *error)
+long _DLLFunc dev_notimported_init (char *device_name, long access, long i_nethost, devserver *ds_ptr, DevLong *error)
 {
         dev_printdebug (DBG_TRACE | DBG_API, "\ndev_notimported_init() : entering routine\n");
 
@@ -3377,7 +3347,7 @@ long _DLLFunc dev_notimported_init (char *device_name, long access, long i_netho
  * @return DS_OK or DS_NOTOK
  */
 long _DLLFunc dev_import_timeout (long request, struct timeval *dev_timeout,
-                                  long *error)
+                                  DevLong *error)
 {
         *error = 0;
 /*

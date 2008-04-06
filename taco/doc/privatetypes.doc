@@ -1,0 +1,360 @@
+/*! \page private_types Adding Private Commands, Errors and XDR Data Types 
+\addindex private_types
+
+For more flexible and memory saving architecture, commands, errors and XDR data 
+types are treated as follows :
+-# error strings can be generated dynamically by the server and returned to the
+client as part of the dev putget() call.
+-# in addition strings can be stored as resources in the resource database. 
+-# a split up of the command and error numbers into several fields allows private
+specifications for a device server.
+-# there is a small kernel of general XDR data types which has to be linked to
+every device server or client. All other data types are declared private and must 
+be explicitly loaded in a server or client process.
+
+\section dynamic_errors Dynamic Errors 
+
+TACO supports dynamic error strings. This means error strings can be generated 
+dynamically by the server and returned to the client using the dev_error_push() 
+call. This allows for much more flexible error treatment e.g. errors can be 
+generated in situ with very clear dynamically generated text indicating the exact 
+error. Error messages can be stacked on the server side to indicate the device or 
+class where the error was first detected. NOTE: when using dynamic error strings 
+the error code is ignored when retrieving the error string (obviously) but the 
+client can still use it to detect the type of error. For more details see the DSAPI 
+section of this manual. Example of using dev_error_push() :
+\code
+long MyClass::my_cmd(MyClass my_device, void *vargin, void *vargout, long *error)
+{ 
+	static char error.str[256]; 
+	long argin;
+	
+	argin = *(long*)vargin;
+
+	if (argin > my_device.maximum)
+	{ 
+		sprintf("MyClass::my_cmd(): argin = %d exceeds maximum value "
+			"allowed (max=%d)\n" argin, my_device.maximum); 
+		dev_error_push(error_str); 
+		*error = DevErr.CommandFailed; 
+		return(DS_NOTOK); 
+	}
+	.
+	.
+	.
+}
+\endcode
+\section error_numbers Error Numbers 
+
+The error number, defined as a long word, is split into four different fields:
+\verbatim
+| 31      26 | 25         18 | 17     12 | 11             0 | 
+-------------------------------------------------------------
+   |            |               |           |
+   |            |               |           |- Error Number 
+   |            |               |
+   |            |               |- Error category 
+   |            |
+   |            |- Device Server Identification 
+   |
+   |- Team Number
+\endverbatim
+- Team Number:
+A uniq number which is assigned to each developer team in the include file DserverTeams.h. 
+These numbers are managed by the machine control team.
+\include DserverTeams.h 
+- Device Server Identification:
+A uniq number to identify a device server class and its private definitions. These 
+numbers will be managed and assigned inside the programming teams. Example 
+(DasDsNumbers.h):
+\include DasDsNumbers.h
+- Error Category:
+Not yet used. Reserved for a future classification of error messages.
+- Error Number:
+The original error number to identify the error.
+
+\section command_numbers Command Numbers 
+The command number, defined as a long word, is split into three different fields:
+\verbatim
+| 31      26 | 25         18 | 17              0 | 
+--------------------------------------------------
+   |            |               |
+   |            |               |- Command Number 
+   |            |
+   |            |- Device Server Identification 
+   |
+   |- Team Number
+\endverbatim
+
+The distribution of Team Number and Device Server Identification is the same as 
+described in the last section.
+
+\section database_support Database Support 
+
+To avoid linking with long lists of error messages or command name strings, all 
+this text information is stored as resources, in two tables, of the static 
+database. The tables are ERROR for error messages and CMDS for command name strings. 
+To specify a private error and command in a device server class, the following 
+defines and resources are necessary. Define the error code:
+\code
+#define DevErr MyError DevMyBase + Error_Number 
+\endcode
+Specify the error string as a resource in the database. Use the Team Number as 
+defined in DserverTeams.h and the Device Server Identification as defined, for 
+your class, in your programming team`s identification file, in the resource path :
+\verbatim
+ERROR/Team_Number/DS_Identification/Error_Number: "Error Message" 
+\endverbatim
+Example:
+\code
+#define DevErr_SetHighLimit DevMcceBase + 15 
+ERROR/2/3/15: "Unable to set polarization high limit"
+
+#define DevSetHighLimit DevMcceBase + 15 
+CMDS/2/3/15: "DevSetHighLimit"
+\endcode
+
+All general errors and commands as they are defined in the include files DevErrors.h 
+and DevCmds.h are loaded in the database as resources with the Team_Number = 0 
+and the DS_Identification = 0. Only the error messages for API and database 
+errors are kept in a global error list. In all versions of the API-library, 
+starting with version 3.20, the functions dev_printerror_no(), dev_error_str(),
+ and dev_cmd_query() use error and command resource definitions. To relink older 
+software should not cause problems, as long as these functions are used and the 
+global lists are not directly accessed.
+
+\section time_stamps_on_err_messages Time Stamp for Error Messages 
+
+All error strings created by the API-library functions dev_printerror_no() and 
+dev_error_str() include a time stamp before the error message. The returned error 
+strings are in the format:
+\verbatim
+Sun Sep 16 01:03:52 1993 This is my error message. 
+\endverbatim
+A description of the two error functions can be found in the man page dev_error.3x
+
+\section new_xdr_concept The restructured XDR concept 
+
+In the last version all available XDR data types were known to servers and clients. 
+This growing list was abandoned in the new release (version 3.30). It is replaced 
+by a small kernel of general purpose data types and a dynamic list, which can hold 
+private XDR data types used by servers or clients. The set of data types in the 
+kernel is always available and automatically loaded. All other XDR data types that 
+should be used, must be explicitly loaded at startup time of a server or client. 
+The implemented general purpose data types are:
+
+-# D_VOID_TYPE 
+-# D_BOOLEAN_TYPE 
+-# D_SHORT_TYPE 
+-# D_LONG_TYPE 
+-# D_FLOAT_TYPE 
+-# D_DOUBLE_TYPE 
+-# D_STRING_TYPE 
+-# D_INT_FLOAT_TYPE 
+-# D_FLOAT_READPOINT 
+-# D_STATE_FLOAT_READPOINT 
+-# D_LONG_READPOINT 
+-# D_DOUBLE_READPOINT 
+-# D_VAR_CHARARR 
+-# D_VAR_STRINGARR 
+-# D_VAR_SHORTARR 
+-# D_VAR_LONGARR 
+-# D_VAR_ULONGARR 
+-# D_VAR_FLOATARR 
+-# D_VAR_DOUBLEARR 
+-# D_VAR_FRPARR - Float Readpoint Array 
+-# D_VAR_LRPARR - Long Readpoint Array 
+-# D_OPAQUE_TYPE - Block of Bytes 
+
+To recompile your old software, which might use other XDR data types as the ones 
+mentioned in the above list, you have two possibilities.
+
+-# To change the code and load all necessary XDR descriptions as described in the 
+next section. Like this you will link only with the XDR functions you really need. 
+The size of the executable will reduce
+-# To change the include files (see section 7.4) and the Makefile to link with the 
+library libtaco which will load all XDR data types known in the last versions up.
+
+\section privat_xdr_types Private XDR Data Types 
+
+\subsection data_type_numbers Data Type Numbers 
+
+\verbatim
+The data type number, defined as a long word, is split into three different fields:
+| 31      26 | 25         18 | 17              0 | 
+--------------------------------------------------
+   |            |               |
+   |            |               |- Data Type Number 
+   |            |
+   |            |- Device Server Identification 
+   |
+   |- Team Number
+\endverbatim
+
+The distribution of Team Number and Device Server Identification is the same as 
+described in section 2.
+
+\subsection complete_xdr_type_definition  What is a Complete XDR Data Type Definition? 
+
+A XDR data type definition consists of a .h and a .c file. In the include file 
+are the C type definition, the declaration of the XDR functions , the declaration 
+of the XDR length calculation functions (for the data collector), the definition 
+for the data type number and the definition of the load macro. Example (ct_xdr.h):
+
+\include ct_xdr.h
+
+The .c file contains the XDR functions and the XDR length calculation functions 
+for the data type. More information on how to write a XDR function can be found 
+in the HP, SUN or OS9 documentation of NFS/RPC. In addition to the standard XDR 
+functions, all translation functions of the defined general purpose data types 
+can be reused. The XDR length calculation functions are structured in the same 
+way as the XDR functions. The length of each structure field has to be summed 
+up to find the length of the structure in XDR format. Reusable XDR length 
+calculation functions are available for all defined general purpose data types. 
+Example (ct_xdr.c):
+
+\include ct_xdr.c
+
+\subsection howto_integrate_new_data_type How to Integrate a New Data Type? 
+
+The integration of a new, private XDR data type must be done in two steps. First, 
+the load macro of the data type must be called once at startup time of a server 
+or a client. The best place in a device server is the method DevMethodClassInitialise 
+to execute all necessary load macros. In a client the same macros have to be 
+executed before the data types are used. Example:
+
+\code
+	long *error;
+
+	if ( LOAD_CT_LIFETIME(error) == DS.NOTOK )
+	{
+		return (DS.NOTOK); 
+	}
+\endcode
+
+Second, the XDR functions of the data type must be linked to server and client. 
+This should be done locally first to test the data transfer. Afterwards the new 
+XDR data type can be used completely local for server and client, or can be 
+integrated to the XDR library. To make the data type visible to other clients 
+who want to use the service.
+
+\subsection available_data_types Available Data Types 
+
+The XDR library contains the data type for the kernel as described in section 6 
+and a number of hardware specific data types. Here is a list of all data types 
+not referenced in the kernel and their include files with the type definitions.
+
+-# bpm_xdr.h : D_BPM_POSFIELD, D_BPM_ELECFIELD 
+-# ws_xdr.h : D_WS_BEAMFITPARM 
+-# vgc_xdr.h : D_VGC_STATUS, D_VGC_GAUGE, D_VGC_CONTROLLER 
+-# ram_xdr.h : D_NEG_STATUS, D_RAD_DOSE_VALUE 
+-# thc_xdr.h : D_VAR_THARR, D_LIEN_STATE 
+-# haz_xdr.h : D_HAZ_STATUS 
+-# vrif_xdr.h : D_VRIF_WDOG, D_VRIF_STATUS, D_VRIF_POWERSTATUS 
+-# gpib_xdr.h : D_GPIB_WRITE, D_GPIB_MUL_WRITE, D_GPIB_RES, D_GPIB_LOC 
+-# bpss_xdr.h : D_BPSS_STATE, D_BPSS_READPOINT, D_BPSS_LINE, D_STATE_INDIC 
+-#  pss_xdr.h : D_PSS_STATUS 
+-#  rf_xdr.h : D_RF_SIGCONFIG 
+-#  ct_xdr.h : D_CT_LIFETIME 
+-#  daemon_xdr.h : D_DAEMON_STATUS, D_DAEMON_DATA 
+-#  seism_xdr.h : D_SEISM_EVENT, D_SEISM_STAT
+-#  slit_xdr.h : D_BLADE_STATE, D_PSLIT_STATE 
+-#  atte_xdr.h : D_ATTE_TYPE 
+-#  maxe_xdr.h : D_MULMOVE_TYPE, D_MOTOR_LONG, D_MOTOR_FLOAT 
+-#  icv101_xdr.h : D_VAR_PATTERNARR, D_ICV_MODE 
+-#  mstat_xdr.h : D_VAR_MSTATARR 
+-#  m4_xdr.h : D_VAR_LONGFLOATSET, D_VAR_LONGREAD, D_VAR_POSREAD, D_VAR_AXEREAD, 
+D_VAR_PARREAD, D_VAR_ERRREAD
+-#  grp_xdr.h : D_GRPFP_TYPE 
+-#  pin_xdr.h : D_PINSTATE_TYPE
+
+\section numbering_limits Numbering Limits 
+
+Due to the length of the bit fields in an error or command number the numbering 
+limits are:
+
+<table>
+ <tr>
+  <th>Bit Field</th>
+  <th>Bits</th>
+  <th>Possible Numbers</th>
+ </tr>
+ <tr>
+  <td>Team Number</td>
+  <td>6</td>
+  <td>0 - 63</td>
+ </tr>
+  <tr>
+  <td>DS Identification</td>
+  <td>8</td>
+  <td>0 - 255  </td>
+ </tr>
+  <tr>
+  <td>Error Category</td>
+  <td>6</td>
+  <td>0 - 63</td>
+ </tr>
+ <tr>
+  <td>Error Number</td>
+  <td>12</td>
+  <td>0 - 4095</td>
+ </tr>
+  <tr>
+  <td>Command Number</td>
+  <td>18</td>
+  <td>0 - 262143  </td>
+ </tr>
+  <tr>
+  <td>XDR Data Type Number</td>
+  <td>18</td>
+  <td>0 - 262143</td>
+ </tr>
+</table>
+
+
+\subsection master_copies Master Copies 
+
+The master copy of all sources can be found under the path
+
+DSHOME=libra:/users/d/dserver 
+
+Important files and pathes are:
+
+- include/DserverTeams.h
+Containing all predefined programming team numbers.
+
+- include/CntrlDsNumbers.h
+Containing the machine control groups`s device server identifications.
+
+- include/DasDsNumbers.h
+Containing the data acquisition groups`s device server identifications.
+
+- include/BlcDsNumbers.h
+Containing the beam line control groups`s device server identifications.
+
+- system/dbase/res/dev_errors.res
+Containing all error default error strings, which have to be loaded into the 
+resource database. The database table ERROR must be defined!
+
+- system/dbase/res/dev_cmds.res
+Containing all default command name strings, which have to be loaded into the 
+resource database. The database table CMDS must be defined!
+
+- lib/xdr
+The subdirectories include and src contain all .h and .c files for the XDR 
+data types which are available in the TACO library
+
+\section  Conclusion 
+
+The versions of the API-and XDR-library, give the possibility to define private 
+commands, errors and XDR data types. The only condition is to respect the correct 
+Team_Number and DS_Identifaction for definitions and the resource pathes. Attention: 
+If the numbering scheme is not respected resources of other classes or general 
+resource definitions will be deleted. The ERROR and CMD tables in the resource 
+database are not yet protected. Despite private definitions, the wheel should not 
+be reinvented. Errors and commands should be reused as long as an appropriate 
+definition can be found in the general files DevErrors.h and DevCmds.h. Also, 
+first try to reuse already existing XDR data types before creating new ones. In 
+95% of all cases the general purpose data types are sufficient.
+
+*/

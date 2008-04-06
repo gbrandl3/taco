@@ -30,9 +30,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:21 $
  *
  *******************************************************************-*/
 
@@ -43,29 +43,29 @@
  * definitions for hazemeyer powersupply
  */
 struct DevHazStatus {
-        char  Power;
-	char  Remote;
-	char  Aux;
-	char  Stat;
-	char  Phase;
-	char  Mains;
-	char  PassivFilt;
-	char  ActivFilt;
-	char  Doors;
-	char  Synchro;
-	char  IMains;
-	char  Loop;
-	char  Waterflow;
-	char  OverTemp;
-	char  DCCTsat;
-	char  OverVolt;
-	char  OverCurrent;
-	char  EarthFault;
-	char  User1;
-	char  User2;
-	char  User3;
-	char  Transformer;
-	char  TOilTemp;
+        DevChar  Power;
+	DevChar  Remote;
+	DevChar  Aux;
+	DevChar  Stat;
+	DevChar  Phase;
+	DevChar  Mains;
+	DevChar  PassivFilt;
+	DevChar  ActivFilt;
+	DevChar  Doors;
+	DevChar  Synchro;
+	DevChar  IMains;
+	DevChar  Loop;
+	DevChar  Waterflow;
+	DevChar  OverTemp;
+	DevChar  DCCTsat;
+	DevChar  OverVolt;
+	DevChar  OverCurrent;
+	DevChar  EarthFault;
+	DevChar  User1;
+	DevChar  User2;
+	DevChar  User3;
+	DevChar  Transformer;
+	DevChar  TOilTemp;
 };
 typedef struct DevHazStatus 	DevHazStatus;
 bool_t 	_DLLFunc xdr_DevHazStatus PT_((XDR *xdrs, DevHazStatus *objp));

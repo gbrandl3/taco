@@ -29,9 +29,9 @@
  *
  * Original:	Feb 1994
  *
- * Version:	$Revision: 1.27 $
+ * Version:	$Revision: 1.28 $
  *
- * Date:		$Date: 2007-10-02 14:46:28 $
+ * Date:		$Date: 2008-04-06 09:07:01 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -73,6 +73,7 @@
 #include <rpc/pmap_clnt.h>
 #endif  /* WIN32 */
 
+#include "taco_utils.h"
 
 
 /****************************************
@@ -89,9 +90,11 @@
  */
 
 #ifdef __cplusplus
-extern "C" configuration_flags      config_flags;
+extern "C" configuration_flags  config_flags;
+extern "C" char 		*dev_error_stack;
 #else
 extern configuration_flags      config_flags;
+extern char 		    	*dev_error_stack;
 #endif
 
 /*
@@ -118,14 +121,9 @@ long 			max_no_of_devices = 0;
 static long	asyn_error;
 
 /*
- * Dynamic error stack
- */
-extern char *dev_error_stack;
-
-/*
  * Internal Functions
  */
-static long read_device_id PT_((long, long *, long *, long *));
+static long read_device_id PT_((long, long *, long *, DevLong *));
 
 /**@ingroup dsAPI
  * RPC procedure corresponding to dev_import().
@@ -236,7 +234,7 @@ _dev_import_out * _DLLFunc rpc_dev_import_4 (_dev_import_in *dev_import_in,
  */
 _dev_free_out * _DLLFunc rpc_dev_free_4 (_dev_free_in *dev_free_in)
 {
-	static _dev_free_out dev_free_out;
+	static _dev_free_out 	dev_free_out;
 	long			ds_id;
 	long			connection_id;
 
@@ -252,8 +250,7 @@ _dev_free_out * _DLLFunc rpc_dev_free_4 (_dev_free_in *dev_free_in)
 /*
  * Split up the device identification.
  */
-	if (read_device_id (dev_free_in->ds_id, &ds_id, &connection_id, 
-	    &dev_free_out.error) == DS_NOTOK)
+	if (read_device_id (dev_free_in->ds_id, &ds_id, &connection_id, &dev_free_out.error) == DS_NOTOK)
 	{
 		dev_free_out.status = DS_NOTOK;
 		return (&dev_free_out);
@@ -323,8 +320,7 @@ _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
 /*
  * Clear dynamic error stack
  */
-        if (dev_error_stack != NULL) free(dev_error_stack);
-	dev_error_stack = NULL;
+        dev_error_clear(); 
 
 /*
  * Split up the device identification.
@@ -422,11 +418,11 @@ _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
  * C++ version
  */
 	client_data.status = device->Command(server_data->cmd,
-                                             (void*)server_data->argin,
-                                             server_data->argin_type,
-                                             (void*)client_data.argout,
-                                             client_data.argout_type,
-                                             &client_data.error);
+                                            (DevArgument)server_data->argin,
+                                            server_data->argin_type,
+                                            (DevArgument)client_data.argout,
+                                            client_data.argout_type,
+                                            &client_data.error);
 #endif /* __cplusplus */
 
 /*
@@ -495,8 +491,7 @@ _client_data * _DLLFunc rpc_dev_put_4 (_server_data *server_data)
 /*
  * Clear dynamic error stack
  */
-        if (dev_error_stack != NULL) free(dev_error_stack);
-	dev_error_stack = NULL;
+        dev_error_clear();
 
 /*
  * Split up the device identification.
@@ -628,6 +623,11 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
 		free (client_data.argout);
 
 	memset ((char *)&client_data,0,sizeof(client_data));
+
+/*
+ * Clear dynamic error stack
+ */
+        dev_error_clear();
 
 /*
  * Split up the device identification.
@@ -807,6 +807,11 @@ _client_data * _DLLFunc rpc_dev_put_asyn_4 (_server_data *server_data)
 	client_data.error       = DS_OK;
 
 /*
+ * Clear dynamic error stack
+ */
+        dev_error_clear();
+
+/*
  * Split up the device identification.
  */
 	if (read_device_id (server_data->ds_id, &ds_id, &connection_id, 
@@ -859,26 +864,31 @@ void _DLLFunc rpc_dev_put_asyn_cmd (_server_data *server_data)
 #endif /* __cplusplus */
 	long			ds_id;
 	long 			connection_id;
-	long			error;
+	DevLong			error;
 
 	error = DS_OK;
 
 	dev_printdebug (DBG_TRACE | DBG_DEV_SVR_CLASS, "\nrpc_dev_put_asyn_cmd() : entering routine\n");
 	dev_printdebug ( DBG_DEV_SVR_CLASS, "\nrpc_dev_put_asyn_cmd() : with ds_id = %d\n", server_data->ds_id);
 
-	/*
-    * If an error occurred in rpc_dev_put_asyn(), do not execute
-    * the command.
-    */
+/*
+ * Clear dynamic error stack
+ */
+        dev_error_clear();
+
+/*
+ * If an error occurred in rpc_dev_put_asyn(), do not execute
+ * the command.
+ */
 
 	if ( asyn_error != DS_OK )
 	{
 		return;
 	}
 
-	/*
-    * Split up the device identification.
-    */
+/*
+ * Split up the device identification.
+ */
 
 	if (read_device_id (server_data->ds_id, &ds_id, &connection_id, 
 	    &error) == DS_NOTOK)
@@ -898,10 +908,10 @@ void _DLLFunc rpc_dev_put_asyn_cmd (_server_data *server_data)
 	device = devices[(_Int)ds_id].device;
 #endif
 
-	/*
-    * in the simple case the command is passed directly on 
-    * to the command_handler method.
-    */
+/*
+ * in the simple case the command is passed directly on 
+ * to the command_handler method.
+ */
 
 	client_data.argout_type = D_VOID_TYPE;
 	client_data.argout      = NULL;
@@ -949,12 +959,12 @@ void _DLLFunc rpc_dev_put_asyn_cmd (_server_data *server_data)
 /*
  * OIC version
  */
-long dev_export (char *name, void *ptr_ds, long *error)
+long dev_export (char *name, void *ptr_ds, DevLong *error)
 #else
 /*
  * C++ version
  */
-long dev_export (char *name, Device *ptr_dev, long *error)
+long dev_export (char *name, Device *ptr_dev, DevLong *error)
 #endif
 {
 	db_devinf		devinfo;
@@ -1046,7 +1056,7 @@ free_found:
 /*
  *  convert the device name to lower case letters
  */
-	TOLOWER(name)
+	str_tolower(name);
 
 /* 
  * do not export the device to the static database if no_database is selected ...
@@ -1162,7 +1172,7 @@ free_found:
  *
  * @return DS_OK or DS_NOTOK
  */
-long ds__destroy (void *ptr_ds, long *error)
+long ds__destroy (void *ptr_ds, DevLong *error)
 {
 	short	i;
 
@@ -1579,7 +1589,7 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
  * @return DS_OK or DS_NOTOK
  *
  */
-static long read_device_id (long device_id, long *ds_id, long *connection_id, long *error)
+static long read_device_id (long device_id, long *ds_id, long *connection_id, DevLong *error)
 {
 	long 	export_counter;
 
@@ -1857,7 +1867,8 @@ static SVCXPRT *transp_tcp;
 extern long minimal_access;
 
 static void _WINAPI devserver_prog_4    PT_( (struct svc_req *rqstp,SVCXPRT *transp) );
-static long svc_check           PT_( (long *error) );
+long svc_check  PT_( (DevLong *error) );
+long db_check	PT_( (DevLong *error) );
 
 #ifdef WIN32  /* WIN32 */
 
@@ -1867,6 +1878,17 @@ static long svc_check           PT_( (long *error) );
 #define	MB_ERR		(MB_OK | MB_ICONEXCLAMATION)
 #define	MB_INFO		(MB_OK | MB_ICONINFORMATION)
 #endif /* WIN32 */
+
+static int error_msg(const char *msg)
+{
+#ifdef WIN32
+	MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
+	return (FALSE);
+#else
+	fprintf (stderr, msg);
+	return (DS_NOTOK);
+#endif
+}
 
 /**
  * @ingroup dsAPIintern
@@ -1896,8 +1918,8 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 	void		*test_heap;
 
 	long			prog_number=0,
-				status,
-				error = 0;
+				status;
+	DevLong			error = 0;
 	int			pid = 0;
 	short			sig,
 				i,
@@ -1907,26 +1929,14 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 	{
 		char msg[80];
 		snprintf(msg, sizeof(msg),"Filename to long : server_name <= %d char's\n", DS_NAME_LENGTH - 1);
-#ifdef WIN32
-		MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
-		return(FALSE);
-#else
-		fprintf (stderr, msg);
-		exit (DS_NOTOK);
-#endif
+		return error_msg(msg);
 	}
 
 	if (strlen(pers_name) >= DSPERS_NAME_LENGTH)
 	{
 		char msg[80];
 		snprintf(msg, sizeof(msg), "Personal DS_name to long : personal_dsname <= %d char's\n", DSPERS_NAME_LENGTH - 1);
-#ifdef WIN32
-		MessageBox((HWND)NULL, msg, TITLE_STR, MB_INFO);
-		return(FALSE);
-#else
-		fprintf (stderr, msg); 
-		exit (DS_NOTOK);
-#endif
+		return error_msg(msg);
 	}
 /*
  * unregister this program number from the portmapper - this is potentially
@@ -1939,10 +1949,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 		pmap_unset (prog_number, ASYNCH_API_VERSION);
 	}
 
-	memset  (dsn_name, 0, sizeof(dsn_name));
-	strncpy (dsn_name, server_name, DS_NAME_LENGTH - 1);
-	strncat (dsn_name, "/", 1);
-	strncat (dsn_name, pers_name, DSPERS_NAME_LENGTH - 1);
+	snprintf(dsn_name, sizeof(dsn_name), "%s/%s", server_name, pers_name);
 /*
  * make sure all config flags are set to zero before starting
  */
@@ -2015,8 +2022,8 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 	if( taco_gethostname(host_name, sizeof(host_name)) != 0 )
 		exit(DS_NOTOK);
 
-	TOLOWER(dsn_name);
-	TOLOWER(host_name);
+	str_tolower(dsn_name);
+	str_tolower(host_name);
 	strncpy(config_flags.server_name, dsn_name, sizeof(config_flags.server_name)); 
 	strncpy(config_flags.server_host, host_name, sizeof(config_flags.server_host)); 
 
@@ -2053,7 +2060,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 /*
  *  if database required then import database server  
  */
-		if ( db_import (&error) < 0 )
+		if ( db_check (&error) < 0 )
 	   	{
 	   		dev_printerror_no (SEND,"db_import failed",error);
 	   		exit(DS_NOTOK);
@@ -2111,6 +2118,11 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 			free_var_str_array (&default_access);
 		}
 	}		
+	else
+	{
+		prog_number = pn;
+		nethost_alloc(&error);	/* allocate multi_nethost */
+	}
 /*
  * let portmapper choose port numbers for services 
  */
@@ -2126,13 +2138,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 	if (transp == NULL) 
 	{
 		char msg[]="Cannot create udp service, exiting...\n";
-#if defined(WIN32)
-		MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
-		return (FALSE);
-#else
-		fprintf (stderr, msg);
-		kill (pid,SIGQUIT);
-#endif
+		return error_msg(msg);
 	}
 /*
  *  make 3 tries to get transient progam number
@@ -2154,15 +2160,15 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 		config_flags.prog_number = prog_number;
 		config_flags.vers_number = API_VERSION;
 
-		if (!svc_register(transp, prog_number, API_VERSION, devserver_prog_4, IPPROTO_UDP)) 
+
+#if defined (FreeBSD) && (__cplusplus)
+                if (!svc_register(transp, prog_number, API_VERSION, (void (*)(...))devserver_prog_4, IPPROTO_UDP))
+#else
+                if (!svc_register(transp, prog_number, API_VERSION, devserver_prog_4, IPPROTO_UDP))
+#endif
 		{
 			char msg[]="Unable to register server (UDP,4), retry...\n"; 
-#if defined(WIN32)
-			MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
-			return(FALSE);
-#else
-			fprintf (stderr, msg); 
-#endif
+			return error_msg(msg);
 		}
 		else
 		{
@@ -2177,13 +2183,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 	if (synch_svc_udp_sock == -1)
 	{
 		char msg[]="Unable to register server (UDP,4), exiting...\n"; 
-#if defined(WIN32)
-		MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
-		return(FALSE);
-#else
-		fprintf (stderr, msg); 
-		kill(pid, SIGQUIT);
-#endif
+		return error_msg(msg);
 	}
 
 /*
@@ -2193,26 +2193,17 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 	if (transp_tcp == NULL) 
 	{
 		char msg[]= "Cannot create tcp service, exiting...\n";
-#if defined(WIN32)
-		MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
-		return (FALSE);
-#else
-		fprintf (stderr, msg); 
-		kill (pid,SIGQUIT);
-#endif
+		return error_msg(msg);
 	}
 
+#if defined (FreeBSD) && (__cplusplus)
+	if (!svc_register(transp_tcp, prog_number, API_VERSION, (void (*)(...))devserver_prog_4, IPPROTO_TCP))
+#else
         if (!svc_register(transp_tcp, prog_number, API_VERSION, devserver_prog_4, IPPROTO_TCP))
+#endif
 	{
 		char msg[]= "Unable to register server (TCP,4), exiting...\n";
-#if defined(WIN32)
-		MessageBox((HWND)NULL, msg, TITLE_STR, MB_ERR);
-		raise(SIGABRT);
-		return (FALSE);
-#else
-		fprintf (stderr, msg); 
-		kill (pid,SIGQUIT);
-#endif
+		return error_msg(msg);
 	}
 
 /*
@@ -2262,11 +2253,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 		if ( status != DS_OK )
 		{
 			dev_printerror_no (SEND,"startup failed",error);
-#if defined(WIN32)
-			raise(SIGABRT);
-#else
-			kill (pid,SIGQUIT);
-#endif
+			return (DS_NOTOK);
 		}		
 
 /*
@@ -2275,13 +2262,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
  *  and to do a proper exit.
  */
 		if ( status == 1 )
-		{
-#if defined(WIN32)
-			raise(SIGABRT);
-#else
-			kill (pid,SIGQUIT);
-#endif
-		}
+			return (DS_NOTOK);
 		multi_nethost[0].config_flags.startup = config_flags.startup = True;
 	}
 
@@ -2292,8 +2273,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 	svc_run();
 		
 	fprintf (stderr, "svc_run returned\n"); 
-	kill (pid,SIGQUIT);
-	return 1;
+	return DS_NOTOK;
 #else   /* WIN32 */
 /*
  * show up the main dialog
@@ -2301,19 +2281,15 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 	return TRUE;
 #endif
 }
-/*+**********************************************************************
- Function   :   static void devserver_prog_4()
 
- Description:   Entry point for received RPCs.
-	    :   Switches to the wished remote procedure.
-
- Arg(s) In  :   struct svc_rep *rqstp - RPC request handle
-	    :   SVCXPRT *transp       - Service transport handle
-
- Arg(s) Out :   none
-
- Return(s)  :   none
-***********************************************************************-*/
+/**
+ * @ingroup dsAPIintern
+ * Entry point for received RPCs. Switches to the wished remote procedure.
+ * 
+ * @param rqstp   RPC request handle
+ * @param transp  Service transport handle
+ *
+ */
 static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp) 
 {
 	char	*help_ptr;
@@ -2441,14 +2417,14 @@ static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp)
  * - andy 26nov96
  *
  *		case RPC_ADMIN_IMPORT:
- *			xdr_argument = xdr_long;
- *			xdr_result = xdr_long;
+ *			xdr_argument = xdr_DevLong;
+ *			xdr_result = xdr_DevLong;
  *			local = (char *(*)()) rpc_admin_import_4;
  *			break;
  *
  *		case RPC_ADMIN:
  *			xdr_argument = (xdrproc_t)xdr__server_admin;
- *			xdr_result = xdr_long;
+ *			xdr_result = xdr_DevLong;
  *			local = (char *(*)()) rpc_admin_4;
  *			break;
  */
@@ -2537,22 +2513,30 @@ static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp)
 	return;
 }
 
+/**
+ * @ingroup dsAPIintern
+ * Checks wether a database server is available.
+ * 
+ * @param error Will contain an appropriate error code if the corresponding 
+ *              call returns a non-zero value.
+ * 
+ * @return DS_OK or DS_NOTOK
+ */
+long db_check (DevLong *error)
+{
+	return db_import(error);
+}
 
-/*+**********************************************************************
- Function   :   static long svc_check()
-
- Description:   Checks wether a device server with 
-		the same name is already running.
-
- Arg(s) In  :   none
-
- Arg(s) Out :   long *error - Will contain an appropriate error
-			      code if the corresponding call
-			      returns a non-zero value.
-
- Return(s)  :   DS_OK or DS_NOTOK
-***********************************************************************-*/
-static long svc_check (long *error)
+/**
+ * @ingroup dsAPIintern
+ * Checks wether a device server with the same name is already running.
+ * 
+ * @param error Will contain an appropriate error code if the corresponding 
+ *              call returns a non-zero value.
+ * 
+ * @return DS_OK or DS_NOTOK
+ */
+long svc_check (DevLong *error)
 {
         CLIENT          *clnt;
 	enum clnt_stat  clnt_stat;
@@ -2565,16 +2549,13 @@ static long svc_check (long *error)
 
 	if ( db_svc_check (config_flags.server_name,
 			   &host_name, &prog_number, &vers_number, error) < 0 )
-		return (-1);
+		return (DS_NOTOK);
 
-   /*
-	 * old server already unmapped ?
- 	 */
-
+/*
+ * old server already unmapped ?
+ */
 	if ( prog_number == 0 )
-	   {
-	   return (0);
-	   }
+		return (DS_OK);
 
 /*
  *  was the old server running on the same host ?
@@ -2582,10 +2563,10 @@ static long svc_check (long *error)
  *  DON'T - removed this check it is an OS9 anachronism (andy 2/5/2000)
  *
  *	if (strcmp (config_flags.server_host,host_name) != 0)
- *	   {
- *	   *error = DevErr_ServerRegisteredOnDifferentHost;
- *	   return (-1);
- *	   }
+ *	{
+ *		*error = DevErr_ServerRegisteredOnDifferentHost;
+ *		return (DS_NOTOK);
+ *	}
  */
 
 /*
@@ -2594,47 +2575,39 @@ static long svc_check (long *error)
  */
 	vers_number = API_VERSION;
 
-    /*
-     *  old server still exists ?
-	  */
-
+/*
+ *  old server still exists ?
+ */
 	clnt = clnt_create (host_name, prog_number,vers_number,"udp");
 	if (clnt != NULL)
-	   {
-           clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &msg_retry_timeout);
+	{
+		clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &msg_retry_timeout);
 	        clnt_control (clnt, CLSET_TIMEOUT, (char *) &msg_timeout);
 
-	   /*
-	    *  call device server check function
-	    */
-
-           clnt_stat = clnt_call (clnt, RPC_CHECK, (xdrproc_t)xdr_void, NULL,
+/*
+ *  call device server check function
+ */
+		clnt_stat = clnt_call (clnt, RPC_CHECK, (xdrproc_t)xdr_void, NULL,
      				  (xdrproc_t)xdr_wrapstring, (caddr_t) &svc_name, 
 			          TIMEVAL(msg_timeout));
- 	   if (clnt_stat == RPC_SUCCESS)
-	   {
-	      if (strcmp (config_flags.server_name,
-			  svc_name) == 0)
-	         {
-	         *error = DevErr_ServerAlreadyExists;
-	         clnt_destroy (clnt);
-	         return (-1);
-		 }
-	   }
-	   else
-	   {
-	      if (clnt_stat != RPC_PROCUNAVAIL)
-		 {
-	         /*pmap_unset (prog_number, DEVSERVER_VERS);*/
-	         pmap_unset (prog_number, API_VERSION);
-	         pmap_unset (prog_number, ASYNCH_API_VERSION);
-		 }
-	   }
-
-	   clnt_destroy (clnt);
-	   }
-
-	return (0);
+		if (clnt_stat == RPC_SUCCESS)
+		{
+			if (strcmp (config_flags.server_name, svc_name) == 0)
+			{
+				*error = DevErr_ServerAlreadyExists;
+				clnt_destroy (clnt);
+				return (DS_NOTOK);
+			}
+		}
+		else if (clnt_stat != RPC_PROCUNAVAIL)
+		{
+			/*pmap_unset (prog_number, DEVSERVER_VERS);*/
+			pmap_unset (prog_number, API_VERSION);
+			pmap_unset (prog_number, ASYNCH_API_VERSION);
+		}
+		clnt_destroy (clnt);
+	}
+	return (DS_OK);
 }
 
 #ifdef _UCC
@@ -2644,25 +2617,17 @@ extern int ds_rpc_svc_fd; /* global variable - client rpc file descriptor */
 void svc_run(void)
 #else
 void svc_run()
-/*+**********************************************************************
- Function   :   void svc_run ()
-
- Description:   OS9 function to wait forever for rpc requests to a server.
-		When a request arrives it is dispatched to the server via
-		the rpc call svc_getreqset(). 
-
-		This version specific to OS9 has been modelled on the
-		example in the "OS9 Network File System/Remote Procedure
-		Call User's Manual" pg 2-21 modified by P.Makijarvi. 
-		It solves the problem of exiting on receiving a signal.
-
-
- Arg(s) In  :   none
-
- Arg(s) Out :   none
-
- Return(s)  :   none
-***********************************************************************-*/
+/**
+ * @ingroup dsAPIintern
+ * OS9 function to wait forever for rpc requests to a server.  When a request 
+ * arrives it is dispatched to the server via the rpc call svc_getreqset(). 
+ *
+ * This version specific to OS9 has been modelled on the example in the "OS9 
+ * Network File System/Remote Procedure Call User's Manual" pg 2-21 modified by 
+ * P.Makijarvi. 
+ *
+ * It solves the problem of exiting on receiving a signal.
+ */
 #endif /* __STDC__ */
 {
 	fd_set readfds;
@@ -2671,7 +2636,7 @@ void svc_run()
 
 	FD_ZERO(&readfds);
 
-	/*printf("svc_run(): arrived ...\n");*/
+/*	printf("svc_run(): arrived ...\n");*/
 	
 	for (;;)
 	{

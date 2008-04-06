@@ -33,9 +33,9 @@
  *
  * Original:    June, 1996
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-18 22:04:49 $
+ * Date:        $Date: 2008-04-06 09:06:33 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -45,6 +45,7 @@
 #include <dc_io.h>
 #include <debug.h>
 
+int SetDCDebugMode(int Argin);
 
 /* =============================================================== */
 /* --------------------------------------------------------------- */
@@ -92,7 +93,7 @@ int dc_io_debug (ClientData clientdata, Tcl_Interp *interp, int argc, char **arg
 	{
 		Tcl_ResetResult(interp);
 		aux = (char *) malloc(80);
-		snprintf (aux, 80, "ERROR in dc_io_debug : bad value in argin %d",Value);
+		snprintf (aux, 80, "ERROR in dc_io_debug : bad value in argin %ld",Value);
 		Tcl_AppendResult (interp,aux,NULL);
 		free(aux); 
 		aux=NULL;

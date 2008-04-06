@@ -30,9 +30,9 @@
  *
  * Original:	June 1992
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.13 $
  *
- * Date:	$Date: 2007-09-28 06:37:09 $
+ * Date:	$Date: 2008-04-06 09:07:17 $
  *
  ********************************************************************-*/
 
@@ -45,7 +45,7 @@
  */
 #ifdef _IDENT
 static char ApiPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.12 2007-09-28 06:37:09 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.13 2008-04-06 09:07:17 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -116,59 +116,51 @@ static char ApiPh[] =
 #define D_EVENT_TYPE  0x20000000
 
 #define EVENT_MAX_CLIENTS 100
+
 /* 
  * timeouts for rpc calls
  */
-
-static struct timeval zero_timeout = { 0 , 0 };        /* { sec , usec } */
-
-/*  timeout for a client server connection  */
-static struct timeval timeout = { 3 , 0 };        /* { sec , usec } */
-#ifndef lynx
-static struct timeval retry_timeout = { 3 , 0 };  /* { sec , usec } */
-#else /* lynx */
-static struct timeval retry_timeout = { 1 , 0 };  /* { sec , usec } */
+#ifdef __cplusplus
+extern "C" {
 #endif
 
+extern struct timeval zero_timeout;
+
+/*  timeout for a client server connection  */
+extern struct timeval timeout;
+extern struct timeval retry_timeout;
+
 /*  timeout for a server server connection  */
-static struct timeval inner_timeout = { 2, 0 };        /* { sec , usec } */
-#ifndef lynx
-static struct timeval inner_retry_timeout = { 2 , 0 };  /* { sec , usec } */
-#else /* lynx */
-static struct timeval inner_retry_timeout = { 1 , 0 };  /* { sec , usec } */
-#endif /* lynx */
+extern struct timeval inner_timeout;
+extern struct timeval inner_retry_timeout;
 
 /*  internal timeout for api library functions  */
-static struct timeval api_timeout = { 1 , 0 };        /* { sec , usec } */
-#ifndef lynx
-static struct timeval api_retry_timeout = { 1 , 0 };  /* { sec , usec } */
-#else /* lynx */
-static struct timeval api_retry_timeout = { 0 , 500000 };  /* { sec , usec } */
-#endif /* lynx */
+extern struct timeval api_timeout;
+extern struct timeval api_retry_timeout;
 
 /*  timeout for a message server connection  */
-static struct timeval msg_timeout = { 1 , 0 };        /* { sec , usec } */
-#ifndef lynx
-static struct timeval msg_retry_timeout = { 1 , 0 };  /* { sec , usec } */
-#else /* lynx */
-static struct timeval msg_retry_timeout = { 0 , 500000 };  /* { sec , usec } */
-#endif /* lynx */
+extern struct timeval msg_timeout;
+extern struct timeval msg_retry_timeout;
 
 /*  timeout for database server connection  */
-static struct timeval dbase_timeout = { 4, 0 };        /* { sec , usec } */
-static struct timeval dbase_retry_timeout = { 4 , 0 };  /* { sec , usec } */
+extern struct timeval dbase_timeout;
+extern struct timeval dbase_retry_timeout;
 
 /* timeout for asynchronous calls i.e. maximum time to wait for reply after 
  * sending request, after this time declare the request as failed due to TIMEOUT
  */
-static struct timeval asynch_timeout = { 25 , 0 };        /* { sec , usec } */
+extern struct timeval asynch_timeout;
 
 /*  default timeout for import */
-static struct timeval import_timeout = { 2 , 0 };        /* { sec , usec } */
-static struct timeval import_retry_timeout = { 2 , 0 };  /* { sec , usec } */
+extern struct timeval import_timeout;
+extern struct timeval import_retry_timeout;
 
 /*  timeout for the select in rpc_check_host   */
-static struct timeval check_host_timeout = { 0 , 200000 }; /* { sec , usec } */
+extern struct timeval check_host_timeout;
+
+#ifdef __cplusplus
+}
+#endif
 
 /*
  *  status flags for device server configuration
@@ -258,22 +250,22 @@ typedef struct {
 		} asynch_request;
 
 struct _asynch_client_data {
-	long asynch_id;
-        long status;
-        long error;
-        long argout_type;
+	DevLong asynch_id;
+        DevLong status;
+        DevLong error;
+        DevLong argout_type;
         DevArgument argout;
         DevVarArgumentArray var_argument;
 };
 typedef struct _asynch_client_data _asynch_client_data;
 
 struct _asynch_client_raw_data {
-	long asynch_id;
-        long status;
-        long error;
-        long ser_argout_type;
-        long deser_argout_type;
-        long xdr_length;
+	DevLong asynch_id;
+        DevLong status;
+        DevLong error;
+        DevLong ser_argout_type;
+        DevLong deser_argout_type;
+        DevLong xdr_length;
         DevArgument argout;
         DevVarArgumentArray var_argument;
 };
@@ -361,68 +353,68 @@ extern _DLLFunc int *  rpc_db_register_1 PT_( (_register_data *register_data) );
 /*
  *	Functions used by library only, not for external use !!!
  */
-long  dev_rpc_connection PT_( (devserver ds, long *error) );
-long  dev_rpc_error PT_( (devserver ds, enum clnt_stat clnt_stat, long *error) );
-long  check_rpc_connection PT_( (devserver ds, long *error) );
-long  reinstall_rpc_connection PT_( (devserver ds, long *error) );
-long  rpc_check_host PT_( (char *host_name, long *error) );
+long  dev_rpc_connection PT_( (devserver ds, DevLong *error) );
+long  dev_rpc_error PT_( (devserver ds, enum clnt_stat clnt_stat, DevLong *error) );
+long  check_rpc_connection PT_( (devserver ds, DevLong *error) );
+long  reinstall_rpc_connection PT_( (devserver ds, DevLong *error) );
+long  rpc_check_host PT_( (char *host_name, DevLong *error) );
 long  dev_query_svr PT_( (char* host,long prog_number,long vers_number) );
 
 /*
  * Calls to setup the connection to the manager, database and message server
  */
-long setup_config_multi PT_( (char *nethost, long *error) );
-long setup_config PT_( (long *error) );
-long db_import_multi PT_( (char *nethost, long *error) );
-long db_ChangeDefaultNethost PT_( (char* nethost, long *error));
+long setup_config_multi PT_( (char *nethost, DevLong *error) );
+long setup_config PT_( (DevLong *error) );
+long db_import_multi PT_( (char *nethost, DevLong *error) );
+long db_ChangeDefaultNethost PT_( (char* nethost, DevLong *error));
 
 
 /*
  * Utility functions for multi-nethost support
  */
-long 	nethost_alloc PT_( (long *error) );
-long 	get_i_nethost_by_device_name PT_( (char *device_name, long *error) );
-long 	get_i_nethost_by_name PT_( (char *nethost, long *error) );
-char* 	get_nethost_by_index PT_( (long i_nethost, long *error) );
-char* 	extract_device_name PT_( (char *full_name, long *error) );
+long 	nethost_alloc PT_( (DevLong *error) );
+long 	get_i_nethost_by_device_name PT_( (char *device_name, DevLong *error) );
+long 	get_i_nethost_by_name PT_( (char *nethost, DevLong *error) );
+char* 	get_nethost_by_index PT_( (long i_nethost, DevLong *error) );
+char* 	extract_device_name PT_( (char *full_name, DevLong *error) );
 /*
  * Private functions used to implement the asynchronism
  */
-long asynch_rpc_register PT_( (long *error) );
-long asynch_server_import PT_( (devserver ds, long *error) );
-long asynch_client_import PT_( (devserver ds, long *error) );
-long asynch_client_check PT_( (devserver ds, long *error) );
+long asynch_rpc_register PT_( (DevLong *error) );
+long asynch_server_import PT_( (devserver ds, DevLong *error) );
+long asynch_client_import PT_( (devserver ds, DevLong *error) );
+long asynch_client_check PT_( (devserver ds, DevLong *error) );
 long asynch_add_request PT_( (devserver ds, long asynch_type, long event_type,
 	      DevArgument argout, DevType argout_type, 
 	      DevCallbackFunction *callback, void *user_data,
-	      long *asynch_id, long *asynch_index, long *error) );
+	      long *asynch_id, long *asynch_index, DevLong *error) );
 long asynch_get_index PT_( (long asynch_id) );
-void asynch_client_cleanup PT_( (long *error) );
+void asynch_client_cleanup PT_( (DevLong *error) );
 void asynch_timed_out PT_( (devserver ds) );
-long asynch_client_ping PT_( (long i, long *error) );
-void event_client_cleanup PT_( (long *error) );
+long asynch_client_ping PT_( (long i, DevLong *error) );
+void event_client_cleanup PT_( (DevLong *error) );
 
 /* Attribute access entry points */
 
-long attribute_import (char *attribute_name, long access, devserver *ds_ptr, long *error);
-long attribute_free (devserver ds, long *error); 
-long attribute_putget (devserver ds, long cmd, DevArgument argin, DevType argin_type,DevArgument argout, DevType argout_type, long *error);
-long attribute_put (devserver ds, long cmd, DevArgument argin, DevType argin_type, long *error);
-long attribute_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error);
+long attribute_import (char *attribute_name, long access, devserver *ds_ptr, DevLong *error);
+long attribute_free (devserver ds, DevLong *error); 
+long attribute_putget (devserver ds, long cmd, DevArgument argin, DevType argin_type,DevArgument argout, DevType argout_type, DevLong *error);
+long attribute_put (devserver ds, long cmd, DevArgument argin, DevType argin_type, DevLong *error);
+long attribute_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, DevLong *error);
 
 /* TANGO entry points */
 
-long tango_db_import(char*, char*, long, long*);
-long tango_dev_import(char*, long, devserver*, long*);
-long tango_dev_free(devserver,long*); 
-long tango_dev_putget(devserver,long,void*,long,void*,long,long*);
-long tango_dev_putget_raw(devserver,long,void*,long,void*,long,long*);
-long tango_dev_cmd_query(devserver,DevVarCmdArray*,long*); 
-long tango_dev_ping(devserver,long*); 
+long tango_db_import(char*, char*, long, DevLong*);
+long tango_dev_import(char*, long, devserver*, DevLong*);
+long tango_dev_free(devserver,DevLong*); 
+long tango_dev_putget(devserver,long,void*,long,void*,long,DevLong*);
+long tango_dev_putget_raw(devserver,long,void*,long,void*,long,DevLong*);
+long tango_dev_cmd_query(devserver,DevVarCmdArray*,DevLong*); 
+long tango_dev_ping(devserver,DevLong*); 
 
 /* used by TANGO */
 
-long dev_notimported_init(char*, long, long, devserver*, long*);
+long dev_notimported_init(char*, long, long, devserver*, DevLong*);
 
 /* dynamic error string handling */
 
@@ -535,13 +527,15 @@ typedef struct _tango_device {
           long *cmd_value;
           long *argin_type;
           long *argout_type;
-          Tango::DeviceProxy *device_proxy;} _tango_device;
+          Tango::DeviceProxy *device_proxy;
+} _tango_device;
 #endif /* TANGO_API */
 
 /* mutex locking for handling asyncronous request */
 #ifdef _REENTRANT
 #	include <pthread.h>
        	extern pthread_mutex_t async_mutex;
+	extern pthread_mutex_t dev_api_mutex;
 
 #	define LOCK(mutex) 	(pthread_mutex_lock(&(mutex)))
 #	define UNLOCK(mutex) 	(pthread_mutex_unlock(&(mutex)))

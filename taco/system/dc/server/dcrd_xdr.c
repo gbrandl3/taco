@@ -30,9 +30,9 @@
  *
  * Original     : February 1993
  *
- * Version      : $Revision: 1.2 $
+ * Version      : $Revision: 1.3 $
  *
- * Date         : $Date: 2006-09-18 21:49:14 $
+ * Date         : $Date: 2008-04-06 09:07:50 $
  *
  */
 
@@ -284,7 +284,7 @@ xdr_xres_clnt(xdrs, objp)
 	xres_clnt *objp;
 {
 	long ftype;
-	long error;
+	DevLong error;
 	DevDataListEntry type_info;
 
 	ftype = objp->xargout_type;
@@ -373,7 +373,7 @@ xdr_xresh_clnt(xdrs, objp)
 	xresh_clnt *objp;
 {
 	long ftype;
-	long error;
+	DevLong error;
 	DevDataListEntry type_info;
 
 	ftype = objp->xargout_type;

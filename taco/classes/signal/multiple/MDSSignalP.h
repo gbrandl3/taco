@@ -30,9 +30,9 @@
  *
  * Original:	24th of january 1997	
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2006-09-18 22:41:57 $
+ * Date:        $Date: 2008-04-06 09:06:38 $
  */
 
 #ifndef _MDSSIGNALP_H
@@ -55,7 +55,7 @@ typedef struct _MDSSignalPart
 	Dssignal	  *signal_obj;
 	DevVarStringArray *signals_properties;
 	char              **property_ptr;
-	long              *alarm_result;
+	DevLong           *alarm_result;
 } MDSSignalPart;
 
 

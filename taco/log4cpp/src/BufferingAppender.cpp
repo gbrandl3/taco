@@ -1,3 +1,4 @@
+#include "PortabilityImpl.hh"
 #include <log4cpp/BufferingAppender.hh>
 #include <algorithm>
 #include <sstream>
@@ -35,8 +36,7 @@ namespace log4cpp
    {
       Layout& layout = _getLayout();
       std::ostringstream s;
-// changed by AG + JK for Solaris CC - 11/12/2006
-//    for(queue_t::const_reverse_iterator i = queue_.rbegin(), last = queue_.rend(); i != last; ++i)
+      //  Solaris 10 CC can't work with const_reverse_iterator
       for(queue_t::reverse_iterator i = queue_.rbegin(), last = queue_.rend(); i != last; ++i)
          s << layout.format(*i);
 

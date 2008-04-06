@@ -30,9 +30,9 @@
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.15 $
+ * Version    :	$Revision: 1.16 $
  *
- * Date       :	$Date: 2007-09-07 14:40:33 $
+ * Date       :	$Date: 2008-04-06 09:07:13 $
  * 
  *-*******************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -46,6 +46,8 @@
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevErrors.h>
+
+#include "taco_utils.h"
 
 #if defined(WIN32)
 #	include <rpc.h>
@@ -125,8 +127,8 @@ extern nethost_info *multi_nethost;
 
 
 /**@ingroup dbaseAPIresource
- * Retrieve resources from the database, convert them to the desired type and 
- * store them at the right place. A resource value is stored as a atring in a database on a 
+ * Retrieves resource from the database, converts them to the desired type and 
+ * stores them at the right place. A resource value is stored as a atring in a database on a 
  * remote computer.
  *
  * @param dev_name	A pointer to a string which defines the device name
@@ -135,10 +137,10 @@ extern nethost_info *multi_nethost;
  * @param res_num	The number of resource to be retrieved
  * @param perr 		The error code if any
  *
- * @return  	In case of trouble, the function returns DS_NOTOK and sets the err variable
+ * @return  	 In case of trouble, the function returns DS_NOTOK and sets the err variable
  *    		pointed to by "perr". Otherwise, the function returns DS_OK
  */
-int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long *perr)
+int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevLong *perr)
 {
 	db_res		*recev;
 	arr1 		send;
@@ -152,7 +154,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long 
 			*short_ptr;
 	char 		numb[SIZE_A],
 			*char_ptr;
-	long 		*long_ptr;
+	DevLong 	*long_ptr;
 	float 		*float_ptr;
 	double 		*double_ptr;
 	char 		**str_ptr,
@@ -163,7 +165,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long 
 			*tmp;
 	CLIENT 		*tcp_cl;
 	int 		tcp_so;
-	long 		error;
+	DevLong		error;
 	long 		i_nethost;
 	char 		nethost[HOST_NAME_LENGTH];
 	long 		try_reconnect = False;
@@ -295,7 +297,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long 
 /* 
  * Allocate memory for the array of pointeur to char 
  */
-	if((send.arr1_val = (nam *)calloc(res_num,sizeof(nam))) == NULL)
+	if((send.arr1_val = (DevString *)calloc(res_num,sizeof(DevString))) == NULL)
 	{
 		*perr = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
@@ -308,7 +310,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long 
 	for ( i = 0; i < (int)res_num; i++)
 	{
 		l = strlen(res[i].resource_name);
-		if ((send.arr1_val[i] = (nam)malloc(k + l + 2)) == NULL)
+		if ((send.arr1_val[i] = (DevString)malloc(k + l + 2)) == NULL)
 		{
 			*perr = DbErr_ClientMemoryAllocation;
 			for (j=0;j<i;j++)
@@ -317,14 +319,9 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long 
 			return(DS_NOTOK);
 		}
 
-		strcpy(send.arr1_val[i],dev_name);
-		send.arr1_val[i][k] = '/';
-		send.arr1_val[i][k + 1] = '\0';
-		strcat(send.arr1_val[i],res[i].resource_name);
-
-		l = strlen(send.arr1_val[i]);
-		for (j = 0; j < l; j++)
-			send.arr1_val[i][j] = tolower(send.arr1_val[i][j]);
+		strcpy_tolower(send.arr1_val[i],dev_name);
+		strcat(send.arr1_val[i], "/");
+		strcat_tolower(send.arr1_val[i],res[i].resource_name);
 	}
 
 /* 
@@ -653,9 +650,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long 
 				break;
 
 			case D_BOOLEAN_TYPE :
-				l = strlen(ptrc);
-				for (j = 0; j < l; j++)
-					ptrc[j] = tolower(ptrc[j]);
+				str_tolower(ptrc);
 
 				if (!strcmp("off",ptrc) || !strcmp("false",ptrc) || !strcmp("0",ptrc))
 					*(char *)res[i].resource_adr = FALSE;
@@ -865,9 +860,9 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long 
 				if (ptrc[0] != INIT_ARRAY) 
 				{
 #ifndef OSK
-					if ((long_ptr = (long *)malloc((size_t)sizeof(long))) == NULL) 
+					if ((long_ptr = (DevLong *)malloc((size_t)sizeof(DevLong))) == NULL) 
 #else
-					if ((long_ptr = (long *)malloc(sizeof(long))) == NULL) 
+					if ((long_ptr = (DevLong *)malloc(sizeof(DevLong))) == NULL) 
 #endif /* OSK */
 					{
 						*perr = DbErr_ClientMemoryAllocation;
@@ -904,9 +899,9 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long 
 					ctr = (u_int)atoi(numb) - 1;
 
 #ifndef OSK
-					if ((long_ptr = (long *)calloc((size_t)(ctr + 1),(size_t)sizeof(long))) == NULL) 
+					if ((long_ptr = (DevLong *)calloc((size_t)(ctr + 1),(size_t)sizeof(DevLong))) == NULL) 
 #else
-					if ((long_ptr = (long *)calloc((ctr + 1),sizeof(long))) == NULL) 
+					if ((long_ptr = (DevLong *)calloc((ctr + 1),sizeof(DevLong))) == NULL) 
 #endif /* OSK */
 					{
 						*perr = DbErr_ClientMemoryAllocation;
@@ -1235,9 +1230,9 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long 
 
 
 /**@ingroup dbaseAPIresource
- * Update already defined resource(s) or add new resources(s) if it (they) 
+ * Updates already defined resource(s) or adds new resources(s) if it (they) 
  * do(es) not exist. Resource files are not updated by this function. It is not possible
- * to update/insert resource(s) belonging to teh SEC domain.
+ * to update/insert resource(s) belonging to the SEC domain.
  * 
  * @param dev_name 	a string which defines the device name
  * @param res      	A pointer to an array of db_resource structure defining the 
@@ -1246,9 +1241,9 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num,long 
  * @param perr		The error code if any
  *
  * @return In case of trouble, the function returns DS_NOTOK and sets the err variable
- *    	 pointed to by "perr". Otherwise, the function returns DS_OK 
+ *    	 pointed to by "perr". Otherwise, the function returns DS_OK
  */
-int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long *perr)
+int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num, DevLong *perr)
 {
 	int i,j,k,k1,l;
 	int k2 = 0;
@@ -1271,7 +1266,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 	int big_packet = 0;
 	CLIENT *tcp_cl;
 	int tcp_so;
-	long error;
+	DevLong error;
 	long i_nethost = 0;
 #ifndef _OSK
 	struct timeval tout;
@@ -1357,11 +1352,8 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 	tmp_arr = (char *)strchr(dev_name,'/');
 #endif /* OSK */
 	diff = (u_int)(tmp_arr - dev_name);
-	strncpy(tmp_rname,dev_name,diff);
+	strncpy_tolower(tmp_rname,dev_name,diff);
 	tmp_rname[diff] = 0;
-
-	for (i = 0;i < (int)diff;i++)
-		tmp_rname[i] = tolower(tmp_rname[i]);
 	if (strcmp(tmp_rname,"sec") == 0)
 	{
 		*perr = DbErr_DomainDefinition;
@@ -1434,14 +1426,9 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
 			return(DS_NOTOK);
 		}
 
-		strcpy(tmp->res_name,dev_name);
-		tmp->res_name[k1] = '/';
-		tmp->res_name[k1 + 1] = 0;
-		strcat(tmp->res_name,res[i].resource_name);
-
-		l = strlen(tmp->res_name);
-		for (j=0;j<l;j++)
-			tmp->res_name[j] = tolower(tmp->res_name[j]);
+		strcpy_tolower(tmp->res_name,dev_name);
+		strcat(tmp->res_name, "/");
+		strcat_tolower(tmp->res_name,res[i].resource_name);
 
 /* Build a string with the resource value */
 
@@ -2256,11 +2243,11 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num,long 
  *
  * @see db_delreslist
  */
-int _DLLFunc db_delresource(char *dev_name, char **res_name, u_int res_num, long *perr)
+int _DLLFunc db_delresource(char *dev_name, char **res_name, u_int res_num,  DevLong *perr)
 {
 	int i,j,k,l;
 	arr1 send;
-	long error;
+	DevLong error;
 	int *recev;
 	char t_name[SIZE_B];
 	register char *tmp;
@@ -2324,7 +2311,7 @@ int _DLLFunc db_delresource(char *dev_name, char **res_name, u_int res_num, long
 
 /* Allocate memory for the array of pointeur to char */
 
-	if((send.arr1_val = (nam *)calloc(res_num,sizeof(nam))) == NULL)
+	if((send.arr1_val = (DevString *)calloc(res_num,sizeof(DevString))) == NULL)
 	{
 		*perr = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
@@ -2337,7 +2324,7 @@ int _DLLFunc db_delresource(char *dev_name, char **res_name, u_int res_num, long
 	for (i=0;i<(int)res_num;i++)
 	{
 		l = strlen(res_name[i]);
-		if ((send.arr1_val[i] = (char *)malloc(k + l + 2)) == NULL)
+		if ((send.arr1_val[i] = (DevString)malloc(k + l + 2)) == NULL)
 		{
 			*perr = DbErr_ClientMemoryAllocation;
 			for (j=0;j<i;j++)
@@ -2346,14 +2333,9 @@ int _DLLFunc db_delresource(char *dev_name, char **res_name, u_int res_num, long
 			return(DS_NOTOK);
 		}
 
-		strcpy(send.arr1_val[i],dev_name);
-		send.arr1_val[i][k] = '/';
-		send.arr1_val[i][k + 1] = '\0';
-		strcat(send.arr1_val[i],res_name[i]);
-
-		l = strlen(send.arr1_val[i]);
-		for (j=0;j<l;j++)
-			send.arr1_val[i][j] = tolower(send.arr1_val[i][j]);
+		strcpy_tolower(send.arr1_val[i],dev_name);
+		strcat(send.arr1_val[i], "/");
+		strcat_tolower(send.arr1_val[i],res_name[i]);
 	}
 
 /* If the device domain name is "sec", refuse to do the work */
@@ -2490,11 +2472,11 @@ int _DLLFunc db_delresource(char *dev_name, char **res_name, u_int res_num, long
  *
  * @see db_delresource
  */
-long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
+long _DLLFunc db_delreslist(char **res_list, long res_num, DevLong *perr)
 {
 	int i,j,k,l;
 	arr1 send;
-	long error;
+	DevLong error;
 	int *recev;
 	long i_nethost = 0;
 #ifndef _OSK
@@ -2549,7 +2531,7 @@ long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
 
 /* Allocate memory for the array of pointeur to char */
 
-	if((send.arr1_val = (nam *)calloc(res_num,sizeof(nam))) == NULL)
+	if((send.arr1_val = (DevString *)calloc(res_num,sizeof(DevString))) == NULL)
 	{
 		*perr = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
@@ -2561,7 +2543,7 @@ long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
 	for (i = 0;i< (int) res_num;i++)
 	{
 		k = strlen(res_list[i]);
-		if ((send.arr1_val[i] = (char *)malloc(k + 1)) == NULL)
+		if ((send.arr1_val[i] = (DevString)malloc(k + 1)) == NULL)
 		{
 			*perr = DbErr_ClientMemoryAllocation;
 			for (j = 0;j < i;j++)
@@ -2570,10 +2552,7 @@ long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
 			return(DS_NOTOK);
 		}
 
-		strcpy(send.arr1_val[i],res_list[i]);
-
-		for (j = 0;j < k;j++)
-			send.arr1_val[i][j] = tolower(send.arr1_val[i][j]);
+		strcpy_tolower(send.arr1_val[i],res_list[i]);
 	}
 
 /* Initialize the structure sended to server */
@@ -2684,12 +2663,12 @@ long _DLLFunc db_delreslist(char **res_list, long res_num,long *perr)
  * 	pointed to by "perr". Otherwise, the function returns DS_OK
  *
  */
-int _DLLFunc db_getdevlist(char *name, char ***tab, u_int *num_dev,long *perr)
+int _DLLFunc db_getdevlist(char *name, char ***tab, u_int *num_dev, DevLong *perr)
 {
 	char *name1;
 	db_res *recev;
 	int i,j,l,k;
-	long error;
+	DevLong error;
 	long i_nethost = 0;
 #ifndef _OSK
 	struct timeval tout;
@@ -2751,9 +2730,7 @@ int _DLLFunc db_getdevlist(char *name, char ***tab, u_int *num_dev,long *perr)
 		*perr = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(name1,name);
-	for(i=0;i<k;i++)
-		name1[i] = tolower(name1[i]);	
+	strcpy_tolower(name1,name);
 
 /* Call server */
 
@@ -2903,7 +2880,7 @@ int _DLLFunc db_getdevlist(char *name, char ***tab, u_int *num_dev,long *perr)
  *
  * @see db_dev_import
  */
-int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
+int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num, DevLong *perr)
 {
 	int i,j,k,l;
 	tab_dbdev_3 send3;
@@ -2911,7 +2888,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 	int *pdb_err;
 	register db_devinfo_3 *devexp3;
 	register db_devinfo_2 *devexp2;
-	long error;
+	DevLong error;
 	int pid;
 	long vers;
 	long i_nethost = 0;
@@ -3035,9 +3012,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				free(devexp2);
 				return(DS_NOTOK);
 			}
-			strcpy(devexp2[i].host_name,devexp[i].host_name);
-			for (j=0;j<k;j++) 
-				devexp2[i].host_name[j] = tolower(devexp2[i].host_name[j]);
+			strcpy_tolower(devexp2[i].host_name,devexp[i].host_name);
 
 			k = strlen(devexp[i].device_name);
 			if ((devexp2[i].dev_name = (char *)malloc(k + 1)) == NULL)
@@ -3054,9 +3029,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				free(devexp2);
 				return(DS_NOTOK);
 			}
-			strcpy(devexp2[i].dev_name,devexp[i].device_name);
-			for (j=0;j<k;j++)
-				devexp2[i].dev_name[j] = tolower(devexp2[i].dev_name[j]);
+			strcpy_tolower(devexp2[i].dev_name,devexp[i].device_name);
 
 			k = strlen(devexp[i].device_type);
 			if ((devexp2[i].dev_type = (char *)malloc(k + 1)) == NULL)
@@ -3133,8 +3106,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				free(devexp3);
 				return(DS_NOTOK);
 			}
-			for (j=0;j<k;j++) 
-				devexp3[i].host_name[j] = tolower(devexp[i].host_name[j]);
+			strncpy_tolower(devexp3[i].host_name, devexp[i].host_name, k);
 			devexp3[i].host_name[k] = '\0';
 
 			k = strlen(devexp[i].device_name);
@@ -3154,8 +3126,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				free(devexp3);
 				return(DS_NOTOK);
 			}
-			for (j=0;j<k;j++)
-				devexp3[i].dev_name[j] = tolower(devexp[i].device_name[j]);
+			strncpy_tolower(devexp3[i].dev_name, devexp[i].device_name, k);
 			devexp3[i].dev_name[k] = '\0';
 
 			k = strlen(devexp[i].device_type);
@@ -3240,8 +3211,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 				free(devexp3);
 				return(DS_NOTOK);
 			}
-			for (j=0;j<k;j++) 
-				devexp3[i].proc_name[j] = tolower(devexp[i].proc_name[j]);
+			strncpy_tolower(devexp3[i].proc_name, devexp[i].proc_name, k);
 			devexp3[i].proc_name[k] = '\0';
 		}
 
@@ -3404,10 +3374,10 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
 /**@ingroup dbaseAPIdevice
  * Return all the necessary parameters to buld RPC connection beween a client 
  * and the device server in charge of a device. 
- * This means to ask for the host name, the program number, and the version number of the device
+ * This means to ask for the host name, the program number and the version number of the device
  * server which drives a device.
  * 
- * It allows to retrieve thes RPC's information for several devices at the same time.
+ * It allows to retrieve these RPC's information for several devices at the same time.
  *
  * @param name	 	an array of pointers to strings. Each string
  *               	contains the name of a device to be imported.
@@ -3421,14 +3391,14 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num,long *perr)
  *
  * @see db_dev_export
  */
-int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *perr)
+int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev, DevLong *perr)
 {
 	int i,j,k,l;
 	arr1 send;
 	register Db_devinf_imp tmp_ptr;
 	db_devinfo *tmp_ptr1;
 	db_resimp *recev;
-	long error;
+	DevLong error;
 	long i_nethost;
 	char **name_copy;
 #ifndef _OSK
@@ -3513,7 +3483,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 /* Allocate memory to build the array of pointers to strings and all device
    names in lowercase letters */
 
-	if ((send.arr1_val = (nam *)calloc(num_dev,sizeof(nam))) == NULL) 
+	if ((send.arr1_val = (DevString *)calloc(num_dev,sizeof(DevString))) == NULL) 
 	{
 		*perr = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
@@ -3521,7 +3491,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 	for (k=0;k<(int)num_dev;k++) 
 	{
 		l = strlen(name_copy[k]);
-		if ((send.arr1_val[k] = (char *)malloc(l + 1)) == NULL) 
+		if ((send.arr1_val[k] = (DevString)malloc(l + 1)) == NULL) 
 		{
 			*perr = DbErr_ClientMemoryAllocation;
 			for(i=0;i<k;i++)
@@ -3530,9 +3500,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
 			free(name_copy);
 			return(DS_NOTOK);
 		}
-		strcpy(send.arr1_val[k],name_copy[k]);
-		for(j=0;j<l;j++)
-			send.arr1_val[k][j] = tolower(send.arr1_val[k][j]);
+		strcpy_tolower(send.arr1_val[k],name_copy[k]);
 	}
 
 /* Allocate memory for the array of structures sent back to the client */
@@ -3673,15 +3641,15 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev,long *p
  * @param ds_netnam 	a string which contains the device server network name.
  * @param perr 		The error caode in case of trouble
  *
- * @return   In case of trouble, the function returns DS_NOTOK and set the err variable
+ * @return   In case of trouble, the function returns DS_NOTOK and sets the err variable
  *    pointed to by "perr". Otherwise, the function returns DS_OK
  */
-int _DLLFunc db_svc_unreg(char *ds_netnam, long *perr)
+int _DLLFunc db_svc_unreg(char *ds_netnam,  DevLong *perr)
 {
 	int i,j,k;
 	int *pdb_err;
 	char *ds_netnam1;
-	long error;
+	DevLong error;
 	long i_nethost = 0;
 #ifndef _OSK
 	struct timeval tout;
@@ -3738,9 +3706,7 @@ int _DLLFunc db_svc_unreg(char *ds_netnam, long *perr)
 		*perr = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(ds_netnam1,ds_netnam);
-	for (j=0;j<k;j++)
-		ds_netnam1[j] = tolower(ds_netnam1[j]);
+	strcpy_tolower(ds_netnam1,ds_netnam);
 
 /* Call server */
 
@@ -3838,12 +3804,12 @@ int _DLLFunc db_svc_unreg(char *ds_netnam, long *perr)
  *    	pointed to by "perr". Otherwise, the function returns DS_OK
  *
  */
-int _DLLFunc db_svc_check(char *ds_netname, char **pho_name, u_int *pp_num, u_int *pv_num,long *perr)
+int _DLLFunc db_svc_check(char *ds_netname, char **pho_name, u_int *pp_num, u_int *pv_num, DevLong *perr)
 {
 	int i,j,k;
 	svc_inf *back;
 	char *ds_netname1;
-	long error;
+	DevLong error;
 	long i_nethost = 0;
 #ifndef OSK
 	struct timeval tout;
@@ -3900,10 +3866,7 @@ int _DLLFunc db_svc_check(char *ds_netname, char **pho_name, u_int *pp_num, u_in
 		*perr = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(ds_netname1,ds_netname);
-	for (j=0;j<k;j++) 
-		ds_netname1[j] = tolower(ds_netname1[j]);
-
+	strcpy_tolower(ds_netname1,ds_netname);
 /* Call server */
 
 #ifdef ALONE
@@ -4009,7 +3972,7 @@ int _DLLFunc db_svc_check(char *ds_netname, char **pho_name, u_int *pp_num, u_in
 
 #ifndef _OSK
 /**@ingroup dbaseAPIexport
- * Allow an user to get the name of exported (and then ready to accept
+ * Allows an user to get the name of exported (and then ready to accept
  * command) devices. With the filter parameter, it is possible to limit the devices
  * name return by the function. This function is not available for OS-9 client.
  *
@@ -4021,7 +3984,7 @@ int _DLLFunc db_svc_check(char *ds_netname, char **pho_name, u_int *pp_num, u_in
  * @return   In case of trouble, the function returns DS_NOTOK and sets the err variable
  *    pointed to by "perr". Otherwise, the function returns DS_OK
  */
-int _DLLFunc db_getdevexp(char *filter, char ***tab, u_int *num_dev,long *perr)
+int _DLLFunc db_getdevexp(char *filter, char ***tab, u_int *num_dev, DevLong *perr)
 {
 	char *filter1;
 	register db_res *recev;
@@ -4029,7 +3992,7 @@ int _DLLFunc db_getdevexp(char *filter, char ***tab, u_int *num_dev,long *perr)
 	CLIENT *tcp_cl;
 	int tcp_so;
 	int tcp_used = 0;
-	long error;
+	DevLong error;
 	struct timeval tout;
 #ifdef ALONE
 	char *serv_name = ALONE_SERVER_HOST;
@@ -4120,9 +4083,7 @@ int _DLLFunc db_getdevexp(char *filter, char ***tab, u_int *num_dev,long *perr)
 		*perr = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(filter1,filter);
-	for(i=0;i<k;i++)
-		filter1[i] = tolower(filter1[i]);	
+	strcpy_tolower(filter1,filter);
 
 /* Realloc memory if the array tab_clstu is full */
 
@@ -4487,7 +4448,7 @@ void kern_sort(char **tab,int n)
 }
 			
 /**@ingroup dbaseAPIintern
- * To test the number of wild card ('*') in every filter
+ * Test the number of wild card ('*') in every filter
  * fields. The maximun number of '*' for each field is 1
  *
  * @param filter the filter string				
@@ -4587,9 +4548,9 @@ int test_star(char *filter)
 
 
 /**@ingroup dbaseAPIexport
- * The @ref db_getdevexp function can return a lot of device names and allocate memory
+ * The @ref db_getdevexp function can return a lot of device names and allocates memory
  * to store them. This call is a local call and frees all the memory allocated by the
- * db_getdevexp funtion.
+ * db_getdevexp function.
  *
  * @param ptr The pointer to the array of exported device name strings.
  *   This pointer must have been initialized by a db_getdevexp function.
@@ -4686,11 +4647,11 @@ int _DLLFunc db_freedevexp(char **ptr)
  * @return   In case of trouble, the function returns DS_NOTOK and sets the err variable
  *    	pointed to by "perr". Otherwise, the function returns DS_OK
  */
-int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code,long *perr)
+int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code, DevLong *perr)
 {
 	int i;
 	cmd_que *serv_ans;
-	long error;
+	DevLong error;
 	long i_nethost = 0;
 #ifndef _OSK
 	struct timeval tout;
@@ -4823,11 +4784,11 @@ int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code,long *perr)
  * @return   In case of trouble, the function returns DS_NOTOK and sets the err variable
  *    pointed to by "perr". Otherwise, the function returns DS_OK
  */
-int _DLLFunc db_event_query(char *event_name, u_int *event_code, long *perr)
+int _DLLFunc db_event_query(char *event_name, u_int *event_code,  DevLong *perr)
 {
 	int i;
 	event_que *serv_ans;
-	long error;
+	DevLong error;
 	long i_nethost = 0;
 #ifndef _OSK
 	struct timeval tout;
@@ -4976,7 +4937,7 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
 	int l;
 	psdev_reg_x *tmp_x;
 	psdev_elt *tmp_x_low;
-	long error;
+	DevLong error;
 	db_psdev_error *serv_ans;
 	static char hostna[HOST_NAME_LENGTH];
 	long i_nethost = 0;
@@ -5177,7 +5138,7 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 {
 	register long i,j,l;
 	arr1 send;
-	long error;
+	DevLong error;
 	db_psdev_error *serv_ans;
 	long i_nethost = 0;
 #ifndef _OSK
@@ -5234,7 +5195,7 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 
 /* Allocate memory for the array of pointeur to char */
 
-	if((send.arr1_val = (nam *)calloc(num_psdev,sizeof(nam))) == NULL)
+	if((send.arr1_val = (DevString *)calloc(num_psdev,sizeof(DevString))) == NULL)
 	{
 		p_err->error_code = DbErr_ClientMemoryAllocation;
 		p_err->psdev_err = DS_OK;
@@ -5246,7 +5207,7 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 	for (i = 0;i < num_psdev;i++)
 	{
 		l = strlen(psdev_list[i]);
-		if ((send.arr1_val[i] = (char *)malloc(l + 2)) == NULL)
+		if ((send.arr1_val[i] = (DevString)malloc(l + 2)) == NULL)
 		{
 			p_err->error_code = DbErr_ClientMemoryAllocation;
 			p_err->psdev_err = DS_OK;
@@ -5256,9 +5217,7 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 			return(DS_NOTOK);
 		}
 
-		strcpy(send.arr1_val[i],psdev_list[i]);
-		for (j = 0;j < l;j++)
-			send.arr1_val[i][j] = tolower(send.arr1_val[i][j]);
+		strcpy_tolower(send.arr1_val[i],psdev_list[i]);
 	}
 	send.arr1_len = num_psdev;
 
@@ -5364,10 +5323,10 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
  * @see db_import
  * @see db_svc_reopen
  */
-int _DLLFunc db_svc_close(long *perr)
+int _DLLFunc db_svc_close( DevLong *perr)
 {
 	int *pdb_err;
-	long error;
+	DevLong error;
 	int padd;
 	long i_nethost = 0;
 #ifdef ALONE
@@ -5453,10 +5412,10 @@ int _DLLFunc db_svc_close(long *perr)
  * @see db_import
  * @see db_svc_close
  */
-int _DLLFunc db_svc_reopen(long *perr)
+int _DLLFunc db_svc_reopen( DevLong *perr)
 {
 	int *pdb_err;
-	long error;
+	DevLong error;
 	int padd;
 	long i_nethost = 0;
 #ifdef ALONE

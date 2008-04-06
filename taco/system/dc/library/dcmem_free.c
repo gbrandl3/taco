@@ -29,9 +29,9 @@
  *
  * Original     : August 1992
  *
- * Version      : $Revision: 1.3 $
+ * Version      : $Revision: 1.4 $
  *
- * Date         : $Date: 2006-09-18 21:48:25 $
+ * Date         : $Date: 2008-04-06 09:07:48 $
  *
  */
 
@@ -62,35 +62,28 @@
 extern int time_out;
 extern int errno;
 
+static void compute_first_mask(int pos,int nb_bit,unsigned char *pmask);
+static void compute_last_mask(int nb_bit,unsigned char *pmask);
 
-/****************************************************************************
-*                                                                           *
-*		Code for dcmem_free function                                *
-*                        ----------                                         *
-*                                                                           *
-*    Function rule : To free memory . This means to change bit in the       *
-*		     allocation area from 1 to 0.			    *
-*                    WARNING : This function uses a semaphore and set an    *
-*                              alarm to have a time-out on semaphore        *
-*                              request. The signal must be caught and the   *
-*                              the signal routine must set the "time_out"   *
-*                              variable to True in case of its execution    *
-*                                                                           *
-*    Argin : - Base address of the allocation area			    *
-*	     - Base address of the buffer where an area must be cleared     *
-*	     - Address of the buffer to freed				    *
-*            - The buffer size						    *
-*	     - The semaphore identifier					    *
-*                                                                           *
-*    Argout : - The error code						    *
-*                                                                           *
-*    This function returns DS_NOTOK if one error occurs and the error code will   *
-*    be set								    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To free memory. This means to change bit in the allocation area from 1 to 0.
+ * WARNING : This function uses a semaphore and set an alarm to have a time-out 
+ * on semaphore request. The signal must be caught and the the signal routine 
+ * must set the "time_out" variable to True in case of its execution
+ * 
+ * @param base Base address of the allocation area
+ * @param base_buf Base address of the buffer where an area must be cleared
+ * @param tab Address of the buffer to freed
+ * @param bufsize The buffer size
+ * @param semid The semaphore identifier
+ * @param perr The error code
+ * 
+ * @return  This function returns DS_NOTOK if one error occurs and the error 
+ *    code will be set
+ *
+ */
 
-
-int dcmem_free(unsigned char *base,unsigned char *base_buf,unsigned char *tab,int buf_size,int semid,long *perr)
+int dcmem_free(unsigned char *base,unsigned char *base_buf,unsigned char *tab,int buf_size,int semid, DevLong *perr)
 {
 	int offset;
 	int bit,byte,nb_bit;
@@ -216,24 +209,18 @@ int dcmem_free(unsigned char *base,unsigned char *base_buf,unsigned char *tab,in
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for compute_first_mask function                        *
-*                        ------------------                                 *
-*                                                                           *
-*    Function rule : To compute the mask needed (for an AND operation)      *
-*		     to clear the necessary bits in the first byte of the   *
-*		     area to be freed					    *
-*                                                                           *
-*    Argin : - The position of the first bit to clear (between 0 and 7)     *
-*	     - The number of bits to clear (between 1 and 8)		    *
-*                                                                           *
-*    Argout : - The mask						    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To compute the mask needed (for an AND operation) to clear the necessary bits
+ * in the first byte of the area to be freed
+ * 
+ * @param pos The position of the first bit to clear (between 0 and 7)
+ * @param nb_bit The number of bits to clear (between 1 and 8)
+ *
+ * @param pmask The pointer of the computed mask
+ * 
+ */
 
-
-compute_first_mask(int pos,int nb_bit,unsigned char *pmask)
+static void compute_first_mask(int pos,int nb_bit,unsigned char *pmask)
 {
 	switch(pos)
 	{
@@ -356,23 +343,17 @@ compute_first_mask(int pos,int nb_bit,unsigned char *pmask)
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for compute_last_mask function                         *
-*                        -----------------                                  *
-*                                                                           *
-*    Function rule : To compute the mask needed (for an AND operation)      *
-*		     to clear the necessary bits in the last byte of the    *
-*		     area to be freed					    *
-*                                                                           *
-*    Argin : - The number of bits to clear (between 1 and 8)		    *
-*	     (It always starts from bit 0)				    *
-*                                                                           *
-*    Argout : - The mask						    *
-*                                                                           *
-****************************************************************************/
+/**
+ * To compute the mask needed (for an AND operation) to clear the necessary bits
+ * in the last byte of the area to be freed
+ *
+ * @param nb_bit The number of bits to clear (between 1 and 8)(It always starts from bit 0)
+ *
+ * @param The pointer to the computed mask
+ *
+ */
 
-compute_last_mask(int nb_bit,unsigned char *pmask)
+static void compute_last_mask(int nb_bit,unsigned char *pmask)
 {
 	switch(nb_bit) 
 	{

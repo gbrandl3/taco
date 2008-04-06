@@ -1,0 +1,57 @@
+# Copyright (C) 2007 Jens Krüger <jens.krueger@frm2.tum.de>
+#
+# Permission to use, copy, modify, and distribute this software and its
+# documentation under the terms of the GNU General Public License is hereby
+# granted. No representations are made about the suitability of this software
+# for any purpose. It is provided "as is" without express or implied warranty.
+# See the GNU General Public License for more details.
+#
+
+PROJECT_NAME      	= "TACO manual"
+OUTPUT_DIRECTORY  	= .
+HTML_HEADER       	=
+HTML_FOOTER       	=
+QUIET             	= NO
+WARNINGS          	= YES
+DISABLE_INDEX     	= YES
+EXTRACT_ALL       	= NO
+EXTRACT_PRIVATE   	= NO
+GENERATE_MAN      	= NO
+GENERATE_LATEX    	= YES
+GENERATE_HTML     	= YES
+GENERATE_HTMLHELP 	= YES
+GENERATE_RTF      	= NO
+GENERATE_XML      	= NO
+ENABLED_SECTIONS  	= logo_on
+ENABLE_PREPROCESSING 	= NO
+CASE_SENSE_NAMES  	= NO
+IMAGE_PATH        	= @srcdir@
+INPUT             	= index.doc @srcdir@/introduction.doc @srcdir@/whatis.doc @srcdir@/acknowledge.doc \
+			@srcdir@/started.doc @srcdir@/install.doc \
+			@srcdir@/c.doc @srcdir@/cplusplus.doc @srcdir@/python.doc @srcdir@/labview.doc \
+			@srcdir@/ds_model.doc \
+			@srcdir@/database.doc \
+			@srcdir@/dsapi.doc \
+			@srcdir@/xdr.doc \
+			@srcdir@/clib_dsapi.doc \
+			@srcdir@/clib_database.doc \
+			@srcdir@/basicsteps.doc \
+			@srcdir@/access.doc \
+			@srcdir@/privatetypes.doc \
+			@srcdir@/lite.doc \
+			@srcdir@/interfaces.doc \
+			@srcdir@/testtool.doc \
+			@srcdir@/events.doc @srcdir@/signal.doc
+
+FILE_PATTERNS     	= *.cpp *.h *.doc
+EXAMPLE_PATH      	= @top_srcdir@/lib @top_srcdir@/classes/powersupply @top_srcdir@/classes/agps @top_srcdir@/lib/xdr @top_srcdir@/bindings/python/demo.server \
+			@top_srcdir@/classes/signal/multiple @top_srcdir@/examples/helloworld
+RECURSIVE         	= NO
+TAGFILES          	=
+ALLEXTERNALS      	= NO
+PERL_PATH         	= /usr/bin/perl
+SEARCHENGINE      	= NO
+PDF_HYPERLINKS    	= YES
+USE_PDFLATEX      	= YES
+STRIP_CODE_COMMENTS 	= NO
+DOTFILE_DIRS 		= @srcdir@

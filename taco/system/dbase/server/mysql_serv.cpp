@@ -19,15 +19,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * File:
- *
+ *		mysql_serv.cpp
  * Description:
  *
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.17 $
+ * Version:	$Revision: 1.18 $
  *
- * Date:	$Date: 2007-03-22 14:25:53 $
+ * Date:	$Date: 2008-04-06 09:07:41 $
  *
  */
 
@@ -60,14 +60,13 @@ db_res *MySQLServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
     u_short 		prot;
     int 		k1 = 1;
 
-#if DEBUG 
-    std::cout << "In db_getres_1_svc " << std::endl;
-#endif
+    logStream->debugStream() << "In db_getres_1_svc " << log4cpp::eol;
 //
 // Return error code if the server is not connected to the database 
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	browse_back.res_val.arr1_len = 0;
 	browse_back.res_val.arr1_val = NULL;
@@ -97,10 +96,10 @@ db_res *MySQLServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 	prot = IPPROTO_TCP;
 #endif 
     num_res = rece->arr1_len;
-#ifdef DEBUG
+
     for(int i = 0; i < num_res; i++)
-	std::cout << "Resource name : " << rece->arr1_val[i] << std::endl;
-#endif
+	logStream->debugStream() << "Resource name : " << rece->arr1_val[i] << log4cpp::eol;
+
 //
 // Initialize browse_back structure error code 
 //
@@ -111,7 +110,7 @@ db_res *MySQLServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
     int i = 0;
     try
     {
-    	browse_back.res_val.arr1_val = new nam[num_res];
+    	browse_back.res_val.arr1_val = new DevString[num_res];
 	for (int j = 0; j < num_res; ++j)
 		browse_back.res_val.arr1_val[j] = NULL;
 //
@@ -182,9 +181,7 @@ db_res *MySQLServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 //
 // Exit server 
 //
-#if DEBUG 
-    std::cout << "Exit db_getres_1_svc " << std::endl;
-#endif
+    logStream->debugStream() << "Exit db_getres_1_svc " << log4cpp::eol;
     return(&browse_back);
 }
 
@@ -196,14 +193,12 @@ db_res *MySQLServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
  *
  * @returns a pointer to a structure of the db_res type.
  */
-db_res *MySQLServer::db_getdev_1_svc(nam *dev_name)
+db_res *MySQLServer::db_getdev_1_svc(DevString *dev_name)
 {
     int 	dev_num,
 		err_db;
 
-#ifdef DEBUG
-    std::cout << "Device server name (getdevlist) : " << *dev_name << std::endl;
-#endif
+    logStream->debugStream() << "Device server name (getdevlist) : " << *dev_name << log4cpp::eol;
 //
 // Initialize error code sended back to client 
 //
@@ -211,8 +206,9 @@ db_res *MySQLServer::db_getdev_1_svc(nam *dev_name)
 //
 // Return error code if the server is not connected to the database 
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	browse_back.res_val.arr1_len = 0;
 	browse_back.res_val.arr1_val = NULL;
@@ -227,10 +223,9 @@ db_res *MySQLServer::db_getdev_1_svc(nam *dev_name)
 	browse_back.res_val.arr1_len = 0;
 	return(&browse_back);
     }
-#ifdef DEBUG
+
     for (int i = 0; i < dev_num; i++)
-	std::cout << "Device name : " << browse_back.res_val.arr1_val[i] << std::endl;
-#endif
+	logStream->debugStream() << "Device name : " << browse_back.res_val.arr1_val[i] << log4cpp::eol;
 //
 // Exit server
 //
@@ -261,9 +256,7 @@ int MySQLServer::db_find(std::string tab_name, std::string p_res_name, char **ou
 			sec_res,
     			i;
 
-#ifdef DEBUG
-    std::cout << "Table name : " << tab_name << std::endl;
-#endif
+    logStream->debugStream() << "Table name : " << tab_name << log4cpp::eol;
 //
 // Set a flag if the resource belongs to security domain 
 //
@@ -285,11 +278,11 @@ int MySQLServer::db_find(std::string tab_name, std::string p_res_name, char **ou
     if ((pos = r_name.find('/')) != std::string::npos)
 	r_name.erase(pos,1);
 
-#ifdef NEVER
-    std::cout << "Family name : " << family << std::endl;
-    std::cout << "Member name : " << member << std::endl;
-    std::cout << "Resource name : " << r_name << std::endl;
-#endif
+
+    logStream->debugStream() << "Family name : " << family << log4cpp::eol;
+    logStream->debugStream() << "Member name : " << member << log4cpp::eol;
+    logStream->debugStream() << "Resource name : " << r_name << log4cpp::eol;
+
 //
 // Select the right resource table in the right database
 //
@@ -306,12 +299,12 @@ int MySQLServer::db_find(std::string tab_name, std::string p_res_name, char **ou
     query = "SELECT COUNT, VALUE FROM property_device ";
     query += ("WHERE DEVICE = '" + tab_name + "/" + family + "/" + member + "' AND NAME = '" + r_name);
     query += "' ORDER BY COUNT ASC";
-#ifdef DEBUG
-    std::cout << "MySQLServer::db_find(): query = " << query << std::endl;
-#endif /* DEBUG */
+
+    logStream->debugStream() << "MySQLServer::db_find(): query = " << query << log4cpp::eol;
+
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	return (DbErr_DatabaseAccess);
     }
 	MYSQL_RES	*result = mysql_store_result(mysql_conn);
@@ -363,7 +356,7 @@ int MySQLServer::db_find(std::string tab_name, std::string p_res_name, char **ou
 	}
 	catch(const std::bad_alloc &e)
 	{
-		std::cout << "Error in malloc for out" << std::endl;
+		logStream->errorStream() << "Error in malloc for out" << log4cpp::eol;
 		throw e;
 	}
 
@@ -400,23 +393,22 @@ int MySQLServer::db_devlist(std::string dev_na, int *dev_num, db_res *back)
 //
     ds_name = dev_na.substr(pos + 1);
 //
-#ifdef DEBUG
-    std::cout << "Device server class (getdevlist) : " << ds_class << std::endl;
-    std::cout << "Device server name (getdevlist) : " << ds_name << std::endl;
-#endif 
+
+    logStream->debugStream() << "Device server class (getdevlist) : " << ds_class << log4cpp::eol;
+    logStream->debugStream() << "Device server name (getdevlist) : " << ds_name << log4cpp::eol;
+
 //
 // Try to retrieve the right tuple in NAMES table 
 //
 //  
     std::string query;
     query = "SELECT NAME, CLASS FROM device WHERE SERVER = '" + ds_class + "/" + ds_name + "' ORDER BY CLASS";
-#ifdef DEBUG
-    std::cout << "MySQLServer::db_devlist(): query " << query << std::endl;
-#endif /* DEBUG */
+
+    logStream->debugStream() << "MySQLServer::db_devlist(): query " << query << log4cpp::eol;
     
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	return (DbErr_DatabaseAccess);
     }
     
@@ -431,7 +423,7 @@ int MySQLServer::db_devlist(std::string dev_na, int *dev_num, db_res *back)
     int i = 0;
     try
     {
-    	ptra = new nam[d_num];
+    	ptra = new DevString[d_num];
     
     	for (i = 0; i < d_num && ((row = mysql_fetch_row(result)) != NULL); i++)
     	{
@@ -482,10 +474,8 @@ DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
     register putres 		*tmp_ptr;
     char 			indnr[16];
 
-#ifdef DEBUG
     for (int i = 0; i < res_num; i++)
-	std::cout << "Resource name : " << rece->tab_putres_val[i].res_name << std::endl;
-#endif 
+	logStream->debugStream() << "Resource name : " << rece->tab_putres_val[i].res_name << log4cpp::eol;
 //
 // Initialize sent back error code 
 //
@@ -493,8 +483,9 @@ DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
 //
 // Return error code if the server is not connected to the database 
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode); 
     }
@@ -509,7 +500,7 @@ DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
 	res_name = tmp_ptr->res_name;
 
 	if (db_del(res_name) != 0)
-	    std::cout << "Could not delete resource" << res_name << std::endl;
+	    logStream->errorStream() << "Could not delete resource" << res_name << log4cpp::eol;
 	res_val = tmp_ptr->res_val;
 //
 // Try to retrieve this resource from the database 
@@ -527,7 +518,7 @@ DevLong *MySQLServer::db_putres_1_svc(tab_putres *rece)
 	    
   	    if ((pos = res_val.find(SEP_ELT)) == std::string::npos)
 	    {
-		std::cout << "Missing '" << SEP_ELT <<"' in resource value." << std::endl;
+		logStream->errorStream() << "Missing '" << SEP_ELT <<"' in resource value." << log4cpp::eol;
 		errcode = DbErr_BadResSyntax;
 		return (&errcode);
 	    }
@@ -597,10 +588,8 @@ DevLong *MySQLServer::db_delres_1_svc(arr1 *rece/*, struct svc_req *rqstp*/)
 		err_db;
     register char *ptrc;
 
-#ifdef DEBUG
     for(int i = 0; i < num_res; i++)
-	std::cout << "Resource to delete : " << rece->arr1_val[i] << std::endl;
-#endif
+	logStream->debugStream() << "Resource to delete : " << rece->arr1_val[i] << log4cpp::eol;
 //
 // Initialize error code 
 //
@@ -608,8 +597,9 @@ DevLong *MySQLServer::db_delres_1_svc(arr1 *rece/*, struct svc_req *rqstp*/)
 //
 // Return error code if the server is not connected to the database files
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
+	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
 	errcode = DbErr_DatabaseNotConnected;
 	return(&errcode);
     }
@@ -617,7 +607,7 @@ DevLong *MySQLServer::db_delres_1_svc(arr1 *rece/*, struct svc_req *rqstp*/)
 // Mark the server as not connected. This will prevent dbm_update to
 // add/modify resources during this call
 //
-    dbgen.connected = False;
+    dbgen.connected = false;
 //
 // Allocate array for pointers to store deleted resources value
 //
@@ -631,15 +621,15 @@ DevLong *MySQLServer::db_delres_1_svc(arr1 *rece/*, struct svc_req *rqstp*/)
 //
 	if((errcode = db_del(rece->arr1_val[i])) != 0 )
 	{
-	    dbgen.connected = True;
-	    std::cout << "Could not delete resource " << rece->arr1_val[i] << std::endl;
+	    dbgen.connected = true;
+	    logStream->errorStream() << "Could not delete resource " << rece->arr1_val[i] << log4cpp::eol;
 	    return(&errcode);
     	}
     }
 //
 // Free memory and exit server 
 //
-    dbgen.connected = True;
+    dbgen.connected = true;
     return(&errcode);
 }
 
@@ -666,7 +656,7 @@ int MySQLServer::db_insert(std::string res_name, std::string number, std::string
 //
     if ((pos = res_name.find('/')) == std::string::npos)
     {
-	std::cout << "db_del : Error in resource name " << res_name << std::endl;
+	logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::eol;
 	return(DbErr_BadResourceType);
     }
     domain = res_name.substr(0, pos);
@@ -675,7 +665,7 @@ int MySQLServer::db_insert(std::string res_name, std::string number, std::string
 //
     if ((pos = res_name.find('/', (last_pos = pos + 1))) == std::string::npos)
     {
-	std::cout << "db_insert : Error in resource name " << res_name << std::endl;
+	logStream->errorStream() << "db_insert : Error in resource name " << res_name << log4cpp::eol;
 	return(DbErr_BadResourceType);
     }
     family = res_name.substr(last_pos, pos - last_pos);
@@ -684,7 +674,7 @@ int MySQLServer::db_insert(std::string res_name, std::string number, std::string
 //
     if ((pos = res_name.find('/', (last_pos = pos + 1))) == std::string::npos)
     {
-	std::cout << "db_insert : Error in resource name " <<res_name << std::endl;
+	logStream->errorStream() << "db_insert : Error in resource name " <<res_name << log4cpp::eol;
 	return(DbErr_BadResourceType);
     }
     member = res_name.substr(last_pos, pos - last_pos);
@@ -693,11 +683,9 @@ int MySQLServer::db_insert(std::string res_name, std::string number, std::string
 //
     r_name = res_name.substr(pos + 1);
 
-#ifdef NEVER
-    std::cout << "Family name : " << family << std::endl;
-    std::cout << "Number name : " << member << std::endl;
-    std::cout << "Resource name : " << r_name << std::endl;
-#endif
+    logStream->debugStream() << "Family name : " << family << log4cpp::eol;
+    logStream->debugStream() << "Number name : " << member << log4cpp::eol;
+    logStream->debugStream() << "Resource name : " << r_name << log4cpp::eol;
 //
 // Select the right resource table in database
 //
@@ -711,17 +699,17 @@ int MySQLServer::db_insert(std::string res_name, std::string number, std::string
     query = "INSERT INTO property_device(DEVICE,NAME,DOMAIN,FAMILY,MEMBER,COUNT,VALUE) VALUES('" + domain + "/" + family + "/" + member + "','" + r_name + "','"; 
     query += (domain + "','" + family +"','" + member + "','");
     query += (number + "','" + content + "')");
-#ifdef DEBUG
-    std::cout << "MySQLServer::db_insert(): query = " << query;
-#endif /* DEBUG */
+
+    logStream->debugStream() << "MySQLServer::db_insert(): query = " << query << log4cpp::eol;
+
     if (mysql_query(mysql_conn, query.c_str()))
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	return (DbErr_DatabaseAccess);
     }
     if ((i = mysql_affected_rows(mysql_conn)) != 1)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	return (DbErr_DatabaseAccess);
     }
     
@@ -755,7 +743,7 @@ int MySQLServer::db_del(std::string res_name)
 //
     if ((pos = res_name.find('/')) == std::string::npos)
     {
-	std::cout << "db_del : Error in resource name " << res_name << std::endl;
+	logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::eol;
 	return(DbErr_BadResourceType);
     }
     t_name = res_name.substr(0, pos);    
@@ -764,7 +752,7 @@ int MySQLServer::db_del(std::string res_name)
 //
     if ((pos = res_name.find('/', 1 + (last_pos = pos))) == std::string::npos)
     {
-	std::cout << "db_del : Error in resource name " << res_name << std::endl;
+	logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::eol;
 	return(DbErr_BadResourceType);
     }
     family = res_name.substr(last_pos + 1, pos - last_pos - 1);
@@ -773,7 +761,7 @@ int MySQLServer::db_del(std::string res_name)
 //
     if ((pos = res_name.find('/', 1 + (last_pos = pos))) == std::string::npos)
     {
-	std::cout << "db_del : Error in resource name " <<res_name << std::endl;
+	logStream->errorStream() << "db_del : Error in resource name " <<res_name << log4cpp::eol;
 	return(DbErr_BadResourceType);
     }
     member = res_name.substr(last_pos + 1, pos - last_pos - 1);
@@ -783,11 +771,9 @@ int MySQLServer::db_del(std::string res_name)
    last_pos = pos;
     r_name = res_name.substr(last_pos + 1);
 
-#ifdef NEVER
-    std::cout << "Family name : " << family << std::endl;
-    std::cout << "Number name : " << member << std::endl;
-    std::cout << "Resource name : " << r_name << std::endl;
-#endif
+    logStream->debugStream() << "Family name : " << family << log4cpp::eol;
+    logStream->debugStream() << "Number name : " << member << log4cpp::eol;
+    logStream->debugStream() << "Resource name : " << r_name << log4cpp::eol;
 //
 // Select the right resource table in database
 //
@@ -804,18 +790,16 @@ int MySQLServer::db_del(std::string res_name)
     query = "DELETE FROM property_device WHERE DEVICE = '" + t_name + "/" + family + "/" + member + "'";
     query += " AND NAME = '" + r_name + "'";
 
-#ifdef DEBUG
-    std::cout << "db_del : query = " << query << std::endl;
-#endif /* DEBUG */
+    logStream->debugStream() << "db_del : query = " << query << log4cpp::eol;
 
     if (mysql_query(mysql_conn, query.c_str()))
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	return (DbErr_DatabaseAccess);
     }
     if ((i = mysql_affected_rows(mysql_conn)) == -1)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	return (DbErr_DatabaseAccess);
     }
     

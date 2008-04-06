@@ -31,9 +31,9 @@
  *
  * Original:	July 1995
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:	$Date: 2006-09-18 22:31:44 $
+ * Date:	$Date: 2008-04-06 09:07:00 $
  *
  ********************************************************************-*/
 
@@ -201,7 +201,7 @@ DevMethodFunction ds__method_finder (void *ptr_ds, DevMethod method)
  * 
  * @return  DS_OK or DS_NOTOK
  */
-long ds__create (char *name, void *ptr_ds_class,void *ptr_ds_ptr, long *error)
+long ds__create (char *name, void *ptr_ds_class,void *ptr_ds_ptr, DevLong *error)
 {
 	DevServerClass ds_class_tmp;
 	DevMethodFunction method_fn;

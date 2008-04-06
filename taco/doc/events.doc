@@ -1,0 +1,212 @@
+/*! \page events Events 
+
+\addindex events
+
+The TACO control system was originally based on synchronous remote 
+procedure calls (RPCs) and the client-server model. Clients and servers which 
+required asynchronism made use of the data collector (a distributed online 
+buffer of device command results) or the servers implemented their own mini-buffers 
+locally and the clients polled the server. This is not always efficient in terms 
+of time, network bandwidth and CPU usage. Therefore an asynchronous call was added 
+and has been available for over a year now. The asynchronous call implements the 
+mechanisms necessary to add events without much effort. It was logical therefore 
+with the recent move towards Linux on frontends to take advantage of the excellent 
+TCP/IP stack implementation on Linux to offer programmers and clients events. 
+
+The present implementation offers a simple model for user events which will permit 
+device server programmers to add their own events (user events) to their code 
+thereby providing adding value to their device servers. The present implementation 
+is ideal for device servers which have a small number of clients. A full 
+implementation with sophisticated system and user events which provides efficient 
+mechanisms for distributing events to large numbers of clients will be implemented 
+in TANGO (next generation TACO). The present implementation in TACO is simply an 
+avantgout of TANGO events and allows TACO programmers to gain experience using 
+events. This chapter presents the user event api, examples of how to program them 
+and a discussion on performance and problems which can arise.
+
+\section Events 
+
+Events are short messages which are sent to clients asynchronously. The origin of 
+the messages is a device server. Clients only receive messages if they have solicited 
+them. Events are classified according to type. Event types are specific to the 
+device server and should be defined as unique long integers. The most obvious way 
+to do so is to use the device class unique base as offset and number events starting 
+from 1 e.g. :
+\code
+#define D_EVENT_AGPS_STATE 		DevAgpsBase + 1 
+
+#define D_EVENT_OMS_STATE_CHANGE 	DevOmsBase + 1
+\endcode
+*/
+\section event_api API 
+
+The event API consists of three additional calls which are distributed as part of 
+the DSAPI. The API consists of a client part and a server part. The client part 
+allows a client to register its interest in events , to receive events and to 
+unregister once it is finished. The server part allows servers to dispatch events 
+to clients. The server has to program how to trigger events.
+
+\subsection client_event_api Client side
+
+- dev_event_listen() - register a callback for an event type
+
+long dev.event.listen (devserver ds, long event.type,
+
+DevArgument argout, DevType argout.type DevCallbackFunction *callback, void *user.data, long *event.id.ptr, long *error)
+
+devserver ds - device from which client wants to receive events long event.type - type of event to receive DevArgument argout - pointer to argout data (if any) which will be sent with event DevType argout.type - argout type DevCallbackFunction *callback - pointer to callback function void *user.data - pointer to user data to pass to callback function long *event.id.ptr - pointer to event id (returned by dev.event.listen()) long *error - pointer to error code (if any)
+
+ffl dev event unlisten() - unregister a callback for an event type
+
+long dev.event.unlisten (devserver ds, long event.type,
+
+long event.id, long *error)
+
+devserver ds - device from which to unregister client's interest in event long event.type - event type to unregister long event.id - event id (returned by dev.event.listen()) long *error - pointer to error code (if any)long dev.event.fire
+
+ffl dev synch() - poll network to check if any events have arrived and trigger
+
+callback
+
+long dev.synch (struct timeval *timeout, long *error) struct timeval *timeout - pointer to maximum time to wait while polling long *error - pointer to error code (if any)
+
+14.3.2 Server side
+
+ffl dev event fire() - a server call to diispatch a user event to all clients which
+
+have registered their interest in that event with this server
+
+- C using Objects in C :
+
+long dev.event.fire (DevServer ds, long event.type,
+
+DevArgument argout,DevType argout.type, long event.status, long event.error)
+
+14.4. IMPLEMENTATION 185
+
+long event.type - event type to dispatch DevArgument argout - pointer to argout to dispatch with event DevType argout.type - argout type long event.status - status of event to dispatch to client long event.error - error code of event to dispatch to client (if status != DS.OK)
+
+- C++ using the Device class :
+
+long dev.event.fire (Device *device, long event.type,
+
+DevArgument argout,DevType argout.type, long event.status, long event.error)
+
+long event.type - event type to dispatch DevArgument argout - pointer to argout to dispatch with event DevType argout.type - argout type long event.status - status of event to dispatch to client long event.error - error code of event to dispatch to client (if status != DS.OK)
+/**
+\page events
+\section Implementation 
+
+User events have been implemented in TACO DSAPI v7.0. They have been tested on 
+Linux/x86, Linux/m68k, HP-UX and Solaris 2.5. They should work in principle on 
+OS-9 but because of its flaky TCP/IP stack implementation programmers are urged 
+to port their device servers to one of the Unix derivatives e.g. Linux, where 
+they will not be plagued by sockets closing when they shouldn't or not closing 
+when they should ! No port has been undertaken so far for Windows or VxWorks.
+
+\section Timeouts 
+
+Events depend on detecting the server or client going down in order to work 
+correctly. This is treated as a timeout in the client. If the client does not 
+receive any events during a period exceeding the asynchronous timeout value 
+(set using \c dev_asynch_timeout()) it will ping the server to see if it is 
+still alive. If not it will trigger the event callback with status = DS_NOTOK 
+and error = DevErr_RPCTimedout. The event will be unregistered on the client 
+side. If the server detects a client is not there anymore it will silently 
+remove it from the list of registered clients.
+
+\section Examples 
+
+How best to generate events in a device server ? The most obvious way is to create 
+an event thread whose job it is to poll a variable (state or value) to detect the 
+event. Once the event is detected the event thread calls \c dev_event_fire() to 
+dispatch the event. Here is a simple example to generate a periodic event using 
+Posix threads :
+\code
+void *events_thread(void * arg) 
+{
+	long event = 1; 
+	long counter=0; 
+	struct timespec t100ms;
+
+	fprintf(stderr, "\nfire_events(): starting thread %s\n", (char *)arg); 
+	for (;;) 
+	{
+		dev_event_fire(ds, event,&counter,D_LONG_TYPE,DS_OK,0); 
+		counter++; 
+/*
+ * sleep for 90 ms 
+ */
+		t100ms.tv.sec = 0; 
+		t100ms.tv.nsec = 90000000; 
+		nanosleep(&t100ms, NULL); 
+	}
+	return NULL; 
+}
+
+int event_thread_start()
+{ 
+	int retcode; 
+	pthread_t th_a, th_b; 
+	void * retval;
+
+#if defined(linux) || defined(solaris)
+	retcode = pthread_create(&th_a, NULL, fire_events, "a"); 
+#else
+	retcode = pthread_create(&th_a, pthread_attr_default,
+				(pthread_startroutine_t)fire_events, 
+				(pthread_addr_t)"a"); 
+#endif /* linux || solaris */
+	if (retcode != 0) 
+		fprintf(stderr, "create a failed %d\n", retcode);
+\endcode
+
+The function \c event_thread_start() has to be called at an appropiate point in 
+the device server e.g. during class_initialise() or object_create().
+
+\section Performance 
+
+The performance of events depends naturally on what type of system the device 
+server is running on. Tests have been caried out on Linux/x86, Linux/68k, HP-UX 
+and Solaris running on Pentiums, 68030s, s700s and SPARC CPUs. They all showed 
+similar performance with variations due to the scheduler. Firing of events uses 
+the one-way ONC/RPC mechanism which means it is immediately copied to the system 
+buffer without waiting. This means there is very little overhead introduced in 
+the device server. Generating events at maximum speed shows that the minimum 
+time between events is about 25 microseconds with an average of 500 microseconds 
+over a long (seconds) time scale. This is due to scheduler stopping the device 
+server at regular intervals (presumably to dispatch the events). Using the example 
+code above a number of tests were done on different platforms. The results were 
+all roughly the same i.e. the server could generate events at regular time 
+intervals of 100 millseconds wih a jitter of less than 10 microseconds. The 
+jitter goes up as a function of the number of clients e.g. jitter of 25 microseconds 
+for 10 clients on Linux/m68k. Here is an example output log from a client 
+(Linux/x86 + Pentium) which accepts the events from a device server running on a 
+tacobox (Linux/x86 + Pentium) and prints out their times :
+\verbatim
+counter = 3362 , server time = {924772119 s,342170 us} delta time = 99974 us 
+counter = 3363 , server time = {924772119 s,442169 us} delta time = 99999 us 
+counter = 3364 , server time = {924772119 s,542169 us} delta time = 100000 us 
+counter = 3365 , server time = {924772119 s,642169 us} delta time = 100000 us 
+counter = 3366 , server time = {924772119 s,742169 us} delta time = 100000 us 
+counter = 3367 , server time = {924772119 s,842169 us} delta time = 100000 us 
+counter = 3368 , server time = {924772119 s,942169 us} delta time = 100000 us 
+counter = 3369 , server time = {924772120 s,042173 us} delta time = 100004 us 
+counter = 3370 , server time = {924772120 s,142169 us} delta time = 99996 us 
+counter = 3371 , server time = {924772120 s,242169 us} delta time = 100000 us 
+counter = 3372 , server time = {924772120 s,342169 us} delta time = 100000 us 
+counter = 3373 , server time = {924772120 s,442169 us} delta time = 100000 us 
+counter = 3374 , server time = {924772120 s,542169 us} delta time = 100000 us
+\endverbatim
+
+\section event_problems Known problems 
+
+Known problems so far are that when the server or client die then HP-UX and 
+Solaris servers and clients have difficult to detect this due to the way sockets 
+are handled. The next release will fix this by implementing an event heartbeat 
+which will reactivate the event channel. Failure to do so will result in the 
+event timing out and the client being removed from the list of registered clients 
+in the server.
+
+*/
+

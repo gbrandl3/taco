@@ -29,9 +29,9 @@
  *
  * Original:    January 1991
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  *
  *******************************************************************-*/
 
@@ -65,8 +65,8 @@ xdr_length_DevVgcStat(objp)
 {
 	long	length = 0;
 
-	length = length + 8;
-	length = length + 8;
+	length += 8;
+	length += 8;
 
 	return (length);
 }
@@ -111,14 +111,14 @@ xdr_length_DevVgcGauge (objp)
 {
 	long	length = 0;
 
-	length = length + 8;
-	length = length + 8;
-	length = length + 16;
-        length = length + xdr_length_DevChar (&objp->type);
-        length = length + xdr_length_DevChar (&objp->number);
-	length = length + 8;
-	length = length + 8;
-        length = length + xdr_length_DevDouble (&objp->pressure);
+	length += 8;
+	length += 8;
+	length += 16;
+        length += xdr_length_DevChar (&objp->type);
+        length += xdr_length_DevChar (&objp->number);
+	length += 8;
+	length += 8;
+        length += xdr_length_DevDouble (&objp->pressure);
 
 	return (length);
 }
@@ -162,13 +162,13 @@ xdr_length_DevVgcPiraniGauge (objp)
 {
 	long	length = 0;
 
-        length = length + xdr_length_DevChar (&objp->type);
-        length = length + xdr_length_DevChar (&objp->number);
-        length = length + xdr_length_DevChar (&objp->calibration);
-        length = length + xdr_length_DevDouble (&objp->gas_factor);
-	length = length + 8;
-	length = length + 8;
-        length = length + xdr_length_DevDouble (&objp->pressure);
+        length += xdr_length_DevChar (&objp->type);
+        length += xdr_length_DevChar (&objp->number);
+        length += xdr_length_DevChar (&objp->calibration);
+        length += xdr_length_DevDouble (&objp->gas_factor);
+	length += 8;
+	length += 8;
+        length += xdr_length_DevDouble (&objp->pressure);
 
 	return (length);
 }
@@ -218,15 +218,15 @@ xdr_length_DevVgcPenningGauge (objp)
 {
 	long	length = 0;
 
-        length = length + xdr_length_DevChar (&objp->type);
-        length = length + xdr_length_DevChar (&objp->number);
-        length = length + xdr_length_DevChar (&objp->filter);
-        length = length + xdr_length_DevLong ((long *)&objp->start_time);
-        length = length + xdr_length_DevChar (&objp->calibration);
-        length = length + xdr_length_DevDouble (&objp->min_current);
-	length = length + 8;
-	length = length + 8;
-        length = length + xdr_length_DevDouble (&objp->pressure);
+        length += xdr_length_DevChar (&objp->type);
+        length += xdr_length_DevChar (&objp->number);
+        length += xdr_length_DevChar (&objp->filter);
+        length += xdr_length_DevLong (&objp->start_time);
+        length += xdr_length_DevChar (&objp->calibration);
+        length += xdr_length_DevDouble (&objp->min_current);
+	length += 8;
+	length += 8;
+        length += xdr_length_DevDouble (&objp->pressure);
 
 	return (length);
 }
@@ -261,10 +261,10 @@ xdr_length_DevVgcRelay (objp)
 {
 	long	length = 0;
 
-        length = length + xdr_length_DevChar (&objp->letter);
-        length = length + xdr_length_DevChar (&objp->status);
-        length = length + xdr_length_DevDouble (&objp->setpoint);
-        length = length + xdr_length_DevChar (&objp->ass_gauge);
+        length += xdr_length_DevChar (&objp->letter);
+        length += xdr_length_DevChar (&objp->status);
+        length += xdr_length_DevDouble (&objp->setpoint);
+        length += xdr_length_DevChar (&objp->ass_gauge);
 
 	return (length);
 }
@@ -298,10 +298,10 @@ xdr_length_DevVgcSystem (objp)
 {
 	long	length = 0;
 
-        length = length + xdr_length_DevChar (&objp->interlock);
-        length = length + xdr_length_DevChar (&objp->relay_conf);
-        length = length + xdr_length_DevChar (&objp->cold_cathode);
-	length = length + 4;
+        length += xdr_length_DevChar (&objp->interlock);
+        length += xdr_length_DevChar (&objp->relay_conf);
+        length += xdr_length_DevChar (&objp->cold_cathode);
+	length += 4;
 
 	return (length);
 }
@@ -358,29 +358,29 @@ xdr_length_DevVgcController (objp)
 	if ( (type_length = xdr_length_DevVgcPiraniGauge (&objp->pirani[0])) 
 		== -1 )
 		return (-1);
-	length = length + 2 * type_length;
+	length += 2 * type_length;
 
 	/* length of four DevVgcPenningGauge structures */
 	if ( (type_length = xdr_length_DevVgcPenningGauge (&objp->penning[0])) 
 		== -1 )
 		return (-1);
-	length = length + 4 * type_length;
+	length += 4 * type_length;
 
 	/* length of twelve DevVgcRelay structures */
 	if ( (type_length = xdr_length_DevVgcRelay (&objp->relay[0])) 
 		== -1 )
 		return (-1);
-	length = length + 12 * type_length;
+	length += 12 * type_length;
 
-        length = length + xdr_length_DevLong ((long *)&objp->nb_pir);
-        length = length + xdr_length_DevLong ((long *)&objp->nb_pen);
-	length = length + xdr_length_DevLong ((long *)&objp->nb_relay);
+        length += xdr_length_DevLong (&objp->nb_pir);
+        length += xdr_length_DevLong (&objp->nb_pen);
+	length += xdr_length_DevLong (&objp->nb_relay);
 	if ( (type_length = xdr_length_DevVgcSystem (&objp->syst)) == -1 )
 		return (-1);
-	length = length + type_length;
-	length = length + 8;
-	length = length + 8;
-	length = length + 16;
+	length += type_length;
+	length += 8;
+	length += 8;
+	length += 16;
 
 	return (length);
 }

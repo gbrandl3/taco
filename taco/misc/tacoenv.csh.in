@@ -80,7 +80,7 @@ setenv LOGPATH @logdir@
 if (${?LOGCONF}) then
 ;
 else
-setenv LOGCONF @sysconfdir@/taco_log.cfg
+setenv LOGCONF ${sysconfdir}/taco_log.cfg
 endif
 
 if (${?NETHOST}) then
@@ -91,15 +91,15 @@ endif
 
 if ( $DSHOME == $prefix ) then
 	if (${?LD_LIBRARY_PATH}) then
-		setenv LD_LIBRARY_PATH @libdir@:${LD_LIBRARY_PATH}
+		setenv LD_LIBRARY_PATH ${libdir}:${LD_LIBRARY_PATH}
 	else
-		setenv LD_LIBRARY_PATH @libdir@
+		setenv LD_LIBRARY_PATH ${libdir}
 	endif
-        setenv TACO_PATH @sbindir@
+        setenv TACO_PATH ${sbindir}
 	if (${?PATH}) then
-		setenv PATH ${TACO_PATH}:@bindir@:${PATH}
+		setenv PATH ${TACO_PATH}:${bindir}:${PATH}
 	else
-		setenv PATH ${TACO_PATH}:@bindir@
+		setenv PATH ${TACO_PATH}:${bindir}
 	endif
 else
 	if (${?LD_LIBRARY_PATH}) then
@@ -130,8 +130,8 @@ endif
 setenv LD_LIBRARY_PATH @GCC_LIBRARY_PATH@:${LD_LIBRARY_PATH}
 
 if (${?PYTHONPATH}) then
-	setenv PYTHONPATH @pkgpythondir@:@pkgpyexecdir@:${PYTHONPATH}
+	setenv PYTHONPATH ${pkgpythondir}:${pkgpyexecdir}:${PYTHONPATH}
 else
-	setenv PYTHONPATH @pkgpythondir@:@pkgpyexecdir@
+	setenv PYTHONPATH ${pkgpythondir}:${pkgpyexecdir}
 endif
 

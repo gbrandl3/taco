@@ -33,9 +33,9 @@
  *
  * Original:    June, 1996
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-18 22:04:49 $
+ * Date:        $Date: 2008-04-06 09:06:33 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -57,7 +57,7 @@ int db_io_put (ClientData clientdata, Tcl_Interp *interp, int argc, char **argv)
 /* db_putresource() interface */
 	db_resource 		tabres; /* only one structure item */
 	unsigned int 		res_num; /* will be initialized to 1 */
-	long 			db_error;
+	DevLong 		db_error;
 	DevVarStringArray 	res_adr; /* only one item because only one resource */
 
 /* local variables that hold the arguments of db_io_put*/

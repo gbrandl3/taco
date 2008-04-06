@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2006-12-15 12:43:54 $
+ * Date:	$Date: 2008-04-06 09:07:43 $
  *
  */
 
@@ -54,21 +54,21 @@ db_psdev_error *SQLite3Server::db_psdev_reg_1_svc(psdev_reg_x *rece)
 //
     psdev_back.error_code = psdev_back.psdev_err = 0;
 
-    logStream->debugStream() << "Begin db_psdev_register" << log4cpp::CategoryStream::ENDLINE;
-    logStream->debugStream() << "Host name : " << rece->h_name << log4cpp::CategoryStream::ENDLINE;
-    logStream->debugStream() << "PID = " << rece->pid << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "Begin db_psdev_register" << log4cpp::eol;
+    logStream->debugStream() << "Host name : " << rece->h_name << log4cpp::eol;
+    logStream->debugStream() << "PID = " << rece->pid << log4cpp::eol;
     for (long i = 0; i < num_psdev; i++)
     {
 	tmp = &(rece->psdev_arr.psdev_arr_val[i]);
-	logStream->debugStream() << "Pseudo device name : " << tmp->psdev_name << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "Refresh period : " << tmp->poll << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Pseudo device name : " << tmp->psdev_name << log4cpp::eol;
+	logStream->debugStream() << "Refresh period : " << tmp->poll << log4cpp::eol;
     }
 //
 // Return error code if the server is not connected 
 //
     if (dbgen.connected == False)
     {
-	logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	psdev_back.error_code = DbErr_DatabaseNotConnected;
 	return(&psdev_back);
     }
@@ -77,7 +77,7 @@ db_psdev_error *SQLite3Server::db_psdev_reg_1_svc(psdev_reg_x *rece)
 //
     for (long i = 0;i < num_psdev;i++)
     {
-	long	error;
+	DevLong	error;
 	tmp = &(rece->psdev_arr.psdev_arr_val[i]);
 	if (reg_ps(rece->h_name,rece->pid,tmp->psdev_name, tmp->poll,&error) == -1)
 	{
@@ -89,7 +89,7 @@ db_psdev_error *SQLite3Server::db_psdev_reg_1_svc(psdev_reg_x *rece)
 //
 // Leave server 
 //
-    logStream->debugStream() << "End db_psdev_register" << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "End db_psdev_register" << log4cpp::eol;
     return(&psdev_back);
 }
 
@@ -107,7 +107,7 @@ db_psdev_error *SQLite3Server::db_psdev_reg_1_svc(psdev_reg_x *rece)
  * @returns DS_OK is everything OK. Otherwise, the returned value is DS_NOTOK and 
  * 	the error code is set to the appropiate error.
  */
-long SQLite3Server::reg_ps(std::string h_name, long pid, std::string ps_name, long poll, long *p_error)
+long SQLite3Server::reg_ps(std::string h_name, long pid, std::string ps_name, long poll, DevLong *p_error)
 {
 	std::string	ps_name_low(ps_name);
 //
@@ -131,7 +131,7 @@ long SQLite3Server::reg_ps(std::string h_name, long pid, std::string ps_name, lo
     	query = "SELECT COUNT(*) FROM device WHERE NAME = '" + ps_name_low + "' AND CLASS NOT LIKE 'PseudoDevice'";
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE; 
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol; 
 		*p_error = DbErr_DatabaseAccess;
 		return(-1);
 	}
@@ -172,7 +172,7 @@ long SQLite3Server::reg_ps(std::string h_name, long pid, std::string ps_name, lo
 //
 // In case of error 
 //
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		throw long(DbErr_DatabaseAccess);
         }
 #if !HAVE_SSTREAM
@@ -242,16 +242,16 @@ db_psdev_error *SQLite3Server::db_psdev_unreg_1_svc(arr1 *rece)
 //
     psdev_back.error_code = psdev_back.psdev_err = 0;
 
-    logStream->debugStream() << "Begin db_psdev_unregister" << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "Begin db_psdev_unregister" << log4cpp::eol;
     for (long i = 0;i < num_psdev;i++)
-	logStream->debugStream() << "Pseudo device name : " << rece->arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Pseudo device name : " << rece->arr1_val[i] << log4cpp::eol;
 
 //
 // Return error code if the server is not connected 
 //
     if (dbgen.connected == False)
     {
-	logStream->errorStream() << "I'm not connected to database." << log4cpp::CategoryStream::ENDLINE;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	psdev_back.error_code = DbErr_DatabaseNotConnected;
 	return(&psdev_back);
     }
@@ -271,7 +271,7 @@ db_psdev_error *SQLite3Server::db_psdev_unreg_1_svc(arr1 *rece)
 //
 // Leave server */
 //
-    logStream->debugStream() << "End db_psdev_unregister" << log4cpp::CategoryStream::ENDLINE;
+    logStream->debugStream() << "End db_psdev_unregister" << log4cpp::eol;
     return(&psdev_back);
 }
 
@@ -309,7 +309,7 @@ long SQLite3Server::unreg_ps(std::string ps_name, long *p_error)
 	query = "DELETE FROM device WHERE NAME = '" + ps_name_low + "'";
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
-		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		*p_error = DbErr_DatabaseAccess;
 		return (-1);
 	}

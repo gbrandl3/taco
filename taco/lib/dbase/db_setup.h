@@ -25,9 +25,9 @@
  * Author(s):	
  *		$Author: jkrueger1 $
  * 
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2007-09-07 14:33:11 $
+ * Date:	$Date: 2008-04-06 09:07:06 $
  *
  ******************************************************************************/
 
@@ -92,6 +92,7 @@
 
 #ifndef _db_setup_h
 #define _db_setup_h
+#include <dev_xdr.h>
 
 /* Constants definition */
 
@@ -410,9 +411,9 @@ typedef struct _db_svc
 
 typedef struct _db_delupd_error 
 {
-	long	type;
-	long 	number;
-	long 	error;
+	DevLong	type;
+	DevLong number;
+	DevLong error;
 }db_delupd_error;
 
 
@@ -432,119 +433,61 @@ typedef struct _db_delupd_error
 
 /* Functions definitions */
 
-#ifndef __cplusplus
-/*
- * OIC version
- */
-int _DLLFunc db_getresource PT_((char *dev_name,register Db_resource resource,u_int num_resource,long *error));
-int _DLLFunc db_getdevlist PT_((char *ds_name,char ***device_tab,u_int *dev_num,long *error));
-int _DLLFunc db_dev_export PT_((register Db_devinf devinfo,u_int num_device,long *error));
-int _DLLFunc db_dev_import PT_((char **devname,Db_devinf_imp *devinf,unsigned int num_device,long *error));
-int _DLLFunc db_svc_unreg PT_((char *dsn_name,long *error));
-int _DLLFunc db_svc_check PT_((char *dsn_name,char **host_name,u_int *p_num,u_int *v_num,long *error));
-int _DLLFunc db_getdevexp  PT_((char *filter,char ***device_tab,u_int *dev_num,long *error));
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int _DLLFunc db_getresource PT_((char *dev_name,register Db_resource resource,u_int num_resource,DevLong *error));
+int _DLLFunc db_getdevlist PT_((char *ds_name,char ***device_tab,u_int *dev_num,DevLong *error));
+int _DLLFunc db_dev_export PT_((register Db_devinf devinfo,u_int num_device,DevLong *error));
+int _DLLFunc db_dev_import PT_((char **devname,Db_devinf_imp *devinf,unsigned int num_device,DevLong *error));
+int _DLLFunc db_svc_unreg PT_((char *dsn_name,DevLong *error));
+int _DLLFunc db_svc_check PT_((char *dsn_name,char **host_name,u_int *p_num,u_int *v_num,DevLong *error));
+int _DLLFunc db_getdevexp  PT_((char *filter,char ***device_tab,u_int *dev_num,DevLong *error));
 int _DLLFunc db_freedevexp  PT_((char **buffer));
-int _DLLFunc db_svc_close PT_((long *error));
-int _DLLFunc db_svc_reopen PT_((long *error));
-int _DLLFunc db_putresource PT_((char *dev_name,register Db_resource resource,u_int num_resource,long *error));
-int _DLLFunc db_delresource PT_((char *dev_name,register char **res_name,u_int num_resource,long *error));
-int _DLLFunc db_cmd_query PT_((char *cmd_name,u_int *cmd_code,long *error));
+int _DLLFunc db_svc_close PT_((DevLong *error));
+int _DLLFunc db_svc_reopen PT_((DevLong *error));
+int _DLLFunc db_putresource PT_((char *dev_name,register Db_resource resource,u_int num_resource,DevLong *error));
+int _DLLFunc db_delresource PT_((char *dev_name,register char **res_name,u_int num_resource,DevLong *error));
+int _DLLFunc db_cmd_query PT_((char *cmd_name,u_int *cmd_code,DevLong *error));
 /*event query */
-int _DLLFunc db_event_query PT_((char *event_name,u_int *event_code,long *error));
+int _DLLFunc db_event_query PT_((char *event_name,u_int *event_code,DevLong *error));
 
 int _DLLFunc db_psdev_register PT_((db_psdev_info *psdev,long num_psdev,db_error *error));
 int _DLLFunc db_psdev_unregister PT_((char *psdev_list[],long num_psdev,db_error *error));
 
-long _DLLFunc db_getdevdomainlist PT_((long *domain_nb,char ***domain_list,long *error));
-long _DLLFunc db_getdevfamilylist PT_((char *domain,long *family_nb,char ***family_list,long *error));
-long _DLLFunc db_getdevmemberlist PT_((char *domain,char *family,long *member_nb,char ***member_list,long *error));
-long _DLLFunc db_getresdomainlist PT_((long *domain_nb,char ***domain_list,long *error));
-long _DLLFunc db_getresfamilylist PT_((char *domain,long *family_nb,char ***family_list,long *error));
-long _DLLFunc db_getresmemberlist PT_((char *domain,char *family,long *member_nb,char ***member_list,long *error));
-long _DLLFunc db_getresresolist PT_((char *domain,char *family,char *member,long *resource_nb,char ***resource_list,long *error));
-long _DLLFunc db_getresresoval PT_((char *domain,char *family,char *member,char *resource,long *resval_nb,char ***resval_list,long *error));
-long _DLLFunc db_getdsserverlist PT_((long *server_nb,char ***server_list,long *error));
-long _DLLFunc db_getdspersnamelist PT_((char *server,long *persname_nb,char ***persname_list,long *error));
-long _DLLFunc db_gethostlist PT_((long *host_nb,char ***host_list,long *error));
-long _DLLFunc db_getdsonhost PT_((char *host,long *ds_nb,db_svc **ds_list,long *error));
+long _DLLFunc db_getdevdomainlist PT_((long *domain_nb,char ***domain_list,DevLong *error));
+long _DLLFunc db_getdevfamilylist PT_((char *domain,long *family_nb,char ***family_list,DevLong *error));
+long _DLLFunc db_getdevmemberlist PT_((char *domain,char *family,long *member_nb,char ***member_list,DevLong *error));
+long _DLLFunc db_getresdomainlist PT_((long *domain_nb,char ***domain_list,DevLong *error));
+long _DLLFunc db_getresfamilylist PT_((char *domain,long *family_nb,char ***family_list,DevLong *error));
+long _DLLFunc db_getresmemberlist PT_((char *domain,char *family,long *member_nb,char ***member_list,DevLong *error));
+long _DLLFunc db_getresresolist PT_((char *domain,char *family,char *member,long *resource_nb,char ***resource_list,DevLong *error));
+long _DLLFunc db_getresresoval PT_((char *domain,char *family,char *member,char *resource,long *resval_nb,char ***resval_list,DevLong *error));
+long _DLLFunc db_getdsserverlist PT_((long *server_nb,char ***server_list,DevLong *error));
+long _DLLFunc db_getdspersnamelist PT_((char *server,long *persname_nb,char ***persname_list,DevLong *error));
+long _DLLFunc db_gethostlist PT_((long *host_nb,char ***host_list,DevLong *error));
+long _DLLFunc db_getdsonhost PT_((char *host,long *ds_nb,db_svc **ds_list,DevLong *error));
 
-long _DLLFunc db_deviceinfo PT_((const char *dev_name,db_devinfo_call *devinfo,long *error));
-long _DLLFunc db_deviceres PT_((long dev_nb,char **dev_name_list,long *res_nb,char ***res_list,long *error));
-long _DLLFunc db_devicedelete PT_((const char *dev_name,long *error));
+long _DLLFunc db_deviceinfo PT_((const char *dev_name,db_devinfo_call *devinfo,DevLong *error));
+long _DLLFunc db_deviceres PT_((long dev_nb,char **dev_name_list,long *res_nb,char ***res_list,DevLong *error));
+long _DLLFunc db_devicedelete PT_((const char *dev_name,DevLong *error));
 long _DLLFunc db_devicedeleteres PT_((long dev_nb,char **dev_name_list,db_error *error));
-long _DLLFunc db_stat PT_((db_stat_call *info,long *error));
-long _DLLFunc db_servunreg PT_((const char *ds_name,const char *pers_name,long *error));
-long _DLLFunc db_servinfo PT_((const char *ds_name,const char *pers_name,db_svcinfo_call *s_info,long *error));
-long _DLLFunc db_servdelete PT_((const char *ds_name,const char *pers_name,long delres_flag,long *error));
-long _DLLFunc db_getpoller PT_((const char *dev_name,db_poller *poll,long *error));
-long _DLLFunc db_delreslist PT_((char **res_list,long res_num,long *error));
-long _DLLFunc db_initcache PT_((const char *domain,long *error));
+long _DLLFunc db_stat PT_((db_stat_call *info,DevLong *error));
+long _DLLFunc db_servunreg PT_((const char *ds_name,const char *pers_name,DevLong *error));
+long _DLLFunc db_servinfo PT_((const char *ds_name,const char *pers_name,db_svcinfo_call *s_info,DevLong *error));
+long _DLLFunc db_servdelete PT_((const char *ds_name,const char *pers_name,long delres_flag,DevLong *error));
+long _DLLFunc db_getpoller PT_((const char *dev_name,db_poller *poll,DevLong *error));
+long _DLLFunc db_delreslist PT_((char **res_list,long res_num,DevLong *error));
+long _DLLFunc db_initcache PT_((const char *domain,DevLong *error));
 
-long _DLLFunc db_analyze_data PT_((long in_type,const char *buffer,long *nb_devdef,char ***devdef,long *nb_resdef,char ***resdef,long *error_line,long *error));
-long _DLLFunc db_upddev PT_((long devdef_nb,char **devdef,long *deferr_nb,long *error));
-long _DLLFunc db_updres PT_((long resdef_nb,char **resdef,long *deferr_nb,long *error));
-long _DLLFunc db_secpass PT_((char **pass,long *error));
+long _DLLFunc db_analyze_data PT_((long in_type,const char *buffer,long *nb_devdef,char ***devdef,long *nb_resdef,char ***resdef,long *error_line,DevLong *error));
+long _DLLFunc db_upddev PT_((long devdef_nb,char **devdef,long *deferr_nb,DevLong *error));
+long _DLLFunc db_updres PT_((long resdef_nb,char **resdef,long *deferr_nb,DevLong *error));
+long _DLLFunc db_secpass PT_((char **pass,DevLong *error));
 long _DLLFunc db_delete_update PT_((long dev_nb,char **dev_name_list,long list_type,long devdef_nb,char **devdef,long resdef_nb,char **resdef,db_delupd_error *p_error));
 
-#else
-/*
- * C++ version
- */
-extern "C" 
-{
-int _DLLFunc db_getresource (char *dev_name,Db_resource resource,u_int num_resource,long *error);
-int _DLLFunc db_getdevlist (char *ds_name,char ***device_tab,u_int *dev_num,long *error);
-int _DLLFunc db_dev_export (register Db_devinf devinfo,u_int num_device,long *error);
-int _DLLFunc db_dev_import (char **devname,Db_devinf_imp *devinf,unsigned int num_device,long *error);
-int _DLLFunc db_svc_unreg (char *dsn_name,long *error);
-int _DLLFunc db_svc_check (char *dsn_name,char **host_name,u_int *p_num,u_int *v_num,long *error);
-int _DLLFunc db_getdevexp  (char *filter,char ***device_tab,u_int *dev_num,long *error);
-int _DLLFunc db_freedevexp (char **buffer);
-int _DLLFunc db_svc_close (long *error);
-int _DLLFunc db_svc_reopen (long *error);
-int _DLLFunc db_putresource (char *dev_name,register Db_resource resource,u_int num_resource,long *error);
-int _DLLFunc db_delresource (char *dev_name,register char **res_name,u_int num_resource,long *error);
-int _DLLFunc db_cmd_query (char *cmd_name,u_int *cmd_code,long *error);
-    /*event query*/
-int _DLLFunc db_event_query (char *event_name,u_int *event_code,long *error);
-
-int _DLLFunc db_psdev_register (db_psdev_info *psdev,long num_psdev,db_error *error);
-int _DLLFunc db_psdev_unregister (char *psdev_list[],long num_psdev,db_error *error);
-
-long _DLLFunc db_getdevdomainlist (long *domain_nb,char ***domain_list,long *error);
-long _DLLFunc db_getdevfamilylist (char *domain,long *family_nb,char ***family_list,long *error);
-long _DLLFunc db_getdevmemberlist (char *domain,char *family,long *member_nb,char ***member_list,long *error);
-long _DLLFunc db_getresdomainlist (long *domain_nb,char ***domain_list,long *error);
-long _DLLFunc db_getresfamilylist (char *domain,long *family_nb,char ***family_list,long *error);
-long _DLLFunc db_getresmemberlist (char *domain,char *family,long *member_nb,char ***member_list,long *error);
-long _DLLFunc db_getresresolist (char *domain,char *family,char *member,long *resource_nb,char ***resource_list,long *error);
-long _DLLFunc db_getresresoval (char *domain,char *family,char *member,char *resource,long *resval_nb,char ***resval_list,long *error);
-long _DLLFunc db_getdsserverlist (long *server_nb,char ***server_list,long *error);
-long _DLLFunc db_getdspersnamelist (char *server,long *persname_nb,char ***persname_list,long *error);
-long _DLLFunc db_gethostlist (long *host_nb,char ***host_list,long *error);
-long _DLLFunc db_getdsonhost (char *host,long *ds_nb,db_svc **ds_list,long *error);
-
-long _DLLFunc db_deviceinfo (const char *dev_name,db_devinfo_call *devinfo,long *error);
-long _DLLFunc db_deviceres (long dev_nb,char **dev_name_list,long *res_nb,char ***res_list,long *error);
-long _DLLFunc db_devicedelete (const char *dev_name,long *error);
-long _DLLFunc db_devicedeleteres (long dev_nb,char **dev_name_list,db_error *error);
-long _DLLFunc db_stat (db_stat_call *info,long *error);
-long _DLLFunc db_servunreg (const char *ds_name,const char *pers_name,long *error);
-long _DLLFunc db_servinfo (const char *ds_name,const char *pers_name,db_svcinfo_call *s_info,long *error);
-long _DLLFunc db_servdelete (const char *ds_name,const char *pers_name,long delres_flag,long *error);
-long _DLLFunc db_getpoller (const char *dev_name,db_poller *poll,long *error);
-long _DLLFunc db_delreslist (char **res_list,long res_num,long *error);
-long _DLLFunc db_initcache (const char *domain,long *error);
-
-
-long _DLLFunc db_analyze_data (long in_type,const char *buffer,long *nb_devdef,char ***devdef,long *nb_resdef,char ***resdef,long *error_line,long *error);
-long _DLLFunc db_upddev (long devdef_nb,char **devdef,long *deferr_nb,long *error);
-long _DLLFunc db_updres (long resdef_nb,char **resdef,long *deferr_nb,long *error);
-long _DLLFunc db_secpass (char **pass,long *error);
-long _DLLFunc db_delete_update(long dev_nb,char **dev_name_list,long list_type,long devdef_nb,char **devdef,long resdef_nb,char **resdef,db_delupd_error *p_error);
-
-int _DLLFunc db_getdevexp_tango  (char *filter,char ***device_tab,u_int *dev_num,long *error);
-int _DLLFunc db_freedevexp_tango (char **buffer);
+#ifdef __cplusplus
 }
 #endif /* __cplusplus */
 

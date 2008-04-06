@@ -32,9 +32,9 @@
  *
  * Original:	November 1993
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:20 $
  *
  *******************************************************************-*/
 
@@ -46,7 +46,7 @@
  */
 #ifdef _IDENT
 static char DevXdrKernelh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/DevXdrKernel.h,v 1.3 2005-07-25 13:05:45 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/DevXdrKernel.h,v 1.4 2008-04-06 09:07:20 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -78,43 +78,30 @@ typedef long   DevType;
 #define NUMBER_OF_GENERAL_XDR_TYPES	100
 
 typedef struct _DevDataListEntry {
-											long                   type;
-                                 DevDataFunction        xdr;
-											long                   size;
-											DevDataLengthFunction  xdr_length;
-                                 } DevDataListEntry;
+				long                   type;
+                                DevDataFunction        xdr;
+				long                   size;
+				DevDataLengthFunction  xdr_length;
+} DevDataListEntry;
 
 /*
  * Function definitions
  */
 
-#ifndef __cplusplus
-/*
- * OIC version
- */
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern long _DLLFunc xdr_load_type
 		  	PT_( (long type, DevDataFunction xdr,
 			      long size, DevDataLengthFunction xdr_length,
-			      long *error) );
+			      DevLong *error) );
 extern long _DLLFunc xdr_get_type
 		     	PT_( (long type, DevDataListEntry *xdr_type,
-			      long *error) );
+			      DevLong *error) );
 extern long _DLLFunc xdr_load_kernel
-		     	PT_( (long *error) );
-#else
-/*
- * C++ version
- */
-extern "C" long _DLLFunc xdr_load_type
-		  	PT_( (long type, DevDataFunction xdr,
-			      long size, DevDataLengthFunction xdr_length,
-			      long *error) );
-extern "C" long _DLLFunc  xdr_get_type
-		     	PT_( (long type, DevDataListEntry *xdr_type,
-			      long *error) );
-extern "C" long _DLLFunc  xdr_load_kernel
-		     	PT_( (long *error) );
-
+		     	PT_( (DevLong *error) );
+#ifdef __cplusplus
+}
 #endif /* __cplusplus */
 
 

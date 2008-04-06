@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.5 $
+ * Version      : $Revision: 1.6 $
  *
- * Date         : $Date: 2006-09-18 21:50:15 $
+ * Date         : $Date: 2008-04-06 09:07:50 $
  *
  */
 
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 	DevString	*dc_path,
 			*s_dc_path,
 			*dc_login;
-	long 		error;
+	DevLong		error;
 	char 		*tmp,
 			*rsh,
 			*net;
@@ -198,5 +198,5 @@ int main(int argc, char **argv)
 		if (fista.st_size != 0) 
 			break;
 	}
-	return;
+	return 0;
 }

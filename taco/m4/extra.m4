@@ -4,9 +4,9 @@ dnl
 dnl Author(s):	B. Pedersen
 dnl		$Author: jkrueger1 $
 dnl
-dnl Version:	$Revision: 1.2 $
+dnl Version:	$Revision: 1.3 $
 dnl
-dnl Date:	$Date: 2004-08-02 12:54:25 $
+dnl Date:	$Date: 2008-04-06 09:07:32 $
 dnl
 
 dnl
@@ -22,13 +22,15 @@ AC_DEFUN([AC_CHECK_LIB_FUN],
 	AC_CACHE_VAL(ac_cv_lib_$ac_safe, AC_TRY_LINK([$2], [$3],[eval "ac_cv_lib_$ac_safe=yes"], [eval "ac_cv_lib_$ac_safe=no"]))		
 	eval "res="'$ac_cv_lib_'$ac_safe""
 	AC_MSG_RESULT($res)
-	if eval "test \"`echo $res`\" = yes"; then
+	AS_IF([eval "test \"`echo $res`\" = yes"],
+	      [
 		LIBS="$LIBS_ORG_LIBFUN"
 		$4
-	else
+	      ],
+	      [	
 		LIBS="$LIBS_ORG_LIBFUN" 
 		$5
-	fi
+	      ])
 ])
 
 dnl
@@ -46,19 +48,17 @@ AC_DEFUN([AC_FIND_HEADER],
 			CPPFLAGS="$CPPFLAGS -I$i"
 			AC_CHECK_HEADER([$1], [found=yes], [unset ac_cv_header_$ac_safe; unset ac_Header])
 			CPPFLAGS="$save_CPPFLAGS"
-			if   eval "test \"`echo $found`\" = yes"; then
+			AS_IF([eval "test \"`echo $found`\" = yes"], 
+			      [
 				if test -f ${i}/$1 ; then 
 					eval ac_cv_header_path_$ac_shead="\"$i\""
 					$3
 					break;
 				fi
-			fi
+			      ])
 		done
-		if   eval "test \"`echo $found`\" = no"; then
-			$4
-		else
-			eval  CPPFLAGS=\"${CPPFLAGS} -I'$ac_cv_header_path_'$ac_shead\"
-		fi
+		AS_IF([eval "test \"`echo $found`\" = no"], 
+		      [$4], [eval  CPPFLAGS=\"${CPPFLAGS} -I'$ac_cv_header_path_'$ac_shead\"])
 	])
 ])
 
@@ -83,12 +83,17 @@ AC_DEFUN([AC_FIND_LIB],
 				break;
 			fi
 		done
-		if  eval "test \"`echo $found`\" = no"; then
-			$5
-		else
-			eval ac_cv_lib_path_$ac_slib="\"-l$1\""
-		fi
+		AS_IF([eval "test \"`echo $found`\" = no"], [$5], [eval ac_cv_lib_path_$ac_slib="\"-l$1\""])
 		LIBS="$save_LIBS"
 	])
+])
+
+#
+# AC_PROG_RM
+# ----------
+#
+AC_DEFUN([AC_PROG_RM],
+[
+	AC_CHECK_TOOL([RM], [rm], [echo])
 ])
 

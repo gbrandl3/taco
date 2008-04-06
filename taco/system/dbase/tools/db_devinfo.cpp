@@ -25,14 +25,15 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.6 $
+ * Version:     $Revision: 1.7 $
  *
- * Date:        $Date: 2007-06-20 07:20:42 $
+ * Date:        $Date: 2008-04-06 09:07:47 $
  */
 
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 /* TACO include file */
-
-#include "config.h"
 #include <API.h>
 
 /* Include files */
@@ -41,10 +42,10 @@
 #include <algorithm>
 #include <cstdlib>
 #ifdef _solaris
-#include "_count.h"
+#	include "_count.h"
+#include <taco_utils.h>
 #endif /* _solaris */
 
-using namespace std;
 
 void usage(const char *cmd)
 {
@@ -52,12 +53,19 @@ void usage(const char *cmd)
 	std::cerr << " display informations of the device" << std::endl;
 	std::cerr << "         options: -h display this message" << std::endl;
 	std::cerr << "                  -n nethost" << std::endl;
+	std::cerr << "                  -v display the current version" << std::endl;
 	exit(1);
+}
+
+void version(const char *cmd)
+{
+	std::cerr << cmd << " version " << VERSION << std::endl;
+	exit(0);
 }
 
 int main(int argc,char *argv[])
 {
-	long 		error;
+	DevLong 	error;
 	db_devinfo_call info;
 	char **dev_list;
 	unsigned int dev_nb;
@@ -69,12 +77,15 @@ int main(int argc,char *argv[])
 //
 // Argument test and device name structure
 //
-        while ((c = getopt(argc, argv, "hn:")) != -1)
+        while ((c = getopt(argc, argv, "hvn:")) != -1)
                 switch (c)
                 {
 			case 'n':
 				setenv("NETHOST", optarg, 1);
-			break;
+				break;
+			case 'v':
+				version(argv[0]);
+				break;
                 	case 'h':
                 	case '?':
 				usage(argv[0]);
@@ -83,7 +94,7 @@ int main(int argc,char *argv[])
 	if (optind != argc - 1)
 		usage(argv[0]);
 
-	string dev_name(argv[optind]);
+	std::string dev_name(argv[optind]);
 	if (dev_name.substr(0, 2) == "//")
 	{
 		std::string::size_type pos = dev_name.find("/", 2);
@@ -92,7 +103,7 @@ int main(int argc,char *argv[])
 	}
 
 #ifdef DEBUG
-	cout  << "Device name : " << dev_name << endl;
+	std::cout  << "Device name : " << dev_name << std::endl;
 #endif 
 #ifndef _solaris
 	if (std::count(dev_name.begin(), dev_name.end(), '/') != 2)
@@ -100,7 +111,7 @@ int main(int argc,char *argv[])
 	if (_sol::count(dev_name.begin(), dev_name.end(), '/') != 2)
 #endif /* _solaris */
 	{
-		cerr << "db_devinfo : Bad device name" << endl;
+		std::cerr << "db_devinfo : Bad device name" << std::endl;
 		exit(-1);
 	}
 
@@ -110,14 +121,14 @@ int main(int argc,char *argv[])
 
 	if (db_import(&error) == -1)
 	{
-		cerr << "db_devinfo : Impossible to connect to database server" << endl;
+		std::cerr << "db_devinfo : Impossible to connect to database server" << std::endl;
 		exit(-1);
 	}
 
 //
 // Check if there is any * used in the device name
 //
-	bool devexp = (dev_name.find('*') != string::npos);
+	bool devexp = (dev_name.find('*') != std::string::npos);
 	if (!devexp)
 	{
 //
@@ -128,13 +139,13 @@ int main(int argc,char *argv[])
 		{
 			if (error == DbErr_DeviceNotDefined)
 			{
-				cout << "The device " << dev_name << " is not defined in the database" << endl;
+				std::cerr << "The device " << dev_name << " is not defined in the database" << std::endl;
 				exit(-1);
 			}
 			else
 			{
-				cerr << "The call to database server failed with error " << error << endl;
-				cerr << "Error message : " << dev_error_str(error) << endl;
+				std::cerr << "The call to database server failed with error " << error << std::endl
+					<< "Error message : " << dev_error_str(error) << std::endl;
 				exit(-1);
 			}
 		}
@@ -146,7 +157,7 @@ int main(int argc,char *argv[])
 //
 			if (info.device_exported == False)
 			{
-				cout << "The device " << dev_name << " is not actually exported" << endl;
+				std::cout << "The device " << dev_name << " is not actually exported" << std::endl;
 				exit(-1);
 			}
 			else
@@ -154,19 +165,20 @@ int main(int argc,char *argv[])
 //
 // Print results
 //
-				cout << "Device " << dev_name << " belongs to class : " << info.device_class << endl;
-				cout << "It is monitored by the server : " << info.server_name <<"/" << info.personal_name << " version " << info.server_version << endl;
+				std::cout << "Device " << dev_name << " belongs to class : " << info.device_class << std::endl
+					<< "It is monitored by the server : " << info.server_name <<"/" << info.personal_name 
+					<< " version " << info.server_version << std::endl;
 				if (strcmp(info.process_name,"unknown") != 0)
 				{
-					cout << "The device server process name is : " << info.process_name;
+					std::cout << "The device server process name is : " << info.process_name;
 					if (info.program_num != 0)
-						cout << " with program number : " << info.program_num;
-					cout << endl;
+						std::cout << " with program number : " << info.program_num;
+					std::cout << std::endl;
 				}
-				cout << "The process is running on the computer : " << info.host_name;
+				std::cout << "The process is running on the computer : " << info.host_name;
 				if (info.pid != 0)
-					cout << " with process ID : " << info.pid;
-				cout << endl;
+					std::cout << " with process ID : " << info.pid;
+				std::cout << std::endl;
 			}
 		}
 		else
@@ -174,8 +186,9 @@ int main(int argc,char *argv[])
 //
 // Display pseudo-device info
 //
-			cout << "Device " << dev_name << " is a pseudo device" << endl;
-			cout << "It has been created by a process with PID : " << info.pid << " running on host : " << info.host_name << endl;
+			std::cout << "Device " << dev_name << " is a pseudo device" << std::endl
+				<< "It has been created by a process with PID : " << info.pid << " running on host : " 
+				<< info.host_name << std::endl;
 		}
 	}
 	else
@@ -186,15 +199,15 @@ int main(int argc,char *argv[])
 //
 		if (db_getdevexp(const_cast< char *>(dev_name.c_str()), &dev_list, &dev_nb, &error) == -1)
 		{
-			cerr << "The call to database server failed with error " << error << endl;
-			cerr << "Error message : " << dev_error_str(error) << endl;
+			std::cerr << "The call to database server failed with error " << error << std::endl
+				<< "Error message : " << dev_error_str(error) << std::endl;
 			exit(-1);
 		}
 //
 // Display device list
 //
 		for (int i = 0; i < dev_nb; i++)
-			cout << dev_list[i] << endl;
+			std::cout << dev_list[i] << std::endl;
 	}
 	return 0;
 }

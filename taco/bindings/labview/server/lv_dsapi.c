@@ -67,13 +67,19 @@
  *
  * Original:	February 1999
  *
- * $Revision: 1.3 $
+ * $Revision: 1.4 $
  *
- * $Date: 2006-11-21 16:38:19 $
+ * $Date: 2008-04-06 09:06:26 $
  *
  * $Author: jkrueger1 $
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.3.4.1  2008/03/18 13:23:42  jkrueger1
+ * make TACO 64 bit ready
+ *
+ * Revision 1.3  2006/11/21 16:38:19  jkrueger1
+ * Add code from ESRF
+ *
  * Revision 1.17  2005/06/29 08:39:39  goetz
  * going to add D_INT_FLOAT for the insertion device group
  *
@@ -205,14 +211,14 @@ typedef ShortArray **ShortArrayHdl;
 
 typedef struct {
   long dimSizes[1];
-  long arg1[1];
+  DevLong arg1[1];
 } LongArray;
 
 typedef LongArray **LongArrayHdl;
 
 typedef struct {
   long dimSizes[1];
-  unsigned long arg1[1];
+  DevULong arg1[1];
 } ULongArray;
 
 typedef ULongArray **ULongArrayHdl;
@@ -265,23 +271,23 @@ struct { char *name;
 #define EXPORT
 #endif /* _WINDOWS */
 
-EXPORT long (*_dev_import)(char *,long,devserver*,long*)=NULL;
-EXPORT long (*_dev_cmd_query)(devserver,DevVarCmdArray*,long*)=NULL;
-EXPORT long (*_dev_putget)(devserver,long,void*,long,void*,long,long*)=NULL;
-EXPORT long (*_dev_xdrfree)(long,void*,long*)=NULL;
-EXPORT long (*_dev_free)(devserver,long*)=NULL;
-EXPORT long (*_dc_free)(dc_dev_free*,unsigned int,long*)=NULL;
-EXPORT long (*_dev_rpc_protocol)(devserver,long,long*)=NULL;
-EXPORT long (*_dev_rpc_timeout)(devserver,long,struct timeval*,long*)=NULL;
+EXPORT long (*_dev_import)(char *,long,devserver*,DevLong*)=NULL;
+EXPORT long (*_dev_cmd_query)(devserver,DevVarCmdArray*,DevLong*)=NULL;
+EXPORT long (*_dev_putget)(devserver,long,void*,long,void*,long,DevLong*)=NULL;
+EXPORT long (*_dev_xdrfree)(long,void*,DevLong*)=NULL;
+EXPORT long (*_dev_free)(devserver,DevLong*)=NULL;
+EXPORT long (*_dc_free)(dc_dev_free*,unsigned int,DevLong*)=NULL;
+EXPORT long (*_dev_rpc_protocol)(devserver,long,DevLong*)=NULL;
+EXPORT long (*_dev_rpc_timeout)(devserver,long,struct timeval*,DevLong*)=NULL;
 EXPORT char* (*_dev_error_str)(long)=NULL;
 #ifdef LV_DC
-long (*_dc_import)(dc_dev_imp*,long,long*)=NULL;
-long (*_dc_dinfo)(char*,dc_devinf*,long*)=NULL;
-long (*_dc_devget)(datco*,long,void*,long,long*)=NULL;
+long (*_dc_import)(dc_dev_imp*,long,DevLong*)=NULL;
+long (*_dc_dinfo)(char*,dc_devinf*,DevLong*)=NULL;
+long (*_dc_devget)(datco*,long,void*,long,DevLong*)=NULL;
 #endif /* DC */
-EXPORT long (*_db_import)(long*)=NULL;
-EXPORT long (*_db_getresource)(char*,Db_resource,u_int,long*)=NULL;
-EXPORT long (*_db_getdevexp)(char*,char***,u_int*,long*)=NULL;
+EXPORT long (*_db_import)(DevLong*)=NULL;
+EXPORT long (*_db_getresource)(char*,Db_resource,u_int,DevLong*)=NULL;
+EXPORT long (*_db_getdevexp)(char*,char***,u_int*,DevLong*)=NULL;
 EXPORT long (*_db_freedevexp)(char**)=NULL;
 long (*_lv_ds__main)(char*,char*)=NULL;
 long (*_lv_ds__cmd_get)()=NULL;
@@ -319,7 +325,7 @@ static long lv_debug = 0;
  *
  ******************************************************************************/
 
-static long lv_dev_init(long *error)
+static long lv_dev_init(DevLong *error)
 {
 
 #ifdef unix
@@ -660,7 +666,7 @@ static long lv_dev_init(long *error)
  *
  ******************************************************************************/
 
-static long lv_dev_import(char *name, long *error)
+static long lv_dev_import(char *name, DevLong *error)
 {
 	long i, status, dev_status=-1;
 
@@ -733,7 +739,7 @@ static long lv_dev_import(char *name, long *error)
  *
  ******************************************************************************/
 
-static long lv_dc_import(char *name, long *error)
+static long lv_dc_import(char *name, DevLong *error)
 {
 	long i, j, status, dc_status=-1;
 	static dc_dev_imp dc_dev_import;
@@ -849,7 +855,7 @@ static long lv_dc_import(char *name, long *error)
  *
  ******************************************************************************/
 
-long lv_dev_free(char *name, long *error)
+long lv_dev_free(char *name, DevLong *error)
 {
 	long idev, status;
 	u_int i;
@@ -1002,7 +1008,7 @@ static long lv_dev_search(char *name)
  *
  ******************************************************************************/
 
-static long lv_dev_cmd_args(long id, char *cmd, long *icmd, long *argin_type, long *argout_type,long *error)
+static long lv_dev_cmd_args(long id, char *cmd, long *icmd, long *argin_type, long *argout_type, DevLong *error)
 {
 	long status, found=0;
 	u_int i;
@@ -1059,7 +1065,7 @@ static long lv_dev_cmd_args(long id, char *cmd, long *icmd, long *argin_type, lo
  *
  ******************************************************************************/
 
-static long lv_dc_cmd_args(long id, char *cmd, long *icmd, long *argout_type,long *error)
+static long lv_dc_cmd_args(long id, char *cmd, long *icmd, long *argout_type,DevLong *error)
 {
 	long i, status, found=0;
 
@@ -1103,7 +1109,7 @@ static long lv_dc_cmd_args(long id, char *cmd, long *icmd, long *argout_type,lon
  *
  ******************************************************************************/
 
-static long lv_argin_convert(long argin_type, void *argin_lv, void **argin_taco, long *error)
+static long lv_argin_convert(long argin_type, void *argin_lv, void **argin_taco, DevLong *error)
     
 {	
   	unsigned long i;
@@ -1379,7 +1385,7 @@ static long lv_argin_convert(long argin_type, void *argin_lv, void **argin_taco,
  *
  ******************************************************************************/
 
-static long lv_argout_prepare(long argout_type, void **argout_taco, long *error)
+static long lv_argout_prepare(long argout_type, void **argout_taco, DevLong *error)
 {	
   /* fixed size data */
   	static DevShort argout_short;
@@ -1535,7 +1541,7 @@ static long lv_argout_prepare(long argout_type, void **argout_taco, long *error)
  *
  ******************************************************************************/
 
-static long lv_argout_convert(long argout_type, void *argout_taco, void *argout_lv, long *error)
+static long lv_argout_convert(long argout_type, void *argout_taco, void *argout_lv, DevLong *error)
 {	
   	static char *argout_char_ptr;
   	long string_len, status;
@@ -1548,7 +1554,7 @@ static long lv_argout_convert(long argout_type, void *argout_taco, void *argout_
   	static short *argout_short_ptr;
   	static LongArrayHdl argout_longarray_hdl;
   	static ULongArrayHdl argout_ulongarray_hdl;
-  	static long *argout_long_ptr;
+  	static DevLong *argout_long_ptr;
   	static FloatArrayHdl argout_floatarray_hdl;
   	static float *argout_float_ptr;
   	static DblArrayHdl argout_dblarray_hdl;
@@ -1840,7 +1846,7 @@ static long lv_argout_convert(long argout_type, void *argout_taco, void *argout_
  *
  ******************************************************************************/
 
-EXPORT long lv_dev_putget(char *name, char *cmd, void *argin_lv, void *argout_lv, long *error)
+EXPORT long lv_dev_putget(char *name, char *cmd, void *argin_lv, void *argout_lv, DevLong *error)
     
 {	
 	unsigned int i;
@@ -1941,7 +1947,7 @@ EXPORT long lv_dev_putget(char *name, char *cmd, void *argin_lv, void *argout_lv
  *
  ******************************************************************************/
 
-EXPORT long lv_dc_devget(char *name, char *cmd, void *argout_lv, long *error)
+EXPORT long lv_dc_devget(char *name, char *cmd, void *argout_lv, DevLong *error)
 {	
   	static long i, idevice, status, icmd, argin_type, argout_type;
 	static void *argout_taco;
@@ -2175,7 +2181,7 @@ static long lv_in_out_to_string(char *cmd_in_out, long in_type, long out_type)
  *
  ******************************************************************************/
 
-EXPORT long lv_dev_cmd_query(char *name, void *argout_lv, long *error)
+EXPORT long lv_dev_cmd_query(char *name, void *argout_lv, DevLong *error)
     
 {	
   	long i, idevice, status, string_len;
@@ -2242,7 +2248,7 @@ EXPORT long lv_dev_cmd_query(char *name, void *argout_lv, long *error)
  *
  ******************************************************************************/
 
-EXPORT long lv_dc_cmd_query(char *name, void *argout_lv, long *error)
+EXPORT long lv_dc_cmd_query(char *name, void *argout_lv, DevLong *error)
 {	
   	long i, idevice, status, icmd, argin_type, argout_type, string_len;
   	LVStringHdl argout_string_hdl;
@@ -2307,7 +2313,7 @@ EXPORT long lv_dc_cmd_query(char *name, void *argout_lv, long *error)
  *
  ******************************************************************************/
 
-EXPORT long lv_db_getdevexp(char *filter, void *argout_lv, long *error)
+EXPORT long lv_db_getdevexp(char *filter, void *argout_lv, DevLong *error)
 {	
   	long i, status, string_len;
 	u_int	n_devices; 
@@ -2355,7 +2361,7 @@ EXPORT long lv_db_getdevexp(char *filter, void *argout_lv, long *error)
  *
  ******************************************************************************/
 
-EXPORT long lv_dev_protocol(char *name, char *protocol, long *error)
+EXPORT long lv_dev_protocol(char *name, char *protocol, DevLong *error)
 {
   	long idevice, status;
 /*
@@ -2421,7 +2427,7 @@ EXPORT long lv_dev_protocol(char *name, char *protocol, long *error)
  *
  ******************************************************************************/
 
-EXPORT long lv_dev_timeout(char *name, long timeout, long *error)
+EXPORT long lv_dev_timeout(char *name, long timeout, DevLong *error)
 
 {
   	long idevice, status;
@@ -2485,7 +2491,7 @@ EXPORT long lv_dev_timeout(char *name, long timeout, long *error)
  *
  ******************************************************************************/
 
-EXPORT long lv_ds_init(char *server_name, char *pers_name, long *error)
+EXPORT long lv_ds_init(char *server_name, char *pers_name, DevLong *error)
 {
 #ifdef unix
     	if (taco_lib == NULL && class_lib == NULL) 
@@ -2515,7 +2521,8 @@ EXPORT long lv_ds_init(char *server_name, char *pers_name, long *error)
 
 EXPORT long lv_ds_cmd_get(long *icmd, void *argin)
 {
-	long str_len, error;
+	long str_len; 
+	DevLong error;
 	unsigned int i;
 	void *ds_argin;
 	static DevVarDoubleArray *dblarray_in;
@@ -2592,7 +2599,7 @@ EXPORT long lv_ds_cmd_get(long *icmd, void *argin)
 
 EXPORT long lv_ds_cmd_put(long icmd, void *argout)
 {
-	long error;
+	DevLong error;
 	unsigned int i;
 	static DevVarDoubleArray dblarray_out;
 	static DevVarStringArray strarray_out = {0, NULL};
@@ -2686,8 +2693,8 @@ EXPORT long lv_ds_debug(long debug)
 EXPORT char *lv_dev_error_str(long error_no)
 {
    	static char *error_str=NULL, *char_ptr;
-   	static prev_error_no;
-	long error;
+   	static int prev_error_no;
+	DevLong error;
 
 
    	if (prev_error_no > 0) if (error_str != NULL) free(error_str);

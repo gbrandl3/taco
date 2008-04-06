@@ -24,6 +24,7 @@
 #include <iomanip>
 #include <ctime>
 #include <cmath>
+#include "Localtime.hh"
 
 #ifdef LOG4CPP_HAVE_INT64_T
 #ifdef LOG4CPP_HAVE_STDINT_H
@@ -121,7 +122,7 @@ namespace log4cpp {
 
     struct ProcessorTimeComponent : public PatternLayout::PatternComponent {
         virtual void append(std::ostringstream& out, const LoggingEvent& event) {
-            out << ::clock();
+            out << std::clock();
         }
     };
 
@@ -150,9 +151,9 @@ namespace log4cpp {
         }
 
         virtual void append(std::ostringstream& out, const LoggingEvent& event) {
-            struct tm *currentTime;
-            time_t t = event.timeStamp.getSeconds();
-            currentTime = std::localtime(&t);
+            struct std::tm currentTime;
+            std::time_t t = event.timeStamp.getSeconds();
+            localtime(&t, &currentTime);
             char formatted[100];
             std::string timeFormat;
             if (_printMillis) {
@@ -165,7 +166,7 @@ namespace log4cpp {
             } else {
                 timeFormat = _timeFormat1;
             }
-            std::strftime(formatted, sizeof(formatted), timeFormat.c_str(), currentTime);
+            std::strftime(formatted, sizeof(formatted), timeFormat.c_str(), &currentTime);
             out << formatted;
         }
 
@@ -228,8 +229,8 @@ namespace log4cpp {
             if (_maxWidth > 0 && _maxWidth < msg.length()) {
                 msg.erase(_maxWidth);
             }
-            int fillCount = _minWidth - msg.length();
-            if (fillCount > 0) {
+            size_t fillCount = _minWidth - msg.length();
+            if (_minWidth > msg.length()) {
                 if (_alignLeft) {
                     out << msg << std::string(fillCount, ' ');
                 } else {
@@ -401,34 +402,30 @@ namespace log4cpp {
         return message.str();
     }
 
-    std::auto_ptr<Layout> create_pattern_layout(const FactoryParams& params)
-    {
-       std::string pattern;
-       params.get_for("pattern layout").optional("pattern", pattern);
-       std::auto_ptr<Layout> result(new PatternLayout);
-       PatternLayout* l = static_cast<PatternLayout*>(result.get());
-       if (pattern.empty() || pattern == "default")
-          return result;
+    std::auto_ptr<Layout> create_pattern_layout(const FactoryParams& params) {
+        std::string pattern;
+        params.get_for("PatternLayout").optional("ConversionPattern", pattern);
+        std::auto_ptr<Layout> result(new PatternLayout);
+        PatternLayout* l = static_cast<PatternLayout*>(result.get());
+        if (pattern.empty() || pattern == "default")
+            return result;
 
-       if (pattern == "simple")
-       {
-          l->setConversionPattern(PatternLayout::SIMPLE_CONVERSION_PATTERN);
-          return result;
-       }
+        if (pattern == "simple") {
+            l->setConversionPattern(PatternLayout::SIMPLE_CONVERSION_PATTERN);
+            return result;
+        }
 
-       if (pattern == "basic")
-       {
-          l->setConversionPattern(PatternLayout::BASIC_CONVERSION_PATTERN);
-          return result;
-       }
+        if (pattern == "basic") {
+            l->setConversionPattern(PatternLayout::BASIC_CONVERSION_PATTERN);
+            return result;
+        }
 
-       if (pattern == "ttcc")
-       {
-          l->setConversionPattern(PatternLayout::TTCC_CONVERSION_PATTERN);
-          return result;
-       }
+        if (pattern == "ttcc") {
+            l->setConversionPattern(PatternLayout::TTCC_CONVERSION_PATTERN);
+            return result;
+        }
        
-       l->setConversionPattern(pattern);
-       return result;
-   }
+        l->setConversionPattern(pattern);
+        return result;
+    }
 }

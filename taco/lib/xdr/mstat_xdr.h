@@ -30,9 +30,9 @@
  *
  * Original:	March 1993
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  *
  *******************************************************************-*/
 
@@ -44,9 +44,9 @@
  */
 
 struct SysState { 
-	char 	*sys_name;
-	long 	sys_ident;		
-	long 	sys_state;		
+	DevString 	sys_name;
+	DevLong 	sys_ident;		
+	DevLong 	sys_state;		
 };
 typedef struct SysState 	SysState;
 bool_t 	_DLLFunc xdr_SysState PT_((XDR *xdrs, SysState *objp));

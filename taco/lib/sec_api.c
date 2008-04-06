@@ -29,9 +29,9 @@
  *
  * Original   : December 1993
  *
- * Version    :	$Revision: 1.17 $
+ * Version    :	$Revision: 1.18 $
  *
- * Date       :	$Date: 2007-09-07 14:09:40 $
+ * Date       :	$Date: 2008-04-06 09:07:00 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -43,6 +43,8 @@
 #include <DevServerP.h>
 #include <DevErrors.h>
 #include <Admin.h>
+
+#include "taco_utils.h"
 
 #include <errno.h>
 
@@ -87,25 +89,25 @@
 #endif /* vxworks */
 
 static long sec_check
-PT_( (char *dev_name, long access_right, SecUserAuth user_auth, long *error) );
+PT_( (char *dev_name, long access_right, SecUserAuth user_auth, DevLong *error) );
 
 static long sec_user_ident
-PT_( (SecUserAuth user_auth, SecDefaultAccess sec_default_access, long i_nethost, long *error) );
+PT_( (SecUserAuth user_auth, SecDefaultAccess sec_default_access, long i_nethost, DevLong *error) );
 
 static long search_dev_name
-PT_( (char *dev_name, char str_array[3][LONG_NAME_SIZE], long *error) );
+PT_( (char *dev_name, char str_array[3][LONG_NAME_SIZE], DevLong *error) );
 
 static long check_access_hierarchy
-PT_( (char *dev_name, long access_right, char *name, char *res_path, long *error) );
+PT_( (char *dev_name, long access_right, char *name, char *res_path, DevLong *error) );
 
 static long check_access_right
-PT_( (char *name, long requested_access, DevVarStringArray *access_res, long *error) );
+PT_( (char *name, long requested_access, DevVarStringArray *access_res, DevLong *error) );
 
 static long create_client_id
-PT_( (SecUserAuth user_auth, long *ret_client_id, long *error) );
+PT_( (SecUserAuth user_auth, long *ret_client_id, DevLong *error) );
 
 static long get_connection_id
-PT_( (long *connection_id, long *error) );
+PT_( (long *connection_id, DevLong *error) );
 
 static long sec_verify_tcp_conn
 PT_( (DevServerDevices *device) );
@@ -158,7 +160,7 @@ short		*auth_flag;
  * @return DS_OK if the access is allowed , otherwise Error, access denied.
  */
 long _DLLFunc dev_security (char *dev_name, long requested_access,
-			    long *ret_client_id, long *connection_id, long *error)
+			    long *ret_client_id, long *connection_id, DevLong *error)
 {
 	static SecUserAuth	user_auth;
 	char			*user_name;
@@ -393,7 +395,7 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
  * @return DS_OK if access is allowed, otherwise DS_NOTOK 
  */
 static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
-		       long *error)
+		       DevLong *error)
 {
         /* M. Diehl, 2.11.99
          * sec_default_access will either be alloc'ed or set to &default_ip!
@@ -622,7 +624,7 @@ static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
 /**
  * @ingroup secAPIintern
  * Read the three resource tables (DOMAIN/FAMILY/MEMBER) for user or group access rights. 
- * Check the user or group access rights specified in these tables in the order MEMBER, 
+ * Checks the user or group access rights specified in these tables in the order MEMBER, 
  * FAMILY, and DOMAIN.
  *
  * @param dev_name name of the device to access.
@@ -635,7 +637,7 @@ static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
  * @return DS_OK if the access is allowed, DS_NOTOK if access denied, DS_WARNING if no access right specification.
  */
 static long check_access_hierarchy (char *dev_name, long access_right, 
-				    char *name, char *res_path, long *error)
+				    char *name, char *res_path, DevLong *error)
 {
 	db_resource   		res_tab[3];
 	u_int           	res_tab_size = 3;
@@ -776,7 +778,7 @@ static long check_access_hierarchy (char *dev_name, long access_right,
  */
 static long sec_user_ident (SecUserAuth user_auth, 
 			    SecDefaultAccess sec_default_access,
-			    long i_nethost, long *error)
+			    long i_nethost, DevLong *error)
 {
 	db_resource 		res_tab;
 	char            	res_path [LONG_NAME_SIZE];
@@ -1092,7 +1094,7 @@ static long sec_user_ident (SecUserAuth user_auth,
  * @return DS_OK or DS_NOTOK
  */
 static long search_dev_name (char *dev_name, char str_array[3][LONG_NAME_SIZE],
-			     long *error)
+			     DevLong *error)
 {
 	char		name[LONG_NAME_SIZE];
 	char            *ptr1;
@@ -1179,7 +1181,7 @@ static long search_dev_name (char *dev_name, char str_array[3][LONG_NAME_SIZE],
  * @return DS_OK if access allowed, DS_NOTOK if access denied, DS_WARNING if oo access right specification.
  */
 static long check_access_right (char *name, long requested_access,
-				DevVarStringArray *access_res, long *error)
+				DevVarStringArray *access_res, DevLong *error)
 {
 	long		max_access_right;
 	char		*name_ptr;
@@ -1196,30 +1198,23 @@ static long check_access_right (char *name, long requested_access,
 	 */
 	for (i=0; (u_long)i<access_res->length; i=i+2)
 	{
-		/*
-	    * make sure, all names are in small letters.
-	    */
+/*
+ * make sure, all names are in lower letters.
+ */
+		name_ptr = str_tolower(access_res->sequence[i]);
 
-		len = strlen (access_res->sequence[i]);
-		name_ptr = access_res->sequence[i];
-		for (k=0; k<len; k++, name_ptr++)
-		{
-			*name_ptr = tolower (*name_ptr);
-		}
-
-		/*
-  	    * If a name was found in the resource array, compare the
-	    * requested access right with the one specified in the 
-	    * security database.
-	    */
+/*
+ * If a name was found in the resource array, compare the
+ * requested access right with the one specified in the 
+ * security database.
+ */
 
 		if ( strcmp(name, access_res->sequence[i]) == 0 )
 		{
-			/*
-	       *  Search the minimum access right value,
-	       *  DevSec_List.
-	       */
-
+		/*
+	         *  Search the minimum access right value,
+	         *  DevSec_List.
+	         */
 			for (k=0; k<SEC_LIST_LENGTH; k++)
 			{
 				if (strcmp (access_res->sequence[i+1], 
@@ -1299,7 +1294,7 @@ void _DLLFunc free_var_str_array (DevVarStringArray *str_array)
  * @return DS_OK or DS_NOTOK
  */
 static long create_client_id (SecUserAuth user_auth, long *ret_client_id, 
-			      long *error)
+			      DevLong *error)
 {
 	time_t 	time_stamp;
 	long 	pid;
@@ -1356,7 +1351,7 @@ static long create_client_id (SecUserAuth user_auth, long *ret_client_id,
  * 
  * @return DS_OK / DS_NOTOK
  */
-static long get_connection_id (long *connection_id, long *error)
+static long get_connection_id (long *connection_id, DevLong *error)
 {
 	long   	*new_connections;
 	short    i;
@@ -1436,7 +1431,7 @@ static long get_connection_id (long *connection_id, long *error)
  * 
  * @return DS_OK / DS_NOTOK
  */
-long _DLLFunc free_connection_id_vers3 (long connection_id, long *error)
+long _DLLFunc free_connection_id_vers3 (long connection_id, DevLong *error)
 {
 	dev_printdebug (DBG_TRACE | DBG_SEC, "free_connection_id_vers3() : entering routine\n");
 
@@ -1459,7 +1454,7 @@ long _DLLFunc free_connection_id_vers3 (long connection_id, long *error)
  * 
  * @return DS_OK or DS_NOTOK
  */
-long _DLLFunc create_sec_key (devserver ds, long *error)
+long _DLLFunc create_sec_key (devserver ds, DevLong *error)
 {
 	long	connection_id;
 
@@ -1517,7 +1512,7 @@ long _DLLFunc create_sec_key (devserver ds, long *error)
  *
  * @return DS_OK or DS_NOTOK
  */
-long _DLLFunc verify_sec_key (devserver ds, long *ret_client_id, long *error)
+long _DLLFunc verify_sec_key (devserver ds, long *ret_client_id, DevLong *error)
 {
 	long	sec_key;
 	long	connection_id;
@@ -1623,7 +1618,7 @@ void _DLLFunc free_sec_key (devserver ds)
  */
 long _DLLFunc sec_svc_import (DevServerDevices *device, long connection_id,
 			      long client_id, long access_right,
-			      struct svc_req *rqstp, long *error)
+			      struct svc_req *rqstp, DevLong *error)
 {
 #ifdef _XOPEN_SOURCE_EXTENDED
 	unsigned int ulen = sizeof(device->si_peeraddr);
@@ -1802,7 +1797,7 @@ long _DLLFunc sec_svc_import (DevServerDevices *device, long connection_id,
  * @return DS_OK or DS_NOTOK
  */
 long _DLLFunc sec_svc_free (DevServerDevices *device, long connection_id,
-			    long client_id, long access_right, long *error)
+			    long client_id, long access_right, DevLong *error)
 {
 	dev_printdebug (DBG_TRACE | DBG_SEC, "\nsec_svc_free() : entering routine \n");
 	dev_printdebug (DBG_SEC, "sec_svc_free() : client_id     = %d\n", client_id);
@@ -1855,7 +1850,7 @@ long _DLLFunc sec_svc_free (DevServerDevices *device, long connection_id,
  */
 long _DLLFunc sec_svc_cmd (DevServerDevices *device, long connection_id,
 			   long client_id, long access_right, long cmd,
-			   long *error)
+			   DevLong *error)
 {
 #ifdef __cplusplus
 	long ret;
@@ -2011,7 +2006,7 @@ long _DLLFunc sec_svc_cmd (DevServerDevices *device, long connection_id,
  * @return DS_OK or DS_NOTOK
  */
 long _DLLFunc sec_tcp_connection (long requested_access, CLIENT **clnt,
-				  server_connections *svr_conn, long *error)
+				  server_connections *svr_conn, DevLong *error)
 {
 	struct  sockaddr_in     serv_adr;
 #if !defined vxworks
@@ -2169,7 +2164,7 @@ long _DLLFunc sec_tcp_connection (long requested_access, CLIENT **clnt,
  */
 void _DLLFunc sec_free_tcp_connection (devserver ds, server_connections *svr_conn)
 {
-	long 	error = 0;
+	DevLong 	error = 0;
 
 	dev_printdebug (DBG_TRACE | DBG_SEC, "\nsec_free_tcp_connection() : entering routine \n");
 

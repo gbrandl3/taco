@@ -12,9 +12,7 @@
 
 #include <log4cpp/Portability.hh>
 #include <log4cpp/Priority.hh>
-#ifdef LOG4CPP_HAVE_IOS
 #include <ios>
-#endif
 #ifdef LOG4CPP_HAVE_SSTREAM
 #include <sstream>
 #endif
@@ -23,6 +21,16 @@
 namespace log4cpp {
 
     class LOG4CPP_EXPORT Category;
+    class LOG4CPP_EXPORT CategoryStream;    
+    /**
+     * eol manipulator
+     **/
+    LOG4CPP_EXPORT CategoryStream& eol (CategoryStream& os);
+
+    /**
+     * left manipulator
+     **/
+    LOG4CPP_EXPORT CategoryStream& left (CategoryStream& os);
 
     /**
      * This class enables streaming simple types and objects to a category.
@@ -30,18 +38,6 @@ namespace log4cpp {
      **/
     class LOG4CPP_EXPORT CategoryStream {
         public:
-
-        /**
-         * Enumeration of special 'Separators'. Currently only contains the
-         * 'ENDLINE' separator, which separates two log messages.
-         **/
-        typedef enum {
-            ENDLINE = 0,
-			EOL		= 0,
-			endline	= 0
-// changed by andy_gotz + jkrueger1 for Solaris CC, 11/12/2006
-			//eol		= 0
-        } Separator;
 
         /**
          * Construct a CategoryStream for given Category with given priority.
@@ -71,15 +67,6 @@ namespace log4cpp {
         };
 
         /**
-         * Streams in a Separator. If the separator equals 
-         * CategoryStream::ENDLINE it sends the contents of the stream buffer
-         * to the Category with set priority and empties the buffer.
-         * @param separator The Separator
-         * @returns A reference to itself.
-         **/
-        CategoryStream& operator<<(Separator separator);
-
-        /**
          * Flush the contents of the stream buffer to the Category and
          * empties the buffer.
          **/
@@ -90,7 +77,8 @@ namespace log4cpp {
          * @param t The value or object to stream in.
          * @returns A reference to itself.
          **/
-		template<typename T> CategoryStream& operator<<(const T& t) {
+		  template<typename T> 
+        CategoryStream& operator<<(const T& t) {
             if (getPriority() != Priority::NOTSET) {
                 if (!_buffer) {
 					if (!(_buffer = new std::ostringstream)) {
@@ -101,7 +89,11 @@ namespace log4cpp {
             }
             return *this;
         }
-		template<typename T> CategoryStream& operator<<(const std::string& t) {
+	   
+        CategoryStream& operator<<(const char* t);
+
+	     template<typename T> 
+ 	     CategoryStream& operator<<(const std::string& t) {
             if (getPriority() != Priority::NOTSET) {
                 if (!_buffer) {
                     if (!(_buffer = new std::ostringstream)) {
@@ -112,9 +104,9 @@ namespace log4cpp {
             }
             return *this;
         }
-/* exclude this because old gcc 2.95 does not support const wstring */
-#if 0
-		template<typename T> CategoryStream& operator<<(const std::wstring& t) {
+#if LOG4CPP_HAS_WCHAR_T != 0
+        template<typename T> 
+        CategoryStream& operator<<(const std::wstring& t) {
             if (getPriority() != Priority::NOTSET) {
                 if (!_wbuffer) {
                     if (!(_wbuffer = new std::wostringstream)) {
@@ -129,34 +121,26 @@ namespace log4cpp {
         /**
          * Set the width output on CategoryStream
          **/
-		std::streamsize width(std::streamsize wide );
+		  std::streamsize width(std::streamsize wide );
 
 
         private:
         Category& _category;
         Priority::Value _priority;
-		union {
-			std::ostringstream* _buffer;
-/* exclude this because old gcc 2.95 does not support wostringstream */
-#if 0
-			std::wostringstream* _wbuffer;
+	     union {
+	         std::ostringstream* _buffer;
+#if LOG4CPP_HAS_WCHAR_T != 0
+            std::wostringstream* _wbuffer;
 #endif
-		};
+        };
 
-		public:
-		typedef CategoryStream& (*cspf) (CategoryStream&);
+	     public:
+	     typedef CategoryStream& (*cspf) (CategoryStream&);
 
-		CategoryStream& operator<< (cspf);
-
-        /**
-         * eol manipulator
-         **/
-friend  LOG4CPP_EXPORT CategoryStream& eol (CategoryStream& os);
-
-        /**
-         * left manipulator
-         **/
-friend  LOG4CPP_EXPORT CategoryStream& left (CategoryStream& os);
+	     CategoryStream& operator << (cspf);
+        LOG4CPP_EXPORT friend CategoryStream& eol (CategoryStream& os);
+        LOG4CPP_EXPORT friend CategoryStream& left (CategoryStream& os);
    };
 }
+
 #endif // _LOG4CPP_CATEGORYSTREAM_HH

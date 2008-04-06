@@ -45,6 +45,9 @@
 #include <qdialog.h>
 
 /* TACO Includes */
+#ifdef DEBUG
+#undef DEBUG
+#endif
 #include <Admin.h>
 #include <API.h>
 #include <DevServer.h>

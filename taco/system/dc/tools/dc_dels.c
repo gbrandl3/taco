@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.6 $
+ * Version      : $Revision: 1.7 $
  *
- * Date         : $Date: 2006-09-18 21:50:15 $
+ * Date         : $Date: 2008-04-06 09:07:51 $
  *
  */
 
@@ -87,7 +87,7 @@ int main(int argc, char **argv)
 	int nb_tot;
 	int 		l1,
 			l2;
-	long 		error;
+	DevLong		error;
 	char 		*tmp;
 	DevString	passwd = "setup";
 	unsigned int diff;
@@ -226,5 +226,5 @@ int main(int argc, char **argv)
 		fprintf(stderr, "dc_dels : Can't remove pointer semaphores from memory\n");
 		perror("dc_dels ");
 	}
-	return;
+	return 0;
 }

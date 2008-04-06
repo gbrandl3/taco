@@ -92,14 +92,14 @@ namespace TACO {
 		return std::vector<unsigned short>( argin->sequence, argin->sequence + argin->length);
 	}
 
-	inline std::vector<long> convert( DevVarLongArray* argin) throw()
+	inline std::vector<DevLong> convert( DevVarLongArray* argin) throw()
 	{
-		return std::vector<long>( argin->sequence, argin->sequence + argin->length);
+		return std::vector<DevLong>( argin->sequence, argin->sequence + argin->length);
 	}
 
-	inline std::vector<unsigned long> convert( DevVarULongArray* argin) throw()
+	inline std::vector<DevULong> convert( DevVarULongArray* argin) throw()
 	{
-		return std::vector<unsigned long>( argin->sequence, argin->sequence + argin->length);
+		return std::vector<DevULong>( argin->sequence, argin->sequence + argin->length);
 	}
 
 	inline std::vector<float> convert( DevVarFloatArray* argin) throw()
@@ -178,28 +178,28 @@ namespace TACO {
 		left->sequence = p; 
 	}
 
-	inline void assign( DevVarShortArray* left, const std::vector<short>& right) throw ()
+	inline void assign( DevVarShortArray* left, const std::vector<DevShort>& right) throw ()
 	{
 		left->length = right.size();
-		left->sequence = (left->length == 0) ? 0 : const_cast<short*>( &right.front());
+		left->sequence = (left->length == 0) ? 0 : const_cast<DevShort*>( &right.front());
 	}
 
-	inline void assign( DevVarUShortArray* left, const std::vector<unsigned short>& right) throw ()
+	inline void assign( DevVarUShortArray* left, const std::vector<DevUShort>& right) throw ()
 	{
 		left->length = right.size();
-		left->sequence = (left->length == 0) ? 0 : const_cast<unsigned short*>( &right.front());
+		left->sequence = (left->length == 0) ? 0 : const_cast<DevUShort*>( &right.front());
 	}
 
-	inline void assign( DevVarLongArray* left, const std::vector<long>& right) throw ()
+	inline void assign( DevVarLongArray* left, const std::vector<DevLong>& right) throw ()
 	{
 		left->length = right.size();
-		left->sequence = (left->length == 0) ? 0 : const_cast<long*>( &right.front());
+		left->sequence = (left->length == 0) ? 0 : const_cast<DevLong*>( &right.front());
 	}
 
-	inline void assign( DevVarULongArray* left, const std::vector<unsigned long>& right) throw ()
+	inline void assign( DevVarULongArray* left, const std::vector<DevULong>& right) throw ()
 	{
 		left->length = right.size();
-		left->sequence = (left->length == 0) ? 0 : const_cast<unsigned long*>( &right.front());
+		left->sequence = (left->length == 0) ? 0 : const_cast<DevULong*>( &right.front());
 	}
 
 	inline void assign( DevVarFloatArray* left, const std::vector<float>& right) throw ()
@@ -213,7 +213,7 @@ namespace TACO {
 		left->length = right.size();
 		left->sequence = (left->length == 0) ? 0 : const_cast<double*>( &right.front());
 	}
-
+#if HAVE_STRUCT_TIMESPEC
 	inline void assign( struct timespec& left, double right) throw (Exception)
 	{
 		if (0.0 <= right && right < LONG_MAX) {
@@ -228,7 +228,7 @@ namespace TACO {
 	{
 		left = static_cast<double>( right.tv_sec) + static_cast<double>( right.tv_nsec) / 1E9;
 	}
-
+#endif
 	inline void assign( struct timeval& left, double right) throw (Exception)
 	{
 		if (0.0 <= right && right < LONG_MAX) {

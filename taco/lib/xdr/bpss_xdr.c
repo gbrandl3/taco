@@ -29,9 +29,9 @@
  *
  * Original:    December 1991
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:21 $
  *
  *******************************************************************-*/
 
@@ -58,8 +58,8 @@ xdr_length_DevStateIndic(objp)
 {
         long  length = 0;
 
-	length = length + xdr_length_DevShort (&objp->State);
-	length = length + xdr_length_DevShort (&objp->Indic);
+	length += xdr_length_DevShort (&objp->State);
+	length += xdr_length_DevShort (&objp->Indic);
 
 	return (length);
 }
@@ -82,8 +82,8 @@ xdr_length_DevBpssState(objp)
 {
         long  length = 0;
 
-	length = length + xdr_length_DevShort (&objp->Ac);
-	length = length + xdr_length_DevShort (&objp->Dc);
+	length += xdr_length_DevShort (&objp->Ac);
+	length += xdr_length_DevShort (&objp->Dc);
 
 	return (length);
 }
@@ -109,10 +109,10 @@ xdr_length_DevBpssLine(objp)
 {
         long  length = 0;
 
-	length = length + xdr_length_DevFloat (&objp->Set);
-	length = length + xdr_length_DevFloat (&objp->Read);
-	length = length + xdr_length_DevShort (&objp->Control);
-	length = length + xdr_length_DevShort (&objp->Alarm);
+	length += xdr_length_DevFloat (&objp->Set);
+	length += xdr_length_DevFloat (&objp->Read);
+	length += xdr_length_DevShort (&objp->Control);
+	length += xdr_length_DevShort (&objp->Alarm);
 
 	return (length);
 }
@@ -150,25 +150,25 @@ xdr_length_DevBpssReadPoint(objp)
 {
         long  length = 0;
 
-	length = length + xdr_length_DevBpssLine (&objp->IACinv);
-	length = length + xdr_length_DevBpssLine (&objp->IACmag);
-	length = length + xdr_length_DevBpssLine (&objp->IDCmag);
-	length = length + xdr_length_DevBpssLine (&objp->Period);
-	length = length + xdr_length_DevBpssLine (&objp->PhLag);
+	length += xdr_length_DevBpssLine (&objp->IACinv);
+	length += xdr_length_DevBpssLine (&objp->IACmag);
+	length += xdr_length_DevBpssLine (&objp->IDCmag);
+	length += xdr_length_DevBpssLine (&objp->Period);
+	length += xdr_length_DevBpssLine (&objp->PhLag);
 
-	length = length + xdr_length_DevFloat (&objp->PhLagUI);
-	length = length + xdr_length_DevFloat (&objp->VACinv);
-	length = length + xdr_length_DevFloat (&objp->VDCmag);
-	length = length + xdr_length_DevFloat (&objp->CapTemp);
-	length = length + xdr_length_DevFloat (&objp->ChokeTemp);
+	length += xdr_length_DevFloat (&objp->PhLagUI);
+	length += xdr_length_DevFloat (&objp->VACinv);
+	length += xdr_length_DevFloat (&objp->VDCmag);
+	length += xdr_length_DevFloat (&objp->CapTemp);
+	length += xdr_length_DevFloat (&objp->ChokeTemp);
 
-	length = length + (8 * xdr_length_DevFloat (&objp->Temperature[0]));
+	length += (8 * xdr_length_DevFloat (&objp->Temperature[0]));
 
-	length = length + xdr_length_DevBpssState (&objp->State);
-	length = length + xdr_length_DevBpssState (&objp->ExtState);
-	length = length + (32 * xdr_length_DevBpssState (&objp->Faults[0]));
+	length += xdr_length_DevBpssState (&objp->State);
+	length += xdr_length_DevBpssState (&objp->ExtState);
+	length += (32 * xdr_length_DevBpssState (&objp->Faults[0]));
 
-	length = length + xdr_length_DevShort (&objp->Master);
+	length += xdr_length_DevShort (&objp->Master);
 
 	return (length);
 }

@@ -30,9 +30,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.32 $
+ * Version    :	$Revision: 1.33 $
  *
- * Date       : $Date: 2007-09-07 14:11:15 $
+ * Date       : $Date: 2008-04-06 09:06:59 $
  *
  ********************************************************************-*/
 
@@ -68,11 +68,11 @@
 #error could not find signal.h
 #endif
 
-extern _DLLFunc long 	setup_config_multi(char *nethost, long *error);
+extern _DLLFunc long 	setup_config_multi(char *nethost, DevLong *error);
 static void 		msg_write(_Int msg_type, char *msg_string);
 static void 		msg_send (_Int msg_type);
 static void 		msg_clear(_Int msg_type);
-static char 		*get_error_string(long error);
+static char 		*get_error_string(DevLong error);
 
 /*
  * UCC has not prototype for putenv() , define one ! 
@@ -83,7 +83,6 @@ static char 		*get_error_string(long error);
 long putenv(char *);
 #endif /* _OSK */
 
-char *dev_error_string=NULL; /* global pointer to dynamic error string */
 char *dev_error_stack=NULL; /* global pointer to dynamic error stack */
 
 /****************************************
@@ -193,7 +192,7 @@ long debug_flag = 0x0;
  *
  * @return	DS_OK or DS_NOTOK
  */
-long _DLLFunc msg_import (char *DS_name, char *DS_host, long DS_prog_number, char *DS_display, long *error)
+long _DLLFunc msg_import (char *DS_name, char *DS_host, long DS_prog_number, char *DS_display, DevLong *error)
 {
 	CLIENT		*clnt;
 	char		*hstring;
@@ -289,7 +288,7 @@ long _DLLFunc msg_import (char *DS_name, char *DS_host, long DS_prog_number, cha
  * @param fmt   format string in printf() style.
  * @param ...   variable argument list of variables to print
  */
-_DLLFunc void dev_printerror (DevShort mode, char *fmt, ...)
+_DLLFunc void dev_printerror (DevShort mode, const char *fmt, ...)
 {
 	char		buffer [256];
 	va_list 	args;
@@ -362,7 +361,7 @@ _DLLFunc void dev_printerror (DevShort mode, char *fmt, ...)
  * @param fmt   format string in printf() style.
  * @param str   variable argument list of variables to print
  */
-_DLLFunc void dev_printerror (DevShort mode,char *fmt, char *str)
+_DLLFunc void dev_printerror (DevShort mode, const char *fmt, const char *str)
 {
 	char  		buffer [256];
 
@@ -436,7 +435,7 @@ _DLLFunc void dev_printerror (DevShort mode,char *fmt, char *str)
  * @param comment  	comment to be printed before error string.
  * @param dev_errno 	device server system error number.
  */ 
-void _DLLFunc dev_printerror_no (DevShort mode, char *comment, long dev_errno)
+void _DLLFunc dev_printerror_no (DevShort mode, const char *comment, long dev_errno)
 {
 	char *error_string = get_error_string ( dev_errno);
 /*
@@ -513,7 +512,7 @@ _DLLFunc char * dev_error_str (long dev_errno)
  * @param fmt        	format string in printf() style.
  * @param ... 		reserving memory for variables to print.
  */ 
-void _DLLFunc dev_printdebug (long debug_bits, char *fmt, ...)
+void _DLLFunc dev_printdebug (long debug_bits, const char *fmt, ...)
 {
 	char		debug_string[256];
 	va_list	args;
@@ -580,7 +579,7 @@ void _DLLFunc dev_printdebug (long debug_bits, char *fmt, ...)
  * @param fmt        	format string in printf() style.
  * @param str		reserving memory for variables to print.
  */
-void dev_printdebug (long debug_bits,char *fmt, char *str)
+void dev_printdebug (long debug_bits, const char *fmt, const char *str)
 {
 	char 	debug_string[256];
 
@@ -637,11 +636,11 @@ void dev_printdebug (long debug_bits,char *fmt, char *str)
  * mode and send the whole buffer by using
  * the SEND mode with the last string.
  *
- * @param mode mode for message buffer : WRITE or SEND
+ * @param mode mode for message buffer : WRITE, SEND, or CLEAR
  * @param fmt  format string in printf() style.
  * @param ...  reserving memory for variables to print.
  */
-_DLLFunc void dev_printdiag (DevShort mode, char *fmt, ...)
+_DLLFunc void dev_printdiag (DevShort mode, const char *fmt, ...)
 {
 	char  		buffer [256];
 	va_list		args;
@@ -715,11 +714,11 @@ _DLLFunc void dev_printdiag (DevShort mode, char *fmt, ...)
  * mode and send the whole buffer by using
  * the SEND mode with the last string.
  *
- * @param mode mode for message buffer : WRITE or SEND
+ * @param mode mode for message buffer : WRITE, SEND, or CLEAR
  * @param fmt  format string in printf() style.
  * @param str  reserving memory for variables to print.
  */
-void dev_printdiag (DevShort mode,char *fmt,char *str)
+void dev_printdiag (DevShort mode, const char *fmt, const char *str)
 {
 	char	buffer [256];
 
@@ -998,7 +997,7 @@ static void msg_clear (_Int msg_type)
  *
  * @return DS_OK or DS_NOTOK
  */
-long _DLLFunc db_import (long *error)
+long _DLLFunc db_import (DevLong *error)
 {
 	CLIENT		*clnt;
         enum clnt_stat  clnt_stat;
@@ -1008,110 +1007,20 @@ long _DLLFunc db_import (long *error)
 
 	*error = DS_OK;
 
-/*
- * check wether a database server is already imported
- */
-	if (config_flags.database_server)
-		return (DS_OK);
-
-/*
- * check wether the system is already configured
- */
-	if ( !config_flags.configuration && (setup_config(error) != DS_OK) )
-		return (DS_NOTOK);
-
-/*
- * Create database server client handle with data from
- * global dbserver_info structure.
- *
- * Create a client handle for version 3! 
- */
-	clnt = clnt_create ( db_info.conf->server_host, db_info.conf->prog_number, DB_VERS_3, "udp");
-	if (clnt == NULL)
+	if ((nethost_env = (char *)getenv("NETHOST")) == NULL)
 	{
-		hstring = clnt_spcreateerror ("db_import");
-		dev_printerror (SEND,"%s",hstring);
-		*error = DevErr_DbImportFailed;
-		return (DS_NOTOK);
-	}
-
-	clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &dbase_retry_timeout);
-	clnt_control (clnt, CLSET_TIMEOUT, (char *) &dbase_timeout);
-
-/*
- * Check the database server version. 
- * If it is not a new version 3 server, create a handle to version 2!!!
- */ 
-        clnt_stat = clnt_call (clnt, NULLPROC, (xdrproc_t)xdr_void, NULL, 
-			       (xdrproc_t)xdr_void, NULL, TIMEVAL(timeout));
-        if (clnt_stat != RPC_SUCCESS)
-        {
-        	if ( clnt_stat != RPC_PROGVERSMISMATCH )
-		{
-			clnt_perror (clnt,"db_import()");
-			clnt_destroy (clnt);
-			*error = DevErr_DbImportFailed;
-			return (DS_NOTOK);
-		}
-
-/*
- * If it was an old version 2 of the database server,
- * a version mismatch occured because the client handle
- * was created for version 3.
- * Destroy the handle and use version 2.
- */
-		else
-		{
-/*
- * Destroy version 3 handle.
- */
-			clnt_destroy (clnt);
-
-/*
- * Set version number to 2 and recreate the
- * client handle.
- *  read environmental variable NETHOST
- */
-			clnt = clnt_create ( db_info.conf->server_host, db_info.conf->prog_number, DB_VERS_2, "udp");
-			if (clnt == NULL)
-			{
-				hstring = clnt_spcreateerror ("db_import()");
-				dev_printerror (SEND,"%s",hstring);
-				*error = DevErr_DbImportFailed;
-				return (DS_NOTOK);
-			}
-
-			db_info.conf->vers_number = DB_VERS_2;
-		}
-	}
-	if ((nethost_env = (char *)getenv ("NETHOST")) == NULL)
-	{
-	   	db_info.conf->vers_number = DB_VERS_3;
 		*error = DevErr_NethostNotDefined;
 		return (DS_NOTOK);
 	}
 
-/* 
- * pass the information to the database server_info structure
- */
-	strncpy (db_info.conf->device_name, "DatabaseServer", sizeof(db_info.conf->device_name));
-        db_info.conf->device_name[sizeof(db_info.conf->device_name) - 1] = '\0';
-	db_info.conf->clnt = clnt;
-	db_info.conf->ds_id = 0;
-	db_info.conf->no_svr_conn = 1;
+	strncpy(nethost, nethost_env, sizeof(nethost) - 1);
+	nethost[sizeof(nethost) - 1] = '\0';
 
-	config_flags.database_server = True;
-	strncpy(nethost, nethost_env, sizeof(nethost));
-        nethost[sizeof(nethost) - 1] = '\0';
-
-/*
- * for multi-nethost support copy the default configuration
- * and database info to multi_nethost[0] in case one of the 
- * api routines makes a reference to it.
- */
+#if 0
 	multi_nethost[0].config_flags = config_flags;
 	multi_nethost[0].db_info = db_info.conf;
-	return db_import_multi(nethost,error);
+#endif
+	return db_import_multi(nethost, error);
 }
 
 /**@ingroup dbaseAPI
@@ -1123,7 +1032,7 @@ long _DLLFunc db_import (long *error)
  *
  * @return DS_OK or DS_NOTOK
  */
-long _DLLFunc db_import_multi (char *nethost, long *error)
+long _DLLFunc db_import_multi (char *nethost, DevLong *error)
 {
 	CLIENT		*clnt;
         enum clnt_stat  clnt_stat;
@@ -1186,10 +1095,10 @@ long _DLLFunc db_import_multi (char *nethost, long *error)
 	{
 		if ( clnt_stat != RPC_PROGVERSMISMATCH )
 		{
-		clnt_perror (clnt,"db_import()");
-		clnt_destroy (clnt);
-		*error = DevErr_DbImportFailed;
-		return (DS_NOTOK);
+			clnt_perror (clnt,"db_import()");
+			clnt_destroy (clnt);
+			*error = DevErr_DbImportFailed;
+			return (DS_NOTOK);
 		}
 
 /*
@@ -1236,240 +1145,11 @@ long _DLLFunc db_import_multi (char *nethost, long *error)
  * if this is the first nethost (i_nethost=0) then add mono-nethost 
  * support by calling db_import to import the "default" nethost
  */
-		if (!config_flags.database_server)
-		{
-			if (db_import(error) != DS_OK)
-				return(DS_NOTOK);
-			config_flags = nethost_i->config_flags;
-			db_info.conf = multi_nethost[0].db_info ;
-		}
+		config_flags = nethost_i->config_flags;
+		db_info.conf = nethost_i->db_info ;
 	}
 	return (DS_OK);
 }
-
-/**@ingroup dsAPIintern
- * This function gets the necessary configuration information for a static database service and a message
- * service from  a network manager.
- *
- * The host of the network manager must be specified by the environment variable NETHOST.    
- *
- * @param error Will contain an appropriate error code if the corresponding call returns a non-zero value.
- * 
- * @return  DS_OK or DS_NOTOK
- */
-long setup_config (long *error)
-{
-	char				nethost[HOST_NAME_LENGTH], 
-					*nethost_env;
-	CLIENT				*clnt;
-	enum clnt_stat			clnt_stat;
-	int				pid;
-	static _manager_data 		manager_data;
-	static _register_data  		register_data;
-	static char			host_name[HOST_NAME_LENGTH];
-#if 0
-	static struct _devserver	msg_ds, db_ds;
-#endif
-	dev_printdebug (DBG_TRACE | DBG_API, "\nsetup_config() : entering routine\n");
-
-#ifdef WIN32
-	if (!win32_rpc_inited)
-	{
-		rpc_nt_init();
-		win32_rpc_inited = 1;
-	}
-#endif /* WIN32 */
-
-	*error = DS_OK;
-	memset ((char *)&manager_data,0,sizeof(manager_data));
-
-/*
- *  read environmental variable NETHOST
- */
-	if ( (nethost_env = (char *)getenv ("NETHOST")) == NULL )
-	{
-		*error = DevErr_NethostNotDefined;
-		return (DS_NOTOK);
-	}
-	strncpy(nethost, nethost_env, sizeof(nethost));
-        nethost[sizeof(nethost) - 1] = '\0';
-
-/*
- *  create registration information that is send to
- *  the network manager and stored in the System.log file.
- */
-	taco_gethostname (host_name, sizeof(host_name));
-
-#if !defined (WIN32)
-#if !defined (vxworks)
-        pid = getpid ();
-#else  /* !vxworks */
-        pid = taskIdSelf ();
-#endif /* !vxworks */
-#else  /* !WIN32 */
-        pid = _getpid ();
-#endif /* !WIN32 */
-	register_data.host_name   = host_name;
-	register_data.prog_number = pid;
-	register_data.vers_number = 0;
-
-/*
- * Create network manager client handle 
- */
-	clnt = clnt_create ( nethost, NMSERVER_PROG, NMSERVER_VERS, "udp");
-	if (clnt == NULL)
-	{
-		clnt_pcreateerror ("setup_config");
-		*error = DevErr_NoNetworkManagerAvailable;
-		return (DS_NOTOK);
-	}
-	clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &api_retry_timeout);
-	clnt_control (clnt, CLSET_TIMEOUT, (char *) &api_timeout);
-
-/*
- *   get configuration information from a network manager
- */
-	clnt_stat = clnt_call (clnt, RPC_GET_CONFIG,
-	    (xdrproc_t)xdr__register_data, (caddr_t) &register_data,
-	    (xdrproc_t)xdr__manager_data, (caddr_t) &manager_data, TIMEVAL(timeout));
-	if (clnt_stat != RPC_SUCCESS)
-	{
-		if ( clnt_stat != RPC_PROGVERSMISMATCH )
-		{
-			clnt_perror (clnt,"setup_config ()");
-			clnt_destroy (clnt);
-			*error = DevErr_NetworkManagerNotResponding;
-			return (DS_NOTOK);
-		}
-
-/*
- * If it was an old version 1 of the manager process,
- * a version mismatch occured because the client handle
- * was created for version 4.
- * Destroy the handle and use version 1.
- */
-		else
-		{
-/*
- * Destroy version 4 handle.
- */
-			clnt_destroy (clnt);
-
-/*
- * Set version number to 1 and recreate the client handle.
- */
-			clnt = clnt_create (nethost,NMSERVER_PROG,NMSERVER_VERS_1,"udp");
-			if (clnt == NULL)
-			{
-				clnt_pcreateerror ("setup_config");
-				*error = DevErr_NoNetworkManagerAvailable;
-				return (DS_NOTOK);
-			}
-
-/*
- *   get configuration information from a network manager running version 1.
- */
-			clnt_stat = clnt_call (clnt, RPC_GET_CONFIG,
-						(xdrproc_t)xdr__register_data, (caddr_t) &register_data,
-						(xdrproc_t)xdr__manager_data_3, (caddr_t) &manager_data, TIMEVAL(timeout));
-			if (clnt_stat != RPC_SUCCESS)
-			{
-				clnt_perror (clnt,"setup_config ()");
-				clnt_destroy (clnt);
-				*error = DevErr_NetworkManagerNotResponding;
-				return (DS_NOTOK);
-			}
-		}
-	}
-
-	if (manager_data.status < 0)
-	{
-		*error = manager_data.error;
-/*
- * free memory allocated by xdr in manager_data (assume we have connected
- * to version 4 of the Manager
- */
-		xdr_free((xdrproc_t)xdr__manager_data, (char *)&manager_data);
-		
-		clnt_destroy (clnt);
-		return (DS_NOTOK);
-	}
-
-/*
-  * Initialise the XDR data type list with all data types
- * specified in the Kernel of the system.
- */
-
-	if ( xdr_load_kernel (error) == DS_NOTOK )
-	{
-/*
- * free memory allocated by xdr in manager_data (assume we have connected
- * to version 4 of the Manager
- */
-		xdr_free((xdrproc_t)xdr__manager_data, (char *)&manager_data);
-		clnt_destroy (clnt);
-		return (DS_NOTOK);
-	}
-
-/*
- *  put message server and database server configuration
- *  into the global structures msgserver_info and
- *  dbserver_info.
- *
- * do not allocate space for _devserver structure because this routine
- * could be called multiple times e.g. when database server has to be
- * reimported, simply point to a static _devserver structure which
- * is locally allocated in static space
- */
-	if (max_nethost <= 0) 
-		nethost_alloc(error);
-	msg_info.conf=(devserver)msg_ds;
-	db_info.conf =(devserver)db_ds;
-
-	snprintf (msg_info.conf->server_host, sizeof(msg_info.conf->server_host), "%s", 
-	    manager_data.msg_info.host_name);
-	msg_info.conf->prog_number =  manager_data.msg_info.prog_number;
-	msg_info.conf->vers_number =  manager_data.msg_info.vers_number;
-
-	snprintf (db_info.conf->server_host, sizeof(db_info.conf->server_host), "%s", 
-	    manager_data.db_info.host_name);
-	db_info.conf->prog_number =  manager_data.db_info.prog_number;
-	db_info.conf->vers_number =  manager_data.db_info.vers_number;
-
-/*
- * Enable the security system if the Manager indicates 
- * the use of the security system.
- */
-	config_flags.security =  manager_data.security; 
-
-/*
- * free memory allocated by xdr in manager_data (assume we have connected
- * to version 4 of the Manager
- */
-	xdr_free((xdrproc_t)xdr__manager_data, (char *)&manager_data);
-	clnt_destroy (clnt);
-	config_flags.configuration = True;
-/*
- * for multi-nethost support copy the default configuration,
- * database and message info to multi_nethost[0] in case one of the 
- * api routines makes a reference to it.
- *
- * first allocate space for a minimum no. of nethosts
- */
-	if (max_nethost <= 0) 
-		nethost_alloc(error);
-	strncpy(nethost,nethost_env,HOST_NAME_LENGTH);
-        nethost[sizeof(nethost) - 1] = '\0';
-//	snprintf(nethost, sizeof(nethost), "%s",nethost_env);
-
-	strncpy(multi_nethost[0].nethost,nethost, sizeof(multi_nethost[0].nethost));
-        multi_nethost[0].nethost[sizeof(multi_nethost[0].nethost) - 1] = '\0';
-	multi_nethost[0].config_flags = config_flags;
-	multi_nethost[0].db_info = db_info.conf;
-	multi_nethost[0].msg_info = msg_info.conf;
-	return setup_config_multi(nethost,error);
-}
-
 
 /**@ingroup dsAPI
  * This function gets the necessary configuration information for a static database service and a message
@@ -1484,7 +1164,7 @@ long setup_config (long *error)
  *
  * @return DS_OK or DS_NOTOK
  */
-long setup_config_multi (char *nethost, long *error)
+long setup_config_multi (char *nethost, DevLong *error)
 {
 	_manager_data 		manager_data={0};
 	_register_data  	register_data;
@@ -1544,14 +1224,6 @@ long setup_config_multi (char *nethost, long *error)
  *
  * only call setup_config() if it hasn't been called already - andy 19nov98
  */
-		if ((char *)getenv("NETHOST") != NULL)
-		{
-			if ( !config_flags.configuration )
-			{
-				if ( (setup_config (error)) != DS_OK )
-					return (DS_NOTOK);
-			}
-		}
 		for (i=0; i< max_nethost; i++)
 		{
 			if (!multi_nethost[i].config_flags.configuration)
@@ -1598,7 +1270,9 @@ long setup_config_multi (char *nethost, long *error)
 	clnt = clnt_create ( nethost, NMSERVER_PROG, NMSERVER_VERS, "udp");
 	if (clnt == NULL)
 	{
-		clnt_pcreateerror ("setup_config");
+		char tmp[255];
+		snprintf(tmp, sizeof(tmp), "setup_config (NETHOST=%s) : ", nethost);
+		clnt_pcreateerror (tmp);
 		*error = DevErr_NoNetworkManagerAvailable;
 		return (DS_NOTOK);
 	}
@@ -1639,7 +1313,9 @@ long setup_config_multi (char *nethost, long *error)
 			clnt = clnt_create (nethost,NMSERVER_PROG,NMSERVER_VERS_1,"udp");
 			if (clnt == NULL)
 			{
-				clnt_pcreateerror ("setup_config");
+				char tmp[255];
+				snprintf(tmp, sizeof(tmp), "setup_config (NETHOST=%s) : ", nethost);
+				clnt_pcreateerror (tmp);
 				*error = DevErr_NoNetworkManagerAvailable;
 				return (DS_NOTOK);
 			}
@@ -1651,7 +1327,9 @@ long setup_config_multi (char *nethost, long *error)
 				(xdrproc_t)xdr__manager_data_3, (caddr_t) &manager_data, TIMEVAL(timeout));
 			if (clnt_stat != RPC_SUCCESS)
 			{
-				clnt_perror (clnt,"setup_config ()");
+				char tmp[255];
+				snprintf(tmp, sizeof(tmp), "setup_config (NETHOST=%s) : ", nethost);
+				clnt_perror (clnt, tmp);
 				clnt_destroy (clnt);
 				*error = DevErr_NetworkManagerNotResponding;
 				return (DS_NOTOK);
@@ -1724,28 +1402,6 @@ long setup_config_multi (char *nethost, long *error)
  */
 		if (!config_flags.configuration)
 		{
-/*
- * The string pointed to by string becomes part of the environment, so altering the string 
- * changes the environment.
- */
-			static char	*nethost_tmp = NULL;
-			if (!nethost_tmp)
-				nethost_tmp = (char*)malloc(64);
-/* 
- * Ultra-C++ does not find the symbole putenv() (maybe the prototype
- * is wrong). Supress its use for Ultra-C++. This means Ultra-C++
- * programs have to specify $NETHOST
- *
- * - andy 27nov96
- * Initialise the XDR data type list with all data types
- * specified in the Kernel of the system. 
- */
-#ifndef _UCC
-			snprintf(nethost_tmp, HOST_NAME_LENGTH + 20, "NETHOST=%s", nethost);
-			putenv(nethost_tmp);
-			nethost_env = (char *)getenv ("NETHOST");
-#endif /*!_UCC*/
-//			if (setup_config(error) != DS_OK)
 		    	if ( xdr_load_kernel (error) == DS_NOTOK )
 			{
 /*
@@ -1756,9 +1412,17 @@ long setup_config_multi (char *nethost, long *error)
 				clnt_destroy (clnt);
 				return(DS_NOTOK);
 			}
-		    	config_flags = multi_nethost[0].config_flags;
-		    	db_info.conf = multi_nethost[0].db_info;
-		    	msg_info.conf = multi_nethost[0].msg_info;
+			if (strlen(config_flags.server_name))
+				snprintf (multi_nethost[i_nethost].config_flags.server_name, sizeof(multi_nethost[i_nethost].config_flags.server_name), "%s", config_flags.server_name);
+			if (strlen(config_flags.server_host))
+				snprintf (multi_nethost[i_nethost].config_flags.server_host, sizeof(multi_nethost[i_nethost].config_flags.server_host), "%s", config_flags.server_host);
+			if (config_flags.device_no)
+				multi_nethost[0].config_flags.device_no = config_flags.device_no;
+			if (config_flags.device_list)
+				multi_nethost[0].config_flags.device_list = config_flags.device_list;
+			config_flags = multi_nethost[0].config_flags;
+			db_info.conf = multi_nethost[0].db_info;
+			msg_info.conf = multi_nethost[0].msg_info;
 		}
 	}
 	return (DS_OK);
@@ -1773,7 +1437,7 @@ long setup_config_multi (char *nethost, long *error)
  *
  * @return DS_OK or DS_NOTOK in case of failure
  */
-long db_ChangeDefaultNethost(char* nethost,long *error)
+long db_ChangeDefaultNethost(char* nethost,DevLong *error)
 {
 	int i_nethost = get_i_nethost_by_name(nethost,error);
 /* 
@@ -1781,6 +1445,11 @@ long db_ChangeDefaultNethost(char* nethost,long *error)
  */
 	if (i_nethost < 0)
 	{
+		if ((char *)getenv("NETHOST") != NULL)
+                {
+                        if ( (db_import(error)) != DS_OK )
+				return (DS_NOTOK);
+                }
 /* 
  * lookup failed, try to import the host 
  */
@@ -1837,14 +1506,14 @@ static char* format_error_string(const char* time_stamp,const char* message )
  * 
  * @return error string.
  */ 
-static char *get_error_string (long error)
+static char *get_error_string (DevLong error)
 {
 	char		res_path[LONG_NAME_SIZE];
 	char		res_name[SHORT_NAME_SIZE];
 	char		*ret_str = NULL;
 	char		*error_str = NULL;
 	db_resource 	res_tab;
-	long		db_error;
+	DevLong		db_error;
 	unsigned short 	error_number_mask = 0xfff;
 	unsigned short 	team;
 	unsigned short 	server;
@@ -1907,9 +1576,9 @@ static char *get_error_string (long error)
  * error string rather than the static error string stored in the global
  * error table or the database
  */
-	if (dev_error_string != NULL)
+	if (dev_error_stack != NULL)
 	{
-	    return format_error_string(time_stamp, dev_error_string);
+	    return format_error_string(time_stamp, dev_error_stack);
 	}
 
 /*

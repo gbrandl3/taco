@@ -10,7 +10,7 @@
 #include <unistd.h>
 #endif
 
-#include <cstdlib>
+#include <stdlib.h>
 
 #include <log4cpp/Category.hh>
 #include <log4cpp/Appender.hh>
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
         /* looking for the init file in $srcdir is a requirement of
            automake's distcheck target.
         */
-        char* srcdir = std::getenv("srcdir");
+        char* srcdir = getenv("srcdir");
         std::string initFileName;
         if (srcdir == NULL) {
             initFileName = "./log4cpp.init";
@@ -93,8 +93,8 @@ int main(int argc, char* argv[])
     sub2.error("%s %s %d", "test", "vform", 123);
     sub2.warnStream() << "streamed warn";
 
-    sub2 << log4cpp::Priority::WARN << "warn2.." << "..warn3..value=" << 0 << 
-        log4cpp::CategoryStream::ENDLINE << "..warn4";
+    sub2 << log4cpp::Priority::WARN << "warn2.." << "..warn3..value=" << 0 
+         << log4cpp::eol << "..warn4";
 
     log4cpp::Category::shutdown();
 

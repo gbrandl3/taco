@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.5 $
+ * Version      : $Revision: 1.6 $
  *
- * Date         : $Date: 2006-09-18 21:50:16 $
+ * Date         : $Date: 2008-04-06 09:07:51 $
  *
  */
 
@@ -76,7 +76,7 @@ void usage(const char *cmd)
 ****************************************************************************/
 int main(int argc, char **argv)
 {
-	long 			error;
+	DevLong			error;
 	char 			*tmp,
 				*rsh,
 				*net;

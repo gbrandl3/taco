@@ -31,9 +31,9 @@
  * 
  * Original:	March 1990
  * 
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  * 
- * Date:	$Date: 2005-07-25 13:08:22 $
+ * Date:	$Date: 2008-04-06 09:06:58 $
  * 
  ********************************************************************-*/
 
@@ -51,7 +51,7 @@
  */
 #ifdef _IDENT
 static char DevServerh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServer.h,v 1.10 2005-07-25 13:08:22 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServer.h,v 1.11 2008-04-06 09:06:58 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 typedef long DevMethod;
@@ -171,10 +171,12 @@ extern "C" {
 DevMethodFunction ds__method_finder PT_( (void *ptr_ds, DevMethod method) );
 
 long ds__method_search PT_( (void *ptr_ds_class, DevMethod method, DevMethodFunction *function_ptr) );
-long ds__create PT_( (char *name, void *ptr_ds_class, void *ptr_ds_ptr, long *error) );
-long ds__destroy PT_( (void *ptr_ds, long *error) );
-long ds__svcrun PT_( (long *error) );
-long startup PT_( (char* svr_name,long* error) );
+long ds__create PT_( (char *name, void *ptr_ds_class, void *ptr_ds_ptr, DevLong *error) );
+long ds__destroy PT_( (void *ptr_ds, DevLong *error) );
+long ds__svcrun PT_( (DevLong *error) );
+long startup PT_( (char* svr_name,DevLong* error) );
+long svc_check PT_( (DevLong* error) );
+long db_check PT_( (DevLong* error) );
 
 
 long ds__signal PT_( (int sig, void (*action)(int), long *error) );
@@ -199,19 +201,19 @@ extern "C" {
 
 long dev_cmd PT_( (void *ptr_ds, long cmd, DevArgument argin,
 			long argin_type, DevArgument argout, long argout_type,
-			long *error) );
+			DevLong *error) );
 
 #ifdef __cplusplus
 void dev_event_fire PT_( (Device *device, long event_type,
 				DevArgument argout, DevType argout_type,
 	 			long event_status, long event_error) );
-long dev_export (char *name, Device *ptr_dev, long *error);
+long dev_export (char *name, Device *ptr_dev, DevLong *error);
 }
 #else
 void dev_event_fire PT_( (DevServer ds, long event_type,
 				DevArgument argout, DevType argout_type,
 				long event_status, long event_error) );
-long dev_export  PT_( (char *dev_name, void *ptr_ds, long *error) );
+long dev_export  PT_( (char *dev_name, void *ptr_ds, DevLong *error) );
 #endif
 
 /*

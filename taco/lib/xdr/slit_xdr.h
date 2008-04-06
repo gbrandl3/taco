@@ -30,9 +30,9 @@
  *
  * Original:	September 1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  *
  *******************************************************************-*/
 
@@ -43,12 +43,12 @@
  *  definitions for slits
  */
  struct pslit_head {
-       long pmain_st; /* The main device state ( from the state handler):
+       DevLong pmain_st; /* The main device state ( from the state handler):
                          DEVON : all is good for you
                          DEVWARNING : at least on maxe acces failed or
                                       one basic device is DEVFAULT.
                          DEVFAULT : fatal error occured. */
-       long dev_diag; /* device diagnostic. When pmain_st is not DEVON
+       DevLong dev_diag; /* device diagnostic. When pmain_st is not DEVON
                          The bits are numbered 0 to 23 from the right and
                           the value 1 corresponds to an error state.
 
@@ -80,7 +80,7 @@
                       */       
 
 
-       long unit;    /* the current unit :
+       DevLong unit;    /* the current unit :
                         1: STEPS: 2: MM; 3: MICRONS; 4: ROTATIONS;
                         5: DEGREES; 6: ARC_SEC
                      */ 
@@ -90,20 +90,20 @@ bool_t 	_DLLFunc xdr_pslit_head PT_((XDR *xdrs, pslit_head *objp));
 
 
 struct blade_state {
-       long values_st; /* availability of each value. 1 if not available
+       DevLong  values_st; /* availability of each value. 1 if not available
                          00001 mot_pos
                          00010 enc_pos
                          00100 temp
                          01000 brake
                          10000 switch
                        */                       
-       long mot_moving; /* 1 if the motor is moving 0 if not */
-       float mot_pos;   /* in current unit */
-       float enc_pos;   /* in current unit */
-       float temp;      /* in degrees */
-       long  brake;     /* DEVOPEN | DEVCLOSE | DEVFAULT */
-       long  switch_st; /* LIMITSOFF | NEGATLIMIT | POSITLIMIT */
-       long tuned;      /* TUNED | NOTTUNED */
+       DevLong  mot_moving; /* 1 if the motor is moving 0 if not */
+       DevFloat mot_pos;   /* in current unit */
+       DevFloat enc_pos;   /* in current unit */
+       DevFloat temp;      /* in degrees */
+       DevLong  brake;     /* DEVOPEN | DEVCLOSE | DEVFAULT */
+       DevLong  switch_st; /* LIMITSOFF | NEGATLIMIT | POSITLIMIT */
+       DevLong  tuned;      /* TUNED | NOTTUNED */
 };
 typedef struct blade_state blade_state;
 bool_t 	_DLLFunc xdr_blade_state PT_((XDR *xdrs, blade_state *objp));
@@ -128,7 +128,7 @@ bool_t 	_DLLFunc xdr_DevBladeState PT_((XDR *xdrs, DevBladeState *objp));
 
 
 struct pslit_state{
-     long values_st; /* availability of each value. 1 if not available 
+     DevLong  values_st; /* availability of each value. 1 if not available 
                        00000001 : gap
                        00000010 : offset
                        00000100 : temp_1 (up or front)
@@ -138,14 +138,14 @@ struct pslit_state{
                        01000000 : switch_1 (up or front)
                        10000000 : switch_2 (down or back)
                        */ 
-     float gap;      /* in current unit */
-     float offset;   /* in current unit */
-     float temp_1;   /* up or front blade in degrees */
-     float temp_2;   /* down or back blade in degrees */
-     long brake_1;   /* up or front blade: DEVOPEN | DEVCLOSE | DEVFAULT */
-     long brake_2;   /* down or back DEVOPEN | DEVCLOSE | DEVFAULT */
-     long switch_1;  /* up or front  LIMITSOFF | NEGATLIMIT | POSITLIMIT */
-     long switch_2;  /* down or back LIMITSOFF | NEGATLIMIT | POSITLIMIT */
+     DevFloat gap;      /* in current unit */
+     DevFloat offset;   /* in current unit */
+     DevFloat temp_1;   /* up or front blade in degrees */
+     DevFloat temp_2;   /* down or back blade in degrees */
+     DevLong  brake_1;   /* up or front blade: DEVOPEN | DEVCLOSE | DEVFAULT */
+     DevLong  brake_2;   /* down or back DEVOPEN | DEVCLOSE | DEVFAULT */
+     DevLong  switch_1;  /* up or front  LIMITSOFF | NEGATLIMIT | POSITLIMIT */
+     DevLong  switch_2;  /* down or back LIMITSOFF | NEGATLIMIT | POSITLIMIT */
 };
 
 typedef struct pslit_state pslit_state; 

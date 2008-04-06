@@ -27,11 +27,11 @@ noinst_HEADERS 		= LabViewGeneric.h LabViewGenericP.h \
 			LabView.h LabViewP.h
 
 lv_dsapi_la_SOURCES 	= lv_dsapi.c 
-lv_dsapi_la_LDFLAGS 	= $(LV_FLAGS) -module
+lv_dsapi_la_LDFLAGS 	= $(LV_FLAGS) -module -export-dynamic -avoid-version
 lv_dsapi_la_LIBADD 	= $(top_builddir)/lib/libtaco.la
 
 lv_dsclass_la_SOURCES	= lv_dsclass.c LabViewGeneric.h LabViewGenericP.h
-lv_dsclass_la_LDFLAGS 	= $(LV_FLAGS) -module
+lv_dsclass_la_LDFLAGS 	= $(LV_FLAGS) -module -export-dynamic -avoid-version
 lv_dsclass_la_LIBADD 	= $(top_builddir)/lib/libtaco.la 
 
 ## CMDS_res_DATA 	= LabviewGenericCmds.res

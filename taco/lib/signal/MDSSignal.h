@@ -28,11 +28,11 @@
  * Author(s):	Ingrid Fladmark
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
  * Original:	24th of january 1997
  *
- * Date:	$Date: 2005-07-25 12:59:10 $
+ * Date:	$Date: 2008-04-06 09:07:18 $
  *
  *********************************************************************/
 
@@ -70,13 +70,13 @@ extern "C" {
 #endif
 
 long dev_get_sig_config (char *device_name, DevVarStringArray *argout,
-                         long *error);
+                         DevLong *error);
 
 long dev_get_sig_list (char *device_name, DevVarStringArray *argout, 
-		       long *error);
+		       DevLong *error);
 
 long dev_get_sig_config_from_name (char *device_name, char *signal_name , 
-		                   DevVarStringArray *argout, long *error);
+		                   DevVarStringArray *argout, DevLong *error);
 
 void get_sig_prop_suffix (DevVarStringArray *suf_list );
 #ifdef __cplusplus

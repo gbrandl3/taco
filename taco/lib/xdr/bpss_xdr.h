@@ -31,9 +31,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:21 $
  *
  *******************************************************************-*/
 
@@ -44,8 +44,8 @@
  *  definition for booster power supplies system
  */
 struct DevStateIndic {
-		short State;
-		short Indic;
+		DevShort State;
+		DevShort Indic;
 		     };
 typedef struct DevStateIndic 	DevStateIndic;
 bool_t 	_DLLFunc xdr_DevStateIndic PT_((XDR *xdrs, DevStateIndic *objp));
@@ -58,8 +58,8 @@ long   	_DLLFunc xdr_length_DevStateIndic PT_((DevStateIndic *objp));
                                                 A )
 
 struct DevBpssState {
-		short Ac;
-		short Dc;
+		DevShort Ac;
+		DevShort Dc;
 		    };
 typedef struct DevBpssState 	DevBpssState;
 bool_t 	_DLLFunc xdr_DevBpssState PT_((XDR *xdrs, DevBpssState *objp));
@@ -74,10 +74,10 @@ long   	_DLLFunc xdr_length_DevBpssState PT_((DevBpssState *objp));
 
 
 struct DevBpssLine {
-		float Set;
-		float Read;
-		short Control;
-		short Alarm;
+		DevFloat Set;
+		DevFloat Read;
+		DevShort Control;
+		DevShort Alarm;
 		     };
 typedef struct DevBpssLine 	DevBpssLine;
 bool_t 	_DLLFunc xdr_DevBpssLine PT_((XDR *xdrs, DevBpssLine *objp));
@@ -90,21 +90,21 @@ long   	_DLLFunc xdr_length_DevBpssLine PT_((DevBpssLine *objp));
                                                 A )
 
 struct DevBpssReadPoint {
-		 DevBpssLine IACinv;
-		 DevBpssLine IACmag;
-		 DevBpssLine IDCmag;
-		 DevBpssLine Period;
-		 DevBpssLine PhLag;
-                 float      PhLagUI;
-                 float      VACinv;
-                 float      VDCmag;
-                 float      CapTemp;
-                 float      ChokeTemp;
-		 float	    Temperature[8];
+		 DevBpssLine  IACinv;
+		 DevBpssLine  IACmag;
+		 DevBpssLine  IDCmag;
+		 DevBpssLine  Period;
+		 DevBpssLine  PhLag;
+                 DevFloat     PhLagUI;
+                 DevFloat     VACinv;
+                 DevFloat     VDCmag;
+                 DevFloat     CapTemp;
+                 DevFloat     ChokeTemp;
+		 DevFloat     Temperature[8];
 		 DevBpssState State;
 		 DevBpssState ExtState;
 		 DevBpssState Faults[32];
-		 short	    Master;
+		 DevShort     Master;
 			};
 typedef struct DevBpssReadPoint DevBpssReadPoint;
 bool_t 	_DLLFunc xdr_DevBpssReadPoint

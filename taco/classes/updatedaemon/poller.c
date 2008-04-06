@@ -29,12 +29,12 @@
  *
  * Original:    
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2006-11-02 16:53:04 $
+ * Date:        $Date: 2008-04-06 09:06:39 $
  */
 
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/poller.c,v 1.5 2006-11-02 16:53:04 jkrueger1 Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/poller.c,v 1.6 2008-04-06 09:06:39 jkrueger1 Exp $";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -64,6 +64,11 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/cla
 #include <daemon.h>
 
 #include <Admin.h>
+
+#ifdef EBUG
+#	error EBUG
+#	undef EBUG
+#endif
 
 static long dev_id;
 static devserver ds;
@@ -100,35 +105,35 @@ long poll_device(int);
 
 /* template resource table for each device */
 
-db_resource devres_table[] = {                           /* DEFAULT */
-                   {"ud_poll_on_init",   D_BOOLEAN_TYPE},   /* False */
-                   {"ud_poll_mode",      D_STRING_TYPE},    /* survey */
-                   {"ud_num_retries",    D_LONG_TYPE},      /* 5 */
-                   {"ud_continue",       D_BOOLEAN_TYPE},   /* True */
-                   {"ud_poll_interval",  D_LONG_TYPE},      /* FACTOR*10 */
-                   {"ud_command_list",   D_VAR_STRINGARR},  /* No Default */
-                   {"ud_poll_recover",   D_STRING_TYPE},    /* catchup */
-                   {"ud_poll_forget",    D_LONG_TYPE}       /* 5 times */
-                   };
+db_resource devres_table[] = {                   /* DEFAULT */
+	{"ud_poll_on_init",   D_BOOLEAN_TYPE},   /* False */
+	{"ud_poll_mode",      D_STRING_TYPE},    /* survey */
+	{"ud_num_retries",    D_LONG_TYPE},      /* 5 */
+	{"ud_continue",       D_BOOLEAN_TYPE},   /* True */
+	{"ud_poll_interval",  D_LONG_TYPE},      /* FACTOR*10 */
+	{"ud_command_list",   D_VAR_STRINGARR},  /* No Default */
+	{"ud_poll_recover",   D_STRING_TYPE},    /* catchup */
+	{"ud_poll_forget",    D_LONG_TYPE}       /* 5 times */
+};
 
 const char* devres_name[] = {                         
-                        "ud_poll_on_init",
-                        "ud_poll_mode",  
-                        "ud_num_retries", 
-                        "ud_continue", 
-                        "ud_poll_interval",
-                        "ud_command_list",  
-                        "ud_poll_recover",  
-                        "ud_poll_forget",    
-                       };
+	"ud_poll_on_init",
+	"ud_poll_mode",  
+	"ud_num_retries", 
+	"ud_continue", 
+	"ud_poll_interval",
+	"ud_command_list",  
+	"ud_poll_recover",  
+	"ud_poll_forget",    
+};
 
 int devres_tab_size = sizeof(devres_table)/sizeof(db_resource);
 
 struct poll_list_type {
-		   int                   index;
-		   struct poll_list_type *next;
-		   struct poll_list_type *previous;
-		       };
+	int                   index;
+	struct poll_list_type *next;
+	struct poll_list_type *previous;
+};
 
 struct poll_list_type *first_poll;
 struct poll_list_type *last_poll;
@@ -263,7 +268,8 @@ void check_next_device (long check_time)
 	static daemon_device_struct_type *current_device_ptr;
 	struct timeval wait_time;
 	long time_diff,dT;
-	long status,error,error_dev;
+	long status;
+	DevLong error,error_dev;
 	long oldpolltime=0;
 	int signaltestloop;
 	int i;
@@ -527,7 +533,8 @@ void signal_handler(int signal)
 {
 
    	register int dev;
-   	long status,error;
+   	long status;
+	DevLong error;
    	dc_error dc_error_val;
 
 #if defined (EBUG)
@@ -631,7 +638,7 @@ void free_command(int cmd_num,command_list *cmd_ptr)
 
 /****************************************************************************/
 long store_command(char *command_name,int command_type,
-                   command_list **list_ptr,long *error)
+                   command_list **list_ptr, DevLong *error)
 {
 
   int size;
@@ -693,7 +700,9 @@ long initialise_ipc(pid_t pid)
 #endif
 
   Make_Dataport_Name (dataport_name, sizeof(dataport_name) - 1, (char *)DAEMON_DATAPORT,pid);
-
+#if defined (EBUG)
+  fprintf(stderr, "dataport name : %s\n", dataport_name);
+#endif
   dp=OpenDataport (dataport_name,sizeof(dataport_struct_type));
   if (dp==NULL)
   {
@@ -745,7 +754,7 @@ void store_status(int dev_num,long status,long error)
 
 
 /****************************************************************************/
-long get_types (daemon_device_struct_type *cdp,long *error)
+long get_types (daemon_device_struct_type *cdp, DevLong *error)
 {
 
   DevVarCmdArray    ValidCommandList;
@@ -836,7 +845,8 @@ long get_types (daemon_device_struct_type *cdp,long *error)
 /****************************************************************************/
 long import_device(int dev_num)
 {
-  long status,error;
+  long status;
+  DevLong error;
   char dev_name[60];
  
 #if defined(VOIDTYPE)
@@ -895,7 +905,7 @@ long import_device(int dev_num)
 
 
 /****************************************************************************/
-long d_initdev(long *error)
+long d_initdev(DevLong *error)
 {
   long status,counter;
   static daemon_device_struct_type *current_device_ptr;
@@ -1368,7 +1378,7 @@ long d_initdev(long *error)
 
 
 /****************************************************************************/
-long d_removedev(long *error)
+long d_removedev(DevLong *error)
 {
  int found,indexvalue;
  long status,ddid,counter;
@@ -1736,7 +1746,7 @@ long ddid_valid()
 
 
 /****************************************************************************/
-long d_on(long *error)
+long d_on(DevLong *error)
 {
 
 #if defined(TRACE)
@@ -1756,7 +1766,7 @@ long d_on(long *error)
 
 
 /****************************************************************************/
-long d_off(long *error)
+long d_off(DevLong *error)
 {
 
 #if defined(TRACE)
@@ -1776,7 +1786,7 @@ long d_off(long *error)
 
 
 /****************************************************************************/
-long d_accessstatus(long *error)
+long d_accessstatus(DevLong *error)
 {
   static char str[255];
   long ddid,counter;
@@ -1838,7 +1848,7 @@ long d_accessstatus(long *error)
 
 
 /****************************************************************************/
-long d_status(long *error)
+long d_status(DevLong *error)
 {
   static char str[511];
   static char temp[255];
@@ -1951,7 +1961,7 @@ long d_status(long *error)
 
 
 /****************************************************************************/
-long d_pollstatus(long *error)
+long d_pollstatus(DevLong *error)
 {
   static char str[255];
   long ddid,counter;
@@ -2011,7 +2021,7 @@ long d_pollstatus(long *error)
 
 
 /****************************************************************************/
-long d_state(long *error)
+long d_state(DevLong *error)
 {
 
 #if defined(TRACE)
@@ -2042,7 +2052,7 @@ long d_state(long *error)
 
 
 /****************************************************************************/
-long d_ident(long *error)
+long d_ident(DevLong *error)
 {
   static char device_name[255];
   register int count;
@@ -2120,7 +2130,7 @@ long d_ident(long *error)
 
 
 /****************************************************************************/
-long d_name(long *error)
+long d_name(DevLong *error)
 {
   static char device_name[255];
   register int count;
@@ -2182,7 +2192,7 @@ long d_name(long *error)
 
 
 /****************************************************************************/
-long d_startpoll(long *error)
+long d_startpoll(DevLong *error)
 {
   long ddid,counter;
   long status;
@@ -2228,7 +2238,7 @@ long d_startpoll(long *error)
 
 
 /****************************************************************************/
-long d_stoppoll(long *error)
+long d_stoppoll(DevLong *error)
 {
   long ddid,counter;
   long status;
@@ -2275,7 +2285,7 @@ long d_stoppoll(long *error)
 
 
 /****************************************************************************/
-long d_changeinterval(long *error)
+long d_changeinterval(DevLong *error)
 {
   long ddid,counter; 
   long interval;
@@ -2332,7 +2342,7 @@ long d_changeinterval(long *error)
 
 
 /****************************************************************************/
-long d_definemode(long *error)
+long d_definemode(DevLong *error)
 {
   long ddid,counter;
   int mode;
@@ -2389,7 +2399,8 @@ long d_definemode(long *error)
 /****************************************************************************/
 long proc_command(int command)
 {
-  long status,error;
+  long status;
+  DevLong error;
 
 #if defined(TRACE)
   fprintf(stderr,"proc_command()\n");
@@ -2588,7 +2599,8 @@ long poll_device(int dev_num)
   command_list *current_command;
   daemon_device_struct_type *current_device_ptr;
   register int retries;
-  long status,error,ddid;
+  long status,ddid;
+  DevLong error;
   int i;
 
   DevOpaque Oargout;

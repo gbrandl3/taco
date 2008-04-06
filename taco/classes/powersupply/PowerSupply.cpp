@@ -31,9 +31,9 @@
  *
  * Original:	April 1995
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-18 22:39:09 $
+ * Date:        $Date: 2008-04-06 09:06:37 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -68,7 +68,7 @@ short PowerSupply::class_inited = 0;
 //
 // Arg(s) Out:  long *error - pointer to error code if routine fails.
 //-=======================================================================
-long PowerSupply::GetResources (char *res_name, long *error)
+long PowerSupply::GetResources (char *res_name, DevLong *error)
 {
    static db_resource res_powersupply[] = { {"delta_i", D_FLOAT_TYPE},
 		                            {"time_constant", D_LONG_TYPE}, };
@@ -108,7 +108,7 @@ long PowerSupply::GetResources (char *res_name, long *error)
 //
 //-=====================================================================
 
-long PowerSupply::ClassInitialise( long *error )
+long PowerSupply::ClassInitialise( DevLong *error )
 {
    dev_printdebug(DBG_TRACE,"PowerSupply::ClassInitialise() called\n");
 
@@ -133,7 +133,7 @@ long PowerSupply::ClassInitialise( long *error )
 //
 //-=====================================================================
 
-PowerSupply::PowerSupply (char *devname, long *error)
+PowerSupply::PowerSupply (char *devname, DevLong *error)
 	    :Device (devname, error)
 {
    dev_printdebug(DBG_TRACE,"PowerSupply::PowerSupply() called, devname = %s\n",devname);
@@ -155,7 +155,7 @@ PowerSupply::PowerSupply (char *devname, long *error)
 // Initialise the class_name filed of the device class
 //
 
-   this->class_name = "PowerSupplyClass";
+   this->class_name = const_cast<char *>("PowerSupplyClass");
 
 //
 // initialise the object with default values via the database
@@ -213,7 +213,7 @@ PowerSupply::~PowerSupply ()
 //
 //-=====================================================================
 
-long PowerSupply::CheckReadValue(DevBoolean *alarm, long *error)
+long PowerSupply::CheckReadValue(DevBoolean *alarm, DevLong *error)
 {
    dev_printdebug(DBG_TRACE,"PowerSupply::CheckReadValue() called\n");
 

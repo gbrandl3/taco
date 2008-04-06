@@ -29,9 +29,9 @@
  *
  * Original:    June 1992
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:22 $
  *
  *******************************************************************-*/
 
@@ -47,11 +47,11 @@ xdr_DevMulMove(xdrs, objp)
 	DevMulMove *objp;
 {
 	if (!xdr_vector(xdrs, (char *)objp->action, 8,
-		        sizeof(long), (xdrproc_t)xdr_long)) {
+		        sizeof(long), (xdrproc_t)xdr_DevLong)) {
 		return (FALSE);
      	}
      	if (!xdr_vector(xdrs, (char *)objp->delay, 8,
-		        sizeof(long), (xdrproc_t)xdr_long)) {
+		        sizeof(long), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
   	}
  	if (!xdr_vector(xdrs, (char *)objp->position, 8,
@@ -66,9 +66,9 @@ xdr_DevMotorLong(xdrs, objp)
 	XDR *xdrs;
 	DevMotorLong *objp;
 {
-	if (!xdr_long(xdrs, &objp->axisnum))
+	if (!xdr_DevLong(xdrs, &objp->axisnum))
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->value))
+	if (!xdr_DevLong(xdrs, &objp->value))
 		return (FALSE);
 
        return (TRUE);
@@ -81,7 +81,7 @@ xdr_DevMotorFloat(xdrs, objp)
 	XDR *xdrs;
 	DevMotorFloat *objp;
 {
-	if (!xdr_long(xdrs, &objp->axisnum))
+	if (!xdr_DevLong(xdrs, &objp->axisnum))
 		return (FALSE);
 	if (!xdr_float(xdrs, &objp->value))
 		return (FALSE);

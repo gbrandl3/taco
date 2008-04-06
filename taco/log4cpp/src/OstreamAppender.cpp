@@ -15,10 +15,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <log4cpp/OstreamAppender.hh>
-
-#ifndef O_LARGEFILE
-#define O_LARGEFILE 0
-#endif
+#include <log4cpp/FactoryParams.hh>
 
 namespace log4cpp {
 
@@ -45,4 +42,13 @@ namespace log4cpp {
     bool OstreamAppender::reopen() {
         return true;
     }      
+
+    std::auto_ptr<Appender> create_console_appender(const FactoryParams& params)
+    {
+        std::string name;
+
+        params.get_for("ConsoleAppender").required("name", name);
+
+        return std::auto_ptr<Appender>(new OstreamAppender(name, &std::cout));
+    }
 }

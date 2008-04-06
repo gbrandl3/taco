@@ -30,9 +30,9 @@
  *
  * Original:	24th of january 1997
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:11:12 $
+ * Date:	$Date: 2008-04-06 09:07:18 $
  *
  *********************************************************************/
 
@@ -54,16 +54,15 @@
  * public methods
  */
 
-static long class_initialise(long *error);
-static long object_create(char *name,DevServer *ds_ptr,long *error);
-static long object_destroy      (MDSSignal ds, long *error);
-static long object_initialise(MDSSignal ds,char *dev_class_name, long *error);
-static long read_properties(MDSSignal ds,DevVarStringArray *properties,long *error);
-static long check_alarms(MDSSignal ds,DevVarDoubleArray *values,DevVarLongArray *alarm_state, long *error);
-static long read_alarms(MDSSignal ds,DevVarStringArray *alarm_mess,long *error);
-static long signals_reset(MDSSignal ds, long *error);
-static long get_signal_object (MDSSignal ds, char *signal_name, 
-			       Dssignal *signal_object, long *error);
+static long class_initialise(DevLong *error);
+static long object_create(char *name,DevServer *ds_ptr,DevLong *error);
+static long object_destroy      (MDSSignal ds, DevLong *error);
+static long object_initialise(MDSSignal ds,char *dev_class_name, DevLong *error);
+static long read_properties(MDSSignal ds,DevVarStringArray *properties,DevLong *error);
+static long check_alarms(MDSSignal ds,DevVarDoubleArray *values,DevVarLongArray *alarm_state, DevLong *error);
+static long read_alarms(MDSSignal ds,DevVarStringArray *alarm_mess,DevLong *error);
+static long signals_reset(MDSSignal ds, DevLong *error);
+static long get_signal_object (MDSSignal ds, char *signal_name, Dssignal *signal_object, DevLong *error);
 
 static	DevMethodListEntry methods_list[] = {
    	{DevMethodClassInitialise,	(DevMethodFunction)class_initialise},
@@ -132,7 +131,7 @@ static long			*ds->mDSSignal.alarm_result = NULL;
  Arg(s) Out:	long *error - pointer to error code, in case routine fails
  =======================================================================*/
 
-static long class_initialise(long *error)
+static long class_initialise(DevLong *error)
 {
 
 /*
@@ -179,7 +178,7 @@ static long class_initialise(long *error)
 		long *error - pointer to error code, in case routine fails
  =======================================================================*/
 
-static long object_create(char *name,DevServer *ds_ptr,long *error)
+static long object_create(char *name,DevServer *ds_ptr, DevLong *error)
 {
    MDSSignal ds;
 
@@ -216,8 +215,7 @@ Arg(s) In:      Dssignal ds     - object to destroy
 Arg(s) Out:     long *error     - pointer to error code, in case routine fails
 =============================================================================*/
 
-static long object_destroy (MDSSignal ds, long *error)
-
+static long object_destroy (MDSSignal ds, DevLong *error)
 {
 	u_long		no_of_signals;
 	short		i;
@@ -319,7 +317,7 @@ Arg(s) Out:
 
 		long *error     - pointer to error code, in case routine fails
 =============================================================================*/
-static long object_initialise(MDSSignal ds,char *dev_class_name, long *error)
+static long object_initialise(MDSSignal ds,char *dev_class_name, DevLong *error)
 {
 	char		class_res_name[80];
 	char		signal_name[80];
@@ -436,7 +434,7 @@ static long object_initialise(MDSSignal ds,char *dev_class_name, long *error)
 
  ============================================================================*/
 
-static long  read_properties(MDSSignal ds,DevVarStringArray *properties,long *error)
+static long  read_properties(MDSSignal ds,DevVarStringArray *properties, DevLong *error)
 {
 #ifdef PRINT
    printf("MDSSignal, read_properties(), entered\n");
@@ -551,7 +549,7 @@ static long  read_properties(MDSSignal ds,DevVarStringArray *properties,long *er
 
  ============================================================================*/
 
-static long  check_alarms(MDSSignal ds, DevVarDoubleArray *values,DevVarLongArray *alarm_state,long *error)
+static long  check_alarms(MDSSignal ds, DevVarDoubleArray *values,DevVarLongArray *alarm_state, DevLong *error)
 {
 	long no_of_values,i,alarm_read;
 	long iret = False;
@@ -566,7 +564,7 @@ static long  check_alarms(MDSSignal ds, DevVarDoubleArray *values,DevVarLongArra
 	if (ds->mDSSignal.alarm_result != NULL)
 		free(ds->mDSSignal.alarm_result);
 
-	ds->mDSSignal.alarm_result = (long *)malloc(no_of_values*sizeof(long));
+	ds->mDSSignal.alarm_result = (DevLong *)malloc(no_of_values*sizeof(DevLong));
 	if (ds->mDSSignal.alarm_result == 0)
 	{
 		printf("can't allocate memory for ds->mDSSignal.alarm_result array --NOTOK \n");
@@ -611,7 +609,7 @@ static long  check_alarms(MDSSignal ds, DevVarDoubleArray *values,DevVarLongArra
 
  ============================================================================*/
 
-static long  read_alarms(MDSSignal ds,DevVarStringArray *alarm_mess,long *error)
+static long  read_alarms(MDSSignal ds,DevVarStringArray *alarm_mess, DevLong *error)
 {
 	static char			**alarm_tab   = NULL;
 	static u_long 		no_of_signals = 0;
@@ -691,7 +689,7 @@ static long  read_alarms(MDSSignal ds,DevVarStringArray *alarm_mess,long *error)
 
  ============================================================================*/
 
-static long  signals_reset(MDSSignal ds,long *error)
+static long  signals_reset(MDSSignal ds, DevLong *error)
 {
 	short i, no_of_signals;
 #ifdef PRINT
@@ -731,7 +729,7 @@ static long  signals_reset(MDSSignal ds,long *error)
  ============================================================================*/
 
 static long get_signal_object (MDSSignal ds, char *signal_name, 
-			       Dssignal *signal_object, long *error)
+			       Dssignal *signal_object, DevLong *error)
 {
 	u_long	i;
 

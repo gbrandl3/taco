@@ -1,0 +1,44 @@
+/*! \page basicsteps Basic steps to install and configure a device server 
+\addindex basicsteps
+
+-# Write your new class (e.g. NewClass) 
+-# Write the startup for the new class (startup.c or startup.cpp). 
+-# Compile and link the device server (e.g. Newds). 
+-# Create a resource file containing a list of devices to be created for a copy
+of the device server.\note each copy of a device server has its own so-called 
+"personal name" which is used to identify, the full server name is therefore 
+the name of the executable followed by the personal name e.g. Newds/test
+
+The resource file must contain at least one line which consists of the device 
+server name followed by the keyword device colon and at least one device for a 
+valid domain (e.g. TL1, SY, TL2, SR, ID, EXP at the ESRF). An example for the 
+New class would be :
+\verbatim
+newds/test/device: id/new/1 
+\endverbatim
+The resource file can contain other resources which are device specific. The 
+resource file must be stored in the resource base directory (e.g. 
+/users/d/dserver/dbase/res on libra for the test control system used at the ESRF).
+-# If your device server defines new commands and/or errors (cf. DSN/096) then
+define a class base number (e.g. DevNewBase) and define the commands in the resource 
+file e.g.
+\verbatim
+# 
+# test device for the Newds device server 
+# 
+newds/test/device: id/new/1 
+# 
+# private commands 
+# 
+cmds/4/6/1: "DevNewCmd1"
+\endverbatim
+This is all explained in the section on "Adding Private Commands". 
+-# Update the resource file in the static database using the command db update
+file (where file is the resource file name w.r.t to the resource base directory) 
+or greta (the graphical resource editor).
+-# Start the device server with the personal name specified in the resource file
+and the option -m (e.g. Newds test -m), make sure the environment variable 
+$NETHOST is pointing to a valid control system nethost (e.g. libra at the ESRF).
+
+*/
+

@@ -32,9 +32,9 @@
  *
  * Original:	June 1995
  *
- * Version:     $Revision: 1.6 $
+ * Version:     $Revision: 1.7 $
  *
- * Date:        $Date: 2006-09-18 22:39:09 $
+ * Date:        $Date: 2008-04-06 09:06:37 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -53,7 +53,7 @@
 
 long minimal_access;
 
-long startup(char *svr_name, long *error)
+long startup(char *svr_name, DevLong *error)
 {
    char **dev_list;
    unsigned int n_devices, i;
@@ -93,7 +93,7 @@ long startup(char *svr_name, long *error)
 //
 // export the device onto the network
 //
-      status = dev_export((char*)device[i]->name,(Device*)device[i],(long*)error);
+      status = dev_export((char*)device[i]->GetDevName(),(Device*)device[i], error);
 
       printf("startup++() dev_export() returned %d (error = %d)\n",status,*error);
 

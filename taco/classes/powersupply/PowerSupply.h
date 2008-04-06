@@ -31,9 +31,9 @@
  *
  * Original:	April 1995
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2006-09-18 22:39:09 $
+ * Date:        $Date: 2008-04-06 09:06:37 $
  */
 
 #include <Device.h>
@@ -47,8 +47,8 @@ class PowerSupply : public Device {
 
 private :
 
-   long ClassInitialise( long *error );
-   long GetResources (char *res_name, long *error);
+   long ClassInitialise( DevLong *error );
+   long GetResources (char *res_name, DevLong *error);
 
    static short class_inited;
 //
@@ -76,15 +76,15 @@ protected:
    long time_const;
    long last_set_t;
 
-   long CheckReadValue(DevBoolean *check, long *error);
+   long CheckReadValue(DevBoolean *check, DevLong *error);
 
-   virtual long StateMachine( long cmd, long *error) = 0; // pure virtual function
+   virtual long StateMachine( DevCommand cmd, DevLong *error) = 0; // pure virtual function
 //
 // public members
 //
 public:
 
-     PowerSupply (char *name, long *error);
+     PowerSupply (char *name, DevLong *error);
      ~PowerSupply ();
 
 };

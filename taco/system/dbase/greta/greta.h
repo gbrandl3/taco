@@ -25,9 +25,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-18 21:59:06 $
+ * Date:        $Date: 2008-04-06 09:07:38 $
  *
  */
 
@@ -394,9 +394,9 @@ long gethdb_info(char *,char *);
 
 /* In servutil.c */
 
-long db_getserverdeviceres(char *,char *,db_svcinfo_call *,char **,long,long,long *);
-long db_builddevicelist(char *,char *,db_svcinfo_call *,char **,long,long *);
-long db_buildservinfo(char *,char *,db_svcinfo_call *,char **,long,long *);
+long db_getserverdeviceres(char *,char *,db_svcinfo_call *,char **,long,long, DevLong *);
+long db_builddevicelist(char *,char *,db_svcinfo_call *,char **,long, DevLong *);
+long db_buildservinfo(char *,char *,db_svcinfo_call *,char **,long, DevLong *);
 
 /*
  * Convenience functions from utilities file.

@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2006-12-15 12:43:54 $
+ * Date:	$Date: 2008-04-06 09:07:40 $
  *
  */
 
@@ -68,13 +68,13 @@ db_psdev_error *NdbmServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
 	err.error_code = 0;
 	err.psdev_err = 0;
 
-	logStream->debugStream() << "Begin db_psdev_register" << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "Host name : " << rece->h_name << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "PID = " << rece->pid << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Begin db_psdev_register" << log4cpp::eol;
+	logStream->debugStream() << "Host name : " << rece->h_name << log4cpp::eol;
+	logStream->debugStream() << "PID = " << rece->pid << log4cpp::eol;
 	for (int i = 0; i < num_psdev; i++)
 	{
-		logStream->debugStream() << "Pseudo device name : " << rece->psdev_arr.psdev_arr_val[i].psdev_name << log4cpp::CategoryStream::ENDLINE;
-		logStream->debugStream() << "Refresh period : " << rece->psdev_arr.psdev_arr_val[i].poll << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "Pseudo device name : " << rece->psdev_arr.psdev_arr_val[i].psdev_name << log4cpp::eol;
+		logStream->debugStream() << "Refresh period : " << rece->psdev_arr.psdev_arr_val[i].poll << log4cpp::eol;
 	}
 //
 // Return error code if the server is not connected */
@@ -101,7 +101,7 @@ db_psdev_error *NdbmServer::db_psdev_reg_1_svc(psdev_reg_x *rece)
 //
 // Leave server 
 //
-	logStream->debugStream() << "End db_psdev_register" << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "End db_psdev_register" << log4cpp::eol;
 	return(&err);
 }
 
@@ -202,13 +202,13 @@ long NdbmServer::reg_ps(char *h_name, long pid, char *ps_name, long poll, long *
         }
         catch (NdbmError &err)
         {
-                logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;
+                logStream->errorStream() << err.get_err_message() << log4cpp::eol;
                 *p_error = err.get_err_code();
                 return(DS_NOTOK);
         }
         catch (std::bad_alloc)
         {
-                logStream->errorStream() << "Memory allocation error in devserverlist" << log4cpp::CategoryStream::ENDLINE;
+                logStream->errorStream() << "Memory allocation error in devserverlist" << log4cpp::eol;
                 *p_error = DbErr_ServerMemoryAllocation;
                 return(DS_NOTOK);
         }
@@ -248,9 +248,9 @@ db_psdev_error *NdbmServer::db_psdev_unreg_1_svc(arr1 *rece)
 	err.error_code = 0;
 	err.psdev_err = 0;
 
-	logStream->debugStream() << "Begin db_psdev_unregister" << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Begin db_psdev_unregister" << log4cpp::eol;
 	for (int i = 0;i < num_psdev;i++)
-		logStream->debugStream() << "Pseudo device name : " << rece->arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "Pseudo device name : " << rece->arr1_val[i] << log4cpp::eol;
 //
 // Return error code if the server is not connected
 //
@@ -274,7 +274,7 @@ db_psdev_error *NdbmServer::db_psdev_unreg_1_svc(arr1 *rece)
 //
 // Leave server 
 //
-	logStream->debugStream() << "End db_psdev_unregister" << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "End db_psdev_unregister" << log4cpp::eol;
 	return(&err);
 }
 

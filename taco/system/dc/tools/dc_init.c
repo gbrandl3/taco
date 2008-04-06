@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.7 $
+ * Version      : $Revision: 1.8 $
  *
- * Date         : $Date: 2006-09-18 21:50:15 $
+ * Date         : $Date: 2008-04-06 09:07:51 $
  *
  */
 
@@ -40,6 +40,7 @@
 #	include "config.h"
 #endif
 #include <API.h>
+#include <private/ApiP.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -59,6 +60,10 @@
 #define	DEFAULT_LOGIN		"blissadm"
 
 char *gethostname_wo_dot(int length);
+int dc_res_management(DevLong *error_ptr);
+int dc_res_serv_nb(DevLong *error_ptr);
+int dc_res_request(DevLong *error_ptr);
+int dc_class_dc(DevLong *error_ptr);
 
 void usage(const char *cmd)
 {
@@ -92,7 +97,7 @@ int main(int argc, char **argv)
 {
 	DevVarStringArray 	host_dc = {0, NULL};
 	int 			ds;
-	long 			error;
+	DevLong			error;
 	char 			*tmp,
 				*net;
 	DevString		dc_path,
@@ -253,7 +258,7 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-int dc_res_management(long *error_ptr)
+int dc_res_management(DevLong *error_ptr)
 {
 	DevLong 		m_call = 0,
 				to = 1000;
@@ -377,7 +382,7 @@ int dc_res_management(long *error_ptr)
 	return 0;
 }
 
-int dc_res_serv_nb(long *error_ptr)
+int dc_res_serv_nb(DevLong *error_ptr)
 {
 	DevLong 	rd_nb = 1000,
 			wr_nb = 1000;
@@ -463,7 +468,7 @@ int dc_res_serv_nb(long *error_ptr)
 	return 0;
 }
 
-int dc_res_request(long *error_ptr)
+int dc_res_request(DevLong *error_ptr)
 {
 	DevLong		req1 = 1234,
 			req2 = 1234,
@@ -643,7 +648,7 @@ int dc_res_request(long *error_ptr)
 	return 0;
 }
 
-int dc_class_dc(long *error_ptr)
+int dc_class_dc(DevLong *error_ptr)
 {
 	DevLong 	dev_number = 100,
 			cellar_number = 252488,

@@ -30,9 +30,9 @@
  *
  * Original:	 
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2005-07-25 13:08:22 $
+ * Date:	$Date: 2008-04-06 09:06:59 $
  *
  *+**********************************************************************/
 
@@ -117,7 +117,7 @@ public:
 				DevArgType		arginType;
 				DevArgType		argoutType;
 				long			minAccess;
-				char			*cmd_name;
+				const char			*cmd_name;
 				_DeviceCommandMapEntry() : cmd(0), fn(NULL), arginType(0), argoutType(0), minAccess(0), cmd_name(NULL) {};
 				_DeviceCommandMapEntry(DevCommand _cmd, DeviceBaseMemberFunction f, DevArgType in, DevArgType out, 
 							long acc, char *_cmd_name = NULL) 
@@ -129,7 +129,7 @@ public:
                         {
 				DevEvent	event;
 				DevArgType	argType;
-				char		*event_name;
+				const char		*event_name;
 				_DeviceEventListEntry() : event(0), argType(0), event_name(NULL) {};
 				_DeviceEventListEntry(DevEvent _event, DevArgType type, char *_event_name) 
 					: event(_event), argType(type), event_name(_event_name) {};

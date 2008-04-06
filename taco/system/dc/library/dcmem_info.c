@@ -29,9 +29,9 @@
  *
  * Original     : August 1992
  *
- * Version      : $Revision: 1.3 $
+ * Version      : $Revision: 1.4 $
  *
- * Date         : $Date: 2006-09-18 21:48:25 $
+ * Date         : $Date: 2008-04-06 09:07:48 $
  *
  */
 
@@ -44,33 +44,25 @@
 #include <dcP.h>
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for dcmem_info function                                *
-*                        ----------                                         *
-*                                                                           *
-*    Function rule : To return the free memory in a block and to return     *
-*		     largest free area.					    *
-*		     Every block of XX bytes of the shared memory area is   *
-*		     represented by a bit. If this bit is one, this means   *
-*		     the area is already occupied. If this bit is 0, the    *
-*		     area is free for use. 				    *
-*                                                                           *
-*    Argin : - Address of the allocation table				    *
-*            - The buffer size						    *
-*                                                                           *
-*    Argout : - The largest free area size				    *
-*	      - The amount of free memory				    *
-*	      - The number of free area					    *
-*	      - The error code						    *
-*                                                                           *
-*    This function returns DS_NOTOK if one error occurs and the error code will   *
-*    be set								    *
-*                                                                           *
-****************************************************************************/
-
-
-int dcmem_info(register char *tab,int buf_size,unsigned int *lmem_free,unsigned int *mem_free,int *parea,long *perr)
+/**
+ * To return the free memory in a block and to return largest free area.
+ * Every block of XX bytes of the shared memory area is represented by a bit. 
+ * If this bit is one, this means the area is already occupied. If this bit 
+ * is 0, the area is free for use.
+ *
+ * @param tab Address of the allocation table
+ * @param buf_size The buffer size
+ *
+ * @param lmem_free The largest free area size
+ * @param mem_free The amount of free memory
+ * @param parea The number of free area
+ * @param perr The error code
+ *
+ * @return This function returns DS_NOTOK if one error occurs and the error code
+ *  will be set
+ *
+ */
+int dcmem_info(register char *tab,int buf_size,unsigned int *lmem_free,unsigned int *mem_free,int *parea, DevLong *perr)
 {
 	int i,j;
 	register unsigned char mask;

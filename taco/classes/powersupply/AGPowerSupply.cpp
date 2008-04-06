@@ -36,9 +36,9 @@
  *
  * Original:	June 1995
  *
- * Version:     $Revision: 1.7 $
+ * Version:     $Revision: 1.8 $
  *
- * Date:        $Date: 2006-09-18 22:39:09 $
+ * Date:        $Date: 2008-04-06 09:06:36 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -76,7 +76,7 @@ short AGPowerSupply::class_inited = 0;
 //
 // Arg(s) Out:	long *error - pointer to error code if routine fails.
 //-=======================================================================
-long AGPowerSupply::GetResources (char *res_name, long *error)
+long AGPowerSupply::GetResources (char *res_name, DevLong *error)
 {
    static db_resource res_table[] = {
                {"state",D_LONG_TYPE},
@@ -140,7 +140,7 @@ long AGPowerSupply::GetResources (char *res_name, long *error)
 // Arg(s) Out:	long *error - pointer to error code if routine fails.
 //-=======================================================================
 
-long AGPowerSupply::ClassInitialise (long *error)
+long AGPowerSupply::ClassInitialise (DevLong *error)
 {
    static AGPowerSupply *agps_template = (AGPowerSupply*)malloc(sizeof(AGPowerSupply)); 
 
@@ -214,22 +214,34 @@ long AGPowerSupply::ClassInitialise (long *error)
 //		long *error - pointer to error code (in case of failure)
 //-=====================================================================
 
-AGPowerSupply::AGPowerSupply (char *name, long *error)
+AGPowerSupply::AGPowerSupply (char *name, DevLong *error)
               :PowerSupply (name, error)
 {
    static Device::DeviceCommandListEntry commands_list[] = {
-     {DevState, &Device::State, D_VOID_TYPE, D_SHORT_TYPE, 0, "DevState"},
-     {DevStatus, (DeviceMemberFunction)(&AGPowerSupply::Status), D_VOID_TYPE, D_STRING_TYPE, 0, "DevStatus"},
-     {DevOn, (DeviceMemberFunction)(&AGPowerSupply::On), D_VOID_TYPE, D_VOID_TYPE, 0, "DevOn"},
-     {DevOff, (DeviceMemberFunction)&AGPowerSupply::Off, D_VOID_TYPE, D_VOID_TYPE, 0, "DevOff"},
-     {DevSetValue, (DeviceMemberFunction)&AGPowerSupply::SetValue, D_FLOAT_TYPE, D_VOID_TYPE, 0, "DevSetValue"},
-     {DevReadValue, (DeviceMemberFunction)&AGPowerSupply::ReadValue, D_VOID_TYPE, D_FLOAT_READPOINT, 0, "DevReadValue"},
-     {DevReset, (DeviceMemberFunction)&AGPowerSupply::Reset, D_VOID_TYPE, D_VOID_TYPE, 0, "DevReset"},
-     {DevError, (DeviceMemberFunction)&AGPowerSupply::Error, D_VOID_TYPE, D_VOID_TYPE, 0, "DevError"},
-     {DevLocal, (DeviceMemberFunction)&AGPowerSupply::Local, D_VOID_TYPE, D_VOID_TYPE, 0, "DevLocal"},
-     {DevRemote, (DeviceMemberFunction)&AGPowerSupply::Remote, D_VOID_TYPE, D_VOID_TYPE, 0, "DevRemote"},
-     {DevUpdate, (DeviceMemberFunction)&AGPowerSupply::Update, D_VOID_TYPE, D_STATE_FLOAT_READPOINT, 0, "DevUpdate"},
-     {DevHello, (DeviceMemberFunction)&AGPowerSupply::Hello, D_STRING_TYPE, D_SHORT_TYPE, 0, "DevHello"},
+     Device::DeviceCommandListEntry(DevState, 	&Device::State, 
+			D_VOID_TYPE, D_SHORT_TYPE, READ_ACCESS, "DevState"),
+     Device::DeviceCommandListEntry(DevStatus, 	(DeviceMemberFunction)(&AGPowerSupply::Status), 
+			D_VOID_TYPE, D_STRING_TYPE, READ_ACCESS, "DevStatus"),
+     Device::DeviceCommandListEntry(DevOn, 		(DeviceMemberFunction)(&AGPowerSupply::On), 
+			D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevOn"),
+     Device::DeviceCommandListEntry(DevOff, 		(DeviceMemberFunction)&AGPowerSupply::Off, 
+			D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevOff"),
+     Device::DeviceCommandListEntry(DevSetValue, 	(DeviceMemberFunction)&AGPowerSupply::SetValue, 
+			D_FLOAT_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevSetValue"),
+     Device::DeviceCommandListEntry(DevReadValue, 	(DeviceMemberFunction)&AGPowerSupply::ReadValue, 
+			D_VOID_TYPE, D_FLOAT_READPOINT, READ_ACCESS, "DevReadValue"),
+     Device::DeviceCommandListEntry(DevReset, 	(DeviceMemberFunction)&AGPowerSupply::Reset, 
+			D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevReset"),
+     Device::DeviceCommandListEntry(DevError, 	(DeviceMemberFunction)&AGPowerSupply::Error, 
+			D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevError"),
+     Device::DeviceCommandListEntry(DevLocal, 	(DeviceMemberFunction)&AGPowerSupply::Local, 
+			D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevLocal"),
+     Device::DeviceCommandListEntry(DevRemote, 	(DeviceMemberFunction)&AGPowerSupply::Remote, D_VOID_TYPE, 
+			D_VOID_TYPE, WRITE_ACCESS, "DevRemote"),
+     Device::DeviceCommandListEntry(DevUpdate, 	(DeviceMemberFunction)&AGPowerSupply::Update, 
+			D_VOID_TYPE, D_STATE_FLOAT_READPOINT, WRITE_ACCESS, "DevUpdate"),
+     Device::DeviceCommandListEntry(DevHello, 	(DeviceMemberFunction)&AGPowerSupply::Hello, 
+			D_STRING_TYPE, D_SHORT_TYPE, WRITE_ACCESS, "DevHello"),
    };
       static long n_commands = sizeof(commands_list)/
                             sizeof(DeviceCommandListEntry);
@@ -320,7 +332,7 @@ AGPowerSupply::AGPowerSupply (char *name, long *error)
 //
 // Arg(s) Out:	long *error - pointer to error code (in case of failure).
 //-=====================================================================
-long AGPowerSupply::StateMachine (long cmd, long *error)
+long AGPowerSupply::StateMachine (DevCommand cmd, DevLong *error)
 {
 	long iret = 0;
 	long int p_state, n_state;
@@ -483,9 +495,9 @@ long AGPowerSupply::StateMachine (long cmd, long *error)
 //		long *error - pointer to error code in case of failure.
 //-=====================================================================
 
-long AGPowerSupply::Off (void *vargin, void *vargout, long *error)
+long AGPowerSupply::Off (DevArgument vargin, DevArgument vargout, DevLong *error)
 {
-	void *tmp;
+	DevArgument tmp;
 
 	printf("AGPowerSupply::Off(%s) called\n",this->name);
 
@@ -511,9 +523,9 @@ long AGPowerSupply::Off (void *vargin, void *vargout, long *error)
 //		long *error - pointer to error code (in case of failure)
 //-=====================================================================
 
-long AGPowerSupply::On (void *vargin, void *vargout, long *error)
+long AGPowerSupply::On (DevArgument vargin, DevArgument vargout, DevLong *error)
 {
-	void *tmp;
+	DevArgument tmp;
 
 	printf("AGPowerSupply::On(%s) called\n",this->name);
 
@@ -538,10 +550,10 @@ long AGPowerSupply::On (void *vargin, void *vargout, long *error)
 //		long *error - pointer to error code (in the case of failure)
 //-=====================================================================
 
-long AGPowerSupply::SetValue (void *vargin, void *vargout, long *error)
+long AGPowerSupply::SetValue (DevArgument vargin, DevArgument vargout, DevLong *error)
 {
 	float *setting;
-	void *tmp;
+	DevArgument tmp;
 
 	printf("AGPowerSupply::SetValue(%s) called\n",name);
 
@@ -568,11 +580,11 @@ long AGPowerSupply::SetValue (void *vargin, void *vargout, long *error)
 //		long *error - pointer to error code (in the case of failure)
 //-=====================================================================
 
-long AGPowerSupply::ReadValue (void *vargin, void *vargout, long *error)
+long AGPowerSupply::ReadValue (DevArgument vargin, DevArgument vargout, DevLong *error)
 {
 	DevFloatReadPoint *frp;
         float per_error;
-	void *tmp;
+	DevArgument tmp;
 
 	printf("AGPowerSupply::ReadValue(%s) called\n",name);
 
@@ -609,9 +621,9 @@ long AGPowerSupply::ReadValue (void *vargin, void *vargout, long *error)
 //		long *error - pointer to error code (in case of failure)
 //-=====================================================================
 
-long AGPowerSupply::Remote (void *vargin, void *vargout, long *error)
+long AGPowerSupply::Remote (DevArgument vargin, DevArgument vargout, DevLong *error)
 {
-	void *tmp;
+	DevArgument tmp;
 
 	printf("AGPowerSupply::Remote(%s) called\n",name);
 
@@ -640,9 +652,9 @@ long AGPowerSupply::Remote (void *vargin, void *vargout, long *error)
 //		long *error - pointer to error in the case of failure.
 //-=====================================================================
 
-long AGPowerSupply::Reset (void *vargin, void *vargout, long *error)
+long AGPowerSupply::Reset (DevArgument vargin, DevArgument vargout, DevLong *error)
 {
-	void *tmp;
+	DevArgument tmp;
 
 	printf("AGPowerSupply::Reset(%s) called\n",name);
 
@@ -672,10 +684,9 @@ long AGPowerSupply::Reset (void *vargin, void *vargout, long *error)
 // Arg(s) Out:	DevVoid *vargout - void.
 //		long *error - pointer to error code, in the case of failure.
 //-=====================================================================
-
-long AGPowerSupply::Error (void *vargin, void *vargout, long *error)
+long AGPowerSupply::Error (DevArgument vargin, DevArgument vargout, DevLong *error)
 {
-	void *tmp;
+	DevArgument tmp;
 
 	printf("AGPowerSupply::Error(%s) called\n",name);
 
@@ -704,14 +715,13 @@ long AGPowerSupply::Error (void *vargin, void *vargout, long *error)
 // Arg(s) Out:	DevString *vargout - contains string.
 //		long *error - pointer to error code (in the case of failure)
 //-=====================================================================
-
-long AGPowerSupply::Status ( void *vargin, void *vargout, long *error)
+long AGPowerSupply::Status ( DevArgument vargin, DevArgument vargout, DevLong *error)
 {
 	static char mess[1024];
 	char **status;
 	long fault = fault_val;
 	long p_state;
-	void *tmp;
+	DevArgument tmp;
 
 	printf("AGPowerSupply::Status(%s) called\n",name);
 
@@ -793,9 +803,9 @@ long AGPowerSupply::Status ( void *vargin, void *vargout, long *error)
 //		long *error - pointer to error code in the case of failure.
 //-=====================================================================
 
-long AGPowerSupply::Local (void *vargin, void *vargout, long *error)
+long AGPowerSupply::Local (DevArgument vargin, DevArgument vargout, DevLong *error)
 {
-	void *tmp;
+	DevArgument tmp;
 
 	printf("AGPowerSupply::Local(%s) called\n",name);
 
@@ -820,12 +830,12 @@ long AGPowerSupply::Local (void *vargin, void *vargout, long *error)
 //		long *error - pointer to error code (in the case of failure)
 //-=====================================================================
 
-long AGPowerSupply::Update ( void *vargin, void *vargout, long *error)
+long AGPowerSupply::Update ( DevArgument vargin, DevArgument vargout, DevLong *error)
 {
 	DevStateFloatReadPoint *vargout_sfrp;
 	DevShort darg_short;
 	DevFloatReadPoint darg_frp;
-	void *tmp;
+	DevArgument tmp;
 
 	printf("AGPowerSupply::Update(%s) called\n",name);
 
@@ -867,7 +877,7 @@ long AGPowerSupply::Update ( void *vargin, void *vargout, long *error)
 //
 //-=====================================================================
 
-/*long AGPowerSupply::State(void *vargin, void *vargout, long *error)
+/*long AGPowerSupply::State(DevArgument vargin, DevArgument vargout, long *error)
 {
    static short *state;
    *error = DS_OK;
@@ -897,7 +907,7 @@ long AGPowerSupply::Update ( void *vargin, void *vargout, long *error)
 //
 //-=====================================================================
 
-long AGPowerSupply::Hello(void *vargin, void *vargout, long *error)
+long AGPowerSupply::Hello(DevArgument vargin, DevArgument vargout, DevLong *error)
 {
    static devserver loc_device;
    static long status;

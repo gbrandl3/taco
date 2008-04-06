@@ -54,7 +54,7 @@ namespace log4cpp {
         void instantiateAllAppenders() throw(ConfigureFailure);
 
         /**
-         * Intantiate and configure the appender referred to by the given name. This method searches the
+         * Instantiate and configure the appender referred to by the given name. This method searches the
          * map to find all configuration parameters for the appender, and adds the appender
          * to the given category.  This isn't very general in the sense that it will need to
          * be modified for each type of appender and layout.  A more general solution would 
@@ -66,7 +66,7 @@ namespace log4cpp {
          * possible?).
          * @param name	String containing the name of the type of appender to be instantiated.
          */
-        Appender* instantiateAppender(const std::string& name);
+        Appender *instantiateAppender(const std::string& name);
 
         /**
          * Method for instantiating and configuring the layouts associated with each

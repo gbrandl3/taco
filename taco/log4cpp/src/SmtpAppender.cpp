@@ -1,3 +1,5 @@
+#include "PortabilityImpl.hh"
+
 #if defined(LOG4CPP_HAVE_BOOST)
 #include <boost/version.hpp>
 #if BOOST_VERSION >= 103400

@@ -1,0 +1,38 @@
+/*! \page ack Acknowledgements 
+
+\addindex ack
+
+A lot of people have contributed to TACO since its beginning. The following people 
+have contributed to the kernel of TACO in the form of system programming, bug fixes, 
+ports etc :
+
+- Martin Diehl (FRMII) - bug fixes 
+- Andy G&ouml;tz (ESRF) - device server model, asynchronism, events, dsapi 
+- Markhu Karhu (ESRF) - (original) ndbm database server 
+- Wolf-Dieter Klotz (ESRF) - Windows port 
+- Jens Meyer (ESRF) - dsapi, dsxdr, security, manager 
+- Jon Quick (HartRAO) - bug fixes 
+- Bj&ouml;rn Pederson (FRMII) - bug fixes, improvements to events 
+- Emmanuel Taurel (ESRF) - rtdb, Oracle and ndbm database server, dbapi, hdb
+
+The following people have written client interfaces to TACO :
+
+- Marie-Christine Dominguez (ESRF) - Python clients 
+- Laurent Farvacque (ESRF) - Mathlab 
+- Andy G&ouml;tz (ESRF) - Labview 
+- Jens Meyer (ESRF) - Python servers 
+- Gilbert Pepellin (ESRF) - Tcl 
+- Faranguiss Poncet (ESRF) - xdevmenu 
+- Gerry Swislow (CSS) - SPEC 
+
+TACO would not be of much use without the device servers therefore it is only fair 
+to mention the (long and incomplete) list of device server programmers :
+
+A.Beteva (ESRF), D.Carron (ESRF), J.M.Chaize (ESRF), M-C.Dominguez (ESRF), 
+F.Epaud (ESRF), L.Farvacque (ESRF), D.Fernandez (ESRF), A.G&ouml;tz (ESRF), S.Hunt (SLS),
+W.-D.Klotz (ESRF), M.Konijnenberg (AFOM), P.M&auml;kij&auml;rvi (ESRF), J.Meyer (ESRF), 
+J.Neuhaus (FRM II), W. &Ouml;hme (Rossendorf), B.Pederson (FRM II), C.Penel (ESRF), 
+M.Perez (ESRF), M.Peru (ESRF), J.L.Pons (ESRF), J.Quick (HartRAO), B.Regad (ESRF), 
+V.Rey (ESRF), L.Roussier (Lure), B.Scaringella (ESRF), M.Schofield (ESRF), 
+F.Sever (ESRF), E.Taurel (ESRF), P.Verdier (ESRF), R.Wilcke (ESRF), H.Witsch (ESRF)
+*/

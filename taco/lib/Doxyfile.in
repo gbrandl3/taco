@@ -71,7 +71,15 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = . dbase xdr dc dataport ascii tc
+INPUT                  = @srcdir@ \
+			@srcdir@/dbase \
+			@srcdir@/xdr \
+			@srcdir@/dc \
+			@srcdir@/dataport \
+			@srcdir@/ascii \
+			@srcdir@/tc \
+			@top_srcdir@/classes/signal/multiple
+
 FILE_PATTERNS          = *.c \
                          *.h \
                          *.cpp \
@@ -185,17 +193,17 @@ INCLUDED_BY_GRAPH      = YES
 GRAPHICAL_HIERARCHY    = YES
 DOT_PATH               = 
 DOTFILE_DIRS           = 
-MAX_DOT_GRAPH_WIDTH    = 1024
-MAX_DOT_GRAPH_HEIGHT   = 1024
+# MAX_DOT_GRAPH_WIDTH    = 1024
+# MAX_DOT_GRAPH_HEIGHT   = 1024
 GENERATE_LEGEND        = YES
 DOT_CLEANUP            = YES
 #---------------------------------------------------------------------------
 # Configuration::addtions related to the search engine   
 #---------------------------------------------------------------------------
 SEARCHENGINE           = NO
-CGI_NAME               = 
-CGI_URL                = 
-DOC_URL                = 
-DOC_ABSPATH            = 
-BIN_ABSPATH            = 
-EXT_DOC_PATHS          = 
+# CGI_NAME               = 
+# CGI_URL                = 
+# DOC_URL                = 
+# DOC_ABSPATH            = 
+# BIN_ABSPATH            = 
+# EXT_DOC_PATHS          = 

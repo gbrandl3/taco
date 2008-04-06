@@ -29,9 +29,9 @@
  *
  * Original:	June 1996	
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 12:59:10 $
+ * Date:	$Date: 2008-04-06 09:07:18 $
  *
  *********************************************************************/
 
@@ -39,6 +39,7 @@
 #define _DSSIGNALP_H
 
 #include <CntrlDsNumbers.h>
+#include <dev_xdr.h>
 
 /*
  * Define the methods of the signal class
@@ -75,11 +76,11 @@ typedef struct _DssignalPart
 	char	*min_limit;
 	double	min_limit_value;
 	char	*dev_class_name;
-	long	delta_time_value;
+	DevLong	delta_time_value;
 	char	*delta_time;
 	double	delta_value;
 	char	*delta;
-	long	last_set_time;
+	DevLong	last_set_time;
 	double	last_set_value;
 	char	*last_alarm_msg;
 	char	*std_unit_multiplier;

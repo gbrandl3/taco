@@ -19,6 +19,7 @@
 #include <log4cpp/Category.hh>
 #include <log4cpp/FactoryParams.hh>
 #include <memory>
+#include <stdio.h>
 
 #ifdef LOG4CPP_HAVE_SSTREAM
 #include <sstream>
@@ -63,9 +64,7 @@ namespace log4cpp {
             for(unsigned int i = _maxBackupIndex; i > 1; i--) {
                 std::string newName = oldName.str();
 #ifndef LOG4CPP_STLPORT_AND_BOOST_BUILD
-/* change cast for old gcc 2.95 */
-                                //oldName.seekp(static_cast<std::ios::off_type>(n), std::ios::beg);
-                                oldName.seekp((std::stringbuf::off_type)n, std::ios::beg);
+                                oldName.seekp(static_cast<std::ios::off_type>(n), std::ios::beg);
 #else
                                 // the direction parameter is broken in STLport 4.5.3, 
                                 // so we don't specify it (the code works without it)
@@ -91,16 +90,22 @@ namespace log4cpp {
         }
     }
     
-   std::auto_ptr<Appender> create_roll_file_appender(const FactoryParams& params)
-   {
-      std::string name, filename;
-      bool append = true;
-      mode_t mode = 664;
-      int max_file_size = 0, max_backup_index = 0;
-      params.get_for("rool file appender").required("name", name)("filename", filename)("max_file_size", max_file_size)
-                                                     ("max_backup_index", max_backup_index)
-                                          .optional("append", append)("mode", mode);
+    std::auto_ptr<Appender> create_roll_file_appender(const FactoryParams& params) {
+        std::string name, filename;
+        bool append = true;
+        mode_t mode = 0664;
+        int max_file_size = 0, max_backup_index = 0;
+        std::string modString;
 
-      return std::auto_ptr<Appender>(new RollingFileAppender(name, filename, max_file_size, max_backup_index, append, mode));
-   }
+        params.get_for("RollingFileAppender").required("name", name)("fileName", filename)("maxFileSize", max_file_size)
+                                                     ("maxBackupIndex", max_backup_index)
+                                          .optional("append", append)("mode", modString);
+
+        if (!modString.empty()) {
+	    mode = strtol(modString.c_str(), NULL, 8);
+            if (mode == 0)
+                mode = 0664;	 
+        }
+        return std::auto_ptr<Appender>(new RollingFileAppender(name, filename, max_file_size, max_backup_index, append, mode));
+    }
 }

@@ -29,9 +29,9 @@
  *
  * Original   :	September 2002
  *
- * Version    : $Revision: 1.6 $
+ * Version    : $Revision: 1.7 $
  *
- * Date       : $Date: 2007-03-22 14:20:30 $
+ * Date       : $Date: 2008-04-06 09:07:19 $
  *
  *********************************************************************/ 
 
@@ -39,7 +39,6 @@
 #	include "config.h"
 #endif
 #include <attr_api.h>
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/attr_api.cpp,v 1.6 2007-03-22 14:20:30 jkrueger1 Exp $";
 
 /**
  * Hook to TACO dev_import().
@@ -55,7 +54,7 @@ static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
 long attribute_import (char *attribute_name, long access, 
-							  devserver *ds_ptr, long *error)
+							  devserver *ds_ptr, DevLong *error)
 {
 	AttrAccess	*attr;
 	
@@ -107,7 +106,7 @@ long attribute_import (char *attribute_name, long access,
  *
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
-long attribute_free (devserver ds, long *error)
+long attribute_free (devserver ds, DevLong *error)
 {
 	AttrAccess	*attr;
 
@@ -132,7 +131,7 @@ long attribute_free (devserver ds, long *error)
  *
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
-long attribute_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error)
+long attribute_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, DevLong *error)
 {
 	AttrAccess	*attr;
 
@@ -166,7 +165,7 @@ long attribute_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error)
  */
 long attribute_putget (devserver ds, long cmd, DevArgument argin,
 			 DevType argin_type,DevArgument argout,
-			 DevType argout_type, long *error)
+			 DevType argout_type, DevLong *error)
 {
 	AttrAccess	*attr;
 
@@ -268,7 +267,7 @@ long attribute_putget (devserver ds, long cmd, DevArgument argin,
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
 long attribute_put (devserver ds, long cmd, DevArgument argin,
-		       		  DevType argin_type, long *error)
+		       		  DevType argin_type, DevLong *error)
 {
 	AttrAccess	*attr;
 

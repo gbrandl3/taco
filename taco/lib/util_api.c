@@ -31,9 +31,9 @@
  *
  * Original   :	April 1993
  *
- * Version:	$Revision: 1.31 $
+ * Version:	$Revision: 1.32 $
  *
- * Date:		$Date: 2007-09-03 08:25:50 $
+ * Date:		$Date: 2008-04-06 09:07:01 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -66,10 +66,7 @@
 #	endif /* OSK | _OSK */
 #endif  /* WIN32 */
 
-/* pointer to global error message */
-extern char *dev_error_string;
-
-static long get_cmd_string PT_( (devserver ds, long cmd, char *cmd_str, size_t len, long *error) );
+static long get_cmd_string PT_( (devserver ds, long cmd, char *cmd_str, size_t len, DevLong *error) );
 
 /****************************************
  *          Globals	                *
@@ -87,10 +84,6 @@ extern "C" {
  *  Configuration flags
  */
 	extern configuration_flags      config_flags;
-/* 
- * pointer to global error message 
- */
-	extern char 			*dev_error_string;
 /*
  * Global structure for multiple control systems, setup by
  * setup_config_multi() but used by all multi-nethost functions
@@ -135,7 +128,7 @@ static db_resource   res_tab [] = {
  */
 long _DLLFunc dev_putget_raw (devserver ds, long cmd, DevArgument argin,
 			      DevType argin_type, DevOpaque *argout,
-			      DevType argout_type, long *error)
+			      DevType argout_type, DevLong *error)
 {
 	_server_data		server_data;
 	_client_raw_data	client_data;
@@ -151,11 +144,7 @@ long _DLLFunc dev_putget_raw (devserver ds, long cmd, DevArgument argin,
 		*error = DevErr_DeviceNotImportedYet;
 		return(DS_NOTOK);
 	}
-	if (dev_error_string != NULL)
-	{
-		free(dev_error_string);
-		dev_error_string = NULL;
-	}
+	dev_error_clear();
 #ifdef TANGO
 	if (ds->rpc_protocol == D_IIOP)
 	{
@@ -216,7 +205,7 @@ long _DLLFunc dev_putget_raw (devserver ds, long cmd, DevArgument argin,
 	memset ((char *)&client_data, 0, sizeof (client_data));
 	client_data.argout	= (char *) argout;
 
-	dev_printdebug (DBG_API, "dev_putget() : server data -> \n");
+	dev_printdebug (DBG_API, "dev_putget_raw() : server data -> \n");
 	dev_printdebug (DBG_API, "ds_id=%d  cmd=%d  intype=%d  outtype=%d\n",
 	    server_data.ds_id, server_data.cmd, server_data.argin_type, server_data.argout_type);
 
@@ -292,7 +281,7 @@ long _DLLFunc dev_putget_raw (devserver ds, long cmd, DevArgument argin,
  * @return	DS_OK or DS_NOTOK
  */ 
 long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
-			    DevType argin_type, long *error )
+			    DevType argin_type, DevLong *error )
 {
 	_server_data		server_data;
 	_client_data     	client_data;
@@ -308,6 +297,7 @@ long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
 		*error = DevErr_DeviceNotImportedYet;
 		return(DS_NOTOK);
 	}
+	dev_error_clear();
 #ifdef TANGO
 	if (ds->rpc_protocol == D_IIOP)
 	{
@@ -411,7 +401,7 @@ long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
  *
  * @return DS_OK or DS_NOTOK
  */
-long _DLLFunc taco_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error)
+long _DLLFunc taco_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, DevLong *error)
 {
 	_dev_query_in	dev_query_in;
 	_dev_query_out	dev_query_out;
@@ -658,7 +648,7 @@ long _DLLFunc taco_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long 
  *
  * @return DS_OK or DS_NOTOK
  */
-long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error)
+long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, DevLong *error)
 {
 	*error = DS_OK;
 	dev_printdebug (DBG_TRACE | DBG_API, "\ndev_cmd_query() : entering routine\n");
@@ -699,7 +689,7 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *erro
  * 		executed correctly, but no command name
  * 		string was found in the database.
  */ 
-static long get_cmd_string (devserver ds, long cmd, char *cmd_str, size_t len, long *error)
+static long get_cmd_string (devserver ds, long cmd, char *cmd_str, size_t len, DevLong *error)
 {
 	char		res_path[LONG_NAME_SIZE];
 	char		res_name[SHORT_NAME_SIZE];
@@ -796,7 +786,7 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, size_t len, l
  * @return DS_OK or DS_NOTOK
  */
 long _DLLFunc dev_inform (devserver *clnt_handles, long num_devices,
-			  DevInfo **dev_info, long *error)
+			  DevInfo **dev_info, DevLong *error)
 {
 	devserver	*clnt_ptr;
 	DevInfo		*info_ptr;
@@ -854,7 +844,7 @@ long _DLLFunc dev_inform (devserver *clnt_handles, long num_devices,
 }
 
 /**@ingroup clientAPI
- * Set or reads the timeout for an RPC connection. A request to set the timeout has to be asked with
+ * Set or read the timeout for a RPC connection. A request to set the timeout has to be asked with
  * CLSET_TIMEOUT as request parameter and the timeout specified by the timeval structure dev_timeout.
  * The timeout will be set without any retry. A request to read the timeout has to ask with CLGET_TIMEOUT,
  * and the current timeout will be returned in dev_timeout.
@@ -876,7 +866,7 @@ long _DLLFunc dev_inform (devserver *clnt_handles, long num_devices,
  * @return	DS_OK or DS_NOTOK
  */ 
 long _DLLFunc dev_rpc_timeout (devserver ds, long request, 
-			       struct timeval *dev_timeout, long *error)
+			       struct timeval *dev_timeout, DevLong *error)
 {
 	*error = DS_OK;
 
@@ -1022,7 +1012,7 @@ int*  error;
  * 		default nethost (0). If the nethost is specified
  * 		but not imported then return DS_NOTOK.
  */ 
-long _DLLFunc get_i_nethost_by_device_name (char *device_name, long *error)
+long _DLLFunc get_i_nethost_by_device_name (char *device_name, DevLong *error)
 {
 	long i_nethost, i;
 	char *nethost;
@@ -1091,7 +1081,7 @@ long _DLLFunc get_i_nethost_by_device_name (char *device_name, long *error)
  * @return 	the index of nethost or DS_NOTOK if not found in the list of known 
  *		NETHOST's.
  */
-long _DLLFunc get_i_nethost_by_name (char *nethost, long *error)
+long _DLLFunc get_i_nethost_by_name (char *nethost, DevLong *error)
 {
 	long i;
 	
@@ -1131,7 +1121,7 @@ long _DLLFunc get_i_nethost_by_name (char *nethost, long *error)
  * 
  *  Return(s)  :	DS_OK or DS_NOTOK
  */
-char* _DLLFunc get_nethost_by_index (long i_nethost, long *error)
+char* _DLLFunc get_nethost_by_index (long i_nethost, DevLong *error)
 {
 	char *nethost;
 /*
@@ -1161,7 +1151,7 @@ char* _DLLFunc get_nethost_by_index (long i_nethost, long *error)
  *
  * @return	pointer to string containing only "domain/family/member"
  */
-char* _DLLFunc extract_device_name (char *full_name, long *error)
+char* _DLLFunc extract_device_name (char *full_name, DevLong *error)
 {
 	static char 	*device_name_alloc = NULL, 
 			*device_name;
@@ -1212,7 +1202,7 @@ extern msgserver_info          msg_info;
  * 
  * @return	DS_OK or DS_NOTOK
  */ 
-long _DLLFunc nethost_alloc (long *error)
+long _DLLFunc nethost_alloc (DevLong *error)
 {
 	static long first=1;
 	long i, new_max_nethost;
@@ -1327,7 +1317,7 @@ long _DLLFunc nethost_alloc (long *error)
  *
  * @return	DS_OK or DS_NOTOK
  */
-long _DLLFunc dev_ping (devserver ds, long *error)
+long _DLLFunc dev_ping (devserver ds, DevLong *error)
 {
 	_dev_import_in	dev_import_in;
 	_dev_import_out	dev_import_out;

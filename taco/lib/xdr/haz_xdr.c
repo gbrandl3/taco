@@ -29,9 +29,9 @@
  *
  * Original:      January 1991
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:		$Date: 2006-09-18 22:07:20 $
+ * Date:		$Date: 2008-04-06 09:07:21 $
  *
  *******************************************************************-*/
 
@@ -126,29 +126,29 @@ xdr_length_DevHazStatus(objp)
         {
         long  length = 0;
 
-        length = length + xdr_length_DevChar (&objp->Power);
-        length = length + xdr_length_DevChar (&objp->Remote);
-        length = length + xdr_length_DevChar (&objp->Aux);
-        length = length + xdr_length_DevChar (&objp->Stat);
-        length = length + xdr_length_DevChar (&objp->Phase);
-        length = length + xdr_length_DevChar (&objp->Mains);
-        length = length + xdr_length_DevChar (&objp->PassivFilt);
-        length = length + xdr_length_DevChar (&objp->ActivFilt);
-        length = length + xdr_length_DevChar (&objp->Doors);
-        length = length + xdr_length_DevChar (&objp->Synchro);
-        length = length + xdr_length_DevChar (&objp->IMains);
-        length = length + xdr_length_DevChar (&objp->Loop);
-        length = length + xdr_length_DevChar (&objp->Waterflow);
-        length = length + xdr_length_DevChar (&objp->OverTemp);
-        length = length + xdr_length_DevChar (&objp->DCCTsat);
-        length = length + xdr_length_DevChar (&objp->OverVolt);
-        length = length + xdr_length_DevChar (&objp->OverCurrent);
-        length = length + xdr_length_DevChar (&objp->EarthFault);
-        length = length + xdr_length_DevChar (&objp->User1);
-        length = length + xdr_length_DevChar (&objp->User2);
-        length = length + xdr_length_DevChar (&objp->User3);
-        length = length + xdr_length_DevChar (&objp->Transformer);
-        length = length + xdr_length_DevChar (&objp->TOilTemp);
+        length += xdr_length_DevChar (&objp->Power);
+        length += xdr_length_DevChar (&objp->Remote);
+        length += xdr_length_DevChar (&objp->Aux);
+        length += xdr_length_DevChar (&objp->Stat);
+        length += xdr_length_DevChar (&objp->Phase);
+        length += xdr_length_DevChar (&objp->Mains);
+        length += xdr_length_DevChar (&objp->PassivFilt);
+        length += xdr_length_DevChar (&objp->ActivFilt);
+        length += xdr_length_DevChar (&objp->Doors);
+        length += xdr_length_DevChar (&objp->Synchro);
+        length += xdr_length_DevChar (&objp->IMains);
+        length += xdr_length_DevChar (&objp->Loop);
+        length += xdr_length_DevChar (&objp->Waterflow);
+        length += xdr_length_DevChar (&objp->OverTemp);
+        length += xdr_length_DevChar (&objp->DCCTsat);
+        length += xdr_length_DevChar (&objp->OverVolt);
+        length += xdr_length_DevChar (&objp->OverCurrent);
+        length += xdr_length_DevChar (&objp->EarthFault);
+        length += xdr_length_DevChar (&objp->User1);
+        length += xdr_length_DevChar (&objp->User2);
+        length += xdr_length_DevChar (&objp->User3);
+        length += xdr_length_DevChar (&objp->Transformer);
+        length += xdr_length_DevChar (&objp->TOilTemp);
 
         return (length);
 }

@@ -45,10 +45,10 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 				  DevArgument argout, DevType argout_type, 
 				  DevCallbackFunction *callback, void
 				  *user_data, 
-				  long *event_id_ptr, long *error);
+				  long *event_id_ptr, DevLong *error);
 
 long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
-                                  long event_id, long *error);
+                                  long event_id, DevLong *error);
 
 static long add_relisten_info(long, long, DevArgument, DevType, DevCallbackFunction *, void *, long *);
 static long remove_relisten_info(long, long);
@@ -65,7 +65,7 @@ static long remove_relisten_info(long, long);
  */
 long relisten_events(devserver ds)
 {
-	long error;
+	DevLong error;
     
 	Event_Relisten_Info* start = event_head;
 	dev_printdebug(DBG_TRACE | DBG_API, "relisten_events called\n");
@@ -108,7 +108,7 @@ long relisten_events(devserver ds)
 long _DLLFunc dev_event_listen (devserver ds, long event_type,
 				DevArgument argout, DevType argout_type, 
 				DevCallbackFunction *callback, void *user_data,
-				long *event_id_ptr, long *error)
+				long *event_id_ptr, DevLong *error)
 {
 	long ret;
 	dev_printdebug(DBG_TRACE | DBG_API, "dev_event_listen called\n");
@@ -135,7 +135,7 @@ long _DLLFunc dev_event_listen (devserver ds, long event_type,
  * @return DS_OK if event was successfully unregistered otherwise DS_NOTOK 
  */
 long _DLLFunc dev_event_unlisten (devserver ds, long event_type,
-                                  long event_id, long *error)
+                                  long event_id, DevLong *error)
 {
 	long ret;
 	dev_printdebug(DBG_TRACE | DBG_API, "dev_event_unlisten called\n");

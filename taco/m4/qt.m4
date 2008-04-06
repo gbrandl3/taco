@@ -4,9 +4,9 @@ dnl		adapted form the KDE2 acinclude.m4
 dnl
 dnl Author: 	$Author: jkrueger1 $
 dnl
-dnl Version:	$Revision: 1.5 $
+dnl Version:	$Revision: 1.6 $
 dnl
-dnl Date:	$Date: 2005-04-11 15:38:25 $
+dnl Date:	$Date: 2008-04-06 09:07:33 $
 dnl
 
 dnl
@@ -275,15 +275,15 @@ dnl (the linker is smart enough to pick the correct default library).
 dnl Things work just fine if you use just AC_PATH_X_DIRECT.
 		case "$host" in
 		    mips-sgi-irix6*) 
-					;;
+			;;
 		    *)
-  					_AC_PATH_X_XMKMF
-  					if test -z "$ac_x_includes"; then
-    					     ac_x_includes="."
-  					fi
-  					if test -z "$ac_x_libraries"; then
-    					     ac_x_libraries="/usr/lib"
-  					fi
+  			_AC_PATH_X_XMKMF
+  			if test -z "$ac_x_includes"; then
+    			     ac_x_includes="."
+  			fi
+  			if test -z "$ac_x_libraries"; then
+    			     ac_x_libraries="/usr/lib"
+  			fi
 		esac
 #from now on we use our own again
 
@@ -325,7 +325,7 @@ dnl Things work just fine if you use just AC_PATH_X_DIRECT.
   	    AC_MSG_RESULT([libraries $qt_x_libraries, headers $qt_x_includes])
 	fi
  
-	if test -z "$qt_x_includes" || test "x$qt_x_includes" = xNONE; then
+	if test -z "$qt_x_includes" || test "x$qt_x_includes" = xNONE || test "x$qt_x_includes" = xNO; then
   	    X_INCLUDES=""
 dnl better than nothing 
 	    x_includes="."
@@ -334,7 +334,7 @@ dnl better than nothing
   	    X_INCLUDES="-I$x_includes"
 	fi
  
-	if test -z "$qt_x_libraries" || test "x$qt_x_libraries" = xNONE; then
+	if test -z "$qt_x_libraries" || test "x$qt_x_libraries" = xNONE || test "x$qt_x_libraries" = xNO; then
   	    X_LDFLAGS=""
 dnl better than nothing 
 	    x_libraries="/usr/lib"

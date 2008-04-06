@@ -78,7 +78,7 @@ static char* info[]= {
 
 long startup(svr_name, error)
 char *svr_name;
-long *error;
+DevLong *error;
 {
    AGPowerSupply ps_list[100];
    u_int dev_no, u_i;

@@ -29,9 +29,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  *
  *******************************************************************-*/
 
@@ -70,7 +70,7 @@ xdr_DevUnion(xdrs, objp)
 		}
 		break;
 	case 3:
-		if (!xdr_long(xdrs, &objp->u.L_data)) {
+		if (!xdr_DevLong(xdrs, &objp->u.L_data)) {
 			return (FALSE);
 		}
 		break;

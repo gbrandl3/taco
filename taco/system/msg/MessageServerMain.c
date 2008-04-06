@@ -29,9 +29,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2006-09-18 21:46:20 $
+ * Date:	$Date: 2008-04-06 09:07:52 $
  *
  */
 
@@ -71,6 +71,14 @@ char *getTimeString(const char *name)
 	return message;
 }
 
+void usage(const char *cmd)
+{
+	fprintf (stderr, "usage: %s [-h] [-v] nethost\n",cmd);
+	fprintf (stderr, "  -h displays this information and exits\n");
+        fprintf (stderr, "  -v displays the version number and exits\n");
+	exit (1);
+}
+
 int main (int argc, char **argv)
 {
 	SVCXPRT *transp;
@@ -78,14 +86,26 @@ int main (int argc, char **argv)
 	char    *dshome;
 	char	*logpath = getenv("LOGPATH");
 
-	if (argc < 2)
-	{
-		fprintf (stderr, "usage: %s nethost\n",argv[0]);
-		exit (1);
-	}
+        int             c;
+        extern int      optind;
+        extern char     *optarg;
+
+        while ((c = getopt(argc, argv, "hv")) != EOF)
+                switch(c)
+                {
+			case 'v':
+				printf("%s version : %s\n", argv[0], VERSION);
+				exit(0);
+                        case 'h' :
+			case '?' :
+				usage(argv[0]);
+		}
+
+	if (optind != argc - 1)
+		usage(argv[0]);
 
 	strncpy (msg.name, argv[0], sizeof(msg.name) - 1);
-	nethost = argv[1];
+	nethost = argv[optind];
 	if (!logpath)
 		logpath = getenv("DSHOME");
 	if (!logpath)
@@ -129,6 +149,7 @@ int main (int argc, char **argv)
   	taco_gethostname (msg.host_name, sizeof(msg.host_name) - 1);
 	msg.host_name[sizeof(msg.host_name) - 1] = '\0';
 
+	fprintf(logFile, "%s Version : %s \n", getTimeString("MessageServer"), VERSION);
 	fprintf(logFile, "%s Starting with program number %d on host %s\n", getTimeString("MessageServer"), msg.prog_number, msg.host_name);
 	fflush(logFile);
 /*

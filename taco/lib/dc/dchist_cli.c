@@ -25,9 +25,9 @@
  * Author(s):	E. Taurel
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2007-09-07 14:53:14 $
+ * Date:	$Date: 2008-04-06 09:07:15 $
  *
  ****************************************************************************/
 
@@ -96,7 +96,7 @@ extern dc_nethost_info *dc_multi_nethost;
  *    only some command result in the history, the function returns the number of command 
  * which failed.Otherwise, the function returns DS_OK
  */
-int dc_devget_history(datco *dc_ptr,long cmd_code,dc_hist *hist_buff,DevType argout_type,long nb_rec,long *error)
+int dc_devget_history(datco *dc_ptr,long cmd_code,dc_hist *hist_buff,DevType argout_type,long nb_rec,DevLong *error)
 {
 	int 		i,
 			l,
@@ -106,7 +106,7 @@ int dc_devget_history(datco *dc_ptr,long cmd_code,dc_hist *hist_buff,DevType arg
 	xres_hist_clnt 	*recev;
 	xresh_clnt 	*tmp_ptr;
 	int 		tmp_err;
-	long 		err,
+	DevLong 	err,
 			error1;
 	int 		ret = 0;
 	long 		i_net;

@@ -1,0 +1,53 @@
+/*! \page introduction Introduction
+
+\addindex introduction
+
+TACO is a toolkit for implementing distributed object oriented control systems. It 
+has been used at the European Synchrotron Radiation Facility (ESRF) in Grenoble 
+(FRANCE) to control the accelerator complex and all beamlines. 
+
+It is also used at 
+<a href="http://www.frm2.tum.de/">Neue Forschungsneutronenquelle "Heinz Maier-Leibnitz" (FRM II)</a>
+\latexonly(see {\tt http://www.frm2.tum.de/})\endlatexonly
+in Garching (Germany) to control the instruments and at the 
+<a href="http://www.hartrao.ac.za">Hartebeesthoek Radio Astronomy Observatory (HartRAO)</a> 
+\latexonly(see {\tt http://www.hartrao.ac.za/})\endlatexonly
+in Hartebeesthoek (South Africa) to control a 26 meter radio telescope. 
+
+TACO can be compared to other distributed object toolkits like CORBA, DCOM, and OPC 
+(on Windows) with the main differences being : 
+
+-# TACO is easy to use and understand, 
+-# TACO is freely available, 
+-# TACO is based on ONC/RPC (now part of the GNU C library), 
+-# TACO is multi-platform. 
+
+In TACO all control points are represented as devices. Devices are objects which belong 
+to a control class. The class implements the logic necessary to control the device 
+hardware/software. 
+
+Devices are served by processes called device servers. Device servers are distributed 
+over one or any number of machines. 
+
+Clients which need to accesses devices do so through a application programmer's interface. 
+The clients can access devices synchronously, asynchronously or by events. 
+
+The network layers are kept entirely hidden from the device server and client programmer's by 
+
+TACO. TACO supports a database for storing persistant information and keeping track of where 
+devices are running. 
+
+TACO is used to control an accelerator complex, experimental setups on beamlines (using 
+synchrotron radiation and neutrons), a radio telescope, and other smaller projects. 
+It is ideal for adding Ethernet control to embedded and non-embedded devices in a research, 
+industrial or home environment. 
+
+Refer to the appendix for a list of existing device servers. 
+
+TACO can be downloaded from the 
+<a href="http://taco.sourceforge.net">TACO website</a>
+\latexonly(see {\tt http://taco.sourceforge.net})\endlatexonly
+and installed from the source code. TACO is made available under the GNU Public Licence 
+(see \ref license) without warranties. For news about recent developments in TACO go to the 
+website. 
+*/

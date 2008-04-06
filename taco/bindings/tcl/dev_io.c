@@ -51,9 +51,9 @@
  *
  * Original:    June, 1996
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2006-09-18 22:04:49 $
+ * Date:        $Date: 2008-04-06 09:06:34 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -67,6 +67,7 @@
 #include <dev_io.h>
 #include <debug.h>
 #include <maxe_xdr.h>
+#include "convert.h"
 
 #define	STRING_TMP_LENGTH 250
 
@@ -255,7 +256,7 @@ int dev_io_asyn (ClientData clientdata, Tcl_Interp *interp,
 		 int argc, char **argv)
 {
 	SetIoMode(ASYNCHRONOUS_MODE);
-	dev_io (clientdata,interp,argc,argv);
+	return dev_io (clientdata,interp,argc,argv);
 } 
 
 
@@ -283,28 +284,25 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			test2;
 	long 		DeviceStatus; /* To obtain the state of a device */
 	devserver 	ds;
-	long 		DeviceError; /* To have the error of a device */
+	DevLong		DeviceError; /* To have the error of a device */
 	char 		*StringTemp = NULL,
 			*StringAux = NULL;
 	long 		readwrite = 0; /* To precise the divice access */
 	DevCmdInfo 	*InfoCmd; /* To have information about each command */
-	long 		Cmd; /* For identifying the command of the device; */
+	long 		Cmd = 0; /* For identifying the command of the device; */
 	DevVarCmdArray  Info; /* To have the information's structure about a command */
 	char 		*InType ; /* String which contains the argin required by a device's command  */
 	char 		*OutType; /* String which contains the argout required by a device's command */
 	IMPORTED_DEVICE *LastDevice;
-	DevType 	ArginRequired,
-			ArgoutRequired; /* For knowing the types needed by the device's command */
+	DevType 	ArginRequired = 0,
+			ArgoutRequired = 0; /* For knowing the types needed by the device's command */
 	char 		*TclAux = NULL; /* For converting OutputArg into TCL variables */
 	void 		*TclTemp = NULL; /* For converting OutputArg into TCL variables when var array is used */
 
 	int 		R; /* For testing the returned code of the functions of conversion */
 	int 		NEW_DEVICE = False;
-	long 		errload;
 	char 		*tcl_precision;
 	long 		precision; /* to get the global Tcl variable tcl_precision */
-	char 		format[32] ;   /* to build the format when call sprintf to convert */
-					/* argout from dev_putget to Tcl string */
 
 /* -------------------------------- */
 /* Setting debug mode               */
@@ -319,7 +317,7 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 		precision = 6;
 	if (TCL_TEST) 
 	{
-		printf("tcl_precision= %d\n",precision); 
+		printf("tcl_precision= %ld\n",precision); 
 		fflush (stdout); 
 		printf("++++++++++++ Entering dev_io ++++++++++++++++\n");
 	}
@@ -376,7 +374,7 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 	OutputArg = NULL;
 	StringType = NULL;
 	if (TCL_TEST) 
-		printf("StringTemp=%X SequencePointer=%X TclAux=%X\n InputArg=%X OutputArg=%X StringType =%X\n", 
+		printf("StringTemp=%p SequencePointer=%p TclAux=%p\n InputArg=%p OutputArg=%p StringType =%p\n", 
                        StringTemp,SequencePointer,TclAux ,InputArg,OutputArg,StringType);
  
 /* ----------------------------------*/
@@ -406,15 +404,15 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 		DeviceError = 0;
 		DeviceStatus = dev_import (DeviceName,readwrite,&ds,&DeviceError);     
 		if (TCL_TEST) 
-			printf("error_import= %d\n",DeviceError);
+			printf("error_import= %ld\n", (long)DeviceError);
 		if (DeviceStatus != DS_OK) /* dev_import failed */
 		{
 			if (TCL_TEST) 
 				printf("dev_import failed\n");
-			snprintf (StringTemp, STRING_TMP_LENGTH, "%d",DeviceStatus);
+			snprintf (StringTemp, STRING_TMP_LENGTH, "%ld",DeviceStatus);
 			Tcl_SetVar (interp,State,StringTemp,0);
 			StringAux = dev_error_str(DeviceError);
-			snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%d]",StringAux,DeviceError);
+			snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 			Tcl_SetVar (interp,Error,StringTemp,0);
 			free(StringAux); 
 			free (StringTemp);
@@ -434,10 +432,10 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			if (TCL_TEST) 
 				printf("dev_cmd_query failed\n"); 
 
-			snprintf (StringTemp, STRING_TMP_LENGTH, "%d",DeviceStatus);
+			snprintf (StringTemp, STRING_TMP_LENGTH, "%ld",DeviceStatus);
 			Tcl_SetVar (interp,State,StringTemp,0);
 			StringAux = dev_error_str(DeviceError);
-			snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%d]",StringAux,DeviceError);
+			snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 			Tcl_SetVar (interp,Error,StringTemp,0);
 			free(StringAux); 
 			free (StringTemp);
@@ -469,14 +467,14 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			if (TCL_TEST) 
 				printf("%s was freed, import it again.\n",DeviceName);
 			DeviceError = 0;
-			if ( dev_import (DeviceName,readwrite,&ds,&DeviceError) == DS_NOTOK )
+			if ( (DeviceStatus = dev_import (DeviceName,readwrite,&ds,&DeviceError)) == DS_NOTOK )
 			{
 				if (TCL_TEST) 
 					printf("dev_import failed\n");
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%d",DeviceStatus);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%ld",DeviceStatus);
 				Tcl_SetVar (interp,State,StringTemp,0);
 				StringAux = dev_error_str(DeviceError);
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%d]",StringAux,DeviceError);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 				Tcl_SetVar (interp,Error,StringTemp,0);
 				free(StringAux); 
 				free (StringTemp);
@@ -536,7 +534,7 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			if (TCL_TEST) 
 				printf("%s is a valid command for %s\n",CommandName,DeviceName);
 			if (TCL_TEST) 
-				printf("ArginRequired=%d ArgoutRequired=%d\n",ArginRequired,ArgoutRequired);
+				printf("ArginRequired=%ld ArgoutRequired=%ld\n",ArginRequired,ArgoutRequired);
 		} /* ends if (strcmp(CommandName,InfoCmd->cmd_name)==0) */
  
 /* Setting Tcl Variables with the infos as a list if the command is ?*/ 
@@ -599,7 +597,7 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 	InputArg=NULL;
 
 	if(TCL_TEST) 
-		printf("ArginRequired= %d\n",ArginRequired);
+		printf("ArginRequired= %ld\n",ArginRequired);
 	switch (ArginRequired)
 	{
 		case D_VOID_TYPE:
@@ -956,13 +954,13 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 	if (GetIoMode()==SYNCHRONOUS_MODE)
 	{
 		if (TCL_TEST) 
-			printf("Call dev_putget...%d\n",Cmd);
+			printf("Call dev_putget...%ld\n",Cmd);
 			DeviceStatus = dev_putget(CurrentDevice->ds,Cmd, InputArg,ArginRequired,
                               OutputArg,ArgoutRequired, &DeviceError);
 /* GP TESTS */
 		if (TCL_TEST) 
 		{
-			printf("dev_putget returns: error=%d :%s\n",DeviceError,StringTemp);
+			printf("dev_putget returns: error=%ld :%s\n",(long)DeviceError,StringTemp);
                 	fflush(stdout);
 		}
 	}
@@ -972,16 +970,16 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 		DeviceStatus = dev_put_asyn(CurrentDevice->ds,Cmd, InputArg,ArginRequired, &DeviceError);
 	}
    
-	snprintf (StringTemp, STRING_TMP_LENGTH, "%d",DeviceStatus);
+	snprintf (StringTemp, STRING_TMP_LENGTH, "%ld",DeviceStatus);
 	Tcl_SetVar (interp,State,StringTemp,0);
 	if(DeviceError != 0) 
 	{
 		StringAux = dev_error_str(DeviceError);
-		snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%d]",StringAux,DeviceError);
+		snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 		Tcl_SetVar (interp,Error,StringTemp,0);
 	}
 	if (TCL_TEST) 
-		printf("dev_putget returns: error=%d :%s\n",DeviceError,StringTemp);
+		printf("dev_putget returns: error=%ld :%s\n", (long)DeviceError,StringTemp);
 
 	if (DeviceStatus != DS_OK) /* Error during dev_putget */
 	{
@@ -1026,12 +1024,12 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			break;
 		case D_ULONG_TYPE:
 			TclAux = (char *) malloc (TCLAUX_LENGTH*sizeof(char));
-			snprintf(TclAux, TCLAUX_LENGTH, "%d",*((unsigned long*)OutputArg));
+			snprintf(TclAux, TCLAUX_LENGTH, "%ld",*((unsigned long*)OutputArg));
 			Tcl_AppendResult(interp,TclAux,NULL);
 			break;
 		case D_LONG_TYPE:
 			TclAux = (char *) malloc (TCLAUX_LENGTH*sizeof(char));
-			snprintf(TclAux, TCLAUX_LENGTH, "%d",*((long*)OutputArg));
+			snprintf(TclAux, TCLAUX_LENGTH, "%ld",*((long*)OutputArg));
 			Tcl_AppendResult(interp,TclAux,NULL);
 			break;
 		case D_FLOAT_TYPE:
@@ -1053,10 +1051,10 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
 			if (DeviceStatus != DS_OK) /* Error in the dev_xdrfree */
 			{
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%d",DeviceStatus);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%ld",DeviceStatus);
 				Tcl_SetVar (interp,State,StringTemp,0);
 				StringAux = dev_error_str(DeviceError);
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%d]",StringAux,DeviceError);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 				Tcl_SetVar (interp,Error,StringTemp,0);
 				free (StringTemp); 
 				free (StringAux);
@@ -1065,7 +1063,7 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			break;
 		case D_INT_FLOAT_TYPE:
 			TclAux = (char *) malloc (TCLAUX_LENGTH*sizeof(char));
-			snprintf(TclAux, TCLAUX_LENGTH, "%d",(((DevIntFloat*)OutputArg)->state));
+			snprintf(TclAux, TCLAUX_LENGTH, "%ld", (long)(((DevIntFloat*)OutputArg)->state));
 			Tcl_AppendResult(interp,TclAux," ",NULL);
 			snprintf(TclAux, TCLAUX_LENGTH, "%f",(((DevIntFloat*)OutputArg)->value));
 			Tcl_AppendResult(interp,TclAux,NULL);
@@ -1088,9 +1086,9 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			break;
 		case D_LONG_READPOINT:
 			TclAux = (char *) malloc (TCLAUX_LENGTH*sizeof(char));
-			snprintf(TclAux, TCLAUX_LENGTH, "%d",(((DevLongReadPoint*)OutputArg)->set));
+			snprintf(TclAux, TCLAUX_LENGTH, "%ld", (long)(((DevLongReadPoint*)OutputArg)->set));
 			Tcl_AppendResult(interp,TclAux," ",NULL);
-			snprintf(TclAux, TCLAUX_LENGTH, "%d",(((DevLongReadPoint*)OutputArg)->read));
+			snprintf(TclAux, TCLAUX_LENGTH, "%ld", (long)(((DevLongReadPoint*)OutputArg)->read));
 			Tcl_AppendResult(interp,TclAux,NULL); 
 			break;
 		case D_DOUBLE_READPOINT	:
@@ -1110,10 +1108,10 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
 			if (DeviceStatus != DS_OK) /* Error in the dev_xdrfree */
 			{
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%d",DeviceStatus);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%ld",DeviceStatus);
 				Tcl_SetVar (interp,State,StringTemp,0);
 				StringAux = dev_error_str(DeviceError);
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%d]",StringAux,DeviceError);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 				Tcl_SetVar (interp,Error,StringTemp,0);
 				free (StringTemp); 
 				free (StringAux);
@@ -1130,10 +1128,10 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
 			if (DeviceStatus != DS_OK) /* Error in the dev_xdrfree */
 			{
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%d",DeviceStatus);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%ld",DeviceStatus);
 				Tcl_SetVar (interp,State,StringTemp,0);
 				StringAux = dev_error_str(DeviceError);
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%d]",StringAux,DeviceError);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 				Tcl_SetVar (interp,Error,StringTemp,0);
 				free (StringTemp); 
 				free (StringAux);
@@ -1152,10 +1150,10 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
 			if (DeviceStatus != DS_OK) /* Error in the dev_xdrfree */
 			{
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%d",DeviceStatus);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%ld",DeviceStatus);
 				Tcl_SetVar (interp,State,StringTemp,0);
 				StringAux = dev_error_str(DeviceError);
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%d]",StringAux,DeviceError);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 				Tcl_SetVar (interp,Error,StringTemp,0);
 				free (StringTemp); 
 				free (StringAux);
@@ -1174,10 +1172,10 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
 			if (DeviceStatus != DS_OK) /* Error in the dev_xdrfree */
 			{
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%d",DeviceStatus);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%ld",DeviceStatus);
 				Tcl_SetVar (interp,State,StringTemp,0);
 				StringAux = dev_error_str(DeviceError);
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%d]",StringAux,DeviceError);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 				Tcl_SetVar (interp,Error,StringTemp,0);
 				free (StringTemp); 
 				free (StringAux);
@@ -1190,16 +1188,16 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			for (i=0;i<j;i++)
 			{
 				TclTemp = (unsigned long*)( ((DevVarULongArray*)OutputArg)->sequence+i);
-				snprintf(TclAux, TCLAUX_LENGTH, "%d",*((unsigned long*)TclTemp));
+				snprintf(TclAux, TCLAUX_LENGTH, "%lu",*((unsigned long*)TclTemp));
 				Tcl_AppendElement(interp,TclAux);
 			}
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
 			if (DeviceStatus != DS_OK) /* Error in the dev_xdrfree */
 			{
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%d",DeviceStatus);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%ld",DeviceStatus);
 				Tcl_SetVar (interp,State,StringTemp,0);
 				StringAux = dev_error_str(DeviceError);
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%d]",StringAux,DeviceError);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 				Tcl_SetVar (interp,Error,StringTemp,0);
 				free (StringTemp); 
 				free (StringAux);
@@ -1212,16 +1210,16 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			for (i=0;i<j;i++)
 			{
 				TclTemp = (long*)( ((DevVarLongArray*)OutputArg)->sequence+i);
-				snprintf(TclAux, TCLAUX_LENGTH, "%d",*((long*)TclTemp));
+				snprintf(TclAux, TCLAUX_LENGTH, "%ld",*((long*)TclTemp));
 				Tcl_AppendElement(interp,TclAux);
 			}
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
 			if (DeviceStatus != DS_OK) /* Error in the dev_xdrfree */
 			{
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%d",DeviceStatus);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%ld",DeviceStatus);
 				Tcl_SetVar (interp,State,StringTemp,0);
 				StringAux = dev_error_str(DeviceError);
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%d]",StringAux,DeviceError);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 				Tcl_SetVar (interp,Error,StringTemp,0);
 				free (StringTemp); 
 				free (StringAux);
@@ -1240,10 +1238,10 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
 			if (DeviceStatus != DS_OK) /* Error in the dev_xdrfree */
 			{
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%d",DeviceStatus);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%ld",DeviceStatus);
 				Tcl_SetVar (interp,State,StringTemp,0);
 				StringAux = dev_error_str(DeviceError);
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%d]",StringAux,DeviceError);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 				Tcl_SetVar (interp,Error,StringTemp,0);
 				free (StringTemp); 
 				free (StringAux);
@@ -1262,10 +1260,10 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
 			if (DeviceStatus != DS_OK) /* Error in the dev_xdrfree */
 			{
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%d",DeviceStatus);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%ld",DeviceStatus);
 				Tcl_SetVar (interp,State,StringTemp,0);
 				StringAux = dev_error_str(DeviceError);
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%d]",StringAux,DeviceError);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 				Tcl_SetVar (interp,Error,StringTemp,0);
 				free (StringTemp); 
 				free (StringAux);
@@ -1286,10 +1284,10 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
 			if (DeviceStatus != DS_OK) /* Error in the dev_xdrfree */
 			{
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%d",DeviceStatus);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%ld",DeviceStatus);
 				Tcl_SetVar (interp,State,StringTemp,0);
 				StringAux = dev_error_str(DeviceError);
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%d]",StringAux,DeviceError);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 				Tcl_SetVar (interp,Error,StringTemp,0);
 				free (StringTemp); 
 				free (StringAux);
@@ -1312,10 +1310,10 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
 			if (DeviceStatus != DS_OK) /* Error in the dev_xdrfree */
 			{
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%d",DeviceStatus);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%ld",DeviceStatus);
 				Tcl_SetVar (interp,State,StringTemp,0);
 				StringAux = dev_error_str(DeviceError);
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%d]",StringAux,DeviceError);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 				Tcl_SetVar (interp,Error,StringTemp,0);
 				free (StringTemp); 
 				free (StringAux);
@@ -1328,18 +1326,18 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			for (i=0;i<j;i++)
 			{
 				TclTemp = (DevLongReadPoint*)(((DevVarLongReadPointArray*)OutputArg)->sequence+i);
-				snprintf(TclAux, TCLAUX_LENGTH, "%d",((DevLongReadPoint*)TclTemp)->set);
+				snprintf(TclAux, TCLAUX_LENGTH, "%ld", (long)((DevLongReadPoint*)TclTemp)->set);
 				Tcl_AppendElement(interp,TclAux);
-				snprintf(TclAux, TCLAUX_LENGTH, "%d",((DevLongReadPoint*)TclTemp)->read);         
+				snprintf(TclAux, TCLAUX_LENGTH, "%ld", (long)((DevLongReadPoint*)TclTemp)->read);         
 				Tcl_AppendElement(interp,TclAux);
 			}
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
 			if (DeviceStatus != DS_OK) /* Error in the dev_xdrfree */
 			{
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%d",DeviceStatus);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%ld",DeviceStatus);
 				Tcl_SetVar (interp,State,StringTemp,0);
 				StringAux = dev_error_str(DeviceError);
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%d]",StringAux,DeviceError);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 				Tcl_SetVar (interp,Error,StringTemp,0);
 				free (StringTemp); 
 				free (StringAux);
@@ -1356,10 +1354,10 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
 			if (DeviceStatus != DS_OK) /* Error in the dev_xdrfree */
 			{
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%d",DeviceStatus);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%ld",DeviceStatus);
 				Tcl_SetVar (interp,State,StringTemp,0);
 				StringAux = dev_error_str(DeviceError);
-				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%d]",StringAux,DeviceError);
+				snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 				Tcl_SetVar (interp,Error,StringTemp,0);
 				free (StringTemp); 
 				free (StringAux);
@@ -1370,32 +1368,32 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			TclAux = (char*) malloc (TCLAUX_LENGTH*sizeof(char));
 			for (i=0;i<8;i++)
 			{
-				snprintf(TclAux, TCLAUX_LENGTH, "%d",&( ((DevMulMove*)OutputArg)->action[i]));
+				snprintf(TclAux, TCLAUX_LENGTH, "%ld", (long)( ((DevMulMove*)OutputArg)->action[i]));
 				Tcl_AppendResult(interp,TclAux," ",NULL);
 			}
 			for (i=0;i<8;i++)
 			{
-				snprintf(TclAux, TCLAUX_LENGTH, "%d",&( ((DevMulMove*)OutputArg)->delay[i]));
+				snprintf(TclAux, TCLAUX_LENGTH, "%ld", (long)( ((DevMulMove*)OutputArg)->delay[i]));
 				Tcl_AppendResult(interp,TclAux," ",NULL);
 			}
 			for (i=0;i<8;i++)
 			{
-				snprintf(TclAux, TCLAUX_LENGTH, "%f",&( ((DevMulMove*)OutputArg)->position[i]));
+				snprintf(TclAux, TCLAUX_LENGTH, "%f",( ((DevMulMove*)OutputArg)->position[i]));
 				Tcl_AppendResult(interp,TclAux," ",NULL);
 			}
        			break;
 		case D_MOTOR_LONG: 
 			TclAux = (char*) malloc (TCLAUX_LENGTH*sizeof(char));
-			snprintf(TclAux, TCLAUX_LENGTH, "%d",&( ((DevMotorLong*)OutputArg)->axisnum));
+			snprintf(TclAux, TCLAUX_LENGTH, "%ld", (long)( ((DevMotorLong*)OutputArg)->axisnum));
 			Tcl_AppendResult(interp,TclAux," ",NULL);
-			snprintf(TclAux, TCLAUX_LENGTH, "%d",&( ((DevMotorLong*)OutputArg)->value));
+			snprintf(TclAux, TCLAUX_LENGTH, "%ld", (long)( ((DevMotorLong*)OutputArg)->value));
 			Tcl_AppendResult(interp,TclAux,NULL);
 			break;
 		case D_MOTOR_FLOAT:
 			TclAux = (char*) malloc (TCLAUX_LENGTH*sizeof(char));
-			snprintf(TclAux, TCLAUX_LENGTH, "%d",&( ((DevMotorFloat*)OutputArg)->axisnum));
+			snprintf(TclAux, TCLAUX_LENGTH, "%ld", (long)( ((DevMotorFloat*)OutputArg)->axisnum));
 			Tcl_AppendResult(interp,TclAux," ",NULL);
-			snprintf(TclAux, TCLAUX_LENGTH, "%f",&( ((DevMotorFloat*)OutputArg)->value));
+			snprintf(TclAux, TCLAUX_LENGTH, "%f",( ((DevMotorFloat*)OutputArg)->value));
 			Tcl_AppendResult(interp,TclAux,NULL);
 			break;
 		default:
@@ -1409,24 +1407,24 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 	if (TCL_TEST) 
 	{
 		printf("free the memory....\n");
-		printf("...................TclAux %X\n",TclAux);
+		printf("...................TclAux %p\n",TclAux);
 	}
 	if (TclAux != NULL) 
 		free (TclAux);
 	if (TCL_TEST) 
-		printf("...................SequencePointer %X\n",SequencePointer);
+		printf("...................SequencePointer %p\n",SequencePointer);
 	if (SequencePointer != NULL) 
 		free (SequencePointer);
 	if (TCL_TEST) 
-		printf("...................StringTemp %X\n",StringTemp);
+		printf("...................StringTemp %p\n",StringTemp);
 	if (StringTemp != NULL) 
 		free (StringTemp);
 	if (TCL_TEST) 
-		printf("...................StringAux %X\n",StringAux);
+		printf("...................StringAux %p\n",StringAux);
 	if (StringAux != NULL) 
 		free (StringAux);
 	if (TCL_TEST) 
-		printf("...................StringType %X\n",StringType);
+		printf("...................StringType %p\n",StringType);
 	if (StringType != NULL) 
 		free (StringType); 
 
@@ -1438,7 +1436,7 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 		for (i=0;i<j;i++)
 		{
 			if (TCL_TEST) 
-      				printf("...................Free %X\n",((DevVarStringArray*)InputArg)->sequence+i);
+      				printf("...................Free %p\n",((DevVarStringArray*)InputArg)->sequence+i);
 			free(((DevVarStringArray*)InputArg)->sequence+i);
 		}  
 	}
@@ -1447,7 +1445,7 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 	if (ArginRequired != D_STRING_TYPE) 
 	{
 		if (TCL_TEST) 
-			printf("...................InputArg %X\n",InputArg);
+			printf("...................InputArg %p\n",InputArg);
  
 		if (InputArg != NULL) 
 		{
@@ -1459,7 +1457,7 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 	if (ArgoutRequired != D_STRING_TYPE) 
 	{
 		if (TCL_TEST) 
-			printf("...................OutputArg %X\n",OutputArg); 
+			printf("...................OutputArg %p\n",OutputArg); 
 		if (OutputArg != NULL) 
 		{
 			free (OutputArg); 

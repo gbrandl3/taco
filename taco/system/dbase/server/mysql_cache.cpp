@@ -19,15 +19,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * File:
- *
+ *		mysql_cache.cpp
  * Description:
  *
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2007-03-22 14:25:53 $
+ * Date:	$Date: 2008-04-06 09:07:41 $
  *
  */
 
@@ -130,8 +130,8 @@ long MySQLServer::fill_cache(std::string domain)
   
   if (mysql_query(mysql_conn, query.c_str()) != 0)
   {
-    std::cout << mysql_error(mysql_conn) << std::endl;
-    std::cout << query << std::endl;
+    logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
+    logStream->errorStream() << query << log4cpp::eol;
     return 1;
   }
   
@@ -149,7 +149,7 @@ long MySQLServer::fill_cache(std::string domain)
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
       mysql_free_result(res_list);
-      std::cout << mysql_error(mysql_conn) << std::endl;
+      logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
       return 1;
     }
 
@@ -238,7 +238,7 @@ int MySQLServer::db_find_from_cache(std::string tab_name, std::string res_name, 
   
   } catch(const std::bad_alloc &e) {
     
-    std::cout << "Error in malloc for out" << std::endl;
+    logStream->errorStream() << "Error in malloc for out" << log4cpp::eol;
     throw e;
     
   }

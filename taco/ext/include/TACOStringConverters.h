@@ -32,13 +32,13 @@
 
 namespace TACO {
 	//! Allocates a device argument
-	void* allocateDevArgument( DevType type) throw (Exception);
+	DevArgument allocateDevArgument( DevArgType type) throw (Exception);
 
 	//! Frees a device argument
-	void freeDevArgument( void* arg) throw ();
+	void freeDevArgument( DevArgument arg) throw ();
 
 	//! Frees a device argument and its data
-	void freeDevArgument( DevType type, void* arg) throw (Exception);
+	void freeDevArgument( DevArgType type, DevArgument arg) throw (Exception);
 
 	template<typename T> void copyDevVarArray( const T* src, std::stringstream& dest) throw ()
 	{
@@ -81,7 +81,7 @@ namespace TACO {
 		}
 	}
 
-	std::string convertToString( DevType type, const void* input)
+	std::string convertToString( DevArgType type, const DevArgument input)
 		throw (Exception);
 
 	/**
@@ -90,7 +90,7 @@ namespace TACO {
 	 * @warning
 	 * You must use freeDevArgument( type, arg) to free the created argument.
 	 */
-	void* convertToDevArgument( DevType type, const std::string& input)
+	DevArgument convertToDevArgument( DevArgType type, const std::string& input)
 		throw (Exception);
 
 	/**

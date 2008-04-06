@@ -20,8 +20,15 @@
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
 #endif
-
+#ifdef HAVE_FSTAT
+#undef HAVE_FSTAT
+#endif
 #include <Python.h>
+
+#ifndef HAVE_PY_SSIZE_T
+typedef int Py_ssize_t;
+#endif
+
 #include "TACOClient.h"
 #include "TACOPythonClientConverters.h"
 #include "TACOBasicCommands.h"
@@ -631,7 +638,7 @@ PyDoc_STR("Client(devicename) --> a TACO client object\n\n"
 "supported by every reasonable device. You have also direct access to the device\n"
 "commands via the 'execute()' method.");
 
-static PyObject *TACOClient_alloc(PyTypeObject *type, int nitems)
+static PyObject *TACOClient_alloc(PyTypeObject *type, Py_ssize_t nitems)
 {
         PyObject *self;
 
@@ -711,42 +718,42 @@ static PyObject *TACOClient_deviceQueryResourceInfo(PyObject *self, PyObject *ar
 			}
 			PyObject *key1,
 				 *value;
-			if (key1 = PyString_FromString("type"))
+			if ((key1 = PyString_FromString("type")) != NULL)
 			{
 				value = PyLong_FromLong(it->type);
 				PyDict_SetItem(o, key1, value);
 				Py_DECREF(key1);
 				Py_DECREF(value);
 			}
-			if (key1 = PyString_FromString("info"))
+			if ((key1 = PyString_FromString("info")) != NULL)
 			{
 				value = PyString_FromString(const_cast<char *>(it->info.c_str()));
 				PyDict_SetItem(o, key1, value);
 				Py_DECREF(key1);
 				Py_DECREF(value);
 			}
-			if (key1 = PyString_FromString("defaults"))
+			if ((key1 = PyString_FromString("defaults")) != NULL)
 			{
 				value = PyString_FromString(const_cast<char *>(it->defaults.c_str()));
 				PyDict_SetItem(o, key1, value);
 				Py_DECREF(key1);
 				Py_DECREF(value);
 			}
-			if (key1 = PyString_FromString("format"))
+			if ((key1 = PyString_FromString("format")) != NULL)
 			{
 				value = PyString_FromString(const_cast<char *>(it->format.c_str()));
 				PyDict_SetItem(o, key1, value);
 				Py_DECREF(key1);
 				Py_DECREF(value);
 			}
-			if (key1 = PyString_FromString("max"))
+			if ((key1 = PyString_FromString("max")) != NULL)
 			{
 				value = PyString_FromString(const_cast<char *>(it->max.c_str()));
 				PyDict_SetItem(o, key1, value);
 				Py_DECREF(key1);
 				Py_DECREF(value);
 			}
-			if (key1 = PyString_FromString("min"))
+			if ((key1 = PyString_FromString("min")) != NULL)
 			{
 				value = PyString_FromString(const_cast<char *>(it->min.c_str()));
 				PyDict_SetItem(o, key1, value);
@@ -763,6 +770,7 @@ static PyObject *TACOClient_deviceQueryResourceInfo(PyObject *self, PyObject *ar
 	{
 	}
 	PyErr_SetString(PyExc_RuntimeError, "lost the TACO client");
+	return NULL;
 }
 
 static void TACOClient_del(PyObject *self)
@@ -771,7 +779,7 @@ static void TACOClient_del(PyObject *self)
 	delete ((TACOClientObject *)self)->m_CmdInfo;
 }
 
-static char *TACOClient_kws[] = {"devicename", NULL};
+static char *TACOClient_kws[] = {(char*)"devicename", NULL};
 
 static PyObject *TACOClient_new(PyTypeObject *type, PyObject *args, PyObject *kw)
 {
@@ -803,7 +811,7 @@ static PyObject *TACOClient_new(PyTypeObject *type, PyObject *args, PyObject *kw
 static PyObject *TACOClient_sync(PyObject *self, PyObject *args)
 {
 	struct timeval t = {0, 0};
-	long		err;
+	DevLong		err;
 	if (!PyArg_ParseTuple(args, "l|l", &t.tv_sec, &t.tv_usec))
 		return NULL;
 	if (dev_synch(&t, &err) != DS_OK)
@@ -845,7 +853,7 @@ void initTACOClient(int i)
 	PyObject 	*m = Py_InitModule3("TACOClient", TACOClientType_methods, "This modules contains the Client class for the FRM-II TACO devices"),
 			*d,
 			*tmp;
-	long		e;
+	DevLong		e;
 
 	db_import(&e);
 
@@ -853,94 +861,94 @@ void initTACOClient(int i)
 		return;
 
 	Py_INCREF(&TACOClientType);
-        PyModule_AddObject(m, "Client", (PyObject *)&TACOClientType);
+        PyModule_AddObject(m, "Client", reinterpret_cast<PyObject *>(&TACOClientType));
 
-	TACOError = PyErr_NewException("TACOClient.TACOError", NULL, NULL);
+	TACOError = PyErr_NewException((char *)"TACOClient.TACOError", NULL, NULL);
 	Py_INCREF(TACOError);
 	PyModule_AddObject(m, "TACOError", TACOError);
 
 	d = PyModule_GetDict(m);
-	if (tmp = PyLong_FromLong(TACO::Command::DEVICE_ON))
+	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_ON)) != NULL)
 	{
 		PyDict_SetItemString(d, "DEVICE_ON", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyLong_FromLong(TACO::Command::DEVICE_OFF))
+	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_OFF)) != NULL)
 	{
 		PyDict_SetItemString(d, "DEVICE_OFF", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyLong_FromLong(TACO::Command::DEVICE_RESET))
+	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_RESET)) != NULL)
 	{
 		PyDict_SetItemString(d, "DEVICE_RESET", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyLong_FromLong(TACO::Command::DEVICE_STATE))
+	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_STATE)) != NULL)
 	{
 		PyDict_SetItemString(d, "DEVICE_STATE", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyLong_FromLong(TACO::Command::DEVICE_STATUS))
+	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_STATUS)) != NULL)
 	{
 		PyDict_SetItemString(d, "DEVICE_STATUS", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyLong_FromLong(TACO::Command::DEVICE_VERSION))
+	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_VERSION)) != NULL)
 	{
 		PyDict_SetItemString(d, "DEVICE_VERSION", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyLong_FromLong(TACO::Command::DEVICE_TYPES))
+	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_TYPES)) != NULL)
 	{
 		PyDict_SetItemString(d, "DEVICE_TYPES", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyLong_FromLong(TACO::Command::DEVICE_QUERY_RESOURCE))
+	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_QUERY_RESOURCE)) != NULL)
 	{
 		PyDict_SetItemString(d, "DEVICE_QUERY_RESOURCE", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyLong_FromLong(TACO::Command::DEVICE_UPDATE_RESOURCE))
+	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_UPDATE_RESOURCE)) != NULL)
 	{
 		PyDict_SetItemString(d, "DEVICE_UPDATE_RESOURCE", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyLong_FromLong(TACO::Command::DEVICE_UPDATE))
+	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_UPDATE)) != NULL)
 	{
 		PyDict_SetItemString(d, "DEVICE_UPDATE", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyLong_FromLong(TACO::Command::DEVICE_QUERY_RESOURCE_INFO))
+	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_QUERY_RESOURCE_INFO)) != NULL)
 	{
 		PyDict_SetItemString(d, "DEVICE_QUERY_RESOURCE_INFO", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyLong_FromLong(D_UDP))
+	if ((tmp = PyLong_FromLong(D_UDP)) != NULL)
 	{
 		PyDict_SetItemString(d, "UDP", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyLong_FromLong(D_TCP))
+	if ((tmp = PyLong_FromLong(D_TCP)) != NULL)
 	{
 		PyDict_SetItemString(d, "TCP", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyString_FromString("Jens Krueger"))
+	if ((tmp = PyString_FromString("Jens Krueger")) != NULL)
 	{
 		PyDict_SetItemString(d, "__author__", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyString_FromString("$Revision: 1.1 $"))
+	if ((tmp = PyString_FromString("$Revision: 1.2 $")) != NULL)
 	{
 		PyDict_SetItemString(d, "__revision__", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyString_FromString("$Date: 2006-12-07 15:11:46 $"))
+	if ((tmp = PyString_FromString("$Date: 2008-04-06 09:06:57 $")) != NULL)
 	{
 		PyDict_SetItemString(d, "__date__", tmp);
 		Py_DECREF(tmp);
 	}
-	if (tmp = PyString_FromString("jens dot krueger add frm2 dot tum dot de"))
+	if ((tmp = PyString_FromString("jens dot krueger add frm2 dot tum dot de")) != NULL)
 	{
 		PyDict_SetItemString(d, "__email__", tmp);
 		Py_DECREF(tmp);

@@ -29,9 +29,9 @@
  *
  * Original:   	November 1996
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2007-09-07 14:24:51 $
+ * Date:	$Date: 2008-04-06 09:07:01 $
  *
  *****************************************************************************/
 
@@ -39,7 +39,7 @@
  * @defgroup asciiAPI ASCII based device API
  * @ingroup API
  *
- * The "ASCII based dev api" has been designed as a shared library
+ * The "ASCII based device API" has been designed as a shared library
  * which can dynamically be loaded (using dynamic loader functions) in any C
  * program. It has been loaded and used inside 'veetest' application to access
  * the TACO control system. It will also be used in "xdevmenu" application to
@@ -48,7 +48,7 @@
  * The aim of this library is to give an ASCII based interface to the device
  * server API. It means one can execute a command on a device server simply by
  * specifying the device name and the command name with two strings. He (she)
- * is returned the output result and the possible errors in the form of string
+ * returns the output result and the possible errors in the form of string
  * as well. If the device server command requires an input argument, it is also
  * specified through a string.
  * 
@@ -117,7 +117,7 @@ static  int                   _asc_library_loaded = ASC_FALSE;
 
 static long _asc_load_library()
 {
-	long		err;
+	DevLong		err;
 	db_resource	res;
 	char		*lib_path,
 			*dev_name;
@@ -275,8 +275,8 @@ static long _asc_dev_connect(char *dev_name, const char *cmd_name, devserver *ds
 	int		index_dev, 
 			ind_cmd,
 			cmd_found;
-	long		status, 
-			error;
+	long		status; 
+	DevLong		error;
 	devserver	ds;
 	DevVarCmdArray	cmd_arr;
 	char		*error_str;
@@ -429,7 +429,8 @@ long dev_get_ascii(char *dev_name, char *cmd_name, char **out_arg, char **str_er
 
 	devserver                        ds;
 	char                             *error_str;
-	long                             status,error;
+	long                             status;
+	DevLong				 error;
 	void                             *out_data;
 	long                             cmd;
 	long                             in_type;
@@ -724,7 +725,8 @@ long dev_put_ascii(char *dev_name, char *cmd_name, char *in_arg, char **str_err)
 {
 	devserver                        ds;
 	char                             *error_str;
-	long                             status,error;
+	long                             status;
+	DevLong				 error;
 	void                             *in_data;
 	long                             cmd;
 	long                             in_type;
@@ -1121,8 +1123,8 @@ long dev_putget_ascii(char *dev_name, char *cmd_name, char *in_arg,
 {
 	devserver			ds;
 	char				*error_str;
-	long				status = 0,
-					error;
+	long				status = 0;
+	DevLong				error;
 	void				*in_data, 
 					*out_data;
 	long				cmd;
@@ -1722,8 +1724,8 @@ long dev_putget_ascii(char *dev_name, char *cmd_name, char *in_arg,
  */
 long dev_free_ascii(char *dev_name, char **str_err)
 {
-	long          	status, 
-			error;
+	long          	status; 
+	DevLong		error;
 	int             ind_dev, 
 			dev_found, 
 			ind_cmd;

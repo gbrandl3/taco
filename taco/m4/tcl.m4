@@ -14,6 +14,7 @@ AC_DEFUN([TCL_PROG],
 
 AC_DEFUN([TCL_DEVEL],
 [
+	AC_REQUIRE([AC_CANONICAL_SYSTEM])
 	AC_REQUIRE([TCL_PROG])
 	AC_ARG_WITH(tclconfig, AC_HELP_STRING([--with-tclconfig=path], [Set location of tclConfig.sh]),
         	[with_tclconfig="$withval"])
@@ -26,60 +27,56 @@ AC_DEFUN([TCL_DEVEL],
 dnl
 dnl First check to see if --with-tclconfig was specified.
 dnl
-	if test x"${with_tclconfig}" != x ; then
-   		if test -f "${with_tclconfig}/tclConfig.sh" ; then
-      			TCLCONFIG=`(cd ${with_tclconfig}; pwd)`
-   		else
-      			AC_MSG_ERROR([${with_tcl} directory doesn't contain tclConfig.sh])
-   		fi
-	fi
+	AS_IF([test x"${with_tclconfig}" != x], 
+              [
+   		AS_IF([test -f "${with_tclconfig}/tclConfig.sh"], [TCLCONFIG=`(cd ${with_tclconfig}; pwd)`],
+      		      [AC_MSG_ERROR([${with_tcl} directory doesn't contain tclConfig.sh])])
+	      ])
 dnl
 dnl check in a few common install locations
 dnl	
-	if test x"${TCLCONFIG}" = x ; then
-               for i in "/usr/lib:" `ls -a /usr/lib/* /usr/local/lib/* 2>/dev/null | grep ':$'` ; do
+	AS_IF([test x"${TCLCONFIG}" = x],
+	      [
+	        case "$target" in
+                        x86_64-*-linux* | ia64-*-linux-* | ia64-*-freebsd* )
+                                taco_tcl_lib_search="/usr/lib64: "`ls -a /usr/lib64/* /usr/local/lib64/* 2>/dev/null | grep ':$'` 
+                                ;;
+                        *)
+                                taco_tcl_lib_search="/usr/lib: "`ls -a /usr/lib/* /usr/local/lib/* 2>/dev/null | grep ':$'` 
+                                ;;
+                esac
+                for i in $taco_tcl_lib_search ; do
                         dir="`dirname $i`/`basename $i ':'`"
                         if test -f "$dir/tclConfig.sh" ; then
                                 TCLCONFIG=$dir
 	    			break
 			fi
 		done
-	fi
-	if test x"${TCLCONFIG}" = x ; then
-		AC_MSG_RESULT(no)
-	else
+              ])
+	AS_IF([test x"${TCLCONFIG}" = x], [AC_MSG_RESULT(no)],
+	      [
 		AC_MSG_RESULT(found $TCLCONFIG/tclConfig.sh)
 		. $TCLCONFIG/tclConfig.sh
-		if test -z "$TCL_INCLUDE_SPEC" ; then
+		AS_IF([test -z "$TCL_INCLUDE_SPEC"], 
+                      [
 			TCL_PREFIX=`eval "echo $TCL_PREFIX"`
 			TCL_H=`find $TCL_PREFIX/include -type f -name tcl.h | grep $TCL_VERSION`
-			if test -z "$TCL_H" ; then
-				TCL_H=`find $TCL_PREFIX/include -type f -name tcl.h`
-			fi
+			AS_IF([test -z "$TCL_H"], [TCL_H=`find $TCL_PREFIX/include -type f -name tcl.h`])
 			TCLINCLUDE="-I`dirname $TCL_H`"
-		else
-			TCLINCLUDE=`eval "echo $TCL_INCLUDE_SPEC"`
-		fi
+		      ], [TCLINCLUDE=`eval "echo $TCL_INCLUDE_SPEC"`])
 		TCLINCLUDE="$TCL_CFLAGS_WARNING $TCL_EXTRA_CFLAGS $TCLINCLUDE"
 		TCLLIB=`eval "echo $TCL_LIB_SPEC $TCL_LIBS"`
-	fi
+	      ])
 
-	if test -z "$TCLINCLUDE"; then
-		if test -n "$TCLPACKAGE"; then
-			TCLINCLUDE="-I$TCLPACKAGE/include"
-   		fi
-	fi
-
-	if test -z "$TCLLIB"; then
-		if test -n "$TCLPACKAGE"; then
-			TCLLIB="-L$TCLPACKAGE/lib -ltcl"
-		fi
-	fi
+	AS_IF([test -z "$TCLINCLUDE" -a -n "$TCLPACKAGE"], [TCLINCLUDE="-I$TCLPACKAGE/include"])
+	AS_IF([test -z "$TCLLIB" -a -n "$TCLPACKAGE"], [TCLLIB="-L$TCLPACKAGE/lib -ltcl"])
 
 	AC_MSG_CHECKING(for Tcl header files)
 	save_CPPFLAGS="$CPPFLAGS"
-	if test -z "$TCLINCLUDE"; then
-		if test -z "$TCLINCLUDE"; then
+	AS_IF([test -z "$TCLINCLUDE"], 
+              [
+		AS_IF([test -z "$TCLINCLUDE"],
+                      [
 			dirs="/usr/local/include /usr/include /opt/local/include"
 			for i in $dirs ; do
 				if test -r $i/tcl.h; then
@@ -88,22 +85,30 @@ dnl
 					break
 				fi
 			done
-		fi
-	fi
-	if test -n "$TCLINCLUDE"; then
+		      ])
+	      ])
+	AS_IF([test -n "$TCLINCLUDE"], 
+	      [
 		CPPFLAGS="$CPPFLAGS -I$TCLINCLUDE"
 		AC_CHECK_HEADERS([tcl.h], , TCLINCLUDE="")
-	fi
-	if test -n "$TCLINCLUDE"; then
-        	AC_MSG_RESULT($TCLINCLUDE)
-	else
+	      ])
+	AS_IF([test -n "$TCLINCLUDE"], AC_MSG_RESULT($TCLINCLUDE),
+	      [
 		CPPFLAGS="$save_CPPFLAGS"
     		AC_MSG_RESULT(not found)
-	fi
+	      ])
 
 	AC_MSG_CHECKING(for Tcl library)
-	if test -z "$TCLLIB"; then
-		dirs="/usr/local/lib /usr/lib /opt/local/lib"
+	AS_IF([test -z "$TCLLIB"], 
+              [
+	        case "$target" in
+                        x86_64-*-linux* | ia64-*-linux-* | ia64-*-freebsd* )
+				dirs="/usr/local/lib64 /usr/lib64 /opt/local/lib64"
+                                ;;
+                        *)
+				dirs="/usr/local/lib /usr/lib /opt/local/lib"
+                                ;;
+                esac
 		for i in $dirs ; do
 			if test -r $i/libtcl.a; then
 				AC_MSG_RESULT($i)
@@ -111,12 +116,8 @@ dnl
 				break
 			fi
 		done
-		if test -z "$TCLLIB"; then
-			AC_MSG_RESULT(not found)
-	fi
-	else
-		AC_MSG_RESULT($TCLLIB)
-	fi
+		AS_IF([test -z "$TCLLIB"], [AC_MSG_RESULT(not found)])
+	      ], [AC_MSG_RESULT($TCLLIB)])
 
 # Cygwin (Windows) needs the library for dynamic linking
 	case $host in

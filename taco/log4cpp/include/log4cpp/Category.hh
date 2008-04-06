@@ -16,6 +16,7 @@
 #include <log4cpp/Priority.hh>
 #include <log4cpp/CategoryStream.hh>
 #include <log4cpp/threading/Threading.hh>
+#include <log4cpp/convenience.h>
 
 #include <map>
 #include <vector>
@@ -222,7 +223,7 @@ namespace log4cpp {
          * the Appender.
          * @deprecated use ownsAppender(Appender*)
          **/
-        inline bool ownsAppender() const throw() {
+        virtual bool ownsAppender() const throw() {
             return ownsAppender(getAppender());
         };
 

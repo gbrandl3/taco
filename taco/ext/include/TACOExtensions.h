@@ -43,9 +43,9 @@ namespace TACO {
 	struct CommandInfo {
 		CommandInfo(
 			const std::string& iName,
-			DevType iInputType,
+			DevArgType iInputType,
 			const std::string& iInputName,
-			DevType iOutputType,
+			DevArgType iOutputType,
 			const std::string& iOutputName
 		)
 			: name( iName),
@@ -64,11 +64,11 @@ namespace TACO {
 
 		std::string name;
 
-		DevType inputType;
+		DevArgType inputType;
 
 		std::string inputName;
 
-		DevType outputType;
+		DevArgType outputType;
 
 		std::string outputName;
 	};
@@ -86,7 +86,7 @@ namespace TACO {
 	struct EventInfo {
 		EventInfo(
 			const std::string& iName,
-			DevType iOutputType,
+			DevArgType iOutputType,
 			const std::string& iOutputName
 		)
 			: name( iName),
@@ -103,7 +103,7 @@ namespace TACO {
 
 		std::string name;
 
-		DevType outputType;
+		DevArgType outputType;
 
 		std::string outputName;
 	};

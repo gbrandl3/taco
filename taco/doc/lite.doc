@@ -1,0 +1,46 @@
+/*! \page lite TACO Lite 
+\addindex lite
+
+What is TACO lite ? TACO lite is the ability to run TACO servers and clients without 
+the database.  Normally TACO needs a database (ndbm, mySQL, or SQLITE) for storing 
+network address and permanent configuration information and settings. Sometimes 
+however all you want is a single device server and client running and using the TACO 
+protocol. 
+
+For example in a small lab or for an embedded or portable device. In this case it can 
+be a constraint to run the manager, database and message server as well. Running a 
+device server without the database means you have to fix the network address (host and 
+program number) for the server and inform the client, somehow tell the server which 
+devices it has to serve and program the server not to use the resources in the database 
+
+To use TACO lite all you have to do is :
+
+-# on the server side start the device server as follows
+\verbatim
+MyServer name -nodb -pn 123456 -device mydevice1 mydevice2 ... 
+\endverbatim
+where name is the personal name of the device server,123456 is the program
+number the device server will use and mydevice1, mydevice2, ... are 
+the names of the device to be served (note they do not have to have to respect the 
+domain/family/member nomenclature).
+
+\note make sure this is free beforehand by doing a rcpinfo -p host on the host where it will run
+
+-# on the client side import the device(s) in the device server using the following
+syntax for the name
+\verbatim
+//host/mydevice1?123456 
+\endverbatim
+where host is the name of the host machine where the client is running, mydevice1 
+is the name of the device given on the command line to the server, and 123456 is the 
+program number specified on the command line of the server.
+
+Clients can mix devices without database with devices with database in the same 
+process. Using TACO lite it is now possible to distribute servers and clients as 
+static binaries to run on green sites where TACO is not installed. This is just 
+the first version of running TACO servers and clients without a database. Comments 
+are welcomed. Further evolutions could include providing support for a flat file for 
+resources for example.
+
+*/
+

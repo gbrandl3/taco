@@ -27,29 +27,34 @@
 
 #include <TACOServer.h>
 
-std::string TACO::Server::sServerName;
+#include <private/ApiP.h>
+
+std::string TACO::Server::sServerName = config_flags.server_name;
 std::string TACO::Server::sStringBuffer;
 
 TACO::Server::Server( const std::string& name, DevLong& error) throw (TACO::Exception)
-	: Device(const_cast<char *>(name.c_str()), &error),
-	mInitialized( false), mName( name), mVersion( "unknown"), mAlwaysAllowDeviceUpdate( false)
+	: Device(const_cast<char *>(name.c_str()), &error)
+	, mInitialized( false) 
+	, mName( name) 
+	, mVersion( "unknown")
+	, mAlwaysAllowDeviceUpdate( false)
 {
-	addCommand( Command::DEVICE_ON, &tacoDeviceOn, D_VOID_TYPE, D_VOID_TYPE);
-	addCommand( Command::DEVICE_OFF, &tacoDeviceOff, D_VOID_TYPE, D_VOID_TYPE);
-	addCommand( Command::DEVICE_RESET, &tacoDeviceReset, D_VOID_TYPE, D_VOID_TYPE);
-	addCommand( Command::DEVICE_STATE, &tacoDeviceState, D_VOID_TYPE, D_SHORT_TYPE);
-	addCommand( Command::DEVICE_STATUS, &tacoDeviceStatus, D_VOID_TYPE, D_VAR_CHARARR);
-	addCommand( Command::DEVICE_VERSION, &tacoDeviceVersion, D_VOID_TYPE, D_VAR_CHARARR);
-	addCommand( Command::DEVICE_TYPES, &tacoDeviceTypes, D_VOID_TYPE, D_VAR_STRINGARR);
-	addCommand( Command::DEVICE_QUERY_RESOURCE, &tacoDeviceQueryResource, D_VAR_CHARARR, D_VAR_CHARARR);
-	addCommand( Command::DEVICE_UPDATE_RESOURCE, &tacoDeviceUpdateResource, D_VAR_CHARARR, D_VOID_TYPE);
-	addCommand( Command::DEVICE_UPDATE, &tacoDeviceUpdate, D_VOID_TYPE, D_VOID_TYPE);
-	addCommand( Command::DEVICE_QUERY_RESOURCE_INFO, &tacoDeviceQueryResourceInfo, D_VOID_TYPE, D_VAR_CHARARR);
+	addCommand( Command::DEVICE_ON, &tacoDeviceOn, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "Device On");
+	addCommand( Command::DEVICE_OFF, &tacoDeviceOff, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "Device Off");
+	addCommand( Command::DEVICE_RESET, &tacoDeviceReset, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "Device Reset");
+	addCommand( Command::DEVICE_STATE, &tacoDeviceState, D_VOID_TYPE, D_SHORT_TYPE, READ_ACCESS, "Device State");
+	addCommand( Command::DEVICE_STATUS, &tacoDeviceStatus, D_VOID_TYPE, D_VAR_CHARARR, READ_ACCESS, "Device Status");
+	addCommand( Command::DEVICE_VERSION, &tacoDeviceVersion, D_VOID_TYPE, D_VAR_CHARARR, READ_ACCESS, "Device Version");
+	addCommand( Command::DEVICE_TYPES, &tacoDeviceTypes, D_VOID_TYPE, D_VAR_STRINGARR, READ_ACCESS, "Device Types");
+	addCommand( Command::DEVICE_QUERY_RESOURCE, &tacoDeviceQueryResource, D_VAR_CHARARR, D_VAR_CHARARR, READ_ACCESS, "Device Query Resources");
+	addCommand( Command::DEVICE_UPDATE_RESOURCE, &tacoDeviceUpdateResource, D_VAR_CHARARR, D_VOID_TYPE, SI_WRITE_ACCESS, "Device Update Resources");
+	addCommand( Command::DEVICE_UPDATE, &tacoDeviceUpdate, D_VOID_TYPE, D_VOID_TYPE, SI_SU_ACCESS, "Device Update");
+	addCommand( Command::DEVICE_QUERY_RESOURCE_INFO, &tacoDeviceQueryResourceInfo, D_VOID_TYPE, D_VAR_CHARARR, READ_ACCESS, "Device Query Resource Info");
 	setDeviceState(State::DEVICE_OFF);
-	setServerName("TACO::Server");
+//	setServerName("TACO::Server");
 }
 
-DevLong TACO::Server::Command(DevCommand command, void* argin, DevType inputType, void* argout, DevType outputType, DevLong* error)
+long TACO::Server::Command(DevCommand command, DevArgument argin, DevArgType inputType, DevArgument argout, DevArgType outputType, DevLong* error)
 {
 	DevShort status;
 	try {
@@ -108,13 +113,13 @@ const char* TACO::Server::GetDevName()
 	return mName.c_str();
 }
 
-DevLong TACO::Server::GetMinAccessRight(DevCommand command)
+long TACO::Server::GetMinAccessRight(DevCommand command)
 {
 	CommandMap::const_iterator i( mCommandMap.find( command));
-	if (i == mCommandMap.end()) {
+	if (i != mCommandMap.end()) {
 		return i->second.minAccess;
 	} else {
-		throw Exception( Error::RUNTIME_ERROR, "command not supported");
+		throw Error::RUNTIME_ERROR;
 	}
 }
 
@@ -123,7 +128,7 @@ unsigned TACO::Server::GetCommandNumber()
 	return mCommandMap.size();
 }
 
-DevLong TACO::Server::CommandQuery( _dev_cmd_info* info)
+long TACO::Server::CommandQuery( _dev_cmd_info* info)
 {
 	int i = 0;
 	
@@ -141,7 +146,7 @@ unsigned TACO::Server::GetEventNumber()
 	return mEventMap.size();
 }
 
-DevLong TACO::Server::EventQuery( _dev_event_info* info)
+long TACO::Server::EventQuery( _dev_event_info* info)
 {
 	int i = 0;
 	EventMap::const_iterator it( mEventMap.begin());

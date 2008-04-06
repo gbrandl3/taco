@@ -1,0 +1,691 @@
+/*! \page dsapi DSAPI 
+
+The DSAPI is the TACO Device Server Application Programmer's Interface for C and 
+C++ programs. It is used by clients and servers to import, execute commands on, 
+free and explore TACO devices. It uses the ONC-RPC (SUN remote procedure call) 
+as underlying communication protocol. This document describes the latest version 
+of the DSAPI V6.0. This document is split into the following sections :
+- "Getting Started" describes how to write a simple client which uses DSAPI, should 
+be read by beginner's who want to get a quick start; 
+- "Changes" describes what are the main changes in the different major releases; 
+
+
+Beginners should read "Getting Started" first, other programmers should read what 
+changes have taken place in the latest version and use the reference guide.
+
+\section what_s_dsapi What is DSAPI ? 
+
+DSAPI is a C (and C++) programmer's interface for accessing device in a TACO 
+control system. Devices in a TACO control system are network objects created 
+and served by processes called device servers. 
+A device is identified by its ASCII name :
+\verbatim
+[//facility/]domain/family/member 
+\endverbatim
+Each device understands a set of commands. The commands enable a remote client 
+to execute actions on a device e.g. for a powersupply switch it on or off, read 
+the state, read the current. The DSAPI gives remote and local clients access to 
+device commands. Using DSAPI it is possible to execute any command on any device 
+(assuming the client has the necessary permission) in a TACO control system. Data 
+is passed from the client to the device via the input and output parameters of 
+the DSAPI. Devices are organised into classes. Each class implements and understands 
+a fixed set of commands. The list of commands for a device class is documented 
+in the Device Server User's Guide (DSUG). The set of C functions which implement 
+the DSAPI are archived in static or shared libraries for all platforms supported.
+
+\section getting_started Getting Started 
+
+This section will take you through the steps of writing a simple application using 
+DSAPI. Two versions of a simple "Hello World" in C for sending a string to a 
+"hello world" device will be presented The first version demonstrates using the 
+DSAPI to execute commands synchronously while the second version demonstrates 
+asynchronous command execution. The user will be taken through the stages of 
+compiling, linking, debugging and running. The section will terminate with tips on 
+common pitfalls encountered by DSAPI beginner's (and even old-timer's sometimes).
+
+\subsection hello_worl_sync "Hello World" (synchronous) example 
+
+This example will take you through the steps of writing a simple program to send 
+a "Hello World" string to a device synchronously.
+
+Step 1 
+
+The first step is to find out which commands the device understands. If you don't 
+know them off by heart then get hold of the user guide (DSUG) for that device class 
+and read it. The DSUG will list all commands implemented for the device and their 
+input and output arguments. The command we will use in this example is DevHello.
+
+Step 2 
+
+The next step is to write the program. This assumes we know what we have to control 
+and how. In the case of this example we want a program which sends a string to a 
+device and reads one back. The program is written in C and uses a simple ascii 
+interface to interact with the user. The program listing can be found below (cf. 
+section "Code Example"). ALL device access is done using DSAPI (of course). The main 
+statements to note are :
+
+- \verbatim #include <API.h>\endverbatim - include file required by all clients (and servers). Necessary 
+to prototype all DSAPI functions, and to define symbols and types. API.h will 
+include other include as necessary.
+- devserver hs - variable which will contain the device handle. Every device has 
+to have a device handle. It is passed as input parameter to every DSAPI call. It 
+contains all information necessary to communicate with the device on the network 
+(network address, protocol, security etc.) as well as various bookkeeping 
+information (device name). The device handle is initialised on the first successful 
+call to \c dev_import() (cf. below).
+- dev_import() - initialise the device handle. This call takes as input the device 
+name and permission level requested. It checks the database to see if the device 
+is defined and if so it asks the database for the device's network address. Then 
+it tries to contact the device server. All this information is stored in the device 
+handle and returned to the user. If the device is not defined in the database or 
+the user does not have the necessary permission to use the device \c dev_import() 
+will return an error and the device handle will be NULL. The import is stateless 
+this means the routine will not fail if the device server is not running. The 2nd 
+parameter is used for security (this is discussed in the C library reference).
+- dev_putget() - execute a command on the device. This call is the workhorse of 
+DSAPI. It is used to execute a command on a device synchronously i.e. the client 
+sends her request to the device and then waits for the command to be executed and 
+for the answer to be returned before continuing. For the asynchronous version see 
+below. The client has to specify the input and output arguments and their types. 
+This information is normally obtained from the DSUG but can be constructed dynamically 
+(using \ref dev_cmd_query). All parameters are passed as pointers. If the output 
+arguments contain any pointers in them the client can choose to allocate space for 
+the result himself or let DSAPI allocate space. (by setting the pointer to NULL) 
+In the latter case it is up to the client to free the space allocated by DSAPI. 
+The question of when to allocate and when to free is a tricky one and is treated 
+in more detail in the section \ref common_pitfalls "Common Pitfalls".
+- dev_free() - free the device handle. This call will try to inform device server
+that the client is not connected to this device anymore. If this is the client's 
+last network connection to the device server it will free the socket connection 
+to the device server. Finally it will free the device handle structure allocated 
+by \ref dev_import().
+
+Step 3 
+
+The next step is to compile and link the client. This is different depending 
+whether you are using a Unix-like (HP-UX, Solaris, Linux, VxWorks), OS9 or a 
+Windows-NT system. 
+
+Unix and OS9 
+
+To compile under Unix and OS9 you have to tell the compiler where to find the 
+DSAPI include files and which libraries to link with. Assuming the your program 
+is called helloworld, DSHOME is an environment variable which points to the root 
+directory of your TACO installation and OS the operating system type (s700 for 
+HP-UX 9.x, hpux10.2 for HP-UX 10.2, solaris for Solaris, linux for Linux, 
+vxworks for VxWorks, os9 for OS9) then simply type : 
+\verbatim 
+$CC $CFLAGS -I$DSHOME/include -L$DSHOME/lib/$OS -ldsapi -ldbapi -ldsxdr helloworld.c -o helloworld.
+\endverbatim
+
+CC and CFLAGS have to be positioned for each platform (refer to the example 
+Makefile). 
+
+Windows-NT 
+
+To compile under Visual C++ 4.2 you need to set the following options using the 
+graphical interface : 
+
+to be filled in ...
+
+Step 4 
+
+The final step is to run your program. Make sure you are in a shell interpreter 
+(e.g. bash, ksh, tcsh, csh for Unix and MSDOS for Windows-NT) and simple type 
+the name of the client program plus the name of the device i.e. 
+\verbatim
+helloworld exp/hello/world. 
+\endverbatim
+If you forget to provide a device name the program will prompt you for one.
+
+Example code - helloworld.c 
+\include helloworld.c
+
+\subsection hello_world_async "Hello World" (asynchronous) example 
+
+This example is a repeat of the above but using the asynchronous version of DSAPI. 
+Asynchronism in this case means the client requests a command to be executed but 
+does not wait for the server to respond. Instead it continues on to the next 
+statement immediately. The request is put into the server's buffer of incoming 
+requests. After the server has executed the command it returns an acknowledge 
+plus any output arguments to the client asynchronously. The reply is buffered in 
+the clients queue of incoming replies. When the client is ready it polls its 
+input queue to see if there are any replies pending (using the dev synch() call).
+
+Asynchronous command execution is more difficult to program than synchronous. 
+However it is more efficient and is particularly useful for windowing programs 
+and for programs which want to start multiple commands on multiple devices 
+executing simultaneously and don't want to wait for the command to finish execution.
+
+This example is identical to the above example excepting for the fact that DevHello 
+command is executed asynchronously. A callback function specified. This makes 
+the code longer and more slightly more complicated to read.
+
+Step 1 
+
+Understanding the device - same as Step 1 above.
+
+Step 2 
+
+Writing the program - in principal same as Step 2 above however this time round 
+use the asynchronous version of DSAPI. The new calls are :
+- callbacks - functions to be called when client receives a reply. Every reply
+received by the client has to be signalled to the client and unpacked. The 
+callback functions serve this purpose. One callbacks functions has been implemented 
+for this example - \c hello_callback(). The client can pass its own data with every 
+asynchronous call which can be used to identify each reply during the callback 
+(user data parameter).
+- dev_putget_asyn() - execute a command asynchronously on a device. As explained 
+above the client does not wait for the server to accept the request for the reply. 
+The input arguments are the same as for \c dev_putget() (synchronous) plus three 
+additional arguments. The additional arguments specify the callback function (to 
+be triggered during a call to \c dev_synch()), a pointer to user data and an 
+asynchronous id (returned by dev_putget_asyn()).
+- dev_synch() - check to see if any asynchronous replies have been received. If
+so they are unpacked and the corresponding callback is triggered. dev_synch() 
+takes as input the amount of time it should wait for pending replies before 
+continuing.
+
+Step 3 
+
+Compiling and linking - same as Step 3 above for Unix and OS9. The asynchronous 
+calls are part of the standard library. Not support under Windows-NT (yet).
+
+Step 4 
+
+Running - same as Step 4 above for Unix and OS9. Not supported under Windows-NT 
+(yet).
+
+Example code - helloworld_asyn.c 
+\include helloworld_async.c
+
+\subsection common_pitfalls Common Pitfalls 
+
+Using an API is easy once you know how. For beginner's this is not the case. This 
+section will list the common pitfalls encountered by beginner's (and old-timers 
+too!) when they start using DSAPI.
+
+\subsection Nethost 
+
+Every TACO control system is managed by a NETHOST. The NETHOST is the name of 
+the host where the TACO Manager has been started. It is referred to as the 
+facility in the device name. The Manager is the entry point for all TACO 
+clients and servers. A common error when starting an application (e.g. helloworld) 
+is to forget to specify the NETHOST environment variable. In this case you will 
+get an error similar to this :
+\verbatim
+Thu Nov 6 13:56:42 1997 environmental variable NETHOST not defined 
+\endverbatim
+The solution is to set the environment variable to the name of a host where a 
+TACO control system Manager is running e.g. "setenv NETHOST libra" for csh or 
+"export NETHOST=libra" for ksh or bash. An alternative to specifying the 
+NETHOST environment variable is to qualify the device name with the facility 
+field which is the same as the NETHOST e.g. //libra/exp/hello/world. 
+
+If the Manager is not running you will get the following error :
+\verbatim
+Thu Nov 6 14:03:26 1997 no network manager available 
+\endverbatim
+
+If you don't know which host is your NETHOST then ask your TCO system 
+administrator/guru. If you are supposed to be the guru then start the Manager. 
+If you don't know how then send an email to the TACO help-line taco@esrf.fr
+
+\subsubsection shared_libraries Shared Libraries 
+
+Another common error is not finding the DSAPI shared libraries. If your application 
+dies with the following message :
+\verbatim
+./helloworld: can't load library 'libtaco.so' 
+\endverbatim
+You must add the DSAPI library directory for your platform to the shared library 
+path searched by your system. 
+For Solaris and Linux use : 
+setenv LD_LIBRARY_$PATH:$DSHOME/lib/$OS for csh and tcsh, 
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$DSHOME/lib/$OS for ksh and bash. 
+For HP-UX use : 
+setenv SHLIB_PATH $DSHOME/lib/$OS for csh and tcsh, 
+export SHLIB_PATH=$SHLIB_PATH:$DSHOME/lib/$OS for ksh and bash.
+
+Where DSHOME is an environment variable pointing to the TACO home directory and 
+OS the operating system flavour. Shared libraries are not supported on OS9 and 
+Windows/NT (yet).
+
+\subsection Makefiles
+Although the compile+link instructions listed above can be typed every time you want to recompile+relink it is much more efficient to write a makefile with the necessary instruct
+ions. The TACO makefiles are multi-platform and make use of the conditional statements supported by GNU make (also known as gmake). gmake supports statements of the kind ifdef $(symbol), else and
+ endif. Most TACO conditional makefiles use the same symbols. These are :
+
+- __hp9000s700 - for HPPA 1.0 systems running HP-UX 9.x
+- __hpux10 - for HPPA 1.0 systems running HP-UX 10.2
+- _solaris - for Solaris
+- linux - for Linux
+- vw68k - for Motorola 68k systems running VxWorks
+- vwx86 - for Intel 68k systems running VxWorks
+- _UCC - for OS9 system using the Ultra C and C++ Compiler
+- unix - for HP-UX, Solaris, Linux and VxWorks platforms
+
+A simple example Makefile for the helloworld program could look like this :
+
+\verbatim
+#
+#
+# Makefile for helloworld - a simple DSAPI client
+#
+#
+# TACO home directory
+#
+DSHOME = $(LOCAL.DSHOME)
+#
+# library home direcory - platform dependant
+#
+ifdef __hpux10
+LIBHOME = $(DSHOME)/lib/hpux10.2
+endif # __hpux10
+ifdef _solaris
+LIBHOME = $(DSHOME)/lib/solaris
+endif # _solaris
+ifdef linux
+LIBHOME = $(DSHOME)/lib/linux
+endif # linux
+ifdef _UCC
+LIBHOME = $(DSHOME)/lib/os9
+endif # _UCC
+ifdef vw68k
+LIBHOME = $(DSHOME)/lib/vw68k
+endif # vw68k
+ifdef vwx86
+LIBHOME = $(DSHOME)/lib/vwx86
+endif # vwx86
+#
+# include files home directory
+#
+INCLDIRS = -I$(DSHOME)/include \ 
+           -I$(DSHOME)/include/private
+#
+# compiler flags - platform dependant
+#
+ifdef __hpux10
+CC = /bin/cc
+CFLAGS = -Aa -g -DEBUG -Dunix -D.HPUX.SOURCE -D..hpux10 -DBSD=199704 \ 
+         -c $(INCLDIRS)
+endif # __hpux10
+ifdef _solaris
+CC = /opt/SUNWspro/SC4.0/bin/cc
+CFLAGS = -Xa -g -Dsolaris -DEBUG -c $(INCLDIRS)
+endif # _solaris
+ifdef linux
+CC = gcc
+CFLAGS = $(INCLDIRS) -Dlinux -Duniy -ansi -DEBUG -g -c
+endif # linux
+ifdef _UCC
+CC = xcc CFLAGS = -mode=c89 -g -D EBUG -to osk -tp 020 -x il -e as=. $(INCLDIRS)
+endif # _UCC
+ifdef vw68k
+CC = cc68k
+CFLAGS = -Dvxworks -Dunix -DCPU=MC68020 -ansi -m68030 \
+         -msoft-float -DEBUG -e $(INCLDIRS) -g
+endif # vw68k
+ifdef vwx86
+CC = cc386
+CFLAGS = -v -c -Dvxworks -Dunix -DCPU=I80386 -ansi \ 
+         -DEBUG $(INCLDIRS) -g
+endif # vwx86
+#
+# library flags
+#
+ifdef __hpux10
+LFLAGS = -L$(LIBHOME) -ldsapi -ldsxdr -ldbapi -lm
+endif # __hpux10
+ifdef _solaris
+LFLAGS = -L$(LIBHOME) -ldsapi -ldsxdr -ldbapi -lnsl -lsocket -lm
+endif # _solaris
+ifdef linux
+LFLAGS = -L$(LIBHOME) -ldsapi -ldsxdr -ldbapi -lm
+endif # linux
+ifdef _UCC
+LFLAGS = -L$(LIBHOME) -l dsapi -l dsxdr -l dbapi -l rpclib -l netdb_small \
+         -l socklib.l -l sys_clib.l -l unix.l
+endif # _UCC
+#
+#------------------------main-target-to-make------------------------------
+#
+all : helloworld
+
+helloworld : helloworld.c
+$(CC) $(CFLAGS) helloworld.c -o helloworld $(LFLAGS)
+\endverbatim
+
+\note don't forget to start all rules with a tabulation mark ! Although even this simple example looks complicated keeping all platform dependancies in one file can prove to be a time saver when developing on multiple platforms.
+
+\subsubsection memory_allocation Memory Allocation
+
+Probably the trickiest part for beginners to DSAPI is memory allocation. DSAPI
+uses the memory allocation of the XDR library of the ONC-RPC. The difficulties
+come from the fact that all procedure calls are to remote servers and pointers
+to memory areas have to be copied to the (remote) server and vice versa. The
+rules for memory allocation in DSAPI can be summarised as follows :
+-# arguments are either outgoing (input) or incoming (output) from the client
+to the server,
+-# all input and output arguments are passed via pointers,
+-# memory for input arguments have to allocated by the client (of course !),
+-# memory for pointers in output arguments can be allocated either by the client
+or by the DSAPI (actually the XDR layer),
+-# if memory in output arguments is to be allocated by DSAPI then initialise
+pointers in output arguments to NULL,
+-# if pointers to memory in output arguments are NOT initialised to NULL DSAPI
+assumes the client has allocated the necessary memory and will try to use it
+(with catastrophic consequences if this is not the case !),
+-# any memory allocated by DSAPI has to be freed by the client using
+\c dev_xdrfree().
+-# in order to avoid nasty bugs or strange core dumps therefore clients MUST
+initialise all incoming pointers to NULL or to locally allocated memory.
+
+If you understand the above rules and follow them you should not have any
+problems. The problems come from not understanding and following these rules.
+The XDR types supported by DSAPI are covered in the section on "XDR Types".
+
+To illustrate the above rules here are some examples :
+
+- simple C types
+
+\verbatim
+
+devserver ps;
+long status, error;
+float readvalue;
+.
+.
+.
+status = dev_putget(ps, DevReadCurrent, NULL, D_VOID_TYPE,
+                        &readvalue, D_FLOAT_TYPE, &error);
+printf("current %6.3f\n",readvalue);
+.
+.
+.
+
+\endverbatim
+
+This is a simple example of using a simple C type to receive output from the
+server. Simply pass the pointer to the simple type to DSAPI.
+
+\note DSAPI cannot allocated memory for simple types because it expects a
+pointer to a value and not a pointer to a pointer to a value and it therefore
+has no way of distinguishing between a pointer to the value ZERO and a pointer
+to NULL (if you know what I mean ...)
+
+- output arguments - memory allocated by client
+
+\verbatim
+devserver ps;
+long status, error, i;
+float readvalues[MAX_READVALUES];
+DevFloatVarArray float_vararr;
+.
+.
+.
+floatr_.vararr.length = MAXr_.READVALUES;
+float_vararr.sequence = readvalues;
+status = dev_putget(ps, DevReadAll, NULL, D_VOID_TYPE,
+                        &float.vararr, D.VAR.FLOATARR, &error);
+printf("read %d value\n\n",float.vararr.sequence);
+for (i=0; i!float_vararr.sequence; i++)
+{
+        printf(" current[%d] %6.3f\n", i, readvalues[i]);
+}
+.
+.
+.
+\endverbatim
+In this example the client receives a variable length array of floats. The client
+has allocated memory for the array of floats itself. It is the responsibility of
+the client to ensure that sufficient memory is allocated for the return argments
+and that the server does not send more values than the client expects.
+
+- output arguments - memory allocated by DSAPI
+
+\verbatim
+devserver ps;
+long status, error, i;
+DevFloatVarArray float.vararr;
+.
+.
+.
+float.vararr.length = 0;
+float.vararr.sequence = NULL;
+status = dev.putget(ps, DevReadAll, NULL, D.VOID.TYPE,
+                        &float.vararr, D.VAR.FLOATARR, &error);
+printf("read %d value"n"n",float.vararr.sequence);
+for (i=0; i!float.vararr.sequence; i++)
+{
+        printf(" current[%d] %6.3f"n", i, float.vararr.sequence[i]);
+}
+dev.xdrfree(D.VAR.FLOATARR, &float.vararr, &error);
+.
+.
+.
+\endverbatim
+
+In this example the client sets the sequence to NULL and lets DSAPI allocate memory
+for the output arguments. The client has to free the allocated memory.
+
+
+\subsection advanced_features Advanced Features 
+
+Before leaving the "Getting Started" section we would like to mention some advanced 
+features of the DSAPI which are very useful.
+
+\subsection Timeouts 
+
+The DSAPI is managed by timeouts. Both synchronous and asynchronous calls have a 
+timeout. A client will receive a timeout error (DevErr_RPCTimedOut) if the server 
+has not sent an answer within the timeout period. The default timeout for 
+synchronous calls is 3 seconds. The default timeout for asynchronous calls is 25 
+seconds. The client can modify the timeout per device using the dev_rpctimeout() 
+call (cf. the C library reference). This can be necessary if the request is know 
+to take longer than the default timeout to execute. If a client gets lots of 
+timeouts there could be a network problem i.e. lots of network traffic. This can 
+fixed by simply changing from UDP to TCP protocol (see next section).
+
+\subsection Protocol 
+
+The DSAPI is based on the ONC-RPC and makes use of UDP and TCP (the two main IP 
+protocols). The difference between the two protocols is :
+- UDP is a connectionless unreliable protocol. UDP has the advantage that it
+does not require a dedicated file descriptor per client-server connection and it 
+is (sometimes) faster than TCP. It has the disadvantage that it does not retry 
+if a request fails and it is limited in maximum packet size to 8 kilobytes. All 
+device imports are done using UDP. UDP is the default protocol
+- TCP is a connection-oriented reliable protocol. It has the advantage that it 
+is reliable i.e. it will retry if a request fails to be acknowledge, and can 
+transfer unlimited packet sizes (in reality limited by the receiving computer to 
+a few megabytes). It has the disadvantage that it requires a file descriptor per 
+client-server connection and it is a more complicated protocol to implement.
+
+To change from UDP to TCP or vice-versa use the dev rpc protocol() call (cf. below).
+
+\section Changes
+
+\subsection part1 Version 8.0
+
+Version 8 introduces support for TANGO. TANGO (http://www.esrf.fr/tango) is the new Version of TACO based
+on CORBA (instead of RPC) and with support for C++ and Java. The TANGO interface
+allows TACO clients to do a dev putget() call on a TANGO device in a transparent
+manner - simply add "tango:" in front of the device name to switch protocol from
+RPC to CORBA. To use the TACO-TANGO interface link your C or C++ program with the
+C++ linker and the libtaco++ library.
+
+\subsection part2 Version 7.0
+
+Version 7 introduces events. Events use the same mechanism as the asynchronous
+call for dispatching. They allow servers to be programmed to generate true
+asynchronous events to clients.
+
+\subsection part3 Version 6.0
+
+The main changes in the new version are the inclusion of true asynchronous
+dev putget() calls - dev putget asyn() and related calls (cf.
+"C library reference" above).
+
+\subsection part4 Version 5.1
+
+The main changes to this version were the following - support for multi-nethost,
+ports to Windows (95 and NT), Linux and VxWorks.
+
+\subsection part5 Version 4.1
+
+The main changes here were security was implemented, and port to Ultra C for OS9.
+
+\subsection part6 Version 3.37
+
+\subsubsection An Asynchronous dev_put()
+The new function dev_put_asyn() is similar to the ancient
+dev_put(). The only difference is, that dev_put_asyn() sends a request to execute
+a command to a device server and returns immediately when the command was received.
+The only errors which can be returned by dev_put_asyn() are errors during the
+sending of the command. A correct return status only indicates that the command
+execution was started. No failures during command execution can be reported back
+to the client.
+
+\code
+
+long dev_put.asyn (ds, cmd, argin, argin.type, error)
+	devserver	ds;		/// client handle to the device 
+	long		cmd;		/// command to execute 
+	DevArgument	argin;		/// pointer to input arguments 
+	DevType		argin_type	/// input argument data type 
+	long		*error; 	/// error 
+
+\endcode
+
+
+
+\subsubsection Destroying Objects
+
+With the function ds_destroy() a proper interface was created to destroy objects
+in a device server. Ds_destroy() searches for a destroy method (DevMethodDestroy)
+in the object class. If no destroy method is implemented in the object class, its
+superclasses are searched. Arriving at the end of the class tree, the destroy method
+of the general device server class will be executed. The general destroy method
+will free the object correctly only, if no memory allocation was done for object
+fields outside the DevServerPart structure of the object. The device name, as a
+field of DevServerPart will be freed correctly bye the general device server
+class destroy method. Also exported objects can be destroyed. They will be
+deleted from the list of exported devices and all client accesses will be stopped.
+
+\code
+long ds__destroy (ds, error)
+	DevServer	ds; 		/// pointer to the object 
+	lond		*error 		/// error 
+
+
+\endcode
+
+Attention:
+
+To destroy an exported object, ds_destroy() must be used. Executing only the
+destroy method will not delete the device from the list of exported devices. With
+the next client access a nice core will be generated.
+
+\subsubsection Accessing Process Internal Devices
+
+Until version 3.37 the only possibility to access devices internally was the
+function dev_cmd(). That was not enough to handle the coming security features.
+Out of this reason the functionality of the functions:
+
+\code
+
+					dev_import()
+					dev_putget()
+					dev_put()
+					dev_free()
+
+\endcode
+was enlarged. They can be used now on all exported devices, remote via RPCs or
+internally just via function calls. Dev_import() will detect automatically whether
+a device is internal and will avoid all overhang of the remote access on the
+client handle. Also memory treatment was unified. All outgoing arguments (remote
+or intern) are allocated by XDR. Dev_xdrfree() must be used to free the memory.
+
+Attention:
+
+This unified interface for device access works on all exported devices. Objects
+which are not exported, can be accessed only be dev_cmd(). To access process
+internal devices the unified interface must be used to avoid access and security
+problems in the coming releases.
+
+\subsubsection Dynamic Memory Allocation  
+
+
+The general structures handling exported devices and client connections to the
+devices
+
+\code
+typedef struct _DevServerSec {
+	long	 security_key;
+	long  	 access_right;
+	long	 single_user_flag; 
+	} DevServerSec;
+
+typedef struct _DevServerAccess {
+	DevServer	 ds;
+	char		 export_name[80];
+	long 		 export_status;
+	long		 export_counter;
+	long 		 single_user_flag;
+	long		 max_no_of_clients;
+	DevServerSec	 *client.access; 
+	} DevServerDevices;
+
+DevServerDevices 	*devices	///Exported devices; in DevServer.c
+
+\endcode
+
+
+are no longer static arrays. The are allocated dynamically in data blocks. The
+BLOCK SIZE is defined in ApiP.h and set to 5 structures per data block. To avoid
+the growth of a device server, all client connections should be freed correctly.
+
+\subsubsection The Device ID
+
+Every device in a server is referenced by a device ID. The ID is send with every
+client call to identify the device and is hidden to the user in the client handle
+to the device. Up to version 3.37 the device ID was a simple number. Indicating
+the position of the device in the list of exported devices. Now the device ID
+was split up into several information fields.
+
+\verbatim
+| 31 | 30             20 | 19         12 | 11             0 |
+-------------------------------------------------------------
+  |     |                    |              |
+  |     |                    |              |- Position in the
+  |     |                    |                 list of exported
+  |     |                    |                 devices.
+  |     |                    |
+  |     |                    |- Position in the
+  |     |                       list of client
+  |     |                       connections to
+  |     |                       the device.
+  |     |
+  |     |- Export counter
+  |
+  |- Local access flag
+\endverbatim
+The export counter field becomes interesting only if you destroy an exported
+object and reexport another or the same object again. In the case of a destroyed
+object, the export counter is increased and all client connections on the old value
+are no longer valid. A newly exported device might take the place in the list of
+exported devices afterwards. The Local access flag is set if the dev_import()
+detects a local device. The split up of the device ID limits a device server to
+the following values:
+
+\code
+
+	Maximum number of exported devices = 4096
+	Maximum number of client connections per device = 256
+
+\endcode
+
+*/
+
+

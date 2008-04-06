@@ -29,9 +29,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  *
  *******************************************************************-*/
 
@@ -69,9 +69,9 @@ xdr_length_DevThermocouple (objp)
 {
 	long  length = 0;
 
-	length = length + xdr_length_DevFloat (&objp->temperature);
-	length = length + xdr_length_DevShort (&objp->th_broken);
-	length = length + xdr_length_DevShort (&objp->th_alarm);
+	length += xdr_length_DevFloat (&objp->temperature);
+	length += xdr_length_DevShort (&objp->th_broken);
+	length += xdr_length_DevShort (&objp->th_alarm);
 
 	return (length);
 }
@@ -101,14 +101,13 @@ xdr_length_DevVarTHArray (objp)
 	 *  four bytes for the number of array elements
 	 */
 
-	length = length + xdr_length_DevLong ((long *)&objp->length);
+	length += xdr_length_DevLong (&objp->length);
 
 	/*
 	 *  now calculate the length of the array
 	 */
 
-	length = length + (objp->length *
-		 xdr_length_DevThermocouple(&objp->sequence[0]) );
+	length += (objp->length * xdr_length_DevThermocouple(&objp->sequence[0]) );
 
  	return (length);
 }
@@ -150,12 +149,12 @@ xdr_length_DevLienState (objp)
 {
         long    length = 0;
 
-	length = length + (64 * xdr_length_DevFloat (&objp->temp[0]));
-	length = length + 8;
-	length = length + 8;
-	length = length + 8;
-	length = length + 8;
-	length = length + 8;
+	length += (64 * xdr_length_DevFloat (&objp->temp[0]));
+	length += 8;
+	length += 8;
+	length += 8;
+	length += 8;
+	length += 8;
 
  	return (length);
 }

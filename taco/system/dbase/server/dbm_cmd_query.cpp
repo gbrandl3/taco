@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2006-12-15 12:43:53 $
+ * Date:	$Date: 2008-04-06 09:07:40 $
  *
  */
 
@@ -59,7 +59,7 @@
  *				0 if the database query fails
  *            }
  */
-cmd_que *NdbmServer::db_cmd_query_1_svc(nam *pcmd_name)
+cmd_que *NdbmServer::db_cmd_query_1_svc(DevString *pcmd_name)
 {
 	static cmd_que 	back;
 	int 		i;
@@ -75,7 +75,7 @@ cmd_que *NdbmServer::db_cmd_query_1_svc(nam *pcmd_name)
 			cmd_str,
 			req_cmd(*pcmd_name);
 
-	logStream->debugStream() << "Command name : " << req_cmd << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Command name : " << req_cmd << log4cpp::eol;
 //
 // Initialize error code sended back to client
 //

@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2006-12-15 12:43:53 $
+ * Date:	$Date: 2008-04-06 09:07:40 $
  *
  */
 
@@ -46,7 +46,7 @@ DBServer::DBServer()
 	char 	*ptr;
 	if ((ptr = (char *)getenv("DBTABLES")) == NULL)
 	{
-		logStream->fatalStream() << "dbm_server: Can't find environment variable DBTABLES" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "dbm_server: Can't find environment variable DBTABLES" << log4cpp::eol;
 		exit(-1);
 	}
 //
@@ -89,7 +89,7 @@ db_res *DBServer::secpass_1_svc()
 {
 	char pass[80];
 	
-	logStream->debugStream() << "In secpass_1_svc function" << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "In secpass_1_svc function" << log4cpp::eol;
 
 //
 // Initialize structure sent back to client
@@ -135,7 +135,7 @@ db_res *DBServer::secpass_1_svc()
 //	
 	try
 	{
-		browse_back.res_val.arr1_val = new nam[1];
+		browse_back.res_val.arr1_val = new DevString[1];
 		browse_back.res_val.arr1_val[0] = new char [strlen(pass) + 1];
 		strcpy(browse_back.res_val.arr1_val[0], pass);
 	}

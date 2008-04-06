@@ -1,0 +1,167 @@
+/*! \page ds_model Device Server Model (DSM) 
+
+\addindex ds_model
+
+
+\section dsm The Device Server Model
+
+This section will present the device server model (see figure), hereafter
+referred to as DSM. It will describe each of the basic features of the DSM and
+their function. The DSM can be divided into the following basic elements - the
+device, the server, Objects In C, the root class, the resource database, the
+commands, local access, network access, and the application programmers
+interface. This chapter will treat each of the above elements (except for OIC
+which is treated in the next chapter) separately. More details on the DSM can
+be found in G&ouml;tz et. al. (from which most of the information for this
+chapter have been taken).
+
+\subsection dsm_model The model
+
+The basic idea of the DSM is to treat each device as an object which is created
+and stored in a process called a server. Each device is a separate entity which
+has its own data and behaviour.  Each device has a unique name which identifies
+it in network name space. Devices are configured via resources which are stored
+in a database. Devices are organised according to classes, each device belonging
+to a class. Classes are implemented in C using a technique called Objects In C.
+All classes are derived from one root class. The class contains a generic
+description of the device i.e. what actions can be performed on the device and
+how to implement them. The actions are available via commands. Commands can be
+executed locally i.e. in the same process, or remotely i.e. across the network.
+Network access is implemented using a remote procedure call which is accessed
+via an application programmers interface.
+
+\subsection dsm_device The device
+
+The device is at the heart of the DSM. A device is an abstract concept defined
+by the DSM. In reality it can be a piece of hardware (e.g. an interlock bit) a
+collection of hardware (e.g. a screen attached to a stepper motor) a logical
+device (e.g. a taper) or a combination of all these (e.g. an accelerator). Each
+device has a unique name. At the ESRF a three field name space has been adopted
+consisting of DOMAIN/FAMILY/MEMBER. A document (see Taurel (1993)) exists which
+describes device names for the ESRF's Machine Control System. A similar document
+exists (see Pepellin (1993)) for the Beam Line Control Systems.
+
+\subsection dsm_server The server
+
+Another integral part of the DSM is the server concept. The server is a process
+whose main task is to offer one or more services to one or more clients. To do
+this the server has to spend most of its time in a wait loop waiting for clients
+to connect to it. This division of labour is known as the client-server concept.
+It is used extensively in many systems today (see Mullender (1990) for a good
+overview of the state of client-server technology today).
+
+\image html dsm_model.gif "The Device Server Model"
+\image latex dsm_model.eps "The Device Server Model" width=14cm
+
+\subsection root_class The root class
+
+All device classes are derived from the same class, the root class called the
+DevServerClass. The DevServerClass contains all common device server code. This
+includes all code related to the applications programmer interface, the database
+connection, security, administration and so on. Because all device classes are
+derived from this class they automatically inherit all this code. This makes
+maintenance and improvements to the DSM easy to carry out.
+
+\subsection device_class The device class
+
+Devices are organised into classes in order to generalise on common features
+between devices while at the same time hiding device dependent details. The device
+class contains a complete description and implementation of the behaviour of all
+members of that class. New device classes can be constructed out of existing device
+classes. This way a new hierarchy of classes can be built up in a short time.
+Device classes can use existing devices as sub-classes or as sub-objects. The
+practice of reusing existing classes is classical for OOP and is one of its main
+advantages. It encourages code to be written only once and maintained only once.
+Implementing device access in device classes forces the programmer to implement
+a generic solution.
+
+\subsection resource_database The resource database
+
+To achieve complete device independence it is necessary however to supplement
+device classes with a possibility for configuring device dependencies at runtime.
+The utility which does this in the DSM is the resource database. Resources are
+identified by an ASCII string and the device name. The link between resource and
+the device is done using the device name. Each device class should support a
+certain number of device resources. A well written device class will implement
+all device dependencies as resources. At device initialisation time the device
+class interrogates the resource database for all resources associated with each
+device being created.
+
+\subsection the_commands The commands
+
+Each device class implements a list of commands. Commands are very important
+because they are the client's dials and knobs for controlling a device. Commands
+are like special methods. They difference being they cannot be inherited by
+subclasses and they have a fixed calling syntax - consisting of one input argument
+and on output argument. Arguments can be any C type varying from simple types to
+complicated structures. Commands can execute any sequence of actions.  However
+because all commands are executed synchronously commands timing can become critical.
+
+Commands are executed across the network using the application programmers interface
+function dev_putget(). dev_putget() calls a special method implemented in the root
+class - the command_handler method. The command_handler calls the state_handler
+method implemented in the device class before calling the command itself. The
+state handler implements the state machine for all devices belonging to that device
+class. The state machine checks to see wether the command to be executed is
+compatible with the present state. The command function is only executed if the
+state handler returns DS_OK. The control flow at command execution is represented
+in figure ??.
+
+\image html cmd_exe.gif "Flow of command execution"
+\image latex cmd_exe.eps "Flow of command execution" width=14cm
+
+
+\subsection cmd_execute_local Executing commands locally
+
+If a device is created in a class or in a program it is possible to execute the
+device's commands locally i.e. in the same process. The convenience function for
+executing commands locally is dev_cmd(). Commands executed locally do not have
+any overhead and are consequently much quicker than the same commands executed
+over the network. This allows programs or other device classes which have to run
+close to the hardware because of performance or hardware constraints to use existing
+device classes locally. Devices which are created as members of a class are referred
+to as sub-objects. 
+
+\subsection cmd_execute_network Executing commands over the network
+
+Network access is implemented in the DSM in the root class. This is achieved with
+a remote procedure call (rpc). The DSM is presently use the rpc from SUN - the
+Network File System rpc or NFS/RPC. Data is transported in network format using
+the eXternal Data Representation (XDR format). The XDR routines are part of the
+NFS/RPC software. A library of routines is maintained for all basic C data types
+supported. This way not all device server programmers have to learn how to use
+the XDR routines. It is possible for the device server programmer to add new
+(exotic) types to this list.
+
+\subsection the_api The application programmers interface
+
+Device server clients access devices using the application programmer's interface
+(API). For performance reasons the device server API is based on the file paradigm.
+The file paradigm is the open-read-write-close paradigm. The device server API
+paradigm uses the import-put-get-free paradigm.  The three fundamental API calls
+are :
+-# A call to import a device :
+\code
+dev_import(char *name, dev_server *ds_handle, long access, long *error)
+\endcode
+-# A call to execute a command on a device :
+\code
+dev_putget(dev_server ds_handle, DevCommand cmd,
+        DevArgument *argin_ptr, DevType in_type,
+        DevArgument *argout_ptr, DevType out_type,
+        long *error);
+\endcode
+-# A call to free a device :
+\code
+dev_free (devserver ds_handle, long *error);
+\endcode
+
+Using these three calls clients can execute all commands implemented in the device
+class on an imported device. All calls are synchronous calls. This means that the
+clients waits for the call to complete before continuing. If the device server
+does not respond or the remote machine is down a timeout will occur. If the client
+continues to try executing dev_putget() calls and in the meantime the device
+server is running again the device will be automatically reimported. This last
+feature assumes that the device has been imported correctly before the connection
+was lost.
+*/

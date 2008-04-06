@@ -29,9 +29,9 @@
  *
  * Original:	May 93
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:22 $
  *
  *******************************************************************-*/
 
@@ -43,10 +43,10 @@
 
 struct DevVarLongFloatSet
 {
-	long length;
-	long *axis;
-	long *value;
-        float *valuef;
+	DevLong  length;
+	DevLong  *axis;
+	DevLong  *value;
+        DevFloat *valuef;
 };
 typedef struct DevVarLongFloatSet DevVarLongFloatSet;
 bool_t 	_DLLFunc xdr_DevVarLongFloatSet
@@ -61,10 +61,10 @@ bool_t 	_DLLFunc xdr_DevVarLongFloatSet
 
 struct DevVarLongRead
 {
-	long length;
-        long *value;
-	long *stat;
-	long *err;
+	DevLong length;
+        DevLong *value;
+	DevLong *stat;
+	DevLong *err;
 };
 typedef struct DevVarLongRead 	DevVarLongRead; 
 bool_t 	_DLLFunc xdr_DevVarLongRead
@@ -79,10 +79,10 @@ bool_t 	_DLLFunc xdr_DevVarLongRead
 
 struct DevVarPosRead
 {
-	long length;
-	float *pos;
-	long *stat;
-	long *err;
+	DevLong  length;
+	DevFloat *pos;
+	DevLong  *stat;
+	DevLong  *err;
 };
 typedef struct DevVarPosRead 	DevVarPosRead; 
 bool_t 	_DLLFunc xdr_DevVarPosRead PT_((XDR *xdrs, DevVarPosRead *objp));
@@ -96,14 +96,14 @@ bool_t 	_DLLFunc xdr_DevVarPosRead PT_((XDR *xdrs, DevVarPosRead *objp));
 
 struct DevVarAxeRead
 {
-	long length;
-	float *m_pos;
-	float *s_pos;
-	long *m_stat;
-	long *s_stat;
-	long *swit;
-        long *clutch;
-	long *err;
+	DevLong length;
+	DevFloat *m_pos;
+	DevFloat *s_pos;
+	DevLong  *m_stat;
+	DevLong  *s_stat;
+	DevLong  *swit;
+        DevLong  *clutch;
+	DevLong  *err;
 };
 typedef struct DevVarAxeRead 	DevVarAxeRead; 
 bool_t 	_DLLFunc xdr_DevVarAxeRead PT_((XDR *xdrs, DevVarAxeRead *objp));
@@ -117,15 +117,15 @@ bool_t 	_DLLFunc xdr_DevVarAxeRead PT_((XDR *xdrs, DevVarAxeRead *objp));
 
 struct DevVarParRead
 {
-	long length;
-	float *veloc;
-	float *acc;
-	float *fstep;
-	float *hslew;
-        float *backlash;
-	long *stepmode;
-	long *unit;
-	long *err;
+	DevLong  length;
+	DevFloat *veloc;
+	DevFloat *acc;
+	DevFloat *fstep;
+	DevFloat *hslew;
+        DevFloat *backlash;
+	DevLong  *stepmode;
+	DevLong  *unit;
+	DevLong  *err;
 };
 typedef struct DevVarParRead 	DevVarParRead; 
 bool_t 	_DLLFunc xdr_DevVarParRead PT_((XDR *xdrs, DevVarParRead *objp));
@@ -139,8 +139,8 @@ bool_t 	_DLLFunc xdr_DevVarParRead PT_((XDR *xdrs, DevVarParRead *objp));
 
 struct DevVarErrRead
 {
-	long length;
-	long *err;
+	DevLong length;
+	DevLong *err;
 };
 typedef struct DevVarErrRead 	DevVarErrRead; 
 bool_t 	_DLLFunc xdr_DevVarErrRead PT_((XDR *xdrs, DevVarErrRead *objp));

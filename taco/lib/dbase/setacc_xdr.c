@@ -27,9 +27,9 @@
  * 
  * Original:      
  *
- * Version:     $Revision: 1.8 $
+ * Version:     $Revision: 1.9 $
  *
- * Date:        $Date: 2006-09-18 22:15:37 $
+ * Date:        $Date: 2008-04-06 09:07:13 $
  *
  ****************************************************************************/
 
@@ -50,7 +50,7 @@
 #include <rpc/rpc.h>
 #endif
 
-bool_t _WINAPI xdr_nam(XDR *xdrs, nam *objp)
+bool_t _WINAPI xdr_nam(XDR *xdrs, DevString *objp)
 {
 	if (!xdr_wrapstring(xdrs, objp))
 		return (FALSE);
@@ -61,7 +61,7 @@ bool_t _WINAPI xdr_arr1(XDR *xdrs, arr1 *objp)
 {
 	if (!xdr_array(xdrs, (caddr_t *)&objp->arr1_val,
 			(u_int *)&objp->arr1_len, MAXU_INT,
-			sizeof(nam), (xdrproc_t)xdr_nam))
+			sizeof(DevString), (xdrproc_t)xdr_nam))
 		return (FALSE);
 	return (TRUE);
 }
@@ -251,16 +251,16 @@ bool_t _WINAPI xdr_psdev_elt(XDR *xdrs,psdev_elt *objp)
 {
 	if (!xdr_string(xdrs, &objp->psdev_name, DS_NAME_LENGTH))
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->poll))
+	if (!xdr_DevLong(xdrs, &objp->poll))
 		return (FALSE);
 	return (TRUE);
 }
 
 bool_t _WINAPI xdr_db_psdev_error(XDR *xdrs,db_psdev_error *objp)
 {
-	if (!xdr_long(xdrs, &objp->error_code))
+	if (!xdr_DevLong(xdrs, &objp->error_code))
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->psdev_err))
+	if (!xdr_DevLong(xdrs, &objp->psdev_err))
 		return (FALSE);
 	return (TRUE);
 }
@@ -268,9 +268,9 @@ bool_t _WINAPI xdr_db_psdev_error(XDR *xdrs,db_psdev_error *objp)
 
 bool_t _WINAPI xdr_db_devinfo_svc(XDR *xdrs,db_devinfo_svc *objp)
 {
-	if (!xdr_long(xdrs, &objp->device_type))
+	if (!xdr_DevLong(xdrs, &objp->device_type))
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->device_exported))
+	if (!xdr_DevLong(xdrs, &objp->device_exported))
 		return (FALSE);
 	if (!xdr_string(xdrs, &objp->device_class,DEV_CLASS_LENGTH))
 		return (FALSE);
@@ -280,13 +280,13 @@ bool_t _WINAPI xdr_db_devinfo_svc(XDR *xdrs,db_devinfo_svc *objp)
 		return (FALSE);
 	if (!xdr_string(xdrs, &objp->process_name,PROC_NAME_LENGTH))
 		return (FALSE);
-	if (!xdr_u_long(xdrs, &objp->server_version))
+	if (!xdr_DevULong(xdrs, &objp->server_version))
 		return (FALSE);
 	if (!xdr_string(xdrs, &objp->host_name,HOST_NAME_LENGTH))
 		return (FALSE);
-	if (!xdr_u_long(xdrs, &objp->pid))
+	if (!xdr_DevULong(xdrs, &objp->pid))
 		return (FALSE);
-	if (!xdr_u_long(xdrs, &objp->program_num))
+	if (!xdr_DevULong(xdrs, &objp->program_num))
 		return(FALSE);
 	if (!xdr_int(xdrs, &objp->db_err))
 		return (FALSE);
@@ -297,7 +297,7 @@ bool_t _WINAPI xdr_db_info_dom_svc(XDR *xdrs,db_info_dom_svc *objp)
 {
 	if (!xdr_string(xdrs, &objp->dom_name,DOMAIN_NAME_LENGTH))
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->dom_elt))
+	if (!xdr_DevLong(xdrs, &objp->dom_elt))
 		return (FALSE);
 	return (TRUE);
 }
@@ -313,13 +313,13 @@ bool_t _WINAPI xdr_var_dom(XDR *xdrs,var_dom *objp)
 
 bool_t _WINAPI xdr_db_info_svc(XDR *xdrs,db_info_svc *objp)
 {
-	if (!xdr_long(xdrs, &objp->dev_defined))
+	if (!xdr_DevLong(xdrs, &objp->dev_defined))
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->dev_exported))
+	if (!xdr_DevLong(xdrs, &objp->dev_exported))
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->psdev_defined))
+	if (!xdr_DevLong(xdrs, &objp->psdev_defined))
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->res_number))
+	if (!xdr_DevLong(xdrs, &objp->res_number))
 		return (FALSE);
 	if (!xdr_var_dom(xdrs, &objp->dev))
 		return (FALSE);
@@ -332,7 +332,7 @@ bool_t _WINAPI xdr_db_info_svc(XDR *xdrs,db_info_svc *objp)
 
 bool_t _WINAPI xdr_svcinfo_dev(XDR *xdrs,svcinfo_dev *objp)
 {
-	if (!xdr_long(xdrs, &objp->exported_flag))
+	if (!xdr_DevLong(xdrs, &objp->exported_flag))
 		return (FALSE);
 	if (!xdr_string(xdrs, &objp->name,DEV_NAME_LENGTH))
 		return (FALSE);
@@ -354,9 +354,9 @@ bool_t _WINAPI xdr_svcinfo_svc(XDR *xdrs,svcinfo_svc *objp)
 {
 	if (!xdr_string(xdrs, &objp->process_name,PROC_NAME_LENGTH))
 		return (FALSE);
-	if (!xdr_u_long(xdrs, &objp->pid))
+	if (!xdr_DevULong(xdrs, &objp->pid))
 		return (FALSE);
-	if (!xdr_u_long(xdrs, &objp->program_num))
+	if (!xdr_DevULong(xdrs, &objp->program_num))
 		return (FALSE);
 	if (!xdr_string(xdrs, &objp->host_name,HOST_NAME_LENGTH))
 		return (FALSE);
@@ -379,7 +379,7 @@ bool_t _WINAPI xdr_db_poller_svc(XDR *xdrs,db_poller_svc *objp)
 		return (FALSE);
 	if (!xdr_string(xdrs, &objp->process_name,PROC_NAME_LENGTH))
 		return (FALSE);
-	if (!xdr_u_long(xdrs, &objp->pid))
+	if (!xdr_DevULong(xdrs, &objp->pid))
 		return (FALSE);
 	if (!xdr_int(xdrs, &objp->db_err))
 		return (FALSE);
@@ -388,11 +388,11 @@ bool_t _WINAPI xdr_db_poller_svc(XDR *xdrs,db_poller_svc *objp)
 
 bool_t _WINAPI xdr_db_delupd_error(XDR *xdrs,db_delupd_error *objp)
 {
-	if (!xdr_long(xdrs, &objp->type))
+	if (!xdr_DevLong(xdrs, &objp->type))
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->number))
+	if (!xdr_DevLong(xdrs, &objp->number))
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->error))
+	if (!xdr_DevLong(xdrs, &objp->error))
 		return (FALSE);
 	return (TRUE);
 }
@@ -416,9 +416,9 @@ bool_t _WINAPI xdr_db_svc_net(XDR *xdrs, db_svc_net *objp)
 		return (FALSE);
 	if (!xdr_string(xdrs, &objp->host_name,HOST_NAME_LENGTH))
 		return (FALSE);
-	if (!xdr_u_long(xdrs, &objp->pid))
+	if (!xdr_DevULong(xdrs, &objp->pid))
 		return (FALSE);
-	if (!xdr_u_long(xdrs, &objp->program_num))
+	if (!xdr_DevULong(xdrs, &objp->program_num))
 		return (FALSE);
 	return (TRUE);
 }
@@ -429,7 +429,7 @@ bool_t _WINAPI xdr_db_svcarray_net(XDR *xdrs, db_svcarray_net *objp)
 			(u_int *)&objp->length, MAXU_INT,
 			sizeof(db_svc_net), (xdrproc_t)xdr_db_svc_net))
 		return (FALSE);
-	if (!xdr_long(xdrs, &objp->db_err))
+	if (!xdr_DevLong(xdrs, &objp->db_err))
 		return (FALSE);
 	return (TRUE);
 }

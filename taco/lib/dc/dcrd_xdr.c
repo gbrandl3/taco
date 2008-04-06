@@ -27,9 +27,9 @@
  *
  * Original:    1992
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2006-09-18 22:13:30 $
+ * Date:        $Date: 2008-04-06 09:07:15 $
  *
  ******************************************************************************/
 
@@ -182,7 +182,7 @@ bool_t xdr_mpar_back(XDR *xdrs, mpar_back *objp)
 bool_t xdr_xres_clnt(XDR *xdrs, xres_clnt *objp)
 {
 	long ftype;
-	long error;
+	DevLong error;
 	DevDataListEntry type_info;
 
 	ftype = objp->xargout_type;
@@ -243,7 +243,7 @@ bool_t xdr_xresv_clnt(XDR *xdrs, xresv_clnt *objp)
 bool_t xdr_xresh_clnt(XDR *xdrs, xresh_clnt *objp)
 {
 	long ftype;
-	long error;
+	DevLong error;
 	DevDataListEntry type_info;
 
 	ftype = objp->xargout_type;

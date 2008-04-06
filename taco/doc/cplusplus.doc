@@ -1,0 +1,572 @@
+/*! \page cplusplus Device Servers in C++ 
+\addindex cplusplus
+
+Device Servers are the distributed objects which form the heart of the TACO control 
+system. They were designed to be written in C based on a technique called Objects 
+in C (OIC). This technique was inspired by the Widget model in the X11 Intrinsics 
+Toolkit (Xt). 
+
+This chapter describes how to implement Device Servers in C++. This chapter will 
+describe the first C++ implementation of Device Servers taking as an example the 
+AGPowerSupply class. The advantages and disadvantages of this new implementation 
+will be discussed plus the possible future directions which sh/could be explored.
+
+\section dsm_plusplus  Device Server Model ++ 
+The Device Server Model (DSM) provides a framework for implementing and distributing 
+objects called devices in a networked environment. The original DSM (as described 
+in The Device Server Programmer's Manual) was comprised of the following elements :
+
+-# the device, 
+-# the server, 
+-# Objects in C, 
+-# the root class, 
+-# the device class, 
+-# the resource database, 
+-# the commands, 
+-# local access, 
+-# network access, and 
+-# the applications programmer's interface.
+
+Because the DSM has proved to be successful and in order to stay backwards compatible 
+the DSM has been kept as is and only the OIC part has been replaced. However replacing 
+OIC by C++ has meant a new terminology and technology for implementing the individual 
+elements of the DSM. In the C++ implementation the invidual elements of the DSM are 
+implemented as follows :
+
+-# a device is an instantiation of the base C++ class Device, 
+-# a server is an individual process in the classical operating system sense (here 
+nothing has changed),
+-# the root class is the C++ base class Device, 
+-# a device class is a C++ class derived from the public base class Device (e.g. 
+AGPowerSupply),
+-# the resource database is a database accessed via a database api (here nothing 
+has changed),
+-# commands are C++ protected member functions implemented in the device class,
+-# local access is implemented via the standard api call dev putget() or via the 
+virtual Command method implemented in the base class Device (the equivalent of the 
+old dev_cmd() function),
+-# network access is provided via the standard api call dev_putget(), 
+-# the applications programmer's interface is the same as before i.e. the client 
+does not know if the server is implemented in OIC or a C++
+
+In addition to the above basic elements the following additional points can be made 
+about the C++ implementation of the DSM :
+
+- the class initialise function (called once for every class) although not supported 
+by the C++ language has been retained in order to allow efficient implementation e.g. 
+for the retrieving of class resources, and is implemented as a virtual private method 
+in the base class Device,
+- the object initialise method has been suppressed, 
+- the state machine has (of course) been retained and is implemented as a virtual 
+public method in the base class,
+- a get resource method has been added as a standard method in all in order to retrieve 
+resources from the static database.
+- C++ does not support class variables in the same manner OIC does i.e. one copy of 
+a variable per class and derived class common to all instantiations of that class. 
+Class variables were therefore transformed into static class members, static variables 
+(with file scope) or in the worst case a copy of the variable was stored in each object.
+
+\section device_root_class Device root class 
+
+All device classes must be derived from the Device base class (also known as the 
+root class). The Device class replaces the old DevServer class. The server part 
+is implemented in the rpc stubs and in the standard Device Server main(). This 
+distinction between what is a device and what is a server creates a clean separation 
+between two functionally different aspects of the DSM. The following comments 
+can be made about the present implementation :
+
+- Device is implemented as an abstract class (one of its members, GetResources, 
+is a pure virtual function). This means Device cannot be instantiated and can 
+only serve as a base class for derived classes.
+- the new type DeviceCommandListEntry replaces the old DevCommandListEntry. 
+- a command is defined as a pointer member functions of the Device class (or a 
+class publicly derived from Device) which takes as arguments two void and one 
+long pointer and returns a long status. The void pointers refer to argin and 
+argout and have to be casted to the correct type inside the command.
+- the standard commands State() and Status() are implemented as virtual methods 
+in the base class.  This means that any derived class which does not implement 
+these commands automatically inherits the base class implementation.
+- a dummy StateMachine method is implemented as virtual method which always returns 
+DEVOK.
+- as mentioned above the object initialise as something different from the object 
+create method has been suppressed from the DSM. This has been done for simplicity 
+reasons (in the past most Device Server Programmer's did not know what the 
+difference between the two were) and also to be more in the spirit of C++. All 
+initialisation is now done at object create time in the class constructor method.
+- most of the variables required by the old DevServer implementation have been 
+retained for compatibility reasons e.g. class name, dev type, these are also needed 
+by the api when exporting a device.
+- each instantiation object of a class derived from Device has a pointer to the 
+commands list and the number of commands. This was unavoidable because C++ does 
+not support the notion of class variables.
+
+\subsection device_h Device.h - include file 
+
+The Device interface is defined in the public include file Device.h and is listed 
+below.
+
+\includelineno Device.h
+
+\subsection device_cpp Device.cpp - source code file 
+
+The following points can be made about the Device class source code implementation :
+
+- the Device constructor Device::Device (listed below) defines a command list 
+containing two commands 
+	- DevState and 
+	- DevStatus
+	. 
+This command list will normally be overridden by the derived device class but 
+in the case that the device class defines no command list the derived class 
+will have at least the two standard commands.
+- the ClassInitialise method is called from the constructor via the static 
+variable class_inited.
+\dontinclude Device.cpp
+\skip Device::Device
+\until this->state = DEVON;
+\line }
+- one of the most important member methods of the Device class is the Command
+method which searches for the required command in the device class' command 
+list, calls the state machine and then calls the command. One not so clean 
+feature of this implementation is that the type checking is done by the method 
+and not by the C++ compiler but this has so far proved unavoidable. Command 
+is defined to virtual so that it can be overloaded by any of the subclasses. 
+This is necessary for the OICDevice class which needs to call the (old) 
+OIC_DevMethodCommandHandler. Normally no other classes need to overload the 
+Command method.
+\dontinclude Device.cpp
+\skip Device::Command
+\until name = NULL;
+\line }
+\line }
+
+\section power_supply_class PowerSupply class an example superclass 
+
+At the ESRF the functionalities of a standard powersupply class have been 
+defined (cf. DSN/078) and are implemented in the superclass PowerSupplyClass 
+in OIC. This section describes an equivalent C++ implementation which 
+respects the ESRF standard. The following points can be made about this 
+implementation :
+
+- PowerSupply is defined as an abstract class (it has one pure virtual 
+function (StateMachine)).  This means it can only be used as a base class for 
+other derived classes and cannot be instantiated,
+
+- the exact same types for class member variables were used for the C++ 
+implementation as for the previous OIC implementation, the only difference being 
+that they were defined as protected which means that they are only visible to 
+classes derived from the PowerSupply class,
+
+- CheckReadValue is implemented as a protected method to be used only by classes 
+derived from the PowerSupply class.
+
+\subsection power_supply_h PowerSupply.h - include file 
+\dontinclude powersupply/PowerSupply.h
+\skip class PowerSupply : public Device
+\until };
+
+\subsection power_supply_cpp PowerSupply.cpp - source code file 
+
+The implementation of PowerSupply class is very simple and does not do much. One 
+interesting point however is the GetResources method which retrieves the delta_i 
+and time constant resources. Because this is called directly from the constructor 
+during initialisation it is transparent to the sub-classes. This was not possible 
+in the OIC and demonstrates the advantage of using C++. Here is the listing of 
+the GetResources method :
+\dontinclude PowerSupply.cpp
+\skip long PowerSupply::GetResources 
+\until return(DS_OK);
+\line }
+
+\section agpowersupply_class AGPowerSupply class - an example derived class 
+
+AGPowerSupply is an example of a device class derived from the PowerSupply class, 
+it simulates a real powersupply and is one of the simulators used by the 
+application programmers to simulate the machine. 
+
+The class definition can be found in the public include file (AGPowerSupply.h). 
+The following comments can be made on present implementation :
+
+- the State command is inherited from base class Device, 
+- the Status command implemented in the AGPowerSupply derived class overrides the 
+base class implementation.
+
+\subsection agpower_supply_h AGPowerSupply.h - include file 
+\dontinclude powersupply/AGPowerSupply.h
+\skip class AGPowerSupply : public PowerSupply
+\until };
+
+\subsection agpower_supply_cpp AGPowerSupply.cpp - source code 
+
+Below are some examples taken from the AGPowerSupply.cpp source code which 
+illustrates some of the details of the C++ implementation.
+
+- the notion of template has been kept in the present C++ implementation. This 
+is done in a somewhat unorthodox manner because of the fact that C++ does not 
+implement this feature. A global pointer to a copy of an AGPowerSupply is 
+defined in static address space. The pointer is initialised to point to a block 
+of memory of size sizeof(AGPowerSupply) allocated in ClassInitialise. The individual 
+fields of the template are then initialised to the class defaults in ClassInitialise. 
+The reason for this unorthodox approach is because it is not possible to address 
+an object which does not exist (if you understand what I mean !) \note if agps 
+template was defined as a new AGPowerSupply the first time the constructor is 
+called it will try to access agps_template->something but agps template does not 
+exist yet and will generate a bus error
+
+\dontinclude AGPowerSupply.cpp
+\skip long AGPowerSupply::ClassInitialise 
+\until return(iret)
+\line }
+
+- the command list references the two commands DevState and DevStatus in the base 
+class Device.  Because they are defined in the base class as virtual C++ uses 
+dynamic binding to resolve them and therefore at runtime Device::DevState and 
+AGPowerSupply::DevStatus are executed respectively.
+\dontinclude AGPowerSupply.cpp
+\skip static Device::DeviceCommandListEntry commands_list
+\until READ_ACCESS, "DevStatus"
+
+- simple commands (e.g. which don't take input or output parameters) have not 
+changed much in their implementation e.g. AGPowerSupply::Off looks as follows :
+\skip long AGPowerSupply::Off 
+\until return (DS_OK)
+\line }
+
+- commands which take input or output parameters have to cast their parameters 
+from void to pointers to the correct type. Here is an example of 
+AGPowerSupply::Update which calls two other commands to return the state, set 
+and read value :
+\dontinclude AGPowerSupply.cpp
+\skip long AGPowerSupply::Update ( void *vargin, void *vargout, long *error)
+\until return(DS_NOTOK)
+\line }
+
+\section startup_cpp startup.cpp - an example startup file 
+
+Any device which has to be served by a Device Server has to be created and 
+exported as usual in a startup procedure. Listed below is an example startup() 
+for the AGPowerSUpply class which reads a list of devices form the static database, 
+instantiates them, executes a command on them (to see if they are alive) and then 
+exports them.
+\include startup.cpp
+
+\section oicdevice_wrapper_class OICDevice wrapper class 
+
+Writing device servers in C++ is no problem for new classes which do not depend 
+on any existing classes. However one of the main aims of object oriented 
+programming is code reuse. Seeing as the majority of classes at the ESRF were 
+written before C++ was available on OS9 they were written in C using the Objects 
+In C (OIC) methodology. It is vital therefore that C++ classes can (re)use 
+OIC classes. Two possibilities of including OIC classes in C++ considered were :
+
+-# calling the OIC C functions ds create(), ds method finder() directly from C++,
+-# writing a C++ wrapper class for OIC which "wraps" the OIC DevServer objects as 
+a C++ Device objects.
+
+The first method (C++ calls OIC C directly) poses the problem of what happens when 
+the programmer wants to export a mixture of C++ and C objects onto the network? 
+The device server main() routine assumes can manage a list of either all OIC 
+DevServer's or all C++ Device's but not both. It was decided therefore to use the 
+second method (C++ wrapper class) and write a class called OICDevice. 
+
+OICDevice is a C++ wrapper class for OIC classes. OICDevice is a generic class for 
+creating objects of any OIC class, it is derived from the Device root class. The 
+result is a C++ OICDevice object which has a pointer to the actual OIC object. Seen 
+from the C++ programmer's point of view it appears as a C++ object. It has the same 
+interface as all other C++ objects dervied from Device. Executing commands on the 
+object will result in the OIC command method handler being called. Some points to 
+be aware of when wrapping your OIC objects with OICDevice :
+
+- OICDevice implements basic versions of DevState and DevStatus which access the OIC 
+device state,
+- the actual state of the OICDevice object is stored in the OIC object, to access it 
+use (short)this->ds->devserver.state (and NOT the state variable in the Device part 
+of the object),
+- to access the OIC object use the pointer stored in the OICDevice object part i.e. 
+this->ds (use this for example to access any fields of the OIC object e.g. 
+((PowerSupply)this->ds)->powersupply.set_val),
+- to access the OIC object's class use the pointer stored in the OICDevice object 
+part i.e.  this->ds class,
+
+Note the OICDevice class is only a wrapper class for encapsulating OIC objects and 
+not classes. 
+
+Because of the differences between the OIC and C++ implementations it is not possible 
+to derive new C++ classes from existing OIC classes as sub-classes. It is however 
+possible to instantiate OIC classes in C++. If you want to use an existing OIC class 
+as a super-class for C++ then you have to rewrite the OIC class in C++.
+
+\subsection oicdevice_h OICDevice.h - include file 
+
+Here is the source code of the OICDevice.h header file which defines the interface 
+to the OICDevice class :
+\include OICDevice.h
+
+\subsection oic_device_startup_cpp startup.cpp - an example 
+
+Here is an example of a simple C++ startup function which creates a OIC AGPowerSupply 
+object in C++ using the OICDevice wrapper class (note the syntax for the full C++ 
+case commented out) :
+\code
+//+********************************************************************** // 
+// Toolkit for building distributed control systems or any other distributed system.
+//
+// Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+//                            Grenoble, France
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
+// File: 	startup.cpp 
+// 
+// Project: 	Device Servers in C++ 
+// 
+// Description: startup source code file for testing the OIC AGPowerSupply class 
+// 		in C++. AGPowerSupply class implements a simulated powersupply 
+// 		derived from the base classes PowerSupply and Device (root // class). 
+// 
+// Author(s): 	Andy Goetz 
+// 		$Author: jkrueger1 $ 
+// 
+// Original: 	November 1997 
+// 
+// Version:	$Revision: 1.2 $ 
+// 
+// Date:	$Date: 2008-04-06 09:06:41 $ 
+// 
+//+**********************************************************************
+
+#include <iostream.h> 
+#include <API.h> 
+#include <Device.H> 
+#include <DevServer.h> 
+#include <DevServerP.h> 
+#include <OICDevice.H> 
+#include <PowerSupply.h>
+
+#include <PowerSupplyP.h> 
+#include <AGPowerSupply.h> 
+#include <AGPowerSupplyP.h>
+
+#define MAX_DEVICES 1000 
+
+long startup(char *svr_name, long *error) 
+{
+	char **dev_list; 
+	unsigned int n_devices, i; 
+	OICDevice *device[MAX_DEVICES]; 
+	short state; 
+	long status;
+
+	printf ("startup++() program to test dserver++ (server name = %s)\n",svr_name); 
+// 
+// get the list of device name to be served from the static database 
+//
+	if (db_getdevlist(svr_name,&dev_list,&n_devices,error)) 
+	{
+		printf("startup(): db_getdevlist() failed, error %d\n",*error); 
+		return(-1); 
+	}
+	printf("following devices found in static database: \n\n"); 
+	for (i=0;i<n_devices;i++) 
+	{
+		printf("\t%s\n",dev_list[i]); 
+	}
+
+// 
+// now loop round creating and exporting the devices 
+//
+
+	for (i=0; i<n_devices; i++)
+	{
+// 
+// DO NOT create AGPowerSupply (C++) objects 
+// 
+// 		device[i] = new AGPowerSupply(dev_list[i],error); 
+// 
+// 
+// create old (OIC) AGPowerSupply objects 
+//
+		device[i] = new OICDevice(dev_list[i],(DevServerClass)aGPowerSupplyClass,error); 
+// 
+// test calling Device::State via Device::Command method 
+//
+		device[i]->Command(DevState, NULL, D_VOID_TYPE, (void*)&state, D_SHORT_TYPE, error); 
+// 
+// export the device onto the network 
+//
+		status = devr_export((char*)device[i]->name,(Device*)device[i],(long*)error); 
+		printf("startup++() dev.export() returned %d (error = %d)\n",status,*error); 
+	}
+
+	return(DS_OK); 
+}
+\endcode
+
+\section Implementation 
+
+In designing the present implementation the following requirements were considered :
+
+-# to conserve as much as possible the investment made in the device server api 
+and the existing classes,
+-# to be compatible with any further developments made in the api, 
+-# clients should not have to be modified. 
+
+Based on these requirements it was decided to implement only the device classes 
+in C++ and keep the api in C thereby satisfying all three requirements. It means 
+that there is only one api implementation and it can be continued to be developed 
+and the improvements/bug fixes will be visible to device servers written in C and 
+C++ and to clients. To implement device servers in C++ the following modifications 
+were made:
+<ol>
+<li> the svc api.c file (which implements the rpc stubs for the api functions) was 
+modified so that 
+	<ul>
+	<li> when compiled with the C compiler it uses the OIC DevMethodCommandHandler and 
+	<li> when compiled with C++ it calls the Device::Command method. 
+	</ul>
+Here is an example taken from the dev putget() function :
+\code
+#ifndef __cplusplus 
+/*
+ * OIC version 
+ */
+	client_data.status = (ds__method.finder (ds, DevMethodCommandHandler))
+			(ds, server_data->cmd, 
+			 server_data->argin, server_data->argin_type, 
+			 client_data.argout, client_data.argout_type, 
+			 &client_data.error); 
+#else 
+/*
+ * C++ version 
+ */
+	client_data.status = device->Command(server_data->cmd,
+			(void*)server_data->argin, server_data->argin.type, 
+			(void*)client_data.argout, client_data.argout.type, 
+			&client_data.error); 
+#endif /* __cplusplus */
+\endcode
+<li> svc api.c was also modified so that it can deal with Devices and not DevServers 
+anymore. In OIC a list of DevServer has to be managed, while in C++ a list of Device 
+has to be managed i.e.
+\code
+#ifndef __cplusplus
+	DevServer ds;
+	ds = (DevServer) ptr_ds; 
+#else
+	Device *device;
+	device = (Device*) ptr_ds; 
+#endif /* __cplusplus */
+\endcode
+<li>All include files had to be modified to declare external functions as C functions
+for the C++ compiler e.g.
+\code
+extern "C" long dev_export PT_((char* dev_name, Device *ptr_dev, long *error))
+\endcode
+</ol>
+
+\section Compilers 
+
+The first C++ implementation was done in 1995 (by AG) using the HP CC compiler on the HP 9000/700 
+series. This compiler is a 2.x C++ compiler and supports symbolic debugging. When compiling the 
+following symbols have to be defined STDC , unix, and HPUX SOURCE. In 1996 this work was repeated 
+(by ET) for the Kicker Powersupply at the ESRF using the Ultra-C++ compiler from Microware and 
+the GNU g++ compiler on HP-UX. For the future we propose that wherever possible the GNU g++ 
+compiler must be used. Where it is not possible the best adapted native compiler should be used. 
+This is clearly the case for OS9 where the native Ultra-C++ compiler from Microware is the obvious 
+choice. This is not so clear for HP-UX - the GNU g++ compiler does not support exceptions but is 
+otherwise a good choice. For the present g++ is supported under HPUX (i.e. the C++ libraries are 
+compiled only with the g++ compiler)
+\note that because the GNU compiler uses a different algorithm for "name mangling"
+it is not possible to mix GNU object files with those compiled with a different compiler
+ 
+
+\section template_class Template Class 
+
+In the absence of xclassgen supporting C++ we have written templates for a 
+Template class. The templates were derived from the KickerSupply class but have 
+never been compiled (i.e. we do not guarantee there are no bugs !). To use the 
+templates simply copy them and modify them with a global editor replacing all 
+occurrences of Template and template with MyNewClassName and mynewclassname 
+(the name of your new class). The templates can be found in 
+
+libra:/users/d/dserver/classes++/template :
+
+-# include/Template.H - template include file 
+-# src/Template.cpp - template source file 
+-# src/startup.cpp - template startup file 
+-# src/Makefile - template Makefile for HPUX and Ultra C++ 
+
+
+\section cplusplus_programming_style C++ Programming Style 
+
+The following style conventions have been adopted :
+
+- the suffixes .h and .cpp were used for C++ include files and source files respectively.
+- the C++ commenting style which uses // at the beginning of each line has been used in order to 
+distinguish it from the pure C style of \code (/* bla bla ...*/)\endcode
+- extensive use of the this pointer has been made to make the code as explicit and readable as possible.
+- no use has been made of ref types.
+
+\section cplusplus_advantages Advantages of C++ 
+
+The following are some of the advantages of using C++ for writing device servers as opposed to OIC :
+
+-# C++ is a real language with compiler support and symbolic debuggers, 
+-# C++ is well documented and has a large selection of literature (see the section on Suggested Reading),
+-# because of the compiler support for C++ it is easier to program new classes, the programmer does 
+not have to learn the many big and small letter conventions of OIC,
+-# a new class can have more than one base class (polymorphism), 
+-# C++ is more compatible with new products for which only C++ bindings exist e.g. Corba, DOOCS and cdev.
+
+\section cplusplus_disadvantages Disadvantages of C++ 
+
+There are not many disadvantages of using C++ but here are some of them :
+-# C++ with all its many concepts and possibilities has a steep learning curve, 
+-# extensive use of operator overloading, function overloading and virtual functions can very quickly 
+make C++ totally unreadable,
+-# C++ executables are big (ss 500 kilobytes on HP-UX) compared to OIC executables (ss 150 kilobytes 
+on HP-UX).
+
+\section cplusplus_future Future developments 
+
+Some of the future directions to be considered are :
+
+-# ports to other platforms e.g. Solaris, Linux, LynxOS, vxWorks, will be undertaken,
+-# the class generator tool will be extended so that it can generate C++, 
+-# more use of inline functions should be made,
+-# define and implement C++ bindings for the database API and the device server API (DOOCS or cdev?).
+-# if templates and exception handling become standard on all compilers then investigate how they can 
+
+\section Conclusion
+
+OIC has served a useful purpose but the time has come to move to a real object
+oriented language and C++ seems to be the obvious choice. The present imple-
+mentation shows that it is possible to implement Device Servers in C++ and still be
+backwards and forwards compatible with the device server api and the existing OIC
+classes.
+
+
+\section suggest_reading Suggested Reading
+
+A lot of literature exists on C++ (books, journals, conferences proceedings etc.) here is a short
+list of titles which can be recommended :
+
+-# C++ Primer by Stanley B. Lippman,
+-# The C++ Programming Language by Bjarne Stroustrup,
+-# The Annotated C++ Reference Manual by Margaret Ellis and Bjarne Stroustrup (ANSI Base Document),
+-# Effective C++: 50 Specific Ways to Improve Your Programs and Designs by Scott Meyers,
+-# More Effective C++: 35 New Ways to Improve Your Programs and Designs by Scott Meyers,
+
+*/

@@ -29,9 +29,9 @@
  *
  * Original:    April 1992
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:21 $
  *
  *******************************************************************-*/
 
@@ -53,10 +53,10 @@ xdr_DevCtIntLifeTime (xdrs, objp)
 	if (!xdr_float(xdrs, &objp->LifeTime)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->DateTicks)) {
+	if (!xdr_DevLong(xdrs, &objp->DateTicks)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->DeltaTused)) {
+	if (!xdr_DevLong(xdrs, &objp->DeltaTused)) {
 		return (FALSE);
 	}
 	return (TRUE);
@@ -69,10 +69,10 @@ xdr_length_DevCtIntLifeTime(objp)
 	{
 	long  length = 0;
 
-	length = length + xdr_length_DevFloat (&objp->DeltaIntensity);
-	length = length + xdr_length_DevFloat (&objp->LifeTime);
-	length = length + xdr_length_DevLong  (&objp->DateTicks);
-	length = length + xdr_length_DevLong  (&objp->DeltaTused);
+	length += xdr_length_DevFloat (&objp->DeltaIntensity);
+	length += xdr_length_DevFloat (&objp->LifeTime);
+	length += xdr_length_DevLong  (&objp->DateTicks);
+	length += xdr_length_DevLong  (&objp->DeltaTused);
 
 	return (length);
 }
@@ -103,14 +103,13 @@ xdr_length_DevVarCtIntLifeTimeArray (objp)
 	 *  four bytes for the number of array elements
   	 */
 
-	length = length + xdr_length_DevLong ((long *)&objp->length);
+	length += xdr_length_DevLong (&objp->length);
 
 	/*
 	 *  now calculate the length of the array
 	 */
 
-	length = length + (objp->length *
-	         xdr_length_DevCtIntLifeTime(&objp->sequence[0]) );
+	length += (objp->length * xdr_length_DevCtIntLifeTime(&objp->sequence[0]) );
 
 	return (length);
 }

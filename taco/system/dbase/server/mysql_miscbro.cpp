@@ -19,15 +19,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * File:
- *
+ *		mysql_miscbro.cpp
  * Description:
  *
  * Authors:
- *		$Author: jlpons $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2006-12-12 17:23:08 $
+ * Date:	$Date: 2008-04-06 09:07:41 $
  *
  */
 
@@ -46,9 +46,7 @@ db_res *MySQLServer::devserverlist_1_svc()
     std::vector<std::string> 	serv_list;
     int			i;
 	
-#ifdef DEBUG
-    std::cout << "In devserverlist_1_svc function" << std::endl;
-#endif
+    logStream->debugStream() << "In devserverlist_1_svc function" << log4cpp::eol;
 
 //
 // Initialize structure sent back to client
@@ -59,9 +57,9 @@ db_res *MySQLServer::devserverlist_1_svc()
 //
 // If the server is not connected to the database, return error
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -75,7 +73,7 @@ db_res *MySQLServer::devserverlist_1_svc()
     query = "SELECT DISTINCT SUBSTRING_INDEX(SERVER,'/',1) FROM device ORDER BY SERVER ASC";
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return(&browse_back);			
     }
@@ -84,9 +82,9 @@ db_res *MySQLServer::devserverlist_1_svc()
     while ((row = mysql_fetch_row(result)) != NULL)
     {
 	serv_list.push_back(row[0]);		
-#ifdef DEBUG
-	std::cout << "devserverlist_1_svc(): server found " << row[0] << std::endl;
-#endif /* DEBUG */
+
+	logStream->debugStream() << "devserverlist_1_svc(): server found " << row[0] << log4cpp::eol;
+
     }
     mysql_free_result(result);
 //
@@ -102,14 +100,6 @@ db_res *MySQLServer::devserverlist_1_svc()
         serv_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
         (browse_back.res_val.arr1_val[i])[k] = '\0';
     }                                                                                                                                        
-#if 0
-    if (serv_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
-    {
-	std::cout << "Memory allocation error in devserverlist" << std::endl;
-	browse_back.db_err = DbErr_ServerMemoryAllocation;
-	return(&browse_back);
-    }
-#endif
 //
 // Return data
 //
@@ -124,15 +114,13 @@ db_res *MySQLServer::devserverlist_1_svc()
  * 
  * @param The family name list
  */
-db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
+db_res *MySQLServer::devpersnamelist_1_svc(DevString *server)
 {
     std::string 		user_server(*server);
     std::vector<std::string>	pers_list;
     int			i;
 
-#ifdef DEBUG
-    std::cout << "In devpersnamelist_1_svc function for server " << user_server << std::endl;
-#endif
+    logStream->debugStream() << "In devpersnamelist_1_svc function for server " << user_server << log4cpp::eol;
 
 //
 // Initialize structure sent back to client
@@ -143,9 +131,9 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
 //
 // If the server is not connected to the database, return error
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	return(&browse_back);
     }
@@ -161,7 +149,7 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
     query += (user_server + "/%' ORDER BY SERVER ASC");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseAccess;
 	return(&browse_back);			
     }
@@ -170,9 +158,7 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
     while ((row = mysql_fetch_row(result)) != NULL)
     {
 	pers_list.push_back(row[0]);
-#ifdef DEBUG
-	std::cout << "devserverlist_1_svc(): server found " << row[0] << std::endl;
-#endif /* DEBUG */
+	logStream->debugStream() << "devserverlist_1_svc(): server found " << row[0] << log4cpp::eol;
     }
     mysql_free_result(result);
 //
@@ -188,14 +174,6 @@ db_res *MySQLServer::devpersnamelist_1_svc(nam *server)
         pers_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
         (browse_back.res_val.arr1_val[i])[k] = '\0';
     }                                                                                                                                        
-#if 0
-    if (pers_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
-    {
-		std::cout << "Memory allocation error in devpersnamelist" << std::endl;
-		browse_back.db_err = DbErr_ServerMemoryAllocation;
-		return(&browse_back);
-    }
-#endif
 //
 // Return data
 //
@@ -212,9 +190,7 @@ db_res *MySQLServer::hostlist_1_svc()
 {
 	std::vector<std::string>	host_list;
 	
-#ifdef DEBUG
-	std::cout << "In hostlist_1_svc function" << std::endl;
-#endif
+	logStream->debugStream() << "In hostlist_1_svc function" << log4cpp::eol;
 
 //
 // Initialize structure sent back to client
@@ -226,8 +202,9 @@ db_res *MySQLServer::hostlist_1_svc()
 //
 // If the server is not connected to the database, return error
 //
-	if (dbgen.connected == False)
+	if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
 	{
+		logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 		browse_back.db_err = DbErr_DatabaseNotConnected;
 		return(&browse_back);
 	}
@@ -240,7 +217,7 @@ db_res *MySQLServer::hostlist_1_svc()
 	query = "SELECT DISTINCT HOST FROM device WHERE EXPORTED != 0 ORDER BY HOST ASC";
 	if (mysql_query(mysql_conn, query.c_str()) != 0)
 	{
-		std::cout << mysql_error(mysql_conn) << std::endl;
+		logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 		browse_back.db_err = DbErr_DatabaseAccess;
 		return(&browse_back);			
 	}
@@ -262,14 +239,6 @@ db_res *MySQLServer::hostlist_1_svc()
         	host_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
         	(browse_back.res_val.arr1_val[i])[k] = '\0';
 	}                                                                                                                                        
-#if 0
-	if (host_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
-	{
-		std::cout << "Memory allocation error in hostlist" << std::endl;
-		browse_back.db_err = DbErr_ServerMemoryAllocation;
-		return(&browse_back);
-	}
-#endif
 //
 // Return data
 //

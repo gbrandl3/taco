@@ -26,7 +26,7 @@ echo startserver/$pers_name/device:	SYS/START/$pers_name >starter.res
 echo SYS/START/$pers_name/DEFAULT:	"Inst_verify/1", "AGPSpp/1" >>starter.res
 AT_CHECK([RES_BASE_DIR=`pwd` taco db_update starter.res; 
 taco StartServer $pers_name -d
-sleep 5
+sleep 15
 printf "%d\n" `ps x | grep StartServer | grep -v grep | wc -l`
 printf "%d\n" `ps x | grep Inst_verify | grep -v grep | wc -l`
 printf "%d\n" `ps x | grep AGPSpp | grep -v grep | wc -l`
@@ -121,12 +121,22 @@ AT_SETUP([Shutting down Starter server])
 AT_DATA([starter], [[
 7
 AGPSpp 1
+7
+Inst_verify 1
 0
 ]])
 AT_CHECK([
 AT_TACO_RUN_LOCAL([test_starter sys/start/`uname -n|cut -f1 -d'.'` 2>/dev/null < starter; sleep 3; ])
 AT_TACO_RUN_LOCAL([off StartServer >>log])], [0],
 [[Select one of the following commands:
+
+0. Quit
+1. On          2. Off          3. Reset
+4. State       5. Status
+6. Run         7. Stop         8. Restart
+cmd ?
+DevStop devput() returned 0
+Select one of the following commands:
 
 0. Quit
 1. On          2. Off          3. Reset

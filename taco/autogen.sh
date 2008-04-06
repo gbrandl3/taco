@@ -26,7 +26,7 @@ done
 LIBTOOLIZE="$libtoolize --force --copy --automake"
 ACLOCAL="aclocal${am_postfix} -I m4 -I $aclocal_includes" 
 AUTOHEADER="autoheader${ac_postfix}"
-AUTOMAKE="$automake -a -c --foreign"
+AUTOMAKE="$automake -a -c"
 AUTOCONF="$autoconf"
 
 touch AUTHORS ChangeLog NEWS README
@@ -109,7 +109,7 @@ fi
 # Generate the Makefiles and configure files
 if ( $ACLOCAL --version ) < /dev/null > /dev/null 2>&1; then
 	echo "Building macros..."
-	$ACLOCAL -I log4cpp
+	$ACLOCAL -I log4cpp -I log4cpp/m4
 	echo "done."
 else
 	echo "aclocal not found -- aborting"

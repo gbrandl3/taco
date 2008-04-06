@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.18 $
+ * Version:	$Revision: 1.19 $
  *
- * Date:	$Date: 2006-12-15 12:43:53 $
+ * Date:	$Date: 2008-04-06 09:07:40 $
  *
  */
 
@@ -67,12 +67,12 @@ DevLong *NdbmServer::db_devexp_1_svc(tab_dbdev *rece)
 
 	if (logStream->getPriority() >= log4cpp::Priority::DEBUG)
 		for (int i = 0; i < num_dev; i++)
-			logStream->debugStream() << "Device name : " << rece->tab_dbdev_val[i].dev_name << log4cpp::CategoryStream::ENDLINE
-				<< "Host name : " << rece->tab_dbdev_val[i].host_name << log4cpp::CategoryStream::ENDLINE
-				<< "Program number : " << rece->tab_dbdev_val[i].p_num << log4cpp::CategoryStream::ENDLINE
-				<< "Version number : " << rece->tab_dbdev_val[i].v_num << log4cpp::CategoryStream::ENDLINE
-				<< "Device type : " << rece->tab_dbdev_val[i].dev_type << log4cpp::CategoryStream::ENDLINE
-				<< "Device class : " << rece->tab_dbdev_val[i].dev_class << log4cpp::CategoryStream::ENDLINE;
+			logStream->debugStream() << "Device name : " << rece->tab_dbdev_val[i].dev_name << log4cpp::eol
+				<< "Host name : " << rece->tab_dbdev_val[i].host_name << log4cpp::eol
+				<< "Program number : " << rece->tab_dbdev_val[i].p_num << log4cpp::eol
+				<< "Version number : " << rece->tab_dbdev_val[i].v_num << log4cpp::eol
+				<< "Device type : " << rece->tab_dbdev_val[i].dev_type << log4cpp::eol
+				<< "Device class : " << rece->tab_dbdev_val[i].dev_class << log4cpp::eol;
 //
 // Initialize error code sent back to client 
 //
@@ -117,13 +117,13 @@ DevLong *NdbmServer::db_devexp_2_svc(tab_dbdev_2 *rece)
 
 	if (logStream->getPriority() >= log4cpp::Priority::DEBUG)
 		for (int i = 0; i < num_dev; i++)
-			logStream->debugStream() << "Device name : " << rece->tab_dbdev_val[i].dev_name << log4cpp::CategoryStream::ENDLINE
-				<< "Host name : " << rece->tab_dbdev_val[i].host_name << log4cpp::CategoryStream::ENDLINE
-				<< "Program number : " << rece->tab_dbdev_val[i].p_num << log4cpp::CategoryStream::ENDLINE
-				<< "Version number : " << rece->tab_dbdev_val[i].v_num << log4cpp::CategoryStream::ENDLINE
-				<< "Device type : " << rece->tab_dbdev_val[i].dev_type << log4cpp::CategoryStream::ENDLINE
-				<< "Device class : " << rece->tab_dbdev_val[i].dev_class << log4cpp::CategoryStream::ENDLINE
-				<< "Device server PID : " << rece->tab_dbdev_val[i].pid << log4cpp::CategoryStream::ENDLINE;
+			logStream->debugStream() << "Device name : " << rece->tab_dbdev_val[i].dev_name << log4cpp::eol
+				<< "Host name : " << rece->tab_dbdev_val[i].host_name << log4cpp::eol
+				<< "Program number : " << rece->tab_dbdev_val[i].p_num << log4cpp::eol
+				<< "Version number : " << rece->tab_dbdev_val[i].v_num << log4cpp::eol
+				<< "Device type : " << rece->tab_dbdev_val[i].dev_type << log4cpp::eol
+				<< "Device class : " << rece->tab_dbdev_val[i].dev_class << log4cpp::eol
+				<< "Device server PID : " << rece->tab_dbdev_val[i].pid << log4cpp::eol;
 //
 // Initialize error code sent back to client
 //
@@ -166,14 +166,14 @@ DevLong *NdbmServer::db_devexp_3_svc(tab_dbdev_3 *rece)
 
 	if (logStream->getPriority() >= log4cpp::Priority::DEBUG)
 		for (int i = 0; i < num_dev; i++)
-			logStream->debugStream() << "Device name : " << rece->tab_dbdev_val[i].dev_name << log4cpp::CategoryStream::ENDLINE
-				<< "Host name : " << rece->tab_dbdev_val[i].host_name << log4cpp::CategoryStream::ENDLINE
-				<< "Program number : " << rece->tab_dbdev_val[i].p_num << log4cpp::CategoryStream::ENDLINE
-				<< "Version number : " << rece->tab_dbdev_val[i].v_num << log4cpp::CategoryStream::ENDLINE
-				<< "Device type : " << rece->tab_dbdev_val[i].dev_type << log4cpp::CategoryStream::ENDLINE
-				<< "Device class : " << rece->tab_dbdev_val[i].dev_class << log4cpp::CategoryStream::ENDLINE
-				<< "Device server PID : " << rece->tab_dbdev_val[i].pid << log4cpp::CategoryStream::ENDLINE
-				<< "Device server process name : " << rece->tab_dbdev_val[i].proc_name << log4cpp::CategoryStream::ENDLINE;
+			logStream->debugStream() << "Device name : " << rece->tab_dbdev_val[i].dev_name << log4cpp::eol
+				<< "Host name : " << rece->tab_dbdev_val[i].host_name << log4cpp::eol
+				<< "Program number : " << rece->tab_dbdev_val[i].p_num << log4cpp::eol
+				<< "Version number : " << rece->tab_dbdev_val[i].v_num << log4cpp::eol
+				<< "Device type : " << rece->tab_dbdev_val[i].dev_type << log4cpp::eol
+				<< "Device class : " << rece->tab_dbdev_val[i].dev_class << log4cpp::eol
+				<< "Device server PID : " << rece->tab_dbdev_val[i].pid << log4cpp::eol
+				<< "Device server process name : " << rece->tab_dbdev_val[i].proc_name << log4cpp::eol;
 //
 // Initialize error code sent back to client 
 //
@@ -226,7 +226,7 @@ db_resimp *NdbmServer::db_devimp_1_svc(arr1 *de_name)
 
 
 	for (int i = 0; i < num_dev; i++)
-		logStream->debugStream() << "Device name (in import function) : " << de_name->arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "Device name (in import function) : " << de_name->arr1_val[i] << log4cpp::eol;
 
 //
 // Initialize error code sent back to client
@@ -339,7 +339,7 @@ db_resimp *NdbmServer::db_devimp_1_svc(arr1 *de_name)
 				delete [] stu_addr->dev_type;
 				delete [] stu_addr->dev_class;
 			}
-			logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;
+			logStream->errorStream() << err.get_err_message() << log4cpp::eol;
 			back.db_imperr = err.get_err_code();
 			back.imp_dev.tab_dbdev_len = 0;
 			return (&back);
@@ -359,7 +359,7 @@ db_resimp *NdbmServer::db_devimp_1_svc(arr1 *de_name)
 				delete [] stu_addr->dev_class;
 			}
 			back.imp_dev.tab_dbdev_len = 0;
-			logStream->errorStream() << "Memory allocation error in devinfo" << log4cpp::CategoryStream::ENDLINE;
+			logStream->errorStream() << "Memory allocation error in devinfo" << log4cpp::eol;
 			back.db_imperr = DbErr_ServerMemoryAllocation;
 			return (&back);
 		}
@@ -396,7 +396,7 @@ db_resimp *NdbmServer::db_devimp_1_svc(arr1 *de_name)
  * 
  * @return This function returns an int which is an error code Zero means no error
  */
-DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
+DevLong *NdbmServer::db_svcunr_1_svc(DevString *dsn_name)
 {
 	static DevLong 	mis;
 	register char 	*tmp,
@@ -419,7 +419,7 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 
 	std::string	device_name(*dsn_name);
 
-	logStream->debugStream() << "Device server name (unregister function) : " << device_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device server name (unregister function) : " << device_name << log4cpp::eol;
 
 //
 // Miscellaneous initialization
@@ -444,8 +444,8 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
 	strcpy(dev.ds_name, device_name.substr(pos + 1).c_str());
 
 
-	logStream->debugStream() << "Device server class (unreg) : " << dev.ds_class << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "Device server name (unreg) : " << dev.ds_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device server class (unreg) : " << dev.ds_class << log4cpp::eol;
+	logStream->debugStream() << "Device server name (unreg) : " << dev.ds_name << log4cpp::eol;
 
 //
 // Try to retrieve devices in database assuming that the input device server name is the
@@ -599,7 +599,7 @@ DevLong *NdbmServer::db_svcunr_1_svc(nam *dsn_name)
  * 
  * @return a pointer to a stucture of the svc_inf type
  */
-svc_inf *NdbmServer::db_svcchk_1_svc(nam *dsn_nam)
+svc_inf *NdbmServer::db_svcchk_1_svc(DevString *dsn_nam)
 {
 	datum		key,
 			content;
@@ -609,7 +609,7 @@ svc_inf *NdbmServer::db_svcchk_1_svc(nam *dsn_nam)
 			ret_dev_class,
 			sto(*dsn_nam);
 
-	logStream->debugStream() << "Device server name (check function) : " << sto << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device server name (check function) : " << sto << log4cpp::eol;
 
 //
 // Miscellaneous initialization
@@ -635,8 +635,8 @@ svc_inf *NdbmServer::db_svcchk_1_svc(nam *dsn_nam)
 //
 	std::string	ds_name = sto.substr(pos + 1);
 
-	logStream->debugStream() << "Device server class (check) : " << ds_class << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "Device server name (check) : " << ds_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device server class (check) : " << ds_class << log4cpp::eol;
+	logStream->debugStream() << "Device server name (check) : " << ds_name << log4cpp::eol;
 //
 // Initialization needed to retrieve the right tuples in the NAMES table
 //

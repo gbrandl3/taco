@@ -17,41 +17,32 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-if XDEVMENUBUILD
- xdev_dir=xdevmenu
-else
- xdev_dir=
-endif
-
-if ALARMBUILD
- alarm_dir=alarm
-else
- alarm_dir=
-endif
-
-if DC_BUILD
-  dc_dir=dc
-else
-  dc_dir=
-endif
-
-if BUILD_SERVER
-starter=starter
-else
-starter=
-endif
+SUBDIRS = . dbase tools
 
 if BUILD_MANAGER
-manager=manager
-else
-manager=
+SUBDIRS += manager
 endif
 
 if BUILD_MESSAGESERVER
-messageserver=msg
-else
-messageserver=
+SUBDIRS += msg
 endif
 
-SUBDIRS = . dbase $(manager) $(messageserver) $(dc_dir) $(starter) $(xdev_dir) $(alarm_dir) $(dbdev_dir)
+if BUILD_SERVER
+SUBDIRS += starter
+endif
 
+if DC_BUILD
+SUBDIRS += dc
+endif
+
+if XDEVMENUBUILD
+SUBDIRS += xdevmenu
+endif
+
+if ALARMBUILD
+SUBDIRS += alarm
+endif
+
+SUBDIRS += testcs
+
+SUBDIRS += $(dbdev_dir)

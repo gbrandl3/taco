@@ -26,9 +26,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-18 22:34:41 $
+ * Date:        $Date: 2008-04-06 09:08:06 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 // Display error message if the call fails
 //
 	devserver	ds;
-	if (dev_import(const_cast<char *>(full_name.c_str()), WRITE_ACCESS, &ds, &error) == -1)
+	if (dev_import(const_cast<char *>(full_name.c_str()), READ_ACCESS, &ds, &error) == -1)
 	{
 		std::cerr << "The call to system failed with error " << error << std::endl;
 		std::cerr << "Error message : " << dev_error_str(error) << std::endl;

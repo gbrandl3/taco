@@ -31,9 +31,9 @@
  *
  * Original:	March 1990
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2005-07-25 13:08:22 $
+ * Date:	$Date: 2008-04-06 09:06:58 $
  *
  ********************************************************************-*/
 
@@ -45,7 +45,7 @@
  */
 #ifdef _IDENT
 static char DevServerPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServerP.h,v 1.4 2005-07-25 13:08:22 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevServerP.h,v 1.5 2008-04-06 09:06:58 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*
@@ -58,36 +58,32 @@ static char DevServerPh[] =
 
 
 typedef struct _DevServerClassPart {
-               int                  n_methods;
-               DevMethodList        methods_list;
-               DevServerClass       superclass;
-               DevString	    class_name;
-               DevBoolean           class_inited;
-               int                  n_commands;
-               DevCommandList       commands_list;
-               int                  n_events;
-               DevEventList         events_list;
-                                  }
-               DevServerClassPart;
+	int                  n_methods;
+	DevMethodList        methods_list;
+	DevServerClass       superclass;
+	DevString	    class_name;
+	DevBoolean           class_inited;
+	int                  n_commands;
+	DevCommandList       commands_list;
+	int                  n_events;
+	DevEventList         events_list;
+} DevServerClassPart;
 
 typedef struct _DevServerPart {
-               DevString       name;
-	       char            dev_type[DEV_TYPE_LENGTH];
-               DevServerClass  class_pointer;
-               long            state;
-               long            n_state;
-                             }
-               DevServerPart;
+	DevString       name;
+	char            dev_type[DEV_TYPE_LENGTH];
+	DevServerClass  class_pointer;
+	long            state;
+	long            n_state;
+} DevServerPart;
 
 typedef struct _DevServerClassRec {
-               DevServerClassPart 	devserver_class;
-                                  }
-               DevServerClassRec;
+	DevServerClassPart 	devserver_class;
+} DevServerClassRec;
 
 typedef struct _DevServerRec {
-               DevServerPart		devserver;
-                             }
-               DevServerRec;
+	DevServerPart		devserver;
+} DevServerRec;
 
 #ifdef __cplusplus
 typedef char * (* DevRpcLocalFunc)(...);

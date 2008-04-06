@@ -30,9 +30,9 @@
  *
  * Original:	June 1993
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  *
  *******************************************************************-*/
 
@@ -47,16 +47,16 @@ xdr_pin_head(xdrs, objp)
 	XDR *xdrs;
 	pin_head *objp;
 {
-	if (!xdr_long(xdrs, &objp->main_st)) {
+	if (!xdr_DevLong(xdrs, &objp->main_st)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->dev_diag)) {
+	if (!xdr_DevLong(xdrs, &objp->dev_diag)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->tuned)) {
+	if (!xdr_DevLong(xdrs, &objp->tuned)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->mode)) {
+	if (!xdr_DevLong(xdrs, &objp->mode)) {
 		return (FALSE);
 	}
 	return (TRUE);
@@ -68,10 +68,10 @@ xdr_length_pin_head(objp)
 {
         long  length = 0;
 
-        length = length + xdr_length_DevLong (&objp->main_st);
-        length = length + xdr_length_DevLong (&objp->dev_diag);
-        length = length + xdr_length_DevLong (&objp->tuned);
-        length = length + xdr_length_DevLong (&objp->mode);
+        length += xdr_length_DevLong (&objp->main_st);
+        length += xdr_length_DevLong (&objp->dev_diag);
+        length += xdr_length_DevLong (&objp->tuned);
+        length += xdr_length_DevLong (&objp->mode);
 
         return (length);
 }
@@ -84,10 +84,10 @@ xdr_axis_state(xdrs, objp)
 	XDR *xdrs;
 	axis_state *objp;
 {
-	if (!xdr_long(xdrs, &objp->unit)) {
+	if (!xdr_DevLong(xdrs, &objp->unit)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->moving)) {
+	if (!xdr_DevLong(xdrs, &objp->moving)) {
 		return (FALSE);
 	}
 	if (!xdr_float(xdrs, &objp->mot_pos)) {
@@ -96,10 +96,10 @@ xdr_axis_state(xdrs, objp)
 	if (!xdr_float(xdrs, &objp->enc_pos)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->switch_st)) {
+	if (!xdr_DevLong(xdrs, &objp->switch_st)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->tuned)) {
+	if (!xdr_DevLong(xdrs, &objp->tuned)) {
 		return (FALSE);
 	}
 	return (TRUE);
@@ -111,12 +111,12 @@ xdr_length_axis_state(objp)
 {
         long  length = 0;
 
-        length = length + xdr_length_DevLong (&objp->unit);
-        length = length + xdr_length_DevLong (&objp->moving);
-        length = length + xdr_length_DevFloat (&objp->mot_pos);
-        length = length + xdr_length_DevFloat (&objp->enc_pos);
-        length = length + xdr_length_DevLong (&objp->switch_st);
-        length = length + xdr_length_DevLong (&objp->tuned);
+        length += xdr_length_DevLong (&objp->unit);
+        length += xdr_length_DevLong (&objp->moving);
+        length += xdr_length_DevFloat (&objp->mot_pos);
+        length += xdr_length_DevFloat (&objp->enc_pos);
+        length += xdr_length_DevLong (&objp->switch_st);
+        length += xdr_length_DevLong (&objp->tuned);
 
         return (length);
 }
@@ -153,11 +153,11 @@ xdr_length_DevPinState(objp)
 {
         long  length = 0;
 
-        length = length + xdr_length_pin_head (&objp->pin_head);
-        length = length + xdr_length_axis_state (&objp->z1_state);
-        length = length + xdr_length_axis_state (&objp->z2_state);
-        length = length + xdr_length_axis_state (&objp->tx_state);
-        length = length + xdr_length_axis_state (&objp->tt_state);
+        length += xdr_length_pin_head (&objp->pin_head);
+        length += xdr_length_axis_state (&objp->z1_state);
+        length += xdr_length_axis_state (&objp->z2_state);
+        length += xdr_length_axis_state (&objp->tx_state);
+        length += xdr_length_axis_state (&objp->tt_state);
 
         return (length);
 }

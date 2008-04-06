@@ -28,10 +28,11 @@
 #include <TACOException.h>
 
 namespace TACO {
+#ifndef TACO_JAVA 
 	const std::string RESOURCE_INFO_VERSION = "1";
 
+#endif
 	const char RESOURCE_INFO_SEPERATOR = '\0';
-
 	struct ResourceInfo {
 		ResourceInfo(
 			const std::string& iName,

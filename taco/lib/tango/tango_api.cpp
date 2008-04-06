@@ -35,17 +35,16 @@
  *
  * Original   :	December 1999
  *
- * Version    : $Revision: 1.7 $
+ * Version    : $Revision: 1.8 $
  *
- * Date       : $Date: 2007-10-02 14:46:29 $
+ * Date       : $Date: 2008-04-06 09:07:19 $
  *
  ********************************************************************-*/
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/tango/tango_api.cpp,v 1.7 2007-10-02 14:46:29 jkrueger1 Exp $";
 
+#include <tango.h>
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
 #endif
-#include <tango.h>
 #define TANGO_API
 #include <API.h>
 #include <ApiP.h>
@@ -61,12 +60,12 @@ using namespace std;
 
 #define D_IIOP	1111		/* TANGO native protocol - should be in API.h */
 
-static long get_cmd_value (char*, char*, long*, long *error);
+static long get_cmd_value (char*, char*, long*, DevLong *error);
 static long tango_to_taco_type(long );
-static CORBA::Any tango_argin_to_any(long, long, void *, long *);    
-static void tango_any_to_argout(long, long, CORBA::Any, void *, long *);    
-static void tango_any_to_argout_raw(long, long, CORBA::Any, void *, long *);    
-static long tango_dev_check(devserver, long *);    
+static CORBA::Any tango_argin_to_any(long, long, void *, DevLong *);    
+static void tango_any_to_argout(long, long, CORBA::Any, void *, DevLong *);    
+static void tango_any_to_argout_raw(long, long, CORBA::Any, void *, DevLong *);    
+static long tango_dev_check(devserver, DevLong *);    
 static long tango_dev_error_string(Tango::DevFailed tango_exception);
 
 /*
@@ -105,7 +104,6 @@ static char *tango_host_c_str=NULL;
 #define TANGO_DEV_FREE		3
 
 extern long debug_flag;
-extern char *dev_error_string;
 
 #undef DevState
 #undef RUNNING
@@ -130,7 +128,7 @@ extern char *dev_error_string;
  */
 
 
-long tango_db_import(long *error)
+long tango_db_import(DevLong *error)
 {
 
 
@@ -186,7 +184,7 @@ long tango_db_import(long *error)
  * @return DS_OK or DS_NOTOK
  */
 
-long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, long *error)
+long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, DevLong *error)
 {
 	_tango_device tango_device_tmp;
 	long tango_device_free;
@@ -261,7 +259,7 @@ long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, long *erro
 		tango_state = -1;
 		for (i = 0;i < cmd_query->size();i++)
 		{
-			long error, tango_cmd_value;
+			long tango_cmd_value;
 			//tango_device_tmp.cmd_name[i] = string((*cmd_query)[i].cmd_name);
 //
 // map TANGO's "State" and "Status" commands into "DevState" and "DevStatus"
@@ -305,7 +303,7 @@ long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, long *erro
 					get_cmd_value((char*)dev_info.dev_class.c_str(),
 			              		tango_device_tmp.cmd_name[tango_state],
 			              		&tango_cmd_value,
-			              		&error);
+			              		error);
 					tango_device_tmp.cmd_value[tango_state] = tango_cmd_value;
 				}
 			}
@@ -357,7 +355,7 @@ long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, long *erro
 			get_cmd_value((char*)dev_info.dev_class.c_str(),
 			              tango_device_tmp.cmd_name[i],
 			              &tango_cmd_value,
-			              &error);
+			              error);
 			tango_device_tmp.cmd_value[i] = tango_cmd_value;
 			tango_device_tmp.argin_type[i] = (*cmd_query)[i].in_type;
 			tango_device_tmp.argout_type[i] = (*cmd_query)[i].out_type;
@@ -435,7 +433,7 @@ long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, long *erro
  * @return DS_OK or DS_NOTOK
  */
 
-long tango_dev_free(devserver ds, long *error)
+long tango_dev_free(devserver ds, DevLong *error)
 {
 	if (ds->ds_id != -1)
 	{
@@ -465,7 +463,7 @@ long tango_dev_free(devserver ds, long *error)
  * @return DS_OK or DS_NOTOK
  */
 
-long tango_dev_reimport(devserver ds, long *error)
+long tango_dev_reimport(devserver ds, DevLong *error)
 {
 
 	if (!tango_dbase_init) 
@@ -528,7 +526,7 @@ long tango_dev_reimport(devserver ds, long *error)
  */
 
 long tango_dev_putget(devserver ds, long cmd, void *argin, long argin_type,
-                      void *argout, long argout_type, long *error)
+                      void *argout, long argout_type, DevLong *error)
 {
 
 	long i_cmd = -1, dev_id;
@@ -718,7 +716,7 @@ long tango_dev_putget(devserver ds, long cmd, void *argin, long argin_type,
  */
 
 long tango_dev_putget_raw(devserver ds, long cmd, void *argin, long argin_type,
-                      void *argout, long argout_type, long *error)
+                      void *argout, long argout_type, DevLong *error)
 {
 
 	long i_cmd = -1, dev_id;
@@ -869,7 +867,7 @@ long tango_dev_putget_raw(devserver ds, long cmd, void *argin, long argin_type,
  * @return DS_OK or DS_NOTOK
  */
 
-long tango_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error)
+long tango_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, DevLong *error)
 {
 	long dev_id;
 
@@ -919,7 +917,7 @@ long tango_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, long *error)
  * @return DS_OK or DS_NOTOK
  */
 
-long tango_dev_ping (devserver ds, long *error)
+long tango_dev_ping (devserver ds, DevLong *error)
 {
 	long dev_id;
 
@@ -958,7 +956,7 @@ long tango_dev_ping (devserver ds, long *error)
  * @return DS_OK or DS_NOTOK
  */
 
-static CORBA::Any tango_argin_to_any(long argin_type, long tango_type, void *argin, long *error)
+static CORBA::Any tango_argin_to_any(long argin_type, long tango_type, void *argin, DevLong *error)
 {
 	CORBA::Any send;
 
@@ -1265,7 +1263,7 @@ static CORBA::Any tango_argin_to_any(long argin_type, long tango_type, void *arg
  */
 
 
-static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any received, void *argout, long *error)
+static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any received, void *argout, DevLong *error)
 {
 	if (argout == NULL && argout_type != D_VOID_TYPE)
 	{
@@ -1593,7 +1591,7 @@ static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any re
 			argout_vla = (DevVarLongArray*)argout;
 			if (argout_vla->sequence == NULL)
 			{
-				argout_vla->sequence = (long*)malloc(tango_vla->length()*sizeof(long));
+				argout_vla->sequence = (DevLong*)malloc(tango_vla->length()*sizeof(long));
 			}
 			argout_vla->length = tango_vla->length();
 			for (long i=0; i< tango_vla->length(); i++)
@@ -1618,7 +1616,7 @@ static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any re
 			argout_vula = (DevVarULongArray*)argout;
 			if (argout_vula->sequence == NULL)
 			{
-				argout_vula->sequence = (unsigned long*)malloc(tango_vula->length()*sizeof(unsigned long));
+				argout_vula->sequence = (DevULong*)malloc(tango_vula->length()*sizeof(unsigned long));
 			}
 			argout_vula->length = tango_vula->length();
 			for (long i=0; i< tango_vula->length(); i++)
@@ -1700,7 +1698,7 @@ static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any re
  * @return DS_OK or DS_NOTOK
  */
 	
-static void tango_any_to_argout_raw(long argout_type, long tango_type, CORBA::Any received, void *argout, long *error)
+static void tango_any_to_argout_raw(long argout_type, long tango_type, CORBA::Any received, void *argout, DevLong *error)
 {
 	dc_datacmd dc_datacmd;
 	dc_error dc_error;
@@ -2054,7 +2052,7 @@ static void tango_any_to_argout_raw(long argout_type, long tango_type, CORBA::An
 				                (const char *)"tango_any_to_argout_raw()");
 			}
 			received >>= tango_vla;
-			taco_vla.sequence = (long*)malloc(tango_vla->length()*sizeof(long));
+			taco_vla.sequence = (DevLong*)malloc(tango_vla->length()*sizeof(long));
 			taco_vla.length = tango_vla->length();
 			for (long i=0; i< tango_vla->length(); i++)
 			{
@@ -2081,7 +2079,7 @@ static void tango_any_to_argout_raw(long argout_type, long tango_type, CORBA::An
 				                (const char *)"tango_any_to_argout_raw()");
 			}
 			received >>= tango_vula;
-			taco_vula.sequence = (unsigned long*)malloc(tango_vula->length()*sizeof(unsigned long));
+			taco_vula.sequence = (DevULong*)malloc(tango_vula->length()*sizeof(unsigned long));
 			taco_vula.length = tango_vula->length();
 			for (long i=0; i< tango_vula->length(); i++)
 			{
@@ -2255,7 +2253,7 @@ extern int max_cmds;
  *	executed correctly, but no command name value was found in the database, DS_OK 
  *	otherwise
  */
-static long get_cmd_value (char *class_name, char *cmd_name, long *cmd_value, long *error)
+static long get_cmd_value (char *class_name, char *cmd_name, long *cmd_value, DevLong *error)
 {
 	static unsigned int tango_auto_cmd = DevTangoBase;
 	char		res_path[LONG_NAME_SIZE];
@@ -2343,7 +2341,7 @@ static long get_cmd_value (char *class_name, char *cmd_name, long *cmd_value, lo
  * 
  * @return DS_OK if device has been (re)imported correctly or DS_NOTOK
  */
-static long tango_dev_check(devserver ds, long *error)
+static long tango_dev_check(devserver ds, DevLong *error)
 {
 	long dev_id;
 
@@ -2414,16 +2412,7 @@ static long tango_dev_error_string(Tango::DevFailed tango_exception)
 {
 	for (int i=0; i<tango_exception.errors.length(); i++)
 	{
-		if (i == 0)
-		{
-			dev_error_string = (char*)malloc(strlen(tango_exception.errors[i].desc.in())+1);
-			sprintf(dev_error_string,"%s",tango_exception.errors[i].desc.in());
-		}
-		else
-		{
-			dev_error_string = (char*)realloc(dev_error_string,strlen(dev_error_string)+strlen(tango_exception.errors[i].desc.in())+1);
-			sprintf(dev_error_string+strlen(dev_error_string),"%s",tango_exception.errors[i].desc.in());
-		}
+		dev_error_push(const_cast<char *>(tango_exception.errors[i].desc.in()));
 	}
 	return(DS_OK);
 }

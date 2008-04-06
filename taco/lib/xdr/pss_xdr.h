@@ -30,9 +30,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  *
  *******************************************************************-*/
 
@@ -43,11 +43,11 @@
  * definitions for PSS
  */
 struct PSSInterlockStatus {
-	int		Module;
-	int		GuardA;
-	int		GuardB;
-	int		GuardC;
-	unsigned short 	Interlocks;
+	DevLong		Module;
+	DevLong		GuardA;
+	DevLong		GuardB;
+	DevLong		GuardC;
+	DevUShort 	Interlocks;
 };
 typedef struct PSSInterlockStatus PSSInterlockStatus;
 bool_t 	_DLLFunc xdr_PSSInterlockStatus

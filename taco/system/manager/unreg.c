@@ -29,9 +29,9 @@
  *
  * Original:    January 1991
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:                $Date: 2006-09-18 21:47:02 $
+ * Date:                $Date: 2008-04-06 09:07:51 $
  *
  */
 
@@ -44,6 +44,9 @@
 #	include <rpc.h>
 #else
 #	error Did not found rpc.h file
+#endif
+#ifdef HAVE_RPC_PMAP_CLNT_H
+#	include <rpc/pmap_clnt.h>
 #endif
 
 int main (int argc, char **argv)

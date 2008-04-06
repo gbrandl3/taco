@@ -26,9 +26,9 @@
  *
  * Original:	January 2003
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Revision:	$Date: 2006-11-02 15:33:27 $
+ * Revision:	$Date: 2008-04-06 09:07:55 $
  *
  */
 
@@ -61,6 +61,11 @@
 #	include "_count.h"
 #endif /* _solaris */
 
+#include <log4cpp/BasicConfigurator.hh>
+#include <log4cpp/PropertyConfigurator.hh>
+#include <log4cpp/Category.hh>
+
+log4cpp::Category       *logStream;
 
 static std::string	devServer;
 
@@ -112,7 +117,7 @@ static void SignalHandler (int signal)
 			}
 			break;
 		default:
-			std::cerr << "Got unexpected signal: " << signal << std::endl;
+			logStream->warnStream() << "Got unexpected signal: " << signal << log4cpp::eol;
 			break;
 	}
 	return;
@@ -124,7 +129,7 @@ static void SignalHandler (int signal)
  */
 static void CleanServer(void)
 {
-	long 	lError;
+	DevLong lError;
 
 	db_svc_unreg(const_cast<char *>(devServer.c_str()), &lError);
 	return;
@@ -139,6 +144,28 @@ static void CleanServer(void)
  */
 long startup(char *pszServerName, long *plError)
 {
+	const char              *logpath = getenv("LOGCONFIG");
+
+        try
+        {
+                if (!logpath)
+                        throw 0;
+                log4cpp::PropertyConfigurator::configure(logpath);
+        }
+	catch (const log4cpp::ConfigureFailure &e)
+	{
+		std::cerr << e.what() << std::endl;
+                logpath = "no";
+                log4cpp::BasicConfigurator::configure();
+	}
+        catch (...)
+        {
+                logpath = "no";
+                log4cpp::BasicConfigurator::configure();
+        }
+        logStream = &log4cpp::Category::getInstance("taco.system.StartServer");
+        logStream->noticeStream() << "using " << logpath << " configuration file" << log4cpp::eol;
+
 	struct sigaction sighand;
 	sighand.sa_handler = SignalHandler;
 	sighand.sa_flags = 0;
@@ -149,7 +176,7 @@ long startup(char *pszServerName, long *plError)
 		|| sigaction (SIGALRM, &sighand, NULL) != 0
 		|| sigaction (SIGCHLD, &sighand, NULL) != 0)
 	{
-		std::cerr <<" could not install signal handler" << std::endl;
+		logStream->emergStream() <<" could not install signal handler" << log4cpp::eol;
 		return DS_NOTOK;
 	}
 	return ServerSetup(pszServerName, plError);
@@ -180,61 +207,21 @@ long ServerSetup(char *pszServerName, long *plError)
 	else
 		devName += std::string(hostname);
 
-	long    	lError;
+	DevLong	lError;
 	StarterDevice	*dev = new StarterDevice(devName, lError);
 	if ((dev == NULL))
 	{
-		std::cerr << "Error when trying to create " << devName << " device" << std::endl;
+		logStream->emergStream() << "Error when trying to create " << devName << " device" << log4cpp::eol;
 		*plError = lError;
 		return DS_NOTOK; 
 	}
       	if (dev_export(const_cast<char *>(dev->GetDevName()), dev, &lError) != DS_OK)
 	{
-		std::cerr << "Starter Device  = " << dev->GetDevName() << " not exported." << std::endl;
+		logStream->emergStream() << "Starter Device  = " << dev->GetDevName() << " not exported." << log4cpp::eol;
 		*plError = lError;
 		return DS_NOTOK;
 	}
-#ifdef EBUG
-    	std::cout << "Device server <" << pszServerName << "> started (pid = " << getpid() << ")." << std::endl;
-#endif
+    	logStream->debugStream() << "Device server <" << pszServerName << "> started (pid = " << getpid() << ")." << log4cpp::eol;
 
-	DevVarStringArray       server_list = {0, NULL};
-	db_resource		server = {"default", D_VAR_STRINGARR, &server_list};
-	if (db_getresource(const_cast<char *>(dev->GetDevName()), &server, 1, plError) != DS_OK)
-	{
-		dev_printerror_no(SEND, "Could not get the \"default\" resource ", *plError); 
-		return DS_OK;
-	}
-	for (int i = 0; i < server_list.length; i++)
-	{
-		std::string server_name = server_list.sequence[i];
-#ifdef EBUG
-		std::cout << "start TACO server " << server_name << std::endl;
-#endif
-#ifndef _solaris
-		if (std::count(server_name.begin(), server_name.end(), '/') != 1)
-#else
-		if (_sol::count(server_name.begin(), server_name.end(), '/') != 1)
-#endif /* _solaris */
-		{
-			std::cerr << " Server name \"" << server_name << "\"not correctly defined" << std::endl;
-			continue;
-		}
-		std::string::size_type pos = server_name.find('/');
-#ifdef EBUG
-		std::cerr << server_name.substr(0, pos) << " " << server_name.substr(pos + 1) << std::endl;
-#endif
-		try
-		{
-			dev->deviceRun(server_name.substr(0, pos), server_name.substr(pos + 1), "-m", "");
-#ifdef EBUG
-			std::cerr << " started" << std::endl;
-#endif
-		}
-		catch (const long &e)
-		{
-		}
-		sleep(1);
-	}
     	return DS_OK;
 }

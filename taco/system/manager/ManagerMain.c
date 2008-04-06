@@ -31,9 +31,9 @@
  *
  * Original:  January 1991
  *
- * Version:   $Revision: 1.27 $
+ * Version:   $Revision: 1.28 $
  *
- * Date:              $Date: 2006-09-27 12:12:27 $
+ * Date:              $Date: 2008-04-06 09:07:51 $
  *
  */
 
@@ -56,6 +56,9 @@
 #	include <sys/wait.h>
 #else
 #	error Could not find sys/wait.h
+#endif
+#ifdef HAVE_RPC_PMAP_CLNT_H
+#	include <rpc/pmap_clnt.h>
 #endif
 #include <errno.h>
 #include <string.h>
@@ -177,9 +180,14 @@ static	int	fd_devnull = -1;
 		 			c_flags.request_log = True;
 				else if (strcmp (arg, "security") == 0)
 		 			c_flags.security    = True;
+				else if (*arg == 'v')
+				{
+					printf("TACO Manager version : %s\n", VERSION);
+					exit(0); 
+				}
 				else if (*arg == 'h')
 				{
-		 			printf("usage: Manager [ -dbm | -mysql | -oracle ] [-log] [-security] [-help] \n");
+		 			printf("usage: Manager [-help] [-version] [ -dbm | -mysql | -oracle ] [-log] [-security]\n");
 					printf(" (note: default database is dbm)\n");
 					exit(0);
 				}
@@ -241,6 +249,8 @@ static	int	fd_devnull = -1;
 			fprintf(stderr, "LOGPATH or DSHOME path may be wrong\n");
 			kill (pid,SIGQUIT);
 		}
+		fprintf(system_log, "%s Version : %s\n", getTimeString("Manager"), VERSION);
+		fflush(system_log);
 	}
 
 #ifdef unix

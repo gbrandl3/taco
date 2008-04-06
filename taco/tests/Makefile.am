@@ -25,7 +25,9 @@ CLEANFILES 		= log taco
 
 DISTCLEANFILES 		= System.log atconfig *.lineno package.m4 testsuite
 
-INCLUDES		= @TACO_INCLUDES@ @GDBM_CFLAGS@
+INCLUDES		= @TACO_INCLUDES@ 
+
+## @GDBM_CFLAGS@ 
 
 AM_CFLAGS		= -g -O0
 
@@ -57,7 +59,9 @@ check_PROGRAMS 		= db_connect db_resget db_resput db_getdevexp \
 			dev_cmdquery dev_conparams \
 			test_server test_client test_client2 test_status test_connect \
 			longest_testserver \
-                        db_analyze 
+			taco_hostname \
+                        db_analyze \
+			db_getres
 
 check_SCRIPT		= taco
 
@@ -132,6 +136,10 @@ db_getdevexp_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 db_analyze_SOURCES      = db_analyze.cpp
 db_analyze_LDADD        = @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
+db_getres_SOURCES	= db_getres.cpp
+db_getres_CPPFLAGS	= @TACO_INCLUDES@ -I$(top_srcdir)/ext/include
+db_getres_LDADD		= @TACO_CLIENT_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/src/libTACOExtensions.la
+
 package.m4:	$(top_srcdir)/configure.ac
 	{\
 		echo '# Signature of the current package.'; \
@@ -179,7 +187,7 @@ longest_testserver_SOURCES = test_server.cpp
 longest_testserver_LDADD = @TACO_SERVER_CXX_LIBS@ -lstdc++
 
 if BUILD_EXT
-check_PROGRAMS		+= TestExtServer ExtServerClient TestExtClient
+check_PROGRAMS		+= TestExtServer ExtServerClient TestExtClient TestExtClient2
 
 TestExtServer_CPPFLAGS  = -I$(top_srcdir)/ext/include -DTACO_EXT
 TestExtServer_SOURCES	= TestExtServer.cpp TestExtServerStartup.cpp
@@ -195,4 +203,13 @@ TestExtClient_SOURCES 	= TestExtClient.cpp
 TestExtClient_CPPFLAGS  = -I$(top_srcdir)/ext/include -DTACO_EXT
 TestExtClient_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/src/libTACOExtensions.la
 TestExtClient_LDFLAGS	= -no-install
+
+TestExtClient2_SOURCES 	= TestExtClient2.cpp
+TestExtClient2_CPPFLAGS = -I$(top_srcdir)/ext/include -DTACO_EXT
+TestExtClient2_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/src/libTACOExtensions.la
+TestExtClient2_LDFLAGS	= -no-install
+
 endif
+
+taco_hostname_SOURCES	= taco_hostname.c
+taco_hostname_LDADD	= @TACO_CLIENT_LIBS@

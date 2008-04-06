@@ -26,9 +26,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2006-09-18 22:34:41 $
+ * Date:        $Date: 2008-04-06 09:08:05 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 //
 // Connect to database server
 //
-	if (db_import(&error) == -1)
+	if (db_import(&error) == DS_NOTOK)
 	{
 		std::cerr << *argv << " : Impossible to connect to database server" << std::endl;
 		exit(-1);
@@ -118,9 +118,12 @@ int main(int argc, char *argv[])
 			exit(-1);
 		}
 	}
-	int i = 0;
-	for (i = 0; i < tmp.length - 1; ++i)
-		std::cout << tmp.sequence[i] << ",";
-	std::cout << tmp.sequence[i] << std::endl;
+	for (unsigned int i = 0; i < tmp.length; ++i)
+	{
+		std::cout << tmp.sequence[i]; 
+		if (i < tmp.length - 1)
+			std::cout << ",";
+	}
+	std::cout << std::endl;
 	return 0;
 }

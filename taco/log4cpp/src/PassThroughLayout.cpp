@@ -4,8 +4,7 @@
 
 namespace log4cpp
 {
-   std::auto_ptr<Layout> create_pass_through_layout(const FactoryParams& params)
-   {
-      return std::auto_ptr<Layout>(new PassThroughLayout);
-   }
+    std::auto_ptr<Layout> create_pass_through_layout(const FactoryParams& params) {
+        return std::auto_ptr<Layout>(new PassThroughLayout);
+    }
 }

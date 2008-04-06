@@ -32,9 +32,9 @@
 # Author(s):	Jens Krueger
 #		$Author: jkrueger1 $
 #
-# Date:		$Date: 2005-07-25 11:40:17 $
+# Date:		$Date: 2008-04-06 09:07:47 $
 #
-# Version:	$Revision: 1.3 $
+# Version:	$Revision: 1.4 $
 #
 # Copyright (c) 2004, FRM-II, TU Munich, Germany
 #
@@ -54,4 +54,5 @@ for i in `ls -R1p $RES_BASE_DIR | grep -v '/$' | grep -v '^$'`; do
 	else
 		echo ERROR during update the $RES_BASE_DIR/$dir/$i resource file.
 	fi
+	sleep 2
 done

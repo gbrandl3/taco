@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.16 $
+ * Version:	$Revision: 1.17 $
  *
- * Date:	$Date: 2006-12-15 12:43:54 $
+ * Date:	$Date: 2008-04-06 09:07:40 $
  *
  */
 
@@ -127,7 +127,7 @@ db_res *NdbmServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 #endif 
 
 	for (int i = 0; i < num_res; i++)
-		logStream->debugStream() << "Resource name : " << rece->arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "Resource name : " << rece->arr1_val[i] << log4cpp::eol;
 //
 // Initialize browse_back structure error code 
 //
@@ -137,7 +137,7 @@ db_res *NdbmServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 //
 	try
 	{
-		browse_back.res_val.arr1_val = new nam[num_res];
+		browse_back.res_val.arr1_val = new DevString[num_res];
 	} 
 	catch (const std::bad_alloc &)
 	{
@@ -208,9 +208,9 @@ db_res *NdbmServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
  * @return a pointer to a structure of the db_res type, containing the device names
  *	and the error code.
  */
-db_res *NdbmServer::db_getdev_1_svc(nam *dev_name)
+db_res *NdbmServer::db_getdev_1_svc(DevString *dev_name)
 {
-	logStream->debugStream() << "Device server name (getdevlist) : " << *dev_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device server name (getdevlist) : " << *dev_name << log4cpp::eol;
 //
 // Initialize error code sended back to client 
 //
@@ -233,7 +233,7 @@ db_res *NdbmServer::db_getdev_1_svc(nam *dev_name)
 		int dev_num = db_devlist(*dev_name, &browse_back);
 
 		for (int i = 0; i < dev_num; i++)
-			logStream->debugStream() << "Device name : " << browse_back.res_val.arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+			logStream->debugStream() << "Device name : " << browse_back.res_val.arr1_val[i] << log4cpp::eol;
 
 	}
 	catch (const int err_db)
@@ -257,7 +257,7 @@ db_res *NdbmServer::db_getdev_1_svc(nam *dev_name)
  *
  * @return 0 if no errors occurs or the error code when there is a problem.  
  */
-int NdbmServer::db_find(const std::string tab_name, const std::string res_name, nam *out) throw (int)
+int NdbmServer::db_find(const std::string tab_name, const std::string res_name, DevString *out) throw (int)
 {
 	std::string	p_res_name(res_name),
     			adr_tmp1;
@@ -269,7 +269,7 @@ int NdbmServer::db_find(const std::string tab_name, const std::string res_name, 
 	GDBM_FILE 	tab;
 	datum 		key;
 
-	logStream->debugStream() << "Table name : " << tab_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Table name : " << tab_name << log4cpp::eol;
 
 //
 // Get family name 
@@ -292,9 +292,9 @@ int NdbmServer::db_find(const std::string tab_name, const std::string res_name, 
 	if (sec_res) 
 		std::transform(r_name.begin(), r_name.end(), r_name.begin(), DBServer::make_sec);
 
-	logStream->debugStream() << "Family name : " << family << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "Member name : " << member << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "Resource name : " << r_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Family name : " << family << log4cpp::eol;
+	logStream->debugStream() << "Member name : " << member << log4cpp::eol;
+	logStream->debugStream() << "Resource name : " << r_name << log4cpp::eol;
 //
 // Select the right resource table in the right database 
 //
@@ -315,7 +315,7 @@ int NdbmServer::db_find(const std::string tab_name, const std::string res_name, 
 	}
 	catch(const std::bad_alloc &)
 	{
-		logStream->errorStream() << "Error in malloc for key" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Error in malloc for key" << log4cpp::eol;
 		throw int (DbErr_ServerMemoryAllocation);
 	}
 
@@ -396,7 +396,7 @@ int NdbmServer::db_find(const std::string tab_name, const std::string res_name, 
 	catch(const std::bad_alloc &)
 	{
 		delete [] key.dptr;
-		logStream->errorStream() << "Error in malloc for out" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Error in malloc for out" << log4cpp::eol;
 		throw int (DbErr_ServerMemoryAllocation);
 	}
 //
@@ -420,7 +420,7 @@ int NdbmServer::db_find(const std::string tab_name, const std::string res_name, 
 int NdbmServer::db_devlist(const std::string dev_name, db_res * back)
 {
 	std::string	dev_na(dev_name);
-	std::vector<nam> ptra;
+	std::vector<DevString> ptra;
 	register int 	d_num = 0;
 	int 		i,
 			j,
@@ -437,8 +437,8 @@ int NdbmServer::db_devlist(const std::string dev_name, db_res * back)
 //
 	std::string		ds_name = dev_na.substr(pos + 1);
 
-	logStream->debugStream() << "Device server class (getdevlist) : " << ds_class << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "Device server name (getdevlist) : " << ds_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Device server class (getdevlist) : " << ds_class << log4cpp::eol;
+	logStream->debugStream() << "Device server name (getdevlist) : " << ds_name << log4cpp::eol;
 
 //
 // Try to retrieve the right tuple in NAMES table 
@@ -476,7 +476,7 @@ int NdbmServer::db_devlist(const std::string dev_name, db_res * back)
 			pos = dev_name.find('|');
 			if (pos == std::string::npos)
 			{
-				logStream->errorStream() << "No separator in the content." << log4cpp::CategoryStream::ENDLINE;
+				logStream->errorStream() << "No separator in the content." << log4cpp::eol;
 				delete [] key.dptr;
 				throw int (ERR_DEVNAME);
 			}
@@ -495,14 +495,14 @@ int NdbmServer::db_devlist(const std::string dev_name, db_res * back)
 		}
 		catch(const std::bad_alloc &)
 		{
-			for (std::vector<nam>::iterator j = ptra.begin(); j != ptra.end(); ++j)
+			for (std::vector<DevString>::iterator j = ptra.begin(); j != ptra.end(); ++j)
 				delete [] *j;
 			delete [] key.dptr;
 			return (DbErr_ServerMemoryAllocation);
 		}
 		catch (const int err)
 		{
-			for (std::vector<nam>::iterator j = ptra.begin(); j != ptra.end(); ++j)
+			for (std::vector<DevString>::iterator j = ptra.begin(); j != ptra.end(); ++j)
 				delete [] *j;
 			delete [] key.dptr;
 			return err;
@@ -518,7 +518,7 @@ int NdbmServer::db_devlist(const std::string dev_name, db_res * back)
 //
 	try
 	{
-    		back->res_val.arr1_val = new nam[ptra.size()];
+    		back->res_val.arr1_val = new DevString[ptra.size()];
     		back->res_val.arr1_len = ptra.size();
 		for (int j = 0; j < back->res_val.arr1_len; ++j)
 			back->res_val.arr1_val[j] = ptra[j];
@@ -556,7 +556,7 @@ DevLong *NdbmServer::db_putres_1_svc(tab_putres * rece)
 			content;
 
 	for (i = 0; i < res_num; i++)
-		logStream->debugStream() << "Resource name : " << rece->tab_putres_val[i].res_name << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "Resource name : " << rece->tab_putres_val[i].res_name << log4cpp::eol;
 //
 // Initialize sent back error code 
 //
@@ -608,10 +608,10 @@ DevLong *NdbmServer::db_putres_1_svc(tab_putres * rece)
 			member = temp.substr(0, pos);
 			r_name = temp.substr(pos + 1);
 
-			logStream->debugStream() << "Domain name : " << domain << log4cpp::CategoryStream::ENDLINE;
-			logStream->debugStream() << "Family name : " << family << log4cpp::CategoryStream::ENDLINE;
-			logStream->debugStream() << "Member name : " << member << log4cpp::CategoryStream::ENDLINE;
-			logStream->debugStream() << "Resource name : " << r_name << log4cpp::CategoryStream::ENDLINE;
+			logStream->debugStream() << "Domain name : " << domain << log4cpp::eol;
+			logStream->debugStream() << "Family name : " << family << log4cpp::eol;
+			logStream->debugStream() << "Member name : " << member << log4cpp::eol;
+			logStream->debugStream() << "Resource name : " << r_name << log4cpp::eol;
 //
 // Select the right resource table in CS database 
 //
@@ -761,10 +761,10 @@ DevLong *NdbmServer::db_putres_1_svc(tab_putres * rece)
 DevLong *NdbmServer::db_delres_1_svc(arr1 * rece /* , struct svc_req *rqstp */)
 {
 	u_int 	num_res = rece->arr1_len;
-	nam 	*old_res;
+	DevString 	*old_res;
 
 	for (int i = 0; i < num_res; i++)
-		logStream->debugStream() << "Resource to delete : " << rece->arr1_val[i] << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "Resource to delete : " << rece->arr1_val[i] << log4cpp::eol;
 //
 // Initialize error code 
 //
@@ -787,7 +787,7 @@ DevLong *NdbmServer::db_delres_1_svc(arr1 * rece /* , struct svc_req *rqstp */)
 //
 	try
 	{
-    		old_res = new nam[num_res];
+    		old_res = new DevString[num_res];
 		int	err_db;
 //
 // A loop on the resource's number to be deleted 
@@ -832,7 +832,7 @@ DevLong *NdbmServer::db_delres_1_svc(arr1 * rece /* , struct svc_req *rqstp */)
  *
  * @return 0 if no errors occurs or the error code when there is a problem.
  */
-int NdbmServer::db_del(std::string res_name, nam *p_oldres)
+int NdbmServer::db_del(std::string res_name, DevString *p_oldres)
 {
 	std::string 	t_name,
 			family,
@@ -854,7 +854,7 @@ int NdbmServer::db_del(std::string res_name, nam *p_oldres)
 //
 	if ((pos = res_name.find('/')) == std::string::npos)
 	{
-		logStream->errorStream() << "db_del : Error in resource name " << res_name << 	log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "db_del : Error in resource name " << res_name << 	log4cpp::eol;
 		return (DbErr_BadResourceType);
 	}
 	t_name = res_name.substr(0, pos);
@@ -863,7 +863,7 @@ int NdbmServer::db_del(std::string res_name, nam *p_oldres)
 //
 	if ((pos = res_name.find('/', (last_pos = pos + 1))) == std::string::npos)
 	{
-		logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::eol;
 		return (DbErr_BadResourceType);
 	}
 	family = res_name.substr(last_pos, pos - last_pos);
@@ -872,7 +872,7 @@ int NdbmServer::db_del(std::string res_name, nam *p_oldres)
 //
 	if ((pos = res_name.find('/', (last_pos = pos + 1))) == std::string::npos)
 	{
-		logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::eol;
 		return (DbErr_BadResourceType);
 	}
 	member = res_name.substr(last_pos, pos - last_pos);
@@ -881,9 +881,9 @@ int NdbmServer::db_del(std::string res_name, nam *p_oldres)
 //
 	r_name = res_name.substr(pos + 1);
 
-	logStream->debugStream() << "Family name : " << family << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "Number name : " << member << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "Resource name : " << r_name << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "Family name : " << family << log4cpp::eol;
+	logStream->debugStream() << "Number name : " << member << log4cpp::eol;
+	logStream->debugStream() << "Resource name : " << r_name << log4cpp::eol;
 //
 // Select the right resource table in database
 //
@@ -1010,7 +1010,7 @@ int NdbmServer::db_del(std::string res_name, nam *p_oldres)
  * 
  * @return 0 if no errors occurs or the error code when there is a problem. 
  */
-int NdbmServer::db_reinsert(arr1 * rece, nam *res_value, int num_res)
+int NdbmServer::db_reinsert(arr1 * rece, DevString *res_value, int num_res)
 {
 	tab_putres 	tmp;
 	int 		j,

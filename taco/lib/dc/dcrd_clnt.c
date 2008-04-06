@@ -23,13 +23,13 @@
  * Description:
  *
  * Author(s):   Emmanuel Taurel
- *              $Author: bourtemb $
+ *              $Author: jkrueger1 $
  * 
  * Original:    1993
  *
- * Version:     $Revision: 1.6 $
+ * Version:     $Revision: 1.7 $
  *
- * Date:        $Date: 2007-08-21 07:44:39 $
+ * Date:        $Date: 2008-04-06 09:07:15 $
  *
  *****************************************************************************/
 
@@ -62,7 +62,7 @@ static void sigpipe_handler(int signo)
 	return;
 }
 
-xres_clnt *dc_devget_clnt_1(xdevget *argp, CLIENT *clnt, DevArgument argout, DevType argout_type, long *perr)
+xres_clnt *dc_devget_clnt_1(xdevget *argp, CLIENT *clnt, DevArgument argout, DevType argout_type, DevLong *perr)
 {
 	static xres_clnt 	res;
 	enum clnt_stat 		clnt_stat;
@@ -101,7 +101,7 @@ xres_clnt *dc_devget_clnt_1(xdevget *argp, CLIENT *clnt, DevArgument argout, Dev
 	return (&res);
 }
 
-xresv_clnt *dc_devgetv_clnt_1(xdevgetv *argp, CLIENT *clnt, xres_clnt *st_ptr, long *perr)
+xresv_clnt *dc_devgetv_clnt_1(xdevgetv *argp, CLIENT *clnt, xres_clnt *st_ptr, DevLong *perr)
 {
 	static xresv_clnt 	res;
 	enum clnt_stat 		clnt_stat;
@@ -129,7 +129,7 @@ xresv_clnt *dc_devgetv_clnt_1(xdevgetv *argp, CLIENT *clnt, xres_clnt *st_ptr, l
 	return (&res);
 }
 
-xresm_clnt *dc_devgetm_clnt_1(mpar *argp, CLIENT *clnt, mint *st_ptr, long *perr)
+xresm_clnt *dc_devgetm_clnt_1(mpar *argp, CLIENT *clnt, mint *st_ptr, DevLong *perr)
 {
 	static xresm_clnt 	res;
 	enum clnt_stat 	clnt_stat;
@@ -157,7 +157,7 @@ xresm_clnt *dc_devgetm_clnt_1(mpar *argp, CLIENT *clnt, mint *st_ptr, long *perr
 	return (&res);
 }
 
-outpar *dc_devdef_1(imppar *argp, CLIENT *clnt, long *perr)
+outpar *dc_devdef_1(imppar *argp, CLIENT *clnt, DevLong *perr)
 {
 	static outpar 	res;
 	enum clnt_stat 	clnt_stat;
@@ -184,7 +184,7 @@ outpar *dc_devdef_1(imppar *argp, CLIENT *clnt, long *perr)
 	return (&res);
 }
 
-xres_hist_clnt *dc_devgeth_clnt_1(xdevgeth *argp, CLIENT *clnt, xresh_clnt *st_ptr, long *perr)
+xres_hist_clnt *dc_devgeth_clnt_1(xdevgeth *argp, CLIENT *clnt, xresh_clnt *st_ptr, DevLong *perr)
 {
 	static xres_hist_clnt	res;
 	enum clnt_stat		clnt_stat;
@@ -213,7 +213,7 @@ xres_hist_clnt *dc_devgeth_clnt_1(xdevgeth *argp, CLIENT *clnt, xresh_clnt *st_p
 	return (&res);
 }
 
-int dc_rpc_check_clnt_1(CLIENT *clnt, char **res, long *perr)
+int dc_rpc_check_clnt_1(CLIENT *clnt, char **res, DevLong *perr)
 {
 	enum clnt_stat clnt_stat;
 	void (* old_sighandler)(int);
@@ -236,3 +236,4 @@ int dc_rpc_check_clnt_1(CLIENT *clnt, char **res, long *perr)
 	}
 	return (0);
 }
+

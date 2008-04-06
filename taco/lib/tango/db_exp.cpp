@@ -30,9 +30,9 @@
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.2 $
+ * Version    :	$Revision: 1.3 $
  *
- * Date       :	$Date: 2006-09-18 22:09:12 $
+ * Date       :	$Date: 2008-04-06 09:07:19 $
  * 
  *-*******************************************************************/
 using namespace std;
@@ -49,6 +49,8 @@ using namespace std;
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevErrors.h>
+
+#include "taco_utils.h"
 
 #if defined(WIN32)
 #	include <rpc.h>
@@ -86,7 +88,7 @@ extern msgserver_info msg_info;
 /* Static and Global variables */
 
 extern int func_ptr;
-devexp_res *tab_clstu;
+static devexp_res *tab_clstu;
 
 static int first_devexp = 0;
 static int first_tcp_call = 0;
@@ -122,7 +124,7 @@ int _DLLFunc db_getdevexp_tango(char *filter, char ***tab, u_int *num_dev,long *
 	CLIENT *tcp_cl;
 	int tcp_so;
 	int tcp_used = 0;
-	long error;
+	DevLong error;
 	struct timeval tout;
 
         if (config_flags.no_database)
@@ -193,9 +195,7 @@ int _DLLFunc db_getdevexp_tango(char *filter, char ***tab, u_int *num_dev,long *
 		*perr = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(filter1,filter);
-	for(i=0;i<k;i++)
-		filter1[i] = tolower(filter1[i]);	
+	strcpy_tolower(filter1,filter);
 
 /* Realloc memory if the array tab_clstu is full */
 

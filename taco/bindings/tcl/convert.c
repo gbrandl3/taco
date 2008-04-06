@@ -33,14 +33,16 @@
  *
  * Original:  	June 1996
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-18 22:04:49 $
+ * Date:        $Date: 2008-04-06 09:06:33 $
  */
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
 #endif
+
+#include <tcl.h>
 
 #include "dev_io.h"
 #include "debug.h"
@@ -62,7 +64,7 @@ int F_D_BOOLEAN_TYPE (interp,Name,Param)
      int Param;
 {
  DevBoolean tmp;
- char *aux;
+ const char *aux;
  int temp;
  int R;
  
@@ -90,7 +92,7 @@ int F_D_USHORT_TYPE (interp,Name,Param)
      int Param;
 {
  DevUShort tmp;
- char *aux;
+ const char *aux;
  long temp;
  int R;
  
@@ -118,7 +120,7 @@ int F_D_SHORT_TYPE (interp,Name,Param)
      int Param;
 {
  DevShort tmp;
- char *aux;
+ const char *aux;
  int temp;
  int R;
  
@@ -146,7 +148,7 @@ int F_D_ULONG_TYPE (interp,Name,Param)
      int Param;
 {
  DevULong tmp;
- char *aux;
+ const char *aux;
  long temp;
  int R;
  
@@ -174,7 +176,7 @@ int F_D_LONG_TYPE (interp,Name,Param)
      int Param;
 {
  DevLong tmp;
- char *aux;
+ const char *aux;
  long temp;
  int R;
  
@@ -202,7 +204,7 @@ int F_D_FLOAT_TYPE (interp,Name,Param)
      int Param;
 {
  DevFloat tmp;
- char *aux;
+ const char *aux;
  double temp;
  int R;
  
@@ -230,7 +232,7 @@ int F_D_DOUBLE_TYPE (interp,Name,Param)
      int Param;
 {
  DevDouble tmp;
- char *aux;
+ const char *aux;
  double temp;
  int R;
  
@@ -257,13 +259,13 @@ int F_D_STRING_TYPE (interp,Name,Param)
      char *Name;
      int Param;
 {
- char *aux;
+ const char *aux;
  
  if (Param==INPUT)
     {
      aux = Tcl_GetVar (interp,Name,0);
      StringType =(DevString ) calloc (strlen(aux)+1,sizeof(char));
-     if(TCL_TEST) printf("convert: StringType= %X\n",StringType);
+     if(TCL_TEST) printf("convert: StringType= %p\n",StringType);
      memcpy (StringType,aux,strlen(aux));
      if(TCL_TEST) printf("convert: [StringType]= %s\n",StringType);
       InputArg = &(StringType);
@@ -283,7 +285,7 @@ int F_D_INT_FLOAT_TYPE (interp,Name,Param)
      char *Name;
      int Param;
 {
- char *aux;
+ const char *aux;
  long tmp1;
  double tmp2;
  DevIntFloat tmp3;
@@ -294,7 +296,7 @@ int F_D_INT_FLOAT_TYPE (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar (interp,Name,0);
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (R==TCL_ERROR) return False;
      if (Count != 2)       /* 2 elements in the structure */
         {
@@ -324,7 +326,7 @@ int F_D_FLOAT_READPOINT (interp,Name,Param)
      char *Name;
      int Param;
 {
- char *aux;
+ const char *aux;
  double tmp1;
  double tmp2;
  DevFloatReadPoint tmp3;
@@ -335,7 +337,7 @@ int F_D_FLOAT_READPOINT (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar (interp,Name,0);
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (R==TCL_ERROR) return False;
      if (Count != 2)       /* 2 elements in the structure */
         {
@@ -365,7 +367,7 @@ int F_D_STATE_FLOAT_READPOINT (interp,Name,Param)
      char *Name;
      int Param;
 {
- char *aux;
+ const char *aux;
  int tmp1;
  double tmp2;
  double tmp3;
@@ -377,7 +379,7 @@ int F_D_STATE_FLOAT_READPOINT (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar (interp,Name,0);
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (R==TCL_ERROR) return False;
      if (Count != 3)       /* 3 elements in the structure */
         {
@@ -410,7 +412,7 @@ int F_D_LONG_READPOINT (interp,Name,Param)
      char *Name;
      int Param;
 {
- char *aux;
+ const char *aux;
  long tmp1;
  long tmp2;
  DevLongReadPoint tmp3;
@@ -421,7 +423,7 @@ int F_D_LONG_READPOINT (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar (interp,Name,0);
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (Count != 2)       /* 2 elements in the structure */
         {
          return False;
@@ -450,7 +452,7 @@ int F_D_DOUBLE_READPOINT (interp,Name,Param)
      char *Name;
      int Param;
 {
- char *aux;
+ const char *aux;
  double tmp1;
  double tmp2;
  DevDoubleReadPoint tmp3;
@@ -461,7 +463,7 @@ int F_D_DOUBLE_READPOINT (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar (interp,Name,0);
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (R==TCL_ERROR) return False;
      if (Count != 2)       /* 2 elements in the structure */
         {
@@ -491,14 +493,14 @@ int F_D_VAR_CHARARR (interp,Name,Param)
      char *Name;
      int Param;
 {
- char *aux;
+ const char *aux;
  DevVarCharArray Arr;
 
  if (Param==INPUT)
     {
      aux = Tcl_GetVar(interp,Name,0); 
      Arr.length   = strlen(aux);
-     Arr.sequence = aux;
+     Arr.sequence = (char *)aux;
        
      InputArg = (DevVarCharArray *) malloc(sizeof(DevVarCharArray));
      memcpy (InputArg,&Arr,sizeof(DevVarCharArray));
@@ -519,12 +521,11 @@ int F_D_VAR_STRINGARR (interp,Name,Param)
      char *Name;
      int Param;
 {
- char *aux;
+ const char *aux;
  DevVarStringArray Arr;
  int Count; /* Number of elements present in the splited list */
  char **SplitList; /* Array of the split list */
  int R;
- int i;
 
  if (Param==INPUT)
     {
@@ -538,7 +539,7 @@ int F_D_VAR_STRINGARR (interp,Name,Param)
                   There will be count valid entries in the array, followed by
                   a NULL entry
 */
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
 #ifdef CONV_TRACE
      printf("F_D_VAR_STRINGARR:.....\n");
      printf("SplitList: count=%d\n",Count);
@@ -593,7 +594,7 @@ int F_D_VAR_USHORTARR (interp,Name,Param)
      int Param;
 {
  int i;
- char *aux;
+ const char *aux;
  DevVarUShortArray Arr;
  int Count; /* In order to Know how much elements are present in the split list */
  char **SplitList; /* Array of the split list */
@@ -603,7 +604,7 @@ int F_D_VAR_USHORTARR (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar(interp,Name,0);
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (R==TCL_ERROR) return False;
      if (Count<1)
         {
@@ -638,7 +639,7 @@ int F_D_VAR_SHORTARR (interp,Name,Param)
      int Param;
 {
  int i;
- char *aux;
+ const char *aux;
  DevVarShortArray Arr;
  int Count; /* In order to Know how much elements are present in the split list */
  char **SplitList; /* Array of the split list */
@@ -648,7 +649,7 @@ int F_D_VAR_SHORTARR (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar(interp,Name,0);
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (R==TCL_ERROR) return False;
      if (Count<1)
         {
@@ -683,7 +684,7 @@ int F_D_VAR_ULONGARR (interp,Name,Param)
      int Param;
 {
  int i;
- char *aux;
+ const char *aux;
  DevVarULongArray Arr;
  int Count; /* In order to Know how much elements are present in the split list */
  char **SplitList; /* Array of the split list */
@@ -693,7 +694,7 @@ int F_D_VAR_ULONGARR (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar(interp,Name,0);
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (R==TCL_ERROR) return False;
      if (Count<1)
         {
@@ -728,7 +729,7 @@ int F_D_VAR_LONGARR (interp,Name,Param)
      int Param;
 {
  int i;
- char *aux;
+ const char *aux;
  DevVarLongArray Arr;
  int Count; /* Number of elements present in the splited list */
  char **SplitList; /* Array of the split list */
@@ -738,7 +739,7 @@ int F_D_VAR_LONGARR (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar(interp,Name,0);
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (R==TCL_ERROR) return False;
      if (Count<1)
         {
@@ -773,7 +774,7 @@ int F_D_VAR_FLOATARR (interp,Name,Param)
      int Param;
 {
  int i;
- char *aux;
+ const char *aux;
  DevVarFloatArray Arr;
  int Count; /* In order to Know how much elements are present in the split list */
  char **SplitList; /* Array of the split list */
@@ -783,7 +784,7 @@ int F_D_VAR_FLOATARR (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar(interp,Name,0);
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (R==TCL_ERROR) return False;
      if (Count<1)
         {
@@ -818,7 +819,7 @@ int F_D_VAR_DOUBLEARR (interp,Name,Param)
      int Param;
 {
  int i;
- char *aux;
+ const char *aux;
  DevVarDoubleArray Arr;
  int Count; /* In order to Know how much elements are present in the split list */
  char **SplitList; /* Array of the split list */
@@ -828,7 +829,7 @@ int F_D_VAR_DOUBLEARR (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar(interp,Name,0);
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (R==TCL_ERROR) return False;
      if (Count<1)
         {
@@ -863,7 +864,7 @@ int F_D_VAR_FRPARR (interp,Name,Param)
      int Param;
 {
  int i;
- char *aux;
+ const char *aux;
  DevVarFloatReadPointArray Arr;
  int Count; /* In order to Know how much elements are present in the split list */
  char **SplitList; /* Array of the split list */
@@ -874,7 +875,7 @@ int F_D_VAR_FRPARR (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar(interp,Name,0);
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (R==TCL_ERROR) return False;
      if (Count<2 || Count%2==1)
         {
@@ -912,7 +913,7 @@ int F_D_VAR_SFRPARR (interp,Name,Param)
      int Param;
 {
  int i;
- char *aux;
+ const char *aux;
  DevVarStateFloatReadPointArray Arr;
  int Count; /* In order to Know how much elements are present in the split list */
  char **SplitList; /* Array of the split list */
@@ -923,7 +924,7 @@ int F_D_VAR_SFRPARR (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar(interp,Name,0);
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (R==TCL_ERROR) return False;
      if (Count<3 || Count%3 != 0)
         {
@@ -964,7 +965,7 @@ int F_D_VAR_LRPARR (interp,Name,Param)
      int Param;
 {
  int i;
- char *aux;
+ const char *aux;
  DevVarLongReadPointArray Arr;
  int Count; /* In order to Know how much elements are present in the split list */
  char **SplitList; /* Array of the split list */
@@ -974,7 +975,7 @@ int F_D_VAR_LRPARR (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar(interp,Name,0);
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (R==TCL_ERROR) return False;
      if (Count<2 || Count%2==1)
         {
@@ -1011,7 +1012,7 @@ int F_D_OPAQUE_TYPE (interp,Name,Param)
      char *Name;
      int Param;
 {
- char *aux;
+ const char *aux;
  DevOpaque Arr;
  int Count; /* In order to Know how much elements are present in the split list */
  char **SplitList; /* Array of the split list */
@@ -1020,7 +1021,7 @@ int F_D_OPAQUE_TYPE (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar(interp,Name,0);
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (R==TCL_ERROR) return False;
      if (Count<1)
         {
@@ -1051,7 +1052,7 @@ int F_D_MULMOVE_TYPE (interp,Name,Param)
      int Param;
 {
  int i;
- char *aux;
+ const char *aux;
  DevMulMove Arr;
  int Count; /* In order to Know how much elements are present in the split list */
  char **SplitList; /* Array of the split list */
@@ -1062,7 +1063,7 @@ int F_D_MULMOVE_TYPE (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar(interp,Name,0);
-     Tcl_SplitList (interp,aux,&Count,&SplitList);
+     Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (Count!=24)    /* Number of elements in the DevMulMove structure */
         {
          return False; /* Must be modified */
@@ -1097,7 +1098,7 @@ int F_D_MOTOR_LONG (interp,Name,Param)
      char *Name;
      int Param;
 {
- char *aux;
+ const char *aux;
  long tmp1;
  long tmp2;
  DevMotorLong tmp3;
@@ -1108,7 +1109,7 @@ int F_D_MOTOR_LONG (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar (interp,Name,0);
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (R==TCL_ERROR) return False;
      if (Count != 2)       /* 2 elements in the structure */
         {
@@ -1138,7 +1139,7 @@ int F_D_MOTOR_FLOAT (interp,Name,Param)
      char *Name;
      int Param;
 {
- char *aux;
+ const char *aux;
  long tmp1;
  double tmp2;
  DevMotorFloat tmp3;
@@ -1149,7 +1150,7 @@ int F_D_MOTOR_FLOAT (interp,Name,Param)
  if (Param==INPUT)
     {
      aux = Tcl_GetVar (interp,Name,0);
-     R=Tcl_SplitList (interp,aux,&Count,&SplitList);
+     R=Tcl_SplitList (interp,aux,&Count,(const char ***)&SplitList);
      if (R==TCL_ERROR) return False;
      if (Count != 2)       /* 2 elements in the structure */
         {
@@ -1174,37 +1175,3 @@ int F_D_MOTOR_FLOAT (interp,Name,Param)
 }
 #endif
 
-
-
-
-
-
-     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-     
-
-     
-     
-   

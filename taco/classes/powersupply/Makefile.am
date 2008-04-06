@@ -19,9 +19,8 @@
 
 noinst_HEADERS 		= PowerSupply.h AGPowerSupply.h
 
-INCLUDES		= @TACO_INCLUDES@
-
-LIBADD 			= @TACO_SERVER_CXX_LIBS@ -lstdc++
+AM_CXXFLAGS     	= @TACO_INCLUDES@ -I$(top_srcdir)/log4cpp/include 
+AM_CFLAGS       	= @TACO_INCLUDES@
 
 noinst_LTLIBRARIES 	= libPowersupply.la
 

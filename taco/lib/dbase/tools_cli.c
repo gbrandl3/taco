@@ -31,10 +31,10 @@
  * 
  * Original   :   April 1997
  * 
- * Version    :   $Revision: 1.8 $
+ * Version    :   $Revision: 1.9 $
  * 
- * Date       :   $Date: 2007-09-03 10:06:37 $
- *-*******************************************************************/
+ * Date       :   $Date: 2008-04-06 09:07:14 $
+ ********************************************************************/
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -48,6 +48,8 @@
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevErrors.h>
+
+#include "taco_utils.h"
 
 #if defined(WIN32)
 #	include <rpc.h>
@@ -111,18 +113,19 @@ static struct timeval timeout_browse={60,0};
  * @li ...
  *									
  * @param dev_name	Device name
- * @param p_info 	Pointer for device information
+ * @param p_info 	Pointer for device information			
  * @param p_error 	Pointer for the error code in case of problems
  *
  * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info,long *p_error)
+long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info, DevLong *p_error)
 {
 	db_devinfo_svc *recev;
 	int i,k;
-	char *name_sent;
-	long error;
+	char 	*name_sent,
+		*ptr;
+	DevLong error;
 	long exit_code = DS_OK;
 	struct timeval old_tout;
 	CLIENT *local_cl;
@@ -187,13 +190,15 @@ long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info,long *p_error)
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(name_sent,dev_name);
-	for(i = 0;i < k;i++)
-		name_sent[i] = tolower(name_sent[i]);
+	ptr = strcpy_tolower(name_sent,dev_name);
+/*
+ * if the device name contains the hostname strip the host name ???
+ */
+	if (strncmp(name_sent, "//", 2) == 0)
+		ptr = strchr(name_sent + 2, '/') + 1;
 
 /* Call server */
-
-	recev = db_deviceinfo_1(&name_sent,local_cl,&error);
+	recev = db_deviceinfo_1(&ptr,local_cl,&error);
 
 /* Any problem with server ? If yes and if it is a time-out, try to reconnect
    to a new database server. */
@@ -300,11 +305,11 @@ long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info,long *p_error)
  * @return    	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_deviceres(long dev_nb, char **dev_name_list, long *p_res_nb, char ***ppp_list, long *p_error)
+long db_deviceres(long dev_nb, char **dev_name_list, long *p_res_nb, char ***ppp_list, DevLong *p_error)
 {
 	db_res *recev;
 	int i,j,k;
-	long error;
+	DevLong error;
 	long exit_code = DS_OK;
 	long nb_res;
 	db_res sent;
@@ -422,9 +427,7 @@ long db_deviceres(long dev_nb, char **dev_name_list, long *p_res_nb, char ***ppp
 			*p_error = DbErr_ClientMemoryAllocation;
 			return(DS_NOTOK);
 		}
-		strcpy(sent.res_val.arr1_val[i],dev_name_list[i]);
-		for(j = 0;j < k;j++)
-			sent.res_val.arr1_val[i][j] = tolower(sent.res_val.arr1_val[i][j]);
+		strcpy_tolower(sent.res_val.arr1_val[i],dev_name_list[i]);
 	}
 
 /* Call server */
@@ -555,12 +558,12 @@ long db_deviceres(long dev_nb, char **dev_name_list, long *p_res_nb, char ***ppp
  * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_devicedelete(const char *dev_name,long *p_error)
+long db_devicedelete(const char *dev_name,DevLong *p_error)
 {
 	long *recev;
 	int i,k;
 	char *name_sent;
-	long error;
+	DevLong error;
 	long exit_code = DS_OK;
 	struct timeval old_tout;
 	CLIENT *local_cl;
@@ -625,9 +628,7 @@ long db_devicedelete(const char *dev_name,long *p_error)
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(name_sent,dev_name);
-	for(i = 0;i < k;i++)
-		name_sent[i] = tolower(name_sent[i]);
+	strcpy_tolower(name_sent,dev_name);
 
 /* Call server */
 
@@ -722,7 +723,7 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 	db_psdev_error *recev;
 	int i,j,k;
 	db_res sent;
-	long error;
+	DevLong error;
 	long exit_code = DS_OK;
 	struct timeval old_tout;
 	CLIENT *local_cl;
@@ -806,9 +807,7 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 			p_error->error_code = DbErr_ClientMemoryAllocation;
 			return(DS_NOTOK);
 		}
-		strcpy(sent.res_val.arr1_val[i],dev_name_list[i]);
-		for(j = 0;j < k;j++)
-			sent.res_val.arr1_val[i][j] = tolower(sent.res_val.arr1_val[i][j]);
+		strcpy_tolower(sent.res_val.arr1_val[i],dev_name_list[i]);
 	}
 
 /* Sort this device name list */
@@ -916,11 +915,11 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
  * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK 
  */
-long db_stat(db_stat_call *p_info,long *p_error)
+long db_stat(db_stat_call *p_info,DevLong *p_error)
 {
 	db_info_svc *recev;
 	int i;
-	long error;
+	DevLong error;
 	long exit_code = DS_OK;
 	struct timeval old_tout;
 	CLIENT *local_cl;
@@ -1104,11 +1103,11 @@ long db_stat(db_stat_call *p_info,long *p_error)
  * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
+long db_servunreg(const char *ds_name,const char *pers_name,DevLong *p_error)
 {
 	long *recev;
 	int i,j,k;
-	long error;
+	DevLong error;
 	long exit_code = DS_OK;
 	db_res sent;
 	struct timeval old_tout;
@@ -1185,9 +1184,7 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(sent.res_val.arr1_val[0],ds_name);
-	for(i = 0;i < k;i++)
-		sent.res_val.arr1_val[0][i] = tolower(sent.res_val.arr1_val[0][i]);
+	strcpy_tolower(sent.res_val.arr1_val[0],ds_name);
 
 	k = strlen(pers_name);
 	if ((sent.res_val.arr1_val[1] = (char *)malloc(k + 1)) == NULL)
@@ -1197,9 +1194,7 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(sent.res_val.arr1_val[1],pers_name);
-	for(i = 0;i < k;i++)
-		sent.res_val.arr1_val[1][i] = tolower(sent.res_val.arr1_val[1][i]);
+	strcpy_tolower(sent.res_val.arr1_val[1],pers_name);
 		
 /* Call server */
 
@@ -1305,11 +1300,12 @@ long db_servunreg(const char *ds_name,const char *pers_name,long *p_error)
  * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_servinfo(const char *ds_name,const char *pers_name, db_svcinfo_call *p_inf, long *p_error)
+long db_servinfo(const char *ds_name,const char *pers_name, db_svcinfo_call *p_inf, DevLong *p_error)
 {
 	svcinfo_svc *recev;
 	int i,j,k;
-	long error,tmp,tmp_dev;
+	DevLong error;
+	long tmp,tmp_dev;
 	long exit_code = DS_OK;
 	db_res sent;
 	struct timeval old_tout;
@@ -1393,9 +1389,7 @@ long db_servinfo(const char *ds_name,const char *pers_name, db_svcinfo_call *p_i
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(sent.res_val.arr1_val[0],ds_name);
-	for(i = 0;i < k;i++)
-		sent.res_val.arr1_val[0][i] = tolower(sent.res_val.arr1_val[0][i]);
+	strcpy_tolower(sent.res_val.arr1_val[0],ds_name);
 
 	k = strlen(pers_name);
 	if ((sent.res_val.arr1_val[1] = (char *)malloc(k + 1)) == NULL)
@@ -1405,9 +1399,7 @@ long db_servinfo(const char *ds_name,const char *pers_name, db_svcinfo_call *p_i
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(sent.res_val.arr1_val[1],pers_name);
-	for(i = 0;i < k;i++)
-		sent.res_val.arr1_val[1][i] = tolower(sent.res_val.arr1_val[1][i]);
+	strcpy_tolower(sent.res_val.arr1_val[1],pers_name);
 		
 /* Call server */
 
@@ -1559,11 +1551,11 @@ long db_servinfo(const char *ds_name,const char *pers_name, db_svcinfo_call *p_i
  * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_servdelete(const char *ds_name,const char *pers_name, long delres_flag, long *p_error)
+long db_servdelete(const char *ds_name,const char *pers_name, long delres_flag, DevLong *p_error)
 {
 	long *recev;
 	int i,j,k;
-	long error;
+	DevLong error;
 	long exit_code = DS_OK;
 	db_res sent;
 	struct timeval old_tout;
@@ -1646,9 +1638,7 @@ long db_servdelete(const char *ds_name,const char *pers_name, long delres_flag, 
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(sent.res_val.arr1_val[0],ds_name);
-	for(i = 0;i < k;i++)
-		sent.res_val.arr1_val[0][i] = tolower(sent.res_val.arr1_val[0][i]);
+	strcpy_tolower(sent.res_val.arr1_val[0],ds_name);
 
 	k = strlen(pers_name);
 	if ((sent.res_val.arr1_val[1] = (char *)malloc(k + 1)) == NULL)
@@ -1658,9 +1648,7 @@ long db_servdelete(const char *ds_name,const char *pers_name, long delres_flag, 
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(sent.res_val.arr1_val[1],pers_name);
-	for(i = 0;i < k;i++)
-		sent.res_val.arr1_val[1][i] = tolower(sent.res_val.arr1_val[1][i]);
+	strcpy_tolower(sent.res_val.arr1_val[1],pers_name);
 		
 /* Call server */
 
@@ -1757,12 +1745,12 @@ long db_servdelete(const char *ds_name,const char *pers_name, long delres_flag, 
  * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_getpoller(const char *dev_name,db_poller *poll,long *p_error)
+long db_getpoller(const char *dev_name,db_poller *poll,DevLong *p_error)
 {
 	db_poller_svc *recev;
 	int i,k;
 	char *name_sent;
-	long error;
+	DevLong error;
 	long exit_code = DS_OK;
 	struct timeval old_tout;
 	CLIENT *local_cl;
@@ -1827,9 +1815,7 @@ long db_getpoller(const char *dev_name,db_poller *poll,long *p_error)
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(name_sent,dev_name);
-	for(i = 0;i < k;i++)
-		name_sent[i] = tolower(name_sent[i]);
+	strcpy_tolower(name_sent,dev_name);
 
 /* Call server */
 
@@ -1924,20 +1910,20 @@ long db_getpoller(const char *dev_name,db_poller *poll,long *p_error)
 
 
 /**@ingroup dbaseAPImisc
- * This functions initialises a resource cache for the specified domain.
+ * This function initialises a resource cache for the specified domain.
  *									
  * @param domain 	Domain name
  * @param p_error  	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and set the variable
+ * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_initcache(const char *domain, long *p_error)
+long db_initcache(const char *domain, DevLong *p_error)
 {
 	long *recev;
 	int i,k;
 	char *name_sent;
-	long error;
+	DevLong error;
 	long exit_code = DS_OK;
 	struct timeval old_tout;
 	CLIENT *local_cl;
@@ -2002,9 +1988,7 @@ long db_initcache(const char *domain, long *p_error)
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(name_sent,domain);
-	for(i = 0;i < k;i++)
-		name_sent[i] = tolower(name_sent[i]);
+	strcpy_tolower(name_sent,domain);
 
 /* Call server */
 

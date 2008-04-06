@@ -30,9 +30,9 @@
  *
  * Original     : February 1993
  *
- * Version      : $Revision: 1.4 $
+ * Version      : $Revision: 1.5 $
  *
- * Date         : $Date: 2006-09-18 21:49:14 $
+ * Date         : $Date: 2008-04-06 09:07:50 $
  *
  */
 
@@ -55,39 +55,33 @@ extern char *addr_ptr,*addr_alloc,*addr_data;
 extern int semid;
 extern int req_call;
 
-/****************************************************************************
-*                                                                           *
-*		Server code for dc_open function                            *
-*                               -------                                     *
-*                                                                           *
-*    Function rule : To initialize in the data collector database part all  *
-*		     the information needed for further dc_dataput and      *
-*		     of course, dc_devget.. functions.			    *
-*		     files) a resource value                                *
-*                                                                           *
-*    Argin : A pointer to a structure of the "arr1" type                    *
-*            The definition of the arr1 type is :                           *
-*            struct {                                                       *
-*              u_int arr1_len;     The number of strings                    *
-*              char **arr1_val;    A pointer to the array of strings        *
-*                  }                                                        *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a structure of the "db_res" type.   *
-*    The definition of this structure is :                                  *
-*    struct {                                                               *
-*      arr1 rev_val;   A structure of the arr1 type (see above) with the    *
-*                     resources values information transferred as strings   *
-*      int db_err;    The database error code                               *
-*                     0 if no error                                         *
-*          }                                                                *
-*                                                                           *
-*****************************************************************************/
+int dev_open(dc_dev_x *dev_info, int *perr);
+int add_device(dc_dev_x *dev_inf,char *d_name,int *perr);
+int upd_device(dc_dev_x *dev_inf,char *d_name,int ind,dc_dev_param *pdata,int *perr);
+int dev_remove(char *dev_name,int ptrs_beg,int *perr);
 
-
-dc_xdr_error *dc_open_1(rece)
-dc_open_in *rece;
+/**
+ * To initialize in the data collector database part all the information needed 
+ * for further dc_dataput and of course, dc_devget.. functions.
+ *
+ * @param rece A pointer to a structure of the "arr1" type 
+ *            The definition of the arr1 type is :
+ *            struct {
+ *              u_int arr1_len;     The number of strings
+ *              char **arr1_val;    A pointer to the array of strings
+ *            }
+ * 
+ * @return This function returns a pointer to a structure of the "db_res" type.
+ *    The definition of this structure is :
+ *    struct {
+ *      arr1 rev_val;   A structure of the arr1 type (see above) with the
+ *                     resources values information transferred as strings
+ *      int db_err;    The database error code
+ *                     0 if no error
+ *          }
+ *
+ */
+dc_xdr_error *dc_open_1(dc_open_in *rece)
 {
 	int num_dev;
 	int i,j,nb_cmd;
@@ -149,35 +143,25 @@ dc_open_in *rece;
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for dev_open function                                  *
-*                        --------                                           *
-*                                                                           *
-*    Function rule : To initialize or update in pointers area/device info   *
-*		     part of the data collector the device information	    *
-*		     This function is called for every device		    *
-*                                                                           *
-*    Argin : - A pointer to the structure which contains the device         *
-*	     information (dc_dev_x type)				    *
-*	     - A pointer to the error code				    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no error occurs. Otherwise, this function   *
-*    set the error code and returns -1					    *
-*                                                                           *
-*****************************************************************************/
-
-int dev_open(dev_info,perr)
-dc_dev_x *dev_info;
-int *perr;
+/**
+ * To initialize or update in pointers area/device info part of the data 
+ * collector the device information. This function is called for every device
+ *
+ * @param dev_info A pointer to the structure which contains the device
+ *	     information (dc_dev_x type)
+ * @param perr A pointer to the error code
+ *
+ * @return  This function returns 0 if no error occurs. Otherwise, this function
+ *    set the error code and returns -1
+ *
+ */
+int dev_open(dc_dev_x *dev_info, int *perr)
 {
 	int resu;
 	char d_name[60];
 	dc_dev_param data;
 	int ind;
-	long error;
+	DevLong error;
 
 /* Check that command number is correct */
 
@@ -230,34 +214,23 @@ int *perr;
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for add_device function                                *
-*                        ----------                                         *
-*                                                                           *
-*    Function rule : To add a new device in the pointers/device_info area   *
-*                                                                           *
-*    Argin : - A pointer to the structure which contains the device         *
-*	     information (dc_dev_x type)				    *
-*	     - A pointer to the device name			    	    *
-*            - A pointer to the error code				    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no error occurs. Otherwise, this function   *
-*    set the error code and returns -1					    *
-*                                                                           *
-*****************************************************************************/
-
-int add_device(dev_inf,d_name,perr)
-dc_dev_x *dev_inf;
-char *d_name;
-int *perr;
+/**
+ * To add a new device in the pointers/device_info area.
+ *
+ * @param dev_inf A pointer to the structure which contains the device information 
+ * (dc_dev_x type)
+ * @param d_name A pointer to the device name
+ * @param perr A pointer to the error code
+ * 
+ * @return This function returns 0 if no error occurs. Otherwise, this function
+ *    set the error code and returns -1
+ */
+int add_device(dc_dev_x *dev_inf,char *d_name,int *perr)
 {
 	int i,j,resu;
 	dc_dev_param data;
 	int dev_number;
-	long error;
+	DevLong error;
 
 /* A special case with no meaning : adding a device but with 0 cmd !! */
 
@@ -299,39 +272,26 @@ int *perr;
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for upd_device function                                *
-*                        ----------                                         *
-*                                                                           *
-*    Function rule : To update device information which are stored in       *
-*		     the DCINF database table				    *
-*                                                                           *
-*    Argin : - A pointer to the structure which contains the device         *
-*	     information (dc_dev_x type)				    *
-*	     - A pointer to the device name			    	    *
-*	     - The indice in the device_info area of the device structure   *
-*	     - The address of the structure returned by the previous call   *
-*	       the serching function					    *
-*            - A pointer to the error code				    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no error occurs. Otherwise, this function   *
-*    set the error code and returns -1					    *
-*                                                                           *
-*****************************************************************************/
-
-int upd_device(dev_inf,d_name,ind,pdata,perr)
-dc_dev_x *dev_inf;
-char *d_name;
-int ind;
-dc_dev_param *pdata;
-int *perr;
+/**
+ * To update device information which are stored in the DCINF database table
+ *
+ * @param dev_inf A pointer to the structure which contains the device
+ *	     information (dc_dev_x type)
+ * @param d_name A pointer to the device name
+ * @param ind The indice in the device_info area of the device structure
+ * @param pdata	The address of the structure returned by the previous call
+ *	       the searching function
+ * @param perr A pointer to the error code
+ * 
+ * @return This function returns 0 if no error occurs. Otherwise, this function
+ *    set the error code and returns -1
+ *                                                                           *
+ */
+int upd_device(dc_dev_x *dev_inf,char *d_name,int ind,dc_dev_param *pdata,int *perr)
 {
 	dc_dev_param reta;
 	int i,j;
-	long error;
+	DevLong error;
 
 /* Build the new device information structure */
 
@@ -366,34 +326,25 @@ int *perr;
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Server code for dc_close function                           *
-*                               --------                                    *
-*                                                                           *
-*    Function rule : To unregister a list of devices from the data collector*
-*		     After this call, it will not be possible to store      *
-*		     device command result in the data collector	    *
-*                                                                           *
-*    Argin : The name of the device server                                  *
-*            The definition of the nam type is :                            *
-*            typedef char *nam;                                             *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a structure of the "db_res" type.   *
-*    The definition of this structure is :                                  *
-*    struct {                                                               *
-*      arr1 rev_val;   A structure of the arr1 type (see above) with the    *
-*                     devices names                                         *
-*      int db_err;    The database error code                               *
-*                     0 if no error                                         *
-*            }                                                              *
-*                                                                           *
-****************************************************************************/
-
-dc_xdr_error *dc_close_1(dev_name)
-register name_arr *dev_name;
+/**
+ * To unregister a list of devices from the data collector
+ * After this call, it will not be possible to store device command result in 
+ * the data collector
+ *
+ * @param dev_name The name of the device server. The definition of the nam 
+ *                  type is : typedef char *nam;
+ * 
+ * @return This function returns a pointer to a structure of the "db_res" type.   *
+ *    The definition of this structure is :
+ *    struct {
+ *      arr1 rev_val;   A structure of the arr1 type (see above) with the
+ *                     devices names
+ *      int db_err;    The database error code
+ *                     0 if no error
+ *            }
+ * 
+ */
+dc_xdr_error *dc_close_1(name_arr *dev_name)
 {
 	int dev_number;
 	int i;
@@ -437,32 +388,22 @@ register name_arr *dev_name;
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for dev_remove function                                *
-*                        ----------                                         *
-*                                                                           *
-*    Function rule : To unregister a device from the data collector         *
-*                                                                           *
-*    Argin : - A pointer to the device name				    *
-*	     - A pointer to the error code				    *
-*	     - The offset from the pointers shared memory segment beginning *
-*	       to the beginning of the pointers themself		    * 
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no error occurs. Otherwise, this function   *
-*    set the error code and returns -1					    *
-*                                                                           *
-*****************************************************************************/
-
-int dev_remove(dev_name,ptrs_beg,perr)
-char *dev_name;
-int ptrs_beg;
-int *perr;
+/**
+ * To unregister a device from the data collector
+ *
+ * @param dev_name A pointer to the device name
+ * @param ptrs_beg The offset from the pointers shared memory segment beginning
+ *	    to the beginning of the pointers themself
+ * @param perr A pointer to the error code
+ *
+ * @return This function returns 0 if no error occurs. Otherwise, this function
+ *    set the error code and returns -1
+ * 
+ */
+int dev_remove(char *dev_name,int ptrs_beg,int *perr)
 {
 	int resu;
-	long error;
+	DevLong error;
 	unsigned int *ptr;
 	int ind,size;
 	int_level *int_array;
@@ -480,48 +421,53 @@ int *perr;
    name */
 
 	resu = search_dev(dev_name,&data,&mem,&ind,&error);
-	if (resu == -1) {
+	if (resu == -1) 
+	{
 #ifdef DEBUG
 		printf("endf (search_dev) dev_remove\n");
 #endif /* DEBUG */
-		if (error == DcErr_DeviceNotInPtrsMemory) {
+		if (error == DcErr_DeviceNotInPtrsMemory) 
+		{
 			*perr = DcErr_DeviceNotDefined;
 			return(-1);
-							}
-		else {
+		}
+		else 
+		{
 			*perr = error;
 			return(-1);
-		     }
-			}
+		}
+	}
 
 /* The device exists, so do the work
    Free the data buffers used for this device */
 
-	for (i = 0;i < HIST;i++) {
-		ptr = int_array[ind].data_buf[i];
-		if (ptr == NULL)
+	for (i = 0;i < HIST;i++) 
+	{
+		if (int_array[ind].data_buf[i] == -1)
 			break;
+		ptr = (unsigned int *)addr_ptr + (int)int_array[ind].data_buf[i];
 		size = ptr[1];
-		if (dcmem_free((unsigned char*)addr_alloc,(unsigned char *)addr_data,
-			        (unsigned char *)ptr,size,semid,&error)) {
+		if (dcmem_free((unsigned char*)addr_alloc,(unsigned char *)addr_data, (unsigned char *)ptr,size,semid,&error)) 
+		{
 #ifdef DEBUG
 			printf("endf (dcmem_free) dev_remove\n");
 #endif /* DEBUG */
 			*perr = DcErr_CantFreeDataBuffer;
 			return(-1);
-								}
-		int_array[ind].data_buf[i] = NULL;
-				}
+		}
+		int_array[ind].data_buf[i] = -1;
+	}
 
 /* Delete the device from the device_info area */
 
-	if (delete_dev(dev_name,&mem,&error)) {
+	if (delete_dev(dev_name,&mem,&error)) 
+	{
 #ifdef DEBUG
 		printf("endf (delete_dev) dev_remove\n");
 #endif /* DEBUG */
 		*perr = error;;
 		return(-1);
-						}
+	}
 
 /* Leave function */
 

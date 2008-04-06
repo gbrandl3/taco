@@ -30,9 +30,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  *
  *******************************************************************-*/
 
@@ -45,22 +45,22 @@
  */
 
 struct DevRfSigConfig {
-        int 	number;
-	char 	name[12];
-	char 	family[4];
-	int 	related_setpoint;
-	char 	units[8];
-	float 	warn_high;
-	float 	warn_low;
-	float 	error_high;
-	float 	error_low;
-	float 	scale_high;
-	float 	scale_low;
-	char 	format[16];
-	char 	description[80];
-	double 	setptr;
-	char 	false_text[10];
-	char 	true_text[10];
+        DevLong 	number;
+	DevChar 	name[12];
+	DevChar 	family[4];
+	DevLong 	related_setpoint;
+	DevChar 	units[8];
+	DevFloat 	warn_high;
+	DevFloat 	warn_low;
+	DevFloat 	error_high;
+	DevFloat 	error_low;
+	DevFloat 	scale_high;
+	DevFloat 	scale_low;
+	DevChar 	format[16];
+	DevChar 	description[80];
+	DevDouble 	setptr;
+	DevChar 	false_text[10];
+	DevChar 	true_text[10];
 };
 typedef struct DevRfSigConfig 	DevRfSigConfig ;
 bool_t 	_DLLFunc xdr_DevRfSigConfig PT_((XDR *xdrs, DevRfSigConfig *objp));

@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2006-12-15 12:43:54 $
+ * Date:	$Date: 2008-04-06 09:07:40 $
  *
  */
 
@@ -52,7 +52,7 @@
 db_res *NdbmServer::resdomainlist_1_svc()
 {
 
-	logStream->debugStream() << "In resdomainlist_1_svc function" << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "In resdomainlist_1_svc function" << log4cpp::eol;
 
 //
 // Initialize structure sent back to client
@@ -91,7 +91,7 @@ db_res *NdbmServer::resdomainlist_1_svc()
 	browse_back.res_val.arr1_len = dom_list.size();
 	if (dom_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
 	{
-		logStream->errorStream() << "Memory allocation error in resdomainlist" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Memory allocation error in resdomainlist" << log4cpp::eol;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}
@@ -110,12 +110,12 @@ db_res *NdbmServer::resdomainlist_1_svc()
  *
  * @return The family name list
  */
-db_res *NdbmServer::resfamilylist_1_svc(nam* domain)
+db_res *NdbmServer::resfamilylist_1_svc(DevString* domain)
 {
 	long 		i;
 	std::string 	user_domain(*domain);
 
-	logStream->debugStream() << "In resfamilylist_1_svc function for domain " << user_domain << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "In resfamilylist_1_svc function for domain " << user_domain << log4cpp::eol;
 	
 //
 // Initialize structure sent back to client
@@ -170,13 +170,13 @@ db_res *NdbmServer::resfamilylist_1_svc(nam* domain)
 	}
 	catch (NdbmError &err)
 	{		
-		logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << err.get_err_message() << log4cpp::eol;
 		browse_back.db_err = err.get_err_code();
 		return(&browse_back);
 	}
 	catch (std::bad_alloc)
 	{		
-		logStream->errorStream() << "Memory allocation error in resfamilylist" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Memory allocation error in resfamilylist" << log4cpp::eol;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}
@@ -192,7 +192,7 @@ db_res *NdbmServer::resfamilylist_1_svc(nam* domain)
 	browse_back.res_val.arr1_len = fam_list.size();
 	if (fam_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
 	{
-		logStream->errorStream() << "Memory allocation error in resfamilylist" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Memory allocation error in resfamilylist" << log4cpp::eol;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}
@@ -218,7 +218,7 @@ db_res *NdbmServer::resmemberlist_1_svc(db_res *recev)
 	std::string user_domain(recev->res_val.arr1_val[0]);
 	std::string user_family(recev->res_val.arr1_val[1]);
 
-	logStream->debugStream() << "In resmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "In resmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << log4cpp::eol;
 	
 //
 // Initialize structure sent back to client
@@ -276,13 +276,13 @@ db_res *NdbmServer::resmemberlist_1_svc(db_res *recev)
 	}
 	catch (NdbmError &err)
 	{		
-		logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << err.get_err_message() << log4cpp::eol;
 		browse_back.db_err = err.get_err_code();
 		return(&browse_back);
 	}
 	catch (std::bad_alloc)
 	{		
-		logStream->errorStream() << "Memory allocation error in resmemberlist" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Memory allocation error in resmemberlist" << log4cpp::eol;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}
@@ -298,7 +298,7 @@ db_res *NdbmServer::resmemberlist_1_svc(db_res *recev)
 	browse_back.res_val.arr1_len = memb_list.size();
 	if (memb_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
 	{
-		logStream->errorStream() << "Memory allocation error in resmemberlist" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Memory allocation error in resmemberlist" << log4cpp::eol;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}
@@ -326,7 +326,7 @@ db_res *NdbmServer::resresolist_1_svc(db_res *recev)
 			user_member(recev->res_val.arr1_val[2]);
 
 	logStream->debugStream() << "In resresolist_1_svc function for " << user_domain 
-			<< "/" << user_family << "/" << user_member << log4cpp::CategoryStream::ENDLINE;
+			<< "/" << user_family << "/" << user_member << log4cpp::eol;
 	
 //
 // Initialize structure sent back to client
@@ -391,13 +391,13 @@ db_res *NdbmServer::resresolist_1_svc(db_res *recev)
 	}
 	catch (NdbmError &err)
 	{		
-		logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << err.get_err_message() << log4cpp::eol;
 		browse_back.db_err = err.get_err_code();
 		return(&browse_back);
 	}
 	catch (std::bad_alloc)
 	{		
-		logStream->errorStream() << "Memory allocation error in resresolist" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Memory allocation error in resresolist" << log4cpp::eol;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}
@@ -430,7 +430,7 @@ db_res *NdbmServer::resresolist_1_svc(db_res *recev)
 	browse_back.res_val.arr1_len = reso_list.size();
 	if (reso_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
 	{
-		logStream->errorStream() << "Memory allocation error in resresolist" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Memory allocation error in resresolist" << log4cpp::eol;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}
@@ -460,7 +460,7 @@ db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 			user_reso(recev->res_val.arr1_val[3]);
 
 	logStream->debugStream() << "In resresoval_1_svc function for " << user_domain \
-		<< "/" << user_family << "/" << user_member << "/" << user_reso << log4cpp::CategoryStream::ENDLINE;
+		<< "/" << user_family << "/" << user_member << "/" << user_reso << log4cpp::eol;
 	
 //
 // Initialize structure sent back to client
@@ -524,13 +524,13 @@ db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 	}
 	catch (NdbmError &err)
 	{		
-		logStream->errorStream() << err.get_err_message() << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << err.get_err_message() << log4cpp::eol;
 		browse_back.db_err = err.get_err_code();
 		return(&browse_back);
 	}
 	catch (std::bad_alloc)
 	{		
-		logStream->errorStream() << "Memory allocation error in resresolist" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Memory allocation error in resresolist" << log4cpp::eol;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}
@@ -599,7 +599,7 @@ db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 			}	
 			catch (std::bad_alloc)
 			{
-				logStream->errorStream() << "Memory allocation error in resresoval" << log4cpp::CategoryStream::ENDLINE;
+				logStream->errorStream() << "Memory allocation error in resresoval" << log4cpp::eol;
 				browse_back.db_err = DbErr_ServerMemoryAllocation;
 				return(&browse_back);
 			}	
@@ -633,7 +633,7 @@ db_res *NdbmServer::resresoval_1_svc(db_res *recev)
 	browse_back.res_val.arr1_len = reso_val.size();
 	if (reso_val.copy_to_C(browse_back.res_val.arr1_val) != 0)
 	{
-		logStream->errorStream() << "Memory allocation error in resresoval" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "Memory allocation error in resresoval" << log4cpp::eol;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
 	}

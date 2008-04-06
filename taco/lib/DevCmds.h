@@ -31,9 +31,9 @@
  *
  * Original:	June 1991
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2005-07-25 13:08:21 $
+ * Date:	$Date: 2008-04-06 09:06:58 $
  *
  ********************************************************************-*/
 
@@ -45,15 +45,15 @@
  */
 #ifdef _IDENT
 static char DevCmdsh[] = 
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevCmds.h,v 1.6 2005-07-25 13:08:21 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/DevCmds.h,v 1.7 2008-04-06 09:06:58 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
 #if !defined(FORTRAN)
 #include <dev_xdr.h>
-typedef long 	DevCommand;
-typedef long 	DevEvent;
-typedef long 	DevArgType;
+typedef DevLong 	DevCommand;
+typedef DevLong 	DevEvent;
+typedef DevLong 	DevArgType;
 typedef long int (*DevCommandFunction)();
 #endif /* FORTRAN */
 

@@ -30,9 +30,9 @@
  *
  * Original:	June 1993
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  *
  *******************************************************************-*/
 
@@ -43,14 +43,14 @@
  *  Head structure definition;
  */
 struct pin_head {
-       long main_st; /* The main device state  :
+       DevLong main_st; /* The main device state  :
                          DEVON      : all is good for you
                          DEVWARNING : at least on Maxe acces failed or
                                       one basic device is DEVFAULT.
                          DEVFAULT   : fatal error occured. 
                       */
 
-       long dev_diag; /* device diagnostic. When main_st is not DEVON
+       DevLong dev_diag; /* device diagnostic. When main_st is not DEVON
                          The bits are numbered 0 to 11 from the right and
                           the value 1 corresponds to an error state.
 
@@ -72,12 +72,12 @@ struct pin_head {
 
                       */       
 
-        long tuned;   /* 1 if the whole component is TUNED (ie the three
+        DevLong tuned;   /* 1 if the whole component is TUNED (ie the three
                             axes are TUNED
                          0 if at least one axis is NOTTUNED
                       */
 
-        long mode;    /* defines the current operation mode 
+        DevLong mode;    /* defines the current operation mode 
                            0 if CALIBRATION mode
                            1 if ALIGNMENT    mode
                            2 if OPERATION   mode
@@ -93,13 +93,13 @@ long   	_DLLFunc xdr_length_pin_head  PT_((pin_head *objp));
   axis structure definition
 */
 struct axis_state { 
-       long unit;        /* current unit: STEPS | MM (for Z1,Z2,and TX axes)
+       DevLong  unit;        /* current unit: STEPS | MM (for Z1,Z2,and TX axes)
                                           STEPS | DEGREE (for TT axis) */  
-       long moving;      /* DEVMOVING | DEVON | DEVFAULT */
-       float mot_pos;    /* motor position in axis current unit */
-       float enc_pos;    /* encoder position in axis current unit */
-       long  switch_st;  /* LIMITSOFF | NEGATLIMIT | POSITLIMIT */
-       long tuned;       /* TUNED | NOTTUNED */
+       DevLong  moving;      /* DEVMOVING | DEVON | DEVFAULT */
+       DevFloat mot_pos;    /* motor position in axis current unit */
+       DevFloat enc_pos;    /* encoder position in axis current unit */
+       DevLong  switch_st;  /* LIMITSOFF | NEGATLIMIT | POSITLIMIT */
+       DevLong  tuned;       /* TUNED | NOTTUNED */
 };
 typedef struct axis_state 	axis_state;
 bool_t 	_DLLFunc xdr_axis_state  PT_((XDR *xdrs, axis_state *objp));

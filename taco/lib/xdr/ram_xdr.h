@@ -30,9 +30,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  *
  *******************************************************************-*/
 
@@ -46,23 +46,23 @@
 #define UNIT_MSG_SIZE	10
 
 struct DevNeg14StatusRec {
-	int unit_type;
-	float unitrange;
-	long samplermode;
-	int last_update;
-	long monitorerror;
-	char msgalarm;
-	long unitstatus;
-	long unitfaultcode;
-	char checksum[UNIT_MSG_SIZE];
-	char aritherrorcode[UNIT_MSG_SIZE];
-	long alarmstatus;
-	float doserate;
-	double lowalarmth;
-	double highalarmth;
-	double alertalarmth;
-	double primingdoserate;
-	char AlarmResponseOpts[UNIT_MSG_SIZE];
+	DevLong  unit_type;
+	DevFloat  unitrange;
+	DevLong   samplermode;
+	DevLong   last_update;
+	DevLong   monitorerror;
+	DevChar   msgalarm;
+	DevLong   unitstatus;
+	DevLong   unitfaultcode;
+	DevChar   checksum[UNIT_MSG_SIZE];
+	DevChar   aritherrorcode[UNIT_MSG_SIZE];
+	DevLong   alarmstatus;
+	DevFloat  doserate;
+	DevDouble lowalarmth;
+	DevDouble highalarmth;
+	DevDouble alertalarmth;
+	DevDouble primingdoserate;
+	DevChar   AlarmResponseOpts[UNIT_MSG_SIZE];
 };
 typedef struct DevNeg14StatusRec DevNeg14StatusRec;
 bool_t 	_DLLFunc xdr_DevNeg14StatusRec
@@ -77,9 +77,9 @@ long   	_DLLFunc xdr_length_DevNeg14StatusRec
                                                 A )
 
 struct DevRadiationDoseValue {
-	short state;
-	short type;
-	float read;
+	DevShort state;
+	DevShort type;
+	DevFloat read;
 };
 typedef struct DevRadiationDoseValue DevRadiationDoseValue;
 bool_t 	_DLLFunc xdr_DevRadiationDoseValue

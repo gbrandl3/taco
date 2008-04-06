@@ -32,13 +32,13 @@
  *		is normally done from startup().
  *
  * Author(s);	A. Goetz 
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
  * Original:	October 1996
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2005-12-09 15:11:25 $
+ * Date:	$Date: 2008-04-06 09:07:01 $
  *
  *********************************************************************/
 
@@ -75,7 +75,7 @@ extern long debug_flag;
  *
  * @return DS_NOTOK in case of error, DS_OK else
  */
-long startup(char *svr_name, long *error)
+long startup(char *svr_name, DevLong *error)
 {
 #ifndef __cplusplus
 	DevServer 	ds_list[1];

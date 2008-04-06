@@ -1,0 +1,70 @@
+#!/bin/sh
+# Toolkit for building distributed control systems or any other distributed system.
+#
+# Copyright (c) 2005-2008 Jörg Pulz <joerg.pulz@frm2.tum.de>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+# This is the FreeBSD specific init script
+# 
+# PROVIDE: taco_dc
+# REQUIRE: taco_manager
+# BEFORE: LOGIN
+# KEYWORD: FreeBSD shutdown
+#
+# Add the following lines to /etc/rc.conf to enable taco-manager:
+#
+# taco_dc_enable="YES"
+#
+taco_dc_enable=${taco_dc_enable:-"NO"}
+
+. /etc/rc.subr
+
+# Save the (one) commandline argument in cas it gets clobbered.
+arg=$1
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+required_files=@sysconfdir@/tacoenv.sh @bindir@/dc_inits @bindir@/dc_dels
+start_precmd="taco_dc_start_precmd"
+stop_precmd="taco_dc_stop_postcmd"
+
+taco_dc_start_precmd()
+{
+	. @sysconfdir@/tacoenv.sh
+	dc_inits
+}
+
+taco_dc_stop_postcmd()
+{
+	. @sysconfdir@/tacoenv.sh
+	dc_dels setup
+}
+
+# dc_wr_alo
+name=dc_wr_alo
+rcvar=taco_dc_enable
+command=@sbindir@/${name}
+command_args="1 &"
+load_rc_config $name
+run_rc_command "$arg"
+
+# dc_rd_alo
+name=dc_rd_alo
+rcvar=taco_dc_enable
+command=@sbindir@/${name}
+command_args="1 &"
+load_rc_config $name
+run_rc_command "$arg"

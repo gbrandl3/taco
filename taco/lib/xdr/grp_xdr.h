@@ -30,9 +30,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:21 $
  *
  *******************************************************************-*/
 
@@ -40,9 +40,9 @@
 #define GRP_XDR_H
 
 struct Frame {
-	double		value;
-	short		output;
-	short		pause;
+	DevDouble	value;
+	DevShort	output;
+	DevShort	pause;
 };
 typedef struct Frame 		Frame;
 bool_t 	_DLLFunc xdr_Frame  PT_((XDR *xdrs, Frame *objp));

@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.8 $
+ * Version      : $Revision: 1.9 $
  *
- * Date         : $Date: 2006-09-18 21:50:15 $
+ * Date         : $Date: 2008-04-06 09:07:51 $
  *
  */
 
@@ -128,7 +128,7 @@ int main(int argc, char **argv)
 	extern int	optind,
 			optopt;
 	char 		devname[DEV_NAME_LENGTH];
-	long 		error;
+	DevLong		error;
 	dc_devinf 	dcdev;
 	int 		verbose = False;
 	unsigned int 	cmd_team;
@@ -503,7 +503,7 @@ void printtype(int type)
 void get_print_daemon(char *devname)
 {
 	long i,j,k,l;
-	long error;
+	DevLong error;
 	long found;
 	unsigned int 		dev_num;
 	char 			filter[] ="sys/daemon/*";
@@ -571,7 +571,7 @@ void get_print_daemon(char *devname)
 void ask_daemon(char *devname)
 {
 	devserver 	ds;
-	long 		error;
+	DevLong 	error;
 	DevInfo 	*dev_info = NULL;
 	char 		pers_name[40];
 	char 		*tmp;

@@ -30,9 +30,9 @@
  *
  * Original     : February 1993
  *
- * Version      : $Revision: 1.5 $
+ * Version      : $Revision: 1.6 $
  *
- * Date         : $Date: 2007-03-22 13:44:47 $
+ * Date         : $Date: 2008-04-06 09:07:50 $
  *
  */
 
@@ -60,7 +60,8 @@ extern int req_call;
 extern hash_info mem;
 extern char sig_devname[];
 
-extern char *addr_ptr,*addr_alloc,*addr_data;
+extern char 	*addr_ptr,
+		*addr_data;
 
 /* Added some global variables. These variables are defined as global to be
    able to free memory after the data have been sent back to the client in
@@ -80,27 +81,21 @@ xresh *ptr_xresh;
 
 outpar back_def;
 
+int dev_retrieve(char *,int ,int ,xres *,int *);
+int dev_mretrieve(char *,int ,int ,dc_dev_param *,int *,unsigned int *,xres *,int *);
+int dev_mret(char *,int ,int ,dc_dev_param *,int ,xres *,int *);
+int dev_check(char *,int ,int ,unsigned int ***,int *,int *);
 
-/****************************************************************************
-*                                                                           *
-*		Server code for dc_devget function                          *
-*                               ---------                                   *
-*                                                                           *
-*    Function rule : To retrieve from the data collector the result of a    *
-*		     single device. Obviously, the device must be polled    *
-*		     by the update daemon with the right commands.	    *
-*                                                                           *
-*    Argin : A pointer to a structure of the "xdevget" type                 *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a structure of the "xres" type.     *
-*          }                                                                *
-*                                                                           *
-*****************************************************************************/
-
-xres *dc_devget_1(rece)
-xdevget *rece;
+/**
+ * To retrieve from the data collector the result of a single device. Obviously,
+ * the device must be polled by the update daemon with the right commands.
+ * 
+ * @param rece A pointer to a structure of the "xdevget" type 
+ *
+ * @return This function returns a pointer to a structure of the "xres" type.
+ *
+ */
+xres *dc_devget_1(xdevget *rece)
 {
 	int i,j,k;
 	static xres res;
@@ -142,36 +137,23 @@ xdevget *rece;
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for dev_retrieve function                              *
-*                        ------------                                       *
-*                                                                           *
-*    Function rule : To retrieve command result for one device		    *
-*                                                                           *
-*    Argin : - The device name						    *
-*	     - The command code						    *
-*	     - The command argout type				   	    *
-*	     - A pointer to the structure used to send back data to the     *
-*	       caller							    *
-*	     - The address of an error code				    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no error occurs. Otherwise, this function   *
-*    set the error code and returns -1					    *
-*                                                                           *
-*****************************************************************************/
-
-dev_retrieve(dev_name,cmd,arg_type,pres,perr)
-char *dev_name;
-int cmd;
-int arg_type;
-xres *pres;
-int *perr;
+/**
+ * To retrieve command result for one device
+ *
+ * @param dev_name The device name
+ * @param cmd The command code
+ * @param arg_type The command argout type
+ * @param pres A pointer to the structure used to send back data to the caller
+ * @param perr The address of an error code
+ *
+ * @return This function returns 0 if no error occurs. Otherwise, this function
+ *    set the error code and returns -1
+ *
+ */
+int dev_retrieve(char *dev_name,int cmd,int arg_type,xres *pres,int *perr)
 {
 	int resu;
-	unsigned int *ptr;
+	unsigned int *ptr = NULL;
 	struct timeval time;
 	struct timezone tzone;
 	unsigned int time_ten;
@@ -179,7 +161,7 @@ int *perr;
 	int off,found,nb_cmd,buf_size;
 	int i,ind;
 	dc_dev_param data;
-	long error;
+	DevLong error;
 	int ptrs_beg;
 
 	ptrs_beg = (mem.hash_table_size + mem.cellar_size) * sizeof(dc_dev_param);
@@ -251,9 +233,14 @@ int *perr;
 /* If the device cmd have just been updated and the new command result not
    yet available */
 
-	ptr = int_array[ind].data_buf[data.ind_read];
+	ptr = (unsigned int *)(addr_data + int_array[ind].data_buf[data.ind_read]);
 	
-	if (ptr == NULL)
+#ifdef DEBUG
+	printf("INDEX = %d\n", data.ind_read);
+	printf("ADDR_DATA= %p, PTR = %p\n", addr_data, ptr);
+	printf("IND = %d\n", ind);
+#endif
+	if (int_array[ind].data_buf[data.ind_read] == -1)
 	{
 		*perr = DcErr_DeviceNotDefined;
 		return(-1);
@@ -276,12 +263,12 @@ int *perr;
 				off = off + ((ptr[off + 1] & 0x00FFFFFF) >> 2) + 3;
 		}
 
-			if (found == False)
-			{
-				*perr = DcErr_DataNotYetAvailable;
-				return(-1);
-			}
+		if (found == False)
+		{
+			*perr = DcErr_DataNotYetAvailable;
+			return(-1);
 		}
+	}
 
 /* Get UNIX time */
 				
@@ -292,9 +279,9 @@ int *perr;
 
 /* Verify that the update daemon is still running */
 
-/*		printf("time_ten %d ptr[0] %d poll_freq %d\n",time_ten, ptr[0],data.poll_freq);*/
 		if (time_ten > (ptr[0] + (data.poll_freq << shift_dt)))
 		{
+			printf("time_ten %d ptr[0] %d poll_freq %d shift_dt %d\n",time_ten, ptr[0],data.poll_freq, shift_dt);
 			*perr = DcErr_DataNotUpdated;
 			return(-1);
 		}
@@ -334,24 +321,16 @@ int *perr;
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Server code for dc_devgetv function                         *
-*                               ----------                                  *
-*                                                                           *
-*    Function rule : To retrieve from the data collector the result of 	    *
-*		     the same command for several devices.                  *
-*                                                                           *
-*    Argin : A pointer to a structure of the "xdevgetv" type                *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a structure of the "xres" type.     *
-*                                                                           *
-*****************************************************************************/
-
-xresv *dc_devgetv_1(rece)
-xdevgetv *rece;
+/**
+ * To retrieve from the data collector the result of the same command for 
+ * several devices.
+ * 
+ * @param rece A pointer to a structure of the "xdevgetv" type
+ *
+ * @return This function returns a pointer to a structure of the "xres" type.
+ *
+ */
+xresv *dc_devgetv_1(xdevgetv *rece)
 {
 	int i,j,k;
 	int err_code;
@@ -424,24 +403,16 @@ xdevgetv *rece;
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Server code for dc_devgetm function                         *
-*                               ----------                                  *
-*                                                                           *
-*    Function rule : To retrieve from the data collector the result of 	    *
-*		     the several commands for several devices.              *
-*                                                                           *
-*    Argin : A pointer to a structure of the "mpar" type                    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a structure of the "mpar_back" type.*
-*                                                                           *
-*****************************************************************************/
-
-mpar_back *dc_devgetm_1(rece)
-mpar *rece;
+/**
+ * To retrieve from the data collector the result of the several commands for 
+ * several devices.
+ * 
+ * @param rece A pointer to a structure of the "mpar" type
+ * 
+ * @return This function returns a pointer to a structure of the "mpar_back" type.
+ *
+ */
+mpar_back *dc_devgetm_1(mpar *rece)
 {
 	int i,j,k;
 	int err_code;
@@ -555,7 +526,7 @@ mpar *rece;
 				backm.xxres.xxres_val[i].mxres_val[k].xerr = err_code;
 				k++;
 			}
-		continue;
+			continue;
 		}
 
 /* Get command result for the remaining commands */
@@ -583,42 +554,25 @@ mpar *rece;
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for dev_mretrieve function                             *
-*                        -------------                                      *
-*                                                                           *
-*    Function rule : To retrieve command result for one device		    *
-*                                                                           *
-*    Argin : - The device name						    *
-*	     - The command code						    *
-*	     - The command argout type				   	    *
-*	     - A pointer to the record retrieved from device_info part of   *
-*	       the pointers area					    *
-*	     - The address where to store the indice in the device-info     *
-*	       array of the device record				    *
-*	     - The address where to store the UNIX time (in tenth of a      *
-*	       second)							    *
-*	     - A pointer to the structure used to send back data to the     *
-*	       caller							    *
-*	     - The address of an error code				    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no error occurs. Otherwise, this function   *
-*    set the error code and returns -1					    *
-*                                                                           *
-*****************************************************************************/
-
-dev_mretrieve(dev_name,cmd,arg_type,pret,pind,ptime,pres,perr)
-char *dev_name;
-int cmd;
-int arg_type;
-dc_dev_param *pret;
-int *pind;
-unsigned int *ptime;
-xres *pres;
-int *perr;
+/**
+ * To retrieve command result for one device
+ * 
+ * @param dev_name The device name
+ * @param cmd The command code
+ * @param arg_type The command argout type
+ * @param pret A pointer to the record retrieved from device_info part of 
+ *	       the pointers area
+ * @param pind The address where to store the indice in the device-info
+ *	       array of the device record
+ * @param ptime	The address where to store the UNIX time (in tenth of a second)
+ * @param pres 	A pointer to the structure used to send back data to the caller
+ * @param perr	The address of an error code
+ *
+ * @return This function returns 0 if no error occurs. Otherwise, this function
+ *    set the error code and returns -1
+ *
+ */
+int dev_mretrieve(char *dev_name,int cmd,int arg_type,dc_dev_param *pret,int *pind,unsigned int *ptime,xres *pres,int *perr)
 {
 	int resu;
 	unsigned int *ptr;
@@ -629,7 +583,7 @@ int *perr;
 	int off,found,nb_cmd,buf_size;
 	int i,ind;
 	int ptrs_beg;
-	long error;
+	DevLong error;
 
 	ptrs_beg = (mem.hash_table_size + mem.cellar_size) * sizeof(dc_dev_param);
 	int_array = (int_level *)&addr_ptr[ptrs_beg];
@@ -703,7 +657,7 @@ int *perr;
    function succeed but in between the device has been removed from the dc
    by another process.  */
 
-	ptr = int_array[ind].data_buf[pret->ind_read];
+	ptr = (unsigned int *)(addr_data + int_array[ind].data_buf[pret->ind_read]);
 	
 	if (ptr == NULL)
 	{
@@ -783,40 +737,25 @@ int *perr;
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for dev_mret function                                  *
-*                        --------                                           *
-*                                                                           *
-*    Function rule : To retrieve command result for one device		    *
-*                                                                           *
-*    Argin : - The device name						    *
-*	     - The command code						    *
-*	     - The command argout type				   	    *
-*	     - A pointer to the record retrieved from the device_info part  *
-*	       of the pointers area					    *
-*	     - The indice of the record in the device-info array            *
-*	       If the indice is -1, this means that the first retrieve      *
-*	       function in the dev_mretrieve function fails		    *
-*	     - A pointer to the structure used to send back data to the     *
-*	       caller							    *
-*	     - The address of an error code				    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no error occurs. Otherwise, this function   *
-*    set the error code and returns -1					    *
-*                                                                           *
-*****************************************************************************/
-
-dev_mret(dev_name,cmd,arg_type,pret,ind,pres,perr)
-char *dev_name;
-int cmd;
-int arg_type;
-dc_dev_param *pret;
-int ind;
-xres *pres;
-int *perr;
+/**
+ * To retrieve command result for one device
+ *
+ * @param dev_name The device name
+ * @param cmd The command code
+ * @param arg_type The command argout type
+ * @param pret A pointer to the record retrieved from the device_info part
+ *	       of the pointers area
+ * @param ind The indice of the record in the device-info array
+ *	       If the indice is -1, this means that the first retrieve
+ *	       function in the dev_mretrieve function fails
+ * @param pres A pointer to the structure used to send back data to the caller
+ * @param perr The address of an error code
+ *
+ * @return This function returns 0 if no error occurs. Otherwise, this function
+ *    set the error code and returns -1
+ *
+ */
+int dev_mret(char *dev_name,int cmd,int arg_type,dc_dev_param *pret,int ind,xres *pres,int *perr)
 {
 	unsigned int *ptr;
 	struct timeval time;
@@ -827,7 +766,7 @@ int *perr;
 	int i;
 	int ptrs_beg;
 	int resu;
-	long error;
+	DevLong error;
 
 /* If ind is -1, redo the search function */
 
@@ -879,7 +818,7 @@ int *perr;
 /* If the device cmd have just been updated and the new command result not
    yet available */
 
-	ptr = int_array[ind].data_buf[pret->ind_read];
+	ptr = (unsigned int *)(addr_data + int_array[ind].data_buf[pret->ind_read]);
 	
 	if (ptr == NULL)
 	{
@@ -943,28 +882,18 @@ int *perr;
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Server code for dc_devdef function                          *
-*                               ---------                                   *
-*                                                                           *
-*    Function rule : To check that a device is define for the data collector*
-*		     running on this crate.				    *
-*		     This is used by the multi-machine data collector to    *
-*		     retrieve on which system the device is defined         *
-*		     (for the data collector point of view)		    *
-*                                                                           *
-*    Argin : A list of device name					    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a structure of the "xres" type.     *
-*          }                                                                *
-*                                                                           *
-*****************************************************************************/
+/**
+ * To check that a device is define for the data collector running on this crate.
+ * This is used by the multi-machine data collector to retrieve on which system 
+ * the device is defined (for the data collector point of view)
+ * 
+ * @param rece A list of device name
+ *
+ * @return This function returns a pointer to a structure of the "xres" type.
+ *
+ */
 
-outpar *dc_devdef_1(rece)
-imppar *rece;
+outpar *dc_devdef_1(imppar *rece)
 {
 	int i,j,tp;
 	int dev_num;
@@ -972,7 +901,7 @@ imppar *rece;
 	int resu;
 	int ind;
 	dc_dev_param data;
-	long error;
+	DevLong error;
 
 /* Miscellaneous initialization */
 
@@ -1069,25 +998,15 @@ imppar *rece;
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Server code for dc_devget_history function                  *
-*                               -----------------                           *
-*                                                                           *
-*    Function rule : To retrieve from the data collector the history of a   *
-*		     command result.					    *
-*                                                                           *
-*    Argin : A pointer to a structure of the "xdevgeth" type                *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns a pointer to a structure of the "xresh_mast"     *
-*    type.     								    *
-*                                                                           *
-*****************************************************************************/
-
-xresh_mast *dc_devgeth_1(rece)
-xdevgeth *rece;
+/**
+ * To retrieve from the data collector the history of a command result.
+ *
+ * @param rece A pointer to a structure of the "xdevgeth" type
+ * 
+ * @return This function returns a pointer to a structure of the "xresh_mast"type.     								    *
+ *                                                                           *
+ */
+xresh_mast *dc_devgeth_1(xdevgeth *rece)
 {
 	int i;
 	int err_code;
@@ -1142,8 +1061,7 @@ xdevgeth *rece;
 
 /* Call the dev_check function for the device */
 
-	if (dev_check(rece->xdev_name,cmd,rece->xargout_type,
-                      &base_adr,&ind,&err_code) == -1)
+	if (dev_check(rece->xdev_name,cmd,rece->xargout_type, &base_adr,&ind,&err_code) == -1)
 	{
 		if (err_code != DcWarn_DataNotUpdated)
 		{
@@ -1159,9 +1077,9 @@ xdevgeth *rece;
 
 	for (i = 0;i < nb_rec;i++)
 	{
-		ptr = base_adr[ind];
+		ptr = (unsigned int *)(addr_data + (unsigned int)base_adr[ind]);
 
-		if (ptr == NULL)
+		if ((int)base_adr[ind] == -1)
 			ptr_xresh[i].xerr = DcErr_DataNotYetAvailable;
 		else
 		{
@@ -1215,36 +1133,23 @@ xdevgeth *rece;
 
 
 
-/****************************************************************************
-*                                                                           *
-*		Code for dev_check function                                 *
-*                        ---------                                          *
-*                                                                           *
-*    Function rule : To retrieve command result for one device		    *
-*                                                                           *
-*    Argin : - The device name						    *
-*	     - The command code						    *
-*	     - The command argout type				   	    *
-*	     - The address where to store the base address of the device    *
-*	       pointer area						    *
-*	     - The address where to store the read index in the device      *
-*	       pointer area						    *
-*	     - The address of an error code				    *
-*                                                                           *
-*    Argout : No argout                                                     *
-*                                                                           *
-*    This function returns 0 if no error occurs. Otherwise, this function   *
-*    set the error code and returns -1					    *
-*                                                                           *
-*****************************************************************************/
-
-dev_check(dev_name,cmd,arg_type,pbase_adr,pind,perr)
-char *dev_name;
-int cmd;
-int arg_type;
-unsigned int ***pbase_adr;
-int *pind;
-int *perr;
+/**
+ * To retrieve command result for one device
+ * 
+ * @param dev_name The device name
+ * @param cmd The command code
+ * @param arg_type The command argout type
+ * @param pbase_adr The address where to store the base address of the device
+ *	       pointer area
+ * @param pind The address where to store the read index in the device
+ *	       pointer area
+ * @param perr The address of an error code
+ *
+ * @return This function returns 0 if no error occurs. Otherwise, this function 
+ *    set the error code and returns -1
+ *
+ */
+int dev_check(char *dev_name,int cmd,int arg_type,unsigned int ***pbase_adr,int *pind,int *perr)
 {
 	int resu;
 	unsigned int *ptr;
@@ -1255,7 +1160,7 @@ int *perr;
 	int off,found,nb_cmd,buf_size;
 	int i,ind;
 	dc_dev_param data;
-	long error;
+	DevLong error;
 	int ptrs_beg;
 
 	ptrs_beg = (mem.hash_table_size + mem.cellar_size) * sizeof(dc_dev_param);
@@ -1287,7 +1192,7 @@ int *perr;
 
 /* Init. caller parameters */
 
-	*pbase_adr = int_array[ind].data_buf;
+	*pbase_adr = (unsigned int **)int_array[ind].data_buf;
 	*pind = data.ind_read;
 
 /* The device exists
@@ -1332,7 +1237,7 @@ int *perr;
 /* If the device cmd have just been updated and the new command result not
    yet available */
 
-	ptr = int_array[ind].data_buf[data.ind_read];
+	ptr = (unsigned int *)(addr_data + int_array[ind].data_buf[data.ind_read]);
 	
 	if (ptr == NULL)
 	{

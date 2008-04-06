@@ -26,19 +26,31 @@
  *
  *
  * Author       : E. Taurel
- *                $Author: bourtemb $
+ *                $Author: jkrueger1 $
  *
  * Original(s)  : February 1993
  *
- * Version      : $Revision: 1.11 $
+ * Version      : $Revision: 1.12 $
  *
- * Date         : $Date: 2007-08-21 07:54:29 $
+ * Date         : $Date: 2008-04-06 09:07:50 $
  *
  */
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
 #endif
+#if HAVE_RPC_RPC_H
+#	include <rpc/rpc.h>
+#elif HAVE_RPC_H
+#	include <rpc.h>
+#endif
+#if HAVE_RPC_PMAP_CLNT_H
+#	include <rpc/pmap_clnt.h>
+#endif
+#if HAVE_SYS_SEM_H
+#	include <sys/sem.h>
+#endif
+
 #ifdef _solaris
 #define PORTMAP
 #endif
@@ -77,6 +89,7 @@
 #if HAVE_SYS_RESOURCE_H
 #	include <sys/resource.h>
 #endif
+
 #define DC_SERVER 1
 #include <dc_xdr.h>
 #include <dcP.h>
@@ -119,6 +132,7 @@ int 		ctr,
 upd_reqnb 	req;
 hash_info 	mem;
 
+#ifdef DC_DATAPORT
 #include <dataport.h>
 Dataport *dp_rd;		/* pointer on the dataport */
 char dp_rd_name[15];	/* name of the shared memory (dataport) */
@@ -126,6 +140,7 @@ typedef	struct {
 	int ctr;
 } Sharedstruct_rd;
 Sharedstruct_rd *shared_rd;
+#endif /* DC_DATAPORT */
 
 db_resource 	res_serv_put,
 		res_serv_get[] = {
@@ -170,11 +185,13 @@ extern xresh 		*ptr_xresh;
 
 void un_register_prog(int signo)
 {
-	long error;
+	DevLong error;
 	pmap_unset(pgnum, DC_VERS);
 /* Added code to unregister the server from static db */
 	db_svc_unreg(ds_name, &error);
+#ifdef DC_DATAPORT
 	CloseDataport(dp_rd, dp_rd_name);
+#endif /* DC_DATAPORT */
 	exit(-1);
 }
 
@@ -224,7 +241,9 @@ void default_sig(int signo)
 		fprintf(stderr,"utilities call\n");
 
 	fflush(stderr);
+#ifdef DC_DATAPORT
 	CloseDataport(dp_rd, dp_rd_name);
+#endif /* DC_DATAPORT */
 }
 
 
@@ -239,7 +258,8 @@ int main(int argc, char **argv)
 				*transp_udp;
 	struct sockaddr_in 	so;
 	char 			hostna[HOST_NAME_LENGTH],
-				full_name[DEV_NAME_LENGTH];
+				full_name[1024];
+				//full_name[DEV_NAME_LENGTH];
 #ifdef OBSOLETE_SUN
 	int 			sig_mask;
 	struct sigvec 		sighand;
@@ -270,6 +290,7 @@ int main(int argc, char **argv)
 	}
 #endif /* ALONE */
 
+#ifdef DC_DATAPORT
 /* Create the Dataport to have a diagnostic on the load of the server */
 	strncpy(dp_rd_name,"dc_rd_alo_",11);
 	strncat(dp_rd_name,argv[1],2);
@@ -311,6 +332,7 @@ int main(int argc, char **argv)
 	{
 		fprintf(stderr,"Can't release Dataport %s, errno = %d\n", dp_rd_name,errno);
 	}
+#endif /* DC_DATAPORT */
 
 /* Install signal handler */
 #ifdef OBSOLETE_SUN
@@ -424,7 +446,7 @@ int main(int argc, char **argv)
 	}
 
 /* Register the server with the TCP protocol */
-	if (!svc_register(transp_tcp,pgnum,DC_VERS,dc_prog_1,IPPROTO_TCP))
+	if (svc_register(transp_tcp,pgnum,DC_VERS,dc_prog_1,IPPROTO_TCP) == 0)
 	{
 		fprintf(stderr,"unable to register (pgnum,DC_VERS,tcp). \n");
 		leave(NO_UNREG);
@@ -437,7 +459,7 @@ int main(int argc, char **argv)
 	}
 
 /* Register the server with the UDP protocol */
-	if (!svc_register(transp_udp,pgnum,DC_VERS,dc_prog_1,IPPROTO_UDP))
+	if (svc_register(transp_udp,pgnum,DC_VERS,dc_prog_1,IPPROTO_UDP) == 0)
 	{
 		fprintf(stderr,"unable to register (pgnum,DC_VERS,udp)\n");
 		leave(NO_UNREG);
@@ -471,6 +493,9 @@ int main(int argc, char **argv)
 		fprintf(stderr,"dc_server_rd : Error code : %d\n",errno);
 		leave(UNREG);
 	}
+#ifdef DEBUG
+	fprintf(stderr, "ALLOC : SHMID = %d (%d), ptr = %p\n", shmid_alloc, alloc_size, addr_alloc);
+#endif
 
 /* Attach the data buffer (it's a shared memory segment) to this process
    data area */
@@ -488,6 +513,10 @@ int main(int argc, char **argv)
 		fprintf(stderr,"dc_server_rd : Error code : %d\n",errno);
 		leave(UNREG);
 	}
+#ifdef DEBUG
+	fprintf(stderr, "DATA : SHMID = %d (%d), ptr = %p\n", shmid_data, dat_size, addr_data);
+#endif
+	
 
 /* Attach the pointers buffer (it's a shared memory segment) to this process
    data area */
@@ -505,6 +534,10 @@ int main(int argc, char **argv)
 		fprintf(stderr,"dc_server_rd : Error code : %d\n",errno);
 		leave(UNREG);
 	}
+#ifdef DEBUG
+	fprintf(stderr, "PTR : SHMID = %d (%d), ptr = %p\n", shmid_ptr, ptr_size, addr_ptr);
+#endif
+	
 
 /* Get the semaphore set id used to protect the pointers area */
 
@@ -514,6 +547,9 @@ int main(int argc, char **argv)
 		perror("dc_server_rd ");
 		leave(UNREG);
 	}
+#ifdef DEBUG
+	fprintf(stderr, "SEM : SHMID = %d (%d)\n", semid1, 2);
+#endif
 
 /* End of hash_info structure initalisation */
 
@@ -716,8 +752,8 @@ static void register_dc(char *netman_host, char *host, u_long prog, u_long vers)
 static int db_register(char *serv_num, unsigned int pn_serv, unsigned int vn_serv, char *host_name, char *c_proc_name)
 {
 	struct hostent 	*host;
-	long 		error,
-			dev_def_err;
+	DevLong 	error;
+	long		dev_def_err;
 	db_devinf 	devinfo;
 	unsigned char 	tmp = 0;
 	unsigned int 	diff;
@@ -977,7 +1013,7 @@ static int shm_size(char *host_name)
 	char dev_name[DEV_NAME_LENGTH];
 	char hostna[HOST_NAME_LENGTH];
 	char *tmp;
-	long error;
+	DevLong error;
 	int nb_tot;
 
 /* Build the device name which is a function of the host name */
@@ -1010,7 +1046,7 @@ static int shm_size(char *host_name)
 
 /* Compute real memories size */
 	nb_tot = cell_num + dev_num;
-	ptr_size = (int)((nb_tot * sizeof(dc_dev_param)) + (nb_tot * sizeof(int_level)));
+	ptr_size = (int)(nb_tot * (sizeof(dc_dev_param) + sizeof(int_level)));
 	dat_size = dat_size1;
 	alloc_size = (int)(dat_size1 / 256);
 
@@ -1029,7 +1065,7 @@ static int shm_size(char *host_name)
  */
 void one_more_request(void)
 {
-	long 		error;
+	DevLong		error;
 	int 		ctr1,
 			ctr_mul,
 			ctr_mul_st,
@@ -1087,6 +1123,7 @@ void one_more_request(void)
 			}
 		}
 	}
+#ifdef DC_DATAPORT
 	ctr = ctr1;
 	if (AccessDataport(dp_rd) == -1)
 	{
@@ -1100,6 +1137,7 @@ void one_more_request(void)
 	   	fprintf(stderr,"Can't release Dataport %s, errno = % d\n", dp_rd_name,errno);
 		return;
 	}
+#endif /* DC_DATAPORT */
 }
 
 
@@ -1111,7 +1149,7 @@ void one_more_request(void)
  */
 void leave(int flag)
 {
-	long error;
+	DevLong error;
 /* Unregister server from portmapper */
 	pmap_unset(pgnum, DC_VERS);
 /* Unregister server from database (if necessary) */

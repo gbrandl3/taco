@@ -32,9 +32,9 @@
  *
  * Original   : January 1991
  *
- * Version    : $Revision: 1.4 $
+ * Version    : $Revision: 1.5 $
  *
- * Date       : $Date: 2006-09-18 22:15:37 $
+ * Date       : $Date: 2008-04-06 09:07:13 $
  *
  *-*******************************************************************/
 
@@ -76,12 +76,12 @@ static struct timeval TimeOut = { 3, 0 };
 
 db_res
 #if defined __STDC__ | defined __STDCPP__
-* db_getres_1(arr1 *argp, CLIENT *clnt, long *perr)
+* db_getres_1(arr1 *argp, CLIENT *clnt, DevLong *perr)
 #else
 *db_getres_1(argp, clnt, perr)
 	arr1 *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_res res;
@@ -111,12 +111,12 @@ db_res
 
 db_res
 #if defined __STDC__ | defined __STDCPP__
-* db_getdev_1(nam *argp, CLIENT *clnt, long *perr)
+* db_getdev_1(DevString *argp, CLIENT *clnt, DevLong *perr)
 #else
 *db_getdev_1(argp, clnt, perr)
-	nam *argp;
+	DevString *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_res res;
@@ -152,12 +152,12 @@ db_res
 
 int
 #if defined __STDC__ | defined __STDCPP__
-* db_devexp_2(tab_dbdev_2 *argp, CLIENT *clnt, long *perr)
+* db_devexp_2(tab_dbdev_2 *argp, CLIENT *clnt, DevLong *perr)
 #else
 *db_devexp_2(argp, clnt, perr)
 	tab_dbdev_2 *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static int res;
@@ -187,12 +187,12 @@ int
 
 int
 #if defined __STDC__ | defined __STDCPP__
-* db_devexp_3(tab_dbdev_3 *argp, CLIENT *clnt, long *perr)
+* db_devexp_3(tab_dbdev_3 *argp, CLIENT *clnt, DevLong *perr)
 #else
 *db_devexp_3(argp, clnt, perr)
 	tab_dbdev_3 *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static int res;
@@ -224,12 +224,12 @@ int
 
 db_resimp
 #if defined __STDC__ | defined __STDCPP__
-* db_devimp_1(arr1 *argp, CLIENT *clnt, long *perr)
+* db_devimp_1(arr1 *argp, CLIENT *clnt, DevLong *perr)
 #else
 *db_devimp_1(argp, clnt, perr)
 	arr1 *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_resimp res;
@@ -259,12 +259,12 @@ db_resimp
 
 int
 #if defined __STDC__ | defined __STDCPP__
-* db_svcunr_1(nam *argp, CLIENT *clnt, long *perr)
+* db_svcunr_1(DevString *argp, CLIENT *clnt, DevLong *perr)
 #else
 *db_svcunr_1(argp, clnt, perr)
-	nam *argp;
+	DevString *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static int res;
@@ -294,12 +294,12 @@ int
 
 svc_inf
 #if defined __STDC__ | defined __STDCPP__
-* db_svcchk_1(nam *argp, CLIENT *clnt, long *perr)
+* db_svcchk_1(DevString *argp, CLIENT *clnt, DevLong *perr)
 #else
 *db_svcchk_1(argp, clnt, perr)
-	nam *argp;
+	DevString *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static svc_inf res;
@@ -335,12 +335,12 @@ svc_inf
 
 db_res
 #if defined __STDC__ | defined __STDCPP__
-* db_getdevexp_1(nam *argp, CLIENT *clnt, long *perr)
+* db_getdevexp_1(DevString *argp, CLIENT *clnt, DevLong *perr)
 #else
 *db_getdevexp_1(argp, clnt, perr)
-	nam *argp;
+	DevString *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	enum clnt_stat clnt_stat;
@@ -368,11 +368,11 @@ db_res
 
 int
 #if defined __STDC__ | defined __STDCPP__
-* db_clodb_1(CLIENT *clnt, long *perr)
+* db_clodb_1(CLIENT *clnt, DevLong *perr)
 #else
 *db_clodb_1(clnt, perr)
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static int res;
@@ -402,11 +402,11 @@ int
 
 int
 #if defined __STDC__ | defined __STDCPP__
-* db_reopendb_1(CLIENT *clnt, long *perr)
+* db_reopendb_1(CLIENT *clnt, DevLong *perr)
 #else
 *db_reopendb_1(clnt, perr)
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static int res;
@@ -436,12 +436,12 @@ int
 
 int
 #if defined __STDC__ | defined __STDCPP__
-* db_putres_1(tab_putres *argp, CLIENT *clnt, long *perr)
+* db_putres_1(tab_putres *argp, CLIENT *clnt, DevLong *perr)
 #else
 *db_putres_1(argp, clnt, perr)
 	tab_putres *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static int res;
@@ -471,12 +471,12 @@ int
 
 int
 #if defined __STDC__ | defined __STDCPP__
-* db_delres_1(arr1 *argp, CLIENT *clnt, long *perr)
+* db_delres_1(arr1 *argp, CLIENT *clnt, DevLong *perr)
 #else
 *db_delres_1(argp, clnt, perr)
 	arr1 *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static int res;
@@ -506,12 +506,12 @@ int
 
 cmd_que
 #if defined __STDC__ | defined __STDCPP__
-* db_cmd_query_1(nam *argp, CLIENT *clnt, long *perr)
+* db_cmd_query_1(DevString *argp, CLIENT *clnt, DevLong *perr)
 #else
 *db_cmd_query_1(argp, clnt, perr)
-	nam *argp;
+	DevString *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static cmd_que res;
@@ -541,12 +541,12 @@ cmd_que
 /*event query function */
 event_que
 #if defined __STDC__ | defined __STDCPP__
-* db_event_query_1(nam *argp, CLIENT *clnt, long *perr)
+* db_event_query_1(DevString *argp, CLIENT *clnt, DevLong *perr)
 #else
 *db_event_query_1(argp, clnt, perr)
-	nam *argp;
+	DevString *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static event_que res;
@@ -577,12 +577,12 @@ event_que
 
 db_psdev_error
 #if defined __STDC__ | defined __STDCPP__
-* db_psdev_reg_1(psdev_reg_x *argp, CLIENT *clnt, long *perr)
+* db_psdev_reg_1(psdev_reg_x *argp, CLIENT *clnt, DevLong *perr)
 #else
 *db_psdev_reg_1(argp, clnt, perr)
 	ps_dev_reg_x *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_psdev_error res;
@@ -613,12 +613,12 @@ db_psdev_error
 
 db_psdev_error
 #if defined __STDC__ | defined __STDCPP__
-* db_psdev_unreg_1(arr1 *argp, CLIENT *clnt, long *perr)
+* db_psdev_unreg_1(arr1 *argp, CLIENT *clnt, DevLong *perr)
 #else
 *db_psdev_unreg_1(argp, clnt, perr)
 	arr1 *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_psdev_error res;
@@ -646,11 +646,11 @@ db_psdev_error
 }
 
 #if defined __STDC__ | defined __STDCPP__
-db_res *db_getdevdomain_1(CLIENT *clnt, long *perr)
+db_res *db_getdevdomain_1(CLIENT *clnt, DevLong *perr)
 #else
 db_res *db_getdevfamily_1(clnt, perr)
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_res res;
@@ -678,12 +678,12 @@ db_res *db_getdevfamily_1(clnt, perr)
 }
 
 #if defined __STDC__ | defined __STDCPP__
-db_res *db_getdevfamily_1(nam *argp, CLIENT *clnt, long *perr)
+db_res *db_getdevfamily_1(DevString *argp, CLIENT *clnt, DevLong *perr)
 #else
 db_res *db_getdevfamily_1(argp, clnt, perr)
-	nam *argp;
+	DevString *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_res res;
@@ -711,12 +711,12 @@ db_res *db_getdevfamily_1(argp, clnt, perr)
 }
 
 #if defined __STDC__ | defined __STDCPP__
-db_res *db_getdevmember_1(db_res *argp, CLIENT *clnt, long *perr)
+db_res *db_getdevmember_1(db_res *argp, CLIENT *clnt, DevLong *perr)
 #else
 db_res *db_getdevmember_1(argp, clnt, perr)
 	db_res *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_res res;
@@ -744,11 +744,11 @@ db_res *db_getdevmember_1(argp, clnt, perr)
 }
 
 #if defined __STDC__ | defined __STDCPP__
-db_res *db_getresdomain_1(CLIENT *clnt, long *perr)
+db_res *db_getresdomain_1(CLIENT *clnt, DevLong *perr)
 #else
 db_res *db_getresdomain_1(clnt, perr)
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_res res;
@@ -776,12 +776,12 @@ db_res *db_getresdomain_1(clnt, perr)
 }
 
 #if defined __STDC__ | defined __STDCPP__
-db_res *db_getresfamily_1(nam *argp, CLIENT *clnt, long *perr)
+db_res *db_getresfamily_1(DevString *argp, CLIENT *clnt, DevLong *perr)
 #else
 db_res *db_getresfamily_1(argp, clnt, perr)
-	nam *argp;
+	DevString *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_res res;
@@ -809,12 +809,12 @@ db_res *db_getresfamily_1(argp, clnt, perr)
 }
 
 #if defined __STDC__ | defined __STDCPP__
-db_res *db_getresmember_1(db_res *argp, CLIENT *clnt, long *perr)
+db_res *db_getresmember_1(db_res *argp, CLIENT *clnt, DevLong *perr)
 #else
 db_res *db_getresmember_1(argp, clnt, perr)
 	db_res *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_res res;
@@ -842,12 +842,12 @@ db_res *db_getresmember_1(argp, clnt, perr)
 }
 
 #if defined __STDC__ | defined __STDCPP__
-db_res *db_getresreso_1(db_res *argp, CLIENT *clnt, long *perr)
+db_res *db_getresreso_1(db_res *argp, CLIENT *clnt, DevLong *perr)
 #else
 db_res *db_getresreso_1(argp, clnt, perr)
 	db_res *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_res res;
@@ -875,12 +875,12 @@ db_res *db_getresreso_1(argp, clnt, perr)
 }
 
 #if defined __STDC__ | defined __STDCPP__
-db_res *db_getresresoval_1(db_res *argp, CLIENT *clnt, long *perr)
+db_res *db_getresresoval_1(db_res *argp, CLIENT *clnt, DevLong *perr)
 #else
 db_res *db_getresresoval_1(argp, clnt, perr)
 	db_res *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_res res;
@@ -908,11 +908,11 @@ db_res *db_getresresoval_1(argp, clnt, perr)
 }
 
 #if defined __STDC__ | defined __STDCPP__
-db_res *db_getdsserver_1(CLIENT *clnt, long *perr)
+db_res *db_getdsserver_1(CLIENT *clnt, DevLong *perr)
 #else
 db_res *db_getdsserver_1(clnt, perr)
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_res res;
@@ -940,12 +940,12 @@ db_res *db_getdsserver_1(clnt, perr)
 }
 
 #if defined __STDC__ | defined __STDCPP__
-db_res *db_getdspers_1(nam *argp, CLIENT *clnt, long *perr)
+db_res *db_getdspers_1(DevString *argp, CLIENT *clnt, DevLong *perr)
 #else
 db_res *db_getdspers_1(argp, clnt, perr)
-	nam *argp;
+	DevString *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_res res;
@@ -973,11 +973,11 @@ db_res *db_getdspers_1(argp, clnt, perr)
 }
 
 #if defined __STDC__ | defined __STDCPP__
-db_res *db_gethost_1(CLIENT *clnt, long *perr)
+db_res *db_gethost_1(CLIENT *clnt, DevLong *perr)
 #else
 db_res *db_gethost_1(clnt, perr)
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_res res;
@@ -1006,12 +1006,12 @@ db_res *db_gethost_1(clnt, perr)
 
 
 #if defined __STDC__ | defined __STDCPP__
-db_devinfo_svc *db_deviceinfo_1(nam *argp,CLIENT *clnt, long *perr)
+db_devinfo_svc *db_deviceinfo_1(DevString *argp,CLIENT *clnt, DevLong *perr)
 #else
 db_devinfo_svc *db_deviceinfo_1(argp, clnt, perr)
-	nam *argp;
+	DevString *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_devinfo_svc res;
@@ -1040,12 +1040,12 @@ db_devinfo_svc *db_deviceinfo_1(argp, clnt, perr)
 
 
 #if defined __STDC__ | defined __STDCPP__
-db_res *db_deviceres_1(db_res *argp, CLIENT *clnt, long *perr)
+db_res *db_deviceres_1(db_res *argp, CLIENT *clnt, DevLong *perr)
 #else
 db_res *db_deviceres_1(argp, clnt, perr)
 	db_res *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_res res;
@@ -1075,12 +1075,12 @@ db_res *db_deviceres_1(argp, clnt, perr)
 
 
 #if defined __STDC__ | defined __STDCPP__
-long *db_devicedelete_1(nam *argp, CLIENT *clnt, long *perr)
+long *db_devicedelete_1(DevString *argp, CLIENT *clnt, DevLong *perr)
 #else
 long *db_devicedelete_1(argp, clnt, perr)
-	nam *argp;
+	DevString *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static long res;
@@ -1089,7 +1089,7 @@ long *db_devicedelete_1(argp, clnt, perr)
 	memset((void *)&res, 0, sizeof(res));
 
 	clnt_stat = clnt_call(clnt, DB_DEVDEL, (xdrproc_t)xdr_nam, 
-	                      (caddr_t)argp, (xdrproc_t)xdr_long, 
+	                      (caddr_t)argp, (xdrproc_t)xdr_DevLong, 
 		              (caddr_t)&res, TIMEVAL(TimeOut));
 
 	if (clnt_stat != RPC_SUCCESS)
@@ -1109,12 +1109,12 @@ long *db_devicedelete_1(argp, clnt, perr)
 
 
 #if defined __STDC__ | defined __STDCPP__
-db_psdev_error *db_devicedeleteres_1(db_res *argp, CLIENT *clnt, long *perr)
+db_psdev_error *db_devicedeleteres_1(db_res *argp, CLIENT *clnt, DevLong *perr)
 #else
 db_psdev_error *db_devicedeleteres_1(argp, clnt, perr)
 	db_res *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_psdev_error res;
@@ -1143,11 +1143,11 @@ db_psdev_error *db_devicedeleteres_1(argp, clnt, perr)
 
 
 #if defined __STDC__ | defined __STDCPP__
-db_info_svc *db_stat_1(CLIENT *clnt, long *perr)
+db_info_svc *db_stat_1(CLIENT *clnt, DevLong *perr)
 #else
 db_info_svc *db_stat_1(clnt, perr)
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_info_svc res;
@@ -1176,12 +1176,12 @@ db_info_svc *db_stat_1(clnt, perr)
 
 
 #if defined __STDC__ | defined __STDCPP__
-long *db_servunreg_1(db_res *argp, CLIENT *clnt, long *perr)
+long *db_servunreg_1(db_res *argp, CLIENT *clnt, DevLong *perr)
 #else
 long *db_servunreg_1(argp, clnt, perr)
 	db_res *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static long res;
@@ -1190,7 +1190,7 @@ long *db_servunreg_1(argp, clnt, perr)
 	memset((void *)&res, 0, sizeof(res));
 
 	clnt_stat = clnt_call(clnt, DB_SVCUNREG, (xdrproc_t)xdr_db_res, 
-	                      (caddr_t)argp, (xdrproc_t)xdr_long, 
+	                      (caddr_t)argp, (xdrproc_t)xdr_DevLong, 
 		              (caddr_t)&res, TIMEVAL(TimeOut));
 
 	if (clnt_stat != RPC_SUCCESS)
@@ -1211,12 +1211,12 @@ long *db_servunreg_1(argp, clnt, perr)
 
 
 #if defined __STDC__ | defined __STDCPP__
-svcinfo_svc *db_servinfo_1(db_res *argp, CLIENT *clnt, long *perr)
+svcinfo_svc *db_servinfo_1(db_res *argp, CLIENT *clnt, DevLong *perr)
 #else
 svcinfo_svc *db_servinfo_1(argp, clnt, perr)
 	db_res *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static svcinfo_svc res;
@@ -1245,12 +1245,12 @@ svcinfo_svc *db_servinfo_1(argp, clnt, perr)
 
 
 #if defined __STDC__ | defined __STDCPP__
-long *db_servdelete_1(db_res *argp, CLIENT *clnt, long *perr)
+long *db_servdelete_1(db_res *argp, CLIENT *clnt, DevLong *perr)
 #else
 long *db_servdelete_1(argp, clnt, perr)
 	db_res *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static long res;
@@ -1259,7 +1259,7 @@ long *db_servdelete_1(argp, clnt, perr)
 	memset((void *)&res, 0, sizeof(res));
 
 	clnt_stat = clnt_call(clnt, DB_SVCDELETE, (xdrproc_t)xdr_db_res, 
-	                      (caddr_t)argp, (xdrproc_t)xdr_long, 
+	                      (caddr_t)argp, (xdrproc_t)xdr_DevLong, 
 		              (caddr_t)&res, TIMEVAL(TimeOut));
 
 	if (clnt_stat != RPC_SUCCESS)
@@ -1280,12 +1280,12 @@ long *db_servdelete_1(argp, clnt, perr)
 
 
 #if defined __STDC__ | defined __STDCPP__
-db_psdev_error *db_upddev_1(db_res *argp, CLIENT *clnt, long *perr)
+db_psdev_error *db_upddev_1(db_res *argp, CLIENT *clnt, DevLong *perr)
 #else
 db_psdev_error *db_upddev_1(argp, clnt, perr)
 	db_res *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_psdev_error res;
@@ -1314,12 +1314,12 @@ db_psdev_error *db_upddev_1(argp, clnt, perr)
 
 
 #if defined __STDC__ | defined __STDCPP__
-db_psdev_error *db_updres_1(db_res *argp, CLIENT *clnt, long *perr)
+db_psdev_error *db_updres_1(db_res *argp, CLIENT *clnt, DevLong *perr)
 #else
 db_psdev_error *db_updres_1(argp, clnt, perr)
 	db_res *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_psdev_error res;
@@ -1349,11 +1349,11 @@ db_psdev_error *db_updres_1(argp, clnt, perr)
 
 
 #if defined __STDC__ | defined __STDCPP__
-db_res *db_secpass_1(CLIENT *clnt, long *perr)
+db_res *db_secpass_1(CLIENT *clnt, DevLong *perr)
 #else
 db_res *db_secpass_1(clnt, perr)
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_res res;
@@ -1382,12 +1382,12 @@ db_res *db_secpass_1(clnt, perr)
 
 
 #if defined __STDC__ | defined __STDCPP__
-db_poller_svc *db_getpoll_1(nam *argp, CLIENT *clnt, long *perr)
+db_poller_svc *db_getpoll_1(DevString *argp, CLIENT *clnt, DevLong *perr)
 #else
 db_poller_svc *db_getpoll_1(clnt, perr)
-	nam *argp;
+	DevString *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_poller_svc res;
@@ -1416,12 +1416,12 @@ db_poller_svc *db_getpoll_1(clnt, perr)
 
 
 #if defined __STDC__ | defined __STDCPP__
-db_delupd_error *db_delete_update_1(db_arr1_array *argp, CLIENT *clnt, long *perr)
+db_delupd_error *db_delete_update_1(db_arr1_array *argp, CLIENT *clnt, DevLong *perr)
 #else
 db_delupd_error *db_delete_update_1(clnt, perr)
 	db_arr1_array *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_delupd_error res;
@@ -1451,12 +1451,12 @@ db_delupd_error *db_delete_update_1(clnt, perr)
 
 
 #if defined __STDC__ | defined __STDCPP__
-long *db_initcache_1(nam *argp, CLIENT *clnt, long *perr)
+long *db_initcache_1(DevString *argp, CLIENT *clnt, DevLong *perr)
 #else
 long *db_initcache_1(argp, clnt, perr)
-	nam *argp;
+	DevString *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static long res;
@@ -1465,7 +1465,7 @@ long *db_initcache_1(argp, clnt, perr)
 	memset((void *)&res, 0, sizeof(res));
 
 	clnt_stat = clnt_call(clnt, DB_INITCACHE, (xdrproc_t)xdr_nam, 
-	                      (caddr_t)argp, (xdrproc_t)xdr_long, 
+	                      (caddr_t)argp, (xdrproc_t)xdr_DevLong, 
 		              (caddr_t)&res, TIMEVAL(TimeOut));
 
 	if (clnt_stat != RPC_SUCCESS)
@@ -1485,12 +1485,12 @@ long *db_initcache_1(argp, clnt, perr)
 
 
 #if defined __STDC__ | defined __STDCPP__
-db_svcarray_net *db_getdsonhost_1(nam *argp, CLIENT *clnt, long *perr)
+db_svcarray_net *db_getdsonhost_1(DevString *argp, CLIENT *clnt, DevLong *perr)
 #else
 db_svcarray_net *db_getdsonhost_1(argp, clnt, perr)
-	nam *argp;
+	DevString *argp;
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	static db_svcarray_net res;
@@ -1519,11 +1519,11 @@ db_svcarray_net *db_getdsonhost_1(argp, clnt, perr)
 
 
 #if defined __STDC__ | defined __STDCPP__
-long db_null_proc_1(CLIENT *clnt, long *perr)
+long db_null_proc_1(CLIENT *clnt, DevLong *perr)
 #else
 long db_null_proc_1(clnt, perr)
 	CLIENT *clnt;
-	long *perr;
+	DevLong *perr;
 #endif	/* __STDC__ */
 {
 	enum clnt_stat clnt_stat;

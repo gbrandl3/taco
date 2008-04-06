@@ -1,0 +1,546 @@
+/*! \page signal The Signal Interface
+
+The device server signal interface is based on the use of the device server 
+signal and multi signal classes. They define a signal object for a value 
+with a set of standard properties and functionality. The implementation of 
+three commands with standard behaviour in the device class offers a standard 
+interface to clients. Following this conventions, generic monitoring 
+applications and the history database can be easily used, without coding, 
+on the devices of a class.
+
+\section conventions_on_signals Conventions on Signals 
+
+The signal class allows the creation of signal objects with a naming convention 
+as:
+\verbatim
+DOMAIN/FAMILY/MEMBER/SIGNAL 
+\endverbatim
+The signal name is an extension to the device name used in the ESRF control 
+system. To create a signal object a name with four fields must be used. This 
+corresponds to signal naming as it is used in the history database and in 
+general data display applications.
+- A signal represents a simple data value. 
+- All signals of a class must be of the same data type. 
+- The data type might be float values or double values. 
+
+A special problem is the relation between read and set values. To identify 
+all signals which can be set clearly the following naming convention must 
+be respected. A setpoint signal name must be preceded by the identifier "set-". 
+
+Example: 
+\verbatim
+SR/RF-FOC/TRA3-1/set-Voltage 
+\endverbatim 
+
+A set-point signal can be modified and its actual value can be read. 
+
+In the case of a readable set-point value and a separate read value (as on most 
+of the power supplies) the read values must keep the same signal name without 
+the preceding identifier "set-". 
+Example: 
+\verbatim
+SR/RF-FOC/TRA3-1/Voltage 
+\endverbatim 
+With this convention all signals which can be modified can be easily identified. 
+Also the relation between separate read and set signals can be automatically 
+established.
+
+\section signal_properties The Signal Properties 
+
+A set of signal properties is defined in the signal class. The properties must 
+be defined for a device class. They are used for signal identification and the 
+automatic configuration of monitoring and tuning applications and the history 
+database configuration tool. The properties of a signal object are:
+-# Name - The full signal name. 
+-# Label - A label for the signal value, which can be used in applications. 
+-# Unit - The unit of the signal value 
+-# Format - The format in which the data should be displayed (printf() format). 
+-# Description - A text describing the signal. 
+-# Max - A maximum value. Can be used for data display or to check limits of
+set values.
+-# Min - A minimum value. Can be used for data display or to check limits of
+set values.
+-# AlHigh - Above this limit an alarm will be indicated. 
+-# AlLow - Under this limit an alarm will be indicated. 
+-# Delta - If the nominal value and the read value of the signal differ by +/-
+delta during the number of seconds specified by "Delta_t" , an alarm will be 
+raised.
+-# Delta_t If the nominal value differs from the read value for a longer time 
+than Delta_t seconds, an alarm will be raised.
+-# Standard Unit - A multiplier factor to convert the given signal unit into a
+standard unit (V, A, W, bar ...).
+
+\section server_side  The Server Side 
+\subsection signal_commands The Commands to Access Signals 
+
+Four commands must be defined in a device class to access signals. 
+- One to read an array of signal values, 
+- one to identify and to describe each signal value, 
+- one to update changed signal properties and 
+- one to set a signal value.
+
+<b>DevReadSigValues</b> 
+
+The command reads an array of signal values. The array should contain all signals 
+for this class. The data type for all signals of a class must be the same. Possible 
+data types are float values or double values. The command must always return an 
+array, even if only one signal value is defined. To avoid the polling of several 
+commands in the data collector, the state of a device should be also treated as a 
+signal and should be returned as the signal "DOMAIN/FAMILY/MEMBER/State" by this 
+command. Command list entry:
+\code
+DevReadSigValues, read_signal_values, D_VOID_TYPE, D_VAR_FLOATARR, READ_ACCESS
+\endcode
+Command function definition: 
+\code
+long read_signal_values (MDSSignal ds, DevVoid *argin, DevVarFloat Array *argout, long *error);
+\endcode
+
+Description: Returns the signal values of a device. 
+
+Arg(s) In: None 
+
+Arg(s) Out: DevVarFloatArray signal.values - Array of signal values. 
+
+long *error - Pointer to error code, in case routine fails.
+
+<b>DevGetSigConfig</b> 
+
+The command reads the properties of all signals returned by DevReadSigValues. The 
+order of the signals must be the same for the two commands. The first value returned 
+by DevReadSigValues must correspond to the first set of properties returned by 
+DevReadSigConfig. The properties of all signals of a class are returned as a string 
+array. The first string (element [0]) must indicate the number of properties per 
+signal, to have the flexibility to add new properties. The number of elements in 
+the string array will be: 
+\verbatim
+length = number of properties * number of signals + 1 
+\endverbatim 
+The properties of the signals must be added to the string array by using the result 
+of the method DevMethodReadProperties on the signal or multi signal object (see: 
+the user guides of the two classes). Command list entry:
+\code
+DevReadSigConfig, readr_signal_config, D_VOID_TYPE, D_VAR_STRINGARR, READ_ACCESS 
+\endcode 
+Command function definition: 
+\code
+long read_signal_config (MDSSignal ds, DevVoid *argin, DevVarStringArray *argout, long *error);
+\endcode
+
+Description: Returns the signal properties of all signals of a device. 
+
+Arg(s) In: None 
+
+Arg(s) Out: DevVarStringArray signal_values - Array of signal properties. 
+
+long *error - Pointer to error code, in case routine fails.
+
+<b>DevUpdateSigConfig</b> 
+
+The command reinitialises all signal properties of all signals of a device. After 
+an update of the resource database calling this command reinitialises all signal 
+properties dynamically with their actual resource values. The goal is an 
+interactive resource editor with a direct update of the device configuration. The 
+method DevMethodSignalsReset must be used on the signal or multi signal object 
+(see: the user guides of the two classes) Command list entry:
+\code
+DevUpdatedSigConfig, update_signal_config, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS
+\endcode 
+Command function definition:
+\code
+long update_signal_config (MDSSignal ds, DevVoid *argin, DevVoid *argout, long *error);
+\endcode
+ Description: Reinitialises all signal properties of all signals of a device with the 
+actual resource values.
+
+Arg(s) In: None 
+
+Arg(s) Out: None
+
+<b>DevSetSigValue</b>
+
+Receives a new value for a set-point signal (with "set-" identifier). Verifies the 
+validity of the given signal name and that the value doesn`t exceed the specified 
+range for the signal by using the method DevMethodCheckLimits on the signal or multi 
+signal object (see: the user guides of the two classes). Applies the new set-point. 
+Command list entry:
+\code
+DevSetSigValue, set_signal_value, D_STRINGDOUBLE_TYPE, D_VOID_TYPE, WRITE_ACCESS
+\endcode
+Command function definition: 
+\code
+long set_signal_value (MDSSignal ds, DevStringDouble *argin, DevVoid *argout, long *error);
+\endcode
+Description: Receives a new value for a signal. Verifies that the value doesn`t 
+exceed the specified range for the signal. Applies the new set-point.
+
+Arg(s) In: DevStringDouble *argin - Structure containing the name of the signal to 
+modify as a string and the value to be applied as double.
+
+Arg(s) Out: None
+
+\subsection coding_example  Coding Example using a Multi Signal Object 
+
+This example is for a device server written in "C". For the use in a "C++" device 
+server the multi signal object must be created via the OIC interface, but can be 
+used with the same functionality. To use a multi signal object it must be created 
+and initialised in the object_initialise() method:
+
+\dontinclude MDSSignal.c
+\skip #include <MDSSignalP.h> 
+\until #include <MDSSignal.h>
+\skip ds__create
+\until ds__method_finder
+\until return(DS_NOTOK);
+\line }
+
+Afterwards two commands can be implemented using the multi signal object: 
+\code 
+=====================================================
+
+Function: 	static long read_signal_config() 
+
+Description: 	Read the properties of all signals specified
+		for the focus power supply.
+
+Arg(s) In: 	Focus ds - pointer to object
+		void *argin - no input arguments
+
+Arg(s) Out: 	DevVarStringArray *argout - Array of signal properties
+		long *error - pointer to error code, in case routine fails
+
+===================================================== i
+static long read_signal_config (Focus ds, DevVoid *argin,
+				DevVarStringArray *argout, long *error)
+{ 
+	*error = 0;
+	if (ds__method__inder (ds->focus.msignal.obj, DevMethodReadProperties) 
+		(ds->focus.msignal_obj, argout, error) == DS_NOTOK) 
+	{
+		return(DS_NOTOK); 
+	}
+	return (DS_OK); 
+}
+
+=====================================================
+
+Function: 	static long update_signal_config() 
+
+Description: 	Reinitialises all specified signal properties with
+		their actual resource values..
+
+Arg(s) In: 	Focus ds - pointer to object
+		void *argin - no input arguments
+
+Arg(s) Out: 	void *argout - no outgoing arguments
+		long *error - pointer to error code, in case routine fails
+
+==================================================== 
+static long update_signal_config (Focus ds, DevVoid *argin,
+				DevVoid *argout, long *error) 
+{
+	*error=0;
+	if (ds__method_finder (ds->focus.msignal_obj, DevMethodSignalsReset)
+		(ds->focus.msignal.obj, error) == DS_NOTOK) 
+	{
+		return(DS_NOTOK);
+	} 
+	return(DS.OK);
+} 
+\endcode
+The third command just has to return an array of values which must be ordered 
+as the signal properties!
+\code
+====================================================
+
+Function: 	static long read_signal_values() 
+
+Description: 	Read the measurement and setpoint values
+		for this device.
+
+		[0] : current setpoint 
+		[1] : voltage 
+		[2] : current
+
+Arg(s) In: 	Focus ds - pointer to object
+		void *argin - no input arguments
+
+Arg(s) Out: 	DevVarFloatArray *argout - Array of signal values..
+		long *error - pointer to error code, in case routine fails
+
+===================================================== 
+static long read_signal_values (Focus ds, DevVoid *argin,
+				DevVarFloatArray *argout, long *error) 
+{
+	static float values[3]; 
+	*error = 0;
+/*
+ *	-> Read the signal values here! 
+ */
+	argout->length = 3; 
+	argout->sequence = &values[0]; 
+	return (DS_OK); 
+}
+\code
+The fourth command must treat all available set-points, which are identified by their name.
+\code
+====================================================
+
+Function: 	static long set_signal_value() 
+
+Description: 	Receives a new value for a signal. Verifies that the value
+		doesn`t exceed the specified range for the signal. Applies 
+		the new set-point.
+
+Arg(s) In: 	Focus ds - pointer to object
+		DevStringDouble *argin - Structure containing the name of the signal 
+					to modify as a string and the value to be 
+					applied as double.
+
+Arg(s) Out: 	void *argout - no output arguments.
+		long *error - pointer to error code, in case routine fails
+
+===================================================== 
+static long set_signal_value (Focus ds, DevStringDouble *argin,
+				void *argout, long *error) 
+{
+	long limit_state; 
+	char *sig_name;
+
+	*error = 0;
+
+/*
+ * Check whether the signal name is a valid set-point signal and 
+ * whether its values are in the specified range. 
+ */
+	if (ds__method_finder (ds->focus.msignal_obj, DevMethodCheckLimits)
+		(ds->focus.msignal_obj, argin, &limit_state, error) == DS_NOTOK) 
+	{
+		return(DS_NOTOK);
+	}
+
+	if ( limit_state != DEVRUN ) 
+	{
+		*error = DevErr_ValueOutOfBounds; 
+		return (DS_NOTOK);
+	}
+/*
+ * Find the set-point signal amongst all available set-points and 
+ * apply the new set value.
+ */
+	sig_name = strrchr (argin->name, `/`); 
+	sig_name++;
+	if ( strcmp (sig_name, "set-Voltage") == 0 ) 
+	{
+/*
+ * 	-> Set the value here! 
+ */
+	}
+	if ( strcmp (sig_name, "set-Current") == 0 ) 
+	{
+/*
+ *	-> Set the value here! 
+ */
+	}
+
+	return (DS_OK); 
+}
+\endcode
+The multi signal object is also used to handle alarms on signals which change the 
+state of a device. The method used in the DevState command is DevMethodCheckAlarms 
+and the method used in the DevStatus command is DevMethodReadAlarms. See the Multi 
+Signal Class Users Guide for more information.
+
+\section reading_signal_properties Reading the Signal Properties without Accessing the Device
+
+A second way to extract the signal names and properties of a device was developed. 
+They are read directly from the resource database without a connection to the device. 
+This interface is used in applications like fsigmon, devsel, hdb config and the hdb 
+filler which can read data only from the data collector without having access to a 
+device server running on a VME crate. To use this functionality your client must be 
+linked with the shared library: libdssig.sl The functions were not integrated to the 
+TACO API-library, because it uses internally the signal and multi signal classes. 
+This would cross reference the API-library with the class library. Linking problems 
+and Makefile changes would be the result. Available functions are:
+
+- dev_get_sig_config() 
+\code
+long dev_get_sig_config (char *device_name, DevVarStringArray *sig_config, long *error);
+\endcode
+- dev_get_sig_config_from_name() 
+\code
+long dev_get_sig_config_from_name (char *signal_name, DevVarStringArray *sig_config, 
+				long *error);
+\endcode
+- dev_get_sig_list() 
+\code
+long dev_get_sig_list (char *device_name, DevVarStringArray *sig_list, long *error);
+\code
+- dev_get_sig_set_list() 
+\code
+long dev_get_sig_set_list (char *device_name, DevVarStringArray *argout, long *error);
+\endcode
+- dev_get_sig_setread_from_name() 
+\code
+long dev_get_sig_setread (char *signal_name, DevLongString *set_signal,
+			DevLongString *read_signal, long *error);
+\endcode
+
+\section client_side The Client Side 
+
+With the described commands, signals can be displayed in a generic way on the 
+client side.
+-# To find out the data type used by the command DevReadSigValues, the function 
+dev_cmd_query() of the API-library can be used. Filtering for the command indicates 
+the data type of the outgoing arguments.
+-# By executing the command DevReadSigConfig the place of a signal in the array 
+can be determined by its name. All other properties needed for a signal display 
+are following the signal name in the described order (see "The Signal Properties" 
+on page2).
+-# DevReadSigValues returns the signal values in the same order as indicated by
+DevReadSigConfig.
+
+An example shows how DevReadSigConfig and DevReadSigValues can be used to display 
+signals in a device server menu. The data type in this case is known and 
+dev_cmd_query() is not used.
+\code
+devserver 		device; 
+DevVarStringArray 	sig_config; 
+DevVarFloatArray 	param_array; 
+long 			nu_of_properties; 
+long 			nu_of_signals; 
+long 			i, k;
+
+	case (3) :
+
+/*
+ * Read the device signal values. 
+ */
+		param_array.length = 0; 
+		param_array.sequence = NULL;
+		if (dev_putget (device, DevReadSigValues, NULL, D_VOID_TYPE,
+				&param.array, D_VAR_FLOATARR, &error) != DS_OK) 
+		{
+			dev_printerror_no (SEND, "DevReadSigValues", error); 
+			break;
+		}
+/*
+ * Read the signal properies to display the values. 
+ */
+		sig_config.length = 0; 
+		sig_config.sequence = NULL;
+
+		if (dev_putget (device, DevGetSigConfig, NULL, D_VOID_TYPE,
+				&sig_config, D_VAR_STRINGARR, &error) != DS_OK)
+		{
+			dev_printerror_no (SEND, "DevGetSigConfig", error); 
+			break; 
+		}
+/*
+ * Find the label format and unit for the signal values. 
+ */
+		nu_of_properties = atol (sig_config.sequence[0]); 
+		nu_of_signals = (sig_config.length - 1) / nu_of_properties;
+
+		printf ("Device parameters:\n"); 
+		for (i=0; i<nu_of_signals; i++) 
+		{
+			sprintf (format, "%24s [%2s] : %s\n", 
+				sig_config.sequence[(i*nu_of_properties) + 2], 
+				sig_config.sequence[(i*nu_of_properties) + 3], 
+				sig_config.sequence[(i*nu_of_properties) + 4]); 
+			printf (format, param.array.sequence[i]); 
+		}
+/*
+ * Free the allocated arrays. 
+ */
+
+		if ( dev_xdrfree (D_VAR_FLOATARR, &param_array, &error) != DS_OK )
+		{
+			dev_printerror_no (SEND, "dev.xdrfree", error);
+		}
+
+		if ( dev_xdrfree (D_VAR_STRINGARR, &sig_config, &error) != DS_OK ) 
+		{
+			dev_printerror_no (SEND, "dev_xdrfree", error);
+		}
+		break;
+\endcode
+
+\section signal_interface_to_hdb The Signal Interface to HDB 
+
+An entry point to the HDB signal library was developed to allow signal configuration 
+in HDB with the same names as they are known in a device class. Using 
+\c dev_get_sig_config() in the HDB signal library and storing the result of the command 
+\c DevReadSigValues in the data collector, all signals configured for a device class 
+(in the device server) are dynamically available in HDB with the same names and 
+descriptions. 
+
+But, today the HDB signal library still needs for dynamic loading one module for 
+each device class. It is just a question of copy and paste to install such a module 
+for a device class using the signal interface, but it implies recompilation of the 
+HDB signal library. Studies are going on to change this to avoid recompilation and 
+reinstallation of the HDB signal library in the future. 
+
+Here is an example module for the HDB signal library. This can be copied, but the 
+function names must be changed to the class name the new module will be used for.
+\code
+#include <API.h> 
+#include <siggen.h>
+
+/*
+ * function prototypes 
+ */
+
+long RF_FOCUS_load_type (long *error); 
+long RF_FOCUS_signal_list_init (char *device_name,
+			SigDefEntry **signal_list_ptr, 
+			long *n_signal, 
+			long *error);
+
+extern long signal_list_init (char *device_name,
+			SigDefEntry **signal_list_ptr, 
+			long *n_signal, 
+			long *error);
+
+/*
+ * The load type function 
+ */
+long RF_FOCUS_load_type (long *error)
+{ 
+	return (DS_OK); 
+}
+
+/*
+ * Dynamic signal initialisation function.
+ * Uses signals defined on the device server level.
+ */
+long RF_FOCUS_signal_list_init (char *device_name,
+			SigDefEntry **signal_list_ptr, 
+			long *n_signal, 
+			long *error) 
+{
+/*
+ * calls the general signal init function, which is 
+ * used for all classes which implement signals on 
+ * the device server level. 
+ */
+	if ( signal_list_init (device_name, signal_list_ptr, 
+				n_signal, error) == DS_NOTOK )
+	{
+		return (DS_NOTOK); 
+	}
+	return (DS_OK);
+}
+\endcode
+
+\section Conclusion 
+
+The device server signal interface was developed for the SRRF project and was 
+adapted mainly to the project needs. But, I see it as a useful extension to 
+other device server classes. The advantage of using signals is that you can 
+immediately profit from generic plotting and display programs like fsigmon 
+and xtuning. Contact meyer@esrf.fr or pons@esrf.fr for more information on 
+these programs.
+*/
+

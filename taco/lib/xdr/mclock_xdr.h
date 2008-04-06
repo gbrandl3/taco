@@ -28,9 +28,9 @@
  * Author(s):
  *		$Author: jkrueger1 $
  * 
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2005-10-19 11:27:01 $
+ * Date:	$Date: 2008-04-06 09:07:22 $
  *
  **************************************************************************/
 
@@ -45,15 +45,15 @@
 /*  C type definition  */
 struct DevTm
        {
-	 short tm_year;
-	 short tm_mon;
-	 short tm_mday;
-	 short tm_hour;
-	 short tm_min;
-	 short tm_sec;
-	 short tm_wday;
-	 short tm_yday;
-	 short tm_isdst;
+	 DevShort tm_year;
+	 DevShort tm_mon;
+	 DevShort tm_mday;
+	 DevShort tm_hour;
+	 DevShort tm_min;
+	 DevShort tm_sec;
+	 DevShort tm_wday;
+	 DevShort tm_yday;
+	 DevShort tm_isdst;
        };
 typedef struct	DevTm	DevTm;
 
@@ -70,9 +70,9 @@ long 	xdr_length_DevTm();
 /*  C type definition  */
 struct DevStructMasterClock
        {
-	 char 	*convert_dh;
-	 long 	nb_sec;
-	 DevTm 	*timeptr;
+	 DevString 	*convert_dh;
+	 DevLong 	nb_sec;
+	 DevTm 		*timeptr;
        };
 typedef	struct	DevStructMasterClock	DevStructMasterClock;
 

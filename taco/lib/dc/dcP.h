@@ -23,11 +23,11 @@
  * Description:
  *
  * Author(s):	
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2005-11-16 08:27:41 $
+ * Date:	$Date: 2008-04-06 09:07:14 $
  *  
  ******************************************************************************/
 
@@ -58,16 +58,16 @@
 
 #ifdef TEST
 
-#define	DATBUF_SIZE	16384	/* 32 Mb for the data shared memory */
-#define PTR_SIZE	4096		/* 2 Mb for the pointers shared mem
-					   (5000 devices and 100 cmd result) */
+#define	DATBUF_SIZE	16384		/* 16 kB  for the data shared memory */
+#define PTR_SIZE	4096		/* 4 kB for the pointers shared mem
+					  (10 devices and ? cmd result) */
 #define MAX_DEV		10		/* Max number of devices */
 #define ALLOC_SIZE	64
 
 #else
 
-#define	DATBUF_SIZE	33554432	/* 32 Mb for the data shared memory */
-#define PTR_SIZE	2097152		/* 2 Mb for the pointers shared mem
+#define	DATBUF_SIZE	33554432	/* 32 MB for the data shared memory */
+#define PTR_SIZE	2097152		/* 2 MB for the pointers shared mem
 					   (5000 devices and 100 cmd result) */
 #define MAX_DEV		5000		/* Max number of devices */
 #define ALLOC_SIZE	DATBUF_SIZE / (BLOC_SIZE * 8)
@@ -142,7 +142,7 @@ typedef struct _cmd_info {
 	}cmd_info;
 
 typedef struct _int_level {
-	unsigned int *data_buf[HIST];
+	unsigned int data_buf[HIST];
 	}int_level;
 
 typedef struct _dc_dev_param {
@@ -339,15 +339,15 @@ typedef struct _serv {
 
 
 #ifndef OSK
-unsigned char *dcmem_alloc(unsigned char *base,register char *tab,int size,int alloc_size,int semid,long *perr);
-int dcmem_info(register char *tab,int buf_size,unsigned int *lmem_free,unsigned int *mem_free,int *parea,long *perr);
-int dcmem_free(unsigned char *base,unsigned char *base_buf,unsigned char *tab,int buf_size,int semid,long *perr);
+unsigned char *dcmem_alloc(unsigned char *base,register char *tab,int size,int alloc_size,int semid,DevLong *perr);
+int dcmem_info(register char *tab,int buf_size,unsigned int *lmem_free,unsigned int *mem_free,int *parea,DevLong *perr);
+int dcmem_free(unsigned char *base,unsigned char *base_buf,unsigned char *tab,int buf_size,int semid,DevLong *perr);
 
 int hash(char *dev_name,int hash_table_size);
-int insert_dev(char *devname,dc_dev_param *pdata,hash_info *mem_info,long *perr);
-int search_dev(char *devname,dc_dev_param *pdata,hash_info *mem_info,int *pind,long *perr);
-int delete_dev(char *devname,hash_info *mem_info,long *perr);
-int update_dev(int ind,dc_dev_param *pdata,hash_info *mem_info,long *perr);
+int insert_dev(char *devname,dc_dev_param *pdata,hash_info *mem_info,DevLong *perr);
+int search_dev(char *devname,dc_dev_param *pdata,hash_info *mem_info,int *pind,DevLong *perr);
+int delete_dev(char *devname,hash_info *mem_info,DevLong *perr);
+int update_dev(int ind,dc_dev_param *pdata,hash_info *mem_info,DevLong *perr);
 #else
 unsigned char *dcmem_alloc();
 int dcmem_info();

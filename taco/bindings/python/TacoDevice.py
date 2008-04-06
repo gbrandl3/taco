@@ -19,7 +19,7 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
-# File:         ResDatabase.py
+# File:         TacoDevice.py
 #
 # Project:      Automatic Beamline Alignment
 #
@@ -30,15 +30,15 @@
 #
 # Original:     Mai 2001
 #
-# Version:      $Revision: 1.4 $
+# Version:      $Revision: 1.5 $
 #
-# Date:         $Date: 2005-07-25 13:43:42 $
+# Date:         $Date: 2008-04-06 09:06:26 $
 #
 
 """ Python interface for ... """
 
-__revision__ = "$Revision: 1.4 $"
-__date__ = "$Date: 2005-07-25 13:43:42 $"
+__revision__ = "$Revision: 1.5 $"
+__date__ = "$Date: 2008-04-06 09:06:26 $"
 __author__ = "$Author: jkrueger1 $"
 
 import Taco 

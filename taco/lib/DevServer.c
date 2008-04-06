@@ -31,9 +31,9 @@
  *
  * Original:	June 1990
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2006-09-18 22:31:43 $
+ * Date:	$Date: 2008-04-06 09:06:58 $
  *
  ********************************************************************-*/
 
@@ -346,7 +346,7 @@ static long device_destroy (DevServer ds, long *error)
  * @return DS_OK or DS_NOTOK
  */
 long dev_cmd (void *ptr_ds, long cmd, DevArgument argin,  long argin_type,
-	      DevArgument argout, long argout_type, long *error)
+	      DevArgument argout, long argout_type, DevLong *error)
 {
    	DevServer       ds;
 	ds = (DevServer) ptr_ds;
@@ -368,7 +368,7 @@ long dev_cmd (void *ptr_ds, long cmd, DevArgument argin,  long argin_type,
  * 
  * @return DS_OK or DS_NOTOK
  */
-long ds__svcrun (long *error)
+long ds__svcrun (DevLong *error)
 {
 	struct timeval	timeout;
 #ifdef linux
@@ -443,7 +443,7 @@ long ds__svcrun (long *error)
 /* 
  * Return error message
  */
-			dev_printerror (SEND, "ds__svcrun() : select() : errno = %d", (char*)errno);	
+			dev_printerror (SEND, "ds__svcrun() : select() : errno = %d", errno);	
 			*error = DevErr_RPCFailed;
 			return (DS_NOTOK);
 	   	case  0:

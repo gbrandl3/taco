@@ -25,9 +25,9 @@
  * Author(s):	Emanuel Taurel
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2007-09-07 14:50:25 $
+ * Date:	$Date: 2008-04-06 09:07:14 $
  *
  *****************************************************************************/
 
@@ -68,7 +68,7 @@ typedef struct _dc_error {
 
 typedef struct _dc_cmd_dat {
 	int cmd;
-	long cmd_error;
+	DevLong cmd_error;
 #ifndef OLDDC
 	int cmd_time;
 #endif
@@ -83,17 +83,17 @@ typedef struct _dc_dev_dat {
 	}dc_dev_dat,*Dc_dev_dat;
 
 typedef struct _dc_cmd_mretdat{
-	long cmd_code;
+	DevLong cmd_code;
 	DevArgument argout;
 	DevType argout_type;
-	long *cmd_error;
+	DevLong *cmd_error;
 	}dc_cmd_mretdat;
 
 typedef struct _datco {
 	char device_name[DEV_NAME_LENGTH];
 	char dc_host_name[HOST_NAME_LENGTH];
 	int indice;
-	long net_ind;
+	DevLong net_ind;
 	}datco;
 
 typedef struct _dc_dev_retdat {
@@ -104,7 +104,7 @@ typedef struct _dc_dev_retdat {
 #endif 
 	DevArgument argout;
 	DevType argout_type;
-	long *cmd_error;
+	DevLong *cmd_error;
 	}dc_dev_retdat;
 
 typedef struct _dc_dev_mretdat {
@@ -119,14 +119,14 @@ typedef struct _dc_dev_mretdat {
 
 typedef struct _dc_dev_imp {
 	char *device_name;
-	long dc_access;
+	DevLong dc_access;
 	datco *dc_ptr;
-	long *dc_dev_error;
+	DevLong *dc_dev_error;
 	}dc_dev_imp;
 
 typedef struct _dc_dev_free {
 	datco *dc_ptr;
-	long *dc_dev_error;
+	DevLong *dc_dev_error;
 	}dc_dev_free;
 
 typedef struct _dom_info {
@@ -168,15 +168,18 @@ typedef struct _dc_datacmd {
 
 typedef struct _dc_hist {
 	DevArgument argout;
-	long time;
-	long cmd_error;
+	DevLong time;
+	DevLong cmd_error;
 	}dc_hist;
 
 
 /* Functions definitions */
 
 
-#ifndef __cplusplus
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 /*
  * OIC version
  */
@@ -184,48 +187,26 @@ int _DLLFunc dc_open PT_((dc_dev *poll_dev,unsigned int num_device,dc_error *err
 int _DLLFunc dc_close PT_((char **dev_name,unsigned int num_device,dc_error *error));
 int _DLLFunc dc_dataput PT_((dc_dev_dat *dev_data,unsigned int num_device,dc_error *error));
 
-int _DLLFunc dc_import PT_((dc_dev_imp *dc_devimp,unsigned int num_device,long *error));
-int _DLLFunc dc_free PT_((dc_dev_free *dc_devfree,unsigned int num_device,long *error));
+int _DLLFunc dc_import PT_((dc_dev_imp *dc_devimp,unsigned int num_device,DevLong *error));
+int _DLLFunc dc_free PT_((dc_dev_free *dc_devfree,unsigned int num_device,DevLong *error));
 #ifdef OLDDC
-int _DLLFunc dc_devget PT_((devserver ds_ptr,long cmd_code,DevArgument argout,DevType argout_type,long *error));
+int _DLLFunc dc_devget PT_((devserver ds_ptr,long cmd_code,DevArgument argout,DevType argout_type,DevLong *error));
 #else
-int _DLLFunc dc_devget PT_((datco *dc_ptr,long cmd_code,DevArgument argout,DevType argout_type,long *error));
+int _DLLFunc dc_devget PT_((datco *dc_ptr,long cmd_code,DevArgument argout,DevType argout_type,DevLong *error));
 #endif /* OLDDC */
-int _DLLFunc dc_devgetv PT_((dc_dev_retdat *dev_retdat,unsigned int num_device,long cmd_code,long *error));
-int _DLLFunc dc_devgetm PT_((dc_dev_mretdat *dev_mretdat,unsigned int num_device,long *error));
-int _DLLFunc dc_info PT_((char *serv_name,servinf *dc_inf,long *error));
-int _DLLFunc dc_devall PT_((char *serv_name,char ***devnametab,int *dev_n,long *error));
-int _DLLFunc dc_dinfo PT_((char *dev_name,dc_devinf *dc_dev_info,long *error));
-int _DLLFunc dc_devinfo PT_((char *serv_name,char *dev_name,dc_devinf *dc_dev_info,long *error));
+int _DLLFunc dc_devgetv PT_((dc_dev_retdat *dev_retdat,unsigned int num_device,long cmd_code,DevLong *error));
+int _DLLFunc dc_devgetm PT_((dc_dev_mretdat *dev_mretdat,unsigned int num_device,DevLong *error));
+int _DLLFunc dc_info PT_((char *serv_name,servinf *dc_inf,DevLong *error));
+int _DLLFunc dc_devall PT_((char *serv_name,char ***devnametab,int *dev_n,DevLong *error));
+int _DLLFunc dc_dinfo PT_((char *dev_name,dc_devinf *dc_dev_info,DevLong *error));
+int _DLLFunc dc_devinfo PT_((char *serv_name,char *dev_name,dc_devinf *dc_dev_info,DevLong *error));
 int _DLLFunc dc_dataconvert PT_((dc_datacmd *data_cmd,unsigned int num_cmd,dc_error *error));
-int _DLLFunc dc_devget_history PT_((datco *dc_ptr,long cmd_code,dc_hist *hist_buff,DevType argout_type,long nb_rec,long *error));
-int rpc_reconnect_rd PT_( (int ind,long i_net,long *perr));
-int dc_rpc_check_clnt_1 PT_( (CLIENT *clnt,char **res,long *perr));
-int dc_rpcwr_check_clnt_1 PT_( (CLIENT *clnt,char **res,long *perr));
+int _DLLFunc dc_devget_history PT_((datco *dc_ptr,long cmd_code,dc_hist *hist_buff,DevType argout_type,long nb_rec,DevLong *error));
+int rpc_reconnect_rd PT_( (int ind,long i_net,DevLong *perr));
+int dc_rpc_check_clnt_1 PT_( (CLIENT *clnt,char **res,DevLong *perr));
+int dc_rpcwr_check_clnt_1 PT_( (CLIENT *clnt,char **res,DevLong *perr));
 
-#else
-/*
- * C++ version
- */
-extern "C"
-{
-int _DLLFunc dc_open (dc_dev *poll_dev,unsigned int num_device,dc_error *error);
-int _DLLFunc dc_close (char **dev_name,unsigned int num_device,dc_error *error);
-int _DLLFunc dc_dataput (dc_dev_dat *dev_data,unsigned int num_device,dc_error *error);
-int _DLLFunc dc_import (dc_dev_imp *dc_devimp,unsigned int num_device,long *error);
-int _DLLFunc dc_free (dc_dev_free *dc_devfree,unsigned int num_device,long *error);
-int _DLLFunc dc_devget (datco *dc_ptr,long cmd_code,DevArgument argout,DevType argout_type,long *error);
-int _DLLFunc dc_devgetv (dc_dev_retdat *dev_retdat,unsigned int num_device,long cmd_code,long *error);
-int _DLLFunc dc_devgetm (dc_dev_mretdat *dev_mretdat,unsigned int num_device,long *error);
-int _DLLFunc dc_info (char *serv_name,servinf *dc_inf,long *error);
-int _DLLFunc dc_devall (char *serv_name,char ***devnametab,int *dev_n,long *error);
-int _DLLFunc dc_dinfo (char *dev_name,dc_devinf *dc_dev_info,long *error);
-int _DLLFunc dc_devinfo (char *serv_name,char *dev_name,dc_devinf *dc_dev_info,long *error);
-int _DLLFunc dc_dataconvert (dc_datacmd *data_cmd,unsigned int num_cmd,dc_error *error);
-int _DLLFunc dc_devget_history (datco *dc_ptr,long cmd_code,dc_hist *hist_buff,DevType argout_type,long nb_rec,long *error);
-int rpc_reconnect_rd(int ind,long i_net,long *perr);
-int dc_rpc_check_clnt_1(CLIENT *clnt,char **res,long *perr);
-int dc_rpcwr_check_clnt_1(CLIENT *clnt,char **res,long *perr);
+#ifdef __cplusplus
 }
 #endif /* __cplusplus */
 

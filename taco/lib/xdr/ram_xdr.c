@@ -29,9 +29,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  *
  *******************************************************************-*/
 
@@ -57,22 +57,22 @@ xdr_DevNeg14StatusRec(xdrs, objp)
 	if (!xdr_float(xdrs, &objp->unitrange)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->samplermode)) {
+	if (!xdr_DevLong(xdrs, &objp->samplermode)) {
 		return (FALSE);
 	}
 	if (!xdr_int(xdrs, &objp->last_update)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->monitorerror)) {
+	if (!xdr_DevLong(xdrs, &objp->monitorerror)) {
 		return (FALSE);
 	}
 	if (!xdr_char(xdrs, &objp->msgalarm)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->unitstatus)) {
+	if (!xdr_DevLong(xdrs, &objp->unitstatus)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->unitfaultcode)) {
+	if (!xdr_DevLong(xdrs, &objp->unitfaultcode)) {
 		return (FALSE);
 	}
 	if (!xdr_vector(xdrs, (char *)objp->checksum, UNIT_MSG_SIZE, 
@@ -83,7 +83,7 @@ xdr_DevNeg14StatusRec(xdrs, objp)
 			sizeof(char), (xdrproc_t)xdr_char)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->alarmstatus)) {
+	if (!xdr_DevLong(xdrs, &objp->alarmstatus)) {
 		return (FALSE);
 	}
 	if (!xdr_float(xdrs, &objp->doserate)) {
@@ -114,26 +114,23 @@ xdr_length_DevNeg14StatusRec(objp)
 {
 	long 	length = 0;
 
-        length = length + xdr_length_DevLong ((long *)&objp->unit_type);
-        length = length + xdr_length_DevFloat (&objp->unitrange);
-        length = length + xdr_length_DevLong (&objp->samplermode);
-	length = length + xdr_length_DevLong ((long *)&objp->last_update);
-        length = length + xdr_length_DevLong (&objp->monitorerror);
-        length = length + xdr_length_DevChar (&objp->msgalarm);
-        length = length + xdr_length_DevLong (&objp->unitstatus);
-        length = length + xdr_length_DevLong (&objp->unitfaultcode);
-	length = length + 
-	(UNIT_MSG_SIZE * xdr_length_DevChar (&objp->checksum[0]));
-	length = length + 
-	(UNIT_MSG_SIZE * xdr_length_DevChar (&objp->aritherrorcode[0]));
-        length = length + xdr_length_DevLong (&objp->alarmstatus);
-        length = length + xdr_length_DevFloat (&objp->doserate);
-        length = length + xdr_length_DevDouble (&objp->lowalarmth);
-        length = length + xdr_length_DevDouble (&objp->highalarmth);
-        length = length + xdr_length_DevDouble (&objp->alertalarmth);
-        length = length + xdr_length_DevDouble (&objp->primingdoserate);
-	length = length + 
-	(UNIT_MSG_SIZE * xdr_length_DevChar (&objp->AlarmResponseOpts[0]));
+        length += xdr_length_DevLong (&objp->unit_type);
+        length += xdr_length_DevFloat (&objp->unitrange);
+        length += xdr_length_DevLong (&objp->samplermode);
+	length += xdr_length_DevLong (&objp->last_update);
+        length += xdr_length_DevLong (&objp->monitorerror);
+        length += xdr_length_DevChar (&objp->msgalarm);
+        length += xdr_length_DevLong (&objp->unitstatus);
+        length += xdr_length_DevLong (&objp->unitfaultcode);
+	length += (UNIT_MSG_SIZE * xdr_length_DevChar (&objp->checksum[0]));
+	length += (UNIT_MSG_SIZE * xdr_length_DevChar (&objp->aritherrorcode[0]));
+        length += xdr_length_DevLong (&objp->alarmstatus);
+        length += xdr_length_DevFloat (&objp->doserate);
+        length += xdr_length_DevDouble (&objp->lowalarmth);
+        length += xdr_length_DevDouble (&objp->highalarmth);
+        length += xdr_length_DevDouble (&objp->alertalarmth);
+        length += xdr_length_DevDouble (&objp->primingdoserate);
+	length += (UNIT_MSG_SIZE * xdr_length_DevChar (&objp->AlarmResponseOpts[0]));
 
 	return (length);
 }

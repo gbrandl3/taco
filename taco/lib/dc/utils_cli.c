@@ -27,9 +27,9 @@
  *
  * Original:    1993
  *
- * Version:     $Revision: 1.13 $
+ * Version:     $Revision: 1.14 $
  *
- * Date:        $Date: 2007-09-07 15:02:27 $
+ * Date:        $Date: 2008-04-06 09:07:15 $
  *
  *****************************************************************************/
 
@@ -43,6 +43,8 @@
 #include "dc.h"
 #include "dcP.h"
 #include "dc_xdr.h"
+
+#include "taco_utils.h"
 
 #ifndef _OSK
 #	include <stdlib.h> 
@@ -87,9 +89,9 @@ extern configuration_flags config_flags;
  * @return  In case of trouble, the function returns DS_NOTOK and set the error variable
  *    	pointed to by "error". Otherwise, the function returns 0 
  */
-int dc_info(char *serv_name,servinf *dc_inf,long *error)
+int dc_info(char *serv_name,servinf *dc_inf,DevLong *error)
 {
-	long 		err;
+	DevLong		err;
 	int 		send;
 	dc_infox_back 	*recev;
 	struct hostent 	*host;
@@ -245,9 +247,9 @@ int dc_info(char *serv_name,servinf *dc_inf,long *error)
  * @return    In case of trouble, the function returns DS_NOTOK and sets the err variable
  *    pointed to by "perr". Otherwise, the function returns DS_OK
  */
-int dc_devall(char *serv_name,char ***devnametab,int *dev_n,long *error)
+int dc_devall(char *serv_name,char ***devnametab,int *dev_n,DevLong *error)
 {
-	long 		err;
+	DevLong		err;
 	int 		send,
 			nb_dev;
 	int 		i,
@@ -432,9 +434,9 @@ int dc_devall(char *serv_name,char ***devnametab,int *dev_n,long *error)
  * @return   In case of trouble, the function returns DS_NOTOK and set the err variable 
  *    pointed to by "perr". Otherwise, the function returns DS_OK
  */
-int dc_dinfo(char *dev_name,dc_devinf *dc_dev_info,long *error)
+int dc_dinfo(char *dev_name,dc_devinf *dc_dev_info,DevLong *error)
 {
-	long 			err;
+	DevLong			err;
 	int 			i,
 				ret,
 				l;
@@ -560,9 +562,9 @@ int dc_dinfo(char *dev_name,dc_devinf *dc_dev_info,long *error)
  * @return   In case of trouble, the function returns DS_NOTOK and set the err variable
  *    pointed to by "perr". Otherwise, the function returns DS_OK
  */
-int dc_devinfo(char *serv_name,char *dev_name,dc_devinf *dc_dev_info,long *error)
+int dc_devinfo(char *serv_name,char *dev_name,dc_devinf *dc_dev_info,DevLong *error)
 {
-	long 		err;
+	DevLong		err;
 	int 		i,
 			l;
 	static char 	*send;
@@ -672,8 +674,7 @@ int dc_devinfo(char *serv_name,char *dev_name,dc_devinf *dc_dev_info,long *error
 		return(DS_NOTOK);
 	}
 	strcpy(send, tmp_name);
-	for (i = 0;i < l;i++)
-		send[i] = tolower(send[i]);
+	send = str_tolower(send);
 
 /* 
  * Call server 

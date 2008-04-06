@@ -17,15 +17,10 @@
 
 #include <memory>
 #include <stdio.h>
-#include <errno.h>
 #include <time.h>
 #include <log4cpp/FileAppender.hh>
 #include <log4cpp/Category.hh>
 #include <log4cpp/FactoryParams.hh>
-
-#ifndef O_LARGEFILE
-#define O_LARGEFILE 0
-#endif
 
 namespace log4cpp {
 
@@ -35,16 +30,11 @@ namespace log4cpp {
                                mode_t mode) : 
             LayoutAppender(name),
             _fileName(fileName),
-            _flags(O_CREAT | O_APPEND | O_WRONLY | O_LARGEFILE), 
+            _flags(O_CREAT | O_APPEND | O_WRONLY),
             _mode(mode) {
         if (!append)
             _flags |= O_TRUNC;
-        if ((_fd = ::open(_fileName.c_str(), _flags, _mode)) < 0) {
-            if (errno == EINVAL) {	// LARGEFILE not supported !! tulsi_rammayala@strongmail.com
-                _flags &= ~O_LARGEFILE;
-                _fd = ::open(_fileName.c_str(), _flags, _mode);
-            }
-	}
+        _fd = ::open(_fileName.c_str(), _flags, _mode);
     }
     
     FileAppender::FileAppender(const std::string& name, int fd) :
@@ -96,12 +86,9 @@ namespace log4cpp {
     bool FileAppender::reopen() {
         if (_fileName != "") {
             int fd = ::open(_fileName.c_str(), _flags, _mode);
-            if (fd < 0) {
-                if (errno == EINVAL) { // LARGEFILE not supported !! tulsi_rammayala@strongmail.com  
-                    _flags &= ~O_LARGEFILE;
-                    return reopen();
-                }
-            } else {
+            if (fd < 0)
+                return false;
+            else {
 	        if (_fd != -1)
                     ::close(_fd);
                 _fd = fd;
@@ -112,15 +99,21 @@ namespace log4cpp {
         }      
     }
 
-   std::auto_ptr<Appender> create_file_appender(const FactoryParams& params)
-   {
-      std::string name, filename;
-      bool append = true;
-      mode_t mode = 664;
+    std::auto_ptr<Appender> create_file_appender(const FactoryParams& params) {
+        std::string name, filename;
+        bool append = true;
+        mode_t mode = 0664;
+        std::string modString;
 
-      params.get_for("file appender").required("name", name)("filename", filename)
-                                     .optional("append", append)("mode", mode);
+        params.get_for("FileAppender").required("name", name)("fileName", filename)
+                                     .optional("append", append)("mode", modString);
 
-      return std::auto_ptr<Appender>(new FileAppender(name, filename, append, mode));
-   }
+        if (!modString.empty()){
+	    mode = strtol(modString.c_str(), NULL, 8);
+            if (mode == 0)
+                mode = 0664;	 
+        }
+
+        return std::auto_ptr<Appender>(new FileAppender(name, filename, append, mode));
+    }
 }

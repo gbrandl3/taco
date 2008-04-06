@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2006-12-15 12:43:54 $
+ * Date:	$Date: 2008-04-06 09:07:43 $
  *
  */
 
@@ -45,7 +45,7 @@
  *
  * @return a pointer to a structure of the db_res type.
  */
-db_res *SQLite3Server::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
+db_res *SQLite3Server::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rqstp)
 {
 	std::string 	domain,	
     			family("%"),			
@@ -66,7 +66,7 @@ db_res *SQLite3Server::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 //
 	if (dbgen.connected == False)
 	{
-		logStream->errorStream() << "I'm not connected to database" << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "I'm not connected to database" << log4cpp::eol;
 		browse_back.db_err = DbErr_DatabaseNotConnected;
 		browse_back.res_val.arr1_len = 0;
 		return(&browse_back);
@@ -143,18 +143,18 @@ db_res *SQLite3Server::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 				query += " DOMAIN LIKE '" + tmpf + "' AND";
 			break;
 		default: 
-			logStream->errorStream() << "To many '/' in device name." << log4cpp::CategoryStream::ENDLINE;
+			logStream->errorStream() << "To many '/' in device name." << log4cpp::eol;
 			browse_back.db_err = 1;
 			browse_back.res_val.arr1_len = 0;
 			return (&browse_back);		 		 
 	}
 	query += (" EXPORTED != 0 AND IOR LIKE 'rpc:%'");
 
-	logStream->debugStream() << "SQLite3Server::db_getdevexp_1_svc() : " << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "filter domain : " << domain << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "filter family : " << family << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "filter member : " << member << log4cpp::CategoryStream::ENDLINE;
-	logStream->debugStream() << "SQLite3Server::db_getdevexp_1_svc() : " << query << log4cpp::CategoryStream::ENDLINE;
+	logStream->debugStream() << "SQLite3Server::db_getdevexp_1_svc() : " << log4cpp::eol;
+	logStream->debugStream() << "filter domain : " << domain << log4cpp::eol;
+	logStream->debugStream() << "filter family : " << family << log4cpp::eol;
+	logStream->debugStream() << "filter member : " << member << log4cpp::eol;
+	logStream->debugStream() << "SQLite3Server::db_getdevexp_1_svc() : " << query << log4cpp::eol;
 
 //
 // Try to retrieve all tuples in the database NAMES table with the PN column
@@ -168,7 +168,7 @@ db_res *SQLite3Server::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 //
 // If a problem occurs during database function 
 //
-		logStream->errorStream() << "SQLite3Server::db_getdevexp_1_svc() : " << sqlite3_errmsg(db) << log4cpp::CategoryStream::ENDLINE;
+		logStream->errorStream() << "SQLite3Server::db_getdevexp_1_svc() : " << sqlite3_errmsg(db) << log4cpp::eol;
     		browse_back.db_err = DbErr_DatabaseAccess;
     		return(&browse_back);
 	}
@@ -189,11 +189,11 @@ db_res *SQLite3Server::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 	int j = ncol;
 	try
 	{
-		ptra = new nam[dev_num];
+		ptra = new DevString[dev_num];
 		for (i = 0; i < dev_num; i++, j += ncol)
 		{
 
-			logStream->debugStream() << "SQLite3Server::db_getdevexp_1_svc() : " << result[j] << log4cpp::CategoryStream::ENDLINE;
+			logStream->debugStream() << "SQLite3Server::db_getdevexp_1_svc() : " << result[j] << log4cpp::eol;
 
 			ptra[i] = new char[strlen(result[j]) + 1]; 
 			strcpy(ptra[i], result[j]);

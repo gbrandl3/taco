@@ -2,41 +2,52 @@ Summary: TACO control system.
 Name: @PACKAGE@
 Version: @VERSION@
 Release: @RPM_RELEASE@
-Copyright: GPL
+License: GPL
 Group: Utilities/TACO
 Source: @PACKAGE@-@VERSION@.tar.bz2 
 Prefix: %{_prefix}
 Vendor: FRMII, TU München, FRG
 Distribution:@DISTRIBUTION@
-Requires: gdbm
+Requires: gdbm sqlite mysql python openmotif pyhton-numeric
+BuildRequires: open-motif-devel gcc-c++ doxygen swig python-devel mysql-devel sqlite-devel tcl-devel python-numeric
 Provides: taco
 Url: http://www.sourceforge.net/projects/taco
 
 %description
-TACO is an object oriented control system originally developed at the European Synchrotron Radiation Facility to control accelerators 
-and beamlines and data acquisition systems. 
+TACO is an object oriented control system originally developed at the European 
+Synchrotron Radiation Facility to control accelerators and beamlines and data 
+acquisition systems. 
 
-At the ESRF (www.esrf.fr) TACO is used to control three accelerators - linear accelerator , booster synchrotron and storage ring, and 
-over 30 beamlines. 
-TACO is being used for instrument control for the new  neutron source FRM-II (www.frm2.tum.de) in Garching-Munich. 
-TACO has been applied to telescope control at the 26m radio telescope at the Hartebeesthoek Radio Astronomy Observatory (www.hartroa.ac.za). 
+At the ESRF (www.esrf.fr) TACO is used to control three accelerators - linear 
+accelerator , booster synchrotron and storage ring, and over 30 beamlines. 
 
-TACO is very scalable and can be used for simple single device laboratory like setups with only a few devices or for a big installation 
-comprising thousands of devices. TACO is a cheap and simple solution for doing distributed home automation. TACO is available free of 
-charge without warranties. 
+TACO is being used for instrument control for the new  neutron source FRM-II 
+(www.frm2.tum.de) in Garching-Munich. 
 
-TACO is object oriented because it treats ALL (physical and logical) control points in a control system as objects in a distributed 
-environment. All actions are implement in classes. New classes can be constructed out of existing classes in a hierarchical manner 
-thereby ensuring a high-level of software reuse. Classes can be written in C++, in C (using a methodology called Objects in C), in 
-Python or in LabView (using G). 
+TACO has been applied to telescope control at the 26m radio telescope at the 
+Hartebeesthoek Radio Astronomy Observatory (www.hartroa.ac.za). 
 
-TACO has been designed to be portable and runs on a large number of platforms (e.g. Linux, Solaris, BSD, Mac OS X, HP-UX, Win32, OS9). 
+TACO is very scalable and can be used for simple single device laboratory like 
+setups with only a few devices or for a big installation comprising thousands of 
+devices. TACO is a cheap and simple solution for doing distributed home automation. 
+
+TACO is available free of charge without warranties. 
+
+TACO is object oriented because it treats ALL (physical and logical) control 
+points in a control system as objects in a distributed environment. All actions 
+are implemented in classes. New classes can be constructed out of existing classes 
+in a hierarchical manner thereby ensuring a high-level of software reuse. Classes 
+can be written in C++, in C (using a methodology called Objects in C), in Python 
+or in LabView (using G). 
+
+TACO has been designed to be portable and runs on a large number of platforms (e.g. 
+Linux, Solaris, BSD, Mac OS X, HP-UX, Win32, OS9). 
 
 %prep
 %setup -n @PACKAGE@-@VERSION@
 
 %build
-./configure --enable-fast-install=yes --enable-greta --enable-xdevmenu --prefix=%_prefix
+./configure --enable-fast-install=yes --enable-greta --enable-xdevmenu --prefix=%_prefix --enable-ext
 make 
 
 %install
@@ -136,13 +147,6 @@ fi
 %files -f @PACKAGE@.txt
 %defattr(-,root,root)
 %_datadir/taco/templates/taco
-%config(noreplace) %_sbindir/taco.shutdown
-%config(noreplace) %_sbindir/taco.startup
-%config(noreplace) %_datadir/taco/dbase/res/SEC/sec_auth.res
-%config %_datadir/taco/dbase/res/CMDS/dev_cmds.res
-%config %_datadir/taco/dbase/res/ERROR/dev_errors.res
-%config %_datadir/taco/dbase/res/ERROR/db_errors.res
-%config %_datadir/taco/dbase/res/TEST/python.res
 %config %_sysconfdir/tacoenv.sh
 %config %_sysconfdir/tacoenv.csh
 %doc %_infodir/gdbm.info
@@ -174,13 +178,30 @@ fi
 %_bindir/db_servunreg
 %_bindir/db_devres
 %_bindir/db_resdel
+%_sbindir/dcwr_alo
+%_sbindir/dcrd_alo
+%_sbindir/StartServer
 %_sbindir/Manager
 %_sbindir/unreg
 %_sbindir/MessageServer
-%_sbindir/dcwr_alo
-%_sbindir/dcrd_alo
 %_sbindir/dbm_server
-%_sbindir/StartServer
+%config(noreplace) %_sbindir/taco.shutdown
+%config(noreplace) %_sbindir/taco.startup
+%config(noreplace) %_datadir/taco/dbase/res/SEC/sec_auth.res
+%config %_datadir/taco/dbase/res/CMDS/dev_cmds.res
+%config %_datadir/taco/dbase/res/ERROR/dev_errors.res
+%config %_datadir/taco/dbase/res/ERROR/db_errors.res
+%config %_datadir/taco/dbase/res/TEST/python.res
+
+%package devel
+Summary: TACO devel
+Group: Utilities/TACO/devel
+Prefix: %{_prefix}
+Provides: taco-devel
+
+%description devel
+
+%files devel
 %_sbindir/taco-config
 %_datadir/aclocal/extra.m4
 %_datadir/aclocal/findfile.m4
@@ -193,7 +214,7 @@ fi
 %package x-apps
 Summary: TACO control system X11 applications.
 Group: Utilities/TACO/X11
-Prefix: /usr/local/dshome
+Prefix: %{_prefix}
 Provides: taco-x-apps
 
 %description x-apps
@@ -207,6 +228,8 @@ Provides: taco-x-apps
 @appdefaultdir@/XDevmenu
 
 %changelog
+* Mon Oct 29 2007 Jens Krüger <jens.krueger@frm2.tum.de>
+- Change some entries for the SuSE online build system
 * Wed Jun 02 2004 Jens Krüger <jens.krueger@frm2.tum.de>
 - Change the pathes for the autotool macros
 - remove the 'make uninstall' in the 'clean' section

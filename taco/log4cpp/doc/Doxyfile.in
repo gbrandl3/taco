@@ -33,7 +33,7 @@ CLASS_DIAGRAMS       = YES
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
 INPUT            = @top_srcdir@/include @top_srcdir@/src @top_srcdir@/doc/mainPage.txt
-FILE_PATTERNS    = *.cpp *.hh
+FILE_PATTERNS    = *.hh
 EXAMPLE_PATH     = 
 RECURSIVE        = YES
 INPUT_FILTER     = 
@@ -62,6 +62,7 @@ COLLABORATION_GRAPH  = YES
 INCLUDE_GRAPH        = YES
 INCLUDED_BY_GRAPH    = YES
 GRAPHICAL_HIERARCHY  = YES
-MAX_DOT_GRAPH_WIDTH    = 1024
-MAX_DOT_GRAPH_HEIGHT   = 1024
+# MAX_DOT_GRAPH_WIDTH    = 1024
+# MAX_DOT_GRAPH_HEIGHT   = 1024
 GENERATE_LEGEND        = YES
+DOT_IMAGE_FORMAT = gif

@@ -30,13 +30,13 @@
  *		OICDevice is derived from the Device class
  *
  * Author(s):	Andy Goetz
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original:	November 1996
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2005-11-16 08:27:14 $
+ * Date:	$Date: 2008-04-06 09:06:59 $
  *
  *-**********************************************************************/
 		
@@ -95,7 +95,7 @@ long OICDevice::ClassInitialise( long *error )
  *
  * @return DS_OK
  */
-long OICDevice::GetResources( char *name, long *error )
+long OICDevice::GetResources( char *name, DevLong *error )
 {
 	dev_printdebug(DBG_TRACE,"OICDevice::GetResources() called\n");
 	*error = 0;
@@ -109,7 +109,7 @@ long OICDevice::GetResources( char *name, long *error )
  * @param devclass
  * @param error 	error code returned in the case of problems
  */
-OICDevice::OICDevice (DevString devname, DevServerClass devclass, long *error)
+OICDevice::OICDevice (DevString devname, DevServerClass devclass, DevLong *error)
           : Device (devname, error)
 {
 //	static  DeviceCommandListEntry dev_cmd_list[] = {
@@ -168,7 +168,7 @@ OICDevice::OICDevice (DevString devname, DevServerClass devclass, long *error)
 		DevArgType _argin_type, _argout_type;
 		long _min_access;
 		char *_cmd_name;
-		DeviceCommandMapEntry cmd_map;
+		DeviceCommandListEntry cmd_map;
 		
         	_cmd = oicclass->devserver_class.commands_list[i].cmd;
 		_fn = (DeviceMemberFunction)NULL;
@@ -192,9 +192,9 @@ OICDevice::OICDevice (DevString devname, DevServerClass devclass, long *error)
 	
 		cmd_map.cmd = _cmd;
 		cmd_map.fn = _fn;
-		cmd_map.arginType = _argin_type;
-		cmd_map.argoutType = _argout_type;
-		cmd_map.minAccess = _min_access;
+		cmd_map.argin_type = _argin_type;
+		cmd_map.argout_type = _argout_type;
+		cmd_map.min_access = _min_access;
 		cmd_map.cmd_name = _cmd_name;
 		this->commands_map[_cmd] =  cmd_map;
 		/*
@@ -246,7 +246,7 @@ OICDevice::OICDevice (DevString devname, DevServerClass devclass, long *error)
  * @return DS_NOT in case of error otherwise DS_OK
  */
 long OICDevice::Command (long cmd, void* argin, long argin_type,
-                      void* argout, long argout_type, long *error)
+                      void* argout, long argout_type, DevLong *error)
 {
 	dev_printdebug(DBG_TRACE,"OICDevice::Command() called, cmd = %d\n",cmd);
 //
@@ -275,7 +275,7 @@ DevMethodFunction OICDevice::MethodFinder ( DevMethod method)
  */
 OICDevice::~OICDevice ()
 {
-	long error;
+	DevLong error;
 
 	dev_printdebug(DBG_TRACE,"OICDevice::~OICDevice() called\n");
 //
@@ -295,7 +295,7 @@ OICDevice::~OICDevice ()
  *
  * @return DS_OK if the required command exits otherwise DS_NOTOK
  */
-long OICDevice::StateMachine(long cmd, long *error)
+long OICDevice::StateMachine(DevCommand cmd, DevLong *error)
 {
 	dev_printdebug(DBG_TRACE,"OICDevice::StateMachine() called\n");
 	*error = DS_OK;
@@ -312,7 +312,7 @@ long OICDevice::StateMachine(long cmd, long *error)
  *
  * @return DS_OK
  */
-long OICDevice::State(void *vargin, void *vargout, long *error)
+long OICDevice::State(DevArgument vargin, DevArgument vargout, DevLong *error)
 {
 	static short *pstate;
 	*error = DS_OK;
@@ -337,7 +337,7 @@ long OICDevice::State(void *vargin, void *vargout, long *error)
  *
  * @return DS_OK
  */
-long OICDevice::Status(void *vargin, void *vargout, long *error)
+long OICDevice::Status(DevArgument vargin, DevArgument vargout, DevLong *error)
 {
 	static char 	lstatus[20], 
 			**status;

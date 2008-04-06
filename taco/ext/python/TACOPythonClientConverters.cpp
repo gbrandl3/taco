@@ -22,20 +22,24 @@
 #endif
 
 #include <iostream>
-
-#include <signal.h>
+#if HAVE_SIGNAL_H
+#	include <signal.h>
+#endif
 #include <float.h>
 #include <limits.h>
 
 #include <TACOExtensions.h>
 
+#ifdef HAVE_FSTAT
+#undef HAVE_FSTAT
+#endif
 #include <TACOPythonClientConverters.h>
 
 bool TACOPythonClient::createDevArgument( DevType type, DevArgument& arg)
 {
 	if (type != D_VOID_TYPE) {
 		DevDataListEntry data;
-		long e;
+		DevLong e;
 		if (xdr_get_type( type, &data, &e) != DS_OK) {
 			arg = 0;
 			PyErr_SetString( PyExc_RuntimeError, ("cannot get XDR type: " + TACO::errorString( e)).c_str());
@@ -253,7 +257,7 @@ DevArgument TACOPythonClient::convertToDevVarCharArray( PyObject* in)
 DevArgument TACOPythonClient::convertToDevVarStringArray( PyObject* in)
 {
 	unsigned int size;
-	PyObject* (*getItem)( PyObject*, int);
+	PyObject* (*getItem)( PyObject*, Py_ssize_t);
 	if (PyTuple_Check( in) != 0) {
 		size = static_cast<unsigned int>( PyTuple_Size( in));
 		getItem = &PyTuple_GetItem;
@@ -520,7 +524,7 @@ void TACOPythonClient::freeInputArgument( long inputType, DevArgument argin)
 void TACOPythonClient::freeOutputArgument( long outputType, DevArgument argout)
 {
 	if (outputType != D_VOID_TYPE && argout != 0) {
-		long e;
+		DevLong e;
 		dev_xdrfree( outputType, argout, &e);
 		switch (outputType) {
 		case D_BOOLEAN_TYPE:

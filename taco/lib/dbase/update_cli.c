@@ -31,9 +31,9 @@
  *
  * Original   : May 1998
  *
- * Version:     $Revision: 1.15 $
+ * Version:     $Revision: 1.16 $
  *
- * Date:        $Date: 2007-09-07 14:44:56 $
+ * Date:        $Date: 2008-04-06 09:07:14 $
  *
  *-*******************************************************************/
 
@@ -49,6 +49,8 @@
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevErrors.h>
+
+#include "taco_utils.h"
 
 #if defined(WIN32)
 #	include <rpc.h>
@@ -95,9 +97,9 @@ extern dbserver_info db_info;
 /* Some local functions */
 
 static long TestLine(char *, char **, ana_input *, DevULong *, DevLong *);
-static long check_res(char *,long, char **, long *);
-static long check_dev(char *,long, char **, long *, long *);
-static void get_error_line(const char *,long ,long *);
+static long check_res(char *,long, char **, DevLong *);
+static long check_dev(char *,long, char **, DevLong *, DevLong *);
+static void get_error_line(const char *,long , DevLong *);
 
 /* Static and Global variables */
 
@@ -133,7 +135,7 @@ static struct timeval timeout_update={60,0};
  * 		function returns DS_OK 
  */
 long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***devdef, 
-		     long *nb_resdef, char ***resdef, long *error_line, long *p_error)
+		     long *nb_resdef, char ***resdef, long *error_line, DevLong *p_error)
 {
 	FILE *file;
 	long domain_nb;
@@ -389,8 +391,8 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
 
 
 /**@ingroup dbaseAPIintern
- * Change the line to lower case letters if it is
- * necessary and return a value which indicates which
+ * To change the line to lower case letters if it is
+ * necessary and to return a value which indicates which
  * type of line it is (device definition, simple resource
  * definition or resources array definition)
  *
@@ -492,16 +494,14 @@ printf("Start of TestLine \n");
 		*p_error = DbErr_ClientMemoryAllocation;
 		return DS_NOTOK;
 	}
-	i = 0;
-	for (j = 0; j < diff; j++)
-		tmp[i++] = tolower(ptr[j]);
-	tmp[i] = '\0';
+	strncpy_tolower(tmp, ptr, diff);
+	tmp[diff] = '\0';
 
 /* Is it a device definition line ? In this case, all the line must be 
    translated to lower case letter */
 	if (strstr(tmp, "device:") != NULL)
 	{
-		for (j = diff; j < k; j++)
+		for (i = j = diff; j < k; j++)
 			if (!isspace(ptr[j]))
 			{
 				tmp[i++] = tolower(ptr[j]);
@@ -514,7 +514,7 @@ printf("Start of TestLine \n");
 	else
 	{
 		a = 1;
-		for (j = diff; j < k;j++)
+		for (i = j = diff; j < k;j++)
 		{
 /* If the " character is detected, set a flag. If the flag is already set, reset it */
 			if (ptr[j] == '"')
@@ -574,7 +574,7 @@ printf("End of TestLine \n");
  * @return    	This function returns DS_OK if no errors occurs or DS_NOTOK if the resource
  *    		definition is not valid.						
  */
-static long check_res(char *lin,long d_num,char **d_list,long *p_error)
+static long check_res(char *lin,long d_num,char **d_list,DevLong *p_error)
 {
 	char t_name[RES_NAME_LENGTH + DEV_NAME_LENGTH];
 	unsigned int diff;
@@ -673,7 +673,7 @@ static long check_res(char *lin,long d_num,char **d_list,long *p_error)
  * @return    	This function returns DS_OK if no errors occurs or DS_NOTOK if the resource
  *    		definition is not valid.						
  */
-static long check_dev(char *lin,long d_num, char **d_list, long *p_err_dev,long *p_error)
+static long check_dev(char *lin,long d_num, char **d_list, DevLong *p_err_dev,DevLong *p_error)
 {
 	char *ptr,*ptr1;
 	char *ptr_cp;
@@ -772,7 +772,7 @@ static long check_dev(char *lin,long d_num, char **d_list, long *p_err_dev,long 
  * @param p_line 	Pointer for line number
  *
  */
-static void get_error_line(const char *buffer,long err_dev,long *p_line)
+static void get_error_line(const char *buffer,long err_dev, DevLong *p_line)
 {
 	long line_cptr = 0;
 	char *ptr;
@@ -821,11 +821,11 @@ static void get_error_line(const char *buffer,long err_dev,long *p_line)
  *    		argout with the device definition  where the error occurs. Otherwise,
  *    		the function returns DS_OK             				
  */
-long db_upddev(long devdef_nb, char **devdef, long *deferr_nb, long *p_error)
+long db_upddev(long devdef_nb, char **devdef, long *deferr_nb, DevLong *p_error)
 {
 	db_psdev_error *recev;
 	int i,j,k;
-	long error;
+	DevLong error;
 	long exit_code = DS_OK;
 	db_res sent;
 	struct timeval old_tout;
@@ -1013,16 +1013,17 @@ long db_upddev(long devdef_nb, char **devdef, long *deferr_nb, long *p_error)
  * @param deferr_nb 	Which device definition is the error reason	
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return    	In case of trouble, the function returns DS_NOTOK and set the variable
+ * @return    	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". The function also initializes the deferr_nb
  *    		argout with the device definition  where the error occurs. Otherwise,
  *    		the function returns DS_OK             				
  */
-long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
+long db_updres(long resdef_nb,char **resdef,long *deferr_nb,DevLong *p_error)
 {
 	db_psdev_error *recev;
 	int i,j,k;
-	long error,con_type;
+	DevLong error;
+	long con_type;
 	long exit_code = DS_OK;
 	db_res sent;
 	struct timeval old_tout;
@@ -1321,7 +1322,7 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
 
 /**@ingroup dbaseAPImisc
  * The static databse is also used to store security resources. A very simple system protects
- * security resources from beeing updated by a user if the administrator choose to protect them.
+ * security resources from being updated by a user if the administrator choose to protect them.
  * This function returns database protection data to the caller allowing an application to ask
  * its user for security resources password.
  *
@@ -1331,11 +1332,11 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,long *p_error)
  * @return   		In case of trouble, the function returns DS_NOTOK and sets the variable
  *    			pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_secpass(char **pass, long *p_error)
+long db_secpass(char **pass, DevLong *p_error)
 {
 	db_res *recev;
 	int i,j;
-	long error;
+	DevLong error;
 	long nb_domain;
 	long exit_code = DS_OK;
 	struct timeval old_tout;
@@ -1503,7 +1504,8 @@ long db_delete_update(long dev_nb, char **dev_name_list, long list_type,
 {
 	db_delupd_error *recev;
 	int i,j,k;
-	long error,con_type;
+	DevLong error;
+	long con_type;
 	long exit_code = 0;
 	arr1 sent_data[3];
 	db_arr1_array sent;

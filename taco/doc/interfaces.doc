@@ -1,0 +1,19 @@
+/*! \page interfac Interfaces 
+
+\addindex interfac
+
+TACO has been interfaced to a number of other languages and programs. The main 
+interfaces are C and C++ and are described in a separate chapter. In addition 
+to these two languages the following languages/programs have been interfaced to 
+TACO :
+
+- Python - contact Jens Meyer (meyer@esrf.fr) or Marie-Christine Dominguez
+(domingue@esrf.fr)
+- Tcl - contact Gilbert Pepellin (pepellin@esrf.fr) 
+- MathLab - contact Laurent Farvacque (laurent@esrf.fr) or Francis Epaud
+(epaud@esrf.fr)
+- LabView - contact Andy G&ouml;tz (goetz@esrf.fr) 
+- SPEC - contact Gerry Swislow (info@certif.com) i
+
+For more information refer to the website or contact the person involved directly.
+*/

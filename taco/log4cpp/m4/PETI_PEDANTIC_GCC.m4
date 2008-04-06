@@ -8,7 +8,7 @@ dnl $CXXFLAGS if $CC is found to be a gcc.
 dnl
 dnl @author Peter Simons <simons@computer.org>
 dnl original version: peti_pedantic_gcc.m4,v 1.4 2000/12/31 10:18:09 simons
-dnl @version $Id: PETI_PEDANTIC_GCC.m4,v 1.1 2006-11-12 16:37:27 jkrueger1 Exp $
+dnl @version $Id: PETI_PEDANTIC_GCC.m4,v 1.2 2008-04-06 09:07:28 jkrueger1 Exp $
 
 AC_DEFUN([PETI_PEDANTIC_GCC],
     [

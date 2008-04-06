@@ -32,9 +32,9 @@
  *
  * Original   : December 1997
  *
- * Version    :	$Revision: 1.9 $
+ * Version    :	$Revision: 1.10 $
  *
- * Date	    :	$Date: 2007-09-07 14:32:04 $
+ * Date	    :	$Date: 2008-04-06 09:07:05 $
  *
  *-*******************************************************************/
 
@@ -50,6 +50,9 @@
 #include <API.h>
 #include <DevErrors.h>
 #include <private/ApiP.h>
+
+#include "taco_utils.h"
+
 #if defined(WIN32)
 #	include <rpc.h>
 #else
@@ -108,11 +111,11 @@ static struct timeval timeout_browse={60,0};
  *    pointed to by p_error. Otherwise, the function returns DS_OK
  *
  */
-long db_getdevdomainlist(long *p_domain_nb,char ***ppp_list,long *p_error)
+long db_getdevdomainlist(long *p_domain_nb,char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
 	int i,j;
-	long error;
+	DevLong error;
 	long nb_domain;
 	long exit_code = DS_OK;
 	struct timeval old_tout;
@@ -291,11 +294,11 @@ long db_getdevdomainlist(long *p_domain_nb,char ***ppp_list,long *p_error)
  * @return  	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by p_error. Otherwise, the function returns DS_OK
  */
-long db_getdevfamilylist(char *domain,long *p_family_nb,char ***ppp_list,long *p_error)
+long db_getdevfamilylist(char *domain,long *p_family_nb,char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
 	int i,j,k;
-	long error;
+	DevLong error;
 	long exit_code = DS_OK;
 	long nb_family;
 	char *dom_sent;
@@ -364,9 +367,7 @@ long db_getdevfamilylist(char *domain,long *p_family_nb,char ***ppp_list,long *p
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(dom_sent,domain);
-	for(i = 0;i < k;i++)
-		dom_sent[i] = tolower(dom_sent[i]);
+	strcpy_tolower(dom_sent,domain);
 
 /* Call server */
 
@@ -493,15 +494,15 @@ long db_getdevfamilylist(char *domain,long *p_family_nb,char ***ppp_list,long *p
  * @param ppp_list  	Pointer for the member name list. Memory is allocated by this function
  * @param p_error 	Pointer for the error code in case of problems 
  *
- * @return    	In case of trouble, the function returns DS_NOTOK and sets the variable 
+ * @return    	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by p_error. Otherwise, the function returns DS_OK 
  */
 long db_getdevmemberlist(char *domain,char *family,long *p_member_nb, 
-			 char ***ppp_list,long *p_error)
+			 char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
 	int i,j,k;
-	long error;
+	DevLong error;
 	long exit_code = DS_OK;
 	long nb_member;
 	db_res sent;
@@ -582,9 +583,7 @@ long db_getdevmemberlist(char *domain,char *family,long *p_member_nb,
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(sent.res_val.arr1_val[0],domain);
-	for(i = 0;i < k;i++)
-		sent.res_val.arr1_val[0][i] = tolower(sent.res_val.arr1_val[0][i]);
+	strcpy_tolower(sent.res_val.arr1_val[0],domain);
 
 	k = strlen(family);
 	if ((sent.res_val.arr1_val[1] = (char *)malloc(k + 1)) == NULL)
@@ -594,9 +593,7 @@ long db_getdevmemberlist(char *domain,char *family,long *p_member_nb,
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(sent.res_val.arr1_val[1],family);
-	for(i = 0;i < k;i++)
-		sent.res_val.arr1_val[1][i] = tolower(sent.res_val.arr1_val[1][i]);
+	strcpy_tolower(sent.res_val.arr1_val[1],family);
 		
 /* Call server */
 
@@ -726,11 +723,11 @@ long db_getdevmemberlist(char *domain,char *family,long *p_member_nb,
  * @return    	In case of trouble, the function returns DS_NOTOK and sets the variable 
  *    		pointed to by p_error. Otherwise, the function returns DS_OK 
  */
-long db_getresdomainlist(long *p_domain_nb,char ***ppp_list,long *p_error)
+long db_getresdomainlist(long *p_domain_nb,char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
 	int i,j;
-	long error;
+	DevLong error;
 	long nb_domain;
 	long exit_code = DS_OK;
 	struct timeval old_tout;
@@ -908,11 +905,11 @@ long db_getresdomainlist(long *p_domain_nb,char ***ppp_list,long *p_error)
  * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by p_error. Otherwise, the function returns DS_OK
  */
-long db_getresfamilylist(char *domain,long *p_family_nb,char ***ppp_list,long *p_error)
+long db_getresfamilylist(char *domain,long *p_family_nb,char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
 	int i,j,k;
-	long error;
+	DevLong error;
 	long exit_code = DS_OK;
 	long nb_family;
 	char *dom_sent;
@@ -981,9 +978,7 @@ long db_getresfamilylist(char *domain,long *p_family_nb,char ***ppp_list,long *p
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(dom_sent,domain);
-	for(i = 0;i < k;i++)
-		dom_sent[i] = tolower(dom_sent[i]);
+	strcpy_tolower(dom_sent,domain);
 
 /* Call server */
 
@@ -1114,11 +1109,11 @@ long db_getresfamilylist(char *domain,long *p_family_nb,char ***ppp_list,long *p
  *    		pointed to by p_error. Otherwise, the function returns DS_OK
  */
 long db_getresmemberlist(char *domain,char *family,long *p_member_nb, 
-			 char ***ppp_list,long *p_error)
+			 char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
 	int i,j,k;
-	long error;
+	DevLong error;
 	long exit_code = DS_OK;
 	long nb_member;
 	db_res sent;
@@ -1199,9 +1194,7 @@ long db_getresmemberlist(char *domain,char *family,long *p_member_nb,
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(sent.res_val.arr1_val[0],domain);
-	for(i = 0;i < k;i++)
-		sent.res_val.arr1_val[0][i] = tolower(sent.res_val.arr1_val[0][i]);
+	strcpy_tolower(sent.res_val.arr1_val[0],domain);
 
 	k = strlen(family);
 	if ((sent.res_val.arr1_val[1] = (char *)malloc(k + 1)) == NULL)
@@ -1211,9 +1204,7 @@ long db_getresmemberlist(char *domain,char *family,long *p_member_nb,
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(sent.res_val.arr1_val[1],family);
-	for(i = 0;i < k;i++)
-		sent.res_val.arr1_val[1][i] = tolower(sent.res_val.arr1_val[1][i]);
+	strcpy_tolower(sent.res_val.arr1_val[1],family);
 		
 /* Call server */
 
@@ -1355,11 +1346,11 @@ long db_getresmemberlist(char *domain,char *family,long *p_member_nb,
 
 
 long db_getresresolist(char *domain,char *family,char *member, 
-		       long *p_reso_nb,char ***ppp_list,long *p_error)
+		       long *p_reso_nb,char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
 	int i,j,k;
-	long error;
+	DevLong error;
 	long exit_code = DS_OK;
 	long nb_reso;
 	db_res sent;
@@ -1439,10 +1430,7 @@ long db_getresresolist(char *domain,char *family,char *member,
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(sent.res_val.arr1_val[0],domain);
-	for(i = 0;i < k;i++)
-		sent.res_val.arr1_val[0][i] = tolower(sent.res_val.arr1_val[0][i]);
-
+	strcpy_tolower(sent.res_val.arr1_val[0],domain);
 	k = strlen(family);
 	if ((sent.res_val.arr1_val[1] = (char *)malloc(k + 1)) == NULL)
 	{
@@ -1451,10 +1439,7 @@ long db_getresresolist(char *domain,char *family,char *member,
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(sent.res_val.arr1_val[1],family);
-	for(i = 0;i < k;i++)
-		sent.res_val.arr1_val[1][i] = tolower(sent.res_val.arr1_val[1][i]);
-
+	strcpy_tolower(sent.res_val.arr1_val[1],family);
 	k = strlen(member);
 	if ((sent.res_val.arr1_val[2] = (char *)malloc(k + 1)) == NULL)
 	{
@@ -1463,9 +1448,7 @@ long db_getresresolist(char *domain,char *family,char *member,
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(sent.res_val.arr1_val[2],member);
-	for(i = 0;i < k;i++)
-		sent.res_val.arr1_val[2][i] = tolower(sent.res_val.arr1_val[2][i]);
+	strcpy_tolower(sent.res_val.arr1_val[2],member);
 				
 /* Call server */
 
@@ -1619,11 +1602,11 @@ long db_getresresolist(char *domain,char *family,char *member,
  *    		pointed to by p_error. Otherwise, the function returns DS_OK 
  */
 long db_getresresoval(char *domain,char *family,char *member,char *resource, 
-		      long *p_rval_nb,char ***ppp_list,long *p_error)
+		      long *p_rval_nb,char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
 	int i,j,k;
-	long error;
+	DevLong error;
 	long exit_code = DS_OK;
 	long nb_reso;
 	db_res sent;
@@ -1733,9 +1716,7 @@ long db_getresresoval(char *domain,char *family,char *member,char *resource,
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(sent.res_val.arr1_val[0],domain);
-	for(i = 0;i < k;i++)
-		sent.res_val.arr1_val[0][i] = tolower(sent.res_val.arr1_val[0][i]);
+	strcpy_tolower(sent.res_val.arr1_val[0],domain);
 
 	k = strlen(family);
 	if ((sent.res_val.arr1_val[1] = (char *)malloc(k + 1)) == NULL)
@@ -1744,9 +1725,7 @@ long db_getresresoval(char *domain,char *family,char *member,char *resource,
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(sent.res_val.arr1_val[1],family);
-	for(i = 0;i < k;i++)
-		sent.res_val.arr1_val[1][i] = tolower(sent.res_val.arr1_val[1][i]);
+	strcpy_tolower(sent.res_val.arr1_val[1],family);
 
 	k = strlen(member);
 	if ((sent.res_val.arr1_val[2] = (char *)malloc(k + 1)) == NULL)
@@ -1755,10 +1734,7 @@ long db_getresresoval(char *domain,char *family,char *member,char *resource,
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(sent.res_val.arr1_val[2],member);
-	for(i = 0;i < k;i++)
-		sent.res_val.arr1_val[2][i] = tolower(sent.res_val.arr1_val[2][i]);
-		
+	strcpy_tolower(sent.res_val.arr1_val[2],member);
 	k = strlen(resource);
 	if ((sent.res_val.arr1_val[3] = (char *)malloc(k + 1)) == NULL)
 	{
@@ -1766,10 +1742,7 @@ long db_getresresoval(char *domain,char *family,char *member,char *resource,
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(sent.res_val.arr1_val[3],resource);
-	for(i = 0;i < k;i++)
-		sent.res_val.arr1_val[3][i] = tolower(sent.res_val.arr1_val[3][i]);
-				
+	strcpy_tolower(sent.res_val.arr1_val[3],resource);
 /* Call server */
 
 	recev = db_getresresoval_1(&sent,local_cl,&error);
@@ -1906,11 +1879,11 @@ long db_getresresoval(char *domain,char *family,char *member,char *resource,
  * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable 
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_getdsserverlist(long *p_server_nb,char ***ppp_list,long *p_error)
+long db_getdsserverlist(long *p_server_nb,char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
 	int i,j;
-	long error;
+	DevLong error;
 	long nb_server;
 	long exit_code = DS_OK;
 	struct timeval old_tout;
@@ -2087,11 +2060,11 @@ long db_getdsserverlist(long *p_server_nb,char ***ppp_list,long *p_error)
  * @return    	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_getdspersnamelist(char *server,long *p_pers_nb,char ***ppp_list,long *p_error)
+long db_getdspersnamelist(char *server,long *p_pers_nb,char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
 	int i,j,k;
-	long error;
+	DevLong error;
 	long exit_code = DS_OK;
 	long nb_pers;
 	char *serv_sent;
@@ -2159,9 +2132,7 @@ long db_getdspersnamelist(char *server,long *p_pers_nb,char ***ppp_list,long *p_
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(serv_sent,server);
-	for(i = 0;i < k;i++)
-		serv_sent[i] = tolower(serv_sent[i]);
+	strcpy_tolower(serv_sent,server);
 
 /* Call server */
 
@@ -2289,11 +2260,11 @@ long db_getdspersnamelist(char *server,long *p_pers_nb,char ***ppp_list,long *p_
  * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_gethostlist(long *p_host_nb,char ***ppp_list,long *p_error)
+long db_gethostlist(long *p_host_nb,char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
 	int i,j;
-	long error;
+	DevLong error;
 	long nb_host;
 	long exit_code = DS_OK;
 	struct timeval old_tout;
@@ -2469,12 +2440,12 @@ long db_gethostlist(long *p_host_nb,char ***ppp_list,long *p_error)
  * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
  *    		pointed to by "p_error". Otherwise, the function returns DS_OK
  */
-long db_getdsonhost(char *host, long *p_ds_nb, db_svc **ds_list,long *p_error)
+long db_getdsonhost(char *host, long *p_ds_nb, db_svc **ds_list,DevLong *p_error)
 {
 	db_svcarray_net *recev;
 	char *host_sent;
 	int i,j,k;
-	long error;
+	DevLong error;
 	long nb_ds;
 	long exit_code = DS_OK;
 	struct timeval old_tout;
@@ -2541,9 +2512,7 @@ long db_getdsonhost(char *host, long *p_ds_nb, db_svc **ds_list,long *p_error)
 		*p_error = DbErr_ClientMemoryAllocation;
 		return(DS_NOTOK);
 	}
-	strcpy(host_sent,host);
-	for(i = 0;i < k;i++)
-		host_sent[i] = tolower(host_sent[i]);
+	strcpy_tolower(host_sent,host);
 
 /* Call server */
 

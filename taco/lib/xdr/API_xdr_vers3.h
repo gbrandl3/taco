@@ -32,9 +32,9 @@
  *
  * Original:	November 1994
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:20 $
  *
  *******************************************************************-*/
 
@@ -46,7 +46,7 @@
  */
 #ifdef _IDENT
 static char API_xdrh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/API_xdr_vers3.h,v 1.3 2005-07-25 13:05:45 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/API_xdr_vers3.h,v 1.4 2008-04-06 09:07:20 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -59,19 +59,19 @@ static char API_xdrh[] =
  */
 
 struct _server_data_3 {
- 	long ds_id;
-	long cmd;
-	long argin_type;
-	long argout_type;
+ 	DevLong ds_id;
+	DevLong cmd;
+	DevLong argin_type;
+	DevLong argout_type;
 	DevArgument argin;
 };
 typedef struct _server_data_3 _server_data_3;
 
 
 struct _client_data_3 {
-  	long status;
-	long error;
-	long argout_type;
+  	DevLong status;
+	DevLong error;
+	DevLong argout_type;
 	DevArgument argout;
 };
 typedef struct _client_data_3 _client_data_3;
@@ -79,11 +79,11 @@ typedef struct _client_data_3 _client_data_3;
 
 
 struct _client_raw_data_3 {
-  	long status;
-	long error;
-	long ser_argout_type;
-	long deser_argout_type;
-	long xdr_length;
+  	DevLong status;
+	DevLong error;
+	DevLong ser_argout_type;
+	DevLong deser_argout_type;
+	DevLong xdr_length;
 	DevArgument argout;
 };
 typedef struct _client_raw_data_3 _client_raw_data_3;
@@ -103,22 +103,22 @@ typedef struct _dev_import_in_3 _dev_import_in_3;
 
 struct _dev_import_out_3 {
         char server_name[LONG_NAME_SIZE];
-	long ds_id;
-	long status;
-	long error;
+	DevLong ds_id;
+	DevLong status;
+	DevLong error;
 };
 typedef struct _dev_import_out_3 _dev_import_out_3;
 
 
 struct _dev_free_in_3 {
-	long ds_id;
+	DevLong ds_id;
 };
 typedef struct _dev_free_in_3 _dev_free_in_3;
 
 
 struct _dev_free_out_3 {
-	long status;
-	long error;
+	DevLong status;
+	DevLong error;
 };
 typedef struct _dev_free_out_3 _dev_free_out_3;
 
@@ -128,7 +128,7 @@ typedef struct _dev_free_out_3 _dev_free_out_3;
  */
 
 struct _dev_query_in_3 {
-  	long                ds_id;
+  	DevLong                ds_id;
 };
 typedef struct _dev_query_in_3 _dev_query_in_3;
 
@@ -137,8 +137,8 @@ struct _dev_query_out_3 {
   	u_int           length;
   	_dev_cmd_info   *sequence;
   	char            class_name [20];
-  	long            error;
-  	long            status;
+  	DevLong            error;
+  	DevLong            status;
 };
 typedef struct _dev_query_out_3 _dev_query_out_3;
 
@@ -146,8 +146,8 @@ typedef struct _dev_query_out_3 _dev_query_out_3;
 struct _manager_data_3 {
         _register_data  msg_info;
         _register_data  db_info;
-        long    status;
-        long    error;
+        DevLong    status;
+        DevLong    error;
 };
 typedef struct _manager_data_3 _manager_data_3;
 

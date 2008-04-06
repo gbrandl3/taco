@@ -30,9 +30,9 @@
  *
  * Original:    July 1994
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2005-07-25 13:08:28 $
+ * Date:	$Date: 2008-04-06 09:06:59 $
  *
  ********************************************************************-*/
 
@@ -42,7 +42,9 @@
 /*
  * convert NULL-terminated string to lower characters
  */
+#if 0
 #define TOLOWER(a) {char* i; i=a; while ( '\0'!=*i ) { *i=tolower(*i);i++; }}
+#endif
 
 #if !defined(FORTRAN)
 

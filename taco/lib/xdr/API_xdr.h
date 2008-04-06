@@ -30,9 +30,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:20 $
  *
  *******************************************************************-*/
 
@@ -44,10 +44,10 @@
  */
 #ifdef _IDENT
 static char API_xdrh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/API_xdr.h,v 1.5 2005-07-25 13:05:45 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/API_xdr.h,v 1.6 2008-04-06 09:07:20 jkrueger1 Exp $";
 #endif /* _IDENT */
 
-
+#include <dev_xdr.h>
 #include <macros.h>
 
 /*
@@ -60,7 +60,7 @@ extern "C" {
 #endif					   
 
 struct DevVarArgument {
-	long 		argument_type;
+	DevLong 	argument_type;
 	DevArgument 	argument;
 };
 typedef struct DevVarArgument DevVarArgument;
@@ -77,36 +77,36 @@ typedef struct DevVarArgumentArray DevVarArgumentArray;
  */
 
 struct _server_data {
- 	long ds_id;
-	long cmd;
-	long argin_type;
-	long argout_type;
-	DevArgument argin;
- 	long access_right;
- 	long client_id;
-	DevVarArgumentArray var_argument;
+ 	DevLong 		ds_id;
+	DevLong 		cmd;
+	DevLong 		argin_type;
+	DevLong 		argout_type;
+	DevArgument 		argin;
+ 	DevLong 		access_right;
+ 	DevLong 		client_id;
+	DevVarArgumentArray 	var_argument;
 };
 typedef struct _server_data _server_data;
 
 struct _client_data {
-  	long status;
-	long error;
-	long argout_type;
-	DevArgument argout;
-	DevVarArgumentArray var_argument;
+  	DevLong 		status;
+	DevLong 		error;
+	DevLong 		argout_type;
+	DevArgument 		argout;
+	DevVarArgumentArray 	var_argument;
 };
 typedef struct _client_data _client_data;
 
 
 
 struct _client_raw_data {
-  	long status;
-	long error;
-	long ser_argout_type;
-	long deser_argout_type;
-	long xdr_length;
-	DevArgument argout;
-	DevVarArgumentArray var_argument;
+  	DevLong 		status;
+	DevLong 		error;
+	DevLong 		ser_argout_type;
+	DevLong 		deser_argout_type;
+	DevLong 		xdr_length;
+	DevArgument 		argout;
+	DevVarArgumentArray 	var_argument;
 };
 typedef struct _client_raw_data _client_raw_data;
 
@@ -115,45 +115,45 @@ typedef struct _client_raw_data _client_raw_data;
  */
 
 struct _dev_import_in {
-        char *device_name;
-	long access_right;
-	long client_id;
-	long connection_id;
-	DevVarArgumentArray var_argument;
+        DevString 		device_name;
+	DevLong 		access_right;
+	DevLong 		client_id;
+	DevLong 		connection_id;
+	DevVarArgumentArray 	var_argument;
 };
 typedef struct _dev_import_in _dev_import_in;
 
 
 struct _dev_import_out {
-	char server_name[LONG_NAME_SIZE];
-	long ds_id;
-	long status;
-	long error;
-	DevVarArgumentArray var_argument;
+	DevChar 		server_name[LONG_NAME_SIZE];
+	DevLong 		ds_id;
+	DevLong 		status;
+	DevLong 		error;
+	DevVarArgumentArray 	var_argument;
 };
 typedef struct _dev_import_out _dev_import_out;
 
 
 struct _dev_free_in {
-	long ds_id;
-	long access_right;
-	long client_id;
-	DevVarArgumentArray var_argument;
+	DevLong 		ds_id;
+	DevLong 		access_right;
+	DevLong 		client_id;
+	DevVarArgumentArray 	var_argument;
 };
 typedef struct _dev_free_in _dev_free_in;
 
 
 struct _dev_free_out {
-	long status;
-	long error;
-	DevVarArgumentArray var_argument;
+	DevLong 		status;
+	DevLong 		error;
+	DevVarArgumentArray 	var_argument;
 };
 typedef struct _dev_free_out _dev_free_out;
 
 
 struct _server_admin {
-	long cmd;
-	long debug_bits;
+	DevLong cmd;
+	DevLong debug_bits;
 };
 typedef struct _server_admin _server_admin;
 
@@ -164,33 +164,33 @@ typedef struct _server_admin _server_admin;
  */
 
 struct _dev_query_in {
-  	long                ds_id;
+  	DevLong             ds_id;
 	DevVarArgumentArray var_argument;
 };
 typedef struct _dev_query_in _dev_query_in;
 
 
 struct _dev_cmd_info {
-	long  cmd;
-  	long  in_type;
-  	long  out_type;
+	DevLong  cmd;
+  	DevLong  in_type;
+  	DevLong  out_type;
 };
 typedef struct _dev_cmd_info _dev_cmd_info;
 
 
 struct _dev_event_info {
-	long  event;
-  	long  out_type;
+	DevLong  event;
+  	DevLong  out_type;
 };
 typedef struct _dev_event_info _dev_event_info;
 
 struct _dev_query_out {
-  	u_int           length;
-  	_dev_cmd_info   *sequence;
-  	char            class_name [SHORT_NAME_SIZE];
-  	long            error;
-  	long            status;
-	DevVarArgumentArray var_argument;
+  	u_int           	length;
+  	_dev_cmd_info   	*sequence;
+  	char            	class_name [SHORT_NAME_SIZE];
+  	DevLong         	error;
+  	DevLong         	status;
+	DevVarArgumentArray 	var_argument;
 };
 typedef struct _dev_query_out _dev_query_out;
 
@@ -199,12 +199,12 @@ typedef struct _dev_query_out _dev_query_out;
  */
 
 struct _dev_queryevent_out {
-  	u_int           length;
-  	_dev_event_info   *sequence;
-  	char            class_name [SHORT_NAME_SIZE];
-  	long            error;
-  	long            status;
-	DevVarArgumentArray var_argument;
+  	u_int           	length;
+  	_dev_event_info 	*sequence;
+  	DevChar            	class_name [SHORT_NAME_SIZE];
+  	DevLong         	error;
+  	DevLong         	status;
+	DevVarArgumentArray 	var_argument;
 };
 typedef struct _dev_queryevent_out _dev_queryevent_out;
 
@@ -213,19 +213,19 @@ typedef struct _dev_queryevent_out _dev_queryevent_out;
  */
 
 struct _msg_data {
-	char *devserver_name;
-  	char *host_name;
-	long  prog_number;
-  	char *display;
-	short type_of_message;
- 	char *message_buffer;
+	DevString devserver_name;
+  	DevString host_name;
+	DevLong   prog_number;
+  	DevString display;
+	DevShort  type_of_message;
+ 	DevString message_buffer;
 };
 typedef struct _msg_data _msg_data;
 
 
 struct _msg_out {
-	long status;
-	long error;
+	DevLong status;
+	DevLong error;
 };
 typedef struct _msg_out _msg_out;
 
@@ -235,27 +235,27 @@ typedef struct _msg_out _msg_out;
  */
 
 struct _register_data {
-	char    *host_name;
-	long    prog_number;
-	long    vers_number;
+	DevString host_name;
+	DevLong   prog_number;
+	DevLong   vers_number;
 };
 typedef struct _register_data _register_data;
 
 
 struct _manager_data {
-	_register_data  msg_info;
-	_register_data  db_info;
-	long    status;
-	long    error;
-	long	security;
-	DevVarArgumentArray var_argument;
+	_register_data  	msg_info;
+	_register_data  	db_info;
+	DevLong    		status;
+	DevLong    		error;
+	DevLong			security;
+	DevVarArgumentArray 	var_argument;
 };
 typedef struct _manager_data _manager_data;
 
 
 struct _msg_manager_data {
-	char    *dshome;
-	char    *display;
+	DevString    dshome;
+	DevString    display;
 };
 typedef struct _msg_manager_data _msg_manager_data;					   
 					   

@@ -27,12 +27,14 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2006-09-06 18:34:15 $
+ * Date:        $Date: 2008-04-06 09:07:47 $
  */
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 /* TACO include file */
 #include <API.h>
 
@@ -40,24 +42,32 @@
 #include <string>
 #include <iostream>
 #include <cstdlib>
-
-using namespace std;
+#ifdef _solaris
+#include <taco_utils.h>
+#endif
 
 void usage(const char *cmd)
 {
-	cerr << "usage : " << cmd << " [options] <domain name>" << endl;
-	cerr << " Initialize a database server resource cache" << endl;
-	cerr << " This command clears the old cache and (re)initialize it" << std::endl;
-	cerr << " with the contents of the RES database table for the" << std::endl;
-	cerr << " wanted domain" << std::endl;
-	cerr << "        options : -h display this message" << std::endl;
-	cerr << "                  -n nethost" << std::endl;
+	std::cerr << "usage : " << cmd << " [options] <domain name>" << std::endl;
+	std::cerr << " Initialize a database server resource cache" << std::endl;
+	std::cerr << " This command clears the old cache and (re)initialize it" << std::endl;
+	std::cerr << " with the contents of the RES database table for the" << std::endl;
+	std::cerr << " wanted domain" << std::endl;
+	std::cerr << "        options : -h display this message" << std::endl;
+	std::cerr << "                  -n nethost" << std::endl;
+	std::cerr << "                  -v display the current version" << std::endl;
 	exit(1);
+}
+
+void version(const char *cmd)
+{
+	std::cerr << cmd << " version " << VERSION << std::endl;
+	exit(0);
 }
 
 int main(int argc,char *argv[])
 {
-	long error;
+	DevLong error;
         extern char     *optarg;
         extern int      optind,
                         opterr,
@@ -66,16 +76,14 @@ int main(int argc,char *argv[])
 
 
 // Argument test and domain name modification
-        while((c = getopt(argc, argv, "hn:")) != -1)
+        while((c = getopt(argc, argv, "hvn:")) != -1)
                 switch(c)
                 {
 			case 'n':
-				{
-					char s[160];
-					snprintf(s, sizeof(s), "NETHOST=%s", optarg);
-					putenv(s);
-				}
-			break;
+				setenv("NETHOST", optarg, 1);
+				break;
+			case 'v':
+				version(argv[0]);
                         case 'h':
                         case '?':
 				usage(argv[0]);
@@ -86,10 +94,10 @@ int main(int argc,char *argv[])
 	if (optind != argc - 1)
 		usage(argv[0]);
 
-	string dom_name(argv[1]);
+	std::string dom_name(argv[1]);
 
 #ifdef DEBUG
-	cout  << "Domain name : " << dom_name << endl;
+	std::cout  << "Domain name : " << dom_name << std::endl;
 #endif 
 //
 // Connect to database server
@@ -97,7 +105,7 @@ int main(int argc,char *argv[])
 
 	if (db_import(&error) == -1)
 	{
-		cerr << "db_initcache : Impossible to connect to database server" << endl;
+		std::cerr << "db_initcache : Impossible to connect to database server" << std::endl;
 		exit(-1);
 	}
 //
@@ -106,8 +114,8 @@ int main(int argc,char *argv[])
 //
 	if (db_initcache(dom_name.c_str(), &error) == -1)
 	{
-		cerr << "The call to database server failed with error " << error << endl;
-		cerr << "Error message : " << dev_error_str(error) << endl;
+		std::cerr << "The call to database server failed with error " << error << std::endl;
+		std::cerr << "Error message : " << dev_error_str(error) << std::endl;
 		exit(-1);
 	}
 	return 0;

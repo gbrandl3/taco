@@ -19,7 +19,7 @@ namespace log4cpp
          static LayoutsFactory& getInstance();
          void registerCreator(const std::string& class_name, create_function_t create_function);
          std::auto_ptr<Layout> create(const std::string& class_name, const params_t& params);
-         bool registed(const std::string& class_name) const;
+         bool registered(const std::string& class_name) const;
 
       private:
          LayoutsFactory(){};

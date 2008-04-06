@@ -29,9 +29,9 @@
  *
  * Original      :  October 1996
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2006-09-18 21:59:06 $
+ * Date:        $Date: 2008-04-06 09:07:38 $
  *
  */
 
@@ -55,6 +55,8 @@
 #include <Xm/Xm.h>
 #include <Xm/Text.h>
 #include <Xm/TextF.h>
+#include <Xm/List.h>
+#include <Xm/ToggleB.h>
 
 #include <X11/Xutil.h>
 #include <X11/keysymdef.h>
@@ -100,6 +102,8 @@
 
 Widget		BxFindTopShell PROTOTYPE((Widget));
 WidgetList	BxWidgetIdsFromNames PROTOTYPE((Widget, char*, char*));
+void 		SET_BACKGROUND_COLOR();
+long 		file_concat(char *source_file_name,char *dest_file_name);
 
  
 #include <greta.h>
@@ -270,7 +274,7 @@ ServSelOKCb( Widget w, XtPointer client_data, XtPointer call_data)
  	device **devtpl_tbl;
  	int devtpl_nb, index, i, error_code;
 	db_svcinfo_call info,info_all;
-	long error;
+	DevLong error;
 	char *tmp1;
 	unsigned int diff;
 	char ds_name[DS_NAME_LENGTH];
@@ -974,7 +978,7 @@ void ResClickCb( Widget w, XtPointer client_data, XtPointer call_data)
 			if (i!=ResFamListID)
 			{
 				xmstr=XmStringCreateLocalized("*");
-				XmListAddItem(widgtab[i], xmstr);
+				XmListAddItem(widgtab[i], xmstr, 0);
 				XmStringFree(xmstr);
 			}
 		}
@@ -1007,7 +1011,8 @@ void ResFilterCb( Widget w, XtPointer client_data, XtPointer call_data)
  	XmString xmstr, *xmstr_tbl;
  	char dom[20];
  	char **resu_tbl;
-	long resu,resu_nb,error;
+	long resu,resu_nb;
+	DevLong error;
 	char *strerr;
  
     	xsSetCursor(widgtab[ResSelFormID], XC_watch);
@@ -1268,7 +1273,8 @@ void ServDelOKCb( Widget w, XtPointer client_data, XtPointer call_data)
 	char ds_name[DS_NAME_LENGTH];
 	char pers_name[DSPERS_NAME_LENGTH];
 	char *tmp;
-	long flag,error;
+	long flag;
+	DevLong error;
 	char *strerr;
 	
     	xsSetCursor(XtParent(serv_tab[server_to_delete]->window), XC_watch);    
@@ -1465,7 +1471,8 @@ void ResSelOKCb( Widget w, XtPointer client_data, XtPointer call_data)
  	char **reso_str;
  	Widget topLevelShell, mainWindow;
  	char file[48];
-	long num,error;
+	long num;
+	DevLong error;
 	char *text_str;
  
 	xsSetCursor(widgtab[ResSelFormID], XC_watch);
@@ -1989,7 +1996,8 @@ void DevFilterCb( Widget w, XtPointer client_data, XtPointer call_data)
  	Arg args[512];	     
  	Cardinal argcnt=0;
  	int pos;
-	long error,i;
+	DevLong error;
+	long i;
 
     	xsSetCursor(widgtab[DevSelFormID], XC_watch);
     	XFlush(XtDisplay(w)); 
@@ -2222,7 +2230,7 @@ void DevPingCb(Widget w, XtPointer client_data, XtPointer call_data)
 void devping(char *dev_name, Widget w, Widget fo)
 {
 	devserver ds;
-	long error;
+	DevLong error;
 	char *strerr;
 	char mess[160];
 	
@@ -2295,7 +2303,7 @@ void DevSelOK( Widget w, XtPointer client_data, XtPointer call_data)
  	Widget topLevelShell, mainWindow;
  	int resu, index;
 	db_devinfo_call info;
-	long error;
+	DevLong error;
 	char tmp[100];
 	char info_str[500];
 	long i,num;
@@ -2454,7 +2462,8 @@ void DevDcSelOK( Widget w, XtPointer client_data, XtPointer call_data)
  	Widget topLevelShell, mainWindow;
  	int resu, index;
 	db_devinfo_call info;
-	long error,l;
+	DevLong error;
+	long l;
 	char tmp[100];
 	char info_str[500];
 	char hdb_str[2000];
@@ -2687,7 +2696,7 @@ void DevDcSelOK( Widget w, XtPointer client_data, XtPointer call_data)
 
 void DevDelOKCb(Widget w, XtPointer client_data, XtPointer call_data)
 {
-	long error;
+	DevLong error;
 	db_error db_err;
 	char *strerr;
 	char *local_dev_name;
@@ -3075,7 +3084,8 @@ void ServFilterCb( Widget w, XtPointer client_data, XtPointer call_data)
  	char *s, *class, *strerr, sel[256];
  	char      msg_err[501];
  	char **str_tbl;
- 	long num,i,error;
+ 	long num,i;
+	DevLong error;
  	XmString xmstr;
  	XmString *xmstr_tbl;
  	int l, pos;
@@ -3246,7 +3256,7 @@ void ServUnregOKCb( Widget w, XtPointer client_data, XtPointer call_data)
 	char *tmp;
 	char ds_name[DS_NAME_LENGTH];
 	char pers_name[DSPERS_NAME_LENGTH];
-	long error;
+	DevLong error;
 	char *strerr;
 	
 /* Split full server name */
@@ -3277,7 +3287,8 @@ void ServUnregOKCb( Widget w, XtPointer client_data, XtPointer call_data)
 
 void DialogCb( Widget w, XtPointer client_data, XtPointer call_data)
 {  
-	long num,error,i;
+	long num,i;
+	DevLong error;
  	char **str_tbl;
  	XmString *xmstr_tbl;
  	char *strerr;
@@ -3502,7 +3513,8 @@ void DialogCb( Widget w, XtPointer client_data, XtPointer call_data)
 void DbInfoCb( Widget w, XtPointer client_data, XtPointer call_data)
 {
  	char *strerr;
-	long error,size;
+	DevLong error;
+	long size;
 	db_stat_call inf;
 	char tmp[80];
 	char *disp_str;
@@ -4411,8 +4423,8 @@ void DataInitialization()
 {
  	XmString *xmstr_tbl;
  	char **dom_list;
- 	long dom_nb;
- 	long error,i;
+ 	long dom_nb,i;
+ 	DevLong error;
  	db_resource res[10];
  	int rcnt;
  	int ind_dev_serv_res, ind_cb;
@@ -4553,7 +4565,8 @@ void DevChainResCb( Widget w, XtPointer client_data, XtPointer call_data)
     	int              resu;
     	XmTextPosition   cur_posit;
     	int              ind_ch, dev_found, free_place;
-	long		 num,error,i,l;
+	long		 num,i,l;
+	DevLong		 error;
 	char 		 **res_array;
 
     	selected_dev = NULL;
@@ -4758,7 +4771,8 @@ void DevDcChainResCb( Widget w, XtPointer client_data, XtPointer call_data)
     	int              resu;
     	XmTextPosition   cur_posit;
     	int              ind_ch, dev_found, free_place;
-	long		 num,error,i,l;
+	long		 num,i,l;
+	DevLong		 error;
 	char 		 **res_array;
 
     	selected_dev = NULL;
@@ -5058,7 +5072,8 @@ void ServChainResCb( Widget w, XtPointer client_data, XtPointer call_data)
     	char             *info_str, *reso_str, *strerr, s[1001];
     	XmTextPosition   cur_posit;
     	int              ind_ch, dev_found, free_place;
-	long 		 num,error,i,l;
+	long 		 num,i,l;
+	DevLong		 error;
 	char		 **res_array;
 
     	selected_dev = NULL;
@@ -5328,7 +5343,8 @@ void NewServOKCb(Widget w,XtPointer client_data,XtPointer call_data)
 	long nb_res,nb_dev;
 	char **res_def,**dev_def;
 	long l;
-	long err_line,error,res,dev_err;
+	long err_line,res,dev_err;
+	DevLong error;
 	long left,right;
 	Time time;
 	char mess[300];
@@ -5531,7 +5547,8 @@ void ServRestartCb(Widget w,XtPointer client_data,XtPointer call_data)
 
 void DevRestartSvcOK(Widget w,XtPointer client_data,XtPointer call_data)
 {
-	long error,restore;
+	DevLong error;
+	long restore;
 	char *strerr;
 	Widget w_curs;
 	unsigned int pid;

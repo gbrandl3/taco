@@ -40,7 +40,7 @@ testgdbm_LDADD		= libgdbm.la
 
 man3_MANS		= gdbm.3
 
-info_TEXINFOS		= gdbm.texinfo
+#info_TEXINFOS		= gdbm.texinfo
 
 noinst_HEADERS 		= gdbmdefs.h extern.h systems.h gdbmconst.h proto.h gdbmerrno.h
 
@@ -53,7 +53,7 @@ DISTCLEANFILES		= autoconf.h conv2gdbm junk.gdbm junkdbm.dir junkdbm.pag junkndb
 nodist_include_HEADERS	= gdbm.h 
 
 EXTRA_DIST 		= autogen.sh gdbm.3 gdbm.texinfo \
-			gdbm.info gdbm.proto gdbm.proto2 \
+			gdbm.proto gdbm.proto2 \
 			getopt.c getopt.h 
 
 gdbm.h:	gdbm.proto gdbmerrno.h gdbm.proto2

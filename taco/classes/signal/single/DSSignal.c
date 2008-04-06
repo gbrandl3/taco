@@ -29,9 +29,9 @@
  *
  * Original:	June 1996
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2006-09-18 22:41:57 $
+ * Date:        $Date: 2008-04-06 09:06:38 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -54,22 +54,22 @@
  * public methods
  */
 
-static long class_initialise 	(long *error);
-static long object_create    	(char *name, DevServer *ds_ptr, long *error);
-static long object_destroy    	(Dssignal ds, long *error);
+static long class_initialise 	(DevLong *error);
+static long object_create    	(char *name, DevServer *ds_ptr, DevLong *error);
+static long object_destroy    	(Dssignal ds, DevLong *error);
 static long object_initialise 	(Dssignal ds, char *dev_class_name, 
-				 long *error);
+				 DevLong *error);
 static long read_properties 	(Dssignal ds, DevVarStringArray *properties,
-				 long *error);
+				 DevLong *error);
 static long check_alarm 	(Dssignal ds, double read_value, 
-				 long *alarm_state, long *error);
-static long read_alarm 		(Dssignal ds,  char **alarm_msg, long *error);
+				 long *alarm_state, DevLong *error);
+static long read_alarm 		(Dssignal ds,  char **alarm_msg, DevLong *error);
 static long check_limits 	(Dssignal ds, double set_value, 
-				 long *limit_state, long *error);
-static long reset 		(Dssignal ds, long *error);
+				 long *limit_state, DevLong *error);
+static long reset 		(Dssignal ds, DevLong *error);
 static long get_description     (Dssignal ds, 
 				 DevVarStringArray *description_list, 
-				 long *error);
+				 DevLong *error);
 
 static	DevMethodListEntry methods_list[] = {
    	{DevMethodClassInitialise,	class_initialise},
@@ -182,7 +182,7 @@ static long res_object_size = sizeof(res_object)/sizeof(db_resource);
  Arg(s) Out:	long *error - pointer to error code, in case routine fails
  =======================================================================*/
 
-static long class_initialise (long *error)
+static long class_initialise (DevLong *error)
 
 {
 	static char	*init_value = "Not specified";
@@ -300,7 +300,7 @@ static long class_initialise (long *error)
 		                    routine fails
  =======================================================================*/
 
-static long object_create (char *name, DevServer *ds_ptr, long *error)
+static long object_create (char *name, DevServer *ds_ptr, DevLong *error)
 
 {
    Dssignal ds;
@@ -453,7 +453,7 @@ Arg(s) In:	Dssignal ds	- object to destroy
 Arg(s) Out:	long *error     - pointer to error code, in case routine fails
 =============================================================================*/
 
-static long object_destroy (Dssignal ds, long *error)
+static long object_destroy (Dssignal ds, DevLong *error)
 
 {
 	*error = 0;
@@ -517,7 +517,7 @@ Arg(s) In:	Dssignal ds	- object to initialise
 Arg(s) Out:	long *error     - pointer to error code, in case routine fails
 =============================================================================*/
 
-static long object_initialise (Dssignal ds, char *dev_class_name, long *error)
+static long object_initialise (Dssignal ds, char *dev_class_name, DevLong *error)
 
 {
 	char			*label 			= NULL;
@@ -1020,7 +1020,7 @@ static long object_initialise (Dssignal ds, char *dev_class_name, long *error)
  ============================================================================*/
 
 static long check_alarm (Dssignal ds, double read_value, 
-			  long *alarm_state, long *error)
+			  long *alarm_state, DevLong *error)
 {
 	time_t 	now;
 	char 	tmp[160];
@@ -1139,7 +1139,7 @@ static long check_alarm (Dssignal ds, double read_value,
                  long           *error       - pointer to error code, in case
                                                routine fails.
  ============================================================================*/
-static long read_alarm (Dssignal ds,  char **alarm_msg, long *error)
+static long read_alarm (Dssignal ds,  char **alarm_msg, DevLong *error)
 {
 
 	*error = 0;
@@ -1187,7 +1187,7 @@ static long read_alarm (Dssignal ds,  char **alarm_msg, long *error)
                                                routine fails.
  ============================================================================*/
 static long check_limits 	(Dssignal ds, double set_value, 
-				 long *limit_state, long *error)
+				 long *limit_state, DevLong *error)
 {
 	time_t now;
 	*error = 0;
@@ -1247,7 +1247,7 @@ static long check_limits 	(Dssignal ds, double set_value,
  Arg(s) Out:     long           *error       - pointer to error code, in case
                                                routine fails.
  ============================================================================*/
-static long reset 		(Dssignal ds, long *error)
+static long reset 		(Dssignal ds, DevLong *error)
 {
 	*error = 0;
 
@@ -1291,7 +1291,7 @@ static long reset 		(Dssignal ds, long *error)
                                                routine fails.
  ============================================================================*/
 static long read_properties 	(Dssignal ds, DevVarStringArray *properties,
-				 long *error)
+				 DevLong *error)
 {
 	*error = 0;
 
@@ -1406,7 +1406,7 @@ static long read_properties 	(Dssignal ds, DevVarStringArray *properties,
                                          routine fails.
  ============================================================================*/
 static long get_description (Dssignal ds, DevVarStringArray *description_list, 
-			     long *error)
+			     DevLong *error)
 {
 	char	tmp_description[256];
 	short	i;

@@ -30,17 +30,26 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2006-09-19 08:49:53 $
+ * Date:	$Date: 2008-04-06 09:07:52 $
  */
 
 #ifndef _Message_h
 #define _Message_h
 
-extern void msg_alarm_handler(short, char *, char *, char *, char *);
-extern void msg_initialise(char *);
-extern void msg_fault_handler(DevString);
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+extern void msg_alarm_handler(short, const char *, const char *, const char *, const char *);
+extern void msg_initialise(const char *);
+extern void msg_fault_handler(const DevString);
+
+#ifdef __cplusplus
+}
+#endif
 
 typedef struct _MessageServerPart 
 {

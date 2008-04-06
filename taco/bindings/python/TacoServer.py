@@ -19,27 +19,27 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
-# File:         ResDatabase.py
+# File:         TacoServer.py
 #
 # Project:      Automatic Beamline Alignment
 #
 # Description:  Generic interface class to the TACO database.
 #
 # Author(s):    J.Meyer
-#               $Author: andy_gotz $
+#               $Author: jkrueger1 $
 #
 # Original:     Mai 2001
 #
-# Version:      $Revision: 1.5 $
+# Version:      $Revision: 1.6 $
 #
-# Date:         $Date: 2005-12-09 15:09:01 $
+# Date:         $Date: 2008-04-06 09:06:31 $
 #
 
 """ TACO device server """
 
-__author__ = "Jens Meyer, $Author: andy_gotz $"
-__date__ = "$Date: 2005-12-09 15:09:01 $"
-__revision__ = "$Revision: 1.5 $"
+__author__ = "Jens Meyer, $Author: jkrueger1 $"
+__date__ = "$Date: 2008-04-06 09:06:31 $"
+__revision__ = "$Revision: 1.6 $"
 
 import thread
 import Server

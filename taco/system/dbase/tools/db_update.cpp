@@ -26,12 +26,13 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2006-09-06 18:34:15 $
+ * Date:        $Date: 2008-04-06 09:07:47 $
  */
-
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 /* TACO include file */
 #include <API.h>
 
@@ -40,22 +41,30 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
-
-using namespace std;
+#ifdef _solaris
+#include <taco_utils.h>
+#endif /* _solaris */
 
 void usage(const char *cmd)
 {
-	cerr << "usage : " << cmd << " [options] <file name>" << endl;
-	cerr << " Read resource and device informations from the file" << std::endl;
-	cerr << " and put them into the database" << std::endl;
-	cerr << "        options : -h display this message" << std::endl;
-	cerr << "                  -n nethost" << std::endl;
+	std::cerr << "usage : " << cmd << " [options] <file name>" << std::endl;
+	std::cerr << " Read resource and device informations from the file" << std::endl;
+	std::cerr << " and put them into the database" << std::endl;
+	std::cerr << "        options : -h display this message" << std::endl;
+	std::cerr << "                  -n nethost" << std::endl;
+	std::cerr << "                  -v display the current version" << std::endl;
 	exit(1);
+}
+
+void version(const char *cmd)
+{
+	std::cerr << cmd << " version " << VERSION << std::endl;
+	exit(0);
 }
 
 int main(int argc, char **argv)
 {
-	long 	error;
+	DevLong error;
 	char 	*ptr;
 	long 	nb_dev,
         	nb_res,
@@ -75,30 +84,27 @@ int main(int argc, char **argv)
 //
 // Argument test and device name structure
 //
-        while ((c = getopt(argc,argv,"hn:")) != -1)
+        while ((c = getopt(argc,argv,"hvn:")) != -1)
                 switch (c)
                 {
 			case 'n':
-				{
-					char s[160];
-					snprintf(s, sizeof(s), "NETHOST=%s", optarg);
-					putenv(s);
-				}
-			break;
+				setenv("NETHOST", optarg, 1);
+				break;
+			case 'v':
+				version(argv[0]);
                         case 'h':
                         case '?':
                                 usage(argv[0]);
-                                break;
                 }
         if (optind != argc - 1)
                 usage(argv[0]);
 
-	string file_name(argv[optind]);
+	std::string file_name(argv[optind]);
 
 //
 // Get environment variable
 //
-	string base("");
+	std::string base("");
 	if ((ptr = (char *)getenv("RES_BASE_DIR")) != NULL)
 	{
 		base = ptr;
@@ -109,14 +115,14 @@ int main(int argc, char **argv)
 //
 	file_name.insert(0, base);
 #ifdef DEBUG
-	cout  << "File name : " << file_name << endl;
+	std::cout  << "File name : " << file_name << std::endl;
 #endif /* DEBUG */
 //
 // Connect to database server
 //
 	if (db_import(&error) == DS_NOTOK)
 	{
-		cerr << "db_update : Impossible to connect to database server" << endl;
+		std::cerr << "db_update : Impossible to connect to database server" << std::endl;
 		exit(-1);
 	}
 
@@ -129,30 +135,30 @@ int main(int argc, char **argv)
 		if (err_line != 0)
 		{
 			if (error == DbErr_BadDevSyntax)
-				cerr << "Error in device definition" << endl;
+				std::cerr << "Error in device definition" << std::endl;
 			else
 			{
-				cerr << "Error at line " << err_line << " in file " << file_name << " (" << error << ")" << endl;
-				cerr << "Error message : " << dev_error_str(error) << endl;
+				std::cerr << "Error at line " << err_line << " in file " << file_name << " (" << error << ")" << std::endl;
+				std::cerr << "Error message : " << dev_error_str(error) << std::endl;
 			}
 		}
 		else
 		{
-			cerr << "File analysis failed with error " << error << endl;
-	    		cerr << "Error at line " << err_line << " in file " << file_name << " (" << error << ")" << endl;
-			cerr << "Error message : " << dev_error_str(error) << endl;
+			std::cerr << "File analysis failed with error " << error << std::endl;
+	    		std::cerr << "Error at line " << err_line << " in file " << file_name << " (" << error << ")" << std::endl;
+			std::cerr << "Error message : " << dev_error_str(error) << std::endl;
 		}
 		exit(-1);
 	}
 #ifdef DEBUG
-	cout << "File analysis is OK" << endl;
+	std::cout << "File analysis is OK" << std::endl;
 
-	cout << nb_dev << " device list defined" << endl;	
+	std::cout << nb_dev << " device list defined" << std::endl;	
 	for (int i = 0; i < nb_dev; i++)
-		cout << dev_def[i] << endl;
-	cout << nb_res << " resources defined" << endl;
+		std::cout << dev_def[i] << std::endl;
+	std::cout << nb_res << " resources defined" << std::endl;
 	for (int i = 0; i < nb_res; i++)
-		cout << res_def[i] << endl;
+		std::cout << res_def[i] << std::endl;
 #endif /* DEBUG */
 
 //
@@ -160,16 +166,16 @@ int main(int argc, char **argv)
 //
 	for (int i = 0; i < nb_res; i++)
 	{
-		string str(res_def[i]);
-		string::size_type pos;
+		std::string str(res_def[i]);
+		std::string::size_type pos;
 
-		if ((pos = str.find('/')) == string::npos)
+		if ((pos = str.find('/')) == std::string::npos)
 		{
-			cerr << "Wrong resource syntax !!!, exiting" << endl;
+			std::cerr << "Wrong resource syntax !!!, exiting" << std::endl;
 			exit(-1);
 		}
 	
-		string domain(str,0,pos);					
+		std::string domain(str,0,pos);					
 		if (domain == "sec")
 		{
 			sec = True;
@@ -188,7 +194,7 @@ int main(int argc, char **argv)
 				pass = False;
 			else
 			{
-				cerr << "Can't retrieve the database defined password, update not allowed" << endl;
+				std::cerr << "Can't retrieve the database defined password, update not allowed" << std::endl;
 				exit(-1);
 			}
 		}
@@ -198,8 +204,8 @@ int main(int argc, char **argv)
 			answer = (char *)getpass("Security passwd : ");
 			if (strcmp(answer,pa) != 0)
 			{
-				cout << "Sorry, wrong password. Update not allowed" << endl;
-				cout << "Hint : Remove security resources from file" << endl;
+				std::cout << "Sorry, wrong password. Update not allowed" << std::endl;
+				std::cout << "Hint : Remove security resources from file" << std::endl;
 				exit(-1);
 			}
 		}
@@ -217,20 +223,20 @@ int main(int argc, char **argv)
 		{
 			if (dev_err != 0)
 			{
-				cerr << "Error in device definition number " << dev_err << ", error = " << error << endl;
-				cerr << "Error message : " << dev_error_str(error) << endl;
+				std::cerr << "Error in device definition number " << dev_err << ", error = " << error << std::endl;
+				std::cerr << "Error message : " << dev_error_str(error) << std::endl;
 			}
 			else
 			{
-				cerr << "Device(s) update call failed with error " << error << endl;
-				cerr << "Error message : " << dev_error_str(error) << endl;
+				std::cerr << "Device(s) update call failed with error " << error << std::endl;
+				std::cerr << "Error message : " << dev_error_str(error) << std::endl;
 			}
 			exit(-1);
 		}
 	}
 	
 #ifdef DEBUG
-	cout << "Update device successfull" << endl;
+	std::cout << "Update device successfull" << std::endl;
 #endif /* DEBUG */
 
 //
@@ -246,13 +252,13 @@ int main(int argc, char **argv)
 		{
 			if (dev_err != 0)
 			{
-				cerr << "Error in resource definition number " << dev_err << ", error = " << error << endl;
-				cerr << "Error message : " << dev_error_str(error) << endl;
+				std::cerr << "Error in resource definition number " << dev_err << ", error = " << error << std::endl;
+				std::cerr << "Error message : " << dev_error_str(error) << std::endl;
 			}
 			else
 			{
-				cerr << "Resource(s) update call failed with error " << error << endl;
-				cerr << "Error message : " << dev_error_str(error) << endl;
+				std::cerr << "Resource(s) update call failed with error " << error << std::endl;
+				std::cerr << "Error message : " << dev_error_str(error) << std::endl;
 			}
 		}
 	}	

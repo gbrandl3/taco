@@ -29,9 +29,9 @@
  *
  * Original:    July 1992
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:21 $
  *
  *******************************************************************-*/
 
@@ -50,10 +50,10 @@ xdr_DevDaemonStatus(xdrs, objp)
 	if (!xdr_char(xdrs, &objp->BeingPolled)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->PollFrequency)) {
+	if (!xdr_DevLong(xdrs, &objp->PollFrequency)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->TimeLastPolled)) {
+	if (!xdr_DevLong(xdrs, &objp->TimeLastPolled)) {
 		return (FALSE);
 	}
 	if (!xdr_char(xdrs, &objp->PollMode)) {
@@ -62,10 +62,10 @@ xdr_DevDaemonStatus(xdrs, objp)
 	if (!xdr_char(xdrs, &objp->DeviceAccessError)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->ErrorCode)) {
+	if (!xdr_DevLong(xdrs, &objp->ErrorCode)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->LastCommandStatus)) {
+	if (!xdr_DevLong(xdrs, &objp->LastCommandStatus)) {
 		return (FALSE);
 	}
 	if (!xdr_char(xdrs, &objp->ContinueAfterError)) {
@@ -80,14 +80,14 @@ xdr_length_DevDaemonStatus(objp)
         {
         long  length = 0;
 
-        length = length + xdr_length_DevChar (&objp->BeingPolled);
-        length = length + xdr_length_DevLong (&objp->PollFrequency);
-        length = length + xdr_length_DevLong (&objp->TimeLastPolled);
-        length = length + xdr_length_DevChar (&objp->PollMode);
-        length = length + xdr_length_DevChar (&objp->DeviceAccessError);
-        length = length + xdr_length_DevLong (&objp->ErrorCode);
-        length = length + xdr_length_DevLong (&objp->LastCommandStatus);
-        length = length + xdr_length_DevChar (&objp->ContinueAfterError);
+        length += xdr_length_DevChar (&objp->BeingPolled);
+        length += xdr_length_DevLong (&objp->PollFrequency);
+        length += xdr_length_DevLong (&objp->TimeLastPolled);
+        length += xdr_length_DevChar (&objp->PollMode);
+        length += xdr_length_DevChar (&objp->DeviceAccessError);
+        length += xdr_length_DevLong (&objp->ErrorCode);
+        length += xdr_length_DevLong (&objp->LastCommandStatus);
+        length += xdr_length_DevChar (&objp->ContinueAfterError);
 
         return (length);
 }
@@ -99,10 +99,10 @@ xdr_DevDaemonData(xdrs, objp)
 	XDR *xdrs;
 	DevDaemonData *objp;
 {
-	if (!xdr_long(xdrs, &objp->ddid)) {
+	if (!xdr_DevLong(xdrs, &objp->ddid)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->long_data)) {
+	if (!xdr_DevLong(xdrs, &objp->long_data)) {
 		return (FALSE);
 	}
 	if (!xdr_string(xdrs, &objp->string_data, ~0)) {
@@ -118,9 +118,9 @@ xdr_length_DevDaemonData(objp)
         {
         long  length = 0;
 
-        length = length + xdr_length_DevLong (&objp->ddid);
-        length = length + xdr_length_DevLong (&objp->long_data);
-        length = length + xdr_length_DevString (&objp->string_data);
+        length += xdr_length_DevLong (&objp->ddid);
+        length += xdr_length_DevLong (&objp->long_data);
+        length += xdr_length_DevString (&objp->string_data);
 
         return (length);
 }

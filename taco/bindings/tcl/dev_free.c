@@ -30,9 +30,9 @@
  *
  * Original:    July 1997
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-18 22:04:49 $
+ * Date:        $Date: 2008-04-06 09:06:33 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -63,7 +63,7 @@ int dev_io_free (ClientData clientdata, Tcl_Interp *interp,
 	char			*Error;
 	char			*DeviceName;
 	char			*error_str;
-	long			DeviceError  = 0;
+	DevLong			DeviceError  = 0;
 	short			found        = False;
 	short			not_imported = False;
 
@@ -115,7 +115,7 @@ int dev_io_free (ClientData clientdata, Tcl_Interp *interp,
 
 		DeviceError = DevErr_DeviceOfThisNameNotServed;
 		error_str = dev_error_str (DeviceError);
-		snprintf (StringTemp, sizeof(StringTemp), "%s [%d]", error_str, DeviceError);
+		snprintf (StringTemp, sizeof(StringTemp), "%s [%ld]", error_str, (long)DeviceError);
 		Tcl_SetVar (interp,Error,StringTemp,0);
 		free (error_str);
 		return TCL_OK;
@@ -130,7 +130,7 @@ int dev_io_free (ClientData clientdata, Tcl_Interp *interp,
 		Tcl_SetVar (interp,State,"-1",0);
 
 		error_str = dev_error_str (DeviceError);
-		snprintf (StringTemp, sizeof(StringTemp), "%s [%d]", error_str, DeviceError);
+		snprintf (StringTemp, sizeof(StringTemp), "%s [%ld]", error_str, (long)DeviceError);
 		Tcl_SetVar (interp,Error,StringTemp,0);
 		free (error_str);
 	}
@@ -161,7 +161,7 @@ int dev_io_free_all (ClientData clientdata, Tcl_Interp *interp,
 	IMPORTED_DEVICE 	*CurrentDevice;
 	char			*State;
 	char			*Error;
-	long			DeviceError  = 0;
+	DevLong			DeviceError  = 0;
 
 /*
  * Check the input argument

@@ -30,9 +30,9 @@
  *
  * Original:	May 1998 by Andy Gotz
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2006-09-18 22:39:46 $
+ * Date:        $Date: 2008-04-06 09:06:38 $
  */
 
 #ifndef _Serial_H
@@ -91,14 +91,14 @@ class Serial : public Device {
 
    SerialLinePart 	serialline;
 
-   long ClassInitialise	(long *error);
-   long GetResources 	(char *res_name, long *error);
-   long RawReadString 	(DevVoid *argin, DevString *argout, long *error);
-   long NCharReadString	(DevLong *argin, DevString *argout, long *error);
-   long LineReadString	(DevVoid *argin, DevString *argout, long *error);
-   long RawReadChar	(DevVoid *argin, DevVarCharArray *argout, long *error);
-   long NCharReadChar	(DevLong *argin, DevVarCharArray *argout, long *error);
-   long LineReadChar	(DevVoid *argin, DevVarCharArray *argout, long *error);
+   long ClassInitialise	(DevLong *error);
+   long GetResources 	(char *res_name, DevLong *error);
+   long RawReadString 	(DevVoid *argin, DevString *argout, DevLong *error);
+   long NCharReadString	(DevLong *argin, DevString *argout, DevLong *error);
+   long LineReadString	(DevVoid *argin, DevString *argout, DevLong *error);
+   long RawReadChar	(DevVoid *argin, DevVarCharArray *argout, DevLong *error);
+   long NCharReadChar	(DevLong *argin, DevVarCharArray *argout, DevLong *error);
+   long LineReadChar	(DevVoid *argin, DevVarCharArray *argout, DevLong *error);
    long Open_desc	(void);
    char * Decode_parameters(struct termios term, char eol);
 
@@ -109,26 +109,26 @@ class Serial : public Device {
 //
  protected:
 
-   long StateMachine (long cmd, long *error);
+   long StateMachine (DevCommand cmd, DevLong *error);
 
 //
 // commands
 //
-   long SerWriteString	(void *argin, void *argout, long *error);
-   long SerWriteChar	(void *argin, void *argout, long *error);
-   long SerReadString	(void *argin, void *argout, long *error);
-   long SerReadChar	(void *argin, void *argout, long *error);
-   long SerSetParameter	(void *argin, void *argout, long *error);
-   long Reset		(void *argin, void *argout, long *error);
-   long Status		(void *argin, void *argout, long *error);
-   long State		(void *argin, void *argout, long *error);
+   long SerWriteString	(DevArgument argin, DevArgument argout, DevLong *error);
+   long SerWriteChar	(DevArgument argin, DevArgument argout, DevLong *error);
+   long SerReadString	(DevArgument argin, DevArgument argout, DevLong *error);
+   long SerReadChar	(DevArgument argin, DevArgument argout, DevLong *error);
+   long SerSetParameter	(DevArgument argin, DevArgument argout, DevLong *error);
+   long Reset		(DevArgument argin, DevArgument argout, DevLong *error);
+   long Status		(DevArgument argin, DevArgument argout, DevLong *error);
+   long State		(DevArgument argin, DevArgument argout, DevLong *error);
 
 //
 // public members
 //
  public:
 
-   Serial (char *name, long *error);
+   Serial (char *name, DevLong *error);
    ~Serial ();
 
 };

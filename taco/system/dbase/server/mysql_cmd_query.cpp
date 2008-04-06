@@ -19,15 +19,15 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * File:
- *
+ *		mysql_cmd_query.cpp
  * Description:
  *
  * Authors:
- *		$Author: jlpons $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2006-12-12 17:23:08 $
+ * Date:	$Date: 2008-04-06 09:07:41 $
  *
  */
 
@@ -41,14 +41,14 @@
  * 
  * @return a pointer to a structure of the cmd_que type
  */
-cmd_que *MySQLServer::db_cmd_query_1_svc(nam *pcmd_name)
+cmd_que *MySQLServer::db_cmd_query_1_svc(DevString *pcmd_name)
 {
     int 		i;
     std::string 	req_cmd(*pcmd_name);
 
-#ifdef DEBUG
-    std::cout << "Command name : " << req_cmd << std::endl;
-#endif
+
+    logStream->debugStream() << "Command name : " << req_cmd << log4cpp::eol;
+
 //
 // Initialize error code sended cmd_queue to client 
 //
@@ -56,9 +56,9 @@ cmd_que *MySQLServer::db_cmd_query_1_svc(nam *pcmd_name)
 //
 // Return error code if the server is not connected to the database files 
 //
-    if (!dbgen.connected)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to database." << std::endl;
+	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
 	cmd_queue.db_err = DbErr_DatabaseNotConnected;
 	cmd_queue.xcmd_code = 0;
 	return(&cmd_queue);
@@ -83,7 +83,7 @@ cmd_que *MySQLServer::db_cmd_query_1_svc(nam *pcmd_name)
     query += ("DOMAIN = 'cmds' AND VALUE = '" + req_cmd + "'");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
-	std::cout << mysql_error(mysql_conn) << std::endl;
+	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
 	cmd_queue.db_err = DbErr_DatabaseAccess;
 	cmd_queue.xcmd_code = 0;
 	return (&cmd_queue);

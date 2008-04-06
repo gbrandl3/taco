@@ -21,50 +21,46 @@ AC_DEFUN([TACO_PYTHON_BINDING],
 	AC_REQUIRE([TACO_SERVER_T])
 	PYTHON_PROG(2.0, [yes])
 	PYTHON_DEVEL
-	if test "x$taco_python_binding" = "xyes" ; then
+	AS_IF([test "x$taco_python_binding" = "xyes"],
+	      [
 		ac_save_CPPFLAGS="$CPPFLAGS"
 		CPPFLAGS="$CFLAGS $PYTHON_CPPFLAGS"
 		AC_CHECK_HEADERS([numarray/arrayobject.h], [taco_python_binding=yes], 
 			AC_CHECK_HEADERS(Numeric/arrayobject.h, [taco_python_binding=yes], [taco_python_binding=no], [#include <Python.h>]),
 			[#include <Python.h>])
 		CPPFLAGS="$ac_save_CPPFLAGS"
-	fi	
-	if test x"${taco_server_libs}" != x"yes" ; then
-		taco_python_binding=no
-	fi
+	      ])	
+	AS_IF([test x"${enable_server}" != x"yes"], [taco_python_binding=no])
 	AM_CONDITIONAL(PYTHON_BINDING, [test x"${taco_python_binding}" = x"yes"])
 ])
 
 AC_DEFUN([TACO_TCL_BINDING],
 [
 	AC_REQUIRE([TCL_DEVEL])
-	if test -n "$TCLINCLUDE" -a -n "$TCLLIB" -a "$TCLPACKAGE" != "no" ; then
-		taco_tcl_binding=yes
-	else
-		taco_tcl_binding=no
-	fi
+	AS_IF([test -n "$TCLINCLUDE" -a -n "$TCLLIB" -a "$TCLPACKAGE" != "no"], [taco_tcl_binding=yes], [taco_tcl_binding=no])
 	AM_CONDITIONAL(TCL_BINDING, test $taco_tcl_binding = yes)
 ])
 
 AC_DEFUN([TACO_LABVIEW_BINDING],
 [
-	taco_labview_binding="no"
-	AC_ARG_ENABLE(labview, AC_HELP_STRING(--enable-labview, [build the binding for LabView @<:@default=yes@:>@]),
+	taco_labview_binding="yes"
+	AC_ARG_ENABLE(labview, AC_HELP_STRING(--enable-labview, [build the binding for LabView @<:@default=${taco_labview_bindings}@:>@]),
                 [case "${enable_labview}" in
-                        yes)    taco_labview=yes;;
-                        no)     taco_labview=no;;
+                        yes)    taco_labview_binding=yes;;
+                        no)     taco_labview_binding=no;;
                         *)      AC_MSG_ERROR([bad value ${enable_labview} for --enable-labview]);;
                 esac], [taco_labview=yes])
         AC_ARG_WITH(labview, AS_HELP_STRING([--with-labview=PFX], [Prefix where labview is installed, @<:@default=/usr/local/lv71@:>@]),
                 [labview_prefix="$withval"], [labview_prefix="/usr/local/lv71"])
 	ac_save_CPPFLAGS="$CPPFLAGS"
 	CPPFLAGS="$CPPFLAGS -I${labview_prefix}/cintools"
-	if test x"$taco_labview_binding" = x"yes" ; then
+	AS_IF([test x"$taco_labview_binding" = x"yes"],
+	      [
 		AC_CHECK_HEADERS([extcode.h], [taco_labview_binding=yes
 			AC_SUBST([LABVIEW_INCLUDES], ["-I${labview_prefix}/cintools"])
 			AC_SUBST([LABVIEW_LIBS], ["-L${labview_prefix}/cintools -llv"])
-			])
-	fi 
+			],[taco_labview_binding=no])
+	      ])
 	CPPFLAGS="$ac_save_CPPFLAGS"
 	AM_CONDITIONAL(LABVIEW_BINDING, [test "$taco_labview_binding" = "yes"])
 ])
@@ -74,16 +70,12 @@ AC_DEFUN([TACO_DBM_SERVER],
 	TACO_MYSQL_SUPPORT
 	TACO_GDBM_SUPPORT
 	TACO_SQLITE3_SUPPORT
-	AM_CONDITIONAL(MYSQLSUPPORT, test "x$taco_mysql" = "xyes")
+	AM_CONDITIONAL(MYSQLSUPPORT, test "x$enable_mysql" = "xyes")
 dnl disable gdbm support of the dbm server if mysql support of database server is disabled
-	if test x"$taco_mysql" != x"yes" -a x"$taco_sqlite3" != x"yes" ; then 	
-		taco_gdbm=yes
-	fi
+	AS_IF([test x"$enable_mysql" != x"yes" -a x"$enable_sqlite3" != x"yes"], [enable_gdbm=yes])
 dnl disable the build of gdbm if gdbm support of database server is disabled
-	if test "x$taco_gdbm" = "xno" -a "x$taco_build_gdbm" = "xyes" ; then
-		taco_build_gdbm=no
-	fi 
-	AM_CONDITIONAL(GDBMSUPPORT, test "x$taco_gdbm" = "xyes")
+	AS_IF([test "x$enable_gdbm" = "xno" -a "x$taco_build_gdbm" = "xyes"], [taco_build_gdbm=no])
+	AM_CONDITIONAL(GDBMSUPPORT, test "x$enable_gdbm" = "xyes")
 	AM_CONDITIONAL(BUILD_GDBM, test "x$taco_build_gdbm" = "xyes")
 	AC_SUBST(GDBM_CFLAGS)
 	AC_SUBST(GDBM_LIBS)
@@ -93,13 +85,11 @@ dnl disable the build of gdbm if gdbm support of database server is disabled
 AC_DEFUN([TACO_SQLITE3_SUPPORT],
 [
 	AC_ARG_ENABLE(sqlite3, AC_HELP_STRING(--enable-sqlite3, [build the database server with SQLite3 support @<:@default=yes@:>@]),
-		[case "${enable_sqlite3}" in
-			yes)	taco_sqlite3=yes;;
-			no)	taco_sqlite3=no;;
-			*)	AC_MSG_ERROR([bad value ${enable_sqlite3} for --enable-sqlite3]);;
-		esac], [taco_sqlite3=yes])	
-	PKG_CHECK_MODULES(SQLITE3, sqlite3 >= 3.0.0, 
-		[taco_sqlite3=yes
+		[], [enable_sqlite3=yes])	
+	AS_IF([test x"$enable_sqlite3" = x"yes"],
+	      [
+		PKG_CHECK_MODULES(SQLITE3, sqlite3 >= 3.0.0, 
+		[
 		SQLITE3_CLFAGS=`$PKG_CONFIG --cflags sqlite3`
 		SQLITE3_LIBS=`$PKG_CONFIG --libs-only-l sqlite3`
 		SQLITE3_LDFLAGS=`$PKG_CONFIG --libs-only-L sqlite3`
@@ -110,11 +100,12 @@ AC_DEFUN([TACO_SQLITE3_SUPPORT],
 		AC_CHECK_HEADERS([sqlite3.h])
 		CFLAGS="$save_CFLAGS"
 		CPPFLAGS="$save_CPPFLAGS"
-		], [taco_sqlite3=no])
+		], [enable_sqlite3=no])
+	      ])
 	AC_SUBST([SQLITE3_CFLAGS], [$SQLITE3_CFLAGS])
 	AC_SUBST([SQLITE3_LIBS], [$SQLITE3_LIBS])
 	AC_SUBST([SQLITE3_LDFLAGS], [$SQLITE3_LDFLAGS])
-	AM_CONDITIONAL(SQLITE3SUPPORT, test x"$taco_sqlite3" = x"yes")
+	AM_CONDITIONAL(SQLITE3SUPPORT, test x"$enable_sqlite3" = x"yes")
 ])
 
 AC_DEFUN([TACO_MYSQL_SUPPORT],
@@ -124,11 +115,7 @@ dnl Get the cflags and libraries
 dnl
 	AC_PATH_TOOL(MYSQL_CONFIG, mysql_config)
 	AC_ARG_ENABLE(mysql, AC_HELP_STRING(--enable-mysql, [build the database server with mysql support @<:@default=yes@:>@]),
-		[case "${enable_mysql}" in
-			yes)	taco_mysql=yes;;
-			no)	taco_mysql=no;;
-			*)	AC_MSG_ERROR([bad value ${enable_mysql} for --enable-mysql]);;
-		esac], [taco_mysql=yes])
+		[], [enable_mysql=yes])
 	AC_ARG_WITH(mysql, AS_HELP_STRING([--with-mysql=PFX], [Prefix where mysql is installed, e.g. '/usr/local/mysql']),
 		[mysql_prefix="$withval"], [mysql_prefix=""])
 	AC_ARG_WITH(mysql-libraries, AS_HELP_STRING([--with-mysql-libraries=DIR], [Directory where mysql library is installed (optional)]), 
@@ -136,34 +123,25 @@ dnl
 	AC_ARG_WITH(mysql-includes, AS_HELP_STRING([--with-mysql-includes=DIR], [Directory where mysql header files are installed (optional)]), 
 		[mysql_includes="$withval"], [mysql_includes=""])
 
-	if test "x$mysql_libraries" != "x" ; then
-		MYSQL_LIBS="-L$mysql_libraries -lmysqlclient -lm -lz"
-	elif test "x$mysql_prefix" != "x" ; then
-		MYSQL_LIBS="-L$mysql_prefix/lib/mysql -lmysqlclient -lm -lz"
-	elif test -n "$MYSQL_CONFIG" ; then
-		MYSQL_LIBS=`$MYSQL_CONFIG --libs`
-	elif test "x$prefix" != "xNONE" -a "x$prefix" != "x/usr"; then
-		MYSQL_LIBS="-L$prefix/lib -lmysqlclient -lm -lz"
-	fi
+	AS_IF([test "x$enable_mysql" = "xyes"],
+              [
+		AS_IF([test "x$mysql_libraries" != "x"], [MYSQL_LIBS="-L$mysql_libraries -lmysqlclient -lm -lz"],
+	      	      [test "x$mysql_prefix" != "x"], [MYSQL_LIBS="-L$mysql_prefix/lib/mysql -lmysqlclient -lm -lz"],
+	      	      [test -n "$MYSQL_CONFIG"], [MYSQL_LIBS=`$MYSQL_CONFIG --libs`],
+	      	      [test "x$prefix" != "xNONE" -a "x$prefix" != "x/usr"], [MYSQL_LIBS="-L$prefix/lib -lmysqlclient -lm -lz"])
 
-	if test "x$mysql_includes" != "x" ; then
-		MYSQL_CFLAGS="-I$mysql_includes"
-	elif test "x$mysql_prefix" != "x" ; then
-		MYSQL_CFLAGS="-I$mysql_prefix/include/mysql"
-	elif test -n "$MYSQL_CONFIG" ; then
-		MYSQL_CFLAGS=`$MYSQL_CONFIG --cflags`
-	elif test "x$prefix" != "xNONE" -a "x$prefix" != "x/usr"; then
-		MYSQL_CFLAGS="-I$prefix/include"
-	fi
+		AS_IF([test "x$mysql_includes" != "x"], [MYSQL_CFLAGS="-I$mysql_includes"],
+	      	      [test "x$mysql_prefix" != "x"], [MYSQL_CFLAGS="-I$mysql_prefix/include/mysql"],
+	      	      [test -n "$MYSQL_CONFIG"], [MYSQL_CFLAGS=`$MYSQL_CONFIG --cflags`],
+	              [test "x$prefix" != "xNONE" -a "x$prefix" != "x/usr"], [MYSQL_CFLAGS="-I$prefix/include"])
 
-	if test "x$taco_mysql" = "xyes" ; then
 		save_LIBS="$LIBS"
 		save_CPPFLAGS="$CPPFLAGS"
 		CPPFLAGS="$CPPFLAGS $MYSQL_CFLAGS" 
 		LIBS="$LIBS $MYSQL_LIBS"
-		taco_mysql=no
-		AC_CHECK_HEADERS([mysql/mysql.h mysql.h], [taco_mysql=yes])
-		if test "x$taco_mysql" = "xyes" ; then
+		enable_mysql=no
+		AC_CHECK_HEADERS([mysql/mysql.h mysql.h], [enable_mysql=yes])
+		AS_IF([test "x$enable_mysql" = "xyes"], [
 			AC_LINK_IFELSE(
 				[AC_LANG_PROGRAM(
 [#if HAVE_MYSQL_MYSQL_H
@@ -176,129 +154,86 @@ dnl
 MYSQL       mysql,
             *mysql_conn = mysql_real_connect(&mysql, "localhost", "myuser", "mypasswd", "mydb", 0, 0, 0); 
 
-])], [], [taco_mysql=no])
-		fi
+])], [], [enable_mysql=no])
+		])
 		LIBS="$save_LIBS"
 		CPPFLAGS="$save_CPPPLAGS"
-	fi
+	      ])
 	AC_SUBST(MYSQL_CFLAGS)
-l	AC_SUBST(MYSQL_LIBS)
+	AC_SUBST(MYSQL_LIBS)
 ])
 
 AC_DEFUN([TACO_SERVER_T],
 [
 	AC_ARG_ENABLE(server, AC_HELP_STRING([--enable-server], [build the libraries for the TACO servers @<:@default=yes@:>@]),
-		[case "${enable_server}" in
-			yes)	taco_server_libs=yes;;
-			no)	taco_server_libs=no;;
-			*)	AC_MSG_ERROR([bad value ${enable_server} for --enable-server]);;
-		esac], [taco_server_libs=yes])
-	AM_CONDITIONAL(BUILD_SERVER, [test x"${taco_server_libs}" = x"yes"])
+		[], [enable_server=yes])
+	AM_CONDITIONAL(BUILD_SERVER, [test x"${enable_server}" = x"yes"])
 ])
 
 AC_DEFUN([TACO_DATABASE_SERVER],
 [
 	AC_REQUIRE([TACO_SERVER_T])
 	AC_ARG_ENABLE(dbserver, AC_HELP_STRING([--enable-dbserver], [build the TACO database server @<:@default=yes@:>@]),
-		[case "${enable_dbserver}" in
-			yes)	taco_dbserver=yes;;
-			no)	taco_dbserver=no;;
-			*)	AC_MSG_ERROR([bad value ${enable_dbserver} for --enable-dbserver]);;
-		esac], [taco_dbserver=yes])
-	if test x"${taco_server_libs}" != x"yes" ; then
-		taco_dbserver=no
-	fi
-	if test x"${taco_dbserver}" = x"yes" ; then
-		TACO_DBM_SERVER
-	else
+		[], [enable_dbserver=yes])
+	AS_IF([test x"${enable_server}" != x"yes"], [enable_dbserver=no])
+	AS_IF([test x"${enable_dbserver}" = x"yes"], [TACO_DBM_SERVER],
+	      [
 		AM_CONDITIONAL(MYSQLSUPPORT, [false])
 		AM_CONDITIONAL(GDBMSUPPORT, [false])
 		AM_CONDITIONAL(SQLITE3SUPPORT, [false])
 		AM_CONDITIONAL(BUILD_GDBM, [false])
 		taco_build_gdbm=no
-	fi
-	AM_CONDITIONAL(BUILD_DATABASESERVER, [test x"${taco_dbserver}" = x"yes"])
-	if test x"taco_sqlite3" = x"yes" ; then
-		AC_SUBST([TACO_DATABASE], [sqlite3])
-	elif test x"taco_mysql" = x"yes" ; then
-		AC_SUBST([TACO_DATABASE], [mysql])
-	elif test x"taco_gdbm" = x"yes" ; then
-		AC_SUBST([TACO_DATABASE], [dbm])
-	else
-		AC_SUBST([TACO_DATABASE], [no])
-	fi
+	      ])
+	AM_CONDITIONAL(BUILD_DATABASESERVER, [test x"${enable_dbserver}" = x"yes"])
+	AS_IF([test x"enable_sqlite3" = x"yes"], [AC_SUBST([TACO_DATABASE], [sqlite3])],
+	      [test x"enable_mysql" = x"yes"], [AC_SUBST([TACO_DATABASE], [mysql])],
+	      [test x"enable_gdbm" = x"yes"], [AC_SUBST([TACO_DATABASE], [dbm])],
+	      [AC_SUBST([TACO_DATABASE], [no])])
 ])
 
 AC_DEFUN([TACO_MANAGER],
 [
 	AC_REQUIRE([TACO_SERVER_T])
 	AC_ARG_ENABLE(manager, AC_HELP_STRING([--enable-manager], [build the TACO manager @<:@default=yes@:>@]),
-		[case "${enable_manager}" in
-			yes)	taco_manager=yes;;
-			no)	taco_manager=no;;
-			*)	AC_MSG_ERROR([bad value ${enable_manager} for --enable-manager]);;
-		esac], [taco_manager=yes])
-	if test x"${taco_server_libs}" != x"yes" ; then
-		taco_manager=no
-	fi
-	AM_CONDITIONAL(BUILD_MANAGER, [test x"${taco_manager}" = x"yes"])
+		[], [enable_manager=yes])
+	AS_IF([test x"${enable_server}" != x"yes"], [enable_manager=no])
+	AM_CONDITIONAL(BUILD_MANAGER, [test x"${enable_manager}" = x"yes"])
 ])
 
 AC_DEFUN([TACO_MESSAGE_SERVER],
 [
 	AC_REQUIRE([TACO_SERVER_T])
 	AC_ARG_ENABLE(message, AC_HELP_STRING([--enable-message], [build the TACO message server @<:@default=yes@:>@]),
-		[case "${enable_message}" in
-			yes)	taco_message=yes;;
-			no)	taco_message=no;;
-			*)	AC_MSG_ERROR([bad value ${enable_message} for --enable-message]);;
-		esac], [taco_message=yes])
-	if test x"${taco_server_libs}" != x"yes" ; then
-		taco_message=no
-	fi
-	AM_CONDITIONAL(BUILD_MESSAGESERVER, [test x"${taco_message}" = x"yes"])
+		[], [enable_message=yes])
+	AS_IF([test x"${enable_server}" != x"yes"], [enable_message=no])
+	AM_CONDITIONAL(BUILD_MESSAGESERVER, [test x"${enable_message}" = x"yes"])
 ])
 
 AC_DEFUN([TACO_DC_API],
 [
 	AC_ARG_ENABLE(dc, AC_HELP_STRING([--enable-dc], [build the data collector API @<:@default=yes@:>@]),
-		[case "${enable_dc}" in
-			yes)	taco_dc=yes;;
-			no)	taco_dc=no;;
-			*)	AC_MSG_ERROR([bad value ${enable_dc} for --enable-dc]);;
-		esac], [taco_dc=yes])
-	AM_CONDITIONAL(DC_BUILD, test "x$taco_dc" = "xyes") 
-#	if test "x$taco_dc" = "xyes" ; then
+		[], [enable_dc=yes])
+	AM_CONDITIONAL(DC_BUILD, test "x$enable_dc" = "xyes") 
+#	AS_IF([test "x$enable_dc" = "xyes"], [ 
 #		TACO_DC_LIBS="\$(top_builddir)/lib/dc/libdcapi.la"
 #		TACO_DC_LIBS=
-#	fi
+#	      ])
 #	AC_SUBST(TACO_DC_LIBS)
 	AC_ARG_ENABLE(tango_poller, AC_HELP_STRING([--enable-tango_poller], [enable the data collector to poll tango devices @<:@default=no@:>@]),
-		[case "${enable_tango_poller}" in
-			yes)	tango_poller=yes;;
-			no)	tango_poller=no;;
-			*)	AC_MSG_ERROR([bad value ${enable_tango_poller} for --enable-tango_poller]);;
-		esac], [tango_poller=no])
-	AM_CONDITIONAL(TANGO_POLLER, test "x$tango_poller" = "xyes") 
+		[], [enable_tango_poller=no])
+	AM_CONDITIONAL(TANGO_POLLER, test "x$enable_tango_poller" = "xyes") 
 ])
 
 AC_DEFUN([TACO_TANGO],
 [
-	AC_REQUIRE([WITH_CORBA])
-	AC_REQUIRE([WITH_TANGO])
 	AC_ARG_ENABLE(tango, AC_HELP_STRING([--enable-tango], [build the TANGO access @<:@default=no@:>@]),
-		[case "${enable_tango}" in
-			yes)    taco_tango=yes;;
-			no)     taco_tango=no;;
-			*)      AC_MSG_ERROR([bad value ${enable_tango} for --enable-tango]);;
-		esac], [taco_tango=no])
-	AM_CONDITIONAL(TANGO_BUILD, test "x$taco_tango" = "xyes")
-	if test "x$taco_tango" = "xyes" ; then
-		WITH_CORBA
-		WITH_TANGO
+		[], [enable_tango=no])
+	AM_CONDITIONAL(TANGO_BUILD, test "x$enable_tango" = "xyes")
+	AS_IF([test "x$enable_tango" = "xyes"], [
+		AC_REQUIRE([WITH_CORBA])
+		AC_REQUIRE([WITH_TANGO])
 		TACO_TANGO_LIBS="\$(top_builddir)/lib/tango/libtacotango++.la"
-
-	fi
+	      ])
 	AC_SUBST(TACO_TANGO_LIBS)
 ])
 
@@ -308,15 +243,9 @@ AC_DEFUN([TACO_GRETA],
 	AC_REQUIRE([TACO_DC_API])
 	AC_REQUIRE([X_AND_MOTIF])
 	AC_ARG_ENABLE(greta, AC_HELP_STRING([--enable-greta], [build the graphical dbase tool @<:@default=yes@:>@]),
-		[case "${enable_greta}" in
-			yes)	greta=yes;;
-			no)	greta=no;;
-			*)	AC_MSG_ERROR(bad value ${enableval} for --enable-greta);;
-		esac], [greta=yes])
-	if test "x$motif_found" != "xyes" -o "x$taco_dc" != "xyes" ; then 
-		greta=no
-	fi
-	AM_CONDITIONAL(GRETABUILD, test "x$greta" = "xyes") 
+		[], [enable_greta=yes])
+	AS_IF([test "x$motif_found" != "xyes" -o "x$enable_dc" != "xyes"], [enable_greta=no])
+	AM_CONDITIONAL(GRETABUILD, test "x$enable_greta" = "xyes") 
 	AC_SUBST([GRETA], ["greta greta_ndbm"])
 ])
 
@@ -330,33 +259,24 @@ AC_DEFUN([TACO_ASCII_API],
 		esac], [taco_ascii=yes])
 	AC_CHECK_HEADERS([dlfcn.h], [], [
 		AC_CHECK_HEADERS([dl.h], [], [taco_ascii=no])])
-	if test "x$taco_ascii" = "xyes" ; then
-		TACO_ASCII_LIBS="\$(top_builddir)/lib/ascii/libascapi.la \$(top_builddir)/lib/tc/libtcapi.la"
-	fi
+	AS_IF([test "x$taco_ascii" = "xyes"], [TACO_ASCII_LIBS="\$(top_builddir)/lib/ascii/libascapi.la \$(top_builddir)/lib/tc/libtcapi.la"])
 	AC_SUBST(TACO_ASCII_LIBS)
 	AM_CONDITIONAL(ASCII_BUILD, test "x$taco_ascii" = "xyes")
 ])
 
 AC_DEFUN([TACO_XDEVMENU],
 [
-	AC_REQUIRE([TACO_ASCII_API])
-	AC_REQUIRE([X_AND_MOTIF])
 	AC_ARG_ENABLE(xdevmenu, AC_HELP_STRING([--enable-xdevmenu], [build the graphical ds tool @<:@default=yes@:>@]),
-		[case "${enable_xdevmenu}" in
-			yes)	xdevmenu=yes;;
-			no)	xdevmenu=no;;
-			*)	AC_MSG_ERROR(bad value ${enableval} for --enable-xdevmenu);;
-		esac], [xdevmenu=yes])
-	if test "x$xdevmenu" = "xyes" ; then
+		[], [enable_xdevmenu=yes])
+	AS_IF([test "x$enable_xdevmenu" = "xyes"], [
+		AC_REQUIRE([TACO_ASCII_API])
+		AC_REQUIRE([X_AND_MOTIF])
 		taco_ascii=yes
-		X_AND_MOTIF
 		XDEVMENU=xdevmenu
-	fi
+	      ])
 	AM_CONDITIONAL(ASCII_BUILD, test "x$taco_ascii" = "xyes")
-	if test "x$motif_found" != "xyes" -o "x$taco_ascii" != "xyes" ; then
-		xdevmenu=no
-	fi
-	AM_CONDITIONAL(XDEVMENUBUILD, test "x$xdevmenu" = "xyes") 
+	AS_IF([test "x$motif_found" != "xyes" -o "x$taco_ascii" != "xyes"], [enable_xdevmenu=no])
+	AM_CONDITIONAL(XDEVMENUBUILD, test "x$enable_xdevmenu" = "xyes") 
 	AC_SUBST(XDEVMENU)
 ])
 
@@ -364,18 +284,12 @@ AC_DEFUN([TACO_ALARM],
 [
 	AC_REQUIRE([X_AND_MOTIF])
 	AC_ARG_ENABLE(alarm, AC_HELP_STRING([--enable-alarm], [build the graphical alarm tool @<:@default=yes@:>@]),
-		[case "${enable_alarm}" in
-			yes)	alarm=yes;;
-			no)	alarm=no;;
-			*)	AC_MSG_ERROR(bad value ${enableval} for --enable-alarm);;
-		esac], [alarm=yes])
-	if test "x$alarm" = "xno" ; then
-		X_AND_MOTIF
+		[], [enable_alarm=yes])
+	AS_IF([test "x$alarm" = "xyes"], [
+		AC_REQUIRE([X_AND_MOTIF])
 		ALARM=alarm
-	fi
-	if test "x$motif_found" != "xyes" ; then
-		alarm=no
-	fi
+	      ])
+	AS_IF([test "x$motif_found" != "xyes"], [enable_alarm=no])
 	AM_CONDITIONAL(ALARMBUILD, test "x$alarm" = "xyes") 
 	AC_SUBST(ALARM)
 ])
@@ -383,8 +297,13 @@ AC_DEFUN([TACO_ALARM],
 AC_DEFUN([X_AND_MOTIF],
 [
 	AC_REQUIRE([AC_PATH_XTRA])
-	tmp='for i in $X_LDFLAGS ; do if test `echo $i | cut -c1-2` = "-L" ; then echo $i; break; fi; done | cut -c3- '
-	appdefaultdir="\${DESTDIR}"`eval $tmp`/X11/app-defaults
+	AS_IF([test -z "$X_LDFLAGS" -o x"$X_LDFLAGS" = xNO], [appdefaultdir="/usr/share/X11/app-defaults"],
+	      [
+		tmp='for i in $X_LDFLAGS ; do if test `echo $i | cut -c1-2` = "-L" ; then echo $i; break; fi; done | cut -c3- '
+		tmp=`eval $tmp`
+                AS_IF([test -z "$tmp" -o x"$tmp" == xNO], [tmp=/usr/share])
+		appdefaultdir=${tmp}/X11/app-defaults
+	      ])
 	motif_found=yes;
 	AC_ARG_WITH(motif, AC_HELP_STRING([--with-motif@<:@=ARG@:>@], [Motif @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the Motif installation, e.g. '/usr/local/myMotif']), [
 		case  "$with_motif" in
@@ -414,16 +333,12 @@ dnl	X_LDFLAGS="$LIBS $X_LDFLAGS $MOTIF_LIBS $X_LIBS"
 
 AC_DEFUN([TACO_GDBM_SUPPORT],
 [
-dnl
+dnl 
 dnl Get the cflags and libraries
-dnl
+dnl 
 	taco_build_gdbm=no
 	AC_ARG_ENABLE(gdbm, AC_HELP_STRING(--enable-gdbm, [build the database server with gdbm support @<:@default=yes@:>@]),
-		[case "${enable_gdbm}" in
-			yes)	taco_gdbm=yes;;
-			no)	taco_gdbm=no;;
-			*)	AC_MSG_ERROR([bad value ${enable_gdbm} for --enable-gdbm]);;
-		esac], [taco_gdbm=yes])
+		[], [enable_gdbm=yes])
 	AC_ARG_WITH(gdbm, AS_HELP_STRING([--with-gdbm=PFX], [Prefix where gdbm is installed, e.g. '/usr/local/gdbm']),
 		[gdbm_prefix="$withval"], [gdbm_prefix=""])
 	AC_ARG_WITH(gdbm-libraries, AS_HELP_STRING([--with-gdbm-libraries=DIR], [Directory where gdbm library is installed (optional)]), 
@@ -431,25 +346,17 @@ dnl
 	AC_ARG_WITH(gdbm-includes, AS_HELP_STRING([--with-gdbm-includes=DIR], [Directory where gdbm header files are installed (optional)]), 
 		[gdbm_includes="$withval"], [gdbm_includes=""])
 
-	if test "x$gdbm_libraries" != "x" ; then
-		GDBM_LIBS="-L$gdbm_libraries"
-	elif test "x$gdbm_prefix" != "x" ; then
-		GDBM_LIBS="-L$gdbm_prefix/lib"
-	elif test "x$prefix" != "xNONE" -a "x$prefix" != "x/usr"; then
-		GDBM_LIBS="-L$prefix/lib"
-	fi
+	AS_IF([test "x$gdbm_libraries" != "x"], [GDBM_LIBS="-L$gdbm_libraries"],
+	      [test "x$gdbm_prefix" != "x"], [GDBM_LIBS="-L$gdbm_prefix/lib"],
+	      [test "x$prefix" != "xNONE" -a "x$prefix" != "x/usr"], [GDBM_LIBS="-L$prefix/lib"])
 	TACO_GDBM_LDFLAGS="$GDBM_LIBS"
 
 	GDBM_LIBS="$GDBM_LIBS -lgdbm"
 	GDBM_COMPAT_LIBS="-lgdbm_compat"
 
-	if test "x$gdbm_includes" != "x" ; then
-		GDBM_CFLAGS="-I$gdbm_includes"
-	elif test "x$gdbm_prefix" != "x" ; then
-		GDBM_CFLAGS="-I$gdbm_prefix/include"
-	elif test "x$prefix" != "xNONE" -a "x$prefix" != "x/usr"; then
-		GDBM_CFLAGS="-I$prefix/include"
-	fi
+	AS_IF([test "x$gdbm_includes" != "x"], [GDBM_CFLAGS="-I$gdbm_includes"],
+	      [test "x$gdbm_prefix" != "x"], [GDBM_CFLAGS="-I$gdbm_prefix/include"],
+	      [test "x$prefix" != "xNONE" -a "x$prefix" != "x/usr"], [GDBM_CFLAGS="-I$prefix/include"])
 	TACO_GDBM_INC="$GDBM_CFLAGS"
 
 	save_LIBS="$LIBS"
@@ -476,18 +383,15 @@ public:
 // #error Broken
 ]
 )], [AC_CHECK_LIB(gdbm, gdbm_open)], [], [taco_build_gdbm="yes"])
-	if test "$taco_build_gdbm" = "yes" ;then
-		AC_MSG_RESULT([no])
-	else
-		AC_MSG_RESULT([yes])
-	fi
+	AS_IF([test "$taco_build_gdbm" = "yes"], AC_MSG_RESULT([no]), AC_MSG_RESULT([yes]))
 	AC_LANG_POP(C++)
-	if test x${ac_cv_lib_gdbm_gdbm_open} != xyes ; then
+	AS_IF([test x${ac_cv_lib_gdbm_gdbm_open} != xyes],
+	      [
 		GDBM_LIBS="\$(top_builddir)/gdbm/libgdbm.la"
 		GDBM_CFLAGS="-I\$(top_srcdir)/gdbm -I\$(top_builddir)/gdbm"
 		GDBM_COMPAT_LIBS="\$(top_builddir)/gdbm/libgdbm_compat.la"
 		taco_build_gdbm="yes"
-	fi
+	      ])
 	LIBS="$save_LIBS"
 	CPPFLAGS="$save_CPPPLAGS"
 ]
@@ -497,13 +401,9 @@ AC_DEFUN([TACO_DATAPORT_SRC],
 [
  	AC_REQUIRE([AC_CANONICAL_SYSTEM])
 	AC_ARG_ENABLE(dataport, AC_HELP_STRING([--enable-dataport], [enables the dataport support @<:@default=yes@:>@]),
-		[
-		case "$enable_dataport" in 
-			yes)	DATAPORT="yes";;
-			*)	DATAPORT="no";;
-		esac], 
-		[DATAPORT="yes"])
-	if test "x$DATAPORT" = "xyes" ; then
+		[], [enable_dataport="yes"])
+	AS_IF([test "x$enable_dataport" = "xyes"],
+	      [ 
 		case "$target" in
 			ia64-*-linux* | \
 			x86_64-*-linux* | \
@@ -522,8 +422,8 @@ AC_DEFUN([TACO_DATAPORT_SRC],
             		*)              
 				DATAPORT="no";;			
 		esac
-	fi
-	AM_CONDITIONAL(BUILD_DATAPORT, test x$DATAPORT = xyes)
+	      ])
+	AM_CONDITIONAL(BUILD_DATAPORT, test x$enable_dataport = xyes)
 	AM_CONDITIONAL(DATAPORT_UNIX, test x$DATAPORTUNIX = xyes)
 ])
 
@@ -542,47 +442,128 @@ AC_DEFUN([AC_FUNC_DBM_FETCH],
 ], 
 [ac_cv_func_dbm_fetch_void=no],
 [ac_cv_func_dbm_fetch_void=yes])]
-    if test $ac_cv_func_dbm_fetch_void = no ; then
+    AS_IF([test $ac_cv_func_dbm_fetch_void = no], 
 	AC_DEFINE(DBM_FETCH_VOID, 1, 
-		[Define if the C++ compiler supports K&R syntax.])
-    fi
+		[Define if the C++ compiler supports K&R syntax.]))
 )])
 
-AC_DEFUN([TACO_CHECK_RPC],
+AC_DEFUN([WITH_CORBA],
 [
-AC_CHECK_HEADERS([rpc.h rpc/rpc.h])
-AC_CHECK_MEMBERS([SVCXPRT.xp_fd, SVCXPRT.xp_sock], [], [], [
-#if HAVE_RPC_RPC_H
-#       include <rpc/rpc.h>
-#elif HAVE_RPC_H
-#       include <rpc.h>
-#else
-#error rpc.h not found
-#endif
+	AC_REQUIRE([AC_PATH_XTRA])
+	AC_ARG_WITH(corba, AC_HELP_STRING([--with-corba@<:@=ARG@:>@], [CORBA @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the omniORB CORBA installation, e.g. '/usr/local/omniORB']), [
+		case  "$with_corba" in
+			yes) 	
+				PKG_CHECK_MODULES(OMNIORB4, omniCOSDynamic4 >= 4.1.0, 
+					[
+					CORBA_CLFAGS=`$PKG_CONFIG --cflags omniCOSDynamic4`
+					CORBA_LIBS=`$PKG_CONFIG --libs-only-l omniCOSDynamic4`
+					CORBA_LDFLAGS=`$PKG_CONFIG --libs-only-L omniCOSDynamic4`
+					], [with_corba=no])
+				;;
+			no)  	AC_MSG_WARN([Disable build of TANGO])
+				;;
+			*) 	CORBA_LIBS="-lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"
+				CORBA_LDFLAGS="-L${withval}/lib "
+				CORBA_CFLAGS="-I${withval}/include"
+				with_corba=yes
+				;;
+		esac      
+		],[with_corba=yes])
+	AS_IF([test $with_corba = "yes"], 
+              [
+		save_CFLAGS="$CFLAGS"
+		save_CPPFLAGS="$CPPFLAGS"
+		save_LDFLAGS="$LDFLAGS"
+		save_LIBS="$LIBS"
+		LDFLAGS="$LDFLAGS $CORBA_LDFLAGS"
+		CFLAGS="$CFLAGS $CORBA_CFLAGS"
+		CPPFLAGS="$CPPFLAGS $CORBA_CFLAGS"
+		LIBS="$LIBS $CORBA_LIBS"
+		AC_LANG_PUSH(C++)
+		AC_CHECK_HEADERS([omniORB4/CORBA.h],
+			AC_LINK_IFELSE(
+				AC_LANG_PROGRAM([[#include <omniORB4/CORBA.h>]], [[CORBA::ORB_var orb;]]), 
+				[], [with_corba=no]), 
+			[with_corba=no])
+		CFLAGS="$save_CFLAGS"
+		CPPFLAGS="$save_CPPFLAGS"
+		LDFLAGS="$save_LDFLAGS"
+		LIBS="$save_LIBS"
+		AC_LANG_POP(C++)
+	      ])
+	AC_SUBST([CORBA_CFLAGS])
+	AC_SUBST([CORBA_LIBS])
+	AC_SUBST([CORBA_LDFLAGS])
 ])
-AH_BOTTOM([
-#ifndef HAVE_SVCXPRT_XP_SOCK
-#ifdef HAVE_SVCXPRT_XP_FD
-#	define xp_sock xp_fd
-#else
-#	error "Can't find xp_sock"
-#endif
-#endif])
+
+AC_DEFUN([WITH_TANGO],
+[
+#	AC_REQUIRE([AC_PATH_XTRA])
+	AC_ARG_WITH(tango, AC_HELP_STRING([--with-tango@<:@=ARG@:>@], [TANGO @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the TANGO installation, e.g. '/usr/local/tango']), [
+		case  "$with_tango" in
+			yes) 	TANGO_LIBS="-ltango -llog4tango" 
+				TANGO_LDFLAGS=""
+				TANGO_INCLUDES="" 
+				;;
+			no)  	AC_MSG_WARN([Disable build of TANGO])
+				;;
+			*) 	TANGO_LIBS="-ltango -llog4tango"
+				TANGO_LDFLAGS="-L${withval}/lib"
+				TANGO_INCLUDES="-I${withval}/include"
+				with_tango=yes;;
+		esac      
+		],[with_tango=yes; TANGO_LIBS="-ltango -llog4tango"; TANGO_INCLUDES=""])
+	AS_IF([test x"$with_tango" = x"yes"], [
+		save_CFLAGS="$CFLAGS"
+		save_CPPFLAGS="$CPPFLAGS"
+		save_LDFLAGS="$LDFLAGS"
+		save_LIBS="$LIBS"
+		LDFLAGS="$LDFLAGS $CORBA_LDFLAGS $TANGO_LDFLAGS"
+		CFLAGS="$CFLAGS $CORBA_CFLAGS $TANGO_INCLUDES"
+		CPPFLAGS="$CPPFLAGS $CORBA_CFLAGS $TANGO_INCLUDES"
+		LIBS="$LIBS $CORBA_LIBS $TANGO_LIBS"
+		AC_CHECK_HEADERS([tango.h], 
+			AC_LINK_IFELSE(
+				AC_LANG_PROGRAM([[#include <tango.h>]], [[Tango::Util *tg; tg->server_init(false);]]), 
+			[], [with_tango=no], 
+			[$CORBA_LDFLAGS $CORBA_LIBS $TANGO_LDFLAGS $TANGO_LIBS]), 
+			[with_tango=no])
+		CPPFLAGS="$CPPFLAGS_SAVE"
+		LIBS="$LIBS_SAVE"
+	      ])
+	AC_SUBST(TANGO_LIBS)
+	AC_SUBST(TANGO_INCLUDES)
+])
+
+AC_DEFUN([TACO_CLIENT_TCP],
+[
+        AC_ARG_ENABLE(client_tcp, AC_HELP_STRING([--enable-client_tcp], [client connections will be TCP by default (if disabled they will be UDP)@<:@default=yes@:>@]),
+                [], [enable_client_tcp=yes])
+        AM_CONDITIONAL(CLIENT_TCP, test "x$enable_client_tcp" = "xyes")
+])
+
+AC_DEFUN([TACO_FRM_EXT],
+[
+        AC_ARG_ENABLE(ext, AC_HELP_STRING([--enable-ext], [build the extensions libraries servers @<:@default=no@:>@]),
+                [], [enable_ext=no])
+	AS_IF([test x"${taco_ext}" = x"yes"], [
+		AC_CHECK_TYPES([struct timespec])
+		AS_IF([test x"enable_python" = x"yes"], [SWIG_PYTHON])
+		]) 
+        AM_CONDITIONAL(BUILD_EXT, [test x"${enable_ext}" = x"yes"])
 ])
 
 AC_DEFUN([TACO_CHECK_RPC_AND_THREADS],
 [
-AC_CHECK_HEADERS([socket.h sys/socket.h rpc.h rpc/rpc.h])
-LIBS_SAVE="$LIBS"
-PTHREAD_LIBS=""
-AC_SEARCH_LIBS(pthread_create, [pthread c_r nsl])
-if test $ac_cv_search_pthread_create != "none required" ; then
-	PTHREAD_LIBS="$ac_cv_search_pthread_create"
-fi
-AC_SEARCH_LIBS(pthread_mutex_unlock, [$PTHREAD_LIBS])
-AC_SUBST([PTHREAD_LIBS])
-AC_RUN_IFELSE(
-	AC_LANG_PROGRAM([
+	AC_REQUIRE([TACO_CHECK_RPC])
+	AC_CHECK_HEADERS([socket.h sys/socket.h])
+	LIBS_SAVE="$LIBS"
+	PTHREAD_LIBS=""
+	AC_SEARCH_LIBS(pthread_create, [pthread c_r nsl])
+	AS_IF([test $ac_cv_search_pthread_create != "none required"], [PTHREAD_LIBS="$ac_cv_search_pthread_create"])
+	AC_SEARCH_LIBS(pthread_mutex_unlock, [$PTHREAD_LIBS])
+	AC_SUBST([PTHREAD_LIBS])
+	AC_RUN_IFELSE(AC_LANG_PROGRAM([
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -715,127 +696,7 @@ const char hw[[[]]] = "Hello World!\n";],
     fprintf (stderr, "pthread_join: %s\n", strerror (err));
 
   return exitcode;
-])
-,
-AC_MSG_NOTICE([Running]),
-AC_MSG_FAILURE([Not Running]))
-LIBS="$LIBS_SAVE"
-])
-
-AC_DEFUN([LINUX_DISTRIBUTION],
-[
-        AC_REQUIRE([AC_CANONICAL_SYSTEM])
-        case "$target" in
-                i[[3456]]86-*-linux-* | i[[3456]]86-*-linux)
-			if test -f /etc/lsb-release ; then
-				DISTRIBUTION=`(. /etc/lsb-release; echo $DISTRIB_DESCRIPTION)`
-			else
-				DISTRIBUTION=`cat /etc/*-release | head -1`
-			fi
-			;;
-	esac
-	AC_SUBST([DISTRIBUTION])
-])
-
-AC_DEFUN([WITH_CORBA],
-[
-	AC_REQUIRE([AC_PATH_XTRA])
-	corba_found=no;
-	AC_ARG_WITH(corba, AC_HELP_STRING([--with-corba@<:@=ARG@:>@], [CORBA @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the omniORB CORBA installation, e.g. '/usr/local/omniORB']), [
-		case  "$with_corba" in
-			yes) 	
-				PKG_CHECK_MODULES(OMNIORB4, omniCOSDynamic4 >= 4.1.0, 
-					[corba_found=yes
-					CORBA_CLFAGS=`$PKG_CONFIG --cflags omniCOSDynamic4`
-					CORBA_LIBS=`$PKG_CONFIG --libs-only-l omniCOSDynamic4`
-					CORBA_LDFLAGS=`$PKG_CONFIG --libs-only-L omniCOSDynamic4`
-					], [corba_found=no])
-				;;
-			no)  	AC_MSG_WARN([Disable build of TANGO])
-				corba_found=no;;
-			*) 	CORBA_LIBS="-L$withval/lib -lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"
-				CORBA_CFLAGS="-I$withval/include"
-				corba_found=yes;;
-		esac      
-		])
-	if test $corba_found = "yes" ; then
-		save_CFLAGS="$CFLAGS"
-		save_CPPFLAGS="$CPPFLAGS"
-		save_LDFLAGS="$LDFLAGS"
-		LDFLAGS="$LDFLAGS $CORBA_LDFLAGS"
-		CFLAGS="$CFLAGS $CORBA_CFLAGS"
-		CPPFLAGS="$CPPFLAGS $CORBA_CFLAGS"
-		AC_LANG_PUSH(C++)
-		AC_CHECK_HEADERS([omniORB4/CORBA.h], [],
-			AC_CHECK_LIB(omniORB4, init_server, [], [corba_found=no]))
-		CFLAGS="$save_CFLAGS"
-		CPPFLAGS="$save_CPPFLAGS"
-		LDFLAGS="$save_LDFLAGS"
-		AC_LANG_POP(C++)
-	fi
-	AC_SUBST([CORBA_CFLAGS])
-	AC_SUBST([CORBA_LIBS])
-	AC_SUBST([CORBA_LDFLAGS])
-])
-
-AC_DEFUN([WITH_TANGO],
-[
-#	AC_REQUIRE([AC_PATH_XTRA])
-	tango_found=no;
-	AC_ARG_WITH(tango, AC_HELP_STRING([--with-tango@<:@=ARG@:>@], [TANGO @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the TANGO installation, e.g. '/usr/local/tango']), [
-		case  "$with_tango" in
-			yes) 	TANGO_LIBS="-ltango -llog4tango" 
-				TANGO_INCLUDES="-I$withval/include" 
-				tango_found=yes;;
-			no)  	AC_MSG_WARN([Disable build of TANGO])
-				tango_found=no;;
-			*) 	TANGO_LIBS="-L$withval/lib -ltango -llog4tango"
-				TANGO_INCLUDES="-I$withval/include"
-				tango_found=yes;;
-		esac      
-		],[TANGO_LIBS="-ltango -llog4tango"; TANGO_INCLUDES="-I$withval/include"])
-	CPPFLAGS_SAVE="$CPPFLAGS"
-	CPPFLAGS="$CPPFLAGS $TANGO_INCLUDES"
-	LIBS_SAVE="$LIBS"
-#	AC_CHECK_HEADERS([tango.h], [
-#	AC_CHECK_LIB(omniORB4, init_server, [], [tango_found=no], [$TANGO_LDFLAGS -ltango])
-#		break;
-#	], [tango_found=no])
-	CPPFLAGS="$CPPFLAGS_SAVE"
+	]), AC_MSG_NOTICE([Running]), AC_MSG_FAILURE([Not Running]))
 	LIBS="$LIBS_SAVE"
-
-	AC_SUBST(TANGO_LIBS)
-	AC_SUBST(TANGO_INCLUDES)
 ])
 
-AC_DEFUN([TACO_CLIENT_TCP],
-[
-        AC_ARG_ENABLE(client_tcp, AC_HELP_STRING([--enable-client_tcp], [client connections will be TCP by default (if disabled they will be UDP)@<:@default=yes@:>@]),
-                [case "${enable_client_tcp}" in
-                        yes)    taco_client_tcp=yes;;
-                        no)     taco_client_tcp=no;;
-                        *)      AC_MSG_ERROR([bad value ${client_tcp} for --enable-client_tcp]);;
-                esac], [taco_client_tcp=yes])
-        AM_CONDITIONAL(CLIENT_TCP, test "x$taco_client_tcp" = "xyes")
-])
-
-AC_DEFUN([TACO_FRM_EXT],
-[
-        AC_ARG_ENABLE(ext, AC_HELP_STRING([--enable-ext], [build the extensions libraries servers @<:@default=no@:>@]),
-                [case "${enable_ext}" in
-                        yes)    taco_ext=yes;;
-                        no)     taco_ext=no;;
-                        *)      AC_MSG_ERROR([bad value ${enable_ext} for --enable-ext]);;
-                esac], [taco_ext=no])
-        AM_CONDITIONAL(BUILD_EXT, [test x"${taco_ext}" = x"yes"])
-	if test x"${taco_ext}" = x"yes" ; then
-		SWIG_PYTHON
-	else
-		AM_CONDITIONAL(BUILD_PYTHON, false)
-	fi
-])
-
-AC_DEFUN([AC_PROG_RM],
-[
-	AC_CHECK_TOOL([RM], [rm], [echo])
-])

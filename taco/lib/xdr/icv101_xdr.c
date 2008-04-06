@@ -29,14 +29,14 @@
  *
  * Original:    March  1993
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:21 $
  *
  *******************************************************************-*/
 
 static char RcsId[] =
-"$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/icv101_xdr.c,v 1.4 2006-09-18 22:07:20 jkrueger1 Exp $";
+"$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/icv101_xdr.c,v 1.5 2008-04-06 09:07:21 jkrueger1 Exp $";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -79,25 +79,25 @@ xdr_DevIcv101Mode(xdrs, objp)
 	XDR *xdrs;
 	DevIcv101Mode *objp;
 {
-	if (!xdr_long(xdrs, &objp->external_stop)) {
+	if (!xdr_DevLong(xdrs, &objp->external_stop)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->external_start)) {
+	if (!xdr_DevLong(xdrs, &objp->external_start)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->continuous)) {
+	if (!xdr_DevLong(xdrs, &objp->continuous)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->main_frequency)) {
+	if (!xdr_DevLong(xdrs, &objp->main_frequency)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->sub_frequency)) {
+	if (!xdr_DevLong(xdrs, &objp->sub_frequency)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->npfs2)) {
+	if (!xdr_DevLong(xdrs, &objp->npfs2)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->npost)) {
+	if (!xdr_DevLong(xdrs, &objp->npost)) {
 		return (FALSE);
 	}
 	return (TRUE);

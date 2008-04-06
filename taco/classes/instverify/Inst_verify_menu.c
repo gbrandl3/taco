@@ -30,9 +30,9 @@
  *
  * Original:   	10.5.95   
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2006-09-18 22:38:27 $
+ * Date:        $Date: 2008-04-06 09:06:35 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 	long		readwrite = 0;
 	char		cmd_string[80];
 	devserver	ds;
-	long		error;
+	DevLong		error;
 	int		cmd;
 	long		ret;
 

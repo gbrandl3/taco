@@ -1,0 +1,225 @@
+/*! \page whatis What is TACO ? 
+
+\addindex whatis
+
+
+TACO is an object oriented control system originally developed at the European Synchroton Radiation
+Facility. The beasic idea behind TACO is to treat every control element as an object on which commands
+can executed. The objects are called devices and they are available network wide. Devices are created and
+stored in device servers. The command which can be executed on a device are implemented in the device
+class. Device classes can be written in C(using a methodology called OIC) or C++. The commands are 
+accessed via a small set of C calls referred to as the application programmer's interface(DSAPI).
+
+\section History
+
+Device servers were first developed at the European Synchrotron Radiation Facility
+(ESRF) for controlling the 6 GeV synchrotron radiation source. This document is a
+Programmer's Manual on how to write device servers. It will not go into the details
+of the ESRF, nor its Control System nor any of the specific device servers in the
+Control System. Various papers describe these topics already. Readers are referred
+to Laclare (1983) for a description of the ESRF, to G&ouml;tz et al (1991) for the
+Control System and the Device
+Server User Guides (or DSUGs) for specific device servers. The role of this document
+is to help programmers faced with the task of writing device servers. Device servers
+have been developed at the ESRF in order to solve the main task of the Control System
+viz. provide read and write access to all devices in a distributed system. The
+problem of distributed device access is only part of the problem however. The other
+part of the problem is providing a programming framework for a large number of devices
+programmed by a large number of programmers each having different levels of experience
+and style. Device servers have been written at the ESRF for a large variety of
+different devices. Devices vary from serial line devices to devices interfaced by
+field-bus to memory mapped VME cards to entire VME/VXI data acquisition systems.
+The definition of a device depends very much on the user's requirements. In the
+simple case a device server can be used to hide the serial line protocol required
+to communicate with a device. For more complicated devices the device server can
+be used to hide the entire complexity of the device timing, configuration and
+acquisition cycle behind a set of high level commands. A model (referred to as
+the Device Server Model or DSM) has been developed to satisfy the main two
+requirements. In order to do this the DSM has a number of parts to it. It defines
+the concept of a generic device which is created and managed in a server - a device
+server. The device is accessed by an application programmers interface (api) which
+is network transparent. Device specific details get treated in the device servers
+thereby freeing applications to do applicationoriented work. Multiple access is
+implemented by queuing requests - the queuing is handled automatically by the
+network software. 
+
+The concept of using servers to access devices was first proposed by W.-D.Klotz
+in 1989. To demonstrate this a simulation of a powersupply was implemented which
+ran as a server. Clients wanting to use the powersupply connected to the server
+which then forked a copy of the server for the client. Unique data was stored in
+shared memory. This first version was based on Berkeley sockets and suffered from
+the drawback that no machine independent data format was used and that for large
+numbers of clients the number of forked process soon became a limiting factor.
+The original version was released to application programmers and served a useful
+purpose. A.G&ouml;tz (the author) took over the original server in the late Spring
+of 1990. The first goals were to replace the Berkeley sockets with the CERN NC/RPC
+interface, to write servers for real devices, and to setup a team of programmers
+who would write the servers. This was just the time that X11 and MIT Widgets
+started appearing on commercial platforms.  The Widget model (implemented by MIT's
+Intrinsics Toolkit) struck the author as being very appealing. It is easy to use,
+very powerful and manages to hide the complexity of the implementation from the
+user. It also demonstrated how Classes and Objects can be implemented in C. Armed
+thus with the original powersupply api and the Widget model from MIT work begun
+(mid-1990) in earnest on the device server concept. Assistance was provided by
+R.Wilcke (who ported the CERN NC/RPC software to OS9) and H.Witsch (who acted as
+the first guinea-pig device server programmer). The first device server implemented
+the same functionality as the WDKPowerSupply. The server ran on OS9 and the client
+on HPUX. Today (almost three years later) more than 500 device servers exist for
+the ESRF's Machine and Beamline Control Systems and for Data Acquisition Systems.
+They run on a range of Operating Systems i.e. OS9, HPUX, Linux, Windows, and SunOS.
+There are approximately 16 programmers involved in writing device servers.
+The CERN NC/RPC has been replaced by the SUN NFS/RPC thanks to J.Meyer. A resource
+database has been added which is accessible via a standard set of rpc calls
+developed by E.Taurel. Device servers are implemented using classes and clients
+access devices via a standardised api. If the powersupply server process is
+considered as the first prototype and the NC/RPC based device servers as the first
+generation, then it would be true to say that device servers are now well into
+their second generation. The term "device server" first appeared in an internal
+ESRF document by W.-D.Klotz and S.M.Keogh in June 1989. It reappeared in a paper
+written for a GULAP (Group for Upper Level Applications Programming) Meeting in
+January 1990 and has been a common word in the ESRF daily vocabulary ever since.
+
+\section system_arch System architecture 
+TACO is based on a client-server model. All devices are created and served by device servers. 
+Clients access devices via a network transparent application programmer's interface (DSAPI). 
+In addition to device servers there are so-called system serversthe manager and database which 
+provide system services. There is no a-priori limit to the number of device servers and clients. 
+This makes TACO very scalable.
+
+\image html tacoarch.gif "TACO system architecture "
+\image latex tacoarch.eps "TACO system architecture " width=14cm
+
+\subsection manger Manager 
+The manager is the only fixed point in the whole TACO control system. It is used as a single 
+entry point to start and stop the control system. All clients (including device servers) of 
+the control system connect to the Manager before anything else.
+
+\subsection database Database 
+TACO supports a simple database called the resource database where all configuration parameters 
+for devices are stored. The database is served by a database server. All values are stored as 
+ascii strings which are then converted to the correct types at runtime in the calling process 
+(device server). All C simple types and array of simple types are supported. The GNU ndbm 
+database available under Unix and Windows is used as database.
+
+\section dsm Device Server Model
+One of the most fundamental aspects of TACO can be found in the implementation of device access
+in the device servers. All device control (input/output) is implemented in the device servers.
+Device servers are implemented according to a model known as the device server model (DSM). In
+the DSM all devices (physical and logical) are treated as objects. Each object belongs to a device
+class. The class implements the actions necessary for each device type. The actions (referred to
+as commands) can be executed locally or via the network. The device class implements methods and
+actions. The actions can be considered as special methods which can be executed by local and remote
+clients. They have a fixed number of input and output parameters where the parameters can be simple
+or complex (self-defined) types.
+
+\image html tacodsm.gif "TACO Device Server Model for a typical PowerSupply "
+\image latex tacodsm.eps "TACO Device Server Model for a typical PowerSupply " width=14cm
+
+
+\section api Application Programmer's Interface 
+The device server model is used for implementing device access in TACO. Users of the control system 
+on the other hand have a "black box" view of the control system. They access the control system 
+either via a high-level programming language (C, C++, Tcl, Spec) using the device server Application 
+Programmer's Interface (DSAPI) or using one of the graphical applications which have been written. 
+The DSAPI consists the following basic calls :
+
+-# dev_import()- import or build up a connection to a device 
+-# dev_putget() - execute a command on a device 
+-# dev_putget_async() - execute a command n a device asynchronously 
+-# dev_free() - free the device 
+
+In addition to these calls there are a number of calls for modifying the network communication 
+parameters, interrogating the state of an asynchronous command execution and for managing device 
+security. All network calls to and from the device server are implemented using the Sun Open Network 
+Computing / Remote Procedure Call (ONC/RPC). The ONC/RPC is available on all platforms where the 
+Network File System (NFS) is implemented. The ONC/RPC uses the eXternal Data Representation (XDR) 
+format to encode data sent on the network.
+
+\section multi Multiple Control Systems 
+TACO supports the concept of multiple control systems. Each control system has its own database and 
+device servers. Clients and servers of different control systems can communicate with each other as 
+if they were part of the same control system. To specify a device in a diiferent control system a 
+device must be specified with its full name :
+
+\verbatim
+//nethost/domain/family/member 
+\endverbatim
+
+Where nethost is the name of the host where the database of the second control system is running. 
+This concept is referred to as multi-nethost in the documentation.
+
+\section uses Uses of TACO 
+TACO is a toolkit for building distributed objects. Any application which can profit from encapsulating 
+functionality into objects and distributing them over more than one host on the network can find a use 
+for TACO. Control systems are one very good example of this and TACO was developed mainly for doing 
+distributed control. All control systems need to control hardware. The hardware can be in a the same 
+computer or more often than not in a variety of computers and black-boxes. It is the job of the control 
+system to coordinate the different hardware. Examples of hardware are stepper motors, cameras, 
+powersupplies, detectors, adc's, dac's but could even be coffee machines or light switches in the case 
+of home automation. TACO is ideal for encapsulating hardware functionality in a device server and 
+exporting it on the network e.g. for embedded controllers. These are called tacoboxes amongst TACO 
+users. GNU/Linux is an ideal candidate as underlying operating system. TACO can also be used to 
+distribute pure logic where no hardware is involved e.g. for doing image processing, or for sharing 
+data between applications. TACO has been used in the research environment (synchrotron radiation 
+sources, reactors and telescopes) but is also being used to control robots and soon in the home to 
+automate light switches, heaters, messaging systems etc.
+
+\section interfaces Interfaces to TACO
+
+TACO has been interfaced to a number of other languages and programs. The main
+interfaces are C and C++ and are described in a separate chapter. In addition
+to these two languages the following languages/programs have been interfaced to
+TACO :
+
+- Python - contact Jens Meyer (meyer@esrf.fr) or Marie-Christine Dominguez
+(domingue@esrf.fr)
+- Tcl - contact Gilbert Pepellin (pepellin@esrf.fr)
+- MathLab - contact Laurent Farvacque (laurent@esrf.fr) or Francis Epaud
+(epaud@esrf.fr)
+- LabView - contact Andy G&ouml;tz (goetz@esrf.fr)
+- SPEC - contact Gerry Swislow (info@certif.com) i
+
+For more information refer to the website or contact the person involved directly.
+
+
+\section platforms Supported Platforms
+
+\addindex platforms
+
+TACO is actively supported and used on the following platforms :
+
+<ul>
+<li>Linux/x86 - following distributions have been tested
+  <ul>
+	<li>SuSE</li>
+	<li>Mandrakei</li> 
+	<li>RedHat</li> 
+	<li>Debian</li>
+	<li>Ubuntu</li>
+  </ul>
+  but there is no reason why TACO shouldn't compile and run on any Linux distribution.
+</li>
+<li>Linux/68k - using the Debian distribution on MVME-162's and MVME167's Motorola's
+<li>Solaris - versions 2.5 and 2.7 are supported using the native Solaris compilers
+and GNU gcc compilers</li>
+<li>FreeBSD</li> 
+<li>Mac OS X</li>
+<li>HP-UX - version 9.x and 10.20</li> 
+<li>OS9 - version V3.03 on VME</li> 
+<li>Windows 
+	<ul>
+	<li>95/98</li> 
+	<li>NT, 2k, XP</li>  
+	</ul>
+</li>
+</ul>
+The following platforms have been ported to in the past but are not used anymore 
+and are therefore not uptodate :
+- VxWorks - version 5.x 
+- LynxOS - version ? 
+- Irix - version 6.5 The latter platforms could be updated if need arises.
+
+*/
+
+
+*/

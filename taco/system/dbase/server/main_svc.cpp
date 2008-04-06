@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.28 $
+ * Version:	$Revision: 1.29 $
  *
- * Date:	$Date: 2006-12-15 12:43:54 $
+ * Date:	$Date: 2008-04-06 09:07:41 $
  *
  */
 
@@ -105,8 +105,8 @@ static void un_register_prog(int signo)
 	if (signo == SIGHUP)
 		return;
 
-	logStream->noticeStream() << "signal " << signo << " received." << log4cpp::CategoryStream::ENDLINE;
-	logStream->noticeStream() << "unregister database server." << log4cpp::CategoryStream::ENDLINE;
+	logStream->noticeStream() << "signal " << signo << " received." << log4cpp::eol;
+	logStream->noticeStream() << "unregister database server." << log4cpp::eol;
 #ifdef ALONE
 	pmap_unset(DB_SETUPPROG, DB_SETUPVERS);
 	pmap_unset(DB_SETUPPROG, DB_VERS_2);
@@ -119,9 +119,9 @@ static void un_register_prog(int signo)
 //
 // Added code to close database 
 //
-	logStream->noticeStream() << "close connection to database." << log4cpp::CategoryStream::ENDLINE;
+	logStream->noticeStream() << "close connection to database." << log4cpp::eol;
 	delete dbm;
-	logStream->noticeStream() << "exit server." << log4cpp::CategoryStream::ENDLINE;
+	logStream->noticeStream() << "exit server." << log4cpp::eol;
 	exit(1);
 }
 //
@@ -129,7 +129,7 @@ static void un_register_prog(int signo)
 //
 void default_sig(int signo)
 {
-	logStream->noticeStream() << "signal " << signo << " received! (ignored)." << log4cpp::CategoryStream::ENDLINE;
+	logStream->noticeStream() << "signal " << signo << " received! (ignored)." << log4cpp::eol;
 }
 
 void usage(const char *argv)
@@ -148,12 +148,13 @@ void usage(const char *argv)
 		types += '|';
 	types += "mysql";
 #endif
-	std::cerr << "usage: " << argv << " [-h] [-t " << types << "] "
+	std::cerr << "usage: " << argv << " [-h] [-v] [-t " << types << "] "
 #ifdef USE_MYSQL
 		<< "[-u user] [-p password] " 
 #endif
 		<< "database_name network_manager_host_name" << std::endl;
 	std::cerr << "       -h             - prints this message" << std::endl;
+	std::cerr << "       -v             - prints the version and exits" << std::endl;
 	std::cerr << "       -t " << types << " - gives the type of underlying database connect to" << std::endl;
 #ifdef USE_GDBM
 	std::cerr << "                        'dbm' stands for the dbm, ndbm, and gdbm" << std::endl;
@@ -210,10 +211,10 @@ int main(int argc,char **argv)
 	struct hostent 		*host;
 	unsigned long 		*ptmp_long;
 #endif
-	char			*mysql_user="root";
-	char			*mysql_password="";
+	const char		*mysql_user="root";
+	const char		*mysql_password="";
  
-	char 			*logpath = getenv("LOGCONFIG");
+	const char 		*logpath = getenv("LOGCONFIG");
 
 	try
 	{
@@ -221,13 +222,19 @@ int main(int argc,char **argv)
 			throw 0;
 		log4cpp::PropertyConfigurator::configure(logpath);
 	}
+	catch (const log4cpp::ConfigureFailure &e)
+        {
+                std::cerr << e.what() << std::endl;
+                logpath = "no";
+                log4cpp::BasicConfigurator::configure();
+        }
 	catch (...)
 	{
 		logpath = "no";
 		log4cpp::BasicConfigurator::configure();
 	}
 	logStream = &log4cpp::Category::getInstance("taco.system.Database");
-	logStream->noticeStream() << "using " << logpath << " configuration file" << log4cpp::CategoryStream::ENDLINE;
+	logStream->noticeStream() << "using " << logpath << " configuration file" << log4cpp::eol;
 		
 //
 // Install signal handler
@@ -257,7 +264,7 @@ int main(int argc,char **argv)
 	extern char	*optarg;
 
 	for (int i = 0; i< argc; i++) 
-		logStream->debugStream() << "argv[" << i << "] = " << argv[i] << log4cpp::CategoryStream::ENDLINE;
+		logStream->debugStream() << "argv[" << i << "] = " << argv[i] << log4cpp::eol;
 
 #ifdef USE_MYSQL
 	if (getenv("MYSQL_USER") != NULL)
@@ -267,9 +274,12 @@ int main(int argc,char **argv)
 #endif
 
 	std::string database_type;
-	while ((c = getopt(argc, argv, "t:h:lp:u:")) != EOF)
+	while ((c = getopt(argc, argv, "t:h:lp:u:v")) != EOF)
 		switch(c)
 		{
+			case 'v' : 
+				std::cout << argv[0] << " version " << VERSION << std::endl;
+				exit(0);
 			case 't' :	
 				database_type = optarg;
 				break;
@@ -302,7 +312,7 @@ int main(int argc,char **argv)
 	if (database_type == "mysql")
 	{
 		logStream->debugStream() << "going to connect to mysql database with user = " << mysql_user
-			<< ", password = " << mysql_password << log4cpp::CategoryStream::ENDLINE;
+			<< ", password = " << mysql_password << log4cpp::eol;
 
 		dbm = new MySQLServer(mysql_user, mysql_password, argv[optind]);
 	}
@@ -338,15 +348,16 @@ int main(int argc,char **argv)
 //
 	if ((pgnum = gettransient("DatabaseServer")) == 0)
 	{
-		logStream->fatalStream() << "Can't get transcient program number" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "Can't get transcient program number" << log4cpp::eol;
 		exit(-1);
 	}
 	dbm->setPgNum(pgnum);
 
-	logStream->noticeStream() << "Program number : " << pgnum << log4cpp::CategoryStream::ENDLINE;
+	logStream->noticeStream() << "Version : " << VERSION << log4cpp::eol;
+	logStream->noticeStream() << "Program number : " << pgnum << log4cpp::eol;
 
 	taco_gethostname(hostna, sizeof(hostna));
-	logStream->noticeStream() << "Server host name : " << hostna << log4cpp::CategoryStream::ENDLINE;
+	logStream->noticeStream() << "Server host name : " << hostna << log4cpp::eol;
 
 //
 // Send these informations to network manager. Even if the server is now 
@@ -354,7 +365,7 @@ int main(int argc,char **argv)
 // for compatibility with old release of device server. 
 //
 	register_db((char *)netmanhost.c_str(), hostna, pgnum, DB_SETUPVERS);
-	logStream->noticeStream() << "registered on host : " << netmanhost << log4cpp::CategoryStream::ENDLINE;
+	logStream->noticeStream() << "registered on host : " << netmanhost << log4cpp::eol;
 //
 // M. Diehl, 15.11.99
 // Since gettransient() does not bind sockets and pmap_set
@@ -368,12 +379,12 @@ int main(int argc,char **argv)
 
 	if (transp_udp == NULL)
 	{
-		logStream->fatalStream() << "cannot create udp service." << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "cannot create udp service." << log4cpp::eol;
 		exit(1);
 	}
 	if (transp_tcp == NULL)
 	{
-		logStream->fatalStream() << "cannot create tcp service." << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "cannot create tcp service." << log4cpp::eol;
 		exit(1);
 	}
 //
@@ -390,64 +401,64 @@ int main(int argc,char **argv)
 #ifdef ALONE
 	if (!svc_register(transp_udp,DB_SETUPPROG,DB_SETUPVERS,setup_prog,IPPROTO_UDP))
 	{
-		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_SETUPVERS,udp)" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_SETUPVERS,udp)" << log4cpp::eol;
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,DB_SETUPPROG,DB_SETUPVERS,setup_prog,IPPROTO_TCP))
 	{
-		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_SETUPVERS,tcp)" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_SETUPVERS,tcp)" << log4cpp::eol;
 		exit(1);
 	}
 	if (!svc_register(transp_udp,DB_SETUPPROG,DB_VERS_2,setup_prog,IPPROTO_UDP))
 	{
-		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_VERS_2,udp)" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_VERS_2,udp)" << log4cpp::eol;
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,DB_SETUPPROG,DB_VERS_2,setup_prog,IPPROTO_TCP))
 	{
-		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_VERS_2,tcp)" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_VERS_2,tcp)" << log4cpp::eol;
 		exit(1);
 	}
 	if (!svc_register(transp_udp,DB_SETUPPROG,DB_VERS_3,setup_prog,IPPROTO_UDP))
 	{
-		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_VERS_2,udp)" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_VERS_2,udp)" << log4cpp::eol;
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,DB_SETUPPROG,DB_VERS_3, setup_prog,IPPROTO_TCP))
 	{
-		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_VERS_2,tcp)" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "unable to register (DB_SETUPPROG,DB_VERS_2,tcp)" << log4cpp::eol;
 		exit(1);
 	}
 
 #else
 	if (!svc_register(transp_udp,pgnum, DB_SETUPVERS, setup_prog, IPPROTO_UDP))
 	{
-		logStream->fatalStream() << "unable to register (" << pgnum << ", DB_SETUPVERS, udp)" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "unable to register (" << pgnum << ", DB_SETUPVERS, udp)" << log4cpp::eol;
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,pgnum,DB_SETUPVERS, setup_prog,IPPROTO_TCP))
 	{
-		logStream->fatalStream() << "unable to register (" << pgnum << ",DB_SETUPVERS,tcp)" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "unable to register (" << pgnum << ",DB_SETUPVERS,tcp)" << log4cpp::eol;
 		exit(1);
 	}
 	if (!svc_register(transp_udp,pgnum, DB_VERS_2, setup_prog, IPPROTO_UDP))
 	{
-		logStream->fatalStream() << "unable to register (" << pgnum << ", DB_VERS_2, udp)" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "unable to register (" << pgnum << ", DB_VERS_2, udp)" << log4cpp::eol;
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,pgnum,DB_VERS_2,setup_prog,IPPROTO_TCP))
 	{
-		logStream->fatalStream() << "unable to register (" << pgnum << ",DB_VERS_2,tcp)" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "unable to register (" << pgnum << ",DB_VERS_2,tcp)" << log4cpp::eol;
 		exit(1);
 	}
 	if (!svc_register(transp_udp,pgnum, DB_VERS_3, setup_prog, IPPROTO_UDP))
 	{
-		logStream->fatalStream() << "unable to register (" << pgnum << ", DB_VERS_2, udp)" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "unable to register (" << pgnum << ", DB_VERS_2, udp)" << log4cpp::eol;
 		exit(1);
 	}
 	if (!svc_register(transp_tcp,pgnum,DB_VERS_3,setup_prog,IPPROTO_TCP))
 	{
-		logStream->fatalStream() << "unable to register (" << pgnum << ",DB_VERS_2,tcp)" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "unable to register (" << pgnum << ",DB_VERS_2,tcp)" << log4cpp::eol;
 		exit(1);
 	}
 #endif 
@@ -458,7 +469,7 @@ int main(int argc,char **argv)
 #ifdef sun
 	if ((host = gethostbyname(hostna)) == NULL)
 	{
-		logStream->fatalStream() << "Unable to get my IP address" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "Unable to get my IP address" << log4cpp::eol;
 		exit(1);
 	}
 	ptmp_long = (unsigned long *)host->h_addr_list[0];
@@ -471,7 +482,7 @@ int main(int argc,char **argv)
 	if ((udp_port = pmap_getport(&so,pgnum,DB_SETUPVERS,IPPROTO_UDP)) == 0)
 #endif 
 	{
-		logStream->fatalStream() << "unable to retrieve udp port number" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "unable to retrieve udp port number" << log4cpp::eol;
 		exit(1);
 	}
 
@@ -481,15 +492,15 @@ int main(int argc,char **argv)
 	if ((tcp_port = pmap_getport(&so,pgnum,DB_SETUPVERS,IPPROTO_TCP)) == 0)
 #endif 
 	{
-		logStream->fatalStream() << "unable to retrieve tcp port number" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "unable to retrieve tcp port number" << log4cpp::eol;
 		exit(1);
 	}
 	dbm->setUDPPort(udp_port);
 	dbm->setTCPPort(tcp_port);
 	
-	logStream->noticeStream() << "ready to run" << log4cpp::CategoryStream::ENDLINE;
+	logStream->noticeStream() << "ready to run" << log4cpp::eol;
 	svc_run();
-	logStream->fatalStream() << "svc_run returned" << log4cpp::CategoryStream::ENDLINE;
+	logStream->fatalStream() << "svc_run returned" << log4cpp::eol;
 	exit(1);
 }
 
@@ -505,12 +516,12 @@ static void db_setupprog_1(struct svc_req *rqstp, SVCXPRT *transp)
 		tab_dbdev 	db_devexp_1_arg;
 		tab_dbdev_2 	db_devexp_2_arg;
 		tab_dbdev_3 	db_devexp_3_arg;
-		nam 		db_getdev_1_arg;
-		nam 		db_svcunr_1_arg;
-		nam 		db_svcchk_1_arg;
-		nam 		db_getdevexp_1_arg;
-		nam 		db_event_query_1_arg;
-		nam 		db_cmd_query_1_arg;
+		DevString 	db_getdev_1_arg;
+		DevString 	db_svcunr_1_arg;
+		DevString 	db_svcchk_1_arg;
+		DevString 	db_getdevexp_1_arg;
+		DevString 	db_event_query_1_arg;
+		DevString 	db_cmd_query_1_arg;
 		int	 	fill;
 		tab_putres 	db_putres_1_arg;
 		psdev_reg_x 	db_psdev_reg_1_arg;
@@ -742,7 +753,7 @@ static void db_setupprog_1(struct svc_req *rqstp, SVCXPRT *transp)
 #ifndef ALONE
 		case RPC_QUIT_SERVER:
 			svc_sendreply(transp,(xdrproc_t)xdr_void,NULL);
-			logStream->noticeStream() << " RPC_QUIT_SERVER : " << log4cpp::CategoryStream::ENDLINE;
+			logStream->noticeStream() << " RPC_QUIT_SERVER : " << log4cpp::eol;
 			pid = getpid();
 			kill(pid,SIGQUIT);
 			return;
@@ -764,7 +775,7 @@ static void db_setupprog_1(struct svc_req *rqstp, SVCXPRT *transp)
 		svcerr_systemerr(transp);
 	if (!svc_freeargs(transp, xdr_argument, (caddr_t)&argument))
 	{
-		logStream->fatalStream() << "unable to free arguments" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "unable to free arguments" << log4cpp::eol;
 		exit(1);
 	}
 //
@@ -894,7 +905,7 @@ static void register_db(const std::string netman_host,const std::string host, co
 	netman_clnt = clnt_create(const_cast<char *>(netman_host.c_str()), NMSERVER_PROG, NMSERVER_VERS, "udp");
 	if (netman_clnt == NULL)
 	{
-		logStream->fatalStream() << "Unable to create connection to network manager." << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "Unable to create connection to network manager." << log4cpp::eol;
 		exit(1);
 	}
 
@@ -912,7 +923,7 @@ static void register_db(const std::string netman_host,const std::string host, co
 
 	if (clnt_stat != RPC_SUCCESS)
 	{
-		logStream->fatalStream() << "register_db failed !!!" << log4cpp::CategoryStream::ENDLINE;
+		logStream->fatalStream() << "register_db failed !!!" << log4cpp::eol;
 		exit(1);
 	}
 //

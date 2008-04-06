@@ -30,9 +30,9 @@
  *
  * Original       : June 1998
  *
- * Version	: $Revision: 1.5 $
+ * Version	: $Revision: 1.6 $
  *
- * Date		: $Date: 2006-09-18 21:59:06 $
+ * Date		: $Date: 2008-04-06 09:07:38 $
  *
  */
 
@@ -157,7 +157,7 @@ long getdc_info(char *devname, char *dc_str)
 {
 	int i,j,l,k;
 	int resu,nb_cmd,ind;
-	long error;
+	DevLong error;
 	dc_devinf dcdev;
 	unsigned int cmd_team;
 	unsigned int cmd_dsid;

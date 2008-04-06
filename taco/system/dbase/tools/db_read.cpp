@@ -27,12 +27,15 @@
  * 		Synopsis : db_read [domain/all]
  *
  * Author(s):
- *              $Author: jensmeyer $
+ *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.7 $
+ * Version:     $Revision: 1.8 $
  *
- * Date:        $Date: 2005-09-27 08:19:15 $
+ * Date:        $Date: 2008-04-06 09:07:47 $
  */
+#if HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
 #include <cstdio>
 #include <string>
@@ -53,7 +56,6 @@
 #include <sys/shm.h>
 
 #include <fcntl.h>
-#include "config.h"
 #include <gdbm.h>
 
 #include <iostream>
@@ -71,8 +73,15 @@ void usage(const char *cmd)
 {
 	std::cerr << " usage: " << cmd << " [options] <domain name|all>" << std::endl;
 	std::cerr << " Read all resource from specified or all domains" << std::endl;
-	std::cerr << "     options : -h display this message" << std::endl;
+	std::cerr << "     options :    -h display this message" << std::endl;
+	std::cerr << "                  -v display the current version" << std::endl;
 	exit(-1);
+}
+
+void version(const char *cmd)
+{
+	std::cerr << cmd << " version " << VERSION << std::endl;
+	exit(0);
 }
 
 int main(int argc,char **argv)
@@ -89,13 +98,14 @@ int main(int argc,char **argv)
 //
 // Argument test and device name structure
 //
-        while ((c = getopt(argc,argv,"rh")) != -1)
+        while ((c = getopt(argc,argv,"hv")) != -1)
                 switch (c)
                 {
+			case 'v':
+				version(argv[0]);
                 	case 'h':
                 	case '?':
                         	usage(argv[0]);
-                        	break;
                 }
 	if (optind != argc - 1)
 		usage(argv[0]);

@@ -1,0 +1,139 @@
+/*! \page python_and_taco Python and TACO 
+
+Python is fast becoming a very popular language for doing 
+almost anything including writing TACO clients and servers. This chapter 
+documents (briefly) the TACO Python interface for clients (written by 
+M-C.Dominguez) and servers (written by Jens Meyer).
+
+\section python_client  Client interface 
+
+The TACO client interface in Python is based on an object model. The commands to 
+a device are dynamically added to the list of methods for the device. Here is an 
+example of using the TACO client interface in Python :
+\code
+file TacoDevice.py
+
+x=Device("MCD/maxe032.1/1") 
+print x 
+x.CommandList() 
+x.tcp() 
+x.udp() 
+print x.timeout() 
+x.timeout(2) 
+a = x.DevReadEncPos(2) 
+aa=array([0,1,2,3,4,5,6,7],Float32) 
+x.DevReadMulVel(0,1,2,3,out=aa) 
+bb=DevReadMulVel(0,1,2,3,outtype='numeric')
+
+dev_putresource("MCD/maxe032.1/1","toto","5") 
+dev_getresource("MCD/maxe032.1.1/1","axe.ident0") 
+dev_delresource("MCD/maxe032.1/1","toto")
+\endcode
+
+In addition to the dev_command() interface the following calls are defined in the 
+interface :
+-# dev_debug(flag) - sets python functions debug flag
+	- input : debug flag (0: no trace, else: trace)
+	- returns : - 0: error - 1: OK 
+-# dev_init(mdevname) - inits the class instance used by x=Device("MCD/maxe032 1/1")
+	- input : device name 
+	- returns : list ([] if error, or [devname,cpt] devname: mdevname in 
+	  lowercase cpt: index in C device table)
+-# dev_unref(mdevname) - decrement reference to that object in Tab dev table If 
+reference becomes 0, calls the C dev free routines:
+	- input : device name ffl returns : - 0 : error, - 1 : OK
+-# dev_query(mdevname) - asks for database device command list
+	- input : device name in lower case 
+	- returns : dictionnary ( if error else cmd_name:[cmd,in type,out type],
+	   where cmd_name: command_string, cmd: command_numeric_value, in_type: 
+	   input_type, and out_type: output_type)
+-# dev_tcpudp(mdevname,mode) - Sets mode tcp/udp for the device
+	- input : device name in lower case, mode= "tcp" or "udp" 
+	- returns : - 0 if error, - 1 if OK
+-# dev_timeout(mdevname,*mtime) - Asks for or set the device timeout
+	- input : device name in lower case, - mtime: optional argument: - if not
+	  existing: read timeout required - if exists: time in second for setting 
+          timeout
+	- returns : - 0 if error, - time in sec (read or set) if OK
+-# dev_getresource(mdevname,resname) - Gets a device resource
+	- input : mdevname= device name, resname= resource name 
+	- returns : value packed as a string (resource value if OK, else None if
+	  error)
+-# devr_putresource(mdevname,resname,value) - Sets a device resource
+	- input : mdevname=device name, resname=resource name, value=the resource 
+	  value packed as a string
+	- returns : value (1 if OK, 0 if error)
+-# dev_delresource(mdevname,resname) - removes a device resource
+	- input : mdevname=device name, resname=resource name 
+	- returns : value (1 if OK, 0 if error)
+-# dev_io(mdevname,mdevcommand,*parin,**kw) - sends a command to a device
+	- input : mdevname=device name in lower case, parin=list of optional
+          INPUT parameters, kw=dictionnary of optional OUTPUT parameters
+	- returns : value (1 if no device ARGOUT or OUTPUT param provided,
+	  device ARGOUT if device ARGOUT and no OUTPUT param)
+
+List of taco types handled by the C interface : 
+\verbatim
+D_VOID_TYPE 
+D_BOOLEAN_TYPE 
+D_USHORT_TYPE 
+D_SHORT_TYPE 
+D_ULONG_TYPE 
+D_LONG_TYPE 
+D_FLOAT_TYPE 
+D_DOUBLE_TYPE 
+D_STRING_TYPE
+
+D_INT_FLOAT_TYPE 
+D_FLOAT_READPOINT 
+D_LONG_READPOINT 
+D_DOUBLE_READPOINT 
+D_MOTOR_LONG 
+D_MOTOR_FLOAT 
+D_STATE_FLOAT_READPOINT 
+D_MULMOVE_TYPE
+
+D_VAR_CHARARR 
+D_VAR_STRINGARR 
+D_VAR_USHORTARR 
+D_VAR_SHORTARR 
+D_VAR_ULONGARR 
+D_VAR_LONGARR 
+D_VAR_FLOATARR 
+D_VAR_DOUBLEARR 
+D_VAR_FRPARR 
+D_VAR_SFRPARR 
+D_VAR_LRPARR 
+D_OPAQUE_TYPE
+\endverbatim
+For numeric types, the correspondance C to Python numeric is : 
+\verbatim
+D_VAR_CHARARR 	Int8 
+D_VAR_USHORTARR	Int16 
+D_VAR_SHORTARR 	Int16 
+D_VAR_ULONGARR 	Int32 
+D_VAR_LONGARR 	Int32 
+D_VAR_FLOATARR 	Float32 
+D_VAR_DOUBLEARR	Float64
+\endverbatim
+
+\section python_server Server interface 
+
+Thanks to the work by Jens Meyer it is possible to write TACO device servers in 
+Python. The documentation is in the form of examples (yes it is so easy).
+
+\subsection python_example_1 Example 1 
+
+The first example is : 
+\include MyServer.py
+
+And a script to create the server and start it : 
+\include Server_startup.py
+
+\section python_example_2 Example 2 
+
+Here is a second example on how to write a device server in Python :
+\include YourServer.py
+For more information please contact the authors directly - domingue@esrf.fr and 
+meyer@esrf.fr.
+*/

@@ -14,9 +14,9 @@
 
  Original:	November 2003
 
- Version:	$Revision: 1.2 $
+ Version:	$Revision: 1.3 $
 
- Date:		$Date: 2006-11-21 14:53:04 $
+ Date:		$Date: 2008-04-06 09:06:24 $
 
  Copyright (c) 1990-1997 by FRM2 TU München, 
                             Garching, Germany
@@ -93,7 +93,6 @@ int LabviewClient::InitDevice() {
 	readwrite = 0;	
 	char **device_names = NULL;
    unsigned int nb_devices = 0;
-   long error = 0;
   	char *err_str;
   	DevVarCmdArray cmd_table;	
 	status = db_import (&error);
@@ -210,7 +209,7 @@ void LabviewClient::InitGetInputBuffer() {
 }
 
 
-void LabviewClient::TestPutGetError(char* calling_method) {
+void LabviewClient::TestPutGetError(const char* calling_method) {
 	printf("\n%s dev_putget() returned %d\n", calling_method, status);
 	if (status < 0) {
 		dev_printerror_no(SEND,NULL,error);

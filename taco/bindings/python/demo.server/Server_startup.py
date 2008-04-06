@@ -18,20 +18,20 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
-# File:         ResDatabase.py
+# File:         Server_startup.py
 #
 # Project:      Automatic Beamline Alignment
 #
 # Description:  Example script how to start a TACO device server written in Python
 #
 # Author(s):    J.Meyer
-#               $Author: andy_gotz $
+#               $Author: jkrueger1 $
 #
 # Original:     Mai 2001
 #
-# Version:      $Revision: 1.5 $
+# Version:      $Revision: 1.6 $
 #
-# Date:         $Date: 2005-12-09 15:09:01 $
+# Date:         $Date: 2008-04-06 09:06:31 $
 #
 
 from TacoServer import *

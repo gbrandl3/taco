@@ -30,9 +30,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:21 $
  *
  *******************************************************************-*/
 
@@ -44,10 +44,10 @@
  */
 
 struct DevCtIntLifeTime {
-		float DeltaIntensity;  /* delta-intensity for this measure */
-		float LifeTime;        /* value of the life-time */
-		long  DateTicks;       /* date in ticks since midnight */
-		long  DeltaTused;      /* delta-T used for calculations */
+		DevFloat DeltaIntensity;  /* delta-intensity for this measure */
+		DevFloat LifeTime;        /* value of the life-time */
+		DevLong  DateTicks;       /* date in ticks since midnight */
+		DevLong  DeltaTused;      /* delta-T used for calculations */
 };
 typedef struct DevCtIntLifeTime DevCtIntLifeTime;
 bool_t 	_DLLFunc xdr_DevCtIntLifeTime

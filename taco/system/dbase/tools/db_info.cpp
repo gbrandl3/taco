@@ -25,12 +25,13 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2006-09-06 18:34:15 $
+ * Date:        $Date: 2008-04-06 09:07:47 $
  */
-
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 /* TACO include file */
 #include <API.h>
 
@@ -41,20 +42,28 @@
 #include <string>
 #include <iomanip>
 #include <cstdlib>
-
-using namespace std;
+#ifdef _solaris
+#include <taco_utils.h>
+#endif /* _solaris */
 
 void usage(const char *cmd)
 {
-	cerr << "usage : " << cmd << " [options]" << endl;
-        cerr << " displays statistics information about the use of the database" << std::endl;
-	cerr << "        options : -h display this message" << std::endl;
-	cerr << "                  -n nethost" << std::endl;
+	std::cerr << "usage : " << cmd << " [options]" << std::endl;
+        std::cerr << " displays statistics information about the use of the database" << std::endl;
+	std::cerr << "        options : -h display this message" << std::endl;
+	std::cerr << "                  -n nethost" << std::endl;
+	std::cerr << "                  -v display the current version" << std::endl;
 	exit(1);
 }
+void version(const char *cmd)
+{
+	std::cerr << cmd << " version " << VERSION << std::endl;
+	exit(0);
+}
+
 int main(int argc,char *argv[])
 {
-	long error;
+	DevLong error;
 	db_stat_call inf;
 	time_t sec;
 	char *ti;
@@ -66,19 +75,17 @@ int main(int argc,char *argv[])
 
 
 // Argument test and domain name modification
-        while((c = getopt(argc, argv, "h")) != -1)
+        while((c = getopt(argc, argv, "hvn:")) != -1)
                 switch(c)
                 {
 			case 'n':
-				{
-					char s[160];
-					snprintf(s, sizeof(s), "NETHOST=%s", optarg);
-					putenv(s);
-				}
-			break;
+				setenv("NETHOST", optarg, 1);
+				break;
+			case 'v':
+				version(argv[0]);
                         case 'h':
                         case '?':
-				exit(-1);
+				usage(argv[0]);
 		}
 
 	if (optind != argc)
@@ -88,7 +95,7 @@ int main(int argc,char *argv[])
 //
 	if (db_import(&error) == -1)
 	{
-		cerr << "db_info : Impossible to connect to database server" << endl;
+		std::cerr << "db_info : Impossible to connect to database server" << std::endl;
 		exit(-1);
 	}
 //
@@ -97,8 +104,8 @@ int main(int argc,char *argv[])
 //
 	if (db_stat(&inf, &error) == -1)
 	{
-		cerr << "The call to database server failed with error " << error << endl;
-		cerr << "Error message : " << dev_error_str(error) << endl;
+		std::cerr << "The call to database server failed with error " << error << std::endl;
+		std::cerr << "Error message : " << dev_error_str(error) << std::endl;
 		exit(-1);
 	}
 //
@@ -125,18 +132,18 @@ int main(int argc,char *argv[])
 //
 // Displays info
 //
-	cout << "\t\t" << ti;
-	cout << "\t\tDEVICE STATISTICS" << endl << endl;
-	cout << inf.dev_defined << " devices are defined in database" << endl;
-	cout << inf.dev_exported << " of the defined devices are actually exported:" << endl;
+	std::cout << "\t\t" << ti;
+	std::cout << "\t\tDEVICE STATISTICS" << std::endl << std::endl;
+	std::cout << inf.dev_defined << " devices are defined in database" << std::endl;
+	std::cout << inf.dev_exported << " of the defined devices are actually exported:" << std::endl;
 	for (int i = 0; i < inf.dev_domain_nb; i++)
-		cout << "    " << inf.dev_domain[i].dom_elt << " for the " << inf.dev_domain[i].dom_name << " domain" << endl;
-	cout << inf.psdev_defined << " pseudo devices are defined in the database" << endl;
-	cout << endl;
-	cout << "\t\tRESOURCE STATISTICS" << endl << endl;
-	cout << inf.res_number << " resources are defined in database:" << endl;
+		std::cout << "    " << inf.dev_domain[i].dom_elt << " for the " << inf.dev_domain[i].dom_name << " domain" << std::endl;
+	std::cout << inf.psdev_defined << " pseudo devices are defined in the database" << std::endl;
+	std::cout << std::endl;
+	std::cout << "\t\tRESOURCE STATISTICS" << std::endl << std::endl;
+	std::cout << inf.res_number << " resources are defined in database:" << std::endl;
 	for (int i = 0; i < inf.res_domain_nb; i++)
-		cout << "    " << inf.res_domain[i].dom_elt << " resources for the " << inf.res_domain[i].dom_name << " domain" << endl;
+		std::cout << "    " << inf.res_domain[i].dom_elt << " resources for the " << inf.res_domain[i].dom_name << " domain" << std::endl;
 	return 0;
 }
 

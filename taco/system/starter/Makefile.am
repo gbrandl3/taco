@@ -21,12 +21,14 @@ sbin_PROGRAMS 	= StartServer
 
 noinst_HEADERS 	= starter.h
 
-AM_CXXFLAGS 	= @TACO_INCLUDES@
+AM_CXXFLAGS 	= @TACO_INCLUDES@ -I$(top_srcdir)/log4cpp/include -I$(top_builddir)/log4cpp/include
+AM_CFLAGS	= @TACO_INCLUDES@
 
-StartServer_SOURCES 	= starter.cpp startup.cpp
-if SOLARIS_CXX
-StartServer_LDADD 	= @TACO_DEVSERVER_MAIN@ @TACO_SERVER_NOMAIN_CXX_STATIC_LIBS@
-else
+StartServer_SOURCES 	= starter.cpp startup.cpp device_server.c
+#if SOLARIS_CXX
+#StartServer_LDADD 	= @TACO_DEVSERVER_MAIN@ @TACO_SERVER_NOMAIN_CXX_STATIC_LIBS@
+#else
 StartServer_LDADD 	= @TACO_SERVER_CXX_LIBS@ 
-endif
+#endif
 
+StartServer_LDADD	+= $(top_builddir)/log4cpp/src/liblog4cpp.la

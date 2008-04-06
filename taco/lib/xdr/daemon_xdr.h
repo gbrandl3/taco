@@ -30,9 +30,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2005-07-25 13:05:45 $
+ * Date:	$Date: 2008-04-06 09:07:21 $
  *
  *******************************************************************-*/
 
@@ -44,18 +44,18 @@
  */
 
 struct DevDaemonStatus {
-   	char BeingPolled;
-	long PollFrequency;
- 	long TimeLastPolled;
-    	char PollMode;
-    	char DeviceAccessError;
-  	long ErrorCode;
-    	long LastCommandStatus;
-	char ContinueAfterError;
+   	DevChar BeingPolled;
+	DevLong PollFrequency;
+ 	DevLong TimeLastPolled;
+    	DevChar PollMode;
+    	DevChar DeviceAccessError;
+  	DevLong ErrorCode;
+    	DevLong LastCommandStatus;
+	DevChar ContinueAfterError;
 };
 typedef struct DevDaemonStatus 	DevDaemonStatus;
-bool_t 	_DLLFunc xdr_DevDaemonStatus PT_((_LPXDR xdrs, DevDaemonStatus _Far *objp));
-long 	_DLLFunc xdr_length_DevDaemonStatus PT_((DevDaemonStatus _Far *objp));
+bool_t 	_DLLFunc xdr_DevDaemonStatus PT_((XDR *xdrs, DevDaemonStatus *objp));
+long 	_DLLFunc xdr_length_DevDaemonStatus PT_((DevDaemonStatus *objp));
 #define D_DAEMON_STATUS         43
 #define LOAD_DAEMON_STATUS(A)   xdr_load_type ( D_DAEMON_STATUS, \
                                                 xdr_DevDaemonStatus, \
@@ -65,13 +65,13 @@ long 	_DLLFunc xdr_length_DevDaemonStatus PT_((DevDaemonStatus _Far *objp));
 
 
 struct DevDaemonData {
-   	long ddid;
-      	long long_data;
-	char *string_data;
+   	DevLong   ddid;
+      	DevLong   long_data;
+	DevString string_data;
 };
 typedef struct DevDaemonData 	DevDaemonData;
-bool_t 	_DLLFunc xdr_DevDaemonData PT_((_LPXDR xdrs, DevDaemonData _Far *objp));
-long 	_DLLFunc xdr_length_DevDaemonData PT_((DevDaemonData _Far *objp));
+bool_t 	_DLLFunc xdr_DevDaemonData PT_((XDR *xdrs, DevDaemonData *objp));
+long 	_DLLFunc xdr_length_DevDaemonData PT_((DevDaemonData *objp));
 #define D_DAEMON_DATA           44
 #define LOAD_DAEMON_DATA(A)   	xdr_load_type ( D_DAEMON_DATA, \
                                                 xdr_DevDaemonData, \

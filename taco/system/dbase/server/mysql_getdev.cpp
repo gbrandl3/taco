@@ -21,13 +21,13 @@
  * File:
  *
  * Description:
- *
+ *		mysql_getdev.cpp
  * Authors:
- *		$Author: jlpons $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.14 $
+ * Version:	$Revision: 1.15 $
  *
- * Date:	$Date: 2006-12-12 17:23:08 $
+ * Date:	$Date: 2008-04-06 09:07:41 $
  *
  */
 
@@ -45,7 +45,7 @@
  *
  * @return a pointer to a structure of the db_res type.
  */
-db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
+db_res *MySQLServer::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rqstp)
 {
     std::string 	domain,	
     			family("%"),			
@@ -64,9 +64,9 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 //
 // If the server is not connected to the database, return an error 
 //
-    if (dbgen.connected == False)
+    if (!dbgen.connected && (*db_reopendb_1_svc() != DS_OK))
     {
-	std::cout << "I'm not connected to database" << std::endl;
+	logStream->errorStream() << "I'm not connected to database" << log4cpp::eol;
 	browse_back.db_err = DbErr_DatabaseNotConnected;
 	browse_back.res_val.arr1_len = 0;
 	return(&browse_back);
@@ -138,17 +138,17 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 	case 0 : domain = tmpf;		
 		 query += (" DOMAIN LIKE '" + tmpf + "' AND");
 		 break;
-	default: std::cout << "To many '/' in device name." << std::endl;
+	default: logStream->errorStream() << "To many '/' in device name." << log4cpp::eol;
 		 browse_back.db_err = 1;
 		 browse_back.res_val.arr1_len = 0;
 		 return (&browse_back);		 		 
     }
     query += (" EXPORTED != 0 AND IOR LIKE 'rpc:%'");
-#ifdef DEBUG
-    std::cout << "filter domain : " << domain << std::endl;
-    std::cout << "filter family : " << family << std::endl;
-    std::cout << "filter member : " << member << std::endl;
-#endif 
+
+    logStream->debugStream() << "filter domain : " << domain << log4cpp::eol;
+    logStream->debugStream() << "filter family : " << family << log4cpp::eol;
+    logStream->debugStream() << "filter member : " << member << log4cpp::eol;
+
 //
 // Try to retrieve all tuples in the database NAMES table with the PN column
 // different than "not_exp" 
@@ -161,8 +161,8 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 //
 // Store the key if it is needed later 
 //
-	    MYSQL_RES *result = mysql_store_result(mysql_conn);
-	    MYSQL_ROW row;
+	MYSQL_RES *result = mysql_store_result(mysql_conn);
+	MYSQL_ROW row;
 	dev_num = mysql_num_rows(result);
 	if (prot == IPPROTO_UDP && (dev_num > MAXDEV_UDP))
 	{
@@ -176,7 +176,7 @@ db_res *MySQLServer::db_getdevexp_1_svc(nam *fil_name,struct svc_req *rqstp)
 	int i = 0;
 	try
 	{
-    	    ptra = new nam[dev_num];
+    	    ptra = new DevString[dev_num];
 	    for (i = 0; i < dev_num && ((row = mysql_fetch_row(result)) != NULL); i++)
 	    {
 	    	ptra[i] = new char[strlen(row[0]) + 1]; 

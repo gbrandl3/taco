@@ -29,14 +29,17 @@
  *
  * Original     : 
  *
- * Version      : $Revision: 1.2 $
+ * Version      : $Revision: 1.3 $
  *
- * Date         : $Date: 2006-09-18 21:59:06 $
+ * Date         : $Date: 2008-04-06 09:07:38 $
  *
  */
 
 #include <greta.h>
 #include <Xm/Text.h>
+
+void file_button_cb( Widget w, XtPointer client_data, XtPointer call_data);
+void ccb_make_parent_def_button( Widget w, XtPointer client_data, XtPointer call_data);
 
 
 /****************************************************************************

@@ -48,12 +48,12 @@
 
 struct DevDaemonStatus {
    	char BeingPolled;
-	long PollFrequency;
- 	long TimeLastPolled;
+	DevLong PollFrequency;
+ 	DevLong TimeLastPolled;
     	char PollMode;
     	char DeviceAccessError;
-  	long ErrorCode;
-    	long LastCommandStatus;
+  	DevLong ErrorCode;
+    	DevLong LastCommandStatus;
 	char ContinueAfterError;
 };
 typedef struct DevDaemonStatus 	DevDaemonStatus;
@@ -68,8 +68,8 @@ long 				xdr_length_DevDaemonStatus(DevDaemonStatus *objp);
 
 
 struct DevDaemonData {
-   	long ddid;
-      	long long_data;
+   	DevLong ddid;
+      	DevLong long_data;
 };
 typedef struct DevDaemonData 	DevDaemonData;
 bool_t 				xdr_DevDaemonData(XDR *xdrs, DevDaemonData *objp);

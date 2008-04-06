@@ -31,9 +31,9 @@
  *
  * Original   : September 1998
  *  
- * Version    :	$Revision: 1.9 $
+ * Version    :	$Revision: 1.10 $
  *
- * Date	      : $Date: 2006-09-18 22:15:37 $
+ * Date	      : $Date: 2008-04-06 09:07:06 $
  *
  *-*******************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -101,7 +101,7 @@ extern nethost_info 		*multi_nethost;
  */
 int to_reconnection(void *p_data, void **pp_result, CLIENT **client,
 		    int call_type, long nethost_index,
-		    long connect_type, long *error)
+		    long connect_type, DevLong *error)
 {
 	union {
 		db_res 		*getres_ptr;
@@ -332,7 +332,7 @@ int to_reconnection(void *p_data, void **pp_result, CLIENT **client,
 			break;
 			  
 		case DB_GETPOLLER : 
-			recev_ptr.poll_ptr = db_getpoll_1((nam *)p_data,*client,error);
+			recev_ptr.poll_ptr = db_getpoll_1((DevString *)p_data,*client,error);
 			recev_gen = (void *)recev_ptr.poll_ptr;
 			break;
 			    
@@ -368,7 +368,7 @@ int to_reconnection(void *p_data, void **pp_result, CLIENT **client,
 			break;
 			
 		case DB_GETDSHOST :
-			recev_ptr.dshost_ptr = db_getdsonhost_1((nam *)p_data,*client,error);
+			recev_ptr.dshost_ptr = db_getdsonhost_1((DevString *)p_data,*client,error);
 			recev_gen = (void *)recev_ptr.dshost_ptr;
 			break;
 		}
@@ -704,7 +704,7 @@ int to_reconnection(void *p_data, void **pp_result, CLIENT **client,
 			break;
 				  
 		case DB_GETPOLLER : 
-			recev_ptr.poll_ptr = db_getpoll_1((nam *)p_data,new_client,error);
+			recev_ptr.poll_ptr = db_getpoll_1((DevString *)p_data,new_client,error);
 			recev_gen = (void *)recev_ptr.poll_ptr;
 			break;
 				    
@@ -714,12 +714,12 @@ int to_reconnection(void *p_data, void **pp_result, CLIENT **client,
 			break;
 			
 		case DB_INITCACHE : 
-			recev_ptr.lg_ptr = db_initcache_1((nam *)p_data,new_client,error);
+			recev_ptr.lg_ptr = db_initcache_1((DevString *)p_data,new_client,error);
 			recev_gen = (void *)recev_ptr.lg_ptr;
 			break;
 			
 		case DB_GETDSHOST :
-			recev_ptr.dshost_ptr = db_getdsonhost_1((nam *)p_data,new_client,error);
+			recev_ptr.dshost_ptr = db_getdsonhost_1((DevString *)p_data,new_client,error);
 			recev_gen = (void *)recev_ptr.dshost_ptr;
 			break;
 		}

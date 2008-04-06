@@ -14,7 +14,6 @@
 #ifdef LOG4CPP_HAVE_SSTREAM
 #include <sstream>
 #endif
-#include <memory>
 
 namespace log4cpp {
 
@@ -35,8 +34,7 @@ namespace log4cpp {
         return message.str();
     }
 
-    std::auto_ptr<Layout> create_basic_layout(const FactoryParams& params)
-    {
-       return std::auto_ptr<Layout>(new BasicLayout);
+    std::auto_ptr<Layout> create_basic_layout(const FactoryParams& params) {
+        return std::auto_ptr<Layout>(new BasicLayout);
     }
 }

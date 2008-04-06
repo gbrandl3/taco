@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.4 $
+ * Version      : $Revision: 1.5 $
  *
- * Date         : $Date: 2006-09-18 21:50:15 $
+ * Date         : $Date: 2008-04-06 09:07:51 $
  *
  */
 
@@ -92,7 +92,7 @@ int main(int argc, char **argv)
 				optind;
 	int 			pseudo = False,
 				l;
-	long 			error;
+	DevLong			error;
 	db_resource 		res1[] = {
 					{"host",D_VAR_STRINGARR,&host_dc},
 		     		};
@@ -148,7 +148,7 @@ int main(int argc, char **argv)
  */
 void devall(int pseudo)
 {
-	long 		error;
+	DevLong 	error;
 	int 		i,j,k,l,ind;
 	int 		tmp_ptr;
 	char 		**dcall[10];

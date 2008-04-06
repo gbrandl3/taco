@@ -23,16 +23,16 @@
 #include <dev_xdr.h>
 #include <DevErrors.h>
 
-#define DevErr_ExecutionDenied 4010
-#define DevErr_BadDynamicCast 4011
-#define DevErr_UnexpectedException 4012
-#define DevErr_RangeError 4017
-#define DevErr_InvalidValue 4018
-#define DevErr_RuntimeError 4019
-#define DevErr_InternalError 4020
-#define DevErr_TypeError 4023
-#define DevErr_IOError 4024
-#define DevErr_SystemError 4025
+#define DevErr_ExecutionDenied 		4010
+#define DevErr_BadDynamicCast 		4011
+#define DevErr_UnexpectedException 	4012
+#define DevErr_RangeError 		4017
+#define DevErr_InvalidValue 		4018
+#define DevErr_RuntimeError 		4019
+#define DevErr_InternalError 		4020
+#define DevErr_TypeError 		4023
+#define DevErr_IOError 			4024
+#define DevErr_SystemError 		4025
 
 #ifdef __cplusplus
 

@@ -25,12 +25,13 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2006-09-06 18:34:15 $
+ * Date:        $Date: 2008-04-06 09:07:47 $
  */
-
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 /* TACO include file */
 #include <API.h>
 
@@ -40,23 +41,29 @@
 #include <cstdlib>
 #include <algorithm>
 #ifdef _solaris
-#include "_count.h"
+#	include "_count.h"
+#include <taco_utils.h>
 #endif /* _solaris */
-
-using namespace std;
 
 void usage(const char *cmd)
 {
-	cerr << "usage : " << cmd << " [options] <full device server name>" << endl;
-	cerr << "  Diplay device server informations" << std::endl;
-	cerr << "        options : -h display this message" << std::endl;
-	cerr << "                  -n nethost" << std::endl;
+	std::cerr << "usage : " << cmd << " [options] <full device server name>" << std::endl;
+	std::cerr << "  Diplay device server informations" << std::endl;
+	std::cerr << "        options : -h display this message" << std::endl;
+	std::cerr << "                  -n nethost" << std::endl;
+	std::cerr << "                  -v display the current version" << std::endl;
 	exit(1);
+}
+
+void version(const char *cmd)
+{
+	std::cerr << cmd << " version " << VERSION << std::endl;
+	exit(0);
 }
 
 int main(int argc,char *argv[])
 {
-	long error;
+	DevLong error;
         extern int      optopt;
         extern int      optind;
 	extern char	*optarg;
@@ -65,28 +72,25 @@ int main(int argc,char *argv[])
 //
 // Argument test and device name structure
 //
-        while ((c = getopt(argc,argv,"hn:")) != -1)
+        while ((c = getopt(argc,argv,"hvn:")) != -1)
                 switch (c)
                 {
 			case 'n':
-				{
-					char s[160];
-					snprintf(s, sizeof(s), "NETHOST=%s", optarg);
-					putenv(s);
-				}
-			break;
+				setenv("NETHOST", optarg, 1);
+				break;
+			case 'v':
+				version(argv[0]);
                         case 'h':
                         case '?':
                                 usage(argv[0]);
-                                break;
                 }
         if (optind != argc - 1)
                 usage(argv[0]);
 
-	string full_ds_name(argv[optind]);
+	std::string full_ds_name(argv[optind]);
 
 #ifdef DEBUG
-	cout  << "Server name : " << full_ds_name << endl;
+	std::cout  << "Server name : " << full_ds_name << std::endl;
 #endif /* DEBUG */
 #ifndef _solaris
 	if (std::count(full_ds_name.begin(), full_ds_name.end(), '/') != 1)
@@ -94,7 +98,7 @@ int main(int argc,char *argv[])
 	if (_sol::count(full_ds_name.begin(), full_ds_name.end(), '/') != 1)
 #endif /* _solaris */
 	{
-		cerr << "db_servinfo : Bad full device server name" << endl;
+		std::cerr << "db_servinfo : Bad full device server name" << std::endl;
 		exit(-1);
 	}
 
@@ -103,19 +107,19 @@ int main(int argc,char *argv[])
 // name
 //
 
-	string::size_type pos,start;
+	std::string::size_type pos,start;
 
-	if ((pos = full_ds_name.find('/')) == string::npos)
+	if ((pos = full_ds_name.find('/')) == std::string::npos)
 	{
-		cout << "db_servinfo : Can't split full device server" << endl;
+		std::cout << "db_servinfo : Can't split full device server" << std::endl;
 		exit(-1);
 	}
 	
-	string ds_name(full_ds_name,0,pos);
-    string pers_name(full_ds_name.substr(pos + 1)); 
+	std::string ds_name(full_ds_name,0,pos);
+    	std::string pers_name(full_ds_name.substr(pos + 1)); 
 #ifdef DEBUG
-	cout << "DS name : " << ds_name << endl;
-	cout << "Pers. name : " << pers_name << endl;
+	std::cout << "DS name : " << ds_name << std::endl;
+	std::cout << "Pers. name : " << pers_name << std::endl;
 #endif /* DEBUG */
 //
 // Connect to database server
@@ -123,7 +127,7 @@ int main(int argc,char *argv[])
 
 	if (db_import(&error) == -1)
 	{
-		cerr << "db_servinfo : Impossible to connect to database server" << endl;
+		std::cerr << "db_servinfo : Impossible to connect to database server" << std::endl;
 		exit(-1);
 	}
 
@@ -135,11 +139,11 @@ int main(int argc,char *argv[])
 	if (db_servinfo(ds_name.c_str(), pers_name.c_str(), &info, &error) == -1)
 	{
 		if (error == DbErr_DeviceServerNotDefined)
-			cout << "The device server " << full_ds_name << " is not defined in database" << endl;
+			std::cerr << "The device server " << full_ds_name << " is not defined in database" << std::endl;
 		else
 		{
-			cerr << "The call to database server failed with error " << error << endl;
-			cerr << "Error message : " << dev_error_str(error) << endl;
+			std::cerr << "The call to database server failed with error " << error << std::endl;
+			std::cerr << "Error message : " << dev_error_str(error) << std::endl;
 		}
 		exit(-1);
 	}
@@ -147,30 +151,30 @@ int main(int argc,char *argv[])
 // Display info sent back by server
 //
 
-	string pro(info.process_name);
+	std::string pro(info.process_name);
 	if (info.pid != 0)
 	{
 		if (pro != "unknown")
-			cout << "Device server " << full_ds_name << " is part of the process " << info.process_name << endl;
-		cout << "The process is running on host " << info.host_name << " with PID " << info.pid 
-	     		<< " (Program number = " << info.program_num << ")" << endl;
+			std::cout << "Device server " << full_ds_name << " is part of the process " << info.process_name << std::endl;
+		std::cout << "The process is running on host " << info.host_name << " with PID " << info.pid 
+	     		<< " (Program number = " << info.program_num << ")" << std::endl;
 	}
 	
 	for (int i = 0; i < info.embedded_server_nb; i++)
 	{
 		if (info.embedded_server_nb != 1)
 		{
-			cout << endl;
-			cout << "Device server class : " << info.server[i].server_name << endl;
+			std::cout << std::endl;
+			std::cout << "Device server class : " << info.server[i].server_name << std::endl;
 		}
 		for (int j = 0; j < info.server[i].device_nb; j++)
 		{
 			if (info.server[i].device[j].exported_flag == True)
-				cout << "Device number " << j << " : " << info.server[i].device[j].dev_name 
-					<< " exported from host " << info.host_name << endl;
+				std::cout << "Device number " << j << " : " << info.server[i].device[j].dev_name 
+					<< " exported from host " << info.host_name << std::endl;
 			else
-				cout << "The device " << info.server[i].device[j].dev_name 
-					<< " is defined for this server but is not exported" << endl;
+				std::cout << "The device " << info.server[i].device[j].dev_name 
+					<< " is defined for this server but is not exported" << std::endl;
 		}
 	}
 	return 0;

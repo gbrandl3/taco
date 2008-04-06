@@ -30,9 +30,9 @@
  *
  * Original:	March 1993
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-04-06 09:07:23 $
  *
  *******************************************************************-*/
 
@@ -54,10 +54,10 @@ xdr_SysState(xdrs, objp)
 	if (!xdr_string(xdrs, &objp->sys_name, MAXU_INT)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->sys_ident)) {
+	if (!xdr_DevLong(xdrs, &objp->sys_ident)) {
 		return (FALSE);
 	}
-	if (!xdr_long(xdrs, &objp->sys_state)) {
+	if (!xdr_DevLong(xdrs, &objp->sys_state)) {
 		return (FALSE);
 	}
 	return (TRUE);
@@ -69,9 +69,9 @@ xdr_length_SysState(objp)
 {
         long  length = 0;
 
-        length = length + xdr_length_DevString (&objp->sys_name);
-        length = length + xdr_length_DevLong (&objp->sys_ident);
-        length = length + xdr_length_DevLong (&objp->sys_state);
+        length += xdr_length_DevString (&objp->sys_name);
+        length += xdr_length_DevLong (&objp->sys_ident);
+        length += xdr_length_DevLong (&objp->sys_state);
 
         return (length);
 }
@@ -99,7 +99,7 @@ xdr_length_VarSysStateArray(objp)
          *  four bytes for the number of array elements
          */
 
-	length = length + xdr_length_DevLong ((long *)&objp->length);
+	length += xdr_length_DevLong (&objp->length);
 
         /*
          *  now calculate the length of the array
@@ -107,7 +107,7 @@ xdr_length_VarSysStateArray(objp)
 
 	for (i=0; (u_long)i<objp->length; i++)
 	   {
-	   length = length + xdr_length_SysState(&objp->sequence[i]);
+	   length += xdr_length_SysState(&objp->sequence[i]);
 	   }
 
         return (length);

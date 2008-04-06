@@ -29,9 +29,9 @@
  *
  * Original:	January 1997 by Emmanuel Taurel, Andy Gotz
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-18 22:39:46 $
+ * Date:        $Date: 2008-04-06 09:06:38 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -49,7 +49,7 @@
 Serial *device_ds[MAX_DEVICES];
 unsigned int n_devices;
 
-long startup(char *svr_name, long *error)
+long startup(char *svr_name, DevLong *error)
 {
    char **dev_list;
    unsigned int i;
@@ -98,7 +98,7 @@ long startup(char *svr_name, long *error)
 // export the device onto the network
 //
 
-      	status = dev_export((char*)device_ds[i]->name,(Device*)device_ds[i],(long*)error);
+      	status = dev_export((char*)device_ds[i]->GetDevName(),(Device*)device_ds[i],error);
 
       	printf("startup++() dev_export() returned %d (error = %d)\n",status,*error);
    }

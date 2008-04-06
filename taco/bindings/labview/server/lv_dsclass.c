@@ -22,13 +22,16 @@
  *
  * Original:	October 1999
  *
- * $Revision: 1.5 $
+ * $Revision: 1.6 $
  *
- * $Date: 2006-11-21 16:38:19 $
+ * $Date: 2008-04-06 09:06:26 $
  *
  * $Author: jkrueger1 $
  *
- * $Log: not supported by cvs2svn $
+ * $Log: lv_dsclass.c,v 
+ * Revision 1.5  2006/11/21 16:38:19  jkrueger
+ * Add code from ESR
+ *
  * Revision 1.7  2000/02/21 16:04:36  goetz
  * replaced all exit()'s and kill()'s with return(-1) so that Labview does not die
  *
@@ -58,6 +61,9 @@
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
 #endif
+#ifdef HAVE_RPC_PMAP_CLNT_H
+#	include <rpc/pmap_clnt.h>
+#endif
 
 #include <stdio.h>
 #include <time.h>
@@ -75,6 +81,8 @@
 #include <LabViewP.h>
 #include <LabView.h>
 
+#define TOLOWER(a) {char* i; i=a; while ( '\0'!=*i ) { *i=tolower(*i);i++; }}
+
 extern configuration_flags      config_flags;
  
 static int      udp_socket;
@@ -82,10 +90,11 @@ static int      tcp_socket;
 
 static void _WINAPI devserver_prog_4    PT_( (struct svc_req *rqstp,SVCXPRT *transp) );
 static _client_data * _DLLFunc rpc_cmd_get (_server_data *server_data);
-static long lv_startup(char*, long*);
+static long lv_startup(char*, DevLong *);
 static long lv_ds__sendreply();
-static long read_device_id (long,long *,long *,long *);
+static long read_device_id (long,long *,long *,DevLong *);
 
+int gettransient_ut (char *ds_name, int *udp_socket, int *tcp_socket);
 
 /*+======================================================================        
  Function   :   long lv_ds__main ()
@@ -123,7 +132,7 @@ long lv_ds__main(char *server_name, char *pers_name)
 
         long    prog_number;
         long    status;
-        long    error = 0;
+        DevLong    error = 0;
         int     pid = 0;
         short   m_opt = False;
         short   s_opt = True;
@@ -485,7 +494,7 @@ Return(s)  :	minus one on failure, zero otherwise
 ========================================================================*/
 long lv_ds__cmd_get(void **lv_argin)
 {
-	long error;
+	DevLong error;
 
 	cmd_in = 0;
 
@@ -585,7 +594,7 @@ Return(s)  :	minus one on failure, zero otherwise
 
 static long lv_startup(svr_name, error)
 char *svr_name;
-long *error;
+DevLong *error;
 {
    long		i,	status, n_exported;
    short		iret;
@@ -1374,7 +1383,7 @@ static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp)
 
 
 /*+======================================================================
- Function   :   static long svc_check()
+ Function   :   static long lv_svc_check()
 
  Description:   Checks wether a device server with 
 		the same name is already running.
@@ -1388,7 +1397,7 @@ static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp)
  Return(s)  :   DS_OK or DS_NOTOK
 =======================================================================-*/
 
-static long svc_check (long *error)
+static long lv_svc_check (DevLong *error)
 {
         CLIENT          *clnt;
 	enum clnt_stat  clnt_stat;
@@ -1403,18 +1412,18 @@ static long svc_check (long *error)
 			   &host_name, &prog_number, &vers_number, error) < 0 )
 		return (-1);
 
-   /*
-	 * old server already unmapped ?
- 	 */
+/*
+ * old server already unmapped ?
+ */
 
 	if ( prog_number == 0 )
 	   {
 	   return (0);
 	   }
 
-	/*
-	 *  was the old server running on the same host ?
-	 */
+/*
+ *  was the old server running on the same host ?
+ */
 
 	if (strcmp (config_flags.server_host,host_name) != 0)
 	   {
@@ -1428,9 +1437,9 @@ static long svc_check (long *error)
  */
 	vers_number = API_VERSION;
 
-    /*
-     *  old server still exists ?
-	  */
+/*
+ *  old server still exists ?
+ */
 
 	clnt = clnt_create (config_flags.server_host,
 	  	  	    prog_number,vers_number,"udp");
@@ -1439,9 +1448,9 @@ static long svc_check (long *error)
            clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &msg_retry_timeout);
 	        clnt_control (clnt, CLSET_TIMEOUT, (char *) &msg_timeout);
 
-	   /*
-	    *  call device server check function
-	    */
+/*
+ *  call device server check function
+ */
 
            clnt_stat = clnt_call (clnt, RPC_CHECK, (xdrproc_t)xdr_void, NULL,
      				  (xdrproc_t)xdr_wrapstring, (caddr_t) &svc_name, 
@@ -1795,7 +1804,7 @@ static long lv_ds__sendreply()
         {
         	dev_printerror (SEND,
                         "svc_freeargs : server couldn't free arguments !!");
-                        return;
+                        return (-1);
 	}
 
         if (!svc_sendreply(ds__transp, xdr_result, (caddr_t)ds__result))
@@ -1825,7 +1834,7 @@ static long lv_ds__sendreply()
  Return(s)  :	DS_OK / DS_NOTOK
 =======================================================================-*/
 
-static long read_device_id (long device_id, long *ds_id, long *connection_id, long *error)
+static long read_device_id (long device_id, long *ds_id, long *connection_id, DevLong *error)
 {
 	long 	export_counter;
 

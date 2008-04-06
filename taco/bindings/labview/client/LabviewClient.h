@@ -12,9 +12,9 @@
 
  Original:	November 2003
 
- Version:	$Revision: 1.1 $
+ Version:	$Revision: 1.2 $
 
- Date:		$Date: 2004-01-26 08:44:22 $
+ Date:		$Date: 2008-04-06 09:06:24 $
 
  Copyright (c) 1990-1997 by FRM2 TU München, 
                             Garching, Germany
@@ -50,7 +50,7 @@ class LabviewClient {
 
 private:
 bool extern_server;
-long error;
+DevLong error;
 long readwrite;
 int cmd;
 int status;
@@ -77,7 +77,7 @@ LabviewClient(devserver*);
 
 int InitDevice();
 void InitVars();
-void TestPutGetError(char* calling_method);
+void TestPutGetError(const char* calling_method);
 
 void InitGetInputBuffer ();
 void InitGetOutputBuffer(DevString name);
