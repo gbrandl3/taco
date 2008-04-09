@@ -66,4 +66,4 @@ export NETHOST=`hostname`
 myds test&
 \endverbatim
 -# start your client - start your client and test your device server !
-
+*/
