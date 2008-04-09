@@ -7,7 +7,7 @@ for libtoolize in glibtoolize libtoolize libtoolize15 libtoolize13 ; do
                 break;
         fi
 done
-for autoconf in autoconf autoconf261 autoconf260 autoconf259 autoconf253 ; do
+for autoconf in autoconf autoconf262 autoconf261 autoconf260 autoconf259 autoconf253 ; do
 	AUTOCONF=`which $autoconf 2>/dev/null | grep -v '^no'`
 	if test "$AUTOCONF" ; then
 		ac_postfix=`basename $AUTOCONF | sed -e "s/autoconf//"`
@@ -64,11 +64,11 @@ case $automakeversion in
 esac
 
 case $libtoolversion in
-    *1.[45]*)
+    *1.[45]*|*2.2*)
         ;;
     *)
         echo "This libtool version is not supported by taco."
-        echo "taco only supports libtool 1.[45].*."
+        echo "taco only supports libtool 1.[45].*. and 2.2*"
         echo "You may download it from ftp://ftp.gnu.org/gnu/libtool"
         exit
         ;;
