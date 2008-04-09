@@ -24,8 +24,7 @@ Version: @VERSION@
 TACO is a toolkit for implementing distributed object oriented control systems. It
 has been used at the <a href="http://www.esrf.eu">European Synchrotron Radiation Facility (ESRF)</a>
 \latexonly(see {\tt http://www.esrf.eu})\endlatexonly
- in Grenoble
-(FRANCE) to control the accelerator complex and all beamlines.
+ in Grenoble (FRANCE) to control the accelerator complex and all beamlines.
 
 It is also used at
 <a href="http://www.frm2.tum.de">Neue Forschungsneutronenquelle "Heinz Maier-Leibnitz" (FRM II)</a>
@@ -80,7 +79,6 @@ The first part forms a user manual:
 <li>Section \ref whatis  Provides a brief overview of what TACO is, useful for newcomers to TACO.
 <li>Section \ref lite  What is the light version of TACO?
 <li>Section \ref install How to <a href="http://sourceforge.net/project/showfiles.php?group_id=38710">download</a>, compile and install TACO on your platfrom 
-
 <li>Section \ref started  For those who wants to get going quickly without having to read this manual.
 <li>Section \ref ds_model  DSM
 <li>Section \ref c  How to write TACO devices servers in C
