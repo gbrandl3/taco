@@ -128,11 +128,11 @@ In brief you have to start setup a database, start the Manager and then start as
 device server/clients as necessary. Device server/clients which know about your hardware 
 will have to be written. 
 
-An example for C++ can be found ini: classes++/powersupply. It consists of a superclass 
+An example for C++ can be found in: classes/powersupply. It consists of a superclass 
 PowerSupply.cpp and the subclass AGPowersupply.cpp. 
 
 A second example of a real device server for controlling a serial line under Linux can 
-be found in classes++/serialline. 
+be found in classes/serialline. 
 
 An example for C (using the Objects In C methodology) can be found in classes/instverify.
 
