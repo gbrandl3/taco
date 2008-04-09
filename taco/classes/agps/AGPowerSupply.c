@@ -114,19 +114,19 @@ static long dev_write();
 static long dev_read();
 
 static DevCommandListEntry commands_list[] = {
- {DevOff, dev_off, D_VOID_TYPE, D_VOID_TYPE, 0, "DevOff"},
- {DevOn, dev_on, D_VOID_TYPE, D_VOID_TYPE, 0, "DevOn"},
- {DevState, dev_state, D_VOID_TYPE, D_SHORT_TYPE, 0, "DevState"},
- {DevSetValue, dev_setvalue, D_FLOAT_TYPE, D_VOID_TYPE, 0, "DevSetValue"},
- {DevReadValue, dev_readvalue, D_VOID_TYPE, D_FLOAT_READPOINT, 0, "DevReadValue"},
- {DevReset, dev_reset, D_VOID_TYPE, D_VOID_TYPE, 0, "DevReset"},
- {DevStatus, dev_status, D_VOID_TYPE, D_STRING_TYPE, 0, "DevStatus"},
- {DevError, dev_error, D_VOID_TYPE, D_VOID_TYPE, 0, "DevError"},
- {DevLocal, dev_local, D_VOID_TYPE, D_VOID_TYPE, 0, "DevLocal"},
- {DevRemote, dev_remote, D_VOID_TYPE, D_VOID_TYPE, 0, "DevRemote"},
- {DevUpdate, dev_update, D_VOID_TYPE, D_STATE_FLOAT_READPOINT, 0, "DevUpdate"},
- {DevWrite, dev_write, D_VAR_CHARARR, D_VOID_TYPE, 0, "DevWrite"},
- {DevRead, dev_read, D_LONG_TYPE, D_VAR_CHARARR, 0, "DevRead"},
+ {DevOff, dev_off, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevOff"},
+ {DevOn, dev_on, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevOn"},
+ {DevState, dev_state, D_VOID_TYPE, D_SHORT_TYPE, READ_ACCESS, "DevState"},
+ {DevSetValue, dev_setvalue, D_FLOAT_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevSetValue"},
+ {DevReadValue, dev_readvalue, D_VOID_TYPE, D_FLOAT_READPOINT, READ_ACCESS, "DevReadValue"},
+ {DevReset, dev_reset, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevReset"},
+ {DevStatus, dev_status, D_VOID_TYPE, D_STRING_TYPE, READ_ACCESS, "DevStatus"},
+ {DevError, dev_error, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevError"},
+ {DevLocal, dev_local, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevLocal"},
+ {DevRemote, dev_remote, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevRemote"},
+ {DevUpdate, dev_update, D_VOID_TYPE, D_STATE_FLOAT_READPOINT, WRITE_ACCESS, "DevUpdate"},
+ {DevWrite, dev_write, D_VAR_CHARARR, D_VOID_TYPE, WRITE_ACCESS, "DevWrite"},
+ {DevRead, dev_read, D_LONG_TYPE, D_VAR_CHARARR, READ_ACCESS, "DevRead"},
 };
 
 static long n_commands = sizeof(commands_list)/sizeof(DevCommandListEntry);

@@ -39,7 +39,7 @@
  * Date:        $Date: 2006/04/20 06:33:17 $
  */
 
-static char RcsId[] = " $Header: /segfs/dserver/dev/classes/powersupply/ag/src/RCS/PowerSupply.c,v 1.1 2003/12/10 20:57:52 goetz Exp $ ";
+static char RcsId[] = "$Header: /segfs/dserver/dev/classes/powersupply/ag/src/RCS/PowerSupply.c,v 1.1 2003/12/10 20:57:52 goetz Exp $ ";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
