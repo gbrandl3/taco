@@ -1,19 +1,31 @@
 digraph procedure {
-	{
-		rank=same;
-		specification [shape=box,label="SPECIFICATION"];
-		devserver [shape=box,label="DEVICE SERVER"];
+	devserver [shape=box,label="DEVICE SERVER"];
+	specification [shape=box,label="SPECIFICATION"];
+
+	understand    [shape=circle,label="understand\ndevice"];
+	debug 	      [shape=circle,label="debug\ncode"];
+	devdefinition [shape=circle,label="define\ndevice"];
+	code          [shape=circle,label="write\ncode"];
+	cmddefinition [shape=circle,label="define\ncommands"];
+	writedoc      [shape=circle,label="write\ndoc"];
+
+	{ node [shape=circle style=invis label=dum]
+		1 2 3 21 22 23 31 32 41 
 	}
 
-	understand [shape=circle,label="understand\ndevice"];
-	devdefinition [shape=circle,label="define device"];
-	cmddefinition [shape=circle,label="define\ncommands"];
-	design [shape=circle,label="design class"];
-	writedoc [shape=circle,label="write doc"];
-	code [shape=circle,label="code"];
-	debug [shape=circle,label="debug"];
 
+	{rank=same; devserver; 1; 2; 3; specification;}
+	{rank=same; understand; 21; 22; 23; debug;}
+	{rank=same; devdefinition; 31; 32; code;}
+	{rank=same; cmddefinition; 41; writedoc;}
+
+	design [shape=circle,label="design\nclass"];
+
+	specification -> devserver [dir=back];
 	specification -> understand -> devdefinition -> cmddefinition -> design -> writedoc -> code -> debug -> devserver;
-	devserver -> specification;
+	specification -> 1 -> 2 -> 3 -> devserver [style=invis];
+	understand -> 21 -> 22 -> 23 -> debug [style=invis];
+	devdefinition -> 31 -> 32 -> code [style=invis];
+	cmddefinition -> 41 -> writedoc [style=invis];
 	
 }
