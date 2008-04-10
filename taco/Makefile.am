@@ -44,6 +44,12 @@ endif
 
 SUBDIRS += doc misc bindings tests examples
 
+install-data-hook:
+	@if test ! -f $(DESTDIR)/$(includedir)/private/config.h ; then \
+		echo $(INSTALL_HEADER) config.h $(DESTDIR)$(includedir)/private ; \
+		$(INSTALL_HEADER) config.h $(DESTDIR)$(includedir)/private ; \
+	fi
+
 EXTRA_DIST=autogen.sh taco.spec.in README-RPM
 
 include $(top_srcdir)/rpm_rules.mh
