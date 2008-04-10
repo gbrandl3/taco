@@ -29,9 +29,9 @@
  *
  * Original:	Feb 1994
  *
- * Version:	$Revision: 1.28 $
+ * Version:	$Revision: 1.29 $
  *
- * Date:		$Date: 2008-04-06 09:07:01 $
+ * Date:		$Date: 2008-04-10 15:02:29 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -2161,11 +2161,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 		config_flags.vers_number = API_VERSION;
 
 
-#if defined (FreeBSD) && (__cplusplus)
-                if (!svc_register(transp, prog_number, API_VERSION, (void (*)(...))devserver_prog_4, IPPROTO_UDP))
-#else
                 if (!svc_register(transp, prog_number, API_VERSION, devserver_prog_4, IPPROTO_UDP))
-#endif
 		{
 			char msg[]="Unable to register server (UDP,4), retry...\n"; 
 			return error_msg(msg);
@@ -2196,11 +2192,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 		return error_msg(msg);
 	}
 
-#if defined (FreeBSD) && (__cplusplus)
-	if (!svc_register(transp_tcp, prog_number, API_VERSION, (void (*)(...))devserver_prog_4, IPPROTO_TCP))
-#else
         if (!svc_register(transp_tcp, prog_number, API_VERSION, devserver_prog_4, IPPROTO_TCP))
-#endif
 	{
 		char msg[]= "Unable to register server (TCP,4), exiting...\n";
 		return error_msg(msg);

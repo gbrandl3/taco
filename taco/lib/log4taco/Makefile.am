@@ -13,5 +13,3 @@ noinst_PROGRAMS		= MsgServerTest
 
 MsgServerTest_SOURCES 	= MsgServerTest.cpp
 MsgServerTest_LDADD   	= liblog4taco.la
-
-template_DATA		= taco_log.cfg
