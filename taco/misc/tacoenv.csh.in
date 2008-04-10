@@ -86,7 +86,7 @@ endif
 if (${?NETHOST}) then
 ;
 else
-setenv NETHOST `@HOSTNAME@`
+setenv NETHOST `@HOSTNAME_CMD@`
 endif
 
 if ( $DSHOME == $prefix ) then

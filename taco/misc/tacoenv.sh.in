@@ -61,7 +61,7 @@ DBM_DIR=@dbmdir@
 LOGPATH=@logdir@
 LOGCONFIG=${LOGCONFIG:-${sysconfdir}/taco_log.cfg}
 
-NETHOST=${NETHOST:-`@HOSTNAME@`}
+NETHOST=${NETHOST:-`@HOSTNAME_CMD@`}
 if test "$DSHOME" = "$prefix" ; then
 	LD_LIBRARY_PATH=${libdir}${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}
 	TACO_PATH=$sbindir
