@@ -132,7 +132,7 @@ PETI_PEDANTIC_GCC
 AC_CONFIG_LIBCONFIG_IN([log4cpp])
 AC_CONFIG_PKGCONFIG_IN([log4cpp], [C++ library for flexible logging, modeled after Log4j])
 
-AX_BOOST([1.34.0])
+AX_BOOST([1.35.0])
 
 AC_CONFIG_FILES([
 Makefile
