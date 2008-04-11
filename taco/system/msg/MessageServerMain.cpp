@@ -29,9 +29,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2008-04-06 09:07:53 $
+ * Date:	$Date: 2008-04-11 11:14:41 $
  *
  */
 
@@ -201,11 +201,7 @@ int main (int argc, char **argv)
 		kill (pid,SIGQUIT);
 	}
 
-#ifdef FreeBSD
-	if (!svc_register(transp, msg.prog_number, MSGSERVER_VERS, (void (*)(...))msgserver_prog_1, IPPROTO_UDP)) 
-#else
 	if (!svc_register(transp, msg.prog_number, MSGSERVER_VERS, msgserver_prog_1, IPPROTO_UDP)) 
-#endif
 	{
 		fprintf(logFile, "%s Unable to register server, exiting...\n", getTimeString("MessageServer")); 
 		fflush(logFile);
