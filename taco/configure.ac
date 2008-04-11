@@ -18,7 +18,7 @@ dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_INIT([TACO], [3.99.31], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.102 $)dnl
+AC_REVISION($Revision: 1.103 $)dnl
 AC_COPYRIGHT([(C) 1990-2008 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -130,7 +130,7 @@ TACO_DATABASE_SERVER
 TACO_CLIENT_TCP
 TACO_FRM_EXT
 
-AM_PATH_LOG4CPP([0.3.4], [taco_build_log4cpp=no], [taco_build_log4cpp=yes])
+AM_PATH_LOG4CPP([1.0.0], [taco_build_log4cpp=no], [taco_build_log4cpp=yes])
 AM_CONDITIONAL(BUILD_LOG4CPP, test "x$taco_build_log4cpp" = "xyes")
 
 AC_CONFIG_SUBDIRS([gdbm log4cpp])
