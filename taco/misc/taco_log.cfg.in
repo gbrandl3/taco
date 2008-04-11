@@ -14,6 +14,7 @@ log4j.rootCategory=ERROR
 log4j.category.taco.system=INFO, A5
 log4j.category.taco.system.Database=DEBUG, A2
 log4j.category.taco.system.MessageServer=INFO, A4
+log4j.category.taco.server=NOTICE, A5
 # log4j.category.taco.system.StartServer=INFO, A5
 #
 log4j.appender.A1=org.apache.log4j.ConsoleAppender
