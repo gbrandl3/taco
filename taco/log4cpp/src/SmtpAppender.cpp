@@ -173,7 +173,7 @@ namespace log4cpp
    std::auto_ptr<Appender> create_smtp_appender(const FactoryParams& params)
    {
       std::string name, host, from, to, subject;
-      params.get_for("SMTP appender").required("name", name)("host", host)("from", from)
+      params.get_for("SmtpAppender").required("name", name)("host", host)("from", from)
                                               ("to", to)("subject", subject);
       return std::auto_ptr<Appender>(new SmptAppender(name, host, from, to, subject));
    }
