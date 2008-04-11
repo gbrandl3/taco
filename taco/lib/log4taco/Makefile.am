@@ -7,7 +7,7 @@ include_HEADERS 	= MsgServerAppender.h
 liblog4taco_la_SOURCES 	= MsgServerAppender.cpp 
 
 liblog4taco_la_LDFLAGS 	= -version-info @LIB_VERSION@
-liblog4taco_la_LIBADD 	= $(top_builddir)/log4cpp/src/liblog4cpp.la @TACO_CLIENT_LIBS@
+liblog4taco_la_LIBADD 	= $(top_builddir)/log4cpp/src/liblog4cpp.la @TACO_CLIENT_CXX_LIBS@
 
 noinst_PROGRAMS		= MsgServerTest
 
