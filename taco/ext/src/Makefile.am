@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-AM_CPPFLAGS 	= -I$(top_srcdir)/ext/include @TACO_INCLUDES@
+AM_CPPFLAGS 	= -I$(top_srcdir)/ext/include @TACO_INCLUDES@ -I$(top_srcdir)/log4cpp/include
 
 AM_CXXFLAGS 	= -Wall
 

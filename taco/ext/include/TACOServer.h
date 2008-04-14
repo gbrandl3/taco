@@ -20,6 +20,10 @@
 #ifndef TACO_SERVER_H
 #define TACO_SERVER_H
 
+#include <log4cpp/Category.hh>
+
+extern log4cpp::Category       *logStream;
+
 #include <map>
 #include <set>
 #include <string>
@@ -403,6 +407,19 @@ protected:
 	void deleteResource( const std::string& resourceName) throw (Exception)
 	{
 		::TACO::deleteResource( deviceName(), resourceName);
+	}
+
+	void throw_exception(const DevLong err, const std::string &msg)
+	{
+        	logStream->fatalStream() << GetClassName() << " : " << deviceName() << " : " << msg << log4cpp::eol;
+        	::TACO::Exception e = ::TACO::Exception(err, msg);
+        	throw e;
+	}
+
+	void throw_exception(::TACO::Exception &e, const std::string &msg)
+	{
+		logStream->fatalStream() << GetClassName() << " : " << deviceName() << " : " << msg << " : " << e.what() << log4cpp::eol;
+		throw msg >> e;
 	}
 
 private:

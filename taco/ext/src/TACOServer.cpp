@@ -98,17 +98,17 @@ long TACO::Server::Command(DevCommand command, DevArgument argin, DevArgType inp
 	return DS_OK;
 }
 
-const char* TACO::Server::GetClassName()
+const char *TACO::Server::GetClassName()
 {
 	return "TACO::Server";
 }
 
-const char* TACO::Server::GetDevType()
+const char *TACO::Server::GetDevType()
 {
 	return "TACO::Server";
 }
 
-const char* TACO::Server::GetDevName()
+const char *TACO::Server::GetDevName()
 {
 	return mName.c_str();
 }
@@ -311,9 +311,10 @@ void TACO::Server::addResource(
 ) throw (TACO::Exception)
 {
 	if (hasResource( name)) {
-		throw Exception( Error::INTERNAL_ERROR, "resource exists already");
+		throw_exception( Error::INTERNAL_ERROR, "resource '" + name + "' exists already");
 	}
 	mResourceInfoSet.insert( ResourceInfo( toLowerCase( name), type, info, defaults, format, min, max));
+	logStream->debugStream() << "add resource " << name << log4cpp::eol;
 }
 
 void TACO::Server::tacoDeviceOn( TACO::Server* server, void* argin, void* argout) throw (TACO::Exception)
