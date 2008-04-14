@@ -19,6 +19,12 @@
 #	include "config.h"
 #endif // HAVE_CONFIG_H
 
+#include <log4cpp/BasicConfigurator.hh>
+#include <log4cpp/PropertyConfigurator.hh>
+#include <log4cpp/Category.hh>
+
+log4cpp::Category       *logStream;
+
 #if HAVE_RPC_RPC_H
 #	include <rpc/rpc.h>
 #endif
@@ -31,12 +37,46 @@
 #include <iostream>
 
 #include <TACOExtensions.h>
+#include "TACOMotorCommon.h"
+#include "TACOMotor.h"
 
 #include <Admin.h>
 #include <private/ApiP.h>
 
-#include "TACOMotorCommon.h"
-#include "TACOMotor.h"
+/**
+ * This function will initialise the log4cpp logging service.
+ * The service will be configured via the ${LOGCONFIG} environment variable.
+ * If this is not found it will use the default logging mechanism.
+ * The instance will be the "taco.server" + serverName
+ *
+ * @param serverName the name of the server
+ */
+static void init_logstream(const std::string serverName)
+{
+        const char *logpath = getenv("LOGCONFIG");
+        std::string tmp = serverName;
+        std::string::size_type pos = tmp.find('/');
+        tmp[pos] = '.';
+        try
+        {
+                if (!logpath)
+                        throw 0;
+                log4cpp::PropertyConfigurator::configure(logpath);
+        }
+        catch (const log4cpp::ConfigureFailure &e)
+        {
+                std::cerr << e.what() << std::endl;
+                logpath = "no";
+                log4cpp::BasicConfigurator::configure();
+        }
+        catch (...)
+        {
+                logpath = "no";
+                log4cpp::BasicConfigurator::configure();
+        }
+        logStream = &log4cpp::Category::getInstance("taco.server." + tmp);
+        logStream->noticeStream() << "using " << logpath << " configuration file" << log4cpp::eol;
+}
 
 // list of all exported devices of the server
 static std::vector< ::TACO::Server *> devices;
@@ -61,7 +101,9 @@ const unsigned int DEVICE_MAX = 0;
  */
 long startup( char* serverName, DevLong *e)
 {
-	dev_printdebug(DBG_TRACE | DBG_STARTUP,  "startup: starting device server: %s\n", serverName);
+        init_logstream(serverName);
+
+        logStream->noticeStream() << "startup: starting device server: " << serverName << log4cpp::eol;
 
 	devices.clear();
 	TACO::Server::setServerName( serverName);
@@ -72,18 +114,18 @@ long startup( char* serverName, DevLong *e)
 		deviceList = TACO::queryDeviceList( serverName);
 	} catch (const ::TACO::Exception& tmp) {
 		*e = tmp;
-		dev_printerror(SEND, "startup: error: getting device list failed: %s", tmp.what());
+		logStream->errorStream() << "startup: error: getting device list failed: " << tmp.what() << log4cpp::eol;
 		return DS_NOTOK;
 	}
 
 // Allocate memory for the devices
 	if ( 0 < DEVICE_MAX && DEVICE_MAX < deviceList.size()) {
-		dev_printerror(SEND, "startup: error: too many devices");
+		logStream->errorStream() << "startup: error: too many devices" << log4cpp::eol;
 		return DS_NOTOK;
 	}
 
 	for (unsigned int i = 0; i < deviceList.size(); ++i) {
-		dev_printdebug(DBG_TRACE | DBG_STARTUP, "startup: device: %s\n", deviceList[i].c_str());
+		logStream->debugStream() << "startup: device: " << deviceList[i] << log4cpp::eol;
 	}
 
 // Create and export the devices
@@ -95,7 +137,7 @@ long startup( char* serverName, DevLong *e)
 			type = TACO::queryResource<std::string>( deviceList [i], "type");
 		} catch (const ::TACO::Exception& tmp) {
 			*e = tmp;
-			dev_printdiag(WRITE, "startup: error: cannot get type for: %s : %s\n", deviceList[i].c_str(), tmp.what());
+			logStream->errorStream() << "startup: error: cannot get type for: "<< deviceList[i] << " : " << tmp.what() << log4cpp::eol;
 			continue;
 		}
 
@@ -105,34 +147,33 @@ long startup( char* serverName, DevLong *e)
 			if (type == ::Motor::MOTOR_ID) {
 				device = new TACO::Motor::Motor( deviceList [i], *e);
 			} else {
-				dev_printdiag(WRITE, "startup: error: unsupported type: %s\n", deviceList[i].c_str());
+				logStream->errorStream() << "startup: error: unsupported type: " << deviceList[i] << " : " << type << log4cpp::eol;
 				continue;
 			}
-			dev_printdebug(DBG_TRACE | DBG_STARTUP, "startup: created device: %s\n", deviceList[i].c_str());
+			logStream->infoStream() << "startup: created device: " << deviceList[i] << log4cpp::eol;
 		} catch (const ::TACO::Exception& tmp) {
 			*e = tmp;
-			dev_printdiag(WRITE, "startup: error: cannot create device: %s : %s\n", deviceList[i].c_str(), tmp.what());
+			logStream->errorStream() << "startup: error: cannot create device: " << deviceList[i] << " : " << tmp.what() << log4cpp::eol;
 			continue;
 		}
 
 // Export the device
 		if (dev_export (const_cast<char*>(deviceList [i].c_str()), device, e) != DS_OK) {
 			delete device;
-			dev_printdiag(WRITE, "startup: error: cannot export device: %s : %s\n", deviceList[i].c_str(), ::TACO::errorString( *e).c_str());
+			logStream->errorStream() << "startup: error: cannot export device: " << deviceList[i] << " : " << ::TACO::errorString( *e) << log4cpp::eol;
 		} else {
 			++counter;
-			dev_printdebug(DBG_TRACE | DBG_STARTUP, "startup: exported device: %s\n", deviceList[i].c_str());
+			logStream->infoStream() << "startup: exported device: " << deviceList[i] << log4cpp::eol;
 			devices.push_back(device);
 		}
 	}
 
 	if (counter == deviceList.size()) {
-		dev_printdebug(DBG_TRACE | DBG_STARTUP, "startup: success\n");
+		logStream->noticeStream() << "startup: success" << log4cpp::eol;
 	} else if (counter != 0) {
-		dev_printdiag(SEND, "startup: some errors occured\n");
-		dev_printerror(SEND, "startup: some errors occured");
+		logStream->errorStream() << "startup: some errors occured. Not all devices exported." << log4cpp::eol;
 	} else {
-		dev_printerror(SEND, "startup: failed");
+		logStream->fatalStream() << "startup: failed" << log4cpp::eol;
 		return DS_NOTOK;
 	}
 
@@ -148,8 +189,11 @@ void unregister_server (void)
 {
 	for (std::vector< ::TACO::Server *>::iterator it = devices.begin(); it != devices.end(); ++it)
 	{
-		std::cerr << "delete device " << (*it)->deviceName() << std::endl;
+		if ((*it) == NULL)
+			continue;
+		logStream->noticeStream() << "delete device " << (*it)->deviceName() << log4cpp::eol;
 		delete (*it);
+		*it = NULL;
 	}
 	devices.clear();
 	DevLong error = 0;
@@ -161,7 +205,7 @@ void unregister_server (void)
 	if (config_flags.device_server == True)
 	{
 		if (!config_flags.no_database && (db_svc_unreg (config_flags.server_name, &error) != DS_OK))
-			dev_printerror_no (SEND, "db_svc_unreg failed", error);
+			logStream->errorStream() << "db_svc_unreg failed" <<  error << log4cpp::eol;
 //
 // destroy open client handles to message and database servers
 //		clnt_destroy (db_info.conf->clnt);

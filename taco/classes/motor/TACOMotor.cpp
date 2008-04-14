@@ -20,12 +20,12 @@
 #endif // HAVE_CONFIG_H
 
 #include <TACOConverters.h>
+#include "TACOMotor.h"
 
 #include <Admin.h>
 #include <iostream>
 
 #include "TACOMotorCommon.h"
-#include "TACOMotor.h"
 #include "TACOMotorWorker.h"
 
 TACO::Motor::Motor::Motor( const std::string& name, DevLong& error) throw (::TACO::Exception)
@@ -74,23 +74,22 @@ TACO::Motor::Motor::Motor( const std::string& name, DevLong& error) throw (::TAC
 	addResource("gear", D_DOUBLE_TYPE, "ratio between output and input of axis");
 	addResource("backlash", D_DOUBLE_TYPE, "backlash of the axis");
 
-	std::cout << "Motor : " << deviceName() << " : init ";
 	try
 	{
 		v_Init();
 		setDeviceState(::TACO::State::DEVICE_NORMAL);
-		std::cout  << "complete." << std::endl;
+		logStream->noticeStream() << GetClassName() << " : " << deviceName() << " : init complete." << log4cpp::eol;
 	}
-	catch (const ::TACO::Exception &)
+	catch (const ::TACO::Exception &e)
 	{
-		std::cout << "failed." << std::endl;
+		logStream->noticeStream() << GetClassName() << " : " << deviceName() << " : init failed. " << e.what() << log4cpp::eol;
 		Server::setDeviceState(DEVFAULT);
 	}
 }
 
 const char *TACO::Motor::Motor::GetClassName(void)
 {
-	return "Motor";
+	return "TACO::Motor";
 }
 
 const char *TACO::Motor::Motor::GetDevType()
@@ -113,7 +112,9 @@ void TACO::Motor::Motor::v_Init() throw (::TACO::Exception)
 
 TACO::Motor::Motor::~Motor() throw ()
 {
-	// VOID
+	if (m_motor)
+		delete(m_motor);
+	m_motor = NULL;
 }
 
 #if 0
@@ -145,7 +146,7 @@ void TACO::Motor::Motor::deviceReset() throw (::TACO::Exception)
 void TACO::Motor::Motor::stop() throw (::TACO::Exception)
 {
 	if (!m_motor)
-		throw ::TACO::Exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
+		throw_exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
 	m_motor->stop();
         updateResource<DevDouble>("lastpos", this->read());
 }
@@ -179,7 +180,7 @@ void TACO::Motor::Motor::tacoAbort(::TACO::Server *server, void *, void *) throw
 void TACO::Motor::Motor::move( DevDouble input) throw (::TACO::Exception)
 {
 	if (!m_motor)
-		throw ::TACO::Exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
+		throw_exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
 	m_motor->move(input);
 }
 
@@ -195,7 +196,7 @@ void TACO::Motor::Motor::tacoMove( ::TACO::Server* server, void* argin, void* ar
 void TACO::Motor::Motor::moveTo( DevDouble input) throw (::TACO::Exception)
 {
 	if (!m_motor)
-		throw ::TACO::Exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
+		throw_exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
 	m_motor->moveTo(input);
 }
 
@@ -211,7 +212,7 @@ void TACO::Motor::Motor::tacoMoveTo( ::TACO::Server* server, void* argin, void* 
 void TACO::Motor::Motor::setpos(DevDouble input) throw (::TACO::Exception)
 {
 	if (!m_motor)
-		throw ::TACO::Exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
+		throw_exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
 	m_motor->setpos(input);
         updateResource<DevDouble>("lastpos", this->read());
 }
@@ -228,11 +229,11 @@ void TACO::Motor::Motor::tacoSetpos(::TACO::Server *server, void *argin, void *)
 void TACO::Motor::Motor::setSpeed(DevDouble input) throw (::TACO::Exception)
 {
 	if (!m_motor)
-		throw ::TACO::Exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
+		throw_exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
 	if (input <= 0)
-		throw ::TACO::Exception(::TACO::Error::RANGE_ERROR, "requested speed is to low (<= 0)");
+		throw_exception(::TACO::Error::RANGE_ERROR, "requested speed is to low (<= 0)");
 	if (input > m_speedMax)
-		throw ::TACO::Exception(::TACO::Error::RANGE_ERROR, "requested speed is to high (> speedMax)");
+		throw_exception(::TACO::Error::RANGE_ERROR, "requested speed is to high (> speedMax)");
 	m_motor->setSpeed(input);
 }
 
@@ -248,7 +249,7 @@ void TACO::Motor::Motor::tacoSetSpeed(::TACO::Server *server, void *argin, void 
 DevDouble TACO::Motor::Motor::speed(void ) throw (::TACO::Exception)
 {
 	if (!m_motor)
-		throw ::TACO::Exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
+		throw_exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
 	return m_motor->speed();
 }
 
@@ -264,7 +265,7 @@ void TACO::Motor::Motor::tacoSpeed(::TACO::Server *server, void *, void *argout)
 DevDouble TACO::Motor::Motor::read(void) throw (::TACO::Exception)
 {
 	if (!m_motor)
-		throw ::TACO::Exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
+		throw_exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
 	return m_motor->read();
 }
 
@@ -320,7 +321,7 @@ void TACO::Motor::Motor::tacoMoveReference(::TACO::Server *server, void *, void 
 DevDouble TACO::Motor::Motor::acceleration(void) throw (::TACO::Exception)
 {
 	if (!m_motor)
-		throw ::TACO::Exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
+		throw_exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
 	return m_motor->acceleration();
 }
 
@@ -336,7 +337,7 @@ void TACO::Motor::Motor::tacoAcceleration(::TACO::Server *server, void *, void *
 void TACO::Motor::Motor::setAcceleration(DevDouble input) throw (::TACO::Exception)
 {
 	if (!m_motor)
-		throw ::TACO::Exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
+		throw_exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
 	m_motor->setAcceleration(input);
 }
 
@@ -352,7 +353,7 @@ void TACO::Motor::Motor::tacoSetAcceleration(::TACO::Server *server, void *argin
 void TACO::Motor::Motor::setUnit(const std::string &input) throw (::TACO::Exception)
 {
 	if (!m_motor)
-		throw ::TACO::Exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
+		throw_exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
 	m_motor->setUnit(input);
 }
 
@@ -368,7 +369,7 @@ void TACO::Motor::Motor::tacoSetUnit(::TACO::Server *server, void *argin, void *
 DevDouble TACO::Motor::Motor::backlash(void) throw (::TACO::Exception)
 {
 	if (!m_motor)
-		throw ::TACO::Exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
+		throw_exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
 	return m_motor->backlash();
 }
 
@@ -384,7 +385,7 @@ void TACO::Motor::Motor::tacoReadBacklash(::TACO::Server *server, void *, void *
 void TACO::Motor::Motor::setBacklash(DevDouble input) throw (::TACO::Exception)
 {
 	if (!m_motor)
-		throw ::TACO::Exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
+		throw_exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
 	m_motor->setBacklash(input);
 }
 
@@ -400,7 +401,7 @@ void TACO::Motor::Motor::tacoSetBacklash(::TACO::Server *server, void *argin, vo
 std::string TACO::Motor::Motor::unit(void ) throw (::TACO::Exception)
 {
 	if (!m_motor)
-		throw ::TACO::Exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
+		throw_exception(::TACO::Error::INTERNAL_ERROR, "motor worker not initialised");
 	return m_motor->unit();
 }
 
