@@ -808,7 +808,7 @@ should be used, for example function prototyping. Coding is best done using the
 automatic class generator written by Laurent Claustre (1992). Two versions of 
 this exist 
 -# an ascii version (classgen) which requires file input, and 
--# a Motif/X11 based version (xclassgen) which uses a graphic interface. 
+-# a Motif/X11 based version (xclassgen) which uses a graphical interface. 
 
 Consult the user's manual for the class generator for details on how to use it. 
 It is also possible to take an existing class and use it as the starting point 
