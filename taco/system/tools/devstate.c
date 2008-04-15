@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.2 $
+ * Version      : $Revision: 1.3 $
  *
- * Date         : $Date: 2008-04-06 09:08:03 $
+ * Date         : $Date: 2008-04-15 08:37:39 $
  *
  */
 
@@ -45,6 +45,7 @@
 #include <DevServer.h>
 #include <DevErrors.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #ifdef _solaris
 #include <taco_utils.h>
@@ -140,23 +141,28 @@ long devcmd(char *devname)
    status= dev_import(devname,WRITE_ACCESS,&ds,&error);
    if(status<0)
    {
-      printf("** import %s: %s **\n",devname,dev_error_str(error)+26);
+      printf("** import %s: %s **\n",devname,dev_error_str(error)+25);
       return(-1);
    }
    status= dev_putget(ds,DevState,NULL,D_VOID_TYPE,&short_state,D_SHORT_TYPE,&error);
    if(status==0)
    {
-      printf("%s:	%s\n",devname,DEVSTATES[short_state]);
-   }
+      if (short_state <= DEVON_NOT_REACHED)
+      	printf("%s:	%s\n",devname,DEVSTATES[short_state]);
+      else
+        printf("%s:     %d\n", devname, short_state);
+  }
    else
    {
       if(error==DevErr_IncompatibleCmdArgumentTypes)
       {
          status= dev_putget(ds,DevState,NULL,D_VOID_TYPE,&long_state,D_LONG_TYPE,&error);
-         if(status==0) printf(" %s:	%s\n",devname,DEVSTATES[long_state]);
-         else printf("** %s: %s **\n",devname,dev_error_str(error)+26);
+         if(status==0) 
+           printf(" %s:	%s\n",devname,DEVSTATES[long_state]);
+         else 
+           printf("** %s: %s **\n",devname,dev_error_str(error)+25);
       }
-      else printf("** %s: %s **\n",devname,dev_error_str(error)+26);
+      else printf("** %s: %s **\n",devname,dev_error_str(error)+25);
    } 
    dev_free(ds,&error);
    if(cmd_string[0]=='q') exit(0);
