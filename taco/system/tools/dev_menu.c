@@ -30,9 +30,9 @@
  *
  * Original     : JL PONS
  *
- * Version      : $Revision: 1.2 $
+ * Version      : $Revision: 1.3 $
  *
- * Date         : $Date: 2008-04-06 09:07:57 $
+ * Date         : $Date: 2008-04-15 08:36:14 $
  *
  */
 
@@ -960,6 +960,7 @@ int main(unsigned int argc,char **argv)
    /*
     *  import the device
     */
+   dev_name = argv[optind];
    printf("\nImporting %s \n",dev_name);
    
 
