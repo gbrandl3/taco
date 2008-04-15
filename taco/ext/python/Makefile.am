@@ -17,7 +17,7 @@
 
 EXTRA_DIST 		= TACOStates.i
 
-AM_CPPFLAGS 		= -I$(top_srcdir)/ext/include @TACO_INCLUDES@ @SWIG_PYTHON_CPPFLAGS@
+AM_CPPFLAGS 		= -I$(top_srcdir)/ext/include @TACO_INCLUDES@ @SWIG_PYTHON_CPPFLAGS@ -I$(top_srcdir)/log4cpp/include
 
 AM_CXXFLAGS 		= -Wall
 
