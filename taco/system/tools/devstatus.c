@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.2 $
+ * Version      : $Revision: 1.3 $
  *
- * Date         : $Date: 2008-04-06 09:08:03 $
+ * Date         : $Date: 2008-04-15 08:40:47 $
  *
  */
 
@@ -45,6 +45,8 @@
 #include <DevServer.h>
 #include <DevErrors.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <TACOBasicErrors.h>
 
 #ifdef _solaris
 #include <taco_utils.h>
@@ -151,7 +153,7 @@ long devcmd(char *devname)
    status= dev_import(devname,0,&ds,&error);
    if(status<0)
    {
-      printf("** import %s: %s **\n",devname,dev_error_str(error)+26);
+      printf("** import %s: %s **\n",devname,dev_error_str(error)+25);
       return(-1);
    }
    pts=NULL;
@@ -159,13 +161,34 @@ long devcmd(char *devname)
    if(status==0)
    {
       printf("%s:	%s\n",devname,pts);
+      dev_xdrfree(D_STRING_TYPE,&pts,&error);
+   }
+   else if (error == DevErr_TypeError)
+   {
+      DevVarCharArray ptr = {0, NULL};
+      status = dev_putget(ds, DevStatus, NULL, D_VOID_TYPE, &ptr, D_VAR_CHARARR, &error);
+      if (status == 0)
+      {
+	 pts = (char *)malloc(ptr.length + 1);
+	 strncpy(pts, ptr.sequence, ptr.length);
+	 pts[ptr.length] = '\0';
+         printf("%s:       %s\n",devname, pts);
+	 free(pts);
+         dev_xdrfree(D_VAR_CHARARR,&ptr,&error);
+      }	
+      else
+      {
+         printf("** %s: %s **\n",devname,dev_error_str(error)+25);
+         dev_free(ds,&error);
+         return(-1);
+      } 
    }
    else
    {
-      printf("** %s: %s **\n",devname,dev_error_str(error)+26);
+      printf("** %s: %s **\n",devname,dev_error_str(error)+25);
+      dev_free(ds,&error);
       return(-1);
    } 
    dev_free(ds,&error);
-   dev_xdrfree(D_STRING_TYPE,&pts,&error);
-      return(0);
+   return(0);
 }
