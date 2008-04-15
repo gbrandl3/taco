@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.2 $
+ * Version      : $Revision: 1.3 $
  *
- * Date         : $Date: 2008-04-06 09:08:03 $
+ * Date         : $Date: 2008-04-15 08:41:55 $
  *
  */
 
@@ -152,7 +152,7 @@ long devcmd(char *devname,char *pollname)
    status= dev_import(devname,0,&ds,&error);
    if(status<0)
    {
-      printf("import %s (%s): %s\n",devname,pollname,dev_error_str(error)+26);
+      printf("import %s (%s): %s\n",devname,pollname,dev_error_str(error)+25);
       return(-1);
    }
    status= dev_putget(ds,DevState,NULL,D_VOID_TYPE,&pts,D_SHORT_TYPE,&error);
@@ -164,7 +164,7 @@ long devcmd(char *devname,char *pollname)
 	 case (DevErr_CommandNotImplemented):
 	     break;
          default:
-      printf("putget %s (%s): %s\n",devname,pollname,dev_error_str(error)+26);
+      printf("putget %s (%s): %s\n",devname,pollname,dev_error_str(error)+25);
    	}
    } 
     dev_free(ds,&error);

@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.2 $
+ * Version      : $Revision: 1.3 $
  *
- * Date         : $Date: 2008-04-06 09:08:02 $
+ * Date         : $Date: 2008-04-15 08:41:55 $
  *
  */
 
@@ -159,7 +159,7 @@ long devcmd(char *devname)
    status= dev_import(devname,0,&ds,&error);
    if(status<0)
    {
-      printf("** import %s: %s **\n",devname,dev_error_str(error)+26);
+      printf("** import %s: %s **\n",devname,dev_error_str(error)+25);
       return(-1);
    }
 /*
@@ -169,7 +169,7 @@ long devcmd(char *devname)
    {
    */
       status= dev_putget(ds,DevReset,NULL,D_VOID_TYPE,NULL,D_VOID_TYPE,&error);
-      if(status<0) printf("** %s: %s **\n",devname,dev_error_str(error)+26);
+      if(status<0) printf("** %s: %s **\n",devname,dev_error_str(error)+25);
       else printf(" %s reseted \n",devname);
 /*
    }
@@ -187,7 +187,7 @@ long resetpulsedrelay(char *devname, long resettime)
    status= dev_import(devname,0,&ds,&error);
    if(status<0)
    {
-      printf("** import %s: %s **\n",devname,dev_error_str(error)+26);
+      printf("** import %s: %s **\n",devname,dev_error_str(error)+25);
       return(-1);
    }
 /*
@@ -197,7 +197,7 @@ long resetpulsedrelay(char *devname, long resettime)
    {
    */
       status= dev_putget(ds,DevReset,&resettime,D_LONG_TYPE,NULL,D_VOID_TYPE,&error);
-      if(status<0) printf("** %s: %s **\n",devname,dev_error_str(error)+26);
+      if(status<0) printf("** %s: %s **\n",devname,dev_error_str(error)+25);
       else printf(" %s reseted \n",devname);
 /*
    }

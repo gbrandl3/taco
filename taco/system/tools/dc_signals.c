@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.2 $
+ * Version      : $Revision: 1.3 $
  *
- * Date         : $Date: 2008-04-06 09:07:57 $
+ * Date         : $Date: 2008-04-15 08:41:55 $
  *
  */
 
@@ -143,7 +143,7 @@ long devcmd(char *devname)
    status= dev_import(devname,0,&ds,&error);
    if(status<0)
    {
-      printf("** import %s: %s **\n",devname,dev_error_str(error)+26);
+      printf("** import %s: %s **\n",devname,dev_error_str(error)+25);
       return(-1);
    }
    dev_rpc_protocol(ds,D_TCP,&error);
@@ -152,7 +152,7 @@ long devcmd(char *devname)
    status= dev_putget(ds,DevGetSigConfig,NULL,D_VOID_TYPE,&pts,D_VAR_STRINGARR,&error);
    if(status!=0)
    {
-      printf("** %s: %s **\n",devname,dev_error_str(error)+26);
+      printf("** %s: %s **\n",devname,dev_error_str(error)+25);
          return(-1);
    }
 printf("_________________________________________________\n");
@@ -162,7 +162,7 @@ printf("_________________________________________________\n");
       status= dev_putget(ds,DevReadSigValues,NULL,D_VOID_TYPE,&dvalues,D_VAR_DOUBLEARR,&error);
       if(status!=0)
       {
-         printf("** %s: %s **\n",devname,dev_error_str(error)+26);
+         printf("** %s: %s **\n",devname,dev_error_str(error)+25);
          return(-1);
       }
       else 

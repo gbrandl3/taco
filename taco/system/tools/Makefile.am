@@ -45,11 +45,10 @@ bin_PROGRAMS		+= devexp \
  			poll_test \
  			readsignals 
 
+AM_CPPFLAGS		= @TACO_INCLUDES@ -I$(top_srcdir)/ext/include
 if TANGO_BUILD
-AM_CPPFLAGS		= @TACO_INCLUDES@
 LDADD			= @TANGO_LIBS@ @CORBA_LDFLAGS@ @CORBA_LIBS@ @TANGO_CLIENT_CXX_LIBS@
 else
-AM_CPPFLAGS		= @TACO_INCLUDES@ 
 LDADD			= @TACO_CLIENT_LIBS@ 
 endif
 

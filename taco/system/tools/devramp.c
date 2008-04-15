@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.2 $
+ * Version      : $Revision: 1.3 $
  *
- * Date         : $Date: 2008-04-06 09:07:58 $
+ * Date         : $Date: 2008-04-15 08:41:55 $
  *
  */
 
@@ -154,11 +154,11 @@ long devcmd(char *devname,float value,float step)
    status= dev_import(devname,0,&ds,&error);
    if(status<0)
    {
-      printf("** import %s: %s **\n",devname,dev_error_str(error)+26);
+      printf("** import %s: %s **\n",devname,dev_error_str(error)+25);
       return(-1);
    }
       status= dev_putget(ds,DevRamp,&argin,D_VAR_FLOATARR,NULL,D_VOID_TYPE,&error);
-      if(status<0) printf("** %s: %s **\n",devname,dev_error_str(error)+26);
+      if(status<0) printf("** %s: %s **\n",devname,dev_error_str(error)+25);
       else printf(" %s switched ON \n",devname);
    dev_free(ds,&error);
    if(cmd_string[0]=='q') exit(0);
