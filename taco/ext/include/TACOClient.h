@@ -19,6 +19,10 @@
 #ifndef TACO_CLIENT_H
 #define TACO_CLIENT_H
 
+#include <log4cpp/Category.hh>
+
+extern log4cpp::Category       *logStream;
+
 #include <string>
 #include <set>
 

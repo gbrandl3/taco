@@ -26,6 +26,7 @@
 #include <TACOStringConverters.h>
 
 #include <TACOServer.h>
+log4cpp::Category       *logStream;
 
 #include <private/ApiP.h>
 
