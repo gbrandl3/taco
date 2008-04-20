@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.4 $
+ * Version      : $Revision: 1.5 $
  *
- * Date         : $Date: 2008-04-20 08:38:44 $
+ * Date         : $Date: 2008-04-20 10:06:58 $
  *
  */
 
@@ -160,12 +160,12 @@ long devcmd(char *devname)
       status = dev_putget(ds, TACO_COMMAND_READ_DOUBLE, NULL, D_VOID_TYPE, &value, D_DOUBLE_TYPE, &error);
       if (status == 0)
       {
-         printf("%s:        %.3g\n", devname, value);
+         printf("%s:        %g\n", devname, value);
       }
       else if (error == DevErr_RuntimeError)
       {
          DevLong tmpLong;
-         status = dev_putget(ds, TACO_COMMAND_READ_LONG, NULL, D_VOID_TYPE, &value, D_LONG_TYPE, &error);
+         status = dev_putget(ds, TACO_COMMAND_READ_LONG, NULL, D_VOID_TYPE, &tmpLong, D_LONG_TYPE, &error);
          if (status == 0)
          {
             printf("%s:       %ld\n", devname, tmpLong);
@@ -173,10 +173,10 @@ long devcmd(char *devname)
          else if (error == DevErr_RuntimeError)
          {
             DevULong tmpULong;
-            status = dev_putget(ds, TACO_COMMAND_READ_U_LONG, NULL, D_VOID_TYPE, &value, D_ULONG_TYPE, &error);
+            status = dev_putget(ds, TACO_COMMAND_READ_U_LONG, NULL, D_VOID_TYPE, &tmpULong, D_ULONG_TYPE, &error);
             if (status == 0)
             {
-               printf("%s:       %ul\n", devname, tmpLong);
+               printf("%s:       %lu\n", devname, tmpULong);
             }
             else 
             {
