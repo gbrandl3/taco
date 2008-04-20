@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.3 $
+ * Version      : $Revision: 1.4 $
  *
- * Date         : $Date: 2008-04-15 08:41:55 $
+ * Date         : $Date: 2008-04-20 08:38:44 $
  *
  */
 
@@ -44,7 +44,13 @@
 #include <API.h>
 #include <DevServer.h>
 #include <DevErrors.h>
+#include <TACOBasicErrors.h>
 #include <stdio.h>
+
+#define TACODevelTeamNumber DS_LSHIFT(9,DS_TEAM_SHIFT)
+#define TACO_COMMAND_READ_LONG (TACODevelTeamNumber + 68L)
+#define TACO_COMMAND_READ_DOUBLE (TACODevelTeamNumber + 83L)
+#define TACO_COMMAND_READ_U_LONG (TACODevelTeamNumber + 88L)
 
 #ifdef _solaris
 #include <taco_utils.h>
@@ -149,7 +155,45 @@ long devcmd(char *devname)
    {
       printf("%s:	%.3g\n",devname,value);
    }
-   else
+   else if (error == DevErr_RuntimeError)
+   {
+      status = dev_putget(ds, TACO_COMMAND_READ_DOUBLE, NULL, D_VOID_TYPE, &value, D_DOUBLE_TYPE, &error);
+      if (status == 0)
+      {
+         printf("%s:        %.3g\n", devname, value);
+      }
+      else if (error == DevErr_RuntimeError)
+      {
+         DevLong tmpLong;
+         status = dev_putget(ds, TACO_COMMAND_READ_LONG, NULL, D_VOID_TYPE, &value, D_LONG_TYPE, &error);
+         if (status == 0)
+         {
+            printf("%s:       %ld\n", devname, tmpLong);
+         }
+         else if (error == DevErr_RuntimeError)
+         {
+            DevULong tmpULong;
+            status = dev_putget(ds, TACO_COMMAND_READ_U_LONG, NULL, D_VOID_TYPE, &value, D_ULONG_TYPE, &error);
+            if (status == 0)
+            {
+               printf("%s:       %ul\n", devname, tmpLong);
+            }
+            else 
+            {
+               printf("** %s: %s **\n",devname,dev_error_str(error)+25);
+            }
+         }
+         else 
+         {
+            printf("** %s: %s **\n",devname,dev_error_str(error)+25);
+         }
+      }
+      else 
+      {
+         printf("** %s: %s **\n",devname,dev_error_str(error)+25);
+      }
+   }
+   else 
    {
       printf("** %s: %s **\n",devname,dev_error_str(error)+25);
    } 
