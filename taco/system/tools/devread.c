@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.5 $
+ * Version      : $Revision: 1.6 $
  *
- * Date         : $Date: 2008-04-20 10:06:58 $
+ * Date         : $Date: 2008-04-20 10:24:07 $
  *
  */
 
@@ -128,7 +128,7 @@ int main(int argc, char **argv)
       printf("no device has this name\n");
       exit(0);
    }
-   printf("device name		value\n");
+   printf("%-32s  %s\n", "device name", "value");
    for(i=0;i<dev_nb;i++)
    {
       devcmd(device_tab[i]);
@@ -153,14 +153,14 @@ long devcmd(char *devname)
    status= dev_putget(ds,DevRead,NULL,D_VOID_TYPE,&value,D_DOUBLE_TYPE,&error);
    if(status==0)
    {
-      printf("%s:	%.3g\n",devname,value);
+      printf("%-32s: %.3g\n",devname,value);
    }
    else if (error == DevErr_RuntimeError)
    {
       status = dev_putget(ds, TACO_COMMAND_READ_DOUBLE, NULL, D_VOID_TYPE, &value, D_DOUBLE_TYPE, &error);
       if (status == 0)
       {
-         printf("%s:        %g\n", devname, value);
+         printf("%-32s: %g\n", devname, value);
       }
       else if (error == DevErr_RuntimeError)
       {
@@ -168,7 +168,7 @@ long devcmd(char *devname)
          status = dev_putget(ds, TACO_COMMAND_READ_LONG, NULL, D_VOID_TYPE, &tmpLong, D_LONG_TYPE, &error);
          if (status == 0)
          {
-            printf("%s:       %ld\n", devname, tmpLong);
+            printf("%-32s: %ld\n", devname, tmpLong);
          }
          else if (error == DevErr_RuntimeError)
          {
@@ -176,7 +176,7 @@ long devcmd(char *devname)
             status = dev_putget(ds, TACO_COMMAND_READ_U_LONG, NULL, D_VOID_TYPE, &tmpULong, D_ULONG_TYPE, &error);
             if (status == 0)
             {
-               printf("%s:       %lu\n", devname, tmpULong);
+               printf("%-32s: %lu\n", devname, tmpULong);
             }
             else 
             {
