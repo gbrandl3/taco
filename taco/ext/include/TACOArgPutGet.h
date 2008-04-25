@@ -132,9 +132,9 @@ namespace TACO {
 		DevVarStringArray dv;
 	};
 
-	template <> class ArgPut<std::vector<short> > : public ArgBase<DevVarShortArray> {
+	template <> class ArgPut<std::vector<DevShort> > : public ArgBase<DevVarShortArray> {
 	public:
-		explicit ArgPut( const std::vector<short>& i) : v( i)
+		explicit ArgPut( const std::vector<DevShort>& i) : v( i)
 		{
 			// VOID
 		}
@@ -147,13 +147,13 @@ namespace TACO {
 		}
 	
 	private:
-		const std::vector<short>& v;
+		const std::vector<DevShort>& v;
 		DevVarShortArray dv;
 	};
 
-	template <> class ArgPut<std::vector<unsigned short> > : public ArgBase<DevVarUShortArray> {
+	template <> class ArgPut<std::vector<DevUShort> > : public ArgBase<DevVarUShortArray> {
 	public:
-		explicit ArgPut( const std::vector<unsigned short>& i) : v( i)
+		explicit ArgPut( const std::vector<DevUShort>& i) : v( i)
 		{
 			// VOID
 		}
@@ -166,7 +166,7 @@ namespace TACO {
 		}
 	
 	private:
-		const std::vector<unsigned short>& v;
+		const std::vector<DevUShort>& v;
 		DevVarUShortArray dv;
 	};
 
@@ -208,9 +208,9 @@ namespace TACO {
 		DevVarULongArray dv;
 	};
 
-	template <> class ArgPut<std::vector<float> > : public ArgBase<DevVarFloatArray> {
+	template <> class ArgPut<std::vector<DevFloat> > : public ArgBase<DevVarFloatArray> {
 	public:
-		explicit ArgPut( const std::vector<float>& i) : v( i)
+		explicit ArgPut( const std::vector<DevFloat>& i) : v( i)
 		{
 			// VOID
 		}
@@ -223,13 +223,13 @@ namespace TACO {
 		}
 	
 	private:
-		const std::vector<float>& v;
+		const std::vector<DevFloat>& v;
 		DevVarFloatArray dv;
 	};
 
-	template <> class ArgPut<std::vector<double> > : public ArgBase<DevVarDoubleArray> {
+	template <> class ArgPut<std::vector<DevDouble> > : public ArgBase<DevVarDoubleArray> {
 	public:
-		explicit ArgPut( const std::vector<double>& i) : v( i)
+		explicit ArgPut( const std::vector<DevDouble>& i) : v( i)
 		{
 			// VOID
 		}
@@ -242,7 +242,7 @@ namespace TACO {
 		}
 	
 	private:
-		const std::vector<double>& v;
+		const std::vector<DevDouble>& v;
 		DevVarDoubleArray dv;
 	};
 
@@ -423,7 +423,7 @@ namespace TACO {
 		std::vector<std::string> v;
 	};
 
-	template <> class ArgGet<std::vector<short> > : public ArgGetBase<DevVarShortArray> {
+	template <> class ArgGet<std::vector<DevShort> > : public ArgGetBase<DevVarShortArray> {
 	public:
 		explicit ArgGet() : ArgGetBase<DevVarShortArray>()
 		{
@@ -450,7 +450,7 @@ namespace TACO {
 			return static_cast<void*>( &t);
 		}
 
-		std::vector<short> object()
+		std::vector<DevShort> object()
 		{
 			if (t.sequence != 0) {
 				v.assign( t.sequence, t.sequence + t.length);
@@ -461,10 +461,10 @@ namespace TACO {
 		}
 
 	private:
-		std::vector<short> v;
+		std::vector<DevShort> v;
 	};
 
-	template <> class ArgGet<std::vector<unsigned short> > : public ArgGetBase<DevVarUShortArray> {
+	template <> class ArgGet<std::vector<DevUShort> > : public ArgGetBase<DevVarUShortArray> {
 	public:
 		explicit ArgGet() : ArgGetBase<DevVarUShortArray>()
 		{
@@ -491,7 +491,7 @@ namespace TACO {
 			return static_cast<void*>( &t);
 		}
 
-		std::vector<unsigned short> object()
+		std::vector<DevUShort> object()
 		{
 			if (t.sequence != 0) {
 				v.assign( t.sequence, t.sequence + t.length);
@@ -502,10 +502,10 @@ namespace TACO {
 		}
 
 	private:
-		std::vector<unsigned short> v;
+		std::vector<DevUShort> v;
 	};
 
-	template <> class ArgGet<std::vector<long> > : public ArgGetBase<DevVarLongArray> {
+	template <> class ArgGet<std::vector<DevLong> > : public ArgGetBase<DevVarLongArray> {
 	public:
 		explicit ArgGet() : ArgGetBase<DevVarLongArray>()
 		{
@@ -532,7 +532,7 @@ namespace TACO {
 			return static_cast<void*>( &t);
 		}
 
-		std::vector<long> object()
+		std::vector<DevLong> object()
 		{
 			if (t.sequence != 0) {
 				v.assign( t.sequence, t.sequence + t.length);
@@ -543,10 +543,10 @@ namespace TACO {
 		}
 
 	private:
-		std::vector<long> v;
+		std::vector<DevLong> v;
 	};
 
-	template <> class ArgGet<std::vector<unsigned long> > : public ArgGetBase<DevVarULongArray> {
+	template <> class ArgGet<std::vector<DevULong> > : public ArgGetBase<DevVarULongArray> {
 	public:
 		explicit ArgGet() : ArgGetBase<DevVarULongArray>()
 		{
@@ -573,7 +573,7 @@ namespace TACO {
 			return static_cast<void*>( &t);
 		}
 
-		std::vector<unsigned long> object()
+		std::vector<DevULong> object()
 		{
 			if (t.sequence != 0) {
 				v.assign( t.sequence, t.sequence + t.length);
@@ -584,10 +584,10 @@ namespace TACO {
 		}
 
 	private:
-		std::vector<unsigned long> v;
+		std::vector<DevULong> v;
 	};
 
-	template <> class ArgGet<std::vector<float> > : public ArgGetBase<DevVarFloatArray> {
+	template <> class ArgGet<std::vector<DevFloat> > : public ArgGetBase<DevVarFloatArray> {
 	public:
 		explicit ArgGet() : ArgGetBase<DevVarFloatArray>()
 		{
@@ -614,7 +614,7 @@ namespace TACO {
 			return static_cast<void*>( &t);
 		}
 
-		std::vector<float> object()
+		std::vector<DevFloat> object()
 		{
 			if (t.sequence != 0) {
 				v.assign( t.sequence, t.sequence + t.length);
@@ -625,10 +625,10 @@ namespace TACO {
 		}
 
 	private:
-		std::vector<float> v;
+		std::vector<DevFloat> v;
 	};
 
-	template <> class ArgGet<std::vector<double> > : public ArgGetBase<DevVarDoubleArray> {
+	template <> class ArgGet<std::vector<DevDouble> > : public ArgGetBase<DevVarDoubleArray> {
 	public:
 		explicit ArgGet() : ArgGetBase<DevVarDoubleArray>()
 		{
@@ -655,7 +655,7 @@ namespace TACO {
 			return static_cast<void*>( &t);
 		}
 
-		std::vector<double> object()
+		std::vector<DevDouble> object()
 		{
 			if (t.sequence != 0) {
 				v.assign( t.sequence, t.sequence + t.length);
@@ -666,7 +666,7 @@ namespace TACO {
 		}
 
 	private:
-		std::vector<double> v;
+		std::vector<DevDouble> v;
 	};
 
 	template<typename T> class ResourceGet : public ArgGet<T> {
