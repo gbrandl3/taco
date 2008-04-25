@@ -57,9 +57,10 @@ namespace TACO {
 	/**
 	 * Synchronize the process with pending asynchronous events.
 	 *
+	 * @param timeout 
 	 * @see Client::eventListen()
 	 */
-	void synchronize( double timeout) throw (::TACO::Exception);
+	void synchronize( DevDouble timeout) throw (::TACO::Exception);
 }
 
 /**
@@ -92,7 +93,14 @@ public:
 	//! Device type set
 	typedef std::set<std::string> DeviceTypeSet;
 
-	//! Constructs a client and connects to the device if desired
+	/** 
+	 * Constructs a client and connects to the device if desired
+	 *
+	 * @param name the device name '[//nethost/]domain/family/member[?program_number]'
+	 * @param access required access rights
+	 * @param connect automatic connect or not
+	 * @throw TACO::Exception in case of failure
+	 */
 	Client( const std::string& name, DevLong access = 0, bool connect = true) throw (::TACO::Exception);
 
 	//! Constructs an unconnected client
@@ -115,7 +123,7 @@ public:
 	/**
 	 * Connect the client.
 	 *
-	 * @exception Undocumented
+	 * @exception TACO::Exception in case of failure
 	 *	This method uses the %TACO dev_import() and dev_cmd_query() functions.
 	 *	The possible errors of these functions are not documented.
 	 */
@@ -124,7 +132,9 @@ public:
 	/**
 	 * Connect the client with new connection parameters.
 	 *
-	 * @exception Undocumented
+	 * @param name the device name '[//nethost/]domain/family/member[?program_number]'
+	 * @param access required access rights
+	 * @exception TACO::Exception in case of failure
 	 *	This method uses the %TACO dev_import() and dev_cmd_query() functions.
 	 *	The possible errors of these functions are not documented.
 	 */
@@ -145,7 +155,7 @@ public:
 	/**
 	 * Disconnect the client.
 	 *
-	 * @exception Undocumented
+	 * @exception TACO::Exception in case of failure
 	 *	This method uses the %TACO dev_free() function.
 	 *	The possible errors of this function are not documented.
 	 */
@@ -154,7 +164,7 @@ public:
 	/**
 	 * Reconnect the client.
 	 *
-	 * @exception Undocumented
+	 * @exception TACO::Exception in case of failure
 	 *	This method uses the %TACO dev_import(), dev_cmd_query() and dev_free() functions.
 	 *	The possible errors of these functions are not documented.
 	 */
@@ -196,9 +206,10 @@ public:
 	 * In this case <em>huge</em> means more than 8kB data. This limit comes from the UDP itself and
 	 * there is <b>no</b> way to change this limit!
 	 *
+	 * @param protocol
 	 * @exception Error::RUNTIME_ERROR
 	 *
-	 * @exception Undocumented
+	 * @exception TACO::Exception in case of failure
 	 *	This method uses the %TACO dev_rpc_protocol() function.
 	 *	The possible errors of this function are not documented.
 	 *
@@ -209,9 +220,10 @@ public:
 	/**
 	 * Returns the current network timeout.
 	 *
+	 * @return the network timeout in seconds
 	 * @exception Error::RUNTIME_ERROR
 	 *
-	 * @exception Undocumented
+	 * @exception TACO::Exception in case of failure
 	 *	This method uses the %TACO dev_rpc_timeout() function.
 	 *	The possible errors of this function are not documented.
 	 *
@@ -222,11 +234,13 @@ public:
 	/**
 	 * Sets the network timeout.
 	 *
+	 * @param timeout the allowed timeout for a action to the device in seconds
+	 *
 	 * @exception Error::RANGE_ERROR
 	 *
 	 * @exception Error::RUNTIME_ERROR
 	 *
-	 * @exception Undocumented
+	 * @exception TACO::Exception in case of failure
 	 *	This method uses the %TACO dev_rpc_timeout() function.
 	 *	The possible errors of this function are not documented.
 	 *
@@ -336,21 +350,42 @@ public:
 
 	/**
 	 * Returns the value of a device resource with the given <em>name</em>.
+	 * 
+	 * @param name the name of the resource
+	 * @return the current value of the resource in the device
+	 * @see deviceUpdateResource
+	 * @throw TACO::Exception in case of failure
 	 */
 	std::string deviceQueryResource( const std::string& name) throw (::TACO::Exception);
 
 	/**
 	 * Updates the <em>value</em> of a device resource with the given <em>name</em>.
+	 *
+	 * @param name the name of the resource
+	 * @param value the value of the resource
+	 * @see deviceQueryResource
+	 * @throw TACO::Exception in case of failure
 	 */
 	void deviceUpdateResource( const std::string& name, const std::string& value) throw (::TACO::Exception);
 
 	/**
 	 * Updates all device resources.
+	 *
+	 * @see deviceQueryResource
+	 * @see deviceUpdateResource
+	 * @see deviceQueryResourceInfo
+	 * @throw TACO::Exception in case of failure
 	 */
 	void deviceUpdate() throw (::TACO::Exception);
 
 	/**
 	 * Queries all device resources information.
+	 * 
+	 * @return all device resource informations
+	 * @see deviceQueryResource
+	 * @see deviceUpdateResource
+	 * @see deviceUpdate
+	 * @throw TACO::Exception in case of failure
 	 */
 	ResourceInfoSet deviceQueryResourceInfo() throw (::TACO::Exception);
 
@@ -367,10 +402,16 @@ public:
 	/**
 	 * Start listen to an event.
 	 *
+	 * @param event	the event number
+	 * @param handler pointer to the event handler
+	 * @param userData pointer to the user data
+	 * @param eventData pointer to the event data
 	 * @warning
 	 * The pointer to the <em>event data</em> must be valid during the time listening to the event.
 	 *
-	 * @see eventUnlisten(), synchronize()
+	 * @see eventUnlisten()
+	 * @see synchronize()
+	 * @throw TACO::Exception in case of failure
 	 */
 	template<typename T> DevLong eventListen( DevEvent event, EventHandler* handler, void* userData, T* eventData) throw (::TACO::Exception)
 	{
@@ -386,6 +427,9 @@ public:
 	/**
 	 * Start listen to an event.
 	 *
+	 * @param event the event number
+	 * @param handler pointer to the event handler
+	 * @param userData pointer to the user data
 	 * @see eventUnlisten(), synchronize()
 	 */
 	DevLong eventListen( DevEvent event, EventHandler* handler, void* userData) throw (::TACO::Exception);
@@ -395,6 +439,8 @@ public:
 	 *
 	 * The member function eventHandler() is used as the event handler.
 	 *
+	 * @param event the event number
+	 * @param eventData the event data
 	 * @warning
 	 * The pointer to the <em>event data</em> must be valid during the time listening to the event.
 	 *
@@ -410,6 +456,7 @@ public:
 	 *
 	 * The member function eventHandler() is used as the event handler.
 	 *
+	 * @param event the event number
 	 * @see eventHandler(), eventUnlisten(), synchronize()
 	 */
 	DevLong eventListen( DevEvent event) throw (::TACO::Exception)
@@ -419,7 +466,9 @@ public:
 
 	/**
 	 * Stop listen to an event.
-	 *
+	 * 
+	 * @param event the event number
+	 * @param id the id got from eventListen
 	 * @see eventListen(), synchronize()
 	 */
 	void eventUnlisten( DevEvent event, DevLong id) throw (::TACO::Exception);
@@ -430,6 +479,7 @@ protected:
 	/**
 	 * Standard event handler.
 	 *
+	 * @param data
 	 * @see eventListen( DevEvent event, T& eventData), eventListen( DevEvent event), synchronize()
 	 */
 	virtual void* eventHandler( EventHandlerData data) throw ();
