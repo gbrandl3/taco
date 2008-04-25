@@ -31,4 +31,4 @@ libTACOExtensions_la_SOURCES = TACOServer.cpp \
 	TACOAdmin.cpp
 
 libTACOExtensions_la_LDFLAGS = -version-info @LIB_VERSION@
-libTACOExtensions_la_LIBADD = @TACO_SERVER_CXX_LIBS@ @LIB_STDCXX@ $(top_builddir)/lib/log4taco/liblog4taco.la
+libTACOExtensions_la_LIBADD = @TACO_CLIENT_CXX_LIBS@ @LIB_STDCXX@ $(top_builddir)/lib/log4taco/liblog4taco.la
