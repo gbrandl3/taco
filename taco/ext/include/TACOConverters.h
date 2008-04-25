@@ -82,14 +82,14 @@ namespace TACO {
 		return tmp;
 	}
 
-	inline std::vector<short> convert( DevVarShortArray* argin) throw()
+	inline std::vector<DevShort> convert( DevVarShortArray* argin) throw()
 	{
-		return std::vector<short>( argin->sequence, argin->sequence + argin->length);
+		return std::vector<DevShort>( argin->sequence, argin->sequence + argin->length);
 	}
 
-	inline std::vector<unsigned short> convert( DevVarUShortArray* argin) throw()
+	inline std::vector<DevUShort> convert( DevVarUShortArray* argin) throw()
 	{
-		return std::vector<unsigned short>( argin->sequence, argin->sequence + argin->length);
+		return std::vector<DevUShort>( argin->sequence, argin->sequence + argin->length);
 	}
 
 	inline std::vector<DevLong> convert( DevVarLongArray* argin) throw()
@@ -102,14 +102,14 @@ namespace TACO {
 		return std::vector<DevULong>( argin->sequence, argin->sequence + argin->length);
 	}
 
-	inline std::vector<float> convert( DevVarFloatArray* argin) throw()
+	inline std::vector<DevFloat> convert( DevVarFloatArray* argin) throw()
 	{
-		return std::vector<float>( argin->sequence, argin->sequence + argin->length);
+		return std::vector<DevFloat>( argin->sequence, argin->sequence + argin->length);
 	}
 
-	inline std::vector<double> convert( DevVarDoubleArray* argin) throw()
+	inline std::vector<DevDouble> convert( DevVarDoubleArray* argin) throw()
 	{
-		return std::vector<double>( argin->sequence, argin->sequence + argin->length);
+		return std::vector<DevDouble>( argin->sequence, argin->sequence + argin->length);
 	}
 
 	// The assignment functions assume that the right hand data is not modified in any way
@@ -202,16 +202,16 @@ namespace TACO {
 		left->sequence = (left->length == 0) ? 0 : const_cast<DevULong*>( &right.front());
 	}
 
-	inline void assign( DevVarFloatArray* left, const std::vector<float>& right) throw ()
+	inline void assign( DevVarFloatArray* left, const std::vector<DevFloat>& right) throw ()
 	{
 		left->length = right.size();
-		left->sequence = (left->length == 0) ? 0 : const_cast<float*>( &right.front());
+		left->sequence = (left->length == 0) ? 0 : const_cast<DevFloat*>( &right.front());
 	}
 
-	inline void assign( DevVarDoubleArray* left, const std::vector<double>& right) throw ()
+	inline void assign( DevVarDoubleArray* left, const std::vector<DevDouble>& right) throw ()
 	{
 		left->length = right.size();
-		left->sequence = (left->length == 0) ? 0 : const_cast<double*>( &right.front());
+		left->sequence = (left->length == 0) ? 0 : const_cast<DevDouble*>( &right.front());
 	}
 #if HAVE_STRUCT_TIMESPEC
 	inline void assign( struct timespec& left, double right) throw (Exception)
