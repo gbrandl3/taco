@@ -26,9 +26,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2006-09-20 16:33:04 $
+ * Date:        $Date: 2008-04-30 13:42:46 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -40,11 +40,11 @@
 #	include "config.h"
 #endif // HAVE_CONFIG_H
 
+#include <TestExtServer.h>
 #include <TACOConverters.h>
 #include <TACOBasicCommands.h>
-#include <TestExtServer.h>
 
-Test::Ext::Server::Server( const std::string& name, long& error) throw (::TACO::Exception)
+Test::Ext::Server::Server( const std::string &name, DevLong &error) throw (::TACO::Exception)
 	: ::TACO::Server( name, error)
 {
 	setDeviceVersion( VERSION );

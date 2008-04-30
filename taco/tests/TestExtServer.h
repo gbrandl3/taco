@@ -14,7 +14,7 @@ namespace Test {
 class Test::Ext::Server : public ::TACO::Server
 {
 public:
-        Server( const std::string& name, long& error) throw (::TACO::Exception);
+        Server( const std::string &name, DevLong &error) throw (::TACO::Exception);
 
         ~Server() throw ();
 protected:

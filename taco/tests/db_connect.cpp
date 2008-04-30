@@ -25,9 +25,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2006-09-18 22:34:41 $
+ * Date:        $Date: 2008-04-30 13:42:46 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -54,7 +54,7 @@
  */
 int main(int argc, char *argv[])
 {
-	long 	error;
+	DevLong error;
 //
 // Connect to database server
 //

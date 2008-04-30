@@ -6,19 +6,19 @@
 class TestDevice : public Device
 {
 public:
-	TestDevice(const std::string name, long &error);
+	TestDevice(const std::string name, DevLong &error);
 	~TestDevice();
 protected:
-	long tacoSendByteArray(void *argin, void *argout, long *error);
+	long tacoSendByteArray(void *argin, void *argout, DevLong *error);
 };
 
 class TestDevice2 : public Device
 {
 public:
-       TestDevice2(const std::string name, long &error);
+       TestDevice2(const std::string name, DevLong &error);
        ~TestDevice2();
 protected:
-       long tacoRead(void *argin, void *argout, long *error);
+       long tacoRead(void *argin, void *argout, DevLong *error);
 };
 
 #endif

@@ -26,9 +26,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2006-09-18 22:34:41 $
+ * Date:        $Date: 2008-04-30 13:42:46 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -58,7 +58,7 @@ void usage(const char *cmd)
 
 int main(int argc, char **argv)
 {
-	long 	error;
+	DevLong error;
 	char 	*ptr;
 	long 	nb_dev,
         	nb_res,

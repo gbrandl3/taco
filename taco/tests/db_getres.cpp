@@ -26,9 +26,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2008-04-06 09:08:05 $
+ * Date:        $Date: 2008-04-30 13:42:47 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -44,7 +44,7 @@
 
 int main(int argc, char *argv[])
 {
-	long error;
+	DevLong error;
 //
 // Argument test and device name structure
 //
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
 //
 	try
 	{
-		DevLong tmp = ::TACO::queryResource<DevLong>(dev_name, res_name, 255);
+		DevLong tmp = ::TACO::queryResource<DevLong>(dev_name, res_name); // , 255);
 		std::cout << tmp << std::endl;
 	}
 	catch ( ... )

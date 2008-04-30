@@ -25,9 +25,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.12 $
+ * Version:     $Revision: 1.13 $
  *
- * Date:        $Date: 2008-04-06 09:08:06 $
+ * Date:        $Date: 2008-04-30 13:42:48 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -43,7 +43,7 @@
 #include <iostream>
 #include <iomanip>
 
-TestDevice::TestDevice(const std::string name, long &error)
+TestDevice::TestDevice(const std::string name, DevLong &error)
 	: Device(const_cast<char *>(name.c_str()), &error)
 {
 	static Device::DeviceCommandListEntry commands_list[] = {
@@ -70,7 +70,7 @@ TestDevice::~TestDevice()
 {
 }
 
-long TestDevice::tacoSendByteArray(void *argin, void *argout, long *error)
+long TestDevice::tacoSendByteArray(void *argin, void *argout, DevLong *error)
 {
 	static	DevVarCharArray	*p; 
 	static	DevVarCharArray	arr = {0, NULL};
@@ -90,7 +90,7 @@ long TestDevice::tacoSendByteArray(void *argin, void *argout, long *error)
 	return DS_OK;
 }
 
-extern "C" long startup(char *serverName, long *error)
+extern "C" long startup(char *serverName, DevLong *error)
 {
 /*
  * pointer to list of devices returned by database.
@@ -111,7 +111,7 @@ extern "C" long startup(char *serverName, long *error)
 		Device	**dev = new Device*[dev_no];
 		for (unsigned int i = 0; i < dev_no; ++i)
 		{
-			long		lError;
+			DevLong		lError;
 			db_resource	r;
 			char		*type;
                 	r.resource_name = "type";
@@ -139,7 +139,7 @@ extern "C" long startup(char *serverName, long *error)
 	return DS_OK;
 }
 
-TestDevice2::TestDevice2(const std::string name, long &error)
+TestDevice2::TestDevice2(const std::string name, DevLong &error)
 	: Device(const_cast<char *>(name.c_str()), &error)
 {
 	static Device::DeviceCommandListEntry commands_list[] = {
@@ -175,7 +175,7 @@ TestDevice2::~TestDevice2()
 {
 }
 
-long TestDevice2::tacoRead(void *argin, void *argout, long *error)
+long TestDevice2::tacoRead(void *argin, void *argout, DevLong *error)
 {
 	*error = DS_OK;
 	DevVarCharArray	*p; 

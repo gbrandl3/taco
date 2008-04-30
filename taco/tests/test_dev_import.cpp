@@ -26,9 +26,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2008-04-06 09:08:06 $
+ * Date:        $Date: 2008-04-30 13:42:48 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -47,7 +47,7 @@
 
 int main(int argc, char *argv[])
 {
-	long error;
+	DevLong error;
 //
 // Argument test and device name structure
 //

@@ -26,9 +26,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2006-09-27 12:43:12 $
+ * Date:        $Date: 2008-04-30 13:42:47 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -47,7 +47,7 @@
 int main(int argc, char *argv[])
 {
 	DevVarStringArray       server_list = {0, NULL};
-	long error;
+	DevLong error;
 //
 // Argument test and device name structure
 //

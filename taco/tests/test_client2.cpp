@@ -25,9 +25,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2006-11-03 16:06:22 $
+ * Date:        $Date: 2008-04-30 13:42:48 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -50,8 +50,8 @@ int main(int argc,char **argv)
 
 	devserver 		ps;
 	long 			readwrite = ADMIN_ACCESS, 
-				pid,
-				error;
+				pid;
+	DevLong			error;
 	int 			cmd, 
 				status;
 	char			*ch_ptr; 

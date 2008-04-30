@@ -25,9 +25,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2006-09-18 22:34:41 $
+ * Date:        $Date: 2008-04-30 13:42:46 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -38,11 +38,11 @@
 #include <vector>
 #include <iostream>
 
+#include <TestExtServer.h>
 #include <TACOExtensions.h>
 #include <Admin.h>
-#include <TestExtServer.h>
 
-long startup( char* serverName, long* e)
+long startup( char *serverName, DevLong *e)
 {
 	extern long debug_flag;
 //	debug_flag = DEBUG_ON_OFF | DBG_DEV_SVR_CLASS;
