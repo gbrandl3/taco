@@ -539,6 +539,8 @@ AC_DEFUN([TACO_CLIENT_TCP],
 [
         AC_ARG_ENABLE(client_tcp, AC_HELP_STRING([--enable-client_tcp], [client connections will be TCP by default (if disabled they will be UDP)@<:@default=yes@:>@]),
                 [], [enable_client_tcp=yes])
+	AH_TEMPLATE(CLIENT_TCP, [define to one if the clients should be run TCP mode as default])
+	AS_IF(test "x$enable_client_tcp" = "xyes", AC_DEFINE(CLIENT_TCP), [])
         AM_CONDITIONAL(CLIENT_TCP, test "x$enable_client_tcp" = "xyes")
 ])
 
