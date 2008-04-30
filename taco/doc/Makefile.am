@@ -25,7 +25,7 @@ EXTRA_DIST	= README
 # doc: language FORCE
 doc:	FORCE index.doc Doxyfile taco_manual.pdf started.doc
 	@DOXYGEN@
-	@echo rm -f latex/refman.tex
+	@rm -f latex/refman.tex
 	@cp @srcdir@/taco_logo.gif html
 	@sed -e "s/\$$VERSION/$(VERSION)/g" taco_manual.tex >latex/taco_manual.tex
 	@sed -e "s/\$$VERSION/$(VERSION)/g" taco.sty >latex/taco.sty 
@@ -35,8 +35,10 @@ latex/index.tex:
 	@DOXYGEN@
 
 taco_manual.pdf: taco_manual.tex taco.sty latex/index.tex taco_logo.pdf tacoarch.pdf \
-		tacodsm.pdf dsm_model.pdf cmd_exe.pdf class_hierarchy.pdf procedure.pdf \
+		tacodsm.pdf dsm_model.pdf cmd_exe.pdf class_hierarchy.pdf \
 		devwindow.pdf filewindow.pdf servwindow.pdf reswindow.pdf newserver.pdf
+	@cp latex/procedure.pdf .
+	@cp latex/agps_states.pdf .
 	@echo "Running latex..."
 	@pdflatex taco_manual.tex
 	@echo "Running makeindex..."
