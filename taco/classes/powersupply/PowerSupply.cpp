@@ -31,9 +31,9 @@
  *
  * Original:	April 1995
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2008-04-06 09:06:37 $
+ * Date:        $Date: 2008-04-30 14:04:11 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -57,17 +57,15 @@
 
 short PowerSupply::class_inited = 0;
 
-//+======================================================================
-// Function:    PowerSupply::GetResources()
-//
-// Description: Interrogate the static database for PowerSupply resources
-//                for the specified device. This routine can also be used
-//                to initialise the class default resources.
-//
-// Arg(s) In:   char *res_name - name in the database to interrogate
-//
-// Arg(s) Out:  long *error - pointer to error code if routine fails.
-//-=======================================================================
+/**
+ * Interrogate the static database for PowerSupply resources for the specified 
+ * device. This routine can also be used to initialise the class default resources.
+ *
+ * @param res_name name in the database to interrogate
+ * @param error pointer to error code if routine fails.
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 long PowerSupply::GetResources (char *res_name, DevLong *error)
 {
    static db_resource res_powersupply[] = { {"delta_i", D_FLOAT_TYPE},
@@ -79,9 +77,9 @@ long PowerSupply::GetResources (char *res_name, DevLong *error)
    *error = DS_OK;
 
 //
-// setup the db_resource structure so that we can interrogate the database
-// for the two resources "delta_i" and "time_constant" which are needed
-// by all powersupplies to implement the read<>set check
+// setup the db_resource structure so that we can interrogate the database for 
+// the two resources "delta_i" and "time_constant" which are needed by all 
+// powersupplies to implement the read<>set check
 //
 
    ires = 0;
@@ -96,43 +94,32 @@ long PowerSupply::GetResources (char *res_name, DevLong *error)
    return(DS_OK);
 }
 
-//+=====================================================================
-//
-// Function:	PowerSupply::ClassInitialise() 
-//
-// Description:	function to initialise the Device class
-//
-// Input:	none
-//
-// Output:	long *error - error code returned in the case of problems
-//
-//-=====================================================================
-
+/**
+ * function to initialise the Device class
+ *
+ * @param error error code returned in the case of problems
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 long PowerSupply::ClassInitialise( DevLong *error )
 {
    dev_printdebug(DBG_TRACE,"PowerSupply::ClassInitialise() called\n");
 
    *error = 0;
 
-//   int l = strlen(RcsId);
+// int l = strlen(RcsId);
 
    PowerSupply::class_inited = 1;
 
    return(DS_OK);
 }
 
-//+=====================================================================
-//
-// Function:	PowerSupply::PowerSupply() 
-//
-// Description:	constructor to create an object of the base class PowerSupply
-//
-// Input:	char *name - name (ascii identifier) of device to create
-//
-// Output:	long *error - error code returned in the case of problems
-//
-//-=====================================================================
-
+/**
+ * constructor to create an object of the base class PowerSupply
+ *
+ * @param name name (ascii identifier) of device to create
+ * @param error error code returned in the case of problems
+ */
 PowerSupply::PowerSupply (char *devname, DevLong *error)
 	    :Device (devname, error)
 {
@@ -170,18 +157,9 @@ PowerSupply::PowerSupply (char *devname, DevLong *error)
    }
 }
 
-//+=====================================================================
-//
-// Function:	PowerSupply::~PowerSupply() 
-//
-// Description:	destructor to destroy an object of the base class PowerSupply
-//
-// Input:	none
-//
-// Output:	long *error - error code returned in the case of problems
-//
-//-=====================================================================
-
+/**
+ * destructor to destroy an object of the base class PowerSupply
+ */
 PowerSupply::~PowerSupply ()
 {
    dev_printdebug(DBG_TRACE,"PowerSupply::~PowerSupply() called\n");
@@ -191,28 +169,22 @@ PowerSupply::~PowerSupply ()
 //
 }
 
-//+=====================================================================
-//
-// Function:	PowerSupply::CheckReadValue() 
-//
-// Description:	function to implement a check for read<>set value for
-//		all members of the PowerSupply class. It will check if 
-//		the read value lies within the tolerance of the desired
-//		set value - it if doesn't then it returns an alarm
-//		in the boolean value alarm. This metod assumes that
-//		the powersupply has been read recently and that all 
-//		information necessary for doing the check is passed
-//		via the object (cf. input parameters below).
-//
-// Input:	none - it is assumed that the subclass has update
-//		       the object fields last_set_t, time_const,
-//		       set_val and read_val before calling this function
-//
-// Output:	DevBoolean alarm - 
-//		long *error - error code returned in the case of problems
-//
-//-=====================================================================
-
+/**
+ * function to implement a check for read<>set value for all members of the 
+ * PowerSupply class. It will check if the read value lies within the 
+ * tolerance of the desired set value - it if doesn't then it returns an alarm
+ * in the boolean value alarm. This metod assumes that the powersupply has been 
+ * read recently and that all information necessary for doing the check is passed
+ * via the object (cf. input parameters below).
+ *
+ * It is assumed that the subclass has update the object fields last_set_t, 
+ * time_const, set_val and read_val before calling this function
+ *
+ * @param alarm alarm  
+ * @param error error code returned in the case of problems
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 long PowerSupply::CheckReadValue(DevBoolean *alarm, DevLong *error)
 {
    dev_printdebug(DBG_TRACE,"PowerSupply::CheckReadValue() called\n");

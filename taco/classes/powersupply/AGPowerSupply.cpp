@@ -36,9 +36,9 @@
  *
  * Original:	June 1995
  *
- * Version:     $Revision: 1.8 $
+ * Version:     $Revision: 1.9 $
  *
- * Date:        $Date: 2008-04-06 09:06:36 $
+ * Date:        $Date: 2008-04-30 14:04:11 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -65,17 +65,15 @@ static AGPowerSupply *agps_template;
 short AGPowerSupply::class_inited = 0;
 
 
-//+======================================================================
-// Function:    AGPowerSupply::GetResources()
-//
-// Description:	Interrogate the static database for AGPowerSupply resources 
-//		for the specified device. This routine can also be used
-//		to initialise the class default resources.
-//
-// Arg(s) In:	char *res_name - name in the database to interrogate
-//
-// Arg(s) Out:	long *error - pointer to error code if routine fails.
-//-=======================================================================
+/**
+ * Interrogate the static database for AGPowerSupply resources for the specified 
+ * device. This routine can also be used to initialise the class default resources.
+ *
+ * @param res_name name in the database to interrogate
+ * @param error pointer to error code if routine fails.
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 long AGPowerSupply::GetResources (char *res_name, DevLong *error)
 {
    static db_resource res_table[] = {
@@ -113,7 +111,8 @@ long AGPowerSupply::GetResources (char *res_name, DevLong *error)
    else
    {
       printf("initial values after searching the static database for %s\n\n",res_name);
-/*      printf("state         D_LONG_TYPE    %6d\n",this->state);
+#if 0
+      printf("state         D_LONG_TYPE    %6d\n",this->state);
       printf("set_val       D_FLOAT_TYPE   %6.0f\n",this->set_val);
       printf("channel       D_SHORT_TYPE   %6d\n",this->channel);
       printf("n_ave         D_SHORT_TYPE   %6d\n",this->n_ave);
@@ -122,24 +121,22 @@ long AGPowerSupply::GetResources (char *res_name, DevLong *error)
       printf("read_offset   D_FLOAT_TYPE   %6.0f\n",this->read_offset);
       printf("set_u_limit   D_FLOAT_TYPE   %6.0f\n",this->set_u_limit);
       printf("set_l_limit   D_FLOAT_TYPE   %6.0f\n",this->set_l_limit);
-      printf("polarity      D_SHORT_TYPE   %6d\n",this->polarity);*/
+      printf("polarity      D_SHORT_TYPE   %6d\n",this->polarity);
+#endif
    }
 
    return(DS_OK);
 }
-//+======================================================================
-// Function:    AGPowerSupply::ClassInitialise()
-//
-// Description:	Initialise the AGPowerSupplyClass, is called once for
-//		this class per process. ClassInitialise() will initialise
-//		the class variables and the template powersupply device 
-//		agps_template. 
-//
-// Arg(s) In:	none
-//
-// Arg(s) Out:	long *error - pointer to error code if routine fails.
-//-=======================================================================
 
+/**
+ * Initialise the AGPowerSupplyClass, is called once for this class per process. 
+ * ClassInitialise() will initialise the class variables and the template 
+ * powersupply device agps_template. 
+ *
+ * @param error pointer to error code if routine fails.
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 long AGPowerSupply::ClassInitialise (DevLong *error)
 {
    static AGPowerSupply *agps_template = (AGPowerSupply*)malloc(sizeof(AGPowerSupply)); 
@@ -151,15 +148,14 @@ long AGPowerSupply::ClassInitialise (DevLong *error)
    debug_flag = 0xffffffff;
 
 //
-// initialise the template powersupply so that DevMethodCreate has
-// default values for creating a powersupply, these values will be
-// overridden by the static database (if defined there). 
+// initialise the template powersupply so that DevMethodCreate has default values 
+// for creating a powersupply, these values will be overridden by the static 
+// database (if defined there). 
 //
-// default is to start with powersupply switched OFF; the state 
-// variable gets (ab)used during initialisation to interpret the
-// initial state of the powersupply: 0==DEVOFF, 1==DEVON. this is
-// because the database doesn't support the normal state variables
-// like DEVON, DEVSTANDBY, DEVINSERTED, etc.
+// default is to start with powersupply switched OFF; the state variable gets 
+// (ab)used during initialisation to interpret the initial state of the powersupply: 
+// 0==DEVOFF, 1==DEVON. this is because the database doesn't support the normal 
+// state variables like DEVON, DEVSTANDBY, DEVINSERTED, etc.
 
    agps_template->state = 0;
    agps_template->n_state = agps_template->state;
@@ -178,8 +174,6 @@ long AGPowerSupply::ClassInitialise (DevLong *error)
 //
 // interrogate the static database for default values 
 //
-  
-// if(this->GetResources("CLASS/AGPS/DEFAULT",error))
    if(GetResources("CLASS/AGPS/DEFAULT",error))
    {
       printf("AGPowerSupply::ClassInitialise(): GetResources() failed, error %d\n",error);
@@ -202,18 +196,15 @@ long AGPowerSupply::ClassInitialise (DevLong *error)
    return(iret);
 }
 
-//+======================================================================
-// Function:    AGPowerSupply::AGPowerSupply()
-//
-// Description:	create a AGPowerSupply object. This involves allocating
-//		memory for this object and initialising its name.
-//
-// Arg(s) In:	char *name - name of object.
-//
-// Arg(s) Out:	DevServer *ds_ptr - pointer to object created.
-//		long *error - pointer to error code (in case of failure)
-//-=====================================================================
-
+/**
+ * create a AGPowerSupply object. This involves allocating memory for this 
+ * object and initialising its name.
+ *
+ * @param name name of object.
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 AGPowerSupply::AGPowerSupply (char *name, DevLong *error)
               :PowerSupply (name, error)
 {
@@ -263,8 +254,8 @@ AGPowerSupply::AGPowerSupply (char *name, DevLong *error)
 	strcpy(this->class_name, "AGPowerSupplyClass");
 
 //
-// initialise the commands list to point to the commands list 
-// implemented for the AG PowerSupply class
+// initialise the commands list to point to the commands list implemented for the 
+// AG PowerSupply class
 //
    this->n_commands = n_commands;
    this->commands_list = commands_list;
@@ -274,7 +265,7 @@ AGPowerSupply::AGPowerSupply (char *name, DevLong *error)
 // also be done by overloading the operator=)
 //
 
-/*
+#if 0
 	this->state = agps_template->state;
 	this->set_val = agps_template->set_val;
 	this->channel = agps_template->channel;
@@ -286,8 +277,7 @@ AGPowerSupply::AGPowerSupply (char *name, DevLong *error)
 	this->set_u_limit = agps_template->set_u_limit;
 	this->set_l_limit = agps_template->set_l_limit;
 	this->polarity = agps_template->polarity;
- */
-
+#endif
 
 //
 // initialise powersupply with values defined in database
@@ -322,16 +312,15 @@ AGPowerSupply::AGPowerSupply (char *name, DevLong *error)
 	return;
 }
 
-//+======================================================================
-// Function:    AGPowerSupply::StateMachine()
-//
-// Description:	Check if the command to be executed does not violate
-//		the present state of the device.
-//
-// Arg(s) In:	DevCommand cmd - command to be executed.
-//
-// Arg(s) Out:	long *error - pointer to error code (in case of failure).
-//-=====================================================================
+/**
+ * Check if the command to be executed does not violate the present state of 
+ * the device.
+ *
+ * @param cmd command to be executed.
+ * @param error pointer to error code (in case of failure).
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 long AGPowerSupply::StateMachine (DevCommand cmd, DevLong *error)
 {
 	long iret = 0;
@@ -482,19 +471,16 @@ long AGPowerSupply::StateMachine (DevCommand cmd, DevLong *error)
 	return(iret);
 }
 
-//+=====================================================================
-// Function:    AGPowerSupply::Off()
-//
-// Description:	switch the simulated power supply off. the read value 
-//		and set value get set to zero - this is a convention
-//		adopted at the ESRF for all powersupplies.
-//
-// Arg(s) In:	DevVoid *argin - void.
-//
-// Arg(s) Out:	DevVoid *argout - void.
-//		long *error - pointer to error code in case of failure.
-//-=====================================================================
-
+/**
+ * switch the simulated power supply off. the read value and set value get set 
+ * to zero - this is a convention adopted at the ESRF for all powersupplies.
+ *
+ * @param argin %void.
+ * @param argout %void.
+ * @param error pointer to error code in case of failure.
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 long AGPowerSupply::Off (DevArgument vargin, DevArgument vargout, DevLong *error)
 {
 	DevArgument tmp;
@@ -512,17 +498,15 @@ long AGPowerSupply::Off (DevArgument vargin, DevArgument vargout, DevLong *error
 	return (DS_OK);
 }
 	
-//+=====================================================================
-// Function:    AGPowerSupply::On()
-//
-// Description:	switch simulated powersupply ON
-//
-// Arg(s) In:	DevVoid *argin - void.
-//
-// Arg(s) Out:	DevVoid *argout - void.
-//		long *error - pointer to error code (in case of failure)
-//-=====================================================================
-
+/**
+ * switch simulated powersupply ON
+ *
+ * @param argin %void.
+ * @param argout %void.
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 long AGPowerSupply::On (DevArgument vargin, DevArgument vargout, DevLong *error)
 {
 	DevArgument tmp;
@@ -538,18 +522,16 @@ long AGPowerSupply::On (DevArgument vargin, DevArgument vargout, DevLong *error)
 	return (DS_OK);
 }
 
-//+=====================================================================
-// Function:    AGPowerSupply::SetValue()
-//
-// Description:	Routine to set current of simulated power supply. This
-//		version does not check the limits of the set_value.
-//
-// Arg(s) In:	DevFloat *vargin - current to set
-//
-// Arg(s) Out:	DevVoid *argout - void.
-//		long *error - pointer to error code (in the case of failure)
-//-=====================================================================
-
+/**
+ * Routine to set current of simulated power supply. This version does not check 
+ * the limits of the set_value.
+ *
+ * @param vargin pointer to a DevFloat value for the current to set
+ * @param vargout %void.
+ * @param error pointer to error code (in the case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 long AGPowerSupply::SetValue (DevArgument vargin, DevArgument vargout, DevLong *error)
 {
 	float *setting;
@@ -566,20 +548,17 @@ long AGPowerSupply::SetValue (DevArgument vargin, DevArgument vargout, DevLong *
 	return (DS_OK);
 }
 
-//+=====================================================================
-// Function:    AGPowerSupply::ReadValue()
-//
-// Description:	Return read value of simulated power supply. The read
-//		value is the last set value with some simulated noise
-//		on it. The noise is taken from the time() and is therefore
-//		repetitive.
-//
-// Arg(s) In:	DevVoid *vargin - void.
-//
-// Arg(s) Out:	DevFloatReadPoint *vargout - set and read value.
-//		long *error - pointer to error code (in the case of failure)
-//-=====================================================================
-
+/**
+ * Return read value of simulated power supply. The read value is the last set 
+ * value with some simulated noise on it. The noise is taken from the time() and 
+ * is therefore repetitive.
+ *
+ * @param vargin %void.
+ * @param vargout pointer to a DevFloatReadPoint set and read value.
+ * @param error pointer to error code (in the case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 long AGPowerSupply::ReadValue (DevArgument vargin, DevArgument vargout, DevLong *error)
 {
 	DevFloatReadPoint *frp;
@@ -600,27 +579,23 @@ long AGPowerSupply::ReadValue (DevArgument vargin, DevArgument vargout, DevLong 
 //
 	per_error = AG_PER_ERROR/100.*2.*
                     (((float)(time(NULL)&0xf)/15.0)-0.5);
-//	            printf("ReadValue(): percent error %6.3f\n",
-//                          per_error);
+//	printf("ReadValue(): percent error %6.3f\n", per_error);
         frp->read = set_val*(1.-per_error);
         read_val = frp->read;
 
 	return (DS_OK);
 }
 
-//+=====================================================================
-// Function:   	AGPowerSupply::Remote()
-//
-// Description:	Switch simulated power supply from LOCAL mode to socalled
-//		REMOTE mode i.e. a mode in which the power supply can receive
-//		commands.
-//
-// Arg(s) In:	DevVoid *vargin - void.
-//
-// Arg(s) Out:	DevVoid *vargout - void.
-//		long *error - pointer to error code (in case of failure)
-//-=====================================================================
-
+/**
+ * Switch simulated power supply from LOCAL mode to so called REMOTE mode i.e. 
+ * a mode in which the power supply can receive commands.
+ *
+ * @param vargin %void.
+ * @param vargout %void.
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 long AGPowerSupply::Remote (DevArgument vargin, DevArgument vargout, DevLong *error)
 {
 	DevArgument tmp;
@@ -639,19 +614,16 @@ long AGPowerSupply::Remote (DevArgument vargin, DevArgument vargout, DevLong *er
 	return (DS_OK);
 }
 
-//+=====================================================================
-// Function:    AGPowerSupply::Reset()
-//
-// Description:	Reset simulated power supply to a well known state.
-//		Used to recover from errors mostly. All set and read 
-//		points are reset at the same time.
-//
-// Arg(s) In:	DevVoid *vargin - void.
-//
-// Arg(s) Out:	DevVoid *vargout - void.
-//		long *error - pointer to error in the case of failure.
-//-=====================================================================
-
+/**
+ * Reset simulated power supply to a well known state. Used to recover from 
+ * errors mostly. All set and read points are reset at the same time.
+ *
+ * @param vargin %void.
+ * @param vargout %void.
+ * @param error pointer to error in the case of failure.
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 long AGPowerSupply::Reset (DevArgument vargin, DevArgument vargout, DevLong *error)
 {
 	DevArgument tmp;
@@ -672,18 +644,16 @@ long AGPowerSupply::Reset (DevArgument vargin, DevArgument vargout, DevLong *err
 	return (DS_OK);
 }
 
-//+=====================================================================
-// Function:    AGPowerSupply::Error()
-//
-// Description:	Simulate an error condition on the simulated power supply.
-//		The system call time() is used to generate any one of 8
-//		possible errors.
-//
-// Arg(s) In:	DevVoid *vargin - void.
-//
-// Arg(s) Out:	DevVoid *vargout - void.
-//		long *error - pointer to error code, in the case of failure.
-//-=====================================================================
+/**
+ * Simulate an error condition on the simulated power supply.  The system call 
+ * time() is used to generate any one of 8 possible errors.
+ *
+ * @param vargin %void.
+ * @param vargout %void.
+ * @param error pointer to error code, in the case of failure.
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 long AGPowerSupply::Error (DevArgument vargin, DevArgument vargout, DevLong *error)
 {
 	DevArgument tmp;
@@ -704,17 +674,16 @@ long AGPowerSupply::Error (DevArgument vargin, DevArgument vargout, DevLong *err
 	return (DS_OK);
 }
 
-//+=====================================================================
-// Function:    AGPowerSupply::Status()
-//
-// Description:	Return the state as an ASCII string. Interprets the error
-//		flag as well if the status is FAULT.
-//
-// Arg(s) In:	DevVoid *vargin - void.
-//
-// Arg(s) Out:	DevString *vargout - contains string.
-//		long *error - pointer to error code (in the case of failure)
-//-=====================================================================
+/**
+ * Return the state as an ASCII string. Interprets the error flag as well if 
+ * the status is FAULT.
+ *
+ * @param vargin %void.
+ * @param vargout pointer to the status string.
+ * @param error pointer to error code (in the case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 long AGPowerSupply::Status ( DevArgument vargin, DevArgument vargout, DevLong *error)
 {
 	static char mess[1024];
@@ -790,19 +759,17 @@ long AGPowerSupply::Status ( DevArgument vargin, DevArgument vargout, DevLong *e
 
 	return(DS_OK);
 }
-//+=====================================================================
-// Function:    AGPowerSupply::Local()
-//
-// Description:	Switch simulated power supply to LOCAL mode. In this mode
-//		the power supply does not respond to any commands until
-//		the next DevRemote command is executed.
-//
-// Arg(s) In:	DevVoid *vargin - void.
-//
-// Arg(s) Out:	DevVoid *vargout - void.
-//		long *error - pointer to error code in the case of failure.
-//-=====================================================================
 
+/**
+ * Switch simulated power supply to LOCAL mode. In this mode the power supply does 
+ * not respond to any commands until the next DevRemote command is executed.
+ *
+ * @param vargin %void.
+ * @param vargout %void.
+ * @param error pointer to error code in the case of failure.
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 long AGPowerSupply::Local (DevArgument vargin, DevArgument vargout, DevLong *error)
 {
 	DevArgument tmp;
@@ -818,18 +785,16 @@ long AGPowerSupply::Local (DevArgument vargin, DevArgument vargout, DevLong *err
 	return(DS_OK);
 }
 
-//+=====================================================================
-// Function:    AGPowerSupply::Update()
-//
-// Description:	Return the state and the read and set points. This command
-//		is a combination of the DevState and the DevReadValue commands.
-//
-// Arg(s) In:	DevVoid *argin - void.
-//
-// Arg(s) Out:	DevStateFloatReadPoint *vargout - contains the three values.
-//		long *error - pointer to error code (in the case of failure)
-//-=====================================================================
-
+/**
+ * Return the state and the read and set points. This command is a combination 
+ * of the DevState and the DevReadValue commands.
+ *
+ * @param argin void.
+ * @param vargout pointer to a DevStateFloatReadPoint containing the three values.
+ * @param error pointer to error code (in the case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 long AGPowerSupply::Update ( DevArgument vargin, DevArgument vargout, DevLong *error)
 {
 	DevStateFloatReadPoint *vargout_sfrp;
@@ -863,21 +828,17 @@ long AGPowerSupply::Update ( DevArgument vargin, DevArgument vargout, DevLong *e
 	return(DS_NOTOK);
 }
 
-//+=====================================================================
-//
-// Function:	AGPowersupply::State() 
-//
-// Description:	function to implement the command to return the present 
-//		state of a device as a short variable
-//
-// Input:	none
-//
-// Output:	short *state - pointer to state returned
-//		long *error - error code returned in the case of problems
-//
-//-=====================================================================
-
-/*long AGPowerSupply::State(DevArgument vargin, DevArgument vargout, long *error)
+/**
+ * function to implement the command to return the present state of a device as 
+ * a short variable
+ *
+ * @param vargin %void.
+ * @param vargout pointer to a DevShort variable containing the state
+ * @param error - error code returned in the case of problems
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
+long AGPowerSupply::State(DevArgument vargin, DevArgument vargout, DevLong *error)
 {
    static short *state;
    *error = DS_OK;
@@ -891,22 +852,18 @@ long AGPowerSupply::Update ( DevArgument vargin, DevArgument vargout, DevLong *e
    *state = (short)this->state;
 
    return(DS_OK);
-}*/
+}
 
 
-//+=====================================================================
-//
-// Function:	AGPowersupply::Hello() 
-//
-// Description:	function to test dev_putget(DevState) on a local device
-//
-// Input:	none
-//
-// Output:	short *state - pointer to state returned
-//		long *error - error code returned in the case of problems
-//
-//-=====================================================================
-
+/**
+ * function to test dev_putget(DevState) on a local device
+ *
+ * @param vargin pointer to string 
+ * @param vargout pointer to a DevShort variable containing the state
+ * @param error - error code returned in the case of problems
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 long AGPowerSupply::Hello(DevArgument vargin, DevArgument vargout, DevLong *error)
 {
    static devserver loc_device;
@@ -948,18 +905,9 @@ long AGPowerSupply::Hello(DevArgument vargin, DevArgument vargout, DevLong *erro
 }
 
 
-//+=====================================================================
-//
-// Function:	AGPowersupply::~AGPowerSupply() 
-//
-// Description:	destroy method of AGPowerSupply class (which does nothing)
-//
-// Input:	none
-//
-// Output:	none
-//
-//-=====================================================================
-
+/**
+ * destroy method of AGPowerSupply class (which does nothing)
+ */
 AGPowerSupply::~AGPowerSupply()
 {
 

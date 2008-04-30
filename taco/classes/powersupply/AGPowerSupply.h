@@ -31,16 +31,22 @@
  *
  * Original:	June 1995
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2008-04-06 09:06:36 $
+ * Date:        $Date: 2008-04-30 14:04:11 $
  */
 
 #ifndef _AGPOWERSUPPLY_H
 #define _AGPOWERSUPPLY_H
 		
+/**
+ * The AG Power Supply is a simulation of a typical power supply at the ESRF. 
+ * This means it has two main state DEVON and DEVOFF, DEVSTANDBY is unknown.
+ * All the common power supply commands are implemented. The simulation runs 
+ * under OS9 and Unix. It has been developped for application program developers 
+ * who want to test their applications without accessing real devices.
+ */
 class AGPowerSupply : public PowerSupply {
-
 
 //
 // private members
@@ -74,7 +80,7 @@ protected:
    long Remote (DevArgument argin, DevArgument argout, DevLong *error);
    long Update (DevArgument argin, DevArgument argout, DevLong *error);
    long Hello (DevArgument argin, DevArgument argout, DevLong *error);
-//   long State (DevArgument argin, void*argout, DevLong *error);
+   long State (DevArgument argin, void*argout, DevLong *error);
 
 //
 // public members

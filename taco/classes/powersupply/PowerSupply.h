@@ -31,13 +31,16 @@
  *
  * Original:	April 1995
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2008-04-06 09:06:37 $
+ * Date:        $Date: 2008-04-30 14:04:11 $
  */
 
 #include <Device.h>
 		
+/**
+ * PowerSupply superclass in C++
+ */
 class PowerSupply : public Device {
 
 
