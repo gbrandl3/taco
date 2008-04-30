@@ -117,10 +117,11 @@ static DevCommandListEntry commands_list[] = {
  {DevOff, dev_off, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevOff"},
  {DevOn, dev_on, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevOn"},
  {DevState, dev_state, D_VOID_TYPE, D_SHORT_TYPE, READ_ACCESS, "DevState"},
+ {DevStatus, dev_status, D_VOID_TYPE, D_STRING_TYPE, READ_ACCESS, "DevStatus"},
+ {DevReset, dev_reset, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevReset"},
+
  {DevSetValue, dev_setvalue, D_FLOAT_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevSetValue"},
  {DevReadValue, dev_readvalue, D_VOID_TYPE, D_FLOAT_READPOINT, READ_ACCESS, "DevReadValue"},
- {DevReset, dev_reset, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevReset"},
- {DevStatus, dev_status, D_VOID_TYPE, D_STRING_TYPE, READ_ACCESS, "DevStatus"},
  {DevError, dev_error, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevError"},
  {DevLocal, dev_local, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevLocal"},
  {DevRemote, dev_remote, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevRemote"},
@@ -177,20 +178,16 @@ void sighandler(long signal, long action)
 }
 #endif /* _UCC */
 
-/*======================================================================
- Function:      static long class_initialise()
-
- Description:	Initialise the AGPowerSupplyClass, is called once for
-		this class per process. class_initialise() will initialise
-		the class structure (aGPowerSupplyClass) and the default 
-		powersupply device (aGPowerSupply). At present default
-		values are hardwired in the include and source code files.
-
- Arg(s) In:	none
-
- Arg(s) Out:	long *error - pointer to error code if routine fails.
- =======================================================================*/
-
+/**
+ * Initialise the AGPowerSupplyClass, is called once for this class per process. 
+ * class_initialise() will initialise the class structure (aGPowerSupplyClass) 
+ * and the default powersupply device (aGPowerSupply). At present default values 
+ * are hardwired in the include and source code files.
+ *
+ * @param error pointer to error code if routine fails.
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 static long class_initialise(error)
 DevLong *error;
 {
@@ -327,18 +324,16 @@ DevLong *error;
    return(iret);
 }
 
-/*======================================================================
- Function:      static long object_create()
-
- Description:	create a AGPowerSupply object. This involves allocating
-		memory for this object and initialising its name.
-
- Arg(s) In:	char *name - name of object.
-
- Arg(s) Out:	DevServer *ds_ptr - pointer to object created.
-		long *error - pointer to error code (in case of failure)
- =======================================================================*/
-
+/**
+ * create a AGPowerSupply object. This involves allocating memory for this 
+ * object and initialising its name.
+ *
+ * @param name name of object.
+ * @param ds_ptr pointer to object created.
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 static long object_create(name, ds_ptr, error)
 char *name;
 DevServer *ds_ptr;
@@ -385,7 +380,14 @@ DevLong *error;
 
    return(iret);
 }
- 
+
+/** 
+ *
+ * @param ps
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 static long object_initialise(ps,error)
 AGPowerSupply ps;
 DevLong *error;
@@ -484,18 +486,16 @@ DevLong *error;
    return(DS_OK);
 }
 
-/*======================================================================
- Function:      static long state_handler()
-
- Description:	Check if the command to be executed does not violate
-		the present state of the device.
-
- Arg(s) In:	AGPowerSupply ps - device to execute command to.
-		DevCommand cmd - command to be executed.
-
- Arg(s) Out:	long *error - pointer to error code (in case of failure).
- =======================================================================*/
-
+/**
+ * Check if the command to be executed does not violate the present state of 
+ * the device.
+ *
+ * @param ps device to execute command to.
+ * @param cmd command to be executed.
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 static long state_handler( ps, cmd, error)
 AGPowerSupply ps;
 DevCommand cmd;
@@ -669,20 +669,18 @@ DevLong *error;
    return(iret);
 }
 
-/*======================================================================
- Function:      static long dev_off()
-
- Description:	switch the simulated power supply off. the read value 
-		and set value get set to zero - this is a convention
-		adopted at the ESRF for all powersupplies.
-
- Arg(s) In:	AGPowerSupply ps - object on which to execute command.
-		DevUnion *argin - void.
-
- Arg(s) Out:	DevUnion *argout - void.
-		long *error - pointer to error code in case of failure.
- =======================================================================*/
-
+/**
+ * switch the simulated power supply off. the read value and set value get set 
+ * to zero - this is a convention adopted at the ESRF for all powersupplies.
+ *
+ * @param ps object on which to execute command.
+ * @param argin %void.
+ * @param argout %void.
+ * 
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 static long dev_off (ps, argin, argout, error)
 AGPowerSupply ps;
 DevVoid *argin;
@@ -698,18 +696,17 @@ long *error;
 	return (iret);
 }
 	
-/*======================================================================
- Function:      static long dev_on()
-
- Description:	switch simulated powersupply ON
-
- Arg(s) In:	AGPowerSupply ps - object on which to execute command.
-		DevUnion *argin - void.
-
- Arg(s) Out:	DevUnion *argout - void.
-		long *error - pointer to error code (in case of failure)
- =======================================================================*/
-
+/**
+ * switch simulated powersupply ON
+ *
+ * @param ps object on which to execute command.
+ * @param argin %void.
+ * @param argout %void.
+ *
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 static long dev_on (ps, argin, argout, error)
 AGPowerSupply ps;
 DevVoid *argin;
@@ -723,18 +720,17 @@ long *error;
 	return (iret);
 }
 
-/*======================================================================
- Function:      static long dev_state()
-
- Description:	return state of simulated power supply.
-
- Arg(s) In:	AGPowerSupply ps - object on which to execute command.
-		DevUnion *argin - void.
-
- Arg(s) Out:	DevUnion *argout - S_data branch contains status as short
-		long *error - pointer to error code (in case routine fails)
- =======================================================================*/
-
+/**
+ * return state of simulated power supply.
+ *
+ * @param ps object on which to execute command.
+ * @param argin %void.
+ * @param argout S_data branch contains status as short
+ *
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 static long dev_state (ps, argin, argout, error)
 AGPowerSupply ps;
 DevVoid *argin;
@@ -765,19 +761,18 @@ DevLong *error;
 	return (iret);
 }
 
-/*======================================================================
- Function:      static long dev_setvalue()
-
- Description:	Routine to set current of simulated power supply. This
-		version does not check the limits of the set_value.
-
- Arg(s) In:	AGPowerSupply ps - object to execute command on.
-		DevUnion *argin - F_data branch of union contains set value
-
- Arg(s) Out:	DevUnion *argout - void.
-		long *error - pointer to error code (in the case of failure)
- =======================================================================*/
-
+/**
+ * Routine to set current of simulated power supply. This version does not check
+ * the limits of the set_value.
+ *
+ * @param ps object to execute command on.
+ * @param argin F_data branch of union contains set value
+ * @param argout %void.
+ *
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 static long dev_setvalue (ps, argin, argout, error)
 AGPowerSupply ps;
 DevFloat *argin;
@@ -791,21 +786,19 @@ long *error;
 	return (iret);
 }
 
-/*======================================================================
- Function:      static long dev_readvalue()
-
- Description:	Return read value of simulated power supply. The read
-		value is the last set value with some simulated noise
-		on it. The noise is taken from the time() and is therefore
-		repetitive.
-
- Arg(s) In:	AGPowerSupply ps - object on which to execute command.
-		DevUnion *argin - void.
-
- Arg(s) Out:	DevUnion *argout - F_data branch contains read value.
-		long *error - pointer to error code (in the case of failure)
- =======================================================================*/
-
+/**
+ * Return read value of simulated power supply. The read value is the last set
+ * value with some simulated noise on it. The noise is taken from the time() 
+ * and is therefore repetitive.
+ *
+ * @param ps object on which to execute command.
+ * @param argin %void.
+ * @param argout F_data branch contains read value.
+ *
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 static long dev_readvalue (ps, argin, argout, error)
 AGPowerSupply ps;
 DevVoid *argin;
@@ -832,20 +825,18 @@ long *error;
 	return (iret);
 }
 
-/*======================================================================
- Function:      static long dev_remote()
-
- Description:	Switch simulated power supply from LOCAL mode to socalled
-		REMOTE mode i.e. a mode in which the power supply can receive
-		commands.
-
- Arg(s) In:	AGPowerSupply ps - object on which to execute command.
-		DevUnion *argin - void.
-
- Arg(s) Out:	DevUnion *argout - void.
-		long *error - pointer to error code (in case of failure)
- =======================================================================*/
-
+/**
+ * Switch simulated power supply from LOCAL mode to socalled REMOTE mode i.e. a
+ * mode in which the power supply can receive commands.
+ *
+ * @param ps object on which to execute command.
+ * @param argin %void.
+ * @param argout %void.
+ *
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 static long dev_remote (ps, argin, argout, error)
 AGPowerSupply ps;
 DevVoid *argin;
@@ -859,20 +850,18 @@ long *error;
 	return (iret);
 }
 
-/*======================================================================
- Function:      static long dev_reset()
-
- Description:	Reset simulated power supply to a well known state.
-		Used to recover from errors mostly. All set and read 
-		points are reset at the same time.
-
- Arg(s) In:	AGPowerSupply ps - object on which to execute command.
-		DevUnion *argin - void.
-
- Arg(s) Out:	DevUnion *argout - void.
-		long *error - pointer to error in the case of failure.
- =======================================================================*/
-
+/**
+ * Reset simulated power supply to a well known state. Used to recover from errors
+ * mostly. All set and read points are reset at the same time.
+ *
+ * @param ps object on which to execute command.
+ * @param argin %void.
+ * @param argout %void.
+ *
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 static long dev_reset (ps, argin, argout, error)
 AGPowerSupply ps;
 DevVoid *argin;
@@ -894,20 +883,18 @@ long *error;
 	return (iret);
 }
 
-/*======================================================================
- Function:      static long dev_error()
-
- Description:	Simulate an error condition on the simulated power supply.
-		The system call time() is used to generate any one of 8
-		possible errors.
-
- Arg(s) In:	AGPowerSupply ps - object on which to execute command.
-		DevUnion *argin - void.
-
- Arg(s) Out:	DevUnion *argout - void.
-		long *error - pointer to error code, in the case of failure.
- =======================================================================*/
-
+/**
+ * Simulate an error condition on the simulated power supply. The system call 
+ * time() is used to generate any one of 8 possible errors.
+ *
+ * @param ps object on which to execute command.
+ * @param argin %void.
+ * @param argout %void.
+ *
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 static long dev_error (ps, argin, argout, error)
 AGPowerSupply ps;
 DevVoid *argin;
@@ -939,19 +926,18 @@ DevLong *error;
 	return (iret);
 }
 
-/*======================================================================
- Function:      static long dev_status()
-
- Description:	Return the state as an ASCII string. Interprets the error
-		flag as well if the status is FAULT.
-
- Arg(s) In:	AGPowerSupply ps - object on which to execute command.
-		DevUnion *argin - void.
-
- Arg(s) Out:	DevUnion *argout - STR_data branch of union contains string.
-		long *error - pointer to error code (in the case of failure)
- =======================================================================*/
-
+/**
+ * Return the state as an ASCII string. Interprets the error flag as well if the
+ * status is FAULT.
+ *
+ * @param ps object on which to execute command.
+ * @param argin void.
+ * @param argout STR_data branch of union contains string.
+ *
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 static long dev_status (ps, argin, argout, error)
 AGPowerSupply ps;
 DevVoid *argin;
@@ -1033,20 +1019,18 @@ long *error;
 	return(iret);
 }
 
-/*======================================================================
- Function:      static long dev_local()
-
- Description:	Switch simulated power supply to LOCAL mode. In this mode
-		the power supply does not respond to any commands until
-		the next DevRemote command is executed.
-
- Arg(s) In:	AGPowerSupply ps - object on which to execute command
-		DevUnion *argin - void.
-
- Arg(s) Out:	DevUnion *argout - void.
-		long *error - pointer to error code in the case of failure.
- =======================================================================*/
-
+/**
+ * Switch simulated power supply to LOCAL mode. In this mode the power supply
+ * does not respond to any commands until the next DevRemote command is executed.
+ *
+ * @param ps object on which to execute command
+ * @param argin %void.
+ * @param argout %void.
+ *
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 static long dev_local (ps, argin, argout, error)
 AGPowerSupply ps;
 DevVoid *argin;
@@ -1060,19 +1044,18 @@ long *error;
 	return(iret);
 }
 
-/*======================================================================
- Function:      static long dev_update()
-
- Description:	Return the state and the read and set points. This command
-		is a combination of the DevState and the DevReadValue commands.
-
- Arg(s) In:	AGPowerSupply ps - object on which to execute command
-		DevUnion *argin - void.
-
- Arg(s) Out:	DevUnion *argout - SRFP_data branch contains the three values.
-		long *error - pointer to error code (in the case of failure)
- =======================================================================*/
-
+/**
+ * Return the state and the read and set points. This command is a combination 
+ * of the DevState and the DevReadValue commands.
+ *
+ * @param ps object on which to execute command
+ * @param argin %void.
+ * @param argout SRFP_data branch contains the three values.
+ *
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 static long dev_update (ps, argin, argout, error)
 AGPowerSupply ps;
 DevVoid *argin;
@@ -1106,6 +1089,16 @@ long *error;
 	return(DS_WARNING);
 }
 
+/**
+ *
+ * @param ps object on which to execute command
+ * @param argin 
+ * @param argout %void
+ *
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 static long dev_write (ps, argin, argout, error)
 AGPowerSupply ps;
 DevVarCharArray *argin;
@@ -1124,6 +1117,16 @@ long *error;
 	return(DS_OK);
 }
 
+/**
+ *
+ * @param ps object on which to execute command
+ * @param argin 
+ * @param argout 
+ *
+ * @param error pointer to error code (in case of failure)
+ *
+ * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
+ */
 static long dev_read (ps, argin, argout, error)
 AGPowerSupply ps;
 DevLong *argin;
@@ -1141,19 +1144,6 @@ long *error;
 
 	return(DS_OK);
 }
-
-/*======================================================================
- Function:      static long ()
-
-/*======================================================================
- Function:      static long ()
-
- Description:
-
- Arg(s) In:
-
- Arg(s) Out:
- =======================================================================*/
 
 #if defined(linux) || defined(_HPUX_SOURCE) || defined(solaris)
 
