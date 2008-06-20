@@ -34,7 +34,8 @@ bin_PROGRAMS		= db_update \
 			db_devicetree \
 			sec_objinfo \
 			sec_passwd \
-			sec_userinfo
+			sec_userinfo \
+			db_backup
 
 bin_SCRIPTS		= db_fillup2
 
@@ -102,3 +103,6 @@ sec_passwd_LDADD	= @TACO_CLIENT_LIBS@
 
 sec_userinfo_SOURCES	= dbm_sec_userinfo.cpp
 sec_userinfo_LDADD	= @TACO_CLIENT_LIBS@
+
+db_backup_SOURCES	= db_backup.cpp
+db_backup_LDADD		= @TACO_CLIENT_LIBS@
