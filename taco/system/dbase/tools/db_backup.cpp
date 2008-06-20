@@ -25,9 +25,9 @@
  * Author(s):	Jens Krüger
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.1 $
+ * Version:     $Revision: 1.2 $
  *
- * Date:        $Date: 2008-06-20 19:53:08 $
+ * Date:        $Date: 2008-06-20 19:56:10 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -47,7 +47,7 @@
 void usage(const char *cmd)
 {
 	std::cerr << "usage : " << cmd << " [options] <device name>" << std::endl;
-	std::cerr << " displays all devices according to their servers. " << std::endl;
+	std::cerr << " print outs a dump of the database like a resource file. " << std::endl;
 	std::cerr << "        options : -h display this message" << std::endl;
 	std::cerr << "                  -n nethost" << std::endl;
 	std::cerr << "                  -v display the current version" << std::endl;
