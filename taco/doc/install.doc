@@ -185,9 +185,9 @@ versions. For details on compiler flags etc. you have to look into the correspon
 i.e. files with the extension .mak. The current libraries are based on DSAPI revision 8.29
 
 The zip file for the TACO Windows release can be found on
-<a href="http://sourceforge.net/project/showfiles.php?group_id=38710">TACO download site</a>.
+<a href="http://sourceforge.net/project/showfiles.php?group_id=38710&package_id=186029">TACO download site</a>.
 \latexonly
-(see {\tt http://sourceforge.net/project/showfiles.php?group\_id=38710})
+(see {\tt http://sourceforge.net/project/showfiles.php?group\_id=38710\&package\_id=186029})
 \endlatexonly.
 
 Additional archives mentioned below are also available on our ftp server.

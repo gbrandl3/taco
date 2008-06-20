@@ -78,7 +78,7 @@ The first part forms a user manual:
 <ul>
 <li>Section \ref whatis  Provides a brief overview of what TACO is, useful for newcomers to TACO.
 <li>Section \ref lite  What is the light version of TACO?
-<li>Section \ref install How to <a href="http://sourceforge.net/project/showfiles.php?group_id=38710">download</a>, compile and install TACO on your platfrom 
+<li>Section \ref install How to <a href="http://sourceforge.net/project/showfiles.php?group_id=38710&package_id=30925">download</a>, compile and install TACO on your platform 
 <li>Section \ref started  For those who wants to get going quickly without having to read this manual.
 <li>Section \ref ds_model  DSM
 <li>Section \ref c  How to write TACO devices servers in C

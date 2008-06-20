@@ -14,9 +14,9 @@ Here is a step by step description of the above recipe :
 
 -# downloading - TACO can be downloaded from 
    the 
-   <a href="http://sourceforge.net/project/showfiles.php?group_id=38710">TACO download site</a>.
+   <a href="http://sourceforge.net/project/showfiles.php?group_id=38710&package_id=30925">TACO download site</a>.
    \latexonly 
-   TACO download site (see {\tt http://sourceforge.net/project/showfiles.php?group\_id=38710})
+   TACO download site (see {\tt http://sourceforge.net/project/showfiles.php?group\_id=38710\&package\_id=30925})
    \endlatexonly
    The source files are taco-@VERSION@.tar.gz or taco-@VERSION@.tar.bz2. 
 -# unpacking - unpack the source code in a directory where you have sufficient 
