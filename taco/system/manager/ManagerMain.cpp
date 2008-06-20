@@ -31,9 +31,9 @@
  *
  * Original:  January 1991
  *
- * Version:   $Revision: 1.1 $
+ * Version:   $Revision: 1.2 $
  *
- * Date:              $Date: 2008-06-20 10:40:45 $
+ * Date:              $Date: 2008-06-20 11:26:01 $
  *
  */
 
@@ -407,7 +407,7 @@ static	int	fd_devnull = -1;
  */
 	if (c_flags.request_log)
 	{
-		logStream->infoStream() << "dbhost : " << dbhost << ", nethost : " << nethost << log4cpp::eol;
+		logStream->noticeStream() << "dbhost : " << dbhost << ", nethost : " << nethost << log4cpp::eol;
 	}
 	if (strcmp (dbhost, nethost) && strcmp (dbhost, "localhost"))
 	{
@@ -464,7 +464,7 @@ static	int	fd_devnull = -1;
 	{
 		if (c_flags.request_log)
 		{
-			logStream->infoStream() << "try to start database server" << log4cpp::eol;
+			logStream->noticeStream() << "try to start database server" << log4cpp::eol;
 		}
         	if ((db_pid = fork ()) < 0)
 		{
@@ -477,7 +477,7 @@ static	int	fd_devnull = -1;
 		}
 		if (c_flags.request_log)
 		{
-			logStream->infoStream() << "fork returned pid = " << db_pid << log4cpp::eol;
+			logStream->noticeStream() << "fork returned pid = " << db_pid << log4cpp::eol;
 		}
 		if (!db_pid)
 		{
@@ -487,7 +487,7 @@ static	int	fd_devnull = -1;
 			snprintf (homedir, sizeof(homedir), "%s/%s", homepath, dbm_server);
 			if (c_flags.request_log)
 			{
-				logStream->infoStream() << "try to start : " << homedir << log4cpp::eol;
+				logStream->noticeStream() << "try to start : " << homedir << log4cpp::eol;
 			}
 /* 
  * Set arguments for execv 
@@ -515,14 +515,14 @@ static	int	fd_devnull = -1;
 
 			if (c_flags.request_log)
 			{
-				logStream->infoStream() << "Manager execvp arguments for database : " << log4cpp::eol;
-				logStream->infoStream() << homedir << " " << cmd_argv[0] << " " << cmd_argv[1] << " " 
+				logStream->noticeStream() << "Manager execvp arguments for database : " << log4cpp::eol;
+				logStream->noticeStream() << homedir << " " << cmd_argv[0] << " " << cmd_argv[1] << " " 
 					<< cmd_argv[2] << " " << cmd_argv[3] << " " << cmd_argv[4] << log4cpp::eol;
 			}
 			if (transp)
 			{
 				if (c_flags.request_log)
-					logStream->infoStream() << "svc_destroy for database : " << transp << log4cpp::eol;
+					logStream->noticeStream() << "svc_destroy for database : " << transp << log4cpp::eol;
 				svc_destroy(transp);
 			}
 			execvp (homedir, cmd_argv);
@@ -561,12 +561,12 @@ static	int	fd_devnull = -1;
 
 		if (c_flags.request_log)
 		{
-			logStream->infoStream() << "Manager execvp arguments for message server :" << log4cpp::eol;
-			logStream->infoStream() << homedir << " " << cmd_argv[0] << " " << cmd_argv[1] << log4cpp::eol;
+			logStream->noticeStream() << "Manager execvp arguments for message server :" << log4cpp::eol;
+			logStream->noticeStream() << homedir << " " << cmd_argv[0] << " " << cmd_argv[1] << log4cpp::eol;
 		}
 		if (transp)
 		{
-			logStream->infoStream() << "svc_destroy for message server : " << transp << log4cpp::eol;
+			logStream->noticeStream() << "svc_destroy for message server : " << transp << log4cpp::eol;
 			svc_destroy(transp); 
 		}
 		execvp (homedir,cmd_argv);
@@ -626,8 +626,8 @@ static	int	fd_devnull = -1;
  */
 	if (c_flags.request_log)
 	{
-      		logStream->infoStream() << "Network Manager started subprocesses : " << log4cpp::eol;
-      		logStream->infoStream() << "NETHOST = " << nethost << ", PID = " << pid << log4cpp::eol;
+      		logStream->noticeStream() << "Network Manager started subprocesses : " << log4cpp::eol;
+      		logStream->noticeStream() << "NETHOST = " << nethost << ", PID = " << pid << log4cpp::eol;
 	}
 	
 /*
@@ -815,7 +815,7 @@ static void startup_msg (void)
  */
 			if (c_flags.request_log)
 			{
-      				logStream->infoStream() << "startup finished." << log4cpp::eol;
+      				logStream->noticeStream() << "startup finished." << log4cpp::eol;
 			}
 #endif /* unix */
 #ifdef _OSK

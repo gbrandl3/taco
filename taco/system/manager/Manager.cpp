@@ -29,9 +29,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.1 $
+ * Version:	$Revision: 1.2 $
  *
- * Date:		$Date: 2008-06-20 10:40:40 $
+ * Date:		$Date: 2008-06-20 11:26:01 $
  *
  */
 
@@ -92,8 +92,8 @@ _msg_manager_data *rpc_msg_register_1 (_register_data *register_data)
  */
 	if (c_flags.request_log)
 	{
-		logStream->infoStream() << "Message Server registered." << log4cpp::eol;
-		logStream->infoStream() << "(msg_host = " << msg_conf.host_name << ", prog_nu = " << msg_conf.prog_number 
+		logStream->noticeStream() << "Message Server registered." << log4cpp::eol;
+		logStream->noticeStream() << "(msg_host = " << msg_conf.host_name << ", prog_nu = " << msg_conf.prog_number 
 					<< ", vers_nu = " << msg_conf.vers_number << ")" << log4cpp::eol;
 	}
 /*
@@ -131,8 +131,8 @@ int *rpc_db_register_1 (_register_data *register_data)
  */
 	if ( c_flags.request_log == True )
 	{
-		logStream->infoStream() << "Database Server registered." << log4cpp::eol;
-		logStream->infoStream() << "(db_host = " << db_conf.host_name 
+		logStream->noticeStream() << "Database Server registered." << log4cpp::eol;
+		logStream->noticeStream() << "(db_host = " << db_conf.host_name 
 					<< ", prog_nu = " << db_conf.prog_number 
 					<< ", vers_nu = " << db_conf.vers_number << ")" << log4cpp::eol;
 	}
@@ -165,8 +165,8 @@ _manager_data *rpc_get_config_4 (_register_data	*register_data)
  */
 	if ( c_flags.request_log == True )
 	{
-		logStream->infoStream() << "Configuration request." << log4cpp::eol;
-		logStream->infoStream() << "(Requesting process is running on " << register_data->host_name << " with pid = " 
+		logStream->noticeStream() << "Configuration request." << log4cpp::eol;
+		logStream->noticeStream() << "(Requesting process is running on " << register_data->host_name << " with pid = " 
 					<< register_data->prog_number << ")" << log4cpp::eol;
 	}
 
@@ -207,8 +207,8 @@ void unreg_server (int signo)
  */
 	if ( c_flags.request_log == True )
 	{
-		logStream->infoStream() << "Received signal " << signo << log4cpp::eol;
-		logStream->infoStream() << "System shutdown." << log4cpp::eol << log4cpp::eol;
+		logStream->noticeStream() << "Received signal " << signo << log4cpp::eol;
+		logStream->noticeStream() << "System shutdown." << log4cpp::eol << log4cpp::eol;
 	}
 
 /*

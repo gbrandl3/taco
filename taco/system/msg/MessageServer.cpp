@@ -29,9 +29,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2008-06-20 10:41:35 $
+ * Date:	$Date: 2008-06-20 11:26:17 $
  */
 
 /*
@@ -122,9 +122,9 @@ void msg_initialise (const char *dshome)
         snprintf (msg.aw_path, sizeof(msg.aw_path), "%s/system/bin/sun4/S_Alarm", dshome );
 #endif /* sun */
 
-  	logStream->infoStream() << "Error message dir    : " << msg.ER_file_dir << log4cpp::eol;
-  	logStream->infoStream() << "Pipe message dir     : " << msg.pipe_dir << log4cpp::eol;
-  	logStream->infoStream() << "Alarm window program : " << msg.aw_path << log4cpp::eol;
+  	logStream->noticeStream() << "Error message dir    : " << msg.ER_file_dir << log4cpp::eol;
+  	logStream->noticeStream() << "Pipe message dir     : " << msg.pipe_dir << log4cpp::eol;
+  	logStream->noticeStream() << "Alarm window program : " << msg.aw_path << log4cpp::eol;
 }
 
 
@@ -157,7 +157,7 @@ void msg_alarm_handler(short alarm_type,
 				break;
 			case 1 :
 			case 0 :
-				logStream->infoStream() <<  "error file : " << file_name << log4cpp::eol;
+				logStream->noticeStream() <<  "error file : " << file_name << log4cpp::eol;
 				break;
 			case -1 :
 				logStream->fatalStream() << "exiting!" << log4cpp::eol << log4cpp::eol;

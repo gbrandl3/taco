@@ -29,9 +29,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2008-06-20 10:41:37 $
+ * Date:	$Date: 2008-06-20 11:26:17 $
  *
  */
 
@@ -195,13 +195,13 @@ int main (int argc, char **argv)
   	taco_gethostname (msg.host_name, sizeof(msg.host_name) - 1);
 	msg.host_name[sizeof(msg.host_name) - 1] = '\0';
 
-	logStream->infoStream() << "Version : " << VERSION << log4cpp::eol;
-	logStream->infoStream() << "Starting with program number " << msg.prog_number << " on host " << msg.host_name << log4cpp::eol;
+	logStream->noticeStream() << "Version : " << VERSION << log4cpp::eol;
+	logStream->noticeStream() << "Starting with program number " << msg.prog_number << " on host " << msg.host_name << log4cpp::eol;
 /*
  *  register message-server to netwok manager
  */
 	register_msg (nethost, &dshome);
-	logStream->infoStream() << "registered on NETHOST " << nethost << " with home=" << dshome << " and DISPLAY=" << msg.display << log4cpp::eol;
+	logStream->noticeStream() << "registered on NETHOST " << nethost << " with home=" << dshome << " and DISPLAY=" << msg.display << log4cpp::eol;
 	
 /*
  *  create server handle
@@ -228,12 +228,12 @@ int main (int argc, char **argv)
  *  startup message server
  */
         msg_initialise (dshome);
-	logStream->infoStream() << "initialized" << log4cpp::eol;
+	logStream->noticeStream() << "initialized" << log4cpp::eol;
 
 /*
  *  set server into wait status
  */
-	logStream->infoStream() << "ready to run" << log4cpp::eol;
+	logStream->noticeStream() << "ready to run" << log4cpp::eol;
 	svc_run();
 	logStream->fatalStream() << "svc_run returned. Exiting." << log4cpp::eol << log4cpp::eol;
 	kill (pid,SIGQUIT);
@@ -374,9 +374,9 @@ void register_msg (char *nethost, char **dshome)
 void unreg_server (int signo)
 {
 	pmap_unset(msg.prog_number, MSGSERVER_VERS);
-	logStream->infoStream() << "received signal " << signo << log4cpp::eol;
-	logStream->infoStream() << "unregistered." << log4cpp::eol;
-	logStream->infoStream() << "exited." << log4cpp::eol << log4cpp::eol;
+	logStream->noticeStream() << "received signal " << signo << log4cpp::eol;
+	logStream->noticeStream() << "unregistered." << log4cpp::eol;
+	logStream->noticeStream() << "exited." << log4cpp::eol << log4cpp::eol;
 	exit(1);
 }
 
