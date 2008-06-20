@@ -29,15 +29,20 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2008-04-11 11:14:41 $
+ * Date:	$Date: 2008-06-20 10:41:37 $
  *
  */
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
 #endif
+
+#include <log4cpp/BasicConfigurator.hh>
+#include <log4cpp/PropertyConfigurator.hh>
+#include <log4cpp/Category.hh>
+
 #include <API.h>
 #include <private/ApiP.h>
 #include <Message.h>
@@ -83,19 +88,7 @@ _msg_out 	*rpc_msg_send_1(_msg_data *);
 
 MessageServerPart 	msg;
 int	 	  	pid = 0;
-FILE			*logFile;
-
-char *getTimeString(const char *name)
-{
-	time_t          tps = time((time_t *)NULL);
-	struct tm       *time_tm = localtime(&tps);
-	static char     message[80];
-	char            *tps_str = asctime(time_tm);
-	tps_str[24] = '\0';
-
-	snprintf(message, sizeof(message), "%s : %s : ", name, tps_str);
-	return message;
-}
+log4cpp::Category       *logStream;
 
 void usage(const char *cmd)
 {
@@ -105,12 +98,46 @@ void usage(const char *cmd)
 	exit (1);
 }
 
+/**
+ * This function will initialise the log4cpp logging service.
+ * The service will be configured via the ${LOGCONFIG} environment variable.
+ * If this is not found it will use the default logging mechanism.
+ * The instance will be the "taco.server" + serverName
+ *
+ * @param serverName the name of the server
+ */
+static void init_logstream(const std::string serverName)
+{
+        const char *logpath = getenv("LOGCONFIG");
+        std::string tmp = serverName;
+        std::string::size_type pos = tmp.find('/');
+        tmp[pos] = '.';
+        try
+        {
+                if (!logpath)
+                        throw 0;
+                log4cpp::PropertyConfigurator::configure(logpath);
+        }
+        catch (const log4cpp::ConfigureFailure &e)
+        {
+                std::cerr << e.what() << std::endl;
+                logpath = "no";
+                log4cpp::BasicConfigurator::configure();
+        }
+        catch (...)
+        {
+                logpath = "no";
+                log4cpp::BasicConfigurator::configure();
+        }
+        logStream = &log4cpp::Category::getInstance("taco.system." + tmp);
+        logStream->noticeStream() << "using " << logpath << " configuration file" << log4cpp::eol;
+}
+
 int main (int argc, char **argv)
 {
 	SVCXPRT *transp;
 	char	*nethost;
 	char    *dshome;
-	const char	*logpath = getenv("LOGPATH");
 
         int             c;
         extern int      optind;
@@ -130,18 +157,11 @@ int main (int argc, char **argv)
 	if (optind != argc - 1)
 		usage(argv[0]);
 
+        init_logstream("MessageServer");
+
 	strncpy (msg.name, argv[0], sizeof(msg.name) - 1);
 	nethost = argv[optind];
-	if (!logpath)
-		logpath = getenv("DSHOME");
-	if (!logpath)
-		logpath = "/tmp";
 
-	snprintf(msg.logfile, sizeof(msg.logfile), "%s/MessageServer.log", logpath); 
-	logFile = fopen(msg.logfile, "a");
-
-	if (!logFile)
-		logFile = stderr;
 /*
  *  get process ID
  */
@@ -175,15 +195,13 @@ int main (int argc, char **argv)
   	taco_gethostname (msg.host_name, sizeof(msg.host_name) - 1);
 	msg.host_name[sizeof(msg.host_name) - 1] = '\0';
 
-	fprintf(logFile, "%s Version : %s \n", getTimeString("MessageServer"), VERSION);
-	fprintf(logFile, "%s Starting with program number %d on host %s\n", getTimeString("MessageServer"), msg.prog_number, msg.host_name);
-	fflush(logFile);
+	logStream->infoStream() << "Version : " << VERSION << log4cpp::eol;
+	logStream->infoStream() << "Starting with program number " << msg.prog_number << " on host " << msg.host_name << log4cpp::eol;
 /*
  *  register message-server to netwok manager
  */
 	register_msg (nethost, &dshome);
-	fprintf(logFile, "%s registered on NETHOST %s with home=%s and DISPLAY=%s\n", getTimeString("MessageServer"), nethost, dshome, msg.display);
-	fflush(logFile);
+	logStream->infoStream() << "registered on NETHOST " << nethost << " with home=" << dshome << " and DISPLAY=" << msg.display << log4cpp::eol;
 	
 /*
  *  create server handle
@@ -196,15 +214,13 @@ int main (int argc, char **argv)
 	transp = svcudp_create(RPC_ANYSOCK);
 	if (transp == NULL) 
 	{
-		fprintf(logFile, "%s Cannot create udp service, exiting...\n", getTimeString("MessageServer"));
-		fflush(logFile);
+		logStream->fatalStream() << "Cannot create udp service, exiting..." << log4cpp::eol;
 		kill (pid,SIGQUIT);
 	}
 
 	if (!svc_register(transp, msg.prog_number, MSGSERVER_VERS, msgserver_prog_1, IPPROTO_UDP)) 
 	{
-		fprintf(logFile, "%s Unable to register server, exiting...\n", getTimeString("MessageServer")); 
-		fflush(logFile);
+		logStream->fatalStream() << "Unable to register server, exiting..." << log4cpp::eol;
 		kill (pid,SIGQUIT);
 	}
 
@@ -212,17 +228,14 @@ int main (int argc, char **argv)
  *  startup message server
  */
         msg_initialise (dshome);
-	fprintf(logFile, "%s initialized\n", getTimeString("MessageServer"));
-	fflush(logFile);
+	logStream->infoStream() << "initialized" << log4cpp::eol;
 
 /*
  *  set server into wait status
  */
-	fprintf(logFile, "%s ready to run\n", getTimeString("MessageServer"));
-	fflush(logFile);
+	logStream->infoStream() << "ready to run" << log4cpp::eol;
 	svc_run();
-	fprintf(logFile, "%s svc_run returned. Exiting.\n\n", getTimeString("MessageServer"));
-	fflush(logFile);
+	logStream->fatalStream() << "svc_run returned. Exiting." << log4cpp::eol << log4cpp::eol;
 	kill (pid,SIGQUIT);
 }
 
@@ -361,11 +374,9 @@ void register_msg (char *nethost, char **dshome)
 void unreg_server (int signo)
 {
 	pmap_unset(msg.prog_number, MSGSERVER_VERS);
-	fprintf(logFile, "%s received signal %d.\n", getTimeString("MessageServer"), signo);
-	fprintf(logFile, "%s unregistered.\n", getTimeString("MessageServer"));
-	fprintf(logFile, "%s exited.\n\n", getTimeString("MessageServer"));
-	fflush(logFile);
-	fclose(logFile);
+	logStream->infoStream() << "received signal " << signo << log4cpp::eol;
+	logStream->infoStream() << "unregistered." << log4cpp::eol;
+	logStream->infoStream() << "exited." << log4cpp::eol << log4cpp::eol;
 	exit(1);
 }
 

@@ -29,9 +29,9 @@
  *
  * Original:      January 1991
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:		$Date: 2006-09-27 12:12:27 $
+ * Date:		$Date: 2008-06-20 10:40:45 $
  *
  *
  *		       All Rights Reserved
@@ -40,7 +40,7 @@
 #ifndef _ManagerP_h
 #define _ManagerP_h
 
-extern void	unreg_server ();
+extern void	unreg_server (int);
 
 /*
  *  definitions for the static database server
@@ -67,6 +67,7 @@ static char	*ora_tns	    = "/usr/local/oracle";
 
 typedef enum{E_ORACLE = 0, E_MYSQL, E_GDBM, E_SQLITE} dbm_type;
 
+
 typedef struct 	{
 		short	msg_server;
 		short	db_server;
@@ -74,7 +75,7 @@ typedef struct 	{
 		short	security;
 		short	request_log;
 		dbm_type dbm;
-		} config_flags;
+} manager_config_flags;
 
 typedef struct 	{
 		char 	host_name [HOST_NAME_LENGTH];

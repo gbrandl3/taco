@@ -31,15 +31,19 @@
  *
  * Original:  January 1991
  *
- * Version:   $Revision: 1.28 $
+ * Version:   $Revision: 1.1 $
  *
- * Date:              $Date: 2008-04-06 09:07:51 $
+ * Date:              $Date: 2008-06-20 10:40:45 $
  *
  */
 
 #ifdef HAVE_CONFIG_H
 #     include "config.h"
 #endif
+
+#include <log4cpp/BasicConfigurator.hh>
+#include <log4cpp/PropertyConfigurator.hh>
+#include <log4cpp/Category.hh>
 
 #include <API.h>
 #include <private/ApiP.h>
@@ -56,6 +60,9 @@
 #	include <sys/wait.h>
 #else
 #	error Could not find sys/wait.h
+#endif
+#ifdef HAVE_RPC_RPC_H
+#	include <rpc/rpc.h>
 #endif
 #ifdef HAVE_RPC_PMAP_CLNT_H
 #	include <rpc/pmap_clnt.h>
@@ -79,34 +86,60 @@
 #	include <unistd.h>
 #endif
 
-static void 	network_manager_1();
-static void 	network_manager_4();
+static void 	network_manager_1(struct svc_req *rqstp, SVCXPRT *transp);
+static void 	network_manager_4(struct svc_req *rqstp, SVCXPRT *transp);
 static void 	startup_msg();
 
-config_flags	c_flags = {False,False,False,False,False,E_GDBM};
+manager_config_flags	c_flags = {False,False,False,False,False,E_GDBM};
 char 		*dshome  = NULL;
 char		*display = NULL;
 char	 	nethost [HOST_NAME_LENGTH];
-char		logfile [256];
-FILE		*system_log = NULL;
 
 int		pid = 0;
+
+log4cpp::Category	*logStream;
+
+typedef char *(* DbRpcLocalFunc)(...);
 
 #ifdef unix
 pid_t	become_daemon(void);
 #endif
 
-char *getTimeString(const char *name)
+/**
+ * This function will initialise the log4cpp logging service.
+ * The service will be configured via the ${LOGCONFIG} environment variable.
+ * If this is not found it will use the default logging mechanism.
+ * The instance will be the "taco.server" + serverName
+ *
+ * @param serverName the name of the server
+ */
+static void init_logstream(const std::string serverName)
 {
-        time_t          tps = time((time_t *)NULL);
-        struct tm       *time_tm = localtime(&tps);
-	static char	message[80];
-        char            *tps_str = asctime(time_tm);
-        tps_str[24] = '\0';
-	
-	snprintf(message, sizeof(message), "%s : %s : ", name, tps_str);
-	return message;
+        const char *logpath = getenv("LOGCONFIG");
+        std::string tmp = serverName;
+        std::string::size_type pos = tmp.find('/');
+        tmp[pos] = '.';
+        try
+        {
+                if (!logpath)
+                        throw 0;
+                log4cpp::PropertyConfigurator::configure(logpath);
+        }
+        catch (const log4cpp::ConfigureFailure &e)
+        {
+                std::cerr << e.what() << std::endl;
+                logpath = "no";
+                log4cpp::BasicConfigurator::configure();
+        }
+        catch (...)
+        {
+                logpath = "no";
+                log4cpp::BasicConfigurator::configure();
+        }
+        logStream = &log4cpp::Category::getInstance("taco.system." + tmp);
+        logStream->noticeStream() << "using " << logpath << " configuration file" << log4cpp::eol;
 }
+
 
 int main (int argc, char **argv)
 {
@@ -240,17 +273,8 @@ static	int	fd_devnull = -1;
  *  Manager.log file for writing system information
  */
 	if (c_flags.request_log)
-	{
-		char *logpath = getenv("LOGPATH");
-		snprintf (logfile, sizeof(logfile), "%s/Manager.log", logpath ? logpath : homepath);
-		if ( (system_log = fopen (logfile, "a")) == NULL )
-		{
-			fprintf (stderr,"\ncannot open Manager.log file (%s), exiting...\n", logfile);
-			fprintf(stderr, "LOGPATH or DSHOME path may be wrong\n");
-			kill (pid,SIGQUIT);
-		}
-		fprintf(system_log, "%s Version : %s\n", getTimeString("Manager"), VERSION);
-		fflush(system_log);
+	{       
+		init_logstream("Manager");
 	}
 
 #ifdef unix
@@ -383,8 +407,7 @@ static	int	fd_devnull = -1;
  */
 	if (c_flags.request_log)
 	{
-		fprintf(system_log, "%s dbhost : %s, nethost : %s\n", getTimeString("Manager"), dbhost, nethost);
-		fflush(system_log);
+		logStream->infoStream() << "dbhost : " << dbhost << ", nethost : " << nethost << log4cpp::eol;
 	}
 	if (strcmp (dbhost, nethost) && strcmp (dbhost, "localhost"))
 	{
@@ -441,23 +464,20 @@ static	int	fd_devnull = -1;
 	{
 		if (c_flags.request_log)
 		{
-			fprintf(system_log, "%s try to start database server\n", getTimeString("Manager"));
-			fflush(system_log);
+			logStream->infoStream() << "try to start database server" << log4cpp::eol;
 		}
         	if ((db_pid = fork ()) < 0)
 		{
 			fprintf (stderr,"\ndatabase server startup failed, exiting...\n");
 			if (c_flags.request_log)
 			{
-				fprintf (system_log, "%s : Database server startup failed, exiting...\n", getTimeString("Manager"));
-				fflush(system_log);
+				logStream->fatalStream() << "Database server startup failed, exiting..." << log4cpp::eol;
 			}
 			kill (pid,SIGQUIT);
 		}
 		if (c_flags.request_log)
 		{
-			fprintf(system_log, "%s fork returned : %d\n", getTimeString("Manager"), db_pid);
-			fflush(system_log);
+			logStream->infoStream() << "fork returned pid = " << db_pid << log4cpp::eol;
 		}
 		if (!db_pid)
 		{
@@ -467,8 +487,7 @@ static	int	fd_devnull = -1;
 			snprintf (homedir, sizeof(homedir), "%s/%s", homepath, dbm_server);
 			if (c_flags.request_log)
 			{
-				fprintf(system_log, "%s try to start : %s\n", getTimeString("Manager"), homedir);
-				fflush(system_log);
+				logStream->infoStream() << "try to start : " << homedir << log4cpp::eol;
 			}
 /* 
  * Set arguments for execv 
@@ -496,21 +515,23 @@ static	int	fd_devnull = -1;
 
 			if (c_flags.request_log)
 			{
-				fprintf(system_log, "%s Manager execvp arguments for database : ", getTimeString("Manager"));
-				fprintf(system_log, "%s %s %s %s %s %s\n",homedir,cmd_argv[0],cmd_argv[1],cmd_argv[2],cmd_argv[3],cmd_argv[4]);
-				fprintf(system_log, "%s svc_destroy for database : %p\n", getTimeString("Manager"), transp);
-				fflush(system_log);
+				logStream->infoStream() << "Manager execvp arguments for database : " << log4cpp::eol;
+				logStream->infoStream() << homedir << " " << cmd_argv[0] << " " << cmd_argv[1] << " " 
+					<< cmd_argv[2] << " " << cmd_argv[3] << " " << cmd_argv[4] << log4cpp::eol;
 			}
 			if (transp)
-				svc_destroy(transp); 
+			{
+				if (c_flags.request_log)
+					logStream->infoStream() << "svc_destroy for database : " << transp << log4cpp::eol;
+				svc_destroy(transp);
+			}
 			execvp (homedir, cmd_argv);
 			
-			fprintf (stderr,"\nexecvp failed, database_server not started\n");
+			std::cerr << "execvp failed, database_server not started" << std::endl;
 			if (c_flags.request_log)
 			{
-				fprintf(system_log, "%s execv failed, database_server not started : ", getTimeString("Manager"));
-				fprintf(system_log, "Error = %d (%s)\n", errno, strerror(errno));
-				fflush(system_log);
+				logStream->fatalStream() << "execv failed, database_server not started : " << log4cpp::eol;
+				logStream->fatalStream() << "Error = " << errno << " (" << strerror(errno) << ")" << log4cpp::eol; 
 			}
 			kill (pid,SIGQUIT);
 		}
@@ -521,11 +542,10 @@ static	int	fd_devnull = -1;
  */
         if (( msg_pid = fork () ) < 0 )
 	{
-		fprintf (stderr,"\nmessage server startup failed, exiting...\n");
+		std::cerr << "message server startup failed, exiting..." << std::endl;
 		if (c_flags.request_log)
 		{
-			fprintf (system_log, "%s Message server startup failed, exiting...\n", getTimeString("Manager"));
-			fflush(system_log);
+			logStream->fatalStream() << "Message server startup failed, exiting..." << log4cpp::eol;
 		}
 		kill (pid,SIGQUIT);
 	}
@@ -541,21 +561,21 @@ static	int	fd_devnull = -1;
 
 		if (c_flags.request_log)
 		{
-			fprintf(system_log, "%s Manager execvp arguments for message server :", getTimeString("Manager"));
-			fprintf(system_log, "%s %s %s\n",homedir,cmd_argv[0],cmd_argv[1]);
-			fprintf(system_log, "%s svc_destroy for message server : %p\n", getTimeString("Manager"), transp);
-			fflush(system_log);
+			logStream->infoStream() << "Manager execvp arguments for message server :" << log4cpp::eol;
+			logStream->infoStream() << homedir << " " << cmd_argv[0] << " " << cmd_argv[1] << log4cpp::eol;
 		}
 		if (transp)
+		{
+			logStream->infoStream() << "svc_destroy for message server : " << transp << log4cpp::eol;
 			svc_destroy(transp); 
+		}
 		execvp (homedir,cmd_argv);
 
-		fprintf (stderr,"\nexecvp failed, message server not started\n");
+		std::cerr << "execvp failed, message server not started" << log4cpp::eol;
 		if (c_flags.request_log)
 		{
-			fprintf(system_log,"%s execv failed, message server not started : ", getTimeString("Manager"));
-			fprintf(system_log, "Error = %d (%s)\n", errno, strerror(errno));
-			fflush(system_log);
+			logStream->fatalStream() << "execv failed, message server not started." << log4cpp::eol;
+			logStream->fatalStream() << "Error = " << errno << " (" << strerror(errno) << ")" << log4cpp::eol;
 		}
 		kill (pid,SIGQUIT);
 	}
@@ -578,11 +598,10 @@ static	int	fd_devnull = -1;
 		if ((db_pid = os9exec(os9forkc, cmd_argv[0], 
 			      cmd_argv, environ,0,0,3)) <= 0)
 		{
-			fprintf (stderr,"\nos9exec failed, os9_dbsu-server not started\n");
+			std::cerr << "os9exec failed, os9_dbsu-server not started");
 			if (c_flags.request_log)
 			{
-				fprintf (system_log, "os9exec failed, os9_dbsu-server not started\n");
-				fflush(system_log);
+				logStream->debugStream() << "os9exec failed, os9_dbsu-server not started" << log4cpp::eol;
 			}
 			kill (pid,SIGQUIT);
 		}
@@ -607,9 +626,8 @@ static	int	fd_devnull = -1;
  */
 	if (c_flags.request_log)
 	{
-      		fprintf (system_log,"%s Network Manager started subprocesses : ", getTimeString("Manager"));
-      		fprintf (system_log,"NETHOST = %s   PID = %d\n",nethost,pid);
-		fclose (system_log);
+      		logStream->infoStream() << "Network Manager started subprocesses : " << log4cpp::eol;
+      		logStream->infoStream() << "NETHOST = " << nethost << ", PID = " << pid << log4cpp::eol;
 	}
 	
 /*
@@ -625,8 +643,7 @@ static	int	fd_devnull = -1;
 	svc_run();
 	if (c_flags.request_log)
 	{	
-		fprintf(system_log, "%s svc_run returned: Manager stopped\n", getTimeString("Manager"));	
-		fflush(system_log);
+		logStream->fatalStream() << "svc_run returned: Manager stopped" << log4cpp::eol;
 	}
 	kill (pid,SIGQUIT);
 }
@@ -640,9 +657,10 @@ static void network_manager_4(struct svc_req *rqstp, SVCXPRT *transp)
 		_register_data  	rpc_get_config_4_arg;
 	} argument;
 
-	char *result;
-	bool_t (*xdr_argument)(), (*xdr_result)();
-	char *(*local)();
+	char 		*result;
+	xdrproc_t 	xdr_argument,
+			xdr_result;
+	DbRpcLocalFunc 	local;
 
 	switch (rqstp->rq_proc) 
 	{
@@ -650,14 +668,14 @@ static void network_manager_4(struct svc_req *rqstp, SVCXPRT *transp)
 			svc_sendreply (transp, (xdrproc_t)xdr_void, NULL);
 			return;
 		case RPC_MSG_REGISTER:
-			xdr_argument = xdr__register_data;
-			xdr_result = xdr__msg_manager_data;
-			local = (char *(*)()) rpc_msg_register_1;
+			xdr_argument = (xdrproc_t)xdr__register_data;
+			xdr_result = (xdrproc_t)xdr__msg_manager_data;
+			local = (DbRpcLocalFunc)rpc_msg_register_1;
 			break;
 		case RPC_DB_REGISTER:
-			xdr_argument = xdr__register_data;
-			xdr_result = xdr_int;
-			local = (char *(*)()) rpc_db_register_1;
+			xdr_argument = (xdrproc_t)xdr__register_data;
+			xdr_result = (xdrproc_t)xdr_int;
+			local = (DbRpcLocalFunc)rpc_db_register_1;
 			break;
 		case RPC_GET_CONFIG:
 /*
@@ -665,9 +683,9 @@ static void network_manager_4(struct svc_req *rqstp, SVCXPRT *transp)
  */
 			if ( c_flags.startup == True )
 			{
-				xdr_argument = xdr__register_data;
-				xdr_result = xdr__manager_data;
-				local = (char *(*)()) rpc_get_config_4;
+				xdr_argument = (xdrproc_t)xdr__register_data;
+				xdr_result = (xdrproc_t)xdr__manager_data;
+				local = (DbRpcLocalFunc) rpc_get_config_4;
 				break;
 			}
 			else
@@ -711,9 +729,10 @@ static void network_manager_1(struct svc_req *rqstp, SVCXPRT *transp)
 		_register_data  	rpc_get_config_1_arg;
 	} argument;
 
-	char *result;
-	bool_t (*xdr_argument)(), (*xdr_result)();
-	char *(*local)();
+	char 		*result;
+	xdrproc_t 	xdr_argument,
+			xdr_result;
+	DbRpcLocalFunc 	local;
 
 	switch (rqstp->rq_proc) 
 	{
@@ -721,15 +740,15 @@ static void network_manager_1(struct svc_req *rqstp, SVCXPRT *transp)
 			svc_sendreply (transp, (xdrproc_t)xdr_void, NULL);
 			return;
 		case RPC_MSG_REGISTER:
-			xdr_argument = xdr__register_data;
-			xdr_result = xdr__msg_manager_data;
-			local = (char *(*)()) rpc_msg_register_1;
+			xdr_argument = (xdrproc_t)xdr__register_data;
+			xdr_result = (xdrproc_t)xdr__msg_manager_data;
+			local = (DbRpcLocalFunc) rpc_msg_register_1;
 			break;
 		
 		case RPC_DB_REGISTER:
-			xdr_argument = xdr__register_data;
-			xdr_result = xdr_int;
-			local = (char *(*)()) rpc_db_register_1;
+			xdr_argument = (xdrproc_t)xdr__register_data;
+			xdr_result = (xdrproc_t)xdr_int;
+			local = (DbRpcLocalFunc) rpc_db_register_1;
 			break;
 
 		case RPC_GET_CONFIG:
@@ -738,9 +757,9 @@ static void network_manager_1(struct svc_req *rqstp, SVCXPRT *transp)
  */
 			if ( c_flags.startup == True )
 			{
-				xdr_argument = xdr__register_data;
-				xdr_result = xdr__manager_data_3;
-				local = (char *(*)()) rpc_get_config_4;
+				xdr_argument = (xdrproc_t)xdr__register_data;
+				xdr_result = (xdrproc_t)xdr__manager_data_3;
+				local = (DbRpcLocalFunc) rpc_get_config_4;
 				break;
 			}
 			else
@@ -785,8 +804,6 @@ static void network_manager_1(struct svc_req *rqstp, SVCXPRT *transp)
 
 static void startup_msg (void)
 {
-	FILE	*system_log = NULL;
-
 	if ( c_flags.startup == False )
 	{
 		if ( c_flags.msg_server == True && c_flags.db_server == True) 
@@ -798,13 +815,7 @@ static void startup_msg (void)
  */
 			if (c_flags.request_log)
 			{
-				if ((system_log = fopen (logfile, "a")) != NULL )
-	   			{
-      					fprintf (system_log, "%s startup finished.\n", getTimeString("Manager"));
-					fclose (system_log);
-	   			}
-				else
-           				fprintf (stderr, "\ncannot open Manager.log file (%s).\n", logfile);
+      				logStream->infoStream() << "startup finished." << log4cpp::eol;
 			}
 #endif /* unix */
 #ifdef _OSK

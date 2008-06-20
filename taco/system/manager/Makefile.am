@@ -20,10 +20,10 @@
 noinst_HEADERS		= ManagerP.h
 sbin_PROGRAMS		= Manager unreg
 
-INCLUDES		= @TACO_INCLUDES@
+INCLUDES		= @TACO_INCLUDES@  -I$(top_srcdir)/log4cpp/include \
+                          -I$(top_builddir)/log4cpp/include
 
-Manager_SOURCES		= Manager.c ManagerMain.c
-#Manager_LDADD		= @TACO_SERVER_LIBS@ $(top_builddir)/lib/libtaco.la 
-Manager_LDADD		= $(top_builddir)/lib/libtaco.la 
+Manager_SOURCES		= ManagerMain.cpp Manager.cpp 
+Manager_LDADD		= $(top_builddir)/lib/libtaco++.la  $(top_builddir)/log4cpp/src/liblog4cpp.la
 
 unreg_SOURCES		= unreg.c

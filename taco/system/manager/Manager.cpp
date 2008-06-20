@@ -29,15 +29,18 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.1 $
  *
- * Date:		$Date: 2008-04-06 09:07:51 $
+ * Date:		$Date: 2008-06-20 10:40:40 $
  *
  */
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
 #endif
+
+#include <log4cpp/Category.hh>
+
 #include <API.h>
 #include <private/ApiP.h>
 #include <DevErrors.h>
@@ -53,20 +56,19 @@
 #	error Could not find signal.h
 #endif
 
-void 			quit_server ();
+void 			quit_server (char *, long, long);
 
-extern config_flags 	c_flags;
+extern manager_config_flags 	c_flags;
 extern char		*dshome;
 extern char		*display;
 extern char		nethost [];
-extern char		logfile [];
 
 static server_conf	db_conf  = {0,0,0};
 static server_conf	msg_conf = {0,0,0};
 
-static dbserver_info   	db_info;
+// static dbserver_info   	db_info;
 
-char *getTimeString(const char *);
+extern log4cpp::Category	*logStream;
 
 /**
   *  register message server to manager 
@@ -90,15 +92,9 @@ _msg_manager_data *rpc_msg_register_1 (_register_data *register_data)
  */
 	if (c_flags.request_log)
 	{
-       		if ( (system_log = fopen (logfile, "a")) != NULL )
-		{
-			fprintf (system_log, "%s Message Server registered ", getTimeString("Manager"));
-			fprintf (system_log, "(msg_host = %s  prog_nu = %d  vers_nu = %d)\n",
-					    msg_conf.host_name, msg_conf.prog_number, msg_conf.vers_number);
-			fclose (system_log);
-		}
-	   	else
-			fprintf (stderr,"cannot open System.log file.\n");
+		logStream->infoStream() << "Message Server registered." << log4cpp::eol;
+		logStream->infoStream() << "(msg_host = " << msg_conf.host_name << ", prog_nu = " << msg_conf.prog_number 
+					<< ", vers_nu = " << msg_conf.vers_number << ")" << log4cpp::eol;
 	}
 /*
  *  set manager return values
@@ -135,15 +131,10 @@ int *rpc_db_register_1 (_register_data *register_data)
  */
 	if ( c_flags.request_log == True )
 	{
-		if ( (system_log = fopen (logfile, "a")) != NULL )
-		{
-			fprintf (system_log, "%s Database Server registered ", getTimeString("Manager"));
-			fprintf (system_log, "(db_host = %s  prog_nu = %d  vers_nu = %d)\n",
-					    db_conf.host_name, db_conf.prog_number, db_conf.vers_number);
-			fclose (system_log);
-		}
-   		else
-			fprintf (stderr,"cannot open System.log file.\n");
+		logStream->infoStream() << "Database Server registered." << log4cpp::eol;
+		logStream->infoStream() << "(db_host = " << db_conf.host_name 
+					<< ", prog_nu = " << db_conf.prog_number 
+					<< ", vers_nu = " << db_conf.vers_number << ")" << log4cpp::eol;
 	}
 /*
  *  set configuration status
@@ -174,15 +165,9 @@ _manager_data *rpc_get_config_4 (_register_data	*register_data)
  */
 	if ( c_flags.request_log == True )
 	{
-       		if ( (system_log = fopen (logfile, "a")) != NULL )
-		{
-			fprintf (system_log, "%s Configuration request ", getTimeString("Manager"));
-			fprintf (system_log, "(Requesting process is running on %s with pid = %d)\n",
-					register_data->host_name, register_data->prog_number);
-			fclose (system_log);
-		}
-		else
-			fprintf (stderr,"cannot open System.log file.\n");
+		logStream->infoStream() << "Configuration request." << log4cpp::eol;
+		logStream->infoStream() << "(Requesting process is running on " << register_data->host_name << " with pid = " 
+					<< register_data->prog_number << ")" << log4cpp::eol;
 	}
 
 /*
@@ -221,12 +206,10 @@ void unreg_server (int signo)
  *  write system shutdown message to System.log file
  */
 	if ( c_flags.request_log == True )
-		if ( (system_log = fopen (logfile, "a")) != NULL )
-		{
-			fprintf (system_log, "%s Received signal %d\n", getTimeString("Manager"), signo);
-			fprintf (system_log, "%s System shutdown.\n\n", getTimeString("Manager"));
-			fclose (system_log);
-		}
+	{
+		logStream->infoStream() << "Received signal " << signo << log4cpp::eol;
+		logStream->infoStream() << "System shutdown." << log4cpp::eol << log4cpp::eol;
+	}
 
 /*
  *  quit database and message servers

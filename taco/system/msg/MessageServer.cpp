@@ -29,9 +29,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2008-04-06 09:07:52 $
+ * Date:	$Date: 2008-06-20 10:41:35 $
  */
 
 /*
@@ -41,6 +41,9 @@
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
 #endif
+
+#include <log4cpp/Category.hh>
+
 #include <errno.h>
 #include <API.h>
 #include <private/ApiP.h>
@@ -75,9 +78,8 @@
 #endif
 
 extern MessageServerPart 	msg;
-extern FILE		 	*logFile;
 
-char *getTimeString(const char *name);
+extern log4cpp::Category       *logStream;
 
 /***************************************
  * Message-Server initialise           *
@@ -120,9 +122,9 @@ void msg_initialise (const char *dshome)
         snprintf (msg.aw_path, sizeof(msg.aw_path), "%s/system/bin/sun4/S_Alarm", dshome );
 #endif /* sun */
 
-  	fprintf (logFile, "%s Error message dir : %s\n", getTimeString("MessageServer"), msg.ER_file_dir);
-  	fprintf (logFile, "%s Pipe message dir : %s\n", getTimeString("MessageServer"), msg.pipe_dir);
-  	fprintf (logFile, "%s Alarm window program : %s\n", getTimeString("MessageServer"), msg.aw_path);
+  	logStream->infoStream() << "Error message dir    : " << msg.ER_file_dir << log4cpp::eol;
+  	logStream->infoStream() << "Pipe message dir     : " << msg.pipe_dir << log4cpp::eol;
+  	logStream->infoStream() << "Alarm window program : " << msg.aw_path << log4cpp::eol;
 }
 
 
@@ -145,20 +147,20 @@ void msg_alarm_handler(short alarm_type,
  */
 	if (( pid = fork () ) < 0 )
 	{
-  		fprintf (logFile, "%s Cannot start alarm window because fork failed!\n", getTimeString("MessageServer"));
-		fprintf (logFile, "%s Error in %s on host %s !\n", getTimeString("MessageServer"), server_name, host_name);
+  		logStream->errorStream() << "Cannot start alarm window because fork failed!" << log4cpp::eol;
+		logStream->errorStream() << "Error in " << server_name << " on host " << host_name << "!" << log4cpp::eol;
 
 		switch (alarm_type)
 		{
 			case 2 :
-				fprintf (logFile,"%s cannot open error file :  %s\n", getTimeString("MessageServer"), file_name);
+				logStream->errorStream() << "cannot open error file : " << file_name << log4cpp::eol;
 				break;
 			case 1 :
 			case 0 :
-				fprintf (logFile,"%s error file :  %s\n", getTimeString("MessageServer"), file_name);
+				logStream->infoStream() <<  "error file : " << file_name << log4cpp::eol;
 				break;
 			case -1 :
-				fprintf (logFile,"%s exiting!\n\n", getTimeString("MessageServer"));
+				logStream->fatalStream() << "exiting!" << log4cpp::eol << log4cpp::eol;
 				kill(getpid(), SIGQUIT);
 		}
 		return;
@@ -177,8 +179,7 @@ void msg_alarm_handler(short alarm_type,
 		cmd_argv[i++] = const_cast<char *>(display); 
 		cmd_argv[i] = 0; 
 		execv (msg.aw_path, cmd_argv);
-		fprintf (logFile,"%s can not start Alarm Window !\n", getTimeString("MessageServer"));
-		fflush(logFile);
+		logStream->errorStream() << "can not start Alarm Window !" << log4cpp::eol;
 		exit (-1);
 	}
 }
@@ -313,7 +314,7 @@ _msg_out *rpc_msg_send_1 (_msg_data *msg_data)
 		fildes = open(pipe_name, O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
 	if (fildes == -1)
 	{
-  		fprintf (logFile, "%s Pipe name : %s, %d (%s)\n", getTimeString("MessageServer"), pipe_name, errno, strerror(errno));
+  		logStream->errorStream() << "Pipe name : " << pipe_name << ", " << errno << "(" << strerror(errno) << ")" << log4cpp::eol;
 		msg_out.error = DevErr_CannotOpenPipe;
 		msg_out.status = -1;
 		return (&msg_out);
