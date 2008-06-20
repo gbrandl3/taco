@@ -63,7 +63,7 @@ AC_DEFUN([TACO_DEFINES],
         AC_REQUIRE([TACO_INIT])dnl
         case "$target" in
                 i[[3456]]86-*-linux-* | i[[3456]]86-*-linux | i[[3456]]86-*-cygwin* | \
-                x86_64-*-linux* | ia64-*-linux-*)
+                x86_64-*-linux* | ia64-*-linux-* | arm-*-linux-*)
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -DNDBM" ;;
                 ia64-*-freebsd* | i386-*-freebsd* | powerpc-apple-darwin*)
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -DNDBM" ;;

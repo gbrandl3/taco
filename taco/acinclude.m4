@@ -405,6 +405,7 @@ AC_DEFUN([TACO_DATAPORT_SRC],
 	AS_IF([test "x$enable_dataport" = "xyes"],
 	      [ 
 		case "$target" in
+			arm-*-linux* | \
 			ia64-*-linux* | \
 			x86_64-*-linux* | \
         		i[[3456]]86-*-linux-* |\
@@ -420,7 +421,7 @@ AC_DEFUN([TACO_DATAPORT_SRC],
             		*-*-OS?-*)      
 				DATAPORTUNIX="no" ;;
             		*)              
-				DATAPORT="no";;			
+				DATAPORT="no";;	
 		esac
 	      ])
 	AM_CONDITIONAL(BUILD_DATAPORT, test x$enable_dataport = xyes)
@@ -565,7 +566,8 @@ AC_DEFUN([TACO_CHECK_RPC_AND_THREADS],
 	AS_IF([test $ac_cv_search_pthread_create != "none required"], [PTHREAD_LIBS="$ac_cv_search_pthread_create"])
 	AC_SEARCH_LIBS(pthread_mutex_unlock, [$PTHREAD_LIBS])
 	AC_SUBST([PTHREAD_LIBS])
-	AC_RUN_IFELSE(AC_LANG_PROGRAM([
+	AS_IF([test "$cross_compiling" != yes], 
+		[AC_RUN_IFELSE(AC_LANG_PROGRAM([
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -698,7 +700,7 @@ const char hw[[[]]] = "Hello World!\n";],
     fprintf (stderr, "pthread_join: %s\n", strerror (err));
 
   return exitcode;
-	]), AC_MSG_NOTICE([Running]), AC_MSG_FAILURE([Not Running]))
+	]), AC_MSG_NOTICE([Running]), AC_MSG_FAILURE([Not Running]))])
 	LIBS="$LIBS_SAVE"
 ])
 
