@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2008-04-06 09:07:45 $
+ * Date:	$Date: 2008-06-20 10:43:01 $
  *
  */
 
@@ -291,7 +291,7 @@ db_res *SQLite3Server::devres_1_svc(db_res *recev)
 			if (!resource.empty())
 				res_list_dev.push_back(resource);
 			sqlite3_free_table(result);
-			logStream->errorStream() << "SQLite3Server::devres_1_svc : " << resource << log4cpp::eol;
+			logStream->debugStream() << "SQLite3Server::devres_1_svc : " << resource << log4cpp::eol;
 		}
 	}
 //
