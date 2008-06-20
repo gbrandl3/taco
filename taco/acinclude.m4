@@ -45,11 +45,11 @@ AC_DEFUN([TACO_LABVIEW_BINDING],
 [
 	taco_labview_binding="yes"
 	AC_ARG_ENABLE(labview, AC_HELP_STRING(--enable-labview, [build the binding for LabView @<:@default=${taco_labview_bindings}@:>@]),
-                [case "${enable_labview}" in
-                        yes)    taco_labview_binding=yes;;
-                        no)     taco_labview_binding=no;;
-                        *)      AC_MSG_ERROR([bad value ${enable_labview} for --enable-labview]);;
-                esac], [taco_labview=yes])
+                [AS_CASE(["${enable_labview}"], 
+                        [yes], [taco_labview_binding=yes],
+                        [no], [taco_labview_binding=no],
+                        [AC_MSG_ERROR([bad value ${enable_labview} for --enable-labview])])
+                ], [taco_labview=yes])
         AC_ARG_WITH(labview, AS_HELP_STRING([--with-labview=PFX], [Prefix where labview is installed, @<:@default=/usr/local/lv71@:>@]),
                 [labview_prefix="$withval"], [labview_prefix="/usr/local/lv71"])
 	ac_save_CPPFLAGS="$CPPFLAGS"
@@ -500,19 +500,19 @@ AC_DEFUN([WITH_CORBA],
 AC_DEFUN([WITH_TANGO],
 [
 #	AC_REQUIRE([AC_PATH_XTRA])
+	AC_ARG_WITH(tango-libraries, 
+		AS_HELP_STRING([--with-tango-libraries=DIR], [Directory where TANGO libraries are installed (optional)]),
+                [TANGO_LDFLAGS=-L${withval}; tango_libraries=-L${withval}], [tango_libraries=""])
 	AC_ARG_WITH(tango, AC_HELP_STRING([--with-tango@<:@=ARG@:>@], [TANGO @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the TANGO installation, e.g. '/usr/local/tango']), [
-		case  "$with_tango" in
-			yes) 	TANGO_LIBS="-ltango -llog4tango" 
+		AS_CASE(["$with_tango"], 
+			[yes],[	TANGO_LIBS="-ltango -llog4tango" 
 				TANGO_LDFLAGS=""
-				TANGO_INCLUDES="" 
-				;;
-			no)  	AC_MSG_WARN([Disable build of TANGO])
-				;;
-			*) 	TANGO_LIBS="-ltango -llog4tango"
-				TANGO_LDFLAGS="-L${withval}/lib"
-				TANGO_INCLUDES="-I${withval}/include"
-				with_tango=yes;;
-		esac      
+				TANGO_INCLUDES=""], 
+			[no], [AC_MSG_WARN([Disable build of TANGO])],
+			[TANGO_LIBS="-ltango -llog4tango"
+			TANGO_LDFLAGS=${TANGO_LDFLAGS:-"-L"${withval}/lib}
+			TANGO_INCLUDES=-I${withval}/include
+			with_tango=yes])
 		],[with_tango=yes; TANGO_LIBS="-ltango -llog4tango"; TANGO_INCLUDES=""])
 	AS_IF([test x"$with_tango" = x"yes"], [
 		save_CFLAGS="$CFLAGS"
@@ -534,6 +534,7 @@ AC_DEFUN([WITH_TANGO],
 	      ])
 	AC_SUBST(TANGO_LIBS)
 	AC_SUBST(TANGO_INCLUDES)
+	AC_SUBST(TANGO_LDFLAGS)
 ])
 
 AC_DEFUN([TACO_CLIENT_TCP],
