@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2008-04-06 09:07:45 $
+ * Date:	$Date: 2008-06-22 19:04:05 $
  *
  */
 
@@ -106,9 +106,7 @@ db_psdev_error *SQLite3Server::upddev_1_svc(db_res *dev_list)
 
 		std::string query = "SELECT NAME FROM device WHERE ";
 		query += (" SERVER LIKE '" + ds_class + "/" + ds_name + "'");
-
-		logStream->debugStream() << "SQLite3Server::upddev_1_svc(): query = " << query << log4cpp::eol;
-
+		logStream->infoStream() << "SQLite3Server::upddev_1_svc(): query = " << query << log4cpp::eol;
 		if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 		{
 			logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
@@ -179,14 +177,14 @@ db_psdev_error *SQLite3Server::upddev_1_svc(db_res *dev_list)
 
 // clean it from the database if an entry exists
 				query = "DELETE FROM device WHERE NAME = '" + *it + "'";
-				if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
+				logStream->infoStream() << query << log4cpp::eol;
+				if (sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
                         	{
 					logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 					psdev_back.error_code = DbErr_DatabaseAccess;
 					psdev_back.psdev_err = i + 1;
 					return (&psdev_back);
 				}
-				sqlite3_free_table(result);
 			}
 		}
 
@@ -239,12 +237,12 @@ long SQLite3Server::db_delete_names(const std::string ds_class, const std::strin
 
 	std::string query = "DELETE FROM device WHERE SERVER LIKE '" + ds_class + "/" + ds_name
                          + "' AND NAME = '" + dev_name + "'";
-	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
+	logStream->infoStream() << query << log4cpp::eol;
+	if (sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
 	{
 		logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::eol;
 		return DbErr_DatabaseAccess;
     	}
-	sqlite3_free_table(result);
 	return DS_OK;
 }
 
@@ -260,36 +258,36 @@ long SQLite3Server::db_delete_names(const std::string ds_class, const std::strin
  */
 long SQLite3Server::db_insert_names(const std::string ds_class, const std::string ds_name, const int ind, const std::string dev_name)
 {
-    std::stringstream query;
+	std::stringstream query;
 
-    if (count(dev_name.begin(), dev_name.end(), '/') != 2)
+	if (count(dev_name.begin(), dev_name.end(), '/') != 2)
 	return DbErr_BadDevSyntax;
-    std::string	domain,
-		family,
-		member;
-    std::string::size_type	pos,
+	std::string	domain,
+			family,
+			member;
+	std::string::size_type	pos,
 			last_pos = 0;
 
-    pos = dev_name.find('/');
-    domain = dev_name.substr(0, pos);
-    pos = dev_name.find('/', (last_pos = pos + 1));
-    family = dev_name.substr(last_pos, (pos - last_pos));
-    pos = dev_name.find('/', (last_pos = pos + 1));
-    member = dev_name.substr(last_pos, (pos - last_pos));
+	pos = dev_name.find('/');
+	domain = dev_name.substr(0, pos);
+	pos = dev_name.find('/', (last_pos = pos + 1));
+	family = dev_name.substr(last_pos, (pos - last_pos));
+	pos = dev_name.find('/', (last_pos = pos + 1));
+	member = dev_name.substr(last_pos, (pos - last_pos));
 
-    query << "INSERT INTO device(NAME, CLASS, SERVER, DOMAIN, FAMILY, MEMBER, IOR, PID, VERSION, EXPORTED)"
+	query << "INSERT INTO device(NAME, CLASS, SERVER, DOMAIN, FAMILY, MEMBER, IOR, PID, VERSION, EXPORTED)"
 	      << " VALUES('" << domain << "/" << family << "/" << member << "','" 
 	      << ds_class << "', '" << ds_class << "/" << ds_name << "', '" << domain << "', '" << family
 	      << "', '" << member << "', 'nada', 0, 0, 0)" << std::ends;
 //	      << "', '" << member << "', 'rpc::0', 0, 0, 0)" << std::ends;
 
 
-	logStream->debugStream() << query.str() << log4cpp::eol;
+	logStream->infoStream() << query.str() << log4cpp::eol;
 
 #if !HAVE_SSTREAM
-	if (sqlite3_get_table(db, query.str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
+	if (sqlite3_exec(db, query.str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
 #else
-	if (sqlite3_get_table(db, query.str().c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
+	if (sqlite3_exec(db, query.str().c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
 #endif
 	{
 		logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::eol;
@@ -301,7 +299,6 @@ long SQLite3Server::db_insert_names(const std::string ds_class, const std::strin
 #if !HAVE_SSTREAM
 	query.freeze(false);
 #endif
-	sqlite3_free_table(result);
 	return DS_OK;
 }
 
@@ -315,14 +312,14 @@ long SQLite3Server::db_insert_names(const std::string ds_class, const std::strin
  */
 db_psdev_error *SQLite3Server::updres_1_svc(db_res *res_list)
 {
-    long 			list_nb = res_list->res_val.arr1_len,
-				last,
-				ind;
-    char 			*ptr,
-				*ptr_cp,
-				*tmp,
-				last_dev[DEV_NAME_LENGTH],
-				pat[2] = {SEP_ELT, '\0'};
+	long 	list_nb = res_list->res_val.arr1_len,
+		last,
+		ind;
+	char 	*ptr,
+		*ptr_cp,
+		*tmp,
+		last_dev[DEV_NAME_LENGTH],
+		pat[2] = {SEP_ELT, '\0'};
 
 	logStream->debugStream() << "In updres_1_svc function for " << list_nb << " resource(s)" << log4cpp::eol;
 //
@@ -411,113 +408,109 @@ db_psdev_error *SQLite3Server::updres_1_svc(db_res *res_list)
  */
 long SQLite3Server::upd_res(std::string lin, long numb, char array, DevLong *p_err)
 {
-    unsigned int 	diff;
-    static std::string	domain,
+	unsigned int 	diff;
+	static std::string	domain,
 			family,
 			member,
 			name;
-    std::string		val;
+	std::string		val;
 
-    if (numb == 1)
-    {
-    	std::string::size_type	pos,
+	if (numb == 1)
+	{
+    		std::string::size_type	pos,
 				last_pos;
 //
 // Get table name 
 //
-	pos = lin.find('/');
-	domain = lin.substr(0, pos).c_str();
-	errcode = (domain == "sec");
+		pos = lin.find('/');
+		domain = lin.substr(0, pos).c_str();
+		errcode = (domain == "sec");
 //
 // Get family name 
 //
-	pos = lin.find('/',  (last_pos = pos + 1));
-	family = lin.substr(last_pos, pos - last_pos);
+		pos = lin.find('/',  (last_pos = pos + 1));
+		family = lin.substr(last_pos, pos - last_pos);
 //
 // Get member name 
 //
-	pos = lin.find('/', (last_pos = pos + 1));
-	member = lin.substr(last_pos, pos - last_pos);
+		pos = lin.find('/', (last_pos = pos + 1));
+		member = lin.substr(last_pos, pos - last_pos);
 //
 // Get resource name 
 //
-	pos = lin.find(':', (last_pos = pos + 1));
-	name = lin.substr(last_pos, pos - last_pos);
+		pos = lin.find(':', (last_pos = pos + 1));
+		name = lin.substr(last_pos, pos - last_pos);
 //
 // If the resource belongs to Security domain, change every occurance of
 // | by a ^ character 
 // 
-   	if (errcode == True)
-	{
-	    long l = name.length();
-	    for (int i = 0; i < l; i++)
-		if (name[i] == '|')
-			name[i] = SEC_SEP;
-	}
+   		if (errcode == True)
+		{
+			long l = name.length();
+			for (int i = 0; i < l; i++)
+				if (name[i] == '|')
+					name[i] = SEC_SEP;
+		}
 //
 // Get resource value (resource values are stored in the database as 
 // case dependent std::strings 
 //
-	val = lin.substr(pos + 1);
-    }
-    else
-	val = lin;
+		val = lin.substr(pos + 1);
+	}
+	else
+		val = lin;
 //
 // For security domain, change every occurance of | by a ^ 
 //
-    if (errcode == True)
-    {
-	long l = val.length();
-	for (int i = 0; i < l; i++)
-	    if (val[i] == '|')
-		val[i] = SEC_SEP;
-    }
-//
-// Initialise resource number */
-//
-    numb;
+	if (errcode == True)
+	{
+		long l = val.length();
+		for (int i = 0; i < l; i++)
+			if (val[i] == '|')
+				val[i] = SEC_SEP;
+	}
 
-    logStream->debugStream() << "Table name : " << domain << log4cpp::eol;
-    logStream->debugStream() << "Family name : " << family << log4cpp::eol;
-    logStream->debugStream() << "Number name : " << member << log4cpp::eol;
-    logStream->debugStream() << "Resource name : " << name << log4cpp::eol;
-    logStream->debugStream() << "Resource value : " << val << log4cpp::eol;
-    logStream->debugStream() << "Sequence number : " << numb << log4cpp::eol;
-
+	logStream->debugStream() << "Table name : " << domain << log4cpp::eol;
+	logStream->debugStream() << "Family name : " << family << log4cpp::eol;
+	logStream->debugStream() << "Number name : " << member << log4cpp::eol;
+	logStream->debugStream() << "Resource name : " << name << log4cpp::eol;
+	logStream->debugStream() << "Resource value : " << val << log4cpp::eol;
+	logStream->debugStream() << "Sequence number : " << numb << log4cpp::eol;
 //
 // Select the right resource table in database */
 //
-    if (numb == 1)
-    {
-	int i;
-	for (i = 0; i < dbgen.TblNum; i++)
-	    if (domain == dbgen.TblName[i])
-		break;
-	if (i == dbgen.TblNum)
+	if (numb == 1)
 	{
-	    *p_err = DbErr_DomainDefinition;
-	    return(-1);
+		int i;
+		for (i = 0; i < dbgen.TblNum; i++)
+			if (domain == dbgen.TblName[i])
+				break;
+		if (i == dbgen.TblNum)
+		{
+			*p_err = DbErr_DomainDefinition;
+			return(-1);
+		}
 	}
-    }
 //
 // If the resource value is %, remove all the resources.
 // If this function is called for a normal resource, I must also 
 // remove all the old resources with the old name. This is necessary if there
 // is an update of a resource which was previously an array 
 //
-    if (val == "%" || !array)
-    {
-	std::string query = "DELETE FROM property_device WHERE DEVICE = '" + domain + "/" + family + "/" + member + "'";
-        query += " AND NAME = '" + name + "'";
-	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
+	if (val == "%" || !array)
 	{
-	    logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::eol;
-	    logStream->errorStream() << query.c_str() << log4cpp::eol;
-	    *p_err = DbErr_DatabaseAccess;
-	    return(-1);
+		std::string query = "DELETE FROM property_device WHERE DEVICE = '" + domain + "/" + family + "/" + member + "'";
+        	query += " AND NAME = '" + name + "'";
+		logStream->infoStream() << query << log4cpp::eol;
+		if (sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
+		{
+			logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::eol;
+			logStream->errorStream() << query.c_str() << log4cpp::eol;
+			*p_err = DbErr_DatabaseAccess;
+			return(-1);
+		}
+		logStream->infoStream() << query << log4cpp::eol;
 	}
-	sqlite3_free_table(result);
-    }
 //
 // Insert a new tuple only if the value != %
 //
@@ -529,12 +522,12 @@ long SQLite3Server::upd_res(std::string lin, long numb, char array, DevLong *p_e
 			<< domain << "','" << family << "','" << member << "','" 
 			<< numb << "',\"" << val << "\", DATETIME('now'), DATETIME('now'))" << std::ends;
 
-		logStream->debugStream() << "SQLite3Server::upd_res(): query = " << query.str() << log4cpp::eol;
+		logStream->infoStream() << "SQLite3Server::upd_res(): query = " << query.str() << log4cpp::eol;
 
 #if !HAVE_SSTREAM
-		if (sqlite3_get_table(db, query.str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
+		if (sqlite3_exec(db, query.str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
 #else
-		if (sqlite3_get_table(db, query.str().c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
+		if (sqlite3_exec(db, query.str().c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
 #endif
 		{
 			logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::eol;
@@ -548,7 +541,6 @@ long SQLite3Server::upd_res(std::string lin, long numb, char array, DevLong *p_e
 #if !HAVE_SSTREAM
 		query.freeze(false);
 #endif
-		sqlite3_free_table(result);
 	}
 	return DS_OK;
 }

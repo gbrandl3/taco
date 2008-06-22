@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2008-04-06 09:07:43 $
+ * Date:	$Date: 2008-06-22 19:04:05 $
  *
  */
 
@@ -234,28 +234,27 @@ db_resimp *SQLite3Server::db_devimp_1_svc(arr1 *de_name)
 //
 // Allocate memory for the array of db_devinfo structures */
 //
-    int i = 0;
-    try
-    {
-    	back.imp_dev.tab_dbdev_val = new db_devinfo[num_dev];
+	int i = 0;
+	try
+	{
+    		back.imp_dev.tab_dbdev_val = new db_devinfo[num_dev];
 //
 // A loop on every device to import 
 //
-    	for (i = 0; i < num_dev; i++)
-    	{
+    		for (i = 0; i < num_dev; i++)
+    		{
 //
 // Try to retrieve the tuple in the NAMES table 
 //
-	    std::string dev_name(de_name->arr1_val[i]);
-	    std::string query;
-	    query = "SELECT HOST, IOR, VERSION, CLASS";
-	    query += (" FROM device WHERE name = '" + dev_name + "'" );
-	    query += (" AND IOR LIKE 'rpc:%'");
+			std::string dev_name(de_name->arr1_val[i]);
+			std::string query;
+			query = "SELECT HOST, IOR, VERSION, CLASS";
+			query += (" FROM device WHERE name = '" + dev_name + "'" );
+			query += (" AND IOR LIKE 'rpc:%'");
 
-	    logStream->debugStream() << "SQLite3Server::db_devimp_1_svc() : " << query << log4cpp::eol;
-
-	    if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
-	    {
+			logStream->infoStream() << "SQLite3Server::db_devimp_1_svc() : " << query << log4cpp::eol;
+			if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
+			{
 /*
  * unknown compiler directive for Solaris CC. Return an error.
  * 
@@ -264,108 +263,107 @@ db_resimp *SQLite3Server::db_devimp_1_svc(arr1 *de_name)
 #warning What happens if this point is reached ?
 		throw;
  */
-	    	for (int j = 0; j < i; j++)
-	    	{
-		    stu_addr = &(back.imp_dev.tab_dbdev_val[j]);
-		    delete [] stu_addr->dev_name;
-		    delete [] stu_addr->host_name;
-		    delete [] stu_addr->dev_type;
-		    delete [] stu_addr->dev_class;
-	    	}
-	    	back.imp_dev.tab_dbdev_len = 0;
-		back.db_imperr = DbErr_DatabaseAccess;
-	    	return(&back);
-	    }
+				for (int j = 0; j < i; j++)
+				{
+					stu_addr = &(back.imp_dev.tab_dbdev_val[j]);
+					delete [] stu_addr->dev_name;
+					delete [] stu_addr->host_name;
+					delete [] stu_addr->dev_type;
+					delete [] stu_addr->dev_class;
+				}
+				back.imp_dev.tab_dbdev_len = 0;
+				back.db_imperr = DbErr_DatabaseAccess;
+				return(&back);
+			}
+			logStream->debugStream() << "SQLite3Server::db_devimp_1_svc() : " << nrow << " devices found " << log4cpp::eol;
 
-	    logStream->debugStream() << "SQLite3Server::db_devimp_1_svc() : " << nrow << " devices found " << log4cpp::eol;
-
-            if (nrow == 1)
-	    {
+			if (nrow == 1)
+			{
 //
 // Unpack the content 
 //
-	    	    ret_host_name = result[ncol];
-		    std::string ior(result[ncol + 1]);
-		    std::string pgm_no;
-		    pgm_no = ior.substr(ior.rfind(':')+1);
-                    ret_pn = atoi(pgm_no.c_str());
-                    ret_dev_type = "DevType_Default";
-                    ret_dev_class = result[ncol + 3];
-	    	    ret_vn = atoi(result[ncol + 2]);
-	    }
+				ret_host_name = result[ncol];
+				std::string ior(result[ncol + 1]);
+				std::string pgm_no;
+				pgm_no = ior.substr(ior.rfind(':')+1);
+				ret_pn = atoi(pgm_no.c_str());
+				ret_dev_type = "DevType_Default";
+				ret_dev_class = result[ncol + 3];
+				ret_vn = atoi(result[ncol + 2]);
+			}
+			sqlite3_free_table(result); 
 //
 // In case of error 
 //
-	    sqlite3_free_table(result); 
-	    if (ret_pn == 0 || nrow != 1)
-	    {
-	    	for (int j = 0; j < i; j++)
-	    	{
-		    stu_addr = &(back.imp_dev.tab_dbdev_val[j]);
-		    delete [] stu_addr->dev_name;
-		    delete [] stu_addr->host_name;
-		    delete [] stu_addr->dev_type;
-		    delete [] stu_addr->dev_class;
-	    	}
-	    	back.imp_dev.tab_dbdev_len = 0;
-	    	if (nrow == 0)
-		    back.db_imperr = DbErr_DeviceNotDefined;
-	    	else if (nrow != 1)
-		    back.db_imperr = DbErr_DatabaseAccess;
-	    	else
-		    back.db_imperr = DbErr_DeviceNotExported;
-	    	return(&back);
-	    }
-	    stu_addr = &(back.imp_dev.tab_dbdev_val[i]);
+			if (ret_pn == 0 || nrow != 1)
+			{
+				for (int j = 0; j < i; j++)
+				{
+					stu_addr = &(back.imp_dev.tab_dbdev_val[j]);
+					delete [] stu_addr->dev_name;
+					delete [] stu_addr->host_name;
+					delete [] stu_addr->dev_type;
+					delete [] stu_addr->dev_class;
+				}
+				back.imp_dev.tab_dbdev_len = 0;
+				if (nrow == 0)
+					back.db_imperr = DbErr_DeviceNotDefined;
+				else if (nrow != 1)
+					back.db_imperr = DbErr_DatabaseAccess;
+				else
+					back.db_imperr = DbErr_DeviceNotExported;
+				return(&back);
+			}
+			stu_addr = &(back.imp_dev.tab_dbdev_val[i]);
 //
 // Allocate memory for the host_name string 
 //
-	    stu_addr->host_name = new char[ret_host_name.length() + 1];
+			stu_addr->host_name = new char[ret_host_name.length() + 1];
 //
 // Allocate memory for the device name string 
 //
-	    stu_addr->dev_name = new char[dev_name.length() + 1];
+			stu_addr->dev_name = new char[dev_name.length() + 1];
 //
 // Allocate memory for the device type string 
 //
-	    stu_addr->dev_type = new char[ret_dev_type.length() + 1];
+			stu_addr->dev_type = new char[ret_dev_type.length() + 1];
 //
 // Allocate memory for the device class string 
 //
-	    stu_addr->dev_class = new char[ret_dev_class.length() + 1];
+			stu_addr->dev_class = new char[ret_dev_class.length() + 1];
 //
 // Initialize structure sended back to client 
 //
-	    strcpy(stu_addr->host_name,ret_host_name.c_str());
-	    strcpy(stu_addr->dev_name,dev_name.c_str());
-	    stu_addr->p_num = ret_pn;
-	    stu_addr->v_num = ret_vn;
-	    strcpy(stu_addr->dev_class,ret_dev_class.c_str());
-	    strcpy(stu_addr->dev_type,ret_dev_type.c_str());
-    	} 
-        back.imp_dev.tab_dbdev_len = num_dev;
-    }
-    catch(std::bad_alloc)
-    {
-	delete [] stu_addr->host_name;
-	delete [] stu_addr->dev_name;
-	delete [] stu_addr->dev_type;
-	delete [] stu_addr->dev_class;
-	for (int j = 0; j < i; j++)
-	{
-	    stu_addr = &(back.imp_dev.tab_dbdev_val[j]);
-	    delete [] stu_addr->dev_name;
-	    delete [] stu_addr->host_name;
-	    delete [] stu_addr->dev_class;
-	    delete [] stu_addr->dev_type;
+			strcpy(stu_addr->host_name,ret_host_name.c_str());
+			strcpy(stu_addr->dev_name,dev_name.c_str());
+			stu_addr->p_num = ret_pn;
+			stu_addr->v_num = ret_vn;
+			strcpy(stu_addr->dev_class,ret_dev_class.c_str());
+			strcpy(stu_addr->dev_type,ret_dev_type.c_str());
+		} 
+		back.imp_dev.tab_dbdev_len = num_dev;
 	}
-	back.imp_dev.tab_dbdev_len = 0;
-	back.db_imperr = DbErr_ServerMemoryAllocation;
-    }
+	catch(std::bad_alloc)
+	{
+		delete [] stu_addr->host_name;
+		delete [] stu_addr->dev_name;
+		delete [] stu_addr->dev_type;
+		delete [] stu_addr->dev_class;
+		for (int j = 0; j < i; j++)
+		{
+			stu_addr = &(back.imp_dev.tab_dbdev_val[j]);
+			delete [] stu_addr->dev_name;
+			delete [] stu_addr->host_name;
+			delete [] stu_addr->dev_class;
+			delete [] stu_addr->dev_type;
+		}
+		back.imp_dev.tab_dbdev_len = 0;
+		back.db_imperr = DbErr_ServerMemoryAllocation;
+	}
 
 	logStream->debugStream() << "SQLite3Server::db_devimp_1_svc() : finish" << back.db_imperr << log4cpp::eol;
 
-    return(&back);
+	return(&back);
 }
 
 /**
@@ -426,14 +424,13 @@ DevLong *SQLite3Server::db_svcunr_1_svc(DevString *dsn_name)
 //	query = "UPDATE device SET EXPORTED = 0, STOPPED = DATETIME('NOW')";
 	query += (" WHERE SERVER = '" + ds_class + "/" + ds_name +"' AND PID != 0");
 
-        logStream->debugStream() << "SQLite3Server::db_svcunr_1_svc(): query = " << query << log4cpp::eol;
+        logStream->infoStream() << "SQLite3Server::db_svcunr_1_svc(): query = " << query << log4cpp::eol;
 
-	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
+	if (sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
 	{
 		errcode = DbErr_DatabaseAccess;
 		return (&errcode);
 	}
-	sqlite3_free_table(result);
 //
 // No error 
 //
@@ -449,39 +446,39 @@ DevLong *SQLite3Server::db_svcunr_1_svc(DevString *dsn_name)
  */
 svc_inf *SQLite3Server::db_svcchk_1_svc(DevString *dsn_name)
 {
-    static char 	host_name[HOST_NAME_LENGTH];
-    std::string		ds_class,
+	static char 	host_name[HOST_NAME_LENGTH];
+	std::string	ds_class,
 			ds_name,
 			device(*dsn_name);
-    std::string::size_type	pos;
+	std::string::size_type	pos;
 
-    logStream->debugStream() << "Device server name (check function) : " << device << log4cpp::eol;
-//
-// Miscellaneous initialization */
-//
-    host_name[0] = '\0';
-    svc_info.ho_name = host_name;
-    svc_info.p_num = 1;
-    svc_info.v_num = 1;
-    svc_info.db_err = 0;
+	logStream->debugStream() << "Device server name (check function) : " << device << log4cpp::eol;
 //
 // Return error code if the server is not connected to the database 
 //
-    if (!dbgen.connected)
-    {
-	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
-	svc_info.db_err = DbErr_DatabaseNotConnected;
-	return(&svc_info);
-    }
+	if (!dbgen.connected)
+	{
+		logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
+		svc_info.db_err = DbErr_DatabaseNotConnected;
+		return(&svc_info);
+	}
 //
-// Get device server class */
+// Miscellaneous initialization 
 //
-    if ((pos = device.find('/')) == std::string::npos)
-    {
-    	svc_info.db_err = DbErr_BadDevSyntax; 
-	return (&svc_info);
-    }
-    ds_class = device.substr(0, pos);
+	host_name[0] = '\0';
+	svc_info.ho_name = host_name;
+	svc_info.p_num = 1;
+	svc_info.v_num = 1;
+	svc_info.db_err = 0;
+//
+// Get device server class 
+//
+	if ((pos = device.find('/')) == std::string::npos)
+	{
+    		svc_info.db_err = DbErr_BadDevSyntax; 
+		return (&svc_info);
+	}
+	ds_class = device.substr(0, pos);
 //
 // Get device server name
 //
@@ -489,7 +486,6 @@ svc_inf *SQLite3Server::db_svcchk_1_svc(DevString *dsn_name)
 
 	logStream->debugStream() << "Device server class (check) : " << ds_class << log4cpp::eol;
 	logStream->debugStream() << "Device server name (check) : " << ds_name << log4cpp::eol;
-
 //
 // Initialization needed to retrieve the right tuples in the NAMES table 
 //
@@ -499,6 +495,7 @@ svc_inf *SQLite3Server::db_svcchk_1_svc(DevString *dsn_name)
 //
 // Try to retrieve the tuples 
 //
+	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
     	{
 		svc_info.db_err = DbErr_DatabaseAccess;
@@ -540,29 +537,27 @@ int SQLite3Server::db_store(db_devinfo &dev_stu)
 //
 	std::stringstream query;
 	query << "UPDATE device SET HOST = '" << dev_stu.host_name <<  "',"
-          << " IOR = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
-          << " VERSION = '" << dev_stu.v_num << "',"
-          << " CLASS = '" << dev_stu.dev_class << "',"
-          << " PID = 0 , SERVER = 'unknown'"
-          << " WHERE NAME = '" << dev_stu.dev_name << "'" << std::ends; 	
+          	<< " IOR = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
+          	<< " VERSION = '" << dev_stu.v_num << "',"
+          	<< " CLASS = '" << dev_stu.dev_class << "',"
+          	<< " PID = 0 , SERVER = 'unknown'"
+          	<< " WHERE NAME = '" << dev_stu.dev_name << "'" << std::ends; 	
 
 	logStream->debugStream() << "SQLite3Server::db_store() : " << query << log4cpp::eol;
-
 	try
 	{
+		logStream->infoStream() << query << log4cpp::eol;
 #if !HAVE_SSTREAM
-		if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
+		if (sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
 			throw long(DbErr_DatabaseAccess);
 		query.freeze(false);
 #else
-		if (sqlite3_get_table(db, query.str().c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
+		if (sqlite3_exec(db, query.str().c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
 			throw long(DbErr_DatabaseAccess);
 #endif
-		sqlite3_free_table(result);
 	}
 	catch(const long err)
 	{
-		sqlite3_free_table(result);
 		throw err;
 	}
 //
@@ -585,35 +580,34 @@ int SQLite3Server::db_store(db_devinfo_2 &dev_stu)
 //
 // Try to retrieve the right tuple in the NAMES table 
 //
-    std::stringstream query;
-    query << "UPDATE device SET HOST = '" << dev_stu.host_name <<  "',"
-          << " IOR = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
-          << " VERSION = '" << dev_stu.v_num << "',"
-          << " CLASS = '" << dev_stu.dev_class << "',"
-          << " PID = " << dev_stu.pid << ", SERVER = 'unknown'"
-          << " WHERE NAME = '" << dev_stu.dev_name << "'" << std::ends; 	
+	std::stringstream query;
+	query << "UPDATE device SET HOST = '" << dev_stu.host_name <<  "',"
+		<< " IOR = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
+		<< " VERSION = '" << dev_stu.v_num << "',"
+		<< " CLASS = '" << dev_stu.dev_class << "',"
+		<< " PID = " << dev_stu.pid << ", SERVER = 'unknown'"
+		<< " WHERE NAME = '" << dev_stu.dev_name << "'" << std::ends; 	
 
-    try
-    {
+	try
+	{
+		logStream->infoStream() << query << log4cpp::eol;
 #if !HAVE_SSTREAM
-	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
-	    throw long(DbErr_DatabaseAccess);
-        query.freeze(false);
+		if (sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
+			throw long(DbErr_DatabaseAccess);
+		query.freeze(false);
 #else
-	if (sqlite3_get_table(db, query.str().c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
-	    throw long(DbErr_DatabaseAccess);
+		if (sqlite3_exec(db, query.str().c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
+			throw long(DbErr_DatabaseAccess);
 #endif
-	sqlite3_free_table(result);
-    }
-    catch(const long err)
-    {
-	sqlite3_free_table(result);
-	throw err;
-    }
+	}
+	catch(const long err)
+	{
+		throw err;
+	}
 //
 // Leave function
 //
-    return DS_OK;
+	return DS_OK;
 }
 
 /**
@@ -636,6 +630,7 @@ int SQLite3Server::db_store(db_devinfo_3 &dev_stu)
 	query_device << "SELECT NAME FROM device WHERE name = '" << dev_stu.dev_name << "';" << std::ends;
 	try
 	{
+		logStream->infoStream() << query_device.str() << log4cpp::eol;
 #if !HAVE_SSTREAM
 		if (sqlite3_get_table(db, queryi_device.str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 			throw long(DbErr_DatabaseAccess);
@@ -657,38 +652,36 @@ int SQLite3Server::db_store(db_devinfo_3 &dev_stu)
         	throw long(DbErr_DeviceNotDefined);
     	}
 	sqlite3_free_table(result);
-
 //
 // Try to retrieve the right tuple in the NAMES table 
 //
-    std::stringstream query;
-    query << "UPDATE device SET HOST = '" << dev_stu.host_name <<  "',"
-          << " IOR = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
-          << " VERSION = '" << dev_stu.v_num << "',"
-          << " CLASS = '" << dev_stu.dev_class << "',"
-//        << " PID = " << dev_stu.pid << ", SERVER = '" << dev_stu.proc_name << "'"
-          << " PID = " << dev_stu.pid << "," << " EXPORTED = 1," 
-	  << " STARTED = DATETIME('NOW')"
-          << " WHERE NAME = '" << dev_stu.dev_name << "'" << std::ends; 	
-    logStream->debugStream() << "SQLite3Server::db_store() query = " << query.str() << log4cpp::eol;
-    try
-    {
+	std::stringstream query;
+	query << "UPDATE device SET HOST = '" << dev_stu.host_name <<  "',"
+		<< " IOR = 'rpc:" << dev_stu.host_name << ":" << dev_stu.p_num << "',"
+		<< " VERSION = '" << dev_stu.v_num << "',"
+		<< " CLASS = '" << dev_stu.dev_class << "',"
+//		<< " PID = " << dev_stu.pid << ", SERVER = '" << dev_stu.proc_name << "'"
+		<< " PID = " << dev_stu.pid << "," << " EXPORTED = 1," 
+		<< " STARTED = DATETIME('NOW')"
+		<< " WHERE NAME = '" << dev_stu.dev_name << "'" << std::ends; 	
+	logStream->debugStream() << "SQLite3Server::db_store() query = " << query.str() << log4cpp::eol;
+	try
+	{
+		logStream->infoStream() << query << log4cpp::eol;
 #if !HAVE_SSTREAM
-	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
-	    throw long(DbErr_DatabaseAccess);
-        query.freeze(false);
+		if (sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
+			throw long(DbErr_DatabaseAccess);
+		query.freeze(false);
 #else
-	if (sqlite3_get_table(db, query.str().c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
-	    throw long(DbErr_DatabaseAccess);
+		if (sqlite3_exec(db, query.str().c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
+			throw long(DbErr_DatabaseAccess);
 #endif
-	sqlite3_free_table(result);
-    }
-    catch(const long err)
-    {
-	sqlite3_free_table(result);
-	logStream->errorStream() << "SQLite3Server::db_store(): error = " << sqlite3_errmsg(db) << log4cpp::eol;
-	throw err;
-    }
+	}
+	catch(const long err)
+	{
+		logStream->errorStream() << "SQLite3Server::db_store(): error = " << sqlite3_errmsg(db) << log4cpp::eol;
+		throw err;
+	}
 //
 // Leave function
 //

@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2008-04-06 09:07:43 $
+ * Date:	$Date: 2008-06-22 19:04:05 $
  *
  */
 
@@ -111,32 +111,32 @@ db_res *SQLite3Server::resdomainlist_1_svc()
  */
 db_res *SQLite3Server::resfamilylist_1_svc(DevString* domain)
 {
-    std::vector<std::string> 	fam_list;
+	std::vector<std::string> 	fam_list;
 	
-    logStream->debugStream() << "In resfamilylist_1_svc function for domain " << *domain << log4cpp::eol;
-
-    std::string user_domain(*domain);
-//
-// Initialize structure sent back to client
-//
-    browse_back.db_err = 0;
-    browse_back.res_val.arr1_len = 0;
-    browse_back.res_val.arr1_val = NULL;
+	logStream->debugStream() << "In resfamilylist_1_svc function for domain " << *domain << log4cpp::eol;
 //
 // If the server is not connected to the database, throw exception
 //
-    if (dbgen.connected == False)
-    {
-	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
-	browse_back.db_err = DbErr_DatabaseNotConnected;
-	return(&browse_back);
-    }
+	if (dbgen.connected == False)
+	{
+		logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
+		browse_back.db_err = DbErr_DatabaseNotConnected;
+		return(&browse_back);
+	}
+	std::string user_domain(*domain);
+//
+// Initialize structure sent back to client
+//
+	browse_back.db_err = 0;
+	browse_back.res_val.arr1_len = 0;
+	browse_back.res_val.arr1_val = NULL;
 //
 // Get all resources family name defined in this table
 //
-    std::string query;
-    query = "SELECT DISTINCT FAMILY FROM property_device WHERE DOMAIN = '";
-    query += (user_domain + "' ORDER BY FAMILY ASC");
+	std::string query;
+	query = "SELECT DISTINCT FAMILY FROM property_device WHERE DOMAIN = '";
+	query += (user_domain + "' ORDER BY FAMILY ASC");
+	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
@@ -153,28 +153,28 @@ db_res *SQLite3Server::resfamilylist_1_svc(DevString* domain)
 //
 // Build the structure returned to caller
 //
-    int length = browse_back.res_val.arr1_len = fam_list.size();
-    browse_back.res_val.arr1_val = new char *[browse_back.res_val.arr1_len];
+	int length = browse_back.res_val.arr1_len = fam_list.size();
+	browse_back.res_val.arr1_val = new char *[browse_back.res_val.arr1_len];
  
-    for (int i = 0;i < length;i++)
-    {
-        int     k = fam_list[i].length();
-        browse_back.res_val.arr1_val[i] = new char [k + 1];
-        fam_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
-        (browse_back.res_val.arr1_val[i])[k] = '\0';
-    }                                                                                                     
+	for (int i = 0;i < length;i++)
+	{
+		int     k = fam_list[i].length();
+		browse_back.res_val.arr1_val[i] = new char [k + 1];
+		fam_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
+		(browse_back.res_val.arr1_val[i])[k] = '\0';
+	}                                                                                                     
 #if 0
-    if (fam_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
-    {
+	if (fam_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
+	{
 	logStream->errorStream() << "Memory allocation error in resfamilylist" << log4cpp::eol;
 	browse_back.db_err = DbErr_ServerMemoryAllocation;
 	return(&browse_back);
-    }
+	}
 #endif
 //
 // Return data
 //
-    return(&browse_back);	
+	return(&browse_back);	
 }
 
 
@@ -187,45 +187,41 @@ db_res *SQLite3Server::resfamilylist_1_svc(DevString* domain)
  */
 db_res *SQLite3Server::resmemberlist_1_svc(db_res *recev)
 {
-    std::vector<std::string> 	memb_list;
-    std::string 		user_domain(recev->res_val.arr1_val[0]),
-  	   			user_family(recev->res_val.arr1_val[1]);
-	
-    logStream->debugStream() << "In resmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << log4cpp::eol;
-	
-//
-// Initialize structure sent back to client
-//
-    browse_back.db_err = 0;
-    browse_back.res_val.arr1_len = 0;
-    browse_back.res_val.arr1_val = NULL;
 //
 // If the server is not connected to the database, return error
 //
-    if (dbgen.connected == False)
-    {
-	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
-	browse_back.db_err = DbErr_DatabaseNotConnected;
-	return(&browse_back);
-    }
+	if (dbgen.connected == False)
+	{
+		logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
+		browse_back.db_err = DbErr_DatabaseNotConnected;
+		return(&browse_back);
+	}
+	std::vector<std::string> 	memb_list;
+	std::string 			user_domain(recev->res_val.arr1_val[0]),
+  	   				user_family(recev->res_val.arr1_val[1]);
+	
+	logStream->debugStream() << "In resmemberlist_1_svc function for domain " << user_domain << " and family " 
+				<< user_family << log4cpp::eol;
+//
+// Initialize structure sent back to client
+//
+	browse_back.db_err = 0;
+	browse_back.res_val.arr1_len = 0;
+	browse_back.res_val.arr1_val = NULL;
 //
 // Get all resources family name defined in this table
 //
 	std::string query;
 	query = "SELECT DISTINCT MEMBER FROM property_device WHERE DOMAIN = '";
 	query += (user_domain + "' AND FAMILY = '" + user_family + "' ORDER BY MEMBER ASC");
-
-	logStream->debugStream() << "SQLite3Server::resmemberlist_1_svc() : " << query << log4cpp::eol;
-
+	logStream->infoStream() << "SQLite3Server::resmemberlist_1_svc() : " << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		browse_back.db_err = DbErr_DatabaseAccess;
 		return (&browse_back);
 	}
-
 	logStream->debugStream() << "SQLite3Server::resmemberlist_1_svc() : " << nrow << " rows found" << log4cpp::eol;
-
 
 	int j = ncol; 
 	memb_list.clear();
@@ -253,20 +249,19 @@ db_res *SQLite3Server::resmemberlist_1_svc(db_res *recev)
         	(browse_back.res_val.arr1_val[i])[k] = '\0';
     	}                                                                                                     
 #if 0
-    if (memb_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
-    {
+	if (memb_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
+	{
 		logStream->errorStream() << "Memory allocation error in resmemberlist" << log4cpp::eol;
 		browse_back.db_err = DbErr_ServerMemoryAllocation;
 		return(&browse_back);
-    }
+	}
 #endif
 
 	logStream->debugStream() << "SQLite3Server::resmemberlist_1_svc() : finish" << log4cpp::eol;
-
 //
 // Return data
 //
-    return(&browse_back);	
+	return(&browse_back);	
 }
 
 
@@ -279,48 +274,41 @@ db_res *SQLite3Server::resmemberlist_1_svc(db_res *recev)
  */
 db_res *SQLite3Server::resresolist_1_svc(db_res *recev)
 {
-    std::vector<std::string> 	reso_list;
-    std::string 		user_domain(recev->res_val.arr1_val[0]),
-    			user_family(recev->res_val.arr1_val[1]),
-    			user_member(recev->res_val.arr1_val[2]);
-	
-
-    logStream->debugStream() << "In resresolist_1_svc function for " << user_domain \
-	<< "/" << user_family << "/" << user_member << log4cpp::eol;
-
-//
-// Initialize structure sent back to client
-//
-    browse_back.db_err = 0;
-    browse_back.res_val.arr1_len = 0;
-    browse_back.res_val.arr1_val = NULL;
 //
 // If the server is not connected to the database, return error
 //
-    if (dbgen.connected == False)
-    {
-	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
-	browse_back.db_err = DbErr_DatabaseNotConnected;
-	return(&browse_back);
-    }
+	if (dbgen.connected == False)
+	{
+		logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
+		browse_back.db_err = DbErr_DatabaseNotConnected;
+		return(&browse_back);
+	}
+	std::vector<std::string> 	reso_list;
+	std::string 		user_domain(recev->res_val.arr1_val[0]),
+    				user_family(recev->res_val.arr1_val[1]),
+    				user_member(recev->res_val.arr1_val[2]);
+
+	logStream->debugStream() << "In resresolist_1_svc function for " << user_domain \
+			<< "/" << user_family << "/" << user_member << log4cpp::eol;
+//
+// Initialize structure sent back to client
+//
+	browse_back.db_err = 0;
+	browse_back.res_val.arr1_len = 0;
+	browse_back.res_val.arr1_val = NULL;
 //
 // Get all resources for the specified domain,family,member
 // The test to know if the resource is a new one is done by the index value
 // which is 1 for all new resource
 //
-    std::string query;
+	std::string query;
 
 	query = "SELECT DISTINCT NAME FROM property_device WHERE DOMAIN = '";
     	query += (user_domain + "' AND FAMILY = '" + user_family);
 	if (user_member != "*")
-	{
-		query += ("' AND MEMBER = '" + user_member + "' ORDER BY NAME ASC");
-	}
-        else
-	{
-                query += ("' ORDER BY NAME ASC");
-	}
-
+		query += ("' AND MEMBER = '" + user_member);
+	query += ("' ORDER BY NAME ASC");
+	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
@@ -333,33 +321,30 @@ db_res *SQLite3Server::resresolist_1_svc(db_res *recev)
 		reso_list.push_back(result[j]);
 	sqlite3_free_table(result);                                                                            
 //
-// Sort resource name list
-//
-//
 // Build the structure returned to caller
 //
-    int length = browse_back.res_val.arr1_len = reso_list.size();
-    browse_back.res_val.arr1_val = new char *[browse_back.res_val.arr1_len];
+	int length = browse_back.res_val.arr1_len = reso_list.size();
+	browse_back.res_val.arr1_val = new char *[browse_back.res_val.arr1_len];
  
-    for (int i = 0;i < length;i++)
-    {
-        int     k = reso_list[i].length();
-        browse_back.res_val.arr1_val[i] = new char [k + 1];
-        reso_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
-        (browse_back.res_val.arr1_val[i])[k] = '\0';
-    }
+	for (int i = 0;i < length;i++)
+	{
+		int     k = reso_list[i].length();
+		browse_back.res_val.arr1_val[i] = new char [k + 1];
+		reso_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
+		(browse_back.res_val.arr1_val[i])[k] = '\0';
+	}
 #if 0
-    if (reso_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
-    {
-	logStream->errorStream() << "Memory allocation error in resresolist" << log4cpp::eol;
-	browse_back.db_err = DbErr_ServerMemoryAllocation;
-	return(&browse_back);
-    }
+	if (reso_list.copy_to_C(browse_back.res_val.arr1_val) != 0)
+	{
+		logStream->errorStream() << "Memory allocation error in resresolist" << log4cpp::eol;
+		browse_back.db_err = DbErr_ServerMemoryAllocation;
+		return(&browse_back);
+	}
 #endif
 //
 // Return data
 //
-    return(&browse_back);	
+	return(&browse_back);	
 }
 
 /**
@@ -372,43 +357,43 @@ db_res *SQLite3Server::resresolist_1_svc(db_res *recev)
  */
 db_res *SQLite3Server::resresoval_1_svc(db_res *recev)
 {
-    std::string 		res_val;
-    std::vector<std::string> 	reso_list;
-    std::string 		user_domain(recev->res_val.arr1_val[0]),
+//
+// If the server is not connected to the database, throw exception
+//
+	if (dbgen.connected == False)
+	{
+		logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
+		browse_back.db_err = DbErr_DatabaseNotConnected;
+		return(&browse_back);
+	}
+	std::vector<std::string> 	reso_list;
+	std::string 	res_val;
+	std::string 	user_domain(recev->res_val.arr1_val[0]),
     			user_family(recev->res_val.arr1_val[1]),
     			user_member(recev->res_val.arr1_val[2]),
     			user_reso(recev->res_val.arr1_val[3]);
 		
-    logStream->debugStream() << "In resresoval_1_svc function for " << user_domain \
-	<< "/" << user_family << "/" << user_member << "/" << user_reso << log4cpp::eol;
-	
+	logStream->debugStream() << "In resresoval_1_svc function for " << user_domain \
+		<< "/" << user_family << "/" << user_member << "/" << user_reso << log4cpp::eol;
 //
 // Initialize structure sent back to client
 //
-    browse_back.db_err = 0;
-    browse_back.res_val.arr1_len = 0;
-    browse_back.res_val.arr1_val = NULL;
-//
-// If the server is not connected to the database, throw exception
-//
-    if (dbgen.connected == False)
-    {
-	logStream->errorStream() << "I'm not connected to the database" << log4cpp::eol;
-	browse_back.db_err = DbErr_DatabaseNotConnected;
-	return(&browse_back);
-    }
+	browse_back.db_err = 0;
+	browse_back.res_val.arr1_len = 0;
+	browse_back.res_val.arr1_val = NULL;
 //
 // Get a list of all members and resource name
 //
-    std::string query;
+	std::string query;
 
-    query = "SELECT MEMBER, NAME, COUNT, VALUE FROM property_device WHERE ";
-    query += (" DOMAIN = '" + user_domain + "' AND FAMILY = '" + user_family + "'");
-    if (user_member != "*")
-    	    query += (" AND MEMBER = '" + user_member + "'");
-    if (user_reso != "*")
-	    query += (" AND NAME = '" + user_reso + "'");
-    query += (" ORDER BY MEMBER ASC, NAME ASC, COUNT ASC");
+	query = "SELECT MEMBER, NAME, COUNT, VALUE FROM property_device WHERE ";
+	query += (" DOMAIN = '" + user_domain + "' AND FAMILY = '" + user_family + "'");
+	if (user_member != "*")
+		query += (" AND MEMBER = '" + user_member + "'");
+	if (user_reso != "*")
+		query += (" AND NAME = '" + user_reso + "'");
+	query += (" ORDER BY MEMBER ASC, NAME ASC, COUNT ASC");
+	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
@@ -432,43 +417,40 @@ db_res *SQLite3Server::resresoval_1_svc(db_res *recev)
 //
 // Build the first field of the complete resource name
 //
-	if (atoi(result[j + 2]) == 1)
-	{
-	    if (res_val.length() != 0)
-		reso_list.push_back(res_val);
-	    res_val = user_domain + "/" + user_family + "/" + result[j] + "/" + result[j + 1] + ": " + result[j + 3];
+		if (atoi(result[j + 2]) == 1)
+		{
+			if (res_val.length() != 0)
+				reso_list.push_back(res_val);
+			res_val = user_domain + "/" + user_family + "/" + result[j] + "/" + result[j + 1] + ": " + result[j + 3];
+		}
+		else
+			res_val += ("," + std::string(result[j + 3]));
 	}
-	else
-	    res_val += ("," + std::string(result[j + 3]));
-    }
-    reso_list.push_back(res_val);
-    sqlite3_free_table(result);                                                                            
-//
-// Sort the resource array
-//
+	reso_list.push_back(res_val);
+	sqlite3_free_table(result);                                                                            
 //
 // Build the structure returned to caller
 //
-    int length = browse_back.res_val.arr1_len = reso_list.size();
-    browse_back.res_val.arr1_val = new char *[browse_back.res_val.arr1_len];
+	int length = browse_back.res_val.arr1_len = reso_list.size();
+	browse_back.res_val.arr1_val = new char *[browse_back.res_val.arr1_len];
  
-    for (int i = 0;i < length;i++)
-    {
-        int     k = reso_list[i].length();
-        browse_back.res_val.arr1_val[i] = new char [k + 1];
-        reso_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
-        (browse_back.res_val.arr1_val[i])[k] = '\0';
-    }
+	for (int i = 0;i < length;i++)
+	{
+        	int     k = reso_list[i].length();
+        	browse_back.res_val.arr1_val[i] = new char [k + 1];
+        	reso_list[i].copy(browse_back.res_val.arr1_val[i],std::string::npos);
+        	(browse_back.res_val.arr1_val[i])[k] = '\0';
+	}
 #if 0
-    if (reso_val.copy_to_C(browse_back.res_val.arr1_val) != 0)
-    {
-	logStream->errorStream() << "Memory allocation error in resresoval" << log4cpp::eol;
-	browse_back.db_err = DbErr_ServerMemoryAllocation;
-	return(&browse_back);
-    }
+	if (reso_val.copy_to_C(browse_back.res_val.arr1_val) != 0)
+	{
+		logStream->errorStream() << "Memory allocation error in resresoval" << log4cpp::eol;
+		browse_back.db_err = DbErr_ServerMemoryAllocation;
+		return(&browse_back);
+	}
 #endif
 //
 // Return data
 //
-    return(&browse_back);
+	return(&browse_back);
 }

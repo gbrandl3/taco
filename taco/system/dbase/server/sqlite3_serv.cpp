@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2008-04-06 09:07:43 $
+ * Date:	$Date: 2008-06-22 19:04:05 $
  *
  */
 
@@ -45,132 +45,132 @@
  */
 db_res *SQLite3Server::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 {
-    int 		j,
+	int 		j,
     			k = 0;
-    u_int 		num_res,
+	u_int 		num_res,
 			err_db;
-    std::string		tab_name,
+	std::string	tab_name,
     			rest;
-    struct sockaddr_in 	so;
+	struct sockaddr_in 	so;
 #if defined __GLIBC__  &&  __GLIBC__ >= 2
-    socklen_t  		so_size;   /* from POSIX draft - already used by GLIBC */
+	socklen_t  	so_size;   /* from POSIX draft - already used by GLIBC */
 #else
-    int 		so_size;
+	int 		so_size;
 #endif
-    u_short 		prot;
-    int 		k1 = 1;
+	u_short 		prot;
+	int 		k1 = 1;
 
-    logStream->debugStream() << "In db_getres_1_svc " << log4cpp::eol;
+	logStream->debugStream() << "In db_getres_1_svc " << log4cpp::eol;
 //
 // Return error code if the server is not connected to the database 
 //
-    if (dbgen.connected == False)
-    {
-	browse_back.db_err = DbErr_DatabaseNotConnected;
-	browse_back.res_val.arr1_len = 0;
-	browse_back.res_val.arr1_val = NULL;
-	return(&browse_back);
-    }
+	if (dbgen.connected == False)
+	{
+		browse_back.db_err = DbErr_DatabaseNotConnected;
+		browse_back.res_val.arr1_len = 0;
+		browse_back.res_val.arr1_val = NULL;
+		return(&browse_back);
+	}
 //
 // Retrieve the protocol used to send this request to server 
 //
-    so_size = sizeof(so);
+	so_size = sizeof(so);
 #ifdef unix
-    if (rqstp->rq_xprt->xp_port == getUDPPort())
-        prot = IPPROTO_UDP;
-    else
-        prot = IPPROTO_TCP;
+	if (rqstp->rq_xprt->xp_port == getUDPPort())
+        	prot = IPPROTO_UDP;
+	else
+        	prot = IPPROTO_TCP;
 #else
-    so_size = sizeof(so);
-    if (getsockname(rqstp->rq_xprt->xp_sock,(struct sockaddr *)&so, (socklen_t *)&so_size) == -1)
-    {
-	browse_back.db_err = DbErr_TooManyInfoForUDP;
-	browse_back.res_val.arr1_len = 0;
-	return(&browse_back);
-    }
+	so_size = sizeof(so);
+	if (getsockname(rqstp->rq_xprt->xp_sock,(struct sockaddr *)&so, (socklen_t *)&so_size) == -1)
+	{
+		browse_back.db_err = DbErr_TooManyInfoForUDP;
+		browse_back.res_val.arr1_len = 0;
+		return(&browse_back);
+	}
 
-    if (so.sin_port == getUDPPort())
-	prot = IPPROTO_UDP;
-    else
-	prot = IPPROTO_TCP;
+	if (so.sin_port == getUDPPort())
+		prot = IPPROTO_UDP;
+	else
+		prot = IPPROTO_TCP;
 #endif 
-    num_res = rece->arr1_len;
+	num_res = rece->arr1_len;
 
-    for(int i = 0; i < num_res; i++)
-	logStream->debugStream() << "Resource name : " << rece->arr1_val[i] << log4cpp::eol;
+	for(int i = 0; i < num_res; i++)
+		logStream->debugStream() << "Resource name : " << rece->arr1_val[i] << log4cpp::eol;
 
 //
 // Initialize browse_back structure error code 
 //
-    browse_back.db_err = 0;
+	browse_back.db_err = 0;
 //
 // Allocate memory for the array of string sended back to client 
 //
-    int i = 0;
-    try
-    {
-    	browse_back.res_val.arr1_val = new DevString[num_res];
-	for (int j = 0; j < num_res; ++j)
-		browse_back.res_val.arr1_val[j] = NULL;
+	int i = 0;
+	try
+	{
+		browse_back.res_val.arr1_val = new DevString[num_res];
+		for (int j = 0; j < num_res; ++j)
+			browse_back.res_val.arr1_val[j] = NULL;
 //
 // A loop on the resource's number to be looked for
 //
-    	for(i = 0; i < num_res; i++)
-    	{
-	    std::string ptrc = rece->arr1_val[i];
+		for(i = 0; i < num_res; i++)
+	    	{
+			std::string ptrc = rece->arr1_val[i];
 //
 // Find the table name (DOMAIN) 
 //
-	    std::string::size_type pos = ptrc.find('/');
-	    tab_name = ptrc.substr(0, pos);
-	    rest = ptrc.substr(pos + 1);
+			std::string::size_type pos = ptrc.find('/');
+			tab_name = ptrc.substr(0, pos);
+			rest = ptrc.substr(pos + 1);
 //
 // Try to find the resource value from database 
 //
-	    if((err_db = db_find(tab_name, rest, &browse_back.res_val.arr1_val[i], &k1)) != 0)
-	    {
-	    	for (int j = 0; j <= i; j++)
-		    delete [] browse_back.res_val.arr1_val[j];
-		delete [] browse_back.res_val.arr1_val;
-	    	browse_back.db_err = err_db;
-	    	browse_back.res_val.arr1_len = 0;
-	    	return(&browse_back);
-	    }
+			if((err_db = db_find(tab_name, rest, &browse_back.res_val.arr1_val[i], &k1)) != 0)
+			{
+		    		for (int j = 0; j <= i; j++)
+					delete [] browse_back.res_val.arr1_val[j];
+				delete [] browse_back.res_val.arr1_val;
+		    		browse_back.db_err = err_db;
+		    		browse_back.res_val.arr1_len = 0;
+		    		return(&browse_back);
+			}
 //
 // Compute an estimation of the network packet size (Only if the UDP protocol
 // has been used to send this request to the server) 
 //
-	    if (prot == IPPROTO_UDP)
-	    {
-	    	if ((k = strlen(browse_back.res_val.arr1_val[i]) + k) > SIZE - 1000)
-	    	{
-		    for (int j = 0; j <= i; j++)
-		    	delete [] browse_back.res_val.arr1_val[j];
-		    delete [] browse_back.res_val.arr1_val;
-		    browse_back.db_err = DbErr_TooManyInfoForUDP;
-		    browse_back.res_val.arr1_len = 0;
-		    return(&browse_back);
-	    	}
-	    }
-    	}
+			if (prot == IPPROTO_UDP)
+			{
+				if ((k = strlen(browse_back.res_val.arr1_val[i]) + k) > SIZE - 1000)
+				{
+					for (int j = 0; j <= i; j++)
+						delete [] browse_back.res_val.arr1_val[j];
+					delete [] browse_back.res_val.arr1_val;
+					browse_back.db_err = DbErr_TooManyInfoForUDP;
+					browse_back.res_val.arr1_len = 0;
+					return(&browse_back);
+				}
+			}
+		}
 //
 // Initialize the structure sended back to client 
 //
-    	browse_back.res_val.arr1_len = num_res;
-    }
-    catch(std::bad_alloc)
-    {
-	for (int j = 0; j <= i; j++)
-	    delete [] browse_back.res_val.arr1_val[j];
-	delete [] browse_back.res_val.arr1_val;
-	browse_back.db_err = DbErr_ServerMemoryAllocation;
-	browse_back.res_val.arr1_len = 0;
-    }
+    		browse_back.res_val.arr1_len = num_res;
+	}
+	catch(std::bad_alloc)
+	{
+		for (int j = 0; j <= i; j++)
+			delete [] browse_back.res_val.arr1_val[j];
+		delete [] browse_back.res_val.arr1_val;
+		browse_back.db_err = DbErr_ServerMemoryAllocation;
+		browse_back.res_val.arr1_len = 0;
+	}
 //
 // Exit server 
 //
-    logStream->debugStream() << "Exit db_getres_1_svc " << log4cpp::eol;
-    return(&browse_back);
+	logStream->debugStream() << "Exit db_getres_1_svc " << log4cpp::eol;
+	return(&browse_back);
 }
 
 
@@ -300,7 +300,7 @@ int SQLite3Server::db_find(std::string tab_name, std::string p_res_name, char **
 	query += ("WHERE DEVICE = '" + tab_name + "/" + family + "/" + member + "' AND NAME = '" + r_name);
 	query += "' ORDER BY COUNT ASC";
 
-	logStream->debugStream() << "SQLite3Server::db_find(): query = " << query << log4cpp::eol;
+	logStream->infoStream() << "SQLite3Server::db_find(): query = " << query << log4cpp::eol;
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
@@ -407,7 +407,7 @@ int SQLite3Server::db_devlist(std::string dev_na, int *dev_num, db_res *back)
 	std::string query;
 	query = "SELECT NAME, CLASS FROM device WHERE SERVER = '" + ds_class + "/" + ds_name + "' ORDER BY CLASS";
 
-	logStream->debugStream() << "SQLite3Server::db_devlist(): query " << query << log4cpp::eol;
+	logStream->infoStream() << "SQLite3Server::db_devlist(): query " << query << log4cpp::eol;
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
@@ -593,54 +593,51 @@ DevLong *SQLite3Server::db_putres_1_svc(tab_putres *rece)
  */
 DevLong *SQLite3Server::db_delres_1_svc(arr1 *rece/*, struct svc_req *rqstp*/)
 {
-    int 	j;
-    u_int 	num_res = rece->arr1_len,
+	int 	j;
+	u_int 	num_res = rece->arr1_len,
 		err_db;
-    register char *ptrc;
+	register char *ptrc;
 
-    for(int i = 0; i < num_res; i++)
-	logStream->debugStream() << "Resource to delete : " << rece->arr1_val[i] << log4cpp::eol;
-
-//
-// Initialize error code 
-//
-    errcode = 0;
 //
 // Return error code if the server is not connected to the database files
 //
-    if (dbgen.connected == False)
-    {
-	errcode = DbErr_DatabaseNotConnected;
-	return(&errcode);
-    }
+	if (dbgen.connected == False)
+	{
+		errcode = DbErr_DatabaseNotConnected;
+		return(&errcode);
+	}
+
+	for(int i = 0; i < num_res; i++)
+		logStream->debugStream() << "Resource to delete : " << rece->arr1_val[i] << log4cpp::eol;
+//
+// Initialize error code 
+//
+	errcode = 0;
 //
 // Mark the server as not connected. This will prevent dbm_update to
 // add/modify resources during this call
 //
-    dbgen.connected = False;
-//
-// Allocate array for pointers to store deleted resources value
-//
+	dbgen.connected = False;
 //
 // A loop on the resource's number to be deleted
-
-    for (int i = 0; i < num_res; i++)
-    {
+//
+	for (int i = 0; i < num_res; i++)
+	{
 //
 // Try to delete the resource from database 
 //
-	if((errcode = db_del(rece->arr1_val[i])) != 0 )
-	{
-	    dbgen.connected = True;
-	    logStream->errorStream() << "Could not delete resource " << rece->arr1_val[i] << log4cpp::eol;
-	    return(&errcode);
-    	}
-    }
+		if((errcode = db_del(rece->arr1_val[i])) != 0 )
+		{
+			dbgen.connected = True;
+			logStream->errorStream() << "Could not delete resource " << rece->arr1_val[i] << log4cpp::eol;
+			return(&errcode);
+    		}
+	}
 //
 // Free memory and exit server 
 //
-    dbgen.connected = True;
-    return(&errcode);
+	dbgen.connected = True;
+	return(&errcode);
 }
 
 /**
@@ -713,14 +710,13 @@ int SQLite3Server::db_insert(std::string res_name, std::string number, std::stri
 	query += (domain + "','" + family +"','" + member + "','");
 	query += (number + "','" + content + "', DATETIME('now'), DATETIME('now'))");
 
-	logStream->debugStream() << "SQLite3Server::db_insert(): query = " << query << log4cpp::eol;
+	logStream->infoStream() << "SQLite3Server::db_insert(): query = " << query << log4cpp::eol;
 
-	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
+	if (sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
 	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		return (DbErr_DatabaseAccess);
 	}
-	sqlite3_free_table(result);
 	return DS_OK;
 }
 
@@ -734,59 +730,57 @@ int SQLite3Server::db_insert(std::string res_name, std::string number, std::stri
  */
 int SQLite3Server::db_del(std::string res_name)
 {
-    std::string		t_name,
+	std::string	t_name,
     			family,
     			member,
     			r_name;
-    std::string::size_type 	pos, 
+	std::string::size_type 	pos, 
 			last_pos;
-    int			i;
+	int		i;
 //
 // Get table name 
 //
-    if ((pos = res_name.find('/')) == std::string::npos)
-    {
+	if ((pos = res_name.find('/')) == std::string::npos)
+	{
 	logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::eol;
 	return(DbErr_BadResourceType);
-    }
-    t_name = res_name.substr(0, pos);
+	}
+	t_name = res_name.substr(0, pos);
 //
 // Get family name 
 //
-    if ((pos = res_name.find('/', 1 + (last_pos = pos))) == std::string::npos)
-    {
+	if ((pos = res_name.find('/', 1 + (last_pos = pos))) == std::string::npos)
+	{
 	logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::eol;
 	return(DbErr_BadResourceType);
-    }
-    family = res_name.substr(last_pos + 1, pos - last_pos - 1);
+	}
+	family = res_name.substr(last_pos + 1, pos - last_pos - 1);
 //
 // Get member name 
 //
-    if ((pos = res_name.find('/', 1 + (last_pos = pos))) == std::string::npos)
-    {
+	if ((pos = res_name.find('/', 1 + (last_pos = pos))) == std::string::npos)
+	{
 	logStream->errorStream() << "db_del : Error in resource name " <<res_name << log4cpp::eol;
 	return(DbErr_BadResourceType);
-    }
-    member = res_name.substr(last_pos + 1, pos - last_pos - 1);
+	}
+	member = res_name.substr(last_pos + 1, pos - last_pos - 1);
 //
 // Get resource name 
 //
-   last_pos = pos;
-    r_name = res_name.substr(last_pos + 1);
+	last_pos = pos;
+	r_name = res_name.substr(last_pos + 1);
 
-#ifdef NEVER
-    logStream->errorStream() << "Family name : " << family << log4cpp::eol;
-    logStream->errorStream() << "Number name : " << member << log4cpp::eol;
-    logStream->errorStream() << "Resource name : " << r_name << log4cpp::eol;
-#endif
+	logStream->debugStream() << "Family name : " << family << log4cpp::eol;
+	logStream->debugStream() << "Number name : " << member << log4cpp::eol;
+	logStream->debugStream() << "Resource name : " << r_name << log4cpp::eol;
 //
 // Select the right resource table in database
 //
-    for (i = 0; i < dbgen.TblNum;i++)
-	if (t_name == dbgen.TblName[i])
-	    break;
-    if (i == dbgen.TblNum)
-	return(DbErr_DomainDefinition);
+	for (i = 0; i < dbgen.TblNum;i++)
+		if (t_name == dbgen.TblName[i])
+			break;
+	if (i == dbgen.TblNum)
+		return(DbErr_DomainDefinition);
 //
 // Try to retrieve the right tuple in table and loop for the case of an
 // array of resource 
@@ -794,14 +788,13 @@ int SQLite3Server::db_del(std::string res_name)
 	std::string query;
 	query = "DELETE FROM property_device WHERE DEVICE = '" + t_name + "/" + family + "/" + member + "'";
 	query += " AND NAME = '" + r_name + "'";
-
-	logStream->debugStream() << "db_del : query = " << query << log4cpp::eol;
-
-	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
+	logStream->infoStream() << "db_del : query = " << query << log4cpp::eol;
+	if (sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
 	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		return (DbErr_DatabaseAccess);
 	}
+	logStream->infoStream() << "db_del : query = " << query << log4cpp::eol;
 	return(0);
 }
 

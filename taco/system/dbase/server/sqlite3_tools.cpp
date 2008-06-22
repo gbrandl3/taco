@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2008-06-22 09:41:24 $
+ * Date:	$Date: 2008-06-22 19:04:05 $
  *
  */
 
@@ -100,6 +100,7 @@ db_devinfo_svc *SQLite3Server::devinfo_1_svc(DevString *dev)
 	query = "SELECT SERVER, HOST, IOR, VERSION, CLASS, PID, EXPORTED FROM device";
 	query += " WHERE NAME = '" + user_device + "' AND IOR NOT LIKE 'ior:%'";
 	query += " AND CLASS NOT LIKE 'PseudoDevice'";
+	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{			
 		sent_back.db_err = DbErr_DatabaseAccess;
@@ -107,9 +108,7 @@ db_devinfo_svc *SQLite3Server::devinfo_1_svc(DevString *dev)
 	}
 	else
 	{
-
 		logStream->debugStream() << "SQLite3Server::devinfo_1_svc() : " << nrow << " devices found" << log4cpp::eol;
-
 		if(nrow != 0)
 		{
 			sent_back.device_type = DB_Device;				
@@ -153,6 +152,7 @@ db_devinfo_svc *SQLite3Server::devinfo_1_svc(DevString *dev)
 			query += (" WHERE NAME = '" + user_device + "'");
 			query += (" AND IOR NOT LIKE 'ior:%'");
 			query += (" AND CLASS LIKE 'PseudoDevice'");
+			logStream->infoStream() << query << log4cpp::eol;
 			if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 			{
 				if(nrow != 0)
@@ -261,8 +261,7 @@ db_res *SQLite3Server::devres_1_svc(db_res *recev)
 		query += (" DEVICE = '" + in_dev);
 		query += ( + "' ORDER BY DOMAIN ASC, FAMILY ASC, MEMBER ASC, NAME ASC, COUNT ASC");
 
-		logStream->debugStream() << "QUERY = " << query << log4cpp::eol;
-
+		logStream->infoStream() << "QUERY = " << query << log4cpp::eol;
 //
 // Get resource value for each element in the tmp_res_list list 
 //
@@ -371,18 +370,15 @@ DevLong *SQLite3Server::devdel_1_svc(DevString *dev)
 	std::string query, where;
 	query = "SELECT CLASS, SERVER FROM device ",
 	where = "WHERE NAME = '" + user_device + "'";   
-
-	logStream->debugStream() << "SQLite3Server::devdel_1_svc() : " << query + where << log4cpp::eol;
-
+	logStream->infoStream() << "SQLite3Server::devdel_1_svc() : " << query + where << log4cpp::eol;
 	if (sqlite3_get_table(db, (query + where).c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
     	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 		errcode = DbErr_DatabaseAccess;
 		return (&errcode);
     	}
-
-
 	logStream->debugStream() << "SQLite3Server::devdel_1_svc() : " << nrow << log4cpp::eol;
+	sqlite3_free_table(result);
 
 	if(nrow != 0)
 	{
@@ -391,10 +387,8 @@ DevLong *SQLite3Server::devdel_1_svc(DevString *dev)
 		
 		sqlite3_free_table(result);
 		query = "DELETE FROM device "; 
-
-		logStream->debugStream() << "SQLite3Server::devdel_1_svc() : " << query + where << log4cpp::eol;
-
-		if (sqlite3_get_table(db, (query + where).c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
+		logStream->infoStream() << "SQLite3Server::devdel_1_svc() : " << query + where << log4cpp::eol;
+		if (sqlite3_exec(db, (query + where).c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
 		{
 			logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 			errcode = DbErr_DatabaseAccess;
@@ -405,7 +399,6 @@ DevLong *SQLite3Server::devdel_1_svc(DevString *dev)
 // for all devices above the deleted one)
 //
 	}
-	sqlite3_free_table(result);
 //
 // Return data
 //
@@ -423,60 +416,60 @@ DevLong *SQLite3Server::devdel_1_svc(DevString *dev)
  */
 db_psdev_error *SQLite3Server::devdelres_1_svc(db_res *recev)
 {
-    logStream->debugStream() << "In devdelres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << log4cpp::eol;
-
-//
-// Initialize parameter sent back to client
-//
-    psdev_back.error_code = 0;
-    psdev_back.psdev_err = 0;
+	logStream->debugStream() << "In devdelres_1_svc function for " << recev->res_val.arr1_len << " device(s)" << log4cpp::eol;
 //
 // If the server is not connected to the database, return error
 //
-    if (dbgen.connected == False)
-    {
-	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
-	psdev_back.error_code = DbErr_DatabaseNotConnected;
-	return(&psdev_back);
-    }
+	if (dbgen.connected == False)
+	{
+		logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
+		psdev_back.error_code = DbErr_DatabaseNotConnected;
+		return(&psdev_back);
+	}
+//
+// Initialize parameter sent back to client
+//
+	psdev_back.error_code = 0;
+	psdev_back.psdev_err = 0;
 //
 // Build a vector of object from the NdbmDomDev class. Each object in this class
 // has a domain name and a list of family/member for this domain
 //
-    for (long i = 0;i < recev->res_val.arr1_len;i++)
-    {
-	std::string in_dev(recev->res_val.arr1_val[i]);
+	for (long i = 0;i < recev->res_val.arr1_len;i++)
+	{
+		std::string in_dev(recev->res_val.arr1_val[i]);
 		
-	if (count(in_dev.begin(), in_dev.end(), SEP_DEV) != 2)
-	{
-	    psdev_back.error_code = DbErr_BadDevSyntax;
-	    psdev_back.psdev_err = i;
-	    return(&psdev_back);
+		if (count(in_dev.begin(), in_dev.end(), SEP_DEV) != 2)
+		{
+			psdev_back.error_code = DbErr_BadDevSyntax;
+			psdev_back.psdev_err = i;
+			return(&psdev_back);
+		}
+		std::string query;
+		query = "DELETE FROM property_device WHERE DEVICE = '" + in_dev + "'";
+		logStream->infoStream() << query << log4cpp::eol;
+		if (sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
+		{
+			logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
+			psdev_back.error_code = DbErr_DatabaseAccess;
+			psdev_back.psdev_err = i;
+			return (&psdev_back);
+		}
+		logStream->infoStream() << query << log4cpp::eol;
 	}
-	std::string query;
-	query = "DELETE FROM property_device WHERE DEVICE = '" + in_dev + "'";
-	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
-	{
-	    logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
-	    psdev_back.error_code = DbErr_DatabaseAccess;
-	    psdev_back.psdev_err = i;
-	    return (&psdev_back);
-	}
-	sqlite3_free_table(result);
-    }
 //
 // leave fucntion
 //
-    return(&psdev_back);
+	return(&psdev_back);
 }
 
 class NameCount	
 {
 public:
-    std::string	name;
-    long	count;
-    friend bool operator== (const NameCount &a, const NameCount &b){return (a.name == b.name);};
-    friend bool operator< (const NameCount &a, const NameCount &b) {return (a.name < b.name);};
+	std::string	name;
+	long	count;
+	friend bool operator== (const NameCount &a, const NameCount &b){return (a.name == b.name);};
+	friend bool operator< (const NameCount &a, const NameCount &b) {return (a.name < b.name);};
 };
 
 
@@ -523,6 +516,7 @@ db_info_svc *SQLite3Server::info_1_svc()
 //
 	std::string query;
 	query = "SELECT DOMAIN, COUNT(*) FROM device WHERE EXPORTED != 0 GROUP BY DOMAIN";
+	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
@@ -544,6 +538,7 @@ db_info_svc *SQLite3Server::info_1_svc()
 // And now,  count not exported devices in the domains
 //
 	query = "SELECT DOMAIN, COUNT(*) FROM device WHERE EXPORTED = 0 GROUP BY domain";
+	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
@@ -569,6 +564,7 @@ db_info_svc *SQLite3Server::info_1_svc()
 // Now, count pseudo_devices
 //
 	query = "SELECT COUNT(*) FROM device WHERE IOR LIKE 'DC:%'";
+	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{ 
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
@@ -583,6 +579,7 @@ db_info_svc *SQLite3Server::info_1_svc()
 // Then, count resources in each domain
 //
 	query = "SELECT DOMAIN, COUNT(*) FROM property_device GROUP BY domain";
+	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
@@ -644,33 +641,30 @@ db_info_svc *SQLite3Server::info_1_svc()
  */
 DevLong *SQLite3Server::unreg_1_svc(db_res *recev)
 {
-    std::string 		user_ds_name(recev->res_val.arr1_val[0]),
+	std::string 	user_ds_name(recev->res_val.arr1_val[0]),
     			user_pers_name(recev->res_val.arr1_val[1]);
 		
-    logStream->debugStream() << "In unreg_1_svc function for " << user_ds_name << "/" << user_pers_name << log4cpp::eol;
-	
-//
-// Initialize structure sent back to client
-//
-    errcode = 0;
+	logStream->debugStream() << "In unreg_1_svc function for " << user_ds_name << "/" << user_pers_name << log4cpp::eol;
 //
 // If the server is not connected to the database, returns error
 //
-    if (dbgen.connected == False)
-    {
-	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
-	errcode = DbErr_DatabaseNotConnected;
-	return(&errcode);
-    }
+	if (dbgen.connected == False)
+	{
+		logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
+		errcode = DbErr_DatabaseNotConnected;
+		return(&errcode);
+	}
+//
+// Initialize structure sent back to client
+//
+	errcode = 0;
 //
 // First, suppose that the ds_name is a PROCESS name
 //
-    std::string query;
-    query = "SELECT DISTINCT CLASS FROM device";
-    query += (" WHERE SERVER = '" + user_ds_name + "/" + user_pers_name + "'");
-
-	logStream->debugStream() << " SQLite3Server::unreg_1_svc() : " << query << log4cpp::eol;
-
+	std::string query;
+	query = "SELECT DISTINCT CLASS FROM device";
+	query += (" WHERE SERVER = '" + user_ds_name + "/" + user_pers_name + "'");
+	logStream->infoStream() << " SQLite3Server::unreg_1_svc() : " << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
@@ -705,7 +699,7 @@ DevLong *SQLite3Server::unreg_1_svc(db_res *recev)
 	else
 		query += (class_list + ") AND SERVER = '"+ user_ds_name + "/" + user_pers_name + "'");
 
-	logStream->debugStream() << " SQLite3Server::unreg_1_svc() : " << query << log4cpp::eol;
+	logStream->infoStream() << " SQLite3Server::unreg_1_svc() : " << query << log4cpp::eol;
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
@@ -785,6 +779,7 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
 		+ user_ds_name + "/" + user_pers_name + "' AND IOR NOT LIKE 'ior:%'";
 
 
+	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
@@ -855,6 +850,7 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
 	char pid_str[32];
 	snprintf(pid_str, sizeof(pid_str), "%d", svcinfo_back.pid);
 	query += pid_str;
+	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
@@ -893,6 +889,7 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
 			ncol2;
 
 		query = "SELECT NAME, EXPORTED FROM DEVICE WHERE SERVER ='" + full_srv_name + "'";
+		logStream->infoStream() << query << log4cpp::eol;
 		if (sqlite3_get_table(db, query.c_str(), &result2, &nrow2, &ncol2, &zErrMsg2) != SQLITE_OK)
 		{
 			logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
@@ -964,7 +961,7 @@ DevLong *SQLite3Server::svcdelete_1_svc(db_res *recev)
 	std::string query;
 	query = "SELECT NAME FROM DEVICE WHERE SERVER = '"
 		+ user_ds_name + "/" + user_pers_name + "' AND IOR NOT LIKE 'ior:%'";
-
+	logStream->infoStream() << query << log4cpp::eol;	
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
@@ -991,30 +988,29 @@ DevLong *SQLite3Server::svcdelete_1_svc(db_res *recev)
 		if (del_res == true) 
 		{
 			query = "DELETE FROM PROPERTY_DEVICE WHERE DEVICE = '" + dev_name + "'";
-			if (sqlite3_get_table(db, query.c_str(), &result2, &nrow2, &ncol2, &zErrMsg2) != SQLITE_OK)
+			logStream->infoStream() << query << log4cpp::eol;
+			if (sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg2) != SQLITE_OK)
 			{
-				sqlite3_free_table(result);
 				logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 				errcode = DbErr_DatabaseAccess;
 				return (&errcode);
 			}
-			sqlite3_free_table(result2);
+			logStream->infoStream() << query << log4cpp::eol;
 		}
 
 		query = "DELETE FROM DEVICE WHERE NAME = '" + dev_name + "'";
-		if (sqlite3_get_table(db, query.c_str(), &result2, &nrow2, &ncol2, &zErrMsg2) != SQLITE_OK)
+		logStream->infoStream() << query << log4cpp::eol;
+		if (sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg2) != SQLITE_OK)
 		{
-			sqlite3_free_table(result);
 			logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 			errcode = DbErr_DatabaseAccess;
 			return (&errcode);
 		}
-		sqlite3_free_table(result2);
 	}
+	sqlite3_free_table(result);
 //
 // Leave call
 //				
-	sqlite3_free_table(result);
 	return(&errcode);
 }
 
@@ -1091,6 +1087,7 @@ db_poller_svc *SQLite3Server::getpoller_1_svc(DevString *dev)
 
 	query = "SELECT DEVICE FROM property_device WHERE DOMAIN = 'sys' AND";
 	query += (" name = '" + std::string(POLL_RES) + "' AND UPPER(value) = UPPER('" + user_device + "')");
+	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
@@ -1120,6 +1117,7 @@ db_poller_svc *SQLite3Server::getpoller_1_svc(DevString *dev)
 //
 	query = "SELECT SERVER, HOST, PID FROM device";
 	query += (" WHERE NAME = '" + poller_name + "'");
+	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;

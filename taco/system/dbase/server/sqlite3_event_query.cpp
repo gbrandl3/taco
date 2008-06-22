@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2008-04-06 09:07:42 $
+ * Date:	$Date: 2008-06-22 19:04:05 $
  *
  */
 
@@ -43,47 +43,48 @@
  */
 event_que *SQLite3Server::db_event_query_1_svc(DevString *pevent_name)
 {
-    int 		i;
-    std::string		fam,
+	int 		i;
+	std::string	fam,
 			memb,
 			r_name,
 			event_str(*pevent_name);
 
-    logStream->debugStream() << "Command name : " << event_str << log4cpp::eol;
+	logStream->debugStream() << "Command name : " << event_str << log4cpp::eol;
 //
 // Initialize error code sended event_queue to client 
 //
-    event_queue.db_err = 0;
+	event_queue.db_err = 0;
 //
 // Return error code if the server is not connected to the database files 
 //
-    if (!dbgen.connected)
-    {
-	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
-	event_queue.db_err = DbErr_DatabaseNotConnected;
-	event_queue.xevent_code = 0;
-	return(&event_queue);
-    }
+	if (!dbgen.connected)
+	{
+		logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
+		event_queue.db_err = DbErr_DatabaseNotConnected;
+		event_queue.xevent_code = 0;
+		return(&event_queue);
+	}
 //
 // Retrieve the right "table" in the table array 
 //
-    for (i = 0;i < dbgen.TblNum;i++)
-	if (dbgen.TblName[i] == "events")
-	    break;
-    if (i == dbgen.TblNum)
-    {
-	event_queue.db_err = DbErr_DomainDefinition;
-	event_queue.xevent_code = 0;
-	return(&event_queue);
-    }
+	for (i = 0;i < dbgen.TblNum;i++)
+		if (dbgen.TblName[i] == "events")
+			break;
+	if (i == dbgen.TblNum)
+	{
+		event_queue.db_err = DbErr_DomainDefinition;
+		event_queue.xevent_code = 0;
+		return(&event_queue);
+	}
 //
 // Try to retrieve a resource in the EVENTS table with a resource value equal
 // to the command name 
 //
-    std::string query;
+	std::string query;
 
-    query = "SELECT FAMILY, MEMBER, NAME FROM property_device WHERE ";
-    query += ("DOMAIN = 'events' AND VALUE = '" + event_str + "'");
+	query = "SELECT FAMILY, MEMBER, NAME FROM property_device WHERE ";
+	query += ("DOMAIN = 'events' AND VALUE = '" + event_str + "'");
+	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
     	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
@@ -106,5 +107,5 @@ event_que *SQLite3Server::db_event_query_1_svc(DevString *pevent_name)
 //
 // Leave server 
 //
-    return(&event_queue);
+	return(&event_queue);
 }

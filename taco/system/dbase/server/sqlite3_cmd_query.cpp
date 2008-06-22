@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2008-04-06 09:07:42 $
+ * Date:	$Date: 2008-06-22 19:04:05 $
  *
  */
 
@@ -43,42 +43,43 @@
  */
 cmd_que *SQLite3Server::db_cmd_query_1_svc(DevString *pcmd_name)
 {
-    int 		i;
-    std::string 	req_cmd(*pcmd_name);
+	int 		i;
+	std::string 	req_cmd(*pcmd_name);
 
-    logStream->debugStream() << "Command name : " << req_cmd << log4cpp::eol;
+	logStream->debugStream() << "Command name : " << req_cmd << log4cpp::eol;
 //
 // Initialize error code sended cmd_queue to client 
 //
-    cmd_queue.db_err = 0;
+	cmd_queue.db_err = 0;
 //
 // Return error code if the server is not connected to the database files 
 //
-    if (!dbgen.connected)
-    {
-	logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
-	cmd_queue.db_err = DbErr_DatabaseNotConnected;
-	cmd_queue.xcmd_code = 0;
-	return(&cmd_queue);
-    }
+	if (!dbgen.connected)
+	{
+		logStream->errorStream() << "I'm not connected to database." << log4cpp::eol;
+		cmd_queue.db_err = DbErr_DatabaseNotConnected;
+		cmd_queue.xcmd_code = 0;
+		return(&cmd_queue);
+	}
 //
 // Retrieve the right "table" in the table array 
 //
-    for (i = 0;i < dbgen.TblNum;i++)
-	if (dbgen.TblName[i] == "cmds")		// DOMAIN = 'cmds'
-	    break;
-    if (i == dbgen.TblNum)
-    {
-	cmd_queue.db_err = DbErr_DomainDefinition;
-	cmd_queue.xcmd_code = 0;
-	return(&cmd_queue);
-    }
+	for (i = 0;i < dbgen.TblNum;i++)
+		if (dbgen.TblName[i] == "cmds")		// DOMAIN = 'cmds'
+			break;
+	if (i == dbgen.TblNum)
+	{
+		cmd_queue.db_err = DbErr_DomainDefinition;
+		cmd_queue.xcmd_code = 0;
+		return(&cmd_queue);
+	}
 //
 // Try to retrieve a resource in the CMDS table with a resource value equal
 // to the command name 
 //
-    std::string query = "SELECT FAMILY, MEMBER, NAME FROM property_device WHERE ";
-    query += ("DOMAIN = 'cmds' AND VALUE = '" + req_cmd + "'");
+	std::string query = "SELECT FAMILY, MEMBER, NAME FROM property_device WHERE ";
+	query += ("DOMAIN = 'cmds' AND VALUE = '" + req_cmd + "'");
+	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 		logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
@@ -101,5 +102,5 @@ cmd_que *SQLite3Server::db_cmd_query_1_svc(DevString *pcmd_name)
 //
 // Leave server 
 //
-    return(&cmd_queue);
+	return(&cmd_queue);
 }

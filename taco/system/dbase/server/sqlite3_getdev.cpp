@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2008-04-06 09:07:43 $
+ * Date:	$Date: 2008-06-22 19:04:05 $
  *
  */
 
@@ -163,6 +163,7 @@ db_res *SQLite3Server::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rq
 
 	browse_back.res_val.arr1_len = 0;
 	browse_back.db_err = 0;
+	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
 //
