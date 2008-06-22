@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.17 $
+ * Version:	$Revision: 1.18 $
  *
- * Date:	$Date: 2008-04-06 09:07:40 $
+ * Date:	$Date: 2008-06-22 19:02:40 $
  *
  */
 
@@ -788,6 +788,7 @@ DevLong *NdbmServer::db_delres_1_svc(arr1 * rece /* , struct svc_req *rqstp */)
 	try
 	{
     		old_res = new DevString[num_res];
+		memset(old_res, 0, num_res * sizeof(DevString));
 		int	err_db;
 //
 // A loop on the resource's number to be deleted 
@@ -818,7 +819,8 @@ DevLong *NdbmServer::db_delres_1_svc(arr1 * rece /* , struct svc_req *rqstp */)
 // Free memory and exit server 
 //
 	for (int i = 0; i < num_res; i++)
-		delete [] old_res[i];
+		if (old_res[i])
+			delete [] old_res[i];
 	delete [] old_res;
 	dbgen.connected = true;
 	return (&errcode);
