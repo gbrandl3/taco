@@ -35,7 +35,8 @@ bin_PROGRAMS		= db_update \
 			sec_objinfo \
 			sec_passwd \
 			sec_userinfo \
-			db_backup
+			db_backup \
+			db_clear
 
 bin_SCRIPTS		= db_fillup2
 
@@ -106,3 +107,6 @@ sec_userinfo_LDADD	= @TACO_CLIENT_LIBS@
 
 db_backup_SOURCES	= db_backup.cpp
 db_backup_LDADD		= @TACO_CLIENT_LIBS@
+
+db_clear_SOURCES	= db_clear.cpp
+db_clear_LDADD		= @TACO_CLIENT_LIBS@
