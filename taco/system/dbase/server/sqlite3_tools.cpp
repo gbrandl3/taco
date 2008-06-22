@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2008-06-20 10:43:01 $
+ * Date:	$Date: 2008-06-22 09:41:24 $
  *
  */
 
@@ -962,7 +962,6 @@ DevLong *SQLite3Server::svcdelete_1_svc(db_res *recev)
 // from the server name.
 //
 	std::string query;
-	query = "SELECT DISTINCT CLASS FROM device WHERE SERVER = '" + user_ds_name + "/" + user_pers_name + "'";
 	query = "SELECT NAME FROM DEVICE WHERE SERVER = '"
 		+ user_ds_name + "/" + user_pers_name + "' AND IOR NOT LIKE 'ior:%'";
 
@@ -972,7 +971,7 @@ DevLong *SQLite3Server::svcdelete_1_svc(db_res *recev)
 		errcode = DbErr_DatabaseAccess;
 		return (&errcode);
 	}
-	int dev_length = ncol;
+	int dev_length = nrow;
 	if (dev_length == 0)
 	{
 		sqlite3_free_table(result);
@@ -988,7 +987,7 @@ DevLong *SQLite3Server::svcdelete_1_svc(db_res *recev)
 		nrow2;
 	for(int i = 0; i < dev_length; ++i) 
 	{
-		std::string dev_name(result[k]);
+		std::string dev_name(result[k + i]);
 		if (del_res == true) 
 		{
 			query = "DELETE FROM PROPERTY_DEVICE WHERE DEVICE = '" + dev_name + "'";
@@ -1011,18 +1010,6 @@ DevLong *SQLite3Server::svcdelete_1_svc(db_res *recev)
 			return (&errcode);
 		}
 		sqlite3_free_table(result2);
-	}
-	sqlite3_free_table(result);
-
-
-	std::string class_list("");
-	int j = ncol;
-	for (int i = 0; i < nrow; ++i, j += ncol)
-	{
-		if (class_list.empty())
-			class_list = "'" + std::string(result[j]) + "'";
-		else
-			class_list += (", '" + std::string(result[j]) + "'");
 	}
 //
 // Leave call
