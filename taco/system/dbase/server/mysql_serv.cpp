@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.18 $
+ * Version:	$Revision: 1.19 $
  *
- * Date:	$Date: 2008-04-06 09:07:41 $
+ * Date:	$Date: 2008-06-22 09:39:40 $
  *
  */
 
@@ -656,7 +656,7 @@ int MySQLServer::db_insert(std::string res_name, std::string number, std::string
 //
     if ((pos = res_name.find('/')) == std::string::npos)
     {
-	logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::eol;
+	logStream->errorStream() << "db_insert : Error in resource name " << res_name << log4cpp::eol;
 	return(DbErr_BadResourceType);
     }
     domain = res_name.substr(0, pos);
