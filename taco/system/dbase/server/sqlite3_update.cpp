@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2008-06-22 19:04:05 $
+ * Date:	$Date: 2008-06-23 10:17:58 $
  *
  */
 
@@ -50,17 +50,17 @@ db_psdev_error *SQLite3Server::upddev_1_svc(db_res *dev_list)
 	logStream->debugStream() << "In upddev_1_svc function for " << list_nb << " device list(s)" << log4cpp::eol;
 
 //
-// Initialize parameter sent back to client */
+// Initialize parameter sent back to client 
 //
 	psdev_back.error_code = 0;
 	psdev_back.psdev_err = 0;
 //
-// A loop on each device list */
+// A loop on each device list 
 //
 	for (long i = 0;i < list_nb;i++)
 	{
 //		
-// Allocate memory for strtok pointers */
+// Allocate memory for strtok pointers 
 //
 		std::string lin = dev_list->res_val.arr1_val[i];
 
@@ -327,6 +327,16 @@ db_psdev_error *SQLite3Server::updres_1_svc(db_res *res_list)
 //
 	psdev_back.error_code = 0;
 	psdev_back.psdev_err = 0;
+
+	std::string query = "BEGIN TRANSACTION";
+	logStream->infoStream() << query << log4cpp::eol;
+	if (sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
+	{
+		logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::eol;
+		logStream->errorStream() << query.c_str() << log4cpp::eol;
+		psdev_back.error_code = DbErr_DatabaseAccess;
+		return (&psdev_back);
+	}
 //
 // A loop on each resources 
 //
@@ -339,12 +349,15 @@ db_psdev_error *SQLite3Server::updres_1_svc(db_res *res_list)
 
 		logStream->debugStream() << "Resource list = " << lin << log4cpp::eol;
 //
-// Only one update if the resource is a simple one */
+// Only one update if the resource is a simple one 
 //
 		if (lin.find(SEP_ELT) == std::string::npos)
 		{
 	    		if (upd_res(lin,1,False,&psdev_back.error_code) == -1)
 	    		{
+				query = "ROLLBACK TRANSACTION";
+				logStream->infoStream() << query << log4cpp::eol;
+				sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg);
 				psdev_back.psdev_err = i + 1;
 				return(&psdev_back);
 	    		}
@@ -357,6 +370,9 @@ db_psdev_error *SQLite3Server::updres_1_svc(db_res *res_list)
 			}
 			catch(std::bad_alloc)
 			{
+				query = "ROLLBACK TRANSACTION";
+				logStream->infoStream() << query << log4cpp::eol;
+				sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg);
 				psdev_back.psdev_err = i + 1;
 				psdev_back.error_code = DbErr_ClientMemoryAllocation;
 				return(&psdev_back);
@@ -369,6 +385,9 @@ db_psdev_error *SQLite3Server::updres_1_svc(db_res *res_list)
 			ptr = strtok(ptr_cp,pat);
 			if (upd_res(ptr, ind, False, &psdev_back.error_code) == -1)
 			{
+				query = "ROLLBACK TRANSACTION";
+				logStream->infoStream() << query << log4cpp::eol;
+				sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg);
 				delete [] ptr_cp;
 				psdev_back.psdev_err = i + 1;
 				return(&psdev_back);
@@ -380,6 +399,9 @@ db_psdev_error *SQLite3Server::updres_1_svc(db_res *res_list)
 				ind++;	
 				if (upd_res(ptr, ind, True, &psdev_back.error_code) == -1)
 				{
+					query = "ROLLBACK TRANSACTION";
+					logStream->infoStream() << query << log4cpp::eol;
+					sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg);
 					delete [] ptr_cp;
 					psdev_back.psdev_err = i + 1;
 					return(&psdev_back);
@@ -388,6 +410,16 @@ db_psdev_error *SQLite3Server::updres_1_svc(db_res *res_list)
 			delete [] ptr_cp;
 		}
 	}
+	query = "COMMIT TRANSACTION";
+	logStream->infoStream() << query << log4cpp::eol;
+	if (sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
+	{
+		logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::eol;
+		logStream->errorStream() << query.c_str() << log4cpp::eol;
+		psdev_back.error_code = DbErr_DatabaseAccess;
+		return (&psdev_back);
+	}
+	logStream->infoStream() << query << log4cpp::eol;
 //
 // Free memory and return data
 //
@@ -408,6 +440,7 @@ db_psdev_error *SQLite3Server::updres_1_svc(db_res *res_list)
  */
 long SQLite3Server::upd_res(std::string lin, long numb, char array, DevLong *p_err)
 {
+	logStream->infoStream() << "ENTER upd_res" << log4cpp::eol;
 	unsigned int 	diff;
 	static std::string	domain,
 			family,
@@ -477,7 +510,7 @@ long SQLite3Server::upd_res(std::string lin, long numb, char array, DevLong *p_e
 	logStream->debugStream() << "Resource value : " << val << log4cpp::eol;
 	logStream->debugStream() << "Sequence number : " << numb << log4cpp::eol;
 //
-// Select the right resource table in database */
+// Select the right resource table in database 
 //
 	if (numb == 1)
 	{
@@ -516,32 +549,34 @@ long SQLite3Server::upd_res(std::string lin, long numb, char array, DevLong *p_e
 //
 	if (val != "%")
 	{
-    		std::stringstream query;
-		query << "INSERT INTO property_device(DEVICE,NAME,DOMAIN,FAMILY,MEMBER,COUNT,VALUE,UPDATED,ACCESSED)"
+    		std::stringstream strquery;
+		strquery << "INSERT INTO property_device(DEVICE,NAME,DOMAIN,FAMILY,MEMBER,COUNT,VALUE,UPDATED,ACCESSED)"
 			" VALUES('" << domain << "/" << family << "/" << member << "','" << name << "','"
 			<< domain << "','" << family << "','" << member << "','" 
 			<< numb << "',\"" << val << "\", DATETIME('now'), DATETIME('now'))" << std::ends;
 
-		logStream->infoStream() << "SQLite3Server::upd_res(): query = " << query.str() << log4cpp::eol;
+		logStream->infoStream() << "SQLite3Server::upd_res(): query = " << strquery.str() << log4cpp::eol;
 
 #if !HAVE_SSTREAM
-		if (sqlite3_exec(db, query.str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
+		if (sqlite3_exec(db, strquery.str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
 #else
-		if (sqlite3_exec(db, query.str().c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
+		if (sqlite3_exec(db, strquery.str().c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
 #endif
 		{
 			logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::eol;
-			logStream->errorStream() << query.str() << log4cpp::eol;
+			logStream->errorStream() << strquery.str() << log4cpp::eol;
 #if !HAVE_SSTREAM
 			query.freeze(false);
 #endif
 			*p_err = DbErr_DatabaseAccess;
 			return (-1);
 		}
+		logStream->infoStream() << "SQLite3Server::upd_res(): query = " << strquery.str() << log4cpp::eol;
 #if !HAVE_SSTREAM
 		query.freeze(false);
 #endif
 	}
+	logStream->infoStream() << "LEAVE upd_res" << log4cpp::eol;
 	return DS_OK;
 }
 

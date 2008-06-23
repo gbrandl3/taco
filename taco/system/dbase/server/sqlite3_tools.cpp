@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:	$Date: 2008-06-22 19:04:05 $
+ * Date:	$Date: 2008-06-23 10:17:58 $
  *
  */
 
@@ -435,6 +435,15 @@ db_psdev_error *SQLite3Server::devdelres_1_svc(db_res *recev)
 // Build a vector of object from the NdbmDomDev class. Each object in this class
 // has a domain name and a list of family/member for this domain
 //
+	std::string query = "BEGIN TRANSACTION";
+	logStream->infoStream() << query << log4cpp::eol;
+	if (sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
+	{
+		logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::eol;
+		logStream->errorStream() << query.c_str() << log4cpp::eol;
+		psdev_back.error_code = DbErr_DatabaseAccess;
+		return (&psdev_back);
+	}
 	for (long i = 0;i < recev->res_val.arr1_len;i++)
 	{
 		std::string in_dev(recev->res_val.arr1_val[i]);
@@ -443,6 +452,9 @@ db_psdev_error *SQLite3Server::devdelres_1_svc(db_res *recev)
 		{
 			psdev_back.error_code = DbErr_BadDevSyntax;
 			psdev_back.psdev_err = i;
+			query = "ROLLBACK TRANSACTION";
+			logStream->infoStream() << query << log4cpp::eol;
+			sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg);
 			return(&psdev_back);
 		}
 		std::string query;
@@ -452,11 +464,24 @@ db_psdev_error *SQLite3Server::devdelres_1_svc(db_res *recev)
 		{
 			logStream->errorStream() << sqlite3_errmsg(db) << log4cpp::eol;
 			psdev_back.error_code = DbErr_DatabaseAccess;
+			query = "ROLLBACK TRANSACTION";
+			logStream->infoStream() << query << log4cpp::eol;
+			sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg);
 			psdev_back.psdev_err = i;
 			return (&psdev_back);
 		}
 		logStream->infoStream() << query << log4cpp::eol;
 	}
+	query = "COMMIT TRANSACTION";
+	logStream->infoStream() << query << log4cpp::eol;
+	if (sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
+	{
+		logStream->errorStream() << __LINE__ << sqlite3_errmsg(db) << log4cpp::eol;
+		logStream->errorStream() << query.c_str() << log4cpp::eol;
+		psdev_back.error_code = DbErr_DatabaseAccess;
+		return (&psdev_back);
+	}
+	logStream->infoStream() << query << log4cpp::eol;
 //
 // leave fucntion
 //

@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2008-06-22 19:04:05 $
+ * Date:	$Date: 2008-06-23 10:17:57 $
  *
  */
 
@@ -165,11 +165,11 @@ DevLong *SQLite3Server::db_devexp_3_svc(tab_dbdev_3 *rece)
     }
 
 //
-// Initialize error code sended back to client */
+// Initialize error code sended back to client 
 //
     errcode = 0;
 //
-// Return error code if the server is not connected to the database */
+// Return error code if the server is not connected to the database 
 //
     if (dbgen.connected == False)
     {
@@ -178,7 +178,7 @@ DevLong *SQLite3Server::db_devexp_3_svc(tab_dbdev_3 *rece)
 	return(&errcode);
     }
 //
-// Store values in database */
+// Store values in database 
 //
     try
     {
@@ -217,11 +217,11 @@ db_resimp *SQLite3Server::db_devimp_1_svc(arr1 *de_name)
 		logStream->debugStream() << "Device name (in import function) : " << de_name->arr1_val[i] << log4cpp::eol;
 
 //
-// Initialize error code sended back to client */
+// Initialize error code sended back to client 
 //
 	back.db_imperr = 0;
 //
-// Return error code if the server is not connected to the database */
+// Return error code if the server is not connected to the database 
 //
 	if (!dbgen.connected)
 	{
@@ -232,7 +232,7 @@ db_resimp *SQLite3Server::db_devimp_1_svc(arr1 *de_name)
 		return(&back);
 	}
 //
-// Allocate memory for the array of db_devinfo structures */
+// Allocate memory for the array of db_devinfo structures 
 //
 	int i = 0;
 	try
@@ -387,7 +387,7 @@ DevLong *SQLite3Server::db_svcunr_1_svc(DevString *dsn_name)
 //
 	errcode = 0;
 //
-// Return error code if the server is not connected to the database */
+// Return error code if the server is not connected to the database 
 //
 	if (!dbgen.connected)
 	{
@@ -396,7 +396,7 @@ DevLong *SQLite3Server::db_svcunr_1_svc(DevString *dsn_name)
 		return(&errcode);
 	}
 //
-// Get device server class */
+// Get device server class 
 //
 	if ((pos = device.find('/')) == std::string::npos)
 	{

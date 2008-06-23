@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2008-06-22 19:04:05 $
+ * Date:	$Date: 2008-06-23 10:17:58 $
  *
  */
 
@@ -663,7 +663,7 @@ int SQLite3Server::db_insert(std::string res_name, std::string number, std::stri
 //
 	if ((pos = res_name.find('/')) == std::string::npos)
 	{
-		logStream->errorStream() << "db_del : Error in resource name " << res_name << log4cpp::eol;
+		logStream->errorStream() << "db_insert : Error in resource name " << res_name << log4cpp::eol;
 		return(DbErr_BadResourceType);
  	}
 	domain = res_name.substr(0, pos);
