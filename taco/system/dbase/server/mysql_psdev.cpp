@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2008-04-06 09:07:41 $
+ * Date:	$Date: 2008-06-23 08:50:22 $
  *
  */
 
@@ -273,7 +273,7 @@ db_psdev_error *MySQLServer::db_psdev_unreg_1_svc(arr1 *rece)
 	}
     }
 //
-// Leave server */
+// Leave server 
 //
     logStream->debugStream() << "End db_psdev_unregister" << log4cpp::eol;
     return(&psdev_back);

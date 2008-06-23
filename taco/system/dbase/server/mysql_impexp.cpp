@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.19 $
+ * Version:	$Revision: 1.20 $
  *
- * Date:	$Date: 2008-04-06 09:07:41 $
+ * Date:	$Date: 2008-06-23 08:50:22 $
  *
  */
 
@@ -162,11 +162,11 @@ DevLong *MySQLServer::db_devexp_3_svc(tab_dbdev_3 *rece)
     }
 
 //
-// Initialize error code sended back to client */
+// Initialize error code sended back to client 
 //
     errcode = 0;
 //
-// Return error code if the server is not connected to the database */
+// Return error code if the server is not connected to the database 
 //
     if (!dbgen.connected)
     {
@@ -175,7 +175,7 @@ DevLong *MySQLServer::db_devexp_3_svc(tab_dbdev_3 *rece)
 	return(&errcode);
     }
 //
-// Store values in database */
+// Store values in database 
 //
     try
     {
@@ -213,11 +213,11 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
     for (int i = 0; i < num_dev; i++)
 	logStream->debugStream() << "Device name (in import function) : " << de_name->arr1_val[i] << log4cpp::eol;
 //
-// Initialize error code sended back to client */
+// Initialize error code sended back to client 
 //
     back.db_imperr = 0;
 //
-// Return error code if the server is not connected to the database */
+// Return error code if the server is not connected to the database 
 //
     if (!dbgen.connected)
     {
@@ -228,7 +228,7 @@ db_resimp *MySQLServer::db_devimp_1_svc(arr1 *de_name)
 	return(&back);
     }
 //
-// Allocate memory for the array of db_devinfo structures */
+// Allocate memory for the array of db_devinfo structures 
 //
     int i = 0;
     try
@@ -380,7 +380,7 @@ DevLong *MySQLServer::db_svcunr_1_svc(DevString *dsn_name)
 //
     errcode = 0;
 //
-// Return error code if the server is not connected to the database */
+// Return error code if the server is not connected to the database 
 //
     if (!dbgen.connected)
     {
@@ -389,7 +389,7 @@ DevLong *MySQLServer::db_svcunr_1_svc(DevString *dsn_name)
 	return(&errcode);
     }
 //
-// Get device server class */
+// Get device server class 
 //
     if ((pos = device.find('/')) == std::string::npos)
     {
@@ -457,7 +457,7 @@ svc_inf *MySQLServer::db_svcchk_1_svc(DevString *dsn_name)
     logStream->debugStream() << "Device server name (check function) : " << device << log4cpp::eol;
 
 //
-// Miscellaneous initialization */
+// Miscellaneous initialization 
 //
     host_name[0] = '\0';
     svc_info.ho_name = host_name;
@@ -474,7 +474,7 @@ svc_inf *MySQLServer::db_svcchk_1_svc(DevString *dsn_name)
 	return(&svc_info);
     }
 //
-// Get device server class */
+// Get device server class 
 //
     if ((pos = device.find('/')) == std::string::npos)
     {

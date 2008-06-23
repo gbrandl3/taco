@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.14 $
+ * Version:	$Revision: 1.15 $
  *
- * Date:	$Date: 2008-04-06 09:07:42 $
+ * Date:	$Date: 2008-06-23 08:50:22 $
  *
  */
 
@@ -50,7 +50,7 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 
     logStream->debugStream() << "In upddev_1_svc function for " << list_nb << " device list(s)" << log4cpp::eol;
 //
-// Initialize parameter sent back to client */
+// Initialize parameter sent back to client 
 //
     psdev_back.error_code = 0;
     psdev_back.psdev_err = 0;
@@ -62,12 +62,12 @@ db_psdev_error *MySQLServer::upddev_1_svc(db_res *dev_list)
 	return(&psdev_back);
     }
 //
-// A loop on each device list */
+// A loop on each device list 
 //
     for (long i = 0;i < list_nb;i++)
     {
 //		
-// Allocate memory for strtok pointers */
+// Allocate memory for strtok pointers 
 //
 	std::string lin = dev_list->res_val.arr1_val[i];
 
@@ -330,7 +330,7 @@ db_psdev_error *MySQLServer::updres_1_svc(db_res *res_list)
     logStream->debugStream() << "In updres_1_svc function for " << list_nb << " resource(s)" << log4cpp::eol;
 
 //
-// Initialize parameter sent back to client */
+// Initialize parameter sent back to client 
 //
     psdev_back.error_code = 0;
     psdev_back.psdev_err = 0;
@@ -342,19 +342,19 @@ db_psdev_error *MySQLServer::updres_1_svc(db_res *res_list)
 	return(&psdev_back);
     }
 //
-// A loop on each resources */
+// A loop on each resources 
 //
     for (long i = 0; i < list_nb; i++)
     {
 //
-// Allocate memory for strtok pointers */
+// Allocate memory for strtok pointers 
 //
 	std::string lin(res_list->res_val.arr1_val[i]);
 
 	logStream->debugStream() << "Resource list = " << lin << log4cpp::eol;
 
 //
-// Only one update if the resource is a simple one */
+// Only one update if the resource is a simple one 
 //
 	if (lin.find(SEP_ELT) == std::string::npos)
 	{
