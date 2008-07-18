@@ -29,9 +29,9 @@
  *
  * Original:    
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2008-04-06 09:06:39 $
+ * Date:        $Date: 2008-07-18 07:27:30 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -88,7 +88,7 @@ void print_boolean(char flag)
 }
 
 
-int main(unsigned int argc, char **argv)
+int main(int argc, char **argv)
 {
         char cstr[60];
 	char *cmdstr;

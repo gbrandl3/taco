@@ -25,14 +25,15 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2008-06-22 19:04:05 $
+ * Date:	$Date: 2008-07-18 07:31:58 $
  *
  */
 
 #include <DevErrors.h>
 #include <Sqlite3Server.h>
+#include <algorithm>
 
 
 /**
@@ -82,7 +83,7 @@ db_res *SQLite3Server::devserverlist_1_svc()
 		std::string tmp = result[j];
 		std::string::size_type pos = tmp.find('/');
 		tmp.erase(pos);
-		if (find(serv_list.begin(), serv_list.end(), tmp) == serv_list.end())
+		if (std::find(serv_list.begin(), serv_list.end(), tmp) == serv_list.end())
 		{
 			serv_list.push_back(tmp);		
 
@@ -170,7 +171,7 @@ db_res *SQLite3Server::devpersnamelist_1_svc(DevString *server)
 		std::string tmp = result[j];
 		std::string::size_type pos = tmp.find('/');
 		tmp.erase(0, pos + 1);
-		if (find(pers_list.begin(), pers_list.end(), tmp) == pers_list.end())
+		if (std::find(pers_list.begin(), pers_list.end(), tmp) == pers_list.end())
 		{
 			pers_list.push_back(tmp);		
 

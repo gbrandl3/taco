@@ -4,6 +4,7 @@
 #include <log4cpp/Category.hh>
 
 #include <MsgServerAppender.h>
+#include <cstdlib>
 
 int main(int argc, char **argv)
 {

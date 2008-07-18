@@ -29,9 +29,9 @@
  *
  * Original:    June 1996
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2008-04-06 09:07:56 $
+ * Date:        $Date: 2008-07-18 07:31:25 $
  *
  +**********************************************************************/
 
@@ -60,6 +60,7 @@
 #include <string>
 #include <iostream>
 #include <strstream>
+#include <algorithm>
 
 // testcs classes include files
 

@@ -29,9 +29,9 @@
  *
  * Original:    June 1996
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2008-04-06 09:07:56 $
+ * Date:        $Date: 2008-07-18 07:31:25 $
  *
  +**********************************************************************/
 
@@ -60,8 +60,9 @@
 #include <strstream>
 #include <KernelServer.h>
 #ifdef _solaris
-#include "_count.h"
+#	include "_count.h"
 #endif
+#include <algorithm>
 
 void get_database_param(unsigned int &,std::string &);
 void get_dc_param(int,int,char *,unsigned int &,std::string &);

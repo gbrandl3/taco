@@ -16,7 +16,8 @@
 #endif
 
 #include <memory>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <time.h>
 #include <log4cpp/FileAppender.hh>
 #include <log4cpp/Category.hh>

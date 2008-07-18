@@ -16,6 +16,7 @@
 #include <fcntl.h>
 #include <log4cpp/OstreamAppender.hh>
 #include <log4cpp/FactoryParams.hh>
+#include <memory>
 
 namespace log4cpp {
 

@@ -3,6 +3,7 @@
 
 #include <log4cpp/LayoutAppender.hh>
 #include <log4cpp/FactoryParams.hh>
+#include <memory>
 
 namespace log4taco
 {
