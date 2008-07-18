@@ -24,16 +24,17 @@
  * Author(s):	Jens Krüger
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2008-04-06 09:07:47 $
+ * Date:        $Date: 2008-07-18 07:39:35 $
  */
 
 #include <iostream>
 #include <string>
 #ifdef _solaris
-#include <taco_utils.h>
+#	include <taco_utils.h>
 #endif /* _solaris */
+#include <cstdlib>
 
 void usage(const std::string cmd)
 {
