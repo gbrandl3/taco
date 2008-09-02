@@ -77,10 +77,10 @@ endif
 setenv DBM_DIR @dbmdir@
 
 setenv LOGPATH @logdir@
-if (${?LOGCONF}) then
+if (${?LOGCONFIG}) then
 ;
 else
-setenv LOGCONF ${sysconfdir}/taco_log.cfg
+setenv LOGCONFIG ${sysconfdir}/taco_log.cfg
 endif
 
 if (${?NETHOST}) then
@@ -130,8 +130,8 @@ endif
 setenv LD_LIBRARY_PATH @GCC_LIBRARY_PATH@:${LD_LIBRARY_PATH}
 
 if (${?PYTHONPATH}) then
-	setenv PYTHONPATH ${pkgpythondir}:${pkgpyexecdir}:${PYTHONPATH}
+	setenv PYTHONPATH ${pythondir}:${pyexecdir}:${PYTHONPATH}
 else
-	setenv PYTHONPATH ${pkgpythondir}:${pkgpyexecdir}
+	setenv PYTHONPATH ${pythondir}:${pyexecdir}
 endif
 
