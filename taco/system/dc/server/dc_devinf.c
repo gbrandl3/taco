@@ -30,9 +30,9 @@
  *
  * Original     : February 1993
  *
- * Version      : $Revision: 1.6 $
+ * Version      : $Revision: 1.7 $
  *
- * Date         : $Date: 2008-04-06 09:07:50 $
+ * Date         : $Date: 2008-09-02 13:02:34 $
  *
  */
 
@@ -151,8 +151,8 @@ dc_devinfx_back *dc_devinfo_1(char **rece)
 /* Compute offset to data buffer */
 		array = (dc_dev_param *)addr_ptr;
 		int_array = (int_level *)&array[nb_tot];
-		ptr = (unsigned int *)addr_ptr + (int)int_array[ind].data_buf[data.ind_read];
 		retinf.device.data_offset = (unsigned int)(int_array[ind].data_buf[data.ind_read]);
+		ptr = (unsigned int *)(addr_ptr + retinf.device.data_offset);
 		retinf.device.data_base = (unsigned int)addr_data;
 
 /* Compute the interval between the last five records */
@@ -171,9 +171,12 @@ dc_devinfx_back *dc_devinfo_1(char **rece)
 				}
 				break;
 			}
-			tmp_ptr = (unsigned int *)addr_ptr + (int)int_array[ind].data_buf[ind1];
-			retinf.device.deltax[k] = ptr[0] - tmp_ptr[0];
-			ptr = tmp_ptr;
+			else 
+			{
+				tmp_ptr = (unsigned int *)(addr_ptr + (int)int_array[ind].data_buf[ind1]);
+				retinf.device.deltax[k] = ptr[0] - tmp_ptr[0];
+				ptr = tmp_ptr;
+			}
 		}
 
 /* Compute time between the last data update and the actual time */

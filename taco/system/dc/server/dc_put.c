@@ -30,9 +30,9 @@
  *
  * Original     : February 1993
  *
- * Version      : $Revision: 1.6 $
+ * Version      : $Revision: 1.7 $
  *
- * Date         : $Date: 2008-04-06 09:07:50 $
+ * Date         : $Date: 2008-09-02 13:03:15 $
  *
  */
 
@@ -340,7 +340,10 @@ int add_data(dev_dat *dev_info, dc_dev_param *pdata, int ind, int *perr)
 	for (i = 0;i < nb_cmd;i++)
 	{
 		buf_size = buf_size + cmd_info[i].cmd + CMD_HEADER_SIZE;
-		//printf("add_data(): buf_size %d xdr sequence length %d cmd %d nb_loop %d\n",buf_size, dev_info->xcmd_dat.xcmd_dat_val[i].xsequence.xsequence_len,cmd_info[i].cmd,cmd_info[i].nb_loop);
+/*
+		printf("add_data(): buf_size %d xdr sequence length %d cmd %d nb_loop %d\n",buf_size, 
+			dev_info->xcmd_dat.xcmd_dat_val[i].xsequence.xsequence_len,cmd_info[i].cmd,cmd_info[i].nb_loop);
+*/
 	}
 	old_buf_size = buf_size;
 	if ((buf_size & MASK_BLK_SIZE) != 0)	

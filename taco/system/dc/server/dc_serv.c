@@ -30,9 +30,9 @@
  *
  * Original     : February 1993
  *
- * Version      : $Revision: 1.5 $
+ * Version      : $Revision: 1.6 $
  *
- * Date         : $Date: 2008-04-06 09:07:50 $
+ * Date         : $Date: 2008-09-02 13:03:48 $
  *
  */
 
@@ -445,7 +445,7 @@ int dev_remove(char *dev_name,int ptrs_beg,int *perr)
 	{
 		if (int_array[ind].data_buf[i] == -1)
 			break;
-		ptr = (unsigned int *)addr_ptr + (int)int_array[ind].data_buf[i];
+		ptr = (unsigned int *)(addr_ptr + (int)int_array[ind].data_buf[i]);
 		size = ptr[1];
 		if (dcmem_free((unsigned char*)addr_alloc,(unsigned char *)addr_data, (unsigned char *)ptr,size,semid,&error)) 
 		{
