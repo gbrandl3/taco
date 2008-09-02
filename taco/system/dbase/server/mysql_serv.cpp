@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.19 $
+ * Version:	$Revision: 1.20 $
  *
- * Date:	$Date: 2008-06-22 09:39:40 $
+ * Date:	$Date: 2008-09-02 12:58:01 $
  *
  */
 
@@ -129,13 +129,9 @@ db_res *MySQLServer::db_getres_1_svc(arr1 *rece, struct svc_req *rqstp)
 // Try to find the resource value from database or cache
 //
 	    if( tab_name == "sec" || tab_name == "error" ) {
-	    
 	      err_db = db_find_from_cache(tab_name, rest, &browse_back.res_val.arr1_val[i], &k1);
-	    
 	    } else {
-
 	      err_db = db_find(tab_name, rest, &browse_back.res_val.arr1_val[i], &k1);
-	    
 	    }
 	    
 	    if(err_db != 0)
