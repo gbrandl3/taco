@@ -30,9 +30,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.22 $
+ * Version:	$Revision: 1.23 $
  *
- * Date:	$Date: 2008-04-06 09:06:58 $
+ * Date:	$Date: 2008-09-10 16:34:42 $
  *
  *********************************************************************-*/
 
@@ -101,7 +101,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.22 2008-04-06 09:06:58 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.23 2008-09-10 16:34:42 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 /*
@@ -393,7 +393,7 @@ extern _DLLFunc long   msg_import
 				PT_( (char *DS_name, char *DS_host,
 				long DS_prog_number, char *DS_display,
 				DevLong *error) );
-extern _DLLFunc char * dev_error_str
+extern _DLLFunc char *dev_error_str
 				PT_( (long dev_errno) );
 extern _DLLFunc void  dev_printerror_no
 				PT_( (short mode, const char *comment,
