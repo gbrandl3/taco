@@ -31,9 +31,9 @@
  *
  * Original   : September 1998
  *  
- * Version    :	$Revision: 1.10 $
+ * Version    :	$Revision: 1.11 $
  *
- * Date	      : $Date: 2008-04-06 09:07:06 $
+ * Date	      : $Date: 2008-09-11 13:58:37 $
  *
  *-*******************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -426,7 +426,6 @@ int to_reconnection(void *p_data, void **pp_result, CLIENT **client,
 					return(-1);
 				}
 				new_client = db_info.conf->clnt;
-				clnt_destroy(old_client);
 			}
 			else
 			{
@@ -443,8 +442,9 @@ int to_reconnection(void *p_data, void **pp_result, CLIENT **client,
 					return(-1);
 				}
 				new_client = multi_nethost[nethost_index].db_info->clnt;
-				clnt_destroy(old_client);
 			}
+			if (old_client != new_client)
+				clnt_destroy(old_client);
 		}
 		else
 		{
@@ -498,7 +498,8 @@ int to_reconnection(void *p_data, void **pp_result, CLIENT **client,
 			}
 			else
 			{
-				clnt_destroy(*client);
+				if (client != cl_tcp)
+					clnt_destroy(*client);
 				new_client = cl_tcp;
 			}
 		}
