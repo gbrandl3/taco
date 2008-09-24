@@ -113,7 +113,7 @@ dnl	AC_CHECK_HEADERS([memory.h unistd.h stdlib.h string.h strings.h])
         AC_HEADER_STDBOOL
 
 	AC_CHECK_HEADERS([sys/sem.h sys/shm.h sys/resource.h sys/time.h])
-        AC_CHECK_HEADERS([sys/file.h sys/ioctl.h sys/filio.h paths.h])
+        AC_CHECK_HEADERS([sys/file.h sys/ioctl.h sys/filio.h paths.h sys/param.h])
         AC_CHECK_HEADERS([termios.h])
         AC_CHECK_HEADERS([wait.h sys/wait.h])
         AC_CHECK_HEADERS([pthread.h siggen.h])
