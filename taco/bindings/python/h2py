@@ -30,9 +30,9 @@
 #
 # Original:     Mai 2001
 #
-# Version:      $Revision: 1.5 $
+# Version:      $Revision: 1.6 $
 #
-# Date:         $Date: 2007-01-26 07:25:44 $
+# Date:         $Date: 2008-09-26 12:46:01 $
 #
 
 """
@@ -59,8 +59,8 @@
 """
 
 __author__ = "Jens Meyer, $Author: jkrueger1 $"
-__date__ = "$Date: 2007-01-26 07:25:44 $"
-__revision__ = "$Revision: 1.5 $"
+__date__ = "$Date: 2008-09-26 12:46:01 $"
+__revision__ = "$Revision: 1.6 $"
 
 import sys, re, string, getopt, os
 
@@ -140,7 +140,7 @@ def process(fp, outfp, env = {}):
             break
         lineno += 1
         n = p_define.match(line, 0)
-        if n >= 0:
+        if n is not None:
             # gobble up continuation lines
             while line[-2:] == '\\\n':
                 nextline = fp.readline()
@@ -163,7 +163,7 @@ def process(fp, outfp, env = {}):
             else:
                 outfp.write(stmt)
         n = p_macro.match(line)
-        if n >= 0:
+        if n is not None:
             macro, arg = n.group(1, 2)
             while line[-2:] == '\\\n':
                 nextline = fp.readline()
@@ -183,7 +183,7 @@ def process(fp, outfp, env = {}):
             else:
                 outfp.write(stmt)
         n = p_include.match(line) 
-        if n >= 0:
+        if n is not None:
             filename = n.group(1)
             if not filedict.has_key(filename):
                 filedict[filename] = None
