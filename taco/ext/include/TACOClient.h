@@ -483,10 +483,14 @@ protected:
 	 * @see eventListen( DevEvent event, T& eventData), eventListen( DevEvent event), synchronize()
 	 */
 	virtual void* eventHandler( EventHandlerData data) throw ();
-
+#ifdef SWIGPYTHON
+public:
+#endif
 	//! Executes a command
 	void execute( DevCommand cmd, DevArgument argin, DevArgType inType, DevArgument argout, DevArgType outType) throw (::TACO::Exception);
-
+#ifdef SWIGPYTHON
+protected:
+#endif
 	//! Executes a command without any error handling
 	void executeCore( DevCommand cmd, DevArgument argin, DevArgType inType, DevArgument argout, DevArgType outType) throw (::TACO::Exception);
 

@@ -15,19 +15,31 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-EXTRA_DIST 		= TACOStates.i
+EXTRA_DIST 		= TACOStates.i TACOClient.i
 
-AM_CPPFLAGS 		= -I$(top_srcdir)/ext/include @TACO_INCLUDES@ @SWIG_PYTHON_CPPFLAGS@ \
+AM_CPPFLAGS 		= -I$(top_srcdir)/ext/include @TACO_INCLUDES@ @SWIG_PYTHON_CPPFLAGS@ -DSWIG\
 			-I$(top_srcdir)/log4cpp/include \
 			-I$(top_builddir)/log4cpp/include
 
 AM_CXXFLAGS 		= -Wall
 
-nodist_python_PYTHON	= TACOStates.py
+nodist_python_PYTHON	= TACOStates.py TACOClient.py
 
-pyexec_LTLIBRARIES 	= _TACOStates.la TACOClient.la
+pyexec_LTLIBRARIES 	= _TACOStates.la _TACOClient.la 
 
-nodist__TACOStates_la_SOURCES = wrap_TACOStates.cpp
+nodist__TACOStates_la_SOURCES = wrap_TACOStates.cpp 
+
+nodist__TACOClient_la_SOURCES = wrap_TACOClient.cpp TACOPythonClientConverters.cpp
+
+_TACOClient_la_LDFLAGS 	= -avoid-version -module
+_TACOClient_la_LIBADD  	= @LIB_STDCXX@ ../src/libTACOExtensions.la
+
+TACOClient.py:		wrap_TACOClient.cpp
+	@true
+
+wrap_TACOClient.cpp:	$(srcdir)/TACOClient.i $(top_srcdir)/ext/include/TACOClient.h
+	@SWIG@ @SWIG_PYTHON_OPT@ -c++ -I$(top_srcdir)/ext/include -o $@ $(srcdir)/TACOClient.i
+
 _TACOStates_la_LDFLAGS 	= -avoid-version -module
 _TACOStates_la_LIBADD 	= @LIB_STDCXX@ ../src/libTACOExtensions.la
 
@@ -46,10 +58,11 @@ noinst_PYTHON		= test.py
  
 noinst_HEADERS 		= TACOPythonClient.h TACOPythonClientConverters.h
 
-TACOClient_la_SOURCES 	= TACOPythonClient.cpp TACOPythonClientConverters.cpp
-TACOClient_la_LDFLAGS 	= -pthread -avoid-version -module
-TACOClient_la_LIBADD 	= @LIB_STDCXX@ ../src/libTACOExtensions.la @TACO_CLIENT_CXX_LIBS@
+# pyexec_LTLIBRARIES 	+= TACOClient.la 
+# TACOClient_la_SOURCES 	= TACOPythonClient.cpp TACOPythonClientConverters.cpp
+# TACOClient_la_LDFLAGS 	= -pthread -avoid-version -module
+# TACOClient_la_LIBADD 	= @LIB_STDCXX@ ../src/libTACOExtensions.la @TACO_CLIENT_CXX_LIBS@
 
-install-data-hook:
-	rm -f $(DESTDIR)$(pythondir)/TACOClient.py*
+# install-data-hook:
+# 	rm -f $(DESTDIR)$(pythondir)/TACOClient.py*
 
