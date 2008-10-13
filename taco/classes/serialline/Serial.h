@@ -26,13 +26,13 @@
  *		for implementing the Serial class in C++ (SerialClass).
  *
  * Author(s):	Manuel Perez
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
  * Original:	May 1998 by Andy Gotz
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2008-04-06 09:06:38 $
+ * Date:        $Date: 2008-10-13 18:57:08 $
  */
 
 #ifndef _Serial_H
@@ -144,9 +144,11 @@ class Serial : public Device {
 #define DevSerReadString	DevSerBase+3
 #define DevSerReadChar		DevSerBase+4
 #define DevSerSetParameter	DevSerBase+5
-
-
-
+#define DevSerSetCharDelay      DevSerBase+6
+#define DevSerSetLongParameter  DevSerBase+7
+#define DevSerGetNChar          DevSerBase+8
+#define DevSerWaitChar          DevSerBase+9
+#define DevSerFlush             DevSerBase+10
 
 //
 //maximum string length supported to date
