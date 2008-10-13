@@ -27,13 +27,13 @@
  *		(DeviceClass).
  *
  * Author(s):	Andy Goetz
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original:	February 1995
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2008-04-06 09:06:59 $
+ * Date:	$Date: 2008-10-13 19:04:02 $
  *
  +**********************************************************************/
 
@@ -74,6 +74,10 @@ typedef struct _DeviceCommandListEntry {
 	long               	min_access;
 	const char              *cmd_name;
 
+/* the following code will force the command list array to be initialised with DeviceCommandListEntry() 
+ * objects and not with braces i.e. {DevState, &Device::State, D_VOID_TYPE, D_SHORT_TYPE}
+ */
+#ifdef TACO_EXT
 	_DeviceCommandListEntry() 
 		: cmd(0)
 		, fn(NULL) 
@@ -93,6 +97,7 @@ typedef struct _DeviceCommandListEntry {
 		, min_access(acc)
 		, cmd_name(_cmd_name)	
 	{};
+#endif /* TACO_EXT */
 } DeviceCommandListEntry;
 
 typedef struct _DeviceCommandListEntry *DeviceCommandList;
@@ -138,8 +143,8 @@ protected:
 	char* class_name;
 	char dev_type[DEV_TYPE_LENGTH];
 
-	char* name;
 public:
+	char* name;
 	Device (DevString name, DevLong *error);
 	virtual ~Device ();
 //

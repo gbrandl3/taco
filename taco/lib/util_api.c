@@ -27,13 +27,13 @@
  *		handle remote devices.
  *
  * Author(s)  :	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original   :	April 1993
  *
- * Version:	$Revision: 1.32 $
+ * Version:	$Revision: 1.33 $
  *
- * Date:		$Date: 2008-04-06 09:07:01 $
+ * Date:		$Date: 2008-10-13 19:04:02 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -83,17 +83,18 @@ extern "C" {
 /*
  *  Configuration flags
  */
-	extern configuration_flags      config_flags;
+extern configuration_flags	config_flags;
 /*
  * Global structure for multiple control systems, setup by
  * setup_config_multi() but used by all multi-nethost functions
  */
-	extern nethost_info 		*multi_nethost;
-	extern long  			max_nethost;
+extern nethost_info 		*multi_nethost;
+extern long  			max_nethost;
+extern long			default_nethost;
 /*  
  *  Structure for the adnministration of open RPC connections.
  */
-	extern server_connections	svr_conns [];
+extern server_connections	svr_conns [];
 #ifdef __cplusplus
 };
 #endif
@@ -1017,12 +1018,10 @@ long _DLLFunc get_i_nethost_by_device_name (char *device_name, DevLong *error)
 	long i_nethost, i;
 	char *nethost;
 	
-
 /*
  * is the nethost specified ?
  */
-
-	if (strncmp(device_name,"//",2) == 0)
+	if (strncmp(device_name, "//", 2) == 0)
 	{
 /*
  * make a copy of the nethost name without the "//" and
@@ -1047,28 +1046,27 @@ long _DLLFunc get_i_nethost_by_device_name (char *device_name, DevLong *error)
 /*
  * check to see whether the nethost has been imported
  */
-	
 		if ((i_nethost = get_i_nethost_by_name(nethost,error)) < 0)
+		{
 /*
  * the specified nethost is not in the list of imported nethosts,
  * (config_setup_multi() should be called to add it)
  */
-		{
 			i_nethost = DS_NOTOK;
 		}
 		free(nethost);
 	}
-/*
- * nethost not specified in the device name, assume the nethost of
- * the control system by default (i_nethost = 0)
- */
 	else
 	{
-	//	i_nethost = (max_nethost > 0) ? 0 : -1;
-		i_nethost = 0;
+/*
+ * nethost not specified in the device name, assume the nethost of the control 
+ * system by default (i_nethost = 0)
+ */
+		if (default_nethost == -1)
+			db_import(error);
+		i_nethost = default_nethost;
 	}
-
-	return(i_nethost);
+	return i_nethost;
 }
 
 /**@ingroup clientAPIintern
@@ -1084,14 +1082,20 @@ long _DLLFunc get_i_nethost_by_device_name (char *device_name, DevLong *error)
 long _DLLFunc get_i_nethost_by_name (char *nethost, DevLong *error)
 {
 	long i;
-	
-/* no nethost specified */
-	if(nethost==NULL)
-	    return DS_NOTOK;
+/* 
+ * no nethost specified 
+ */
+	if(nethost == NULL)
+		if (default_nethost != -1)
+			return -1;
+		else
+		{
+			db_import(error);
+			return default_nethost;
+		}
 
 /*
- * loop through the array of imported nethosts looking for the 
- * specified nethost
+ * loop through the array of imported nethosts looking for the specified nethost
  */
 	for (i=0; i<max_nethost; i++)
 	{
@@ -1107,7 +1111,6 @@ long _DLLFunc get_i_nethost_by_name (char *nethost, DevLong *error)
 			}
 		}
 	}
-	
 	return DS_NOTOK;
 }
 
@@ -1151,7 +1154,7 @@ char* _DLLFunc get_nethost_by_index (long i_nethost, DevLong *error)
  *
  * @return	pointer to string containing only "domain/family/member"
  */
-char* _DLLFunc extract_device_name (char *full_name, DevLong *error)
+char* _DLLFunc extract_device_name (const char *full_name, DevLong *error)
 {
 	static char 	*device_name_alloc = NULL, 
 			*device_name;
@@ -1170,18 +1173,58 @@ char* _DLLFunc extract_device_name (char *full_name, DevLong *error)
 /*
  * if nethost is specified in the device name "remove" it
  */
-	if (strncmp(device_name,"//",2) == 0)
+	if (strncmp(device_name, "//", 2) == 0)
 	{
-		for (device_name +=2; *device_name != '/'; device_name++);
+		for (device_name +=2; *device_name && *device_name != '/'; device_name++);
 		device_name++;
 	}
 	if (strchr(device_name,'?') != NULL)
 	{
 		prog_url = strchr(device_name, '?');
-		*prog_url = 0;
+		*prog_url = '\0';
 	}
 	return(device_name);
 }
+
+/**@ingroup clientAPIintern
+ * Extract the nethost part of name from the full device name 
+ * "//nethost/domain/family/member?number" , return a pointer
+ *
+ * @param full_name 	device name
+ * @param error  	Will contain an appropriate error code if the
+ *		        corresponding call returns a non-zero value.
+ *
+ * @return	pointer to string containing only "nethost"
+ */
+char *_DLLFunc extract_nethost(const char *full_name, DevLong *error)
+{
+	static char	*device_name_alloc = NULL,
+			*host_name;
+
+	*error = DS_OK;
+	if (strncmp(full_name, "//", 2) == 0)
+	{
+/*
+ * assume full_name == device_name to start off with
+ */
+		host_name = device_name_alloc = (char*)realloc(device_name_alloc,strlen(full_name));
+		if (!device_name_alloc)
+		{
+			*error = DevErr_InsufficientMemory;
+			return NULL;
+		}
+		strcpy(device_name_alloc, full_name + 2);
+/*
+ * if nethost is specified in the device name "remove" it
+ */
+		for (; *host_name && *host_name != '/'; host_name++);
+		*host_name = '\0';
+		return device_name_alloc;
+	}
+	else
+		return NULL;
+}
+	
 
 /*
  * global arrays required for multi-nethost support, memory is
@@ -1214,13 +1257,12 @@ long _DLLFunc nethost_alloc (DevLong *error)
  */
 	if (first)
 	{
-		multi_nethost =
-		(nethost_info*)malloc((sizeof(nethost_info)));
+		multi_nethost = (nethost_info*)malloc((sizeof(nethost_info)));
 		if (multi_nethost == NULL)
-		    {
+		{
 			*error  = DevErr_InsufficientMemory;
 			return (DS_NOTOK);
-		    }
+		}
 
 		msg_ds = (struct _devserver*)malloc((sizeof(struct _devserver)));
 		if (msg_ds == NULL)
@@ -1245,7 +1287,7 @@ long _DLLFunc nethost_alloc (DevLong *error)
  */
 	else
 	{
-	    void* tmp;
+	    	void* tmp;
 		tmp = realloc(multi_nethost,(sizeof(nethost_info))*(max_nethost+MIN_NETHOST));
 		
 		if (tmp == NULL)
@@ -1346,7 +1388,6 @@ long _DLLFunc dev_ping (devserver ds, DevLong *error)
 	if ( dev_rpc_connection (ds, error)  == DS_NOTOK )
 		return (DS_NOTOK);
 
-
 /*
  *  fill in data transfer structures dev_import_in
  *  and dev_import_out.
@@ -1380,34 +1421,30 @@ long _DLLFunc dev_ping (devserver ds, DevLong *error)
 	}
 	else
 	{
- 	   /*
-	    * An old device does not support ping !
-	    */
+/*
+ * An old device does not support ping !
+ */
 		*error = DevErr_CommandNotImplemented;;
 		return(DS_NOTOK);
 	}
 
 
-	/*
-         * Check for errors on the RPC connection.
-         */
+/*
+ * Check for errors on the RPC connection.
+ */
 
 	if ( dev_rpc_error (ds, clnt_stat, error) == DS_NOTOK )
 		return (DS_NOTOK);
-	/*
-	 *  free dev_import_out 
-	 */
+/*
+ *  free dev_import_out 
+ */
+	xdr_free ((xdrproc_t)xdr__dev_import_out, (char *)&dev_import_out);
 
-	xdr_free ((xdrproc_t)xdr__dev_import_out,
-	    (char *)&dev_import_out);
-
-	/*
-         * Free the variable arguments in the dev_import_out
-         * structure, coming from the server.
-         */
-
-	xdr_free ((xdrproc_t)xdr_DevVarArgumentArray,
-	    (char *)&(dev_import_out.var_argument));
+/*
+ * Free the variable arguments in the dev_import_out
+ * structure, coming from the server.
+ */
+	xdr_free ((xdrproc_t)xdr_DevVarArgumentArray, (char *)&(dev_import_out.var_argument));
 
 /*
  * Return error code and status from device server.

@@ -25,13 +25,13 @@
  * Description	: Main programm for all device servers
  *
  * Author(s)  	: Jens Meyer
- * 		  $Author: jkrueger1 $
+ * 		  $Author: andy_gotz $
  *
  * Original   	: March 1991
  *
- * Version	: $Revision: 1.27 $
+ * Version	: $Revision: 1.28 $
  *
- * Date		: $Date: 2008-04-06 09:06:58 $
+ * Date		: $Date: 2008-10-13 19:04:02 $
  *
  *******************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -401,7 +401,7 @@ int main (int argc, char **argv)
 			else if (strcmp (argv[i], "-n") == 0 && (i + 1) < argc)
 			{
 				snprintf(nethost, sizeof(nethost), "%s", argv[i + 1]);
-				setenv("NETHOST", nethost, 1);
+				taco_setenv("NETHOST", nethost, 1);
 				++i;
 			}
 /*

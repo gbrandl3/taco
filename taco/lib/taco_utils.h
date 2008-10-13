@@ -26,13 +26,13 @@
  *              handle remote devices.
  *
  * Author(s)  : Jens Krüger <jens.krueger@frm2.tum.de>
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
  * Original   : June 2007
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:                $Date: 2008-04-06 09:07:01 $
+ * Date:                $Date: 2008-10-13 19:04:02 $
  *
  ********************************************************************-*/
 
@@ -55,9 +55,7 @@ char *strcpy_tolower(char *dest, const char *src);
 char *strncpy_tolower(char *dest, const char *src, size_t n);
 char *strcat_tolower(char *dest, const char *src);
 char *strdup_tolower(const char *str);
-#ifdef _solaris
-int setenv(const char *name, const char *value, int overwrite);
-#endif /* _solaris */
+void taco_setenv(const char *env_name, const char *env_value, int overwrite);
 
 #ifdef __cplusplus
 }

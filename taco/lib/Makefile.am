@@ -75,7 +75,7 @@ libtaco_la_LIBADD  	= xdr/libdsxdr_all.la dbase/libdbapi.la signal/libsignal.la 
 if DC_BUILD
 libtaco_la_LIBADD	+= dc/libdcapi.la
 endif
-libtaco_la_LDFLAGS 	= -version-info @LIB_VERSION@
+libtaco_la_LDFLAGS 	= -version-info @LIB_VERSION@ --with-pic
 
 libtaco___la_SOURCES 	= $(SRC_TACO_SPECIAL) Device.cpp OICDevice.cpp 
 libtaco___la_CFLAGS  	= -x c++

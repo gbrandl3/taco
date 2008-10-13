@@ -26,13 +26,13 @@
  *              Interface to access static database
  *
  * Author(s)  : Emmanuel Taurel
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.16 $
+ * Version    :	$Revision: 1.17 $
  *
- * Date       :	$Date: 2008-04-06 09:07:13 $
+ * Date       :	$Date: 2008-10-13 19:04:02 $
  * 
  *-*******************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -164,10 +164,11 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevL
 	register char 	*temp,
 			*tmp;
 	CLIENT 		*tcp_cl;
+	CLIENT 		*local_cl;
 	int 		tcp_so;
 	DevLong		error;
 	long 		i_nethost;
-	char 		nethost[HOST_NAME_LENGTH];
+	char 		*nethost = NULL;
 	long 		try_reconnect = False;
 #ifndef _OSK
 	struct timeval 	tout;
@@ -237,8 +238,8 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevL
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&timeout_resource);
 		first++;
 	}
+	local_cl = cl;
 #else
-
 /*
  * find out which nethost has been requested for this device
  */
@@ -247,15 +248,11 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevL
 /* 
  * The nethost is not imported, extract nethost name and import it 
  */
-		strncpy(nethost, dev_name + 2, sizeof(nethost));
-		for (i = 0; i < (int)strlen(nethost); i++)
-			if (nethost[i] == '/')
-			{
-				nethost[i] = 0;
-				break;
-			}
+		nethost = extract_nethost(dev_name, perr);
+		if (*perr != DS_OK)
+			return DS_NOTOK;
 /* 
- * The specified nethost is not in the list of imorted nethosts, therefore 
+ * The specified nethost is not in the list of imported nethosts, therefore 
  * call setup_config_multi() to add it 
  */
 		if (setup_config_multi(nethost,perr) != DS_OK)
@@ -272,27 +269,15 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevL
  * in order to recall the manager for database server RPC parameter at the
  * next db_import (for reconnection) 
  */
-	if (i_nethost == 0)
-	{
-		if ((config_flags.database_server != True) && db_import(&error))
-		{
-			config_flags.configuration = False;
-			*perr = DbErr_CannotCreateClientHandle;
-			return(DS_NOTOK);
-		}
-	}
-	else
-	{
-		if ((multi_nethost[i_nethost].config_flags.database_server != True)
+	if ((multi_nethost[i_nethost].config_flags.database_server != True)
 			&& db_import_multi(multi_nethost[i_nethost].nethost,&error))
-		{
-			multi_nethost[i_nethost].config_flags.configuration = False;
-			*perr = DbErr_CannotCreateClientHandle;
-			return(DS_NOTOK);
-		}
+	{
+		multi_nethost[i_nethost].config_flags.configuration = False;
+		*perr = DbErr_CannotCreateClientHandle;
+		return(DS_NOTOK);
 	}
+	local_cl = multi_nethost[i_nethost].db_info->clnt;
 	dev_name = extract_device_name(dev_name,perr);
-
 #endif /* ALONE */
 /* 
  * Allocate memory for the array of pointeur to char 
@@ -332,15 +317,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevL
 /* 
  * Call server 
  */
-#ifdef ALONE
-	recev = db_getres_1(&send,cl,&error);
-#else
-	if (i_nethost == 0)
-		recev = db_getres_1(&send,db_info.conf->clnt,&error);
-	else
-		recev = db_getres_1(&send,multi_nethost[i_nethost].db_info->clnt,&error);
-#endif /* ALONE */
-
+	recev = db_getres_1(&send,local_cl,&error);
 /* 
  * Any problem with server ? 
  */
@@ -348,16 +325,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevL
 	{
 		if (error == DevErr_RPCTimedOut || error == DbErr_RPCreception)
 		{
-#ifdef ALONE
-			to_reconnection((void *)&send,(void **)&recev,&cl,(int)DB_GETRES,0,DB_UDP,&error);
-#else
-			if (i_nethost == 0)
-				to_reconnection((void *)&send,(void **)&recev, &db_info.conf->clnt,
-						 (int)DB_GETRES,i_nethost, DB_UDP,&error);
-			else
-				to_reconnection((void *)&send,(void **)&recev, &multi_nethost[i_nethost].db_info->clnt,
-						(int)DB_GETRES,i_nethost,DB_UDP,&error);
-#endif /* ALONE */
+			to_reconnection((void *)&send,(void **)&recev,&local_cl,(int)DB_GETRES,0,DB_UDP,&error);
 		}
 		if (error != DS_OK)
 		{
@@ -388,14 +356,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevL
 				tout.tv_usec = 20000;
 				select(0,0,0,0,&tout);
 #endif /* _OSK */
-#ifdef ALONE
-				recev = db_getres_1(&send,cl,&error);
-#else
-				if (i_nethost == 0)
-					recev = db_getres_1(&send,db_info.conf->clnt,&error);
-				else
-					recev = db_getres_1(&send, multi_nethost[i_nethost].db_info->clnt, &error);
-#endif /* ALONE */
+				recev = db_getres_1(&send,local_cl,&error);
 				if(recev == NULL)
 				{
 					for (j = 0; j < (int)res_num; j++)
@@ -473,10 +434,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevL
 #ifdef ALONE
 			tcp_cl = clnttcp_create(&serv_adr,DB_SETUPPROG, DB_VERS_3, &tcp_so,0,0);
 #else
-			if (i_nethost == 0)
-				tcp_cl = clnttcp_create(&serv_adr, db_info.conf->prog_number, DB_VERS_3,&tcp_so,0,0);
-			else
-				tcp_cl = clnttcp_create(&serv_adr, multi_nethost[i_nethost].db_info->prog_number, DB_VERS_3,&tcp_so,0,0);
+			tcp_cl = clnttcp_create(&serv_adr, multi_nethost[i_nethost].db_info->prog_number, DB_VERS_3,&tcp_so,0,0);
 #endif /* ALONE */
 			if (tcp_cl == NULL)
 			{
@@ -1193,30 +1151,11 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevL
 	}
 	else
 	{
-#ifdef ALONE
-		if (!clnt_freeres(cl,xdr_db_res,(char *)recev)) 
+		if (!clnt_freeres(local_cl,(xdrproc_t)xdr_db_res,(char *)recev)) 
 		{
 			*perr = DbErr_MemoryFree;
 			return(DS_NOTOK);
 		}
-#else
-		if (i_nethost == 0)
-		{
-			if (!clnt_freeres(db_info.conf->clnt,(xdrproc_t)xdr_db_res,(char *)recev)) 
-			{
-				*perr = DbErr_MemoryFree;
-				return(DS_NOTOK);
-			}
-		}
-		else
-		{
-			if (!clnt_freeres(multi_nethost[i_nethost].db_info->clnt,(xdrproc_t)xdr_db_res,(char *)recev)) 
-			{
-				*perr = DbErr_MemoryFree;
-				return(DS_NOTOK);
-			}
-		}
-#endif /* ALONE */
 	}
 
 /* 
@@ -1224,7 +1163,6 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevL
  */
 	*perr = DS_OK;
 	return(DS_OK);
-
 }
  
 
@@ -1255,6 +1193,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num, DevL
 	int big_res;
 	putres *tmp;
 	char *tmp_arr;
+	char	*devname;
 	DevVarCharArray *tmp_char;
 	DevVarStringArray *tmp_string;
 	DevVarShortArray *tmp_short;
@@ -1265,6 +1204,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num, DevL
 	int *recev;
 	int big_packet = 0;
 	CLIENT *tcp_cl;
+	CLIENT 		*local_cl;
 	int tcp_so;
 	DevLong error;
 	long i_nethost = 0;
@@ -1376,20 +1316,47 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num, DevL
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
 		first++;
 	}
+	devname = dev_name;
+	local_cl;
 #else
-/* If the RPC connection to the database server is not built, build one.
-   The "config_flags" variable is defined as global by the device server
-   API library */
-
-	if (config_flags.database_server != True)
+/*
+ * find out which nethost has been requested for this device
+ */
+	if ((i_nethost = get_i_nethost_by_device_name(dev_name,perr)) < 0)
 	{
-		if (db_import(&error))
-		{
-			config_flags.configuration = False;
-			*perr = DbErr_CannotCreateClientHandle;
+/* 
+ * The nethost is not imported, extract nethost name and import it 
+ */
+		char *nethost = extract_nethost(dev_name, perr);
+		if (*perr != DS_OK)
+			return DS_NOTOK;
+/* 
+ * The specified nethost is not in the list of imorted nethosts, therefore 
+ * call setup_config_multi() to add it 
+ */
+		if (setup_config_multi(nethost,perr) != DS_OK)
 			return(DS_NOTOK);
-		}
+/* 
+ * Find where the nethost is in the multi-nethost array 
+ */
+		i_nethost = get_i_nethost_by_name(nethost,perr);
 	}
+/* 
+ * If the RPC connection to the database server is not built, build one.
+ * The "config_flags" variable is defined as global by the device server
+ * API library. If the db_import failed, clear the configuration flag
+ * in order to recall the manager for database server RPC parameter at the
+ * next db_import (for reconnection) 
+ */
+	if ((multi_nethost[i_nethost].config_flags.database_server != True)
+			&& db_import_multi(multi_nethost[i_nethost].nethost,&error))
+	{
+		multi_nethost[i_nethost].config_flags.configuration = False;
+		*perr = DbErr_CannotCreateClientHandle;
+		return(DS_NOTOK);
+	}
+	devname = extract_device_name(dev_name,perr);
+	local_cl = multi_nethost[i_nethost].db_info->clnt;
 #endif /* ALONE */
 
 /* Allocate memory for the array putres structure */
@@ -1405,7 +1372,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num, DevL
 		return(DS_NOTOK);
 	}
 
-	k1 = strlen(dev_name);
+	k1 = strlen(devname);
 	for (i = 0;i < (int)res_num;i++)
 	{
 
@@ -1426,7 +1393,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num, DevL
 			return(DS_NOTOK);
 		}
 
-		strcpy_tolower(tmp->res_name,dev_name);
+		strcpy_tolower(tmp->res_name,devname);
 		strcat(tmp->res_name, "/");
 		strcat_tolower(tmp->res_name,res[i].resource_name);
 
@@ -2082,7 +2049,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num, DevL
 					DB_VERS_3, &tcp_so,0,0);
 #else
 			tcp_cl = clnttcp_create(&serv_adr,
-				        db_info.conf->prog_number,
+					multi_nethost[i_nethost].db_info->prog_number,
 				        DB_VERS_3,&tcp_so,0,0);
 #endif /* ALONE */
 			if (tcp_cl == NULL)
@@ -2110,7 +2077,8 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num, DevL
 	if (big_packet == 1)
 		recev = db_putres_1(&send,tcp_cl,&error);
 	else
-		recev = db_putres_1(&send,db_info.conf->clnt,&error);
+					
+		recev = db_putres_1(&send,multi_nethost[i_nethost].db_info->clnt,&error);
 #endif /* ALONE */
 
 /* If the server is not connected to the database (because a database update
@@ -2136,7 +2104,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num, DevL
 			if (big_packet == 1)
 				recev = db_putres_1(&send,tcp_cl,&error);
 			else
-				recev = db_putres_1(&send,db_info.conf->clnt,&error);
+				recev = db_putres_1(&send,multi_nethost[i_nethost].db_info->clnt,&error);
 #endif /* ALONE */
 			if(recev == NULL)
 				break;
@@ -2156,7 +2124,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num, DevL
 			to_reconnection((void *)&send,(void **)&recev,&cl,(int)DB_PUTRES,i_nethost,DB_UDP,&error);
 #else
 			to_reconnection((void *)&send,(void **)&recev,
-					&db_info.conf->clnt,(int)DB_PUTRES,
+					&multi_nethost[i_nethost].db_info->clnt,(int)DB_PUTRES,
 					i_nethost,DB_UDP,&error);
 #endif /* ALONE */
 		}

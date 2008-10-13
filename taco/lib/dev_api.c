@@ -27,13 +27,13 @@
  *
  * Author(s)  :	Andy Goetz
  *		Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.37 $
+ * Version    :	$Revision: 1.38 $
  *
- * Date	    :	$Date: 2008-04-06 09:06:59 $
+ * Date	    :	$Date: 2008-10-13 19:04:02 $
  *
  ********************************************************************-*/
 
@@ -321,7 +321,7 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, D
 				no_database = False;
 	char			name [256],
 				*hstring,
-				nethost[HOST_NAME_LENGTH],
+				*nethost,
 				*prog_url;
 
 /*
@@ -330,30 +330,23 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, D
 	snprintf(name, sizeof(name), "%s", dev_name);
 	device_name = str_tolower(name);
 /*
- * now check to see whether the nethost is specified
- * in the device name e.g. "//nethost/domain/family/member"
- * by calling the function get_i_nethost_from_device_name()
- * if nethost is not specified the default nethost (0)
- * will be returned
+ * now check to see whether the nethost is specified in the device name e.g. 
+ * "//nethost/domain/family/member" by calling the function 
+ * get_i_nethost_from_device_name(), if nethost is not specified the default 
+ * nethost will be returned. If there is no default nethost defined -1 will be
+ * returned.
  */
 	if ((i_nethost = get_i_nethost_by_device_name(device_name,error)) < 0)
 	{
 /*
- * nethost not imported, extract nethost and import it
- *
- * make a copy of the nethost name without the "//" and
- * removing the device name which follows
+ * nethost not imported. extract nethost 
  */
-		snprintf(nethost, sizeof(nethost), "%s", device_name + 2);
-		for (i = 0; i < (int)strlen(nethost); i++)
-			if (nethost[i] == '/')
-			{
-				nethost[i] = 0;
-				break;
-			}
+		nethost = extract_nethost(device_name, error);
+		if (*error != DS_OK)
+			return DS_NOTOK;
 /*
- * now check to see if this is a device without database
- * by checking for the "?number" in the device name
+ * now check to see if this is a device without database by checking for the 
+ * "?number" in the device name
  */
 		if (strchr(device_name,'?') != NULL)
 		{
@@ -372,8 +365,8 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, D
 		else
 		{
 /*
- * the specified nethost is not in the list of imported nethosts,
- * therefore call setup_config_multi() to add it
+ * the specified nethost is not in the list of imported nethosts, therefore call 
+ * setup_config_multi() to add it
  */
 			if (setup_config_multi(nethost,error) != DS_OK)
 				return(DS_NOTOK);
@@ -382,30 +375,16 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, D
 	}
 
 /*
- * the specified nethost now exists in the list of imported nethosts
- * i_nethost is the index into the array of nethosts
- *
+ * the specified nethost now exists in the list of imported nethosts i_nethost 
+ * is the index into the array of nethosts
  * check wether a database server is already imported
  */
 	if (!no_database)
 	{
-		if (i_nethost == 0)
+		if ( !multi_nethost[i_nethost].config_flags.database_server )
 		{
-			if ( !config_flags.database_server )
-			{
-				if (db_import(error) != DS_OK)
-				{
-					return(DS_NOTOK);
-				}
-			}
-		}
-		else
-		{
-			if ( !multi_nethost[i_nethost].config_flags.database_server )
-			{
-				if ( db_import_multi (nethost,error) != DS_OK )
-					return (DS_NOTOK);
-			}
+			if ( db_import_multi (nethost,error) != DS_OK )
+				return (DS_NOTOK);
 		}
 
 		dev_printdebug (DBG_API, "dev_import() : try to import %s\n",device_name);

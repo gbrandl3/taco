@@ -26,13 +26,13 @@
  *		programmers interface.
  *
  * Author(s):	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original:	June 1992
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2008-04-06 09:07:17 $
+ * Date:	$Date: 2008-10-13 19:04:02 $
  *
  ********************************************************************-*/
 
@@ -45,7 +45,7 @@
  */
 #ifdef _IDENT
 static char ApiPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.13 2008-04-06 09:07:17 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.14 2008-10-13 19:04:02 andy_gotz Exp $";
 #endif /* _IDENT */
 
 
@@ -376,7 +376,8 @@ long 	nethost_alloc PT_( (DevLong *error) );
 long 	get_i_nethost_by_device_name PT_( (char *device_name, DevLong *error) );
 long 	get_i_nethost_by_name PT_( (char *nethost, DevLong *error) );
 char* 	get_nethost_by_index PT_( (long i_nethost, DevLong *error) );
-char* 	extract_device_name PT_( (char *full_name, DevLong *error) );
+char* 	extract_device_name PT_( (const char *full_name, DevLong *error) );
+char* 	extract_nethost PT_( (const char *full_name, DevLong *error) );
 /*
  * Private functions used to implement the asynchronism
  */

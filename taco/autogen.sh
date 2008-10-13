@@ -23,7 +23,7 @@ for automake in automake automake19 automake18 automake17 ; do
 	fi
 done
 
-LIBTOOLIZE="$libtoolize --force --copy --automake"
+LIBTOOLIZE="$libtoolize --force --copy --automake "
 ACLOCAL="aclocal${am_postfix} -I m4 -I $aclocal_includes" 
 AUTOHEADER="autoheader${ac_postfix}"
 AUTOMAKE="$automake -a -c"

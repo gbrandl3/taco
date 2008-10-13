@@ -26,13 +26,13 @@
  *              handle remote devices.
  *
  * Author(s)  : Jens Krüger <jens.krueger@frm2.tum.de>
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
  * Original   : June 2007
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:                $Date: 2008-04-10 15:02:29 $
+ * Date:                $Date: 2008-10-13 19:04:02 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -41,6 +41,8 @@
 
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -146,6 +148,29 @@ char *strcat_tolower(char *dest, const char *src)
 	return dest;
 }
 
+/**
+ * @ingroup utilsAPI
+ * Update the value of an environment variable.
+ *
+ * @param env_name name of environment variable e.g. NETHOST
+ * @param env_value value of environment variable
+ * @param overwrite overwrite current value
+ *
+ * @see setenv
+ *
+ * @return nothing
+ */
+void taco_setenv(const char *env_name, const char *env_value, int overwrite)
+{
+#ifndef _solaris
+	setenv(env_name, env_value, overwrite);
+#else
+	/* not this is a potential memory leak, but we assume setenv() is not being called in an infinite loop ! */
+	char * env_putenv = 0;
+	env_putenv = (char*)malloc(strlen(env_name)+1+strlen(env_value)+1);
+	sprintf(env_putenv, "%s=%s", env_name, env_value);
+#endif /* _solaris */
+}
 #ifdef __cplusplus
 }
 #endif

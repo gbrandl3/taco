@@ -26,13 +26,13 @@
  *		servers and clients using the SUN-RPC.
  *
  * Author(s)  :	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.33 $
+ * Version    :	$Revision: 1.34 $
  *
- * Date       : $Date: 2008-04-06 09:06:59 $
+ * Date       : $Date: 2008-10-13 19:04:02 $
  *
  ********************************************************************-*/
 
@@ -83,6 +83,7 @@ static char 		*get_error_string(DevLong error);
 long putenv(char *);
 #endif /* _OSK */
 
+char *dev_error_string=NULL; /* global pointer to dynamic error string */
 char *dev_error_stack=NULL; /* global pointer to dynamic error stack */
 
 /****************************************
@@ -112,7 +113,6 @@ extern "C" {
  *  security		== false
  */
 
-
 configuration_flags	config_flags =
 {
 	False,False,False,False,False, "", "", 0L
@@ -122,17 +122,13 @@ configuration_flags	config_flags =
 /*
  *  Database Server globals
  */
-
 dbserver_info		db_info;
 
 /*
  *  Message Server globals
  */
-
 msgserver_info		msg_info;
 static _message_buffer 	message_buffer [NUMBER_OF_MSG_TYPES];
-
-
 struct _devserver 	*msg_ds, 
 			*db_ds;
 /*
@@ -148,19 +144,18 @@ struct _devserver 	*msg_ds,
  * MIN_NETHOST (10)
  *
  */
-
 nethost_info 	*multi_nethost;
-long max_nethost = 0;
+long 		max_nethost = 0;
+long		default_nethost = -1;
 
 #ifdef WIN32
-static long win32_rpc_inited;
+static long 	win32_rpc_inited;
 #endif /* WIN32 */
 
 /*
  *  Debug globals
  */
-
-long debug_flag = 0x0;
+long 		debug_flag = 0x0;
 
 #ifdef __cplusplus
 }
@@ -214,7 +209,6 @@ long _DLLFunc msg_import (char *DS_name, char *DS_host, long DS_prog_number, cha
 	{
 		if ( (setup_config_multi(NULL,error)) < 0 )
 			return (DS_NOTOK);
-
 	}
 
 
@@ -990,10 +984,11 @@ static void msg_clear (_Int msg_type)
 }
 
 /**@ingroup dbaseAPI
- * This function imports the static database service.
+ * Imports the static database service from the serve given by the $NETHOST
+ * environment variable. If no default nethost was set it will be set.
  *
- * @param error Will contain an appropriate error
- *		code if the corresponding call returns a non-zero value.
+ * @param error Will contain an appropriate error code if the corresponding 
+ *	        call returns a non-zero value.
  *
  * @return DS_OK or DS_NOTOK
  */
@@ -1004,6 +999,7 @@ long _DLLFunc db_import (DevLong *error)
 	char		*hstring;
 	char		nethost[HOST_NAME_LENGTH], 
 			*nethost_env;
+	long		res;
 
 	*error = DS_OK;
 
@@ -1016,11 +1012,16 @@ long _DLLFunc db_import (DevLong *error)
 	strncpy(nethost, nethost_env, sizeof(nethost) - 1);
 	nethost[sizeof(nethost) - 1] = '\0';
 
-#if 0
-	multi_nethost[0].config_flags = config_flags;
-	multi_nethost[0].db_info = db_info.conf;
-#endif
-	return db_import_multi(nethost, error);
+	res = db_import_multi(nethost, error);
+/*
+ * if the import was successful and the default nethost was yet not set set it
+ */
+	if (res == DS_OK && default_nethost < 0)
+	{
+		long i_nethost = get_i_nethost_by_name(nethost, error);
+		default_nethost = i_nethost;
+	}
+	return res; 
 }
 
 /**@ingroup dbaseAPI
@@ -1050,7 +1051,7 @@ long _DLLFunc db_import_multi (char *nethost, DevLong *error)
 /*
  * if not try to configure the new nethost
  */
-                if ( (setup_config_multi (nethost,error)) < 0 )
+                if ((setup_config_multi(nethost,error)) < 0)
                         return (DS_NOTOK);
 		i_nethost = get_i_nethost_by_name(nethost,error);
 	}
@@ -1064,7 +1065,6 @@ long _DLLFunc db_import_multi (char *nethost, DevLong *error)
  */
 	if (nethost_i->config_flags.database_server)
 		return (DS_OK);
-
 /*
  * Create message server client handle with data from
  * global dbserver_info structure.
@@ -1073,7 +1073,7 @@ long _DLLFunc db_import_multi (char *nethost, DevLong *error)
 /* 
  * Create a client handle for version 3! 
  */
-	clnt = clnt_create ( nethost_i->db_info->server_host, nethost_i->db_info->prog_number, DB_VERS_3, "udp");
+	clnt = clnt_create(nethost_i->db_info->server_host, nethost_i->db_info->prog_number, DB_VERS_3, "udp");
 	if (clnt == NULL)
 	{
 		hstring = clnt_spcreateerror ("db_import");
@@ -1084,7 +1084,6 @@ long _DLLFunc db_import_multi (char *nethost, DevLong *error)
 
 	clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &dbase_retry_timeout);
 	clnt_control (clnt, CLSET_TIMEOUT, (char *) &dbase_timeout);
-
 /*
  * Check the database server version. 
  * If it is not a new version 3 server, create a handle to version 2!!!
@@ -1100,7 +1099,6 @@ long _DLLFunc db_import_multi (char *nethost, DevLong *error)
 			*error = DevErr_DbImportFailed;
 			return (DS_NOTOK);
 		}
-
 /*
  * If it was an old version 2 of the database server,
  * a version mismatch occured because the client handle
@@ -1129,7 +1127,6 @@ long _DLLFunc db_import_multi (char *nethost, DevLong *error)
 	}
 	else
 		nethost_i->db_info->vers_number = DB_VERS_3;
-
 /* 
  * pass the information to the database server_info structure
  */
@@ -1139,7 +1136,7 @@ long _DLLFunc db_import_multi (char *nethost, DevLong *error)
 	nethost_i->db_info->ds_id = 0;
 	nethost_i->db_info->no_svr_conn = 1;
 	nethost_i->config_flags.database_server = True;
-	if (i_nethost == 0)
+	if (i_nethost == default_nethost)
 	{
 /*
  * if this is the first nethost (i_nethost=0) then add mono-nethost 
@@ -1152,8 +1149,9 @@ long _DLLFunc db_import_multi (char *nethost, DevLong *error)
 }
 
 /**@ingroup dsAPI
- * This function gets the necessary configuration information for a static database service and a message
- * service from  a network manager in a multi-nethost environment.
+ * This function gets the necessary configuration information for a static 
+ * database service and a message service from  a network manager in a 
+ * multi-nethost environment.
  *
  * The host of the network manager is specified by the nethost parameter.    
  *
@@ -1175,7 +1173,7 @@ long setup_config_multi (char *nethost, DevLong *error)
 	long			i_nethost, i;
 #ifndef _UCC
 	char*                   nethost_env;
-	static char             nethost_buffer[80]; /* used if * nethost=NULL */
+	static char             nethost_buffer[80]; /* used if nethost=NULL */
 
 #endif
 
@@ -1203,23 +1201,20 @@ long setup_config_multi (char *nethost, DevLong *error)
 			return (DS_NOTOK);
 		}
 		nethost=nethost_buffer;
-		snprintf(nethost, sizeof(nethost), "%s",nethost_env);
+		snprintf(nethost, sizeof(nethost_buffer), "%s",nethost_env);
 	}
-
 /*
- * look for the nethost in the array of multi_nethosts[] and
- * return its index; if the nethost is not found then return the
- * index of the next free slot in the array
+ * look for the nethost in the array of multi_nethosts[] and return its index; 
+ * if the nethost is not found then return the index of the next free slot in 
+ * the array
  */
 	if ((i_nethost = get_i_nethost_by_name(nethost,error)) < 0)
 	{
 /*
- * nethost is not defined in the list of imported nethosts, add it
- * to the next free slot in multi_nethosts
- *
- * but first check to see whether the $NETHOST environment variable is
- * defined. If so then set it up first as default nethost by calling 
- * setup_config(). The $NETHOST environment variable has precedance 
+ * nethost is not defined in the list of imported nethosts, add it to the next 
+ * free slot in multi_nethosts, but first check to see whether the $NETHOST 
+ * environment variable is defined. If so then set it up first as default nethost 
+ * by calling setup_config(). The $NETHOST environment variable has precedance 
  * over the nethost defined in the device name
  *
  * only call setup_config() if it hasn't been called already - andy 19nov98
@@ -1271,7 +1266,7 @@ long setup_config_multi (char *nethost, DevLong *error)
 	if (clnt == NULL)
 	{
 		char tmp[255];
-		snprintf(tmp, sizeof(tmp), "setup_config (NETHOST=%s) : ", nethost);
+		snprintf(tmp, sizeof(tmp), "setup_config_multi (NETHOST=%s) : ", nethost);
 		clnt_pcreateerror (tmp);
 		*error = DevErr_NoNetworkManagerAvailable;
 		return (DS_NOTOK);
@@ -1282,7 +1277,6 @@ long setup_config_multi (char *nethost, DevLong *error)
 /*
  * get configuration information from a network manager
  */
-
 	clnt_stat = clnt_call (clnt, RPC_GET_CONFIG,
 	    (xdrproc_t)xdr__register_data, (caddr_t) &register_data,
 	    (xdrproc_t)xdr__manager_data, (caddr_t) &manager_data, TIMEVAL(timeout));
@@ -1296,10 +1290,9 @@ long setup_config_multi (char *nethost, DevLong *error)
 			return (DS_NOTOK);
 		}
 /*
- * If it was an old version 1 of the manager process,
- * a version mismatch occured because the client handle
- * was created for version 4.
- * Destroy the handle and use version 1.
+ * If it was an old version 1 of the manager process, a version mismatch occured 
+ * because the client handle was created for version 4. Destroy the handle and 
+ * use version 1.
  */
 		else
 		{
@@ -1314,7 +1307,7 @@ long setup_config_multi (char *nethost, DevLong *error)
 			if (clnt == NULL)
 			{
 				char tmp[255];
-				snprintf(tmp, sizeof(tmp), "setup_config (NETHOST=%s) : ", nethost);
+				snprintf(tmp, sizeof(tmp), "setup_config_multi (NETHOST=%s) : ", nethost);
 				clnt_pcreateerror (tmp);
 				*error = DevErr_NoNetworkManagerAvailable;
 				return (DS_NOTOK);
@@ -1337,13 +1330,12 @@ long setup_config_multi (char *nethost, DevLong *error)
 		}
 	}
 
-
 	if (manager_data.status < 0)
 	{
 		*error = manager_data.error;
 /*
- * free memory allocated by xdr in manager_data (assume we have connected
- * to version 4 of the Manager
+ * free memory allocated by xdr in manager_data (assume we have connected to 
+ * version 4 of the Manager
  */
 		xdr_free((xdrproc_t)xdr__manager_data, (char *)&manager_data);
 		clnt_destroy (clnt);
@@ -1351,14 +1343,12 @@ long setup_config_multi (char *nethost, DevLong *error)
 	}
 
 /*
- * put message server and database server configuration
- * into the global structures msgserver_info and
- * dbserver_info.
+ * put message server and database server configuration into the global structures 
+ * msgserver_info and dbserver_info.
  *
- * do not allocate space for _devserver structure because this routine
- * could be called multiple times e.g. when database server has to be
- * reimported, simply point to a static _devserver structure which
- * is always allocated
+ * do not allocate space for _devserver structure because this routine could be 
+ * called multiple times e.g. when database server has to be reimported, simply 
+ * point to a static _devserver structure which is always allocated
  */
 	multi_nethost[i_nethost].msg_info = (devserver)&msg_ds[i_nethost];
 	multi_nethost[i_nethost].db_info = (devserver)&db_ds[i_nethost];
@@ -1378,14 +1368,12 @@ long setup_config_multi (char *nethost, DevLong *error)
                                  manager_data.db_info.vers_number;
 
 /*
- * Enable the security system if the Manager indicates 
- * the use of the security system.
+ * Enable the security system if the Manager indicates the use of the security system.
  */
 	multi_nethost[i_nethost].config_flags.security = manager_data.security;
-
 /*
- * free memory allocated by xdr in manager_data (assume we have connected
- * to version 4 of the Manager
+ * free memory allocated by xdr in manager_data (assume we have connected to 
+ * version 4 of the Manager
  */
 	xdr_free((xdrproc_t)xdr__manager_data, (char *)&manager_data);
 	clnt_destroy (clnt);
@@ -1396,9 +1384,8 @@ long setup_config_multi (char *nethost, DevLong *error)
 	if (i_nethost == 0)
 	{
 /*
- * if this is the first nethost (i_nethost=0) then add mono-nethost 
- * support by calling setup_config to initialise the default nethost
- * i.e. the present nethost
+ * if this is the first nethost (i_nethost=0) then add mono-nethost support by 
+ * calling setup_config to initialise the default nethost i.e. the present nethost
  */
 		if (!config_flags.configuration)
 		{
@@ -1439,10 +1426,11 @@ long setup_config_multi (char *nethost, DevLong *error)
  */
 long db_ChangeDefaultNethost(char* nethost,DevLong *error)
 {
-	int i_nethost = get_i_nethost_by_name(nethost,error);
 /* 
  * lookup in nethost array 
  */
+	int i_nethost = get_i_nethost_by_name(nethost,error);
+
 	if (i_nethost < 0)
 	{
 		if ((char *)getenv("NETHOST") != NULL)
@@ -1467,16 +1455,15 @@ long db_ChangeDefaultNethost(char* nethost,DevLong *error)
 	}
 /* 
  * set the default nethost vars from multi-nethost array 
- *
  * HINT: some day, there should be a global index, and all
  * functions could use multi_nethost[glob_index]  
  */
+	default_nethost = i_nethost;
 	config_flags = multi_nethost[i_nethost].config_flags;
 	db_info.conf = multi_nethost[i_nethost].db_info;
 	msg_info.conf = multi_nethost[i_nethost].msg_info;
 	return (DS_OK);
 }
-/* Function: */
 
 /**@ingroup dsAPIintern
  * This function formats the error string with a timestamp. The resulting string contains at

@@ -26,13 +26,13 @@
  *
  * Author(s):	Andy Goetz
  *		Jens Meyer
- *		$Author: jensmeyer $
+ *		$Author: andy_gotz $
  *
  * Original:	9 March 1992
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2005-08-02 09:16:42 $
+ * Date:        $Date: 2008-10-13 19:04:02 $
  *
  ********************************************************************-*/
 
@@ -96,8 +96,10 @@ DevErrListEntry DevErr_List[] = {
 		    "Calculation of the XDR length of the data type failed"},
 { DevErr_NameStringToLong, "String exceeded length of character field"},
 { DevErr_DeviceNoLongerExported, "The device is no longer exported"},
-{ DevErr_ExceededMaximumNoOfClientConn, 
-		    "Exceeded the maximum number of client connections"},
+{ DevErr_ExceededMaximumNoOfClientConn,
+                    "Exceeded the maximum number of client connections"},
+{ DevErr_DeviceTimedOut, 
+		    "Device timed out"},
 
 /*
  *  Network manager error messages
@@ -175,6 +177,10 @@ DevErrListEntry DevErr_List[] = {
 { DevErr_AttributeNotFound,"Attribute name is neither defined for TACO nor for TANGO"},
 { DevErr_CannotConvertAttributeDataType,"Cannot cast attribute data type to the requested type"},
 { DevErr_TangoAttributeValueIsNotValid,"The Tango attribute value is INVALID!"},
+/*
+ *  Data colelctor error messages
+ */
+{ DcErr_DeviceNotDefined, "The device is not registered in the data collector"},
 };
 
 
