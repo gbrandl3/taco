@@ -26,13 +26,13 @@
  *		and the list of all available data types.
  *
  * Author(s):  	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2008-04-06 09:07:21 $
+ * Date:	$Date: 2008-10-13 13:31:37 $
  *
  *******************************************************************-*/
 
@@ -107,11 +107,12 @@ long  				_DLLFunc xdr_length_DevShort
 						sizeof(DevShort), \
 						xdr_length_DevShort, \
 						A )
-#if SIZEOF_UNSIGNED_INT == 4
-typedef unsigned int 		DevULong;
-#elif SIZEOF_UNSIGNED_LONG == 4
-typedef unsigned long      	DevULong;
+#if SIZEOF_UNSIGNED_LONG == 4
+typedef unsigned long           DevULong;
+#elif SIZEOF_UNSIGNED_INT == 4
+typedef unsigned int            DevULong;
 #endif
+
 bool_t 				_DLLFunc xdr_DevULong
 		 			PT_((XDR *xdrs, DevULong *objp));
 long                        	_DLLFunc xdr_length_DevULong
@@ -125,11 +126,12 @@ long                        	_DLLFunc xdr_length_DevULong
                                                xdr_length_DevULong, \
                                                A)
 
-#if SIZEOF_INT == 4
-typedef int			DevLong;
-#elif SIZEOF_LONG == 4
-typedef	long			DevLong;
+#if SIZEOF_LONG == 4
+typedef long                    DevLong;
+#elif SIZEOF_INT == 4
+typedef int                     DevLong;
 #endif
+
 bool_t 				_DLLFunc xdr_DevLong
 		 			PT_((XDR *xdrs, DevLong *objp));
 long    			_DLLFunc xdr_length_DevLong PT_((DevLong *objp));
