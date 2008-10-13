@@ -24,11 +24,11 @@
  *		Synopsis : db_update <file name>
  *
  * Author(s):
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
- * Version:     $Revision: 1.6 $
+ * Version:     $Revision: 1.7 $
  *
- * Date:        $Date: 2008-04-06 09:07:47 $
+ * Date:        $Date: 2008-10-13 19:01:46 $
  */
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -88,7 +88,8 @@ int main(int argc, char **argv)
                 switch (c)
                 {
 			case 'n':
-				setenv("NETHOST", optarg, 1);
+				taco_setenv("NETHOST", optarg, 1);
+
 				break;
 			case 'v':
 				version(argv[0]);

@@ -23,11 +23,11 @@
  *		family, or device.
  *
  * Author(s):	Jens Krüger
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2008-07-18 07:39:35 $
+ * Date:        $Date: 2008-10-13 19:01:46 $
  */
 
 #include <iostream>
@@ -68,7 +68,7 @@ int main(int argc, char **argv)
 		switch (c)
 		{
 			case 'n':
-				setenv("NETHOST", optarg, 1);
+				taco_setenv("NETHOST", optarg, 1);
 				break;
 			case 'u':
 				user_name = optarg;

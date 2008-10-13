@@ -26,13 +26,13 @@
  *
  *
  * Author       : 
- *                $Author: jkrueger1 $
+ *                $Author: andy_gotz $
  *
  * Original     :
  *
- * Version      : $Revision: 1.6 $
+ * Version      : $Revision: 1.7 $
  *
- * Date         : $Date: 2008-04-20 10:24:07 $
+ * Date         : $Date: 2008-10-13 19:01:46 $
  *
  */
 
@@ -94,7 +94,7 @@ int main(int argc, char **argv)
                 switch (c)
                 {
                         case 'n':
-                                setenv("NETHOST", optarg, 1);
+                                taco_setenv("NETHOST", optarg, 1);
                                 break;
                         case 'v':
                                 version(argv[0]);
@@ -107,11 +107,13 @@ int main(int argc, char **argv)
         if (optind != argc - 1)
                 usage(argv[0]);
 
+/*
    if(db_import(&error)) 
    {
 	   printf("Error during db_import\n");
 	   exit(0);
    }
+ */
    if(index(argv[optind],'*')==0)
       devcmd(argv[optind]);
    else
@@ -135,6 +137,7 @@ int main(int argc, char **argv)
    }
    db_freedevexp(device_tab);
    }
+   devcmd(device_tab[0]);
 }
 
 long devcmd(char *devname)

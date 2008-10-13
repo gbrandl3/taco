@@ -27,8 +27,10 @@ if BUILD_MESSAGESERVER
 SUBDIRS += msg
 endif
 
+if BUILD_EXT
 if BUILD_SERVER
 SUBDIRS += starter
+endif
 endif
 
 if DC_BUILD

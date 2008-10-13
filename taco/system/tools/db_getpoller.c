@@ -26,13 +26,13 @@
  *
  *
  * Author       : 
- *                $Author: jkrueger1 $
+ *                $Author: andy_gotz $
  *
  * Original     :
  *
- * Version      : $Revision: 1.2 $
+ * Version      : $Revision: 1.3 $
  *
- * Date         : $Date: 2008-04-06 09:07:57 $
+ * Date         : $Date: 2008-10-13 19:01:46 $
  *
  */
 
@@ -80,7 +80,7 @@ int main(int argc,char *argv[])
                 switch (c)
                 {
                         case 'n':
-                                setenv("NETHOST", optarg, 1);
+                                taco_setenv("NETHOST", optarg, 1);
                                 break;
                         case 'v':
                                 version(argv[0]);

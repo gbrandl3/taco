@@ -23,11 +23,11 @@
  *              Synopsis : db_devicelist
  *
  * Author(s):	Jens Krüger
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2008-04-06 09:07:46 $
+ * Date:        $Date: 2008-10-13 19:01:46 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 		switch (c)
 		{
 		case 'n':
-			setenv("NETHOST", optarg, 1);
+			taco_setenv("NETHOST", optarg, 1);
 			break;
 		case 'v':
 			version(argv[0]);

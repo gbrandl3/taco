@@ -23,11 +23,11 @@
  *		Synopsis : db_devres [ device name ]
  *
  * Author(s):
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
- * Version:     $Revision: 1.8 $
+ * Version:     $Revision: 1.9 $
  *
- * Date:        $Date: 2008-04-06 09:07:47 $
+ * Date:        $Date: 2008-10-13 19:01:46 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -77,7 +77,7 @@ int main(int argc,char *argv[])
                 switch (c)
                 {
 			case 'n':
-				setenv("NETHOST", optarg, 1);
+                                taco_setenv("NETHOST", optarg, 1);
 				break;
 			case 'v':
 				version(argv[0]);
@@ -94,7 +94,7 @@ int main(int argc,char *argv[])
 	if (dev_name.substr(0, 2) == "//")
 	{
 		std::string::size_type pos = dev_name.find("/", 2);
-		setenv("NETHOST", dev_name.substr(2, pos - 2).c_str(), 1);
+		taco_setenv("NETHOST", dev_name.substr(2, pos - 2).c_str(), 1);
 		dev_name.erase(0, pos + 1);
 	}
 

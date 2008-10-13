@@ -25,11 +25,11 @@
  *              Synopsis : db_devdel [-r] <device name>
  *
  * Author(s):
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
- * Version:     $Revision: 1.7 $
+ * Version:     $Revision: 1.8 $
  *
- * Date:        $Date: 2008-04-06 09:07:46 $
+ * Date:        $Date: 2008-10-13 19:01:46 $
  */
 
 /* TACO include file */
@@ -74,7 +74,6 @@ int main(int argc,char *argv[])
 	extern int	optind;
 	extern char 	*optarg;
 	int 		c;
-
 //
 // Argument test and device name structure
 //
@@ -86,7 +85,7 @@ int main(int argc,char *argv[])
 			del_res = False;
 			break;
 		case 'n':
-			setenv("NETHOST", optarg, 1);
+			taco_setenv("NETHOST", optarg, 1);
 			break;
 		case 'v':
 			version(argv[0]);
@@ -104,7 +103,7 @@ int main(int argc,char *argv[])
 	if (dev_name.substr(0, 2) == "//")
 	{
 		std::string::size_type pos = dev_name.find("/", 2);
-		setenv("NETHOST", dev_name.substr(2, pos - 2).c_str(), 1);
+		taco_setenv("NETHOST", dev_name.substr(2, pos - 2).c_str(), 1);
 		dev_name.erase(0, pos + 1);
 	}
 #ifdef DEBUG

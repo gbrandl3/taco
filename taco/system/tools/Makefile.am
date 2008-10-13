@@ -17,6 +17,9 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
+if SOLARIS_CXX
+# do nothing for Solaris CC because of problems with linking ...
+else
 bin_PROGRAMS		= devoff \
 			devon \
 			devstate \
@@ -47,7 +50,7 @@ bin_PROGRAMS		+= devexp \
 
 AM_CPPFLAGS		= @TACO_INCLUDES@ -I$(top_srcdir)/ext/include
 if TANGO_BUILD
-LDADD			= @TANGO_LIBS@ @CORBA_LDFLAGS@ @CORBA_LIBS@ @TANGO_CLIENT_CXX_LIBS@
+LDADD			= @TANGO_LIBS@ @CORBA_LDFLAGS@ @CORBA_LIBS@ @TANGO_CLIENT_CXX_LIBS@ 
 else
 LDADD			= @TACO_CLIENT_LIBS@ 
 endif
@@ -87,3 +90,4 @@ devexp_SOURCES		= devexp.c
 devupdate_SOURCES	= devupdate.c
 poll_test_SOURCES	= poll_test.c
 readsignals_SOURCES	= readsignals.c
+endif

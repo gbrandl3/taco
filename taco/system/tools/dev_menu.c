@@ -26,13 +26,13 @@
  *
  *
  * Author       : JL PONS, R. Wilcke
- *                $Author: jkrueger1 $
+ *                $Author: andy_gotz $
  *
  * Original     : JL PONS
  *
- * Version      : $Revision: 1.3 $
+ * Version      : $Revision: 1.4 $
  *
- * Date         : $Date: 2008-04-15 08:36:14 $
+ * Date         : $Date: 2008-10-13 19:01:46 $
  *
  */
 
@@ -944,7 +944,7 @@ int main(unsigned int argc,char **argv)
      				useTcp = 1;     
 				break;
                         case 'n':
-                                setenv("NETHOST", optarg, 1);
+                                taco_setenv("NETHOST", optarg, 1);
                                 break;
                         case 'v':
                                 version(argv[0]);
