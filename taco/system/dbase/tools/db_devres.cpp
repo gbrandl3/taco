@@ -25,9 +25,9 @@
  * Author(s):
  *              $Author: andy_gotz $
  *
- * Version:     $Revision: 1.9 $
+ * Version:     $Revision: 1.10 $
  *
- * Date:        $Date: 2008-10-13 19:01:46 $
+ * Date:        $Date: 2008-10-13 19:41:24 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -41,9 +41,9 @@
 #include <string>
 #include <algorithm>
 #include <cstdlib>
+#include <taco_utils.h>
 #ifdef _solaris
 #	include "_count.h"
-#include <taco_utils.h>
 #endif /* _solaris */
 
 void usage(const char *cmd)

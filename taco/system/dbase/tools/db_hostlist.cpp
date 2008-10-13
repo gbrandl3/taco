@@ -25,9 +25,9 @@
  * Author(s):
  *              $Author: andy_gotz $
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2008-10-13 19:01:46 $
+ * Date:        $Date: 2008-10-13 19:41:24 $
  */
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -38,9 +38,7 @@
 /* Include files */
 #include <iostream>
 #include <cstdlib>
-#ifdef _solaris
 #include <taco_utils.h>
-#endif /* _solaris */
 
 void usage(const char *cmd)
 {

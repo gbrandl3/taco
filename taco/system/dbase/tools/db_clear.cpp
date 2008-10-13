@@ -25,9 +25,9 @@
  * Author(s):	Jens Krüger
  *              $Author: andy_gotz $
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2008-10-13 19:01:46 $
+ * Date:        $Date: 2008-10-13 19:41:24 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -40,9 +40,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#ifdef _solaris
 #include <taco_utils.h>
-#endif /* _solaris */
 
 void usage(const char *cmd)
 {

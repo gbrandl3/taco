@@ -27,9 +27,9 @@
  * Author(s):
  *              $Author: andy_gotz $
  *
- * Version:     $Revision: 1.8 $
+ * Version:     $Revision: 1.9 $
  *
- * Date:        $Date: 2008-10-13 19:01:46 $
+ * Date:        $Date: 2008-10-13 19:41:24 $
  */
 
 /* TACO include file */
@@ -46,8 +46,8 @@
 #include <algorithm>
 #ifdef _solaris
 #	include "_count.h"
-#include <taco_utils.h>
 #endif /* _solaris */
+#include <taco_utils.h>
 
 void usage(const char *cmd)
 {

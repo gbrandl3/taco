@@ -25,16 +25,14 @@
  * Author(s):	Jens Krüger
  *              $Author: andy_gotz $
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2008-10-13 19:01:46 $
+ * Date:        $Date: 2008-10-13 19:41:24 $
  */
 
 #include <iostream>
 #include <string>
-#ifdef _solaris
-#	include <taco_utils.h>
-#endif /* _solaris */
+#include <taco_utils.h>
 
 #include <cstdlib>
 
