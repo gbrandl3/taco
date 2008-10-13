@@ -25,13 +25,13 @@
  * Description:	Code for implementing the Serial class in C++ on Linux/x86.
  *
  * Author(s);	Manuel Perez
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
  * Original:	May 1998 by Andy Gotz
  *
- * Version:     $Revision: 1.12 $
+ * Version:     $Revision: 1.13 $
  *
- * Date:        $Date: 2008-04-06 09:06:37 $
+ * Date:        $Date: 2008-10-13 18:56:33 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -332,6 +332,7 @@ Serial::Serial (char *name, DevLong *error)
  //
  // Commands list available
  //
+#ifdef TACO_EXT
  this->commands_map[DevSerWriteString] = DeviceCommandListEntry(
    DevSerWriteString, (DeviceMemberFunction)(&Serial::SerWriteString), D_STRING_TYPE, D_LONG_TYPE, WRITE_ACCESS, "DevSerWriteString");
  this->commands_map[DevSerWriteChar] = DeviceCommandListEntry(
@@ -348,6 +349,91 @@ Serial::Serial (char *name, DevLong *error)
    DevState, (DeviceMemberFunction)(&Serial::State), D_VOID_TYPE, D_SHORT_TYPE, WRITE_ACCESS, "DevState");
  this->commands_map[DevStatus] = DeviceCommandListEntry(
    DevStatus, (DeviceMemberFunction)(&Serial::Status), D_VOID_TYPE, D_STRING_TYPE, WRITE_ACCESS, "DevStatus");
+#else
+ static Device::DeviceCommandListEntry commands_list[] =
+ {
+  {
+   DevSerWriteString,
+   (DeviceMemberFunction)(&Serial::SerWriteString),
+   D_STRING_TYPE,
+   D_LONG_TYPE
+  },
+  {
+   DevSerWriteChar,
+   (DeviceMemberFunction)(&Serial::SerWriteChar),
+   D_VAR_CHARARR,
+   D_LONG_TYPE
+  },
+  {
+   DevSerReadString,
+   (DeviceMemberFunction)(&Serial::SerReadString),
+   D_LONG_TYPE,
+   D_STRING_TYPE
+  },
+  {
+   DevSerReadChar,
+   (DeviceMemberFunction)(&Serial::SerReadChar),
+   D_LONG_TYPE,
+   D_VAR_CHARARR
+  },
+  {
+   DevSerSetParameter,
+   (DeviceMemberFunction)(&Serial::SerSetParameter),
+   D_VAR_SHORTARR,
+   D_VOID_TYPE
+  },
+  /*
+  {
+   DevSerSetLongParameter,
+   (DeviceMemberFunction)(&Serial::SerSetLongParameter),
+   D_VAR_LONGARR,
+   D_VOID_TYPE
+  },
+  {
+   DevSerSetCharDelay,
+   (DeviceMemberFunction)(&Serial::SerSetCharDelay),
+   D_SHORT_TYPE,
+   D_VOID_TYPE
+  },
+  {
+   DevSerGetNChar,
+   (DeviceMemberFunction)(&Serial::SerGetNChar),
+   D_VOID_TYPE,
+   D_LONG_TYPE
+  },
+  {
+   DevSerWaitChar,
+   (DeviceMemberFunction)(&Serial::SerWaitChar),
+   D_VOID_TYPE,
+   D_LONG_TYPE
+  },
+  {
+   DevSerFlush,
+   (DeviceMemberFunction)(&Serial::SerFlush),
+   D_SHORT_TYPE,
+   D_VOID_TYPE
+  },
+  */
+  {
+   DevReset,
+   (DeviceMemberFunction)(&Serial::Reset),
+   D_VOID_TYPE,
+   D_VOID_TYPE
+  },
+  {
+   DevState,
+   (DeviceMemberFunction)(&Serial::State),
+   D_VOID_TYPE,
+   D_SHORT_TYPE
+  },
+  {
+   DevStatus,
+   (DeviceMemberFunction)(&Serial::Status),
+   D_VOID_TYPE,
+   D_STRING_TYPE
+  },
+ };
+#endif /* TACO_EXT */
 
 
 
