@@ -25,13 +25,13 @@
  * Description: implementation for KernelServer class 
  *
  * Author(s):   Emmanuel Taurel
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
  * Original:    June 1996
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2008-07-18 07:31:25 $
+ * Date:        $Date: 2008-10-13 19:01:14 $
  *
  +**********************************************************************/
 
@@ -69,8 +69,10 @@ void get_dc_param(int,int,char *,unsigned int &,std::string &);
 
 extern bool_t xdr__manager_data(XDR *,struct _manager_data *);
 
+#ifndef HAVE_DECL_GETHOSTNAME
 #ifdef sun
 extern "C" {int gethostname(char *,int);}
+#endif
 #endif
 
 
