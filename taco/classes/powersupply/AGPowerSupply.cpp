@@ -32,13 +32,13 @@
  *		test their applications without accessing real devices
  *
  * Author(s);	A. Goetz 
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
  * Original:	June 1995
  *
- * Version:     $Revision: 1.9 $
+ * Version:     $Revision: 1.10 $
  *
- * Date:        $Date: 2008-04-30 14:04:11 $
+ * Date:        $Date: 2008-10-13 18:55:17 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -209,6 +209,7 @@ AGPowerSupply::AGPowerSupply (char *name, DevLong *error)
               :PowerSupply (name, error)
 {
    static Device::DeviceCommandListEntry commands_list[] = {
+#ifdef TACO_EXT
      Device::DeviceCommandListEntry(DevState, 	&Device::State, 
 			D_VOID_TYPE, D_SHORT_TYPE, READ_ACCESS, "DevState"),
      Device::DeviceCommandListEntry(DevStatus, 	(DeviceMemberFunction)(&AGPowerSupply::Status), 
@@ -233,6 +234,24 @@ AGPowerSupply::AGPowerSupply (char *name, DevLong *error)
 			D_VOID_TYPE, D_STATE_FLOAT_READPOINT, WRITE_ACCESS, "DevUpdate"),
      Device::DeviceCommandListEntry(DevHello, 	(DeviceMemberFunction)&AGPowerSupply::Hello, 
 			D_STRING_TYPE, D_SHORT_TYPE, WRITE_ACCESS, "DevHello"),
+#else
+         {DevState, &Device::State, D_VOID_TYPE, D_SHORT_TYPE,0,"DevState"},
+         {DevStatus, (DeviceMemberFunction)(&AGPowerSupply::Status), D_VOID_TYPE, D_STRING_TYPE,0,"DevStatus"},
+         {DevOn, (DeviceMemberFunction)(&AGPowerSupply::On), D_VOID_TYPE, D_VOID_TYPE,0,"DevOn"},
+         {DevOff, (DeviceMemberFunction)&AGPowerSupply::Off, D_VOID_TYPE, D_VOID_TYPE,0,"DevOff"},
+         {DevSetValue, (DeviceMemberFunction)&AGPowerSupply::SetValue, D_FLOAT_TYPE, D_VOID_TYPE,0,"DevSetValue"},
+         {DevReadValue, (DeviceMemberFunction)&AGPowerSupply::ReadValue, D_VOID_TYPE, D_FLOAT_READPOINT,0,"DevReadValue"},
+         {DevReset, (DeviceMemberFunction)&AGPowerSupply::Reset, D_VOID_TYPE, D_VOID_TYPE,0,"DevReset"},
+         {DevError, (DeviceMemberFunction)&AGPowerSupply::Error, D_VOID_TYPE, D_VOID_TYPE,0,"DevError"},
+         {DevLocal, (DeviceMemberFunction)&AGPowerSupply::Local, D_VOID_TYPE, D_VOID_TYPE,0,"DevLocal"},
+         {DevRemote, (DeviceMemberFunction)&AGPowerSupply::Remote, D_VOID_TYPE,
+D_VOID_TYPE,0,"DevRemote"},
+         {DevUpdate, (DeviceMemberFunction)&AGPowerSupply::Update, D_VOID_TYPE,
+D_STATE_FLOAT_READPOINT,0,"DevUpdate"},
+         {DevHello, (DeviceMemberFunction)&AGPowerSupply::Hello, D_STRING_TYPE,
+D_SHORT_TYPE,0,"DevHello"},
+#endif /* TACO_EXT */
+
    };
       static long n_commands = sizeof(commands_list)/
                             sizeof(DeviceCommandListEntry);
