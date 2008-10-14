@@ -26,13 +26,13 @@
  *		for implementing the Serial class in C++ (SerialClass).
  *
  * Author(s):	Manuel Perez
- *              $Author: andy_gotz $
+ *              $Author: jkrueger1 $
  *
  * Original:	May 1998 by Andy Gotz
  *
- * Version:     $Revision: 1.6 $
+ * Version:     $Revision: 1.7 $
  *
- * Date:        $Date: 2008-10-13 18:57:08 $
+ * Date:        $Date: 2008-10-14 09:59:03 $
  */
 
 #ifndef _Serial_H
@@ -161,29 +161,29 @@ class Serial : public Device {
 //
 // symbolic defines - used by server and client alike
 //
-#define SL_RAW 0	/* raw read/write mode */
-#define SL_NCHAR 1	/* character read/write mode */
-#define SL_LINE 2	/* line read mode */
+#define SL_RAW 		0	/* raw read/write mode */
+#define SL_NCHAR 	1	/* character read/write mode */
+#define SL_LINE 	2	/* line read mode */
 
-#define SL_NONE 0
-#define SL_ODD 1
-#define SL_EVEN 3
+#define SL_NONE 	0
+#define SL_ODD 		1
+#define SL_EVEN 	3
 
-#define SL_DATA8 0
-#define SL_DATA7 1
-#define SL_DATA6 2
-#define SL_DATA5 3
+#define SL_DATA8 	0
+#define SL_DATA7 	1
+#define SL_DATA6 	2
+#define SL_DATA5 	3
 
-#define SL_STOP1 0
-#define SL_STOP15 1
-#define SL_STOP2 2
+#define SL_STOP1 	0
+#define SL_STOP15 	1
+#define SL_STOP2 	2
 
-#define SL_TIMEOUT 3 	/* timeout parameter */
-#define SL_PARITY 4 	/* number of parity bits parameter */
-#define SL_CHARLENGTH 5	/* number of data bits parameter */
-#define SL_STOPBITS 6 	/* number of stop bits parameter */
-#define SL_BAUDRATE 7 	/* baud rate parameter */
-#define SL_NEWLINE 8 	/* new line character parameter */
+#define SL_TIMEOUT 	3 	/* timeout parameter */
+#define SL_PARITY 	4 	/* number of parity bits parameter */
+#define SL_CHARLENGTH 	5	/* number of data bits parameter */
+#define SL_STOPBITS 	6 	/* number of stop bits parameter */
+#define SL_BAUDRATE 	7 	/* baud rate parameter */
+#define SL_NEWLINE 	8 	/* new line character parameter */
 
 
 #endif /* _Serial_H */

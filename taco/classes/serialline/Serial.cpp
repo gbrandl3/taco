@@ -25,13 +25,13 @@
  * Description:	Code for implementing the Serial class in C++ on Linux/x86.
  *
  * Author(s);	Manuel Perez
- *              $Author: andy_gotz $
+ *              $Author: jkrueger1 $
  *
  * Original:	May 1998 by Andy Gotz
  *
- * Version:     $Revision: 1.13 $
+ * Version:     $Revision: 1.14 $
  *
- * Date:        $Date: 2008-10-13 18:56:33 $
+ * Date:        $Date: 2008-10-14 09:59:03 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -346,9 +346,9 @@ Serial::Serial (char *name, DevLong *error)
  this->commands_map[DevReset] = DeviceCommandListEntry(
    DevReset, (DeviceMemberFunction)(&Serial::Reset), D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevReset");
  this->commands_map[DevState] = DeviceCommandListEntry(
-   DevState, (DeviceMemberFunction)(&Serial::State), D_VOID_TYPE, D_SHORT_TYPE, WRITE_ACCESS, "DevState");
+   DevState, (DeviceMemberFunction)(&Serial::State), D_VOID_TYPE, D_SHORT_TYPE, READ_ACCESS, "DevState");
  this->commands_map[DevStatus] = DeviceCommandListEntry(
-   DevStatus, (DeviceMemberFunction)(&Serial::Status), D_VOID_TYPE, D_STRING_TYPE, WRITE_ACCESS, "DevStatus");
+   DevStatus, (DeviceMemberFunction)(&Serial::Status), D_VOID_TYPE, D_STRING_TYPE, READ_ACCESS, "DevStatus");
 #else
  static Device::DeviceCommandListEntry commands_list[] =
  {
@@ -356,31 +356,41 @@ Serial::Serial (char *name, DevLong *error)
    DevSerWriteString,
    (DeviceMemberFunction)(&Serial::SerWriteString),
    D_STRING_TYPE,
-   D_LONG_TYPE
+   D_LONG_TYPE,
+   WRITE_ACCESS,
+   "DevSerWriteString",
   },
   {
    DevSerWriteChar,
    (DeviceMemberFunction)(&Serial::SerWriteChar),
    D_VAR_CHARARR,
-   D_LONG_TYPE
+   D_LONG_TYPE,
+   WRITE_ACCESS,
+   "DevSerWriteChar",
   },
   {
    DevSerReadString,
    (DeviceMemberFunction)(&Serial::SerReadString),
    D_LONG_TYPE,
-   D_STRING_TYPE
+   D_STRING_TYPE,
+   WRITE_ACCESS,
+   "DevSerReadString",
   },
   {
    DevSerReadChar,
    (DeviceMemberFunction)(&Serial::SerReadChar),
    D_LONG_TYPE,
-   D_VAR_CHARARR
+   D_VAR_CHARARR,
+   WRITE_ACCESS,
+   "DevSerReadChar",
   },
   {
    DevSerSetParameter,
    (DeviceMemberFunction)(&Serial::SerSetParameter),
    D_VAR_SHORTARR,
-   D_VOID_TYPE
+   D_VOID_TYPE,
+   WRITE_ACCESS,
+   "DevSerSetParameter",
   },
   /*
   {
@@ -418,19 +428,25 @@ Serial::Serial (char *name, DevLong *error)
    DevReset,
    (DeviceMemberFunction)(&Serial::Reset),
    D_VOID_TYPE,
-   D_VOID_TYPE
+   D_VOID_TYPE,
+   WRITE_ACCESS,
+   "DevReset",
   },
   {
    DevState,
    (DeviceMemberFunction)(&Serial::State),
    D_VOID_TYPE,
-   D_SHORT_TYPE
+   D_SHORT_TYPE,
+   READ_ACCESS,
+   "DevState",
   },
   {
    DevStatus,
    (DeviceMemberFunction)(&Serial::Status),
    D_VOID_TYPE,
-   D_STRING_TYPE
+   D_STRING_TYPE,
+   READ_ACCESS,
+   "DevStatus",
   },
  };
 #endif /* TACO_EXT */

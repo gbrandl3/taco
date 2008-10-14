@@ -32,13 +32,13 @@
  *		test their applications without accessing real devices
  *
  * Author(s);	A. Goetz 
- *              $Author: andy_gotz $
+ *              $Author: jkrueger1 $
  *
  * Original:	June 1995
  *
- * Version:     $Revision: 1.10 $
+ * Version:     $Revision: 1.11 $
  *
- * Date:        $Date: 2008-10-13 18:55:17 $
+ * Date:        $Date: 2008-10-14 10:01:45 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -208,52 +208,49 @@ long AGPowerSupply::ClassInitialise (DevLong *error)
 AGPowerSupply::AGPowerSupply (char *name, DevLong *error)
               :PowerSupply (name, error)
 {
-   static Device::DeviceCommandListEntry commands_list[] = {
+	static Device::DeviceCommandListEntry commands_list[] = {
 #ifdef TACO_EXT
-     Device::DeviceCommandListEntry(DevState, 	&Device::State, 
+	Device::DeviceCommandListEntry(DevState, 	&Device::State, 
 			D_VOID_TYPE, D_SHORT_TYPE, READ_ACCESS, "DevState"),
-     Device::DeviceCommandListEntry(DevStatus, 	(DeviceMemberFunction)(&AGPowerSupply::Status), 
+	Device::DeviceCommandListEntry(DevStatus, 	(DeviceMemberFunction)(&AGPowerSupply::Status), 
 			D_VOID_TYPE, D_STRING_TYPE, READ_ACCESS, "DevStatus"),
-     Device::DeviceCommandListEntry(DevOn, 		(DeviceMemberFunction)(&AGPowerSupply::On), 
+	Device::DeviceCommandListEntry(DevOn, 		(DeviceMemberFunction)(&AGPowerSupply::On), 
 			D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevOn"),
-     Device::DeviceCommandListEntry(DevOff, 		(DeviceMemberFunction)&AGPowerSupply::Off, 
+	Device::DeviceCommandListEntry(DevOff, 		(DeviceMemberFunction)&AGPowerSupply::Off, 
 			D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevOff"),
-     Device::DeviceCommandListEntry(DevSetValue, 	(DeviceMemberFunction)&AGPowerSupply::SetValue, 
+	Device::DeviceCommandListEntry(DevSetValue, 	(DeviceMemberFunction)&AGPowerSupply::SetValue, 
 			D_FLOAT_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevSetValue"),
-     Device::DeviceCommandListEntry(DevReadValue, 	(DeviceMemberFunction)&AGPowerSupply::ReadValue, 
+	Device::DeviceCommandListEntry(DevReadValue, 	(DeviceMemberFunction)&AGPowerSupply::ReadValue, 
 			D_VOID_TYPE, D_FLOAT_READPOINT, READ_ACCESS, "DevReadValue"),
-     Device::DeviceCommandListEntry(DevReset, 	(DeviceMemberFunction)&AGPowerSupply::Reset, 
+	Device::DeviceCommandListEntry(DevReset, 	(DeviceMemberFunction)&AGPowerSupply::Reset, 
 			D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevReset"),
-     Device::DeviceCommandListEntry(DevError, 	(DeviceMemberFunction)&AGPowerSupply::Error, 
+	Device::DeviceCommandListEntry(DevError, 	(DeviceMemberFunction)&AGPowerSupply::Error, 
 			D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevError"),
-     Device::DeviceCommandListEntry(DevLocal, 	(DeviceMemberFunction)&AGPowerSupply::Local, 
+	Device::DeviceCommandListEntry(DevLocal, 	(DeviceMemberFunction)&AGPowerSupply::Local, 
 			D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevLocal"),
-     Device::DeviceCommandListEntry(DevRemote, 	(DeviceMemberFunction)&AGPowerSupply::Remote, D_VOID_TYPE, 
+	Device::DeviceCommandListEntry(DevRemote, 	(DeviceMemberFunction)&AGPowerSupply::Remote, D_VOID_TYPE, 
 			D_VOID_TYPE, WRITE_ACCESS, "DevRemote"),
-     Device::DeviceCommandListEntry(DevUpdate, 	(DeviceMemberFunction)&AGPowerSupply::Update, 
+	Device::DeviceCommandListEntry(DevUpdate, 	(DeviceMemberFunction)&AGPowerSupply::Update, 
 			D_VOID_TYPE, D_STATE_FLOAT_READPOINT, WRITE_ACCESS, "DevUpdate"),
-     Device::DeviceCommandListEntry(DevHello, 	(DeviceMemberFunction)&AGPowerSupply::Hello, 
+	Device::DeviceCommandListEntry(DevHello, 	(DeviceMemberFunction)&AGPowerSupply::Hello, 
 			D_STRING_TYPE, D_SHORT_TYPE, WRITE_ACCESS, "DevHello"),
 #else
-         {DevState, &Device::State, D_VOID_TYPE, D_SHORT_TYPE,0,"DevState"},
-         {DevStatus, (DeviceMemberFunction)(&AGPowerSupply::Status), D_VOID_TYPE, D_STRING_TYPE,0,"DevStatus"},
-         {DevOn, (DeviceMemberFunction)(&AGPowerSupply::On), D_VOID_TYPE, D_VOID_TYPE,0,"DevOn"},
-         {DevOff, (DeviceMemberFunction)&AGPowerSupply::Off, D_VOID_TYPE, D_VOID_TYPE,0,"DevOff"},
-         {DevSetValue, (DeviceMemberFunction)&AGPowerSupply::SetValue, D_FLOAT_TYPE, D_VOID_TYPE,0,"DevSetValue"},
-         {DevReadValue, (DeviceMemberFunction)&AGPowerSupply::ReadValue, D_VOID_TYPE, D_FLOAT_READPOINT,0,"DevReadValue"},
-         {DevReset, (DeviceMemberFunction)&AGPowerSupply::Reset, D_VOID_TYPE, D_VOID_TYPE,0,"DevReset"},
-         {DevError, (DeviceMemberFunction)&AGPowerSupply::Error, D_VOID_TYPE, D_VOID_TYPE,0,"DevError"},
-         {DevLocal, (DeviceMemberFunction)&AGPowerSupply::Local, D_VOID_TYPE, D_VOID_TYPE,0,"DevLocal"},
-         {DevRemote, (DeviceMemberFunction)&AGPowerSupply::Remote, D_VOID_TYPE,
-D_VOID_TYPE,0,"DevRemote"},
-         {DevUpdate, (DeviceMemberFunction)&AGPowerSupply::Update, D_VOID_TYPE,
-D_STATE_FLOAT_READPOINT,0,"DevUpdate"},
-         {DevHello, (DeviceMemberFunction)&AGPowerSupply::Hello, D_STRING_TYPE,
-D_SHORT_TYPE,0,"DevHello"},
+	{DevState, &Device::State, D_VOID_TYPE, D_SHORT_TYPE, READ_ACCESS,"DevState"},
+	{DevStatus, (DeviceMemberFunction)(&AGPowerSupply::Status), D_VOID_TYPE, D_STRING_TYPE, READ_ACCESS,"DevStatus"},
+	{DevOn, (DeviceMemberFunction)(&AGPowerSupply::On), D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS,"DevOn"},
+	{DevOff, (DeviceMemberFunction)&AGPowerSupply::Off, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS,"DevOff"},
+	{DevSetValue, (DeviceMemberFunction)&AGPowerSupply::SetValue, D_FLOAT_TYPE, D_VOID_TYPE, WRITE_ACCESS,"DevSetValue"},
+	{DevReadValue, (DeviceMemberFunction)&AGPowerSupply::ReadValue, D_VOID_TYPE, D_FLOAT_READPOINT, READ_ACCESS,"DevReadValue"},
+	{DevReset, (DeviceMemberFunction)&AGPowerSupply::Reset, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS,"DevReset"},
+	{DevError, (DeviceMemberFunction)&AGPowerSupply::Error, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS,"DevError"},
+	{DevLocal, (DeviceMemberFunction)&AGPowerSupply::Local, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS,"DevLocal"},
+	{DevRemote, (DeviceMemberFunction)&AGPowerSupply::Remote, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS,"DevRemote"},
+	{DevUpdate, (DeviceMemberFunction)&AGPowerSupply::Update, D_VOID_TYPE, D_STATE_FLOAT_READPOINT, WRITE_ACCESS,"DevUpdate"},
+       	{DevHello, (DeviceMemberFunction)&AGPowerSupply::Hello, D_STRING_TYPE, D_SHORT_TYPE, WRITE_ACCESS,"DevHello"},
 #endif /* TACO_EXT */
 
-   };
-      static long n_commands = sizeof(commands_list)/
+	};
+	static long n_commands = sizeof(commands_list)/
                             sizeof(DeviceCommandListEntry);
 
 	printf("AGPowerSupply::AGPowerSupply called, name %s\n",name);
