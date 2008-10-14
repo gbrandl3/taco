@@ -26,13 +26,13 @@
  *
  *
  * Author       : 
- *                $Author: andy_gotz $
+ *                $Author: jkrueger1 $
  *
  * Original     :
  *
- * Version      : $Revision: 1.4 $
+ * Version      : $Revision: 1.5 $
  *
- * Date         : $Date: 2008-10-13 19:01:46 $
+ * Date         : $Date: 2008-10-14 09:52:29 $
  *
  */
 
@@ -48,10 +48,7 @@
 #include <stdlib.h>
 #include <TACOBasicErrors.h>
 
-#ifdef _solaris
 #include <taco_utils.h>
-#endif /* _solaris */
-
 
 long devcmd(char *devname);
 

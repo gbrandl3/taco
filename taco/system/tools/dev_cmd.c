@@ -26,13 +26,13 @@
  *
  *
  * Author       : 
- *                $Author: andy_gotz $
+ *                $Author: jkrueger1 $
  *
  * Original     :
  *
- * Version      : $Revision: 1.3 $
+ * Version      : $Revision: 1.4 $
  *
- * Date         : $Date: 2008-10-13 19:01:46 $
+ * Date         : $Date: 2008-10-14 09:52:29 $
  *
  */
 
@@ -48,11 +48,7 @@
 #include <DevErrors.h>
 #include <DevServer.h>
 
-#ifdef _solaris
 #include <taco_utils.h>
-#endif /* _solaris */
-
-
 
 char *T0="D_VOID_TYPE";
 char *T1="D_BOOLEAN_TYPE";

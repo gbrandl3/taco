@@ -26,13 +26,13 @@
  *
  *
  * Author       : JL PONS, R. Wilcke
- *                $Author: andy_gotz $
+ *                $Author: jkrueger1 $
  *
  * Original     : JL PONS
  *
- * Version      : $Revision: 1.4 $
+ * Version      : $Revision: 1.5 $
  *
- * Date         : $Date: 2008-10-13 19:01:46 $
+ * Date         : $Date: 2008-10-14 09:52:29 $
  *
  */
 
@@ -53,9 +53,7 @@ extern "C" {
 #include <DevErrors.h>
 #include <stdlib.h>
 
-#ifdef _solaris
 #include <taco_utils.h>
-#endif /* _solaris */
 
 char *T0="D_VOID_TYPE";
 char *T1="D_BOOLEAN_TYPE";

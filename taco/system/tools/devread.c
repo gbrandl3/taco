@@ -26,13 +26,13 @@
  *
  *
  * Author       : 
- *                $Author: andy_gotz $
+ *                $Author: jkrueger1 $
  *
  * Original     :
  *
- * Version      : $Revision: 1.7 $
+ * Version      : $Revision: 1.8 $
  *
- * Date         : $Date: 2008-10-13 19:01:46 $
+ * Date         : $Date: 2008-10-14 09:52:29 $
  *
  */
 
@@ -52,9 +52,7 @@
 #define TACO_COMMAND_READ_DOUBLE (TACODevelTeamNumber + 83L)
 #define TACO_COMMAND_READ_U_LONG (TACODevelTeamNumber + 88L)
 
-#ifdef _solaris
 #include <taco_utils.h>
-#endif /* _solaris */
 
 long devcmd(char *devname);
 
