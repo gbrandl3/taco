@@ -457,9 +457,15 @@ private:
 	char *commandName(const DevLong num)
 	{
 		char 	*cmd_name = new char[32];
-        	snprintf(cmd_name, sizeof(cmd_name) - 1, "(%d/%d/%d)", ((num >> DS_TEAM_SHIFT) & DS_TEAM_MASK), 
-							((num >> DS_IDENT_SHIFT) & DS_IDENT_MASK), 
-							(num & 0xFFF));
+        	snprintf(cmd_name, sizeof(cmd_name) - 1, 
+#if SIZEOF_LONG == 4
+				"(%ld/%ld/%ld)", 
+#else
+				"(%d/%d/%d)", 
+#endif
+				((num >> DS_TEAM_SHIFT) & DS_TEAM_MASK), 
+				((num >> DS_IDENT_SHIFT) & DS_IDENT_MASK), 
+				(num & 0x3FFF));
 		return cmd_name;
 	}
 	
