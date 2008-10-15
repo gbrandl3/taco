@@ -90,12 +90,17 @@ dnl
 			done
 			LIBS="${ac_save_LIBS}"
 			LDFLAGS="$ac_save_LDFLAGS"
-	  		AS_IF([test -n "$PYTHON_LDFLAGS"], [taco_python_binding=yes; AC_MSG_RESULT([Python (devel and runtime) found.])],
-			      [taco_python_binding=no; AC_MSG_RESULT([Python library version ${ac_python_version} not found.])])
+	  		AS_IF([test -n "$PYTHON_LDFLAGS"], 
+				[taco_python_binding=yes; 
+				 using_python_version=" : using Python version : $am_cv_python_version";
+				 AC_MSG_RESULT([Python (devel and runtime) found.])],
+			      	[taco_python_binding=no; 
+				 AC_MSG_RESULT([Python library version ${ac_python_version} not found.])])
 		      ],  
 	    	      AC_MSG_RESULT([Python.h not found.]))
 		AC_SUBST(PYTHON_CPPFLAGS)
 		AC_SUBST(PYTHON_LDFLAGS)
 	      ]) 
+
 ])
 
