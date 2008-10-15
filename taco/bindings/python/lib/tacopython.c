@@ -29,9 +29,9 @@
  *
  * Original:	June 2000
  *
- * Date:	$Date: 2008-04-06 09:06:32 $
+ * Date:	$Date: 2008-10-15 14:48:18 $
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.2 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -48,7 +48,7 @@
 
 #include <DevServerP.h>
 #include <pythonP.h>
-#include <python.h>
+#include <tacopython.h>
 
 extern long check_type(long , long *, long *, long *);
 extern long get_argout_single(DevArgument , long , PyObject **, char*);

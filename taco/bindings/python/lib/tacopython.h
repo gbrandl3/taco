@@ -29,9 +29,9 @@
  *
  * Original:	
  *
- * Date:	$Date: 2005-07-25 13:33:42 $
+ * Date:	$Date: 2008-10-15 14:48:18 $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.2 $
  */
 
 #ifndef _PYTHON_H

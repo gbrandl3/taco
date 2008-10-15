@@ -27,9 +27,9 @@
  *
  * Original:    June 2000
  *
- * Date:	$Date: 2008-04-06 09:06:32 $
+ * Date:	$Date: 2008-10-15 14:48:18 $
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -44,7 +44,7 @@
 
 #include <DevServer.h>
 #include <DevServerP.h>
-#include <python.h>
+#include <tacopython.h>
 #include <pythonP.h>
 
 extern long     debug_flag;
