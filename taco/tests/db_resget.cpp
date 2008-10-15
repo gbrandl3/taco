@@ -26,9 +26,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.6 $
+ * Version:     $Revision: 1.7 $
  *
- * Date:        $Date: 2008-04-30 13:42:47 $
+ * Date:        $Date: 2008-10-15 15:57:44 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -44,19 +44,61 @@
 #include <cctype>
 #include <algorithm>
 
+#include <unistd.h>
+
+#include <taco_utils.h>
+
+void usage(const char *argv)
+{
+	std::cerr << "usage : " << argv << " [options] resource_name" << std::endl;
+	std::cerr << "options : -h         display this information" << std::endl;
+	std::cerr << "          -n nethost set nethost environment" << std::endl;
+	std::cerr << "          -t         enable time measurment" << std::endl;
+	exit(-1);
+}
+
+
+double elapsedTime(struct timeval first, struct timeval second)
+{
+        if (first.tv_usec > second.tv_usec)
+        {
+                second.tv_usec += 1000000;
+                second.tv_sec--;
+        }
+        double lapsed = (second.tv_usec - first.tv_usec) / 1000.;
+        lapsed += 1000. * (second.tv_sec - first.tv_sec);
+	return lapsed;
+}
+
+
+
+
 int main(int argc, char *argv[])
 {
 	DevLong error;
+	int 	c;
+	bool	b_timing(false);
 //
 // Argument test and device name structure
 //
-	if (argc != 2)
-	{
-		std::cerr << "usage : " << *argv << " resource_name" << std::endl;
-		exit(-1);
-	}
+        while ((c = getopt(argc,argv,"hn:t")) != -1)
+                switch (c)
+                {
+                        case 'n':
+				taco_setenv("NETHOST", optarg, 1);
+				break;
+			case 't':
+				++b_timing;
+				break;
+                        case 'h':
+                        case '?':
+                                usage(argv[0]);
+                                break;
+                }
+        if (optind != argc - 1)
+                usage(argv[0]);
 
-	std::string full_res_name(argv[1]);
+	std::string full_res_name(argv[optind]);
 	std::transform(full_res_name.begin(), full_res_name.end(), full_res_name.begin(), ::tolower);
 //
 // Test resource name syntax
@@ -66,7 +108,13 @@ int main(int argc, char *argv[])
 	{
 		std::cerr << *argv << " : Bad resource name" << std::endl;
 		exit(-1);
-
+	}
+	std::string nethost("");
+	if (max_slashes == 6)
+	{
+		std::string::size_type pos = full_res_name.find('/', 2);
+		if (pos != std::string::npos)
+			nethost = full_res_name.substr(2, pos - 2);
 	}
 //
 // Extract device name from full resource name
@@ -92,7 +140,7 @@ int main(int argc, char *argv[])
 //
 // Connect to database server
 //
-	if (db_import(&error) == DS_NOTOK)
+	if (nethost.empty() && db_import(&error) == DS_NOTOK)
 	{
 		std::cerr << *argv << " : Impossible to connect to database server" << std::endl;
 		exit(-1);
@@ -104,7 +152,19 @@ int main(int argc, char *argv[])
 	unsigned int res_nb = 1;
 	DevVarStringArray tmp = {0, NULL};
 	db_resource resTable [] = {{ res_name.c_str(), D_VAR_STRINGARR, &tmp},};
-	if (db_getresource(const_cast<char *>(dev_name.c_str()), resTable, 1, &error) == -1)
+
+        struct timeval  first,
+                        second;
+        struct timezone tzp;
+        DevLong         err;
+
+        gettimeofday (&first, &tzp);
+	long res = db_getresource(const_cast<char *>(dev_name.c_str()), resTable, 1, &error);
+        gettimeofday (&second, &tzp);
+	if (b_timing)
+        	printf("%.3f ms\n", elapsedTime(first, second));
+
+	if (res == -1)
 	{
 		if (error == DbErr_ResourceNotDefined)
 		{
