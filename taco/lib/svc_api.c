@@ -29,9 +29,9 @@
  *
  * Original:	Feb 1994
  *
- * Version:	$Revision: 1.29 $
+ * Version:	$Revision: 1.30 $
  *
- * Date:		$Date: 2008-04-10 15:02:29 $
+ * Date:		$Date: 2008-10-15 15:12:03 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -1867,6 +1867,14 @@ static SVCXPRT *transp_tcp;
 extern long minimal_access;
 
 static void _WINAPI devserver_prog_4    PT_( (struct svc_req *rqstp,SVCXPRT *transp) );
+#ifdef DARWIN
+	typedef void (* MyRpcFuncPtr)();
+#else
+	typedef void (* MyRpcFuncPtr)(struct svc_req *, SVCXPRT *);
+#endif
+
+static MyRpcFuncPtr devserver_prog = (MyRpcFuncPtr)devserver_prog_4;
+
 long svc_check  PT_( (DevLong *error) );
 long db_check	PT_( (DevLong *error) );
 
@@ -2161,7 +2169,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 		config_flags.vers_number = API_VERSION;
 
 
-                if (!svc_register(transp, prog_number, API_VERSION, devserver_prog_4, IPPROTO_UDP))
+                if (!svc_register(transp, prog_number, API_VERSION, devserver_prog, IPPROTO_UDP))
 		{
 			char msg[]="Unable to register server (UDP,4), retry...\n"; 
 			return error_msg(msg);
@@ -2192,7 +2200,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 		return error_msg(msg);
 	}
 
-        if (!svc_register(transp_tcp, prog_number, API_VERSION, devserver_prog_4, IPPROTO_TCP))
+        if (!svc_register(transp_tcp, prog_number, API_VERSION, devserver_prog, IPPROTO_TCP))
 	{
 		char msg[]= "Unable to register server (TCP,4), exiting...\n";
 		return error_msg(msg);
