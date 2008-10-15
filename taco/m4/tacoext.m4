@@ -29,7 +29,9 @@ AC_DEFUN([TACO_EXTENSIONS],[
 	AC_LANG_CPLUSPLUS
 	AC_PREPROC_IFELSE(AC_LANG_PROGRAM([[#include <TACOExtensions.h>]], []), [taco_try=ok],[taco_try=failed])
 	AC_MSG_RESULT($taco_try)
-	AS_IF([test $taco_try = failed], AC_MSG_ERROR([it seems that the TACO extension header files are not installed]))
+	AS_IF([test $taco_try = failed], 
+		AC_MSG_ERROR([it seems that the TACO extension header files are not installed]),
+		CXXFLAGS="$CXXFLAGS -DTACO_EXT")
 
 	# Check TACO extensions library
 	LIB_TACO="$LIB_TACO -lTACOExtensions"

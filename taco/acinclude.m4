@@ -550,7 +550,9 @@ AC_DEFUN([TACO_FRM_EXT],
 [
         AC_ARG_ENABLE(ext, AC_HELP_STRING([--enable-ext], [build the extensions libraries servers @<:@default=no@:>@]),
                 [], [enable_ext=no])
-	AS_IF([test x"${taco_ext}" = x"yes"], [
+	AS_IF([test x"${enable_ext}" = x"yes"], [
+		CFLAGS="$CFLAGS -DTACO_EXT"
+		CXXFLAGS="$CXXFLAGS -DTACO_EXT"
 		AC_CHECK_TYPES([struct timespec])
 		AS_IF([test x"enable_python" = x"yes"], [SWIG_PYTHON])
 		]) 
