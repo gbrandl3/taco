@@ -27,13 +27,13 @@
  *		(DeviceClass).
  *
  * Author(s):	Andy Goetz
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original:	February 1995
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:	$Date: 2008-10-13 19:04:02 $
+ * Date:	$Date: 2008-10-15 14:18:44 $
  *
  +**********************************************************************/
 
@@ -142,9 +142,11 @@ protected:
 //  
 	char* class_name;
 	char dev_type[DEV_TYPE_LENGTH];
-
+#ifndef TACO_EXT
 public:
+#endif
 	char* name;
+public:
 	Device (DevString name, DevLong *error);
 	virtual ~Device ();
 //
