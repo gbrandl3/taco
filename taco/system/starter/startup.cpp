@@ -26,9 +26,9 @@
  *
  * Original:	January 2003
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.13 $
  *
- * Revision:	$Date: 2008-04-06 09:07:55 $
+ * Revision:	$Date: 2008-10-15 15:10:09 $
  *
  */
 
@@ -52,7 +52,7 @@
 #	include <sys/wait.h>
 #endif
 #include <errno.h>
-#include "starter.h"
+#include "StarterDevice.h"
 
 #include <iostream>
 #include <string>

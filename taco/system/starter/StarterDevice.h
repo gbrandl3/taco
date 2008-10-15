@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * File:        $RCSfile: starter.h,v $
+ * File:        $RCSfile: StarterDevice.h,v $
  *
  * Project:     Device Servers with sun-rpc
  *
@@ -26,9 +26,9 @@
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.2 $
  *
- * Date:	$Date: 2008-04-06 09:07:54 $
+ * Date:	$Date: 2008-10-15 15:10:09 $
  *
  *****************************************************************************/
 
