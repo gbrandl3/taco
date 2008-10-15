@@ -25,9 +25,9 @@ AC_DEFUN([TACO_PYTHON_BINDING],
 	      [
 		ac_save_CPPFLAGS="$CPPFLAGS"
 		CPPFLAGS="$CFLAGS $PYTHON_CPPFLAGS"
-		AC_CHECK_HEADERS([numarray/arrayobject.h], [taco_python_binding=yes], 
-			AC_CHECK_HEADERS(Numeric/arrayobject.h, [taco_python_binding=yes], [taco_python_binding=no], [#include <Python.h>]),
-			[#include <Python.h>])
+		AC_CHECK_HEADERS([numarray/arrayobject.h Numeric/arrayobject.h numpy/arrayobject.h], 
+				[taco_python_binding=yes; break;], 
+				[taco_python_binding=no], [#include <Python.h>])
 		CPPFLAGS="$ac_save_CPPFLAGS"
 	      ])	
 	AS_IF([test x"${enable_server}" != x"yes"], [taco_python_binding=no])
