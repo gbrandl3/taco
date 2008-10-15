@@ -57,11 +57,16 @@ AC_DEFUN([SWIG_PROG],[
 	AC_SUBST([SWIG_RUNTIME_LIBS_DIR])
 ])
 
+AC_DEFUN([SWIG_PROG_13],
+[
+	SWIG_PROG([1.3])
+])
+
 # SWIG_ENABLE_CXX()
 #
 # Enable SWIG C++ support.  This effects all invocations of $(SWIG).
 AC_DEFUN([SWIG_ENABLE_CXX],[
-	AC_REQUIRE([SWIG_PROG])
+	AC_REQUIRE([SWIG_PROG_13])
 	AC_REQUIRE([AC_PROG_CXX])
 	SWIG="$SWIG -c++"
 ])
@@ -73,7 +78,7 @@ AC_DEFUN([SWIG_ENABLE_CXX],[
 # If you want to build Python modules for example, use the SWIG_PYTHON() macro
 # and link the modules against $(SWIG_PYTHON_LIBS).
 AC_DEFUN([SWIG_MULTI_MODULE_SUPPORT],[
-	AC_REQUIRE([SWIG_PROG])
+	AC_REQUIRE([SWIG_PROG_13])
 	SWIG="$SWIG -c"
 ])
 
@@ -87,7 +92,7 @@ AC_DEFUN([SWIG_MULTI_MODULE_SUPPORT],[
 # to link against the appropriate library.  It contains the SWIG Python runtime library
 # that is needed by the type check system for example.
 AC_DEFUN([SWIG_PYTHON],[
-	AC_REQUIRE([SWIG_PROG])
+	AC_REQUIRE([SWIG_PROG_13])
 	AC_REQUIRE([PYTHON_DEVEL])
 	AS_IF([test "x$1" != "xno"], [swig_shadow=" -shadow"])
 	AC_SUBST([SWIG_PYTHON_OPT],[-python$swig_shadow])
