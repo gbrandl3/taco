@@ -31,13 +31,15 @@
  *
  * Original:	June 1995
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2008-04-30 14:04:11 $
+ * Date:        $Date: 2008-10-15 15:54:46 $
  */
 
 #ifndef _AGPOWERSUPPLY_H
 #define _AGPOWERSUPPLY_H
+
+#include "PowerSupply.h"
 		
 /**
  * The AG Power Supply is a simulation of a typical power supply at the ESRF. 
