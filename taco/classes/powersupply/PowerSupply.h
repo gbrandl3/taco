@@ -31,10 +31,13 @@
  *
  * Original:	April 1995
  *
- * Version:     $Revision: 1.6 $
+ * Version:     $Revision: 1.7 $
  *
- * Date:        $Date: 2008-04-30 14:04:11 $
+ * Date:        $Date: 2008-10-15 15:53:32 $
  */
+
+#ifndef POWERSUPPLY_H
+#define POWERSUPPLY_H
 
 #include <Device.h>
 		
@@ -91,3 +94,5 @@ public:
      ~PowerSupply ();
 
 };
+
+#endif // POWERSUPPLY_H
