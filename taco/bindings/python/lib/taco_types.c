@@ -26,9 +26,9 @@
  *
  * Original:    March 99
  * 
- * Date:	$Date: 2008-04-06 09:06:32 $
+ * Date:	$Date: 2008-10-15 14:52:49 $
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  */
  
 #ifdef HAVE_CONFIG_H
@@ -54,6 +54,9 @@
 #		include <Numeric/arrayobject.h>
 #	elif HAVE_NUMARRAY_ARRAYOBJECT_H
 #		include <numarray/arrayobject.h>
+#	elif HAVE_NUMPY_ARRAYOBJECT_H
+#		include <numpy/oldnumeric.h>
+#		include <numpy/arrayobject.h>
 #	endif
 #endif 
 

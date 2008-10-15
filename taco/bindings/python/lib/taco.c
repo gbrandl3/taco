@@ -27,9 +27,9 @@
  *
  * Original:    December 99
  * 
- * Date:	$Date: 2008-04-06 09:06:32 $
+ * Date:	$Date: 2008-10-15 14:52:49 $
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -56,6 +56,8 @@
 #		include <numarray/arrayobject.h>
 #	elif HAVE_NUMERIC_ARRAYOBJECT_H
 #		include <Numeric/arrayobject.h>
+#	elif HAVE_NUMPY_ARRAYOBJECT_H
+#		include <numpy/arrayobject.h>
 #	endif
 #endif
 
@@ -367,7 +369,7 @@ static PyObject* esrf_putresource(PyObject *self,PyObject *args)
    if (flag != 0)
       printf("-- esrf_putresource: enter\n");
    if (!PyArg_ParseTuple(args,"sss",&devname,&resname,&resval))
-      onError("usage: esrf_getresource(<devname>,<resname>,<value>)")
+      onError("usage: esrf_putresource(<devname>,<resname>,<value>)")
       
    if (flag != 0)
    {
@@ -1573,19 +1575,21 @@ static PyObject *esrf_dc_info(PyObject *self, PyObject *args)
 ***************************************************************/
 
 static struct PyMethodDef Taco_methods[] = {
-   {"esrf_import",	esrf_import,	1},
-   {"esrf_query",	esrf_query,	1},
-   {"esrf_tcpudp",	esrf_tcpudp,	1},
-   {"esrf_timeout",	esrf_timeout,	1},
-   {"esrf_getdevlist",	esrf_getdevlist,1},
-   {"esrf_getdevexp",	esrf_getdevexp,1},
-   {"esrf_getresource",	esrf_getresource,1},
-   {"esrf_putresource",	esrf_putresource,1},
-   {"esrf_delresource",	esrf_delresource,1},
+   {"esrf_import",	esrf_import,		1},
+   {"esrf_query",	esrf_query,		1},
+   {"esrf_tcpudp",	esrf_tcpudp,		1},
+   {"esrf_timeout",	esrf_timeout,		1},
+   {"esrf_getdevlist",	esrf_getdevlist,	1},
+   {"esrf_getdevexp",	esrf_getdevexp, 	1},
+   {"esrf_getresource",	esrf_getresource,	1},
+   {"esrf_putresource",	esrf_putresource,	1},
+   {"esrf_delresource",	esrf_delresource,	1},
    {"esrf_io",		(PyCFunction)esrf_io, 1|2},
-   {"esrf_debug",	esrf_debug, 	1},
-   {"esrf_dc_info",	esrf_dc_info, 1},
-   {"esrf_dc_import",	esrf_dc_import, 1},
+   {"esrf_debug",	esrf_debug, 		1},
+   {"esrf_dc_info",	esrf_dc_info, 		1},
+   {"esrf_dc_import",	esrf_dc_import, 	1},
+   {"db_getresource",	esrf_getresource,	1},
+   {"db_putresource",	esrf_putresource,	1},
    {NULL,	NULL}
 };
 
