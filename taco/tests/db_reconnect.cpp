@@ -1,3 +1,36 @@
+/*
+ * Toolkit for building distributed control systems or any other distributed system.
+ *
+ * Copyright (c) 1990-2005 ESRF, www.esrf.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * File:        db_reconnect.cpp
+ *
+ * Description: Code for db_resget test program
+ *              Command rule : To get a resource from the static database.
+ *              Synopsis : db_resget <resource name>
+ *
+ * Author(s):
+ *              $Author: jkrueger1 $
+ *
+ * Version:     $Revision: 1.2 $
+ *
+ * Date:        $Date: 2008-10-15 16:02:11 $
+ */
+
 #include <API.h>
 #include <DevServer.h>
 #include <private/ApiP.h>
