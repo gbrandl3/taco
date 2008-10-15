@@ -61,7 +61,8 @@ check_PROGRAMS 		= db_connect db_resget db_resput db_getdevexp \
 			longest_testserver \
 			taco_hostname \
                         db_analyze \
-			db_getres
+			db_getres \
+			db_reconnect
 
 check_SCRIPT		= taco
 
@@ -139,6 +140,10 @@ db_analyze_LDADD        = @TACO_CLIENT_CXX_LIBS@ -lstdc++
 db_getres_SOURCES	= db_getres.cpp
 db_getres_CPPFLAGS	= @TACO_INCLUDES@ -I$(top_srcdir)/ext/include
 db_getres_LDADD		= @TACO_CLIENT_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/src/libTACOExtensions.la
+
+db_reconnect_SOURCES	= db_reconnect.cpp
+db_reconnect_CPPFLAGS	= @TACO_INCLUDES@ -I$(top_srcdir)/ext/include
+db_reconnect_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/src/libTACOExtensions.la
 
 package.m4:	$(top_srcdir)/configure.ac
 	{\
