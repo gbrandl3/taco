@@ -43,7 +43,7 @@ dnl
                       [
 			python_incdirs=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('INCLUDEDIR'), distutils.sysconfig.get_config_var('CONFINCLUDEPY')"`
 			case $target in
-		 		powerpc-apple-darwin*)	
+		 		*-apple-darwin*)	
 					python_incdirs="$python_incdirs /System/Library/Frameworks/Python.framework/Versions/${ac_python_version}/include" ;;
 			esac
 	              ])
