@@ -668,21 +668,21 @@ static PyTypeObject TACOClientType = {
 	(hashfunc)	0,			// tp_hash
 	(ternaryfunc)	0,			// tp_call
 	(reprfunc)TACOClient_str,		// tp_str
-	PyObject_GenericGetAttr,                // tp_getattro */
-        0,                                      // tp_setattro */
-        0,                                      // tp_as_buffer */
+	PyObject_GenericGetAttr,                // tp_getattro 
+        0,                                      // tp_setattro 
+        0,                                      // tp_as_buffer 
         Py_TPFLAGS_DEFAULT | Py_TPFLAGS_CHECKTYPES |
         Py_TPFLAGS_BASETYPE,                    // tp_flags 
         TACOClient_doc,                         // tp_doc 
         0,                                      // tp_traverse 
         0,                                      // tp_clear 
-        0, //(richcmpfunc)time_richcompare,          // tp_richcompare 
+        0, //(richcmpfunc)time_richcompare,     // tp_richcompare 
         0,                                      // tp_weaklistoffset 
         0,                                      // tp_iter 
         0,                                      // tp_iternext 
         TACOClient_methods,                     // tp_methods 
         0,                                      // tp_members 
-        0, //time_getset,                            // tp_getset 
+        0, //time_getset,                       // tp_getset 
         0,                                      // tp_base 
         0,                                      // tp_dict 
         0,                                      // tp_descr_get 
@@ -938,12 +938,12 @@ void initTACOClient(int i)
 		PyDict_SetItemString(d, "__author__", tmp);
 		Py_DECREF(tmp);
 	}
-	if ((tmp = PyString_FromString("$Revision: 1.2 $")) != NULL)
+	if ((tmp = PyString_FromString("$Revision: 1.3 $")) != NULL)
 	{
 		PyDict_SetItemString(d, "__revision__", tmp);
 		Py_DECREF(tmp);
 	}
-	if ((tmp = PyString_FromString("$Date: 2008-04-06 09:06:57 $")) != NULL)
+	if ((tmp = PyString_FromString("$Date: 2008-10-16 18:22:32 $")) != NULL)
 	{
 		PyDict_SetItemString(d, "__date__", tmp);
 		Py_DECREF(tmp);
