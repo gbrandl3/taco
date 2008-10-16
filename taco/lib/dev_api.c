@@ -27,13 +27,13 @@
  *
  * Author(s)  :	Andy Goetz
  *		Jens Meyer
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.38 $
+ * Version    :	$Revision: 1.39 $
  *
- * Date	    :	$Date: 2008-10-13 19:04:02 $
+ * Date	    :	$Date: 2008-10-16 18:31:52 $
  *
  ********************************************************************-*/
 
@@ -321,7 +321,7 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, D
 				no_database = False;
 	char			name [256],
 				*hstring,
-				*nethost,
+				*nethost = NULL,
 				*prog_url;
 
 /*
