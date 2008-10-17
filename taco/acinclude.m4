@@ -297,13 +297,22 @@ AC_DEFUN([TACO_ALARM],
 AC_DEFUN([X_AND_MOTIF],
 [
 	AC_REQUIRE([AC_PATH_XTRA])
-	AS_IF([test -z "$X_LDFLAGS" -o x"$X_LDFLAGS" = xNO], [appdefaultdir="/usr/share/X11/app-defaults"],
-	      [
-		tmp='for i in $X_LDFLAGS ; do if test `echo $i | cut -c1-2` = "-L" ; then echo $i; break; fi; done | cut -c3- '
-		tmp=`eval $tmp`
-                AS_IF([test -z "$tmp" -o x"$tmp" == xNO], [tmp=/usr/share])
-		appdefaultdir=${tmp}/X11/app-defaults
-	      ])
+
+	PKG_CHECK_MODULES(APPDEFS, xt)
+	PKG_CHECK_EXISTS([xt], 
+		[xt_appdefaultdir=`pkg-config --variable=appdefaultdir xt`],
+		AS_IF([test -z "$X_LDFLAGS" -o x"$X_LDFLAGS" = xNO], [xt_appdefaultdir="/usr/share/X11/app-defaults"],
+	      	[
+			tmp='for i in $X_LDFLAGS ; do if test `echo $i | cut -c1-2` = "-L" ; then echo $i; break; fi; done | cut -c3- '
+			tmp=`eval $tmp`
+                	AS_IF([test -z "$tmp" -o x"$tmp" == xNO], [tmp=/usr/share])
+			xt_appdefaultdir=${tmp}/X11/app-defaults
+	      	]))
+	AC_ARG_WITH(appdefaultdir,
+		AC_HELP_STRING([--with-appdefaultdir=<pathname>],
+		  	[specify directory for app-defaults files (default is autodetected)]),
+			[appdefaultdir="$withval"], [appdefaultdir="${xt_appdefaultdir}"])
+ 	AC_SUBST(appdefaultdir)
 	motif_found=yes;
 	AC_ARG_WITH(motif, AC_HELP_STRING([--with-motif@<:@=ARG@:>@], [Motif @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the Motif installation, e.g. '/usr/local/myMotif']), [
 		case  "$with_motif" in

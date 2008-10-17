@@ -17,6 +17,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
+DISTCHECK_CONFIGURE_FLAGS = --with-appdefaultdir=\$${datadir}/X11/app-defaults
+
 SUBDIRS		= doc
 
 EXTRA_DIST	= bitmaps 
@@ -27,7 +29,7 @@ SRC 		= xdev_bxutil.c xdev_creation.c xdev_gui.c xdevmenu.uil\
 		
 bin_PROGRAMS	= xdevmenu
 
-appdefaultdir	= $(datadir)/taco/app-defaults
+# appdefaultdir	= $(datadir)/taco/app-defaults
 appdefault_DATA	= XDevmenu 
 
 EXTRA_DIST	+= ${appdefault_DATA} xdevmenu.uil

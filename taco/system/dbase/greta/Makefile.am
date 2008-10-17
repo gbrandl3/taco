@@ -17,6 +17,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
+DISTCHECK_CONFIGURE_FLAGS = --with-appdefaultdir=\$${datadir}/X11/app-defaults
+
 noinst_HEADERS		= greta.h  greta_cstes.h
 
 SRC_GRETA		= greta.c greta_creation.c bxutil-c.c greta_cb.c greta_xs.c \
@@ -26,7 +28,7 @@ SRC_GRETA		= greta.c greta_creation.c bxutil-c.c greta_cb.c greta_xs.c \
 EXTRA_PROGRAMS		= greta greta_ndbm
 bin_PROGRAMS		= @GRETA@
 
-appdefaultdir		= $(datadir)/taco/app-defaults
+# appdefaultdir		= $(datadir)/taco/app-defaults
 appdefault_DATA		= GReta
 
 EXTRA_DIST		= GReta greta.uil
