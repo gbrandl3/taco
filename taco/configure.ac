@@ -18,7 +18,7 @@ dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_INIT([TACO], [3.99.46], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.115 $)dnl
+AC_REVISION($Revision: 1.116 $)dnl
 AC_COPYRIGHT([(C) 1990-2008 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -290,13 +290,13 @@ AM_MISSING_PROG([AUTOM4TE], [$AUTOM4TE])
 
 AC_OUTPUT
 
-if test x"${taco_dbserver}" = x"yes" ; then
-	taco_dbserver_support="
+AS_IF([test x"${enable_dbserver}" = x"yes"],
+	[taco_dbserver_support="
 	 	with:
-		DBM support:	${taco_gdbm}
+		DBM support:	${enable_gdbm}
 		mySQL support:	${enable_mysql}
 		SQLite3 support:${enable_sqlite3}"
-fi
+	])
 
 AC_MSG_RESULT([
 
