@@ -32,6 +32,7 @@ includedir="@includedir@"
 datadir="@datadir@"
 initdir="@initdir@"
 pythondir="@pythondir@"
+datarootdir="@datarootdir@"
 
 case $1 in
 	--prefix) echo "$prefix" ;;
@@ -43,6 +44,7 @@ case $1 in
 	--datadir) echo "$datadir" ;;
 	--initdir) echo "$initdir" ;;
 	--pythondir) echo "$pythondir" ;;
+	--datarootdir) echo "$datarootdir"
 	*)
 	echo "error: unknown option: $1"
 	exit 1

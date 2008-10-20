@@ -66,7 +66,7 @@ dnl
 dnl Based upon AC_CREATE_GENERIC_CONFIG (ac_create_generic_config.m4)
 dnl by Guido Draheim <guidod@gmx.de> and gtk-config by Owen Taylor.
 dnl
-dnl @version $Id: ac_config_libconfig_in.m4,v 1.2 2008-04-06 09:07:28 jkrueger1 Exp $
+dnl @version $Id: ac_config_libconfig_in.m4,v 1.3 2008-10-20 07:28:27 jkrueger1 Exp $
 dnl @author Roger Leigh <roger@whinlatter.uklinux.net>
 dnl
 # AC_CONFIG_LIBCONFIG_IN(LIBRARY, DESTINATION, MODULES)
@@ -120,7 +120,7 @@ echo 'o=""' >>$LIBCONFIG_FILE
 echo 'h=""' >>$LIBCONFIG_FILE
 echo 'for i ; do' >>$LIBCONFIG_FILE
 echo '  case $i in' >>$LIBCONFIG_FILE
-options="prefix exec-prefix eprefix package version cflags libs bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir infodir mandir target host build pkgdatadir pkglibdir pkgincludedir template-version help"
+options="prefix exec-prefix eprefix package version cflags libs bindir sbindir libexecdir datadir datarootdir sysconfdir sharedstatedir localstatedir libdir infodir mandir target host build pkgdatadir pkglibdir pkgincludedir template-version help"
 echo '    --prefix=*) prefix=`echo $i | sed -e "s/--prefix=//"` ;;' >>$LIBCONFIG_FILE
 echo '    --exec-prefix=*) exec_prefix=`echo $i | sed -e "s/--exec-prefix=//"` ;;' >>$LIBCONFIG_FILE
 echo '    --eprefix=*) exec_prefix=`echo $i | sed -e "s/--eprefix=//"` ;;' >>$LIBCONFIG_FILE
@@ -143,7 +143,7 @@ echo 'done' >>$LIBCONFIG_FILE
 echo ' ' >>$LIBCONFIG_FILE
 # in the order of occurence a standard automake Makefile
 echo '# defaults from configure; set only if not set previously' >>$LIBCONFIG_FILE
-vars="prefix exec_prefix bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir infodir mandir includedir target host build"
+vars="prefix exec_prefix bindir sbindir libexecdir datadir datarootdir sysconfdir sharedstatedir localstatedir libdir infodir mandir includedir target host build"
 for var in $vars ; do
   echo "if test -z \"\$$var\" ; then" >>$LIBCONFIG_FILE
   echo "  $var=\"@$var@\"" >>$LIBCONFIG_FILE
@@ -209,6 +209,7 @@ echo '  --bindir           \$bindir        $bindir' >>$LIBCONFIG_FILE
 echo '  --sbindir          \$sbindir       $sbindir' >>$LIBCONFIG_FILE
 echo '  --libexecdir       \$libexecdir    $libexecdir' >>$LIBCONFIG_FILE
 echo '  --datadir          \$datadir       $datadir' >>$LIBCONFIG_FILE
+echo '  --datarootdir      \$datarootdir   $datarootdir' >>$LIBCONFIG_FILE
 echo '  --sysconfdir       \$sysconfdir    $sysconfdir' >>$LIBCONFIG_FILE
 echo '  --sharedstatedir   \$sharedstatedir$sharedstatedir' >>$LIBCONFIG_FILE
 echo '  --localstatedir    \$localstatedir $localstatedir' >>$LIBCONFIG_FILE

@@ -24,6 +24,7 @@ libdir=@libdir@
 bindir=@bindir@
 sbindir=@sbindir@
 datadir=@datadir@
+datarootdir=@datarootdir@
 pythondir=@pythondir@
 pyexecdir=@pyexecdir@
 localstatedir=@localstatedir@

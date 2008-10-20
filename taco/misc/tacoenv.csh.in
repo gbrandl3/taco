@@ -24,6 +24,7 @@ setenv libdir @libdir@
 setenv bindir @bindir@
 setenv sbindir @sbindir@
 setenv datadir @datadir@
+setenv datarootdir @datarootdir@
 setenv pythondir @pythondir@
 setenv pyexecdir @pyexecdir@
 setenv localstatedir @localstatedir@

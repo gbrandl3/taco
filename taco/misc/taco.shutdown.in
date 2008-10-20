@@ -27,6 +27,7 @@ environ()
 	exec_prefix=@exec_prefix@
 	sysconfdir=@sysconfdir@
 	datadir=@datadir@
+	datarootdir=@datarootdir@
 	templatedir=@templatedir@
 	if test -f ${sysconfdir}/tacoenv.sh ; then
 		. ${sysconfdir}/tacoenv.sh
