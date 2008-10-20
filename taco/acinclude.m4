@@ -298,7 +298,7 @@ AC_DEFUN([X_AND_MOTIF],
 [
 	AC_REQUIRE([AC_PATH_XTRA])
 
-	PKG_CHECK_MODULES(APPDEFS, xt)
+	PKG_CHECK_MODULES(APPDEFS, xt, [], [true])
 	PKG_CHECK_EXISTS([xt], 
 		[xt_appdefaultdir=`pkg-config --variable=appdefaultdir xt`],
 		AS_IF([test -z "$X_LDFLAGS" -o x"$X_LDFLAGS" = xNO], [xt_appdefaultdir="/usr/share/X11/app-defaults"],
