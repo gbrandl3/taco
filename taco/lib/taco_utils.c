@@ -17,7 +17,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * File       : util_api.c
+ * File       : taco_utils.c
  *
  * Project    : Device Servers with SUN-RPC
  *
@@ -26,13 +26,13 @@
  *              handle remote devices.
  *
  * Author(s)  : Jens Krüger <jens.krueger@frm2.tum.de>
- *              $Author: andy_gotz $
+ *              $Author: jkrueger1 $
  *
  * Original   : June 2007
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:                $Date: 2008-10-13 19:04:02 $
+ * Date:                $Date: 2008-10-22 08:24:00 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -43,6 +43,8 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#include "taco_utils.h"
 
 #ifdef __cplusplus
 extern "C" {
