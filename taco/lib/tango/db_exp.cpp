@@ -26,13 +26,13 @@
  *              Interface to access static database
  *
  * Author(s)  : Emmanuel Taurel
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.3 $
+ * Version    :	$Revision: 1.4 $
  *
- * Date       :	$Date: 2008-04-06 09:07:19 $
+ * Date       :	$Date: 2008-10-22 10:38:44 $
  * 
  *-*******************************************************************/
 using namespace std;
@@ -82,7 +82,7 @@ using namespace std;
 #include <string>
 
 extern dbserver_info db_info;
-extern configuration_flags config_flags;
+extern configuration_flags *config_flags;
 extern msgserver_info msg_info;
 
 /* Static and Global variables */
@@ -127,7 +127,7 @@ int _DLLFunc db_getdevexp_tango(char *filter, char ***tab, u_int *num_dev,long *
 	DevLong error;
 	struct timeval tout;
 
-        if (config_flags.no_database)
+        if (config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -476,7 +476,7 @@ int _DLLFunc db_freedevexp_tango(char **ptr)
 	register int i;
 	int l;
 
-        if (config_flags.no_database)
+        if (config_flags->no_database)
         {
                 return(DS_NOTOK);
         } 

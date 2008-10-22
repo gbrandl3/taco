@@ -51,6 +51,7 @@ typedef struct _AGPowerSupplyClassPart {
 
 typedef struct _AGPowerSupplyPart {
 	int nada;
+	char *import_device;
 } AGPowerSupplyPart;
 
 typedef struct _AGPowerSupplyClassRec {

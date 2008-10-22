@@ -157,6 +157,7 @@ AGPowerSupply aGPowerSupply = (AGPowerSupply)(&aGPowerSupplyRec);
                {"set_u_limit",D_FLOAT_TYPE},
                {"set_l_limit",D_FLOAT_TYPE},
                {"polarity",D_SHORT_TYPE},
+               {"import",D_STRING_TYPE},
                              };
    int res_tab_size = sizeof(res_table)/sizeof(db_resource);
 
@@ -247,6 +248,7 @@ DevLong *error;
    aGPowerSupply->powersupply.set_u_limit = (float)AG_MAX_CUR;
    aGPowerSupply->powersupply.set_l_limit = (float)AG_MIN_CUR;
    aGPowerSupply->powersupply.polarity = 1;
+   aGPowerSupply->agpowersupply.import_device = NULL;
 
 /*
  * interrogate the static database for default values 
@@ -263,6 +265,7 @@ DevLong *error;
    res_table[7].resource_adr = &(ps->powersupply.set_u_limit);
    res_table[8].resource_adr = &(ps->powersupply.set_l_limit);
    res_table[9].resource_adr = &(ps->powersupply.polarity);
+   res_table[10].resource_adr = &(ps->agpowersupply.import_device);
 
    if(db_getresource("CLASS/AGPS/DEFAULT",res_table,res_tab_size,error))
    {
@@ -302,6 +305,7 @@ DevLong *error;
       printf("CLASS/AGPS/DEFAULT/set_u_limit   D_FLOAT_TYPE   %6.0f\n",ps->powersupply.set_u_limit);
       printf("CLASS/AGPS/DEFAULT/set_l_limit   D_FLOAT_TYPE   %6.0f\n",ps->powersupply.set_l_limit);
       printf("CLASS/AGPS/DEFAULT/polarity      D_SHORT_TYPE   %6d\n",ps->powersupply.polarity);
+      printf("CLASS/AGPS/DEFAULT/import        D_STRING_TYPE  %6s\n",ps->agpowersupply.import_device);
 #endif
    }
 
@@ -394,6 +398,8 @@ DevLong *error;
 {
    unsigned long ul_state=0;
    unsigned short us_channel=0;
+   int status;
+   devserver ps_import;
 
    printf("arrived in object_initialise()\n");
 /*
@@ -412,6 +418,7 @@ DevLong *error;
    res_table[7].resource_adr = &(ps->powersupply.set_u_limit);
    res_table[8].resource_adr = &(ps->powersupply.set_l_limit);
    res_table[9].resource_adr = &(ps->powersupply.polarity);
+   res_table[10].resource_adr = &(ps->agpowersupply.import_device);
 
    if(db_getresource(ps->devserver.name,res_table,res_tab_size,error))
    {
@@ -449,6 +456,7 @@ DevLong *error;
       printf("set_u_limit   D_FLOAT_TYPE   %6.0f\n",ps->powersupply.set_u_limit);
       printf("set_l_limit   D_FLOAT_TYPE   %6.0f\n",ps->powersupply.set_l_limit);
       printf("polarity      D_SHORT_TYPE   %6d\n",ps->powersupply.polarity);
+      printf("import        D_STRING_TYPE  %6s\n",ps->agpowersupply.import_device);
 #endif
 
 /*
@@ -482,6 +490,16 @@ DevLong *error;
    }
 
    dev_on(ps,NULL,NULL,error);
+
+/*
+ * test importing a device in a server
+ */
+
+   if (ps->agpowersupply.import_device != NULL) 
+   {
+        status = dev_import(ps->agpowersupply.import_device,0,&ps_import,&error);
+        printf("dev_import(%s) returned %d\n",ps->agpowersupply.import_device,status);
+   }
 
    return(DS_OK);
 }

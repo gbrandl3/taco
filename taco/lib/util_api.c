@@ -27,13 +27,13 @@
  *		handle remote devices.
  *
  * Author(s)  :	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original   :	April 1993
  *
- * Version:	$Revision: 1.34 $
+ * Version:	$Revision: 1.35 $
  *
- * Date:		$Date: 2008-10-22 08:23:00 $
+ * Date:		$Date: 2008-10-22 10:38:44 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -80,7 +80,6 @@ static long get_cmd_string PT_( (devserver ds, long cmd, char *cmd_str, size_t l
 #ifdef __cplusplus
 extern "C" {
 #endif
-/*
  * Global structure for multiple control systems, setup by
  * setup_config_multi() but used by all multi-nethost functions
  */

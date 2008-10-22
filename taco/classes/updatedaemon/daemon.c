@@ -25,16 +25,16 @@
  * Description: source code to implement DaemonClass
  *
  * Author(s):   Michael Schofield
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
  * Original:    April 1992
  *
- * Version:     $Revision: 1.6 $
+ * Version:     $Revision: 1.7 $
  *
- * Date:        $Date: 2008-04-06 09:06:38 $
+ * Date:        $Date: 2008-10-22 10:38:44 $
  */
 
-static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon.c,v 1.6 2008-04-06 09:06:38 jkrueger1 Exp $";
+static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon.c,v 1.7 2008-10-22 10:38:44 andy_gotz Exp $";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -105,7 +105,7 @@ db_resource resource2[] = {
 		           {"ud_poll_interval", D_LONG_TYPE},
 			  };  
 
-extern configuration_flags config_flags;
+extern configuration_flags *config_flags;
 
 /**************************************************************/
 /** daemon resource table used to access the static database **/
@@ -1567,7 +1567,7 @@ static long dev_saveconfi(Daemon ds, DevVoid *argin, DevVoid *argout, DevLong *e
    name_svr = n_svr;
    ns = name_svr;
    svr_name = svr_n;
-   snprintf(svr_name, sizeof(svr_n) - 1, "%s",config_flags.server_name);
+   snprintf(svr_name, sizeof(svr_n) - 1, "%s",config_flags->server_name);
 
    i = 0;
    j = 0;
