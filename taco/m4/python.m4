@@ -68,7 +68,7 @@ dnl
 		AS_IF([test "x$taco_python_binding" = "xyes"],
 		      [
 	        	AS_IF([test "x$python_prefix" != "x"], [python_libraries=${python_prefix}/lib],
-	      	  	      [test "x$python_libraries" == "x"], 
+	      	  	      [test "x$python_libraries" = "x"], 
 			      [
 				python_libraries=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('LIBDIR')"`
 			      ])

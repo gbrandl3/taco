@@ -305,7 +305,7 @@ AC_DEFUN([X_AND_MOTIF],
 	      	[
 			tmp='for i in $X_LDFLAGS ; do if test `echo $i | cut -c1-2` = "-L" ; then echo $i; break; fi; done | cut -c3- '
 			tmp=`eval $tmp`
-                	AS_IF([test -z "$tmp" -o x"$tmp" == xNO], [tmp=/usr/share])
+                	AS_IF([test -z "$tmp" -o x"$tmp" = xNO], [tmp=/usr/share])
 			xt_appdefaultdir=${tmp}/X11/app-defaults
 	      	]))
 	AC_ARG_WITH(appdefaultdir,
