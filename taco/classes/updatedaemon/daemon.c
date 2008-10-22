@@ -25,16 +25,16 @@
  * Description: source code to implement DaemonClass
  *
  * Author(s):   Michael Schofield
- *              $Author: andy_gotz $
+ *              $Author: jkrueger1 $
  *
  * Original:    April 1992
  *
- * Version:     $Revision: 1.7 $
+ * Version:     $Revision: 1.8 $
  *
- * Date:        $Date: 2008-10-22 10:38:44 $
+ * Date:        $Date: 2008-10-22 15:10:43 $
  */
 
-static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon.c,v 1.7 2008-10-22 10:38:44 andy_gotz Exp $";
+static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon.c,v 1.8 2008-10-22 15:10:43 jkrueger1 Exp $";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -104,8 +104,6 @@ db_resource resource1[] = {
 db_resource resource2[] = {
 		           {"ud_poll_interval", D_LONG_TYPE},
 			  };  
-
-extern configuration_flags *config_flags;
 
 /**************************************************************/
 /** daemon resource table used to access the static database **/

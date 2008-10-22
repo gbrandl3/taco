@@ -26,13 +26,13 @@
  *              Interface to access static database
  *
  * Author(s)  : Emmanuel Taurel
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.4 $
+ * Version    :	$Revision: 1.5 $
  *
- * Date       :	$Date: 2008-10-22 10:38:44 $
+ * Date       :	$Date: 2008-10-22 15:11:20 $
  * 
  *-*******************************************************************/
 using namespace std;
@@ -82,7 +82,6 @@ using namespace std;
 #include <string>
 
 extern dbserver_info db_info;
-extern configuration_flags *config_flags;
 extern msgserver_info msg_info;
 
 /* Static and Global variables */
