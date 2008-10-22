@@ -51,9 +51,9 @@
  *
  * Original   :	April 1999
  *
- * Version    :	$Revision: 1.18 $
+ * Version    :	$Revision: 1.19 $
  *
- * Date       :	$Date: 2008-04-06 09:06:59 $
+ * Date       :	$Date: 2008-10-22 08:27:36 $
  *
  ********************************************************************-*/
 
@@ -106,8 +106,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	extern configuration_flags 	config_flags;
-	extern nethost_info 		*multi_nethost;
 	extern server_connections 	svr_conns[];
 	extern DevServerDevices 	*devices;
 /*
@@ -277,7 +275,7 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
  * in order to received events the client needs to register an RPC service to receive the answer. Check if the 
  * client has done this, if not then register the client.
  */
-	if (config_flags.asynch_rpc != True)
+	if (config_flags->asynch_rpc != True)
 	{
 		rstatus = asynch_rpc_register(error);
 		if (rstatus != DS_OK) return(DS_NOTOK);
@@ -325,20 +323,20 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 	vararg[iarg].argument		= (DevArgument)&event_id;
 	server_data.var_argument.length++; iarg++;
 
-	name = config_flags.server_name;
+	name = config_flags->server_name;
 	vararg[iarg].argument_type	= D_STRING_TYPE;
 	vararg[iarg].argument		= (DevArgument)&name;
 	server_data.var_argument.length++; iarg++;
-	host = config_flags.server_host;
+	host = config_flags->server_host;
 	vararg[iarg].argument_type	= D_STRING_TYPE;
 	vararg[iarg].argument		= (DevArgument)&host;
 	server_data.var_argument.length++; iarg++;
  
 	vararg[iarg].argument_type	= D_ULONG_TYPE;
-	vararg[iarg].argument		= (DevArgument)&config_flags.prog_number;
+	vararg[iarg].argument		= (DevArgument)&config_flags->prog_number;
 	server_data.var_argument.length++; iarg++;
 	vararg[iarg].argument_type	= D_ULONG_TYPE;
-	vararg[iarg].argument		= (DevArgument)&config_flags.vers_number;
+	vararg[iarg].argument		= (DevArgument)&config_flags->vers_number;
 	server_data.var_argument.length++; iarg++;
 	vararg[iarg].argument_type	= D_ULONG_TYPE;
 	vararg[iarg].argument		= (DevArgument)&event_type;
@@ -347,7 +345,7 @@ long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 
         dev_printdebug (DBG_TRACE | DBG_ASYNCH, "\ndev_event_listen_x() : client data -> ");
         dev_printdebug (DBG_ASYNCH, "event_type=%d asynch_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
-	    	event_type,event_id, config_flags.server_name,config_flags.server_host, config_flags.prog_number,config_flags.vers_number);
+	    	event_type,event_id, config_flags->server_name,config_flags->server_host, config_flags->prog_number,config_flags->vers_number);
 
 /*
  *  call RPC_DEV_PUTGET_ASYN using the client handle which has been opened to the asynchronous service of the server and
@@ -679,25 +677,25 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 	server_data.var_argument.length++; 
 	iarg++;
 
-	name = config_flags.server_name;
+	name = config_flags->server_name;
 	vararg[iarg].argument_type	= D_STRING_TYPE;
 	vararg[iarg].argument		= (DevArgument)&name;
 	server_data.var_argument.length++; 
 	iarg++;
 	
-	host = config_flags.server_host;
+	host = config_flags->server_host;
 	vararg[iarg].argument_type	= D_STRING_TYPE;
 	vararg[iarg].argument		= (DevArgument)&host;
 	server_data.var_argument.length++; 
 	iarg++;
  
 	vararg[iarg].argument_type	= D_ULONG_TYPE;
-	vararg[iarg].argument		= (DevArgument)&config_flags.prog_number;
+	vararg[iarg].argument		= (DevArgument)&config_flags->prog_number;
 	server_data.var_argument.length++; 
 	iarg++;
 
 	vararg[iarg].argument_type	= D_ULONG_TYPE;
-	vararg[iarg].argument		= (DevArgument)&config_flags.vers_number;
+	vararg[iarg].argument		= (DevArgument)&config_flags->vers_number;
 	server_data.var_argument.length++; iarg++;
 	vararg[iarg].argument_type	= D_ULONG_TYPE;
 	vararg[iarg].argument		= (DevArgument)&event_type;
@@ -706,7 +704,7 @@ long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
 
         dev_printdebug (DBG_TRACE | DBG_ASYNCH, "\ndev_event_unlisten_x() : client data -> ");
         dev_printdebug (DBG_ASYNCH, "event_type=%d asynch_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
-	    event_type,event_id, config_flags.server_name,config_flags.server_host, config_flags.prog_number,config_flags.vers_number);
+	    event_type,event_id, config_flags->server_name,config_flags->server_host, config_flags->prog_number,config_flags->vers_number);
 
 /*
  * call RPC_EVENT_LISTEN using the client handle which has been opened to the asynchronous service of the 

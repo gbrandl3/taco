@@ -30,7 +30,7 @@ log4cpp::Category       *logStream;
 
 #include <private/ApiP.h>
 
-std::string TACO::Server::sServerName = config_flags.server_name;
+std::string TACO::Server::sServerName = multi_nethost[default_nethost].config_flags.server_name;
 std::string TACO::Server::sStringBuffer;
 
 TACO::Server::Server( const std::string& name, DevLong& error) throw (TACO::Exception)

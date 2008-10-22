@@ -43,9 +43,9 @@
  *
  * Original   :	January 1997
  *
- * Version:	$Revision: 1.25 $
+ * Version:	$Revision: 1.26 $
  *
- * Date:	$Date: 2008-04-06 09:06:59 $
+ * Date:	$Date: 2008-10-22 08:29:41 $
  *
  ********************************************************************-*/
 
@@ -118,8 +118,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	extern configuration_flags config_flags;
-	extern nethost_info *multi_nethost;
 /*
  * global dynamic array of pending asynchronous requests used to store 
  * info needed to receive asynchronous replies
@@ -287,7 +285,7 @@ long _DLLFunc dev_putget_asyn (devserver ds, long cmd,
  * an RPC service to receive the answer. Check if the client has done
  * this, if not then register the client.
  */
-	if (config_flags.asynch_rpc != True)
+	if (config_flags->asynch_rpc != True)
 	{
 		rstatus = asynch_rpc_register(error);
 		if (rstatus != DS_OK) 
@@ -337,29 +335,29 @@ long _DLLFunc dev_putget_asyn (devserver ds, long cmd,
 	server_data.var_argument.length++; 
 	iarg++;
 
-	name = config_flags.server_name;
+	name = config_flags->server_name;
 	vararg[iarg].argument_type	= D_STRING_TYPE;
 	vararg[iarg].argument		= (DevArgument)&name;
 	server_data.var_argument.length++; 
 	iarg++;
-	host = config_flags.server_host;
+	host = config_flags->server_host;
 	vararg[iarg].argument_type	= D_STRING_TYPE;
 	vararg[iarg].argument		= (DevArgument)&host;
 	server_data.var_argument.length++; 
 	iarg++;
  
 	vararg[iarg].argument_type	= D_ULONG_TYPE;
-	vararg[iarg].argument		= (DevArgument)&config_flags.prog_number;
+	vararg[iarg].argument		= (DevArgument)&config_flags->prog_number;
 	server_data.var_argument.length++; 
 	iarg++;
 	vararg[iarg].argument_type	= D_ULONG_TYPE;
-	vararg[iarg].argument		= (DevArgument)&config_flags.vers_number;
+	vararg[iarg].argument		= (DevArgument)&config_flags->vers_number;
 	server_data.var_argument.length++;
 	server_data.var_argument.sequence = vararg;
 
         dev_printdebug (DBG_TRACE | DBG_ASYNCH, "\ndev_putget_asyn() : client data -> ");
         dev_printdebug (DBG_ASYNCH, "asynch_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
-	    asynch_id,config_flags.server_name,config_flags.server_host, config_flags.prog_number,config_flags.vers_number);
+	    asynch_id,config_flags->server_name,config_flags->server_host, config_flags->prog_number,config_flags->vers_number);
 
 /* 
  * the asynchronous call uses one-way RPC to dispatch the call which
@@ -527,7 +525,7 @@ long _DLLFunc dev_putget_raw_asyn (devserver ds, long cmd,
  * an RPC service to receive the answer. Check if the client has done
  * this, if not then register the client.
  */
-	if (config_flags.asynch_rpc != True)
+	if (config_flags->asynch_rpc != True)
 	{
 		rstatus = asynch_rpc_register(error);
 		if (rstatus != DS_OK) return(DS_NOTOK);
@@ -575,32 +573,32 @@ long _DLLFunc dev_putget_raw_asyn (devserver ds, long cmd,
 	server_data.var_argument.length++; 
 	iarg++;
 
-	name = config_flags.server_name;
+	name = config_flags->server_name;
 	vararg[iarg].argument_type	= D_STRING_TYPE;
 	vararg[iarg].argument		= (DevArgument)&name;
 	server_data.var_argument.length++; 
 	iarg++;
 
-	host = config_flags.server_host;
+	host = config_flags->server_host;
 	vararg[iarg].argument_type	= D_STRING_TYPE;
 	vararg[iarg].argument		= (DevArgument)&host;
 	server_data.var_argument.length++; 
 	iarg++;
  
 	vararg[iarg].argument_type	= D_ULONG_TYPE;
-	vararg[iarg].argument		= (DevArgument)&config_flags.prog_number;
+	vararg[iarg].argument		= (DevArgument)&config_flags->prog_number;
 	server_data.var_argument.length++; 
 	iarg++;
 
 	vararg[iarg].argument_type	= D_ULONG_TYPE;
-	vararg[iarg].argument		= (DevArgument)&config_flags.vers_number;
+	vararg[iarg].argument		= (DevArgument)&config_flags->vers_number;
 	server_data.var_argument.length++;
 	server_data.var_argument.sequence = vararg;
 
         dev_printdebug (DBG_TRACE | DBG_ASYNCH, "\ndev_putget_asyn() : client data -> ");
         dev_printdebug (DBG_ASYNCH, "asynch_id=%d name=%s host=%s prog_no=%d vers_no=%d\n",
-	    asynch_id,config_flags.server_name,config_flags.server_host,
-	    config_flags.prog_number,config_flags.vers_number);
+	    asynch_id,config_flags->server_name,config_flags->server_host,
+	    config_flags->prog_number,config_flags->vers_number);
 
 /* 
  * the asynchronous call uses one-way RPC to dispatch the call which
@@ -1116,13 +1114,13 @@ long _DLLFunc asynch_rpc_register(DevLong *error)
  * been registered. if so then do not register it.
  */
 	LOCK(async_mutex);
-	if (config_flags.asynch_rpc != True)
+	if (config_flags->asynch_rpc != True)
 	{
 /*
  * check if process is a bona fida device server if not then
  * generate a server name out of the host name and pid
  */
-		if (config_flags.device_server != True)
+		if (config_flags->device_server != True)
 		{
 /*
  * the client's "server name" is the hostname/pid, it would be
@@ -1134,8 +1132,8 @@ long _DLLFunc asynch_rpc_register(DevLong *error)
                         pid = taskIdSelf ();
 #endif /* !vxworks */
 			taco_gethostname(hostname,sizeof(hostname));
-			snprintf(config_flags.server_name, sizeof(config_flags.server_name), "%s/%d",hostname,pid);
-			strncpy(config_flags.server_host,hostname, sizeof(config_flags.server_host));
+			snprintf(config_flags->server_name, sizeof(config_flags->server_name), "%s/%d",hostname,pid);
+			strncpy(config_flags->server_host,hostname, sizeof(config_flags->server_host));
 
 /* 
  * M Diehl, 15.11.99
@@ -1144,14 +1142,14 @@ long _DLLFunc asynch_rpc_register(DevLong *error)
  * If we aren't, use the new gettransient() interface!
  */
  
-                        if( config_flags.prog_number == 0 )
-				config_flags.prog_number = gettransient(config_flags.server_name);
+                        if( config_flags->prog_number == 0 )
+				config_flags->prog_number = gettransient(config_flags->server_name);
 
 /*
  * return error, if no number found
  */
 
-                        if( config_flags.prog_number == 0 )
+                        if( config_flags->prog_number == 0 )
 			{
 				UNLOCK(async_mutex);
 				return DS_NOTOK;    /* no error defined in  DB */
@@ -1161,10 +1159,10 @@ long _DLLFunc asynch_rpc_register(DevLong *error)
  * M. Diehl, 15.11.99
  * Set version depending on whether we are a real device server or not!
  */
-                        if( config_flags.device_server == True )
- 				config_flags.vers_number = API_VERSION;
+                        if( config_flags->device_server == True )
+ 				config_flags->vers_number = API_VERSION;
 			else
- 				config_flags.vers_number = ASYNCH_API_VERSION;
+ 				config_flags->vers_number = ASYNCH_API_VERSION;
 
 /*
  * setup signal handling to catch SIGPIPE and SIGHUP and return
@@ -1198,9 +1196,9 @@ long _DLLFunc asynch_rpc_register(DevLong *error)
 
   
 #if defined (FreeBSD) && (__cplusplus)
-  		if (!svc_register(asynch_trans_tcp, config_flags.prog_number, ASYNCH_API_VERSION, (void (*)(...))devserver_prog_5, IPPROTO_TCP))
+  		if (!svc_register(asynch_trans_tcp, config_flags->prog_number, ASYNCH_API_VERSION, (void (*)(...))devserver_prog_5, IPPROTO_TCP))
 #else
-  		if (!svc_register(asynch_trans_tcp, config_flags.prog_number, ASYNCH_API_VERSION, devserver_prog_5, IPPROTO_TCP))
+  		if (!svc_register(asynch_trans_tcp, config_flags->prog_number, ASYNCH_API_VERSION, devserver_prog_5, IPPROTO_TCP))
 #endif
   		{
   			fprintf(stderr, "asynch_rpc_register(): cannot register asynchronous tcp service\n");
@@ -1210,8 +1208,8 @@ long _DLLFunc asynch_rpc_register(DevLong *error)
   
 		asynch_svc_tcp_sock = asynch_trans_tcp->xp_sock;
         	dev_printdebug (DBG_ASYNCH, "\nasynch_rpc_register() : registered asynchronous server (%s) at prog no=%d\n",
-		config_flags.server_name,config_flags.prog_number);
-		config_flags.asynch_rpc = True;
+		config_flags->server_name,config_flags->prog_number);
+		config_flags->asynch_rpc = True;
 	}
 
 	UNLOCK(async_mutex);
@@ -1318,25 +1316,25 @@ long asynch_server_import(devserver ds, DevLong *error)
  * client
  */
         	dev_import_in.var_argument.length = iarg = 0;
-        	name = config_flags.server_name;
+        	name = config_flags->server_name;
         	vararg[iarg].argument_type      = D_STRING_TYPE;
         	vararg[iarg].argument           = (DevArgument)&name;
         	dev_import_in.var_argument.length++; 
 		iarg++;
 
-        	host = config_flags.server_host;
+        	host = config_flags->server_host;
         	vararg[iarg].argument_type      = D_STRING_TYPE;
         	vararg[iarg].argument           = (DevArgument)&host;
         	dev_import_in.var_argument.length++; 
 		iarg++;
 
         	vararg[iarg].argument_type      = D_ULONG_TYPE;
-        	vararg[iarg].argument           = (DevArgument)&config_flags.prog_number;
+        	vararg[iarg].argument           = (DevArgument)&config_flags->prog_number;
         	dev_import_in.var_argument.length++; 
 		iarg++;
 
         	vararg[iarg].argument_type      = D_ULONG_TYPE;
-        	vararg[iarg].argument           = (DevArgument)&config_flags.vers_number;
+        	vararg[iarg].argument           = (DevArgument)&config_flags->vers_number;
         	dev_import_in.var_argument.length++;
         	dev_import_in.var_argument.sequence = vararg;
 
@@ -1767,7 +1765,7 @@ _dev_import_out* _DLLFunc rpc_asynch_import_5(_dev_import_in *dev_import_in)
         dev_import_out.ds_id  = 0;
         dev_import_out.status = status;
         dev_import_out.error  = error;
-        strncpy (dev_import_out.server_name,  config_flags.server_name, sizeof(dev_import_out.server_name));
+        strncpy (dev_import_out.server_name,  config_flags->server_name, sizeof(dev_import_out.server_name));
         dev_import_out.var_argument.length   = 0;
         dev_import_out.var_argument.sequence = NULL;
 

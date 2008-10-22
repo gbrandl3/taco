@@ -29,9 +29,9 @@
  *
  * Original   : December 1993
  *
- * Version    :	$Revision: 1.18 $
+ * Version    :	$Revision: 1.19 $
  *
- * Date       :	$Date: 2008-04-06 09:07:00 $
+ * Date       :	$Date: 2008-10-22 08:25:52 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -123,17 +123,6 @@ static long	client_id = 0;
  * the client handles.
  */
 static SecOpenConn 	conn_list = { 0, NULL};
-
-/* 
- * global variable defined in gen_api.c which keeps track of multi-nethosts
- */
-#ifdef __cplusplus
-extern "C" {
-#endif
-	extern nethost_info *multi_nethost;
-#ifdef __cplusplus
-};
-#endif
 
 /*
  * the following array have to be declared once per nethost

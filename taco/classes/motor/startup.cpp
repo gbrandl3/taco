@@ -202,9 +202,10 @@ void unregister_server (void)
 // if this is a bona fida device server and it is using the database
 // then unregister server from database device table
 //
-	if (config_flags.device_server == True)
+	if (multi_nethost[default_nethost].config_flags.device_server == True)
 	{
-		if (!config_flags.no_database && (db_svc_unreg (config_flags.server_name, &error) != DS_OK))
+		if (!multi_nethost[default_nethost].config_flags.no_database 
+			&& (db_svc_unreg (multi_nethost[default_nethost].config_flags.server_name, &error) != DS_OK))
 			logStream->errorStream() << "db_svc_unreg failed" <<  error << log4cpp::eol;
 //
 // destroy open client handles to message and database servers
@@ -215,21 +216,21 @@ void unregister_server (void)
 //
 // unregister synchronous version (4) of server from portmapper
 //
-	pmap_unset (config_flags.prog_number, API_VERSION);
+	pmap_unset (multi_nethost[default_nethost].config_flags.prog_number, API_VERSION);
 //
 // unregister the asynchronous version (5) of the server from portmapper
 //
-	pmap_unset (config_flags.prog_number, ASYNCH_API_VERSION);
+	pmap_unset (multi_nethost[default_nethost].config_flags.prog_number, ASYNCH_API_VERSION);
 //
 //  finally unregister version (1) used by gettransient_ut()
 //
-	pmap_unset (config_flags.prog_number, DEVSERVER_VERS);
+	pmap_unset (multi_nethost[default_nethost].config_flags.prog_number, DEVSERVER_VERS);
 //
 // the server has been unregistred, so set flag to false!
 // otherwise, there may be more than one attempt to unregister the server
 // in multithreaded apps.
 //
-	config_flags.device_server = False;
+	multi_nethost[default_nethost].config_flags.device_server = False;
 	UNLOCK(async_mutex);
 //
 // returning here and calling exit() later from main_signal_handler() will

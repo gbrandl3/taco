@@ -29,9 +29,9 @@
  *
  * Original:	Feb 1994
  *
- * Version:	$Revision: 1.30 $
+ * Version:	$Revision: 1.31 $
  *
- * Date:		$Date: 2008-10-15 15:12:03 $
+ * Date:		$Date: 2008-10-22 08:25:03 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -90,10 +90,8 @@
  */
 
 #ifdef __cplusplus
-extern "C" configuration_flags  config_flags;
 extern "C" char 		*dev_error_stack;
 #else
-extern configuration_flags      config_flags;
 extern char 		    	*dev_error_stack;
 #endif
 
@@ -151,7 +149,7 @@ _dev_import_out * _DLLFunc rpc_dev_import_4 (_dev_import_in *dev_import_in,
 	dev_import_out.ds_id  = 0;
 	dev_import_out.status = DS_OK;
 	dev_import_out.error  = DS_OK;
-	snprintf (dev_import_out.server_name, sizeof(dev_import_out.server_name), "%s", config_flags.server_name);
+	snprintf (dev_import_out.server_name, sizeof(dev_import_out.server_name), "%s", config_flags->server_name);
 
 	dev_import_out.var_argument.length   = 0;
 	dev_import_out.var_argument.sequence = NULL;
@@ -171,7 +169,7 @@ _dev_import_out * _DLLFunc rpc_dev_import_4 (_dev_import_in *dev_import_in,
 /*
  * Do the security checks and initialization for the device import.
  */
-				if ( config_flags.security == True )
+				if ( config_flags->security == True )
 				{
 					if ( sec_svc_import (&devices[i], dev_import_in->connection_id, 
 					    dev_import_in->client_id, dev_import_in->access_right,
@@ -259,7 +257,7 @@ _dev_free_out * _DLLFunc rpc_dev_free_4 (_dev_free_in *dev_free_in)
 /*
  * Clean up the security structure for the client connection.
  */
-	if ( config_flags.security == True )
+	if ( config_flags->security == True )
 	{
 		if ( sec_svc_free (&devices[(_Int)ds_id], connection_id,
 		    dev_free_in->client_id, dev_free_in->access_right, 
@@ -348,7 +346,7 @@ _client_data * _DLLFunc rpc_dev_putget_4 (_server_data *server_data)
 /*
  * Do the security checks for the command access.
  */
-	if ( config_flags.security == True )
+	if ( config_flags->security == True )
 	{
 		if ( sec_svc_cmd (&devices[(_Int)ds_id], connection_id,
 		    server_data->client_id, server_data->access_right, 
@@ -518,7 +516,7 @@ _client_data * _DLLFunc rpc_dev_put_4 (_server_data *server_data)
 /*
  * Do the security checks for the command access.
  */
-	if ( config_flags.security == True )
+	if ( config_flags->security == True )
 	{
 		if ( sec_svc_cmd (&devices[(_Int)ds_id], connection_id,
 		    server_data->client_id, server_data->access_right, 
@@ -654,7 +652,7 @@ _client_raw_data * _DLLFunc rpc_dev_putget_raw_4 (_server_data *server_data)
 /*
  * Do the security checks for the command access.
  */
-	if ( config_flags.security == True )
+	if ( config_flags->security == True )
 	{
 		if ( sec_svc_cmd (&devices[(_Int)ds_id], connection_id, 
 		    server_data->client_id, server_data->access_right, 
@@ -825,7 +823,7 @@ _client_data * _DLLFunc rpc_dev_put_asyn_4 (_server_data *server_data)
 /*
  * Do the security checks for the command access.
  */
-	if ( config_flags.security == True )
+	if ( config_flags->security == True )
 	{
 		if ( sec_svc_cmd (&devices[(_Int)ds_id], connection_id,
 		    server_data->client_id, server_data->access_right, 
@@ -1061,21 +1059,21 @@ free_found:
 /* 
  * do not export the device to the static database if no_database is selected ...
  */
-	if (!config_flags.no_database)
+	if (!config_flags->no_database)
 	{
 /*
  *  export device to the static database. device server configuration for this device
  *  will be stored in the static database
  */
 		devinfo.device_name = name;
-		strncpy(server_host, config_flags.server_host, sizeof(server_host));
+		strncpy(server_host, config_flags->server_host, sizeof(server_host));
 		devinfo.host_name   = server_host;
-		devinfo.pn	    = (u_int)config_flags.prog_number;
-		devinfo.vn          = (u_int)config_flags.vers_number;
+		devinfo.pn	    = (u_int)config_flags->prog_number;
+		devinfo.vn          = (u_int)config_flags->vers_number;
 /*
  * Extract the name of the executable
  */
-		snprintf (proc_name, sizeof(proc_name), "%s", config_flags.server_name);
+		snprintf (proc_name, sizeof(proc_name), "%s", config_flags->server_name);
 		strptr = strchr (proc_name, '/');
 		*strptr = '\0'; 
 		devinfo.proc_name   = proc_name;
@@ -1699,7 +1697,7 @@ _client_data * _DLLFunc rpc_dev_putget_local (_server_data *server_data)
  * Do the security checks for the command access.
  */
 
-	if ( config_flags.security == True )
+	if ( config_flags->security == True )
 	{
 		if ( sec_svc_cmd (&devices[(_Int)ds_id], connection_id,
 		    server_data->client_id, server_data->access_right, 
@@ -1813,7 +1811,7 @@ _dev_import_out * _DLLFunc rpc_dev_ping_4 (_dev_import_in *dev_import_in,
 	dev_import_out.ds_id  = 0;
 	dev_import_out.status = DS_OK;
 	dev_import_out.error  = DS_OK;
-	snprintf (dev_import_out.server_name, sizeof(dev_import_out.server_name), "%s", config_flags.server_name);
+	snprintf (dev_import_out.server_name, sizeof(dev_import_out.server_name), "%s", config_flags->server_name);
 
 	dev_import_out.var_argument.length   = 0;
 	dev_import_out.var_argument.sequence = NULL;
@@ -1914,7 +1912,6 @@ static int error_msg(const char *msg)
 int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int nodb, int pn, int n_device, char** device_list)
 
 {
-	extern nethost_info     *multi_nethost;
 	char    		host_name [HOST_NAME_LENGTH],
 				dsn_name [37],
 		//		*proc_name,
@@ -1958,23 +1955,20 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 	}
 
 	snprintf(dsn_name, sizeof(dsn_name), "%s/%s", server_name, pers_name);
-/*
- * make sure all config flags are set to zero before starting
- */
-	memset(&config_flags, 0, sizeof(config_flags));
+	nethost_alloc(&error);  /* allocate multi_nethost */
 /*
  * option nodb means run device server without database
  */
 	if (nodb > 0)
 	{
-		config_flags.no_database = True;
+		config_flags->no_database = True;
 		xdr_load_kernel(&error);
 	}
 /*
  * option -device means remaining command line arguments are device names
  */
-	config_flags.device_no = n_device;
-	config_flags.device_list = device_list;
+	config_flags->device_no = n_device;
+	config_flags->device_list = device_list;
 
 #ifdef vxworks
 /*
@@ -2032,8 +2026,8 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 
 	str_tolower(dsn_name);
 	str_tolower(host_name);
-	strncpy(config_flags.server_name, dsn_name, sizeof(config_flags.server_name)); 
-	strncpy(config_flags.server_host, host_name, sizeof(config_flags.server_host)); 
+	strncpy(config_flags->server_name, dsn_name, sizeof(config_flags->server_name)); 
+	strncpy(config_flags->server_host, host_name, sizeof(config_flags->server_host)); 
 
 /*
  * install signal handling for HPUX, SUN, OS9
@@ -2087,7 +2081,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
  * access right for version 3 clients from the 
  * security database.
  */
-		if ( config_flags.security == True )
+		if ( config_flags->security == True )
 		{
 			default_access.length   = 0;
 			default_access.sequence = NULL;
@@ -2129,7 +2123,6 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 	else
 	{
 		prog_number = pn;
-		nethost_alloc(&error);	/* allocate multi_nethost */
 	}
 /*
  * let portmapper choose port numbers for services 
@@ -2165,8 +2158,8 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
  * Write the device server identification to the global
  * configuration structure.
  */
-		config_flags.prog_number = prog_number;
-		config_flags.vers_number = API_VERSION;
+		config_flags->prog_number = prog_number;
+		config_flags->vers_number = API_VERSION;
 
 
                 if (!svc_register(transp, prog_number, API_VERSION, devserver_prog, IPPROTO_UDP))
@@ -2214,7 +2207,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 /*
  * if the process has got this far then it is a bona-fida device server set the appropiate flag
  */
-	config_flags.device_server = True;
+	config_flags->device_server = True;
 /*
  * startup message service 
  */
@@ -2247,15 +2240,13 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
  * Set the startup configuration flag to SERVER_STARTUP
  * during the startup phase.
  */
-	    	config_flags.startup = SERVER_STARTUP;
-		multi_nethost[0].config_flags = config_flags;
-		status = startup(config_flags.server_name,&error);
+	    	config_flags->startup = SERVER_STARTUP;
+		status = startup(config_flags->server_name, &error);
 		if ( status != DS_OK )
 		{
 			dev_printerror_no (SEND,"startup failed",error);
 			return (DS_NOTOK);
 		}		
-
 /*
  *  if ds__svcrun() is used, the server can return from
  *  the startup function with status=1 to avoid svc_run()
@@ -2263,7 +2254,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
  */
 		if ( status == 1 )
 			return (DS_NOTOK);
-		multi_nethost[0].config_flags.startup = config_flags.startup = True;
+		multi_nethost[0].config_flags.startup = True;
 	}
 
 #ifndef WIN32
@@ -2346,7 +2337,7 @@ static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp)
 			return;
 
 		case RPC_CHECK:
-			help_ptr = &(config_flags.server_name[0]);
+			help_ptr = &(config_flags->server_name[0]);
 			svc_sendreply (transp, (xdrproc_t)xdr_wrapstring, (caddr_t) &help_ptr);
 			return;
 
@@ -2547,7 +2538,7 @@ long svc_check (DevLong *error)
 
 	*error = 0;
 
-	if ( db_svc_check (config_flags.server_name,
+	if ( db_svc_check (config_flags->server_name,
 			   &host_name, &prog_number, &vers_number, error) < 0 )
 		return (DS_NOTOK);
 
@@ -2562,7 +2553,7 @@ long svc_check (DevLong *error)
  *
  *  DON'T - removed this check it is an OS9 anachronism (andy 2/5/2000)
  *
- *	if (strcmp (config_flags.server_host,host_name) != 0)
+ *	if (strcmp (config_flags->server_host,host_name) != 0)
  *	{
  *		*error = DevErr_ServerRegisteredOnDifferentHost;
  *		return (DS_NOTOK);
@@ -2592,7 +2583,7 @@ long svc_check (DevLong *error)
 			          TIMEVAL(msg_timeout));
 		if (clnt_stat == RPC_SUCCESS)
 		{
-			if (strcmp (config_flags.server_name, svc_name) == 0)
+			if (strcmp (config_flags->server_name, svc_name) == 0)
 			{
 				*error = DevErr_ServerAlreadyExists;
 				clnt_destroy (clnt);

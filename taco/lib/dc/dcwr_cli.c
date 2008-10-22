@@ -29,9 +29,9 @@
  *
  * Original       : August 1992
  *
- * Version      : $Revision: 1.14 $
+ * Version      : $Revision: 1.15 $
  *
- * Date         : $Date: 2008-04-06 09:07:15 $
+ * Date         : $Date: 2008-10-22 08:20:16 $
  *
  */
 
@@ -87,9 +87,6 @@ struct timeval time_out;
 int err_count = 0;
 
 /* Some extern variables (I know that this is against the GPS !!) */
-
-extern configuration_flags config_flags;
-extern dbserver_info db_info;
 
 /* Some functions declaration */
 
@@ -871,7 +868,7 @@ static int rpc_connect(DevLong *perr)
    The "config_flags" variable is defined as global by the device server
    API library. */
 
-	if (config_flags.database_server != True)
+	if (config_flags->database_server != True)
 	{
 		if (db_import(&error))
 		{

@@ -31,9 +31,9 @@
  *
  * Original:	June 1990
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.13 $
  *
- * Date:	$Date: 2008-04-06 09:06:58 $
+ * Date:	$Date: 2008-10-22 08:30:39 $
  *
  ********************************************************************-*/
 
@@ -63,16 +63,6 @@
  *  Type for global state flags for the current
  *  server or client status is defined in API.h
  */
-
-/*
- *  Configuration flags
- */
-
-#ifdef __cplusplus
-extern "C" configuration_flags      config_flags;
-#else
-extern configuration_flags      config_flags;
-#endif
 
 /*
  *  Debug flag
@@ -384,7 +374,7 @@ long ds__svcrun (DevLong *error)
  * Set the startup configuration flag.
  * Indicates, that the process acts as a server now.
  */
-	config_flags.startup = True;
+	config_flags->startup = True;
 
 /*
  *  set timeout to the shortest time os9 can measure (1 tick).

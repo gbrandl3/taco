@@ -26,13 +26,13 @@
  *		servers and clients using the SUN-RPC.
  *
  * Author(s)  :	Jens Meyer
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.34 $
+ * Version    :	$Revision: 1.35 $
  *
- * Date       : $Date: 2008-10-13 19:04:02 $
+ * Date       : $Date: 2008-10-22 08:26:33 $
  *
  ********************************************************************-*/
 
@@ -103,21 +103,7 @@ extern "C" {
  *  Server information are defined in API.h
  */
 
-/*
- *  Configuration flags - modified by ag 16sep94
- *
- *  configuration 	== false
- *  message_server 	== false
- *  database_server	== false
- *  startup		== false
- *  security		== false
- */
-
-configuration_flags	config_flags =
-{
-	False,False,False,False,False, "", "", 0L
-};
-
+configuration_flags	*config_flags = NULL;
 
 /*
  *  Database Server globals
@@ -198,14 +184,14 @@ long _DLLFunc msg_import (char *DS_name, char *DS_host, long DS_prog_number, cha
 	 * check wether a message server is already imported
 	 */
 
-	if (config_flags.message_server)
+	if (config_flags->message_server)
 		return (DS_OK);
 
 	/*
 	 * check wether the system is already configured
 	 */
 
-	if ( !config_flags.configuration )
+	if ( !config_flags->configuration )
 	{
 		if ( (setup_config_multi(NULL,error)) < 0 )
 			return (DS_NOTOK);
@@ -248,7 +234,7 @@ long _DLLFunc msg_import (char *DS_name, char *DS_host, long DS_prog_number, cha
 	msg_info.DS_prog_number         =   DS_prog_number;
 	snprintf (msg_info.DS_display, sizeof(msg_info.DS_display), "%s", DS_display);
 
-	config_flags.message_server = True;
+	config_flags->message_server = True;
 
 	return (DS_OK);
 }
@@ -317,7 +303,7 @@ _DLLFunc void dev_printerror (DevShort mode, const char *fmt, ...)
             * send messages to message server if imported
             */
 
-		if ( config_flags.message_server )
+		if ( config_flags->message_server )
 			msg_send ( ERROR_TYPE );
 		else
 		{
@@ -381,7 +367,7 @@ _DLLFunc void dev_printerror (DevShort mode, const char *fmt, const char *str)
 /*
  * send messages to message server if imported
  */
-		if ( config_flags.message_server )
+		if ( config_flags->message_server )
 			msg_send ( ERROR_TYPE );
 		else
 		{
@@ -536,7 +522,7 @@ void _DLLFunc dev_printdebug (long debug_bits, const char *fmt, ...)
 /*
  *  is the message server imported ?
  */
-			if ( config_flags.message_server )
+			if ( config_flags->message_server )
 			{
 				msg_write ( DEBUG_TYPE, debug_string );
 				msg_send ( DEBUG_TYPE );
@@ -595,7 +581,7 @@ void dev_printdebug (long debug_bits, const char *fmt, const char *str)
 /*
  *  is the message server imported ?
  */
-			if ( config_flags.message_server )
+			if ( config_flags->message_server )
 			{
 				msg_write ( DEBUG_TYPE, debug_string );
 				msg_send ( DEBUG_TYPE );
@@ -670,7 +656,7 @@ _DLLFunc void dev_printdiag (DevShort mode, const char *fmt, ...)
 /*
  * send messages to message server if imported
  */
-		if ( config_flags.message_server )
+		if ( config_flags->message_server )
 			msg_send ( DIAG_TYPE );
 		else
 		{
@@ -734,7 +720,7 @@ void dev_printdiag (DevShort mode, const char *fmt, const char *str)
 /*
  * send messages to message server if imported
  */
-		if ( config_flags.message_server )
+		if ( config_flags->message_server )
 			msg_send ( DIAG_TYPE );
 		else
 		{
@@ -1020,6 +1006,8 @@ long _DLLFunc db_import (DevLong *error)
 	{
 		long i_nethost = get_i_nethost_by_name(nethost, error);
 		default_nethost = i_nethost;
+		config_flags = &multi_nethost[default_nethost].config_flags;
+		db_info.conf = multi_nethost[default_nethost].db_info ;
 	}
 	return res; 
 }
@@ -1142,7 +1130,7 @@ long _DLLFunc db_import_multi (char *nethost, DevLong *error)
  * if this is the first nethost (i_nethost=0) then add mono-nethost 
  * support by calling db_import to import the "default" nethost
  */
-		config_flags = nethost_i->config_flags;
+		config_flags = &nethost_i->config_flags;
 		db_info.conf = nethost_i->db_info ;
 	}
 	return (DS_OK);
@@ -1380,14 +1368,13 @@ long setup_config_multi (char *nethost, DevLong *error)
 	strncpy(multi_nethost[i_nethost].nethost,nethost, sizeof(multi_nethost[i_nethost].nethost));
         multi_nethost[i_nethost].nethost[sizeof(multi_nethost[i_nethost].nethost) - 1] = '\0';
 
-	multi_nethost[i_nethost].config_flags.configuration = True;
 	if (i_nethost == 0)
 	{
 /*
  * if this is the first nethost (i_nethost=0) then add mono-nethost support by 
  * calling setup_config to initialise the default nethost i.e. the present nethost
  */
-		if (!config_flags.configuration)
+		if (!config_flags->configuration)
 		{
 		    	if ( xdr_load_kernel (error) == DS_NOTOK )
 			{
@@ -1399,6 +1386,7 @@ long setup_config_multi (char *nethost, DevLong *error)
 				clnt_destroy (clnt);
 				return(DS_NOTOK);
 			}
+#if 0
 			if (strlen(config_flags.server_name))
 				snprintf (multi_nethost[i_nethost].config_flags.server_name, sizeof(multi_nethost[i_nethost].config_flags.server_name), "%s", config_flags.server_name);
 			if (strlen(config_flags.server_host))
@@ -1408,10 +1396,12 @@ long setup_config_multi (char *nethost, DevLong *error)
 			if (config_flags.device_list)
 				multi_nethost[0].config_flags.device_list = config_flags.device_list;
 			config_flags = multi_nethost[0].config_flags;
+#endif
 			db_info.conf = multi_nethost[0].db_info;
 			msg_info.conf = multi_nethost[0].msg_info;
 		}
 	}
+	multi_nethost[i_nethost].config_flags.configuration = True;
 	return (DS_OK);
 }
 
@@ -1459,7 +1449,7 @@ long db_ChangeDefaultNethost(char* nethost,DevLong *error)
  * functions could use multi_nethost[glob_index]  
  */
 	default_nethost = i_nethost;
-	config_flags = multi_nethost[i_nethost].config_flags;
+	config_flags = &multi_nethost[i_nethost].config_flags;
 	db_info.conf = multi_nethost[i_nethost].db_info;
 	msg_info.conf = multi_nethost[i_nethost].msg_info;
 	return (DS_OK);

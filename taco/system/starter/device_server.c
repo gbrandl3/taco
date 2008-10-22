@@ -12,8 +12,6 @@
 #	include <rpc/pmap_clnt.h>
 #endif
 
-extern configuration_flags      config_flags;
-
 /**
  * @ingroup dsAPIintern
  * Checks wether a device server with the same name is already running.
@@ -33,7 +31,7 @@ long svc_check (DevLong *error)
         unsigned int    vers_number;
 
         *error = 0;
-        if (db_svc_check(config_flags.server_name, &host_name, &prog_number, &vers_number, error) == DS_OK)
+        if (db_svc_check(config_flags->server_name, &host_name, &prog_number, &vers_number, error) == DS_OK)
 	{
 /*
  * old server already unmapped ?
@@ -61,7 +59,7 @@ long svc_check (DevLong *error)
                                   	(xdrproc_t)xdr_wrapstring, (caddr_t) &svc_name, TIMEVAL(msg_timeout));
 				if (clnt_stat == RPC_SUCCESS)
 				{
-					if (strcmp (config_flags.server_name, svc_name) == 0)
+					if (strcmp (config_flags->server_name, svc_name) == 0)
 					{
 						*error = DevErr_ServerAlreadyExists;
 						clnt_destroy (clnt);
@@ -87,8 +85,8 @@ long svc_check (DevLong *error)
 			dev_err;
 		char 	**resdef,
 			**devdef;
-		char *host = strchr(config_flags.server_name, '/') + 1;
-		snprintf(resource_line, sizeof(resource_line), "%s/device: sys/start/%s", config_flags.server_name, host);
+		char *host = strchr(config_flags->server_name, '/') + 1;
+		snprintf(resource_line, sizeof(resource_line), "%s/device: sys/start/%s", config_flags->server_name, host);
 		printf("RESOURCE LINE : %s\n", resource_line);
 		if (db_analyze_data(Db_Buffer, resource_line, &nb_devdef, &devdef, &nb_resdef, &resdef, &error_line, error) != DS_OK)
 			return DS_NOTOK;

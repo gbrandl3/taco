@@ -31,9 +31,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.39 $
+ * Version    :	$Revision: 1.40 $
  *
- * Date	    :	$Date: 2008-10-16 18:31:52 $
+ * Date	    :	$Date: 2008-10-22 08:28:59 $
  *
  ********************************************************************-*/
 
@@ -176,22 +176,6 @@ long _DLLFunc	dev_notimported_init PT_( (char *device_name, long access, long i_
  */
 
 /*
- *  Configuration flags for the default control system
- */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-extern configuration_flags      config_flags;
-extern nethost_info 		*multi_nethost;
-/*
- * dynamic error string
- */
-#ifdef __cplusplus
-};
-#endif
-
-/*
  * Global structure for multiple control systems, setup by
  * setup_config_multi() but used by all multi-nethost functions
  */
@@ -267,7 +251,7 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, DevLon
 /*
  * check wether the system is already configured
  */
-		if ( !config_flags.configuration )
+		if ( !config_flags->configuration )
 			if ( (setup_config_multi (NULL, error)) < 0 )
 				return (DS_NOTOK);
                 return attribute_import (dev_name, access, ds_ptr, error);
@@ -466,13 +450,13 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, D
  * served locally in the process. 
  */
 #if !defined __BORLANDC__
-	if (config_flags.startup == SERVER_STARTUP || config_flags.startup == True)
+	if (config_flags->startup == SERVER_STARTUP || config_flags->startup == True)
 #else
-	if (config_flags.startup == True)
+	if (config_flags->startup == True)
 #endif
 	{
-		if ( strcmp (host_name, config_flags.server_host) == 0 &&
-		    prog_number == config_flags.prog_number )
+		if ( strcmp (host_name, config_flags->server_host) == 0 &&
+		    prog_number == config_flags->prog_number )
 		{
 /*
  * Call the import function for local devices.
@@ -496,7 +480,7 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, D
  * If the device import has worked, create the security
  * key of the client handle.
  */
-			if ((config_flags.security == True) && (create_sec_key ((*ds_ptr), error) == DS_NOTOK ))
+			if ((config_flags->security == True) && (create_sec_key ((*ds_ptr), error) == DS_NOTOK ))
 					return (DS_NOTOK);
 			return (DS_OK);
 		}
@@ -620,7 +604,7 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, D
 			}
 		}
 
-		if (config_flags.startup == True)
+		if (config_flags->startup == True)
 		{
 			clnt_control (clnt, CLSET_RETRY_TIMEOUT, (char *) &inner_retry_timeout);
 			clnt_control (clnt, CLSET_TIMEOUT, (char *) &inner_timeout);
@@ -1576,19 +1560,19 @@ long _DLLFunc taco_dev_free(devserver ds, DevLong *error)
  * client
  */
                 	dev_free_in.var_argument.length = iarg = 0;
-                	name = config_flags.server_name;
+                	name = config_flags->server_name;
                 	vararg[iarg].argument_type      = D_STRING_TYPE;
                 	vararg[iarg].argument           = (DevArgument)&name;
                 	dev_free_in.var_argument.length++; iarg++;
-                	host = config_flags.server_host;
+                	host = config_flags->server_host;
                 	vararg[iarg].argument_type      = D_STRING_TYPE;
                 	vararg[iarg].argument           = (DevArgument)&host;
                 	dev_free_in.var_argument.length++; iarg++;
                 	vararg[iarg].argument_type      = D_ULONG_TYPE;
-                	vararg[iarg].argument           = (DevArgument)&config_flags.prog_number;
+                	vararg[iarg].argument           = (DevArgument)&config_flags->prog_number;
                 	dev_free_in.var_argument.length++; iarg++;
                 	vararg[iarg].argument_type      = D_ULONG_TYPE;
-                	vararg[iarg].argument           = (DevArgument)&config_flags.vers_number;
+                	vararg[iarg].argument           = (DevArgument)&config_flags->vers_number;
                 	dev_free_in.var_argument.length++;
                 	dev_free_in.var_argument.sequence = vararg;
 

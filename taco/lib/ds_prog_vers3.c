@@ -30,9 +30,9 @@
  *
  * Original   :	November 1994
  *
- * Version    :	$Revision: 1.8 $
+ * Version    :	$Revision: 1.9 $
  *
- * Date	    :	$Date: 2006-09-18 22:31:44 $
+ * Date	    :	$Date: 2008-10-22 08:28:16 $
  *
  *******************************************************************-*/
 
@@ -54,13 +54,6 @@
  *  server or client status and for Database Server
  *  information are defined in API.h
  */
-
-/*
- *  Configuration flags
- */
-
-extern configuration_flags      config_flags;
-
 
 /*
  * Minimal access for clients of version 3.
@@ -114,7 +107,7 @@ void _WINAPI devserver_prog_1 (struct svc_req *rqstp, SVCXPRT *transp)
 #endif /* _UCC */
 			return;
 		case RPC_CHECK:
-			help_ptr = &(config_flags.server_name[0]);
+			help_ptr = &(config_flags->server_name[0]);
 			svc_sendreply (transp, (xdrproc_t)xdr_wrapstring, (caddr_t) &help_ptr);
 			return;
 		case RPC_DEV_IMPORT:

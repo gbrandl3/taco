@@ -27,9 +27,9 @@
  *
  * Original:    1993
  *
- * Version:     $Revision: 1.14 $
+ * Version:     $Revision: 1.15 $
  *
- * Date:        $Date: 2008-04-06 09:07:15 $
+ * Date:        $Date: 2008-10-22 08:20:16 $
  *
  *****************************************************************************/
 
@@ -73,8 +73,6 @@
 
 
 /* Some extern variables (I know that this is against the GPS !!) */
-
-extern configuration_flags config_flags;
 
 
 
@@ -127,7 +125,7 @@ int dc_info(char *serv_name,servinf *dc_inf,DevLong *error)
  * The "config_flags" variable is defined as global by the device server
  * API library. 
  */
-	if ((config_flags.database_server != True) && db_import(&err))
+	if ((config_flags->database_server != True) && db_import(&err))
 	{
 		*error = DcErr_CantBuildStaDbConnection;
 		return(DS_NOTOK);
@@ -279,7 +277,7 @@ int dc_devall(char *serv_name,char ***devnametab,int *dev_n,DevLong *error)
  * The "config_flags" variable is defined as global by the device server
  * API library. 
  */
-	if ((config_flags.database_server != True) && db_import(&err))
+	if ((config_flags->database_server != True) && db_import(&err))
 	{
 		*dev_n = 0;
 		*error = DcErr_CantBuildStaDbConnection;

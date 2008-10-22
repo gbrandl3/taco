@@ -31,9 +31,9 @@
  *
  * Original:	June 1991
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.13 $
  *
- * Date:	$Date: 2008-04-06 09:06:58 $
+ * Date:	$Date: 2008-10-22 08:32:00 $
  *
  *******************************************************************-*/
 
@@ -68,16 +68,6 @@
 static void 	(*sig_tab [NUSIG])(int) = {(void (*)(int))SIG_DFL};
 #else
 static void 	(*sig_tab [NUSIG])() = {SIG_DFL};
-#endif
-
-/**
- * global external containing all device server config info
- */
-
-#ifdef __cplusplus
-extern "C" configuration_flags config_flags;
-#else
-extern configuration_flags config_flags;
 #endif
 
 /**@ingroup dsAPI
@@ -250,10 +240,10 @@ void unregister_server (void)
  * if this is a bona fida device server and it is using the database
  * then unregister server from database device table
  */
-	if (config_flags.device_server == True)
+	if (config_flags->device_server == True)
 	{
-		if (!config_flags.no_database  
-			&& (db_svc_unreg (config_flags.server_name, &error) != DS_OK))
+		if (!config_flags->no_database  
+			&& (db_svc_unreg (config_flags->server_name, &error) != DS_OK))
 	   			dev_printerror_no (SEND,"db_svc_unreg failed",error);
 /*
  *  destroy open client handles to message and database servers
@@ -264,21 +254,21 @@ void unregister_server (void)
 /*
  * unregister synchronous version (4) of server from portmapper
  */
-	pmap_unset (config_flags.prog_number, API_VERSION);
+	pmap_unset (config_flags->prog_number, API_VERSION);
 /*
  * unregister the asynchronous version (5) of the server from portmapper
  */
-	pmap_unset (config_flags.prog_number, ASYNCH_API_VERSION);
+	pmap_unset (config_flags->prog_number, ASYNCH_API_VERSION);
 /*
  *  finally unregister version (1) used by gettransient_ut()
  */
-	pmap_unset (config_flags.prog_number, DEVSERVER_VERS);
+	pmap_unset (config_flags->prog_number, DEVSERVER_VERS);
 /* 
  * the server has been unregistred, so set flag to false! 
  * otherwise, there may be more than one attempt to unregister the server
  * in multithreaded apps.
  */
-	config_flags.device_server = False;    
+	config_flags->device_server = False;    
 	UNLOCK(async_mutex);
 /*
  * returning here and calling exit() later from main_signal_handler() will

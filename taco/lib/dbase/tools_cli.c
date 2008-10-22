@@ -27,13 +27,13 @@
  *                calls
  * 
  * Author(s)  :   Emmanuel Taurel
- *                $Author: andy_gotz $
+ *                $Author: jkrueger1 $
  * 
  * Original   :   April 1997
  * 
- * Version    :   $Revision: 1.10 $
+ * Version    :   $Revision: 1.11 $
  * 
- * Date       :   $Date: 2008-10-13 19:04:02 $
+ * Date       :   $Date: 2008-10-22 08:21:37 $
  ********************************************************************/
 
 #ifdef HAVE_CONFIG_H
@@ -84,9 +84,6 @@
 #ifdef ALONE
 extern CLIENT 			*cl;
 extern int 			first;
-#else
-extern dbserver_info 		db_info;
-extern configuration_flags 	config_flags;
 #endif /* ALONE */
 
 static CLIENT 			*cl_tcp;

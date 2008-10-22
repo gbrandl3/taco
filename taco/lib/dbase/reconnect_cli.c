@@ -31,9 +31,9 @@
  *
  * Original   : September 1998
  *  
- * Version    :	$Revision: 1.11 $
+ * Version    :	$Revision: 1.12 $
  *
- * Date	      : $Date: 2008-09-11 13:58:37 $
+ * Date	      : $Date: 2008-10-22 08:20:58 $
  *
  *-*******************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -79,11 +79,6 @@
 #ifdef ALONE
 extern CLIENT *cl;
 #endif
-
-extern dbserver_info 		db_info;
-extern configuration_flags 	config_flags;
-extern nethost_info 		*multi_nethost;
-
 
 /**@ingroup dbaseAPIintern
  * To do automatic reconnection with the database server if it has been killed or restarted.		
@@ -414,14 +409,14 @@ int to_reconnection(void *p_data, void **pp_result, CLIENT **client,
 			if (nethost_index == 0)
 			{
 				old_client = db_info.conf->clnt;
-				config_flags.database_server = False;
-				config_flags.configuration = False;
+				config_flags->database_server = False;
+				config_flags->configuration = False;
 				if(db_import(error))
 				{
 					clnt_control(*client,CLSET_TIMEOUT,(char *)&timeout);
 					clnt_control(*client,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
-					config_flags.database_server = True;
-					config_flags.database_server = True;
+					config_flags->database_server = True;
+					config_flags->database_server = True;
 					db_info.conf->clnt = *client;
 					return(-1);
 				}

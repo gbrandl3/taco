@@ -26,13 +26,13 @@
  *		programmers interface.
  *
  * Author(s):	Jens Meyer
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original:	June 1992
  *
- * Version:	$Revision: 1.14 $
+ * Version:	$Revision: 1.15 $
  *
- * Date:	$Date: 2008-10-13 19:04:02 $
+ * Date:	$Date: 2008-10-22 08:19:33 $
  *
  ********************************************************************-*/
 
@@ -45,7 +45,7 @@
  */
 #ifdef _IDENT
 static char ApiPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.14 2008-10-13 19:04:02 andy_gotz Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.15 2008-10-22 08:19:33 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -512,9 +512,14 @@ void 	get_myaddress(struct sockaddr_in *);
 #endif /* __cplusplus */
 
 #ifdef __cplusplus
-extern "C" configuration_flags  config_flags;
-extern "C" nethost_info 	*multi_nethost;
-extern "C" dbserver_info        db_info;
+extern "C" {
+#endif
+extern configuration_flags  	*config_flags;
+extern nethost_info 		*multi_nethost;
+extern long			default_nethost;
+extern dbserver_info        	db_info;
+#ifdef __cplusplus
+}
 #endif
 
 #ifdef TANGO_API

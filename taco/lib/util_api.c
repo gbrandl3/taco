@@ -27,13 +27,13 @@
  *		handle remote devices.
  *
  * Author(s)  :	Jens Meyer
- * 		$Author: andy_gotz $
+ * 		$Author: jkrueger1 $
  *
  * Original   :	April 1993
  *
- * Version:	$Revision: 1.33 $
+ * Version:	$Revision: 1.34 $
  *
- * Date:		$Date: 2008-10-13 19:04:02 $
+ * Date:		$Date: 2008-10-22 08:23:00 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -81,16 +81,10 @@ static long get_cmd_string PT_( (devserver ds, long cmd, char *cmd_str, size_t l
 extern "C" {
 #endif
 /*
- *  Configuration flags
- */
-extern configuration_flags	config_flags;
-/*
  * Global structure for multiple control systems, setup by
  * setup_config_multi() but used by all multi-nethost functions
  */
-extern nethost_info 		*multi_nethost;
 extern long  			max_nethost;
-extern long			default_nethost;
 /*  
  *  Structure for the adnministration of open RPC connections.
  */
@@ -178,7 +172,7 @@ long _DLLFunc dev_putget_raw (devserver ds, long cmd, DevArgument argin,
 	 * verify the security key
 	 */
 
-	if ( config_flags.security == True )
+	if ( config_flags->security == True )
 	{
 		if ( verify_sec_key (ds, &client_id, error) == DS_NOTOK )
 		{
@@ -321,7 +315,7 @@ long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
 	 * verify the security key
 	 */
 
-	if ( config_flags.security == True )
+	if ( config_flags->security == True )
 	{
 		if ( verify_sec_key (ds, &client_id, error) == DS_NOTOK )
 		{
@@ -1335,14 +1329,19 @@ long _DLLFunc nethost_alloc (DevLong *error)
  */
 	for (i=max_nethost; i<new_max_nethost; i++)
 	{
-		multi_nethost[i].config_flags.configuration = False;
 /*
  * initialise all flags to zero so that no-one (e.g. ET) tries to use
  * the database (or any other server) as long as it is not imported
  */
 		memset((char*)&multi_nethost[i].config_flags, 0, sizeof(multi_nethost[i].config_flags));
+		multi_nethost[i].config_flags.configuration = False;
 		auth_flag[i] = False;
 	}
+	if (default_nethost < 0)
+		config_flags = &multi_nethost[0].config_flags;
+	else
+		config_flags = &multi_nethost[default_nethost].config_flags;
+
 	max_nethost = new_max_nethost;
 	dev_printdebug (DBG_TRACE | DBG_API, "nethost_alloc(): (re)allocate space for nethost, new max = %d\n", max_nethost);
 

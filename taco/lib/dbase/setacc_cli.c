@@ -26,13 +26,13 @@
  *              Interface to access static database
  *
  * Author(s)  : Emmanuel Taurel
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.17 $
+ * Version    :	$Revision: 1.18 $
  *
- * Date       :	$Date: 2008-10-13 19:04:02 $
+ * Date       :	$Date: 2008-10-22 08:22:12 $
  * 
  *-*******************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -90,10 +90,6 @@
 #ifdef ALONE
 CLIENT *cl;
 int first = 0;
-#else
-extern dbserver_info db_info;
-extern configuration_flags config_flags;
-extern msgserver_info msg_info;
 #endif /* ALONE */
 
 #define SIZE_A	20
@@ -181,7 +177,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevL
  * Try to verify the function parameters (non NULL pointer and two 
  *  characters in device name) 
  */
-	if (config_flags.no_database)
+	if (config_flags->no_database)
 	{
 		*perr = DbErr_NoDatabase;
 		return(DS_NOTOK);
@@ -1218,7 +1214,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num, DevL
 /* Verify function parameters (non NULL pointers and two \ characters in 
    device name). */
 
-        if (config_flags.no_database)
+        if (config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -2228,7 +2224,7 @@ int _DLLFunc db_delresource(char *dev_name, char **res_name, u_int res_num,  Dev
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags.no_database)
+        if (config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -2454,7 +2450,7 @@ long _DLLFunc db_delreslist(char **res_list, long res_num, DevLong *perr)
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags.no_database)
+        if (config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -2649,10 +2645,10 @@ int _DLLFunc db_getdevlist(char *name, char ***tab, u_int *num_dev, DevLong *per
  * if this is a device server without database then simply return
  * the list of devices passed on the command line
  */
- 	if (config_flags.no_database == True)
+ 	if (config_flags->no_database == True)
 	{
-		*num_dev = config_flags.device_no;
-		*tab = (char **)config_flags.device_list;
+		*num_dev = config_flags->device_no;
+		*tab = (char **)config_flags->device_list;
 		return(DS_OK);
 	}
 
@@ -2873,7 +2869,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num, DevLong *perr)
 	vers = DB_VERS_3;
 #endif 
 
-        if (config_flags.no_database)
+        if (config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -3376,7 +3372,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev, DevLon
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags.no_database)
+        if (config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -3626,7 +3622,7 @@ int _DLLFunc db_svc_unreg(char *ds_netnam,  DevLong *perr)
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags.no_database)
+        if (config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -3786,7 +3782,7 @@ int _DLLFunc db_svc_check(char *ds_netname, char **pho_name, u_int *pp_num, u_in
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags.no_database)
+        if (config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -3966,7 +3962,7 @@ int _DLLFunc db_getdevexp(char *filter, char ***tab, u_int *num_dev, DevLong *pe
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags.no_database)
+        if (config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -4532,7 +4528,7 @@ int _DLLFunc db_freedevexp(char **ptr)
 	register int i;
 	int l;
 
-        if (config_flags.no_database)
+        if (config_flags->no_database)
         {
                 return(DS_NOTOK);
         } 
@@ -4628,7 +4624,7 @@ int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code, DevLong *perr)
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags.no_database)
+        if (config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -4765,7 +4761,7 @@ int _DLLFunc db_event_query(char *event_name, u_int *event_code,  DevLong *perr)
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags.no_database)
+        if (config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -4916,7 +4912,7 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags.no_database)
+        if (config_flags->no_database)
         {
                 p_err->error_code = DbErr_NoDatabase;
 		p_err->psdev_err = DS_OK;
@@ -5116,7 +5112,7 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags.no_database)
+        if (config_flags->no_database)
         {
                 p_err->error_code = DbErr_NoDatabase;
 		p_err->psdev_err = DS_OK;
@@ -5303,7 +5299,7 @@ int _DLLFunc db_svc_close( DevLong *perr)
 
 #ifdef ALONE
 
-        if (config_flags.no_database)
+        if (config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -5390,7 +5386,7 @@ int _DLLFunc db_svc_reopen( DevLong *perr)
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags.no_database)
+        if (config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);

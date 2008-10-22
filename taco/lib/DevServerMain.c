@@ -25,13 +25,13 @@
  * Description	: Main programm for all device servers
  *
  * Author(s)  	: Jens Meyer
- * 		  $Author: andy_gotz $
+ * 		  $Author: jkrueger1 $
  *
  * Original   	: March 1991
  *
- * Version	: $Revision: 1.28 $
+ * Version	: $Revision: 1.29 $
  *
- * Date		: $Date: 2008-10-13 19:04:02 $
+ * Date		: $Date: 2008-10-22 08:31:22 $
  *
  *******************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -58,6 +58,8 @@
 #include <DevSignal.h>
 #include <DevErrors.h>
 #include "db_setup.h"
+#include "taco_utils.h"
+
 #if defined WIN32
 #include <rpc/Pmap_pro.h>
 #include <rpc/pmap_cln.h>
@@ -116,12 +118,6 @@ static void _WINAPI devserver_prog_4	PT_( (struct svc_req *rqstp,SVCXPRT *transp
  *  Type for global state flags for the current
  *  server or client status is defined in API.h 
  */
-
-/*
- *  Configuration flags
- */
-
-extern configuration_flags      config_flags;
 
 /*
  *  Communication sockets
@@ -367,7 +363,7 @@ int main (int argc, char **argv)
 /*
  * make sure all config flags are set to zero before starting
  */
-	memset(&config_flags, 0, sizeof(config_flags));
+	memset(config_flags, 0, sizeof(config_flags));
 #if defined (unix)
 	proc_name = (char *)strrchr (argv[0], '/');
 #elif ( OSK || _OSK )
@@ -934,9 +930,9 @@ WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		   /*
 			* RPC and potmapper stuff.
 			*/
-			svc_unregister(config_flags.prog_number, DEVSERVER_VERS);
-			svc_unregister(config_flags.prog_number, API_VERSION);
-			svc_unregister(config_flags.prog_number, ASYNCH_API_VERSION);
+			svc_unregister(config_flags->prog_number, DEVSERVER_VERS);
+			svc_unregister(config_flags->prog_number, API_VERSION);
+			svc_unregister(config_flags->prog_number, ASYNCH_API_VERSION);
 
 			if (transp != 0) svc_destroy(transp);
 			if (transp_tcp != 0) svc_destroy(transp_tcp);
