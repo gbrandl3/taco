@@ -30,9 +30,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.35 $
+ * Version    :	$Revision: 1.36 $
  *
- * Date       : $Date: 2008-10-22 08:26:33 $
+ * Date       : $Date: 2008-10-22 08:43:29 $
  *
  ********************************************************************-*/
 
@@ -1386,17 +1386,6 @@ long setup_config_multi (char *nethost, DevLong *error)
 				clnt_destroy (clnt);
 				return(DS_NOTOK);
 			}
-#if 0
-			if (strlen(config_flags.server_name))
-				snprintf (multi_nethost[i_nethost].config_flags.server_name, sizeof(multi_nethost[i_nethost].config_flags.server_name), "%s", config_flags.server_name);
-			if (strlen(config_flags.server_host))
-				snprintf (multi_nethost[i_nethost].config_flags.server_host, sizeof(multi_nethost[i_nethost].config_flags.server_host), "%s", config_flags.server_host);
-			if (config_flags.device_no)
-				multi_nethost[0].config_flags.device_no = config_flags.device_no;
-			if (config_flags.device_list)
-				multi_nethost[0].config_flags.device_list = config_flags.device_list;
-			config_flags = multi_nethost[0].config_flags;
-#endif
 			db_info.conf = multi_nethost[0].db_info;
 			msg_info.conf = multi_nethost[0].msg_info;
 		}
