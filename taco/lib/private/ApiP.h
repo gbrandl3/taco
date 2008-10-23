@@ -30,9 +30,9 @@
  *
  * Original:	June 1992
  *
- * Version:	$Revision: 1.16 $
+ * Version:	$Revision: 1.17 $
  *
- * Date:	$Date: 2008-10-23 09:21:32 $
+ * Date:	$Date: 2008-10-23 09:48:34 $
  *
  ********************************************************************-*/
 
@@ -45,7 +45,7 @@
  */
 #ifdef _IDENT
 static char ApiPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.16 2008-10-23 09:21:32 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.17 2008-10-23 09:48:34 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -357,24 +357,24 @@ long  dev_rpc_connection PT_( (devserver ds, DevLong *error) );
 long  dev_rpc_error PT_( (devserver ds, enum clnt_stat clnt_stat, DevLong *error) );
 long  check_rpc_connection PT_( (devserver ds, DevLong *error) );
 long  reinstall_rpc_connection PT_( (devserver ds, DevLong *error) );
-long  rpc_check_host PT_( (const char *host_name, DevLong *error) );
-long  dev_query_svr PT_( (const char *host,long prog_number,long vers_number) );
+long  rpc_check_host PT_( (char *host_name, DevLong *error) );
+long  dev_query_svr PT_( (char* host,long prog_number,long vers_number) );
 
 /*
  * Calls to setup the connection to the manager, database and message server
  */
-long setup_config_multi PT_( (const char *nethost, DevLong *error) );
+long setup_config_multi PT_( (char *nethost, DevLong *error) );
 long setup_config PT_( (DevLong *error) );
-long db_import_multi PT_( (const char *nethost, DevLong *error) );
-long db_ChangeDefaultNethost PT_( (const char* nethost, DevLong *error));
+long db_import_multi PT_( (char *nethost, DevLong *error) );
+long db_ChangeDefaultNethost PT_( (char* nethost, DevLong *error));
 
 
 /*
  * Utility functions for multi-nethost support
  */
 long 	nethost_alloc PT_( (DevLong *error) );
-long 	get_i_nethost_by_device_name PT_( (const char *device_name, DevLong *error) );
-long 	get_i_nethost_by_name PT_( (const char *nethost, DevLong *error) );
+long 	get_i_nethost_by_device_name PT_( (char *device_name, DevLong *error) );
+long 	get_i_nethost_by_name PT_( (char *nethost, DevLong *error) );
 char* 	get_nethost_by_index PT_( (long i_nethost, DevLong *error) );
 char* 	extract_device_name PT_( (const char *full_name, DevLong *error) );
 char* 	extract_nethost PT_( (const char *full_name, DevLong *error) );
@@ -397,7 +397,7 @@ void event_client_cleanup PT_( (DevLong *error) );
 
 /* Attribute access entry points */
 
-long attribute_import (const char *attribute_name, long access, devserver *ds_ptr, DevLong *error);
+long attribute_import (char *attribute_name, long access, devserver *ds_ptr, DevLong *error);
 long attribute_free (devserver ds, DevLong *error); 
 long attribute_putget (devserver ds, long cmd, DevArgument argin, DevType argin_type,DevArgument argout, DevType argout_type, DevLong *error);
 long attribute_put (devserver ds, long cmd, DevArgument argin, DevType argin_type, DevLong *error);
@@ -419,7 +419,7 @@ long dev_notimported_init(char*, long, long, devserver*, DevLong*);
 
 /* dynamic error string handling */
 
-long dev_error_push PT_( (const char *error_string) );
+long dev_error_push PT_( (char *error_string) );
 long dev_error_clear PT_( () );
 long dev_error_push_level PT_( (const char * message,int level) );
 

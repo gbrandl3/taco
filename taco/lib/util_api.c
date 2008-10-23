@@ -31,9 +31,9 @@
  *
  * Original   :	April 1993
  *
- * Version:	$Revision: 1.38 $
+ * Version:	$Revision: 1.39 $
  *
- * Date:		$Date: 2008-10-23 09:21:32 $
+ * Date:		$Date: 2008-10-23 09:48:34 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -1013,7 +1013,7 @@ int*  error;
  * 		default nethost (0). If the nethost is specified
  * 		but not imported then return DS_NOTOK.
  */ 
-long _DLLFunc get_i_nethost_by_device_name (const char *device_name, DevLong *error)
+long _DLLFunc get_i_nethost_by_device_name (char *device_name, DevLong *error)
 {
 	long i_nethost, i;
 	char *nethost;
@@ -1079,7 +1079,7 @@ long _DLLFunc get_i_nethost_by_device_name (const char *device_name, DevLong *er
  * @return the index of nethost 
  * @retval DS_NOTOK if not found in the list of known NETHOST's.
  */
-long _DLLFunc get_i_nethost_by_name (const char *nethost, DevLong *error)
+long _DLLFunc get_i_nethost_by_name (char *nethost, DevLong *error)
 {
 	long i;
 /* 
@@ -1164,7 +1164,7 @@ char* _DLLFunc extract_device_name (const char *full_name, DevLong *error)
 /*
  * assume full_name == device_name to start off with
  */
-	device_name = device_name_alloc = (char*)realloc(device_name_alloc, strlen(full_name) + 1);
+	device_name = device_name_alloc = (char*)realloc(device_name_alloc,strlen(full_name)+1);
 	if (!device_name_alloc)
 	{
 		*error = DevErr_InsufficientMemory;
@@ -1231,11 +1231,11 @@ char *_DLLFunc extract_nethost(const char *full_name, DevLong *error)
  * global arrays required for multi-nethost support, memory is
  * allocated for them by nethost_alloc()
  */
-extern struct _devserver 	*msg_ds;
-extern struct _devserver 	*db_ds;
-extern short 			*auth_flag;
-extern dbserver_info           	db_info;
-extern msgserver_info         	msg_info;
+extern struct _devserver *msg_ds;
+extern struct _devserver *db_ds;
+extern short *auth_flag;
+extern dbserver_info           db_info;
+extern msgserver_info          msg_info;
 
 
 /**@ingroup clientAPIintern

@@ -30,9 +30,9 @@
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.20 $
+ * Version    :	$Revision: 1.21 $
  *
- * Date       :	$Date: 2008-10-23 09:21:32 $
+ * Date       :	$Date: 2008-10-23 09:48:34 $
  * 
  *-*******************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -137,7 +137,7 @@ extern nethost_info *multi_nethost;
  *			to by "perr". 
  * @retval DS_OK otherwise.
  */
-int _DLLFunc db_getresource(const char *devname, Db_resource res, u_int res_num, DevLong *perr)
+int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevLong *perr)
 {
 	db_res		*recev;
 	arr1 		send;
@@ -173,7 +173,6 @@ int _DLLFunc db_getresource(const char *devname, Db_resource res, u_int res_num,
 #ifdef ALONE
 	char 		*serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
-	char		*dev_name = devname;
 
 /* 
  * Try to verify the function parameters (non NULL pointer and two 
@@ -275,7 +274,7 @@ int _DLLFunc db_getresource(const char *devname, Db_resource res, u_int res_num,
 		return(DS_NOTOK);
 	}
 	local_cl = multi_nethost[i_nethost].db_info->clnt;
-	dev_name = extract_device_name(dev_name, perr);
+	dev_name = extract_device_name(dev_name,perr);
 #endif /* ALONE */
 /* 
  * Allocate memory for the array of pointeur to char 

@@ -30,9 +30,9 @@
  *
  * Original   : June 2007
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:                $Date: 2008-10-23 09:21:32 $
+ * Date:                $Date: 2008-10-23 09:48:34 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -99,7 +99,12 @@ char *strdup_tolower(const char *str)
  */
 char *strcpy_tolower(char *dest, const char *src)
 {
-	return strncpy_tolower(dest, src, strlen(src) + 1);
+	char 	*tmp,
+		*ptr = dest;
+	for (tmp = (char *)src; *tmp != '\0'; ++tmp, ++ptr)
+		*ptr = tolower(*tmp);
+	*ptr = '\0';
+	return dest;
 }	
 
 /**
@@ -137,9 +142,12 @@ char *strncpy_tolower(char *dest, const char *src, size_t n)
  */
 char *strcat_tolower(char *dest, const char *src)
 {
-	char 	*ptr = dest + strlen(dest);
-	strcpy_tolower(ptr, src);
-	return dest; 
+	char 	*ptr = dest + strlen(dest),
+		*tmp;
+	for (tmp = (char *)src; *tmp != '\0'; ++tmp, ++ptr)
+		*ptr = tolower(*tmp);
+	*ptr = '\0';
+	return dest;
 }
 
 /**

@@ -31,9 +31,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.42 $
+ * Version    :	$Revision: 1.43 $
  *
- * Date	    :	$Date: 2008-10-23 09:21:31 $
+ * Date	    :	$Date: 2008-10-23 09:48:34 $
  *
  ********************************************************************-*/
 
@@ -141,16 +141,12 @@
  * Functions reused in modul util_api.c
  */
 
-#if 0
-long _DLLFunc 	dev_query_svr PT_( (const char* host,long prog_number,long vers_number) );
-#endif
+long _DLLFunc 	dev_query_svr PT_( (char* host,long prog_number,long vers_number) );
 static long 	dev_import_local PT_( (_dev_import_in  *dev_import_in, devserver  *ds_ptr, DevLong* error) );
 static long 	dev_free_local PT_( (_dev_free_in  *dev_free_in, DevLong* error) );
 static long 	dev_put_local PT_( (_server_data  *server_data, DevLong* error) );
 static long 	dev_putget_local PT_( (_server_data  *server_data, _client_data  *client_data, DevLong* error) );
-#if 0
-long _DLLFunc	dev_notimported_init PT_( (const char *device_name, long access, long i_nethost, devserver *ds_ptr, DevLong *error) );
-#endif
+long _DLLFunc	dev_notimported_init PT_( (char *device_name, long access, long i_nethost, devserver *ds_ptr, DevLong *error) );
 
 /*
  * local data used by each client is kept in external area
@@ -1689,7 +1685,7 @@ DON'T - 26/3/98
  * @retval DS_OK 
  * @retval DS_NOTOK
  */
-long _DLLFunc dev_query_svr (const char* host, long prog_number, long vers_number)
+long _DLLFunc dev_query_svr (char* host, long prog_number, long vers_number)
 {
 	static int no_svr_conn = TRUE;
 	int 	   next_conn   = -1;
@@ -2467,7 +2463,7 @@ long _DLLFunc reinstall_rpc_connection (devserver ds, DevLong *error)
  * @retval DS_OK 
  * @retval DS_NOTOK
  */
-long _DLLFunc rpc_check_host (const char *host_name, DevLong *error)
+long _DLLFunc rpc_check_host (char *host_name, DevLong *error)
 {
 #if !defined vxworks
 #if ( (! OSK) && (! _OSK))

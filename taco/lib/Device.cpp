@@ -30,9 +30,9 @@
  *
  * Original:	March 1995
  *
- * Version:	$Revision: 1.15 $
+ * Version:	$Revision: 1.16 $
  *
- * Date:	$Date: 2008-10-23 09:21:31 $
+ * Date:	$Date: 2008-10-23 09:48:34 $
  *
  *-**********************************************************************/
 		
@@ -80,7 +80,7 @@ long Device::ClassInitialise( DevLong *error )
  * @param error error code returned in the case of problems
  *
  */
-Device::Device (const char *devname, DevLong *error)
+Device::Device (DevString devname, DevLong *error)
 {
 	dev_printdebug(DBG_TRACE,"Device::Device() called, devname = %s\n",devname);
 	*error = DS_OK;

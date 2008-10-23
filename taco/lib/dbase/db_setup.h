@@ -25,9 +25,9 @@
  * Author(s):	
  *		$Author: jkrueger1 $
  * 
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2008-10-23 09:21:32 $
+ * Date:	$Date: 2008-10-23 09:48:34 $
  *
  ******************************************************************************/
 
@@ -437,7 +437,7 @@ typedef struct _db_delupd_error
 extern "C" {
 #endif
 
-int _DLLFunc db_getresource PT_((const char *dev_name,register Db_resource resource,u_int num_resource,DevLong *error));
+int _DLLFunc db_getresource PT_((char *dev_name,register Db_resource resource,u_int num_resource,DevLong *error));
 int _DLLFunc db_getdevlist PT_((char *ds_name,char ***device_tab,u_int *dev_num,DevLong *error));
 int _DLLFunc db_dev_export PT_((register Db_devinf devinfo,u_int num_device,DevLong *error));
 int _DLLFunc db_dev_import PT_((char **devname,Db_devinf_imp *devinf,unsigned int num_device,DevLong *error));
