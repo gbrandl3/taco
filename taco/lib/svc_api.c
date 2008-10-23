@@ -29,9 +29,9 @@
  *
  * Original:	Feb 1994
  *
- * Version:	$Revision: 1.32 $
+ * Version:	$Revision: 1.33 $
  *
- * Date:		$Date: 2008-10-23 05:28:17 $
+ * Date:		$Date: 2008-10-23 09:21:31 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -2125,7 +2125,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 
 			free_var_str_array (&default_access);
 		}
-	}		
+	}
 	else
 	{
 		prog_number = pn;

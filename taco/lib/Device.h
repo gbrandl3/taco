@@ -31,9 +31,9 @@
  *
  * Original:	February 1995
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2008-10-15 14:18:44 $
+ * Date:	$Date: 2008-10-23 09:21:31 $
  *
  +**********************************************************************/
 
@@ -147,7 +147,7 @@ public:
 #endif
 	char* name;
 public:
-	Device (DevString name, DevLong *error);
+	Device (const char *name, DevLong *error);
 	virtual ~Device ();
 //
 // following method is "virtual" which means derived classes can

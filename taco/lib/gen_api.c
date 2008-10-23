@@ -30,9 +30,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.37 $
+ * Version    :	$Revision: 1.38 $
  *
- * Date       : $Date: 2008-10-23 05:28:17 $
+ * Date       : $Date: 2008-10-23 09:21:31 $
  *
  ********************************************************************-*/
 
@@ -68,7 +68,9 @@
 #error could not find signal.h
 #endif
 
+#if 0
 extern _DLLFunc long 	setup_config_multi(char *nethost, DevLong *error);
+#endif
 static void 		msg_write(_Int msg_type, char *msg_string);
 static void 		msg_send (_Int msg_type);
 static void 		msg_clear(_Int msg_type);
@@ -1024,7 +1026,7 @@ long _DLLFunc db_import (DevLong *error)
  * @retval DS_OK 
  * @retval DS_NOTOK
  */
-long _DLLFunc db_import_multi (char *nethost, DevLong *error)
+long _DLLFunc db_import_multi (const char *nethost, DevLong *error)
 {
 	CLIENT		*clnt;
         enum clnt_stat  clnt_stat;
@@ -1154,7 +1156,7 @@ long _DLLFunc db_import_multi (char *nethost, DevLong *error)
  * @retval DS_OK 
  * @retval DS_NOTOK
  */
-long setup_config_multi (char *nethost, DevLong *error)
+long setup_config_multi (const char *nethost, DevLong *error)
 {
 	_manager_data 		manager_data={0};
 	_register_data  	register_data;
@@ -1192,8 +1194,8 @@ long setup_config_multi (char *nethost, DevLong *error)
 			*error = DevErr_NethostNotDefined;
 			return (DS_NOTOK);
 		}
-		nethost=nethost_buffer;
-		snprintf(nethost, sizeof(nethost_buffer), "%s",nethost_env);
+		nethost = nethost_buffer;
+		snprintf(nethost_buffer, sizeof(nethost_buffer), "%s",nethost_env);
 	}
 /*
  * look for the nethost in the array of multi_nethosts[] and return its index; 
@@ -1408,7 +1410,7 @@ long setup_config_multi (char *nethost, DevLong *error)
  * @retval DS_OK 
  * @retval DS_NOTOK in case of failure
  */
-long db_ChangeDefaultNethost(char* nethost,DevLong *error)
+long db_ChangeDefaultNethost(const char* nethost, DevLong *error)
 {
 /* 
  * lookup in nethost array 
@@ -1621,7 +1623,7 @@ static char *get_error_string (DevLong error)
  * @retval DS_OK 
  * @retval DS_NOTOK 
  */
-long dev_error_push (char *error_string)
+long dev_error_push (const char *error_string)
 {
 	if (dev_error_stack == NULL)
 	{
