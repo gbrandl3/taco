@@ -151,7 +151,7 @@ void TACO::Motor::Motor::stop() throw (::TACO::Exception)
         updateResource<DevDouble>("lastpos", this->read());
 }
 
-void TACO::Motor::Motor::tacoStop(::TACO::Server *server, void *, void *) throw (::TACO::Exception)
+void TACO::Motor::Motor::tacoStop(::TACO::Server *server, DevArgument, DevArgument) throw (::TACO::Exception)
 {
 	Motor *s = dynamic_cast<Motor*>(server);
 	if (s != 0) 
@@ -168,7 +168,7 @@ void TACO::Motor::Motor::abort() throw (::TACO::Exception)
         updateResource<DevDouble>("lastpos", this->read());
 }
 
-void TACO::Motor::Motor::tacoAbort(::TACO::Server *server, void *, void *) throw (::TACO::Exception)
+void TACO::Motor::Motor::tacoAbort(::TACO::Server *server, DevArgument, DevArgument) throw (::TACO::Exception)
 {
 	Motor* s = dynamic_cast<Motor*>(server);
 	if (s != 0)
@@ -184,7 +184,7 @@ void TACO::Motor::Motor::move( DevDouble input) throw (::TACO::Exception)
 	m_motor->move(input);
 }
 
-void TACO::Motor::Motor::tacoMove( ::TACO::Server* server, void* argin, void* argout) throw (::TACO::Exception)
+void TACO::Motor::Motor::tacoMove( ::TACO::Server* server, DevArgument argin, DevArgument) throw (::TACO::Exception)
 {
 	Motor *s = dynamic_cast<Motor*>(server);
 	if (s != 0)
@@ -200,7 +200,7 @@ void TACO::Motor::Motor::moveTo( DevDouble input) throw (::TACO::Exception)
 	m_motor->moveTo(input);
 }
 
-void TACO::Motor::Motor::tacoMoveTo( ::TACO::Server* server, void* argin, void* argout) throw (::TACO::Exception)
+void TACO::Motor::Motor::tacoMoveTo( ::TACO::Server* server, DevArgument argin, DevArgument) throw (::TACO::Exception)
 {
 	Motor *s = dynamic_cast<Motor*>(server);
 	if (s != 0)
@@ -217,7 +217,7 @@ void TACO::Motor::Motor::setpos(DevDouble input) throw (::TACO::Exception)
         updateResource<DevDouble>("lastpos", this->read());
 }
 
-void TACO::Motor::Motor::tacoSetpos(::TACO::Server *server, void *argin, void *) throw (::TACO::Exception)
+void TACO::Motor::Motor::tacoSetpos(::TACO::Server *server, DevArgument argin, DevArgument) throw (::TACO::Exception)
 {
 	Motor *s = dynamic_cast<Motor*>(server);
 	if (s != 0) 
@@ -237,7 +237,7 @@ void TACO::Motor::Motor::setSpeed(DevDouble input) throw (::TACO::Exception)
 	m_motor->setSpeed(input);
 }
 
-void TACO::Motor::Motor::tacoSetSpeed(::TACO::Server *server, void *argin, void *) throw (::TACO::Exception)
+void TACO::Motor::Motor::tacoSetSpeed(::TACO::Server *server, DevArgument argin, DevArgument) throw (::TACO::Exception)
 {
 	Motor *s = dynamic_cast<Motor*>(server);
 	if (s != 0)
@@ -253,7 +253,7 @@ DevDouble TACO::Motor::Motor::speed(void ) throw (::TACO::Exception)
 	return m_motor->speed();
 }
 
-void TACO::Motor::Motor::tacoSpeed(::TACO::Server *server, void *, void *argout) throw (::TACO::Exception)
+void TACO::Motor::Motor::tacoSpeed(::TACO::Server *server, DevArgument, DevArgument argout) throw (::TACO::Exception)
 {
 	Motor *s = dynamic_cast<Motor*>(server);
 	if (s != 0) 
@@ -269,7 +269,7 @@ DevDouble TACO::Motor::Motor::read(void) throw (::TACO::Exception)
 	return m_motor->read();
 }
 
-void TACO::Motor::Motor::tacoRead(::TACO::Server *server, void *, void *argout) throw (::TACO::Exception)
+void TACO::Motor::Motor::tacoRead(::TACO::Server *server, DevArgument, DevArgument argout) throw (::TACO::Exception)
 {
 	Motor *s = dynamic_cast<Motor*>(server);
 	if (s != 0) 
@@ -282,7 +282,7 @@ void TACO::Motor::Motor::setAccSlope(const std::string &input) throw (::TACO::Ex
 {
 }
 
-void TACO::Motor::Motor::tacoSetAccelerationSlope(::TACO::Server *server, void *argin, void *) throw (::TACO::Exception)
+void TACO::Motor::Motor::tacoSetAccelerationSlope(::TACO::Server *server, DevArgument argin, DevArgument) throw (::TACO::Exception)
 {
 	Motor *s = dynamic_cast<Motor*>(server);
 	if (s != 0) 
@@ -296,7 +296,7 @@ std::string TACO::Motor::Motor::accSlope(void) throw (::TACO::Exception)
 	return "linear";
 }
 
-void TACO::Motor::Motor::tacoAccelerationSlope(::TACO::Server *server, void *, void *argout) throw (::TACO::Exception)
+void TACO::Motor::Motor::tacoAccelerationSlope(::TACO::Server *server, DevArgument, DevArgument argout) throw (::TACO::Exception)
 {
 	Motor *s = dynamic_cast<Motor*>(server);
 	if (s != 0) 
@@ -309,7 +309,7 @@ void TACO::Motor::Motor::moveToReference(void) throw (::TACO::Exception)
 {
 }
 
-void TACO::Motor::Motor::tacoMoveReference(::TACO::Server *server, void *, void *) throw (::TACO::Exception)
+void TACO::Motor::Motor::tacoMoveReference(::TACO::Server *server, DevArgument, DevArgument) throw (::TACO::Exception)
 {
 	Motor *s = dynamic_cast<Motor*>(server);
 	if (s != 0) 
@@ -325,7 +325,7 @@ DevDouble TACO::Motor::Motor::acceleration(void) throw (::TACO::Exception)
 	return m_motor->acceleration();
 }
 
-void TACO::Motor::Motor::tacoAcceleration(::TACO::Server *server, void *, void *argout) throw (::TACO::Exception)
+void TACO::Motor::Motor::tacoAcceleration(::TACO::Server *server, DevArgument, DevArgument argout) throw (::TACO::Exception)
 {
 	Motor *s = dynamic_cast<Motor*>(server);
 	if (s != 0) 
@@ -341,7 +341,7 @@ void TACO::Motor::Motor::setAcceleration(DevDouble input) throw (::TACO::Excepti
 	m_motor->setAcceleration(input);
 }
 
-void TACO::Motor::Motor::tacoSetAcceleration(::TACO::Server *server, void *argin, void *) throw (::TACO::Exception)
+void TACO::Motor::Motor::tacoSetAcceleration(::TACO::Server *server, DevArgument argin, DevArgument) throw (::TACO::Exception)
 {
 	Motor *s = dynamic_cast<Motor*>(server);
 	if (s != 0) 
@@ -357,7 +357,7 @@ void TACO::Motor::Motor::setUnit(const std::string &input) throw (::TACO::Except
 	m_motor->setUnit(input);
 }
 
-void TACO::Motor::Motor::tacoSetUnit(::TACO::Server *server, void *argin, void *) throw (::TACO::Exception)
+void TACO::Motor::Motor::tacoSetUnit(::TACO::Server *server, DevArgument argin, DevArgument) throw (::TACO::Exception)
 {
 	Motor *s = dynamic_cast<Motor*>(server);
 	if (s != 0) 
@@ -373,7 +373,7 @@ DevDouble TACO::Motor::Motor::backlash(void) throw (::TACO::Exception)
 	return m_motor->backlash();
 }
 
-void TACO::Motor::Motor::tacoReadBacklash(::TACO::Server *server, void *, void *argout) throw (::TACO::Exception)
+void TACO::Motor::Motor::tacoReadBacklash(::TACO::Server *server, DevArgument, DevArgument argout) throw (::TACO::Exception)
 {
 	Motor *s = dynamic_cast<Motor*>(server);
 	if (s != 0) 
@@ -389,7 +389,7 @@ void TACO::Motor::Motor::setBacklash(DevDouble input) throw (::TACO::Exception)
 	m_motor->setBacklash(input);
 }
 
-void TACO::Motor::Motor::tacoSetBacklash(::TACO::Server *server, void *argin, void *) throw (::TACO::Exception)
+void TACO::Motor::Motor::tacoSetBacklash(::TACO::Server *server, DevArgument argin, DevArgument) throw (::TACO::Exception)
 {
 	Motor *s = dynamic_cast<Motor*>(server);
 	if (s != 0) 
@@ -405,7 +405,7 @@ std::string TACO::Motor::Motor::unit(void ) throw (::TACO::Exception)
 	return m_motor->unit();
 }
 
-void TACO::Motor::Motor::tacoUnit(::TACO::Server *server, void *, void *argout) throw (::TACO::Exception)
+void TACO::Motor::Motor::tacoUnit(::TACO::Server *server, DevArgument, DevArgument argout) throw (::TACO::Exception)
 {
 	Motor *s = dynamic_cast<Motor*>(server);
 	if (s != 0) 
