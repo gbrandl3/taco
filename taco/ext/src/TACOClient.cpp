@@ -23,6 +23,7 @@
 
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 #include <TACOBasicCommands.h>
 #include <TACOConverters.h>
@@ -45,7 +46,7 @@ TACO::Client::Client( const std::string& name, DevLong access, bool connect) thr
 	: mDeviceHandle( 0), 
 	  mName( name), 
 	  mAccess( access), 
-	  mAutoConnect( true), 
+	  mAutoConnect( connect), 
           mAutoDeviceOn( true),
 	  mPseudo(false),
 	  mConnected(false)
@@ -150,40 +151,16 @@ void TACO::Client::connectClient() throw (::TACO::Exception)
 	DevLong dc_error;
 	std::string	sTemp = mName;
 
-	db_devinfo_call info;
-	std::string nethost_save = "";
-	
-	if (db_info.conf)
-		nethost_save = db_info.conf->server_host;
+	int num = std::count(sTemp.begin(), sTemp.end(), '/');
+	if (num != 2 && !(num == 5 && sTemp.substr(0, 2) == "//"))
+		throw ::TACO::Exception(::TACO::Error::INVALID_VALUE, "device name is not correct : " + sTemp);
 
-	std::string nethost = "";
-	char *tmp = getenv("NETHOST");
-	if (tmp)
-		nethost = tmp;	
-	
-	if (sTemp.substr(0, 2) == "//")
-	{
-		std::string::size_type n_pos = sTemp.find('/', 2);
-		nethost = sTemp.substr(2, n_pos - 2);
-		sTemp.erase(0, n_pos + 1);
-	}
-	else if (nethost.size())
-// normalise the device name
-		mName = "//" + nethost + "/" + sTemp;
-	if (db_ChangeDefaultNethost(const_cast<char *>(nethost.c_str()), &e))
-	{
-		mDeviceHandle = 0;
-		mConnected = false;
-		throw ::TACO::Exception(e);
-	}
+	db_devinfo_call info;
+
 	if (db_deviceinfo(const_cast<char *>(sTemp.c_str()), &info, &e) != DS_OK)
 	{
 		mDeviceHandle = 0;
 		mConnected = false;
-		if (nethost_save != "" && db_ChangeDefaultNethost(const_cast<char *>(nethost_save.c_str()), &e))
-		{
-			throw ::TACO::Exception(e);
-		}
 		throw ::TACO::Exception(e);
 	}
 	mPseudo = info.device_type != DB_Device;
@@ -194,20 +171,16 @@ void TACO::Client::connectClient() throw (::TACO::Exception)
 		mConnected = dc_import(&m_dc, 1, &e) == DS_OK;
 	}
 	else
-	mConnected =  dev_import( const_cast<char*>(mName.c_str()), mAccess, &mDeviceHandle, &e) == DS_OK;
+		mConnected =  dev_import( const_cast<char*>(mName.c_str()), mAccess, &mDeviceHandle, &e) == DS_OK;
 	if (!mConnected)
 	{
 		mDeviceHandle = 0;
-		if (nethost_save != "" && db_ChangeDefaultNethost(const_cast<char *>(nethost_save.c_str()), &e))
-		{
-			throw ::TACO::Exception(e);
-		}
 		throw ::TACO::Exception(e);
 	}
 	setClientNetworkProtocol(TCP);
 
 
-	// Query the types of the server device and check them
+// Query the types of the server device and check them
 	try 
 	{
 		if (mPseudo)
@@ -236,7 +209,7 @@ void TACO::Client::connectClient() throw (::TACO::Exception)
 			executeCore( ::TACO::Command::DEVICE_TYPES, 0, D_VOID_TYPE, output.address(), output.type());
 			std::vector<std::string> serverTypes( output.object());
 			std::vector<std::string>::const_iterator i( serverTypes.begin());
-			// mServerTypes is cleared by disconnectClient()
+// mServerTypes is cleared by disconnectClient()
 			while (i != serverTypes.end()) {
 				mServerTypes.insert( *i++);
 			}
@@ -245,13 +218,7 @@ void TACO::Client::connectClient() throw (::TACO::Exception)
 	} 
 	catch (::TACO::Exception) 
 	{
-		// Ignore this exception, because the old servers do not support device types
-		if (nethost_save != "" && db_ChangeDefaultNethost(const_cast<char *>(nethost_save.c_str()), &e))
-		{
-			mDeviceHandle = 0;
-			mConnected = false;
-			throw ::TACO::Exception(e);
-		}
+// Ignore this exception, because the old servers do not support device types
 	}
 }
 
@@ -292,11 +259,11 @@ TACO::NetworkProtocol TACO::Client::clientNetworkProtocol() throw (::TACO::Excep
 		return TCP;
 	NetworkProtocol protocol = static_cast<NetworkProtocol>( mDeviceHandle->rpc_protocol);
 	switch (protocol) {
-	case UDP:
-	case TCP:
-		return protocol;
-	default:
-		throw ::TACO::Exception( ::TACO::Error::INTERNAL_ERROR, "unknown network protocol");
+		case UDP:
+		case TCP:
+			return protocol;
+		default:
+			throw ::TACO::Exception( ::TACO::Error::INTERNAL_ERROR, "unknown network protocol");
 	}
 }
 
