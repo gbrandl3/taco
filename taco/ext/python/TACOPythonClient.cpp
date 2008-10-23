@@ -23,10 +23,11 @@
 #ifdef HAVE_FSTAT
 #undef HAVE_FSTAT
 #endif
+
 #include <Python.h>
 
 #ifndef HAVE_PY_SSIZE_T
-typedef int Py_ssize_t;
+typedef ssize_t Py_ssize_t;
 #endif
 
 #include "TACOClient.h"
@@ -36,7 +37,11 @@ typedef int Py_ssize_t;
 class TACOClient : public TACO::Client
 {
 public:
-	TACOClient( const std::string& name, long access = 0, bool connect = true) : TACO::Client(name, access, connect) {}
+	TACOClient( const std::string& name, long access = 0, bool connect = true) 
+		: TACO::Client(name, access, connect) 
+	{
+		printf("name = %s, access = %ld, connect = %d\n", name.c_str(), access, int(connect));
+	}
 	
 	void execute(long cmd, void *argin, long in_type, void *argout, long out_type)
 	{
@@ -44,11 +49,13 @@ public:
 	}
 };
 
+// staticforward PyTypeObject TACOClientType;
+
 typedef struct 
 {
 	PyObject_HEAD
-	TACOClient	*m_Client;
-	TACO::CommandInfoMap *m_CmdInfo; 
+	TACOClient		*m_Client;
+	TACO::CommandInfoMap 	*m_CmdInfo; 
 } TACOClientObject;
 
 extern "C"
@@ -558,7 +565,11 @@ static PyObject *TACOClient_isDeviceOff(PyObject *self, PyObject *args)
 	{
 		try
 		{
+#if PYTHON_API_VERSION >= 1012
 			return PyBool_FromLong(p->m_Client->deviceState() == TACO::State::DEVICE_OFF);
+#else
+			return PyInt_FromLong(p->m_Client->deviceState() == TACO::State::DEVICE_OFF);
+#endif
 		}
 		catch (const TACO::Exception &e)
 		{
@@ -571,7 +582,15 @@ static PyObject *TACOClient_isDeviceOff(PyObject *self, PyObject *args)
 	return NULL;
 }
 
+static void TACOClient_del(PyObject *self);
+static PyObject *TACOClient_new(
+#if PYTHON_API_VERSION > 1010
+	PyTypeObject *type, 
+#endif
+	PyObject *args, PyObject *kw);
+
 static struct PyMethodDef TACOClient_methods[] = {
+	{"new_Client", TACOClient_new, METH_VARARGS, ""},
 	{"execute", TACOClient_execute, METH_VARARGS, "commandNumber, input = None\n\n"
 			"Multipurpose method for direct command execution.\n"
 			"commandNumber - the command number of the desired command.\n"
@@ -627,12 +646,11 @@ static PyObject *TACOClient_getattr(PyObject *self, char *name)
 	return Py_FindMethod(TACOClient_methods, self, name);
 }
 
-static void TACOClient_del(PyObject *self);
-static PyObject *TACOClient_new(PyTypeObject *type, PyObject *args, PyObject *kw);
-
 static char TACOClient_doc[] =
-PyDoc_STR("Client(devicename) --> a TACO client object\n\n" 
-"devicename - name of the TACO device\n\n"
+PyDoc_STR("Client(devicename, access = 0, connect = 1) --> a TACO client object\n\n" 
+"devicename - name of the TACO device\n"
+"access - access level\n"
+"connect - automatic connect 1(yes) or 0(no)\n"
 "Basic TACO client class for the devices at the FRM-II.\n"
 "This is a base class for TACO client. It provides standard methods which are\n"
 "supported by every reasonable device. You have also direct access to the device\n"
@@ -652,46 +670,60 @@ static PyObject *TACOClient_alloc(PyTypeObject *type, Py_ssize_t nitems)
 
 static PyTypeObject TACOClientType = {
 	PyObject_HEAD_INIT(&PyType_Type)	
-	0,					// obj_size
-	"TACOClient.Client",			// tp_name
-	sizeof(TACOClientObject),		// tp_basicsize
-	0,					// tp_itemsize
-	(destructor)	TACOClient_del,		// tp_dealloc
-	(printfunc)	0,			// tp_print
-	(getattrfunc)	TACOClient_getattr,	// tp_getattr
-	(setattrfunc)	0,			// tp_setattr
-	(cmpfunc)	0,			// tp_cmp
-	(reprfunc)	0,			// tp_repr
-	0,					// tp_as_number
-	0,					// tp_as_sequence
-	0,					// tp_as_mapping
-	(hashfunc)	0,			// tp_hash
-	(ternaryfunc)	0,			// tp_call
-	(reprfunc)TACOClient_str,		// tp_str
-	PyObject_GenericGetAttr,                // tp_getattro 
-        0,                                      // tp_setattro 
-        0,                                      // tp_as_buffer 
-        Py_TPFLAGS_DEFAULT | Py_TPFLAGS_CHECKTYPES |
-        Py_TPFLAGS_BASETYPE,                    // tp_flags 
-        TACOClient_doc,                         // tp_doc 
-        0,                                      // tp_traverse 
-        0,                                      // tp_clear 
-        0, //(richcmpfunc)time_richcompare,     // tp_richcompare 
-        0,                                      // tp_weaklistoffset 
-        0,                                      // tp_iter 
-        0,                                      // tp_iternext 
-        TACOClient_methods,                     // tp_methods 
-        0,                                      // tp_members 
-        0, //time_getset,                       // tp_getset 
-        0,                                      // tp_base 
-        0,                                      // tp_dict 
-        0,                                      // tp_descr_get 
-        0,                                      // tp_descr_set 
-        0,                                      // tp_dictoffset 
-        0,                                      // tp_init 
-        TACOClient_alloc,                       // tp_alloc 
-        TACOClient_new,                   	// tp_new 
-        0,                                      // tp_free 
+	ob_size : 0,				// obj_size
+	tp_name : "TACOClient.Client",		// tp_name
+	tp_basicsize : sizeof(TACOClientObject),// tp_basicsize
+	tp_itemsize : 0,			// tp_itemsize
+	tp_dealloc : (destructor)TACOClient_del,// tp_dealloc
+	tp_print : (printfunc)0,		// tp_print
+	tp_getattr : (getattrfunc)TACOClient_getattr,	// tp_getattr
+	tp_setattr : (setattrfunc)0,		// tp_setattr
+#if PYTHON_API_VERSION == 1009
+	tp_compare : 0,
+#else
+	tp_cmp : (cmpfunc)0,			// tp_cmp
+#endif
+	tp_repr : (reprfunc)0,			// tp_repr
+	tp_as_number : 0,			// tp_as_number
+	tp_as_sequence : 0,			// tp_as_sequence
+	tp_as_mapping : 0,			// tp_as_mapping
+	tp_hash : (hashfunc)0,			// tp_hash
+	tp_call : (ternaryfunc)0,		// tp_call
+	tp_str : (reprfunc)TACOClient_str,	// tp_str
+#if PYTHON_API_VERSION >= 1012 
+	tp_getattro : PyObject_GenericGetAttr,  // tp_getattro 
+#else
+	tp_getattro : 0,
+#endif
+        tp_setattro : 0,                        // tp_setattro
+        tp_as_buffer : 0,                       // tp_as_buffer
+        tp_flags : Py_TPFLAGS_DEFAULT 
+#if PYTHON_API_VERSION > 1009 
+	| Py_TPFLAGS_CHECKTYPES 
+        | Py_TPFLAGS_BASETYPE
+#endif
+	,                    			// tp_flags 
+        tp_doc : TACOClient_doc,                // tp_doc 
+        tp_traverse : 0,                        // tp_traverse 
+        tp_clear : 0,                           // tp_clear 
+#if PYTHON_API_VERSION > 1009
+        tp_richcompare : 0, //(richcmpfunc)time_richcompare,     // tp_richcompare 
+        tp_tweaklistoffset : 0,                 // tp_weaklistoffset 
+        tp_iter : 0,                            // tp_iter 
+        tp_iternext : 0,                        // tp_iternext 
+        tp_methods : TACOClient_methods,        // tp_methods 
+        tmp_members : 0,                        // tp_members 
+        tp_getset : 0, //time_getset,           // tp_getset 
+        tp_base : 0,                            // tp_base 
+        tp_dict : 0,                            // tp_dict 
+        tp_descr_get : 0,                       // tp_descr_get 
+        tp_descr_set : 0,                       // tp_descr_set 
+        tp_dictoffset : 0,                      // tp_dictoffset 
+        tp_init : 0,                            // tp_init 
+        tp_alloc : TACOClient_alloc,            // tp_alloc 
+        tp_new : TACOClient_new,                // tp_new 
+        tp_free : 0,                            // tp_free 
+#endif
 };
 
 static PyObject *TACOClient_deviceQueryResourceInfo(PyObject *self, PyObject *args)
@@ -779,21 +811,37 @@ static void TACOClient_del(PyObject *self)
 	delete ((TACOClientObject *)self)->m_CmdInfo;
 }
 
-static char *TACOClient_kws[] = {(char*)"devicename", NULL};
+static char *TACOClient_kws[] = {(char*)"devicename", 
+				 (char*)"access",
+				 (char*)"connect",
+				NULL};
 
-static PyObject *TACOClient_new(PyTypeObject *type, PyObject *args, PyObject *kw)
+static PyObject *TACOClient_new(
+#if PYTHON_API_VERSION > 1010
+	PyTypeObject *type,
+#endif
+	PyObject *args, PyObject *kw)
 {
 	char	*name;
-	if (!PyArg_ParseTupleAndKeywords(args, kw, "s", TACOClient_kws, &name))
-		return NULL;
+	long	access = 0;
+	int	connect = 1;
 
 	TACOClientObject *self = NULL;
-
+#if PYTHON_API_VERSION > 1009
+	if (!PyArg_ParseTupleAndKeywords(args, kw, (char *)"s|li", TACOClient_kws, &name, &access, &connect))
+		return NULL;
 	self = (TACOClientObject *)(type->tp_alloc(type, 1));
+#else
+	if (!PyArg_ParseTuple(args, (char *)"s|li", &name, &access, &connect))
+		return NULL;
+	self = PyObject_New(TACOClientObject, &TACOClientType);
+#endif
+	connect = !!connect;
 	if (self)
 		try
 		{
-			self->m_Client = new TACOClient(name);
+			printf("name = %s, access = %ld, connect = %d\n", name, access, connect);
+			self->m_Client = new TACOClient(name, access, bool(connect));
 			self->m_CmdInfo = new TACO::CommandInfoMap();
 			TACO::CommandInfoMap info = self->m_Client->deviceQueryCommandInfo();
 			*(self->m_CmdInfo) = info;
@@ -802,7 +850,7 @@ static PyObject *TACOClient_new(PyTypeObject *type, PyObject *args, PyObject *kw
 		{
 			PyErr_SetString(TACOError, e.what());
 			long	err = e;
-			PyObject_SetAttrString(TACOError, "errcode", Py_BuildValue("i", err));
+			PyObject_SetAttrString(TACOError, (char *)"errcode", Py_BuildValue((char *)"i", err));
 			return NULL;
 		}
 	return (PyObject *)self;
@@ -812,12 +860,12 @@ static PyObject *TACOClient_sync(PyObject *self, PyObject *args)
 {
 	struct timeval t = {0, 0};
 	DevLong		err;
-	if (!PyArg_ParseTuple(args, "l|l", &t.tv_sec, &t.tv_usec))
+	if (!PyArg_ParseTuple(args, (char *)"l|l", &t.tv_sec, &t.tv_usec))
 		return NULL;
 	if (dev_synch(&t, &err) != DS_OK)
 	{
 		PyErr_SetString(TACOError, TACO::errorString(err).c_str());
-		PyObject_SetAttrString(TACOError, "errcode", PyLong_FromLong(err));
+		PyObject_SetAttrString(TACOError, (char *)"errcode", PyLong_FromLong(err));
 		return NULL;
 	}
 	Py_INCREF(Py_None);
@@ -828,7 +876,7 @@ static PyObject *TACOClient_sync(PyObject *self, PyObject *args)
 static PyObject *TACOClient_unlisten(PyObject *self, PyObject *args)
 {
 	long eventID;
-	if (!PyArg_ParseTuple(args, "l", &eventID))
+	if (!PyArg_ParseTuple(args, (char *)"l", &eventID))
 		return NULL;
 #if 0
 	
@@ -843,114 +891,116 @@ static struct PyMethodDef TACOClientType_methods [] = {
 //							"This is a base class for TACO client. It provides standard methods which are\n"
 //							"supported by every reasonable device. You have also direct access to the device\n"
 //							"commands via the 'execute()' method."},
-	{"sync", TACOClient_sync, METH_VARARGS, "seconds, microseconds\n\nthis function sync's the callbacks for the events"},
-	{"unlisten", TACOClient_unlisten, METH_VARARGS, "eventId - event Id to unregister\n\nunregisters an event"},
+	{(char *)"sync", TACOClient_sync, METH_VARARGS, (char *)"seconds, microseconds\n\nthis function sync's the callbacks for the events"},
+	{(char *)"unlisten", TACOClient_unlisten, METH_VARARGS, (char *)"eventId - event Id to unregister\n\nunregisters an event"},
 	{NULL, NULL},
 };
 
 void initTACOClient(int i)
 {
-	PyObject 	*m = Py_InitModule3("TACOClient", TACOClientType_methods, "This modules contains the Client class for the FRM-II TACO devices"),
+	PyObject 	*m = Py_InitModule3((char *)"TACOClient", TACOClientType_methods, (char *)"This modules contains the Client class for the FRM-II TACO devices"),
 			*d,
 			*tmp;
 	DevLong		e;
 
 	db_import(&e);
 
+#if PYTHON_API_VERSION > 1010
 	if (PyType_Ready(&TACOClientType) < 0)
 		return;
+#endif
 
 	Py_INCREF(&TACOClientType);
-        PyModule_AddObject(m, "Client", reinterpret_cast<PyObject *>(&TACOClientType));
+        PyModule_AddObject(m, (char *)"Client", reinterpret_cast<PyObject *>(&TACOClientType));
 
 	TACOError = PyErr_NewException((char *)"TACOClient.TACOError", NULL, NULL);
 	Py_INCREF(TACOError);
-	PyModule_AddObject(m, "TACOError", TACOError);
+	PyModule_AddObject(m, (char *)"TACOError", TACOError);
 
 	d = PyModule_GetDict(m);
 	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_ON)) != NULL)
 	{
-		PyDict_SetItemString(d, "DEVICE_ON", tmp);
+		PyDict_SetItemString(d, (char *)"DEVICE_ON", tmp);
 		Py_DECREF(tmp);
 	}
 	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_OFF)) != NULL)
 	{
-		PyDict_SetItemString(d, "DEVICE_OFF", tmp);
+		PyDict_SetItemString(d, (char *)"DEVICE_OFF", tmp);
 		Py_DECREF(tmp);
 	}
 	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_RESET)) != NULL)
 	{
-		PyDict_SetItemString(d, "DEVICE_RESET", tmp);
+		PyDict_SetItemString(d, (char *)"DEVICE_RESET", tmp);
 		Py_DECREF(tmp);
 	}
 	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_STATE)) != NULL)
 	{
-		PyDict_SetItemString(d, "DEVICE_STATE", tmp);
+		PyDict_SetItemString(d, (char *)"DEVICE_STATE", tmp);
 		Py_DECREF(tmp);
 	}
 	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_STATUS)) != NULL)
 	{
-		PyDict_SetItemString(d, "DEVICE_STATUS", tmp);
+		PyDict_SetItemString(d, (char *)"DEVICE_STATUS", tmp);
 		Py_DECREF(tmp);
 	}
 	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_VERSION)) != NULL)
 	{
-		PyDict_SetItemString(d, "DEVICE_VERSION", tmp);
+		PyDict_SetItemString(d, (char *)"DEVICE_VERSION", tmp);
 		Py_DECREF(tmp);
 	}
 	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_TYPES)) != NULL)
 	{
-		PyDict_SetItemString(d, "DEVICE_TYPES", tmp);
+		PyDict_SetItemString(d, (char *)"DEVICE_TYPES", tmp);
 		Py_DECREF(tmp);
 	}
 	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_QUERY_RESOURCE)) != NULL)
 	{
-		PyDict_SetItemString(d, "DEVICE_QUERY_RESOURCE", tmp);
+		PyDict_SetItemString(d, (char *)"DEVICE_QUERY_RESOURCE", tmp);
 		Py_DECREF(tmp);
 	}
 	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_UPDATE_RESOURCE)) != NULL)
 	{
-		PyDict_SetItemString(d, "DEVICE_UPDATE_RESOURCE", tmp);
+		PyDict_SetItemString(d, (char *)"DEVICE_UPDATE_RESOURCE", tmp);
 		Py_DECREF(tmp);
 	}
 	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_UPDATE)) != NULL)
 	{
-		PyDict_SetItemString(d, "DEVICE_UPDATE", tmp);
+		PyDict_SetItemString(d, (char *)"DEVICE_UPDATE", tmp);
 		Py_DECREF(tmp);
 	}
 	if ((tmp = PyLong_FromLong(TACO::Command::DEVICE_QUERY_RESOURCE_INFO)) != NULL)
 	{
-		PyDict_SetItemString(d, "DEVICE_QUERY_RESOURCE_INFO", tmp);
+		PyDict_SetItemString(d, (char *)"DEVICE_QUERY_RESOURCE_INFO", tmp);
 		Py_DECREF(tmp);
 	}
 	if ((tmp = PyLong_FromLong(D_UDP)) != NULL)
 	{
-		PyDict_SetItemString(d, "UDP", tmp);
+		PyDict_SetItemString(d, (char *)"UDP", tmp);
 		Py_DECREF(tmp);
 	}
 	if ((tmp = PyLong_FromLong(D_TCP)) != NULL)
 	{
-		PyDict_SetItemString(d, "TCP", tmp);
+		PyDict_SetItemString(d, (char *)"TCP", tmp);
 		Py_DECREF(tmp);
 	}
 	if ((tmp = PyString_FromString("Jens Krueger")) != NULL)
 	{
-		PyDict_SetItemString(d, "__author__", tmp);
+		PyDict_SetItemString(d, (char *)"__author__", tmp);
 		Py_DECREF(tmp);
 	}
-	if ((tmp = PyString_FromString("$Revision: 1.3 $")) != NULL)
+	if ((tmp = PyString_FromString("$Revision: 1.4 $")) != NULL)
 	{
-		PyDict_SetItemString(d, "__revision__", tmp);
+		PyDict_SetItemString(d, (char *)"__revision__", tmp);
 		Py_DECREF(tmp);
 	}
-	if ((tmp = PyString_FromString("$Date: 2008-10-16 18:22:32 $")) != NULL)
+	if ((tmp = PyString_FromString("$Date: 2008-10-23 10:24:03 $")) != NULL)
 	{
-		PyDict_SetItemString(d, "__date__", tmp);
+		PyDict_SetItemString(d, (char *)"__date__", tmp);
 		Py_DECREF(tmp);
 	}
 	if ((tmp = PyString_FromString("jens dot krueger add frm2 dot tum dot de")) != NULL)
 	{
-		PyDict_SetItemString(d, "__email__", tmp);
+		PyDict_SetItemString(d, (char *)"__email__", tmp);
 		Py_DECREF(tmp);
 	}
 }

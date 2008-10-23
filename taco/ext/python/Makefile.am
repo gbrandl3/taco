@@ -29,7 +29,8 @@ pyexec_LTLIBRARIES 	= _TACOStates.la _TACOClient.la
 
 nodist__TACOStates_la_SOURCES = wrap_TACOStates.cpp 
 
-nodist__TACOClient_la_SOURCES = wrap_TACOClient.cpp TACOPythonClientConverters.cpp
+nodist__TACOClient_la_SOURCES = wrap_TACOClient.cpp 
+_TACOClient_la_SOURCES	= TACOPythonClientConverters.cpp
 
 _TACOClient_la_LDFLAGS 	= -avoid-version -module
 _TACOClient_la_LIBADD  	= @LIB_STDCXX@ ../src/libTACOExtensions.la

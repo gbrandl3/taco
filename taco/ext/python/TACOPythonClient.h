@@ -4,6 +4,10 @@
 #include <pthread.h>
 
 #include <Python.h>
+#if PYTHON_API_VERSION == 1009
+typedef ssize_t Py_ssize_t;
+#define PyDoc_STR(str)	str
+#endif
 
 //! Contains the %TACO Python client stuff
 namespace TACOPythonClient {
