@@ -358,6 +358,12 @@ void TACO::Client::deviceReset() throw (::TACO::Exception)
 		return execute<void>( ::TACO::Command::DEVICE_RESET);
 }
 
+void TACO::Client::deviceInit() throw (::TACO::Exception)
+{
+	if (!mPseudo)
+		return execute<void>( ::TACO::Command::DEVICE_INIT);
+}
+
 short TACO::Client::deviceState() throw (::TACO::Exception)
 {
 	if (mPseudo)

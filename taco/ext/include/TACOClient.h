@@ -309,6 +309,14 @@ public:
 	virtual void deviceReset() throw (::TACO::Exception);
 
 	/**
+	 * Inits the device.
+	 *
+	 * @exception Unknown
+	 * The errors vary from server to server.
+	 */
+	virtual void deviceInit() throw (::TACO::Exception);
+
+	/**
 	 * Returns the device state.
 	 *
 	 * @exception Unknown

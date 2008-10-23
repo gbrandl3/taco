@@ -30,18 +30,19 @@ log4cpp::Category       *logStream;
 
 #include <private/ApiP.h>
 
-std::string TACO::Server::sServerName = multi_nethost[default_nethost].config_flags.server_name;
+std::string TACO::Server::sServerName;
 std::string TACO::Server::sStringBuffer;
 
 TACO::Server::Server( const std::string& name, DevLong& error) throw (TACO::Exception)
 	: Device(const_cast<char *>(name.c_str()), &error)
 	, mInitialized( false) 
 	, mName( name) 
-	, mVersion( "unknown")
+	, mVersion( VERSION)
 	, mAlwaysAllowDeviceUpdate( false)
 {
 	addCommand( Command::DEVICE_ON, &tacoDeviceOn, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "Device On");
 	addCommand( Command::DEVICE_OFF, &tacoDeviceOff, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "Device Off");
+	addCommand( Command::DEVICE_INIT, &tacoDeviceInit, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "Device Init");
 	addCommand( Command::DEVICE_RESET, &tacoDeviceReset, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "Device Reset");
 	addCommand( Command::DEVICE_STATE, &tacoDeviceState, D_VOID_TYPE, D_SHORT_TYPE, READ_ACCESS, "Device State");
 	addCommand( Command::DEVICE_STATUS, &tacoDeviceStatus, D_VOID_TYPE, D_VAR_CHARARR, READ_ACCESS, "Device Status");
@@ -221,6 +222,10 @@ void TACO::Server::deviceOff() throw (TACO::Exception)
 	setDeviceState( State::DEVICE_OFF);
 }
 
+void TACO::Server::deviceInit() throw (TACO::Exception)
+{
+}
+
 void TACO::Server::deviceReset() throw (TACO::Exception)
 {
 	deviceOff();
@@ -258,11 +263,9 @@ void TACO::Server::deviceUpdate() throw (TACO::Exception)
 
 std::string TACO::Server::serverName() throw (TACO::Exception)
 {
-	if (sServerName.empty()) {
-		throw Exception( Error::INTERNAL_ERROR, "server name not initialized");
-	} else {
-		return sServerName;
-	}
+	if (sServerName.empty()) 
+		sServerName = multi_nethost[0].config_flags.server_name;
+	return sServerName;
 }
 
 void TACO::Server::setServerName(const std::string &serverName) throw (::TACO::Exception)
@@ -318,42 +321,47 @@ void TACO::Server::addResource(
 	logStream->debugStream() << "add resource " << name << log4cpp::eol;
 }
 
-void TACO::Server::tacoDeviceOn( TACO::Server* server, void* argin, void* argout) throw (TACO::Exception)
+void TACO::Server::tacoDeviceOn( TACO::Server* server, DevArgument argin, DevArgument argout) throw (TACO::Exception)
 {
 	server->deviceOn();
 }
 
-void TACO::Server::tacoDeviceOff( TACO::Server* server, void* argin, void* argout) throw (TACO::Exception)
+void TACO::Server::tacoDeviceOff( TACO::Server* server, DevArgument argin, DevArgument argout) throw (TACO::Exception)
 {
 	server->deviceOff();
 }
 
-void TACO::Server::tacoDeviceReset( TACO::Server* server, void* argin, void* argout) throw (TACO::Exception)
+void TACO::Server::tacoDeviceInit( TACO::Server *server, DevArgument argin, DevArgument argout) throw (TACO::Exception)
+{
+	server->deviceInit();
+}
+
+void TACO::Server::tacoDeviceReset( TACO::Server* server, DevArgument argin, DevArgument argout) throw (TACO::Exception)
 {
 	server->deviceReset();
 }
 
-void TACO::Server::tacoDeviceState( TACO::Server* server, void* argin, void* argout) throw (TACO::Exception)
+void TACO::Server::tacoDeviceState( TACO::Server* server, DevArgument argin, DevArgument argout) throw (TACO::Exception)
 {
 	assign( static_cast<DevShort*>( argout), server->deviceState());
 }
 
-void TACO::Server::tacoDeviceStatus( TACO::Server* server, void* argin, void* argout) throw (TACO::Exception)
+void TACO::Server::tacoDeviceStatus( TACO::Server* server, DevArgument argin, DevArgument argout) throw (TACO::Exception)
 {
 	assign( static_cast<DevVarCharArray*>( argout), server->deviceStatus());
 }
 
-void TACO::Server::tacoDeviceVersion( TACO::Server* server, void* argin, void* argout) throw (TACO::Exception)
+void TACO::Server::tacoDeviceVersion( TACO::Server* server, DevArgument argin, DevArgument argout) throw (TACO::Exception)
 {
 	assign( static_cast<DevVarCharArray*>( argout), server->deviceVersion());
 }
 
-void TACO::Server::tacoDeviceTypes( TACO::Server* server, void* argin, void* argout) throw (TACO::Exception)
+void TACO::Server::tacoDeviceTypes( TACO::Server* server, DevArgument argin, DevArgument argout) throw (TACO::Exception)
 {
 	assign( static_cast<DevVarStringArray*>( argout), server->deviceTypes());
 }
 
-void TACO::Server::tacoDeviceQueryResource( TACO::Server* server, void* argin, void* argout) throw (TACO::Exception)
+void TACO::Server::tacoDeviceQueryResource( TACO::Server* server, DevArgument argin, DevArgument argout) throw (TACO::Exception)
 {
 	std::string resourceName( convert( static_cast<DevVarCharArray*>( argin)));
 
@@ -382,7 +390,7 @@ void TACO::Server::tacoDeviceQueryResource( TACO::Server* server, void* argin, v
 	assign( static_cast<DevVarCharArray*>( argout), sStringBuffer);
 }
 
-void TACO::Server::tacoDeviceUpdateResource( TACO::Server* server, void* argin, void* argout) throw (TACO::Exception)
+void TACO::Server::tacoDeviceUpdateResource( TACO::Server* server, DevArgument argin, DevArgument argout) throw (TACO::Exception)
 {
 	std::string input( convert( static_cast<DevVarCharArray*>( argin)));
 
@@ -414,13 +422,13 @@ void TACO::Server::tacoDeviceUpdateResource( TACO::Server* server, void* argin, 
 	}
 }
 
-void TACO::Server::tacoDeviceUpdate( TACO::Server* server, void* argin, void* argout) throw (TACO::Exception)
+void TACO::Server::tacoDeviceUpdate( TACO::Server* server, DevArgument argin, DevArgument argout) throw (TACO::Exception)
 {
 	// The empty string indicates a full device update
 	server->deviceUpdate( std::string());
 }
 
-void TACO::Server::tacoDeviceQueryResourceInfo( TACO::Server* server, void* argin, void* argout) throw (TACO::Exception)
+void TACO::Server::tacoDeviceQueryResourceInfo( TACO::Server* server, DevArgument argin, DevArgument argout) throw (TACO::Exception)
 {
 	sStringBuffer.erase();
 	sStringBuffer << server->mResourceInfoSet;

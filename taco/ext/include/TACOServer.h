@@ -73,6 +73,9 @@ public:
 	//! Resets the device
 	virtual void deviceReset() throw (Exception);
 
+	//! Inits the device
+	virtual void deviceInit() throw (Exception);
+
 	//! Returns the current device state
 	virtual short deviceState() throw (Exception);
 
@@ -505,37 +508,40 @@ private:
 	}
 
 	//! Device command function
-	static void tacoDeviceOn( Server* server, void* argin, void* argout) throw (Exception);
+	static void tacoDeviceOn( Server* server, DevArgument argin, DevArgument argout) throw (Exception);
 
 	//! Device command function
-	static void tacoDeviceOff( Server* server, void* argin, void* argout) throw (Exception);
+	static void tacoDeviceOff( Server* server, DevArgument argin, DevArgument argout) throw (Exception);
 
 	//! Device command function
-	static void tacoDeviceReset( Server* server, void* argin, void* argout) throw (Exception);
+	static void tacoDeviceReset( Server* server, DevArgument argin, DevArgument argout) throw (Exception);
 
 	//! Device command function
-	static void tacoDeviceState( Server* server, void* argin, void* argout) throw (Exception);
+	static void tacoDeviceInit( Server* server, DevArgument argin, DevArgument argout) throw (Exception);
 
 	//! Device command function
-	static void tacoDeviceStatus( Server* server, void* argin, void* argout) throw (Exception);
+	static void tacoDeviceState( Server* server, DevArgument argin, DevArgument argout) throw (Exception);
 
 	//! Device command function
-	static void tacoDeviceVersion( Server* server, void* argin, void* argout) throw (Exception);
+	static void tacoDeviceStatus( Server* server, DevArgument argin, DevArgument argout) throw (Exception);
 
 	//! Device command function
-	static void tacoDeviceTypes( Server* server, void* argin, void* argout) throw (Exception);
+	static void tacoDeviceVersion( Server* server, DevArgument argin, DevArgument argout) throw (Exception);
 
 	//! Device command function
-	static void tacoDeviceUpdateResource( Server* server, void* argin, void* argout) throw (Exception);
+	static void tacoDeviceTypes( Server* server, DevArgument argin, DevArgument argout) throw (Exception);
 
 	//! Device command function
-	static void tacoDeviceQueryResource( Server* server, void* argin, void* argout) throw (Exception);
+	static void tacoDeviceUpdateResource( Server* server, DevArgument argin, DevArgument argout) throw (Exception);
 
 	//! Device command function
-	static void tacoDeviceUpdate( Server* server, void* argin, void* argout) throw (Exception);
+	static void tacoDeviceQueryResource( Server* server, DevArgument argin, DevArgument argout) throw (Exception);
 
 	//! Device command function
-	static void tacoDeviceQueryResourceInfo( Server* server, void* argin, void* argout) throw (Exception);
+	static void tacoDeviceUpdate( Server* server, DevArgument argin, DevArgument argout) throw (Exception);
+
+	//! Device command function
+	static void tacoDeviceQueryResourceInfo( Server* server, DevArgument argin, DevArgument argout) throw (Exception);
 
 	//! Name of the server of this device
 	static std::string sServerName;
