@@ -30,9 +30,9 @@
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.18 $
+ * Version    :	$Revision: 1.19 $
  *
- * Date       :	$Date: 2008-10-22 08:22:12 $
+ * Date       :	$Date: 2008-10-23 05:25:49 $
  * 
  *-*******************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -133,8 +133,9 @@ extern nethost_info *multi_nethost;
  * @param res_num	The number of resource to be retrieved
  * @param perr 		The error code if any
  *
- * @return  	 In case of trouble, the function returns DS_NOTOK and sets the err variable
- *    		pointed to by "perr". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ *			to by "perr". 
+ * @retval DS_OK otherwise.
  */
 int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevLong *perr)
 {
@@ -1174,8 +1175,9 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevL
  * @param res_num  	The number of resource to be retrieved 
  * @param perr		The error code if any
  *
- * @return In case of trouble, the function returns DS_NOTOK and sets the err variable
- *    	 pointed to by "perr". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ *			to by "perr". 
+ * @retval DS_OK otherwise.
  */
 int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num, DevLong *perr)
 {
@@ -2202,8 +2204,9 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num, DevL
  * @param res_num       The number of resource to be deleted
  * @param perr 		The error code if any
  *
- * @return  In case of trouble, the function returns DS_NOTOK and sets the err variable
- *    		pointed to by "perr". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ *			to by "perr". 
+ * @retval DS_OK otherwise.
  *
  * @see db_delreslist
  */
@@ -2431,8 +2434,9 @@ int _DLLFunc db_delresource(char *dev_name, char **res_name, u_int res_num,  Dev
  * @param res_num  	The number of resource to be deleted
  * @param perr		The error code if any
  *
- * @return   In case of trouble, the function returns DS_NOTOK and sets the err variable
- *    		pointed to by "perr". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ *			to by "perr". 
+ * @retval DS_OK otherwise.
  *
  * @see db_delresource
  */
@@ -2623,9 +2627,9 @@ long _DLLFunc db_delreslist(char **res_list, long res_num, DevLong *perr)
  * @param num_dev	The number of deices for this device server
  * @param perr		The error code in case of problems
  *
- * @return In case of trouble, the function returns DS_NOTOK and sets the err variable
- * 	pointed to by "perr". Otherwise, the function returns DS_OK
- *
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ *			to by "perr". 
+ * @retval DS_OK otherwise.
  */
 int _DLLFunc db_getdevlist(char *name, char ***tab, u_int *num_dev, DevLong *perr)
 {
@@ -2839,8 +2843,9 @@ int _DLLFunc db_getdevlist(char *name, char ***tab, u_int *num_dev, DevLong *per
  * @param dev_num	The number of resource to be exported
  * @param perr		The error code if any
  *
- * @return   In case of trouble, the function returns DS_NOTOK and sets the err variable
- *    pointed to by "perr". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ *			to by "perr". 
+ * @retval DS_OK otherwise.
  *
  * @see db_dev_import
  */
@@ -3350,8 +3355,9 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num, DevLong *perr)
  *               	structure defines a device
  * @param perr		The error code in case of problems
  *
- * @return   In case of trouble, the function returns DS_NOTOK and sets the err variable
- *    	pointed to by "perr". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ *			to by "perr". 
+ * @retval DS_OK otherwise.
  *
  * @see db_dev_export
  */
@@ -3605,8 +3611,9 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev, DevLon
  * @param ds_netnam 	a string which contains the device server network name.
  * @param perr 		The error caode in case of trouble
  *
- * @return   In case of trouble, the function returns DS_NOTOK and sets the err variable
- *    pointed to by "perr". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK  In case of trouble, the function sets the err variable pointed 
+ *			to by "perr". 
+ * @retval DS_OK otherwise.
  */
 int _DLLFunc db_svc_unreg(char *ds_netnam,  DevLong *perr)
 {
@@ -3764,8 +3771,9 @@ int _DLLFunc db_svc_unreg(char *ds_netnam,  DevLong *perr)
  * @param pho_name	The host_name
  * @param perr		The error code in case of trouble
  *
- * @return   In case of trouble, the function returns DS_NOTOK and sets the err variable
- *    	pointed to by "perr". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ *			to by "perr". 
+ * @retval DS_OK otherwise.
  *
  */
 int _DLLFunc db_svc_check(char *ds_netname, char **pho_name, u_int *pp_num, u_int *pv_num, DevLong *perr)
@@ -3945,8 +3953,9 @@ int _DLLFunc db_svc_check(char *ds_netname, char **pho_name, u_int *pp_num, u_in
  * @param num_dev	The number of exported devices
  * @param perr		The error code in case of problems
  *
- * @return   In case of trouble, the function returns DS_NOTOK and sets the err variable
- *    pointed to by "perr". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ * 			to by "perr". 
+ * @retval DS_OK otherwise.
  */
 int _DLLFunc db_getdevexp(char *filter, char ***tab, u_int *num_dev, DevLong *perr)
 {
@@ -4417,8 +4426,8 @@ void kern_sort(char **tab,int n)
  *
  * @param filter the filter string				
  *
- * @return   This function returns DS_OK if the * is correctly used. Otherwise, the
- *    function returns DS_NOTOK						
+ * @retval DS_OK if the '*' is correctly used. 
+ * @retval DS_NOTOK Otherwise
  */
 int test_star(char *filter)
 {
@@ -4519,7 +4528,8 @@ int test_star(char *filter)
  * @param ptr The pointer to the array of exported device name strings.
  *   This pointer must have been initialized by a db_getdevexp function.
  *
- * @return DS_OK if no errors occurs or DS_NOTOK if a problem occurs
+ * @retval DS_OK if no errors occurs 
+ * @retval DS_NOTOK if a problem occurs
  * 
  * @see db_getdevexp
  */
@@ -4608,8 +4618,9 @@ int _DLLFunc db_freedevexp(char **ptr)
  * @param cmd_code	The command code
  * @param perr		The error code in case of trouble
  *
- * @return   In case of trouble, the function returns DS_NOTOK and sets the err variable
- *    	pointed to by "perr". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ *			to by "perr". 
+ * @retval DS_OK otherwise.
  */
 int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code, DevLong *perr)
 {
@@ -4745,8 +4756,9 @@ int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code, DevLong *perr)
  * @param event_code	The event code					
  * @param perr		The error caode in case of trouble
  *
- * @return   In case of trouble, the function returns DS_NOTOK and sets the err variable
- *    pointed to by "perr". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ *			to by "perr". 
+ * @retval DS_OK otherwise.
  */
 int _DLLFunc db_event_query(char *event_name, u_int *event_code,  DevLong *perr)
 {
@@ -4888,10 +4900,10 @@ int _DLLFunc db_event_query(char *event_name, u_int *event_code,  DevLong *perr)
  * @param num_psdev 	The pseudo devices number
  * @param p_err		The error code in case of failure
  *
- * @return   In case of major trouble, the function returns DS_NOTOK and sets the
- * 	error_code  variable of the error structure. In case of error for a
- *	pseudo device in the list, the function returns 1.
- *	Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of major trouble, the function sets the error_code 
+ *			variable of the error structure. In case of error for a
+ *			pseudo device in the list, the function returns 1.
+ * @retval DS_OK otherwise.
  *
  * @see db_psdev_unregister
  */
@@ -5091,10 +5103,10 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
  * @param num_psdev	The pseudo devices number
  * @param p_err		The error code in case of failure
  *
- * @return   In case of major trouble, the function returns DS_NOTOK and sets the
- * 	error_code  variable of the error structure. In case of error for a
- * 	pseudo device in the list, the function returns 1.			
- * 	Otherwise, the function returns DS_OK                			
+ * @retval DS_NOTOK In case of major trouble, the function sets the error_code  
+ *			variable of the error structure. In case of error for a
+ *			pseudo device in the list, the function returns 1.			
+ * @retval DS_OK otherwise.
  *
  * @see db_psdev_register
  */
@@ -5282,7 +5294,8 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
  *
  * @param perr	The error code
  * 
- * @return This function returns DS_OK if no errors occurs or DS_NOTOK if a problem occurs
+ * @retval DS_OK if no errors occurs 
+ * @retval DS_NOTOK if a problem occurs
  * 
  * @see db_import
  * @see db_svc_reopen
@@ -5371,7 +5384,8 @@ int _DLLFunc db_svc_close( DevLong *perr)
  * 
  * @param perr	The error code
  * 
- * @return This function returns DS_OK if no errors occurs or DS_NOTOK if a problem occurs
+ * @retval DS_OK if no errors occurs 
+ * @retval DS_NOTOK if a problem occurs
  *
  * @see db_import
  * @see db_svc_close

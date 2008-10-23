@@ -29,9 +29,9 @@
  *
  * Original:   	November 1996
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2008-04-06 09:07:01 $
+ * Date:	$Date: 2008-10-23 05:26:33 $
  *
  *****************************************************************************/
 
@@ -420,7 +420,8 @@ static long _asc_convert_intype ( const char *type_name, const char *str_in, voi
  * @param out_arg
  * @param str_err
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  *
  * @see dev_put_ascii
  */
@@ -715,7 +716,8 @@ long dev_get_ascii(char *dev_name, char *cmd_name, char **out_arg, char **str_er
  * @param in_arg
  * @param str_err
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  *
  * @see dev_putget_ascii
  * @see dev_put
@@ -1113,7 +1115,8 @@ long dev_put_ascii(char *dev_name, char *cmd_name, char *in_arg, char **str_err)
  * @param out_arg
  * @param str_err
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  *
  * @see dev_put_ascii
  * @see dev_putget
@@ -1720,7 +1723,8 @@ long dev_putget_ascii(char *dev_name, char *cmd_name, char *in_arg,
  * @param dev_name
  * @param str_err
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long dev_free_ascii(char *dev_name, char **str_err)
 {

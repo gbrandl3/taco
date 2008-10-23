@@ -27,9 +27,9 @@
  *
  * Original:    1993
  *
- * Version:     $Revision: 1.15 $
+ * Version:     $Revision: 1.16 $
  *
- * Date:        $Date: 2008-10-22 08:20:16 $
+ * Date:        $Date: 2008-10-23 05:26:24 $
  *
  *****************************************************************************/
 
@@ -84,8 +84,9 @@
  * @param dc_inf 	Pointer to where function result will be stored
  * @param error 	Pointer for error code
  *
- * @return  In case of trouble, the function returns DS_NOTOK and set the error variable
- *    	pointed to by "error". Otherwise, the function returns 0 
+ * @retval DS_NOTOK In case of trouble, the function sets the error variable 
+ *			pointed to by "error". 
+ * @retval DS_OK otherwise.
  */
 int dc_info(char *serv_name,servinf *dc_inf,DevLong *error)
 {
@@ -242,8 +243,9 @@ int dc_info(char *serv_name,servinf *dc_inf,DevLong *error)
  * @param dev_n		Pointer where the number of devices in the list will be stored
  * @param error 	Pointer for error code
  *
- * @return    In case of trouble, the function returns DS_NOTOK and sets the err variable
- *    pointed to by "perr". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ *			to by "perr". 
+ * @retval DS_OK otherwise.
  */
 int dc_devall(char *serv_name,char ***devnametab,int *dev_n,DevLong *error)
 {
@@ -429,8 +431,9 @@ int dc_devall(char *serv_name,char ***devnametab,int *dev_n,DevLong *error)
  * @param dc_dev_info 	Pointer to a structure where all the info will be stored	
  * @param error 	Pointer to error code (in case of)
  *
- * @return   In case of trouble, the function returns DS_NOTOK and set the err variable 
- *    pointed to by "perr". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ *			to by "perr". 
+ * @retval DS_OK otherwise. 
  */
 int dc_dinfo(char *dev_name,dc_devinf *dc_dev_info,DevLong *error)
 {
@@ -557,8 +560,9 @@ int dc_dinfo(char *dev_name,dc_devinf *dc_dev_info,DevLong *error)
  * @param dc_dev_info 	Pointer to structure where command result will be stored
  * @param error 	Pointer for error code
  *
- * @return   In case of trouble, the function returns DS_NOTOK and set the err variable
- *    pointed to by "perr". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ *			to by "perr". 
+ * @retval DS_OK otherwise.
  */
 int dc_devinfo(char *serv_name,char *dev_name,dc_devinf *dc_dev_info,DevLong *error)
 {

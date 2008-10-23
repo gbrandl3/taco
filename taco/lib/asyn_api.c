@@ -43,9 +43,9 @@
  *
  * Original   :	January 1997
  *
- * Version:	$Revision: 1.26 $
+ * Version:	$Revision: 1.27 $
  *
- * Date:	$Date: 2008-10-22 08:29:41 $
+ * Date:	$Date: 2008-10-23 05:28:17 $
  *
  ********************************************************************-*/
 
@@ -197,7 +197,8 @@ long asynch_svc_tcp_sock;
  * @param error         Will contain an appropriate error * code if the 
  *			corresponding call returns a non-zero value.
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc dev_putget_asyn (devserver ds, long cmd, 
                                DevArgument argin, DevType argin_type, 
@@ -440,7 +441,8 @@ long _DLLFunc dev_putget_asyn (devserver ds, long cmd,
  * @param error         Will contain an appropriate error code if the 
  *			corresponding call returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */ 
 long _DLLFunc dev_putget_raw_asyn (devserver ds, long cmd, 
                                 DevArgument argin, DevType argin_type, 
@@ -1101,7 +1103,8 @@ static SVCXPRT 	*asynch_trans_tcp,
  * @param error         Will contain an appropriate error code if the 
  *			corresponding call returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc asynch_rpc_register(DevLong *error)
 {
@@ -1223,7 +1226,8 @@ long _DLLFunc asynch_rpc_register(DevLong *error)
  * @param error         Will contain an appropriate error code if the 
  *			corresponding call returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long asynch_server_import(devserver ds, DevLong *error)
 {
@@ -1417,7 +1421,8 @@ long asynch_server_import(devserver ds, DevLong *error)
  * @param error         Will contain an appropriate error code if the 
  *			corresponding call returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long asynch_client_import(devserver client, DevLong *error)
 {
@@ -1553,7 +1558,8 @@ long asynch_client_import(devserver client, DevLong *error)
  * @param error         Will contain an appropriate error code if the 
  *			corresponding call returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long asynch_client_check(devserver client, DevLong *error)
 {
@@ -1602,7 +1608,8 @@ long asynch_client_check(devserver client, DevLong *error)
  * @param error         Will contain an appropriate error code if the 
  *			corresponding call returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */ 
 long _DLLFunc dev_synch(struct timeval *timeout, DevLong *error)
 {
@@ -2043,7 +2050,8 @@ _asynch_client_raw_data* _DLLFunc rpc_raw_asynch_reply_5(_asynch_client_raw_data
  * @param error         Will contain an appropriate error * code if the 
  *			corresponding call returns a non-zero value.
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc asynch_add_request(devserver ds, long asynch_type, long event_type,
                                  DevArgument argout, DevType argout_type, 
@@ -2143,7 +2151,8 @@ long _DLLFunc asynch_add_request(devserver ds, long asynch_type, long event_type
  * 
  * @param asynch_id
  *
- * @return index or DS_NOTOK if not found
+ * @return index 
+ * @retval DS_NOTOK if not found
  */
 long _DLLFunc asynch_get_index( long asynch_id)
 {
@@ -2168,7 +2177,8 @@ long _DLLFunc asynch_get_index( long asynch_id)
  * @param xdrs
  * @param objp
  *
- * @return TRUE or FALSE
+ * @retval TRUE 
+ * @retval FALSE
  *********************************************************************-*/
 bool_t xdr__asynch_client_data(XDR *xdrs, _asynch_client_data *objp)
 {
@@ -2256,7 +2266,8 @@ bool_t xdr__asynch_client_data(XDR *xdrs, _asynch_client_data *objp)
  * @param xdrs
  * @param objp
  *
- * @return TRUE or FALSE
+ * @retval TRUE 
+ * @retval FALSE
  */
 bool_t xdr__asynch_client_raw_data(XDR *xdrs, _asynch_client_raw_data *objp)
 {
@@ -2347,7 +2358,8 @@ bool_t xdr__asynch_client_raw_data(XDR *xdrs, _asynch_client_raw_data *objp)
  * 
  * @param ds       	handle to access the device.
  *
- * @return DS_OK 
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  *********************************************************************-*/
 long _DLLFunc dev_flush(devserver ds)
 {
@@ -2401,7 +2413,8 @@ long _DLLFunc dev_flush(devserver ds)
  * 
  * @param ds       	handle to access the device.
  *
- * @return number of pending asynch calls or DS_NOTOK
+ * @return number of pending asynch calls 
+ * @retval DS_NOTOK
  */
 long _DLLFunc dev_pending(devserver ds)
 {
@@ -2440,7 +2453,8 @@ long _DLLFunc dev_pending(devserver ds)
  * @param error   	Will contain an appropriate error code if the
  *		        corresponding call returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */ 
 long _DLLFunc dev_asynch_timeout (devserver ds, long request,
 				  struct timeval *dev_timeout, DevLong *error)
@@ -2665,7 +2679,8 @@ void _DLLFunc asynch_timed_out(devserver ds_tout)
  * @param i
  * @param error
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc asynch_client_ping(long i,DevLong *error)
 {

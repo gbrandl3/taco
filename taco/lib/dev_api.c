@@ -31,9 +31,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.40 $
+ * Version    :	$Revision: 1.41 $
  *
- * Date	    :	$Date: 2008-10-22 08:28:59 $
+ * Date	    :	$Date: 2008-10-23 05:28:17 $
  *
  ********************************************************************-*/
 
@@ -213,7 +213,8 @@ server_connections	 	svr_conns [NFILE];
  * @param error        	Will contain an appropriate error code if the corresponding call 
  *			returns DS_NOTOK
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, DevLong *error)
 {
@@ -279,7 +280,8 @@ long _DLLFunc dev_import (char *dev_name, long access, devserver *ds_ptr, DevLon
  * @param error Will contain an appropriate error code if the corresponding call
  *  returns a non-zero value.
  * 
- * @return  DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, DevLong *error)
 {
@@ -994,7 +996,8 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, D
  * @param error         Will contain an appropriate error code if the corresponding 
  *			call returns a non-zero value.
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */ 
 long _DLLFunc dev_putget (devserver ds, long cmd,DevArgument argin,
 			  DevType argin_type,DevArgument argout,
@@ -1038,7 +1041,8 @@ long _DLLFunc dev_putget (devserver ds, long cmd,DevArgument argin,
  * @param error Will contain an appropriate error code if the corresponding call
  *	returns a non-zero value.
  * 
- * @return   DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc taco_dev_putget (devserver ds, long cmd,DevArgument argin,
 			  DevType argin_type,DevArgument argout,
@@ -1181,7 +1185,8 @@ long _DLLFunc taco_dev_putget (devserver ds, long cmd,DevArgument argin,
  * @param error        	Will contain an appropriate error 
  * 			code if the corresponding call  returns a non-zero value.
  * 
- * Return(s)  :	DS_OK or DS_NOTOK
+ * @retval DS_OK
+ * @retval DS_NOTOK
  */ 
 long _DLLFunc dev_put (devserver ds, long cmd,DevArgument argin,
 		       DevType argin_type, DevLong *error )
@@ -1222,7 +1227,8 @@ long _DLLFunc dev_put (devserver ds, long cmd,DevArgument argin,
  * @param error Will contain an appropriate error code if the corresponding call
  *	returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc taco_dev_put (devserver ds, long cmd,DevArgument argin,
 		       DevType argin_type, DevLong *error )
@@ -1348,7 +1354,8 @@ long _DLLFunc taco_dev_put (devserver ds, long cmd,DevArgument argin,
  * @param error Will contain an appropriate error code if the corresponding 
  *		call returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc dev_free (devserver ds, DevLong *error)
 {
@@ -1675,7 +1682,8 @@ DON'T - 26/3/98
  * @param prog_number 	program number of the device server
  * @param vers_number	vers number of the device server
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc dev_query_svr (char* host, long prog_number, long vers_number)
 {
@@ -1781,7 +1789,8 @@ long _DLLFunc dev_query_svr (char* host, long prog_number, long vers_number)
  * @param error  Will contain an appropriate error code if the
  *		 corresponding call returns a non-zero value.
  *
- * @return  DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc dev_xdrfree (DevType type, DevArgument objptr, DevLong *error)
 {
@@ -1818,7 +1827,8 @@ long _DLLFunc dev_xdrfree (DevType type, DevArgument objptr, DevLong *error)
  * @param error Will contain an appropriate error code if the
  * 		corresponding call returns a non-zero value.
  * 
- * Return(s)  :	DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc check_rpc_connection (devserver ds, DevLong *error)
 {
@@ -2310,7 +2320,8 @@ long _DLLFunc check_rpc_connection (devserver ds, DevLong *error)
  * @param error Will contain an appropriate error code if the
  * 		corresponding call returns a non-zero value.
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */ 
 long _DLLFunc reinstall_rpc_connection (devserver ds, DevLong *error)
 {
@@ -2449,7 +2460,8 @@ long _DLLFunc reinstall_rpc_connection (devserver ds, DevLong *error)
  * @param error  	Will contain an appropriate error code if the
  * 			corresponding call returns a non-zero value.
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc rpc_check_host (char *host_name, DevLong *error)
 {
@@ -2650,7 +2662,8 @@ long _DLLFunc rpc_check_host (char *host_name, DevLong *error)
  *			code if the corresponding call 
  *			returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 static long dev_import_local (_dev_import_in  *dev_import_in, devserver  *ds_ptr, DevLong* error)
 {
@@ -2709,7 +2722,8 @@ static long dev_import_local (_dev_import_in  *dev_import_in, devserver  *ds_ptr
  * 		code if the corresponding call 
  * 		returns a non-zero value.
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */ 
 static long dev_free_local (_dev_free_in  *dev_free_in, DevLong* error)
 {
@@ -2735,7 +2749,8 @@ static long dev_free_local (_dev_free_in  *dev_free_in, DevLong* error)
  * 			code if the corresponding call 
  * 			returns a non-zero value.
  * 
- * Return(s)  :	DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */ 
 static long dev_put_local (_server_data  *server_data, DevLong* error)
 {
@@ -2762,7 +2777,8 @@ static long dev_put_local (_server_data  *server_data, DevLong* error)
  *			code if the corresponding call 
  *			returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 static long dev_putget_local (_server_data  *server_data,
 			      _client_data  *client_data, DevLong *error)
@@ -2889,7 +2905,8 @@ static long dev_putget_local (_server_data  *server_data,
  * @param error Will contain an appropriate error code if the
  * 		corresponding call returns a non-zero value.
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */ 
 long _DLLFunc dev_rpc_connection (devserver ds, DevLong *error)
 {
@@ -2954,7 +2971,8 @@ long _DLLFunc dev_rpc_connection (devserver ds, DevLong *error)
  * @param error		Will contain an appropriate error code if the
  * corresponding call returns a non-zero value.
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc dev_rpc_error (devserver ds, enum clnt_stat clnt_stat, DevLong *error)
 {
@@ -3026,7 +3044,8 @@ long _DLLFunc dev_rpc_error (devserver ds, enum clnt_stat clnt_stat, DevLong *er
  * @param error  	Will contain an appropriate error code if the
  * 		        corresponding call returns a non-zero value.
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, DevLong *error)
 {
@@ -3256,7 +3275,8 @@ long _DLLFunc dev_rpc_protocol (devserver ds, long protocol, DevLong *error)
  * @param error  	Will contain an appropriate error code if the
  *                      corresponding call returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc dev_notimported_init (char *device_name, long access, long i_nethost, devserver *ds_ptr, DevLong *error)
 {
@@ -3307,7 +3327,8 @@ long _DLLFunc dev_notimported_init (char *device_name, long access, long i_netho
  * @param error  	Will contain an appropriate error code if the
  *                      corresponding call returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc dev_import_timeout (long request, struct timeval *dev_timeout,
                                   DevLong *error)

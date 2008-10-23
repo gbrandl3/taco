@@ -27,9 +27,9 @@
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.21 $
+ * Version:	$Revision: 1.22 $
  *
- * Date:	$Date: 2008-04-06 09:07:15 $
+ * Date:	$Date: 2008-10-23 05:26:24 $
  *
  ******************************************************************************/
 
@@ -129,9 +129,9 @@ static int alea(int n)
  * @param num_device 	The device number
  * @param error 	Pointer to error code
  *
- * @return In case of major trouble, this function returns DS_NOTOK. If there is a 
- * 	problem on only some devices, this function returns the number of
- *	faulty devices. Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of major trouble, if there is a problem on only some 
+ *			devices, this function returns the number of faulty devices. 
+ * @retval DS_OK otherwise.
  */
 int dc_import(dc_dev_imp *dc_devimp, unsigned int num_device, DevLong *error)
 {
@@ -547,8 +547,9 @@ int dc_import(dc_dev_imp *dc_devimp, unsigned int num_device, DevLong *error)
  * @param i_nethost	The index in the multi nethost array of the nethost to initialize
  * @param perr 		A pointer to an error code
  *
- * @return In case of trouble, the function returns DS_NOTOK and sets the err variable
- *    pointed to by "error". Otherwise, the function returns DS_OK 
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ *			to by "error". 
+ * @retval DS_OK otherwise.
  */
 static long init_imp(long i_nethost, DevLong *perr)
 {
@@ -611,7 +612,9 @@ static long init_imp(long i_nethost, DevLong *perr)
  * available as a UNIX man page
  * @param vpa
  * @param vpb
- * @return -1 if vpa < vpb, 0 if vpa == vpa, 1 otherwise
+ * @retval -1 if vpa < vpb
+ * @retval 0 if vpa == vpa
+ * @retval 1 otherwise
  */
 #ifndef WIN32
 static int comp(const void *vpa,const void *vpb)
@@ -641,8 +644,8 @@ static int comp(const void *vpa,const void *vpb)
  * @param prpc 		The address where to store the RPC client handle
  * @param perr 		The address of the error variable
  *
- * @return This function returns DS_OK when no problem occurs. Otherwise the return
- *    value is DS_NOTOK and the error variable is set according to the error
+ * @retval DS_OK when no problem occurs. 
+ * @retval DS_NOTOK otherwise, the error variable is set according to the error
  */
 static int rpc_connect(char *serv_name,CLIENT **prpc,int ind,long i_net,DevLong *perr)
 {
@@ -740,8 +743,8 @@ static int rpc_connect(char *serv_name,CLIENT **prpc,int ind,long i_net,DevLong 
  * @param clnt_ptr 	A pointer to the client handle which will be used later on  				
  * @param perr 		The address of the error variable
  *
- * @return   This function returns DS_OK when no problem occurs. Otherwise the return
- *    value is DS_NOTOK and the error variable is set according to the error
+ * @retval DS_OK  when no problem occurs. 
+ * @retval DS_NOTOK otherwise, the error variable is set according to the error
  */
 static int test_server(int ind,serv *serv_info,int min,CLIENT **clnt_ptr,long i_net,DevLong *perr)
 {
@@ -848,8 +851,9 @@ static int test_server(int ind,serv *serv_info,int min,CLIENT **clnt_ptr,long i_
  * @param dev_unk 	A pointer to store the name of unknown devices for this dc 
  * @param perr 		Pointer to error code
  *
- * @return In case of trouble, the function returns DS_NOTOK and sets the err variable
- *    pointed to by "error". Otherwise, the function returns DS_OK 
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ *			to by "error". 
+ * @retval DS_OK otherwise.
  */
 static int check_dc(int ind,int dev_numb,char **devname_arr,int *call_numb,dc_dev_imp *caller_arr,int *dev_unk,long i_net,DevLong *perr)
 {
@@ -1029,9 +1033,9 @@ static int check_dc(int ind,int dev_numb,char **devname_arr,int *call_numb,dc_de
  * @param num_device 	The number of device to be freed
  * @param error 	Pointer to error code
  *
- * @return In case of major trouble, this function returns DS_NOTOK. If there is a  
- *    problem on only some devices, this function returns the number of
- *    faulty devices. Otherwise, the function returns DS_OK.
+ * @retval DS_NOTOK In case of major trouble, if there is a problem on only some 
+ *			devices, this function returns the number of faulty devices. 
+ * @retval DS_OK otherwise.
  */
 int dc_free(dc_dev_free *dc_devfree,unsigned int num_device,DevLong *error)
 {
@@ -1114,8 +1118,9 @@ int dc_free(dc_dev_free *dc_devfree,unsigned int num_device,DevLong *error)
  * @param argout   	Pointer where the command result will be stored
  * @param error 	Pointer to error code
  *
- * @return   In case of trouble, the function returns DS_NOTOK and sets the variable 
- *    pointed to by "error". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *			to by "error". 
+ * @retval DS_OK otherwise.
  */
 int dc_devget(datco *dc_ptr,long cmd_code,DevArgument argout,DevType argout_type,DevLong *error)
 {
@@ -1223,9 +1228,9 @@ int dc_devget(datco *dc_ptr,long cmd_code,DevArgument argout,DevType argout_type
  * @param cmd_code 	The command code
  * @param error 	Pointer to error code
  * 
- * @return In case of major trouble, this function returns DS_NOTOK. If there is a 
- *    problem on only some devices, this function returns the number of 
- *    faulty devices. Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of major trouble, if there is a problem on only some 
+ *			devices, this function returns the number of faulty devices. 
+ * @retval DS_OK otherwise.
  */
 int dc_devgetv(dc_dev_retdat *dev_retdat,unsigned int num_device,long cmd_code,DevLong *error)
 {
@@ -1527,8 +1532,9 @@ int dc_devgetv(dc_dev_retdat *dev_retdat,unsigned int num_device,long cmd_code,D
  * @param nb_deverr 	Pointer where the number of faulty devices will be stored
  * @param perr 		Pointer to error code
  *
- * @return In case of trouble, the function returns DS_NOTOK and set the err variable 
- *    pointed to by "error". Otherwise, the function returns DS_OK 
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ *			to by "error". 
+ * @retval DS_OK otherwise.
  */
 static int call_dcserv(int num_device,long *dev_numb,dc_dev_retdat *dev_retdat,int ind,int *nb_deverr,long cmd_code,long i_net,DevLong *perr)
 {
@@ -1677,9 +1683,9 @@ static int call_dcserv(int num_device,long *dev_numb,dc_dev_retdat *dev_retdat,i
  * @param num_device 	The device number
  * @param error 	Pointer to error code
  *
- * @return In case of major trouble, this function returns DS_NOTOK. It there is a 
- *    problem on only some devices, this function returns the number of
- *    faulty devices. Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of major trouble, if there is a problem on only some 
+ *			devices, this function returns the number of faulty devices. 
+ * @retval DS_OK otherwise.
  */
 int dc_devgetm(dc_dev_mretdat *dev_mretdat,unsigned int num_device,DevLong *error)
 {
@@ -1992,8 +1998,9 @@ int dc_devgetm(dc_dev_mretdat *dev_mretdat,unsigned int num_device,DevLong *erro
  * @param nb_deverr 	Pointer where the number of faulty devices will be stored
  * @param perr 		Pointer to error code
  *
- * @return In case of trouble, the function returns DS_NOTOK and set the err variable
- *    pointed to by "error". Otherwise, the function returns DS_OK 
+ * @retval DS_NOTOK In case of trouble, the function sets the err variable pointed 
+ *			to by "error". 
+ * @retval DS_OK otherwise.
  */
 static int call_dcservm(long num_device,long *dev_numb,dc_dev_mretdat *dev_mretdat,int ind,int *nb_deverr,long i_net,DevLong *perr)
 {
@@ -2207,8 +2214,8 @@ static int call_dcservm(long num_device,long *dev_numb,dc_dev_mretdat *dev_mretd
  * @param i_net The index in the multi nethost array
  * @param perr  Pointer to error code
  *
- * @return DS_OK when no problem occurs. Otherwise the return value is DS_NOTOK 
- *	and the error variable is set according to the error
+ * @retval DS_OK when no problem occurs
+ * @retval DS_NOTOK otherwise the error variable is set according to the error
  */
 int rpc_reconnect_rd(int ind,long i_net,DevLong *perr)
 {
@@ -2263,8 +2270,8 @@ int rpc_reconnect_rd(int ind,long i_net,DevLong *perr)
  * @param i_net 	Index into the multi nethost array
  * @param perr 		Pointer to error code
  *
- * @return DS_OK when no problem occurs. Otherwise the return value is DS_NOTOK and the error 
- *		variable is set according to the error
+ * @retval DS_OK when no problem occurs. 
+ * @retval DS_NOTOK otherwise the error variable is set according to the error
  */
 static int re_test_server(int ind,serv *serv_info,int min,int nb_server,long i_net,DevLong *perr)
 {
@@ -2391,8 +2398,8 @@ static int re_test_server(int ind,serv *serv_info,int min,int nb_server,long i_n
  * @param p_ind 	Pointer to index array
  * @param p_err 	Pointer to error code
  *
- * @return DS_OK when no problem occurs. Otherwise the return value is DS_NOTOK
- *	 and the variable to which p_err points is set according to error
+ * @retval DS_OK when no problem occurs. 
+ * @retval DS_NOTOK otherwise the variable to which p_err points is set according to error
  */
 static long build_nethost_arr(dc_dev_imp *p_input,unsigned int num_dev,
  			      nethost_call **p_array,long *p_nethost_nb,
@@ -2485,8 +2492,8 @@ static long build_nethost_arr(dc_dev_imp *p_input,unsigned int num_dev,
  * @param p_nethost_nb 	Pointer to nethost number in the array
  * @param p_err 	Pointer to error code
  *
- * @return DS_OK when no problem occurs. Otherwise the return value is DS_NOTOK 
- *	and the variable to which p_err points is set according to error
+ * @retval DS_OK when no problem occurs. 
+ * @retval DS_NOTOK otherwise the variable to which p_err points is set according to error
  */
 static long build_net_arr_index(dc_dev_retdat *p_input,unsigned int num_dev,
 				nethost_index **p_array,long *p_nethost_nb,
@@ -2572,8 +2579,8 @@ static long build_net_arr_index(dc_dev_retdat *p_input,unsigned int num_dev,
  * @param p_nethost_nb 	Pointer to nethost number in the array
  * @param p_err 	Pointer to error code
  *
- * @return DS_OK when no problem occurs. Otherwise the return value is DS_NOTOK 
- * 	and the variable to which p_err points is set according to error
+ * @retval DS_OK when no problem occurs. 
+ * @retval DS_NOTOK otherwise the variable to which p_err points is set according to error
  */
 static long build_net_arr_indexm(dc_dev_mretdat *p_input,unsigned int num_dev,
 				 nethost_index **p_array,long *p_nethost_nb,
@@ -2695,7 +2702,8 @@ static void get_nethost(char *dev_name, char *nethost)
  * 
  * @param nethost The nethost name
  *
- * @return the index in the array or DS_NOTOK if the nethost is not found in the array
+ * @return the index in the array 
+ * @retval DS_NOTOK if the nethost is not found in the array
  */
 static long dc_get_i_nethost_by_name(char *nethost)
 {
@@ -2720,7 +2728,8 @@ static long dc_get_i_nethost_by_name(char *nethost)
  * @param net_array 	The array with nethosts name involved in this call
  * @param nb_net 	the number of nethost involved in this call
  *
- * @return the index in the array or DS_NOTOK if the nethost is not found in the array
+ * @return the index in the array 
+ * @retval DS_NOTOK if the nethost is not found in the array
  */
 static long dc_get_i_nethost_in_call(char *dev_name,nethost_call *net_array,long nb_net)
 {

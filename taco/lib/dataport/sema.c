@@ -25,9 +25,9 @@
  * Author(s):
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2008-04-06 09:07:04 $
+ * Date:	$Date: 2008-10-23 05:25:05 $
  *
  ******************************************************************************/
 
@@ -69,7 +69,8 @@ extern int errno;
  * @param key_num The key
  * @param create  A flag to inform the function that the sem. must be created  
  * 
- * @return the semaphore ID or -1 if it fails
+ * @return the semaphore ID 
+ * @retval -1 if it fails
  */
 int define_sema (int number,int key_num,int create)
 {
@@ -156,8 +157,8 @@ int define_sema (int number,int key_num,int create)
  *
  * - The semaphore ID
  *
- * @return DS_OK if the semaphore is correctly deleted. 
- *    Otherwise, the function returns DS_NOTOK
+ * @retval DS_OK if the semaphore is correctly deleted. 
+ * @retval DS_NOTOK otherwise
  */
 int delete_sema(int sph)
 {
@@ -178,7 +179,8 @@ int delete_sema(int sph)
  *
  * @param sph The semapore ID
  *
- * @returns DS_OK if it is possible to take the sem. Otherwise, it returns DS_NOTOK.
+ * @retval DS_OK if it is possible to take the sem
+ * @retval DS_NOTOK otherwise
  */
 int get_sema (int sph)
 {
@@ -220,7 +222,8 @@ int get_sema (int sph)
  *
  * @param sph The semapore ID
  * 
- * @return DS_OK if it is possible to take the sem. Otherwise, it returns DS_NOTOK.
+ * @retval DS_OK if it is possible to take the sem. 
+ * @retval DS_NOTOK otherwise
  */
 int get_sema_nowait (int sph)
 {
@@ -248,7 +251,8 @@ int get_sema_nowait (int sph)
  *
  * @param sph The semaphore ID
  * 
- * @return DS_OK if the semaphore is correctly released. otherwise, it returns -1.
+ * @retval DS_OK if the semaphore is correctly released
+ * @retval DS_NOTOK otherwise
  */
 int release_sema (int sph)
 {

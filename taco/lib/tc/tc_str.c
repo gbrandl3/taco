@@ -33,9 +33,9 @@
  *
  * Original:   	November 1996
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2008-04-06 09:07:20 $
+ * Date:	$Date: 2008-10-23 05:26:13 $
  *
  *****************************************************************************/
 
@@ -378,7 +378,7 @@ long tc_DevVarLongReadPointArray_to_str( DevVarLongReadPointArray *d_lnrp_arr, c
  * @param in_str The input string can by any string
  * @param d_void The pointer passed in is returned unchanged.
  * 
- * @return DS_OK
+ * @retval DS_OK
  */
 long tc_str_to_DevVoid(char *in_str, DevVoid *d_void)
 {
@@ -398,7 +398,8 @@ long tc_str_to_DevVoid(char *in_str, DevVoid *d_void)
  *               	values are not case sensitive.
  * @param d_boolean	The pointer should point to a DevBoolean data
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevBoolean(char *in_str, DevBoolean *d_boolean)
 {
@@ -424,7 +425,8 @@ long tc_str_to_DevBoolean(char *in_str, DevBoolean *d_boolean)
  * @param d_short 	The pointer should point to a DevShort data
  *                  	otherwise the result is unpredictable.
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevShort(char *in_str, DevShort *d_short)
 {
@@ -447,7 +449,8 @@ long tc_str_to_DevShort(char *in_str, DevShort *d_short)
  * @param d_ushort	The pointer should point to a DevUShort data 
  *                  	otherwise the result is unpredictable.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevUShort(char *in_str, DevUShort *d_ushort)
 {
@@ -470,7 +473,8 @@ long tc_str_to_DevUShort(char *in_str, DevUShort *d_ushort)
  * @param d_long	The pointer should point to a DevLong data
  *                  	otherwise the result is unpredictable.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevLong(char *in_str, DevLong *d_long)
 {
@@ -493,7 +497,8 @@ long tc_str_to_DevLong(char *in_str, DevLong *d_long)
  * @param d_ulong	The pointer should point to a DevULong data
  *                  	otherwise the result is unpredictable.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevULong(char *in_str, DevULong *d_ulong)
 {
@@ -516,7 +521,8 @@ long tc_str_to_DevULong(char *in_str, DevULong *d_ulong)
  * @param d_float	The pointer should point to a DevFloat data
  *                  	otherwise the result is unpredictable.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevFloat(char *in_str, DevFloat *d_float)
 {
@@ -539,7 +545,8 @@ long tc_str_to_DevFloat(char *in_str, DevFloat *d_float)
  * @param d_double	The pointer should point to a DevDouble data
  *                  	otherwise the result is unpredictable.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevDouble(char *in_str, DevDouble *d_double)
 {
@@ -565,7 +572,8 @@ long tc_str_to_DevDouble(char *in_str, DevDouble *d_double)
  * @param d_string  	should point to a memory long enough to contain the input string,  
  *			otherwise the result is unpredictable.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevString(char *in_str, DevString *d_string)
 {
@@ -589,7 +597,8 @@ long tc_str_to_DevString(char *in_str, DevString *d_string)
  * @param d_intfl	The pointer should point to a DevIntFloat structure
  *                  	otherwise the result is unpredictable.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 
 long tc_str_to_DevIntFloat(char *in_str, DevIntFloat *d_intfl)
@@ -614,7 +623,8 @@ long tc_str_to_DevIntFloat(char *in_str, DevIntFloat *d_intfl)
  * @param d_flrp	The pointer should point to a DevFloatReadPoint structure
  *                  	otherwise the result is unpredictable.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevFloatReadPoint(char *in_str, DevFloatReadPoint *d_flrp)
 {
@@ -639,7 +649,8 @@ long tc_str_to_DevFloatReadPoint(char *in_str, DevFloatReadPoint *d_flrp)
  * @param d_stflrp	The pointer should point to a DevStateFloatReadPoint
  *                  	structure, otherwise the result is unpredictable.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * retval DS_NOTOK
  */
 long tc_str_to_DevStateFloatReadPoint(char *in_str, DevStateFloatReadPoint *d_stflrp)
 {
@@ -664,7 +675,8 @@ long tc_str_to_DevStateFloatReadPoint(char *in_str, DevStateFloatReadPoint *d_st
  * @param d_lngrp 	The pointer should point to a DevLongReadPoint structure
  *                  	otherwise the result is unpredictable.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 
 long tc_str_to_DevLongReadPoint(char *in_str, DevLongReadPoint *d_lngrp)
@@ -689,7 +701,8 @@ long tc_str_to_DevLongReadPoint(char *in_str, DevLongReadPoint *d_lngrp)
  * @param d_dblrp	The pointer should point to a DevDoubleReadPoint
  *                  	structure, otherwise the result is unpredictable.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevDoubleReadPoint(char *in_str, DevDoubleReadPoint *d_dblrp)
 {
@@ -724,7 +737,8 @@ long tc_str_to_DevDoubleReadPoint(char *in_str, DevDoubleReadPoint *d_dblrp)
  *                  will not allocate the memory and it supposes that the
  *                  allocation is done correctly by the caller.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevVarCharArray(char *in_str, DevVarCharArray *d_char_arr)
 {
@@ -793,7 +807,8 @@ long tc_str_to_DevVarCharArray(char *in_str, DevVarCharArray *d_char_arr)
  *                  corresponding string. The caller should free the memory
  *                  allocated for each index of the sequence array.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevVarStringArray(char *in_str, DevVarStringArray *d_str_arr)
 {
@@ -899,7 +914,8 @@ long tc_str_to_DevVarStringArray(char *in_str, DevVarStringArray *d_str_arr)
  *                  allocation is correctly done for sequence field by the
  *                  caller.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevVarUShortArray(char *in_str, DevVarUShortArray *d_ushort_arr)
 {
@@ -996,7 +1012,8 @@ long tc_str_to_DevVarUShortArray(char *in_str, DevVarUShortArray *d_ushort_arr)
  *                  allocation is correctly done for sequence field by the
  *                  caller.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevVarShortArray(char *in_str, DevVarShortArray *d_short_arr)
 {
@@ -1092,7 +1109,8 @@ long tc_str_to_DevVarShortArray(char *in_str, DevVarShortArray *d_short_arr)
  *                  allocation is correctly done for sequence field by the
  *                  caller.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevVarULongArray(char *in_str, DevVarULongArray *d_ulong_arr)
 {
@@ -1190,7 +1208,8 @@ long tc_str_to_DevVarULongArray(char *in_str, DevVarULongArray *d_ulong_arr)
  *                  allocation is correctly done for sequence field by the
  *                  caller.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 
 long tc_str_to_DevVarLongArray(char *in_str, DevVarLongArray *d_long_arr)
@@ -1288,7 +1307,8 @@ long tc_str_to_DevVarLongArray(char *in_str, DevVarLongArray *d_long_arr)
  *                  allocation is correctly done for sequence field by the
  *                  caller.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevVarFloatArray(char *in_str, DevVarFloatArray *d_float_arr)
 {
@@ -1384,7 +1404,8 @@ long tc_str_to_DevVarFloatArray(char *in_str, DevVarFloatArray *d_float_arr)
  *                  allocation is correctly done for sequence field by the
  *                  caller.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevVarDoubleArray(char *in_str, DevVarDoubleArray *d_double_arr)
 {
@@ -1466,7 +1487,8 @@ long tc_str_to_DevVarDoubleArray(char *in_str, DevVarDoubleArray *d_double_arr)
  * @param d_mulmove	The pointer should point to a DevMulMove structure
  *                  otherwise the result is unpredictable.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevMulMove(char *in_str, DevMulMove *d_mulmove)
 {
@@ -1500,7 +1522,8 @@ long tc_str_to_DevMulMove(char *in_str, DevMulMove *d_mulmove)
  * @param d_motorl	The pointer should point to a DevMotorLong structure
  *                  otherwise the result is unpredictable.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevMotorLong(char *in_str, DevMotorLong *d_motorl)
 {
@@ -1525,7 +1548,8 @@ long tc_str_to_DevMotorLong(char *in_str, DevMotorLong *d_motorl)
  * @param d_motorf	The pointer should point to a DevMotorFloat structure
  *                  otherwise the result is unpredictable.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long tc_str_to_DevMotorFloat(char *in_str, DevMotorFloat *d_motorf)
 {

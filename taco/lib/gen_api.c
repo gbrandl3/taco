@@ -30,9 +30,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.36 $
+ * Version    :	$Revision: 1.37 $
  *
- * Date       : $Date: 2008-10-22 08:43:29 $
+ * Date       : $Date: 2008-10-23 05:28:17 $
  *
  ********************************************************************-*/
 
@@ -171,7 +171,8 @@ long 		debug_flag = 0x0;
  *			code if the corresponding call
  *		    	returns a non-zero value.
  *
- * @return	DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc msg_import (char *DS_name, char *DS_host, long DS_prog_number, char *DS_display, DevLong *error)
 {
@@ -976,7 +977,8 @@ static void msg_clear (_Int msg_type)
  * @param error Will contain an appropriate error code if the corresponding 
  *	        call returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc db_import (DevLong *error)
 {
@@ -1019,7 +1021,8 @@ long _DLLFunc db_import (DevLong *error)
  * @param error 	Will contain an appropriate error code if the 
  *			corresponding call returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc db_import_multi (char *nethost, DevLong *error)
 {
@@ -1148,7 +1151,8 @@ long _DLLFunc db_import_multi (char *nethost, DevLong *error)
  * @param error Will contain an appropriate error code if the corresponding call
  *		returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long setup_config_multi (char *nethost, DevLong *error)
 {
@@ -1401,7 +1405,8 @@ long setup_config_multi (char *nethost, DevLong *error)
  * @param nethost host name of the new nethost
  * @param error points to the possible error code, only set if returns DS_NOTOK
  *
- * @return DS_OK or DS_NOTOK in case of failure
+ * @retval DS_OK 
+ * @retval DS_NOTOK in case of failure
  */
 long db_ChangeDefaultNethost(char* nethost,DevLong *error)
 {
@@ -1613,7 +1618,8 @@ static char *get_error_string (DevLong error)
  *
  * @param error_string error string
  * 
- * @return   DS_OK or DS_NOTOK 
+ * @retval DS_OK 
+ * @retval DS_NOTOK 
  */
 long dev_error_push (char *error_string)
 {
@@ -1642,7 +1648,7 @@ long dev_error_push (char *error_string)
  * who want to remove error messages from the stack and return
  * their own error only.
  *
- * @return DS_OK 
+ * @retval DS_OK 
  */
 long dev_error_clear(void)
 {
@@ -1668,7 +1674,8 @@ long dev_error_clear(void)
  * The error messages will be intended by some spaces given by the value level.
  * @see dev_error_push
  *
- * @return DS_OK
+ * @retval DS_OK
+ * @retval DS_NOTOK
  */
 long dev_error_push_level(const char * message,int level)
 {

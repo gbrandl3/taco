@@ -29,9 +29,9 @@
  *
  * Original   	: March 1991
  *
- * Version	: $Revision: 1.29 $
+ * Version	: $Revision: 1.30 $
  *
- * Date		: $Date: 2008-10-22 08:31:22 $
+ * Date		: $Date: 2008-10-23 05:28:17 $
  *
  *******************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -282,7 +282,8 @@ pid_t   become_daemon(void)
  * @param argc the number of command line parameters including the name of the executeable itself
  * @param argv options and the personal name for the device server.
  * 
- * @return 1 DS_NOTOK
+ * @retval DS_OK
+ * @retval DS_NOTOK
  */
 int main (int argc, char **argv)
 #endif /* WIN32 */

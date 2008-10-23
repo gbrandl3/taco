@@ -31,9 +31,9 @@
  * 
  * Original   :   April 1997
  * 
- * Version    :   $Revision: 1.11 $
+ * Version    :   $Revision: 1.12 $
  * 
- * Date       :   $Date: 2008-10-22 08:21:37 $
+ * Date       :   $Date: 2008-10-23 05:25:49 $
  ********************************************************************/
 
 #ifdef HAVE_CONFIG_H
@@ -119,8 +119,9 @@ extern nethost_info 		*multi_nethost;
  * @param p_info 	Pointer for device information			
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *		to by "p_error". 
+ * @retval DS_OK otherwise.
  */
 long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info, DevLong *p_error)
 {
@@ -342,8 +343,9 @@ long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info, DevLong *p_erro
  * @param ppp_list	Resource(s) list (allocated by this function)
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return    	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *			to by "p_error". 
+ * @retval DS_OK otherwise.
  */
 long db_deviceres(long dev_nb, char **dev_name_list, long *p_res_nb, char ***ppp_list, DevLong *p_error)
 {
@@ -597,8 +599,9 @@ long db_deviceres(long dev_nb, char **dev_name_list, long *p_res_nb, char ***ppp
  * @param dev_name 	Device name
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *			to by "p_error". 
+ * @retval DS_OK otherwise.
  */
 long db_devicedelete(const char *dev_name,DevLong *p_error)
 {
@@ -754,8 +757,9 @@ long db_devicedelete(const char *dev_name,DevLong *p_error)
  * @param dev_name_list The device name list
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *			to by "p_error". 
+ * @retval DS_OK otherwise.
  */
 long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
 {
@@ -947,8 +951,9 @@ long db_devicedeleteres(long dev_nb,char **dev_name_list,db_error *p_error)
  *			database, the number of resources defined in the database ...
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by "p_error". Otherwise, the function returns DS_OK 
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *			to by "p_error". 
+ * @retval DS_OK otherwise.
  */
 long db_stat(db_stat_call *p_info,DevLong *p_error)
 {
@@ -1131,8 +1136,9 @@ long db_stat(db_stat_call *p_info,DevLong *p_error)
  * @param pers_name 	The device server personal name		
  * @param p_error  	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *			to by "p_error". 
+ * @retval DS_OK otherwise.
  */
 long db_servunreg(const char *ds_name,const char *pers_name,DevLong *p_error)
 {
@@ -1326,8 +1332,9 @@ long db_servunreg(const char *ds_name,const char *pers_name,DevLong *p_error)
  * @param p_inf 	Pointer for the structure with DS info		
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ * 			to by "p_error". 
+ * @retval DS_OK otherwise.
  */
 long db_servinfo(const char *ds_name,const char *pers_name, db_svcinfo_call *p_inf, DevLong *p_error)
 {
@@ -1575,8 +1582,9 @@ long db_servinfo(const char *ds_name,const char *pers_name, db_svcinfo_call *p_i
  * @param delres_flag 	A flag set to True if device resources should also be deleted				
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *			to by "p_error". 
+ * @retval DS_OK otherwise.
  */
 long db_servdelete(const char *ds_name,const char *pers_name, long delres_flag, DevLong *p_error)
 {
@@ -1768,8 +1776,9 @@ long db_servdelete(const char *ds_name,const char *pers_name, long delres_flag, 
  *		       	host name, process name and PID			
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *			to by "p_error". 
+ * @retval DS_OK otherwise.
  */
 long db_getpoller(const char *dev_name,db_poller *poll,DevLong *p_error)
 {
@@ -1938,8 +1947,9 @@ long db_getpoller(const char *dev_name,db_poller *poll,DevLong *p_error)
  * @param domain 	Domain name
  * @param p_error  	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *			to by "p_error". 
+ * @retval DS_OK otherwise.
  */
 long db_initcache(const char *domain, DevLong *p_error)
 {

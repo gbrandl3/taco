@@ -25,9 +25,9 @@
  * Author(s):	
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2008-04-06 09:07:04 $
+ * Date:	$Date: 2008-10-23 05:25:05 $
  *
  ****************************************************************************/
 
@@ -62,7 +62,8 @@ static int shmid = -1;
  * @param create  A flag to inform the function that the shared memory has to be created
  * @param shar 	 The shared memory identifier
  *
- * @return the shared memory address or -1 if it fails
+ * @return the shared memory address 
+ * @retval -1 if it fails
  */
 char *get_shared (int size,int key_num,int create,int *shar)
 {
@@ -125,12 +126,12 @@ char *get_shared (int size,int key_num,int create,int *shar)
  *
  * @param address A pointer to the shared memory segment
  * 
- * @return DS_OK
+ * @retval DS_OK
  */
 int release_shared (char *address)
 {
 	shmdt (address);
-	return(0);
+	return (0);
 }
 
 
@@ -140,7 +141,8 @@ int release_shared (char *address)
  *
  * @param sid The shared memory identifier
  *
- * @return DS_OK if successful. Otherwise, it returns DS_NOTOK. 
+ * @retval DS_OK if successful. 
+ * @retval DS_NOTOK otherwise
  */
 int delete_shared (int sid)
 {

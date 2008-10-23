@@ -31,9 +31,9 @@
  *
  * Original   : May 1998
  *
- * Version:     $Revision: 1.16 $
+ * Version:     $Revision: 1.17 $
  *
- * Date:        $Date: 2008-04-06 09:07:14 $
+ * Date:        $Date: 2008-10-23 05:25:49 $
  *
  *-*******************************************************************/
 
@@ -129,10 +129,10 @@ static struct timeval timeout_update={60,0};
  * @param error_line 	File line where error occurs
  * @param p_error 	Pointer for the error code in case of problems 
  * 
- * @return 	In case of trouble, the function returns DS_NOTOK and sets the variable 
- * 		pointed to by "p_error". The function also initializes the line_err
- * 		argout with the file line where the error occurs. Otherwise, the 
- * 		function returns DS_OK 
+ * @retval DS_NOTOK In case of trouble the function sets the variable pointed to 
+ *		    by "p_error". The function also initializes the line_err
+ * 		    argout with the file line where the error occurs. 
+ * @retval DS_OK otherwise
  */
 long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***devdef, 
 		     long *nb_resdef, char ***resdef, long *error_line, DevLong *p_error)
@@ -402,10 +402,10 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
  * @param p_line_ptr
  * @param p_error pointer to the error code in case of error
  *
- * @return 	- DS_NOTOK Error  					
- *		- DS_OK It is a device definition line
- *              - 1 It is a simple resource definition line
- *              - 2 It is definition for an array of resources
+ * @retval DS_OK It is a device definition line
+ * @retval DS_NOTOK Error  					
+ * @retval 1 It is a simple resource definition line
+ * @retval 2 It is definition for an array of resources
  */
 static long TestLine(char *line, char **line1, ana_input *in, DevULong *p_line_ptr, DevLong *p_error)
 {
@@ -571,8 +571,8 @@ printf("End of TestLine \n");
  * @param d_list   	Name of resource domain known by the db server
  * @param p_error	Pointer to the error code in case of failure
  *
- * @return    	This function returns DS_OK if no errors occurs or DS_NOTOK if the resource
- *    		definition is not valid.						
+ * @retval DS_OK no errors occurs 
+ * @retval DS_NOTOK if the resource definition is not valid.						
  */
 static long check_res(char *lin,long d_num,char **d_list,DevLong *p_error)
 {
@@ -670,8 +670,8 @@ static long check_res(char *lin,long d_num,char **d_list,DevLong *p_error)
  * @param p_err_dev	
  * @param p_error
  *
- * @return    	This function returns DS_OK if no errors occurs or DS_NOTOK if the resource
- *    		definition is not valid.						
+ * @retval DS_OK no errors occurs 
+ * @retval DS_NOTOK if the resource definition is not valid.						
  */
 static long check_dev(char *lin,long d_num, char **d_list, DevLong *p_err_dev,DevLong *p_error)
 {
@@ -816,10 +816,10 @@ static void get_error_line(const char *buffer,long err_dev, DevLong *p_line)
  * @param deferr_nb 	Which device definition is the error reason	
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by "p_error". The function also initializes the deferr_nb
- *    		argout with the device definition  where the error occurs. Otherwise,
- *    		the function returns DS_OK             				
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed to 
+ *		    by "p_error". The function also initializes the deferr_nb
+ *    		    argout with the device definition  where the error occurs
+ * @retval DS_OK otherwise
  */
 long db_upddev(long devdef_nb, char **devdef, long *deferr_nb, DevLong *p_error)
 {
@@ -1013,10 +1013,10 @@ long db_upddev(long devdef_nb, char **devdef, long *deferr_nb, DevLong *p_error)
  * @param deferr_nb 	Which device definition is the error reason	
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return    	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by "p_error". The function also initializes the deferr_nb
- *    		argout with the device definition  where the error occurs. Otherwise,
- *    		the function returns DS_OK             				
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *		to by "p_error". The function also initializes the deferr_nb
+ *    		argout with the device definition  where the error occurs. 
+ * @retval DS_OK Otherwise
  */
 long db_updres(long resdef_nb,char **resdef,long *deferr_nb,DevLong *p_error)
 {
@@ -1329,8 +1329,9 @@ long db_updres(long resdef_nb,char **resdef,long *deferr_nb,DevLong *p_error)
  * @param pass 		Database security password
  * @param p_error	Pointer to the error code in case of failure
  *
- * @return   		In case of trouble, the function returns DS_NOTOK and sets the variable
- *    			pointed to by "p_error". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *		to by "p_error". 
+ * @retval DS_OK otherwise
  */
 long db_secpass(char **pass, DevLong *p_error)
 {
@@ -1492,10 +1493,10 @@ long db_secpass(char **pass, DevLong *p_error)
  *									
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return    	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by "p_error". The function also initializes the deferr_nb
- *    		argout with the device definition  where the error occurs. Otherwise,
- *    		the function returns DS_OK             				
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *		to by "p_error". The function also initializes the deferr_nb
+ *    		argout with the device definition  where the error occurs. 
+ * @retval DS_OK otherwise.
  */
 long db_delete_update(long dev_nb, char **dev_name_list, long list_type,
 		      long devdef_nb, char **devdef,

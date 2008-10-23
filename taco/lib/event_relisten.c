@@ -61,7 +61,8 @@ static long remove_relisten_info(long, long);
  *
  * @param ds	the device server
  *
- * @return DS_OK or DS_NOTOK in case of error
+ * @retval DS_OK 
+ * @retval DS_NOTOK in case of error
  */
 long relisten_events(devserver ds)
 {
@@ -103,7 +104,8 @@ long relisten_events(devserver ds)
  * @param error         Will contain an appropriate error code if the
  *                      corresponding call returns a non-zero value.
  * 
- * @return DS_OK if event was successfully registered otherwise DS_NOTOK
+ * @retval DS_OK if event was successfully registered 
+ * @retval DS_NOTOK otherwise 
  */
 long _DLLFunc dev_event_listen (devserver ds, long event_type,
 				DevArgument argout, DevType argout_type, 
@@ -132,7 +134,8 @@ long _DLLFunc dev_event_listen (devserver ds, long event_type,
  * @param error         Will contain an appropriate error code if the
  *                      corresponding call returns a non-zero value.
  *
- * @return DS_OK if event was successfully unregistered otherwise DS_NOTOK 
+ * @retval DS_OK if event was successfully unregistered 
+ * @retval DS_NOTOK otherwise
  */
 long _DLLFunc dev_event_unlisten (devserver ds, long event_type,
                                   long event_id, DevLong *error)
@@ -155,7 +158,8 @@ long _DLLFunc dev_event_unlisten (devserver ds, long event_type,
  * @param user_data
  * @param event_id_ptr
  *
- * @return DS_OK if the event added successfully or DS_NOTOK in case of error
+ * @retval DS_OK if the event added successfully 
+ * @retval DS_NOTOK in case of error
  */
 static long add_relisten_info(long event_id, 
 		       long event_type,
@@ -206,7 +210,8 @@ static long add_relisten_info(long event_id,
  * @param event_id
  * @param event_type
  *
- * @return DS_OK if event successfully unregistered otherwise DS_NOTOK
+ * @retval DS_OK if event successfully unregistered 
+ * @retval DS_NOTOK otherwise 
  */
 static long remove_relisten_info(long event_id, long event_type)
 {

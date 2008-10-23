@@ -25,9 +25,9 @@
  * Author(s):	E. Taurel
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.13 $
  *
- * Date:	$Date: 2008-04-06 09:07:15 $
+ * Date:	$Date: 2008-10-23 05:26:24 $
  *
  ****************************************************************************/
 
@@ -81,7 +81,7 @@ extern dc_nethost_info *dc_multi_nethost;
  *	- The command code from which the result history must be retrieved
  *	- The command result data type
  *	- The number of records to retrieve in the history.
- * The data trenasffered from the server to the client are organised in the same way that the 
+ * The data transferred from the server to the client are organised in the same way that the 
  * devget function with the command time added in the xresh and xresh_clnt structures.
  * A general error code has been added to inform the client of a global error like server ... .
  *
@@ -92,9 +92,10 @@ extern dc_nethost_info *dc_multi_nethost;
  * @param hist_buff 	Pointer to buffer where command result history must be stored	
  * @param error 	Pointer to error code				
  *
- * @return In case of trouble, the function returns DS_NOTOK. If there is a problem for
- *    only some command result in the history, the function returns the number of command 
- * which failed.Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, if there is a problem for only some command 
+ *			result in the history, the function returns the number of 
+ *			command which failed.
+ * @retval DS_OK otherwise.
  */
 int dc_devget_history(datco *dc_ptr,long cmd_code,dc_hist *hist_buff,DevType argout_type,long nb_rec,DevLong *error)
 {

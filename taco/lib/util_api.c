@@ -31,9 +31,9 @@
  *
  * Original   :	April 1993
  *
- * Version:	$Revision: 1.36 $
+ * Version:	$Revision: 1.37 $
  *
- * Date:		$Date: 2008-10-22 15:09:55 $
+ * Date:		$Date: 2008-10-23 05:28:17 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -119,7 +119,8 @@ static db_resource   res_tab [] = {
  * @param error         Will contain an appropriate error code if the corresponding call 
  *			returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc dev_putget_raw (devserver ds, long cmd, DevArgument argin,
 			      DevType argin_type, DevOpaque *argout,
@@ -273,7 +274,8 @@ long _DLLFunc dev_putget_raw (devserver ds, long cmd, DevArgument argin,
  * 			code if the corresponding call 
  * 			returns a non-zero value.
  * 
- * @return	DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */ 
 long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
 			    DevType argin_type, DevLong *error )
@@ -394,7 +396,8 @@ long _DLLFunc dev_put_asyn (devserver ds, long cmd, DevArgument argin,
  * @param varcmdarr sequence of DevCmdInfo structures, that will returned.
  * @param error Will contain an appropriate error code if the corresponding call returns a DS_NOTOK
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc taco_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, DevLong *error)
 {
@@ -641,7 +644,8 @@ long _DLLFunc taco_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, DevLo
  * @param error     	Will contain an appropriate error code if the
  *			corresponding call returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, DevLong *error)
 {
@@ -679,10 +683,10 @@ long _DLLFunc dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, DevLong *e
  * 			code if the corresponding call
  * 			returns a non-zero value.
  * 
- * @return	DS_OK or DS_NOTOK or DS_WARNING
- * 		DS_WARNING is returned, if the function was
- * 		executed correctly, but no command name
- * 		string was found in the database.
+ * @retval DS_OK 
+ * @retval DS_NOTOK 
+ * @retval DS_WARNING returned, if the function was executed correctly, but no 
+ *			command name string was found in the database.
  */ 
 static long get_cmd_string (devserver ds, long cmd, char *cmd_str, size_t len, DevLong *error)
 {
@@ -778,7 +782,8 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, size_t len, D
  * @param error		Will contain an appropriate error code if the
  * 		        corresponding call returns a non-zero value.
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc dev_inform (devserver *clnt_handles, long num_devices,
 			  DevInfo **dev_info, DevLong *error)
@@ -858,7 +863,8 @@ long _DLLFunc dev_inform (devserver *clnt_handles, long num_devices,
  * @param error   	Will contain an appropriate error code if the
  * 			corresponding call returns a non-zero value.
  * 
- * @return	DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */ 
 long _DLLFunc dev_rpc_timeout (devserver ds, long request, 
 			       struct timeval *dev_timeout, DevLong *error)
@@ -1070,8 +1076,8 @@ long _DLLFunc get_i_nethost_by_device_name (char *device_name, DevLong *error)
  * @param error  	Will contain an appropriate error code if the
  *		        corresponding call returns a non-zero value.
  *
- * @return 	the index of nethost or DS_NOTOK if not found in the list of known 
- *		NETHOST's.
+ * @return the index of nethost 
+ * @retval DS_NOTOK if not found in the list of known NETHOST's.
  */
 long _DLLFunc get_i_nethost_by_name (char *nethost, DevLong *error)
 {
@@ -1116,7 +1122,8 @@ long _DLLFunc get_i_nethost_by_name (char *nethost, DevLong *error)
  * @param error  	Will contain an appropriate error code if the
  * 		        corresponding call returns a non-zero value.
  * 
- *  Return(s)  :	DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 char* _DLLFunc get_nethost_by_index (long i_nethost, DevLong *error)
 {
@@ -1237,7 +1244,8 @@ extern msgserver_info          msg_info;
  * @param error Will contain an appropriate error code if the
  * 		corresponding call returns a non-zero value.
  * 
- * @return	DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */ 
 long _DLLFunc nethost_alloc (DevLong *error)
 {
@@ -1356,7 +1364,8 @@ long _DLLFunc nethost_alloc (DevLong *error)
  * @param error Will contain an appropriate error code if the
  * 		corresponding call returns a non-zero value.
  *
- * @return	DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc dev_ping (devserver ds, DevLong *error)
 {
@@ -1460,7 +1469,8 @@ long _DLLFunc dev_ping (devserver ds, DevLong *error)
  * @param host_name a NUL-terminated hostname in the array name that has a length of len bytes
  * @param len length of the array host_name
  *
- * @return 0 on success else -1
+ * @retval 0 on success 
+ * @retval -1
  */
 int taco_gethostname(char *host_name, size_t len)
 {

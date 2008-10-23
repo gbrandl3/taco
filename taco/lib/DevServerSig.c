@@ -31,9 +31,9 @@
  *
  * Original:	June 1991
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2008-10-22 08:32:00 $
+ * Date:	$Date: 2008-10-23 05:28:17 $
  *
  *******************************************************************-*/
 
@@ -90,7 +90,8 @@ static void 	(*sig_tab [NUSIG])() = {SIG_DFL};
  *			code if the corresponding call
  *			returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long ds__signal (int sig, void (*action)(int), long *error)
 {

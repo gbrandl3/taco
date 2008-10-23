@@ -32,9 +32,9 @@
  *
  * Original   : December 1997
  *
- * Version    :	$Revision: 1.10 $
+ * Version    :	$Revision: 1.11 $
  *
- * Date	    :	$Date: 2008-04-06 09:07:05 $
+ * Date	    :	$Date: 2008-10-23 05:25:49 $
  *
  *-*******************************************************************/
 
@@ -107,8 +107,9 @@ static struct timeval timeout_browse={60,0};
  *			allocated by this function
  * @param p_error 	Pointer for the error code in case of problems 
  *
- * @return In case of trouble, the function returns DS_NOTOK and sets the variable
- *    pointed to by p_error. Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *		to by p_error. 
+ * @retval DS_OK otherwise.
  *
  */
 long db_getdevdomainlist(long *p_domain_nb,char ***ppp_list,DevLong *p_error)
@@ -291,8 +292,9 @@ long db_getdevdomainlist(long *p_domain_nb,char ***ppp_list,DevLong *p_error)
  *			allocated by this function
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return  	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by p_error. Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *			to by p_error. 
+ * @retval DS_OK otherwise.
  */
 long db_getdevfamilylist(char *domain,long *p_family_nb,char ***ppp_list,DevLong *p_error)
 {
@@ -494,8 +496,9 @@ long db_getdevfamilylist(char *domain,long *p_family_nb,char ***ppp_list,DevLong
  * @param ppp_list  	Pointer for the member name list. Memory is allocated by this function
  * @param p_error 	Pointer for the error code in case of problems 
  *
- * @return    	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by p_error. Otherwise, the function returns DS_OK 
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *			to by p_error. 
+ * @retval DS_OK otherwise.
  */
 long db_getdevmemberlist(char *domain,char *family,long *p_member_nb, 
 			 char ***ppp_list,DevLong *p_error)
@@ -720,8 +723,9 @@ long db_getdevmemberlist(char *domain,char *family,long *p_member_nb,
  * @param ppp_list : Pointer for the domain name list. Memory is allocated by this function
  * @param p_error : Pointer for the error code in case of problems
  * 
- * @return    	In case of trouble, the function returns DS_NOTOK and sets the variable 
- *    		pointed to by p_error. Otherwise, the function returns DS_OK 
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *			to by p_error. 
+ * @retval otherwise. 
  */
 long db_getresdomainlist(long *p_domain_nb,char ***ppp_list,DevLong *p_error)
 {
@@ -902,8 +906,9 @@ long db_getresdomainlist(long *p_domain_nb,char ***ppp_list,DevLong *p_error)
  * @param ppp_list 	Pointer for the family name list. Memory is allocated by this function
  * @param p_error 	Pointer for the error code in case of problems 
  * 
- * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by p_error. Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed 
+ *			to by p_error. 
+ * @retval DS_OK otherwise.
  */
 long db_getresfamilylist(char *domain,long *p_family_nb,char ***ppp_list,DevLong *p_error)
 {
@@ -1105,8 +1110,8 @@ long db_getresfamilylist(char *domain,long *p_family_nb,char ***ppp_list,DevLong
  * @param ppp_list 	Pointer for the member name list. Memory is allocated by this function
  * @param p_error 	Pointer for the error code in case of problems
  * 
- * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by p_error. Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed to by p_error. 
+ * @retval DS_OK otherwise.
  */
 long db_getresmemberlist(char *domain,char *family,long *p_member_nb, 
 			 char ***ppp_list,DevLong *p_error)
@@ -1340,8 +1345,8 @@ long db_getresmemberlist(char *domain,char *family,long *p_member_nb,
  * @param ppp_list  	Pointer for the member name list. Memory is allocated by this function
  * @param p_error  	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by p_error. Otherwise, the function returns DS_OK 
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed to by p_error. 
+ * @retval DS_OK otherwise.
  */
 
 
@@ -1598,8 +1603,8 @@ long db_getresresolist(char *domain,char *family,char *member,
  * @param ppp_list  	Pointer for the resource value list. Memory is allocated by this function
  * @param p_error  	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable 
- *    		pointed to by p_error. Otherwise, the function returns DS_OK 
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed to by p_error. 
+ * @retval DS_OK otherwise.
  */
 long db_getresresoval(char *domain,char *family,char *member,char *resource, 
 		      long *p_rval_nb,char ***ppp_list,DevLong *p_error)
@@ -1876,8 +1881,8 @@ long db_getresresoval(char *domain,char *family,char *member,char *resource,
  * @param ppp_list  	Pointer for the server name list. Memory is allocated by this function
  * @param p_error  	Pointer for the error code in case of problems
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable 
- *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed to by "p_error". 
+ * @retval DS_OK otherwise.
  */
 long db_getdsserverlist(long *p_server_nb,char ***ppp_list,DevLong *p_error)
 {
@@ -2057,8 +2062,8 @@ long db_getdsserverlist(long *p_server_nb,char ***ppp_list,DevLong *p_error)
  * @param ppp_list 	Pointer for the personal name list. Memory is allocated by this function
  * @param p_error 	Pointer for the error code in case of problems
  *
- * @return    	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed to by "p_error". 
+ * @retval DS_OK otherwise.
  */
 long db_getdspersnamelist(char *server,long *p_pers_nb,char ***ppp_list,DevLong *p_error)
 {
@@ -2257,8 +2262,8 @@ long db_getdspersnamelist(char *server,long *p_pers_nb,char ***ppp_list,DevLong 
  * @param ppp_list  	Pointer for the host name list. Memory is allocated by this function
  * @param p_error  	Pointer for the error code in case of problems 
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed to by "p_error". 
+ * @retval DS_OK otherwise.
  */
 long db_gethostlist(long *p_host_nb,char ***ppp_list,DevLong *p_error)
 {
@@ -2437,8 +2442,8 @@ long db_gethostlist(long *p_host_nb,char ***ppp_list,DevLong *p_error)
  * @param ds_list  	Pointer for the ds info structure array
  * @param p_error  	Pointer for the error code in case of problems 
  *
- * @return   	In case of trouble, the function returns DS_NOTOK and sets the variable
- *    		pointed to by "p_error". Otherwise, the function returns DS_OK
+ * @retval DS_NOTOK In case of trouble, the function sets the variable pointed to by "p_error". 
+ * @retval DS_OK otherwise.
  */
 long db_getdsonhost(char *host, long *p_ds_nb, db_svc **ds_list,DevLong *p_error)
 {

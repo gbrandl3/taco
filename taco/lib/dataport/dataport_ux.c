@@ -25,9 +25,9 @@
  * Author(s):
  *		$Author: jkrueger1 $
  * 
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2008-04-06 09:07:03 $
+ * Date:	$Date: 2008-10-23 05:25:05 $
  *
  ****************************************************************************/
 
@@ -57,7 +57,8 @@ extern int delete_shared (int sid);
  *
  * @param name The dataport name
  * 
- * @return the key or -1 if it fails
+ * @return the key 
+ * @retval -1 if it fails
  */
 
 int build_key (char *name)
@@ -88,7 +89,8 @@ int build_key (char *name)
  * @param name 	The dataport name
  * @param size 	The shared memory size wanted by the user
  *
- * @return the datport pointer or NULL if it fails
+ * @return the dataport pointer 
+ * @retval NULL if it fails
  */
 Dataport *CreateDataport(char *name, long size)
 {
@@ -136,7 +138,8 @@ Dataport *CreateDataport(char *name, long size)
  * @param name The dataport name
  * @param size The dataport shared memory size
  *
- * @return a pointer to the dataport shm or NULL if it fails
+ * @return a pointer to the dataport shm 
+ * @retval NULL if it fails
  */
 Dataport *OpenDataport(char *name,long size)
 {
@@ -178,7 +181,8 @@ Dataport *OpenDataport(char *name,long size)
  *
  * @param dp Address of dataport shared memory
  *
- * @returns DS_OK when the process gets the dataport control or DS_NOTOK when it fails
+ * @retval DS_OK when the process gets the dataport control 
+ * @retval DS_NOTOK when it fails
  */
 long AccessDataport(Dataport *dp)
 {
@@ -203,7 +207,8 @@ long AccessDataportNoWait(Dataport *dp)
  *
  * @param dp Address of dataport shared memory
  *
- * @return DS_OK if the dataport is released. Otherwise, the function returns DS_NOTOK.
+ * @retval DS_OK if the dataport is released. 
+ * @retval DS_NOTOK otherwise
  */
 long ReleaseDataport(Dataport *dp)
 {
@@ -220,7 +225,8 @@ long ReleaseDataport(Dataport *dp)
  * - The largest free area size
  * - The amount of free memory
  *
- * @return DS_NOTOK if one error occurs and the error code will be set
+ * @retval DS_NOTOK if one error occurs and the error code will be set
+ * @retval DS_OK
  */
 long CloseDataport(Dataport *dp,char *name)
 {

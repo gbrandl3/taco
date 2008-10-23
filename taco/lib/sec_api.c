@@ -29,9 +29,9 @@
  *
  * Original   : December 1993
  *
- * Version    :	$Revision: 1.19 $
+ * Version    :	$Revision: 1.20 $
  *
- * Date       :	$Date: 2008-10-22 08:25:52 $
+ * Date       :	$Date: 2008-10-23 05:28:17 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -146,7 +146,8 @@ short		*auth_flag;
  * @param connection_id will be set to the next free field in the list of connections
  * @param error pointer to error code in case routine fails
  *
- * @return DS_OK if the access is allowed , otherwise Error, access denied.
+ * @retval DS_OK if the access is allowed 
+ * @retval DS_NOTOK access denied.
  */
 long _DLLFunc dev_security (char *dev_name, long requested_access,
 			    long *ret_client_id, long *connection_id, DevLong *error)
@@ -381,7 +382,8 @@ long _DLLFunc dev_security (char *dev_name, long requested_access,
  *
  * @param error pointer to error code, in case routine fails
  * 
- * @return DS_OK if access is allowed, otherwise DS_NOTOK 
+ * @retval DS_OK if access is allowed
+ * @retval DS_NOTOK otherwise 
  */
 static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
 		       DevLong *error)
@@ -623,7 +625,9 @@ static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
  *
  * @param error pointer to error code, in case routine fails
  *
- * @return DS_OK if the access is allowed, DS_NOTOK if access denied, DS_WARNING if no access right specification.
+ * @retval DS_OK if the access is allowed
+ * @retval DS_NOTOK if access denied
+ * @retval DS_WARNING if no access right specification.
  */
 static long check_access_hierarchy (char *dev_name, long access_right, 
 				    char *name, char *res_path, DevLong *error)
@@ -763,7 +767,8 @@ static long check_access_hierarchy (char *dev_name, long access_right,
  *
  * @param error pointer to error code. Will return error if no access was given.
  *
- * @return  DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 static long sec_user_ident (SecUserAuth user_auth, 
 			    SecDefaultAccess sec_default_access,
@@ -1080,7 +1085,8 @@ static long sec_user_ident (SecUserAuth user_auth,
  * @param str_array extracted parts of the device name.
  * @param error pointer to error code, in case routine fails
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 static long search_dev_name (char *dev_name, char str_array[3][LONG_NAME_SIZE],
 			     DevLong *error)
@@ -1167,7 +1173,9 @@ static long search_dev_name (char *dev_name, char str_array[3][LONG_NAME_SIZE],
  * 
  * @param error pointer to error code, in case routine fails
  *
- * @return DS_OK if access allowed, DS_NOTOK if access denied, DS_WARNING if oo access right specification.
+ * @retval DS_OK if access allowed
+ * @retval DS_NOTOK if access denied
+ * @retval DS_WARNING if access right specification.
  */
 static long check_access_right (char *name, long requested_access,
 				DevVarStringArray *access_res, DevLong *error)
@@ -1280,7 +1288,8 @@ void _DLLFunc free_var_str_array (DevVarStringArray *str_array)
  * @param ret_client_id will be set to the client ID
  * @param error pointer to error code, in case routine fails
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 static long create_client_id (SecUserAuth user_auth, long *ret_client_id, 
 			      DevLong *error)
@@ -1338,7 +1347,8 @@ static long create_client_id (SecUserAuth user_auth, long *ret_client_id,
  * @param connection_id will be set to the connection number.
  * @param error pointer to error code, in case routine fails.
  * 
- * @return DS_OK / DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 static long get_connection_id (long *connection_id, DevLong *error)
 {
@@ -1418,7 +1428,8 @@ static long get_connection_id (long *connection_id, DevLong *error)
  * 
  * @param error pointer to error code, in case routine fails.
  * 
- * @return DS_OK / DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc free_connection_id_vers3 (long connection_id, DevLong *error)
 {
@@ -1441,7 +1452,8 @@ long _DLLFunc free_connection_id_vers3 (long connection_id, DevLong *error)
  * 
  * @param error pointer to error code, in case routine fails
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc create_sec_key (devserver ds, DevLong *error)
 {
@@ -1499,7 +1511,8 @@ long _DLLFunc create_sec_key (devserver ds, DevLong *error)
  * @param ret_client_id will be set to the client ID.
  * @param error pointer to error code, in case routine fails
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc verify_sec_key (devserver ds, long *ret_client_id, DevLong *error)
 {
@@ -1603,7 +1616,8 @@ void _DLLFunc free_sec_key (devserver ds)
  *
  * @param error pointer to error code, in case routine fails
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc sec_svc_import (DevServerDevices *device, long connection_id,
 			      long client_id, long access_right,
@@ -1783,7 +1797,8 @@ long _DLLFunc sec_svc_import (DevServerDevices *device, long connection_id,
  *
  * @param error pointer to error code, in case routine fails
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc sec_svc_free (DevServerDevices *device, long connection_id,
 			    long client_id, long access_right, DevLong *error)
@@ -1835,7 +1850,8 @@ long _DLLFunc sec_svc_free (DevServerDevices *device, long connection_id,
  *
  * @param error pointer to error code, in case routine fails
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc sec_svc_cmd (DevServerDevices *device, long connection_id,
 			   long client_id, long access_right, long cmd,
@@ -1992,7 +2008,8 @@ long _DLLFunc sec_svc_cmd (DevServerDevices *device, long connection_id,
  * @param svr_conn connection structure with protocol and socket information.
  * @param error pointer to error code, in case routine fails
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc sec_tcp_connection (long requested_access, CLIENT **clnt,
 				  server_connections *svr_conn, DevLong *error)
@@ -2198,7 +2215,8 @@ void _DLLFunc sec_free_tcp_connection (devserver ds, server_connections *svr_con
  *
  * @param device structure for the exported device.
  * 
- * @return DS_OK if Connection valid. DS_NOTOK if connection no longer valid, single user access canceled.
+ * @retval DS_OK if connection valid 
+ * @retval DS_NOTOK if connection no longer valid, single user access canceled.
  */
 static long sec_verify_tcp_conn (DevServerDevices *device)
 {

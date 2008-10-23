@@ -29,9 +29,9 @@
  *
  * Original:	Feb 1994
  *
- * Version:	$Revision: 1.31 $
+ * Version:	$Revision: 1.32 $
  *
- * Date:		$Date: 2008-10-22 08:25:03 $
+ * Date:		$Date: 2008-10-23 05:28:17 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -951,7 +951,8 @@ void _DLLFunc rpc_dev_put_asyn_cmd (_server_data *server_data)
  * @param error Will contain an appropriate error code if the corresponding 
  *		call returns a non-zero value.
  *
- * @return  DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 #ifndef __cplusplus
 /*
@@ -1168,7 +1169,8 @@ free_found:
  * @param error 	Will contain an appropriate error
  *		code if the corresponding call returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long ds__destroy (void *ptr_ds, DevLong *error)
 {
@@ -1424,6 +1426,7 @@ _dev_query_out * _DLLFunc rpc_dev_cmd_query_4 (_dev_query_in *dev_query_in)
  * The _dev_query_out type is defined in API_xdr.h.
  *
  * @param dev_query_in
+ *
  * @return
  */
 _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_in)
@@ -1584,7 +1587,8 @@ _dev_queryevent_out * _DLLFunc rpc_dev_event_query_4 (_dev_query_in *dev_query_i
  *			client access) array of an exported device.
  * @param error 	pointer to error code, in case routine fails.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  *
  */
 static long read_device_id (long device_id, long *ds_id, long *connection_id, DevLong *error)
@@ -1908,9 +1912,11 @@ static int error_msg(const char *msg)
  * @param pn        if different from 0 use this RPC program number
  * @param n_device    number of devices to export
  * @param device_list list of devices
+ *
+ * @retval DS_OK
+ * @retval DS_NOTOK
  */
 int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int nodb, int pn, int n_device, char** device_list)
-
 {
 	char    		host_name [HOST_NAME_LENGTH],
 				dsn_name [37],
@@ -2511,7 +2517,8 @@ static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp)
  * @param error Will contain an appropriate error code if the corresponding 
  *              call returns a non-zero value.
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long db_check (DevLong *error)
 {
@@ -2525,7 +2532,8 @@ long db_check (DevLong *error)
  * @param error Will contain an appropriate error code if the corresponding 
  *              call returns a non-zero value.
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long svc_check (DevLong *error)
 {

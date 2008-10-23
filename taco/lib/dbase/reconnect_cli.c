@@ -31,9 +31,9 @@
  *
  * Original   : September 1998
  *  
- * Version    :	$Revision: 1.12 $
+ * Version    :	$Revision: 1.13 $
  *
- * Date	      : $Date: 2008-10-22 08:20:58 $
+ * Date	      : $Date: 2008-10-23 05:25:49 $
  *
  *-*******************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -91,8 +91,8 @@ extern CLIENT *cl;
  * @param connect_type
  * @param error		The error code in case of failure
  *
- * @return   This function returns DS_OK and clears the error code if the reconnection
- *    was successful. Otherwise, the function returns DS_NOTOK and set the error code.								
+ * @retval DS_OK  This function clears the error code if the reconnection was successful. 
+ * @retval DS_NOTOK otherwise, the function sets the error code.								
  */
 int to_reconnection(void *p_data, void **pp_result, CLIENT **client,
 		    int call_type, long nethost_index,

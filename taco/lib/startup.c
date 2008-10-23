@@ -36,9 +36,9 @@
  *
  * Original:	October 1996
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2008-04-06 09:07:01 $
+ * Date:	$Date: 2008-10-23 05:28:17 $
  *
  *********************************************************************/
 
@@ -73,7 +73,8 @@ extern long debug_flag;
  * @param svr_name 	the name of the server
  * @param error		the error code in case of error
  *
- * @return DS_NOTOK in case of error, DS_OK else
+ * @retval DS_NOTOK in case of error
+ * @retval DS_OK no error
  */
 long startup(char *svr_name, DevLong *error)
 {

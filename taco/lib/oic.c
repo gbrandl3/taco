@@ -31,9 +31,9 @@
  *
  * Original:	July 1995
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2008-04-06 09:07:00 $
+ * Date:	$Date: 2008-10-23 05:28:17 $
  *
  ********************************************************************-*/
 
@@ -72,7 +72,8 @@
  * @param method 	method to be searched for.
  * @param function_ptr 	function pointer of method to be searched for.
  *
- * @return  DS_OK or DS_NOTOK
+ * @retval  DS_OK 
+ * @retval DS_NOTOK
  */
 long ds__method_search (void *ptr_ds_class, DevMethod method,
 			DevMethodFunction *function_ptr)
@@ -199,7 +200,8 @@ DevMethodFunction ds__method_finder (void *ptr_ds, DevMethod method)
  * @param ptr_ds_ptr 	pointer to the new object structure.
  * @param error 	Will contain an appropriate error code if the corresponding call returns a non-zero value.
  * 
- * @return  DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long ds__create (char *name, void *ptr_ds_class,void *ptr_ds_ptr, DevLong *error)
 {

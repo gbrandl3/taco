@@ -51,9 +51,9 @@
  *
  * Original   :	April 1999
  *
- * Version    :	$Revision: 1.19 $
+ * Version    :	$Revision: 1.20 $
  *
- * Date       :	$Date: 2008-10-22 08:27:36 $
+ * Date       :	$Date: 2008-10-23 05:28:17 $
  *
  ********************************************************************-*/
 
@@ -173,7 +173,8 @@ bool_t _DLLFunc xdr__asynch_client_data PT_((XDR *xdrs, _asynch_client_data *obj
  * @param error         Will contain an appropriate error code if the 
  *			corresponding call returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc dev_event_listen_x (devserver ds, long event_type,
 	DevArgument argout, DevType argout_type, 
@@ -576,7 +577,8 @@ void _DLLFunc dev_event_fire (Device *device, long event,
  * @param error         Will contain an appropriate error code if the 
  *			corresponding call returns a non-zero value.
  * 
- * @return	DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */ 
 long _DLLFunc dev_event_unlisten_x (devserver ds, long event_type,
                                   long event_id, DevLong *error)
@@ -784,7 +786,8 @@ void _DLLFunc event_client_cleanup (DevLong *error)
  * 
  * @param server_data client data
  * 
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */ 
 _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
 {
@@ -904,7 +907,8 @@ _dev_import_out* _DLLFunc rpc_event_listen_5 (_server_data *server_data)
  *
  * @param server_data client data
  *
- * @return DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 _dev_free_out* _DLLFunc rpc_event_unlisten_5 (_server_data *server_data)
 {
@@ -993,7 +997,8 @@ static long get_event_string PT_( (devserver ds, long event, char *event_str, si
  * @param error     	Will contain an appropriate error code if the
  *			corresponding call returns a non-zero value.
  *
- * Return(s)  :	DS_OK or DS_NOTOK
+ * @retval DS_OK 
+ * @retval DS_NOTOK
  */
 long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, DevLong *error)
 {
@@ -1212,7 +1217,9 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, DevL
  * @param len		size of the event_str (must be shorter than the space of event_str to avoid buffer overruns)
  * @param error   	Will contain an appropriate error code if the corresponding call returns a non-zero value.
  *
- * @return DS_OK or DS_NOTOK or DS_WARNING
+ * @retval DS_OK 
+ * @retval DS_NOTOK 
+ * @retval DS_WARNING
  */
 static long get_event_string (devserver ds, long event, char *event_str, size_t len, DevLong *error)
 {
