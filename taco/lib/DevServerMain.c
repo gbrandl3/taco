@@ -29,9 +29,9 @@
  *
  * Original   	: March 1991
  *
- * Version	: $Revision: 1.30 $
+ * Version	: $Revision: 1.31 $
  *
- * Date		: $Date: 2008-10-23 05:28:17 $
+ * Date		: $Date: 2008-10-23 09:51:16 $
  *
  *******************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -361,6 +361,7 @@ int main (int argc, char **argv)
 	}
 #endif  /* !WIN32 */
 
+	nethost_alloc(&error);  /* allocate multi_nethost */
 /*
  * make sure all config flags are set to zero before starting
  */

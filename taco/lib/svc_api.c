@@ -29,9 +29,9 @@
  *
  * Original:	Feb 1994
  *
- * Version:	$Revision: 1.34 $
+ * Version:	$Revision: 1.35 $
  *
- * Date:		$Date: 2008-10-23 09:48:34 $
+ * Date:		$Date: 2008-10-23 09:51:16 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -1961,7 +1961,6 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 	}
 
 	snprintf(dsn_name, sizeof(dsn_name), "%s/%s", server_name, pers_name);
-	nethost_alloc(&error);  /* allocate multi_nethost */
 /*
  * option nodb means run device server without database
  */
