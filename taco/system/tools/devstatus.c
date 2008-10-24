@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.5 $
+ * Version      : $Revision: 1.6 $
  *
- * Date         : $Date: 2008-10-14 09:52:29 $
+ * Date         : $Date: 2008-10-24 15:41:57 $
  *
  */
 
@@ -104,88 +104,90 @@ int main(int argc,char **argv)
         if (optind != argc - 1)
                 usage(argv[0]);
 
-   if(db_import(&error)) 
-   {
-	   printf("Error during db_import\n");
-	   return(-1);
-   }
-   if(strchr(argv[optind],'*')==0)
-   {
-      if(devcmd(argv[optind])!=0)
-         error_flag = 1;
-   }
-   else
-   {
-   status=db_getdevexp(argv[optind],&device_tab,&dev_nb,&error);
-   if (status==-1) 
-   {
-      printf("%s\n",dev_error_str(error));
-      fflush(stdout);
-     return(-1);
+	if(db_import(&error)) 
+	{
+		printf("** db_import : %s **\n", dev_error_str(error)+25);
+	}
 
-   }
-   if(dev_nb==0) 
-   {
-      printf("no device has this name\n");
-     return(-1);
-   }
-   for(i=0;i<dev_nb;i++)
-   {
-      if(devcmd(device_tab[i])!=0)
-      error_flag = 1;
-   }
-   db_freedevexp(device_tab);
-   }
-   if(error_flag ==1) return (-1);
-   else return(0);
+	if(strchr(argv[optind],'*')==0)
+	{
+		if(devcmd(argv[optind])!=0)
+			error_flag = 1;
+	}
+	else
+	{
+		status=db_getdevexp(argv[optind],&device_tab,&dev_nb,&error);
+		if (status==-1) 
+		{
+			printf("%s\n",dev_error_str(error));
+			fflush(stdout);
+			return(-1);
+		}
+		if(dev_nb==0) 
+		{
+			printf("no device has this name\n");
+			return(-1);
+		}
+		for(i=0;i<dev_nb;i++)
+		{
+			if(devcmd(device_tab[i])!=0)
+				error_flag = 1;
+		}
+		db_freedevexp(device_tab);
+	}
+	if(error_flag ==1) 
+		return (-1);
+	else 
+		return(0);
 }
 long devcmd(char *devname)
 {
-   long 	status,long_state;
-   DevLong	error;
-   char  	*pts;
-   char 	cmd_string[80];
-   devserver 	ds;
+	long 	status,
+		long_state;
+	DevLong	error;
+	char  	*pts;
+	char 	cmd_string[80];
+	devserver 	ds;
 
-   status= dev_import(devname,0,&ds,&error);
-   if(status<0)
-   {
-      printf("** import %s: %s **\n",devname,dev_error_str(error)+25);
-      return(-1);
-   }
-   pts=NULL;
-   status= dev_putget(ds,DevStatus,NULL,D_VOID_TYPE,&pts,D_STRING_TYPE,&error);
-   if(status==0)
-   {
-      printf("%s:	%s\n",devname,pts);
-      dev_xdrfree(D_STRING_TYPE,&pts,&error);
-   }
-   else if (error == DevErr_TypeError)
-   {
-      DevVarCharArray ptr = {0, NULL};
-      status = dev_putget(ds, DevStatus, NULL, D_VOID_TYPE, &ptr, D_VAR_CHARARR, &error);
-      if (status == 0)
-      {
-	 pts = (char *)malloc(ptr.length + 1);
-	 strncpy(pts, ptr.sequence, ptr.length);
-	 pts[ptr.length] = '\0';
-         printf("%s:       %s\n",devname, pts);
-	 free(pts);
-         dev_xdrfree(D_VAR_CHARARR,&ptr,&error);
-      }	
-      else
-      {
-         printf("** %s: %s **\n",devname,dev_error_str(error)+25);
-         dev_free(ds,&error);
-         return(-1);
-      } 
-   }
-   else
-   {
-      printf("** %s: %s **\n",devname,dev_error_str(error)+25);
-      dev_free(ds,&error);
-      return(-1);
-   } 
-   dev_free(ds,&error);
-   return(0);
+	status= dev_import(devname,0,&ds,&error);
+	if(status<0)
+	{
+		printf("** import %s: %s **\n",devname,dev_error_str(error)+25);
+		return(-1);
+	}
+	pts=NULL;
+	status= dev_putget(ds,DevStatus,NULL,D_VOID_TYPE,&pts,D_STRING_TYPE,&error);
+	if(status==0)
+	{
+		printf("%s:	%s\n",devname,pts);
+		dev_xdrfree(D_STRING_TYPE,&pts,&error);
+	}
+	else if (error == DevErr_TypeError)
+	{
+		DevVarCharArray ptr = {0, NULL};
+		status = dev_putget(ds, DevStatus, NULL, D_VOID_TYPE, &ptr, D_VAR_CHARARR, &error);
+		if (status == 0)
+		{
+			pts = (char *)malloc(ptr.length + 1);
+			strncpy(pts, ptr.sequence, ptr.length);
+			pts[ptr.length] = '\0';
+			printf("%s:       %s\n",devname, pts);
+			free(pts);
+			dev_xdrfree(D_VAR_CHARARR,&ptr,&error);
+		}	
+		else
+		{
+			printf("** %s: %s **\n",devname,dev_error_str(error)+25);
+			dev_free(ds,&error);
+			return(-1);
+		} 
+	}
+	else
+	{
+		printf("** %s: %s **\n",devname,dev_error_str(error)+25);
+		dev_free(ds,&error);
+		return(-1);
+	} 
+	dev_free(ds,&error);
+	return(0);
 }

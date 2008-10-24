@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.8 $
+ * Version      : $Revision: 1.9 $
  *
- * Date         : $Date: 2008-10-14 09:52:29 $
+ * Date         : $Date: 2008-10-24 15:41:57 $
  *
  */
 
@@ -105,99 +105,98 @@ int main(int argc, char **argv)
         if (optind != argc - 1)
                 usage(argv[0]);
 
-/*
-   if(db_import(&error)) 
-   {
-	   printf("Error during db_import\n");
-	   exit(0);
-   }
- */
-   if(index(argv[optind],'*')==0)
-      devcmd(argv[optind]);
-   else
-   {
-   status=db_getdevexp(argv[optind],&device_tab,&dev_nb,&error);
-   if (status==-1) 
-   {
-      printf("%s\n",dev_error_str(error));
-      fflush(stdout);
-      exit(0);
-   }
-   if(dev_nb==0) 
-   {
-      printf("no device has this name\n");
-      exit(0);
-   }
-   printf("%-32s  %s\n", "device name", "value");
-   for(i=0;i<dev_nb;i++)
-   {
-      devcmd(device_tab[i]);
-   }
-   db_freedevexp(device_tab);
-   }
-   devcmd(device_tab[0]);
+	if(db_import(&error)) 
+	{
+		printf("** db_import : %s **\n", dev_error_str(error)+25);
+	}
+
+	if(index(argv[optind],'*')==0)
+		devcmd(argv[optind]);
+	else
+	{
+		status=db_getdevexp(argv[optind],&device_tab,&dev_nb,&error);
+		if (status==-1) 
+		{
+			printf("%s\n",dev_error_str(error));
+			fflush(stdout);
+			exit(0);
+		}
+		if(dev_nb==0) 
+		{
+			printf("no device has this name\n");
+			exit(0);
+		}
+		printf("%-32s  %s\n", "device name", "value");
+		for(i=0;i<dev_nb;i++)
+		{
+		devcmd(device_tab[i]);
+		}
+		db_freedevexp(device_tab);
+	}
 }
 
 long devcmd(char *devname)
 {
-   long status,long_state;
-   DevLong error;
-   char cmd_string[80];
-   double value;
-   devserver ds;
-   status= dev_import(devname,0,&ds,&error);
-   if(status<0)
-   {
-      printf("** import %s: %s **\n",devname,dev_error_str(error)+25);
-      return(-1);
-   }
-   status= dev_putget(ds,DevRead,NULL,D_VOID_TYPE,&value,D_DOUBLE_TYPE,&error);
-   if(status==0)
-   {
-      printf("%-32s: %.3g\n",devname,value);
-   }
-   else if (error == DevErr_RuntimeError)
-   {
-      status = dev_putget(ds, TACO_COMMAND_READ_DOUBLE, NULL, D_VOID_TYPE, &value, D_DOUBLE_TYPE, &error);
-      if (status == 0)
-      {
-         printf("%-32s: %g\n", devname, value);
-      }
-      else if (error == DevErr_RuntimeError)
-      {
-         DevLong tmpLong;
-         status = dev_putget(ds, TACO_COMMAND_READ_LONG, NULL, D_VOID_TYPE, &tmpLong, D_LONG_TYPE, &error);
-         if (status == 0)
-         {
-            printf("%-32s: %ld\n", devname, tmpLong);
-         }
-         else if (error == DevErr_RuntimeError)
-         {
-            DevULong tmpULong;
-            status = dev_putget(ds, TACO_COMMAND_READ_U_LONG, NULL, D_VOID_TYPE, &tmpULong, D_ULONG_TYPE, &error);
-            if (status == 0)
-            {
-               printf("%-32s: %lu\n", devname, tmpULong);
-            }
-            else 
-            {
-               printf("** %s: %s **\n",devname,dev_error_str(error)+25);
-            }
-         }
-         else 
-         {
-            printf("** %s: %s **\n",devname,dev_error_str(error)+25);
-         }
-      }
-      else 
-      {
-         printf("** %s: %s **\n",devname,dev_error_str(error)+25);
-      }
-   }
-   else 
-   {
-      printf("** %s: %s **\n",devname,dev_error_str(error)+25);
-   } 
-   dev_free(ds,&error);
-   if(cmd_string[0]=='q') exit(0);
+	long 	status,
+		long_state;
+	DevLong error;
+	char cmd_string[80];
+	double value;
+	devserver ds;
+	status= dev_import(devname,0,&ds,&error);
+	if(status<0)
+	{
+		printf("** import %s: %s **\n",devname,dev_error_str(error)+25);
+		return(-1);
+	}
+	status= dev_putget(ds,DevRead,NULL,D_VOID_TYPE,&value,D_DOUBLE_TYPE,&error);
+	if(status==0)
+	{
+		printf("%-32s: %.3g\n",devname,value);
+	}
+	else if (error == DevErr_RuntimeError)
+	{
+		status = dev_putget(ds, TACO_COMMAND_READ_DOUBLE, NULL, D_VOID_TYPE, &value, D_DOUBLE_TYPE, &error);
+		if (status == 0)
+		{
+			printf("%-32s: %g\n", devname, value);
+		}
+		else if (error == DevErr_RuntimeError)
+		{
+			DevLong tmpLong;
+			status = dev_putget(ds, TACO_COMMAND_READ_LONG, NULL, D_VOID_TYPE, &tmpLong, D_LONG_TYPE, &error);
+			if (status == 0)
+			{
+				printf("%-32s: %ld\n", devname, tmpLong);
+			}
+			else if (error == DevErr_RuntimeError)
+			{
+				DevULong tmpULong;
+				status = dev_putget(ds, TACO_COMMAND_READ_U_LONG, NULL, D_VOID_TYPE, &tmpULong, D_ULONG_TYPE, &error);
+				if (status == 0)
+				{
+					printf("%-32s: %lu\n", devname, tmpULong);
+				}
+				else 
+				{
+					printf("** %s: %s **\n",devname,dev_error_str(error)+25);
+				}
+			}
+			else 
+			{
+				printf("** %s: %s **\n",devname,dev_error_str(error)+25);
+			}
+		}
+		else 
+		{
+			printf("** %s: %s **\n",devname,dev_error_str(error)+25);
+		}
+	}
+	else 
+	{
+		printf("** %s: %s **\n",devname,dev_error_str(error)+25);
+	} 
+	dev_free(ds,&error);
+	if(cmd_string[0]=='q') 
+		exit(0);
 }
