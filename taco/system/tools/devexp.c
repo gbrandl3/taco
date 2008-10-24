@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.4 $
+ * Version      : $Revision: 1.5 $
  *
- * Date         : $Date: 2008-10-14 09:52:29 $
+ * Date         : $Date: 2008-10-24 16:08:39 $
  *
  */
 
@@ -99,8 +99,7 @@ int main(int argc, char **argv)
 
    if(db_import(&error)) 
    {
-	   printf("error: during db_import\n");
-	   exit(0);
+	printf("** db_import : %s **\n", dev_error_str(error)+25);
    }
    status=db_getdevexp(argv[optind],&device_tab,&dev_nb,&error);
    if (status==-1) 

@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.4 $
+ * Version      : $Revision: 1.5 $
  *
- * Date         : $Date: 2008-10-14 09:52:29 $
+ * Date         : $Date: 2008-10-24 16:08:39 $
  *
  */
 
@@ -91,7 +91,10 @@ int main(int argc,char *argv[])
         if (optind != argc)
                 usage(argv[0]);
 
-	db_import(&error);
+	if (db_import(&error) < 0)
+	{
+		printf("** db_import : %s **\n", dev_error_str(error)+25);
+	}
 	status = db_getpoller(argv[optind],&poll,&error);
 	if (status == -1)
 		printf("%s\n", dev_error_str(error));

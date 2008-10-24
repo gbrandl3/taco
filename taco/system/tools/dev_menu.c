@@ -30,9 +30,9 @@
  *
  * Original     : JL PONS
  *
- * Version      : $Revision: 1.5 $
+ * Version      : $Revision: 1.6 $
  *
- * Date         : $Date: 2008-10-14 09:52:29 $
+ * Date         : $Date: 2008-10-24 16:08:39 $
  *
  */
 
@@ -964,8 +964,7 @@ int main(unsigned int argc,char **argv)
 
    if(dev_import(dev_name,0,&ds,&error) < 0)
    {
-      dev_printerror_no(SEND,"dev_import()",error);
-      exit(-1);
+	printf("** db_import : %s **\n", dev_error_str(error)+25);
    }
    
    

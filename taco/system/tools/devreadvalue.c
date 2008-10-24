@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.5 $
+ * Version      : $Revision: 1.6 $
  *
- * Date         : $Date: 2008-10-14 09:52:29 $
+ * Date         : $Date: 2008-10-24 16:08:39 $
  *
  */
 
@@ -104,8 +104,7 @@ int main(int argc, char **argv)
 
    if(db_import(&error)) 
    {
-	   printf("Error during db_import\n");
-	   exit(0);
+	printf("** db_import : %s **\n", dev_error_str(error)+25);
    }
    if(index(argv[optind],'*')==0)
       devcmd(argv[optind]);
