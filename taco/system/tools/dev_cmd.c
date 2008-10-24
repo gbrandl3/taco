@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.4 $
+ * Version      : $Revision: 1.5 $
  *
- * Date         : $Date: 2008-10-14 09:52:29 $
+ * Date         : $Date: 2008-10-24 15:58:37 $
  *
  */
 
@@ -160,40 +160,44 @@ int main(int argc,char **argv)
         if (optind != argc - 1)
                 usage(argv[0]);
 
-  printf("\n");
+	printf("\n");
 
-  if( db_import(&error) < 0 ) {
-      printf("db_import() failed : %s\n",dev_error_str(error));
-      exit(0);
-  }
+	if( db_import(&error) < 0 ) 
+	{
+		printf("** db_import : %s **\n", dev_error_str(error)+25);
+  	}
 
-   if ( dev_import(argv[optind],0,&ds,&error) < 0 )
-   {
-      printf("Error : %s\n",dev_error_str(error));
-      exit(0);
-   }
+	if ( dev_import(argv[optind],0,&ds,&error) < 0 )
+	{
+		printf("Error : %s\n",dev_error_str(error));
+		exit(0);
+	}
 
-   while(!ok) {
-     if( dev_cmd_query(ds,&DevCmd,&error) <0 )
-     {
-       printf("Error : %s\n",dev_error_str(error));
-       sleep(1);
-     } else {
-       ok=1;
-     }
-   }
+	while(!ok) 
+	{
+		if( dev_cmd_query(ds,&DevCmd,&error) <0 )
+		{
+			printf("Error : %s\n",dev_error_str(error));
+			sleep(1);
+		} 
+		else 
+		{
+			ok=1;
+		}
+	}
 
-   printf("NETHOST=%s\n",getenv("NETHOST"));
-   printf("command(IN_TYPE,OUT_TYPE) [Cmd code]\n\n");
+	printf("NETHOST=%s\n", getenv("NETHOST") ? getenv("NETHOST") : " ");
+	printf("command(IN_TYPE,OUT_TYPE) [Cmd code]\n\n");
 
-   for(i=0;i<DevCmd.length;i++) {
-     printf("%s(%s,%s) [%d]\n",DevCmd.sequence[i].cmd_name,
+	for(i=0;i<DevCmd.length;i++) 
+	{
+		printf("%s(%s,%s) [%d]\n",DevCmd.sequence[i].cmd_name,
      			       Type_Str(DevCmd.sequence[i].in_type),
                                Type_Str(DevCmd.sequence[i].out_type),
 			       DevCmd.sequence[i].cmd);
 
-   }
+	}
 
-   dev_free(ds,&error);
+	dev_free(ds,&error);
 }
 

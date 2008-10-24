@@ -30,9 +30,9 @@
  *
  * Original     :
  *
- * Version      : $Revision: 1.5 $
+ * Version      : $Revision: 1.6 $
  *
- * Date         : $Date: 2008-10-14 09:52:29 $
+ * Date         : $Date: 2008-10-24 15:53:54 $
  *
  */
 
@@ -100,55 +100,58 @@ int main(int argc,char *argv[])
         if (optind != argc - 1)
                 usage(argv[0]);
 
-   if(db_import(&error)) 
-   {
-	   printf("Error during db_import\n");
-	   exit(0);
-   }
-   if(strchr(argv[optind],'*')==0)
-      devcmd(argv[optind]);
-   else
-   {
-   status=db_getdevexp(argv[optind],&device_tab,&dev_nb,&error);
-   if (status==-1) 
-   {
-      printf("%s\n",dev_error_str(error));
-      fflush(stdout);
-      exit(0);
-   }
-   if(dev_nb==0) 
-   {
-      printf("no device has this name\n");
-      exit(0);
-   }
-   for(i=0;i<dev_nb;i++)
-   {
-      devcmd(device_tab[i]);
-   }
-   db_freedevexp(device_tab);
-   }
+	if(db_import(&error)) 
+	{
+		printf("** db_import : %s **\n", dev_error_str(error)+25);
+	}
+
+	if(strchr(argv[optind],'*')==0)
+		devcmd(argv[optind]);
+	else
+	{
+		status=db_getdevexp(argv[optind],&device_tab,&dev_nb,&error);
+		if (status==-1) 
+		{
+			printf("%s\n",dev_error_str(error));
+			fflush(stdout);
+			exit(0);
+		}
+		if(dev_nb==0) 
+		{
+			printf("no device has this name\n");
+			exit(0);
+		}
+		for(i=0;i<dev_nb;i++)
+		{
+			devcmd(device_tab[i]);
+		}
+		db_freedevexp(device_tab);
+	}
 }
 long devcmd(char *devname)
 {
-   long 	status;
-   DevLong 	error;
-   char 	cmd_string[80];
-   devserver 	ds;
+	long 	status;
+	DevLong error;
+	char 	cmd_string[80];
+	devserver 	ds;
 
-   status= dev_import(devname,0,&ds,&error);
-   if(status<0)
-   {
-      printf("** import %s: %s **\n",devname,dev_error_str(error)+25);
-      return(-1);
-   }
-   printf("Are you sure you want to switch %s off (y or n  (q to exit) ? ",devname);
-   while((status = fscanf(stdin,"%s",cmd_string)) <= 0);
-   if(cmd_string[0]=='y')
-   {
-      status= dev_putget(ds,DevOff,NULL,D_VOID_TYPE,NULL,D_VOID_TYPE,&error);
-      if(status<0) printf("** %s: %s **\n",devname,dev_error_str(error)+25);
-      else printf("%s switched OFF \n",devname);
-   }
-   dev_free(ds,&error);
-   if(cmd_string[0]=='q') exit(0);
+	status= dev_import(devname,0,&ds,&error);
+	if(status<0)
+	{
+	      printf("** import %s: %s **\n",devname,dev_error_str(error)+25);
+	      return(-1);
+	}
+	printf("Are you sure you want to switch %s off (y or n  (q to exit) ? ",devname);
+	while((status = fscanf(stdin,"%s",cmd_string)) <= 0);
+	if(cmd_string[0]=='y')
+	{
+		status= dev_putget(ds,DevOff,NULL,D_VOID_TYPE,NULL,D_VOID_TYPE,&error);
+		if(status<0) 
+			printf("** %s: %s **\n",devname,dev_error_str(error)+25);
+		else 
+			printf("%s switched OFF \n",devname);
+	}
+	dev_free(ds,&error);
+	if(cmd_string[0]=='q') 
+		exit(0);
 }
