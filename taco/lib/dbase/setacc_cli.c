@@ -30,9 +30,9 @@
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.21 $
+ * Version    :	$Revision: 1.22 $
  *
- * Date       :	$Date: 2008-10-23 09:48:34 $
+ * Date       :	$Date: 2008-10-31 13:11:53 $
  * 
  *-*******************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -178,7 +178,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevL
  * Try to verify the function parameters (non NULL pointer and two 
  *  characters in device name) 
  */
-	if (config_flags->no_database)
+	if (config_flags && config_flags->no_database)
 	{
 		*perr = DbErr_NoDatabase;
 		return(DS_NOTOK);
