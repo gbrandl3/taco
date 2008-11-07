@@ -67,13 +67,16 @@
  *
  * Original:	February 1999
  *
- * $Revision: 1.4 $
+ * $Revision: 1.5 $
  *
- * $Date: 2008-04-06 09:06:26 $
+ * $Date: 2008-11-07 17:01:06 $
  *
  * $Author: jkrueger1 $
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.4  2008/04/06 09:06:26  jkrueger1
+ * Merge from branch JK
+ *
  * Revision 1.3.4.1  2008/03/18 13:23:42  jkrueger1
  * make TACO 64 bit ready
  *
@@ -1165,25 +1168,40 @@ static long lv_argin_convert(long argin_type, void *argin_lv, void **argin_taco,
     
 
   	case D_SHORT_TYPE : 
-  	case D_USHORT_TYPE : 
     		*argin_taco = &argin_short;
-    		argin_short = *(short*)argin_lv;
+    		argin_short = *(DevShort*)argin_lv;
 #ifdef LV_DEBUG
     		if (lv_debug) printf("short argin = %d\n", argin_short);
 #endif /* LV_DEBUG */
     		break;
     
+  	case D_USHORT_TYPE : 
+    		*argin_taco = &argin_ushort;
+    		argin_ushort = *(DevUShort*)argin_lv;
+#ifdef LV_DEBUG
+    		if (lv_debug) printf("unsigned short argin = %u\n", argin_ushort);
+#endif /* LV_DEBUG */
+    		break;
+    
   	case D_LONG_TYPE : 
     		*argin_taco = &argin_long;
-    		argin_long = *(long*)argin_lv;
+    		argin_long = *(DevLong*)argin_lv;
 #ifdef LV_DEBUG
     		if (lv_debug) printf("long argin = %d\n", argin_long);
 #endif /* LV_DEBUG */
     		break;
   
+  	case D_ULONG_TYPE : 
+    		*argin_taco = &argin_ulong;
+    		argin_ulong = *(DevULong*)argin_lv;
+#ifdef LV_DEBUG
+    		if (lv_debug) printf("unsigned long argin = %ld\n", argin_ulong);
+#endif /* LV_DEBUG */
+    		break;
+  
   	case D_FLOAT_TYPE : 
     		*argin_taco = &argin_float;
-    		argin_float = *(float*)argin_lv;
+    		argin_float = *(DevFloat*)argin_lv;
 #ifdef LV_DEBUG
     		if (lv_debug) printf("float argin = %f\n", argin_float);
 #endif /* LV_DEBUG */
@@ -1191,7 +1209,7 @@ static long lv_argin_convert(long argin_type, void *argin_lv, void **argin_taco,
 
   	case D_DOUBLE_TYPE : 
     		*argin_taco = &argin_double;
-    		argin_double = *(double*)argin_lv;
+    		argin_double = *(DevDouble*)argin_lv;
 #ifdef LV_DEBUG
     		if (lv_debug) printf("double argin = %f\n", argin_double);
 #endif /* LV_DEBUG */
@@ -1331,7 +1349,7 @@ static long lv_argin_convert(long argin_type, void *argin_lv, void **argin_taco,
     		if (lv_debug) printf("Entering D_MOTOR_FLOAT\n");
     		*argin_taco = &argin_motfloat;
     		argin_floatarray_hdl = (FloatArrayHdl) argin_lv; 
-    		argin_motfloat.axisnum = (long)(*argin_floatarray_hdl)->arg1[0];
+    		argin_motfloat.axisnum = (DevLong)(*argin_floatarray_hdl)->arg1[0];
     		argin_motfloat.value = (*argin_floatarray_hdl)->arg1[1];
 #ifdef LV_DEBUG
     		if (lv_debug) printf("axisnum = %d value = %f\n",argin_motfloat.axisnum,
@@ -1343,8 +1361,8 @@ static long lv_argin_convert(long argin_type, void *argin_lv, void **argin_taco,
     		*argin_taco = &argin_floatarray;
     		argin_floatarray_hdl = (FloatArrayHdl) argin_lv; 
     		for(i=0;i<8;i++) {
-      			argin_mulmove.action[i] = (long)(*argin_floatarray_hdl)->arg1[i];
-      			argin_mulmove.delay[i] = (long)(*argin_floatarray_hdl)->arg1[8+i];
+      			argin_mulmove.action[i] = (DevLong)(*argin_floatarray_hdl)->arg1[i];
+      			argin_mulmove.delay[i] = (DevLong)(*argin_floatarray_hdl)->arg1[8+i];
       			argin_mulmove.position[i] = (*argin_floatarray_hdl)->arg1[16+i];
 #ifdef LV_DEBUG
       			if (lv_debug) printf("action[%d] = %d position[%d] = %f \n",
@@ -1355,7 +1373,7 @@ static long lv_argin_convert(long argin_type, void *argin_lv, void **argin_taco,
   	case D_INT_FLOAT_TYPE :
     		*argin_taco = &argin_intfloat;
     		argin_floatarray_hdl = (FloatArrayHdl) argin_lv; 
-    		argin_intfloat.state = (long)(*argin_floatarray_hdl)->arg1[0];
+    		argin_intfloat.state = (DevLong)(*argin_floatarray_hdl)->arg1[0];
     		argin_intfloat.value = (*argin_floatarray_hdl)->arg1[1];
 #ifdef LV_DEBUG
     		if (lv_debug) printf("state = %d value = %f\n",argin_intfloat.state,
@@ -1426,12 +1444,19 @@ static long lv_argout_prepare(long argout_type, void **argout_taco, DevLong *err
     		break;
    
   	case D_SHORT_TYPE : 
-  	case D_USHORT_TYPE : 
     		*argout_taco = &argout_short;
+    		break;
+
+  	case D_USHORT_TYPE : 
+    		*argout_taco = &argout_ushort;
     		break;
    
   	case D_LONG_TYPE : 
     		*argout_taco = &argout_long;
+    		break;
+    
+  	case D_ULONG_TYPE : 
+    		*argout_taco = &argout_ulong;
     		break;
     
   	case D_FLOAT_TYPE : 
@@ -1556,9 +1581,9 @@ static long lv_argout_convert(long argout_type, void *argout_taco, void *argout_
   	static ULongArrayHdl argout_ulongarray_hdl;
   	static DevLong *argout_long_ptr;
   	static FloatArrayHdl argout_floatarray_hdl;
-  	static float *argout_float_ptr;
+  	static DevFloat *argout_float_ptr;
   	static DblArrayHdl argout_dblarray_hdl;
-  	static double *argout_double_ptr;
+  	static DevDouble *argout_double_ptr;
 
   	status = 0;
   /*
@@ -1570,27 +1595,27 @@ static long lv_argout_convert(long argout_type, void *argout_taco, void *argout_
     		break;
     
   	case D_SHORT_TYPE : 
-    		*(short*)argout_lv = *(DevShort*)argout_taco;
+    		*(DevShort*)argout_lv = *(DevShort*)argout_taco;
     		break;
     
   	case D_USHORT_TYPE : 
-    		*(short*)argout_lv = *(DevUShort*)argout_taco;
+    		*(DevUShort*)argout_lv = *(DevUShort*)argout_taco;
     		break;
     
   	case D_LONG_TYPE : 
-    		*(long*)argout_lv = *(DevLong*)argout_taco;
+    		*(DevLong*)argout_lv = *(DevLong*)argout_taco;
     		break;
     
   	case D_ULONG_TYPE : 
-    		*(long*)argout_lv = *(DevULong*)argout_taco;
+    		*(DevLong*)argout_lv = *(DevULong*)argout_taco;
     		break;
     
   	case D_FLOAT_TYPE : 
-    		*(float*)argout_lv = *(DevFloat*)argout_taco;
+    		*(DevFloat*)argout_lv = *(DevFloat*)argout_taco;
     		break;
     
   	case D_DOUBLE_TYPE : 
-    		*(double*)argout_lv = *(DevDouble*)argout_taco;
+    		*(DevDouble*)argout_lv = *(DevDouble*)argout_taco;
     		break;
     
   	case D_LONG_READPOINT : 
@@ -1900,12 +1925,20 @@ EXPORT long lv_dev_putget(char *name, char *cmd, void *argin_lv, void *argout_lv
   /*
    * prepare input arguments
    */
-  	if (lv_argin_convert(argin_type, argin_lv, &argin_taco, error) != DS_OK) return(DS_NOTOK);
+  	if (lv_argin_convert(argin_type, argin_lv, &argin_taco, error) != DS_OK) 
+	{
+		printf("lv_argin_convert() %d\n", error);
+		return(DS_NOTOK);
+	}
   
   /*
    * prepare output arguments
    */
-  	if (lv_argout_prepare(argout_type, &argout_taco, error) != DS_OK) return(DS_NOTOK);
+  	if (lv_argout_prepare(argout_type, &argout_taco, error) != DS_OK) 
+	{
+		printf("lv_argout_prepare() %d\n", error);
+		return(DS_NOTOK);
+	}
   
   	status = (*_dev_putget)(lv_device[idevice].ds,icmd,argin_taco,argin_type,
 			      argout_taco,argout_type,error);

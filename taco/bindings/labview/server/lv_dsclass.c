@@ -22,9 +22,9 @@
  *
  * Original:	October 1999
  *
- * $Revision: 1.6 $
+ * $Revision: 1.7 $
  *
- * $Date: 2008-04-06 09:06:26 $
+ * $Date: 2008-11-07 17:01:06 $
  *
  * $Author: jkrueger1 $
  *
@@ -83,8 +83,6 @@
 
 #define TOLOWER(a) {char* i; i=a; while ( '\0'!=*i ) { *i=tolower(*i);i++; }}
 
-extern configuration_flags      config_flags;
- 
 static int      udp_socket;
 static int      tcp_socket;
 
@@ -181,8 +179,8 @@ long lv_ds__main(char *server_name, char *pers_name)
    	TOLOWER(dsn_name);
    	TOLOWER(host_name);
 
-	sprintf (config_flags.server_name,"%s", dsn_name); 
-	sprintf (config_flags.server_host,"%s", host_name); 
+	sprintf (multi_nethost[0].config_flags.server_name,"%s", dsn_name); 
+	sprintf (multi_nethost[0].config_flags.server_host,"%s", host_name); 
 
 
 	/*
@@ -300,8 +298,8 @@ long lv_ds__main(char *server_name, char *pers_name)
 	 * configuration structure.
 	 */
 
-	config_flags.prog_number = prog_number;
-	config_flags.vers_number = API_VERSION;
+	multi_nethost[0].config_flags.prog_number = prog_number;
+	multi_nethost[0].config_flags.vers_number = API_VERSION;
 
 
 /*
@@ -401,7 +399,7 @@ long lv_ds__main(char *server_name, char *pers_name)
  * if the process has got this far then it is a bona-fida device server 
  * set the appropiate flag
  */
-	config_flags.device_server = True;
+	multi_nethost[0].config_flags.device_server = True;
 
 /*
  * Register the asynchronous rpc service so that the device server
@@ -429,9 +427,9 @@ long lv_ds__main(char *server_name, char *pers_name)
             * during the startup phase.
             */
 
-           config_flags.startup = SERVER_STARTUP;
+           multi_nethost[0].config_flags.startup = SERVER_STARTUP;
 
-	   status = lv_startup(config_flags.server_name,&error);
+	   status = lv_startup(multi_nethost[0].config_flags.server_name,&error);
 	   if ( status < 0 )
 	      {
 	      printf ("lv_startup failed (error=%d)",error);
@@ -450,7 +448,7 @@ long lv_ds__main(char *server_name, char *pers_name)
                 return(-1);
 	      }
 
-	   config_flags.startup = True;
+	   multi_nethost[0].config_flags.startup = True;
 	   }
 
 	/*
@@ -1223,7 +1221,7 @@ static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp)
 		return;
 
 	case RPC_CHECK:
-		help_ptr = &(config_flags.server_name[0]);
+		help_ptr = &(multi_nethost[0].config_flags.server_name[0]);
 		svc_sendreply (transp, (xdrproc_t)xdr_wrapstring, 
 			       (caddr_t) &help_ptr);
 		return;
@@ -1408,7 +1406,7 @@ static long lv_svc_check (DevLong *error)
 
 	*error = 0;
 
-	if ( db_svc_check (config_flags.server_name,
+	if ( db_svc_check (multi_nethost[0].config_flags.server_name,
 			   &host_name, &prog_number, &vers_number, error) < 0 )
 		return (-1);
 
@@ -1425,7 +1423,7 @@ static long lv_svc_check (DevLong *error)
  *  was the old server running on the same host ?
  */
 
-	if (strcmp (config_flags.server_host,host_name) != 0)
+	if (strcmp (multi_nethost[0].config_flags.server_host,host_name) != 0)
 	   {
 	   *error = DevErr_ServerRegisteredOnDifferentHost;
 	   return (-1);
@@ -1441,7 +1439,7 @@ static long lv_svc_check (DevLong *error)
  *  old server still exists ?
  */
 
-	clnt = clnt_create (config_flags.server_host,
+	clnt = clnt_create (multi_nethost[0].config_flags.server_host,
 	  	  	    prog_number,vers_number,"udp");
 	if (clnt != NULL)
 	   {
@@ -1457,7 +1455,7 @@ static long lv_svc_check (DevLong *error)
 			          TIMEVAL(msg_timeout));
  	   if (clnt_stat == RPC_SUCCESS)
 	   {
-	      if (strcmp (config_flags.server_name,
+	      if (strcmp (multi_nethost[0].config_flags.server_name,
 			  svc_name) == 0)
 	         {
 	         *error = DevErr_ServerAlreadyExists;
@@ -1710,7 +1708,7 @@ static _client_data * _DLLFunc rpc_cmd_get (_server_data *server_data)
     * Do the security checks for the command access.
     */
 
-        if ( config_flags.security == True )
+        if ( multi_nethost[0].config_flags.security == True )
         {
                 if ( sec_svc_cmd (&devices[(_Int)ds_id], connection_id,
                     server_data->client_id, server_data->access_right,
