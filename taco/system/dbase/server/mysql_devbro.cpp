@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:	$Date: 2008-04-06 09:07:41 $
+ * Date:	$Date: 2008-11-12 09:45:08 $
  *
  */
 
@@ -196,7 +196,7 @@ db_res *MySQLServer::devmemberlist_1_svc(db_res *recev)
     std::string user_domain(recev->res_val.arr1_val[0]);
     std::string user_family(recev->res_val.arr1_val[1]);
 	
-    logStream->errorStream() << "In devmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << log4cpp::eol;
+    logStream->debugStream() << "In devmemberlist_1_svc function for domain " << user_domain << " and family " << user_family << log4cpp::eol;
 	
 //
 // Initialize structure sent back to client
