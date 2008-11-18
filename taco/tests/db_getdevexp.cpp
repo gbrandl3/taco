@@ -26,9 +26,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2008-04-30 13:42:47 $
+ * Date:        $Date: 2008-11-18 11:28:19 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -76,6 +76,6 @@ int main(int argc, char *argv[])
 	}
 	for (int i = 0; i < res_nb; i++)
     		std::cout << tmp[i] << std::endl;
-//	db_freedevexp(tmp);
+	db_freedevexp(tmp);
 	return 0;
 }
