@@ -9,7 +9,7 @@ Prefix: %{_prefix}
 Vendor: FRMII, TU München, FRG
 Distribution:@DISTRIBUTION@
 Requires: gdbm sqlite mysql python openmotif pyhton-numeric
-BuildRequires: open-motif-devel gcc-c++ doxygen swig python-devel mysql-devel sqlite-devel tcl-devel python-numeric
+BuildRequires: openmotif-devel gcc-c++ doxygen swig python-devel mysql-devel sqlite-devel tcl-devel python-numeric
 Provides: taco
 Url: http://www.sourceforge.net/projects/taco
 
