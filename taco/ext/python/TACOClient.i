@@ -247,6 +247,11 @@ Returns - the ouput of the command."
                         PyObject *ret;
                         if (!TACOPythonClient::convertToPyObject(outputType, argout, &ret))
                                 SWIG_fail; 
+//                        free(argout);
+                        TACOPythonClient::freeInputArgument(    inputType,argin);
+                        TACOPythonClient::freeOutputArgument(   outputType,argout);
+
+
                         return ret;
                 }
                 catch (const TACO::Exception &e)

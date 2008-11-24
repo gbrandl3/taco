@@ -38,7 +38,6 @@ typedef int Py_ssize_t;
 
 #include <API.h>
 #include <TACOTypes.h>
-
 namespace TACOPythonClient {
 	bool createDevArgument( DevType type, DevArgument& arg);
 
@@ -219,6 +218,7 @@ namespace TACOPythonClient {
 		freeInputArgument( inputType, argin);
 		freeOutputArgument( outputType, argout);
 	}
-}
+
+} 
 
 #endif // TACO_PYTHON_CLIENT_CONVERTERS_H

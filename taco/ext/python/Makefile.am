@@ -15,9 +15,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-EXTRA_DIST 		= TACOStates.i TACOClient.i
+EXTRA_DIST 		= TACOClient.i TACOStates.i
 
-AM_CPPFLAGS 		= -I$(top_srcdir)/ext/include @TACO_INCLUDES@ @SWIG_PYTHON_CPPFLAGS@ -DSWIG\
+AM_CPPFLAGS 		= -I$(top_srcdir)/ext/include @TACO_INCLUDES@ @SWIG_PYTHON_CPPFLAGS@ \
 			-I$(top_srcdir)/log4cpp/include \
 			-I$(top_builddir)/log4cpp/include
 
@@ -26,11 +26,11 @@ AM_CXXFLAGS 		= -Wall
 nodist_python_PYTHON	= TACOStates.py TACOClient.py
 
 pyexec_LTLIBRARIES 	= _TACOStates.la _TACOClient.la 
+# TACOClient.la 
 
 nodist__TACOStates_la_SOURCES = wrap_TACOStates.cpp 
 
-nodist__TACOClient_la_SOURCES = wrap_TACOClient.cpp 
-_TACOClient_la_SOURCES	= TACOPythonClientConverters.cpp
+nodist__TACOClient_la_SOURCES = wrap_TACOClient.cpp TACOPythonClientConverters.cpp
 
 _TACOClient_la_LDFLAGS 	= -avoid-version -module
 _TACOClient_la_LIBADD  	= @LIB_STDCXX@ ../src/libTACOExtensions.la
@@ -39,7 +39,7 @@ TACOClient.py:		wrap_TACOClient.cpp
 	@true
 
 wrap_TACOClient.cpp:	$(srcdir)/TACOClient.i $(top_srcdir)/ext/include/TACOClient.h
-	@SWIG@ @SWIG_PYTHON_OPT@ -c++ -I$(top_srcdir)/ext/include -o $@ $(srcdir)/TACOClient.i
+	@SWIG@ @SWIG_PYTHON_OPT@ -c++ -I$(top_srcdir)/ext/include @TACO_INCLUDES@ -o $@ $(srcdir)/TACOClient.i
 
 _TACOStates_la_LDFLAGS 	= -avoid-version -module
 _TACOStates_la_LIBADD 	= @LIB_STDCXX@ ../src/libTACOExtensions.la
@@ -57,9 +57,8 @@ AM_CPPFLAGS 		+= -D_REENTRANT @PYTHON_CPPFLAGS@
 
 noinst_PYTHON		= test.py
  
-noinst_HEADERS 		= TACOPythonClient.h TACOPythonClientConverters.h
+noinst_HEADERS 		= TACOPythonClientConverters.h
 
-# pyexec_LTLIBRARIES 	+= TACOClient.la 
 # TACOClient_la_SOURCES 	= TACOPythonClient.cpp TACOPythonClientConverters.cpp
 # TACOClient_la_LDFLAGS 	= -pthread -avoid-version -module
 # TACOClient_la_LIBADD 	= @LIB_STDCXX@ ../src/libTACOExtensions.la @TACO_CLIENT_CXX_LIBS@
