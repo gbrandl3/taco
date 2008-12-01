@@ -195,7 +195,7 @@ void TACO::Client::connectClient() throw (::TACO::Exception)
                                 		D_VOID_TYPE, "", dc_inf.devcmd[i].devinf_argout, "");
 					if (dc_inf.devcmd[i].devinf_argout == D_DOUBLE_TYPE)
 						mServerTypes.insert("IOAnalogInput");
-					else if (dc_inf.devcmd[i].devinf_argout == D_LONG_TYPE)
+					else if (dc_inf.devcmd[i].devinf_argout == D_ULONG_TYPE)
 						mServerTypes.insert("IODigitalInput");
 				}
 //				m_dc.device_name = const_cast<char *>(mName.c_str());
