@@ -29,9 +29,9 @@
  * 
  * Original:	July 1992
  * 
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  * 
- * Date:	$Date: 2008-12-02 09:19:43 $
+ * Date:	$Date: 2008-12-02 09:25:46 $
  * 
  *******************************************************************-*/
 
@@ -64,7 +64,7 @@ xdr_PSSInterlockStatus(xdrs, objp)
 	if (!xdr_DevLong(xdrs, &objp->GuardC)) {
 		return (FALSE);
 	}
-	if (!xdr_DevUShort(xdrs, &objp->Interlocks)) {
+	if (!xdr_u_short(xdrs, &objp->Interlocks)) {
 		return (FALSE);
 	}
 	return (TRUE);
