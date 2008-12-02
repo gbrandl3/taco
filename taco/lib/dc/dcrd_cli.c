@@ -27,9 +27,9 @@
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.22 $
+ * Version:	$Revision: 1.23 $
  *
- * Date:	$Date: 2008-10-23 05:26:24 $
+ * Date:	$Date: 2008-12-02 08:50:56 $
  *
  ******************************************************************************/
 
@@ -239,21 +239,19 @@ int dc_import(dc_dev_imp *dc_devimp, unsigned int num_device, DevLong *error)
  */
 		if (strncmp(tmp,"//",2) == 0)
 		{
+			tmp = str_tolower(tmp);
 			if (env_nethost == NULL)
 			{
-				l = strlen(tmp);
-				for (i = 2;i < l;i++)
+				char *s = strchr(&tmp[2], '/');
+				if (s)
 				{
-					if (tmp[i] == '/')
-					{
-						dc_multi_nethost[0].nethost[i - 2] = '\0';
-						break;
-					}
-					dc_multi_nethost[0].nethost[i - 2] = tolower(tmp[i]);
+					strncpy(dc_multi_nethost[0].nethost, &tmp[2], s - tmp - 2);
+					dc_multi_nethost[0].nethost[s - tmp - 2] = '\0';
 				}
 			}
 			else
 				strcpy(dc_multi_nethost[0].nethost,env_nethost);
+			setup_config_multi(dc_multi_nethost[0].nethost, error);
 		}
 
 /* 
@@ -660,7 +658,7 @@ static int rpc_connect(char *serv_name,CLIENT **prpc,int ind,long i_net,DevLong 
 	unsigned char 		tmp = 0;
 	int			rand_nb;
 	static db_resource	nb_serv_res[1];
-	char 			res_name_rd[64];
+	char 			res_name_rd[LONG_RES_NAME_LENGTH];
 #ifdef OSK
 	char 			*tmp1;
 	unsigned int 		diff;
@@ -669,12 +667,12 @@ static int rpc_connect(char *serv_name,CLIENT **prpc,int ind,long i_net,DevLong 
 /*
  * Get the number of data collector read servers
  */
- 	strcpy(res_name_rd, serv_name);
-	strcat(res_name_rd, "_rd");
+ 	snprintf(res_name_rd, sizeof(res_name_rd) - 1, "%s_rd", serv_name);
 	nb_serv_res[0].resource_name = res_name_rd;
 	nb_serv_res[0].resource_type = D_LONG_TYPE;
 	nb_serv_res[0].resource_adr = &nb_rd_serv;
-	if (db_getresource("class/dc/server_nb",nb_serv_res,1,perr))
+	snprintf(tmp_name, sizeof(tmp_name) - 1, "//%s/class/dc/server_nb", dc_multi_nethost[i_net].nethost);
+	if (db_getresource(tmp_name,nb_serv_res,1,perr))
 	{
 		fprintf(stderr,"rpc_connect: Can't retrieve class/dc/server_nb/%s resources\n",res_name_rd);
 		return -1;
