@@ -30,9 +30,9 @@
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.22 $
+ * Version    :	$Revision: 1.23 $
  *
- * Date       :	$Date: 2008-10-31 13:11:53 $
+ * Date       :	$Date: 2008-12-02 08:46:36 $
  * 
  *-*******************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -40,12 +40,12 @@
 #endif /* WIN32 */
 #define PORTMAP
 
-#include <macros.h>
-#include <db_setup.h>
-#include <db_xdr.h>
-#include <API.h>
-#include <private/ApiP.h>
-#include <DevErrors.h>
+#include "macros.h"
+#include "db_setup.h"
+#include "db_xdr.h"
+#include "API.h"
+#include "private/ApiP.h"
+#include "DevErrors.h"
 
 #include "taco_utils.h"
 
@@ -96,7 +96,7 @@ int first = 0;
 #define SIZE_B	40
 #define SIZE_C	80
 
-int test_star PT_((char *filter));
+int test_star PT_((const char *filter));
 
 /* Static and Global variables */
 
@@ -121,7 +121,6 @@ static int host_addr;
 
 extern nethost_info *multi_nethost;
 
-
 /**@ingroup dbaseAPIresource
  * Retrieves resource from the database, converts them to the desired type and 
  * stores them at the right place. A resource value is stored as a atring in a database on a 
@@ -137,7 +136,7 @@ extern nethost_info *multi_nethost;
  *			to by "perr". 
  * @retval DS_OK otherwise.
  */
-int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevLong *perr)
+int _DLLFunc db_getresource(const char *devname, Db_resource res, u_int res_num, DevLong *perr)
 {
 	db_res		*recev;
 	arr1 		send;
@@ -173,6 +172,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevL
 #ifdef ALONE
 	char 		*serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
+	char		*dev_name = (char *)devname;
 
 /* 
  * Try to verify the function parameters (non NULL pointer and two 
@@ -274,7 +274,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevL
 		return(DS_NOTOK);
 	}
 	local_cl = multi_nethost[i_nethost].db_info->clnt;
-	dev_name = extract_device_name(dev_name,perr);
+	dev_name = extract_device_name(dev_name, perr);
 #endif /* ALONE */
 /* 
  * Allocate memory for the array of pointeur to char 
@@ -1179,7 +1179,7 @@ int _DLLFunc db_getresource(char *dev_name, Db_resource res, u_int res_num, DevL
  *			to by "perr". 
  * @retval DS_OK otherwise.
  */
-int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num, DevLong *perr)
+int _DLLFunc db_putresource(const char *dev_name, Db_resource res, u_int res_num, DevLong *perr)
 {
 	int i,j,k,k1,l;
 	int k2 = 0;
@@ -1216,7 +1216,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num, DevL
 /* Verify function parameters (non NULL pointers and two \ characters in 
    device name). */
 
-        if (config_flags->no_database)
+        if (config_flags && config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -2210,7 +2210,7 @@ int _DLLFunc db_putresource(char *dev_name, Db_resource res, u_int res_num, DevL
  *
  * @see db_delreslist
  */
-int _DLLFunc db_delresource(char *dev_name, char **res_name, u_int res_num,  DevLong *perr)
+int _DLLFunc db_delresource(const char *dev_name, char **res_name, u_int res_num,  DevLong *perr)
 {
 	int i,j,k,l;
 	arr1 send;
@@ -2227,7 +2227,7 @@ int _DLLFunc db_delresource(char *dev_name, char **res_name, u_int res_num,  Dev
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags->no_database)
+        if (config_flags && config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -2454,7 +2454,7 @@ long _DLLFunc db_delreslist(char **res_list, long res_num, DevLong *perr)
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags->no_database)
+        if (config_flags && config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -2631,7 +2631,7 @@ long _DLLFunc db_delreslist(char **res_list, long res_num, DevLong *perr)
  *			to by "perr". 
  * @retval DS_OK otherwise.
  */
-int _DLLFunc db_getdevlist(char *name, char ***tab, u_int *num_dev, DevLong *perr)
+int _DLLFunc db_getdevlist(const char *name, char ***tab, u_int *num_dev, DevLong *perr)
 {
 	char *name1;
 	db_res *recev;
@@ -2649,7 +2649,7 @@ int _DLLFunc db_getdevlist(char *name, char ***tab, u_int *num_dev, DevLong *per
  * if this is a device server without database then simply return
  * the list of devices passed on the command line
  */
- 	if (config_flags->no_database == True)
+ 	if (config_flags && config_flags->no_database == True)
 	{
 		*num_dev = config_flags->device_no;
 		*tab = (char **)config_flags->device_list;
@@ -2874,7 +2874,7 @@ int _DLLFunc db_dev_export(Db_devinf devexp, u_int dev_num, DevLong *perr)
 	vers = DB_VERS_3;
 #endif 
 
-        if (config_flags->no_database)
+        if (config_flags && config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -3378,7 +3378,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev, DevLon
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags->no_database)
+        if (config_flags && config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -3615,7 +3615,7 @@ int _DLLFunc db_dev_import(char **name,Db_devinf_imp *tab, u_int num_dev, DevLon
  *			to by "perr". 
  * @retval DS_OK otherwise.
  */
-int _DLLFunc db_svc_unreg(char *ds_netnam,  DevLong *perr)
+int _DLLFunc db_svc_unreg(const char *ds_netnam,  DevLong *perr)
 {
 	int i,j,k;
 	int *pdb_err;
@@ -3629,7 +3629,7 @@ int _DLLFunc db_svc_unreg(char *ds_netnam,  DevLong *perr)
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags->no_database)
+        if (config_flags && config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -3776,7 +3776,7 @@ int _DLLFunc db_svc_unreg(char *ds_netnam,  DevLong *perr)
  * @retval DS_OK otherwise.
  *
  */
-int _DLLFunc db_svc_check(char *ds_netname, char **pho_name, u_int *pp_num, u_int *pv_num, DevLong *perr)
+int _DLLFunc db_svc_check(const char *ds_netname, char **pho_name, u_int *pp_num, u_int *pv_num, DevLong *perr)
 {
 	int i,j,k;
 	svc_inf *back;
@@ -3790,7 +3790,7 @@ int _DLLFunc db_svc_check(char *ds_netname, char **pho_name, u_int *pp_num, u_in
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags->no_database)
+        if (config_flags && config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -3957,7 +3957,7 @@ int _DLLFunc db_svc_check(char *ds_netname, char **pho_name, u_int *pp_num, u_in
  * 			to by "perr". 
  * @retval DS_OK otherwise.
  */
-int _DLLFunc db_getdevexp(char *filter, char ***tab, u_int *num_dev, DevLong *perr)
+int _DLLFunc db_getdevexp(const char *filter, char ***tab, u_int *num_dev, DevLong *perr)
 {
 	char *filter1;
 	register db_res *recev;
@@ -3971,7 +3971,7 @@ int _DLLFunc db_getdevexp(char *filter, char ***tab, u_int *num_dev, DevLong *pe
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags->no_database)
+        if (config_flags && config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -4044,6 +4044,15 @@ int _DLLFunc db_getdevexp(char *filter, char ***tab, u_int *num_dev, DevLong *pe
 		clnt_control(cl,CLSET_TIMEOUT,(char *)&timeout);
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
 		first++;
+	}
+#else
+/*
+ * find out which nethost has been requested for this device
+ */
+	if (!config_flags)
+	{
+		if (db_import(perr) != DS_OK)
+			return(DS_NOTOK);
 	}
 #endif /* ALONE */
 
@@ -4429,10 +4438,11 @@ void kern_sort(char **tab,int n)
  * @retval DS_OK if the '*' is correctly used. 
  * @retval DS_NOTOK Otherwise
  */
-int test_star(char *filter)
+int test_star(const char *filter)
 {
 	int i,j;
-	char *tmp,*temp;
+	const char *tmp;
+	char *temp;
 	u_int diff;
 	char filter_domain[SIZE_A];
 	char filter_family[SIZE_A];
@@ -4538,7 +4548,7 @@ int _DLLFunc db_freedevexp(char **ptr)
 	register int i;
 	int l;
 
-        if (config_flags->no_database)
+        if (config_flags && config_flags->no_database)
         {
                 return(DS_NOTOK);
         } 
@@ -4622,7 +4632,7 @@ int _DLLFunc db_freedevexp(char **ptr)
  *			to by "perr". 
  * @retval DS_OK otherwise.
  */
-int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code, DevLong *perr)
+int _DLLFunc db_cmd_query(const char *cmd_name, u_int *cmd_code, DevLong *perr)
 {
 	int i;
 	cmd_que *serv_ans;
@@ -4635,7 +4645,7 @@ int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code, DevLong *perr)
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags->no_database)
+        if (config_flags && config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -4672,9 +4682,9 @@ int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code, DevLong *perr)
 /* Call server */
 
 #ifdef ALONE
-	serv_ans = db_cmd_query_1(&cmd_name,cl,&error);
+	serv_ans = db_cmd_query_1((DevString *)&cmd_name,cl,&error);
 #else
-	serv_ans = db_cmd_query_1(&cmd_name,db_info.conf->clnt,&error);
+	serv_ans = db_cmd_query_1((DevString *)&cmd_name,db_info.conf->clnt,&error);
 #endif /* ALONE */
 
 /* If the server is not connected to the database (because a database update
@@ -4695,9 +4705,9 @@ int _DLLFunc db_cmd_query(char *cmd_name, u_int *cmd_code, DevLong *perr)
 				select(0,0,0,0,&tout);
 #endif /* _OSK */
 #ifdef ALONE
-				serv_ans = db_cmd_query_1(&cmd_name,cl,&error);
+				serv_ans = db_cmd_query_1((DevString *)&cmd_name,cl,&error);
 #else
-				serv_ans = db_cmd_query_1(&cmd_name,db_info.conf->clnt,&error);
+				serv_ans = db_cmd_query_1((DevString *)&cmd_name,db_info.conf->clnt,&error);
 #endif /* ALONE */
 				if(serv_ans == NULL)
 					break;
@@ -4773,7 +4783,7 @@ int _DLLFunc db_event_query(char *event_name, u_int *event_code,  DevLong *perr)
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags->no_database)
+        if (config_flags && config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -4924,7 +4934,7 @@ int _DLLFunc db_psdev_register(db_psdev_info *psdev,long num_psdev,db_error *p_e
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags->no_database)
+        if (config_flags && config_flags->no_database)
         {
                 p_err->error_code = DbErr_NoDatabase;
 		p_err->psdev_err = DS_OK;
@@ -5124,7 +5134,7 @@ int _DLLFunc db_psdev_unregister(char *psdev_list[],long num_psdev,db_error *p_e
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags->no_database)
+        if (config_flags && config_flags->no_database)
         {
                 p_err->error_code = DbErr_NoDatabase;
 		p_err->psdev_err = DS_OK;
@@ -5312,7 +5322,7 @@ int _DLLFunc db_svc_close( DevLong *perr)
 
 #ifdef ALONE
 
-        if (config_flags->no_database)
+        if (config_flags && config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -5400,7 +5410,7 @@ int _DLLFunc db_svc_reopen( DevLong *perr)
 	char *serv_name = ALONE_SERVER_HOST;
 #endif /* ALONE */
 
-        if (config_flags->no_database)
+        if (config_flags && config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
