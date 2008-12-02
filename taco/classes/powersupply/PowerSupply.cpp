@@ -31,9 +31,9 @@
  *
  * Original:	April 1995
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2008-04-30 14:04:11 $
+ * Date:        $Date: 2008-12-02 12:51:10 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -54,7 +54,6 @@
 //
 // private global variables of the Device class which have only static scope
 //
-
 short PowerSupply::class_inited = 0;
 
 /**
@@ -66,32 +65,32 @@ short PowerSupply::class_inited = 0;
  *
  * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
  */
-long PowerSupply::GetResources (char *res_name, DevLong *error)
+long PowerSupply::GetResources (const char *res_name, DevLong *error)
 {
-   static db_resource res_powersupply[] = { {"delta_i", D_FLOAT_TYPE},
-		                            {"time_constant", D_LONG_TYPE}, };
-   static unsigned int res_powersupply_size = sizeof(res_powersupply)/
+	static db_resource res_powersupply[] = { 
+						{"delta_i", D_FLOAT_TYPE},
+		                            	{"time_constant", D_LONG_TYPE}, 
+					};
+	static unsigned int res_powersupply_size = sizeof(res_powersupply)/
                                               sizeof(db_resource);
-   register int ires;
+	register int ires;
 
-   *error = DS_OK;
+	*error = DS_OK;
 
 //
 // setup the db_resource structure so that we can interrogate the database for 
 // the two resources "delta_i" and "time_constant" which are needed by all 
 // powersupplies to implement the read<>set check
 //
+	ires = 0;
+	res_powersupply[ires++].resource_adr = &(this->delta_i); 
+	res_powersupply[ires++].resource_adr = &(this->time_const); 
 
-   ires = 0;
-   res_powersupply[ires].resource_adr = &(this->delta_i); ires++;
-   res_powersupply[ires].resource_adr = &(this->time_const); ires++;
-
-   if (db_getresource(res_name, res_powersupply, res_powersupply_size, error) != DS_OK)
-   {
-      printf("PowerSupply::GetResources() db_getresource failed, error %d\n", *error);
-   }
-
-   return(DS_OK);
+	if (db_getresource(res_name, res_powersupply, res_powersupply_size, error) != DS_OK)
+	{
+		printf("PowerSupply::GetResources() db_getresource failed, error %d\n", *error);
+	}
+	return(DS_OK);
 }
 
 /**
@@ -103,15 +102,13 @@ long PowerSupply::GetResources (char *res_name, DevLong *error)
  */
 long PowerSupply::ClassInitialise( DevLong *error )
 {
-   dev_printdebug(DBG_TRACE,"PowerSupply::ClassInitialise() called\n");
+	dev_printdebug(DBG_TRACE,"PowerSupply::ClassInitialise() called\n");
 
-   *error = 0;
+	*error = 0;
 
-// int l = strlen(RcsId);
+	PowerSupply::class_inited = 1;
 
-   PowerSupply::class_inited = 1;
-
-   return(DS_OK);
+	return(DS_OK);
 }
 
 /**
@@ -120,29 +117,26 @@ long PowerSupply::ClassInitialise( DevLong *error )
  * @param name name (ascii identifier) of device to create
  * @param error error code returned in the case of problems
  */
-PowerSupply::PowerSupply (char *devname, DevLong *error)
+PowerSupply::PowerSupply (const char *devname, DevLong *error)
 	    :Device (devname, error)
 {
-   dev_printdebug(DBG_TRACE,"PowerSupply::PowerSupply() called, devname = %s\n",devname);
+	dev_printdebug(DBG_TRACE,"PowerSupply::PowerSupply() called, devname = %s\n",devname);
 
-   *error = DS_OK;
-
+	*error = DS_OK;
 //
 // check if ClassInitialise() has been called
 //
-   if (PowerSupply::class_inited != 1)
-   {
-      if (PowerSupply::ClassInitialise(error) != DS_OK)
-      {
-         return;
-      }
-   }
-
+	if (PowerSupply::class_inited != 1)
+	{
+		if (PowerSupply::ClassInitialise(error) != DS_OK)
+		{
+			return;
+		}
+	}
 //
 // Initialise the class_name filed of the device class
 //
-
-   this->class_name = const_cast<char *>("PowerSupplyClass");
+	this->class_name = const_cast<char *>("PowerSupplyClass");
 
 //
 // initialise the object with default values via the database
@@ -151,10 +145,10 @@ PowerSupply::PowerSupply (char *devname, DevLong *error)
 // this avoids the necessity to call the initialise function
 // separately - andy 6jun95
 //
-   if (this->GetResources(devname, error) != DS_OK);
-   {
-      return;
-   }
+	if (this->GetResources(devname, error) != DS_OK);
+	{
+		return;
+	}
 }
 
 /**
@@ -162,8 +156,7 @@ PowerSupply::PowerSupply (char *devname, DevLong *error)
  */
 PowerSupply::~PowerSupply ()
 {
-   dev_printdebug(DBG_TRACE,"PowerSupply::~PowerSupply() called\n");
-
+	dev_printdebug(DBG_TRACE,"PowerSupply::~PowerSupply() called\n");
 //
 // add code to destroy a device here
 //
@@ -187,38 +180,38 @@ PowerSupply::~PowerSupply ()
  */
 long PowerSupply::CheckReadValue(DevBoolean *alarm, DevLong *error)
 {
-   dev_printdebug(DBG_TRACE,"PowerSupply::CheckReadValue() called\n");
+	dev_printdebug(DBG_TRACE,"PowerSupply::CheckReadValue() called\n");
 
-   time_t now;
-   float delta;
+	time_t 	 now;
+	DevFloat delta;
 
-   *error = DS_OK;
+	*error = DS_OK;
 //
 // start off by assuming that there is no alarm condition
 //
-   *alarm = FALSE;
+	*alarm = FALSE;
 
 //
 // only do the check if the delta_i value is initialised to a +ve
 // value
 //
-   if (this->delta_i > 0.0)
-   {
+	if (this->delta_i > 0.0)
+	{
 //
 // first check to see wether the last set value was sent at least
 // time_const seconds beforehand
 //
-      time(&now);
+		time(&now);
 
-      if ((now - this->last_set_t) > this->time_const)
-      {
-         delta = this->set_val - this->read_val;
-         if (fabs(delta) > this->delta_i)
-         {
-            *alarm = TRUE;
-         }
-      }
-   }
+		if ((now - this->last_set_t) > this->time_const)
+		{
+			delta = this->set_val - this->read_val;
+			if (fabs(delta) > this->delta_i)
+			{
+				*alarm = TRUE;
+			}
+		}
+	}
 
-   return(DS_OK);
+	return(DS_OK);
 }

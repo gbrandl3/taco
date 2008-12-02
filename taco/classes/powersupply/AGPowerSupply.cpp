@@ -36,9 +36,9 @@
  *
  * Original:	June 1995
  *
- * Version:     $Revision: 1.12 $
+ * Version:     $Revision: 1.13 $
  *
- * Date:        $Date: 2008-10-15 15:55:53 $
+ * Date:        $Date: 2008-12-02 12:51:10 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -62,7 +62,7 @@
 //
 
 static AGPowerSupply *agps_template;
-short AGPowerSupply::class_inited = 0;
+short  AGPowerSupply::class_inited = 0;
 
 
 /**
@@ -74,58 +74,58 @@ short AGPowerSupply::class_inited = 0;
  *
  * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
  */
-long AGPowerSupply::GetResources (char *res_name, DevLong *error)
+long AGPowerSupply::GetResources (const char *res_name, DevLong *error)
 {
-   static db_resource res_table[] = {
-               {"state",D_LONG_TYPE},
-               {"set_val",D_FLOAT_TYPE},
-               {"channel",D_SHORT_TYPE},
-               {"n_ave",D_SHORT_TYPE},
-               {"conv_unit",D_STRING_TYPE},
-               {"set_offset",D_FLOAT_TYPE},
-               {"read_offset",D_FLOAT_TYPE},
-               {"set_u_limit",D_FLOAT_TYPE},
-               {"set_l_limit",D_FLOAT_TYPE},
-               {"polarity",D_SHORT_TYPE},
-                             };
-   static int res_tab_size = sizeof(res_table)/sizeof(db_resource);
+	static db_resource res_table[] = {
+				{"state",	D_LONG_TYPE},
+				{"set_val",	D_FLOAT_TYPE},
+				{"channel",	D_SHORT_TYPE},
+				{"n_ave",	D_SHORT_TYPE},
+				{"conv_unit",	D_STRING_TYPE},
+				{"set_offset",	D_FLOAT_TYPE},
+				{"read_offset",	D_FLOAT_TYPE},
+				{"set_u_limit",	D_FLOAT_TYPE},
+				{"set_l_limit",	D_FLOAT_TYPE},
+				{"polarity",	D_SHORT_TYPE},
+				};
+	static int res_tab_size = sizeof(res_table) / sizeof(db_resource);
 
-   *error = 0;
+	*error = 0;
 
-   res_table[0].resource_adr = &(this->state);
-   res_table[1].resource_adr = &(this->set_val);
-   res_table[2].resource_adr = &(this->channel);
-   res_table[3].resource_adr = &(this->n_ave);
-   res_table[4].resource_adr = &(this->conv_unit);
-   res_table[5].resource_adr = &(this->set_offset);
-   res_table[6].resource_adr = &(this->read_offset);
-   res_table[7].resource_adr = &(this->set_u_limit);
-   res_table[8].resource_adr = &(this->set_l_limit);
-   res_table[9].resource_adr = &(this->polarity);
+	res_table[0].resource_adr = &(this->state);
+	res_table[1].resource_adr = &(this->set_val);
+	res_table[2].resource_adr = &(this->channel);
+	res_table[3].resource_adr = &(this->n_ave);
+	res_table[4].resource_adr = &(this->conv_unit);
+	res_table[5].resource_adr = &(this->set_offset);
+	res_table[6].resource_adr = &(this->read_offset);
+	res_table[7].resource_adr = &(this->set_u_limit);
+	res_table[8].resource_adr = &(this->set_l_limit);
+	res_table[9].resource_adr = &(this->polarity);
 
-   if(db_getresource(res_name,res_table,res_tab_size,error))
-   {
-      printf("AGPowerSupply::GetResources(): db_getresource() failed, error %d\n",error);
-      return(DS_NOTOK);
-   }
-   else
-   {
-      printf("initial values after searching the static database for %s\n\n",res_name);
+	if(db_getresource(res_name,res_table,res_tab_size,error))
+	{
+		printf("AGPowerSupply::GetResources(): db_getresource() failed, error %d\n",error);
+		return(DS_NOTOK);
+	}
+	else
+	{
+		printf("initial values after searching the static database for %s\n\n",res_name);
 #if 0
-      printf("state         D_LONG_TYPE    %6d\n",this->state);
-      printf("set_val       D_FLOAT_TYPE   %6.0f\n",this->set_val);
-      printf("channel       D_SHORT_TYPE   %6d\n",this->channel);
-      printf("n_ave         D_SHORT_TYPE   %6d\n",this->n_ave);
-      printf("conv_unit     D_STRING_TYPE  %6s\n",this->conv_unit);
-      printf("set_offset    D_FLOAT_TYPE   %6.0f\n",this->set_offset);
-      printf("read_offset   D_FLOAT_TYPE   %6.0f\n",this->read_offset);
-      printf("set_u_limit   D_FLOAT_TYPE   %6.0f\n",this->set_u_limit);
-      printf("set_l_limit   D_FLOAT_TYPE   %6.0f\n",this->set_l_limit);
-      printf("polarity      D_SHORT_TYPE   %6d\n",this->polarity);
+		printf("state         D_LONG_TYPE    %6d\n",	this->state);
+		printf("set_val       D_FLOAT_TYPE   %6.0f\n",	this->set_val);
+		printf("channel       D_SHORT_TYPE   %6d\n",	this->channel);
+		printf("n_ave         D_SHORT_TYPE   %6d\n",	this->n_ave);
+		printf("conv_unit     D_STRING_TYPE  %6s\n",	this->conv_unit);
+		printf("set_offset    D_FLOAT_TYPE   %6.0f\n",	this->set_offset);
+		printf("read_offset   D_FLOAT_TYPE   %6.0f\n",	this->read_offset);
+		printf("set_u_limit   D_FLOAT_TYPE   %6.0f\n",	this->set_u_limit);
+		printf("set_l_limit   D_FLOAT_TYPE   %6.0f\n",	this->set_l_limit);
+		printf("polarity      D_SHORT_TYPE   %6d\n",	this->polarity);
 #endif
-   }
+	}
 
-   return(DS_OK);
+	return(DS_OK);
 }
 
 /**
@@ -139,13 +139,13 @@ long AGPowerSupply::GetResources (char *res_name, DevLong *error)
  */
 long AGPowerSupply::ClassInitialise (DevLong *error)
 {
-   static AGPowerSupply *agps_template = (AGPowerSupply*)malloc(sizeof(AGPowerSupply)); 
+	static AGPowerSupply *agps_template = (AGPowerSupply*)malloc(sizeof(AGPowerSupply)); 
 
-   int iret=0;
+	int iret=0;
 
-   printf ("AGPowerSupply::ClassInitialise() called\n");
+	printf ("AGPowerSupply::ClassInitialise() called\n");
   
-   debug_flag = 0xffffffff;
+	debug_flag = 0xffffffff;
 
 //
 // initialise the template powersupply so that DevMethodCreate has default values 
@@ -156,44 +156,43 @@ long AGPowerSupply::ClassInitialise (DevLong *error)
 // (ab)used during initialisation to interpret the initial state of the powersupply: 
 // 0==DEVOFF, 1==DEVON. this is because the database doesn't support the normal 
 // state variables like DEVON, DEVSTANDBY, DEVINSERTED, etc.
-
-   agps_template->state = 0;
-   agps_template->n_state = agps_template->state;
-   agps_template->set_val = 0.0;
-   agps_template->read_val = 0.0;
-   agps_template->channel = 1;
-   agps_template->n_ave = 1;
-   agps_template->conv_unit = (char*)malloc(sizeof("AMP")+1);
-   sprintf(agps_template->conv_unit,"AMP");
-   agps_template->set_offset = 0.0,
-   agps_template->read_offset = 0.0;
-   agps_template->set_u_limit = AG_MAX_CUR;
-   agps_template->set_l_limit = AG_MIN_CUR;
-   agps_template->polarity = 1;
-
+//
+	agps_template->state = 0;
+	agps_template->n_state = agps_template->state;
+	agps_template->set_val = 0.0;
+	agps_template->read_val = 0.0;
+	agps_template->channel = 1;
+	agps_template->n_ave = 1;
+	agps_template->conv_unit = (char*)malloc(sizeof("AMP")+1);
+	sprintf(agps_template->conv_unit,"AMP");
+	agps_template->set_offset = 0.0,
+	agps_template->read_offset = 0.0;
+	agps_template->set_u_limit = AG_MAX_CUR;
+	agps_template->set_l_limit = AG_MIN_CUR;
+	agps_template->polarity = 1;
 //
 // interrogate the static database for default values 
 //
-   if(GetResources("CLASS/AGPS/DEFAULT",error))
-   {
-      printf("AGPowerSupply::ClassInitialise(): GetResources() failed, error %d\n",error);
-      return(DS_NOTOK);
-   }
+	if(GetResources("CLASS/AGPS/DEFAULT", error))
+	{
+		printf("AGPowerSupply::ClassInitialise(): GetResources() failed, error %d\n",error);
+		return(DS_NOTOK);
+	}
 
-   agps_template->state = state;
-   agps_template->set_val = set_val;
-   agps_template->channel = channel;
-   agps_template->n_ave = n_ave;
-   agps_template->read_offset = read_offset;
-   agps_template->set_u_limit = set_u_limit;
-   agps_template->set_l_limit = set_l_limit;
-   agps_template->polarity = polarity;
+	agps_template->state = state;
+	agps_template->set_val = set_val;
+	agps_template->channel = channel;
+	agps_template->n_ave = n_ave;
+	agps_template->read_offset = read_offset;
+	agps_template->set_u_limit = set_u_limit;
+	agps_template->set_l_limit = set_l_limit;
+	agps_template->polarity = polarity;
 
-   AGPowerSupply::class_inited = 1;
+	AGPowerSupply::class_inited = 1;
 
-   printf("returning from AGPowerSupply::ClassInitialise()\n");
+	printf("returning from AGPowerSupply::ClassInitialise()\n");
 
-   return(iret);
+	return(iret);
 }
 
 /**
@@ -205,7 +204,7 @@ long AGPowerSupply::ClassInitialise (DevLong *error)
  *
  * @return DS_OK if ok otherwise DS_NOTOK and the error code will be set
  */
-AGPowerSupply::AGPowerSupply (char *name, DevLong *error)
+AGPowerSupply::AGPowerSupply (const char *name, DevLong *error)
               : PowerSupply (name, error)
 {
 	static Device::DeviceCommandListEntry commands_list[] = {
@@ -265,15 +264,15 @@ AGPowerSupply::AGPowerSupply (char *name, DevLong *error)
 //
 // AGPowerSupplyClass is a subclass of PowerSupplyClass
 //
-	this->class_name = (char*)malloc(strlen("AGPowerSupplyClass")+1);
+	this->class_name = (DevString)malloc(strlen("AGPowerSupplyClass") + 1);
 	strcpy(this->class_name, "AGPowerSupplyClass");
 
 //
 // initialise the commands list to point to the commands list implemented for the 
 // AG PowerSupply class
 //
-   this->n_commands = n_commands;
-   this->commands_list = commands_list;
+	this->n_commands = n_commands;
+	this->commands_list = commands_list;
 
 //
 // initialise new AGPowerSupply with template, (this could 
@@ -592,8 +591,7 @@ long AGPowerSupply::ReadValue (DevArgument vargin, DevArgument vargout, DevLong 
 // the last 4 bits of time() provide some random noise on this
 // simulated reading - andy 11apr90
 //
-	per_error = AG_PER_ERROR/100.*2.*
-                    (((float)(time(NULL)&0xf)/15.0)-0.5);
+	per_error = AG_PER_ERROR / 100. * 2. * (((float)(time(NULL) & 0xf) / 15.0) -0.5);
 //	printf("ReadValue(): percent error %6.3f\n", per_error);
         frp->read = set_val*(1.-per_error);
         read_val = frp->read;
@@ -620,7 +618,6 @@ long AGPowerSupply::Remote (DevArgument vargin, DevArgument vargout, DevLong *er
 	*error = 0;
 	tmp = vargin;
 	tmp = vargout;
-
 //
 // simply update the present state with the next state
 //
@@ -713,60 +710,61 @@ long AGPowerSupply::Status ( DevArgument vargin, DevArgument vargout, DevLong *e
 	tmp = vargin;
 	p_state = state;
 
-	switch (p_state) {
-
-	case (DEVOFF) : sprintf(mess,"%s","Off");
+	switch (p_state) 
+	{
+		case (DEVOFF) : 
+			sprintf(mess,"%s","Off");
 	                break;
-
-	case (DEVON) : sprintf(mess,"%s","On");
-	                    break;
-
-	case (DEVLOCAL) : sprintf(mess,"%s","Local");
-	                  break;
-
-	case (DEVFAULT) : sprintf(mess,"%s","Fault\n");
-	                  break;
-
-	default : sprintf(mess,"%s","Unknown");
-	          break;
+		case (DEVON) : 
+			sprintf(mess,"%s","On");
+	                break;
+		case (DEVLOCAL) : 
+			sprintf(mess,"%s","Local");
+	                break;
+		case (DEVFAULT) : 
+			sprintf(mess,"%s","Fault\n");
+	                break;
+		default : 
+			sprintf(mess,"%s","Unknown");
+			break;
 	}
-
+//
 // translate fault into a string
-
+//
 	if ((fault != 0) && (p_state == DEVFAULT))
 	{
-	if ((fault & AG_OVERTEMP) != 0) 
-	{
-	  sprintf(mess+strlen(mess)," %s","Overtemp");
-	}
-	if ((fault & AG_NO_WATER) != 0)
-	{
-	   sprintf(mess+strlen(mess)," %s","No Cooling");
-	}
-	if ((fault & AG_CROWBAR) != 0)
-	{
-	   sprintf(mess+strlen(mess)," %s","Crowbar");
-	}
-	if ((fault & AG_RIPPLE) != 0)
-	{
-	   sprintf(mess+strlen(mess)," %s","Ripple");
-	}
-	if ((fault & AG_MAINS) != 0)
-	{
-	   sprintf(mess+strlen(mess)," %s","Mains");
-	}
-	if ((fault & AG_LOAD) != 0)
-	{
-	   sprintf(mess+strlen(mess)," %s","Load");
-	}
-	if ((fault & AG_TRANSFORMER) != 0)
-	{
-	   sprintf(mess+strlen(mess)," %s","Transformer");
-	}
-	if ((fault & AG_THYRISTOR) != 0)
-	{
-	   sprintf(mess+strlen(mess)," %s","Thyristor");
-	}
+		if ((fault & AG_OVERTEMP) != 0) 
+		{
+			sprintf(mess+strlen(mess)," %s","Overtemp");
+		}
+		if ((fault & AG_NO_WATER) != 0)
+		{
+			sprintf(mess+strlen(mess)," %s","No Cooling");
+		}
+		if ((fault & AG_CROWBAR) != 0)
+		{
+			sprintf(mess+strlen(mess)," %s","Crowbar");
+		}
+		if ((fault & AG_RIPPLE) != 0)
+		{
+			sprintf(mess+strlen(mess)," %s","Ripple");
+		}
+		if ((fault & AG_MAINS) != 0)
+		{
+			sprintf(mess+strlen(mess)," %s","Mains");
+		}
+		if ((fault & AG_LOAD) != 0)
+		{
+			sprintf(mess+strlen(mess)," %s","Load");
+		}
+		if ((fault & AG_TRANSFORMER) != 0)
+		{
+			sprintf(mess+strlen(mess)," %s","Transformer");
+		}
+		if ((fault & AG_THYRISTOR) != 0)
+		{
+			sprintf(mess+strlen(mess)," %s","Thyristor");
+		}
 	}
 
 	status = (char **)vargout;
@@ -827,7 +825,6 @@ long AGPowerSupply::Update ( DevArgument vargin, DevArgument vargout, DevLong *e
 //
 	State(NULL, &darg_short, error);
 	vargout_sfrp->state = darg_short;
-
 //
 // get latest set and read values
 //
@@ -855,18 +852,18 @@ long AGPowerSupply::Update ( DevArgument vargin, DevArgument vargout, DevLong *e
  */
 long AGPowerSupply::State(DevArgument vargin, DevArgument vargout, DevLong *error)
 {
-   static short *state;
-   *error = DS_OK;
+	static DevShort *state;
+	*error = DS_OK;
 
-   printf("Device::State() called\n");
+	printf("Device::State() called\n");
 
-   state = (short*)vargout;
+	state = (DevShort*)vargout;
 //
 // code to implement the DevState command here
 //
-   *state = (short)this->state;
+	*state = (DevShort)this->state;
 
-   return(DS_OK);
+	return(DS_OK);
 }
 
 
@@ -881,42 +878,42 @@ long AGPowerSupply::State(DevArgument vargin, DevArgument vargout, DevLong *erro
  */
 long AGPowerSupply::Hello(DevArgument vargin, DevArgument vargout, DevLong *error)
 {
-   static devserver loc_device;
-   static long status;
-   static short *state;
-   static char **name;
-   *error = DS_OK;
+	static devserver 	loc_device;
+	static long 		status;
+	static DevShort 	*state;
+	static DevString 	*name;
 
-   printf("AGPowerSupply::Hello() called\n");
+	*error = DS_OK;
 
-   name = (char**)vargin;
-   state = (short*)vargout;
+	printf("AGPowerSupply::Hello() called\n");
+
+	name = (DevString *)vargin;
+	state = (DevShort *)vargout;
 //
 // import (local) device
 //
-   status = dev_import(*name,0,&loc_device,error);
-   printf("AGPowerSupply::Hello() dev_import(%s) returned %d (error=%d)\n",
-          *name, status, *error);
-   if (status != DS_OK) return(DS_NOTOK);
+	status = dev_import(*name,0,&loc_device,error);
+	printf("AGPowerSupply::Hello() dev_import(%s) returned %d (error=%d)\n", *name, status, *error);
+	if (status != DS_OK) 
+		return(DS_NOTOK);
 //
 // execute (local) dev_putget(DevState)
 //
-   status = dev_putget(loc_device,DevState,NULL,D_VOID_TYPE,
-                       state,D_SHORT_TYPE,error);
-   printf("AGPowerSupply::Hello() dev_putget(DevState) state = %d returned %d (error=%d)\n",
-          *state, status, *error);
-   if (status != DS_OK) return(DS_NOTOK);
+	status = dev_putget(loc_device, DevState, NULL, D_VOID_TYPE, state, D_SHORT_TYPE, error);
+	printf("AGPowerSupply::Hello() dev_putget(DevState) state = %d returned %d (error=%d)\n", *state, status, *error);
+	if (status != DS_OK) 
+		return(DS_NOTOK);
 //
 // free (local) device
 //
-   status = dev_free(loc_device,error);
-   printf("AGPowerSupply::Hello() dev_free(%s) returned %d (error=%d)\n",
-          *name, status, *error);
-   if (status != DS_OK) return(DS_NOTOK);
+	status = dev_free(loc_device,error);
+	printf("AGPowerSupply::Hello() dev_free(%s) returned %d (error=%d)\n", *name, status, *error);
+	if (status != DS_OK) 
+		return(DS_NOTOK);
 //
 // code to implement the DevState command here
 //
-   return(DS_OK);
+	return(DS_OK);
 }
 
 
@@ -925,9 +922,7 @@ long AGPowerSupply::Hello(DevArgument vargin, DevArgument vargout, DevLong *erro
  */
 AGPowerSupply::~AGPowerSupply()
 {
-
-   printf("AGPowerSupply::~AGPowerSupply() called\n");
-
+	printf("AGPowerSupply::~AGPowerSupply() called\n");
 }
 
 

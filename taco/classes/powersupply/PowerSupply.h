@@ -31,9 +31,9 @@
  *
  * Original:	April 1995
  *
- * Version:     $Revision: 1.7 $
+ * Version:     $Revision: 1.8 $
  *
- * Date:        $Date: 2008-10-15 15:53:32 $
+ * Date:        $Date: 2008-12-02 12:51:10 $
  */
 
 #ifndef POWERSUPPLY_H
@@ -44,55 +44,53 @@
 /**
  * PowerSupply superclass in C++
  */
-class PowerSupply : public Device {
+class PowerSupply : public Device 
+{
+//
+// private methods
+// 
+private :
+	long ClassInitialise(DevLong *error);
 
-
+	long GetResources(const char *res_name, DevLong *error);
 //
 // private members
-// 
-
-private :
-
-   long ClassInitialise( DevLong *error );
-   long GetResources (char *res_name, DevLong *error);
-
-   static short class_inited;
+//
+	static short class_inited;
 //
 // protected members
 //
-
 protected:
+	DevFloat 	set_val;
+	DevFloat 	read_val;
+	DevLong 	channel;
+	DevLong 	n_ave;
+	DevLong 	fault_val;
+	DevFloat 	cal_val;
+	DevFloat 	conv_val;
+	DevString 	conv_unit;
+	DevFloat 	set_offset;
+	DevFloat 	read_offset;
+	DevFloat 	set_u_limit;
+	DevFloat 	set_l_limit;
+	DevFloat 	idot_limit;
+	DevLong 	polarity;
+	DevFloat 	delta_i;
+	DevLong 	time_const;
+	DevLong 	last_set_t;
 
+//
+// protected methods
+//
+	long CheckReadValue(DevBoolean *check, DevLong *error);
 
-   float set_val;
-   float read_val;
-   long channel;
-   long n_ave;
-   long fault_val;
-   float cal_val;
-   float conv_val;
-   char *conv_unit;
-   float set_offset;
-   float read_offset;
-   float set_u_limit;
-   float set_l_limit;
-   float idot_limit;
-   long polarity;
-   float delta_i;
-   long time_const;
-   long last_set_t;
-
-   long CheckReadValue(DevBoolean *check, DevLong *error);
-
-   virtual long StateMachine( DevCommand cmd, DevLong *error) = 0; // pure virtual function
+	virtual long StateMachine(DevCommand cmd, DevLong *error) = 0; // pure virtual function
 //
 // public members
 //
 public:
-
-     PowerSupply (char *name, DevLong *error);
+     PowerSupply (const char *name, DevLong *error);
      ~PowerSupply ();
-
 };
 
 #endif // POWERSUPPLY_H
