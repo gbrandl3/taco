@@ -28,3 +28,4 @@ if BUILD_EXT
 SUBDIRS += motor
 endif
 
+## SUBDIRS += fbus steppermotor xbpm 
