@@ -31,9 +31,9 @@
  *
  * Original:  January 1991
  *
- * Version:   $Revision: 1.2 $
+ * Version:   $Revision: 1.3 $
  *
- * Date:              $Date: 2008-06-20 11:26:01 $
+ * Date:              $Date: 2008-12-02 09:32:36 $
  *
  */
 
@@ -92,7 +92,7 @@ static void 	startup_msg();
 
 manager_config_flags	c_flags = {False,False,False,False,False,E_GDBM};
 char 		*dshome  = NULL;
-char		*display = NULL;
+const char	*display = NULL;
 char	 	nethost [HOST_NAME_LENGTH];
 
 int		pid = 0;
@@ -145,13 +145,13 @@ int main (int argc, char **argv)
 {
 	SVCXPRT *transp;
 	FILE	*fptr;
-	char	*dbhost = NULL;
-	char	*dbhome = NULL;
+	const char	*dbhost = NULL;
+	const char	*dbhome = NULL;
 	char 	*dbtables = NULL;
 	char	*nethost_env = NULL;
 	char	*ora_sid = NULL;
 	char 	*ora_home = NULL;
-	char 	*cmd_argv [5];
+	const char 	*cmd_argv [5];
 	char	oracle_server_path [200];
 	char	db_path [200];
 	char	homepath [200];
@@ -163,7 +163,7 @@ int main (int argc, char **argv)
 	int	db_pid = 0;
 	int	i;
 	int     res;
-	char 	*dbase_used="NDBM";
+	const char 	*dbase_used="NDBM";
 #ifdef unix
 static	int	fd_devnull = -1;
 #endif
@@ -202,12 +202,12 @@ static	int	fd_devnull = -1;
 				{
 	         			c_flags.dbm  	     = E_MYSQL;
 					dbase_used = "MYSQL";
-					dbm_name = "tango";
+					dbm_name = const_cast<char *>("tango");
 				}
 				else if (strcmp (arg, "sqlite3") == 0)
 				{
 	         			c_flags.dbm  	     = E_SQLITE;
-					dbm_name = "tango";
+					dbm_name = const_cast<char *>("tango");
 				}
 				else if (strcmp (arg, "log") == 0)
 		 			c_flags.request_log = True;
@@ -525,7 +525,7 @@ static	int	fd_devnull = -1;
 					logStream->noticeStream() << "svc_destroy for database : " << transp << log4cpp::eol;
 				svc_destroy(transp);
 			}
-			execvp (homedir, cmd_argv);
+			execvp (homedir, const_cast<char **>(cmd_argv));
 			
 			std::cerr << "execvp failed, database_server not started" << std::endl;
 			if (c_flags.request_log)
@@ -569,9 +569,9 @@ static	int	fd_devnull = -1;
 			logStream->noticeStream() << "svc_destroy for message server : " << transp << log4cpp::eol;
 			svc_destroy(transp); 
 		}
-		execvp (homedir,cmd_argv);
+		execvp (homedir, const_cast<char **>(cmd_argv));
 
-		std::cerr << "execvp failed, message server not started" << log4cpp::eol;
+		std::cerr << "execvp failed, message server not started" << std::endl;
 		if (c_flags.request_log)
 		{
 			logStream->fatalStream() << "execv failed, message server not started." << log4cpp::eol;

@@ -29,9 +29,9 @@
  *
  * Original:      January 1991
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:		$Date: 2008-06-20 10:40:45 $
+ * Date:		$Date: 2008-12-02 09:32:36 $
  *
  *
  *		       All Rights Reserved
@@ -48,21 +48,21 @@ extern void	unreg_server (int);
 /*
  * Definitions for RTDB database
  */
-static char	*db_server         = "dbsu_server";
-static char   	*db_name           = "Set_bdd";
+static const char	*db_server         = "dbsu_server";
+static const char   	*db_name           = "Set_bdd";
 
 /*
  * Definitions for DBM and MYSQL databases
  */
-static char     *dbm_server 	    = "dbm_server";
-static char   	*dbm_name           = "taco";
+static const char     *dbm_server 	    = "dbm_server";
+static const char   	*dbm_name           = "taco";
 	
 /*
  * Definition for ORACLE database
  */
-static char 	*ora_server	    = "db_server";
-static char 	*ora_name	    = "res";
-static char	*ora_tns	    = "/usr/local/oracle";
+static const char 	*ora_server	    = "db_server";
+static const char 	*ora_name	    = "res";
+static const char	*ora_tns	    = "/usr/local/oracle";
 
 
 typedef enum{E_ORACLE = 0, E_MYSQL, E_GDBM, E_SQLITE} dbm_type;
