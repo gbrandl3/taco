@@ -32,9 +32,9 @@
  *
  * Original   : December 1997
  *
- * Version    :	$Revision: 1.11 $
+ * Version    :	$Revision: 1.12 $
  *
- * Date	    :	$Date: 2008-10-23 05:25:49 $
+ * Date	    :	$Date: 2008-12-02 08:43:55 $
  *
  *-*******************************************************************/
 
@@ -296,7 +296,7 @@ long db_getdevdomainlist(long *p_domain_nb,char ***ppp_list,DevLong *p_error)
  *			to by p_error. 
  * @retval DS_OK otherwise.
  */
-long db_getdevfamilylist(char *domain,long *p_family_nb,char ***ppp_list,DevLong *p_error)
+long db_getdevfamilylist(const char *domain,long *p_family_nb,char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
 	int i,j,k;
@@ -500,7 +500,7 @@ long db_getdevfamilylist(char *domain,long *p_family_nb,char ***ppp_list,DevLong
  *			to by p_error. 
  * @retval DS_OK otherwise.
  */
-long db_getdevmemberlist(char *domain,char *family,long *p_member_nb, 
+long db_getdevmemberlist(const char *domain,char *family,long *p_member_nb, 
 			 char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
@@ -910,7 +910,7 @@ long db_getresdomainlist(long *p_domain_nb,char ***ppp_list,DevLong *p_error)
  *			to by p_error. 
  * @retval DS_OK otherwise.
  */
-long db_getresfamilylist(char *domain,long *p_family_nb,char ***ppp_list,DevLong *p_error)
+long db_getresfamilylist(const char *domain,long *p_family_nb,char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
 	int i,j,k;
@@ -1113,7 +1113,7 @@ long db_getresfamilylist(char *domain,long *p_family_nb,char ***ppp_list,DevLong
  * @retval DS_NOTOK In case of trouble, the function sets the variable pointed to by p_error. 
  * @retval DS_OK otherwise.
  */
-long db_getresmemberlist(char *domain,char *family,long *p_member_nb, 
+long db_getresmemberlist(const char *domain,char *family,long *p_member_nb, 
 			 char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
@@ -1350,7 +1350,7 @@ long db_getresmemberlist(char *domain,char *family,long *p_member_nb,
  */
 
 
-long db_getresresolist(char *domain,char *family,char *member, 
+long db_getresresolist(const char *domain,char *family,char *member, 
 		       long *p_reso_nb,char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
@@ -1606,7 +1606,7 @@ long db_getresresolist(char *domain,char *family,char *member,
  * @retval DS_NOTOK In case of trouble, the function sets the variable pointed to by p_error. 
  * @retval DS_OK otherwise.
  */
-long db_getresresoval(char *domain,char *family,char *member,char *resource, 
+long db_getresresoval(const char *domain,char *family,char *member,char *resource, 
 		      long *p_rval_nb,char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
@@ -2065,7 +2065,7 @@ long db_getdsserverlist(long *p_server_nb,char ***ppp_list,DevLong *p_error)
  * @retval DS_NOTOK In case of trouble, the function sets the variable pointed to by "p_error". 
  * @retval DS_OK otherwise.
  */
-long db_getdspersnamelist(char *server,long *p_pers_nb,char ***ppp_list,DevLong *p_error)
+long db_getdspersnamelist(const char *server,long *p_pers_nb,char ***ppp_list,DevLong *p_error)
 {
 	db_res *recev;
 	int i,j,k;
@@ -2445,7 +2445,7 @@ long db_gethostlist(long *p_host_nb,char ***ppp_list,DevLong *p_error)
  * @retval DS_NOTOK In case of trouble, the function sets the variable pointed to by "p_error". 
  * @retval DS_OK otherwise.
  */
-long db_getdsonhost(char *host, long *p_ds_nb, db_svc **ds_list,DevLong *p_error)
+long db_getdsonhost(const char *host, long *p_ds_nb, db_svc **ds_list,DevLong *p_error)
 {
 	db_svcarray_net *recev;
 	char *host_sent;
