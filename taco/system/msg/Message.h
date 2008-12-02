@@ -30,9 +30,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2008-04-06 09:07:52 $
+ * Date:	$Date: 2008-12-02 12:55:41 $
  */
 
 #ifndef _Message_h
@@ -43,9 +43,9 @@ extern "C"
 {
 #endif
 
-extern void msg_alarm_handler(short, const char *, const char *, const char *, const char *);
-extern void msg_initialise(const char *);
-extern void msg_fault_handler(const DevString);
+void msg_alarm_handler(short, const char *, const char *, const char *, const char *);
+void msg_initialise(const char *);
+void msg_fault_handler(const char *);
 
 #ifdef __cplusplus
 }

@@ -29,9 +29,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2008-06-20 11:26:17 $
+ * Date:	$Date: 2008-12-02 12:55:41 $
  */
 
 /*
@@ -188,7 +188,7 @@ void msg_alarm_handler(short alarm_type,
 /*******************************************
  * Message-Server fault handler method     *
  *******************************************/
-void msg_fault_handler (const DevString error_msg)
+void msg_fault_handler (const char *error_msg)
 {
         FILE *filepointer;
         char file_name [256];
