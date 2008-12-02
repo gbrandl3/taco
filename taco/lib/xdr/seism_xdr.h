@@ -30,9 +30,9 @@
  *
  * Original:	August 1992
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2008-04-06 09:07:23 $
+ * Date:	$Date: 2008-12-02 09:19:43 $
  *
  *******************************************************************-*/
 
@@ -41,25 +41,25 @@
 
 struct DevSeismEvent {
 	DevLong   nsta;
-        DevShort weight[16];
-	DevShort coincid_sum;
-	DevShort pre_eventtime;
-	DevShort post_eventtime;
-        DevChar  tape_id;
-        DevChar  file_num[3];
-	DevFloat t_beg;
-	DevFloat t_ana;
+        DevShort  weight[16];
+	DevShort  coincid_sum;
+	DevShort  pre_eventtime;
+	DevShort  post_eventtime;
+        DevChar   tape_id;
+        DevChar   file_num[3];
+	DevFloat  t_beg;
+	DevFloat  t_ana;
 	DevLong   win_type;
-	DevFloat win_width;
+	DevFloat  win_width;
         DevLong   inst_cor_flag;
-	DevFloat rms_fmin;
-	DevFloat rms_fmax;
+	DevFloat  rms_fmin;
+	DevFloat  rms_fmax;
 	DevLong   smooth_flag;
-	DevFloat smo_width;
-	DevFloat freq_inc;
+	DevFloat  smo_width;
+	DevFloat  freq_inc;
 	DevLong   nspecout;
-	DevFloat out_freqinc;
-		     };
+	DevFloat  out_freqinc;
+};
 typedef struct DevSeismEvent 	DevSeismEvent;
 bool_t 	_DLLFunc xdr_DevSeismEvent PT_((XDR *xdrs, DevSeismEvent *objp));
 #define D_SEISM_EVENT           48
@@ -70,36 +70,36 @@ bool_t 	_DLLFunc xdr_DevSeismEvent PT_((XDR *xdrs, DevSeismEvent *objp));
                                                 A )
 
 struct DevSeismStat {
-                DevChar comp;
+                DevChar   comp;
 		DevString sismo_type;
-		DevFloat n_lat;
-		DevFloat e_lon;
-		DevFloat elev;
-		DevFloat freq_prop;
-		DevFloat damping;
-		DevFloat gain;
-		DevFloat sampling;
-		DevFloat transduct;
-		DevFloat conv;
+		DevFloat  n_lat;
+		DevFloat  e_lon;
+		DevFloat  elev;
+		DevFloat  freq_prop;
+		DevFloat  damping;
+		DevFloat  gain;
+		DevFloat  sampling;
+		DevFloat  transduct;
+		DevFloat  conv;
 		DevString pos;
-		DevFloat high_pass;
-		DevFloat tr_mode;
-		DevFloat tr_hpass;
-		DevFloat tr_lpass;
-		DevFloat tr_sta;
-		DevFloat tr_lta;
-		DevLong tr_stalta;
-		DevLong trigger;
-		DevLong v_test;
-		DevFloat vmin_a;
-		DevFloat vmax_a;
-		DevFloat vmin_w;
-		DevFloat vmax_w;
-		DevFloat dmin;
-		DevFloat dmax;
-		DevFloat rms_time;
-		DevFloat rms_spec;
-		    };
+		DevFloat  high_pass;
+		DevFloat  tr_mode;
+		DevFloat  tr_hpass;
+		DevFloat  tr_lpass;
+		DevFloat  tr_sta;
+		DevFloat  tr_lta;
+		DevLong   tr_stalta;
+		DevLong   trigger;
+		DevLong   v_test;
+		DevFloat  vmin_a;
+		DevFloat  vmax_a;
+		DevFloat  vmin_w;
+		DevFloat  vmax_w;
+		DevFloat  dmin;
+		DevFloat  dmax;
+		DevFloat  rms_time;
+		DevFloat  rms_spec;
+};
 typedef struct DevSeismStat 	DevSeismStat;
 bool_t 	_DLLFunc xdr_DevSeismStat PT_((XDR *xdrs, DevSeismStat *objp));
 #define D_SEISM_STAT            49

@@ -31,9 +31,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2008-04-06 09:07:21 $
+ * Date:	$Date: 2008-12-02 09:19:43 $
  *
  *******************************************************************-*/
 
@@ -54,7 +54,7 @@ struct DevBpmMeasHead {
 	DevUShort 	mn;
 	DevUShort 	gms;
         struct {
-		u_int 	    length;
+		DevULong   length;
 		DevBpmElec *sequence;
 	} momint;
 };
@@ -74,7 +74,7 @@ long   _DLLFunc xdr_length_DevBpmPos PT_((DevBpmPos *objp));
 struct DevBpmPosMeasure { 
 	DevBpmMeasHead 	meashead;
 	struct {
-		u_int 	    length;
+		DevULong   length;
 		DevBpmPos  *sequence;
 	} posdata;
 };
@@ -87,7 +87,7 @@ long   _DLLFunc xdr_length_DevBpmPosMeasure PT_((DevBpmPosMeasure *objp));
 struct DevBpmElecMeasure { 
 	DevBpmMeasHead 	meashead;
         struct {
-		u_int 	    length;
+		DevULong   length;
 		DevBpmElec *sequence;
 	} elecdata;
 };
@@ -120,7 +120,7 @@ long   _DLLFunc xdr_length_DevBpmInjectHead PT_((DevBpmInjectHead *objp));
 struct DevBpmPosField { 
 	DevBpmInjectHead injhead;
 	struct 	{
-		u_int 		 length;
+		DevULong	 length;
 	  	DevBpmPosMeasure *sequence;
 		} posmeas;
 };
@@ -138,7 +138,7 @@ long   	_DLLFunc xdr_length_DevBpmPosField PT_((DevBpmPosField *objp));
 struct DevBpmElecField { 
 	DevBpmInjectHead injhead;
 	struct 	{
-		u_int 		  length;
+		DevULong 	  length;
 		DevBpmElecMeasure *sequence;
 		} elecmeas;
 };

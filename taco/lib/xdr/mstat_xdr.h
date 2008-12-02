@@ -30,9 +30,9 @@
  *
  * Original:	March 1993
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2008-04-06 09:07:23 $
+ * Date:	$Date: 2008-12-02 09:19:43 $
  *
  *******************************************************************-*/
 
@@ -54,7 +54,7 @@ long   	_DLLFunc xdr_length_SysState PT_((SysState *objp));
 
 
 struct VarSysStateArray {
-	u_int 		length;
+	DevULong 	length;
 	SysState 	*sequence;
 };
 typedef struct VarSysStateArray VarSysStateArray;

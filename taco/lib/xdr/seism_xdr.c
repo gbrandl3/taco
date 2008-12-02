@@ -30,9 +30,9 @@
  *
  * Original:	August 1992
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2006-09-18 22:07:20 $
+ * Date:	$Date: 2008-12-02 09:19:43 $
  *
  *******************************************************************-*/
 
@@ -47,20 +47,20 @@ bool_t xdr_DevSeismEvent(xdrs, objp)
 XDR *xdrs;
 DevSeismEvent *objp;
 {
-	if (!xdr_int ( xdrs, &objp->nsta )) return (FALSE);
+	if (!xdr_DevLong ( xdrs, &objp->nsta )) return (FALSE);
  if (!xdr_vector(xdrs, (char *)objp, 16, sizeof(short), (xdrproc_t)xdr_short)) return (FALSE);
 	if (!xdr_short ( xdrs, &objp->coincid_sum )) return (FALSE);
 	if (!xdr_short ( xdrs, &objp->pre_eventtime )) return (FALSE);
 	if (!xdr_short ( xdrs, &objp->post_eventtime )) return (FALSE);
 	if (!xdr_float ( xdrs, &objp->t_beg )) return (FALSE);
 	if (!xdr_float ( xdrs, &objp->t_ana )) return (FALSE);
-	if (!xdr_int ( xdrs, &objp->win_type )) return (FALSE);
+	if (!xdr_DevLong ( xdrs, &objp->win_type )) return (FALSE);
 	if (!xdr_float ( xdrs, &objp->win_width )) return (FALSE);
 	if (!xdr_float ( xdrs, &objp->rms_fmin )) return (FALSE);
 	if (!xdr_float ( xdrs, &objp->rms_fmax )) return (FALSE);
-	if (!xdr_int ( xdrs, &objp->smooth_flag )) return (FALSE);
+	if (!xdr_DevLong ( xdrs, &objp->smooth_flag )) return (FALSE);
 	if (!xdr_float ( xdrs, &objp->smo_width )) return (FALSE);
-	if (!xdr_int ( xdrs, &objp->nspecout )) return (FALSE);
+	if (!xdr_DevLong ( xdrs, &objp->nspecout )) return (FALSE);
 	if (!xdr_float ( xdrs, &objp->out_freqinc )) return (FALSE);
 	return (TRUE);
 }
@@ -87,9 +87,9 @@ DevSeismStat *objp;
 	if (!xdr_float ( xdrs, &objp->tr_lpass )) return (FALSE);
 	if (!xdr_float ( xdrs, &objp->tr_sta )) return (FALSE);
 	if (!xdr_float ( xdrs, &objp->tr_lta )) return (FALSE);
-	if (!xdr_int ( xdrs, &objp->tr_stalta )) return (FALSE);
-	if (!xdr_int ( xdrs, &objp->trigger )) return (FALSE);
-	if (!xdr_int ( xdrs, &objp->v_test )) return (FALSE);
+	if (!xdr_DevLong ( xdrs, &objp->tr_stalta )) return (FALSE);
+	if (!xdr_DevLong ( xdrs, &objp->trigger )) return (FALSE);
+	if (!xdr_DevLong ( xdrs, &objp->v_test )) return (FALSE);
 	if (!xdr_float ( xdrs, &objp->vmin_a )) return (FALSE);
 	if (!xdr_float ( xdrs, &objp->vmax_a )) return (FALSE);
 	if (!xdr_float ( xdrs, &objp->vmin_w )) return (FALSE);

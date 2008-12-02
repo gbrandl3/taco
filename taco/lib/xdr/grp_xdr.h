@@ -30,9 +30,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2008-04-06 09:07:21 $
+ * Date:	$Date: 2008-12-02 09:19:43 $
  *
  *******************************************************************-*/
 
@@ -59,7 +59,7 @@ long    _DLLFunc xdr_length_FramePair  PT_((FramePair *objp));
 
 
 struct DevGrpFramePair {
-	u_int		nb_framepair;
+	DevULong	nb_framepair;
 	FramePair	framepair;
 };
 typedef struct DevGrpFramePair 	DevGrpFramePair;
@@ -74,7 +74,7 @@ long   	_DLLFunc xdr_length_DevGrpFramePair  PT_((DevGrpFramePair *objp));
 
 
 struct DevGrpFramePairArray {
-	u_int		length;
+	DevULong	length;
 	DevGrpFramePair	*sequence;
 };
 typedef struct DevGrpFramePairArray DevGrpFramePairArray;

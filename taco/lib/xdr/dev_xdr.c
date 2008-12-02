@@ -29,9 +29,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.9 $
+ * Version:	$Revision: 1.10 $
  *
- * Date:	$Date: 2008-04-06 09:07:21 $
+ * Date:	$Date: 2008-12-02 09:19:43 $
  *
  *******************************************************************-*/
 
@@ -142,10 +142,10 @@ bool_t xdr_DevLong(xdrs, objp)
 	XDR *xdrs;
 	DevLong *objp;
 {
-#if SIZEOF_INT == 4
-	return xdr_int(xdrs, objp);
-#elif SIZEOF_LONG == 4
+#if SIZEOF_LONG == 4
 	return xdr_long(xdrs, objp);
+#elif SIZEOF_INT == 4
+	return xdr_int(xdrs, objp);
 #endif
 }
 
@@ -153,10 +153,10 @@ bool_t xdr_DevULong(xdrs, objp)
 	XDR *xdrs;
 	DevULong *objp;
 {
-#if SIZEOF_INT == 4
-	return xdr_u_int(xdrs, objp);
-#elif SIZEOF_LONG == 4
+#if SIZEOF_UNSIGNED_LONG == 4
 	return xdr_u_long(xdrs, objp);
+#elif SIZEOF_UNSIGNED_INT == 4
+	return xdr_u_int(xdrs, objp);
 #endif
 }
 

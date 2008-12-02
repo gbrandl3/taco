@@ -29,9 +29,9 @@
  * 
  * Original:	July 1992
  * 
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  * 
- * Date:	$Date: 2008-04-06 09:07:23 $
+ * Date:	$Date: 2008-12-02 09:19:43 $
  * 
  *******************************************************************-*/
 
@@ -52,19 +52,19 @@ xdr_PSSInterlockStatus(xdrs, objp)
 	XDR *xdrs;
 	PSSInterlockStatus *objp;
 {
-	if (!xdr_int(xdrs, &objp->Module)) {
+	if (!xdr_DevLong(xdrs, &objp->Module)) {
 		return (FALSE);
 	}
-	if (!xdr_int(xdrs, &objp->GuardA)) {
+	if (!xdr_DevLong(xdrs, &objp->GuardA)) {
 		return (FALSE);
 	}
-	if (!xdr_int(xdrs, &objp->GuardB)) {
+	if (!xdr_DevLong(xdrs, &objp->GuardB)) {
 		return (FALSE);
 	}
-	if (!xdr_int(xdrs, &objp->GuardC)) {
+	if (!xdr_DevLong(xdrs, &objp->GuardC)) {
 		return (FALSE);
 	}
-	if (!xdr_u_short(xdrs, &objp->Interlocks)) {
+	if (!xdr_DevUShort(xdrs, &objp->Interlocks)) {
 		return (FALSE);
 	}
 	return (TRUE);

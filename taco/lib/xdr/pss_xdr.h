@@ -30,9 +30,9 @@
  *
  * Original:	July 1992
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2008-04-06 09:07:23 $
+ * Date:	$Date: 2008-12-02 09:19:43 $
  *
  *******************************************************************-*/
 
@@ -57,7 +57,7 @@ long   	_DLLFunc xdr_length_PSSInterlockStatus
 
 
 struct DevDaresburyStatus {
-	u_int length;
+	DevULong 	   length;
 	PSSInterlockStatus *sequence;
 };
 typedef struct DevDaresburyStatus DevDaresburyStatus;

@@ -30,9 +30,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2008-04-06 09:07:20 $
+ * Date:	$Date: 2008-12-02 09:19:43 $
  *
  *******************************************************************-*/
 
@@ -44,7 +44,7 @@
  */
 #ifdef _IDENT
 static char API_xdrh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/API_xdr.h,v 1.6 2008-04-06 09:07:20 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/xdr/API_xdr.h,v 1.7 2008-12-02 09:19:43 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 #include <dev_xdr.h>
@@ -66,7 +66,7 @@ struct DevVarArgument {
 typedef struct DevVarArgument DevVarArgument;
 
 struct DevVarArgumentArray {
-        u_int 		length;
+        DevULong 	length;
         DevVarArgument  *sequence;
 };
 typedef struct DevVarArgumentArray DevVarArgumentArray;
@@ -185,7 +185,7 @@ struct _dev_event_info {
 typedef struct _dev_event_info _dev_event_info;
 
 struct _dev_query_out {
-  	u_int           	length;
+  	DevULong           	length;
   	_dev_cmd_info   	*sequence;
   	char            	class_name [SHORT_NAME_SIZE];
   	DevLong         	error;
@@ -199,7 +199,7 @@ typedef struct _dev_query_out _dev_query_out;
  */
 
 struct _dev_queryevent_out {
-  	u_int           	length;
+  	DevULong           	length;
   	_dev_event_info 	*sequence;
   	DevChar            	class_name [SHORT_NAME_SIZE];
   	DevLong         	error;

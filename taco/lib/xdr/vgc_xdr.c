@@ -29,9 +29,9 @@
  *
  * Original:    January 1991
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2008-04-06 09:07:23 $
+ * Date:	$Date: 2008-12-02 09:19:43 $
  *
  *******************************************************************-*/
 
@@ -191,7 +191,7 @@ xdr_DevVgcPenningGauge(xdrs, objp)
 	if (!xdr_char(xdrs, &objp->filter)) {
 		return (FALSE);
 	}
-	if (!xdr_int(xdrs, &objp->start_time)) {
+	if (!xdr_DevLong(xdrs, &objp->start_time)) {
 		return (FALSE);
 	}
 	if (!xdr_char(xdrs, &objp->calibration)) {
@@ -323,13 +323,13 @@ xdr_DevVgcController(xdrs, objp)
 	if (!xdr_vector(xdrs, (char *)objp->relay, 12, sizeof(DevVgcRelay), (xdrproc_t)xdr_DevVgcRelay)) {
 		return (FALSE);
 	}
-	if (!xdr_int(xdrs, &objp->nb_pir)) {
+	if (!xdr_DevLong(xdrs, &objp->nb_pir)) {
 		return (FALSE);
 	}
-	if (!xdr_int(xdrs, &objp->nb_pen)) {
+	if (!xdr_DevLong(xdrs, &objp->nb_pen)) {
 		return (FALSE);
 	}
-	if (!xdr_int(xdrs, &objp->nb_relay)) {
+	if (!xdr_DevLong(xdrs, &objp->nb_relay)) {
 		return (FALSE);
 	}
 	if (!xdr_DevVgcSystem(xdrs, &objp->syst)) {
