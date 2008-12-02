@@ -25,13 +25,13 @@
  * Description: implementation for KernelServer class 
  *
  * Author(s):   Emmanuel Taurel
- *              $Author: andy_gotz $
+ *              $Author: jkrueger1 $
  *
  * Original:    June 1996
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2008-10-13 19:01:14 $
+ * Date:        $Date: 2008-12-02 13:02:08 $
  *
  +**********************************************************************/
 
@@ -57,7 +57,7 @@
 
 #include <string.h>
 #include <iostream>
-#include <strstream>
+#include <sstream>
 #include <KernelServer.h>
 #ifdef _solaris
 #	include "_count.h"
@@ -300,7 +300,7 @@ void get_dc_param(int server_nb,int dc_type,char *dc_host,unsigned int &pn,std::
 
 // Build dc server pseudo device name
 
-	std::ostrstream misc;
+	std::ostringstream misc;
 	std::string dc_name = "sys/dc_";
 
 	if ((p_host = gethostbyname(dc_host)) == NULL)
