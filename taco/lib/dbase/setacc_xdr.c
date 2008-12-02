@@ -27,9 +27,9 @@
  * 
  * Original:      
  *
- * Version:     $Revision: 1.9 $
+ * Version:     $Revision: 1.10 $
  *
- * Date:        $Date: 2008-04-06 09:07:13 $
+ * Date:        $Date: 2008-12-02 08:47:52 $
  *
  ****************************************************************************/
 
@@ -288,7 +288,7 @@ bool_t _WINAPI xdr_db_devinfo_svc(XDR *xdrs,db_devinfo_svc *objp)
 		return (FALSE);
 	if (!xdr_DevULong(xdrs, &objp->program_num))
 		return(FALSE);
-	if (!xdr_int(xdrs, &objp->db_err))
+	if (!xdr_DevLong(xdrs, &objp->db_err))
 		return (FALSE);
 	return (TRUE);
 }
@@ -325,7 +325,7 @@ bool_t _WINAPI xdr_db_info_svc(XDR *xdrs,db_info_svc *objp)
 		return (FALSE);
 	if (!xdr_var_dom(xdrs, &objp->res))
 		return (FALSE);
-	if (!xdr_int(xdrs, &objp->db_err))
+	if (!xdr_DevLong(xdrs, &objp->db_err))
 		return (FALSE);
 	return (TRUE);
 }
@@ -364,7 +364,7 @@ bool_t _WINAPI xdr_svcinfo_svc(XDR *xdrs,svcinfo_svc *objp)
 			(u_int *)&objp->embedded_len, MAXU_INT,
 			sizeof(svcinfo_server), (xdrproc_t)xdr_svcinfo_server))
 		return (FALSE);
-	if (!xdr_int(xdrs, &objp->db_err))
+	if (!xdr_DevLong(xdrs, &objp->db_err))
 		return (FALSE);
 	return (TRUE);
 }
@@ -381,7 +381,7 @@ bool_t _WINAPI xdr_db_poller_svc(XDR *xdrs,db_poller_svc *objp)
 		return (FALSE);
 	if (!xdr_DevULong(xdrs, &objp->pid))
 		return (FALSE);
-	if (!xdr_int(xdrs, &objp->db_err))
+	if (!xdr_DevLong(xdrs, &objp->db_err))
 		return (FALSE);
 	return (TRUE);
 }
