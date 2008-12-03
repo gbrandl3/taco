@@ -25,13 +25,13 @@
  * Description:	
  *	
  * Author(s)  :	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: andy_gotz $
  *
  * Original   :	September 2002
  *
- * Version    : $Revision: 1.7 $
+ * Version    : $Revision: 1.8 $
  *
- * Date       : $Date: 2008-04-06 09:07:19 $
+ * Date       : $Date: 2008-12-03 20:59:59 $
  *
  *********************************************************************/ 
 
@@ -53,7 +53,7 @@
  *
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
-long attribute_import (char *attribute_name, long access, 
+long attribute_import (const char *attribute_name, long access, 
 							  devserver *ds_ptr, DevLong *error)
 {
 	AttrAccess	*attr;
@@ -64,7 +64,7 @@ long attribute_import (char *attribute_name, long access,
 	 * Create attribute access
 	 */
 	 
-	attr = new AttrAccess (attribute_name, access, error);
+	attr = new AttrAccess ((char*)attribute_name, access, error);
 	if ( attr == NULL || *error != DS_OK )
 		{
 		return (DS_NOTOK);
