@@ -23,8 +23,8 @@ setenv exec_prefix @exec_prefix@
 setenv libdir @libdir@
 setenv bindir @bindir@
 setenv sbindir @sbindir@
-setenv datadir @datadir@
 setenv datarootdir @datarootdir@
+setenv datadir @datadir@
 setenv pythondir @pythondir@
 setenv pyexecdir @pyexecdir@
 setenv localstatedir @localstatedir@

@@ -29,10 +29,10 @@ bindir="@bindir@"
 sbindir="@sbindir@"
 libdir="@libdir@"
 includedir="@includedir@"
+datarootdir="@datarootdir@"
 datadir="@datadir@"
 initdir="@initdir@"
 pythondir="@pythondir@"
-datarootdir="@datarootdir@"
 
 case $1 in
 	--prefix) echo "$prefix" ;;

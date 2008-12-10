@@ -28,8 +28,8 @@ environ()
 	prefix=${DSHOME:-@prefix@}
 	exec_prefix=@exec_prefix@
 	sysconfdir=@sysconfdir@
-	datadir=@datadir@
 	datarootdir=@datarootdir@
+	datadir=@datadir@
 	templatedir=@templatedir@
 	if test -f ${sysconfdir}/tacoenv.sh ; then
 		. ${sysconfdir}/tacoenv.sh
