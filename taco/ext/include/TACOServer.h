@@ -461,7 +461,7 @@ private:
 	{
 		char 	*cmd_name = new char[32];
         	snprintf(cmd_name, sizeof(cmd_name) - 1, 
-#if SIZEOF_INT != 4
+#if SIZEOF_LONG == 4
 				"(%ld/%ld/%ld)", 
 #else
 				"(%d/%d/%d)", 
