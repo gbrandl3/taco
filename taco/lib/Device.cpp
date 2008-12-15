@@ -30,9 +30,9 @@
  *
  * Original:	March 1995
  *
- * Version:	$Revision: 1.18 $
+ * Version:	$Revision: 1.19 $
  *
- * Date:	$Date: 2008-12-02 09:58:30 $
+ * Date:	$Date: 2008-12-15 08:21:55 $
  *
  *-**********************************************************************/
 		
@@ -74,13 +74,13 @@ long Device::ClassInitialise( DevLong *error )
 }
 
 /**
- * constructor to create an object of the base class Device
+ * 'constructor' method to initialize an object of the base class Device
  *
  * @param devname name (ascii identifier) of device to create
  * @param error error code returned in the case of problems
  *
  */
-Device::Device (const char *devname, DevLong *error)
+void Device::init(const char *devname, DevLong *error)
 {
 	dev_printdebug(DBG_TRACE,"Device::Device() called, devname = %s\n",devname);
 	*error = DS_OK;

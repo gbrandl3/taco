@@ -31,9 +31,9 @@
  *
  * Original:	February 1995
  *
- * Version:	$Revision: 1.14 $
+ * Version:	$Revision: 1.15 $
  *
- * Date:	$Date: 2008-12-02 09:58:30 $
+ * Date:	$Date: 2008-12-15 08:21:55 $
  *
  +**********************************************************************/
 
@@ -147,7 +147,48 @@ public:
 #endif
 	char* name;
 public:
-	Device (const char *name, DevLong *error);
+	/**
+	 * constructor to create an object of the base class Device
+	 *
+	 * @param devname name (ascii identifier) of device to create
+	 * @param error error code returned in the case of problems
+	 *
+	 */
+	Device (const DevString devname, DevLong *error)
+		: name(NULL)
+	{
+		init(devname, error);
+	}
+
+	
+	/**
+	 * constructor to create an object of the base class Device
+	 *
+	 * @param devname name (ascii identifier) of device to create
+	 * @param error error code returned in the case of problems
+	 *
+	 * @overload Device (const char *devname, DevLong *error)
+	 */
+	Device (const char *devname, DevLong *error)
+		: name(NULL)
+	{
+		init(devname, error);
+	}
+
+	/**
+	 * constructor to create an object of the base class Device
+	 *
+	 * @param devname name (ascii identifier) of device to create
+	 * @param error error code returned in the case of problems
+	 *
+	 * @overload Device (const std::string  &devname, DevLong *error)
+	 */
+	Device (const std::string &devname, DevLong *error)
+		: name(NULL)
+	{
+		init(devname.c_str(), error);
+	}
+
 	virtual ~Device ();
 //
 // following method is "virtual" which means derived classes can
@@ -189,7 +230,13 @@ protected:
 	long n_commands;	// number of commands
    	DeviceCommandList commands_list; // array of commands (for backwards compatibility @ ESRF)
 protected: 
+	/**
+	 * constructor to create an object of the base class Device
+	 */
 	Device(){};
+
+private:
+	void init(const char *name, DevLong *error);
 };
 
 #define TYPE_DEFAULT            "DevType_Default"
