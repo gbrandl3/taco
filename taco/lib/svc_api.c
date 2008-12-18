@@ -29,9 +29,9 @@
  *
  * Original:	Feb 1994
  *
- * Version:	$Revision: 1.36 $
+ * Version:	$Revision: 1.37 $
  *
- * Date:		$Date: 2008-12-02 08:15:55 $
+ * Date:		$Date: 2008-12-18 08:04:40 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -1868,7 +1868,6 @@ static SVCXPRT *transp_tcp;
 
 extern long minimal_access;
 
-static void _WINAPI devserver_prog_4    PT_( (struct svc_req *rqstp,SVCXPRT *transp) );
 #ifdef DARWIN
 	typedef void (* MyRpcFuncPtr)();
 #else
@@ -2278,6 +2277,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 #endif
 }
 
+#if 0
 /**
  * @ingroup dsAPIintern
  * Entry point for received RPCs. Switches to the wished remote procedure.
@@ -2508,6 +2508,7 @@ static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp)
 	}
 	return;
 }
+#endif
 
 /**
  * @ingroup dsAPIintern

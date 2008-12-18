@@ -57,7 +57,7 @@ INCLUDES		= @TACO_INCLUDES@
 ## AM_CPPFLAGS 		= -DEBUG
 
 libtacoc_la_SOURCES 	= gen_api.c dev_cmds.c dev_errors.c dev_states.c oic.c \
-			util_api.c asyn_api.c gettrans.c ds_prog_vers3.c DevServer.c taco_utils.c timeouts.c
+			util_api.c asyn_api.c gettrans.c ds_prog_vers3.c DevServer.c taco_utils.c timeouts.c devserver_prog_4.c
 libtacoc_la_LIBADD	= @PTHREAD_LIBS@
 
 libtacoc_la_LDFLAGS 	= -version-info @LIB_VERSION@
@@ -79,6 +79,7 @@ libtaco_la_LDFLAGS 	= -version-info @LIB_VERSION@ --with-pic
 
 libtaco___la_SOURCES 	= $(SRC_TACO_SPECIAL) Device.cpp OICDevice.cpp 
 libtaco___la_CFLAGS  	= -x c++
+libtaco___la_LIBTOOLFLAGS = --tag=CXX
 libtaco___la_LIBADD  	= xdr/libdsxdr_all.la dbase/libdbapi.la signal/libsignal.la libtacoc.la @LIB_STDCXX@
 if DC_BUILD
 libtaco___la_LIBADD	+= dc/libdcapi.la
