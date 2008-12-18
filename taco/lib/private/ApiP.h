@@ -30,9 +30,9 @@
  *
  * Original:	June 1992
  *
- * Version:	$Revision: 1.18 $
+ * Version:	$Revision: 1.19 $
  *
- * Date:	$Date: 2008-12-02 08:07:15 $
+ * Date:	$Date: 2008-12-18 08:03:22 $
  *
  ********************************************************************-*/
 
@@ -45,7 +45,7 @@
  */
 #ifdef _IDENT
 static char ApiPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.18 2008-12-02 08:07:15 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.19 2008-12-18 08:03:22 jkrueger1 Exp $";
 #endif /* _IDENT */
 
 
@@ -433,6 +433,7 @@ long 	relisten_events(devserver ds);
  */
 int taco_gethostname(char *host_name, size_t len);
 
+void _WINAPI devserver_prog_4    PT_( (struct svc_req *rqstp,SVCXPRT *transp) );
 #ifdef __cplusplus
 }
 #endif
