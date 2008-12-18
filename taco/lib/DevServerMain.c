@@ -29,9 +29,9 @@
  *
  * Original   	: March 1991
  *
- * Version	: $Revision: 1.31 $
+ * Version	: $Revision: 1.32 $
  *
- * Date		: $Date: 2008-10-23 09:51:16 $
+ * Date		: $Date: 2008-12-18 08:01:09 $
  *
  *******************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -106,9 +106,6 @@
 
 void _WINAPI devserver_prog_1	PT_( (struct svc_req *rqstp,SVCXPRT *transp) );
 extern long minimal_access;
-
-static void _WINAPI devserver_prog_4	PT_( (struct svc_req *rqstp,SVCXPRT *transp) );
-
 
 /****************************************
  *          Globals                     *
