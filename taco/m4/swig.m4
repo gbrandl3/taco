@@ -50,7 +50,7 @@ AC_DEFUN([SWIG_PROG],[
 			SWIG_RUNTIME_LIBS_DIR="${SWIG%/bin*}/lib"
 			AC_MSG_CHECKING([for SWIG runtime libraries in $SWIG_RUNTIME_LIBS_DIR])
 			swig_tmp=`find "$SWIG_RUNTIME_LIBS_DIR" -maxdepth 1 -name 'libswig*'`
-			test -n "$swig_tmp" && swig_tmp=yes || swig_tmp=no
+			AS_IF([test -n "$swig_tmp"], [swig_tmp=yes], [swig_tmp=no])
 			AC_MSG_RESULT([$swig_tmp])
 		      ], [swig_tmp="yes"])
 	      ])
