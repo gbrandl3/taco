@@ -199,6 +199,10 @@ Returns - the ouput of the command."
 %enddef
 %feature("docstring", EXECUTE_DOC) TACOClient_execute;
 
+/*
+%thread TACO::Client;
+*/
+
 %extend TACO::Client{
 #ifdef SWIGPYTHON
         PyObject *TACOClient_execute(long commandNumber, PyObject *optargs=NULL)

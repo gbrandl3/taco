@@ -30,7 +30,9 @@ pyexec_LTLIBRARIES 	= _TACOStates.la _TACOClient.la
 
 nodist__TACOStates_la_SOURCES = wrap_TACOStates.cpp 
 
-nodist__TACOClient_la_SOURCES = wrap_TACOClient.cpp TACOPythonClientConverters.cpp
+nodist__TACOClient_la_SOURCES = wrap_TACOClient.cpp 
+
+_TACOClient_la_SOURCES	= TACOPythonClientConverters.cpp
 
 _TACOClient_la_LDFLAGS 	= -avoid-version -module
 _TACOClient_la_LIBADD  	= @LIB_STDCXX@ ../src/libTACOExtensions.la
@@ -39,7 +41,7 @@ TACOClient.py:		wrap_TACOClient.cpp
 	@true
 
 wrap_TACOClient.cpp:	$(srcdir)/TACOClient.i $(top_srcdir)/ext/include/TACOClient.h
-	@SWIG@ @SWIG_PYTHON_OPT@ -c++ -I$(top_srcdir)/ext/include @TACO_INCLUDES@ -o $@ $(srcdir)/TACOClient.i
+	@SWIG@ @SWIG_PYTHON_OPT@ -threads -c++ -I$(top_srcdir)/ext/include @TACO_INCLUDES@ -o $@ $(srcdir)/TACOClient.i
 
 _TACOStates_la_LDFLAGS 	= -avoid-version -module
 _TACOStates_la_LIBADD 	= @LIB_STDCXX@ ../src/libTACOExtensions.la
