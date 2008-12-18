@@ -29,9 +29,9 @@
  *
  * Original:    June 1996
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2008-04-06 09:07:56 $
+ * Date:        $Date: 2008-12-18 07:52:19 $
  *
  +**********************************************************************/
 
@@ -45,18 +45,30 @@
 #include <sys/filio.h>
 #endif
 
-#ifdef sun
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
 
 #include <cstdlib>
+#if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif
+#if HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
+#endif
+#if HAVE_NETINET_IN_H
 #include <netinet/in.h>
+#endif
+#if HAVE_NETDB_H
 #include <netdb.h>
+#endif
+#if HAVE_TIME_H
 #include <time.h>
+#endif
 #include <unistd.h>
+#if HAVE_SYS_SELECT_H
 #include <sys/select.h>
+#endif
 
 // ESRF include files
 
