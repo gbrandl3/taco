@@ -22,9 +22,9 @@
  *
  * Original:	October 1999
  *
- * $Revision: 1.7 $
+ * $Revision: 1.8 $
  *
- * $Date: 2008-11-07 17:01:06 $
+ * $Date: 2008-12-18 07:56:02 $
  *
  * $Author: jkrueger1 $
  *
@@ -86,8 +86,8 @@
 static int      udp_socket;
 static int      tcp_socket;
 
-static void _WINAPI devserver_prog_4    PT_( (struct svc_req *rqstp,SVCXPRT *transp) );
-static _client_data * _DLLFunc rpc_cmd_get (_server_data *server_data);
+static void _WINAPI lv_devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp);
+static _client_data * _DLLFunc lv_rpc_cmd_get (_server_data *server_data);
 static long lv_startup(char*, DevLong *);
 static long lv_ds__sendreply();
 static long read_device_id (long,long *,long *,DevLong *);
@@ -359,7 +359,7 @@ long lv_ds__main(char *server_name, char *pers_name)
 	/*sock_udp= transp->xp_sock;*/
 
 	if (!svc_register(transp, prog_number, API_VERSION, 
-			  devserver_prog_4, IPPROTO_UDP)) 
+			  lv_devserver_prog_4, IPPROTO_UDP)) 
 		{
 		char msg[]="Unable to register server (UDP,4), exiting...\n"; 
 			fprintf (stderr, msg); 
@@ -386,7 +386,7 @@ long lv_ds__main(char *server_name, char *pers_name)
 	/*sock_tcp= transp_tcp->xp_sock;*/
 
         if (!svc_register(transp_tcp, prog_number, API_VERSION,
-			  devserver_prog_4, IPPROTO_TCP))
+			  lv_devserver_prog_4, IPPROTO_TCP))
 		{
 	    char msg[]= "Unable to register server (TCP,4), exiting...\n";
 			fprintf (stderr, msg); 
@@ -1163,7 +1163,7 @@ static union {
 
 
 /*+======================================================================
- Function   :   static void devserver_prog_4()
+ Function   :   static void lv_devserver_prog_4()
 
  Description:   Entry point for received RPCs.
 	    :   Switches to the requested remote procedure.
@@ -1176,7 +1176,7 @@ static union {
  Return(s)  :   none
 =======================================================================-*/
 
-static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp) 
+static void _WINAPI lv_devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp) 
 {
 	char	*help_ptr;
 	int	pid = 0;
@@ -1250,9 +1250,9 @@ static void _WINAPI devserver_prog_4 (struct svc_req *rqstp, SVCXPRT *transp)
 		xdr_argument = (xdrproc_t)xdr__server_data;
 		xdr_result = (xdrproc_t)xdr__client_data;
 #ifdef __cplusplus
-		local = (DevRpcLocalFunc) rpc_cmd_get;
+		local = (DevRpcLocalFunc) lv_rpc_cmd_get;
 #else
-		local = (char *(*)()) rpc_cmd_get;
+		local = (char *(*)()) lv_rpc_cmd_get;
 #endif
 		break;
 
@@ -1648,7 +1648,7 @@ int gettransient_ut (char *ds_name, int *udp_socket, int *tcp_socket)
 extern DevServerDevices *devices;
 
 /*+======================================================================
- Function   :   extern _client_data *rpc_cmd_get()
+ Function   :   extern _client_data *lv_rpc_cmd_get()
 
  Description:   RPC procedure corresponding to LabView lv_ds__cmd_get().
             :   Its only job is to unpack the input arguments and 
@@ -1666,7 +1666,7 @@ extern DevServerDevices *devices;
                 an appropriate error number if the function fails.
 =======================================================================-*/
 
-static _client_data * _DLLFunc rpc_cmd_get (_server_data *server_data)
+static _client_data * _DLLFunc lv_rpc_cmd_get (_server_data *server_data)
 {
         static _client_data     client_data;
         DevServer               ds;
