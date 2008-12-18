@@ -16,9 +16,9 @@ dnl You should have received a copy of the GNU Lesser General Public
 dnl License along with this library; if not, write to the Free Software
 dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_INIT([TACO], [3.99.47], [taco-devel@lists.sourceforge.net])
+AC_INIT([TACO], [3.99.58], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.118 $)dnl
+AC_REVISION($Revision: 1.119 $)dnl
 AC_COPYRIGHT([(C) 1990-2008 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -27,7 +27,7 @@ AC_CONFIG_MACRO_DIR(m4)
 
 TACO_CHECK_SYSTEM
 
-AC_SUBST(LIB_VERSION, [14:4:0])
+AC_SUBST(LIB_VERSION, [15:4:0])
 
 TACO_CHECK_SIZEOF_TYPES
 
@@ -213,6 +213,16 @@ AC_CONFIG_FILES([classes/powersupply/Makefile])
 AC_CONFIG_FILES([classes/serialline/Makefile])
 AC_CONFIG_FILES([classes/updatedaemon/Makefile])
 AC_CONFIG_FILES([classes/agps/Makefile])
+dnl AC_CONFIG_FILES([classes/steppermotor/Makefile])
+dnl AC_CONFIG_FILES([classes/steppermotor/include/Makefile])
+dnl AC_CONFIG_FILES([classes/steppermotor/src/Makefile])
+dnl AC_CONFIG_FILES([classes/steppermotor/vpap/Makefile])
+dnl AC_CONFIG_FILES([classes/fbus/Makefile])
+dnl AC_CONFIG_FILES([classes/fbus/include/Makefile])
+dnl AC_CONFIG_FILES([classes/fbus/src/Makefile])
+dnl AC_CONFIG_FILES([classes/fbus/utils/Makefile])
+dnl AC_CONFIG_FILES([classes/fbus/gescio1/Makefile])
+dnl AC_CONFIG_FILES([classes/xbpm/Makefile])
 AC_CONFIG_FILES([classes/motor/Makefile])
 AC_CONFIG_FILES([
 		classes/signal/Makefile 
@@ -334,6 +344,7 @@ build:
 
 	TANGO support:		${enable_tango}
 	Extensions :		${enable_ext}
+		python :	${swig_tmp}
 
 install:
 	Fast install:           ${enable_fast_install}
