@@ -31,9 +31,9 @@
  *
  * Original   : May 1998
  *
- * Version:     $Revision: 1.17 $
+ * Version:     $Revision: 1.18 $
  *
- * Date:        $Date: 2008-10-23 05:25:49 $
+ * Date:        $Date: 2008-12-18 07:59:06 $
  *
  *-*******************************************************************/
 
@@ -420,7 +420,7 @@ static long TestLine(char *line, char **line1, ana_input *in, DevULong *p_line_p
 	int a = 0;
 
 #ifdef DEBUG
-printf("Start of TestLine \n");
+	printf("Start of TestLine \n");
 #endif /* DEBUG */
 
 /* Return error in this line is not a definition line */
@@ -556,7 +556,7 @@ printf("Start of TestLine \n");
 	if ((strlen(tmp) == diff) && (a == 0))
 		iret = DS_NOTOK;
 #ifdef DEBUG
-printf("End of TestLine \n");
+	printf("End of TestLine \n");
 #endif /* DEBUG */
 	*line1 = tmp;
 	return(iret);
