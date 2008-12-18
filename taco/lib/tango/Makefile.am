@@ -43,6 +43,7 @@ libtacotango___la_SOURCES = ../dev_api.cpp ../sec_api.cpp ../event_api.cpp \
 			../dc/dcrd_cli.c ../dc/dcwr_cli.c ../dc/utils_cli.c \
 			tango_api.cpp attr_api.cpp attr_access.cpp \
 			db_exp.cpp ../startup.c ../taco_utils.c ../timeouts.c
+			../devserver_prog_4.c
 else
 libtacotango___la_SOURCES = ../dev_api.c ../sec_api.c ../event_api.c \
 			../svc_api.c ../DevServerSig.c  ../event_relisten.c \
@@ -56,7 +57,8 @@ libtacotango___la_SOURCES = ../dev_api.c ../sec_api.c ../event_api.c \
 			../dc/dchist_cli.c ../dc/dcrd_xdr.c ../dc/dcwr_xdr.c \
 			../dc/dcrd_cli.c ../dc/dcwr_cli.c ../dc/utils_cli.c \
 			tango_api.cpp attr_api.cpp attr_access.cpp \
-			db_exp.cpp ../startup.c ../taco_utils.c ../timeouts.c
+			db_exp.cpp ../startup.c ../taco_utils.c ../timeouts.c \
+			../devserver_prog_4.c
 endif
 
 libtacotango___la_CFLAGS  	= -x c++ -DTANGO
