@@ -30,9 +30,9 @@
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.23 $
+ * Version    :	$Revision: 1.24 $
  *
- * Date       :	$Date: 2008-12-02 08:46:36 $
+ * Date       :	$Date: 2008-12-18 07:59:44 $
  * 
  *-*******************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -126,7 +126,7 @@ extern nethost_info *multi_nethost;
  * stores them at the right place. A resource value is stored as a atring in a database on a 
  * remote computer.
  *
- * @param dev_name	A pointer to a string which defines the device name
+ * @param devname	A pointer to a string which defines the device name
  * @param res		A pointer to an array of db_resource structure defining the
  *               	resource to be retrieved
  * @param res_num	The number of resource to be retrieved
