@@ -412,6 +412,13 @@ protected:
 		::TACO::deleteResource( deviceName(), resourceName);
 	}
 
+	void throw_exception(const DevLong err)
+	{
+		::TACO::Exception e = ::TACO::Exception(err);
+		logStream->fatalStream() << GetClassName() << " : " << deviceName() << " : " << e.what() << log4cpp::eol;
+		throw e;
+	}
+
 	void throw_exception(const DevLong err, const std::string &msg)
 	{
         	logStream->fatalStream() << GetClassName() << " : " << deviceName() << " : " << msg << log4cpp::eol;
@@ -422,7 +429,7 @@ protected:
 	void throw_exception(::TACO::Exception &e, const std::string &msg)
 	{
 		logStream->fatalStream() << GetClassName() << " : " << deviceName() << " : " << msg << " : " << e.what() << log4cpp::eol;
-		throw msg >> e;
+		throw (msg + " : ") >> e;
 	}
 
 private:
