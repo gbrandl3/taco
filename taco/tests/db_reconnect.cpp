@@ -26,9 +26,9 @@
  * Author(s):
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2008-10-15 16:02:11 $
+ * Date:        $Date: 2009-01-16 15:18:43 $
  */
 
 #include <API.h>
@@ -40,8 +40,8 @@
 #include <db_xdr.h>
 
 extern dbserver_info         db_info;
-extern configuration_flags   config_flags;
-extern nethost_info         *multi_nethost;
+extern configuration_flags   *config_flags;
+extern nethost_info          *multi_nethost;
 
 static char devname[] = "test/sr/1";
 
@@ -82,8 +82,8 @@ int main(int argc,char **argv)
 /* Force database reconnection */
  
 	old_client = db_info.conf->clnt;
-	config_flags.database_server = False;
-	config_flags.configuration = False;
+	config_flags->database_server = False;
+	config_flags->configuration = False;
 	if(db_import(&error))
 	{
 		char *str_err = dev_error_str(error);
