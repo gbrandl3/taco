@@ -27,9 +27,9 @@
  *
  * Original:    1993
  *
- * Version:     $Revision: 1.16 $
+ * Version:     $Revision: 1.17 $
  *
- * Date:        $Date: 2008-10-23 05:26:24 $
+ * Date:        $Date: 2009-01-16 18:18:55 $
  *
  *****************************************************************************/
 
@@ -126,7 +126,7 @@ int dc_info(char *serv_name,servinf *dc_inf,DevLong *error)
  * The "config_flags" variable is defined as global by the device server
  * API library. 
  */
-	if ((config_flags->database_server != True) && db_import(&err))
+	if ((!config_flags || config_flags->database_server != True) && db_import(&err))
 	{
 		*error = DcErr_CantBuildStaDbConnection;
 		return(DS_NOTOK);
@@ -279,7 +279,7 @@ int dc_devall(char *serv_name,char ***devnametab,int *dev_n,DevLong *error)
  * The "config_flags" variable is defined as global by the device server
  * API library. 
  */
-	if ((config_flags->database_server != True) && db_import(&err))
+	if ((!config_flags || config_flags->database_server != True) && db_import(&err))
 	{
 		*dev_n = 0;
 		*error = DcErr_CantBuildStaDbConnection;
