@@ -30,9 +30,9 @@
  *
  * Original:    April 1995
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2008-04-06 09:06:37 $
+ * Date:        $Date: 2009-01-16 15:16:23 $
  */
 
 
@@ -68,6 +68,8 @@ int main(int argc,char **argv)
 			printf("enter device name [\"tl1/ps-d/d\"]? ");
 			if(NULL==fgets(cmd_string, sizeof(cmd_string), stdin) || '\0'==cmd_string[0])
 				strcpy(cmd_string,"tl1/ps-d/d");
+			else if (cmd_string[strlen(cmd_string) - 1] == '\n')
+				cmd_string[strlen(cmd_string) - 1] = '\0';	
 			break;
 		case 2:
 			strcpy(cmd_string,argv[1]);
