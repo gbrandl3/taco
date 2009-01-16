@@ -285,12 +285,12 @@ AC_DEFUN([TACO_ALARM],
 	AC_REQUIRE([X_AND_MOTIF])
 	AC_ARG_ENABLE(alarm, AC_HELP_STRING([--enable-alarm], [build the graphical alarm tool @<:@default=yes@:>@]),
 		[], [enable_alarm=yes])
-	AS_IF([test "x$alarm" = "xyes"], [
+	AS_IF([test "x$enable_alarm" = "xyes"], [
 		AC_REQUIRE([X_AND_MOTIF])
 		ALARM=alarm
 	      ])
 	AS_IF([test "x$motif_found" != "xyes"], [enable_alarm=no])
-	AM_CONDITIONAL(ALARMBUILD, test "x$alarm" = "xyes") 
+	AM_CONDITIONAL(ALARMBUILD, test "x$enable_alarm" = "xyes") 
 	AC_SUBST(ALARM)
 ])
 
