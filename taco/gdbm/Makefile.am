@@ -40,7 +40,7 @@ testgdbm_LDADD		= libgdbm.la
 
 man3_MANS		= gdbm.3
 
-#info_TEXINFOS		= gdbm.texinfo
+info_TEXINFOS		= gdbm.texinfo
 
 noinst_HEADERS 		= gdbmdefs.h extern.h systems.h gdbmconst.h proto.h gdbmerrno.h
 
