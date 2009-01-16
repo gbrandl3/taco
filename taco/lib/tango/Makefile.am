@@ -30,7 +30,7 @@ AM_CPPFLAGS 		= -DTANGO
 EXTRA_DIST 		= 
 
 if SOLARIS_CXX
-libtacotango___la_SOURCES = ../dev_api.cpp ../sec_api.cpp ../event_api.cpp \
+nodist_libtacotango___la_SOURCES = ../dev_api.cpp ../sec_api.cpp ../event_api.cpp \
 			../svc_api.cpp ../DevServerSig.cpp  ../event_relisten.cpp \
 			../gen_api.cpp ../dev_cmds.cpp ../dev_errors.cpp ../dev_states.cpp \
 			../oic.cpp ../util_api.cpp ../asyn_api.cpp ../gettrans.cpp \
@@ -74,15 +74,15 @@ libtacotango___la_LIBADD  	+= -lstdc++
 endif
 libtacotango___la_LDFLAGS 	= -version-info @LIB_VERSION@
 
-include_HEADERS		+= ../BlcDsNumbers.h ../CntrlDsNumbers.h ../DasDsNumbers.h ../MachDsNumbers.h ../SysNumbers.h 
+# include_HEADERS		+= ../BlcDsNumbers.h ../CntrlDsNumbers.h ../DasDsNumbers.h ../MachDsNumbers.h ../SysNumbers.h 
 
-include_HEADERS		+= ../Device.h ../OICDevice.h 
-include_HEADERS		+= ../DevServer.h  ../DevServerP.h  ../DevSignal.h  ../NT_debug.h  ../Starter.h
-include_HEADERS		+= ../signal/MDSSignal.h 
+# include_HEADERS		+= ../Device.h ../OICDevice.h 
+# include_HEADERS		+= ../DevServer.h  ../DevServerP.h  ../DevSignal.h  ../NT_debug.h  ../Starter.h
+# include_HEADERS		+= ../signal/MDSSignal.h 
 include_HEADERS		+= attr_api.h
 
-EXTRA_DIST		+= ../DeviceFRM.h ../OICDeviceFRM.h ../DeviceFRM.cpp ../OICDeviceFRM.cpp 
-EXTRA_DIST		+= ../NT_debug.c  ../Doxyfile.in
+# EXTRA_DIST		+= ../DeviceFRM.h ../OICDeviceFRM.h ../DeviceFRM.cpp ../OICDeviceFRM.cpp 
+# EXTRA_DIST		+= ../NT_debug.c  ../Doxyfile.in
 
 doc:	Doxyfile $(include_HEADERS) $(libtacotango___la_SOURCES) 
 	doxygen
