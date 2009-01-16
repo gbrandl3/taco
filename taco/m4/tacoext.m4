@@ -57,8 +57,11 @@ AC_DEFUN([LINUX_DISTRIBUTION],
         AC_REQUIRE([AC_CANONICAL_SYSTEM])
         case "$target" in
                 i[[3456]]86-*-linux-* | i[[3456]]86-*-linux | x86_64-*-linux | x86_64-*-linux-*)
-                   AS_IF([test -f /etc/lsb-release], [DISTRIBUTION=`(. /etc/lsb-release; echo $DISTRIB_DESCRIPTION)`],
-                         [DISTRIBUTION=`cat /etc/*-release | head -1`])
+                   AS_IF([test -f /etc/lsb-release], [DISTRIBUTION=`(. /etc/lsb-release; echo $DISTRIB_DESCRIPTION)`])
+		   AS_IF([test -z "$DISTRIBUTION"], 
+			[LSB_FILE=`ls /etc/*-release | grep -v lsb`
+                         DISTRIBUTION=`cat $LSB_FILE | head -1`
+			])
                         ;;
         esac
         AC_SUBST([DISTRIBUTION])
