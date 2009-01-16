@@ -47,7 +47,16 @@ Linux, Solaris, BSD, Mac OS X, HP-UX, Win32, OS9).
 %setup -n @PACKAGE@-@VERSION@
 
 %build
-./configure --enable-fast-install=yes --enable-greta --enable-xdevmenu --prefix=%_prefix --enable-ext
+./configure --enable-fast-install=yes --enable-greta --enable-xdevmenu --enable-ext \
+	--prefix=%{_prefix} \
+	--exec_prefix=%{_exec_prefix} \
+	--bindir=%{_bindir} \
+	--sbindir=%{_sbindir} \
+	--libexecdir=%{_libexecdir} \
+	--datadir=%{_datadir} \
+	--sysconfdir=%{_sysconfdir} \
+	--sharedstatedir=%{_sharedstatedir} \
+	--localstatedir=/var
 make 
 
 %install
@@ -146,10 +155,10 @@ fi
 
 %files -f @PACKAGE@.txt
 %defattr(-,root,root)
-%_datadir/taco/templates/taco
+%_datadir/taco/templates/taco.SuSE
 %config %_sysconfdir/tacoenv.sh
 %config %_sysconfdir/tacoenv.csh
-%doc %_infodir/gdbm.info
+# %doc %_infodir/gdbm.info
 # %doc INSTALL doc/TACO.pdf doc/README doc/index.html
 %_bindir/dc_del
 %_bindir/dc_dels
@@ -178,8 +187,8 @@ fi
 %_bindir/db_servunreg
 %_bindir/db_devres
 %_bindir/db_resdel
-%_sbindir/dcwr_alo
-%_sbindir/dcrd_alo
+%_sbindir/dc_wr_alo
+%_sbindir/dc_rd_alo
 %_sbindir/StartServer
 %_sbindir/Manager
 %_sbindir/unreg
