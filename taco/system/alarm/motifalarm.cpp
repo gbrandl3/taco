@@ -24,14 +24,15 @@
  * Authors:
  *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.2 $
+ * Version:     $Revision: 1.3 $
  *
- * Date:        $Date: 2006-09-18 21:42:27 $
+ * Date:        $Date: 2009-01-19 13:38:06 $
  *
  */
 
 #include <Xm/MessageB.h>
 #include <string>
+#include <stdlib.h>
 
 std::string	getLastMessage(const std::string);
 
