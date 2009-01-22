@@ -21,6 +21,7 @@ liblog4cppinclude_HEADERS =  \
 	StringQueueAppender.hh \
 	SyslogAppender.hh \
 	RemoteSyslogAppender.hh \
+	SmtpAppender.hh \
 	Layout.hh \
 	SimpleLayout.hh \
 	BasicLayout.hh \
