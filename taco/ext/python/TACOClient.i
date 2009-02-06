@@ -65,8 +65,10 @@ using namespace TACO;
 
 %typemap(throws) ::TACO::Exception %{
 #ifdef SWIGPYTHON
-        SWIG_Python_SetErrorMsg(TACOError, $1.what());
-        PyObject_SetAttrString(TACOError, "errcode", PyInt_FromLong($1));
+        SWIG_PYTHON_THREAD_BEGIN_BLOCK;
+        PyErr_SetString(TACOError, $1.what());
+        PyObject_SetAttr(TACOError, PyString_FromString("errcode"), PyInt_FromLong($1));
+        SWIG_PYTHON_THREAD_END_BLOCK;
         SWIG_fail;
 #endif /*SWIGPYTHON*/
 %}
@@ -226,8 +228,10 @@ Returns - the ouput of the command."
                 }
                 catch (const TACO::Exception &e)
                 {
-                        SWIG_Python_SetErrorMsg(TACOError, e.what());
-                        PyObject_SetAttrString(TACOError, "errcode", PyInt_FromLong(e));
+                        SWIG_PYTHON_THREAD_BEGIN_BLOCK;
+                        PyErr_SetString(TACOError, e.what());
+                        PyObject_SetAttr(TACOError, PyString_FromString("errcode"), PyInt_FromLong(e));
+                        SWIG_PYTHON_THREAD_END_BLOCK;
                         SWIG_fail; 
                 }
 
@@ -260,8 +264,10 @@ Returns - the ouput of the command."
                 }
                 catch (const TACO::Exception &e)
                 {
-                        SWIG_Python_SetErrorMsg(TACOError, e.what());
-                        PyObject_SetAttrString(TACOError, "errcode", PyInt_FromLong(e));
+                        SWIG_PYTHON_THREAD_BEGIN_BLOCK;
+                        PyErr_SetString(TACOError, e.what());
+                        PyObject_SetAttr(TACOError, PyString_FromString("errcode"), PyInt_FromLong(e));
+                        SWIG_PYTHON_THREAD_END_BLOCK;
                         SWIG_fail;
                 }
                 PyErr_SetString(PyExc_RuntimeError, "lost the TACO client");
