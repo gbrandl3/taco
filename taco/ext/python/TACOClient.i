@@ -65,7 +65,7 @@ using namespace TACO;
 
 %typemap(throws) ::TACO::Exception %{
 #ifdef SWIGPYTHON
-        PyErr_SetString(TACOError, $1.what()); 
+        SWIG_Python_SetErrorMsg(TACOError, $1.what());
         PyObject_SetAttrString(TACOError, "errcode", PyInt_FromLong($1));
         SWIG_fail;
 #endif /*SWIGPYTHON*/
@@ -226,7 +226,7 @@ Returns - the ouput of the command."
                 }
                 catch (const TACO::Exception &e)
                 {
-                        PyErr_SetString(TACOError, e.what()); 
+                        SWIG_Python_SetErrorMsg(TACOError, e.what());
                         PyObject_SetAttrString(TACOError, "errcode", PyInt_FromLong(e));
                         SWIG_fail; 
                 }
@@ -251,7 +251,7 @@ Returns - the ouput of the command."
                         PyObject *ret;
                         if (!TACOPythonClient::convertToPyObject(outputType, argout, &ret))
                                 SWIG_fail; 
-//                        free(argout);
+//                      free(argout);
                         TACOPythonClient::freeInputArgument(    inputType,argin);
                         TACOPythonClient::freeOutputArgument(   outputType,argout);
 
@@ -260,7 +260,7 @@ Returns - the ouput of the command."
                 }
                 catch (const TACO::Exception &e)
                 {
-                        PyErr_SetString(TACOError, e.what()); 
+                        SWIG_Python_SetErrorMsg(TACOError, e.what());
                         PyObject_SetAttrString(TACOError, "errcode", PyInt_FromLong(e));
                         SWIG_fail;
                 }
