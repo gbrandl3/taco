@@ -419,7 +419,8 @@ AC_DEFUN([TACO_DATAPORT_SRC],
 			x86_64-*-linux* | \
         		i[[3456]]86-*-linux-* |\
         		i[[3456]]86-*-linux |\
-			i[[3456]]86-*-cygwin*|\
+			i[[3456]]86-*-cygwin* |\
+			powerpc-*-linux-* |\
         		m68k-*-linux-* |\
             		*-*-solaris* | *-*-sun*-* |\
 			*-*-darwin* |\
