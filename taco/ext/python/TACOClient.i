@@ -251,7 +251,9 @@ Returns - the ouput of the command."
    
                 try
                 {
+                        SWIG_PYTHON_THREAD_BEGIN_BLOCK;
                         self->execute(commandNumber, argin, inputType, argout, outputType);
+                        SWIG_PYTHON_THREAD_END_BLOCK;
                         PyObject *ret;
                         if (!TACOPythonClient::convertToPyObject(outputType, argout, &ret))
                                 SWIG_fail; 
