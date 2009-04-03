@@ -27,6 +27,7 @@
 
 #include <TACOBasicCommands.h>
 #include <TACOConverters.h>
+#include <TACOStringConverters.h>
 
 #include <TACOClient.h>
 
@@ -43,11 +44,11 @@ void TACO::synchronize( double timeout) throw (::TACO::Exception)
 }
 
 TACO::Client::Client( const std::string& name, DevLong access, bool connect) throw (::TACO::Exception)
-	: mDeviceHandle( 0), 
-	  mName( name), 
-	  mAccess( access), 
-	  mAutoConnect( connect), 
-          mAutoDeviceOn( true),
+	: mDeviceHandle(0), 
+	  mName(name), 
+	  mAccess(access), 
+	  mAutoConnect(connect), 
+          mAutoDeviceOn(true),
 	  mPseudo(false),
 	  mConnected(false)
 {
@@ -445,10 +446,10 @@ void TACO::Client::execute( DevCommand cmd, DevArgument argin, DevArgType inType
 						throw "automatic device on failed: " >> e;
 					}
 				} else {
-					throw e << " : device state " << state.object();
+					throw e << " : device state " << ::TACO::numberToString(state.object());
 				}
 			} else {
-				throw;
+				throw e;
 			}
 		}
 	}
