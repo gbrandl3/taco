@@ -23,6 +23,10 @@
 
 extern log4cpp::Category       *logStream;
 
+#if HAVE_PTHREAD_H 
+#	include <pthread.h>
+#endif
+
 #include <string>
 #include <set>
 
@@ -588,6 +592,9 @@ private:
 
 	//! Map with the command infos of the device
 	CommandInfoMap mCommandInfoMap;
+
+	//! Mutex
+	static pthread_mutex_t mMutex;
 
 #ifdef TACO_CLIENT_RUNTIME_TYPE_CHECK
 	/**

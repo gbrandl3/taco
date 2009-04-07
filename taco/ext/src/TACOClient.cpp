@@ -32,6 +32,9 @@
 #include <TACOClient.h>
 
 #include <private/ApiP.h>
+#include <DevSec.h>
+
+pthread_mutex_t TACO::Client::mMutex = PTHREAD_MUTEX_INITIALIZER;
 
 void TACO::synchronize( double timeout) throw (::TACO::Exception)
 {
@@ -44,13 +47,13 @@ void TACO::synchronize( double timeout) throw (::TACO::Exception)
 }
 
 TACO::Client::Client( const std::string& name, DevLong access, bool connect) throw (::TACO::Exception)
-	: mDeviceHandle(0), 
-	  mName(name), 
-	  mAccess(access), 
-	  mAutoConnect(connect), 
-          mAutoDeviceOn(true),
-	  mPseudo(false),
-	  mConnected(false)
+	: mDeviceHandle(0) 
+	, mName(name) 
+	, mAccess(access) 
+	, mAutoConnect(connect) 
+        , mAutoDeviceOn(false)
+	, mPseudo(false)
+	, mConnected(false)
 {
 	if (connect) {
 		connectClient();
@@ -58,13 +61,14 @@ TACO::Client::Client( const std::string& name, DevLong access, bool connect) thr
 }
 
 TACO::Client::Client() throw ()
-	: mDeviceHandle( 0), 
-	  mAutoConnect( true), 
-	  mAutoDeviceOn( true), 
-          mPseudo(false), 
-          mConnected(false)
+	: mDeviceHandle(0) 
+	, mName("")
+	, mAccess(READ_ACCESS)
+	, mAutoConnect(false) 
+	, mAutoDeviceOn(false) 
+        , mPseudo(false) 
+        , mConnected(false)
 {
-	// VOID
 }
 
 TACO::Client::~Client() throw ()
@@ -77,13 +81,13 @@ TACO::Client::~Client() throw ()
 }
 
 TACO::Client::Client( const TACO::Client& client) throw (::TACO::Exception)
-	: mDeviceHandle( 0),
-	  mName( client.mName),
-	  mAccess( client.mAccess),
-	  mAutoConnect( client.mAutoConnect),
-	  mAutoDeviceOn( client.mAutoDeviceOn),
-	  mPseudo(false),
-	  mConnected(false)
+	: mDeviceHandle(0)
+	, mName(client.mName)
+	, mAccess(client.mAccess)
+	, mAutoConnect(client.mAutoConnect)
+	, mAutoDeviceOn(client.mAutoDeviceOn)
+	, mPseudo(false)
+	, mConnected(false)
 {
 	if (client.isClientConnected()) {
 		connectClient();
@@ -136,12 +140,12 @@ static std::string getCmdName(const DevCommand cmd)
 	cmdName = res_path;
 	cmdName += "/";
 	cmdName += res_name;
-        if (db_getresource(res_path, &res_tab, 1, &error) == DS_OK)
-                if (ret_str != NULL)
-                {
+        if (db_getresource(res_path, &res_tab, 1, &error) == DS_OK) {
+                if (ret_str != NULL) {
                         cmdName = ret_str;
                         free(ret_str);
                 }
+	}
         return cmdName;
 }
 
@@ -179,7 +183,6 @@ void TACO::Client::connectClient() throw (::TACO::Exception)
 		throw ::TACO::Exception(e);
 	}
 	setClientNetworkProtocol(TCP);
-
 
 // Query the types of the server device and check them
 	try 
@@ -416,44 +419,47 @@ void* TACO::Client::eventHandler( ::TACO::EventHandlerData data) throw ()
 	return 0;
 }
 
-void TACO::Client::execute( DevCommand cmd, DevArgument argin, DevArgType inType, DevArgument argout, DevArgType outType) throw (::TACO::Exception)
+void TACO::Client::execute(DevCommand cmd, DevArgument argin, DevArgType inType, DevArgument argout, DevArgType outType) throw (::TACO::Exception)
 {
-	checkConnection();
-
-// There is one attempt for a bad server connection with reconnection,
-// one for the device on and one for the command execution.
-	int executionAttempts = 3;
-	while (--executionAttempts >= 0) {
+// There are three attempts for execution of the command:
+//	- one attempt for a bad server connection with reconnection,
+//	- one for the device on (if automatic device on is set)
+//	- one for the command execution
+	
+	std::string tmpError;
+	for (int i = 0; i < 3; ++i) {
 		try {
-	        	executeCore( cmd, argin, inType, argout, outType);
+	        	executeCore(cmd, argin, inType, argout, outType);
 			return;
 		} catch (::TACO::Exception& e) {
-			if (e == DevErr_BadServerConnection) {
-				try {
-					reconnectClient();
-				} catch (::TACO::Exception& e) {
-					throw "automatic client reconnection failed: " >> e;
-				}
-			} else if (e == ::TACO::Error::EXECUTION_DENIED) {
-				ArgGet<short> state;
-				executeCore( ::TACO::Command::DEVICE_STATE, 0, D_VOID_TYPE, state.address(), state.type());
-				if (mAutoDeviceOn) {
-					try {
-						if (state.object() == ::TACO::State::DEVICE_OFF) {
-							executeCore( ::TACO::Command::DEVICE_ON, 0, D_VOID_TYPE, 0, D_VOID_TYPE);
+			tmpError = e.what();
+			switch (e) {
+				case DevErr_RPCFailed:
+				case DevErr_BadServerConnection:
+// reconnection will be handled by TACO library itself					
+					break;
+				case ::TACO::Error::EXECUTION_DENIED:
+					{
+						ArgGet<short> state;
+						executeCore( ::TACO::Command::DEVICE_STATE, 0, D_VOID_TYPE, state.address(), state.type());
+						if (mAutoDeviceOn) {
+							try {
+								if (state.object() == ::TACO::State::DEVICE_OFF) {
+									executeCore( ::TACO::Command::DEVICE_ON, 0, D_VOID_TYPE, 0, D_VOID_TYPE);
+								}
+							} catch (::TACO::Exception& e) {
+								throw "automatic device on failed: " >> e;
+							}
+						} else {
+							throw e << " : device state " << ::TACO::numberToString(state.object());
 						}
-					} catch (::TACO::Exception& e) {
-						throw "automatic device on failed: " >> e;
-					}
-				} else {
-					throw e << " : device state " << ::TACO::numberToString(state.object());
-				}
-			} else {
-				throw e;
+					} 
+				default :
+					throw e;
 			}
 		}
 	}
-	throw ::TACO::Exception( ::TACO::Error::RUNTIME_ERROR, "cannot execute command");
+	throw ::TACO::Exception( ::TACO::Error::RUNTIME_ERROR, "cannot execute command : " + tmpError);
 }
 
 void TACO::Client::executeCore( DevCommand cmd, DevArgument argin, DevArgType inType, DevArgument argout, DevArgType outType) throw (::TACO::Exception)
@@ -461,15 +467,17 @@ void TACO::Client::executeCore( DevCommand cmd, DevArgument argin, DevArgType in
 	DevLong e;
 	DevLong res;
 
+	pthread_mutex_lock(&mMutex);
 	if (mPseudo)
 		res = dc_devget(m_dc.dc_ptr, cmd, argout, outType, &e);
 	else
 		res = dev_putget(mDeviceHandle, cmd, argin, inType, argout, outType, &e); 
+	pthread_mutex_unlock(&mMutex);
 	if (res != DS_OK)
 	{
 // 0x7FFF largest error number, hopefully never used
 // If this number isn't used the generated error string will be used
-		::TACO::Exception ex(e, plainErrorString(0x7FFF));
+		::TACO::Exception ex(e, plainErrorString(e));
 		throw ex;
 	}
 }
