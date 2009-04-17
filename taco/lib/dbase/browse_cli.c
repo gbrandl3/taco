@@ -32,9 +32,9 @@
  *
  * Original   : December 1997
  *
- * Version    :	$Revision: 1.12 $
+ * Version    :	$Revision: 1.13 $
  *
- * Date	    :	$Date: 2008-12-02 08:43:55 $
+ * Date	    :	$Date: 2009-04-17 11:35:48 $
  *
  *-*******************************************************************/
 
@@ -2313,6 +2313,8 @@ long db_gethostlist(long *p_host_nb,char ***ppp_list,DevLong *p_error)
 #else
 /* Get client time-out value and change it to a larger value more suitable
    for browsing call */
+	if (!db_info.conf && (db_import(p_error) == DS_NOTOK))
+		return DS_NOTOK;
    
    	clnt_control(db_info.conf->clnt,CLGET_TIMEOUT,(char *)&old_tout);
 	clnt_control(db_info.conf->clnt,CLSET_TIMEOUT,(char *)&timeout_browse);
