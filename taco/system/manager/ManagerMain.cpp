@@ -27,13 +27,13 @@
  *            dummy database under OS9.
  *
  * Author(s):     Jens Meyer
- *            $Author: jkrueger1 $
+ *            $Author: andy_gotz $
  *
  * Original:  January 1991
  *
- * Version:   $Revision: 1.3 $
+ * Version:   $Revision: 1.4 $
  *
- * Date:              $Date: 2008-12-02 09:32:36 $
+ * Date:              $Date: 2009-08-04 10:54:31 $
  *
  */
 
@@ -679,9 +679,9 @@ static void network_manager_4(struct svc_req *rqstp, SVCXPRT *transp)
 			break;
 		case RPC_GET_CONFIG:
 /*
- * Execute only if the startup is finished!
+ * Execute only if the db_server is exported !
  */
-			if ( c_flags.startup == True )
+			if ( c_flags.db_server == True )
 			{
 				xdr_argument = (xdrproc_t)xdr__register_data;
 				xdr_result = (xdrproc_t)xdr__manager_data;
