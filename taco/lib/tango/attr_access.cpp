@@ -25,13 +25,13 @@
  * Description:	
  *	
  * Author(s)  :	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: jensmeyer $
  *
  * Original   :	September2002
  *
- * Version    :	$Revision: 1.11 $
+ * Version    :	$Revision: 1.12 $
  *
- * Date       : $Date: 2008-04-06 09:07:19 $
+ * Date       : $Date: 2009-09-17 09:35:34 $
  *
  *********************************************************************/ 
 
@@ -423,7 +423,7 @@ long AttrAccess::read_attr_config (DevArgument argout,
 	
 	*error = 0;
 	
-	property_ptrs[0] = "17";
+	property_ptrs[0] = "18";
 	property_ptrs[1] = (char *)attr_config.name.c_str();
 	property_ptrs[2] = (char *)attr_config.label.c_str();
 	property_ptrs[3] = (char *)attr_config.unit.c_str();
@@ -436,6 +436,9 @@ long AttrAccess::read_attr_config (DevArgument argout,
 	property_ptrs[10] =(char *)attr_config.alarms.delta_val.c_str();;
 	property_ptrs[11] =(char *)attr_config.alarms.delta_t.c_str();;
 	property_ptrs[12] =(char *)attr_config.standard_unit.c_str();
+	
+	// added tango display unit parameter 16.9.2009
+	property_ptrs[18] =(char *)attr_config.display_unit.c_str();
 	
 	// translate enumeration type
 	switch (attr_config.writable)
@@ -476,7 +479,7 @@ long AttrAccess::read_attr_config (DevArgument argout,
 	sprintf (max_dim_y, "%d", attr_config.max_dim_y);
 	property_ptrs[17] = max_dim_y;
 	
-	property_array.length = 18;
+	property_array.length = 19;
 	property_array.sequence = property_ptrs;
 	
 	//	Allocate and fill XDR argout
@@ -1849,7 +1852,8 @@ long AttrAccess::create_attr_access (DevLong *error)
 		attr_config.description = signal_config.sequence[4];
 		attr_config.max_value = signal_config.sequence[5];
 		attr_config.min_value = signal_config.sequence[6];
-		attr_config.standard_unit = signal_config.sequence[11];					
+		attr_config.standard_unit = signal_config.sequence[11];
+		attr_config.display_unit  = "1"; /* Taco does not support the display unit */
 
 		attr_config.alarms.max_alarm = signal_config.sequence[7];
 		attr_config.alarms.min_alarm = signal_config.sequence[8];		
@@ -1943,7 +1947,8 @@ long AttrAccess::create_attr_access (DevLong *error)
 	//cout << "Min Value : " << attr_config.min_value << endl;
 	//cout << "High Alarm: " << attr_config.max_alarm	<< endl;
 	//cout << "Low Alarm : " << attr_config.min_alarm	<< endl;
-	//cout << "Std. Unit : " << attr_config.standard_unit	<< endl;				
+	//cout << "Std. Unit : " << attr_config.standard_unit	<< endl;
+	//cout << "Disp Unit : " << attr_config.display_unit	<< endl;				
 }
 
 /**
