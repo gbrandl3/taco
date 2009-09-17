@@ -31,13 +31,13 @@
  *		to talk to TANGO device servers.
  *	
  * Author(s)  :	Andy Goetz
- * 		$Author: jkrueger1 $
+ * 		$Author: jensmeyer $
  *
  * Original   :	December 1999
  *
- * Version    : $Revision: 1.8 $
+ * Version    : $Revision: 1.9 $
  *
- * Date       : $Date: 2008-04-06 09:07:19 $
+ * Date       : $Date: 2009-09-17 09:34:21 $
  *
  ********************************************************************-*/
 
@@ -2410,9 +2410,14 @@ static long tango_dev_check(devserver ds, DevLong *error)
  */
 static long tango_dev_error_string(Tango::DevFailed tango_exception)
 {
+	// clear the error stack first
+	
+	dev_error_clear();
+	
 	for (int i=0; i<tango_exception.errors.length(); i++)
 	{
 		dev_error_push(const_cast<char *>(tango_exception.errors[i].desc.in()));
 	}
+	
 	return(DS_OK);
 }
