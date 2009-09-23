@@ -25,13 +25,13 @@
  * Description    :
  *
  * Author         : E. Taurel
- *                $Author: jkrueger1 $
+ *                $Author: andy_gotz $
  *
  * Original       : August 1992
  *
- * Version      : $Revision: 1.16 $
+ * Version      : $Revision: 1.17 $
  *
- * Date         : $Date: 2009-01-16 18:18:55 $
+ * Date         : $Date: 2009-09-23 11:42:34 $
  *
  */
 
@@ -80,7 +80,7 @@
 CLIENT *cl;
 int first = 0;
 int call_numb = 0;
-int max_call = 0;
+DevLong max_call = 0;
 char psd_name[40];
 char tmp_name[40];
 struct timeval time_out;
@@ -159,6 +159,8 @@ dc_error *perr;
 	db_psdev_info *ps_dev;
 	db_error db_err;
 	long vers;
+	dc_cmd *cmdi;
+	dc_cmd_x *cmdo;
 
 /* Try to verify the function parameters (non NULL pointer and two
    \ character in the device name) */
@@ -321,12 +323,30 @@ dc_error *perr;
 		{
 			perr->error_code = DcErr_ClientMemoryAllocation;
 			perr->dev_error = 0;
-			for(i=0;i<k;i++)
+			for(i=0;i<k;i++) {
+				free(send.dc_open_in_val[i].dc_cmd_ax.dc_cmd_ax_val);
 				free(send.dc_open_in_val[i].dev_name);
+			}
 			free(send.dc_open_in_val);
 			return(-1);
 		}
 		strcpy_tolower(ptr->dev_name,tab[k].device_name);
+
+		cmdo = (dc_cmd_x *) calloc(tab[k].nb_cmd, sizeof(dc_cmd_x));
+		if (cmdo == NULL) {
+			perr->error_code = DcErr_ClientMemoryAllocation;
+			perr->dev_error = 0;
+			free(ptr->dev_name);
+			for(i=0;i<k;i++) {
+				free(send.dc_open_in_val[i].dc_cmd_ax.dc_cmd_ax_val);
+				free(send.dc_open_in_val[i].dev_name);
+			}
+			free(send.dc_open_in_val);
+			return(-1);
+		}
+		
+		ptr->dc_cmd_ax.dc_cmd_ax_len = tab[k].nb_cmd;
+		ptr->dc_cmd_ax.dc_cmd_ax_val = cmdo;
 	}
 
 /* Structure initialization (structure sended to server) */
@@ -334,8 +354,11 @@ dc_error *perr;
 	send.dc_open_in_len = num_dev;
 	for (k=0;k<(int)num_dev;k++)
 	{
-		send.dc_open_in_val[k].dc_cmd_ax.dc_cmd_ax_len = tab[k].nb_cmd;
-		send.dc_open_in_val[k].dc_cmd_ax.dc_cmd_ax_val = (dc_cmd_x *)tab[k].dev_cmd;
+		cmdo = send.dc_open_in_val[k].dc_cmd_ax.dc_cmd_ax_val;
+		for (i = 0; i < tab[k].nb_cmd; i++) {
+			cmdo[i].cmd        = tab[k].dev_cmd[i].cmd;
+			cmdo[i].cmd_argout = tab[k].dev_cmd[i].argout_type;
+		}
 		send.dc_open_in_val[k].poll_int = tab[k].poll_interval;
 	}
 
@@ -346,8 +369,10 @@ dc_error *perr;
 
 /* Return memory */
 
-	for (i=0;i<(int)num_dev;i++)
+	for (i=0;i<(int)num_dev;i++) {
+		free(send.dc_open_in_val[i].dc_cmd_ax.dc_cmd_ax_val);
 		free(send.dc_open_in_val[i].dev_name);
+	}
 	free(send.dc_open_in_val);
 
 /* Any problem with server ? */
@@ -673,6 +698,8 @@ dc_error *perr;
 	register dev_dat *ptr;
 	DevLong error;
 	dc_xdr_error *recev;
+	dc_cmd_dat *cdati;
+	cmd_dat *cdato;
 
 /* Try to verify the function parameters (non NULL pointer and two
    \ character in the device name) */
@@ -747,14 +774,39 @@ dc_error *perr;
 		{
 			perr->error_code = DcErr_ClientMemoryAllocation;
 			perr->dev_error = 0;
-			for(i=0;i<k;i++)
+			for(i=0;i<k;i++) {
+				free(send.dev_datarr_val[i].xcmd_dat.xcmd_dat_val);
 				free(send.dev_datarr_val[i].xdev_name);
+			}
 			free(send.dev_datarr_val);
 			return(-1);
 		}
 		strcpy_tolower(ptr->xdev_name,dev_data[k].device_name);
 		ptr->xcmd_dat.xcmd_dat_len = dev_data[k].nb_cmd;
-		ptr->xcmd_dat.xcmd_dat_val = (cmd_dat *)dev_data[k].cmd_data;
+
+		cdato = (cmd_dat *) calloc(dev_data[k].nb_cmd,
+					   sizeof(cmd_dat));
+		if (cdato == NULL) {
+			perr->error_code = DcErr_ClientMemoryAllocation;
+			perr->dev_error = 0;
+			free(ptr->xdev_name);
+			for(i=0;i<k;i++) {
+				free(send.dev_datarr_val[i].xcmd_dat.xcmd_dat_val);
+				free(send.dev_datarr_val[i].xdev_name);
+			}
+			free(send.dev_datarr_val);
+			return(-1);
+		}
+		cdati = dev_data[k].cmd_data;
+		for (i = 0; i < dev_data[k].nb_cmd; i++) {
+			cdato[i].xcmd       = cdati[i].cmd;
+			cdato[i].xcmd_error = cdati[i].cmd_error;
+			cdato[i].xcmd_time  = cdati[i].cmd_time;
+			cdato[i].xsequence.xsequence_len = cdati[i].length;
+			cdato[i].xsequence.xsequence_val = cdati[i].sequence;
+		}
+			
+		ptr->xcmd_dat.xcmd_dat_val = cdato;
 	}
 
 /* Structure initialization (structure sended to server) */
@@ -768,8 +820,10 @@ dc_error *perr;
 
 /* Return memory */
 
-	for (i=0;i<(int)num_dev;i++)
+	for (i=0;i<(int)num_dev;i++) {
+		free(send.dev_datarr_val[i].xcmd_dat.xcmd_dat_val);
 		free(send.dev_datarr_val[i].xdev_name);
+	}
 	free(send.dev_datarr_val);
 
 /* Any problem with server ? */

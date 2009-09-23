@@ -25,16 +25,16 @@
  * Description: 
  *
  * Author(s):   
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
  * Original:    
  *
- * Version:     $Revision: 1.6 $
+ * Version:     $Revision: 1.7 $
  *
- * Date:        $Date: 2008-04-06 09:06:39 $
+ * Date:        $Date: 2009-09-23 11:42:34 $
  */
 
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/poller.c,v 1.6 2008-04-06 09:06:39 jkrueger1 Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/poller.c,v 1.7 2009-09-23 11:42:34 andy_gotz Exp $";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -913,6 +913,7 @@ long d_initdev(DevLong *error)
   register int count,savcount;
   char *PollModeString;
   char *PollRecoverString;
+  DevLong PollInterval, PollForgetMultiple;
   struct poll_list_type *new_element;
   int size,found;
   char device_name[60];
@@ -1060,15 +1061,18 @@ long d_initdev(DevLong *error)
 
   PollModeString=NULL;
   PollRecoverString=NULL;
+  PollInterval = current_device_ptr->PollInterval;
+  PollForgetMultiple = current_device_ptr->PollForgetMultiple;
+
   ReadCommandList.length = 0;
   devres_table[0].resource_adr=&(current_device_ptr->PollOnInitialise);
   devres_table[1].resource_adr=&(PollModeString);
   devres_table[2].resource_adr=&(current_device_ptr->NumRetries);
   devres_table[3].resource_adr=&(current_device_ptr->ContinueAfterError);
-  devres_table[4].resource_adr=&(current_device_ptr->PollInterval);
+  devres_table[4].resource_adr=&(PollInterval);
   devres_table[5].resource_adr=&(ReadCommandList);
   devres_table[6].resource_adr=&(PollRecoverString);
-  devres_table[7].resource_adr=&(current_device_ptr->PollForgetMultiple);
+  devres_table[7].resource_adr=&(PollForgetMultiple);
 #if defined(EBUG)
   fprintf(stderr,"before db_getresource\n");
 #endif
@@ -1105,6 +1109,10 @@ long d_initdev(DevLong *error)
 
     }
   }
+
+  current_device_ptr->PollInterval = PollInterval;
+  current_device_ptr->PollForgetMultiple = PollForgetMultiple;
+
   current_device_ptr->PollMode=READOUT;
   if (PollModeString != NULL)
   {
@@ -2689,6 +2697,8 @@ long poll_device(int dev_num)
                                &Oargout,current_command->command_type,
                                &error);
       ttime=get_time();
+      if (ttime == btime)
+        ttime = btime + 1;
       if (btime < ttime)
         dpr_time=ttime-btime;
       else

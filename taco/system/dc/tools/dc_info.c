@@ -26,13 +26,13 @@
  *
  *
  * Author       :
- *                $Author: jkrueger1 $
+ *                $Author: andy_gotz $
  *
  * Original     :
  *
- * Version      : $Revision: 1.6 $
+ * Version      : $Revision: 1.7 $
  *
- * Date         : $Date: 2008-04-06 09:07:51 $
+ * Date         : $Date: 2009-09-23 11:42:34 $
  *
  */
 
@@ -109,7 +109,7 @@ char *argv[];
 	int i,j,k,resu,found;
 	int nb_dom_sum,nb_dom;
 	int cptr = 0;
-	int rd_num,wr_num;
+	DevLong rd_num,wr_num;
 	float 			free_f,
 				data_f;
 	DevLong			error;

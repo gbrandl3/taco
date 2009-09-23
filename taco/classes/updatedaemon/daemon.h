@@ -155,7 +155,7 @@ typedef struct _daemon_device_struct_type {
                 long      NextPollTime;
                 int       BeingPolled;
                 int       DeviceBeingAccessed;
-                int       NumRetries;
+                DevLong   NumRetries;
                 int       ContinueAfterError;
                 int       DeviceAccessFailure;
                 long      PollInterval;          /* in 10ths of seconds */

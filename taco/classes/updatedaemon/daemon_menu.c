@@ -25,13 +25,13 @@
  * Description: source code file testing the update daemon server 
  *
  * Author(s):   
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
  * Original:    
  *
- * Version:     $Revision: 1.6 $
+ * Version:     $Revision: 1.7 $
  *
- * Date:        $Date: 2008-07-18 07:27:30 $
+ * Date:        $Date: 2009-09-23 11:42:34 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -110,7 +110,7 @@ int main(int argc, char **argv)
 	DevString devname;
 	char *output_string;
 	char *ch_ptr,cmd_string[256];
-	long ddid,long_output;
+	DevLong ddid,long_output;
 	char *input_addr,*resfile;
 	static DevDaemonData ddata;
 	DevDaemonStatus dstatus;

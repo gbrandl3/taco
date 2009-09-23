@@ -26,13 +26,13 @@
  *
  *
  * Author       : 
- *                $Author: jkrueger1 $
+ *                $Author: andy_gotz $
  *
  * Original     :
  *
- * Version      : $Revision: 1.9 $
+ * Version      : $Revision: 1.10 $
  *
- * Date         : $Date: 2008-10-24 15:41:57 $
+ * Date         : $Date: 2009-09-23 11:42:34 $
  *
  */
 
@@ -105,10 +105,12 @@ int main(int argc, char **argv)
         if (optind != argc - 1)
                 usage(argv[0]);
 
+	/*
 	if(db_import(&error)) 
 	{
 		printf("** db_import : %s **\n", dev_error_str(error)+25);
 	}
+	*/
 
 	if(index(argv[optind],'*')==0)
 		devcmd(argv[optind]);

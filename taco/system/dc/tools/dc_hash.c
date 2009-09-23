@@ -26,13 +26,13 @@
  *
  *
  * Author       :
- *                $Author: jkrueger1 $
+ *                $Author: andy_gotz $
  *
  * Original     :
  *
- * Version      : $Revision: 1.6 $
+ * Version      : $Revision: 1.7 $
  *
- * Date         : $Date: 2008-04-06 09:07:51 $
+ * Date         : $Date: 2009-09-23 11:42:34 $
  *
  */
 
@@ -73,7 +73,7 @@ void usage(const char *cmd)
 int main(int argc, char **argv)
 {
 	DevLong		error;
-	static int 	dev_num;
+	static DevLong 	dev_num;
 	char 		hostna[HOST_NAME_LENGTH],
 			dev_name[DEV_NAME_LENGTH],
 			devname[DEV_NAME_LENGTH];

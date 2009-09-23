@@ -26,13 +26,13 @@
  *
  *
  * Author(s):	  E. Taurel
- *                $Author: jkrueger1 $
+ *                $Author: andy_gotz $
  *
  * Original     : February 1993
  *
- * Version      : $Revision: 1.6 $
+ * Version      : $Revision: 1.7 $
  *
- * Date         : $Date: 2008-04-06 09:07:50 $
+ * Date         : $Date: 2009-09-23 11:42:34 $
  *
  */
 
@@ -84,7 +84,7 @@ outpar back_def;
 int dev_retrieve(char *,int ,int ,xres *,int *);
 int dev_mretrieve(char *,int ,int ,dc_dev_param *,int *,unsigned int *,xres *,int *);
 int dev_mret(char *,int ,int ,dc_dev_param *,int ,xres *,int *);
-int dev_check(char *,int ,int ,unsigned int ***,int *,int *);
+int dev_check(char *,int ,int ,unsigned int **,int *,int *);
 
 /**
  * To retrieve from the data collector the result of a single device. Obviously,
@@ -1014,7 +1014,7 @@ xresh_mast *dc_devgeth_1(xdevgeth *rece)
 	int cmd,time;
 	int ind,off,next;
 	int ret;
-	unsigned int **base_adr;
+	unsigned int *base_adr;
 	unsigned int *ptr;
 
 /* Miscellaneous initializations */
@@ -1149,7 +1149,7 @@ xresh_mast *dc_devgeth_1(xdevgeth *rece)
  *    set the error code and returns -1
  *
  */
-int dev_check(char *dev_name,int cmd,int arg_type,unsigned int ***pbase_adr,int *pind,int *perr)
+int dev_check(char *dev_name,int cmd,int arg_type,unsigned int **pbase_adr,int *pind,int *perr)
 {
 	int resu;
 	unsigned int *ptr;
@@ -1192,7 +1192,7 @@ int dev_check(char *dev_name,int cmd,int arg_type,unsigned int ***pbase_adr,int 
 
 /* Init. caller parameters */
 
-	*pbase_adr = (unsigned int **)int_array[ind].data_buf;
+	*pbase_adr = (unsigned int *)int_array[ind].data_buf;
 	*pind = data.ind_read;
 
 /* The device exists

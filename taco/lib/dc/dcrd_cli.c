@@ -23,13 +23,13 @@
  * Description:
  *
  * Author(s):	Emmanuel Taurel
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
  * Original:	1992
  *
- * Version:	$Revision: 1.23 $
+ * Version:	$Revision: 1.24 $
  *
- * Date:	$Date: 2008-12-02 08:50:56 $
+ * Date:	$Date: 2009-09-23 11:42:34 $
  *
  ******************************************************************************/
 
@@ -101,7 +101,7 @@ static int call_dcservm(long,long *,dc_dev_mretdat *,int,int *,long,DevLong *);
 static long set_err_nethv(long,long *,long,dc_dev_retdat *);
 static long set_err_nethm(long,long *,long,dc_dev_mretdat *);
 
-long nb_rd_serv = 10;
+DevLong nb_rd_serv = 10;
 
 /* This function will return an integer between 1 and n */
 static int alea(int n)

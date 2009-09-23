@@ -23,11 +23,11 @@
  * Description:
  *
  * Author(s):	
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2008-04-06 09:07:14 $
+ * Date:	$Date: 2009-09-23 11:42:34 $
  *  
  ******************************************************************************/
 
@@ -124,14 +124,14 @@
 
 
 typedef struct _upd_reqnb {
-	int start_req;			/* Req num. between each update during
+	DevLong start_req;		/* Req num. between each update during
 					   starting phase */
 	int start_shift;		/* Number of shift during starting 
 					   phase */
 	int start;			/* Update number in starting phase */
-	int start_nb;			/* Max num. of update during starting
+	DevLong start_nb;			/* Max num. of update during starting
 					   phase */
-	int update;			/* Req num between each resource upd. */
+	DevLong update;			/* Req num between each resource upd. */
 	int shift;			/* Shift number */
 	}upd_reqnb,*Upd_reqnb;
 
@@ -185,7 +185,7 @@ typedef struct _dc_nethost_info {
 	char nethost[HOST_NAME_LENGTH];
 	long first_imp;
 	DevVarStringArray host_dc;
-	long max_call_rd;
+	DevLong max_call_rd;
 	}dc_nethost_info;
 
 typedef struct _nethost_call {

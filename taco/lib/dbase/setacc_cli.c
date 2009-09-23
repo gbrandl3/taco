@@ -26,13 +26,13 @@
  *              Interface to access static database
  *
  * Author(s)  : Emmanuel Taurel
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.24 $
+ * Version    :	$Revision: 1.25 $
  *
- * Date       :	$Date: 2008-12-18 07:59:44 $
+ * Date       :	$Date: 2009-09-23 11:42:34 $
  * 
  *-*******************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -562,27 +562,27 @@ int _DLLFunc db_getresource(const char *devname, Db_resource res, u_int res_num,
 			case D_LONG_TYPE :
 				if (ptrc[0] == '0' && ptrc[1] == 'x')
 				{
-					if (sscanf(&(ptrc[2]),"%x",(long *)res[i].resource_adr) == -1)
+					if (sscanf(&(ptrc[2]),"%x",(DevLong *)res[i].resource_adr) == -1)
 					{
 						*perr = DbErr_BadResourceType;
 						return(DS_NOTOK);
 					}
 				}
 				else
-					*(long *)res[i].resource_adr = atol(ptrc);
+					*(DevLong *)res[i].resource_adr = atol(ptrc);
 				break;
 
 			case D_ULONG_TYPE :
 				if (ptrc[0] == '0' && ptrc[1] == 'x')
 				{
-					if (sscanf(&(ptrc[2]),"%x",(long *)res[i].resource_adr) == -1)
+					if (sscanf(&(ptrc[2]),"%x",(DevULong *)res[i].resource_adr) == -1)
 					{
 						*perr = DbErr_BadResourceType;
 						return(DS_NOTOK);
 					}
 				}
 				else
-					*(unsigned long *)res[i].resource_adr = atol(ptrc);
+					*(DevULong *)res[i].resource_adr = atol(ptrc);
 				break;
 
 			case D_DOUBLE_TYPE :

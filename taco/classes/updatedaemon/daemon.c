@@ -25,16 +25,16 @@
  * Description: source code to implement DaemonClass
  *
  * Author(s):   Michael Schofield
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
  * Original:    April 1992
  *
- * Version:     $Revision: 1.8 $
+ * Version:     $Revision: 1.9 $
  *
- * Date:        $Date: 2008-10-22 15:10:43 $
+ * Date:        $Date: 2009-09-23 11:42:34 $
  */
 
-static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon.c,v 1.8 2008-10-22 15:10:43 jkrueger1 Exp $";
+static char RcsID[]="$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/daemon.c,v 1.9 2009-09-23 11:42:34 andy_gotz Exp $";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -578,7 +578,7 @@ static long class_initialise(DevLong *error)
    int iret = DS_OK;
    long status;
    long class_tab_size=sizeof(class_tab) / sizeof(db_resource);
-
+   DevLong n_state;
 
 #if (OSK || _OSK)
    unsigned int i,j,l;
@@ -648,12 +648,15 @@ static long class_initialise(DevLong *error)
 /** Interrogate the static database for default values **/
 /********************************************************/
 
-   res_class[0].resource_adr = &(ud_daemon->devserver.n_state);
+   n_state = ud_daemon->devserver.n_state;
+   res_class[0].resource_adr = &(n_state);
 
    if (db_getresource("CLASS/Daemon/DEFAULT",res_class,res_class_size,error))
    {
      return(DS_NOTOK);
    } 
+
+   ud_daemon->devserver.n_state = n_state;
 
 /**************************************************************/
 /** three private structure definitions for daemon commandis **/

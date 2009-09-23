@@ -26,13 +26,13 @@
  *
  *
  * Author       :
- *                $Author: jkrueger1 $
+ *                $Author: andy_gotz $
  *
  * Original     :
  *
- * Version      : $Revision: 1.8 $
+ * Version      : $Revision: 1.9 $
  *
- * Date         : $Date: 2008-04-06 09:07:51 $
+ * Date         : $Date: 2009-09-23 11:42:34 $
  *
  */
 
@@ -115,7 +115,7 @@ int main(int argc, char **argv)
 			alloc_size;
         DevVarStringArray       host_dc = {0, NULL};
 	char 		*dc_default_host[] = {NULL}; 
-	long		max_call = 0;
+	DevLong		max_call = 0;
 	db_resource 	res1[] = {
 				{"dev_number", D_LONG_TYPE, &dev_num},
 				{"cellar_number", D_LONG_TYPE, &cell_num},

@@ -25,16 +25,16 @@
  * Description: 
  *
  * Author(s):   
- *              $Author: jkrueger1 $
+ *              $Author: andy_gotz $
  *
  * Original:    
  *
- * Version:     $Revision: 1.3 $
+ * Version:     $Revision: 1.4 $
  *
- * Date:        $Date: 2008-04-06 09:06:39 $
+ * Date:        $Date: 2009-09-23 11:42:34 $
  */
 
-static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/datac.c,v 1.3 2008-04-06 09:06:39 jkrueger1 Exp $";
+static char RcsId[] = "@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/classes/updatedaemon/datac.c,v 1.4 2009-09-23 11:42:34 andy_gotz Exp $";
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
@@ -101,7 +101,7 @@ long queue_data (char *name,devserver handle,int cmd,long cmd_error,
   fprintf(stderr,"** THE QUEUE DATA ROUTINE FOR THE DATA COLLECTOR IS HERE *\n");
   fprintf(stderr,"#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#\n");
   fprintf(stderr,"NAME:     %s\n",name);
-  fprintf(stderr,"HANDLE:   %d\n",(int)handle);
+  fprintf(stderr,"HANDLE:   %d\n",(long) handle);
   fprintf(stderr,"CMD:      %d\n",cmd);
   fprintf(stderr,"CMD_ERROR:%d\n",cmd_error);
   fprintf(stderr,"CMD_TIME: %d\n",cmd_time);

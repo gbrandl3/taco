@@ -26,13 +26,13 @@
  *
  *
  * Author(s)    : E. Taurel
- *                $Author: jkrueger1 $
+ *                $Author: andy_gotz $
  *
  * Original     : February 1993
  *
- * Version      : $Revision: 1.13 $
+ * Version      : $Revision: 1.14 $
  *
- * Date         : $Date: 2008-04-06 09:07:50 $
+ * Date         : $Date: 2009-09-23 11:42:34 $
  *
  */
 
@@ -118,8 +118,8 @@ char		d_name[DEV_NAME_LENGTH],
 		*addr_data;
 upd_reqnb 	req;
 hash_info 	mem;
-int 		ctr,
-		req_call,
+DevLong		ctr;
+int		req_call,
 		time_out = False,
 		shmid_alloc,
 		shmid_ptr,
@@ -941,7 +941,7 @@ static int shm_size(char *host_name)
 /*
  * changed the default values from zero to the values I have on id11
  */
-        static long     dev_num = 100,
+        static DevLong  dev_num = 100,
                         dat_size1 = 252488,
                         cell_num = 50;
 

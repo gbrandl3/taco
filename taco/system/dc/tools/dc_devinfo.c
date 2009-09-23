@@ -26,13 +26,13 @@
  *
  *
  * Author       :
- *                $Author: jkrueger1 $
+ *                $Author: andy_gotz $
  *
  * Original     :
  *
- * Version      : $Revision: 1.9 $
+ * Version      : $Revision: 1.10 $
  *
- * Date         : $Date: 2008-04-06 09:07:51 $
+ * Date         : $Date: 2009-09-23 11:42:34 $
  *
  */
 
@@ -298,7 +298,7 @@ void printtype(int type)
 			break;
 
 		case D_ULONG_TYPE : 
-			printf("     with D_LONG_TYPE\n");
+			printf("     with D_ULONG_TYPE\n");
 			break;
 
 		case D_FLOAT_TYPE : 
