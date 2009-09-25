@@ -29,9 +29,9 @@
  *
  * Original   :	September 2002
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2008-04-06 09:07:19 $
+ * Date:	$Date: 2009-09-25 11:57:00 $
  *
  *********************************************************************/ 
 
@@ -53,23 +53,23 @@ extern "C" void free_var_str_array (DevVarStringArray *str_array);
 
 // defines to translate TANGO enum types
 
-#define READ_ATTR							"read"
-#define WRITE_ATTR	  					"write"
-#define READ_WRITE_ATTR	 				"read_write"
+#define READ_ATTR				"read"
+#define WRITE_ATTR	  			"write"
+#define READ_WRITE_ATTR	 			"read_write"
 #define READ_WITH_WRITE_ATTR			"read_with_write"
 
-#define SCALAR_FORMAT					"scalar"
-#define SPECTRUM_FORMAT 				"spectrum"
-#define IMAGE_FORMAT						"image"
+#define SCALAR_FORMAT				"scalar"
+#define SPECTRUM_FORMAT 			"spectrum"
+#define IMAGE_FORMAT				"image"
 
-#define QUALITY_VALID					0
-#define QUALITY_INVALID					(-1)
-#define QUALITY_ALARM					1
-#define QUALITY_WARNING					2
-#define QUALITY_CHANGING				3
+#define QUALITY_VALID				0
+#define QUALITY_INVALID				(-1)
+#define QUALITY_ALARM				1
+#define QUALITY_WARNING				2
+#define QUALITY_CHANGING			3
 
-#define SOURCE_DEVICE					0
-#define SOURCE_CACHE  					1
+#define SOURCE_DEVICE				0
+#define SOURCE_CACHE  				1
 #define SOURCE_CACHE_DEVICE			2									 
 
 /*
