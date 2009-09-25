@@ -12,10 +12,13 @@ Author(s) : 	Andy Goetz
 
 Original : 	November 1997 
 
-Version :	$Revision: 1.2 $ $Date: 2008-04-06 09:06:55 $
+Version :	$Revision: 1.3 $ $Date: 2009-09-25 07:03:56 $
 
 History :
 		$Log: not supported by cvs2svn $
+		Revision 1.2  2008/04/06 09:06:55  jkrueger1
+		Merge from branch JK
+		
 		Revision 1.1.2.2  2008/03/18 13:23:44  jkrueger1
 		make TACO 64 bit ready
 		
@@ -39,7 +42,7 @@ int main(int argc, char **argv)
 	devserver hw; 
 	long access = WRITE_ACCESS, status; 
 	DevLong error; 
-	char *ch_ptr,helloworld[256], dev_name[256];
+	char *ch_ptr,helloworld[256], dev_name[256] = "";
 
 	switch (argc)
 	{ 
@@ -47,6 +50,8 @@ int main(int argc, char **argv)
 			printf("enter device name [""exp/hello/world""]? "); 
 			if(!fgets(dev_name,sizeof(dev_name),stdin) || !dev_name[0])
 				strcpy(dev_name,"exp/hello/world"); 
+			else if (dev_name[strlen(dev_name) - 1] == '\n')
+				dev_name[strlen(dev_name) - 1] = '\0';	
 			break; 
 		case 2:
 			strcpy(dev_name,argv[1]); 
@@ -72,7 +77,7 @@ int main(int argc, char **argv)
 
 	status = dev_putget(hw,DevHello,
 				&helloworld,D_STRING_TYPE,
-				&ch_ptr,D_STRING_TYPE,
+				&ch_ptr, D_STRING_TYPE,
 				&error); 
 	printf("\nDevHello dev_putget() returned %d\n",status);
 
