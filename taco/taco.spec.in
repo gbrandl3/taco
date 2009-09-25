@@ -1,17 +1,22 @@
-Summary: TACO control system.
-Name: @PACKAGE@
-Version: @VERSION@
-Release: @RPM_RELEASE@
-License: GPL
-Group: Utilities/TACO
-Source: @PACKAGE@-@VERSION@.tar.bz2 
-Prefix: %{_prefix}
-Vendor: FRMII, TU München, FRG
-Distribution:@DISTRIBUTION@
-Requires: gdbm sqlite mysql python openmotif pyhton-numeric
-BuildRequires: openmotif-devel gcc-c++ doxygen swig python-devel mysql-devel sqlite-devel tcl-devel python-numeric
-Provides: taco
-Url: http://www.sourceforge.net/projects/taco
+%define name 		@PACKAGE@
+%define version 	@VERSION@
+%define release 	@RPM_RELEASE@
+%define distribution 	@DISTRIBUTION@
+
+Summary: 	TACO control system.
+Name: 		%{name}
+Version: 	%{version}
+Release: 	%{release}
+License: 	GPL
+Group: 		Utilities/TACO
+Source: 	%{name}-%{version}.tar.bz2 
+Prefix: 	%{_prefix}
+Vendor: 	FRMII, TU München, FRG
+Distribution:	%{distribution}
+Requires: 	gdbm sqlite mysql python openmotif pyhton-numeric
+BuildRequires: 	openmotif-devel gcc-c++ doxygen swig python-devel mysql-devel sqlite-devel tcl-devel python-numeric
+Provides: 	taco
+Url: 		http://www.sourceforge.net/projects/taco
 
 %description
 TACO is an object oriented control system originally developed at the European 
@@ -160,18 +165,62 @@ fi
 %config %_sysconfdir/tacoenv.csh
 # %doc %_infodir/gdbm.info
 # %doc INSTALL doc/TACO.pdf doc/README doc/index.html
-%_bindir/dc_del
-%_bindir/dc_dels
-%_bindir/dc_devall
-%_bindir/dc_devinfo
-%_bindir/dc_hash
-%_bindir/dc_info
-%_bindir/dc_init
-%_bindir/dc_inits
-%_bindir/dc_mem
-%_bindir/dc_mfree
-%_bindir/dc_mfrees
+%_sbindir/StartServer
+%_sbindir/Manager
+%_sbindir/unreg
+%_sbindir/MessageServer
+%_sbindir/dbm_server
+%config(noreplace) %_sbindir/taco.shutdown
+%config(noreplace) %_sbindir/taco.startup
+%config(noreplace) %_datadir/taco/dbase/res/SEC/sec_auth.res
+%config %_datadir/taco/dbase/res/CMDS/dev_cmds.res
+%config %_datadir/taco/dbase/res/ERROR/dev_errors.res
+%config %_datadir/taco/dbase/res/ERROR/db_errors.res
+%config %_datadir/taco/dbase/res/TEST/python.res
+
+%package datacollector
+Summary: TACO data collector system
+Group:	 Utilities/TACO
+Prefix:	 %{_prefix}
+Provides:taco-datacollector
+
+%description datacollector
+This package contains the TACO Data Collector (DC) system
+
+%files datacollector
+%_bindir/dc_cmd  
+%_bindir/dc_del  
+%_bindir/dc_dels    
+%_bindir/dc_devall  
+%_bindir/dc_devinfo  
+%_bindir/dc_hash     
+%_bindir/dc_info  
+%_bindir/dc_init  
+%_bindir/dc_inits  
+%_bindir/dc_mem    
+%_bindir/dc_mfree   
+%_bindir/dc_mfrees  
 %_bindir/dc_patch
+%_bindir/dc_signals
+%_sbindir/dc_wr_alo
+%_sbindir/dc_rd_alo
+%_libdir/libdcmem.la
+%_libdir/libdcmem.so
+%_libdir/libdcmem.so.15
+%_libdir/libdcmem.so.15.0.4
+
+
+%package utilities
+Summary: TACO utilities
+Group: Utilities/TACO
+Prefix: %{_prefix}
+Provides: taco-utilities
+
+%description utilities
+This package contains data base oriented command line tools as well as device 
+oriented command line tools to control the TACO devices
+
+%files utilities
 %_bindir/conv2gdbm
 %_bindir/db_devicetree
 %_bindir/db_fillup
@@ -187,28 +236,40 @@ fi
 %_bindir/db_servunreg
 %_bindir/db_devres
 %_bindir/db_resdel
-%_sbindir/dc_wr_alo
-%_sbindir/dc_rd_alo
-%_sbindir/StartServer
-%_sbindir/Manager
-%_sbindir/unreg
-%_sbindir/MessageServer
-%_sbindir/dbm_server
-%config(noreplace) %_sbindir/taco.shutdown
-%config(noreplace) %_sbindir/taco.startup
-%config(noreplace) %_datadir/taco/dbase/res/SEC/sec_auth.res
-%config %_datadir/taco/dbase/res/CMDS/dev_cmds.res
-%config %_datadir/taco/dbase/res/ERROR/dev_errors.res
-%config %_datadir/taco/dbase/res/ERROR/db_errors.res
-%config %_datadir/taco/dbase/res/TEST/python.res
+%_bindir/db_backup      
+%_bindir/db_clear       
+%_bindir/db_getpoller  
+%_bindir/db_devicelist  
+%_bindir/db_dump        
+%_bindir/db_hostlist   
+%_bindir/devclose
+%_bindir/dev_cmd
+%_bindir/devexp
+%_bindir/devlocal
+%_bindir/dev_menu
+%_bindir/devoff
+%_bindir/devon
+%_bindir/devopen
+%_bindir/devread
+%_bindir/devreadstate
+%_bindir/devreadvalue
+%_bindir/devremote
+%_bindir/devreset
+%_bindir/devrun
+%_bindir/devstandby
+%_bindir/devstate
+%_bindir/devstatus
+%_bindir/devupdate
 
 %package devel
 Summary: TACO devel
 Group: Utilities/TACO/devel
 Prefix: %{_prefix}
 Provides: taco-devel
+Requires: %{name} = %{version}
 
 %description devel
+This package contains the files for the development of TACO servers
 
 %files devel
 %_sbindir/taco-config
@@ -219,12 +280,20 @@ Provides: taco-devel
 %_datadir/aclocal/rpm.m4
 %_datadir/aclocal/swig.m4
 %_datadir/aclocal/taco.m4
+%_libdir/pkgconfig/log4cpp.pc
+%_libdir/pkgconfig/taco-server.pc
+%_libdir/pkgconfig/taco-server++.pc
+%_libdir/pkgconfig/taco-client.pc
+%_libdir/pkgconfig/taco-client++.pc
+%_mandir/man3/*.3.gz
+
 
 %package x-apps
 Summary: TACO control system X11 applications.
 Group: Utilities/TACO/X11
 Prefix: %{_prefix}
 Provides: taco-x-apps
+Requires: %{name} = %{version}
 
 %description x-apps
 
@@ -236,7 +305,34 @@ Provides: taco-x-apps
 @appdefaultdir@/GReta
 @appdefaultdir@/XDevmenu
 
+%package client
+Summary: TACO control system client package
+Group: Utilities/TACO/client
+Prefix: %{_prefix}
+Provides: taco-client
+Requires: %{name} = %{version}
+
+%description client
+
+%files client
+%defattr(-,root,root)
+
+%package client-devel
+Summary: TACO control system client development package
+Group: Utilities/TACO/devel
+Prefix: %{_prefix}
+Provides: taco-client-devel
+Requires: %{name}-devel = %{version}
+
+%description client-devel
+
+%files client-devel
+%defattr(-,root,root)
+
+
 %changelog
+* Tue Jun 09 2009 Jens Krüger <jens.krueger@frm2.tum.de>
+- Add the client and client-devel packages
 * Mon Oct 29 2007 Jens Krüger <jens.krueger@frm2.tum.de>
 - Change some entries for the SuSE online build system
 * Wed Jun 02 2004 Jens Krüger <jens.krueger@frm2.tum.de>
