@@ -127,7 +127,7 @@ int main(int argc, char **argv)
 	        if (status < 0) 
 		{
 			printf("dev_ping to %s: status=NOTOK sequence=%d time=%.3f ms\n",device_name, j, elapsed);
-			dev_printerror_no(SEND,NULL,error); 
+//			dev_printerror_no(SEND,NULL,error); 
 			n_notok++;
 		}
 		else
