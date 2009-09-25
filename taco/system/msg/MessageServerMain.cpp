@@ -29,9 +29,9 @@
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2008-06-20 11:26:17 $
+ * Date:	$Date: 2009-09-25 11:52:02 $
  *
  */
 
@@ -68,6 +68,12 @@
 #include <sys/wait.h>
 #elif HAVE_WAIT_H
 #include <wait.h>
+#endif
+
+#ifdef DARWIN
+        typedef void (* MyRpcFuncPtr)();
+#else
+	typedef void (* MyRpcFuncPtr)(struct svc_req *, SVCXPRT *);
 #endif
 
 extern "C" 
@@ -211,6 +217,9 @@ int main (int argc, char **argv)
  * Since gettransient() does not bind sockets and pmap_set  prognums anymore, the patches required 
  * for Solaris and Linux/glibc 2.x (and probably for every other well-behaving system) have been removed.
  */
+	MyRpcFuncPtr msgserver_prog;
+        msgserver_prog = (MyRpcFuncPtr)msgserver_prog_1;
+
 	transp = svcudp_create(RPC_ANYSOCK);
 	if (transp == NULL) 
 	{
@@ -218,7 +227,7 @@ int main (int argc, char **argv)
 		kill (pid,SIGQUIT);
 	}
 
-	if (!svc_register(transp, msg.prog_number, MSGSERVER_VERS, msgserver_prog_1, IPPROTO_UDP)) 
+	if (!svc_register(transp, msg.prog_number, MSGSERVER_VERS, msgserver_prog, IPPROTO_UDP)) 
 	{
 		logStream->fatalStream() << "Unable to register server, exiting..." << log4cpp::eol;
 		kill (pid,SIGQUIT);

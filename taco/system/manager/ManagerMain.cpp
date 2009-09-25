@@ -27,13 +27,13 @@
  *            dummy database under OS9.
  *
  * Author(s):     Jens Meyer
- *            $Author: andy_gotz $
+ *            $Author: jkrueger1 $
  *
  * Original:  January 1991
  *
- * Version:   $Revision: 1.4 $
+ * Version:   $Revision: 1.5 $
  *
- * Date:              $Date: 2009-08-04 10:54:31 $
+ * Date:              $Date: 2009-09-25 11:51:04 $
  *
  */
 
@@ -67,9 +67,15 @@
 #ifdef HAVE_RPC_PMAP_CLNT_H
 #	include <rpc/pmap_clnt.h>
 #endif
-#include <errno.h>
-#include <string.h>
 
+#ifdef DARWIN
+        typedef void (* MyRpcFuncPtr)();
+#else
+	typedef void (* MyRpcFuncPtr)(struct svc_req *, SVCXPRT *);
+#endif
+
+#include <cerrno>
+#include <string>
 
 #ifdef HAVE_PATHS_H
 #	include <paths.h>
@@ -385,14 +391,17 @@ static	int	fd_devnull = -1;
 	        exit (-1);
 	}
 
-	if (!svc_register(transp, NMSERVER_PROG, NMSERVER_VERS_1, network_manager_1, IPPROTO_UDP)) 	
+	MyRpcFuncPtr network_manager;
+        network_manager = (MyRpcFuncPtr)network_manager_1;
+	if (!svc_register(transp, NMSERVER_PROG, NMSERVER_VERS_1, network_manager, IPPROTO_UDP)) 	
 	{
 		fprintf(stderr, "\nUnable to register network manager.\n");
 		fprintf(stderr, "Program number 100 already in use?\n");
 	        exit (-1);
 	}
 
-	if (!svc_register(transp, NMSERVER_PROG, NMSERVER_VERS, network_manager_4, IPPROTO_UDP)) 	
+        network_manager = (MyRpcFuncPtr)network_manager_4;
+	if (!svc_register(transp, NMSERVER_PROG, NMSERVER_VERS, network_manager, IPPROTO_UDP)) 	
 	{
 		fprintf(stderr, "\nunable to register network manager\n");
 		fprintf(stderr, "Program number 100 already in use?\n");
