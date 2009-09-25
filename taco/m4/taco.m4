@@ -664,7 +664,13 @@ dnl try to guess taco locations
 AC_DEFUN([TACO_CHECK_RPC],
 [
 	AC_CHECK_HEADERS([rpc.h rpc/rpc.h])
-        AC_CHECK_HEADERS([svc.h rpc/svc.h rpc/pmap_prot.h rpc/pmap_clnt.h])
+        AC_CHECK_HEADERS([svc.h rpc/svc.h rpc/pmap_prot.h rpc/pmap_clnt.h], [], [], [
+#if HAVE_RPC_RPC_H
+#       include <rpc/rpc.h>
+#elif HAVE_RPC_H
+#       include <rpc.h>
+#endif
+])
         AC_CHECK_MEMBERS([SVCXPRT.xp_fd, SVCXPRT.xp_sock], [], [], [
 #if HAVE_RPC_RPC_H
 #       include <rpc/rpc.h>
