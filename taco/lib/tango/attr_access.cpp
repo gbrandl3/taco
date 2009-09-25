@@ -25,13 +25,13 @@
  * Description:	
  *	
  * Author(s)  :	Jens Meyer
- * 		$Author: jensmeyer $
+ * 		$Author: jkrueger1 $
  *
  * Original   :	September2002
  *
- * Version    :	$Revision: 1.12 $
+ * Version    :	$Revision: 1.13 $
  *
- * Date       : $Date: 2009-09-17 09:35:34 $
+ * Date       : $Date: 2009-09-25 11:55:08 $
  *
  *********************************************************************/ 
 
@@ -423,7 +423,7 @@ long AttrAccess::read_attr_config (DevArgument argout,
 	
 	*error = 0;
 	
-	property_ptrs[0] = "18";
+	property_ptrs[0] = (char *)"18";
 	property_ptrs[1] = (char *)attr_config.name.c_str();
 	property_ptrs[2] = (char *)attr_config.label.c_str();
 	property_ptrs[3] = (char *)attr_config.unit.c_str();
@@ -444,16 +444,16 @@ long AttrAccess::read_attr_config (DevArgument argout,
 	switch (attr_config.writable)
 		{
 		case Tango::READ:
-			property_ptrs[13] = READ_ATTR;
+			property_ptrs[13] = (char *)READ_ATTR;
 			break;
 		case Tango::WRITE:
-			property_ptrs[13] = WRITE_ATTR;
+			property_ptrs[13] = (char *)WRITE_ATTR;
 			break;
 		case Tango::READ_WRITE:
-			property_ptrs[13] = READ_WRITE_ATTR;
+			property_ptrs[13] = (char *)READ_WRITE_ATTR;
 			break;
 		case Tango::READ_WITH_WRITE:
-			property_ptrs[13] = READ_WITH_WRITE_ATTR;
+			property_ptrs[13] = (char *)READ_WITH_WRITE_ATTR;
 			break;		
 		}
 		
@@ -464,13 +464,13 @@ long AttrAccess::read_attr_config (DevArgument argout,
 	switch (attr_config.data_format)
 		{
 		case Tango::SCALAR:
-			property_ptrs[15] = SCALAR_FORMAT;
+			property_ptrs[15] = (char *)SCALAR_FORMAT;
 			break;
 		case Tango::SPECTRUM:
-			property_ptrs[15] = SPECTRUM_FORMAT;
+			property_ptrs[15] = (char *)SPECTRUM_FORMAT;
 			break;
 		case Tango::IMAGE:
-			property_ptrs[15] = IMAGE_FORMAT;
+			property_ptrs[15] = (char *)IMAGE_FORMAT;
 			break;
 		}	
 	
