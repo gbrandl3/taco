@@ -38,6 +38,8 @@ dnl
 
         AM_INIT_AUTOMAKE([dist-bzip2 1.7])
 
+	m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])],)
+
         AC_PREFIX_DEFAULT(${DSHOME:-/usr/local/taco})
 
         AC_REQUIRE([AC_PROG_INSTALL])dnl
