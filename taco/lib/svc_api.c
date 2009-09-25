@@ -29,9 +29,9 @@
  *
  * Original:	Feb 1994
  *
- * Version:	$Revision: 1.37 $
+ * Version:	$Revision: 1.38 $
  *
- * Date:		$Date: 2008-12-18 08:04:40 $
+ * Date:		$Date: 2009-09-25 14:35:15 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -1925,7 +1925,7 @@ int device_server (char *server_name, char *pers_name, int m_opt, int s_opt, int
 				res_name[80];
 	DevVarStringArray	default_access;
 	db_resource		res_tab;
-	void		*test_heap;
+	void			*test_heap;
 
 	long			prog_number=0,
 				status;
