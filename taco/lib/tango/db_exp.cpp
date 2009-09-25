@@ -30,9 +30,9 @@
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.5 $
+ * Version    :	$Revision: 1.6 $
  *
- * Date       :	$Date: 2008-10-22 15:11:20 $
+ * Date       :	$Date: 2009-09-25 11:57:53 $
  * 
  *-*******************************************************************/
 using namespace std;
@@ -102,7 +102,7 @@ static long get_tango_exp_devices(char *filter,std::vector<std::string> &dev_nam
 extern "C" int test_star(char *filter);
  
 
-/**
+/**@ingroup tangoAPI
  * This function allows a user to get the name of exported (and then ready to accept
  * command) devices for Taco and Tango. With the filter parameter, it is possible to limit the devices
  * name return by the function.
@@ -458,13 +458,13 @@ int _DLLFunc db_getdevexp_tango(char *filter, char ***tab, u_int *num_dev,long *
 
 }
 
-/**
+/**@ingroup tangoAPI
  * The @ref db_getdevexp_tango function can return a lot of device names and allocate memory
  * to store them. This call is a local call and frees all the memory allocated by the
  * db_getdevexp_tango funtion.
  *
- * @param ptr The pointer to the array of exported device name strings.
- *   This pointer must have been initialized by a db_getdevexp function.
+ * @param ptr 	The pointer to the array of exported device name strings.
+ *   		This pointer must have been initialized by a db_getdevexp function.
  *
  * @return DS_OK if no errors occurs or DS_NOTOK if a problem occurs
  * 
@@ -535,11 +535,11 @@ int _DLLFunc db_freedevexp_tango(char **ptr)
 	
 }
 
-/**
+/**@ingroup tangoAPI
  * Get the list of exported devices from the Tango database
  *
  * @param filter	A filter to select the exported device names.
- * @param dev_name_list		the vector of strings containing the found exported devices
+ * @param dev_name_list	the vector of strings containing the found exported devices
  * @param perr		The error code in case of problems
  *
  * @return   In case of trouble, the function returns DS_WARNING 
