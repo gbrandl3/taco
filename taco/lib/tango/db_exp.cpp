@@ -26,13 +26,13 @@
  *              Interface to access static database
  *
  * Author(s)  : Emmanuel Taurel
- *		$Author: jkrueger1 $
+ *		$Author: jensmeyer $
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.6 $
+ * Version    :	$Revision: 1.7 $
  *
- * Date       :	$Date: 2009-09-25 11:57:53 $
+ * Date       :	$Date: 2009-10-09 13:03:44 $
  * 
  *-*******************************************************************/
 using namespace std;
@@ -87,7 +87,7 @@ extern msgserver_info msg_info;
 /* Static and Global variables */
 
 extern int func_ptr;
-static devexp_res *tab_clstu;
+devexp_res *tab_clstu;
 
 static int first_devexp = 0;
 static int first_tcp_call = 0;
@@ -126,7 +126,7 @@ int _DLLFunc db_getdevexp_tango(char *filter, char ***tab, u_int *num_dev,long *
 	DevLong error;
 	struct timeval tout;
 
-        if (config_flags->no_database)
+        if (config_flags && config_flags->no_database)
         {
                 *perr = DbErr_NoDatabase;
                 return(DS_NOTOK);
@@ -185,6 +185,14 @@ int _DLLFunc db_getdevexp_tango(char *filter, char ***tab, u_int *num_dev,long *
 		first_devexp++;
 	}
 
+/*
+ * find out which nethost has been requested for this device
+ */
+	if (!config_flags)
+	{
+		if (db_import(perr) != DS_OK)
+			return(DS_NOTOK);
+	}
 
 /* Make a copy of the filter name and all  the string's character 
    in lowercase */
