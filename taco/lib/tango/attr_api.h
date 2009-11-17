@@ -25,13 +25,13 @@
  * Description:	
  *	
  * Author(s)  :	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: jensmeyer $
  *
  * Original   :	September 2002
  *
- * Version:	$Revision: 1.7 $
+ * Version:	$Revision: 1.8 $
  *
- * Date:	$Date: 2009-09-25 11:57:00 $
+ * Date:	$Date: 2009-11-17 10:42:08 $
  *
  *********************************************************************/ 
 
@@ -93,8 +93,9 @@ class AttrAccess
 		long  read_attr_config (DevArgument argout, DevType argout_type, 
 									   DevLong *error);
 		long  read_attr_mode  (DevArgument argout, DevType argout_type, DevLong *error);
-		long  write_attr_mode (DevArgument argin,  DevType argin_type,  DevLong *error);													
-	
+		long  write_attr_mode (DevArgument argin,  DevType argin_type,  DevLong *error);
+		long  timeout(long request, struct timeval *dev_timeout, DevLong *error);
+		
 	protected:
 		long	search_attr_name (DevLong *error);
 		long	search_tango_attr_name (DevLong *error);

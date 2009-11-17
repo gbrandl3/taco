@@ -25,13 +25,13 @@
  * Description:	
  *	
  * Author(s)  :	Jens Meyer
- * 		$Author: andy_gotz $
+ * 		$Author: jensmeyer $
  *
  * Original   :	September 2002
  *
- * Version    : $Revision: 1.8 $
+ * Version    : $Revision: 1.9 $
  *
- * Date       : $Date: 2008-12-03 20:59:59 $
+ * Date       : $Date: 2009-11-17 10:42:07 $
  *
  *********************************************************************/ 
 
@@ -306,3 +306,33 @@ long attribute_put (devserver ds, long cmd, DevArgument argin,
 	return (DS_OK);
 }
 
+
+/**
+ * Hook to TACO dev_rpc_timeout().
+ *
+ * Calls the correct attribute access methode to 
+ * the Tango connection timeout.
+ *
+ * @param ds device server structure
+ * @param request set or read timout value
+ * @param dev_timeout pointer to timeval structure for timeout value
+ * @param error Taco error code
+
+ *
+ * @return DS_NOTOK in case of failure otherwise DS_OK
+ */
+long attribute_timeout (devserver ds, long request, 
+                       struct timeval *dev_timeout, DevLong *error)
+{
+	AttrAccess	*attr;
+
+	*error = 0;
+	attr = (AttrAccess *) ds->clnt;
+	
+	if ( attr->timeout (request, dev_timeout, error) == DS_NOTOK )
+	{
+		return (DS_NOTOK);
+	}
+	
+	return (DS_OK);
+}

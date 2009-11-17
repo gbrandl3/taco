@@ -35,9 +35,9 @@
  *
  * Original   :	December 1999
  *
- * Version    : $Revision: 1.9 $
+ * Version    : $Revision: 1.10 $
  *
- * Date       : $Date: 2009-09-17 09:34:21 $
+ * Date       : $Date: 2009-11-17 10:42:08 $
  *
  ********************************************************************-*/
 
@@ -927,17 +927,77 @@ long tango_dev_ping (devserver ds, DevLong *error)
 
 	*error = 0;
 
-        try
-        {
-                tango_device[dev_id].device_proxy->ping();
-        }
-        catch (CORBA::Exception  &corba_exception)
+    try
+	{
+    	tango_device[dev_id].device_proxy->ping();
+   	}
+   	
+	catch (CORBA::Exception  &corba_exception)
 	{
 #ifdef DEBUG
 		if (debug_flag & DBG_TANGO) Tango::Util::print_exception(corba_exception);
 #endif
 // TODO - improve TANGO to TACO error handling here
                 *error = DevErr_CommandFailed;
+                return(DS_NOTOK);
+    } 
+
+	return (DS_OK);
+}
+
+/**@ingroup tangoAPI
+ * 
+ * set the timeout for a tango device connection
+ *
+ * @param ds device server structure
+ * @param request set or read timout value
+ * @param dev_timeout pointer to timeval structure for timeout value
+ * @param error	  contains the error code if function returns DS_NOTOK
+ *
+ * @return DS_OK or DS_NOTOK
+ */
+
+long tango_dev_timeout (devserver ds, long request, 
+                       struct timeval *dev_timeout, DevLong *error)
+{
+	long dev_id;
+	int timeout_millis;
+	
+	if (tango_dev_check(ds,error) != DS_OK) return(DS_NOTOK);
+
+	dev_id = ds->ds_id;
+
+	*error = 0;
+
+        try
+        {
+			switch (request)
+			{
+				case (CLSET_TIMEOUT): 
+					timeout_millis = dev_timeout->tv_sec * 1000 + 
+					                 (int)(dev_timeout->tv_usec / 1000);
+					tango_device[dev_id].device_proxy->set_timeout_millis (timeout_millis);
+					break;
+
+				case (CLGET_TIMEOUT):
+					timeout_millis = tango_device[dev_id].device_proxy->get_timeout_millis();
+					
+					dev_timeout->tv_sec  = (int)(timeout_millis / 1000);
+					dev_timeout->tv_usec = (timeout_millis - (dev_timeout->tv_sec * 1000)) * 1000;
+					break;
+				
+        		default:
+                	*error = DevErr_UnknownInputParameter;
+                	return (DS_NOTOK);                
+       		}
+		}
+		catch (Tango::DevFailed &e)
+		{
+#ifdef DEBUG
+		if (debug_flag & DBG_TANGO) Tango::Util::print_exception(e);
+#endif
+// TODO - improve TANGO to TACO error handling here
+                *error = DevErr_TangoAccessFailed;
                 return(DS_NOTOK);
         } 
 
@@ -1017,8 +1077,8 @@ static CORBA::Any tango_argin_to_any(long argin_type, long tango_type, void *arg
 						(const char*)"TANGO argin type not Tango::DEV_LONG ", 
 		                		(const char *)"tango_argin_to_any()");
 			}
-			long *argin_long;
-			argin_long = (long*)argin;
+			DevLong *argin_long;
+			argin_long = (DevLong *)argin;
 			send <<= *argin_long;
 			break;
 		}
@@ -1031,8 +1091,8 @@ static CORBA::Any tango_argin_to_any(long argin_type, long tango_type, void *arg
 						(const char*)"TANGO argin type not Tango::DEV_ULONG ", 
 		                		(const char *)"tango_argin_to_any()");
 			}
-			unsigned long *argin_ulong;
-			argin_ulong = (unsigned long*)argin;
+			DevULong *argin_ulong;
+			argin_ulong = (DevULong *)argin;
 			send <<= *argin_ulong;
 			break;
 		}
@@ -1364,8 +1424,8 @@ static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any re
 
 		case D_LONG_TYPE :
 		{
-			long tango_long;
-			long *argout_long;
+			DevLong tango_long;
+			DevLong *argout_long;
 
 			if (tango_type != Tango::DEV_LONG)
 			{
@@ -1374,15 +1434,15 @@ static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any re
 				                (const char *)"tango_any_to_argout()");
 			}
 			received >>= tango_long;
-			argout_long = (long*)argout;
+			argout_long = (DevLong *)argout;
 			*argout_long = tango_long;
 			break;
 		}
 
 		case D_ULONG_TYPE :
 		{
-			unsigned long tango_ulong;
-			unsigned long *argout_ulong;
+			DevULong tango_ulong;
+			DevULong *argout_ulong;
 
 			if (tango_type != Tango::DEV_ULONG)
 			{
@@ -1391,7 +1451,7 @@ static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any re
 				                (const char *)"tango_any_to_argout()");
 			}
 			received >>= tango_ulong;
-			argout_ulong = (unsigned long*)argout;
+			argout_ulong = (DevULong *)argout;
 			*argout_ulong = tango_ulong;
 			break;
 		}
@@ -1591,7 +1651,7 @@ static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any re
 			argout_vla = (DevVarLongArray*)argout;
 			if (argout_vla->sequence == NULL)
 			{
-				argout_vla->sequence = (DevLong*)malloc(tango_vla->length()*sizeof(long));
+				argout_vla->sequence = (DevLong*)malloc(tango_vla->length()*sizeof(DevLong));
 			}
 			argout_vla->length = tango_vla->length();
 			for (long i=0; i< tango_vla->length(); i++)
@@ -1616,7 +1676,7 @@ static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any re
 			argout_vula = (DevVarULongArray*)argout;
 			if (argout_vula->sequence == NULL)
 			{
-				argout_vula->sequence = (DevULong*)malloc(tango_vula->length()*sizeof(unsigned long));
+				argout_vula->sequence = (DevULong*)malloc(tango_vula->length()*sizeof(DevULong));
 			}
 			argout_vula->length = tango_vula->length();
 			for (long i=0; i< tango_vula->length(); i++)
@@ -1821,8 +1881,8 @@ static void tango_any_to_argout_raw(long argout_type, long tango_type, CORBA::An
 		 
 		case D_LONG_TYPE :
 		{
-			long tango_long;
-			long taco_long;
+			DevLong tango_long;
+			DevLong taco_long;
 
 			if (tango_type != Tango::DEV_LONG)
 			{
@@ -1842,8 +1902,8 @@ static void tango_any_to_argout_raw(long argout_type, long tango_type, CORBA::An
 
 		case D_ULONG_TYPE :
 		{
-			unsigned long tango_ulong;
-			unsigned long taco_ulong;
+			DevULong tango_ulong;
+			DevULong taco_ulong;
 
 			if (tango_type != Tango::DEV_ULONG)
 			{
@@ -2052,7 +2112,7 @@ static void tango_any_to_argout_raw(long argout_type, long tango_type, CORBA::An
 				                (const char *)"tango_any_to_argout_raw()");
 			}
 			received >>= tango_vla;
-			taco_vla.sequence = (DevLong*)malloc(tango_vla->length()*sizeof(long));
+			taco_vla.sequence = (DevLong*)malloc(tango_vla->length()*sizeof(DevLong));
 			taco_vla.length = tango_vla->length();
 			for (long i=0; i< tango_vla->length(); i++)
 			{
@@ -2079,7 +2139,7 @@ static void tango_any_to_argout_raw(long argout_type, long tango_type, CORBA::An
 				                (const char *)"tango_any_to_argout_raw()");
 			}
 			received >>= tango_vula;
-			taco_vula.sequence = (DevULong*)malloc(tango_vula->length()*sizeof(unsigned long));
+			taco_vula.sequence = (DevULong*)malloc(tango_vula->length()*sizeof(DevULong));
 			taco_vula.length = tango_vula->length();
 			for (long i=0; i< tango_vula->length(); i++)
 			{

@@ -30,9 +30,9 @@
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.7 $
+ * Version    :	$Revision: 1.8 $
  *
- * Date       :	$Date: 2009-10-09 13:03:44 $
+ * Date       :	$Date: 2009-11-17 10:42:08 $
  * 
  *-*******************************************************************/
 using namespace std;
@@ -98,7 +98,7 @@ static struct hostent *ht;
 static int host_addr;
 #endif
 
-static long get_tango_exp_devices(char *filter,std::vector<std::string> &dev_name_list,long *perr);
+static long get_tango_exp_devices(char *filter,std::vector<std::string> &dev_name_list,DevLong *perr);
 extern "C" int test_star(char *filter);
  
 
@@ -115,7 +115,7 @@ extern "C" int test_star(char *filter);
  * @return   In case of trouble, the function returns DS_NOTOK and set the err varaible
  *    pointed to by "perr". Otherwise, the function returns DS_OK
  */
-int _DLLFunc db_getdevexp_tango(char *filter, char ***tab, u_int *num_dev,long *perr)
+int _DLLFunc db_getdevexp_tango(char *filter, char ***tab, u_int *num_dev,DevLong *perr)
 {
 	char *filter1;
 	register db_res *recev;
@@ -553,7 +553,7 @@ int _DLLFunc db_freedevexp_tango(char **ptr)
  * @return   In case of trouble, the function returns DS_WARNING 
  *           Otherwise, the function returns DS_OK
  */
-static long get_tango_exp_devices(char *filter,std::vector<std::string> &dev_name_list,long *perr)
+static long get_tango_exp_devices(char *filter,std::vector<std::string> &dev_name_list,DevLong *perr)
 {
 	std::string filt(filter);
 
