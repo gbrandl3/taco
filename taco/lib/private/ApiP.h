@@ -26,13 +26,13 @@
  *		programmers interface.
  *
  * Author(s):	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: jensmeyer $
  *
  * Original:	June 1992
  *
- * Version:	$Revision: 1.19 $
+ * Version:	$Revision: 1.20 $
  *
- * Date:	$Date: 2008-12-18 08:03:22 $
+ * Date:	$Date: 2009-11-17 11:49:03 $
  *
  ********************************************************************-*/
 
@@ -45,7 +45,7 @@
  */
 #ifdef _IDENT
 static char ApiPh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.19 2008-12-18 08:03:22 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/private/ApiP.h,v 1.20 2009-11-17 11:49:03 jensmeyer Exp $";
 #endif /* _IDENT */
 
 
@@ -402,7 +402,9 @@ long attribute_free (devserver ds, DevLong *error);
 long attribute_putget (devserver ds, long cmd, DevArgument argin, DevType argin_type,DevArgument argout, DevType argout_type, DevLong *error);
 long attribute_put (devserver ds, long cmd, DevArgument argin, DevType argin_type, DevLong *error);
 long attribute_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, DevLong *error);
-
+long attribute_timeout(devserver ds, long request, 
+                       struct timeval *dev_timeout, DevLong *error);
+					   
 /* TANGO entry points */
 
 long tango_db_import(char*, char*, long, DevLong*);
@@ -411,7 +413,9 @@ long tango_dev_free(devserver,DevLong*);
 long tango_dev_putget(devserver,long,void*,long,void*,long,DevLong*);
 long tango_dev_putget_raw(devserver,long,void*,long,void*,long,DevLong*);
 long tango_dev_cmd_query(devserver,DevVarCmdArray*,DevLong*); 
-long tango_dev_ping(devserver,DevLong*); 
+long tango_dev_ping(devserver,DevLong*);
+long tango_dev_timeout(devserver ds, long request, 
+                       struct timeval *dev_timeout, DevLong *error); 
 
 /* used by TANGO */
 
@@ -428,6 +432,12 @@ long dev_error_push_level PT_( (const char * message,int level) );
  */
 long 	relisten_events(devserver ds);
 
+/*
+ * used internally for Taco timeout
+ */
+long taco_dev_timeout (devserver ds, long request, 
+			           struct timeval *dev_timeout, DevLong *error);
+					   
 /*
  * used for determination of the hostname
  */
