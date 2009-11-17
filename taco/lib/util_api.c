@@ -27,13 +27,13 @@
  *		handle remote devices.
  *
  * Author(s)  :	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: jensmeyer $
  *
  * Original   :	April 1993
  *
- * Version:	$Revision: 1.40 $
+ * Version:	$Revision: 1.41 $
  *
- * Date:		$Date: 2008-12-02 08:16:40 $
+ * Date:		$Date: 2009-11-17 11:46:36 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -876,13 +876,42 @@ long _DLLFunc dev_rpc_timeout (devserver ds, long request,
 		*error = DevErr_DeviceNotImportedYet;
 		return(DS_NOTOK);
 	}
+	
 #ifdef TANGO
 	if (ds->rpc_protocol == D_IIOP)
 	{
-/* TODO - implement dev_rpc_timeout() */
-		return(DS_OK);
+		if ( strcmp (ds->device_type, "attribute") == 0 )
+        	return attribute_timeout(ds, request, dev_timeout, error);
+
+		return tango_dev_timeout(ds, request, dev_timeout, error);
 	}
+	
 #endif /* TANGO */
+
+	return taco_dev_timeout(ds, request, dev_timeout, error);
+}
+
+
+/**
+ * Interface to get or set the timeout value for a Taco device connection. 
+ * 
+ * @param ds handle to device.
+ * @param request	indicates whether the timeout should be set or only read.
+ * 			A request to set the timeout has to be asked  with CLSET_TIMEOUT. 
+ * 			The timeout will be set without any retry.
+ *
+ * 			A request to read the timeout has to be asked with CLGET_TIMEOUT.
+ * @param dev_timeout 	timeout structure.
+ * @param error   	Will contain an appropriate error code if the
+ * 			corresponding call returns a non-zero value.
+ * 
+ * @retval DS_OK 
+ * @retval DS_NOTOK
+ */ 
+long taco_dev_timeout (devserver ds, long request, 
+			           struct timeval *dev_timeout, DevLong *error)
+{
+
 /*
  * in the stateless import case the device might not be imported yet
  * and therefore has not client handle. In this case if the client
