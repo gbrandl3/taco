@@ -35,9 +35,9 @@
  *
  * Original   :	December 1999
  *
- * Version    : $Revision: 1.10 $
+ * Version    : $Revision: 1.11 $
  *
- * Date       : $Date: 2009-11-17 10:42:08 $
+ * Date       : $Date: 2009-12-08 12:33:01 $
  *
  ********************************************************************-*/
 
@@ -267,7 +267,8 @@ long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, DevLong *e
 //
 // andy 08apr03
 // 
-// added following commands - Insert, Extract, On, Off, Reset, Open, Close
+// added following commands - Insert, Extract, On, Off, Reset, Open, Close,
+//                            Standby
 //
 // added special treatment for TacoState - if TacoState is implemented then map this
 // to DevState and not the Tango::State(). This allows Tango device servers to return
@@ -346,6 +347,11 @@ long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, DevLong *e
 			{
 				tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevReset")+1);
 				sprintf(tango_device_tmp.cmd_name[i],"DevReset");
+			}
+			else if ((*cmd_query)[i].cmd_name == "Standby")
+			{
+				tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevStandby")+1);
+				sprintf(tango_device_tmp.cmd_name[i],"DevStandby");
 			}
 			else
 			{
@@ -565,7 +571,7 @@ long tango_dev_putget(devserver ds, long cmd, void *argin, long argin_type,
 			{
 				cmd_name = "Status";
 			}
-// added following commands - Insert, Extract, On, Off, Reset, Open, Close
+// added following commands - Insert, Extract, On, Off, Reset, Open, Close, Standby
 //
 			else if (strcmp(cmd_name,"DevOn") == 0)
 			{
@@ -594,6 +600,10 @@ long tango_dev_putget(devserver ds, long cmd, void *argin, long argin_type,
 			else if (strcmp(cmd_name,"DevReset") == 0)
 			{
 				cmd_name = "Reset";
+			}
+			else if (strcmp(cmd_name,"DevStandby") == 0)
+			{
+				cmd_name = "Standby";
 			}
 			break;
 		}
