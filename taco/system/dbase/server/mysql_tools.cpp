@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.23 $
+ * Version:	$Revision: 1.24 $
  *
- * Date:	$Date: 2008-04-06 09:07:41 $
+ * Date:	$Date: 2010-01-06 17:36:34 $
  *
  */
 
@@ -36,16 +36,32 @@
 #include <algorithm>
 
 // Add quote to resource value containing separator
-void MySQLServer::db_quote(std::string &value) {
-
-  std::string::size_type pos;
-  
-  if (((pos = value.find(',')) != std::string::npos) ||
-      ((pos = value.find(' ')) != std::string::npos))
-  {
-    value = "\"" + value + "\"";
-  }
-  
+void MySQLServer::db_quote(std::string &value) 
+{
+	std::string::size_type pos;
+	if (((pos = value.find(',')) != std::string::npos) ||
+		((pos = value.find(' ')) != std::string::npos))
+	{
+		value = "\"" + value + "\"";
+	}
+}
+/**
+ * add the escape sign '\' for all wildcards characters '_' for the 
+ * MySQL database
+ *
+ * @param input string containing wildcards
+ * @return string containing escaped wildcards
+ */
+std::string MySQLServer::escape_wildcards(const std::string &input)
+{
+	std::string tmp(input);
+	std::string::size_type pos(0);
+	while ((pos = tmp.find('_', pos)) != std::string::npos)
+	{
+		tmp.insert(pos, 1, '\\');
+		pos += 2;
+	}
+	return tmp;
 }
 
 
@@ -711,7 +727,7 @@ DevLong *MySQLServer::unreg_1_svc(db_res *recev)
     if (class_list.empty())
     {
 	class_list = "'" + user_ds_name + "'";
-	query += (class_list + ") AND SERVER LIKE '%" + user_pers_name + "'");
+	query += (class_list + ") AND SERVER LIKE '%/" + escape_wildcards(user_pers_name) + "'");
     }
     else
     {
@@ -870,7 +886,7 @@ svcinfo_svc *MySQLServer::svcinfo_1_svc(db_res *recev)
 
     query = "SELECT DISTINCT server FROM device WHERE host='";
     query += svcinfo_back.host_name;
-    query += "' and server like '%/" + user_pers_name + "' and pid=";
+    query += "' and server like '%/" + escape_wildcards(user_pers_name) + "' and pid=";
     char pid_str[32];
     snprintf(pid_str, sizeof(pid_str), "%d", svcinfo_back.pid);
     query += pid_str;

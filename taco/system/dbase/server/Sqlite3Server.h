@@ -23,11 +23,11 @@
  * Description:
  *
  * Author(s):
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2008-04-06 09:07:40 $
+ * Date:	$Date: 2010-01-06 17:36:34 $
  *
  */
 
@@ -133,6 +133,10 @@ private:
 	long	db_insert_names(const std::string, const std::string, const int, const std::string); 
 	long	db_delete_names(const std::string, const std::string, const int, const std::string); 
 	long	upd_res(std::string, long, char, DevLong *);
+
+    	// Utility functions
+	std::string escape_wildcards(const std::string &input);
+
 public:
     			SQLite3Server(std::string);
 	virtual		~SQLite3Server();

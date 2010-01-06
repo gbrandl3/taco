@@ -23,11 +23,11 @@
  * Description:
  *		mysql_getdev.cpp
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.15 $
+ * Version:	$Revision: 1.16 $
  *
- * Date:	$Date: 2008-04-06 09:07:41 $
+ * Date:	$Date: 2010-01-06 17:36:34 $
  *
  */
 
@@ -127,16 +127,16 @@ db_res *MySQLServer::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rqst
 		   pos = tmpf.find('/', 1 + (last_pos = pos));
 		   family = tmpf.substr(last_pos + 1, (pos - last_pos));
 		   member = tmpf.substr(pos + 1);
-		   query += (" name LIKE '" + tmpf + "' AND");
+		   query += (" name LIKE '" + escape_wildcards(tmpf) + "' AND");
 		 }
 		 break;
 	case 1 : pos = tmpf.find('/');
 		 domain = tmpf.substr(0, pos);	
 		 family = tmpf.substr(pos + 1);
-		 query += (" CONCAT(DOMAIN, '/', FAMILY) LIKE '" + tmpf + "' AND");
+		 query += (" CONCAT(DOMAIN, '/', FAMILY) LIKE '" + escape_wildcards(tmpf) + "' AND");
 		 break;
 	case 0 : domain = tmpf;		
-		 query += (" DOMAIN LIKE '" + tmpf + "' AND");
+		 query += (" DOMAIN LIKE '" + escape_wildcards(tmpf) + "' AND");
 		 break;
 	default: logStream->errorStream() << "To many '/' in device name." << log4cpp::eol;
 		 browse_back.db_err = 1;

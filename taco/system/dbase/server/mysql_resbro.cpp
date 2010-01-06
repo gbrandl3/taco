@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.14 $
+ * Version:	$Revision: 1.15 $
  *
- * Date:	$Date: 2008-04-06 09:07:41 $
+ * Date:	$Date: 2010-01-06 17:36:34 $
  *
  */
 
@@ -272,18 +272,15 @@ db_res *MySQLServer::resresolist_1_svc(db_res *recev)
 // The test to know if the resource is a new one is done by the index value
 // which is 1 for all new resource
 //
-    std::string query;
+	std::string query;
 
 	query = "SELECT DISTINCT NAME FROM property_device WHERE DOMAIN = '";
     	query += (user_domain + "' AND FAMILY = '" + user_family);
 	if (user_member != "*")
 	{
-		query += ("' AND MEMBER = '" + user_member + "' ORDER BY NAME ASC");
+		query += ("' AND MEMBER = '" + user_member);
 	}
-        else
-	{
-                query += ("' ORDER BY NAME ASC");
-	}
+        query += ("' ORDER BY NAME ASC");
 
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {

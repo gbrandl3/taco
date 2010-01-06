@@ -23,11 +23,11 @@
  * Description:
  *
  * Author(s):
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Date:	$Date: 2008-04-06 09:07:40 $
+ * Date:	$Date: 2010-01-06 17:36:34 $
  *
  */
 
@@ -122,12 +122,15 @@ private:
     long	upd_res(std::string, long, char, DevLong *);
     void        db_quote(std::string &);
         
-    // Cache function
+    // Cache functions
     long        fill_cache(std::string);
     int         db_find_from_cache(std::string, std::string, char **, int *);
     void        db_insert_into_cache(std::string, std::string, std::string);
     void        db_insert_into_cache(std::string, long, std::string);
     void        db_delete_from_cache(std::string);
+
+    // Utility functions
+    std::string escape_wildcards(const std::string &input);
         
 public:
     				MySQLServer(std::string, std::string, std::string);

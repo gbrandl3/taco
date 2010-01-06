@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2008-04-06 09:07:41 $
+ * Date:	$Date: 2010-01-06 17:36:34 $
  *
  */
 
@@ -143,7 +143,7 @@ long MySQLServer::fill_cache(std::string domain)
     string res_name = string(row[0]) + "/" + string(row[1]);
     
     query =  "SELECT value FROM property_device ";
-    query += "WHERE device = '" + string(row[0]) + "' AND name= '" + string(row[1]) + "' ";
+    query += "WHERE device = '" + std::string(row[0]) + "' AND name= '" + std::string(row[1]) + "' ";
     query += "ORDER BY count ASC";
 
     if (mysql_query(mysql_conn, query.c_str()) != 0)

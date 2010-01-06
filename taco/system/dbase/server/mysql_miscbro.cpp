@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: jkrueger1 $
+ *		$Author: andy_gotz $
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  *
- * Date:	$Date: 2008-04-06 09:07:41 $
+ * Date:	$Date: 2010-01-06 17:36:34 $
  *
  */
 
@@ -145,8 +145,8 @@ db_res *MySQLServer::devpersnamelist_1_svc(DevString *server)
 //
     std::string query;
 
-    query = "SELECT DISTINCT SUBSTRING_INDEX(SERVER,'/',-1) FROM device WHERE SERVER like '";
-    query += (user_server + "/%' ORDER BY SERVER ASC");
+    query = "SELECT DISTINCT SUBSTRING_INDEX(SERVER,'/',-1) FROM device WHERE SERVER LIKE '";
+    query += (escape_wildcards(user_server) + "/%' ORDER BY SERVER ASC");
     if (mysql_query(mysql_conn, query.c_str()) != 0)
     {
 	logStream->errorStream() << mysql_error(mysql_conn) << log4cpp::eol;
