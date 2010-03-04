@@ -29,9 +29,9 @@
  *
  * Original   :	September 2002
  *
- * Version:	$Revision: 1.8 $
+ * Version:	$Revision: 1.9 $
  *
- * Date:	$Date: 2009-11-17 10:42:08 $
+ * Date:	$Date: 2010-03-04 12:18:20 $
  *
  *********************************************************************/ 
 
@@ -103,14 +103,22 @@ class AttrAccess
 		long	get_tango_data_type (long taco_data_type);
 		long	get_taco_data_type (long tango_data_type);
 		long	get_taco_array_data_type (long tango_data_type);
-		long  check_requested_data_type (long request_type, long attr_type, 
+		long    check_requested_data_type (long request_type, long attr_type, 
 												   DevLong *error);
-		long  convert_data (long data_type, void *data_ptr,
+		long    convert_data (long data_type, void *data_ptr,
 								  long conv_data_type, void *conv_data_ptr, DevLong *error);
 		long	to_taco_sequence(Tango::DeviceAttribute , DevArgument , 
 								    DevType , DevType,long , DevLong *);	
-		long	to_xdr_sequence(DevArgument , DevArgument , DevType , DevLong *);	
+		long	to_xdr_sequence(DevArgument , DevArgument , DevType , DevLong *);
 		
+#ifdef DevState
+#undef DevState
+#endif		
+		short   tango_to_taco_state (Tango::DevState);
+		Tango::DevState taco_to_tango_state (short);	
+#ifndef DevState
+#define DevState	4
+#endif		
 			
 		char	attr_name[80];
 		char	device_name[80];
@@ -124,6 +132,8 @@ class AttrAccess
 		short	tango_device;
 		short   is_boolean;
 		short   is_uchar;
+		short   is_state;
+		short   is_64;
 		
 		long	taco_signal_index;
 		long	taco_access;
