@@ -44,7 +44,7 @@ endif
 
 nobase_include_HEADERS  = private/ApiP.h
 
-include_HEADERS 	= API.h DevSec.h hdb.h hdb_out.h Admin.h DevCmds.h DevErrors.h DevStates.h DserverTeams.h macros.h
+include_HEADERS 	= API.h DevSec.h Admin.h DevCmds.h DevErrors.h DevStates.h DserverTeams.h macros.h
 
 noinst_HEADERS		= taco_utils.h _count.h
 

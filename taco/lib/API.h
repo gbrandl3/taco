@@ -26,13 +26,13 @@
  *		the applications programmers interface.
  *
  * Author(s):	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: jensmeyer $
  *
  * Original:	January 1991
  *
- * Version:	$Revision: 1.23 $
+ * Version:	$Revision: 1.24 $
  *
- * Date:	$Date: 2008-09-10 16:34:42 $
+ * Date:	$Date: 2010-03-04 12:23:50 $
  *
  *********************************************************************-*/
 
@@ -101,7 +101,7 @@
  */
 #ifdef _IDENT
 static char APIh[] =
-"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.23 2008-09-10 16:34:42 jkrueger1 Exp $";
+"@(#)$Header: /home/jkrueger1/sources/taco/backup/taco/lib/API.h,v 1.24 2010-03-04 12:23:50 jensmeyer Exp $";
 #endif /* _IDENT */
 
 /*
@@ -309,13 +309,6 @@ typedef void (*DevCallbackFunction(devserver, void*, DevCallbackData));
  */
 #include <dc.h>
 
-
-#if !defined(WIN32)
-/*
- * HDB library include file
- */
-#include <hdb_out.h>
-#endif
 
 /*
  *  Function definitions for API-library
