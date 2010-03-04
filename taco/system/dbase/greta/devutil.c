@@ -26,13 +26,13 @@
  * 		  device server information (device list, device resources..)
  *
  * Author         : E. Taurel
- *		  $Author: jkrueger1 $
+ *		  $Author: jensmeyer $
  *
  * Original       : June 1998
  *
- * Version	: $Revision: 1.6 $
+ * Version	: $Revision: 1.7 $
  *
- * Date		: $Date: 2008-04-06 09:07:38 $
+ * Date		: $Date: 2010-03-04 12:28:48 $
  *
  */
 
@@ -64,10 +64,10 @@
 #include <dc.h>
 #if HAVE_SIGGEN_H
 #include <siggen.h>
+#include <hdb_out.h>
 #endif
 
 
-#include <hdb_out.h>
 
 #include <greta.h>
 
@@ -103,9 +103,11 @@
 static void printtype(int,char *);
 static long get_print_daemon(char *,char *);
 static long ask_daemon(char *,char *);
+#if HAVE_SIGGEN_H
 static long get_type_str(long ,char *,long *);
 static void disp_storage(HdbSigConf *,char *);
 static void disp_values(HdbSigOut *,char *);
+#endif
 static long objinfo_sig(long,char *);
 
 
