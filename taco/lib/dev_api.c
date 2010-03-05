@@ -27,13 +27,13 @@
  *
  * Author(s)  :	Andy Goetz
  *		Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: jensmeyer $
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.44 $
+ * Version    :	$Revision: 1.45 $
  *
- * Date	    :	$Date: 2008-12-02 08:10:52 $
+ * Date	    :	$Date: 2010-03-05 15:50:35 $
  *
  ********************************************************************-*/
 
@@ -309,7 +309,7 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, D
 				len,
 				i,
 				no_database = False;
-	char			name [256],
+	char		name [256],
 				*hstring,
 				*nethost = NULL,
 				*prog_url;
@@ -317,8 +317,15 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, D
 /*
  *  first convert the device name to lower case letters
  */
+	strcpy (name, dev_name);
+	device_name = &name[0];
+	str_tolower(device_name);
+	
+	/*
 	snprintf(name, sizeof(name), "%s", dev_name);
 	device_name = str_tolower(name);
+	*/
+	
 /*
  * now check to see whether the nethost is specified in the device name e.g. 
  * "//nethost/domain/family/member" by calling the function 
