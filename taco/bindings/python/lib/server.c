@@ -23,13 +23,13 @@
  * Description: TACO server in Python
  *
  * Author(s):   J. Meyer
- *		$Author: jkrueger1 $
+ *		$Author: jensmeyer $
  *
  * Original:    June 2000
  *
- * Date:	$Date: 2008-10-15 14:48:18 $
+ * Date:	$Date: 2010-04-01 15:52:49 $
  *
- * Version:	$Revision: 1.11 $
+ * Version:	$Revision: 1.12 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -71,6 +71,13 @@ static PyObject *Server_startup(PyObject *self, PyObject *args)
 
 	dev_printdebug(DBG_STARTUP, "Got server name\n");
 	dev_printdebug(DBG_STARTUP, "name = %s, personal_name = %s\n", name, pers_name);
+
+/*
+* initialise Taco
+*/
+	
+	nethost_alloc(&error);
+
 /* 
  * start the device server
  */
@@ -114,6 +121,12 @@ static PyObject *Server_startup_nodb (PyObject *self, PyObject *args)
 		device_list[i] = PyString_AsString(py_name);
 	}
 
+/*
+* initialise Taco
+*/
+	
+	nethost_alloc(&error);
+
 /* 
  * start the device server
  */
@@ -121,6 +134,7 @@ static PyObject *Server_startup_nodb (PyObject *self, PyObject *args)
 			
         return PyInt_FromLong(0L);
 }
+
 
 static PyObject *Server_cmd_string (PyObject *self, PyObject *args)
 {
