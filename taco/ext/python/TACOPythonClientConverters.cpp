@@ -189,6 +189,10 @@ bool TACOPythonClient::convertToDevLong( PyObject* in, DevLong& value)
 bool TACOPythonClient::convertToDevULong( PyObject* in, DevULong& value)
 {
 	DevLong tmp;
+	if (PyLong_Check(in)) {
+		value = PyLong_AsUnsignedLong(in);
+		return true;
+	}
 	if (convertToDevLong( in, tmp) && 0L <= tmp) {
 		value = static_cast<DevULong>( tmp);
 		return true;
