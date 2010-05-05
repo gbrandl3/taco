@@ -57,7 +57,7 @@ CC=%{__cc} CXX=%{__cxx} ./configure --prefix=%{prefix} --enable-doxygen
 %install
 %{__rm} -rf $RPM_BUILD_ROOT
 
-%{__make} prefix=$RPM_BUILD_ROOT%{prefix}docdir=$RPM_BUILD_ROOT/%{manualdir} install
+%{__make} prefix=$RPM_BUILD_ROOT%{prefix} docdir=$RPM_BUILD_ROOT/%{manualdir} install
 %clean
 %{__rm} -rf $RPM_BUILD_ROOT
 
@@ -83,7 +83,7 @@ fi
 %files devel
 %defattr(-,root,root,755)
 %prefix/include/*
-%prefix/man/*
+%prefix/share/man/*
 %attr(755,root,root) %prefix/bin/log4cpp-config
 %attr(755,root,root) %prefix/lib/lib*.so
 %attr(644,root,root) %prefix/lib/*.*a
