@@ -43,7 +43,7 @@ dnl @license AllPermissive
 AC_DEFUN([AX_BOOST],
 [
     AC_ARG_WITH([boost],
-                AS_HELP_STRING([--with-boost=DIR],
+	AS_HELP_STRING([--with-boost=DIR],
                 [use boost (default is YES) specify the root directory for boost library (optional)]),
                 [
                 if test "$withval" = "no"; then
@@ -88,6 +88,7 @@ AC_DEFUN([AX_BOOST],
 				fi
 			done
 		fi
+		AS_CASE([$target], [x86_64-* | ia64-*], [BOOST_LDFLAGS=`echo $BOOST_LDFLAGS | sed -e 's/lib/lib64/g'`],[])
 
 		CPPFLAGS_SAVED="$CPPFLAGS"
 		CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
@@ -288,7 +289,7 @@ AC_DEFUN([AX_BOOST],
 				AC_SUBST(BOOST_CPPFLAGS)
 				AC_DEFINE(HAVE_BOOST_THREAD,,[define if the Boost::THREAD library is available])
 				BN=boost_thread
-				for ax_lib in $BN $BN-$CC $BN-$CC-mt $BN-$CC-mt-s $BN-$CC-s \
+				for ax_lib in $BN $BN-mt $BN-$CC $BN-$CC-mt $BN-$CC-mt-s $BN-$CC-s \
                               lib$BN lib$BN-$CC lib$BN-$CC-mt lib$BN-$CC-mt-s lib$BN-$CC-s \
                               $BN-mgw $BN-mgw $BN-mgw-mt $BN-mgw-mt-s $BN-mgw-s ; do
 				    AC_CHECK_LIB($ax_lib, main, [BOOST_THREAD_LIB="-l$ax_lib" AC_SUBST(BOOST_THREAD_LIB) link_thread="yes" break],
