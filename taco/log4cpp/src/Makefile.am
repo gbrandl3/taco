@@ -57,4 +57,6 @@ liblog4cpp_la_SOURCES = \
 	AbortAppender.cpp \
 	SmtpAppender.cpp
 
+liblog4cpp_la_LIBADD = @BOOST_THREAD_LIB@ @BOOST_SYSTEM_LIB@
+
 liblog4cpp_la_LDFLAGS = -version-info @LT_VERSION@
