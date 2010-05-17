@@ -29,10 +29,10 @@ kill_procs()
 	esac
 	
 	proc_name=$1
-	number_of_procs=`ps $PSARGS | grep -v $0 | grep -v grep | grep $proc_name | wc -l`
-	pid_list=`ps $PSARGS | grep -v grep | grep -v $0 | grep $proc_name | awk '{print $1}'`
-	printf "There are %d %s processes:\n" $number_of_procs $proc_name 
+	pid_list=`ps $PSARGS | awk '$2 ~ /^'$proc_name'$/ {print $1}'`
+	number_of_procs=`echo $pid_list | wc -w`
 
+	printf "There are %d %s processes:\n" $number_of_procs $proc_name 
 	for i in $pid_list ; do
 		echo "Killing process $i"
 		kill $i
