@@ -39,6 +39,7 @@ exec_prefix=@exec_prefix@
 command=@sbindir@/Manager
 required_files=@sysconfdir@/tacoenv.sh
 start_precmd="taco_precmd"
+start_postcmd="taco_postcmd"
 
 taco_precmd()
 {
@@ -54,6 +55,35 @@ taco_precmd()
 		command_args="$command_args -security"
 	fi
 	command_args="$command_args -${TACO_DATABASE:-dbm}"
+}
+
+taco_postcmd()
+{
+	. @sysconfdir@/tacoenv.sh
+	if [ ${TACO_DATABASE:-dbm} = dbm ] ; then
+		new=`ls -l ${DBM_DIR}/* 2>/dev/null | awk '{print $5;}' | sort | uniq | wc -l`
+		if [ $new -le 1 ] ;  then
+			info "Initialization of the database:"
+			if db_fillup2 ; then
+				info "TACO database successfully loaded"
+				return 0
+			else
+				err "TACO database not completely loaded"
+				return 1
+			fi
+		fi
+	elif test x"${TACO_DATABASE}" = x"sqlite3" ; then
+		new=`sqlite3 ${DBM_DIR}/tango 'select count(*) from property_device'`
+		if [ $new -eq 0 ] ; then
+			info "Initialization of the database:"
+			if db_fillup2 ; then
+				info "TACO database successfully loaded"
+			else
+				err "TACO database not completely loaded"
+				return 1
+			fi
+		fi
+	fi
 }
 
 # set defaults
