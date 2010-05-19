@@ -25,13 +25,13 @@
  * Description: Interface for the security system
  *
  * Author(s)  : Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: jensmeyer $
  *
  * Original   : December 1993
  *
- * Version    :	$Revision: 1.20 $
+ * Version    :	$Revision: 1.21 $
  *
- * Date       :	$Date: 2008-10-23 05:28:17 $
+ * Date       :	$Date: 2010-05-19 15:56:57 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -434,18 +434,12 @@ static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
 	res_tab.resource_adr  = &default_access;
 
 /*
- * if not using the default nethost then add it to the resource path
+ * Add the nethost to the resource path
  * so that db_getresource() queries the appropriate static database
  */
-	if (i_nethost > 0)
-	{
-		snprintf (res_path, sizeof(res_path), "//%s/SEC/MINIMAL/ACC_RIGHT",multi_nethost[i_nethost].nethost);
-	}
-	else
-	{
-		snprintf (res_path, sizeof(res_path), "SEC/MINIMAL/ACC_RIGHT");
-	}
-
+ 
+	snprintf (res_path, sizeof(res_path), "//%s/SEC/MINIMAL/ACC_RIGHT",multi_nethost[i_nethost].nethost);
+	
 	if (db_getresource (res_path, &res_tab, res_tab_size, error)==DS_NOTOK)
 	{
 		return (DS_NOTOK);
@@ -556,19 +550,10 @@ static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
 
 /*
  * Prepare the resource path.
- *
- * If not using the default nethost then add it to the resource path
- * so that db_getresource() queries the appropriate static database
  */
-	if (i_nethost > 0)
-	{
-		snprintf (res_path, sizeof(res_path), "//%s/SEC/USER/ACC_RIGHT",multi_nethost[i_nethost].nethost);
-	}
-	else
-	{
-		snprintf (res_path, sizeof(res_path), "SEC/USER/ACC_RIGHT");
-	}
-
+ 
+	snprintf (res_path, sizeof(res_path), "//%s/SEC/USER/ACC_RIGHT",multi_nethost[i_nethost].nethost);
+	
 	ret = check_access_hierarchy (dev_name, access_right, user_auth.user_name, res_path, error);
 	if (ret != DS_WARNING)
 	{
@@ -581,14 +566,7 @@ static long sec_check (char *dev_name, long access_right, SecUserAuth user_auth,
 	 * check the group access hierarchy for DOMAIN/FAMILY/MEMBER.
 	 */
 
-	if (i_nethost > 0)
-	{
-		snprintf (res_path, sizeof(res_path), "//%s/SEC/GROUP/ACC_RIGHT",multi_nethost[i_nethost].nethost);
-	}
-	else
-	{
-		snprintf (res_path, sizeof(res_path), "SEC/GROUP/ACC_RIGHT");
-	}
+	snprintf (res_path, sizeof(res_path), "//%s/SEC/GROUP/ACC_RIGHT",multi_nethost[i_nethost].nethost);
 
 	ret = check_access_hierarchy (dev_name, access_right, 
 	    user_auth.group_name, res_path, error);
@@ -803,18 +781,9 @@ static long sec_user_ident (SecUserAuth user_auth,
 
 /*
  * Prepare the resource path.
- *
- * If not using the default nethost then add it to the resource path
- * so that db_getresource() queries the appropriate static database
  */
-	if (i_nethost > 0)
-	{
-		snprintf (res_path, sizeof(res_path), "//%s/SEC/USER/IDENT",multi_nethost[i_nethost].nethost);
-	}
-	else
-	{
-		snprintf (res_path, sizeof(res_path), "SEC/USER/IDENT");
-	}
+ 
+	snprintf (res_path, sizeof(res_path), "//%s/SEC/USER/IDENT",multi_nethost[i_nethost].nethost);
 
 	if (db_getresource (res_path, &res_tab, 1, error) == DS_NOTOK)
 	{
@@ -922,18 +891,9 @@ static long sec_user_ident (SecUserAuth user_auth,
 
 /*
  * Prepare the resource path.
- *
- * If not using the default nethost then add it to the resource path
- * so that db_getresource() queries the appropriate static database
  */
-	if (i_nethost > 0)
-	{
-		snprintf (res_path, sizeof(res_path), "//%s/SEC/GROUP/IDENT",multi_nethost[i_nethost].nethost);
-	}
-	else
-	{
-		snprintf (res_path, sizeof(res_path), "SEC/GROUP/IDENT");
-	}
+ 
+	snprintf (res_path, sizeof(res_path), "//%s/SEC/GROUP/IDENT",multi_nethost[i_nethost].nethost);
 
 	if (db_getresource (res_path, &res_tab, 1, error) == DS_NOTOK)
 	{
