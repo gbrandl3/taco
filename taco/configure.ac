@@ -18,7 +18,7 @@ dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_INIT([TACO], [3.99.70], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.124 $)dnl
+AC_REVISION($Revision: 1.125 $)dnl
 AC_COPYRIGHT([(C) 1990-2008 ESRF])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([config.h.in])
@@ -27,7 +27,7 @@ AC_CONFIG_MACRO_DIR(m4)
 
 TACO_CHECK_SYSTEM
 
-AC_SUBST(LIB_VERSION, [15:3:0])
+AC_SUBST(LIB_VERSION, [15:4:0])
 
 TACO_CHECK_SIZEOF_TYPES
 
