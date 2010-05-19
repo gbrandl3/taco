@@ -35,9 +35,9 @@
  *
  * Original   :	December 1999
  *
- * Version    : $Revision: 1.11 $
+ * Version    : $Revision: 1.12 $
  *
- * Date       : $Date: 2009-12-08 12:33:01 $
+ * Date       : $Date: 2010-05-19 15:58:34 $
  *
  ********************************************************************-*/
 
@@ -1052,15 +1052,26 @@ static CORBA::Any tango_argin_to_any(long argin_type, long tango_type, void *arg
 
 		case D_SHORT_TYPE :
 		{
-			if (tango_type != Tango::DEV_SHORT)
+			switch (tango_type)
 			{
-				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
-						(const char*)"TANGO argin type not Tango::DEV_SHORT ", 
-		                		(const char *)"tango_argin_to_any()");
-			}
-			short *argin_short;
-			argin_short = (short*)argin;
-			send <<= *argin_short;
+				case Tango::DEV_SHORT:
+					short *argin_short;
+					argin_short = (short*)argin;
+					send <<= *argin_short;
+					break;
+				
+				case Tango::DEV_BOOLEAN:
+					bool *argin_bool;
+					argin_bool = (bool*)argin;
+					send <<= CORBA::Any::from_boolean(*argin_bool);
+					break;
+				
+				default:
+					Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
+						(const char*)"TANGO argin type not Tango::DEV_SHORT or Tango::DEV_BOOLEAN", 
+		                (const char *)"tango_argin_to_any()");
+					break;
+			}			
 			break;
 		}
 			
@@ -1356,62 +1367,72 @@ static void tango_any_to_argout(long argout_type, long tango_type, CORBA::Any re
 		}
 
 		case D_SHORT_TYPE :
-		{
-			short tango_short;
+		{		
 			short *argout_short;
-			Tango::DevState tango_state;
-
-			if ((tango_type != Tango::DEV_SHORT) &&
-			    (tango_type != Tango::DEV_STATE))
-			{
-				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
-						(const char*)"tango argout type is not Tango::DEV_SHORT", 
-				                (const char *)"tango_any_to_argout()");
-			}
 			argout_short = (short*)argout;
-			if (tango_type == Tango::DEV_SHORT)
+			
+			switch (tango_type)
 			{
-				received >>= tango_short;
-				*argout_short = tango_short;
-			}
-			if (tango_type == Tango::DEV_STATE)
-			{
-				received >>= tango_state;
-//
-// convert TANGO:Devstate type to equivalent TACO state
-//
-				switch (tango_state) 
-				{
-					case (Tango::ON) : *argout_short = DEVON; 
+				case Tango::DEV_SHORT:
+					short tango_short;
+					received >>= tango_short;
+					*argout_short = tango_short;
+					break;
+				
+				case Tango::DEV_STATE:
+					Tango::DevState tango_state;
+					received >>= tango_state;
+					
+					//
+					// convert TANGO:Devstate type to equivalent TACO state
+					//
+					
+					switch (tango_state) 
+					{
+						case (Tango::ON) : *argout_short = DEVON; 
 					            break;
-					case (Tango::OFF) : *argout_short = DEVOFF; 
+						case (Tango::OFF) : *argout_short = DEVOFF; 
 					             break;
-					case (Tango::CLOSE) : *argout_short = DEVCLOSE; 
+						case (Tango::CLOSE) : *argout_short = DEVCLOSE; 
 					             break;
-					case (Tango::OPEN) : *argout_short = DEVOPEN; 
+						case (Tango::OPEN) : *argout_short = DEVOPEN; 
 					             break;
-					case (Tango::INSERT) : *argout_short = DEVINSERTED; 
+						case (Tango::INSERT) : *argout_short = DEVINSERTED; 
 					             break;
-					case (Tango::EXTRACT) : *argout_short = DEVEXTRACTED; 
+						case (Tango::EXTRACT) : *argout_short = DEVEXTRACTED; 
 					             break;
-					case (Tango::MOVING) : *argout_short = DEVMOVING; 
+						case (Tango::MOVING) : *argout_short = DEVMOVING; 
 					             break;
-					case (Tango::STANDBY) : *argout_short = DEVSTANDBY; 
+						case (Tango::STANDBY) : *argout_short = DEVSTANDBY; 
 					             break;
-					case (Tango::FAULT) : *argout_short = DEVFAULT; 
+						case (Tango::FAULT) : *argout_short = DEVFAULT; 
 					             break;
-					case (Tango::INIT) : *argout_short = DEVINIT; 
+						case (Tango::INIT) : *argout_short = DEVINIT; 
 					             break;
-					case (Tango::RUNNING) : *argout_short = DEVRUN; 
+						case (Tango::RUNNING) : *argout_short = DEVRUN; 
 					             break;
-					case (Tango::ALARM) : *argout_short = DEVALARM; 
+						case (Tango::ALARM) : *argout_short = DEVALARM; 
 					             break;
-					case (Tango::DISABLE) : *argout_short = DEVDISABLED; 
+						case (Tango::DISABLE) : *argout_short = DEVDISABLED; 
 					             break;
-					default : *argout_short = DEVUNKNOWN; 
+						default : *argout_short = DEVUNKNOWN; 
 					             break;
-				};
-			}
+					}
+					break;
+					
+				case Tango::DEV_BOOLEAN:
+					bool tango_bool;
+					received >>= CORBA::Any::to_boolean(tango_bool);
+					
+					*argout_short = (short)tango_bool;
+					break;
+					
+				default:
+					Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
+						(const char*)"tango argout type is not Tango::DEV_SHORT, Tango::DEV_BOOLEAN or Tango::DEV_STATE", 
+				        (const char *)"tango_any_to_argout()");
+					break;
+			}			
 			break;
 		}
 
@@ -1806,60 +1827,71 @@ static void tango_any_to_argout_raw(long argout_type, long tango_type, CORBA::An
 
 		case D_SHORT_TYPE :
 		{
-			short tango_short;
-			Tango::DevState tango_state;
 			short taco_short;
 
-			if ((tango_type != Tango::DEV_SHORT) &&
-			    (tango_type != Tango::DEV_STATE))
+			switch (tango_type)
 			{
-				Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
-						(const char*)"tango argout type is not Tango::DEV_SHORT", 
-				                (const char *)"tango_any_to_argout_raw()");
-			}
-			if (tango_type == Tango::DEV_SHORT)
-			{
-				received >>= tango_short;
-				taco_short = tango_short;
-			}
-			else
-			{
-				received >>= tango_state;
-//
-// convert TANGO:Devstate type to equivalent TACO state
-//
-				switch (tango_state) 
-				{
-					case (Tango::ON) : taco_short = DEVON; 
+				case Tango::DEV_SHORT:
+					short tango_short;
+					received >>= tango_short;
+					taco_short = tango_short;
+					break;
+				
+				case Tango::DEV_STATE:
+					Tango::DevState tango_state;
+					received >>= tango_state;
+
+					//
+					// convert TANGO:Devstate type to equivalent TACO state
+					//
+					
+					switch (tango_state) 
+					{
+						case (Tango::ON) : taco_short = DEVON; 
 					            break;
-					case (Tango::OFF) : taco_short = DEVOFF; 
+						case (Tango::OFF) : taco_short = DEVOFF; 
 					             break;
-					case (Tango::CLOSE) : taco_short = DEVCLOSE; 
+						case (Tango::CLOSE) : taco_short = DEVCLOSE; 
 					             break;
-					case (Tango::OPEN) : taco_short = DEVOPEN; 
+						case (Tango::OPEN) : taco_short = DEVOPEN; 
 					             break;
-					case (Tango::INSERT) : taco_short = DEVINSERTED; 
+						case (Tango::INSERT) : taco_short = DEVINSERTED; 
 					             break;
-					case (Tango::EXTRACT) : taco_short = DEVEXTRACTED; 
+						case (Tango::EXTRACT) : taco_short = DEVEXTRACTED; 
 					             break;
-					case (Tango::MOVING) : taco_short = DEVMOVING; 
+						case (Tango::MOVING) : taco_short = DEVMOVING; 
 					             break;
-					case (Tango::STANDBY) : taco_short = DEVSTANDBY; 
+						case (Tango::STANDBY) : taco_short = DEVSTANDBY; 
 					             break;
-					case (Tango::FAULT) : taco_short = DEVFAULT; 
+						case (Tango::FAULT) : taco_short = DEVFAULT; 
 					             break;
-					case (Tango::INIT) : taco_short = DEVINIT; 
+						case (Tango::INIT) : taco_short = DEVINIT; 
 					             break;
-					case (Tango::RUNNING) : taco_short = DEVRUN; 
+						case (Tango::RUNNING) : taco_short = DEVRUN; 
 					             break;
-					case (Tango::ALARM) : taco_short = DEVALARM; 
+						case (Tango::ALARM) : taco_short = DEVALARM; 
 					             break;
-					case (Tango::DISABLE) : taco_short = DEVDISABLED; 
+						case (Tango::DISABLE) : taco_short = DEVDISABLED; 
 					             break;
-					default : taco_short = DEVUNKNOWN; 
+						default : taco_short = DEVUNKNOWN; 
 					             break;
-				};
-			}
+					}
+					break;
+					
+				case Tango::DEV_BOOLEAN:
+					bool tango_bool;
+					received >>= CORBA::Any::to_boolean(tango_bool);
+					
+					taco_short = (short)tango_bool;
+					break;
+					
+				default:
+					Tango::Except::throw_exception((const char*)"DSAPI_IncorrectArguments", 
+						(const char*)"tango argout type is not Tango::DEV_SHORT, Tango::DEV_BOOLEAN or Tango::DEV_STATE", 
+				        (const char *)"tango_any_to_argout_raw()");
+					break;
+			}			
+			
 			dc_datacmd.argout_type = argout_type;
 			dc_datacmd.argout = &taco_short;
 			status = dc_dataconvert(&dc_datacmd, 1, &dc_error);
@@ -2244,8 +2276,6 @@ static long tango_to_taco_type(long tango_type)
 			taco_type = D_VOID_TYPE;
 			break;
 		case Tango::DEV_BOOLEAN : 
-			taco_type = D_BOOLEAN_TYPE;
-			break;
 		case Tango::DEV_STATE :
 		case Tango::DEV_SHORT : 
 			taco_type = D_SHORT_TYPE;
