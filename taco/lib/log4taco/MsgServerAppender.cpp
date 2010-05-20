@@ -6,7 +6,7 @@
  * See the COPYING file for the terms of usage and distribution.
  */
 
-#include <PortabilityImpl.hh>
+#include <log4cpp/Portability.hh>
 #include <log4cpp/Category.hh>
 #include <log4cpp/FactoryParams.hh>
 
