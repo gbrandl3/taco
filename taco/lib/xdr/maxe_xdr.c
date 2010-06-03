@@ -25,13 +25,13 @@
  * Description: xdr_routines for maxe types.
  *
  * Author(s):   Timo Mettala
- *		$Author: jkrueger1 $
+ *		$Author: jensmeyer $
  *
  * Original:    June 1992
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2008-04-06 09:07:22 $
+ * Date:	$Date: 2010-06-03 09:16:40 $
  *
  *******************************************************************-*/
 
@@ -47,11 +47,11 @@ xdr_DevMulMove(xdrs, objp)
 	DevMulMove *objp;
 {
 	if (!xdr_vector(xdrs, (char *)objp->action, 8,
-		        sizeof(long), (xdrproc_t)xdr_DevLong)) {
+		        sizeof(DevLong), (xdrproc_t)xdr_DevLong)) {
 		return (FALSE);
      	}
      	if (!xdr_vector(xdrs, (char *)objp->delay, 8,
-		        sizeof(long), (xdrproc_t)xdr_DevLong)) {
+		        sizeof(DevLong), (xdrproc_t)xdr_DevLong)) {
 	  	return (FALSE);
   	}
  	if (!xdr_vector(xdrs, (char *)objp->position, 8,
