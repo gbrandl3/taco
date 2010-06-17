@@ -15,11 +15,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-AM_CPPFLAGS 	= -I$(top_srcdir)/ext/include @TACO_INCLUDES@ \
-		-I$(top_srcdir)/log4cpp/include \
-		-I$(top_builddir)/log4cpp/include
+AM_CPPFLAGS 	= -I$(top_srcdir)/ext/include @TACO_INCLUDES@ @LOG4CPP_CFLAGS@
 
-AM_CXXFLAGS 	= -Wall
+AM_CXXFLAGS 	= -Wall -DTACO_CLIENT_RUNTIME_TYPE_CHECK
 
 lib_LTLIBRARIES = libTACOExtensions.la
 

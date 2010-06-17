@@ -34,14 +34,15 @@
 #include <private/ApiP.h>
 #include <DevSec.h>
 
-pthread_mutex_t TACO::Client::mMutex = PTHREAD_MUTEX_INITIALIZER;
-
 void TACO::synchronize( double timeout) throw (::TACO::Exception)
 {
 	struct timeval t;
 	assign( t, timeout);
 	DevLong e;
-	if (dev_synch( &t, &e) != DS_OK) {
+	pthread_mutex_lock(&TACO::mMutex);
+	DevLong res = dev_synch( &t, &e);
+	pthread_mutex_unlock(&TACO::mMutex);
+	if (res != DS_OK) {
 		throw ::TACO::Exception( e);
 	}
 }
@@ -140,7 +141,11 @@ static std::string getCmdName(const DevCommand cmd)
 	cmdName = res_path;
 	cmdName += "/";
 	cmdName += res_name;
-        if (db_getresource(res_path, &res_tab, 1, &error) == DS_OK) {
+
+	pthread_mutex_lock(&TACO::mMutex);
+	DevLong res = db_getresource(res_path, &res_tab, 1, &error);
+	pthread_mutex_unlock(&TACO::mMutex);
+	if (res == DS_OK) {
                 if (ret_str != NULL) {
                         cmdName = ret_str;
                         free(ret_str);
@@ -162,7 +167,10 @@ void TACO::Client::connectClient() throw (::TACO::Exception)
 
 	db_devinfo_call info;
 
-	if (db_deviceinfo(const_cast<char *>(sTemp.c_str()), &info, &e) != DS_OK)
+	pthread_mutex_lock(&TACO::mMutex);
+	DevLong res = db_deviceinfo(const_cast<char *>(sTemp.c_str()), &info, &e); 
+	pthread_mutex_unlock(&TACO::mMutex);
+	if (res != DS_OK)
 	{
 		mDeviceHandle = 0;
 		mConnected = false;
@@ -173,10 +181,16 @@ void TACO::Client::connectClient() throw (::TACO::Exception)
 	{
 		m_dc.device_name = const_cast<char *>(mName.c_str());
 		m_dc.dc_dev_error = &dc_error;
+		pthread_mutex_lock(&TACO::mMutex);
 		mConnected = dc_import(&m_dc, 1, &e) == DS_OK;
+		pthread_mutex_lock(&TACO::mMutex);
 	}
 	else
+	{
+		pthread_mutex_lock(&TACO::mMutex);
 		mConnected =  dev_import( const_cast<char*>(mName.c_str()), mAccess, &mDeviceHandle, &e) == DS_OK;
+		pthread_mutex_unlock(&TACO::mMutex);
+	}
 	if (!mConnected)
 	{
 		mDeviceHandle = 0;
@@ -185,45 +199,53 @@ void TACO::Client::connectClient() throw (::TACO::Exception)
 	setClientNetworkProtocol(TCP);
 
 // Query the types of the server device and check them
-	try 
+	if (mPseudo)
 	{
-		if (mPseudo)
+		dc_devinf       dc_inf;
+		pthread_mutex_lock(&TACO::mMutex);
+		res = dc_dinfo(const_cast<char *>(mName.c_str()), &dc_inf, &e);
+		pthread_mutex_unlock(&TACO::mMutex);
+		if (res == DS_OK)
 		{
-			dc_devinf       dc_inf;
-			if (dc_dinfo(const_cast<char *>(mName.c_str()), &dc_inf, &e) == DS_OK)
+			for (int i = 0; i < dc_inf.devinf_nbcmd; ++i)
 			{
-				for (int i = 0; i < dc_inf.devinf_nbcmd; ++i)
+				mCommandInfoMap[dc_inf.devcmd[i].devinf_cmd] = CommandInfo(
+                               		getCmdName(dc_inf.devcmd[i].devinf_cmd),
+                               		D_VOID_TYPE, "", dc_inf.devcmd[i].devinf_argout, "");
+				switch (dc_inf.devcmd[i].devinf_argout)
 				{
-					mCommandInfoMap[dc_inf.devcmd[i].devinf_cmd] = CommandInfo(
-                                		getCmdName(dc_inf.devcmd[i].devinf_cmd),
-                                		D_VOID_TYPE, "", dc_inf.devcmd[i].devinf_argout, "");
-					if (dc_inf.devcmd[i].devinf_argout == D_DOUBLE_TYPE)
+					case D_DOUBLE_TYPE :
 						mServerTypes.insert("IOAnalogInput");
-					else if (dc_inf.devcmd[i].devinf_argout == D_ULONG_TYPE)
+						break;
+					case  D_ULONG_TYPE :
 						mServerTypes.insert("IODigitalInput");
+						break;
+					default:
+						break;
 				}
-//				m_dc.device_name = const_cast<char *>(mName.c_str());
-//				m_dc.dc_dev_error = &dc_error;
 			}
+//			m_dc.device_name = const_cast<char *>(mName.c_str());
+//			m_dc.dc_dev_error = &dc_error;
 		}
-		else
+	}
+	else
+	{
+		try 
 		{
 			mCommandInfoMap = queryAllCommandInfo( mDeviceHandle);
 			ArgGet<std::vector<std::string> > output;
 			executeCore( ::TACO::Command::DEVICE_TYPES, 0, D_VOID_TYPE, output.address(), output.type());
 			std::vector<std::string> serverTypes( output.object());
-			std::vector<std::string>::const_iterator i( serverTypes.begin());
 // mServerTypes is cleared by disconnectClient()
-			while (i != serverTypes.end()) {
-				mServerTypes.insert( *i++);
-			}
-		}
-		checkDeviceTypes();
-	} 
-	catch (::TACO::Exception) 
-	{
+			for (std::vector<std::string>::const_iterator i(serverTypes.begin()); i != serverTypes.end(); ++i) 
+				mServerTypes.insert(*i);
+		} 
+		catch (::TACO::Exception) 
+		{
 // Ignore this exception, because the old servers do not support device types
+		}
 	}
+	checkDeviceTypes();
 }
 
 void TACO::Client::connectClient( const std::string& name, DevLong access) throw (::TACO::Exception)
@@ -242,12 +264,18 @@ void TACO::Client::disconnectClient() throw (::TACO::Exception)
 		{
 			DevLong dc_error;
 			dc_dev_free d_free = {m_dc.dc_ptr, &dc_error};
-			if (dc_free(&d_free, 1, &e) != DS_OK)
+			pthread_mutex_lock(&TACO::mMutex);
+			DevLong res = dc_free(&d_free, 1, &e);
+			pthread_mutex_unlock(&TACO::mMutex);
+			if (res != DS_OK)
 				throw ::TACO::Exception(e);
 		}
 		else
 		{
-			if (dev_free( mDeviceHandle, &e) != DS_OK) {
+			pthread_mutex_lock(&TACO::mMutex);
+			DevLong res = dev_free( mDeviceHandle, &e);
+			pthread_mutex_unlock(&TACO::mMutex);
+			if (res != DS_OK) {
 				throw ::TACO::Exception( e);
 			}
 			mDeviceHandle = 0;
@@ -277,9 +305,12 @@ void TACO::Client::setClientNetworkProtocol( TACO::NetworkProtocol protocol) thr
 	if (mPseudo)
 		return;
 	DevLong e;
-	if (dev_rpc_protocol( mDeviceHandle, static_cast<DevLong>( protocol), &e) != DS_OK) {	
+
+	pthread_mutex_lock(&TACO::mMutex);
+	DevLong res = dev_rpc_protocol(mDeviceHandle, static_cast<DevLong>(protocol), &e); 
+	pthread_mutex_unlock(&TACO::mMutex);
+	if (res != DS_OK) 
 		throw ::TACO::Exception( e);
-	}
 }
 
 double TACO::Client::clientNetworkTimeout() throw (::TACO::Exception)
@@ -289,9 +320,11 @@ double TACO::Client::clientNetworkTimeout() throw (::TACO::Exception)
 	struct timeval tv = {3, 0};
 	if (!mPseudo)
 	{
-		if (dev_rpc_timeout( mDeviceHandle, CLGET_TIMEOUT, &tv, &e) != DS_OK) {	
+		pthread_mutex_lock(&TACO::mMutex);
+		DevLong res = dev_rpc_timeout( mDeviceHandle, CLGET_TIMEOUT, &tv, &e);
+		pthread_mutex_unlock(&TACO::mMutex);
+		if (res != DS_OK) 
 			throw ::TACO::Exception( e);
-		}
 	}
 	double r;
 	assign( r, tv);
@@ -306,9 +339,12 @@ void TACO::Client::setClientNetworkTimeout( double timeout) throw (::TACO::Excep
 	DevLong e;
 	struct timeval tv;
 	assign( tv, timeout);
-	if (dev_rpc_timeout( mDeviceHandle, CLSET_TIMEOUT, &tv, &e) != DS_OK) {	
+	
+	pthread_mutex_lock(&TACO::mMutex);
+	DevLong res = dev_rpc_timeout( mDeviceHandle, CLSET_TIMEOUT, &tv, &e); 
+	pthread_mutex_unlock(&TACO::mMutex);
+	if (res != DS_OK) 
 		throw ::TACO::Exception( e);
-	}
 }
 
 void TACO::Client::deviceOn() throw (::TACO::Exception)
@@ -399,7 +435,10 @@ DevLong TACO::Client::eventListen( DevEvent event, ::TACO::EventHandler* handler
 	checkConnection();
 	long id;
 	DevLong e;
-	if (dev_event_listen( mDeviceHandle, event, 0, D_VOID_TYPE, handler, userData, &id, &e) != DS_OK) {
+	pthread_mutex_lock(&TACO::mMutex);
+	DevLong res = dev_event_listen( mDeviceHandle, event, 0, D_VOID_TYPE, handler, userData, &id, &e);
+	pthread_mutex_unlock(&TACO::mMutex);
+	if (res != DS_OK) {
 		throw ::TACO::Exception( e);
 	}
 	return id;
@@ -409,9 +448,11 @@ void TACO::Client::eventUnlisten( DevEvent event, DevLong id) throw (::TACO::Exc
 {
 	checkConnection();
 	DevLong e;
-	if (dev_event_unlisten( mDeviceHandle, event, id, &e) != DS_OK) {
+	pthread_mutex_lock(&TACO::mMutex);
+	DevLong res = dev_event_unlisten( mDeviceHandle, event, id, &e);
+	pthread_mutex_unlock(&TACO::mMutex);
+	if (res != DS_OK) 
 		throw ::TACO::Exception( e);
-	}
 }
 
 void* TACO::Client::eventHandler( ::TACO::EventHandlerData data) throw ()
@@ -467,12 +508,12 @@ void TACO::Client::executeCore( DevCommand cmd, DevArgument argin, DevArgType in
 	DevLong e;
 	DevLong res;
 
-	pthread_mutex_lock(&mMutex);
+	pthread_mutex_lock(&TACO::mMutex);
 	if (mPseudo)
 		res = dc_devget(m_dc.dc_ptr, cmd, argout, outType, &e);
 	else
 		res = dev_putget(mDeviceHandle, cmd, argin, inType, argout, outType, &e); 
-	pthread_mutex_unlock(&mMutex);
+	pthread_mutex_unlock(&TACO::mMutex);
 	if (res != DS_OK)
 	{
 // 0x7FFF largest error number, hopefully never used
@@ -482,24 +523,21 @@ void TACO::Client::executeCore( DevCommand cmd, DevArgument argin, DevArgType in
 	}
 }
 
-void TACO::Client::checkDeviceType( const std::string& type) throw (::TACO::Exception)
+void TACO::Client::checkDeviceType(const std::string& type) throw (::TACO::Exception)
 {
-	if (mServerTypes.find( type) == mServerTypes.end()) {
-		throw ::TACO::Exception( ::TACO::Error::RUNTIME_ERROR, "connected device has inappropriate device type");
-	}
+	if (mServerTypes.find(type) == mServerTypes.end()) 
+		throw ::TACO::Exception(::TACO::Error::RUNTIME_ERROR, "connected device has inappropriate device type");
 }
 
 void TACO::Client::checkDeviceTypes() throw (::TACO::Exception)
 {
-	DeviceTypeSet::const_iterator i( mClientTypes.begin());
-	while (i != mClientTypes.end()) {
-		checkDeviceType( *i++);
-	}
+	for (DeviceTypeSet::const_iterator i(mClientTypes.begin()); i != mClientTypes.end(); ++i) 
+		checkDeviceType(*i);
 }
 
-void* TACO::Client::eventHandlerCaller( devserver unused, void* thisPointer, ::TACO::EventHandlerData eventHandlerData) throw ()
+void* TACO::Client::eventHandlerCaller(devserver unused, void* thisPointer, ::TACO::EventHandlerData eventHandlerData) throw ()
 {
-	return static_cast<Client*>( thisPointer)->eventHandler( eventHandlerData);
+	return static_cast<Client*>(thisPointer)->eventHandler(eventHandlerData);
 }
 
 void TACO::Client::checkConnection() throw (::TACO::Exception)

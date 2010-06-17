@@ -30,6 +30,9 @@
 #include <TACOArgPutGet.h>
 
 namespace TACO {
+	//! Mutex
+	extern pthread_mutex_t mMutex;
+
 	//! Network protocol type
 	enum NetworkProtocol {
 		//! User Datagram Protocol
@@ -147,7 +150,11 @@ namespace TACO {
 		r.resource_type = static_cast<short>( a.type());
 		r.resource_adr = a.address();
 		DevLong e;
-		if (db_getresource( const_cast<char*>( deviceName.c_str()), &r, 1, &e) != DS_OK) {
+
+		pthread_mutex_lock(&TACO::mMutex);
+		DevLong res = db_getresource( const_cast<char*>( deviceName.c_str()), &r, 1, &e);
+		pthread_mutex_unlock(&TACO::mMutex);
+		if (res != DS_OK) {
 			throw Exception( e);
 		}
 		return a.object();
@@ -178,7 +185,10 @@ namespace TACO {
 		r.resource_type = static_cast<short>( a.type());
 		r.resource_adr = a.address();
 		DevLong e;
-		if (db_putresource( const_cast<char*>( deviceName.c_str()), &r, 1, &e) != DS_OK) {
+		pthread_mutex_lock(&TACO::mMutex);
+		DevLong res = db_putresource( const_cast<char*>( deviceName.c_str()), &r, 1, &e);
+		pthread_mutex_unlock(&TACO::mMutex);
+		if (res != DS_OK) {
 			throw Exception( e);
 		}
 	}

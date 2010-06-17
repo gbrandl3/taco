@@ -430,7 +430,10 @@ public:
 		checkConnection();
 		DevLong id;
 		DevLong e;
-		if (dev_event_listen( mDeviceHandle, event, eventData, type<T>(), handler, userData, &id, &e) != DS_OK) {
+		pthread_mutex_unlock(&mMutex);
+		DevLong res = dev_event_listen( mDeviceHandle, event, eventData, type<T>(), handler, userData, &id, &e);
+		pthread_mutex_lock(&mMutex);
+		if (res != DS_OK) {
 			throw ::TACO::Exception( e);
 		}
 		return id;
@@ -592,9 +595,6 @@ private:
 
 	//! Map with the command infos of the device
 	CommandInfoMap mCommandInfoMap;
-
-	//! Mutex
-	static pthread_mutex_t mMutex;
 
 #ifdef TACO_CLIENT_RUNTIME_TYPE_CHECK
 	/**
