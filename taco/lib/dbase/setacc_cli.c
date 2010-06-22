@@ -26,13 +26,13 @@
  *              Interface to access static database
  *
  * Author(s)  : Emmanuel Taurel
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.25 $
+ * Version    :	$Revision: 1.26 $
  *
- * Date       :	$Date: 2009-09-23 11:42:34 $
+ * Date       :	$Date: 2010-06-22 07:56:54 $
  * 
  *-*******************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -1230,7 +1230,15 @@ int _DLLFunc db_putresource(const char *dev_name, Db_resource res, u_int res_num
 
 	l = 0;
 	NB_CHAR(l,dev_name,'/');
-	if (l != 2)
+	if (dev_name[0] == '/')
+	{
+		if ((l != 5) || (dev_name[1] != '/'))
+		{
+			*perr = DbErr_BadParameters;
+			return(DS_NOTOK);
+		}
+	}
+	else if (l != 2)
 	{
 		*perr = DbErr_BadParameters;
 		return(DS_NOTOK);
