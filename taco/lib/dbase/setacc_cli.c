@@ -30,9 +30,9 @@
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.26 $
+ * Version    :	$Revision: 1.27 $
  *
- * Date       :	$Date: 2010-06-22 07:56:54 $
+ * Date       :	$Date: 2010-06-22 11:09:07 $
  * 
  *-*******************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -1181,16 +1181,16 @@ int _DLLFunc db_getresource(const char *devname, Db_resource res, u_int res_num,
  */
 int _DLLFunc db_putresource(const char *dev_name, Db_resource res, u_int res_num, DevLong *perr)
 {
-	int i,j,k,k1,l;
-	int k2 = 0;
+	int 	i,j,k,k1,l;
+	int 	k2 = 0;
 	tab_putres send;
-	char tmp_rname[SIZE_C];
-	char d_name[SIZE_B];
+	char 	tmp_rname[SIZE_C];
+	char 	d_name[SIZE_B];
 	register char *temp;
-	u_int diff;
-	int big_res;
-	putres *tmp;
-	char *tmp_arr;
+	u_int	diff;
+	int 	big_res;
+	putres 	*tmp;
+	char 	*tmp_arr;
 	char	*devname;
 	DevVarCharArray *tmp_char;
 	DevVarStringArray *tmp_string;
@@ -1323,7 +1323,7 @@ int _DLLFunc db_putresource(const char *dev_name, Db_resource res, u_int res_num
 		first++;
 	}
 	devname = dev_name;
-	local_cl;
+	local_cl = cl;
 #else
 /*
  * find out which nethost has been requested for this device
@@ -2220,16 +2220,18 @@ int _DLLFunc db_putresource(const char *dev_name, Db_resource res, u_int res_num
  */
 int _DLLFunc db_delresource(const char *dev_name, char **res_name, u_int res_num,  DevLong *perr)
 {
-	int i,j,k,l;
-	arr1 send;
+	int 	i,j,k,l;
+	arr1 	send;
 	DevLong error;
-	int *recev;
-	char t_name[SIZE_B];
+	int 	*recev;
+	char 	t_name[SIZE_B];
+	char	*devname;
 	register char *tmp;
-	u_int diff;
-	long i_nethost = 0;
+	u_int 	diff;
+	long 	i_nethost = 0;
+	CLIENT 	*local_cl;
 #ifndef _OSK
-	struct timeval tout;
+	struct 	timeval tout;
 #endif
 #ifdef ALONE
 	char *serv_name = ALONE_SERVER_HOST;
@@ -2252,7 +2254,15 @@ int _DLLFunc db_delresource(const char *dev_name, char **res_name, u_int res_num
 
 	l=0;
 	NB_CHAR(l,dev_name,'/');
-	if (l != 2)
+	if (dev_name[0] == '/')
+	{
+		if ((l != 5) || (dev_name[1] != '/'))
+		{
+			*perr = DbErr_BadParameters;
+			return(DS_NOTOK);
+		}
+	}
+	else if (l != 2)
 	{
 		*perr = DbErr_BadParameters;
 		return(DS_NOTOK);
@@ -2282,6 +2292,47 @@ int _DLLFunc db_delresource(const char *dev_name, char **res_name, u_int res_num
 		clnt_control(cl,CLSET_RETRY_TIMEOUT,(char *)&retry_timeout);
 		first++;
 	}
+	devname = dev_name;
+	local_cl = cl;
+#else
+/*
+ * find out which nethost has been requested for this device
+ */
+	if ((i_nethost = get_i_nethost_by_device_name(dev_name,perr)) < 0)
+	{
+/* 
+ * The nethost is not imported, extract nethost name and import it 
+ */
+		char *nethost = extract_nethost(dev_name, perr);
+		if (*perr != DS_OK)
+			return DS_NOTOK;
+/* 
+ * The specified nethost is not in the list of imorted nethosts, therefore 
+ * call setup_config_multi() to add it 
+ */
+		if (setup_config_multi(nethost,perr) != DS_OK)
+			return(DS_NOTOK);
+/* 
+ * Find where the nethost is in the multi-nethost array 
+ */
+		i_nethost = get_i_nethost_by_name(nethost,perr);
+	}
+/* 
+ * If the RPC connection to the database server is not built, build one.
+ * The "config_flags" variable is defined as global by the device server
+ * API library. If the db_import failed, clear the configuration flag
+ * in order to recall the manager for database server RPC parameter at the
+ * next db_import (for reconnection) 
+ */
+	if ((multi_nethost[i_nethost].config_flags.database_server != True)
+			&& db_import_multi(multi_nethost[i_nethost].nethost,&error))
+	{
+		multi_nethost[i_nethost].config_flags.configuration = False;
+		*perr = DbErr_CannotCreateClientHandle;
+		return(DS_NOTOK);
+	}
+	devname = extract_device_name(dev_name,perr);
+	local_cl = multi_nethost[i_nethost].db_info->clnt;
 #endif /* ALONE */
 
 /* Allocate memory for the array of pointeur to char */
@@ -2295,7 +2346,7 @@ int _DLLFunc db_delresource(const char *dev_name, char **res_name, u_int res_num
 /* Build the full resource name (in lowercase letters) and initialize the array
   of pointer to resource name */
 
-	k = strlen(dev_name);
+	k = strlen(devname);
 	for (i=0;i<(int)res_num;i++)
 	{
 		l = strlen(res_name[i]);
@@ -2308,7 +2359,7 @@ int _DLLFunc db_delresource(const char *dev_name, char **res_name, u_int res_num
 			return(DS_NOTOK);
 		}
 
-		strcpy_tolower(send.arr1_val[i],dev_name);
+		strcpy_tolower(send.arr1_val[i],devname);
 		strcat(send.arr1_val[i], "/");
 		strcat_tolower(send.arr1_val[i],res_name[i]);
 	}
@@ -2322,9 +2373,9 @@ int _DLLFunc db_delresource(const char *dev_name, char **res_name, u_int res_num
 	tmp = (char *)strchr(send.arr1_val[0],'/');
 #endif /* OSK */
 	diff = (u_int)(tmp - send.arr1_val[0]);
-	strncpy(t_name,send.arr1_val[0],diff);
+	strncpy(t_name, send.arr1_val[0],diff);
 	t_name[diff] = 0;
-	if (strcmp(t_name,"sec") == 0)
+	if (strcmp(t_name, "sec") == 0)
 	{
 		for (j = 0;j < (int)res_num;j++)
 			free(send.arr1_val[j]);
