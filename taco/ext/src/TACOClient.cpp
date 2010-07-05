@@ -43,7 +43,7 @@ void TACO::synchronize( double timeout) throw (::TACO::Exception)
 	DevLong res = dev_synch( &t, &e);
 	pthread_mutex_unlock(&TACO::mMutex);
 	if (res != DS_OK) {
-		throw ::TACO::Exception( e);
+		throw ::TACO::Exception(e);
 	}
 }
 
@@ -276,7 +276,7 @@ void TACO::Client::disconnectClient() throw (::TACO::Exception)
 			DevLong res = dev_free( mDeviceHandle, &e);
 			pthread_mutex_unlock(&TACO::mMutex);
 			if (res != DS_OK) {
-				throw ::TACO::Exception( e);
+				throw ::TACO::Exception(e);
 			}
 			mDeviceHandle = 0;
 		}
@@ -310,7 +310,7 @@ void TACO::Client::setClientNetworkProtocol( TACO::NetworkProtocol protocol) thr
 	DevLong res = dev_rpc_protocol(mDeviceHandle, static_cast<DevLong>(protocol), &e); 
 	pthread_mutex_unlock(&TACO::mMutex);
 	if (res != DS_OK) 
-		throw ::TACO::Exception( e);
+		throw ::TACO::Exception(e);
 }
 
 double TACO::Client::clientNetworkTimeout() throw (::TACO::Exception)
@@ -324,7 +324,7 @@ double TACO::Client::clientNetworkTimeout() throw (::TACO::Exception)
 		DevLong res = dev_rpc_timeout( mDeviceHandle, CLGET_TIMEOUT, &tv, &e);
 		pthread_mutex_unlock(&TACO::mMutex);
 		if (res != DS_OK) 
-			throw ::TACO::Exception( e);
+			throw ::TACO::Exception(e);
 	}
 	double r;
 	assign( r, tv);
@@ -344,7 +344,7 @@ void TACO::Client::setClientNetworkTimeout( double timeout) throw (::TACO::Excep
 	DevLong res = dev_rpc_timeout( mDeviceHandle, CLSET_TIMEOUT, &tv, &e); 
 	pthread_mutex_unlock(&TACO::mMutex);
 	if (res != DS_OK) 
-		throw ::TACO::Exception( e);
+		throw ::TACO::Exception(e);
 }
 
 void TACO::Client::deviceOn() throw (::TACO::Exception)
@@ -439,7 +439,7 @@ DevLong TACO::Client::eventListen( DevEvent event, ::TACO::EventHandler* handler
 	DevLong res = dev_event_listen( mDeviceHandle, event, 0, D_VOID_TYPE, handler, userData, &id, &e);
 	pthread_mutex_unlock(&TACO::mMutex);
 	if (res != DS_OK) {
-		throw ::TACO::Exception( e);
+		throw ::TACO::Exception(e);
 	}
 	return id;
 }
@@ -452,7 +452,7 @@ void TACO::Client::eventUnlisten( DevEvent event, DevLong id) throw (::TACO::Exc
 	DevLong res = dev_event_unlisten( mDeviceHandle, event, id, &e);
 	pthread_mutex_unlock(&TACO::mMutex);
 	if (res != DS_OK) 
-		throw ::TACO::Exception( e);
+		throw ::TACO::Exception(e);
 }
 
 void* TACO::Client::eventHandler( ::TACO::EventHandlerData data) throw ()

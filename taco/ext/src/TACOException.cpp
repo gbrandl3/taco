@@ -25,7 +25,11 @@
 
 #include <API.h>
 
-#include <TACOException.h>
+#include "TACOException.h"
+
+#ifdef HAVE_PTHREAD_H
+#	include <pthread.h>
+#endif
 
 // It is important to include ApiP.h at the end
 #if HAVE_APIP_H
@@ -34,9 +38,16 @@
 # 	include <private/ApiP.h>
 #endif
 
+namespace TACO {
+	//! Mutex
+	extern pthread_mutex_t mMutex;
+}
+
 std::string TACO::errorString( DevLong errorNumber) throw ()
 {
-	char* tmp = dev_error_str( errorNumber);
+	pthread_mutex_lock(&TACO::mMutex);
+	char* tmp = dev_error_str(errorNumber);
+	pthread_mutex_unlock(&TACO::mMutex);
 	std::string r;
 	if (tmp != 0) {
 		r = tmp;
@@ -47,7 +58,9 @@ std::string TACO::errorString( DevLong errorNumber) throw ()
 
 std::string TACO::plainErrorString( DevLong errorNumber) throw ()
 {
-	char* tmp = dev_error_str( errorNumber);
+	pthread_mutex_lock(&TACO::mMutex);
+	char* tmp = dev_error_str(errorNumber);
+	pthread_mutex_unlock(&TACO::mMutex);
 	std::string r;
 	if (tmp != 0) {
 		r = tmp;
@@ -57,7 +70,7 @@ std::string TACO::plainErrorString( DevLong errorNumber) throw ()
 	return r;
 }
 
-void TACO::pushErrorMessage( const std::string& msg) throw ()
+void TACO::pushErrorMessage(const std::string& msg) throw ()
 {
 	dev_error_push( const_cast<char*>( msg.c_str()));
 }

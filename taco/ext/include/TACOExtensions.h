@@ -26,10 +26,11 @@
 
 #include <API.h>
 
-#include <TACOException.h>
+#include "TACOException.h"
 #include <TACOArgPutGet.h>
 
 namespace TACO {
+
 	//! Mutex
 	extern pthread_mutex_t mMutex;
 
@@ -192,6 +193,27 @@ namespace TACO {
 			throw Exception( e);
 		}
 	}
+#ifdef SWIGPYTHON
+	std::string queryResource(const std::string &path) throw (Exception)
+	{
+		std::string resName("");
+		std::string::size_type pos = path.rfind('/');
+		if (pos != std::string::npos)
+			resName = path.substr(pos + 1);	
+		return queryResource<std::string>(path.substr(0, pos), resName);
+	}
+
+	void updateResource(const std::string &path, const std::string &value) throw (Exception)
+	{
+		std::string resName("");
+		std::string::size_type pos = path.rfind('/');
+		if (pos != std::string::npos)
+			resName = path.substr(pos + 1);	
+		updateResource<std::string>(path.substr(0, pos), resName, value);
+	}
+
+#endif
+	void deleteResource(const std::string &path);
 
 	/**
 	 * Deletes a database resource.
@@ -206,6 +228,7 @@ namespace TACO {
 	 */
 	void deleteResource( const std::string& deviceName, const std::string& resourceName) throw (Exception);
 
+#ifndef SWIGPYTHON
 	/**
 	 * Splits the string into subparts, divided by delimiters
 	 * 
@@ -216,6 +239,7 @@ namespace TACO {
  	 * @return Vector containing all subparts.
 	 */
 	std::vector< std::string > extractStringTokens( const std::string& input, const std::string& delimiters = "," ) throw();
+#endif
 }
 
 #endif // TACO_EXTENSIONS_H

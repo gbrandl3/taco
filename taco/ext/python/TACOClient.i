@@ -201,6 +201,8 @@ Returns - the ouput of the command."
 %enddef
 %feature("docstring", EXECUTE_DOC) TACOClient_execute;
 
+%ignore deleteResource(const std::string &, const std::string &) throw (Exception);
+
 /*
 %thread TACO::Client;
 */

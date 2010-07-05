@@ -15,31 +15,42 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-EXTRA_DIST 		= TACOClient.i TACOStates.i
+EXTRA_DIST 		= TACOClient.i TACOStates.i TACO.i
 
-AM_CPPFLAGS 		= -I$(top_srcdir)/ext/include @TACO_INCLUDES@ @SWIG_PYTHON_CPPFLAGS@ @LOG4CPP_CFLAGS@
+AM_CPPFLAGS 		= -I$(top_srcdir)/ext/include @TACO_INCLUDES@ @AX_SWIG_PYTHON_OPT@ @LOG4CPP_CFLAGS@
 
 AM_CXXFLAGS 		= -Wall
 
-nodist_python_PYTHON	= TACOStates.py TACOClient.py
+nodist_python_PYTHON	= TACOStates.py TACOClient.py TACO.py
 
-pyexec_LTLIBRARIES 	= _TACOStates.la _TACOClient.la 
+pyexec_LTLIBRARIES 	= _TACOStates.la _TACOClient.la _TACO.la
 # TACOClient.la 
 
 nodist__TACOStates_la_SOURCES = wrap_TACOStates.cpp 
 
 nodist__TACOClient_la_SOURCES = wrap_TACOClient.cpp 
 
+nodist__TACO_la_SOURCES	= wrap_TACO.cpp
+
 _TACOClient_la_SOURCES	= TACOPythonClientConverters.cpp
 
 _TACOClient_la_LDFLAGS 	= -avoid-version -module
 _TACOClient_la_LIBADD  	= @LIB_STDCXX@ ../src/libTACOExtensions.la
 
+_TACO_la_LDFLAGS	= -avoid-version -module
+_TACO_la_LIBADD		= @LIB_STDCXX@ ../src/libTACOExtensions.la
+
+TACO.py:		wrap_TACO.cpp
+	@true
+
 TACOClient.py:		wrap_TACOClient.cpp
 	@true
 
+wrap_TACO.cpp:		$(srcdir)/TACO.i $(top_srcdir)/ext/include/TACOExtensions.h
+	@SWIG@ @AX_SWIG_PYTHON_OPT@ -threads -c++ -I$(top_srcdir)/ext/include @TACO_INCLUDES@ -o $@ $(srcdir)/TACO.i
+
 wrap_TACOClient.cpp:	$(srcdir)/TACOClient.i $(top_srcdir)/ext/include/TACOClient.h
-	@SWIG@ @SWIG_PYTHON_OPT@ -threads -c++ -I$(top_srcdir)/ext/include @TACO_INCLUDES@ -o $@ $(srcdir)/TACOClient.i
+	@SWIG@ @AX_SWIG_PYTHON_OPT@ -threads -c++ -I$(top_srcdir)/ext/include @TACO_INCLUDES@ -o $@ $(srcdir)/TACOClient.i
 
 _TACOStates_la_LDFLAGS 	= -avoid-version -module
 _TACOStates_la_LIBADD 	= @LIB_STDCXX@ ../src/libTACOExtensions.la
@@ -48,7 +59,7 @@ TACOStates.py: 		wrap_TACOStates.cpp
 	@true
 
 wrap_TACOStates.cpp: 	$(srcdir)/TACOStates.i $(top_srcdir)/ext/include/TACOStates.h
-	@SWIG@ @SWIG_PYTHON_OPT@ -c++ -I$(top_srcdir)/ext/include -o $@ $(srcdir)/TACOStates.i
+	@SWIG@ @AX_SWIG_PYTHON_OPT@ -c++ -I$(top_srcdir)/ext/include -o $@ $(srcdir)/TACOStates.i
 
 CLEANFILES		= *.pyc *.pyo wrap_*.cpp TACOStates.py
 

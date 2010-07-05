@@ -30,7 +30,7 @@
 #include <cstdlib>
 
 // TACO includes
-#include <TACOExtensions.h>
+#include "TACOExtensions.h"
 
 pthread_mutex_t TACO::mMutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -150,6 +150,15 @@ void TACO::deleteResource( const std::string& deviceName, const std::string& res
 	if (res != DS_OK) {
 		throw Exception( e);
 	}
+}
+
+void TACO::deleteResource(const std::string &path)
+{
+	std::string resName("");
+	std::string::size_type pos = path.rfind('/');
+	if (pos != std::string::npos)
+		resName = path.substr(pos + 1);	
+	deleteResource(path.substr(0, pos), resName);
 }
 
 std::vector< std::string > TACO::extractStringTokens( const std::string& input, const std::string& delimiters ) throw()
