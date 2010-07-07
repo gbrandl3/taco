@@ -23,11 +23,11 @@
  * Description:
  *
  * Authors:
- *		$Author: andy_gotz $
+ *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.24 $
+ * Version:	$Revision: 1.25 $
  *
- * Date:	$Date: 2010-01-06 17:36:34 $
+ * Date:	$Date: 2010-07-07 08:25:02 $
  *
  */
 
@@ -45,6 +45,7 @@ void MySQLServer::db_quote(std::string &value)
 		value = "\"" + value + "\"";
 	}
 }
+
 /**
  * add the escape sign '\' for all wildcards characters '_' for the 
  * MySQL database
