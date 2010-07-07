@@ -25,15 +25,35 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.10 $
+ * Version:	$Revision: 1.11 $
  *
- * Date:	$Date: 2008-06-23 10:17:58 $
+ * Date:	$Date: 2010-07-07 08:26:02 $
  *
  */
 
 #include <DevErrors.h>
 #include <Sqlite3Server.h>
 #include <algorithm>
+
+
+/**
+ * add the escape sign '\' for all wildcards characters '_' for the 
+ * MySQL database
+ *
+ * @param input string containing wildcards
+ * @return string containing escaped wildcards
+ */
+std::string SQLite3Server::escape_wildcards(const std::string &input)
+{
+	std::string tmp(input);
+	std::string::size_type pos(0);
+	while ((pos = tmp.find('_', pos)) != std::string::npos)
+	{
+		tmp.insert(pos, 1, '\\');
+		pos += 2;
+	}
+	return tmp;
+}
 
 
 /**
@@ -719,7 +739,7 @@ DevLong *SQLite3Server::unreg_1_svc(db_res *recev)
 	if (class_list.empty())
     	{
 		class_list = "'" + user_ds_name + "'";
-		query += (class_list + ") AND SERVER LIKE '%" + user_pers_name + "'");
+		query += (class_list + ") AND SERVER LIKE '%/" + escape_wildcards(user_pers_name) + "'");
 	}
 	else
 		query += (class_list + ") AND SERVER = '"+ user_ds_name + "/" + user_pers_name + "'");

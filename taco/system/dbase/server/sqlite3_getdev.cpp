@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
  *
- * Date:	$Date: 2008-06-22 19:04:05 $
+ * Date:	$Date: 2010-07-07 08:26:02 $
  *
  */
 
@@ -108,6 +108,13 @@ db_res *SQLite3Server::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rq
 /*
  * replace * with mysql wildcard %
  */
+	int index;
+
+	while ((index = tmpf.find('*')) != std::string::npos)
+	{
+		tmpf.replace(index, 1, 1, '%');
+	}
+
 #ifndef _solaris
 	switch(count(tmpf.begin(), tmpf.end(), '/'))
 #else
@@ -115,32 +122,24 @@ db_res *SQLite3Server::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rq
 #endif /* !_solaris */
 	{
 		case 2 : 
-			pos = tmpf.find('/');
-			domain = tmpf.substr(0, pos);
-			tmpf.erase(0, pos + 1);
-			pos = tmpf.find('/');
-			family = tmpf.substr(0, pos);
-			member = tmpf.substr(pos + 1);
-			if (domain != "*")
-				query += " DOMAIN LIKE '" + domain + "' AND";
-			if (family != "*")
-				query += " FAMILY LIKE '" + family + "' AND";
-			if (member != "*")
-				query += " AND MEMBER LIKE '" + member + "' AND";
-			break;
+			if( tmpf != "%/%/%" ) 
+			{	
+				pos = tmpf.find('/');
+				domain = tmpf.substr(0, pos);	
+				pos = tmpf.find('/', 1 + (last_pos = pos));
+				family = tmpf.substr(last_pos + 1, (pos - last_pos));
+				member = tmpf.substr(pos + 1);
+				query += (" name LIKE '" + escape_wildcards(tmpf) + "' AND");
+			}
 		case 1 : 
 			pos = tmpf.find('/');
 			domain = tmpf.substr(0, pos);	
 			family = tmpf.substr(pos + 1);
-			if (domain != "*")
-				query += " DOMAIN LIKE '" + domain + "' AND";
-			if (family != "*")
-				query += " AND FAMILY LIKE '" + family + "' AND";
+			query += (" CONCAT(DOMAIN, '/', FAMILY) LIKE '" + escape_wildcards(tmpf) + "' AND");
 			break;
 		case 0 : 
 			domain = tmpf;		
-			if (domain != "*")
-				query += " DOMAIN LIKE '" + tmpf + "' AND";
+			query += (" DOMAIN LIKE '" + escape_wildcards(tmpf) + "' AND");
 			break;
 		default: 
 			logStream->errorStream() << "To many '/' in device name." << log4cpp::eol;

@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2008-07-18 07:31:58 $
+ * Date:	$Date: 2010-07-07 08:26:02 $
  *
  */
 
@@ -156,7 +156,7 @@ db_res *SQLite3Server::devpersnamelist_1_svc(DevString *server)
 //
 	std::string query;
 	query = "SELECT DISTINCT SERVER FROM device WHERE SERVER like '";
-	query += (user_server + "/%' ORDER BY SERVER ASC");
+	query += (escape_wildcards(user_server) + "/%' ORDER BY SERVER ASC");
 	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{

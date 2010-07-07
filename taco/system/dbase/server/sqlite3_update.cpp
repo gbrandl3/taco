@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.6 $
+ * Version:	$Revision: 1.7 $
  *
- * Date:	$Date: 2008-06-23 10:17:58 $
+ * Date:	$Date: 2010-07-07 08:26:02 $
  *
  */
 
@@ -105,7 +105,7 @@ db_psdev_error *SQLite3Server::upddev_1_svc(db_res *dev_list)
 		dev_list.push_back(lin);
 
 		std::string query = "SELECT NAME FROM device WHERE ";
-		query += (" SERVER LIKE '" + ds_class + "/" + ds_name + "'");
+		query += (" SERVER LIKE '" + escape_wildcards(ds_class + "/" + ds_name) + "'");
 		logStream->infoStream() << "SQLite3Server::upddev_1_svc(): query = " << query << log4cpp::eol;
 		if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 		{
@@ -235,7 +235,7 @@ long SQLite3Server::db_delete_names(const std::string ds_class, const std::strin
 	if (count(dev_name.begin(), dev_name.end(), '/') != 2)
 		return DbErr_BadDevSyntax;
 
-	std::string query = "DELETE FROM device WHERE SERVER LIKE '" + ds_class + "/" + ds_name
+	std::string query = "DELETE FROM device WHERE SERVER LIKE '" + escape_wildcards(ds_class + "/" + ds_name)
                          + "' AND NAME = '" + dev_name + "'";
 	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_exec(db, query.c_str(), NULL, NULL, &zErrMsg) != SQLITE_OK)
