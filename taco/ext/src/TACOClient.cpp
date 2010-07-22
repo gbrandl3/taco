@@ -183,7 +183,7 @@ void TACO::Client::connectClient() throw (::TACO::Exception)
 		m_dc.dc_dev_error = &dc_error;
 		pthread_mutex_lock(&TACO::mMutex);
 		mConnected = dc_import(&m_dc, 1, &e) == DS_OK;
-		pthread_mutex_lock(&TACO::mMutex);
+		pthread_mutex_unlock(&TACO::mMutex);
 	}
 	else
 	{
