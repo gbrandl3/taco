@@ -47,13 +47,13 @@
  *		is totally under control of the device class.
  *	
  * Author(s)  :	Andy Goetz
- * 		$Author: jkrueger1 $
+ * 		$Author: jensmeyer $
  *
  * Original   :	April 1999
  *
- * Version    :	$Revision: 1.20 $
+ * Version    :	$Revision: 1.21 $
  *
- * Date       :	$Date: 2008-10-23 05:28:17 $
+ * Date       :	$Date: 2010-08-04 13:59:05 $
  *
  ********************************************************************-*/
 
@@ -1165,16 +1165,10 @@ long _DLLFunc dev_event_query (devserver ds, DevVarEventArray *vareventarr, DevL
 			event_name[(_Int)length] = '\0';
 
 /*
- * Setup resource path to read information about data types from the CLASS resource table,
- * but first check to see whether the device belongs to another nethost domain i.e. i_nethost != 0
+ * Setup resource path to read information about data types from the CLASS resource table
  */
-			if (ds->i_nethost > -1)
-				snprintf(res_path, sizeof(res_path), "//%s/CLASS/%s/%s", get_nethost_by_index(ds->i_nethost, error), class_name, event_name);
-/*
- * use default nethost
- */
-			else
-				snprintf (res_path, sizeof(res_path), "CLASS/%s/%s", class_name, event_name);
+
+			snprintf(res_path, sizeof(res_path), "//%s/CLASS/%s/%s", get_nethost_by_index(ds->i_nethost, error), class_name, event_name);
 
 /*
  *  read CLASS resources from database
@@ -1248,16 +1242,10 @@ static long get_event_string (devserver ds, long event, char *event_str, size_t 
 	if (!ds->no_database)
 	{
 /*
- * Create the resource path and the resource structure.  First check to see whether the device belongs to another
- * nethost domain i.e. i_nethost != 0
+ * Create the resource path and the resource structure.
  */
-		if (ds->i_nethost > 0)
-			snprintf(res_path, sizeof(res_path), "//%s/EVENTS/%d/%d", get_nethost_by_index(ds->i_nethost, error), team, server);
-/*
- * use default nethost
- */
-		else
-			snprintf(res_path, sizeof(res_path),"EVENTS/%d/%d", team, server);
+
+		snprintf(res_path, sizeof(res_path), "//%s/EVENTS/%d/%d", get_nethost_by_index(ds->i_nethost, error), team, server);
 
 		snprintf(res_name, sizeof(res_name), "%d", events_ident);
 		dev_printdebug (DBG_API, "get_events_string() : res_path = %s\n", res_path);

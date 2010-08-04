@@ -31,9 +31,9 @@
  *
  * Original   :	April 1993
  *
- * Version:	$Revision: 1.41 $
+ * Version:	$Revision: 1.42 $
  *
- * Date:		$Date: 2009-11-17 11:46:36 $
+ * Date:		$Date: 2010-08-04 13:59:46 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -573,18 +573,10 @@ long _DLLFunc taco_dev_cmd_query (devserver ds, DevVarCmdArray *varcmdarr, DevLo
 
 /*
  * Setup resource path to read information about data types from the CLASS resource table.
- * but first check to see whether the device belongs to another nethost domain i.e. i_nethost != 0
  */
-			if (ds->i_nethost > 0)
-			{
-				snprintf(res_path, sizeof(res_path), "//%s/CLASS/%s/%s", get_nethost_by_index(ds->i_nethost, error),
-		   			class_name, cmd_name);
-			}
-/*
- * use default nethost
- */
-			else
-				snprintf (res_path, sizeof(res_path), "CLASS/%s/%s", class_name, cmd_name);
+
+			snprintf(res_path, sizeof(res_path), "//%s/CLASS/%s/%s", get_nethost_by_index(ds->i_nethost, error),
+		   			 class_name, cmd_name);			
 
 /*
  *  read CLASS resources from database
@@ -717,19 +709,9 @@ static long get_cmd_string (devserver ds, long cmd, char *cmd_str, size_t len, D
 	{
 /*
  * Create the resource path and the resource structure.
- * First check to see whether the device belongs to another nethost domain i.e. i_nethost != 0
  */
-		if (ds->i_nethost > 0)
-		{
-			snprintf(res_path, sizeof(res_path), "//%s/CMDS/%d/%d", get_nethost_by_index(ds->i_nethost, error), team, server);
-		}
-/*
- * use default nethost
- */
-		else
-		{
-			snprintf(res_path, sizeof(res_path), "CMDS/%d/%d", team, server);
-		}
+
+		snprintf(res_path, sizeof(res_path), "//%s/CMDS/%d/%d", get_nethost_by_index(ds->i_nethost, error), team, server);
 
 		snprintf (res_name, sizeof(res_name), "%d", cmds_ident);
 		dev_printdebug (DBG_API, "get_cmds_string() : res_path = %s\n", res_path);
