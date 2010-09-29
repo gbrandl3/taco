@@ -39,9 +39,9 @@ TACO::CommandInfoMap TACO::queryAllCommandInfo( devserver ds) throw (TACO::Excep
 	CommandInfoMap r;
 	DevVarCmdArray info;
 	DevLong e;
-	pthread_mutex_lock(&TACO::mMutex);
+	pthread_mutex_lock(&::TACO::mMutex);
 	DevLong res = dev_cmd_query( ds, &info, &e);
-	pthread_mutex_unlock(&TACO::mMutex);
+	pthread_mutex_unlock(&::TACO::mMutex);
 	if (res != DS_OK) {
 		throw Exception( e);
 	}
@@ -76,9 +76,9 @@ TACO::EventInfoMap TACO::queryAllEventInfo( devserver ds) throw (TACO::Exception
 	EventInfoMap r;
 	DevVarEventArray info;
 	DevLong e;
-	pthread_mutex_lock(&TACO::mMutex);
+	pthread_mutex_lock(&::TACO::mMutex);
 	DevLong res = dev_event_query( ds, &info, &e);
-	pthread_mutex_unlock(&TACO::mMutex);
+	pthread_mutex_unlock(&::TACO::mMutex);
 	if (res != DS_OK) {
 		throw Exception( e);
 	}
@@ -125,9 +125,9 @@ std::vector<std::string> TACO::queryDeviceList( const std::string& serverName) t
 	unsigned int size;
 	DevLong e;
 	
-	pthread_mutex_lock(&TACO::mMutex);
+	pthread_mutex_lock(&::TACO::mMutex);
 	DevLong res = db_getdevlist( const_cast<char*>(serverName.c_str()), &list, &size, &e);
-	pthread_mutex_unlock(&TACO::mMutex);
+	pthread_mutex_unlock(&::TACO::mMutex);
 	if (res != DS_OK) {
 		throw Exception( e);
 	}
@@ -144,9 +144,9 @@ void TACO::deleteResource( const std::string& deviceName, const std::string& res
 {
 	char* r = const_cast<char*>( resourceName.c_str());
 	DevLong e;
-	pthread_mutex_lock(&TACO::mMutex);
+	pthread_mutex_lock(&::TACO::mMutex);
 	DevLong res = db_delresource( const_cast<char*>( deviceName.c_str()), &r, 1, &e);
-	pthread_mutex_unlock(&TACO::mMutex);
+	pthread_mutex_unlock(&::TACO::mMutex);
 	if (res != DS_OK) {
 		throw Exception( e);
 	}

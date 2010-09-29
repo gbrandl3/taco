@@ -45,9 +45,9 @@ namespace TACO {
 
 std::string TACO::errorString( DevLong errorNumber) throw ()
 {
-	pthread_mutex_lock(&TACO::mMutex);
+	pthread_mutex_lock(&::TACO::mMutex);
 	char* tmp = dev_error_str(errorNumber);
-	pthread_mutex_unlock(&TACO::mMutex);
+	pthread_mutex_unlock(&::TACO::mMutex);
 	std::string r;
 	if (tmp != 0) {
 		r = tmp;
@@ -58,9 +58,9 @@ std::string TACO::errorString( DevLong errorNumber) throw ()
 
 std::string TACO::plainErrorString( DevLong errorNumber) throw ()
 {
-	pthread_mutex_lock(&TACO::mMutex);
+	pthread_mutex_lock(&::TACO::mMutex);
 	char* tmp = dev_error_str(errorNumber);
-	pthread_mutex_unlock(&TACO::mMutex);
+	pthread_mutex_unlock(&::TACO::mMutex);
 	std::string r;
 	if (tmp != 0) {
 		r = tmp;

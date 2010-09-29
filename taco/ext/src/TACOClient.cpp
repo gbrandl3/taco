@@ -39,9 +39,9 @@ void TACO::synchronize( double timeout) throw (::TACO::Exception)
 	struct timeval t;
 	assign( t, timeout);
 	DevLong e;
-	pthread_mutex_lock(&TACO::mMutex);
+	pthread_mutex_lock(&::TACO::mMutex);
 	DevLong res = dev_synch( &t, &e);
-	pthread_mutex_unlock(&TACO::mMutex);
+	pthread_mutex_unlock(&::TACO::mMutex);
 	if (res != DS_OK) {
 		throw ::TACO::Exception(e);
 	}
@@ -142,9 +142,9 @@ static std::string getCmdName(const DevCommand cmd)
 	cmdName += "/";
 	cmdName += res_name;
 
-	pthread_mutex_lock(&TACO::mMutex);
+	pthread_mutex_lock(&::TACO::mMutex);
 	DevLong res = db_getresource(res_path, &res_tab, 1, &error);
-	pthread_mutex_unlock(&TACO::mMutex);
+	pthread_mutex_unlock(&::TACO::mMutex);
 	if (res == DS_OK) {
                 if (ret_str != NULL) {
                         cmdName = ret_str;
@@ -167,9 +167,9 @@ void TACO::Client::connectClient() throw (::TACO::Exception)
 
 	db_devinfo_call info;
 
-	pthread_mutex_lock(&TACO::mMutex);
+	pthread_mutex_lock(&::TACO::mMutex);
 	DevLong res = db_deviceinfo(const_cast<char *>(sTemp.c_str()), &info, &e); 
-	pthread_mutex_unlock(&TACO::mMutex);
+	pthread_mutex_unlock(&::TACO::mMutex);
 	if (res != DS_OK)
 	{
 		mDeviceHandle = 0;
@@ -181,15 +181,15 @@ void TACO::Client::connectClient() throw (::TACO::Exception)
 	{
 		m_dc.device_name = const_cast<char *>(mName.c_str());
 		m_dc.dc_dev_error = &dc_error;
-		pthread_mutex_lock(&TACO::mMutex);
+		pthread_mutex_lock(&::TACO::mMutex);
 		mConnected = dc_import(&m_dc, 1, &e) == DS_OK;
-		pthread_mutex_unlock(&TACO::mMutex);
+		pthread_mutex_unlock(&::TACO::mMutex);
 	}
 	else
 	{
-		pthread_mutex_lock(&TACO::mMutex);
+		pthread_mutex_lock(&::TACO::mMutex);
 		mConnected =  dev_import( const_cast<char*>(mName.c_str()), mAccess, &mDeviceHandle, &e) == DS_OK;
-		pthread_mutex_unlock(&TACO::mMutex);
+		pthread_mutex_unlock(&::TACO::mMutex);
 	}
 	if (!mConnected)
 	{
@@ -202,9 +202,9 @@ void TACO::Client::connectClient() throw (::TACO::Exception)
 	if (mPseudo)
 	{
 		dc_devinf       dc_inf;
-		pthread_mutex_lock(&TACO::mMutex);
+		pthread_mutex_lock(&::TACO::mMutex);
 		res = dc_dinfo(const_cast<char *>(mName.c_str()), &dc_inf, &e);
-		pthread_mutex_unlock(&TACO::mMutex);
+		pthread_mutex_unlock(&::TACO::mMutex);
 		if (res == DS_OK)
 		{
 			for (int i = 0; i < dc_inf.devinf_nbcmd; ++i)
@@ -264,17 +264,17 @@ void TACO::Client::disconnectClient() throw (::TACO::Exception)
 		{
 			DevLong dc_error;
 			dc_dev_free d_free = {m_dc.dc_ptr, &dc_error};
-			pthread_mutex_lock(&TACO::mMutex);
+			pthread_mutex_lock(&::TACO::mMutex);
 			DevLong res = dc_free(&d_free, 1, &e);
-			pthread_mutex_unlock(&TACO::mMutex);
+			pthread_mutex_unlock(&::TACO::mMutex);
 			if (res != DS_OK)
 				throw ::TACO::Exception(e);
 		}
 		else
 		{
-			pthread_mutex_lock(&TACO::mMutex);
+			pthread_mutex_lock(&::TACO::mMutex);
 			DevLong res = dev_free( mDeviceHandle, &e);
-			pthread_mutex_unlock(&TACO::mMutex);
+			pthread_mutex_unlock(&::TACO::mMutex);
 			if (res != DS_OK) {
 				throw ::TACO::Exception(e);
 			}
@@ -306,9 +306,9 @@ void TACO::Client::setClientNetworkProtocol( TACO::NetworkProtocol protocol) thr
 		return;
 	DevLong e;
 
-	pthread_mutex_lock(&TACO::mMutex);
+	pthread_mutex_lock(&::TACO::mMutex);
 	DevLong res = dev_rpc_protocol(mDeviceHandle, static_cast<DevLong>(protocol), &e); 
-	pthread_mutex_unlock(&TACO::mMutex);
+	pthread_mutex_unlock(&::TACO::mMutex);
 	if (res != DS_OK) 
 		throw ::TACO::Exception(e);
 }
@@ -320,9 +320,9 @@ double TACO::Client::clientNetworkTimeout() throw (::TACO::Exception)
 	struct timeval tv = {3, 0};
 	if (!mPseudo)
 	{
-		pthread_mutex_lock(&TACO::mMutex);
+		pthread_mutex_lock(&::TACO::mMutex);
 		DevLong res = dev_rpc_timeout( mDeviceHandle, CLGET_TIMEOUT, &tv, &e);
-		pthread_mutex_unlock(&TACO::mMutex);
+		pthread_mutex_unlock(&::TACO::mMutex);
 		if (res != DS_OK) 
 			throw ::TACO::Exception(e);
 	}
@@ -340,9 +340,9 @@ void TACO::Client::setClientNetworkTimeout( double timeout) throw (::TACO::Excep
 	struct timeval tv;
 	assign( tv, timeout);
 	
-	pthread_mutex_lock(&TACO::mMutex);
+	pthread_mutex_lock(&::TACO::mMutex);
 	DevLong res = dev_rpc_timeout( mDeviceHandle, CLSET_TIMEOUT, &tv, &e); 
-	pthread_mutex_unlock(&TACO::mMutex);
+	pthread_mutex_unlock(&::TACO::mMutex);
 	if (res != DS_OK) 
 		throw ::TACO::Exception(e);
 }
@@ -435,9 +435,9 @@ DevLong TACO::Client::eventListen( DevEvent event, ::TACO::EventHandler* handler
 	checkConnection();
 	long id;
 	DevLong e;
-	pthread_mutex_lock(&TACO::mMutex);
+	pthread_mutex_lock(&::TACO::mMutex);
 	DevLong res = dev_event_listen( mDeviceHandle, event, 0, D_VOID_TYPE, handler, userData, &id, &e);
-	pthread_mutex_unlock(&TACO::mMutex);
+	pthread_mutex_unlock(&::TACO::mMutex);
 	if (res != DS_OK) {
 		throw ::TACO::Exception(e);
 	}
@@ -448,9 +448,9 @@ void TACO::Client::eventUnlisten( DevEvent event, DevLong id) throw (::TACO::Exc
 {
 	checkConnection();
 	DevLong e;
-	pthread_mutex_lock(&TACO::mMutex);
+	pthread_mutex_lock(&::TACO::mMutex);
 	DevLong res = dev_event_unlisten( mDeviceHandle, event, id, &e);
-	pthread_mutex_unlock(&TACO::mMutex);
+	pthread_mutex_unlock(&::TACO::mMutex);
 	if (res != DS_OK) 
 		throw ::TACO::Exception(e);
 }
@@ -508,12 +508,12 @@ void TACO::Client::executeCore( DevCommand cmd, DevArgument argin, DevArgType in
 	DevLong e;
 	DevLong res;
 
-	pthread_mutex_lock(&TACO::mMutex);
+	pthread_mutex_lock(&::TACO::mMutex);
 	if (mPseudo)
 		res = dc_devget(m_dc.dc_ptr, cmd, argout, outType, &e);
 	else
 		res = dev_putget(mDeviceHandle, cmd, argin, inType, argout, outType, &e); 
-	pthread_mutex_unlock(&TACO::mMutex);
+	pthread_mutex_unlock(&::TACO::mMutex);
 	if (res != DS_OK)
 	{
 // 0x7FFF largest error number, hopefully never used
