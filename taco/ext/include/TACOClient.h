@@ -50,6 +50,9 @@ extern log4cpp::Category       *logStream;
 
 //! Contains all basic TACO classes, functions and constants
 namespace TACO {
+	//! Mutex
+	extern pthread_mutex_t mMutex;
+
 	class Client;
 
 	//! Event handler type
@@ -430,9 +433,9 @@ public:
 		checkConnection();
 		DevLong id;
 		DevLong e;
-		pthread_mutex_unlock(&mMutex);
+		pthread_mutex_lock(&::TACO::mMutex);
 		DevLong res = dev_event_listen( mDeviceHandle, event, eventData, type<T>(), handler, userData, &id, &e);
-		pthread_mutex_lock(&mMutex);
+		pthread_mutex_unlock(&::TACO::mMutex);
 		if (res != DS_OK) {
 			throw ::TACO::Exception( e);
 		}
