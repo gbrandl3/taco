@@ -152,9 +152,9 @@ namespace TACO {
 		r.resource_adr = a.address();
 		DevLong e;
 
-		pthread_mutex_lock(&TACO::mMutex);
+		pthread_mutex_lock(&::TACO::mMutex);
 		DevLong res = db_getresource( const_cast<char*>( deviceName.c_str()), &r, 1, &e);
-		pthread_mutex_unlock(&TACO::mMutex);
+		pthread_mutex_unlock(&::TACO::mMutex);
 		if (res != DS_OK) {
 			throw Exception( e);
 		}
@@ -186,9 +186,9 @@ namespace TACO {
 		r.resource_type = static_cast<short>( a.type());
 		r.resource_adr = a.address();
 		DevLong e;
-		pthread_mutex_lock(&TACO::mMutex);
+		pthread_mutex_lock(&::TACO::mMutex);
 		DevLong res = db_putresource( const_cast<char*>( deviceName.c_str()), &r, 1, &e);
-		pthread_mutex_unlock(&TACO::mMutex);
+		pthread_mutex_unlock(&::TACO::mMutex);
 		if (res != DS_OK) {
 			throw Exception( e);
 		}
