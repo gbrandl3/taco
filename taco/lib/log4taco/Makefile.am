@@ -1,13 +1,14 @@
 lib_LTLIBRARIES 	= liblog4taco.la
 
-INCLUDES 		= -I$(top_srcdir)/log4cpp/src -I$(top_srcdir)/log4cpp/include -I$(top_builddir)/log4cpp/include @TACO_INCLUDES@
+AM_CPPFLAGS 		= @TACO_INCLUDES@ @LOG4CPP_CFLAGS@
 
-include_HEADERS 	= MsgServerAppender.h
+include_HEADERS 	= MsgServerAppender.h \
+			  log4taco.h
 
 liblog4taco_la_SOURCES 	= MsgServerAppender.cpp 
 
 liblog4taco_la_LDFLAGS 	= -version-info @LIB_VERSION@
-liblog4taco_la_LIBADD 	= $(top_builddir)/log4cpp/src/liblog4cpp.la @TACO_CLIENT_CXX_LIBS@
+liblog4taco_la_LIBADD 	= @TACO_CLIENT_CXX_LIBS@ @LOG4CPP_LIBS@
 
 noinst_PROGRAMS		= MsgServerTest
 

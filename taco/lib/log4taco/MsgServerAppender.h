@@ -1,3 +1,11 @@
+/*
+ * MsgServerAppender.cpp
+ *
+ * Copyright 2007, Jens Krueger <jens.krueger@frm2.tum.de>. All rights reserved.
+ *
+ * See the COPYING file for the terms of usage and distribution.
+ */
+
 #ifndef LOG4TACO_MSGSERVERAPPENDER_H
 #define LOG4TACO_MSGSERVERAPPENDER_H
 
