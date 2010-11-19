@@ -27,13 +27,13 @@
  *            dummy database under OS9.
  *
  * Author(s):     Jens Meyer
- *            $Author: jkrueger1 $
+ *            $Author: jensmeyer $
  *
  * Original:  January 1991
  *
- * Version:   $Revision: 1.5 $
+ * Version:   $Revision: 1.6 $
  *
- * Date:              $Date: 2009-09-25 11:51:04 $
+ * Date:              $Date: 2010-11-19 09:29:16 $
  *
  */
 
@@ -575,7 +575,8 @@ static	int	fd_devnull = -1;
 		}
 		if (transp)
 		{
-			logStream->noticeStream() << "svc_destroy for message server : " << transp << log4cpp::eol;
+			if (c_flags.request_log)
+				logStream->noticeStream() << "svc_destroy for message server : " << transp << log4cpp::eol;
 			svc_destroy(transp); 
 		}
 		execvp (homedir, const_cast<char **>(cmd_argv));
