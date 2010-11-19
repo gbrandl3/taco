@@ -27,13 +27,13 @@
  *		group.
  *
  * Author(s):   Jens Meyer
- *		$Author: jkrueger1 $
+ *		$Author: jensmeyer $
  *
  * Original:    July 1993
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
 
- * Date:	$Date: 2005-07-25 13:08:21 $
+ * Date:	$Date: 2010-11-19 14:25:05 $
  *
  ********************************************************************-*/
 
@@ -217,4 +217,6 @@
 #define DevModb_protBase (CntrlTeamNumber + DS_LSHIFT(87, DS_IDENT_SHIFT))
 /* Oxford 700 cryo controller Class base */
 #define DevOxford700Base (CntrlTeamNumber + DS_LSHIFT(88, DS_IDENT_SHIFT))
+/* MecaT : Tango wrapper class for new Unulators */
+#define MecaTBase (CntrlTeamNumber + DS_LSHIFT(89, DS_IDENT_SHIFT))
 #endif	/* _CntrlDsNumbers_h */
