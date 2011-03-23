@@ -31,9 +31,9 @@
  *
  * Original   : May 1998
  *
- * Version:     $Revision: 1.18 $
+ * Version:     $Revision: 1.19 $
  *
- * Date:        $Date: 2008-12-18 07:59:06 $
+ * Date:        $Date: 2011-03-23 09:07:28 $
  *
  *-*******************************************************************/
 
@@ -261,7 +261,7 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
 
 		for (i = 0;i < k;i++)
 		{
-			if (line[i] != ' ')
+			if (line[i] != ' ' && line[i] != '\r' && line[i] != '\n')
 				break;
 		}
 		
@@ -288,7 +288,7 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
 				get_error_line(buffer,err_dev,&line_ptr);
 			*error_line = line_ptr;
 			iret = DS_NOTOK;
-
+			break;
 		case DS_OK : 
 #ifdef DEBUG
 			printf("Device definition (name_line) \n");
