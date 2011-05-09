@@ -31,9 +31,9 @@
  *
  * Original   : May 1998
  *
- * Version:     $Revision: 1.19 $
+ * Version:     $Revision: 1.20 $
  *
- * Date:        $Date: 2011-03-23 09:07:28 $
+ * Date:        $Date: 2011-05-09 11:12:15 $
  *
  *-*******************************************************************/
 
@@ -224,7 +224,10 @@ long db_analyze_data(long in_type, const char *buffer, long *nb_devdef, char ***
 			line[length_to_eol] = '\0';
 		}
 		else
-			line[strlen(line) - 1] = '\0';
+		{
+			length_to_eol = strcspn(ptr,"\r\n");
+			line[length_to_eol] = '\0';
+		}
 		k = strlen(line);
 		line_ptr++;
 		
@@ -461,7 +464,8 @@ static long TestLine(char *line, char **line1, ana_input *in, DevULong *p_line_p
 		if (in->in_type == Db_File)
 		{
 			fgets(tmp_line, sizeof(tmp_line) - 1, in->f);
-			tmp_line[strlen(tmp_line) - 1] = '\0';
+			long length_to_eol = strcspn(tmp_line,"\r\n");
+			tmp_line[length_to_eol] = '\0';
 		}
 		else
 		{
