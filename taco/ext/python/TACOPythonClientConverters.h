@@ -28,20 +28,23 @@
 
 #include <Python.h>
 #if PYTHON_API_VERSION == 1009
-typedef ssize_t Py_ssize_t;
 #define PyDoc_STR(str)	str
 #endif
 
 #ifndef HAVE_PY_SSIZE_T
+// #	if HAVE_SSIZE_T
+// typedef ssize_t Py_ssize_t;
+// #	else
 typedef int Py_ssize_t;
+// #	endif
 #endif
 
 #include <API.h>
 #include <TACOTypes.h>
 namespace TACOPythonClient {
-	bool createDevArgument( DevType type, DevArgument& arg);
+	bool createDevArgument( DevType type, DevArgument& arg) throw (::TACO::Exception);
 
-	bool convertToDevArgument( PyObject* input, DevType inputType, DevArgument& argin);
+	bool convertToDevArgument( PyObject* input, DevType inputType, DevArgument& argin) throw (::TACO::Exception);
 
 	bool convertToDevLong( PyObject* input, DevLong& value);
 
@@ -180,7 +183,7 @@ namespace TACOPythonClient {
 		return convertToDevVarArray<DevVarDoubleArray, DevDouble>( input, &convertToDevDouble);
 	}
 
-	bool convertToPyObject( DevType outputType, DevArgument argout, PyObject** output);
+	bool convertToPyObject( DevType outputType, DevArgument argout, PyObject** output) throw (::TACO::Exception);
 
 	PyObject* convertToPyTuple( DevVarStringArray* array);
 
@@ -195,6 +198,8 @@ namespace TACOPythonClient {
 	PyObject* convertToPyTuple( DevVarFloatArray* array);
 
 	PyObject* convertToPyTuple( DevVarDoubleArray* array);
+
+	PyObject* convertToPyString( DevType type);
 
 	inline void freeDevArgument( DevArgument arg)
 	{

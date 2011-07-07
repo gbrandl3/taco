@@ -33,6 +33,7 @@
 %include <std_set.i>
 #endif /*SWIGPYTHON*/
 %include <TACOException.h>
+%include <TACOResources.h>
 %header %{ 
 #include <log4cpp/Category.hh>
 // Python.h defines OVERFLOW
@@ -44,6 +45,8 @@
 #include <TACOPythonClientConverters.h>
 
 using namespace TACO;
+
+#define TACO_exception_fail(rtype, msg) { SWIG_Python_SetErrorMsg(rtype, msg);  SWIG_fail; }
 
 %}
 
@@ -65,8 +68,8 @@ using namespace TACO;
 
 %typemap(throws) ::TACO::Exception %{
 #ifdef SWIGPYTHON
+        SWIG_Python_SetErrorMsg(TACOError, $1.what());
         SWIG_PYTHON_THREAD_BEGIN_BLOCK;
-        PyErr_SetString(TACOError, $1.what());
         PyObject_SetAttr(TACOError, PyString_FromString("errcode"), PyInt_FromLong($1));
         SWIG_PYTHON_THREAD_END_BLOCK;
         SWIG_fail;
@@ -78,23 +81,91 @@ using namespace TACO;
         $result = PyList_New(0);
         if (!$result)
         {
-                PyErr_SetString(PyExc_RuntimeError, "could not create the device type list");
-                SWIG_fail;
+                TACO_exception_fail(PyExc_RuntimeError, "could not create the device type list");
         }
         for (TACO::Client::DeviceTypeSet::iterator it = $1.begin(); it != $1.end(); ++it)
         {
                 PyObject *o = PyString_FromString((*it).c_str());
-                if (!o)
+                if (!o || PyList_Append($result, o))
                 {
-                        PyErr_SetString(PyExc_RuntimeError, "could not create the device type list");
-                        SWIG_fail; 
-                }
-                if (PyList_Append($result, o))
-                {
-                        PyErr_SetString(PyExc_RuntimeError, "could not create the device type list");
-                        SWIG_fail; 
+                        TACO_exception_fail(PyExc_RuntimeError, "could not create the device type list");
                 }
                 Py_DECREF(o);
+        }
+#endif /*SWIGPYTHON*/
+%}
+
+%typemap(out) TACO::ResourceInfoSet %{
+#ifdef SWIGPYTHON
+        $result = PyDict_New();
+        if (!$result)
+        {
+                TACO_exception_fail(PyExc_RuntimeError, "could not create the device type list");
+        }
+        for (TACO::ResourceInfoSet::iterator it = $1.begin(); it != $1.end(); ++it)
+        {
+                PyObject *key = PyString_FromString(it->name.c_str());
+                PyObject *o = PyDict_New();
+                if (!o || !key || PyDict_SetItem($result, key, o))
+                {
+                        TACO_exception_fail(PyExc_RuntimeError, "could not create the resource info dictionary");
+                }
+                PyObject *tkey = PyString_FromString("type");
+                PyObject *tvalue = TACOPythonClient::convertToPyString(it->type);
+                if (!tkey || !tvalue || PyDict_SetItem(o, tkey, tvalue))
+                {
+                        TACO_exception_fail(PyExc_RuntimeError, "could not create the resource info dictionary");
+                }
+                Py_DECREF(tkey);
+                Py_DECREF(tvalue);
+
+                tkey = PyString_FromString("info");
+                tvalue = PyString_FromString(it->info.c_str());
+                if (!tkey || !tvalue || PyDict_SetItem(o, tkey, tvalue))
+                {
+                        TACO_exception_fail(PyExc_RuntimeError, "could not create the resource info dictionary");
+                }
+                Py_DECREF(tkey);
+                Py_DECREF(tvalue);
+
+                tkey = PyString_FromString("defaults");
+                tvalue = PyString_FromString(it->defaults.c_str());
+                if (!tkey || !tvalue || PyDict_SetItem(o, tkey, tvalue))
+                {
+                        TACO_exception_fail(PyExc_RuntimeError, "could not create the resource info dictionary");
+                }
+                Py_DECREF(tkey);
+                Py_DECREF(tvalue);
+
+                tkey = PyString_FromString("format");
+                tvalue = PyString_FromString(it->format.c_str());
+                if (!tkey || !tvalue || PyDict_SetItem(o, tkey, tvalue))
+                {
+                        TACO_exception_fail(PyExc_RuntimeError, "could not create the resource info dictionary");
+                }
+                Py_DECREF(tkey);
+                Py_DECREF(tvalue);
+
+                tkey = PyString_FromString("min");
+                tvalue = PyString_FromString(it->min.c_str());
+                if (!tkey || !tvalue || PyDict_SetItem(o, tkey, tvalue))
+                {
+                        TACO_exception_fail(PyExc_RuntimeError, "could not create the resource info dictionary");
+                }
+                Py_DECREF(tkey);
+                Py_DECREF(tvalue);
+
+                tkey = PyString_FromString("max");
+                tvalue = PyString_FromString(it->max.c_str());
+                if (!tkey || !tvalue || PyDict_SetItem(o, tkey, tvalue))
+                {
+                        TACO_exception_fail(PyExc_RuntimeError, "could not create the resource info dictionary");
+                }
+                Py_DECREF(tkey);
+                Py_DECREF(tvalue);
+
+                Py_DECREF(o);
+                Py_DECREF(key);
         }
 #endif /*SWIGPYTHON*/
 %}
@@ -207,6 +278,8 @@ Returns - the ouput of the command."
 %thread TACO::Client;
 */
 
+%ignore TACO::Client::execute(DevCommand cmd);
+
 %extend TACO::Client{
 #ifdef SWIGPYTHON
         PyObject *TACOClient_execute(long commandNumber, PyObject *optargs=NULL)
@@ -222,16 +295,15 @@ Returns - the ouput of the command."
                         TACO::CommandInfoMap::iterator it = map.find(commandNumber);
                         if (it == map.end())
                         {
-                                PyErr_SetString(PyExc_ValueError, "command not found in the device command list");
-                                SWIG_fail;
+                                TACO_exception_fail(PyExc_ValueError, "command not found in the device command list");
                         }
                         inputType = it->second.inputType;
                         outputType = it->second.outputType;
                 }
                 catch (const TACO::Exception &e)
                 {
+                        SWIG_Python_SetErrorMsg(TACOError, e.what());
                         SWIG_PYTHON_THREAD_BEGIN_BLOCK;
-                        PyErr_SetString(TACOError, e.what());
                         PyObject_SetAttr(TACOError, PyString_FromString("errcode"), PyInt_FromLong(e));
                         SWIG_PYTHON_THREAD_END_BLOCK;
                         SWIG_fail; 
@@ -240,15 +312,21 @@ Returns - the ouput of the command."
                 DevArgument     argin,
                                 argout;
 
-                if (!TACOPythonClient::convertToDevArgument(input, inputType, argin))
+                try
                 {
-                        PyErr_SetString(PyExc_RuntimeError, "could not convert input argument");
-                        SWIG_fail; 
+                        TACOPythonClient::convertToDevArgument(input, inputType, argin);
                 }
-                if (!TACOPythonClient::createDevArgument(outputType, argout))
+                catch (::TACO::Exception &e)
                 {
-                        PyErr_SetString(PyExc_RuntimeError, "could not convert output argument");
-                        SWIG_fail; 
+                        TACO_exception_fail(PyExc_RuntimeError, (std::string("could not convert input argument: ") + e.what()).c_str());
+                }
+                try
+                {
+                        TACOPythonClient::createDevArgument(outputType, argout);
+                }
+                catch (const ::TACO::Exception &e)
+                {
+                        TACO_exception_fail(PyExc_RuntimeError, (std::string("could not convert output argument: ") + e.what()).c_str());
                 }
    
                 try
@@ -257,28 +335,33 @@ Returns - the ouput of the command."
                         self->execute(commandNumber, argin, inputType, argout, outputType);
                         SWIG_PYTHON_THREAD_END_BLOCK;
                         PyObject *ret;
-                        if (!TACOPythonClient::convertToPyObject(outputType, argout, &ret))
-                                SWIG_fail; 
+                        try
+                        {
+                                TACOPythonClient::convertToPyObject(outputType, argout, &ret);
+                        }
+                        catch (const ::TACO::Exception &e)
+                        {
+                                TACOPythonClient::freeInputArgument(    inputType,argin);
+                                TACOPythonClient::freeOutputArgument(   outputType,argout);
+                                TACO_exception_fail(PyExc_RuntimeError, e.what());
+                        }
 //                      free(argout);
                         TACOPythonClient::freeInputArgument(    inputType,argin);
                         TACOPythonClient::freeOutputArgument(   outputType,argout);
-
-
                         return ret;
                 }
                 catch (const TACO::Exception &e)
                 {
+                        SWIG_Python_SetErrorMsg(TACOError, e.what());
                         SWIG_PYTHON_THREAD_BEGIN_BLOCK;
-                        PyErr_SetString(TACOError, e.what());
                         PyObject_SetAttr(TACOError, PyString_FromString("errcode"), PyInt_FromLong(e));
                         SWIG_PYTHON_THREAD_END_BLOCK;
                         SWIG_fail;
                 }
-                PyErr_SetString(PyExc_RuntimeError, "lost the TACO client");
-                SWIG_fail;
+                TACO_exception_fail(PyExc_RuntimeError, "lost the TACO client");
         fail:
                 return NULL;
         }
-#endif /*SWIGPYTHON*/
+#endif // SWIGPYTHON
 };
 

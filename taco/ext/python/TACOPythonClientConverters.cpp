@@ -35,33 +35,31 @@
 #endif
 #include <TACOPythonClientConverters.h>
 
-bool TACOPythonClient::createDevArgument( DevType type, DevArgument& arg)
+bool TACOPythonClient::createDevArgument( DevType type, DevArgument& arg) throw (::TACO::Exception)
 {
 	if (type != D_VOID_TYPE) {
 		DevDataListEntry data;
 		DevLong e;
 		if (xdr_get_type( type, &data, &e) != DS_OK) {
 			arg = 0;
-			PyErr_SetString( PyExc_RuntimeError, ("cannot get XDR type: " + TACO::errorString( e)).c_str());
-			return false;
+			throw ::TACO::Exception(::TACO::Error::RUNTIME_ERROR, "cannot get XDR type: " + TACO::errorString( e));
 		}
 		arg = static_cast<DevArgument>( malloc( static_cast<size_t>( data.size)));
-		if (arg == 0) {
-			PyErr_SetString( PyExc_MemoryError, "cannot allocate argument");
+		if (arg == NULL) {
+			throw ::TACO::Exception(::TACO::Error::RUNTIME_ERROR, "cannot allocate argument");
 			return false;
 		}
 		memset( arg, 0, static_cast<size_t>( data.size));
-		return true;
 	} else {
-		arg = 0;
-		return true;
+		arg = NULL;
 	}
+	return true;
 }
 
-bool TACOPythonClient::convertToDevArgument( PyObject* input, DevType inputType, DevArgument& argin)
+bool TACOPythonClient::convertToDevArgument( PyObject* input, DevType inputType, DevArgument& argin) throw (::TACO::Exception)
 {
 	if (inputType != D_VOID_TYPE) {
-		if (input != 0) {
+		if (input != NULL) {
 			// Convert PyObject to DevArgument
 			switch (inputType) {
 			case D_BOOLEAN_TYPE:
@@ -113,19 +111,16 @@ bool TACOPythonClient::convertToDevArgument( PyObject* input, DevType inputType,
 				argin = convertToDevVarDoubleArray( input);
 				break;
 			default:
-				PyErr_SetString( PyExc_RuntimeError, "unsupported or invalid input type");
-				return false;
+				throw ::TACO::Exception(::TACO::Error::RUNTIME_ERROR, "unsupported or invalid input type");
 			}
 		} else {
-			PyErr_SetString( PyExc_RuntimeError, "missing input argument");
-			return false;
+			throw ::TACO::Exception(::TACO::Error::RUNTIME_ERROR, "missing input argument");
 		}
-		if (argin == 0) {
-			PyErr_SetString( PyExc_RuntimeError, "cannot convert input argument");
-			return false;
+		if (argin == NULL) {
+			throw ::TACO::Exception(::TACO::Error::RUNTIME_ERROR, "cannot convert input argument");
 		}
 	} else {
-		argin = 0;
+		argin = NULL;
 	}
 	return true;
 }
@@ -143,24 +138,34 @@ bool TACOPythonClient::convertToDevBoolean( PyObject* in, DevBoolean& value)
 
 bool TACOPythonClient::convertToDevShort( PyObject* in, DevShort& value)
 {
-	DevLong tmp;
-	if (convertToDevLong( in, tmp) && SHRT_MIN < tmp && tmp < SHRT_MAX) {
-		value = static_cast<DevShort>( tmp);
-		return true;
-	} else {
-		return false;
+	DevLong tmpLong;
+	if (convertToDevLong( in, tmpLong))
+	{
+#if 0
+		if (tmpLong < -32768 || tmpLong > 32767)
+			return false;
+#endif
+		DevShort tmp = tmpLong;
+		if (SHRT_MIN <= tmp && tmp <= SHRT_MAX) {
+			value = static_cast<DevShort>( tmp);
+			return true;
+		}
 	}
+	return false;
 }
 
 bool TACOPythonClient::convertToDevUShort( PyObject* in, DevUShort& value)
 {
-	DevLong tmp;
-	if (convertToDevLong( in, tmp) && 0L <= tmp && tmp < USHRT_MAX) {
-		value = static_cast<DevUShort>( tmp);
-		return true;
-	} else {
-		return false;
+	DevULong tmp;
+	if (convertToDevULong( in, tmp))
+	{ 
+		tmp &= 0xFFFF;
+		if (0L <= tmp && tmp <= USHRT_MAX) {
+			value = static_cast<DevUShort>( tmp);
+			return true;
+		}
 	}
+	return false;
 }
 
 bool TACOPythonClient::convertToDevLong( PyObject* in, DevLong& value)
@@ -171,7 +176,7 @@ bool TACOPythonClient::convertToDevLong( PyObject* in, DevLong& value)
 		value = PyLong_AsLong( in);
 	} else if (PyFloat_Check( in) != 0) {
 		double tmp = PyFloat_AsDouble( in);
-		if (LONG_MIN < tmp && tmp < LONG_MAX) {
+		if (LONG_MIN <= tmp && tmp <= LONG_MAX) {
 			value = static_cast<DevLong>( tmp);
 		} else {
 			return false;
@@ -188,23 +193,32 @@ bool TACOPythonClient::convertToDevLong( PyObject* in, DevLong& value)
 
 bool TACOPythonClient::convertToDevULong( PyObject* in, DevULong& value)
 {
-	DevLong tmp;
-	if (PyLong_Check(in)) {
+	if (PyInt_Check( in) != 0) {
+		value = PyInt_AsLong(in);
+	} else if (PyLong_Check(in)) {
 		value = PyLong_AsUnsignedLong(in);
 		return true;
-	}
-	if (convertToDevLong( in, tmp) && 0L <= tmp) {
-		value = static_cast<DevULong>( tmp);
-		return true;
+	} else if (PyFloat_Check( in) != 0) {
+		double tmp = PyFloat_AsDouble( in);
+		if (0 <= tmp && tmp <= ULONG_MAX) {
+			value = static_cast<DevULong>( tmp);
+		} else {
+			return false;
+		}
+	} else if (PyTuple_Check( in) != 0 && PyTuple_GET_SIZE( in) == 1) {
+		return convertToDevULong( PyTuple_GET_ITEM( in, 0), value);
+	} else if (PyList_Check( in) != 0 && PyList_GET_SIZE( in) == 1) {
+		return convertToDevULong( PyList_GET_ITEM( in, 0), value);
 	} else {
 		return false;
 	}
+	return true;
 }
 
 bool TACOPythonClient::convertToDevFloat( PyObject* in, DevFloat& value)
 {
 	DevDouble tmp;
-	if (convertToDevDouble( in, tmp) && -FLT_MAX < tmp && tmp < FLT_MAX) {
+	if (convertToDevDouble( in, tmp) && -FLT_MAX <= tmp && tmp <= FLT_MAX) {
 		value = static_cast<DevFloat>( tmp);
 		return true;
 	}
@@ -237,7 +251,7 @@ DevArgument TACOPythonClient::convertToDevString( PyObject* in)
 			*static_cast<DevString*>( r) = PyString_AsString( in);
 		} else {
 			free( r);
-			return 0;
+			return NULL;
 		}
 	}
 	return r;
@@ -252,7 +266,7 @@ DevArgument TACOPythonClient::convertToDevVarCharArray( PyObject* in)
 			static_cast<DevVarCharArray*>( r)->length = PyString_Size( in);
 		} else {
 			free( r);
-			return 0;
+			return NULL;
 		}
 	}
 	return r;
@@ -269,37 +283,37 @@ DevArgument TACOPythonClient::convertToDevVarStringArray( PyObject* in)
 		size = static_cast<unsigned int>( PyList_Size( in));
 		getItem = &PyList_GetItem;
 	} else {
-		return 0;
+		return NULL;
 	}
 	DevArgument r;
 	if (createDevArgument( D_VAR_STRINGARR, r)) {
 		static_cast<DevVarStringArray*>( r)->sequence = static_cast<DevString*>( malloc( sizeof( DevString) * size));
-		if (static_cast<DevVarStringArray*>( r)->sequence != 0) {
+		if (static_cast<DevVarStringArray*>( r)->sequence != NULL) {
 			for (unsigned int i = 0; i < size; ++i) {
 				PyObject* tmp = (*getItem)( in, i);
-				if (tmp != 0 && PyString_Check( tmp) != 0) {
+				if (tmp != NULL && PyString_Check( tmp) != 0) {
 					static_cast<DevVarStringArray*>( r)->sequence [i] = PyString_AsString( tmp);
 				} else {
 					free( static_cast<DevVarStringArray*>( r)->sequence);
 					free( r);
-					return 0;
+					return NULL;
 				}
 			}
 		} else {
 			free( r);
-			return 0;
+			return NULL;
 		}
 		static_cast<DevVarStringArray*>( r)->length = size;
 	}
 	return r;
 }
 
-bool TACOPythonClient::convertToPyObject( DevType outputType, DevArgument argout, PyObject** output)
+bool TACOPythonClient::convertToPyObject( DevType outputType, DevArgument argout, PyObject** output) throw (::TACO::Exception)
 {
 	if (outputType == D_VOID_TYPE) {
 		Py_INCREF( Py_None);
 		*output = Py_None;
-	} else if (argout != 0) {
+	} else if (argout != NULL) {
 		switch (outputType) {
 		case D_BOOLEAN_TYPE:
 			*output = PyInt_FromLong( static_cast<long>( *static_cast<DevBoolean*>( argout)));
@@ -353,12 +367,10 @@ bool TACOPythonClient::convertToPyObject( DevType outputType, DevArgument argout
 			*output = convertToPyTuple( static_cast<DevVarDoubleArray*>( argout));
 			break;
 		default:
-			PyErr_SetString( PyExc_RuntimeError, "unsupported output type");
-			return false;
+			throw ::TACO::Exception(::TACO::Error::RUNTIME_ERROR, "unsupported output type");
 		}
 	} else {
-		PyErr_SetString( PyExc_RuntimeError, "received invalid output argument");
-		return false;
+		throw ::TACO::Exception(::TACO::Error::RUNTIME_ERROR, "received invalid output argument");
 	}
 	return true;
 }
@@ -366,14 +378,14 @@ bool TACOPythonClient::convertToPyObject( DevType outputType, DevArgument argout
 PyObject* TACOPythonClient::convertToPyTuple( DevVarStringArray* array)
 {
 	PyObject* r = PyTuple_New( array->length);
-	if (r == 0) {
-		return 0;
+	if (r == NULL) {
+		return NULL;
 	}
 	for (unsigned int i = 0; i < array->length; ++i) {
 		PyObject* tmp = PyString_FromString( array->sequence [i]);
-		if (tmp == 0) {
+		if (tmp == NULL) {
 			Py_DECREF( r);
-			return 0;
+			return NULL;
 		}
 		PyTuple_SET_ITEM( r, i, tmp);
 	}
@@ -383,14 +395,14 @@ PyObject* TACOPythonClient::convertToPyTuple( DevVarStringArray* array)
 PyObject* TACOPythonClient::convertToPyTuple( DevVarShortArray* array)
 {
 	PyObject* r = PyTuple_New( array->length);
-	if (r == 0) {
-		return 0;
+	if (r == NULL) {
+		return NULL;
 	}
 	for (unsigned int i = 0; i < array->length; ++i) {
 		PyObject* tmp = PyInt_FromLong( static_cast<long>( array->sequence [i]));
-		if (tmp == 0) {
+		if (tmp == NULL) {
 			Py_DECREF( r);
-			return 0;
+			return NULL;
 		}
 		PyTuple_SET_ITEM( r, i, tmp);
 	}
@@ -400,14 +412,14 @@ PyObject* TACOPythonClient::convertToPyTuple( DevVarShortArray* array)
 PyObject* TACOPythonClient::convertToPyTuple( DevVarUShortArray* array)
 {
 	PyObject* r = PyTuple_New( array->length);
-	if (r == 0) {
-		return 0;
+	if (r == NULL) {
+		return NULL;
 	}
 	for (unsigned int i = 0; i < array->length; ++i) {
 		PyObject* tmp = PyInt_FromLong( static_cast<long>( array->sequence [i]));
-		if (tmp == 0) {
+		if (tmp == NULL) {
 			Py_DECREF( r);
-			return 0;
+			return NULL;
 		}
 		PyTuple_SET_ITEM( r, i, tmp);
 	}
@@ -417,14 +429,14 @@ PyObject* TACOPythonClient::convertToPyTuple( DevVarUShortArray* array)
 PyObject* TACOPythonClient::convertToPyTuple( DevVarLongArray* array)
 {
 	PyObject* r = PyTuple_New( array->length);
-	if (r == 0) {
-		return 0;
+	if (r == NULL) {
+		return NULL;
 	}
 	for (unsigned int i = 0; i < array->length; ++i) {
 		PyObject* tmp = PyLong_FromLong( array->sequence [i]);
-		if (tmp == 0) {
+		if (tmp == NULL) {
 			Py_DECREF( r);
-			return 0;
+			return NULL;
 		}
 		PyTuple_SET_ITEM( r, i, tmp);
 	}
@@ -434,14 +446,14 @@ PyObject* TACOPythonClient::convertToPyTuple( DevVarLongArray* array)
 PyObject* TACOPythonClient::convertToPyTuple( DevVarULongArray* array)
 {
 	PyObject* r = PyTuple_New( array->length);
-	if (r == 0) {
-		return 0;
+	if (r == NULL) {
+		return NULL;
 	}
 	for (unsigned int i = 0; i < array->length; ++i) {
 		PyObject* tmp = PyLong_FromUnsignedLong( array->sequence [i]);
-		if (tmp == 0) {
+		if (tmp == NULL) {
 			Py_DECREF( r);
-			return 0;
+			return NULL;
 		}
 		PyTuple_SET_ITEM( r, i, tmp);
 	}
@@ -451,14 +463,14 @@ PyObject* TACOPythonClient::convertToPyTuple( DevVarULongArray* array)
 PyObject* TACOPythonClient::convertToPyTuple( DevVarFloatArray* array)
 {
 	PyObject* r = PyTuple_New( array->length);
-	if (r == 0) {
-		return 0;
+	if (r == NULL) {
+		return NULL;
 	}
 	for (unsigned int i = 0; i < array->length; ++i) {
 		PyObject* tmp = PyFloat_FromDouble( static_cast<double>( array->sequence [i]));
-		if (tmp == 0) {
+		if (tmp == NULL) {
 			Py_DECREF( r);
-			return 0;
+			return NULL;
 		}
 		PyTuple_SET_ITEM( r, i, tmp);
 	}
@@ -468,23 +480,64 @@ PyObject* TACOPythonClient::convertToPyTuple( DevVarFloatArray* array)
 PyObject* TACOPythonClient::convertToPyTuple( DevVarDoubleArray* array)
 {
 	PyObject* r = PyTuple_New( array->length);
-	if (r == 0) {
-		return 0;
+	if (r == NULL) {
+		return NULL;
 	}
 	for (unsigned int i = 0; i < array->length; ++i) {
 		PyObject* tmp = PyFloat_FromDouble( array->sequence [i]);
-		if (tmp == 0) {
+		if (tmp == NULL) {
 			Py_DECREF( r);
-			return 0;
+			return NULL;
 		}
 		PyTuple_SET_ITEM( r, i, tmp);
 	}
 	return r;
 }
 
-void TACOPythonClient::freeInputArgument( long inputType, DevArgument argin)
+PyObject* TACOPythonClient::convertToPyString( DevType inputType)
 {
-	if (inputType != D_VOID_TYPE && argin != 0) {
+	switch (inputType)
+	{
+		case D_BOOLEAN_TYPE:
+			return PyString_FromString("D_BOOLEAN_TYPE");
+		case D_SHORT_TYPE:
+			return PyString_FromString("D_SHORT_TYPE");
+		case D_USHORT_TYPE:
+			return PyString_FromString("D_USHORT_TYPE");
+		case D_LONG_TYPE:
+			return PyString_FromString("D_LONG_TYPE");
+		case D_ULONG_TYPE:
+			return PyString_FromString("D_ULONG_TYPE");
+		case D_FLOAT_TYPE:
+			return PyString_FromString("D_FLOAT_TYPE");
+		case D_DOUBLE_TYPE:
+			return PyString_FromString("D_DOUBLE_TYPE");
+		case D_STRING_TYPE:
+			return PyString_FromString("D_STRING_TYPE");
+		case D_VAR_CHARARR:
+			return PyString_FromString("D_VAR_CHARARR");
+		case D_VAR_STRINGARR:
+			return PyString_FromString("D_VAR_STRINGARR");
+		case D_VAR_SHORTARR:
+			return PyString_FromString("D_VAR_SHORTARR");
+		case D_VAR_USHORTARR:
+			return PyString_FromString("D_VAR_USHORTARR");
+		case D_VAR_LONGARR:
+			return PyString_FromString("D_VAR_LONGARR");
+		case D_VAR_ULONGARR:
+			return PyString_FromString("D_VAR_ULONGARR");
+		case D_VAR_FLOATARR:
+			return PyString_FromString("D_VAR_FLOATARR");
+		case D_VAR_DOUBLEARR:
+			return PyString_FromString("D_VAR_DOUBLEARR");
+		default:
+			return PyString_FromString("not supported type");
+	}
+}
+
+void TACOPythonClient::freeInputArgument( DevType inputType, DevArgument argin)
+{
+	if (inputType != D_VOID_TYPE && argin != NULL) {
 		switch (inputType) {
 		case D_BOOLEAN_TYPE:
 		case D_SHORT_TYPE:
@@ -527,7 +580,7 @@ void TACOPythonClient::freeInputArgument( long inputType, DevArgument argin)
 
 void TACOPythonClient::freeOutputArgument( long outputType, DevArgument argout)
 {
-	if (outputType != D_VOID_TYPE && argout != 0) {
+	if (outputType != D_VOID_TYPE && argout != NULL) {
 		DevLong e;
 		dev_xdrfree( outputType, argout, &e);
 		switch (outputType) {

@@ -17,7 +17,11 @@
 
 EXTRA_DIST 		= TACOClient.i TACOStates.i TACO.i
 
-AM_CPPFLAGS 		= -I$(top_srcdir)/ext/include @TACO_INCLUDES@ @AX_SWIG_PYTHON_OPT@ @LOG4CPP_CFLAGS@
+AM_CPPFLAGS 		= -I$(top_srcdir)/ext/include \
+			@TACO_INCLUDES@ \
+			@LOG4CPP_CFLAGS@ \
+			@LOG4TACO_CFLAGS@ \
+			-DSWIG_PYTHON_THREADS
 
 AM_CXXFLAGS 		= -Wall
 
@@ -61,7 +65,7 @@ TACOStates.py: 		wrap_TACOStates.cpp
 wrap_TACOStates.cpp: 	$(srcdir)/TACOStates.i $(top_srcdir)/ext/include/TACOStates.h
 	@SWIG@ @AX_SWIG_PYTHON_OPT@ -c++ -I$(top_srcdir)/ext/include -o $@ $(srcdir)/TACOStates.i
 
-CLEANFILES		= *.pyc *.pyo wrap_*.cpp TACOStates.py
+CLEANFILES		= *.pyc *.pyo wrap_*.cpp TACOStates.py TACOClient.py TACO.py
 
 
 AM_CPPFLAGS 		+= -D_REENTRANT @PYTHON_CPPFLAGS@
