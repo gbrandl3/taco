@@ -70,7 +70,13 @@ using namespace TACO;
 #ifdef SWIGPYTHON
         SWIG_Python_SetErrorMsg(TACOError, $1.what());
         SWIG_PYTHON_THREAD_BEGIN_BLOCK;
-        PyObject_SetAttr(TACOError, PyString_FromString("errcode"), PyInt_FromLong($1));
+        {
+                PyObject *exc(NULL), *val(NULL), *tb(NULL);
+                PyErr_Fetch(&exc, &val, &tb);   // Get exception class, instance, traceback
+                PyErr_NormalizeException(&exc, &val, &tb); // Lazy instantiation
+                PyObject_SetAttrString(val, "errcode", PyInt_FromLong($1));
+                PyErr_Restore(exc, val, tb);    // restore original exception (may be changed by python calls 
+        }
         SWIG_PYTHON_THREAD_END_BLOCK;
         SWIG_fail;
 #endif /*SWIGPYTHON*/
@@ -304,7 +310,13 @@ Returns - the ouput of the command."
                 {
                         SWIG_Python_SetErrorMsg(TACOError, e.what());
                         SWIG_PYTHON_THREAD_BEGIN_BLOCK;
-                        PyObject_SetAttr(TACOError, PyString_FromString("errcode"), PyInt_FromLong(e));
+                        {
+                                PyObject *exc(NULL), *val(NULL), *tb(NULL);
+                                PyErr_Fetch(&exc, &val, &tb);   // Get exception class, instance, traceback
+                                PyErr_NormalizeException(&exc, &val, &tb); // Lazy instantiation
+                                PyObject_SetAttrString(val, "errcode", PyInt_FromLong(e));
+                                PyErr_Restore(exc, val, tb);    // restore original exception (may be changed by python calls 
+                        }
                         SWIG_PYTHON_THREAD_END_BLOCK;
                         SWIG_fail; 
                 }
@@ -354,7 +366,13 @@ Returns - the ouput of the command."
                 {
                         SWIG_Python_SetErrorMsg(TACOError, e.what());
                         SWIG_PYTHON_THREAD_BEGIN_BLOCK;
-                        PyObject_SetAttr(TACOError, PyString_FromString("errcode"), PyInt_FromLong(e));
+                        {
+                                PyObject *exc(NULL), *val(NULL), *tb(NULL);
+                                PyErr_Fetch(&exc, &val, &tb);   // Get exception class, instance, traceback
+                                PyErr_NormalizeException(&exc, &val, &tb); // Lazy instantiation
+                                PyObject_SetAttrString(val, "errcode", PyInt_FromLong(e));
+                                PyErr_Restore(exc, val, tb);    // restore original exception (may be changed by python calls 
+                        }
                         SWIG_PYTHON_THREAD_END_BLOCK;
                         SWIG_fail;
                 }
