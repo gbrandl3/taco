@@ -31,9 +31,9 @@
  *
  * Original:  January 1991
  *
- * Version:   $Revision: 1.6 $
+ * Version:   $Revision: 1.7 $
  *
- * Date:              $Date: 2010-11-19 09:29:16 $
+ * Date:              $Date: 2011-10-24 13:11:23 $
  *
  */
 
@@ -170,6 +170,10 @@ int main (int argc, char **argv)
 	int	i;
 	int     res;
 	const char 	*dbase_used="NDBM";
+	
+	char	*db_name_env = NULL;
+	char    db_name[256];
+	
 #ifdef unix
 static	int	fd_devnull = -1;
 #endif
@@ -184,9 +188,24 @@ static	int	fd_devnull = -1;
 	}
 	else
 		snprintf(nethost, sizeof(nethost), "%s", nethost_env);
+
 #ifdef DEBUG
 	printf ("Environment variable NETHOST = %s\n",nethost);
-#endif
+#endif		
+		
+	/*
+	 * Get the name of the database schema to use.
+	 */
+	 
+	if ( (db_name_env = (char *)getenv ("TACO_DB_NAME")) != NULL )
+	{
+		snprintf(db_name, sizeof(db_name), "%s", db_name_env);
+	}
+	else
+	{
+		snprintf(db_name, sizeof(db_name), "tango");
+	}
+	
 #endif /* unix */
 
 /*
@@ -208,12 +227,12 @@ static	int	fd_devnull = -1;
 				{
 	         			c_flags.dbm  	     = E_MYSQL;
 					dbase_used = "MYSQL";
-					dbm_name = const_cast<char *>("tango");
+					dbm_name = db_name;
 				}
 				else if (strcmp (arg, "sqlite3") == 0)
 				{
 	         			c_flags.dbm  	     = E_SQLITE;
-					dbm_name = const_cast<char *>("tango");
+					dbm_name = db_name;
 				}
 				else if (strcmp (arg, "log") == 0)
 		 			c_flags.request_log = True;
