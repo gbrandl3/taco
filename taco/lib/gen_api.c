@@ -26,13 +26,13 @@
  *		servers and clients using the SUN-RPC.
  *
  * Author(s)  :	Jens Meyer
- * 		$Author: jkrueger1 $
+ * 		$Author: jensmeyer $
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.40 $
+ * Version    :	$Revision: 1.41 $
  *
- * Date       : $Date: 2008-12-02 08:13:38 $
+ * Date       : $Date: 2012-03-29 13:57:33 $
  *
  ********************************************************************-*/
 
@@ -448,7 +448,7 @@ void _DLLFunc dev_printerror_no (DevShort mode, const char *comment, long dev_er
  * 
  * @return error string, related to dev_errno.
  */ 
-_DLLFunc char * dev_error_str (long dev_errno)
+_DLLFunc char * dev_error_str (DevLong dev_errno)
 {
 	return get_error_string (dev_errno);
 }
