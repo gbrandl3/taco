@@ -27,13 +27,13 @@
  *		group.
  *
  * Author(s):   Jens Meyer
- *		$Author: jensmeyer $
+ *		$Author: jlpons $
  *
  * Original:    July 1993
  *
- * Version:	$Revision: 1.4 $
+ * Version:	$Revision: 1.5 $
 
- * Date:	$Date: 2010-11-19 14:25:05 $
+ * Date:	$Date: 2012-06-25 08:56:09 $
  *
  ********************************************************************-*/
 
@@ -219,4 +219,6 @@
 #define DevOxford700Base (CntrlTeamNumber + DS_LSHIFT(88, DS_IDENT_SHIFT))
 /* MecaT : Tango wrapper class for new Unulators */
 #define MecaTBase (CntrlTeamNumber + DS_LSHIFT(89, DS_IDENT_SHIFT))
+/* CavPhase : Taco class for RF cavity phase measurement */
+#define CavPhaseBase (CntrlTeamNumber + DS_LSHIFT(90, DS_IDENT_SHIFT))
 #endif	/* _CntrlDsNumbers_h */
