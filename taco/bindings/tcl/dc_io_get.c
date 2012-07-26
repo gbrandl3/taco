@@ -31,13 +31,13 @@
  * Author(s):   Denis Beauvois
  *              Gilbert Pepellin
  *              J.Meyer
- *              $Author: jkrueger1 $
+ *              $Author: jensmeyer $
  *
  * Original:    June, 1996
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2008-04-06 09:06:33 $
+ * Date:        $Date: 2012-07-26 16:01:03 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -451,6 +451,7 @@ int dc_io_get (ClientData clientdata, Tcl_Interp *interp, int argc, char **argv)
 				printf("dc_io_get: ArgoutRequired= D_OPAQUE_TYPE\n");
 			F_D_OPAQUE_TYPE(interp,"",OUTPUT);
 			break;
+#if 0
 		case D_MULMOVE_TYPE:
 			if(TCL_TEST) 
 				printf("dc_io_get: ArgoutRequired= D_MULMOVE_TYPE\n");
@@ -466,6 +467,7 @@ int dc_io_get (ClientData clientdata, Tcl_Interp *interp, int argc, char **argv)
 				printf("dc_io_get: ArgoutRequired= D_MOTOR_FLOAT\n");
 			F_D_MOTOR_FLOAT(interp,"",OUTPUT);
 			break;
+#endif
 		default	:
 			printf ("ERROR during the output argument setting.. \n");
 			free (StringTemp); 

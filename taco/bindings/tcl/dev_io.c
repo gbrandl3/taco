@@ -47,13 +47,13 @@
  * Author(s):   Denis Beauvois
  *              Gilbert Pepellin
  *              J.Meyer
- *              $Author: jkrueger1 $
+ *              $Author: jensmeyer $
  *
  * Original:    June, 1996
  *
- * Version:     $Revision: 1.6 $
+ * Version:     $Revision: 1.7 $
  *
- * Date:        $Date: 2008-04-06 09:06:34 $
+ * Date:        $Date: 2012-07-26 16:01:03 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -755,6 +755,7 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			R=F_D_OPAQUE_TYPE(interp,argv[5],INPUT);
 			strcpy(StringTemp,"F_D_OPAQUE_TYPE");
 			break;
+#if 0
 		case D_MULMOVE_TYPE:
 			if(TCL_TEST) 
 				printf("dev_io: ArginRequired= D_MULMOVE_TYPE\n");
@@ -773,6 +774,7 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			R=F_D_MOTOR_FLOAT(interp,argv[5],INPUT);
 			strcpy(StringTemp,"F_D_MOTOR_FLOAT");
 			break;
+#endif
 		default:
 			printf ("ERROR during the conversion of the argin..type unknown \n");
 			free (StringTemp);
@@ -925,6 +927,7 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 				printf("dev_io: ArgoutRequired= D_OPAQUE_TYPE\n");
 			F_D_OPAQUE_TYPE(interp,"",OUTPUT);
 			break;
+#if 0
 		case D_MULMOVE_TYPE		:
 			if(TCL_TEST) 
 				printf("dev_io: ArgoutRequired= D_MULMOVE_TYPE	\n");
@@ -940,6 +943,7 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 				printf("dev_io: ArgoutRequired= D_MOTOR_FLOAT\n");
 			F_D_MOTOR_FLOAT(interp,"",OUTPUT);
 			break;
+#endif
 		default				:
 			printf ("ERROR during the output argument setting.. \n");
 			free (StringTemp); 
@@ -977,6 +981,7 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 		StringAux = dev_error_str(DeviceError);
 		snprintf (StringTemp, STRING_TMP_LENGTH, "%s [%ld]",StringAux, (long)DeviceError);
 		Tcl_SetVar (interp,Error,StringTemp,0);
+		free (StringAux);
 	}
 	if (TCL_TEST) 
 		printf("dev_putget returns: error=%ld :%s\n", (long)DeviceError,StringTemp);
@@ -984,7 +989,7 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 	if (DeviceStatus != DS_OK) /* Error during dev_putget */
 	{
 		free (StringTemp); 
-		free (StringAux);
+		/* free (StringAux); */
 		if (OutputArg != NULL) 
 		{
 			free (OutputArg); 
@@ -993,8 +998,8 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 		return TCL_OK;
 	}
 
-	if(StringAux != NULL) 
-		free (StringAux); 
+	/* if(StringAux != NULL) 
+		free (StringAux); */ 
  
 /* ------------------------------------------- */
 /* Now converting C variables in TCL variables */
