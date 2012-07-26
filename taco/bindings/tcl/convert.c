@@ -29,13 +29,13 @@
  * Author(s): 	Denis Beauvois, ESRF
  *		Gilbert Pepellin
  *		J. Meyer
- *              $Author: jkrueger1 $
+ *              $Author: jensmeyer $
  *
  * Original:  	June 1996
  *
- * Version:     $Revision: 1.4 $
+ * Version:     $Revision: 1.5 $
  *
- * Date:        $Date: 2008-04-06 09:06:33 $
+ * Date:        $Date: 2012-07-26 15:52:48 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -310,7 +310,7 @@ int F_D_INT_FLOAT_TYPE (interp,Name,Param)
      tmp3.value = (float)tmp2;
      InputArg = (DevIntFloat*) malloc (sizeof(DevIntFloat));
      memcpy (InputArg,&tmp3,sizeof(DevIntFloat));
-     free (SplitList);
+     Tcl_Free ((char *)SplitList);
      return True;
     }
  else
