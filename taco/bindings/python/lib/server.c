@@ -27,9 +27,9 @@
  *
  * Original:    June 2000
  *
- * Date:	$Date: 2010-04-01 15:52:49 $
+ * Date:	$Date: 2012-07-26 10:03:42 $
  *
- * Version:	$Revision: 1.12 $
+ * Version:	$Revision: 1.13 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -62,7 +62,9 @@ PyThreadState	*thread_state;
 static PyObject *Server_startup(PyObject *self, PyObject *args)
 {
 	char	*name,
-		*pers_name;	
+		*pers_name;
+	
+	DevLong error = 0;
 			
         if ( !PyArg_ParseTuple(args, "ssO", &name, &pers_name, &Py_devices) )
 	{
@@ -98,6 +100,8 @@ static PyObject *Server_startup_nodb (PyObject *self, PyObject *args)
 	short		i;	
 	PyObject 	*Py_device,
         		*py_name;
+	
+	DevLong error = 0;
 
 			
 	if ( !PyArg_ParseTuple(args, "ssOi", &name, &pers_name, &Py_devices, &pn) )
