@@ -26,13 +26,13 @@
  * 		 device server information (device list, device resources..)
  *
  * Author       : E. Taurel
- *                $Author: jkrueger1 $
+ *                $Author: jensmeyer $
  *
  * Original     : June 1998
  *
- * Version      : $Revision: 1.4 $
+ * Version      : $Revision: 1.5 $
  *
- * Date         : $Date: 2008-04-06 09:07:39 $
+ * Date         : $Date: 2012-10-10 13:32:23 $
  *
  */
 
@@ -189,7 +189,8 @@ long db_builddevicelist(char *ds_name,char *pers_name,db_svcinfo_call *p_info,
 				strcat(tmp,p_info->server[i].device[j].dev_name);
 				if (nb_dev != p_info->server[i].device_nb)
 					strcat(tmp,",");
-				if ((nb_dev != 0) && ((nb_dev % 4) == 0))
+/*				if ((nb_dev != 0) && ((nb_dev % 4) == 0))*/
+				if (((nb_dev % 4) == 0) && (j != p_info->server[i].device_nb - 1))
 				{
 					strcat(tmp,"\\\n                              ");
 				}
