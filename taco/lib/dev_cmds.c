@@ -28,9 +28,9 @@
  *
  * Original:	March 1992
  *
- * Version:	$Revision: 1.3 $
+ * Version:	$Revision: 1.4 $
  *
- * Date:	$Date: 2007-01-15 16:54:15 $
+ * Date:	$Date: 2012-11-14 07:56:36 $
  *
  ********************************************************************-*/
 
@@ -54,7 +54,7 @@ DevCmdNameListEntry DevCmdNameList[] = {
 { DevInsert,             "DevInsert" },  
 { DevExtract,            "DevExtract" }, 
 { DevReadPos,            "DevReadPos" },  
-{ DevWritePos,           "DevWritPos" },  
+{ DevWritePos,           "DevWritePos" },  
 { DevSetParam,		 "DevSetParam" },
 { DevReadParam,		 "DevReadParam" },
 { DevUnlock,		 "DevUnlock" },
@@ -743,7 +743,7 @@ DevCmdNameListEntry DevCmdNameList[] = {
 {DevCcdGetType, "DevCcdGetType"},
 {DevCcdSetKinWinSize, "DevCcdSetKinWinSize"},
 {DevCcdGetKinWinSize, "DevCcdGetKinWinSize"},
-{DevCcdSetKinetics, "DevCcdGetKinWinSize"},
+{DevCcdSetKinetics, "DevCcdSetKinetics"},
 {DevCcdGetKinetics, "DevCcdGetKinetics"},
 {DevCcdCorrect, "DevCcdCorrect"},
 {DevCcdSetFilePar, "DevCcdSetFilePar"},
