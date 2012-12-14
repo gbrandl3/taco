@@ -51,9 +51,9 @@
  *
  * Original:    June, 1996
  *
- * Version:     $Revision: 1.7 $
+ * Version:     $Revision: 1.8 $
  *
- * Date:        $Date: 2012-07-26 16:01:03 $
+ * Date:        $Date: 2012-12-14 14:39:42 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -1029,12 +1029,12 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			break;
 		case D_ULONG_TYPE:
 			TclAux = (char *) malloc (TCLAUX_LENGTH*sizeof(char));
-			snprintf(TclAux, TCLAUX_LENGTH, "%ld",*((unsigned long*)OutputArg));
+			snprintf(TclAux, TCLAUX_LENGTH, "%ld",*((unsigned int*)OutputArg));
 			Tcl_AppendResult(interp,TclAux,NULL);
 			break;
 		case D_LONG_TYPE:
 			TclAux = (char *) malloc (TCLAUX_LENGTH*sizeof(char));
-			snprintf(TclAux, TCLAUX_LENGTH, "%ld",*((long*)OutputArg));
+			snprintf(TclAux, TCLAUX_LENGTH, "%ld",*((int*)OutputArg));
 			Tcl_AppendResult(interp,TclAux,NULL);
 			break;
 		case D_FLOAT_TYPE:
@@ -1192,8 +1192,8 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			j = ((DevVarULongArray*)OutputArg)->length;
 			for (i=0;i<j;i++)
 			{
-				TclTemp = (unsigned long*)( ((DevVarULongArray*)OutputArg)->sequence+i);
-				snprintf(TclAux, TCLAUX_LENGTH, "%lu",*((unsigned long*)TclTemp));
+				TclTemp = (unsigned int*)( ((DevVarULongArray*)OutputArg)->sequence+i);
+				snprintf(TclAux, TCLAUX_LENGTH, "%lu",*((unsigned int*)TclTemp));
 				Tcl_AppendElement(interp,TclAux);
 			}
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
@@ -1214,8 +1214,8 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			j = ((DevVarLongArray*)OutputArg)->length;
 			for (i=0;i<j;i++)
 			{
-				TclTemp = (long*)( ((DevVarLongArray*)OutputArg)->sequence+i);
-				snprintf(TclAux, TCLAUX_LENGTH, "%ld",*((long*)TclTemp));
+				TclTemp = (int*)( ((DevVarLongArray*)OutputArg)->sequence+i);
+				snprintf(TclAux, TCLAUX_LENGTH, "%ld",*((int*)TclTemp));
 				Tcl_AppendElement(interp,TclAux);
 			}
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
