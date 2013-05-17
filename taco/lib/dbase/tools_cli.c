@@ -31,9 +31,9 @@
  * 
  * Original   :   April 1997
  * 
- * Version    :   $Revision: 1.14 $
+ * Version    :   $Revision: 1.15 $
  * 
- * Date       :   $Date: 2013-05-17 08:44:05 $
+ * Date       :   $Date: 2013-05-17 08:55:47 $
  ********************************************************************/
 
 #ifdef HAVE_CONFIG_H
@@ -1026,7 +1026,7 @@ long db_stat(db_stat_call *p_info,DevLong *p_error)
  */
 	if(recev == NULL)
 	{
-		if(error == DevErr_RPCTimedOut)
+		if(error == DevErr_RPCTimedOut || error == DbErr_RPCreception)
 		{
 			to_reconnection((void *)NULL,(void **)&recev,&local_cl,
 					(int)DB_INFO,(long)0,DB_UDP,&error);
