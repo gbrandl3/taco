@@ -34,9 +34,9 @@ if test x"$python" = x"yes" ; then
 
 		RESOURCE STATISTICS
 
-791 resources are defined in database:
+792 resources are defined in database:
     2 resources for the CLASS domain
-    518 resources for the CMDS domain
+    519 resources for the CMDS domain
     266 resources for the ERROR domain
     3 resources for the SEC domain
     2 resources for the TEST domain
