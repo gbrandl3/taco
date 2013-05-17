@@ -47,13 +47,13 @@
  * Author(s):   Denis Beauvois
  *              Gilbert Pepellin
  *              J.Meyer
- *              $Author: jensmeyer $
+ *              $Author: jkrueger1 $
  *
  * Original:    June, 1996
  *
- * Version:     $Revision: 1.8 $
+ * Version:     $Revision: 1.9 $
  *
- * Date:        $Date: 2012-12-14 14:39:42 $
+ * Date:        $Date: 2013-05-17 13:54:36 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -1029,12 +1029,12 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			break;
 		case D_ULONG_TYPE:
 			TclAux = (char *) malloc (TCLAUX_LENGTH*sizeof(char));
-			snprintf(TclAux, TCLAUX_LENGTH, "%ld",*((unsigned int*)OutputArg));
+			snprintf(TclAux, TCLAUX_LENGTH, "%ld",*((DevULong*)OutputArg));
 			Tcl_AppendResult(interp,TclAux,NULL);
 			break;
 		case D_LONG_TYPE:
 			TclAux = (char *) malloc (TCLAUX_LENGTH*sizeof(char));
-			snprintf(TclAux, TCLAUX_LENGTH, "%ld",*((int*)OutputArg));
+			snprintf(TclAux, TCLAUX_LENGTH, "%ld",*((DevLong*)OutputArg));
 			Tcl_AppendResult(interp,TclAux,NULL);
 			break;
 		case D_FLOAT_TYPE:
@@ -1193,7 +1193,7 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			for (i=0;i<j;i++)
 			{
 				TclTemp = (unsigned int*)( ((DevVarULongArray*)OutputArg)->sequence+i);
-				snprintf(TclAux, TCLAUX_LENGTH, "%lu",*((unsigned int*)TclTemp));
+				snprintf(TclAux, TCLAUX_LENGTH, "%lu",*((DevULong*)TclTemp));
 				Tcl_AppendElement(interp,TclAux);
 			}
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
@@ -1215,7 +1215,7 @@ int dev_io (ClientData clientdata, Tcl_Interp *interp,
 			for (i=0;i<j;i++)
 			{
 				TclTemp = (int*)( ((DevVarLongArray*)OutputArg)->sequence+i);
-				snprintf(TclAux, TCLAUX_LENGTH, "%ld",*((int*)TclTemp));
+				snprintf(TclAux, TCLAUX_LENGTH, "%ld",*((DevLong*)TclTemp));
 				Tcl_AppendElement(interp,TclAux);
 			}
 			DeviceStatus = dev_xdrfree(ArgoutRequired,(void*)OutputArg,&DeviceError);
