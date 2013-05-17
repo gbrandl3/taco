@@ -47,12 +47,12 @@ std::string TACO::errorString( DevLong errorNumber) throw ()
 {
 	pthread_mutex_lock(&::TACO::mMutex);
 	char* tmp = dev_error_str(errorNumber);
-	pthread_mutex_unlock(&::TACO::mMutex);
 	std::string r;
 	if (tmp != 0) {
 		r = tmp;
 		free( tmp);
 	}
+	pthread_mutex_unlock(&::TACO::mMutex);
 	return r;
 }
 
@@ -60,13 +60,13 @@ std::string TACO::plainErrorString( DevLong errorNumber) throw ()
 {
 	pthread_mutex_lock(&::TACO::mMutex);
 	char* tmp = dev_error_str(errorNumber);
-	pthread_mutex_unlock(&::TACO::mMutex);
 	std::string r;
 	if (tmp != 0) {
 		r = tmp;
 		free( tmp);
 		r.erase( r.begin(), r.begin() + 25);
 	}
+	pthread_mutex_unlock(&::TACO::mMutex);
 	return r;
 }
 

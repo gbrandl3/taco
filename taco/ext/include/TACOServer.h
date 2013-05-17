@@ -20,9 +20,7 @@
 #ifndef TACO_SERVER_H
 #define TACO_SERVER_H
 
-#include <log4cpp/Category.hh>
-
-extern log4cpp::Category       *logStream;
+#include <log4taco.h>
 
 #include <map>
 #include <set>
@@ -415,20 +413,20 @@ protected:
 	void throw_exception(const DevLong err)
 	{
 		::TACO::Exception e = ::TACO::Exception(err);
-		logStream->fatalStream() << GetClassName() << " : " << deviceName() << " : " << e.what() << log4cpp::eol;
+		FATAL_STREAM << GetClassName() << " : " << deviceName() << " : " << e.what() << ENDLOG;
 		throw e;
 	}
 
 	void throw_exception(const DevLong err, const std::string &msg)
 	{
-        	logStream->fatalStream() << GetClassName() << " : " << deviceName() << " : " << msg << log4cpp::eol;
+		FATAL_STREAM << GetClassName() << " : " << deviceName() << " : " << msg << ENDLOG;
         	::TACO::Exception e = ::TACO::Exception(err, msg);
         	throw e;
 	}
 
 	void throw_exception(::TACO::Exception &e, const std::string &msg)
 	{
-		logStream->fatalStream() << GetClassName() << " : " << deviceName() << " : " << msg << " : " << e.what() << log4cpp::eol;
+		FATAL_STREAM << GetClassName() << " : " << deviceName() << " : " << msg << " : " << e.what() << ENDLOG;
 		throw (msg + " : ") >> e;
 	}
 

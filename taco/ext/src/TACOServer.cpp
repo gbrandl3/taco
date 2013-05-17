@@ -26,7 +26,6 @@
 #include <TACOStringConverters.h>
 
 #include <TACOServer.h>
-log4cpp::Category       *logStream;
 
 #include <private/ApiP.h>
 
@@ -175,6 +174,7 @@ bool TACO::Server::stateMachine( DevShort state, DevCommand command) throw (TACO
 		case Command::DEVICE_VERSION:
 		case Command::DEVICE_RESET:
 		case Command::DEVICE_TYPES:
+		case Command::DEVICE_INIT:
 			return true;
 		default:
 			return false;
@@ -192,6 +192,7 @@ bool TACO::Server::stateMachine( DevShort state, DevCommand command) throw (TACO
 		case Command::DEVICE_UPDATE_RESOURCE:
 		case Command::DEVICE_UPDATE:
 		case Command::DEVICE_QUERY_RESOURCE_INFO:
+		case Command::DEVICE_INIT:
 			return true;
 		default:
 			return false;
@@ -318,7 +319,7 @@ void TACO::Server::addResource(
 		throw_exception( Error::INTERNAL_ERROR, "resource '" + name + "' exists already");
 	}
 	mResourceInfoSet.insert( ResourceInfo( toLowerCase( name), type, info, defaults, format, min, max));
-	logStream->debugStream() << "add resource " << name << log4cpp::eol;
+	DEBUG_STREAM << "add resource " << name << ENDLOG;
 }
 
 void TACO::Server::tacoDeviceOn( TACO::Server* server, DevArgument argin, DevArgument argout) throw (TACO::Exception)

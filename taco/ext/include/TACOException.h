@@ -103,6 +103,8 @@ private:
 };
 
 
+#ifndef SWIG
 ::TACO::Exception& (operator >>) ( const std::string& msg, ::TACO::Exception& e) THROW ();
+#endif
 
 #endif	// TACO_EXCEPTION_H

@@ -19,9 +19,7 @@
 #ifndef TACO_CLIENT_H
 #define TACO_CLIENT_H
 
-#include <log4cpp/Category.hh>
-
-extern log4cpp::Category       *logStream;
+#include <log4taco.h>
 
 #if HAVE_PTHREAD_H 
 #	include <pthread.h>
@@ -201,6 +199,7 @@ public:
 	 * @exception Error::INTERNAL_ERROR
 	 *
 	 * @see setClientNetworkProtocol()
+	 * @return the type of the used protocol TCP or UDP
 	 */
 	NetworkProtocol clientNetworkProtocol() throw (::TACO::Exception);
 
@@ -301,6 +300,7 @@ public:
 	 *
 	 * @exception Unknown
 	 * The errors vary from server to server.
+	 * @return is the server device in status 'DEVICE_OFF' or not
 	 */
 	bool isDeviceOff() throw (::TACO::Exception)
 	{
@@ -329,6 +329,8 @@ public:
 	 * @exception Unknown
 	 * The errors vary from server to server,
 	 * but it is unlikely that this method throws an exception.
+	 * @return the device state (a number)
+	 * @see deviceStatus
 	 */
 	virtual short deviceState() throw (::TACO::Exception);
 
@@ -338,6 +340,9 @@ public:
 	 * @exception Unknown
 	 * The errors vary from server to server,
 	 * but it is unlikely that this method throws an exception.
+	 * @return the device state (a string) corresponding to the return
+	 *	   value of 'deviceState'
+	 * @see deviceState
 	 */
 	virtual std::string deviceStatus() throw (::TACO::Exception);
 
@@ -346,13 +351,20 @@ public:
 	 *
 	 * @exception Unknown
 	 * The errors vary from server to server.
+	 * @returns the version number of the server device
 	 */
 	virtual std::string deviceVersion() throw (::TACO::Exception);
 
 	/**
-	 * Returns the device types.
+	 * Returns the device types. Each device is in a hierarchy of devices
+	 * and the return gives a list of device types. The server device may
+	 * be considered as one of them. This means if a client wants to connect
+	 * to one of them and the required type is equal to one of them the
+	 * client may trust, that all the commands he is knowing to this device
+	 * type will be exist.
 	 *
 	 * @exception Error::RUNTIME_ERROR
+	 * @returns a list of the types of the devices
 	 */
 	DeviceTypeSet deviceTypes() const throw (::TACO::Exception)
 	{
@@ -404,7 +416,12 @@ public:
 	 */
 	ResourceInfoSet deviceQueryResourceInfo() throw (::TACO::Exception);
 
-	//! Queries all device commands informations.
+	/**
+	 * Queries all device commands informations.
+	 *
+	 * @return the list of the command informations
+	 * @throw TACO::Exception in case of failure
+	 */
 	CommandInfoMap deviceQueryCommandInfo() throw (::TACO::Exception) {return mCommandInfoMap;} 
 
 	//@}
@@ -427,6 +444,7 @@ public:
 	 * @see eventUnlisten()
 	 * @see synchronize()
 	 * @throw TACO::Exception in case of failure
+	 * @return the EventHandle
 	 */
 	template<typename T> DevLong eventListen( DevEvent event, EventHandler* handler, void* userData, T* eventData) throw (::TACO::Exception)
 	{
@@ -449,6 +467,7 @@ public:
 	 * @param handler pointer to the event handler
 	 * @param userData pointer to the user data
 	 * @see eventUnlisten(), synchronize()
+	 * @return the EventHandle
 	 */
 	DevLong eventListen( DevEvent event, EventHandler* handler, void* userData) throw (::TACO::Exception);
 
@@ -463,6 +482,7 @@ public:
 	 * The pointer to the <em>event data</em> must be valid during the time listening to the event.
 	 *
 	 * @see eventHandler(), eventUnlisten(), synchronize()
+	 * @return the EventHandle
 	 */
 	template<typename T> DevLong eventListen( DevEvent event, T* eventData) throw (::TACO::Exception)
 	{
@@ -470,12 +490,13 @@ public:
 	}
 
 	/**
-	 * Start listen to an event.
+	 * @overload
 	 *
 	 * The member function eventHandler() is used as the event handler.
 	 *
 	 * @param event the event number
 	 * @see eventHandler(), eventUnlisten(), synchronize()
+	 * @return the EventHandle
 	 */
 	DevLong eventListen( DevEvent event) throw (::TACO::Exception)
 	{
@@ -506,7 +527,7 @@ public:
 #endif
 	//! Executes a command
 	void execute( DevCommand cmd, DevArgument argin, DevArgType inType, DevArgument argout, DevArgType outType) throw (::TACO::Exception);
-#ifdef SWIGPYTHON
+#ifdef SWIG
 protected:
 #endif
 	//! Executes a command without any error handling
@@ -555,6 +576,9 @@ protected:
 	}
 
 private:
+        virtual void taco_connectClient() throw (::TACO::Exception);
+        virtual void tango_connectClient() throw (::TACO::Exception);
+
 	//! Calls eventHandler()
 	static void* eventHandlerCaller( devserver unused, void* thisPointer, EventHandlerData eventHandlerData) throw ();
 
@@ -621,6 +645,7 @@ private:
 		}
 	}
 #endif // TACO_CLIENT_RUNTIME_TYPE_CHECK
+
 };
 
 #endif // TACO_CLIENT_H
