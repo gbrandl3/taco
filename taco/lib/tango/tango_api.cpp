@@ -31,13 +31,13 @@
  *		to talk to TANGO device servers.
  *	
  * Author(s)  :	Andy Goetz
- * 		$Author: jensmeyer $
+ * 		$Author: jkrueger1 $
  *
  * Original   :	December 1999
  *
- * Version    : $Revision: 1.12 $
+ * Version    : $Revision: 1.13 $
  *
- * Date       : $Date: 2010-05-19 15:58:34 $
+ * Date       : $Date: 2013-05-17 08:45:34 $
  *
  ********************************************************************-*/
 
@@ -270,6 +270,8 @@ long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, DevLong *e
 // added following commands - Insert, Extract, On, Off, Reset, Open, Close,
 //                            Standby
 //
+// added following commands - Init
+//
 // added special treatment for TacoState - if TacoState is implemented then map this
 // to DevState and not the Tango::State(). This allows Tango device servers to return
 // a long instead of a short
@@ -348,6 +350,13 @@ long tango_dev_import(char *dev_name, long access, devserver *ds_ptr, DevLong *e
 				tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevReset")+1);
 				sprintf(tango_device_tmp.cmd_name[i],"DevReset");
 			}
+#ifdef TACO_EXT
+			else if ((*cmd_query)[i].cmd_name == "Init")
+			{
+				tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevInit")+1);
+				sprintf(tango_device_tmp.cmd_name[i],"DevInit");
+			}
+#endif
 			else if ((*cmd_query)[i].cmd_name == "Standby")
 			{
 				tango_device_tmp.cmd_name[i] = (char*)malloc(strlen("DevStandby")+1);
