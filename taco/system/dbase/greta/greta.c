@@ -51,6 +51,7 @@ extern void SET_BACKGROUND_COLOR();
 extern Widget CreatemainWindow(Widget);
 extern void DataInitialization();
 
+#include <unistd.h>
 
 /* Begin user code block <globals> */
 /* End user code block <globals> */
@@ -73,7 +74,6 @@ int main(argc, argv)
     Widget   mainWindow;
     
     /* Begin user code block <declarations> */
-#include <unistd.h>
     int c;
     extern int optind;
     extern char *optarg;
