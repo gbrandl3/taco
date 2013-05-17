@@ -27,9 +27,9 @@
  *
  * Original:    June 2000
  *
- * Date:	$Date: 2013-05-17 07:46:04 $
+ * Date:	$Date: 2013-05-17 13:52:54 $
  *
- * Version:	$Revision: 1.14 $
+ * Version:	$Revision: 1.15 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -102,7 +102,7 @@ static PyObject *Server_startup_nodb (PyObject *self, PyObject *args)
 	PyObject 	*Py_device,
         		*py_name;
 	
-	DevLong error = 0;
+	DevLong 	error = 0;
 
 			
 	if ( !PyArg_ParseTuple(args, "ssOi", &name, &pers_name, &Py_devices, &pn) )
