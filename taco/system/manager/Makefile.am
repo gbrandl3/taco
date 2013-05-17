@@ -23,6 +23,6 @@ sbin_PROGRAMS		= Manager unreg
 AM_CPPFLAGS		= @TACO_INCLUDES@ @LOG4CPP_CFLAGS@
 
 Manager_SOURCES		= ManagerMain.cpp Manager.cpp 
-Manager_LDADD		= $(top_builddir)/lib/libtaco++.la  $(top_builddir)/lib/log4taco/liblog4taco.la
+Manager_LDADD		= $(top_builddir)/lib/libtaco++.la  $(top_builddir)/lib/log4taco/liblog4taco.la @LOG4CPP_LIBS@
 
 unreg_SOURCES		= unreg.c

@@ -13,4 +13,5 @@ liblog4taco_la_LIBADD 	= @TACO_CLIENT_CXX_LIBS@ @LOG4CPP_LIBS@
 noinst_PROGRAMS		= MsgServerTest
 
 MsgServerTest_SOURCES 	= MsgServerTest.cpp
-MsgServerTest_LDADD   	= liblog4taco.la
+MsgServerTest_LDADD   	= ${builddir}/liblog4taco.la
+## MsgServerTest_LDADD   	= @TACO_CLIENT_CXX_LIBS@ @LOG4CPP_LIBS@

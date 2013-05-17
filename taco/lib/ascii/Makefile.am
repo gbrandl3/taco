@@ -26,4 +26,5 @@ libascapi_la_SOURCES	= asc_api.c
 EXTRA_DIST		= README
 INCLUDES		= @TACO_INCLUDES@
 
-libascapi_la_DFLAGS	= -module
+libascapi_la_LDFLAGS	= -module
+libascapi_la_LIBADD	= @TACO_CLIENT_LIBS@

@@ -24,10 +24,6 @@ if DC_BUILD
 SUBDIRS			+= dc
 endif
 
-if ASCII_BUILD
-SUBDIRS 		+= ascii tc
-endif
-
 if BUILD_DATAPORT
 SUBDIRS			+= dataport
 endif
@@ -37,9 +33,12 @@ SUBDIRS			+= tango
 endif
 
 SUBDIRS			+= . 
-if BUILD_LOG4CPP
-SUBDIRS			+= log4taco
+
+if ASCII_BUILD
+SUBDIRS 		+= ascii tc
 endif
+
+SUBDIRS			+= log4taco
 
 nobase_include_HEADERS  = private/ApiP.h
 

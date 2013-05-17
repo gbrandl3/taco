@@ -17,7 +17,11 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-SUBDIRS	= instverify powersupply updatedaemon agps signal
+SUBDIRS	= instverify powersupply agps signal
+
+if BUILD_DATAPORT
+SUBDIRS += updatedaemon
+endif
 
 if SOLARIS_CXX
 else

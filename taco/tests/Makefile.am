@@ -25,7 +25,7 @@ CLEANFILES 		= log taco
 
 DISTCLEANFILES 		= System.log atconfig *.lineno package.m4 testsuite
 
-INCLUDES		= @TACO_INCLUDES@ @LOG4CPP_CFLAGS@
+INCLUDES		= @TACO_INCLUDES@ @LOG4CPP_CFLAGS@ @LOG4TACO_CFLAGS@
 
 ## @GDBM_CFLAGS@ 
 

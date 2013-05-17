@@ -23,4 +23,4 @@ sbin_PROGRAMS		= MessageServer
 AM_CPPFLAGS		= @TACO_INCLUDES@ @LOG4CPP_CFLAGS@
 
 MessageServer_SOURCES	= MessageServer.cpp MessageServerMain.cpp 
-MessageServer_LDADD	= @TACO_SERVER_LIBS@ $(top_builddir)/lib/log4taco/liblog4taco.la
+MessageServer_LDADD	= @TACO_SERVER_LIBS@ $(top_builddir)/lib/log4taco/liblog4taco.la @LOG4CPP_LIBS@

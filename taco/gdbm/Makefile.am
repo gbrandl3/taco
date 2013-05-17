@@ -16,11 +16,11 @@ libgdbm_compat_la_LDFLAGS = -version-info $(SHLIB_VER)
 check_PROGRAMS 		+= testdbm testndbm 
 
 testndbm_SOURCES 	= testndbm.c 
-testndbm_LDADD		= libgdbm.la libgdbm_compat.la
+testndbm_LDADD		= libgdbm_compat.la libgdbm.la
 testndbm_CPPFLAGS	= -DGNU 
 
 testdbm_SOURCES 	= testdbm.c 
-testdbm_LDADD		= libgdbm.la libgdbm_compat.la
+testdbm_LDADD		= libgdbm_compat.la libgdbm.la
 
 conv2gdbm_SOURCES	= conv2gdbm.c
 conv2gdbm_LDADD		= libgdbm_compat.la libgdbm.la 
