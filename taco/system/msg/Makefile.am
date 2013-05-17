@@ -20,8 +20,7 @@
 include_HEADERS		= Message.h
 sbin_PROGRAMS		= MessageServer
 
-INCLUDES		= @TACO_INCLUDES@ -I$(top_srcdir)/log4cpp/include \
-                          -I$(top_builddir)/log4cpp/include
+AM_CPPFLAGS		= @TACO_INCLUDES@ @LOG4CPP_CFLAGS@
 
 MessageServer_SOURCES	= MessageServer.cpp MessageServerMain.cpp 
-MessageServer_LDADD	= @TACO_SERVER_LIBS@ $(top_builddir)/log4cpp/src/liblog4cpp.la
+MessageServer_LDADD	= @TACO_SERVER_LIBS@ $(top_builddir)/lib/log4taco/liblog4taco.la

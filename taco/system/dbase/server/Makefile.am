@@ -23,9 +23,9 @@ sbin_PROGRAMS		= dbm_server
 
 lib_LTLIBRARIES 	= 
 
-INCLUDES		= @TACO_INCLUDES@ -I$(top_srcdir)/log4cpp/include \
-			  -I$(top_builddir)/log4cpp/include
-AM_CPPFLAGS		= -DNODEBUG
+AM_CPPFLAGS		= -DNODEBUG @TACO_INCLUDES@ @LOG4CPP_CFLAGS@
+INCLUDES		=
+
 
 if GDBMSUPPORT
 noinst_HEADERS		+= NdbmClass.h NdbmServer.h 
@@ -92,5 +92,6 @@ endif
 
 dbm_server_CFLAGS	= -DNODEBUG 
 dbm_server_SOURCES 	= main_svc.cpp dbm.cpp db_serv.cpp
-dbm_server_LDADD	= @TACO_SERVER_LIBS@ $(lib_LTLIBRARIES) -lstdc++ $(top_builddir)/log4cpp/src/liblog4cpp.la
+dbm_server_LDADD	= @TACO_SERVER_LIBS@ $(lib_LTLIBRARIES) -lstdc++ @LOG4CPP_LIBS@
+
 dbm_server_LDFLAGS	= -static

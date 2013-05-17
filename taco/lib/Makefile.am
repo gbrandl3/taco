@@ -32,12 +32,11 @@ if BUILD_DATAPORT
 SUBDIRS			+= dataport
 endif
 
-SUBDIRS			+= .
-
 if TANGO_BUILD
 SUBDIRS			+= tango
 endif
 
+SUBDIRS			+= . 
 if BUILD_LOG4CPP
 SUBDIRS			+= log4taco
 endif
@@ -86,9 +85,13 @@ libtaco___la_LIBADD	+= dc/libdcapi.la
 endif
 libtaco___la_LDFLAGS 	= -version-info @LIB_VERSION@
 
+if TANGO_BUILD
+libtaco___la_LIBADD	+= tango/libtacotango++.la
+endif
+
 libtacomain_la_SOURCES 	= DevServerMain.c 
 if BUILTIN_STARTUP
-#libtacomain_la_SOURCES 	+= startup.c
+#libtacomain_la_SOURCES += startup.c
 endif
 libtacomain_la_LDFLAGS 	= -version-info @LIB_VERSION@
 

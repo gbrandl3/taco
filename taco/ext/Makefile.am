@@ -21,7 +21,7 @@ if BUILD_PYTHON
 SUBDIRS += python 
 endif
 
-ACLOCAL_AMFLAGS = -I m4 -I @DSHOME@/share/aclocal
+ACLOCAL_AMFLAGS = -I m4 -I @DSHOME@/share/aclocal 
 
 DISTCHECK_CONFIGURE_FLAGS= DSHOME=@DSHOME@
 

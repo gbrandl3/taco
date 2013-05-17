@@ -15,9 +15,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-INCLUDES                = @TACO_INCLUDES@ -I$(top_srcdir)/ext/include \
-			-I$(top_srcdir)/log4cpp/include \
-			-I$(top_builddir)/log4cpp/include
+AM_CPPFLAGS		= @TACO_INCLUDES@ -I$(top_srcdir)/ext/include @LOG4CPP_CFLAGS@ @LOG4TACO_CFLAGS@
+
 
 include_HEADERS          = TACOMotor.h TACOMotorCommon.h TACOMotorWorker.h
 
@@ -31,7 +30,7 @@ bin_PROGRAMS            = TACOMotor
 
 TACOMotor_SOURCES       = startup.cpp
 
-TACOMotor_LDADD         = @TACO_CLIENT_CXX_LIBS@ libTACOMotor.la $(top_builddir)/lib/log4taco/liblog4taco.la
+TACOMotor_LDADD         = @TACO_CLIENT_CXX_LIBS@ libTACOMotor.la 
 
 
 
