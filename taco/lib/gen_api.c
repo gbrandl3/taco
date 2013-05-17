@@ -26,13 +26,13 @@
  *		servers and clients using the SUN-RPC.
  *
  * Author(s)  :	Jens Meyer
- * 		$Author: jensmeyer $
+ * 		$Author: jkrueger1 $
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.41 $
+ * Version    :	$Revision: 1.42 $
  *
- * Date       : $Date: 2012-03-29 13:57:33 $
+ * Date       : $Date: 2013-05-17 07:46:59 $
  *
  ********************************************************************-*/
 
@@ -1009,6 +1009,9 @@ long _DLLFunc db_import (DevLong *error)
 	if (res == DS_OK && default_nethost < 0)
 	{
 		long i_nethost = get_i_nethost_by_name(nethost, error);
+		if (i_nethost < 0) {
+			return DS_NOTOK;
+		}
 		default_nethost = i_nethost;
 		config_flags = &multi_nethost[default_nethost].config_flags;
 		db_info.conf = multi_nethost[default_nethost].db_info ;
@@ -1047,6 +1050,10 @@ long _DLLFunc db_import_multi (const char *nethost, DevLong *error)
                 if ((setup_config_multi(nethost,error)) < 0)
                         return (DS_NOTOK);
 		i_nethost = get_i_nethost_by_name(nethost,error);
+		if (i_nethost < 0) {
+			return DS_NOTOK;
+		}
+
 	}
 /* 
  * which nethost to import the database from

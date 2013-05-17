@@ -27,13 +27,13 @@
  *		handle remote devices.
  *
  * Author(s)  :	Jens Meyer
- * 		$Author: jensmeyer $
+ * 		$Author: jkrueger1 $
  *
  * Original   :	April 1993
  *
- * Version:	$Revision: 1.42 $
+ * Version:	$Revision: 1.43 $
  *
- * Date:		$Date: 2010-08-04 13:59:46 $
+ * Date:		$Date: 2013-05-17 07:46:59 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H
@@ -1098,7 +1098,7 @@ long _DLLFunc get_i_nethost_by_name (const char *nethost, DevLong *error)
  */
 	if(nethost == NULL)
 		if (default_nethost != -1)
-			return -1;
+			return default_nethost;
 		else
 		{
 			db_import(error);

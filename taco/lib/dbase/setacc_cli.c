@@ -30,9 +30,9 @@
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.27 $
+ * Version    :	$Revision: 1.28 $
  *
- * Date       :	$Date: 2010-06-22 11:09:07 $
+ * Date       :	$Date: 2013-05-17 07:46:59 $
  * 
  *-*******************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -258,6 +258,10 @@ int _DLLFunc db_getresource(const char *devname, Db_resource res, u_int res_num,
  * Find where the nethost is in the multi-nethost array 
  */
 		i_nethost = get_i_nethost_by_name(nethost,perr);
+		if (i_nethost < 0) {
+			return DS_NOTOK;
+		}
+
 	}
 /* 
  * If the RPC connection to the database server is not built, build one.
@@ -1346,6 +1350,10 @@ int _DLLFunc db_putresource(const char *dev_name, Db_resource res, u_int res_num
  * Find where the nethost is in the multi-nethost array 
  */
 		i_nethost = get_i_nethost_by_name(nethost,perr);
+		if (i_nethost < 0) {
+			return DS_NOTOK;
+		}
+
 	}
 /* 
  * If the RPC connection to the database server is not built, build one.
@@ -2316,6 +2324,10 @@ int _DLLFunc db_delresource(const char *dev_name, char **res_name, u_int res_num
  * Find where the nethost is in the multi-nethost array 
  */
 		i_nethost = get_i_nethost_by_name(nethost,perr);
+		if (i_nethost < 0) {
+			return DS_NOTOK;
+		}
+
 	}
 /* 
  * If the RPC connection to the database server is not built, build one.

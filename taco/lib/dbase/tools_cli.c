@@ -31,9 +31,9 @@
  * 
  * Original   :   April 1997
  * 
- * Version    :   $Revision: 1.12 $
+ * Version    :   $Revision: 1.13 $
  * 
- * Date       :   $Date: 2008-10-23 05:25:49 $
+ * Date       :   $Date: 2013-05-17 07:46:59 $
  ********************************************************************/
 
 #ifdef HAVE_CONFIG_H
@@ -197,6 +197,9 @@ long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info, DevLong *p_erro
  * Find where the nethost is in the multi-nethost array 
  */
 		i_nethost = get_i_nethost_by_name(nethost, p_error);
+		if (i_nethost < 0) {
+			return DS_NOTOK;
+		}
 	}
 /* 
  * If the RPC connection to the database server is not built, build one.

@@ -27,13 +27,13 @@
  *
  * Author(s)  :	Andy Goetz
  *		Jens Meyer
- * 		$Author: jensmeyer $
+ * 		$Author: jkrueger1 $
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.45 $
+ * Version    :	$Revision: 1.46 $
  *
- * Date	    :	$Date: 2010-03-05 15:50:35 $
+ * Date	    :	$Date: 2013-05-17 07:46:59 $
  *
  ********************************************************************-*/
 
@@ -368,6 +368,9 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, D
 			if (setup_config_multi(nethost,error) != DS_OK)
 				return(DS_NOTOK);
 			i_nethost = get_i_nethost_by_name(nethost,error);
+	    if (i_nethost < 0) {
+		return DS_NOTOK;
+	    }
 		}
 	}
 
