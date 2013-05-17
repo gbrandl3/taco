@@ -12,12 +12,15 @@ Author(s) : 	Andy Goetz
 
 Original : 	January 1997 
 
-Version:	$Revision: 1.3 $ 
+Version:	$Revision: 1.4 $ 
 
-Data:		$Date: 2009-09-25 07:03:56 $
+Data:		$Date: 2013-05-17 08:38:13 $
 
 History:	
 		$Log: not supported by cvs2svn $
+		Revision 1.3  2009/09/25 07:03:56  jkrueger1
+		some samll improvements
+		
 		Revision 1.2  2008/04/06 09:06:55  jkrueger1
 		Merge from branch JK
 		
@@ -83,7 +86,7 @@ Description: 	main function to test asynchronous DSAPI.
 int main(int argc, char **argv) 
 {
 	devserver hw; 
-	long access = WRITE_ACCESS, status; 
+	DevLong access = WRITE_ACCESS, status; 
 	DevLong	error; 
 	char *ch_ptr, helloworld[256], dev_name[256] = ""; 
 	struct timeval timeout_25s = {25,0}; 

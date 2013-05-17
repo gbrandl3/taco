@@ -27,7 +27,7 @@ helloworld_LDADD		= @TACO_CLIENT_LIBS@
 helloworld_async_SOURCES 	= helloworld_async.c
 helloworld_async_LDADD		= @TACO_CLIENT_LIBS@
 
-noinst_INCLUDES			= helloP.h
+noinst_HEADERS			= helloP.h
 
 helloserver_SOURCES		= hello.c startup.c
 helloserver_LDADD		= @TACO_SERVER_LIBS@
