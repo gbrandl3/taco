@@ -1,6 +1,6 @@
 dnl Toolkit for building distributed control systems or any other distributed system.
 dnl
-dnl Copyright (C) 2003-2005  Jens Krueger <jkrueger1@users.sf.net>
+dnl Copyright (C) 2003-2012  Jens Krueger <jkrueger1@users.sf.net>
 dnl
 dnl This library is free software; you can redistribute it and/or
 dnl modify it under the terms of the GNU Lesser General Public
@@ -16,18 +16,18 @@ dnl You should have received a copy of the GNU Lesser General Public
 dnl License along with this library; if not, write to the Free Software
 dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_INIT([TACO], [3.99.70], [taco-devel@lists.sourceforge.net])
+AC_INIT([TACO], [3.99.127], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
-AC_REVISION($Revision: 1.125 $)dnl
-AC_COPYRIGHT([(C) 1990-2008 ESRF])
-AC_CONFIG_AUX_DIR(config)
+AC_REVISION($Revision: 1.126 $)dnl
+AC_COPYRIGHT([(C) 1990-2012 ESRF])
+AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_SRCDIR([config.h.in])
 
-AC_CONFIG_MACRO_DIR(m4)
+AC_CONFIG_MACRO_DIR([m4])
 
 TACO_CHECK_SYSTEM
 
-AC_SUBST(LIB_VERSION, [15:4:0])
+AC_SUBST(LIB_VERSION, [16:7:0])
 
 TACO_CHECK_SIZEOF_TYPES
 
@@ -89,8 +89,7 @@ AC_SUBST(docdir,        ['${datadir}/doc/packages/taco'])
 AC_SUBST(templatedir,   ['${datadir}/taco/templates'])
 AC_SUBST(resdatadir,    ['${datadir}/taco/dbase/res'])
 AC_SUBST(dbmdir,        ['${localstatedir}/cache/taco'])
-eval logdir=${localstatedir}/log/taco
-AC_SUBST(logdir)
+AC_SUBST(logdir,	['${localstatedir}/log/taco'])
 AC_SUBST(rundir,        ['${localstatedir}/run'])
 AC_SUBST(pkgconfigdir,  ['${libdir}/pkgconfig'])
 
@@ -131,8 +130,13 @@ TACO_DATABASE_SERVER
 TACO_CLIENT_TCP
 TACO_FRM_EXT
 
-AM_PATH_LOG4CPP([1.0.0], [taco_build_log4cpp=no], [taco_build_log4cpp=yes])
+AM_PATH_LOG4CPP([1.0.0], [taco_build_log4cpp=no], [
+taco_build_log4cpp=yes
+AC_SUBST(LOG4CPP_CFLAGS, ["-I\$(top_srcdir)/log4cpp/src -I\$(top_srcdir)/log4cpp/include -I\$(top_builddir)/log4cpp/include"])
+AC_SUBST(LOG4CPP_LIBS, ["\$(top_builddir)/log4cpp/src/liblog4cpp.la"])
+])
 AM_CONDITIONAL(BUILD_LOG4CPP, test "x$taco_build_log4cpp" = "xyes")
+AC_SUBST(LOG4TACO_CFLAGS, ["-I\$(top_srcdir)/lib/log4taco"])
 
 AC_CONFIG_SUBDIRS([gdbm log4cpp])
 
@@ -197,6 +201,7 @@ AC_CONFIG_FILES(Makefile
 		system/xdevmenu/Makefile
 		system/xdevmenu/doc/Makefile
 		system/starter/Makefile
+		system/starter/client/Makefile
 		system/alarm/Makefile
 		system/testcs/Makefile
 		taco.spec
@@ -274,10 +279,6 @@ sed \
 tests/t > tests/taco \
 && rm tests/t && chmod +x tests/taco
 ])
-
-
-SWIG_PROG([1.3.17])
-SWIG_PYTHON([yes])
 
 AC_CONFIG_FILES([
 		ext/Makefile 
