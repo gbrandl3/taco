@@ -25,9 +25,9 @@
  * Authors:
  *		$Author: jkrueger1 $
  *
- * Version:	$Revision: 1.5 $
+ * Version:	$Revision: 1.6 $
  *
- * Date:	$Date: 2010-07-07 08:26:02 $
+ * Date:	$Date: 2013-05-17 07:57:59 $
  *
  */
 
@@ -135,7 +135,7 @@ db_res *SQLite3Server::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rq
 			pos = tmpf.find('/');
 			domain = tmpf.substr(0, pos);	
 			family = tmpf.substr(pos + 1);
-			query += (" CONCAT(DOMAIN, '/', FAMILY) LIKE '" + escape_wildcards(tmpf) + "' AND");
+			query += (" DOMAIN || '/' || FAMILY LIKE '" + escape_wildcards(tmpf) + "' AND");
 			break;
 		case 0 : 
 			domain = tmpf;		
