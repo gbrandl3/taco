@@ -23,13 +23,13 @@
  * Description: TACO server in Python
  *
  * Author(s):   J. Meyer
- *		$Author: jensmeyer $
+ *		$Author: jkrueger1 $
  *
  * Original:    June 2000
  *
- * Date:	$Date: 2012-07-26 10:03:42 $
+ * Date:	$Date: 2013-05-17 07:46:04 $
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  */
 
 #ifdef HAVE_CONFIG_H
@@ -40,6 +40,7 @@
 #endif
  
 #include <API.h>
+#include <private/ApiP.h>
 #include <Admin.h>
 
 #include <DevServer.h>
