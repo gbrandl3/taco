@@ -29,6 +29,8 @@ pythondir=@pythondir@
 pyexecdir=@pyexecdir@
 localstatedir=@localstatedir@
 sysconfdir=@sysconfdir@
+logdir=@logdir@
+dbmdir=@dbmdir@
 
 ### USER SETUP START
 # Add your domain tables here (comma separated)
@@ -58,8 +60,8 @@ DBTABLES=NAMES,PS_NAMES,CLASS,SYS,ERROR,CMDS,SEC,EVENTS,${DBTABLES_CUSTOM}
 unset DBTABLES_CUSTOM
 
 RES_BASE_DIR=${RES_BASE_DIR:-@resdatadir@}
-DBM_DIR=@dbmdir@
-LOGPATH=@logdir@
+DBM_DIR=${dbmdir}
+LOGPATH=${logdir}
 LOGCONFIG=${LOGCONFIG:-${sysconfdir}/taco_log.cfg}
 
 NETHOST=${NETHOST:-`@HOSTNAME_CMD@`}
