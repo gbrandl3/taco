@@ -31,9 +31,9 @@
  * 
  * Original   :   April 1997
  * 
- * Version    :   $Revision: 1.13 $
+ * Version    :   $Revision: 1.14 $
  * 
- * Date       :   $Date: 2013-05-17 07:46:59 $
+ * Date       :   $Date: 2013-05-17 08:44:05 $
  ********************************************************************/
 
 #ifdef HAVE_CONFIG_H
@@ -197,7 +197,8 @@ long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info, DevLong *p_erro
  * Find where the nethost is in the multi-nethost array 
  */
 		i_nethost = get_i_nethost_by_name(nethost, p_error);
-		if (i_nethost < 0) {
+		if (i_nethost < 0)
+		{
 			return DS_NOTOK;
 		}
 	}

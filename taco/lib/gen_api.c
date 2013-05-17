@@ -30,9 +30,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.42 $
+ * Version    :	$Revision: 1.43 $
  *
- * Date       : $Date: 2013-05-17 07:46:59 $
+ * Date       : $Date: 2013-05-17 08:44:05 $
  *
  ********************************************************************-*/
 
@@ -1009,7 +1009,8 @@ long _DLLFunc db_import (DevLong *error)
 	if (res == DS_OK && default_nethost < 0)
 	{
 		long i_nethost = get_i_nethost_by_name(nethost, error);
-		if (i_nethost < 0) {
+		if (i_nethost < 0)
+		{
 			return DS_NOTOK;
 		}
 		default_nethost = i_nethost;
@@ -1050,7 +1051,8 @@ long _DLLFunc db_import_multi (const char *nethost, DevLong *error)
                 if ((setup_config_multi(nethost,error)) < 0)
                         return (DS_NOTOK);
 		i_nethost = get_i_nethost_by_name(nethost,error);
-		if (i_nethost < 0) {
+		if (i_nethost < 0)
+		{
 			return DS_NOTOK;
 		}
 

@@ -31,9 +31,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.46 $
+ * Version    :	$Revision: 1.47 $
  *
- * Date	    :	$Date: 2013-05-17 07:46:59 $
+ * Date	    :	$Date: 2013-05-17 08:44:05 $
  *
  ********************************************************************-*/
 
@@ -368,9 +368,10 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, D
 			if (setup_config_multi(nethost,error) != DS_OK)
 				return(DS_NOTOK);
 			i_nethost = get_i_nethost_by_name(nethost,error);
-	    if (i_nethost < 0) {
-		return DS_NOTOK;
-	    }
+			if (i_nethost < 0)
+			{
+				return DS_NOTOK;
+			}
 		}
 	}
 

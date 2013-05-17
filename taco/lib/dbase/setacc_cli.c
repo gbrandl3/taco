@@ -30,9 +30,9 @@
  *
  * Original   : January 1991
  *
- * Version    :	$Revision: 1.28 $
+ * Version    :	$Revision: 1.29 $
  *
- * Date       :	$Date: 2013-05-17 07:46:59 $
+ * Date       :	$Date: 2013-05-17 08:44:05 $
  * 
  *-*******************************************************************/
 #ifdef HAVE_CONFIG_H
@@ -258,7 +258,8 @@ int _DLLFunc db_getresource(const char *devname, Db_resource res, u_int res_num,
  * Find where the nethost is in the multi-nethost array 
  */
 		i_nethost = get_i_nethost_by_name(nethost,perr);
-		if (i_nethost < 0) {
+		if (i_nethost < 0)
+		{
 			return DS_NOTOK;
 		}
 
@@ -1350,7 +1351,8 @@ int _DLLFunc db_putresource(const char *dev_name, Db_resource res, u_int res_num
  * Find where the nethost is in the multi-nethost array 
  */
 		i_nethost = get_i_nethost_by_name(nethost,perr);
-		if (i_nethost < 0) {
+		if (i_nethost < 0)
+		{
 			return DS_NOTOK;
 		}
 
@@ -2324,7 +2326,8 @@ int _DLLFunc db_delresource(const char *dev_name, char **res_name, u_int res_num
  * Find where the nethost is in the multi-nethost array 
  */
 		i_nethost = get_i_nethost_by_name(nethost,perr);
-		if (i_nethost < 0) {
+		if (i_nethost < 0)
+		{
 			return DS_NOTOK;
 		}
 
@@ -3951,7 +3954,7 @@ int _DLLFunc db_svc_check(const char *ds_netname, char **pho_name, u_int *pp_num
 /* Any problem with server ? If yes and if it is a time-out, try to reconnect
    to a new database server. Don't forget to free memory in case of error */
 
-	else
+        if (back == NULL)
 	{
 		if (error == DevErr_RPCTimedOut || error == DbErr_RPCreception)
 		{
@@ -3979,12 +3982,12 @@ int _DLLFunc db_svc_check(const char *ds_netname, char **pho_name, u_int *pp_num
 
 	if (back->db_err != DS_OK)
 	{
+		*perr = back->db_err;
 #ifdef ALONE
 		clnt_freeres(cl,(xdrproc_t)xdr_svc_inf,(char *)back);
 #else	
 		clnt_freeres(db_info.conf->clnt,(xdrproc_t)xdr_svc_inf,(char *)back);
 #endif
-		*perr = back->db_err;
 		return(DS_NOTOK);
 	}
 
@@ -3993,6 +3996,11 @@ int _DLLFunc db_svc_check(const char *ds_netname, char **pho_name, u_int *pp_num
 	if ((*pho_name = (char *)malloc(strlen(back->ho_name) + 1)) == NULL)
 	{
 		*perr = DbErr_ClientMemoryAllocation;
+#ifdef ALONE
+		clnt_freeres(cl,(xdrproc_t)xdr_svc_inf,(char *)back);
+#else
+		clnt_freeres(db_info.conf->clnt,(xdrproc_t)xdr_svc_inf,(char *)back);
+#endif
 		return(DS_NOTOK);
 	}
 	strcpy(*pho_name,back->ho_name);
