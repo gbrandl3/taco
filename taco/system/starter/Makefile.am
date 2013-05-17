@@ -19,9 +19,11 @@
 
 sbin_PROGRAMS 	= StartServer
 
-noinst_HEADERS 	= StarterDevice.h
+noinst_HEADERS 	= StarterDevice.h StarterCmds.h
 
-AM_CXXFLAGS 	= @TACO_INCLUDES@ -I$(top_srcdir)/log4cpp/include -I$(top_builddir)/log4cpp/include
+include_HEADERS	= StarterCommon.h
+
+AM_CXXFLAGS 	= @TACO_INCLUDES@ @LOG4CPP_CFLAGS@ -I$(top_srcdir)/ext/include
 AM_CFLAGS	= @TACO_INCLUDES@
 
 StartServer_SOURCES 	= StarterDevice.cpp startup.cpp device_server.c
@@ -31,4 +33,10 @@ StartServer_SOURCES 	= StarterDevice.cpp startup.cpp device_server.c
 StartServer_LDADD 	= @TACO_SERVER_CXX_LIBS@ 
 #endif
 
-StartServer_LDADD	+= $(top_builddir)/log4cpp/src/liblog4cpp.la
+StartServer_LDADD	+= $(top_builddir)/lib/log4taco/liblog4taco.la @LOG4CPP_LIBS@
+
+SUBDIRS		= .
+
+if BUILD_EXT
+SUBDIRS		+= client
+endif

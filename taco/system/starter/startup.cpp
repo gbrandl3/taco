@@ -26,9 +26,9 @@
  *
  * Original:	January 2003
  *
- * Version:	$Revision: 1.13 $
+ * Version:	$Revision: 1.14 $
  *
- * Revision:	$Date: 2008-10-15 15:10:09 $
+ * Revision:	$Date: 2013-05-17 07:55:50 $
  *
  */
 
@@ -131,7 +131,8 @@ static void CleanServer(void)
 {
 	DevLong lError;
 
-	db_svc_unreg(const_cast<char *>(devServer.c_str()), &lError);
+	if (db_svc_unreg(const_cast<char *>(devServer.c_str()), &lError) == DS_OK)
+	        logStream->noticeStream() << "cleanup: success" << log4cpp::eol;
 	return;
 }
 
@@ -222,6 +223,6 @@ long ServerSetup(char *pszServerName, long *plError)
 		return DS_NOTOK;
 	}
     	logStream->debugStream() << "Device server <" << pszServerName << "> started (pid = " << getpid() << ")." << log4cpp::eol;
-
+        logStream->noticeStream() << "startup: success" << log4cpp::eol;
     	return DS_OK;
 }

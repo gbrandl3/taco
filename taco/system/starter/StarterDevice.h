@@ -26,9 +26,9 @@
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2008-10-15 15:10:09 $
+ * Date:	$Date: 2013-05-17 07:55:50 $
  *
  *****************************************************************************/
 
@@ -49,14 +49,6 @@
 #if HAVE_PTHREAD_H
 #	include <pthread.h>
 #endif
-
-#define DevStartAll		3000L
-#define DevStopAll		3001L
-#define DevStart		3002L
-#define DevGetRunningServers	3003L
-#define DevGetStoppedServers	3004L
-#define DevReadLog		3005L
-#define UpdateServerInfo	3006L
 
 struct ControlledServer
 {
@@ -104,6 +96,11 @@ protected:
 
 private:
 	/**
+	 * TACO command for status
+         */
+	long tacoDevStatus(DevArgument argin, DevArgument argout, DevLong *error);
+
+	/**
 	 * TACO command for starting a Device server.
 	 */
 	long tacoDevRun(DevArgument argin, DevArgument argout, DevLong *error);
@@ -148,6 +145,43 @@ private:
 	 */
 	long tacoUpdateServerInfo(DevArgument argin, DevArgument argout, DevLong *error);
 
+#ifdef TACO_EXT
+	/**
+         * TACO command for reading the device version string
+         */
+	long tacoDevVersion(DevArgument argin, DevArgument argout, DevLong *error);
+
+	/**
+	 * TACO command for reading the device type strings
+	 */
+	long tacoDeviceTypes(DevArgument argin, DevArgument argout, DevLong *errror);
+
+	/**
+         * TACO command to update a device resource
+	 */
+	long tacoDeviceUpdateResource(DevArgument argin, DevArgument argout, DevLong *error);
+
+	/**
+	 * TACO command to query a resource
+	 */
+	long tacoDevQueryResource(DevArgument argin, DevArgument argout, DevLong *error);
+
+	/**
+	 * TACO command
+	 */
+	long tacoDevUpdate(DevArgument argin, DevArgument argout, DevLong *error);
+
+	/**
+	 * TACO command to query infos about the device resources
+	 */
+	long tacoDeviceQueryResourceInfo(DevArgument argin, DevArgument argout, DevLong *error);
+
+	/**
+	 * TACO command to init the device
+	 */
+	long tacoDevInit(DevArgument argin, DevArgument argout, DevLong *error);
+#endif
+
 public:
 	/**
 	 * Implementation of TACO command DevRun
@@ -171,17 +205,22 @@ protected:
 	void checkServerStatus(void);
 	
 private:
-	pid_t getpid(const std::string proc, const std::string pers);
+	pid_t getpid(const std::string &proc, const std::string &pers);
+
+        bool running(const std::string &proc, const std::string &pers);
 	
+	void clearControlledList();
+
+private:
 	std::vector<ControlledServer*>	m_servers;
 
-	pthread_mutex_t         m_refMutex;
+	pthread_mutex_t         	m_refMutex;
 
-        pthread_t               m_checking;
+        pthread_t               	m_checking;
 
-        int                     m_runningState;
+        int                     	m_runningState;
 
-        int                     m_updateRequest;
+        int                     	m_updateRequest;
 };
 
 

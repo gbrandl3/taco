@@ -26,9 +26,9 @@
  *
  * Original:    January 2003
  *
- * Version:	$Revision: 1.2 $
+ * Version:	$Revision: 1.3 $
  *
- * Date:	$Date: 2008-10-15 15:10:09 $
+ * Date:	$Date: 2013-05-17 07:55:49 $
  *
  */
 
@@ -66,6 +66,10 @@
 #	include <sys/wait.h>
 #endif
 
+#ifdef TACO_EXT
+#	include <TACOBasicCommands.h>
+#endif
+
 #include <private/ApiP.h>
 
 #include <log4cpp/BasicConfigurator.hh>
@@ -74,22 +78,81 @@
 
 #include <db_setup.h>
 
+#include "StarterCmds.h"
+#include "StarterCommon.h"
+
 extern log4cpp::Category       *logStream;
 
 StarterDevice::StarterDevice(std::string name, DevLong &error)
 	: Device(const_cast<char *>(name.c_str()), &error)
 	, m_runningState(0)
 {
+	commands_map[DevOn] = DeviceCommandListEntry(DevOn,
+					static_cast<DeviceMemberFunction>( &Device::On),
+					D_VOID_TYPE,
+					D_VOID_TYPE,
+					ADMIN_ACCESS, "DevOn");
+	commands_map[DevOff] = DeviceCommandListEntry(DevOff,
+					static_cast<DeviceMemberFunction>( &Device::Off),
+					D_VOID_TYPE,
+					D_VOID_TYPE,
+					ADMIN_ACCESS, "DevOff");
         commands_map[DevState] = DeviceCommandListEntry(DevState, 
 					static_cast<DeviceMemberFunction>( &Device::State),
 					D_VOID_TYPE,
                                         D_SHORT_TYPE,
                                         READ_ACCESS, "DevState");
-        commands_map[DevStatus] = DeviceCommandListEntry(DevStatus, 
-					static_cast<DeviceMemberFunction>( &Device::Status),
+	commands_map[DevReset] = DeviceCommandListEntry(DevReset,
+					static_cast<DeviceMemberFunction>( &Device::Reset),
 					D_VOID_TYPE,
+					D_VOID_TYPE,
+					ADMIN_ACCESS, "DevReset");
+        commands_map[DevStatus] = DeviceCommandListEntry(DevStatus, 
+					static_cast<DeviceMemberFunction>( &StarterDevice::tacoDevStatus),
+					D_VOID_TYPE,
+#ifdef TACO_EXT
+					D_VAR_CHARARR,
+#else
                                         D_STRING_TYPE,
+#endif
                                         READ_ACCESS, "DevStatus");
+#ifdef TACO_EXT
+	commands_map[TACO_COMMAND_DEVICE_VERSION] = DeviceCommandListEntry(TACO_COMMAND_DEVICE_VERSION,
+					static_cast<DeviceMemberFunction>( &StarterDevice::tacoDevVersion),
+					D_VOID_TYPE,
+					D_VAR_CHARARR,
+					READ_ACCESS, "DevVersion");
+	commands_map[TACO_COMMAND_DEVICE_TYPES] = DeviceCommandListEntry(TACO_COMMAND_DEVICE_TYPES,
+					static_cast<DeviceMemberFunction>( &StarterDevice::tacoDeviceTypes),
+					D_VOID_TYPE,
+					D_VAR_STRINGARR,
+					READ_ACCESS, "DevTypes");
+	commands_map[TACO_COMMAND_DEVICE_UPDATE_RESOURCE] = DeviceCommandListEntry(TACO_COMMAND_DEVICE_UPDATE_RESOURCE,
+					static_cast<DeviceMemberFunction>( &StarterDevice::tacoDeviceUpdateResource),
+					D_VAR_CHARARR,
+					D_VOID_TYPE,
+					SI_WRITE_ACCESS, "DevUpdateResource");
+	commands_map[TACO_COMMAND_DEVICE_QUERY_RESOURCE] = DeviceCommandListEntry(TACO_COMMAND_DEVICE_QUERY_RESOURCE,
+					static_cast<DeviceMemberFunction>( &StarterDevice::tacoDevQueryResource),
+					D_VAR_CHARARR,
+					D_VAR_CHARARR,
+					READ_ACCESS, "DevQueryResource");
+	commands_map[TACO_COMMAND_DEVICE_UPDATE] = DeviceCommandListEntry(TACO_COMMAND_DEVICE_UPDATE,
+					static_cast<DeviceMemberFunction>( &StarterDevice::tacoDevUpdate),
+					D_VOID_TYPE,
+					D_VOID_TYPE,
+					ADMIN_ACCESS, "DevUpdate");
+	commands_map[TACO_COMMAND_DEVICE_QUERY_RESOURCE_INFO] = DeviceCommandListEntry(TACO_COMMAND_DEVICE_QUERY_RESOURCE_INFO,
+					static_cast<DeviceMemberFunction>( &StarterDevice::tacoDeviceQueryResourceInfo),
+					D_VOID_TYPE,
+					D_VAR_CHARARR,
+					READ_ACCESS, "DevQueryResourceInfo");
+	commands_map[TACO_COMMAND_DEVICE_INIT] = DeviceCommandListEntry(TACO_COMMAND_DEVICE_INIT,
+					static_cast<DeviceMemberFunction>( &StarterDevice::tacoDevInit),
+					D_VOID_TYPE,
+					D_VOID_TYPE,
+					ADMIN_ACCESS, "DevInit");
+#endif
         commands_map[DevRun] = DeviceCommandListEntry(DevRun, 
 					static_cast<DeviceMemberFunction>( &StarterDevice::tacoDevRun),
 					D_VAR_STRINGARR,
@@ -156,17 +219,22 @@ StarterDevice::StarterDevice(std::string name, DevLong &error)
 
 StarterDevice::~StarterDevice()
 {
+	logStream->debugStream() << "Destructor" << log4cpp::eol;
 	pthread_mutex_lock(&m_refMutex);
 	m_runningState = 0;
 	pthread_mutex_unlock(&m_refMutex);
 	pthread_join(this->m_checking, NULL);
 	pthread_mutex_destroy(&m_refMutex);
-	DevLong	error;
-	logStream->debugStream() << "Destructor" << log4cpp::eol;
+	clearControlledList();
+
+	return;
+}
+
+void StarterDevice::clearControlledList()
+{
 	for (std::vector<ControlledServer*>::iterator i = m_servers.begin(); i < m_servers.end(); ++i)
 		delete (*i);
 	m_servers.clear();
-	return;
 }
 
 void StarterDevice::v_Init(void)
@@ -182,9 +250,8 @@ void StarterDevice::v_Init(void)
 //
 // Get the list of all devices to be started on default on this machine
 // 
-	for (std::vector<ControlledServer*>::iterator i = m_servers.begin(); i < m_servers.end(); ++i)
-		delete (*i);
-	m_servers.clear();
+	clearControlledList();
+
 	if (db_getresource(const_cast<char *>(this->GetDevName()) , &server, 1, &error) == DS_OK)
 	{
 		for (int i = 0; i < server_list.length; ++i)
@@ -261,7 +328,7 @@ void StarterDevice::v_Init(void)
 								if (dev_import(s_info.server->device[0].dev_name, 0, &tmp->proxyDevice, &error) == DS_NOTOK)
 									logStream->debugStream() << "COULD NOT IMPORT : " << s_info.server->device[0].dev_name << log4cpp::eol;
 								else if (!tmp->running())
-									logStream->infoStream() << "COULD NOT PING : " << s_info.server->device[0].dev_name << log4cpp::eol;
+									logStream->debugStream() << "COULD NOT PING : " << s_info.server->device[0].dev_name << log4cpp::eol;
 							}
 							m_servers.push_back(tmp);
 						}
@@ -292,6 +359,29 @@ void StarterDevice::v_Init(void)
 	}
 }
 	
+long StarterDevice::tacoDevStatus(DevArgument argin, DevArgument argout, DevLong *error)
+{
+	char *pargout;
+
+	DevLong status = Device::Status(argin, &pargout, error);
+
+	if (status == DS_OK)
+	{
+#ifdef TACO_EXT
+		static DevVarCharArray arr = {0, NULL};
+		if (!arr.sequence)
+		{
+			arr.sequence = static_cast<char *>(malloc(sizeof(pargout)));
+		}
+		arr.length = strlen(pargout);
+		strncpy(arr.sequence, pargout, arr.length);
+		*static_cast<DevVarCharArray *>(argout) = arr;
+#else
+		*static_cast<DevString *>(argout) = pargout;
+#endif
+	}
+	return status;
+}
 
 long StarterDevice::tacoDevRun(DevArgument argin, DevArgument argout, DevLong *error) 
 {
@@ -372,7 +462,7 @@ void StarterDevice::deviceRun(const std::string proc, const std::string pers, co
 {
 	DevVarStringArray	server_list = {0, NULL};
 	db_resource		server = {"default", D_VAR_STRINGARR, &server_list};	
-	DevLong 		error;
+	DevLong 		error(DS_OK);
 	std::string		newServer = proc + '/' + pers;
 
 	logStream->infoStream() << "Try to start server : " << newServer << log4cpp::eol;
@@ -398,7 +488,7 @@ void StarterDevice::deviceRun(const std::string proc, const std::string pers, co
 //
 		if (std::find(names_of_server.begin(), names_of_server.end(), newServer) == names_of_server.end())
 			names_of_server.push_back(newServer);
-		else if (this->getpid(proc, pers) != 0)
+		else if (this->running(proc, pers))
 		{
 			logStream->warnStream() << "Process " << proc << " already running." << log4cpp::eol;
 			return;
@@ -418,10 +508,10 @@ void StarterDevice::deviceRun(const std::string proc, const std::string pers, co
 			pid_t	pid = fork();
 			if (pid == 0)
 			{
-				logStream->debugStream() << "Start Child : " << proc << " " << pers << " " << options << log4cpp::eol;
+				logStream->infoStream() << "Start Child : " << proc << " " << pers << " " << options << log4cpp::eol;
 				int 	fd = open("/dev/null", O_APPEND);
 				dup2(fd, fileno(stdout));
-				execlp(proc.c_str(), proc.c_str(), pers.c_str(), options.c_str(), NULL);
+				execlp(proc.c_str(), proc.c_str(), pers.c_str(), options.c_str(), param.c_str(), NULL);
 				close(fd);
 				perror("Execute failed");
 				delete server_list.sequence[--server_list.length];
@@ -473,7 +563,22 @@ void StarterDevice::deviceReStart(const std::string proc, const std::string pers
 	return;
 }	
 
-pid_t StarterDevice::getpid(const std::string proc, const std::string pers)
+bool StarterDevice::running(const std::string &proc, const std::string &pers)
+{
+	db_svcinfo_call	server_info;
+	DevLong		error;
+
+	if (db_servinfo(const_cast<char *>(proc.c_str()), const_cast<char *>(pers.c_str()), &server_info, &error) == DS_OK)
+	{
+		if (server_info.embedded_server_nb > 0)
+			if (server_info.server->device_nb > 0)
+				return server_info.server->device->exported_flag != 0;
+		return false;
+	}
+	throw error;
+}
+
+pid_t StarterDevice::getpid(const std::string &proc, const std::string &pers)
 {	
 	db_svcinfo_call	server_info;
 	DevLong		error;
@@ -586,6 +691,72 @@ long StarterDevice::tacoUpdateServerInfo(DevArgument, DevArgument, DevLong *erro
 	return DS_OK;
 }
 
+#ifdef TACO_EXT
+long StarterDevice::tacoDevVersion(DevArgument, DevArgument argout, DevLong *error)
+{
+	static DevVarCharArray result = {0, NULL};
+	if (!result.sequence)
+	{
+		std::string version(VERSION);
+
+		result.length = version.length();
+		result.sequence = new DevChar[result.length];
+		strncpy(result.sequence, version.c_str(), result.length);
+	}
+	*static_cast<DevVarCharArray*>(argout) = result;
+	*error = DS_OK;
+	return DS_OK;
+}
+
+long StarterDevice::tacoDeviceTypes(DevArgument, DevArgument argout, DevLong *error)
+{
+	static DevVarStringArray result = {0, NULL};
+	if (!result.sequence)
+	{
+		std::string type(STARTER_ID);
+
+		result.length = 1;
+                result.sequence = static_cast<DevString*>(malloc(sizeof(DevString*)));
+		result.sequence[0] = static_cast<DevString>(malloc(type.length() + 1));
+		strcpy(result.sequence[0], type.c_str());
+	}
+	*static_cast<DevVarStringArray*>(argout) = result;
+	*error = DS_OK;
+	return DS_OK;
+}
+
+long StarterDevice::tacoDeviceUpdateResource(DevArgument argin, DevArgument, DevLong *error)
+{
+	*error = DS_OK;
+	return DS_OK;
+}
+
+long StarterDevice::tacoDevQueryResource(DevArgument argin, DevArgument argout, DevLong *error)
+{
+	*error = DS_OK;
+	return DS_OK;
+}
+
+long StarterDevice::tacoDevUpdate(DevArgument, DevArgument, DevLong *error)
+{
+	*error = DS_OK;
+	return DS_OK;
+}
+
+long StarterDevice::tacoDeviceQueryResourceInfo(DevArgument, DevArgument argout, DevLong *error)
+{
+	*error = DS_OK;
+	return DS_OK;
+}
+
+long StarterDevice::tacoDevInit(DevArgument, DevArgument, DevLong *error)
+{
+	*error = DS_OK;
+	return DS_OK;
+}
+
+#endif
+
 void StarterDevice::checkServerStatus(void)
 {
 	logStream->debugStream() << "." << log4cpp::eol;
@@ -597,7 +768,13 @@ void StarterDevice::checkServerStatus(void)
 			std::string tmpString = tmp->serverName;
 			if (!tmp->running())
 			{
-				deviceRun(tmp->serverName, tmp->persName, "-m", "-d");
+				try
+				{
+					deviceRun(tmp->serverName, tmp->persName, "-m", "-d");
+				}
+				catch ( ... )
+				{
+				}
 				tmpString += " not";
 			}
 			tmpString += " running";
