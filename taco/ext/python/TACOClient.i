@@ -324,13 +324,18 @@ Returns - the ouput of the command."
                 DevArgument     argin,
                                 argout;
 
+                {
+                SWIG_PYTHON_THREAD_BEGIN_BLOCK;
                 try
                 {
                         TACOPythonClient::convertToDevArgument(input, inputType, argin);
                 }
                 catch (::TACO::Exception &e)
                 {
+                        SWIG_PYTHON_THREAD_END_BLOCK;
                         TACO_exception_fail(PyExc_RuntimeError, (std::string("could not convert input argument: ") + e.what()).c_str());
+                }
+                SWIG_PYTHON_THREAD_END_BLOCK;
                 }
                 try
                 {
@@ -343,19 +348,22 @@ Returns - the ouput of the command."
    
                 try
                 {
-                        SWIG_PYTHON_THREAD_BEGIN_BLOCK;
                         self->execute(commandNumber, argin, inputType, argout, outputType);
-                        SWIG_PYTHON_THREAD_END_BLOCK;
                         PyObject *ret;
+                        {
+                        SWIG_PYTHON_THREAD_BEGIN_BLOCK;
                         try
                         {
                                 TACOPythonClient::convertToPyObject(outputType, argout, &ret);
                         }
                         catch (const ::TACO::Exception &e)
                         {
+                                SWIG_PYTHON_THREAD_END_BLOCK;
                                 TACOPythonClient::freeInputArgument(    inputType,argin);
                                 TACOPythonClient::freeOutputArgument(   outputType,argout);
                                 TACO_exception_fail(PyExc_RuntimeError, e.what());
+                        }
+                        SWIG_PYTHON_THREAD_END_BLOCK;
                         }
 //                      free(argout);
                         TACOPythonClient::freeInputArgument(    inputType,argin);
