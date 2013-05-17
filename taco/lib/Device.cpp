@@ -30,9 +30,9 @@
  *
  * Original:	March 1995
  *
- * Version:	$Revision: 1.20 $
+ * Version:	$Revision: 1.21 $
  *
- * Date:	$Date: 2013-05-17 07:52:11 $
+ * Date:	$Date: 2013-05-17 08:42:36 $
  *
  *-**********************************************************************/
 		
@@ -295,7 +295,7 @@ long Device::Status(DevArgument, DevArgument vargout, DevLong *error)
 //
 // code to implement the DevStatus command here
 //
-	snprintf(lstatus, sizeof(lstatus), "%s",DEVSTATES[this->state]);
+	snprintf(lstatus, sizeof(lstatus), "%s", DEVSTATES[this->state]);
 	*status = lstatus;
 	return(DS_OK);
 }
