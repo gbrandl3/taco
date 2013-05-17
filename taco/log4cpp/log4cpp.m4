@@ -59,11 +59,12 @@ dnl
 #include <log4cpp/Category.hh>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int 
 main ()
 {
-  int log4cpp_major, log4cpp_minor, log4cpp_micro;
+  int log4cpp_major, log4cpp_minor, log4cpp_micro(0);
   int major, minor, micro;
   char *tmp_version;
   char *tmp_log4cpp_version;
@@ -80,8 +81,10 @@ main ()
    /* HP/UX 9 (%@#!) writes to sscanf strings */
    tmp_log4cpp_version = strdup(LOG4CPP_VERSION);
    if (sscanf(tmp_log4cpp_version, "%d.%d.%d", &log4cpp_major, &log4cpp_minor, &log4cpp_micro) != 3) {
-     printf("%s, bad log4cpp version string\n", LOG4CPP_VERSION);
-     exit(1);
+     if (sscanf(tmp_log4cpp_version, "%d.%d", &log4cpp_major, &log4cpp_minor) != 2) {
+       printf("%s, bad log4cpp version string\n", LOG4CPP_VERSION);
+       exit(1);
+     }
    }
 
    if ((log4cpp_major > major) ||

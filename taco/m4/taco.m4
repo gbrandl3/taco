@@ -65,9 +65,10 @@ AC_DEFUN([TACO_DEFINES],
         AC_REQUIRE([TACO_INIT])dnl
         case "$target" in
                 i[[3456]]86-*-linux-* | i[[3456]]86-*-linux | i[[3456]]86-*-cygwin* | \
-                x86_64-*-linux* | ia64-*-linux-* | arm-*-linux-* | powerpc-*-linux-* )
+		i[[3456]]86-*-mingw* | \
+                x86_64-*-linux* | ia64-*-linux-* | arm*-*-linux-* | powerpc-*-linux-* )
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -DNDBM" ;;
-                i386-*-freebsd* | ia64-*-freebsd* | amd64-*-freebsd* )
+                i386-*-freebsd* | ia64-*-freebsd* | amd64-*-freebsd* | x86_64-*-freebsd* )
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -DNDBM" ;;
                 i[[3456]]86-apple-darwin* | x86_64-apple-darwin*) 
 			taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -Dx86=1 -DNDBM -DDARWIN";;
@@ -544,7 +545,7 @@ AC_DEFUN([TACO_BASE_PATH],
         PKG_CHECK_MODULES(TACO, taco >= 3.0.0,
                 [
                 taco_includes=`$PKG_CONFIG --cflags-only-I taco-client`
-                taco_libraries=`$PKG_CONFIG --libs-only-L taco-client`
+                taco_libraries=`$PKG_CONFIG --libs-only-L taco-client | sed -e 's/-L//g'`
                 ],
                 [
 		AC_CHECK_PROGS(TACO_CONFIG, taco-config)

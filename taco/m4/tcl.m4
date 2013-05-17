@@ -38,7 +38,7 @@ dnl
 	AS_IF([test x"${TCLCONFIG}" = x],
 	      [
 	        case "$target" in
-                        x86_64-*-linux* | ia64-*-linux-* | ia64-*-freebsd* )
+                        x86_64-*-linux* | ia64-*-linux-* | ia64-*-freebsd* | x86_64-*-freebsd* )
                                 taco_tcl_lib_search="/usr/lib64: "`ls -a /usr/lib64/* /usr/local/lib64/* 2>/dev/null | grep ':$'` 
                                 ;;
                         *)

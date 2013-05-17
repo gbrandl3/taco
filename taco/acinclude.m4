@@ -19,18 +19,57 @@ dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 AC_DEFUN([TACO_PYTHON_BINDING],
 [
 	AC_REQUIRE([TACO_SERVER_T])
-	PYTHON_PROG(2.0, [yes])
-	PYTHON_DEVEL
-	AS_IF([test "x$taco_python_binding" = "xyes"],
-	      [
-		ac_save_CPPFLAGS="$CPPFLAGS"
-		CPPFLAGS="$CFLAGS $PYTHON_CPPFLAGS"
-		AC_CHECK_HEADERS([numarray/arrayobject.h Numeric/arrayobject.h numpy/arrayobject.h], 
+	taco_python_binding="yes"
+	swig_tmp="no"
+	AC_ARG_ENABLE(python, AC_HELP_STRING(--enable-python, [build the binding for Python @<:@default=${taco_python_binding}@:>@]),
+                [AS_CASE(["${enable_python}"],
+                        [yes], [taco_python_binding=yes],
+                        [no], [taco_python_binding=no],
+                        [AC_MSG_ERROR([bad value ${enable_python} for --enable-python])])
+                ], [taco_python_binding=yes])
+	AC_MSG_NOTICE([$taco_python_binding])
+	AS_IF([test x"$taco_python_binding" = x"yes"],
+	[
+		AC_MSG_NOTICE([Hallo])
+		AM_PATH_PYTHON([],[],[taco_python_binding=no])
+		AC_MSG_NOTICE([Python])
+		AX_PYTHON(2.0, [yes])
+		AS_IF([test x${ax_python_bin} = xno -o x${ax_python_header} = no -o x${ax_python_lib} = no],
+			[taco_python_binding=no], [taco_python_binding=yes])
+		AX_PYTHON_DEVEL
+		AS_IF([test "x$taco_python_binding" = "xyes"],
+		[
+			ac_save_CPPFLAGS="$CPPFLAGS"
+			AS_IF([test "x$PYTHON" != "x"],
+			[
+				NUMPY_INCLUDES=`$PYTHON -c "import numpy; print numpy.lib.utils.get_include();" 2>/dev/null`
+				AS_IF([test "x$NUMPY_INCLUDES" != "x"],
+				[
+					PYTHON_CPPFLAGS="$PYTHON_CPPFLAGS -I$NUMPY_INCLUDES"
+					AC_SUBST([PYTHON_CPPFLAGS])
+				])
+			])
+			CPPFLAGS="$CFLAGS $PYTHON_CPPFLAGS"
+			AC_CHECK_HEADERS([numarray/arrayobject.h Numeric/arrayobject.h numpy/arrayobject.h],
 				[taco_python_binding=yes; break;], 
 				[taco_python_binding=no], [#include <Python.h>])
-		CPPFLAGS="$ac_save_CPPFLAGS"
-	      ])	
+			CPPFLAGS="$ac_save_CPPFLAGS"
+			AX_PKG_SWIG([1.3.29], [swig_tmp="yes"], [swig_tmp="no"])
+			AS_IF([test x"$swig_tmp" = x"yes" -a x"$taco_python_binding" = x"yes"],
+			[
+				AX_SWIG_ENABLE_CXX
+				AX_SWIG_MULTI_MODULE_SUPPORT
+				AX_SWIG_PYTHON([yes])
+				ac_save_CXXFLAGS="$CXXFLAGS"
+				CXXFLAGS="$PYTHON_CPPFLAGS $CXXFLAGS"
+				AC_CHECK_TYPES(Py_ssize_t, [], [
+					AC_CHECK_TYPES(ssize_t, [], [])], [#include <Python.h>])
+				CXXFLAGS="$ac_save_CXXFLAGS"
+			])
+		])
+	])
 	AS_IF([test x"${enable_server}" != x"yes"], [taco_python_binding=no])
+	AM_CONDITIONAL(BUILD_PYTHON, [test x"$swig_tmp" = x"yes" -a x"$taco_python_binding" = x"yes"])
 	AM_CONDITIONAL(PYTHON_BINDING, [test x"${taco_python_binding}" = x"yes"])
 ])
 
@@ -44,7 +83,7 @@ AC_DEFUN([TACO_TCL_BINDING],
 AC_DEFUN([TACO_LABVIEW_BINDING],
 [
 	taco_labview_binding="yes"
-	AC_ARG_ENABLE(labview, AC_HELP_STRING(--enable-labview, [build the binding for LabView @<:@default=${taco_labview_bindings}@:>@]),
+	AC_ARG_ENABLE(labview, AC_HELP_STRING(--enable-labview, [build the binding for LabView @<:@default=${taco_labview_binding}@:>@]),
                 [AS_CASE(["${enable_labview}"], 
                         [yes], [taco_labview_binding=yes],
                         [no], [taco_labview_binding=no],
@@ -414,18 +453,21 @@ AC_DEFUN([TACO_DATAPORT_SRC],
 	AS_IF([test "x$enable_dataport" = "xyes"],
 	      [ 
 		case "$target" in
-			arm-*-linux* | \
+			arm*-*-linux* | \
 			ia64-*-linux* | \
 			x86_64-*-linux* | \
         		i[[3456]]86-*-linux-* |\
         		i[[3456]]86-*-linux |\
 			i[[3456]]86-*-cygwin* |\
+			i[[3456]]86-*-mingw* |\
 			powerpc-*-linux-* |\
         		m68k-*-linux-* |\
             		*-*-solaris* | *-*-sun*-* |\
 			*-*-darwin* |\
 			i386-*-freebsd* |\
 			ia64-*-freebsd* |\
+			amd64-*-freebsd* |\
+			x86_64-*-freebsd* |\
             		*-*-hp*-*)
 				DATAPORTUNIX="yes" ;;
             		*-*-OS?-*)      
@@ -458,30 +500,37 @@ AC_DEFUN([AC_FUNC_DBM_FETCH],
 		[Define if the C++ compiler supports K&R syntax.]))
 )])
 
+AC_DEFUN([DISABLE_TANGO],
+	[enable_tango=no
+	 AC_MSG_WARN([Disable build of TANGO])])
+
 AC_DEFUN([WITH_CORBA],
 [
 	AC_REQUIRE([AC_PATH_XTRA])
 	AC_ARG_WITH(corba, AC_HELP_STRING([--with-corba@<:@=ARG@:>@], [CORBA @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the omniORB CORBA installation, e.g. '/usr/local/omniORB']), [
-		case  "$with_corba" in
-			yes) 	
-				PKG_CHECK_MODULES(OMNIORB4, omniCOSDynamic4 >= 4.1.0, 
-					[
-					CORBA_CLFAGS=`$PKG_CONFIG --cflags omniCOSDynamic4`
-					CORBA_LIBS=`$PKG_CONFIG --libs-only-l omniCOSDynamic4`
-					CORBA_LDFLAGS=`$PKG_CONFIG --libs-only-L omniCOSDynamic4`
-					], [with_corba=no])
-				;;
-			no)  	AC_MSG_WARN([Disable build of TANGO])
-				;;
-			*) 	CORBA_LIBS="-lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"
-				CORBA_LDFLAGS="-L${withval}/lib "
-				CORBA_CFLAGS="-I${withval}/include"
-				with_corba=yes
-				;;
-		esac      
+		AS_CASE([$with_corba],
+			[yes], [],
+			[no],  [],
+			[with_corba=yes
+			CORBA_LIBS="-lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"
+			CORBA_LDFLAGS="-L${withval}/lib "
+			CORBA_CFLAGS="-I${withval}/include"])
 		],[with_corba=yes])
-	AS_IF([test $with_corba = "yes"], 
+	AS_IF([test $with_corba = "yes"],
               [
+		AS_IF([test -z "$CORBA_CFLAGS"],
+			[
+			PKG_CHECK_MODULES(CORBA, [omniCOSDynamic4 >= 4.1.0],
+			[
+			CORBA_CFLAGS=`$PKG_CONFIG --cflags omniCOSDynamic4`
+			CORBA_LIBS=`$PKG_CONFIG --libs-only-l omniCOSDynamic4`
+			CORBA_LDFLAGS=`$PKG_CONFIG --libs-only-L omniCOSDynamic4`
+			],
+			[
+			CORBA_LIBS="-lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"
+			])])
+
+		AC_MSG_NOTICE([CORBA : $CORBA_LIBS $CORBA_LDFLAGS $CORBA_CFLAGS])
 		save_CFLAGS="$CFLAGS"
 		save_CPPFLAGS="$CPPFLAGS"
 		save_LDFLAGS="$LDFLAGS"
@@ -494,14 +543,23 @@ AC_DEFUN([WITH_CORBA],
 		AC_CHECK_HEADERS([omniORB4/CORBA.h],
 			AC_LINK_IFELSE(
 				AC_LANG_PROGRAM([[#include <omniORB4/CORBA.h>]], [[CORBA::ORB_var orb;]]), 
-				[], [with_corba=no]), 
-			[with_corba=no])
+				[],
+				[with_corba=no
+				AC_MSG_NOTICE([1])
+				DISABLE_TANGO]),
+			[with_corba=no
+			AC_MSG_NOTICE([2])
+			DISABLE_TANGO])
 		CFLAGS="$save_CFLAGS"
 		CPPFLAGS="$save_CPPFLAGS"
 		LDFLAGS="$save_LDFLAGS"
 		LIBS="$save_LIBS"
 		AC_LANG_POP(C++)
-	      ])
+	      ],
+	      [ AC_MSG_NOTICE([3])
+		DISABLE_TANGO
+		]
+	)
 	AC_SUBST([CORBA_CFLAGS])
 	AC_SUBST([CORBA_LIBS])
 	AC_SUBST([CORBA_LDFLAGS])
@@ -510,40 +568,61 @@ AC_DEFUN([WITH_CORBA],
 AC_DEFUN([WITH_TANGO],
 [
 #	AC_REQUIRE([AC_PATH_XTRA])
+	AC_REQUIRE([WITH_CORBA])
 	AC_ARG_WITH(tango-libraries, 
 		AS_HELP_STRING([--with-tango-libraries=DIR], [Directory where TANGO libraries are installed (optional)]),
                 [TANGO_LDFLAGS=-L${withval}; tango_libraries=-L${withval}], [tango_libraries=""])
+	AC_ARG_WITH(tango-includes,
+		AS_HELP_STRING([--with-tango-includes=DIR], [Directory where TANGO headers are installed (optional)]),
+		[TANGO_CFLAGS=-I${withval}; tango_includes=-I${withval}], [tango_includes=""])
 	AC_ARG_WITH(tango, AC_HELP_STRING([--with-tango@<:@=ARG@:>@], [TANGO @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the TANGO installation, e.g. '/usr/local/tango']), [
 		AS_CASE(["$with_tango"], 
-			[yes],[	TANGO_LIBS="-ltango -llog4tango" 
-				TANGO_LDFLAGS=""
-				TANGO_INCLUDES=""], 
-			[no], [AC_MSG_WARN([Disable build of TANGO])],
-			[TANGO_LIBS="-ltango -llog4tango"
-			TANGO_LDFLAGS=${TANGO_LDFLAGS:-"-L"${withval}/lib}
-			TANGO_INCLUDES=-I${withval}/include
-			with_tango=yes])
-		],[with_tango=yes; TANGO_LIBS="-ltango -llog4tango"; TANGO_INCLUDES=""])
-	AS_IF([test x"$with_tango" = x"yes"], [
+			[yes],[],
+			[no], [],
+			[with_tango=yes
+			TANGO_LIBS="-ltango -llog4tango"
+			TANGO_LDFLAGS="-L${withval}/lib"
+			TANGO_CFLAGS="-I${withval}/include"])
+	])
+	AC_MSG_NOTICE([with_tango : $with_tango])
+	AS_IF([test x"$enable_tango" = x"yes"], [
+		AC_MSG_NOTICE([TANGO : $TANGO_LIBS $TANGO_LDFLAGS $TANGO_CFLAGS])
+		AS_IF([test -z "$TANGO_CFLAGS" -a -z "$TANGO_LDFLAGS"],
+			[
+			PKG_CHECK_MODULES(TANGO, [tango >= 7.2.0],
+			[
+				TANGO_CFLAGS=`$PKG_CONFIG --cflags tango`
+				TANGO_LIBS=`$PKG_CONFIG --libs-only-l tango`
+				TANGO_LDFLAGS=`$PKG_CONFIG --libs-only-L tango`
+			],
+			[
+				TANGO_LIBS="-ltango -llog4tango"
+			])])
+
+		AC_MSG_NOTICE([TANGO : $TANGO_LIBS $TANGO_LDFLAGS $TANGO_CFLAGS])
 		save_CFLAGS="$CFLAGS"
 		save_CPPFLAGS="$CPPFLAGS"
 		save_LDFLAGS="$LDFLAGS"
 		save_LIBS="$LIBS"
 		LDFLAGS="$LDFLAGS $CORBA_LDFLAGS $TANGO_LDFLAGS"
-		CFLAGS="$CFLAGS $CORBA_CFLAGS $TANGO_INCLUDES"
-		CPPFLAGS="$CPPFLAGS $CORBA_CFLAGS $TANGO_INCLUDES"
+		CFLAGS="$CFLAGS $CORBA_CFLAGS $TANGO_CFLAGS"
+		CPPFLAGS="$CPPFLAGS $CORBA_CFLAGS $TANGO_CFLAGS"
 		LIBS="$LIBS $CORBA_LIBS $TANGO_LIBS"
 		AC_CHECK_HEADERS([tango.h], 
 			AC_LINK_IFELSE(
-				AC_LANG_PROGRAM([[#include <tango.h>]], [[Tango::Util *tg; tg->server_init(false);]]), 
-			[], [with_tango=no], 
-			[$CORBA_LDFLAGS $CORBA_LIBS $TANGO_LDFLAGS $TANGO_LIBS]), 
-			[with_tango=no])
+				AC_LANG_PROGRAM(
+					[[#include <tango.h>]], [[Tango::Util *tg; tg->server_init(false);]]),
+					[], [enable_tango=no],
+					[$CORBA_LDFLAGS $CORBA_LIBS $TANGO_LDFLAGS $TANGO_LIBS]),
+					[enable_tango=no])
 		CPPFLAGS="$CPPFLAGS_SAVE"
 		LIBS="$LIBS_SAVE"
-	      ])
+	      ],
+	      [AC_MSG_NOTICE([4])
+		DISABLE_TANGO]
+	)
 	AC_SUBST(TANGO_LIBS)
-	AC_SUBST(TANGO_INCLUDES)
+	AC_SUBST(TANGO_CFLAGS)
 	AC_SUBST(TANGO_LDFLAGS)
 ])
 
@@ -560,12 +639,12 @@ AC_DEFUN([TACO_FRM_EXT],
 [
         AC_ARG_ENABLE(ext, AC_HELP_STRING([--enable-ext], [build the extensions libraries servers @<:@default=no@:>@]),
                 [], [enable_ext=no])
-	AS_IF([test x"${enable_ext}" = x"yes"], [
+	AS_CASE(["${enable_ext}"], ["yes"], [
 		CFLAGS="$CFLAGS -DTACO_EXT"
 		CXXFLAGS="$CXXFLAGS -DTACO_EXT"
 		AC_CHECK_TYPES([struct timespec])
-		AS_IF([test x"enable_python" = x"yes"], [SWIG_PYTHON])
-		]) 
+dnl		AS_CASE(["$enable_python"], ["yes"], AX_SWIG_PYTHON)
+		])
         AM_CONDITIONAL(BUILD_EXT, [test x"${enable_ext}" = x"yes"])
 ])
 
@@ -579,7 +658,7 @@ AC_DEFUN([TACO_CHECK_RPC_AND_THREADS],
 	AS_IF([test $ac_cv_search_pthread_create != "none required"], [PTHREAD_LIBS="$ac_cv_search_pthread_create"])
 	AC_SEARCH_LIBS(pthread_mutex_unlock, [$PTHREAD_LIBS])
 	AC_SUBST([PTHREAD_LIBS])
-	AS_IF([test "$cross_compiling" != yes], 
+	AS_IF([test "$cross_compiling" != yes -a "$target" != "i686-pc-mingw32" ],
 		[AC_RUN_IFELSE(AC_LANG_PROGRAM([
 #include <pthread.h>
 #include <stdio.h>

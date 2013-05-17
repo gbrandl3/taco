@@ -24,7 +24,7 @@ for automake in automake automake19 automake18 automake17 ; do
 done
 
 LIBTOOLIZE="$libtoolize --force --copy --automake "
-ACLOCAL="aclocal${am_postfix} -I m4 -I $aclocal_includes" 
+ACLOCAL="aclocal${am_postfix} -I m4 -I log4cpp -I log4cpp/m4 -I $aclocal_includes" 
 AUTOHEADER="autoheader${ac_postfix}"
 AUTOMAKE="$automake -a -c"
 AUTOCONF="$autoconf"
