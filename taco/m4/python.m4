@@ -61,7 +61,8 @@ dnl
 			taco_python_binding=yes
 			ac_save_CXXFLAGS="$CXXFLAGS"
 			CXXFLAGS="$PYTHON_CPPFLAGS $CXXFLAGS"
-			AC_CHECK_TYPES(Py_ssize_t, [], [], [#include <Python.h>])
+			AC_CHECK_TYPES(Py_ssize_t, [], [
+				AC_CHECK_TYPES(ssize_t, [], [])], [#include <Python.h>])
 			CXXFLAGS="$ac_save_CXXFLAGS"
 		      ])
 		result=yes
