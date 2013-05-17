@@ -31,9 +31,9 @@
  *
  * Original   :	January 1991
  *
- * Version    :	$Revision: 1.47 $
+ * Version    :	$Revision: 1.48 $
  *
- * Date	    :	$Date: 2013-05-17 08:44:05 $
+ * Date	    :	$Date: 2013-05-17 08:53:13 $
  *
  ********************************************************************-*/
 
@@ -1847,9 +1847,9 @@ long _DLLFunc dev_xdrfree (DevType type, DevArgument objptr, DevLong *error)
  */
 long _DLLFunc check_rpc_connection (devserver ds, DevLong *error)
 {
-	CLIENT				*clnt = NULL;
+	CLIENT			*clnt = NULL;
 	enum clnt_stat		clnt_stat;
-	Db_devinf_imp		devinfo;
+	Db_devinf_imp		devinfo = NULL;
 	devserver		new_ds = NULL;
 	struct sockaddr_in	serv_adr;
 #if !defined vxworks
@@ -1928,7 +1928,6 @@ long _DLLFunc check_rpc_connection (devserver ds, DevLong *error)
 			host_name[sizeof(host_name)] = '\0';
 			prog_number  = devinfo[0].pn;
 			vers_number  = API_VERSION;
-
 /*
  * now free the devinfo structure allocated by db_dev_import().
  */
@@ -1936,7 +1935,8 @@ long _DLLFunc check_rpc_connection (devserver ds, DevLong *error)
 		}
 		else
 		{
-			free (devinfo);
+			if (devinfo)
+				free (devinfo);
 			*error = DevErr_BadServerConnection;
 			return (DS_NOTOK);
 		}
