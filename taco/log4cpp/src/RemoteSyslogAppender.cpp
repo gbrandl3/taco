@@ -111,7 +111,8 @@ namespace log4cpp {
                     return; // fail silently                    
                 }
             }
-            _ipAddr = *(pent->h_addr);
+//          _ipAddr = *(pent->h_addr);
+            memcpy(&_ipAddr, pent->h_addr, sizeof(in_addr_t));
         }
         // Get a datagram socket.
         
