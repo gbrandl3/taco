@@ -67,13 +67,16 @@
  *
  * Original:	February 1999
  *
- * $Revision: 1.5 $
+ * $Revision: 1.6 $
  *
- * $Date: 2008-11-07 17:01:06 $
+ * $Date: 2013-05-17 08:41:25 $
  *
  * $Author: jkrueger1 $
  *
  * $Log: not supported by cvs2svn $
+ * Revision 1.5  2008/11/07 17:01:06  jkrueger1
+ * Fix: missing conversion of D_ULONG_TYPES in labview binding, and missing compatiblity 32/64 bit systems
+ *
  * Revision 1.4  2008/04/06 09:06:26  jkrueger1
  * Merge from branch JK
  *
@@ -1740,8 +1743,8 @@ static long lv_argout_convert(long argout_type, void *argout_taco, void *argout_
     		(*argout_shortarray_hdl)->dimSizes[0]= ((DevVarShortArray*)argout_taco)->length;   
     		(*_dev_xdrfree)(D_VAR_SHORTARR,argout_taco,error);
     		break;  
-    
-  	case D_VAR_LONGARR : 
+	case D_VAR_ULONGARR :
+	case D_VAR_LONGARR :
     		argout_longarray_hdl = (LongArrayHdl)argout_lv;
     		if ( ( status = NumericArrayResize(iL, 1L, (UHandle*) &argout_longarray_hdl,((DevVarLongArray*)argout_taco)->length )) != noErr )
       			return(status);
