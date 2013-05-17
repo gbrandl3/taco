@@ -542,7 +542,7 @@ AC_DEFUN([WITH_CORBA],
 		AC_LANG_PUSH(C++)
 		AC_CHECK_HEADERS([omniORB4/CORBA.h],
 			AC_LINK_IFELSE(
-				AC_LANG_PROGRAM([[#include <omniORB4/CORBA.h>]], [[CORBA::ORB_var orb;]]), 
+				[AC_LANG_PROGRAM([[#include <omniORB4/CORBA.h>]], [[CORBA::ORB_var orb;]])], 
 				[],
 				[with_corba=no
 				AC_MSG_NOTICE([1])
@@ -610,8 +610,8 @@ AC_DEFUN([WITH_TANGO],
 		LIBS="$LIBS $CORBA_LIBS $TANGO_LIBS"
 		AC_CHECK_HEADERS([tango.h], 
 			AC_LINK_IFELSE(
-				AC_LANG_PROGRAM(
-					[[#include <tango.h>]], [[Tango::Util *tg; tg->server_init(false);]]),
+				[AC_LANG_PROGRAM(
+					[[#include <tango.h>]], [[Tango::Util *tg; tg->server_init(false);]])],
 					[], [enable_tango=no],
 					[$CORBA_LDFLAGS $CORBA_LIBS $TANGO_LDFLAGS $TANGO_LIBS]),
 					[enable_tango=no])
@@ -659,7 +659,7 @@ AC_DEFUN([TACO_CHECK_RPC_AND_THREADS],
 	AC_SEARCH_LIBS(pthread_mutex_unlock, [$PTHREAD_LIBS])
 	AC_SUBST([PTHREAD_LIBS])
 	AS_IF([test "$cross_compiling" != yes -a "$target" != "i686-pc-mingw32" ],
-		[AC_RUN_IFELSE(AC_LANG_PROGRAM([
+		[AC_RUN_IFELSE([AC_LANG_PROGRAM([
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -792,7 +792,7 @@ const char hw[[[]]] = "Hello World!\n";],
     fprintf (stderr, "pthread_join: %s\n", strerror (err));
 
   return exitcode;
-	]), AC_MSG_NOTICE([Running]), AC_MSG_FAILURE([Not Running]))])
+	]), AC_MSG_NOTICE([Running]), AC_MSG_FAILURE([Not Running])])])
 	LIBS="$LIBS_SAVE"
 ])
 

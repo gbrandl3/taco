@@ -27,7 +27,7 @@ AC_DEFUN([TACO_EXTENSIONS],[
 	AC_MSG_CHECKING([for TACO extensions header files])
 	AC_LANG_SAVE
 	AC_LANG_CPLUSPLUS
-	AC_PREPROC_IFELSE(AC_LANG_PROGRAM([[#include <TACOExtensions.h>]], []), [taco_try=ok],[taco_try=failed])
+	AC_PREPROC_IFELSE([AC_LANG_PROGRAM([[#include <TACOExtensions.h>]], [])], [taco_try=ok],[taco_try=failed])
 	AC_MSG_RESULT($taco_try)
 	AS_IF([test $taco_try = failed], 
 		AC_MSG_ERROR([it seems that the TACO extension header files are not installed]),
@@ -37,12 +37,12 @@ AC_DEFUN([TACO_EXTENSIONS],[
 	LIB_TACO="$LIB_TACO -lTACOExtensions"
 	LIBS="$taco_save_libs $LIB_TACO -ltacomain -ltaco++"
 	AC_MSG_CHECKING([for TACO extensions library])
-	AC_LINK_IFELSE(AC_LANG_PROGRAM(
-	[[#include <TACOExtensions.h>]],[[TACO::errorString( 0)]]), [taco_try=ok], [taco_try=failed])
+	AC_LINK_IFELSE([AC_LANG_PROGRAM(
+	[[#include <TACOExtensions.h>]],[[TACO::errorString( 0)]])], [taco_try=ok], [taco_try=failed])
 	AS_IF([test $taco_try = failed], [ 
 		LIBS="$taco_save_libs $LIB_TACO -ltacoapig++"
-		AC_LINK_IFELSE(AC_LANG_PROGRAM(
-		[[#include <TACOExtensions.h>]],[[TACO::errorString( 0)]]), 
+		AC_LINK_IFELSE([AC_LANG_PROGRAM(
+		[[#include <TACOExtensions.h>]],[[TACO::errorString( 0)]])], 
 		[taco_try=ok], [AC_MSG_ERROR([it seems that the TACO extension library is not installed])])
 	])
 	AC_MSG_RESULT($taco_try)
