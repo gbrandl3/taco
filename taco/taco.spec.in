@@ -11,10 +11,13 @@ License: 	GPL
 Group: 		Utilities/TACO
 Source: 	%{name}-%{version}.tar.bz2 
 Prefix: 	%{_prefix}
+BuildRoot: 	%_tmppath/%name-%version-root
+
 Vendor: 	FRMII, TU München, FRG
 Distribution:	%{distribution}
-Requires: 	gdbm sqlite mysql python openmotif pyhton-numeric
+Requires: 	gdbm sqlite mysql openmotif  python pyhton-numeric
 BuildRequires: 	openmotif-devel gcc-c++ doxygen swig python-devel mysql-devel sqlite-devel tcl-devel python-numeric
+
 Provides: 	taco
 Url: 		http://www.sourceforge.net/projects/taco
 
@@ -50,6 +53,8 @@ Linux, Solaris, BSD, Mac OS X, HP-UX, Win32, OS9).
 
 %prep
 %setup -n @PACKAGE@-@VERSION@
+%define destdir 	%{buildroot}
+%{__rm} -rf %{buildroot}
 
 %build
 ./configure --enable-fast-install=yes --enable-greta --enable-xdevmenu --enable-ext \
@@ -65,12 +70,11 @@ Linux, Solaris, BSD, Mac OS X, HP-UX, Win32, OS9).
 make 
 
 %install
-make install-strip
-make "DESTDIR=$PWD/tmp-install-dir" install
-# %makeinstall
-find tmp-install-dir -regex ".*%{_libdir}/.*" -a -not -type d | sed -e 's/^tmp-install-dir//' > @PACKAGE@.txt
-find tmp-install-dir -regex ".*%{_includedir}/.*" -a -not -type d | sed -e 's/^tmp-install-dir//' >> @PACKAGE@.txt
-cp @PACKAGE@.txt /tmp
+%define destdir 	%{buildroot}
+%{__make} install-strip DESTDIR=%{destdir}
+find %{destdir} -regex ".*%{_libdir}/.*" -a -not -type d | sed -e 's#^%{destdir}##' > @PACKAGE@.txt
+find %{destdir} -regex ".*%{_includedir}/.*" -a -not -type d | sed -e 's#^%{destdir}##' >> @PACKAGE@-devel.txt
+cp @PACKAGE@.txt @PACKAGE@-devel.txt /tmp
 
 %clean
 if test "$PWD" = "${PWD%/*}/@PACKAGE@-@VERSION@" ; then
@@ -158,11 +162,12 @@ if test "x$1" = x0 ; then
 	fi
 fi
 
-%files -f @PACKAGE@.txt
+%files
+%_libdir/lib*.so.*
 %defattr(-,root,root)
-%_datadir/taco/templates/taco.SuSE
-%config %_sysconfdir/tacoenv.sh
-%config %_sysconfdir/tacoenv.csh
+%config %_datadir/taco/templates/taco.SuSE
+%config(noreplace) %_sysconfdir/tacoenv.sh
+%config(noreplace) %_sysconfdir/tacoenv.csh
 # %doc %_infodir/gdbm.info
 # %doc INSTALL doc/TACO.pdf doc/README doc/index.html
 %_sbindir/StartServer
@@ -170,6 +175,8 @@ fi
 %_sbindir/unreg
 %_sbindir/MessageServer
 %_sbindir/dbm_server
+%_sbindir/off
+%_sbindir/taco.status
 %config(noreplace) %_sbindir/taco.shutdown
 %config(noreplace) %_sbindir/taco.startup
 %config(noreplace) %_datadir/taco/dbase/res/SEC/sec_auth.res
@@ -177,12 +184,32 @@ fi
 %config %_datadir/taco/dbase/res/ERROR/dev_errors.res
 %config %_datadir/taco/dbase/res/ERROR/db_errors.res
 %config %_datadir/taco/dbase/res/TEST/python.res
+%config %_datadir/taco/dbase/res/CLASS/Inst_verify_class.res
+%config %_datadir/taco/dbase/res/CMDS/SerialCmnds.res
+%config %_datadir/taco/dbase/res/CMDS/TACOBasicCommands.res
+%config %_datadir/taco/dbase/res/ERROR/SerialErrors.res
+%config %_datadir/taco/dbase/res/ERROR/TACOBasicErrors.res
+%config %_datadir/taco/dbase/res/TEST/AGPS.res
+%config %_datadir/taco/dbase/res/TEST/Inst_verify.res
+%config %_datadir/taco/templates/Serial.res
+%config %_datadir/taco/templates/Serial.res
+%config %_datadir/taco/templates/dc.SuSE
+%config %_datadir/taco/templates/taco-dc.sh
+%config %_datadir/taco/templates/taco-manager.sh
+%config %_datadir/taco/templates/taco.debian
+%config %_datadir/taco/templates/taco_log.cfg
+%config %_datadir/taco/templates/tacoenv.csh
+%config %_datadir/taco/templates/tacoenv.sh
+
+%ifnos solaris2.8 solaris2.9 solaris2.10
+%postun -p /sbin/ldconfig
+%endif
 
 %package datacollector
-Summary: TACO data collector system
-Group:	 Utilities/TACO
-Prefix:	 %{_prefix}
-Provides:taco-datacollector
+Summary: 	TACO data collector system
+Group:	 	Utilities/TACO
+Prefix:	 	%{_prefix}
+Provides:	taco-datacollector
 
 %description datacollector
 This package contains the TACO Data Collector (DC) system
@@ -204,24 +231,21 @@ This package contains the TACO Data Collector (DC) system
 %_bindir/dc_signals
 %_sbindir/dc_wr_alo
 %_sbindir/dc_rd_alo
-%_libdir/libdcmem.la
-%_libdir/libdcmem.so
-%_libdir/libdcmem.so.15
-%_libdir/libdcmem.so.15.0.4
-
+%_libdir/libdcmem.so.*
 
 %package utilities
-Summary: TACO utilities
-Group: Utilities/TACO
-Prefix: %{_prefix}
-Provides: taco-utilities
+Summary: 	TACO utilities
+Group: 		Utilities/TACO
+Prefix: 	%{_prefix}
+Provides: 	taco-utilities
 
 %description utilities
 This package contains data base oriented command line tools as well as device 
 oriented command line tools to control the TACO devices
 
 %files utilities
-%_bindir/conv2gdbm
+# %_bindir/conv2gdbm
+%_sbindir/testcs
 %_bindir/db_devicetree
 %_bindir/db_fillup
 %_bindir/db_fillup2
@@ -260,19 +284,66 @@ oriented command line tools to control the TACO devices
 %_bindir/devstate
 %_bindir/devstatus
 %_bindir/devupdate
+%_bindir/ps_menu
+%_bindir/sec_objinfo
+%_bindir/sec_passwd
+%_bindir/sec_userinfo
+
+%_bindir/AGPSpp
+%_bindir/DSSignal
+%_bindir/Inst_verify
+%_bindir/Inst_verify_menu
+%_bindir/MDSSignal
+%_bindir/Serialds
+%_bindir/TACOMotor
+%_bindir/readsignals
+%_bindir/ud_daemon
+%_bindir/ud_daemon_menu
+%_bindir/ud_poller
+%_bindir/poll_test
+
+%package labview
+Summary: 	TACO labview binding
+Group:		Utilities/TACO/labview
+Prefix:		%{_prefix}
+Provides: 	taco-labview
+Requires: 	%{name} = %{version}
+
+%description labview
+This package contains the TACO labview bindings
+
+%files labview
+%_bindir/lv_menu
+%_bindir/TacoSilvia
+%_libdir/lv_dsapi.so
+%_libdir/lv_dsclass.so
+
+%package python
+Summary:	TACO python binding
+Group:		Utilities/TACO/python
+Prefix:		%{_prefix}
+Provides:	taco-python
+Requires:	%{name} = %{version}
+
+%description python
+This package contains the TACO python bindings
+
+%files python
+%_libdir/python*/*
 
 %package devel
-Summary: TACO devel
-Group: Utilities/TACO/devel
-Prefix: %{_prefix}
-Provides: taco-devel
-Requires: %{name} = %{version}
+Summary: 	TACO devel
+Group: 		Utilities/TACO/devel
+Prefix: 	%{_prefix}
+Provides: 	taco-devel
+Requires: 	%{name} = %{version}
 
 %description devel
 This package contains the files for the development of TACO servers
 
 %files devel
 %_sbindir/taco-config
+%_bindir/log4cpp-config
 %_datadir/aclocal/extra.m4
 %_datadir/aclocal/findfile.m4
 %_datadir/aclocal/python.m4
@@ -280,37 +351,44 @@ This package contains the files for the development of TACO servers
 %_datadir/aclocal/rpm.m4
 %_datadir/aclocal/swig.m4
 %_datadir/aclocal/taco.m4
+%_datadir/aclocal/tacoext.m4
+%_datadir/aclocal/log4cpp.m4
 %_libdir/pkgconfig/log4cpp.pc
 %_libdir/pkgconfig/taco-server.pc
 %_libdir/pkgconfig/taco-server++.pc
 %_libdir/pkgconfig/taco-client.pc
 %_libdir/pkgconfig/taco-client++.pc
+%_includedir/*
 %_mandir/man3/*.3.gz
-
+%_libdir/*.la
+%_libdir/lib*.so
+%_libdir/lib*.a
+%doc %_prefix/doc/log4cpp-1.0/*
 
 %package x-apps
-Summary: TACO control system X11 applications.
-Group: Utilities/TACO/X11
-Prefix: %{_prefix}
-Provides: taco-x-apps
-Requires: %{name} = %{version}
+Summary: 	TACO control system X11 applications.
+Group: 		Utilities/TACO/X11
+Prefix: 	%{_prefix}
+Provides: 	taco-x-apps
+Requires: 	%{name} = %{version}
 
 %description x-apps
 
 %files x-apps
 %defattr(-,root,root)
 %_bindir/greta
+%_bindir/greta_ndbm
 %_bindir/xdevmenu
 %_sbindir/S_Alarm
 @appdefaultdir@/GReta
 @appdefaultdir@/XDevmenu
 
 %package client
-Summary: TACO control system client package
-Group: Utilities/TACO/client
-Prefix: %{_prefix}
-Provides: taco-client
-Requires: %{name} = %{version}
+Summary: 	TACO control system client package
+Group: 		Utilities/TACO/client
+Prefix: 	%{_prefix}
+Provides: 	taco-client
+Requires: 	%{name} = %{version}
 
 %description client
 
@@ -318,17 +396,16 @@ Requires: %{name} = %{version}
 %defattr(-,root,root)
 
 %package client-devel
-Summary: TACO control system client development package
-Group: Utilities/TACO/devel
-Prefix: %{_prefix}
-Provides: taco-client-devel
-Requires: %{name}-devel = %{version}
+Summary: 	TACO control system client development package
+Group: 		Utilities/TACO/devel
+Prefix: 	%{_prefix}
+Provides: 	taco-client-devel
+Requires: 	%{name}-devel = %{version}
 
 %description client-devel
 
 %files client-devel
 %defattr(-,root,root)
-
 
 %changelog
 * Tue Jun 09 2009 Jens Krüger <jens.krueger@frm2.tum.de>
