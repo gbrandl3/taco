@@ -67,7 +67,7 @@ AC_DEFUN([TACO_DEFINES],
                 i[[3456]]86-*-linux-* | i[[3456]]86-*-linux | i[[3456]]86-*-cygwin* | \
                 x86_64-*-linux* | ia64-*-linux-* | arm-*-linux-* | powerpc-*-linux-* )
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -DNDBM" ;;
-                ia64-*-freebsd* | i386-*-freebsd*)
+                i386-*-freebsd* | ia64-*-freebsd* | amd64-*-freebsd* )
                         taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -DNDBM" ;;
                 i[[3456]]86-apple-darwin* | x86_64-apple-darwin*) 
 			taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -Dx86=1 -DNDBM -DDARWIN";;
