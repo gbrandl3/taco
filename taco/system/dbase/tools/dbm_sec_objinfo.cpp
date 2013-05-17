@@ -23,11 +23,11 @@
  *		family, or device.
  *
  * Author(s):	Jens Krüger
- *              $Author: andy_gotz $
+ *              $Author: jkrueger1 $
  *
- * Version:     $Revision: 1.5 $
+ * Version:     $Revision: 1.6 $
  *
- * Date:        $Date: 2008-10-13 19:41:24 $
+ * Date:        $Date: 2013-05-17 08:58:02 $
  */
 
 #include <iostream>
@@ -35,6 +35,7 @@
 #include <taco_utils.h>
 
 #include <cstdlib>
+#include <unistd.h>
 
 void usage(const std::string cmd)
 {
