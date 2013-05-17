@@ -64,7 +64,7 @@ case $automakeversion in
 esac
 
 case $libtoolversion in
-    *1.[45]*|*2.2*)
+    *1.[45]*|*2.[024]*)
         ;;
     *)
         echo "This libtool version is not supported by taco."
