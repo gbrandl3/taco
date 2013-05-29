@@ -27,14 +27,13 @@ AC_DEFUN([TACO_PYTHON_BINDING],
                         [no], [taco_python_binding=no],
                         [AC_MSG_ERROR([bad value ${enable_python} for --enable-python])])
                 ], [taco_python_binding=yes])
-	AC_MSG_NOTICE([$taco_python_binding])
 	AS_IF([test x"$taco_python_binding" = x"yes"],
 	[
 		AC_MSG_NOTICE([Hallo])
 		AM_PATH_PYTHON([],[],[taco_python_binding=no])
 		AC_MSG_NOTICE([Python])
 		AX_PYTHON(2.0, [yes])
-		AS_IF([test x${ax_python_bin} = xno -o x${ax_python_header} = no -o x${ax_python_lib} = no],
+		AS_IF([test x"${ax_python_bin}" = x"no" -o x"${ax_python_header}" = x"no" -o x"${ax_python_lib}" = x"no"],
 			[taco_python_binding=no], [taco_python_binding=yes])
 		AX_PYTHON_DEVEL
 		AS_IF([test "x$taco_python_binding" = "xyes"],
@@ -70,6 +69,7 @@ AC_DEFUN([TACO_PYTHON_BINDING],
 	])
 	AS_IF([test x"${enable_server}" != x"yes"], [taco_python_binding=no])
 	AM_CONDITIONAL(BUILD_PYTHON, [test x"$swig_tmp" = x"yes" -a x"$taco_python_binding" = x"yes"])
+	AC_MSG_NOTICE([Build Python bindings ... $taco_python_binding])
 	AM_CONDITIONAL(PYTHON_BINDING, [test x"${taco_python_binding}" = x"yes"])
 ])
 

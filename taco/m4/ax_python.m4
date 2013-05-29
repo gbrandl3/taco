@@ -64,8 +64,8 @@ if test x$ax_python_bin != x; then
    AC_CHECK_HEADER([$ax_python_bin/Python.h],
    [[ax_python_header=`locate $ax_python_bin/Python.h | sed -e s,/Python.h,,`]],
    ax_python_header=no)
-   if test $ax_python_lib != no; then
-     if test $ax_python_header != no; then
+   if test x"$ax_python_lib" != x"no"; then
+     if test x"$ax_python_header" != x"no"; then
        break;
      fi
    fi
