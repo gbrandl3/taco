@@ -1,6 +1,6 @@
 dnl Toolkit for building distributed control systems or any other distributed system.
 dnl
-dnl Copyright (C) 2003-2012  Jens Krueger <jkrueger1@users.sf.net>
+dnl Copyright (C) 2003-2013  Jens Krueger <jkrueger1@users.sf.net>
 dnl
 dnl This library is free software; you can redistribute it and/or
 dnl modify it under the terms of the GNU Lesser General Public
@@ -16,10 +16,10 @@ dnl You should have received a copy of the GNU Lesser General Public
 dnl License along with this library; if not, write to the Free Software
 dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_INIT([TACO], [3.99.135], [taco-devel@lists.sourceforge.net])
+AC_INIT([TACO], [3.99.136], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
 AC_REVISION($Revision: 1.134 $)dnl
-AC_COPYRIGHT([(C) 1990-2012 ESRF])
+AC_COPYRIGHT([(C) 1990-2013 ESRF])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_SRCDIR([config.h.in])
 
@@ -27,7 +27,7 @@ AC_CONFIG_MACRO_DIR([m4])
 
 TACO_CHECK_SYSTEM
 
-AC_SUBST(LIB_VERSION, [16:12:0])
+AC_SUBST(LIB_VERSION, [16:13:0])
 
 TACO_CHECK_SIZEOF_TYPES
 

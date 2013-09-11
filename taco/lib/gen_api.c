@@ -1174,8 +1174,9 @@ long setup_config_multi (const char *nethost, DevLong *error)
 	enum clnt_stat		clnt_stat;
 	int			pid;
 	long			i_nethost, i;
+
 #ifndef _UCC
-	char*                   nethost_env;
+	char*                   nethost_env = NULL;
 	static char             nethost_buffer[80]; /* used if nethost=NULL */
 
 #endif
@@ -1231,6 +1232,13 @@ long setup_config_multi (const char *nethost, DevLong *error)
 		}
 		i_nethost = i;
 		dev_printdebug (DBG_TRACE | DBG_API, "\nsetup_config_multi() : add nethost %d\n",i_nethost);
+/*
+ * NETHOST not set and the first entry, set the NETHOST to the first entry
+ */
+		if (i_nethost == 0 && nethost_env == NULL && nethost != NULL)
+		{
+			taco_setenv("NETHOST", nethost, True);
+		}
 /*
  * if this is the first time a nethost is being defined or the nethost
  * then table is full therefore allocate space for another MIN_NETHOST 
