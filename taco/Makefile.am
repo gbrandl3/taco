@@ -50,6 +50,11 @@ install-data-hook:
 		$(INSTALL_HEADER) config.h $(DESTDIR)$(includedir)/private ; \
 	fi
 
+uninstall-hook:
+	@if test -f $(DESTDIR)/$(includedir)/private/config.h ; then \
+		$(RM) $(DESTDIR)/$(includedir)/private/config.h ; \
+	fi
+
 EXTRA_DIST=autogen.sh taco.spec.in README-RPM
 
 include $(top_srcdir)/rpm_rules.mh
