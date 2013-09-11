@@ -1342,7 +1342,7 @@ int _DLLFunc db_putresource(const char *dev_name, Db_resource res, u_int res_num
 		if (*perr != DS_OK)
 			return DS_NOTOK;
 /* 
- * The specified nethost is not in the list of imorted nethosts, therefore 
+ * The specified nethost is not in the list of imported nethosts, therefore
  * call setup_config_multi() to add it 
  */
 		if (setup_config_multi(nethost,perr) != DS_OK)
@@ -2317,7 +2317,7 @@ int _DLLFunc db_delresource(const char *dev_name, char **res_name, u_int res_num
 		if (*perr != DS_OK)
 			return DS_NOTOK;
 /* 
- * The specified nethost is not in the list of imorted nethosts, therefore 
+ * The specified nethost is not in the list of imported nethosts, therefore
  * call setup_config_multi() to add it 
  */
 		if (setup_config_multi(nethost,perr) != DS_OK)

@@ -186,7 +186,7 @@ long db_deviceinfo(const char *dev_name,db_devinfo_call *p_info, DevLong *p_erro
 		if (*p_error != DS_OK)
 			return DS_NOTOK;
 /* 
- * The specified nethost is not in the list of imorted nethosts, therefore 
+ * The specified nethost is not in the list of imported nethosts, therefore
  * call setup_config_multi() to add it 
  */
 		if (setup_config_multi(nethost, p_error) != DS_OK)
