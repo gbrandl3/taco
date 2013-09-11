@@ -134,8 +134,8 @@ AT_CHECK(AT_TACO_RUN_LOCAL([dev_conparams test/device/1]), [], [[3
 AT_CLEANUP
 
 AT_SETUP([Stop the Inst_verify and AGPSpp device servers])
-AT_CHECK([AT_TACO_RUN_LOCAL([off Inst_verify | grep -v Killing])
-AT_TACO_RUN_LOCAL([off AGPSpp | grep -v Killing])
+AT_CHECK([AT_TACO_RUN_TEST([off Inst_verify | grep -v Killing])
+AT_TACO_RUN_TEST([off AGPSpp | grep -v Killing])
 sleep 4
 printf "%d\n" `ps x | grep Inst_verify | grep -v grep | wc -l`
 printf "%d\n" `ps x | grep AGPSpp | grep -v grep | wc -l`
@@ -162,10 +162,10 @@ test/longfamily/long/longresource: 25
 ]])
 AT_CHECK([
 RES_BASE_DIR=`pwd` taco db_update test_server.res
-AT_TACO_RUN_TEST([test_server 1 -m -d])
+AT_TACO_RUN_LOCAL([test_server 1 -m -d])
 sleep 5
 AT_TACO_RUN_LOCAL([test_connect test/a/1])
-AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [Set protocol to TCP
+AT_TACO_RUN_TEST([off test_server >>log 2>&1])], [], [Set protocol to TCP
 Query commands
     4228120577       0       9                        "SendByteArray"
              1       0       0                        "DevOn"

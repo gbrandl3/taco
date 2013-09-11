@@ -29,7 +29,7 @@ if test x"$extensions" != xyes ; then
 	exit 77
 fi
 RES_BASE_DIR=`pwd` taco db_update test.res
-AT_TACO_RUN_TEST([TestExtServer ext -d])
+AT_TACO_RUN_LOCAL([TestExtServer ext -d])
 sleep 4
 AT_TACO_RUN_LOCAL([test_connect test/ext/dev0])
 ], [], [Set protocol to TCP
@@ -45,6 +45,7 @@ Query commands
           4004       9       9                        "DevQueryResource"
           4005       0       0                        "DevUpdate"
           4006       0       9                        "DevQueryResourceInfo"
+          4007       0       0                        "DevInit"
 Query events
 ])
 AT_CLEANUP
@@ -104,7 +105,7 @@ AT_CHECK([
 if test x"$extensions" != xyes ; then
 	exit 77
 fi
-AT_TACO_RUN_LOCAL([off TestExtServer | grep -v Killing])], [0], 
+AT_TACO_RUN_TEST([off TestExtServer | grep -v Killing])], [0],
 [[There are 1 TestExtServer processes:
 
 ]])

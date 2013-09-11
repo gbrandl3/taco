@@ -84,30 +84,21 @@ if test $# -gt 0 ; then
 			;;
 		uninstall)
 			dc_destdir=$testbindir/test
+			(cd $top_builddir && make DESTDIR=$dc_destdir uninstall) >>log 2>&1
+			rm -f ${sbindir}/system/pipe/* ${sbindir}/system/error/*
+			for i in ${templatedir} ${infodir} ${sbindir}/system/pipe ${sbindir}/system/error ${sbindir}/system ; do
+				if test -n "$i" -a -d $i ; then
+					rmdir $i
+				fi
+			done
 			rm -f ${localstatedir}/cache/taco/*
 			rm -f ${localstatedir}/log/taco/*
-			rmdir ${localstatedir}/log/taco
-			rmdir ${localstatedir}/log
-			rmdir ${localstatedir}/cache/taco
-			rmdir ${localstatedir}/cache
-			rm -f ${templatedir}/*
+			for i in ${localstatedir}/log/taco ${localstatedir}/log ${localstatedir}/cache/taco ${localstatedir}/cache ; do
+				rmdir $i
+			done
+			rm -f ${sysconfdir}/taco_log.cfg
 			rm -f ${infodir}/dir
-			rm -f ${sbindir}/system/pipe/*
-			rm -f ${sysconfdir}/*
-			(cd $top_builddir && make DESTDIR=$dc_destdir uninstall) >>log 2>&1
-			dir=`echo $prefix | cut -d'/' -f 1`
-			if [ -z "$dir" ] ; then
-				dir=`echo $prefix | cut -d'/' -f 2`
-			fi
-			rm -rf ${dc_destdir}/$dir
-			rm -rf ${dc_destdir}/@aclocaldir@
-			dir=`echo $appdefaultdir|cut -d'/' -f1` 
-			if [ -z "$dir" ] ; then
-				dir=`echo $appdefaultdir|cut -d'/' -f2` 
-			fi
-			rm -rf ${dc_destdir}/$dir
-			for i in ${localstatedir} ${templatedir} ${infodir} ${sbindir}/system/pipe ${sbindir}/system/error \
-				${sysconfdir} ; do
+			for i in ${localstatedir} ${templatedir} ${infodir} ${sysconfdir} @aclocaldir@ @bindir@ @sbindir@ ; do
 				if test -n "$i" -a -d $i ; then
 					rmdir $i
 				fi
@@ -115,10 +106,6 @@ if test $# -gt 0 ; then
 			if test -d $dc_destdir ; then
 				if { ! rmdir $dc_destdir 2>/dev/null; } ; then
 					tmp=`find $dc_destdir -type f`
-					if test x"$tmp" = x"${infodir}/dir" ;then
-						rm -rf $dc_destdir
-						exit $?
-					fi
 					if test x"$tmp" = x ; then
 						rm -rf $dc_destdir
 						exit $?
@@ -127,12 +114,16 @@ if test $# -gt 0 ; then
 				fi
 			fi
 			exit 0 ;;
+		off)
+			. $sysconfdir/tacoenv.sh
+			set_env
+			shift 1
+			$sbindir/off $@ ;;
 		unreg)
 			. $sysconfdir/tacoenv.sh 
 			set_env
 			shift 1
 			$sbindir/unreg $@ ;;
-
 		dbm_server)
 			. $sysconfdir/tacoenv.sh 
 			set_env

@@ -68,7 +68,7 @@ AGPSpp 1
 Inst_verify 1
 0
 ]])
-AT_CHECK(AT_TACO_RUN_LOCAL([test_starter sys/start/`uname -n|cut -f1 -d'.'` 2>/dev/null < starter; sleep 3]), [0],
+AT_CHECK(AT_TACO_RUN_LOCAL([test_starter sys/start/`uname -n|cut -f1 -d'.'` 2>/dev/null < starter; sleep 0]), [0],
 [[Select one of the following commands:
 
 0. Quit
@@ -126,7 +126,7 @@ Inst_verify 1
 0
 ]])
 AT_CHECK([
-AT_TACO_RUN_LOCAL([test_starter sys/start/`uname -n|cut -f1 -d'.'` 2>/dev/null < starter; sleep 3; ])
+AT_TACO_RUN_LOCAL([test_starter sys/start/`uname -n|cut -f1 -d'.'` 2>/dev/null < starter; sleep 0; ])
 AT_TACO_RUN_LOCAL([off StartServer >>log])], [0],
 [[Select one of the following commands:
 

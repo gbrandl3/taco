@@ -94,6 +94,7 @@ void Test::Ext::Server::deviceReset(void) throw (::TACO::Exception)
 	}
 	catch (::TACO::Exception &e)
 	{
-		throw "deviceReset() : " >> e;
+		::TACO::Exception eh = "deviceReset() : " >> e;
+		throw ::TACO::Exception(::TACO::Error::RUNTIME_ERROR, eh.what());
 	}
 }

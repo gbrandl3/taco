@@ -270,13 +270,13 @@ test/longfamily/long/longresource: 25
 AT_CHECK([
 RES_BASE_DIR=`pwd` taco db_update test_server.res
 AT_TACO_RUN_LOCAL([db_devperslist test_server])
-AT_TACO_RUN_TEST([test_server 1 -d])
+AT_TACO_RUN_LOCAL([test_server 1 -d])
 sleep 5
-AT_TACO_RUN_LOCAL([off test_server >>log])
+AT_TACO_RUN_TEST([off test_server >>log])
 sleep 1
-AT_TACO_RUN_TEST([test_server 1 -d])
+AT_TACO_RUN_LOCAL([test_server 1 -d])
 sleep 5
-AT_TACO_RUN_LOCAL([off test_server >>log])
+AT_TACO_RUN_TEST([off test_server >>log])
 ], [], [[1
 ]])
 AT_CLEANUP
@@ -306,7 +306,7 @@ AT_DATA([test.res], [[
 longest_testserver/srv0/device:         test/device/10,test/device/20
 ]])
 AT_CHECK([RES_BASE_DIR=`pwd` taco db_update test.res
-AT_TACO_RUN_LOCAL([db_servinfo longest_testserver/srv0])
+AT_TACO_RUN_TEST([db_servinfo longest_testserver/srv0])
 ], [], [[The device test/device/10 is defined for this server but is not exported
 The device test/device/20 is defined for this server but is not exported
 ]])
