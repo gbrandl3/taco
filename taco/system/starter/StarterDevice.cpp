@@ -204,9 +204,11 @@ StarterDevice::StarterDevice(std::string name, DevLong &error)
 					D_VOID_TYPE,
 					ADMIN_ACCESS, "UpdateServerInfo");
 
+	n_commands = commands_map.size();
 	try
 	{
 		pthread_mutex_init(&m_refMutex, NULL);		
+		clearControlledList();
 		v_Init();
 		m_runningState = 1;
 		pthread_create(&this->m_checking, 0, StarterDevice::checking, this);
@@ -250,8 +252,6 @@ void StarterDevice::v_Init(void)
 //
 // Get the list of all devices to be started on default on this machine
 // 
-	clearControlledList();
-
 	if (db_getresource(const_cast<char *>(this->GetDevName()) , &server, 1, &error) == DS_OK)
 	{
 		for (int i = 0; i < server_list.length; ++i)
@@ -260,31 +260,46 @@ void StarterDevice::v_Init(void)
 			std::string::size_type pos = tmpString.find("/");
 			if (pos == std::string::npos)
 				continue;
-
-			ControlledServer *tmp = new ControlledServer();
-			tmp->serverName = tmpString.substr(0, pos);
-			tmp->persName = tmpString.substr(pos + 1);
-			tmp->controlled = true;
-			db_svcinfo_call	s_info;
-			if (db_servinfo(tmp->serverName.c_str(), tmp->persName.c_str(), &s_info, &error) == DS_OK)
+			std::string serverName = tmpString.substr(0, pos);
+			std::string persName = tmpString.substr(pos + 1);
+			bool newserver(true);
+			logStream->debugStream() << "v_Init() : looking for " << serverName << "/" << persName << log4cpp::eol;
+			for (std::vector<ControlledServer*>::iterator it = m_servers.begin(); it < m_servers.end(); ++it)
 			{
-				if (strcmp(s_info.host_name, "not_exp") && strcmp(s_info.host_name, hostna))
+				logStream->debugStream() << "v_Init() : found " << (*it)->serverName << "/" << (*it)->persName << log4cpp::eol;
+				if ((*it)->serverName == serverName && (*it)->persName == persName)
 				{
-					delete tmp;
-					continue;
-				}	
-				if (s_info.server->device_nb > 0)
-				{
-					if (dev_import(s_info.server->device[0].dev_name, 0, &tmp->proxyDevice, &error) == DS_NOTOK)
-						logStream->debugStream() << "COULD NOT IMPORT : " << s_info.server->device[0].dev_name << log4cpp::eol;
-					else if (!tmp->running())
-						logStream->warnStream() << "COULD NOT PING : " << s_info.server->device[0].dev_name << log4cpp::eol;
+					logStream->debugStream() << "v_Init() : " << serverName << "/" << persName << " already known." << log4cpp::eol;
+					newserver = false;
+					break;
 				}
-				m_servers.push_back(tmp);
+			}
+			if (newserver)
+			{
+				db_svcinfo_call	s_info;
+				if (db_servinfo(serverName.c_str(), persName.c_str(), &s_info, &error) == DS_OK)
+				{
+					if (strcmp(s_info.host_name, "not_exp") && strcmp(s_info.host_name, hostna))
+						continue;
 
-				for (int k = 0; k < s_info.embedded_server_nb; ++k)
-					free(s_info.server[k].device);
-				free(s_info.server);
+					ControlledServer *tmp = new ControlledServer();
+					tmp->serverName = serverName;
+					tmp->persName = persName;
+					tmp->controlled = true;
+					if (s_info.server->device_nb > 0)
+					{
+						if (dev_import(s_info.server->device[0].dev_name, 0, &tmp->proxyDevice, &error) == DS_NOTOK)
+							logStream->debugStream() << "COULD NOT IMPORT : " << s_info.server->device[0].dev_name << log4cpp::eol;
+						else if (!tmp->running())
+							logStream->warnStream() << "COULD NOT PING : " << s_info.server->device[0].dev_name << log4cpp::eol;
+					}
+					m_servers.push_back(tmp);
+					logStream->debugStream() << "v_Init() : " << serverName << "/" << persName << " added." << log4cpp::eol;
+
+					for (int k = 0; k < s_info.embedded_server_nb; ++k)
+						free(s_info.server[k].device);
+					free(s_info.server);
+				}
 			}
 			free(server_list.sequence[i]);
 		}
@@ -305,6 +320,7 @@ void StarterDevice::v_Init(void)
 
 			long nb_persnames;
 			char **pers_names;
+			serverName = ds_servers[i];
 			if (db_getdspersnamelist(const_cast<char *>(serverName.c_str()), &nb_persnames, &pers_names, &error) == DS_OK)
 			{
 				for (int j = 0; j < nb_persnames; ++j)
@@ -312,33 +328,44 @@ void StarterDevice::v_Init(void)
 					std::string persName = pers_names[j];
 					free(pers_names[j]);
 
-					std::transform(persName.begin(), persName.end(), persName.begin(), ::tolower);
-
-					db_svcinfo_call	s_info;
-					if (db_servinfo(serverName.c_str(), persName.c_str(), &s_info, &error) == DS_OK)
+					bool newserver(true);
+					for (std::vector<ControlledServer*>::iterator it = m_servers.begin(); it < m_servers.end(); ++it)
+					if ((*it)->serverName == serverName && (*it)->persName == persName)
 					{
-						if (!strcmp(s_info.host_name, hostna))
-						{
-							ControlledServer *tmp = new ControlledServer();
-							tmp->serverName = serverName;
-							tmp->persName = persName;
-							tmp->controlled = false;
-							if (s_info.server->device_nb > 0)
-							{
-								if (dev_import(s_info.server->device[0].dev_name, 0, &tmp->proxyDevice, &error) == DS_NOTOK)
-									logStream->debugStream() << "COULD NOT IMPORT : " << s_info.server->device[0].dev_name << log4cpp::eol;
-								else if (!tmp->running())
-									logStream->debugStream() << "COULD NOT PING : " << s_info.server->device[0].dev_name << log4cpp::eol;
-							}
-							m_servers.push_back(tmp);
-						}
+						newserver = false;
+						break;
 					}
+					if (newserver)
+					{
+//						std::transform(persName.begin(), persName.end(), persName.begin(), ::tolower);
 
-					for (int k = 0; k < s_info.embedded_server_nb; ++k)
-						free(s_info.server[k].device);
-					free(s_info.server);
+						db_svcinfo_call	s_info;
+						if (db_servinfo(serverName.c_str(), persName.c_str(), &s_info, &error) == DS_OK)
+						{
+							if (!strcmp(s_info.host_name, hostna))
+							{
+								ControlledServer *tmp = new ControlledServer();
+								tmp->serverName = serverName;
+								tmp->persName = persName;
+								tmp->controlled = false;
+								if (s_info.server->device_nb > 0)
+								{
+									if (dev_import(s_info.server->device[0].dev_name, 0, &tmp->proxyDevice, &error) == DS_NOTOK)
+										logStream->debugStream() << "COULD NOT IMPORT : " << s_info.server->device[0].dev_name << log4cpp::eol;
+									else if (!tmp->running())
+										logStream->debugStream() << "COULD NOT PING : " << s_info.server->device[0].dev_name << log4cpp::eol;
+								}
+								m_servers.push_back(tmp);
+							}
+						}
+
+						for (int k = 0; k < s_info.embedded_server_nb; ++k)
+							free(s_info.server[k].device);
+						free(s_info.server);
+					}
 				}
-				free(pers_names);
+				if (nb_persnames)
+					free(pers_names);
 			}
 			else 
 				logStream->errorStream() << "    " << error << log4cpp::eol;
@@ -417,7 +444,15 @@ long StarterDevice::tacoDevStop(DevArgument argin, DevArgument argout, DevLong *
 			try
 			{
 				this->deviceStop(arr.sequence[0], arr.sequence[1]);
-				v_Init();
+				for (std::vector<ControlledServer*>::iterator it = m_servers.begin(); it < m_servers.end(); ++it)
+				{
+					if ((*it)->serverName == arr.sequence[0] && (*it)->persName == arr.sequence[1])
+					{
+						logStream->infoStream() << "StarterDevice::tacoDevStop() : take " << (*it)->serverName << "/" << (*it)->persName
+									<< " out of control" << log4cpp::eol;
+						(*it)->controlled = false;
+					}
+				}
 				return DS_OK;
 			}
 			catch(const DevLong &e)
@@ -765,7 +800,7 @@ void StarterDevice::checkServerStatus(void)
 		ControlledServer *tmp = *it;
 		if (tmp->controlled) 
 		{
-			std::string tmpString = tmp->serverName;
+			std::string tmpString = tmp->serverName + "/" + tmp->persName;
 			if (!tmp->running())
 			{
 				try
@@ -778,7 +813,7 @@ void StarterDevice::checkServerStatus(void)
 				tmpString += " not";
 			}
 			tmpString += " running";
-			logStream->debugStream() << "Controlled Server : " << tmpString << log4cpp::eol;
+			logStream->infoStream() << "Controlled Server : " << tmpString << log4cpp::eol;
 // Try to restart the server
 		}
 	}
@@ -792,7 +827,7 @@ void *StarterDevice::checking(void *thisPointer)
 	do
 	{
 		j++;
-		sleep(1);
+		::sleep(1);
 		if (!(j % 30))
 			p->v_Init();
 		if (!(j % 10))
