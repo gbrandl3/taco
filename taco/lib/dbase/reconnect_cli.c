@@ -465,7 +465,7 @@ int to_reconnection(void *p_data, void **pp_result, CLIENT **client,
 				clnt_control(*client,CLSET_TIMEOUT,(char *)&old_tout);
 				clnt_control(*client,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 				*error = DbErr_CannotCreateClientHandle;
-				return(-1);
+				return DS_NOTOK;
 			}		
 #else /* !vxworks */
 			if (nethost_index == 0)
@@ -477,7 +477,7 @@ int to_reconnection(void *p_data, void **pp_result, CLIENT **client,
 				clnt_control(*client,CLSET_TIMEOUT,(char *)&old_tout);
 				clnt_control(*client,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 				*error = DbErr_CannotCreateClientHandle;
-				return(-1);
+				return DS_NOTOK;
 			}
 #endif /* !vxworks */
 
@@ -500,7 +500,7 @@ int to_reconnection(void *p_data, void **pp_result, CLIENT **client,
 				clnt_control(*client,CLSET_TIMEOUT,(char *)&old_tout);
 				clnt_control(*client,CLSET_RETRY_TIMEOUT,(char *)&old_tout);
 				*error = DbErr_CannotCreateClientHandle;
-				return(-1);
+				return DS_NOTOK;
 			}
 			else
 			{
@@ -738,9 +738,9 @@ int to_reconnection(void *p_data, void **pp_result, CLIENT **client,
 	if (recev_gen != NULL)
 	{
 		*error = 0;
-		return(0);
+		return DS_OK;
 	}
 	else
-		return(-1);
+		return DS_NOTOK;
 }
 
