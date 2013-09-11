@@ -70,7 +70,7 @@ log4cpp::Category       *logStream;
 static std::string	devServer;
 
 static void CleanServer(void);
-static long ServerSetup(char *, long *);
+static long ServerSetup(char *, DevLong *);
 
 /**
  * This function is used as signal handler. This callback function for the sigaction function gets
@@ -80,7 +80,7 @@ static long ServerSetup(char *, long *);
  */
 static void SignalHandler (int signal)
 {
-	long lError;
+	DevLong lError;
 
 	switch (signal)
 	{
@@ -143,7 +143,7 @@ static void CleanServer(void)
  * @param plError pointer to the error variable which has to be set in case of an error inside the function
  * @return DS_NOTOK in case of failure otherwise DS_OK
  */
-long startup(char *pszServerName, long *plError)
+long startup(char *pszServerName, DevLong *plError)
 {
 	const char              *logpath = getenv("LOGCONFIG");
 
@@ -193,7 +193,7 @@ long startup(char *pszServerName, long *plError)
  * @param sDeviceName the device name
  * @return in case of succes the pointer to the created device object otherwise NULL
  */
-long ServerSetup(char *pszServerName, long *plError)
+long ServerSetup(char *pszServerName, DevLong *plError)
 {
 	devServer = std::string(pszServerName);
 
