@@ -30,6 +30,8 @@ EXTRA_DIST = \
 
 .PHONY: check rpm docs doc-dist
 
+DISTCLEANFILES = log4cpp.pc.in log4cpp-config.in
+
 dist-hook:
 #	perl -pi -e 's/\n/\r\n/g' `find $(distdir) -name '*.ds?'`
 #	perl -pi -e 's/\n/\r\n/g' `find $(distdir) -name '*.bpg'`

@@ -18,6 +18,8 @@
 #
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-ext --enable-gdbm --enable-sqlite3
+DISTCHECK_CONFIGURE_FLAGS += --with-appdefaultdir=\$${DESTDIR}/\$${datadir}/X11/app-defaults
+
 ACLOCAL_AMFLAGS = -I m4 -I log4cpp -I log4cpp/m4
 
 SUBDIRS = m4 

@@ -46,4 +46,6 @@ StarterCommands.py:		wrap_StarterCommands.cpp
 wrap_StarterCommands.cpp:	$(srcdir)/StarterCommands.i $(srcdir)/../StarterCmds.h
 	@SWIG@ @AX_SWIG_PYTHON_OPT@ -threads -c++ -I$(top_srcdir)/ext/include -I$(srcdir)/.. @TACO_INCLUDES@ -o $@ $(srcdir)/StarterCommands.i
 
+DISTCLEANFILES			= wrap_StarterCommands.cpp StarterCommands.py
+
 endif

@@ -86,9 +86,12 @@ if test $# -gt 0 ; then
 			dc_destdir=$testbindir/test
 			(cd $top_builddir && make DESTDIR=$dc_destdir uninstall) >>log 2>&1
 			rm -f ${sbindir}/system/pipe/* ${sbindir}/system/error/*
+			rm -f ${infodir}/dir
 			for i in ${templatedir} ${infodir} ${sbindir}/system/pipe ${sbindir}/system/error ${sbindir}/system ; do
 				if test -n "$i" -a -d $i ; then
-					rmdir $i
+					if ! rmdir $i ; then
+						ls -lR $i
+					fi
 				fi
 			done
 			rm -f ${localstatedir}/cache/taco/*

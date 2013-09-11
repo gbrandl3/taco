@@ -17,7 +17,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-DISTCHECK_CONFIGURE_FLAGS = --with-appdefaultdir=\$${datadir}/X11/app-defaults
+DISTCHECK_CONFIGURE_FLAGS = --with-appdefaultdir=\$$(DESTDIR)/\$${datadir}/X11/app-defaults
 
 noinst_HEADERS		= greta.h  greta_cstes.h
 
