@@ -250,7 +250,7 @@ db_resimp *SQLite3Server::db_devimp_1_svc(arr1 *de_name)
 			std::string query;
 			query = "SELECT HOST, IOR, VERSION, CLASS";
 			query += (" FROM device WHERE name = '" + dev_name + "'" );
-			query += (" AND IOR LIKE 'rpc:%'");
+			query += (" AND IOR LIKE 'rpc:%' ESCAPE '\\'");
 
 			logStream->infoStream() << "SQLite3Server::db_devimp_1_svc() : " << query << log4cpp::eol;
 			if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)

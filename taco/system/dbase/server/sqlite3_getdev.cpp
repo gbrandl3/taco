@@ -131,6 +131,7 @@ db_res *SQLite3Server::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rq
 				member = tmpf.substr(pos + 1);
 				query += (" name LIKE '" + escape_wildcards(tmpf) + "' AND");
 			}
+			break;
 		case 1 : 
 			pos = tmpf.find('/');
 			domain = tmpf.substr(0, pos);	
@@ -147,7 +148,7 @@ db_res *SQLite3Server::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rq
 			browse_back.res_val.arr1_len = 0;
 			return (&browse_back);		 		 
 	}
-	query += (" EXPORTED != 0 AND IOR LIKE 'rpc:%'");
+	query += (" EXPORTED != 0 AND IOR LIKE 'rpc:%' ESCAPE '\\'");
 
 	logStream->debugStream() << "SQLite3Server::db_getdevexp_1_svc() : " << log4cpp::eol;
 	logStream->debugStream() << "filter domain : " << domain << log4cpp::eol;

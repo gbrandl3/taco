@@ -118,7 +118,7 @@ db_devinfo_svc *SQLite3Server::devinfo_1_svc(DevString *dev)
 
 	std::string query;
 	query = "SELECT SERVER, HOST, IOR, VERSION, CLASS, PID, EXPORTED FROM device";
-	query += " WHERE NAME = '" + user_device + "' AND IOR NOT LIKE 'ior:%'";
+	query += " WHERE NAME = '" + user_device + "' AND IOR NOT LIKE 'ior:%' ESCAPE '\\'";
 	query += " AND CLASS NOT LIKE 'PseudoDevice'";
 	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
@@ -170,7 +170,7 @@ db_devinfo_svc *SQLite3Server::devinfo_1_svc(DevString *dev)
 			sqlite3_free_table(result);
 			query = "SELECT HOST, PID FROM device";
 			query += (" WHERE NAME = '" + user_device + "'");
-			query += (" AND IOR NOT LIKE 'ior:%'");
+			query += (" AND IOR NOT LIKE 'ior:%' ESCAPE '\\'");
 			query += (" AND CLASS LIKE 'PseudoDevice'");
 			logStream->infoStream() << query << log4cpp::eol;
 			if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
@@ -398,7 +398,6 @@ DevLong *SQLite3Server::devdel_1_svc(DevString *dev)
 		return (&errcode);
     	}
 	logStream->debugStream() << "SQLite3Server::devdel_1_svc() : " << nrow << log4cpp::eol;
-	sqlite3_free_table(result);
 
 	if(nrow != 0)
 	{
@@ -608,7 +607,7 @@ db_info_svc *SQLite3Server::info_1_svc()
 //
 // Now, count pseudo_devices
 //
-	query = "SELECT COUNT(*) FROM device WHERE IOR LIKE 'DC:%'";
+	query = "SELECT COUNT(*) FROM device WHERE IOR LIKE 'DC:%' ESCAPE '\\'";
 	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{ 
@@ -739,11 +738,10 @@ DevLong *SQLite3Server::unreg_1_svc(db_res *recev)
 	if (class_list.empty())
     	{
 		class_list = "'" + user_ds_name + "'";
-		query += (class_list + ") AND SERVER LIKE '%/" + escape_wildcards(user_pers_name) + "'");
+		query += (class_list + ") AND SERVER LIKE '%/" + escape_wildcards(user_pers_name) + "' ESCAPE '\\'");
 	}
 	else
 		query += (class_list + ") AND SERVER = '"+ user_ds_name + "/" + user_pers_name + "'");
-
 	logStream->infoStream() << " SQLite3Server::unreg_1_svc() : " << query << log4cpp::eol;
 
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
@@ -821,7 +819,7 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
 // Get server informations
 //
 	query = "SELECT PID, HOST, NAME, IOR, EXPORTED FROM device WHERE server='"
-		+ user_ds_name + "/" + user_pers_name + "' AND IOR NOT LIKE 'ior:%'";
+		+ user_ds_name + "/" + user_pers_name + "' AND IOR NOT LIKE 'ior:%' ESCAPE '\\'";
 
 
 	logStream->infoStream() << query << log4cpp::eol;
@@ -834,7 +832,6 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
     
 	std::string 	class_list("");
 	int		nb_class = 0;
-	int		k = ncol;
 
 	dev_length = nrow;
 
@@ -844,6 +841,11 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
 		svcinfo_back.db_err = DbErr_DeviceServerNotDefined;
  		return(&svcinfo_back);
 	}
+
+//
+// First row contains the column names
+//
+	int		k = ncol;
 
 	svcinfo_back.pid = atoi(result[k]);
 	std::string ior(result[k + 3]);
@@ -855,7 +857,7 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
 		svcinfo_back.host_name[HOST_NAME_LENGTH - 1] = '\0';
 	}
 
-	if (result[ncol + 1] == NULL || svcinfo_back.pid == 0 ) 
+	if (result[k + 1] == NULL || svcinfo_back.pid == 0)
 	{
 //
 // We have here a server that has not been started
@@ -870,7 +872,7 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
 		for(int i = 0; i < dev_length; i++, k += ncol) 
 		{
 			std::string dev_name(result[k + 2]);
-			svcinfo_back.embedded_val[0].dev_val[i].name = new char [dev_name.length()+1];
+			svcinfo_back.embedded_val[0].dev_val[i].name = new char [dev_name.length() + 1];
 			strcpy(svcinfo_back.embedded_val[0].dev_val[i].name, dev_name.c_str());
 			svcinfo_back.embedded_val[0].dev_val[i].exported_flag = atoi(result[k + 4]);
 		}
@@ -891,7 +893,7 @@ svcinfo_svc *SQLite3Server::svcinfo_1_svc(db_res *recev)
 // from the server name.
 //
 	query = "SELECT DISTINCT SERVER FROM DEVICE WHERE HOST ='";
-	query += std::string(svcinfo_back.host_name) + "' AND SERVER LIKE '%/" + user_pers_name + "' AND PID = ";
+	query += std::string(svcinfo_back.host_name) + "' AND SERVER LIKE '%/" + user_pers_name + "' ESCAPE '\\' AND PID = ";
 	char pid_str[32];
 	snprintf(pid_str, sizeof(pid_str), "%d", svcinfo_back.pid);
 	query += pid_str;
@@ -1005,7 +1007,7 @@ DevLong *SQLite3Server::svcdelete_1_svc(db_res *recev)
 //
 	std::string query;
 	query = "SELECT NAME FROM DEVICE WHERE SERVER = '"
-		+ user_ds_name + "/" + user_pers_name + "' AND IOR NOT LIKE 'ior:%'";
+		+ user_ds_name + "/" + user_pers_name + "' AND IOR NOT LIKE 'ior:%' ESCAPE '\\'";
 	logStream->infoStream() << query << log4cpp::eol;	
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{

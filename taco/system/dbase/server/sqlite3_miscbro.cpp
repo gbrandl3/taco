@@ -155,8 +155,8 @@ db_res *SQLite3Server::devpersnamelist_1_svc(DevString *server)
 // Sort device server personal name list
 //
 	std::string query;
-	query = "SELECT DISTINCT SERVER FROM device WHERE SERVER like '";
-	query += (escape_wildcards(user_server) + "/%' ORDER BY SERVER ASC");
+	query = "SELECT DISTINCT SERVER FROM device WHERE SERVER LIKE '";
+	query += (escape_wildcards(user_server) + "/%' ESCAPE '\\' ORDER BY SERVER ASC");
 	logStream->infoStream() << query << log4cpp::eol;
 	if (sqlite3_get_table(db, query.c_str(), &result, &nrow, &ncol, &zErrMsg) != SQLITE_OK)
 	{
