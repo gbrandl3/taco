@@ -16,7 +16,7 @@ dnl You should have received a copy of the GNU Lesser General Public
 dnl License along with this library; if not, write to the Free Software
 dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_INIT([TACO], [3.99.138], [taco-devel@lists.sourceforge.net])
+AC_INIT([TACO], [3.99.139], [taco-devel@lists.sourceforge.net])
 AC_PREREQ([2.57])
 AC_REVISION($Revision: 1.134 $)dnl
 AC_COPYRIGHT([(C) 1990-2013 ESRF])

@@ -30,12 +30,13 @@ AC_DEFUN([TACO_PYTHON_BINDING],
 	AS_IF([test x"$taco_python_binding" = x"yes"],
 	[
 		AC_MSG_NOTICE([Hallo])
-		AM_PATH_PYTHON([],[],[taco_python_binding=no])
+		AM_PATH_PYTHON([2.1],[],[taco_python_binding=no])
 		AC_MSG_NOTICE([Python])
-		AX_PYTHON(2.0, [yes])
+		dnl AX_PYTHON(2.0, [yes])
 		AS_IF([test x"${ax_python_bin}" = x"no" -o x"${ax_python_header}" = x"no" -o x"${ax_python_lib}" = x"no"],
 			[taco_python_binding=no], [taco_python_binding=yes])
 		AX_PYTHON_DEVEL
+		AS_IF([test -z "$PYTHON_VERSION"], [taco_python_binding=no])
 		AS_IF([test "x$taco_python_binding" = "xyes"],
 		[
 			ac_save_CPPFLAGS="$CPPFLAGS"
