@@ -12,41 +12,41 @@
 log4j.rootCategory=ERROR
 
 # log4j.category.taco.system=NOTICE, A5
-log4j.category.taco.system.MessageServer=NOTICE, A2
-log4j.category.taco.system.Database=NOTICE, A3
-log4j.category.taco.system.MessageServer=NOTICE, A4
-log4j.category.taco.server=NOTICE, A5
+log4j.category.taco.system.Manager=NOTICE, Manager
+log4j.category.taco.system.Database=NOTICE, Database
+log4j.category.taco.system.MessageServer=NOTICE, MessageServer
+log4j.category.taco.server=NOTICE, Default
 # log4j.category.taco.system.StartServer=INFO, A5
 #
 log4j.appender.A1=org.apache.log4j.ConsoleAppender
 log4j.appender.A1.layout=org.apache.log4j.SimpleLayout
 #
-log4j.appender.A3=org.apache.log4j.RollingFileAppender
-log4j.appender.A3.layout=org.apache.log4j.PatternLayout
-log4j.appender.A3.layout.ConversionPattern=%c{1} : %d : %-6p : %m%n
-log4j.appender.A3.maxFileSize=10000000
-log4j.appender.A3.maxBackupIndex=10
-log4j.appender.A3.append=true
-log4j.appender.A3.fileName=@logdir@/Manager.log
+log4j.appender.Manager=org.apache.log4j.RollingFileAppender
+log4j.appender.Manager.layout=org.apache.log4j.PatternLayout
+log4j.appender.Manager.layout.ConversionPattern=%c{1} : %d : %-6p : %m%n
+log4j.appender.Manager.maxFileSize=10000000
+log4j.appender.Manager.maxBackupIndex=10
+log4j.appender.Manager.append=true
+log4j.appender.Manager.fileName=@logdir@/Manager.log
 #
 
-log4j.appender.A2=org.apache.log4j.RollingFileAppender
-log4j.appender.A2.layout=org.apache.log4j.PatternLayout
-log4j.appender.A2.layout.ConversionPattern=%c{1} : %d : %-6p : %m%n
-log4j.appender.A2.maxFileSize=10000000
-log4j.appender.A2.maxBackupIndex=10
-log4j.appender.A2.append=true
-log4j.appender.A2.fileName=@logdir@/Database.log
+log4j.appender.Database=org.apache.log4j.RollingFileAppender
+log4j.appender.Database.layout=org.apache.log4j.PatternLayout
+log4j.appender.Database.layout.ConversionPattern=%c{1} : %d : %-6p : %m%n
+log4j.appender.Database.maxFileSize=10000000
+log4j.appender.Database.maxBackupIndex=10
+log4j.appender.Database.append=true
+log4j.appender.Database.fileName=@logdir@/Database.log
 
 #
-log4j.appender.A4=org.apache.log4j.RollingFileAppender
-log4j.appender.A4.layout=org.apache.log4j.PatternLayout
-log4j.appender.A4.layout.ConversionPattern=%c{1} : %d : %-6p : %m%n
-log4j.appender.A4.maxFileSize=10000000
-log4j.appender.A4.maxBackupIndex=10
-log4j.appender.A4.append=true
-log4j.appender.A4.fileName=@logdir@/MessageServer.log
+log4j.appender.MessageServer=org.apache.log4j.RollingFileAppender
+log4j.appender.MessageServer.layout=org.apache.log4j.PatternLayout
+log4j.appender.MessageServer.layout.ConversionPattern=%c{1} : %d : %-6p : %m%n
+log4j.appender.MessageServer.maxFileSize=10000000
+log4j.appender.MessageServer.maxBackupIndex=10
+log4j.appender.MessageServer.append=true
+log4j.appender.MessageServer.fileName=@logdir@/MessageServer.log
 
-log4j.appender.A5=org.apache.log4j.ConsoleAppender
-log4j.appender.A5.layout=org.apache.log4j.PatternLayout
-log4j.appender.A5.layout.ConversionPattern=%d %c %-6p : %m%n
+log4j.appender.Default=org.apache.log4j.ConsoleAppender
+log4j.appender.Default.layout=org.apache.log4j.PatternLayout
+log4j.appender.Default.layout.ConversionPattern=%d %c %-6p : %m%n
