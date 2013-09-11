@@ -1197,9 +1197,10 @@ long setup_config_multi (const char *nethost, DevLong *error)
 /*
  *  read environmental variable NETHOST
  */
-	if ( nethost == NULL )
+	nethost_env = (char *)getenv ("NETHOST");
+	if (nethost == NULL)
 	{
-		if ( (nethost_env = (char *)getenv ("NETHOST")) == NULL )
+		if (nethost_env == NULL)
 		{
 			*error = DevErr_NethostNotDefined;
 			return (DS_NOTOK);
@@ -1246,9 +1247,18 @@ long setup_config_multi (const char *nethost, DevLong *error)
  * 
  * andy 30/6/98
  */
-		if ((i == 0) || (i >= max_nethost))
+		if ((i_nethost == 0) || (i_nethost >= max_nethost))
 		{
 			nethost_alloc(error);
+/*
+ * if it was the first time and the nethost environment variable is not empty
+ * reserve the first entry for the NETHOST entry
+ */
+			if (i_nethost == 0 && nethost_env != NULL && nethost != NULL && (nethost_buffer != nethost))
+			{
+				if (setup_config_multi(NULL, error) == DS_OK)
+					++i_nethost;
+			}
 		}
  	}
 /*
