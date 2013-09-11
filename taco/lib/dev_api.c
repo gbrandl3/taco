@@ -309,7 +309,7 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, D
 				len,
 				i,
 				no_database = False;
-	char		name [256],
+	char			name [256],
 				*hstring,
 				*nethost = NULL,
 				*prog_url;
@@ -317,14 +317,14 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, D
 /*
  *  first convert the device name to lower case letters
  */
-	strcpy (name, dev_name);
+	strncpy(name, dev_name, sizeof(name));
 	device_name = &name[0];
 	str_tolower(device_name);
 	
-	/*
+/*
 	snprintf(name, sizeof(name), "%s", dev_name);
 	device_name = str_tolower(name);
-	*/
+*/
 	
 /*
  * now check to see whether the nethost is specified in the device name e.g. 
@@ -333,7 +333,7 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, D
  * nethost will be returned. If there is no default nethost defined -1 will be
  * returned.
  */
-	if ((i_nethost = get_i_nethost_by_device_name(device_name,error)) < 0)
+	if ((i_nethost = get_i_nethost_by_device_name(device_name, error)) < 0)
 	{
 /*
  * nethost not imported. extract nethost 
