@@ -722,7 +722,7 @@ thread_wrapper (void *arg)
   return 0;
 }
 
-const char hw[[[]]] = "Hello World!\n";],
+const char hw[[]] = "Hello World!\n";],
 [
   pthread_t tid;
   pid_t pid;
