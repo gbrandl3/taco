@@ -75,6 +75,10 @@ case $1 in
 			fi
 		elif test x"${TACO_DATABASE}" = x"sqlite3" ; then
 			new=`sqlite3 ${DBM_DIR}/tango 'select count(*) from property_device'`
+			if [ -z "$new" ] ; then
+				sleep 10
+				new=`sqlite3 ${DBM_DIR}/tango 'select count(*) from property_device'`
+			fi
 			if [ $new -eq 0 ] ; then
 				echo "Initialization of the database:"
 				if db_fillup2 ; then 
