@@ -291,11 +291,11 @@ AC_DEFUN([TACO_GRETA],
 AC_DEFUN([TACO_ASCII_API],
 [
 	AC_ARG_ENABLE(ascii, AC_HELP_STRING([--enable-ascii], [build the ASCII api @<:@default=yes@:>@]),
-		[case "${enable_ascii}" in
-			yes)	taco_ascii=yes;;
-			no)	taco_ascii=no;;
-			*)	AC_MSG_ERROR([bad value ${enable_ascii} for --enable-ascii]);;
-		esac], [taco_ascii=yes])
+		[AS_CASE(["${enable_ascii}"],
+			 [yes],	[taco_ascii=yes],
+			 [no],	[taco_ascii=no],
+			 [AC_MSG_ERROR([bad value ${enable_ascii} for --enable-ascii])])
+		], [taco_ascii=yes])
 	AC_CHECK_HEADERS([dlfcn.h], [], [
 		AC_CHECK_HEADERS([dl.h], [], [taco_ascii=no])])
 	AS_IF([test "x$taco_ascii" = "xyes"], [TACO_ASCII_LIBS="\$(top_builddir)/lib/ascii/libascapi.la \$(top_builddir)/lib/tc/libtcapi.la"])
@@ -354,14 +354,13 @@ AC_DEFUN([X_AND_MOTIF],
  	AC_SUBST(appdefaultdir)
 	motif_found=yes;
 	AC_ARG_WITH(motif, AC_HELP_STRING([--with-motif@<:@=ARG@:>@], [Motif @<:@ARG=yes@:>@ ARG may be 'yes', 'no', or the path to the Motif installation, e.g. '/usr/local/myMotif']), [
-		case  "$with_motif" in
-			yes) 	MOTIF_LIBS="-lXm" 
-				MOTIF_INCLUDES="$X_CFLAGS" ;;
-			no)  	AC_MSG_WARN([Disable build of greta/xdevmenu])
-				motif_found=no;;
-			*) 	MOTIF_LIBS="-L$withval/lib -lXm"
-				MOTIF_INCLUDES="-I$withval/include" ;;
-		esac      
+		AS_CASE(["$with_motif"],
+			[yes], [MOTIF_LIBS="-lXm"
+				MOTIF_INCLUDES="$X_CFLAGS"],
+			[no],  [AC_MSG_WARN([Disable build of greta/xdevmenu])
+				motif_found=no],
+			[MOTIF_LIBS="-L$withval/lib -lXm"
+			 MOTIF_INCLUDES="-I$withval/include"])
 		],[MOTIF_LIBS="-lXm"; MOTIF_INCLUDES="$X_CFLAGS"])
 	CPPFLAGS_SAVE="$CPPFLAGS"
 	CPPFLAGS="$CPPFLAGS $MOTIF_INCLUDES"
@@ -452,29 +451,15 @@ AC_DEFUN([TACO_DATAPORT_SRC],
 		[], [enable_dataport="yes"])
 	AS_IF([test "x$enable_dataport" = "xyes"],
 	      [ 
-		case "$target" in
-			arm*-*-linux* | \
-			ia64-*-linux* | \
-			x86_64-*-linux* | \
-        		i[[3456]]86-*-linux-* |\
-        		i[[3456]]86-*-linux |\
-			i[[3456]]86-*-cygwin* |\
-			i[[3456]]86-*-mingw* |\
-			powerpc-*-linux-* |\
-        		m68k-*-linux-* |\
+		AS_CASE(["$target"],
+			[arm*-*-linux* | ia64-*-linux* | x86_64-*-linux* | i[[3456]]86-*-linux-* | i[[3456]]86-*-linux |\
+			powerpc-*-linux-* | m68k-*-linux-* |\
+			i[[3456]]86-*-cygwin* | i[[3456]]86-*-mingw* |\
             		*-*-solaris* | *-*-sun*-* |\
 			*-*-darwin* |\
-			i386-*-freebsd* |\
-			ia64-*-freebsd* |\
-			amd64-*-freebsd* |\
-			x86_64-*-freebsd* |\
-            		*-*-hp*-*)
-				DATAPORTUNIX="yes" ;;
-            		*-*-OS?-*)      
-				DATAPORTUNIX="no" ;;
-            		*)              
-				DATAPORT="no";;	
-		esac
+			i386-*-freebsd* | ia64-*-freebsd* | amd64-*-freebsd* | x86_64-*-freebsd* | *-*-hp*-*], [DATAPORTUNIX="yes"],
+			[*-*-OS?-*], [DATAPORTUNIX="no"],
+			[DATAPORT="no"])
 	      ])
 	AM_CONDITIONAL(BUILD_DATAPORT, test x$enable_dataport = xyes)
 	AM_CONDITIONAL(DATAPORT_UNIX, test x$DATAPORTUNIX = xyes)

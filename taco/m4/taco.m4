@@ -63,28 +63,20 @@ dnl
 AC_DEFUN([TACO_DEFINES],
 [
         AC_REQUIRE([TACO_INIT])dnl
-        case "$target" in
-                i[[3456]]86-*-linux-* | i[[3456]]86-*-linux | i[[3456]]86-*-cygwin* | \
-		i[[3456]]86-*-mingw* | \
-                x86_64-*-linux* | ia64-*-linux-* | arm*-*-linux-* | powerpc-*-linux-* )
-                        taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -DNDBM" ;;
-                i386-*-freebsd* | ia64-*-freebsd* | amd64-*-freebsd* | x86_64-*-freebsd* )
-                        taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -DNDBM" ;;
-                i[[3456]]86-apple-darwin* | x86_64-apple-darwin*) 
-			taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -Dx86=1 -DNDBM -DDARWIN";;
-                powerpc-apple-darwin*)
-			taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -DNDBM -DDARWIN";;
-                m68k-*-linux-*)
-                        taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -Dm68k=1 -DNDBM" ;;
-                *-*-solaris* | *-*-sun*-*)
-                        taco_CFLAGS="-Dunix=1 -D__unix=1 -D_solaris=1 -D__solaris__=1 -DNDBM" ;;
-                *-*-hp*-*)
-                        taco_CFLAGS="-Dunix=1 -D__unix=1 -D__hpux=1 -D__hpux10=1 -D__hp9000s700=1 -D__hpux9000s700=1 -DNDBM" ;;
-                *-*-OS?-*)
-                        taco_CFLAGS="-D_UCC=1" ;;
-                *)      AC_MSG_ERROR([unknown target : $target])
-                        taco_CFLAGS="unknown $target" ;;
-        esac
+        AS_CASE(["$target"],
+                [i[[3456]]86-*-linux-* | i[[3456]]86-*-linux | x86_64-*-linux* |\
+		ia64-*-linux-* | arm*-*-linux* | powerpc-*-linux-* |\
+		i[[3456]]86-*-cygwin* | i[[3456]]86-*-mingw*], 		[taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -DNDBM"],
+                [i386-*-freebsd* | ia64-*-freebsd* | \
+		amd64-*-freebsd* | x86_64-*-freebsd*], 			[taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -DNDBM"],
+                [i[[3456]]86-apple-darwin* | x86_64-apple-darwin*], 	[taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -Dx86=1 -DNDBM -DDARWIN"],
+                [powerpc-apple-darwin*], 				[taco_CFLAGS="-Dunix=1 -D__unix=1 -DFreeBSD -DNDBM -DDARWIN"],
+                [m68k-*-linux-*], 					[taco_CFLAGS="-Dunix=1 -D__unix=1 -Dlinux=1 -Dm68k=1 -DNDBM"],
+                [*-*-solaris* | *-*-sun*-*],				[taco_CFLAGS="-Dunix=1 -D__unix=1 -D_solaris=1 -D__solaris__=1 -DNDBM"],
+                [*-*-hp*-*], 						[taco_CFLAGS="-Dunix=1 -D__unix=1 -D__hpux=1 -D__hpux10=1 -D__hp9000s700=1 -D__hpux9000s700=1 -DNDBM"],
+                [*-*-OS?-*], 						[taco_CFLAGS="-D_UCC=1"],
+                [AC_MSG_ERROR([unknown target : $target])
+                 taco_CFLAGS="unknown $target"])
         AC_ARG_ENABLE(multithreading, AC_HELP_STRING([--enable-multithreading], [allow multithreading @<:@default=yes@:>@]),
         [
                 AS_IF([test x$enableval = xno], [extraflags=""], [extraflags="-D_REENTRANT"])
@@ -399,56 +391,36 @@ AC_DEFUN([TACO_ENABLE_DEBUG],
 
 	AC_REQUIRE([AC_PROG_CC])dnl
 	AC_REQUIRE([AC_PROG_CXX])dnl
-	case "$ac_ct_CC" in
-		gcc)
-		case "$enable_debug" in
-			yes)
-				;;
-			full)
-                       		CFLAGS=`echo $CFLAGS | sed -e"s/-O2/-O0/g"`
-                       		CFLAGS=`echo $CFLAGS | sed -e"s/-g//g"`
-                       		CFLAGS="-g3 -fno-inline $CFLAGS"
-				;;
-			*)
-                       		CFLAGS=`echo $CFLAGS | sed -e"s/-g//g"`
-				;;
-       		esac
-		;;
-		*)
-		;;
-	esac
+	AS_CASE(["$ac_ct_CC"],
+		[gcc], [AS_CASE(["$enable_debug"],
+				[yes], [],
+				[full], [
+					 CFLAGS=`echo $CFLAGS | sed -e"s/-O2/-O0/g"`
+					 CFLAGS=`echo $CFLAGS | sed -e"s/-g//g"`
+					 CFLAGS="-g3 -fno-inline $CFLAGS"
+				        ],
+				[CFLAGS=`echo $CFLAGS | sed -e"s/-g//g"`])
+		       ],
+		[])
 dnl
 dnl Not really clear !!!
 dnl
 	AS_IF([test -z "$LDFLAGS" -a x"$enable_debug" = x"no" -a x"$ac_ct_CC" = x"gcc"], [LDFLAGS=""])
-	case "$ac_ct_CXX" in 
-		g++)
-		case "$enable_debug" in
-			yes)
-				;;
-                       	full)
-                                CXXFLAGS=`echo $CXXFLAGS | sed -e"s/-O2/-O0/g"`
-                       		CXXFLAGS=`echo $CXXFLAGS | sed -e"s/-g//g"`
-                                CXXFLAGS="-g3 -fno-inline $CXXFLAGS"
-				;;
-			*)
-                       		CXXFLAGS=`echo $CXXFLAGS | sed -e"s/-g//g"`
-				;;
-		esac
-		;;
-        	KCC)
-		case "$enable_debug" in
-			no)
-                       		CXXFLAGS="+K3 $CXXFLAGS"
-				;;
-			*)
-                       		CXXFLAGS="+K0 -Wall -pedantic -W -Wpointer-arith -Wwrite-strings $CXXFLAGS"
-				;;
-		esac
-		;;
-		*)
-		;;
-	esac
+	AS_CASE(["$ac_ct_CXX"],
+		[g++], [AS_CASE(["$enable_debug"],
+				[yes], [],
+				[full], [
+					 CXXFLAGS=`echo $CXXFLAGS | sed -e"s/-O2/-O0/g"`
+					 CXXFLAGS=`echo $CXXFLAGS | sed -e"s/-g//g"`
+					 CXXFLAGS="-g3 -fno-inline $CXXFLAGS"
+					],
+				[CXXFLAGS=`echo $CXXFLAGS | sed -e"s/-g//g"`])
+		       ],
+		[KCC], [AS_CASE(["$enable_debug"],
+				[no], [CXXFLAGS="+K3 $CXXFLAGS"],
+				[CXXFLAGS="+K0 -Wall -pedantic -W -Wpointer-arith -Wwrite-strings $CXXFLAGS"])
+		       ],
+		[])
 ])
 
 AC_DEFUN([TACO_SERVER],
@@ -558,15 +530,10 @@ AC_DEFUN([TACO_BASE_PATH],
                 	AS_IF([test "${prefix}" != NONE],
 			      [
                       		taco_includes=${prefix}/include
-                       		AS_IF([test "${exec_prefix}" != NONE], [taco_libraries=${exec_prefix}], [taco_libraries=${prefix}])
-                       		case "$target" in
-                        	       	x86_64-*-linux* | ia64-*-linux-* | ia64-*-freebsd* | x86_64-*-freebsd*)
-                        	              	taco_libraries=${taco_libraries}/lib64
-                        	               	;;
-                        	       	*)
-                        	               	taco_libraries=${taco_libraries}/lib
-                        	               	;;
-                       		esac
+				AS_IF([test "${exec_prefix}" != NONE], [taco_libraries=${exec_prefix}], [taco_libraries=${prefix}])
+				AS_CASE(["$target"],
+					[x86_64-*-linux* | ia64-*-linux-* | ia64-*-freebsd* | x86_64-*-freebsd*], [taco_libraries=${taco_libraries}/lib64],
+					[taco_libraries=${taco_libraries}/lib])
                 	      ],
 			      [
                        		taco_libraries=""
@@ -594,14 +561,9 @@ dnl try to guess taco locations
 
                 taco_libdirs="$ac_taco_libraries"
                 for i in $taco_standard_dirs ; do
-                        case "$target" in
-                                x86_64-*-linux* | ia64-*-linux-* | ia64-*-freebsd* | x86_64-*-freebsd* )
-                                        taco_libdirs="$taco_libdirs $i/lib64"
-                                        ;;
-                                *)
-                                        taco_libdirs="$taco_libdirs $i/lib"
-                                        ;;
-                        esac
+                        AS_CASE(["$target"],
+                                [x86_64-*-linux* | ia64-*-linux-* | ia64-*-freebsd* | x86_64-*-freebsd*], [taco_libdirs="$taco_libdirs $i/lib64"],
+                                [taco_libdirs="$taco_libdirs $i/lib"])
                 done
                 AC_FIND_LIB([taco], [xdr_length_DevChar], [$taco_libdirs], [eval taco_libdir="\"$i\""; LIB_TACO="-ltaco"],
                         [AC_MSG_ERROR([In the following dirs: $taco_libdirs, there are no taco libraries installed.])], [])
@@ -613,35 +575,30 @@ dnl try to guess taco locations
         ])dnl
 
 	eval "$ac_cv_have_taco"
-        if test "$have_taco" != "yes"; then
-                if test x"${prefix}" = xNONE; then
-                        ac_taco_prefix="$ac_default_prefix"
-                else
-                        ac_taco_prefix="$prefix"
-                fi
-                if test x"${exec_prefix}" = xNONE; then
-                        ac_taco_exec_prefix="$ac_taco_prefix"
-                        AC_MSG_RESULT([will be installed in $ac_taco_prefix])
-                else
-                        ac_taco_exec_prefix="$exec_prefix"
-                        AC_MSG_RESULT([will be installed in $ac_taco_prefix and $ac_taco_exec_prefix])
-                fi
-                case "$target" in
-                        x86_64-*-linux* | ia64-*-linux-* | ia64-*-freebsd* )
-                                taco_libraries="${ac_taco_exec_prefix}/lib64"
-                                ;;
-                        *)
-                                taco_libraries="${ac_taco_exec_prefix}/lib"
-                                ;;
-                esac
+        AS_IF([test "$have_taco" != "yes"],
+	      [
+                AS_IF([test x"${prefix}" = xNONE],
+                      [ac_taco_prefix="$ac_default_prefix"],
+                      [ac_taco_prefix="$prefix"])
+                AS_IF([test x"${exec_prefix}" = xNONE],
+                      [ac_taco_exec_prefix="$ac_taco_prefix"
+                       AC_MSG_RESULT([will be installed in $ac_taco_prefix])
+		      ],
+                      [ac_taco_exec_prefix="$exec_prefix"
+                       AC_MSG_RESULT([will be installed in $ac_taco_prefix and $ac_taco_exec_prefix])
+                      ])
+                AS_CASE(["$target"],
+                        [x86_64-*-linux* | ia64-*-linux-* | ia64-*-freebsd*], [taco_libraries="${ac_taco_exec_prefix}/lib64"],
+                        [taco_libraries="${ac_taco_exec_prefix}/lib"])
                 taco_includes="${ac_taco_prefix}/include"
-        else
+	      ],
+	      [
                 ac_cv_have_taco="have_taco=yes \
                 ac_taco_includes=$ac_taco_includes ac_taco_libraries=$ac_taco_libraries"
                 AC_MSG_RESULT([libraries $ac_taco_libraries, headers $ac_taco_includes])
                 taco_libraries="$ac_taco_libraries"
                 taco_includes="${ac_taco_includes}"
-        fi
+              ])
 
         AC_MSG_CHECKING([for TACO])
         AC_MSG_RESULT([found $taco_path libraries $taco_libraries])
