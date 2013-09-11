@@ -37,22 +37,27 @@ dnl check in a few common install locations
 dnl	
 	AS_IF([test x"${TCLCONFIG}" = x],
 	      [
-	        case "$target" in
-                        x86_64-*-linux* | ia64-*-linux-* | ia64-*-freebsd* | x86_64-*-freebsd* )
-                                taco_tcl_lib_search="/usr/lib64: "`ls -a /usr/lib64/* /usr/local/lib64/* 2>/dev/null | grep ':$'` 
-                                ;;
-                        *)
-                                taco_tcl_lib_search="/usr/lib: "`ls -a /usr/lib/* /usr/local/lib/* 2>/dev/null | grep ':$'` 
-                                ;;
-                esac
-                for i in $taco_tcl_lib_search ; do
+                AC_CHECK_PROGS([TCLSH], [tclsh])
+		AS_IF([test x"${TCLSH}" != x],
+                      [tcl_version=`echo 'puts $tcl_version; exit 0' | tclsh`
+                       tcl_lib_search="/usr/lib/tcl${tcl_version}"
+                      ]
+		     )
+	        AS_CASE(["$target"],
+                        [x86_64-*-linux* | ia64-*-linux-* | ia64-*-freebsd* | x86_64-*-freebsd*],
+                        [taco_tcl_lib_search="/usr/lib64: "`ls -a /usr/lib64/* /usr/local/lib64/* 2>/dev/null | grep ':$'`],
+                        [taco_tcl_lib_search="/usr/lib: "`ls -a /usr/lib/* /usr/local/lib/* 2>/dev/null | grep ':$'`]
+		       )
+
+                for i in $tcl_lib_search $taco_tcl_lib_search ; do
                         dir="`dirname $i`/`basename $i ':'`"
                         if test -f "$dir/tclConfig.sh" ; then
                                 TCLCONFIG=$dir
 	    			break
 			fi
 		done
-              ])
+	      ])
+
 	AS_IF([test x"${TCLCONFIG}" = x], [AC_MSG_RESULT(no)],
 	      [
 		AC_MSG_RESULT(found $TCLCONFIG/tclConfig.sh)
