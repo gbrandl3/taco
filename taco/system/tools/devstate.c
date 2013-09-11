@@ -69,7 +69,7 @@ void version(const char *cmd)
         exit(0);
 }
 
-int main(long argc,char **argv)
+int main(int argc,char **argv)
 {
 	int 		status,
 			i;

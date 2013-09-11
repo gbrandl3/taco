@@ -916,7 +916,7 @@ void exec_cmd(long cmd,char *cmd_name,int argin_type,void *arg_in,
 /**********************************************************************/
 /*    Main                                                            */
 /**********************************************************************/
-int main(unsigned int argc,char **argv)
+int main(int argc,char **argv)
 {
  	char *dev_name;
 	DevLong error = 0;
