@@ -1,5 +1,5 @@
 # Server for a (stepper/servo) motor
-# Copyright (C) 2007 Jens Krüger
+# Copyright (C) 2007-2013 Jens Krüger
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

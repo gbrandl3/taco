@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006 FRM-II
+ * Copyright (C) 2006-2013 FRM-II
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

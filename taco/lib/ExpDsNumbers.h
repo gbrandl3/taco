@@ -16,7 +16,7 @@
 
  Date:		$Date: 2007-03-22 15:49:49 $
 
- Copyright (c) 1993 by European Synchrotron Radiation Facility,
+ Copyright (c) 1993-2013 by European Synchrotron Radiation Facility,
                        Grenoble, France
 ********************************************************************-*/
 

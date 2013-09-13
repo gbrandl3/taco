@@ -13,7 +13,7 @@
 #
 # Original:	July 1993
 #
-# Copyright (c) 1990 by European Synchrotron Radiation Facility, 
+# Copyright (c) 1990-2013 by European Synchrotron Radiation Facility, 
 #                       Grenoble, France
 #
 #********************************************************************-*/

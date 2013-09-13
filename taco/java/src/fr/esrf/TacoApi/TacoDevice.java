@@ -63,7 +63,7 @@
  Initial import
 
 
- Copyright (c) 2005 by  European Synchrotron Radiation Facility,
+ Copyright (c) 2005-2013 by  European Synchrotron Radiation Facility,
 			     Grenoble, France
 
 *******************************************************************-*/

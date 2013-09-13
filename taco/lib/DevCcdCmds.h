@@ -16,7 +16,7 @@
 
   Version:	$Revision: 1.2 $
 
-  Copyright (c) 2000 by European Synchrotron Radiation Facility,
+  Copyright (c) 2000-2013 by European Synchrotron Radiation Facility,
 				        Grenoble, France
 
 *********************************************************************/

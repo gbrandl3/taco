@@ -13,7 +13,7 @@
 #
 # Original:	June 2001
 #
-# Copyright (c) 2001 by FRMII-ZBE Garching, Germany
+# Copyright (c) 2001-2013 by FRMII-ZBE Garching, Germany
 #
 #********************************************************************-*/
 #

@@ -1,7 +1,7 @@
 /*
  * log4taco.h
  *
- * Copyright 2010, Jens Krueger <jens.krueger@frm2.tum.de>. All rights reserved.
+ * Copyright 2010-2013, Jens Krueger <jens.krueger@frm2.tum.de>. All rights reserved.
  *
  * See the COPYING file for the terms of usage and distribution.
  */

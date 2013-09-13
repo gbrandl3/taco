@@ -1,7 +1,7 @@
 /****************************************************************************
 ** $Id: main.cpp,v 1.1 2004-01-26 08:44:22 hgilde1 Exp $
 **
-** Copyright (C) 1992-2000 Trolltech AS.  All rights reserved.
+** Copyright (c) 2003-2013 FRM-II, www.frm2.tum.de
 **
 ** This file is part of an example program for Qt.  This example
 ** program may be used, distributed and modified without limitation.

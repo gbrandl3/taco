@@ -2,7 +2,8 @@
 #
 # Toolkit for building distributed control systems or any other distributed system.
 #
-# Copyright (c) 1990-2005 ESRF, www.esrf.fr
+# Copyright (c) 2004-2013, FRM-II, TU Munich, Germany
+#
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -35,8 +36,6 @@
 # Date:		$Date: 2008-04-06 09:07:47 $
 #
 # Version:	$Revision: 1.4 $
-#
-# Copyright (c) 2004, FRM-II, TU Munich, Germany
 #
 
 if test -z "$RES_BASE_DIR" ; then
