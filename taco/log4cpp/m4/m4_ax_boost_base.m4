@@ -91,7 +91,7 @@ if test "x$want_boost" = "xyes"; then
     dnl are found, e.g. when only header-only libraries are installed!
     libsubdirs="lib"
     if test `uname -m` = x86_64; then
-        libsubdirs="lib64 lib lib64"
+        libsubdirs="lib64 lib lib/x86_64-linux-gnu lib64"
     fi
 
     dnl first we check the system location for boost libraries
