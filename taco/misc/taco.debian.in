@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 # Toolkit for building distributed control systems or any other distributed system.
 #
 # Copyright (c) 2003-2005 Jens Krüger <jkrueger1@users.sf.net>
@@ -22,12 +22,106 @@
 # Provides: taco
 # Required-Start: $network $portmap
 # Required-Stop:
-# Default-Start: 3 5
-# Default-Stop: 0 1 2 6
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
 # Description: Start the TACO system services.
 ### END INIT INFO
 
-usage="Usage: $0 {start|stop|restart|new}"
+if test -r /etc/rc.status ; then
+	. /etc/rc.status
+else
+	export LC_ALL=POSIX
+	_cmd=$1
+	if test "${_cmd}" = "status" ; then
+		_SMSG=(running dead dead unused unknown reserved)
+		_RC_UNUSED=3
+	else
+		_SMSG=(done failed failed missed failed skipped unused failed failed reserved)
+		_RC_UNUSED=6
+	fi
+	if test -r /lib/lsb/init-functions ; then
+		. /lib/lsb/init-functions
+		echo_rc() {
+			if test ${_RC_RV} = 0 ; then
+				log_success_msg " [${_SMSG[${_RC_RV}]}] "
+			else
+				log_failure_msg " [${_SMSG[${_RC_RV}]}] "
+			fi
+		}
+	elif test -r /etc/init.d/functions ; then
+		. /etc/init.d/functions
+		echo_rc() {
+			if test ${_RC_RV} = 0 ; then
+				log_success_msg " [${_SMSG[${_RC_RV}]}] "
+			else
+				log_failure_msg " [${_SMSG[${_RC_RV}]}] "
+			fi
+		}
+	else
+		echo_rc(){
+			echo " [${_SMSG[${_RC_RV}]}] "
+		}
+	fi
+	rc_reset() {
+		_RC_RV=0;
+	}
+	rc_failed() {
+		if test -z "$1" ; then
+			_RC_RV=1;
+		elif test "$1" != "0" ; then
+			_RC_RV=$1;
+		fi
+		return ${_RC_RV}
+	}
+	rc_check() {
+		return rc_failed $?
+	}
+	rc_status() {
+		rc_failed $?
+		if test "$1" = "-r" ; then _RC_RV=0; shift; fi
+		if test "$1" = "-s" ; then rc_failed 5; echo_rc; rc_failed 3; shift; fi
+		if test "$1" = "-u" ; then rc_failed ${_RC_UNUSED}; echo_rc; rc_failed 3; shift; fi
+		if test "$1" = "-v" ; then echo_rc; shift; fi
+		if test "$1" = "-r" ; then _RC_RV=0; shift; fi
+		return ${_RC_RV}
+	}
+	rc_exit() {
+		exit ${_RC_RV}
+	}
+	rc_active() {
+#		if test -z "$RUNLEVEL" ; then read RUNLEVEL REST < <(/sbin/runlevel) ; fi
+		if test -e /etc/init.d/S[0-9][0-9]${1} ; then return 0 ; fi
+		return 1
+	}
+fi
+rc_reset
+
+check_proc()
+{
+	rc_pid=$(pgrep -f "${taco_manager}")
+	if [ -z "${rc_pid}" ] ; then
+		return 1
+	else
+		return 0
+	fi
+}
+
+kill_proc() {
+	rc_pid=$(pgrep -f "${taco_manager}")
+	kill -TERM ${rc_pid}
+}
+
+server_start()
+{
+	echo -n "Starting TACO services $sec_text"
+	check_proc ${taco_manager} && rc_status -v -r && return
+	"${taco_manager}" $dbase $log $security >/dev/null 2>&1
+	sleep 5
+	check_proc ${taco_manager}
+	rc_status -v -r
+}
+
+usage="Usage: $0 {start|stop|status|restart|new}"
 
 # Include TACO environment file
 prefix=${DSHOME:-@prefix@}
@@ -56,33 +150,50 @@ case $1 in
 			security="-security"
 		fi
 		dbase="-${TACO_DATABASE:-dbm}"
-		echo -n "Starting TACO services $sec_text"
-		start-stop-daemon --start --quiet --exec "$taco_manager -- $dbase $log $security"
-		echo "."
+		server_start
+		rc_status -v
 		if [ ${TACO_DATABASE:-dbm} = dbm ] ; then
 			new=`ls -l ${DBM_DIR}/* 2>/dev/null | awk '{print $5;}' | sort | uniq | wc -l`
 			if [ $new -le 1 ] ;  then
-				echo -n "Initialization of the database:"
+				echo "Initialization of the database:"
 				if db_fillup2 ; then
-					echo "."
+					rc_status -v
 				else
-					exit 1
+					rc_status -v
+					rc_exit
+				fi
+			fi
+		elif test x"${TACO_DATABASE}" = x"sqlite3" ; then
+			if [ -f  ${DBM_DIR}/tango -a -s ${DBM_DIR}/tango ] ; then
+				new=`sqlite3 ${DBM_DIR}/tango 'select count(*) from property_device'`
+			else
+				new=0
+			fi
+			if [ $new -eq 0 ] ; then
+				echo "Initialization of the database:"
+				if db_fillup2 ; then
+					rc_status -v
+				else
+					rc_status -v
+					rc_exit
 				fi
 			fi
 		fi
 		;;
 	stop)
 		echo -n "Shutting down TACO services"
-		start-stop-daemon --stop --quiet --oknodo --exec "$taco_manager"
-		echo "."
+		kill_proc "$taco_manager"
+		rc_status -v
 		;;
 	restart)
 		$0 stop
 		$0 start
+		rc_status
 		;;
 	status)
 		echo -n "Checking for TACO services"
-		exit 3
+		check_proc "$taco_manager"
+		rc_status -v
 		;;
 	new)
 		if [ ${TACO_DATABASE:-dbm} = dbm ] ; then
@@ -91,12 +202,15 @@ case $1 in
 			if test "x$REPLY" = xyes ; then
 				rm -f "$DBM_DIR"/*
 				$0 restart
+				rc_status
+			else
+				rc_failed
 			fi
 		fi
 		;;
 	*)
 		echo "$usage"
-		exit 1
+		rc_failed
 		;;
 esac
-exit 0
+rc_exit

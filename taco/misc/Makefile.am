@@ -51,6 +51,7 @@ install-data-hook:	$(nodist_template_DATA)
 	else \
 		@INSTALL_DATA@ tacoenv.csh $(DESTDIR)${sysconfdir} ;\
 	fi
+	@rm tacoenv.tmp
 
 uninstall-local:
 	rm -f $(DESTDIR)/$(sysconfdir)/tacoenv.sh $(DESTDIR)/$(sysconfdir)/tacoenv.csh 
