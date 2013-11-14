@@ -506,14 +506,12 @@ AC_DEFUN([WITH_CORBA],
               [
 		AS_IF([test -z "$CORBA_CFLAGS"],
 			[
-			PKG_CHECK_MODULES(CORBA, [omniCOSDynamic4 >= 4.1.0],
+			PKG_CHECK_MODULES(CORBA, [omniCOSDynamic4 >= 4.1.0], [],
 			[
-			CORBA_CFLAGS=`$PKG_CONFIG --cflags omniCOSDynamic4`
-			CORBA_LIBS=`$PKG_CONFIG --libs-only-l omniCOSDynamic4`
-			CORBA_LDFLAGS=`$PKG_CONFIG --libs-only-L omniCOSDynamic4`
-			],
-			[
-			CORBA_LIBS="-lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"
+				PKG_CHECK_MODULES(CORBA, [omniDynamic4 >= 4.1.0], [],
+				[
+				CORBA_LIBS="-lomniORB4 -lomniDynamic4 -lCOS4 -lomnithread"
+				])
 			])])
 
 		AC_MSG_NOTICE([CORBA : $CORBA_LIBS $CORBA_LDFLAGS $CORBA_CFLAGS])
