@@ -594,12 +594,11 @@ db_psdev_error *NdbmServer::updres_1_svc(db_res *res_list)
 			std::string::size_type	pos = 0;
 
 			logStream->debugStream() << "Resource list = " << lin << log4cpp::eol;
-
 //
 // Only one update if the resource is a simple one 
 //
 			if ((pos = lin.find(SEP_ELT)) == std::string::npos)
-				upd_res(lin, ind, false);
+				upd_res(lin, 1, false);
 			else
 			{		
 				ind = 1;
