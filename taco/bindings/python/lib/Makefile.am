@@ -1,7 +1,7 @@
 #
 # Toolkit for building distributed control systems or any other distributed system.
 #
-# Copyright (c) 2004-2005 Jens Krüger <jkrueger1@users.sf.net>
+# Copyright (c) 2004-2013 Jens Krüger <jkrueger1@users.sf.net>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -24,13 +24,13 @@ Server_la_LDFLAGS 	= -module
 
 Taco_la_LDFLAGS 	= -module 
 
-INCLUDES 		= @TACO_INCLUDES@ @PYTHON_CPPFLAGS@ @PYTHON_CPPFLAGS@
+AM_CPPFLAGS 		= @TACO_INCLUDES@ @PYTHON_CPPFLAGS@ @PYTHON_CPPFLAGS@
 
 Server_la_LIBADD 	= $(top_builddir)/lib/libtaco.la $(top_builddir)/lib/xdr/libdsxdr_all.la @PYTHON_LDFLAGS@
 
 Taco_la_LIBADD 		= $(top_builddir)/lib/libtaco.la $(top_builddir)/lib/xdr/libdsxdr_all.la @PYTHON_LDFLAGS@
 
-AM_CPPFLAGS 		= -DMYDEB -DNUMPY 
+AM_CPPFLAGS 		+= -DMYDEB -DNUMPY
 
 noinst_HEADERS		= taco.h tacopython.h pythonP.h
 

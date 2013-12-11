@@ -1,6 +1,6 @@
 # Toolkit for building distributed control systems or any other distributed system.
 #
-# Copyright (c) 2003-2005 Jens Kr�ger <jkrueger1@users.sf.net>
+# Copyright (c) 2003-2013 Jens Krüger <jkrueger1@users.sf.net>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -24,7 +24,6 @@ sbin_PROGRAMS		= dbm_server
 lib_LTLIBRARIES 	= 
 
 AM_CPPFLAGS		= -DNODEBUG @TACO_INCLUDES@ @LOG4CPP_CFLAGS@
-INCLUDES		=
 
 
 if GDBMSUPPORT
@@ -45,7 +44,7 @@ libTACOndbm_la_SOURCES = dbm_serv.cpp \
 			dbm_update.cpp \
 			NdbmClass.cpp
 libTACOndbm_la_LIBADD	= @GDBM_LIBS@ -lstdc++
-INCLUDES		+= @GDBM_CFLAGS@ 
+AM_CPPFLAGS		+= @GDBM_CFLAGS@
 AM_CPPFLAGS		+= -DNDBM -DUSE_GDBM -DNODEBUG
 endif
 
@@ -66,7 +65,7 @@ libTACOMySQL_la_SOURCES = mysql_serv.cpp \
 			mysql_update.cpp \
 			mysql_cache.cpp
 libTACOMySQL_la_LIBADD	= @MYSQL_LIBS@ -lstdc++
-INCLUDES		+= @MYSQL_CFLAGS@ 
+AM_CPPFLAGS		+= @MYSQL_CFLAGS@
 AM_CPPFLAGS		+= -DUSE_MYSQL -DNODEBUG
 endif
 
@@ -86,7 +85,7 @@ libTACOSQLite3_la_SOURCES = sqlite3_serv.cpp \
 			sqlite3_miscbro.cpp \
 			sqlite3_update.cpp 
 libTACOSQLite3_la_LIBADD= @SQLITE3_LDFLAGS@ @SQLITE3_LIBS@ -lstdc++
-INCLUDES		+= @SQLITE3_CFLAGS@ 
+AM_CPPFLAGS		+= @SQLITE3_CFLAGS@
 AM_CPPFLAGS		+= -DUSE_SQLITE3 -DNODEBUG
 endif
 

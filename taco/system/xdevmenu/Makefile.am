@@ -1,6 +1,6 @@
 # Toolkit for building distributed control systems or any other distributed system.
 #
-# Copyright (c) 2003-2005 Jens Krüger <jkrueger1@users.sf.net>
+# Copyright (c) 2003-2013 Jens Krüger <jkrueger1@users.sf.net>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -34,9 +34,9 @@ appdefault_DATA	= XDevmenu
 
 EXTRA_DIST	+= ${appdefault_DATA} xdevmenu.uil
 
-AM_CFLAGS	= -DXK_MISCELLANY -D_BSD_SOURCE @X_CFLAGS@
+AM_CPPFLAGS	= -DXK_MISCELLANY -D_BSD_SOURCE @X_CFLAGS@
 
-INCLUDES	= @MOTIF_INCLUDES@ @TACO_INCLUDES@ 
+AM_CPPFLAGS	+= @MOTIF_INCLUDES@ @TACO_INCLUDES@
 
 LDADD		= @TACO_CLIENT_LIBS@ @MOTIF_LIBS@ @X_LIBS@ @X_PRE_LIBS@ @X_EXTRA_LIBS@ @LIB_X11@ -lXt @TACO_ASCII_LIBS@ # -ldl
 

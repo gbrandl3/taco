@@ -1,6 +1,6 @@
 # Toolkit for building distributed control systems or any other distributed system.
 #
-# Copyright (c) 2003-2005 Jens Krüger <jkrueger1@users.sf.net>
+# Copyright (c) 2003-2013 Jens Krüger <jkrueger1@users.sf.net>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@ include_HEADERS		= API_xdr.h API_xdr_vers3.h DevServerXdr.h DevXdrKernel.h xdr_t
 
 noinst_LTLIBRARIES	= libdsxdr.la libdsxdr_all.la libdsxdrbase.la
 
-INCLUDES		= @TACO_INCLUDES@
+AM_CPPFLAGS		= @TACO_INCLUDES@
 
 KERNEL_SOURCE		= DevXdrKernel.c 
 

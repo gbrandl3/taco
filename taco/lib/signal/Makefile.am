@@ -1,6 +1,6 @@
 # Toolkit for building distributed control systems or any other distributed system.
 #
-# Copyright (c) 1990-2005 by European Synchrotron Radiation Facility,
+# Copyright (c) 1990-2013 by European Synchrotron Radiation Facility,
 #                            Grenoble, France
 #
 # This library is free software; you can redistribute it and/or
@@ -18,6 +18,6 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 noinst_LTLIBRARIES	= libsignal.la
-INCLUDES                = @TACO_INCLUDES@
+AM_CPPFLAGS             = @TACO_INCLUDES@
 libsignal_la_SOURCES	= DSSignal.c MDSSignal.c MDSSignal_config.c
 include_HEADERS		= DSSignalP.h MDSSignal.h MDSSignalP.h

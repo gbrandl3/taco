@@ -1,6 +1,6 @@
 # Toolkit for building distributed control systems or any other distributed system.
 #
-# Copyright (c) 2003-2005 Jens Krüger <jkrueger1@users.sf.net>
+# Copyright (c) 2003-2013 Jens Krüger <jkrueger1@users.sf.net>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@ CLEANFILES 		= log taco
 
 DISTCLEANFILES 		= System.log atconfig *.lineno package.m4 testsuite
 
-INCLUDES		= @TACO_INCLUDES@ @LOG4CPP_CFLAGS@ @LOG4TACO_CFLAGS@
+AM_CPPFLAGS		= @TACO_INCLUDES@ @LOG4CPP_CFLAGS@ @LOG4TACO_CFLAGS@
 
 ## @GDBM_CFLAGS@ 
 
@@ -194,23 +194,23 @@ longest_testserver_LDADD = @TACO_SERVER_CXX_LIBS@ -lstdc++
 if BUILD_EXT
 check_PROGRAMS		+= TestExtServer ExtServerClient TestExtClient TestExtClient2
 
-TestExtServer_CPPFLAGS  = -I$(top_srcdir)/ext/include -DTACO_EXT
+TestExtServer_CPPFLAGS  = -I$(top_srcdir)/ext/include ${AM_CPPFLAGS} -DTACO_EXT
 TestExtServer_SOURCES	= TestExtServer.cpp TestExtServerStartup.cpp
 TestExtServer_LDADD	= @TACO_SERVER_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/src/libTACOExtensions.la
 TestExtServer_LDFLAGS	= -no-install
 
-ExtServerClient_CPPFLAGS= -I$(top_srcdir)/ext/include -DTACO_EXT
+ExtServerClient_CPPFLAGS= -I$(top_srcdir)/ext/include ${AM_CPPFLAGS} -DTACO_EXT
 ExtServerClient_SOURCES = ExtServerClient.cpp
 ExtServerClient_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/src/libTACOExtensions.la
 ExtServerClient_LDFLAGS = -no-install
 
 TestExtClient_SOURCES 	= TestExtClient.cpp
-TestExtClient_CPPFLAGS  = -I$(top_srcdir)/ext/include -DTACO_EXT
+TestExtClient_CPPFLAGS  = -I$(top_srcdir)/ext/include ${AM_CPPFLAGS} -DTACO_EXT
 TestExtClient_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/src/libTACOExtensions.la
 TestExtClient_LDFLAGS	= -no-install
 
 TestExtClient2_SOURCES 	= TestExtClient2.cpp
-TestExtClient2_CPPFLAGS = -I$(top_srcdir)/ext/include -DTACO_EXT
+TestExtClient2_CPPFLAGS = -I$(top_srcdir)/ext/include ${AM_CPPFLAGS} -DTACO_EXT
 TestExtClient2_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/src/libTACOExtensions.la
 TestExtClient2_LDFLAGS	= -no-install
 

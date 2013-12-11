@@ -1,6 +1,6 @@
 # Toolkit for building distributed control systems or any other distributed system.
 #
-# Copyright (c) 2003-2005 Jens Krüger <jkrueger1@users.sf.net>
+# Copyright (c) 2003-2013 Jens Krüger <jkrueger1@users.sf.net>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,13 +17,13 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-lib_LTLIBRARIES=libdcmem.la
+lib_LTLIBRARIES = libdcmem.la
 
-libdcmem_la_SOURCES=	dc_hash.c \
+libdcmem_la_SOURCES =	dc_hash.c \
 		dcmem_alloc.c \
 		dcmem_free.c \
 		dcmem_info.c
 
-libdcmem_la_LDFLAGS=-version-info @LIB_VERSION@
+libdcmem_la_LDFLAGS = -version-info @LIB_VERSION@
 
-INCLUDES=-I$(top_srcdir)/dbase/include @TACO_INCLUDES@
+AM_CPPFLAGS = -I$(top_srcdir)/dbase/include @TACO_INCLUDES@

@@ -1,6 +1,6 @@
 # Toolkit for building distributed control systems or any other distributed system.
 #
-# Copyright (c) 2003-2005 Jens Krüger <jkrueger1@users.sf.net>
+# Copyright (c) 2003-2013 Jens Krüger <jkrueger1@users.sf.net>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -20,8 +20,8 @@
 sbin_PROGRAMS	=dc_wr_alo dc_rd_alo
 
 AM_CPPFLAGS	= -DALONE @DEFS@
-INCLUDES	=-I$(top_srcdir)/dbase/include @TACO_INCLUDES@ -I$(top_srcdir)/lib/dataport
-LIBDC		=../library/libdcmem.la
+AM_CPPFLAGS	+= -I$(top_srcdir)/dbase/include @TACO_INCLUDES@ -I$(top_srcdir)/lib/dataport
+LIBDC		= ../library/libdcmem.la
 
 dc_wr_alo_SOURCES=dc_devall.c \
 		dc_devinf.c \

@@ -1,6 +1,6 @@
 # Toolkit for building distributed control systems or any other distributed system.
 #
-# Copyright (c) 2003-2005 Jens Krüger <jkrueger1@users.sf.net>
+# Copyright (c) 2003-2013 Jens Krüger <jkrueger1@users.sf.net>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -22,9 +22,9 @@ SUBDIRS = doc
 include_HEADERS = MDSSignal.h
 noinst_HEADERS = MDSSignalP.h
 
-INCLUDES=-I$(srcdir)/../single -I$(top_srcdir)/dbase/include @TACO_INCLUDES@
+AM_CPPFLAGS = -I$(srcdir)/../single -I$(top_srcdir)/dbase/include @TACO_INCLUDES@
 
-LDADD= @TACO_SERVER_LIBS@ ../single/libdssig.la
+LDADD = @TACO_SERVER_LIBS@ ../single/libdssig.la
 
 bin_PROGRAMS = MDSSignal 
 

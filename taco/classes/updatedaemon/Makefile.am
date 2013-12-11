@@ -1,6 +1,6 @@
 # Toolkit for building distributed control systems or any other distributed system.
 #
-# Copyright (c) 2003-2005 Jens Krüger <jkrueger1@users.sf.net>
+# Copyright (c) 2003-2013 Jens Krüger <jkrueger1@users.sf.net>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,7 @@
 #
 
 noinst_HEADERS 		= daemon.h daemon_xdr.h ud_server.h ud_serverP.h
-INCLUDES		= @TACO_INCLUDES@ -I$(top_srcdir)/lib/dataport/
+AM_CPPFLAGS		= @TACO_INCLUDES@ -I$(top_srcdir)/lib/dataport/
 
 LDADD			= @TACO_SERVER_LIBS@ ../../lib/dataport/libdataport.la 
 
