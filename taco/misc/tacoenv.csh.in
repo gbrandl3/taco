@@ -75,9 +75,14 @@ else
 setenv RES_BASE_DIR @resdatadir@
 endif
 
-setenv DBM_DIR @dbmdir@
+if ! ${?DBM_DIR} then
+  setenv DBM_DIR @dbmdir@
+endif
 
-setenv LOGPATH @logdir@
+if ! ${?LOGPATH} then
+  setenv LOGPATH @logdir@
+endif
+
 if (${?LOGCONFIG}) then
 ;
 else
