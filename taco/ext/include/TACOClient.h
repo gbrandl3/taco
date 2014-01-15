@@ -1,6 +1,7 @@
 /*
  * Extensions for the convenient access to TACO
  * Copyright (C) 2002-2013 Sebastian Huber <sebastian-huber@web.de>
+ * Copyright (C) 2014 Jens Krüger <jens.krueger@frm2.tum..de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +22,7 @@
 
 #include <log4taco.h>
 
-#if HAVE_PTHREAD_H 
+#if HAVE_PTHREAD_H
 #	include <pthread.h>
 #endif
 
@@ -62,10 +63,10 @@ namespace TACO {
 	/**
 	 * Synchronize the process with pending asynchronous events.
 	 *
-	 * @param timeout 
+	 * @param timeout
 	 * @see Client::eventListen()
 	 */
-	void synchronize( DevDouble timeout) throw (::TACO::Exception);
+	void synchronize(DevDouble timeout) throw (::TACO::Exception);
 }
 
 /**
@@ -75,12 +76,12 @@ namespace TACO {
  * the %TACO device servers.  It implements the access functionality to the device and hides all
  * implementation features of the %TACO communication between client and server.  Classes derived from
  * TACO::Client should be used in applications of the instrument user.
- * 
+ *
  * The concept of using %TACO at the FRM-II is a little bit different from that at ESRF.  %TACO is considered
  * as a transport layer for controlling the experiments.  This idea results in a more user friendly interface
  * of %TACO.  The original interface to the %TACO device is a little bit curious and tends to be unwiedly for
  * someone who did not work every day with %TACO.
- * 
+ *
  * One of the main problems of %TACO is the generic interface.  This interface is powerful but dangerous due
  * to the usage of pointers and furthermore you have to know what type of input and output parameters a %TACO
  * command of a special device requires.  It is not possible to make type checks at compile time.  Our idea is
@@ -92,13 +93,14 @@ namespace TACO {
  * safe environment on account of type checks during compilation, not to mention the other advantages of
  * object orientated software design.  This helps to shorten the development time drastically and leads to a
  * more robust system.
- */ 
-class TACO::Client {
+ */
+class TACO::Client
+{
 public:
 	//! Device type set
 	typedef std::set<std::string> DeviceTypeSet;
 
-	/** 
+	/**
 	 * Constructs a client and connects to the device if desired
 	 *
 	 * @param name the device name '[//nethost/]domain/family/member[?program_number]'
@@ -106,7 +108,7 @@ public:
 	 * @param connect automatic connect or not
 	 * @throw TACO::Exception in case of failure
 	 */
-	Client( const std::string& name, DevLong access = 0, bool connect = true) throw (::TACO::Exception);
+	Client(const std::string &name, DevLong access = 0, bool connect = true) throw (::TACO::Exception);
 
 	//! Constructs an unconnected client
 	Client() throw ();
@@ -115,10 +117,10 @@ public:
 	virtual ~Client() throw ();
 
 	//! Copies a client
-	Client( const Client& client) throw (::TACO::Exception);
+	Client(const Client &client) throw (::TACO::Exception);
 
 	//! Assignment operator
-	Client& operator=( const Client& client) throw (::TACO::Exception);
+	Client& operator=(const Client &client) throw (::TACO::Exception);
 
 	/**
 	 * @name Pure Client Methods
@@ -143,7 +145,7 @@ public:
 	 *	This method uses the %TACO dev_import() and dev_cmd_query() functions.
 	 *	The possible errors of these functions are not documented.
 	 */
-	virtual void connectClient( const std::string& name, DevLong access = 0) throw (::TACO::Exception);
+	virtual void connectClient(const std::string &name, DevLong access = 0) throw (::TACO::Exception);
 
 	//! Returns true if automatic client connection is enabled
 	bool isAutoClientConnectionEnabled() const throw ()
@@ -152,7 +154,7 @@ public:
 	}
 
 	//! Enable automatic client connection
-	void enableAutoClientConnection( bool enable) throw ()
+	void enableAutoClientConnection(bool enable) throw ()
 	{
 		mAutoConnect = enable;
 	}
@@ -208,7 +210,7 @@ public:
 	 *
 	 * This protocol is used for the communication between client and server.  The default
 	 * is probably UDP.  This protocol is faster than TCP but the transfer volume is limited.  If you want
-	 * to transfer huge data sets you should choose TCP.  But what is <em>huge</em> exactly? 
+	 * to transfer huge data sets you should choose TCP.  But what is <em>huge</em> exactly?
 	 * In this case <em>huge</em> means more than 8kB data. This limit comes from the UDP itself and
 	 * there is <b>no</b> way to change this limit!
 	 *
@@ -221,7 +223,7 @@ public:
 	 *
 	 * @see clientNetworkProtocol()
 	 */
-	void setClientNetworkProtocol( NetworkProtocol protocol) throw (::TACO::Exception);
+	void setClientNetworkProtocol(NetworkProtocol protocol) throw (::TACO::Exception);
 
 	/**
 	 * Returns the current network timeout.
@@ -252,7 +254,7 @@ public:
 	 *
 	 * @see clientNetworkTimeout()
 	 */
-	void setClientNetworkTimeout( double timeout) throw (::TACO::Exception);
+	void setClientNetworkTimeout(double timeout) throw (::TACO::Exception);
 
 	//@}
 
@@ -282,7 +284,7 @@ public:
 	}
 
 	//! Enable automatic device on
-	void enableAutoDeviceOn( bool enable) throw ()
+	void enableAutoDeviceOn(bool enable) throw ()
 	{
 		mAutoDeviceOn = enable;
 	}
@@ -368,22 +370,21 @@ public:
 	 */
 	DeviceTypeSet deviceTypes() const throw (::TACO::Exception)
 	{
-		if (isClientConnected()) {
+		if (isClientConnected())
 			return mServerTypes;
-		} else {
-			throw ::TACO::Exception( ::TACO::Error::RUNTIME_ERROR, "client not connected");
-		}
+		else
+			throw ::TACO::Exception(::TACO::Error::RUNTIME_ERROR, "client not connected");
 	}
 
 	/**
 	 * Returns the value of a device resource with the given <em>name</em>.
-	 * 
+	 *
 	 * @param name the name of the resource
 	 * @return the current value of the resource in the device
 	 * @see deviceUpdateResource
 	 * @throw TACO::Exception in case of failure
 	 */
-	std::string deviceQueryResource( const std::string& name) throw (::TACO::Exception);
+	std::string deviceQueryResource(const std::string &name) throw (::TACO::Exception);
 
 	/**
 	 * Updates the <em>value</em> of a device resource with the given <em>name</em>.
@@ -393,7 +394,7 @@ public:
 	 * @see deviceQueryResource
 	 * @throw TACO::Exception in case of failure
 	 */
-	void deviceUpdateResource( const std::string& name, const std::string& value) throw (::TACO::Exception);
+	void deviceUpdateResource(const std::string &name, const std::string &value) throw (::TACO::Exception);
 
 	/**
 	 * Updates all device resources.
@@ -407,7 +408,7 @@ public:
 
 	/**
 	 * Queries all device resources information.
-	 * 
+	 *
 	 * @return all device resource informations
 	 * @see deviceQueryResource
 	 * @see deviceUpdateResource
@@ -422,7 +423,7 @@ public:
 	 * @return the list of the command informations
 	 * @throw TACO::Exception in case of failure
 	 */
-	CommandInfoMap deviceQueryCommandInfo() throw (::TACO::Exception) {return mCommandInfoMap;} 
+	CommandInfoMap deviceQueryCommandInfo() throw (::TACO::Exception) {return mCommandInfoMap;}
 
 	//@}
 
@@ -446,17 +447,16 @@ public:
 	 * @throw TACO::Exception in case of failure
 	 * @return the EventHandle
 	 */
-	template<typename T> DevLong eventListen( DevEvent event, EventHandler* handler, void* userData, T* eventData) throw (::TACO::Exception)
+	template<typename T> DevLong eventListen(DevEvent event, EventHandler *handler, void *userData, T *eventData) throw (::TACO::Exception)
 	{
 		checkConnection();
 		DevLong id;
 		DevLong e;
 		pthread_mutex_lock(&::TACO::mMutex);
-		DevLong res = dev_event_listen( mDeviceHandle, event, eventData, type<T>(), handler, userData, &id, &e);
+		DevLong res = dev_event_listen(mDeviceHandle, event, eventData, type<T>(), handler, userData, &id, &e);
 		pthread_mutex_unlock(&::TACO::mMutex);
-		if (res != DS_OK) {
-			throw ::TACO::Exception( e);
-		}
+		if (res != DS_OK)
+			throw ::TACO::Exception(e);
 		return id;
 	}
 
@@ -469,7 +469,7 @@ public:
 	 * @see eventUnlisten(), synchronize()
 	 * @return the EventHandle
 	 */
-	DevLong eventListen( DevEvent event, EventHandler* handler, void* userData) throw (::TACO::Exception);
+	DevLong eventListen(DevEvent event, EventHandler *handler, void *userData) throw (::TACO::Exception);
 
 	/**
 	 * Start listen to an event.
@@ -484,9 +484,9 @@ public:
 	 * @see eventHandler(), eventUnlisten(), synchronize()
 	 * @return the EventHandle
 	 */
-	template<typename T> DevLong eventListen( DevEvent event, T* eventData) throw (::TACO::Exception)
+	template<typename T> DevLong eventListen(DevEvent event, T *eventData) throw (::TACO::Exception)
 	{
-		return eventListen<T>( event, eventHandlerCaller, this, eventData);
+		return eventListen<T>(event, eventHandlerCaller, this, eventData);
 	}
 
 	/**
@@ -498,81 +498,108 @@ public:
 	 * @see eventHandler(), eventUnlisten(), synchronize()
 	 * @return the EventHandle
 	 */
-	DevLong eventListen( DevEvent event) throw (::TACO::Exception)
+	DevLong eventListen(DevEvent event) throw (::TACO::Exception)
 	{
-		return eventListen( event, eventHandlerCaller, this);
+		return eventListen(event, eventHandlerCaller, this);
 	}
 
 	/**
 	 * Stop listen to an event.
-	 * 
+	 *
 	 * @param event the event number
 	 * @param id the id got from eventListen
 	 * @see eventListen(), synchronize()
 	 */
-	void eventUnlisten( DevEvent event, DevLong id) throw (::TACO::Exception);
+	void eventUnlisten(DevEvent event, DevLong id) throw (::TACO::Exception);
 
 	//@}
+
+	/**
+	 * @name Server Information Methods
+	 */
+	//{@
+
+	/**
+	 * @return the name of the server executable
+	 */
+	std::string getServerProcessName(void) {return mDeviceInfo.process_name;}
+
+	/**
+	 * @return the personal name of the server
+	 */
+	std::string getServerPersonalName(void) {return mDeviceInfo.personal_name;}
+
+	/**
+	 * @return the host where the server is running now
+	 */
+	std::string getServerHost(void) {return mDeviceInfo.host_name;}
+
+	/**
+	 * @return the process id of the server
+	 */
+	DevULong getServerProcessId(void) {return mDeviceInfo.pid;}
+	//@}
+
 
 protected:
 	/**
 	 * Standard event handler.
 	 *
 	 * @param data
-	 * @see eventListen( DevEvent event, T& eventData), eventListen( DevEvent event), synchronize()
+	 * @see eventListen(DevEvent event, T &eventData)
+	 * @see eventListen(DevEvent event)
+	 * @see synchronize()
 	 */
-	virtual void* eventHandler( EventHandlerData data) throw ();
+	virtual void* eventHandler(EventHandlerData data) throw ();
 #ifdef SWIGPYTHON
 public:
 #endif
 	//! Executes a command
-	void execute( DevCommand cmd, DevArgument argin, DevArgType inType, DevArgument argout, DevArgType outType) throw (::TACO::Exception);
+	void execute(DevCommand cmd, DevArgument argin, DevArgType inType, DevArgument argout, DevArgType outType) throw (::TACO::Exception);
 #ifdef SWIG
 protected:
 #endif
 	//! Executes a command without any error handling
-	void executeCore( DevCommand cmd, DevArgument argin, DevArgType inType, DevArgument argout, DevArgType outType) throw (::TACO::Exception);
+	void executeCore(DevCommand cmd, DevArgument argin, DevArgType inType, DevArgument argout, DevArgType outType) throw (::TACO::Exception);
 
 	//! Executes a command
-	template<typename OUT, typename IN> OUT execute( DevCommand cmd, const IN& i) throw (::TACO::Exception)
+	template<typename OUT, typename IN> OUT execute(DevCommand cmd, const IN &i) throw (::TACO::Exception)
 	{
 		ArgGet<OUT> output;
-		ArgPut<IN> input( i);
+		ArgPut<IN> input(i);
 #ifdef TACO_CLIENT_RUNTIME_TYPE_CHECK
-		const CommandInfo info = commandInfo( cmd);
-		if (info.inputType != input.type() || info.outputType != output.type()) {
-			throw ::TACO::Exception( ::TACO::Error::TYPE_ERROR);
-		}
+		const CommandInfo info = commandInfo(cmd);
+		if (info.inputType != input.type() || info.outputType != output.type())
+			throw ::TACO::Exception(::TACO::Error::TYPE_ERROR);
 #endif // TACO_CLIENT_RUNTIME_TYPE_CHECK
-		execute( cmd, input.address(), input.type(), output.address(), output.type());
+		execute(cmd, input.address(), input.type(), output.address(), output.type());
 		return output.object();
 	}
 
 	//! Executes a command
-	template<typename OUT> OUT execute( DevCommand cmd) throw (::TACO::Exception)
+	template<typename OUT> OUT execute(DevCommand cmd) throw (::TACO::Exception)
 	{
 		ArgGet<OUT> output;
 		ArgPut<void> input;
 #ifdef TACO_CLIENT_RUNTIME_TYPE_CHECK
-		const CommandInfo info = commandInfo( cmd);
-		if (info.inputType != input.type() || info.outputType != output.type()) {
-			throw Exception( ::TACO::Error::TYPE_ERROR);
-		}
+		const CommandInfo info = commandInfo(cmd);
+		if (info.inputType != input.type() || info.outputType != output.type())
+			throw Exception(::TACO::Error::TYPE_ERROR);
 #endif // TACO_CLIENT_RUNTIME_TYPE_CHECK
-		execute( cmd, input.address(), input.type(), output.address(), output.type());
+		execute(cmd, input.address(), input.type(), output.address(), output.type());
 		return output.object();
 	}
 
 	//! Checks if the <em>type</em> is supported by the connected device
-	void checkDeviceType( const std::string& type) throw (::TACO::Exception);
+	void checkDeviceType(const std::string &type) throw (::TACO::Exception);
 
 	//! Checks if the client device types go with the server types
 	void checkDeviceTypes() throw (::TACO::Exception);
 
 	//! Addes a device type to the client
-	void addDeviceType( const std::string& type) throw ()
+	void addDeviceType(const std::string &type) throw ()
 	{
-		mClientTypes.insert( type);
+		mClientTypes.insert(type);
 	}
 
 private:
@@ -580,7 +607,7 @@ private:
         virtual void tango_connectClient() throw (::TACO::Exception);
 
 	//! Calls eventHandler()
-	static void* eventHandlerCaller( devserver unused, void* thisPointer, EventHandlerData eventHandlerData) throw ();
+	static void* eventHandlerCaller(devserver unused, void *thisPointer, EventHandlerData eventHandlerData) throw ();
 
 	/**
 	 * Checks the connection to the device server.
@@ -631,21 +658,22 @@ private:
 	 *
 	 * @exception Error::CLIENT_NOT_CONNECTED
 	 */
-	CommandInfo commandInfo( DevCommand commandNumber) const throw (::TACO::Exception)
+	CommandInfo commandInfo(DevCommand commandNumber) const throw (::TACO::Exception)
 	{
-		if (isClientConnected()) {
-			CommandInfoMap::const_iterator i = mCommandInfoMap.find( commandNumber);
-			if (i != mCommandInfoMap.end()) {
+		if (isClientConnected())
+		{
+			CommandInfoMap::const_iterator i = mCommandInfoMap.find(commandNumber);
+			if (i != mCommandInfoMap.end())
 				return i->second;
-			} else {
-				throw ::TACO::Exception( ::TACO::Error::RUNTIME_ERROR, "command not supported");
-			}
-		} else {
-			throw ::TACO::Exception( ::TACO::Error::RUNTIME_ERROR, "client not connected");
+			else
+				throw ::TACO::Exception(::TACO::Error::RUNTIME_ERROR, "command not supported");
 		}
+		else
+			throw ::TACO::Exception(::TACO::Error::RUNTIME_ERROR, "client not connected");
 	}
 #endif // TACO_CLIENT_RUNTIME_TYPE_CHECK
 
+	db_devinfo_call mDeviceInfo;
 };
 
 #endif // TACO_CLIENT_H

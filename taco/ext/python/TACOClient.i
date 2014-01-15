@@ -1,6 +1,7 @@
 /*
  * Extensions for the convenient access to TACO
  * Copyright (C) 2002-2013 Sebastian Huber <sebastian-huber@web.de>
+ * Copyright (C) 2014 Jens Krüger <jens.krueger@frm2.tum.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,6 +80,18 @@ using namespace TACO;
         }
         SWIG_PYTHON_THREAD_END_BLOCK;
         SWIG_fail;
+#endif /*SWIGPYTHON*/
+%}
+
+%typemap(out) DevULong %{
+#ifdef SWIGPYTHON
+        $result = PyInt_FromLong((DevULong)$1);
+#endif /*SWIGPYTHON*/
+%}
+
+%typemap(out) DevLong %{
+#ifdef SWIGPYTHON
+        $result = PyInt_FromLong((DevLong)$1);
 #endif /*SWIGPYTHON*/
 %}
 
@@ -255,6 +268,14 @@ setup of the constructor call or by last connect call") reconnectClient;
 %feature("docstring", "returns whether client is connected") isClientConnected;
 
 %feature("docstring", "returns whether client is not connected") isClientDisconnected;
+
+%feature("docstring", "returns the name of the server process (in lowercase letters)") getServerProcessName;
+
+%feature("docstring", "returns the 'personal name' of the server process (in lowercase letters") getServerPersonalName;
+
+%feature("docstring", "returns the host name where the server is running on") getServerHost;
+
+%feature("docstring", "returns the process id of the server process") getServerProcessId;
 
 %include <TACOClient.h>
 

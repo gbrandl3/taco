@@ -496,10 +496,8 @@ void TACO::Client::taco_connectClient() throw (::TACO::Exception)
 	DevLong dc_error;
 	std::string	sTemp = mName;
 
-	db_devinfo_call info;
-
 	pthread_mutex_lock(&::TACO::mMutex);
-	DevLong res = db_deviceinfo(const_cast<char *>(sTemp.c_str()), &info, &e);
+	DevLong res = db_deviceinfo(const_cast<char *>(sTemp.c_str()), &mDeviceInfo, &e);
 	pthread_mutex_unlock(&::TACO::mMutex);
 	if (res != DS_OK)
 	{
@@ -507,7 +505,7 @@ void TACO::Client::taco_connectClient() throw (::TACO::Exception)
 		mConnected = false;
 		throw ::TACO::Exception(e);
 	}
-	mPseudo = info.device_type != DB_Device;
+	mPseudo = mDeviceInfo.device_type != DB_Device;
 	if (mPseudo)
 	{
 		m_dc.device_name = const_cast<char *>(mName.c_str());
