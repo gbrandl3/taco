@@ -36,17 +36,17 @@
 
 char 		device_name[80];
 devserver 	ping_device;
-static long 	n_total = 0, 
-		n_ok = 0, 
+static long 	n_total = 0,
+		n_ok = 0,
 		n_notok = 0;
-static double 	t_min = 1e10, 
-		t_max = 0, 
+static double 	t_min = 1e10,
+		t_max = 0,
 		t_total = 0;
 
 void signal_handler(int signal)
 {
 	long 	error;
-	double	t_avg = t_total / (double)n_total;; 
+	double	t_avg = t_total / (double)n_total;
 /*
  *
  * ----orion.ctrm.esrf.fr PING Statistics----
@@ -64,12 +64,12 @@ void signal_handler(int signal)
 
 int main(int argc, char **argv)
 {
-	long 	readwrite = 0, 
+	long 	readwrite = 0,
 		error;
-	int 	i, 
+	int 	i,
 		j,
-		c, 
-		n_devices, 
+		c,
+		n_devices,
 		n_counts = 1000000,
 		status;
 	short 	devstatus;
@@ -81,7 +81,7 @@ int main(int argc, char **argv)
 	while((c = getopt(argc, argv, "c:h")) != -1)
 		switch (c)
 		{
-			case 'c' : 
+			case 'c' :
 				n_counts = atoi(optarg);
 				break;
 			case 'h' :
@@ -89,8 +89,8 @@ int main(int argc, char **argv)
 				fprintf(stderr, "usage: dev_ping [-c num] <device name>\n");
 				exit(1);
 		}
-				
-	if (optind != argc -1)	
+
+	if (optind != argc -1)
 	{
 		fprintf(stderr, "usage: dev_ping [-c num] <device name>\n");
 		exit(1);
@@ -99,9 +99,9 @@ int main(int argc, char **argv)
 	strcpy(device_name,argv[optind]);
 	status = dev_import(device_name,readwrite,&ping_device,&error);
 	/*printf("dev_import(%s) returned %d\n",device_name,status);*/
-	if (status != DS_OK) 
+	if (status != DS_OK)
 	{
-		dev_printerror_no(SEND,NULL,error); 
+		dev_printerror_no(SEND,NULL,error);
 		exit(1);
 	}
 	n_devices = 1;
@@ -124,17 +124,17 @@ int main(int argc, char **argv)
 		elapsed += (t2.tv_usec-t1.tv_usec) / 1000.;
 
 		n_total++;
-	        if (status < 0) 
+	        if (status < 0)
 		{
 			printf("dev_ping to %s: status=NOTOK sequence=%d time=%.3f ms\n",device_name, j, elapsed);
-//			dev_printerror_no(SEND,NULL,error); 
+//			dev_printerror_no(SEND,NULL,error);
 			n_notok++;
 		}
 		else
 		{
-			if (elapsed > t_max) 
+			if (elapsed > t_max)
 				t_max = elapsed;
-			if (elapsed < t_min) 
+			if (elapsed < t_min)
 				t_min = elapsed;
 			t_total += elapsed;
 			printf("dev_ping to %s: status=OK sequence=%d time=%.3f ms %.3f %.3f %.3f\n",device_name, j, elapsed, t_min, t_max, t_total);

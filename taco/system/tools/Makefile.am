@@ -39,14 +39,15 @@ bin_PROGRAMS		+= devclose \
 ##  			devramp 
 
 bin_PROGRAMS		+= dev_menu \
-			dev_cmd
+			dev_cmd \
+			dev_ping
 
 bin_PROGRAMS		+= devexp \
  			devupdate \
  			db_getpoller \
  			dc_signals \
  			poll_test \
- 			readsignals 
+			readsignals
 
 AM_CPPFLAGS		= @TACO_INCLUDES@ -I$(top_srcdir)/ext/include
 if TANGO_BUILD
@@ -90,4 +91,6 @@ devexp_SOURCES		= devexp.c
 devupdate_SOURCES	= devupdate.c
 poll_test_SOURCES	= poll_test.c
 readsignals_SOURCES	= readsignals.c
+dev_ping_SOURCES 	= dev_ping.c
+
 endif

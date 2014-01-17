@@ -19,7 +19,7 @@ dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 dnl 02111-1307, USA.
 
 AT_SETUP([Start Inst_verify device server])
-AT_CHECK([taco Inst_verify 1 -m -d 
+AT_CHECK([taco Inst_verify 1 -m -d
 sleep 1
 printf "%d\n" `ps x | grep Inst_verify | grep -v grep | wc -l`], [],
 [[1
@@ -27,7 +27,7 @@ printf "%d\n" `ps x | grep Inst_verify | grep -v grep | wc -l`], [],
 AT_CLEANUP
 
 AT_SETUP([ping to the device test/device1/1])
-AT_CHECK(AT_TACO_RUN_LOCAL([dev_ping -c 3 test/device/1 | grep status | cut -d' ' -f 4 | uniq]), [],
+AT_CHECK([taco dev_ping -c 3 test/device/1 | grep status | cut -d' ' -f 4 | uniq], [],
 [[status=OK
 ]])
 AT_CLEANUP

@@ -51,7 +51,7 @@ TESTSUITE_AT		= dbase.at devices.at starter.at message.at specialtest1.at local.
 AUTOTEST 		= $(AUTOM4TE) --language=autotest
 
 check_PROGRAMS 		= db_connect db_resget db_resput db_getdevexp \
-			db_resdomain db_resfamily db_resmember dev_ping \
+			db_resdomain db_resfamily db_resmember \
 			db_getresoval db_devdomain db_devfamily db_devmember \
 			db_devlist db_devperslist dev_export dev_import \
 			db_serverlist db_hostlist db_dsonhost \
@@ -115,9 +115,6 @@ db_resmember_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
 
 db_devmember_SOURCES 	= db_devmember.cpp 
 db_devmember_LDADD 	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
-
-dev_ping_SOURCES 	= dev_ping.c
-dev_ping_LDADD 		= @TACO_CLIENT_LIBS@ 
 
 test_starter_SOURCES	= test_start.cpp
 test_starter_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++
