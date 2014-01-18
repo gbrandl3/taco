@@ -44,7 +44,7 @@ sleep 5
 printf "%d\n" `ps x | grep test_server | grep -v grep | wc -l`
 AT_TACO_RUN_LOCAL([test_client2 test/a/1 test/family/long_member test/a/1 test/family/long_member longtest/longest_family_name/longest_member_name])
 dnl AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])
-], [], [2
+], [], [1
 1
 Exported 1
 Type 1

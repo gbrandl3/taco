@@ -117,6 +117,8 @@ if test $# -gt 0 ; then
 			done
 			rm -f ${localstatedir}/cache/taco/*
 			rm -f ${localstatedir}/log/taco/*
+			@GRETABUILD_TRUE@ rmdir ${appdefaultdir}
+			@GRETABUILD_TRUE@ rmdir `dirname ${appdefaultdir}`
 			for i in ${localstatedir}/log/taco ${localstatedir}/log ${localstatedir}/cache/taco ${localstatedir}/cache ; do
 				rmdir $i
 			done
@@ -131,7 +133,7 @@ if test $# -gt 0 ; then
 				if { ! rmdir $dc_destdir 2>/dev/null; } ; then
 					tmp=`find $dc_destdir -type f`
 					if test x"$tmp" = x ; then
-						rm -rf $dc_destdir
+						# rm -rf $dc_destdir
 						exit $?
 					fi
 					exit 1
