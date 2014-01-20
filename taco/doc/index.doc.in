@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2007-2013 Jens Krüger <jens.krueger@frm2.tum.de>
+ * Copyright (C) 2007-2014 Jens Krüger <jens.krueger@frm2.tum.de>
  *
  * Permission to use, copy, modify, and distribute this software and its
  * documentation under the terms of the GNU General Public License is hereby 
@@ -113,7 +113,7 @@ The third part provides information for developers:
 \addindex license
 \addindex GPL
 
-Copyright &copy; 1991-2013 by 
+Copyright &copy; 1991-2014 by
 <a href="mailto:@PACKAGE_BUGREPORT@">TACO developers</a>.<p>
 
 TACO is a free software. You can redistribute it and/or modify it under the terms

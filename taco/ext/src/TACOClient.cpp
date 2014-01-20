@@ -1,6 +1,7 @@
 /*
  * Extensions for the convenient access to TACO
  * Copyright (C) 2002-2013 Sebastian Huber <sebastian-huber@web.de>
+ * Copyright (C) 2014 Jens Krüger <jens.krueger@frm2.tum.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

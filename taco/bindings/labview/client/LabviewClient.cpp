@@ -18,7 +18,7 @@
 
  Date:		$Date: 2008-04-06 09:06:24 $
 
- Copyright (c) 2003-2013 by FRM2 TU München, 
+ Copyright (c) 2003-2014 by FRM2 TU München,
                             Garching, Germany
 
 ********************************************************************-*/

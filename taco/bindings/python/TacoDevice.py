@@ -2,7 +2,7 @@
 #
 # Toolkit for building distributed control systems or any other distributed system.
 #
-# Copyright(c) 1994-2013 by European Synchrotron Radiation Facility,
+# Copyright(c) 1994-2014 by European Synchrotron Radiation Facility,
 #                     Grenoble, France
 #
 # This library is free software; you can redistribute it and/or

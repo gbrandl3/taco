@@ -1,7 +1,7 @@
 /*
  * MsgServerAppender.cpp
  *
- * Copyright 2007-2013, Jens Krueger <jens.krueger@frm2.tum.de>. All rights reserved.
+ * Copyright 2007-2014, Jens Krueger <jens.krueger@frm2.tum.de>. All rights reserved.
  *
  * See the COPYING file for the terms of usage and distribution.
  */

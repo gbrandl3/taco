@@ -1,7 +1,7 @@
 /*
  * Toolkit for building distributed control systems or any other distributed system.
  *
- * Copyright (c) 2005-2013 Jens Krüger <jkrueger1@users.sf.net>
+ * Copyright (c) 2005-2014 Jens Krüger <jkrueger1@users.sf.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

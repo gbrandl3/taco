@@ -143,7 +143,7 @@
  * JMC's version for HP-UX
  *
  *
- * Copyleft 1999 by European Synchrotron Radiation Facility
+ * Copyleft 1999-2014 by European Synchrotron Radiation Facility
  *                  Grenoble, France
  *
  ******************************************************************************/

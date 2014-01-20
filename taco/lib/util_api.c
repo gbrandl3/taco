@@ -1,7 +1,7 @@
 /******************************************************************************
  * Toolkit for building distributed control systems or any other distributed system.
  *
- * Copyright (c) 1990-2013 by European Synchrotron Radiation Facility,
+ * Copyright (c) 1990-2014 by European Synchrotron Radiation Facility,
  *                            Grenoble, France
  *
  * This library is free software; you can redistribute it and/or
@@ -33,7 +33,7 @@
  *
  * Version:	$Revision: 1.43 $
  *
- * Date:		$Date: 2013-05-17 07:46:59 $
+ * Date:	$Date: 2013-05-17 07:46:59 $
  *
  ********************************************************************-*/
 #ifdef HAVE_CONFIG_H

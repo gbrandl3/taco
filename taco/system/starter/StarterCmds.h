@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2003-2013 Jens Krueger
+ * Copyright (C) 2003-2014 Jens Krueger
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
