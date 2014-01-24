@@ -203,7 +203,7 @@ static long object_initialise (Python ds, long *error)
  * Read the class name from the python object
  */
 	py_name    = PyObject_CallMethod(ds->python.Py_device, "get_class_name", NULL);
-	class_name = PyString_AsString(py_name);
+	class_name = PYSTRING_ASSTRING(py_name);
 	object_class->devserver_class.class_name = (char*)malloc(strlen(class_name)+1);
 	sprintf (object_class->devserver_class.class_name, class_name);
    
@@ -230,7 +230,7 @@ static long object_initialise (Python ds, long *error)
  *Get the command 
  */
 		py_key = PyList_GetItem (py_cmd_list_keys, i);
-		object_class->devserver_class.commands_list[i].cmd = PyInt_AsLong(py_key);
+		object_class->devserver_class.commands_list[i].cmd = PYINT_ASLONG(py_key);
       
 /* 
  * Store the command function pointer 
@@ -245,9 +245,9 @@ static long object_initialise (Python ds, long *error)
 		py_argout_type   = PyList_GetItem (py_cmd_list_item, 1);
 		py_cmd_name      = PyList_GetItem (py_cmd_list_item, 2);
       
-		object_class->devserver_class.commands_list[i].argin_type = PyInt_AsLong(py_argin_type);
-		object_class->devserver_class.commands_list[i].argout_type = PyInt_AsLong(py_argout_type);  
-		object_class->devserver_class.commands_list[i].cmd_name = PyString_AsString(py_cmd_name);  
+		object_class->devserver_class.commands_list[i].argin_type = PYINT_ASLONG(py_argin_type);
+		object_class->devserver_class.commands_list[i].argout_type = PYINT_ASLONG(py_argout_type);
+		object_class->devserver_class.commands_list[i].cmd_name = PYSTRING_ASSTRING(py_cmd_name);
 	}  
         		
 /*
@@ -358,14 +358,14 @@ static long dev_exec_cmd (Python ds, DevVoid *argin, DevVoid *argout, long *erro
 	{
 		py_key = PyList_GetItem (py_cmd_list_keys, i);
 	    
-		if ( ds->python.cmd_code == PyInt_AsLong(py_key) )
+		if ( ds->python.cmd_code == PYINT_ASLONG(py_key) )
 		{
 /*
  * Get the python methode to execute
  */
 			py_cmd_list_item = PyDict_GetItem (py_cmd_list, py_key);
 			py_method_name  = PyList_GetItem (py_cmd_list_item, 2);
-			method_name     = PyString_AsString (py_method_name);
+			method_name     = PYSTRING_ASSTRING (py_method_name);
 	      
 /*
  * Clear all pending python errors
@@ -376,7 +376,7 @@ static long dev_exec_cmd (Python ds, DevVoid *argin, DevVoid *argout, long *erro
  * convert the incoming data
  */
 			py_argin_type   = PyList_GetItem (py_cmd_list_item, 0);
-			argin_type      = PyInt_AsLong(py_argin_type);
+			argin_type      = PYINT_ASLONG(py_argin_type);
 
 /*
  * Check the output argument type
@@ -448,9 +448,9 @@ static long dev_exec_cmd (Python ds, DevVoid *argin, DevVoid *argout, long *erro
 					printf ("received a TACO style exception!\n");
 		    
 					py_error = PyObject_GetAttrString (ErrorObject, "taco_error");
-					printf ("error = %d \n", PyInt_AsLong(py_error));
+					printf ("error = %d \n", PYINT_ASLONG(py_error));
 									    
-					*error = PyInt_AsLong (py_error);
+					*error = PYINT_ASLONG (py_error);
 				}
 				else
 				{
@@ -469,7 +469,7 @@ static long dev_exec_cmd (Python ds, DevVoid *argin, DevVoid *argout, long *erro
  * convert the outgoing data
  */
 			py_argout_type   = PyList_GetItem (py_cmd_list_item, 1);
-			argout_type      = PyInt_AsLong(py_argout_type);
+			argout_type      = PYINT_ASLONG(py_argout_type);
 
 /*
  * Check the output argument type

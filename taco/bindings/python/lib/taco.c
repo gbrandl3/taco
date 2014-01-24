@@ -41,6 +41,18 @@
 
 #include <Python.h>
 
+#if PY_MAJOR_VERSION < 3
+#	define PYINT_FROMLONG		PyInt_FromLong
+#	define PYINT_ASLONG		PyInt_AsLong
+#	define PYSTRING_ASSTRING	PyString_AsString
+#	define PYSTRING_FROMSTRING	PyString_FromString
+#else
+#	define PYINT_FROMLONG		PyLong_FromLong
+#	define PYINT_ASLONG		PyLong_AsLong
+#	define PYSTRING_ASSTRING	PyBytes_AsString
+#	define PYSTRING_FROMSTRING	PyBytes_FromString
+#endif
+
 #include <ctype.h>
 
 /* for taco */
@@ -80,6 +92,17 @@ static PyObject *glob_dict;
 
 extern long check_provided(long typenum,long ds_out);
       				      		      
+struct module_state {
+	    PyObject *error;
+};
+
+#if PY_MAJOR_VERSION >= 3
+#define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
+#else
+#define GETSTATE(m) (&_state)
+static struct module_state _state;
+#endif
+
 /**
  * frees a device 
  *
@@ -99,7 +122,6 @@ void  esrf_free(void *self)
    else
       if (flag != 0)
          printf("-- esrf_free: OK\n");
-	 
 }
 
 /**
@@ -132,8 +154,11 @@ static PyObject* esrf_import(PyObject *self,PyObject *args)
       printf("%s\n",dev_error_str(error));
       onError("import failed in dev_import");
    }
-
-   return PyCObject_FromVoidPtr((void *)ds_pt, (void *)esrf_free);   
+#if PY_MAJOR_VERSION < 3
+   return PyCObject_FromVoidPtr((void *)ds_pt, (void *)esrf_free);
+#else
+   return PyCapsule_New((void *)ds_pt, NULL, (PyCapsule_Destructor)esrf_free);
+#endif
 }
 
 /**
@@ -182,7 +207,11 @@ static PyObject* esrf_query(PyObject *self, PyObject *args)
    if (!PyArg_ParseTuple(args,"O",&py_ds_pt))
       onError("usage: esrf_query(<c_object>)")
 
+#if PY_MAJOR_VERSION < 3
    ds = (devserver *) PyCObject_AsVoidPtr(py_ds_pt);
+#else
+   ds = (devserver *)PyCapsule_GetPointer(py_ds_pt, NULL);
+#endif
    devstatus = dev_cmd_query(*ds,&varcmdarr,&error);
    if (devstatus != 0) 
       {
@@ -200,17 +229,17 @@ static PyObject* esrf_query(PyObject *self, PyObject *args)
       if ( (mylist = PyList_New(3)) == NULL)
          onError("cannot build command descriptors list");
       /* cmd */
-      if ( (item = PyInt_FromLong(varcmdarr.sequence[i].cmd)) == NULL)
+      if ( (item = PYINT_FROMLONG(varcmdarr.sequence[i].cmd)) == NULL)
             onError("cannot build command descriptors list");
       if (PyList_SetItem(mylist,0,item) == - 1)
             onError("cannot build command descriptors list");
       /* in_type */
-      if ( (item = PyInt_FromLong(varcmdarr.sequence[i].in_type)) == NULL)
+      if ( (item = PYINT_FROMLONG(varcmdarr.sequence[i].in_type)) == NULL)
             onError("cannot build command descriptors list");
       if (PyList_SetItem(mylist,1,item) == -1)
             onError("cannot build command descriptors list");
       /* out_type */
-      if ( (item = PyInt_FromLong(varcmdarr.sequence[i].out_type)) == NULL)
+      if ( (item = PYINT_FROMLONG(varcmdarr.sequence[i].out_type)) == NULL)
             onError("cannot build command descriptors list");
       if (PyList_SetItem(mylist,2,item) == -1)
             onError("cannot build command descriptors list");
@@ -325,7 +354,7 @@ static PyObject *esrf_getresource(PyObject *self, PyObject *args)
             }
          for (i=0; i<res_array.length; i++)
             {
-            item = PyString_FromString( (char *) res_array.sequence[i]);
+            item = PYSTRING_FROMSTRING( (char *) res_array.sequence[i]);
             PyList_SetItem (mylist,i,item);
             }
 
@@ -468,8 +497,11 @@ static PyObject* esrf_tcpudp(PyObject *self, PyObject *args)
    /* get pointer on device server and mode*/
    if (!PyArg_ParseTuple(args,"Os",&py_ds_pt,&mymode))
       onError("usage: esrf_tcpudp(<c_object>,\"tcp\"|\"udp\"");
-
+#if PY_MAJOR_VERSION < 3
    ds = (devserver *) PyCObject_AsVoidPtr(py_ds_pt);
+#else
+   ds = (devserver *)PyCapsule_GetPointer(py_ds_pt, NULL);
+#endif
    
    found = 0;
    if ( !strcmp(mymode,"tcp") )
@@ -529,7 +561,11 @@ static PyObject *esrf_timeout(PyObject *self, PyObject *args)
    if (!PyArg_ParseTuple(args,"O|f",&py_ds_pt,&mytime))
       onError("usage: esrf_timeout(<c_object>[,<time_in_sec>]");
 
+#if PY_MAJOR_VERSION < 3
    ds = (devserver *) PyCObject_AsVoidPtr(py_ds_pt);
+#else
+   ds = (devserver *)PyCapsule_GetPointer(py_ds_pt, NULL);
+#endif
 
    if (mytime == -1)
    {
@@ -635,7 +671,7 @@ static PyObject *esrf_getdevlist(PyObject *self,PyObject *args)
       
    for (i=0; i<dev_num; i++)
    	{
-      if ( (item = PyString_FromString(tab[i]) ) == NULL)
+      if ( (item = PYSTRING_FROMSTRING(tab[i]) ) == NULL)
             onError("cannot build string for device name");
       if ( PyList_SetItem(mylist,i,item ) == - 1)
             onError("cannot add device name string to the list");      
@@ -715,7 +751,7 @@ esrf_getdevexp(PyObject *self,PyObject *args)
       
    for (i=0; i<dev_num; i++)
       {
-      if ( (item = PyString_FromString(tab[i])) == NULL)
+      if ( (item = PYSTRING_FROMSTRING(tab[i])) == NULL)
             onError("cannot build list of devices");
       if (PyList_SetItem(mylist,i,item) == - 1)
             onError("cannot build command descriptors list");      
@@ -969,12 +1005,20 @@ static PyObject* esrf_io(PyObject *self, PyObject *args, PyObject *kwarg)
    if ( (myarray != NULL) || (myouttype != NULL) )
       printf("Not working with NUMERIC types: out= and outtype= ignored\n");
 #endif
-   
+
    /* get device server pointer */ 
    if (flag_dc == 0)
-      ds = (devserver *) PyCObject_AsVoidPtr(py_ds_pt);
+#if PY_MAJOR_VERSION < 3
+	ds = (devserver *) PyCObject_AsVoidPtr(py_ds_pt);
+#else
+	ds = (devserver *)PyCapsule_GetPointer(py_ds_pt, NULL);
+#endif
    else
-      dc = (datco *) PyCObject_AsVoidPtr(py_ds_pt);
+#if PY_MAJOR_VERSION < 3
+	dc = (datco *) PyCObject_AsVoidPtr(py_ds_pt);
+#else
+	dc = (datco *)PyCapsule_GetPointer(py_ds_pt, NULL);
+#endif
       
    if (flag != 0)
       printf("   server command: %s : cmd = %d, in = %d, out = %d\n",\
@@ -1447,8 +1491,11 @@ static PyObject *esrf_dc_import(PyObject *self,PyObject *args)
    if(dc_devimp != 0)
       free(dc_devimp);   
    
-   return PyCObject_FromVoidPtr((void *)mydc_ptr, 
-                                (void *)esrf_dc_free);   
+#if PY_MAJOR_VERSION < 3
+   return PyCObject_FromVoidPtr((void *)mydc_ptr, (void *)esrf_dc_free);
+#else
+   return PyCapsule_New((void *)mydc_ptr, NULL, (PyCapsule_Destructor)esrf_dc_free);
+#endif
 }
 
 /**
@@ -1508,7 +1555,7 @@ static PyObject *esrf_dc_info(PyObject *self, PyObject *args)
       
          for (i=0; i<dev_n; i++)
          {
-            if ( (item = PyString_FromString(devnametab[i])) == NULL)
+            if ( (item = PYSTRING_FROMSTRING(devnametab[i])) == NULL)
                onError("cannot build device name");
             if (PyList_SetItem(mylist,i,item) == - 1)
                onError("cannot build device name list");      
@@ -1543,11 +1590,11 @@ static PyObject *esrf_dc_info(PyObject *self, PyObject *args)
          {
             if ( (mylistcmd = PyList_New(2)) == NULL)
                onError("cannot build list for [command,type]");  
-	    if ( (item = PyInt_FromLong((long)dc_dev_info.devcmd[i].devinf_cmd)) == NULL)
+	    if ( (item = PYINT_FROMLONG((long)dc_dev_info.devcmd[i].devinf_cmd)) == NULL)
                onError("cannot build command item");
             if (PyList_SetItem(mylistcmd,0,item) == - 1)
                onError("cannot set command item in [command,type] list");   
-            if ( (item = PyInt_FromLong((long)dc_dev_info.devcmd[i].devinf_argout)) == NULL)
+            if ( (item = PYINT_FROMLONG((long)dc_dev_info.devcmd[i].devinf_argout)) == NULL)
                onError("cannot build argout type item");
             if (PyList_SetItem(mylistcmd,1,item) == - 1)
                onError("cannot set type item in [command,type] list");   	 
@@ -1599,30 +1646,74 @@ static struct PyMethodDef Taco_methods[] = {
 		init function
 
 ***************************************************************/
-void initTaco()
+#if PY_MAJOR_VERSION >= 3
+static int Taco_traverse(PyObject *m, visitproc visit, void *arg)
 {
-    PyObject *m, *d;
+	Py_VISIT(GETSTATE(m)->error);
+	return 0;
+}
+
+static int Taco_clear(PyObject *m)
+{
+	Py_CLEAR(GETSTATE(m)->error);
+	return 0;
+}
+
+static struct PyModuleDef moduledef = {
+	PyModuleDef_HEAD_INIT,
+	"Taco",
+	NULL,
+	sizeof(struct module_state),
+	Taco_methods,
+	NULL,
+	Taco_traverse,
+	Taco_clear,
+	NULL,
+};
+
+#define INITERROR	NULL
+PyObject *PyInit_Taco(void)
+#else
+#define INITERROR
+void initTaco()
+#endif
+{
+	PyObject *m, *d;
     
-    m = Py_InitModule("Taco",Taco_methods);
+#if PY_MAJOR_VERSION >= 3
+	m = PyModule_Create(&moduledef);
+#else
+	m = Py_InitModule("Taco", Taco_methods);
+#endif
+	if (m == NULL)
+		return INITERROR;
 #ifdef NUMPY
-    import_array();
+	import_array();
 #endif
     
-    d = PyModule_GetDict(m);
-    ErrorObject = Py_BuildValue("s","Taco.error");
-    PyDict_SetItemString(d,"error",ErrorObject);
+	d = PyModule_GetDict(m);
+	ErrorObject = Py_BuildValue("s","Taco.error");
+	if (ErrorObject == NULL)
+	{
+		Py_DECREF(m);
+		return INITERROR;
+	}
+	PyDict_SetItemString(d,"error",ErrorObject);
     
-    if (PyErr_Occurred())
-       Py_FatalError("Can't initialize module Taco");
+	if (PyErr_Occurred())
+		Py_FatalError("Can't initialize module Taco");
 
-    /* we create here a global dictionnary and a global tuple for
-       esrf_io further init parameters */
+	/* we create here a global dictionnary and a global tuple for
+	   esrf_io further init parameters */
 
-    if ( (glob_tuple = PyList_New(0)) == NULL)
-       printf("initTaco: cannot create global tuple\n");
+	if ( (glob_tuple = PyList_New(0)) == NULL)
+		printf("initTaco: cannot create global tuple\n");
     
-    if ( (glob_dict = PyDict_New()) == NULL)
-       printf("Cannot create global dict\n");
+	if ( (glob_dict = PyDict_New()) == NULL)
+		printf("Cannot create global dict\n");
            
-    /* printf("Taco module init\n"); */
+	/* printf("Taco module init\n"); */
+#if PY_MAJOR_VERSION >= 3
+	return m;
+#endif
 }

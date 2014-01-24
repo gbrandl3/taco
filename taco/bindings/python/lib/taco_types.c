@@ -39,6 +39,25 @@
 #endif
 
 #include <Python.h>
+
+#if PY_MAJOR_VERSION < 3
+#	define PYINT_FROMLONG		PyInt_FromLong
+#	define PYINT_ASLONG		PyInt_AsLong
+#	define PYINT_CHECK		PyInt_Check
+#	define PYSTRING_ASSTRING	PyString_AsString
+#	define PYSTRING_FROMSTRING	PyString_FromString
+#	define PYSTRING_FROMSTRINGANDSIZE	PyString_FromStringAndSize
+#	define PYSTRING_CHECK		PyString_Check
+#else
+#	define PYINT_FROMLONG		PyLong_FromLong
+#	define PYINT_ASLONG		PyLong_AsLong
+#	define PYINT_CHECK		PyLong_Check
+#	define PYSTRING_ASSTRING	PyBytes_AsString
+#	define PYSTRING_FROMSTRING	PyBytes_FromString
+#	define PYSTRING_FROMSTRINGANDSIZE	PyBytes_FromStringAndSize
+#	define PYSTRING_CHECK		PyBytes_Check
+#endif
+
 #include <ctype.h>
 
 /* for taco */
@@ -154,8 +173,8 @@ void display_single(DevArgument ds_argin,long ds_in,char * ms)
 char p2c_BOOLEAN(PyObject *item,long *err)
 {
    *err = 0;
-   if (PyInt_Check(item))
-      return (char)PyInt_AsLong(item);
+   if (PYINT_CHECK(item))
+      return (char)PYINT_ASLONG(item);
    else
    {
       *err = 1;
@@ -174,10 +193,12 @@ char p2c_BOOLEAN(PyObject *item,long *err)
 unsigned short p2c_USHORT(PyObject *item,long *err)
 {
    *err = 0;
-   if (PyInt_Check(item))
-       return (unsigned short)PyInt_AsLong(item);
-   else if (PyLong_Check(item))
+   if (PyLong_Check(item))
        return (unsigned short)PyLong_AsLong(item);
+#if PY_MAJOR_VERSION < 3
+   else if (PyInt_Check(item))
+       return (unsigned short)PyInt_AsLong(item);
+#endif
    else
    {
       *err = 1;
@@ -196,10 +217,12 @@ unsigned short p2c_USHORT(PyObject *item,long *err)
 short p2c_SHORT(PyObject *item,long *err)
 {
    *err = 0;
-   if (PyInt_Check(item))
-      return (short)PyInt_AsLong(item);
-   else if (PyLong_Check(item))
+   if (PyLong_Check(item))
       return (short)PyLong_AsLong(item);
+#if PY_MAJOR_VERSION < 3
+   else if (PyInt_Check(item))
+      return (short)PyInt_AsLong(item);
+#endif
    else
    {
       *err = 1;
@@ -218,10 +241,12 @@ short p2c_SHORT(PyObject *item,long *err)
 unsigned long p2c_ULONG(PyObject *item,long *err)
 {
    *err = 0;
-   if (PyInt_Check(item))
-      return (unsigned long)PyInt_AsLong(item);
-   else if (PyLong_Check(item))
+   if (PyLong_Check(item))
       return (unsigned long)PyLong_AsLong(item);
+#if PY_MAJOR_VERSION < 3
+   else if (PyInt_Check(item))
+      return (unsigned long)PyInt_AsLong(item);
+#endif
    else
    {
       *err = 1;
@@ -240,10 +265,12 @@ unsigned long p2c_ULONG(PyObject *item,long *err)
 long p2c_LONG(PyObject *item,long *err)
 {
    *err = 0;
-   if (PyInt_Check(item))
-      return (long)PyInt_AsLong(item);
-   else if (PyLong_Check(item))
+   if (PyLong_Check(item))
       return (long)PyLong_AsLong(item);
+#if PY_MAJOR_VERSION < 3
+   else if (PyInt_Check(item))
+      return (long)PyInt_AsLong(item);
+#endif
    else
    {
       *err = 1;
@@ -262,10 +289,12 @@ long p2c_LONG(PyObject *item,long *err)
 float p2c_FLOAT(PyObject *item,long *err)
 {
    *err = 0;
-   if (PyInt_Check(item))
-      return (float)PyInt_AsLong(item);
-   else if (PyLong_Check(item))
+   if (PyLong_Check(item))
       return (float)PyLong_AsDouble(item);
+#if PY_MAJOR_VERSION < 3
+   else if (PyInt_Check(item))
+      return (float)PyInt_AsLong(item);
+#endif
    else if (PyFloat_Check(item))
       return (float)PyFloat_AsDouble(item);
    else
@@ -287,10 +316,12 @@ float p2c_FLOAT(PyObject *item,long *err)
 double p2c_DOUBLE(PyObject *item,long *err)
 {
    *err = 0;
-   if (PyInt_Check(item))
-      return (double)PyInt_AsLong(item);
-   else if (PyLong_Check(item))
+   if (PyLong_Check(item))
       return (double)PyLong_AsDouble(item);
+#if PY_MAJOR_VERSION < 3
+   else if (PyInt_Check(item))
+      return (double)PyInt_AsLong(item);
+#endif
    else if (PyFloat_Check(item))
       return (double)PyFloat_AsDouble(item);
    else
@@ -311,8 +342,8 @@ double p2c_DOUBLE(PyObject *item,long *err)
 char* p2c_STRING(PyObject *item,long *err)
 {
    *err = 0;
-   if (PyString_Check(item))
-	return PyString_AsString(item);
+   if (PYSTRING_CHECK(item))
+	return PYSTRING_ASSTRING(item);
    else
    {
       *err = 1;
@@ -1146,15 +1177,15 @@ long get_argout_single(DevArgument ds_argout, long ds_out,
    switch (ds_out) 
    {
       case D_BOOLEAN_TYPE:
-         *item = PyInt_FromLong((long) *((char *)(ds_argout)));
+         *item = PYINT_FROMLONG((long) *((char *)(ds_argout)));
 	 break;
 	 
       case D_USHORT_TYPE:
-         *item = PyInt_FromLong((long) (*((unsigned short *)(ds_argout))));
+         *item = PYINT_FROMLONG((long) (*((unsigned short *)(ds_argout))));
 	 break;
 	 
       case D_SHORT_TYPE:
-         *item = PyInt_FromLong((long) (*((short *)(ds_argout))));
+         *item = PYINT_FROMLONG((long) (*((short *)(ds_argout))));
 	 break;
 	 
       case D_ULONG_TYPE:               
@@ -1174,12 +1205,12 @@ long get_argout_single(DevArgument ds_argout, long ds_out,
          break;
 
       case D_STRING_TYPE:
-         *item = PyString_FromString((DevString) (*((DevString *)(ds_argout))));
+         *item = PYSTRING_FROMSTRING((DevString) (*((DevString *)(ds_argout))));
          break;
 	
     	case D_OPAQUE_TYPE:
-         len = ((DevVarCharArray *)(ds_argout))->length;  
-         *item = PyString_FromStringAndSize( (DevString) (((DevVarCharArray *)(ds_argout))->sequence), len);        
+         len = ((DevVarCharArray *)(ds_argout))->length;
+         *item = PYSTRING_FROMSTRINGANDSIZE( (DevString) (((DevVarCharArray *)(ds_argout))->sequence), len);
          break;         
 	 
       default:
@@ -1219,7 +1250,7 @@ long get_argout_array(DevArgument ds_argout, long ds_out,
 	 }
 	 for (i=0; i<len; i++)
 	 {
-            item = PyInt_FromLong((long) ((((DevVarCharArray *)(ds_argout))->sequence)[i]));
+            item = PYINT_FROMLONG((long) ((((DevVarCharArray *)(ds_argout))->sequence)[i]));
 	    PyList_SetItem(*mylist,i,item); 
 	 }
 	 break;
@@ -1234,7 +1265,7 @@ long get_argout_array(DevArgument ds_argout, long ds_out,
 	 }
 	 for (i=0; i<len; i++)
 	 {
-            item = PyInt_FromLong((long) ((((DevVarUShortArray *)(ds_argout))->sequence)[i]));
+            item = PYINT_FROMLONG((long) ((((DevVarUShortArray *)(ds_argout))->sequence)[i]));
 	    PyList_SetItem(*mylist,i,item); 
 	 }      
 	 break;
@@ -1249,7 +1280,7 @@ long get_argout_array(DevArgument ds_argout, long ds_out,
 	 }
 	 for (i=0; i<len; i++)
 	 {
-            item = PyInt_FromLong((long) ((((DevVarShortArray *)(ds_argout))->sequence)[i]));
+            item = PYINT_FROMLONG((long) ((((DevVarShortArray *)(ds_argout))->sequence)[i]));
 	    PyList_SetItem(*mylist,i,item); 
 	 }          	 
 	 break;
@@ -1324,7 +1355,7 @@ long get_argout_array(DevArgument ds_argout, long ds_out,
 	 }
 	 for (i=0; i<len; i++)
 	 {
-            item = PyString_FromString((char *) ((((DevVarStringArray *)(ds_argout))->sequence)[i]));
+            item = PYSTRING_FROMSTRING((char *) ((((DevVarStringArray *)(ds_argout))->sequence)[i]));
 	    PyList_SetItem(*mylist,i,item); 
 	 }           
 	 break;
@@ -1422,7 +1453,7 @@ long get_argout_special(DevArgument ds_argout, long ds_out,
 	    sprintf(mymess,"get_argout_special: cannot build list");
 	    return(-1);
 	 }
-         item = PyInt_FromLong((long) ((((DevIntFloat *)(ds_argout))->state)));
+         item = PYINT_FROMLONG((long) ((((DevIntFloat *)(ds_argout))->state)));
 	 PyList_SetItem(*mylist,i,item); 
          item = PyFloat_FromDouble((double) ((((DevIntFloat *)(ds_argout))->value)));
 	 PyList_SetItem(*mylist,i,item); 
@@ -1446,9 +1477,9 @@ long get_argout_special(DevArgument ds_argout, long ds_out,
 	    sprintf(mymess,"get_argout_special: cannot build list");
 	    return(-1);
 	 }
-         item = PyInt_FromLong((long) ((((DevLongReadPoint *)(ds_argout))->set)));
+         item = PYINT_FROMLONG((long) ((((DevLongReadPoint *)(ds_argout))->set)));
 	 PyList_SetItem(*mylist,i,item); 
-         item = PyInt_FromLong((long) ((((DevLongReadPoint *)(ds_argout))->read)));
+         item = PYINT_FROMLONG((long) ((((DevLongReadPoint *)(ds_argout))->read)));
 	 PyList_SetItem(*mylist,i,item);         	 
 	 break;
 	 
@@ -1470,9 +1501,9 @@ long get_argout_special(DevArgument ds_argout, long ds_out,
 	    sprintf(mymess,"get_argout_special: cannot build list");
 	    return(-1);
 	 }
-         item = PyInt_FromLong((long) ((((DevMotorLong *)(ds_argout))->axisnum)));
+         item = PYINT_FROMLONG((long) ((((DevMotorLong *)(ds_argout))->axisnum)));
 	 PyList_SetItem(*mylist,i,item); 
-         item = PyInt_FromLong((long) ((((DevMotorLong *)(ds_argout))->value)));
+         item = PYINT_FROMLONG((long) ((((DevMotorLong *)(ds_argout))->value)));
 	 PyList_SetItem(*mylist,i,item);         	 
 	 break;
 	 
@@ -1494,7 +1525,7 @@ long get_argout_special(DevArgument ds_argout, long ds_out,
 	    sprintf(mymess,"get_argout_special: cannot build list");
 	    return(-1);
 	 }
-         item = PyInt_FromLong((long) ((((DevStateFloatReadPoint*)(ds_argout))->state)));
+         item = PYINT_FROMLONG((long) ((((DevStateFloatReadPoint*)(ds_argout))->state)));
 	 PyList_SetItem(*mylist,i,item); 
          item = PyFloat_FromDouble((double) ((((DevStateFloatReadPoint *)(ds_argout))->set)));
 	 PyList_SetItem(*mylist,i,item);      

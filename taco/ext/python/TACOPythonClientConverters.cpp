@@ -35,6 +35,22 @@
 #endif
 #include <TACOPythonClientConverters.h>
 
+#if PY_MAJOR_VERSION < 3
+#	define PYSTRING_FROMSTRING 		PyString_FromString
+#	define PYINT_FROMLONG			PyInt_FromLong
+#	define PYSTRING_FROMSTRINGANDSIZE	PyString_FromStringAndSize
+#	define PYSTRING_ASSTRING		PyString_AsString
+#	define PYSTRING_CHECK			PyString_Check
+#	define PYSTRING_SIZE			PyString_Size
+#else
+#	define PYINT_FROMLONG			PyLong_FromLong
+#	define PYSTRING_FROMSTRING 		PyBytes_FromString
+#	define PYSTRING_FROMSTRINGANDSIZE	PyBytes_FromStringAndSize
+#	define PYSTRING_ASSTRING		PyBytes_AsString
+#	define PYSTRING_CHECK			PyBytes_Check
+#	define PYSTRING_SIZE			PyBytes_Size
+#endif
+
 bool TACOPythonClient::createDevArgument( DevType type, DevArgument& arg) throw (::TACO::Exception)
 {
 	if (type != D_VOID_TYPE) {
@@ -170,10 +186,12 @@ bool TACOPythonClient::convertToDevUShort( PyObject* in, DevUShort& value)
 
 bool TACOPythonClient::convertToDevLong( PyObject* in, DevLong& value)
 {
-	if (PyInt_Check( in) != 0) {
-		value = PyInt_AsLong( in);
-	} else if (PyLong_Check( in) != 0) {
+	if (PyLong_Check( in) != 0) {
 		value = PyLong_AsLong( in);
+#if PY_MAJOR_VERSION < 3
+	} else if (PyInt_Check( in) != 0) {
+		value = PyInt_AsLong( in);
+#endif
 	} else if (PyFloat_Check( in) != 0) {
 		double tmp = PyFloat_AsDouble( in);
 		if (LONG_MIN <= tmp && tmp <= LONG_MAX) {
@@ -193,11 +211,13 @@ bool TACOPythonClient::convertToDevLong( PyObject* in, DevLong& value)
 
 bool TACOPythonClient::convertToDevULong( PyObject* in, DevULong& value)
 {
-	if (PyInt_Check( in) != 0) {
-		value = PyInt_AsLong(in);
-	} else if (PyLong_Check(in)) {
+	if (PyLong_Check( in) != 0) {
 		value = PyLong_AsUnsignedLong(in);
+#if PY_MAJOR_VERSION < 3
+	} else if (PyInt_Check(in)) {
+		value = PyInt_AsLong(in);
 		return true;
+#endif
 	} else if (PyFloat_Check( in) != 0) {
 		double tmp = PyFloat_AsDouble( in);
 		if (0 <= tmp && tmp <= ULONG_MAX) {
@@ -229,8 +249,10 @@ bool TACOPythonClient::convertToDevDouble( PyObject* in, DevDouble& value)
 {
 	if (PyFloat_Check( in) != 0) {
 		value = PyFloat_AsDouble( in);
+#if PY_MAJOR_VERSION < 3
 	} else if (PyInt_Check( in) != 0) {
 		value = static_cast<DevDouble>( PyInt_AsLong( in));
+#endif
 	} else if (PyLong_Check( in) != 0) {
 		value = PyLong_AsDouble( in);
 	} else if (PyTuple_Check( in) != 0 && PyTuple_GET_SIZE( in) == 1) {
@@ -247,8 +269,8 @@ DevArgument TACOPythonClient::convertToDevString( PyObject* in)
 {
 	DevArgument r;
 	if (createDevArgument( D_STRING_TYPE, r)) {
-		if (PyString_Check( in) != 0) {
-			*static_cast<DevString*>( r) = PyString_AsString( in);
+		if (PYSTRING_CHECK( in) != 0) {
+			*static_cast<DevString*>( r) = PYSTRING_ASSTRING( in);
 		} else {
 			free( r);
 			return NULL;
@@ -261,9 +283,9 @@ DevArgument TACOPythonClient::convertToDevVarCharArray( PyObject* in)
 {
 	DevArgument r;
 	if (createDevArgument( D_VAR_CHARARR, r)) {
-		if (PyString_Check( in) != 0) {
-			static_cast<DevVarCharArray*>( r)->sequence = PyString_AsString( in);
-			static_cast<DevVarCharArray*>( r)->length = PyString_Size( in);
+		if (PYSTRING_CHECK( in) != 0) {
+			static_cast<DevVarCharArray*>( r)->sequence = PYSTRING_ASSTRING( in);
+			static_cast<DevVarCharArray*>( r)->length = PYSTRING_SIZE( in);
 		} else {
 			free( r);
 			return NULL;
@@ -291,8 +313,8 @@ DevArgument TACOPythonClient::convertToDevVarStringArray( PyObject* in)
 		if (static_cast<DevVarStringArray*>( r)->sequence != NULL) {
 			for (unsigned int i = 0; i < size; ++i) {
 				PyObject* tmp = (*getItem)( in, i);
-				if (tmp != NULL && PyString_Check( tmp) != 0) {
-					static_cast<DevVarStringArray*>( r)->sequence [i] = PyString_AsString( tmp);
+				if (tmp != NULL && PYSTRING_CHECK( tmp) != 0) {
+					static_cast<DevVarStringArray*>( r)->sequence [i] = PYSTRING_ASSTRING( tmp);
 				} else {
 					free( static_cast<DevVarStringArray*>( r)->sequence);
 					free( r);
@@ -316,13 +338,13 @@ bool TACOPythonClient::convertToPyObject( DevType outputType, DevArgument argout
 	} else if (argout != NULL) {
 		switch (outputType) {
 		case D_BOOLEAN_TYPE:
-			*output = PyInt_FromLong( static_cast<long>( *static_cast<DevBoolean*>( argout)));
+			*output = PYINT_FROMLONG( static_cast<long>( *static_cast<DevBoolean*>( argout)));
 			break;
 		case D_SHORT_TYPE:
-			*output = PyInt_FromLong( static_cast<long>( *static_cast<DevShort*>( argout)));
+			*output = PYINT_FROMLONG( static_cast<long>( *static_cast<DevShort*>( argout)));
 			break;
 		case D_USHORT_TYPE:
-			*output = PyInt_FromLong( static_cast<long>( *static_cast<DevUShort*>( argout)));
+			*output = PYINT_FROMLONG( static_cast<long>( *static_cast<DevUShort*>( argout)));
 			break;
 		case D_LONG_TYPE:
 			*output = PyLong_FromLong( *static_cast<DevLong*>( argout));
@@ -337,10 +359,10 @@ bool TACOPythonClient::convertToPyObject( DevType outputType, DevArgument argout
 			*output = PyFloat_FromDouble( *static_cast<DevDouble*>( argout));
 			break;
 		case D_STRING_TYPE:
-			*output = PyString_FromString( *static_cast<DevString*>( argout));
+			*output = PYSTRING_FROMSTRING( *static_cast<DevString*>( argout));
 			break;
 		case D_VAR_CHARARR:
-			*output = PyString_FromStringAndSize(
+			*output = PYSTRING_FROMSTRINGANDSIZE(
 				static_cast<DevVarCharArray*>( argout)->sequence,
 				static_cast<DevVarCharArray*>( argout)->length
 			);
@@ -382,7 +404,7 @@ PyObject* TACOPythonClient::convertToPyTuple( DevVarStringArray* array)
 		return NULL;
 	}
 	for (unsigned int i = 0; i < array->length; ++i) {
-		PyObject* tmp = PyString_FromString( array->sequence [i]);
+		PyObject* tmp = PYSTRING_FROMSTRING( array->sequence [i]);
 		if (tmp == NULL) {
 			Py_DECREF( r);
 			return NULL;
@@ -399,7 +421,11 @@ PyObject* TACOPythonClient::convertToPyTuple( DevVarShortArray* array)
 		return NULL;
 	}
 	for (unsigned int i = 0; i < array->length; ++i) {
+#if PY_MAJOR_VERSION < 3
 		PyObject* tmp = PyInt_FromLong( static_cast<long>( array->sequence [i]));
+#else
+		PyObject* tmp = PyLong_FromLong( static_cast<long>( array->sequence [i]));
+#endif
 		if (tmp == NULL) {
 			Py_DECREF( r);
 			return NULL;
@@ -416,7 +442,11 @@ PyObject* TACOPythonClient::convertToPyTuple( DevVarUShortArray* array)
 		return NULL;
 	}
 	for (unsigned int i = 0; i < array->length; ++i) {
+#if PY_MAJOR_VERSION < 3
 		PyObject* tmp = PyInt_FromLong( static_cast<long>( array->sequence [i]));
+#else
+		PyObject* tmp = PyLong_FromLong( static_cast<long>( array->sequence [i]));
+#endif
 		if (tmp == NULL) {
 			Py_DECREF( r);
 			return NULL;
@@ -499,39 +529,39 @@ PyObject* TACOPythonClient::convertToPyString( DevType inputType)
 	switch (inputType)
 	{
 		case D_BOOLEAN_TYPE:
-			return PyString_FromString("D_BOOLEAN_TYPE");
+			return PYSTRING_FROMSTRING("D_BOOLEAN_TYPE");
 		case D_SHORT_TYPE:
-			return PyString_FromString("D_SHORT_TYPE");
+			return PYSTRING_FROMSTRING("D_SHORT_TYPE");
 		case D_USHORT_TYPE:
-			return PyString_FromString("D_USHORT_TYPE");
+			return PYSTRING_FROMSTRING("D_USHORT_TYPE");
 		case D_LONG_TYPE:
-			return PyString_FromString("D_LONG_TYPE");
+			return PYSTRING_FROMSTRING("D_LONG_TYPE");
 		case D_ULONG_TYPE:
-			return PyString_FromString("D_ULONG_TYPE");
+			return PYSTRING_FROMSTRING("D_ULONG_TYPE");
 		case D_FLOAT_TYPE:
-			return PyString_FromString("D_FLOAT_TYPE");
+			return PYSTRING_FROMSTRING("D_FLOAT_TYPE");
 		case D_DOUBLE_TYPE:
-			return PyString_FromString("D_DOUBLE_TYPE");
+			return PYSTRING_FROMSTRING("D_DOUBLE_TYPE");
 		case D_STRING_TYPE:
-			return PyString_FromString("D_STRING_TYPE");
+			return PYSTRING_FROMSTRING("D_STRING_TYPE");
 		case D_VAR_CHARARR:
-			return PyString_FromString("D_VAR_CHARARR");
+			return PYSTRING_FROMSTRING("D_VAR_CHARARR");
 		case D_VAR_STRINGARR:
-			return PyString_FromString("D_VAR_STRINGARR");
+			return PYSTRING_FROMSTRING("D_VAR_STRINGARR");
 		case D_VAR_SHORTARR:
-			return PyString_FromString("D_VAR_SHORTARR");
+			return PYSTRING_FROMSTRING("D_VAR_SHORTARR");
 		case D_VAR_USHORTARR:
-			return PyString_FromString("D_VAR_USHORTARR");
+			return PYSTRING_FROMSTRING("D_VAR_USHORTARR");
 		case D_VAR_LONGARR:
-			return PyString_FromString("D_VAR_LONGARR");
+			return PYSTRING_FROMSTRING("D_VAR_LONGARR");
 		case D_VAR_ULONGARR:
-			return PyString_FromString("D_VAR_ULONGARR");
+			return PYSTRING_FROMSTRING("D_VAR_ULONGARR");
 		case D_VAR_FLOATARR:
-			return PyString_FromString("D_VAR_FLOATARR");
+			return PYSTRING_FROMSTRING("D_VAR_FLOATARR");
 		case D_VAR_DOUBLEARR:
-			return PyString_FromString("D_VAR_DOUBLEARR");
+			return PYSTRING_FROMSTRING("D_VAR_DOUBLEARR");
 		default:
-			return PyString_FromString("not supported type");
+			return PYSTRING_FROMSTRING("not supported type");
 	}
 }
 

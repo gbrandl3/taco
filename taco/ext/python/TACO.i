@@ -139,7 +139,7 @@ PyObject *TACO_queryResource(long commandNumber, PyObject *optargs=NULL)
         input = optargs;
         try
         {
-                TACO::CommandInfoMap map= self->deviceQueryCommandInfo();
+                TACO::CommandInfoMap map = self->deviceQueryCommandInfo();
                 TACO::CommandInfoMap::iterator it = map.find(commandNumber);
                 if (it == map.end())
                 {

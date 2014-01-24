@@ -39,6 +39,22 @@
 
 #include <Python.h>
 
+#if PY_MAJOR_VERSION >= 3
+#define IS_PY3K
+#endif
+
+#if PY_MAJOR_VERSION < 3
+#	define PYINT_FROMLONG		PyInt_FromLong
+#	define PYINT_ASLONG		PyInt_AsLong
+#	define PYSTRING_ASSTRING	PyString_AsString
+#	define PYSTRING_FROMSTRING	PyString_FromString
+#else
+#	define PYINT_FROMLONG		PyLong_FromLong
+#	define PYINT_ASLONG		PyLong_AsLong
+#	define PYSTRING_ASSTRING	PyBytes_AsString
+#	define PYSTRING_FROMSTRING	PyBytes_FromString
+#endif
+
 #define MAX_PY_DEVICE	100
 
 typedef struct _PythonClassPart

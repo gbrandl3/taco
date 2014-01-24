@@ -30,6 +30,9 @@
 #if PYTHON_API_VERSION == 1009
 #define PyDoc_STR(str)	str
 #endif
+#if PY_MAJOR_VERSION >= 3
+#define IS_PY3K
+#endif
 
 #ifndef HAVE_PY_SSIZE_T
 // #	if HAVE_SSIZE_T

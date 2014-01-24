@@ -57,6 +57,17 @@ PyObject 	*Py_devices;
 PyObject	*ErrorObject;
 PyThreadState	*thread_state;
 
+struct module_state {
+	    PyObject *error;
+};
+
+#if PY_MAJOR_VERSION >= 3
+#define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
+#else
+#define GETSTATE(m) (&_state)
+static struct module_state _state;
+#endif
+
 /**
  *  A static c module to implement a device server startup 
  */
@@ -66,10 +77,10 @@ static PyObject *Server_startup(PyObject *self, PyObject *args)
 		*pers_name;
 	
 	DevLong error = 0;
-			
+
         if ( !PyArg_ParseTuple(args, "ssO", &name, &pers_name, &Py_devices) )
 	{
-        	return PyInt_FromLong(-1L);
+		return PYINT_FROMLONG(-1L);
 	}
 
 	dev_printdebug(DBG_STARTUP, "Got server name\n");
@@ -85,7 +96,7 @@ static PyObject *Server_startup(PyObject *self, PyObject *args)
  * start the device server
  */
 	device_server (name, pers_name, (int)0, (int)1, (int)0, (int)0, (int)0, (char **)NULL);
-        return PyInt_FromLong(0L);
+        return PYINT_FROMLONG(0L);
 }
 
 /* 
@@ -107,7 +118,7 @@ static PyObject *Server_startup_nodb (PyObject *self, PyObject *args)
 			
 	if ( !PyArg_ParseTuple(args, "ssOi", &name, &pers_name, &Py_devices, &pn) )
 	{
-		return PyInt_FromLong(-1L);
+		return PYINT_FROMLONG(-1L);
 	}
 	dev_printdebug(DBG_STARTUP, "Got server name\n");
 	dev_printdebug(DBG_STARTUP, "name = %s, personal_name = %s\npn = %d\n", name, pers_name, pn);
@@ -123,7 +134,7 @@ static PyObject *Server_startup_nodb (PyObject *self, PyObject *args)
  * Read the device name
  */
 		py_name  = PyObject_CallMethod (Py_device, "get_dev_name", NULL);
-		device_list[i] = PyString_AsString(py_name);
+		device_list[i] = PYSTRING_ASSTRING(py_name);
 	}
 
 /*
@@ -137,7 +148,7 @@ static PyObject *Server_startup_nodb (PyObject *self, PyObject *args)
  */
 	device_server (name, pers_name, 0, 1, 1, pn, n_device, device_list);
 			
-        return PyInt_FromLong(0L);
+        return PYINT_FROMLONG(0L);
 }
 
 
@@ -200,7 +211,7 @@ static PyObject *Server_cmd_string (PyObject *self, PyObject *args)
 		return Py_None;
 	}
 
-	return PyString_FromString(ret_str);
+	return PYSTRING_FROMSTRING(ret_str);
 }
 
 static PyMethodDef Server_methods[] = {
@@ -210,14 +221,50 @@ static PyMethodDef Server_methods[] = {
         {NULL,          NULL}           /* sentinel */
 };
 
+#if PY_MAJOR_VERSION >= 3
+static int Server_traverse(PyObject *m, visitproc visit, void *arg)
+{
+	Py_VISIT(GETSTATE(m)->error);
+	return 0;
+}
+
+static int Server_clear(PyObject *m)
+{
+	Py_CLEAR(GETSTATE(m)->error);
+	return 0;
+}
+
+static struct PyModuleDef moduledef = {
+	PyModuleDef_HEAD_INIT,
+	"Server",
+	NULL,
+	sizeof(struct module_state),
+	Server_methods,
+	NULL,
+	Server_traverse,
+	Server_clear,
+	NULL,
+};
+
+#define INITERROR	NULL
+PyObject *PyInit_Server(void)
+#else
+#define INITERROR
 void initServer()
+#endif
 {
 	PyObject	*py_module,
 			*py_dict,
 			*py_exception_dict;
 	
 	PyImport_AddModule("Server");
+#if PY_MAJOR_VERSION >= 3
+	py_module = PyModule_Create(&moduledef);
+#else
 	py_module = Py_InitModule("Server", Server_methods);
+#endif
+	if (py_module == NULL)
+		return INITERROR;
 	
 /*
  * Prepare the error object to catch python exceptions
@@ -233,7 +280,15 @@ void initServer()
 	PyDict_SetItemString (py_exception_dict, "taco_error", Py_BuildValue ("i", 0));		      
 
 	ErrorObject = PyErr_NewException ("Server.error", NULL, py_exception_dict);
+	if (ErrorObject == NULL)
+	{
+		Py_DECREF(py_module);
+		return INITERROR;
+	}
     	PyDict_SetItemString (py_dict, "error", ErrorObject);				  	 	 		
+#if PY_MAJOR_VERSION >= 3
+	return py_module;
+#endif
 }
 
 /** 
@@ -270,7 +325,7 @@ long startup (char *svc_name, DevLong *error)
  * Read the device name
  */
 		py_name   = PyObject_CallMethod(Py_device, "get_dev_name", NULL);
-		dev_name = PyString_AsString(py_name);
+		dev_name = PYSTRING_ASSTRING(py_name);
 /*
  * Create the device
  */
