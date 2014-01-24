@@ -101,7 +101,7 @@ using namespace TACO;
 %feature("docstring", "path - path to the resource (may include the nethost)\n" \
 "Deletes a resource in the database") deleteResource;
 
-%include <TACOExtensions.h>
+// %include <TACOExtensions.h>
 
 namespace std {
 }

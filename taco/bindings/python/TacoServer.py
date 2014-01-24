@@ -152,7 +152,7 @@ class TacoServer:
         Prints the command list of the object 
         """
 		
-        print Tab_dev_head
+        print (Tab_dev_head)
         cmd_list_keys = self.cmd_list.keys()
         for cmd in cmd_list_keys:
             cmd_list_values = self.cmd_list[cmd]
@@ -175,7 +175,7 @@ class TacoServer:
             if (cmd_name == None):
                 cmd_name = Tab_dev_type_unk
 					     
-            print "%s %s %s" % (myin, myout, cmd_name)
+            print ("%s %s %s" % (myin, myout, cmd_name))
         return None
 
     def __getattr__ (self, cmd_name):

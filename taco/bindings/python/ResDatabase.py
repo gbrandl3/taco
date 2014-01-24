@@ -42,6 +42,7 @@ __revision__ = "$Revision: 1.3 $"
 
 # Include standard built-in modules.
 import types
+import sys
 import string
 
 class ResDatabase:
@@ -77,17 +78,17 @@ class ResDatabase:
             self.TACO_DB_flag = 0
             db_file = open (self.db_file_name, "a")
             db_file.close()
-            print "Using the file " + self.db_file_name + " as database"
+            print ("Using the file " + self.db_file_name + " as database")
         else:	
 # Include the TACO module
             import TacoDevice as Taco
             self.TacoDeviceObj = Taco
-            print "Using the TACO database"
+            print ("Using the TACO database")
 			
 				
     def __del__ (self):
         """ Destructor of the class """
-        print "ResDatabase : called destructor"
+        print ("ResDatabase : called destructor")
 		
 		
     def read(self, res_name):

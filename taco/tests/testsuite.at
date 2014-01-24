@@ -31,13 +31,14 @@ m4_define([AT_TACO_RUN_TEST],
 m4_include([gdbm.at])
 m4_include([dbase.at])
 m4_include([devices.at])
+m4_include([python.at])
 m4_include([specialtest1.at])
 m4_include([starter.at])
 m4_include([message.at])
 m4_include([ext.at])
 
 m4_define(AT_TACO_SUITE, [
-AT_BANNER([Testing TACO system ($1) database backend])
+AT_BANNER([Testing TACO system for $1 database backend])
 AT_SETUP([Starting TACO])
 AS_VAR_SET([tmp], m4_tolower([$1]))
 AS_IF([test x${tmp} = xgdbm], AS_VAR_SET([taco_database], [dbm], ${tmp}))
@@ -52,6 +53,9 @@ AT_BANNER([[Testing the devices.]])
 AT_TACO_DEVICE_SUITE($2)
 AT_TACO_SPECIALDEVICE_SUITE($2)
 
+AT_BANNER([Check the Python client library])
+AT_TACO_CHECK_PYTHON()
+
 AT_BANNER([[Testing the starter server]])
 AT_TACO_STARTER_SUITE($2)
 
@@ -61,6 +65,7 @@ AT_TACO_MESSAGESERVER_SUITE($2)
 AT_BANNER([[Testing extensions]])
 AT_TACO_EXTENSION_SUITE($2)
 
+AT_BANNER([Finishing tests for $1 database backend])
 AT_SETUP([Stopping TACO])
 AT_SKIP_IF([test x$2 != xyes])
 AT_CHECK([taco stop; sleep 5])

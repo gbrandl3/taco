@@ -37,16 +37,17 @@ AC_DEFUN([PYTHON_DEVEL],[
 dnl
 dnl Get the cflags and libraries
 dnl
-		PYTHON_LIBS=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('LIBS'), distutils.sysconfig.get_config_var('SYSLIBS'), distutils.sysconfig.get_config_var('LDFLAGS')"`
+		PYTHON_LIBS=`$PYTHON -c "import distutils.sysconfig; print ('%s %s %s' % (distutils.sysconfig.get_config_var('LIBS'), distutils.sysconfig.get_config_var('SYSLIBS'), distutils.sysconfig.get_config_var('LDFLAGS')))"`
 		AS_IF([test "x$python_includes" != "x"], [python_incdirs=${python_includes}],
 	              [test "x$python_prefix" != "x"], [python_incdirs=${python_prefix}/include],
                       [
-			python_incdirs=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('INCLUDEDIR'), distutils.sysconfig.get_config_var('CONFINCLUDEPY')"`
+			python_incdirs=`$PYTHON -c "import distutils.sysconfig; print ('%s %s' % (distutils.sysconfig.get_config_var('INCLUDEDIR'), distutils.sysconfig.get_config_var('CONFINCLUDEPY')))"`
 			case $target in
 		 		*-apple-darwin*)	
 					python_incdirs="$python_incdirs /System/Library/Frameworks/Python.framework/Versions/${ac_python_version}/include" ;;
 			esac
 	              ])
+		AC_MSG_RESULT([$python_incdirs])
 		AC_FIND_FILE(Python.h, $python_incdirs, python_incdir)
 	
 		AS_IF([test ! -r $python_incdir/Python.h],
@@ -71,19 +72,20 @@ dnl
 	        	AS_IF([test "x$python_prefix" != "x"], [python_libraries=${python_prefix}/lib],
 	      	  	      [test "x$python_libraries" = "x"], 
 			      [
-				python_libraries=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('LIBDIR')"`
+				python_libraries=`$PYTHON -c "import distutils.sysconfig; print ('%s' % distutils.sysconfig.get_config_var('LIBDIR'))"`
 			      ])
 			ac_save_LIBS="$LIBS"
 			ac_save_LDFLAGS="$LDFLAGS"
 			for i in ${python_libraries} ; do
 				LDFLAGS="$ac_save_LDFLAGS -L${i} ${PYTHON_LIBS}"
-				PYTHON_LIB=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('LDLIBRARY')"`
+				PYTHON_LIB=`$PYTHON -c "import distutils.sysconfig; print ('%s' % distutils.sysconfig.get_config_var('BLDLIBRARY')[[2:]])"`
 				AS_IF([test -z "$PYTHON_LIB"],
 				      [
-					PYTHON_LIB=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_config_var('LIBRARY')"`
+					PYTHON_LIB=`$PYTHON -c "import distutils.sysconfig; print ('%s' % distutils.sysconfig.get_config_var('LIBRARY')[[3:]])"`
 				      ])
-				AC_CHECK_LIB([python], [Py_Initialize], [
-					PYTHON_LDFLAGS="-L${i} -lpython"
+				AS_IF([test -z "$PYTHON_LIB"], [PYTHON_LIB="python"])
+				AC_CHECK_LIB([$PYTHON_LIB], [Py_Initialize], [
+					PYTHON_LDFLAGS="-L${i}"
 					break], 
 					AC_CHECK_LIB([python${ac_python_version}], [Py_Initialize], [
 					PYTHON_LDFLAGS="-L${i} -lpython${ac_python_version}"

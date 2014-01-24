@@ -31,13 +31,15 @@ datadir=@datadir@
 sysconfdir=@sysconfdir@
 templatedir=@templatedir@
 top_builddir=@abs_top_builddir@
+top_srcdir=@abs_top_srcdir@
 testbindir=${top_builddir}/tests
 appdefaultdir=@appdefaultdir@
 localstatedir=@localstatedir@
 infodir=@infodir@
 libdir=@libdir@
 LD_LIBRARY_PATH=@GCC_LIBRARY_PATH@:${libdir}:${LD_LIBRARY_PATH:+:}
-export DSHOME LD_LIBRARY_PATH
+PYTHONPATH=@pythondir@:@pyexecdir@:${top_srcdir}/bindings/python:${top_srcdir}/tests
+export DSHOME LD_LIBRARY_PATH PYTHONPATH
 export DBTABLES_CUSTOM=TEST,LONGTEST
 export sysconfdir
 }
@@ -46,7 +48,7 @@ unset NETHOST
 # unset RES_BASE_DIR
 set_env
 if test $# -gt 0 ; then
-	case $1 in 
+	case $1 in
 		--version)	echo @PACKAGE_VERSION@;;
 		install) if [ -d test ] ; then
 				rm -rf test
@@ -92,7 +94,7 @@ if test $# -gt 0 ; then
 			exit 1;;
 		start)
 			DESTDIR=$testbindir/test
-			. $sysconfdir/tacoenv.sh 
+			. $sysconfdir/tacoenv.sh
 			mkdir -p ${LOGPATH}
 			set_env
 			TACO_PATH=$sbindir
@@ -100,7 +102,7 @@ if test $# -gt 0 ; then
 			$sbindir/taco.startup >>log 2>&1
 			exit 0;;
 		stop)
-			. $sysconfdir/tacoenv.sh 
+			. $sysconfdir/tacoenv.sh
 			$sbindir/taco.shutdown >>log 2>&1
 			;;
 		uninstall)
@@ -146,22 +148,22 @@ if test $# -gt 0 ; then
 			shift 1
 			$sbindir/off $@ ;;
 		unreg)
-			. $sysconfdir/tacoenv.sh 
+			. $sysconfdir/tacoenv.sh
 			set_env
 			shift 1
 			$sbindir/unreg $@ ;;
 		dbm_server)
-			. $sysconfdir/tacoenv.sh 
+			. $sysconfdir/tacoenv.sh
 			set_env
 			shift 1
 			$sbindir/dbm_server dbm `uname -n|cut -f1 -d'.'` ;;
 		ldd)
-			. $sysconfdir/tacoenv.sh 
+			. $sysconfdir/tacoenv.sh
 			set_env
 			shift 1
 			ldd $bindir/$1 ;;
 		StartServer)
-			. $sysconfdir/tacoenv.sh 
+			. $sysconfdir/tacoenv.sh
 			set_env
 			prog=$1
 			shift 1
@@ -170,13 +172,19 @@ if test $# -gt 0 ; then
 			shift 1
 			prog=$1
 			shift 1
-			. $sysconfdir/tacoenv.sh 
+			. $sysconfdir/tacoenv.sh
 			set_env
 			LD_LIBRARY_PATH=${libdir}:${LD_LIBRARY_PATH} $prog $@ ;;
+		python)
+			shift 1
+			. $sysconfdir/tacoenv.sh
+			set_env
+			python ${top_srcdir}/tests/$@
+			;;
 		*)
 			prog=$1
 			shift 1
-			. $sysconfdir/tacoenv.sh 
+			. $sysconfdir/tacoenv.sh
 			set_env
 			LD_LIBRARY_PATH=${libdir}:${LD_LIBRARY_PATH} $bindir/$prog $@ ;;
 	esac

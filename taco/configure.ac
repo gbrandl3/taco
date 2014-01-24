@@ -16,7 +16,7 @@ dnl You should have received a copy of the GNU Lesser General Public
 dnl License along with this library; if not, write to the Free Software
 dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_INIT([TACO], [3.99.173], [taco-devel@lists.sourceforge.net], [], [http://sf.net/projects/taco])
+AC_INIT([TACO], [3.99.174], [taco-devel@lists.sourceforge.net], [], [http://sf.net/projects/taco])
 AC_PREREQ([2.62])
 AC_REVISION($Revision: 1.134 $)dnl
 AC_COPYRIGHT([(C) 1990-2014 ESRF])
@@ -137,6 +137,10 @@ TACO_MANAGER
 TACO_DATABASE_SERVER
 TACO_CLIENT_TCP
 TACO_FRM_EXT
+AS_IF([test x"${enable_ext}" = x"yes"],
+	[enable_python_ext=$swig_tmp],
+	[enable_python_ext="no"])
+AC_SUBST([PYTHON_EXT_BUILD], [test x"${enable_python_ext}" = x"yes"])
 
 AM_PATH_LOG4CPP([1.0.0], [taco_build_log4cpp=no], [
 taco_build_log4cpp=yes
@@ -353,7 +357,7 @@ build:
 
 	TANGO support:		${enable_tango}
 	Extensions :		${enable_ext}
-		python :	${swig_tmp}
+		python :	${enable_python_ext}
 
 install:
 	Fast install:           ${enable_fast_install}

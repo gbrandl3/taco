@@ -19,7 +19,7 @@
 
 SUBDIRS			= ## testserver
 
-EXTRA_DIST 		= taco.in 
+EXTRA_DIST 		= taco.in t1.py t2.py t3.py
 
 CLEANFILES 		= log taco
 
@@ -42,11 +42,12 @@ test_tc_LDADD		= @TACO_CLIENT_LIBS@
 
 EXTRA_DIST 		+= testsuite.at $(TESTSUITE_AT) testsuite 
 
-# local.at ext.at cleanup.at
+# local.at ext.at
 
 TESTSUITE 		= testsuite
 
 TESTSUITE_AT		= dbase.at devices.at starter.at message.at specialtest1.at local.at ext.at gdbm.at
+TESTSUITE_AT		+= python.at
 
 AUTOTEST 		= $(AUTOM4TE) --language=autotest
 
