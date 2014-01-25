@@ -50,9 +50,9 @@ int main(int argc, char *argv[])
 //
 // Argument test and device name structure
 //
-	if (argc != 1)
+	if (argc < 1 || argc > 2)
 	{
-		std::cerr << "usage : " << *argv << std::endl;
+		std::cerr << "usage : " << *argv << " [filter rule]" << std::endl;
 		exit(-1);
 	}
 //
@@ -69,7 +69,10 @@ int main(int argc, char *argv[])
 //
 	u_int res_nb;
 	char **tmp; 
-	if (db_getdevexp(NULL, &tmp, &res_nb, &error) == -1)
+	char *filter = NULL;
+	if (argc > 1)
+		filter = argv[1];
+	if (db_getdevexp(filter, &tmp, &res_nb, &error) == -1)
 	{
 		std::cerr << "The call to database server failed with error " << error << std::endl;
 		std::cerr << "Error message : " << dev_error_str(error) << std::endl;

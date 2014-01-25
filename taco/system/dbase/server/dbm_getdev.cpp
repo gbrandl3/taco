@@ -52,9 +52,9 @@
 
 
 /**
- * To retrieve the names of the exported devices device server. 
- * 
- * @param fil_name A string to filter special device names in the whole list of 
+ * To retrieve the names of the exported devices device server.
+ *
+ * @param fil_name A string to filter special device names in the whole list of
  *	     the exported device
  * @param rqstp
  *
@@ -76,8 +76,8 @@ db_res *NdbmServer::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rqstp
 #else
 	int 		so_size;
 #endif
-	datum 		key, 
-			key2, 
+	datum 		key,
+			key2,
 			content;
 	std::string	ret_host_name,
 			ret_pn,
@@ -112,12 +112,12 @@ db_res *NdbmServer::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rqstp
 		prot = IPPROTO_TCP;
 #endif
 //
-// Extract from filter string each part of the filter (domain, family and 
+// Extract from filter string each part of the filter (domain, family and
 // member). If two / characters can be retrieved in the filter string, this
 // means that the domain, family and member part of the filter are initialized.
 // If only one / can be retrieved, only the domain and family part are
 // initialized and if there is no / in the filter string, just the domain
-// is initialized. 
+// is initialized.
 //
         std::string::size_type       pos;
         std::string             member,
@@ -129,7 +129,7 @@ db_res *NdbmServer::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rqstp
         switch(NdbmServer::count(device_name.begin(), device_name.end(), '/'))
 #endif /* _solaris */
         {
-                case 2 : 
+                case 2 :
 			pos =  device_name.find('/');
                         domain = device_name.substr(0, pos);    // potential error
                         device_name.erase(0, pos + 1);
@@ -137,13 +137,13 @@ db_res *NdbmServer::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rqstp
                         family  = device_name.substr(0, pos);   // potential error
                         member = device_name.substr(pos + 1);
                         break;
-                case 1 : 
+                case 1 :
 			pos =  device_name.find('/');
                         domain = device_name.substr(0, pos);    // potential error
                         family  = device_name.substr(pos + 1);  // potential error
                         member = "*";
                         break;
-                case 0 : 
+                case 0 :
 			domain = device_name;                  // potential error
                         family = "*";
                         member = "*";
@@ -231,7 +231,6 @@ db_res *NdbmServer::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rqstp
                                 std::string domain_tup =  temp.substr(0, pos);
 
 				logStream->debugStream() << "Domain part from DB: " << domain_tup << log4cpp::eol;
-
 //
 // Call the stringOK function to verify that the retrieved devices device name is OK
 // If the domain part of the filter is *, directly call the fam_fil  function
@@ -240,6 +239,7 @@ db_res *NdbmServer::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rqstp
 				{
 					try
 					{
+						logStream->debugStream() << "add " << dev.d_name << log4cpp::eol;
 						ptra.push_back(fam_fil(&dev, family, member, prot));
 					}
 					catch(const int err)
@@ -258,7 +258,7 @@ db_res *NdbmServer::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rqstp
 				}
 			}
 		}
-	} 
+	}
 //
 // Initialize the structure sended back to client and leave the server
 //
@@ -271,15 +271,15 @@ db_res *NdbmServer::db_getdevexp_1_svc(DevString *fil_name,struct svc_req *rqstp
 }
 
 /**
- * check if the family part of the filter is the same as the family part of the 
+ * check if the family part of the filter is the same as the family part of the
  * device name retrieved from the database
- * 
- * @param dev1 
+ *
+ * @param dev1
  * @param family
- * @param member 
+ * @param member
  * @param prot
  *
- * @return 
+ * @return
  */
 char* NdbmServer::fam_fil(device *dev1, const std::string &family, const std::string &member, int prot) throw (int)
 {
@@ -288,13 +288,13 @@ char* NdbmServer::fam_fil(device *dev1, const std::string &family, const std::st
 	int 		err,ret;
 //
 // If the family part of the filter is *, directly call the memb_fil
-// function 
+// function
 //
 
 	logStream->debugStream() << "Arrived in fam_fil function" << log4cpp::eol;
 
 //
-// Extract the family part of the device name in the retrieved tuple 
+// Extract the family part of the device name in the retrieved tuple
 //
 #ifndef _solaris
 	if (std::count(tmp.begin(), tmp.end(), '/') != 2)
@@ -304,22 +304,22 @@ char* NdbmServer::fam_fil(device *dev1, const std::string &family, const std::st
 		throw int(1);
 	std::string::size_type	first = tmp.find('/'),
 				second = tmp.rfind('/');
-	std::string 		family_tup = tmp.substr(first + 1, second - first);
+	std::string 		family_tup = tmp.substr(first + 1, second - first - 1);
 
 	logStream->debugStream() << "Family part from DB : " << family_tup << log4cpp::eol;
 
 //
-// Special case for the data collector pseudo devices which are not real 
+// Special case for the data collector pseudo devices which are not real
 // devices. It is impossible to execute command on them. So, don't return
-// them to the caller. 
+// them to the caller.
 //
 	if ("dc_rd" == family_tup.substr(0, 5))
 		throw int(0);
 	if ("dc_wr" == family_tup.substr(0, 5))
 		throw int(0);
 //
-// Call the stringOK to verify that the family name is OK 
-// Is this family part the same than in the filter, call the memb_fil function 
+// Call the stringOK to verify that the family name is OK
+// Is this family part the same than in the filter, call the memb_fil function
 //
 	if (!stringOK(family, family_tup))
 		return memb_fil(dev1, member, prot);
@@ -327,14 +327,14 @@ char* NdbmServer::fam_fil(device *dev1, const std::string &family, const std::st
 }
 
 /**
- * check if the member part of the filter is the same as the member part of the device 
+ * check if the member part of the filter is the same as the member part of the device
  * name retrieved from the database. If yes, this device name must be returned to the caller
- * 
- * @param dev2 
+ *
+ * @param dev2
  * @param member
  * @param prot	
  *
- * @return 
+ * @return
  */
 char *NdbmServer::memb_fil(device *dev2, const std::string &member, int prot) throw (int)
 {
@@ -346,7 +346,7 @@ char *NdbmServer::memb_fil(device *dev2, const std::string &member, int prot) th
 //
 // If the member part of the filter is *, the device name must be sent back to
 // the user. This means copy the device name in the special array (allocate
-// memory for the string) and increment the device name counter 
+// memory for the string) and increment the device name counter
 //
 
 	logStream->debugStream() << "Arrived in memb_fil function" << log4cpp::eol;
@@ -366,10 +366,10 @@ char *NdbmServer::memb_fil(device *dev2, const std::string &member, int prot) th
 
 //
 // Call the stringOK function to verify that the member part of the
-// retrieved device is OK 
+// retrieved device is OK
 // Is this member part the same than in the filter ? If yes, the device name
 // must be sent back to the user: copy the device name in the special array
-// (allocate memory for the string) and increment the device name counter. 
+// (allocate memory for the string) and increment the device name counter.
 //
 	if (!stringOK(member, tmp.substr(pos + 1)))
 	{
@@ -393,24 +393,24 @@ char *NdbmServer::memb_fil(device *dev2, const std::string &member, int prot) th
 }
 
 /**
- * check if a string is the same than a wanted string This function allow the 
+ * check if a string is the same than a wanted string This function allow the
  * caller to have ONE wildcard '*' in the wanted string.
  *
  * @param wanted the wanted string
  * @param retrieved the string to be compared
- * 
- * @return 0 if the string in the same than the wanted one Otherwise, this function returns 1
+ *
+ * @return 0 if the string is the same than the wanted one Otherwise, this function returns 1
  */
 bool NdbmServer::stringOK(const std::string wanted, const std::string retrieved)
 {
 //
-// If the wanted string is only the wild card, return 0 
+// If the wanted string is only the wild card, return 0
 //
 	if (wanted == "*")
 		return(0);
 //
 // If the wild card is in the wanted string, compute the number of
-// characters before and after it 
+// characters before and after it
 //
 	std::string::size_type	pos;
 	if ((pos = wanted.find('*')) != std::string::npos)
@@ -421,23 +421,23 @@ bool NdbmServer::stringOK(const std::string wanted, const std::string retrieved)
 			return(1);
 	}
 //
-// Test to see if the string is stricly the same than the wanted one 
+// Test to see if the string is stricly the same than the wanted one
 //
 	else
-		return (wanted == retrieved); 
+		return !(wanted == retrieved);
 //
 // Test characters before the wild card
-// 
+//
 	if (wanted.substr(0, pos) != retrieved.substr(0, pos))
 		return(1);
 //
-// Test characters after the wild card 
+// Test characters after the wild card
 //
 	long l = wanted.length() - (pos + 1);
 	if (wanted.substr(pos + 1) != retrieved.substr(0, retrieved.length() - l))
 		return(1);
 //
-// Leave function 
+// Leave function
 //
 	return(0);
 }
