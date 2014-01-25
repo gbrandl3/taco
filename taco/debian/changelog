@@ -1,3 +1,9 @@
+taco (3.99.173) unstable; urgency=low
+
+  * FIX: get list of exported devices for the dbm backend
+
+ -- Jens Krüger <jens.krueger@frm2.tum.de>  Wed, 02 Apr 2014 14:13:38 +0200
+
 taco (3.99.172) unstable; urgency=low
 
   * Remove the autoconf cache during running autogen.sh
