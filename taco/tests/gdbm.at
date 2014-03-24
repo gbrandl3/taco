@@ -18,20 +18,22 @@ dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 dnl 02111-1307, USA.
 
+m4_define(AT_TACO_CHECK_GDBM, [
+AT_BANNER([[Testing the gdbm.]])
 AT_SETUP([db_read command])
-if test x"$python" = x"yes" ; then
+AT_SKIP_IF([test x$1 != xyes])
+AS_IF([test x"$check_python" = x"yes"],
 	AT_CHECK([
 taco db_read names | sort], [],
 [[NAMES: agpspp|1|1|: test/agps/1|not_exp|0|0|unknown|unknown|0|unknown|
 NAMES: inst_verify|1|1|: test/device/1|not_exp|0|0|unknown|unknown|0|unknown|
 NAMES: python|test|1|: test/python/test1|not_exp|0|0|unknown|unknown|0|unknown|
 NAMES: python|test|2|: test/python/test2|not_exp|0|0|unknown|unknown|0|unknown|
-]])
-else 
+]]),
 	AT_CHECK([
 taco db_read names | sort], [],
 [[NAMES: agpspp|1|1|: test/agps/1|not_exp|0|0|unknown|unknown|0|unknown|
 NAMES: inst_verify|1|1|: test/device/1|not_exp|0|0|unknown|unknown|0|unknown|
-]])
-fi
+]]))
 AT_CLEANUP
+])

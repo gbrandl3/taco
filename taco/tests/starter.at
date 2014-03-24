@@ -18,7 +18,9 @@ dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 dnl 02111-1307, USA.
 
+m4_define(AT_TACO_STARTER_SUITE, [
 AT_SETUP([launching starter server])
+AT_SKIP_IF([test x$1 != xyes])
 pers_name=`uname -n|cut -f1 -d'.'`
 AT_DATA([starter.res], [[
 ]])
@@ -37,6 +39,7 @@ printf "%d\n" `ps x | grep AGPSpp | grep -v grep | wc -l`
 AT_CLEANUP
 
 AT_SETUP([Starter server : Restart])
+AT_SKIP_IF([test x$1 != xyes])
 AT_DATA([starter], [[
 8
 Inst_verify 1
@@ -61,6 +64,7 @@ cmd ?]])
 AT_CLEANUP
 
 AT_SETUP([Starter server : Stop])
+AT_SKIP_IF([test x$1 != xyes])
 AT_DATA([starter], [[
 7
 AGPSpp 1
@@ -95,6 +99,7 @@ cmd ?]])
 AT_CLEANUP
 
 AT_SETUP([Starter server : Start])
+AT_SKIP_IF([test x$1 != xyes])
 AT_DATA([starter], [[
 6
 AGPSpp 1
@@ -118,6 +123,7 @@ cmd ?]])
 AT_CLEANUP
 
 AT_SETUP([Shutting down Starter server])
+AT_SKIP_IF([test x$1 != xyes])
 AT_DATA([starter], [[
 7
 AGPSpp 1
@@ -152,5 +158,4 @@ Select one of the following commands:
 6. Run         7. Stop         8. Restart
 cmd ?]])
 AT_CLEANUP
-
-
+])

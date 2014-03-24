@@ -18,7 +18,9 @@ dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 dnl 02111-1307, USA.
 
+m4_define(AT_TACO_DEVICE_SUITE, [
 AT_SETUP([Start Inst_verify device server])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK([taco Inst_verify 1 -m -d
 sleep 1
 printf "%d\n" `ps x | grep Inst_verify | grep -v grep | wc -l`], [],
@@ -27,12 +29,14 @@ printf "%d\n" `ps x | grep Inst_verify | grep -v grep | wc -l`], [],
 AT_CLEANUP
 
 AT_SETUP([ping to the device test/device1/1])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK([taco dev_ping -c 3 test/device/1 | grep status | cut -d' ' -f 4 | uniq], [],
 [[status=OK
 ]])
 AT_CLEANUP
 
 AT_SETUP([cmd_query command to test/device/1])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK(AT_TACO_RUN_LOCAL([dev_cmdquery test/device/1]), [],
 [[        12             DevReadValue         0         8
         11              DevSetValue         4         0
@@ -42,6 +46,7 @@ AT_CHECK(AT_TACO_RUN_LOCAL([dev_cmdquery test/device/1]), [],
 AT_CLEANUP
 
 AT_SETUP([Send commands to test/device/1])
+AT_SKIP_IF([test x$1 != xyes])
 AT_DATA([instverify], [[3
 0
 ]])
@@ -67,6 +72,7 @@ Select one commands (0 to quit) : ?
 AT_CLEANUP
 
 AT_SETUP([Gets device information])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK([taco db_devinfo test/device/1 | egrep "(belongs|monitored)" ], [], 
 [[Device test/device/1 belongs to class : Inst_verifyClass
 It is monitored by the server : inst_verify/1 version 4
@@ -74,12 +80,14 @@ It is monitored by the server : inst_verify/1 version 4
 AT_CLEANUP
 
 AT_SETUP([Test device information of not existing device])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK([taco db_devinfo test/device/x], [255],[], 
 [[The device test/device/x is not defined in the database
 ]])
 AT_CLEANUP
 
 AT_SETUP([Start AGPSpp device server ])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK([taco AGPSpp 1 -m -d 
 sleep 1
 printf "%d\n" `ps x | grep AGPSpp | grep -v grep | wc -l`], [],
@@ -88,6 +96,7 @@ printf "%d\n" `ps x | grep AGPSpp | grep -v grep | wc -l`], [],
 AT_CLEANUP
 
 AT_SETUP([Send commands to the AGPSpp])
+AT_SKIP_IF([test x$1 != xyes])
 AT_DATA([agps],
 [[4
 0
@@ -115,12 +124,14 @@ cmd ?]])
 AT_CLEANUP
 
 AT_SETUP([get exported devices])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK(AT_TACO_RUN_LOCAL([db_getdevexp]), [], [[test/agps/1
 test/device/1
 ]]) 
 AT_CLEANUP
 
 AT_SETUP([import a device from server])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK(AT_TACO_RUN_LOCAL([dev_import test/device/1]), [], [[test/device/1
 Inst_verifyClass
 DevType_Default
@@ -128,12 +139,14 @@ DevType_Default
 AT_CLEANUP
 
 AT_SETUP([check the RPC connection parameters])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK(AT_TACO_RUN_LOCAL([dev_conparams test/device/1]), [], [[3
 1.5
 ]])
 AT_CLEANUP
 
 AT_SETUP([Stop the Inst_verify and AGPSpp device servers])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK([AT_TACO_RUN_TEST([off Inst_verify | grep -v Killing])
 AT_TACO_RUN_TEST([off AGPSpp | grep -v Killing])
 sleep 4
@@ -151,6 +164,7 @@ There are 1 AGPSpp processes:
 AT_CLEANUP
 
 AT_SETUP([Test the command and event lists of a device])
+AT_SKIP_IF([test x$1 != xyes])
 AT_DATA([test_server.res], [[
 # This file contains only resources for the tests
 test_server/1/device:	test/a/1 \
@@ -177,5 +191,4 @@ Query events
     4228120578           3                        "HeartBeat"
 ])
 AT_CLEANUP
-
-
+])

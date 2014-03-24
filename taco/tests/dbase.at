@@ -18,13 +18,16 @@ dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 dnl 02111-1307, USA.
 
+m4_define(AT_TACO_DBASE_SUITE, [
 AT_SETUP([connection to the database])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK(AT_TACO_RUN_LOCAL([db_connect]))
 AT_CLEANUP
 
 AT_SETUP([db_info command])
-if test x"$python" = x"yes" ; then
-	if test x"$extensions" = x"yes" ; then
+AT_SKIP_IF([test x$1 != xyes])
+AS_IF([test x"$check_python" = x"yes"],
+	AS_IF([test x"$check_extensions" = x"yes"],
 		AT_CHECK([taco db_info | tail -15], [], [[		DEVICE STATISTICS
 
 4 devices are defined in database
@@ -40,8 +43,7 @@ if test x"$python" = x"yes" ; then
     266 resources for the ERROR domain
     3 resources for the SEC domain
     2 resources for the TEST domain
-]])
-	else
+]]),
 		AT_CHECK([taco db_info | tail -15], [], [[		DEVICE STATISTICS
 
 4 devices are defined in database
@@ -57,10 +59,8 @@ if test x"$python" = x"yes" ; then
     243 resources for the ERROR domain
     3 resources for the SEC domain
     2 resources for the TEST domain
-]])
-	fi
-else
-	if test x"$extensions" = x"yes" ; then
+]])),
+	AS_IF([test x"$check_extensions" = x"yes"],
 		AT_CHECK([taco db_info | tail -15], [], [[		DEVICE STATISTICS
 
 2 devices are defined in database
@@ -76,8 +76,7 @@ else
     266 resources for the ERROR domain
     3 resources for the SEC domain
     1 resources for the TEST domain
-]])
-	else
+]]),
 		AT_CHECK([taco db_info | tail -15], [], [[		DEVICE STATISTICS
 
 2 devices are defined in database
@@ -93,37 +92,40 @@ else
     243 resources for the ERROR domain
     3 resources for the SEC domain
     1 resources for the TEST domain
-]])
-	fi
-fi
+]])))
 AT_CLEANUP
 
 AT_SETUP([db_getresresoval command])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK(AT_TACO_RUN_LOCAL([db_getresoval CMDS/0/0/1]), [], [[cmds/0/0/1: DevOn
 ]])
 AT_CLEANUP
 
 AT_SETUP([db_update command])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK([taco db_update TEST/Inst_verify.res])
 AT_CLEANUP
 
 AT_SETUP([db_devres command])
-AT_CHECK([taco db_devres test/device/1], [], 
+AT_SKIP_IF([test x$1 != xyes])
+AT_CHECK([taco db_devres test/device/1], [],
 [[test/device/1/status: Off
 ]])
 AT_CLEANUP
 
 AT_SETUP([db_servinfo command])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK([taco db_servinfo inst_verify/1], [], [[The device test/device/1 is defined for this server but is not exported
 ]])
 AT_CLEANUP
 
 AT_SETUP([db_analyze_data function])
+AT_SKIP_IF([test x$1 != xyes])
 AT_DATA([test.res], [[
 # This file contains only resources for the tests
 test/test/device:	test/device/2 \
 			test/device/3 \
-			test/device/4 
+			test/device/4
 test/device/2/res1:	"resource 1"
 test/device/2/res2:	2
 test/device/2/res3:	3.1
@@ -150,11 +152,12 @@ test/device/2/res7:1^B2^B3^B4
 AT_CLEANUP
 
 AT_SETUP([db_update command])
+AT_SKIP_IF([test x$1 != xyes])
 AT_DATA([test.res], [[
 # This file contains only resources for the tests
 test/test/device:	test/device/2 \
 			test/device/3 \
-			test/device/4 
+			test/device/4
 test/device/2/res1:	"resource 1"
 test/device/2/res2:	2
 test/device/2/res3:	3.1
@@ -172,20 +175,23 @@ test/device/2/res5: A,B,C
 AT_CLEANUP
 
 AT_SETUP([db_update command failes])
+AT_SKIP_IF([test x$1 != xyes])
 AT_DATA([test.res], [[
 # This file contains only resources for the tests
-test/test/devices:	test/device/2 
+test/test/devices:	test/device/2
 test/device/2/res1:	"resource 1"
 ]])
-AT_CHECK([RES_BASE_DIR=`pwd` taco db_update test.res 2>/dev/null], [255])  
+AT_CHECK([RES_BASE_DIR=`pwd` taco db_update test.res 2>/dev/null], [255])
 AT_CLEANUP
 
 AT_SETUP([db_getresource function])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK(AT_TACO_RUN_LOCAL([db_resget test/device/2/res1]), [], [[resource 1
 ]])
 AT_CLEANUP
 
 AT_SETUP([db_putresource function])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK([AT_TACO_RUN_LOCAL([db_resput test/device/3/res1 TEST])
 AT_TACO_RUN_LOCAL([db_resget test/device/3/res1])
 AT_TACO_RUN_LOCAL([db_resput test/device/3/res1 TEST TEST2 TEST3])
@@ -195,10 +201,12 @@ TEST,TEST2,TEST3
 AT_CLEANUP
 
 AT_SETUP([db_delresource function])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK([taco db_resdel test/device/3/res1], [])
 AT_CLEANUP
 
 AT_SETUP([check existing resource domains])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK(AT_TACO_RUN_LOCAL([db_resdomain]), [], [[class
 cmds
 error
@@ -211,53 +219,55 @@ test
 AT_CLEANUP
 
 AT_SETUP([check existing resource families])
-if test x"$python" = x"yes" ; then 
+AT_SKIP_IF([test x$1 != xyes])
+AS_IF([test x"$check_python" = x"yes"],
 	AT_CHECK(AT_TACO_RUN_LOCAL([db_resfamily test]), [], [[device
 python
-]])
-else
+]]),
 	AT_CHECK(AT_TACO_RUN_LOCAL([db_resfamily test]), [], [[device
-]])
-fi
+]]))
 AT_CLEANUP
 
 AT_SETUP([check existing resource members])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK(AT_TACO_RUN_LOCAL([db_resmember test device]), [], [[1
 2
 ]])
 AT_CLEANUP
 
 AT_SETUP([check resource value])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK(AT_TACO_RUN_LOCAL([db_getresoval class/inst_verify/default/config]), [], [[class/inst_verify/default/config: 10
 ]])
-AT_CLEANUP 
+AT_CLEANUP
 
 AT_SETUP([check existing device domains])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK(AT_TACO_RUN_LOCAL([db_devdomain]), [], [[test
 ]])
 AT_CLEANUP
 
 AT_SETUP([check existing device families])
-if test x"$python" = x"yes" ; then
+AT_SKIP_IF([test x$1 != xyes])
+AS_IF([test x"$check_python" = x"yes"],
 	AT_CHECK(AT_TACO_RUN_LOCAL([db_devfamily test]), [], [[agps
 device
 python
-]])
-else
+]]),
 	AT_CHECK(AT_TACO_RUN_LOCAL([db_devfamily test]), [], [[agps
 device
-]])
-fi
+]]))
 AT_CLEANUP
 
 AT_SETUP([check existing device members])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK(AT_TACO_RUN_LOCAL([db_devmember test device]), [], [[1
 2
 ]])
 AT_CLEANUP
 
-
 AT_SETUP([check db_export and db_servunreg])
+AT_SKIP_IF([test x$1 != xyes])
 AT_DATA([test_server.res], [[
 # This file contains only resources for the tests
 test_server/1/device:	test/a/1 \
@@ -282,9 +292,10 @@ AT_TACO_RUN_TEST([off test_server >>log])
 AT_CLEANUP
 
 AT_SETUP([db_update command with maximum name sizes])
+AT_SKIP_IF([test x$1 != xyes])
 AT_DATA([test.res], [[
 # This file contains only resources for the tests
-test/test/device:	longtest/longest_family_name/longest_member_name 
+test/test/device:	longtest/longest_family_name/longest_member_name
 
 longtest/longest_family_name/longest_member_name/longresourcename1:	"resource 1"
 longtest/longest_family_name/longest_member_name/longresourcename2:	2
@@ -295,12 +306,14 @@ AT_CHECK([RES_BASE_DIR=`pwd` taco db_update test.res])
 AT_CLEANUP
 
 AT_SETUP([check value from resources with extra long names])
-AT_CHECK(AT_TACO_RUN_LOCAL([db_getresoval longtest/longest_family_name/longest_member_name/longest_possible_resource_name1]), [], 
+AT_SKIP_IF([test x$1 != xyes])
+AT_CHECK(AT_TACO_RUN_LOCAL([db_getresoval longtest/longest_family_name/longest_member_name/longest_possible_resource_name1]), [],
 	[[longtest/longest_family_name/longest_member_name/longest_possible_resource_name1: a
 ]])
-AT_CLEANUP 
+AT_CLEANUP
 
 AT_SETUP([db_servinfo with extremly long server names])
+AT_SKIP_IF([test x$1 != xyes])
 AT_DATA([test.res], [[
 # This file contains only resources for the tests
 longest_testserver/srv0/device:         test/device/10,test/device/20
@@ -311,4 +324,4 @@ AT_TACO_RUN_TEST([db_servinfo longest_testserver/srv0])
 The device test/device/20 is defined for this server but is not exported
 ]])
 AT_CLEANUP
-
+])

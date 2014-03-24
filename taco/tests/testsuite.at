@@ -18,8 +18,6 @@ dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 dnl 02111-1307, USA.
 
-dnl We need a recent Autotest.
-m4_version_prereq([2.57])
 
 m4_define([AT_TACO_RUN_LOCAL],
 [. taco local $@
@@ -30,68 +28,57 @@ m4_define([AT_TACO_RUN_TEST],
 [taco $@
 ])
 
-AT_INIT
-AT_TESTED(taco)
+m4_include([gdbm.at])
+m4_include([dbase.at])
+m4_include([devices.at])
+m4_include([specialtest1.at])
+m4_include([starter.at])
+m4_include([message.at])
+m4_include([ext.at])
+
+m4_define(AT_TACO_SUITE, [
+AT_BANNER([Testing TACO system ($1) database backend])
+AT_SETUP([Starting TACO])
+AS_VAR_SET([tmp], m4_tolower([$1]))
+AS_IF([test x${tmp} = xgdbm], AS_VAR_SET([taco_database], [dbm], ${tmp}))
+AT_SKIP_IF([test x$2 != xyes])
+AT_CHECK([unset RES_BASE_DIR; TACO_DATABASE=$taco_database taco start ; sleep 5])
+AT_CLEANUP
+
+AT_BANNER([[Testing the database server.]])
+AT_TACO_DBASE_SUITE($2)
+
+AT_BANNER([[Testing the devices.]])
+AT_TACO_DEVICE_SUITE($2)
+AT_TACO_SPECIALDEVICE_SUITE($2)
+
+AT_BANNER([[Testing the starter server]])
+AT_TACO_STARTER_SUITE($2)
+
+AT_BANNER([[Testing message server]])
+AT_TACO_MESSAGESERVER_SUITE($2)
+
+AT_BANNER([[Testing extensions]])
+AT_TACO_EXTENSION_SUITE($2)
+
+AT_SETUP([Stopping TACO])
+AT_SKIP_IF([test x$2 != xyes])
+AT_CHECK([taco stop; sleep 5])
+AT_CLEANUP
+])
 
 AT_BANNER([[Installing TACO system.]])
-
 AT_SETUP([TACO installation])
 AT_CHECK([taco install])
 AT_CLEANUP
 
-AT_BANNER([Testing TACO system (GDBM database backend)])
+AT_TACO_SUITE([GDBM], [${check_gdbm}])
+AT_TACO_CHECK_GDBM([${check_gdbm}])
 
-AT_SETUP([Starting TACO])
-AT_CHECK([unset RES_BASE_DIR; TACO_DATABASE=dbm taco start ; sleep 1])
-AT_CLEANUP
-
-AT_BANNER([[Testing the database server.]])
-m4_include([gdbm.at])
-m4_include([dbase.at])
-
-AT_BANNER([[Testing the devices.]])
-m4_include([devices.at])
-m4_include([specialtest1.at])
-
-AT_BANNER([[Testing the starter server]])
-m4_include([starter.at])
-
-AT_BANNER([[Testing message server]])
-m4_include([message.at])
-
-AT_BANNER([[Testing extensions]])
-m4_include([ext.at])
-
-AT_SETUP([Stopping TACO])
-AT_CHECK([taco stop;sleep 5])
-AT_CLEANUP
-
-AT_BANNER([Testing TACO system (SQLite3 database backend)])
-
-AT_SETUP([Starting TACO])
-AT_CHECK([unset RES_BASE_DIR; TACO_DATABASE=sqlite3 taco start ; sleep 15])
-AT_CLEANUP
-
-AT_BANNER([[Testing the database server.]])
-m4_include([dbase.at])
-
-AT_BANNER([[Testing the devices.]])
-m4_include([devices.at])
-m4_include([specialtest1.at])
-
-AT_BANNER([[Testing the starter server]])
-m4_include([starter.at])
-
-AT_BANNER([[Testing message server]])
-m4_include([message.at])
-
-AT_BANNER([[Testing extensions]])
-m4_include([ext.at])
-
-AT_SETUP([Stopping TACO])
-AT_CHECK([taco stop; sleep 5])
-AT_CLEANUP
+AT_TACO_SUITE([SQLite3], [${check_sqlite3}])
 
 AT_BANNER([[Uninstalling TACO system.]])
-m4_include([cleanup.at])
+AT_SETUP([TACO deinstallation])
+AT_CHECK([taco uninstall])
+AT_CLEANUP
 

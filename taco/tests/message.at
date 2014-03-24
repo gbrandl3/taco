@@ -18,14 +18,18 @@ dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 dnl 02111-1307, USA.
 
+m4_define(AT_TACO_MESSAGESERVER_SUITE, [
 AT_SETUP([Test the dev_printerror without message server])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK([AT_TACO_RUN_LOCAL([test_server 1 -d])
 sleep 1
 AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [])
 AT_CLEANUP
+
 AT_SETUP([Test the dev_printerror with message server])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK([AT_TACO_RUN_LOCAL([test_server 1 -m -d])
 sleep 1
 AT_TACO_RUN_LOCAL([off test_server >>log 2>&1])], [], [])
 AT_CLEANUP
-
+])

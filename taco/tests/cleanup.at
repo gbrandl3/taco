@@ -1,3 +1,0 @@
-AT_SETUP([TACO deinstallation])
-AT_CHECK([taco uninstall])
-AT_CLEANUP

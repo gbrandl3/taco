@@ -18,13 +18,16 @@ dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 dnl 02111-1307, USA.
 
-AT_SETUP([Test db_devdel command])
+m4_define(AT_TACO_SPECIALDEVICE_SUITE, [
+AT_SETUP([Test db_devdel command for long device names])
+AT_SKIP_IF([test x$1 != xyes])
 AT_CHECK([taco db_devdel -r test/a/1
 taco db_devdel -r test/longfamily/long
 taco db_devdel -r longtest/longest_family_name/longest_member_name])
 AT_CLEANUP
 
 AT_SETUP([Test the connection to the testserver devices])
+AT_SKIP_IF([test x$1 != xyes])
 AT_DATA([test_server.res], [[
 # This file contains only resources for the tests
 test_server/1/device:   test/a/1 \
@@ -35,6 +38,9 @@ test/a/1/type: TestDevice
 test/family/long_member/type: TestDevice2
 test/family/long_member/longresource: 25
 longtest/longest_family_name/longest_member_name/type: TestDevice2
+longtest/longest_family_name/longest_member_name/longresourcename1: "resource 1"
+longtest/longest_family_name/longest_member_name/longresourcename2: 2
+longtest/longest_family_name/longest_member_name/longresourcename3: 3.1
 longtest/longest_family_name/longest_member_name/longest_possible_resource_name1: 31
 ]])
 AT_CHECK([
@@ -138,4 +144,4 @@ CMD[[5]] = DevStatus
 Ping : longtest/longest_family_name/longest_member_name - 0
 ])
 AT_CLEANUP
-
+])

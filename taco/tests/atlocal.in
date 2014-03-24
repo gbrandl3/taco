@@ -1,6 +1,12 @@
 #! /bin/sh -v
-@PYTHON_BINDING_TRUE@ python=yes
-@PYTHON_BINDING_FALSE@ python=no
-@BUILD_EXT_TRUE@ extensions=yes
-@BUILD_EXT_FALSE@ extensions=no
+@PYTHON_BINDING_TRUE@ check_python=yes
+@PYTHON_BINDING_FALSE@ check_python=no
+@BUILD_EXT_TRUE@ check_extensions=yes
+@BUILD_EXT_FALSE@ check_extensions=no
+@GDBMSUPPORT_TRUE@ check_gdbm=yes
+@GDBMSUPPORT_FALSE@ check_gdbm=no
+@SQLITE3SUPPORT_TRUE@ check_sqlite3=yes
+@SQLITE3SUPPORT_FALSE@ check_sqlite3=no
+@MYSQLSUPPORT_TRUE@ check_mysql=yes
+@MYSQLSUPPORT_FALSE@ check_mysql=no
 unset RES_BASE_DIR DSHOME || true

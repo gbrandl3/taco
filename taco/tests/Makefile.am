@@ -46,7 +46,7 @@ EXTRA_DIST 		+= testsuite.at $(TESTSUITE_AT) testsuite
 
 TESTSUITE 		= testsuite
 
-TESTSUITE_AT		= dbase.at devices.at starter.at message.at specialtest1.at local.at ext.at cleanup.at gdbm.at
+TESTSUITE_AT		= dbase.at devices.at starter.at message.at specialtest1.at local.at ext.at gdbm.at
 
 AUTOTEST 		= $(AUTOM4TE) --language=autotest
 
@@ -142,7 +142,7 @@ db_reconnect_SOURCES	= db_reconnect.cpp
 db_reconnect_CPPFLAGS	= @TACO_INCLUDES@ -I$(top_srcdir)/ext/include
 db_reconnect_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/src/libTACOExtensions.la
 
-package.m4:	$(top_srcdir)/configure.ac
+package.m4:	$(top_srcdir)/configure.ac $(srcdir)/Makefile.am
 	{\
 		echo '# Signature of the current package.'; \
 		echo 'm4_define([AT_PACKAGE_NAME], 	[@PACKAGE_NAME@])'; \
@@ -150,6 +150,7 @@ package.m4:	$(top_srcdir)/configure.ac
 		echo 'm4_define([AT_PACKAGE_VERSION],	[@PACKAGE_VERSION@])'; \
 		echo 'm4_define([AT_PACKAGE_STRING],	[@PACKAGE_STRING@])'; \
 		echo 'm4_define([AT_PACKAGE_BUGREPORT],	[@PACKAGE_BUGREPORT@])'; \
+		echo 'm4_define([AT_PACKAGE_URL],	[@PACKAGE_URL@])'; \
 	} > package.m4
 
 check-local:	atconfig atlocal $(TESTSUITE) taco

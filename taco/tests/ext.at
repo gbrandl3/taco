@@ -18,16 +18,16 @@ dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 dnl 02111-1307, USA.
 
+m4_define(AT_TACO_EXTENSION_SUITE, [
 AT_SETUP([Test extended server])
+AT_SKIP_IF([test x$1 != xyes])
+AT_SKIP_IF([test x"$check_extensions" != xyes])
 AT_DATA([test.res], [[
 # This file contains only resources for the tests
 TestExtServer/ext/device:    test/ext/dev0
 test/ext/dev0/type:     "TestExtServer"
 ]])
 AT_CHECK([
-if test x"$extensions" != xyes ; then
-	exit 77
-fi
 RES_BASE_DIR=`pwd` taco db_update test.res
 AT_TACO_RUN_LOCAL([TestExtServer ext -d])
 sleep 4
@@ -51,15 +51,14 @@ Query events
 AT_CLEANUP
 
 AT_SETUP([Test TACO exceptions])
+AT_SKIP_IF([test x$1 != xyes])
+AT_SKIP_IF([test x"$check_extensions" != xyes])
 AT_DATA([testextclient], [[1
 2
 3
 0
 ]])
 AT_CHECK([
-if test x"$extensions" != xyes ; then
-	exit 77
-fi
 AT_TACO_RUN_LOCAL([ExtServerClient test/ext/dev0  < testextclient])], [0], 
 [[
 test_menu for test/ext/dev0 ()
@@ -101,13 +100,12 @@ Select one commands (0 to quit) : ?0
 AT_CLEANUP
 
 AT_SETUP([Stopping extended server])
+AT_SKIP_IF([test x$1 != xyes])
+AT_SKIP_IF([test x"$check_extensions" != xyes])
 AT_CHECK([
-if test x"$extensions" != xyes ; then
-	exit 77
-fi
 AT_TACO_RUN_TEST([off TestExtServer | grep -v Killing])], [0],
 [[There are 1 TestExtServer processes:
 
 ]])
 AT_CLEANUP
-
+])
