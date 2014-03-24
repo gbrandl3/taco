@@ -69,7 +69,7 @@ void version(const char *cmd)
 int main(int argc,char *argv[])
 {
 	DevLong		error;
-	long 		del_res = True;
+	long 		del_res = False;
 	extern int 	optopt;
 	extern int	optind;
 	extern char 	*optarg;
@@ -82,7 +82,7 @@ int main(int argc,char *argv[])
 		switch (c)
 		{
 		case 'r':
-			del_res = False;
+			del_res = True;
 			break;
 		case 'n':
 			taco_setenv("NETHOST", optarg, 1);
