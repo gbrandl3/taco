@@ -702,7 +702,7 @@ static void db_setupprog_1(struct svc_req *rqstp, SVCXPRT *transp)
 			break;
 		case DB_DEVDEL:
 			xdr_argument = (xdrproc_t)xdr_nam;
-			xdr_result = (xdrproc_t)xdr_long;
+			xdr_result = (xdrproc_t)xdr_DevLong;
 			local = (DbRpcLocalFunc) devdel_1_svc;
 			break;
 		case DB_DEVDELALLRES:
@@ -717,7 +717,7 @@ static void db_setupprog_1(struct svc_req *rqstp, SVCXPRT *transp)
 			break;
 		case DB_SVCUNREG :
 			xdr_argument = (xdrproc_t)xdr_db_res;
-			xdr_result = (xdrproc_t)xdr_long;
+			xdr_result = (xdrproc_t)xdr_DevLong;
 			local = (DbRpcLocalFunc) unreg_1_svc;
 			break;
 		case DB_SVCINFO :
@@ -727,7 +727,7 @@ static void db_setupprog_1(struct svc_req *rqstp, SVCXPRT *transp)
 			break;
 		case DB_SVCDELETE :
 			xdr_argument = (xdrproc_t)xdr_db_res;
-			xdr_result = (xdrproc_t)xdr_long;
+			xdr_result = (xdrproc_t)xdr_DevLong;
 			local = (DbRpcLocalFunc) svcdelete_1_svc;
 			break;
 		case DB_UPDDEV :
