@@ -1,0 +1,51 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+
+# Disable format-security errors (due to some taco warnings)
+# Code should be fixed instead of this workaround.
+export DEB_CFLAGS_MAINT_APPEND= -Wno-error=format-security
+export DEB_CXXFLAGS_MAINT_APPEND= -Wno-error=format-security
+export DEB_CPPFLAGS_MAINT_APPEND= -Wno-error=format-security
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# Enable verbose make output if verbose mode is enabled
+export V=$(DH_VERBOSE)
+
+
+
+override_dh_auto_configure:
+	dh_auto_configure -- --prefix=/opt/taco --enable-sqlite3 --enable-gdbm --enable-mysql --enable-python --enable-ext DESTDIR=/opt/taco
+
+override_dh_auto_test:
+	echo "TACO tests temporary disabled!"
+
+
+# Move debug symbols into an independent package.
+override_dh_strip:
+	dh_strip --dbg-package=taco-dbg
+
+# Register the init script that's shipped within the upstream package.
+override_dh_installinit:
+	dh_installinit --onlyscripts --name=taco.debian --no-start
+
+override_dh_install:
+	# remove byte compiled python files
+	find . -name '*.py?' -exec rm {} \;
+	
+	# add ld search path
+	mkdir -p etc/ld.so.conf.d
+	echo "/opt/taco/${DEB_HOST_MULTIARCH}" > etc/ld.so.conf.d/taco.conf
+	
+	# List files that ar installed by the upstream build system
+	# but not part of the debian package.
+	dh_install --list-missing
+
+%:
+	dh $@  --with autotools-dev

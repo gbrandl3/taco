@@ -1,0 +1,44 @@
+##
+## Taco base package
+##
+Source: taco
+Priority: optional
+# Noted the package creator as maintainer
+Maintainer: Alexander Lenz <alexander.lenz@frm2.tum.de>
+# And the actual developers as uploaders (additional maintainers)
+Uploaders: Jens Krüger <jens.krueger@frm2.tum.de>
+Build-Depends: debhelper (>= 9.0.0), autotools-dev,
+ swig,
+ pkg-config,
+ libsqlite3-dev,
+ mysql-dev,
+ python-dev,
+ python-numpy,
+ frm2-libtool, 
+ liblog4cpp5-dev,
+ libgdbm-dev,
+ texinfo
+Standards-Version: 3.9.3
+Section: libs
+Homepage: http://trac.frm2.tum.de/redmine/projects/taco
+
+Package: taco-dev
+Section: libdevel
+Architecture: any
+Depends: taco (= ${binary:Version}), liblog4cpp5-dev, frm2-libtool
+Description: Development files for the taco package.
+
+Package: taco
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: TACO is an object oriented control system.
+ TACO is an object oriented control system originally developed at the European
+ Synchrotron Radiation Facility (ESRF) to control accelerators and beamlines and
+ data acquisition systems.
+
+Package: taco-dbg
+Section: debug
+Architecture: any
+Depends: taco (= ${binary:Version})
+Description: Debug symbols for the taco package.

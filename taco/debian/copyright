@@ -1,0 +1,15 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Name: taco-base
+Source: http://sourceforge.net/p/taco/taco/HEAD/tree/
+
+Files: *
+Copyright: 1990-2014 ESRF
+License: LGPL-2+
+
+Files: debian/*
+Copyright: 2014 Alexander Lenz <alexander.lenz@frm2.tum.de>
+License: GPL-2+
+
+License: GPL-2+
+ See: /usr/share/common-licenses/GPL-2
+

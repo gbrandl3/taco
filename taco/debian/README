@@ -1,0 +1,7 @@
+The Debian Package taco
+----------------------------
+
+Taco control system using sqlite3 and providing the python bindings.
+
+ -- Alexander Lenz <alexander.lenz@frm2.tum.de>  Fri, 14 Mar 2014 15:20:58 +0100
+

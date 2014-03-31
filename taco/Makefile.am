@@ -57,7 +57,11 @@ uninstall-hook:
 		$(RM) $(DESTDIR)/$(includedir)/private/config.h ; \
 	fi
 
-EXTRA_DIST=autogen.sh taco.spec.in README-RPM
+EXTRA_DIST	= autogen.sh taco.spec.in README-RPM
+
+EXTRA_DIST	+= debian/changelog debian/compat debian/control debian/copyright \
+		   debian/docs debian/README debian/rules debian/taco-dev.install \
+		   debian/taco.dirs debian/taco.install debian/source/format
 
 include $(top_srcdir)/rpm_rules.mh
 
