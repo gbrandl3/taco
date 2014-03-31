@@ -73,7 +73,7 @@ AT_CHECK([taco install])
 AT_CLEANUP
 
 AT_TACO_SUITE([GDBM], [${check_gdbm}])
-AT_TACO_CHECK_GDBM([${check_gdbm}])
+dnl AT_TACO_CHECK_GDBM([${check_gdbm}])
 
 AT_TACO_SUITE([SQLite3], [${check_sqlite3}])
 

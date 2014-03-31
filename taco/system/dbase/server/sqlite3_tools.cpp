@@ -730,7 +730,7 @@ DevLong *SQLite3Server::unreg_1_svc(db_res *recev)
 //
 // If the ds_name was not a process name, init the class list with the user ds name
 //
-	// do no destroy useful information about device server
+	// do not destroy useful information about device server
 //	query = "UPDATE device SET EXPORTED = 0 , IOR = 'rpc:not_exp:0',";
 //	query += " VERSION = 0, PID = 0, CLASS = 'unknown' WHERE CLASS IN (";
 	query = "UPDATE device SET EXPORTED = 0 WHERE CLASS IN (";

@@ -535,6 +535,13 @@ void NdbmNamesCont::unreg()
 		throw NdbmError(DbErr_BadContSyntax,MessContSyntax);
 	start++;
 	str.replace(start, str.size() - start, "not_exp|0|0|unknown|unknown|0|unknown|");	
+	if (dat.dsize != 0)
+		delete [] dat.dptr;
+	int l = str.length();
+	dat.dptr = new char[l + 1];
+	strncpy(dat.dptr,str.c_str(), l);
+	dat.dptr[l] = 0; /* NULL terminate string - andy 23nov2005 */
+	dat.dsize = l;
 }
 
 /**@class NdbmPSNamesKey

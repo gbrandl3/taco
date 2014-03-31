@@ -1094,11 +1094,9 @@ DevLong *NdbmServer::unreg_1_svc(db_res *recev)
 //		
 		if (found == False)
 			ds_name_list.push_back(user_ds_name);
-
 //
 // Unregister every devices for each ds name in the list
 //
-			
 		for (i = 0;i < ds_name_list.size();i++)
 		{
 			indi = 1;
@@ -1113,7 +1111,7 @@ DevLong *NdbmServer::unreg_1_svc(db_res *recev)
 					NdbmNamesCont co(dbgen.tid[0],k.get_key());
 					found = True;
 					co.unreg();
-//					co.build_datum();
+					// co.build_datum();
 		
 					gdbm_store(dbgen.tid[0],k.get_key(),co.get_datum(),GDBM_REPLACE);
 					indi++;
