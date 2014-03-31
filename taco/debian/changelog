@@ -1,4 +1,23 @@
-taco (3.99.158) unstable; urgency=low
+taco (3.99.166) unstable; urgency=low
+
+  [ Jens Krüger ]
+  * Make the Python bindings Python3 compatible.
+
+  [ Alexander Lenz ]
+  * FIX: add missing '$' to indicate a shell variable
+
+  [ Jens Krüger ]
+  * FIX: db_devdel wrong implementation of the '-r' option
+  * FIX: wrong return type conversion in database server
+  * Make the checks depending on configuration
+  * [LOG4TACO] add the CRIT_STREAM macro for the critical errors
+  * [PACKAGE] add debian related files to create debian packages
+  * [DBM_SERVER] Fix unregistering of the device in dbm part.
+  * [PACKAGE] Update the Debian changelog
+
+ -- Jens Krüger <jens.krueger@frm2.tum.de>  Mon, 31 Mar 2014 16:26:42 +0200
+
+taco (3.99.157) unstable; urgency=low
 
   * Initial release
 
