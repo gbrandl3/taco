@@ -27,6 +27,13 @@ dnl
         AC_REQUIRE([AC_DISABLE_STATIC])
         AC_REQUIRE([AC_ENABLE_FAST_INSTALL])
         AC_REQUIRE([AM_PROG_LIBTOOL])dnl
+	LT_INIT
+	dnl Debian resets this to no, but this break both Spot and the libtool
+	dnl test suite itself.  Instead of requiring developer to install a
+	dnl non-patched version of Libtool on any Debian they use, we just
+	dnl cancel the effect of Debian's patch here.
+	link_all_deplibs=yes
+	link_all_deplibs_CXX=yes
 dnl
 dnl     essential for automatic make in development
 dnl

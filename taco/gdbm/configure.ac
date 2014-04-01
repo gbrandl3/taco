@@ -11,6 +11,13 @@ AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_INSTALL
 AM_PROG_LIBTOOL
+LT_INIT
+dnl Debian resets this to no, but this break both Spot and the libtool
+dnl test suite itself.  Instead of requiring developer to install a
+dnl non-patched version of Libtool on any Debian they use, we just
+dnl cancel the effect of Debian's patch here.
+link_all_deplibs=yes
+link_all_deplibs_CXX=yes
 AC_CHECK_PROGS([MAKEINDEX], [makeindex], [:])
 AC_CHECK_PROGS([MAKEINFO], [makeinfo], [:])
 AC_CHECK_PROGS([TEXI2DVI], [texi2dvi], [:])
