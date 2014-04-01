@@ -179,7 +179,9 @@ RES_BASE_DIR=`pwd` taco db_update test_server.res
 AT_TACO_RUN_LOCAL([test_server 1 -m -d])
 sleep 5
 AT_TACO_RUN_LOCAL([test_connect test/a/1])
-AT_TACO_RUN_TEST([off test_server >>log 2>&1])], [], [Set protocol to TCP
+AT_TACO_RUN_TEST([off test_server >>log 2>&1])
+sleep 1
+], [], [Set protocol to TCP
 Query commands
     4228120577       0       9                        "SendByteArray"
              1       0       0                        "DevOn"
