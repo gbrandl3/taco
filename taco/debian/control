@@ -8,15 +8,17 @@ Maintainer: Alexander Lenz <alexander.lenz@frm2.tum.de>
 # And the actual developers as uploaders (additional maintainers)
 Uploaders: Jens Krüger <jens.krueger@frm2.tum.de>
 Build-Depends: debhelper (>= 9.0.0), autotools-dev,
+ autoconf,
+ automake,
+ libtool,
  swig,
  pkg-config,
+ libgdbm-dev,
  libsqlite3-dev,
  libmysqlclient-dev,
  python-dev,
  python-numpy,
- frm2-libtool, 
  liblog4cpp5-dev,
- libgdbm-dev,
  texinfo
 Standards-Version: 3.9.3
 Section: libs
