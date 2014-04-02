@@ -23,7 +23,7 @@ noinst_HEADERS 	= StarterDevice.h StarterCmds.h
 
 include_HEADERS	= StarterCommon.h
 
-AM_CXXFLAGS 	= @TACO_INCLUDES@ @LOG4CPP_CFLAGS@ -I$(top_srcdir)/ext/include
+AM_CXXFLAGS 	= @TACO_INCLUDES@ @LOG4CPP_CFLAGS@ -I$(top_srcdir)/ext/include -I$(top_srcdir)/lib/log4taco
 AM_CFLAGS	= @TACO_INCLUDES@
 
 StartServer_SOURCES 	= StarterDevice.cpp startup.cpp device_server.c

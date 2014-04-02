@@ -24,7 +24,7 @@ lib_LTLIBRARIES 	= libTACOMotor.la
 
 libTACOMotor_la_SOURCES = TACOMotor.cpp TACOMotorWorker.cpp
 
-libTACOMotor_la_LIBADD  = $(top_builddir)/ext/src/libTACOExtensions.la @TACO_SERVER_CXX_LIBS@ ## @LOG4CPP_LIBS@ ## -lstdc++
+libTACOMotor_la_LIBADD  = $(top_builddir)/ext/src/libTACOExtensions.la @TACO_SERVER_CXX_LIBS@
 
 bin_PROGRAMS            = TACOMotor 
 

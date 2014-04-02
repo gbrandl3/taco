@@ -21,5 +21,6 @@ extern log4cpp::Category *logStream;
 #define ERROR_STREAM    logStream->errorStream()
 #define FATAL_STREAM    logStream->fatalStream()
 #define CRIT_STREAM     logStream->critStream()
+#define EMERG_STREAM	logStream->emergStream()
 
 #endif

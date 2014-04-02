@@ -63,9 +63,7 @@
 
 #include <log4cpp/BasicConfigurator.hh>
 #include <log4cpp/PropertyConfigurator.hh>
-#include <log4cpp/Category.hh>
-
-log4cpp::Category       *logStream;
+#include <log4taco.h>
 
 static std::string	devServer;
 
@@ -117,7 +115,7 @@ static void SignalHandler (int signal)
 			}
 			break;
 		default:
-			logStream->warnStream() << "Got unexpected signal: " << signal << log4cpp::eol;
+			WARN_STREAM << "Got unexpected signal: " << signal << ENDLOG;
 			break;
 	}
 	return;
@@ -132,7 +130,7 @@ static void CleanServer(void)
 	DevLong lError;
 
 	if (db_svc_unreg(const_cast<char *>(devServer.c_str()), &lError) == DS_OK)
-	        logStream->noticeStream() << "cleanup: success" << log4cpp::eol;
+	        NOTICE_STREAM << "cleanup: success" << ENDLOG;
 	return;
 }
 
@@ -165,7 +163,7 @@ long startup(char *pszServerName, DevLong *plError)
                 log4cpp::BasicConfigurator::configure();
         }
         logStream = &log4cpp::Category::getInstance("taco.system.StartServer");
-        logStream->noticeStream() << "using " << logpath << " configuration file" << log4cpp::eol;
+        NOTICE_STREAM << "using " << logpath << " configuration file" << ENDLOG;
 
 	struct sigaction sighand;
 	sighand.sa_handler = SignalHandler;
@@ -177,7 +175,7 @@ long startup(char *pszServerName, DevLong *plError)
 		|| sigaction (SIGALRM, &sighand, NULL) != 0
 		|| sigaction (SIGCHLD, &sighand, NULL) != 0)
 	{
-		logStream->emergStream() <<" could not install signal handler" << log4cpp::eol;
+		EMERG_STREAM <<" could not install signal handler" << ENDLOG;
 		return DS_NOTOK;
 	}
 	return ServerSetup(pszServerName, plError);
@@ -212,17 +210,17 @@ long ServerSetup(char *pszServerName, DevLong *plError)
 	StarterDevice	*dev = new StarterDevice(devName, lError);
 	if ((dev == NULL))
 	{
-		logStream->emergStream() << "Error when trying to create " << devName << " device" << log4cpp::eol;
+		EMERG_STREAM << "Error when trying to create " << devName << " device" << ENDLOG;
 		*plError = lError;
 		return DS_NOTOK; 
 	}
-      	if (dev_export(const_cast<char *>(dev->GetDevName()), dev, &lError) != DS_OK)
+	if (dev_export(const_cast<char *>(dev->GetDevName()), dev, &lError) != DS_OK)
 	{
-		logStream->emergStream() << "Starter Device  = " << dev->GetDevName() << " not exported." << log4cpp::eol;
+		EMERG_STREAM << "Starter Device  = " << dev->GetDevName() << " not exported." << ENDLOG;
 		*plError = lError;
 		return DS_NOTOK;
 	}
-    	logStream->debugStream() << "Device server <" << pszServerName << "> started (pid = " << getpid() << ")." << log4cpp::eol;
-        logStream->noticeStream() << "startup: success" << log4cpp::eol;
+	DEBUG_STREAM << "Device server <" << pszServerName << "> started (pid = " << getpid() << ")." << ENDLOG;
+	NOTICE_STREAM << "startup: success" << ENDLOG;
     	return DS_OK;
 }

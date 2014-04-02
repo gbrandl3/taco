@@ -39,8 +39,6 @@
 #include <private/ApiP.h>
 #include <DevSec.h>
 
-log4cpp::Category *logStream;
-
 void TACO::synchronize( double timeout) throw (::TACO::Exception)
 {
 	struct timeval t;

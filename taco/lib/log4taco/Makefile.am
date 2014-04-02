@@ -24,13 +24,12 @@ AM_CPPFLAGS 		= @TACO_INCLUDES@ @LOG4CPP_CFLAGS@
 include_HEADERS 	= MsgServerAppender.h \
 			  log4taco.h
 
-liblog4taco_la_SOURCES 	= MsgServerAppender.cpp 
+liblog4taco_la_SOURCES 	= MsgServerAppender.cpp log4taco.cpp
 
 liblog4taco_la_LDFLAGS 	= -version-info @LIB_VERSION@
-liblog4taco_la_LIBADD 	= @TACO_CLIENT_CXX_LIBS@ @LOG4CPP_LIBS@
+liblog4taco_la_LIBADD 	= @LOG4CPP_LIBS@ @TACO_CLIENT_CXX_LIBS@
 
 noinst_PROGRAMS		= MsgServerTest
 
 MsgServerTest_SOURCES 	= MsgServerTest.cpp
-MsgServerTest_LDADD   	= ${builddir}/liblog4taco.la
-## MsgServerTest_LDADD   	= @TACO_CLIENT_CXX_LIBS@ @LOG4CPP_LIBS@
+MsgServerTest_LDADD   	= $(builddir)/liblog4taco.la
