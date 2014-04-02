@@ -1,5 +1,7 @@
 #!/bin/sh
 
+[ -d autom4te.cache ] && rm -rf autom4te.cache
+
 for libtoolize in glibtoolize libtoolize libtoolize15 libtoolize13 ; do
         LIBTOOLIZE=`which $libtoolize 2>/dev/null | grep -v 'no'`
         if test "$LIBTOOLIZE" ; then

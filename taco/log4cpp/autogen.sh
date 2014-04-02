@@ -1,4 +1,6 @@
 #! /bin/sh
+[ -d autom4te.cache ] && rm -rf autom4te.cache
+
 for libtoolize in glibtoolize libtoolize libtoolize15 libtoolize13 ; do
         LIBTOOLIZE=`which $libtoolize 2>/dev/null | grep -v 'no'`
         if test "$LIBTOOLIZE" ; then
@@ -24,7 +26,7 @@ for automake in automake automake19 automake18 automake17 ; do
 done
 
 LIBTOOLIZE="$libtoolize --force --copy --automake"
-ACLOCAL="aclocal${am_postfix} -I $aclocal_includes"
+ACLOCAL="aclocal${am_postfix} -I m4 -I $aclocal_includes"
 AUTOHEADER="autoheader${ac_postfix}"
 AUTOMAKE="$automake -a -c --foreign"
 AUTOCONF="$autoconf"
