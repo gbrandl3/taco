@@ -1,3 +1,11 @@
+taco (3.99.175) unstable; urgency=low
+
+  * Make the Python bindings Python3 compatible.
+  * FIX: get list of exported devices for the dbm backend
+  * [Debian] update changelog
+
+ -- Jens Krüger <jens.krueger@frm2.tum.de>  Thu, 03 Apr 2014 08:55:45 +0200
+
 taco (3.99.173) unstable; urgency=low
 
   * FIX: get list of exported devices for the dbm backend
