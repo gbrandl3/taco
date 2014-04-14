@@ -64,7 +64,9 @@ __revision__ = "$Revision: 1.6 $"
 
 import sys, re, string, getopt, os
 
-p_define = re.compile('(^[\t ]*#[\t ]*define[\t ]+)([a-zA-Z0-9_]+[\t \n]+)')
+# p_define = re.compile('(^[\t ]*#[\t ]*define[\t ]+)([a-zA-Z0-9_]+[\t \n]+)')
+p_define = re.compile('(^[\t ]*#[\t ]*define[\t ]+)'
+                      '([a-zA-Z0-9_]+)[\t ]+([0-9]+[lL]?)')
 
 p_macro = re.compile('^[\t ]*#[\t ]*define[\t ]+'
   '([a-zA-Z0-9_]+)\(([_a-zA-Z][_a-zA-Z0-9]*)\)[\t ]+')
@@ -149,8 +151,7 @@ def main():
 
 if sys.version_info < (3, 0):
     def exec_(_code_, _globs_=None):
-        pass
-        #exec stmt in env
+        exec _code_ in _globs_
 else:
     import builtins
     exec_ = getattr(builtins, "exec")
@@ -176,7 +177,7 @@ def process(fp, outfp, env = {}):
                 lineno += 1
                 line += nextline
             name = n.group(2)
-            body = line[n.end(0):]
+            body = n.group(3) # line[n.end(0):]
             # replace ignored patterns by spaces
             for p in ignores:
                 body = re.sub(p, ' ', body)
