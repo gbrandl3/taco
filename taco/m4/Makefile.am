@@ -17,7 +17,8 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-aclocal_macros	= extra.m4 findfile.m4 python.m4 swig.m4 qt.m4 taco.m4 rpm.m4 tacoext.m4
+aclocal_macros	= extra.m4 findfile.m4 python.m4 swig.m4 qt.m4 taco.m4 rpm.m4 tacoext.m4 \
+		  taco_rpc_threads.m4
 
 aclocal_DATA 	= $(aclocal_macros)
 
