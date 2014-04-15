@@ -324,28 +324,28 @@ int main (int argc, char **argv)
 	if (argc < 2)
 	{
 		fprintf( stderr, "Usage: %s personal_name [OPTIONS]\n\n",
-			argv[0] );
+			argv[0]);
 		
-		fprintf( stderr, "   -device device1 [device2 ... ] : "
-			"only export these devices\n" );
+		fprintf( stderr, "   -D, --device device1 [device2 ... ] : "
+			"only export these devices\n");
 		
-		fprintf( stderr, "   -m                             : "
-			"enable logging via message server\n" );
+		fprintf( stderr, "   -m                                  : "
+			"enable logging via message server\n");
 		
-		fprintf( stderr, "   -nodb                          : "
-			"do not use database server for resource handling\n" );
+		fprintf( stderr, "   -N, --nodb                          : "
+			"do not use database server for resource handling\n");
 		
-		fprintf( stderr, "   -pn program #                  : "
-			"use this rpc program number\n" );
+		fprintf( stderr, "   -P, --pn program #                  : "
+			"use this rpc program number\n");
 		
-		fprintf( stderr, "   -s                             : "
-			"use startup function from server\n" );
-		fprintf( stderr, "   -n nethost                     : "
+		fprintf( stderr, "   -s                                  : "
+			"use startup function from server\n");
+		fprintf( stderr, "   -n nethost                          : "
 			"use nethost instead of NETHOST environment\n" );
 #ifdef unix
-		fprintf( stderr, "   -d                             : "
+		fprintf( stderr, "   -d                                  : "
 			"start as daemon\n");
-		fprintf( stderr, "   -p pid_file                    : "
+		fprintf( stderr, "   -p pid_file                         : "
 			"write a pid file\n");
 #endif
 		exit (1);
@@ -385,12 +385,12 @@ int main (int argc, char **argv)
 	{
 		for (i=2; i<(argc); i++)
 		{
-			if (strcmp (argv[i],"-m") == 0)
+			if (strcmp (argv[i], "-m") == 0)
 				m_opt = True;
-			else if (strcmp (argv[i],"-s") == 0)
+			else if (strcmp (argv[i], "-s") == 0)
 				s_opt = True;
 #ifdef unix
-			else if (strcmp (argv[i],"-d") == 0)
+			else if (strcmp (argv[i], "-d") == 0)
 				daemon_opt = True;
 #endif
 			else if (strcmp (argv[i], "-n") == 0 && (i + 1) < argc)
@@ -402,12 +402,12 @@ int main (int argc, char **argv)
 /*
  * option -nodb means run device server without database
  */
-			else if (strcmp (argv[i],"-nodb") == 0)
+			else if (strcmp (argv[i], "--nodb") == 0 || strcmp(argv[i], "-N") == 0 || strcmp(argv[i], "-nodb") == 0)
 				nodb_opt = True;
 /*
  * option -pn specifies program number (to be used in conjunction with -nodb)
  */
-			else if (strcmp (argv[i],"-pn") == 0)
+			else if (strcmp (argv[i], "--pn") == 0 || strcmp(argv[i], "-P") == 0 || strcmp(argv[i], "-pn") == 0)
 			{
 				sscanf(argv[i+1],"%d",&prog_number);
 				i++;
@@ -415,7 +415,7 @@ int main (int argc, char **argv)
 /*
  * option -device means remaining command line arguments are device names
  */
-			else if (strcmp (argv[i],"-device") == 0)
+			else if (strcmp (argv[i], "--device") == 0 || strcmp(argv[i], "-D") == 0 || strcmp(argv[i], "-device") == 0)
 			{
 				device_no = argc-i-1;
 				device_list = (char**)malloc(device_no*sizeof(char));
