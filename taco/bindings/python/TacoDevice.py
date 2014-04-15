@@ -42,11 +42,11 @@ __date__ = "$Date: 2008-04-06 09:06:26 $"
 __author__ = "$Author: jkrueger1 $"
 
 import Taco 
-import sys
 import string
 
 Dev_deb = [0]
-Dev_Exception = "TacoException"
+
+Dev_Exception = Taco.error
 
 #--------------------------------------------------------------
 # Tab_dev: 
@@ -157,15 +157,12 @@ def dev_init(mdevname):
 
     else:
 # have to import the device and create place in dict   
-        try :
-            mpt = Taco.esrf_import(locname)
+        mpt = Taco.esrf_import(locname)
 # create in Tab_dev 
-            Tab_dev[locname] = {}
-            Tab_dev[locname]['cobj'] = mpt
-            Tab_dev[locname]['ref'] = 1
-            Tab_dev[locname]['cmd'] = dev_query(locname)
-        except Taco.error:
-            raise (Dev_Exception, sys.exc_value)
+        Tab_dev[locname] = {}
+        Tab_dev[locname]['cobj'] = mpt
+        Tab_dev[locname]['ref'] = 1
+        Tab_dev[locname]['cmd'] = dev_query(locname)
 
     if Dev_deb[0] == 1:      
         print ('dev_init: leaving OK')
@@ -194,15 +191,12 @@ def dev_initC(mdevname):
 
     else:
 # have to import the device and create place in dict   
-        try :
-            mpt = Taco.esrf_dc_import(locname)
+        mpt = Taco.esrf_dc_import(locname)
 # create in Tab_devC 
-            Tab_devC[locname] = {}
-            Tab_devC[locname]['cobj'] = mpt
-            Tab_devC[locname]['ref'] = 1
-            Tab_devC[locname]['cmd'] = dev_queryC(locname)
-        except Taco.error:
-            raise (Dev_Exception, sys.exc_value)
+        Tab_devC[locname] = {}
+        Tab_devC[locname]['cobj'] = mpt
+        Tab_devC[locname]['ref'] = 1
+        Tab_devC[locname]['cmd'] = dev_queryC(locname)
 
     if Dev_deb[0] == 1:      
         print ('dev_initC: leaving OK')
@@ -270,11 +264,8 @@ def dev_query(mdevname):
     """
     if Tab_dev.has_key(mdevname):
         loc_c_pt = Tab_dev[mdevname]['cobj']
-        try:
-            locdict = Taco.esrf_query(loc_c_pt)
-            return locdict
-        except Taco.error:
-            raise (Dev_Exception, sys.exc_value)
+        locdict = Taco.esrf_query(loc_c_pt)
+        return locdict
     else:
         print ("dev_query: no device %s defined" % mdevname)
         return None
@@ -293,11 +284,8 @@ def dev_queryC(mdevname):
       		cmd: command numeric value
  		out_type: output type
     """
-    try:
-        locdict = Taco.esrf_dc_info(mdevname)
-        return locdict
-    except Taco.error:
-        raise (Dev_Exception, sys.exc_value)
+    locdict = Taco.esrf_dc_info(mdevname)
+    return locdict
    
 def dev_tcpudp(mdevname, mode):
     """
@@ -316,10 +304,7 @@ def dev_tcpudp(mdevname, mode):
         if (mode != "tcp") and (mode != "udp"):
             print ('usage: dev_tcpudp(<device_name>,udp|tcp)')
             return 0
-        try:
-            return Taco.esrf_tcpudp(loc_c_pt, mode)
-        except Taco.error:
-            raise (Dev_Exception, sys.exc_value)
+        return Taco.esrf_tcpudp(loc_c_pt, mode)
     else:
         print ("dev_tcpudp: no device %s defined" % mdevname)
     return 0
@@ -343,18 +328,12 @@ def dev_timeout(mdevname, *mtime):
             print (loc_c_pt)
         if (mtime == ()):
             print ('dev_timeout readmode ')
-            try:
-                return Taco.esrf_timeout(loc_c_pt)
-            except Taco.error:
-                raise (Dev_Exception, sys.exc_value)
+            return Taco.esrf_timeout(loc_c_pt)
         else:
             itime = mtime[0]
             if (type(itime) == type(0)) or (type(itime) == type(2.4)):
                 print ('dev_timeout set mode %f' % itime)
-                try:
-                    return Taco.esrf_timeout(loc_c_pt, itime)
-                except:
-                    raise (Dev_Exception, sys.exc_value)
+                return Taco.esrf_timeout(loc_c_pt, itime)
     else:
         print ("dev_timeout: no device %s defined" % mdevname)
     return 0
@@ -369,13 +348,10 @@ def dev_getresource(mdevname, resname):
  	- resource value if OK
  	- None if error
     """
-    try:
-        ret = Taco.esrf_getresource(mdevname, resname)
-        if (Dev_deb[0] == 1):
-            print ("string length is %s" % len(ret))
-        return ret
-    except Taco.error:
-        raise (Dev_Exception, sys.exc_value)
+    ret = Taco.esrf_getresource(mdevname, resname)
+    if (Dev_deb[0] == 1):
+        print ("string length is %s" % len(ret))
+    return ret
 
 def dev_putresource(mdevname, resname, value):
     """
@@ -391,10 +367,7 @@ def dev_putresource(mdevname, resname, value):
     """
     if type(value) != type("a"):
         print ("dev_putresource: resource value must be packed as string")
-    try:
-        return Taco.esrf_putresource(mdevname, resname, value)
-    except Taco.error:
-        raise (Dev_Exception, sys.exc_value)
+    return Taco.esrf_putresource(mdevname, resname, value)
    
 def dev_delresource(mdevname, resname):
     """
@@ -407,11 +380,7 @@ def dev_delresource(mdevname, resname):
  	- 1: OK
  	- 0: error
     """
-    try:
-        return Taco.esrf_delresource(mdevname, resname)
-    except Taco.error:
-        raise (Dev_Exception, sys.exc_value)
-   
+    return Taco.esrf_delresource(mdevname, resname)
       
 def dev_io(mdevname, mdevcommand, *parin, **keyword):
     """
@@ -455,10 +424,7 @@ def dev_io(mdevname, mdevcommand, *parin, **keyword):
                 print (parin2)
                 print ('esrf_io dict:')
                 print (keyword)
-            try:
-                return apply(Taco.esrf_io, parin2, keyword)
-            except Taco.error:
-                raise (Dev_Exception, sys.exc_value)
+            return apply(Taco.esrf_io, parin2, keyword)
         else:
             print ("dev_io: no command %s for device %s" % (mdevcommand,
                                                             mdevname))
@@ -505,13 +471,10 @@ def dev_ioC(mdevname, mdevcommand, **keyword):
                 print (parin2)
                 print ('esrf_io dict:')
                 print (keyword)
-            try:
-                ret = apply(Taco.esrf_io, parin2, keyword)
-                if Dev_deb[0] == 1:
-                    print ('returned from esrf_io: %s' % ret)
-                return ret
-            except Taco.error:
-                raise (Dev_Exception, sys.exc_value)
+            ret = apply(Taco.esrf_io, parin2, keyword)
+            if Dev_deb[0] == 1:
+                print ('returned from esrf_io: %s' % ret)
+            return ret
         else:
             print ("dev_ioC: no command %s for device %s" % (mdevcommand,
                                                              mdevname))

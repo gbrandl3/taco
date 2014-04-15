@@ -1,4 +1,4 @@
 #!/usr/bin/env python
-import TacoDevice
+from TacoDevice import TacoDevice, Dev_Exception
 
-d = TacoDevice.TacoDevice('//localhost/test/a/1')
+d = TacoDevice('//localhost/test/a/1')

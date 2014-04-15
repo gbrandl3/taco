@@ -40,6 +40,16 @@ Goodbye //localhost/test/a/1
 ]])
 AT_CLEANUP
 
+AT_SETUP([Dev_Exception])
+AT_SKIP_IF([test x$check_python != xyes])
+AT_CHECK([taco python t4.py 2>/dev/null | sed 's/^\([[A-Z]][[a-z]]\{2\} \)\{2\}[[0-9]]\{2\} \([[0-9]]\{2\}:\)\{2\}[[0-9]]\{2\} [[0-9]]\{4\} //g'],
+[], [[Welcome //localhost/test/test/test
+Device not defined in the database
+import failed in dev_import
+Goodbye //localhost/test/test/test
+]])
+AT_CLEANUP
+
 AT_SETUP([Get command list])
 AT_SKIP_IF([test x$check_python != xyes])
 AT_CHECK([taco python t3.py], [], [[Welcome //localhost/test/a/1
