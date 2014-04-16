@@ -192,6 +192,7 @@ RES_BASE_DIR=`pwd` taco db_update test_server.res
 AT_TACO_RUN_LOCAL([test_server 1 -m -d])
 sleep 5
 AT_TACO_RUN_LOCAL([test_connect test/a/1])
+AT_TACO_RUN_LOCAL([test_client test/a/1 2>&1 |sed 's/\([A-Z][a-z]\{2\} \)\{2\}[0-9]\{2\} \([0-9]\{2\}:\)\{2\}[0-9]\{2\} [0-9]\{4\} //g'])
 AT_TACO_RUN_TEST([off test_server >>log 2>&1])
 sleep 1
 ], [], [Set protocol to TCP
@@ -204,6 +205,18 @@ Query commands
              8       0       6                        "DevStatus"
 Query events
     4228120578           3                        "HeartBeat"
+8188 Elements
+A Z
+B Y
+C X
+D W
+E V
+F U
+G T
+H S
+I R
+J Q
+using UDP : RPC client call failed
 ])
 AT_CLEANUP
 ])

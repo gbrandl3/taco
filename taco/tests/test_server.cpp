@@ -52,7 +52,7 @@ TestDevice::TestDevice(const std::string name, DevLong &error)
 		DeviceCommandListEntry(DevOn, &Device::On, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevOn"),
 		DeviceCommandListEntry(DevOff, &Device::Off, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevOff"),
 		DeviceCommandListEntry(DevReset, &Device::Reset, D_VOID_TYPE, D_VOID_TYPE, WRITE_ACCESS, "DevReset"),
-		DeviceCommandListEntry(SendByteArray, (DeviceMemberFunction)&TestDevice::tacoSendByteArray, D_VOID_TYPE, D_VAR_CHARARR, WRITE_ACCESS, "SendByteArray"),
+		DeviceCommandListEntry(SendByteArray, (DeviceMemberFunction)&TestDevice::tacoSendByteArray, D_VOID_TYPE, D_VAR_CHARARR, READ_ACCESS, "SendByteArray"),
 		};
 	static long n_commands = sizeof(commands_list) / sizeof(DeviceCommandListEntry);
 //

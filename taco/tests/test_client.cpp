@@ -105,7 +105,7 @@ int main(int argc,char **argv)
 			std::cout << arr.sequence[i] << " " << arr.sequence[arr.length - 1 -i] << std::endl;
 	}
 	else
-		std::cerr << dev_error_str(error) << std::endl;
+		std::cerr << "using TCP : " << dev_error_str(error) << std::endl;
 	if (dev_rpc_protocol(ps, D_UDP, &error) != DS_OK)
 		return 1;
 	if (dev_putget(ps, SendByteArray, NULL, D_VOID_TYPE, &arr, D_VAR_CHARARR, &error) == DS_OK)
@@ -115,7 +115,7 @@ int main(int argc,char **argv)
 			std::cout << arr.sequence[i] << " " << arr.sequence[arr.length - 1 - i] << std::endl;
 	}
 	else
-		std::cerr << dev_error_str(error) << std::endl;
+		std::cerr << "using UDP : " << dev_error_str(error) << std::endl;
 	return 0;
 }
 
