@@ -353,8 +353,8 @@ static PyObject *esrf_getresource(PyObject *self, PyObject *args)
 
 			/* free allocated memory */
 			for (i = 0; i < res_array.length; ++i)
-				free (res_array.sequence[i]);
-			free (res_array.sequence);
+				free(res_array.sequence[i]);
+			free(res_array.sequence);
 			return mylist;
 		}
 	}
@@ -444,7 +444,7 @@ static PyObject *esrf_delresource(PyObject *self, PyObject *args)
 		printf("resource name: %s\n", resname);
 	}
 
-	if ( db_delresource(devname, &resname, res_num, &error) != 0)
+	if (db_delresource(devname, &resname, res_num, &error) != 0)
 	{
 		printf("error deleting resource for device %s: resource %s\n",
 			devname, resname);
@@ -566,7 +566,7 @@ static PyObject *esrf_timeout(PyObject *self, PyObject *args)
 	{
 		/* set mode choosen */
 		dev_timeout.tv_sec = (unsigned long)(int)mytime;
-		dev_timeout.tv_usec = (long) ((mytime - (int)mytime) * 1e6);
+		dev_timeout.tv_usec = (long)((mytime - (int)mytime) * 1e6);
 		if (flag != 0)
 			printf("-- esrf_timeout: set mode : %d %d\n", dev_timeout.tv_sec,
       						   dev_timeout.tv_usec);
@@ -1171,9 +1171,9 @@ static PyObject* esrf_io(PyObject *self, PyObject *args, PyObject *kwarg)
 		thread_state = PyEval_SaveThread();
 		ret = dev_putget(*ds, ds_cmd, ds_argin, ds_in, ds_argout, ds_out, &error);
 		/*
-		 * Acquire the global interpreter lock and restore the tread state
+		 * Acquire the global interpreter lock and restore the thread state
 		 */
-		PyEval_RestoreThread (thread_state);
+		PyEval_RestoreThread(thread_state);
 
 		if (flag != 0)
 			printf("   from dev_putget (%d)\n", ret);
@@ -1252,7 +1252,7 @@ static PyObject* esrf_io(PyObject *self, PyObject *args, PyObject *kwarg)
 			/* convert python object in ds_argout */
 			if ((ret = get_argout_special(ds_argout, ds_out, &mylist, mymsg)) != 0)
 			{
-				free_argout ((DevType)ds_out, ds_argout);
+				free_argout((DevType)ds_out, ds_argout);
 				onError(mymsg)
 			}
 			if (flag != 0)
@@ -1315,7 +1315,7 @@ static PyObject* esrf_io(PyObject *self, PyObject *args, PyObject *kwarg)
 			((DevVarCharArray*)(ds_argout))->length * mylen);
 
 		/* now, generate the Numeric array */
-		dimension[0]= (int)(((DevVarCharArray*)(ds_argout))->length);
+		dimension[0] = (int)(((DevVarCharArray*)(ds_argout))->length);
 		myarray = (PyArrayObject *)PyArray_FromDimsAndData(1, dimension, (int)type_num, array_2py);
 
 		free_argout((DevType)ds_out, ds_argout);
