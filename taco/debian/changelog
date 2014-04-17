@@ -2,6 +2,7 @@ taco (3.99.180) unstable; urgency=low
 
   * [PYTHON] Code clean up
   * [TEST] Fix some issues in the testsuite
+  * [TEST] Add some tests for the python bindings
 
  -- Jens Krüger <jens.krueger@frm2.tum.de>  Wed, 16 Apr 2014 12:55:00 +0200
 

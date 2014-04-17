@@ -19,7 +19,7 @@
 
 SUBDIRS			= ## testserver
 
-EXTRA_DIST 		= taco.in t1.py t2.py t3.py t4.py
+EXTRA_DIST 		= taco.in t1.py t2.py t3.py t4.py t5.py t6.py
 
 CLEANFILES 		= log taco
 

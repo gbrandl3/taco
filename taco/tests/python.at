@@ -59,4 +59,21 @@ Goodbye //localhost/test/a/1
 ]])
 AT_CLEANUP
 
+AT_SETUP([Check On, Off, and Reset])
+AT_SKIP_IF([test x$check_python != xyes])
+AT_CHECK([taco python t6.py], [], [[Welcome //localhost/test/a/1
+Goodbye //localhost/test/a/1
+ *** calling C dev_free routine
+]])
+AT_CLEANUP
+
+AT_SETUP([Read char array])
+AT_SKIP_IF([test x$check_python != xyes])
+AT_CHECK([taco python t5.py], [], [[Welcome //localhost/test/a/1
+[65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90]
+Goodbye //localhost/test/a/1
+ *** calling C dev_free routine
+]])
+AT_CLEANUP
+
 ])
