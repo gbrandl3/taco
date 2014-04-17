@@ -21,6 +21,7 @@ export V=$(DH_VERBOSE)
 
 
 override_dh_auto_configure:
+	./autogen.sh
 	dh_auto_configure -- --prefix=/opt/taco --enable-sqlite3 --enable-gdbm --enable-mysql --enable-python --enable-ext DESTDIR=/opt/taco
 
 override_dh_auto_test:
