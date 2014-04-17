@@ -571,17 +571,17 @@ class TacoDevice:
         self.command = name
         if Dev_deb[0] == 1:
             print (name)
-        return self.device_io
+        return lambda *args, **kwargs: self.device_io(name, *args, **kwargs)
       
-    def device_io(self, *par, **keyw):
+    def device_io(self, command, *par, **kw):
         """ execution of a TACO command """
         if Dev_deb[0] == 1:
             print ('in device_io')
-        parin = (self.devname, self.command) + par
+        parin = (self.devname, command) + par
         if Dev_deb[0] == 1:
             print (parin)
-            print (keyw)
-        return apply(dev_io, parin, keyw)
+            print (kw)
+        return dev_io(*parin, **kw)
 
 
 class TacoDeviceC:
