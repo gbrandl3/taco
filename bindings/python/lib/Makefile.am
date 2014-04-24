@@ -26,9 +26,9 @@ Taco_la_LDFLAGS 	= -module
 
 AM_CPPFLAGS 		= @TACO_INCLUDES@ @PYTHON_CPPFLAGS@ @PYTHON_CPPFLAGS@
 
-Server_la_LIBADD 	= $(top_builddir)/lib/libtaco.la $(top_builddir)/lib/xdr/libdsxdr_all.la @PYTHON_LDFLAGS@
+Server_la_LIBADD 	= $(top_builddir)/lib/libtaco.la @PYTHON_LDFLAGS@
 
-Taco_la_LIBADD 		= $(top_builddir)/lib/libtaco.la $(top_builddir)/lib/xdr/libdsxdr_all.la @PYTHON_LDFLAGS@
+Taco_la_LIBADD 		= $(top_builddir)/lib/libtaco.la @PYTHON_LDFLAGS@
 
 AM_CPPFLAGS 		+= -DMYDEB -DNUMPY
 
