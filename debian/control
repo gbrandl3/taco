@@ -27,7 +27,7 @@ Homepage: http://trac.frm2.tum.de/redmine/projects/taco
 Package: taco-dev
 Section: libdevel
 Architecture: any
-Depends: taco (= ${binary:Version}), liblog4cpp5-dev, frm2-libtool
+Depends: taco (= ${binary:Version}), liblog4cpp5-dev
 Description: Development files for the taco package.
 
 Package: taco
