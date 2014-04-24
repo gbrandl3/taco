@@ -191,7 +191,7 @@ longest_testserver_SOURCES = test_server.cpp
 longest_testserver_LDADD = @TACO_SERVER_CXX_LIBS@ -lstdc++
 
 if BUILD_EXT
-check_PROGRAMS		+= TestExtServer ExtServerClient TestExtClient TestExtClient2
+check_PROGRAMS		+= TestExtServer ExtServerClient TestExtClient TestExtClient2 TestExtClient3
 
 TestExtServer_CPPFLAGS  = -I$(top_srcdir)/ext/include ${AM_CPPFLAGS} -DTACO_EXT
 TestExtServer_SOURCES	= TestExtServer.cpp TestExtServerStartup.cpp
@@ -212,6 +212,11 @@ TestExtClient2_SOURCES 	= TestExtClient2.cpp
 TestExtClient2_CPPFLAGS = -I$(top_srcdir)/ext/include ${AM_CPPFLAGS} -DTACO_EXT
 TestExtClient2_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/src/libTACOExtensions.la
 TestExtClient2_LDFLAGS	= -no-install
+
+TestExtClient3_SOURCES 	= TestExtClient3.cpp
+TestExtClient3_CPPFLAGS = -I$(top_srcdir)/ext/include ${AM_CPPFLAGS} -DTACO_EXT
+TestExtClient3_LDADD	= @TACO_CLIENT_CXX_LIBS@ -lstdc++ $(top_builddir)/ext/src/libTACOExtensions.la
+TestExtClient3_LDFLAGS	= -no-install
 
 endif
 
