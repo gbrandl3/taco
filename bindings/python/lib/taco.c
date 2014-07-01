@@ -173,7 +173,7 @@ static PyObject *esrf_debug(PyObject *self, PyObject *args, PyObject *kwarg)
 {
 	static char *kwlist[] = {"flag", NULL};
 	/* get the flag value */
-	if (!PyArg_ParseTupleAndKeywords(args, kwarg, "d", kwlist, &flag))
+	if (!PyArg_ParseTupleAndKeywords(args, kwarg, "l", kwlist, &flag))
 		onError("usage: esrf_debug(flag=0|1)")
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -1552,35 +1552,35 @@ static PyObject *esrf_dc_info(PyObject *self, PyObject *args)
 
 ***************************************************************/
 static struct PyMethodDef Taco_methods[] = {
-	{"esrf_import",	esrf_import, 1,
+	{"esrf_import",	esrf_import, METH_VARARGS,
 	PyDoc_STR("esrf_import(device_name)")},
-	{"esrf_query",	esrf_query, 1,
+	{"esrf_query",	(PyCFunction)esrf_query, (METH_VARARGS | METH_KEYWORDS),
 	PyDoc_STR("esrf_query(C_obj)")},
-	{"esrf_tcpudp",	esrf_tcpudp, 1,
+	{"esrf_tcpudp",	esrf_tcpudp, METH_VARARGS,
 	PyDoc_STR("esrf_tcpudp(C_obj, \"tcp\"|\"udp\")")},
-	{"esrf_timeout", esrf_timeout, 1,
+	{"esrf_timeout", esrf_timeout, METH_VARARGS,
 	PyDoc_STR("esrf_timeout(C_obj[, time_in_sec])")},
-	{"esrf_getdevlist", esrf_getdevlist, 1,
+	{"esrf_getdevlist", esrf_getdevlist, METH_VARARGS,
 	PyDoc_STR("esrf_getdevlist(server_name)")},
-	{"esrf_getdevexp", esrf_getdevexp, 1,
+	{"esrf_getdevexp", esrf_getdevexp, METH_VARARGS,
 	PyDoc_STR("esrf_getdevexp(filter='*/*/*')")},
-	{"esrf_getresource", esrf_getresource, 1,
+	{"esrf_getresource", esrf_getresource, METH_VARARGS,
 	PyDoc_STR("esrf_getresource(devname, resname)")},
-	{"esrf_putresource", esrf_putresource, 1,
+	{"esrf_putresource", esrf_putresource, METH_VARARGS,
 	PyDoc_STR("esrf_putresource(devname, resname, value)")},
-	{"esrf_delresource", esrf_delresource, 1,
+	{"esrf_delresource", esrf_delresource, METH_VARARGS,
 	PyDoc_STR("esrf_delresource(devname, resname)")},
-	{"esrf_io", (PyCFunction)esrf_io, 1|2,
+	{"esrf_io", (PyCFunction)esrf_io, (METH_VARARGS | METH_KEYWORDS),
 	PyDoc_STR("esrf_io(cds=C_obj, cmds=cmd_string, cmd=cmd, typein=in_type, typeout=out_type, dc=dc_flag, parin=input_param[, out=xx][, outtype=xx])")},
-	{"esrf_debug", esrf_debug, 1,
+	{"esrf_debug", (PyCFunction)esrf_debug, (METH_VARARGS | METH_KEYWORDS),
 	PyDoc_STR("esrf_debug(0|1)")},
-	{"esrf_dc_info", esrf_dc_info, 1,
+	{"esrf_dc_info", esrf_dc_info, METH_VARARGS,
 	PyDoc_STR("esrf_dc_info([device])")},
-	{"esrf_dc_import", esrf_dc_import,  1,
+	{"esrf_dc_import", esrf_dc_import, METH_VARARGS,
 	PyDoc_STR("esrf_dc_import(device_name)")},
-	{"db_getresource", esrf_getresource, 1,
+	{"db_getresource", esrf_getresource, METH_VARARGS,
 	PyDoc_STR("db_getresource(devname, resname)")},
-	{"db_putresource", esrf_putresource, 1,
+	{"db_putresource", esrf_putresource, METH_VARARGS,
 	PyDoc_STR("db_putresource(devname, resname, value)")},
 	{NULL,	NULL}
 };
