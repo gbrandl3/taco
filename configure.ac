@@ -16,7 +16,7 @@ dnl You should have received a copy of the GNU Lesser General Public
 dnl License along with this library; if not, write to the Free Software
 dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_INIT([TACO], [3.99.182], [taco-devel@lists.sourceforge.net], [], [http://sf.net/projects/taco])
+AC_INIT([TACO], [3.99.183], [taco-devel@lists.sourceforge.net], [], [http://sf.net/projects/taco])
 AC_PREREQ([2.62])
 AC_REVISION($Revision: 1.134 $)dnl
 AC_COPYRIGHT([(C) 1990-2014 ESRF])
@@ -68,12 +68,13 @@ AC_SEARCH_LIBS(nanosleep, [c rt c_r])
 AC_SEARCH_LIBS(inet_pton, [c socket nsl])
 
 sbin_dir=`eval "echo $sbindir"`
-if test x"$prefix" = x"NONE" -a x"$sbin_dir" = x"NONE/sbin"; then
-	sbin_dir=`echo $sbin_dir| sed -e s%NONE/%%`
+AS_IF([test x"$prefix" = x"NONE" -a x"$sbin_dir" = x"NONE/sbin"],
+      [ sbin_dir=`echo $sbin_dir| sed -e s%NONE/%%`
 	sbin_dir="${ac_default_prefix}/${sbin_dir}"
-else
+      ],
+      [
 	sbin_dir="$sbindir"
-fi
+      ])
 AC_SUBST(sbin_dir)
 AC_CONFIG_COMMANDS([pathes.h], [echo '#define sbindir "'${sbin_dir}'"' > pathes.h], [sbin_dir=$sbin_dir]) 
 
