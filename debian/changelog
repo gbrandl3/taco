@@ -1,3 +1,10 @@
+taco (3.99.185) UNRELEASED; urgency=low
+
+  * [Python] Fix another 32/64 bit issue related with the Dev(U)Long data
+  * Add missing debian changelog
+
+ -- Jens Krüger <jkrueger@taco61.ictrl.frm2>  Mon, 07 Jul 2014 16:27:07 +0200
+
 taco (3.99.184) UNRELEASED; urgency=low
 
   * [deb] Change the sysconfdir to '/etc'
