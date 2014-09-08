@@ -1424,6 +1424,8 @@ long _DLLFunc taco_dev_free(devserver ds, DevLong *error)
 	char			*hstring,
 				*name,
 				*host;
+	if (ds == NULL)
+		return (DS_OK);
 /*
  * in a "stateless" import if the device was never imported
  * then simply free the _devserver structure and return

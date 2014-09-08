@@ -193,23 +193,33 @@ void TACO::Client::disconnectClient() throw (::TACO::Exception)
 	{
 		mServerTypes.clear();
 		DevLong e;
+		DevLong res;
 		if (mPseudo)
 		{
 			DevLong dc_error;
 			dc_dev_free d_free = {m_dc.dc_ptr, &dc_error};
 			pthread_mutex_lock(&::TACO::mMutex);
-			DevLong res = dc_free(&d_free, 1, &e);
+			res = dc_free(&d_free, 1, &e);
 			pthread_mutex_unlock(&::TACO::mMutex);
 			if (res != DS_OK)
+			{
+				mConnected = false;
 				throw ::TACO::Exception(e);
+			}
 		}
 		else
 		{
-			pthread_mutex_lock(&::TACO::mMutex);
-			DevLong res = dev_free( mDeviceHandle, &e);
-			pthread_mutex_unlock(&::TACO::mMutex);
-			if (res != DS_OK) {
-				throw ::TACO::Exception(e);
+			if (mDeviceHandle)
+			{
+				pthread_mutex_lock(&::TACO::mMutex);
+				res = dev_free( mDeviceHandle, &e);
+				pthread_mutex_unlock(&::TACO::mMutex);
+				if (res != DS_OK)
+				{
+					mDeviceHandle = 0;
+					mConnected = false;
+					throw ::TACO::Exception(e);
+				}
 			}
 			mDeviceHandle = 0;
 		}
