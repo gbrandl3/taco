@@ -1061,17 +1061,15 @@ long _DLLFunc db_import_multi (const char *nethost, DevLong *error)
  * which nethost to import the database from
  */
 	nethost_i = &(multi_nethost[i_nethost]);
-
 /*
  * check wether a database server is already imported
  */
-	if (nethost_i->config_flags.database_server)
+	if (nethost_i->config_flags.database_server && nethost_i->db_info && nethost_i->db_info->clnt)
 		return (DS_OK);
 /*
  * Create message server client handle with data from
  * global dbserver_info structure.
  */
-
 /* 
  * Create a client handle for version 3! 
  */
@@ -1466,6 +1464,14 @@ long db_ChangeDefaultNethost(const char* nethost, DevLong *error)
  */
 			return (DS_NOTOK);
 	}
+/*
+ * Network manager was available but not the database server.
+ * This occurs typically if the hostname command does not give the full qualified
+ * hostname. In this case try to import the database server again.
+ */
+	if (multi_nethost[i_nethost].db_info->clnt == NULL)
+		if (db_import_multi(multi_nethost[i_nethost].nethost, error) != DS_OK)
+			return (DS_NOTOK);
 /* 
  * set the default nethost vars from multi-nethost array 
  * HINT: some day, there should be a global index, and all
