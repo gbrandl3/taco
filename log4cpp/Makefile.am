@@ -16,6 +16,7 @@ pkgconfig_DATA = log4cpp.pc
 
 EXTRA_DIST = \
 	log4cpp.spec.in log4cpp.spec log4cpp.m4 \
+	log4cpp.pc.in log4cpp-config.in \
 	m4/ac_config_libconfig_in.m4 \
 	m4/ac_config_pkgconfig_in.m4 \
 	m4/AC_CREATE_PREFIX_CONFIG_H.m4 \
@@ -30,7 +31,7 @@ EXTRA_DIST = \
 
 .PHONY: check rpm docs doc-dist
 
-DISTCLEANFILES = log4cpp.pc.in log4cpp-config.in
+DISTCLEANFILES = log4cpp.pc log4cpp-config
 
 dist-hook:
 #	perl -pi -e 's/\n/\r\n/g' `find $(distdir) -name '*.ds?'`
