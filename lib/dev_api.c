@@ -659,7 +659,13 @@ long _DLLFunc taco_dev_import (char *dev_name, long access, devserver *ds_ptr, D
 		clnt        = svr_conns[n_svr_conn].clnt;
 		vers_number = svr_conns[n_svr_conn].vers_number;
 
-		clnt_stat = clnt_call (clnt, NULLPROC, (xdrproc_t)xdr_void,  NULL,
+		if (clnt == NULL)
+		{
+			dev_printerror (SEND,"%s", "Reused client points to NULL");
+			clnt_stat = RPC_FAILED;
+		}
+		else
+			clnt_stat = clnt_call (clnt, NULLPROC, (xdrproc_t)xdr_void,  NULL,
 				    (xdrproc_t)xdr_void,  NULL, TIMEVAL(timeout));
 #ifndef WIN32
 		signal(SIGPIPE, oldsighandler);
@@ -1523,11 +1529,20 @@ long _DLLFunc taco_dev_free(devserver ds, DevLong *error)
 
 		if (clnt_stat != RPC_SUCCESS)
 		{
+/*
+ * Set the connection state to bad to try to reconnect to the server to remove the
+ * device. This is needed if the server is not available anymore or was down between
+ * creation and deleting device connection.
+ */
+			svr_conns[ds->no_svr_conn].rpc_conn_status = BAD_SVC_CONN;
+			status = check_rpc_connection(ds, error);
+#if 0
 			if (clnt_stat == RPC_TIMEDOUT)
 				*error = DevErr_RPCTimedOut;
 			else
 				*error = DevErr_RPCFailed;
 			status = DS_NOTOK;
+#endif
 		}
 		else if (dev_free_out.status == DS_NOTOK)
 		{

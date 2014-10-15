@@ -1,21 +1,31 @@
+taco (v3.99.188) UNRELEASED; urgency=low
+
+  * Update changelog
+  * [log4cpp] Fix handling of the log4cpp configuration files
+  * [log4cpp] Put the autogen.sh script to the distribution
+  * FIX: automatic reconnect to the database server
+  * FIX: freeing device with closed/reopenend network connection.
+
+ -- Jens Krüger <jkrueger@tum.frm2>  Fri, 24 Oct 2014 09:32:07 +0200
+
 taco (3.99.186) UNRELEASED; urgency=low
 
   * FIX: double freed device client
 
- -- Jens Krüger <jkrueger@taco61.ictrl.frm2>  Wed, 15 Oct 2014 09:38:24 +0200
+ -- Jens Krüger <jkrueger@tum.frm2>  Wed, 15 Oct 2014 09:38:24 +0200
 
 taco (3.99.185) UNRELEASED; urgency=low
 
   * [Python] Fix another 32/64 bit issue related with the Dev(U)Long data
   * Add missing debian changelog
 
- -- Jens Krüger <jkrueger@taco61.ictrl.frm2>  Mon, 07 Jul 2014 16:27:07 +0200
+ -- Jens Krüger <jkrueger@tum.frm2>  Mon, 07 Jul 2014 16:27:07 +0200
 
 taco (3.99.184) UNRELEASED; urgency=low
 
   * [deb] Change the sysconfdir to '/etc'
 
- -- Jens Krüger <jkrueger@taco61.ictrl.frm2>  Fri, 04 Jul 2014 14:24:58 +0200
+ -- Jens Krüger <jkrueger@tum.frm2>  Fri, 04 Jul 2014 14:24:58 +0200
 
 taco (3.99.183) UNRELEASED; urgency=low
 
@@ -24,13 +34,13 @@ taco (3.99.183) UNRELEASED; urgency=low
 
   [ Jens Krüger ]
 
- -- Jens Krüger <jkrueger@taco61.ictrl.frm2>  Fri, 04 Jul 2014 14:00:28 +0200
+ -- Jens Krüger <jkrueger@tum.frm2>  Fri, 04 Jul 2014 14:00:28 +0200
 
 taco (3.99.182) UNRELEASED; urgency=low
 
   * [PYTHON] The handling of keywords was not correctly implemented
 
- -- Jens Krüger <jkrueger@taco61.ictrl.frm2>  Tue, 01 Jul 2014 14:40:23 +0200
+ -- Jens Krüger <jkrueger@tum.frm2>  Tue, 01 Jul 2014 14:40:23 +0200
 
 taco (3.99.181) unstable; urgency=low
 
