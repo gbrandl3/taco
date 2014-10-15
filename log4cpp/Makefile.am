@@ -15,6 +15,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = log4cpp.pc
 
 EXTRA_DIST = \
+	autogen.sh \
 	log4cpp.spec.in log4cpp.spec log4cpp.m4 \
 	log4cpp.pc.in log4cpp-config.in \
 	m4/ac_config_libconfig_in.m4 \
