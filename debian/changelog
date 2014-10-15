@@ -1,3 +1,9 @@
+taco (3.99.186) UNRELEASED; urgency=low
+
+  * FIX: double freed device client
+
+ -- Jens Krüger <jkrueger@taco61.ictrl.frm2>  Wed, 15 Oct 2014 09:38:24 +0200
+
 taco (3.99.185) UNRELEASED; urgency=low
 
   * [Python] Fix another 32/64 bit issue related with the Dev(U)Long data
