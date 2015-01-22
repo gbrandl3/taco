@@ -374,6 +374,17 @@ TACO::ResourceInfoSet TACO::Client::deviceQueryResourceInfo() throw (::TACO::Exc
 	return r;
 }
 
+std::string TACO::Client::logLevel(void) throw (::TACO::Exception)
+{
+	return execute<std::string>(::TACO::Command::LOGLEVEL);
+}
+
+void TACO::Client::setLogLevel(const std::string &level) throw (::TACO::Exception)
+{
+	if (!mPseudo)
+		return execute<void>(::TACO::Command::SET_LOGLEVEL, level);
+}
+
 DevLong TACO::Client::eventListen( DevEvent event, ::TACO::EventHandler* handler, void* userData) throw (::TACO::Exception)
 {
 	checkConnection();

@@ -21,13 +21,18 @@
 #	include "config.h"
 #endif
 
-#include <TACOBasicCommands.h>
-#include <TACOConverters.h>
-#include <TACOStringConverters.h>
+#include "TACOBasicCommands.h"
+#include "TACOConverters.h"
+#include "TACOStringConverters.h"
 
-#include <TACOServer.h>
+#include "TACOServer.h"
 
-#include <private/ApiP.h>
+#include "private/ApiP.h"
+
+#include <log4cpp/Priority.hh>
+#include "log4taco.h"
+
+#include <algorithm>
 
 std::string TACO::Server::sServerName;
 std::string TACO::Server::sStringBuffer;
@@ -51,6 +56,8 @@ TACO::Server::Server( const std::string& name, DevLong& error) throw (TACO::Exce
 	addCommand( Command::DEVICE_UPDATE_RESOURCE, &tacoDeviceUpdateResource, D_VAR_CHARARR, D_VOID_TYPE, SI_WRITE_ACCESS, "Device Update Resources");
 	addCommand( Command::DEVICE_UPDATE, &tacoDeviceUpdate, D_VOID_TYPE, D_VOID_TYPE, SI_SU_ACCESS, "Device Update");
 	addCommand( Command::DEVICE_QUERY_RESOURCE_INFO, &tacoDeviceQueryResourceInfo, D_VOID_TYPE, D_VAR_CHARARR, READ_ACCESS, "Device Query Resource Info");
+	addCommand( Command::LOGLEVEL, &tacoLogLevel, D_VOID_TYPE, D_VAR_CHARARR, READ_ACCESS, "Get Logging Level");
+	addCommand( Command::SET_LOGLEVEL, &tacoSetLogLevel, D_VAR_CHARARR, D_VOID_TYPE, WRITE_ACCESS, "Set Logging Level");
 	setDeviceState(State::DEVICE_OFF);
 //	setServerName("TACO::Server");
 }
@@ -175,6 +182,8 @@ bool TACO::Server::stateMachine( DevShort state, DevCommand command) throw (TACO
 		case Command::DEVICE_RESET:
 		case Command::DEVICE_TYPES:
 		case Command::DEVICE_INIT:
+		case Command::LOGLEVEL:
+		case Command::SET_LOGLEVEL:
 			return true;
 		default:
 			return false;
@@ -193,6 +202,8 @@ bool TACO::Server::stateMachine( DevShort state, DevCommand command) throw (TACO
 		case Command::DEVICE_UPDATE:
 		case Command::DEVICE_QUERY_RESOURCE_INFO:
 		case Command::DEVICE_INIT:
+		case Command::LOGLEVEL:
+		case Command::SET_LOGLEVEL:
 			return true;
 		default:
 			return false;
@@ -277,6 +288,25 @@ void TACO::Server::setServerName(const std::string &serverName) throw (::TACO::E
 void TACO::Server::setDeviceVersion( const std::string& version) throw (TACO::Exception)
 {
 	mVersion = version;
+}
+
+void TACO::Server::setLogLevel( const std::string& level) throw (TACO::Exception)
+{
+	std::string tmp(level);
+	std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::toupper);
+	try
+	{
+		logStream->setPriority(log4cpp::Priority::getPriorityValue(tmp));
+	}
+	catch (const std::invalid_argument &e)
+	{
+		throw_exception(::TACO::Exception(::TACO::Error::INVALID_VALUE, e.what()));
+	}
+}
+
+std::string TACO::Server::logLevel(void) throw (TACO::Exception)
+{
+	return std::string(log4cpp::Priority::getPriorityName(logStream->getChainedPriority()));
 }
 
 const std::vector<std::string>& TACO::Server::deviceTypes() throw (TACO::Exception)
@@ -434,4 +464,15 @@ void TACO::Server::tacoDeviceQueryResourceInfo( TACO::Server* server, DevArgumen
 	sStringBuffer.erase();
 	sStringBuffer << server->mResourceInfoSet;
 	assign( static_cast<DevVarCharArray*>( argout), sStringBuffer);
+}
+
+void TACO::Server::tacoLogLevel( TACO::Server* server, DevArgument argin, DevArgument argout) throw (TACO::Exception)
+{
+	assign( static_cast<DevVarCharArray*>( argout), server->logLevel());
+}
+
+void TACO::Server::tacoSetLogLevel( TACO::Server* server, DevArgument argin, DevArgument argout) throw (TACO::Exception)
+{
+	std::string input( convert( static_cast<DevVarCharArray*>( argin)));
+	server->setLogLevel(input);
 }

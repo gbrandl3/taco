@@ -425,6 +425,36 @@ public:
 	 */
 	CommandInfoMap deviceQueryCommandInfo() throw (::TACO::Exception) {return mCommandInfoMap;}
 
+	/**
+	 * Queries the current logging level of the TACO server instance, which exports the device.
+	 *
+	 * @return the current logging level of the whole server instance
+	 * @throw TACO::Exception in case of failure
+	 */
+	std::string logLevel(void) throw (::TACO::Exception);
+
+	/**
+	 * Sets the current logging level of the TACO server instance. It sets the level for all
+	 * devices for that running instance which provides the device.
+	 *
+	 * As values are the following strings allowed:
+	 *
+	 * 	- EMERG
+	 * 	- FATAL
+	 * 	- ALERT
+	 * 	- CRIT
+	 * 	- ERROR
+	 * 	- WARN
+	 * 	- NOTICE
+	 * 	- INFO
+	 * 	- DEBUG
+	 * 	- NOTSET
+	 *
+	 * @param loglevel string representing the logging level
+	 * @throw TACO::Exception in case of failure
+	 */
+	void setLogLevel(const std::string &) throw (::TACO::Exception);
+
 	//@}
 
 	/**

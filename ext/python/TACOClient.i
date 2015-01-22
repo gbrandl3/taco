@@ -277,6 +277,25 @@ setup of the constructor call or by last connect call") reconnectClient;
 
 %feature("docstring", "returns the process id of the server process") getServerProcessId;
 
+%feature("docstring", "returns the current set logging level of the TACO server, which exports the device") logLevel;
+
+%feature("docstring", \
+"Sets the logging level of the TACO server, which exports the device,
+which means that the level for all devices of the server will be changed!
+The allowed values for the levels are (the priority is decreasing):
+
+- EMERG (or FATAL)
+- ALERT
+- CRIT
+- ERROR
+- WARN
+- NOTICE
+- INFO
+- DEBUG
+
+The less the priority the more logging will be written, which could lead under bad conditions
+to a slow down of the server.") setLogLevel;
+
 %include <TACOClient.h>
 
 namespace std {

@@ -92,6 +92,12 @@ public:
 		return mName;
 	}
 
+	//! Returns the logging level
+	std::string logLevel(void) throw (Exception);
+
+	//! Sets the logging level of the device server
+	void setLogLevel(const std::string&) throw (Exception);
+
 	//! Sets the server name
 	static void setServerName(const std::string &name) throw (Exception);
 
@@ -547,6 +553,12 @@ private:
 
 	//! Device command function
 	static void tacoDeviceQueryResourceInfo( Server* server, DevArgument argin, DevArgument argout) throw (Exception);
+
+	//! Device command function
+	static void tacoLogLevel( Server* server, DevArgument argin, DevArgument argout) throw (Exception);
+
+	//! Device command function
+	static void tacoSetLogLevel( Server* server, DevArgument argin, DevArgument argout) throw (Exception);
 
 	//! Name of the server of this device
 	static std::string sServerName;

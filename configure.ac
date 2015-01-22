@@ -16,7 +16,7 @@ dnl You should have received a copy of the GNU Lesser General Public
 dnl License along with this library; if not, write to the Free Software
 dnl Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AC_INIT([TACO], [3.99.188], [taco-devel@lists.sourceforge.net], [], [http://sf.net/projects/taco])
+AC_INIT([TACO], [3.100.0], [taco-devel@lists.sourceforge.net], [], [http://sf.net/projects/taco])
 AC_PREREQ([2.62])
 AC_REVISION($Revision: 1.134 $)dnl
 AC_COPYRIGHT([(C) 1990-2014 ESRF])
@@ -35,7 +35,7 @@ dnl cancel the effect of Debian's patch here.
 link_all_deplibs=yes
 link_all_deplibs_CXX=yes
 
-AC_SUBST(LIB_VERSION, [17:3:0])
+AC_SUBST(LIB_VERSION, [18:0:1])
 
 TACO_CHECK_SIZEOF_TYPES
 

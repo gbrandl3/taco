@@ -35,7 +35,7 @@ namespace log4cpp {
          
         priority++;
         priority /= 100;
-        return names[((priority < 0) || (priority > 8)) ? 8 : priority];
+        return names[((priority < 0) || (priority > MESSAGE_SIZE)) ? MESSAGE_SIZE : priority];
     }
 
     Priority::Value Priority::getPriorityValue(const std::string& priorityName) 
