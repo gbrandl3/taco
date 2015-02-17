@@ -33,7 +33,10 @@ Description: Development files for the taco package.
 Package: taco
 Section: libs
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends},
+ libgdbm3,
+ libsqlite3-0,
+ libmysqlclient18
 Description: TACO is an object oriented control system.
  TACO is an object oriented control system originally developed at the European
  Synchrotron Radiation Facility (ESRF) to control accelerators and beamlines and
