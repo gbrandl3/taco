@@ -4,4 +4,5 @@ opt/taco/sbin/
 etc/
 opt/taco/share/taco/dbase/res
 opt/taco/share/taco/templates/taco_log.cfg etc/
+opt/taco/share/taco/templates/tacoenv.sh etc/
 opt/taco/share/taco/templates/taco.debian etc/init.d

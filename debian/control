@@ -27,7 +27,14 @@ Homepage: http://trac.frm2.tum.de/redmine/projects/taco
 Package: taco-dev
 Section: libdevel
 Architecture: any
-Depends: taco (= ${binary:Version}), liblog4cpp5-dev
+Depends: taco (= ${binary:Version}),
+ liblog4cpp5-dev,
+ libgdbm-dev,
+ libsqlite3-dev,
+ libmysqlclient-dev,
+ python-dev,
+ python-numpy,
+ liblog4cpp5-dev
 Description: Development files for the taco package.
 
 Package: taco
@@ -36,7 +43,10 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends},
  libgdbm3,
  libsqlite3-0,
- libmysqlclient18
+ libmysqlclient18,
+ python,
+ liblog4cpp5,
+ rpcbind
 Description: TACO is an object oriented control system.
  TACO is an object oriented control system originally developed at the European
  Synchrotron Radiation Facility (ESRF) to control accelerators and beamlines and

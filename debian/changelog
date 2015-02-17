@@ -1,4 +1,4 @@
-taco (v3.99.188) UNRELEASED; urgency=low
+taco (3.99.188) UNRELEASED; urgency=low
 
   * Update changelog
   * [log4cpp] Fix handling of the log4cpp configuration files

@@ -43,6 +43,7 @@ override_dh_install:
 	# add ld search path
 	mkdir -p etc/ld.so.conf.d
 	echo "/opt/taco/lib/${DEB_HOST_MULTIARCH}" > etc/ld.so.conf.d/taco.conf
+	# ln -s /etc/tacoenv.sh etc/profile.d/tacoenv.sh
 	
 	# List files that ar installed by the upstream build system
 	# but not part of the debian package.
