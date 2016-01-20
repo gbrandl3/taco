@@ -653,7 +653,20 @@ long tango_dev_putget(devserver ds, long cmd, void *argin, long argin_type,
 // it can be printed out with dev_error_str()
 //
 			tango_dev_error_string(tango_exception);
-			*error = DevErr_CommandFailed;
+
+			// some stupid hack to make the Tango serial line server
+			// work with SPEC!!
+
+			std::string reason = tango_exception.errors[0].reason.in();
+			if (reason.compare("Timeout Error") == 0)
+			{
+				*error = DevErr_DeviceTimedOut;
+			}
+			else
+			{
+				*error = DevErr_CommandFailed;
+			}
+
                 	return(DS_NOTOK);
         	}
 //
